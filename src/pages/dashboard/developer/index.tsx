@@ -1,18 +1,20 @@
 // import { Button, message, Input, Drawer } from 'antd';
 import React, { useRef } from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
-import {QueryFilter, ProFormText, ProFormDatePicker, ProFormDateRangePicker, ProFormSelect} from '@ant-design/pro-form';
+import {QueryFilter, ProFormDateRangePicker, ProFormSelect} from '@ant-design/pro-form';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { useRequest } from 'ahooks';
 import {ApolloClient, gql} from '@apollo/client';
-
-// import ProDescriptions, { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
-// import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import {GridApi, GridReadyEvent} from "ag-grid-community";
-import {useApolloClient} from "@/hooks";
+import {useApolloClient, useQuery} from "@/hooks";
 import moment from "moment";
+
+type FormStoreType = {
+  dateRange?: [string, string];
+  deptId?: number;
+}
 
 const queryUsers =async (client: ApolloClient<object>, value: FormStoreType = {}) => {
   let from = ""; let to = "";
@@ -24,10 +26,6 @@ const queryUsers =async (client: ApolloClient<object>, value: FormStoreType = {}
   } else {
     from = moment(dateRange[0]).valueOf().toString();
     to = moment(dateRange[1]).valueOf().toString();
-  }
-
-  if (deptId !== undefined) {
-
   }
 
   const rangeArgs = `from: "${from}", to: "${to}"`
@@ -60,12 +58,30 @@ query {
   return data?.developerView;
 };
 
-type FormStoreType = {
-  dateRange?: [string, string];
-  deptId?: number;
-}
-
 const DataFilter = ( { refresh }: { refresh: any }) => {
+  const { data: {depts = []} = {} } = useQuery(gql`
+{
+  depts{
+    id
+    name
+    path
+    parent
+    grade
+    order
+  }
+}
+  `)
+
+  const deptOptions = depts.map( (x: any) => ({
+    value: x.id,
+    label: x.name,
+  }));
+
+  deptOptions.unshift({
+    value: 0,
+    label: '全部',
+  })
+
   return (
     <QueryFilter defaultCollapsed onFinish={(values) => {
       console.log('query values', values);
@@ -86,31 +102,9 @@ const DataFilter = ( { refresh }: { refresh: any }) => {
       <ProFormSelect
         name="deptId"
         label="部门/开发组"
-        initialValue={0}
+        initialValue={deptOptions.length > 0 ? deptOptions[0].id : 0}
         allowClear={false}
-        options={[
-          {
-            value: 0,
-            label: '全部'
-          },
-          {
-            value: 21,
-            label: '产品研发部'
-          },
-          {
-            value: 20,
-            label: '前端平台研发部'
-          },
-          {
-            value: 29,
-            label: '1组收付合同'
-          },
-          {
-            value: 30,
-            label: '2组项目预算'
-          },
-
-        ]}
+        options={deptOptions}
       />
     </QueryFilter>
   )

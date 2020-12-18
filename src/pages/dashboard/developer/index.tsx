@@ -91,7 +91,7 @@ const DataFilter = ( { refresh }: { refresh: any }) => {
       return refresh(values);
     }}>
       <ProFormDateRangePicker
-        name="rangeDate"
+        name="dateRange"
         label="发生区间"
         initialValue={thisWeekValue()}
         allowClear={false}

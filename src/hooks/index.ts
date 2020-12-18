@@ -1,19 +1,28 @@
-import {ApolloClient, QueryOptions} from "@apollo/client/core";
+import {ApolloClient, gql} from "@apollo/client/core";
 import {useModel} from "@@/plugin-model/useModel";
 import {useRequest} from "ahooks";
 
-export function useApolloClient(): ApolloClient<object> {
-  const { initialState: { apolloClient }  } = useModel('@@initialState') as any;
-  return apolloClient;
+export class GqlClient<T> {
+  constructor(private readonly apolloClient: ApolloClient<T>) {
+  }
+
+  query = (query: string) => {
+    return this.apolloClient.query({
+      query: gql(query)
+    })
+  }
 }
 
-export function useQuery(gql: QueryOptions['query']): { data: any, loading: boolean, error: any } {
-  const client = useApolloClient();
+export function useGqlClient(): GqlClient<object> {
+  const { initialState: { gqlClient }  } = useModel('@@initialState') as any;
+  return gqlClient;
+}
+
+export function useQuery(query: string): { data: any, loading: boolean, error: any } {
+  const client = useGqlClient();
 
   return useRequest(async () => {
-    const { data } = await client.query({
-      query: gql
-    });
+    const { data } = await client.query(query);
 
     return data;
   });

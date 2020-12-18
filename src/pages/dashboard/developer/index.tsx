@@ -1,71 +1,74 @@
-// import { Button, message, Input, Drawer } from 'antd';
 import React, { useRef } from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {QueryFilter, ProFormDateRangePicker, ProFormSelect} from '@ant-design/pro-form';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
+import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { useRequest } from 'ahooks';
-import {ApolloClient, gql} from '@apollo/client';
 import {GridApi, GridReadyEvent} from "ag-grid-community";
-import {useApolloClient, useQuery} from "@/hooks";
+import {GqlClient, useGqlClient, useQuery} from "@/hooks";
 import moment from "moment";
+import {getRanges, thisWeekValue} from "@/utils/data-range-picker.util";
 
 type FormStoreType = {
   dateRange?: [string, string];
   deptId?: number;
 }
 
-const queryUsers =async (client: ApolloClient<object>, value: FormStoreType = {}) => {
-  let from = ""; let to = "";
+const queryDevelopViews = async (client: GqlClient<object>, value: FormStoreType = {}) => {
+  let from = 0; let to = 0;
   const { dateRange, deptId = 0 } = value;
 
   if (! dateRange) {
-    from = moment().startOf('month').valueOf().toString();
-    to = moment().endOf('month').valueOf().toString();
+    from = moment().startOf('month').valueOf();
+    to = moment().endOf('month').valueOf();
   } else {
-    from = moment(dateRange[0]).valueOf().toString();
-    to = moment(dateRange[1]).valueOf().toString();
+    from = moment(dateRange[0]).valueOf();
+    to = moment(dateRange[1]).valueOf();
   }
 
-  const rangeArgs = `from: "${from}", to: "${to}"`
+  const rangeArgs = `dateRange: { from: ${from}, to: ${to} }`
+  // const query = new GqlQueryBuilder('developerView', { deptIds: [deptId]})
+  //   .find()
 
-  const { data } = await client.query({
-    query: gql`
-query {
-  developerView(deptIds: [${deptId}]) {
-    user {
-      id
-      account
-      realname
-      pinyin
-    }
-    activeBugView(${rangeArgs}) {
-      count
-      sprintCount
-      hotfixCount
-    }
-    resolveBugView(${rangeArgs}) {
-      count
-      sprintCount
-      hotfixCount
-    }
-  }
-}
-    `
-  });
+  const { data } = await client.query(`
+       {
+          developerView(deptIds: [${deptId}]) {
+            user {
+              id
+              account
+              realname
+              pinyin
+              dept {
+                id
+                name
+              }
+            }
+            activeBugView(${rangeArgs}) {
+              count
+              sprintCount
+              hotfixCount
+            }
+            resolveBugView(${rangeArgs}) {
+              count
+              sprintCount
+              hotfixCount
+            }
+          }
+      }
+    `);
 
   return data?.developerView;
 };
 
 const DataFilter = ( { refresh }: { refresh: any }) => {
-  const { data: {depts = []} = {} } = useQuery(gql`
+  const { data: {depts = []} = {} } = useQuery(`
 {
-  depts{
+  depts {
     id
     name
     path
-    parent
     grade
     order
   }
@@ -90,19 +93,16 @@ const DataFilter = ( { refresh }: { refresh: any }) => {
       <ProFormDateRangePicker
         name="rangeDate"
         label="发生区间"
-        initialValue={[moment().startOf('month'), moment().endOf('month')]}
+        initialValue={thisWeekValue()}
         allowClear={false}
         fieldProps={{
-          ranges: {
-            '今天': [moment(), moment()],
-            '本月': [moment().startOf('month'), moment().endOf('month')],
-          }
+          ranges: getRanges(),
         } as any}
       />
       <ProFormSelect
         name="deptId"
         label="部门/开发组"
-        initialValue={deptOptions.length > 0 ? deptOptions[0].id : 0}
+        initialValue={deptOptions[0].value}
         allowClear={false}
         options={deptOptions}
       />
@@ -112,8 +112,8 @@ const DataFilter = ( { refresh }: { refresh: any }) => {
 
 const TableList: React.FC<any> = () => {
   const gridApi = useRef<GridApi>();
-  const apolloClient  = useApolloClient();
-  const { data, run, loading } = useRequest((value: FormStoreType) => queryUsers(apolloClient, value))
+  const gqlClient  = useGqlClient();
+  const { data, run, loading } = useRequest((value: FormStoreType) => queryDevelopViews(gqlClient, value))
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -140,10 +140,18 @@ const TableList: React.FC<any> = () => {
             sortable: true,
             floatingFilter: true,
             filter: true,
+            flex: 1,
+            minWidth: 150,
           }}
+          autoGroupColumnDef={{
+            minWidth: 200,
+          }}
+          suppressDragLeaveHidesColumns
+          suppressMakeColumnVisibleAfterUnGroup
+          rowGroupPanelShow='always'
           onGridReady={onGridReady}
         >
-          <AgGridColumn field="user.id"/>
+          <AgGridColumn field="user.dept.name" headerName="部门" enableRowGroup />
           <AgGridColumn field="user.account"/>
           <AgGridColumn field="user.realname"/>
           <AgGridColumn field="user.pinyin"/>

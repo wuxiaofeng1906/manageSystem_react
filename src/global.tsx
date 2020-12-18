@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, message, notification } from 'antd';
-import { useIntl } from 'umi';
+import {useIntl} from "@@/plugin-locale/localeExports";
 import '@ant-design/pro-form/dist/form.css';
 import defaultSettings from '../config/defaultSettings';
 

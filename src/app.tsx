@@ -1,11 +1,12 @@
 import React from 'react';
 import { Settings as LayoutSettings, PageLoading } from '@ant-design/pro-layout';
 import { notification } from 'antd';
-import { history, RequestConfig, RunTimeLayoutConfig } from 'umi';
+import { history } from 'umi';
 import RightContent from '@/components/RightContent';
 // import Footer from '@/components/Footer';
 import { ResponseError } from 'umi-request';
 import {ApolloClient, InMemoryCache} from '@apollo/client';
+import {GqlClient} from "@/hooks";
 import { queryCurrent } from './services/user';
 import defaultSettings from '../config/defaultSettings';
 
@@ -31,11 +32,13 @@ const apolloClient = new ApolloClient({
   }
 });
 
+const gqlClient = new GqlClient(apolloClient);
+
 export async function getInitialState(): Promise<{
   settings?: LayoutSettings;
   currentUser?: API.CurrentUser;
   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
-  apolloClient?: ApolloClient<any>;
+  gqlClient?: GqlClient<any>;
 }> {
   const fetchUserInfo = async () => {
     try {
@@ -53,18 +56,18 @@ export async function getInitialState(): Promise<{
       fetchUserInfo,
       currentUser,
       settings: defaultSettings,
-      apolloClient,
+      gqlClient,
     };
   }
   return {
     fetchUserInfo,
     settings: defaultSettings,
-    apolloClient,
+    gqlClient,
   };
 }
 
 
-export const layout: RunTimeLayoutConfig = ({ initialState }) => {
+export const layout = ({ initialState }: any) => {
   return {
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
@@ -126,6 +129,6 @@ const errorHandler = (error: ResponseError) => {
   throw error;
 };
 
-export const request: RequestConfig = {
+export const request = {
   errorHandler,
 };

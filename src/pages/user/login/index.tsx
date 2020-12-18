@@ -10,7 +10,11 @@ import {
 import { Alert, Space, message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import ProForm, { ProFormCaptcha, ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
-import { useIntl, Link, history, FormattedMessage, SelectLang, useModel } from 'umi';
+import { Link, history } from 'umi';
+import {useIntl, FormattedMessage} from "@@/plugin-locale/localeExports";
+import {useModel} from "@@/plugin-model/useModel";
+import {SelectLang} from "@@/plugin-locale/SelectLang";
+
 import Footer from '@/components/Footer';
 import { fakeAccountLogin, getFakeCaptcha, LoginParamsType } from '@/services/login';
 

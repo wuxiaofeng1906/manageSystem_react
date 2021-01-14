@@ -1,4 +1,4 @@
-﻿import {MenuDataItem} from "@@/plugin-layout/runtime";
+﻿import { MenuDataItem } from '@@/plugin-layout/runtime';
 
 export default [
   {
@@ -51,10 +51,42 @@ export default [
     component: './dashboard/developer',
   },
   {
+    name: '单元测试覆盖率',
+    icon: 'AppstoreOutlined',
+    path: '/coverage',
+    routes: [
+      {
+        name: '按分支',
+        icon: 'table',
+        path: 'byBranch',
+        component: './coverage/byBranch',
+      },
+      {
+        name: '按组',
+        icon: 'table',
+        path: 'byGroup',
+        routes: [
+          {
+            name: '前端',
+            icon: 'table',
+            path: 'front',
+            component: './coverage/byGroup/front',
+          },
+          {
+            name: '后端',
+            icon: 'table',
+            path: 'backend',
+            component: './coverage/byGroup/backend',
+          },
+        ],
+      },
+    ],
+  },
+  {
     path: '/',
     redirect: '/welcome',
   },
   {
     component: './404',
   },
-] as MenuDataItem[] ;
+] as MenuDataItem[];

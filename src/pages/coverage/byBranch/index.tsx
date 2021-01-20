@@ -1,17 +1,16 @@
-import React, {useRef} from 'react';
-import {PageContainer} from '@ant-design/pro-layout';
-import {AgGridColumn, AgGridReact} from 'ag-grid-react';
+import React, { useRef } from 'react';
+import { PageContainer } from '@ant-design/pro-layout';
+import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {useRequest} from 'ahooks';
-import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient} from '@/hooks';
+import { useRequest } from 'ahooks';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GqlClient, useGqlClient } from '@/hooks';
 import * as dayjs from 'dayjs';
 
-
 const queryBranchViews = async (client: GqlClient<object>) => {
-  const {data} = await client.query(`
+  const { data } = await client.query(`
     {
       fileCovers(side:ALL)
       {
@@ -24,15 +23,14 @@ const queryBranchViews = async (client: GqlClient<object>) => {
           branCove
       }
     }
-    `
-  );
+    `);
   return data?.fileCovers;
 };
 
 // 日期渲染（加上latest）
 function dateCellRenderer(params: any) {
   const times: any = params.value;
-  const currentTime: string = dayjs().subtract(1, 'day').format("YYYY-MM-DD");
+  const currentTime: string = dayjs().subtract(1, 'day').format('YYYY-MM-DD');
   if (times < currentTime) {
     return ` <span><span>  ${times} </span> <span style='color: darkorange'> (latest) </span></span>`;
   }
@@ -42,12 +40,12 @@ function dateCellRenderer(params: any) {
 // 区分前端或者后端
 function sideCellRenderer(params: any) {
   const module = params.value;
-  let cModule = "";
-  if (module === "BACKEND") {
-    cModule = "后端";
+  let cModule = '';
+  if (module === 'BACKEND') {
+    cModule = '后端';
   }
-  if (module === "FRONT") {
-    cModule = "前端";
+  if (module === 'FRONT') {
+    cModule = '前端';
   }
   return ` <span> ${cModule}</span>`;
 }
@@ -69,10 +67,7 @@ function coverageCellRenderer(params: any) {
 const TableList: React.FC<any> = () => {
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() =>
-    queryBranchViews(gqlClient),
-  );
-
+  const { data, loading } = useRequest(() => queryBranchViews(gqlClient));
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -86,7 +81,7 @@ const TableList: React.FC<any> = () => {
 
   return (
     <PageContainer>
-      <div className="ag-theme-alpine" style={{height: 700, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{ height: 700, width: '100%' }}>
         <AgGridReact
           rowData={data}
           defaultColDef={{
@@ -97,7 +92,7 @@ const TableList: React.FC<any> = () => {
             filter: true,
             flex: 1,
             minWidth: 100,
-            cellStyle: {"text-align": "left"}  //
+            cellStyle: { 'text-align': 'left' }, //
           }}
           autoGroupColumnDef={{
             minWidth: 100,
@@ -109,9 +104,14 @@ const TableList: React.FC<any> = () => {
           rowGroupPanelShow="always"
           onGridReady={onGridReady}
         >
-          <AgGridColumn field="side" headerName="技术侧" enableRowGroup cellRenderer={sideCellRenderer}/>
-          <AgGridColumn field="branch" headerName="分支名"/>
-          <AgGridColumn field="reportDate" headerName="日期" cellRenderer={dateCellRenderer}/>
+          <AgGridColumn
+            field="side"
+            headerName="技术侧"
+            enableRowGroup
+            cellRenderer={sideCellRenderer}
+          />
+          <AgGridColumn field="branch" headerName="分支名" />
+          <AgGridColumn field="reportDate" headerName="日期" cellRenderer={dateCellRenderer} />
           <AgGridColumn
             field="instCove"
             headerName="结构覆盖率"

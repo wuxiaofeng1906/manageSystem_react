@@ -9,8 +9,8 @@ export class GqlClient<T> {
   query = (query: string) => {
     return this.apolloClient.query({
       query: gql(query)
-    })
-  }
+    });
+  };
 }
 
 export function useGqlClient(): GqlClient<object> {

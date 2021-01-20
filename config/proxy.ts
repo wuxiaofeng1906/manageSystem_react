@@ -9,23 +9,24 @@ export default {
   dev: {
     '/api/': {
       // target: 'https://preview.pro.ant.design',
-      target: 'http://localhost:5000',
+      // target: 'http://localhost:5000',
+      target: 'http://172.31.50.4:8300/',
       changeOrigin: true,
-      pathRewrite: { '^': '' },
+      pathRewrite: {'^': ''},
     },
   },
   test: {
     '/api/': {
       target: 'https://preview.pro.ant.design',
       changeOrigin: true,
-      pathRewrite: { '^': '' },
+      pathRewrite: {'^': ''},
     },
   },
   pre: {
     '/api/': {
       target: 'your pre url',
       changeOrigin: true,
-      pathRewrite: { '^': '' },
+      pathRewrite: {'^': ''},
     },
   },
 };

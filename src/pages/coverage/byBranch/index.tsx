@@ -1,126 +1,55 @@
-import React, { useRef } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
-// import {QueryFilter, ProFormDateRangePicker, ProFormSelect} from '@ant-design/pro-form';
-import { AgGridColumn, AgGridReact } from 'ag-grid-react';
+import React, {useRef} from 'react';
+import {PageContainer} from '@ant-design/pro-layout';
+import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import { useRequest } from 'ahooks';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
-// import {GqlClient, useGqlClient, useQuery} from "@/hooks";
-import { GqlClient, useGqlClient } from '@/hooks';
+import {useRequest} from 'ahooks';
+import {GridApi, GridReadyEvent} from 'ag-grid-community';
+import {GqlClient, useGqlClient} from '@/hooks';
+import * as dayjs from 'dayjs';
 
-import moment from 'moment';
-// import {getRanges, thisWeekValue} from "@/utils/data-range-picker.util";
 
-type FormStoreType = {
-  dateRange?: [string, string];
-  deptId?: number;
-};
-
-const queryDevelopViews = async (client: GqlClient<object>, value: FormStoreType = {}) => {
-  let from = 0;
-  let to = 0;
-  const { dateRange, deptId = 0 } = value;
-
-  if (!dateRange) {
-    from = moment().startOf('month').valueOf();
-    to = moment().endOf('month').valueOf();
-  } else {
-    from = moment(dateRange[0]).valueOf();
-    to = moment(dateRange[1]).valueOf();
-  }
-
-  const rangeArgs = `dateRange: { from: ${from}, to: ${to} }`;
-  // const query = new GqlQueryBuilder('developerView', { deptIds: [deptId]})
-  //   .find()
-
-  const { data } = await client.query(`
-       {
-          developerView(deptIds: [${deptId}]) {
-            user {
-              id
-              account
-              realname
-              pinyin
-              dept {
-                id
-                name
-              }
-            }
-            activeBugView(${rangeArgs}) {
-              count
-              sprintCount
-              hotfixCount
-            }
-            resolveBugView(${rangeArgs}) {
-              count
-              sprintCount
-              hotfixCount
-            }
-          }
+const queryBranchViews = async (client: GqlClient<object>) => {
+  const {data} = await client.query(`
+    {
+      fileCovers(side:ALL)
+      {
+          id
+          side
+          branch
+          reportDate
+          project
+          instCove
+          branCove
       }
-    `);
-
-  return data?.developerView;
+    }
+    `
+  );
+  return data?.fileCovers;
 };
 
-// const DataFilter = ( { refresh }: { refresh: any }) => {
-//   const { data: {depts = []} = {} } = useQuery(`
-// {
-//   depts {
-//     id
-//     name
-//     path
-//     grade
-//     order
-//   }
-// }
-//   `)
-//
-//   const deptOptions = depts.map( (x: any) => ({
-//     value: x.id,
-//     label: x.name,
-//   }));
-//
-//   deptOptions.unshift({
-//     value: 0,
-//     label: '全部',
-//   })
-//
-//   return (
-//     <QueryFilter defaultCollapsed onFinish={(values) => {
-//       console.log('query values', values);
-//       return refresh(values);
-//     }}>
-//       <ProFormDateRangePicker
-//         name="dateRange"
-//         label="发生区间"
-//         initialValue={thisWeekValue()}
-//         allowClear={false}
-//         fieldProps={{
-//           ranges: getRanges(),
-//         } as any}
-//       />
-//       <ProFormSelect
-//         name="deptId"
-//         label="部门/开发组"
-//         initialValue={deptOptions[0].value}
-//         allowClear={false}
-//         options={deptOptions}
-//       />
-//     </QueryFilter>
-//   );
-// };
-
-// region 表格代码渲染
 // 日期渲染（加上latest）
 function dateCellRenderer(params: any) {
-  console.log('params', params);
-  if (params.data.user.dept.name === '后端平台研发部') {
-    return ` <span><span>  ${params.value} </span> <span style='color: darkorange'> (latest) </span></span>`;
+  const times: any = params.value;
+  const currentTime: string = dayjs().subtract(1, 'day').format("YYYY-MM-DD");
+  if (times < currentTime) {
+    return ` <span><span>  ${times} </span> <span style='color: darkorange'> (latest) </span></span>`;
   }
-  return ` <span>  ${params.value} </span>`;
+  return ` <span>  ${times} </span>`;
+}
+
+// 区分前端或者后端
+function sideCellRenderer(params: any) {
+  const module = params.value;
+  let cModule = "";
+  if (module === "BACKEND") {
+    cModule = "后端";
+  }
+  if (module === "FRONT") {
+    cModule = "前端";
+  }
+  return ` <span> ${cModule}</span>`;
 }
 
 // 值为0显示为蓝色
@@ -137,15 +66,14 @@ function coverageCellRenderer(params: any) {
   return values.toString();
 }
 
-// region
-
 const TableList: React.FC<any> = () => {
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
-  // const { data, run, loading } = useRequest((value: FormStoreType) => queryDevelopViews(gqlClient, value));
-  const { data, loading } = useRequest((value: FormStoreType) =>
-    queryDevelopViews(gqlClient, value),
+  const {data, loading} = useRequest(() =>
+    queryBranchViews(gqlClient),
   );
+
+
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -158,38 +86,40 @@ const TableList: React.FC<any> = () => {
 
   return (
     <PageContainer>
-      {/* <DataFilter refresh={run}/> */}
-
-      <div className="ag-theme-alpine" style={{ height: 700, width: '100%' }}>
+      <div className="ag-theme-alpine" style={{height: 700, width: '100%'}}>
         <AgGridReact
           rowData={data}
           defaultColDef={{
             resizable: true,
             sortable: true,
-            // floatingFilter: true,
-            // filter: true,
+            floatingFilter: true,
+            // filter: "agTextColumnFilter",
+            filter: true,
             flex: 1,
             minWidth: 100,
+            cellStyle: {"text-align": "left"}  //
           }}
           autoGroupColumnDef={{
             minWidth: 100,
           }}
+          // rowHeight={35}
+          // headerHeight={35}
           suppressDragLeaveHidesColumns
           suppressMakeColumnVisibleAfterUnGroup
           rowGroupPanelShow="always"
           onGridReady={onGridReady}
         >
-          <AgGridColumn field="user.dept.name" headerName="技术侧" enableRowGroup />
-          <AgGridColumn field="user.account" headerName="分支名" />
-          <AgGridColumn field="user.realname" headerName="日期" cellRenderer={dateCellRenderer} />
+          <AgGridColumn field="side" headerName="技术侧" enableRowGroup cellRenderer={sideCellRenderer}/>
+          <AgGridColumn field="branch" headerName="分支名"/>
+          <AgGridColumn field="reportDate" headerName="日期" cellRenderer={dateCellRenderer}/>
           <AgGridColumn
-            field="resolveBugView.count"
+            field="instCove"
             headerName="结构覆盖率"
             type="numericColumn"
             cellRenderer={coverageCellRenderer}
           />
           <AgGridColumn
-            field="activeBugView.count"
+            field="branCove"
             headerName="分支覆盖率"
             type="numericColumn"
             cellRenderer={coverageCellRenderer}

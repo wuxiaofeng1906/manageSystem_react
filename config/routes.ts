@@ -1,4 +1,4 @@
-﻿import { MenuDataItem } from '@@/plugin-layout/runtime';
+﻿import {MenuDataItem} from '@@/plugin-layout/runtime';
 
 export default [
   {
@@ -17,6 +17,12 @@ export default [
       },
     ],
   },
+  // {
+  //   path: 'login',
+  //   layout: false,
+  //   name: '用户登录',
+  //   component: './'
+  // },
   {
     path: '/welcome',
     name: 'welcome',
@@ -81,10 +87,28 @@ export default [
         ],
       },
     ],
+  }, {
+    name: 'sprint工作台',
+    icon: 'AppstoreOutlined',
+    path: '/sprint',
+    routes: [
+      {
+        name: 'dsahboard',
+        icon: 'table',
+        path: 'sprintDashboard',
+        component: './sprint/sprintDashboard',
+      },
+      {
+        name: 'list',
+        icon: 'table',
+        path: 'sprintList',
+        component: './sprint/sprintList',
+      }
+    ],
   },
   {
     path: '/',
-    redirect: '/welcome',
+    redirect: './welcome',
   },
   {
     component: './404',

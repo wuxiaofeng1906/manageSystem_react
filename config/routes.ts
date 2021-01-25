@@ -1,22 +1,7 @@
 ﻿import {MenuDataItem} from '@@/plugin-layout/runtime';
 
 export default [
-  {
-    path: '/user',
-    layout: false,
-    routes: [
-      {
-        path: '/user',
-        routes: [
-          {
-            name: 'login',
-            path: '/user/login',
-            component: './user/login',
-          },
-        ],
-      },
-    ],
-  },
+
   // {
   //   path: 'login',
   //   layout: false,
@@ -27,29 +12,29 @@ export default [
     path: '/welcome',
     name: 'welcome',
     icon: 'smile',
-    component: './Welcome',
+    component: './welcomes',
   },
-  {
-    path: '/admin',
-    name: 'admin',
-    icon: 'crown',
-    access: 'canAdmin',
-    component: './Admin',
-    routes: [
-      {
-        path: '/admin/sub-page',
-        name: 'sub-page',
-        icon: 'smile',
-        component: './Welcome',
-      },
-    ],
-  },
-  {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './ListTableList',
-  },
+  // {
+  //   path: '/admin',
+  //   name: 'admin',
+  //   icon: 'crown',
+  //   access: 'canAdmin',
+  //   component: './Admin',
+  //   routes: [
+  //     {
+  //       path: '/admin/sub-page',
+  //       name: 'sub-page',
+  //       icon: 'smile',
+  //       component: './Welcome',
+  //     },
+  //   ],
+  // },
+  // {
+  //   name: 'list.table-list',
+  //   icon: 'table',
+  //   path: '/list',
+  //   component: './ListTableList',
+  // },
   {
     name: '开发者',
     icon: 'table',
@@ -108,7 +93,7 @@ export default [
   },
   {
     path: '/',
-    redirect: './welcome',
+    redirect: './welcomes',
   },
   {
     component: './404',

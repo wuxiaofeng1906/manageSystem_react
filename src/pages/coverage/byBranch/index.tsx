@@ -8,13 +8,13 @@ import { useRequest } from 'ahooks';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { GqlClient, useGqlClient } from '@/hooks';
 import * as dayjs from 'dayjs';
+// import styles from './index.less';
 
 const queryBranchViews = async (client: GqlClient<object>) => {
   const { data } = await client.query(`
     {
       fileCovers
       {
-          id
           side
           branch
           reportDate
@@ -32,7 +32,7 @@ const queryBranchViews = async (client: GqlClient<object>) => {
 function dateCellRenderer(params: any) {
   const times: any = params.value;
   const currentTime: string = dayjs().subtract(1, 'day').format('YYYY-MM-DD');
-  if (times < currentTime) {
+  if (times <= currentTime) {
     return ` <span><span>  ${times} </span> <span style='color: darkorange'> (latest) </span></span>`;
   }
   return ` <span>  ${times} </span>`;
@@ -65,7 +65,8 @@ function coverageCellRenderer(params: any) {
   return values.toString();
 }
 
-const TableList: React.FC<any> = () => {
+const BranchTableList: React.FC<any> = () => {
+
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
   const { data, loading } = useRequest(() => queryBranchViews(gqlClient));
@@ -88,18 +89,21 @@ const TableList: React.FC<any> = () => {
           defaultColDef={{
             resizable: true,
             sortable: true,
-            floatingFilter: true,
+            // floatingFilter: true,
             // filter: "agTextColumnFilter",
             filter: true,
             flex: 1,
             minWidth: 100,
-            cellStyle: { 'text-align': 'left' }, //
+             // cellStyle: { 'text-align': 'center' }, //
+
+
           }}
           autoGroupColumnDef={{
             minWidth: 100,
           }}
           // rowHeight={35}
           // headerHeight={35}
+
           suppressDragLeaveHidesColumns
           suppressMakeColumnVisibleAfterUnGroup
           rowGroupPanelShow="always"
@@ -116,23 +120,24 @@ const TableList: React.FC<any> = () => {
           <AgGridColumn
             field="instCove"
             headerName="结构覆盖率"
-            type="numericColumn"
+            // type="numericColumn"
             cellRenderer={coverageCellRenderer}
           />
           <AgGridColumn
             field="branCove"
             headerName="分支覆盖率"
-            type="numericColumn"
+            // type="numericColumn"
             cellRenderer={coverageCellRenderer}
           />
           <AgGridColumn
             field="createAt"
             headerName="扫描时间"
           />
+
         </AgGridReact>
       </div>
     </PageContainer>
   );
 };
 
-export default TableList;
+export default BranchTableList;

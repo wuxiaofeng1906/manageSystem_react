@@ -30,8 +30,8 @@ const colums = () => {
       headerName: '',
       checkboxSelection: true,
       headerCheckboxSelection: true,
-      width: 50,
-      // 'pinned': 'left'
+      maxWidth: 50,
+      'pinned': 'left'
     },
     {
       headerName: '项目名称',
@@ -174,46 +174,47 @@ const TableList: React.FC<any> = () => {
 
   return (
 
-    <PageContainer>
-      <div style={{marginBottom: "20px"}}>
-        <Form.Item label="项目名称" name="prjName">
-          <Input placeholder="请输入" style={{"width": "250px"}} allowClear={true} onChange={onChange}/>
+    <PageContainer >
+      <div style={{width: "100%" ,  overflow: "auto", whiteSpace: "nowrap"}}>
 
-          <label style={{marginLeft: "20px"}}>项目类型：</label>
-          <Select placeholder="请选择" mode="tags" style={{width: '250px'}} onChange={handleChange} tokenSeparators={[',']}>
-            {arrays}
+        <Form.Item name="prjName">
+          <label style={{marginLeft: "10px"}}>项目名称：</label>
+          <Input placeholder="请输入" style={{"width": "18%"}} allowClear={true} onChange={onChange}/>
+
+          <label style={{marginLeft: "10px"}}>项目类型：</label>
+          <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={handleChange}
+                  tokenSeparators={[',']}> {arrays}
           </Select>
 
-          <label style={{marginLeft: "20px"}}>时间：</label> <RangePicker className={"times"}/>
+          <label style={{marginLeft: "10px"}}>时间：</label>
+          <RangePicker className={"times"} style={{width: '18%'}}/>
 
-          <label style={{marginLeft: "20px"}}>项目状态：</label>
-          <Select placeholder="请选择"  mode="tags" style={{width: '250px'}} onChange={handleChange} tokenSeparators={[',']}>
+
+          <label style={{marginLeft: "10px"}}>项目状态：</label>
+          <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={handleChange}
+                  tokenSeparators={[',']}>
             {arrays}
           </Select>
 
 
         </Form.Item>
 
-
       </div>
 
-      <div style={{"background": "white"}}>
-        <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}>  {/* 使用一个图标就要导入一个图标 */}
-          默认：近一月未关闭
-        </Button>
-        <Button type="text" style={{"color": "black", "marginLeft": "80%"}} icon={<FolderAddTwoTone/>}
-                size={"large"}>  {/* 使用一个图标就要导入一个图标 */}
-          新增
-        </Button>
-        <Button type="text" style={{"color": "black", "marginLeft": "20px"}} icon={<EditTwoTone/>} size={"large"}>
-          修改
-        </Button>
-        <Button type="text" style={{"color": "black", "marginLeft": "20px"}} icon={<DeleteTwoTone/>} size={"large"}>
-          删除
-        </Button>
+      <div style={{"background": "white"}}> {/* 使用一个图标就要导入一个图标 */}
+        <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}> 默认：近1月未关闭的 </Button>
+
+        <Button type="text" style={{"color": "black", float: "right"}} icon={<FolderAddTwoTone/>}
+                size={"large"}>删除 </Button>
+
+        <Button type="text" style={{"color": "black", float: "right"}} icon={<EditTwoTone/>}
+                size={"large"}> 修改 </Button>
+
+        <Button type="text" style={{"color": "black", float: "right"}} icon={<DeleteTwoTone/>}
+                size={"large"}> 新增 </Button>
       </div>
 
-      <div className="ag-theme-alpine" style={{height: 700, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
 
         <AgGridReact
           columnDefs={colums()} // 定义列
@@ -234,7 +235,8 @@ const TableList: React.FC<any> = () => {
           // suppressMakeColumnVisibleAfterUnGroup // 如果用户在移动列时不小心将列移出了网格，但并不打算将其隐藏，那么这就很方便。
           // rowGroupPanelShow="always"
           onGridReady={onGridReady}
-        ></AgGridReact>
+        >
+        </AgGridReact>
       </div>
     </PageContainer>
   );

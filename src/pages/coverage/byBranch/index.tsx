@@ -106,7 +106,7 @@ const BranchTableList: React.FC<any> = () => {
 
           suppressDragLeaveHidesColumns
           suppressMakeColumnVisibleAfterUnGroup
-          rowGroupPanelShow="always"
+          // rowGroupPanelShow="always"
           onGridReady={onGridReady}
         >
           <AgGridColumn

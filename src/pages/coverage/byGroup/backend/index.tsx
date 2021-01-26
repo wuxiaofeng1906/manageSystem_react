@@ -152,9 +152,10 @@ const TableList: React.FC<any> = () => {
           groupDefaultExpanded={9} // 展开分组
           suppressDragLeaveHidesColumns // 取消分组时，例如单击删除区域中某一列上的“ x” ，该列将不可见
           suppressMakeColumnVisibleAfterUnGroup // 如果用户在移动列时不小心将列移出了网格，但并不打算将其隐藏，那么这就很方便。
-          rowGroupPanelShow="always"
+          // rowGroupPanelShow="always"
           onGridReady={onGridReady}
-        ></AgGridReact>
+        >
+        </AgGridReact>
       </div>
     </PageContainer>
   );

@@ -1,16 +1,25 @@
 ﻿import {MenuDataItem} from '@@/plugin-layout/runtime';
 
 export default [
-
-  // {
-  //   path: 'login',
-  //   layout: false,
-  //   name: '用户登录',
-  //   component: './'
-  // },
   {
-    path: '/welcome',
-    name: 'welcome',
+    path: '/user',
+    layout: false,
+    routes: [
+      {
+        path: '/user',
+        routes: [
+          {
+            name: 'login',
+            path: '/user/login',
+            component: './user/login',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: '/welcomes',
+    name: '欢迎使用',
     icon: 'smile',
     component: './welcomes',
   },
@@ -43,7 +52,7 @@ export default [
   },
   {
     name: '单元测试覆盖率',
-    icon: 'AppstoreOutlined',
+    icon: 'table',
     path: '/coverage',
     routes: [
       {
@@ -59,13 +68,11 @@ export default [
         routes: [
           {
             name: '前端',
-            icon: 'table',
             path: 'front',
             component: './coverage/byGroup/front',
           },
           {
             name: '后端',
-            icon: 'table',
             path: 'backend',
             component: './coverage/byGroup/backend',
           },
@@ -74,18 +81,16 @@ export default [
     ],
   }, {
     name: 'sprint工作台',
-    icon: 'AppstoreOutlined',
+    icon: 'table',
     path: '/sprint',
     routes: [
       {
         name: 'dsahboard',
-        icon: 'table',
         path: 'sprintDashboard',
         component: './sprint/sprintDashboard',
       },
       {
         name: 'list',
-        icon: 'table',
         path: 'sprintList',
         component: './sprint/sprintList',
       }

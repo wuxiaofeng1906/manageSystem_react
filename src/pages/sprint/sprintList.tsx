@@ -10,6 +10,7 @@ import {GqlClient, useGqlClient} from '@/hooks';
 import moment from 'moment';
 import {Button, Input, Form, DatePicker, Select} from 'antd';
 import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone} from '@ant-design/icons';
+import axios from 'axios';
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
@@ -145,7 +146,16 @@ const onChange = (e: any) => {
   console.log(e.nativeEvent.data);
 };
 
-function handleChange(value: any) {
+const onTimeSelected = (params: any) => {
+  const from = moment(params[0]).format('YYYY-MM-DD');
+  const to = moment(params[1]).format('YYYY-MM-DD');
+
+  console.log("选择的times", from, to);
+};
+
+
+function handleChange(value: any, params: any) {
+  console.log(params);
   console.log(`selected ${value}`);
 }
 
@@ -165,17 +175,11 @@ const TableList: React.FC<any> = () => {
     else gridApi.current.hideOverlay();
   }
 
-  const arrays: any = [
-    < Option value={1} children={1}></Option>,
-    < Option value={2} children={2}></Option>,
-    < Option value={3} children={3}></Option>,
-    < Option value={4} children={4}></Option>
-  ];
-
+  // @ts-ignore
   return (
 
-    <PageContainer >
-      <div style={{width: "100%" ,  overflow: "auto", whiteSpace: "nowrap"}}>
+    <PageContainer>
+      <div style={{width: "100%", overflow: "auto", whiteSpace: "nowrap"}}>
 
         <Form.Item name="prjName">
           <label style={{marginLeft: "10px"}}>项目名称：</label>
@@ -183,17 +187,34 @@ const TableList: React.FC<any> = () => {
 
           <label style={{marginLeft: "10px"}}>项目类型：</label>
           <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={handleChange}
-                  tokenSeparators={[',']}> {arrays}
+                  tokenSeparators={[',']}> {
+            [
+              <Option key={"sprint"} value={"sprint"}>sprint </Option>,
+              <Option key={"hotfix"} value={"hotfix"}>hotfix </Option>,
+
+            ]
+          }
           </Select>
 
           <label style={{marginLeft: "10px"}}>时间：</label>
-          <RangePicker className={"times"} style={{width: '18%'}}/>
+          <RangePicker className={"times"} style={{width: '18%'}} onChange={onTimeSelected}/>
 
 
           <label style={{marginLeft: "10px"}}>项目状态：</label>
           <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={handleChange}
-                  tokenSeparators={[',']}>
-            {arrays}
+                  tokenSeparators={[',']}>{
+            [
+              <Option key={"closed"} value={"closed"}>已关闭 </Option>,
+              <Option key={"doing"} value={"doing"}>进行中 </Option>,
+              <Option key={"suspended"} value={"suspended"}>已暂停 </Option>,
+              <Option key={"wait"} value={"wait"}>未开始 </Option>,
+              //
+              // < Option value={'closed'} children={'已关闭'}> </Option>,
+              // < Option value={'doing'} children={'进行中'}></Option>,
+              // < Option value={'suspended'} children={'已暂停'}></Option>,
+              // < Option value={'wait'} children={'未开始'}></Option>
+            ]
+          }
           </Select>
 
 

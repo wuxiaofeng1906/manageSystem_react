@@ -16,7 +16,7 @@ function getWeeksRange(weekCounts: number) {
 
     ranges.unshift(range);
   }
-  console.log('ranges', ranges);
+  // console.log('ranges', ranges);
 
   return ranges;
 }
@@ -45,7 +45,7 @@ function getMonthWeek(starttime: string) {
   };
 
   const week = `${config.getYear}年${config.getMonth}月0${config.getWeek}周`;
-  console.log('weeks', week);
+  // console.log('weeks', week);
   return week;
 }
 export { getWeeksRange, getMonthWeek };

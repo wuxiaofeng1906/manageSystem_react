@@ -80,7 +80,7 @@ export default [
       },
     ],
   }, {
-    name: 'sprint工作台',
+    name: 'sprint 工作台',
     icon: 'table',
     path: '/sprint',
     routes: [
@@ -90,7 +90,7 @@ export default [
         component: './sprint/sprintDashboard',
       },
       {
-        name: 'list',
+        name: 'sprint 列表',
         path: 'sprintList',
         component: './sprint/sprintList',
       }

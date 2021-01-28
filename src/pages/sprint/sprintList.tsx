@@ -10,7 +10,6 @@ import {GqlClient, useGqlClient} from '@/hooks';
 import moment from 'moment';
 import {Button, Input, Form, DatePicker, Select} from 'antd';
 import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone} from '@ant-design/icons';
-import axios from 'axios';
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
@@ -142,22 +141,6 @@ function deatilsCellRenderer(params: any) {
   // return values.toString();
 }
 
-const onChange = (e: any) => {
-  console.log(e.nativeEvent.data);
-};
-
-const onTimeSelected = (params: any) => {
-  const from = moment(params[0]).format('YYYY-MM-DD');
-  const to = moment(params[1]).format('YYYY-MM-DD');
-
-  console.log("选择的times", from, to);
-};
-
-
-function handleChange(value: any, params: any) {
-  console.log(params);
-  console.log(`selected ${value}`);
-}
 
 const TableList: React.FC<any> = () => {
   const gridApi = useRef<GridApi>();
@@ -175,7 +158,50 @@ const TableList: React.FC<any> = () => {
     else gridApi.current.hideOverlay();
   }
 
-  // @ts-ignore
+  let prjName = "";
+  // 项目名称输入事件
+  const inputOnChange = (e: any) => {
+    prjName = e.nativeEvent.data;
+    // console.log("项目名",e.nativeEvent.data);
+    // console.log("参数项目名：", prjName);
+    // 请求数据
+  };
+
+  let prjType = new Array();
+  // 项目类型选择事件
+  const prjTypeHandleChange = (value: any, params: any) => {
+    console.log(params);
+    prjType = value;
+    // console.log(`选择的项目类型`, prjName, prjType);
+    // 请求数据
+  };
+
+  let starttime = "";
+  let endtime = "";
+  // 时间选择事件
+  const onTimeSelected = (params: any) => {
+    starttime = moment(params[0]).format('YYYY-MM-DD');
+    endtime = moment(params[1]).format('YYYY-MM-DD');
+
+    console.log("选择的times", starttime, endtime);
+    // 请求数据
+
+  };
+
+  let prjStatus = "";
+  // 选择项目状态
+  const prjStatusHandleChange = (value: any, params: any) => {
+
+    console.log(params);
+    prjStatus = value;
+    console.log(`selected ${prjStatus}`);
+
+    console.log(prjName, prjType, starttime, endtime, prjStatus);
+
+    // 请求数据
+
+  };
+
   return (
 
     <PageContainer>
@@ -183,15 +209,15 @@ const TableList: React.FC<any> = () => {
 
         <Form.Item name="prjName">
           <label style={{marginLeft: "10px"}}>项目名称：</label>
-          <Input placeholder="请输入" style={{"width": "18%"}} allowClear={true} onChange={onChange}/>
+          <Input placeholder="请输入" style={{"width": "18%"}} allowClear={true} onChange={inputOnChange}/>
 
           <label style={{marginLeft: "10px"}}>项目类型：</label>
-          <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={handleChange}
+          <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjTypeHandleChange}
                   tokenSeparators={[',']}> {
             [
               <Option key={"sprint"} value={"sprint"}>sprint </Option>,
               <Option key={"hotfix"} value={"hotfix"}>hotfix </Option>,
-
+              <Option key={"emergency"} value={"emergency"}>emergency </Option>,
             ]
           }
           </Select>
@@ -201,25 +227,17 @@ const TableList: React.FC<any> = () => {
 
 
           <label style={{marginLeft: "10px"}}>项目状态：</label>
-          <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={handleChange}
+          <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjStatusHandleChange}
                   tokenSeparators={[',']}>{
             [
               <Option key={"closed"} value={"closed"}>已关闭 </Option>,
               <Option key={"doing"} value={"doing"}>进行中 </Option>,
               <Option key={"suspended"} value={"suspended"}>已暂停 </Option>,
-              <Option key={"wait"} value={"wait"}>未开始 </Option>,
-              //
-              // < Option value={'closed'} children={'已关闭'}> </Option>,
-              // < Option value={'doing'} children={'进行中'}></Option>,
-              // < Option value={'suspended'} children={'已暂停'}></Option>,
-              // < Option value={'wait'} children={'未开始'}></Option>
+              <Option key={"wait"} value={"wait"}>未开始 </Option>
             ]
           }
           </Select>
-
-
         </Form.Item>
-
       </div>
 
       <div style={{"background": "white"}}> {/* 使用一个图标就要导入一个图标 */}

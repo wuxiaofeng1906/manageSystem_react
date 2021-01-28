@@ -3,20 +3,19 @@ import * as dayjs from 'dayjs'; // 使用dayjs
 // 计算近几周的日期范围
 function getWeeksRange(weekCounts: number) {
   const ranges = new Array();
-
   // 最近几周
   for (let idx = 0; idx < weekCounts; idx += 1) {
     const week = dayjs().startOf('w').subtract(idx, 'w');
     const from = week;
     const to = week.endOf('w');
     const range = {
-      from: dayjs(from).format('YYYY-MM-DD'),
-      to: dayjs(to).format('YYYY-MM-DD'),
+      from: dayjs(from).add(1, 'day').format('YYYY-MM-DD'),
+      to: dayjs(to).add(1, 'day').format('YYYY-MM-DD'),
     };
 
     ranges.unshift(range);
   }
-  // console.log('ranges', ranges);
+  console.log('ranges', ranges);
 
   return ranges;
 }
@@ -44,8 +43,13 @@ function getMonthWeek(starttime: string) {
     getWeek: Math.ceil((d + 4 - w) / 7),
   };
 
-  const week = `${config.getYear}年${config.getMonth}月0${config.getWeek}周`;
+  let monthStr = (config.getMonth).toString();
+  if (config.getMonth < 10) {
+    monthStr = `0${config.getMonth}`;
+  }
+  const week = `${config.getYear}年${monthStr}月0${config.getWeek}周`;
   // console.log('weeks', week);
   return week;
 }
-export { getWeeksRange, getMonthWeek };
+
+export {getWeeksRange, getMonthWeek};

@@ -1,37 +1,39 @@
 import React, {useRef} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
-import {AgGridReact} from 'ag-grid-react';
+import { AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
-import moment from 'moment';
 import {getWeeksRange, getMonthWeek} from '@/publicMethods/timeMethods';
-import {forEach} from "ag-grid-community/dist/lib/utils/array"; // 引用 publicMethods/timeMethods中的方法
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(4);
+// const InstGroupValues = [{time:"instCove2021-01-04",group:"2组-项目、预算",values:"11"},{time:"instCove2021-01-11",group:"2组-项目、预算",values:"22"},{time:"instCove2021-01-18",group:"2组-项目、预算",values:"33"}];
 
-
+const InstGroupValues: any[] = [];
+const branGroupValues: any[] = [];
 const colums = () => {
   const component = new Array();
   component.push(
     {
       headerName: '组名',
-      field: 'dept.name',
-      showRowGroup: 'dept',
+      field: 'group',
       rowGroup: true,
       hide: true,
+
     },
     {
       headerName: '所属部门',
-      field: 'dept.parent',
+      field: 'dept',
+
     },
+
     {
       headerName: '姓名',
-      field: 'userName',
+      field: 'username',
     },
   );
 
@@ -43,12 +45,16 @@ const colums = () => {
       children: [
         {
           headerName: '结构覆盖率',
-          field: `instCove${index.toString()}`,
+          field: `instCove${starttime.toString()}`,
+          type: "numericColumn",
+          aggFunc: instCoveRender,
           cellRenderer: coverageCellRenderer,
         },
         {
           headerName: '分支覆盖率',
-          field: `branCove${index.toString()}`,
+          field: `branCove${starttime.toString()}`,
+          type: "numericColumn",
+          aggFunc: branCoveRender,
           cellRenderer: coverageCellRenderer,
         },
       ],
@@ -57,39 +63,112 @@ const colums = () => {
   return component;
 };
 
+function instCoveRender(values: any) {
+  console.log("values", values);
+  for (let i = 0; i < InstGroupValues.length; i += 1) {
+    const datas = InstGroupValues[i];
+    if (values.colDef.field === datas.time && values.rowNode.key === datas.group) {
+      return ` <span style="font-weight: bold">  ${datas.values} </span> `;
+      // return datas.values;
+      break;
+    }
+  }
+  return "";
+}
+
+function branCoveRender(values: any) {
+
+  for (let i = 0; i < branGroupValues.length; i += 1) {
+    const datas = branGroupValues[i];
+    if (values.colDef.field === datas.time && values.rowNode.key === datas.group) {
+      return ` <span style="font-weight: bold">  ${datas.values} </span> `;
+      // return datas.values;
+      break;
+    }
+  }
+  return "";
+}
 
 const queryDevelopViews = async (client: GqlClient<object>) => {
-  // 用来存储结果数据
 
-  const tempDataArray: string | any[] = [];
+  const timeRange = new Array();
   for (let index = weekRanges.length - 1; index >= 0; index -= 1) {
-    const starting: any = weekRanges[index].from;
-    const ending = weekRanges[index].to;
-    // 需要时间  ,starttime:[${starting}],endtime:[${ending}]
-    const {data} = await client.query(`
+    timeRange.push(
+      `"${weekRanges[index].from}/${weekRanges[index].to}"`
+    );
+  }
+  const params = `[${timeRange.join(",")}]`;
+
+  const {data} = await client.query(`
        {
-         detailCover(side:BACKEND){
-          userName
-          dept{
+        detailCover(side:BACKEND, dates:${params}){
+          datas{
+            id
+            side
             name
             parent
+            instCove
+            branCove
+            order{
+              start
+              end
+            }
+            users{
+              userName
+              instCove
+              branCove
+            }
           }
-          instCove
-          branCove
         }
+
       }
     `);
 
-    // 重命名数组中的key
-    const timeOfData = JSON.parse(JSON.stringify(data?.detailCover).replace(/branCove/g, `branCove${index.toString()}`).replace(/instCove/g, `instCove${index.toString()}`));
+  const objectValues = addGroupAndDept(data?.detailCover);
+  return dealData(objectValues);
+};
 
-    // 将所有数据放到一个数组中
-    for (let i = 0; i < timeOfData.length; i += 1) {
-      tempDataArray.push(timeOfData[i]);
+// 解析数据
+function addGroupAndDept(oraDatas: any) {
+  const objectDataArray: string | any[] = [];
+  for (let index = 0; index < oraDatas.length; index += 1) {
+
+    if (oraDatas[index] !== null) {
+      const weekDatas = oraDatas[index].datas;
+      if (weekDatas !== null) {
+        for (let i = 0; i < weekDatas.length; i += 1) {
+          const groupInfo = weekDatas[i].name;
+          const deptInfo = weekDatas[i].parent;
+          const userInfo = weekDatas[i].users;
+          const orderTime = weekDatas[i].order.start;
+          // 此代码处理组的覆盖率,将组的单元测试覆盖率存到全局变量
+          InstGroupValues.push({
+            time: `instCove${orderTime}`,
+            group: groupInfo,
+            values: weekDatas[i].instCove
+          });
+
+          branGroupValues.push({
+            time: `branCove${orderTime}`,
+            group: groupInfo,
+            values: weekDatas[i].branCove
+          });
+
+          // 此循环用于处理个人的覆盖率
+          for (let index2 = 0; index2 < userInfo.length; index2 += 1) {
+            objectDataArray.push({
+              group: groupInfo,
+              dept: deptInfo,
+              username: userInfo[index2].userName,
+              [`instCove${orderTime}`]: userInfo[index2].instCove,
+              [`branCove${orderTime}`]: userInfo[index2].branCove
+            });
+          }
+        }
+      }
     }
   }
- // 需要重新解析数据，将相同姓名的数组放到一个对象中
-  return dealData(tempDataArray);
+  return objectDataArray;
 };
 
 
@@ -99,7 +178,7 @@ function dealData(tempDataArray: any) {
   // 首先需要获取所有已有的人名。
   let userNames = new Array();
   for (let i = 0; i < tempDataArray.length; i += 1) {
-    userNames.push(tempDataArray[i].userName);
+    userNames.push(tempDataArray[i].username);
   }
   userNames = Array.from(new Set(userNames));
 
@@ -109,7 +188,7 @@ function dealData(tempDataArray: any) {
     const objectStr = {};
     for (let i = 0; i < tempDataArray.length; i += 1) {
       // 当姓名相等，则把属性放到一起
-      if (userNames[userIndex] === tempDataArray[i].userName) {
+      if (userNames[userIndex] === tempDataArray[i].username) {
         // 遍历属性
         Object.keys(tempDataArray[i]).forEach((key) => {
           objectStr[key] = tempDataArray[i][key];
@@ -119,22 +198,20 @@ function dealData(tempDataArray: any) {
     // 再把最终的对象放到数组中
     resultDataArray.push(objectStr);
   }
-  console.log('resultDataArray',resultDataArray);
+  console.log('resultDataArray', resultDataArray);
   return resultDataArray;
 }
 
 // 表格代码渲染
 function coverageCellRenderer(params: any) {
-  let values: number = 0;
-  if (params.value === '' || params.value == null) {
-    values = 0;
-  } else {
-    values = params.value;
+  // 判断是否包含属性
+  if (params.hasOwnProperty("value")) {
+    if (params.value === 0) {
+      return ` <span style="color: dodgerblue">  ${params.value} </span> `;
+    }
+    return params.value;
   }
-  if (values === 0) {
-    return ` <span style="color: dodgerblue">  ${values} </span> `;
-  }
-  return values.toString();
+  return ` <span style="color: dodgerblue">  ${0} </span> `;
 }
 
 
@@ -159,25 +236,25 @@ const BackendTableList: React.FC<any> = () => {
 
   return (
     <PageContainer>
-      <div className="ag-theme-alpine" style={{height: 700, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
         <AgGridReact
           columnDefs={colums()} // 定义列
           rowData={data} // 数据绑定
           defaultColDef={{
             resizable: true,
             sortable: true,
-            // floatingFilter: true,
             filter: true,
             flex: 1,
-            minWidth: 100,
+            allowedAggFuncs: ['sum', 'min', 'max']
           }}
           autoGroupColumnDef={{
-            minWidth: 100,
+            maxWidth: 300,
           }}
           groupDefaultExpanded={9} // 展开分组
-          suppressDragLeaveHidesColumns // 取消分组时，例如单击删除区域中某一列上的“ x” ，该列将不可见
-          suppressMakeColumnVisibleAfterUnGroup // 如果用户在移动列时不小心将列移出了网格，但并不打算将其隐藏，那么这就很方便。
-          // rowGroupPanelShow="always"
+          // pivotColumnGroupTotals={'always'}
+          // groupHideOpenParents={true}  // 组和人名同一列
+
+          // rowGroupPanelShow={'always'}  可以拖拽列到上面
           onGridReady={onGridReady}
         >
         </AgGridReact>

@@ -14,17 +14,38 @@ import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone} from '@ant-design/icons';
 const {RangePicker} = DatePicker;
 const {Option} = Select;
 
-type FormStoreType = {
-  dateRange?: [string, string];
-  deptId?: number;
+const queryCondition: any = {
+  projectName: "",
+  projectType: [],
+  dateRange: [],
+  projectStatus: [],
 };
 
+
+const datasTest = [{
+  id: 1,
+  prjname: "测试1",
+  sourceType: "测试1"
+}, {
+  id: 2,
+  prjname: "测试2",
+  sourceType: "测试2"
+}, {
+  id: 3,
+  prjname: "测试3",
+  sourceType: "测试3"
+}, {
+  id: 4,
+  prjname: "测试4",
+  sourceType: "测试4"
+}];
+// 定义列名
 const colums = () => {
   const component = new Array();
   component.push(
     {
       headerName: '序号',
-      field: 'user.dept.name',
+      field: 'id',
     },
     {
       headerName: '',
@@ -35,13 +56,15 @@ const colums = () => {
     },
     {
       headerName: '项目名称',
-      field: 'user.dept.name',
-      cellRenderer: deatilsCellRenderer,
+      field: 'prjname',
+      cellRenderer: (params: any) => {
+        return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://172.31.1.219:8384/zentao/project-task-269-unclosed.html'>${params.value}</a>`;
+      },
 
     },
     {
       headerName: '来源类型',
-      field: 'user.realname',
+      field: 'sourceType',
     }, {
       headerName: '开始时间',
       field: 'user.realname',
@@ -80,73 +103,17 @@ const colums = () => {
 };
 
 // 查询数据
-const queryDevelopViews = async (client: GqlClient<object>, value: FormStoreType = {}) => {
-  let from = 0;
-  let to = 0;
-  const {dateRange, deptId = 0} = value;
-
-  if (!dateRange) {
-    from = moment().startOf('month').valueOf();
-    to = moment().endOf('month').valueOf();
-  } else {
-    from = moment(dateRange[0]).valueOf();
-    to = moment(dateRange[1]).valueOf();
-  }
-
-  const rangeArgs = `dateRange: { from: ${from}, to: ${to} }`;
-
-  const {data} = await client.query(`
-       {
-          developerView(deptIds: [${deptId}]) {
-            user {
-              id
-              account
-              realname
-              pinyin
-              dept {
-                id
-                name
-              }
-            }
-            activeBugView(${rangeArgs}) {
-              count
-              sprintCount
-              hotfixCount
-            }
-            resolveBugView(${rangeArgs}) {
-              count
-              sprintCount
-              hotfixCount
-            }
-          }
-      }
-    `);
-
-  return data?.developerView;
+const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
+  console.log(params.projectName, params.projectType, params.dateRange, params.projectStatus);
+  return [];
 };
 
-// 表格代码渲染
-function deatilsCellRenderer(params: any) {
-  return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://172.31.1.219:8384/zentao/project-task-269-unclosed.html'>${params.value}</a>`;
-
-  // let values: number = 0;
-  // if (params.value === '' || params.value == null) {
-  //   values = 400;
-  // } else {
-  //   values = params.value;
-  // }
-  // if (values === 400) {
-  //   return ` <span style="color: dodgerblue">  ${values} </span> `;
-  // }
-  // return values.toString();
-}
-
-
-const TableList: React.FC<any> = () => {
-  const gridApi = useRef<GridApi>();
+// 组件初始化
+const SprintList: React.FC<any> = () => {
+  const gridApi = useRef<GridApi>();   // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest((value: FormStoreType) =>
-    queryDevelopViews(gqlClient, value),
+  const {data, loading} = useRequest(() =>
+    queryDevelopViews(gqlClient, queryCondition),
   );
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -162,9 +129,14 @@ const TableList: React.FC<any> = () => {
   // 项目名称输入事件
   const inputOnChange = (e: any) => {
     prjName = e.nativeEvent.data;
+    queryCondition.projectName = prjName;
     // console.log("项目名",e.nativeEvent.data);
     // console.log("参数项目名：", prjName);
     // 请求数据
+
+    // 绑定数据
+    gridApi.current?.setRowData(datasTest);
+
   };
 
   let prjType = new Array();
@@ -172,8 +144,14 @@ const TableList: React.FC<any> = () => {
   const prjTypeHandleChange = (value: any, params: any) => {
     console.log(params);
     prjType = value;
+
+
     // console.log(`选择的项目类型`, prjName, prjType);
     // 请求数据
+
+    // 绑定数据
+    gridApi.current?.setRowData(datasTest);
+
   };
 
   let starttime = "";
@@ -281,4 +259,4 @@ const TableList: React.FC<any> = () => {
   );
 };
 
-export default TableList;
+export default SprintList;

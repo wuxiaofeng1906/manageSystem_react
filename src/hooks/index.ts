@@ -3,6 +3,7 @@ import {useModel} from '@@/plugin-model/useModel';
 import {useRequest} from 'ahooks';
 
 export class GqlClient<T> {
+  // eslint-disable-next-line @typescript-eslint/no-parameter-properties
   constructor(private readonly apolloClient: ApolloClient<T>) {
   }
 
@@ -14,9 +15,7 @@ export class GqlClient<T> {
 }
 
 export function useGqlClient(): GqlClient<object> {
-  const {
-    initialState: {gqlClient},
-  } = useModel('@@initialState') as any;
+  const {initialState: {gqlClient},} = useModel('@@initialState') as any;
   return gqlClient;
 }
 

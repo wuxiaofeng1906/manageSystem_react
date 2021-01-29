@@ -8,7 +8,6 @@ import { useRequest } from 'ahooks';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { GqlClient, useGqlClient } from '@/hooks';
 import * as dayjs from 'dayjs';
-// import styles from './index.less';
 
 const queryBranchViews = async (client: GqlClient<object>) => {
   const { data } = await client.query(`

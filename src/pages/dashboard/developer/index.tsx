@@ -14,8 +14,9 @@ import {getRanges, thisWeekValue} from "@/utils/data-range-picker.util";
 type FormStoreType = {
   dateRange?: [string, string];
   deptId?: number;
-}
+};
 
+// 初始化查询
 const queryDevelopViews = async (client: GqlClient<object>, value: FormStoreType = {}) => {
   let from = 0; let to = 0;
   const { dateRange, deptId = 0 } = value;
@@ -28,7 +29,7 @@ const queryDevelopViews = async (client: GqlClient<object>, value: FormStoreType
     to = moment(dateRange[1]).valueOf();
   }
 
-  const rangeArgs = `dateRange: { from: ${from}, to: ${to} }`
+  const rangeArgs = `dateRange: { from: ${from}, to: ${to} }`;
   // const query = new GqlQueryBuilder('developerView', { deptIds: [deptId]})
   //   .find()
 
@@ -62,18 +63,20 @@ const queryDevelopViews = async (client: GqlClient<object>, value: FormStoreType
   return data?.developerView;
 };
 
+// 手动查询
 const DataFilter = ( { refresh }: { refresh: any }) => {
+
   const { data: {depts = []} = {} } = useQuery(`
-{
-  depts {
-    id
-    name
-    path
-    grade
-    order
+  {
+    depts {
+      id
+      name
+      path
+      grade
+      order
+    }
   }
-}
-  `)
+  `);
 
   const deptOptions = depts.map( (x: any) => ({
     value: x.id,
@@ -83,7 +86,7 @@ const DataFilter = ( { refresh }: { refresh: any }) => {
   deptOptions.unshift({
     value: 0,
     label: '全部',
-  })
+  });
 
   return (
     <QueryFilter defaultCollapsed onFinish={(values) => {
@@ -107,13 +110,14 @@ const DataFilter = ( { refresh }: { refresh: any }) => {
         options={deptOptions}
       />
     </QueryFilter>
-  )
-}
+  );
+};
 
+// React组件创建
 const TableList: React.FC<any> = () => {
   const gridApi = useRef<GridApi>();
   const gqlClient  = useGqlClient();
-  const { data, run, loading } = useRequest((value: FormStoreType) => queryDevelopViews(gqlClient, value))
+  const { data, run, loading } = useRequest((value: FormStoreType) => queryDevelopViews(gqlClient, value));
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -121,18 +125,16 @@ const TableList: React.FC<any> = () => {
 
   if (gridApi.current) {
     if (loading)
-      gridApi.current.showLoadingOverlay()
+      gridApi.current.showLoadingOverlay();
     else
-      gridApi.current.hideOverlay()
+      gridApi.current.hideOverlay();
   }
 
   return (
     <PageContainer>
       <DataFilter refresh={run}/>
 
-      <div className="ag-theme-alpine"
-           style={ {height: 700, width: '100%' } }
-      >
+      <div className="ag-theme-alpine"  style={ {height: 700, width: '100%' } } >
         <AgGridReact
           rowData={data}
           defaultColDef={{
@@ -167,8 +169,9 @@ const TableList: React.FC<any> = () => {
           </AgGridColumn>
         </AgGridReact>
       </div>
+
     </PageContainer>
-  )
-}
+  );
+};
 
 export default TableList;

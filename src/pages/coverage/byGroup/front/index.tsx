@@ -18,15 +18,17 @@ const colums = () => {
   const component = new Array();
   component.push(
     {
+      headerName: '所属部门',
+      field: 'dept',
+      rowGroup: true,
+      hide: true,
+    },
+    {
       headerName: '组名',
       field: 'group',
       rowGroup: true,
       hide: true,
 
-    },
-    {
-      headerName: '所属部门',
-      field: 'dept',
     },
     {
       headerName: '姓名',
@@ -35,8 +37,10 @@ const colums = () => {
   );
 
   for (let index = weekRanges.length - 1; index >= 0; index -= 1) {
+    const starttime = weekRanges[index].from;
+    const weekName = getMonthWeek(starttime);
     const endtime = weekRanges[index].to;
-    const weekName = getMonthWeek(endtime);
+
     component.push({
       headerName: weekName,
       children: [
@@ -62,7 +66,7 @@ const colums = () => {
 
 // 合并结构列渲染
 function instCoveRender(values: any) {
-  console.log("values", values);
+  // console.log("values", values);
   for (let i = 0; i < InstGroupValues.length; i += 1) {
     const datas = InstGroupValues[i];
     if (values.colDef.field === datas.time && values.rowNode.key === datas.group) {

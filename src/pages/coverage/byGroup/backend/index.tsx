@@ -14,19 +14,23 @@ const weekRanges = getWeeksRange(4);
 // const InstGroupValues = [{time:"instCove2021-01-04",group:"2组-项目、预算",values:"11"},{time:"instCove2021-01-11",group:"2组-项目、预算",values:"22"},{time:"instCove2021-01-18",group:"2组-项目、预算",values:"33"}];
 const InstGroupValues: any[] = [];
 const branGroupValues: any[] = [];
+
+/* 定义列名 */
 const colums = () => {
   const component = new Array();
   component.push(
+    {
+      headerName: '所属部门',
+      field: 'dept',
+      rowGroup: true,
+      hide: true,
+    },
     {
       headerName: '组名',
       field: 'group',
       rowGroup: true,
       hide: true,
 
-    },
-    {
-      headerName: '所属部门',
-      field: 'dept',
     },
     {
       headerName: '姓名',

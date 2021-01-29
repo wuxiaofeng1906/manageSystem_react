@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -8,7 +8,7 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import moment from 'moment';
-import {Button, Input, Form, DatePicker, Select} from 'antd';
+import {Button, Input, Form, DatePicker, Select, Modal} from 'antd';
 import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone} from '@ant-design/icons';
 
 const {RangePicker} = DatePicker;
@@ -22,23 +22,24 @@ const queryCondition: any = {
 };
 
 
-const datasTest = [{
-  id: 1,
-  prjname: "测试1",
-  sourceType: "测试1"
-}, {
-  id: 2,
-  prjname: "测试2",
-  sourceType: "测试2"
-}, {
-  id: 3,
-  prjname: "测试3",
-  sourceType: "测试3"
-}, {
-  id: 4,
-  prjname: "测试4",
-  sourceType: "测试4"
-}];
+const datasTest = [
+  {
+    id: 1,
+    prjname: "测试1",
+    sourceType: "测试1"
+  }, {
+    id: 2,
+    prjname: "测试2",
+    sourceType: "测试2"
+  }, {
+    id: 3,
+    prjname: "测试3",
+    sourceType: "测试3"
+  }, {
+    id: 4,
+    prjname: "测试4",
+    sourceType: "测试4"
+  }];
 // 定义列名
 const colums = () => {
   const component = new Array();
@@ -179,6 +180,18 @@ const SprintList: React.FC<any> = () => {
     // 请求数据
 
   };
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
 
   return (
 
@@ -228,7 +241,7 @@ const SprintList: React.FC<any> = () => {
                 size={"large"}> 修改 </Button>
 
         <Button type="text" style={{"color": "black", float: "right"}} icon={<DeleteTwoTone/>}
-                size={"large"}> 新增 </Button>
+                size={"large"} onClick={showModal}> 新增 </Button>
       </div>
 
       <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
@@ -255,8 +268,67 @@ const SprintList: React.FC<any> = () => {
         >
         </AgGridReact>
       </div>
+
+      <Modal title="新增项目" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}
+             centered={true} footer={null} width={700}>
+        <Form>
+          <Form.Item>
+            <label style={{marginLeft: "10px"}}>项目名称：</label>
+            <Select placeholder="请选择类型" mode="tags" style={{width: '150px'}} onChange={prjTypeHandleChange}
+                    tokenSeparators={[',']}> {
+              [
+                <Option key={"sprint"} value={"sprint"}>sprint </Option>,
+                <Option key={"hotfix"} value={"hotfix"}>hotfix </Option>,
+                <Option key={"emergency"} value={"emergency"}>emergency </Option>,
+              ]
+            }
+            </Select>
+            <DatePicker/>
+          </Form.Item>
+
+          <Form.Item>
+            <label style={{marginLeft: "10px", width: "20px"}}>开始时间：</label>
+            <DatePicker/>
+
+            <label style={{marginLeft: "160px", width: "20px"}}>提测截止：</label>
+            <DatePicker/>
+          </Form.Item>
+
+          <Form.Item>
+            <label style={{marginLeft: "10px", width: "20px"}}>测试截止：</label>
+            <DatePicker/>
+
+            <label style={{marginLeft: "160px", width: "20px"}}>计划灰度：</label>
+            <DatePicker/>
+          </Form.Item>
+
+          <Form.Item>
+            <label style={{marginLeft: "10px", width: "20px"}}>计划上线：</label>
+            <DatePicker/>
+
+            <label style={{marginLeft: "160px"}}>项目状态：</label>
+            <Select placeholder="请选择" mode="tags" style={{width: "150px"}} onChange={prjStatusHandleChange}
+                    tokenSeparators={[',']}>{
+              [
+                <Option key={"closed"} value={"closed"}>已关闭 </Option>,
+                <Option key={"doing"} value={"doing"}>进行中 </Option>,
+                <Option key={"suspended"} value={"suspended"}>已暂停 </Option>,
+                <Option key={"wait"} value={"wait"}>未开始 </Option>
+              ]
+            }
+            </Select>
+          </Form.Item>
+
+          <Form.Item style={{marginTop:"50px"}}>
+            <Button type="primary" style={{marginLeft: "250px"}}>确定</Button>
+            <Button type="primary" style={{marginLeft: "20px"}}>取消</Button>
+          </Form.Item>
+        </Form>
+
+      </Modal>
     </PageContainer>
   );
 };
+
 
 export default SprintList;

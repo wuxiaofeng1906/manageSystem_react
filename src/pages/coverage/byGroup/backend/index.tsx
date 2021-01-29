@@ -1,6 +1,6 @@
 import React, {useRef} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
-import { AgGridReact} from 'ag-grid-react';
+import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
@@ -12,7 +12,6 @@ import {getWeeksRange, getMonthWeek} from '@/publicMethods/timeMethods';
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(4);
 // const InstGroupValues = [{time:"instCove2021-01-04",group:"2组-项目、预算",values:"11"},{time:"instCove2021-01-11",group:"2组-项目、预算",values:"22"},{time:"instCove2021-01-18",group:"2组-项目、预算",values:"33"}];
-
 const InstGroupValues: any[] = [];
 const branGroupValues: any[] = [];
 const colums = () => {
@@ -28,9 +27,7 @@ const colums = () => {
     {
       headerName: '所属部门',
       field: 'dept',
-
     },
-
     {
       headerName: '姓名',
       field: 'username',
@@ -38,21 +35,21 @@ const colums = () => {
   );
 
   for (let index = weekRanges.length - 1; index >= 0; index -= 1) {
-    const starttime = weekRanges[index].from;
-    const weekName = getMonthWeek(starttime);
+    const endtime = weekRanges[index].to;
+    const weekName = getMonthWeek(endtime);
     component.push({
       headerName: weekName,
       children: [
         {
           headerName: '结构覆盖率',
-          field: `instCove${starttime.toString()}`,
+          field: `instCove${endtime.toString()}`,
           type: "numericColumn",
           aggFunc: instCoveRender,
           cellRenderer: coverageCellRenderer,
         },
         {
           headerName: '分支覆盖率',
-          field: `branCove${starttime.toString()}`,
+          field: `branCove${endtime.toString()}`,
           type: "numericColumn",
           aggFunc: branCoveRender,
           cellRenderer: coverageCellRenderer,
@@ -63,6 +60,7 @@ const colums = () => {
   return component;
 };
 
+// 合并结构列渲染
 function instCoveRender(values: any) {
   console.log("values", values);
   for (let i = 0; i < InstGroupValues.length; i += 1) {
@@ -76,8 +74,8 @@ function instCoveRender(values: any) {
   return "";
 }
 
+// 合并分支列渲染
 function branCoveRender(values: any) {
-
   for (let i = 0; i < branGroupValues.length; i += 1) {
     const datas = branGroupValues[i];
     if (values.colDef.field === datas.time && values.rowNode.key === datas.group) {
@@ -92,16 +90,17 @@ function branCoveRender(values: any) {
 const queryDevelopViews = async (client: GqlClient<object>) => {
 
   const timeRange = new Array();
-  for (let index = weekRanges.length - 1; index >= 0; index -= 1) {
-    timeRange.push(
-      `"${weekRanges[index].from}/${weekRanges[index].to}"`
-    );
+  for (let index = 0; index <weekRanges.length; index += 1) {
+    timeRange.push(`"${weekRanges[index].to}"`);
   }
-  const params = `[${timeRange.join(",")}]`;
+  // 求出开始时间和结束时间
+  const start =`"${weekRanges[0].from}"` ;
+  const ends = `[${timeRange.join(",")}]`;
 
+  // const ends = `"["2021-01-10","2021-01-17","2021-01-24","2021-01-31"]"`;
   const {data} = await client.query(`
        {
-        detailCover(side:BACKEND, dates:${params}){
+        detailCover(side:BACKEND,start:${start},ends:${ends}){
           datas{
             id
             side
@@ -128,7 +127,7 @@ const queryDevelopViews = async (client: GqlClient<object>) => {
   return dealData(objectValues);
 };
 
-// 解析数据
+
 function addGroupAndDept(oraDatas: any) {
   const objectDataArray: string | any[] = [];
   for (let index = 0; index < oraDatas.length; index += 1) {
@@ -140,7 +139,7 @@ function addGroupAndDept(oraDatas: any) {
           const groupInfo = weekDatas[i].name;
           const deptInfo = weekDatas[i].parent;
           const userInfo = weekDatas[i].users;
-          const orderTime = weekDatas[i].order.start;
+          const orderTime = weekDatas[i].order.end;
           // 此代码处理组的覆盖率,将组的单元测试覆盖率存到全局变量
           InstGroupValues.push({
             time: `instCove${orderTime}`,
@@ -206,8 +205,8 @@ function dealData(tempDataArray: any) {
 function coverageCellRenderer(params: any) {
   // 判断是否包含属性
   if (params.hasOwnProperty("value")) {
-    if (params.value === 0) {
-      return ` <span style="color: dodgerblue">  ${params.value} </span> `;
+    if (params.value === "0.00") {
+      return ` <span style="color: dodgerblue">  ${0} </span> `;
     }
     return params.value;
   }

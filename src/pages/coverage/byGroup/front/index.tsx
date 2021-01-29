@@ -35,21 +35,21 @@ const colums = () => {
   );
 
   for (let index = weekRanges.length - 1; index >= 0; index -= 1) {
-    const starttime = weekRanges[index].from;
-    const weekName = getMonthWeek(starttime);
+    const endtime = weekRanges[index].to;
+    const weekName = getMonthWeek(endtime);
     component.push({
       headerName: weekName,
       children: [
         {
           headerName: '结构覆盖率',
-          field: `instCove${starttime.toString()}`,
+          field: `instCove${endtime.toString()}`,
           type: "numericColumn",
           aggFunc: instCoveRender,
           cellRenderer: coverageCellRenderer,
         },
         {
           headerName: '分支覆盖率',
-          field: `branCove${starttime.toString()}`,
+          field: `branCove${endtime.toString()}`,
           type: "numericColumn",
           aggFunc: branCoveRender,
           cellRenderer: coverageCellRenderer,
@@ -90,16 +90,17 @@ function branCoveRender(values: any) {
 const queryDevelopViews = async (client: GqlClient<object>) => {
 
   const timeRange = new Array();
-  for (let index = weekRanges.length - 1; index >= 0; index -= 1) {
-    timeRange.push(
-      `"${weekRanges[index].from}/${weekRanges[index].to}"`
-    );
+  for (let index = 0; index <weekRanges.length; index += 1) {
+    timeRange.push(`"${weekRanges[index].to}"`);
   }
-  const params = `[${timeRange.join(",")}]`;
+  // 求出开始时间和结束时间
+  const start =`"${weekRanges[0].from}"` ;
+  const ends = `[${timeRange.join(",")}]`;
 
+  // const ends = `"["2021-01-10","2021-01-17","2021-01-24","2021-01-31"]"`;
   const {data} = await client.query(`
        {
-        detailCover(side:FRONT, dates:${params}){
+        detailCover(side:FRONT,start:${start},ends:${ends}){
           datas{
             id
             side
@@ -138,7 +139,7 @@ function addGroupAndDept(oraDatas: any) {
           const groupInfo = weekDatas[i].name;
           const deptInfo = weekDatas[i].parent;
           const userInfo = weekDatas[i].users;
-          const orderTime = weekDatas[i].order.start;
+          const orderTime = weekDatas[i].order.end;
           // 此代码处理组的覆盖率,将组的单元测试覆盖率存到全局变量
           InstGroupValues.push({
             time: `instCove${orderTime}`,

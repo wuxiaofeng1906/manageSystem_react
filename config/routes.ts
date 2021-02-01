@@ -19,7 +19,7 @@ export default [
   },
   {
     path: '/welcomes',
-    name: '欢迎使用',
+    name: '首页',
     icon: 'smile',
     component: './welcomes',
   },
@@ -44,12 +44,12 @@ export default [
   //   path: '/list',
   //   component: './ListTableList',
   // },
-  {
-    name: '开发者',
-    icon: 'table',
-    path: '/users/list',
-    component: './dashboard/developer',
-  },
+  // {
+  //   name: '开发者',
+  //   icon: 'table',
+  //   path: '/users/list',
+  //   component: './dashboard/developer',
+  // },
   {
     name: '单元测试覆盖率',
     icon: 'table',
@@ -79,7 +79,8 @@ export default [
         ],
       },
     ],
-  }, {
+  },
+  {
     name: 'sprint 工作台',
     icon: 'table',
     path: '/sprint',

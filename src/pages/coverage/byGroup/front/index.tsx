@@ -47,14 +47,14 @@ const colums = () => {
         {
           headerName: '结构覆盖率',
           field: `instCove${endtime.toString()}`,
-          type: "numericColumn",
+          // type: "numericColumn",
           aggFunc: instCoveRender,
           cellRenderer: coverageCellRenderer,
         },
         {
           headerName: '分支覆盖率',
           field: `branCove${endtime.toString()}`,
-          type: "numericColumn",
+          // type: "numericColumn",
           aggFunc: branCoveRender,
           cellRenderer: coverageCellRenderer,
         },
@@ -94,15 +94,14 @@ function branCoveRender(values: any) {
 const queryDevelopViews = async (client: GqlClient<object>) => {
 
   const timeRange = new Array();
-  for (let index = 0; index <weekRanges.length; index += 1) {
+  for (let index = 0; index < weekRanges.length; index += 1) {
     timeRange.push(`"${weekRanges[index].to}"`);
   }
   // 求出开始时间和结束时间
-  const start =`"${weekRanges[0].from}"` ;
+  const start = `"${weekRanges[0].from}"`;
   const ends = `[${timeRange.join(",")}]`;
 
-  // const ends = `"["2021-01-10","2021-01-17","2021-01-24","2021-01-31"]"`;
-  const {data} = await client.query(`
+   const {data} = await client.query(`
        {
         detailCover(side:FRONT,start:${start},ends:${ends}){
           datas{
@@ -140,10 +139,15 @@ function addGroupAndDept(oraDatas: any) {
       const weekDatas = oraDatas[index].datas;
       if (weekDatas !== null) {
         for (let i = 0; i < weekDatas.length; i += 1) {
-          const groupInfo = weekDatas[i].name;
-          const deptInfo = weekDatas[i].parent;
           const userInfo = weekDatas[i].users;
           const orderTime = weekDatas[i].order.end;
+          let deptInfo = weekDatas[i].parent;
+          let groupInfo = weekDatas[i].name;
+
+          if (deptInfo === "成都研发中心") {
+            deptInfo = "前端平台研发部";
+            groupInfo = "前端平台研发";
+          }
           // 此代码处理组的覆盖率,将组的单元测试覆盖率存到全局变量
           InstGroupValues.push({
             time: `instCove${orderTime}`,
@@ -156,16 +160,18 @@ function addGroupAndDept(oraDatas: any) {
             group: groupInfo,
             values: weekDatas[i].branCove
           });
-
+          let index2;
           // 此循环用于处理个人的覆盖率
-          for (let index2 = 0; index2 < userInfo.length; index2 += 1) {
-            objectDataArray.push({
-              group: groupInfo,
-              dept: deptInfo,
-              username: userInfo[index2].userName,
-              [`instCove${orderTime}`]: userInfo[index2].instCove,
-              [`branCove${orderTime}`]: userInfo[index2].branCove
-            });
+          for (index2 = 0; index2 < userInfo.length; index2 += 1) {
+            if (userInfo[index2].userName !== "王润燕" && userInfo[index2].userName !== "宋永强") {
+              objectDataArray.push({
+                group: groupInfo,
+                dept: deptInfo,
+                username: userInfo[index2].userName,
+                [`instCove${orderTime}`]: userInfo[index2].instCove,
+                [`branCove${orderTime}`]: userInfo[index2].branCove
+              });
+            }
           }
         }
       }
@@ -254,6 +260,8 @@ const BackendTableList: React.FC<any> = () => {
             maxWidth: 300,
           }}
           groupDefaultExpanded={9} // 展开分组
+          suppressAggFuncInHeader={true}   // 不显示标题聚合函数的标识
+
           // pivotColumnGroupTotals={'always'}
           // groupHideOpenParents={true}  // 组和人名同一列
 

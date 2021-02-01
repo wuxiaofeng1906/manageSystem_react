@@ -66,6 +66,9 @@ const colums = () => {
 
 // 合并结构列渲染
 function instCoveRender(values: any) {
+  if(values.rowNode.key === "产品研发部"){
+    return "";
+  }
   // console.log("values", values);
   for (let i = 0; i < InstGroupValues.length; i += 1) {
     const datas = InstGroupValues[i];
@@ -80,6 +83,10 @@ function instCoveRender(values: any) {
 
 // 合并分支列渲染
 function branCoveRender(values: any) {
+  if(values.rowNode.key === "产品研发部"){
+    return "";
+  }
+
   for (let i = 0; i < branGroupValues.length; i += 1) {
     const datas = branGroupValues[i];
     if (values.colDef.field === datas.time && values.rowNode.key === datas.group) {

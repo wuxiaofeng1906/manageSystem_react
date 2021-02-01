@@ -193,6 +193,11 @@ const SprintList: React.FC<any> = () => {
     setIsModalVisible(false);
   };
 
+  // 获取当前时间
+
+
+ const currentDate = moment(new Date()).add('year',0);
+
   return (
 
     <PageContainer>
@@ -269,8 +274,18 @@ const SprintList: React.FC<any> = () => {
         </AgGridReact>
       </div>
 
-      <Modal title="新增项目" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}
-             centered={true} footer={null} width={700}>
+      <Modal
+        // title={[<div style={{
+        //   height: "50px",
+        //   marginTop: "-17px",
+        //   marginRight: "-24px",
+        //   marginBottom: "-17px",
+        //   marginLeft: "-24px",
+        //   backgroundColor: "lightskyblue"
+        // }}>新增项目</div>]}
+        title="新增项目"
+        visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}
+        centered={true} footer={null} width={700}>
         <Form>
           <Form.Item>
             <label style={{marginLeft: "10px"}}>项目名称：</label>
@@ -288,7 +303,7 @@ const SprintList: React.FC<any> = () => {
 
           <Form.Item>
             <label style={{marginLeft: "10px", width: "20px"}}>开始时间：</label>
-            <DatePicker/>
+            <DatePicker defaultValue={moment(currentDate, "YYYY-MM-DD")} allowClear={false}/>
 
             <label style={{marginLeft: "160px", width: "20px"}}>提测截止：</label>
             <DatePicker/>
@@ -319,14 +334,13 @@ const SprintList: React.FC<any> = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item style={{marginTop:"50px"}}>
+          <Form.Item style={{marginTop: "50px"}}>
             <Button type="primary" style={{marginLeft: "250px"}}>确定</Button>
             <Button type="primary" style={{marginLeft: "20px"}}>取消</Button>
           </Form.Item>
         </Form>
 
       </Modal>
-
 
 
     </PageContainer>

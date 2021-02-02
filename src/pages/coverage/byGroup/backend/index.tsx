@@ -57,7 +57,7 @@ const colums = () => {
           // type: "numericColumn",
           aggFunc: branCoveRender,
           cellRenderer: coverageCellRenderer,
-         },
+        },
       ],
     });
   }
@@ -66,9 +66,6 @@ const colums = () => {
 
 // 合并结构列渲染
 function instCoveRender(values: any) {
-  if(values.rowNode.key === "产品研发部"){
-    return "";
-  }
   // console.log("values", values);
   for (let i = 0; i < InstGroupValues.length; i += 1) {
     const datas = InstGroupValues[i];
@@ -83,9 +80,9 @@ function instCoveRender(values: any) {
 
 // 合并分支列渲染
 function branCoveRender(values: any) {
-  if(values.rowNode.key === "产品研发部"){
-    return "";
-  }
+  // if (values.rowNode.key === "产品研发部") {
+  //   return "";
+  // }
 
   for (let i = 0; i < branGroupValues.length; i += 1) {
     const datas = branGroupValues[i];
@@ -116,7 +113,11 @@ const queryDevelopViews = async (client: GqlClient<object>) => {
             id
             side
             name
-            parent
+            parent{
+            name
+            instCove
+            branCove
+            }
             instCove
             branCove
             order{
@@ -124,7 +125,7 @@ const queryDevelopViews = async (client: GqlClient<object>) => {
               end
             }
             users{
-              userName
+              name
               instCove
               branCove
             }
@@ -151,8 +152,13 @@ function addGroupAndDept(oraDatas: any) {
           const orderTime = weekDatas[i].order.end;
 
           // 特殊处理部门和组名
+          let deptInfo = "";
+          if (weekDatas[i].parent !== null) {
+            deptInfo = weekDatas[i].parent.name;
+          }
+
           let groupInfo = weekDatas[i].name;
-          let deptInfo = weekDatas[i].parent;
+
           if (groupInfo === "应用架构部") {
             deptInfo = "应用架构部";
             groupInfo = "应用架构";
@@ -161,6 +167,20 @@ function addGroupAndDept(oraDatas: any) {
           if (groupInfo === "平台研发部") {
             deptInfo = "平台研发部";
             groupInfo = "平台研发";
+          }
+
+          if (deptInfo === "产品研发部") {
+            InstGroupValues.push({
+              time: `instCove${orderTime}`,
+              group: "产品研发部",
+              values: weekDatas[i].parent.instCove
+            });
+
+            branGroupValues.push({
+              time: `branCove${orderTime}`,
+              group: "产品研发部",
+              values: weekDatas[i].parent.branCove
+            });
           }
 
           // 此代码处理组的覆盖率,将组的单元测试覆盖率存到全局变量
@@ -178,11 +198,11 @@ function addGroupAndDept(oraDatas: any) {
           let index2;
           // 此循环用于处理个人的覆盖率
           for (index2 = 0; index2 < userInfo.length; index2 += 1) {
-            if (userInfo[index2].userName !== "王润燕" && userInfo[index2].userName !== "宋永强") {
+            if (userInfo[index2].name !== "王润燕" && userInfo[index2].name !== "宋永强") {
               objectDataArray.push({
                 group: groupInfo,
                 dept: deptInfo,
-                username: userInfo[index2].userName,
+                username: userInfo[index2].name,
                 [`instCove${orderTime}`]: userInfo[index2].instCove,
                 [`branCove${orderTime}`]: userInfo[index2].branCove
               });
@@ -270,7 +290,7 @@ const BackendTableList: React.FC<any> = () => {
             filter: true,
             flex: 1,
 
-           }}
+          }}
           autoGroupColumnDef={{
             maxWidth: 300,
           }}

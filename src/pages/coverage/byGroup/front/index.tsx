@@ -101,14 +101,18 @@ const queryDevelopViews = async (client: GqlClient<object>) => {
   const start = `"${weekRanges[0].from}"`;
   const ends = `[${timeRange.join(",")}]`;
 
-   const {data} = await client.query(`
+  const {data} = await client.query(`
        {
         detailCover(side:FRONT,start:${start},ends:${ends}){
           datas{
             id
             side
             name
-            parent
+            parent{
+            name
+            instCove
+            branCove
+            }
             instCove
             branCove
             order{
@@ -116,7 +120,7 @@ const queryDevelopViews = async (client: GqlClient<object>) => {
               end
             }
             users{
-              userName
+              name
               instCove
               branCove
             }
@@ -125,7 +129,6 @@ const queryDevelopViews = async (client: GqlClient<object>) => {
 
       }
     `);
-
   const objectValues = addGroupAndDept(data?.detailCover);
   return dealData(objectValues);
 };
@@ -141,7 +144,10 @@ function addGroupAndDept(oraDatas: any) {
         for (let i = 0; i < weekDatas.length; i += 1) {
           const userInfo = weekDatas[i].users;
           const orderTime = weekDatas[i].order.end;
-          let deptInfo = weekDatas[i].parent;
+          let deptInfo = "";
+          if (weekDatas[i].parent !== null) {
+            deptInfo = weekDatas[i].parent.name;
+          }
           let groupInfo = weekDatas[i].name;
 
           if (deptInfo === "成都研发中心") {
@@ -149,6 +155,23 @@ function addGroupAndDept(oraDatas: any) {
             groupInfo = "前端平台研发";
           }
           // 此代码处理组的覆盖率,将组的单元测试覆盖率存到全局变量
+
+          // 特殊处理产品研发部的数据
+          if (deptInfo === "产品研发部") {
+            InstGroupValues.push({
+              time: `instCove${orderTime}`,
+              group: "产品研发部",
+              values: weekDatas[i].parent.instCove
+            });
+
+            branGroupValues.push({
+              time: `branCove${orderTime}`,
+              group: "产品研发部",
+              values: weekDatas[i].parent.branCove
+            });
+          }
+
+          // 添加所有部门和组的信息
           InstGroupValues.push({
             time: `instCove${orderTime}`,
             group: groupInfo,
@@ -160,14 +183,16 @@ function addGroupAndDept(oraDatas: any) {
             group: groupInfo,
             values: weekDatas[i].branCove
           });
+
+
           let index2;
           // 此循环用于处理个人的覆盖率
           for (index2 = 0; index2 < userInfo.length; index2 += 1) {
-            if (userInfo[index2].userName !== "王润燕" && userInfo[index2].userName !== "宋永强") {
+            if (userInfo[index2].name !== "王润燕" && userInfo[index2].name !== "宋永强") {
               objectDataArray.push({
                 group: groupInfo,
                 dept: deptInfo,
-                username: userInfo[index2].userName,
+                username: userInfo[index2].name,
                 [`instCove${orderTime}`]: userInfo[index2].instCove,
                 [`branCove${orderTime}`]: userInfo[index2].branCove
               });

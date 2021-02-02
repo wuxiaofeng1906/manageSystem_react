@@ -144,6 +144,7 @@ const colums = () => {
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   // console.log(params.projectName, params.projectType, params.dateRange, params.projectStatus);
+  console.log(client, params);
   return [];
 };
 
@@ -170,10 +171,10 @@ const SprintList: React.FC<any> = () => {
   let prjStatus = "";
   // 项目类型选择事件
   const prjTypeHandleChange = (value: any, params: any) => {
-    // console.log(params);
+    console.log(params);
     prjType = value;
 
-    // console.log(`选择的项目类型`, prjName, prjType);
+    console.log(`选择的项目类型`, prjType);
     // 请求数据
 
     // 绑定数据
@@ -185,7 +186,7 @@ const SprintList: React.FC<any> = () => {
     starttime = moment(params[0]).format('YYYY-MM-DD');
     endtime = moment(params[1]).format('YYYY-MM-DD');
 
-    // console.log("选择的times", starttime, endtime);
+    console.log("选择的times", starttime, endtime);
 
     // 请求数据
     gridApi.current?.setRowData(datasTest);
@@ -194,11 +195,11 @@ const SprintList: React.FC<any> = () => {
   // 选择项目状态
   const prjStatusHandleChange = (value: any, params: any) => {
 
-    // console.log(params);
+    console.log(params);
     prjStatus = value;
     // console.log(`selected ${prjStatus}`);
 
-    // console.log(prjType, starttime, endtime, prjStatus);
+    console.log(prjType, starttime, endtime, prjStatus);
 
     // 请求数据
     gridApi.current?.setRowData(datasTest);
@@ -227,6 +228,7 @@ const SprintList: React.FC<any> = () => {
 
   };
 
+  // 修改项目
   const modifyProject = () => {
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
     // 没有选中则提醒
@@ -295,7 +297,6 @@ const SprintList: React.FC<any> = () => {
   // sprint 项目保存
   const commitSprint = () => {
     console.log("保存项目！");
-
   };
 
   const rightStyle = {marginLeft: "30px"};
@@ -365,7 +366,7 @@ const SprintList: React.FC<any> = () => {
 
         <AgGridReact
           columnDefs={colums()} // 定义列
-          rowData={data} // 数据绑定
+          rowData={datasTest} // 数据绑定
           defaultColDef={{
             resizable: true,
             sortable: true,
@@ -408,8 +409,7 @@ const SprintList: React.FC<any> = () => {
                 <Form.Item label="项目名称：">
                   <Input.Group compact>
                     <Form.Item name="prjNames">
-                      <Select id={"prjNames"} placeholder="请选择类型" mode="tags" style={{width: '150px'}}
-                              onChange={prjTypeHandleChange}> {
+                      <Select id={"prjNames"} placeholder="请选择类型" style={{width: '150px'}}> {
                         [
                           <Option key={"sprint"} value={"sprint"}>sprint </Option>,
                           <Option key={"hotfix"} value={"hotfix"}>hotfix </Option>,
@@ -484,8 +484,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="prjStatus" label="项目状态:">
-                  <Select placeholder="请选择" mode="tags" style={widths} onChange={prjStatusHandleChange}
-                          tokenSeparators={[',']}>{
+                  <Select placeholder="请选择" style={widths} onChange={prjStatusHandleChange}>{
                     [
                       <Option key={"closed"} value={"closed"}>已关闭 </Option>,
                       <Option key={"doing"} value={"doing"}>进行中 </Option>,
@@ -511,6 +510,8 @@ const SprintList: React.FC<any> = () => {
 
     </PageContainer>
   );
+
 };
+
 
 export default SprintList;

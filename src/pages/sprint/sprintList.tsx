@@ -210,7 +210,7 @@ const SprintList: React.FC<any> = () => {
   // 添加项目
   const addProject = () => {
     const currentDate = moment(new Date()).add('year', 0);
-     form.setFieldsValue({
+    form.setFieldsValue({
       prjNames: null,
       prjDate: moment(currentDate, "YYYY-MM-DD"),
       starttime: moment(currentDate, "YYYY-MM-DD"),
@@ -254,10 +254,21 @@ const SprintList: React.FC<any> = () => {
     }
 
     const detailsInfo = selRows[0];
-    debugger;
+    const prjNames = detailsInfo.prjname.toString();
+    let projectType = "";
+    let prjTime = "";
+    if (prjNames.indexOf('sprint') !== -1) {
+      projectType = "sprint";
+    } else if (prjNames.indexOf('emergency') !== -1) {
+      projectType = "emergency";
+    } else if (prjNames.indexOf('hotfix') !== -1) {
+      projectType = "hotfix";
+    }
+    prjTime = prjNames.replace(projectType, "").trim();
+
     form.setFieldsValue({
-      prjNames: detailsInfo.prjname,
-      prjDate: moment("2021-01-22", "YYYY-MM-DD"),
+      prjNames: projectType,
+      prjDate: moment(prjTime, "YYYY-MM-DD"),
       starttime: moment(detailsInfo.starttime, "YYYY-MM-DD"),
       testCutoff: moment(detailsInfo.end1, "YYYY-MM-DD"),
       testFinnished: moment(detailsInfo.end2, "YYYY-MM-DD"),
@@ -279,6 +290,12 @@ const SprintList: React.FC<any> = () => {
   // 弹出层取消按钮事件
   const handleCancel = () => {
     setIsModalVisible(false);
+  };
+
+  // sprint 项目保存
+  const commitSprint = () => {
+    console.log("保存项目！");
+
   };
 
   const rightStyle = {marginLeft: "30px"};
@@ -314,7 +331,6 @@ const SprintList: React.FC<any> = () => {
 
           <label style={{marginLeft: "10px"}}>时间：</label>
           <RangePicker className={"times"} style={{width: '18%'}} onChange={onTimeSelected}/>
-
 
           <label style={{marginLeft: "10px"}}>项目状态：</label>
           <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjStatusHandleChange}
@@ -485,8 +501,8 @@ const SprintList: React.FC<any> = () => {
           </Row>
 
           <Form.Item style={{marginTop: "50px"}}>
-            <Button type="primary" style={{marginLeft: "250px"}}>确定</Button>
-            <Button type="primary" style={{marginLeft: "20px"}}>取消</Button>
+            <Button type="primary" style={{marginLeft: "250px"}} onClick={commitSprint}>确定</Button>
+            <Button type="primary" style={{marginLeft: "20px"}} onClick={handleCancel}>取消</Button>
           </Form.Item>
         </Form>
 

@@ -153,6 +153,18 @@ function addGroupAndDept(oraDatas: any) {
           if (deptInfo === "成都研发中心") {
             deptInfo = "前端平台研发部";
             groupInfo = "前端平台研发";
+
+            InstGroupValues.push({
+              time: `instCove${orderTime}`,
+              group: "前端平台研发部",
+              values: weekDatas[i].instCove
+            });
+
+            branGroupValues.push({
+              time: `branCove${orderTime}`,
+              group: "前端平台研发部",
+              values: weekDatas[i].branCove
+            });
           }
           // 此代码处理组的覆盖率,将组的单元测试覆盖率存到全局变量
 

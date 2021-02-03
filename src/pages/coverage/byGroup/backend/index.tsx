@@ -162,11 +162,33 @@ function addGroupAndDept(oraDatas: any) {
           if (groupInfo === "应用架构部") {
             deptInfo = "应用架构部";
             groupInfo = "应用架构";
+            InstGroupValues.push({
+              time: `instCove${orderTime}`,
+              group: "应用架构部",
+              values: weekDatas[i].instCove
+            });
+
+            branGroupValues.push({
+              time: `branCove${orderTime}`,
+              group: "应用架构部",
+              values: weekDatas[i].branCove
+            });
           }
 
           if (groupInfo === "平台研发部") {
             deptInfo = "平台研发部";
             groupInfo = "平台研发";
+            InstGroupValues.push({
+              time: `instCove${orderTime}`,
+              group: "平台研发部",
+              values: weekDatas[i].instCove
+            });
+
+            branGroupValues.push({
+              time: `branCove${orderTime}`,
+              group: "平台研发部",
+              values: weekDatas[i].branCove
+            });
           }
 
           if (deptInfo === "产品研发部") {

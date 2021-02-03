@@ -83,15 +83,17 @@ const colums = () => {
   const component = new Array();
   component.push(
     {
-      headerName: '序号',
-      field: 'id',
-    },
-    {
       headerName: '',
       checkboxSelection: true,
       headerCheckboxSelection: true,
       maxWidth: 50,
       'pinned': 'left'
+    },
+    {
+      headerName: '序号',
+      field: 'id',
+      maxWidth: 50,
+      filter: false
     },
     {
       headerName: '项目名称',
@@ -150,11 +152,16 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
+  /* 整个模块都需要用到的 */
+  const [form] = Form.useForm();
+
+  /* region  表格相关事件 */
   const gridApi = useRef<GridApi>();   // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
     queryDevelopViews(gqlClient, queryCondition),
   );
+  console.log(data);
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -165,12 +172,23 @@ const SprintList: React.FC<any> = () => {
     else gridApi.current.hideOverlay();
   }
 
+  /* endregion */
+
+  /* region 条件查询功能 */
+
+  // 定义全局变量，记录每一次修改的内容
   let prjType = new Array();
   let starttime = "";
   let endtime = "";
   let prjStatus = "";
+
+  // 项目名称输入事件
+  const projectChanged = (params: any) => {
+    console.log(params);
+  };
+
   // 项目类型选择事件
-  const prjTypeHandleChange = (value: any, params: any) => {
+  const prjTypeChanged = (value: any, params: any) => {
     console.log(params);
     prjType = value;
 
@@ -193,7 +211,7 @@ const SprintList: React.FC<any> = () => {
   };
 
   // 选择项目状态
-  const prjStatusHandleChange = (value: any, params: any) => {
+  const prjStatusChanged = (value: any, params: any) => {
 
     console.log(params);
     prjStatus = value;
@@ -204,11 +222,26 @@ const SprintList: React.FC<any> = () => {
     // 请求数据
     gridApi.current?.setRowData(datasTest);
   };
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [modal, setmodal] = useState({title: "新增项目"});
-  const [form] = Form.useForm();
+
+  /* endregion */
+
+  /* region 按钮栏以及弹出层事件  */
+
+  // 显示默认数据（近一个月未关闭数据）
+  const showDefalultValue = () => {
+    console.log("11");
+  };
+
+  // 删除sprint列表
+  const deleteSprintList = () => {
+    console.log("删除数据");
+  };
 
   // 添加项目
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modal, setmodal] = useState({title: "新增项目"});
+
+
   const addProject = () => {
     const currentDate = moment(new Date()).add('year', 0);
     form.setFieldsValue({
@@ -284,20 +317,45 @@ const SprintList: React.FC<any> = () => {
 
   };
 
-  // 弹出层确认按钮事件
-  const handleOk = () => {
-    setIsModalVisible(false);
-  };
-
   // 弹出层取消按钮事件
   const handleCancel = () => {
     setIsModalVisible(false);
   };
 
+  /* endregion */
+
+  /* region 新增功能 */
+
+  // 时间选择后，检查数据库有无，有的话需要禁用某些控件
+  const [isAble, setisAble] = useState({shown: false});
+  const formTimeSelected = (params: any) => {
+    console.log("params", params);
+    // debugger;
+    // starttime = moment(params[0]).format('YYYY-MM-DD');
+    // 时间选择后禁用某些控件
+    setisAble({"shown": true});
+  };
+
+  /* endregion */
+
+  /* region 修改功能  */
+
+  /* endregion */
+
+  /* region 修改和删除公用的commit方法 */
   // sprint 项目保存
   const commitSprint = () => {
+    const datatest = form.getFieldsValue();
+    console.log("datatest", datatest);
     console.log("保存项目！");
   };
+
+  /* endregion */
+
+  /* region 删除功能 */
+
+
+  /* endregion */
 
   const rightStyle = {marginLeft: "30px"};
   const leftStyle = {marginLeft: "120px"};
@@ -312,15 +370,15 @@ const SprintList: React.FC<any> = () => {
 
         <Form.Item name="prjName">
           <label style={{marginLeft: "10px"}}>项目名称：</label>
-          {/* <Input placeholder="请输入" style={{"width": "18%"}} allowClear={true} onChange={inputOnChange}/> */}
-          <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjTypeHandleChange}
-                  tokenSeparators={[',']}> {[
-            <Option key={"emergency20201223"} value={"emergency20201223"}>emergency20201223 </Option>
-          ]}
-          </Select>
+          <Input placeholder="请输入" style={{"width": "18%"}} allowClear={true} onChange={projectChanged}/>
+          {/* <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjTypeHandleChange} */}
+          {/*        tokenSeparators={[',']}> {[ */}
+          {/*  <Option key={"emergency20201223"} value={"emergency20201223"}>emergency20201223 </Option> */}
+          {/* ]} */}
+          {/* </Select> */}
 
           <label style={{marginLeft: "10px"}}>项目类型：</label>
-          <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjTypeHandleChange}
+          <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjTypeChanged}
                   tokenSeparators={[',']}> {
             [
               <Option key={"sprint"} value={"sprint"}>sprint </Option>,
@@ -334,7 +392,7 @@ const SprintList: React.FC<any> = () => {
           <RangePicker className={"times"} style={{width: '18%'}} onChange={onTimeSelected}/>
 
           <label style={{marginLeft: "10px"}}>项目状态：</label>
-          <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjStatusHandleChange}
+          <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjStatusChanged}
                   tokenSeparators={[',']}>{
             [
               <Option key={"closed"} value={"closed"}>已关闭 </Option>,
@@ -349,10 +407,11 @@ const SprintList: React.FC<any> = () => {
 
       {/* 新增、修改、删除按钮栏 */}
       <div style={{"background": "white"}}> {/* 使用一个图标就要导入一个图标 */}
-        <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}> 默认：近1月未关闭的 </Button>
+        <Button type="text" style={{"color": "black"}} size={"large"} onClick={showDefalultValue}> 默认:近1月未关闭的</Button>
+        {/* <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}> 近1月未关闭的 </Button> */}
 
         <Button type="text" style={{"color": "black", float: "right"}} icon={<FolderAddTwoTone/>}
-                size={"large"}>删除 </Button>
+                size={"large"} onClick={deleteSprintList}>删除 </Button>
 
         <Button type="text" style={{"color": "black", float: "right"}} icon={<EditTwoTone/>}
                 size={"large"} onClick={modifyProject}> 修改 </Button>
@@ -398,7 +457,7 @@ const SprintList: React.FC<any> = () => {
         //   backgroundColor: "lightskyblue"
         // }}>新增项目</div>]}
         title={modal.title}
-        visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}
+        visible={isModalVisible} onCancel={handleCancel}
         centered={true} footer={null} width={700}>
 
         <Form form={form}>
@@ -420,7 +479,7 @@ const SprintList: React.FC<any> = () => {
                     </Form.Item>
 
                     <Form.Item name="prjDate">
-                      <DatePicker/>
+                      <DatePicker onChange={formTimeSelected}/>
                     </Form.Item>
                   </Input.Group>
                 </Form.Item>
@@ -484,7 +543,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="prjStatus" label="项目状态:">
-                  <Select placeholder="请选择" style={widths} onChange={prjStatusHandleChange}>{
+                  <Select placeholder="请选择" style={widths}>{
                     [
                       <Option key={"closed"} value={"closed"}>已关闭 </Option>,
                       <Option key={"doing"} value={"doing"}>进行中 </Option>,
@@ -500,7 +559,8 @@ const SprintList: React.FC<any> = () => {
           </Row>
 
           <Form.Item style={{marginTop: "50px"}}>
-            <Button type="primary" style={{marginLeft: "250px"}} onClick={commitSprint}>确定</Button>
+            <Button type="primary" style={{marginLeft: "250px"}} disabled={isAble.shown}
+                    onClick={commitSprint}>确定</Button>
             <Button type="primary" style={{marginLeft: "20px"}} onClick={handleCancel}>取消</Button>
           </Form.Item>
         </Form>

@@ -9,31 +9,17 @@ import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import moment from 'moment';
 import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col} from 'antd';
-import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone, ExclamationCircleOutlined} from '@ant-design/icons';
-import {getRecentMonth} from '@/publicMethods/timeMethods';
-// import {Link} from 'umi';
-
-// import {axios} from 'axios';
-
+import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone} from '@ant-design/icons';
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
 
-// 默认条件：近一个月；未关闭的
-const defaltCondition: any = {
+
+const queryCondition: any = {
   projectName: "",
   projectType: [],
-  dateRange: getRecentMonth(),
+  dateRange: [],
   projectStatus: [],
-};
-
-debugger;
-console.log("defaltCondition", defaltCondition);
-const queryCondition: any = {
-  projectName: "hotfix20200319",
-  projectType: [],
-  dateRange: {},
-  projectStatus: ["wait", "doing", "suspended"],
 };
 
 // 测试数据
@@ -92,31 +78,6 @@ const datasTest = [
     chandao: "禅道4"
   }];
 
-/* 表格渲染方法 */
-const statusRenderer = (params: any) => {
-  let returnValue = "";
-  switch (params.value) {
-    case  "closed":
-      returnValue = "已关闭";
-      break;
-    case  "wait":
-      returnValue = "未开始";
-      break;
-    case "doing":
-      returnValue = "进行中";
-      break;
-
-    case "suspended":
-      returnValue = "已挂起";
-      break;
-    default:
-      returnValue = params.value;
-      break;
-  }
-
-  return returnValue;
-};
-
 // 定义列名
 const colums = () => {
   const component = new Array();
@@ -127,103 +88,131 @@ const colums = () => {
       headerCheckboxSelection: true,
       maxWidth: 50,
       'pinned': 'left'
-    },
-    {
+    }, {
       headerName: '序号',
       field: 'id',
       maxWidth: 50,
       filter: false
-    },
-    {
-      headerName: '项目名称',
-      field: 'name',
-      minWidth: 200,
-      cellRenderer: (params: any) => {
-        console.log("33", params.value);
-        // return  `<Link to="/sprint/sprintDashboard"> ${params.value} </Link>`;
-        return `<a href="/sprint/sprintDashboard" style="color:blue;text-decoration: underline" >${params.value}</a>`;
+    }, {
+      headerName: '当前状态',
+      field: 'prjname',
+    }, {
+      headerName: '测试负责人填写',
+      children: [
+        {
+          headerName: '对应测试',
+          field: 'athlete'
+        }, {
+          headerName: '禅道类型',
+          field: 'athlete'
+        }, {
+          headerName: '禅道编号',
+          field: 'athlete'
+        },
+      ]
+    }, {
+      headerName: '禅道自动实时获取',
+      children: [
+        {
+          headerName: '标题内容',
+          field: 'athlete'
+        }, {
+          headerName: '严重程度',
+          field: 'athlete'
+        }, {
+          headerName: '优先级',
+          field: 'athlete'
+        }, {
+          headerName: '所属模块',
+          field: 'athlete'
+        }, {
+          headerName: '禅道状态',
+          field: 'athlete'
+        }, {
+          headerName: '所处阶段',
+          field: 'athlete'
+        }, {
+          headerName: '指派给',
+          field: 'athlete'
+        }, {
+          headerName: '由谁解决',
+          field: 'athlete'
+        }, {
+          headerName: '由谁关闭',
+          field: 'athlete'
+        },
+      ]
+    }, {
+      headerName: '开发经理填写',
+      children: [{
+        headerName: '是否支持热更新',
+        field: 'athlete'
+      }, {
+        headerName: '是否有数据升级',
+        field: 'athlete'
+      }, {
+        headerName: '是否有接口升级',
+        field: 'athlete'
+      }, {
+        headerName: '是否需要测试验证',
+        field: 'athlete'
+      }, {
+        headerName: '验证范围建议',
+        field: 'athlete'
+      }, {
+        headerName: '发布环境',
+        field: 'athlete'
       },
-    },
-    {
-      headerName: '来源类型',
-      field: 'type',
-      cellRenderer: (params: any) => {
-        if (params.value === "AUTO") {
-          return "自动创建";
-        }
-        return "人工创建";
+      ]
+    }, {
+      headerName: 'UED填写',
+      children: [{
+        headerName: '对应UED',
+        field: 'athlete'
+      }, {
+        headerName: 'UED测试环境验证',
+        field: 'athlete'
+      }, {
+        headerName: 'UED线上验证',
+        field: 'athlete'
       },
+      ]
     }, {
-      headerName: '开始时间',
-      field: 'startAt',
-    },
-    {
-      headerName: '提测截止日期',
-      field: 'testEnd',
+      headerName: '测试/UED填写',
+      children: [
+        {
+          headerName: '备注',
+          field: 'athlete'
+        }, {
+          headerName: '来源',
+          field: 'athlete'
+        },
+      ]
     }, {
-      headerName: '测试完成日期',
-      field: 'testFinish',
+      headerName: '自动生成',
+      children: [{
+        headerName: '反馈人',
+        field: 'athlete'
+      }]
     }, {
-      headerName: '计划灰度日期',
-      field: 'expStage',
-    }, {
-      headerName: '计划上线日期',
-      field: 'expOnline',
-    }, {
-      headerName: '创建日期',
-      field: 'createAt',
-    }, {
-      headerName: '创建人',
-      field: 'creator',
-    }, {
-      headerName: '项目状态',
-      field: 'status',
-      cellRenderer: statusRenderer,
-    }, {
-      headerName: '访问禅道',
-      field: 'ztId',
-      cellRenderer: (params: any) => {
-        return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://172.31.1.219:8384/zentao/project-task-${params.value}.html'>去禅道</a>`;
-      }
-    },
+      headerName: '操作',
+      field: 'athlete'
+    }
   );
 
   return component;
 };
 
-
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
-  console.log(params.projectName, params.projectType, params.dateRange, params.projectStatus);
-  const category = params.projectType;
-  const range = params.dateRange;
-  const status = params.projectStatus;
-
-  const {data} = await client.query(`
-      {
-        project(name:"${params.projectName}",category:[${category}], range:${range},status:[${status}]){
-          id
-          name
-          type
-          startAt
-          testEnd
-          testFinish
-          expStage
-          expOnline
-          creator
-          status
-          createAt
-          ztId
-        }
-      }
-  `);
-  return data?.project;
+  // console.log(params.projectName, params.projectType, params.dateRange, params.projectStatus);
+  console.log(client, params);
+  return [];
 };
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
-
-
+  debugger;
     /* 整个模块都需要用到的 */
     const [formForAddAnaMod] = Form.useForm();
     const [formForDel] = Form.useForm();
@@ -232,12 +221,9 @@ const SprintList: React.FC<any> = () => {
     const gridApi = useRef<GridApi>();   // 绑定ag-grid 组件
     const gqlClient = useGqlClient();
     const {data, loading} = useRequest(() =>
-
-        queryDevelopViews(gqlClient, queryCondition),
-      )
-    ;
-
-    console.log("datas", data);
+      queryDevelopViews(gqlClient, queryCondition),
+    );
+    console.log(data);
     const onGridReady = (params: GridReadyEvent) => {
       gridApi.current = params.api;
       params.api.sizeColumnsToFit();
@@ -413,32 +399,10 @@ const SprintList: React.FC<any> = () => {
     };
 
     // sprint 项目保存
-    const commitSprint = async () => {
-      console.log("formForAddAnaMod", formForAddAnaMod);
+    const commitSprint = () => {
       const datatest = formForAddAnaMod.getFieldsValue();
       console.log("datatest", datatest);
       console.log("保存项目！");
-
-      // 判断是修改还是新增
-      // const isAdd = true;
-      // const datas = {
-      //   "name": "string",
-      //   "type": "MANUAL",
-      //   "startAt": "string",
-      //   "endAt": "string",
-      //   "finishAt": "string",
-      //   "stageAt": "string",
-      //   "onlineAt": "string",
-      //   "status": "wait",
-      //   "creator": "string"
-      // };
-      // if (isAdd) {
-      //   const res = axios.post('/sprint/api/sprint/project', datas);
-      //   console.log("res", res);
-      // } else {
-      //   const res = axios.put('/sprint/api/sprint/project', datas);
-      //   console.log("res", res);
-      // }
     };
 
     /* endregion */
@@ -574,7 +538,7 @@ const SprintList: React.FC<any> = () => {
 
           <AgGridReact
             columnDefs={colums()} // 定义列
-            rowData={data} // 数据绑定
+            rowData={datasTest} // 数据绑定
             defaultColDef={{
               resizable: true,
               sortable: true,

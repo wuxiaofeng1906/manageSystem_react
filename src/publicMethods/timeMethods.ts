@@ -52,4 +52,18 @@ function getMonthWeek(starttime: string) {
   return week;
 }
 
-export {getWeeksRange, getMonthWeek};
+// 获取最近一个月
+function getRecentMonth() {
+  // 获取当前时间
+
+  const currentTime = dayjs().format("YYYY-MM-DD");
+
+  const recentTime = dayjs(currentTime).subtract(1, 'month').format("YYYY-MM-DD");
+  const range = {
+    start: currentTime,
+    end: recentTime
+  };
+  return range;
+}
+
+export {getWeeksRange, getMonthWeek, getRecentMonth};

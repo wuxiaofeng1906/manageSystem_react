@@ -6,33 +6,22 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient} from '@/hooks';
+import {GqlClient, useGqlClient, useQuery} from '@/hooks';
 import moment from 'moment';
 import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col} from 'antd';
-import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone, ExclamationCircleOutlined} from '@ant-design/icons';
+import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone} from '@ant-design/icons';
 import {getRecentMonth} from '@/publicMethods/timeMethods';
-// import {Link} from 'umi';
 
-// import {axios} from 'axios';
-
+import axios from 'axios';
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
 
 // 默认条件：近一个月；未关闭的
-const defaltCondition: any = {
+const queryCondition: any = {
   projectName: "",
   projectType: [],
   dateRange: getRecentMonth(),
-  projectStatus: [],
-};
-
-debugger;
-console.log("defaltCondition", defaltCondition);
-const queryCondition: any = {
-  projectName: "hotfix20200319",
-  projectType: [],
-  dateRange: {},
   projectStatus: ["wait", "doing", "suspended"],
 };
 
@@ -131,7 +120,7 @@ const colums = () => {
     {
       headerName: '序号',
       field: 'id',
-      maxWidth: 50,
+      maxWidth: 70,
       filter: false
     },
     {
@@ -194,14 +183,10 @@ const colums = () => {
 
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
-  console.log(params.projectName, params.projectType, params.dateRange, params.projectStatus);
-  const category = params.projectType;
-  const range = params.dateRange;
-  const status = params.projectStatus;
-
+  const range = `{start:"${params.dateRange.start}", end:"${params.dateRange.end}"}`;
   const {data} = await client.query(`
       {
-        project(name:"${params.projectName}",category:[${category}], range:${range},status:[${status}]){
+         project(name:"",category:[], range:${range},status:[${params.projectStatus}]){
           id
           name
           type
@@ -219,6 +204,33 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   `);
   return data?.project;
 };
+
+
+// 手动查询
+const DataFilter = (param: any) => {
+
+  const range = `{start:"${param.dateRange.start}", end:"${param.dateRange.end}"}`;
+  const {data} = useQuery(`
+     {
+         project(name:"",category:[], range:${range},status:[${param.projectStatus}]){
+          id
+          name
+          type
+          startAt
+          testEnd
+          testFinish
+          expStage
+          expOnline
+          creator
+          status
+          createAt
+          ztId
+        }
+      }
+  `);
+  return data?.project;
+};
+
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
@@ -260,6 +272,7 @@ const SprintList: React.FC<any> = () => {
 
     // 项目名称输入事件
     const projectChanged = (params: any) => {
+      DataFilter(queryCondition);
       console.log(params);
     };
 
@@ -305,7 +318,16 @@ const SprintList: React.FC<any> = () => {
 
     // 显示默认数据（近一个月未关闭数据）
     const showDefalultValue = () => {
-      console.log("11");
+      const defalutCondition: any = {
+        projectName: "",
+        projectType: [],
+        dateRange: getRecentMonth(),
+        projectStatus: ["wait", "doing", "suspended"],
+      };
+      const queryDatas = DataFilter(defalutCondition);
+      // 请求数据
+      gridApi.current?.setRowData(queryDatas);
+
     };
 
     /* endregion */
@@ -336,12 +358,17 @@ const SprintList: React.FC<any> = () => {
 
     // 时间选择后，检查数据库有无，有的话需要禁用某些控件
     const [isAble, setisAble] = useState({shown: false});
-    const formTimeSelected = (params: any) => {
-      console.log("params", params);
-      // debugger;
-      // starttime = moment(params[0]).format('YYYY-MM-DD');
+    const formTimeSelected = () => {
+
+      const values = formForAddAnaMod.getFieldsValue();
+      const prjName = `${values.prjNames}${values.prjDate.format("YYYYMMDD")}`;
+
+
       // 时间选择后禁用某些控件
-      setisAble({"shown": true});
+      if (false) {
+        console.log(prjName);
+        setisAble({"shown": true});
+      }
     };
 
     /* endregion */
@@ -412,33 +439,101 @@ const SprintList: React.FC<any> = () => {
       setIsAddModalVisible(false);
     };
 
+
     // sprint 项目保存
     const commitSprint = async () => {
-      console.log("formForAddAnaMod", formForAddAnaMod);
-      const datatest = formForAddAnaMod.getFieldsValue();
-      console.log("datatest", datatest);
-      console.log("保存项目！");
+      const values = formForAddAnaMod.getFieldsValue();
+      console.log("values", values);
 
-      // 判断是修改还是新增
-      // const isAdd = true;
-      // const datas = {
-      //   "name": "string",
-      //   "type": "MANUAL",
-      //   "startAt": "string",
-      //   "endAt": "string",
-      //   "finishAt": "string",
-      //   "stageAt": "string",
-      //   "onlineAt": "string",
-      //   "status": "wait",
-      //   "creator": "string"
-      // };
-      // if (isAdd) {
-      //   const res = axios.post('/sprint/api/sprint/project', datas);
-      //   console.log("res", res);
-      // } else {
-      //   const res = axios.put('/sprint/api/sprint/project', datas);
-      //   console.log("res", res);
-      // }
+      const prjtype = values.prjNames;
+      if (prjtype === null) {
+        message.error({
+          content: '项目类型不能为空!',
+          className: 'AddNone',
+          duration:1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return;
+      }
+
+      if (values.prjStatus === null) {
+        message.error({
+          content: '项目状态不能为空!',
+          className: 'AddNone',
+          duration:1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return;
+      }
+
+      const prjdate = values.prjDate.format("YYYYMMDD");
+      const datas = {
+        "name": `${prjtype}${prjdate}`,
+        "type": "MANUAL",
+        "startAt": values.starttime.format("YYYY-MM-DD"),
+        "endAt": values.testCutoff.format("YYYY-MM-DD"),
+        "finishAt": values.testFinnished.format("YYYY-MM-DD"),
+        "stageAt": values.planHuidu.format("YYYY-MM-DD"),
+        "onlineAt": values.planOnline.format("YYYY-MM-DD"),
+        "status": values.prjStatus,
+        "creator": "admin"
+      };
+
+      //  判断是修改还是新增
+      if (modal.title === "新增项目") {
+        axios.post('/api/sprint/project', datas).then(function (res) {
+          if (res.data.ok === true) {
+            setIsAddModalVisible(false);
+
+            message.info({
+              content: res.data.message,
+              className: 'AddSuccess',
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          } else {
+            message.error({
+              content: res.data.message,
+              className: 'AddNone',
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          }
+        }).catch(function (error) {
+          console.log("error", error);
+        });
+
+      } else {
+        axios.put('/api/sprint/project', datas).then(function (res) {
+          if (res.data.ok === true) {
+            setIsAddModalVisible(false);
+
+            message.info({
+              content: res.data.message,
+              className: 'AddSuccess',
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          } else {
+            message.error({
+              content: res.data.message,
+              className: 'AddNone',
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          }
+        }).catch(function (error) {
+          console.log("error", error);
+        });
+      }
     };
 
     /* endregion */
@@ -597,14 +692,6 @@ const SprintList: React.FC<any> = () => {
 
         {/* 弹出层定义 */}
         <Modal
-          // title={[<div style={{
-          //   height: "50px",
-          //   marginTop: "-17px",
-          //   marginRight: "-24px",
-          //   marginBottom: "-17px",
-          //   marginLeft: "-24px",
-          //   backgroundColor: "lightskyblue"
-          // }}>新增项目</div>]}
           title={modal.title}
           visible={isAddModalVisible} onCancel={handleCancel}
           centered={true} footer={null} width={700}>

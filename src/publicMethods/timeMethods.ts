@@ -60,8 +60,8 @@ function getRecentMonth() {
 
   const recentTime = dayjs(currentTime).subtract(1, 'month').format("YYYY-MM-DD");
   const range = {
-    start: currentTime,
-    end: recentTime
+    start: recentTime,
+    end: `${currentTime} 23:59:59`
   };
   return range;
 }

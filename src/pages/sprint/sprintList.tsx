@@ -21,7 +21,7 @@ const queryCondition: any = {
   projectName: "",
   projectType: [],
   dateRange: getRecentMonth(),
-  projectStatus: ['wait','doing','suspended'],
+  projectStatus: ['wait', 'doing', 'suspended'],
 };
 
 // 定义列名
@@ -179,6 +179,7 @@ const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
 // 组件初始化
 const SprintList: React.FC<any> = () => {
 
+
     /* 整个模块都需要用到的 */
     const [formForAddAnaMod] = Form.useForm();
     const [formForDel] = Form.useForm();
@@ -204,6 +205,11 @@ const SprintList: React.FC<any> = () => {
 
     /* region 条件查询功能 */
 
+  const updateGrid = async () => {
+    const datas: any = await queryDevelopViews(gqlClient, queryCondition);
+    gridApi.current?.setRowData(datas);
+  };
+
     // 项目名称输入事件
     const projectChanged = async (params: any) => {
 
@@ -211,8 +217,9 @@ const SprintList: React.FC<any> = () => {
       // console.log("finally",params.target.value);  // 为输入框的值
 
       queryCondition.projectName = params.target.value;
-      const datas: any = await queryDevelopViews(gqlClient, queryCondition);
-      gridApi.current?.setRowData(datas);
+      updateGrid();
+      // const datas: any = await queryDevelopViews(gqlClient, queryCondition);
+      // gridApi.current?.setRowData(datas);
     };
 
 
@@ -220,8 +227,9 @@ const SprintList: React.FC<any> = () => {
     const prjTypeChanged = async (value: any, params: any) => {
       console.log(value, params);
       queryCondition.projectType = value;
-      const datas: any = await queryDevelopViews(gqlClient, queryCondition);
-      gridApi.current?.setRowData(datas);
+      updateGrid();
+      // const datas: any = await queryDevelopViews(gqlClient, queryCondition);
+      // gridApi.current?.setRowData(datas);
 
     };
 
@@ -232,17 +240,18 @@ const SprintList: React.FC<any> = () => {
         start: moment(params[0]).format('YYYY-MM-DD'),
         end: `${moment(params[1]).format('YYYY-MM-DD')} 23:59:59`
       };
-
-      const datas: any = await queryDevelopViews(gqlClient, queryCondition);
-      gridApi.current?.setRowData(datas);
+      updateGrid();
+      // const datas: any = await queryDevelopViews(gqlClient, queryCondition);
+      // gridApi.current?.setRowData(datas);
     };
 
     // 选择项目状态
     const prjStatusChanged = async (value: any, params: any) => {
       console.log(value, params);
       queryCondition.projectStatus = value;
-      const datas: any = await queryDevelopViews(gqlClient, queryCondition);
-      gridApi.current?.setRowData(datas);
+      updateGrid();
+      // const datas: any = await queryDevelopViews(gqlClient, queryCondition);
+      // gridApi.current?.setRowData(datas);
     };
 
     /* endregion */
@@ -338,7 +347,8 @@ const SprintList: React.FC<any> = () => {
       }
 
       const detailsInfo = selRows[0];
-      const prjNames = detailsInfo.prjname.toString();
+      console.log("detailsInfo", detailsInfo);
+      const prjNames = detailsInfo.name.toString();
       let projectType = "";
       let prjTime = "";
       if (prjNames.indexOf('sprint') !== -1) {
@@ -353,12 +363,13 @@ const SprintList: React.FC<any> = () => {
       formForAddAnaMod.setFieldsValue({
         prjNames: projectType,
         prjDate: moment(prjTime, "YYYY-MM-DD"),
-        starttime: moment(detailsInfo.starttime, "YYYY-MM-DD"),
-        testCutoff: moment(detailsInfo.end1, "YYYY-MM-DD"),
-        testFinnished: moment(detailsInfo.end2, "YYYY-MM-DD"),
-        planHuidu: moment(detailsInfo.plan1, "YYYY-MM-DD"),
-        planOnline: moment(detailsInfo.plan2, "YYYY-MM-DD"),
-        prjStatus: detailsInfo.status
+        starttime: moment(detailsInfo.startAt, "YYYY-MM-DD"),
+        testCutoff: moment(detailsInfo.testEnd, "YYYY-MM-DD"),
+        testFinnished: moment(detailsInfo.testFinish, "YYYY-MM-DD"),
+        planHuidu: moment(detailsInfo.expStage, "YYYY-MM-DD"),
+        planOnline: moment(detailsInfo.expOnline, "YYYY-MM-DD"),
+        prjStatus: detailsInfo.status,
+        prjId: detailsInfo.id
       });
 
       setmodal({"title": "修改项目"});
@@ -379,8 +390,6 @@ const SprintList: React.FC<any> = () => {
     // sprint 项目保存
     const commitSprint = async () => {
       const values = formForAddAnaMod.getFieldsValue();
-      // console.log("values", values);
-
       const prjtype = values.prjNames;
       if (prjtype === null) {
         message.error({
@@ -424,7 +433,7 @@ const SprintList: React.FC<any> = () => {
         axios.post('/api/sprint/project', datas).then(function (res) {
           if (res.data.ok === true) {
             setIsAddModalVisible(false);
-
+            updateGrid();
             message.info({
               content: res.data.message,
               className: 'AddSuccess',
@@ -446,13 +455,15 @@ const SprintList: React.FC<any> = () => {
         });
 
       } else {
+
+        datas["id"] = values.prjId;
         axios.put('/api/sprint/project', datas).then(function (res) {
           if (res.data.ok === true) {
             setIsAddModalVisible(false);
 
             message.info({
               content: res.data.message,
-              className: 'AddSuccess',
+              className: 'ModSuccess',
               style: {
                 marginTop: '50vh',
               },
@@ -460,7 +471,7 @@ const SprintList: React.FC<any> = () => {
           } else {
             message.error({
               content: res.data.message,
-              className: 'AddNone',
+              className: 'ModNone',
               style: {
                 marginTop: '50vh',
               },
@@ -471,6 +482,8 @@ const SprintList: React.FC<any> = () => {
         });
       }
     };
+
+
 
     /* endregion */
 
@@ -504,8 +517,8 @@ const SprintList: React.FC<any> = () => {
         return;
       }
 
-      const detailsInfo = selRows[0];
-      const prjNames = detailsInfo.prjname.toString();
+      // const detailsInfo = selRows[0];
+      // const prjNames = detailsInfo.prjname.toString();
       // 首先查询这个里面有多少条数据，根并进行具体提示。
 
       // console.log("prjNames", prjNames);
@@ -534,6 +547,7 @@ const SprintList: React.FC<any> = () => {
       setIsDelModalVisible(false);
     };
     /* endregion */
+
 
     const rightStyle = {marginLeft: "30px"};
     const leftStyle = {marginLeft: "120px"};
@@ -655,6 +669,10 @@ const SprintList: React.FC<any> = () => {
                       <Form.Item name="prjLable">
                         <label style={{marginLeft: "10px"}}></label>
                       </Form.Item>
+                      <Form.Item name="prjId">
+                        <label style={{display: "none"}}></label>
+                      </Form.Item>
+
                     </Input.Group>
                   </Form.Item>
 

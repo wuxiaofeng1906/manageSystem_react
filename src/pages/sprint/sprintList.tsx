@@ -21,7 +21,7 @@ const queryCondition: any = {
   projectName: "",
   projectType: [],
   dateRange: getRecentMonth(),
-  projectStatus: ["wait", "doing", "suspended"],
+  projectStatus: ['wait','doing','suspended'],
 };
 
 // 定义列名
@@ -123,7 +123,6 @@ const colums = () => {
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
 
-  debugger;
   const range = `{start:"${params.dateRange.start}", end:"${params.dateRange.end}"}`;
   const {data} = await client.query(`
       {
@@ -177,7 +176,6 @@ const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
   return data?.proExist;
 };
 
-
 // 组件初始化
 const SprintList: React.FC<any> = () => {
 
@@ -206,52 +204,45 @@ const SprintList: React.FC<any> = () => {
 
     /* region 条件查询功能 */
 
-    // 定义全局变量，记录每一次修改的内容
-    let prjType = new Array();
-    let starttime = "";
-    let endtime = "";
-    let prjStatus = "";
-
     // 项目名称输入事件
-    const projectChanged = (params: any) => {
+    const projectChanged = async (params: any) => {
 
+      // console.log("projectName", params.nativeEvent.data);  // 为当时输入的值
+      // console.log("finally",params.target.value);  // 为输入框的值
+
+      queryCondition.projectName = params.target.value;
+      const datas: any = await queryDevelopViews(gqlClient, queryCondition);
+      gridApi.current?.setRowData(datas);
     };
 
 
     // 项目类型选择事件
-    const prjTypeChanged = (value: any, params: any) => {
-      // console.log(params);
-      prjType = value;
+    const prjTypeChanged = async (value: any, params: any) => {
+      console.log(value, params);
+      queryCondition.projectType = value;
+      const datas: any = await queryDevelopViews(gqlClient, queryCondition);
+      gridApi.current?.setRowData(datas);
 
-      // console.log(`选择的项目类型`, prjType);
-      // 请求数据
-
-      // 绑定数据
-      gridApi.current?.setRowData([]);
     };
 
     // 时间选择事件
-    const onTimeSelected = (params: any) => {
-      starttime = moment(params[0]).format('YYYY-MM-DD');
-      endtime = moment(params[1]).format('YYYY-MM-DD');
+    const onTimeSelected = async (params: any) => {
 
-      // console.log("选择的times", starttime, endtime);
+      queryCondition.dateRange = {
+        start: moment(params[0]).format('YYYY-MM-DD'),
+        end: `${moment(params[1]).format('YYYY-MM-DD')} 23:59:59`
+      };
 
-      // 请求数据
-      gridApi.current?.setRowData([]);
+      const datas: any = await queryDevelopViews(gqlClient, queryCondition);
+      gridApi.current?.setRowData(datas);
     };
 
     // 选择项目状态
-    const prjStatusChanged = (value: any, params: any) => {
-
-      // console.log(params);
-      prjStatus = value;
-      // console.log(`selected ${prjStatus}`);
-
-      // console.log(prjType, starttime, endtime, prjStatus);
-
-      // 请求数据
-      gridApi.current?.setRowData([]);
+    const prjStatusChanged = async (value: any, params: any) => {
+      console.log(value, params);
+      queryCondition.projectStatus = value;
+      const datas: any = await queryDevelopViews(gqlClient, queryCondition);
+      gridApi.current?.setRowData(datas);
     };
 
     /* endregion */
@@ -303,7 +294,6 @@ const SprintList: React.FC<any> = () => {
       const values = formForAddAnaMod.getFieldsValue();
       const prjName = `${values.prjNames}${values.prjDate.format("YYYYMMDD")}`;
       const datas: any = await queryRepeats(gqlClient, prjName);
-      debugger;
       // 时间选择后禁用某些控件
       if (datas.ok === true) {   // 可以新增项目
         setisAble({"shown": false});
@@ -566,8 +556,7 @@ const SprintList: React.FC<any> = () => {
             {/* </Select> */}
 
             <label style={{marginLeft: "10px"}}>项目类型：</label>
-            <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjTypeChanged}
-                    tokenSeparators={[',']}> {
+            <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjTypeChanged}> {
               [
                 <Option key={"sprint"} value={"sprint"}>sprint </Option>,
                 <Option key={"hotfix"} value={"hotfix"}>hotfix </Option>,
@@ -577,15 +566,16 @@ const SprintList: React.FC<any> = () => {
             </Select>
 
             <label style={{marginLeft: "10px"}}>时间：</label>
-            <RangePicker className={"times"} style={{width: '18%'}} onChange={onTimeSelected}/>
+            <RangePicker className={"times"} style={{width: '18%'}}
+                         defaultValue={[moment(getRecentMonth().start), moment()]} onChange={onTimeSelected}/>
 
             <label style={{marginLeft: "10px"}}>项目状态：</label>
             <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjStatusChanged}
-                    tokenSeparators={[',']}>{
+                    defaultValue={['doing', 'suspended', 'wait']}>{
               [
                 <Option key={"closed"} value={"closed"}>已关闭 </Option>,
                 <Option key={"doing"} value={"doing"}>进行中 </Option>,
-                <Option key={"suspended"} value={"suspended"}>已暂停 </Option>,
+                <Option key={"suspended"} value={"suspended"}>已挂起 </Option>,
                 <Option key={"wait"} value={"wait"}>未开始 </Option>
               ]
             }
@@ -663,7 +653,7 @@ const SprintList: React.FC<any> = () => {
                         <DatePicker onChange={formTimeSelected}/>
                       </Form.Item>
                       <Form.Item name="prjLable">
-                        <label style={{marginLeft: "10px"}}>多大</label>
+                        <label style={{marginLeft: "10px"}}></label>
                       </Form.Item>
                     </Input.Group>
                   </Form.Item>
@@ -731,7 +721,7 @@ const SprintList: React.FC<any> = () => {
                       [
                         <Option key={"closed"} value={"closed"}>已关闭 </Option>,
                         <Option key={"doing"} value={"doing"}>进行中 </Option>,
-                        <Option key={"suspended"} value={"suspended"}>已暂停 </Option>,
+                        <Option key={"suspended"} value={"suspended"}>已挂起 </Option>,
                         <Option key={"wait"} value={"wait"}>未开始 </Option>
                       ]
                     }

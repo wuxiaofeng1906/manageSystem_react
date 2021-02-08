@@ -8,6 +8,7 @@ export class GqlClient<T> {
   }
 
   query = (query: string) => {
+    // debugger;
     return this.apolloClient.query({
       query: gql(query)
     });

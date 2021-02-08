@@ -6,12 +6,11 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient, useQuery} from '@/hooks';
+import {GqlClient, useGqlClient} from '@/hooks';
 import moment from 'moment';
 import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col} from 'antd';
 import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone} from '@ant-design/icons';
 import {getRecentMonth} from '@/publicMethods/timeMethods';
-
 import axios from 'axios';
 
 const {RangePicker} = DatePicker;
@@ -23,87 +22,6 @@ const queryCondition: any = {
   projectType: [],
   dateRange: getRecentMonth(),
   projectStatus: ["wait", "doing", "suspended"],
-};
-
-// 测试数据
-const datasTest = [
-  {
-    id: 1,
-    prjname: "emergency20201220",
-    sourceType: "人工创建",
-    starttime: "2021-01-01",
-    end1: "2021-01-01",
-    end2: "2021-01-01",
-    plan1: "2021-01-01",
-    plan2: "2021-01-01",
-    create1: "2021-01-01",
-    creater: "陈诺",
-    status: "进行中",
-    chandao: "禅道1"
-  }, {
-    id: 2,
-    prjname: "emergency20201221",
-    sourceType: "自动创建",
-    starttime: "2021-01-02",
-    end1: "2021-01-02",
-    end2: "2021-01-02",
-    plan1: "2021-01-02",
-    plan2: "2021-01-02",
-    create1: "2021-01-02",
-    creater: "王丽萍",
-    status: "未开始",
-    chandao: "禅道2"
-  }, {
-    id: 3,
-    prjname: "emergency20201222",
-    sourceType: "人工创建",
-    starttime: "2021-01-03",
-    end1: "2021-01-03",
-    end2: "2021-01-03",
-    plan1: "2021-01-03",
-    plan2: "2021-01-03",
-    create1: "2021-01-03",
-    creater: "陈欢",
-    status: "进行中",
-    chandao: "禅道3"
-  }, {
-    id: 4,
-    prjname: "emergency20201223",
-    sourceType: "自动创建",
-    starttime: "2021-01-04",
-    end1: "2021-01-04",
-    end2: "2021-01-04",
-    plan1: "2021-01-04",
-    plan2: "2021-01-04",
-    create1: "2021-01-04",
-    creater: "吴晓凤",
-    status: "已完成",
-    chandao: "禅道4"
-  }];
-
-/* 表格渲染方法 */
-const statusRenderer = (params: any) => {
-  let returnValue = "";
-  switch (params.value) {
-    case  "closed":
-      returnValue = "已关闭";
-      break;
-    case  "wait":
-      returnValue = "未开始";
-      break;
-    case "doing":
-      returnValue = "进行中";
-      break;
-
-    case "suspended":
-      returnValue = "已挂起";
-      break;
-    default:
-      returnValue = params.value;
-      break;
-  }
-
-  return returnValue;
 };
 
 // 定义列名
@@ -128,7 +46,7 @@ const colums = () => {
       field: 'name',
       minWidth: 200,
       cellRenderer: (params: any) => {
-        console.log("33", params.value);
+        // console.log("33", params.value);
         // return  `<Link to="/sprint/sprintDashboard"> ${params.value} </Link>`;
         return `<a href="/sprint/sprintDashboard" style="color:blue;text-decoration: underline" >${params.value}</a>`;
       },
@@ -167,7 +85,29 @@ const colums = () => {
     }, {
       headerName: '项目状态',
       field: 'status',
-      cellRenderer: statusRenderer,
+      cellRenderer: (params: any) => {
+        let returnValue = "";
+        switch (params.value) {
+          case  "closed":
+            returnValue = "已关闭";
+            break;
+          case  "wait":
+            returnValue = "未开始";
+            break;
+          case "doing":
+            returnValue = "进行中";
+            break;
+
+          case "suspended":
+            returnValue = "已挂起";
+            break;
+          default:
+            returnValue = params.value;
+            break;
+        }
+
+        return returnValue;
+      },
     }, {
       headerName: '访问禅道',
       field: 'ztId',
@@ -180,13 +120,14 @@ const colums = () => {
   return component;
 };
 
-
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
+
+  debugger;
   const range = `{start:"${params.dateRange.start}", end:"${params.dateRange.end}"}`;
   const {data} = await client.query(`
       {
-         project(name:"",category:[], range:${range},status:[${params.projectStatus}]){
+         project(name:"${params.projectName}",category:[${params.projectType}], range:${range},status:[${params.projectStatus}]){
           id
           name
           type
@@ -205,36 +146,40 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   return data?.project;
 };
 
+// 查询是否有重复数据
+const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
 
-// 手动查询
-const DataFilter = (param: any) => {
-
-  const range = `{start:"${param.dateRange.start}", end:"${param.dateRange.end}"}`;
-  const {data} = useQuery(`
-     {
-         project(name:"",category:[], range:${range},status:[${param.projectStatus}]){
-          id
-          name
-          type
-          startAt
-          testEnd
-          testFinish
-          expStage
-          expOnline
-          creator
-          status
-          createAt
-          ztId
+  const {data} = await client.query(`
+      {
+        proExist(name:"${prjName}"){
+          ok
+          data{
+            id
+            name
+            type
+            startAt
+            testEnd
+            testFinish
+            expStage
+            expOnline
+            creator
+            status
+            createAt
+            ztId
+          }
+          code
+          message
         }
       }
   `);
-  return data?.project;
+
+  console.log("data", data);
+  return data?.proExist;
 };
 
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
-
 
     /* 整个模块都需要用到的 */
     const [formForAddAnaMod] = Form.useForm();
@@ -244,12 +189,9 @@ const SprintList: React.FC<any> = () => {
     const gridApi = useRef<GridApi>();   // 绑定ag-grid 组件
     const gqlClient = useGqlClient();
     const {data, loading} = useRequest(() =>
+      queryDevelopViews(gqlClient, queryCondition),
+    );
 
-        queryDevelopViews(gqlClient, queryCondition),
-      )
-    ;
-
-    console.log("datas", data);
     const onGridReady = (params: GridReadyEvent) => {
       gridApi.current = params.api;
       params.api.sizeColumnsToFit();
@@ -272,20 +214,20 @@ const SprintList: React.FC<any> = () => {
 
     // 项目名称输入事件
     const projectChanged = (params: any) => {
-      DataFilter(queryCondition);
-      console.log(params);
+
     };
+
 
     // 项目类型选择事件
     const prjTypeChanged = (value: any, params: any) => {
-      console.log(params);
+      // console.log(params);
       prjType = value;
 
-      console.log(`选择的项目类型`, prjType);
+      // console.log(`选择的项目类型`, prjType);
       // 请求数据
 
       // 绑定数据
-      gridApi.current?.setRowData(datasTest);
+      gridApi.current?.setRowData([]);
     };
 
     // 时间选择事件
@@ -293,41 +235,39 @@ const SprintList: React.FC<any> = () => {
       starttime = moment(params[0]).format('YYYY-MM-DD');
       endtime = moment(params[1]).format('YYYY-MM-DD');
 
-      console.log("选择的times", starttime, endtime);
+      // console.log("选择的times", starttime, endtime);
 
       // 请求数据
-      gridApi.current?.setRowData(datasTest);
+      gridApi.current?.setRowData([]);
     };
 
     // 选择项目状态
     const prjStatusChanged = (value: any, params: any) => {
 
-      console.log(params);
+      // console.log(params);
       prjStatus = value;
       // console.log(`selected ${prjStatus}`);
 
-      console.log(prjType, starttime, endtime, prjStatus);
+      // console.log(prjType, starttime, endtime, prjStatus);
 
       // 请求数据
-      gridApi.current?.setRowData(datasTest);
+      gridApi.current?.setRowData([]);
     };
 
     /* endregion */
 
     /* region 显示默认数据  */
 
-    // 显示默认数据（近一个月未关闭数据）
-    const showDefalultValue = () => {
+    const showDefalultValue = async () => {
+
       const defalutCondition: any = {
         projectName: "",
         projectType: [],
         dateRange: getRecentMonth(),
         projectStatus: ["wait", "doing", "suspended"],
       };
-      const queryDatas = DataFilter(defalutCondition);
-      // 请求数据
-      gridApi.current?.setRowData(queryDatas);
-
+      const datas: any = await queryDevelopViews(gqlClient, defalutCondition);
+      gridApi.current?.setRowData(datas);
     };
 
     /* endregion */
@@ -358,16 +298,22 @@ const SprintList: React.FC<any> = () => {
 
     // 时间选择后，检查数据库有无，有的话需要禁用某些控件
     const [isAble, setisAble] = useState({shown: false});
-    const formTimeSelected = () => {
 
+    const formTimeSelected = async () => {
       const values = formForAddAnaMod.getFieldsValue();
       const prjName = `${values.prjNames}${values.prjDate.format("YYYYMMDD")}`;
-
-
+      const datas: any = await queryRepeats(gqlClient, prjName);
+      debugger;
       // 时间选择后禁用某些控件
-      if (false) {
-        console.log(prjName);
+      if (datas.ok === true) {   // 可以新增项目
+        setisAble({"shown": false});
+
+      } else {
         setisAble({"shown": true});
+        formForAddAnaMod.setFieldsValue({
+          prjLable: "重复项目",
+          // prjStatus: data.data.status  // data 可能没有数据
+        });
       }
     };
 
@@ -443,14 +389,14 @@ const SprintList: React.FC<any> = () => {
     // sprint 项目保存
     const commitSprint = async () => {
       const values = formForAddAnaMod.getFieldsValue();
-      console.log("values", values);
+      // console.log("values", values);
 
       const prjtype = values.prjNames;
       if (prjtype === null) {
         message.error({
           content: '项目类型不能为空!',
           className: 'AddNone',
-          duration:1,
+          duration: 1,
           style: {
             marginTop: '50vh',
           },
@@ -462,7 +408,7 @@ const SprintList: React.FC<any> = () => {
         message.error({
           content: '项目状态不能为空!',
           className: 'AddNone',
-          duration:1,
+          duration: 1,
           style: {
             marginTop: '50vh',
           },
@@ -545,7 +491,7 @@ const SprintList: React.FC<any> = () => {
     const deleteSprintList = () => {
       // 判断是否选中数据
       const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
-      // 没有选中则提醒
+
       if (selRows.length === 0) {
         message.error({
           content: '请选中需要删除的数据!',
@@ -557,7 +503,6 @@ const SprintList: React.FC<any> = () => {
         return;
       }
 
-      // 一次只能修改一条数据
       if (selRows.length > 1) {
         message.error({
           content: '一次只能删除一条数据!',
@@ -573,7 +518,7 @@ const SprintList: React.FC<any> = () => {
       const prjNames = detailsInfo.prjname.toString();
       // 首先查询这个里面有多少条数据，根并进行具体提示。
 
-      console.log("prjNames", prjNames);
+      // console.log("prjNames", prjNames);
 
       // const delCounts = 0;
       setIsDelModalVisible(true);
@@ -592,14 +537,13 @@ const SprintList: React.FC<any> = () => {
     };
 
     const delSprintList = () => {
-      console.log("test");
+      // console.log("test");
     };
 
     const DelCancel = () => {
       setIsDelModalVisible(false);
     };
     /* endregion */
-
 
     const rightStyle = {marginLeft: "30px"};
     const leftStyle = {marginLeft: "120px"};
@@ -651,7 +595,8 @@ const SprintList: React.FC<any> = () => {
 
         {/* 新增、修改、删除按钮栏 */}
         <div style={{"background": "white"}}> {/* 使用一个图标就要导入一个图标 */}
-          <Button type="text" style={{"color": "black"}} size={"large"} onClick={showDefalultValue}> 默认:近1月未关闭的</Button>
+          <Button type="text" style={{"color": "black"}} size={"large"} onClick={showDefalultValue}> 默认：</Button>
+          <label style={{"color": "black"}}> 近1月未关闭的</label>
           {/* <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}> 近1月未关闭的 </Button> */}
 
           <Button type="text" style={{"color": "black", float: "right"}} icon={<FolderAddTwoTone/>}
@@ -716,6 +661,9 @@ const SprintList: React.FC<any> = () => {
 
                       <Form.Item name="prjDate">
                         <DatePicker onChange={formTimeSelected}/>
+                      </Form.Item>
+                      <Form.Item name="prjLable">
+                        <label style={{marginLeft: "10px"}}>多大</label>
                       </Form.Item>
                     </Input.Group>
                   </Form.Item>
@@ -828,6 +776,5 @@ const SprintList: React.FC<any> = () => {
 
   }
 ;
-
 
 export default SprintList;

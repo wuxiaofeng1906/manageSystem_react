@@ -94,6 +94,12 @@ export default [
         name: 'sprint 列表',
         path: 'sprintList',
         component: './sprint/sprintList',
+      },
+      {
+        name: 'sprint details',
+        path: 'sprintListDetails',
+        hideInMenu:true,
+        component: './sprint/sprintListDetails',
       }
     ],
   },

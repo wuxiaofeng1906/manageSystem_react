@@ -12,6 +12,8 @@ import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col} from 
 import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone} from '@ant-design/icons';
 import {getRecentMonth} from '@/publicMethods/timeMethods';
 import axios from 'axios';
+import {Link} from 'umi';
+import {history} from 'umi';
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
@@ -25,9 +27,16 @@ const queryCondition: any = {
 };
 
 let orgPrjname = "";
+let delCounts = 0;
+
+const testTiaozhaun = () => {
+  console.log("222");
+  history.push(`/sprint/sprintListDetails`);
+};
 
 // 定义列名
 const colums = () => {
+
   const component = new Array();
   component.push(
     {
@@ -50,9 +59,11 @@ const colums = () => {
       field: 'name',
       minWidth: 200,
       cellRenderer: (params: any) => {
-        // console.log("33", params.value);
-        // return  `<Link to="/sprint/sprintDashboard"> ${params.value} </Link>`;
-        return `<a href="/sprint/sprintDashboard" style="color:blue;text-decoration: underline" >${params.value}</a>`;
+        return ` <button onClick={testTiaozhaun}>${params.value}</button>`;
+        // return `<a style="color:blue;text-decoration: underline" onclick= {history.push("/sprint/sprintListDetails")} >${params.value}</a>`;
+        // return `<div><Link to="/sprint/sprintListDetails">${params.value}</Link></div>`;
+        // return `<a target="_blank" style="color:blue;text-decoration: underline" href='/sprint/sprintListDetails'>${params.value}</a>`;
+        // return `<a href="/sprint/sprintListDetails" style="color:blue;text-decoration: underline" >${params.value}</a>`;
       },
     },
     {
@@ -123,6 +134,7 @@ const colums = () => {
 
   return component;
 };
+
 
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
@@ -438,8 +450,7 @@ const SprintList: React.FC<any> = () => {
       //  判断是修改还是新增
       if (modal.title === "新增项目") {
         axios.post('/api/sprint/project', datas).then(function (res) {
-          debugger;
-          console.log("res", res.data.zt.message.end[0]);
+
           if (res.data.ok === true) {
             setIsAddModalVisible(false);
             updateGrid();
@@ -504,7 +515,6 @@ const SprintList: React.FC<any> = () => {
               marginTop: '50vh',
             },
           });
-
         });
       }
     };
@@ -542,17 +552,15 @@ const SprintList: React.FC<any> = () => {
         return;
       }
 
-      // const detailsInfo = selRows[0];
-      // const prjNames = detailsInfo.prjname.toString();
+      const detailsInfo = selRows[0];
+      const prjNames = detailsInfo.name;
       // 首先查询这个里面有多少条数据，根并进行具体提示。
-
-      // console.log("prjNames", prjNames);
-
-      // const delCounts = 0;
+      delCounts = 1;
+      console.log("prjNames", prjNames);
       setIsDelModalVisible(true);
       // Modal.confirm({
       //   title: '删除项目',
-      //   icon: <ExclamationCircleOutlined/>,
+      //   // icon: <ExclamationCircleOutlined/>,
       //   content: `此项目包含【${delCounts}】条数据，请确认是否删除？`,
       //   okText: '确认',
       //   cancelText: '取消',
@@ -565,7 +573,10 @@ const SprintList: React.FC<any> = () => {
     };
 
     const delSprintList = () => {
-      // console.log("test");
+      const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+      const prjNames = selRows[0].name;
+
+      console.log("删除项目：", prjNames);
     };
 
     const DelCancel = () => {
@@ -578,13 +589,17 @@ const SprintList: React.FC<any> = () => {
     const leftStyle = {marginLeft: "120px"};
     const widths = {width: "150px"};
 
+
     // 返回渲染的组件
     return (
       <PageContainer>
 
+
         {/* 查询条件 */}
         <div style={{width: "100%", overflow: "auto", whiteSpace: "nowrap"}}>
+          {/*<button onClick={testTiaozhaun}>跳转测试</button>*/}
 
+          {/*<div><Link to="/sprint/sprintListDetails">跳转测试</Link></div>*/}
           <Form.Item name="prjName">
             <label style={{marginLeft: "10px"}}>项目名称：</label>
             <Input placeholder="请输入" style={{"width": "18%"}} allowClear={true} onChange={projectChanged}/>
@@ -791,7 +806,7 @@ const SprintList: React.FC<any> = () => {
           <Form form={formForDel}>
             <Form.Item>
               <label style={{marginLeft: "20px"}}>
-                此项目包含【{0}】条数据，请确认是否删除？
+                此项目包含【{delCounts}】条数据，请确认是否删除？
               </label>
             </Form.Item>
 

@@ -24,6 +24,8 @@ const queryCondition: any = {
   projectStatus: ['wait', 'doing', 'suspended'],
 };
 
+let orgPrjname = "";
+
 // 定义列名
 const colums = () => {
   const component = new Array();
@@ -37,9 +39,11 @@ const colums = () => {
     },
     {
       headerName: '序号',
-      field: 'id',
-      maxWidth: 70,
-      filter: false
+      maxWidth: 80,
+      filter: false,
+      cellRenderer: (params: any) => {
+        return Number(params.node.id) + 1;
+      },
     },
     {
       headerName: '项目名称',
@@ -205,10 +209,10 @@ const SprintList: React.FC<any> = () => {
 
     /* region 条件查询功能 */
 
-  const updateGrid = async () => {
-    const datas: any = await queryDevelopViews(gqlClient, queryCondition);
-    gridApi.current?.setRowData(datas);
-  };
+    const updateGrid = async () => {
+      const datas: any = await queryDevelopViews(gqlClient, queryCondition);
+      gridApi.current?.setRowData(datas);
+    };
 
     // 项目名称输入事件
     const projectChanged = async (params: any) => {
@@ -306,7 +310,9 @@ const SprintList: React.FC<any> = () => {
       // 时间选择后禁用某些控件
       if (datas.ok === true) {   // 可以新增项目
         setisAble({"shown": false});
-
+        formForAddAnaMod.setFieldsValue({
+          prjLable: "",
+        });
       } else {
         setisAble({"shown": true});
         formForAddAnaMod.setFieldsValue({
@@ -349,6 +355,7 @@ const SprintList: React.FC<any> = () => {
       const detailsInfo = selRows[0];
       console.log("detailsInfo", detailsInfo);
       const prjNames = detailsInfo.name.toString();
+      orgPrjname = prjNames;
       let projectType = "";
       let prjTime = "";
       if (prjNames.indexOf('sprint') !== -1) {
@@ -431,6 +438,8 @@ const SprintList: React.FC<any> = () => {
       //  判断是修改还是新增
       if (modal.title === "新增项目") {
         axios.post('/api/sprint/project', datas).then(function (res) {
+          debugger;
+          console.log("res", res.data.zt.message.end[0]);
           if (res.data.ok === true) {
             setIsAddModalVisible(false);
             updateGrid();
@@ -443,7 +452,7 @@ const SprintList: React.FC<any> = () => {
             });
           } else {
             message.error({
-              content: res.data.message,
+              content: `${res.data.message}${res.data.zt.message.end[0]}`,
               className: 'AddNone',
               style: {
                 marginTop: '50vh',
@@ -451,12 +460,22 @@ const SprintList: React.FC<any> = () => {
             });
           }
         }).catch(function (error) {
-          console.log("error", error);
+          // console.log("error", error);
+          message.error({
+            content: error.toString(),
+            className: 'AddError',
+            style: {
+              marginTop: '50vh',
+            },
+          });
         });
 
       } else {
 
         datas["id"] = values.prjId;
+        if (orgPrjname === datas["name"]) {
+          datas["name"] = "";
+        }
         axios.put('/api/sprint/project', datas).then(function (res) {
           if (res.data.ok === true) {
             setIsAddModalVisible(false);
@@ -470,7 +489,7 @@ const SprintList: React.FC<any> = () => {
             });
           } else {
             message.error({
-              content: res.data.message,
+              content: `${res.data.message}${res.data.zt.message.end[0]}`,
               className: 'ModNone',
               style: {
                 marginTop: '50vh',
@@ -478,11 +497,17 @@ const SprintList: React.FC<any> = () => {
             });
           }
         }).catch(function (error) {
-          console.log("error", error);
+          message.error({
+            content: error.toString(),
+            className: 'ModError',
+            style: {
+              marginTop: '50vh',
+            },
+          });
+
         });
       }
     };
-
 
 
     /* endregion */
@@ -667,7 +692,8 @@ const SprintList: React.FC<any> = () => {
                         <DatePicker onChange={formTimeSelected}/>
                       </Form.Item>
                       <Form.Item name="prjLable">
-                        <label style={{marginLeft: "10px"}}></label>
+                        <input style={{marginLeft: '10px', color: "red", border: "none", backgroundColor: "transparent"}}
+                               disabled={true}/>
                       </Form.Item>
                       <Form.Item name="prjId">
                         <label style={{display: "none"}}></label>

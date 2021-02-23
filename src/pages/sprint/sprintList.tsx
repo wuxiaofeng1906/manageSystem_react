@@ -12,7 +12,7 @@ import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col} from 
 import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone} from '@ant-design/icons';
 import {getRecentMonth} from '@/publicMethods/timeMethods';
 import axios from 'axios';
-import {Link} from 'umi';
+// import {Link} from 'umi';
 import {history} from 'umi';
 
 const {RangePicker} = DatePicker;
@@ -28,113 +28,6 @@ const queryCondition: any = {
 
 let orgPrjname = "";
 let delCounts = 0;
-
-const testTiaozhaun = () => {
-  console.log("222");
-  history.push(`/sprint/sprintListDetails`);
-};
-
-// 定义列名
-const colums = () => {
-
-  const component = new Array();
-  component.push(
-    {
-      headerName: '',
-      checkboxSelection: true,
-      headerCheckboxSelection: true,
-      maxWidth: 50,
-      'pinned': 'left'
-    },
-    {
-      headerName: '序号',
-      maxWidth: 80,
-      filter: false,
-      cellRenderer: (params: any) => {
-        return Number(params.node.id) + 1;
-      },
-    },
-    {
-      headerName: '项目名称',
-      field: 'name',
-      minWidth: 200,
-      cellRenderer: (params: any) => {
-        // return ` <button onClick={testTiaozhaun}>${params.value}</button>`;
-        // return `<a style="color:blue;text-decoration: underline" onclick= {history.push("/sprint/sprintListDetails")} >${params.value}</a>`;
-        // return `<div><Link to="/sprint/sprintListDetails">${params.value}</Link></div>`;
-        // return `<a target="_blank" style="color:blue;text-decoration: underline" href='/sprint/sprintListDetails'>${params.value}</a>`;
-        return `<a href="/sprint/sprintListDetails" style="color:blue;text-decoration: underline" >${params.value}</a>`;
-      },
-    },
-    {
-      headerName: '来源类型',
-      field: 'type',
-      cellRenderer: (params: any) => {
-        if (params.value === "AUTO") {
-          return "自动创建";
-        }
-        return "人工创建";
-      },
-    }, {
-      headerName: '开始时间',
-      field: 'startAt',
-    },
-    {
-      headerName: '提测截止日期',
-      field: 'testEnd',
-    }, {
-      headerName: '测试完成日期',
-      field: 'testFinish',
-    }, {
-      headerName: '计划灰度日期',
-      field: 'expStage',
-    }, {
-      headerName: '计划上线日期',
-      field: 'expOnline',
-    }, {
-      headerName: '创建日期',
-      field: 'createAt',
-    }, {
-      headerName: '创建人',
-      field: 'creator',
-    }, {
-      headerName: '项目状态',
-      field: 'status',
-      cellRenderer: (params: any) => {
-        let returnValue = "";
-        switch (params.value) {
-          case  "closed":
-            returnValue = "已关闭";
-            break;
-          case  "wait":
-            returnValue = "未开始";
-            break;
-          case "doing":
-            returnValue = "进行中";
-            break;
-
-          case "suspended":
-            returnValue = "已挂起";
-            break;
-          default:
-            returnValue = params.value;
-            break;
-        }
-
-        return returnValue;
-      },
-    }, {
-      headerName: '访问禅道',
-      field: 'ztId',
-      cellRenderer: (params: any) => {
-        return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://172.31.1.219:8384/zentao/project-task-${params.value}.html'>去禅道</a>`;
-      }
-    },
-  );
-
-  return component;
-};
-
 
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
@@ -192,8 +85,115 @@ const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
   return data?.proExist;
 };
 
+
 // 组件初始化
 const SprintList: React.FC<any> = () => {
+
+    // const ChangePages = () => {
+    //   history.push("/sprint/sprintListDetails");
+    // };
+
+    // 定义列名
+    const colums = () => {
+      const component = new Array();
+      component.push(
+        {
+          headerName: '',
+          checkboxSelection: true,
+          headerCheckboxSelection: true,
+          maxWidth: 50,
+          'pinned': 'left'
+        },
+        {
+          headerName: '序号',
+          maxWidth: 80,
+          filter: false,
+          cellRenderer: (params: any) => {
+            return Number(params.node.id) + 1;
+          },
+        },
+        {
+          headerName: '项目名称',
+          field: 'name',
+          minWidth: 200,
+          cellRenderer: (params: any) => {
+            return `<a  style="color:blue;text-decoration: underline" >${params.value}</a>`;
+            // return `<a  style="color:blue;text-decoration: underline" onclick={ChangePages}>${params.value}</a>`;
+            // return `<a href="/sprint/sprintListDetails" style="color:blue;text-decoration: underline" >${params.value}</a>`;
+          },
+          onCellClicked: (params: any) => {
+            // console.log("params", params.value);
+            history.push(`/sprint/sprintListDetails?project=${params.value}`);
+          }
+        },
+        {
+          headerName: '来源类型',
+          field: 'type',
+          cellRenderer: (params: any) => {
+            if (params.value === "AUTO") {
+              return "自动创建";
+            }
+            return "人工创建";
+          },
+        }, {
+          headerName: '开始时间',
+          field: 'startAt',
+        },
+        {
+          headerName: '提测截止日期',
+          field: 'testEnd',
+        }, {
+          headerName: '测试完成日期',
+          field: 'testFinish',
+        }, {
+          headerName: '计划灰度日期',
+          field: 'expStage',
+        }, {
+          headerName: '计划上线日期',
+          field: 'expOnline',
+        }, {
+          headerName: '创建日期',
+          field: 'createAt',
+        }, {
+          headerName: '创建人',
+          field: 'creator',
+        }, {
+          headerName: '项目状态',
+          field: 'status',
+          cellRenderer: (params: any) => {
+            let returnValue = "";
+            switch (params.value) {
+              case  "closed":
+                returnValue = "已关闭";
+                break;
+              case  "wait":
+                returnValue = "未开始";
+                break;
+              case "doing":
+                returnValue = "进行中";
+                break;
+
+              case "suspended":
+                returnValue = "已挂起";
+                break;
+              default:
+                returnValue = params.value;
+                break;
+            }
+
+            return returnValue;
+          },
+        }, {
+          headerName: '访问禅道',
+          field: 'ztId',
+          cellRenderer: (params: any) => {
+            return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://172.31.1.219:8384/zentao/project-task-${params.value}.html'>去禅道</a>`;
+          }
+        },
+      );
+
+      return component;
+    };
 
 
     /* 整个模块都需要用到的 */
@@ -552,8 +552,8 @@ const SprintList: React.FC<any> = () => {
         return;
       }
 
-      const detailsInfo = selRows[0];
-      const prjNames = detailsInfo.name;
+      // const detailsInfo = selRows[0];
+      // const prjNames = detailsInfo.name;
       // 首先查询这个里面有多少条数据，根并进行具体提示。
       delCounts = 10000;
       setIsDelModalVisible(true);
@@ -688,6 +688,7 @@ const SprintList: React.FC<any> = () => {
         {/* ag-grid 表格定义 */}
         <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
 
+
           <AgGridReact
             columnDefs={colums()} // 定义列
             rowData={data} // 数据绑定
@@ -707,6 +708,7 @@ const SprintList: React.FC<any> = () => {
             // suppressMakeColumnVisibleAfterUnGroup // 如果用户在移动列时不小心将列移出了网格，但并不打算将其隐藏，那么这就很方便。
             // rowGroupPanelShow="always"
             onGridReady={onGridReady}
+
           >
           </AgGridReact>
         </div>
@@ -857,5 +859,6 @@ const SprintList: React.FC<any> = () => {
 
   }
 ;
+
 
 export default SprintList;

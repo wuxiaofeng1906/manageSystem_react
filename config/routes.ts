@@ -1,4 +1,5 @@
-﻿import {MenuDataItem} from '@@/plugin-layout/runtime';
+﻿// @ts-ignore
+import {MenuDataItem} from '@@/plugin-layout/runtime';
 
 export default [
   {
@@ -96,7 +97,7 @@ export default [
         component: './sprint/sprintList',
       },
       {
-        name: 'sprint details',
+        name: 'sprint 项目详情',
         path: 'sprintListDetails',
         hideInMenu:true,
         component: './sprint/sprintListDetails',

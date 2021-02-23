@@ -10,10 +10,12 @@ import {GqlClient, useGqlClient} from '@/hooks';
 import moment from 'moment';
 import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col} from 'antd';
 import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone} from '@ant-design/icons';
+import {history} from 'umi';
 
-const {RangePicker} = DatePicker;
 const {Option} = Select;
-
+const unlisten = history.listen((location, action) => {
+  console.log(location.pathname);
+});
 
 const queryCondition: any = {
   projectName: "",
@@ -80,6 +82,7 @@ const datasTest = [
 
 // 定义列名
 const colums = () => {
+
   const component = new Array();
   component.push(
     {
@@ -94,7 +97,7 @@ const colums = () => {
       maxWidth: 50,
       filter: false
     }, {
-      headerName: '当前状态',
+      headerName: '当前阶段',
       field: 'prjname',
     }, {
       headerName: '测试负责人填写',
@@ -212,7 +215,7 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
-  debugger;
+    unlisten();
     /* 整个模块都需要用到的 */
     const [formForAddAnaMod] = Form.useForm();
     const [formForDel] = Form.useForm();
@@ -236,56 +239,6 @@ const SprintList: React.FC<any> = () => {
 
     /* endregion */
 
-    /* region 条件查询功能 */
-
-    // 定义全局变量，记录每一次修改的内容
-    let prjType = new Array();
-    let starttime = "";
-    let endtime = "";
-    let prjStatus = "";
-
-    // 项目名称输入事件
-    const projectChanged = (params: any) => {
-      console.log(params);
-    };
-
-    // 项目类型选择事件
-    const prjTypeChanged = (value: any, params: any) => {
-      console.log(params);
-      prjType = value;
-
-      console.log(`选择的项目类型`, prjType);
-      // 请求数据
-
-      // 绑定数据
-      gridApi.current?.setRowData(datasTest);
-    };
-
-    // 时间选择事件
-    const onTimeSelected = (params: any) => {
-      starttime = moment(params[0]).format('YYYY-MM-DD');
-      endtime = moment(params[1]).format('YYYY-MM-DD');
-
-      console.log("选择的times", starttime, endtime);
-
-      // 请求数据
-      gridApi.current?.setRowData(datasTest);
-    };
-
-    // 选择项目状态
-    const prjStatusChanged = (value: any, params: any) => {
-
-      console.log(params);
-      prjStatus = value;
-      // console.log(`selected ${prjStatus}`);
-
-      console.log(prjType, starttime, endtime, prjStatus);
-
-      // 请求数据
-      gridApi.current?.setRowData(datasTest);
-    };
-
-    /* endregion */
 
     /* region 显示默认数据  */
 
@@ -474,63 +427,20 @@ const SprintList: React.FC<any> = () => {
     const leftStyle = {marginLeft: "120px"};
     const widths = {width: "150px"};
 
+
     // 返回渲染的组件
     return (
       <PageContainer>
 
-        {/* 查询条件 */}
-        <div style={{width: "100%", overflow: "auto", whiteSpace: "nowrap"}}>
-
-          <Form.Item name="prjName">
-            <label style={{marginLeft: "10px"}}>项目名称：</label>
-            <Input placeholder="请输入" style={{"width": "18%"}} allowClear={true} onChange={projectChanged}/>
-            {/* <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjTypeHandleChange} */}
-            {/*        tokenSeparators={[',']}> {[ */}
-            {/*  <Option key={"emergency20201223"} value={"emergency20201223"}>emergency20201223 </Option> */}
-            {/* ]} */}
-            {/* </Select> */}
-
-            <label style={{marginLeft: "10px"}}>项目类型：</label>
-            <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjTypeChanged}
-                    tokenSeparators={[',']}> {
-              [
-                <Option key={"sprint"} value={"sprint"}>sprint </Option>,
-                <Option key={"hotfix"} value={"hotfix"}>hotfix </Option>,
-                <Option key={"emergency"} value={"emergency"}>emergency </Option>,
-              ]
-            }
-            </Select>
-
-            <label style={{marginLeft: "10px"}}>时间：</label>
-            <RangePicker className={"times"} style={{width: '18%'}} onChange={onTimeSelected}/>
-
-            <label style={{marginLeft: "10px"}}>项目状态：</label>
-            <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjStatusChanged}
-                    tokenSeparators={[',']}>{
-              [
-                <Option key={"closed"} value={"closed"}>已关闭 </Option>,
-                <Option key={"doing"} value={"doing"}>进行中 </Option>,
-                <Option key={"suspended"} value={"suspended"}>已暂停 </Option>,
-                <Option key={"wait"} value={"wait"}>未开始 </Option>
-              ]
-            }
-            </Select>
-          </Form.Item>
-        </div>
-
         {/* 新增、修改、删除按钮栏 */}
         <div style={{"background": "white"}}> {/* 使用一个图标就要导入一个图标 */}
-          <Button type="text" style={{"color": "black"}} size={"large"} onClick={showDefalultValue}> 默认:近1月未关闭的</Button>
-          {/* <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}> 近1月未关闭的 </Button> */}
 
-          <Button type="text" style={{"color": "black", float: "right"}} icon={<FolderAddTwoTone/>}
-                  size={"large"} onClick={deleteSprintList}>删除 </Button>
-
-          <Button type="text" style={{"color": "black", float: "right"}} icon={<EditTwoTone/>}
-                  size={"large"} onClick={modifyProject}> 修改 </Button>
-
-          <Button type="text" style={{"color": "black", float: "right"}} icon={<DeleteTwoTone/>}
+          <Button type="text" style={{"color": "black"}} icon={<DeleteTwoTone/>}
                   size={"large"} onClick={addProject}> 新增 </Button>
+          <Button type="text" style={{"color": "black"}} icon={<FolderAddTwoTone/>}
+                  size={"large"} onClick={deleteSprintList}>删除 </Button>
+          <Button type="text" style={{"color": "black"}} icon={<EditTwoTone/>}
+                  size={"large"} onClick={modifyProject}> 移动 </Button>
         </div>
 
         {/* ag-grid 表格定义 */}

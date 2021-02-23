@@ -59,11 +59,11 @@ const colums = () => {
       field: 'name',
       minWidth: 200,
       cellRenderer: (params: any) => {
-        return ` <button onClick={testTiaozhaun}>${params.value}</button>`;
+        // return ` <button onClick={testTiaozhaun}>${params.value}</button>`;
         // return `<a style="color:blue;text-decoration: underline" onclick= {history.push("/sprint/sprintListDetails")} >${params.value}</a>`;
         // return `<div><Link to="/sprint/sprintListDetails">${params.value}</Link></div>`;
         // return `<a target="_blank" style="color:blue;text-decoration: underline" href='/sprint/sprintListDetails'>${params.value}</a>`;
-        // return `<a href="/sprint/sprintListDetails" style="color:blue;text-decoration: underline" >${params.value}</a>`;
+        return `<a href="/sprint/sprintListDetails" style="color:blue;text-decoration: underline" >${params.value}</a>`;
       },
     },
     {
@@ -555,8 +555,7 @@ const SprintList: React.FC<any> = () => {
       const detailsInfo = selRows[0];
       const prjNames = detailsInfo.name;
       // 首先查询这个里面有多少条数据，根并进行具体提示。
-      delCounts = 1;
-      console.log("prjNames", prjNames);
+      delCounts = 10000;
       setIsDelModalVisible(true);
       // Modal.confirm({
       //   title: '删除项目',
@@ -574,9 +573,42 @@ const SprintList: React.FC<any> = () => {
 
     const delSprintList = () => {
       const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
-      const prjNames = selRows[0].name;
+      const prjId = selRows[0].id;
 
-      console.log("删除项目：", prjNames);
+      const url = `/api/sprint/project/${prjId}`;
+
+      axios.delete(url).then(function (res) {
+
+        if (res.data.ok === true) {
+
+          setIsDelModalVisible(false);
+          updateGrid();
+          message.info({
+            content: res.data.message,
+            className: 'delSuccess',
+            style: {
+              marginTop: '50vh',
+            },
+          });
+
+        } else {
+          message.error({
+            content: `${res.data.message}${res.data.zt.message.end[0]}`,
+            className: 'MdelNone',
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+      }).catch(function (error) {
+        message.error({
+          content: error.toString(),
+          className: 'MdelError',
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      });
     };
 
     const DelCancel = () => {
@@ -597,9 +629,9 @@ const SprintList: React.FC<any> = () => {
 
         {/* 查询条件 */}
         <div style={{width: "100%", overflow: "auto", whiteSpace: "nowrap"}}>
-          {/*<button onClick={testTiaozhaun}>跳转测试</button>*/}
+          {/* <button onClick={testTiaozhaun}>跳转测试</button> */}
 
-          {/*<div><Link to="/sprint/sprintListDetails">跳转测试</Link></div>*/}
+          {/* <div><Link to="/sprint/sprintListDetails">跳转测试</Link></div> */}
           <Form.Item name="prjName">
             <label style={{marginLeft: "10px"}}>项目名称：</label>
             <Input placeholder="请输入" style={{"width": "18%"}} allowClear={true} onChange={projectChanged}/>

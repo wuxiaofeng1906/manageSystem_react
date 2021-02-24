@@ -8,21 +8,17 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import moment from 'moment';
-import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col} from 'antd';
+import {Button, message, Form, Select, Modal, Input, Row, Col} from 'antd';
 import {FolderAddTwoTone, SnippetsTwoTone, DeleteTwoTone, EditTwoTone} from '@ant-design/icons';
 import {history} from 'umi';
 
 const {Option} = Select;
 const unlisten = history.listen((location, action) => {
-  console.log(location.pathname);
+
+  return [location.pathname, action];
+  // console.log(location.pathname);
 });
 
-const queryCondition: any = {
-  projectName: "",
-  projectType: [],
-  dateRange: [],
-  projectStatus: [],
-};
 
 // 测试数据
 const datasTest = [
@@ -260,14 +256,23 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
 const SprintList: React.FC<any> = () => {
     unlisten();
     /* 整个模块都需要用到的 */
+
+    // admin 新增和修改from表单
     const [formForAdminToAddAnaMod] = Form.useForm();
+    // 开发经理修改from表单
+    const [formForManagerToMod] = Form.useForm();
+    // 测试修改from表单
+    const [formForTesterToMod] = Form.useForm();
+    // UED修改from表单
+    const [formForUEDToMod] = Form.useForm();
+    // 删除提醒表单
     const [formForDel] = Form.useForm();
 
     /* region  表格相关事件 */
     const gridApi = useRef<GridApi>();   // 绑定ag-grid 组件
     const gqlClient = useGqlClient();
     const {data, loading} = useRequest(() =>
-      queryDevelopViews(gqlClient, queryCondition),
+      queryDevelopViews(gqlClient, ""),
     );
     console.log(data);
     const onGridReady = (params: GridReadyEvent) => {
@@ -286,7 +291,7 @@ const SprintList: React.FC<any> = () => {
 
     // 添加项目
     const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-    const [modal, setmodal] = useState({title: "新增明细"});
+    const [modal, setmodal] = useState({title: "新增明细行"});
     const addProject = () => {
       const currentDate = moment(new Date()).add('year', 0);
       formForAdminToAddAnaMod.setFieldsValue({
@@ -300,27 +305,103 @@ const SprintList: React.FC<any> = () => {
         prjStatus: null
       });
 
-      setmodal({"title": "新增明细"});
+      setmodal({"title": "新增明细行"});
       // 赋值给控件
       setIsAddModalVisible(true);
 
     };
 
-    // 时间选择后，检查数据库有无，有的话需要禁用某些控件
-    const [isAble, setisAble] = useState({shown: false});
-    const formTimeSelected = (params: any) => {
-      console.log("params", params);
-      // debugger;
-      // starttime = moment(params[0]).format('YYYY-MM-DD');
-      // 时间选择后禁用某些控件
-      setisAble({"shown": true});
-    };
-
     /* endregion */
 
     /* region 修改功能  */
-    // 修改项目
-    const modifyProject = () => {
+
+    const [isformForManagerToModVisible, setformForManagerToModVisible] = useState(false);
+    const [isformForTesterToModVisible, setformForTesterToModVisible] = useState(false);
+    const [isformForUEDToModVisible, setformForUEDToModVisible] = useState(false);
+
+    /* admin 权限操作 */
+    // 新增和修改弹出层取消按钮事件
+    const handleCancel = () => {
+      setIsAddModalVisible(false);
+    };
+
+    // sprint 项目保存
+    const commitSprintDetails = () => {
+      const datatest = formForAdminToAddAnaMod.getFieldsValue();
+      console.log("datatest", datatest);
+
+    };
+
+    // admin 修改
+    const adminModify = (datas: any) => {
+      console.log("datas", datas);
+
+      formForAdminToAddAnaMod.setFieldsValue({
+        // prjNames: projectType,
+        // prjDate: moment(prjTime, "YYYY-MM-DD"),
+        // starttime: moment(detailsInfo.starttime, "YYYY-MM-DD"),
+        // testCutoff: moment(detailsInfo.end1, "YYYY-MM-DD"),
+        // testFinnished: moment(detailsInfo.end2, "YYYY-MM-DD"),
+        // planHuidu: moment(detailsInfo.plan1, "YYYY-MM-DD"),
+        // planOnline: moment(detailsInfo.plan2, "YYYY-MM-DD"),
+        // prjStatus: detailsInfo.status
+      });
+
+      setmodal({"title": "修改明细行(admin)"});
+      setIsAddModalVisible(true);
+
+    };
+
+    /* 开发经理 权限操作 */
+    // 开发经理（开发）manager 修改
+    const managerModify = () => {
+      setformForManagerToModVisible(true);
+    };
+
+    // 开发经理弹出层取消
+    const mangerHandleCancel = () => {
+      setformForManagerToModVisible(false);
+
+    };
+
+    // 开发经理提交修改
+    const commitManagerModify = () => {
+
+    };
+
+    /* 测试 权限操作 */
+    // 测试 修改
+    const testerModify = () => {
+      setformForTesterToModVisible(true);
+    };
+
+    const testerHandleCancel = () => {
+      setformForTesterToModVisible(false);
+    };
+
+    const commitTesterModify = () => {
+
+    };
+
+
+    /* UED 权限操作 */
+    // UED 修改
+    const uedModify = () => {
+      setformForUEDToModVisible(true);
+    };
+
+    const UEDHandleCancel = () => {
+      setformForUEDToModVisible(false);
+    };
+
+
+    const commitUedModify = () => {
+
+    };
+
+    // 修改按钮点击事件
+    const btnModifyProject = () => {
+
       const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
       // 没有选中则提醒
       if (selRows.length === 0) {
@@ -347,53 +428,36 @@ const SprintList: React.FC<any> = () => {
       }
 
       const detailsInfo = selRows[0];
-      const prjNames = detailsInfo.prjname.toString();
-      let projectType = "";
-      let prjTime = "";
-      if (prjNames.indexOf('sprint') !== -1) {
-        projectType = "sprint";
-      } else if (prjNames.indexOf('emergency') !== -1) {
-        projectType = "emergency";
-      } else if (prjNames.indexOf('hotfix') !== -1) {
-        projectType = "hotfix";
+
+      // 判断人员权限（admin，测试，开发经理（开发）,UED）
+      let currentUser = "";
+      currentUser = "tester";
+      switch (currentUser) {
+        case "admin":
+          adminModify(detailsInfo);
+          break;
+        case "tester":
+          testerModify();
+          break;
+        case "manager":
+          managerModify();
+          break;
+        case "UED":
+          uedModify();
+          break;
+        default:
+          break;
       }
-      prjTime = prjNames.replace(projectType, "").trim();
 
-      formForAdminToAddAnaMod.setFieldsValue({
-        prjNames: projectType,
-        prjDate: moment(prjTime, "YYYY-MM-DD"),
-        starttime: moment(detailsInfo.starttime, "YYYY-MM-DD"),
-        testCutoff: moment(detailsInfo.end1, "YYYY-MM-DD"),
-        testFinnished: moment(detailsInfo.end2, "YYYY-MM-DD"),
-        planHuidu: moment(detailsInfo.plan1, "YYYY-MM-DD"),
-        planOnline: moment(detailsInfo.plan2, "YYYY-MM-DD"),
-        prjStatus: detailsInfo.status
-      });
-
-      setmodal({"title": "修改项目"});
-      setIsAddModalVisible(true);
 
     };
+
 
     /* endregion */
 
-    /* region 修改和新增公用的commit方法 */
-
-    // 新增和修改弹出层取消按钮事件
-    const handleCancel = () => {
-      setIsAddModalVisible(false);
-    };
-
-    // sprint 项目保存
-    const commitSprintDetails = () => {
-      const datatest = formForAdminToAddAnaMod.getFieldsValue();
-      console.log("datatest", datatest);
-
-    };
-
-    /* endregion */
 
     /* region 删除功能 */
+
     // 删除sprint列表
     const [isdelModalVisible, setIsDelModalVisible] = useState(false);
     // 删除按钮点击
@@ -455,11 +519,14 @@ const SprintList: React.FC<any> = () => {
     };
     /* endregion */
 
+    /* region 移动功能 */
 
-    const rightStyle = {marginLeft: "20px"};
+    const moveProject = () => {
+      console.log("项目移动");
+    };
+    /* endregion */
     const leftStyle = {marginLeft: "20px"};
     const widths = {width: "200px"};
-
 
     // 返回渲染的组件
     return (
@@ -471,11 +538,11 @@ const SprintList: React.FC<any> = () => {
           <Button type="text" style={{"color": "black"}} icon={<FolderAddTwoTone/>}
                   size={"large"} onClick={addProject}> 新增 </Button>
           <Button type="text" style={{"color": "black"}} icon={<EditTwoTone/>}
-                  size={"large"} onClick={modifyProject}> 修改 </Button>
+                  size={"large"} onClick={btnModifyProject}> 修改 </Button>
           <Button type="text" style={{"color": "black"}} icon={<DeleteTwoTone/>}
                   size={"large"} onClick={deleteSprintList}>删除 </Button>
           <Button type="text" style={{"color": "black"}} icon={<SnippetsTwoTone/>}
-                  size={"large"} onClick={modifyProject}> 移动 </Button>
+                  size={"large"} onClick={moveProject}> 移动 </Button>
         </div>
 
         {/* ag-grid 表格定义 */}
@@ -504,11 +571,9 @@ const SprintList: React.FC<any> = () => {
           </AgGridReact>
         </div>
 
-        {/* 弹出层定义 */}
-        <Modal
-          title={modal.title}
-          visible={isAddModalVisible} onCancel={handleCancel}
-          centered={true} footer={null} width={1000}>
+        {/* admin新增和修改表单 */}
+        <Modal title={modal.title} visible={isAddModalVisible} onCancel={handleCancel} centered={true} footer={null}
+               width={1000}>
 
           {/* admin 权限组新增和修改的界面 */}
           <Form form={formForAdminToAddAnaMod}>
@@ -627,7 +692,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddModule" label="所属模块:">
-                    <Input style={{width:"218px"}}/>
+                    <Input style={{width: "218px"}}/>
                   </Form.Item>
                 </div>
               </Col>
@@ -652,7 +717,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddSolvedBy" label="由谁解决/完成:">
-                    <Input style={{width:"185px"}}/>
+                    <Input style={{width: "185px"}}/>
                   </Form.Item>
                 </div>
               </Col>
@@ -671,7 +736,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddHotUpdate" label="是否支持热更新:">
-                    <Select placeholder="请选择" style={{width:"150px"}}>{
+                    <Select placeholder="请选择" style={{width: "150px"}}>{
                       [
                         <Option key={"closed"} value={"closed"}>是 </Option>,
                         <Option key={"doing"} value={"doing"}>否 </Option>
@@ -684,7 +749,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddDataUpgrade" label="是否有数据升级:">
-                    <Select placeholder="请选择" style={{width:"170px"}}>{
+                    <Select placeholder="请选择" style={{width: "170px"}}>{
                       [
                         <Option key={"closed"} value={"closed"}>是 </Option>,
                         <Option key={"wait"} value={"wait"}>否 </Option>
@@ -702,7 +767,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddInteUpgrade" label="是否有接口升级：">
-                    <Select placeholder="请选择" style={{width:"160px"}}>{
+                    <Select placeholder="请选择" style={{width: "160px"}}>{
                       [
                         <Option key={"closed"} value={"closed"}>是 </Option>,
                         <Option key={"wait"} value={"wait"}>否 </Option>
@@ -717,7 +782,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddPreData" label="是否有预置数据:">
-                    <Select placeholder="请选择" style={{width:"150px"}}>{
+                    <Select placeholder="请选择" style={{width: "150px"}}>{
                       [
                         <Option key={"closed"} value={"closed"}>是 </Option>,
                         <Option key={"doing"} value={"doing"}>否 </Option>
@@ -731,7 +796,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddtesterVerifi" label="是否需要测试验证：">
-                    <Select placeholder="请选择" style={{width:"155px"}}>{
+                    <Select placeholder="请选择" style={{width: "155px"}}>{
                       [
                         <Option key={"closed"} value={"closed"}>是 </Option>,
                         <Option key={"wait"} value={"wait"}>否 </Option>
@@ -844,7 +909,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddFeedbacker" label="反馈人:">
-                    <Input style={{width:"230px"}}/>
+                    <Input style={{width: "230px"}}/>
                   </Form.Item>
                 </div>
               </Col>
@@ -863,7 +928,7 @@ const SprintList: React.FC<any> = () => {
             </Row>
 
             <Form.Item style={{marginTop: "50px"}}>
-              <Button type="primary" style={{marginLeft: "400px"}} disabled={isAble.shown}
+              <Button type="primary" style={{marginLeft: "400px"}}
                       onClick={commitSprintDetails}>确定</Button>
               <Button type="primary" style={{marginLeft: "20px"}} onClick={handleCancel}>取消</Button>
             </Form.Item>
@@ -871,7 +936,436 @@ const SprintList: React.FC<any> = () => {
           </Form>
         </Modal>
 
+        {/* 开发经理和开发修改表单 */}
+        <Modal title="编辑明细行(开发)" visible={isformForManagerToModVisible} onCancel={mangerHandleCancel} centered={true}
+               footer={null} width={750}>
 
+          <Form form={formForManagerToMod}>
+            <Row gutter={16}>
+
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="managerChandaoType" label="禅道类型：">
+                    <Select placeholder="请选择" style={widths}>{
+                      [
+                        <Option key={"closed"} value={"closed"}>bug </Option>,
+                        <Option key={"doing"} value={"doing"}>需求 </Option>,
+                        <Option key={"wait"} value={"wait"}>task </Option>
+                      ]
+                    }
+                    </Select>
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+              <Col className="gutter-row">
+                <div style={{marginLeft: "50px"}}>
+                  <Form.Item name="managerCHandaoID" label="禅道编号:">
+                    <Input placeholder="请输入" style={widths}/>
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+            </Row>
+            <Row gutter={16}>
+
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="managerTitle" label="标题内容:">
+                    <Input style={{width: "540px"}}/>
+
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+            </Row>
+            <Row gutter={16}>
+
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="managerHotUpdate" label="是否支持热更新:">
+                    <Select placeholder="请选择" style={{width: "150px"}}>{
+                      [
+                        <Option key={"closed"} value={"closed"}>是 </Option>,
+                        <Option key={"doing"} value={"doing"}>否 </Option>
+                      ]
+                    }
+                    </Select>
+                  </Form.Item>
+                </div>
+              </Col>
+              <Col className="gutter-row">
+                <div style={{marginLeft: "55px"}}>
+                  <Form.Item name="managerDataUpgrade" label="是否有数据升级:">
+                    <Select placeholder="请选择" style={{width: "170px"}}>{
+                      [
+                        <Option key={"closed"} value={"closed"}>是 </Option>,
+                        <Option key={"wait"} value={"wait"}>否 </Option>
+                      ]
+                    }
+                    </Select>
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+            </Row>
+            <Row gutter={16}>
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="managerInteUpgrade" label="是否有接口升级：">
+                    <Select placeholder="请选择" style={{width: "155px"}}>{
+                      [
+                        <Option key={"closed"} value={"closed"}>是 </Option>,
+                        <Option key={"wait"} value={"wait"}>否 </Option>
+                      ]
+                    }
+                    </Select>
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+              <Col className="gutter-row">
+                <div style={{marginLeft: "50px"}}>
+                  <Form.Item name="managerPreData" label="是否有预置数据:">
+                    <Select placeholder="请选择" style={{width: "170px"}}>{
+                      [
+                        <Option key={"closed"} value={"closed"}>是 </Option>,
+                        <Option key={"doing"} value={"doing"}>否 </Option>
+                      ]
+                    }
+                    </Select>
+                  </Form.Item>
+                </div>
+              </Col>
+
+            </Row>
+            <Row gutter={16}>
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="managertesterVerifi" label="是否需要测试验证：">
+                    <Select placeholder="请选择" style={{width: "150px"}}>{
+                      [
+                        <Option key={"closed"} value={"closed"}>是 </Option>,
+                        <Option key={"wait"} value={"wait"}>否 </Option>
+                      ]
+                    }
+                    </Select>
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+              <Col className="gutter-row">
+                <div style={{marginLeft: "50px"}}>
+                  <Form.Item name="managerEnvironment" label="发布环境:">
+                    <Select placeholder="请选择" style={widths}>{
+                      [
+                        <Option key={"closed"} value={"closed"}>集群1</Option>,
+                        <Option key={"closed2"} value={"closed2"}>集群2 </Option>,
+                        <Option key={"doing"} value={"doing"}>集群3 </Option>
+                      ]
+                    }
+                    </Select>
+                  </Form.Item>
+
+                </div>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="managerSuggestion" label="验证范围建议:">
+                    <Input style={{width: "520px"}}/>
+                  </Form.Item>
+                </div>
+              </Col>
+
+            </Row>
+            <Row gutter={16}>
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="managerRevert" label="开发是否已Revert:">
+                    <Select placeholder="请选择" style={widths}>{
+                      [
+                        <Option key={"closed"} value={"closed"}> </Option>,
+                        <Option key={"closed2"} value={"closed2"}>是</Option>,
+                        <Option key={"doing"} value={"doing"}>否 </Option>
+                      ]
+                    }
+                    </Select>
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+            </Row>
+
+            <Form.Item style={{marginTop: "50px"}}>
+              <Button type="primary" style={{marginLeft: "300px"}}
+                      onClick={commitManagerModify}>确定</Button>
+              <Button type="primary" style={{marginLeft: "20px"}} onClick={mangerHandleCancel}>取消</Button>
+            </Form.Item>
+
+          </Form>
+        </Modal>
+
+
+        {/* 测试修改表单 */}
+        <Modal title="编辑明细行(测试)" visible={isformForTesterToModVisible} onCancel={testerHandleCancel} centered={true}
+               footer={null} width={750}>
+
+          <Form form={formForTesterToMod}>
+            <Row gutter={16}>
+
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="testerChandaoType" label="禅道类型：">
+                    <Select placeholder="请选择" style={widths}>{
+                      [
+                        <Option key={"closed"} value={"closed"}>bug </Option>,
+                        <Option key={"doing"} value={"doing"}>需求 </Option>,
+                        <Option key={"wait"} value={"wait"}>task </Option>
+                      ]
+                    }
+                    </Select>
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+              <Col className="gutter-row">
+                <div style={{marginLeft: "50px"}}>
+                  <Form.Item name="testerCHandaoID" label="禅道编号:">
+                    <Input placeholder="请输入" style={widths}/>
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+            </Row>
+            <Row gutter={16}>
+
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="testerTitle" label="标题内容:">
+                    <Input style={{width: "540px"}}/>
+
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+            </Row>
+
+            <Row gutter={16}>
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="adminAddChandaoStatus" label="禅道状态:">
+                    <Input style={widths}/>
+                  </Form.Item>
+                </div>
+              </Col>
+
+              <Col className="gutter-row">
+                <div style={{marginLeft: "50px"}}>
+                  <Form.Item name="testToTester" label="对应测试:">
+                    <Select placeholder="请选择" style={widths}>{
+                      [
+                        <Option key={"closed"} value={"closed"}>tester1 </Option>,
+                        <Option key={"wait"} value={"wait"}>tester2 </Option>
+                      ]
+                    }
+                    </Select>
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="testerRevert" label="revert后是否已验证：">
+                    <Select placeholder="请选择" style={{width: "140px"}}>{
+                      [
+                        <Option key={"closed"} value={"closed"}> </Option>,
+                        <Option key={"doing"} value={"doing"}>是 </Option>,
+                        <Option key={"wait"} value={"wait"}>否 </Option>
+                      ]
+                    }
+                    </Select>
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+            </Row>
+
+            <Row gutter={16}>
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="testerRemark" label="备 注:">
+                    <Input style={{width: "570px"}}/>
+                  </Form.Item>
+                </div>
+              </Col>
+
+            </Row>
+
+            <Form.Item style={{marginTop: "50px"}}>
+              <Button type="primary" style={{marginLeft: "300px"}}
+                      onClick={commitTesterModify}>确定</Button>
+              <Button type="primary" style={{marginLeft: "20px"}} onClick={testerHandleCancel}>取消</Button>
+            </Form.Item>
+
+          </Form>
+        </Modal>
+
+
+        {/* UED修改表单 */}
+        <Modal title="编辑明细行(UED)" visible={isformForUEDToModVisible} onCancel={UEDHandleCancel} centered={true}
+               footer={null} width={750}>
+
+          <Form form={formForUEDToMod}>
+            <Row gutter={16}>
+
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="uedChandaoType" label="禅道类型：">
+                    <Select placeholder="请选择" style={widths}>{
+                      [
+                        <Option key={"closed"} value={"closed"}>bug </Option>,
+                        <Option key={"doing"} value={"doing"}>需求 </Option>,
+                        <Option key={"wait"} value={"wait"}>task </Option>
+                      ]
+                    }
+                    </Select>
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+              <Col className="gutter-row">
+                <div style={{marginLeft: "50px"}}>
+                  <Form.Item name="uedCHandaoID" label="禅道编号:">
+                    <Input placeholder="请输入" style={widths}/>
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+            </Row>
+            <Row gutter={16}>
+
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="uedTitle" label="标题内容:">
+                    <Input style={{width: "540px"}}/>
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+            </Row>
+
+            <Row gutter={16}>
+
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="uedForUED" label="对应UED：">
+                    <Select placeholder="请选择" style={widths}>{
+                      [
+                        <Option key={"closed"} value={"closed"}>UED1 </Option>,
+                        <Option key={"doing"} value={"doing"}>UED2 </Option>,
+                      ]
+                    }
+                    </Select>
+                  </Form.Item>
+
+                </div>
+              </Col>
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="uedForUedVerify" label="UED测试环境验证：">
+                    <Select placeholder="请选择" style={{width: "180px"}}>{
+                      [
+                        <Option key={"closed"} value={"closed"}>验证通过 </Option>,
+                        <Option key={"doing"} value={"doing"}>未通过 </Option>,
+                        <Option key={"doin"} value={"doin"}>无需验证 </Option>
+                      ]
+                    }
+                    </Select>
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+            </Row>
+
+            <Row gutter={16}>
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="UedOnlineVerti" label="UED线上验证:">
+                    <Select placeholder="请选择" style={widths}>{
+                      [
+                        <Option key={"closed"} value={"closed"}>验证通过 </Option>,
+                        <Option key={"doing"} value={"doing"}>未通过 </Option>,
+                        <Option key={"suspended"} value={"suspended"}>无需验证 </Option>
+                      ]
+                    }
+                    </Select>
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+              <Col className="gutter-row">
+                <div style={{marginLeft: "50px"}}>
+                  <Form.Item name="uedSource" label="来 源:">
+                    <Select placeholder="请选择" style={widths}>{
+                      [
+                        <Option key={"closed"} value={"closed"}>产品hotfix申请 </Option>,
+                        <Option key={"wait"} value={"wait"}>UED-hotfix申请 </Option>,
+                        <Option key={"wait"} value={"wait"}>开发hotfix申请 </Option>,
+                        <Option key={"wait"} value={"wait"}>emergency申请 </Option>,
+                        <Option key={"wait"} value={"wait"}>开发热更新申请 </Option>,
+                        <Option key={"wait"} value={"wait"}>禅道自动写入 </Option>,
+                        <Option key={"wait"} value={"wait"}>手工录入 </Option>,
+                      ]
+                    }
+                    </Select>
+                  </Form.Item>
+
+                </div>
+              </Col>
+
+            </Row>
+
+            <Row gutter={16}>
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="uedRemark" label="备 注:">
+                    <Input style={{width: "575px"}}/>
+                  </Form.Item>
+                </div>
+              </Col>
+            </Row>
+
+            <Form.Item style={{marginTop: "50px"}}>
+              <Button type="primary" style={{marginLeft: "300px"}}
+                      onClick={commitUedModify}>确定</Button>
+              <Button type="primary" style={{marginLeft: "20px"}} onClick={UEDHandleCancel}>取消</Button>
+            </Form.Item>
+
+          </Form>
+        </Modal>
+
+
+        {/* 删除项目 */}
         <Modal title={"删除项目"} visible={isdelModalVisible} onCancel={DelCancel} centered={true} footer={null} width={500}>
 
           <Form form={formForDel}>
@@ -882,7 +1376,7 @@ const SprintList: React.FC<any> = () => {
             </Form.Item>
 
             <Form.Item>
-              <Button type="primary" style={{marginLeft: "150px"}} disabled={isAble.shown}
+              <Button type="primary" style={{marginLeft: "150px"}}
                       onClick={delSprintList}>确定</Button>
               <Button type="primary" style={{marginLeft: "20px"}} onClick={DelCancel}>取消</Button>
             </Form.Item>

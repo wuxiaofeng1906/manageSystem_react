@@ -844,7 +844,7 @@ const SprintList: React.FC<any> = () => {
             </Form.Item>
 
             <Form.Item>
-              <Button type="primary" style={{marginLeft: "150px"}} disabled={isAble.shown}
+              <Button type="primary" style={{marginLeft: "150px"}}
                       onClick={delSprintList}>确定</Button>
               <Button type="primary" style={{marginLeft: "20px"}} onClick={DelCancel}>取消</Button>
             </Form.Item>

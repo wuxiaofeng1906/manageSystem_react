@@ -12,7 +12,6 @@ import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col} from 
 import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone} from '@ant-design/icons';
 import {getRecentMonth} from '@/publicMethods/timeMethods';
 import axios from 'axios';
-// import {Link} from 'umi';
 import {history} from 'umi';
 
 const {RangePicker} = DatePicker;
@@ -675,13 +674,13 @@ const SprintList: React.FC<any> = () => {
           <label style={{"color": "black"}}> 近1月未关闭的</label>
           {/* <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}> 近1月未关闭的 </Button> */}
 
-          <Button type="text" style={{"color": "black", float: "right"}} icon={<FolderAddTwoTone/>}
+          <Button type="text" style={{"color": "black", float: "right"}} icon={<DeleteTwoTone/>}
                   size={"large"} onClick={deleteSprintList}>删除 </Button>
 
           <Button type="text" style={{"color": "black", float: "right"}} icon={<EditTwoTone/>}
                   size={"large"} onClick={modifyProject}> 修改 </Button>
 
-          <Button type="text" style={{"color": "black", float: "right"}} icon={<DeleteTwoTone/>}
+          <Button type="text" style={{"color": "black", float: "right"}} icon={<FolderAddTwoTone/>}
                   size={"large"} onClick={addProject}> 新增 </Button>
         </div>
 

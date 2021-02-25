@@ -82,7 +82,7 @@ const numberRenderToZentaoType = (params: any) => {
       type = "Bug";
       break;
     case "2":
-      type = "任务";
+      type = "Task";
       break;
     case "3":
       type = "需求";
@@ -94,7 +94,7 @@ const numberRenderToZentaoType = (params: any) => {
 };
 
 const numberRenderToZentaoSeverity = (params: any) => {
-  // P0 = 1,
+   // P0 = 1,
   //  P1 = 2,
   //  P2 = 3,
   //  P3 = 4,

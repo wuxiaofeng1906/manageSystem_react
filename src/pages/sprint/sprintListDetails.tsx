@@ -7,7 +7,6 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
-import moment from 'moment';
 import {Button, message, Form, Select, Modal, Input, Row, Col} from 'antd';
 import {
   FolderAddTwoTone,
@@ -28,6 +27,8 @@ import {
   numberRenderToSource,
   linkToZentaoPage
 } from '@/publicMethods/cellRenderer';
+import axios from "axios";
+import {forEach} from "ag-grid-community/dist/lib/utils/array";
 
 const {Option} = Select;
 
@@ -219,6 +220,21 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   return data?.proDetail;
 };
 
+// 查询数据
+const queryDeptViews = async (client: GqlClient<object>, params: any) => {
+
+  const {data} = await client.query(`
+      {
+       WxDeptUsers(deptNames:["${params}"]){
+          id
+          userName
+        }
+      }
+  `);
+  return data?.WxDeptUsers;
+};
+
+
 // 组件初始化
 const SprintList: React.FC<any> = () => {
 
@@ -262,20 +278,105 @@ const SprintList: React.FC<any> = () => {
 
     /* region 新增功能 */
 
+    // 隐藏
+    //   const [isChandaoInfoEdit, setChandaoInfoEdit] = useState({isEdit: true});
+    // setChandaoInfoEdit({isEdit: true});
+
+    // 失去焦点后查询值
+    const checkZentaoInfo = (params: any) => {
+      const ztno = params.target.value;
+      const addFormData = formForAdminToAddAnaMod.getFieldsValue();
+
+      axios.get('/api/sprint/project/child', {
+        params: {
+          project: prjId,
+          category: addFormData.adminChandaoType,
+          ztNo: ztno
+        }
+      }).then(function (res) {
+        if (res.data.ok === true) {
+          const queryDatas = res.data.ztRecord;
+
+          formForAdminToAddAnaMod.setFieldsValue({
+            adminAddChandaoTitle: queryDatas.title,
+            adminAddSeverity: numberRenderToZentaoSeverity({value: queryDatas.severity.toString()}),
+            adminAddPriority: queryDatas.priority,
+            adminAddModule: queryDatas.module,
+            adminAddChandaoStatus: queryDatas.ztStatus,
+            adminAddAssignTo: queryDatas.assignedTo,
+            adminAddSolvedBy: queryDatas.finishedBy,
+            adminAddClosedBy: queryDatas.closedBy,
+          });
+        } else if (res.data.code === "404") {
+          message.error({
+            content: `禅道不存在ID为${ztno}的${addFormData.adminChandaoType}`,
+            className: 'ModNone',
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          formForAdminToAddAnaMod.setFieldsValue({
+            adminAddChandaoTitle: "",
+            adminAddSeverity: "",
+            adminAddPriority: "",
+            adminAddModule: "",
+            adminAddChandaoStatus: "",
+            adminAddAssignTo: "",
+            adminAddSolvedBy: "",
+            adminAddClosedBy: "",
+          });
+
+        } else {
+          message.error({
+            content: `${res.data.message}`,
+            className: 'ModNone',
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+      }).catch(function (error) {
+        message.error({
+          content: error.toString(),
+          className: 'ModError',
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      });
+
+    };
     // 添加项目
     const [isAddModalVisible, setIsAddModalVisible] = useState(false);
     const [modal, setmodal] = useState({title: "新增明细行"});
     const addProject = () => {
-      const currentDate = moment(new Date()).add('year', 0);
       formForAdminToAddAnaMod.setFieldsValue({
-        prjNames: null,
-        prjDate: moment(currentDate, "YYYY-MM-DD"),
-        starttime: moment(currentDate, "YYYY-MM-DD"),
-        testCutoff: moment(currentDate, "YYYY-MM-DD"),
-        testFinnished: moment(currentDate, "YYYY-MM-DD"),
-        planOnline: moment(currentDate, "YYYY-MM-DD"),
-        planHuidu: moment(currentDate, "YYYY-MM-DD"),
-        prjStatus: null
+        adminCurStage: "",
+        adminAddTester: "",
+        adminChandaoType: "",
+        adminChandaoId: "",
+        adminAddChandaoTitle: "",
+        adminAddSeverity: "",
+        adminAddPriority: "",
+        adminAddModule: "",
+        adminAddChandaoStatus: "",
+        adminAddAssignTo: "",
+        adminAddSolvedBy: "",
+        adminAddClosedBy: "",
+        adminAddHotUpdate: "",
+        adminAddDataUpgrade: "",
+        adminAddInteUpgrade: "",
+        adminAddPreData: "",
+        adminAddtesterVerifi: "",
+        adminAddSuggestion: "",
+        adminAddEnvironment: "",
+        adminAddForUED: "",
+        adminAddForUedVerify: "",
+        adminAdminUedOnline: "",
+        // adminAddSource: "",
+        adminAddFeedbacker: "",
+        adminAddRemark: ""
+
       });
 
       setmodal({"title": "新增明细行"});
@@ -300,8 +401,60 @@ const SprintList: React.FC<any> = () => {
 
     // sprint 项目保存
     const commitSprintDetails = () => {
-      const datatest = formForAdminToAddAnaMod.getFieldsValue();
-      console.log("datatest", datatest);
+      const oradata = formForAdminToAddAnaMod.getFieldsValue();
+      debugger;
+
+      const datas = {
+        "project": prjId,
+        "tester": oradata.adminAddTester,
+        "category": oradata.adminChandaoType,
+        "ztNo": oradata.adminChandaoId,
+        "hotUpdate": oradata.adminAddHotUpdate,
+        "dataUpdate": oradata.adminAddDataUpgrade,
+        "interUpdate": oradata.adminAddInteUpgrade,
+        "presetData": oradata.adminAddPreData,
+        "testCheck": oradata.adminAddtesterVerifi,
+        "scopeLimit": oradata.adminAddSuggestion,
+        "publish": oradata.adminAddEnvironment,
+        "uedName": oradata.adminAddForUED,
+        "uedEnvCheck": oradata.adminAddForUedVerify,
+        "uedOnlineCheck": oradata.adminAdminUedOnline,
+        "source": 7, // oradata.adminAddSource,
+        "feedback": oradata.adminAddFeedbacker,
+        "memo": oradata.adminAddRemark,
+      };
+
+      axios.post('/api/sprint/project/child', datas).then(function (res) {
+        debugger;
+
+        if (res.data.ok === true) {
+          // setIsAddModalVisible(false);
+          // updateGrid();
+          message.info({
+            content: res.data.message,
+            className: 'AddSuccess',
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+          message.error({
+            content: `${res.data.message}`,
+            className: 'AddNone',
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+      }).catch(function (error) {
+        message.error({
+          content: error.toString(),
+          className: 'AddError',
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      });
 
     };
 
@@ -310,6 +463,7 @@ const SprintList: React.FC<any> = () => {
       console.log("datas", datas);
 
       formForAdminToAddAnaMod.setFieldsValue({
+
         // prjNames: projectType,
         // prjDate: moment(prjTime, "YYYY-MM-DD"),
         // starttime: moment(detailsInfo.starttime, "YYYY-MM-DD"),
@@ -521,7 +675,26 @@ const SprintList: React.FC<any> = () => {
     /* endregion */
 
     const leftStyle = {marginLeft: "20px"};
-    const widths = {width: "200px"};
+    const widths = {width: "200px", color: "black"};
+
+    // 获取部门数据
+    const getUedMemner = () => {
+      const uedMan = [<Option key={"HuRong"} value={"HuRong"}>胡蓉 </Option>,
+        <Option key={"DuanJunJie"} value={"DuanJunJie"}>段俊杰 </Option>];
+      // const uedMan: any = [];
+      // const datas: any = await queryDeptViews(gqlClient, "测试");
+      // datas.forEach(function (e: any) {
+      //   debugger;
+      //   uedMan.push(`<Option key={"${e.id}"} value={"${e.id}"}>${e.userName} </Option>`);
+      // });
+      // for (let index = 0; index < datas.length; index += 1) {
+      //   uedMan.push(`<Option key={"${datas[index].id}"} value={"${datas[index].id}"}>${datas[index].userName} </Option>`);
+      // }
+
+      // const ued = [<Option key={"closed"} value={"closed"}>UED1 </Option>];
+      return uedMan;
+    };
+
 
     // 返回渲染的组件
     return (
@@ -595,17 +768,17 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminCurStage" label="当前阶段:">
                     <Select placeholder="请选择" style={widths}>{
                       [
-                        <Option key={"closed"} value={"closed"}>未开始 </Option>,
-                        <Option key={"doing"} value={"doing"}>开发中 </Option>,
-                        <Option key={"suspended"} value={"suspended"}>已提测 </Option>,
-                        <Option key={"wait"} value={"wait"}>测试中 </Option>,
-                        <Option key={"wait"} value={"wait"}>TE测试环境已验过 </Option>,
-                        <Option key={"wait"} value={"wait"}>UED测试环境已验过 </Option>,
-                        <Option key={"wait"} value={"wait"}>已取消 </Option>,
-                        <Option key={"wait"} value={"wait"}>开发已revert </Option>,
-                        <Option key={"wait"} value={"wait"}>测试已验证revert </Option>,
-                        <Option key={"wait"} value={"wait"}>灰度已验过 </Option>,
-                        <Option key={"wait"} value={"wait"}>线上已验过 </Option>
+                        <Option key={"1"} value={"1"}>未开始 </Option>,
+                        <Option key={"2"} value={"2"}>开发中 </Option>,
+                        <Option key={"3"} value={"3"}>已提测 </Option>,
+                        <Option key={"4"} value={"4"}>测试中 </Option>,
+                        <Option key={"5"} value={"5"}>TE测试环境已验过 </Option>,
+                        <Option key={"6"} value={"6"}>UED测试环境已验过 </Option>,
+                        <Option key={"7"} value={"7"}>已取消 </Option>,
+                        <Option key={"8"} value={"8"}>开发已revert </Option>,
+                        <Option key={"9"} value={"9"}>测试已验证revert </Option>,
+                        <Option key={"10"} value={"10"}>灰度已验过 </Option>,
+                        <Option key={"11"} value={"11"}>线上已验过 </Option>
                       ]
                     }
                     </Select>
@@ -632,9 +805,9 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminChandaoType" label="禅道类型：">
                     <Select placeholder="请选择" style={widths}>{
                       [
-                        <Option key={"closed"} value={"closed"}>bug </Option>,
-                        <Option key={"doing"} value={"doing"}>需求 </Option>,
-                        <Option key={"wait"} value={"wait"}>task </Option>
+                        <Option key={"1"} value={"1"}>bug </Option>,
+                        <Option key={"3"} value={"3"}>需求 </Option>,
+                        <Option key={"2"} value={"2"}>task </Option>
                       ]
                     }
                     </Select>
@@ -649,7 +822,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminChandaoId" label="禅道编号:">
-                    <Input placeholder="请输入" style={widths}/>
+                    <Input placeholder="请输入" style={widths} onBlur={checkZentaoInfo}/>
                   </Form.Item>
 
                 </div>
@@ -657,7 +830,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddChandaoTitle" label="标题内容:">
-                    <Input style={{width: "510px"}}/>
+                    <Input disabled={true} style={{width: "510px", color: "black"}}/>
 
                   </Form.Item>
 
@@ -670,13 +843,12 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddSeverity" label="严重程度:">
-                    <Select placeholder="请选择" style={widths}>{
+                    <Select disabled={true} placeholder="请选择" style={widths}>{
                       [
-                        <Option key={"closed"} value={"closed"}> </Option>,
-                        <Option key={"closed2"} value={"closed2"}>P0 </Option>,
-                        <Option key={"doing"} value={"doing"}>P1 </Option>,
-                        <Option key={"suspended"} value={"suspended"}>P2 </Option>,
-                        <Option key={"wait"} value={"wait"}>P3 </Option>,
+                        <Option key={"1"} value={"1"}>P0 </Option>,
+                        <Option key={"2"} value={"2"}>P1 </Option>,
+                        <Option key={"3"} value={"3"}>P2 </Option>,
+                        <Option key={"4"} value={"4"}>P3 </Option>,
                       ]
                     }
                     </Select>
@@ -687,7 +859,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddPriority" label="优先级：">
-                    <Select placeholder="请选择" style={widths}>{
+                    <Select disabled={true} placeholder="请选择" style={widths}>{
                       [
                         <Option key={"closed"} value={"closed"}>1 </Option>,
                         <Option key={"doing"} value={"doing"}>2 </Option>,
@@ -703,7 +875,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddModule" label="所属模块:">
-                    <Input style={{width: "218px"}}/>
+                    <Input disabled={true} style={{width: "218px"}}/>
                   </Form.Item>
                 </div>
               </Col>
@@ -714,21 +886,21 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddChandaoStatus" label="禅道状态:">
-                    <Input style={widths}/>
+                    <Input disabled={true} style={widths}/>
                   </Form.Item>
                 </div>
               </Col>
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddAssignTo" label="指派给:">
-                    <Input style={widths}/>
+                    <Input disabled={true} style={widths}/>
                   </Form.Item>
                 </div>
               </Col>
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddSolvedBy" label="由谁解决/完成:">
-                    <Input style={{width: "185px"}}/>
+                    <Input disabled={true} style={{width: "185px", color: "black"}}/>
                   </Form.Item>
                 </div>
               </Col>
@@ -739,7 +911,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddClosedBy" label="由谁关闭:">
-                    <Input style={widths}/>
+                    <Input disabled={true} style={widths}/>
                   </Form.Item>
                 </div>
               </Col>
@@ -749,8 +921,8 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminAddHotUpdate" label="是否支持热更新:">
                     <Select placeholder="请选择" style={{width: "150px"}}>{
                       [
-                        <Option key={"closed"} value={"closed"}>是 </Option>,
-                        <Option key={"doing"} value={"doing"}>否 </Option>
+                        <Option key={"1"} value={"1"}>是 </Option>,
+                        <Option key={"0"} value={"0"}>否 </Option>
                       ]
                     }
                     </Select>
@@ -762,8 +934,8 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminAddDataUpgrade" label="是否有数据升级:">
                     <Select placeholder="请选择" style={{width: "170px"}}>{
                       [
-                        <Option key={"closed"} value={"closed"}>是 </Option>,
-                        <Option key={"wait"} value={"wait"}>否 </Option>
+                        <Option key={"1"} value={"1"}>是 </Option>,
+                        <Option key={"0"} value={"0"}>否 </Option>
                       ]
                     }
                     </Select>
@@ -780,8 +952,8 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminAddInteUpgrade" label="是否有接口升级：">
                     <Select placeholder="请选择" style={{width: "160px"}}>{
                       [
-                        <Option key={"closed"} value={"closed"}>是 </Option>,
-                        <Option key={"wait"} value={"wait"}>否 </Option>
+                        <Option key={"1"} value={"1"}>是 </Option>,
+                        <Option key={"0"} value={"0"}>否 </Option>
                       ]
                     }
                     </Select>
@@ -795,8 +967,8 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminAddPreData" label="是否有预置数据:">
                     <Select placeholder="请选择" style={{width: "150px"}}>{
                       [
-                        <Option key={"closed"} value={"closed"}>是 </Option>,
-                        <Option key={"doing"} value={"doing"}>否 </Option>
+                        <Option key={"1"} value={"1"}>是 </Option>,
+                        <Option key={"0"} value={"0"}>否 </Option>
                       ]
                     }
                     </Select>
@@ -809,8 +981,8 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminAddtesterVerifi" label="是否需要测试验证：">
                     <Select placeholder="请选择" style={{width: "155px"}}>{
                       [
-                        <Option key={"closed"} value={"closed"}>是 </Option>,
-                        <Option key={"wait"} value={"wait"}>否 </Option>
+                        <Option key={"1"} value={"1"}>是 </Option>,
+                        <Option key={"0"} value={"0"}>否 </Option>
                       ]
                     }
                     </Select>
@@ -839,9 +1011,9 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminAddEnvironment" label="发布环境:">
                     <Select placeholder="请选择" style={widths}>{
                       [
-                        <Option key={"closed"} value={"closed"}>集群1</Option>,
-                        <Option key={"closed2"} value={"closed2"}>集群2 </Option>,
-                        <Option key={"doing"} value={"doing"}>集群3 </Option>
+                        <Option key={"集群1"} value={"集群1"}>集群1</Option>,
+                        <Option key={"集群2"} value={"集群2"}>集群2 </Option>,
+                        <Option key={"集群3"} value={"集群3"}>集群3 </Option>
                       ]
                     }
                     </Select>
@@ -852,12 +1024,8 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddForUED" label="对应UED：">
-                    <Select placeholder="请选择" style={widths}>{
-                      [
-                        <Option key={"closed"} value={"closed"}>UED1 </Option>,
-                        <Option key={"doing"} value={"doing"}>UED2 </Option>,
-                      ]
-                    }
+
+                    <Select placeholder="请选择" style={widths}>{getUedMemner()}
                     </Select>
                   </Form.Item>
 
@@ -868,9 +1036,9 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminAddForUedVerify" label="UED测试环境验证：">
                     <Select placeholder="请选择" style={{width: "158px"}}>{
                       [
-                        <Option key={"closed"} value={"closed"}>验证通过 </Option>,
-                        <Option key={"doing"} value={"doing"}>未通过 </Option>,
-                        <Option key={"doin"} value={"doin"}>无需验证 </Option>
+                        <Option key={"1"} value={"1"}>验证通过 </Option>,
+                        <Option key={"0"} value={"0"}>未通过 </Option>,
+                        <Option key={"2"} value={"2"}>无需验证 </Option>
                       ]
                     }
                     </Select>
@@ -887,9 +1055,9 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminAdminUedOnline" label="UED线上验证:">
                     <Select placeholder="请选择" style={widths}>{
                       [
-                        <Option key={"closed"} value={"closed"}>验证通过 </Option>,
-                        <Option key={"doing"} value={"doing"}>未通过 </Option>,
-                        <Option key={"suspended"} value={"suspended"}>无需验证 </Option>
+                        <Option key={"1"} value={"1"}>验证通过 </Option>,
+                        <Option key={"0"} value={"0"}>未通过 </Option>,
+                        <Option key={"2"} value={"2"}>无需验证 </Option>
                       ]
                     }
                     </Select>
@@ -900,15 +1068,15 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddSource" label="来源:">
-                    <Select placeholder="请选择" style={widths}>{
+                    <Select placeholder="请选择" defaultValue={["手工录入"]} style={widths}>{
                       [
-                        <Option key={"closed"} value={"closed"}>产品hotfix申请 </Option>,
-                        <Option key={"wait"} value={"wait"}>UED-hotfix申请 </Option>,
-                        <Option key={"wait"} value={"wait"}>开发hotfix申请 </Option>,
-                        <Option key={"wait"} value={"wait"}>emergency申请 </Option>,
-                        <Option key={"wait"} value={"wait"}>开发热更新申请 </Option>,
-                        <Option key={"wait"} value={"wait"}>禅道自动写入 </Option>,
-                        <Option key={"wait"} value={"wait"}>手工录入 </Option>,
+                        <Option key={"6"} value={"6"}>禅道自动写入</Option>,
+                        <Option key={"7"} value={"7"}>手工录入</Option>,
+                        <Option key={"1"} value={"1"}>《产品hotfix申请》 </Option>,
+                        <Option key={"2"} value={"2"}>《UED-hotfix申请》 </Option>,
+                        <Option key={"3"} value={"3"}>《开发hotfix申请》 </Option>,
+                        <Option key={"4"} value={"4"}>《emergency申请》 </Option>,
+                        <Option key={"5"} value={"5"}>《开发热更新申请》 </Option>,
                       ]
                     }
                     </Select>
@@ -985,7 +1153,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="managerTitle" label="标题内容:">
-                    <Input style={{width: "540px"}}/>
+                    <Input disabled={true} style={{width: "540px", color: "black"}}/>
 
                   </Form.Item>
 
@@ -1013,8 +1181,8 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="managerDataUpgrade" label="是否有数据升级:">
                     <Select placeholder="请选择" style={{width: "170px"}}>{
                       [
-                        <Option key={"closed"} value={"closed"}>是 </Option>,
-                        <Option key={"wait"} value={"wait"}>否 </Option>
+                        <Option key={"1"} value={"1"}>是 </Option>,
+                        <Option key={"0"} value={"0"}>否 </Option>
                       ]
                     }
                     </Select>
@@ -1030,8 +1198,8 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="managerInteUpgrade" label="是否有接口升级：">
                     <Select placeholder="请选择" style={{width: "155px"}}>{
                       [
-                        <Option key={"closed"} value={"closed"}>是 </Option>,
-                        <Option key={"wait"} value={"wait"}>否 </Option>
+                        <Option key={"1"} value={"1"}>是 </Option>,
+                        <Option key={"0"} value={"0"}>否 </Option>
                       ]
                     }
                     </Select>
@@ -1045,8 +1213,8 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="managerPreData" label="是否有预置数据:">
                     <Select placeholder="请选择" style={{width: "170px"}}>{
                       [
-                        <Option key={"closed"} value={"closed"}>是 </Option>,
-                        <Option key={"doing"} value={"doing"}>否 </Option>
+                        <Option key={"1"} value={"1"}>是 </Option>,
+                        <Option key={"0"} value={"0"}>否 </Option>
                       ]
                     }
                     </Select>
@@ -1061,8 +1229,8 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="managertesterVerifi" label="是否需要测试验证：">
                     <Select placeholder="请选择" style={{width: "150px"}}>{
                       [
-                        <Option key={"closed"} value={"closed"}>是 </Option>,
-                        <Option key={"wait"} value={"wait"}>否 </Option>
+                        <Option key={"1"} value={"1"}>是 </Option>,
+                        <Option key={"0"} value={"0"}>否 </Option>
                       ]
                     }
                     </Select>
@@ -1076,9 +1244,9 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="managerEnvironment" label="发布环境:">
                     <Select placeholder="请选择" style={widths}>{
                       [
-                        <Option key={"closed"} value={"closed"}>集群1</Option>,
-                        <Option key={"closed2"} value={"closed2"}>集群2 </Option>,
-                        <Option key={"doing"} value={"doing"}>集群3 </Option>
+                        <Option key={"集群1"} value={"集群1"}>集群1</Option>,
+                        <Option key={"集群2"} value={"集群2"}>集群2 </Option>,
+                        <Option key={"集群3"} value={"集群3"}>集群3 </Option>
                       ]
                     }
                     </Select>
@@ -1165,7 +1333,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="testerTitle" label="标题内容:">
-                    <Input style={{width: "540px"}}/>
+                    <Input disabled={true} style={{width: "540px", color: "black"}}/>
 
                   </Form.Item>
 
@@ -1178,7 +1346,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddChandaoStatus" label="禅道状态:">
-                    <Input style={widths}/>
+                    <Input disabled={true} style={widths}/>
                   </Form.Item>
                 </div>
               </Col>
@@ -1275,7 +1443,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="uedTitle" label="标题内容:">
-                    <Input style={{width: "540px"}}/>
+                    <Input disabled={true} style={{width: "540px", color: "black"}}/>
                   </Form.Item>
 
                 </div>
@@ -1304,9 +1472,9 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="uedForUedVerify" label="UED测试环境验证：">
                     <Select placeholder="请选择" style={{width: "180px"}}>{
                       [
-                        <Option key={"closed"} value={"closed"}>验证通过 </Option>,
-                        <Option key={"doing"} value={"doing"}>未通过 </Option>,
-                        <Option key={"doin"} value={"doin"}>无需验证 </Option>
+                        <Option key={"1"} value={"1"}>验证通过 </Option>,
+                        <Option key={"0"} value={"0"}>未通过 </Option>,
+                        <Option key={"2"} value={"2"}>无需验证 </Option>
                       ]
                     }
                     </Select>
@@ -1323,9 +1491,9 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="UedOnlineVerti" label="UED线上验证:">
                     <Select placeholder="请选择" style={widths}>{
                       [
-                        <Option key={"closed"} value={"closed"}>验证通过 </Option>,
-                        <Option key={"doing"} value={"doing"}>未通过 </Option>,
-                        <Option key={"suspended"} value={"suspended"}>无需验证 </Option>
+                        <Option key={"1"} value={"1"}>验证通过 </Option>,
+                        <Option key={"0"} value={"0"}>未通过 </Option>,
+                        <Option key={"2"} value={"2"}>无需验证 </Option>
                       ]
                     }
                     </Select>
@@ -1339,13 +1507,13 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="uedSource" label="来 源:">
                     <Select placeholder="请选择" style={widths}>{
                       [
-                        <Option key={"closed"} value={"closed"}>产品hotfix申请 </Option>,
-                        <Option key={"wait"} value={"wait"}>UED-hotfix申请 </Option>,
-                        <Option key={"wait"} value={"wait"}>开发hotfix申请 </Option>,
-                        <Option key={"wait"} value={"wait"}>emergency申请 </Option>,
-                        <Option key={"wait"} value={"wait"}>开发热更新申请 </Option>,
-                        <Option key={"wait"} value={"wait"}>禅道自动写入 </Option>,
-                        <Option key={"wait"} value={"wait"}>手工录入 </Option>,
+                        <Option key={"1"} value={"1"}>《产品hotfix申请》 </Option>,
+                        <Option key={"2"} value={"2"}>《UED-hotfix申请》 </Option>,
+                        <Option key={"3"} value={"3"}>《开发hotfix申请》 </Option>,
+                        <Option key={"4"} value={"4"}>《emergency申请》 </Option>,
+                        <Option key={"5"} value={"5"}>《开发热更新申请》 </Option>,
+                        <Option key={"6"} value={"6"}> 禅道自动写入 </Option>,
+                        <Option key={"7"} value={"7"}> 手工录入 </Option>,
                       ]
                     }
                     </Select>

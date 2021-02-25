@@ -9,72 +9,28 @@ import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import moment from 'moment';
 import {Button, message, Form, Select, Modal, Input, Row, Col} from 'antd';
-import {FolderAddTwoTone, SnippetsTwoTone, DeleteTwoTone, EditTwoTone} from '@ant-design/icons';
+import {
+  FolderAddTwoTone,
+  SnippetsTwoTone,
+  DeleteTwoTone,
+  EditTwoTone,
+  CloseSquareTwoTone,
+  CheckSquareTwoTone
+} from '@ant-design/icons';
 import {history} from 'umi';
+import {
+  numberRenderToYesNo,
+  numberRenderTopass,
+  numberRenderToCurrentStage,
+  numberRenderToZentaoType,
+  numberRenderToZentaoSeverity,
+  numberRenderToZentaoStatus,
+  numberRenderToSource,
+  linkToZentaoPage
+} from '@/publicMethods/cellRenderer';
 
 const {Option} = Select;
-const unlisten = history.listen((location, action) => {
 
-  return [location.pathname, action];
-  // console.log(location.pathname);
-});
-
-
-// 测试数据
-const datasTest = [
-  {
-    id: 1,
-    prjname: "emergency20201220",
-    sourceType: "人工创建",
-    starttime: "2021-01-01",
-    end1: "2021-01-01",
-    end2: "2021-01-01",
-    plan1: "2021-01-01",
-    plan2: "2021-01-01",
-    create1: "2021-01-01",
-    creater: "陈诺",
-    status: "进行中",
-    chandao: "禅道1"
-  }, {
-    id: 2,
-    prjname: "emergency20201221",
-    sourceType: "自动创建",
-    starttime: "2021-01-02",
-    end1: "2021-01-02",
-    end2: "2021-01-02",
-    plan1: "2021-01-02",
-    plan2: "2021-01-02",
-    create1: "2021-01-02",
-    creater: "王丽萍",
-    status: "未开始",
-    chandao: "禅道2"
-  }, {
-    id: 3,
-    prjname: "emergency20201222",
-    sourceType: "人工创建",
-    starttime: "2021-01-03",
-    end1: "2021-01-03",
-    end2: "2021-01-03",
-    plan1: "2021-01-03",
-    plan2: "2021-01-03",
-    create1: "2021-01-03",
-    creater: "陈欢",
-    status: "进行中",
-    chandao: "禅道3"
-  }, {
-    id: 4,
-    prjname: "emergency20201223",
-    sourceType: "自动创建",
-    starttime: "2021-01-04",
-    end1: "2021-01-04",
-    end2: "2021-01-04",
-    plan1: "2021-01-04",
-    plan2: "2021-01-04",
-    create1: "2021-01-04",
-    creater: "吴晓凤",
-    status: "已完成",
-    chandao: "禅道4"
-  }];
 
 // 定义列名
 const colums = () => {
@@ -89,24 +45,29 @@ const colums = () => {
       'pinned': 'left'
     }, {
       headerName: '序号',
-      field: 'id',
-      maxWidth: 50,
-      filter: false
+      maxWidth: 80,
+      filter: false,
+      cellRenderer: (params: any) => {
+        return Number(params.node.id) + 1;
+      },
     }, {
       headerName: '当前阶段',
-      field: 'prjname',
+      field: 'stage',
+      cellRenderer: numberRenderToCurrentStage
     }, {
       headerName: '测试负责人填写',
       children: [
         {
           headerName: '对应测试',
-          field: 'athlete'
+          field: 'tester'
         }, {
           headerName: '禅道类型',
-          field: 'athlete'
+          field: 'category',
+          cellRenderer: numberRenderToZentaoType
         }, {
           headerName: '禅道编号',
-          field: 'athlete'
+          field: 'ztNo',
+          cellRenderer: linkToZentaoPage
         },
       ]
     }, {
@@ -114,66 +75,76 @@ const colums = () => {
       children: [
         {
           headerName: '标题内容',
-          field: 'athlete'
+          field: 'title'
         }, {
           headerName: '严重程度',
-          field: 'athlete'
+          field: 'severity',
+          cellRenderer: numberRenderToZentaoSeverity
         }, {
           headerName: '优先级',
-          field: 'athlete'
+          field: 'priority'
         }, {
           headerName: '所属模块',
-          field: 'athlete'
+          field: 'moduleName'
         }, {
           headerName: '禅道状态',
-          field: 'athlete'
+          field: 'ztStatus',
+          cellRenderer: numberRenderToZentaoStatus
+
         }, {
           headerName: '指派给',
-          field: 'athlete'
+          field: 'assignedTo'
         }, {
           headerName: '由谁解决/完成',
-          field: 'athlete'
+          field: 'finishedBy'
         }, {
           headerName: '由谁关闭',
-          field: 'athlete'
+          field: 'closedBy'
         },
       ]
     }, {
       headerName: '开发经理填写',
       children: [{
         headerName: '是否支持热更新',
-        field: 'athlete'
+        field: 'hotUpdate',
+        cellRenderer: numberRenderToYesNo
       }, {
         headerName: '是否有数据升级',
-        field: 'athlete'
+        field: 'dataUpdate',
+        cellRenderer: numberRenderToYesNo
       }, {
         headerName: '是否有接口升级',
-        field: 'athlete'
+        field: 'interUpdate',
+        cellRenderer: numberRenderToYesNo
       }, {
         headerName: '是否有预置数据修改',
-        field: 'athlete'
+        field: 'presetData',
+        cellRenderer: numberRenderToYesNo
       }, {
         headerName: '是否需要测试验证',
-        field: 'athlete'
+        field: 'testCheck',
+        cellRenderer: numberRenderToYesNo
       }, {
         headerName: '验证范围建议',
-        field: 'athlete'
+        field: 'scopeLimit'
       }, {
         headerName: '发布环境',
-        field: 'athlete'
+        field: 'publishEnv'
       },
       ]
     }, {
       headerName: 'UED填写',
       children: [{
         headerName: '对应UED',
-        field: 'athlete'
+        field: 'uedName'
       }, {
         headerName: 'UED测试环境验证',
-        field: 'athlete'
+        field: 'uedEnvCheck',
+        cellRenderer: numberRenderTopass
       }, {
         headerName: 'UED线上验证',
-        field: 'athlete'
+        field: 'uedOnlineCheck',
+        cellRenderer: numberRenderTopass
       },
       ]
     }, {
@@ -181,44 +152,19 @@ const colums = () => {
       children: [
         {
           headerName: '备注',
-          field: 'athlete'
+          field: 'memo'
         }, {
           headerName: '来源',
-          field: 'athlete'
+          field: 'source',
+          cellRenderer: numberRenderToSource
+
         },
       ]
     }, {
       headerName: '自动生成',
       children: [{
         headerName: '反馈人',
-        field: 'athlete'
-      }]
-    }, {
-      headerName: '操作',
-
-      children: [{
-        headerName: '取消',
-        field: 'athlete',
-        'pinned': 'right',
-        cellRenderer: (params: any) => {
-          return "";
-        }
-      }, {
-        headerName: '开发已revert',
-        field: 'athlete',
-        'pinned': 'right'
-      }, {
-        headerName: '测试已验revert',
-        field: 'athlete',
-        'pinned': 'right'
-      }, {
-        headerName: '灰度已验证',
-        field: 'athlete',
-        'pinned': 'right'
-      }, {
-        headerName: '线上已验证',
-        field: 'athlete',
-        'pinned': 'right'
+        field: 'feedback'
       }]
     }
   );
@@ -232,29 +178,57 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   console.log(client, params);
   const {data} = await client.query(`
       {
-         project(name:"${params.projectName}",category:[${params.projectType}], range:${params},status:[${params.projectStatus}]){
-          id
-          name
-          type
-          startAt
-          testEnd
-          testFinish
-          expStage
-          expOnline
-          creator
-          status
-          createAt
-          ztId
-        }
+         proDetail(project:${params}){
+            id
+            stage
+            tester
+            category
+            ztNo
+            title
+            severity
+            priority
+            moduleName
+            ztStatus
+            assignedTo
+            finishedBy
+            closedBy
+            hotUpdate
+            dataUpdate
+            interUpdate
+            presetData
+            testCheck
+            scopeLimit
+            publishEnv
+            uedName
+            uedEnvCheck
+            uedOnlineCheck
+            memo
+            source
+            feedback
+            expectTest
+            submitTest
+            activeDuration
+            solveDuration
+            verifyDuration
+            closedDuration
+            relatedBug
+            relatedTask
+          }
       }
   `);
-  return data?.project;
-  return [];
+  return data?.proDetail;
 };
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
-    unlisten();
+
+    /* 获取网页的项目id */
+    let prjId: string = "";
+    const location = history.location.query;
+    if (location !== undefined && location.projectid !== null) {
+      prjId = location.projectid.toString();
+    }
+
     /* 整个模块都需要用到的 */
 
     // admin 新增和修改from表单
@@ -272,9 +246,8 @@ const SprintList: React.FC<any> = () => {
     const gridApi = useRef<GridApi>();   // 绑定ag-grid 组件
     const gqlClient = useGqlClient();
     const {data, loading} = useRequest(() =>
-      queryDevelopViews(gqlClient, ""),
+      queryDevelopViews(gqlClient, prjId),
     );
-    console.log(data);
     const onGridReady = (params: GridReadyEvent) => {
       gridApi.current = params.api;
       params.api.sizeColumnsToFit();
@@ -431,7 +404,7 @@ const SprintList: React.FC<any> = () => {
 
       // 判断人员权限（admin，测试，开发经理（开发）,UED）
       let currentUser = "";
-      currentUser = "tester";
+      currentUser = "manager";
       switch (currentUser) {
         case "admin":
           adminModify(detailsInfo);
@@ -448,20 +421,17 @@ const SprintList: React.FC<any> = () => {
         default:
           break;
       }
-
-
     };
 
 
     /* endregion */
-
 
     /* region 删除功能 */
 
     // 删除sprint列表
     const [isdelModalVisible, setIsDelModalVisible] = useState(false);
     // 删除按钮点击
-    const deleteSprintList = () => {
+    const deleteSprintDetails = () => {
       // 判断是否选中数据
       const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
       // 没有选中则提醒
@@ -525,6 +495,31 @@ const SprintList: React.FC<any> = () => {
       console.log("项目移动");
     };
     /* endregion */
+
+    /* region 操作流程 */
+    // 流程-取消
+    const flowForCancle = () => {
+
+    };
+    // 流程-开发已revert
+    const flowForDevRevert = () => {
+
+    };
+
+    // 流程-测试已验revert
+    const flowForTestRevert = () => {
+
+    };
+    // 流程-灰度已验
+    const flowForHuiduChecked = () => {
+
+    };
+    // 流程-线上已验证
+    const flowForOnlineChecked = () => {
+
+    };
+    /* endregion */
+
     const leftStyle = {marginLeft: "20px"};
     const widths = {width: "200px"};
 
@@ -535,14 +530,30 @@ const SprintList: React.FC<any> = () => {
         {/* 新增、修改、删除按钮栏 */}
         <div style={{"background": "white"}}> {/* 使用一个图标就要导入一个图标 */}
 
+          {/* 明细操作按钮 */}
           <Button type="text" style={{"color": "black"}} icon={<FolderAddTwoTone/>}
                   size={"large"} onClick={addProject}> 新增 </Button>
           <Button type="text" style={{"color": "black"}} icon={<EditTwoTone/>}
                   size={"large"} onClick={btnModifyProject}> 修改 </Button>
           <Button type="text" style={{"color": "black"}} icon={<DeleteTwoTone/>}
-                  size={"large"} onClick={deleteSprintList}>删除 </Button>
+                  size={"large"} onClick={deleteSprintDetails}>删除 </Button>
           <Button type="text" style={{"color": "black"}} icon={<SnippetsTwoTone/>}
                   size={"large"} onClick={moveProject}> 移动 </Button>
+
+          {/* 操作流程按钮 */}
+
+          <Button type="text" style={{"color": "black", float: "right"}} icon={<CheckSquareTwoTone/>}
+                  size={"large"} onClick={flowForOnlineChecked}>线上已验证 </Button>
+          <Button type="text" style={{"color": "black", float: "right"}} icon={<CheckSquareTwoTone/>}
+                  size={"large"} onClick={flowForHuiduChecked}>灰度已验证 </Button>
+          <Button type="text" style={{"color": "black", float: "right"}} icon={<CheckSquareTwoTone/>}
+                  size={"large"} onClick={flowForTestRevert}>测试已验revert </Button>
+          <Button type="text" style={{"color": "black", float: "right"}} icon={<CheckSquareTwoTone/>}
+                  size={"large"} onClick={flowForDevRevert}> 开发已revert </Button>
+          <Button type="text" style={{"color": "black", float: "right"}} icon={<CloseSquareTwoTone/>}
+                  size={"large"} onClick={flowForCancle}> 取消 </Button>
+          <label style={{marginTop: "10px", "color": "black", fontWeight: "bold", float: "right"}}> 操作流程:</label>
+
         </div>
 
         {/* ag-grid 表格定义 */}
@@ -550,7 +561,7 @@ const SprintList: React.FC<any> = () => {
 
           <AgGridReact
             columnDefs={colums()} // 定义列
-            rowData={datasTest} // 数据绑定
+            rowData={data} // 数据绑定
             defaultColDef={{
               resizable: true,
               sortable: true,

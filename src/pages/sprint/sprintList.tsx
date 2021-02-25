@@ -121,8 +121,8 @@ const SprintList: React.FC<any> = () => {
             // return `<a href="/sprint/sprintListDetails" style="color:blue;text-decoration: underline" >${params.value}</a>`;
           },
           onCellClicked: (params: any) => {
-            // console.log("params", params.value);
-            history.push(`/sprint/sprintListDetails?project=${params.value}`);
+            console.log("params", params.data.id);
+            history.push(`/sprint/sprintListDetails?projectid=${params.data.id}`);
           }
         },
         {

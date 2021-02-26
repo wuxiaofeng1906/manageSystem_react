@@ -89,18 +89,18 @@ export default [
       {
         name: 'dsahboard',
         path: 'sprintDashboard',
-        component: './sprint/sprintDashboard',
+        component: './sprint/sprintDashboard/sprintDashboard',
       },
       {
         name: 'sprint 列表',
         path: 'sprintList',
-        component: './sprint/sprintList',
+        component: './sprint/sprintList/sprintList',
       },
       {
         name: 'sprint 项目详情',
         path: 'sprintListDetails',
         hideInMenu:true,
-        component: './sprint/sprintListDetails',
+        component: './sprint/sprintListDetails/sprintListDetails',
       }
     ],
   },

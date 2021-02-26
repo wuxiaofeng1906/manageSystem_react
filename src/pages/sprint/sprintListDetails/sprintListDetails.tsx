@@ -181,7 +181,6 @@ const colums = () => {
 
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
-  console.log(client, params);
   const {data} = await client.query(`
       {
          proDetail(project:${params}){
@@ -217,8 +216,9 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
             solveDuration
             verifyDuration
             closedDuration
-            relatedBug
-            relatedTask
+            relatedBugs
+            relatedTasks
+            relatedStories
           }
       }
   `);
@@ -439,41 +439,10 @@ const SprintList: React.FC<any> = () => {
       setIsAddModalVisible(false);
     };
 
+
     // sprint 项目保存
-    const commitSprintDetails = () => {
-      const oradata = formForAdminToAddAnaMod.getFieldsValue();
-      if (oradata.adminChandaoType === "" || oradata.adminChandaoId === "") {
-        message.error({
-          content: `禅道类型和禅道编号不能为空！`,
-          className: 'MNone',
-          style: {
-            marginTop: '50vh',
-          },
-        });
-        return;
-      }
 
-
-      const datas = {
-        "project": prjId,
-        "tester": oradata.adminAddTester,
-        "category": oradata.adminChandaoType,
-        "ztNo": oradata.adminChandaoId,
-        "hotUpdate": oradata.adminAddHotUpdate,
-        "dataUpdate": oradata.adminAddDataUpgrade,
-        "interUpdate": oradata.adminAddInteUpgrade,
-        "presetData": oradata.adminAddPreData,
-        "testCheck": oradata.adminAddtesterVerifi,
-        "scopeLimit": oradata.adminAddSuggestion,
-        "publish": oradata.adminAddEnvironment,
-        "uedName": oradata.adminAddForUED,
-        "uedEnvCheck": oradata.adminAddForUedVerify,
-        "uedOnlineCheck": oradata.adminAdminUedOnline,
-        "source": 7,
-        "feedback": oradata.adminAddFeedbacker,
-        "memo": oradata.adminAddRemark,
-      };
-
+    const addCommitDetails = (datas: any) => {
       axios.post('/api/sprint/project/child', datas).then(function (res) {
 
         if (res.data.ok === true) {
@@ -504,28 +473,118 @@ const SprintList: React.FC<any> = () => {
           },
         });
       });
+    };
 
+    const modCommitDetails = (datas: any) => {
+      axios.put('/api/sprint/project/child', datas).then(function (res) {
+        if (res.data.ok === true) {
+          setIsAddModalVisible(false);
+          updateGrid();
+          message.info({
+            content: res.data.message,
+            className: 'ModSuccess',
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+          message.error({
+            content: `${res.data.message}`,
+            className: 'ModNone',
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+      }).catch(function (error) {
+        message.error({
+          content: error.toString(),
+          className: 'ModError',
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      });
+
+    };
+
+    const commitSprintDetails = () => {
+      const oradata = formForAdminToAddAnaMod.getFieldsValue();
+
+      if (oradata.adminChandaoType === "" || oradata.adminChandaoId === "") {
+        message.error({
+          content: `禅道类型和禅道编号不能为空！`,
+          className: 'MNone',
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return;
+      }
+
+      const datas = {
+        "tester": oradata.adminAddTester,
+        "category": oradata.adminChandaoType,
+        "ztNo": oradata.adminChandaoId,
+        "hotUpdate": oradata.adminAddHotUpdate,
+        "dataUpdate": oradata.adminAddDataUpgrade,
+        "interUpdate": oradata.adminAddInteUpgrade,
+        "presetData": oradata.adminAddPreData,
+        "testCheck": oradata.adminAddtesterVerifi,
+        "scopeLimit": oradata.adminAddSuggestion,
+        "publish": oradata.adminAddEnvironment,
+        "uedName": oradata.adminAddForUED,
+        "uedEnvCheck": oradata.adminAddForUedVerify,
+        "uedOnlineCheck": oradata.adminAdminUedOnline,
+        "source": 7,
+        "feedback": oradata.adminAddFeedbacker,
+        "memo": oradata.adminAddRemark,
+      };
+
+      if (modal.title === "新增明细行") {
+        // 新增使用的是project id
+        datas["project"] = prjId;
+        addCommitDetails(datas);
+      } else {
+        const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+        // 修改使用的是明细 id
+        datas["id"] = curRow[0].id;
+        modCommitDetails(datas);
+      }
     };
 
     // admin 修改
     const adminModify = (datas: any) => {
-      console.log("datas", datas);
-
       formForAdminToAddAnaMod.setFieldsValue({
+        adminCurStage: numberRenderToCurrentStage({value: datas.stage === null ? "" : datas.stage.toString()}),
+        adminAddTester: datas.tester,
+        adminChandaoType: datas.category,
+        adminChandaoId: datas.ztNo,
+        adminAddChandaoTitle: datas.title,
+        adminAddSeverity: datas.severity,
+        adminAddPriority: datas.priority,
+        adminAddModule: datas.moduleName,
+        adminAddChandaoStatus: numberRenderToZentaoStatus({value: datas.ztStatus === null ? "" : datas.ztStatus.toString()}),
+        adminAddAssignTo: datas.assignedTo,
+        adminAddSolvedBy: datas.finishedBy,
+        adminAddClosedBy: datas.closedBy,
+        adminAddHotUpdate: datas.hotUpdate,
+        adminAddDataUpgrade: datas.dataUpdate,
+        adminAddInteUpgrade: datas.interUpdate,
+        adminAddPreData: datas.presetData,
+        adminAddtesterVerifi: datas.testCheck,
+        adminAddSuggestion: datas.scopeLimit,
+        adminAddEnvironment: datas.publishEnv,
+        adminAddForUED: datas.uedName,
+        adminAddForUedVerify: datas.uedEnvCheck,
+        adminAdminUedOnline: datas.uedOnlineCheck,
+        adminAddSource: datas.source,
+        adminAddFeedbacker: datas.feedback,
+        adminAddRemark: datas.memo
 
-        // prjNames: projectType,
-        // prjDate: moment(prjTime, "YYYY-MM-DD"),
-        // starttime: moment(detailsInfo.starttime, "YYYY-MM-DD"),
-        // testCutoff: moment(detailsInfo.end1, "YYYY-MM-DD"),
-        // testFinnished: moment(detailsInfo.end2, "YYYY-MM-DD"),
-        // planHuidu: moment(detailsInfo.plan1, "YYYY-MM-DD"),
-        // planOnline: moment(detailsInfo.plan2, "YYYY-MM-DD"),
-        // prjStatus: detailsInfo.status
       });
-
       setmodal({"title": "修改明细行(admin)"});
       setIsAddModalVisible(true);
-
     };
 
     /* 开发经理 权限操作 */
@@ -607,7 +666,7 @@ const SprintList: React.FC<any> = () => {
 
       // 判断人员权限（admin，测试，开发经理（开发）,UED）
       let currentUser = "";
-      currentUser = "manager";
+      currentUser = "admin";
       switch (currentUser) {
         case "admin":
           adminModify(detailsInfo);
@@ -775,6 +834,7 @@ const SprintList: React.FC<any> = () => {
             autoGroupColumnDef={{
               minWidth: 100,
             }}
+            rowSelection={"multiple"} // 设置多行选中
             groupDefaultExpanded={9} // 展开分组
             // suppressDragLeaveHidesColumns // 取消分组时，例如单击删除区域中某一列上的“ x” ，该列将不可见
             // suppressMakeColumnVisibleAfterUnGroup // 如果用户在移动列时不小心将列移出了网格，但并不打算将其隐藏，那么这就很方便。
@@ -790,7 +850,6 @@ const SprintList: React.FC<any> = () => {
 
           {/* admin 权限组新增和修改的界面 */}
           <Form form={formForAdminToAddAnaMod}>
-
             <Row gutter={16}>
               <Col className="gutter-row">
                 <div style={leftStyle}>
@@ -841,7 +900,6 @@ const SprintList: React.FC<any> = () => {
               </Col>
 
             </Row>
-
             <Row gutter={16}>
               <Col className="gutter-row">
                 <div style={leftStyle}>
@@ -862,7 +920,6 @@ const SprintList: React.FC<any> = () => {
               </Col>
 
             </Row>
-
             <Row gutter={16}>
               <Col className="gutter-row">
                 <div style={leftStyle}>
@@ -905,7 +962,6 @@ const SprintList: React.FC<any> = () => {
               </Col>
 
             </Row>
-
             <Row gutter={16}>
               <Col className="gutter-row">
                 <div style={leftStyle}>
@@ -930,7 +986,6 @@ const SprintList: React.FC<any> = () => {
               </Col>
 
             </Row>
-
             <Row gutter={16}>
               <Col className="gutter-row">
                 <div style={leftStyle}>
@@ -969,7 +1024,6 @@ const SprintList: React.FC<any> = () => {
               </Col>
 
             </Row>
-
             <Row gutter={16}>
               <Col className="gutter-row">
                 <div style={leftStyle}>
@@ -1016,7 +1070,6 @@ const SprintList: React.FC<any> = () => {
               </Col>
 
             </Row>
-
             <Row gutter={16}>
 
               <Col className="gutter-row">
@@ -1028,7 +1081,6 @@ const SprintList: React.FC<any> = () => {
               </Col>
 
             </Row>
-
             <Row gutter={16}>
               <Col className="gutter-row">
                 <div style={leftStyle}>
@@ -1072,7 +1124,6 @@ const SprintList: React.FC<any> = () => {
               </Col>
 
             </Row>
-
             <Row gutter={16}>
               <Col className="gutter-row">
                 <div style={leftStyle}>
@@ -1118,7 +1169,6 @@ const SprintList: React.FC<any> = () => {
               </Col>
 
             </Row>
-
             <Row gutter={16}>
               <Col className="gutter-row">
                 <div style={leftStyle}>
@@ -1129,7 +1179,6 @@ const SprintList: React.FC<any> = () => {
               </Col>
 
             </Row>
-
             <Form.Item style={{marginTop: "50px"}}>
               <Button type="primary" style={{marginLeft: "400px"}}
                       onClick={commitSprintDetails}>确定</Button>
@@ -1318,7 +1367,6 @@ const SprintList: React.FC<any> = () => {
           </Form>
         </Modal>
 
-
         {/* 测试修改表单 */}
         <Modal title="编辑明细行(测试)" visible={isformForTesterToModVisible} onCancel={testerHandleCancel} centered={true}
                footer={null} width={750}>
@@ -1427,7 +1475,6 @@ const SprintList: React.FC<any> = () => {
 
           </Form>
         </Modal>
-
 
         {/* UED修改表单 */}
         <Modal title="编辑明细行(UED)" visible={isformForUEDToModVisible} onCancel={UEDHandleCancel} centered={true}
@@ -1566,7 +1613,6 @@ const SprintList: React.FC<any> = () => {
 
           </Form>
         </Modal>
-
 
         {/* 删除项目 */}
         <Modal title={"删除项目"} visible={isdelModalVisible} onCancel={DelCancel} centered={true} footer={null} width={500}>

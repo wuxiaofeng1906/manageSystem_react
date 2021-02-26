@@ -489,7 +489,7 @@ const SprintList: React.FC<any> = () => {
         axios.put('/api/sprint/project', datas).then(function (res) {
           if (res.data.ok === true) {
             setIsAddModalVisible(false);
-
+            updateGrid();
             message.info({
               content: res.data.message,
               className: 'ModSuccess',

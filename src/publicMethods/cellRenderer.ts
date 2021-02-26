@@ -18,7 +18,7 @@ const numberRenderTopass = (params: any) => {
 
 const numberRenderToCurrentStage = (params: any) => {
   let stage = "";
-  switch (params.value) {
+  switch (params.value.toString()) {
     case "1":
       stage = "未开始";
       break;
@@ -94,7 +94,7 @@ const numberRenderToZentaoType = (params: any) => {
 };
 
 const numberRenderToZentaoSeverity = (params: any) => {
-   // P0 = 1,
+  // P0 = 1,
   //  P1 = 2,
   //  P2 = 3,
   //  P3 = 4,

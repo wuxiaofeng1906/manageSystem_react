@@ -24,6 +24,7 @@ export function useQuery(query: string): { data: any; loading: boolean; error: a
   const client = useGqlClient();
 
   return useRequest(async () => {
+
     const {data} = await client.query(query);
 
     return data;

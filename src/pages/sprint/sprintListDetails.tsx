@@ -6,7 +6,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient} from '@/hooks';
+import {GqlClient, useGqlClient, useQuery} from '@/hooks';
 import {Button, message, Form, Select, Modal, Input, Row, Col} from 'antd';
 import {
   FolderAddTwoTone,
@@ -28,10 +28,8 @@ import {
   linkToZentaoPage
 } from '@/publicMethods/cellRenderer';
 import axios from "axios";
-import {forEach} from "ag-grid-community/dist/lib/utils/array";
 
 const {Option} = Select;
-
 
 // 定义列名
 const colums = () => {
@@ -91,7 +89,15 @@ const colums = () => {
           headerName: '禅道状态',
           field: 'ztStatus',
           cellRenderer: numberRenderToZentaoStatus
-
+        }, {
+          headerName: '相关需求数',
+          field: '',
+        }, {
+          headerName: '相关任务数',
+          field: '',
+        }, {
+          headerName: '相关bug数',
+          field: '',
         }, {
           headerName: '指派给',
           field: 'assignedTo'
@@ -173,7 +179,6 @@ const colums = () => {
   return component;
 };
 
-
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   console.log(client, params);
@@ -220,21 +225,6 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   return data?.proDetail;
 };
 
-// 查询数据
-const queryDeptViews = async (client: GqlClient<object>, params: any) => {
-
-  const {data} = await client.query(`
-      {
-       WxDeptUsers(deptNames:["${params}"]){
-          id
-          userName
-        }
-      }
-  `);
-  return data?.WxDeptUsers;
-};
-
-
 // 组件初始化
 const SprintList: React.FC<any> = () => {
 
@@ -246,7 +236,6 @@ const SprintList: React.FC<any> = () => {
     }
 
     /* 整个模块都需要用到的 */
-
     // admin 新增和修改from表单
     const [formForAdminToAddAnaMod] = Form.useForm();
     // 开发经理修改from表单
@@ -276,6 +265,33 @@ const SprintList: React.FC<any> = () => {
 
     /* endregion */
 
+    /* region 其他 */
+    const updateGrid = async () => {
+      const datas: any = await queryDevelopViews(gqlClient, prjId);
+      gridApi.current?.setRowData(datas);
+    };
+    // 获取部门数据
+    const GetDeptMemner = (params: any) => {
+      const deptMan = [];
+
+      const {data: {WxDeptUsers = []} = {}} = useQuery(`
+          {
+            WxDeptUsers(deptNames:["${params}"]){
+               id
+              userName
+            }
+          }
+      `);
+      for (let index = 0; index < WxDeptUsers.length; index += 1) {
+        deptMan.push(
+          <Option key={WxDeptUsers[index].id} value={WxDeptUsers[index].id}>{WxDeptUsers[index].userName} </Option>
+        );
+      }
+      return deptMan;
+    };
+
+    /* endregion */
+
     /* region 新增功能 */
 
     // 隐藏
@@ -286,11 +302,33 @@ const SprintList: React.FC<any> = () => {
     const checkZentaoInfo = (params: any) => {
       const ztno = params.target.value;
       const addFormData = formForAdminToAddAnaMod.getFieldsValue();
+      const chanDaoType = addFormData.adminChandaoType;
+      if (chanDaoType === "") {
+        message.error({
+          content: `禅道类型不能为空！`,
+          className: 'ModNone',
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return;
+      }
+
+      if (ztno === "") {
+        message.error({
+          content: `禅道编号不能为空！`,
+          className: 'ModNone',
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return;
+      }
 
       axios.get('/api/sprint/project/child', {
         params: {
           project: prjId,
-          category: addFormData.adminChandaoType,
+          category: chanDaoType,
           ztNo: ztno
         }
       }).then(function (res) {
@@ -299,7 +337,7 @@ const SprintList: React.FC<any> = () => {
 
           formForAdminToAddAnaMod.setFieldsValue({
             adminAddChandaoTitle: queryDatas.title,
-            adminAddSeverity: numberRenderToZentaoSeverity({value: queryDatas.severity.toString()}),
+            adminAddSeverity: numberRenderToZentaoSeverity({value: queryDatas.severity === null ? "" : queryDatas.severity.toString()}),
             adminAddPriority: queryDatas.priority,
             adminAddModule: queryDatas.module,
             adminAddChandaoStatus: queryDatas.ztStatus,
@@ -307,14 +345,24 @@ const SprintList: React.FC<any> = () => {
             adminAddSolvedBy: queryDatas.finishedBy,
             adminAddClosedBy: queryDatas.closedBy,
           });
-        } else if (res.data.code === "404") {
-          message.error({
-            content: `禅道不存在ID为${ztno}的${addFormData.adminChandaoType}`,
-            className: 'ModNone',
-            style: {
-              marginTop: '50vh',
-            },
-          });
+        } else {
+          if (res.data.code === "404") {
+            message.error({
+              content: `禅道不存在ID为${ztno}的${chanDaoType}`,
+              className: 'ModNone',
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          } else {
+            message.error({
+              content: `${res.data.message}`,
+              className: 'ModNone',
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          }
           formForAdminToAddAnaMod.setFieldsValue({
             adminAddChandaoTitle: "",
             adminAddSeverity: "",
@@ -324,15 +372,6 @@ const SprintList: React.FC<any> = () => {
             adminAddAssignTo: "",
             adminAddSolvedBy: "",
             adminAddClosedBy: "",
-          });
-
-        } else {
-          message.error({
-            content: `${res.data.message}`,
-            className: 'ModNone',
-            style: {
-              marginTop: '50vh',
-            },
           });
         }
       }).catch(function (error) {
@@ -346,6 +385,7 @@ const SprintList: React.FC<any> = () => {
       });
 
     };
+
     // 添加项目
     const [isAddModalVisible, setIsAddModalVisible] = useState(false);
     const [modal, setmodal] = useState({title: "新增明细行"});
@@ -402,7 +442,17 @@ const SprintList: React.FC<any> = () => {
     // sprint 项目保存
     const commitSprintDetails = () => {
       const oradata = formForAdminToAddAnaMod.getFieldsValue();
-      debugger;
+      if (oradata.adminChandaoType === "" || oradata.adminChandaoId === "") {
+        message.error({
+          content: `禅道类型和禅道编号不能为空！`,
+          className: 'MNone',
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return;
+      }
+
 
       const datas = {
         "project": prjId,
@@ -419,17 +469,16 @@ const SprintList: React.FC<any> = () => {
         "uedName": oradata.adminAddForUED,
         "uedEnvCheck": oradata.adminAddForUedVerify,
         "uedOnlineCheck": oradata.adminAdminUedOnline,
-        "source": 7, // oradata.adminAddSource,
+        "source": 7,
         "feedback": oradata.adminAddFeedbacker,
         "memo": oradata.adminAddRemark,
       };
 
       axios.post('/api/sprint/project/child', datas).then(function (res) {
-        debugger;
 
         if (res.data.ok === true) {
-          // setIsAddModalVisible(false);
-          // updateGrid();
+          setIsAddModalVisible(false);
+          updateGrid();
           message.info({
             content: res.data.message,
             className: 'AddSuccess',
@@ -677,26 +726,6 @@ const SprintList: React.FC<any> = () => {
     const leftStyle = {marginLeft: "20px"};
     const widths = {width: "200px", color: "black"};
 
-    // 获取部门数据
-    const getUedMemner = () => {
-      const uedMan = [<Option key={"HuRong"} value={"HuRong"}>胡蓉 </Option>,
-        <Option key={"DuanJunJie"} value={"DuanJunJie"}>段俊杰 </Option>];
-      // const uedMan: any = [];
-      // const datas: any = await queryDeptViews(gqlClient, "测试");
-      // datas.forEach(function (e: any) {
-      //   debugger;
-      //   uedMan.push(`<Option key={"${e.id}"} value={"${e.id}"}>${e.userName} </Option>`);
-      // });
-      // for (let index = 0; index < datas.length; index += 1) {
-      //   uedMan.push(`<Option key={"${datas[index].id}"} value={"${datas[index].id}"}>${datas[index].userName} </Option>`);
-      // }
-
-      // const ued = [<Option key={"closed"} value={"closed"}>UED1 </Option>];
-      return uedMan;
-    };
-
-
-    // 返回渲染的组件
     return (
       <PageContainer>
 
@@ -789,12 +818,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddTester" label="对应测试:">
-                    <Select placeholder="请选择" style={widths}>{
-                      [
-                        <Option key={"closed"} value={"closed"}>tester1 </Option>,
-                        <Option key={"wait"} value={"wait"}>tester2 </Option>
-                      ]
-                    }
+                    <Select placeholder="请选择" style={widths}>{GetDeptMemner("测试")}
                     </Select>
                   </Form.Item>
 
@@ -802,7 +826,7 @@ const SprintList: React.FC<any> = () => {
               </Col>
               <Col className="gutter-row">
                 <div style={leftStyle}>
-                  <Form.Item name="adminChandaoType" label="禅道类型：">
+                  <Form.Item name="adminChandaoType" label="禅道类型：" rules={[{required: true}]}>
                     <Select placeholder="请选择" style={widths}>{
                       [
                         <Option key={"1"} value={"1"}>bug </Option>,
@@ -821,7 +845,7 @@ const SprintList: React.FC<any> = () => {
             <Row gutter={16}>
               <Col className="gutter-row">
                 <div style={leftStyle}>
-                  <Form.Item name="adminChandaoId" label="禅道编号:">
+                  <Form.Item name="adminChandaoId" label="禅道编号:" rules={[{required: true}]}>
                     <Input placeholder="请输入" style={widths} onBlur={checkZentaoInfo}/>
                   </Form.Item>
 
@@ -1011,9 +1035,9 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminAddEnvironment" label="发布环境:">
                     <Select placeholder="请选择" style={widths}>{
                       [
-                        <Option key={"集群1"} value={"集群1"}>集群1</Option>,
-                        <Option key={"集群2"} value={"集群2"}>集群2 </Option>,
-                        <Option key={"集群3"} value={"集群3"}>集群3 </Option>
+                        <Option key={"1"} value={"1"}>集群1</Option>,
+                        <Option key={"2"} value={"2"}>集群2 </Option>,
+                        <Option key={"3"} value={"3"}>集群3 </Option>
                       ]
                     }
                     </Select>
@@ -1025,7 +1049,7 @@ const SprintList: React.FC<any> = () => {
                 <div style={leftStyle}>
                   <Form.Item name="adminAddForUED" label="对应UED：">
 
-                    <Select placeholder="请选择" style={widths}>{getUedMemner()}
+                    <Select placeholder="请选择" style={widths}>{GetDeptMemner("UED")}
                     </Select>
                   </Form.Item>
 
@@ -1068,7 +1092,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddSource" label="来源:">
-                    <Select placeholder="请选择" defaultValue={["手工录入"]} style={widths}>{
+                    <Select placeholder="请选择" defaultValue={["手工录入"]} disabled={true} style={widths}>{
                       [
                         <Option key={"6"} value={"6"}>禅道自动写入</Option>,
                         <Option key={"7"} value={"7"}>手工录入</Option>,

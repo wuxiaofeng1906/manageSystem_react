@@ -866,7 +866,6 @@ const SprintList: React.FC<any> = () => {
   const deleteSprintDetails = () => {
     // 判断是否选中数据
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
-    // 没有选中则提醒
     if (selRows.length === 0) {
       message.error({
         content: '请选中需要删除的数据!',
@@ -877,8 +876,6 @@ const SprintList: React.FC<any> = () => {
       });
       return;
     }
-
-    // 一次只能修改一条数据
     if (selRows.length > 1) {
       message.error({
         content: '一次只能删除一条数据!',
@@ -889,31 +886,45 @@ const SprintList: React.FC<any> = () => {
       });
       return;
     }
-
-    const detailsInfo = selRows[0];
-    const prjNames = detailsInfo.prjname.toString();
-    // 首先查询这个里面有多少条数据，根并进行具体提示。
-
-    console.log('prjNames', prjNames);
-
-    // const delCounts = 0;
     setIsDelModalVisible(true);
-    // Modal.confirm({
-    //   title: '删除项目',
-    //   icon: <ExclamationCircleOutlined/>,
-    //   content: `此项目包含【${delCounts}】条数据，请确认是否删除？`,
-    //   okText: '确认',
-    //   cancelText: '取消',
-    //   centered: true,
-    //   onOk: () => {
-    //     console.log("确认删除！");
-    //
-    //   }
-    // });
   };
 
   const delSprintList = () => {
-    console.log('test');
+    const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+    const detailsId = selRows[0].id;
+    const url = `/api/sprint/project/child/${detailsId}`;
+    axios
+      .delete(url)
+      .then(function (res) {
+        if (res.data.ok === true) {
+          setIsDelModalVisible(false);
+          updateGrid();
+          message.info({
+            content: res.data.message,
+            className: 'delSuccess',
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+          message.error({
+            content: `${res.data.message}`,
+            className: 'MdelNon',
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+      })
+      .catch(function (error) {
+        message.error({
+          content: error.toString(),
+          className: 'MdelError',
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      });
   };
 
   const DelCancel = () => {
@@ -1956,7 +1967,7 @@ const SprintList: React.FC<any> = () => {
 
       {/* 删除项目 */}
       <Modal
-        title={'删除项目'}
+        title={'删除明细行'}
         visible={isdelModalVisible}
         onCancel={DelCancel}
         centered={true}
@@ -1965,7 +1976,7 @@ const SprintList: React.FC<any> = () => {
       >
         <Form form={formForDel}>
           <Form.Item>
-            <label style={{ marginLeft: '20px' }}>此项目包含【{0}】条数据，请确认是否删除？</label>
+            <label style={{ marginLeft: '20px' }}>删除将不能恢复，请确认是否删除？</label>
           </Form.Item>
 
           <Form.Item>

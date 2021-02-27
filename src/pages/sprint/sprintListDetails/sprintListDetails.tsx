@@ -940,17 +940,106 @@ const SprintList: React.FC<any> = () => {
   /* endregion */
 
   /* region 操作流程 */
+  const [isFlowModalVisible, setIsFlowModalVisible] = useState(false);
+  const [flowHitmessage, setFlowHitmessage] = useState({ hintMessage: '' });
+
   // 流程-取消
-  const flowForCancle = () => {};
+  const flowForCancle = () => {
+    setFlowHitmessage({ hintMessage: '已取消' });
+    setIsFlowModalVisible(true);
+  };
   // 流程-开发已revert
-  const flowForDevRevert = () => {};
+  const flowForDevRevert = () => {
+    setFlowHitmessage({ hintMessage: '开发已revert' });
+
+    setIsFlowModalVisible(true);
+  };
 
   // 流程-测试已验revert
-  const flowForTestRevert = () => {};
+  const flowForTestRevert = () => {
+    setFlowHitmessage({ hintMessage: '测试已验证revert' });
+
+    setIsFlowModalVisible(true);
+  };
   // 流程-灰度已验
-  const flowForHuiduChecked = () => {};
+  const flowForHuiduChecked = () => {
+    setFlowHitmessage({ hintMessage: '灰度已验过' });
+
+    setIsFlowModalVisible(true);
+  };
   // 流程-线上已验证
-  const flowForOnlineChecked = () => {};
+  const flowForOnlineChecked = () => {
+    setFlowHitmessage({ hintMessage: '线上已验过' });
+
+    setIsFlowModalVisible(true);
+  };
+
+  const modFlowStage = (stage: number) => {
+    const selRows: any = gridApi.current?.getSelectedRows();
+    for (let index = 0; index < selRows.length; index += 1) {
+      const params = {
+        id: selRows[index].id,
+        attribute: selRows[index].category,
+        value: stage,
+      };
+      axios
+        .patch('/api/sprint/project/child', params)
+        .then(function (res) {
+          if (res.data.ok === true) {
+            setIsFlowModalVisible(false);
+            updateGrid();
+            message.info({
+              content: res.data.message,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          } else {
+            message.error({
+              content: `${res.data.message}`,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          }
+        })
+        .catch(function (error) {
+          message.error({
+            content: error.toString(),
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        });
+    }
+  };
+
+  const commitFlow = () => {
+    switch (flowHitmessage.hintMessage) {
+      case '已取消':
+        modFlowStage(7);
+        break;
+      case '开发已revert':
+        modFlowStage(8);
+        break;
+      case '测试已验证revert':
+        modFlowStage(9);
+        break;
+      case '灰度已验过':
+        modFlowStage(10);
+        break;
+      case '线上已验过':
+        modFlowStage(11);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const flowCancel = () => {
+    setIsFlowModalVisible(false);
+  };
+
   /* endregion */
 
   const leftStyle = { marginLeft: '20px' };
@@ -1984,6 +2073,33 @@ const SprintList: React.FC<any> = () => {
               确定
             </Button>
             <Button type="primary" style={{ marginLeft: '20px' }} onClick={DelCancel}>
+              取消
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* 流程操作 */}
+      <Modal
+        title={'流程操作提示'}
+        visible={isFlowModalVisible}
+        onCancel={flowCancel}
+        centered={true}
+        footer={null}
+        width={500}
+      >
+        <Form>
+          <Form.Item>
+            <label style={{ marginLeft: '20px' }}>
+              确定将当前阶段修改为【{flowHitmessage.hintMessage}】吗？
+            </label>
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" style={{ marginLeft: '150px' }} onClick={commitFlow}>
+              确定
+            </Button>
+            <Button type="primary" style={{ marginLeft: '20px' }} onClick={flowCancel}>
               取消
             </Button>
           </Form.Item>

@@ -260,9 +260,11 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
 const SprintList: React.FC<any> = () => {
   /* 获取网页的项目id */
   let prjId: string = '';
+  let prjNames: string = '';
   const location = history.location.query;
   if (location !== undefined && location.projectid !== null) {
     prjId = location.projectid.toString();
+    prjNames = location.project === null ? '' : location.project.toString();
   }
 
   /* 整个模块都需要用到的 */
@@ -276,6 +278,9 @@ const SprintList: React.FC<any> = () => {
   const [formForUEDToMod] = Form.useForm();
   // 删除提醒表单
   const [formForDel] = Form.useForm();
+
+  // 移动提醒表单
+  const [formForMove] = Form.useForm();
 
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
@@ -333,6 +338,24 @@ const SprintList: React.FC<any> = () => {
       );
     }
     return deptMan;
+  };
+
+  const GetSprintProject = () => {
+    const projectArray = [];
+
+    const {data: {project = []} = {}} = useQuery(`{
+        project(range:{start:"2021-02-01", end:"2021-10-05 23:59:59"}){
+        id
+        name
+      }
+    }`);
+
+    for (let index = 0; index < project.length; index += 1) {
+      projectArray.push(
+        <Option value={project[index].id.toString()}> {project[index].name}</Option>,
+      );
+    }
+    return projectArray;
   };
 
   /* endregion */
@@ -970,10 +993,82 @@ const SprintList: React.FC<any> = () => {
   /* endregion */
 
   /* region 移动功能 */
+  const [isMoveModalVisible, setIsMoveModalVisible] = useState(false);
+
 
   const moveProject = () => {
-    console.log('项目移动');
+    const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+    if (selRows.length <= 0) {
+      message.error({
+        content: "请选择需要移动的数据！",
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
+
+    formForMove.setFieldsValue({
+      moveForOraPrj: prjNames
+    });
+    setIsMoveModalVisible(true);
   };
+
+  const moveCancel = () => {
+    setIsMoveModalVisible(false);
+  };
+
+  const moveSprintList = () => {
+    // 获取被选择明细项
+    const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+    for (let index = 0; index < selRows.length; index += 1) {
+
+    }
+    const oradata = formForMove.getFieldsValue();
+
+    const params = {
+      "id": selRows[0].id,
+      "source": prjId,
+      "target": oradata.moveNewPrj
+    };
+
+    axios.patch('/api/sprint/project/child/move', params)
+      .then(function (res) {
+        if (res.data.ok === true) {
+          setIsMoveModalVisible(false);
+          updateGrid();
+          message.info({
+            content: res.data.message,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+          message.error({
+            content: `${res.data.message}`,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+      })
+      .catch(function (error) {
+        message.error({
+          content: error.toString(),
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      });
+
+
+  };
+
+  const addNewProject = () => {
+
+  };
+
   /* endregion */
 
   /* region 操作流程 */
@@ -2045,6 +2140,50 @@ const SprintList: React.FC<any> = () => {
           </Form.Item>
         </Form>
       </Modal>
+
+
+      {/* 移动项目 */}
+      <Modal
+        title={'移动明细行'}
+        visible={isMoveModalVisible}
+        onCancel={moveCancel}
+        centered={true}
+        footer={null}
+        width={500}
+      >
+        <Form form={formForMove}>
+          <div style={{marginLeft: '60px'}}>
+            <Form.Item name="moveForOraPrj" label="原项目名称:">
+              <Input style={widths} disabled={true}/>
+            </Form.Item>
+            <Form.Item label="新项目名称:">
+              <Input.Group compact>
+                <Form.Item name="moveNewPrj">
+                  <Select placeholder="请选择" style={widths} showSearch optionFilterProp="children">
+                    {GetSprintProject()}
+                  </Select>
+                </Form.Item>
+
+                <Form.Item>
+                  <Button type="primary" size={"middle"} style={{marginLeft: '10px'}}
+                          onClick={addNewProject}> + </Button>
+                </Form.Item>
+              </Input.Group>
+            </Form.Item>
+
+          </div>
+
+          <Form.Item>
+            <Button type="primary" style={{marginLeft: '150px'}} onClick={moveSprintList}>
+              确定
+            </Button>
+            <Button type="primary" style={{marginLeft: '20px'}} onClick={moveCancel}>
+              取消
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
 
       {/* 流程操作 */}
       <Modal

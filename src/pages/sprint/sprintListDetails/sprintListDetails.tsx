@@ -1,13 +1,13 @@
-import React, { useRef, useState } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
-import { AgGridReact } from 'ag-grid-react';
+import React, {useRef, useState} from 'react';
+import {PageContainer} from '@ant-design/pro-layout';
+import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import { useRequest } from 'ahooks';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import { GqlClient, useGqlClient, useQuery } from '@/hooks';
-import { Button, message, Form, Select, Modal, Input, Row, Col } from 'antd';
+import {useRequest} from 'ahooks';
+import {GridApi, GridReadyEvent} from 'ag-grid-community';
+import {GqlClient, useGqlClient, useQuery} from '@/hooks';
+import {Button, message, Form, Select, Modal, Input, Row, Col} from 'antd';
 import {
   FolderAddTwoTone,
   SnippetsTwoTone,
@@ -16,7 +16,7 @@ import {
   CloseSquareTwoTone,
   CheckSquareTwoTone,
 } from '@ant-design/icons';
-import { history } from 'umi';
+import {history} from 'umi';
 import {
   numberRenderToYesNo,
   numberRenderTopass,
@@ -29,7 +29,7 @@ import {
 } from '@/publicMethods/cellRenderer';
 import axios from 'axios';
 
-const { Option } = Select;
+const {Option} = Select;
 
 // 定义列名
 const colums = () => {
@@ -212,7 +212,7 @@ const colums = () => {
 
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
-  const { data } = await client.query(`
+  const {data} = await client.query(`
       {
          proDetail(project:${params}){
             id
@@ -280,7 +280,7 @@ const SprintList: React.FC<any> = () => {
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
-  const { data, loading } = useRequest(() => queryDevelopViews(gqlClient, prjId));
+  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, prjId));
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -301,20 +301,35 @@ const SprintList: React.FC<any> = () => {
   // 获取部门数据
   const GetDeptMemner = (params: any) => {
     const deptMan = [];
+    let deptMember;
 
-    const { data: { WxDeptUsers = [] } = {} } = useQuery(`
+    if (params === "all") {
+
+      deptMember = `
+          {
+            WxDeptUsers{
+               id
+              userName
+            }
+          }
+      `;
+    } else {
+
+      deptMember = `
           {
             WxDeptUsers(deptNames:["${params}"]){
                id
               userName
             }
           }
-      `);
+      `;
+    }
+
+    const {data: {WxDeptUsers = []} = {}} = useQuery(deptMember);
+
     for (let index = 0; index < WxDeptUsers.length; index += 1) {
       deptMan.push(
-        <Option key={WxDeptUsers[index].id} value={WxDeptUsers[index].id}>
-          {WxDeptUsers[index].userName}{' '}
-        </Option>,
+        <Option value={WxDeptUsers[index].id}> {WxDeptUsers[index].userName}</Option>,
       );
     }
     return deptMan;
@@ -422,7 +437,7 @@ const SprintList: React.FC<any> = () => {
 
   // 添加项目
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-  const [modal, setmodal] = useState({ title: '新增明细行' });
+  const [modal, setmodal] = useState({title: '新增明细行'});
   const addProject = () => {
     formForAdminToAddAnaMod.setFieldsValue({
       adminCurStage: '',
@@ -452,7 +467,7 @@ const SprintList: React.FC<any> = () => {
       adminAddRemark: '',
     });
 
-    setmodal({ title: '新增明细行' });
+    setmodal({title: '新增明细行'});
     // 赋值给控件
     setIsAddModalVisible(true);
   };
@@ -548,6 +563,7 @@ const SprintList: React.FC<any> = () => {
 
   const commitSprintDetails = () => {
     const oradata = formForAdminToAddAnaMod.getFieldsValue();
+    debugger;
 
     if (oradata.adminChandaoType === '' || oradata.adminChandaoId === '') {
       message.error({
@@ -574,7 +590,6 @@ const SprintList: React.FC<any> = () => {
       uedName: oradata.adminAddForUED,
       uedEnvCheck: oradata.adminAddForUedVerify,
       uedOnlineCheck: oradata.adminAdminUedOnline,
-      source: 7,
       feedback: oradata.adminAddFeedbacker,
       memo: oradata.adminAddRemark,
     };
@@ -582,17 +597,19 @@ const SprintList: React.FC<any> = () => {
     if (modal.title === '新增明细行') {
       // 新增使用的是project id
       datas['project'] = prjId;
+      datas["source"] = 7;
       addCommitDetails(datas);
     } else {
       const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
       // 修改使用的是明细 id
       datas['id'] = curRow[0].id;
-      modCommitDetails(datas);
+      //  modCommitDetails(datas);
     }
   };
 
   // admin 修改
   const adminModify = (datas: any) => {
+    debugger;
     formForAdminToAddAnaMod.setFieldsValue({
       adminCurStage: numberRenderToCurrentStage({
         value: datas.stage === null ? '' : datas.stage.toString(),
@@ -624,7 +641,7 @@ const SprintList: React.FC<any> = () => {
       adminAddFeedbacker: datas.feedback,
       adminAddRemark: datas.memo,
     });
-    setmodal({ title: '修改明细行(admin)' });
+    setmodal({title: '修改明细行(admin)'});
     setIsAddModalVisible(true);
   };
 
@@ -837,7 +854,7 @@ const SprintList: React.FC<any> = () => {
 
     // 判断人员权限（admin，测试，开发经理（开发）,UED）
     let currentUser = '';
-    currentUser = 'UED';
+    currentUser = 'admin';
     switch (currentUser) {
       case 'admin':
         adminModify(detailsInfo);
@@ -941,77 +958,81 @@ const SprintList: React.FC<any> = () => {
 
   /* region 操作流程 */
   const [isFlowModalVisible, setIsFlowModalVisible] = useState(false);
-  const [flowHitmessage, setFlowHitmessage] = useState({ hintMessage: '' });
+  const [flowHitmessage, setFlowHitmessage] = useState({hintMessage: ''});
 
   // 流程-取消
   const flowForCancle = () => {
-    setFlowHitmessage({ hintMessage: '已取消' });
+    setFlowHitmessage({hintMessage: '已取消'});
     setIsFlowModalVisible(true);
   };
   // 流程-开发已revert
   const flowForDevRevert = () => {
-    setFlowHitmessage({ hintMessage: '开发已revert' });
+    setFlowHitmessage({hintMessage: '开发已revert'});
 
     setIsFlowModalVisible(true);
   };
 
   // 流程-测试已验revert
   const flowForTestRevert = () => {
-    setFlowHitmessage({ hintMessage: '测试已验证revert' });
+    setFlowHitmessage({hintMessage: '测试已验证revert'});
 
     setIsFlowModalVisible(true);
   };
   // 流程-灰度已验
   const flowForHuiduChecked = () => {
-    setFlowHitmessage({ hintMessage: '灰度已验过' });
+    setFlowHitmessage({hintMessage: '灰度已验过'});
 
     setIsFlowModalVisible(true);
   };
   // 流程-线上已验证
   const flowForOnlineChecked = () => {
-    setFlowHitmessage({ hintMessage: '线上已验过' });
+    setFlowHitmessage({hintMessage: '线上已验过'});
 
     setIsFlowModalVisible(true);
   };
 
   const modFlowStage = (stage: number) => {
     const selRows: any = gridApi.current?.getSelectedRows();
+    const selIds = [];
     for (let index = 0; index < selRows.length; index += 1) {
-      const params = {
-        id: selRows[index].id,
-        attribute: selRows[index].category,
-        value: stage,
-      };
-      axios
-        .patch('/api/sprint/project/child', params)
-        .then(function (res) {
-          if (res.data.ok === true) {
-            setIsFlowModalVisible(false);
-            updateGrid();
-            message.info({
-              content: res.data.message,
-              style: {
-                marginTop: '50vh',
-              },
-            });
-          } else {
-            message.error({
-              content: `${res.data.message}`,
-              style: {
-                marginTop: '50vh',
-              },
-            });
-          }
-        })
-        .catch(function (error) {
-          message.error({
-            content: error.toString(),
+      selIds.push(selRows[index].id);
+    }
+    const params = {
+      id: selIds,
+      attribute: "stage",
+      value: stage,
+    };
+
+    axios
+      .patch('/api/sprint/project/child', params)
+      .then(function (res) {
+        if (res.data.ok === true) {
+          setIsFlowModalVisible(false);
+          updateGrid();
+          message.info({
+            content: res.data.message,
             style: {
               marginTop: '50vh',
             },
           });
+        } else {
+          message.error({
+            content: `${res.data.message}`,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+      })
+      .catch(function (error) {
+        message.error({
+          content: error.toString(),
+          style: {
+            marginTop: '50vh',
+          },
         });
-    }
+      });
+
   };
 
   const commitFlow = () => {
@@ -1042,20 +1063,20 @@ const SprintList: React.FC<any> = () => {
 
   /* endregion */
 
-  const leftStyle = { marginLeft: '20px' };
-  const widths = { width: '200px', color: 'black' };
+  const leftStyle = {marginLeft: '20px'};
+  const widths = {width: '200px', color: 'black'};
 
   return (
     <PageContainer>
       {/* 新增、修改、删除按钮栏 */}
-      <div style={{ background: 'white' }}>
+      <div style={{background: 'white'}}>
         {' '}
         {/* 使用一个图标就要导入一个图标 */}
         {/* 明细操作按钮 */}
         <Button
           type="text"
-          style={{ color: 'black' }}
-          icon={<FolderAddTwoTone />}
+          style={{color: 'black'}}
+          icon={<FolderAddTwoTone/>}
           size={'large'}
           onClick={addProject}
         >
@@ -1064,8 +1085,8 @@ const SprintList: React.FC<any> = () => {
         </Button>
         <Button
           type="text"
-          style={{ color: 'black' }}
-          icon={<EditTwoTone />}
+          style={{color: 'black'}}
+          icon={<EditTwoTone/>}
           size={'large'}
           onClick={btnModifyProject}
         >
@@ -1074,8 +1095,8 @@ const SprintList: React.FC<any> = () => {
         </Button>
         <Button
           type="text"
-          style={{ color: 'black' }}
-          icon={<DeleteTwoTone />}
+          style={{color: 'black'}}
+          icon={<DeleteTwoTone/>}
           size={'large'}
           onClick={deleteSprintDetails}
         >
@@ -1083,8 +1104,8 @@ const SprintList: React.FC<any> = () => {
         </Button>
         <Button
           type="text"
-          style={{ color: 'black' }}
-          icon={<SnippetsTwoTone />}
+          style={{color: 'black'}}
+          icon={<SnippetsTwoTone/>}
           size={'large'}
           onClick={moveProject}
         >
@@ -1094,8 +1115,8 @@ const SprintList: React.FC<any> = () => {
         {/* 操作流程按钮 */}
         <Button
           type="text"
-          style={{ color: 'black', float: 'right' }}
-          icon={<CheckSquareTwoTone />}
+          style={{color: 'black', float: 'right'}}
+          icon={<CheckSquareTwoTone/>}
           size={'large'}
           onClick={flowForOnlineChecked}
         >
@@ -1103,8 +1124,8 @@ const SprintList: React.FC<any> = () => {
         </Button>
         <Button
           type="text"
-          style={{ color: 'black', float: 'right' }}
-          icon={<CheckSquareTwoTone />}
+          style={{color: 'black', float: 'right'}}
+          icon={<CheckSquareTwoTone/>}
           size={'large'}
           onClick={flowForHuiduChecked}
         >
@@ -1112,8 +1133,8 @@ const SprintList: React.FC<any> = () => {
         </Button>
         <Button
           type="text"
-          style={{ color: 'black', float: 'right' }}
-          icon={<CheckSquareTwoTone />}
+          style={{color: 'black', float: 'right'}}
+          icon={<CheckSquareTwoTone/>}
           size={'large'}
           onClick={flowForTestRevert}
         >
@@ -1121,8 +1142,8 @@ const SprintList: React.FC<any> = () => {
         </Button>
         <Button
           type="text"
-          style={{ color: 'black', float: 'right' }}
-          icon={<CheckSquareTwoTone />}
+          style={{color: 'black', float: 'right'}}
+          icon={<CheckSquareTwoTone/>}
           size={'large'}
           onClick={flowForDevRevert}
         >
@@ -1131,22 +1152,22 @@ const SprintList: React.FC<any> = () => {
         </Button>
         <Button
           type="text"
-          style={{ color: 'black', float: 'right' }}
-          icon={<CloseSquareTwoTone />}
+          style={{color: 'black', float: 'right'}}
+          icon={<CloseSquareTwoTone/>}
           size={'large'}
           onClick={flowForCancle}
         >
           {' '}
           取消{' '}
         </Button>
-        <label style={{ marginTop: '10px', color: 'black', fontWeight: 'bold', float: 'right' }}>
+        <label style={{marginTop: '10px', color: 'black', fontWeight: 'bold', float: 'right'}}>
           {' '}
           操作流程:
         </label>
       </div>
 
       {/* ag-grid 表格定义 */}
-      <div className="ag-theme-alpine" style={{ height: 1000, width: '100%' }}>
+      <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
         <AgGridReact
           columnDefs={colums()} // 定义列
           rowData={data} // 数据绑定
@@ -1185,7 +1206,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminCurStage" label="当前阶段:">
-                  <Select placeholder="请选择" style={widths}>
+                  <Select placeholder="请选择" style={widths} showSearch optionFilterProp="children">
                     {[
                       <Option key={'1'} value={'1'}>
                         未开始{' '}
@@ -1228,7 +1249,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddTester" label="对应测试:">
-                  <Select placeholder="请选择" style={widths}>
+                  <Select placeholder="请选择" style={widths} showSearch optionFilterProp="children">
                     {GetDeptMemner('测试')}
                   </Select>
                 </Form.Item>
@@ -1236,7 +1257,7 @@ const SprintList: React.FC<any> = () => {
             </Col>
             <Col className="gutter-row">
               <div style={leftStyle}>
-                <Form.Item name="adminChandaoType" label="禅道类型：" rules={[{ required: true }]}>
+                <Form.Item name="adminChandaoType" label="禅道类型：" rules={[{required: true}]}>
                   <Select placeholder="请选择" style={widths}>
                     {[
                       <Option key={'1'} value={'1'}>
@@ -1257,15 +1278,15 @@ const SprintList: React.FC<any> = () => {
           <Row gutter={16}>
             <Col className="gutter-row">
               <div style={leftStyle}>
-                <Form.Item name="adminChandaoId" label="禅道编号:" rules={[{ required: true }]}>
-                  <Input placeholder="请输入" style={widths} onBlur={checkZentaoInfo} />
+                <Form.Item name="adminChandaoId" label="禅道编号:" rules={[{required: true}]}>
+                  <Input placeholder="请输入" style={widths} onBlur={checkZentaoInfo}/>
                 </Form.Item>
               </div>
             </Col>
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddChandaoTitle" label="标题内容:">
-                  <Input disabled={true} style={{ width: '510px', color: 'black' }} />
+                  <Input disabled={true} style={{width: '510px', color: 'black'}}/>
                 </Form.Item>
               </div>
             </Col>
@@ -1318,7 +1339,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddModule" label="所属模块:">
-                  <Input disabled={true} style={{ width: '218px' }} />
+                  <Input disabled={true} style={{width: '218px'}}/>
                 </Form.Item>
               </div>
             </Col>
@@ -1327,21 +1348,21 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddChandaoStatus" label="禅道状态:">
-                  <Input disabled={true} style={widths} />
+                  <Input disabled={true} style={widths}/>
                 </Form.Item>
               </div>
             </Col>
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddAssignTo" label="指派给:">
-                  <Input disabled={true} style={widths} />
+                  <Input disabled={true} style={widths}/>
                 </Form.Item>
               </div>
             </Col>
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddSolvedBy" label="由谁解决/完成:">
-                  <Input disabled={true} style={{ width: '185px', color: 'black' }} />
+                  <Input disabled={true} style={{width: '185px', color: 'black'}}/>
                 </Form.Item>
               </div>
             </Col>
@@ -1350,7 +1371,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddClosedBy" label="由谁关闭:">
-                  <Input disabled={true} style={widths} />
+                  <Input disabled={true} style={widths}/>
                 </Form.Item>
               </div>
             </Col>
@@ -1358,7 +1379,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddHotUpdate" label="是否支持热更新:">
-                  <Select placeholder="请选择" style={{ width: '150px' }}>
+                  <Select placeholder="请选择" style={{width: '150px'}}>
                     {[
                       <Option key={'1'} value={'1'}>
                         是{' '}
@@ -1374,7 +1395,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddDataUpgrade" label="是否有数据升级:">
-                  <Select placeholder="请选择" style={{ width: '170px' }}>
+                  <Select placeholder="请选择" style={{width: '170px'}}>
                     {[
                       <Option key={'1'} value={'1'}>
                         是{' '}
@@ -1392,7 +1413,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddInteUpgrade" label="是否有接口升级：">
-                  <Select placeholder="请选择" style={{ width: '160px' }}>
+                  <Select placeholder="请选择" style={{width: '160px'}}>
                     {[
                       <Option key={'1'} value={'1'}>
                         是{' '}
@@ -1409,7 +1430,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddPreData" label="是否有预置数据:">
-                  <Select placeholder="请选择" style={{ width: '150px' }}>
+                  <Select placeholder="请选择" style={{width: '150px'}}>
                     {[
                       <Option key={'1'} value={'1'}>
                         是{' '}
@@ -1426,7 +1447,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddtesterVerifi" label="是否需要测试验证：">
-                  <Select placeholder="请选择" style={{ width: '155px' }}>
+                  <Select placeholder="请选择" style={{width: '155px'}}>
                     {[
                       <Option key={'1'} value={'1'}>
                         是{' '}
@@ -1444,7 +1465,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddSuggestion" label="验证范围建议:">
-                  <Input style={{ width: '790px' }} />
+                  <Input style={{width: '790px'}}/>
                 </Form.Item>
               </div>
             </Col>
@@ -1481,7 +1502,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddForUedVerify" label="UED测试环境验证：">
-                  <Select placeholder="请选择" style={{ width: '158px' }}>
+                  <Select placeholder="请选择" style={{width: '158px'}}>
                     {[
                       <Option key={'1'} value={'1'}>
                         验证通过{' '}
@@ -1558,7 +1579,9 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddFeedbacker" label="反馈人:">
-                  <Input style={{ width: '230px' }} />
+                  <Select placeholder="请选择" style={widths} showSearch optionFilterProp="children">
+                    {GetDeptMemner('all')}
+                  </Select>
                 </Form.Item>
               </div>
             </Col>
@@ -1567,16 +1590,16 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddRemark" label="备注:">
-                  <Input style={{ width: '860px' }} />
+                  <Input style={{width: '860px'}}/>
                 </Form.Item>
               </div>
             </Col>
           </Row>
-          <Form.Item style={{ marginTop: '50px' }}>
-            <Button type="primary" style={{ marginLeft: '400px' }} onClick={commitSprintDetails}>
+          <Form.Item style={{marginTop: '50px'}}>
+            <Button type="primary" style={{marginLeft: '400px'}} onClick={commitSprintDetails}>
               确定
             </Button>
-            <Button type="primary" style={{ marginLeft: '20px' }} onClick={handleCancel}>
+            <Button type="primary" style={{marginLeft: '20px'}} onClick={handleCancel}>
               取消
             </Button>
           </Form.Item>
@@ -1615,9 +1638,9 @@ const SprintList: React.FC<any> = () => {
             </Col>
 
             <Col className="gutter-row">
-              <div style={{ marginLeft: '50px' }}>
+              <div style={{marginLeft: '50px'}}>
                 <Form.Item name="managerCHandaoID" label="禅道编号:">
-                  <Input placeholder="请输入" style={widths} />
+                  <Input placeholder="请输入" style={widths}/>
                 </Form.Item>
               </div>
             </Col>
@@ -1626,7 +1649,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="managerTitle" label="标题内容:">
-                  <Input disabled={true} style={{ width: '540px', color: 'black' }} />
+                  <Input disabled={true} style={{width: '540px', color: 'black'}}/>
                 </Form.Item>
               </div>
             </Col>
@@ -1635,7 +1658,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="managerHotUpdate" label="是否支持热更新:">
-                  <Select placeholder="请选择" style={{ width: '150px' }}>
+                  <Select placeholder="请选择" style={{width: '150px'}}>
                     {[
                       <Option key={'closed'} value={'closed'}>
                         是{' '}
@@ -1649,9 +1672,9 @@ const SprintList: React.FC<any> = () => {
               </div>
             </Col>
             <Col className="gutter-row">
-              <div style={{ marginLeft: '55px' }}>
+              <div style={{marginLeft: '55px'}}>
                 <Form.Item name="managerDataUpgrade" label="是否有数据升级:">
-                  <Select placeholder="请选择" style={{ width: '170px' }}>
+                  <Select placeholder="请选择" style={{width: '170px'}}>
                     {[
                       <Option key={'1'} value={'1'}>
                         是{' '}
@@ -1669,7 +1692,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="managerInteUpgrade" label="是否有接口升级：">
-                  <Select placeholder="请选择" style={{ width: '155px' }}>
+                  <Select placeholder="请选择" style={{width: '155px'}}>
                     {[
                       <Option key={'1'} value={'1'}>
                         是{' '}
@@ -1684,9 +1707,9 @@ const SprintList: React.FC<any> = () => {
             </Col>
 
             <Col className="gutter-row">
-              <div style={{ marginLeft: '50px' }}>
+              <div style={{marginLeft: '50px'}}>
                 <Form.Item name="managerPreData" label="是否有预置数据:">
-                  <Select placeholder="请选择" style={{ width: '170px' }}>
+                  <Select placeholder="请选择" style={{width: '170px'}}>
                     {[
                       <Option key={'1'} value={'1'}>
                         是{' '}
@@ -1704,7 +1727,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="managertesterVerifi" label="是否需要测试验证：">
-                  <Select placeholder="请选择" style={{ width: '150px' }}>
+                  <Select placeholder="请选择" style={{width: '150px'}}>
                     {[
                       <Option key={'1'} value={'1'}>
                         是{' '}
@@ -1719,7 +1742,7 @@ const SprintList: React.FC<any> = () => {
             </Col>
 
             <Col className="gutter-row">
-              <div style={{ marginLeft: '50px' }}>
+              <div style={{marginLeft: '50px'}}>
                 <Form.Item name="managerEnvironment" label="发布环境:">
                   <Select placeholder="请选择" style={widths}>
                     {[
@@ -1742,7 +1765,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="managerSuggestion" label="验证范围建议:">
-                  <Input style={{ width: '520px' }} />
+                  <Input style={{width: '520px'}}/>
                 </Form.Item>
               </div>
             </Col>
@@ -1769,11 +1792,11 @@ const SprintList: React.FC<any> = () => {
             </Col>
           </Row>
 
-          <Form.Item style={{ marginTop: '50px' }}>
-            <Button type="primary" style={{ marginLeft: '300px' }} onClick={commitManagerModify}>
+          <Form.Item style={{marginTop: '50px'}}>
+            <Button type="primary" style={{marginLeft: '300px'}} onClick={commitManagerModify}>
               确定
             </Button>
-            <Button type="primary" style={{ marginLeft: '20px' }} onClick={mangerHandleCancel}>
+            <Button type="primary" style={{marginLeft: '20px'}} onClick={mangerHandleCancel}>
               取消
             </Button>
           </Form.Item>
@@ -1812,9 +1835,9 @@ const SprintList: React.FC<any> = () => {
             </Col>
 
             <Col className="gutter-row">
-              <div style={{ marginLeft: '50px' }}>
+              <div style={{marginLeft: '50px'}}>
                 <Form.Item name="testerCHandaoID" label="禅道编号:">
-                  <Input placeholder="请输入" style={widths} />
+                  <Input placeholder="请输入" style={widths}/>
                 </Form.Item>
               </div>
             </Col>
@@ -1823,7 +1846,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="testerTitle" label="标题内容:">
-                  <Input disabled={true} style={{ width: '540px', color: 'black' }} />
+                  <Input disabled={true} style={{width: '540px', color: 'black'}}/>
                 </Form.Item>
               </div>
             </Col>
@@ -1833,15 +1856,15 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="testChandaoStatus" label="禅道状态:">
-                  <Input disabled={true} style={widths} />
+                  <Input disabled={true} style={widths}/>
                 </Form.Item>
               </div>
             </Col>
 
             <Col className="gutter-row">
-              <div style={{ marginLeft: '50px' }}>
+              <div style={{marginLeft: '50px'}}>
                 <Form.Item name="testToTester" label="对应测试:">
-                  <Select placeholder="请选择" style={widths}>
+                  <Select placeholder="请选择" style={widths} showSearch   optionFilterProp="children">
                     {GetDeptMemner('测试')}
                   </Select>
                 </Form.Item>
@@ -1851,7 +1874,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="testerRevert" label="revert后是否已验证：">
-                  <Select placeholder="请选择" style={{ width: '140px' }}>
+                  <Select placeholder="请选择" style={{width: '140px'}}>
                     {[
                       <Option key={'closed'} value={'closed'}>
                         {' '}
@@ -1873,17 +1896,17 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="testerRemark" label="备 注:">
-                  <Input style={{ width: '570px' }} />
+                  <Input style={{width: '570px'}}/>
                 </Form.Item>
               </div>
             </Col>
           </Row>
 
-          <Form.Item style={{ marginTop: '50px' }}>
-            <Button type="primary" style={{ marginLeft: '300px' }} onClick={commitTesterModify}>
+          <Form.Item style={{marginTop: '50px'}}>
+            <Button type="primary" style={{marginLeft: '300px'}} onClick={commitTesterModify}>
               确定
             </Button>
-            <Button type="primary" style={{ marginLeft: '20px' }} onClick={testerHandleCancel}>
+            <Button type="primary" style={{marginLeft: '20px'}} onClick={testerHandleCancel}>
               取消
             </Button>
           </Form.Item>
@@ -1922,9 +1945,9 @@ const SprintList: React.FC<any> = () => {
             </Col>
 
             <Col className="gutter-row">
-              <div style={{ marginLeft: '50px' }}>
+              <div style={{marginLeft: '50px'}}>
                 <Form.Item name="uedCHandaoID" label="禅道编号:">
-                  <Input placeholder="请输入" style={widths} />
+                  <Input placeholder="请输入" style={widths}/>
                 </Form.Item>
               </div>
             </Col>
@@ -1933,7 +1956,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="uedTitle" label="标题内容:">
-                  <Input disabled={true} style={{ width: '540px', color: 'black' }} />
+                  <Input disabled={true} style={{width: '540px', color: 'black'}}/>
                 </Form.Item>
               </div>
             </Col>
@@ -1959,7 +1982,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="uedForUedVerify" label="UED测试环境验证：">
-                  <Select placeholder="请选择" style={{ width: '180px' }}>
+                  <Select placeholder="请选择" style={{width: '180px'}}>
                     {[
                       <Option key={'1'} value={'1'}>
                         验证通过{' '}
@@ -1999,7 +2022,7 @@ const SprintList: React.FC<any> = () => {
             </Col>
 
             <Col className="gutter-row">
-              <div style={{ marginLeft: '50px' }}>
+              <div style={{marginLeft: '50px'}}>
                 <Form.Item name="uedSource" label="来 源:">
                   <Select placeholder="请选择" style={widths}>
                     {[
@@ -2037,17 +2060,17 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="uedRemark" label="备 注:">
-                  <Input style={{ width: '575px' }} />
+                  <Input style={{width: '575px'}}/>
                 </Form.Item>
               </div>
             </Col>
           </Row>
 
-          <Form.Item style={{ marginTop: '50px' }}>
-            <Button type="primary" style={{ marginLeft: '300px' }} onClick={commitUedModify}>
+          <Form.Item style={{marginTop: '50px'}}>
+            <Button type="primary" style={{marginLeft: '300px'}} onClick={commitUedModify}>
               确定
             </Button>
-            <Button type="primary" style={{ marginLeft: '20px' }} onClick={UEDHandleCancel}>
+            <Button type="primary" style={{marginLeft: '20px'}} onClick={UEDHandleCancel}>
               取消
             </Button>
           </Form.Item>
@@ -2065,14 +2088,14 @@ const SprintList: React.FC<any> = () => {
       >
         <Form form={formForDel}>
           <Form.Item>
-            <label style={{ marginLeft: '20px' }}>删除将不能恢复，请确认是否删除？</label>
+            <label style={{marginLeft: '20px'}}>删除将不能恢复，请确认是否删除？</label>
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" style={{ marginLeft: '150px' }} onClick={delSprintList}>
+            <Button type="primary" style={{marginLeft: '150px'}} onClick={delSprintList}>
               确定
             </Button>
-            <Button type="primary" style={{ marginLeft: '20px' }} onClick={DelCancel}>
+            <Button type="primary" style={{marginLeft: '20px'}} onClick={DelCancel}>
               取消
             </Button>
           </Form.Item>
@@ -2090,16 +2113,16 @@ const SprintList: React.FC<any> = () => {
       >
         <Form>
           <Form.Item>
-            <label style={{ marginLeft: '20px' }}>
+            <label style={{marginLeft: '20px'}}>
               确定将当前阶段修改为【{flowHitmessage.hintMessage}】吗？
             </label>
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" style={{ marginLeft: '150px' }} onClick={commitFlow}>
+            <Button type="primary" style={{marginLeft: '150px'}} onClick={commitFlow}>
               确定
             </Button>
-            <Button type="primary" style={{ marginLeft: '20px' }} onClick={flowCancel}>
+            <Button type="primary" style={{marginLeft: '20px'}} onClick={flowCancel}>
               取消
             </Button>
           </Form.Item>

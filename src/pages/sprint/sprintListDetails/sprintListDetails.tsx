@@ -101,15 +101,15 @@ const colums = () => {
         },
         {
           headerName: '相关需求数',
-          field: '',
+          field: 'relatedStories',
         },
         {
           headerName: '相关任务数',
-          field: '',
+          field: 'relatedTasks',
         },
         {
           headerName: '相关bug数',
-          field: '',
+          field: 'relatedBugs',
         },
         {
           headerName: '指派给',
@@ -389,7 +389,7 @@ const SprintList: React.FC<any> = () => {
             }),
             adminAddPriority: queryDatas.priority,
             adminAddModule: queryDatas.module,
-            adminAddChandaoStatus: queryDatas.ztStatus,
+            adminAddChandaoStatus: numberRenderToZentaoStatus({value: queryDatas.ztStatus === null ? '' : queryDatas.ztStatus.toString()}),
             adminAddAssignTo: queryDatas.assignedTo,
             adminAddSolvedBy: queryDatas.finishedBy,
             adminAddClosedBy: queryDatas.closedBy,
@@ -563,8 +563,6 @@ const SprintList: React.FC<any> = () => {
 
   const commitSprintDetails = () => {
     const oradata = formForAdminToAddAnaMod.getFieldsValue();
-    debugger;
-
     if (oradata.adminChandaoType === '' || oradata.adminChandaoId === '') {
       message.error({
         content: `禅道类型和禅道编号不能为空！`,
@@ -577,9 +575,7 @@ const SprintList: React.FC<any> = () => {
     }
 
     const datas = {
-      tester: oradata.adminAddTester,
       category: oradata.adminChandaoType,
-      ztNo: oradata.adminChandaoId,
       hotUpdate: oradata.adminAddHotUpdate,
       dataUpdate: oradata.adminAddDataUpgrade,
       interUpdate: oradata.adminAddInteUpgrade,
@@ -587,10 +583,8 @@ const SprintList: React.FC<any> = () => {
       testCheck: oradata.adminAddtesterVerifi,
       scopeLimit: oradata.adminAddSuggestion,
       publish: oradata.adminAddEnvironment,
-      uedName: oradata.adminAddForUED,
       uedEnvCheck: oradata.adminAddForUedVerify,
       uedOnlineCheck: oradata.adminAdminUedOnline,
-      feedback: oradata.adminAddFeedbacker,
       memo: oradata.adminAddRemark,
     };
 
@@ -598,18 +592,38 @@ const SprintList: React.FC<any> = () => {
       // 新增使用的是project id
       datas['project'] = prjId;
       datas["source"] = 7;
+      datas["ztNo"] = oradata.adminChandaoId;
+      datas["tester"] = oradata.adminAddTester;
+      datas["uedName"] = oradata.adminAddForUED;
+      datas["feedback"] = oradata.adminAddFeedbacker;
+
       addCommitDetails(datas);
     } else {
       const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
-      // 修改使用的是明细 id
       datas['id'] = curRow[0].id;
-      //  modCommitDetails(datas);
+      // 判断是否被修改过 禅道id 对应测试、对应UED、反馈人
+      if (formForAdminToAddAnaMod.isFieldTouched('adminChandaoId')) {
+        datas["ztNo"] = oradata.adminChandaoId;
+      }
+
+      if (formForAdminToAddAnaMod.isFieldTouched('adminAddTester')) {
+        datas["tester"] = oradata.adminAddTester;
+      }
+
+      if (formForAdminToAddAnaMod.isFieldTouched('adminAddForUED')) {
+        datas["uedName"] = oradata.adminAddForUED;
+      }
+
+      if (formForAdminToAddAnaMod.isFieldTouched('adminAddFeedbacker')) {
+        datas["feedback"] = oradata.adminAddFeedbacker;
+      }
+
+      modCommitDetails(datas);
     }
   };
 
   // admin 修改
   const adminModify = (datas: any) => {
-    debugger;
     formForAdminToAddAnaMod.setFieldsValue({
       adminCurStage: numberRenderToCurrentStage({
         value: datas.stage === null ? '' : datas.stage.toString(),
@@ -650,13 +664,12 @@ const SprintList: React.FC<any> = () => {
   const managerModify = (datas: any) => {
     formForManagerToMod.setFieldsValue({
       managerCHandaoID: datas.ztNo,
-      managerChandaoType: datas.category,
+      managerChandaoType: numberRenderToZentaoType({value: datas.category === null ? '' : datas.category.toString()}),
       managerDataUpgrade: datas.dataUpdate,
       managerEnvironment: datas.publishEnv,
       managerHotUpdate: datas.hotUpdate,
       managerInteUpgrade: datas.interUpdate,
       managerPreData: datas.presetData,
-      managerRevert: 1,
       managerSuggestion: datas.scopeLimit,
       managerTitle: datas.title,
       managertesterVerifi: datas.testCheck,
@@ -687,22 +700,22 @@ const SprintList: React.FC<any> = () => {
 
     const datas = {
       id: rowDatas.id,
-      tester: rowDatas.tester,
-      category: oradata.managerChandaoType,
-      ztNo: oradata.managerCHandaoID,
+      // tester: rowDatas.tester,
+      // category: oradata.managerChandaoType,
+      // ztNo: oradata.managerCHandaoID,
       hotUpdate: oradata.managerHotUpdate,
       dataUpdate: oradata.managerDataUpgrade,
       interUpdate: oradata.managerInteUpgrade,
       presetData: oradata.managerPreData,
       testCheck: oradata.managertesterVerifi,
       scopeLimit: oradata.managerSuggestion,
-      publish: oradata.managerEnvironment,
-      uedName: rowDatas.uedName,
-      uedEnvCheck: rowDatas.uedEnvCheck,
-      uedOnlineCheck: rowDatas.uedOnlineCheck,
-      source: rowDatas.source,
-      feedback: rowDatas.feedback,
-      memo: rowDatas.memo,
+      // publish: oradata.managerEnvironment,
+      // uedName: rowDatas.uedName,
+      // uedEnvCheck: rowDatas.uedEnvCheck,
+      // uedOnlineCheck: rowDatas.uedOnlineCheck,
+      // source: rowDatas.source,
+      // feedback: rowDatas.feedback,
+      // memo: rowDatas.memo,
     };
     modCommitDetails(datas);
   };
@@ -711,15 +724,15 @@ const SprintList: React.FC<any> = () => {
   // 测试 修改
   const testerModify = (datas: any) => {
     formForTesterToMod.setFieldsValue({
+      testerChandaoType: numberRenderToZentaoType({value: datas.category === null ? '' : datas.category.toString()}),
+      testerCHandaoID: datas.ztNo,
+      testerTitle: datas.title,
       testChandaoStatus: numberRenderToZentaoStatus({
         value: datas.ztStatus === null ? '' : datas.ztStatus.toString(),
       }),
       testToTester: datas.tester,
-      testerCHandaoID: datas.ztNo,
-      testerChandaoType: datas.category,
-      testerRemark: datas.memo,
-      testerRevert: datas.testCheck,
-      testerTitle: datas.title,
+      testerRemark: datas.memo
+
     });
     setformForTesterToModVisible(true);
   };
@@ -741,27 +754,30 @@ const SprintList: React.FC<any> = () => {
       return;
     }
     const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
-    const rowDatas = curRow[0];
 
     const datas = {
-      id: rowDatas.id,
-      tester: oradata.testToTester,
-      category: oradata.testerChandaoType,
-      ztNo: oradata.testerCHandaoID,
-      hotUpdate: rowDatas.hotUpdate,
-      dataUpdate: rowDatas.dataUpdate,
-      interUpdate: rowDatas.interUpdate,
-      presetData: rowDatas.presetData,
-      testCheck: rowDatas.testCheck,
-      scopeLimit: rowDatas.scopeLimit,
-      publish: rowDatas.publishEnv,
-      uedName: rowDatas.uedName,
-      uedEnvCheck: rowDatas.uedEnvCheck,
-      uedOnlineCheck: rowDatas.uedOnlineCheck,
-      source: rowDatas.source,
-      feedback: rowDatas.feedback,
+      id: curRow[0].id,
       memo: oradata.testerRemark,
+
+      // category: oradata.testerChandaoType,
+      // ztNo: oradata.testerCHandaoID,
+      // hotUpdate: rowDatas.hotUpdate,
+      // dataUpdate: rowDatas.dataUpdate,
+      // interUpdate: rowDatas.interUpdate,
+      // presetData: rowDatas.presetData,
+      // testCheck: rowDatas.testCheck,
+      // scopeLimit: rowDatas.scopeLimit,
+      // publish: rowDatas.publishEnv,
+      // uedName: rowDatas.uedName,
+      // uedEnvCheck: rowDatas.uedEnvCheck,
+      // uedOnlineCheck: rowDatas.uedOnlineCheck,
+      // source: rowDatas.source,
+      // feedback: rowDatas.feedback,
+
     };
+    if (formForTesterToMod.isFieldTouched('testToTester')) {
+      datas["tester"] = oradata.testToTester;
+    }
     modCommitDetails(datas);
   };
 
@@ -770,7 +786,7 @@ const SprintList: React.FC<any> = () => {
   const uedModify = (datas: any) => {
     formForUEDToMod.setFieldsValue({
       uedCHandaoID: datas.ztNo,
-      uedChandaoType: datas.category,
+      uedChandaoType: numberRenderToZentaoType({value: datas.category === null ? '' : datas.category.toString()}),
       uedRemark: datas.memo,
       uedTitle: datas.title,
       uedForUED: datas.uedName,
@@ -803,23 +819,27 @@ const SprintList: React.FC<any> = () => {
 
     const datas = {
       id: rowDatas.id,
-      tester: rowDatas.tester,
-      category: oradata.uedChandaoType,
-      ztNo: oradata.uedCHandaoID,
-      hotUpdate: rowDatas.hotUpdate,
-      dataUpdate: rowDatas.dataUpdate,
-      interUpdate: rowDatas.interUpdate,
-      presetData: rowDatas.presetData,
-      testCheck: rowDatas.testCheck,
-      scopeLimit: rowDatas.scopeLimit,
-      publish: rowDatas.publishEnv,
-      uedName: oradata.uedForUED,
+      // tester: rowDatas.tester,
+      // category: oradata.uedChandaoType,
+      // ztNo: oradata.uedCHandaoID,
+      // hotUpdate: rowDatas.hotUpdate,
+      // dataUpdate: rowDatas.dataUpdate,
+      // interUpdate: rowDatas.interUpdate,
+      // presetData: rowDatas.presetData,
+      // testCheck: rowDatas.testCheck,
+      // scopeLimit: rowDatas.scopeLimit,
+      // publish: rowDatas.publishEnv,
+
       uedEnvCheck: oradata.uedForUedVerify,
       uedOnlineCheck: oradata.UedOnlineVerti,
-      source: rowDatas.uedSource,
-      feedback: rowDatas.feedback,
+      // source: rowDatas.uedSource,
+      // feedback: rowDatas.feedback,
       memo: oradata.uedRemark,
     };
+
+    if (formForUEDToMod.isFieldTouched('uedForUED')) {
+      datas["uedName"] = oradata.uedForUED;
+    }
     modCommitDetails(datas);
   };
 
@@ -854,7 +874,7 @@ const SprintList: React.FC<any> = () => {
 
     // 判断人员权限（admin，测试，开发经理（开发）,UED）
     let currentUser = '';
-    currentUser = 'admin';
+    currentUser = 'UED';
     switch (currentUser) {
       case 'admin':
         adminModify(detailsInfo);
@@ -1260,15 +1280,9 @@ const SprintList: React.FC<any> = () => {
                 <Form.Item name="adminChandaoType" label="禅道类型：" rules={[{required: true}]}>
                   <Select placeholder="请选择" style={widths}>
                     {[
-                      <Option key={'1'} value={'1'}>
-                        bug{' '}
-                      </Option>,
-                      <Option key={'3'} value={'3'}>
-                        需求{' '}
-                      </Option>,
-                      <Option key={'2'} value={'2'}>
-                        task{' '}
-                      </Option>,
+                      <Option value={'1'}> Bug </Option>,
+                      <Option value={'3'}> 需求 </Option>,
+                      <Option value={'2'}> Task </Option>,
                     ]}
                   </Select>
                 </Form.Item>
@@ -1620,17 +1634,11 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="managerChandaoType" label="禅道类型：">
-                  <Select placeholder="请选择" style={widths}>
+                  <Select placeholder="请选择" style={widths} disabled={true}>
                     {[
-                      <Option key={'closed'} value={'closed'}>
-                        bug{' '}
-                      </Option>,
-                      <Option key={'doing'} value={'doing'}>
-                        需求{' '}
-                      </Option>,
-                      <Option key={'wait'} value={'wait'}>
-                        task{' '}
-                      </Option>,
+                      <Option value={'1'}> Bug </Option>,
+                      <Option value={'3'}> 需求 </Option>,
+                      <Option value={'2'}> Task </Option>,
                     ]}
                   </Select>
                 </Form.Item>
@@ -1640,7 +1648,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={{marginLeft: '50px'}}>
                 <Form.Item name="managerCHandaoID" label="禅道编号:">
-                  <Input placeholder="请输入" style={widths}/>
+                  <Input placeholder="请输入" style={widths} disabled={true}/>
                 </Form.Item>
               </div>
             </Col>
@@ -1660,12 +1668,8 @@ const SprintList: React.FC<any> = () => {
                 <Form.Item name="managerHotUpdate" label="是否支持热更新:">
                   <Select placeholder="请选择" style={{width: '150px'}}>
                     {[
-                      <Option key={'closed'} value={'closed'}>
-                        是{' '}
-                      </Option>,
-                      <Option key={'doing'} value={'doing'}>
-                        否{' '}
-                      </Option>,
+                      <Option value={'1'}>是</Option>,
+                      <Option value={'0'}>否</Option>,
                     ]}
                   </Select>
                 </Form.Item>
@@ -1770,27 +1774,6 @@ const SprintList: React.FC<any> = () => {
               </div>
             </Col>
           </Row>
-          <Row gutter={16}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="managerRevert" label="开发是否已Revert:">
-                  <Select placeholder="请选择" style={widths}>
-                    {[
-                      <Option key={'closed'} value={'closed'}>
-                        {' '}
-                      </Option>,
-                      <Option key={'closed2'} value={'closed2'}>
-                        是
-                      </Option>,
-                      <Option key={'doing'} value={'doing'}>
-                        否{' '}
-                      </Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
-            </Col>
-          </Row>
 
           <Form.Item style={{marginTop: '50px'}}>
             <Button type="primary" style={{marginLeft: '300px'}} onClick={commitManagerModify}>
@@ -1817,17 +1800,11 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="testerChandaoType" label="禅道类型：">
-                  <Select placeholder="请选择" style={widths}>
+                  <Select placeholder="请选择" style={widths} disabled={true}>
                     {[
-                      <Option key={'closed'} value={'closed'}>
-                        bug{' '}
-                      </Option>,
-                      <Option key={'doing'} value={'doing'}>
-                        需求{' '}
-                      </Option>,
-                      <Option key={'wait'} value={'wait'}>
-                        task{' '}
-                      </Option>,
+                      <Option value={'1'}> Bug </Option>,
+                      <Option value={'3'}> 需求 </Option>,
+                      <Option value={'2'}> Task </Option>,
                     ]}
                   </Select>
                 </Form.Item>
@@ -1837,7 +1814,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={{marginLeft: '50px'}}>
                 <Form.Item name="testerCHandaoID" label="禅道编号:">
-                  <Input placeholder="请输入" style={widths}/>
+                  <Input placeholder="请输入" style={widths} disabled={true}/>
                 </Form.Item>
               </div>
             </Col>
@@ -1864,28 +1841,8 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={{marginLeft: '50px'}}>
                 <Form.Item name="testToTester" label="对应测试:">
-                  <Select placeholder="请选择" style={widths} showSearch   optionFilterProp="children">
+                  <Select placeholder="请选择" style={widths} showSearch optionFilterProp="children">
                     {GetDeptMemner('测试')}
-                  </Select>
-                </Form.Item>
-              </div>
-            </Col>
-
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="testerRevert" label="revert后是否已验证：">
-                  <Select placeholder="请选择" style={{width: '140px'}}>
-                    {[
-                      <Option key={'closed'} value={'closed'}>
-                        {' '}
-                      </Option>,
-                      <Option key={'doing'} value={'doing'}>
-                        是{' '}
-                      </Option>,
-                      <Option key={'wait'} value={'wait'}>
-                        否{' '}
-                      </Option>,
-                    ]}
                   </Select>
                 </Form.Item>
               </div>
@@ -1927,17 +1884,11 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="uedChandaoType" label="禅道类型：">
-                  <Select placeholder="请选择" style={widths}>
+                  <Select placeholder="请选择" style={widths} disabled={true}>
                     {[
-                      <Option key={'closed'} value={'closed'}>
-                        bug{' '}
-                      </Option>,
-                      <Option key={'doing'} value={'doing'}>
-                        需求{' '}
-                      </Option>,
-                      <Option key={'wait'} value={'wait'}>
-                        task{' '}
-                      </Option>,
+                      <Option value={'1'}> Bug </Option>,
+                      <Option value={'3'}> 需求 </Option>,
+                      <Option value={'2'}> Task </Option>,
                     ]}
                   </Select>
                 </Form.Item>
@@ -1947,7 +1898,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={{marginLeft: '50px'}}>
                 <Form.Item name="uedCHandaoID" label="禅道编号:">
-                  <Input placeholder="请输入" style={widths}/>
+                  <Input placeholder="请输入" style={widths} disabled={true}/>
                 </Form.Item>
               </div>
             </Col>
@@ -1967,14 +1918,7 @@ const SprintList: React.FC<any> = () => {
               <div style={leftStyle}>
                 <Form.Item name="uedForUED" label="对应UED：">
                   <Select placeholder="请选择" style={widths}>
-                    {[
-                      <Option key={'closed'} value={'closed'}>
-                        UED1{' '}
-                      </Option>,
-                      <Option key={'doing'} value={'doing'}>
-                        UED2{' '}
-                      </Option>,
-                    ]}
+                    {GetDeptMemner('UED')}
                   </Select>
                 </Form.Item>
               </div>
@@ -2024,7 +1968,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={{marginLeft: '50px'}}>
                 <Form.Item name="uedSource" label="来 源:">
-                  <Select placeholder="请选择" style={widths}>
+                  <Select placeholder="请选择" style={widths} disabled={true}>
                     {[
                       <Option key={'1'} value={'1'}>
                         《产品hotfix申请》{' '}

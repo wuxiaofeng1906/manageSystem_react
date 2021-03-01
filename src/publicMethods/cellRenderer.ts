@@ -73,7 +73,7 @@ const numberRenderToCurrentStage = (params: any) => {
 };
 
 const numberRenderToZentaoType = (params: any) => {
-  // BUG = 1,
+   // BUG = 1,
   // TASK = 2,
   // STORY = 3,
   let type = "";
@@ -119,31 +119,41 @@ const numberRenderToZentaoSeverity = (params: any) => {
 };
 
 const numberRenderToZentaoStatus = (params: any) => {
-  // WAIT = 1,
-  // DOING,
-  // DONE,
-  // PAUSE,
-  // CANCEL,
-  // CLOSED,
+
   let status = "";
   switch (params.value) {
-    case "1":
+    case "active":
+      status = "激活";
+      break;
+    case "closed":
+      status = "已关闭";
+      break;
+    case "verified":
+      status = " 已验证";
+      break;
+    case "resolved":
+      status = "已解决";
+      break;
+    case "wait":
       status = "未开始";
       break;
-    case "2":
+    case "doing":
       status = "进行中";
       break;
-    case "3":
+    case "done":
       status = "已完成";
       break;
-    case "4":
+    case "pause":
       status = "已暂停";
       break;
-    case "5":
+    case "cancel":
       status = "已取消";
       break;
-    case "6":
-      status = "已关闭";
+    case "changed":
+      status = "已更改";
+      break;
+    case "draft":
+      status = "已草拟";
       break;
     default:
       break;

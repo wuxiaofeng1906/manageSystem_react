@@ -7,7 +7,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient, useQuery} from '@/hooks';
-import {Button, message, Form, Select, Modal, Input, Row, Col} from 'antd';
+import {Button, message, Form, Select, Modal, Input, Row, Col, DatePicker} from 'antd';
 import {
   FolderAddTwoTone,
   SnippetsTwoTone,
@@ -28,6 +28,7 @@ import {
   linkToZentaoPage,
 } from '@/publicMethods/cellRenderer';
 import axios from 'axios';
+import moment from "moment";
 
 const {Option} = Select;
 
@@ -256,6 +257,36 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   return data?.proDetail;
 };
 
+// 查询是否有重复数据
+const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
+  const {data} = await client.query(`
+      {
+        proExist(name:"${prjName}"){
+          ok
+          data{
+            id
+            name
+            type
+            startAt
+            testEnd
+            testFinish
+            expStage
+            expOnline
+            creator
+            status
+            createAt
+            ztId
+          }
+          code
+          message
+        }
+      }
+  `);
+
+  console.log('data', data);
+  return data?.proExist;
+};
+
 // 组件初始化
 const SprintList: React.FC<any> = () => {
   /* 获取网页的项目id */
@@ -278,9 +309,11 @@ const SprintList: React.FC<any> = () => {
   const [formForUEDToMod] = Form.useForm();
   // 删除提醒表单
   const [formForDel] = Form.useForm();
-
   // 移动提醒表单
   const [formForMove] = Form.useForm();
+  // 移动新增项目
+  const [formForMoveAddAnaMod] = Form.useForm();
+
 
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
@@ -339,7 +372,6 @@ const SprintList: React.FC<any> = () => {
     }
     return deptMan;
   };
-
   const GetSprintProject = () => {
     const projectArray = [];
 
@@ -994,7 +1026,8 @@ const SprintList: React.FC<any> = () => {
 
   /* region 移动功能 */
   const [isMoveModalVisible, setIsMoveModalVisible] = useState(false);
-
+  const [isMoveAddModalVisible, setIsMoveAddModalVisible] = useState(false);
+  const [isAble, setisAble] = useState({shown: false});
 
   const moveProject = () => {
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
@@ -1023,7 +1056,7 @@ const SprintList: React.FC<any> = () => {
     // 获取被选择明细项
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
     for (let index = 0; index < selRows.length; index += 1) {
-
+      console.log("111");
     }
     const oradata = formForMove.getFieldsValue();
 
@@ -1065,7 +1098,120 @@ const SprintList: React.FC<any> = () => {
 
   };
 
+  const addPrjCancel = () => {
+    setIsMoveAddModalVisible(false);
+  };
+
   const addNewProject = () => {
+    const currentDate = moment(new Date()).add('year', 0);
+    formForMoveAddAnaMod.setFieldsValue({
+      prjNames: null,
+      prjDate: moment(currentDate, 'YYYY-MM-DD'),
+      starttime: moment(currentDate, 'YYYY-MM-DD'),
+      testCutoff: moment(currentDate, 'YYYY-MM-DD'),
+      testFinnished: moment(currentDate, 'YYYY-MM-DD'),
+      planOnline: moment(currentDate, 'YYYY-MM-DD'),
+      planHuidu: moment(currentDate, 'YYYY-MM-DD'),
+      prjStatus: null,
+    });
+
+    // 赋值给控件
+    setIsMoveAddModalVisible(true);
+  };
+
+  const formTimeSelected = async () => {
+    const values = formForMoveAddAnaMod.getFieldsValue();
+    const prjName = `${values.prjNames}${values.prjDate.format('YYYYMMDD')}`;
+    const datas: any = await queryRepeats(gqlClient, prjName);
+    // 时间选择后禁用某些控件
+    if (datas.ok === true) {
+      // 可以新增项目
+      setisAble({shown: false});
+      formForMoveAddAnaMod.setFieldsValue({
+        prjLable: '',
+      });
+    } else {
+      setisAble({shown: true});
+      formForMoveAddAnaMod.setFieldsValue({
+        prjLable: '重复项目',
+        // prjStatus: data.data.status  // data 可能没有数据
+      });
+    }
+  };
+
+  const commitAddProject = async () => {
+    const values = formForMoveAddAnaMod.getFieldsValue();
+    const prjtype = values.prjNames;
+    if (prjtype === null) {
+      message.error({
+        content: '项目类型不能为空!',
+        className: 'AddNone',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+
+    if (values.prjStatus === null) {
+      message.error({
+        content: '项目状态不能为空!',
+        className: 'AddNone',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+
+    const prjdate = values.prjDate.format('YYYYMMDD');
+    const datas = {
+      name: `${prjtype}${prjdate}`,
+      type: 'MANUAL',
+      startAt: values.starttime.format('YYYY-MM-DD'),
+      endAt: values.testCutoff.format('YYYY-MM-DD'),
+      finishAt: values.testFinnished.format('YYYY-MM-DD'),
+      stageAt: values.planHuidu.format('YYYY-MM-DD'),
+      onlineAt: values.planOnline.format('YYYY-MM-DD'),
+      status: values.prjStatus,
+      creator: 'admin',
+    };
+    axios
+      .post('/api/sprint/project', datas)
+      .then(function (res) {
+        if (res.data.ok === true) {
+          setIsMoveModalVisible(false);
+          setIsMoveAddModalVisible(false);
+          // updateGrid();
+          message.info({
+            content: res.data.message,
+            className: 'AddSuccess',
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+          message.error({
+            content: `${res.data.message}${res.data.zt.message.end[0]}`,
+            className: 'AddNone',
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+      })
+      .catch(function (error) {
+        // console.log("error", error);
+        message.error({
+          content: error.toString(),
+          className: 'AddError',
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      });
 
   };
 
@@ -1179,6 +1325,7 @@ const SprintList: React.FC<any> = () => {
   /* endregion */
 
   const leftStyle = {marginLeft: '20px'};
+  const rightStyle = {marginLeft: '30px'};
   const widths = {width: '200px', color: 'black'};
 
   return (
@@ -2159,7 +2306,8 @@ const SprintList: React.FC<any> = () => {
             <Form.Item label="新项目名称:">
               <Input.Group compact>
                 <Form.Item name="moveNewPrj">
-                  <Select placeholder="请选择" style={widths} showSearch optionFilterProp="children">
+                  <Select placeholder="请选择" style={widths} showSearch optionFilterProp="children"
+                          onInputKeyDown={GetSprintProject}>
                     {GetSprintProject()}
                   </Select>
                 </Form.Item>
@@ -2178,6 +2326,146 @@ const SprintList: React.FC<any> = () => {
               确定
             </Button>
             <Button type="primary" style={{marginLeft: '20px'}} onClick={moveCancel}>
+              取消
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+
+      {/* 新增项目 */}
+      <Modal
+        title="新增项目"
+        visible={isMoveAddModalVisible}
+        onCancel={addPrjCancel}
+        centered={true}
+        footer={null}
+        width={700}
+      >
+        <Form form={formForMoveAddAnaMod}>
+          <Row gutter={16} style={{marginBottom: '-20px'}}>
+            <Col className="gutter-row">
+              <div style={rightStyle}>
+                <Form.Item label="项目名称：">
+                  <Input.Group compact>
+                    <Form.Item name="prjNames">
+                      <Select id={'prjNames'} placeholder="请选择类型" style={{width: '150px'}}>
+                        {' '}
+                        {[
+                          <Option key={'sprint'} value={'sprint'}>
+                            sprint{' '}
+                          </Option>,
+                          <Option key={'hotfix'} value={'hotfix'}>
+                            hotfix{' '}
+                          </Option>,
+                          <Option key={'emergency'} value={'emergency'}>
+                            emergency{' '}
+                          </Option>,
+                        ]}
+                      </Select>
+                    </Form.Item>
+
+                    <Form.Item name="prjDate">
+                      <DatePicker onChange={formTimeSelected}/>
+                    </Form.Item>
+                    <Form.Item name="prjLable">
+                      <input
+                        style={{
+                          marginLeft: '10px',
+                          color: 'red',
+                          border: 'none',
+                          backgroundColor: 'transparent',
+                        }}
+                        disabled={true}
+                      />
+                    </Form.Item>
+                    <Form.Item name="prjId">
+                      <label style={{display: 'none'}}></label>
+                    </Form.Item>
+                  </Input.Group>
+                </Form.Item>
+              </div>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col className="gutter-row">
+              <div style={rightStyle}>
+                <Form.Item name="starttime" label="开始时间">
+                  <DatePicker style={widths} allowClear={false}/>
+                </Form.Item>
+              </div>
+            </Col>
+
+            <Col className="gutter-row">
+              <div style={leftStyle}>
+                <Form.Item name="testCutoff" label="提测截止">
+                  <DatePicker style={widths} allowClear={false}/>
+                </Form.Item>
+              </div>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col className="gutter-row">
+              <div style={rightStyle}>
+                <Form.Item name="testFinnished" label="测试完成：">
+                  <DatePicker style={widths} allowClear={false}/>
+                </Form.Item>
+              </div>
+            </Col>
+
+            <Col className="gutter-row">
+              <div style={leftStyle}>
+                <Form.Item name="planHuidu" label="计划灰度：">
+                  <DatePicker style={widths} allowClear={false}/>
+                </Form.Item>
+              </div>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col className="gutter-row">
+              <div style={rightStyle}>
+                <Form.Item name="planOnline" label="计划上线：">
+                  <DatePicker style={widths} allowClear={false}/>
+                </Form.Item>
+              </div>
+            </Col>
+            <Col className="gutter-row">
+              <div style={leftStyle}>
+                <Form.Item name="prjStatus" label="项目状态:">
+                  <Select placeholder="请选择" style={widths}>
+                    {[
+                      <Option key={'closed'} value={'closed'}>
+                        已关闭{' '}
+                      </Option>,
+                      <Option key={'doing'} value={'doing'}>
+                        进行中{' '}
+                      </Option>,
+                      <Option key={'suspended'} value={'suspended'}>
+                        已挂起{' '}
+                      </Option>,
+                      <Option key={'wait'} value={'wait'}>
+                        未开始{' '}
+                      </Option>,
+                    ]}
+                  </Select>
+                </Form.Item>
+              </div>
+            </Col>
+          </Row>
+
+          <Form.Item style={{marginTop: '50px'}}>
+            <Button
+              type="primary"
+              style={{marginLeft: '250px'}}
+              disabled={isAble.shown}
+              onClick={commitAddProject}
+            >
+              确定
+            </Button>
+            <Button type="primary" style={{marginLeft: '20px'}} onClick={addPrjCancel}>
               取消
             </Button>
           </Form.Item>

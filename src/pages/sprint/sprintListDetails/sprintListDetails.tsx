@@ -1053,7 +1053,6 @@ const SprintList: React.FC<any> = () => {
   };
 
   const moveSprintList = () => {
-    debugger;
     // 获取被选择明细项
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
     const idArray = [];

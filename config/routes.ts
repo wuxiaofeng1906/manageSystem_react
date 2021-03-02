@@ -99,10 +99,16 @@ export default [
       {
         name: 'sprint 项目详情',
         path: 'sprintListDetails',
-        hideInMenu:true,
+        hideInMenu: true,
         component: './sprint/sprintListDetails/sprintListDetails',
       }
     ],
+  },
+  {
+    name: 'Code Review',
+    icon: 'table',
+    path: 'codeReview',
+    component: './performance/developer/codeReview',
   },
   {
     path: '/',

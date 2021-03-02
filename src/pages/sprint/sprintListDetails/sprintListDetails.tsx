@@ -1053,15 +1053,17 @@ const SprintList: React.FC<any> = () => {
   };
 
   const moveSprintList = () => {
+    debugger;
     // 获取被选择明细项
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+    const idArray = [];
     for (let index = 0; index < selRows.length; index += 1) {
-      console.log("111");
+      idArray.push(selRows[index].id);
     }
     const oradata = formForMove.getFieldsValue();
 
     const params = {
-      "id": selRows[0].id,
+      "id": idArray,
       "source": prjId,
       "target": oradata.moveNewPrj
     };
@@ -1079,7 +1081,7 @@ const SprintList: React.FC<any> = () => {
           });
         } else {
           message.error({
-            content: `${res.data.message}`,
+            content: res.data.verify === undefined ? res.data.message : res.data.verify,
             style: {
               marginTop: '50vh',
             },

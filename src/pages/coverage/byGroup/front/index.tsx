@@ -101,6 +101,7 @@ const queryDevelopViews = async (client: GqlClient<object>) => {
   const start = `"${weekRanges[0].from}"`;
   const ends = `[${timeRange.join(",")}]`;
 
+  debugger;
   const {data} = await client.query(`
        {
         detailCover(side:FRONT,start:${start},ends:${ends}){

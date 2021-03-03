@@ -105,11 +105,27 @@ export default [
     ],
   },
   {
-    name: 'Code Review',
+    name: '绩效数据',
     icon: 'table',
-    path: 'codeReview',
-    component: './performance/developer/codeReview',
+    path: '/performance',
+    routes: [{
+      name: '开发',
+      icon: 'table',
+      path: '/performance/developer',
+      routes: [{
+        name: 'Code Review',
+        icon: 'table',
+        path: 'codeReview',
+        component: './performance/developer/codeReview',
+      },]
+    }, {
+      name: '测试',
+      icon: 'table',
+      path: '/performance/tester',
+      routes: []
+    },]
   },
+
   {
     path: '/',
     redirect: './welcomes',

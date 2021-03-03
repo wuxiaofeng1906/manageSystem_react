@@ -66,4 +66,74 @@ function getRecentMonth() {
   return range;
 }
 
-export {getWeeksRange, getMonthWeek, getRecentMonth};
+
+// 获取12个月的 开始和结束时间
+function getTwelveMonthTime() {
+  const monthArray = [];
+  for (let index = 0; index < 12; index += 1) {
+    const currentMonth = dayjs().subtract(index, 'month');
+    const from = dayjs(currentMonth).startOf('month').format('YYYY-MM-DD');
+    const to = dayjs(currentMonth).endOf('month').format('YYYY-MM-DD');
+    monthArray.push({
+      title: `${currentMonth.year()}年${currentMonth.month() + 1}月`,
+      start: from,
+      end: `${to} 23:59:59`
+    });
+  }
+
+  return monthArray;
+}
+
+
+// 获取季度 的开始和结束时间
+function getFourQuarterTime() {
+  const quarterArray = [];
+  for (let index = 0; index < 12; index += 3) {
+    const currentMonth = dayjs().subtract(index, 'month');
+    let currentQuarter = 0;
+    let from = "";
+    let to = "";
+    switch (currentMonth.format("M")) {
+      case "1":
+      case "2":
+      case "3":
+        currentQuarter = 1;
+        from = "01-01";
+        to = "03-31 23:59:59";
+        break;
+      case "4":
+      case "5":
+      case "6":
+        currentQuarter = 2;
+        from = "04-01";
+        to = "06-30 23:59:59";
+        break;
+      case "7":
+      case "8":
+      case "9":
+        currentQuarter = 3;
+        from = "07-01";
+        to = "09-30 23:59:59";
+        break;
+      case "10":
+      case "11":
+      case "12":
+        currentQuarter = 4;
+        from = "10-01";
+        to = "12-31 23:59:59";
+        break;
+
+      default:
+        break;
+    }
+    quarterArray.push({
+      title: `${currentMonth.year()}年${currentQuarter}季度`,
+      start: `${currentMonth.year()}-${from}`,
+      end: `${currentMonth.year()}-${to}`,
+    });
+  }
+
+  return quarterArray;
+}
+
+export {getWeeksRange, getMonthWeek, getRecentMonth, getTwelveMonthTime, getFourQuarterTime};

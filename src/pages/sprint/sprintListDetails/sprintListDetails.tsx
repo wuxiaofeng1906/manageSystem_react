@@ -438,6 +438,9 @@ const SprintList: React.FC<any> = () => {
           const queryDatas = res.data.ztRecord;
 
           formForAdminToAddAnaMod.setFieldsValue({
+            adminCurStage: numberRenderToCurrentStage({
+              value: queryDatas.stage === null ? '' : queryDatas.stage.toString(),
+            }),
             adminAddChandaoTitle: queryDatas.title,
             adminAddSeverity: numberRenderToZentaoSeverity({
               value: queryDatas.severity === null ? '' : queryDatas.severity.toString(),
@@ -929,7 +932,7 @@ const SprintList: React.FC<any> = () => {
 
     // 判断人员权限（admin，测试，开发经理（开发）,UED）
     let currentUser = '';
-    currentUser = 'UED';
+    currentUser = 'admin';
     switch (currentUser) {
       case 'admin':
         adminModify(detailsInfo);

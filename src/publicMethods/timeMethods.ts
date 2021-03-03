@@ -1,7 +1,7 @@
 import * as dayjs from 'dayjs'; // 使用dayjs
 import moment from 'moment'; // 使用moment
 
-function formatDayjsTime(time: any) {
+function formatMomentTime(time: any) {
   return time === null ? null : moment(time, "YYYY-MM-DD");
 }
 
@@ -141,4 +141,4 @@ function getFourQuarterTime() {
   return quarterArray;
 }
 
-export {getWeeksRange, getMonthWeek, getRecentMonth, getTwelveMonthTime, getFourQuarterTime, formatDayjsTime};
+export {getWeeksRange, getMonthWeek, getRecentMonth, getTwelveMonthTime, getFourQuarterTime, formatMomentTime};

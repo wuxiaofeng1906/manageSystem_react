@@ -8,6 +8,7 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient, useQuery} from '@/hooks';
 import {Button, message, Form, Select, Modal, Input, Row, Col, DatePicker} from 'antd';
+import {formatMomentTime} from '@/publicMethods/timeMethods';
 import {
   FolderAddTwoTone,
   SnippetsTwoTone,
@@ -1110,12 +1111,12 @@ const SprintList: React.FC<any> = () => {
     const currentDate = moment(new Date()).add('year', 0);
     formForMoveAddAnaMod.setFieldsValue({
       prjNames: null,
-      prjDate: moment(currentDate, 'YYYY-MM-DD'),
-      starttime: moment(currentDate, 'YYYY-MM-DD'),
-      testCutoff: moment(currentDate, 'YYYY-MM-DD'),
-      testFinnished: moment(currentDate, 'YYYY-MM-DD'),
-      planOnline: moment(currentDate, 'YYYY-MM-DD'),
-      planHuidu: moment(currentDate, 'YYYY-MM-DD'),
+      prjDate: formatMomentTime(currentDate),
+      starttime: formatMomentTime(currentDate),
+      testCutoff: formatMomentTime(currentDate),
+      testFinnished: formatMomentTime(currentDate),
+      planOnline: formatMomentTime(currentDate),
+      planHuidu: formatMomentTime(currentDate),
       prjStatus: null,
     });
 
@@ -1174,11 +1175,11 @@ const SprintList: React.FC<any> = () => {
     const datas = {
       name: `${prjtype}${prjdate}`,
       type: 'MANUAL',
-      startAt: values.starttime.format('YYYY-MM-DD'),
-      endAt: values.testCutoff.format('YYYY-MM-DD'),
-      finishAt: values.testFinnished.format('YYYY-MM-DD'),
-      stageAt: values.planHuidu.format('YYYY-MM-DD'),
-      onlineAt: values.planOnline.format('YYYY-MM-DD'),
+      startAt: formatMomentTime(values.starttime),
+      endAt: formatMomentTime(values.testCutoff),
+      finishAt: formatMomentTime(values.testFinnished),
+      stageAt: formatMomentTime(values.planHuidu),
+      onlineAt: formatMomentTime(values.planOnline),
       status: values.prjStatus,
       creator: 'admin',
     };

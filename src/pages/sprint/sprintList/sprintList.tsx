@@ -10,7 +10,7 @@ import {GqlClient, useGqlClient} from '@/hooks';
 import moment from 'moment';
 import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col} from 'antd';
 import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone} from '@ant-design/icons';
-import {getRecentMonth, formatDayjsTime} from '@/publicMethods/timeMethods';
+import {getRecentMonth, formatMomentTime} from '@/publicMethods/timeMethods';
 import axios from 'axios';
 import {history} from 'umi';
 
@@ -249,8 +249,8 @@ const SprintList: React.FC<any> = () => {
   // 时间选择事件
   const onTimeSelected = async (params: any) => {
     queryCondition.dateRange = {
-      start: formatDayjsTime(params[0]),
-      end: formatDayjsTime(params[1]),
+      start: formatMomentTime(params[0]),
+      end: formatMomentTime(params[1]),
     };
     updateGrid();
 
@@ -293,12 +293,12 @@ const SprintList: React.FC<any> = () => {
     formForAddAnaMod.setFieldsValue({
       prjLable: '',
       prjNames: null,
-      prjDate: formatDayjsTime(currentDate),
-      starttime: formatDayjsTime(currentDate),
-      testCutoff: formatDayjsTime(currentDate),
-      testFinnished: formatDayjsTime(currentDate),
-      planOnline: formatDayjsTime(currentDate),
-      planHuidu: formatDayjsTime(currentDate),
+      prjDate: formatMomentTime(currentDate),
+      starttime: formatMomentTime(currentDate),
+      testCutoff: formatMomentTime(currentDate),
+      testFinnished: formatMomentTime(currentDate),
+      planOnline: formatMomentTime(currentDate),
+      planHuidu: formatMomentTime(currentDate),
       prjStatus: null,
     });
 
@@ -381,12 +381,12 @@ const SprintList: React.FC<any> = () => {
     formForAddAnaMod.setFieldsValue({
       prjLable: '',
       prjNames: projectType,
-      prjDate: formatDayjsTime(prjTime),
-      starttime: formatDayjsTime(detailsInfo.startAt),
-      testCutoff: formatDayjsTime(detailsInfo.testEnd),
-      testFinnished: formatDayjsTime(detailsInfo.testFinish),
-      planHuidu: formatDayjsTime(detailsInfo.expStage),
-      planOnline: formatDayjsTime(detailsInfo.expOnline),
+      prjDate: formatMomentTime(prjTime),
+      starttime: formatMomentTime(detailsInfo.startAt),
+      testCutoff: formatMomentTime(detailsInfo.testEnd),
+      testFinnished: formatMomentTime(detailsInfo.testFinish),
+      planHuidu: formatMomentTime(detailsInfo.expStage),
+      planOnline: formatMomentTime(detailsInfo.expOnline),
       prjStatus: detailsInfo.status,
       prjId: detailsInfo.id,
     });
@@ -447,11 +447,11 @@ const SprintList: React.FC<any> = () => {
     const datas = {
       name: `${prjtype}${prjdate}`,
       type: 'MANUAL',
-      startAt: formatDayjsTime(values.starttime),
-      endAt: formatDayjsTime(values.testCutoff),
-      finishAt: formatDayjsTime(values.testFinnished),
-      stageAt: formatDayjsTime(values.planHuidu),
-      onlineAt: formatDayjsTime(values.planOnline),
+      startAt: formatMomentTime(values.starttime),
+      endAt: formatMomentTime(values.testCutoff),
+      finishAt: formatMomentTime(values.testFinnished),
+      stageAt: formatMomentTime(values.planHuidu),
+      onlineAt: formatMomentTime(values.planOnline),
       status: values.prjStatus,
       creator: 'admin',
     };

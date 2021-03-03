@@ -1,4 +1,9 @@
 import * as dayjs from 'dayjs'; // 使用dayjs
+import moment from 'moment'; // 使用moment
+
+function formatDayjsTime(time: any) {
+  return time === null ? null : moment(time, "YYYY-MM-DD");
+}
 
 // 计算近几周的日期范围
 function getWeeksRange(weekCounts: number) {
@@ -136,4 +141,4 @@ function getFourQuarterTime() {
   return quarterArray;
 }
 
-export {getWeeksRange, getMonthWeek, getRecentMonth, getTwelveMonthTime, getFourQuarterTime};
+export {getWeeksRange, getMonthWeek, getRecentMonth, getTwelveMonthTime, getFourQuarterTime, formatDayjsTime};

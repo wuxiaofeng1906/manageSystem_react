@@ -1,21 +1,21 @@
-import React, { useRef, useState } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
-import { AgGridReact } from 'ag-grid-react';
+import React, {useRef, useState} from 'react';
+import {PageContainer} from '@ant-design/pro-layout';
+import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import { useRequest } from 'ahooks';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import { GqlClient, useGqlClient } from '@/hooks';
+import {useRequest} from 'ahooks';
+import {GridApi, GridReadyEvent} from 'ag-grid-community';
+import {GqlClient, useGqlClient} from '@/hooks';
 import moment from 'moment';
-import { Button, message, Form, DatePicker, Select, Modal, Input, Row, Col } from 'antd';
-import { FolderAddTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import { getRecentMonth } from '@/publicMethods/timeMethods';
+import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col} from 'antd';
+import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone} from '@ant-design/icons';
+import {getRecentMonth, formatDayjsTime} from '@/publicMethods/timeMethods';
 import axios from 'axios';
-import { history } from 'umi';
+import {history} from 'umi';
 
-const { RangePicker } = DatePicker;
-const { Option } = Select;
+const {RangePicker} = DatePicker;
+const {Option} = Select;
 
 // 默认条件：近一个月；未关闭的
 const queryCondition: any = {
@@ -31,7 +31,7 @@ let delCounts = 0;
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   const range = `{start:"${params.dateRange.start}", end:"${params.dateRange.end}"}`;
-  const { data } = await client.query(`
+  const {data} = await client.query(`
       {
          project(name:"${params.projectName}",category:[${params.projectType}], range:${range},status:[${params.projectStatus}]){
           id
@@ -54,7 +54,7 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
 
 // 查询是否有重复数据
 const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
-  const { data } = await client.query(`
+  const {data} = await client.query(`
       {
         proExist(name:"${prjName}"){
           ok
@@ -205,7 +205,7 @@ const SprintList: React.FC<any> = () => {
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
-  const { data, loading } = useRequest(() => queryDevelopViews(gqlClient, queryCondition));
+  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, queryCondition));
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -249,12 +249,11 @@ const SprintList: React.FC<any> = () => {
   // 时间选择事件
   const onTimeSelected = async (params: any) => {
     queryCondition.dateRange = {
-      start: moment(params[0]).format('YYYY-MM-DD'),
-      end: `${moment(params[1]).format('YYYY-MM-DD')} 23:59:59`,
+      start: formatDayjsTime(params[0]),
+      end: formatDayjsTime(params[1]),
     };
     updateGrid();
-    // const datas: any = await queryDevelopViews(gqlClient, queryCondition);
-    // gridApi.current?.setRowData(datas);
+
   };
 
   // 选择项目状态
@@ -262,8 +261,7 @@ const SprintList: React.FC<any> = () => {
     console.log(value, params);
     queryCondition.projectStatus = value;
     updateGrid();
-    // const datas: any = await queryDevelopViews(gqlClient, queryCondition);
-    // gridApi.current?.setRowData(datas);
+
   };
 
   /* endregion */
@@ -284,44 +282,50 @@ const SprintList: React.FC<any> = () => {
   /* endregion */
 
   /* region 新增功能 */
+  // 时间选择后，检查数据库有无，有的话需要禁用某些控件
+  const [isAble, setisAble] = useState({shown: false});
 
   // 添加项目
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-  const [modal, setmodal] = useState({ title: '新增项目' });
+  const [modal, setmodal] = useState({title: '新增项目'});
   const addProject = () => {
     const currentDate = moment(new Date()).add('year', 0);
     formForAddAnaMod.setFieldsValue({
+      prjLable: '',
       prjNames: null,
-      prjDate: moment(currentDate, 'YYYY-MM-DD'),
-      starttime: moment(currentDate, 'YYYY-MM-DD'),
-      testCutoff: moment(currentDate, 'YYYY-MM-DD'),
-      testFinnished: moment(currentDate, 'YYYY-MM-DD'),
-      planOnline: moment(currentDate, 'YYYY-MM-DD'),
-      planHuidu: moment(currentDate, 'YYYY-MM-DD'),
+      prjDate: formatDayjsTime(currentDate),
+      starttime: formatDayjsTime(currentDate),
+      testCutoff: formatDayjsTime(currentDate),
+      testFinnished: formatDayjsTime(currentDate),
+      planOnline: formatDayjsTime(currentDate),
+      planHuidu: formatDayjsTime(currentDate),
       prjStatus: null,
     });
 
-    setmodal({ title: '新增项目' });
+    setmodal({title: '新增项目'});
+
     // 赋值给控件
     setIsAddModalVisible(true);
-  };
+    setisAble({shown: false});
 
-  // 时间选择后，检查数据库有无，有的话需要禁用某些控件
-  const [isAble, setisAble] = useState({ shown: false });
+  };
 
   const formTimeSelected = async () => {
     const values = formForAddAnaMod.getFieldsValue();
+    if (values.prjDate === null) {
+      return;
+    }
     const prjName = `${values.prjNames}${values.prjDate.format('YYYYMMDD')}`;
     const datas: any = await queryRepeats(gqlClient, prjName);
     // 时间选择后禁用某些控件
     if (datas.ok === true) {
       // 可以新增项目
-      setisAble({ shown: false });
+      setisAble({shown: false});
       formForAddAnaMod.setFieldsValue({
         prjLable: '',
       });
     } else {
-      setisAble({ shown: true });
+      setisAble({shown: true});
       formForAddAnaMod.setFieldsValue({
         prjLable: '重复项目',
         // prjStatus: data.data.status  // data 可能没有数据
@@ -375,19 +379,22 @@ const SprintList: React.FC<any> = () => {
     prjTime = prjNames.replace(projectType, '').trim();
 
     formForAddAnaMod.setFieldsValue({
+      prjLable: '',
       prjNames: projectType,
-      prjDate: moment(prjTime, 'YYYY-MM-DD'),
-      starttime: moment(detailsInfo.startAt, 'YYYY-MM-DD'),
-      testCutoff: moment(detailsInfo.testEnd, 'YYYY-MM-DD'),
-      testFinnished: moment(detailsInfo.testFinish, 'YYYY-MM-DD'),
-      planHuidu: moment(detailsInfo.expStage, 'YYYY-MM-DD'),
-      planOnline: moment(detailsInfo.expOnline, 'YYYY-MM-DD'),
+      prjDate: formatDayjsTime(prjTime),
+      starttime: formatDayjsTime(detailsInfo.startAt),
+      testCutoff: formatDayjsTime(detailsInfo.testEnd),
+      testFinnished: formatDayjsTime(detailsInfo.testFinish),
+      planHuidu: formatDayjsTime(detailsInfo.expStage),
+      planOnline: formatDayjsTime(detailsInfo.expOnline),
       prjStatus: detailsInfo.status,
       prjId: detailsInfo.id,
     });
 
-    setmodal({ title: '修改项目' });
+    setmodal({title: '修改项目'});
     setIsAddModalVisible(true);
+    setisAble({shown: false});
+
   };
 
   /* endregion */
@@ -406,7 +413,6 @@ const SprintList: React.FC<any> = () => {
     if (prjtype === null) {
       message.error({
         content: '项目类型不能为空!',
-        className: 'AddNone',
         duration: 1,
         style: {
           marginTop: '50vh',
@@ -418,7 +424,16 @@ const SprintList: React.FC<any> = () => {
     if (values.prjStatus === null) {
       message.error({
         content: '项目状态不能为空!',
-        className: 'AddNone',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+    if (values.prjDate === null) {
+      message.error({
+        content: '项目日期不能为空!',
         duration: 1,
         style: {
           marginTop: '50vh',
@@ -427,15 +442,16 @@ const SprintList: React.FC<any> = () => {
       return;
     }
 
-    const prjdate = values.prjDate.format('YYYYMMDD');
+    const prjdate = values.prjDate === null ? "" : values.prjDate.format('YYYYMMDD');
+
     const datas = {
       name: `${prjtype}${prjdate}`,
       type: 'MANUAL',
-      startAt: values.starttime.format('YYYY-MM-DD'),
-      endAt: values.testCutoff.format('YYYY-MM-DD'),
-      finishAt: values.testFinnished.format('YYYY-MM-DD'),
-      stageAt: values.planHuidu.format('YYYY-MM-DD'),
-      onlineAt: values.planOnline.format('YYYY-MM-DD'),
+      startAt: formatDayjsTime(values.starttime),
+      endAt: formatDayjsTime(values.testCutoff),
+      finishAt: formatDayjsTime(values.testFinnished),
+      stageAt: formatDayjsTime(values.planHuidu),
+      onlineAt: formatDayjsTime(values.planOnline),
       status: values.prjStatus,
       creator: 'admin',
     };
@@ -611,23 +627,23 @@ const SprintList: React.FC<any> = () => {
   };
   /* endregion */
 
-  const rightStyle = { marginLeft: '30px' };
-  const leftStyle = { marginLeft: '120px' };
-  const widths = { width: '150px' };
+  const rightStyle = {marginLeft: '30px'};
+  const leftStyle = {marginLeft: '120px'};
+  const widths = {width: '150px'};
 
   // 返回渲染的组件
   return (
     <PageContainer>
       {/* 查询条件 */}
-      <div style={{ width: '100%', overflow: 'auto', whiteSpace: 'nowrap' }}>
+      <div style={{width: '100%', overflow: 'auto', whiteSpace: 'nowrap'}}>
         {/* <button onClick={testTiaozhaun}>跳转测试</button> */}
 
         {/* <div><Link to="/sprint/sprintListDetails">跳转测试</Link></div> */}
         <Form.Item name="prjName">
-          <label style={{ marginLeft: '10px' }}>项目名称：</label>
+          <label style={{marginLeft: '10px'}}>项目名称：</label>
           <Input
             placeholder="请输入"
-            style={{ width: '18%' }}
+            style={{width: '18%'}}
             allowClear={true}
             onChange={projectChanged}
           />
@@ -637,11 +653,11 @@ const SprintList: React.FC<any> = () => {
           {/* ]} */}
           {/* </Select> */}
 
-          <label style={{ marginLeft: '10px' }}>项目类型：</label>
+          <label style={{marginLeft: '10px'}}>项目类型：</label>
           <Select
             placeholder="请选择"
             mode="tags"
-            style={{ width: '18%' }}
+            style={{width: '18%'}}
             onChange={prjTypeChanged}
           >
             {' '}
@@ -658,19 +674,19 @@ const SprintList: React.FC<any> = () => {
             ]}
           </Select>
 
-          <label style={{ marginLeft: '10px' }}>时间：</label>
+          <label style={{marginLeft: '10px'}}>时间：</label>
           <RangePicker
             className={'times'}
-            style={{ width: '18%' }}
+            style={{width: '18%'}}
             defaultValue={[moment(getRecentMonth().start), moment()]}
             onChange={onTimeSelected}
           />
 
-          <label style={{ marginLeft: '10px' }}>项目状态：</label>
+          <label style={{marginLeft: '10px'}}>项目状态：</label>
           <Select
             placeholder="请选择"
             mode="tags"
-            style={{ width: '18%' }}
+            style={{width: '18%'}}
             onChange={prjStatusChanged}
             defaultValue={['doing', 'suspended', 'wait']}
           >
@@ -693,19 +709,19 @@ const SprintList: React.FC<any> = () => {
       </div>
 
       {/* 新增、修改、删除按钮栏 */}
-      <div style={{ background: 'white' }}>
+      <div style={{background: 'white'}}>
         {' '}
         {/* 使用一个图标就要导入一个图标 */}
-        <Button type="text" style={{ color: 'black' }} size={'large'} onClick={showDefalultValue}>
+        <Button type="text" style={{color: 'black'}} size={'large'} onClick={showDefalultValue}>
           {' '}
           默认：
         </Button>
-        <label style={{ color: 'black' }}> 近1月未关闭的</label>
+        <label style={{color: 'black'}}> 近1月未关闭的</label>
         {/* <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}> 近1月未关闭的 </Button> */}
         <Button
           type="text"
-          style={{ color: 'black', float: 'right' }}
-          icon={<DeleteTwoTone />}
+          style={{color: 'black', float: 'right'}}
+          icon={<DeleteTwoTone/>}
           size={'large'}
           onClick={deleteSprintList}
         >
@@ -713,8 +729,8 @@ const SprintList: React.FC<any> = () => {
         </Button>
         <Button
           type="text"
-          style={{ color: 'black', float: 'right' }}
-          icon={<EditTwoTone />}
+          style={{color: 'black', float: 'right'}}
+          icon={<EditTwoTone/>}
           size={'large'}
           onClick={modifyProject}
         >
@@ -723,8 +739,8 @@ const SprintList: React.FC<any> = () => {
         </Button>
         <Button
           type="text"
-          style={{ color: 'black', float: 'right' }}
-          icon={<FolderAddTwoTone />}
+          style={{color: 'black', float: 'right'}}
+          icon={<FolderAddTwoTone/>}
           size={'large'}
           onClick={addProject}
         >
@@ -734,7 +750,7 @@ const SprintList: React.FC<any> = () => {
       </div>
 
       {/* ag-grid 表格定义 */}
-      <div className="ag-theme-alpine" style={{ height: 1000, width: '100%' }}>
+      <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
         <AgGridReact
           columnDefs={colums()} // 定义列
           rowData={data} // 数据绑定
@@ -767,13 +783,13 @@ const SprintList: React.FC<any> = () => {
         width={700}
       >
         <Form form={formForAddAnaMod}>
-          <Row gutter={16} style={{ marginBottom: '-20px' }}>
+          <Row gutter={16} style={{marginBottom: '-20px'}}>
             <Col className="gutter-row">
               <div style={rightStyle}>
                 <Form.Item label="项目名称：">
                   <Input.Group compact>
                     <Form.Item name="prjNames">
-                      <Select id={'prjNames'} placeholder="请选择类型" style={{ width: '150px' }}>
+                      <Select id={'prjNames'} placeholder="请选择类型" style={{width: '150px'}}>
                         {' '}
                         {[
                           <Option key={'sprint'} value={'sprint'}>
@@ -790,7 +806,7 @@ const SprintList: React.FC<any> = () => {
                     </Form.Item>
 
                     <Form.Item name="prjDate">
-                      <DatePicker onChange={formTimeSelected} />
+                      <DatePicker onChange={formTimeSelected}/>
                     </Form.Item>
                     <Form.Item name="prjLable">
                       <input
@@ -804,7 +820,7 @@ const SprintList: React.FC<any> = () => {
                       />
                     </Form.Item>
                     <Form.Item name="prjId">
-                      <label style={{ display: 'none' }}></label>
+                      <label style={{display: 'none'}}></label>
                     </Form.Item>
                   </Input.Group>
                 </Form.Item>
@@ -816,7 +832,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={rightStyle}>
                 <Form.Item name="starttime" label="开始时间">
-                  <DatePicker style={widths} allowClear={false} />
+                  <DatePicker style={widths} allowClear={false}/>
                 </Form.Item>
               </div>
             </Col>
@@ -824,7 +840,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="testCutoff" label="提测截止">
-                  <DatePicker style={widths} allowClear={false} />
+                  <DatePicker style={widths} allowClear={false}/>
                 </Form.Item>
               </div>
             </Col>
@@ -834,7 +850,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={rightStyle}>
                 <Form.Item name="testFinnished" label="测试完成：">
-                  <DatePicker style={widths} allowClear={false} />
+                  <DatePicker style={widths} allowClear={false}/>
                 </Form.Item>
               </div>
             </Col>
@@ -842,7 +858,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="planHuidu" label="计划灰度：">
-                  <DatePicker style={widths} allowClear={false} />
+                  <DatePicker style={widths} allowClear={false}/>
                 </Form.Item>
               </div>
             </Col>
@@ -852,7 +868,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={rightStyle}>
                 <Form.Item name="planOnline" label="计划上线：">
-                  <DatePicker style={widths} allowClear={false} />
+                  <DatePicker style={widths} allowClear={false}/>
                 </Form.Item>
               </div>
             </Col>
@@ -880,16 +896,16 @@ const SprintList: React.FC<any> = () => {
             </Col>
           </Row>
 
-          <Form.Item style={{ marginTop: '50px' }}>
+          <Form.Item style={{marginTop: '50px'}}>
             <Button
               type="primary"
-              style={{ marginLeft: '250px' }}
+              style={{marginLeft: '250px'}}
               disabled={isAble.shown}
               onClick={commitSprint}
             >
               确定
             </Button>
-            <Button type="primary" style={{ marginLeft: '20px' }} onClick={handleCancel}>
+            <Button type="primary" style={{marginLeft: '20px'}} onClick={handleCancel}>
               取消
             </Button>
           </Form.Item>
@@ -906,16 +922,16 @@ const SprintList: React.FC<any> = () => {
       >
         <Form form={formForDel}>
           <Form.Item>
-            <label style={{ marginLeft: '20px' }}>
+            <label style={{marginLeft: '20px'}}>
               此项目包含【{delCounts}】条数据，请确认是否删除？
             </label>
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" style={{ marginLeft: '150px' }} onClick={delSprintList}>
+            <Button type="primary" style={{marginLeft: '150px'}} onClick={delSprintList}>
               确定
             </Button>
-            <Button type="primary" style={{ marginLeft: '20px' }} onClick={DelCancel}>
+            <Button type="primary" style={{marginLeft: '20px'}} onClick={DelCancel}>
               取消
             </Button>
           </Form.Item>

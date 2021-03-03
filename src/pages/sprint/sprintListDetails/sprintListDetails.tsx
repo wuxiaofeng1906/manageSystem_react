@@ -2310,8 +2310,7 @@ const SprintList: React.FC<any> = () => {
             <Form.Item label="新项目名称:">
               <Input.Group compact>
                 <Form.Item name="moveNewPrj">
-                  <Select placeholder="请选择" style={widths} showSearch optionFilterProp="children"
-                          onInputKeyDown={GetSprintProject}>
+                  <Select placeholder="请选择" style={widths} showSearch optionFilterProp="children">
                     {GetSprintProject()}
                   </Select>
                 </Form.Item>

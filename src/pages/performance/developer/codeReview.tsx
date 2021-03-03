@@ -9,7 +9,7 @@ import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import {getWeeksRange, getMonthWeek, getTwelveMonthTime, getFourQuarterTime} from '@/publicMethods/timeMethods';
 import {Button} from "antd";
-import {FolderAddTwoTone,} from "@ant-design/icons";
+import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone} from "@ant-design/icons";
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(8);
@@ -101,48 +101,25 @@ const columsForQuarters = () => {
   return compColums.concat(component);
 };
 
-const queryDevelopViews = async (client: GqlClient<object>) => {
-
-  const timeRange = new Array();
-  for (let index = 0; index < weekRanges.length; index += 1) {
-    timeRange.push(`"${weekRanges[index].to}"`);
+const queryCodeReviewCount = async (client: GqlClient<object>, params: string) => {
+  if (params === 'week') {
+    console.log("按周");
+  } else if (params === 'month') {
+    console.log("按月");
+  } else if (params === 'quarter') {
+    console.log("按季度");
+  } else {
+    return [];
   }
-  // 求出开始时间和结束时间
-  const start = `"${weekRanges[0].from}"`;
-  const ends = `[${timeRange.join(",")}]`;
 
   const {data} = await client.query(`
-       {
-        detailCover(side:FRONT,start:${start},ends:${ends}){
-          datas{
-            id
-            side
-            name
-            parent{
-            name
-            instCove
-            branCove
-            }
-            instCove
-            branCove
-            order{
-              start
-              end
-            }
-            users{
-              name
-              instCove
-              branCove
-            }
-          }
-        }
+      {
 
       }
-    `);
-
-  console.log(data);
-  return [];
+  `);
+  return data;
 };
+
 
 const CodeReviewTableList: React.FC<any> = () => {
 
@@ -150,7 +127,7 @@ const CodeReviewTableList: React.FC<any> = () => {
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
-    queryDevelopViews(gqlClient),
+    queryCodeReviewCount(gqlClient, 'week'),
   );
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -164,39 +141,42 @@ const CodeReviewTableList: React.FC<any> = () => {
   /* endregion */
 
   // 按周统计
-  const statisticsByWeeks = () => {
+  const statisticsByWeeks = async () => {
     /* 八周 */
     const weekColums = columsForWeeks();
     gridApi.current?.setColumnDefs(weekColums);
-    gridApi.current?.setRowData([]);
+    // const datas: any = await queryCodeReviewCount(gqlClient, 'week');
+    //gridApi.current?.setRowData(datas);
 
   };
 
   // 按月统计
-  const statisticsByMonths = () => {
+  const statisticsByMonths = async () => {
     /* 12月 */
     const monthColums = columsForMonths();
     gridApi.current?.setColumnDefs(monthColums);
-    gridApi.current?.setRowData([]);
+    //   const datas: any = await queryCodeReviewCount(gqlClient, 'month');
+    // gridApi.current?.setRowData(datas);
 
   };
 
   // 按季度统计
-  const statisticsByQuarters = () => {
+  const statisticsByQuarters = async () => {
     /* 4季 */
     const quartersColums = columsForQuarters();
     gridApi.current?.setColumnDefs(quartersColums);
-    gridApi.current?.setRowData([]);
+    // const datas: any = await queryCodeReviewCount(gqlClient, 'quarter');
+    // gridApi.current?.setRowData(datas);
   };
 
   return (
     <PageContainer>
       <div style={{background: 'white'}}>
-        <Button type="text" style={{color: 'black'}} icon={<FolderAddTwoTone/>} size={'large'}
+        <Button type="text" style={{color: 'black'}} icon={<ProfileTwoTone/>} size={'large'}
                 onClick={statisticsByWeeks}>按周统计</Button>
-        <Button type="text" style={{color: 'black'}} icon={<FolderAddTwoTone/>} size={'large'}
+        <Button type="text" style={{color: 'black'}} icon={<CalendarTwoTone/>} size={'large'}
                 onClick={statisticsByMonths}>按月统计</Button>
-        <Button type="text" style={{color: 'black'}} icon={<FolderAddTwoTone/>} size={'large'}
+        <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
       </div>
 

@@ -13,50 +13,92 @@ import {FolderAddTwoTone,} from "@ant-design/icons";
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(8);
+const monthRanges = getTwelveMonthTime();
+const quarterTime = getFourQuarterTime();
 
-const colums = () => {
+const compColums = [{
+  headerName: '所属部门',
+  field: 'dept',
+  rowGroup: true,
+  hide: true,
+}, {
+  headerName: '组名',
+  field: 'group',
+  rowGroup: true,
+  hide: true,
+
+}, {
+  headerName: '姓名',
+  field: 'username',
+},];
+
+
+const columsForWeeks = () => {
   const component = new Array();
-  component.push(
-    {
-      headerName: '所属部门',
-      field: 'dept',
-      rowGroup: true,
-      hide: true,
-    },
-    {
-      headerName: '组名',
-      field: 'group',
-      rowGroup: true,
-      hide: true,
-
-    },
-    {
-      headerName: '姓名',
-      field: 'username',
-    },
-  );
-
   for (let index = weekRanges.length - 1; index >= 0; index -= 1) {
     const starttime = weekRanges[index].from;
     const weekName = getMonthWeek(starttime);
     const endtime = weekRanges[index].to;
-
     component.push({
       headerName: weekName,
-      children: [
-        {
-          headerName: '结构覆盖率',
-          field: `instCove${endtime.toString()}`,
-
-        },
-        {
-          headerName: '分支覆盖率',
-          field: `branCove${endtime.toString()}`,
-        },
-      ],
+      field: `instCove${endtime.toString()}`,
     });
+
+
+    // component.push({
+    //   headerName: weekName,
+    //   children: [
+    //     {
+    //       headerName: 'review个数',
+    //       field: `instCove${endtime.toString()}`,
+    //     },
+    //   ],
+    // });
   }
-  return component;
+  return compColums.concat(component);
+};
+
+const columsForMonths = () => {
+  const component = new Array();
+  for (let index = 0; index < monthRanges.length; index += 1) {
+    component.push({
+      headerName: monthRanges[index].title,
+      field: monthRanges[index].title,
+    });
+
+    // component.push({
+    //   headerName: monthRanges[index].title,
+    //   children: [
+    //     {
+    //       headerName: 'review个数',
+    //       field: monthRanges[index].title,
+    //     },
+    //   ],
+    // });
+  }
+  return compColums.concat(component);
+};
+
+const columsForQuarters = () => {
+  const component = new Array();
+  for (let index = 0; index < quarterTime.length; index += 1) {
+    component.push({
+      headerName: quarterTime[index].title,
+      field: quarterTime[index].title,
+
+    });
+
+    // component.push({
+    //   headerName: quarterTime[index].title,
+    //   children: [
+    //     {
+    //       headerName: 'review个数',
+    //       field: quarterTime[index].title,
+    //     },
+    //   ],
+    // });
+  }
+  return compColums.concat(component);
 };
 
 const queryDevelopViews = async (client: GqlClient<object>) => {
@@ -102,7 +144,6 @@ const queryDevelopViews = async (client: GqlClient<object>) => {
   return [];
 };
 
-
 const CodeReviewTableList: React.FC<any> = () => {
 
   /* region ag-grid */
@@ -122,24 +163,30 @@ const CodeReviewTableList: React.FC<any> = () => {
 
   /* endregion */
 
-  const monthRange = getTwelveMonthTime();
-
-  const quarterTime = getFourQuarterTime();
   // 按周统计
   const statisticsByWeeks = () => {
     /* 八周 */
+    const weekColums = columsForWeeks();
+    gridApi.current?.setColumnDefs(weekColums);
+    gridApi.current?.setRowData([]);
 
   };
-
 
   // 按月统计
   const statisticsByMonths = () => {
     /* 12月 */
+    const monthColums = columsForMonths();
+    gridApi.current?.setColumnDefs(monthColums);
+    gridApi.current?.setRowData([]);
+
   };
 
   // 按季度统计
   const statisticsByQuarters = () => {
     /* 4季 */
+    const quartersColums = columsForQuarters();
+    gridApi.current?.setColumnDefs(quartersColums);
+    gridApi.current?.setRowData([]);
   };
 
   return (
@@ -155,7 +202,7 @@ const CodeReviewTableList: React.FC<any> = () => {
 
       <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
         <AgGridReact
-          columnDefs={colums()} // 定义列
+          columnDefs={columsForWeeks()} // 定义列
           rowData={data} // 数据绑定
           defaultColDef={{
             resizable: true,

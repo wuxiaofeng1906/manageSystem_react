@@ -51,36 +51,7 @@ export default [
   //   path: '/users/list',
   //   component: './dashboard/developer',
   // },
-  {
-    name: '单元测试覆盖率',
-    icon: 'table',
-    path: '/coverage',
-    routes: [
-      {
-        name: '按分支',
-        icon: 'table',
-        path: 'byBranch',
-        component: './coverage/byBranch',
-      },
-      {
-        name: '按组',
-        icon: 'table',
-        path: 'byGroup',
-        routes: [
-          {
-            name: '前端',
-            path: 'front',
-            component: './coverage/byGroup/front',
-          },
-          {
-            name: '后端',
-            path: 'backend',
-            component: './coverage/byGroup/backend',
-          },
-        ],
-      },
-    ],
-  },
+
   {
     name: 'sprint 工作台',
     icon: 'table',
@@ -113,11 +84,41 @@ export default [
       icon: 'table',
       path: '/performance/developer',
       routes: [{
-        name: 'Code Review',
+        name: '单元测试覆盖率',
         icon: 'table',
-        path: 'codeReview',
-        component: './performance/developer/codeReview',
-      },]
+        path: '/performance/developer/coverage',
+        routes: [
+          {
+            name: '按分支',
+            icon: 'table',
+            path: '/performance/developer/coverage/byBranch',
+            component: './performance/developer/coverage/byBranch',
+          },
+          {
+            name: '按组',
+            icon: 'table',
+            path: '/performance/developer/coverage/byGroup',
+            routes: [
+              {
+                name: '前端',
+                path: '/performance/developer/coverage/byGroup/front',
+                component: './performance/developer/coverage/byGroup/front',
+              },
+              {
+                name: '后端',
+                path: '/performance/developer/coverage/byGroup/backend',
+                component: './performance/developer/coverage/byGroup/backend',
+              },
+            ],
+          },
+        ],
+      },
+        {
+          name: 'Code Review',
+          icon: 'table',
+          path: 'codeReview',
+          component: './performance/developer/codeReview',
+        },]
     }, {
       name: '测试',
       icon: 'table',

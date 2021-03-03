@@ -146,7 +146,7 @@ const CodeReviewTableList: React.FC<any> = () => {
     const weekColums = columsForWeeks();
     gridApi.current?.setColumnDefs(weekColums);
     // const datas: any = await queryCodeReviewCount(gqlClient, 'week');
-    //gridApi.current?.setRowData(datas);
+    // gridApi.current?.setRowData(datas);
 
   };
 

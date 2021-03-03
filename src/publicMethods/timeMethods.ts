@@ -79,8 +79,14 @@ function getTwelveMonthTime() {
     const currentMonth = dayjs().subtract(index, 'month');
     const from = dayjs(currentMonth).startOf('month').format('YYYY-MM-DD');
     const to = dayjs(currentMonth).endOf('month').format('YYYY-MM-DD');
+    let month = "";
+    if (currentMonth.month() + 1 > 9) {
+      month = (currentMonth.month() + 1).toString();
+    } else {
+      month = `0${currentMonth.month() + 1}`;
+    }
     monthArray.push({
-      title: `${currentMonth.year()}年${currentMonth.month() + 1}月`,
+      title: `${currentMonth.year()}年${month}月`,
       start: from,
       end: `${to} 23:59:59`
     });

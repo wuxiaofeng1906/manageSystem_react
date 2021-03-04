@@ -118,7 +118,13 @@ export default [
           icon: 'table',
           path: 'codeReview',
           component: './performance/developer/codeReview',
-        },]
+        }, {
+          name: 'Bug解决时长',
+          icon: 'table',
+          path: 'bugResolutionTime',
+          component: './performance/developer/bugResolutionTime',
+        },
+      ]
     }, {
       name: '测试',
       icon: 'table',

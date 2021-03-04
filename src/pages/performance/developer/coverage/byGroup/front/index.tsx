@@ -7,62 +7,18 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
-import {getWeeksRange, getMonthWeek} from '@/publicMethods/timeMethods';
+import {getWeeksRange, getMonthWeek, getTwelveMonthTime, getFourQuarterTime} from '@/publicMethods/timeMethods';
+import {Button} from "antd";
+import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone} from "@ant-design/icons";
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(4);
-// const InstGroupValues = [{time:"instCove2021-01-04",group:"2组-项目、预算",values:"11"},{time:"instCove2021-01-11",group:"2组-项目、预算",values:"22"},{time:"instCove2021-01-18",group:"2组-项目、预算",values:"33"}];
+const monthRanges = getTwelveMonthTime();
+const quarterTime = getFourQuarterTime();
 const InstGroupValues: any[] = [];
 const branGroupValues: any[] = [];
-const colums = () => {
-  const component = new Array();
-  component.push(
-    {
-      headerName: '所属部门',
-      field: 'dept',
-      rowGroup: true,
-      hide: true,
-    },
-    {
-      headerName: '组名',
-      field: 'group',
-      rowGroup: true,
-      hide: true,
 
-    },
-    {
-      headerName: '姓名',
-      field: 'username',
-    },
-  );
-
-  for (let index = weekRanges.length - 1; index >= 0; index -= 1) {
-    const starttime = weekRanges[index].from;
-    const weekName = getMonthWeek(starttime);
-    const endtime = weekRanges[index].to;
-
-    component.push({
-      headerName: weekName,
-      children: [
-        {
-          headerName: '结构覆盖率',
-          field: `instCove${endtime.toString()}`,
-          // type: "numericColumn",
-          aggFunc: instCoveRender,
-          cellRenderer: coverageCellRenderer,
-        },
-        {
-          headerName: '分支覆盖率',
-          field: `branCove${endtime.toString()}`,
-          // type: "numericColumn",
-          aggFunc: branCoveRender,
-          cellRenderer: coverageCellRenderer,
-        },
-      ],
-    });
-  }
-  return component;
-};
+/* region 表格渲染 */
 
 // 合并结构列渲染
 function instCoveRender(values: any) {
@@ -91,49 +47,111 @@ function branCoveRender(values: any) {
   return "";
 }
 
-const queryDevelopViews = async (client: GqlClient<object>) => {
-
-  const timeRange = new Array();
-  for (let index = 0; index < weekRanges.length; index += 1) {
-    timeRange.push(`"${weekRanges[index].to}"`);
+// 表格代码渲染
+function coverageCellRenderer(params: any) {
+  // 判断是否包含属性
+  if (params.hasOwnProperty("value")) {
+    if (params.value === "0.00") {
+      return ` <span style="color: dodgerblue">  ${0} </span> `;
+    }
+    return params.value;
   }
-  // 求出开始时间和结束时间
-  const start = `"${weekRanges[0].from}"`;
-  const ends = `[${timeRange.join(",")}]`;
+  return ` <span style="color: dodgerblue">  ${0} </span> `;
+}
 
-  const {data} = await client.query(`
-       {
-        detailCover(side:FRONT,start:${start},ends:${ends}){
-          datas{
-            id
-            side
-            name
-            parent{
-            name
-            instCove
-            branCove
-            }
-            instCove
-            branCove
-            order{
-              start
-              end
-            }
-            users{
-              name
-              instCove
-              branCove
-            }
-          }
-        }
+/* endregion */
 
-      }
-    `);
-  const objectValues = addGroupAndDept(data?.detailCover);
-  return dealData(objectValues);
+/* region 动态定义列 */
+const compColums = [
+  {
+    headerName: '所属部门',
+    field: 'dept',
+    rowGroup: true,
+    hide: true,
+  }, {
+    headerName: '组名',
+    field: 'group',
+    rowGroup: true,
+    hide: true,
+
+  }, {
+    headerName: '姓名',
+    field: 'username',
+  },];
+
+const columsForWeeks = () => {
+  const component = new Array();
+  for (let index = weekRanges.length - 1; index >= 0; index -= 1) {
+    const starttime = weekRanges[index].from;
+    const weekName = getMonthWeek(starttime);
+    const endtime = weekRanges[index].to;
+    component.push({
+      headerName: weekName,
+      children: [
+        {
+          headerName: '结构覆盖率',
+          field: `instCove${endtime.toString()}`,
+          aggFunc: instCoveRender,
+          cellRenderer: coverageCellRenderer,
+        },
+        {
+          headerName: '分支覆盖率',
+          field: `branCove${endtime.toString()}`,
+          aggFunc: branCoveRender,
+          cellRenderer: coverageCellRenderer,
+        },
+      ],
+    });
+  }
+  return compColums.concat(component);
 };
 
+const columsForMonths = () => {
+  const component = new Array();
+  for (let index = 0; index < monthRanges.length; index += 1) {
+    component.push({
+      headerName: monthRanges[index].title,
+      field: monthRanges[index].title,
+    });
 
+    // component.push({
+    //   headerName: monthRanges[index].title,
+    //   children: [
+    //     {
+    //       headerName: 'review个数',
+    //       field: monthRanges[index].title,
+    //     },
+    //   ],
+    // });
+  }
+  return compColums.concat(component);
+};
+
+const columsForQuarters = () => {
+  const component = new Array();
+  for (let index = 0; index < quarterTime.length; index += 1) {
+    component.push({
+      headerName: quarterTime[index].title,
+      field: quarterTime[index].title,
+
+    });
+
+    // component.push({
+    //   headerName: quarterTime[index].title,
+    //   children: [
+    //     {
+    //       headerName: 'review个数',
+    //       field: quarterTime[index].title,
+    //     },
+    //   ],
+    // });
+  }
+  return compColums.concat(component);
+};
+
+/* endregion */
+
+/* region 数据处理 */
 function addGroupAndDept(oraDatas: any) {
   const objectDataArray: string | any[] = [];
   for (let index = 0; index < oraDatas.length; index += 1) {
@@ -217,7 +235,6 @@ function addGroupAndDept(oraDatas: any) {
   return objectDataArray;
 };
 
-
 function dealData(tempDataArray: any) {
   const resultDataArray: string | any[] = [];
 
@@ -248,57 +265,141 @@ function dealData(tempDataArray: any) {
   return resultDataArray;
 }
 
-// 表格代码渲染
-function coverageCellRenderer(params: any) {
-  // 判断是否包含属性
-  if (params.hasOwnProperty("value")) {
-    if (params.value === "0.00") {
-      return ` <span style="color: dodgerblue">  ${0} </span> `;
+const queryFrontCoverage = async (client: GqlClient<object>, params: string) => {
+  let start = "";
+  let ends = "";
+  if (params === 'week') {
+    const timeRange = new Array();
+    for (let index = 0; index < weekRanges.length; index += 1) {
+      timeRange.push(`"${weekRanges[index].to}"`);
     }
-    return params.value;
+    // 求出开始时间和结束时间
+    start = `"${weekRanges[0].from}"`;
+    ends = `[${timeRange.join(",")}]`;
+  } else if (params === 'month') {
+
+    console.log("按月");
+    return [];
+  } else if (params === 'quarter') {
+    console.log("按季度");
+    return [];
+  } else {
+    return [];
   }
-  return ` <span style="color: dodgerblue">  ${0} </span> `;
-}
 
+  const {data} = await client.query(`
+       {
+        detailCover(side:FRONT,start:${start},ends:${ends}){
+          datas{
+            id
+            side
+            name
+            parent{
+            name
+            instCove
+            branCove
+            }
+            instCove
+            branCove
+            order{
+              start
+              end
+            }
+            users{
+              name
+              instCove
+              branCove
+            }
+          }
+        }
 
-const BackendTableList: React.FC<any> = () => {
+      }
+    `);
+  const objectValues = addGroupAndDept(data?.detailCover);
+  return dealData(objectValues);
+};
+
+/* endregion */
+
+const CodeReviewTableList: React.FC<any> = () => {
+  /* region ag-grid */
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
-
-    queryDevelopViews(gqlClient),
+    queryFrontCoverage(gqlClient, 'week'),
   );
-
-
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
-
   if (gridApi.current) {
     if (loading) gridApi.current.showLoadingOverlay();
     else gridApi.current.hideOverlay();
   }
 
+  /* endregion */
+
+  /* region 按钮点击事件 */
+  // 按周统计
+  const statisticsByWeeks = async () => {
+    /* 4周 */
+    const weekColums = columsForWeeks();
+    gridApi.current?.setColumnDefs(weekColums);
+    const datas: any = await queryFrontCoverage(gqlClient, 'week');
+    gridApi.current?.setRowData(datas);
+
+  };
+
+  // 按月统计
+  const statisticsByMonths = async () => {
+    /* 12月 */
+    const monthColums = columsForMonths();
+    gridApi.current?.setColumnDefs(monthColums);
+    const datas: any = await queryFrontCoverage(gqlClient, 'month');
+    gridApi.current?.setRowData(datas);
+
+  };
+
+  // 按季度统计
+  const statisticsByQuarters = async () => {
+    /* 4季 */
+    const quartersColums = columsForQuarters();
+    gridApi.current?.setColumnDefs(quartersColums);
+    const datas: any = await queryFrontCoverage(gqlClient, 'quarter');
+    gridApi.current?.setRowData(datas);
+  };
+
+  /* endregion */
+
   return (
     <PageContainer>
+      <div style={{background: 'white'}}>
+        <Button type="text" style={{color: 'black'}} icon={<ProfileTwoTone/>} size={'large'}
+                onClick={statisticsByWeeks}>按周统计</Button>
+        <Button type="text" style={{color: 'black'}} icon={<CalendarTwoTone/>} size={'large'}
+                onClick={statisticsByMonths}>按月统计</Button>
+        <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
+                onClick={statisticsByQuarters}>按季统计</Button>
+      </div>
+
       <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
         <AgGridReact
-          columnDefs={colums()} // 定义列
+          columnDefs={columsForWeeks()} // 定义列
           rowData={data} // 数据绑定
           defaultColDef={{
             resizable: true,
             sortable: true,
             filter: true,
             flex: 1,
-            allowedAggFuncs: ['sum', 'min', 'max']
+            cellStyle: {"margin-top": "-5px"}
           }}
           autoGroupColumnDef={{
             maxWidth: 300,
           }}
           groupDefaultExpanded={9} // 展开分组
           suppressAggFuncInHeader={true}   // 不显示标题聚合函数的标识
-
+          rowHeight={32}
+          headerHeight={35}
           // pivotColumnGroupTotals={'always'}
           // groupHideOpenParents={true}  // 组和人名同一列
 
@@ -311,4 +412,4 @@ const BackendTableList: React.FC<any> = () => {
   );
 };
 
-export default BackendTableList;
+export default CodeReviewTableList;

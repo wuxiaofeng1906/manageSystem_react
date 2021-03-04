@@ -63,6 +63,21 @@ export default [
         component: './sprint/sprintDashboard/sprintDashboard',
       },
       {
+        name: 'bug明细（待隐藏）',
+        path: 'basicTable/bug',
+        component: './sprint/basicTable/bug',
+      },
+      {
+        name: 'story（待隐藏）',
+        path: 'basicTable/story',
+        component: './sprint/basicTable/story',
+      },
+      {
+        name: 'task（待隐藏）',
+        path: 'basicTable/task',
+        component: './sprint/basicTable/task',
+      },
+      {
         name: 'sprint 列表',
         path: 'sprintList',
         component: './sprint/sprintList/sprintList',

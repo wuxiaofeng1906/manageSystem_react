@@ -16,21 +16,27 @@ const weekRanges = getWeeksRange(8);
 const monthRanges = getTwelveMonthTime();
 const quarterTime = getFourQuarterTime();
 
-const compColums = [{
-  headerName: '所属部门',
-  field: 'dept',
-  rowGroup: true,
-  hide: true,
-}, {
-  headerName: '组名',
-  field: 'group',
-  rowGroup: true,
-  hide: true,
-
-}, {
-  headerName: '姓名',
-  field: 'username',
-},];
+/* region 动态定义列 */
+const compColums = [
+  {
+    headerName: '研发中心',
+    field: 'devCenter',
+    rowGroup: true,
+    hide: true,
+  }, {
+    headerName: '所属部门',
+    field: 'dept',
+    rowGroup: true,
+    hide: true,
+  }, {
+    headerName: '组名',
+    field: 'group',
+    rowGroup: true,
+    hide: true,
+  }, {
+    headerName: '姓名',
+    field: 'username',
+  }];
 
 
 const columsForWeeks = () => {
@@ -38,12 +44,11 @@ const columsForWeeks = () => {
   for (let index = weekRanges.length - 1; index >= 0; index -= 1) {
     const starttime = weekRanges[index].from;
     const weekName = getMonthWeek(starttime);
-    const endtime = weekRanges[index].to;
+    // const endtime = weekRanges[index].to;
     component.push({
       headerName: weekName,
-      field: `instCove${endtime.toString()}`,
+      field: starttime.toString(),
     });
-
 
     // component.push({
     //   headerName: weekName,
@@ -63,7 +68,7 @@ const columsForMonths = () => {
   for (let index = 0; index < monthRanges.length; index += 1) {
     component.push({
       headerName: monthRanges[index].title,
-      field: monthRanges[index].title,
+      field: monthRanges[index].start,
     });
 
     // component.push({
@@ -84,12 +89,13 @@ const columsForQuarters = () => {
   for (let index = 0; index < quarterTime.length; index += 1) {
     component.push({
       headerName: quarterTime[index].title,
-      field: quarterTime[index].title,
+      field: quarterTime[index].start,
 
     });
 
     // component.push({
     //   headerName: quarterTime[index].title,
+
     //   children: [
     //     {
     //       headerName: 'review个数',
@@ -101,25 +107,108 @@ const columsForQuarters = () => {
   return compColums.concat(component);
 };
 
-const queryCodeReviewCount = async (client: GqlClient<object>, params: string) => {
+/* endregion */
+
+/* region 数据处理 */
+
+const getParamsByType = (params: any) => {
+  let typeFlag = 0;
+  let ends = "";
   if (params === 'week') {
-    console.log("按周");
+    const timeRange = new Array();
+    for (let index = 0; index < weekRanges.length; index += 1) {
+      timeRange.push(`"${weekRanges[index].to}"`);
+    }
+    ends = `[${timeRange.join(",")}]`;
+    typeFlag = 1;
+
   } else if (params === 'month') {
-    console.log("按月");
+    const timeRange = new Array();
+    for (let index = 0; index < monthRanges.length; index += 1) {
+      timeRange.push(`"${monthRanges[index].end}"`);
+    }
+    ends = `[${timeRange.join(",")}]`;
+    typeFlag = 2;
+
   } else if (params === 'quarter') {
-    console.log("按季度");
-  } else {
-    return [];
+    const timeRange = new Array();
+    for (let index = 0; index < monthRanges.length; index += 1) {
+      timeRange.push(`"${monthRanges[index].end}"`);
+    }
+    ends = `[${timeRange.join(",")}]`;
+    typeFlag = 3;
   }
 
-  const {data} = await client.query(`
-      {
-
-      }
-  `);
-  return data;
+  return {typeFlag, ends};
 };
 
+// 转化为ag-grid能被显示的格式
+const converseFormatForAgGrid = (oraDatas: any) => {
+  const arrays: any[] = [];
+  if (oraDatas === null) {
+    return arrays;
+  }
+  debugger;
+  for (let index = 0; index < oraDatas.length; index += 1) {
+    const data = oraDatas[index].datas;
+    for (let i = 0; i < data.length; i += 1) {
+      const usersData = data[i].users;
+      for (let m = 0; m < usersData.length; m += 1) {
+        const username = usersData[m].userName;
+        const counts = usersData[m].count;
+
+        arrays.push({
+          devCenter: "研发中心",
+          dept: data[i].parent.deptName,
+          group: data[i].deptName,
+          "username": username,
+          [data[i].range.start]: counts
+        });
+      }
+    }
+  }
+
+  return arrays;
+};
+
+const queryCodeReviewCount = async (client: GqlClient<object>, params: string) => {
+  const condition = getParamsByType(params);
+  debugger;
+  if (condition.typeFlag === 0) {
+    return [];
+  }
+  const {data} = await client.query(`
+      {
+        codeReviewDept(kind:"${condition.typeFlag}",ends:${condition.ends}){
+          total{
+              deptName
+              count
+            }
+            datas{
+              dept
+              deptName
+              parent{
+                deptName
+                count
+              }
+              count
+              range{
+                start
+                end
+              }
+              users{
+                userId
+                userName
+                count
+              }
+            }
+          }
+      }
+  `);
+  return converseFormatForAgGrid(data?.codeReviewDept);
+};
+
+/* endregion */
 
 const CodeReviewTableList: React.FC<any> = () => {
 
@@ -145,8 +234,8 @@ const CodeReviewTableList: React.FC<any> = () => {
     /* 八周 */
     const weekColums = columsForWeeks();
     gridApi.current?.setColumnDefs(weekColums);
-    // const datas: any = await queryCodeReviewCount(gqlClient, 'week');
-    // gridApi.current?.setRowData(datas);
+    const datas: any = await queryCodeReviewCount(gqlClient, 'week');
+    gridApi.current?.setRowData(datas);
 
   };
 
@@ -155,8 +244,8 @@ const CodeReviewTableList: React.FC<any> = () => {
     /* 12月 */
     const monthColums = columsForMonths();
     gridApi.current?.setColumnDefs(monthColums);
-    //   const datas: any = await queryCodeReviewCount(gqlClient, 'month');
-    // gridApi.current?.setRowData(datas);
+    const datas: any = await queryCodeReviewCount(gqlClient, 'month');
+    gridApi.current?.setRowData(datas);
 
   };
 
@@ -165,8 +254,8 @@ const CodeReviewTableList: React.FC<any> = () => {
     /* 4季 */
     const quartersColums = columsForQuarters();
     gridApi.current?.setColumnDefs(quartersColums);
-    // const datas: any = await queryCodeReviewCount(gqlClient, 'quarter');
-    // gridApi.current?.setRowData(datas);
+    const datas: any = await queryCodeReviewCount(gqlClient, 'quarter');
+    gridApi.current?.setRowData(datas);
   };
 
   return (

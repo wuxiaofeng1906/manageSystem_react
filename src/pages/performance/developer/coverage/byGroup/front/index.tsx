@@ -232,6 +232,7 @@ function addGroupAndDept(oraDatas: any) {
       }
     }
   }
+  debugger;
   return objectDataArray;
 };
 

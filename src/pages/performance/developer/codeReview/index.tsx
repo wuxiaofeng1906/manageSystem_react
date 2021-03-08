@@ -10,11 +10,13 @@ import {GqlClient, useGqlClient} from '@/hooks';
 import {getWeeksRange, getMonthWeek, getTwelveMonthTime, getFourQuarterTime} from '@/publicMethods/timeMethods';
 import {Button} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone} from "@ant-design/icons";
+import {forEach} from "ag-grid-community/dist/lib/utils/array";
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(8);
 const monthRanges = getTwelveMonthTime();
 const quarterTime = getFourQuarterTime();
+const weekGroupValues: any[] = [];
 
 /* region 动态定义列 */
 const compColums = [
@@ -38,6 +40,18 @@ const compColums = [
     field: 'username',
   }];
 
+function codeNumberRender(values: any) {
+  // console.log("values", values);
+  for (let i = 0; i < weekGroupValues.length; i += 1) {
+    const datas = weekGroupValues[i];
+    if (values.colDef.field === datas.time && values.rowNode.key === datas.group) {
+      return ` <span style="font-weight: bold">  ${datas.values} </span> `;
+      // return datas.values;
+      break;
+    }
+  }
+  return "";
+}
 
 const columsForWeeks = () => {
   const component = new Array();
@@ -48,6 +62,7 @@ const columsForWeeks = () => {
     component.push({
       headerName: weekName,
       field: starttime.toString(),
+      // aggFunc: codeNumberRender
     });
 
     // component.push({
@@ -132,8 +147,8 @@ const getParamsByType = (params: any) => {
 
   } else if (params === 'quarter') {
     const timeRange = new Array();
-    for (let index = 0; index < monthRanges.length; index += 1) {
-      timeRange.push(`"${monthRanges[index].end}"`);
+    for (let index = 0; index < quarterTime.length; index += 1) {
+      timeRange.push(`"${quarterTime[index].end}"`);
     }
     ends = `[${timeRange.join(",")}]`;
     typeFlag = 3;
@@ -148,7 +163,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
   if (oraDatas === null) {
     return arrays;
   }
-  debugger;
+
   for (let index = 0; index < oraDatas.length; index += 1) {
     const data = oraDatas[index].datas;
     for (let i = 0; i < data.length; i += 1) {
@@ -156,6 +171,12 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       for (let m = 0; m < usersData.length; m += 1) {
         const username = usersData[m].userName;
         const counts = usersData[m].count;
+
+        weekGroupValues.push({
+          time: data[i].range.start,
+          group: data[i].deptName,
+          values: data[i].count
+        });
 
         arrays.push({
           devCenter: "研发中心",
@@ -171,9 +192,39 @@ const converseFormatForAgGrid = (oraDatas: any) => {
   return arrays;
 };
 
+const converseArrayToOne = (data: any) => {
+  const resultData = new Array();
+  for (let index = 0; index < data.length; index += 1) {
+    let repeatFlag = false;
+    // 判断原有数组是否包含有名字
+    for (let m = 0; m < resultData.length; m += 1) {
+      if (resultData[m].username === data[index].username) {
+        repeatFlag = true;
+        break;
+      }
+    }
+
+    if (repeatFlag === false) {
+      const tempData = {};
+      for (let index2 = 0; index2 < data.length; index2 += 1) {
+        tempData["username"] = data[index].username;
+
+        if (data[index].username === data[index2].username) {
+          const key = Object.keys(data[index2]);  // 获取所有的Key值
+          key.forEach(function (item) {
+            tempData[item] = data[index2][item];
+          });
+        }
+      }
+      resultData.push(tempData);
+    }
+  }
+
+  return resultData;
+};
+
 const queryCodeReviewCount = async (client: GqlClient<object>, params: string) => {
   const condition = getParamsByType(params);
-  debugger;
   if (condition.typeFlag === 0) {
     return [];
   }
@@ -205,7 +256,9 @@ const queryCodeReviewCount = async (client: GqlClient<object>, params: string) =
           }
       }
   `);
-  return converseFormatForAgGrid(data?.codeReviewDept);
+  const datas = converseFormatForAgGrid(data?.codeReviewDept);
+
+  return converseArrayToOne(datas);
 };
 
 /* endregion */
@@ -252,6 +305,7 @@ const CodeReviewTableList: React.FC<any> = () => {
   // 按季度统计
   const statisticsByQuarters = async () => {
     /* 4季 */
+    debugger;
     const quartersColums = columsForQuarters();
     gridApi.current?.setColumnDefs(quartersColums);
     const datas: any = await queryCodeReviewCount(gqlClient, 'quarter');

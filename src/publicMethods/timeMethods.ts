@@ -88,7 +88,7 @@ function getTwelveMonthTime() {
     monthArray.push({
       title: `${currentMonth.year()}年${month}月`,
       start: from,
-      end: `${to} 23:59:59`
+      end: `${to}`
     });
   }
 
@@ -110,28 +110,28 @@ function getFourQuarterTime() {
       case "3":
         currentQuarter = 1;
         from = "01-01";
-        to = "03-31 23:59:59";
+        to = "03-31";
         break;
       case "4":
       case "5":
       case "6":
         currentQuarter = 2;
         from = "04-01";
-        to = "06-30 23:59:59";
+        to = "06-30";
         break;
       case "7":
       case "8":
       case "9":
         currentQuarter = 3;
         from = "07-01";
-        to = "09-30 23:59:59";
+        to = "09-30";
         break;
       case "10":
       case "11":
       case "12":
         currentQuarter = 4;
         from = "10-01";
-        to = "12-31 23:59:59";
+        to = "12-31";
         break;
 
       default:

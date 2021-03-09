@@ -88,6 +88,9 @@ const columsForMonths = () => {
     component.push({
       headerName: monthRanges[index].title,
       field: monthRanges[index].start,
+      cellRenderer: (params: any) => {
+        return params.value;  // 为了将聚合函数实现格式化
+      },
     });
 
     // component.push({
@@ -109,7 +112,9 @@ const columsForQuarters = () => {
     component.push({
       headerName: quarterTime[index].title,
       field: quarterTime[index].start,
-
+      cellRenderer: (params: any) => {
+        return params.value;  // 为了将聚合函数实现格式化
+      },
     });
 
     // component.push({

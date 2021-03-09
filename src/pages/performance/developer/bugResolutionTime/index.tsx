@@ -8,29 +8,59 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import {getWeeksRange, getMonthWeek, getTwelveMonthTime, getFourQuarterTime} from '@/publicMethods/timeMethods';
+import {moduleChange} from '@/publicMethods/cellRenderer';
 import {Button} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone} from "@ant-design/icons";
+
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(8);
 const monthRanges = getTwelveMonthTime();
 const quarterTime = getFourQuarterTime();
+const weekGroupValues: any[] = [];
 
-const compColums = [{
-  headerName: '所属部门',
-  field: 'dept',
-  rowGroup: true,
-  hide: true,
-}, {
-  headerName: '组名',
-  field: 'group',
-  rowGroup: true,
-  hide: true,
+/* region 动态定义列 */
+const compColums = [
+  {
+    headerName: '研发中心',
+    field: 'devCenter',
+    rowGroup: true,
+    hide: true,
+  }, {
+    headerName: '所属部门',
+    field: 'dept',
+    rowGroup: true,
+    hide: true,
+  }, {
+    headerName: '组名',
+    field: 'group',
+    rowGroup: true,
+    hide: true,
+  }, {
+    headerName: '所属端',
+    field: 'module',
+    rowGroup: true,
+    hide: true,
 
-}, {
-  headerName: '姓名',
-  field: 'username',
-},];
+  }, {
+    headerName: '姓名',
+    field: 'username',
+  }];
+
+function codeNumberRender(values: any) {
+
+  if (values.rowNode.key === "前端") {
+    console.log("values", values);
+  }
+  for (let i = 0; i < weekGroupValues.length; i += 1) {
+    const datas = weekGroupValues[i];
+    if (values.colDef.field === datas.time && values.rowNode.key === datas.group) {
+      return ` <span style="font-weight: bold">  ${Number(datas.values).toFixed(2)} </span> `;
+      break;
+    }
+  }
+  return '';
+}
 
 
 const columsForWeeks = () => {
@@ -38,22 +68,15 @@ const columsForWeeks = () => {
   for (let index = weekRanges.length - 1; index >= 0; index -= 1) {
     const starttime = weekRanges[index].from;
     const weekName = getMonthWeek(starttime);
-    const endtime = weekRanges[index].to;
     component.push({
       headerName: weekName,
-      field: `instCove${endtime.toString()}`,
+      field: starttime.toString(),
+      aggFunc: codeNumberRender,
+      cellRenderer: (params: any) => {
+        return params.value;  // 为了将聚合函数实现格式化
+      },
     });
 
-
-    // component.push({
-    //   headerName: weekName,
-    //   children: [
-    //     {
-    //       headerName: 'review个数',
-    //       field: `instCove${endtime.toString()}`,
-    //     },
-    //   ],
-    // });
   }
   return compColums.concat(component);
 };
@@ -63,7 +86,10 @@ const columsForMonths = () => {
   for (let index = 0; index < monthRanges.length; index += 1) {
     component.push({
       headerName: monthRanges[index].title,
-      field: monthRanges[index].title,
+      field: monthRanges[index].start,
+      cellRenderer: (params: any) => {
+        return params.value;  // 为了将聚合函数实现格式化
+      },
     });
 
     // component.push({
@@ -84,12 +110,15 @@ const columsForQuarters = () => {
   for (let index = 0; index < quarterTime.length; index += 1) {
     component.push({
       headerName: quarterTime[index].title,
-      field: quarterTime[index].title,
-
+      field: quarterTime[index].start,
+      cellRenderer: (params: any) => {
+        return params.value;  // 为了将聚合函数实现格式化
+      },
     });
 
     // component.push({
     //   headerName: quarterTime[index].title,
+
     //   children: [
     //     {
     //       headerName: 'review个数',
@@ -101,25 +130,198 @@ const columsForQuarters = () => {
   return compColums.concat(component);
 };
 
-const queryCodeReviewCount = async (client: GqlClient<object>, params: string) => {
+/* endregion */
+
+/* region 数据处理 */
+
+const getParamsByType = (params: any) => {
+  let typeFlag = 0;
+  let ends = "";
   if (params === 'week') {
-    console.log("按周");
+    const timeRange = new Array();
+    for (let index = 0; index < weekRanges.length; index += 1) {
+      timeRange.push(`"${weekRanges[index].to}"`);
+    }
+    ends = `[${timeRange.join(",")}]`;
+    typeFlag = 1;
+
   } else if (params === 'month') {
-    console.log("按月");
+    const timeRange = new Array();
+    for (let index = 0; index < monthRanges.length; index += 1) {
+      timeRange.push(`"${monthRanges[index].end}"`);
+    }
+    ends = `[${timeRange.join(",")}]`;
+    typeFlag = 2;
+
   } else if (params === 'quarter') {
-    console.log("按季度");
-  } else {
-    return [];
+    const timeRange = new Array();
+    for (let index = 0; index < quarterTime.length; index += 1) {
+      timeRange.push(`"${quarterTime[index].end}"`);
+    }
+    ends = `[${timeRange.join(",")}]`;
+    typeFlag = 3;
   }
 
+  return {typeFlag, ends};
+};
+
+// 转化为ag-grid能被显示的格式
+const converseFormatForAgGrid = (oraDatas: any) => {
+
+  weekGroupValues.length = 0;
+  const arrays: any[] = [];
+  if (oraDatas === null) {
+    return arrays;
+  }
+
+  for (let index = 0; index < oraDatas.length; index += 1) {
+    debugger;
+    const starttime = oraDatas[index].range.start;
+    arrays.push({
+        devCenter: "研发中心",
+        "username": "前端",
+        [starttime]: Number(oraDatas[index].side.front).toFixed(2)
+      }
+    );
+    arrays.push({
+        devCenter: "研发中心",
+        "username": "后端",
+        [starttime]: Number(oraDatas[index].side.backend).toFixed(2)
+      }
+    );
+
+    weekGroupValues.push({
+      time: starttime,
+      group: "研发中心",
+      values: oraDatas[index].total.ratio
+    });
+
+    const data = oraDatas[index].datas;
+    for (let i = 0; i < data.length; i += 1) {
+
+      weekGroupValues.push({
+        time: starttime,
+        group: data[i].deptName,
+        values: data[i].ratio
+      }, {
+        time: starttime,
+        group: data[i].parent.deptName,
+        values: data[i].parent.ratio
+      });
+
+      const usersData = data[i].users;
+      for (let m = 0; m < usersData.length; m += 1) {
+        const username = usersData[m].userName;
+        const counts = usersData[m].ratio;
+
+        // weekGroupValues.push({
+        //   time: starttime,
+        //   group: "应用架构部",
+        //   values: weekDatas[i].instCove
+        // });
+
+        arrays.push({
+          devCenter: "研发中心",
+          dept: data[i].parent.deptName,
+          group: data[i].deptName,
+          module: moduleChange(usersData[m].tech),
+          "username": username,
+          [starttime]: counts
+        });
+      }
+    }
+
+  }
+
+
+  return arrays;
+};
+
+const converseArrayToOne = (data: any) => {
+  const resultData = new Array();
+  for (let index = 0; index < data.length; index += 1) {
+    let repeatFlag = false;
+    // 判断原有数组是否包含有名字
+    for (let m = 0; m < resultData.length; m += 1) {
+      if (resultData[m].username === data[index].username) {
+        repeatFlag = true;
+        break;
+      }
+    }
+
+    if (repeatFlag === false) {
+      const tempData = {};
+      for (let index2 = 0; index2 < data.length; index2 += 1) {
+        tempData["username"] = data[index].username;
+
+        if (data[index].username === data[index2].username) {
+          const key = Object.keys(data[index2]);  // 获取所有的Key值
+          key.forEach(function (item) {
+            tempData[item] = data[index2][item];
+          });
+        }
+      }
+      resultData.push(tempData);
+    }
+  }
+
+  return resultData;
+};
+
+const queryBugResolutionCount = async (client: GqlClient<object>, params: string) => {
+  debugger;
+  const condition = getParamsByType(params);
+  if (condition.typeFlag === 0) {
+    return [];
+  }
   const {data} = await client.query(`
       {
+        bugRepairDept(kind:"${condition.typeFlag}",ends:${condition.ends}){
+          total{
+            deptName
+            duration
+            count
+            ratio
+          }
+          range{
+            start
+            end
+          }
+          side{
+            both
+            front
+            backend
+          }
+          datas{
+            dept
+            deptName
+            parent{
+              deptName
+              ratio
+            }
+            side{
+              both
+              front
+              backend
+            }
+            ratio
+            users{
+              userId
+              userName
+              ratio
+              tech
+            }
+          }
+        }
 
       }
   `);
-  return data;
+  debugger;
+  const datas = converseFormatForAgGrid(data?.bugRepairDept);
+  return converseArrayToOne(datas);
 };
 
+/* endregion */
 
 const CodeReviewTableList: React.FC<any> = () => {
 
@@ -127,7 +329,7 @@ const CodeReviewTableList: React.FC<any> = () => {
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
-    queryCodeReviewCount(gqlClient, 'week'),
+    queryBugResolutionCount(gqlClient, 'week'),
   );
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -145,8 +347,8 @@ const CodeReviewTableList: React.FC<any> = () => {
     /* 八周 */
     const weekColums = columsForWeeks();
     gridApi.current?.setColumnDefs(weekColums);
-    // const datas: any = await queryCodeReviewCount(gqlClient, 'week');
-    // gridApi.current?.setRowData(datas);
+    const datas: any = await queryBugResolutionCount(gqlClient, 'week');
+    gridApi.current?.setRowData(datas);
 
   };
 
@@ -155,18 +357,19 @@ const CodeReviewTableList: React.FC<any> = () => {
     /* 12月 */
     const monthColums = columsForMonths();
     gridApi.current?.setColumnDefs(monthColums);
-    //   const datas: any = await queryCodeReviewCount(gqlClient, 'month');
-    // gridApi.current?.setRowData(datas);
+    const datas: any = await queryBugResolutionCount(gqlClient, 'month');
+    gridApi.current?.setRowData(datas);
 
   };
 
   // 按季度统计
   const statisticsByQuarters = async () => {
     /* 4季 */
+    debugger;
     const quartersColums = columsForQuarters();
     gridApi.current?.setColumnDefs(quartersColums);
-    // const datas: any = await queryCodeReviewCount(gqlClient, 'quarter');
-    // gridApi.current?.setRowData(datas);
+    const datas: any = await queryBugResolutionCount(gqlClient, 'quarter');
+    gridApi.current?.setRowData(datas);
   };
 
   return (
@@ -189,7 +392,7 @@ const CodeReviewTableList: React.FC<any> = () => {
             sortable: true,
             filter: true,
             flex: 1,
-            allowedAggFuncs: ['sum', 'min', 'max']
+            // allowedAggFuncs: ['sum', 'min', 'max']
           }}
           autoGroupColumnDef={{
             maxWidth: 300,

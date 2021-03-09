@@ -8,9 +8,10 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import {getWeeksRange, getMonthWeek, getTwelveMonthTime, getFourQuarterTime} from '@/publicMethods/timeMethods';
+import {moduleChange} from '@/publicMethods/cellRenderer';
 import {Button} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone} from "@ant-design/icons";
-import {forEach} from "ag-grid-community/dist/lib/utils/array";
+
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(8);
@@ -36,44 +37,47 @@ const compColums = [
     rowGroup: true,
     hide: true,
   }, {
+    headerName: '所属端',
+    field: 'module',
+    rowGroup: true,
+    hide: true,
+
+  }, {
     headerName: '姓名',
     field: 'username',
   }];
 
 function codeNumberRender(values: any) {
-  // console.log("values", values);
+
+  if(values.rowNode.key === "前端"){
+    console.log("values", values);
+  }
+  debugger;
   for (let i = 0; i < weekGroupValues.length; i += 1) {
     const datas = weekGroupValues[i];
     if (values.colDef.field === datas.time && values.rowNode.key === datas.group) {
       return ` <span style="font-weight: bold">  ${datas.values} </span> `;
-      // return datas.values;
       break;
     }
   }
-  return "";
+  return '';
 }
+
 
 const columsForWeeks = () => {
   const component = new Array();
   for (let index = weekRanges.length - 1; index >= 0; index -= 1) {
     const starttime = weekRanges[index].from;
     const weekName = getMonthWeek(starttime);
-    // const endtime = weekRanges[index].to;
     component.push({
       headerName: weekName,
       field: starttime.toString(),
-      // aggFunc: codeNumberRender
+      aggFunc: codeNumberRender,
+      cellRenderer: (params: any) => {
+        return params.value;  // 为了将聚合函数实现格式化
+      },
     });
 
-    // component.push({
-    //   headerName: weekName,
-    //   children: [
-    //     {
-    //       headerName: 'review个数',
-    //       field: `instCove${endtime.toString()}`,
-    //     },
-    //   ],
-    // });
   }
   return compColums.concat(component);
 };
@@ -159,35 +163,70 @@ const getParamsByType = (params: any) => {
 
 // 转化为ag-grid能被显示的格式
 const converseFormatForAgGrid = (oraDatas: any) => {
+  weekGroupValues.length = 0;
   const arrays: any[] = [];
   if (oraDatas === null) {
     return arrays;
   }
 
   for (let index = 0; index < oraDatas.length; index += 1) {
+    const starttime = oraDatas[index].range.start;
+    arrays.push({
+        devCenter: "研发中心",
+        "username": "前端",
+        [starttime]: oraDatas[index].side.front
+      }
+    );
+    arrays.push({
+        devCenter: "研发中心",
+        "username": "后端",
+        [starttime]: oraDatas[index].side.backend
+      }
+    );
+
+    weekGroupValues.push({
+      time: starttime,
+      group: "研发中心",
+      values: oraDatas[index].total.count
+    });
+
     const data = oraDatas[index].datas;
     for (let i = 0; i < data.length; i += 1) {
+
+      weekGroupValues.push({
+        time: starttime,
+        group: data[i].deptName,
+        values: data[i].count
+      }, {
+        time: starttime,
+        group: data[i].parent.deptName,
+        values: data[i].parent.count
+      });
+
       const usersData = data[i].users;
       for (let m = 0; m < usersData.length; m += 1) {
         const username = usersData[m].userName;
         const counts = usersData[m].count;
 
-        weekGroupValues.push({
-          time: data[i].range.start,
-          group: data[i].deptName,
-          values: data[i].count
-        });
+        // weekGroupValues.push({
+        //   time: starttime,
+        //   group: "应用架构部",
+        //   values: weekDatas[i].instCove
+        // });
 
         arrays.push({
           devCenter: "研发中心",
           dept: data[i].parent.deptName,
           group: data[i].deptName,
+          module: moduleChange(usersData[m].tech),
           "username": username,
-          [data[i].range.start]: counts
+          [starttime]: counts
         });
       }
     }
+
   }
+
 
   return arrays;
 };
@@ -231,9 +270,18 @@ const queryCodeReviewCount = async (client: GqlClient<object>, params: string) =
   const {data} = await client.query(`
       {
         codeReviewDept(kind:"${condition.typeFlag}",ends:${condition.ends}){
-          total{
+            total{
               deptName
               count
+            }
+            range{
+              start
+              end
+            }
+            side{
+              both
+              front
+              backend
             }
             datas{
               dept
@@ -243,21 +291,23 @@ const queryCodeReviewCount = async (client: GqlClient<object>, params: string) =
                 count
               }
               count
-              range{
-                start
-                end
+              side{
+                both
+                front
+                backend
               }
               users{
                 userId
                 userName
                 count
+                tech
               }
             }
           }
+
       }
   `);
   const datas = converseFormatForAgGrid(data?.codeReviewDept);
-
   return converseArrayToOne(datas);
 };
 
@@ -332,7 +382,7 @@ const CodeReviewTableList: React.FC<any> = () => {
             sortable: true,
             filter: true,
             flex: 1,
-            allowedAggFuncs: ['sum', 'min', 'max']
+            // allowedAggFuncs: ['sum', 'min', 'max']
           }}
           autoGroupColumnDef={{
             maxWidth: 300,

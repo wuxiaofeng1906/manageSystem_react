@@ -73,7 +73,7 @@ const numberRenderToCurrentStage = (params: any) => {
 };
 
 const numberRenderToZentaoType = (params: any) => {
-   // BUG = 1,
+  // BUG = 1,
   // TASK = 2,
   // STORY = 3,
   let type = "";
@@ -217,6 +217,39 @@ const linkToZentaoPage = (params: any) => {
 
 };
 
+const moduleChange = (params: string) => {
+  // export const enum USER_TECH {
+  //   FRONT = '1',
+  //   BACKEND = '2',
+  //   TEST = '3',
+  //   PRODUCT = '4',
+  //   OTHER = '5',
+  // }
+
+  let module = "";
+  switch (params) {
+    case "1":
+      module = "前端";
+      break;
+    case "2":
+      module = "后端";
+      break;
+    case "3":
+      module = "产品";
+      break;
+    case "4":
+      module = "测试";
+      break;
+    case "5":
+      module = "其他";
+      break;
+    default:
+      break;
+  }
+
+  return module;
+};
+
 export {
   numberRenderToYesNo,
   numberRenderTopass,
@@ -225,6 +258,7 @@ export {
   numberRenderToZentaoSeverity,
   numberRenderToZentaoStatus,
   numberRenderToSource,
-  linkToZentaoPage
+  linkToZentaoPage,
+  moduleChange
 };
 

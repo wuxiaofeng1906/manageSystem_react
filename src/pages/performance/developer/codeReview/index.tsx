@@ -23,7 +23,8 @@ import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone} from "@ant-design/icon
 const weekRanges = getWeeksRange(8);
 const monthRanges = getTwelveMonthTime();
 const quarterTime = getFourQuarterTime();
-const weekGroupValues: any[] = [];
+const groupValues: any[] = [];
+const moduleValues: any[] = [];
 
 /* region 动态定义列 */
 const compColums = [
@@ -54,16 +55,23 @@ const compColums = [
   }];
 
 function codeNumberRender(values: any) {
+  const rowName = values.rowNode.key;
+  if (rowName === "前端" || rowName === "后端") {
 
-  if (values.rowNode.key === "前端") {
-    console.log("values", values);
-  }
-  debugger;
-  for (let i = 0; i < weekGroupValues.length; i += 1) {
-    const datas = weekGroupValues[i];
-    if (values.colDef.field === datas.time && values.rowNode.key === datas.group) {
-      return ` <span style="font-weight: bold">  ${datas.values} </span> `;
-      break;
+    for (let i = 0; i < moduleValues.length; i += 1) {
+      const moduleInfo = moduleValues[i];
+      if (values.colDef.field === moduleInfo.time && rowName === moduleInfo.module && values.rowNode.parent.key === moduleInfo.parent) {
+        return ` <span style="font-weight: bold">  ${moduleInfo.values} </span> `;
+        break;
+      }
+    }
+  } else {
+    for (let i = 0; i < groupValues.length; i += 1) {
+      const datas = groupValues[i];
+      if (values.colDef.field === datas.time && rowName === datas.group) {
+        return ` <span style="font-weight: bold">  ${Number(datas.values)} </span> `;
+        break;
+      }
     }
   }
   return '';
@@ -174,7 +182,8 @@ const columsForQuarters = () => {
 
 // 转化为ag-grid能被显示的格式
 const converseFormatForAgGrid = (oraDatas: any) => {
-  weekGroupValues.length = 0;
+  groupValues.length = 0;
+  moduleValues.length = 0;
   const arrays: any[] = [];
   if (oraDatas === null) {
     return arrays;
@@ -186,16 +195,14 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         devCenter: "研发中心",
         "username": "前端",
         [starttime]: oraDatas[index].side.front
-      }
-    );
-    arrays.push({
+      }, {
         devCenter: "研发中心",
         "username": "后端",
         [starttime]: oraDatas[index].side.backend
       }
     );
 
-    weekGroupValues.push({
+    groupValues.push({
       time: starttime,
       group: "研发中心",
       values: oraDatas[index].total.count
@@ -204,7 +211,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     const data = oraDatas[index].datas;
     for (let i = 0; i < data.length; i += 1) {
 
-      weekGroupValues.push({
+      groupValues.push({
         time: starttime,
         group: data[i].deptName,
         values: data[i].count
@@ -214,16 +221,23 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         values: data[i].parent.count
       });
 
+      moduleValues.push({
+        time: starttime,
+        module: "前端",
+        parent: data[i].deptName,
+        values: data[i].side.front
+      }, {
+        time: starttime,
+        module: "后端",
+        parent: data[i].deptName,
+        values: data[i].side.backend
+      });
+
+
       const usersData = data[i].users;
       for (let m = 0; m < usersData.length; m += 1) {
         const username = usersData[m].userName;
         const counts = usersData[m].count;
-
-        // weekGroupValues.push({
-        //   time: starttime,
-        //   group: "应用架构部",
-        //   values: weekDatas[i].instCove
-        // });
 
         arrays.push({
           devCenter: "研发中心",
@@ -366,7 +380,6 @@ const CodeReviewTableList: React.FC<any> = () => {
   // 按季度统计
   const statisticsByQuarters = async () => {
     /* 4季 */
-    debugger;
     const quartersColums = columsForQuarters();
     gridApi.current?.setColumnDefs(quartersColums);
     const datas: any = await queryCodeReviewCount(gqlClient, 'quarter');

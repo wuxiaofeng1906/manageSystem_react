@@ -144,6 +144,11 @@ export default [
           path: 'bugReopenRate',
           component: './performance/developer/bugReopenRate',
         }, {
+          name: '平均每周代码量',
+          icon: 'table',
+          path: 'avgCodePerWeek',
+          component: './performance/developer/avgCodePerWeek',
+        }, {
           name: '千行Bug率',
           icon: 'table',
           path: 'thousandBugsRate',

@@ -147,4 +147,39 @@ function getFourQuarterTime() {
   return quarterArray;
 }
 
-export {getWeeksRange, getMonthWeek, getRecentMonth, getTwelveMonthTime, getFourQuarterTime, formatMomentTime};
+
+const getParamsByType = (params: any) => {
+  let typeFlag = 0;
+  let ends = "";
+  if (params === 'week') {
+    const weekRanges = getWeeksRange(8);
+    const timeRange = new Array();
+    for (let index = 0; index < weekRanges.length; index += 1) {
+      timeRange.push(`"${weekRanges[index].to}"`);
+    }
+    ends = `[${timeRange.join(",")}]`;
+    typeFlag = 1;
+
+  } else if (params === 'month') {
+    const monthRanges = getTwelveMonthTime();
+    const timeRange = new Array();
+    for (let index = 0; index < monthRanges.length; index += 1) {
+      timeRange.push(`"${monthRanges[index].end}"`);
+    }
+    ends = `[${timeRange.join(",")}]`;
+    typeFlag = 2;
+
+  } else if (params === 'quarter') {
+    const timeRange = new Array();
+    const quarterTime = getFourQuarterTime();
+    for (let index = 0; index < quarterTime.length; index += 1) {
+      timeRange.push(`"${quarterTime[index].end}"`);
+    }
+    ends = `[${timeRange.join(",")}]`;
+    typeFlag = 3;
+  }
+
+  return {typeFlag, ends};
+};
+
+export {getWeeksRange, getMonthWeek, getRecentMonth, getTwelveMonthTime, getFourQuarterTime, formatMomentTime,getParamsByType};

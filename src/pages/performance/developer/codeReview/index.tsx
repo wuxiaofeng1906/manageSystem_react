@@ -7,7 +7,13 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
-import {getWeeksRange, getMonthWeek, getTwelveMonthTime, getFourQuarterTime} from '@/publicMethods/timeMethods';
+import {
+  getWeeksRange,
+  getMonthWeek,
+  getTwelveMonthTime,
+  getFourQuarterTime,
+  getParamsByType
+} from '@/publicMethods/timeMethods';
 import {moduleChange} from '@/publicMethods/cellRenderer';
 import {Button} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone} from "@ant-design/icons";
@@ -49,7 +55,7 @@ const compColums = [
 
 function codeNumberRender(values: any) {
 
-  if(values.rowNode.key === "前端"){
+  if (values.rowNode.key === "前端") {
     console.log("values", values);
   }
   debugger;
@@ -135,36 +141,36 @@ const columsForQuarters = () => {
 
 /* region 数据处理 */
 
-const getParamsByType = (params: any) => {
-  let typeFlag = 0;
-  let ends = "";
-  if (params === 'week') {
-    const timeRange = new Array();
-    for (let index = 0; index < weekRanges.length; index += 1) {
-      timeRange.push(`"${weekRanges[index].to}"`);
-    }
-    ends = `[${timeRange.join(",")}]`;
-    typeFlag = 1;
-
-  } else if (params === 'month') {
-    const timeRange = new Array();
-    for (let index = 0; index < monthRanges.length; index += 1) {
-      timeRange.push(`"${monthRanges[index].end}"`);
-    }
-    ends = `[${timeRange.join(",")}]`;
-    typeFlag = 2;
-
-  } else if (params === 'quarter') {
-    const timeRange = new Array();
-    for (let index = 0; index < quarterTime.length; index += 1) {
-      timeRange.push(`"${quarterTime[index].end}"`);
-    }
-    ends = `[${timeRange.join(",")}]`;
-    typeFlag = 3;
-  }
-
-  return {typeFlag, ends};
-};
+// const getParamsByType = (params: any) => {
+//   let typeFlag = 0;
+//   let ends = "";
+//   if (params === 'week') {
+//     const timeRange = new Array();
+//     for (let index = 0; index < weekRanges.length; index += 1) {
+//       timeRange.push(`"${weekRanges[index].to}"`);
+//     }
+//     ends = `[${timeRange.join(",")}]`;
+//     typeFlag = 1;
+//
+//   } else if (params === 'month') {
+//     const timeRange = new Array();
+//     for (let index = 0; index < monthRanges.length; index += 1) {
+//       timeRange.push(`"${monthRanges[index].end}"`);
+//     }
+//     ends = `[${timeRange.join(",")}]`;
+//     typeFlag = 2;
+//
+//   } else if (params === 'quarter') {
+//     const timeRange = new Array();
+//     for (let index = 0; index < quarterTime.length; index += 1) {
+//       timeRange.push(`"${quarterTime[index].end}"`);
+//     }
+//     ends = `[${timeRange.join(",")}]`;
+//     typeFlag = 3;
+//   }
+//
+//   return {typeFlag, ends};
+// };
 
 // 转化为ag-grid能被显示的格式
 const converseFormatForAgGrid = (oraDatas: any) => {

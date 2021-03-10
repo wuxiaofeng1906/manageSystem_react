@@ -109,42 +109,50 @@ const columsForWeeks = () => {
 const columsForMonths = () => {
   const component = new Array();
   for (let index = 0; index < monthRanges.length; index += 1) {
+    const endtime = monthRanges[index].end;
     component.push({
       headerName: monthRanges[index].title,
-      field: monthRanges[index].title,
+      children: [
+        {
+          headerName: '结构覆盖率',
+          field: `instCove${endtime.toString()}`,
+          aggFunc: instCoveRender,
+          cellRenderer: coverageCellRenderer,
+        },
+        {
+          headerName: '分支覆盖率',
+          field: `branCove${endtime.toString()}`,
+          aggFunc: branCoveRender,
+          cellRenderer: coverageCellRenderer,
+        },
+      ],
     });
-
-    // component.push({
-    //   headerName: monthRanges[index].title,
-    //   children: [
-    //     {
-    //       headerName: 'review个数',
-    //       field: monthRanges[index].title,
-    //     },
-    //   ],
-    // });
   }
   return compColums.concat(component);
 };
 
 const columsForQuarters = () => {
+
   const component = new Array();
   for (let index = 0; index < quarterTime.length; index += 1) {
+    const endtime = quarterTime[index].end;
     component.push({
       headerName: quarterTime[index].title,
-      field: quarterTime[index].title,
-
+      children: [
+        {
+          headerName: '结构覆盖率',
+          field: `instCove${endtime.toString()}`,
+          aggFunc: instCoveRender,
+          cellRenderer: coverageCellRenderer,
+        },
+        {
+          headerName: '分支覆盖率',
+          field: `branCove${endtime.toString()}`,
+          aggFunc: branCoveRender,
+          cellRenderer: coverageCellRenderer,
+        },
+      ],
     });
-
-    // component.push({
-    //   headerName: quarterTime[index].title,
-    //   children: [
-    //     {
-    //       headerName: 'review个数',
-    //       field: quarterTime[index].title,
-    //     },
-    //   ],
-    // });
   }
   return compColums.concat(component);
 };
@@ -232,7 +240,6 @@ function addGroupAndDept(oraDatas: any) {
       }
     }
   }
-  debugger;
   return objectDataArray;
 };
 
@@ -267,30 +274,36 @@ function dealData(tempDataArray: any) {
 }
 
 const queryFrontCoverage = async (client: GqlClient<object>, params: string) => {
-  let start = "";
   let ends = "";
+  let typeFlag = 0;
   if (params === 'week') {
     const timeRange = new Array();
     for (let index = 0; index < weekRanges.length; index += 1) {
       timeRange.push(`"${weekRanges[index].to}"`);
     }
-    // 求出开始时间和结束时间
-    start = `"${weekRanges[0].from}"`;
     ends = `[${timeRange.join(",")}]`;
+    typeFlag = 1;
   } else if (params === 'month') {
-
-    console.log("按月");
-    return [];
+    const timeRange = new Array();
+    for (let index = 0; index < monthRanges.length; index += 1) {
+      timeRange.push(`"${monthRanges[index].end}"`);
+    }
+    ends = `[${timeRange.join(",")}]`;
+    typeFlag = 2;
   } else if (params === 'quarter') {
-    console.log("按季度");
-    return [];
+    const timeRange = new Array();
+    for (let index = 0; index < quarterTime.length; index += 1) {
+      timeRange.push(`"${quarterTime[index].end}"`);
+    }
+    ends = `[${timeRange.join(",")}]`;
+    typeFlag = 3;
   } else {
     return [];
   }
 
   const {data} = await client.query(`
        {
-        detailCover(side:FRONT,start:${start},ends:${ends}){
+        detailCover(side:FRONT,kind:"${typeFlag}",ends:${ends}){
           datas{
             id
             side

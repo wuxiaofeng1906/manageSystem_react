@@ -367,14 +367,15 @@ const CodeReviewTableList: React.FC<any> = () => {
             sortable: true,
             filter: true,
             flex: 1,
-            // allowedAggFuncs: ['sum', 'min', 'max']
+            cellStyle: {"margin-top": "-5px"}
           }}
           autoGroupColumnDef={{
             maxWidth: 300,
           }}
           groupDefaultExpanded={9} // 展开分组
           suppressAggFuncInHeader={true}   // 不显示标题聚合函数的标识
-
+          rowHeight={32}
+          headerHeight={35}
           // pivotColumnGroupTotals={'always'}
           // groupHideOpenParents={true}  // 组和人名同一列
 

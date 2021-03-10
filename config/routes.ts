@@ -138,6 +138,16 @@ export default [
           icon: 'table',
           path: 'bugResolutionTime',
           component: './performance/developer/bugResolutionTime',
+        }, {
+          name: 'Bug Reopen率',
+          icon: 'table',
+          path: 'bugReopenRate',
+          component: './performance/developer/bugReopenRate',
+        }, {
+          name: '千行Bug率',
+          icon: 'table',
+          path: 'thousandBugsRate',
+          component: './performance/developer/thousandBugsRate',
         },
       ]
     }, {

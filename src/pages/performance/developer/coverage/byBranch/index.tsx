@@ -155,10 +155,16 @@ const BranchTableList: React.FC<any> = () => {
       <div>
         <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
                 placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
-          <p><strong>1.计算公式说明</strong></p>
-          <p style={cssIndent}>周报：累计当周的Missed Instructions Cov值；</p>
-          <p style={cssIndent}>月报：累计当月的Missed Instructions Cov值；</p>
-          <p style={cssIndent}>季报：累计当季的Missed Instructions Cov值；</p>
+          <p><strong>1.统计周期</strong></p>
+          <p style={cssIndent}>按周统计：覆盖率为当周最新的覆盖率(累计)；</p>
+          <p style={cssIndent}>按月统计：覆盖率为当月最新的覆盖率(累计)；</p>
+          <p style={cssIndent}>按季统计：覆盖率为当季度最新的覆盖率(累计)；</p>
+          <p><strong>2.统计公式说明</strong></p>
+          <p style={cssIndent}>结构覆盖率 = 所拥有文件结构覆盖数之和/所有拥有文件总结构数之和； </p>
+          <p style={cssIndent}>分支覆盖率 = 所拥有文件分支覆盖数之和/所有拥有文件总分支数之和； </p>
+          <p><strong>3.取值方式</strong></p>
+          <p style={cssIndent}>前端：结构数：Statements 分支数：Branches；</p>
+          <p style={cssIndent}>后端：结构数：Instructions Cov 分支数：Branches；</p>
 
         </Drawer>
       </div>

@@ -411,7 +411,7 @@ const CodeReviewTableList: React.FC<any> = () => {
             cellStyle: {"margin-top": "-5px"}
           }}
           autoGroupColumnDef={{
-            maxWidth: 300,
+            minWidth: 250,
           }}
           groupDefaultExpanded={9} // 展开分组
           suppressAggFuncInHeader={true}   // 不显示标题聚合函数的标识

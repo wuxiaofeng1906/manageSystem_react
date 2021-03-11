@@ -111,10 +111,11 @@ const BranchTableList: React.FC<any> = () => {
           <AgGridColumn
             field="side"
             headerName="技术侧"
+            maxWidth={100}
             enableRowGroup
             cellRenderer={sideCellRenderer}
           />
-          <AgGridColumn field="branch" headerName="分支名" />
+          <AgGridColumn field="branch" headerName="分支名"  width={200} />
           <AgGridColumn field="reportDate" headerName="日期" cellRenderer={dateCellRenderer} />
           <AgGridColumn
             field="instCove"

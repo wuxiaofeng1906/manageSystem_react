@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -15,8 +15,8 @@ import {
   getParamsByType
 } from '@/publicMethods/timeMethods';
 import {colorRender, moduleChange} from '@/publicMethods/cellRenderer';
-import {Button} from "antd";
-import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone} from "@ant-design/icons";
+import {Button, Drawer} from "antd";
+import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
 
 
 // 获取近四周的时间范围
@@ -343,6 +343,18 @@ const CodeReviewTableList: React.FC<any> = () => {
     gridApi.current?.setRowData(datas);
   };
 
+  /* region 提示规则显示 */
+  const [messageVisible, setVisible] = useState(false);
+  const showRules = () => {
+    setVisible(true);
+  };
+  const onClose = () => {
+    setVisible(false);
+  };
+
+  const cssIndent = {textIndent: '2em'};
+  /* endregion */
+
   return (
     <PageContainer>
       <div style={{background: 'white'}}>
@@ -352,6 +364,8 @@ const CodeReviewTableList: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
+        <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
+                size={'large'} onClick={showRules}>计算规则</Button>
       </div>
 
       <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
@@ -380,6 +394,28 @@ const CodeReviewTableList: React.FC<any> = () => {
         >
         </AgGridReact>
       </div>
+
+      <div>
+        <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
+                placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
+          <p><strong>1.统计周期</strong></p>
+          <p style={cssIndent}>按周统计：bug解决日期为周一00:00:00--周日23:59:59；</p>
+          <p style={cssIndent}>按月统计：bug解决日期为每月1号00:00:00--每月最后1天23:59:59；</p>
+          <p style={cssIndent}>按季统计：bug解决日期为每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
+          <p><strong>2.分子值获取</strong></p>
+          <p style={cssIndent}> 分子为重新激活的bug：由谁解决为开发的，且激活次数&gt;=1，且（当前bug状态为激活的，曾经的解决方案有1次以上是fixed的；
+            或bug当前状态为已解决/已关闭的，曾经的解决方案有2次以上是fixed的） </p>
+
+          <p><strong>3.分母值获取</strong></p>
+          <p style={cssIndent}>分母为解决bug：每周或每月或每季由谁解决为开发的bug； </p>
+
+          <p><strong>4.计算公式说明</strong></p>
+          <p style={cssIndent}>周报：当周解决后重新激活的bug数/当周解决的bug数；</p>
+          <p style={cssIndent}>月报：当月解决后重新激活的bug数/当月解决的bug数；</p>
+          <p style={cssIndent}>季报：当季解决后重新激活的bug数/当季解决的bug数；</p>
+        </Drawer>
+      </div>
+
     </PageContainer>
   );
 };

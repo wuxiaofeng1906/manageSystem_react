@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -8,8 +8,8 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import {getWeeksRange, getMonthWeek, getTwelveMonthTime, getFourQuarterTime} from '@/publicMethods/timeMethods';
-import {Button} from "antd";
-import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone} from "@ant-design/icons";
+import {Button, Drawer} from "antd";
+import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(4);
@@ -398,6 +398,18 @@ const BackendCoverageTableList: React.FC<any> = () => {
 
   /* endregion */
 
+  /* region 提示规则显示 */
+  const [messageVisible, setVisible] = useState(false);
+  const showRules = () => {
+    setVisible(true);
+  };
+  const onClose = () => {
+    setVisible(false);
+  };
+
+  const cssIndent = {textIndent: '2em'};
+  /* endregion */
+
   return (
     <PageContainer>
       <div style={{background: 'white'}}>
@@ -407,6 +419,8 @@ const BackendCoverageTableList: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
+        <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
+                size={'large'} onClick={showRules}>计算规则</Button>
       </div>
 
       <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
@@ -434,6 +448,17 @@ const BackendCoverageTableList: React.FC<any> = () => {
           onGridReady={onGridReady}
         >
         </AgGridReact>
+      </div>
+
+      <div>
+        <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
+                placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
+          <p><strong>1.计算公式说明</strong></p>
+          <p style={cssIndent}>周报：累计当周的Missed Instructions Cov值；</p>
+          <p style={cssIndent}>月报：累计当月的Missed Instructions Cov值；</p>
+          <p style={cssIndent}>季报：累计当季的Missed Instructions Cov值；</p>
+
+        </Drawer>
       </div>
     </PageContainer>
   );

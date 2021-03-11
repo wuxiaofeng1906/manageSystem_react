@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -14,9 +14,9 @@ import {
   getFourQuarterTime,
   getParamsByType
 } from '@/publicMethods/timeMethods';
-import {moduleChange,colorRender} from '@/publicMethods/cellRenderer';
-import {Button} from "antd";
-import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone} from "@ant-design/icons";
+import {moduleChange, colorRender} from '@/publicMethods/cellRenderer';
+import {Button, Drawer} from "antd";
+import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
 
 
 // 获取近四周的时间范围
@@ -72,7 +72,7 @@ function codeNumberRender(values: any) {
     for (let i = 0; i < groupValues.length; i += 1) {
       const datas = groupValues[i];
       if (values.colDef.field === datas.time && rowName === datas.group) {
-        if (datas.values === ""|| datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
+        if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
           return ` <span style="color: Silver  ">  ${0} </span> `;
         }
         return ` <span style="font-weight: bold">  ${datas.values} </span> `;
@@ -81,7 +81,6 @@ function codeNumberRender(values: any) {
   }
   return ` <span style="color: Silver  ">  ${0} </span> `;
 }
-
 
 
 const columsForWeeks = () => {
@@ -388,6 +387,15 @@ const CodeReviewTableList: React.FC<any> = () => {
     gridApi.current?.setRowData(datas);
   };
 
+  const [messageVisible, setVisible] = useState(false);
+  const showRules = () => {
+    setVisible(true);
+  };
+  const onClose = () => {
+    setVisible(false);
+  };
+
+  const cssIndent = {textIndent: '2em'};
   return (
     <PageContainer>
       <div style={{background: 'white'}}>
@@ -397,8 +405,10 @@ const CodeReviewTableList: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
-      </div>
 
+        <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
+                size={'large'} onClick={showRules}>计算规则</Button>
+      </div>
       <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
         <AgGridReact
           columnDefs={columsForWeeks()} // 定义列
@@ -425,6 +435,19 @@ const CodeReviewTableList: React.FC<any> = () => {
         >
         </AgGridReact>
       </div>
+
+      <div>
+        <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>} placement="right" width={300}
+                closable={false} onClose={onClose} visible={messageVisible}>
+          <p><strong>1.统计周期</strong></p>
+          <p style={cssIndent}>按周统计：任务完成日期为周一00:00:00--周日23:59:59；</p>
+          <p style={cssIndent}>按月统计：任务完成日期为每月1号00:00:00--每月最后1天23:59:59；</p>
+          <p style={cssIndent}>按季统计：任务完成日期为每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
+          <p><strong>2.统计项</strong></p>
+          <p style={cssIndent}>任务标题含“code review”字样，大小写均可，由谁完成为开发的；</p>
+        </Drawer>
+      </div>
+
     </PageContainer>
   );
 };

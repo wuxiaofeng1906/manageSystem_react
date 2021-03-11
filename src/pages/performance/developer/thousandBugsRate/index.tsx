@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -15,8 +15,8 @@ import {
   getParamsByType
 } from '@/publicMethods/timeMethods';
 import {colorRender, moduleChange} from '@/publicMethods/cellRenderer';
-import {Button} from "antd";
-import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone} from "@ant-design/icons";
+import {Button, Drawer} from "antd";
+import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
 
 
 // 获取近四周的时间范围
@@ -305,6 +305,18 @@ const CodeReviewTableList: React.FC<any> = () => {
     gridApi.current?.setRowData(datas);
   };
 
+  /* region 提示规则显示 */
+  const [messageVisible, setVisible] = useState(false);
+  const showRules = () => {
+    setVisible(true);
+  };
+  const onClose = () => {
+    setVisible(false);
+  };
+
+  const cssIndent = {textIndent: '2em'};
+  /* endregion */
+
   return (
     <PageContainer>
       <div style={{background: 'white'}}>
@@ -314,6 +326,9 @@ const CodeReviewTableList: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
+        <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
+                size={'large'} onClick={showRules}>计算规则</Button>
+
       </div>
 
       <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
@@ -341,6 +356,25 @@ const CodeReviewTableList: React.FC<any> = () => {
           onGridReady={onGridReady}
         >
         </AgGridReact>
+      </div>
+
+      <div>
+        <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
+                placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
+          <p><strong>1.统计周期</strong></p>
+          <p style={cssIndent}>按周统计：bug创建日期为周一00:00:00--周日23:59:59；</p>
+          <p style={cssIndent}>按月统计：bug创建日期为每月1号00:00:00--每月最后1天23:59:59；</p>
+          <p style={cssIndent}>按季统计：bug创建日期每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
+          <p><strong>2.统计范围</strong></p>
+          <p style={cssIndent}>产品为“1.0/1.0正式版--产品经理”“产品实施--实施顾问反馈”“开发自提需求”； </p>
+          <p style={cssIndent}>解决方案为“空”“已解决”“延期处理”“后续版本”“代码未合并”的，统计严重程度为P0、P1、P2的bug； </p>
+          <p style={cssIndent}>Bug状态 等于“激活”的情况，统计指派给为开发的；Bug状态不等于“激活”（已解决/已关闭），统计解决者为开发的； </p>
+          <p><strong>3.计算公式说明</strong></p>
+          <p style={cssIndent}>周报：周一至周天开发类有效bug求和/(周一至周天代码量求和/1000)；</p>
+          <p style={cssIndent}>月报：当月1号至当月最后1天开发类有效bug求和/(当月1号至当月最后1天代码量求和/1000)；</p>
+          <p style={cssIndent}>季报：当季第一个月1号至当季最后1天开发类有效bug求和/(当季第一个月1号至当季最后1天代码量求和/1000)；</p>
+
+        </Drawer>
       </div>
     </PageContainer>
   );

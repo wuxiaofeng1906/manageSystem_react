@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -15,8 +15,8 @@ import {
   getParamsByType
 } from '@/publicMethods/timeMethods';
 import {colorRender, moduleChange} from '@/publicMethods/cellRenderer';
-import {Button} from "antd";
-import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone} from "@ant-design/icons";
+import {Button, Drawer} from "antd";
+import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
 
 
 // 获取近四周的时间范围
@@ -342,6 +342,16 @@ const CodeReviewTableList: React.FC<any> = () => {
     gridApi.current?.setRowData(datas);
   };
 
+  const [messageVisible, setVisible] = useState(false);
+  const showRules = () => {
+    setVisible(true);
+  };
+  const onClose = () => {
+    setVisible(false);
+  };
+
+  const cssIndent = {textIndent: '2em'};
+
   return (
     <PageContainer>
       <div style={{background: 'white'}}>
@@ -351,7 +361,34 @@ const CodeReviewTableList: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
+        <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
+                size={'large'} onClick={showRules}>计算规则</Button>
       </div>
+
+      <div>
+        <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
+                placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
+          <p><strong>1.统计周期</strong></p>
+          <p style={cssIndent}>按周统计：bug解决日期为周一00:00:00--周日23:59:59；</p>
+          <p style={cssIndent}>按月统计：bug解决日期为每月1号00:00:00--每月最后1天23:59:59；</p>
+          <p style={cssIndent}>按季统计：bug解决日期为每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
+          <p><strong>2.计算公式</strong></p>
+          <p style={cssIndent}>开发每次解决时长 = 开发每次打解决时间 减去 打解决时间前最近一次指派给该开发的时间 减去
+            法定节假日时长（若在打解决时间前没有指派给该开发的时间，默认取该bug的创建时间）；</p>
+          <p><strong>3.特殊情况</strong></p>
+          <p style={cssIndent}>在action表中查bug的历史信息，查曾经的解决人为开发的有几个： </p>
+          <p style={cssIndent}>a.若为同一人多次打解决，则只计算每次打解决的时长然后求和（不计算每次打解决后指派给他人验证的时长）；</p>
+          <p style={cssIndent}>b.当一个bug被多个开发打解决时，分段计算各开发在该bug的解决时长，然后按开发人员进行解决时长求和
+            （举个例子：某bug被张三和李四2人解决了3次，其中张三解决了2次分别是2H和5H，李四解决时长6H，那张三在该bug的解决时长就等于2+5=7H，李四则为6H）；</p>
+          <p><strong>4.计算时长说明</strong></p>
+          <p style={cssIndent}>计算时长单位为H，只计算工作日时长（不算周末和法定节假日），每天时长默认24H；</p>
+          <p><strong>5.计算公式说明</strong></p>
+          <p style={cssIndent}>周报：当周所有解决bug时长的和/当周所有解决bug数；</p>
+          <p style={cssIndent}>月报：当月所有解决bug时长的和/当月所有解决bug数；</p>
+          <p style={cssIndent}>季报：当季所有解决bug时长的和/当季所有解决bug数；</p>
+        </Drawer>
+      </div>
+
 
       <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
         <AgGridReact

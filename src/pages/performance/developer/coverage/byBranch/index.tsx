@@ -1,16 +1,18 @@
-import React, { useRef } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
-import { AgGridColumn, AgGridReact } from 'ag-grid-react';
+import React, {useRef, useState} from 'react';
+import {PageContainer} from '@ant-design/pro-layout';
+import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import { useRequest } from 'ahooks';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import { GqlClient, useGqlClient } from '@/hooks';
+import {useRequest} from 'ahooks';
+import {GridApi, GridReadyEvent} from 'ag-grid-community';
+import {GqlClient, useGqlClient} from '@/hooks';
 import * as dayjs from 'dayjs';
+import {Button, Drawer} from "antd";
+import {QuestionCircleTwoTone} from "@ant-design/icons";
 
 const queryBranchViews = async (client: GqlClient<object>) => {
-  const { data } = await client.query(`
+  const {data} = await client.query(`
     {
       fileCovers
       {
@@ -68,7 +70,7 @@ const BranchTableList: React.FC<any> = () => {
 
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
-  const { data, loading } = useRequest(() => queryBranchViews(gqlClient));
+  const {data, loading} = useRequest(() => queryBranchViews(gqlClient));
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -80,29 +82,42 @@ const BranchTableList: React.FC<any> = () => {
     else gridApi.current.hideOverlay();
   }
 
+  /* region 提示规则显示 */
+  const [messageVisible, setVisible] = useState(false);
+  const showRules = () => {
+    setVisible(true);
+  };
+  const onClose = () => {
+    setVisible(false);
+  };
+
+  const cssIndent = {textIndent: '2em'};
+  /* endregion */
+
   return (
     <PageContainer>
-      <div className="ag-theme-alpine" style={{ height: 700, width: '100%' }}>
+      <div style={{background: 'white'}}>
+        <Button type="text" style={{color: 'black'}} size={'large'}></Button>
+        <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
+                size={'large'} onClick={showRules}>计算规则</Button>
+      </div>
+
+      <div className="ag-theme-alpine" style={{height: 700, width: '100%'}}>
         <AgGridReact
           rowData={data}
           defaultColDef={{
             resizable: true,
             sortable: true,
-            // floatingFilter: true,
-            // filter: "agTextColumnFilter",
             filter: true,
             flex: 1,
             minWidth: 100,
-             // cellStyle: { 'text-align': 'center' }, //
-
-
+            cellStyle: {"margin-top": "-5px"}
           }}
           autoGroupColumnDef={{
             minWidth: 100,
           }}
-          // rowHeight={35}
-          // headerHeight={35}
-
+          rowHeight={32}
+          headerHeight={35}
           suppressDragLeaveHidesColumns
           suppressMakeColumnVisibleAfterUnGroup
           // rowGroupPanelShow="always"
@@ -115,8 +130,8 @@ const BranchTableList: React.FC<any> = () => {
             enableRowGroup
             cellRenderer={sideCellRenderer}
           />
-          <AgGridColumn field="branch" headerName="分支名"  width={200} />
-          <AgGridColumn field="reportDate" headerName="日期" cellRenderer={dateCellRenderer} />
+          <AgGridColumn field="branch" headerName="分支名" width={200}/>
+          <AgGridColumn field="reportDate" headerName="日期" cellRenderer={dateCellRenderer}/>
           <AgGridColumn
             field="instCove"
             headerName="结构覆盖率"
@@ -136,6 +151,18 @@ const BranchTableList: React.FC<any> = () => {
 
         </AgGridReact>
       </div>
+
+      <div>
+        <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
+                placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
+          <p><strong>1.计算公式说明</strong></p>
+          <p style={cssIndent}>周报：累计当周的Missed Instructions Cov值；</p>
+          <p style={cssIndent}>月报：累计当月的Missed Instructions Cov值；</p>
+          <p style={cssIndent}>季报：累计当季的Missed Instructions Cov值；</p>
+
+        </Drawer>
+      </div>
+
     </PageContainer>
   );
 };

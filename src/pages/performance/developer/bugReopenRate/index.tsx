@@ -60,8 +60,8 @@ function codeNumberRender(values: any) {
     for (let i = 0; i < moduleValues.length; i += 1) {
       const moduleInfo = moduleValues[i];
       if (values.colDef.field === moduleInfo.time && rowName === moduleInfo.module && values.rowNode.parent.key === moduleInfo.parent) {
-        if (moduleInfo.values === "" || moduleInfo.values === null || moduleInfo.values === undefined || Number(moduleInfo.values) === 0) {
-          return ` <span style="color: Silver  ">  ${0} </span> `;
+        if (moduleInfo.values === "" || moduleInfo.values === null || moduleInfo.values === undefined || Number(moduleInfo.values) === 0 || Number(moduleInfo.values) === 0.00) {
+          return ` <span style="color: Silver  ">  0 </span> `;
         }
         return ` <span style="font-weight: bold">  ${Number(moduleInfo.values).toFixed(2)} </span> `;
       }
@@ -70,14 +70,14 @@ function codeNumberRender(values: any) {
     for (let i = 0; i < groupValues.length; i += 1) {
       const datas = groupValues[i];
       if (values.colDef.field === datas.time && rowName === datas.group) {
-        if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
-          return ` <span style="color: Silver  ">  ${0} </span> `;
+        if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0 || Number(datas.values) === 0.00) {
+          return ` <span style="color: Silver  ">  0 </span> `;
         }
         return ` <span style="font-weight: bold">  ${Number(datas.values).toFixed(2)} </span> `;
       }
     }
   }
-  return ` <span style="color: Silver  ">  ${0} </span> `;
+  return ` <span style="color: Silver  ">  0 </span> `;
 }
 
 
@@ -172,8 +172,8 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         values: data[i].ratio
       }, {
         time: starttime,
-        group: data[i].parent.deptName,
-        values: data[i].parent.ratio
+        group: data[i].parent === null ? data[i].deptName : data[i].parent.deptName,
+        values: data[i].parent === null ? "" : data[i].parent.ratio
       });
       moduleValues.push({
         time: starttime,
@@ -186,6 +186,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         parent: data[i].deptName,
         values: data[i].side.backend
       });
+
       const usersData = data[i].users;
       for (let m = 0; m < usersData.length; m += 1) {
         const username = usersData[m].userName;
@@ -193,7 +194,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
 
         arrays.push({
           devCenter: "研发中心",
-          dept: data[i].parent.deptName,
+          dept: data[i].parent === null ? data[i].deptName : data[i].parent.deptName,
           group: data[i].deptName,
           module: moduleChange(usersData[m].tech),
           "username": username,
@@ -246,48 +247,48 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
   }
   const {data} = await client.query(`
       {
-        bugRepairDept(kind:"${condition.typeFlag}",ends:${condition.ends}){
-          total{
-            deptName
-            duration
-            count
-            ratio
-          }
-          range{
-            start
-            end
-          }
-          side{
-            both
-            front
-            backend
-          }
-          datas{
-            dept
-            deptName
-            parent{
+        bugReopenDept(kind:"${condition.typeFlag}",ends:${condition.ends}){
+            total{
               deptName
+              reopen
+              resolved
               ratio
+            }
+            range{
+              start
+              end
             }
             side{
               both
               front
               backend
             }
-            ratio
-            users{
-              userId
-              userName
+            datas{
+              dept
+              deptName
+              parent{
+                deptName
+                ratio
+              }
+              side{
+                both
+                front
+                backend
+              }
               ratio
-              tech
+              users{
+                userId
+                userName
+                ratio
+                tech
+              }
             }
           }
-        }
 
       }
   `);
 
-  const datas = converseFormatForAgGrid(data?.bugRepairDept);
+  const datas = converseFormatForAgGrid(data?.bugReopenDept);
   return converseArrayToOne(datas);
 };
 

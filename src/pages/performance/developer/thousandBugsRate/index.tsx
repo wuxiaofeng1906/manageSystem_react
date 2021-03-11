@@ -133,6 +133,7 @@ const columsForQuarters = () => {
 // 转化为ag-grid能被显示的格式
 const converseFormatForAgGrid = (oraDatas: any) => {
 
+  debugger;
   groupValues.length = 0;
   moduleValues.length = 0;
 
@@ -246,43 +247,7 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
   }
   const {data} = await client.query(`
       {
-        bugRepairDept(kind:"${condition.typeFlag}",ends:${condition.ends}){
-          total{
-            deptName
-            duration
-            count
-            ratio
-          }
-          range{
-            start
-            end
-          }
-          side{
-            both
-            front
-            backend
-          }
-          datas{
-            dept
-            deptName
-            parent{
-              deptName
-              ratio
-            }
-            side{
-              both
-              front
-              backend
-            }
-            ratio
-            users{
-              userId
-              userName
-              ratio
-              tech
-            }
-          }
-        }
+
 
       }
   `);

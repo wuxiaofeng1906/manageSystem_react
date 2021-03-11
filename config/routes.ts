@@ -134,7 +134,7 @@ export default [
           path: 'codeReview',
           component: './performance/developer/codeReview',
         }, {
-          name: 'Bug解决时长',
+          name: '平均Bug修复时长',
           icon: 'table',
           path: 'bugResolutionTime',
           component: './performance/developer/bugResolutionTime',

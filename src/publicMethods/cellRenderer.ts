@@ -252,7 +252,7 @@ const moduleChange = (params: string) => {
 
 
 function colorRender(params: any) {
-  if (params.value === "" || params.value === undefined || params.value === 0)
+  if (params.value === "" || params.value === undefined || Number(params.value) === 0 || Number(params.value) === 0.00)
     return ` <span style="color: Silver  ">  ${0} </span> `;
   return params.value;  // 为了将聚合函数实现格式化
 }

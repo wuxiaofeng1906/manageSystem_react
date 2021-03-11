@@ -52,11 +52,11 @@ function coverageCellRenderer(params: any) {
   // 判断是否包含属性
   if (params.hasOwnProperty("value")) {
     if (params.value === "0.00") {
-      return ` <span style="color: dodgerblue">  ${0} </span> `;
+      return ` <span style="color: Silver  ">  ${0} </span> `;   // Silver
     }
     return params.value;
   }
-  return ` <span style="color: dodgerblue">  ${0} </span> `;
+  return ` <span style="color: Silver  ">  ${0} </span> `;
 }
 
 /* endregion */
@@ -163,7 +163,6 @@ const columsForQuarters = () => {
 function addGroupAndDept(oraDatas: any) {
   const objectDataArray: string | any[] = [];
   for (let index = 0; index < oraDatas.length; index += 1) {
-
     if (oraDatas[index] !== null) {
       const weekDatas = oraDatas[index].datas;
       if (weekDatas !== null) {
@@ -175,24 +174,39 @@ function addGroupAndDept(oraDatas: any) {
             deptInfo = weekDatas[i].parent.name;
           }
           let groupInfo = weekDatas[i].name;
-
-          if (deptInfo === "成都研发中心") {
+          if(groupInfo === "前端平台研发部"){
             deptInfo = "前端平台研发部";
             groupInfo = "前端平台研发";
+              InstGroupValues.push({
+                time: `instCove${orderTime}`,
+                group: "前端平台研发部",
+                values: weekDatas[i].instCove
+              });
 
-            InstGroupValues.push({
-              time: `instCove${orderTime}`,
-              group: "前端平台研发部",
-              values: weekDatas[i].instCove
-            });
-
-            branGroupValues.push({
-              time: `branCove${orderTime}`,
-              group: "前端平台研发部",
-              values: weekDatas[i].branCove
-            });
+              branGroupValues.push({
+                time: `branCove${orderTime}`,
+                group: "前端平台研发部",
+                values: weekDatas[i].branCove
+              });
           }
-          // 此代码处理组的覆盖率,将组的单元测试覆盖率存到全局变量
+
+          // if (deptInfo === "成都研发中心") {
+          //
+          //   deptInfo = "前端平台研发部";
+          //   groupInfo = "前端平台研发";
+          //
+          //   InstGroupValues.push({
+          //     time: `instCove${orderTime}`,
+          //     group: "前端平台研发部",
+          //     values: weekDatas[i].instCove
+          //   });
+          //
+          //   branGroupValues.push({
+          //     time: `branCove${orderTime}`,
+          //     group: "前端平台研发部",
+          //     values: weekDatas[i].branCove
+          //   });
+          // }
 
           // 特殊处理产品研发部的数据
           if (deptInfo === "产品研发部") {

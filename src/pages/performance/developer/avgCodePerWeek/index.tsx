@@ -14,7 +14,7 @@ import {
   getFourQuarterTime,
   getParamsByType
 } from '@/publicMethods/timeMethods';
-import {moduleChange} from '@/publicMethods/cellRenderer';
+import {colorRender, moduleChange} from '@/publicMethods/cellRenderer';
 import {Button} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone} from "@ant-design/icons";
 
@@ -57,24 +57,27 @@ const compColums = [
 function codeNumberRender(values: any) {
   const rowName = values.rowNode.key;
   if (rowName === "前端" || rowName === "后端") {
-
     for (let i = 0; i < moduleValues.length; i += 1) {
       const moduleInfo = moduleValues[i];
       if (values.colDef.field === moduleInfo.time && rowName === moduleInfo.module && values.rowNode.parent.key === moduleInfo.parent) {
+        if (moduleInfo.values === "" || moduleInfo.values === null || moduleInfo.values === undefined || Number(moduleInfo.values) === 0) {
+          return ` <span style="color: Silver  ">  ${0} </span> `;
+        }
         return ` <span style="font-weight: bold">  ${Number(moduleInfo.values).toFixed(2)} </span> `;
-        break;
       }
     }
   } else {
     for (let i = 0; i < groupValues.length; i += 1) {
       const datas = groupValues[i];
       if (values.colDef.field === datas.time && rowName === datas.group) {
+        if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
+          return ` <span style="color: Silver  ">  ${0} </span> `;
+        }
         return ` <span style="font-weight: bold">  ${Number(datas.values).toFixed(2)} </span> `;
-        break;
       }
     }
   }
-  return '';
+  return ` <span style="color: Silver  ">  ${0} </span> `;
 }
 
 
@@ -87,9 +90,7 @@ const columsForWeeks = () => {
       headerName: weekName,
       field: starttime.toString(),
       aggFunc: codeNumberRender,
-      cellRenderer: (params: any) => {
-        return params.value;  // 为了将聚合函数实现格式化
-      },
+      cellRenderer: colorRender
     });
 
   }
@@ -102,20 +103,10 @@ const columsForMonths = () => {
     component.push({
       headerName: monthRanges[index].title,
       field: monthRanges[index].start,
-      cellRenderer: (params: any) => {
-        return params.value;  // 为了将聚合函数实现格式化
-      },
+      aggFunc: codeNumberRender,
+      cellRenderer: colorRender
     });
 
-    // component.push({
-    //   headerName: monthRanges[index].title,
-    //   children: [
-    //     {
-    //       headerName: 'review个数',
-    //       field: monthRanges[index].title,
-    //     },
-    //   ],
-    // });
   }
   return compColums.concat(component);
 };
@@ -126,21 +117,10 @@ const columsForQuarters = () => {
     component.push({
       headerName: quarterTime[index].title,
       field: quarterTime[index].start,
-      cellRenderer: (params: any) => {
-        return params.value;  // 为了将聚合函数实现格式化
-      },
+      aggFunc: codeNumberRender,
+      cellRenderer: colorRender
     });
 
-    // component.push({
-    //   headerName: quarterTime[index].title,
-
-    //   children: [
-    //     {
-    //       headerName: 'review个数',
-    //       field: quarterTime[index].title,
-    //     },
-    //   ],
-    // });
   }
   return compColums.concat(component);
 };

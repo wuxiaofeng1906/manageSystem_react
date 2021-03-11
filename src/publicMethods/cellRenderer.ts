@@ -250,6 +250,13 @@ const moduleChange = (params: string) => {
   return module;
 };
 
+
+function colorRender(params: any) {
+  if (params.value === "" || params.value === undefined || params.value === 0)
+    return ` <span style="color: Silver  ">  ${0} </span> `;
+  return params.value;  // 为了将聚合函数实现格式化
+}
+
 export {
   numberRenderToYesNo,
   numberRenderTopass,
@@ -259,6 +266,7 @@ export {
   numberRenderToZentaoStatus,
   numberRenderToSource,
   linkToZentaoPage,
-  moduleChange
+  moduleChange,
+  colorRender
 };
 

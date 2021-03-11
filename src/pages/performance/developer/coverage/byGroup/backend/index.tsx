@@ -52,11 +52,11 @@ function coverageCellRenderer(params: any) {
   // 判断是否包含属性
   if (params.hasOwnProperty("value")) {
     if (params.value === "0.00") {
-      return ` <span style="color: dodgerblue">  ${0} </span> `;
+      return ` <span style="color: Silver">  ${0} </span> `;
     }
     return params.value;
   }
-  return ` <span style="color: dodgerblue">  ${0} </span> `;
+  return ` <span style="color: Silver">  ${0} </span> `;
 }
 
 /* endregion */
@@ -316,7 +316,7 @@ const queryFrontCoverage = async (client: GqlClient<object>, params: string) => 
 
   const {data} = await client.query(`
        {
-        detailCover(side:FRONT,kind:"${typeFlag}",ends:${ends}){
+        detailCover(side:BACKEND,kind:"${typeFlag}",ends:${ends}){
           datas{
             id
             side

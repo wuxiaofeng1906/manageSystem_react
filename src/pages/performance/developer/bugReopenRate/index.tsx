@@ -14,7 +14,7 @@ import {
   getFourQuarterTime,
   getParamsByType
 } from '@/publicMethods/timeMethods';
-import {colorRender, moduleChange} from '@/publicMethods/cellRenderer';
+import {moduleChange} from '@/publicMethods/cellRenderer';
 import {Button, Drawer} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
 
@@ -63,7 +63,7 @@ function codeNumberRender(values: any) {
         if (moduleInfo.values === "" || moduleInfo.values === null || moduleInfo.values === undefined || Number(moduleInfo.values) === 0 || Number(moduleInfo.values) === 0.00) {
           return ` <span style="color: Silver  ">  0 </span> `;
         }
-        return ` <span style="font-weight: bold">  ${Number(moduleInfo.values).toFixed(2)} </span> `;
+        return ` <span style="font-weight: bold">  ${`${(Number(moduleInfo.values) * 100).toFixed(2).toString()}%`} </span> `;
       }
     }
   } else {
@@ -73,13 +73,24 @@ function codeNumberRender(values: any) {
         if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0 || Number(datas.values) === 0.00) {
           return ` <span style="color: Silver  ">  0 </span> `;
         }
-        return ` <span style="font-weight: bold">  ${Number(datas.values).toFixed(2)} </span> `;
+        return ` <span style="font-weight: bold">  ${`${(Number(datas.values) * 100).toFixed(2).toString()}%`} </span> `;
       }
     }
   }
   return ` <span style="color: Silver  ">  0 </span> `;
 }
 
+
+function colorRender(params: any) {
+
+  if (params.value === "" || params.value === undefined || Number(params.value) === 0 || Number(params.value) === 0.00) {
+    return ` <span style="color: Silver  ">  ${0} </span> `;
+  }
+  if (Number.isNaN(Number(params.value)) === false) {
+    return `${(Number(params.value) * 100).toFixed(2).toString()}%`;
+  }
+  return params.value;  // 为了将聚合函数实现格式化
+}
 
 const columsForWeeks = () => {
   const component = new Array();

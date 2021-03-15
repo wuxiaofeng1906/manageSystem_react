@@ -25,6 +25,8 @@ const monthRanges = getTwelveMonthTime();
 const quarterTime = getFourQuarterTime();
 const groupValues: any[] = [];
 const moduleValues: any[] = [];
+let frontCount: string[] = [];
+let backendCount: string[] = [];
 
 /* region 动态定义列 */
 const compColums = [
@@ -55,8 +57,11 @@ const compColums = [
   }];
 
 function codeNumberRender(values: any) {
+  // console.log("values", values.rowNode.key, values.rowNode.allChildrenCount,);
+  let userCount = values.rowNode.allChildrenCount;
   const rowName = values.rowNode.key;
   if (rowName === "前端" || rowName === "后端") {
+
     for (let i = 0; i < moduleValues.length; i += 1) {
       const moduleInfo = moduleValues[i];
       if (values.colDef.field === moduleInfo.time && rowName === moduleInfo.module && values.rowNode.parent.key === moduleInfo.parent) {
@@ -64,11 +69,15 @@ function codeNumberRender(values: any) {
           return ` <span style="color: Silver  ">  0 </span> `;
         }
         // return ` <span style="font-weight: bold">  ${`${(Number(moduleInfo.values) * 100).toFixed(2).toString()}%`} </span> `;
-        return ` <span style="font-weight: bold">  ${(Number(moduleInfo.values) * 100).toFixed(2)} </span> `;
+        return ` <span style="font-weight: bold">  ${(Number(moduleInfo.values) / userCount * 100).toFixed(2)} </span> `;
 
       }
     }
   } else {
+
+    if (rowName === "研发中心") {
+      userCount -= 2;
+    }
     for (let i = 0; i < groupValues.length; i += 1) {
       const datas = groupValues[i];
       if (values.colDef.field === datas.time && rowName === datas.group) {
@@ -76,7 +85,7 @@ function codeNumberRender(values: any) {
           return ` <span style="color: Silver  ">  0 </span> `;
         }
         // return ` <span style="font-weight: bold">  ${`${(Number(datas.values) * 100).toFixed(2).toString()}%`} </span> `;
-        return ` <span style="font-weight: bold"> ${(Number(datas.values) * 100).toFixed(2)} </span> `;
+        return ` <span style="font-weight: bold"> ${(Number(datas.values) / userCount * 100).toFixed(2)} </span> `;
       }
     }
   }
@@ -85,12 +94,25 @@ function codeNumberRender(values: any) {
 
 
 function colorRender(params: any) {
+  console.log(frontCount,backendCount);
 
   if (params.value === "" || params.value === undefined || Number(params.value) === 0 || Number(params.value) === 0.00) {
     return ` <span style="color: Silver  ">  ${0} </span> `;
   }
+
   if (Number.isNaN(Number(params.value)) === false) {
+
     // return `${(Number(params.value) * 100).toFixed(2).toString()}%`;
+    if (params.data.username === "前端") {
+      return (Number(params.value) / frontCount.length * 100).toFixed(2);
+
+    }
+    if (params.data.username === "后端") {
+
+      return (Number(params.value) / backendCount.length * 100).toFixed(2);
+
+    }
+
     return (Number(params.value) * 100).toFixed(2);
   }
 
@@ -151,6 +173,8 @@ const converseFormatForAgGrid = (oraDatas: any) => {
 
   groupValues.length = 0;
   moduleValues.length = 0;
+  frontCount.length = 0;
+  backendCount.length = 0;
 
   const arrays: any[] = [];
   if (oraDatas === null) {
@@ -207,12 +231,22 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       for (let m = 0; m < usersData.length; m += 1) {
         const username = usersData[m].userName;
         const counts = usersData[m].ratio;
+        const module = usersData[m].tech;
+        // debugger;
+        if (module === "1" && frontCount.includes(username) === false) {
+
+          frontCount.push(username);
+        }
+        if (module === "2" && backendCount.includes(username) === false) {
+          backendCount.push(username);
+        }
+
 
         arrays.push({
           devCenter: "研发中心",
           dept: data[i].parent === null ? data[i].deptName : data[i].parent.deptName,
           group: data[i].deptName,
-          module: moduleChange(usersData[m].tech),
+          module: moduleChange(module),
           "username": username,
           [starttime]: counts
         });
@@ -380,7 +414,7 @@ const CodeReviewTableList: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
-        <label style={{fontWeight:"bold"}}>(统计单位：%)</label>
+        <label style={{fontWeight: "bold"}}>(统计单位：%)</label>
         <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>

@@ -52,7 +52,7 @@ function getMonthWeek(starttime: string) {
   if (config.getMonth < 10) {
     monthStr = `0${config.getMonth}`;
   }
-  const week = `${config.getYear}年${monthStr}月0${config.getWeek}周`;
+  const week = `${monthStr}月0${config.getWeek}周`;
   // console.log('weeks', week);
   return week;
 }

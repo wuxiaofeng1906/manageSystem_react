@@ -63,7 +63,9 @@ function codeNumberRender(values: any) {
         if (moduleInfo.values === "" || moduleInfo.values === null || moduleInfo.values === undefined || Number(moduleInfo.values) === 0 || Number(moduleInfo.values) === 0.00) {
           return ` <span style="color: Silver  ">  0 </span> `;
         }
-        return ` <span style="font-weight: bold">  ${`${(Number(moduleInfo.values) * 100).toFixed(2).toString()}%`} </span> `;
+        // return ` <span style="font-weight: bold">  ${`${(Number(moduleInfo.values) * 100).toFixed(2).toString()}%`} </span> `;
+        return ` <span style="font-weight: bold">  ${(Number(moduleInfo.values) * 100).toFixed(2)} </span> `;
+
       }
     }
   } else {
@@ -73,7 +75,8 @@ function codeNumberRender(values: any) {
         if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0 || Number(datas.values) === 0.00) {
           return ` <span style="color: Silver  ">  0 </span> `;
         }
-        return ` <span style="font-weight: bold">  ${`${(Number(datas.values) * 100).toFixed(2).toString()}%`} </span> `;
+        // return ` <span style="font-weight: bold">  ${`${(Number(datas.values) * 100).toFixed(2).toString()}%`} </span> `;
+        return ` <span style="font-weight: bold"> ${(Number(datas.values) * 100).toFixed(2)} </span> `;
       }
     }
   }
@@ -87,8 +90,10 @@ function colorRender(params: any) {
     return ` <span style="color: Silver  ">  ${0} </span> `;
   }
   if (Number.isNaN(Number(params.value)) === false) {
-    return `${(Number(params.value) * 100).toFixed(2).toString()}%`;
+    // return `${(Number(params.value) * 100).toFixed(2).toString()}%`;
+    return (Number(params.value) * 100).toFixed(2);
   }
+
   return params.value;  // 为了将聚合函数实现格式化
 }
 
@@ -375,6 +380,7 @@ const CodeReviewTableList: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
+        <label style={{fontWeight:"bold"}}>(统计单位：%)</label>
         <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>

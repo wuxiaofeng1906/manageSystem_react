@@ -403,6 +403,7 @@ const CodeReviewTableList: React.FC<any> = () => {
           }}
           autoGroupColumnDef={{
             minWidth: 250,
+            sort: 'asc'
           }}
           groupDefaultExpanded={9} // 展开分组
           suppressAggFuncInHeader={true}   // 不显示标题聚合函数的标识

@@ -35,21 +35,26 @@ const compColums = [
     field: 'devCenter',
     rowGroup: true,
     hide: true,
+    sort: 'desc'
   }, {
     headerName: '所属部门',
     field: 'dept',
     rowGroup: true,
     hide: true,
+    sort: 'desc'
   }, {
     headerName: '组名',
     field: 'group',
     rowGroup: true,
     hide: true,
+    sort: 'desc'
   }, {
     headerName: '所属端',
     field: 'module',
     rowGroup: true,
     hide: true,
+
+    sort: 'desc'
 
   }, {
     headerName: '姓名',
@@ -94,7 +99,7 @@ function codeNumberRender(values: any) {
 
 
 function colorRender(params: any) {
-  console.log(frontCount,backendCount);
+  console.log(frontCount, backendCount);
 
   if (params.value === "" || params.value === undefined || Number(params.value) === 0 || Number(params.value) === 0.00) {
     return ` <span style="color: Silver  ">  ${0} </span> `;
@@ -431,6 +436,7 @@ const CodeReviewTableList: React.FC<any> = () => {
             cellStyle: {"margin-top": "-5px"}
           }}
           autoGroupColumnDef={{
+            sort: 'asc',
             minWidth: 250,
           }}
           groupDefaultExpanded={9} // 展开分组

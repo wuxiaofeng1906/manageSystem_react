@@ -383,9 +383,9 @@ const CodeReviewTableList: React.FC<any> = () => {
           <p><strong>4.计算时长说明</strong></p>
           <p style={cssIndent}>计算时长单位为H，只计算工作日时长（不算周末和法定节假日），每天时长默认24H；</p>
           <p><strong>5.计算公式说明</strong></p>
-          <p style={cssIndent}>周报：当周所有解决bug时长的和/当周所有解决bug数；</p>
-          <p style={cssIndent}>月报：当月所有解决bug时长的和/当月所有解决bug数；</p>
-          <p style={cssIndent}>季报：当季所有解决bug时长的和/当季所有解决bug数；</p>
+          <p style={cssIndent}>周报：当周所有解决bug时长排序，取中位数；</p>
+          <p style={cssIndent}>月报：当月所有解决bug时长排序，取中位数；</p>
+          <p style={cssIndent}>季报：当季所有解决bug时长排序，取中位数；</p>
         </Drawer>
       </div>
 

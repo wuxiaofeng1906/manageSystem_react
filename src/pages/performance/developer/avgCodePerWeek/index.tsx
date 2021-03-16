@@ -160,7 +160,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     groupValues.push({
       time: starttime,
       group: "研发中心",
-      values: oraDatas[index].total.ratio
+      values: oraDatas[index].total.avg
     });
 
     const data = oraDatas[index].datas;
@@ -169,35 +169,37 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       groupValues.push({
         time: starttime,
         group: data[i].deptName,
-        values: data[i].ratio
+        values: data[i].avg
       }, {
         time: starttime,
-        group: data[i].parent.deptName,
-        values: data[i].parent.ratio
+        group: data[i].parent === null ? "" : data[i].parent.deptName,
+        values: data[i].parent === null ? "" : data[i].parent.avg
       });
+
       moduleValues.push({
         time: starttime,
         module: "前端",
         parent: data[i].deptName,
-        values: data[i].side.front
+        values: data[i].side === null ? "" : data[i].side.front
       }, {
         time: starttime,
         module: "后端",
         parent: data[i].deptName,
-        values: data[i].side.backend
+        values: data[i].side === null ? "" : data[i].side.backend
       });
+
       const usersData = data[i].users;
       for (let m = 0; m < usersData.length; m += 1) {
         const username = usersData[m].userName;
-        const counts = usersData[m].ratio;
+
 
         arrays.push({
           devCenter: "研发中心",
-          dept: data[i].parent.deptName,
+          dept: data[i].parent === null ? "" : data[i].parent.deptName,
           group: data[i].deptName,
           module: moduleChange(usersData[m].tech),
           "username": username,
-          [starttime]: counts
+          [starttime]: usersData[m].avg
         });
       }
     }
@@ -247,11 +249,45 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
   const {data} = await client.query(`
       {
 
-
+        avgCodeDept(kind:"${condition.typeFlag}",ends:${condition.ends}) {
+          total{
+            deptName
+            count
+            avg
+          }
+          range {
+            start
+            end
+          }
+          side{
+            both
+            front
+            backend
+          }
+          datas {
+            parent{
+              deptName
+              avg
+            }
+            dept
+            deptName
+            avg
+            side{
+              front
+              backend
+            }
+            users{
+              userId
+              userName
+              avg
+              tech
+            }
+          }
+        }
       }
   `);
 
-  const datas = converseFormatForAgGrid(data?.bugRepairDept);
+  const datas = converseFormatForAgGrid(data?.avgCodeDept);
   return converseArrayToOne(datas);
 };
 

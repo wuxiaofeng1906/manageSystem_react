@@ -189,19 +189,31 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       });
 
       const usersData = data[i].users;
-      for (let m = 0; m < usersData.length; m += 1) {
-        const username = usersData[m].userName;
+      if (usersData !== null) {
+        for (let m = 0; m < usersData.length; m += 1) {
+          const username = usersData[m].userName;
+          if (data[i].parent === null || data[i].parent.deptName === "北京研发中心" || data[i].parent.deptName === "成都研发中心") {
+            arrays.push({
+              devCenter: "研发中心",
+              group: data[i].deptName,
+              module: moduleChange(usersData[m].tech),
+              "username": username,
+              [starttime]: usersData[m].avg
+            });
+          } else {
+            arrays.push({
+              devCenter: "研发中心",
+              dept: data[i].parent.deptName,
+              group: data[i].deptName,
+              module: moduleChange(usersData[m].tech),
+              "username": username,
+              [starttime]: usersData[m].avg
+            });
+          }
 
-
-        arrays.push({
-          devCenter: "研发中心",
-          dept: data[i].parent === null ? "" : data[i].parent.deptName,
-          group: data[i].deptName,
-          module: moduleChange(usersData[m].tech),
-          "username": username,
-          [starttime]: usersData[m].avg
-        });
+        }
       }
+
     }
 
   }

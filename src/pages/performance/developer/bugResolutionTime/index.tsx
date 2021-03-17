@@ -190,15 +190,27 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       for (let m = 0; m < usersData.length; m += 1) {
         const username = usersData[m].userName;
         const counts = usersData[m].ratio;
+        const deptname = data[i].parent.deptName;
+        if (deptname === "北京研发中心" || deptname === "成都研发中心") {
+          arrays.push({
+            devCenter: "研发中心",
+            group: data[i].deptName,
+            module: moduleChange(usersData[m].tech),
+            "username": username,
+            [starttime]: counts
+          });
+        } else {
+          arrays.push({
+            devCenter: "研发中心",
+            dept: deptname,
+            group: data[i].deptName,
+            module: moduleChange(usersData[m].tech),
+            "username": username,
+            [starttime]: counts
+          });
+        }
 
-        arrays.push({
-          devCenter: "研发中心",
-          dept: data[i].parent.deptName,
-          group: data[i].deptName,
-          module: moduleChange(usersData[m].tech),
-          "username": username,
-          [starttime]: counts
-        });
+
       }
     }
 

@@ -160,7 +160,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     groupValues.push({
       time: starttime,
       group: "研发中心",
-      values: oraDatas[index].total.avg
+      values: oraDatas[index].total.ratio
     });
 
     const data = oraDatas[index].datas;
@@ -169,51 +169,37 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       groupValues.push({
         time: starttime,
         group: data[i].deptName,
-        values: data[i].avg
+        values: data[i].ratio
       }, {
         time: starttime,
-        group: data[i].parent === null ? "" : data[i].parent.deptName,
-        values: data[i].parent === null ? "" : data[i].parent.avg
+        group: data[i].parent.deptName,
+        values: data[i].parent.ratio
       });
-
       moduleValues.push({
         time: starttime,
         module: "前端",
         parent: data[i].deptName,
-        values: data[i].side === null ? "" : data[i].side.front
+        values: data[i].side.front
       }, {
         time: starttime,
         module: "后端",
         parent: data[i].deptName,
-        values: data[i].side === null ? "" : data[i].side.backend
+        values: data[i].side.backend
       });
-
       const usersData = data[i].users;
-      if (usersData !== null) {
-        for (let m = 0; m < usersData.length; m += 1) {
-          const username = usersData[m].userName;
-          if (data[i].parent === null || data[i].parent.deptName === "北京研发中心" || data[i].parent.deptName === "成都研发中心") {
-            arrays.push({
-              devCenter: "研发中心",
-              group: data[i].deptName,
-              module: moduleChange(usersData[m].tech),
-              "username": username,
-              [starttime]: usersData[m].avg
-            });
-          } else {
-            arrays.push({
-              devCenter: "研发中心",
-              dept: data[i].parent.deptName,
-              group: data[i].deptName,
-              module: moduleChange(usersData[m].tech),
-              "username": username,
-              [starttime]: usersData[m].avg
-            });
-          }
+      for (let m = 0; m < usersData.length; m += 1) {
+        const username = usersData[m].userName;
+        const counts = usersData[m].ratio;
 
-        }
+        arrays.push({
+          devCenter: "研发中心",
+          dept: data[i].parent.deptName,
+          group: data[i].deptName,
+          module: moduleChange(usersData[m].tech),
+          "username": username,
+          [starttime]: counts
+        });
       }
-
     }
 
   }
@@ -261,45 +247,10 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
   const {data} = await client.query(`
       {
 
-        avgCodeDept(kind:"${condition.typeFlag}",ends:${condition.ends}) {
-          total{
-            deptName
-            count
-            avg
-          }
-          range {
-            start
-            end
-          }
-          side{
-            both
-            front
-            backend
-          }
-          datas {
-            parent{
-              deptName
-              avg
-            }
-            dept
-            deptName
-            avg
-            side{
-              front
-              backend
-            }
-            users{
-              userId
-              userName
-              avg
-              tech
-            }
-          }
-        }
       }
   `);
 
-  const datas = converseFormatForAgGrid(data?.avgCodeDept);
+  const datas = converseFormatForAgGrid(data?.bugRepairDept);
   return converseArrayToOne(datas);
 };
 
@@ -377,6 +328,7 @@ const CodeReviewTableList: React.FC<any> = () => {
                 onClick={statisticsByQuarters}>按季统计</Button>
         <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
                 size={'large'} onClick={showRules}>计算规则</Button>
+
       </div>
 
       <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
@@ -411,32 +363,17 @@ const CodeReviewTableList: React.FC<any> = () => {
         <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
                 placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
           <p><strong>1.统计周期</strong></p>
-          <p style={cssIndent}>按周统计：代码提交日期为周一00:00:00--周日23:59:59的代码量；</p>
-          <p style={cssIndent}>按月统计：代码提交日期为每月1号00:00:00--每月最后1天23:59:59；</p>
-          <p style={cssIndent}>按季统计：代码提交日期每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
-          <p style={cssIndent}>特殊情况：当月或季度的开始日期或结束日期在周中（不为整数周）时，不计算该周周数和对应该周的代码量；</p>
-
-          <p><strong>2.计算公式说明</strong></p>
-          <p> 2.1 按人统计： </p>
-          <p style={cssIndent}>周报：周一至周天代码量求和；</p>
-          <p style={cssIndent}>月报：当月整周数对应的代码量之和/当月整周数；</p>
-          <p style={cssIndent}>季报：当季整周数对应的代码量之和/当季整周数；</p>
-          <p> 2.2 按端统计： </p>
-          <p style={cssIndent}>周报：该端周一至周天代码量求和/该端人数；</p>
-          <p style={cssIndent}>月报：该端所有人员当月整周数对应的代码量之和/当月整周数/该端所有人数；</p>
-          <p style={cssIndent}>季报：该端所有人员当季整周数对应的代码量之和/当季整周数/该端所有人数；</p>
-          <p> 2.3 按组统计： </p>
-          <p style={cssIndent}>周报：该组周一至周天代码量求和/该组人数；</p>
-          <p style={cssIndent}>月报：该组所有人员当月整周数对应的代码量之和/当月整周数/该组所有人数；</p>
-          <p style={cssIndent}>季报：该组所有人员当季整周数对应的代码量之和/当季整周数/该组所有人数；</p>
-          <p> 2.4 按部门统计： </p>
-          <p style={cssIndent}>周报：该部门周一至周天代码量求和/该部门所有人数；</p>
-          <p style={cssIndent}>月报：该部门所有人员当月整周数对应的代码量之和/当月整周数/该部门所有人数；</p>
-          <p style={cssIndent}>季报：该部门所有人员当季整周数对应的代码量之和/当季整周数/该部门所有人数；</p>
-          <p> 2.4 按研发中心统计： </p>
-          <p style={cssIndent}>周报：该中心所有人员周一至周天代码量求和/该中心所有人数；</p>
-          <p style={cssIndent}>月报：该中心所有人员当月整周数对应的代码量之和/当月整周数/该中心所有人数；</p>
-          <p style={cssIndent}>季报：该中心所有人员当季整周数对应的代码量之和/当季整周数/该中心所有人数；</p>
+          <p style={cssIndent}>按周统计：bug创建日期为周一00:00:00--周日23:59:59；</p>
+          <p style={cssIndent}>按月统计：bug创建日期为每月1号00:00:00--每月最后1天23:59:59；</p>
+          <p style={cssIndent}>按季统计：bug创建日期每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
+          <p><strong>2.统计范围</strong></p>
+          <p style={cssIndent}>产品为“1.0/1.0正式版--产品经理”“产品实施--实施顾问反馈”“开发自提需求”； </p>
+          <p style={cssIndent}>解决方案为“空”“已解决”“延期处理”“后续版本”“代码未合并”的，统计严重程度为P0、P1、P2的bug； </p>
+          <p style={cssIndent}>Bug状态 等于“激活”的情况，统计指派给为开发的；Bug状态不等于“激活”（已解决/已关闭），统计解决者为开发的； </p>
+          <p><strong>3.计算公式说明</strong></p>
+          <p style={cssIndent}>周报：周一至周天开发类有效bug求和/(周一至周天代码量求和/1000)；</p>
+          <p style={cssIndent}>月报：当月1号至当月最后1天开发类有效bug求和/(当月1号至当月最后1天代码量求和/1000)；</p>
+          <p style={cssIndent}>季报：当季第一个月1号至当季最后1天开发类有效bug求和/(当季第一个月1号至当季最后1天代码量求和/1000)；</p>
 
         </Drawer>
       </div>

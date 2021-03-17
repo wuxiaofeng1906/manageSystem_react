@@ -362,19 +362,40 @@ const CodeReviewTableList: React.FC<any> = () => {
       <div>
         <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
                 placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
-          <p><strong>1.统计周期</strong></p>
+          <p><strong>一、开发类有效Bug统计</strong></p>
+          <p>1.统计周期-bug周期 </p>
           <p style={cssIndent}>按周统计：bug创建日期为周一00:00:00--周日23:59:59；</p>
-          <p style={cssIndent}>按月统计：bug创建日期为每月1号00:00:00--每月最后1天23:59:59；</p>
-          <p style={cssIndent}>按季统计：bug创建日期每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
-          <p><strong>2.统计范围</strong></p>
+          <p style={cssIndent}>按月统计：bug创建日期为每月的第一个整周的周一00:00:00--每月最后1个整周的周天23:59:59；</p>
+          <p style={cssIndent}>按季统计：bug创建日期每季第一个月的第一个整周的周一00:00:00--每季第三个月的最后1个整周的周天23:59:59；</p>
+          <p>2.统计周期-代码量周期（修正后的） </p>
+          <p style={cssIndent}>按周统计：代码commit日期为周一00:00:00--周日23:59:59；</p>
+          <p style={cssIndent}>按月统计：代码commit日期为每月的第一个整周的周一00:00:00--每月最后1个整周的周天23:59:59；</p>
+          <p style={cssIndent}>按季统计：代码commit日期每季第一个月的第一个整周的周一00:00:00--每季第三个月的最后1个整周的周天23:59:59；</p>
+          <p><strong>3.Bug统计范围</strong></p>
           <p style={cssIndent}>产品为“1.0/1.0正式版--产品经理”“产品实施--实施顾问反馈”“开发自提需求”； </p>
           <p style={cssIndent}>解决方案为“空”“已解决”“延期处理”“后续版本”“代码未合并”的，统计严重程度为P0、P1、P2的bug； </p>
           <p style={cssIndent}>Bug状态 等于“激活”的情况，统计指派给为开发的；Bug状态不等于“激活”（已解决/已关闭），统计解决者为开发的； </p>
-          <p><strong>3.计算公式说明</strong></p>
-          <p style={cssIndent}>周报：周一至周天开发类有效bug求和/(周一至周天代码量求和/1000)；</p>
-          <p style={cssIndent}>月报：当月1号至当月最后1天开发类有效bug求和/(当月1号至当月最后1天代码量求和/1000)；</p>
-          <p style={cssIndent}>季报：当季第一个月1号至当季最后1天开发类有效bug求和/(当季第一个月1号至当季最后1天代码量求和/1000)；</p>
-
+          <p><strong>二、计算公式说明</strong></p>
+          <p> 1.按人统计（以下人员都特指开发人员） </p>
+          <p style={cssIndent}>周报：周一至周天开发类有效bug求和/(当周周一至周天代码量求和/1000)；</p>
+          <p style={cssIndent}>月报：按月统计bug求和/(按月统计代码量求和/1000)；</p>
+          <p style={cssIndent}>季报：按季统计bug求和/(按季统计代码量求和/1000)；</p>
+          <p> 2.按端统计 </p>
+          <p style={cssIndent}>周报：该端所有人员周一至周天开发类有效bug求和/(该端所有人员当周周一至周天代码量求和/1000)；</p>
+          <p style={cssIndent}>月报：该端所有人员按月统计bug求和/(该端所有人员按月统计代码量求和/1000)；</p>
+          <p style={cssIndent}>季报：该端所有人员按季统计bug求和/(该端所有人员按季统计代码量求和/1000)；</p>
+          <p> 3.按组统计 </p>
+          <p style={cssIndent}>周报：该组所有人员周一至周天开发类有效bug求和/(该组所有人员当周周一至周天代码量求和/1000)；</p>
+          <p style={cssIndent}>月报：该组所有人员按月统计bug求和/(该组所有人员按月统计代码量求和/1000)；</p>
+          <p style={cssIndent}>季报：该组所有人员按季统计bug求和/(该组所有人员按季统计代码量求和/1000)；</p>
+          <p> 4.按部门统计 </p>
+          <p style={cssIndent}>周报：该部门所有人员周一至周天开发类有效bug求和/(该部门所有人员当周周一至周天代码量求和/1000)；</p>
+          <p style={cssIndent}>月报：该部门所有人员按月统计bug求和/(该部门所有人员按月统计代码量求和/1000)；</p>
+          <p style={cssIndent}>季报：该部门所有人员按季统计bug求和/(该部门所有人员按季统计代码量求和/1000)；</p>
+          <p> 5.按中心统计 </p>
+          <p style={cssIndent}>周报：该中心所有人员周一至周天开发类有效bug求和/(该中心所有人员当周周一至周天代码量求和/1000)；</p>
+          <p style={cssIndent}>月报：该中心所有人员按月统计bug求和/(该中心所有人员按月统计代码量求和/1000)；</p>
+          <p style={cssIndent}>季报：该中心所有人员按季统计bug求和/(该中心所有人员按季统计代码量求和/1000)；</p>
         </Drawer>
       </div>
     </PageContainer>

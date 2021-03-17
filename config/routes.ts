@@ -158,8 +158,13 @@ export default [
     }, {
       name: '测试',
       icon: 'table',
-      path: '/performance/tester',
-      routes: []
+      path: '/performance/testers',
+      routes: [{
+        name: '线上千行Bug率',
+        icon: 'table',
+        path: 'on-lineBugRate',
+        component: './performance/testers/on-lineBugRate',
+      },]
     },]
   },
 

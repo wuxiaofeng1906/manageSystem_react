@@ -192,15 +192,47 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       if (usersData !== null) {
         for (let m = 0; m < usersData.length; m += 1) {
           const username = usersData[m].userName;
-          if (data[i].parent === null || data[i].parent.deptName === "北京研发中心" || data[i].parent.deptName === "成都研发中心") {
+
+          // 获取产品研发部前后端的数据
+          if (data[i].deptName === "产品研发部") {
+            arrays.push({
+                devCenter: "研发中心",
+                dept: "产品研发部",
+                "username": "前端 ",
+                [starttime]: data[i].side === null ? "" : Number(data[i].side.front).toFixed(2)
+              }, {
+                devCenter: "研发中心",
+                dept: "产品研发部",
+                "username": "后端 ",   // 故意空一格，以便于区分上一个前后端
+                [starttime]: data[i].side === null ? "" : Number(data[i].side.backend).toFixed(2)
+              }
+            );
+          }
+          // 特殊处理宋老师和王润燕的部门和组
+          if (username === "王润燕") {
             arrays.push({
               devCenter: "研发中心",
-              group: data[i].deptName,
-              module: moduleChange(usersData[m].tech),
+              dept: "产品研发部",
               "username": username,
               [starttime]: usersData[m].avg
             });
-          } else {
+          } else if (username === "宋永强") {
+            arrays.push({
+              devCenter: "研发中心",
+              "username": username,
+              [starttime]: usersData[m].avg
+            });
+          } else if (data[i].parent === null || data[i].parent.deptName === "北京研发中心" || data[i].parent.deptName === "成都研发中心") {  // 如果是（北京或成都）研发中心，去掉部门的显示
+            arrays.push({
+                devCenter: "研发中心",
+                group: data[i].deptName,
+                module: moduleChange(usersData[m].tech),
+                "username": username,
+                [starttime]: usersData[m].avg
+              }
+            );
+          }
+          else {
             arrays.push({
               devCenter: "研发中心",
               dept: data[i].parent.deptName,
@@ -213,11 +245,8 @@ const converseFormatForAgGrid = (oraDatas: any) => {
 
         }
       }
-
     }
-
   }
-
 
   return arrays;
 };

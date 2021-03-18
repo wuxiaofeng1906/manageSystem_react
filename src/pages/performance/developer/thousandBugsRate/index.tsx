@@ -132,6 +132,7 @@ const columsForQuarters = () => {
 
 // 转化为ag-grid能被显示的格式
 const converseFormatForAgGrid = (oraDatas: any) => {
+  debugger;
 
   groupValues.length = 0;
   moduleValues.length = 0;
@@ -160,7 +161,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     groupValues.push({
       time: starttime,
       group: "研发中心",
-      values: oraDatas[index].total.ratio
+      values: oraDatas[index].total.kpi
     });
 
     const data = oraDatas[index].datas;
@@ -169,41 +170,83 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       groupValues.push({
         time: starttime,
         group: data[i].deptName,
-        values: data[i].ratio
+        values: data[i].kpi
       }, {
         time: starttime,
-        group: data[i].parent.deptName,
-        values: data[i].parent.ratio
+        group: data[i].parent === null ? "" : data[i].parent.deptName,
+        values: data[i].parent === null ? "" : data[i].parent.kpi
       });
+
       moduleValues.push({
         time: starttime,
         module: "前端",
         parent: data[i].deptName,
-        values: data[i].side.front
+        values: data[i].side === null ? "" : data[i].side.front
       }, {
         time: starttime,
         module: "后端",
         parent: data[i].deptName,
-        values: data[i].side.backend
+        values: data[i].side === null ? "" : data[i].side.backend
       });
-      const usersData = data[i].users;
-      for (let m = 0; m < usersData.length; m += 1) {
-        const username = usersData[m].userName;
-        const counts = usersData[m].ratio;
 
-        arrays.push({
-          devCenter: "研发中心",
-          dept: data[i].parent.deptName,
-          group: data[i].deptName,
-          module: moduleChange(usersData[m].tech),
-          "username": username,
-          [starttime]: counts
-        });
+      const usersData = data[i].users;
+      if (usersData !== null) {
+        for (let m = 0; m < usersData.length; m += 1) {
+          const username = usersData[m].userName;
+
+          // 获取产品研发部前后端的数据
+          if (data[i].deptName === "产品研发部") {
+            arrays.push({
+                devCenter: "研发中心",
+                dept: "产品研发部",
+                "username": "前端 ",
+                [starttime]: data[i].side === null ? "" : Number(data[i].side.front).toFixed(2)
+              }, {
+                devCenter: "研发中心",
+                dept: "产品研发部",
+                "username": "后端 ",   // 故意空一格，以便于区分上一个前后端
+                [starttime]: data[i].side === null ? "" : Number(data[i].side.backend).toFixed(2)
+              }
+            );
+          }
+          // 特殊处理宋老师和王润燕的部门和组
+          if (username === "王润燕") {
+            arrays.push({
+              devCenter: "研发中心",
+              dept: "产品研发部",
+              "username": username,
+              [starttime]: usersData[m].kpi
+            });
+          } else if (username === "宋永强") {
+            arrays.push({
+              devCenter: "研发中心",
+              "username": username,
+              [starttime]: usersData[m].kpi
+            });
+          } else if (data[i].parent === null || data[i].parent.deptName === "北京研发中心" || data[i].parent.deptName === "成都研发中心") {  // 如果是（北京或成都）研发中心，去掉部门的显示
+            arrays.push({
+                devCenter: "研发中心",
+                group: data[i].deptName,
+                module: moduleChange(usersData[m].tech),
+                "username": username,
+                [starttime]: Number(usersData[m].kpi).toFixed(2)
+              }
+            );
+          } else {
+            arrays.push({
+              devCenter: "研发中心",
+              dept: data[i].parent.deptName,
+              group: data[i].deptName,
+              module: moduleChange(usersData[m].tech),
+              "username": username,
+              [starttime]: Number(usersData[m].kpi).toFixed(2)
+            });
+          }
+
+        }
       }
     }
-
   }
-
 
   return arrays;
 };
@@ -246,11 +289,46 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
   }
   const {data} = await client.query(`
       {
-
+          bugThousDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, thous:DEV) {
+            total {
+              dept
+              deptName
+              kpi
+            }
+            range {
+              start
+              end
+            }
+            side {
+              both
+              front
+              backend
+            }
+            datas {
+              dept
+              deptName
+              kpi
+              side {
+                both
+                front
+                backend
+              }
+              parent {
+                dept
+                deptName
+              }
+              users {
+                userId
+                userName
+                kpi
+                tech
+              }
+            }
+          }
       }
   `);
 
-  const datas = converseFormatForAgGrid(data?.bugRepairDept);
+  const datas = converseFormatForAgGrid(data?.bugThousDept);
   return converseArrayToOne(datas);
 };
 
@@ -328,7 +406,6 @@ const CodeReviewTableList: React.FC<any> = () => {
                 onClick={statisticsByQuarters}>按季统计</Button>
         <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
                 size={'large'} onClick={showRules}>计算规则</Button>
-
       </div>
 
       <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>

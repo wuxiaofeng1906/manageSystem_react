@@ -164,6 +164,11 @@ export default [
         icon: 'table',
         path: 'on-lineBugRate',
         component: './performance/testers/on-lineBugRate',
+      },{
+        name: '线上千行Bug率(参考指标)',
+        icon: 'table',
+        path: 'on-lineBugRateRefer',
+        component: './performance/testers/on-lineBugRateRefer',
       },]
     },]
   },

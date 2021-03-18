@@ -1,4 +1,5 @@
 import {ApolloClient, gql} from '@apollo/client/core';
+// @ts-ignore
 import {useModel} from '@@/plugin-model/useModel';
 import {useRequest} from 'ahooks';
 
@@ -8,7 +9,7 @@ export class GqlClient<T> {
   }
 
   query = (query: string) => {
-    // debugger;
+
     return this.apolloClient.query({
       query: gql(query)
     });

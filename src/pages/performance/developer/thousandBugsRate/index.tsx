@@ -132,7 +132,6 @@ const columsForQuarters = () => {
 
 // 转化为ag-grid能被显示的格式
 const converseFormatForAgGrid = (oraDatas: any) => {
-  debugger;
 
   groupValues.length = 0;
   moduleValues.length = 0;
@@ -161,7 +160,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     groupValues.push({
       time: starttime,
       group: "研发中心",
-      values: oraDatas[index].total.kpi
+      values: Number(oraDatas[index].total.kpi).toFixed(2)
     });
 
     const data = oraDatas[index].datas;
@@ -170,11 +169,11 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       groupValues.push({
         time: starttime,
         group: data[i].deptName,
-        values: data[i].kpi
+        values: Number(data[i].kpi).toFixed(2)
       }, {
         time: starttime,
         group: data[i].parent === null ? "" : data[i].parent.deptName,
-        values: data[i].parent === null ? "" : data[i].parent.kpi
+        values: data[i].parent === null ? "" : Number(data[i].parent.kpi).toFixed(2)
       });
 
       moduleValues.push({
@@ -215,13 +214,13 @@ const converseFormatForAgGrid = (oraDatas: any) => {
               devCenter: "研发中心",
               dept: "产品研发部",
               "username": username,
-              [starttime]: usersData[m].kpi
+              [starttime]: Number(usersData[m].kpi).toFixed(2)
             });
           } else if (username === "宋永强") {
             arrays.push({
               devCenter: "研发中心",
               "username": username,
-              [starttime]: usersData[m].kpi
+              [starttime]: Number(usersData[m].kpi).toFixed(2)
             });
           } else if (data[i].parent === null || data[i].parent.deptName === "北京研发中心" || data[i].parent.deptName === "成都研发中心") {  // 如果是（北京或成都）研发中心，去掉部门的显示
             arrays.push({

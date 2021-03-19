@@ -288,46 +288,36 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
   }
   const {data} = await client.query(`
       {
-          bugThousDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, thous:TEST) {
-            total {
-              dept
-              deptName
-              kpi
-            }
-            range {
-              start
-              end
-            }
-            side {
-              both
-              front
-              backend
-            }
-            datas {
-              dept
-              deptName
-              kpi
-              side {
-                both
-                front
-                backend
-              }
-              parent {
+           bugThousTestDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, thous: TEST) {
+              total {
                 dept
                 deptName
-              }
-              users {
-                userId
-                userName
                 kpi
-                tech
+              }
+              range {
+                start
+                end
+              }
+              datas {
+                dept
+                deptName
+                kpi
+                parent {
+                  dept
+                  deptName
+                }
+                users {
+                  userId
+                  userName
+                  kpi
+                }
               }
             }
-          }
+
       }
   `);
 
-  const datas = converseFormatForAgGrid(data?.bugThousDept);
+  const datas = converseFormatForAgGrid(data?.bugThousTestDept);
   return converseArrayToOne(datas);
 };
 

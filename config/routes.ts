@@ -164,13 +164,38 @@ export default [
         icon: 'table',
         path: 'on-lineBugRate',
         component: './performance/testers/on-lineBugRate',
-      },{
+      }, {
         name: '线上千行Bug率(参考指标)',
         icon: 'table',
         path: 'on-lineBugRateRefer',
         component: './performance/testers/on-lineBugRateRefer',
+      }, {
+        name: '用例执行率',
+        icon: 'table',
+        path: 'examCarryRate',
+        component: './performance/testers/examCarryRate',
+      }, {
+        name: '平均bug回归时长',
+        icon: 'table',
+        path: 'avgBugReturnDur',
+        component: './performance/testers/avgBugReturnDur',
+      }]
+    }, {
+      name: '产品',
+      icon: 'table',
+      path: '/performance/product',
+      routes: [{
+        name: '需求变更率',
+        icon: 'table',
+        path: 'needsChangeRate',
+        component: './performance/product/needsChangeRate',
+      }, {
+        name: '顾问反馈响应平均时长',
+        icon: 'table',
+        path: 'avgAdviserFeedbackTime',
+        component: './performance/product/avgAdviserFeedbackTime',
       },]
-    },]
+    }]
   },
 
   {

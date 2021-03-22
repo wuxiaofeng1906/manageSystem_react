@@ -14,7 +14,6 @@ import {
   getFourQuarterTime,
   getParamsByType
 } from '@/publicMethods/timeMethods';
-import {colorRender} from '@/publicMethods/cellRenderer';
 import {Button, Drawer} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
 
@@ -51,13 +50,27 @@ function codeNumberRender(values: any) {
       if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
         return ` <span style="color: Silver  ">  ${0} </span> `;
       }
-      return ` <span style="font-weight: bold">  ${Number(datas.values).toFixed(2)} </span> `;
+      return ` <span style="font-weight: bold">  ${(Number(datas.values) / 24).toFixed(2)} </span> `;
     }
   }
 
   return ` <span style="color: Silver  ">  ${0} </span> `;
 }
 
+
+function colorRender(params: any) {
+
+  if (params.value === "" || params.value === undefined || Number(params.value) === 0 || Number(params.value) === 0.00) {
+    return ` <span style="color: Silver  ">  ${0} </span> `;
+  }
+
+  if (Number.isNaN(Number(params.value)) === false) {
+
+    return (Number(params.value) / 24).toFixed(2);
+  }
+
+  return params.value;  // 为了将聚合函数实现格式化
+}
 
 const columsForWeeks = () => {
   const component = new Array();
@@ -304,6 +317,8 @@ const AdviserFeedTableList: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
+        <label style={{fontWeight: "bold"}}>(统计单位：天)</label>
+
         <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>

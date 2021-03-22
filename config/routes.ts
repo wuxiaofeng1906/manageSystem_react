@@ -177,7 +177,7 @@ export default [
       }, {
         name: '平均bug回归时长',
         icon: 'table',
-        path: 'avgBugReturnDur',
+        path: 'avgBugReturnDurtion',
         component: './performance/testers/avgBugReturnDur',
       }]
     }, {

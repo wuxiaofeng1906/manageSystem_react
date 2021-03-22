@@ -329,7 +329,7 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
 
 /* endregion */
 
-const CodeReviewTableList: React.FC<any> = () => {
+const BugReopenTableList: React.FC<any> = () => {
 
   /* region ag-grid */
   const gridApi = useRef<GridApi>();
@@ -466,4 +466,4 @@ const CodeReviewTableList: React.FC<any> = () => {
   );
 };
 
-export default CodeReviewTableList;
+export default BugReopenTableList;

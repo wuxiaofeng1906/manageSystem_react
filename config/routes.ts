@@ -165,7 +165,7 @@ export default [
         path: 'on-lineBugRate',
         component: './performance/testers/on-lineBugRate',
       }, {
-        name: '线上千行Bug率(参考指标)',
+        name: '线上千行Bug率(参考)',
         icon: 'table',
         path: 'on-lineBugRateRefer',
         component: './performance/testers/on-lineBugRateRefer',
@@ -190,7 +190,7 @@ export default [
         path: 'needsChangeRate',
         component: './performance/product/needsChangeRate',
       }, {
-        name: '顾问反馈响应平均时长',
+        name: '响应顾问平均时长',
         icon: 'table',
         path: 'avgAdviserFeedbackTime',
         component: './performance/product/avgAdviserFeedbackTime',

@@ -34,11 +34,6 @@ const compColums = [
     rowGroup: true,
     hide: true,
   }, {
-    headerName: '所属部门',
-    field: 'dept',
-    rowGroup: true,
-    hide: true,
-  }, {
     headerName: '组名',
     field: 'group',
     rowGroup: true,
@@ -75,7 +70,6 @@ const columsForWeeks = () => {
       aggFunc: codeNumberRender,
       cellRenderer: colorRender
     });
-
   }
   return compColums.concat(component);
 };
@@ -153,25 +147,12 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         for (let m = 0; m < usersData.length; m += 1) {
           const username = usersData[m].userName;
 
-
-          // 特殊处理宋老师和王润燕的部门和组
-          if (username === "陈诺") {
-            arrays.push({
-              devCenter: "研发中心",
-              dept: "测试部",
-              "username": username,
-              [starttime]: usersData[m].kpi
-            });
-          } else {
-            arrays.push({
-              devCenter: "研发中心",
-              dept: data[i].parent.deptName,
-              group: data[i].deptName,
-              "username": username,
-              [starttime]: Number(usersData[m].kpi).toFixed(2)
-            });
-          }
-
+          arrays.push({
+            devCenter: "研发中心",
+            group: data[i].deptName,
+            "username": username,
+            [starttime]: Number(usersData[m].kpi).toFixed(2)
+          });
         }
       }
     }
@@ -216,21 +197,44 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
   if (condition.typeFlag === 0) {
     return [];
   }
-  // bugThousTestDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, thous: TEST) {
 
   const {data} = await client.query(`
       {
-
+        feedbackAvgDept(kind: "${condition.typeFlag}", ends: ${condition.ends}){
+          total {
+            dept
+            deptName
+            kpi
+          }
+          range {
+            start
+            end
+          }
+          datas {
+            dept
+            deptName
+            kpi
+            parent {
+              dept
+              deptName
+            }
+            users {
+              userId
+              userName
+              kpi
+            }
+          }
+        }
       }
   `);
 
-  const datas = converseFormatForAgGrid(data?.bugThousTestDept);
+  const datas = converseFormatForAgGrid(data?.feedbackAvgDept);
   return converseArrayToOne(datas);
 };
 
 /* endregion */
 
-const TestBugRateTableList: React.FC<any> = () => {
+const AdviserFeedTableList: React.FC<any> = () => {
 
   /* region ag-grid */
   const gridApi = useRef<GridApi>();
@@ -351,4 +355,4 @@ const TestBugRateTableList: React.FC<any> = () => {
   );
 };
 
-export default TestBugRateTableList;
+export default AdviserFeedTableList;

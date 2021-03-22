@@ -56,7 +56,7 @@ function codeNumberRender(values: any) {
       if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
         return ` <span style="color: Silver  ">  ${0} </span> `;
       }
-      return ` <span style="font-weight: bold">  ${Number(datas.values).toFixed(2)} </span> `;
+      return ` <span style="font-weight: bold">  ${Number(datas.values).toFixed(3)} </span> `;
     }
   }
 
@@ -127,18 +127,6 @@ const converseFormatForAgGrid = (oraDatas: any) => {
   for (let index = 0; index < oraDatas.length; index += 1) {
 
     const starttime = oraDatas[index].range.start;
-    // arrays.push({
-    //     devCenter: "研发中心",
-    //     "username": "前端",
-    //     // [starttime]: Number(oraDatas[index].side.front).toFixed(2)
-    //   }
-    // );
-    // arrays.push({
-    //     devCenter: "研发中心",
-    //     "username": "后端",
-    //     // [starttime]: Number(oraDatas[index].side.backend).toFixed(2)
-    //   }
-    // );
 
     groupValues.push({
       time: starttime,
@@ -180,7 +168,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
               dept: data[i].parent.deptName,
               group: data[i].deptName,
               "username": username,
-              [starttime]: Number(usersData[m].kpi).toFixed(2)
+              [starttime]: Number(usersData[m].kpi).toFixed(3)
             });
           }
 
@@ -358,10 +346,6 @@ const TestBugRateTableList: React.FC<any> = () => {
           suppressAggFuncInHeader={true}   // 不显示标题聚合函数的标识
           rowHeight={32}
           headerHeight={35}
-          // pivotColumnGroupTotals={'always'}
-          // groupHideOpenParents={true}  // 组和人名同一列
-
-          // rowGroupPanelShow={'always'}  可以拖拽列到上面
           onGridReady={onGridReady}
         >
         </AgGridReact>

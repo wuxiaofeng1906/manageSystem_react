@@ -56,7 +56,7 @@ function codeNumberRender(values: any) {
       if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
         return ` <span style="color: Silver  ">  ${0} </span> `;
       }
-      return ` <span style="font-weight: bold">  ${Number(datas.values).toFixed(2)} </span> `;
+      return ` <span style="font-weight: bold">  ${Number(datas.values).toFixed(3)} </span> `;
     }
   }
 
@@ -127,18 +127,6 @@ const converseFormatForAgGrid = (oraDatas: any) => {
   for (let index = 0; index < oraDatas.length; index += 1) {
 
     const starttime = oraDatas[index].range.start;
-    // arrays.push({
-    //     devCenter: "研发中心",
-    //     "username": "前端",
-    //     // [starttime]: Number(oraDatas[index].side.front).toFixed(2)
-    //   }
-    // );
-    // arrays.push({
-    //     devCenter: "研发中心",
-    //     "username": "后端",
-    //     // [starttime]: Number(oraDatas[index].side.backend).toFixed(2)
-    //   }
-    // );
 
     groupValues.push({
       time: starttime,
@@ -180,7 +168,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
               dept: data[i].parent.deptName,
               group: data[i].deptName,
               "username": username,
-              [starttime]: Number(usersData[m].kpi).toFixed(2)
+              [starttime]: Number(usersData[m].kpi).toFixed(3)
             });
           }
 
@@ -390,19 +378,15 @@ const TestBugRateRefTableList: React.FC<any> = () => {
           <p style={cssIndent}>周报：周一至周天测试类有效bug求和/(当周周一至周天研发中心所有开发人员代码量之和/1000)；</p>
           <p style={cssIndent}>月报：按月统计bug求和/(按月统计研发中心所有开发人员代码量之和/1000)；</p>
           <p style={cssIndent}>季报：按季统计bug求和/(按季统计研发中心所有开发人员代码量之和/1000)；</p>
-          {/* <p> 2.按端统计 </p> */}
-          {/* <p style={cssIndent}>周报：该端所有人员周一至周天开发类有效bug求和/(该端所有人员当周周一至周天代码量求和/1000)；</p> */}
-          {/* <p style={cssIndent}>月报：该端所有人员按月统计bug求和/(该端所有人员按月统计代码量求和/1000)；</p> */}
-          {/* <p style={cssIndent}>季报：该端所有人员按季统计bug求和/(该端所有人员按季统计代码量求和/1000)；</p> */}
-          <p> 3.按组统计 </p>
+           <p> 2.按组统计 </p>
           <p style={cssIndent}>周报：该组所有人员周一至周天测试类线上有效bug求和/(当周周一至周天研发中心所有开发人员代码量之和/1000)；</p>
           <p style={cssIndent}>月报：该组所有人员按月统计bug求和/(按月统计研发中心所有开发人员代码量之和/1000)；</p>
           <p style={cssIndent}>季报：该组所有人员按季统计bug求和/(按季统计研发中心所有开发人员代码量之和/1000)；</p>
-          <p> 4.按部门统计 </p>
+          <p> 3.按部门统计 </p>
           <p style={cssIndent}>周报：该部门所有人员周一至周天测试类线上有效bug求和/(当周周一至周天研发中心所有开发人员代码量之和/1000)；</p>
           <p style={cssIndent}>月报：该部门所有人员按月统计bug求和/(按月统计研发中心所有开发人员代码量之和/1000)；</p>
           <p style={cssIndent}>季报：该部门所有人员按季统计bug求和/(按季统计研发中心所有开发人员代码量之和/1000)；</p>
-          <p> 5.按中心统计 </p>
+          <p> 4.按中心统计 </p>
           <p style={cssIndent}>周报：该中心所有测试人员周一至周天测试类线上有效bug求和/(当周周一至周天研发中心所有开发人员代码量之和/1000)；</p>
           <p style={cssIndent}>月报：该中心所有测试人员按月统计bug求和/(按月统计研发中心所有开发人员代码量之和/1000)；</p>
           <p style={cssIndent}>季报：该中心所有测试人员按季统计bug求和/(按季统计研发中心所有开发人员代码量之和/1000)；</p>

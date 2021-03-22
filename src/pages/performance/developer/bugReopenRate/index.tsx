@@ -98,17 +98,6 @@ function colorRender(params: any) {
 
   if (Number.isNaN(Number(params.value)) === false) {
 
-    // return `${(Number(params.value) * 100).toFixed(2).toString()}%`;
-    // if (params.data.username === "前端") {
-    //   return (Number(params.value)  * 100).toFixed(2);
-    //
-    // }
-    // if (params.data.username === "后端") {
-    //
-    //   return (Number(params.value)  * 100).toFixed(2);
-    //
-    // }
-
     return (Number(params.value) * 100).toFixed(2);
   }
 

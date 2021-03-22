@@ -134,7 +134,7 @@ export default [
           path: 'codeReview',
           component: './performance/developer/codeReview',
         }, {
-          name: '平均Bug修复时长',
+          name: 'Bug修复时长',
           icon: 'table',
           path: 'bugResolutionTime',
           component: './performance/developer/bugResolutionTime',
@@ -175,7 +175,7 @@ export default [
         path: 'examCarryRate',
         component: './performance/testers/examCarryRate',
       }, {
-        name: '平均bug回归时长',
+        name: 'bug回归时长',
         icon: 'table',
         path: 'avgBugReturnDurtion',
         component: './performance/testers/avgBugReturnDur',

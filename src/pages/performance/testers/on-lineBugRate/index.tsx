@@ -14,7 +14,7 @@ import {
   getFourQuarterTime,
   getParamsByType
 } from '@/publicMethods/timeMethods';
-import {colorRender, moduleChange} from '@/publicMethods/cellRenderer';
+import {colorRender} from '@/publicMethods/cellRenderer';
 import {Button, Drawer} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
 
@@ -44,39 +44,22 @@ const compColums = [
     rowGroup: true,
     hide: true,
   }, {
-    headerName: '所属端',
-    field: 'module',
-    rowGroup: true,
-    hide: true,
-
-  }, {
     headerName: '姓名',
     field: 'username',
   }];
 
 function codeNumberRender(values: any) {
   const rowName = values.rowNode.key;
-  if (rowName === "前端" || rowName === "后端") {
-    for (let i = 0; i < moduleValues.length; i += 1) {
-      const moduleInfo = moduleValues[i];
-      if (values.colDef.field === moduleInfo.time && rowName === moduleInfo.module && values.rowNode.parent.key === moduleInfo.parent) {
-        if (moduleInfo.values === "" || moduleInfo.values === null || moduleInfo.values === undefined || Number(moduleInfo.values) === 0) {
-          return ` <span style="color: Silver  ">  ${0} </span> `;
-        }
-        return ` <span style="font-weight: bold">  ${Number(moduleInfo.values).toFixed(2)} </span> `;
+  for (let i = 0; i < groupValues.length; i += 1) {
+    const datas = groupValues[i];
+    if (values.colDef.field === datas.time && rowName === datas.group) {
+      if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
+        return ` <span style="color: Silver  ">  ${0} </span> `;
       }
-    }
-  } else {
-    for (let i = 0; i < groupValues.length; i += 1) {
-      const datas = groupValues[i];
-      if (values.colDef.field === datas.time && rowName === datas.group) {
-        if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
-          return ` <span style="color: Silver  ">  ${0} </span> `;
-        }
-        return ` <span style="font-weight: bold">  ${Number(datas.values).toFixed(2)} </span> `;
-      }
+      return ` <span style="font-weight: bold">  ${Number(datas.values).toFixed(2)} </span> `;
     }
   }
+
   return ` <span style="color: Silver  ">  ${0} </span> `;
 }
 
@@ -144,18 +127,18 @@ const converseFormatForAgGrid = (oraDatas: any) => {
   for (let index = 0; index < oraDatas.length; index += 1) {
 
     const starttime = oraDatas[index].range.start;
-    arrays.push({
-        devCenter: "研发中心",
-        "username": "前端",
-        [starttime]: Number(oraDatas[index].side.front).toFixed(2)
-      }
-    );
-    arrays.push({
-        devCenter: "研发中心",
-        "username": "后端",
-        [starttime]: Number(oraDatas[index].side.backend).toFixed(2)
-      }
-    );
+    // arrays.push({
+    //     devCenter: "研发中心",
+    //     "username": "前端",
+    //     // [starttime]: Number(oraDatas[index].side.front).toFixed(2)
+    //   }
+    // );
+    // arrays.push({
+    //     devCenter: "研发中心",
+    //     "username": "后端",
+    //     // [starttime]: Number(oraDatas[index].side.backend).toFixed(2)
+    //   }
+    // );
 
     groupValues.push({
       time: starttime,
@@ -176,67 +159,26 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         values: data[i].parent === null ? "" : data[i].parent.kpi
       });
 
-      moduleValues.push({
-        time: starttime,
-        module: "前端",
-        parent: data[i].deptName,
-        values: data[i].side === null ? "" : data[i].side.front
-      }, {
-        time: starttime,
-        module: "后端",
-        parent: data[i].deptName,
-        values: data[i].side === null ? "" : data[i].side.backend
-      });
 
       const usersData = data[i].users;
       if (usersData !== null) {
         for (let m = 0; m < usersData.length; m += 1) {
           const username = usersData[m].userName;
 
-          // 获取产品研发部前后端的数据
-          if (data[i].deptName === "产品研发部") {
-            arrays.push({
-                devCenter: "研发中心",
-                dept: "产品研发部",
-                "username": "前端 ",
-                [starttime]: data[i].side === null ? "" : Number(data[i].side.front).toFixed(2)
-              }, {
-                devCenter: "研发中心",
-                dept: "产品研发部",
-                "username": "后端 ",   // 故意空一格，以便于区分上一个前后端
-                [starttime]: data[i].side === null ? "" : Number(data[i].side.backend).toFixed(2)
-              }
-            );
-          }
+
           // 特殊处理宋老师和王润燕的部门和组
-          if (username === "王润燕") {
+          if (username === "陈诺") {
             arrays.push({
               devCenter: "研发中心",
-              dept: "产品研发部",
+              dept: "测试部",
               "username": username,
               [starttime]: usersData[m].kpi
             });
-          } else if (username === "宋永强") {
-            arrays.push({
-              devCenter: "研发中心",
-              "username": username,
-              [starttime]: usersData[m].kpi
-            });
-          } else if (data[i].parent === null || data[i].parent.deptName === "北京研发中心" || data[i].parent.deptName === "成都研发中心") {  // 如果是（北京或成都）研发中心，去掉部门的显示
-            arrays.push({
-                devCenter: "研发中心",
-                group: data[i].deptName,
-                module: moduleChange(usersData[m].tech),
-                "username": username,
-                [starttime]: Number(usersData[m].kpi).toFixed(2)
-              }
-            );
           } else {
             arrays.push({
               devCenter: "研发中心",
               dept: data[i].parent.deptName,
               group: data[i].deptName,
-              module: moduleChange(usersData[m].tech),
               "username": username,
               [starttime]: Number(usersData[m].kpi).toFixed(2)
             });

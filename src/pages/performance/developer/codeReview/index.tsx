@@ -150,63 +150,114 @@ const columsForQuarters = () => {
 
 /* region 数据处理 */
 
-// const getParamsByType = (params: any) => {
-//   let typeFlag = 0;
-//   let ends = "";
-//   if (params === 'week') {
-//     const timeRange = new Array();
-//     for (let index = 0; index < weekRanges.length; index += 1) {
-//       timeRange.push(`"${weekRanges[index].to}"`);
-//     }
-//     ends = `[${timeRange.join(",")}]`;
-//     typeFlag = 1;
-//
-//   } else if (params === 'month') {
-//     const timeRange = new Array();
-//     for (let index = 0; index < monthRanges.length; index += 1) {
-//       timeRange.push(`"${monthRanges[index].end}"`);
-//     }
-//     ends = `[${timeRange.join(",")}]`;
-//     typeFlag = 2;
-//
-//   } else if (params === 'quarter') {
-//     const timeRange = new Array();
-//     for (let index = 0; index < quarterTime.length; index += 1) {
-//       timeRange.push(`"${quarterTime[index].end}"`);
-//     }
-//     ends = `[${timeRange.join(",")}]`;
-//     typeFlag = 3;
-//   }
-//
-//   return {typeFlag, ends};
-// };
 
 // 转化为ag-grid能被显示的格式
+// const converseFormatForAgGrid = (oraDatas: any) => {
+//   debugger;
+//   groupValues.length = 0;
+//   moduleValues.length = 0;
+//   const arrays: any[] = [];
+//   if (oraDatas === null) {
+//     return arrays;
+//   }
+//
+//   for (let index = 0; index < oraDatas.length; index += 1) {
+//     const starttime = oraDatas[index].range.start;
+//     arrays.push({
+//         devCenter: "研发中心",
+//         "username": "前端",
+//         [starttime]: oraDatas[index].side.front
+//       }, {
+//         devCenter: "研发中心",
+//         "username": "后端",
+//         [starttime]: oraDatas[index].side.backend
+//       }
+//     );
+//
+//     groupValues.push({
+//       time: starttime,
+//       group: "研发中心",
+//       values: oraDatas[index].total.kpi
+//     });
+//
+//     const data = oraDatas[index].datas;
+//     for (let i = 0; i < data.length; i += 1) {
+//
+//       groupValues.push({
+//         time: starttime,
+//         group: data[i].deptName,
+//         values: data[i].kpi
+//       }, {
+//         time: starttime,
+//         group: data[i].parent.deptName,
+//         values: data[i].parent.kpi
+//       });
+//
+//       moduleValues.push({
+//         time: starttime,
+//         module: "前端",
+//         parent: data[i].deptName,
+//         values: data[i].side.front
+//       }, {
+//         time: starttime,
+//         module: "后端",
+//         parent: data[i].deptName,
+//         values: data[i].side.backend
+//       });
+//
+//
+//       const usersData = data[i].users;
+//       for (let m = 0; m < usersData.length; m += 1) {
+//         const username = usersData[m].userName;
+//         const counts = usersData[m].kpi;
+//
+//         arrays.push({
+//           devCenter: "研发中心",
+//           dept: data[i].parent.deptName,
+//           group: data[i].deptName,
+//           module: moduleChange(usersData[m].tech),
+//           "username": username,
+//           [starttime]: counts
+//         });
+//       }
+//     }
+//
+//   }
+//
+//
+//   return arrays;
+// };
+
 const converseFormatForAgGrid = (oraDatas: any) => {
+
   groupValues.length = 0;
   moduleValues.length = 0;
+
   const arrays: any[] = [];
   if (oraDatas === null) {
     return arrays;
   }
 
   for (let index = 0; index < oraDatas.length; index += 1) {
+
     const starttime = oraDatas[index].range.start;
     arrays.push({
         devCenter: "研发中心",
         "username": "前端",
-        [starttime]: oraDatas[index].side.front
-      }, {
+        [starttime]: Number(oraDatas[index].side.front)
+      }
+    );
+    arrays.push({
         devCenter: "研发中心",
         "username": "后端",
-        [starttime]: oraDatas[index].side.backend
+        [starttime]: Number(oraDatas[index].side.backend)
       }
     );
 
     groupValues.push({
       time: starttime,
       group: "研发中心",
-      values: oraDatas[index].total.count
+      values: oraDatas[index].total.kpi
     });
 
     const data = oraDatas[index].datas;
@@ -215,47 +266,88 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       groupValues.push({
         time: starttime,
         group: data[i].deptName,
-        values: data[i].count
+        values: data[i].kpi
       }, {
         time: starttime,
-        group: data[i].parent.deptName,
-        values: data[i].parent.count
+        group: data[i].parent === null ? "" : data[i].parent.deptName,
+        values: data[i].parent === null ? "" : data[i].parent.kpi
       });
 
       moduleValues.push({
         time: starttime,
         module: "前端",
         parent: data[i].deptName,
-        values: data[i].side.front
+        values: data[i].side === null ? "" : data[i].side.front
       }, {
         time: starttime,
         module: "后端",
         parent: data[i].deptName,
-        values: data[i].side.backend
+        values: data[i].side === null ? "" : data[i].side.backend
       });
 
-
       const usersData = data[i].users;
-      for (let m = 0; m < usersData.length; m += 1) {
-        const username = usersData[m].userName;
-        const counts = usersData[m].count;
+      if (usersData !== null) {
+        for (let m = 0; m < usersData.length; m += 1) {
+          const username = usersData[m].userName;
 
-        arrays.push({
-          devCenter: "研发中心",
-          dept: data[i].parent.deptName,
-          group: data[i].deptName,
-          module: moduleChange(usersData[m].tech),
-          "username": username,
-          [starttime]: counts
-        });
+          // 获取产品研发部前后端的数据
+          if (data[i].deptName === "产品研发部") {
+            arrays.push({
+                devCenter: "研发中心",
+                dept: "产品研发部",
+                "username": "前端 ",
+                [starttime]: data[i].side === null ? "" : Number(data[i].side.front)
+              }, {
+                devCenter: "研发中心",
+                dept: "产品研发部",
+                "username": "后端 ",   // 故意空一格，以便于区分上一个前后端
+                [starttime]: data[i].side === null ? "" : Number(data[i].side.backend)
+              }
+            );
+          }
+          // 特殊处理宋老师和王润燕的部门和组
+          if (username === "王润燕") {
+            arrays.push({
+              devCenter: "研发中心",
+              dept: "产品研发部",
+              "username": username,
+              [starttime]: usersData[m].kpi
+            });
+          } else if (username === "宋永强") {
+            arrays.push({
+              devCenter: "研发中心",
+              "username": username,
+              [starttime]: usersData[m].kpi
+            });
+          } else if (data[i].parent === null || data[i].parent.deptName === "北京研发中心" || data[i].parent.deptName === "成都研发中心") {  // 如果是（北京或成都）研发中心，去掉部门的显示
+            arrays.push({
+                devCenter: "研发中心",
+                group: data[i].deptName,
+                module: moduleChange(usersData[m].tech),
+                "username": username,
+                [starttime]: usersData[m].kpi
+              }
+            );
+          }
+          else {
+            arrays.push({
+              devCenter: "研发中心",
+              dept: data[i].parent.deptName,
+              group: data[i].deptName,
+              module: moduleChange(usersData[m].tech),
+              "username": username,
+              [starttime]: usersData[m].kpi
+            });
+          }
+
+        }
       }
     }
-
   }
-
 
   return arrays;
 };
+
 
 const converseArrayToOne = (data: any) => {
   const resultData = new Array();
@@ -296,41 +388,41 @@ const queryCodeReviewCount = async (client: GqlClient<object>, params: string) =
   const {data} = await client.query(`
       {
         codeReviewDept(kind:"${condition.typeFlag}",ends:${condition.ends}){
-            total{
+          total {
+            dept
+            deptName
+            kpi
+          }
+          range {
+            start
+            end
+          }
+          side{
+            both
+            front
+            backend
+          }
+          datas {
+            dept
+            deptName
+            kpi
+            parent {
+              dept
               deptName
-              count
-            }
-            range{
-              start
-              end
             }
             side{
               both
               front
               backend
             }
-            datas{
-              dept
-              deptName
-              parent{
-                deptName
-                count
-              }
-              count
-              side{
-                both
-                front
-                backend
-              }
-              users{
-                userId
-                userName
-                count
-                tech
-              }
+            users {
+              userId
+              userName
+              tech
+              kpi
             }
           }
-
+        }
       }
   `);
   const datas = converseFormatForAgGrid(data?.codeReviewDept);

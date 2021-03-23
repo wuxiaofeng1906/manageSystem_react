@@ -38,6 +38,9 @@ const compColums = [
     rowGroup: true,
     hide: true,
   }, {
+    headerName: '类型',
+    field: 'type',
+  }, {
     headerName: '姓名',
     field: 'username',
   }];
@@ -50,7 +53,7 @@ function codeNumberRender(values: any) {
       if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
         return ` <span style="color: Silver  ">  ${0} </span> `;
       }
-      return ` <span style="font-weight: bold">  ${(Number(datas.values) / 24).toFixed(2)} </span> `;
+      return ` <span style="font-weight: bold">  ${(Number(datas.values) / 24).toFixed(3)} </span> `;
     }
   }
 
@@ -66,7 +69,7 @@ function colorRender(params: any) {
 
   if (Number.isNaN(Number(params.value)) === false) {
 
-    return (Number(params.value) / 24).toFixed(2);
+    return (Number(params.value) / 24).toFixed(3);
   }
 
   return params.value;  // 为了将聚合函数实现格式化
@@ -121,7 +124,7 @@ const columsForQuarters = () => {
 
 
 // 转化为ag-grid能被显示的格式
-const converseFormatForAgGrid = (oraDatas: any) => {
+const converseFormatForAgGrid = (oraDatas: any, type: string) => {
 
   groupValues.length = 0;
   moduleValues.length = 0;
@@ -163,8 +166,9 @@ const converseFormatForAgGrid = (oraDatas: any) => {
           arrays.push({
             devCenter: "研发中心",
             group: data[i].deptName,
+            "type":type,
             "username": username,
-            [starttime]: Number(usersData[m].kpi).toFixed(2)
+            [starttime]: Number(usersData[m].kpi).toFixed(3)
           });
         }
       }
@@ -205,7 +209,7 @@ const converseArrayToOne = (data: any) => {
   return resultData;
 };
 
-const queryBugResolutionCount = async (client: GqlClient<object>, params: string) => {
+const queryBugResolutionCount = async (client: GqlClient<object>, params: string, type: string) => {
   const condition = getParamsByType(params);
   if (condition.typeFlag === 0) {
     return [];
@@ -213,7 +217,7 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
 
   const {data} = await client.query(`
       {
-        feedbackAvgDept(kind: "${condition.typeFlag}", ends: ${condition.ends}){
+        feedbackAvgDept(kind: "${condition.typeFlag}", ends: ${condition.ends},category:${type}){
           total {
             dept
             deptName
@@ -241,7 +245,7 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
       }
   `);
 
-  const datas = converseFormatForAgGrid(data?.feedbackAvgDept);
+  const datas = converseFormatForAgGrid(data?.feedbackAvgDept, type);
   return converseArrayToOne(datas);
 };
 
@@ -250,11 +254,15 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
 const AdviserFeedTableList: React.FC<any> = () => {
 
   /* region ag-grid */
-  const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
-    queryBugResolutionCount(gqlClient, 'week'),
+    queryBugResolutionCount(gqlClient, 'week', 'story'),
   );
+  const bugData = useRequest(() =>
+    queryBugResolutionCount(gqlClient, 'week', 'bug'),
+  );
+
+  const gridApi = useRef<GridApi>();
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -264,6 +272,13 @@ const AdviserFeedTableList: React.FC<any> = () => {
     else gridApi.current.hideOverlay();
   }
 
+  const gridApiForBug = useRef<GridApi>();
+  const onBugGridReady = (params: GridReadyEvent) => {
+    gridApiForBug.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+
   /* endregion */
 
   // 按周统计
@@ -271,8 +286,12 @@ const AdviserFeedTableList: React.FC<any> = () => {
     /* 八周 */
     const weekColums = columsForWeeks();
     gridApi.current?.setColumnDefs(weekColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'week');
+    const datas: any = await queryBugResolutionCount(gqlClient, 'week', 'story');
     gridApi.current?.setRowData(datas);
+
+    gridApiForBug.current?.setColumnDefs(weekColums);
+    const bugDt: any = await queryBugResolutionCount(gqlClient, 'week', 'bug');
+    gridApiForBug.current?.setRowData(bugDt);
 
   };
 
@@ -281,8 +300,12 @@ const AdviserFeedTableList: React.FC<any> = () => {
     /* 12月 */
     const monthColums = columsForMonths();
     gridApi.current?.setColumnDefs(monthColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'month');
+    const datas: any = await queryBugResolutionCount(gqlClient, 'month', 'story');
     gridApi.current?.setRowData(datas);
+
+    gridApiForBug.current?.setColumnDefs(monthColums);
+    const bugDt: any = await queryBugResolutionCount(gqlClient, 'month', 'bug');
+    gridApiForBug.current?.setRowData(bugDt);
 
   };
 
@@ -291,9 +314,14 @@ const AdviserFeedTableList: React.FC<any> = () => {
     /* 4季 */
 
     const quartersColums = columsForQuarters();
+
     gridApi.current?.setColumnDefs(quartersColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'quarter');
+    const datas: any = await queryBugResolutionCount(gqlClient, 'quarter', 'story');
     gridApi.current?.setRowData(datas);
+
+    gridApiForBug.current?.setColumnDefs(quartersColums);
+    const bugDt: any = await queryBugResolutionCount(gqlClient, 'quarter', 'bug');
+    gridApiForBug.current?.setRowData(bugDt);
   };
 
   /* region 提示规则显示 */
@@ -323,7 +351,7 @@ const AdviserFeedTableList: React.FC<any> = () => {
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>
 
-      <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: 350, width: '100%'}}>
         <AgGridReact
           columnDefs={columsForWeeks()} // 定义列
           rowData={data} // 数据绑定
@@ -343,6 +371,29 @@ const AdviserFeedTableList: React.FC<any> = () => {
           rowHeight={32}
           headerHeight={35}
           onGridReady={onGridReady}
+        >
+        </AgGridReact>
+      </div>
+      <div className="ag-theme-alpine" style={{height: 350, width: '100%', marginTop: '20px'}}>
+        <AgGridReact
+          columnDefs={columsForWeeks()} // 定义列
+          rowData={bugData.data} // 数据绑定
+          defaultColDef={{
+            resizable: true,
+            sortable: true,
+            filter: true,
+            flex: 1,
+            cellStyle: {"margin-top": "-5px"}
+          }}
+          autoGroupColumnDef={{
+            minWidth: 250,
+            sort: 'asc'
+          }}
+          groupDefaultExpanded={9} // 展开分组
+          suppressAggFuncInHeader={true}   // 不显示标题聚合函数的标识
+          rowHeight={32}
+          headerHeight={35}
+          onGridReady={onBugGridReady}
         >
         </AgGridReact>
       </div>

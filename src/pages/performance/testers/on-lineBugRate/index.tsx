@@ -127,6 +127,10 @@ const converseFormatForAgGrid = (oraDatas: any) => {
   for (let index = 0; index < oraDatas.length; index += 1) {
 
     const starttime = oraDatas[index].range.start;
+    arrays.push({
+       "username": "代码量",
+      [starttime]:  oraDatas[index].code
+    });
 
     groupValues.push({
       time: starttime,
@@ -224,6 +228,7 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
                 deptName
                 kpi
               }
+              code
               range {
                 start
                 end

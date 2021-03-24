@@ -127,7 +127,10 @@ const converseFormatForAgGrid = (oraDatas: any) => {
   for (let index = 0; index < oraDatas.length; index += 1) {
 
     const starttime = oraDatas[index].range.start;
-
+    arrays.push({
+      "username": "代码量",
+      [starttime]: oraDatas[index].code
+    });
     groupValues.push({
       time: starttime,
       group: "研发中心",
@@ -224,6 +227,7 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
                 deptName
                 kpi
               }
+              code
               range {
                 start
                 end
@@ -378,7 +382,7 @@ const TestBugRateRefTableList: React.FC<any> = () => {
           <p style={cssIndent}>周报：周一至周天测试类有效bug求和/(当周周一至周天研发中心所有开发人员代码量之和/1000)；</p>
           <p style={cssIndent}>月报：按月统计bug求和/(按月统计研发中心所有开发人员代码量之和/1000)；</p>
           <p style={cssIndent}>季报：按季统计bug求和/(按季统计研发中心所有开发人员代码量之和/1000)；</p>
-           <p> 2.按组统计 </p>
+          <p> 2.按组统计 </p>
           <p style={cssIndent}>周报：该组所有人员周一至周天测试类线上有效bug求和/(当周周一至周天研发中心所有开发人员代码量之和/1000)；</p>
           <p style={cssIndent}>月报：该组所有人员按月统计bug求和/(按月统计研发中心所有开发人员代码量之和/1000)；</p>
           <p style={cssIndent}>季报：该组所有人员按季统计bug求和/(按季统计研发中心所有开发人员代码量之和/1000)；</p>

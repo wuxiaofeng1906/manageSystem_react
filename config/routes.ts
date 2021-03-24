@@ -153,6 +153,11 @@ export default [
           icon: 'table',
           path: 'thousandBugsRate',
           component: './performance/developer/thousandBugsRate',
+        }, {
+          name: '提测一次通过率',
+          icon: 'table',
+          path: 'testPassRateForOnce',
+          component: './performance/developer/testPassRateForOnce',
         },
       ]
     }, {

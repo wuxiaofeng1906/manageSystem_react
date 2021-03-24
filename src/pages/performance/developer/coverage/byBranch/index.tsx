@@ -102,7 +102,7 @@ const BranchTableList: React.FC<any> = () => {
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>
 
-      <div className="ag-theme-alpine" style={{height: 700, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: 570, width: '100%'}}>
         <AgGridReact
           rowData={data}
           defaultColDef={{

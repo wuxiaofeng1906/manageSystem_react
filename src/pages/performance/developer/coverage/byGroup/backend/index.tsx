@@ -411,7 +411,7 @@ const BackendCoverageTableList: React.FC<any> = () => {
   /* endregion */
 
   return (
-    <PageContainer>
+    <PageContainer style={{height:'100%'}}>
       <div style={{background: 'white'}}>
         <Button type="text" style={{color: 'black'}} icon={<ProfileTwoTone/>} size={'large'}
                 onClick={statisticsByWeeks}>按周统计</Button>
@@ -423,7 +423,7 @@ const BackendCoverageTableList: React.FC<any> = () => {
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>
 
-      <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: '1000px', width: '100%',marginBottom:"20px"}}>   {/* 570 */}
         <AgGridReact
           columnDefs={columsForWeeks()} // 定义列
           rowData={data} // 数据绑定

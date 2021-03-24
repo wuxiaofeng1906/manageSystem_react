@@ -296,7 +296,7 @@ const queryFrontCoverage = async (client: GqlClient<object>, params: string) => 
       timeRange.push(`"${weekRanges[index].to}"`);
     }
     ends = `[${timeRange.join(",")}]`;
-    typeFlag = 1;
+    typeFlag = 0;
   } else if (params === 'month') {
     const timeRange = new Array();
     for (let index = 0; index < monthRanges.length; index += 1) {

@@ -160,7 +160,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     groupValues.push({
       time: starttime,
       group: "研发中心",
-      values: oraDatas[index].total.avg
+      values: oraDatas[index].total.kpi
     });
 
     const data = oraDatas[index].datas;
@@ -169,11 +169,11 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       groupValues.push({
         time: starttime,
         group: data[i].deptName,
-        values: data[i].avg
+        values: data[i].kpi
       }, {
         time: starttime,
         group: data[i].parent === null ? "" : data[i].parent.deptName,
-        values: data[i].parent === null ? "" : data[i].parent.avg
+        values: data[i].parent === null ? "" : data[i].parent.kpi
       });
 
       moduleValues.push({
@@ -214,13 +214,13 @@ const converseFormatForAgGrid = (oraDatas: any) => {
               devCenter: "研发中心",
               dept: "产品研发部",
               "username": username,
-              [starttime]: usersData[m].avg
+              [starttime]: usersData[m].kpi
             });
           } else if (username === "宋永强") {
             arrays.push({
               devCenter: "研发中心",
               "username": username,
-              [starttime]: usersData[m].avg
+              [starttime]: usersData[m].kpi
             });
           } else if (data[i].parent === null || data[i].parent.deptName === "北京研发中心" || data[i].parent.deptName === "成都研发中心") {  // 如果是（北京或成都）研发中心，去掉部门的显示
             arrays.push({
@@ -228,7 +228,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
                 group: data[i].deptName,
                 module: moduleChange(usersData[m].tech),
                 "username": username,
-                [starttime]: usersData[m].avg
+                [starttime]: usersData[m].kpi
               }
             );
           }
@@ -239,7 +239,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
               group: data[i].deptName,
               module: moduleChange(usersData[m].tech),
               "username": username,
-              [starttime]: usersData[m].avg
+              [starttime]: usersData[m].kpi
             });
           }
 
@@ -291,10 +291,10 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
       {
 
         avgCodeDept(kind:"${condition.typeFlag}",ends:${condition.ends}) {
-          total{
+          total {
+            dept
             deptName
-            count
-            avg
+            kpi
           }
           range {
             start
@@ -306,21 +306,22 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
             backend
           }
           datas {
-            parent{
-              deptName
-              avg
-            }
             dept
             deptName
-            avg
+            kpi
+            parent {
+              dept
+              deptName
+            }
             side{
+              both
               front
               backend
             }
-            users{
+            users {
               userId
               userName
-              avg
+              kpi
               tech
             }
           }

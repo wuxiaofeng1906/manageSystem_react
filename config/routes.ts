@@ -169,12 +169,12 @@ export default [
         icon: 'table',
         path: '/kpi/performance/testers',
         routes: [{
-          name: '线上千行Bug率',
+          name: '线上千行bug率',
           icon: 'table',
           path: 'on-lineBugRate',
           component: './kpi/performance/testers/on-lineBugRate',
         }, {
-          name: '线上千行Bug率(参考)',
+          name: '线上千行bug率(参考)',
           icon: 'table',
           path: 'on-lineBugRateRefer',
           component: './kpi/performance/testers/on-lineBugRateRefer',

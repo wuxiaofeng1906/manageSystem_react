@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -7,170 +7,45 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
-import {
-  getWeeksRange,
-  getMonthWeek,
-  getTwelveMonthTime,
-  getFourQuarterTime,
-  getParamsByType
-} from '@/publicMethods/timeMethods';
-import {Button, Drawer} from "antd";
-import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
+import moment from 'moment';
+import {Button, DatePicker} from 'antd';
+import {getRecentMonth} from '@/publicMethods/timeMethods';
+import {moduleChange} from "@/publicMethods/cellRenderer";
+// import {history} from 'umi';
 
+const {RangePicker} = DatePicker;
 
-// 获取近四周的时间范围
-const weekRanges = getWeeksRange(8);
-const monthRanges = getTwelveMonthTime();
-const quarterTime = getFourQuarterTime();
-const groupValues: any[] = [];
-const moduleValues: any[] = [];
-
-/* region 动态定义列 */
-const compColums = [
-  {
-    headerName: '研发中心',
-    field: 'devCenter',
-    rowGroup: true,
-    hide: true,
-  }, {
-    headerName: '组名',
-    field: 'group',
-    rowGroup: true,
-    hide: true,
-  }, {
-    headerName: '类型',
-    field: 'type',
-  }, {
-    headerName: '姓名',
-    field: 'username',
-  }];
-
-function codeNumberRender(values: any) {
-  const rowName = values.rowNode.key;
-  for (let i = 0; i < groupValues.length; i += 1) {
-    const datas = groupValues[i];
-    if (values.colDef.field === datas.time && rowName === datas.group) {
-      if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
-        return ` <span style="color: Silver  ">  ${0} </span> `;
-      }
-      return ` <span style="font-weight: bold">  ${(Number(datas.values) / 24).toFixed(3)} </span> `;
-    }
-  }
-
-  return ` <span style="color: Silver  ">  ${0} </span> `;
-}
-
-
-function colorRender(params: any) {
-
-  if (params.value === "" || params.value === undefined || Number(params.value) === 0 || Number(params.value) === 0.00) {
-    return ` <span style="color: Silver  ">  ${0} </span> `;
-  }
-
-  if (Number.isNaN(Number(params.value)) === false) {
-
-    return (Number(params.value) / 24).toFixed(3);
-  }
-
-  return params.value;  // 为了将聚合函数实现格式化
-}
-
-const columsForWeeks = () => {
-  const component = new Array();
-  for (let index = weekRanges.length - 1; index >= 0; index -= 1) {
-    const starttime = weekRanges[index].from;
-    const weekName = getMonthWeek(starttime);
-    component.push({
-      headerName: weekName,
-      field: starttime.toString(),
-      aggFunc: codeNumberRender,
-      cellRenderer: colorRender
-    });
-  }
-  return compColums.concat(component);
-};
-
-const columsForMonths = () => {
-  const component = new Array();
-  for (let index = 0; index < monthRanges.length; index += 1) {
-    component.push({
-      headerName: monthRanges[index].title,
-      field: monthRanges[index].start,
-      aggFunc: codeNumberRender,
-      cellRenderer: colorRender
-    });
-
-  }
-  return compColums.concat(component);
-};
-
-const columsForQuarters = () => {
-  const component = new Array();
-  for (let index = 0; index < quarterTime.length; index += 1) {
-    component.push({
-      headerName: quarterTime[index].title,
-      field: quarterTime[index].start,
-      aggFunc: codeNumberRender,
-      cellRenderer: colorRender
-    });
-
-  }
-  return compColums.concat(component);
-};
-
-/* endregion */
-
-/* region 数据处理 */
-
-
-// 转化为ag-grid能被显示的格式
-const converseFormatForAgGrid = (oraDatas: any, type: string) => {
-
-  groupValues.length = 0;
-  moduleValues.length = 0;
-
+const converseFormatForAgGrid = (oraDatas: any) => {
   const arrays: any[] = [];
   if (oraDatas === null) {
     return arrays;
   }
 
   for (let index = 0; index < oraDatas.length; index += 1) {
+    const usersData = oraDatas[index].users;
+    if (usersData !== null) {
+      for (let m = 0; m < usersData.length; m += 1) {
+        const username = usersData[m].userName;
+        if (username !== '李鲲' && username !== '宋永强' && username !== '王润燕' && username !== '陈诺') {
 
-    const starttime = oraDatas[index].range.start;
+          if (oraDatas[index].parent.deptName === "北京研发中心" || oraDatas[index].parent.deptName === "成都研发中心") {
+            arrays.push({
+              dept: oraDatas[index].deptName,
+              module: moduleChange(usersData[m].tech),
+              "username": username,
+            });
+          } else {
+            arrays.push({
+              dept: oraDatas[index].parent.deptName,
+              group: oraDatas[index].deptName,
+              module: moduleChange(usersData[m].tech),
+              "username": username,
+            });
+          }
 
-    groupValues.push({
-      time: starttime,
-      group: "研发中心",
-      values: oraDatas[index].total.kpi
-    });
-
-    const data = oraDatas[index].datas;
-    for (let i = 0; i < data.length; i += 1) {
-
-      groupValues.push({
-        time: starttime,
-        group: data[i].deptName,
-        values: data[i].kpi
-      }, {
-        time: starttime,
-        group: data[i].parent === null ? "" : data[i].parent.deptName,
-        values: data[i].parent === null ? "" : data[i].parent.kpi
-      });
-
-
-      const usersData = data[i].users;
-      if (usersData !== null) {
-        for (let m = 0; m < usersData.length; m += 1) {
-          const username = usersData[m].userName;
-
-          arrays.push({
-            devCenter: "研发中心",
-            group: data[i].deptName,
-            "type":type,
-            "username": username,
-            [starttime]: Number(usersData[m].kpi).toFixed(3)
-          });
         }
+
+
       }
     }
   }
@@ -178,247 +53,243 @@ const converseFormatForAgGrid = (oraDatas: any, type: string) => {
   return arrays;
 };
 
+
 const converseArrayToOne = (data: any) => {
   const resultData = new Array();
   for (let index = 0; index < data.length; index += 1) {
     let repeatFlag = false;
-    // 判断原有数组是否包含有名字
+
     for (let m = 0; m < resultData.length; m += 1) {
-      if (resultData[m].username === data[index].username) {
+      if (resultData[m].dept === data[index].dept && resultData[m].group === data[index].group && resultData[m].module === data[index].module) {
         repeatFlag = true;
         break;
       }
     }
 
     if (repeatFlag === false) {
-      const tempData = {};
-      for (let index2 = 0; index2 < data.length; index2 += 1) {
-        tempData["username"] = data[index].username;
 
-        if (data[index].username === data[index2].username) {
-          const key = Object.keys(data[index2]);  // 获取所有的Key值
-          key.forEach(function (item) {
-            tempData[item] = data[index2][item];
-          });
+      const users: object = {
+        dept: data[index].dept,
+        group: data[index].group,
+        module: data[index].module,
+      };
+
+      const {dept} = data[index];
+      const {group} = data[index];
+      const {module} = data[index];
+      debugger;
+      let num = 0;
+      for (let i = 0; i < data.length; i += 1) {
+        const dept2 = data[i].dept;
+        const group2 = data[i].group;
+        const module2 = data[i].module;
+
+        if (dept === dept2 && group === group2 && module === module2) {
+
+          users[`username${num}`] = data[i].username;
+          num += 1;
         }
       }
-      resultData.push(tempData);
+
+
+      resultData.push(users);
     }
+
+
   }
 
   return resultData;
 };
-
-const queryBugResolutionCount = async (client: GqlClient<object>, params: string, type: string) => {
-  const condition = getParamsByType(params);
-  if (condition.typeFlag === 0) {
-    return [];
-  }
-
+// 查询数据
+const queryDevelopViews = async (client: GqlClient<object>) => {
   const {data} = await client.query(`
       {
-        feedbackAvgDept(kind: "${condition.typeFlag}", ends: ${condition.ends},category:${type}){
-          total {
+          kpiDeptAndUsers{
             dept
             deptName
-            kpi
-          }
-          range {
-            start
-            end
-          }
-          datas {
-            dept
-            deptName
-            kpi
-            parent {
+            parent{
               dept
               deptName
             }
-            users {
-              userId
+            users{
+              id
               userName
-              kpi
+              tech
             }
           }
         }
-      }
   `);
 
-  const datas = converseFormatForAgGrid(data?.feedbackAvgDept, type);
-  return converseArrayToOne(datas);
+  const result: any = converseFormatForAgGrid(data?.kpiDeptAndUsers);
+  console.log(result);
+  return converseArrayToOne(result);
 };
 
-/* endregion */
 
-const AdviserFeedTableList: React.FC<any> = () => {
+// 组件初始化
+const SprintList: React.FC<any> = () => {
 
-  /* region ag-grid */
-  const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() =>
-    queryBugResolutionCount(gqlClient, 'week', 'story'),
-  );
-  const bugData = useRequest(() =>
-    queryBugResolutionCount(gqlClient, 'week', 'bug'),
-  );
+  // 定义列名
+  const colums = () => {
+    const component = new Array();
+    component.push(
+      {
+        headerName: '部门',
+        field: 'dept',
+        minWidth: 100,
+        rowGroup: true,
+        hide: true,
+        // cellRenderer: (params: any) => {
+        //   return `<a  style="color:blue;text-decoration: underline" >${params.value}</a>`;
+        // },
+        // onCellClicked: (params: any) => {
+        //   console.log('params', params.data);
+        //   history.push(`/sprint/sprintListDetails?projectid=${params.data.id}&project=${params.data.name}`);
+        // },
+      },
+      {
+        headerName: '组名',
+        field: 'group',
+        rowGroup: true,
+        hide: true,
+        // cellRenderer: (params: any) => {
+        //   if (params.value === 'AUTO') {
+        //     return '自动创建';
+        //   }
+        //   return '人工创建';
+        // },
+      },
+      {
+        headerName: '所属端',
+        field: 'module',
 
+      },
+      {
+        headerName: '姓名1',
+        field: 'username0',
+      }, {
+        headerName: '姓名2',
+        field: 'username1',
+      }, {
+        headerName: '姓名3',
+        field: 'username2',
+      }, {
+        headerName: '姓名4',
+        field: 'username3',
+      }, {
+        headerName: '姓名5',
+        field: 'username4',
+      }, {
+        headerName: '姓名6',
+        field: 'username5',
+      }, {
+        headerName: '姓名7',
+        field: 'username6',
+      }, {
+        headerName: '姓名8',
+        field: 'username7',
+      }, {
+        headerName: '姓名9',
+        field: 'username8',
+      }, {
+        headerName: '姓名10',
+        field: 'username9',
+      }, {
+        headerName: '姓名11',
+        field: 'username10',
+      }, {
+        headerName: '姓名12',
+        field: 'username11',
+      }
+    );
+
+    return component;
+  };
+
+  /* region  表格相关事件 */
   const gridApi = useRef<GridApi>();
+  const gqlClient = useGqlClient();
+  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient));
+
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
+
   if (gridApi.current) {
     if (loading) gridApi.current.showLoadingOverlay();
     else gridApi.current.hideOverlay();
   }
 
-  const gridApiForBug = useRef<GridApi>();
-  const onBugGridReady = (params: GridReadyEvent) => {
-    gridApiForBug.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
+  /* endregion */
 
+  /* region 条件查询功能 */
+
+
+  // 时间选择事件
+  const onTimeSelected = async (params: any) => {
+
+    console.log("params", params);
+  };
 
   /* endregion */
 
-  // 按周统计
-  const statisticsByWeeks = async () => {
-    /* 八周 */
-    const weekColums = columsForWeeks();
-    gridApi.current?.setColumnDefs(weekColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'week', 'story');
-    gridApi.current?.setRowData(datas);
+  /* region 显示默认数据  */
 
-    gridApiForBug.current?.setColumnDefs(weekColums);
-    const bugDt: any = await queryBugResolutionCount(gqlClient, 'week', 'bug');
-    gridApiForBug.current?.setRowData(bugDt);
+  const showDefalultValue = async () => {
+
 
   };
 
-  // 按月统计
-  const statisticsByMonths = async () => {
-    /* 12月 */
-    const monthColums = columsForMonths();
-    gridApi.current?.setColumnDefs(monthColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'month', 'story');
-    gridApi.current?.setRowData(datas);
-
-    gridApiForBug.current?.setColumnDefs(monthColums);
-    const bugDt: any = await queryBugResolutionCount(gqlClient, 'month', 'bug');
-    gridApiForBug.current?.setRowData(bugDt);
-
-  };
-
-  // 按季度统计
-  const statisticsByQuarters = async () => {
-    /* 4季 */
-
-    const quartersColums = columsForQuarters();
-
-    gridApi.current?.setColumnDefs(quartersColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'quarter', 'story');
-    gridApi.current?.setRowData(datas);
-
-    gridApiForBug.current?.setColumnDefs(quartersColums);
-    const bugDt: any = await queryBugResolutionCount(gqlClient, 'quarter', 'bug');
-    gridApiForBug.current?.setRowData(bugDt);
-  };
-
-  /* region 提示规则显示 */
-  const [messageVisible, setVisible] = useState(false);
-  const showRules = () => {
-    setVisible(true);
-  };
-  const onClose = () => {
-    setVisible(false);
-  };
-
-  const cssIndent = {textIndent: '2em'};
   /* endregion */
 
+
+  // 返回渲染的组件
   return (
     <PageContainer>
-      <div style={{background: 'white'}}>
-        <Button type="text" style={{color: 'black'}} icon={<ProfileTwoTone/>} size={'large'}
-                onClick={statisticsByWeeks}>按周统计</Button>
-        <Button type="text" style={{color: 'black'}} icon={<CalendarTwoTone/>} size={'large'}
-                onClick={statisticsByMonths}>按月统计</Button>
-        <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
-                onClick={statisticsByQuarters}>按季统计</Button>
-        <label style={{fontWeight: "bold"}}>(统计单位：天)</label>
 
-        <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
-                size={'large'} onClick={showRules}>计算规则</Button>
+      {/* 新增、修改、删除按钮栏 */}
+      <div style={{background: 'white', marginBottom: "20px"}}>
+        <Button type="text" style={{color: 'black'}} size={'large'} onClick={showDefalultValue}>默认当前季度</Button>
+
+
+        <label style={{marginLeft: '10px', fontSize: "16px"}}>筛选周期：</label>
+        <RangePicker
+          className={'times'}
+          style={{width: '30%'}}
+          defaultValue={[moment(getRecentMonth().start), moment()]}
+          onChange={onTimeSelected}
+        />
+
       </div>
 
-      <div className="ag-theme-alpine" style={{height: 350, width: '100%'}}>
+      {/* ag-grid 表格定义 */}
+      <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
         <AgGridReact
-          columnDefs={columsForWeeks()} // 定义列
+          columnDefs={colums()} // 定义列
           rowData={data} // 数据绑定
           defaultColDef={{
             resizable: true,
             sortable: true,
+            // floatingFilter: true,
             filter: true,
             flex: 1,
-            cellStyle: {"margin-top": "-5px"}
+            minWidth: 100,
           }}
           autoGroupColumnDef={{
-            minWidth: 250,
-            sort: 'asc'
+            minWidth: 100,
           }}
           groupDefaultExpanded={9} // 展开分组
-          suppressAggFuncInHeader={true}   // 不显示标题聚合函数的标识
-          rowHeight={32}
-          headerHeight={35}
           onGridReady={onGridReady}
+          groupHideOpenParents={true}
+
         >
-        </AgGridReact>
-      </div>
-      <div className="ag-theme-alpine" style={{height: 350, width: '100%', marginTop: '20px'}}>
-        <AgGridReact
-          columnDefs={columsForWeeks()} // 定义列
-          rowData={bugData.data} // 数据绑定
-          defaultColDef={{
-            resizable: true,
-            sortable: true,
-            filter: true,
-            flex: 1,
-            cellStyle: {"margin-top": "-5px"}
-          }}
-          autoGroupColumnDef={{
-            minWidth: 250,
-            sort: 'asc'
-          }}
-          groupDefaultExpanded={9} // 展开分组
-          suppressAggFuncInHeader={true}   // 不显示标题聚合函数的标识
-          rowHeight={32}
-          headerHeight={35}
-          onGridReady={onBugGridReady}
-        >
+
         </AgGridReact>
       </div>
 
-      <div>
-        <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
-                placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
 
-          <p> 1.创建人为顾问（包含“实施顾问”） </p>
-          <p><strong>2.统计周期</strong></p>
-          <p style={cssIndent}>按周统计：bug/需求指派给产品的日期为周一00:00:00--周日23:59:59；</p>
-          <p style={cssIndent}>按月统计：bug/需求指派给产品的日期为每月1号00:00:00--每月最后1天23:59:59；</p>
-          <p style={cssIndent}>按季统计：bug/需求指派给产品的日期为每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
-          <p style={cssIndent}> 3.响应时长=产品响应时间-指派给产品时间-法定节假日</p>
-          <p style={cssIndent}> 4.单位：天，仅计算工作日</p>
-
-          <p><strong>5.计算公式说明</strong></p>
-          <p style={cssIndent}>周报：当周指派给产品的bug或需求响应时长/当周指派给产品的bug或需求总数；</p>
-          <p style={cssIndent}>月报：当月指派给产品的bug或需求响应时长/当月指派给产品的bug或需求总数；</p>
-          <p style={cssIndent}>季报：当季指派给产品的bug或需求响应时长/当季指派给产品的bug或需求总数；</p>
-
-        </Drawer>
-      </div>
     </PageContainer>
   );
 };
-
-export default AdviserFeedTableList;
+export default SprintList;

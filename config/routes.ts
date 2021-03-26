@@ -179,7 +179,7 @@ export default [
           path: 'on-lineBugRateRefer',
           component: './kpi/performance/testers/on-lineBugRateRefer',
         }, {
-          name: '测试千行bug率(含测试)',
+          name: '千行bug率(含测试)',
           icon: 'table',
           path: 'test_bugRate',
           component: './kpi/performance/testers/test_bugRate',

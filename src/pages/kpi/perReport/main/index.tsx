@@ -11,7 +11,7 @@ import moment from 'moment';
 import {Button, DatePicker} from 'antd';
 import {getRecentMonth} from '@/publicMethods/timeMethods';
 import {moduleChange} from "@/publicMethods/cellRenderer";
-// import {history} from 'umi';
+import {history} from 'umi';
 
 const {RangePicker} = DatePicker;
 
@@ -67,17 +67,14 @@ const converseArrayToOne = (data: any) => {
     }
 
     if (repeatFlag === false) {
-
       const users: object = {
         dept: data[index].dept,
         group: data[index].group,
         module: data[index].module,
       };
-
       const {dept} = data[index];
       const {group} = data[index];
       const {module} = data[index];
-      debugger;
       let num = 0;
       for (let i = 0; i < data.length; i += 1) {
         const dept2 = data[i].dept;
@@ -90,12 +87,8 @@ const converseArrayToOne = (data: any) => {
           num += 1;
         }
       }
-
-
       resultData.push(users);
     }
-
-
   }
 
   return resultData;
@@ -121,13 +114,29 @@ const queryDevelopViews = async (client: GqlClient<object>) => {
   `);
 
   const result: any = converseFormatForAgGrid(data?.kpiDeptAndUsers);
-  console.log(result);
+
   return converseArrayToOne(result);
 };
 
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
+
+  const cellRender = (params: any) => {
+    console.log("params",params);
+    if(params.value === undefined){
+      return "";
+    }
+    return `<a  style="color:blue;text-decoration: underline" >${params.value}</a>`;
+
+  };
+
+  const cellRenderLink = (params: any) => {
+    console.log("params",params);
+    // history.push(`/sprint/sprintListDetails?projectid=${params.data.id}&project=${params.data.name}`);
+
+  };
+
 
   // 定义列名
   const colums = () => {
@@ -139,72 +148,85 @@ const SprintList: React.FC<any> = () => {
         minWidth: 100,
         rowGroup: true,
         hide: true,
-        // cellRenderer: (params: any) => {
-        //   return `<a  style="color:blue;text-decoration: underline" >${params.value}</a>`;
-        // },
-        // onCellClicked: (params: any) => {
-        //   console.log('params', params.data);
-        //   history.push(`/sprint/sprintListDetails?projectid=${params.data.id}&project=${params.data.name}`);
-        // },
+        cellRenderer: cellRender,
+        onCellClicked: cellRenderLink
       },
       {
         headerName: '组名',
         field: 'group',
         rowGroup: true,
         hide: true,
-        // cellRenderer: (params: any) => {
-        //   if (params.value === 'AUTO') {
-        //     return '自动创建';
-        //   }
-        //   return '人工创建';
-        // },
       },
       {
         headerName: '所属端',
         field: 'module',
-
       },
       {
         headerName: '姓名1',
         field: 'username0',
+        cellRenderer: cellRender,
+        onCellClicked: cellRenderLink
       }, {
         headerName: '姓名2',
         field: 'username1',
+        cellRenderer: cellRender,
+        onCellClicked: cellRenderLink
       }, {
         headerName: '姓名3',
         field: 'username2',
+        cellRenderer: cellRender,
+        onCellClicked: cellRenderLink
       }, {
         headerName: '姓名4',
         field: 'username3',
+        cellRenderer: cellRender,
+        onCellClicked: cellRenderLink
       }, {
         headerName: '姓名5',
         field: 'username4',
+        cellRenderer: cellRender,
+        onCellClicked: cellRenderLink
       }, {
         headerName: '姓名6',
         field: 'username5',
+        cellRenderer: cellRender,
+        onCellClicked: cellRenderLink
       }, {
         headerName: '姓名7',
         field: 'username6',
+        cellRenderer: cellRender,
+        onCellClicked: cellRenderLink
       }, {
         headerName: '姓名8',
         field: 'username7',
+        cellRenderer: cellRender,
+        onCellClicked: cellRenderLink
       }, {
         headerName: '姓名9',
         field: 'username8',
+        cellRenderer: cellRender,
+        onCellClicked: cellRenderLink
       }, {
         headerName: '姓名10',
         field: 'username9',
+        cellRenderer: cellRender,
+        onCellClicked: cellRenderLink
       }, {
         headerName: '姓名11',
         field: 'username10',
+        cellRenderer: cellRender,
+        onCellClicked: cellRenderLink
       }, {
         headerName: '姓名12',
         field: 'username11',
+        cellRenderer: cellRender,
+        onCellClicked: cellRenderLink
       }
     );
 
     return component;
   };
+
 
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>();

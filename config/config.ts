@@ -15,7 +15,7 @@ export default defineConfig({
   layout: {
     name: 'Ant Design Pro',
     locale: true,
-    siderWidth: 208,
+    siderWidth: 240,   // 原始：208
     ...defaultSettings,
   },
   locale: {

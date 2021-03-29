@@ -9,7 +9,7 @@ import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import moment from 'moment';
 import {Button, Col, DatePicker, Form, Row} from 'antd';
-import {getCurrentQuarterTime, getRecentMonth} from '@/publicMethods/timeMethods';
+import {getCurrentQuarterTime} from '@/publicMethods/timeMethods';
 import {moduleChange} from "@/publicMethods/cellRenderer";
 import {history} from 'umi';
 import {SaveTwoTone} from '@ant-design/icons';
@@ -242,25 +242,22 @@ const SprintList: React.FC<any> = () => {
 
   /* endregion */
 
-  /* region 条件查询功能 */
 
-
+  const [formCondition] = Form.useForm();
   // 时间选择事件
   const onTimeSelected = async (dates: any, dateStrings: any) => {
     timeRg = `[${dateStrings[0]},${dateStrings[1]}]`;
 
   };
 
-  /* endregion */
-
-  /* region 显示默认数据  */
-
   const showDefalultValue = async () => {
     timeRg = `[${quarRange.start},${quarRange.end}]`;
+    formCondition.setFieldsValue({
+      timefilter: [moment(quarRange.start), moment(quarRange.end)],
+
+    });
 
   };
-
-  /* endregion */
 
 
   // 返回渲染的组件
@@ -268,30 +265,27 @@ const SprintList: React.FC<any> = () => {
     <PageContainer>
 
       <div style={{background: 'white', marginBottom: "20px", height: "55px"}}>
-        <form style={{paddingTop: "10px", height: "20px"}}>
 
+        <Form form={formCondition} style={{paddingTop: "10px", height: "20px"}}>
           <Row gutter={16}>
             <Col className="gutter-row">
               <Button type="text" style={{color: 'black'}} icon={<SaveTwoTone/>} size={'large'}
                       onClick={showDefalultValue}>默认当前季度</Button>
             </Col>
 
-            <Col className="gutter-row"  style={{width: '60%'}}>
-
-              <Form.Item name="time" label="筛选周期："   style={{marginTop: "5px", fontSize: "16px", color: 'black'}}>
+            <Col className="gutter-row" style={{width: '60%'}}>
+              <Form.Item name="timefilter" label="筛选周期：" style={{marginTop: "5px", fontSize: "16px", color: 'black'}}>
                 <RangePicker
-                  defaultValue={[moment(getRecentMonth().start), moment()]}
+                  defaultValue={[moment(quarRange.start), moment(quarRange.end)]}
                   onChange={onTimeSelected}
                   style={{width: '50%'}}
                 />
               </Form.Item>
-
             </Col>
-
           </Row>
 
+        </Form>
 
-        </form>
       </div>
 
       {/* ag-grid 表格定义 */}

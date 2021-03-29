@@ -11,7 +11,7 @@ import {history} from "../../../../.umi/core/history";
 import {Button, Col, DatePicker, Form, Row} from 'antd';
 import {SaveTwoTone} from "@ant-design/icons";
 import moment from "moment";
-import { getCurrentQuarterTime, getRecentMonth} from "@/publicMethods/timeMethods";
+import {getCurrentQuarterTime, getRecentMonth} from "@/publicMethods/timeMethods";
 
 const {RangePicker} = DatePicker;
 // import axios from 'axios';
@@ -19,12 +19,15 @@ const {RangePicker} = DatePicker;
 
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
+
+
   // const {data} = await client.query(`
   //     {
   //
   //     }
   // `);
-  // return data?.project;
+
+  console.log(client, params);
   return [
     {
       name1: "title",
@@ -44,6 +47,8 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
+  const [formCondition] = Form.useForm();
+
   // 定义列名
   const colums = () => {
     const component = new Array();
@@ -52,7 +57,6 @@ const SprintList: React.FC<any> = () => {
         headerName: '指标名称',
         field: 'name1',
         colSpan: (params: any) => {
-
           return params.data.name1 === 'title3' ? 5 : 1;
         }
 
@@ -81,18 +85,33 @@ const SprintList: React.FC<any> = () => {
 
     return component;
   };
+  const condition: any = {
+    users: "",
+    starttime: "",
+    endtime: ""
+  };
 
   const location = history.location.query;
   if (location !== undefined && location.projectid !== null) {
-    // const prjId = location.range.toString();
-    // const name = location.name === null ? '' : location.name.toString();
-    // console.log(name);
+
+    condition.users = location.name === null ? '' : location.name.toString();
+    if (location.range !== null) {
+      const ranges = location.range.toString().replace("[", "").replace("]", "").trim().split(",");
+      condition.starttime = ranges[0].toString();
+      condition.endtime = ranges[1].toString();
+      formCondition.setFieldsValue({
+        timefilter: [moment(ranges[0].toString()), moment(ranges[1].toString())],
+
+      });
+    }
+
+    console.log(condition);
   }
 
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, ""));
+  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, condition));
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -107,11 +126,16 @@ const SprintList: React.FC<any> = () => {
 
   /* endregion */
 
+
   const showDefalultValue = async () => {
     const quarRange = getCurrentQuarterTime();
     const starts = quarRange.start;
     const ends = quarRange.end;
     console.log(starts, ends);
+    formCondition.setFieldsValue({
+      timefilter: [moment(quarRange.start), moment(quarRange.end)],
+
+    });
 
     // 查询数据
     const newDatas = await queryDevelopViews(gqlClient, "");
@@ -135,7 +159,7 @@ const SprintList: React.FC<any> = () => {
   return (
     <PageContainer>
       <div style={{background: 'white', marginBottom: "20px", height: "55px"}}>
-        <form style={{paddingTop: "10px", height: "20px"}}>
+        <Form form={formCondition} style={{paddingTop: "10px", height: "20px"}}>
 
           <Row gutter={16}>
             <Col className="gutter-row">
@@ -143,9 +167,9 @@ const SprintList: React.FC<any> = () => {
                       onClick={showDefalultValue}>默认当前季度</Button>
             </Col>
 
-            <Col className="gutter-row"  style={{width: '60%'}}>
+            <Col className="gutter-row" style={{width: '60%'}}>
 
-              <Form.Item name="time" label="筛选周期："   style={{marginTop: "5px", fontSize: "16px", color: 'black'}}>
+              <Form.Item name="timefilter" label="筛选周期：" style={{marginTop: "5px", fontSize: "16px", color: 'black'}}>
                 <RangePicker
                   defaultValue={[moment(getRecentMonth().start), moment()]}
                   onChange={onTimeSelected}
@@ -158,7 +182,7 @@ const SprintList: React.FC<any> = () => {
           </Row>
 
 
-        </form>
+        </Form>
       </div>
 
       {/* ag-grid 表格定义 */}

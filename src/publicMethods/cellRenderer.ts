@@ -218,13 +218,6 @@ const linkToZentaoPage = (params: any) => {
 };
 
 const moduleChange = (params: string) => {
-  // export const enum USER_TECH {
-  //   FRONT = '1',
-  //   BACKEND = '2',
-  //   TEST = '3',
-  //   PRODUCT = '4',
-  //   OTHER = '5',
-  // }
 
   let module = "";
   switch (params) {

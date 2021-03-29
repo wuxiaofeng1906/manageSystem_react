@@ -121,207 +121,216 @@ const queryDevelopViews = async (client: GqlClient<object>) => {
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
-  const cellRendertest = (params: any) => {
-    if (params.value === undefined) {
-      return "";
-    }
-    // return `<a  style="color:blue;text-decoration: underline" href="#/main/test.tsx">${params.value}</a>`;
-    return `<Link to="/kpi/reportDetails range=['2021-01-01','2021-03-03']}&name=test" >${params.value}</Link>`;
-    // return `<link to="/kpi/reportDetails?range=['2021-01-01','2021-03-03']}&name=test"> ${params.value}</link>`;
-    // return `<a  style="color:blue;text-decoration: underline" href="#perReport/reportDetails?range=['2021-01-01','2021-03-03']}&name=test">${params.value}</a>`;
-  };
-
-  const cellRender = (params: any) => {
-    if (params.value === undefined) {
-      return "";
-    }
-
-    return `<a  style="color:blue;text-decoration: underline" >${params.value}</a>`;
-  };
-
-  const cellRenderLink = (params: any) => {
-    history.push(`/kpi/reportDetails?range=${timeRg}&name=${params.value}`);
-  };
-
-  // 定义列名
-  const colums = () => {
-    const component = new Array();
-    component.push(
-      {
-        headerName: '部门',
-        field: 'dept',
-        minWidth: 100,
-        rowGroup: true,
-        hide: true,
-        cellRenderer: cellRendertest,
-        // onCellClicked: cellRenderLink
-
-      },
-      {
-        headerName: '组名',
-        field: 'group',
-        rowGroup: true,
-        hide: true,
-      },
-      {
-        headerName: '所属端',
-        field: 'module',
-      },
-      {
-        headerName: '姓名1',
-        field: 'username0',
-        cellRenderer: cellRender,
-        onCellClicked: cellRenderLink
-      }, {
-        headerName: '姓名2',
-        field: 'username1',
-        cellRenderer: cellRender,
-        onCellClicked: cellRenderLink
-      }, {
-        headerName: '姓名3',
-        field: 'username2',
-        cellRenderer: cellRender,
-        onCellClicked: cellRenderLink
-      }, {
-        headerName: '姓名4',
-        field: 'username3',
-        cellRenderer: cellRender,
-        onCellClicked: cellRenderLink
-      }, {
-        headerName: '姓名5',
-        field: 'username4',
-        cellRenderer: cellRender,
-        onCellClicked: cellRenderLink
-      }, {
-        headerName: '姓名6',
-        field: 'username5',
-        cellRenderer: cellRender,
-        onCellClicked: cellRenderLink
-      }, {
-        headerName: '姓名7',
-        field: 'username6',
-        cellRenderer: cellRender,
-        onCellClicked: cellRenderLink
-      }, {
-        headerName: '姓名8',
-        field: 'username7',
-        cellRenderer: cellRender,
-        onCellClicked: cellRenderLink
-      }, {
-        headerName: '姓名9',
-        field: 'username8',
-        cellRenderer: cellRender,
-        onCellClicked: cellRenderLink
-      }, {
-        headerName: '姓名10',
-        field: 'username9',
-        cellRenderer: cellRender,
-        onCellClicked: cellRenderLink
-      }, {
-        headerName: '姓名11',
-        field: 'username10',
-        cellRenderer: cellRender,
-        onCellClicked: cellRenderLink
-      }, {
-        headerName: '姓名12',
-        field: 'username11',
-        cellRenderer: cellRender,
-        onCellClicked: cellRenderLink
+    const cellRendertest = (params: any) => {
+      if (params.value === undefined) {
+        return "";
       }
+      // return `<a  style="color:blue;text-decoration: underline" href="#/main/test.tsx">${params.value}</a>`;
+      return `<Link to="/kpi/reportDetails range=['2021-01-01','2021-03-03']}&name=test" >${params.value}</Link>`;
+      // return `<link to="/kpi/reportDetails?range=['2021-01-01','2021-03-03']}&name=test"> ${params.value}</link>`;
+      // return `<a  style="color:blue;text-decoration: underline" href="#perReport/reportDetails?range=['2021-01-01','2021-03-03']}&name=test">${params.value}</a>`;
+    };
+
+    const cellRender = (params: any) => {
+      if (params.value === undefined) {
+        return "";
+      }
+
+      return `<a  style="color:blue;text-decoration: underline" >${params.value}</a>`;
+    };
+
+    const cellRenderLink = (params: any) => {
+      history.push(`/kpi/reportDetails?range=${timeRg}&name=${params.value}`);
+    };
+
+    // 定义列名
+    const colums = () => {
+        const component = new Array();
+        component.push(
+          {
+            headerName: '部门',
+            field: 'dept',
+            minWidth: 100,
+            rowGroup: true,
+            hide: true,
+            cellRenderer: cellRendertest,
+            // onCellClicked: cellRenderLink
+
+          },
+          {
+            headerName: '组名',
+            field: 'group',
+            rowGroup: true,
+            hide: true,
+          },
+          {
+            headerName: '所属端',
+            field: 'module',
+            cellRenderer: (params: any) => {
+              if (params.value === "产品" || params.value === "测试") {
+                return "";
+              }
+              return params.value;
+            }
+
+          },
+          {
+            headerName: '姓名1',
+            field: 'username0',
+            cellRenderer: cellRender,
+            onCellClicked: cellRenderLink
+          }, {
+            headerName: '姓名2',
+            field: 'username1',
+            cellRenderer: cellRender,
+            onCellClicked: cellRenderLink
+          }, {
+            headerName: '姓名3',
+            field: 'username2',
+            cellRenderer: cellRender,
+            onCellClicked: cellRenderLink
+          }, {
+            headerName: '姓名4',
+            field: 'username3',
+            cellRenderer: cellRender,
+            onCellClicked: cellRenderLink
+          }, {
+            headerName: '姓名5',
+            field: 'username4',
+            cellRenderer: cellRender,
+            onCellClicked: cellRenderLink
+          }, {
+            headerName: '姓名6',
+            field: 'username5',
+            cellRenderer: cellRender,
+            onCellClicked: cellRenderLink
+          }, {
+            headerName: '姓名7',
+            field: 'username6',
+            cellRenderer: cellRender,
+            onCellClicked: cellRenderLink
+          }, {
+            headerName: '姓名8',
+            field: 'username7',
+            cellRenderer: cellRender,
+            onCellClicked: cellRenderLink
+          }, {
+            headerName: '姓名9',
+            field: 'username8',
+            cellRenderer: cellRender,
+            onCellClicked: cellRenderLink
+          }, {
+            headerName: '姓名10',
+            field: 'username9',
+            cellRenderer: cellRender,
+            onCellClicked: cellRenderLink
+          }, {
+            headerName: '姓名11',
+            field: 'username10',
+            cellRenderer: cellRender,
+            onCellClicked: cellRenderLink
+          }, {
+            headerName: '姓名12',
+            field: 'username11',
+            cellRenderer: cellRender,
+            onCellClicked: cellRenderLink
+          }
+        );
+
+        return component;
+      }
+    ;
+
+    /* region  表格相关事件 */
+    const gridApi = useRef<GridApi>();
+    const gqlClient = useGqlClient();
+    const {data, loading} = useRequest(() => queryDevelopViews(gqlClient));
+
+    const onGridReady = (params: GridReadyEvent) => {
+      gridApi.current = params.api;
+      params.api.sizeColumnsToFit();
+    };
+
+    if (gridApi.current) {
+      if (loading) gridApi.current.showLoadingOverlay();
+      else gridApi.current.hideOverlay();
+    }
+
+    /* endregion */
+
+
+    const [formCondition] = Form.useForm();
+// 时间选择事件
+    const onTimeSelected = async (dates: any, dateStrings: any) => {
+      timeRg = `[${dateStrings[0]},${dateStrings[1]}]`;
+
+    };
+
+    const showDefalultValue = async () => {
+      timeRg = `[${quarRange.start},${quarRange.end}]`;
+      formCondition.setFieldsValue({
+        timefilter: [moment(quarRange.start), moment(quarRange.end)],
+
+      });
+
+    };
+
+
+// 返回渲染的组件
+    return (
+      <PageContainer>
+
+        <div style={{background: 'white', marginBottom: "20px", height: "55px"}}>
+
+          <Form form={formCondition} style={{paddingTop: "10px", height: "20px"}}>
+            <Row gutter={16}>
+              <Col className="gutter-row">
+                <Button type="text" style={{color: 'black'}} icon={<SaveTwoTone/>} size={'large'}
+                        onClick={showDefalultValue}>默认当前季度</Button>
+              </Col>
+
+              <Col className="gutter-row" style={{width: '60%'}}>
+                <Form.Item name="timefilter" label="筛选周期：" style={{marginTop: "5px", fontSize: "16px", color: 'black'}}>
+                  <RangePicker
+                    defaultValue={[moment(quarRange.start), moment(quarRange.end)]}
+                    onChange={onTimeSelected}
+                    style={{width: '50%'}}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+
+          </Form>
+
+        </div>
+
+        {/* ag-grid 表格定义 */}
+        <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
+          <AgGridReact
+            columnDefs={colums()} // 定义列
+            rowData={data} // 数据绑定
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true,
+              flex: 1,
+              minWidth: 100,
+            }}
+            autoGroupColumnDef={{
+              minWidth: 100,
+            }}
+            groupDefaultExpanded={9} // 展开分组
+            onGridReady={onGridReady}
+            groupHideOpenParents={true}
+
+          >
+
+          </AgGridReact>
+        </div>
+
+
+      </PageContainer>
     );
-
-    return component;
-  };
-
-  /* region  表格相关事件 */
-  const gridApi = useRef<GridApi>();
-  const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient));
-
-  const onGridReady = (params: GridReadyEvent) => {
-    gridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-
-  if (gridApi.current) {
-    if (loading) gridApi.current.showLoadingOverlay();
-    else gridApi.current.hideOverlay();
   }
-
-  /* endregion */
-
-
-  const [formCondition] = Form.useForm();
-  // 时间选择事件
-  const onTimeSelected = async (dates: any, dateStrings: any) => {
-    timeRg = `[${dateStrings[0]},${dateStrings[1]}]`;
-
-  };
-
-  const showDefalultValue = async () => {
-    timeRg = `[${quarRange.start},${quarRange.end}]`;
-    formCondition.setFieldsValue({
-      timefilter: [moment(quarRange.start), moment(quarRange.end)],
-
-    });
-
-  };
-
-
-  // 返回渲染的组件
-  return (
-    <PageContainer>
-
-      <div style={{background: 'white', marginBottom: "20px", height: "55px"}}>
-
-        <Form form={formCondition} style={{paddingTop: "10px", height: "20px"}}>
-          <Row gutter={16}>
-            <Col className="gutter-row">
-              <Button type="text" style={{color: 'black'}} icon={<SaveTwoTone/>} size={'large'}
-                      onClick={showDefalultValue}>默认当前季度</Button>
-            </Col>
-
-            <Col className="gutter-row" style={{width: '60%'}}>
-              <Form.Item name="timefilter" label="筛选周期：" style={{marginTop: "5px", fontSize: "16px", color: 'black'}}>
-                <RangePicker
-                  defaultValue={[moment(quarRange.start), moment(quarRange.end)]}
-                  onChange={onTimeSelected}
-                  style={{width: '50%'}}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-
-        </Form>
-
-      </div>
-
-      {/* ag-grid 表格定义 */}
-      <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
-        <AgGridReact
-          columnDefs={colums()} // 定义列
-          rowData={data} // 数据绑定
-          defaultColDef={{
-            resizable: true,
-            sortable: true,
-            filter: true,
-            flex: 1,
-            minWidth: 100,
-          }}
-          autoGroupColumnDef={{
-            minWidth: 100,
-          }}
-          groupDefaultExpanded={9} // 展开分组
-          onGridReady={onGridReady}
-          groupHideOpenParents={true}
-
-        >
-
-        </AgGridReact>
-      </div>
-
-
-    </PageContainer>
-  );
-};
+;
 export default SprintList;

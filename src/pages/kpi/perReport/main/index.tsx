@@ -13,6 +13,7 @@ import {getCurrentQuarterTime} from '@/publicMethods/timeMethods';
 import {moduleChange} from "@/publicMethods/cellRenderer";
 import {history} from 'umi';
 import {SaveTwoTone} from '@ant-design/icons';
+import {Link} from 'umi';
 
 const {RangePicker} = DatePicker;
 const quarRange = getCurrentQuarterTime();
@@ -30,7 +31,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     if (usersData !== null) {
       for (let m = 0; m < usersData.length; m += 1) {
         const username = usersData[m].userName;
-        if (username !== '李鲲' && username !== '宋永强' && username !== '王润燕' && username !== '陈诺') {
+        if (username !== '李鲲' && username !== '宋永强' && username !== '王润燕' && username !== '陈诺' && username !== '薛峰') {
 
           if (oraDatas[index].parent.deptName === "北京研发中心" || oraDatas[index].parent.deptName === "成都研发中心") {
             arrays.push({
@@ -46,10 +47,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
               "username": username,
             });
           }
-
         }
-
-
       }
     }
   }
@@ -121,13 +119,23 @@ const queryDevelopViews = async (client: GqlClient<object>) => {
   return converseArrayToOne(result);
 };
 
-
 // 组件初始化
 const SprintList: React.FC<any> = () => {
+  const cellRendertest = (params: any) => {
+    if (params.value === undefined) {
+      return "";
+    }
+    // return `<a  style="color:blue;text-decoration: underline" href="#/main/test.tsx">${params.value}</a>`;
+    return `<Link to="/kpi/reportDetails range=['2021-01-01','2021-03-03']}&name=test" >${params.value}</Link>`;
+    // return `<link to="/kpi/reportDetails?range=['2021-01-01','2021-03-03']}&name=test"> ${params.value}</link>`;
+    // return `<a  style="color:blue;text-decoration: underline" href="#perReport/reportDetails?range=['2021-01-01','2021-03-03']}&name=test">${params.value}</a>`;
+  };
+
   const cellRender = (params: any) => {
     if (params.value === undefined) {
       return "";
     }
+
     return `<a  style="color:blue;text-decoration: underline" >${params.value}</a>`;
   };
 
@@ -145,8 +153,8 @@ const SprintList: React.FC<any> = () => {
         minWidth: 100,
         rowGroup: true,
         hide: true,
-        cellRenderer: cellRender,
-        onCellClicked: cellRenderLink
+        cellRenderer: cellRendertest,
+        // onCellClicked: cellRenderLink
 
       },
       {

@@ -235,10 +235,10 @@ const moduleChange = (params: string) => {
       module = "后端";
       break;
     case "3":
-      module = "产品";
+      module = "测试";
       break;
     case "4":
-      module = "测试";
+      module = "产品";
       break;
     case "5":
       module = "其他";

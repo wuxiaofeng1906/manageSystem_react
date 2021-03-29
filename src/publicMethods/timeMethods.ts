@@ -147,6 +147,49 @@ function getFourQuarterTime() {
   return quarterArray;
 }
 
+// 获取当前季度 的开始和结束时间
+function getCurrentQuarterTime() {
+  let from = "";
+  let to = "";
+  const currentYear = dayjs().year();
+  const currentMonth = dayjs().month();
+  switch (currentMonth.toString()) {
+    case "1":
+    case "2":
+    case "3":
+
+      from = "01-01";
+      to = "03-31";
+      break;
+    case "4":
+    case "5":
+    case "6":
+
+      from = "04-01";
+      to = "06-30";
+      break;
+    case "7":
+    case "8":
+    case "9":
+
+      from = "07-01";
+      to = "09-30";
+      break;
+    case "10":
+    case "11":
+    case "12":
+
+      from = "10-01";
+      to = "12-31";
+      break;
+
+    default:
+      break;
+  }
+
+  return {start: `${currentYear}-${from}`, end: `${currentYear}-${to}`};
+}
+
 
 const getParamsByType = (params: any) => {
   let typeFlag = 0;
@@ -182,4 +225,13 @@ const getParamsByType = (params: any) => {
   return {typeFlag, ends};
 };
 
-export {getWeeksRange, getMonthWeek, getRecentMonth, getTwelveMonthTime, getFourQuarterTime, formatMomentTime,getParamsByType};
+export {
+  getWeeksRange,
+  getMonthWeek,
+  getRecentMonth,
+  getTwelveMonthTime,
+  getFourQuarterTime,
+  formatMomentTime,
+  getParamsByType,
+  getCurrentQuarterTime
+};

@@ -8,12 +8,16 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import moment from 'moment';
-import {Button, DatePicker} from 'antd';
-import {getRecentMonth} from '@/publicMethods/timeMethods';
+import {Button, Col, DatePicker, Form, Row} from 'antd';
+import {getCurrentQuarterTime, getRecentMonth} from '@/publicMethods/timeMethods';
 import {moduleChange} from "@/publicMethods/cellRenderer";
 import {history} from 'umi';
+import {SaveTwoTone} from '@ant-design/icons';
 
 const {RangePicker} = DatePicker;
+const quarRange = getCurrentQuarterTime();
+let timeRg = `[${quarRange.start},${quarRange.end}]`;
+
 
 const converseFormatForAgGrid = (oraDatas: any) => {
   const arrays: any[] = [];
@@ -52,7 +56,6 @@ const converseFormatForAgGrid = (oraDatas: any) => {
 
   return arrays;
 };
-
 
 const converseArrayToOne = (data: any) => {
   const resultData = new Array();
@@ -121,22 +124,16 @@ const queryDevelopViews = async (client: GqlClient<object>) => {
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
-
   const cellRender = (params: any) => {
-    console.log("params",params);
-    if(params.value === undefined){
+    if (params.value === undefined) {
       return "";
     }
     return `<a  style="color:blue;text-decoration: underline" >${params.value}</a>`;
-
   };
 
   const cellRenderLink = (params: any) => {
-    console.log("params",params);
-    // history.push(`/sprint/sprintListDetails?projectid=${params.data.id}&project=${params.data.name}`);
-
+    history.push(`/kpi/reportDetails?range=${timeRg}&name=${params.value}`);
   };
-
 
   // 定义列名
   const colums = () => {
@@ -150,6 +147,7 @@ const SprintList: React.FC<any> = () => {
         hide: true,
         cellRenderer: cellRender,
         onCellClicked: cellRenderLink
+
       },
       {
         headerName: '组名',
@@ -227,7 +225,6 @@ const SprintList: React.FC<any> = () => {
     return component;
   };
 
-
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
@@ -249,9 +246,9 @@ const SprintList: React.FC<any> = () => {
 
 
   // 时间选择事件
-  const onTimeSelected = async (params: any) => {
+  const onTimeSelected = async (dates: any, dateStrings: any) => {
+    timeRg = `[${dateStrings[0]},${dateStrings[1]}]`;
 
-    console.log("params", params);
   };
 
   /* endregion */
@@ -259,7 +256,7 @@ const SprintList: React.FC<any> = () => {
   /* region 显示默认数据  */
 
   const showDefalultValue = async () => {
-
+    timeRg = `[${quarRange.start},${quarRange.end}]`;
 
   };
 
@@ -270,19 +267,31 @@ const SprintList: React.FC<any> = () => {
   return (
     <PageContainer>
 
-      {/* 新增、修改、删除按钮栏 */}
-      <div style={{background: 'white', marginBottom: "20px"}}>
-        <Button type="text" style={{color: 'black'}} size={'large'} onClick={showDefalultValue}>默认当前季度</Button>
+      <div style={{background: 'white', marginBottom: "20px", height: "55px"}}>
+        <form style={{paddingTop: "10px", height: "20px"}}>
+
+          <Row gutter={16}>
+            <Col className="gutter-row">
+              <Button type="text" style={{color: 'black'}} icon={<SaveTwoTone/>} size={'large'}
+                      onClick={showDefalultValue}>默认当前季度</Button>
+            </Col>
+
+            <Col className="gutter-row"  style={{width: '60%'}}>
+
+              <Form.Item name="time" label="筛选周期："   style={{marginTop: "5px", fontSize: "16px", color: 'black'}}>
+                <RangePicker
+                  defaultValue={[moment(getRecentMonth().start), moment()]}
+                  onChange={onTimeSelected}
+                  style={{width: '50%'}}
+                />
+              </Form.Item>
+
+            </Col>
+
+          </Row>
 
 
-        <label style={{marginLeft: '10px', fontSize: "16px"}}>筛选周期：</label>
-        <RangePicker
-          className={'times'}
-          style={{width: '30%'}}
-          defaultValue={[moment(getRecentMonth().start), moment()]}
-          onChange={onTimeSelected}
-        />
-
+        </form>
       </div>
 
       {/* ag-grid 表格定义 */}
@@ -293,7 +302,6 @@ const SprintList: React.FC<any> = () => {
           defaultColDef={{
             resizable: true,
             sortable: true,
-            // floatingFilter: true,
             filter: true,
             flex: 1,
             minWidth: 100,

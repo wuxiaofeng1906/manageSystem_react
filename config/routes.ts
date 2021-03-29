@@ -215,6 +215,12 @@ export default [
       icon: 'table',
       path: 'main',
       component: './kpi/perReport/main',
+    }, {
+      name: '个人绩效报告',
+      icon: 'table',
+      path: 'reportDetails',
+      hideInMenu: true,
+      component: './kpi/perReport/reportDetails',
     }
     ]
   },

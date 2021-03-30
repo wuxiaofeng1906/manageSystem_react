@@ -1,6 +1,7 @@
 import React from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Card, Alert } from 'antd';
+// @ts-ignore
 import { useIntl } from 'umi';
 
 export default (): React.ReactNode => {
@@ -11,14 +12,15 @@ export default (): React.ReactNode => {
         <Alert
           message={intl.formatMessage({
             id: 'firstPages',
-            defaultMessage: '欢迎使用企企研发过程工作台',
+            defaultMessage: '欢迎使用企企研发管理平台',
           })}
           type="success"
           showIcon
           banner
           style={{
-            margin: -12,
-            marginBottom: 24,
+            fontSize:"20px"
+            // margin: -12,
+            // marginBottom: 24,
           }}
         />
       </Card>

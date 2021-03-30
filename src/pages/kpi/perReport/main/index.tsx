@@ -13,7 +13,6 @@ import {getCurrentQuarterTime} from '@/publicMethods/timeMethods';
 import {moduleChange} from "@/publicMethods/cellRenderer";
 import {history} from 'umi';
 import {SaveTwoTone} from '@ant-design/icons';
-import {Link} from 'umi';
 
 const {RangePicker} = DatePicker;
 const quarRange = getCurrentQuarterTime();

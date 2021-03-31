@@ -410,7 +410,7 @@ const TestPassRateTableList: React.FC<any> = () => {
             cellStyle: {"margin-top": "-5px"}
           }}
           autoGroupColumnDef={{
-            sort: 'asc',
+            // sort: 'asc',
             minWidth: 250,
           }}
           groupDefaultExpanded={9} // 展开分组

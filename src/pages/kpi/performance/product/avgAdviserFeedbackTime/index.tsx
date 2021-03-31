@@ -256,10 +256,10 @@ const AdviserFeedTableList: React.FC<any> = () => {
   /* region ag-grid */
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
-    queryBugResolutionCount(gqlClient, 'week', 'story'),
+    queryBugResolutionCount(gqlClient, 'quarter', 'story'),
   );
   const bugData = useRequest(() =>
-    queryBugResolutionCount(gqlClient, 'week', 'bug'),
+    queryBugResolutionCount(gqlClient, 'quarter', 'bug'),
   );
 
   const gridApi = useRef<GridApi>();
@@ -353,7 +353,7 @@ const AdviserFeedTableList: React.FC<any> = () => {
 
       <div className="ag-theme-alpine" style={{height: 350, width: '100%'}}>
         <AgGridReact
-          columnDefs={columsForWeeks()} // 定义列
+          columnDefs={columsForQuarters()} // 定义列
           rowData={data} // 数据绑定
           defaultColDef={{
             resizable: true,
@@ -376,7 +376,7 @@ const AdviserFeedTableList: React.FC<any> = () => {
       </div>
       <div className="ag-theme-alpine" style={{height: 350, width: '100%', marginTop: '20px'}}>
         <AgGridReact
-          columnDefs={columsForWeeks()} // 定义列
+          columnDefs={columsForQuarters()} // 定义列
           rowData={bugData.data} // 数据绑定
           defaultColDef={{
             resizable: true,

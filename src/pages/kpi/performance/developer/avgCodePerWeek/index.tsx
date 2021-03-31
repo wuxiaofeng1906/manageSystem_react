@@ -132,7 +132,7 @@ const columsForQuarters = () => {
 
 // 转化为ag-grid能被显示的格式
 const converseFormatForAgGrid = (oraDatas: any) => {
-
+  debugger;
   groupValues.length = 0;
   moduleValues.length = 0;
 
@@ -283,6 +283,7 @@ const converseArrayToOne = (data: any) => {
 };
 
 const queryBugResolutionCount = async (client: GqlClient<object>, params: string) => {
+
   const condition = getParamsByType(params);
   if (condition.typeFlag === 0) {
     return [];
@@ -341,7 +342,7 @@ const WeekCodeTableList: React.FC<any> = () => {
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
-    queryBugResolutionCount(gqlClient, 'week'),
+    queryBugResolutionCount(gqlClient, 'quarter'),
   );
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -411,7 +412,7 @@ const WeekCodeTableList: React.FC<any> = () => {
 
       <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
         <AgGridReact
-          columnDefs={columsForWeeks()} // 定义列
+          columnDefs={columsForQuarters()} // 定义列
           rowData={data} // 数据绑定
           defaultColDef={{
             resizable: true,

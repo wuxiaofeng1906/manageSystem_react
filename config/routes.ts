@@ -52,44 +52,45 @@ export default [
   //   component: './dashboard/developer',
   // },
 
-  {
-    name: 'sprint 工作台',
-    icon: 'table',
-    path: '/sprint',
-    routes: [
-      {
-        name: 'dsahboard',
-        path: 'sprintDashboard',
-        component: './sprint/sprintDashboard/sprintDashboard',
-      },
-      {
-        name: 'bug明细（待隐藏）',
-        path: 'basicTable/bug',
-        component: './sprint/basicTable/bug',
-      },
-      {
-        name: 'story（待隐藏）',
-        path: 'basicTable/story',
-        component: './sprint/basicTable/story',
-      },
-      {
-        name: 'task（待隐藏）',
-        path: 'basicTable/task',
-        component: './sprint/basicTable/task',
-      },
-      {
-        name: 'sprint 列表',
-        path: 'sprintList',
-        component: './sprint/sprintList/sprintList',
-      },
-      {
-        name: 'sprint 项目详情',
-        path: 'sprintListDetails',
-        hideInMenu: true,
-        component: './sprint/sprintListDetails/sprintListDetails',
-      }
-    ],
-  },
+  // {
+  //   name: 'sprint 工作台',
+  //   icon: 'table',
+  //   path: '/sprint',
+  //   routes: [
+  //     {
+  //       name: 'dsahboard',
+  //       path: 'sprintDashboard',
+  //       component: './sprint/sprintDashboard/sprintDashboard',
+  //     },
+  //     {
+  //       name: 'bug明细（待隐藏）',
+  //       path: 'basicTable/bug',
+  //       component: './sprint/basicTable/bug',
+  //     },
+  //     {
+  //       name: 'story（待隐藏）',
+  //       path: 'basicTable/story',
+  //       component: './sprint/basicTable/story',
+  //     },
+  //     {
+  //       name: 'task（待隐藏）',
+  //       path: 'basicTable/task',
+  //       component: './sprint/basicTable/task',
+  //     },
+  //     {
+  //       name: 'sprint 列表',
+  //       path: 'sprintList',
+  //       component: './sprint/sprintList/sprintList',
+  //     },
+  //     {
+  //       name: 'sprint 项目详情',
+  //       path: 'sprintListDetails',
+  //       hideInMenu: true,
+  //       component: './sprint/sprintListDetails/sprintListDetails',
+  //     }
+  //   ],
+  // },
+
   {
     name: '研发绩效数据',
     icon: 'table',

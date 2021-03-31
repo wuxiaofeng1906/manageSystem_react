@@ -230,7 +230,7 @@ const NeedsChangeRate: React.FC<any> = () => {
   /* region ag-grid */
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
-    queryBugResolutionCount(gqlClient, 'week'),
+    queryBugResolutionCount(gqlClient, 'quarter'),
   );
 
 
@@ -308,7 +308,7 @@ const NeedsChangeRate: React.FC<any> = () => {
 
       <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
         <AgGridReact
-          columnDefs={columsForWeeks()} // 定义列
+          columnDefs={columsForQuarters()} // 定义列
           rowData={data} // 数据绑定
           defaultColDef={{
             resizable: true,

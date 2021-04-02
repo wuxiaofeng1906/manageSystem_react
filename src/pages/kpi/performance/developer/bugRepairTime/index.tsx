@@ -17,6 +17,7 @@ import {
 import {moduleChange} from '@/publicMethods/cellRenderer';
 import {Button, Drawer} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
+import {getHeight} from "@/publicMethods/pageSet";
 
 
 // 获取近四周的时间范围
@@ -449,7 +450,7 @@ const BugResTimeTableList: React.FC<any> = () => {
       </div>
 
 
-      <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: getHeight(), width: '100%'}}>
         <AgGridReact
           columnDefs={columsForQuarters()} // 定义列
           rowData={data} // 数据绑定

@@ -15,6 +15,8 @@ import {
   getParamsByType
 } from '@/publicMethods/timeMethods';
 import {colorRender, moduleChange} from '@/publicMethods/cellRenderer';
+import {getHeight} from '@/publicMethods/pageSet';
+
 import {Button, Drawer} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
 
@@ -132,7 +134,6 @@ const columsForQuarters = () => {
 
 // 转化为ag-grid能被显示的格式
 const converseFormatForAgGrid = (oraDatas: any) => {
-  debugger;
   groupValues.length = 0;
   moduleValues.length = 0;
 
@@ -398,8 +399,10 @@ const WeekCodeTableList: React.FC<any> = () => {
   const cssIndent = {textIndent: '2em'};
   /* endregion */
 
+
   return (
     <PageContainer>
+
       <div style={{background: 'white'}}>
         <Button type="text" style={{color: 'black'}} icon={<ProfileTwoTone/>} size={'large'}
                 onClick={statisticsByWeeks}>按周统计</Button>
@@ -411,7 +414,7 @@ const WeekCodeTableList: React.FC<any> = () => {
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>
 
-      <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: getHeight(), width: '100%'}}>
         <AgGridReact
           columnDefs={columsForQuarters()} // 定义列
           rowData={data} // 数据绑定
@@ -435,13 +438,15 @@ const WeekCodeTableList: React.FC<any> = () => {
 
           // rowGroupPanelShow={'always'}  可以拖拽列到上面
           onGridReady={onGridReady}
+          suppressScrollOnNewData={false}
         >
         </AgGridReact>
       </div>
 
+
       <div>
         <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
-                placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
+                placement="right" width={"300px"} closable={false} onClose={onClose} visible={messageVisible}>
           <p><strong>1.统计周期</strong></p>
           <p style={cssIndent}>按周统计：代码提交日期为周一00:00:00--周日23:59:59的代码量；</p>
           <p style={cssIndent}>按月统计：代码提交日期为每月1号00:00:00--每月最后1天23:59:59；</p>
@@ -472,6 +477,7 @@ const WeekCodeTableList: React.FC<any> = () => {
 
         </Drawer>
       </div>
+
     </PageContainer>
   );
 };

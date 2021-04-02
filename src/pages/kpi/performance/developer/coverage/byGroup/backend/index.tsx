@@ -10,6 +10,7 @@ import {GqlClient, useGqlClient} from '@/hooks';
 import {getWeeksRange, getMonthWeek, getTwelveMonthTime, getFourQuarterTime} from '@/publicMethods/timeMethods';
 import {Button, Drawer} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
+import {getHeight} from "@/publicMethods/pageSet";
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(4);
@@ -426,7 +427,7 @@ const BackendCoverageTableList: React.FC<any> = () => {
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>
 
-      <div className="ag-theme-alpine" style={{height: '1000px', width: '100%',marginBottom:"20px"}}>   {/* 570 */}
+      <div className="ag-theme-alpine" style={{height: getHeight(), width: '100%',marginBottom:"20px"}}>   {/* 570 */}
         <AgGridReact
           columnDefs={columsForQuarters()} // 定义列
           rowData={data} // 数据绑定

@@ -7,6 +7,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
+import {getHeight} from "@/publicMethods/pageSet";
 
 // import { AllCommunityModules } from '@ag-grid-community/all-modules';
 
@@ -220,7 +221,7 @@ const SprintList: React.FC<any> = () => {
   return (
     <PageContainer>
 
-      <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: getHeight(), width: '100%'}}>
         <AgGridReact
           // modules={AllCommunityModules}
 

@@ -252,8 +252,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
                 [starttime]: usersData[m].kpi
               }
             );
-          }
-          else {
+          } else {
             arrays.push({
               devCenter: "研发中心",
               dept: data[i].parent.deptName,
@@ -470,15 +469,16 @@ const BugReopenTableList: React.FC<any> = () => {
           <p style={cssIndent}>按周统计：bug解决日期为周一00:00:00--周日23:59:59；</p>
           <p style={cssIndent}>按月统计：bug解决日期为每月1号00:00:00--每月最后1天23:59:59；</p>
           <p style={cssIndent}>按季统计：bug解决日期为每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
+
           <p><strong>2.分子值获取</strong></p>
           <p style={cssIndent}> 分子为重新激活的bug：由谁解决为开发的，且激活次数&gt;=1，且（当前bug状态为激活的，曾经的解决方案有1次以上是fixed的；
             或bug当前状态为已解决/已关闭的，曾经的解决方案有2次以上是fixed的） </p>
-          <p style={cssIndent}> 特殊情况说明：当该bug有多次解决，取最早解决方案为“已解决”的开发解决者记录1次reopen（不要取最后的解决者记录）； </p>
+          <p style={cssIndent}> 特殊情况补充：当该bug有多次解决，取最早解决方案为“已解决”的开发解决者记录1次reopen（不要取最后的解决者记录）； </p>
 
           <p><strong>3.分母值获取</strong></p>
-          <p style={cssIndent}>分母为解决bug：每周或每月或每季由谁解决为开发的bug； </p>
+          <p style={cssIndent}>分母解决bug：每周或每月或每季由谁解决为开发的bug； </p>
 
-          <p><strong>4.计算公式说明</strong></p>
+          <p style={{color: "#1890FF"}}><strong>4.计算公式说明</strong></p>
           <p style={cssIndent}>周报：当周解决后重新激活的bug数/当周解决的bug数；</p>
           <p style={cssIndent}>月报：当月解决后重新激活的bug数/当月解决的bug数；</p>
           <p style={cssIndent}>季报：当季解决后重新激活的bug数/当季解决的bug数；</p>

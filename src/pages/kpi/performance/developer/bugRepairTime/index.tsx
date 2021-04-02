@@ -427,17 +427,21 @@ const BugResTimeTableList: React.FC<any> = () => {
           <p style={cssIndent}>按周统计：bug解决日期为周一00:00:00--周日23:59:59；</p>
           <p style={cssIndent}>按月统计：bug解决日期为每月1号00:00:00--每月最后1天23:59:59；</p>
           <p style={cssIndent}>按季统计：bug解决日期为每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
-          <p><strong>2.计算公式</strong></p>
+
+          <p><strong>2.时长说明</strong></p>
           <p style={cssIndent}>开发每次解决时长 = 开发每次打解决时间 减去 打解决时间前最近一次指派给该开发的时间 减去
-            法定节假日时长（若在打解决时间前没有指派给该开发的时间，默认取该bug的创建时间）；</p>
-          <p><strong>3.特殊情况</strong></p>
-          <p style={cssIndent}>在action表中查bug的历史信息，查曾经的解决人为开发的有几个： </p>
+            法定节假日时长（用解决时间往前查激活时间，若解决和激活中间有指派给该开发（解决者），就取指派时间，若无则取前面临近的激活时间，若既没激活有没指派，往前取创建时间）；</p>
+
+          <p><strong>3.特殊情况补充</strong></p>
+          <p style={cssIndent}>过滤掉bug严重程度为P3的bug，在action表中查bug的历史信息，查曾经的解决人为开发的有几个： </p>
           <p style={cssIndent}>a.若为同一人多次打解决，则只计算每次打解决的时长然后求和（不计算每次打解决后指派给他人验证的时长）；</p>
           <p style={cssIndent}>b.当一个bug被多个开发打解决时，分段计算各开发在该bug的解决时长，然后按开发人员进行解决时长求和
             （举个例子：某bug被张三和李四2人解决了3次，其中张三解决了2次分别是2H和5H，李四解决时长6H，那张三在该bug的解决时长就等于2+5=7H，李四则为6H）；</p>
-          <p><strong>4.计算时长说明</strong></p>
+
+          <p><strong>4.其他说明</strong></p>
           <p style={cssIndent}>计算时长单位为H，只计算工作日时长（不算周末和法定节假日），每天时长默认24H；</p>
-          <p><strong>5.计算公式说明</strong></p>
+
+          <p style={{color: "#1890FF"}}><strong>5.计算公式说明</strong></p>
           <p style={cssIndent}>周报：当周所有解决bug时长排序，取中位数；</p>
           <p style={cssIndent}>月报：当月所有解决bug时长排序，取中位数；</p>
           <p style={cssIndent}>季报：当季所有解决bug时长排序，取中位数；</p>

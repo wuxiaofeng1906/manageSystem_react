@@ -448,7 +448,7 @@ const WeekCodeTableList: React.FC<any> = () => {
           <p style={cssIndent}>按季统计：代码提交日期每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
           <p style={cssIndent}>特殊情况：当月或季度的开始日期或结束日期在周中（不为整数周）时，不计算该周周数和对应该周的代码量；</p>
 
-          <p><strong>2.计算公式说明</strong></p>
+          <p style={{color: "#1890FF"}}><strong>2.计算公式说明</strong></p>
           <p> 2.1 按人统计： </p>
           <p style={cssIndent}>周报：周一至周天代码量求和；</p>
           <p style={cssIndent}>月报：当月整周数对应的代码量之和/当月整周数；</p>

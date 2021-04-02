@@ -386,7 +386,7 @@ const BugReturnTableList: React.FC<any> = () => {
           <p><strong>2.统计人员</strong></p>
           <p style={cssIndent}>执行人为测试，且该条case 的rd_zt_testrun表的assignedTo = lastRunner 则将该用例的测试人员记录为 lastRunner的值</p>
 
-          <p><strong>3.计算公式说明（允许某周的用例执行率 &gt;100%）</strong></p>
+          <p style={{color: "#1890FF"}}><strong>3.计算公式说明（允许某周的用例执行率 &gt;100%）</strong></p>
           <p><strong>3.1 按人统计</strong></p>
           <p style={cssIndent}>周报：当周实际执行用例数/当周指派给其应执行的用例数；</p>
           <p style={cssIndent}>月报：当月该测试人员所有关闭bug时长排序，取中位数；</p>

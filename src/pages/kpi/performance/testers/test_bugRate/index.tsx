@@ -128,8 +128,8 @@ const converseFormatForAgGrid = (oraDatas: any) => {
 
     const starttime = oraDatas[index].range.start;
     arrays.push({
-       "username": "代码量",
-      [starttime]:  oraDatas[index].code
+      "username": "代码量",
+      [starttime]: oraDatas[index].code
     });
 
     groupValues.push({
@@ -361,20 +361,46 @@ const TestBugRateTableList: React.FC<any> = () => {
       <div>
         <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
                 placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
-          <p><strong>1.统计周期</strong></p>
+          <p><strong>一、测试类有效Bug统计</strong></p>
+          <p>1.统计周期-bug周期 </p>
           <p style={cssIndent}>按周统计：bug创建日期为周一00:00:00--周日23:59:59；</p>
-          <p style={cssIndent}>按月统计：bug创建日期为每月1号00:00:00--每月最后1天23:59:59；</p>
-          <p style={cssIndent}>按季统计：bug创建日期每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
-          <p><strong>2.统计范围</strong></p>
-          <p style={cssIndent}>产品为“1.0/1.0正式版--产品经理”“产品实施--实施顾问反馈”“开发自提需求”； </p>
-          <p style={cssIndent}>解决方案为“空”“已解决”“延期处理”“后续版本”“代码未合并”的，统计严重程度为P0、P1、P2的bug； </p>
-          <p style={cssIndent}>Bug状态 等于“激活”的情况，统计指派给为开发的；Bug状态不等于“激活”（已解决/已关闭），统计解决者为开发的； </p>
-          <p><strong>3.计算公式说明</strong></p>
-          <p style={cssIndent}>周报：周一至周天开发类有效bug求和/(周一至周天代码量求和/1000)；</p>
-          <p style={cssIndent}>月报：当月1号至当月最后1天开发类有效bug求和/(当月1号至当月最后1天代码量求和/1000)；</p>
-          <p style={cssIndent}>季报：当季第一个月1号至当季最后1天开发类有效bug求和/(当季第一个月1号至当季最后1天代码量求和/1000)；</p>
+          <p style={cssIndent}>按月统计：bug创建日期为每月的第一个整周的周一00:00:00--每月最后1个整周的周天23:59:59；</p>
+          <p style={cssIndent}>按季统计：bug创建日期每季第一个月的第一个整周的周一00:00:00--每季第三个月的最后1个整周的周天23:59:59；</p>
+          <p>2.统计周期-代码量周期（修正后的代码量） </p>
+          <p style={cssIndent}>按周统计：代码commit日期为周一00:00:00--周日23:59:59；</p>
+          <p style={cssIndent}>按月统计：代码commit日期为每月的第一个整周的周一00:00:00--每月最后1个整周的周天23:59:59；</p>
+          <p style={cssIndent}>按季统计：代码commit日期每季第一个月的第一个整周的周一00:00:00--每季第三个月的最后1个整周的周天23:59:59；</p>
+          <p><strong>3.bug统计范围</strong></p>
+          <p style={cssIndent}>3.1 产品为“1.0/1.0正式版--产品经理”“产品实施--实施顾问反馈”“开发自提需求”； </p>
+          <p style={cssIndent}>3.2 创建者为“顾问”“产品”“客服”,“测试”； </p>
+          <p style={cssIndent}>3.3 线上bug统计，统计os操作系统字段值包含“线上”的字段并除去线上bug-重复bug、线上bug-需求相关、线上bug-不是问题、线上bug-自动化发现； </p>
+          <p style={cssIndent}>特殊判定条件： 当dept为3且os值为空时，仅查询项目名称包含hotfix字样的bug；
+            当opendBy='fuyang.li'时，需增加条件bug创建时间&gt;=2020-04-01； </p>
+          <p style={cssIndent}>3.4 解决方案为“空”“已解决”“延期处理”“后续版本”“代码未合并”的； </p>
+          <p style={cssIndent}>3.5 统计人员, 首先在zt_bug表中判断当前的assignedTo的值是不是测试，若是测试则该bug的用户名称则是该测试，
+            若不是测试则在zt_action表中按降序挨个查id 在zt_history表中的old字段按时间倒序去查测试人员，查到的第一个测试人员则该bug的用户名
+            称则是该测试,若old中仍查不到测试人员，则倒序查zt_action.actor的值，查到的第一个测试人员则将该bug的用户名称记录为该测试，若还查不到
+            测试人员则名称记录为空，并且人员的zt_user.dept in （35,36,37,38,39）； </p>
 
+          <p style={{color: "#1890FF"}}><strong>二、计算公式说明</strong></p>
+          <p> 1.按人统计（以下人员都特指测试人员） </p>
+          <p style={cssIndent}>周报：周一至周天测试类有效bug求和/(当周周一至周天研发中心所有开发人员代码量之和/1000)；</p>
+          <p style={cssIndent}>月报：按月统计bug求和/(按月统计研发中心所有开发人员代码量之和/1000)；</p>
+          <p style={cssIndent}>季报：按季统计bug求和/(按季统计研发中心所有开发人员代码量之和/1000)；</p>
+          <p> 2.按组统计 </p>
+          <p style={cssIndent}>周报：该组所有人员周一至周天测试类线上有效bug求和/(当周周一至周天研发中心所有开发人员代码量之和/1000)；</p>
+          <p style={cssIndent}>月报：该组所有人员按月统计bug求和/(按月统计研发中心所有开发人员代码量之和/1000)；</p>
+          <p style={cssIndent}>季报：该组所有人员按季统计bug求和/(按季统计研发中心所有开发人员代码量之和/1000)；</p>
+          <p> 3.按部门统计 </p>
+          <p style={cssIndent}>周报：该部门所有人员周一至周天测试类线上有效bug求和/(当周周一至周天研发中心所有开发人员代码量之和/1000)；</p>
+          <p style={cssIndent}>月报：该部门所有人员按月统计bug求和/(按月统计研发中心所有开发人员代码量之和/1000)；</p>
+          <p style={cssIndent}>季报：该部门所有人员按季统计bug求和/(按季统计研发中心所有开发人员代码量之和/1000)；</p>
+          <p> 4.按中心统计（等于测试部门的周报、月报、季报值） </p>
+          <p style={cssIndent}>周报：该中心所有测试人员周一至周天测试类线上有效bug求和/(当周周一至周天研发中心所有开发人员代码量之和/1000)；</p>
+          <p style={cssIndent}>月报：该中心所有测试人员按月统计bug求和/(按月统计研发中心所有开发人员代码量之和/1000)；</p>
+          <p style={cssIndent}>季报：该中心所有测试人员按季统计bug求和/(按季统计研发中心所有开发人员代码量之和/1000)；</p>
         </Drawer>
+
       </div>
     </PageContainer>
   );

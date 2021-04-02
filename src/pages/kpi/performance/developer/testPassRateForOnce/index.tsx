@@ -431,18 +431,22 @@ const TestPassRateTableList: React.FC<any> = () => {
       <div>
         <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>} placement="right" width={300}
                 closable={false} onClose={onClose} visible={messageVisible}>
-          <p><strong>1.统计周期</strong></p>
+          <p><strong>1.统计周期（（submit_time 字段））</strong></p>
           <p style={cssIndent}>按周统计：企业微信开发转测申请提交日期为周一00:00:00--周日23:59:59；</p>
           <p style={cssIndent}>按月统计：企业微信开发转测申请提交日期为每月1号00:00:00--每月最后1天23:59:59；</p>
           <p style={cssIndent}>按季统计：企业微信开发转测申请提交日期为每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
-          <p><strong>2.统计说明</strong></p>
-          <p style={cssIndent}>提测通过次数=提测总次数-驳回次数；</p>
-          <p><strong>3.特殊情况</strong></p>
+
+          <p><strong>2.按开发人员统计</strong></p>
+          <p style={cssIndent}>2.1、分母暂时根据申请人统计对应 周 或月或季度 的总数；（apply_username 字段）；</p>
+          <p style={cssIndent}>2.2、分子根据被驳回人统计对应 周 或月或季度 的总数；（demonstration_users字段）；</p>
+
+          <p style={{color: "#1890FF"}}><strong>3.计算公式说明</strong></p>
+          <p style={cssIndent}>周报：当周提测通过的次数/当周发起的转测申请总数；</p>
+          <p style={cssIndent}>月报：当月提测通过的次数/当月发起的转测申请总数；</p>
+          <p style={cssIndent}>季报：当季提测通过的次数/当季发起的转测申请总数；</p>
+
+          <p><strong>4.特殊情况</strong></p>
           <p style={cssIndent}>没有提测，提测通过率为100%；</p>
-          <p><strong>4.计算公式说明</strong></p>
-          <p style={cssIndent}>周报：当周提测通过的次数/当周发起的转测申请数；</p>
-          <p style={cssIndent}>月报：当月提测通过的次数/当月发起的转测申请数；</p>
-          <p style={cssIndent}>季报：当季提测通过的次数/当季发起的转测申请；</p>
 
         </Drawer>
       </div>

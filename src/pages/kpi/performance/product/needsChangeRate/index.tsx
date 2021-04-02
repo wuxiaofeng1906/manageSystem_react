@@ -336,18 +336,33 @@ const NeedsChangeRate: React.FC<any> = () => {
         <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
                 placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
 
-          <p> 1.变更申请提交人为产品经理 </p>
-          <p><strong>2.统计周期</strong></p>
+
+          <p><strong>1.统计周期</strong></p>
           <p style={cssIndent}>按周统计：企业微信变更申请提交日期为周一00:00:00--周日23:59:59；</p>
           <p style={cssIndent}>按月统计：企业微信变更申请提交日期为每月1号00:00:00--每月最后1天23:59:59；</p>
           <p style={cssIndent}>按季统计：企业微信变更申请提交日期为每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
+
+          <p style={cssIndent}> 2.按产品经理统计</p>
           <p style={cssIndent}> 3.变更工作量=开发工作量+测试工作量+其他</p>
           <p style={cssIndent}> 4.原始工作量=设计完成后开发定详细开发计划评估的工作量+测试评估工作量+其他</p>
 
-          <p><strong>5.计算公式说明</strong></p>
-          <p style={cssIndent}>周报：（当周有变更项目的需求变更工作量/该项目原始工作量 求和）/当周变更项目数；</p>
-          <p style={cssIndent}>月报：（当月有变更项目的需求变更工作量/该项目原始工作量 求和）/当月变更项目数；</p>
-          <p style={cssIndent}>季报：（当季有变更项目的需求变更工作量/该项目原始工作量 求和）/当季变更项目数；</p>
+          <p style={{color: "#1890FF"}}><strong>5.计算公式说明</strong></p>
+          <p style={cssIndent}>特别注意：当计算分母的时候，需要先判断项目名称是否一致，若项目名称一致时需判断提交人是否一致，
+            若多次变更的项目名称和提交人都一致的时候（审批编号不一致），则分母只计算1次的project_cost_hour值，不要把多次求和，否则都一律分母按规则求和。</p>
+          <p><strong>按人员统计</strong></p>
+          <p style={cssIndent}>周报：（当周有变更项目的需求变更工作量/该项目原始工作量 求和）/当周变更项目数；
+            （该产品经理该周的change_cost_hour字段和 除以 该产品经理该周的project_cost_hour字段和）</p>
+          <p style={cssIndent}>月报：（当月有变更项目的需求变更工作量/该项目原始工作量 求和）/当月变更项目数；
+            （该产品经理该月的change_cost_hour字段和 除以 该产品经理该月的project_cost_hour字段和）</p>
+          <p style={cssIndent}>季报：（当季有变更项目的需求变更工作量/该项目原始工作量 求和）/当季变更项目数；
+            （该产品经理该季度的change_cost_hour字段和 除以 该产品经理该季度的project_cost_hour字段和）</p>
+          <p><strong>按部门/按中心统计</strong></p>
+          <p style={cssIndent}>周报：（当周有变更项目的需求变更工作量/该项目原始工作量 求和）/当周变更项目数；
+            （产品管理部门该周的change_cost_hour字段和 除以 产品管理部门该周的project_cost_hour字段和）</p>
+          <p style={cssIndent}>月报：（当月有变更项目的需求变更工作量/该项目原始工作量 求和）/当月变更项目数；
+            （产品管理部门该月的change_cost_hour字段和 除以 产品管理部门该月的project_cost_hour字段和）</p>
+          <p style={cssIndent}>季报：（当季有变更项目的需求变更工作量/该项目原始工作量 求和）/当季变更项目数；
+            （产品管理部门该季度的change_cost_hour字段和 除以 产品管理部门的project_cost_hour字段和）</p>
 
         </Drawer>
       </div>

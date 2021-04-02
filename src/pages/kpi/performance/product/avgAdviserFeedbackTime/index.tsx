@@ -415,7 +415,7 @@ const AdviserFeedTableList: React.FC<any> = () => {
           <p style={cssIndent}> 3.响应时长=产品响应时间-指派给产品时间-法定节假日</p>
           <p style={cssIndent}> 4.单位：天，仅计算工作日</p>
 
-          <p><strong>5.计算公式说明</strong></p>
+          <p style={{color: "#1890FF"}}><strong>5.计算公式说明</strong></p>
           <p style={cssIndent}>周报：当周指派给产品的bug或需求响应时长/当周指派给产品的bug或需求总数；</p>
           <p style={cssIndent}>月报：当月指派给产品的bug或需求响应时长/当月指派给产品的bug或需求总数；</p>
           <p style={cssIndent}>季报：当季指派给产品的bug或需求响应时长/当季指派给产品的bug或需求总数；</p>

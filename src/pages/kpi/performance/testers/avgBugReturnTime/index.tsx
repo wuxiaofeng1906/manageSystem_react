@@ -387,10 +387,10 @@ const BugReturnTableList: React.FC<any> = () => {
             其中第一次和第二次指派给测试张三，张三回归时长分别是2H和5H，第三次解决指派的测试李四，回归时长6H，那张三在该bug的回归时长就等于2+5=7H，李四则为6H）； </p>
           <p style={cssIndent}> 特别说明：注意在按人统计bug数的时候，1个bug有可能会被多人作为分母，但按组、按部门、按中心时，1个bug只能作为分母中的1个bug； </p>
 
-          <p><strong>3.计算说明</strong></p>
+          <p><strong>3.时长说明</strong></p>
           <p style={cssIndent}>计算时长单位为H，只计算工作日时长（不算周末和法定节假日）；关闭者为测试的</p>
 
-          <p><strong>4.计算公式说明</strong></p>
+          <p style={{color: "#1890FF"}}><strong>4.计算公式说明</strong></p>
           <p><strong>4.1 按人统计</strong></p>
           <p style={cssIndent}>周报：当周该测试人员所有关闭bug时长排序，取中位数；</p>
           <p style={cssIndent}>月报：当月该测试人员所有关闭bug时长排序，取中位数；</p>

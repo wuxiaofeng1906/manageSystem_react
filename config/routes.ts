@@ -167,8 +167,8 @@ export default [
           {
             name: 'Bug修复时长',
             icon: 'table',
-            path: 'bugResolutionTime',
-            component: './kpi/performance/developer/bugResolutionTime',
+            path: 'bugRepairTime',
+            component: './kpi/performance/developer/bugRepairTime',
           },
         ]
       }, {
@@ -197,14 +197,14 @@ export default [
           {
             name: '用例执行率',
             icon: 'table',
-            path: 'examCarryRate',
-            component: './kpi/performance/testers/examCarryRate',
+            path: 'exampleCarryRate',
+            component: './kpi/performance/testers/exampleCarryRate',
           },
           {
             name: 'bug回归时长',
             icon: 'table',
-            path: 'avgBugReturnDurtion',
-            component: './kpi/performance/testers/avgBugReturnDur',
+            path: 'avgBugReturnTime',
+            component: './kpi/performance/testers/avgBugReturnTime',
           }
         ]
       }, {

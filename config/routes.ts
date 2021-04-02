@@ -191,8 +191,8 @@ export default [
           {
             name: '线上千行bug率(含测试)',
             icon: 'table',
-            path: 'test_bugRate',
-            component: './kpi/performance/testers/test_bugRate',
+            path: 'on_lineBugIncTester',
+            component: './kpi/performance/testers/on_lineBugIncTester',
           },
           {
             name: '用例执行率',

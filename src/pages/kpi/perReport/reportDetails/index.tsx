@@ -9,39 +9,49 @@ import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import {getHeight} from "@/publicMethods/pageSet";
 
-// import { AllCommunityModules } from '@ag-grid-community/all-modules';
-
-// const modules= AllCommunityModules;
 const Parsing = (params: any) => {
   const kpiResult: any = new Array();
   const {datas} = params[0];
   if (datas !== null) {
     for (let index = 0; index < datas.length; index += 1) {
+      let deptname = "";
       let kpiScore: number = 0;
       const {kpis} = datas[index];
       for (let m = 0; m < kpis.length; m += 1) {
-        kpiResult.push({
-          userName: datas[index].user.userName,
-          deptName: datas[index].user.parentName,
-          groupName: datas[index].user.deptName,
-          kpiName: kpis[m].kpiName,
-          weight: kpis[m].weight,
-          target: kpis[m].target,
-          actual: kpis[m].actual,
-          ratio: kpis[m].ratio,
-          score: kpis[m].score,
-        });
+        if (datas[index].user.userName !== "陈诺" && datas[index].user.userName !== "王润燕") {
+
+          if (datas[index].user.deptName === "前端平台研发部" || datas[index].user.deptName === "平台研发部") {
+            deptname = datas[index].user.deptName;
+          } else {
+            deptname = datas[index].user.parentName;
+          }
+          kpiResult.push({
+            userName: datas[index].user.userName,
+            deptName: deptname,
+            groupName: datas[index].user.deptName,
+            kpiName: kpis[m].kpiName,
+            weight: kpis[m].weight,
+            target: kpis[m].target,
+            actual: kpis[m].actual,
+            ratio: kpis[m].ratio,
+            score: kpis[m].score,
+          });
+        }
 
         kpiScore += (Number(kpis[m].weight) / 100 * Number(kpis[m].score));
       }
 
-      kpiResult.push({
-        userName: datas[index].user.userName,
-        deptName: datas[index].user.parentName,
-        groupName: datas[index].user.deptName,
-        kpiName: "量化指标得分",
-        score: kpiScore,
-      });
+      if (datas[index].user.userName !== "陈诺" && datas[index].user.userName !== "王润燕") {
+
+        kpiResult.push({
+          userName: datas[index].user.userName,
+          deptName: deptname,
+          groupName: datas[index].user.deptName,
+          kpiName: "量化指标得分",
+          score: kpiScore,
+        });
+      }
+
     }
   }
 
@@ -50,10 +60,10 @@ const Parsing = (params: any) => {
 
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>) => {
-
-  const {data} = await client.query(`
+  // 开发
+  const devloper = await client.query(`
       {
-        kpiReports(kind: "3", ends: ["2021-03-31"],identity:DEV){
+        kpiReports(kind: "3", ends: ["2021-03-31"],identity:DEVELOPER){
                   range{
               start
               end
@@ -79,8 +89,69 @@ const queryDevelopViews = async (client: GqlClient<object>) => {
           }
       }
   `);
+  const devData = Parsing(devloper.data?.kpiReports);
+  // 测试
+  const tester = await client.query(`
+      {
+        kpiReports(kind: "3", ends: ["2021-03-31"],identity:TESTER){
+                  range{
+              start
+              end
+            }
+            datas{
+              user{
+                      id
+                userName
+                tech
+                deptName
+                parentName
+              }
+              kpis{
+                kpiIndex
+                kpiName
+                weight
+                target
+                actual
+                ratio
+                score
+              }
+            }
+          }
+      }
+  `);
+  const testerData = Parsing(tester.data?.kpiReports);
+  // 产品
+  const product = await client.query(`
+      {
+        kpiReports(kind: "3", ends: ["2021-03-31"],identity:PRODUCER){
+                  range{
+              start
+              end
+            }
+            datas{
+              user{
+                      id
+                userName
+                tech
+                deptName
+                parentName
+              }
+              kpis{
+                kpiIndex
+                kpiName
+                weight
+                target
+                actual
+                ratio
+                score
+              }
+            }
+          }
+      }
+  `);
+  const productData = Parsing(product.data?.kpiReports);
 
-  return Parsing(data?.kpiReports);
+  return devData.concat(testerData).concat(productData);
 
 };
 

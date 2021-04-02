@@ -166,7 +166,7 @@ const converseFormatForAgGrid = (oraDatas: any, type: string) => {
           arrays.push({
             devCenter: "研发中心",
             group: data[i].deptName,
-            "type":type,
+            "type": type,
             "username": username,
             [starttime]: Number(usersData[m].kpi).toFixed(3)
           });
@@ -284,11 +284,13 @@ const AdviserFeedTableList: React.FC<any> = () => {
   // 按周统计
   const statisticsByWeeks = async () => {
     /* 八周 */
+    gridApi.current?.setColumnDefs([]);
     const weekColums = columsForWeeks();
     gridApi.current?.setColumnDefs(weekColums);
     const datas: any = await queryBugResolutionCount(gqlClient, 'week', 'story');
     gridApi.current?.setRowData(datas);
 
+    gridApiForBug.current?.setColumnDefs([]);
     gridApiForBug.current?.setColumnDefs(weekColums);
     const bugDt: any = await queryBugResolutionCount(gqlClient, 'week', 'bug');
     gridApiForBug.current?.setRowData(bugDt);
@@ -298,11 +300,13 @@ const AdviserFeedTableList: React.FC<any> = () => {
   // 按月统计
   const statisticsByMonths = async () => {
     /* 12月 */
+    gridApi.current?.setColumnDefs([]);
     const monthColums = columsForMonths();
     gridApi.current?.setColumnDefs(monthColums);
     const datas: any = await queryBugResolutionCount(gqlClient, 'month', 'story');
     gridApi.current?.setRowData(datas);
 
+    gridApiForBug.current?.setColumnDefs([]);
     gridApiForBug.current?.setColumnDefs(monthColums);
     const bugDt: any = await queryBugResolutionCount(gqlClient, 'month', 'bug');
     gridApiForBug.current?.setRowData(bugDt);
@@ -314,11 +318,12 @@ const AdviserFeedTableList: React.FC<any> = () => {
     /* 4季 */
 
     const quartersColums = columsForQuarters();
-
+    gridApi.current?.setColumnDefs([]);
     gridApi.current?.setColumnDefs(quartersColums);
     const datas: any = await queryBugResolutionCount(gqlClient, 'quarter', 'story');
     gridApi.current?.setRowData(datas);
 
+    gridApiForBug.current?.setColumnDefs([]);
     gridApiForBug.current?.setColumnDefs(quartersColums);
     const bugDt: any = await queryBugResolutionCount(gqlClient, 'quarter', 'bug');
     gridApiForBug.current?.setRowData(bugDt);

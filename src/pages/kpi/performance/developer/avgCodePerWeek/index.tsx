@@ -231,8 +231,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
                 [starttime]: usersData[m].kpi
               }
             );
-          }
-          else {
+          } else {
             arrays.push({
               devCenter: "研发中心",
               dept: data[i].parent.deptName,
@@ -358,6 +357,7 @@ const WeekCodeTableList: React.FC<any> = () => {
   // 按周统计
   const statisticsByWeeks = async () => {
     /* 八周 */
+    gridApi.current?.setColumnDefs([]);
     const weekColums = columsForWeeks();
     gridApi.current?.setColumnDefs(weekColums);
     const datas: any = await queryBugResolutionCount(gqlClient, 'week');
@@ -368,6 +368,7 @@ const WeekCodeTableList: React.FC<any> = () => {
   // 按月统计
   const statisticsByMonths = async () => {
     /* 12月 */
+    gridApi.current?.setColumnDefs([]);
     const monthColums = columsForMonths();
     gridApi.current?.setColumnDefs(monthColums);
     const datas: any = await queryBugResolutionCount(gqlClient, 'month');
@@ -378,7 +379,7 @@ const WeekCodeTableList: React.FC<any> = () => {
   // 按季度统计
   const statisticsByQuarters = async () => {
     /* 4季 */
-
+    gridApi.current?.setColumnDefs([]);
     const quartersColums = columsForQuarters();
     gridApi.current?.setColumnDefs(quartersColums);
     const datas: any = await queryBugResolutionCount(gqlClient, 'quarter');

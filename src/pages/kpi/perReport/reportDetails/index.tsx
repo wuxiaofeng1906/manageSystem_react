@@ -81,72 +81,6 @@ const queryDevelopViews = async (client: GqlClient<object>) => {
 
   return Parsing(data?.kpiReports);
 
-  // return [
-  //   {
-  //     name1: "研发部一",
-  //     name2: "2组",
-  //     name3: "谭小杰",
-  //     name4: "指标1",
-  //     name5: "666",
-  //     name6: "666",
-  //     name7: "666",
-  //     name8: "666",
-  //     name9: "666",
-  //   }, {
-  //     name1: "研发部一",
-  //     name2: "2组",
-  //     name3: "谭小杰",
-  //     name4: "指标2",
-  //     name5: "888",
-  //     name6: "888",
-  //     name7: "888",
-  //     name8: "888",
-  //     name9: "888",
-  //   }, {
-  //     name1: "研发部一",
-  //     name2: "2组",
-  //     name3: "谭小杰",
-  //     name4: "指标3",
-  //     name5: "999",
-  //     name6: "999",
-  //     name7: "999",
-  //     name8: "999",
-  //     name9: "999",
-  //   }, {
-  //     name1: "研发部二",
-  //     name2: "1组",
-  //     name3: "欢姐姐",
-  //     name4: "指标1",
-  //     name5: "111",
-  //     name6: "111",
-  //     name7: "111",
-  //     name8: "111",
-  //     name9: "111",
-  //   }, {
-  //     name1: "研发部二",
-  //     name2: "1组",
-  //     name3: "欢姐姐",
-  //     name4: "指标2",
-  //     name5: "222",
-  //     name6: "222",
-  //     name7: "222",
-  //     name8: "222",
-  //     name9: "222",
-  //   }, {
-  //     name1: "研发部二",
-  //     name2: "1组",
-  //     name3: "欢姐姐",
-  //     name4: "指标3",
-  //     name5: "333",
-  //     name6: "333",
-  //     name7: "333",
-  //     name8: "333",
-  //     name9: "333",
-  //   }, {
-  //     name4: "量化指标得分",
-  //     name9: "333",
-  //   },
-  // ];
 };
 
 // 组件初始化
@@ -160,24 +94,31 @@ const SprintList: React.FC<any> = () => {
         field: 'deptName',
         cellRenderer: (params: any) => {
           if (params.data.kpiName === "量化指标得分") {
-            return "";
+            return `<span style="font-weight: bold ;color:black"> ${params.value} </span>`;
           }
           return params.value;
         },
+        // cellStyle: (params: any) => {
+        //   if(params.data.kpiName === "量化指标得分"){
+        //     return {"backgroundColor": "gray"};
+        //   }
+        //   return  "";
+        //   //
+        // }
 
-        colSpan: (params: any) => {
-          if (params.data.kpiName === "量化指标得分") {
-            return 3;
-          }
-          return 1;
-        },
+        // colSpan: (params: any) => {
+        //   if (params.data.kpiName === "量化指标得分") {
+        //     return 3;
+        //   }
+        //   return 1;
+        // },
       }, {
         headerName: '组名',
         field: 'groupName',
         sort: 'asc',
         cellRenderer: (params: any) => {
           if (params.data.kpiName === "量化指标得分") {
-            return "";
+            return `<span style="font-weight: bold ;color:black"> ${params.value} </span>`;
           }
           return params.value;
         },
@@ -187,13 +128,13 @@ const SprintList: React.FC<any> = () => {
         field: 'userName',
         cellRenderer: (params: any) => {
           if (params.data.kpiName === "量化指标得分") {
-            return "";
+            return `<span style="font-weight: bold ;color:black"> ${params.value} </span>`;
           }
           return params.value;
         },
-        rowSpan: () => {
-          return 7;
-        }
+        // rowSpan: () => {
+        //   return 7;
+        // }
 
       },
       {
@@ -201,7 +142,7 @@ const SprintList: React.FC<any> = () => {
         field: 'kpiName',
         cellRenderer: (params: any) => {
           if (params.value === "量化指标得分") {
-            return `<span style="font-weight: bold ;color:green"> ${params.value} </span>`;
+            return `<span style="font-weight: bold ;color:black"> ${params.value} </span>`;
           }
           return params.value;
         },
@@ -216,7 +157,9 @@ const SprintList: React.FC<any> = () => {
         headerName: '权重',
         field: 'weight',
         cellRenderer: (params: any) => {
-
+          // if (params.data.kpiName === "量化指标得分") {
+          //   return '';
+          // }
           return `${params.value}%`;
         }
       },
@@ -244,7 +187,7 @@ const SprintList: React.FC<any> = () => {
 
         cellRenderer: (params: any) => {
           if (params.data.kpiName === "量化指标得分") {
-            return `<span style="font-weight: bold ;color:green"> ${Number(params.value).toFixed(2)} </span>`;
+            return `<span style="font-weight: bold ;color:black"> ${Number(params.value).toFixed(2)} </span>`;
           }
           return Number(params.value).toFixed(2);
         }
@@ -289,14 +232,24 @@ const SprintList: React.FC<any> = () => {
             filter: true,
             flex: 1,
             minWidth: 100,
-
+            // cellStyle: {"margin-top": "-5px"}
+            cellStyle: (params: any) => {
+              if (params.data.kpiName === "量化指标得分") {
+                return {"backgroundColor": "LightGrey", "lineHeight": "32px"};
+              }
+              return {
+                "lineHeight": "32px"
+              };
+            }
           }}
+
           autoGroupColumnDef={{
             minWidth: 100,
           }}
+          rowHeight={32}
           groupDefaultExpanded={9} // 展开分组
           onGridReady={onGridReady}
-          suppressRowTransform={true}
+          // suppressRowTransform={true}
         >
 
         </AgGridReact>
@@ -305,4 +258,5 @@ const SprintList: React.FC<any> = () => {
     </PageContainer>
   );
 };
+
 export default SprintList;

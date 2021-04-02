@@ -98,9 +98,13 @@ function getTwelveMonthTime() {
 
 // 获取季度 的开始和结束时间
 function getFourQuarterTime() {
+
+
   const quarterArray = [];
-  for (let index = 0; index < 12; index += 3) {
-    const currentMonth = dayjs().subtract(index, 'month');
+  for (let index = 0; index < 12; index += 3) {   // 0,3,6,9
+    // const currentMonth = dayjs().subtract(index, 'month');  // 正常的季度显示
+    const currentMonth = dayjs().subtract(index + 1, 'month');  // 只有本季度已经过了一个月，才显示本季度数据
+
     let currentQuarter = 0;
     let from = "";
     let to = "";
@@ -137,10 +141,12 @@ function getFourQuarterTime() {
       default:
         break;
     }
+
+    const currentYear = currentMonth.year();
     quarterArray.push({
-      title: `${currentMonth.year()}年${currentQuarter}季度`,
-      start: `${currentMonth.year()}-${from}`,
-      end: `${currentMonth.year()}-${to}`,
+      title: `${currentYear}年${currentQuarter}季度`,
+      start: `${currentYear}-${from}`,
+      end: `${currentYear}-${to}`,
     });
   }
 

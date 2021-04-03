@@ -151,6 +151,7 @@ const queryDevelopViews = async (client: GqlClient<object>) => {
   `);
   const productData = Parsing(product.data?.kpiReports);
 
+  // return testerData;
   return devData.concat(testerData).concat(productData);
 
 };
@@ -227,6 +228,9 @@ const SprintList: React.FC<any> = () => {
             case "平均bug回归时长":
               returnValue = "bug回归时长";
               break;
+            case "平均bug修复时长":
+              returnValue = "bug修复时长";
+              break;
             default:
               returnValue = params.value;
               break;
@@ -257,6 +261,7 @@ const SprintList: React.FC<any> = () => {
         headerName: '实际值',
         field: 'actual',
         cellRenderer: (params: any) => {
+
           if (params.data.kpiName === "线上千行bug率-排除测试范围&引入bug以外的") {
             if (Number(params.value).toFixed(4) === "0.0000") {
               return 0;
@@ -268,7 +273,10 @@ const SprintList: React.FC<any> = () => {
             return 0;
           }
 
-          return Number(params.value).toFixed(2);
+          //  if (params.data.userName === "关平") {
+          // console.log(params.data.userName, params.value, Number(params.value), (Number(params.value) + 0.00000001).toFixed(2));
+          // }
+          return (Number(params.value) + 0.00000001).toFixed(2);
         }
       },
       {

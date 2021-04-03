@@ -81,7 +81,7 @@ const parsingProduct = (params: any) => {
 
         let tarRate = 0;
         if (actvalue > 0) {  // 实际值<0  ==>  分母为0时，则目标完成率直接为100；
-          console.log("tarRate", tarvalue, actvalue, tarvalue / actvalue * 100);
+          // console.log("tarRate", tarvalue, actvalue, tarvalue / actvalue * 100);
 
           tarRate = tarvalue / actvalue * 100;
           if (tarRate > 100) {  // 算出来的实际目标完成率 > 100,值也为100
@@ -100,7 +100,7 @@ const parsingProduct = (params: any) => {
           target: tarvalue,
           actual: actvalue,
           ratio: tarRate,
-          score: "",
+          score: tarRate,
         });
         kpiScore += weightval / 100 * tarRate;
 

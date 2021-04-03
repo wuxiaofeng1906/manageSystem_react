@@ -57,7 +57,7 @@ function codeNumberRender(values: any) {
       if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
         return ` <span style="color: Silver  ">  ${0} </span> `;
       }
-      return ` <span style="font-weight: bold">  ${Number(datas.values).toFixed(3)} </span> `;
+      return ` <span style="font-weight: bold">  ${Number(datas.values).toFixed(4)} </span> `;
     }
   }
 
@@ -173,7 +173,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
               dept: data[i].parent.deptName,
               group: data[i].deptName,
               "username": username,
-              [starttime]: Number(usersData[m].kpi).toFixed(3)
+              [starttime]: Number(usersData[m].kpi).toFixed(4)
             });
           }
 

@@ -232,18 +232,6 @@ const SprintList: React.FC<any> = () => {
               break;
 
           }
-          // if (params.value === "量化指标得分") {
-          //   return `<span style="font-weight: bold ;color:black"> ${params.value} </span>`;
-          // }
-          // if (params.value === "线上千行bug率-排除测试范围&引入bug以外的") {
-          //   return "线上千行bug率";
-          // }
-          // if (params.value === "内部code review次数") {
-          //   return "code review次数";
-          // }
-          // if (params.value === "平均bug回归时长") {
-          //   return "bug回归时长";
-          // }
 
           return returnValue;
         },
@@ -258,9 +246,6 @@ const SprintList: React.FC<any> = () => {
         headerName: '权重',
         field: 'weight',
         cellRenderer: (params: any) => {
-          // if (params.data.kpiName === "量化指标得分") {
-          //   return '';
-          // }
           return `${params.value}%`;
         }
       },
@@ -272,6 +257,17 @@ const SprintList: React.FC<any> = () => {
         headerName: '实际值',
         field: 'actual',
         cellRenderer: (params: any) => {
+          if (params.data.kpiName === "线上千行bug率-排除测试范围&引入bug以外的") {
+            if (Number(params.value).toFixed(4) === "0.0000") {
+              return 0;
+            }
+            return Number(params.value).toFixed(4);
+          }
+
+          if (Number(params.value).toFixed(2) === "0.00") {
+            return 0;
+          }
+
           return Number(params.value).toFixed(2);
         }
       },

@@ -57,7 +57,7 @@ function codeNumberRender(values: any) {
       if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
         return ` <span style="color: Silver  ">  ${0} </span> `;
       }
-      return ` <span style="font-weight: bold">  ${Number(datas.values).toFixed(3)} </span> `;
+      return ` <span style="font-weight: bold">  ${Number(datas.values).toFixed(4)} </span> `;
     }
   }
 
@@ -158,7 +158,6 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         for (let m = 0; m < usersData.length; m += 1) {
           const username = usersData[m].userName;
 
-
           // 特殊处理宋老师和王润燕的部门和组
           if (username === "陈诺") {
             arrays.push({
@@ -173,7 +172,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
               dept: data[i].parent.deptName,
               group: data[i].deptName,
               "username": username,
-              [starttime]: Number(usersData[m].kpi).toFixed(3)
+              [starttime]: Number(usersData[m].kpi).toFixed(4)
             });
           }
 

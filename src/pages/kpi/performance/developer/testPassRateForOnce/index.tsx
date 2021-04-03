@@ -52,7 +52,6 @@ const compColums = [
     field: 'module',
     rowGroup: true,
     hide: true,
-
     sort: 'desc'
 
   }, {
@@ -68,9 +67,8 @@ function codeNumberRender(values: any) {
       const moduleInfo = moduleValues[i];
       if (values.colDef.field === moduleInfo.time && rowName === moduleInfo.module && values.rowNode.parent.key === moduleInfo.parent) {
         if (moduleInfo.values === "" || moduleInfo.values === null || moduleInfo.values === undefined || Number(moduleInfo.values) === 0 || Number(moduleInfo.values) === 0.00) {
-          return ` <span style="color: Silver  ">  100 </span> `;
+          return ` <span style="">  100 </span> `;
         }
-        // return ` <span style="font-weight: bold">  ${`${(Number(moduleInfo.values) * 100).toFixed(2).toString()}%`} </span> `;
         return ` <span style="font-weight: bold">  ${(Number(moduleInfo.values) * 100).toFixed(2)} </span> `;
       }
     }
@@ -80,28 +78,33 @@ function codeNumberRender(values: any) {
       const datas = groupValues[i];
       if (values.colDef.field === datas.time && rowName === datas.group) {
         if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0 || Number(datas.values) === 0.00) {
-          return ` <span style="color: Silver  ">  100 </span> `;
+          return ` <span style="">  100`;
         }
-        // return ` <span style="font-weight: bold">  ${`${(Number(datas.values) * 100).toFixed(2).toString()}%`} </span> `;
-        return ` <span style="font-weight: bold"> ${(Number(datas.values) * 100).toFixed(2)} </span> `;
+
+        if (Number(datas.values) * 100 !== 100) {
+          return ` <span style="font-weight: bold"> ${(Number(datas.values) * 100).toFixed(2)} </span> `;
+
+        }
+        return ` <span>  100 </span> `;
+
+        // return ` <span style="font-weight: bold"> ${(Number(datas.values) * 100).toFixed(2)} </span> `;
       }
     }
   }
-  return ` <span style="color: Silver  ">  100 </span> `;
+  return ` <span>  100 </span> `;
 }
 
 
 function colorRender(params: any) {
-
   if (params.value === "" || params.value === undefined || Number(params.value) === 0 || Number(params.value) === 0.00) {
-    return ` <span style="color: Silver  ">  ${100} </span> `;
+    return 100;
   }
-
   if (Number.isNaN(Number(params.value)) === false) {
-
-    return (Number(params.value) * 100).toFixed(2);
+    if (Number(params.value) * 100 !== 100) {
+      return ` <span style="color: #1890ff"> ${(Number(params.value) * 100).toFixed(2)} </span> `;
+    }
+    return 100;
   }
-
   return params.value;  // 为了将聚合函数实现格式化
 }
 
@@ -169,13 +172,13 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     arrays.push({
         devCenter: "研发中心",
         "username": "前端",
-        [starttime]: Number(oraDatas[index].side.front)
+        [starttime]: oraDatas[index].side === null ? "" : Number(oraDatas[index].side.front)
       }
     );
     arrays.push({
         devCenter: "研发中心",
         "username": "后端",
-        [starttime]: Number(oraDatas[index].side.backend)
+        [starttime]: oraDatas[index].side === null ? "" : Number(oraDatas[index].side.backend)
       }
     );
 
@@ -313,11 +316,45 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
   //  // bugReopenDept(kind:"${condition.typeFlag}",ends:${condition.ends})
   const {data} = await client.query(`
       {
-
+          kpiCarryTest(kind: "${condition.typeFlag}", ends: ${condition.ends}){
+            total {
+              dept
+              deptName
+              kpi
+            }
+            side{
+              both
+              front
+              backend
+            }
+            range {
+              start
+              end
+            }
+            datas {
+              dept
+              deptName
+              kpi
+              parent {
+                dept
+                deptName
+              }
+              side{
+                both
+                front
+                backend
+              }
+              users {
+                userId
+                userName
+                kpi
+              }
+            }
+          }
       }
   `);
 
-  const datas = converseFormatForAgGrid(data?.bugReopenDept);
+  const datas = converseFormatForAgGrid(data?.kpiCarryTest);
   return converseArrayToOne(datas);
 
 };

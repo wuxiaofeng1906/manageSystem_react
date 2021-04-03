@@ -15,7 +15,7 @@ import {
   getParamsByType
 } from '@/publicMethods/timeMethods';
 import {colorRender, moduleChange} from '@/publicMethods/cellRenderer';
-import {getHeight} from '@/publicMethods/pageSet';
+import {customRound, getHeight} from '@/publicMethods/pageSet';
 
 import {Button, Drawer} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
@@ -65,7 +65,7 @@ function codeNumberRender(values: any) {
         if (moduleInfo.values === "" || moduleInfo.values === null || moduleInfo.values === undefined || Number(moduleInfo.values) === 0) {
           return ` <span style="color: Silver  ">  ${0} </span> `;
         }
-        return ` <span style="font-weight: bold">  ${Number(moduleInfo.values).toFixed(2)} </span> `;
+        return ` <span style="font-weight: bold">  ${customRound(Number(moduleInfo.values), 2)} </span> `;
       }
     }
   } else {
@@ -75,7 +75,7 @@ function codeNumberRender(values: any) {
         if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
           return ` <span style="color: Silver  ">  ${0} </span> `;
         }
-        return ` <span style="font-weight: bold">  ${Number(datas.values).toFixed(2)} </span> `;
+        return ` <span style="font-weight: bold">  ${customRound(Number(datas.values), 2)} </span> `;
       }
     }
   }
@@ -148,13 +148,13 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     arrays.push({
         devCenter: "研发中心",
         "username": "前端",
-        [starttime]: Number(oraDatas[index].side.front).toFixed(2)
+        [starttime]: customRound(Number(oraDatas[index].side.front), 2)
       }
     );
     arrays.push({
         devCenter: "研发中心",
         "username": "后端",
-        [starttime]: Number(oraDatas[index].side.backend).toFixed(2)
+        [starttime]: customRound(Number(oraDatas[index].side.backend), 2)
       }
     );
 
@@ -200,12 +200,12 @@ const converseFormatForAgGrid = (oraDatas: any) => {
                 devCenter: "研发中心",
                 dept: "产品研发部",
                 "username": "前端 ",
-                [starttime]: data[i].side === null ? "" : Number(data[i].side.front).toFixed(2)
+                [starttime]: data[i].side === null ? "" : customRound(Number(data[i].side.front), 2)
               }, {
                 devCenter: "研发中心",
                 dept: "产品研发部",
                 "username": "后端 ",   // 故意空一格，以便于区分上一个前后端
-                [starttime]: data[i].side === null ? "" : Number(data[i].side.backend).toFixed(2)
+                [starttime]: data[i].side === null ? "" : customRound(Number(data[i].side.backend), 2)
               }
             );
           }

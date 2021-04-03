@@ -213,10 +213,39 @@ const SprintList: React.FC<any> = () => {
         headerName: '指标名称',
         field: 'kpiName',
         cellRenderer: (params: any) => {
-          if (params.value === "量化指标得分") {
-            return `<span style="font-weight: bold ;color:black"> ${params.value} </span>`;
+          let returnValue = "";
+          switch (params.value) {
+            case "量化指标得分":
+              returnValue = `<span style="font-weight: bold ;color:black"> ${params.value} </span>`;
+              break;
+            case "线上千行bug率-排除测试范围&引入bug以外的":
+              returnValue = "线上千行bug率";
+              break;
+            case "内部code review次数":
+              returnValue = "code review次数";
+              break;
+            case "平均bug回归时长":
+              returnValue = "bug回归时长";
+              break;
+            default:
+              returnValue = params.value;
+              break;
+
           }
-          return params.value;
+          // if (params.value === "量化指标得分") {
+          //   return `<span style="font-weight: bold ;color:black"> ${params.value} </span>`;
+          // }
+          // if (params.value === "线上千行bug率-排除测试范围&引入bug以外的") {
+          //   return "线上千行bug率";
+          // }
+          // if (params.value === "内部code review次数") {
+          //   return "code review次数";
+          // }
+          // if (params.value === "平均bug回归时长") {
+          //   return "bug回归时长";
+          // }
+
+          return returnValue;
         },
         colSpan: (params: any) => {
           if (params.data.kpiName === "量化指标得分") {

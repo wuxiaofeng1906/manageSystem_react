@@ -39,9 +39,6 @@ const compColums = [
     rowGroup: true,
     hide: true,
   }, {
-    headerName: '类型',
-    field: 'type',
-  }, {
     headerName: '姓名',
     field: 'username',
   }];
@@ -54,7 +51,7 @@ function codeNumberRender(values: any) {
       if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
         return ` <span style="color: Silver  ">  ${0} </span> `;
       }
-      return ` <span style="font-weight: bold">  ${(Number(datas.values) / 24).toFixed(3)} </span> `;
+      return ` <span style="font-weight: bold">  ${(Number(datas.values) * 100).toFixed(2)} </span> `;
     }
   }
 
@@ -69,7 +66,7 @@ function colorRender(params: any) {
 
   if (Number.isNaN(Number(params.value)) === false) {
 
-    return (Number(params.value) / 24).toFixed(3);
+    return (Number(params.value) * 100).toFixed(2);
   }
 
   return params.value;  // 为了将聚合函数实现格式化
@@ -162,13 +159,14 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       if (usersData !== null) {
         for (let m = 0; m < usersData.length; m += 1) {
           const username = usersData[m].userName;
-
-          arrays.push({
-            devCenter: "研发中心",
-            group: data[i].deptName,
-            "username": username,
-            [starttime]: Number(usersData[m].kpi).toFixed(3)
-          });
+          if (username !== "薛峰") {
+            arrays.push({
+              devCenter: "研发中心",
+              group: data[i].deptName,
+              "username": username,
+              [starttime]: Number(usersData[m].kpi).toFixed(3)
+            });
+          }
         }
       }
     }
@@ -213,14 +211,37 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
   if (condition.typeFlag === 0) {
     return [];
   }
-  //         feedbackAvgDept(kind: "${condition.typeFlag}", ends: ${condition.ends},category:${type})
   const {data} = await client.query(`
       {
-
+        proChangeApply(kind: "${condition.typeFlag}", ends: ${condition.ends}){
+          total {
+            dept
+            deptName
+            kpi
+          }
+          range {
+            start
+            end
+          }
+          datas {
+            dept
+            deptName
+            kpi
+            parent {
+              dept
+              deptName
+            }
+            users {
+              userId
+              userName
+              kpi
+            }
+          }
+        }
       }
   `);
 
-  const datas = converseFormatForAgGrid(data?.feedbackAvgDept);
+  const datas = converseFormatForAgGrid(data?.proChangeApply);
   return converseArrayToOne(datas);
 };
 

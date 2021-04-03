@@ -25,17 +25,34 @@ const Parsing = (params: any) => {
           } else {
             deptname = datas[index].user.parentName;
           }
-          kpiResult.push({
-            userName: datas[index].user.userName,
-            deptName: deptname,
-            groupName: datas[index].user.deptName,
-            kpiName: kpis[m].kpiName,
-            weight: kpis[m].weight,
-            target: kpis[m].target,
-            actual: kpis[m].actual,
-            ratio: kpis[m].ratio,
-            score: kpis[m].score,
-          });
+
+          if (kpis[m].kpiName === "内部code review次数") {
+            if (kpis[m].weight !== null) {
+              kpiResult.push({
+                userName: datas[index].user.userName,
+                deptName: deptname,
+                groupName: datas[index].user.deptName,
+                kpiName: kpis[m].kpiName,
+                weight: kpis[m].weight,
+                target: kpis[m].target,
+                actual: kpis[m].actual,
+                ratio: kpis[m].ratio,
+                score: kpis[m].score,
+              });
+            }
+          } else {
+            kpiResult.push({
+              userName: datas[index].user.userName,
+              deptName: deptname,
+              groupName: datas[index].user.deptName,
+              kpiName: kpis[m].kpiName,
+              weight: kpis[m].weight,
+              target: kpis[m].target,
+              actual: kpis[m].actual,
+              ratio: kpis[m].ratio,
+              score: kpis[m].score,
+            });
+          }
           kpiScore += (Number(kpis[m].weight) / 100 * Number(kpis[m].score));
 
         }

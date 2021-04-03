@@ -36,9 +36,10 @@ const Parsing = (params: any) => {
             ratio: kpis[m].ratio,
             score: kpis[m].score,
           });
+          kpiScore += (Number(kpis[m].weight) / 100 * Number(kpis[m].score));
+
         }
 
-        kpiScore += (Number(kpis[m].weight) / 100 * Number(kpis[m].score));
       }
 
       if (datas[index].user.userName !== "陈诺" && datas[index].user.userName !== "王润燕") {
@@ -51,6 +52,66 @@ const Parsing = (params: any) => {
           score: kpiScore,
         });
       }
+
+    }
+  }
+
+  return kpiResult;
+};
+
+const parsingProduct = (params: any) => {
+  const kpiResult: any = new Array();
+  const {datas} = params[0];
+  if (datas !== null) {
+    for (let index = 0; index < datas.length; index += 1) {
+      let deptname = "";
+      let kpiScore: number = 0;
+      const {kpis} = datas[index];
+      for (let m = 0; m < kpis.length; m += 1) {
+
+        if (datas[index].user.deptName === "产品管理部") {
+          deptname = datas[index].user.deptName;
+        } else {
+          deptname = datas[index].user.parentName;
+        }
+
+        const weightval = kpis[m].weight;
+        const actvalue = Number(customRound(Number(kpis[m].actual), 2));
+        const tarvalue = Number(kpis[m].target);
+
+        let tarRate = 0;
+        if (actvalue > 0) {  // 实际值<0  ==>  分母为0时，则目标完成率直接为100；
+          console.log("tarRate", tarvalue, actvalue, tarvalue / actvalue * 100);
+
+          tarRate = tarvalue / actvalue * 100;
+          if (tarRate > 100) {  // 算出来的实际目标完成率 > 100,值也为100
+            tarRate = 100;
+          }
+        } else {
+          tarRate = 100;
+        }
+
+        kpiResult.push({
+          userName: datas[index].user.userName,
+          deptName: deptname,
+          groupName: datas[index].user.deptName,
+          kpiName: kpis[m].kpiName,
+          weight: weightval,
+          target: tarvalue,
+          actual: actvalue,
+          ratio: tarRate,
+          score: "",
+        });
+        kpiScore += weightval / 100 * tarRate;
+
+      }
+      kpiResult.push({
+        userName: datas[index].user.userName,
+        deptName: deptname,
+        groupName: datas[index].user.deptName,
+        kpiName: "量化指标得分",
+        score: kpiScore,
+      });
 
     }
   }
@@ -149,9 +210,9 @@ const queryDevelopViews = async (client: GqlClient<object>) => {
           }
       }
   `);
-  const productData = Parsing(product.data?.kpiReports);
+  const productData = parsingProduct(product.data?.kpiReports);
 
-  // return testerData;
+  // return productData;
   return devData.concat(testerData).concat(productData);
 
 };

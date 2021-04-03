@@ -17,7 +17,7 @@ import {
 import {moduleChange} from '@/publicMethods/cellRenderer';
 import {Button, Drawer} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
-import {getHeight} from "@/publicMethods/pageSet";
+import {customRound, getHeight} from "@/publicMethods/pageSet";
 
 
 // 获取近四周的时间范围
@@ -66,46 +66,67 @@ function codeNumberRender(values: any) {
     for (let i = 0; i < moduleValues.length; i += 1) {
       const moduleInfo = moduleValues[i];
       if (values.colDef.field === moduleInfo.time && rowName === moduleInfo.module && values.rowNode.parent.key === moduleInfo.parent) {
-        if (moduleInfo.values === "" || moduleInfo.values === null || moduleInfo.values === undefined || Number(moduleInfo.values) === 0 || Number(moduleInfo.values) === 0.00) {
-          return ` <span style="">  100 </span> `;
+
+        if (moduleInfo.values === null || moduleInfo.values === undefined || moduleInfo.values === "" || moduleInfo.values === "null") {
+          return 100;
         }
-        return ` <span style="font-weight: bold">  ${(Number(moduleInfo.values) * 100).toFixed(2)} </span> `;
+        if (moduleInfo.values === "0") {
+          return 0;
+        }
+
+        if ((Number(moduleInfo.values) * 100) === 100) {
+          return ` <span style="font-weight: bold">  ${100} </span> `;
+        }
+        return ` <span style="font-weight: bold">  ${customRound((Number(moduleInfo.values) * 100), 2)} </span> `;
       }
+
     }
   } else {
 
     for (let i = 0; i < groupValues.length; i += 1) {
       const datas = groupValues[i];
       if (values.colDef.field === datas.time && rowName === datas.group) {
-        if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0 || Number(datas.values) === 0.00) {
-          return ` <span style="">  100`;
+        if (datas.values === null || datas.values === undefined || datas.values === "" || datas.values === "null") {
+          return 100;
         }
 
-        if (Number(datas.values) * 100 !== 100) {
-          return ` <span style="font-weight: bold"> ${(Number(datas.values) * 100).toFixed(2)} </span> `;
-
+        if ((Number(datas.values) * 100) === 100) {
+          return ` <span style="font-weight: bold"> ${100} </span> `;
         }
-        return ` <span>  100 </span> `;
-
-        // return ` <span style="font-weight: bold"> ${(Number(datas.values) * 100).toFixed(2)} </span> `;
+        return ` <span style="font-weight: bold"> ${customRound((Number(datas.values) * 100), 2)} </span> `;
       }
     }
   }
-  return ` <span>  100 </span> `;
+  return 100;
 }
 
 
 function colorRender(params: any) {
-  if (params.value === "" || params.value === undefined || Number(params.value) === 0 || Number(params.value) === 0.00) {
-    return 100;
+  if (params.value === null || params.value === undefined || params.value === "" || params.value === "null") {
+    return "100";
   }
+
+  if (params.value === 0) {
+    return ` <span style="color: #1890ff"> 0 </span> `;
+  }
+
+  if (params.value === 100) {
+    return ` <span> ${100} </span> `;
+  }
+
+  if ((Number(params.value) * 100) < 100) {
+
+    return ` <span style="color: #1890ff"> ${customRound((Number(params.value) * 100), 2)} </span> `;
+  }
+
   if (Number.isNaN(Number(params.value)) === false) {
-    if (Number(params.value) * 100 !== 100) {
-      return ` <span style="color: #1890ff"> ${(Number(params.value) * 100).toFixed(2)} </span> `;
+    if (Number(params.value) * 100 === 100) {
+      return "100";
     }
-    return 100;
+    return customRound((Number(params.value) * 100), 2);
   }
-  return params.value;  // 为了将聚合函数实现格式化
+
+  return params.value;
 }
 
 const columsForWeeks = () => {
@@ -167,18 +188,17 @@ const converseFormatForAgGrid = (oraDatas: any) => {
   }
 
   for (let index = 0; index < oraDatas.length; index += 1) {
-
     const starttime = oraDatas[index].range.start;
     arrays.push({
         devCenter: "研发中心",
         "username": "前端",
-        [starttime]: oraDatas[index].side === null ? "" : Number(oraDatas[index].side.front)
+        [starttime]: oraDatas[index].side === null ? null : oraDatas[index].side.front
       }
     );
     arrays.push({
         devCenter: "研发中心",
         "username": "后端",
-        [starttime]: oraDatas[index].side === null ? "" : Number(oraDatas[index].side.backend)
+        [starttime]: oraDatas[index].side === null ? null : oraDatas[index].side.backend
       }
     );
 
@@ -197,20 +217,20 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         values: data[i].kpi
       }, {
         time: starttime,
-        group: data[i].parent === null ? "" : data[i].parent.deptName,
-        values: data[i].parent === null ? "" : data[i].parent.kpi
+        group: data[i].parent === null ? null : data[i].parent.deptName,
+        values: data[i].parent === null ? null : data[i].parent.kpi
       });
 
       moduleValues.push({
         time: starttime,
         module: "前端",
         parent: data[i].deptName,
-        values: data[i].side === null ? "" : data[i].side.front
+        values: data[i].side === null ? null : data[i].side.front
       }, {
         time: starttime,
         module: "后端",
         parent: data[i].deptName,
-        values: data[i].side === null ? "" : data[i].side.backend
+        values: data[i].side === null ? null : data[i].side.backend
       });
 
       const usersData = data[i].users;
@@ -224,12 +244,12 @@ const converseFormatForAgGrid = (oraDatas: any) => {
                 devCenter: "研发中心",
                 dept: "产品研发部",
                 "username": "前端 ",
-                [starttime]: data[i].side === null ? "" : Number(data[i].side.front)
+                [starttime]: data[i].side === null ? null : data[i].side.front
               }, {
                 devCenter: "研发中心",
                 dept: "产品研发部",
                 "username": "后端 ",   // 故意空一格，以便于区分上一个前后端
-                [starttime]: data[i].side === null ? "" : Number(data[i].side.backend)
+                [starttime]: data[i].side === null ? null : data[i].side.backend
               }
             );
           }
@@ -313,7 +333,6 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
     return [];
   }
 
-  //  // bugReopenDept(kind:"${condition.typeFlag}",ends:${condition.ends})
   const {data} = await client.query(`
       {
           kpiCarryTest(kind: "${condition.typeFlag}", ends: ${condition.ends}){

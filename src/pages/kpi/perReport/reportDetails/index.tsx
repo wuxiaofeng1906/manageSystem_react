@@ -278,6 +278,9 @@ const SprintList: React.FC<any> = () => {
             case "平均bug修复时长":
               returnValue = "bug修复时长";
               break;
+            case "平均每周代码量":
+              returnValue = "平均每周代码产出";
+              break;
             default:
               returnValue = params.value;
               break;

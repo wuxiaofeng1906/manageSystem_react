@@ -7,7 +7,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
-import {getHeight} from "@/publicMethods/pageSet";
+import {getHeight, customRound} from "@/publicMethods/pageSet";
 
 const Parsing = (params: any) => {
   const kpiResult: any = new Array();
@@ -171,20 +171,6 @@ const SprintList: React.FC<any> = () => {
           }
           return params.value;
         },
-        // cellStyle: (params: any) => {
-        //   if(params.data.kpiName === "量化指标得分"){
-        //     return {"backgroundColor": "gray"};
-        //   }
-        //   return  "";
-        //   //
-        // }
-
-        // colSpan: (params: any) => {
-        //   if (params.data.kpiName === "量化指标得分") {
-        //     return 3;
-        //   }
-        //   return 1;
-        // },
       }, {
         headerName: '组名',
         field: 'groupName',
@@ -261,29 +247,33 @@ const SprintList: React.FC<any> = () => {
         headerName: '实际值',
         field: 'actual',
         cellRenderer: (params: any) => {
-
           if (params.data.kpiName === "线上千行bug率-排除测试范围&引入bug以外的") {
-            if (Number(params.value).toFixed(4) === "0.0000") {
+            if (customRound(Number(params.value), 4) === "0.0000") {
               return 0;
             }
-            return Number(params.value).toFixed(4);
+            return customRound(Number(params.value), 4);
+
+            // if (Number(params.value).toFixed(4) === "0.0000") {
+            //   return 0;
+            // }
+            // return Number(params.value).toFixed(4);
           }
 
-          if (Number(params.value).toFixed(2) === "0.00") {
+          if (customRound(Number(params.value), 2) === "0.00") {
             return 0;
           }
 
-          //  if (params.data.userName === "关平") {
-          // console.log(params.data.userName, params.value, Number(params.value), (Number(params.value) + 0.00000001).toFixed(2));
+          // if (params.data.userName === "关平") {
+          //   console.log(params.data.userName, params.value, Number(params.value), (Number(params.value) + 0.00000001).toFixed(2));
           // }
-          return (Number(params.value) + 0.00000001).toFixed(2);
+          return customRound((Number(params.value)), 2);
         }
       },
       {
         headerName: '目标完成率',
         field: 'ratio',
         cellRenderer: (params: any) => {
-          return Number(params.value).toFixed(2);
+          return customRound(Number(params.value), 2);
         }
       },
       {
@@ -292,9 +282,9 @@ const SprintList: React.FC<any> = () => {
 
         cellRenderer: (params: any) => {
           if (params.data.kpiName === "量化指标得分") {
-            return `<span style="font-weight: bold ;color:black"> ${Number(params.value).toFixed(2)} </span>`;
+            return `<span style="font-weight: bold ;color:black"> ${customRound(Number(params.value), 2)} </span>`;
           }
-          return Number(params.value).toFixed(2);
+          return customRound(Number(params.value), 2);
         }
       }
     );

@@ -348,6 +348,7 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
                 userId
                 userName
                 kpi
+                tech
               }
             }
           }

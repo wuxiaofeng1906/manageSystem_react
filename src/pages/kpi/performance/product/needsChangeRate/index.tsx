@@ -154,7 +154,6 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         values: data[i].parent === null ? "" : data[i].parent.kpi
       });
 
-
       const usersData = data[i].users;
       if (usersData !== null) {
         for (let m = 0; m < usersData.length; m += 1) {
@@ -164,7 +163,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
               devCenter: "研发中心",
               group: data[i].deptName,
               "username": username,
-              [starttime]: Number(usersData[m].kpi).toFixed(3)
+              [starttime]: usersData[m].kpi
             });
           }
         }

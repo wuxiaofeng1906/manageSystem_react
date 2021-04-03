@@ -182,7 +182,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
               dept: data[i].parent.deptName,
               group: data[i].deptName,
               "username": username,
-              [starttime]: Number(usersData[m].kpi).toFixed(2)
+              [starttime]: Number(usersData[m].kpi)
             });
           }
 

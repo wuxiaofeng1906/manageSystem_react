@@ -34,6 +34,11 @@ const compColums = [
     rowGroup: true,
     hide: true,
   }, {
+    headerName: '所属部门',
+    field: 'dept',
+    rowGroup: true,
+    hide: true,
+  }, {
     headerName: '组名',
     field: 'group',
     rowGroup: true,
@@ -57,6 +62,7 @@ function codeNumberRender(values: any) {
 
   return ` <span style="color: Silver  ">  ${0} </span> `;
 }
+
 
 function colorRender(params: any) {
 
@@ -83,6 +89,7 @@ const columsForWeeks = () => {
       aggFunc: codeNumberRender,
       cellRenderer: colorRender
     });
+
   }
   return compColums.concat(component);
 };
@@ -138,9 +145,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     groupValues.push({
       time: starttime,
       group: "研发中心",
-      // values: oraDatas[index].total.kpi
-      values: oraDatas[index].datas[0].kpi   // 对研发中心的值进行特殊处理等于部门的值
-
+      values: oraDatas[index].datas[0].kpi
     });
 
     const data = oraDatas[index].datas;
@@ -156,18 +161,31 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         values: data[i].parent === null ? "" : data[i].parent.kpi
       });
 
+
       const usersData = data[i].users;
       if (usersData !== null) {
         for (let m = 0; m < usersData.length; m += 1) {
           const username = usersData[m].userName;
-          if (username !== "薛峰") {
+
+
+          // 特殊处理宋老师和王润燕的部门和组
+          if (username === "陈诺") {
             arrays.push({
               devCenter: "研发中心",
-              group: data[i].deptName,
+              dept: "测试部",
               "username": username,
               [starttime]: usersData[m].kpi
             });
+          } else {
+            arrays.push({
+              devCenter: "研发中心",
+              dept: data[i].parent.deptName,
+              group: data[i].deptName,
+              "username": username,
+              [starttime]: Number(usersData[m].kpi)
+            });
           }
+
         }
       }
     }
@@ -212,10 +230,12 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
   if (condition.typeFlag === 0) {
     return [];
   }
+
+  // caseRunDept(kind: "${condition.typeFlag}", ends: ${condition.ends})
   const {data} = await client.query(`
       {
-        proChangeApply(kind: "${condition.typeFlag}", ends: ${condition.ends}){
-          total {
+       autoCoverDept(kind: "${condition.typeFlag}", ends: ${condition.ends}){
+            total {
             dept
             deptName
             kpi
@@ -239,25 +259,25 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
             }
           }
         }
+
+
       }
   `);
 
-  const datas = converseFormatForAgGrid(data?.proChangeApply);
+  const datas = converseFormatForAgGrid(data?.autoCoverDept);
   return converseArrayToOne(datas);
 };
 
 /* endregion */
 
-const NeedsChangeRate: React.FC<any> = () => {
+const BugReturnTableList: React.FC<any> = () => {
 
   /* region ag-grid */
+  const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
     queryBugResolutionCount(gqlClient, 'quarter'),
   );
-
-
-  const gridApi = useRef<GridApi>();
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -289,7 +309,6 @@ const NeedsChangeRate: React.FC<any> = () => {
     const datas: any = await queryBugResolutionCount(gqlClient, 'month');
     gridApi.current?.setRowData(datas);
 
-
   };
 
   // 按季度统计
@@ -297,11 +316,9 @@ const NeedsChangeRate: React.FC<any> = () => {
     /* 4季 */
     gridApi.current?.setColumnDefs([]);
     const quartersColums = columsForQuarters();
-
     gridApi.current?.setColumnDefs(quartersColums);
     const datas: any = await queryBugResolutionCount(gqlClient, 'quarter');
     gridApi.current?.setRowData(datas);
-
   };
 
   /* region 提示规则显示 */
@@ -325,8 +342,6 @@ const NeedsChangeRate: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
-        <label style={{fontWeight: "bold"}}>(统计单位：%)</label>
-
         <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>
@@ -350,6 +365,10 @@ const NeedsChangeRate: React.FC<any> = () => {
           suppressAggFuncInHeader={true}   // 不显示标题聚合函数的标识
           rowHeight={32}
           headerHeight={35}
+          // pivotColumnGroupTotals={'always'}
+          // groupHideOpenParents={true}  // 组和人名同一列
+
+          // rowGroupPanelShow={'always'}  可以拖拽列到上面
           onGridReady={onGridReady}
         >
         </AgGridReact>
@@ -358,34 +377,28 @@ const NeedsChangeRate: React.FC<any> = () => {
       <div>
         <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
                 placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
-
-
           <p><strong>1.统计周期</strong></p>
-          <p style={cssIndent}>按周统计：企业微信变更申请提交日期为周一00:00:00--周日23:59:59；</p>
-          <p style={cssIndent}>按月统计：企业微信变更申请提交日期为每月1号00:00:00--每月最后1天23:59:59；</p>
-          <p style={cssIndent}>按季统计：企业微信变更申请提交日期为每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
 
-          <p style={cssIndent}> 2.按产品经理统计</p>
-          <p style={cssIndent}> 3.变更工作量=开发工作量+测试工作量+其他</p>
-          <p style={cssIndent}> 4.原始工作量=设计完成后开发定详细开发计划评估的工作量+测试评估工作量+其他</p>
+          <p style={cssIndent}>按周统计：用例创建日期为周一00:00:00--周日23:59:59；</p>
+          <p style={cssIndent}>按月统计：用例创建日期为每月1号00:00:00--每月最后1天23:59:59；</p>
+          <p style={cssIndent}>按季统计：用例创建日期为每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
 
-          <p style={{color: "#1890FF"}}><strong>5.计算公式说明</strong></p>
-          <p style={cssIndent}>特别注意：当计算分母的时候，需要先判断项目名称是否一致，若项目名称一致时需判断提交人是否一致，
-            若多次变更的项目名称和提交人都一致的时候（审批编号不一致），则分母只计算1次的project_cost_hour值，不要把多次求和，否则都一律分母按规则求和。</p>
-          <p><strong>按人员统计</strong></p>
-          <p style={cssIndent}>周报：（当周有变更项目的需求变更工作量/该项目原始工作量 求和）/当周变更项目数；
-            （该产品经理该周的change_cost_hour字段和 除以 该产品经理该周的project_cost_hour字段和）</p>
-          <p style={cssIndent}>月报：（当月有变更项目的需求变更工作量/该项目原始工作量 求和）/当月变更项目数；
-            （该产品经理该月的change_cost_hour字段和 除以 该产品经理该月的project_cost_hour字段和）</p>
-          <p style={cssIndent}>季报：（当季有变更项目的需求变更工作量/该项目原始工作量 求和）/当季变更项目数；
-            （该产品经理该季度的change_cost_hour字段和 除以 该产品经理该季度的project_cost_hour字段和）</p>
-          <p><strong>按部门/按中心统计</strong></p>
-          <p style={cssIndent}>周报：（当周有变更项目的需求变更工作量/该项目原始工作量 求和）/当周变更项目数；
-            （产品管理部门该周的change_cost_hour字段和 除以 产品管理部门该周的project_cost_hour字段和）</p>
-          <p style={cssIndent}>月报：（当月有变更项目的需求变更工作量/该项目原始工作量 求和）/当月变更项目数；
-            （产品管理部门该月的change_cost_hour字段和 除以 产品管理部门该月的project_cost_hour字段和）</p>
-          <p style={cssIndent}>季报：（当季有变更项目的需求变更工作量/该项目原始工作量 求和）/当季变更项目数；
-            （产品管理部门该季度的change_cost_hour字段和 除以 产品管理部门的project_cost_hour字段和）</p>
+          <p><strong>2.取值范围</strong></p>
+          <p style={cssIndent}>通过徐睿提供的接口获取数据：http://172.32.48.12:9527/case/allCase/（注意：仅取未删除的数据）</p>
+
+          <p style={{color: "#1890FF"}}><strong>3.计算公式说明</strong></p>
+          <p><strong>3.1 按人统计</strong></p>
+          <p style={cssIndent}>按人统计（同按组统计，组员通通都取组的数据）；</p>
+          <p><strong>3.2 按组统计</strong></p>
+          <p style={cssIndent}>周报：该组当周实际创建的有效自动化用例数之和/目标值；</p>
+          <p style={cssIndent}>月报：该组当月实际创建的有效自动化用例数之和/目标值；</p>
+          <p style={cssIndent}>季报：该组当季实际创建的有效自动化用例数之和/目标值；</p>
+          <p><strong>3.3 按部门统计</strong></p>
+          <p style={cssIndent}>周报：该部门当周实际创建的有效自动化用例数之和/目标值；</p>
+          <p style={cssIndent}>月报：该部门当月实际创建的有效自动化用例数之和/目标值；</p>
+          <p style={cssIndent}>季报：该部门当季实际创建的有效自动化用例数之和/目标值；</p>
+          <p><strong>3.4 按中心统计</strong></p>
+          <p style={cssIndent}>按研发中心统计（同按部门统计）；</p>
 
         </Drawer>
       </div>
@@ -393,4 +406,4 @@ const NeedsChangeRate: React.FC<any> = () => {
   );
 };
 
-export default NeedsChangeRate;
+export default BugReturnTableList;

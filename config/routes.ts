@@ -10,10 +10,15 @@ export default [
         path: '/user',
         routes: [
           {
-            name: 'login',
-            path: '/user/login',
-            component: './user/login',
+            name: 'myLogin',
+            path: '/user/myLogin',
+            component: './user/myLogin',
           },
+          // {
+          //   name: 'login',
+          //   path: '/user/login',
+          //   component: './user/login',
+          // },
         ],
       },
     ],
@@ -95,6 +100,8 @@ export default [
     name: '研发绩效数据',
     icon: 'table',
     path: '/kpi',
+    // access: 'canAdmin|testAccess',
+    authority: ['user'],
     routes: [{
       name: '绩效指标',
       icon: 'table',
@@ -205,6 +212,24 @@ export default [
             icon: 'table',
             path: 'avgBugReturnTime',
             component: './kpi/performance/testers/avgBugReturnTime',
+          },
+          {
+            name: '自动化覆盖率',
+            icon: 'table',
+            path: 'autoTestCover',
+            component: './kpi/performance/testers/autoTestCover',
+          },
+          {
+            name: '用例执行量',
+            icon: 'table',
+            path: 'exampleCarryQuantity',
+            component: './kpi/performance/testers/exampleCarryQuantity',
+          },
+          {
+            name: '有效用例率',
+            icon: 'table',
+            path: 'effectiveExampleRate',
+            component: './kpi/performance/testers/effectiveExampleRate',
           }
         ]
       }, {

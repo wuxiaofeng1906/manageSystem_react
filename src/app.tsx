@@ -1,20 +1,20 @@
 import React from 'react';
-import { Settings as LayoutSettings, PageLoading } from '@ant-design/pro-layout';
-import { notification } from 'antd';
-import { history } from 'umi';
+import {Settings as LayoutSettings, PageLoading} from '@ant-design/pro-layout';
+import {notification} from 'antd';
+import {history} from 'umi';
 import RightContent from '@/components/RightContent';
 // import Footer from '@/components/Footer';
-import { ResponseError } from 'umi-request';
+import {ResponseError} from 'umi-request';
 import {ApolloClient, InMemoryCache} from '@apollo/client';
 import {GqlClient} from "@/hooks";
-import { queryCurrent } from './services/user';
+import {queryCurrent} from './services/user';
 import defaultSettings from '../config/defaultSettings';
 
 /**
  * 获取用户信息比较慢的时候会展示一个 loading
  */
 export const initialStateConfig = {
-  loading: <PageLoading />,
+  loading: <PageLoading/>,
 };
 
 const apolloClient = new ApolloClient({
@@ -42,15 +42,22 @@ export async function getInitialState(): Promise<{
 }> {
   const fetchUserInfo = async () => {
     try {
+
       const currentUser = await queryCurrent();
       return currentUser;
     } catch (error) {
-      history.push('/user/login');
+      // history.push('/user/login');
+      history.push('/user/myLogin');
+
     }
     return undefined;
   };
+
+
   // 如果是登录页面，不执行
-  if (history.location.pathname !== '/user/login') {
+  // if (history.location.pathname !== '/user/login') {
+  if (history.location.pathname !== '/user/myLogin') {
+
     const currentUser = await fetchUserInfo();
     return {
       fetchUserInfo,
@@ -67,16 +74,21 @@ export async function getInitialState(): Promise<{
 }
 
 
-export const layout = ({ initialState }: any) => {
+export const layout = ({initialState}: any) => {
   return {
-    rightContentRender: () => <RightContent />,
+    rightContentRender: () => <RightContent/>,
     disableContentMargin: false,
     // footerRender: () => <Footer />,
     onPageChange: () => {
-      const { location } = history;
+      const {location} = history;
       // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== '/user/login') {
-        history.push('/user/login');
+      // if (!initialState?.currentUser && location.pathname !== '/user/login') {
+      //   history.push('/user/login');
+      // }
+
+      if (!initialState?.currentUser && location.pathname !== '/user/myLogin') {
+        history.push('/user/myLogin');
+        // history.push('/welcomes');
       }
     },
     menuHeaderRender: undefined,
@@ -109,10 +121,10 @@ const codeMessage = {
  * 异常处理程序
  */
 const errorHandler = (error: ResponseError) => {
-  const { response } = error;
+  const {response} = error;
   if (response && response.status) {
     const errorText = codeMessage[response.status] || response.statusText;
-    const { status, url } = response;
+    const {status, url} = response;
 
     notification.error({
       message: `请求错误 ${status}: ${url}`,

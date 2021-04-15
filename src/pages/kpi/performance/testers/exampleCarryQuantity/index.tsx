@@ -129,6 +129,7 @@ const columsForQuarters = () => {
 
 // 转化为ag-grid能被显示的格式
 const converseFormatForAgGrid = (oraDatas: any) => {
+  debugger;
 
   groupValues.length = 0;
   moduleValues.length = 0;
@@ -145,7 +146,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     groupValues.push({
       time: starttime,
       group: "研发中心",
-      values: oraDatas[index].total.kpi
+      values: oraDatas[index].datas.length === 0 ? "" : oraDatas[index].datas[0].kpi
     });
 
     const data = oraDatas[index].datas;
@@ -231,16 +232,38 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
     return [];
   }
 
-  //caseRunDept(kind: "${condition.typeFlag}", ends: ${condition.ends})
+  // caseRunDept(kind: "${condition.typeFlag}", ends: ${condition.ends})
   const {data} = await client.query(`
       {
-
-
-
+          caseExecuteDept(kind: "${condition.typeFlag}", ends: ${condition.ends}){
+            total {
+            dept
+            deptName
+            kpi
+          }
+          range {
+            start
+            end
+          }
+          datas {
+            dept
+            deptName
+            kpi
+            parent {
+              dept
+              deptName
+            }
+            users {
+              userId
+              userName
+              kpi
+            }
+          }
+        }
       }
   `);
 
-  const datas = converseFormatForAgGrid(data?.caseRunDept);
+  const datas = converseFormatForAgGrid(data?.caseExecuteDept);
   return converseArrayToOne(datas);
 };
 
@@ -354,35 +377,31 @@ const BugReturnTableList: React.FC<any> = () => {
         <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
                 placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
           <p><strong>1.统计周期</strong></p>
-          <p>1.1 指派时间周期 </p>
-          <p style={cssIndent}>按周统计：用例指派日期为周一00:00:00--周日23:59:59；</p>
-          <p style={cssIndent}>按月统计：用例指派日期为每月1号00:00:00--每月最后1天23:59:59；</p>
-          <p style={cssIndent}>按季统计：用例指派日期为每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
-          <p>1.2 执行时间周期</p>
+
           <p style={cssIndent}>按周统计：用例执行日期为周一00:00:00--周日23:59:59；</p>
           <p style={cssIndent}>按月统计：用例执行日期为每月1号00:00:00--每月最后1天23:59:59；</p>
           <p style={cssIndent}>按季统计：用例执行日期为每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
 
-          <p><strong>2.统计人员</strong></p>
-          <p style={cssIndent}>执行人为测试，且该条case 的rd_zt_testrun表的assignedTo = lastRunner 则将该用例的测试人员记录为 lastRunner的值</p>
+          <p><strong>2.统计范围</strong></p>
+          <p style={cssIndent}>用例统计要求：已评审通过的用例，zt_case.reviewedBy字段值不为空；</p>
 
-          <p style={{color: "#1890FF"}}><strong>3.计算公式说明（允许某周的用例执行率 &gt;100%）</strong></p>
+          <p style={{color: "#1890FF"}}><strong>3.计算公式说明</strong></p>
           <p><strong>3.1 按人统计</strong></p>
-          <p style={cssIndent}>周报：当周实际执行用例数/当周指派给其应执行的用例数；</p>
-          <p style={cssIndent}>月报：当月该测试人员所有关闭bug时长排序，取中位数；</p>
-          <p style={cssIndent}>季报：当季该测试人员所有关闭bug时长排序，取中位数；</p>
+          <p style={cssIndent}>周报：个人当周执行用例数/部门当周执行用例总数；</p>
+          <p style={cssIndent}>月报：个人当月执行用例数/部门当月执行用例总数；</p>
+          <p style={cssIndent}>季报：个人当季执行用例数/部门当季执行用例总数；</p>
+          <p style={cssIndent}> 特别说明：测试经理指标数据=本人个人数据*30%+所负责组的数据*70%;</p>
+
           <p><strong>3.2 按组统计</strong></p>
-          <p style={cssIndent}>周报：该组当周实际执行用例数/该组当周指派给其应执行的用例数；</p>
-          <p style={cssIndent}>月报：该组当月实际执行用例数/该组当月指派给其应执行的用例数；</p>
-          <p style={cssIndent}>季报：该组当季实际执行用例数/该组当季指派给其应执行的用例数；</p>
+          <p style={cssIndent}>周报：该组当周执行用例数/部门当周执行用例总数；</p>
+          <p style={cssIndent}>月报：该组当月执行用例数/部门当月执行用例总数；</p>
+          <p style={cssIndent}>季报：该组当季执行用例数/部门当季执行用例总数；</p>
           <p><strong>3.3 按部门统计</strong></p>
-          <p style={cssIndent}>周报：该部门当周实际执行用例数/该部门当周指派给其应执行的用例数；</p>
-          <p style={cssIndent}>月报：该部门当月实际执行用例数/该部门当月指派给其应执行的用例数；</p>
-          <p style={cssIndent}>季报：该部门当季实际执行用例数/该部门当季指派给其应执行的用例数；</p>
+          <p style={cssIndent}>周报：该部门当周执行用例数/目标值；</p>
+          <p style={cssIndent}>月报：该部门当月执行用例数/目标值；</p>
+          <p style={cssIndent}>季报：该部门当季执行用例数/目标值；</p>
           <p><strong>3.4 按中心统计</strong></p>
-          <p style={cssIndent}>周报：该中心当周实际执行用例数/该中心当周指派给其应执行的用例数；</p>
-          <p style={cssIndent}>月报：该中心当月实际执行用例数/该中心当月指派给其应执行的用例数；</p>
-          <p style={cssIndent}>季报：该中心当季实际执行用例数/该中心当季指派给其应执行的用例数；</p>
+          <p style={cssIndent}>按研发中心统计（同按部门统计）；</p>
 
         </Drawer>
       </div>

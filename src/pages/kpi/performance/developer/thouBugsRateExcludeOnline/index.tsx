@@ -289,7 +289,7 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
   }
   const {data} = await client.query(`
       {
-          bugThousDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, thous:ALL) {
+          bugThousDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, thous:EXCLUDE_ONLINE) {
             total {
               dept
               deptName
@@ -454,6 +454,8 @@ const BugRateTableList: React.FC<any> = () => {
           <p style={cssIndent}>产品为“1.0/1.0正式版--产品经理”“产品实施--实施顾问反馈”“开发自提需求”； </p>
           <p style={cssIndent}>解决方案为“空”“已解决”“延期处理”“后续版本”“代码未合并”的，统计严重程度为P0、P1、P2的bug； </p>
           <p style={cssIndent}>Bug状态 等于“激活”的情况，统计指派给为开发的；Bug状态不等于“激活”（已解决/已关闭），统计解决者为开发的； </p>
+          <p style={cssIndent}>并且操作系统字段不等于“线上存在、线上bug-重复bug、线上bug-界面优化、线上bug-提示语错误、线上bug-漏测、线上bug-引入bug、
+            线上bug-测试范围以外、线上bug-需求相关、线上bug-配置/预置数据问题、线上bug-性能并发问题、线上bug-历史数据、线上bug-不是问题、线上bug-自动化发现； </p>
 
           <p style={{color: "#1890FF"}}><strong>二、计算公式说明</strong></p>
           <p> 1.按人统计（以下人员都特指开发人员） </p>

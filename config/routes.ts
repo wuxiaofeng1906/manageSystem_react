@@ -124,6 +124,12 @@ export default [
             component: './kpi/performance/developer/thousandBugsRate',
           },
           {
+            name: '千行Bug率(不含线上)',
+            icon: 'table',
+            path: 'thouBugsRateExcludeOnline',
+            component: './kpi/performance/developer/thouBugsRateExcludeOnline',
+          },
+          {
             name: '单元测试覆盖率',
             icon: 'table',
             path: '/kpi/performance/developer/coverage',

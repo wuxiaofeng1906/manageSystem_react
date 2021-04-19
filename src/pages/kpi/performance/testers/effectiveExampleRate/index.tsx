@@ -393,21 +393,21 @@ const BugReturnTableList: React.FC<any> = () => {
           <p>2.1、用例统计：</p>
           <p style={cssIndent}> 用例要求，已评审通过的用例，zt_case.reviewedBy字段值不为空;</p>
 
-          <p style={{color: "#1890FF"}}><strong>3.计算公式说明（允许某周的用例执行率 &gt;100%）</strong></p>
+          <p style={{color: "#1890FF"}}><strong>3.计算公式说明</strong></p>
           <p><strong>3.1 按人统计</strong></p>
-          <p style={cssIndent}>周报：（当周该测试创建的有效bug/当周该测试创建的有效用例X100）X（ ∑(各级bug/当周该测试编写用例数X100）X各级bug系数 X100）；</p>
-          <p style={cssIndent}>月报：（当月该测试创建的有效bug/当月该测试创建的有效用例X100）X （∑(各级bug/当月该测试编写用例数X100）X各级bug系数 X100）；</p>
-          <p style={cssIndent}>季报：（当季该测试创建的有效bug/当季该测试创建的有效用例X100）X （∑(各级bug/当季该测试编写用例数X100）X各级bug系数 X100）；</p>
+          <p style={cssIndent}>周报：（当周该测试创建的有效bug/当周该测试创建的有效用例）X（ ∑(各级bug/当周该测试编写用例数X100）X各级bug系数 X100）；</p>
+          <p style={cssIndent}>月报：（当月该测试创建的有效bug/当月该测试创建的有效用例）X （∑(各级bug/当月该测试编写用例数X100）X各级bug系数 X100）；</p>
+          <p style={cssIndent}>季报：（当季该测试创建的有效bug/当季该测试创建的有效用例）X （∑(各级bug/当季该测试编写用例数X100）X各级bug系数 X100）；</p>
           <p><strong>3.2 按组统计</strong></p>
-          <p style={cssIndent}>周报：（当周该组所有测试创建的有效bug/当周该组所有测试创建的有效用例X100）X （∑(各级bug/当周该组所有测试编写用例数X100）X各级bug系数 X100）；</p>
-          <p style={cssIndent}>月报：（当月该组所有测试创建的有效bug/当月该组所有测试创建的有效用例X100）X （∑(各级bug/当月该组所有测试编写用例数X100）X各级bug系数 X100）；</p>
-          <p style={cssIndent}>季报：（当季该组所有测试创建的有效bug/当季该组所有测试创建的有效用例X100）X （∑(各级bug/当季该组所有测试编写用例数X100）X各级bug系数 X100）；</p>
+          <p style={cssIndent}>周报：（当周该组所有测试创建的有效bug/当周该组所有测试创建的有效用例）X （∑(各级bug/当周该组所有测试编写用例数X100）X各级bug系数 X100）；</p>
+          <p style={cssIndent}>月报：（当月该组所有测试创建的有效bug/当月该组所有测试创建的有效用例）X （∑(各级bug/当月该组所有测试编写用例数X100）X各级bug系数 X100）；</p>
+          <p style={cssIndent}>季报：（当季该组所有测试创建的有效bug/当季该组所有测试创建的有效用例）X （∑(各级bug/当季该组所有测试编写用例数X100）X各级bug系数 X100）；</p>
           <p><strong>3.3 按部门统计</strong></p>
-          <p style={cssIndent}>周报：（当周该部门所有测试创建的有效bug/当周该部门所有测试创建的有效用例X100）X （∑(各级bug/当周该部门所有测试编写用例数X100）X各级bug系数
+          <p style={cssIndent}>周报：（当周该部门所有测试创建的有效bug/当周该部门所有测试创建的有效用例）X （∑(各级bug/当周该部门所有测试编写用例数X100）X各级bug系数
             X100）；</p>
-          <p style={cssIndent}>月报：（当月该部门所有测试创建的有效bug/当月该部门所有测试创建的有效用例X100）X （∑(各级bug/当月该部门所有测试编写用例数X100）X各级bug系数
+          <p style={cssIndent}>月报：（当月该部门所有测试创建的有效bug/当月该部门所有测试创建的有效用例）X （∑(各级bug/当月该部门所有测试编写用例数X100）X各级bug系数
             X100）；</p>
-          <p style={cssIndent}>季报：（当季该部门所有测试创建的有效bug/当季该部门所有测试创建的有效用例X100）X（∑(各级bug/当季该部门所有测试编写用例数X100）X各级bug系数
+          <p style={cssIndent}>季报：（当季该部门所有测试创建的有效bug/当季该部门所有测试创建的有效用例）X（∑(各级bug/当季该部门所有测试编写用例数X100）X各级bug系数
             X100）；</p>
           <p><strong>3.4 按中心计算（同按部门计算）</strong></p>
 

@@ -24,7 +24,7 @@ export default {
   },
   pre: {
     '/api/': {
-      target: 'your pre url',
+      target: 'http://dms.q7link.com:8300/',
       changeOrigin: true,
       pathRewrite: { '^': '' },
     },

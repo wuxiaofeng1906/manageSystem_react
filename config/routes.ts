@@ -182,6 +182,11 @@ export default [
             icon: 'table',
             path: 'bugRepairTime',
             component: './kpi/performance/developer/bugRepairTime',
+          }, {
+            name: 'Bug修复率',
+            icon: 'table',
+            path: 'bugRepairRate',
+            component: './kpi/performance/developer/bugRepairRate',
           },
         ]
       }, {

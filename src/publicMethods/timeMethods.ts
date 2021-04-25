@@ -10,9 +10,15 @@ function getWeeksRange(weekCounts: number) {
   const ranges = new Array();
   // 最近几周
   for (let idx = 0; idx < weekCounts; idx += 1) {
-    const week = dayjs().startOf('w').subtract(idx, 'w');
-    const from = week;
-    const to = week.endOf('w');
+
+
+    // const tttt = dayjs().startOf('week').format('YYYY-MM-DD');
+    // const ttttss = dayjs().endOf('week').format('YYYY-MM-DD');
+
+    // debugger;
+    const from = dayjs().subtract(1, 'd').startOf('w').subtract(idx, 'w');
+    const to = from.endOf('w');
+
     const range = {
       from: dayjs(from).add(1, 'day').format('YYYY-MM-DD'),
       to: dayjs(to).add(1, 'day').format('YYYY-MM-DD'),

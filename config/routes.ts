@@ -225,6 +225,12 @@ export default [
             component: './kpi/performance/testers/avgBugReturnTime',
           },
           {
+            name: 'bug回归率',
+            icon: 'table',
+            path: 'bugBugReturnRate',
+            component: './kpi/performance/testers/bugBugReturnRate',
+          },
+          {
             name: '自动化覆盖率',
             icon: 'table',
             path: 'autoTestCover',

@@ -14,7 +14,6 @@ import {
   getFourQuarterTime,
   getParamsByType
 } from '@/publicMethods/timeMethods';
-import {moduleChange} from '@/publicMethods/cellRenderer';
 import {Button, Drawer} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
 import {customRound, getHeight} from "@/publicMethods/pageSet";
@@ -34,27 +33,16 @@ const compColums = [
     field: 'devCenter',
     rowGroup: true,
     hide: true,
-    sort: 'desc'
   }, {
     headerName: '所属部门',
     field: 'dept',
     rowGroup: true,
     hide: true,
-    sort: 'desc'
   }, {
     headerName: '组名',
     field: 'group',
     rowGroup: true,
     hide: true,
-    sort: 'desc'
-  }, {
-    headerName: '所属端',
-    field: 'module',
-    rowGroup: true,
-    hide: true,
-
-    sort: 'desc'
-
   }, {
     headerName: '姓名',
     field: 'username',
@@ -62,45 +50,26 @@ const compColums = [
 
 function codeNumberRender(values: any) {
   const rowName = values.rowNode.key;
-  if (rowName === "前端" || rowName === "后端") {
-
-    for (let i = 0; i < moduleValues.length; i += 1) {
-      const moduleInfo = moduleValues[i];
-      if (values.colDef.field === moduleInfo.time && rowName === moduleInfo.module && values.rowNode.parent.key === moduleInfo.parent) {
-
-        if (moduleInfo.values === null || moduleInfo.values === undefined || moduleInfo.values === "" || moduleInfo.values === "null") {
-          return 100;
-        }
-        if (moduleInfo.values === "0") {
-          return 0;
-        }
-
-        if ((Number(moduleInfo.values) * 100) === 100) {
-          return ` <span style="font-weight: bold">  ${100} </span> `;
-        }
-        return ` <span style="font-weight: bold">  ${customRound((Number(moduleInfo.values) * 100), 2)} </span> `;
+  for (let i = 0; i < groupValues.length; i += 1) {
+    const datas = groupValues[i];
+    if (values.colDef.field === datas.time && rowName === datas.group) {
+      if (datas.values === null || datas.values === undefined || datas.values === "" || datas.values === "null") {
+        return 100;
+      }
+      if (datas.values === "0") {
+        return 0;
       }
 
-    }
-  } else {
 
-    for (let i = 0; i < groupValues.length; i += 1) {
-      const datas = groupValues[i];
-      if (values.colDef.field === datas.time && rowName === datas.group) {
-        if (datas.values === null || datas.values === undefined || datas.values === "" || datas.values === "null") {
-          return 100;
-        }
-
-        if ((Number(datas.values) * 100) === 100) {
-          return ` <span style="font-weight: bold"> ${100} </span> `;
-        }
-        return ` <span style="font-weight: bold"> ${customRound((Number(datas.values) * 100), 2)} </span> `;
-      }
+      // if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
+      //   return ` <span style="color: Silver">  ${0} </span> `;
+      // }
+      return ` <span style="font-weight: bold">  ${(Number(datas.values) * 100).toFixed(2)} </span> `;
     }
   }
-  return 100;
-}
 
+  return ` <span style="color: Silver  ">  ${0} </span> `;
+}
 
 function colorRender(params: any) {
   if (params.value === null || params.value === undefined || params.value === "" || params.value === "null") {
@@ -130,6 +99,19 @@ function colorRender(params: any) {
   return params.value;
 }
 
+// function colorRender(params: any) {
+//
+//   if (params.value === "" || params.value === undefined || Number(params.value) === 0 || Number(params.value) === 0.00) {
+//     return ` <span style="color: Silver  ">  ${0} </span> `;
+//   }
+//
+//   if (Number.isNaN(Number(params.value)) === false) {
+//
+//     return (Number(params.value) * 100).toFixed(2);
+//   }
+//
+//   return params.value;  // 为了将聚合函数实现格式化
+// }
 
 const columsForWeeks = () => {
   const component = new Array();
@@ -190,24 +172,13 @@ const converseFormatForAgGrid = (oraDatas: any) => {
   }
 
   for (let index = 0; index < oraDatas.length; index += 1) {
+
     const starttime = oraDatas[index].range.start;
-    arrays.push({
-        devCenter: "研发中心",
-        "username": "前端",
-        [starttime]: oraDatas[index].side === null ? null : oraDatas[index].side.front
-      }
-    );
-    arrays.push({
-        devCenter: "研发中心",
-        "username": "后端",
-        [starttime]: oraDatas[index].side === null ? null : oraDatas[index].side.backend
-      }
-    );
 
     groupValues.push({
       time: starttime,
       group: "研发中心",
-      values: oraDatas[index].total.kpi
+      values: oraDatas[index].datas[0].kpi
     });
 
     const data = oraDatas[index].datas;
@@ -219,73 +190,30 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         values: data[i].kpi
       }, {
         time: starttime,
-        group: data[i].parent === null ? null : data[i].parent.deptName,
-        values: data[i].parent === null ? null : data[i].parent.kpi
+        group: data[i].parent === null ? "" : data[i].parent.deptName,
+        values: data[i].parent === null ? "" : data[i].parent.kpi
       });
 
-      moduleValues.push({
-        time: starttime,
-        module: "前端",
-        parent: data[i].deptName,
-        values: data[i].side === null ? null : data[i].side.front
-      }, {
-        time: starttime,
-        module: "后端",
-        parent: data[i].deptName,
-        values: data[i].side === null ? null : data[i].side.backend
-      });
 
       const usersData = data[i].users;
       if (usersData !== null) {
         for (let m = 0; m < usersData.length; m += 1) {
           const username = usersData[m].userName;
 
-          // 获取产品研发部前后端的数据
-          if (data[i].deptName === "产品研发部") {
-            arrays.push({
-                devCenter: "研发中心",
-                dept: "产品研发部",
-                "username": "前端 ",
-                [starttime]: data[i].side === null ? null : data[i].side.front
-              }, {
-                devCenter: "研发中心",
-                dept: "产品研发部",
-                "username": "后端 ",   // 故意空一格，以便于区分上一个前后端
-                [starttime]: data[i].side === null ? null : data[i].side.backend
-              }
-            );
-          }
-          // 特殊处理宋老师和王润燕的部门和组
-          if (username === "王润燕") {
+           if (username === "陈诺") {
             arrays.push({
               devCenter: "研发中心",
-              dept: "产品研发部",
+              dept: "测试部",
               "username": username,
               [starttime]: usersData[m].kpi
             });
-          } else if (username === "宋永强") {
-            arrays.push({
-              devCenter: "研发中心",
-              "username": username,
-              [starttime]: usersData[m].kpi
-            });
-          } else if (data[i].parent === null || data[i].parent.deptName === "北京研发中心" || data[i].parent.deptName === "成都研发中心") {  // 如果是（北京或成都）研发中心，去掉部门的显示
-            arrays.push({
-                devCenter: "研发中心",
-                group: data[i].deptName,
-                module: moduleChange(usersData[m].tech),
-                "username": username,
-                [starttime]: usersData[m].kpi
-              }
-            );
           } else {
             arrays.push({
               devCenter: "研发中心",
               dept: data[i].parent.deptName,
               group: data[i].deptName,
-              module: moduleChange(usersData[m].tech),
               "username": username,
-              [starttime]: usersData[m].kpi
+              [starttime]: usersData[m].kpi === null ? "" : Number(usersData[m].kpi)
             });
           }
 
@@ -337,42 +265,33 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
   }
   const {data} = await client.query(`
       {
-         bugRepairRateDept(kind:"${condition.typeFlag}",ends:${condition.ends}){
-          total{
-            deptName
-            kpi
-          }
-          range{
-            start
-            end
-          }
-          side{
-            front
-            backend
-          }
-          datas{
-            dept
-            deptName
-            parent{
-              deptName
-            }
-            side{
-              front
-              backend
-            }
-            kpi
-            users{
-              userId
-              userName
-              kpi
-              tech
+          bugFlybackRateDept(kind:"${condition.typeFlag}",ends:${condition.ends}){
+              total{
+                deptName
+                kpi
+              }
+              range{
+                start
+                end
+              }
+              datas{
+                dept
+                deptName
+                parent{
+                  deptName
+                }
+                kpi
+                users{
+                  userId
+                  userName
+                  kpi
+                }
             }
           }
-        }
       }
   `);
 
-  const datas = converseFormatForAgGrid(data?.bugRepairRateDept);
+  const datas = converseFormatForAgGrid(data?.bugFlybackRateDept);
   return converseArrayToOne(datas);
 };
 
@@ -485,50 +404,37 @@ const BugReopenTableList: React.FC<any> = () => {
                 placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
           <p><strong>一.统计周期</strong></p>
           <p><strong>1.分子统计</strong></p>
-          <p style={cssIndent}>按周统计：bug解决日期为周一00:00:00--周日23:59:59；</p>
-          <p style={cssIndent}>按月统计：bug解决日期为每月1号00:00:00--每月最后1天23:59:59；</p>
-          <p style={cssIndent}>按季统计：bug解决日期为每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
+          <p style={cssIndent}>按周统计：bug关闭日期为周一00:00:00--周日23:59:59；</p>
+          <p style={cssIndent}>按月统计：bug关闭日期为每月1号00:00:00--每月最后1天23:59:59；</p>
+          <p style={cssIndent}>按季统计：bug关闭日期为每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
+          <p style={cssIndent}>特殊说明：bug解决日期&gt;=2021-01-01； </p>
 
           <p><strong>2.分母统计</strong></p>
-          <p style={cssIndent}>含上面1中的分子统计，并且还需要包含当前状态为“激活”且指派给开发的bug，截止当前日期还激活的指派给开发的； </p>
-          <p style={cssIndent}>截止统计日期，开发解决了多少个有效bug，还剩多少个激活bug ；bug修复率=解决有效bug数/（截止当前激活bug数+解决有效bug数）*100； </p>
+          <p style={cssIndent}>含上面1中的分子统计，并且还需要包含截止当前日期状态为“已解决”且指派给测试的bug； </p>
+          <p style={cssIndent}>截止统计日期，测试已回归了多少个有效bug，还剩多少个已解决bug
+            未回归；bug回归率=测试已回归的有效bug数/（截止当前日期已解决且指派给测试的bug数+测试已回归的有效bug数）*100； </p>
 
           <p><strong>二.统计范围</strong></p>
-          <p style={cssIndent}>分子统计bug当前状态为“已解决 或 已关闭” ，且解决者为开发的；</p>
-          <p style={cssIndent}>分母统计bug含上面第1条中的bug，还需包含当前状态为激活且指派给开发的；</p>
-          <p style={cssIndent}>统计解决方案为有效的“已解决、后续版本、延期处理、代码未合并”；</p>
-
+          <p style={cssIndent}>分子只统计最后一次关闭前的最近一次解决方案为“已解决、延期处理、后续版本、未合并代码”的
+            （'fixed','nextversion','postponed','code_not_merge'）；</p>
+          <p style={cssIndent}>分母除统计上面第1条外，还需统计截止统计时间当前日期bug状态为已解决且指派给为测试的bug数；</p>
 
           <p style={{color: "#1890FF"}}><strong>三.计算公式</strong></p>
-          <p style={cssIndent}>周报：当周解决后重新激活的bug数/当周解决的bug数；</p>
-          <p style={cssIndent}>月报：当月解决后重新激活的bug数/当月解决的bug数；</p>
-          <p style={cssIndent}>季报：当季解决后重新激活的bug数/当季解决的bug数；</p>
 
           <p><strong>1.按人统计</strong></p>
-          <p style={cssIndent}>周报：该开发当周解决的有效bug数/截止当周指派给开发所有的有效bug总数*100
-            （举例分母说明：截止当周星期天23:59:59前，指派给该开发还是激活的bug+当周该开发解决的所有有效bug数）；</p>
-          <p style={cssIndent}>月报：该开发当月解决的有效bug数/截止当月指派给开发所有的有效bug总数*100 ；</p>
-          <p style={cssIndent}>季报：该开发当季解决的有效bug数/截止当季指派给开发所有的有效bug总数*100 ；</p>
-          <p><strong>2.按端统计</strong></p>
-          <p style={cssIndent}>周报：该端所有开发当周解决的有效bug数/截止当周指派给该端所有开发的所有有效bug总数*100
-            （分母说明：截止当周星期天23:59:59前，指派给该端所有开发还是激活的bug+当周该端开发解决的所有有效bug数）；</p>
-          <p style={cssIndent}>月报：该端所有开发当月解决的有效bug数/截止当月指派给该端所有开发的所有有效bug总数*100；</p>
-          <p style={cssIndent}>季报：该端所有开发当季解决的有效bug数/截止当季指派给该端所有开发的所有有效bug总数*100；</p>
-          <p><strong>3.按组统计</strong></p>
-          <p style={cssIndent}>周报：该组所有开发当周解决的有效bug数/截止当周指派给该组所有开发的所有有效bug总数*100
-            （分母说明：截止当周星期天23:59:59前，指派给该组所有开发还是激活的bug+当周该组开发解决的所有有效bug数）；</p>
-          <p style={cssIndent}>月报：该组所有开发当月解决的有效bug数/截止当月指派给该组所有开发的所有有效bug总数*100 ；</p>
-          <p style={cssIndent}>季报：该组所有开发当季解决的有效bug数/截止当季指派给该组所有开发的所有有效bug总数*100 ；</p>
-          <p><strong>4.按部门统计</strong></p>
-          <p style={cssIndent}>周报：该部门所有开发当周解决的有效bug数/截止当周指派给该部门所有开发的所有有效bug总数*100
-            （分母说明：截止当周星期天23:59:59前，指派给该部门所有开发还是激活的bug+当周该部门开发解决的所有有效bug数）；</p>
-          <p style={cssIndent}>月报：该部门所有开发当月解决的有效bug数/截止当月指派给该部门所有开发的所有有效bug总数*100 ；</p>
-          <p style={cssIndent}>季报：该部门所有开发当季解决的有效bug数/截止当季指派给该部门所有开发的所有有效bug总数*100；</p>
-          <p><strong>5.按中心统计</strong></p>
-          <p style={cssIndent}>周报：该中心所有开发当周解决的有效bug数/截止当周指派给该中心所有开发的所有有效bug总数*100
-            （分母说明：截止当周星期天23:59:59前，指派给该中心所有开发还是激活的bug+当周该中心开发解决的所有有效bug数）；</p>
-          <p style={cssIndent}>月报：该中心所有开发当月解决的有效bug数/截止当月指派给该中心所有开发的所有有效bug总数*100 ；</p>
-          <p style={cssIndent}>季报：该中心所有开发当季解决的有效bug数/截止当季指派给该中心所有开发的所有有效bug总数*100 ；</p>
+          <p style={cssIndent}>周报：该测试当周关闭的有效bug数/截止当周指派给该测试所有的有效bug总数*100
+            （举例分母说明：截止当周星期天23:59:59前，指派给该测试还是已解决的bug+当周该测试关闭的所有有效bug数）；</p>
+          <p style={cssIndent}>月报：该测试当月关闭的有效bug数/截止当月指派给该测试所有的有效bug总数*100；</p>
+          <p style={cssIndent}>季报：该测试当季关闭的有效bug数/截止当季指派给该测试所有的有效bug总数*100 ；</p>
+          <p><strong>2.按组统计</strong></p>
+          <p style={cssIndent}>周报：该组当周关闭的有效bug数/截止当周指派给该组所有的有效bug总数*100</p>
+          <p style={cssIndent}>月报：该组当月关闭的有效bug数/截止当月指派给该组所有的有效bug总数*100 ；</p>
+          <p style={cssIndent}>季报：该该组当季关闭的有效bug数/截止当季指派给该组所有的有效bug总数*100；</p>
+          <p><strong>3.按部门统计</strong></p>
+          <p style={cssIndent}>周报：该部门当周关闭的有效bug数/截止当周指派给该部门所有的有效bug总数*100 </p>
+          <p style={cssIndent}>月报：该部门当月关闭的有效bug数/截止当月指派给该部门所有的有效bug总数*100 ；</p>
+          <p style={cssIndent}>季报：该部门当季关闭的有效bug数/截止当季指派给该部门所有的有效bug总数*100 ；</p>
+          <p><strong>4.按中心统计（同按部门统计）</strong></p>
 
 
         </Drawer>

@@ -17,9 +17,6 @@ import {fakeAccountLogin, getFakeCaptcha, LoginParamsType} from '@/services/logi
 
 import styles from './index.less';
 
-// import mymodule from 'http://rescdn.qqmail.com/node/ww/wwopenmng/js/sso/wwLogin-1.0.0.js';
-
-
 
 const LoginMessage: React.FC<{
   content: string;
@@ -47,78 +44,44 @@ const goto = () => {
   }, 10);
 };
 
-// const wxLogin = () => {
-//   const a: any = window;
-//   const b: any = document;
-//   const c: any = {
-//     "id": "container",
-//     "appid": "ww90adb0abc37b79c8",
-//     "agentid": 1000002,
-//     "redirect_uri": encodeURIComponent('http://6ea44098830f.ngrok.io/welcomes'),
-//     "state": "ww90adb0abc37b79c8",
-//     "href": "",
-//   };
-//
-//   const d: any = b.createElement("iframe");
-//   let e: string = `https://open.work.weixin.qq.com/wwopen/sso/qrConnect?appid=${c.appid}&agentid=${c.agentid}&redirect_uri=${c.redirect_uri}&state=${c.state}&login_type=jssdk`;
-//   e += c.style ? `&style=${c.style}` : "";
-//   e += c.href ? `&href=${c.href}` : "";
-//   d.src = e;
-//   d.frameBorder = "0";
-//   d.allowTransparency = "true";
-//
-//   d.sandbox = "allow-scripts allow-top-navigation";// 修改的代码在此处，
-//   d.scrolling = "no";
-//   d.width = "300px";
-//   d.height = "400px";
-//   const f = b.getElementById(c.id);
-//   f.innerHTML = "";
-//   f.appendChild(d);
-//   d.onload = function () {
-//     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-//     d.contentWindow.postMessage && a.addEventListener &&
-//     (a.addEventListener("message", function () {
-//
-//       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-//       b.data && b.origin.indexOf("work.weixin.qq.com") > -1 && (a.location.href = b.data);
-//     }),
-//       d.contentWindow.postMessage("ask_usePostMessage", "*"));
-//   };
-// };
-
-
-
-
 const wxLogin = () => {
+  setTimeout(function () {
+    // window.WwLogin({
+    //   "id": "container",
+    //   "appid": "ww90adb0abc37b79c8",
+    //   "agentid": 1000002,
+    //   "redirect_uri": encodeURIComponent('dms.q7link.com'),
+    //   "state": "ww90adb0abc37b79c8",
+    //   "href": "",
+    // });
 
-  // const script = document.createElement('script');
-  // script.type = 'text/javascript';
-  // script.async = false;
-  // script.src = 'http://rescdn.qqmail.com/node/ww/wwopenmng/js/sso/wwLogin-1.0.0.js';
-  // document.head.appendChild(script);
-
-  // window.WwLogin({
-  //   "id": "container",
-  //   "appid": "ww90adb0abc37b79c8",
-  //   "agentid": 1000002,
-  //   "redirect_uri": encodeURIComponent('http://6ea44098830f.ngrok.io/welcomes'),
-  //   "state": "ww90adb0abc37b79c8",
-  //   "href": "",
-  // });
-
+    (window as any).WwLogin({
+      "id": "container",
+      "appid": "ww90adb0abc37b79c8",
+      "agentid": 1000002,
+      "redirect_uri": encodeURIComponent('http://dms.q7link.com:8000/welcomes'),
+      "state": "ww90adb0abc37b79c8",
+      "href": "",
+    });
+  }, 500);
 };
 
-const Login: React.FC<{}> = () => {
+// 添加企业微信需要的script标签
+const qywxScript = () => {
+
   const script = document.createElement('script');
   script.type = 'text/javascript';
   script.async = false;
   script.src = 'http://rescdn.qqmail.com/node/ww/wwopenmng/js/sso/wwLogin-1.0.0.js';
   document.head.appendChild(script);
 
+};
+
+const Login: React.FC<{}> = () => {
+
   useEffect(() => {
     wxLogin();
   }, []);
-
 
   const [submitting, setSubmitting] = useState(false);
   const [userLoginState, setUserLoginState] = useState<API.LoginStateType>({});
@@ -175,17 +138,19 @@ const Login: React.FC<{}> = () => {
   const {status, type: loginType} = userLoginState;
 
   return (
+
     <div className={styles.container}>
+      {qywxScript()}
       <div className={styles.lang}>{SelectLang && <SelectLang/>}</div>
       <div className={styles.content}>
         <div className={styles.top}>
           <div className={styles.header}>
             <Link to="/">
               <img alt="logo" className={styles.logo} src="/logo.svg"/>
-              <span className={styles.title}>Ant Design</span>
+              <span className={styles.title}>企企研发管理平台</span>
             </Link>
           </div>
-          <div className={styles.desc}>Ant Design 是西湖区最具影响力的 Web 设计规范</div>
+          <div className={styles.desc}></div>
         </div>
 
         <div className={styles.main}>
@@ -389,6 +354,8 @@ const Login: React.FC<{}> = () => {
         </div>
       </div>
       <Footer/>
+
+
     </div>
   );
 };

@@ -80,7 +80,7 @@ const qywxScript = () => {
 const Login: React.FC<{}> = () => {
 
   useEffect(() => {
-    wxLogin();
+    // wxLogin();
   }, []);
 
   const [submitting, setSubmitting] = useState(false);

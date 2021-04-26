@@ -49,6 +49,7 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
         }
       }
   `);
+
   return data?.project;
 };
 
@@ -536,7 +537,7 @@ const SprintList: React.FC<any> = () => {
   /* region 删除功能 */
   // 删除sprint列表
   const [isdelModalVisible, setIsDelModalVisible] = useState(false);
-  // 删除按钮点击
+  // 删除按钮点击，弹出删除确认框
   const deleteSprintList = () => {
     // 判断是否选中数据
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
@@ -582,6 +583,7 @@ const SprintList: React.FC<any> = () => {
     // });
   };
 
+  // 请求删除选中的行
   const delSprintList = () => {
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
     const prjId = selRows[0].id;
@@ -659,19 +661,17 @@ const SprintList: React.FC<any> = () => {
             mode="tags"
             style={{width: '18%'}}
             onChange={prjTypeChanged}
-          >
-            {' '}
-            {[
-              <Option key={'sprint'} value={'sprint'}>
-                sprint{' '}
-              </Option>,
-              <Option key={'hotfix'} value={'hotfix'}>
-                hotfix{' '}
-              </Option>,
-              <Option key={'emergency'} value={'emergency'}>
-                emergency{' '}
-              </Option>,
-            ]}
+          >{[
+            <Option key={'sprint'} value={'sprint'}>
+              sprint{' '}
+            </Option>,
+            <Option key={'hotfix'} value={'hotfix'}>
+              hotfix{' '}
+            </Option>,
+            <Option key={'emergency'} value={'emergency'}>
+              emergency{' '}
+            </Option>,
+          ]}
           </Select>
 
           <label style={{marginLeft: '10px'}}>时间：</label>
@@ -692,16 +692,16 @@ const SprintList: React.FC<any> = () => {
           >
             {[
               <Option key={'closed'} value={'closed'}>
-                已关闭{' '}
+                已关闭
               </Option>,
               <Option key={'doing'} value={'doing'}>
-                进行中{' '}
+                进行中
               </Option>,
               <Option key={'suspended'} value={'suspended'}>
-                已挂起{' '}
+                已挂起
               </Option>,
               <Option key={'wait'} value={'wait'}>
-                未开始{' '}
+                未开始
               </Option>,
             ]}
           </Select>
@@ -710,43 +710,17 @@ const SprintList: React.FC<any> = () => {
 
       {/* 新增、修改、删除按钮栏 */}
       <div style={{background: 'white'}}>
-        {' '}
         {/* 使用一个图标就要导入一个图标 */}
         <Button type="text" style={{color: 'black'}} size={'large'} onClick={showDefalultValue}>
-          {' '}
-          默认：
-        </Button>
+          默认：</Button>
         <label style={{color: 'black'}}> 近1月未关闭的</label>
         {/* <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}> 近1月未关闭的 </Button> */}
-        <Button
-          type="text"
-          style={{color: 'black', float: 'right'}}
-          icon={<DeleteTwoTone/>}
-          size={'large'}
-          onClick={deleteSprintList}
-        >
-          删除{' '}
-        </Button>
-        <Button
-          type="text"
-          style={{color: 'black', float: 'right'}}
-          icon={<EditTwoTone/>}
-          size={'large'}
-          onClick={modifyProject}
-        >
-          {' '}
-          修改{' '}
-        </Button>
-        <Button
-          type="text"
-          style={{color: 'black', float: 'right'}}
-          icon={<FolderAddTwoTone/>}
-          size={'large'}
-          onClick={addProject}
-        >
-          {' '}
-          新增{' '}
-        </Button>
+        <Button type="text" style={{color: 'black', float: 'right'}} icon={<DeleteTwoTone/>} size={'large'}
+                onClick={deleteSprintList}>删除</Button>
+        <Button type="text" style={{color: 'black', float: 'right'}} icon={<EditTwoTone/>} size={'large'}
+                onClick={modifyProject}>修改</Button>
+        <Button type="text" style={{color: 'black', float: 'right'}} icon={<FolderAddTwoTone/>} size={'large'}
+                onClick={addProject}>新增</Button>
       </div>
 
       {/* ag-grid 表格定义 */}
@@ -770,7 +744,9 @@ const SprintList: React.FC<any> = () => {
           // suppressMakeColumnVisibleAfterUnGroup // 如果用户在移动列时不小心将列移出了网格，但并不打算将其隐藏，那么这就很方便。
           // rowGroupPanelShow="always"
           onGridReady={onGridReady}
-        ></AgGridReact>
+        >
+
+        </AgGridReact>
       </div>
 
       {/* 弹出层定义 */}
@@ -790,16 +766,15 @@ const SprintList: React.FC<any> = () => {
                   <Input.Group compact>
                     <Form.Item name="prjNames">
                       <Select id={'prjNames'} placeholder="请选择类型" style={{width: '150px'}}>
-                        {' '}
                         {[
                           <Option key={'sprint'} value={'sprint'}>
-                            sprint{' '}
+                            sprint
                           </Option>,
                           <Option key={'hotfix'} value={'hotfix'}>
-                            hotfix{' '}
+                            hotfix
                           </Option>,
                           <Option key={'emergency'} value={'emergency'}>
-                            emergency{' '}
+                            emergency
                           </Option>,
                         ]}
                       </Select>
@@ -878,16 +853,16 @@ const SprintList: React.FC<any> = () => {
                   <Select placeholder="请选择" style={widths}>
                     {[
                       <Option key={'closed'} value={'closed'}>
-                        已关闭{' '}
+                        已关闭
                       </Option>,
                       <Option key={'doing'} value={'doing'}>
-                        进行中{' '}
+                        进行中
                       </Option>,
                       <Option key={'suspended'} value={'suspended'}>
-                        已挂起{' '}
+                        已挂起
                       </Option>,
                       <Option key={'wait'} value={'wait'}>
-                        未开始{' '}
+                        未开始
                       </Option>,
                     ]}
                   </Select>

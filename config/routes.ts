@@ -56,45 +56,70 @@ export default [
   //   path: '/users/list',
   //   component: './dashboard/developer',
   // },
-
-  // {
-  //   name: 'sprint 工作台',
-  //   icon: 'table',
-  //   path: '/sprint',
-  //   routes: [
-  //     {
-  //       name: 'dsahboard',
-  //       path: 'sprintDashboard',
-  //       component: './sprint/sprintDashboard/sprintDashboard',
-  //     },
-  //     {
-  //       name: 'bug明细（待隐藏）',
-  //       path: 'basicTable/bug',
-  //       component: './sprint/basicTable/bug',
-  //     },
-  //     {
-  //       name: 'story（待隐藏）',
-  //       path: 'basicTable/story',
-  //       component: './sprint/basicTable/story',
-  //     },
-  //     {
-  //       name: 'task（待隐藏）',
-  //       path: 'basicTable/task',
-  //       component: './sprint/basicTable/task',
-  //     },
-  //     {
-  //       name: 'sprint 列表',
-  //       path: 'sprintList',
-  //       component: './sprint/sprintList/sprintList',
-  //     },
-  //     {
-  //       name: 'sprint 项目详情',
-  //       path: 'sprintListDetails',
-  //       hideInMenu: true,
-  //       component: './sprint/sprintListDetails/sprintListDetails',
-  //     }
-  //   ],
-  // },
+  {
+    name: 'sprint 工作台',
+    icon: 'table',
+    path: '/sprint',
+    // hideInMenu:true,
+    routes: [
+      {
+        name: 'dsahboard',
+        path: 'sprintDashboard',
+        component: './sprint/sprintDashboard/sprintDashboard',
+      },
+      {
+        name: 'bug明细（待隐藏）',
+        path: 'basicTable/bugs/bug',
+        component: './sprint/basicTable/bugs/bug',
+      }, {
+        name: '无指派bug（待隐藏）',
+        path: 'basicTable/bugs/bugs-noAssign',
+        component: './sprint/basicTable/bugs/bugs-noAssign',
+      }, {
+        name: '无排期bug（待隐藏）',
+        path: 'basicTable/bugs/bugs-noSchedule',
+        component: './sprint/basicTable/bugs/bugs-noSchedule',
+      },
+      {
+        name: '激活bug（待隐藏）',
+        path: 'basicTable/bugs/bugs-actived',
+        component: './sprint/basicTable/bugs/bugs-actived',
+      }, {
+        name: '已关闭bug（待隐藏）',
+        path: 'basicTable/bugs/bugs-closed',
+        component: './sprint/basicTable/bugs/bugs-closed',
+      }, {
+        name: '已解决bug（待隐藏）',
+        path: 'basicTable/bugs/bugs-resolved',
+        component: './sprint/basicTable/bugs/bugs-resolved',
+      }, {
+        name: '已验证bug（待隐藏）',
+        path: 'basicTable/bugs/bugs-verified',
+        component: './sprint/basicTable/bugs/bugs-verified',
+      },
+      {
+        name: 'story（待隐藏）',
+        path: 'basicTable/story',
+        component: './sprint/basicTable/stories/story',
+      },
+      {
+        name: 'task（待隐藏）',
+        path: 'basicTable/task',
+        component: './sprint/basicTable/tasks/task',
+      },
+      {
+        name: 'sprint 列表',
+        path: 'sprintList',
+        component: './sprint/sprintList/sprintList',
+      },
+      {
+        name: 'sprint 项目详情',
+        path: 'sprintListDetails',
+        hideInMenu: true,
+        component: './sprint/sprintListDetails/sprintListDetails',
+      }
+    ],
+  },
 
   {
     name: '研发绩效数据',

@@ -209,7 +209,6 @@ function addGroupAndDept(oraDatas: any) {
   branModuleValues.length = 0;
   const objectDataArray: string | any[] = [];
   for (let index = 0; index < oraDatas.length; index += 1) {
-    debugger;
     if (oraDatas[index] !== null) {
       const orderTime = oraDatas[index].range.end;
       // 研发中心数据
@@ -323,9 +322,8 @@ function addGroupAndDept(oraDatas: any) {
             values: weekDatas[i].side === null ? "" : customRound(Number(weekDatas[i].side.backend.branCove) * 100, 2),
           });
 
-          let index2;
           // 此循环用于处理个人的覆盖率
-          for (index2 = 0; index2 < userInfo.length; index2 += 1) {
+          for (let index2 = 0; index2 < userInfo.length; index2 += 1) {
             if (userInfo[index2].userName !== "王润燕" && userInfo[index2].userName !== "宋永强") {
               if (weekDatas[i].parent === null || weekDatas[i].parent.deptName === "北京研发中心" || weekDatas[i].parent.deptName === "成都研发中心") {  // 如果是（北京或成都）研发中心，去掉部门的显示
                 if (weekDatas[i].parent.deptName !== "研发中心") {
@@ -340,7 +338,7 @@ function addGroupAndDept(oraDatas: any) {
                   );
                 }
 
-              } else if(groupInfo !=="北京研发中心" && deptInfo !=="研发中心") {
+              } else if (groupInfo !== "北京研发中心" && deptInfo !== "研发中心") {
                 objectDataArray.push({
                   devCenter: "研发中心",
                   group: groupInfo,
@@ -352,7 +350,6 @@ function addGroupAndDept(oraDatas: any) {
                 });
               }
 
-
             }
           }
         }
@@ -360,7 +357,6 @@ function addGroupAndDept(oraDatas: any) {
     }
   }
 
-  debugger;
   return objectDataArray;
 };
 
@@ -580,10 +576,6 @@ const CodeReviewTableList: React.FC<any> = () => {
           suppressAggFuncInHeader={true}   // 不显示标题聚合函数的标识
           rowHeight={32}
           headerHeight={35}
-          // pivotColumnGroupTotals={'always'}
-          // groupHideOpenParents={true}  // 组和人名同一列
-
-          // rowGroupPanelShow={'always'}  可以拖拽列到上面
           onGridReady={onGridReady}
         >
         </AgGridReact>
@@ -591,10 +583,19 @@ const CodeReviewTableList: React.FC<any> = () => {
       <div>
         <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
                 placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
-          <p><strong>1.计算公式说明</strong></p>
-          <p style={cssIndent}>周报：累计当周的Statements值；</p>
-          <p style={cssIndent}>月报：累计当月的Statements值；</p>
-          <p style={cssIndent}>季报：累计当季的Statements值；</p>
+          <p><strong>1.统计周期</strong></p>
+
+          <p style={cssIndent}>按周统计：覆盖率为当周最新的覆盖率(累计)；</p>
+          <p style={cssIndent}>按月统计：覆盖率为当月最新的覆盖率(累计)；</p>
+          <p style={cssIndent}>按季统计：覆盖率为当季度最新的覆盖率(累计)；</p>
+
+          <p style={{color: "#1890FF"}}><strong>2.计算公式</strong></p>
+          <p style={cssIndent}>结构覆盖率 = 所拥有文件结构覆盖数之和/所有拥有文件总结构数之和；</p>
+          <p style={cssIndent}>分支覆盖率 = 所拥有文件分支覆盖数之和/所有拥有文件总分支数之和；</p>
+
+          <p><strong>3.取值</strong></p>
+          <p style={cssIndent}>前端取值：结构数：Statements；支数：Branches；</p>
+          <p style={cssIndent}>后端取值：结构数：Instructions Cov；分支数：Branches；</p>
 
         </Drawer>
       </div>

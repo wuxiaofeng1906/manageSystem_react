@@ -22,7 +22,7 @@ import {getHeight} from "@/publicMethods/pageSet";
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(8);
 const monthRanges = getTwelveMonthTime();
-const quarterTime = getFourQuarterTime();
+const quarterTime = getFourQuarterTime(true);
 const groupValues: any[] = [];
 const moduleValues: any[] = [];
 
@@ -208,7 +208,7 @@ const converseArrayToOne = (data: any) => {
 };
 
 const queryBugResolutionCount = async (client: GqlClient<object>, params: string) => {
-  const condition = getParamsByType(params);
+  const condition = getParamsByType(params,true);
   if (condition.typeFlag === 0) {
     return [];
   }

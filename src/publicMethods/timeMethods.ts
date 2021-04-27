@@ -79,9 +79,9 @@ function getRecentMonth() {
 
 
 // 获取12个月的 开始和结束时间
-function getTwelveMonthTime() {
+function getTwelveMonthTime(monthCount: number = 12) {
   const monthArray = [];
-  for (let index = 0; index < 12; index += 1) {
+  for (let index = 0; index < monthCount; index += 1) {
     const currentMonth = dayjs().subtract(index, 'month');
     const from = dayjs(currentMonth).startOf('month').format('YYYY-MM-DD');
     const to = dayjs(currentMonth).endOf('month').format('YYYY-MM-DD');

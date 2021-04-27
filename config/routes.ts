@@ -60,7 +60,7 @@ export default [
     name: 'sprint 工作台',
     icon: 'table',
     path: '/sprint',
-    // hideInMenu:true,
+    hideInMenu:true,
     routes: [
       {
         name: 'dsahboard',
@@ -169,18 +169,19 @@ export default [
                 name: '按组',
                 icon: 'table',
                 path: '/kpi/performance/developer/coverage/byGroup',
-                routes: [
-                  {
-                    name: '前端',
-                    path: '/kpi/performance/developer/coverage/byGroup/front',
-                    component: './kpi/performance/developer/coverage/byGroup/front',
-                  },
-                  {
-                    name: '后端',
-                    path: '/kpi/performance/developer/coverage/byGroup/backend',
-                    component: './kpi/performance/developer/coverage/byGroup/backend',
-                  },
-                ],
+                component: './kpi/performance/developer/coverage/byGroup',
+                // routes: [
+                //   {
+                //     name: '前端',
+                //     path: '/kpi/performance/developer/coverage/byGroup/front',
+                //     component: './kpi/performance/developer/coverage/byGroup/front',
+                //   },
+                //   {
+                //     name: '后端',
+                //     path: '/kpi/performance/developer/coverage/byGroup/backend',
+                //     component: './kpi/performance/developer/coverage/byGroup/backend',
+                //   },
+                // ],
               },
             ],
           },

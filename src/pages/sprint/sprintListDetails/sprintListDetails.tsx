@@ -30,6 +30,8 @@ import {
 } from '@/publicMethods/cellRenderer';
 import axios from 'axios';
 import moment from "moment";
+import {getHeight} from '@/publicMethods/pageSet';
+
 
 const {Option} = Select;
 
@@ -1362,14 +1364,13 @@ const SprintList: React.FC<any> = () => {
       </div>
 
       {/* ag-grid 表格定义 */}
-      <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: getHeight(), width: '100%'}}>
         <AgGridReact
           columnDefs={colums()} // 定义列
           rowData={data} // 数据绑定
           defaultColDef={{
             resizable: true,
             sortable: true,
-            // floatingFilter: true,
             filter: true,
             flex: 1,
             minWidth: 100,
@@ -1379,11 +1380,9 @@ const SprintList: React.FC<any> = () => {
           }}
           rowSelection={'multiple'} // 设置多行选中
           groupDefaultExpanded={9} // 展开分组
-          // suppressDragLeaveHidesColumns // 取消分组时，例如单击删除区域中某一列上的“ x” ，该列将不可见
-          // suppressMakeColumnVisibleAfterUnGroup // 如果用户在移动列时不小心将列移出了网格，但并不打算将其隐藏，那么这就很方便。
-          // rowGroupPanelShow="always"
           onGridReady={onGridReady}
-        > </AgGridReact>
+        />
+
       </div>
 
       {/* admin新增和修改表单 */}

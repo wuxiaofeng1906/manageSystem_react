@@ -1,26 +1,29 @@
-import React, { useRef } from 'react';
+import React, {useRef} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {QueryFilter, ProFormDateRangePicker, ProFormSelect} from '@ant-design/pro-form';
 import {AgGridColumn, AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import { useRequest } from 'ahooks';
+import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {GqlClient, useGqlClient, useQuery} from "@/hooks";
 import moment from "moment";
 import {getRanges, thisWeekValue} from "@/utils/data-range-picker.util";
+import {getHeight} from '@/publicMethods/pageSet';
+
 
 type FormStoreType = {
   dateRange?: [string, string];
   deptId?: number;
-}
+};
 
 const queryDevelopViews = async (client: GqlClient<object>, value: FormStoreType = {}) => {
-  let from = 0; let to = 0;
-  const { dateRange, deptId = 0 } = value;
+  let from = 0;
+  let to = 0;
+  const {dateRange, deptId = 0} = value;
 
-  if (! dateRange) {
+  if (!dateRange) {
     from = moment().startOf('month').valueOf();
     to = moment().endOf('month').valueOf();
   } else {
@@ -32,7 +35,7 @@ const queryDevelopViews = async (client: GqlClient<object>, value: FormStoreType
   // const query = new GqlQueryBuilder('developerView', { deptIds: [deptId]})
   //   .find()
 
-  const { data } = await client.query(`
+  const {data} = await client.query(`
        {
           developerView(deptIds: [${deptId}]) {
             user {
@@ -62,8 +65,8 @@ const queryDevelopViews = async (client: GqlClient<object>, value: FormStoreType
   return data?.developerView;
 };
 
-const DataFilter = ( { refresh }: { refresh: any }) => {
-  const { data: {depts = []} = {} } = useQuery(`
+const DataFilter = ({refresh}: { refresh: any }) => {
+  const {data: {depts = []} = {}} = useQuery(`
 {
   depts {
     id
@@ -75,7 +78,7 @@ const DataFilter = ( { refresh }: { refresh: any }) => {
 }
   `)
 
-  const deptOptions = depts.map( (x: any) => ({
+  const deptOptions = depts.map((x: any) => ({
     value: x.id,
     label: x.name,
   }));
@@ -107,13 +110,13 @@ const DataFilter = ( { refresh }: { refresh: any }) => {
         options={deptOptions}
       />
     </QueryFilter>
-  )
-}
+  );
+};
 
 const TableList: React.FC<any> = () => {
   const gridApi = useRef<GridApi>();
-  const gqlClient  = useGqlClient();
-  const { data, run, loading } = useRequest((value: FormStoreType) => queryDevelopViews(gqlClient, value))
+  const gqlClient = useGqlClient();
+  const {data, run, loading} = useRequest((value: FormStoreType) => queryDevelopViews(gqlClient, value))
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -131,7 +134,7 @@ const TableList: React.FC<any> = () => {
       <DataFilter refresh={run}/>
 
       <div className="ag-theme-alpine"
-           style={ {height: 700, width: '100%' } }
+           style={{height: getHeight(), width: '100%'}}
       >
         <AgGridReact
           rowData={data}
@@ -151,7 +154,7 @@ const TableList: React.FC<any> = () => {
           rowGroupPanelShow='always'
           onGridReady={onGridReady}
         >
-          <AgGridColumn field="user.dept.name" headerName="部门" enableRowGroup />
+          <AgGridColumn field="user.dept.name" headerName="部门" enableRowGroup/>
           <AgGridColumn field="user.account"/>
           <AgGridColumn field="user.realname"/>
           <AgGridColumn field="user.pinyin"/>
@@ -168,7 +171,7 @@ const TableList: React.FC<any> = () => {
         </AgGridReact>
       </div>
     </PageContainer>
-  )
-}
+  );
+};
 
 export default TableList;

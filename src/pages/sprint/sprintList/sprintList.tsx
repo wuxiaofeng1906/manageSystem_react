@@ -11,6 +11,8 @@ import moment from 'moment';
 import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col} from 'antd';
 import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone} from '@ant-design/icons';
 import {getRecentMonth, formatMomentTime} from '@/publicMethods/timeMethods';
+import {getHeight} from '@/publicMethods/pageSet';
+
 import axios from 'axios';
 import {history} from 'umi';
 
@@ -724,7 +726,7 @@ const SprintList: React.FC<any> = () => {
       </div>
 
       {/* ag-grid 表格定义 */}
-      <div className="ag-theme-alpine" style={{height: 1000, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: getHeight(), width: '100%'}}>
         <AgGridReact
           columnDefs={colums()} // 定义列
           rowData={data} // 数据绑定
@@ -745,7 +747,6 @@ const SprintList: React.FC<any> = () => {
           // rowGroupPanelShow="always"
           onGridReady={onGridReady}
         >
-
         </AgGridReact>
       </div>
 

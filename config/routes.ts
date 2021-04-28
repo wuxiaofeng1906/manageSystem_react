@@ -65,7 +65,7 @@ export default [
       {
         name: 'dsahboard',
         path: 'sprintDashboard',
-        component: './sprint/sprintDashboard/sprintDashboard',
+        component: './sprint/sprintDashboard',
       },
       {
         name: 'bug明细（待隐藏）',

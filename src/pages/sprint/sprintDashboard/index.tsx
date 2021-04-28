@@ -18,7 +18,7 @@ const DashBoard: React.FC<any> = () => {
       <div>
         {/* emergency */}
         <div style={{marginLeft: "20px", height: "300px", backgroundColor: "#F2F2F2"}}>
-          <div style={{backgroundColor: "blue"}}>
+          <div>
             <Select placeholder="请选择" defaultValue="1" style={{width: '200px', marginLeft: "20px", marginTop: '10px'}}
                     showSearch optionFilterProp="children">
               {[
@@ -121,7 +121,7 @@ const DashBoard: React.FC<any> = () => {
         </div>
 
         {/* sprint */}
-        <div style={{marginTop: "20px", marginLeft: "20px", height: "100%", backgroundColor: "#F2F2F2"}}>
+        <div style={{marginTop: "20px", marginLeft: "20px", height: "1220px", backgroundColor: "#F2F2F2"}}>
           <div>
             <Select placeholder="请选择" defaultValue="1" style={{width: '200px', marginLeft: "20px", marginTop: '10px'}}
                     showSearch optionFilterProp="children">

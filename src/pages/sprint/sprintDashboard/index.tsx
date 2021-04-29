@@ -12,12 +12,13 @@ const DashBoard: React.FC<any> = () => {
 
   return (
 
-    <PageContainer style={{height: "100%", backgroundColor: "white"}}>
+    <PageContainer style={{height: "102%", backgroundColor: "white"}}>
       <div>
         <Row gutter={16}>
 
           {/* 第一列 */}
           <Col className="gutter-row" span={12}>
+
             {/* emergency */}
             <div style={{marginLeft: "20px", height: "250px", backgroundColor: "#F2F2F2"}}>
               {/* emergency 项目 选择 */}
@@ -28,6 +29,124 @@ const DashBoard: React.FC<any> = () => {
                     <Option key={'1'} value={'1'}>emergency20201223</Option>,
                     <Option key={'2'} value={'2'}>emergency20201216</Option>,
                     <Option key={'3'} value={'3'}>emergency20201209</Option>,
+                  ]}
+                </Select>
+
+                {/* <label style={{width:"200px", float:"right",marginTop: "10px", marginRight:"10px", fontSize: "18px", backgroundColor: "white"}}>hotfix &nbsp; <Link to="/sprint/sprintListDetails">2</Link> &nbsp;个</label> */}
+              </div>
+
+              {/* 类型个数显示 */}
+              <div style={{
+                marginTop: "10px", marginLeft: "20px", width: "97%", fontSize: "18px", backgroundColor: "white"
+              }}> &nbsp;hotfix &nbsp;<Link to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              </div>
+
+              {/* #F2F2F2 :灰色 */}
+              <div className="site-card-wrapper" style={{marginTop: '10px', marginLeft: "20px", marginRight: "20px"}}>
+                <Row gutter={8} align={"middle"} wrap={false}>   {/* gutter 每一列的间隔距离 */}
+
+                  <Col span={2}>
+                    <div style={{backgroundColor: "white", height: "145px", textAlign: "center"}}>
+                      <label style={{fontSize: '18px'}}>Bug</label>
+                      {/* <strong style={{ marginTop:"50px",fontSize: '18px'}}>Bug</strong> */}
+                    </div>
+                  </Col>
+
+                  {/* 规范检查 */}
+                  <Col span={5}>
+                    <Card title="规范检查"
+                          headStyle={{marginTop: "-10px", textAlign: "center"}}
+                          bodyStyle={{height: "100px", textAlign: "center"}}>
+                      <div style={{marginTop: "-15px"}}>
+                        <div style={{whiteSpace: "nowrap"}}>无指派 &nbsp;<Link
+                          to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                        </div>
+                        <div style={{whiteSpace: "nowrap"}}>无排期 &nbsp;<Link
+                          to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                        </div>
+                      </div>
+                    </Card>
+                  </Col>
+
+                  {/* bug状态 */}
+                  <Col span={5}>
+                    <Card title="bug状态"
+                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                          bodyStyle={{height: "100px", textAlign: "center"}}>
+                      <div style={{marginTop: "-15px"}}>
+                        <div style={{whiteSpace: "nowrap"}}>激活&nbsp;<Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                        </div>
+                        <div style={{whiteSpace: "nowrap"}}>已解决&nbsp;<Link
+                          to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                        </div>
+                        <div style={{whiteSpace: "nowrap"}}>已验证&nbsp;<Link
+                          to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                        </div>
+                        <div style={{whiteSpace: "nowrap"}}>已关闭&nbsp;<Link
+                          to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                        </div>
+                      </div>
+                    </Card>
+                  </Col>
+
+                  {/* 激活时长 */}
+                  <Col span={6}>
+                    <Card title="激活时长"
+                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                          bodyStyle={{textAlign: "center", height: "100px"}}>
+                      <div style={{marginTop: "-15px"}}>
+                        <div style={{whiteSpace: "nowrap"}}>&gt;24H &nbsp;<Link
+                          to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                        </div>
+                        <div style={{whiteSpace: "nowrap"}}>16-24H &nbsp;<Link
+                          to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                        </div>
+                        <div style={{whiteSpace: "nowrap"}}>8-16H &nbsp;<Link
+                          to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                        </div>
+                        <div style={{whiteSpace: "nowrap"}}>&lt;8H &nbsp;<Link
+                          to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                        </div>
+                      </div>
+                    </Card>
+                  </Col>
+
+                  {/* 待回验时长 */}
+                  <Col span={6}>
+                    <Card title="待回验时长"
+                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                          bodyStyle={{height: "100px", textAlign: "center"}}>
+                      <div style={{marginTop: "-15px"}}>
+                        <div style={{whiteSpace: "nowrap"}}>&gt;24H &nbsp;<Link
+                          to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                        </div>
+                        <div style={{whiteSpace: "nowrap"}}>16-24H &nbsp;<Link
+                          to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                        </div>
+                        <div style={{whiteSpace: "nowrap"}}>8-16H &nbsp;<Link
+                          to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                        </div>
+                        <div style={{whiteSpace: "nowrap"}}>&lt;8H &nbsp;<Link
+                          to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                        </div>
+                      </div>
+                    </Card>
+                  </Col>
+
+                </Row>
+              </div>
+            </div>
+
+            {/* hotfix */}
+            <div style={{marginTop: "20px", marginLeft: "20px", height: "250px", backgroundColor: "#F2F2F2"}}>
+              {/* hotfix 项目 选择 */}
+              <div>
+                <Select defaultValue="1" style={{width: '200px', marginLeft: "20px", marginTop: '10px'}}
+                        showSearch optionFilterProp="children">
+                  {[
+                    <Option key={'1'} value={'1'}>hotfix20201223</Option>,
+                    <Option key={'2'} value={'2'}>hotfix20201216</Option>,
+                    <Option key={'3'} value={'3'}>hotfix20201209</Option>,
                   ]}
                 </Select>
 
@@ -645,7 +764,7 @@ const DashBoard: React.FC<any> = () => {
                   <Col span={6}>
                     <Card title="待回验时长"
                           headStyle={{textAlign: "center", marginTop: "-10px",}}
-                          bodyStyle={{height: "110px",textAlign: "center"}}>
+                          bodyStyle={{height: "110px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
                           to="/sprint/sprintListDetails">2</Link> &nbsp;个

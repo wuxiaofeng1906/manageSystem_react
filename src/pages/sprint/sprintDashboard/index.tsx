@@ -54,8 +54,12 @@ const DashBoard: React.FC<any> = () => {
 
                   {/* 规范检查 */}
                   <Col span={5}>
-                    <Card title="规范检查"
-                          headStyle={{marginTop: "-10px", textAlign: "center"}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
+                          headStyle={{
+                            textAlign: "center",
+                            height: "10px",
+                            backgroundColor: "aliceblue"
+                          }}
                           bodyStyle={{height: "100px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>无指派 &nbsp;<Link
@@ -70,8 +74,8 @@ const DashBoard: React.FC<any> = () => {
 
                   {/* bug状态 */}
                   <Col span={5}>
-                    <Card title="bug状态"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> bug状态 </div>}
+                          headStyle={{textAlign: "center", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "100px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>激活&nbsp;<Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
@@ -91,8 +95,12 @@ const DashBoard: React.FC<any> = () => {
 
                   {/* 激活时长 */}
                   <Col span={6}>
-                    <Card title="激活时长"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 激活时长 </div>}
+                          headStyle={{
+                            textAlign: "center",
+                            height: "10px",
+                            backgroundColor: "aliceblue"
+                          }}
                           bodyStyle={{textAlign: "center", height: "100px"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>&gt;24H &nbsp;<Link
@@ -113,8 +121,12 @@ const DashBoard: React.FC<any> = () => {
 
                   {/* 待回验时长 */}
                   <Col span={6}>
-                    <Card title="待回验时长"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 待回验时长 </div>}
+                          headStyle={{
+                            textAlign: "center",
+                            height: "10px",
+                            backgroundColor: "aliceblue"
+                          }}
                           bodyStyle={{height: "100px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>&gt;24H &nbsp;<Link
@@ -172,8 +184,8 @@ const DashBoard: React.FC<any> = () => {
 
                   {/* 规范检查 */}
                   <Col span={5}>
-                    <Card title="规范检查"
-                          headStyle={{marginTop: "-10px", textAlign: "center"}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "100px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>无指派 &nbsp;<Link
@@ -188,8 +200,8 @@ const DashBoard: React.FC<any> = () => {
 
                   {/* bug状态 */}
                   <Col span={5}>
-                    <Card title="bug状态"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> bug状态 </div>}
+                          headStyle={{textAlign: "center", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "100px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>激活&nbsp;<Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
@@ -209,8 +221,12 @@ const DashBoard: React.FC<any> = () => {
 
                   {/* 激活时长 */}
                   <Col span={6}>
-                    <Card title="激活时长"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 激活时长 </div>}
+                          headStyle={{
+                            textAlign: "center",
+                            height: "10px",
+                            backgroundColor: "aliceblue"
+                          }}
                           bodyStyle={{textAlign: "center", height: "100px"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>&gt;24H &nbsp;<Link
@@ -231,8 +247,12 @@ const DashBoard: React.FC<any> = () => {
 
                   {/* 待回验时长 */}
                   <Col span={6}>
-                    <Card title="待回验时长"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 待回验时长 </div>}
+                          headStyle={{
+                            textAlign: "center",
+                            height: "10px",
+                            backgroundColor: "aliceblue"
+                          }}
                           bodyStyle={{height: "100px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>&gt;24H &nbsp;<Link
@@ -290,6 +310,7 @@ const DashBoard: React.FC<any> = () => {
                 {/* 需求-状态 */}
                 <Row gutter={8} align={"middle"}>   {/* gutter 每一列的间隔距离 */}
 
+
                   <Col span={2}>
                     <div style={{backgroundColor: "white", height: "165px", textAlign: "center"}}>
                       <label style={{fontSize: '18px'}}>状态</label>
@@ -297,9 +318,10 @@ const DashBoard: React.FC<any> = () => {
                     </div>
                   </Col>
 
+                  {/* 规范检查 */}
                   <Col span={5}>
-                    <Card title="规范检查"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "120px", textAlign: "center"}}>
 
                       <div style={{marginTop: "-15px"}}>
@@ -320,13 +342,12 @@ const DashBoard: React.FC<any> = () => {
                         </div>
                       </div>
                     </Card>
-
-
                   </Col>
 
+                  {/* 开发进展 */}
                   <Col span={5}>
-                    <Card title="开发进展"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 开发进展 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "120px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
@@ -345,9 +366,10 @@ const DashBoard: React.FC<any> = () => {
                     </Card>
                   </Col>
 
+                  {/* 提测进展 */}
                   <Col span={6}>
-                    <Card title="提测进展"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "120px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>提测延期&nbsp;<Link
@@ -364,9 +386,10 @@ const DashBoard: React.FC<any> = () => {
                     </Card>
                   </Col>
 
+                  {/* 测试进展 */}
                   <Col span={6}>
-                    <Card title="测试进展"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 测试进展 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "120px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
@@ -396,13 +419,14 @@ const DashBoard: React.FC<any> = () => {
                     </div>
                   </Col>
 
+                  {/* 规范检查 */}
                   <Col span={5}>
-                    <Card title="规范检查"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "110px", textAlign: "center"}}>
 
                       <div style={{marginTop: "-15px"}}>
-                        <div style={{whiteSpace: "nowrap"}}>无指派  &nbsp;&nbsp;<Link
+                        <div style={{whiteSpace: "nowrap"}}>无指派  &nbsp;<Link
                           to="/sprint/sprintListDetails">2</Link> &nbsp;个
                         </div>
                         <div style={{whiteSpace: "nowrap"}}>无排期  &nbsp;&nbsp;<Link
@@ -415,9 +439,10 @@ const DashBoard: React.FC<any> = () => {
                     </Card>
                   </Col>
 
+                  {/* bug状态 */}
                   <Col span={5}>
-                    <Card title="bug状态"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> bug状态 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "110px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>激活 &nbsp;<Link
@@ -436,12 +461,13 @@ const DashBoard: React.FC<any> = () => {
                     </Card>
                   </Col>
 
+                  {/* 激活时长 */}
                   <Col span={6}>
-                    <Card title="激活时长"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 激活时长 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "110px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
-                        <div style={{whiteSpace: "nowrap"}}>&gt;24H  &nbsp;<Link
+                        <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
                           to="/sprint/sprintListDetails">2</Link> &nbsp;个
                         </div>
                         <div style={{whiteSpace: "nowrap"}}>16-24H  &nbsp;<Link
@@ -457,21 +483,22 @@ const DashBoard: React.FC<any> = () => {
                     </Card>
                   </Col>
 
+                  {/* 待回验时长 */}
                   <Col span={6}>
-                    <Card title="待回验时长"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "110px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
-                        <div style={{whiteSpace: "nowrap"}}>&gt;24H  &nbsp;<Link
+                        <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
                           to="/sprint/sprintListDetails">2</Link> &nbsp;个
                         </div>
-                        <div style={{whiteSpace: "nowrap"}}>16-24H  &nbsp;<Link
-                          to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                        <div style={{whiteSpace: "nowrap"}}>16-24H&nbsp;<Link
+                          to="/sprint/sprintListDetails">2</Link>&nbsp;个
                         </div>
-                        <div style={{whiteSpace: "nowrap"}}>8-16H  &nbsp;<Link
-                          to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                        <div style={{whiteSpace: "nowrap"}}>8-16H&nbsp;<Link
+                          to="/sprint/sprintListDetails">2</Link>&nbsp;个
                         </div>
-                        <div style={{whiteSpace: "nowrap"}}>&lt;8H  &nbsp;<Link
+                        <div style={{whiteSpace: "nowrap"}}>&lt;8H&nbsp;<Link
                           to="/sprint/sprintListDetails">2</Link> &nbsp;个
                         </div>
                       </div>
@@ -493,6 +520,7 @@ const DashBoard: React.FC<any> = () => {
                 <Link to="/sprint/sprintListDetails">10</Link> &nbsp;个
               </div>
               <div className="site-card-wrapper" style={{marginTop: '10px', marginLeft: "20px", marginRight: "20px"}}>
+
                 {/* 任务-状态 */}
                 <Row gutter={8} align={"middle"}>   {/* gutter 每一列的间隔距离 */}
 
@@ -503,9 +531,10 @@ const DashBoard: React.FC<any> = () => {
                     </div>
                   </Col>
 
+                  {/* 规范检查 */}
                   <Col span={5}>
-                    <Card title="规范检查"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "110px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;<Link
@@ -524,9 +553,10 @@ const DashBoard: React.FC<any> = () => {
                     </Card>
                   </Col>
 
+                  {/* 开发进展 */}
                   <Col span={5}>
-                    <Card title="开发进展"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 开发进展 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "110px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
@@ -545,9 +575,10 @@ const DashBoard: React.FC<any> = () => {
                     </Card>
                   </Col>
 
+                  {/* 提测进展 */}
                   <Col span={6}>
-                    <Card title="提测进展"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 提测进展 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "110px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>&gt;24H &nbsp;<Link
@@ -566,9 +597,10 @@ const DashBoard: React.FC<any> = () => {
                     </Card>
                   </Col>
 
+                  {/* 测试进展 */}
                   <Col span={6}>
-                    <Card title="测试进展"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 测试进展 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "110px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;;<Link
@@ -598,10 +630,10 @@ const DashBoard: React.FC<any> = () => {
                       <label style={{fontSize: "18px",}}>Bug</label>
                     </div>
                   </Col>
-
+                  {/* 规范检查 */}
                   <Col span={5}>
-                    <Card title="规范检查"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "110px", textAlign: "center"}}>
 
                       <div style={{marginTop: "-15px"}}>
@@ -618,9 +650,10 @@ const DashBoard: React.FC<any> = () => {
                     </Card>
                   </Col>
 
+                  {/* bug状态 */}
                   <Col span={5}>
-                    <Card title="bug状态"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> bug状态 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "110px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>激活 &nbsp;<Link
@@ -639,9 +672,10 @@ const DashBoard: React.FC<any> = () => {
                     </Card>
                   </Col>
 
+                  {/* 激活时长 */}
                   <Col span={6}>
-                    <Card title="激活时长"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 激活时长 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "110px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>&gt;24H  &nbsp;<Link
@@ -660,9 +694,10 @@ const DashBoard: React.FC<any> = () => {
                     </Card>
                   </Col>
 
+                  {/* 待回验时长 */}
                   <Col span={6}>
-                    <Card title="待回验时长"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 待回验时长 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "110px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>&gt;24H  &nbsp;<Link
@@ -704,9 +739,10 @@ const DashBoard: React.FC<any> = () => {
                     </div>
                   </Col>
 
+                  {/* 规范检查 */}
                   <Col span={5}>
-                    <Card title="规范检查"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "110px", textAlign: "center"}}>
 
                       <div style={{marginTop: "-15px"}}>
@@ -720,9 +756,10 @@ const DashBoard: React.FC<any> = () => {
                     </Card>
                   </Col>
 
+                  {/* bug状态 */}
                   <Col span={5}>
-                    <Card title="bug状态"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> bug状态 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "110px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>激活 &nbsp;<Link
@@ -741,9 +778,10 @@ const DashBoard: React.FC<any> = () => {
                     </Card>
                   </Col>
 
+                  {/* 激活时长 */}
                   <Col span={6}>
-                    <Card title="激活时长"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 激活时长 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "110px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
@@ -761,9 +799,10 @@ const DashBoard: React.FC<any> = () => {
                       </div>
                     </Card>
                   </Col>
+                  {/* 待回验时长 */}
                   <Col span={6}>
-                    <Card title="待回验时长"
-                          headStyle={{textAlign: "center", marginTop: "-10px",}}
+                    <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
+                          headStyle={{textAlign: "center", height: "10px", backgroundColor: "aliceblue"}}
                           bodyStyle={{height: "110px", textAlign: "center"}}>
                       <div style={{marginTop: "-15px"}}>
                         <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link

@@ -15,7 +15,7 @@ const ProjectLoad = () => {
   return (
     <div>
       <Select defaultValue="1"
-              style={{width: '200px', marginLeft: "20px", marginTop: '20px', fontSize: "18px"}}
+              style={{width: '200px', marginLeft: "20px", marginTop: '20px', fontSize: "15px"}}
               showSearch optionFilterProp="children">
         {[
           <Option key={'1'} value={'1'}>sprint20201223</Option>,
@@ -23,7 +23,7 @@ const ProjectLoad = () => {
           <Option key={'3'} value={'3'}>sprint20201209</Option>,
         ]}
       </Select>
-      <Button type="text" style={{float: "right", color: 'black', marginTop: '10px', marginRight: "10px"}}
+      <Button type="text" style={{float: "right", color: 'black', marginTop: '20px', marginRight: "10px"}}
               icon={<SearchOutlined/>}
               size={'large'}>查看项目清单</Button>
     </div>);
@@ -35,7 +35,7 @@ const StoryLoad = () => {
       <div style={{
         marginTop: "-20px",
         width: "100%",
-        fontSize: "18px",
+        fontSize: "15px",
         backgroundColor: "white"
       }}>&nbsp;需求 &nbsp;
         <Link to="/sprint/sprintListDetails">10</Link> &nbsp;个
@@ -47,7 +47,7 @@ const StoryLoad = () => {
 
         <Col span={2}>
           <div style={{backgroundColor: "white", height: "165px", textAlign: "center"}}>
-            <label style={{fontSize: '18px'}}>状态</label>
+            <label style={{fontSize: '15px'}}>状态</label>
             {/* <strong style={{top: "200px"}}>状态</strong> */}
           </div>
         </Col>
@@ -149,7 +149,7 @@ const StoryLoad = () => {
         <Col span={2}>
           <div style={{backgroundColor: "white", height: "155px", textAlign: "center"}}>
             {/* <strong style={{top: "200px"}}>bug</strong> */}
-            <label style={{fontSize: '18px'}}>Bug</label>
+            <label style={{fontSize: '15px'}}>Bug</label>
           </div>
         </Col>
 
@@ -250,7 +250,7 @@ const TaskLoad = () => {
       <div style={{
         marginTop: "-20px",
         width: "100%",
-        fontSize: "18px",
+        fontSize: "15px",
         backgroundColor: "white"
       }}>&nbsp;任务 &nbsp;
         <Link to="/sprint/sprintListDetails">10</Link> &nbsp;个
@@ -262,7 +262,7 @@ const TaskLoad = () => {
         <Col span={2}>
           <div style={{backgroundColor: "white", height: "155px", textAlign: "center"}}>
             {/* <strong style={{top: "200px"}}>状态</strong> */}
-            <label style={{fontSize: "18px",}}>状态</label>
+            <label style={{fontSize: "15px",}}>状态</label>
           </div>
         </Col>
 
@@ -362,7 +362,7 @@ const TaskLoad = () => {
         <Col span={2}>
           <div style={{backgroundColor: "white", height: "155px", textAlign: "center"}}>
             {/* <strong style={{top: "200px"}}>bug</strong> */}
-            <label style={{fontSize: "18px",}}>Bug</label>
+            <label style={{fontSize: "15px",}}>Bug</label>
           </div>
         </Col>
         {/* 规范检查 */}
@@ -461,7 +461,7 @@ const HotfixLoad = () => {
     <div style={{
       marginTop: "-20px",
       width: "100%",
-      fontSize: "18px",
+      fontSize: "15px",
       backgroundColor: "white"
     }}>&nbsp;hotfix &nbsp;
       <Link to="/sprint/sprintListDetails">10</Link> &nbsp;个
@@ -472,7 +472,7 @@ const HotfixLoad = () => {
       <Col span={2}>
         <div style={{backgroundColor: "white", height: "155px", textAlign: "center"}}>
           {/* <strong style={{top: "200px"}}>bug</strong> */}
-          <label style={{fontSize: "18px",}}>Bug</label>
+          <label style={{fontSize: "15px",}}>Bug</label>
         </div>
       </Col>
 

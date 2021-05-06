@@ -116,235 +116,233 @@ const EmergencyProjectLoad = () => {
 
 // 需求组件
 const StoryLoad = () => {
-    return (<div className="site-card-wrapper" style={{marginTop: '10px', marginLeft: "20px", marginRight: "20px"}}>
+  return (<div className="site-card-wrapper" style={{marginTop: '10px', marginLeft: "20px", marginRight: "20px"}}>
 
-        <div style={{
-          marginTop: "-20px",
-          width: "100%",
-          fontSize: "15px",
-          backgroundColor: "white"
-        }}>&nbsp;需求 &nbsp;
-          <Link to="/sprint/sprintListDetails">10</Link> &nbsp;个
-        </div>
-
-        {/* 需求-状态 */}
-        <Row gutter={8} align={"middle"}>   {/* gutter 每一列的间隔距离 */}
-
-          <Col span={2}>
-            <div style={{backgroundColor: "white", height: "230px", textAlign: "center"}}>
-              <label style={{fontSize: '15px'}}>状态</label>
-              {/* <strong style={{top: "200px"}}>状态</strong> */}
-            </div>
-          </Col>
-
-          {/* 规范检查 */}
-          <Col span={5}>
-            <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
-                  headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
-                  bodyStyle={{height: "185px", textAlign: "left"}}>
-
-              <div style={{marginTop: "-15px"}}>
-                <div style={{whiteSpace: "nowrap"}}>草稿&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>无任务&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>缺任务&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>无排期&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>无指派&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>未更新&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>项目错误 &nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                  <Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-              </div>
-            </Card>
-          </Col>
-
-          {/* 开发进展 */}
-          <Col span={5}>
-            <Card title={<div style={{marginTop: "-5px"}}> 开发进展 </div>}
-                  headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
-                  bodyStyle={{height: "185px", textAlign: "left"}}>
-              <div style={{marginTop: "-15px"}}>
-                <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>开发中&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>开发完&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-              </div>
-            </Card>
-          </Col>
-
-          {/* 提测进展 */}
-          <Col span={6}>
-            <Card title={<div style={{marginTop: "-5px"}}> 提测进展 </div>}
-                  headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
-                  bodyStyle={{height: "185px", textAlign: "left"}}>
-              <div style={{marginTop: "-15px"}}>
-                <div style={{whiteSpace: "nowrap"}}>提测延期&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>未提测&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>已提测&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-
-              </div>
-            </Card>
-          </Col>
-
-          {/* 测试进展 */}
-          <Col span={6}>
-            <Card title={<div style={{marginTop: "-5px"}}> 测试进展 </div>}
-                  headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
-                  bodyStyle={{height: "185px", textAlign: "left"}}>
-              <div style={{marginTop: "-15px"}}>
-                <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>测试中&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>测试完&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-              </div>
-            </Card>
-          </Col>
-        </Row>
-
-        {/* 需求-bug */}
-        <Row gutter={8} align={"middle"} style={{marginTop: "10px"}}>   {/* gutter 每一列的间隔距离 */}
-
-          <Col span={2}>
-            <div style={{backgroundColor: "white", height: "165px", textAlign: "center"}}>
-              <label style={{fontSize: '15px'}}>Bug</label>
-            </div>
-          </Col>
-
-          {/* 规范检查 */}
-          <Col span={5}>
-            <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
-                  headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue"}}
-                  bodyStyle={{height: "120px", textAlign: "left"}}>
-
-              <div style={{marginTop: "-15px"}}>
-                <div style={{whiteSpace: "nowrap"}}>无指派  &nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link> &nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>无排期  &nbsp;&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link> &nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>无bug  &nbsp;&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link> &nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-                  <Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                  <Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-              </div>
-            </Card>
-          </Col>
-
-          {/* bug状态 */}
-          <Col span={5}>
-            <Card title={<div style={{marginTop: "-5px"}}> bug状态 </div>}
-                  headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
-                  bodyStyle={{height: "120px", textAlign: "left"}}>
-              <div style={{marginTop: "-15px"}}>
-                <div style={{whiteSpace: "nowrap"}}>激活 &nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link> &nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>已解决 &nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link> &nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link> &nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link> &nbsp;个
-                </div>
-              </div>
-            </Card>
-          </Col>
-
-          {/* 激活时长 */}
-          <Col span={6}>
-            <Card title={<div style={{marginTop: "-5px"}}> 激活时长 </div>}
-                  headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
-                  bodyStyle={{height: "120px", textAlign: "left"}}>
-              <div style={{marginTop: "-15px"}}>
-                <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link> &nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>16-24H  &nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link> &nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>8-16H  &nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link> &nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>&lt;8H  &nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link> &nbsp;个
-                </div>
-              </div>
-            </Card>
-          </Col>
-
-          {/* 待回验时长 */}
-          <Col span={6}>
-            <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
-                  headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
-                  bodyStyle={{height: "120px", textAlign: "left"}}>
-              <div style={{marginTop: "-15px"}}>
-                <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link> &nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>16-24H&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>8-16H&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link>&nbsp;个
-                </div>
-                <div style={{whiteSpace: "nowrap"}}>&lt;8H&nbsp;<Link
-                  to="/sprint/sprintListDetails">2</Link> &nbsp;个
-                </div>
-              </div>
-            </Card>
-          </Col>
-
-        </Row>
-
+      <div style={{
+        marginTop: "-20px",
+        width: "100%",
+        fontSize: "15px",
+        backgroundColor: "white"
+      }}>&nbsp;需求 &nbsp;
+        <Link to="/sprint/sprintListDetails">10</Link> &nbsp;个
       </div>
-    )
-      ;
-  }
-;
+
+      {/* 需求-状态 */}
+      <Row gutter={8} align={"middle"}>   {/* gutter 每一列的间隔距离 */}
+
+        <Col span={2}>
+          <div style={{backgroundColor: "white", height: "230px", textAlign: "center"}}>
+            <button style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "100px"}}>状态</button>
+          </div>
+        </Col>
+
+        {/* 规范检查 */}
+        <Col span={5}>
+          <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
+                headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
+                bodyStyle={{height: "185px", textAlign: "left"}}>
+
+            <div style={{marginTop: "-15px"}}>
+              <div style={{whiteSpace: "nowrap"}}>草稿&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>无任务&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>缺任务&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>无排期&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>无指派&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>未更新&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>项目错误 &nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
+                <Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+            </div>
+          </Card>
+        </Col>
+
+        {/* 开发进展 */}
+        <Col span={5}>
+          <Card title={<div style={{marginTop: "-5px"}}> 开发进展 </div>}
+                headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
+                bodyStyle={{height: "185px", textAlign: "left"}}>
+            <div style={{marginTop: "-15px"}}>
+              <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>开发中&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>开发完&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+            </div>
+          </Card>
+        </Col>
+
+        {/* 提测进展 */}
+        <Col span={6}>
+          <Card title={<div style={{marginTop: "-5px"}}> 提测进展 </div>}
+                headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
+                bodyStyle={{height: "185px", textAlign: "left"}}>
+            <div style={{marginTop: "-15px"}}>
+              <div style={{whiteSpace: "nowrap"}}>提测延期&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>未提测&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>已提测&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+
+            </div>
+          </Card>
+        </Col>
+
+        {/* 测试进展 */}
+        <Col span={6}>
+          <Card title={<div style={{marginTop: "-5px"}}> 测试进展 </div>}
+                headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
+                bodyStyle={{height: "185px", textAlign: "left"}}>
+            <div style={{marginTop: "-15px"}}>
+              <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>测试中&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>测试完&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+            </div>
+          </Card>
+        </Col>
+      </Row>
+
+      {/* 需求-bug */}
+      <Row gutter={8} align={"middle"} style={{marginTop: "10px"}}>   {/* gutter 每一列的间隔距离 */}
+
+        <Col span={2}>
+          <div style={{backgroundColor: "white", height: "165px", textAlign: "center"}}>
+            <button style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug</button>
+          </div>
+        </Col>
+
+        {/* 规范检查 */}
+        <Col span={5}>
+          <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
+                headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue"}}
+                bodyStyle={{height: "120px", textAlign: "left"}}>
+
+            <div style={{marginTop: "-15px"}}>
+              <div style={{whiteSpace: "nowrap"}}>无指派  &nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>无排期  &nbsp;&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>无bug  &nbsp;&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
+                <Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
+                <Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+            </div>
+          </Card>
+        </Col>
+
+        {/* bug状态 */}
+        <Col span={5}>
+          <Card title={<div style={{marginTop: "-5px"}}> bug状态 </div>}
+                headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
+                bodyStyle={{height: "120px", textAlign: "left"}}>
+            <div style={{marginTop: "-15px"}}>
+              <div style={{whiteSpace: "nowrap"}}>激活 &nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>已解决 &nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              </div>
+            </div>
+          </Card>
+        </Col>
+
+        {/* 激活时长 */}
+        <Col span={6}>
+          <Card title={<div style={{marginTop: "-5px"}}> 激活时长 </div>}
+                headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
+                bodyStyle={{height: "120px", textAlign: "left"}}>
+            <div style={{marginTop: "-15px"}}>
+              <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>16-24H  &nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>8-16H  &nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>&lt;8H  &nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              </div>
+            </div>
+          </Card>
+        </Col>
+
+        {/* 待回验时长 */}
+        <Col span={6}>
+          <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
+                headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
+                bodyStyle={{height: "120px", textAlign: "left"}}>
+            <div style={{marginTop: "-15px"}}>
+              <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>16-24H&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>8-16H&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>&lt;8H&nbsp;<Link
+                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              </div>
+            </div>
+          </Card>
+        </Col>
+
+      </Row>
+
+    </div>
+  )
+    ;
+};
 // 任务组件
 const TaskLoad = () => {
   return (<div className="site-card-wrapper" style={{marginTop: '10px', marginLeft: "20px", marginRight: "20px"}}>
@@ -362,8 +360,8 @@ const TaskLoad = () => {
 
         <Col span={2}>
           <div style={{backgroundColor: "white", height: "165px", textAlign: "center"}}>
-            <label style={{fontSize: "15px",}}>状态</label>
-          </div>
+            <button style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>状态</button>
+           </div>
         </Col>
 
         {/* 规范检查 */}
@@ -465,7 +463,7 @@ const TaskLoad = () => {
 
         <Col span={2}>
           <div style={{backgroundColor: "white", height: "165px", textAlign: "center"}}>
-            <label style={{fontSize: "15px",}}>Bug</label>
+            <button style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug</button>
           </div>
         </Col>
         {/* 规范检查 */}
@@ -580,8 +578,7 @@ const HotfixLoad = () => {
 
       <Col span={2}>
         <div style={{backgroundColor: "white", height: "155px", textAlign: "center"}}>
-          {/* <strong style={{top: "200px"}}>bug</strong> */}
-          <label style={{fontSize: "15px",}}>Bug</label>
+          <button style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug</button>
         </div>
       </Col>
 

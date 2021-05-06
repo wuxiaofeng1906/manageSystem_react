@@ -60,7 +60,7 @@ export default [
     name: 'sprint 工作台',
     icon: 'table',
     path: '/sprint',
-    hideInMenu: true,
+    // hideInMenu: true,
     routes: [
       {
         name: 'dsahboard',
@@ -71,31 +71,6 @@ export default [
         name: 'bug明细（待隐藏）',
         path: 'basicTable/bugs/bug',
         component: './sprint/basicTable/bugs/bug',
-      }, {
-        name: '无指派bug（待隐藏）',
-        path: 'basicTable/bugs/bugs-noAssign',
-        component: './sprint/basicTable/bugs/bugs-noAssign',
-      }, {
-        name: '无排期bug（待隐藏）',
-        path: 'basicTable/bugs/bugs-noSchedule',
-        component: './sprint/basicTable/bugs/bugs-noSchedule',
-      },
-      {
-        name: '激活bug（待隐藏）',
-        path: 'basicTable/bugs/bugs-actived',
-        component: './sprint/basicTable/bugs/bugs-actived',
-      }, {
-        name: '已关闭bug（待隐藏）',
-        path: 'basicTable/bugs/bugs-closed',
-        component: './sprint/basicTable/bugs/bugs-closed',
-      }, {
-        name: '已解决bug（待隐藏）',
-        path: 'basicTable/bugs/bugs-resolved',
-        component: './sprint/basicTable/bugs/bugs-resolved',
-      }, {
-        name: '已验证bug（待隐藏）',
-        path: 'basicTable/bugs/bugs-verified',
-        component: './sprint/basicTable/bugs/bugs-verified',
       },
       {
         name: 'story（待隐藏）',

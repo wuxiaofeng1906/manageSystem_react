@@ -501,7 +501,7 @@ const HotfixLoad = () => {
       <Col span={5}>
         <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
               headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
-              bodyStyle={{height: "110px", textAlign: "center"}}>
+              bodyStyle={{height: "110px", textAlign: "left"}}>
 
           <div style={{marginTop: "-15px"}}>
             <div style={{whiteSpace: "nowrap"}}>无指派  &nbsp;<Link
@@ -524,7 +524,7 @@ const HotfixLoad = () => {
       <Col span={5}>
         <Card title={<div style={{marginTop: "-5px"}}> bug状态 </div>}
               headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
-              bodyStyle={{height: "110px", textAlign: "center"}}>
+              bodyStyle={{height: "110px", textAlign: "left"}}>
           <div style={{marginTop: "-15px"}}>
             <div style={{whiteSpace: "nowrap"}}>激活 &nbsp;<Link
               to="/sprint/sprintListDetails">2</Link> &nbsp;个
@@ -546,7 +546,7 @@ const HotfixLoad = () => {
       <Col span={6}>
         <Card title={<div style={{marginTop: "-5px"}}> 激活时长 </div>}
               headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
-              bodyStyle={{height: "110px", textAlign: "center"}}>
+              bodyStyle={{height: "110px", textAlign: "left"}}>
           <div style={{marginTop: "-15px"}}>
             <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
               to="/sprint/sprintListDetails">2</Link> &nbsp;个
@@ -567,7 +567,7 @@ const HotfixLoad = () => {
       <Col span={6}>
         <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
               headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
-              bodyStyle={{height: "110px", textAlign: "center"}}>
+              bodyStyle={{height: "110px", textAlign: "left"}}>
           <div style={{marginTop: "-15px"}}>
             <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
               to="/sprint/sprintListDetails">2</Link> &nbsp;个

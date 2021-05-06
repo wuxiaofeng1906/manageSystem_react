@@ -85,6 +85,20 @@ const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
   return data?.proExist;
 };
 
+
+const queryDeleteCount = async (client: GqlClient<object>, params: any) => {
+  const {data} = await client.query(`
+      {
+         proDetail(project:${params}){
+            id
+            category
+            ztNo
+          }
+      }
+  `);
+  return data?.proDetail;
+};
+
 // 组件初始化
 const SprintList: React.FC<any> = () => {
   // const ChangePages = () => {
@@ -231,13 +245,8 @@ const SprintList: React.FC<any> = () => {
 
   // 项目名称输入事件
   const projectChanged = async (params: any) => {
-    // console.log("projectName", params.nativeEvent.data);  // 为当时输入的值
-    // console.log("finally",params.target.value);  // 为输入框的值
-
     queryCondition.projectName = params.target.value;
     updateGrid();
-    // const datas: any = await queryDevelopViews(gqlClient, queryCondition);
-    // gridApi.current?.setRowData(datas);
   };
 
   // 项目类型选择事件
@@ -245,8 +254,6 @@ const SprintList: React.FC<any> = () => {
     console.log(value, params);
     queryCondition.projectType = value;
     updateGrid();
-    // const datas: any = await queryDevelopViews(gqlClient, queryCondition);
-    // gridApi.current?.setRowData(datas);
   };
 
   // 时间选择事件
@@ -540,7 +547,7 @@ const SprintList: React.FC<any> = () => {
   // 删除sprint列表
   const [isdelModalVisible, setIsDelModalVisible] = useState(false);
   // 删除按钮点击，弹出删除确认框
-  const deleteSprintList = () => {
+  const deleteSprintList = async () => {
     // 判断是否选中数据
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
 
@@ -566,23 +573,10 @@ const SprintList: React.FC<any> = () => {
       return;
     }
 
-    // const detailsInfo = selRows[0];
-    // const prjNames = detailsInfo.name;
-    // 首先查询这个里面有多少条数据，根并进行具体提示。
-    delCounts = 10000;
+    const datas: any = await queryDeleteCount(gqlClient, selRows[0].id);
+    delCounts = datas.length;
     setIsDelModalVisible(true);
-    // Modal.confirm({
-    //   title: '删除项目',
-    //   // icon: <ExclamationCircleOutlined/>,
-    //   content: `此项目包含【${delCounts}】条数据，请确认是否删除？`,
-    //   okText: '确认',
-    //   cancelText: '取消',
-    //   centered: true,
-    //   onOk: () => {
-    //     console.log("确认删除！");
-    //
-    //   }
-    // });
+
   };
 
   // 请求删除选中的行

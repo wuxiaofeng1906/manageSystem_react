@@ -320,7 +320,7 @@ const SprintList: React.FC<any> = () => {
 
   };
 
-  const formTimeSelected = async () => {
+  const queryRepeatProjectasync = async () => {
     const values = formForAddAnaMod.getFieldsValue();
     if (values.prjDate === null) {
       return;
@@ -343,6 +343,10 @@ const SprintList: React.FC<any> = () => {
     }
   };
 
+
+  // const formTimeSelected = async () => {
+  //   await queryRepeatProjectasync();
+  // };
   /* endregion */
 
   /* region 修改功能  */
@@ -420,9 +424,20 @@ const SprintList: React.FC<any> = () => {
   const commitSprint = async () => {
     const values = formForAddAnaMod.getFieldsValue();
     const prjtype = values.prjNames;
-    if (prjtype === null) {
+    if (prjtype === null || values.prjDate === null) {
       message.error({
-        content: '项目类型不能为空!',
+        content: '项目名称不能包含空值!',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+
+    if (values.starttime >= values.testCutoff) {
+      message.error({
+        content: '提测截止时间必须大于开始时间!',
         duration: 1,
         style: {
           marginTop: '50vh',
@@ -434,16 +449,6 @@ const SprintList: React.FC<any> = () => {
     if (values.prjStatus === null) {
       message.error({
         content: '项目状态不能为空!',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-      return;
-    }
-    if (values.prjDate === null) {
-      message.error({
-        content: '项目日期不能为空!',
         duration: 1,
         style: {
           marginTop: '50vh',
@@ -482,8 +487,9 @@ const SprintList: React.FC<any> = () => {
               },
             });
           } else {
+            debugger;
             message.error({
-              content: `${res.data.message}${res.data.zt.message.end[0]}`,
+              content: `${res.data.message}`,
               className: 'AddNone',
               style: {
                 marginTop: '50vh',
@@ -502,6 +508,7 @@ const SprintList: React.FC<any> = () => {
           });
         });
     } else {
+
       datas['id'] = values.prjId;
       if (orgPrjname === datas['name']) {
         datas['name'] = '';
@@ -520,8 +527,9 @@ const SprintList: React.FC<any> = () => {
               },
             });
           } else {
+
             message.error({
-              content: `${res.data.message}${res.data.zt.message.end[0]}`,
+              content: `${res.data.message}`,
               className: 'ModNone',
               style: {
                 marginTop: '50vh',
@@ -760,7 +768,7 @@ const SprintList: React.FC<any> = () => {
                 <Form.Item label="项目名称：">
                   <Input.Group compact>
                     <Form.Item name="prjNames">
-                      <Select id={'prjNames'} placeholder="请选择类型" style={{width: '150px'}}>
+                      <Select id={'prjNames'} placeholder="请选择类型" style={{width: '150px'}} onSelect={queryRepeatProjectasync}>
                         {[
                           <Option key={'sprint'} value={'sprint'}>
                             sprint
@@ -776,7 +784,7 @@ const SprintList: React.FC<any> = () => {
                     </Form.Item>
 
                     <Form.Item name="prjDate">
-                      <DatePicker onChange={formTimeSelected}/>
+                      <DatePicker onChange={queryRepeatProjectasync}/>
                     </Form.Item>
                     <Form.Item name="prjLable">
                       <input

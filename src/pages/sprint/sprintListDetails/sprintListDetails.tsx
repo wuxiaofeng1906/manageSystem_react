@@ -1,5 +1,4 @@
 import React, {useRef, useState} from 'react';
-import {PageContainer} from '@ant-design/pro-layout';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -7,7 +6,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient, useQuery} from '@/hooks';
-import {Button, message, Form, Select, Modal, Input, Row, Col, DatePicker} from 'antd';
+import {PageHeader, Button, message, Form, Select, Modal, Input, Row, Col, DatePicker} from 'antd';
 import {formatMomentTime} from '@/publicMethods/timeMethods';
 import {
   FolderAddTwoTone,
@@ -670,7 +669,6 @@ const SprintList: React.FC<any> = () => {
 
         addCommitDetails(datas);
       } else {
-        debugger;
         let isChanged: boolean = false;
         const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
         datas['id'] = curRow[0].id;
@@ -1392,11 +1390,29 @@ const SprintList: React.FC<any> = () => {
     const leftStyle = {marginLeft: '20px'};
     const rightStyle = {marginLeft: '30px'};
     const widths = {width: '200px', color: 'black'};
+    const routes = [
+      {
+        path: '',
+        breadcrumbName: 'sprint 工作台',
+      }, {
+        path: '',
+        breadcrumbName: '项目详情',
+      }];
 
     return (
-      <PageContainer>
+
+      <div style={{marginTop: "-20px"}}>
+
+        <PageHeader
+          ghost={false}
+          title={prjNames}
+          style={{height: "100px"}}
+          breadcrumb={{routes}}
+        />
+
+
         {/* 新增、修改、删除按钮栏 */}
-        <div style={{background: 'white'}}>
+        <div style={{background: 'white', marginTop: "20px"}}>
           {/* 使用一个图标就要导入一个图标 */}
           {/* 明细操作按钮 */}
           <Button type="text" style={{color: 'black'}} icon={<FolderAddTwoTone/>} size={'large'}
@@ -2322,7 +2338,7 @@ const SprintList: React.FC<any> = () => {
             </Form.Item>
           </Form>
         </Modal>
-      </PageContainer>
+      </div>
     );
   }
 ;

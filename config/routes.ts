@@ -69,18 +69,31 @@ export default [
       },
       {
         name: 'bug明细（待隐藏）',
-        path: 'basicTable/bugs/bug',
-        component: './sprint/basicTable/bugs/bug',
+        path: 'basicTable/bugs/bugAll',
+        component: './sprint/basicTable/bugs/bugAll',
+      }, {
+        name: 'bug明细（待隐藏）',
+        path: 'basicTable/bugs/bugDetails',
+        component: './sprint/basicTable/bugs/bugDetails',
       },
       {
         name: 'story（待隐藏）',
-        path: 'basicTable/story',
-        component: './sprint/basicTable/stories/story',
+        path: 'basicTable/storyAll',
+        component: './sprint/basicTable/stories/storyAll',
+      },
+      {
+        name: 'story（待隐藏）',
+        path: 'basicTable/storyDetails',
+        component: './sprint/basicTable/stories/storyDetails',
       },
       {
         name: 'task（待隐藏）',
-        path: 'basicTable/task',
-        component: './sprint/basicTable/tasks/task',
+        path: 'basicTable/taskAll',
+        component: './sprint/basicTable/tasks/taskAll',
+      }, {
+        name: 'task（待隐藏）',
+        path: 'basicTable/taskDetails',
+        component: './sprint/basicTable/tasks/taskDetails',
       },
       {
         name: 'sprint 列表',
@@ -88,14 +101,13 @@ export default [
         component: './sprint/sprintList/sprintList',
       },
       {
-        name: 'sprint 项目详情',
+        name: '项目详情',
         path: 'sprintListDetails',
         hideInMenu: true,
         component: './sprint/sprintListDetails/sprintListDetails',
       }
     ],
   },
-
   {
     name: '研发绩效数据',
     icon: 'table',

@@ -358,7 +358,7 @@ const SprintList: React.FC<any> = () => {
 
       deptMember = `
           {
-            WxDeptUsers(deptNames:["${params}"]){
+            WxDeptUsers(deptNames:${params}){
                id
               userName
             }
@@ -439,7 +439,6 @@ const SprintList: React.FC<any> = () => {
       .then(function (res) {
         if (res.data.ok === true) {
           const queryDatas = res.data.ztRecord;
-
           formForAdminToAddAnaMod.setFieldsValue({
             adminCurStage: numberRenderToCurrentStage({
               value: queryDatas.stage === null ? '' : queryDatas.stage.toString(),
@@ -541,14 +540,13 @@ const SprintList: React.FC<any> = () => {
   const [isformForTesterToModVisible, setformForTesterToModVisible] = useState(false);
   const [isformForUEDToModVisible, setformForUEDToModVisible] = useState(false);
 
-  /* admin 权限操作 */
+  /* region admin 权限操作 */
   // 新增和修改弹出层取消按钮事件
   const handleCancel = () => {
     setIsAddModalVisible(false);
   };
 
-  // sprint 项目保存
-
+  // admin新增项目
   const addCommitDetails = (datas: any) => {
     axios
       .post('/api/sprint/project/child', datas)
@@ -584,6 +582,7 @@ const SprintList: React.FC<any> = () => {
       });
   };
 
+  // admin 修改项目
   const modCommitDetails = (datas: any) => {
     axios
       .put('/api/sprint/project/child', datas)
@@ -622,11 +621,22 @@ const SprintList: React.FC<any> = () => {
       });
   };
 
+  // 提交admin 新增和修改的操作
   const commitSprintDetails = () => {
     const oradata = formForAdminToAddAnaMod.getFieldsValue();
+    if (oradata.adminAddTester === '' || oradata.adminAddTester === null) {
+      message.error({
+        content: `对应测试不能为空！`,
+        className: 'MNone',
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
     if (oradata.adminChandaoType === '' || oradata.adminChandaoId === '') {
       message.error({
-        content: `禅道类型和禅道编号不能为空！`,
+        content: `禅道类型以及禅道编号不能为空！`,
         className: 'MNone',
         style: {
           marginTop: '50vh',
@@ -660,26 +670,45 @@ const SprintList: React.FC<any> = () => {
 
       addCommitDetails(datas);
     } else {
+      let isChanged: boolean = false;
       const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
       datas['id'] = curRow[0].id;
       // 判断是否被修改过 禅道id 对应测试、对应UED、反馈人
       if (formForAdminToAddAnaMod.isFieldTouched('adminChandaoId')) {
         datas["ztNo"] = oradata.adminChandaoId;
+        isChanged = true;
       }
 
       if (formForAdminToAddAnaMod.isFieldTouched('adminAddTester')) {
         datas["tester"] = oradata.adminAddTester;
+        isChanged = true;
       }
 
       if (formForAdminToAddAnaMod.isFieldTouched('adminAddForUED')) {
         datas["uedName"] = oradata.adminAddForUED;
+        isChanged = true;
       }
 
       if (formForAdminToAddAnaMod.isFieldTouched('adminAddFeedbacker')) {
         datas["feedback"] = oradata.adminAddFeedbacker;
+        isChanged = true;
       }
 
-      modCommitDetails(datas);
+      if (isChanged === true) {
+        modCommitDetails(datas);
+      } else {
+        setformForTesterToModVisible(false);
+        setIsAddModalVisible(false);
+        setformForManagerToModVisible(false);
+        setformForUEDToModVisible(false);
+        message.info({
+          content: '记录更新成功！',
+          className: 'ModSuccess',
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
     }
   };
 
@@ -720,7 +749,10 @@ const SprintList: React.FC<any> = () => {
     setIsAddModalVisible(true);
   };
 
-  /* 开发经理 权限操作 */
+  /* endregion */
+
+  /* region 开发经理 权限操作 */
+
   // 开发经理（开发）manager 修改
   const managerModify = (datas: any) => {
     formForManagerToMod.setFieldsValue({
@@ -781,7 +813,9 @@ const SprintList: React.FC<any> = () => {
     modCommitDetails(datas);
   };
 
-  /* 测试 权限操作 */
+  /*  endregion */
+
+  /* region 测试 权限操作 */
   // 测试 修改
   const testerModify = (datas: any) => {
     formForTesterToMod.setFieldsValue({
@@ -804,6 +838,17 @@ const SprintList: React.FC<any> = () => {
 
   const commitTesterModify = () => {
     const oradata = formForTesterToMod.getFieldsValue();
+
+    if (oradata.testToTester === '' || oradata.testToTester === null) {
+      message.error({
+        content: `对应测试不能为空！`,
+        className: 'MNone',
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
     if (oradata.testerChandaoType === '' || oradata.testerCHandaoID === '') {
       message.error({
         content: `禅道类型和禅道编号不能为空！`,
@@ -842,7 +887,9 @@ const SprintList: React.FC<any> = () => {
     modCommitDetails(datas);
   };
 
-  /* UED 权限操作 */
+  /* endregion */
+
+  /* region UED 权限操作 */
   // UED 修改
   const uedModify = (datas: any) => {
     formForUEDToMod.setFieldsValue({
@@ -903,6 +950,9 @@ const SprintList: React.FC<any> = () => {
     }
     modCommitDetails(datas);
   };
+
+
+  /* endregion */
 
   // 修改按钮点击事件
   const btnModifyProject = () => {
@@ -1420,9 +1470,9 @@ const SprintList: React.FC<any> = () => {
             </Col>
             <Col className="gutter-row">
               <div style={leftStyle}>
-                <Form.Item name="adminAddTester" label="对应测试:">
+                <Form.Item name="adminAddTester" label="对应测试:" rules={[{required: true}]}>
                   <Select placeholder="请选择" style={widths} showSearch optionFilterProp="children">
-                    {GetDeptMemner('测试')}
+                    {GetDeptMemner('["测试","业务"]')}
                   </Select>
                 </Form.Item>
               </div>
@@ -1618,7 +1668,7 @@ const SprintList: React.FC<any> = () => {
               <div style={leftStyle}>
                 <Form.Item name="adminAddForUED" label="对应UED：">
                   <Select placeholder="请选择" style={widths}>
-                    {GetDeptMemner('UED')}
+                    {GetDeptMemner('["UED"]')}
                   </Select>
                 </Form.Item>
               </div>
@@ -1900,9 +1950,9 @@ const SprintList: React.FC<any> = () => {
 
             <Col className="gutter-row">
               <div style={{marginLeft: '50px'}}>
-                <Form.Item name="testToTester" label="对应测试:">
+                <Form.Item name="testToTester" label="对应测试:" rules={[{required: true}]}>
                   <Select placeholder="请选择" style={widths} showSearch optionFilterProp="children">
-                    {GetDeptMemner('测试')}
+                    {GetDeptMemner('["测试","业务"]')}
                   </Select>
                 </Form.Item>
               </div>
@@ -1978,7 +2028,7 @@ const SprintList: React.FC<any> = () => {
               <div style={leftStyle}>
                 <Form.Item name="uedForUED" label="对应UED：">
                   <Select placeholder="请选择" style={widths}>
-                    {GetDeptMemner('UED')}
+                    {GetDeptMemner('["UED"]')}
                   </Select>
                 </Form.Item>
               </div>

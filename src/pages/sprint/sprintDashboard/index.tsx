@@ -93,7 +93,7 @@ const emergencyChanged = (value: string, other: any) => {
 const EmergencyProjectLoad = () => {
   // 初始化值
   emergencyPrjInfo.prjID = "4790";
-  emergencyPrjInfo.prjName = "Emergency20210507";
+  emergencyPrjInfo.prjName = "emergency20210507";
 
   return (
     <div>
@@ -101,8 +101,8 @@ const EmergencyProjectLoad = () => {
               style={{width: '200px', marginLeft: "20px", marginTop: '20px', fontSize: "15px"}}
               showSearch optionFilterProp="children" onChange={emergencyChanged}>
         {[
-          <Option value={'4790'} key={"Emergency20210507"}>Emergency20210507</Option>,
-          <Option value={'4733'} key={"Emergency20210407"}>Emergency20210407</Option>,
+          <Option value={'4790'} key={"emergency20210507"}>emergency20210507</Option>,
+          <Option value={'4733'} key={"emergency20210407"}>emergency20210407</Option>,
         ]}
       </Select>
       <Button type="text" style={{float: "right", color: 'black', marginTop: '20px', marginRight: "10px"}}
@@ -253,19 +253,19 @@ const StoryLoad = () => {
 
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>无指派  &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无排期  &nbsp;&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无bug  &nbsp;&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-                <Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                <Link to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                <Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                <Link to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -278,16 +278,16 @@ const StoryLoad = () => {
                 bodyStyle={{height: "120px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>激活 &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已解决 &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
             </div>
           </Card>
@@ -300,16 +300,16 @@ const StoryLoad = () => {
                 bodyStyle={{height: "120px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>16-24H  &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>8-16H  &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>&lt;8H  &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
             </div>
           </Card>
@@ -317,21 +317,21 @@ const StoryLoad = () => {
 
         {/* 待回验时长 */}
         <Col span={6}>
-          <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
+          <Card title={<div style={{marginTop: "-5px"}}> 待回验时长 </div>}
                 headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                 bodyStyle={{height: "120px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>16-24H&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>8-16H&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>&lt;8H&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
             </div>
           </Card>
@@ -340,8 +340,7 @@ const StoryLoad = () => {
       </Row>
 
     </div>
-  )
-    ;
+  );
 };
 // 任务组件
 const TaskLoad = () => {
@@ -361,7 +360,7 @@ const TaskLoad = () => {
         <Col span={2}>
           <div style={{backgroundColor: "white", height: "165px", textAlign: "center"}}>
             <button style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>状态</button>
-           </div>
+          </div>
         </Col>
 
         {/* 规范检查 */}
@@ -474,19 +473,19 @@ const TaskLoad = () => {
 
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>无指派  &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无排期  &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无bug  &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-                <Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                <Link to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                <Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                <Link to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -499,16 +498,16 @@ const TaskLoad = () => {
                 bodyStyle={{height: "120px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>激活 &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已解决 &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
             </div>
           </Card>
@@ -521,16 +520,16 @@ const TaskLoad = () => {
                 bodyStyle={{height: "120px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>&gt;24H  &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>16-24H  &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>8-16H  &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>&lt;8H  &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
             </div>
           </Card>
@@ -543,16 +542,16 @@ const TaskLoad = () => {
                 bodyStyle={{height: "120px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>&gt;24H  &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>16-24H  &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>8-16H  &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>&lt;8H  &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
               </div>
             </div>
           </Card>
@@ -571,7 +570,7 @@ const HotfixLoad = () => {
       fontSize: "15px",
       backgroundColor: "white"
     }}>&nbsp;hotfix &nbsp;
-      <Link to="/sprint/sprintListDetails">10</Link> &nbsp;个
+      <Link to="/sprint/basicTable/bugs/bugAll?projectid='123'&project='测试'">10</Link> &nbsp;个
     </div>
 
     <Row gutter={8} align={"middle"}>   {/* gutter 每一列的间隔距离 */}
@@ -590,16 +589,16 @@ const HotfixLoad = () => {
 
           <div style={{marginTop: "-15px"}}>
             <div style={{whiteSpace: "nowrap"}}>无指派  &nbsp;<Link
-              to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'?projectid='123'&project='测试'">2</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>无排期  &nbsp;<Link
-              to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-              <Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              <Link to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link>&nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-              <Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              <Link to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link>&nbsp;个
             </div>
           </div>
         </Card>
@@ -612,16 +611,16 @@ const HotfixLoad = () => {
               bodyStyle={{height: "110px", textAlign: "left"}}>
           <div style={{marginTop: "-15px"}}>
             <div style={{whiteSpace: "nowrap"}}>激活 &nbsp;<Link
-              to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>已解决 &nbsp;<Link
-              to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-              to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
-              to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
             </div>
           </div>
         </Card>
@@ -634,37 +633,37 @@ const HotfixLoad = () => {
               bodyStyle={{height: "110px", textAlign: "left"}}>
           <div style={{marginTop: "-15px"}}>
             <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
-              to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>16-24H&nbsp;<Link
-              to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>8-16H&nbsp;<Link
-              to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>&lt;8H&nbsp;<Link
-              to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
             </div>
           </div>
         </Card>
       </Col>
       {/* 待回验时长 */}
       <Col span={6}>
-        <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
+        <Card title={<div style={{marginTop: "-5px"}}> 待回验时长 </div>}
               headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
               bodyStyle={{height: "110px", textAlign: "left"}}>
           <div style={{marginTop: "-15px"}}>
             <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
-              to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>16-24H&nbsp;<Link
-              to="/sprint/sprintListDetails">2</Link> &nbsp;个
+              to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>8-16H&nbsp;<Link
-              to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link>&nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>&lt;8H&nbsp;<Link
-              to="/sprint/sprintListDetails">2</Link>&nbsp;个
+              to="/sprint/basicTable/bugs/bugDetails?projectid='123'&project='测试'">2</Link>&nbsp;个
             </div>
           </div>
         </Card>

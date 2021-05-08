@@ -59,154 +59,124 @@ const colums = () => {
       cellRenderer: numberRenderToCurrentStage,
     },
     {
-      headerName: '测试负责人填写',
-      children: [
-        {
-          headerName: '对应测试',
-          field: 'tester',
-        },
-        {
-          headerName: '禅道类型',
-          field: 'category',
-          cellRenderer: numberRenderToZentaoType,
-        },
-        {
-          headerName: '禅道编号',
-          field: 'ztNo',
-          cellRenderer: linkToZentaoPage,
-        },
-      ],
+      headerName: '对应测试',
+      field: 'tester',
     },
     {
-      headerName: '禅道自动实时获取',
-      children: [
-        {
-          headerName: '标题内容',
-          field: 'title',
-        },
-        {
-          headerName: '严重程度',
-          field: 'severity',
-          cellRenderer: numberRenderToZentaoSeverity,
-        },
-        {
-          headerName: '优先级',
-          field: 'priority',
-        },
-        {
-          headerName: '所属模块',
-          field: 'moduleName',
-        },
-        {
-          headerName: '禅道状态',
-          field: 'ztStatus',
-          cellRenderer: numberRenderToZentaoStatus,
-        },
-        {
-          headerName: '相关需求数',
-          field: 'relatedStories',
-        },
-        {
-          headerName: '相关任务数',
-          field: 'relatedTasks',
-        },
-        {
-          headerName: '相关bug数',
-          field: 'relatedBugs',
-        },
-        {
-          headerName: '指派给',
-          field: 'assignedTo',
-        },
-        {
-          headerName: '由谁解决/完成',
-          field: 'finishedBy',
-        },
-        {
-          headerName: '由谁关闭',
-          field: 'closedBy',
-        },
-      ],
+      headerName: '禅道类型',
+      field: 'category',
+      cellRenderer: numberRenderToZentaoType,
     },
     {
-      headerName: '开发经理填写',
-      children: [
-        {
-          headerName: '是否支持热更新',
-          field: 'hotUpdate',
-          cellRenderer: numberRenderToYesNo,
-        },
-        {
-          headerName: '是否有数据升级',
-          field: 'dataUpdate',
-          cellRenderer: numberRenderToYesNo,
-        },
-        {
-          headerName: '是否有接口升级',
-          field: 'interUpdate',
-          cellRenderer: numberRenderToYesNo,
-        },
-        {
-          headerName: '是否有预置数据修改',
-          field: 'presetData',
-          cellRenderer: numberRenderToYesNo,
-        },
-        {
-          headerName: '是否需要测试验证',
-          field: 'testCheck',
-          cellRenderer: numberRenderToYesNo,
-        },
-        {
-          headerName: '验证范围建议',
-          field: 'scopeLimit',
-        },
-        {
-          headerName: '发布环境',
-          field: 'publishEnv',
-        },
-      ],
+      headerName: '禅道编号',
+      field: 'ztNo',
+      cellRenderer: linkToZentaoPage,
     },
     {
-      headerName: 'UED填写',
-      children: [
-        {
-          headerName: '对应UED',
-          field: 'uedName',
-        },
-        {
-          headerName: 'UED测试环境验证',
-          field: 'uedEnvCheck',
-          cellRenderer: numberRenderTopass,
-        },
-        {
-          headerName: 'UED线上验证',
-          field: 'uedOnlineCheck',
-          cellRenderer: numberRenderTopass,
-        },
-      ],
+      headerName: '标题内容',
+      field: 'title',
     },
     {
-      headerName: '测试/UED填写',
-      children: [
-        {
-          headerName: '备注',
-          field: 'memo',
-        },
-        {
-          headerName: '来源',
-          field: 'source',
-          cellRenderer: numberRenderToSource,
-        },
-      ],
+      headerName: '严重程度',
+      field: 'severity',
+      cellRenderer: numberRenderToZentaoSeverity,
     },
     {
-      headerName: '自动生成',
-      children: [
-        {
-          headerName: '反馈人',
-          field: 'feedback',
-        },
-      ],
+      headerName: '优先级',
+      field: 'priority',
+    },
+    {
+      headerName: '所属模块',
+      field: 'moduleName',
+    },
+    {
+      headerName: '禅道状态',
+      field: 'ztStatus',
+      cellRenderer: numberRenderToZentaoStatus,
+    },
+    {
+      headerName: '相关bug数',
+      field: 'relatedStories',
+    },
+    {
+      headerName: '相关需求数',
+      field: 'relatedTasks',
+    },
+    {
+      headerName: '指派给',
+      field: 'assignedTo',
+    },
+    {
+      headerName: '由谁完成',
+      field: 'finishedBy',
+    },
+    {
+      headerName: '由谁关闭',
+      field: 'closedBy',
+    },
+    {
+      headerName: '计划提测时间',
+      field: 'activeTime',
+    },
+    {
+      headerName: '是否支持热更新',
+      field: 'hotUpdate',
+      cellRenderer: numberRenderToYesNo,
+    },
+    {
+      headerName: '是否有数据升级',
+      field: 'dataUpdate',
+      cellRenderer: numberRenderToYesNo,
+    },
+    {
+      headerName: '是否有接口升级',
+      field: 'interUpdate',
+      cellRenderer: numberRenderToYesNo,
+    },
+    {
+      headerName: '是否有预置数据修改',
+      field: 'presetData',
+      cellRenderer: numberRenderToYesNo,
+    },
+    {
+      headerName: '是否需要测试验证',
+      field: 'testCheck',
+      cellRenderer: numberRenderToYesNo,
+    },
+    {
+      headerName: '验证范围建议',
+      field: 'scopeLimit',
+    },
+    {
+      headerName: '发布环境',
+      field: 'publishEnv',
+    },
+    {
+      headerName: '对应UED',
+      field: 'uedName',
+    },
+    {
+      headerName: 'UED测试环境验证',
+      field: 'uedEnvCheck',
+      cellRenderer: numberRenderTopass,
+    },
+    {
+      headerName: 'UED线上验证结果',
+      field: 'uedOnlineCheck',
+      cellRenderer: numberRenderTopass,
+    },
+    {
+      headerName: '备注',
+      field: 'memo',
+    },
+    {
+      headerName: '来源',
+      field: 'source',
+      cellRenderer: numberRenderToSource,
+    },
+    {
+      headerName: '反馈人',
+      field: 'feedback',
     },
   );
 
@@ -296,8 +266,12 @@ const SprintList: React.FC<any> = () => {
     let prjNames: string = '';
     const location = history.location.query;
     if (location !== undefined && location.projectid !== null) {
-      prjId = location.projectid.toString();
-      prjNames = location.project === null ? '' : location.project.toString();
+      // prjId = location.projectid.toString();
+      // prjNames = location.project === null ? '' : location.project.toString();
+
+      prjId = "4801";
+      prjNames = 'emergency20210507';
+
     }
 
     /* 整个模块都需要用到的 */
@@ -1412,7 +1386,7 @@ const SprintList: React.FC<any> = () => {
         breadcrumbName: 'sprint 工作台',
       }, {
         path: '',
-        breadcrumbName: '项目详情',
+        breadcrumbName: '任务明细',
       }];
 
     return (

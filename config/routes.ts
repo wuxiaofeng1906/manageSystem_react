@@ -60,7 +60,7 @@ export default [
     name: 'sprint 工作台',
     icon: 'table',
     path: '/sprint',
-    hideInMenu: true,
+    // hideInMenu: true,
     routes: [
       {
         name: 'dsahboard',
@@ -80,24 +80,24 @@ export default [
       },
       {
         name: 'story',
-        path: 'basicTable/storyAll',
+        path: 'basicTable/stories/storyAll',
         component: './sprint/basicTable/stories/storyAll',
         hideInMenu: true,
       },
       {
         name: 'story明细',
-        path: 'basicTable/storyDetails',
+        path: 'basicTable/stories/storyDetails',
         component: './sprint/basicTable/stories/storyDetails',
         hideInMenu: true,
       },
       {
         name: 'task',
-        path: 'basicTable/taskAll',
+        path: 'basicTable/tasks/taskAll',
         component: './sprint/basicTable/tasks/taskAll',
         hideInMenu: true,
       }, {
         name: 'task明细',
-        path: 'basicTable/taskDetails',
+        path: 'basicTable/tasks/taskDetails',
         component: './sprint/basicTable/tasks/taskDetails',
         hideInMenu: true,
       },

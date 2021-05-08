@@ -124,7 +124,7 @@ const StoryLoad = () => {
         fontSize: "15px",
         backgroundColor: "white"
       }}>&nbsp;需求 &nbsp;
-        <Link to="/sprint/sprintListDetails">10</Link> &nbsp;个
+        <Link to="/sprint/basicTable/stories/storyAll">10</Link> &nbsp;个
       </div>
 
       {/* 需求-状态 */}
@@ -144,28 +144,28 @@ const StoryLoad = () => {
 
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>草稿&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/stories/storyDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无任务&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/stories/storyDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>缺任务&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/stories/storyDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无排期&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/stories/storyDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无指派&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/stories/storyDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未更新&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/stories/storyDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>项目错误 &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/stories/storyDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                <Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                <Link to="/sprint/basicTable/stories/storyDetails">2</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -178,16 +178,16 @@ const StoryLoad = () => {
                 bodyStyle={{height: "185px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>开发中&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>开发完&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -200,13 +200,13 @@ const StoryLoad = () => {
                 bodyStyle={{height: "185px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>提测延期&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/stories/storyDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未提测&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/stories/storyDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已提测&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/stories/storyDetails">2</Link>&nbsp;个
               </div>
 
             </div>
@@ -220,16 +220,16 @@ const StoryLoad = () => {
                 bodyStyle={{height: "185px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>测试中&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>测试完&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -351,7 +351,7 @@ const TaskLoad = () => {
         fontSize: "15px",
         backgroundColor: "white"
       }}>&nbsp;任务 &nbsp;
-        <Link to="/sprint/sprintListDetails">10</Link> &nbsp;个
+        <Link to="/sprint/basicTable/tasks/taskAll">10</Link> &nbsp;个
       </div>
 
       {/* 任务-状态 */}
@@ -370,19 +370,19 @@ const TaskLoad = () => {
                 bodyStyle={{height: "120px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>无任务&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无排期&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未更新&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-                <Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                <Link to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                <Link to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                <Link to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
 
             </div>
@@ -396,16 +396,16 @@ const TaskLoad = () => {
                 bodyStyle={{height: "120px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>开发中&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>开发完&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -418,16 +418,16 @@ const TaskLoad = () => {
                 bodyStyle={{height: "120px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>&gt;24H &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>提测延期&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未提测&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已提测&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -440,16 +440,16 @@ const TaskLoad = () => {
                 bodyStyle={{height: "120px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link>&nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>测试中 &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>测试完 &nbsp;<Link
-                to="/sprint/sprintListDetails">2</Link> &nbsp;个
+                to="/sprint/basicTable/tasks/taskDetails">2</Link> &nbsp;个
               </div>
             </div>
           </Card>

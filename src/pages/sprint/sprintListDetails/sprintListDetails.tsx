@@ -409,6 +409,7 @@ const SprintList: React.FC<any> = () => {
         message.error({
           content: `禅道类型不能为空！`,
           className: 'ModNone',
+          duration: 1, // 1S 后自动关闭
           style: {
             marginTop: '50vh',
           },
@@ -420,6 +421,7 @@ const SprintList: React.FC<any> = () => {
         message.error({
           content: `禅道编号不能为空！`,
           className: 'ModNone',
+          duration: 1, // 1S 后自动关闭
           style: {
             marginTop: '50vh',
           },
@@ -440,7 +442,7 @@ const SprintList: React.FC<any> = () => {
             const queryDatas = res.data.ztRecord;
             formForAdminToAddAnaMod.setFieldsValue({
               adminCurStage: numberRenderToCurrentStage({
-                value: queryDatas.stage === null ? '' : queryDatas.stage.toString(),
+                value: queryDatas.stage === undefined ? '' : queryDatas.stage.toString(),
               }),
               adminAddChandaoTitle: queryDatas.title,
               adminAddSeverity: numberRenderToZentaoSeverity({
@@ -457,6 +459,7 @@ const SprintList: React.FC<any> = () => {
             if (res.data.code === '404') {
               message.error({
                 content: `禅道不存在ID为${ztno}的${chanDaoType}`,
+                duration: 1, // 1S 后自动关闭
                 className: 'ModNone',
                 style: {
                   marginTop: '50vh',
@@ -465,6 +468,7 @@ const SprintList: React.FC<any> = () => {
             } else {
               message.error({
                 content: `${res.data.message}`,
+                duration: 1, // 1S 后自动关闭
                 className: 'ModNone',
                 style: {
                   marginTop: '50vh',
@@ -486,6 +490,7 @@ const SprintList: React.FC<any> = () => {
         .catch(function (error) {
           message.error({
             content: error.toString(),
+            duration: 1, // 1S 后自动关闭
             className: 'ModError',
             style: {
               marginTop: '50vh',
@@ -555,6 +560,7 @@ const SprintList: React.FC<any> = () => {
             updateGrid();
             message.info({
               content: res.data.message,
+              duration: 1, // 1S 后自动关闭
               className: 'AddSuccess',
               style: {
                 marginTop: '50vh',
@@ -563,6 +569,7 @@ const SprintList: React.FC<any> = () => {
           } else {
             message.error({
               content: `${res.data.message}`,
+              duration: 1, // 1S 后自动关闭
               className: 'AddNone',
               style: {
                 marginTop: '50vh',
@@ -573,6 +580,7 @@ const SprintList: React.FC<any> = () => {
         .catch(function (error) {
           message.error({
             content: error.toString(),
+            duration: 1, // 1S 后自动关闭
             className: 'AddError',
             style: {
               marginTop: '50vh',
@@ -594,6 +602,7 @@ const SprintList: React.FC<any> = () => {
             updateGrid();
             message.info({
               content: res.data.message,
+              duration: 1, // 1S 后自动关闭
               className: 'ModSuccess',
               style: {
                 marginTop: '50vh',
@@ -602,6 +611,7 @@ const SprintList: React.FC<any> = () => {
           } else {
             message.error({
               content: `${res.data.message}`,
+              duration: 1, // 1S 后自动关闭
               className: 'ModNone',
               style: {
                 marginTop: '50vh',
@@ -612,6 +622,7 @@ const SprintList: React.FC<any> = () => {
         .catch(function (error) {
           message.error({
             content: error.toString(),
+            duration: 1,
             className: 'ModError',
             style: {
               marginTop: '50vh',
@@ -626,6 +637,7 @@ const SprintList: React.FC<any> = () => {
       if (oradata.adminAddTester === '' || oradata.adminAddTester === null) {
         message.error({
           content: `对应测试不能为空！`,
+          duration: 1,
           className: 'MNone',
           style: {
             marginTop: '50vh',
@@ -637,6 +649,7 @@ const SprintList: React.FC<any> = () => {
         message.error({
           content: `禅道类型以及禅道编号不能为空！`,
           className: 'MNone',
+          duration: 1,
           style: {
             marginTop: '50vh',
           },
@@ -669,45 +682,27 @@ const SprintList: React.FC<any> = () => {
 
         addCommitDetails(datas);
       } else {
-        let isChanged: boolean = false;
         const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
         datas['id'] = curRow[0].id;
         // 判断是否被修改过 禅道id 对应测试、对应UED、反馈人
-        if (formForAdminToAddAnaMod.isFieldTouched('adminChandaoId')) {
+        if (curRow[0].ztNo !== oradata.adminChandaoId) {
           datas["ztNo"] = oradata.adminChandaoId;
-          isChanged = true;
         }
 
         if (formForAdminToAddAnaMod.isFieldTouched('adminAddTester')) {
           datas["tester"] = oradata.adminAddTester;
-          isChanged = true;
         }
 
         if (formForAdminToAddAnaMod.isFieldTouched('adminAddForUED')) {
           datas["uedName"] = oradata.adminAddForUED;
-          isChanged = true;
         }
 
         if (formForAdminToAddAnaMod.isFieldTouched('adminAddFeedbacker')) {
           datas["feedback"] = oradata.adminAddFeedbacker;
-          isChanged = true;
         }
 
-        if (isChanged === true) {
-          modCommitDetails(datas);
-        } else {
-          setformForTesterToModVisible(false);
-          setIsAddModalVisible(false);
-          setformForManagerToModVisible(false);
-          setformForUEDToModVisible(false);
-          message.info({
-            content: '记录更新成功！',
-            className: 'ModSuccess',
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
+        modCommitDetails(datas);
+
       }
     };
 
@@ -781,6 +776,7 @@ const SprintList: React.FC<any> = () => {
         message.error({
           content: `禅道类型和禅道编号不能为空！`,
           className: 'MNone',
+          duration: 1,
           style: {
             marginTop: '50vh',
           },
@@ -841,6 +837,7 @@ const SprintList: React.FC<any> = () => {
       if (oradata.testToTester === '' || oradata.testToTester === null) {
         message.error({
           content: `对应测试不能为空！`,
+          duration: 1,
           className: 'MNone',
           style: {
             marginTop: '50vh',
@@ -851,6 +848,7 @@ const SprintList: React.FC<any> = () => {
       if (oradata.testerChandaoType === '' || oradata.testerCHandaoID === '') {
         message.error({
           content: `禅道类型和禅道编号不能为空！`,
+          duration: 1,
           className: 'MNone',
           style: {
             marginTop: '50vh',
@@ -914,6 +912,7 @@ const SprintList: React.FC<any> = () => {
       if (oradata.uedChandaoType === '' || oradata.uedCHandaoID === '') {
         message.error({
           content: `禅道类型和禅道编号不能为空！`,
+          duration: 1,
           className: 'MNone',
           style: {
             marginTop: '50vh',
@@ -983,6 +982,7 @@ const SprintList: React.FC<any> = () => {
       if (selRows.length === 0) {
         message.error({
           content: '请选中需要修改的数据!',
+          duration: 1,
           className: 'modifyNone',
           style: {
             marginTop: '50vh',
@@ -995,6 +995,7 @@ const SprintList: React.FC<any> = () => {
       if (selRows.length > 1) {
         message.error({
           content: '一次只能修改一条数据!',
+          duration: 1,
           className: 'modifyMore',
           style: {
             marginTop: '50vh',
@@ -1023,6 +1024,7 @@ const SprintList: React.FC<any> = () => {
       if (selRows.length === 0) {
         message.error({
           content: '请选中需要删除的数据!',
+          duration: 1,
           className: 'delNone',
           style: {
             marginTop: '50vh',
@@ -1033,6 +1035,7 @@ const SprintList: React.FC<any> = () => {
       if (selRows.length > 1) {
         message.error({
           content: '一次只能删除一条数据!',
+          duration: 1,
           className: 'delMore',
           style: {
             marginTop: '50vh',
@@ -1055,6 +1058,7 @@ const SprintList: React.FC<any> = () => {
             updateGrid();
             message.info({
               content: res.data.message,
+              duration: 1, // 1S 后自动关闭
               className: 'delSuccess',
               style: {
                 marginTop: '50vh',
@@ -1063,6 +1067,7 @@ const SprintList: React.FC<any> = () => {
           } else {
             message.error({
               content: `${res.data.message}`,
+              duration: 1, // 1S 后自动关闭
               className: 'MdelNon',
               style: {
                 marginTop: '50vh',
@@ -1073,6 +1078,7 @@ const SprintList: React.FC<any> = () => {
         .catch(function (error) {
           message.error({
             content: error.toString(),
+            duration: 1,
             className: 'MdelError',
             style: {
               marginTop: '50vh',
@@ -1096,6 +1102,7 @@ const SprintList: React.FC<any> = () => {
       if (selRows.length <= 0) {
         message.error({
           content: "请选择需要移动的数据！",
+          duration: 1,
           style: {
             marginTop: '50vh',
           },
@@ -1136,6 +1143,7 @@ const SprintList: React.FC<any> = () => {
             updateGrid();
             message.info({
               content: res.data.message,
+              duration: 1,
               style: {
                 marginTop: '50vh',
               },
@@ -1143,6 +1151,7 @@ const SprintList: React.FC<any> = () => {
           } else {
             message.error({
               content: res.data.verify === undefined ? res.data.message : res.data.verify,
+              duration: 1,
               style: {
                 marginTop: '50vh',
               },
@@ -1152,6 +1161,7 @@ const SprintList: React.FC<any> = () => {
         .catch(function (error) {
           message.error({
             content: error.toString(),
+            duration: 1,
             style: {
               marginTop: '50vh',
             },
@@ -1208,8 +1218,8 @@ const SprintList: React.FC<any> = () => {
       if (prjtype === null) {
         message.error({
           content: '项目类型不能为空!',
-          className: 'AddNone',
           duration: 1,
+          className: 'AddNone',
           style: {
             marginTop: '50vh',
           },
@@ -1250,6 +1260,7 @@ const SprintList: React.FC<any> = () => {
             // updateGrid();
             message.info({
               content: res.data.message,
+              duration: 1,
               className: 'AddSuccess',
               style: {
                 marginTop: '50vh',
@@ -1258,6 +1269,7 @@ const SprintList: React.FC<any> = () => {
           } else {
             message.error({
               content: `${res.data.message}${res.data.zt.message.end[0]}`,
+              duration: 1,
               className: 'AddNone',
               style: {
                 marginTop: '50vh',
@@ -1269,6 +1281,7 @@ const SprintList: React.FC<any> = () => {
           // console.log("error", error);
           message.error({
             content: error.toString(),
+            duration: 1,
             className: 'AddError',
             style: {
               marginTop: '50vh',
@@ -1284,31 +1297,31 @@ const SprintList: React.FC<any> = () => {
     const [isFlowModalVisible, setIsFlowModalVisible] = useState(false);
     const [flowHitmessage, setFlowHitmessage] = useState({hintMessage: ''});
 
-// 流程-取消
+    // 流程-取消
     const flowForCancle = () => {
       setFlowHitmessage({hintMessage: '已取消'});
       setIsFlowModalVisible(true);
     };
-// 流程-开发已revert
+    // 流程-开发已revert
     const flowForDevRevert = () => {
       setFlowHitmessage({hintMessage: '开发已revert'});
 
       setIsFlowModalVisible(true);
     };
 
-// 流程-测试已验revert
+    // 流程-测试已验revert
     const flowForTestRevert = () => {
       setFlowHitmessage({hintMessage: '测试已验证revert'});
 
       setIsFlowModalVisible(true);
     };
-// 流程-灰度已验
+    // 流程-灰度已验
     const flowForHuiduChecked = () => {
       setFlowHitmessage({hintMessage: '灰度已验过'});
 
       setIsFlowModalVisible(true);
     };
-// 流程-线上已验证
+    // 流程-线上已验证
     const flowForOnlineChecked = () => {
       setFlowHitmessage({hintMessage: '线上已验过'});
 
@@ -1335,6 +1348,7 @@ const SprintList: React.FC<any> = () => {
             updateGrid();
             message.info({
               content: res.data.message,
+              duration: 1,
               style: {
                 marginTop: '50vh',
               },
@@ -1342,6 +1356,7 @@ const SprintList: React.FC<any> = () => {
           } else {
             message.error({
               content: `${res.data.message}`,
+              duration: 1,
               style: {
                 marginTop: '50vh',
               },
@@ -1351,6 +1366,7 @@ const SprintList: React.FC<any> = () => {
         .catch(function (error) {
           message.error({
             content: error.toString(),
+            duration: 1,
             style: {
               marginTop: '50vh',
             },

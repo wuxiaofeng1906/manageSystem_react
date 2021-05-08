@@ -23,33 +23,36 @@ const numberRenderToCurrentStage = (params: any) => {
       stage = "未开始";
       break;
     case "2":
-      stage = " 开发中";
+      stage = "开发中";
       break;
     case "3":
-      stage = "已提测";
+      stage = "开发完";
       break;
     case "4":
-      stage = "测试中";
+      stage = "已提测";
       break;
     case "5":
-      stage = "TE测试环境已验过";
+      stage = "测试中";
       break;
     case "6":
-      stage = "UED测试环境已验过";
+      stage = "TE测试环境已验过";
       break;
     case "7":
-      stage = "已取消";
+      stage = "UED测试环境已验过";
       break;
     case "8":
-      stage = "开发已revert";
+      stage = "已取消";
       break;
     case "9":
-      stage = "测试已验证revert";
+      stage = "开发已revert";
       break;
     case "10":
-      stage = "，灰度已验过";
+      stage = "测试已验证revert";
       break;
     case "11":
+      stage = "灰度已验过";
+      break;
+    case "12":
       stage = "线上已验过";
       break;
 

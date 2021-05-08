@@ -357,6 +357,7 @@ const SprintList: React.FC<any> = () => {
     if (selRows.length === 0) {
       message.error({
         content: '请选中需要修改的数据!',
+        duration: 1,
         className: 'modifyNone',
         style: {
           marginTop: '50vh',
@@ -369,6 +370,7 @@ const SprintList: React.FC<any> = () => {
     if (selRows.length > 1) {
       message.error({
         content: '一次只能修改一条数据!',
+        duration: 1,
         className: 'modifyMore',
         style: {
           marginTop: '50vh',
@@ -481,15 +483,16 @@ const SprintList: React.FC<any> = () => {
             updateGrid();
             message.info({
               content: res.data.message,
+              duration: 1,
               className: 'AddSuccess',
               style: {
                 marginTop: '50vh',
               },
             });
           } else {
-            debugger;
             message.error({
               content: `${res.data.message}`,
+              duration: 1,
               className: 'AddNone',
               style: {
                 marginTop: '50vh',
@@ -501,6 +504,7 @@ const SprintList: React.FC<any> = () => {
           // console.log("error", error);
           message.error({
             content: error.toString(),
+            duration:1,
             className: 'AddError',
             style: {
               marginTop: '50vh',
@@ -521,6 +525,7 @@ const SprintList: React.FC<any> = () => {
             updateGrid();
             message.info({
               content: res.data.message,
+              duration:1,
               className: 'ModSuccess',
               style: {
                 marginTop: '50vh',
@@ -530,6 +535,7 @@ const SprintList: React.FC<any> = () => {
 
             message.error({
               content: `${res.data.message}`,
+              duration:1,
               className: 'ModNone',
               style: {
                 marginTop: '50vh',
@@ -540,6 +546,7 @@ const SprintList: React.FC<any> = () => {
         .catch(function (error) {
           message.error({
             content: error.toString(),
+            duration:1,
             className: 'ModError',
             style: {
               marginTop: '50vh',
@@ -562,6 +569,7 @@ const SprintList: React.FC<any> = () => {
     if (selRows.length === 0) {
       message.error({
         content: '请选中需要删除的数据!',
+        duration:1,
         className: 'delNone',
         style: {
           marginTop: '50vh',
@@ -573,6 +581,7 @@ const SprintList: React.FC<any> = () => {
     if (selRows.length > 1) {
       message.error({
         content: '一次只能删除一条数据!',
+        duration:1,
         className: 'delMore',
         style: {
           marginTop: '50vh',
@@ -602,6 +611,7 @@ const SprintList: React.FC<any> = () => {
           updateGrid();
           message.info({
             content: res.data.message,
+            duration:1,
             className: 'delSuccess',
             style: {
               marginTop: '50vh',
@@ -610,6 +620,7 @@ const SprintList: React.FC<any> = () => {
         } else {
           message.error({
             content: `${res.data.message}`,
+            duration:1,
             className: 'MdelNone',
             style: {
               marginTop: '50vh',
@@ -620,6 +631,7 @@ const SprintList: React.FC<any> = () => {
       .catch(function (error) {
         message.error({
           content: error.toString(),
+          duration:1,
           className: 'MdelError',
           style: {
             marginTop: '50vh',
@@ -768,7 +780,8 @@ const SprintList: React.FC<any> = () => {
                 <Form.Item label="项目名称：">
                   <Input.Group compact>
                     <Form.Item name="prjNames">
-                      <Select id={'prjNames'} placeholder="请选择类型" style={{width: '150px'}} onSelect={queryRepeatProjectasync}>
+                      <Select id={'prjNames'} placeholder="请选择类型" style={{width: '150px'}}
+                              onSelect={queryRepeatProjectasync}>
                         {[
                           <Option key={'sprint'} value={'sprint'}>
                             sprint

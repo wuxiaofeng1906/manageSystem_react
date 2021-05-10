@@ -151,21 +151,23 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
 // 组件初始化
 const StoryDetails: React.FC<any> = () => {
   /* 获取网页的项目id */
-  let prjId: string = '';
-  let prjNames: string = '';
+  const projectInfo = {
+    prjId: "",
+    prjNames: "",
+    prjKind: ""
+  };
+
   const location = history.location.query;
   if (location !== undefined && location.projectid !== null) {
-    // prjId = location.projectid.toString();
-    // prjNames = location.project === null ? '' : location.project.toString();
-
-    prjId = "4801";
-    prjNames = 'emergency20210507';
+    projectInfo.prjId = location.projectid.toString();
+    projectInfo.prjNames = location.project === null ? '' : location.project.toString();
+    projectInfo.prjKind = location.kind === null ? '' : location.kind.toString();
 
   }
 
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, prjId));
+  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient,projectInfo.prjId));
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -191,7 +193,7 @@ const StoryDetails: React.FC<any> = () => {
 
       <PageHeader
         ghost={false}
-        title={prjNames}
+        title={projectInfo.prjNames}
         style={{height: "100px"}}
         breadcrumb={{routes}}
       />

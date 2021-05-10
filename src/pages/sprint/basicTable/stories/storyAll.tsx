@@ -262,15 +262,17 @@ const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
 // 组件初始化
 const SprintList: React.FC<any> = () => {
     /* 获取网页的项目id */
-    let prjId: string = '';
-    let prjNames: string = '';
+    const projectInfo = {
+      prjId: "",
+      prjNames: "",
+      prjKind: ""
+    };
+
     const location = history.location.query;
     if (location !== undefined && location.projectid !== null) {
-      // prjId = location.projectid.toString();
-      // prjNames = location.project === null ? '' : location.project.toString();
-
-      prjId = "4801";
-      prjNames = 'emergency20210507';
+      projectInfo.prjId = location.projectid.toString();
+      projectInfo.prjNames = location.project === null ? '' : location.project.toString();
+      projectInfo.prjKind = location.kind === null ? '' : location.kind.toString();
 
     }
 
@@ -294,7 +296,7 @@ const SprintList: React.FC<any> = () => {
     /* region  表格相关事件 */
     const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
     const gqlClient = useGqlClient();
-    const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, prjId));
+    const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, projectInfo.prjId));
     const onGridReady = (params: GridReadyEvent) => {
       gridApi.current = params.api;
       params.api.sizeColumnsToFit();
@@ -309,7 +311,7 @@ const SprintList: React.FC<any> = () => {
 
     /* region 其他 */
     const updateGrid = async () => {
-      const datas: any = await queryDevelopViews(gqlClient, prjId);
+      const datas: any = await queryDevelopViews(gqlClient, projectInfo.prjId);
       gridApi.current?.setRowData(datas);
     };
     // 获取部门数据
@@ -406,7 +408,7 @@ const SprintList: React.FC<any> = () => {
       axios
         .get('/api/sprint/project/child', {
           params: {
-            project: prjId,
+            project: projectInfo.prjId,
             category: chanDaoType,
             ztNo: ztno,
           },
@@ -647,7 +649,7 @@ const SprintList: React.FC<any> = () => {
 
       if (modal.title === '新增明细行') {
         // 新增使用的是project id
-        datas['project'] = prjId;
+        datas['project'] = projectInfo.prjId;
         datas["source"] = 7;
         datas["ztNo"] = oradata.adminChandaoId;
         datas["tester"] = oradata.adminAddTester;
@@ -1086,7 +1088,7 @@ const SprintList: React.FC<any> = () => {
       }
 
       formForMove.setFieldsValue({
-        moveForOraPrj: prjNames
+        moveForOraPrj: projectInfo.prjNames
       });
       setIsMoveModalVisible(true);
     };
@@ -1106,7 +1108,7 @@ const SprintList: React.FC<any> = () => {
 
       const params = {
         "id": idArray,
-        "source": prjId,
+        "source": projectInfo.prjId,
         "target": oradata.moveNewPrj
       };
 
@@ -1395,7 +1397,7 @@ const SprintList: React.FC<any> = () => {
 
         <PageHeader
           ghost={false}
-          title={prjNames}
+          title={projectInfo.prjNames}
           style={{height: "100px"}}
           breadcrumb={{routes}}
         />

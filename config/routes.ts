@@ -60,7 +60,7 @@ export default [
     name: 'sprint 工作台',
     icon: 'table',
     path: '/sprint',
-    // hideInMenu: true,
+    hideInMenu: true,
     routes: [
       {
         name: 'dsahboard',

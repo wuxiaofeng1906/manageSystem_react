@@ -7,6 +7,9 @@ import {Row, Col, Select, Card, Button} from 'antd';
 import {Link} from 'umi';
 import {SearchOutlined} from "@ant-design/icons";
 import {history} from "@@/core/history";
+import {GqlClient, useGqlClient} from "@/hooks";
+import {useRequest} from "ahooks";
+import {getWeeksRange} from '@/publicMethods/timeMethods';
 
 const {Option} = Select;
 
@@ -23,6 +26,27 @@ const emergencyPrjInfo = {
   prjID: "",
   prjName: ""
 };
+
+// 解析数据
+const analyzeResult = (source: any) => {
+
+  return source;
+
+};
+const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
+  const {data} = await client.query(`
+      {
+         proDetail(project:${params}){
+            id
+            stage
+            tester
+            category
+          }
+      }
+  `);
+  return analyzeResult(data?.proDetail);
+};
+
 
 // region 页面代码
 
@@ -116,7 +140,7 @@ const EmergencyProjectLoad = () => {
 
 // 需求组件
 const StoryLoad = (params: any) => {
-  const {project} = params;
+  const project = params.project[0];
   const url = `projectid=${project.prjID}&project=${project.prjName}&kind=hotfix`;
 
 
@@ -348,7 +372,7 @@ const StoryLoad = (params: any) => {
 };
 // 任务组件
 const TaskLoad = (params: any) => {
-  const {project} = params;
+  const project = params.project[0];
   const url = `projectid=${project.prjID}&project=${project.prjName}&kind=hotfix`;
 
 
@@ -571,7 +595,9 @@ const TaskLoad = (params: any) => {
 };
 // hotfix组件
 const HotfixLoad = (params: any) => {
-  const {project} = params;
+  const data = params.project[1];
+  console.log(data);
+  const project = params.project[0];
   const url = `projectid=${project.prjID}&project=${project.prjName}&kind=hotfix`;
 
   return (<div className="site-card-wrapper" style={{marginTop: '10px', marginLeft: "20px", marginRight: "20px"}}>
@@ -596,7 +622,7 @@ const HotfixLoad = (params: any) => {
       {/* 规范检查 */}
       <Col span={5}>
         <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
-              headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
+              headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue"}}
               bodyStyle={{height: "110px", textAlign: "left"}}>
 
           <div style={{marginTop: "-15px"}}>
@@ -687,25 +713,26 @@ const HotfixLoad = (params: any) => {
 };
 
 // 左边页面
-const LeftControl = () => {
+const LeftControl = (params: any) => {
   return (
     <div>
       <HotfixProjectLoad/>,
-      <HotfixLoad project={hotfixPrjInfo}/>
+      <HotfixLoad project={[hotfixPrjInfo, params]}/>
       <EmergencyProjectLoad/>,
-      <HotfixLoad project={emergencyPrjInfo}/>
+      <HotfixLoad project={[emergencyPrjInfo, params]}/>
     </div>
 
   );
 };
 // 右边页面
-const RightControl = () => {
+const RightControl = (params: any) => {
+
   return (
     <div>
       <SprintProjectLoad/>,
-      <StoryLoad project={sprintPrjInfo}/>,
-      <TaskLoad project={sprintPrjInfo}/>,
-      <HotfixLoad project={sprintPrjInfo}/>
+      <StoryLoad project={[sprintPrjInfo, params]}/>,
+      <TaskLoad project={[sprintPrjInfo, params]}/>,
+      <HotfixLoad project={[sprintPrjInfo, params]}/>
     </div>
   );
 };
@@ -713,6 +740,17 @@ const RightControl = () => {
 // endregion
 
 const DashBoard: React.FC<any> = () => {
+  // 获取本周的最后一天
+  const weekRanges = getWeeksRange(1);
+  console.log("weekRanges", weekRanges);
+
+  const gqlClient = useGqlClient();
+  const {data} = useRequest(() => queryDevelopViews(gqlClient, ""));
+
+  console.log(data);
+
+
+  // 获取页面数据并解析
 
   return (
     <PageContainer style={{height: "102%", backgroundColor: "white"}}>
@@ -722,14 +760,14 @@ const DashBoard: React.FC<any> = () => {
           {/* 第一列 */}
           <Col className="gutter-row" span={12}>
             <div style={{height: '101%', backgroundColor: "#F2F2F2"}}>
-              <LeftControl/>
+              <LeftControl result={data}/>
             </div>
           </Col>
 
           {/* 第二列 */}
           <Col className="gutter-row" span={12}>
             <div style={{height: '101%', backgroundColor: "#F2F2F2"}}>
-              <RightControl/>
+              <RightControl result={data}/>
             </div>
           </Col>
 

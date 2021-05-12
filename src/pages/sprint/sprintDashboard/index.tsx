@@ -34,17 +34,25 @@ const analyzeResult = (source: any) => {
 
 };
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
+  console.log("params", params);
   const {data} = await client.query(`
       {
-         proDetail(project:${params}){
-            id
-            stage
-            tester
-            category
+        dashboardAll(endDay:"2021-05-13"){
+          name,
+          data{
+            name
+            data{
+              name
+              data{
+                item
+                value
+              }
+            }
           }
+        }
       }
   `);
-  return analyzeResult(data?.proDetail);
+  return analyzeResult(data?.dashboardAll);
 };
 
 
@@ -172,13 +180,13 @@ const StoryLoad = (params: any) => {
 
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>草稿&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=draft`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无任务&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=no_task`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>缺任务&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=lack_task`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无排期&nbsp;<Link
                 to={`/sprint/basicTable/stories/storyDetails?${url}&item=no_deadline`}>2</Link>&nbsp;个
@@ -187,7 +195,7 @@ const StoryLoad = (params: any) => {
                 to={`/sprint/basicTable/stories/storyDetails?${url}&item=no_assign`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未更新&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=un_modify`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>项目错误 &nbsp;<Link
                 to={`/sprint/basicTable/stories/storyDetails?${url}&item=proj_error`}>2</Link>&nbsp;个
@@ -206,16 +214,16 @@ const StoryLoad = (params: any) => {
                 bodyStyle={{height: "185px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=devtask_delay`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=dev_wait`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>开发中&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=developing`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>开发完&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=dev_done`}>2</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -228,13 +236,13 @@ const StoryLoad = (params: any) => {
                 bodyStyle={{height: "185px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>提测延期&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=raisetest_dela`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未提测&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=un_raisetest`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已提测&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=raisetest_done`}>2</Link>&nbsp;个
               </div>
 
             </div>
@@ -248,16 +256,16 @@ const StoryLoad = (params: any) => {
                 bodyStyle={{height: "185px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=testtask_delay`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=test_wait`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>测试中&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=testing`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>测试完&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=test_done`}>2</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -402,13 +410,13 @@ const TaskLoad = (params: any) => {
                 bodyStyle={{height: "120px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>无任务&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item='no_task`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无排期&nbsp;<Link
                 to={`/sprint/basicTable/tasks/taskDetails?${url}&item=no_deadline`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未更新&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=un_modify`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
                 <Link to={`/sprint/basicTable/tasks/taskDetails?${url}&item=proj_error`}>2</Link>&nbsp;个
@@ -428,16 +436,16 @@ const TaskLoad = (params: any) => {
                 bodyStyle={{height: "120px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=devtask_delay`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=dev_wait`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>开发中&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=developing`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>开发完&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=dev_done`}>2</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -449,17 +457,14 @@ const TaskLoad = (params: any) => {
                 headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                 bodyStyle={{height: "120px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
-              <div style={{whiteSpace: "nowrap"}}>&gt;24H &nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=`}>2</Link>&nbsp;个
-              </div>
               <div style={{whiteSpace: "nowrap"}}>提测延期&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=raisetest_delay`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未提测&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=un_raisetest`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已提测&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=raisetest_done`}>2</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -472,16 +477,16 @@ const TaskLoad = (params: any) => {
                 bodyStyle={{height: "120px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=testtask_delay`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=test_wait`}>2</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>测试中 &nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=testing`}>2</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>测试完 &nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=test_done`}>2</Link> &nbsp;个
               </div>
             </div>
           </Card>
@@ -745,7 +750,7 @@ const DashBoard: React.FC<any> = () => {
   console.log("weekRanges", weekRanges);
 
   const gqlClient = useGqlClient();
-  const {data} = useRequest(() => queryDevelopViews(gqlClient, ""));
+  const {data} = useRequest(() => queryDevelopViews(gqlClient, weekRanges));
 
   console.log(data);
 

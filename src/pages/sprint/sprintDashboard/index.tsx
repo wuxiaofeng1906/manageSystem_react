@@ -9,7 +9,7 @@ import {SearchOutlined} from "@ant-design/icons";
 import {history} from "@@/core/history";
 import {GqlClient, useGqlClient} from "@/hooks";
 import {useRequest} from "ahooks";
-import {storyResultDeals} from "./dataProcess";
+import {storyResultDeals, taskResultDeals, bugResultDeals} from "./dataProcess";
 
 const {Option} = Select;
 
@@ -204,7 +204,7 @@ const StoryLoad = (params: any) => {
   const url = `projectid=${project.prjID}&project=${project.prjName}&kind=hotfix`;
 
   const data = storyResultDeals(params.project[1]);
-  console.log(data);
+  console.log("需求相关数据返回", data);
 
   return (<div className="site-card-wrapper" style={{marginTop: '10px', marginLeft: "20px", marginRight: "20px"}}>
 
@@ -437,6 +437,8 @@ const TaskLoad = (params: any) => {
   const project = params.project[0];
   const url = `projectid=${project.prjID}&project=${project.prjName}&kind=hotfix`;
 
+  const data = taskResultDeals(params.project[1]);
+  console.log("任务相关数据返回", data);
 
   return (<div className="site-card-wrapper" style={{marginTop: '10px', marginLeft: "20px", marginRight: "20px"}}>
       <div style={{
@@ -654,9 +656,11 @@ const TaskLoad = (params: any) => {
 };
 // hotfix组件
 const HotfixLoad = (params: any) => {
-  const data = params.project[1];
-  console.log(data);
+
   const project = params.project[0];
+  const data = bugResultDeals(params.project[1]);
+  console.log("hotfix数据返回", data);
+
   const url = `projectid=${project.prjID}&project=${project.prjName}&kind=hotfix`;
 
   return (<div className="site-card-wrapper" style={{marginTop: '10px', marginLeft: "20px", marginRight: "20px"}}>

@@ -1,4 +1,5 @@
-const statusDeal = (itemArray: any) => {
+// region sprint-需求数据分析
+const storyStatusDeal = (itemArray: any) => {
 
   // const storyStatusCount: any = {
   //
@@ -49,6 +50,9 @@ const statusDeal = (itemArray: any) => {
         break;
       case "no_assign":
         storyStatusCount.status_no_assign = count;
+        break;
+      case "no_bug":
+        storyStatusCount.status_no_bug = count;
         break;
       case "un_modify":
         storyStatusCount.status_un_modify = count;
@@ -108,7 +112,7 @@ const statusDeal = (itemArray: any) => {
   return storyStatusCount;
 };
 
-const bugDeal = (itemArray: any) => {
+const storyBugDeal = (itemArray: any) => {
 
   // const storyBugCount: any = {
   //
@@ -149,9 +153,6 @@ const bugDeal = (itemArray: any) => {
         break;
       case "bug_no_deadline":
         storyBugCount.Bug_no_deadline = count;
-        break;
-      case "bug_no_bug":
-        storyBugCount.Bug_no_bug = count;
         break;
       case "bug_proj_error":
         storyBugCount.Bug_proj_error = count;
@@ -219,15 +220,267 @@ const storyResultDeals = (countArray: any) => {
   for (let index = 0; index < countArray.length; index += 1) {
     const itemArray = countArray[index].data;
     if (countArray[index].name === "status") {
-      statusData = statusDeal(itemArray);
+      statusData = storyStatusDeal(itemArray);
 
     } else {
-      bugData = bugDeal(itemArray);
+      bugData = storyBugDeal(itemArray);
     }
   }
 
   return {status: statusData, bug: bugData};
 };
 
+// endregion
 
-export {storyResultDeals};
+// region sprint-任务数据分析
+const taskStatusDeal = (itemArray: any) => {
+
+  const taskStatusCount = Object();
+  for (let i = 0; i < itemArray.length; i += 1) {
+    const count = itemArray[i].value;
+    switch (itemArray[i].item) {
+      // 规范检查
+      case "lack_task": // 缺任务
+        taskStatusCount.status_lack_task = count;
+        break;
+      case "no_deadline": // 无排期
+        taskStatusCount.status_no_deadline = count;
+        break;
+      case "no_assign":// 无指派
+        taskStatusCount.status_no_assign = count;
+        break;
+      case "no_bug": // 无bug
+        taskStatusCount.status_no_bug = count;
+        break;
+      case "un_modify": // 未更新
+        taskStatusCount.status_un_modify = count;
+        break;
+      case "proj_error":// 项目错误
+        taskStatusCount.status_proj_error = count;
+        break;
+      case "over_area": // 超范围
+        taskStatusCount.status_over_area = count;
+        break;
+
+      // 开发进展
+      case "devtask_delay": // 任务延期
+        taskStatusCount.status_devtask_delay = count;
+        break;
+      case "dev_wait": // 未开始
+        taskStatusCount.status_dev_wait = count;
+        break;
+      case "developing": // 开发中
+        taskStatusCount.status_developing = count;
+        break;
+      case "dev_done": // 开发完
+        taskStatusCount.status_dev_done = count;
+        break;
+
+      // 提测进展
+      case "raisetest_delay": // 提测延期
+        taskStatusCount.status_raisetest_delay = count;
+        break;
+      case "un_raisetest": // 未提测
+        taskStatusCount.status_un_raisetest = count;
+        break;
+      case "raisetest_done": // 已提测
+        taskStatusCount.status_raisetest_done = count;
+        break;
+
+      // 测试进展
+      case "testtask_delay": // 任务延期
+        taskStatusCount.status_testtask_delay = count;
+        break;
+      case "test_wait": // 未开始
+        taskStatusCount.status_test_wait = count;
+        break;
+      case "testing":// 测试中
+        taskStatusCount.status_testing = count;
+        break;
+      case "test_done": // 测试完毕
+        taskStatusCount.status_test_done = count;
+        break;
+
+      default:
+        break;
+    }
+
+  }
+
+  return taskStatusCount;
+};
+
+const taskBugDeal = (itemArray: any) => {
+
+  const taskBugCount = Object();
+  for (let i = 0; i < itemArray.length; i += 1) {
+    const count = itemArray[i].value;
+    switch (itemArray[i].item) {
+      // 规范检查
+      case "bug_no_assign": // 无指派
+        taskBugCount.Bug_no_assign = count;
+        break;
+      case "bug_no_deadline": // 无排期
+        taskBugCount.Bug_no_deadline = count;
+        break;
+      case "bug_proj_error":// 项目错误
+        taskBugCount.Bug_proj_error = count;
+        break;
+      case "bug_over_area":// 超范围
+        taskBugCount.Bug_over_area = count;
+        break;
+
+
+      // bug状态
+      case "bug_actived": // 激活
+        taskBugCount.Bug_actived = count;
+        break;
+      case "bug_resolved": // 已解决
+        taskBugCount.Bug_resolved = count;
+        break;
+      case "bug_verified": // 已验证
+        taskBugCount.Bug_verified = count;
+        break;
+      case "bug_closed": // 已关闭
+        taskBugCount.Bug_closed = count;
+        break;
+
+      // 激活时长
+      case "bug_ac_>24H": // >24H
+        taskBugCount.Bug_ac_24 = count;
+        break;
+      case "bug_ac_16-24H": // 16-24H
+        taskBugCount.Bug_ac_1624 = count;
+        break;
+      case "bug_ac_8-16H": // 8-16H
+        taskBugCount.Bug_ac_0816 = count;
+        break;
+      case "bug_ac_<8H":// <8H
+        taskBugCount.Bug_ac_08 = count;
+        break;
+
+      // 待回验进展
+      case "bug_ve_>24H": // >24H
+        taskBugCount.Bug_ac_24 = count;
+        break;
+      case "bug_ve_16-24H":// 16-24H
+        taskBugCount.Bug_ac_1624 = count;
+        break;
+      case "bug_ve_8-16H":// 8-16H
+        taskBugCount.Bug_ac_0816 = count;
+        break;
+      case "bug_ve_<8H":// <8H
+        taskBugCount.Bug_ac_08 = count;
+        break;
+
+      default:
+        break;
+    }
+
+  }
+
+  return taskBugCount;
+};
+
+const taskResultDeals = (countArray: any) => {
+  let statusData = Object();
+  let bugData = Object();
+
+  for (let index = 0; index < countArray.length; index += 1) {
+    const itemArray = countArray[index].data;
+    if (countArray[index].name === "status") {
+      statusData = taskStatusDeal(itemArray);
+
+    } else {
+      bugData = taskBugDeal(itemArray);
+    }
+  }
+
+  return {status: statusData, bug: bugData};
+};
+
+// endregion
+
+// region sprint-hotfix数据分析
+
+
+const bugResultDeals = (countArray: any) => {
+  let itemArray = [];
+  if (countArray.length > 0) {
+    itemArray = countArray[0].data;
+  }
+
+
+  const hotfixBugCount = Object();
+  for (let i = 0; i < itemArray.length; i += 1) {
+    const count = itemArray[i].value;
+    switch (itemArray[i].item) {
+      // 规范检查
+      case "bug_no_assign": // 无指派
+        hotfixBugCount.Bug_no_assign = count;
+        break;
+      case "bug_no_deadline": // 无排期
+        hotfixBugCount.Bug_no_deadline = count;
+        break;
+      case "bug_proj_error":// 项目错误
+        hotfixBugCount.Bug_proj_error = count;
+        break;
+      case "bug_over_area":// 超范围
+        hotfixBugCount.Bug_over_area = count;
+        break;
+
+
+      // bug状态
+      case "bug_actived": // 激活
+        hotfixBugCount.Bug_actived = count;
+        break;
+      case "bug_resolved": // 已解决
+        hotfixBugCount.Bug_resolved = count;
+        break;
+      case "bug_verified": // 已验证
+        hotfixBugCount.Bug_verified = count;
+        break;
+      case "bug_closed": // 已关闭
+        hotfixBugCount.Bug_closed = count;
+        break;
+
+      // 激活时长
+      case "bug_ac_>24H": // >24H
+        hotfixBugCount.Bug_ac_24 = count;
+        break;
+      case "bug_ac_16-24H": // 16-24H
+        hotfixBugCount.Bug_ac_1624 = count;
+        break;
+      case "bug_ac_8-16H": // 8-16H
+        hotfixBugCount.Bug_ac_0816 = count;
+        break;
+      case "bug_ac_<8H":// <8H
+        hotfixBugCount.Bug_ac_08 = count;
+        break;
+
+      // 待回验进展
+      case "bug_ve_>24H": // >24H
+        hotfixBugCount.Bug_ac_24 = count;
+        break;
+      case "bug_ve_16-24H":// 16-24H
+        hotfixBugCount.Bug_ac_1624 = count;
+        break;
+      case "bug_ve_8-16H":// 8-16H
+        hotfixBugCount.Bug_ac_0816 = count;
+        break;
+      case "bug_ve_<8H":// <8H
+        hotfixBugCount.Bug_ac_08 = count;
+        break;
+
+      default:
+        break;
+    }
+
+  }
+
+  return hotfixBugCount;
+};
+
+// endregion
+
+export {storyResultDeals, taskResultDeals, bugResultDeals};

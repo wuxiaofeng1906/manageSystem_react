@@ -9,7 +9,6 @@ import {SearchOutlined} from "@ant-design/icons";
 import {history} from "@@/core/history";
 import {GqlClient, useGqlClient} from "@/hooks";
 import {useRequest} from "ahooks";
-import {getWeeksRange} from '@/publicMethods/timeMethods';
 
 const {Option} = Select;
 
@@ -29,12 +28,10 @@ const emergencyPrjInfo = {
 
 // 解析数据
 const analyzeResult = (source: any) => {
-
   return source;
-
 };
-const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
-  console.log("params", params);
+
+const queryDashboardViews = async (client: GqlClient<object>) => {
   const {data} = await client.query(`
       {
         dashboardAll(endDay:"2021-05-13"){
@@ -55,6 +52,53 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   return analyzeResult(data?.dashboardAll);
 };
 
+// 查询未关闭的项目，显示到下拉框中
+
+const ProjectClassificate = (source: any) => {
+  const data: any = {
+    hotfix: [],
+    sprint: [],
+    emergency: []
+  };
+
+  source.forEach(function (project: any) {
+    // debugger;
+    if (project.name.includes("hotfix")) {
+      data.hotfix.push({
+        "id": project.id,
+        "name": project.name
+      });
+
+    } else if (project.name.includes("sprint")) {
+      data.sprint.push({
+        "id": project.id,
+        "name": project.name
+      });
+    } else {
+      data.emergency.push({
+        "id": project.id,
+        "name": project.name
+      });
+    }
+  });
+
+  return data;
+
+};
+const queryProjectViews = async (client: GqlClient<object>) => {
+  const {data} = await client.query(`
+      {
+          project(name:null,category:null, range:{start:"", end:""},status:[wait,doing,suspended]){
+          id
+          name
+
+        }
+      }
+  `);
+
+  return ProjectClassificate(data?.project);
+};
+
 
 // region 页面代码
 
@@ -64,20 +108,21 @@ const sprintChanged = (value: string, other: any) => {
   sprintPrjInfo.prjID = value;
   sprintPrjInfo.prjName = other.key;
 };
-const SprintProjectLoad = () => {
-  // 初始化值
-  sprintPrjInfo.prjID = "4790";
-  sprintPrjInfo.prjName = "sprint20210427_测试项目!";
+const SprintChoiceLoad = (params: any) => {
+  const sprintName = params.project;
+  const sp_project = [];
+  for (let index = 0; index < sprintName.length; index += 1) {
+
+    sp_project.push(
+      <Option value={sprintName[index].id}> {sprintName[index].name}</Option>,
+    );
+  }
 
   return (
     <div>
-      <Select defaultValue="4790"
-              style={{width: '200px', marginLeft: "20px", marginTop: '20px', fontSize: "15px"}}
+      <Select style={{width: '200px', marginLeft: "20px", marginTop: '20px', fontSize: "15px"}}
               showSearch optionFilterProp="children" onChange={sprintChanged}>
-        {[
-          <Option value={'4790'} key={"sprint20210427_测试项目!"}>sprint20210427_测试项目!</Option>,
-          <Option value={'4733'} key={"sprint20210422"}>sprint20210422</Option>,
-        ]}
+        {sp_project}
       </Select>
       <Button type="text" style={{float: "right", color: 'black', marginTop: '20px', marginRight: "10px"}}
               icon={<SearchOutlined/>}
@@ -93,21 +138,21 @@ const hotfixChanged = (value: string, other: any) => {
   hotfixPrjInfo.prjID = value;
   hotfixPrjInfo.prjName = other.key;
 };
-const HotfixProjectLoad = () => {
+const HotfixChoiceLoad = (params: any) => {
   // 初始化值
-  hotfixPrjInfo.prjID = "4790";
-  hotfixPrjInfo.prjName = "hotfix20210506";
+  const hotfixName = params.project;
+  const ho_project = [];
+  for (let index = 0; index < hotfixName.length; index += 1) {
+
+    ho_project.push(
+      <Option value={hotfixName[index].id}> {hotfixName[index].name}</Option>,
+    );
+  }
 
   return (
     <div>
-      <Select defaultValue="4790"
-              style={{width: '200px', marginLeft: "20px", marginTop: '20px', fontSize: "15px"}}
-              showSearch optionFilterProp="children" onChange={hotfixChanged}>
-        {[
-          <Option value={'4790'} key={"hotfix20210506"}>hotfix20210506</Option>,
-          <Option value={'4733'} key={"sprint20210422"}>hotfix20210422</Option>,
-        ]}
-      </Select>
+      <Select style={{width: '200px', marginLeft: "20px", marginTop: '20px', fontSize: "15px"}}
+              showSearch optionFilterProp="children" onChange={hotfixChanged}>{ho_project}</Select>
       <Button type="text" style={{float: "right", color: 'black', marginTop: '20px', marginRight: "10px"}}
               icon={<SearchOutlined/>}
               size={'large'}
@@ -122,21 +167,19 @@ const emergencyChanged = (value: string, other: any) => {
   emergencyPrjInfo.prjID = value;
   emergencyPrjInfo.prjName = other.key;
 };
-const EmergencyProjectLoad = () => {
-  // 初始化值
-  emergencyPrjInfo.prjID = "4790";
-  emergencyPrjInfo.prjName = "emergency20210507";
+const EmergencyChoiceLoad = (params: any) => {
+  const emerName = params.project;
+  const em_project = [];
+  for (let index = 0; index < emerName.length; index += 1) {
+    em_project.push(
+      <Option value={emerName[index].id}> {emerName[index].name}</Option>,
+    );
+  }
 
   return (
     <div>
-      <Select defaultValue="4790"
-              style={{width: '200px', marginLeft: "20px", marginTop: '20px', fontSize: "15px"}}
-              showSearch optionFilterProp="children" onChange={emergencyChanged}>
-        {[
-          <Option value={'4790'} key={"emergency20210507"}>emergency20210507</Option>,
-          <Option value={'4733'} key={"emergency20210407"}>emergency20210407</Option>,
-        ]}
-      </Select>
+      <Select style={{width: '200px', marginLeft: "20px", marginTop: '20px', fontSize: "15px"}}
+              showSearch optionFilterProp="children" onChange={emergencyChanged}>{em_project}</Select>
       <Button type="text" style={{float: "right", color: 'black', marginTop: '20px', marginRight: "10px"}}
               icon={<SearchOutlined/>}
               size={'large'}
@@ -719,25 +762,38 @@ const HotfixLoad = (params: any) => {
 
 // 左边页面
 const LeftControl = (params: any) => {
+  let hotfix = Array();
+  let emergency = Array();
+
+  if (params.result[1] !== undefined) {
+    hotfix = params.result[1].hotfix;
+    emergency = params.result[1].emergency;
+  }
+
   return (
     <div>
-      <HotfixProjectLoad/>,
-      <HotfixLoad project={[hotfixPrjInfo, params]}/>
-      <EmergencyProjectLoad/>,
-      <HotfixLoad project={[emergencyPrjInfo, params]}/>
+      <HotfixChoiceLoad project={hotfix}/>,
+      {/* <HotfixLoad project={[hotfixPrjInfo, params]}/> */}
+      <EmergencyChoiceLoad project={emergency}/>,
+      {/* <HotfixLoad project={[emergencyPrjInfo, params]}/> */}
     </div>
 
   );
 };
 // 右边页面
 const RightControl = (params: any) => {
+  let sprint = Array();
+
+  if (params.result[1] !== undefined) {
+    sprint = params.result[1].sprint;
+  }
 
   return (
     <div>
-      <SprintProjectLoad/>,
-      <StoryLoad project={[sprintPrjInfo, params]}/>,
-      <TaskLoad project={[sprintPrjInfo, params]}/>,
-      <HotfixLoad project={[sprintPrjInfo, params]}/>
+      <SprintChoiceLoad project={sprint}/>,
+      {/* <StoryLoad project={[sprintPrjInfo, params.data]}/>, */}
+      {/* <TaskLoad project={[sprintPrjInfo, params.data]}/>, */}
+      {/* <HotfixLoad project={[sprintPrjInfo, params.data]}/> */}
     </div>
   );
 };
@@ -745,14 +801,10 @@ const RightControl = (params: any) => {
 // endregion
 
 const DashBoard: React.FC<any> = () => {
-  // 获取本周的最后一天
-  const weekRanges = getWeeksRange(1);
-  console.log("weekRanges", weekRanges);
 
   const gqlClient = useGqlClient();
-  const {data} = useRequest(() => queryDevelopViews(gqlClient, weekRanges));
-
-  console.log(data);
+  const project: any = useRequest(() => queryProjectViews(gqlClient)).data;
+  const {data} = useRequest(() => queryDashboardViews(gqlClient));
 
 
   // 获取页面数据并解析
@@ -765,14 +817,14 @@ const DashBoard: React.FC<any> = () => {
           {/* 第一列 */}
           <Col className="gutter-row" span={12}>
             <div style={{height: '101%', backgroundColor: "#F2F2F2"}}>
-              <LeftControl result={data}/>
+              <LeftControl result={[data, project]}/>
             </div>
           </Col>
 
           {/* 第二列 */}
           <Col className="gutter-row" span={12}>
             <div style={{height: '101%', backgroundColor: "#F2F2F2"}}>
-              <RightControl result={data}/>
+              <RightControl result={[data, project]}/>
             </div>
           </Col>
 

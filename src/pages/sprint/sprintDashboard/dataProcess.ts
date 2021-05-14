@@ -192,16 +192,16 @@ const storyBugDeal = (itemArray: any) => {
 
       // 待回验进展
       case "bug_ve_>24H":
-        storyBugCount.Bug_ac_24 = count;
+        storyBugCount.Bug_ve_24 = count;
         break;
       case "bug_ve_16-24H":
-        storyBugCount.Bug_ac_1624 = count;
+        storyBugCount.Bug_ve_1624 = count;
         break;
       case "bug_ve_8-16H":
-        storyBugCount.Bug_ac_0816 = count;
+        storyBugCount.Bug_ve_0816 = count;
         break;
       case "bug_ve_<8H":
-        storyBugCount.Bug_ac_08 = count;
+        storyBugCount.Bug_ve_08 = count;
         break;
 
       default:
@@ -240,8 +240,8 @@ const taskStatusDeal = (itemArray: any) => {
     const count = itemArray[i].value;
     switch (itemArray[i].item) {
       // 规范检查
-      case "lack_task": // 缺任务
-        taskStatusCount.status_lack_task = count;
+      case "no_task": // 无任务
+        taskStatusCount.status_no_task = count;
         break;
       case "no_deadline": // 无排期
         taskStatusCount.status_no_deadline = count;
@@ -361,16 +361,16 @@ const taskBugDeal = (itemArray: any) => {
 
       // 待回验进展
       case "bug_ve_>24H": // >24H
-        taskBugCount.Bug_ac_24 = count;
+        taskBugCount.Bug_ve_24 = count;
         break;
       case "bug_ve_16-24H":// 16-24H
-        taskBugCount.Bug_ac_1624 = count;
+        taskBugCount.Bug_ve_1624 = count;
         break;
       case "bug_ve_8-16H":// 8-16H
-        taskBugCount.Bug_ac_0816 = count;
+        taskBugCount.Bug_ve_0816 = count;
         break;
       case "bug_ve_<8H":// <8H
-        taskBugCount.Bug_ac_08 = count;
+        taskBugCount.Bug_ve_08 = count;
         break;
 
       default:
@@ -460,16 +460,16 @@ const bugResultDeals = (countArray: any) => {
 
       // 待回验进展
       case "bug_ve_>24H": // >24H
-        hotfixBugCount.Bug_ac_24 = count;
+        hotfixBugCount.Bug_ve_24 = count;
         break;
       case "bug_ve_16-24H":// 16-24H
-        hotfixBugCount.Bug_ac_1624 = count;
+        hotfixBugCount.Bug_ve_1624 = count;
         break;
       case "bug_ve_8-16H":// 8-16H
-        hotfixBugCount.Bug_ac_0816 = count;
+        hotfixBugCount.Bug_ve_0816 = count;
         break;
       case "bug_ve_<8H":// <8H
-        hotfixBugCount.Bug_ac_08 = count;
+        hotfixBugCount.Bug_ve_08 = count;
         break;
 
       default:

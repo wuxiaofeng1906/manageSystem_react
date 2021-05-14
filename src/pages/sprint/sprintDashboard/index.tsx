@@ -199,6 +199,9 @@ const EmergencyChoiceLoad = (params: any) => {
 
 // 需求组件
 const StoryLoad = (params: any) => {
+  if (params.project[1].length <= 0) {
+    return (<div></div>);
+  }
 
   const project = params.project[0];
   const url = `projectid=${project.prjID}&project=${project.prjName}&kind=hotfix`;
@@ -234,31 +237,31 @@ const StoryLoad = (params: any) => {
 
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>草稿&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=draft`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=draft`}>{data.status.status_draft}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无任务&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=no_task`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=no_task`}>{data.status.status_no_task}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>缺任务&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=lack_task`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=lack_task`}>{data.status.status_lack_task}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无排期&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=no_deadline`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=no_deadline`}>{data.status.status_no_deadline}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无指派&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=no_assign`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=no_assign`}>{data.status.status_no_assign}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无bug  &nbsp;&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=no_bug`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=no_bug`}>{data.status.status_no_bug}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未更新&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=un_modify`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=un_modify`}>{data.status.status_un_modify}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>项目错误 &nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=proj_error`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=proj_error`}>{data.status.status_proj_error}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                <Link to={`/sprint/basicTable/stories/storyDetails?${url}&item=over_area`}>2</Link>&nbsp;个
+                <Link to={`/sprint/basicTable/stories/storyDetails?${url}&item=over_area`}>{data.status.status_over_area}</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -271,16 +274,16 @@ const StoryLoad = (params: any) => {
                 bodyStyle={{height: "205px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=devtask_delay`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=devtask_delay`}>{data.status.status_devtask_delay}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=dev_wait`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=dev_wait`}>{data.status.status_dev_wait}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>开发中&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=developing`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=developing`}>{data.status.status_developing}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>开发完&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=dev_done`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=dev_done`}>{data.status.status_dev_done}</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -293,13 +296,13 @@ const StoryLoad = (params: any) => {
                 bodyStyle={{height: "205px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>提测延期&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=raisetest_delay`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=raisetest_delay`}>{data.status.status_raisetest_delay}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未提测&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=un_raisetest`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=un_raisetest`}>{data.status.status_un_raisetest}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已提测&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=raisetest_done`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=raisetest_done`}>{data.status.status_raisetest_done}</Link>&nbsp;个
               </div>
 
             </div>
@@ -313,16 +316,16 @@ const StoryLoad = (params: any) => {
                 bodyStyle={{height: "205px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=testtask_delay`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=testtask_delay`}>{data.status.status_testtask_delay}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=test_wait`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=test_wait`}>{data.status.status_test_wait}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>测试中&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=testing`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=testing`}>{data.status.status_testing}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>测试完&nbsp;<Link
-                to={`/sprint/basicTable/stories/storyDetails?${url}&item=test_done`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/stories/storyDetails?${url}&item=test_done`}>{data.status.status_test_done}</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -346,16 +349,16 @@ const StoryLoad = (params: any) => {
 
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>无指派  &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_no_assign`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_no_assign`}>{data.bug.Bug_no_assign}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无排期  &nbsp;&nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_no_deadline`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_no_deadline`}>{data.bug.Bug_no_deadline}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-                <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_proj_error`}>2</Link>&nbsp;个
+                <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_proj_error`}>{data.bug.Bug_proj_error}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_over_area`}>2</Link>&nbsp;个
+                <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_over_area`}>{data.bug.Bug_over_area}</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -368,16 +371,16 @@ const StoryLoad = (params: any) => {
                 bodyStyle={{height: "100px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>激活 &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=actived`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=actived`}>{data.bug.Bug_actived}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已解决 &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=resolved`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=resolved`}>{data.bug.Bug_resolved}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=verified`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=verified`}>{data.bug.Bug_verified}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=closed`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=closed`}>{data.bug.Bug_closed}</Link> &nbsp;个
               </div>
             </div>
           </Card>
@@ -390,16 +393,16 @@ const StoryLoad = (params: any) => {
                 bodyStyle={{height: "100px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_>24H`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_>24H`}>{data.bug.Bug_ac_24}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>16-24H  &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_16-24H`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_16-24H`}>{data.bug.Bug_ac_1624}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>8-16H  &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_8-16H`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_8-16H`}>{data.bug.Bug_ac_0816}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>&lt;8H  &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_<8H`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_<8H`}>{data.bug.Bug_ac_08}</Link> &nbsp;个
               </div>
             </div>
           </Card>
@@ -412,16 +415,16 @@ const StoryLoad = (params: any) => {
                 bodyStyle={{height: "100px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_>24H`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_>24H`}>{data.bug.Bug_ve_24}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>16-24H&nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_16-24H`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_16-24H`}>{data.bug.Bug_ve_1624}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>8-16H&nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_8-16H`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_8-16H`}>{data.bug.Bug_ve_0816}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>&lt;8H&nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_<8H`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_<8H`}>{data.bug.Bug_ve_08}</Link> &nbsp;个
               </div>
             </div>
           </Card>
@@ -434,6 +437,10 @@ const StoryLoad = (params: any) => {
 };
 // 任务组件
 const TaskLoad = (params: any) => {
+  if (params.project[1].length <= 0) {
+    return (<div></div>);
+  }
+
   const project = params.project[0];
   const url = `projectid=${project.prjID}&project=${project.prjName}&kind=hotfix`;
 
@@ -454,7 +461,7 @@ const TaskLoad = (params: any) => {
       <Row gutter={8} align={"middle"}>   {/* gutter 每一列的间隔距离 */}
 
         <Col span={2}>
-          <div style={{backgroundColor: "white", height: "185px", textAlign: "center"}}>
+          <div style={{backgroundColor: "white", height: "205px", textAlign: "center"}}>
             <button style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>状态</button>
           </div>
         </Col>
@@ -463,25 +470,28 @@ const TaskLoad = (params: any) => {
         <Col span={5}>
           <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
                 headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
-                bodyStyle={{height: "140px", textAlign: "left"}}>
+                bodyStyle={{height: "160px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>无任务&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item='no_task`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item='no_task`}>{data.status.status_no_task}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无排期&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=no_deadline`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=no_deadline`}>{data.status.status_no_deadline}</Link>&nbsp;个
+              </div>
+              <div style={{whiteSpace: "nowrap"}}>无指派&nbsp;<Link
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=no_assign`}>{data.status.status_no_assign}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无bug  &nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=no_bug`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=no_bug`}>{data.status.status_no_bug}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未更新&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=un_modify`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=un_modify`}>{data.status.status_un_modify}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-                <Link to={`/sprint/basicTable/tasks/taskDetails?${url}&item=proj_error`}>2</Link>&nbsp;个
+                <Link to={`/sprint/basicTable/tasks/taskDetails?${url}&item=proj_error`}>{data.status.status_proj_error}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                <Link to={`/sprint/basicTable/tasks/taskDetails?${url}&item=over_area`}>2</Link>&nbsp;个
+                <Link to={`/sprint/basicTable/tasks/taskDetails?${url}&item=over_area`}>{data.status.status_over_area}</Link>&nbsp;个
               </div>
 
             </div>
@@ -492,19 +502,19 @@ const TaskLoad = (params: any) => {
         <Col span={5}>
           <Card title={<div style={{marginTop: "-5px"}}> 开发进展 </div>}
                 headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
-                bodyStyle={{height: "140px", textAlign: "left"}}>
+                bodyStyle={{height: "160px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=devtask_delay`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=devtask_delay`}>{data.status.status_devtask_delay}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=dev_wait`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=dev_wait`}>{data.status.status_dev_wait}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>开发中&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=developing`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=developing`}>{data.status.status_developing}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>开发完&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=dev_done`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=dev_done`}>{data.status.status_dev_done}</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -514,16 +524,16 @@ const TaskLoad = (params: any) => {
         <Col span={6}>
           <Card title={<div style={{marginTop: "-5px"}}> 提测进展 </div>}
                 headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
-                bodyStyle={{height: "140px", textAlign: "left"}}>
+                bodyStyle={{height: "160px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>提测延期&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=raisetest_delay`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=raisetest_delay`}>{data.status.status_raisetest_delay}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未提测&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=un_raisetest`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=un_raisetest`}>{data.status.status_un_raisetest}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已提测&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=raisetest_done`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=raisetest_done`}>{data.status.status_raisetest_done}</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -533,19 +543,19 @@ const TaskLoad = (params: any) => {
         <Col span={6}>
           <Card title={<div style={{marginTop: "-5px"}}> 测试进展 </div>}
                 headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
-                bodyStyle={{height: "140px", textAlign: "left"}}>
+                bodyStyle={{height: "160px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=testtask_delay`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=testtask_delay`}>{data.status.status_testtask_delay}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=test_wait`}>2</Link>&nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=test_wait`}>{data.status.status_test_wait}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>测试中 &nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=testing`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=testing`}>{data.status.status_testing}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>测试完 &nbsp;<Link
-                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=test_done`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/tasks/taskDetails?${url}&item=test_done`}>{data.status.status_test_done}</Link> &nbsp;个
               </div>
             </div>
           </Card>
@@ -568,17 +578,17 @@ const TaskLoad = (params: any) => {
                 bodyStyle={{height: "100px", textAlign: "left"}}>
 
             <div style={{marginTop: "-15px"}}>
-              <div style={{whiteSpace: "nowrap"}}>无指派  &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_no_assign`}>2</Link> &nbsp;个
+              <div style={{whiteSpace: "nowrap"}}>无指派 &nbsp;<Link
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_no_assign`}>{data.bug.Bug_no_assign}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>无排期  &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_no_deadline`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_no_deadline`}>{data.bug.Bug_no_deadline}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-                <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_proj_error`}>2</Link>&nbsp;个
+                <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_proj_error`}>{data.bug.Bug_proj_error}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_over_area`}>2</Link>&nbsp;个
+                <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_over_area`}>{data.bug.Bug_over_area}</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -591,16 +601,16 @@ const TaskLoad = (params: any) => {
                 bodyStyle={{height: "100px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>激活 &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=actived`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=actived`}>{data.bug.Bug_actived}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已解决 &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=resolved`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=resolved`}>{data.bug.Bug_resolved}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=verified`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=verified`}>{data.bug.Bug_verified}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=closed`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=closed`}>{data.bug.Bug_closed}</Link> &nbsp;个
               </div>
             </div>
           </Card>
@@ -613,16 +623,16 @@ const TaskLoad = (params: any) => {
                 bodyStyle={{height: "100px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>&gt;24H  &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_>24H`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_>24H`}>{data.bug.Bug_ac_24}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>16-24H  &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_16-24H`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_16-24H`}>{data.bug.Bug_ac_1624}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>8-16H  &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_8-16H`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_8-16H`}>{data.bug.Bug_ac_0816}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>&lt;8H  &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_<8H`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_<8H`}>{data.bug.Bug_ac_08}</Link> &nbsp;个
               </div>
             </div>
           </Card>
@@ -635,16 +645,16 @@ const TaskLoad = (params: any) => {
                 bodyStyle={{height: "100px", textAlign: "left"}}>
             <div style={{marginTop: "-15px"}}>
               <div style={{whiteSpace: "nowrap"}}>&gt;24H  &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_>24H`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_>24H`}>{data.bug.Bug_ve_24}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>16-24H  &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_16-24H`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_16-24H`}>{data.bug.Bug_ve_1624}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>8-16H  &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_8-16H`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_8-16H`}>{data.bug.Bug_ve_0816}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>&lt;8H  &nbsp;<Link
-                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_<8H`}>2</Link> &nbsp;个
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_<8H`}>{data.bug.Bug_ve_08}</Link> &nbsp;个
               </div>
             </div>
           </Card>
@@ -656,6 +666,9 @@ const TaskLoad = (params: any) => {
 };
 // hotfix组件
 const HotfixLoad = (params: any) => {
+  if (params.project[1].length <= 0) {
+    return (<div></div>);
+  }
 
   const project = params.project[0];
   const data = bugResultDeals(params.project[1]);
@@ -690,16 +703,16 @@ const HotfixLoad = (params: any) => {
 
           <div style={{marginTop: "-15px"}}>
             <div style={{whiteSpace: "nowrap"}}>无指派  &nbsp;<Link
-              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_no_assign`}>2</Link> &nbsp;个
+              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_no_assign`}>{data.Bug_no_assign}</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>无排期  &nbsp;<Link
-              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_no_deadline`}>2</Link> &nbsp;个
+              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_no_deadline`}>{data.Bug_no_deadline}</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-              <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_proj_error`}>2</Link>&nbsp;个
+              <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_proj_error`}>{data.Bug_proj_error}</Link>&nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-              <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_over_area`}>2</Link>&nbsp;个
+              <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_over_area`}>{data.Bug_over_area}</Link>&nbsp;个
             </div>
           </div>
         </Card>
@@ -712,16 +725,16 @@ const HotfixLoad = (params: any) => {
               bodyStyle={{height: "110px", textAlign: "left"}}>
           <div style={{marginTop: "-15px"}}>
             <div style={{whiteSpace: "nowrap"}}>激活 &nbsp;
-              <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=actived`}>2</Link>&nbsp;个
+              <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=actived`}>{data.Bug_actived}</Link>&nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>已解决 &nbsp;<Link
-              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=resolved`}>2</Link> &nbsp;个
+              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=resolved`}>{data.Bug_resolved}</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=verified`}>2</Link> &nbsp;个
+              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=verified`}>{data.Bug_verified}</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
-              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=closed`}>2</Link> &nbsp;个
+              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=closed`}>{data.Bug_closed}</Link> &nbsp;个
             </div>
           </div>
         </Card>
@@ -734,16 +747,16 @@ const HotfixLoad = (params: any) => {
               bodyStyle={{height: "110px", textAlign: "left"}}>
           <div style={{marginTop: "-15px"}}>
             <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
-              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_>24H`}>2</Link> &nbsp;个
+              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_>24H`}>{data.Bug_ac_24}</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>16-24H&nbsp;<Link
-              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_16-24H`}>2</Link> &nbsp;个
+              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_16-24H`}>{data.Bug_ac_1624}</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>8-16H&nbsp;<Link
-              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_8-16H`}>2</Link> &nbsp;个
+              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_8-16H`}>{data.Bug_ac_0816}</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>&lt;8H&nbsp;<Link
-              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_<8H`}>2</Link> &nbsp;个
+              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ac_<8H`}>{data.Bug_ac_08}</Link> &nbsp;个
             </div>
           </div>
         </Card>
@@ -755,16 +768,16 @@ const HotfixLoad = (params: any) => {
               bodyStyle={{height: "110px", textAlign: "left"}}>
           <div style={{marginTop: "-15px"}}>
             <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
-              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_>24H`}>2</Link> &nbsp;个
+              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_>24H`}>{data.Bug_ve_24}</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>16-24H&nbsp;<Link
-              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_16-24H`}>2</Link> &nbsp;个
+              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_16-24H`}>{data.Bug_ve_1624}</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>8-16H&nbsp;<Link
-              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_8-16H`}>2</Link>&nbsp;个
+              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_8-16H`}>{data.Bug_ve_0816}</Link>&nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>&lt;8H&nbsp;<Link
-              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_<8H`}>2</Link>&nbsp;个
+              to={`/sprint/basicTable/bugs/bugDetails?${url}&item=ve_<8H`}>{data.Bug_ve_08}</Link>&nbsp;个
             </div>
           </div>
         </Card>
@@ -820,6 +833,7 @@ const RightControl = (params: any) => {
   }
 
   return (
+
     <div>
       <SprintChoiceLoad project={sprint}/>,
       <StoryLoad project={[sprintPrjInfo, sprintStory]}/>,

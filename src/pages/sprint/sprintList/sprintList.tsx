@@ -101,6 +101,7 @@ const queryDeleteCount = async (client: GqlClient<object>, params: any) => {
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
+  console.log("33333333333333333");
   // const ChangePages = () => {
   //   history.push("/sprint/sprintListDetails");
   // };
@@ -504,7 +505,7 @@ const SprintList: React.FC<any> = () => {
           // console.log("error", error);
           message.error({
             content: error.toString(),
-            duration:1,
+            duration: 1,
             className: 'AddError',
             style: {
               marginTop: '50vh',
@@ -525,7 +526,7 @@ const SprintList: React.FC<any> = () => {
             updateGrid();
             message.info({
               content: res.data.message,
-              duration:1,
+              duration: 1,
               className: 'ModSuccess',
               style: {
                 marginTop: '50vh',
@@ -535,7 +536,7 @@ const SprintList: React.FC<any> = () => {
 
             message.error({
               content: `${res.data.message}`,
-              duration:1,
+              duration: 1,
               className: 'ModNone',
               style: {
                 marginTop: '50vh',
@@ -546,7 +547,7 @@ const SprintList: React.FC<any> = () => {
         .catch(function (error) {
           message.error({
             content: error.toString(),
-            duration:1,
+            duration: 1,
             className: 'ModError',
             style: {
               marginTop: '50vh',
@@ -569,7 +570,7 @@ const SprintList: React.FC<any> = () => {
     if (selRows.length === 0) {
       message.error({
         content: '请选中需要删除的数据!',
-        duration:1,
+        duration: 1,
         className: 'delNone',
         style: {
           marginTop: '50vh',
@@ -581,7 +582,7 @@ const SprintList: React.FC<any> = () => {
     if (selRows.length > 1) {
       message.error({
         content: '一次只能删除一条数据!',
-        duration:1,
+        duration: 1,
         className: 'delMore',
         style: {
           marginTop: '50vh',
@@ -611,7 +612,7 @@ const SprintList: React.FC<any> = () => {
           updateGrid();
           message.info({
             content: res.data.message,
-            duration:1,
+            duration: 1,
             className: 'delSuccess',
             style: {
               marginTop: '50vh',
@@ -620,7 +621,7 @@ const SprintList: React.FC<any> = () => {
         } else {
           message.error({
             content: `${res.data.message}`,
-            duration:1,
+            duration: 1,
             className: 'MdelNone',
             style: {
               marginTop: '50vh',
@@ -631,7 +632,7 @@ const SprintList: React.FC<any> = () => {
       .catch(function (error) {
         message.error({
           content: error.toString(),
-          duration:1,
+          duration: 1,
           className: 'MdelError',
           style: {
             marginTop: '50vh',

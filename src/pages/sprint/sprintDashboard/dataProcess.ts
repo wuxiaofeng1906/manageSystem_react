@@ -33,7 +33,7 @@ const storyStatusDeal = (itemArray: any) => {
   // };
   const storyStatusCount = Object();
   for (let i = 0; i < itemArray.length; i += 1) {
-    const count = itemArray[i].value;
+    const count = itemArray[i].value === null ? 0 : itemArray[i].value;
     switch (itemArray[i].item) {
       // 规范检查
       case "draft":
@@ -145,7 +145,8 @@ const storyBugDeal = (itemArray: any) => {
 
   const storyBugCount = Object();
   for (let i = 0; i < itemArray.length; i += 1) {
-    const count = itemArray[i].value;
+    const count = itemArray[i].value === null ? 0 : itemArray[i].value;
+
     switch (itemArray[i].item) {
       // 规范检查
       case "bug_no_assign":
@@ -237,7 +238,7 @@ const taskStatusDeal = (itemArray: any) => {
 
   const taskStatusCount = Object();
   for (let i = 0; i < itemArray.length; i += 1) {
-    const count = itemArray[i].value;
+    const count = itemArray[i].value === null ? 0 : itemArray[i].value;
     switch (itemArray[i].item) {
       // 规范检查
       case "no_task": // 无任务
@@ -314,7 +315,7 @@ const taskBugDeal = (itemArray: any) => {
 
   const taskBugCount = Object();
   for (let i = 0; i < itemArray.length; i += 1) {
-    const count = itemArray[i].value;
+    const count = itemArray[i].value === null ? 0 : itemArray[i].value;
     switch (itemArray[i].item) {
       // 规范检查
       case "bug_no_assign": // 无指派
@@ -346,30 +347,30 @@ const taskBugDeal = (itemArray: any) => {
         break;
 
       // 激活时长
-      case "bug_ac_>24H": // >24H
+      case "ac_>24H": // >24H
         taskBugCount.Bug_ac_24 = count;
         break;
-      case "bug_ac_16-24H": // 16-24H
+      case "ac_16-24H": // 16-24H
         taskBugCount.Bug_ac_1624 = count;
         break;
-      case "bug_ac_8-16H": // 8-16H
+      case "ac_8-16H": // 8-16H
         taskBugCount.Bug_ac_0816 = count;
         break;
-      case "bug_ac_<8H":// <8H
+      case "ac_<8H":// <8H
         taskBugCount.Bug_ac_08 = count;
         break;
 
       // 待回验进展
-      case "bug_ve_>24H": // >24H
+      case "ve_>24H": // >24H
         taskBugCount.Bug_ve_24 = count;
         break;
-      case "bug_ve_16-24H":// 16-24H
+      case "ve_16-24H":// 16-24H
         taskBugCount.Bug_ve_1624 = count;
         break;
-      case "bug_ve_8-16H":// 8-16H
+      case "ve_8-16H":// 8-16H
         taskBugCount.Bug_ve_0816 = count;
         break;
-      case "bug_ve_<8H":// <8H
+      case "ve_<8H":// <8H
         taskBugCount.Bug_ve_08 = count;
         break;
 
@@ -383,6 +384,7 @@ const taskBugDeal = (itemArray: any) => {
 };
 
 const taskResultDeals = (countArray: any) => {
+
   let statusData = Object();
   let bugData = Object();
 
@@ -401,19 +403,16 @@ const taskResultDeals = (countArray: any) => {
 
 // endregion
 
-// region sprint-hotfix数据分析
 
-
-const bugResultDeals = (countArray: any) => {
+const shBugResultDeals = (countArray: any) => {
   let itemArray = [];
   if (countArray.length > 0) {
     itemArray = countArray[0].data;
   }
 
-
   const hotfixBugCount = Object();
   for (let i = 0; i < itemArray.length; i += 1) {
-    const count = itemArray[i].value;
+    const count = itemArray[i].value === null ? 0 : itemArray[i].value;
     switch (itemArray[i].item) {
       // 规范检查
       case "bug_no_assign": // 无指派
@@ -445,30 +444,30 @@ const bugResultDeals = (countArray: any) => {
         break;
 
       // 激活时长
-      case "bug_ac_>24H": // >24H
+      case "ac_>24H": // >24H
         hotfixBugCount.Bug_ac_24 = count;
         break;
-      case "bug_ac_16-24H": // 16-24H
+      case "ac_16-24H": // 16-24H
         hotfixBugCount.Bug_ac_1624 = count;
         break;
-      case "bug_ac_8-16H": // 8-16H
+      case "ac_8-16H": // 8-16H
         hotfixBugCount.Bug_ac_0816 = count;
         break;
-      case "bug_ac_<8H":// <8H
+      case "ac_<8H":// <8H
         hotfixBugCount.Bug_ac_08 = count;
         break;
 
       // 待回验进展
-      case "bug_ve_>24H": // >24H
+      case "ve_>24H": // >24H
         hotfixBugCount.Bug_ve_24 = count;
         break;
-      case "bug_ve_16-24H":// 16-24H
+      case "ve_16-24H":// 16-24H
         hotfixBugCount.Bug_ve_1624 = count;
         break;
-      case "bug_ve_8-16H":// 8-16H
+      case "ve_8-16H":// 8-16H
         hotfixBugCount.Bug_ve_0816 = count;
         break;
-      case "bug_ve_<8H":// <8H
+      case "ve_<8H":// <8H
         hotfixBugCount.Bug_ve_08 = count;
         break;
 
@@ -481,6 +480,110 @@ const bugResultDeals = (countArray: any) => {
   return hotfixBugCount;
 };
 
-// endregion
 
-export {storyResultDeals, taskResultDeals, bugResultDeals};
+const bugResultDeals = (countArray: any) => {
+  let itemArray = [];
+  if (countArray.length > 0) {
+    const temp = countArray[0].data;
+    if (temp.length > 0) {
+      itemArray = temp[0].data;
+    }
+
+  }
+
+  // console.log("itemArray", itemArray);
+  const hotfixBugCount = Object();
+  for (let i = 0; i < itemArray.length; i += 1) {
+    const count = itemArray[i].value === null ? 0 : itemArray[i].value;
+    switch (itemArray[i].item) {
+      // 规范检查
+      case "bug_no_assign": // 无指派
+        hotfixBugCount.Bug_no_assign = count;
+        break;
+      case "bug_no_deadline": // 无排期
+        hotfixBugCount.Bug_no_deadline = count;
+        break;
+      case "bug_proj_error":// 项目错误
+        hotfixBugCount.Bug_proj_error = count;
+        break;
+      case "bug_over_area":// 超范围
+        hotfixBugCount.Bug_over_area = count;
+        break;
+
+
+      // bug状态
+      case "bug_actived": // 激活
+        hotfixBugCount.Bug_actived = count;
+        break;
+      case "bug_resolved": // 已解决
+        hotfixBugCount.Bug_resolved = count;
+        break;
+      case "bug_verified": // 已验证
+        hotfixBugCount.Bug_verified = count;
+        break;
+      case "bug_closed": // 已关闭
+        hotfixBugCount.Bug_closed = count;
+        break;
+
+      // 激活时长
+      case "ac_>24H": // >24H
+        hotfixBugCount.Bug_ac_24 = count;
+        break;
+      case "ac_16-24H": // 16-24H
+        hotfixBugCount.Bug_ac_1624 = count;
+        break;
+      case "ac_8-16H": // 8-16H
+        hotfixBugCount.Bug_ac_0816 = count;
+        break;
+      case "ac_<8H":// <8H
+        hotfixBugCount.Bug_ac_08 = count;
+        break;
+
+      // 待回验进展
+      case "ve_>24H": // >24H
+        hotfixBugCount.Bug_ve_24 = count;
+        break;
+      case "ve_16-24H":// 16-24H
+        hotfixBugCount.Bug_ve_1624 = count;
+        break;
+      case "ve_8-16H":// 8-16H
+        hotfixBugCount.Bug_ve_0816 = count;
+        break;
+      case "ve_<8H":// <8H
+        hotfixBugCount.Bug_ve_08 = count;
+        break;
+
+      default:
+        break;
+    }
+
+  }
+
+  return hotfixBugCount;
+};
+
+
+const sp_hotResultDeals = (params: any) => {
+  let storyDt = Object();
+  let taskDt = Object();
+  let bugDt = Object();
+
+  for (let index = 0; index < params.length; index += 1) {
+    if (params[index].name === "story") {
+      storyDt = storyResultDeals(params[index].data);
+
+    } else if (params[index].name === "task") {
+      taskDt = taskResultDeals(params[index].data);
+
+    } else {
+      bugDt = shBugResultDeals(params[index].data);
+
+    }
+
+  }
+
+  return {story: storyDt, task: taskDt, bug: bugDt};
+
+};
+
+export {bugResultDeals, sp_hotResultDeals};

@@ -99,7 +99,6 @@ const queryProjectViews = async (client: GqlClient<object>) => {
           project(name:null,category:null, range:{start:"", end:""},status:[wait,doing,suspended]){
           id
           name
-
         }
       }
   `);
@@ -261,7 +260,8 @@ const StoryLoad = (params: any) => {
                 to={`/sprint/basicTable/stories/storyDetails?${url}&item=proj_error`}>{data.status.status_proj_error}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                <Link to={`/sprint/basicTable/stories/storyDetails?${url}&item=over_area`}>{data.status.status_over_area}</Link>&nbsp;个
+                <Link
+                  to={`/sprint/basicTable/stories/storyDetails?${url}&item=over_area`}>{data.status.status_over_area}</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -355,10 +355,12 @@ const StoryLoad = (params: any) => {
                 to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_no_deadline`}>{data.bug.Bug_no_deadline}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-                <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_proj_error`}>{data.bug.Bug_proj_error}</Link>&nbsp;个
+                <Link
+                  to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_proj_error`}>{data.bug.Bug_proj_error}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_over_area`}>{data.bug.Bug_over_area}</Link>&nbsp;个
+                <Link
+                  to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_over_area`}>{data.bug.Bug_over_area}</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -488,10 +490,12 @@ const TaskLoad = (params: any) => {
                 to={`/sprint/basicTable/tasks/taskDetails?${url}&item=un_modify`}>{data.status.status_un_modify}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-                <Link to={`/sprint/basicTable/tasks/taskDetails?${url}&item=proj_error`}>{data.status.status_proj_error}</Link>&nbsp;个
+                <Link
+                  to={`/sprint/basicTable/tasks/taskDetails?${url}&item=proj_error`}>{data.status.status_proj_error}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                <Link to={`/sprint/basicTable/tasks/taskDetails?${url}&item=over_area`}>{data.status.status_over_area}</Link>&nbsp;个
+                <Link
+                  to={`/sprint/basicTable/tasks/taskDetails?${url}&item=over_area`}>{data.status.status_over_area}</Link>&nbsp;个
               </div>
 
             </div>
@@ -585,10 +589,12 @@ const TaskLoad = (params: any) => {
                 to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_no_deadline`}>{data.bug.Bug_no_deadline}</Link> &nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-                <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_proj_error`}>{data.bug.Bug_proj_error}</Link>&nbsp;个
+                <Link
+                  to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_proj_error`}>{data.bug.Bug_proj_error}</Link>&nbsp;个
               </div>
               <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_over_area`}>{data.bug.Bug_over_area}</Link>&nbsp;个
+                <Link
+                  to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_over_area`}>{data.bug.Bug_over_area}</Link>&nbsp;个
               </div>
             </div>
           </Card>
@@ -709,10 +715,12 @@ const HotfixLoad = (params: any) => {
               to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_no_deadline`}>{data.Bug_no_deadline}</Link> &nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-              <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_proj_error`}>{data.Bug_proj_error}</Link>&nbsp;个
+              <Link
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_proj_error`}>{data.Bug_proj_error}</Link>&nbsp;个
             </div>
             <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-              <Link to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_over_area`}>{data.Bug_over_area}</Link>&nbsp;个
+              <Link
+                to={`/sprint/basicTable/bugs/bugDetails?${url}&item=bug_over_area`}>{data.Bug_over_area}</Link>&nbsp;个
             </div>
           </div>
         </Card>
@@ -800,10 +808,11 @@ const LeftControl = (params: any) => {
 
   return (
     <div>
-      <HotfixChoiceLoad project={hotfix}/>,
-      {/* <HotfixLoad project={[hotfixPrjInfo, params]}/> */}
+
       <EmergencyChoiceLoad project={emergency}/>,
-      {/* <HotfixLoad project={[emergencyPrjInfo, params]}/> */}
+      <HotfixLoad project={[emergencyPrjInfo, params]}/>
+      <HotfixChoiceLoad project={hotfix}/>,
+      <HotfixLoad project={[hotfixPrjInfo, params]}/>
     </div>
 
   );

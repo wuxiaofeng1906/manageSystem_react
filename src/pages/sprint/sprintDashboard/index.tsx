@@ -52,7 +52,6 @@ const queryDashboardViews = async (client: GqlClient<object>) => {
 };
 
 // 查询未关闭的项目，显示到下拉框中
-
 const ProjectClassificate = (source: any) => {
   const data: any = {
     hotfix: [],
@@ -105,6 +104,28 @@ const projectLoad = (params: any) => {
   }
   return project;
 };
+
+
+// 下拉框数据查询
+
+const queryProjectALL = async (client: GqlClient<object>, params: any) => {
+  const {data} = await client.query(`
+      {
+          dashProjectAll(project:${params}){
+          name
+          data{
+            name
+            data{
+              item
+              value
+            }
+          }
+        }
+      }
+  `);
+  return data?.dashProjectAll;
+};
+
 
 const DashBoard: React.FC<any> = () => {
   const gqlClient = useGqlClient();
@@ -404,7 +425,6 @@ const DashBoard: React.FC<any> = () => {
     // endregion
   });
 
-
   const project: any = useRequest(() => queryProjectViews(gqlClient)).data;
   let emergencySelect = Array();
   let hotfixSelect = Array();
@@ -416,75 +436,104 @@ const DashBoard: React.FC<any> = () => {
 
   }
   // emergency赋值和下拉框事件
-  const emergencyChanged = (value: string, other: any) => {
+  const emergencyChanged = async (value: string, other: any) => {
+    let hidde = false;
     emergencyPrjInfo.prjID = value;
     emergencyPrjInfo.prjName = other.key;
+    const datas: any = await queryProjectALL(gqlClient, value);
+    if (datas === null) {
+      hidde = true;
+    }
+
+    const em_datas = bugResultDeals(datas);
+
+
     setEmergency({
-      noAssign: 1,
-      noDeadline: 2,
-      prj_error: 3,
-      over_area: 4,
-      actived: 5,
-      resolved: 6,
-      vertified: 7,
-      closed: 8,
-      ac24: 9,
-      ac1624: 10,
-      ac0816: 11,
-      ac08: 12,
-      ve24: 13,
-      ve1624: 14,
-      ve0816: 15,
-      ve08: 16
+      noAssign: em_datas.Bug_no_assign,
+      noDeadline: em_datas.Bug_no_deadline,
+      prj_error: 0,
+      over_area: 0,
+      actived: em_datas.Bug_actived,
+      resolved: em_datas.Bug_resolved,
+      vertified: em_datas.Bug_verified,
+      closed: em_datas.Bug_closed,
+      ac24: em_datas.Bug_ac_24,
+      ac1624: em_datas.Bug_ac_1624,
+      ac0816: em_datas.Bug_ac_0816,
+      ac08: em_datas.Bug_ac_08,
+      ve24: em_datas.Bug_ve_24,
+      ve1624: em_datas.Bug_ve_1624,
+      ve0816: em_datas.Bug_ve_0816,
+      ve08: em_datas.Bug_ve_08
     });
     setHidden({
       ...hidden,
-      em_bug: false,
+      em_bug: hidde,
     });
   };
 
   // hotfix赋值和下拉框事件
-  const hotfixChanged = (value: string, other: any) => {
+  const hotfixChanged = async (value: string, other: any) => {
+    let story_hidde = false;
+    let story_task = false;
+    let story_bug = false;
+
     hotfixPrjInfo.prjID = value;
     hotfixPrjInfo.prjName = other.key;
+
+    const datas: any = await queryProjectALL(gqlClient, value);
+    if (datas === null) {
+      return;
+    }
+    debugger;
+    const ho_datas = sp_hotResultDeals(datas);
+    if (datas.story === null) {
+      story_hidde = true;
+    }
+    if (datas.task === null) {
+      story_task = true;
+    }
+    if (datas.bug === null) {
+      story_bug = true;
+    }
     setHotfix({
 
       // region 需求
 
       // 状态
-      story_status_draft: 0,
-      story_status_noTask: 0,
-      story_status_lackTask: 0,
-      story_status_noDeadline: 0,
-      story_status_noAssign: 0,
-      story_status_noBug: 0,
-      story_status_noModify: 0,
-      story_status_prj_error: 0,
-      story_status_over_area: 0,
+      story_status_draft: ho_datas.story.status.status_draft,
+      story_status_noTask: ho_datas.story.status.status_no_task,
+      story_status_lackTask: ho_datas.story.status.status_lack_task,
+      story_status_noDeadline: ho_datas.story.status.status_no_deadline,
+      story_status_noAssign: ho_datas.story.status.status_no_assign,
+      story_status_noBug: ho_datas.story.status.status_no_bug,
+      story_status_noModify: ho_datas.story.status.status_un_modify,
+      story_status_prj_error: ho_datas.story.status.status_proj_error,
+      story_status_over_area: ho_datas.story.status.status_over_area,
 
-      story_status_delay: 0,
-      story_status_wait: 0,
-      story_status_doing: 0,
-      story_status_done: 0,
+      story_status_delay: ho_datas.story.status.status_devtask_delay,
+      story_status_wait: ho_datas.story.status.status_dev_wait,
+      story_status_doing: ho_datas.story.status.status_developing,
+      story_status_done: ho_datas.story.status.status_dev_done,
 
-      story_status_raseTestDelay: 0,
+      story_status_raseTestDelay: ho_datas.story.status.status_raisetest_delay,
       story_status_raseTestWait: 0,
       story_status_raseTestDone: 0,
 
-      story_status_testDelay: 0,
-      story_status_testWait: 0,
-      story_status_testDoing: 0,
-      story_status_testDone: 0,
+      story_status_testDelay: ho_datas.story.status.status_testtask_delay,
+      story_status_testWait: ho_datas.story.status.status_test_wait,
+      story_status_testDoing: ho_datas.story.status.status_testing,
+      story_status_testDone: ho_datas.story.status.status_test_done,
 
       // bug
-      story_bug_noAssign: 0,
-      story_bug_noDeadline: 0,
-      story_bug_prj_error: 0,
-      story_bug_over_area: 0,
-      story_bug_actived: 0,
-      story_bug_resolved: 0,
-      story_bug_vertified: 0,
-      story_bug_closed: 0,
+      story_bug_noAssign: ho_datas.story.bug.Bug_no_assign,
+      story_bug_noDeadline: ho_datas.story.bug.Bug_no_deadline,
+      story_bug_prj_error: ho_datas.story.bug.Bug_proj_error,
+      story_bug_over_area: ho_datas.story.bug.Bug_over_area,
+      story_bug_actived: ho_datas.story.bug.Bug_actived,
+      story_bug_resolved: ho_datas.story.bug.Bug_resolved,
+      story_bug_vertified: ho_datas.story.bug.Bug_verified,
+      story_bug_closed: ho_datas.story.bug.Bug_closed,
       story_bug_ac24: 0,
       story_bug_ac1624: 0,
       story_bug_ac0816: 0,
@@ -499,38 +548,38 @@ const DashBoard: React.FC<any> = () => {
       // region 任务
 
       // 状态
-      task_status_noTask: 0,
-      task_status_noDeadline: 0,
-      task_status_noAssign: 0,
-      task_status_noBug: 0,
-      task_status_noModify: 0,
-      task_status_prj_error: 0,
-      task_status_over_area: 0,
+      task_status_noTask: ho_datas.task.status.status_no_task,
+      task_status_noDeadline: ho_datas.task.status.status_no_deadline,
+      task_status_noAssign: ho_datas.task.status.status_no_assign,
+      task_status_noBug: ho_datas.task.status.status_no_bug,
+      task_status_noModify: ho_datas.task.status.status_un_modify,
+      task_status_prj_error: ho_datas.task.status.status_proj_error,
+      task_status_over_area: ho_datas.task.status.status_over_area,
 
-      task_status_taskDelay: 0,
-      task_status_wait: 0,
-      task_status_doing: 0,
-      task_status_done: 0,
+      task_status_taskDelay: ho_datas.task.status.status_devtask_delay,
+      task_status_wait: ho_datas.task.status.status_dev_wait,
+      task_status_doing: ho_datas.task.status.status_developing,
+      task_status_done: ho_datas.task.status.status_dev_done,
 
-      task_status_raseTestDelay: 0,
+      task_status_raseTestDelay: ho_datas.task.status.status_raisetest_delay,
       task_status_raseTestWait: 0,
       task_status_raseTestDone: 0,
 
-      task_status_testDelay: 0,
-      task_status_testWait: 0,
-      task_status_testDoing: 0,
-      task_status_testDone: 0,
+      task_status_testDelay: ho_datas.task.status.status_testtask_delay,
+      task_status_testWait: ho_datas.task.status.status_test_wait,
+      task_status_testDoing: ho_datas.task.status.status_testing,
+      task_status_testDone: ho_datas.task.status.status_test_done,
 
       // bug
-      task_bug_noAssign: 0,
-      task_bug_noDeadline: 0,
-      task_bug_prj_error: 0,
-      task_bug_over_area: 0,
+      task_bug_noAssign: ho_datas.task.bug.Bug_no_assign,
+      task_bug_noDeadline: ho_datas.task.bug.Bug_no_deadline,
+      task_bug_prj_error: ho_datas.task.bug.Bug_proj_error,
+      task_bug_over_area: ho_datas.task.bug.Bug_over_area,
 
-      task_bug_actived: 0,
-      task_bug_resolved: 0,
-      task_bug_vertified: 0,
-      task_bug_closed: 0,
+      task_bug_actived: ho_datas.task.bug.Bug_actived,
+      task_bug_resolved: ho_datas.task.bug.Bug_resolved,
+      task_bug_vertified: ho_datas.task.bug.Bug_verified,
+      task_bug_closed: ho_datas.task.bug.Bug_closed,
 
       task_bug_ac24: 0,
       task_bug_ac1624: 0,
@@ -546,15 +595,15 @@ const DashBoard: React.FC<any> = () => {
 
       // region bug
 
-      bug_noAssign: 0,
-      bug_noDeadline: 0,
+      bug_noAssign: ho_datas.bug.Bug_no_assign,
+      bug_noDeadline: ho_datas.bug.Bug_no_deadline,
       bug_prj_error: 0,
       bug_over_area: 0,
 
-      bug_actived: 0,
-      bug_resolved: 0,
-      bug_vertified: 0,
-      bug_closed: 0,
+      bug_actived: ho_datas.bug.Bug_actived,
+      bug_resolved: ho_datas.bug.Bug_resolved,
+      bug_vertified: ho_datas.bug.Bug_verified,
+      bug_closed: ho_datas.bug.Bug_closed,
 
       bug_ac24: 0,
       bug_ac1624: 0,
@@ -566,57 +615,62 @@ const DashBoard: React.FC<any> = () => {
       bug_ve0816: 0,
       bug_ve08: 0
       // endregion
+
     });
     setHidden({
       ...hidden,
-      ho_story: false,
-      ho_task: false,
-      ho_bug: false
+      ho_story: story_hidde,
+      ho_task: story_task,
+      ho_bug: story_bug
     });
   };
 
   // sprint赋值和下拉框事件
-  const sprintChanged = (value: string, other: any) => {
+  const sprintChanged = async (value: string, other: any) => {
     sprintPrjInfo.prjID = value;
     sprintPrjInfo.prjName = other.key;
+
+    const datas: any = await queryProjectALL(gqlClient, 4790);
+    const sp_datas = sp_hotResultDeals(datas);
+    console.log("sp_datassp_datassp_datassp_datas", sp_datas);
     setsprint({
 
       // region 需求
 
       // 状态
-      story_status_draft: 1,
-      story_status_noTask: 0,
-      story_status_lackTask: 0,
-      story_status_noDeadline: 0,
-      story_status_noAssign: 0,
-      story_status_noBug: 0,
-      story_status_noModify: 0,
-      story_status_prj_error: 0,
-      story_status_over_area: 0,
+      story_status_draft: sp_datas.story.status.status_draft,
+      story_status_noTask: sp_datas.story.status.status_no_task,
+      story_status_lackTask: sp_datas.story.status.status_lack_task,
+      story_status_noDeadline: sp_datas.story.status.status_no_deadline,
+      story_status_noAssign: sp_datas.story.status.status_no_assign,
+      story_status_noBug: sp_datas.story.status.status_no_bug,
+      story_status_noModify: sp_datas.story.status.status_un_modify,
+      story_status_prj_error: sp_datas.story.status.status_proj_error,
+      story_status_over_area: sp_datas.story.status.status_over_area,
 
-      story_status_delay: 0,
-      story_status_wait: 0,
-      story_status_doing: 0,
-      story_status_done: 0,
+      story_status_delay: sp_datas.story.status.status_devtask_delay,
+      story_status_wait: sp_datas.story.status.status_dev_wait,
+      story_status_doing: sp_datas.story.status.status_developing,
+      story_status_done: sp_datas.story.status.status_dev_done,
 
-      story_status_raseTestDelay: 0,
+      story_status_raseTestDelay: sp_datas.story.status.status_raisetest_delay,
       story_status_raseTestWait: 0,
       story_status_raseTestDone: 0,
 
-      story_status_testDelay: 0,
-      story_status_testWait: 0,
-      story_status_testDoing: 0,
-      story_status_testDone: 0,
+      story_status_testDelay: sp_datas.story.status.status_testtask_delay,
+      story_status_testWait: sp_datas.story.status.status_test_wait,
+      story_status_testDoing: sp_datas.story.status.status_testing,
+      story_status_testDone: sp_datas.story.status.status_test_done,
 
       // bug
-      story_bug_noAssign: 0,
-      story_bug_noDeadline: 0,
-      story_bug_prj_error: 0,
-      story_bug_over_area: 0,
-      story_bug_actived: 0,
-      story_bug_resolved: 0,
-      story_bug_vertified: 0,
-      story_bug_closed: 0,
+      story_bug_noAssign: sp_datas.story.bug.Bug_no_assign,
+      story_bug_noDeadline: sp_datas.story.bug.Bug_no_deadline,
+      story_bug_prj_error: sp_datas.story.bug.Bug_proj_error,
+      story_bug_over_area: sp_datas.story.bug.Bug_over_area,
+      story_bug_actived: sp_datas.story.bug.Bug_actived,
+      story_bug_resolved: sp_datas.story.bug.Bug_resolved,
+      story_bug_vertified: sp_datas.story.bug.Bug_verified,
+      story_bug_closed: sp_datas.story.bug.Bug_closed,
       story_bug_ac24: 0,
       story_bug_ac1624: 0,
       story_bug_ac0816: 0,
@@ -631,38 +685,38 @@ const DashBoard: React.FC<any> = () => {
       // region 任务
 
       // 状态
-      task_status_noTask: 0,
-      task_status_noDeadline: 0,
-      task_status_noAssign: 0,
-      task_status_noBug: 0,
-      task_status_noModify: 0,
-      task_status_prj_error: 0,
-      task_status_over_area: 0,
+      task_status_noTask: sp_datas.task.status.status_no_task,
+      task_status_noDeadline: sp_datas.task.status.status_no_deadline,
+      task_status_noAssign: sp_datas.task.status.status_no_assign,
+      task_status_noBug: sp_datas.task.status.status_no_bug,
+      task_status_noModify: sp_datas.task.status.status_un_modify,
+      task_status_prj_error: sp_datas.task.status.status_proj_error,
+      task_status_over_area: sp_datas.task.status.status_over_area,
 
-      task_status_taskDelay: 0,
-      task_status_wait: 0,
-      task_status_doing: 0,
-      task_status_done: 0,
+      task_status_taskDelay: sp_datas.task.status.status_devtask_delay,
+      task_status_wait: sp_datas.task.status.status_dev_wait,
+      task_status_doing: sp_datas.task.status.status_developing,
+      task_status_done: sp_datas.task.status.status_dev_done,
 
-      task_status_raseTestDelay: 0,
+      task_status_raseTestDelay: sp_datas.task.status.status_raisetest_delay,
       task_status_raseTestWait: 0,
       task_status_raseTestDone: 0,
 
-      task_status_testDelay: 0,
-      task_status_testWait: 0,
-      task_status_testDoing: 0,
-      task_status_testDone: 0,
+      task_status_testDelay: sp_datas.task.status.status_testtask_delay,
+      task_status_testWait: sp_datas.task.status.status_test_wait,
+      task_status_testDoing: sp_datas.task.status.status_testing,
+      task_status_testDone: sp_datas.task.status.status_test_done,
 
       // bug
-      task_bug_noAssign: 0,
-      task_bug_noDeadline: 0,
-      task_bug_prj_error: 0,
-      task_bug_over_area: 0,
+      task_bug_noAssign: sp_datas.task.bug.Bug_no_assign,
+      task_bug_noDeadline: sp_datas.task.bug.Bug_no_deadline,
+      task_bug_prj_error: sp_datas.task.bug.Bug_proj_error,
+      task_bug_over_area: sp_datas.task.bug.Bug_over_area,
 
-      task_bug_actived: 0,
-      task_bug_resolved: 0,
-      task_bug_vertified: 0,
-      task_bug_closed: 0,
+      task_bug_actived: sp_datas.task.bug.Bug_actived,
+      task_bug_resolved: sp_datas.task.bug.Bug_resolved,
+      task_bug_vertified: sp_datas.task.bug.Bug_verified,
+      task_bug_closed: sp_datas.task.bug.Bug_closed,
 
       task_bug_ac24: 0,
       task_bug_ac1624: 0,
@@ -678,15 +732,15 @@ const DashBoard: React.FC<any> = () => {
 
       // region bug
 
-      bug_noAssign: 0,
-      bug_noDeadline: 0,
+      bug_noAssign: sp_datas.bug.Bug_no_assign,
+      bug_noDeadline: sp_datas.bug.Bug_no_deadline,
       bug_prj_error: 0,
       bug_over_area: 0,
 
-      bug_actived: 0,
-      bug_resolved: 0,
-      bug_vertified: 0,
-      bug_closed: 0,
+      bug_actived: sp_datas.bug.Bug_actived,
+      bug_resolved: sp_datas.bug.Bug_resolved,
+      bug_vertified: sp_datas.bug.Bug_verified,
+      bug_closed: sp_datas.bug.Bug_closed,
 
       bug_ac24: 0,
       bug_ac1624: 0,

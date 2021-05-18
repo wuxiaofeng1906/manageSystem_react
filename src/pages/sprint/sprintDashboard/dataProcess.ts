@@ -482,6 +482,9 @@ const shBugResultDeals = (countArray: any) => {
 
 
 const bugResultDeals = (countArray: any) => {
+  if (countArray === null) {
+    return {};
+  }
   let itemArray = [];
   if (countArray.length > 0) {
     const temp = countArray[0].data;

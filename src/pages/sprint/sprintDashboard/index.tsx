@@ -31,6 +31,7 @@ const queryDashboardViews = async (client: GqlClient<object>) => {
   const {data} = await client.query(`
       {
         dashboardAll(endDay:"2021-05-13"){
+         id,
           name,
           category,
           data{
@@ -105,9 +106,14 @@ const projectLoad = (params: any) => {
   return project;
 };
 
-
 const DashBoard: React.FC<any> = () => {
   const gqlClient = useGqlClient();
+  const [hidden, setHidden] = useState({
+    em_bug: true,
+    ho_story: true,
+    ho_task: true,
+    ho_bug: true
+  });
 
   const {data} = useRequest(() => queryDashboardViews(gqlClient));
   let sp_data = Object();
@@ -119,15 +125,22 @@ const DashBoard: React.FC<any> = () => {
       const details = data[index];
       if (details.category === "sprint") {
         sprintPrjInfo.prjName = details.name;
+        sprintPrjInfo.prjID = details.id;
+
         sp_data = sp_hotResultDeals(details.data);
+
 
       } else if (details.category === "hotfix") {
         hotfixPrjInfo.prjName = details.name;
+        hotfixPrjInfo.prjID = details.id;
+
         ho_data = sp_hotResultDeals(details.data);
 
       } else {
 
         emergencyPrjInfo.prjName = details.name;
+        emergencyPrjInfo.prjID = details.id;
+
         em_data = bugResultDeals(details.data);
 
       }
@@ -424,6 +437,10 @@ const DashBoard: React.FC<any> = () => {
       ve0816: 15,
       ve08: 16
     });
+    setHidden({
+      ...hidden,
+      em_bug: false,
+    });
   };
 
   // hotfix赋值和下拉框事件
@@ -549,6 +566,12 @@ const DashBoard: React.FC<any> = () => {
       bug_ve0816: 0,
       bug_ve08: 0
       // endregion
+    });
+    setHidden({
+      ...hidden,
+      ho_story: false,
+      ho_task: false,
+      ho_bug: false
     });
   };
 
@@ -676,14 +699,18 @@ const DashBoard: React.FC<any> = () => {
       bug_ve08: 0
       // endregion
     });
+
+
   };
 
   const url = `projectid=${emergencyPrjInfo.prjID}&project=${emergencyPrjInfo.prjName}&kind=hotfix`;
 
-  console.log("em_data", em_data, sp_data);
 
   useEffect(() => {
-
+    let em_bug_hidden = true;
+    let ho_story_hidden = true;
+    let ho_task_hidden = true;
+    let ho_bug_hidden = true;
     // emergency 初始值赋值
     if (JSON.stringify(em_data) !== "{}" && emergency.noAssign === -1) {
       setEmergency({
@@ -704,10 +731,23 @@ const DashBoard: React.FC<any> = () => {
         ve0816: em_data.Bug_ve_0816,
         ve08: em_data.Bug_ve_08
       });
+      em_bug_hidden = false;
     }
 
     // hotfix 初始值赋值
     if (JSON.stringify(ho_data) !== "{}" && hotfix.story_status_draft === -1) {
+      if (ho_data.story !== "{}") {
+        ho_story_hidden = false;
+
+      }
+      if (ho_data.task !== "{}") {
+        ho_task_hidden = false;
+
+      }
+      if (ho_data.bug !== "{}") {
+        ho_bug_hidden = false;
+
+      }
 
       // setHotfix({
       //   // region 需求
@@ -953,6 +993,13 @@ const DashBoard: React.FC<any> = () => {
       });
     }
 
+    // 设置可见性
+    setHidden({
+      em_bug: em_bug_hidden,
+      ho_story: ho_story_hidden,
+      ho_task: ho_task_hidden,
+      ho_bug: ho_bug_hidden
+    });
   }, [em_data.Bug_no_deadline]);
 
   return (
@@ -968,7 +1015,7 @@ const DashBoard: React.FC<any> = () => {
               {/* emergency 下拉框 */}
               <div>
 
-                <Select defaultValue={emergencyPrjInfo.prjName}
+                <Select value={emergencyPrjInfo.prjName}
                         style={{width: '200px', marginLeft: "20px", marginTop: '20px', fontSize: "15px"}}
                         showSearch={true} optionFilterProp="children"
                         onChange={emergencyChanged}>{emergencySelect}</Select>
@@ -981,7 +1028,7 @@ const DashBoard: React.FC<any> = () => {
               </div>
               {/* emergency 数据显示div */}
               <div className="site-card-wrapper" style={{marginTop: '30px', marginLeft: "20px", marginRight: "20px"}}
-                   hidden={false}>
+                   hidden={hidden.em_bug}>
                 <div style={{
                   marginTop: "-20px",
                   width: "100%",
@@ -1099,11 +1146,11 @@ const DashBoard: React.FC<any> = () => {
               </div>
 
               {/* hotfix 下拉框 */}
-              <div>
+              <div style={{marginTop: "20px"}}>
                 <Select defaultValue={hotfixPrjInfo.prjName}
-                        style={{width: '200px', marginLeft: "20px", marginTop: '20px', fontSize: "15px"}}
+                        style={{width: '200px', marginLeft: "20px", fontSize: "15px"}}
                         showSearch optionFilterProp="children" onChange={hotfixChanged}>{hotfixSelect}</Select>
-                <Button type="text" style={{float: "right", color: 'black', marginTop: '20px', marginRight: "10px"}}
+                <Button type="text" style={{float: "right", color: 'black', marginRight: "10px"}}
                         icon={<SearchOutlined/>}
                         size={'large'}
                         onClick={() => {
@@ -1113,7 +1160,8 @@ const DashBoard: React.FC<any> = () => {
               {/* hotfix数据显示div */}
               <div>
                 {/* 需求 */}
-                <div className="site-card-wrapper" style={{marginTop: '30px', marginLeft: "20px", marginRight: "20px"}}>
+                <div className="site-card-wrapper" style={{marginTop: '30px', marginLeft: "20px", marginRight: "20px"}}
+                     hidden={hidden.ho_story}>
 
                   <div style={{
                     marginTop: "-20px",
@@ -1346,7 +1394,8 @@ const DashBoard: React.FC<any> = () => {
                 </div>
 
                 {/* 任务 */}
-                <div className="site-card-wrapper" style={{marginTop: '30px', marginLeft: "20px", marginRight: "20px"}}>
+                <div className="site-card-wrapper" style={{marginTop: '30px', marginLeft: "20px", marginRight: "20px"}}
+                     hidden={hidden.ho_task}>
                   <div style={{
                     marginTop: "-20px",
                     width: "100%",
@@ -1572,7 +1621,8 @@ const DashBoard: React.FC<any> = () => {
                 </div>
 
                 {/* bug */}
-                <div className="site-card-wrapper" style={{marginTop: '30px', marginLeft: "20px", marginRight: "20px"}}>
+                <div className="site-card-wrapper" style={{marginTop: '30px', marginLeft: "20px", marginRight: "20px"}}
+                     hidden={hidden.ho_bug}>
                   <div style={{
                     marginTop: "-20px",
                     width: "100%",
@@ -1700,7 +1750,7 @@ const DashBoard: React.FC<any> = () => {
             <div style={{height: '101%', backgroundColor: "#F2F2F2"}}>
               {/* sprint 下拉框 */}
               <div>
-                <Select defaultValue={sprintPrjInfo.prjName}
+                <Select value={sprintPrjInfo.prjName}
                         style={{width: '200px', marginLeft: "20px", marginTop: '20px', fontSize: "15px"}}
                         showSearch={true} optionFilterProp="children"
                         onChange={sprintChanged}>{sprintSelect}</Select>

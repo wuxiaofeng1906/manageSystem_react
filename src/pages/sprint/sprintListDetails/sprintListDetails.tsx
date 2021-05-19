@@ -8,6 +8,7 @@ import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient, useQuery} from '@/hooks';
 import {PageHeader, Button, message, Form, Select, Modal, Input, Row, Col, DatePicker} from 'antd';
 import {formatMomentTime} from '@/publicMethods/timeMethods';
+import dayjs from "dayjs";
 import {
   FolderAddTwoTone,
   SnippetsTwoTone,
@@ -454,6 +455,9 @@ const SprintList: React.FC<any> = () => {
               adminAddAssignTo: queryDatas.assignedTo,
               adminAddSolvedBy: queryDatas.finishedBy,
               adminAddClosedBy: queryDatas.closedBy,
+              createTime_hidden: dayjs(queryDatas.openedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.openedAt).format("YYYY-MM-DD HH:mm:ss"),
+              activeTime_hidden: dayjs(queryDatas.activedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.activedAt).format("YYYY-MM-DD HH:mm:ss"),
+              resolveTime_hidden: dayjs(queryDatas.resolvedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.resolvedAt).format("YYYY-MM-DD HH:mm:ss")
             });
           } else {
             if (res.data.code === '404') {
@@ -656,7 +660,6 @@ const SprintList: React.FC<any> = () => {
         });
         return;
       }
-
       const datas = {
         category: oradata.adminChandaoType,
         hotUpdate: oradata.adminAddHotUpdate,
@@ -669,6 +672,11 @@ const SprintList: React.FC<any> = () => {
         uedEnvCheck: oradata.adminAddForUedVerify,
         uedOnlineCheck: oradata.adminAdminUedOnline,
         memo: oradata.adminAddRemark,
+
+        // 隐藏的字段
+        openedAt: oradata.createTime_hidden,
+        resolvedAt: oradata.resolveTime_hidden,
+        activedAt: oradata.activeTime_hidden
       };
 
       if (modal.title === '新增明细行') {
@@ -1784,7 +1792,32 @@ const SprintList: React.FC<any> = () => {
                 </div>
               </Col>
             </Row>
-            <Form.Item style={{marginTop: '50px'}}>
+            {/* 以下为不用显示出来但是需要传递的数据 */}
+            <Row gutter={16}>
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="createTime_hidden">
+                    <Input hidden={true} style={widths}/>
+                  </Form.Item>
+                </div>
+              </Col>
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="activeTime_hidden">
+                    <Input hidden={true} style={widths}/>
+                  </Form.Item>
+                </div>
+              </Col>
+              <Col className="gutter-row">
+                <div style={leftStyle}>
+                  <Form.Item name="resolveTime_hidden">
+                    <Input hidden={true} style={{width: '185px', color: 'black'}}/>
+                  </Form.Item>
+                </div>
+              </Col>
+            </Row>
+
+            <Form.Item>
               <Button type="primary" style={{marginLeft: '400px'}} onClick={commitSprintDetails}>
                 确定</Button>
               <Button type="primary" style={{marginLeft: '20px'}} onClick={handleCancel}>

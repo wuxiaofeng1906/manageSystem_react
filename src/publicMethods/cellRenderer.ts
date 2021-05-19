@@ -17,6 +17,7 @@ const numberRenderTopass = (params: any) => {
 };
 
 const numberRenderToCurrentStage = (params: any) => {
+  debugger;
   let stage = "";
   switch (params.value.toString()) {
     case "1":

@@ -141,7 +141,6 @@ const DashBoard: React.FC<any> = () => {
   let ho_data = Object();
   let em_data = Object();
   if (data !== undefined) {
-
     for (let index = 0; index < data.length; index += 1) {
       const details = data[index];
       if (details.category === "sprint") {
@@ -166,7 +165,6 @@ const DashBoard: React.FC<any> = () => {
 
       }
     }
-
   }
   const [emergency, setEmergency] = useState({
     noAssign: -1,
@@ -444,9 +442,7 @@ const DashBoard: React.FC<any> = () => {
     if (datas === null) {
       hidde = true;
     }
-
     const em_datas = bugResultDeals(datas);
-
 
     setEmergency({
       noAssign: em_datas.Bug_no_assign,
@@ -756,11 +752,9 @@ const DashBoard: React.FC<any> = () => {
 
   };
 
-
-  const emergency_url = `projectid=${emergencyPrjInfo.prjID}&project=${emergencyPrjInfo.prjName}&kind=emergency`;
-  const hotfix_url = `projectid=${hotfixPrjInfo.prjID}&project=${hotfixPrjInfo.prjName}&kind=hotfix`;
-  const sprint_url = `projectid=${sprintPrjInfo.prjID}&project=${sprintPrjInfo.prjName}&kind=sprint`;
-
+  const emergency_url = `projectid=${emergencyPrjInfo.prjID}&project=${emergencyPrjInfo.prjName}`;
+  const hotfix_url = `projectid=${hotfixPrjInfo.prjID}&project=${hotfixPrjInfo.prjName}`;
+  const sprint_url = `projectid=${sprintPrjInfo.prjID}&project=${sprintPrjInfo.prjName}`;
 
   useEffect(() => {
     let em_bug_hidden = true;

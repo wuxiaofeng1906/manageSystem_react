@@ -10,7 +10,6 @@ import {PageHeader} from 'antd';
 import {history} from 'umi';
 import {
   numberRenderToCurrentStage,
-  numberRenderToZentaoType,
   numberRenderToZentaoSeverity,
   numberRenderToZentaoStatus,
   linkToZentaoPage
@@ -43,7 +42,7 @@ const colums = () => {
     {
       headerName: '禅道类型',
       field: 'category',
-      cellRenderer: numberRenderToZentaoType,
+
     },
     {
       headerName: '禅道编号',
@@ -86,7 +85,7 @@ const colums = () => {
     },
     {
       headerName: '由谁解决',
-      field: 'finishedBy',
+      field: 'resolvedBy',
     },
     {
       headerName: '由谁关闭',
@@ -94,69 +93,69 @@ const colums = () => {
     },
     {
       headerName: '激活时长',
-      field: 'activeTime',
+      field: 'activeDuration',
     },
     {
       headerName: '解决时长',
-      field: 'resolveTime',
+      field: 'solveDuration',
     },
     {
       headerName: '回验时长',
-      field: 'vertifyTime',
+      field: 'verifyDuration',
     },
     {
       headerName: '关闭时长',
-      field: 'closeTime',
+      field: 'closedDuration',
     }
   );
 
   return component;
 };
 
+const addNewAttributes = (source: any) => {
+  const result = [];
+  console.log("原始数据");
+  const {data} = source[0];
+  for (let index = 0; index < data.length; index += 1) {
+    const details = data[index];
+    details["category"] = "bug";
+    result.push(details);
+  }
+  return result;
+};
+
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   const {data} = await client.query(`
       {
-         proDetail(project:${params}){
-            id
-            stage
-            tester
-            category
-            ztNo
-            title
-            severity
-            priority
-            moduleName
-            ztStatus
-            assignedTo
-            finishedBy
-            closedBy
-            hotUpdate
-            dataUpdate
-            interUpdate
-            presetData
-            testCheck
-            scopeLimit
-            publishEnv
-            uedName
-            uedEnvCheck
-            uedOnlineCheck
-            memo
-            source
-            feedback
-            expectTest
-            submitTest
-            activeDuration
-            solveDuration
-            verifyDuration
-            closedDuration
-            relatedBugs
-            relatedTasks
-            relatedStories
-          }
+       dashSingleItem(project:${params.prjId},kindName:${params.kind}",itemName:${params.item}") {
+        name
+        data{
+           id
+          stage
+          tester
+          ztNo
+          title
+          severity
+          priority
+          moduleName
+          ztStatus
+          relatedStories
+          relatedTasks
+          relatedBugs
+          assignedTo
+          resolvedBy
+          closedBy
+          activeDuration
+          solveDuration
+          verifyDuration
+          closedDuration
+        }
+      }
       }
   `);
-  return data?.proDetail;
+
+  return addNewAttributes(data?.dashSingleItem);
 };
 
 
@@ -166,20 +165,21 @@ const BugDetails: React.FC<any> = () => {
   const projectInfo = {
     prjId: "",
     prjNames: "",
-    prjKind: ""
+    prjKind: "bug",
+    itemName: ""
   };
 
   const location = history.location.query;
   if (location !== undefined && location.projectid !== null) {
     projectInfo.prjId = location.projectid.toString();
     projectInfo.prjNames = location.project === null ? '' : location.project.toString();
-    projectInfo.prjKind = location.kind === null ? '' : location.kind.toString();
-
+    projectInfo.itemName = location.item === null ? '' : location.item.toString();
   }
 
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, projectInfo.prjId));
+  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, projectInfo));
+
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -189,7 +189,6 @@ const BugDetails: React.FC<any> = () => {
     if (loading) gridApi.current.showLoadingOverlay();
     else gridApi.current.hideOverlay();
   }
-
 
   const routes = [
     {

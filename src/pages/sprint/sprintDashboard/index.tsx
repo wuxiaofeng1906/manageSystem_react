@@ -134,259 +134,259 @@ const DashBoard: React.FC<any> = () => {
     ho_bug: true
   });
   const [emergency, setEmergency] = useState({
-    noAssign: -1,
-    noDeadline: -1,
-    prj_error: -1,
-    over_area: -1,
-    actived: -1,
-    resolved: -1,
-    vertified: -1,
-    closed: -1,
-    ac24: -1,
-    ac1624: -1,
-    ac0816: -1,
-    ac08: -1,
-    ve24: -1,
-    ve1624: -1,
-    ve0816: -1,
-    ve08: -1
+    noAssign: '',
+    noDeadline: '',
+    prj_error: '',
+    over_area: '',
+    actived: '',
+    resolved: '',
+    vertified: '',
+    closed: '',
+    ac24: '',
+    ac1624: '',
+    ac0816: '',
+    ac08: '',
+    ve24: '',
+    ve1624: '',
+    ve0816: '',
+    ve08: ''
   });
   const [hotfix, setHotfix] = useState({
     // region 需求
 
     // 状态
-    story_status_draft: -1,
-    story_status_noTask: -1,
-    story_status_lackTask: -1,
-    story_status_noDeadline: -1,
-    story_status_noAssign: -1,
-    story_status_noBug: -1,
-    story_status_noModify: -1,
-    story_status_prj_error: -1,
-    story_status_over_area: -1,
+    story_status_draft: '',
+    story_status_noTask: '',
+    story_status_lackTask: '',
+    story_status_noDeadline: '',
+    story_status_noAssign: '',
+    story_status_noBug: '',
+    story_status_noModify: '',
+    story_status_prj_error: '',
+    story_status_over_area: '',
 
-    story_status_delay: -1,
-    story_status_wait: -1,
-    story_status_doing: -1,
-    story_status_done: -1,
+    story_status_delay: '',
+    story_status_wait: '',
+    story_status_doing: '',
+    story_status_done: '',
 
-    story_status_raseTestDelay: -1,
-    story_status_raseTestWait: -1,
-    story_status_raseTestDone: -1,
+    story_status_raseTestDelay: '',
+    story_status_raseTestWait: '',
+    story_status_raseTestDone: '',
 
-    story_status_testDelay: -1,
-    story_status_testWait: -1,
-    story_status_testDoing: -1,
-    story_status_testDone: -1,
+    story_status_testDelay: '',
+    story_status_testWait: '',
+    story_status_testDoing: '',
+    story_status_testDone: '',
 
     // bug
-    story_bug_noAssign: -1,
-    story_bug_noDeadline: -1,
-    story_bug_prj_error: -1,
-    story_bug_over_area: -1,
-    story_bug_actived: -1,
-    story_bug_resolved: -1,
-    story_bug_vertified: -1,
-    story_bug_closed: -1,
-    story_bug_ac24: -1,
-    story_bug_ac1624: -1,
-    story_bug_ac0816: -1,
-    story_bug_ac08: -1,
-    story_bug_ve24: -1,
-    story_bug_ve1624: -1,
-    story_bug_ve0816: -1,
-    story_bug_ve08: -1,
+    story_bug_noAssign: '',
+    story_bug_noDeadline: '',
+    story_bug_prj_error: '',
+    story_bug_over_area: '',
+    story_bug_actived: '',
+    story_bug_resolved: '',
+    story_bug_vertified: '',
+    story_bug_closed: '',
+    story_bug_ac24: '',
+    story_bug_ac1624: '',
+    story_bug_ac0816: '',
+    story_bug_ac08: '',
+    story_bug_ve24: '',
+    story_bug_ve1624: '',
+    story_bug_ve0816: '',
+    story_bug_ve08: '',
 
     // endregion
 
     // region 任务
 
     // 状态
-    task_status_noTask: -1,
-    task_status_noDeadline: -1,
-    task_status_noAssign: -1,
-    task_status_noBug: -1,
-    task_status_noModify: -1,
-    task_status_prj_error: -1,
-    task_status_over_area: -1,
+    task_status_noTask: '',
+    task_status_noDeadline: '',
+    task_status_noAssign: '',
+    task_status_noBug: '',
+    task_status_noModify: '',
+    task_status_prj_error: '',
+    task_status_over_area: '',
 
-    task_status_taskDelay: -1,
-    task_status_wait: -1,
-    task_status_doing: -1,
-    task_status_done: -1,
+    task_status_taskDelay: '',
+    task_status_wait: '',
+    task_status_doing: '',
+    task_status_done: '',
 
-    task_status_raseTestDelay: -1,
-    task_status_raseTestWait: -1,
-    task_status_raseTestDone: -1,
+    task_status_raseTestDelay: '',
+    task_status_raseTestWait: '',
+    task_status_raseTestDone: '',
 
-    task_status_testDelay: -1,
-    task_status_testWait: -1,
-    task_status_testDoing: -1,
-    task_status_testDone: -1,
+    task_status_testDelay: '',
+    task_status_testWait: '',
+    task_status_testDoing: '',
+    task_status_testDone: '',
 
     // bug
-    task_bug_noAssign: -1,
-    task_bug_noDeadline: -1,
-    task_bug_prj_error: -1,
-    task_bug_over_area: -1,
+    task_bug_noAssign: '',
+    task_bug_noDeadline: '',
+    task_bug_prj_error: '',
+    task_bug_over_area: '',
 
-    task_bug_actived: -1,
-    task_bug_resolved: -1,
-    task_bug_vertified: -1,
-    task_bug_closed: -1,
+    task_bug_actived: '',
+    task_bug_resolved: '',
+    task_bug_vertified: '',
+    task_bug_closed: '',
 
-    task_bug_ac24: -1,
-    task_bug_ac1624: -1,
-    task_bug_ac0816: -1,
-    task_bug_ac08: -1,
+    task_bug_ac24: '',
+    task_bug_ac1624: '',
+    task_bug_ac0816: '',
+    task_bug_ac08: '',
 
-    task_bug_ve24: -1,
-    task_bug_ve1624: -1,
-    task_bug_ve0816: -1,
-    task_bug_ve08: -1,
+    task_bug_ve24: '',
+    task_bug_ve1624: '',
+    task_bug_ve0816: '',
+    task_bug_ve08: '',
 
     // endregion
 
     // region bug
 
-    bug_noAssign: -1,
-    bug_noDeadline: -1,
-    bug_prj_error: -1,
-    bug_over_area: -1,
+    bug_noAssign: '',
+    bug_noDeadline: '',
+    bug_prj_error: '',
+    bug_over_area: '',
 
-    bug_actived: -1,
-    bug_resolved: -1,
-    bug_vertified: -1,
-    bug_closed: -1,
+    bug_actived: '',
+    bug_resolved: '',
+    bug_vertified: '',
+    bug_closed: '',
 
-    bug_ac24: -1,
-    bug_ac1624: -1,
-    bug_ac0816: -1,
-    bug_ac08: -1,
+    bug_ac24: '',
+    bug_ac1624: '',
+    bug_ac0816: '',
+    bug_ac08: '',
 
-    bug_ve24: -1,
-    bug_ve1624: -1,
-    bug_ve0816: -1,
-    bug_ve08: -1
+    bug_ve24: '',
+    bug_ve1624: '',
+    bug_ve0816: '',
+    bug_ve08: ''
     // endregion
   });
   const [sprint, setsprint] = useState({
     // region 需求
 
     // 状态
-    story_status_draft: -1,
-    story_status_noTask: -1,
-    story_status_lackTask: -1,
-    story_status_noDeadline: -1,
-    story_status_noAssign: -1,
-    story_status_noBug: -1,
-    story_status_noModify: -1,
-    story_status_prj_error: -1,
-    story_status_over_area: -1,
+    story_status_draft: '',
+    story_status_noTask: '',
+    story_status_lackTask: '',
+    story_status_noDeadline: '',
+    story_status_noAssign: '',
+    story_status_noBug: '',
+    story_status_noModify: '',
+    story_status_prj_error: '',
+    story_status_over_area: '',
 
-    story_status_delay: -1,
-    story_status_wait: -1,
-    story_status_doing: -1,
-    story_status_done: -1,
+    story_status_delay: '',
+    story_status_wait: '',
+    story_status_doing: '',
+    story_status_done: '',
 
-    story_status_raseTestDelay: -1,
-    story_status_raseTestWait: -1,
-    story_status_raseTestDone: -1,
+    story_status_raseTestDelay: '',
+    story_status_raseTestWait: '',
+    story_status_raseTestDone: '',
 
-    story_status_testDelay: -1,
-    story_status_testWait: -1,
-    story_status_testDoing: -1,
-    story_status_testDone: -1,
+    story_status_testDelay: '',
+    story_status_testWait: '',
+    story_status_testDoing: '',
+    story_status_testDone: '',
 
     // bug
-    story_bug_noAssign: -1,
-    story_bug_noDeadline: -1,
-    story_bug_prj_error: -1,
-    story_bug_over_area: -1,
-    story_bug_actived: -1,
-    story_bug_resolved: -1,
-    story_bug_vertified: -1,
-    story_bug_closed: -1,
-    story_bug_ac24: -1,
-    story_bug_ac1624: -1,
-    story_bug_ac0816: -1,
-    story_bug_ac08: -1,
-    story_bug_ve24: -1,
-    story_bug_ve1624: -1,
-    story_bug_ve0816: -1,
-    story_bug_ve08: -1,
+    story_bug_noAssign: '',
+    story_bug_noDeadline: '',
+    story_bug_prj_error: '',
+    story_bug_over_area: '',
+    story_bug_actived: '',
+    story_bug_resolved: '',
+    story_bug_vertified: '',
+    story_bug_closed: '',
+    story_bug_ac24: '',
+    story_bug_ac1624: '',
+    story_bug_ac0816: '',
+    story_bug_ac08: '',
+    story_bug_ve24: '',
+    story_bug_ve1624: '',
+    story_bug_ve0816: '',
+    story_bug_ve08: '',
 
     // endregion
 
     // region 任务
 
     // 状态
-    task_status_noTask: -1,
-    task_status_noDeadline: -1,
-    task_status_noAssign: -1,
-    task_status_noBug: -1,
-    task_status_noModify: -1,
-    task_status_prj_error: -1,
-    task_status_over_area: -1,
+    task_status_noTask: '',
+    task_status_noDeadline: '',
+    task_status_noAssign: '',
+    task_status_noBug: '',
+    task_status_noModify: '',
+    task_status_prj_error: '',
+    task_status_over_area: '',
 
-    task_status_taskDelay: -1,
-    task_status_wait: -1,
-    task_status_doing: -1,
-    task_status_done: -1,
+    task_status_taskDelay: '',
+    task_status_wait: '',
+    task_status_doing: '',
+    task_status_done: '',
 
-    task_status_raseTestDelay: -1,
-    task_status_raseTestWait: -1,
-    task_status_raseTestDone: -1,
+    task_status_raseTestDelay: '',
+    task_status_raseTestWait: '',
+    task_status_raseTestDone: '',
 
-    task_status_testDelay: -1,
-    task_status_testWait: -1,
-    task_status_testDoing: -1,
-    task_status_testDone: -1,
+    task_status_testDelay: '',
+    task_status_testWait: '',
+    task_status_testDoing: '',
+    task_status_testDone: '',
 
     // bug
-    task_bug_noAssign: -1,
-    task_bug_noDeadline: -1,
-    task_bug_prj_error: -1,
-    task_bug_over_area: -1,
+    task_bug_noAssign: '',
+    task_bug_noDeadline: '',
+    task_bug_prj_error: '',
+    task_bug_over_area: '',
 
-    task_bug_actived: -1,
-    task_bug_resolved: -1,
-    task_bug_vertified: -1,
-    task_bug_closed: -1,
+    task_bug_actived: '',
+    task_bug_resolved: '',
+    task_bug_vertified: '',
+    task_bug_closed: '',
 
-    task_bug_ac24: -1,
-    task_bug_ac1624: -1,
-    task_bug_ac0816: -1,
-    task_bug_ac08: -1,
+    task_bug_ac24: '',
+    task_bug_ac1624: '',
+    task_bug_ac0816: '',
+    task_bug_ac08: '',
 
-    task_bug_ve24: -1,
-    task_bug_ve1624: -1,
-    task_bug_ve0816: -1,
-    task_bug_ve08: -1,
+    task_bug_ve24: '',
+    task_bug_ve1624: '',
+    task_bug_ve0816: '',
+    task_bug_ve08: '',
 
     // endregion
 
     // region bug
 
-    bug_noAssign: -1,
-    bug_noDeadline: -1,
-    bug_prj_error: -1,
-    bug_over_area: -1,
+    bug_noAssign: '',
+    bug_noDeadline: '',
+    bug_prj_error: '',
+    bug_over_area: '',
 
-    bug_actived: -1,
-    bug_resolved: -1,
-    bug_vertified: -1,
-    bug_closed: -1,
+    bug_actived: '',
+    bug_resolved: '',
+    bug_vertified: '',
+    bug_closed: '',
 
-    bug_ac24: -1,
-    bug_ac1624: -1,
-    bug_ac0816: -1,
-    bug_ac08: -1,
+    bug_ac24: '',
+    bug_ac1624: '',
+    bug_ac0816: '',
+    bug_ac08: '',
 
-    bug_ve24: -1,
-    bug_ve1624: -1,
-    bug_ve0816: -1,
-    bug_ve08: -1
+    bug_ve24: '',
+    bug_ve1624: '',
+    bug_ve0816: '',
+    bug_ve08: ''
     // endregion
   });
   const [selectedName, setSelectedName] = useState({
@@ -443,20 +443,25 @@ const DashBoard: React.FC<any> = () => {
     emergencyPrjInfo.prjID = other.key;
     emergencyPrjInfo.prjName = other.value;
     const datas: any = await queryProjectALL(gqlClient, other.key);
-    if (datas === null) {
+    const em_datas = bugResultDeals(datas);
+
+    if (JSON.stringify(em_datas) === "{}" || datas === null) {
       hidde = true;
     }
-    const em_datas = bugResultDeals(datas);
+
     setSelectedName({
       ...selectedName,
       emergency: other.value
     });
-
+    setHidden({
+      ...hidden,
+      em_bug: hidde,
+    });
     setEmergency({
       noAssign: em_datas.Bug_no_assign,
       noDeadline: em_datas.Bug_no_deadline,
-      prj_error: 0,
-      over_area: 0,
+      prj_error: '',
+      over_area: '',
       actived: em_datas.Bug_actived,
       resolved: em_datas.Bug_resolved,
       vertified: em_datas.Bug_verified,
@@ -470,10 +475,7 @@ const DashBoard: React.FC<any> = () => {
       ve0816: em_datas.Bug_ve_0816,
       ve08: em_datas.Bug_ve_08
     });
-    setHidden({
-      ...hidden,
-      em_bug: hidde,
-    });
+
   };
 
   // hotfix赋值和下拉框事件
@@ -490,13 +492,13 @@ const DashBoard: React.FC<any> = () => {
       return;
     }
     const ho_datas = sp_hotResultDeals(datas);
-    if (datas.story === null) {
+    if (ho_datas === null || JSON.stringify(ho_datas.story.bug) === "{}") {
       story_hidde = true;
     }
-    if (datas.task === null) {
+    if (ho_datas === null || JSON.stringify(ho_datas.task.bug) === "{}") {
       story_task = true;
     }
-    if (datas.bug === null) {
+    if (ho_datas === null || JSON.stringify(ho_datas.bug) === "{}") {
       story_bug = true;
     }
     setSelectedName({
@@ -528,8 +530,8 @@ const DashBoard: React.FC<any> = () => {
       story_status_done: ho_datas.story.status.status_dev_done,
 
       story_status_raseTestDelay: ho_datas.story.status.status_raisetest_delay,
-      story_status_raseTestWait: 0,
-      story_status_raseTestDone: 0,
+      story_status_raseTestWait: '',
+      story_status_raseTestDone: '',
 
       story_status_testDelay: ho_datas.story.status.status_testtask_delay,
       story_status_testWait: ho_datas.story.status.status_test_wait,
@@ -545,14 +547,14 @@ const DashBoard: React.FC<any> = () => {
       story_bug_resolved: ho_datas.story.bug.Bug_resolved,
       story_bug_vertified: ho_datas.story.bug.Bug_verified,
       story_bug_closed: ho_datas.story.bug.Bug_closed,
-      story_bug_ac24: 0,
-      story_bug_ac1624: 0,
-      story_bug_ac0816: 0,
-      story_bug_ac08: 0,
-      story_bug_ve24: 0,
-      story_bug_ve1624: 0,
-      story_bug_ve0816: 0,
-      story_bug_ve08: 0,
+      story_bug_ac24: '',
+      story_bug_ac1624: '',
+      story_bug_ac0816: '',
+      story_bug_ac08: '',
+      story_bug_ve24: '',
+      story_bug_ve1624: '',
+      story_bug_ve0816: '',
+      story_bug_ve08: '',
 
       // endregion
 
@@ -573,8 +575,8 @@ const DashBoard: React.FC<any> = () => {
       task_status_done: ho_datas.task.status.status_dev_done,
 
       task_status_raseTestDelay: ho_datas.task.status.status_raisetest_delay,
-      task_status_raseTestWait: 0,
-      task_status_raseTestDone: 0,
+      task_status_raseTestWait: '',
+      task_status_raseTestDone: '',
 
       task_status_testDelay: ho_datas.task.status.status_testtask_delay,
       task_status_testWait: ho_datas.task.status.status_test_wait,
@@ -592,15 +594,15 @@ const DashBoard: React.FC<any> = () => {
       task_bug_vertified: ho_datas.task.bug.Bug_verified,
       task_bug_closed: ho_datas.task.bug.Bug_closed,
 
-      task_bug_ac24: 0,
-      task_bug_ac1624: 0,
-      task_bug_ac0816: 0,
-      task_bug_ac08: 0,
+      task_bug_ac24: '',
+      task_bug_ac1624: '',
+      task_bug_ac0816: '',
+      task_bug_ac08: '',
 
-      task_bug_ve24: 0,
-      task_bug_ve1624: 0,
-      task_bug_ve0816: 0,
-      task_bug_ve08: 0,
+      task_bug_ve24: '',
+      task_bug_ve1624: '',
+      task_bug_ve0816: '',
+      task_bug_ve08: '',
 
       // endregion
 
@@ -608,23 +610,23 @@ const DashBoard: React.FC<any> = () => {
 
       bug_noAssign: ho_datas.bug.Bug_no_assign,
       bug_noDeadline: ho_datas.bug.Bug_no_deadline,
-      bug_prj_error: 0,
-      bug_over_area: 0,
+      bug_prj_error: '',
+      bug_over_area: '',
 
       bug_actived: ho_datas.bug.Bug_actived,
       bug_resolved: ho_datas.bug.Bug_resolved,
       bug_vertified: ho_datas.bug.Bug_verified,
       bug_closed: ho_datas.bug.Bug_closed,
 
-      bug_ac24: 0,
-      bug_ac1624: 0,
-      bug_ac0816: 0,
-      bug_ac08: 0,
+      bug_ac24: '',
+      bug_ac1624: '',
+      bug_ac0816: '',
+      bug_ac08: '',
 
-      bug_ve24: 0,
-      bug_ve1624: 0,
-      bug_ve0816: 0,
-      bug_ve08: 0
+      bug_ve24: '',
+      bug_ve1624: '',
+      bug_ve0816: '',
+      bug_ve08: ''
       // endregion
 
     });
@@ -672,8 +674,8 @@ const DashBoard: React.FC<any> = () => {
       story_status_done: sp_datas.story.status.status_dev_done,
 
       story_status_raseTestDelay: sp_datas.story.status.status_raisetest_delay,
-      story_status_raseTestWait: 0,
-      story_status_raseTestDone: 0,
+      story_status_raseTestWait: '',
+      story_status_raseTestDone: '',
 
       story_status_testDelay: sp_datas.story.status.status_testtask_delay,
       story_status_testWait: sp_datas.story.status.status_test_wait,
@@ -689,14 +691,14 @@ const DashBoard: React.FC<any> = () => {
       story_bug_resolved: sp_datas.story.bug.Bug_resolved,
       story_bug_vertified: sp_datas.story.bug.Bug_verified,
       story_bug_closed: sp_datas.story.bug.Bug_closed,
-      story_bug_ac24: 0,
-      story_bug_ac1624: 0,
-      story_bug_ac0816: 0,
-      story_bug_ac08: 0,
-      story_bug_ve24: 0,
-      story_bug_ve1624: 0,
-      story_bug_ve0816: 0,
-      story_bug_ve08: 0,
+      story_bug_ac24: '',
+      story_bug_ac1624: '',
+      story_bug_ac0816: '',
+      story_bug_ac08: '',
+      story_bug_ve24: '',
+      story_bug_ve1624: '',
+      story_bug_ve0816: '',
+      story_bug_ve08: '',
 
       // endregion
 
@@ -717,8 +719,8 @@ const DashBoard: React.FC<any> = () => {
       task_status_done: sp_datas.task.status.status_dev_done,
 
       task_status_raseTestDelay: sp_datas.task.status.status_raisetest_delay,
-      task_status_raseTestWait: 0,
-      task_status_raseTestDone: 0,
+      task_status_raseTestWait: '',
+      task_status_raseTestDone: '',
 
       task_status_testDelay: sp_datas.task.status.status_testtask_delay,
       task_status_testWait: sp_datas.task.status.status_test_wait,
@@ -736,15 +738,15 @@ const DashBoard: React.FC<any> = () => {
       task_bug_vertified: sp_datas.task.bug.Bug_verified,
       task_bug_closed: sp_datas.task.bug.Bug_closed,
 
-      task_bug_ac24: 0,
-      task_bug_ac1624: 0,
-      task_bug_ac0816: 0,
-      task_bug_ac08: 0,
+      task_bug_ac24: '',
+      task_bug_ac1624: '',
+      task_bug_ac0816: '',
+      task_bug_ac08: '',
 
-      task_bug_ve24: 0,
-      task_bug_ve1624: 0,
-      task_bug_ve0816: 0,
-      task_bug_ve08: 0,
+      task_bug_ve24: '',
+      task_bug_ve1624: '',
+      task_bug_ve0816: '',
+      task_bug_ve08: '',
 
       // endregion
 
@@ -752,23 +754,23 @@ const DashBoard: React.FC<any> = () => {
 
       bug_noAssign: sp_datas.bug.Bug_no_assign,
       bug_noDeadline: sp_datas.bug.Bug_no_deadline,
-      bug_prj_error: 0,
-      bug_over_area: 0,
+      bug_prj_error: '',
+      bug_over_area: '',
 
       bug_actived: sp_datas.bug.Bug_actived,
       bug_resolved: sp_datas.bug.Bug_resolved,
       bug_vertified: sp_datas.bug.Bug_verified,
       bug_closed: sp_datas.bug.Bug_closed,
 
-      bug_ac24: 0,
-      bug_ac1624: 0,
-      bug_ac0816: 0,
-      bug_ac08: 0,
+      bug_ac24: '',
+      bug_ac1624: '',
+      bug_ac0816: '',
+      bug_ac08: '',
 
-      bug_ve24: 0,
-      bug_ve1624: 0,
-      bug_ve0816: 0,
-      bug_ve08: 0
+      bug_ve24: '',
+      bug_ve1624: '',
+      bug_ve0816: '',
+      bug_ve08: ''
       // endregion
     });
   };
@@ -792,12 +794,12 @@ const DashBoard: React.FC<any> = () => {
     let ho_task_hidden = true;
     let ho_bug_hidden = true;
     // emergency 初始值赋值
-    if (JSON.stringify(em_data) !== "{}" && emergency.noAssign === -1) {
+    if (JSON.stringify(em_data) !== "{}" && emergency.noAssign === '') {
       setEmergency({
         noAssign: em_data.Bug_no_assign,
         noDeadline: em_data.Bug_no_deadline,
-        prj_error: 0,
-        over_area: 0,
+        prj_error: '',
+        over_area: '',
         actived: em_data.Bug_actived,
         resolved: em_data.Bug_resolved,
         vertified: em_data.Bug_verified,
@@ -815,7 +817,7 @@ const DashBoard: React.FC<any> = () => {
     }
 
     // hotfix 初始值赋值
-    if (JSON.stringify(ho_data) !== "{}" && hotfix.story_status_draft === -1) {
+    if (JSON.stringify(ho_data) !== "{}" && hotfix.story_status_draft === '') {
       if (ho_data.story !== "{}") {
         ho_story_hidden = false;
 
@@ -829,129 +831,10 @@ const DashBoard: React.FC<any> = () => {
 
       }
 
-      // setHotfix({
-      //   // region 需求
-      //
-      //   // 状态
-      //   story_status_draft: ho_data.story.status.status_draft,
-      //   story_status_noTask: ho_data.story.status.status_no_task,
-      //   story_status_lackTask: ho_data.story.status.status_lack_task,
-      //   story_status_noDeadline: ho_data.story.status.status_no_deadline,
-      //   story_status_noAssign: ho_data.story.status.status_no_assign,
-      //   story_status_noBug: ho_data.story.status.status_no_bug,
-      //   story_status_noModify: ho_data.story.status.status_un_modify,
-      //   story_status_prj_error: ho_data.story.status.status_proj_error,
-      //   story_status_over_area: ho_data.story.status.status_over_area,
-      //
-      //   story_status_delay: ho_data.story.status.status_devtask_delay,
-      //   story_status_wait: ho_data.story.status.status_dev_wait,
-      //   story_status_doing: ho_data.story.status.status_developing,
-      //   story_status_done: ho_data.story.status.status_dev_done,
-      //
-      //   story_status_raseTestDelay: ho_data.story.status.status_raisetest_delay,
-      //   story_status_raseTestWait: ho_data.story.status.status_un_raisetest,
-      //   story_status_raseTestDone: ho_data.story.status.status_raisetest_done,
-      //
-      //   story_status_testDelay: ho_data.story.status.status_testtask_delay,
-      //   story_status_testWait: ho_data.story.status.status_test_wait,
-      //   story_status_testDoing: ho_data.story.status.status_testing,
-      //   story_status_testDone: ho_data.story.status.status_test_done,
-      //
-      //   // bug
-      //   story_bug_noAssign: 0,
-      //   story_bug_noDeadline: 0,
-      //   story_bug_prj_error: 0,
-      //   story_bug_over_area: 0,
-      //   story_bug_actived: 0,
-      //   story_bug_resolved: 0,
-      //   story_bug_vertified: 0,
-      //   story_bug_closed: 0,
-      //   story_bug_ac24: 0,
-      //   story_bug_ac1624: 0,
-      //   story_bug_ac0816: 0,
-      //   story_bug_ac08: 0,
-      //   story_bug_ve24: 0,
-      //   story_bug_ve1624: 0,
-      //   story_bug_ve0816: 0,
-      //   story_bug_ve08: 0,
-      //
-      //   // endregion
-      //
-      //   // region 任务
-      //
-      //   // 状态
-      //   task_status_noTask: ho_data.task.status.status_no_task,
-      //   task_status_noDeadline: ho_data.task.status.status_no_deadline,
-      //   task_status_noAssign: ho_data.task.status.status_no_assign,
-      //   task_status_noBug: ho_data.task.status.status_no_bug,
-      //   task_status_noModify: ho_data.task.status.status_un_modify,
-      //   task_status_prj_error: ho_data.task.status.status_proj_error,
-      //   task_status_over_area: ho_data.task.status.status_over_area,
-      //
-      //   task_status_taskDelay: ho_data.task.status.status_devtask_delay,
-      //   task_status_wait: ho_data.task.status.status_dev_wait,
-      //   task_status_doing: ho_data.task.status.status_developing,
-      //   task_status_done: ho_data.task.status.status_dev_done,
-      //
-      //   task_status_raseTestDelay: ho_data.task.status.status_raisetest_delay,
-      //   task_status_raseTestWait: 0,
-      //   task_status_raseTestDone: 0,
-      //
-      //   task_status_testDelay: ho_data.task.status.status_testtask_delay,
-      //   task_status_testWait: ho_data.task.status.status_test_wait,
-      //   task_status_testDoing: ho_data.task.status.status_testing,
-      //   task_status_testDone: ho_data.task.status.status_test_done,
-      //
-      //   // bug
-      //   task_bug_noAssign: ho_data.task.bug.Bug_no_assign,
-      //   task_bug_noDeadline: ho_data.task.bug.Bug_no_deadline,
-      //   task_bug_prj_error: ho_data.task.bug.Bug_proj_error,
-      //   task_bug_over_area: ho_data.task.bug.Bug_over_area,
-      //
-      //   task_bug_actived: ho_data.task.bug.Bug_actived,
-      //   task_bug_resolved: ho_data.task.bug.Bug_resolved,
-      //   task_bug_vertified: ho_data.task.bug.Bug_verified,
-      //   task_bug_closed: ho_data.task.bug.Bug_closed,
-      //
-      //   task_bug_ac24: 0,
-      //   task_bug_ac1624: 0,
-      //   task_bug_ac0816: 0,
-      //   task_bug_ac08: 0,
-      //
-      //   task_bug_ve24: 0,
-      //   task_bug_ve1624: 0,
-      //   task_bug_ve0816: 0,
-      //   task_bug_ve08: 0,
-      //
-      //   // endregion
-      //
-      //   // region bug
-      //
-      //   bug_noAssign: ho_data.bug.Bug_no_assign,
-      //   bug_noDeadline: ho_data.bug.Bug_no_deadline,
-      //   bug_prj_error: 0,
-      //   bug_over_area: 0,
-      //
-      //   bug_actived: ho_data.bug.Bug_actived,
-      //   bug_resolved: ho_data.bug.Bug_resolved,
-      //   bug_vertified: ho_data.bug.Bug_verified,
-      //   bug_closed: ho_data.Bug_closed,
-      //
-      //   bug_ac24: 0,
-      //   bug_ac1624: 0,
-      //   bug_ac0816: 0,
-      //   bug_ac08: 0,
-      //
-      //   bug_ve24: 0,
-      //   bug_ve1624: 0,
-      //   bug_ve0816: 0,
-      //   bug_ve08: 0
-      //   // endregion
-      // });
     }
 
     // sprint 初始值赋值
-    if (JSON.stringify(sp_data) !== "{}" && sprint.story_status_draft === -1) {
+    if (JSON.stringify(sp_data) !== "{}" && sprint.story_status_draft === '') {
       setsprint({
         // region 需求
 
@@ -989,14 +872,14 @@ const DashBoard: React.FC<any> = () => {
         story_bug_resolved: sp_data.story.bug.Bug_resolved,
         story_bug_vertified: sp_data.story.bug.Bug_verified,
         story_bug_closed: sp_data.story.bug.Bug_closed,
-        story_bug_ac24: 0,
-        story_bug_ac1624: 0,
-        story_bug_ac0816: 0,
-        story_bug_ac08: 0,
-        story_bug_ve24: 0,
-        story_bug_ve1624: 0,
-        story_bug_ve0816: 0,
-        story_bug_ve08: 0,
+        story_bug_ac24: '',
+        story_bug_ac1624: '',
+        story_bug_ac0816: '',
+        story_bug_ac08: '',
+        story_bug_ve24: '',
+        story_bug_ve1624: '',
+        story_bug_ve0816: '',
+        story_bug_ve08: '',
 
         // endregion
 
@@ -1017,8 +900,8 @@ const DashBoard: React.FC<any> = () => {
         task_status_done: sp_data.task.status.status_dev_done,
 
         task_status_raseTestDelay: sp_data.task.status.status_raisetest_delay,
-        task_status_raseTestWait: 0,
-        task_status_raseTestDone: 0,
+        task_status_raseTestWait: '',
+        task_status_raseTestDone: '',
 
         task_status_testDelay: sp_data.task.status.status_testtask_delay,
         task_status_testWait: sp_data.task.status.status_test_wait,
@@ -1036,15 +919,15 @@ const DashBoard: React.FC<any> = () => {
         task_bug_vertified: sp_data.task.bug.Bug_verified,
         task_bug_closed: sp_data.task.bug.Bug_closed,
 
-        task_bug_ac24: 0,
-        task_bug_ac1624: 0,
-        task_bug_ac0816: 0,
-        task_bug_ac08: 0,
+        task_bug_ac24: '',
+        task_bug_ac1624: '',
+        task_bug_ac0816: '',
+        task_bug_ac08: '',
 
-        task_bug_ve24: 0,
-        task_bug_ve1624: 0,
-        task_bug_ve0816: 0,
-        task_bug_ve08: 0,
+        task_bug_ve24: '',
+        task_bug_ve1624: '',
+        task_bug_ve0816: '',
+        task_bug_ve08: '',
 
         // endregion
 
@@ -1052,23 +935,23 @@ const DashBoard: React.FC<any> = () => {
 
         bug_noAssign: sp_data.bug.Bug_no_assign,
         bug_noDeadline: sp_data.bug.Bug_no_deadline,
-        bug_prj_error: 0,
-        bug_over_area: 0,
+        bug_prj_error: '',
+        bug_over_area: '',
 
         bug_actived: sp_data.bug.Bug_actived,
         bug_resolved: sp_data.bug.Bug_resolved,
         bug_vertified: sp_data.bug.Bug_verified,
         bug_closed: sp_data.Bug_closed,
 
-        bug_ac24: 0,
-        bug_ac1624: 0,
-        bug_ac0816: 0,
-        bug_ac08: 0,
+        bug_ac24: '',
+        bug_ac1624: '',
+        bug_ac0816: '',
+        bug_ac08: '',
 
-        bug_ve24: 0,
-        bug_ve1624: 0,
-        bug_ve0816: 0,
-        bug_ve08: 0
+        bug_ve24: '',
+        bug_ve1624: '',
+        bug_ve0816: '',
+        bug_ve08: ''
         // endregion
       });
     }

@@ -567,6 +567,10 @@ const bugResultDeals = (countArray: any) => {
 
 
 const sp_hotResultDeals = (params: any) => {
+  if (params === null) {
+    return null;
+
+  }
   let storyDt = Object();
   let taskDt = Object();
   let bugDt = Object();

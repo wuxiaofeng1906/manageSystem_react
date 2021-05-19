@@ -12,7 +12,6 @@ import {useRequest} from "ahooks";
 import {bugResultDeals, sp_hotResultDeals} from "./dataProcess";
 
 const {Option} = Select;
-
 // 全局变量
 const sprintPrjInfo = {
   prjID: "",
@@ -99,15 +98,13 @@ const projectLoad = (params: any) => {
   const project = [];
   for (let index = 0; index < params.length; index += 1) {
     project.push(
-      <Option key={params[index].id} value={params[index].id}> {params[index].name}</Option>,
+      <Option key={params[index].id} value={params[index].name}> {params[index].name}</Option>,
     );
   }
   return project;
 };
 
-
-// 下拉框数据查询
-
+// 动态查询下拉框所选数据
 const queryProjectALL = async (client: GqlClient<object>, params: any) => {
   const {data} = await client.query(`
       {
@@ -126,46 +123,16 @@ const queryProjectALL = async (client: GqlClient<object>, params: any) => {
   return data?.dashProjectAll;
 };
 
-
 const DashBoard: React.FC<any> = () => {
   const gqlClient = useGqlClient();
+
+  // 设置各种数据初始化状态
   const [hidden, setHidden] = useState({
     em_bug: true,
     ho_story: true,
     ho_task: true,
     ho_bug: true
   });
-
-  const {data} = useRequest(() => queryDashboardViews(gqlClient));
-  let sp_data = Object();
-  let ho_data = Object();
-  let em_data = Object();
-  if (data !== undefined) {
-    for (let index = 0; index < data.length; index += 1) {
-      const details = data[index];
-      if (details.category === "sprint") {
-        sprintPrjInfo.prjName = details.name;
-        sprintPrjInfo.prjID = details.id;
-
-        sp_data = sp_hotResultDeals(details.data);
-
-
-      } else if (details.category === "hotfix") {
-        hotfixPrjInfo.prjName = details.name;
-        hotfixPrjInfo.prjID = details.id;
-
-        ho_data = sp_hotResultDeals(details.data);
-
-      } else {
-
-        emergencyPrjInfo.prjName = details.name;
-        emergencyPrjInfo.prjID = details.id;
-
-        em_data = bugResultDeals(details.data);
-
-      }
-    }
-  }
   const [emergency, setEmergency] = useState({
     noAssign: -1,
     noDeadline: -1,
@@ -422,7 +389,44 @@ const DashBoard: React.FC<any> = () => {
     bug_ve08: -1
     // endregion
   });
+  const [selectedName, setSelectedName] = useState({
+    emergency: "",
+    hotfix: "",
+    sprint: ""
+  });
 
+  // 界面展示数据获取和解析
+  const {data} = useRequest(() => queryDashboardViews(gqlClient));
+  let sp_data = Object();
+  let ho_data = Object();
+  let em_data = Object();
+  if (data !== undefined) {
+    for (let index = 0; index < data.length; index += 1) {
+      const details = data[index];
+      if (details.category === "sprint") {
+        sprintPrjInfo.prjName = details.name;
+        sprintPrjInfo.prjID = details.id;
+
+        sp_data = sp_hotResultDeals(details.data);
+
+
+      } else if (details.category === "hotfix") {
+        hotfixPrjInfo.prjName = details.name;
+        hotfixPrjInfo.prjID = details.id;
+
+        ho_data = sp_hotResultDeals(details.data);
+
+      } else {
+
+        emergencyPrjInfo.prjName = details.name;
+        emergencyPrjInfo.prjID = details.id;
+        em_data = bugResultDeals(details.data);
+
+      }
+    }
+  }
+
+  // region 动态生成项目下拉框 以及下拉框事件
   const project: any = useRequest(() => queryProjectViews(gqlClient)).data;
   let emergencySelect = Array();
   let hotfixSelect = Array();
@@ -431,18 +435,22 @@ const DashBoard: React.FC<any> = () => {
     hotfixSelect = projectLoad(project.hotfix);
     emergencySelect = projectLoad(project.emergency);
     sprintSelect = projectLoad(project.sprint);
-
   }
+
   // emergency赋值和下拉框事件
   const emergencyChanged = async (value: string, other: any) => {
     let hidde = false;
-    emergencyPrjInfo.prjID = value;
-    emergencyPrjInfo.prjName = other.key;
-    const datas: any = await queryProjectALL(gqlClient, value);
+    emergencyPrjInfo.prjID = other.key;
+    emergencyPrjInfo.prjName = other.value;
+    const datas: any = await queryProjectALL(gqlClient, other.key);
     if (datas === null) {
       hidde = true;
     }
     const em_datas = bugResultDeals(datas);
+    setSelectedName({
+      ...selectedName,
+      emergency: other.value
+    });
 
     setEmergency({
       noAssign: em_datas.Bug_no_assign,
@@ -474,10 +482,10 @@ const DashBoard: React.FC<any> = () => {
     let story_task = false;
     let story_bug = false;
 
-    hotfixPrjInfo.prjID = value;
-    hotfixPrjInfo.prjName = other.key;
+    hotfixPrjInfo.prjID = other.key;
+    hotfixPrjInfo.prjName = other.value;
 
-    const datas: any = await queryProjectALL(gqlClient, value);
+    const datas: any = await queryProjectALL(gqlClient, other.key);
     if (datas === null) {
       return;
     }
@@ -490,6 +498,14 @@ const DashBoard: React.FC<any> = () => {
     }
     if (datas.bug === null) {
       story_bug = true;
+    }
+    setSelectedName({
+      ...selectedName,
+      hotfix: other.value
+    });
+
+    if (ho_datas === null) {
+      return;
     }
     setHotfix({
 
@@ -622,12 +638,19 @@ const DashBoard: React.FC<any> = () => {
 
   // sprint赋值和下拉框事件
   const sprintChanged = async (value: string, other: any) => {
-    sprintPrjInfo.prjID = value;
-    sprintPrjInfo.prjName = other.key;
-
-    const datas: any = await queryProjectALL(gqlClient, 4790);
+    sprintPrjInfo.prjID = other.key;
+    sprintPrjInfo.prjName = other.value;
+    const datas: any = await queryProjectALL(gqlClient, other.key);
     const sp_datas = sp_hotResultDeals(datas);
-    console.log("sp_datassp_datassp_datassp_datas", sp_datas);
+
+    setSelectedName({
+      ...selectedName,
+      sprint: other.value
+    });
+
+    if (sp_datas === null) {
+      return;
+    }
     setsprint({
 
       // region 需求
@@ -748,15 +771,22 @@ const DashBoard: React.FC<any> = () => {
       bug_ve08: 0
       // endregion
     });
-
-
   };
+
+  // endregion
 
   const emergency_url = `projectid=${emergencyPrjInfo.prjID}&project=${emergencyPrjInfo.prjName}`;
   const hotfix_url = `projectid=${hotfixPrjInfo.prjID}&project=${hotfixPrjInfo.prjName}`;
   const sprint_url = `projectid=${sprintPrjInfo.prjID}&project=${sprintPrjInfo.prjName}`;
 
   useEffect(() => {
+    setSelectedName({
+
+      emergency: emergencyPrjInfo.prjName,
+      hotfix: hotfixPrjInfo.prjName,
+      sprint: sprintPrjInfo.prjName
+    });
+
     let em_bug_hidden = true;
     let ho_story_hidden = true;
     let ho_task_hidden = true;
@@ -1065,7 +1095,7 @@ const DashBoard: React.FC<any> = () => {
               {/* emergency 下拉框 */}
               <div>
 
-                <Select value={emergencyPrjInfo.prjName}
+                <Select value={selectedName.emergency}
                         style={{width: '200px', marginLeft: "20px", marginTop: '20px', fontSize: "15px"}}
                         showSearch={true} optionFilterProp="children"
                         onChange={emergencyChanged}>{emergencySelect}</Select>
@@ -1197,7 +1227,7 @@ const DashBoard: React.FC<any> = () => {
 
               {/* hotfix 下拉框 */}
               <div style={{marginTop: "20px"}}>
-                <Select defaultValue={hotfixPrjInfo.prjName}
+                <Select defaultValue={selectedName.hotfix}
                         style={{width: '200px', marginLeft: "20px", fontSize: "15px"}}
                         showSearch optionFilterProp="children" onChange={hotfixChanged}>{hotfixSelect}</Select>
                 <Button type="text" style={{float: "right", color: 'black', marginRight: "10px"}}
@@ -1791,7 +1821,6 @@ const DashBoard: React.FC<any> = () => {
 
               </div>
 
-
             </div>
           </Col>
 
@@ -1800,7 +1829,7 @@ const DashBoard: React.FC<any> = () => {
             <div style={{height: '101%', backgroundColor: "#F2F2F2"}}>
               {/* sprint 下拉框 */}
               <div>
-                <Select value={sprintPrjInfo.prjName}
+                <Select value={selectedName.sprint}
                         style={{width: '200px', marginLeft: "20px", marginTop: '20px', fontSize: "15px"}}
                         showSearch={true} optionFilterProp="children"
                         onChange={sprintChanged}>{sprintSelect}</Select>

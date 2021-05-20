@@ -199,7 +199,7 @@ const colums = () => {
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   const {data} = await client.query(`
       {
-         proDetail(project:${params}){
+         proDetail(project:${params},category:"BUG"){
             id
             stage
             tester
@@ -278,14 +278,12 @@ const SprintList: React.FC<any> = () => {
     const projectInfo = {
       prjId: "",
       prjNames: "",
-      prjKind: ""
     };
 
     const location = history.location.query;
     if (location !== undefined && location.projectid !== null) {
       projectInfo.prjId = location.projectid.toString();
       projectInfo.prjNames = location.project === null ? '' : location.project.toString();
-      projectInfo.prjKind = location.kind === null ? '' : location.kind.toString();
 
     }
 

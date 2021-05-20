@@ -26,7 +26,7 @@ function getWeeksRange(weekCounts: number) {
 
     ranges.unshift(range);
   }
-  console.log('ranges', ranges);
+  // console.log('ranges', ranges);
 
   return ranges;
 }

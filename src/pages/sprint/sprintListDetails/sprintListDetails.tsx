@@ -32,7 +32,6 @@ import axios from 'axios';
 import moment from "moment";
 import {getHeight} from '@/publicMethods/pageSet';
 
-
 const {Option} = Select;
 
 // 定义列名
@@ -379,7 +378,7 @@ const SprintList: React.FC<any> = () => {
       const projectArray = [];
 
       const {data: {project = []} = {}} = useQuery(`{
-        project(range:{start:"2021-02-01", end:"2021-10-05 23:59:59"}){
+        project(range:{start:"", end:""}){
         id
         name
       }
@@ -559,6 +558,8 @@ const SprintList: React.FC<any> = () => {
       axios
         .post('/api/sprint/project/child', datas)
         .then(function (res) {
+
+          debugger;
           if (res.data.ok === true) {
             setIsAddModalVisible(false);
             updateGrid();
@@ -674,11 +675,23 @@ const SprintList: React.FC<any> = () => {
         memo: oradata.adminAddRemark,
 
         // 隐藏的字段
-        openedAt: oradata.createTime_hidden,
-        resolvedAt: oradata.resolveTime_hidden,
-        activedAt: oradata.activeTime_hidden
+        // openedAt: oradata.createTime_hidden === "" ? null : oradata.createTime_hidden,
+        // resolvedAt: oradata.resolveTime_hidden=== "" ? null : oradata.resolveTime_hidden,
+        // activedAt: oradata.activeTime_hidden === "" ? null : oradata.activeTime_hidden,
       };
 
+      if (oradata.createTime_hidden !== "") {
+        datas['openedAt'] = oradata.createTime_hidden;
+      }
+      if (oradata.resolveTime_hidden !== "") {
+        datas['resolvedAt'] = oradata.resolveTime_hidden;
+
+      }
+      if (oradata.activeTime_hidden !== "") {
+        datas['activedAt'] = oradata.activeTime_hidden;
+
+      }
+      debugger;
       if (modal.title === '新增明细行') {
         // 新增使用的是project id
         datas['project'] = prjId;

@@ -31,7 +31,6 @@ import axios from 'axios';
 import moment from "moment";
 import {getHeight} from '@/publicMethods/pageSet';
 
-
 const {Option} = Select;
 
 // 定义列名
@@ -187,7 +186,7 @@ const colums = () => {
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   const {data} = await client.query(`
       {
-         proDetail(project:${params}){
+         proDetail(project:${params},category:"STORY"){
             id
             stage
             tester
@@ -264,16 +263,13 @@ const SprintList: React.FC<any> = () => {
     /* 获取网页的项目id */
     const projectInfo = {
       prjId: "",
-      prjNames: "",
-      prjKind: ""
+      prjNames: ""
     };
 
     const location = history.location.query;
     if (location !== undefined && location.projectid !== null) {
       projectInfo.prjId = location.projectid.toString();
       projectInfo.prjNames = location.project === null ? '' : location.project.toString();
-      projectInfo.prjKind = location.kind === null ? '' : location.kind.toString();
-
     }
 
     /* 整个模块都需要用到的 */

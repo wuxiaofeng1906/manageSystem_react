@@ -10,6 +10,7 @@ import {history} from "@@/core/history";
 import {GqlClient, useGqlClient} from "@/hooks";
 import {useRequest} from "ahooks";
 import {bugResultDeals, sp_hotResultDeals} from "./dataProcess";
+import {getWeeksRange} from '@/publicMethods/timeMethods';
 
 const {Option} = Select;
 // 全局变量
@@ -27,9 +28,12 @@ const emergencyPrjInfo = {
 };
 
 const queryDashboardViews = async (client: GqlClient<object>) => {
+  const times = getWeeksRange(1)[0].to;
+
+  // 周末的日期
   const {data} = await client.query(`
       {
-        dashboardAll(endDay:"2021-05-13"){
+        dashboardAll(endDay:${times}){
          id,
           name,
           category,
@@ -786,7 +790,7 @@ const DashBoard: React.FC<any> = () => {
     setSelectedName({
 
       emergency: emergencyPrjInfo.prjName === "" ? "emergency" : emergencyPrjInfo.prjName,
-      hotfix:"hotfix", // hotfixPrjInfo.prjName === "" ? "hotfix" : hotfixPrjInfo.prjName,
+      hotfix: "hotfix", // hotfixPrjInfo.prjName === "" ? "hotfix" : hotfixPrjInfo.prjName,
       sprint: sprintPrjInfo.prjName === "" ? "sprint" : sprintPrjInfo.prjName
     });
 

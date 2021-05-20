@@ -559,7 +559,6 @@ const SprintList: React.FC<any> = () => {
         .post('/api/sprint/project/child', datas)
         .then(function (res) {
 
-          debugger;
           if (res.data.ok === true) {
             setIsAddModalVisible(false);
             updateGrid();
@@ -691,7 +690,6 @@ const SprintList: React.FC<any> = () => {
         datas['activedAt'] = oradata.activeTime_hidden;
 
       }
-      debugger;
       if (modal.title === '新增明细行') {
         // 新增使用的是project id
         datas['project'] = prjId;

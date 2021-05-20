@@ -101,10 +101,6 @@ const queryDeleteCount = async (client: GqlClient<object>, params: any) => {
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
-  console.log("33333333333333333");
-  // const ChangePages = () => {
-  //   history.push("/sprint/sprintListDetails");
-  // };
 
   // 定义列名
   const colums = () => {
@@ -263,6 +259,7 @@ const SprintList: React.FC<any> = () => {
       start: formatMomentTime(params[0]),
       end: formatMomentTime(params[1]),
     };
+    debugger;
     updateGrid();
 
   };
@@ -426,6 +423,7 @@ const SprintList: React.FC<any> = () => {
   // sprint 项目保存
   const commitSprint = async () => {
     const values = formForAddAnaMod.getFieldsValue();
+
     const prjtype = values.prjNames;
     if (prjtype === null || values.prjDate === null) {
       message.error({
@@ -465,11 +463,11 @@ const SprintList: React.FC<any> = () => {
     const datas = {
       name: `${prjtype}${prjdate}`,
       type: 'MANUAL',
-      startAt: formatMomentTime(values.starttime),
-      endAt: formatMomentTime(values.testCutoff),
-      finishAt: formatMomentTime(values.testFinnished),
-      stageAt: formatMomentTime(values.planHuidu),
-      onlineAt: formatMomentTime(values.planOnline),
+      startAt: (values.starttime).format("YYYY-MM-DD"),// formatMomentTime(values.starttime),
+      endAt: (values.testCutoff).format("YYYY-MM-DD"), // formatMomentTime(values.testCutoff),
+      finishAt: (values.testFinnished).format("YYYY-MM-DD"), // formatMomentTime(values.testFinnished),
+      stageAt: (values.planHuidu).format("YYYY-MM-DD"), // formatMomentTime(values.planHuidu),
+      onlineAt: (values.planOnline).format("YYYY-MM-DD"), // formatMomentTime(values.planOnline),
       status: values.prjStatus,
       creator: 'admin',
     };

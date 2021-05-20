@@ -33,7 +33,7 @@ const queryDashboardViews = async (client: GqlClient<object>) => {
   // 周末的日期
   const {data} = await client.query(`
       {
-        dashboardAll(endDay:${times}){
+        dashboardAll(endDay:"${times}"){
          id,
           name,
           category,
@@ -50,6 +50,7 @@ const queryDashboardViews = async (client: GqlClient<object>) => {
         }
       }
   `);
+
   return data?.dashboardAll;
   // return analyzeResult(data?.dashboardAll);
 };
@@ -401,6 +402,7 @@ const DashBoard: React.FC<any> = () => {
 
   // 界面展示数据获取和解析
   const {data} = useRequest(() => queryDashboardViews(gqlClient));
+  debugger;
   let sp_data = Object();
   let ho_data = Object();
   let em_data = Object();
@@ -429,17 +431,21 @@ const DashBoard: React.FC<any> = () => {
       }
     }
   }
-
+  debugger;
   // region 动态生成项目下拉框 以及下拉框事件
   const project: any = useRequest(() => queryProjectViews(gqlClient)).data;
   let emergencySelect = Array();
   let hotfixSelect = Array();
   let sprintSelect = Array();
+
+
   if (project !== undefined) {
     hotfixSelect = projectLoad(project.hotfix);
     emergencySelect = projectLoad(project.emergency);
     sprintSelect = projectLoad(project.sprint);
   }
+
+
 
   // emergency赋值和下拉框事件
   const emergencyChanged = async (value: string, other: any) => {

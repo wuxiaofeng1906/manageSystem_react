@@ -782,11 +782,12 @@ const DashBoard: React.FC<any> = () => {
   const sprint_url = `projectid=${sprintPrjInfo.prjID}&project=${sprintPrjInfo.prjName}`;
 
   useEffect(() => {
+
     setSelectedName({
 
-      emergency: emergencyPrjInfo.prjName,
-      hotfix: hotfixPrjInfo.prjName,
-      sprint: sprintPrjInfo.prjName
+      emergency: emergencyPrjInfo.prjName === "" ? "emergency" : emergencyPrjInfo.prjName,
+      hotfix:"hotfix", // hotfixPrjInfo.prjName === "" ? "hotfix" : hotfixPrjInfo.prjName,
+      sprint: sprintPrjInfo.prjName === "" ? "sprint" : sprintPrjInfo.prjName
     });
 
     let em_bug_hidden = true;
@@ -830,7 +831,6 @@ const DashBoard: React.FC<any> = () => {
         ho_bug_hidden = false;
 
       }
-
     }
 
     // sprint 初始值赋值
@@ -956,13 +956,25 @@ const DashBoard: React.FC<any> = () => {
       });
     }
 
-    // 设置可见性
-    setHidden({
-      em_bug: em_bug_hidden,
-      ho_story: ho_story_hidden,
-      ho_task: ho_task_hidden,
-      ho_bug: ho_bug_hidden
-    });
+
+    if (ho_story_hidden === true && ho_task_hidden === true && ho_bug_hidden === true) {  // 如果初始化所有hotfix都没有数据，那么就显示所有的hotfix项
+      // 设置可见性
+      setHidden({
+        em_bug: em_bug_hidden,
+        ho_story: false,
+        ho_task: false,
+        ho_bug: false
+      });
+    } else {
+      // 设置可见性
+      setHidden({
+        em_bug: em_bug_hidden,
+        ho_story: ho_story_hidden,
+        ho_task: ho_task_hidden,
+        ho_bug: ho_bug_hidden
+      });
+    }
+
   }, [em_data.Bug_no_deadline]);
 
   return (
@@ -977,7 +989,6 @@ const DashBoard: React.FC<any> = () => {
 
               {/* emergency 下拉框 */}
               <div>
-
                 <Select value={selectedName.emergency}
                         style={{width: '200px', marginLeft: "20px", marginTop: '20px', fontSize: "15px"}}
                         showSearch={true} optionFilterProp="children"
@@ -1110,7 +1121,7 @@ const DashBoard: React.FC<any> = () => {
 
               {/* hotfix 下拉框 */}
               <div style={{marginTop: "20px"}}>
-                <Select defaultValue={selectedName.hotfix}
+                <Select value={selectedName.hotfix}
                         style={{width: '200px', marginLeft: "20px", fontSize: "15px"}}
                         showSearch optionFilterProp="children" onChange={hotfixChanged}>{hotfixSelect}</Select>
                 <Button type="text" style={{float: "right", color: 'black', marginRight: "10px"}}

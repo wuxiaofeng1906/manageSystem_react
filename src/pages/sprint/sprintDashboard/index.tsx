@@ -39,6 +39,7 @@ const queryDashboardViews = async (client: GqlClient<object>) => {
           category,
           data{
             name
+            count
             data{
               name
               data{
@@ -139,6 +140,7 @@ const DashBoard: React.FC<any> = () => {
     ho_bug: true
   });
   const [emergency, setEmergency] = useState({
+    all_count_bug: '',
     noAssign: '',
     noDeadline: '',
     prj_error: '',
@@ -158,7 +160,7 @@ const DashBoard: React.FC<any> = () => {
   });
   const [hotfix, setHotfix] = useState({
     // region 需求
-
+    story_all_count: '',
     // 状态
     story_status_draft: '',
     story_status_noTask: '',
@@ -205,7 +207,7 @@ const DashBoard: React.FC<any> = () => {
     // endregion
 
     // region 任务
-
+    task_all_count: '',
     // 状态
     task_status_noTask: '',
     task_status_noDeadline: '',
@@ -253,7 +255,7 @@ const DashBoard: React.FC<any> = () => {
     // endregion
 
     // region bug
-
+    all_bug_counts: '',
     bug_noAssign: '',
     bug_noDeadline: '',
     bug_prj_error: '',
@@ -277,7 +279,7 @@ const DashBoard: React.FC<any> = () => {
   });
   const [sprint, setsprint] = useState({
     // region 需求
-
+    story_all_count: '',
     // 状态
     story_status_draft: '',
     story_status_noTask: '',
@@ -324,7 +326,7 @@ const DashBoard: React.FC<any> = () => {
     // endregion
 
     // region 任务
-
+    task_all_count: '',
     // 状态
     task_status_noTask: '',
     task_status_noDeadline: '',
@@ -372,6 +374,7 @@ const DashBoard: React.FC<any> = () => {
     // endregion
 
     // region bug
+    all_bug_counts: '',
 
     bug_noAssign: '',
     bug_noDeadline: '',
@@ -402,7 +405,6 @@ const DashBoard: React.FC<any> = () => {
 
   // 界面展示数据获取和解析
   const {data} = useRequest(() => queryDashboardViews(gqlClient));
-  debugger;
   let sp_data = Object();
   let ho_data = Object();
   let em_data = Object();
@@ -412,40 +414,31 @@ const DashBoard: React.FC<any> = () => {
       if (details.category === "sprint") {
         sprintPrjInfo.prjName = details.name;
         sprintPrjInfo.prjID = details.id;
-
         sp_data = sp_hotResultDeals(details.data);
-
 
       } else if (details.category === "hotfix") {
         hotfixPrjInfo.prjName = details.name;
         hotfixPrjInfo.prjID = details.id;
-
         ho_data = sp_hotResultDeals(details.data);
 
       } else {
-
         emergencyPrjInfo.prjName = details.name;
         emergencyPrjInfo.prjID = details.id;
         em_data = bugResultDeals(details.data);
-
       }
     }
   }
-  debugger;
   // region 动态生成项目下拉框 以及下拉框事件
   const project: any = useRequest(() => queryProjectViews(gqlClient)).data;
   let emergencySelect = Array();
   let hotfixSelect = Array();
   let sprintSelect = Array();
 
-
   if (project !== undefined) {
     hotfixSelect = projectLoad(project.hotfix);
     emergencySelect = projectLoad(project.emergency);
     sprintSelect = projectLoad(project.sprint);
   }
-
-
 
   // emergency赋值和下拉框事件
   const emergencyChanged = async (value: string, other: any) => {
@@ -468,6 +461,7 @@ const DashBoard: React.FC<any> = () => {
       em_bug: hidde,
     });
     setEmergency({
+      all_count_bug: em_datas.all_count_bug,
       noAssign: em_datas.Bug_no_assign,
       noDeadline: em_datas.Bug_no_deadline,
       prj_error: '',
@@ -522,7 +516,7 @@ const DashBoard: React.FC<any> = () => {
     setHotfix({
 
       // region 需求
-
+      story_all_count: ho_datas.story.allCount,
       // 状态
       story_status_draft: ho_datas.story.status.status_draft,
       story_status_noTask: ho_datas.story.status.status_no_task,
@@ -569,6 +563,7 @@ const DashBoard: React.FC<any> = () => {
       // endregion
 
       // region 任务
+      task_all_count: ho_datas.task.allCount,
 
       // 状态
       task_status_noTask: ho_datas.task.status.status_no_task,
@@ -617,6 +612,7 @@ const DashBoard: React.FC<any> = () => {
       // endregion
 
       // region bug
+      all_bug_counts: ho_datas.bug.all_bug_count,
 
       bug_noAssign: ho_datas.bug.Bug_no_assign,
       bug_noDeadline: ho_datas.bug.Bug_no_deadline,
@@ -666,6 +662,7 @@ const DashBoard: React.FC<any> = () => {
     setsprint({
 
       // region 需求
+      story_all_count: sp_datas.story.allCount,
 
       // 状态
       story_status_draft: sp_datas.story.status.status_draft,
@@ -713,6 +710,7 @@ const DashBoard: React.FC<any> = () => {
       // endregion
 
       // region 任务
+      task_all_count: sp_datas.task.allCount,
 
       // 状态
       task_status_noTask: sp_datas.task.status.status_no_task,
@@ -761,7 +759,7 @@ const DashBoard: React.FC<any> = () => {
       // endregion
 
       // region bug
-
+      all_bug_counts: sp_datas.bug.all_count_bug,
       bug_noAssign: sp_datas.bug.Bug_no_assign,
       bug_noDeadline: sp_datas.bug.Bug_no_deadline,
       bug_prj_error: '',
@@ -807,6 +805,7 @@ const DashBoard: React.FC<any> = () => {
     // emergency 初始值赋值
     if (JSON.stringify(em_data) !== "{}" && emergency.noAssign === '') {
       setEmergency({
+        all_count_bug: em_data.all_bug_count,
         noAssign: em_data.Bug_no_assign,
         noDeadline: em_data.Bug_no_deadline,
         prj_error: '',
@@ -826,6 +825,7 @@ const DashBoard: React.FC<any> = () => {
       });
       em_bug_hidden = false;
     }
+    console.log("em_data", em_data);
 
     // hotfix 初始值赋值
     if (JSON.stringify(ho_data) !== "{}" && hotfix.story_status_draft === '') {
@@ -841,12 +841,139 @@ const DashBoard: React.FC<any> = () => {
         ho_bug_hidden = false;
 
       }
+
+      setHotfix({
+        // region 需求
+        story_all_count: ho_data.story.allCount,
+
+        // 状态
+        story_status_draft: ho_data.story.status.status_draft,
+        story_status_noTask: ho_data.story.status.status_no_task,
+        story_status_lackTask: ho_data.story.status.status_lack_task,
+        story_status_noDeadline: ho_data.story.status.status_no_deadline,
+        story_status_noAssign: ho_data.story.status.status_no_assign,
+        story_status_noBug: ho_data.story.status.status_no_bug,
+        story_status_noModify: ho_data.story.status.status_un_modify,
+        story_status_prj_error: ho_data.story.status.status_proj_error,
+        story_status_over_area: ho_data.story.status.status_over_area,
+
+        story_status_delay: ho_data.story.status.status_devtask_delay,
+        story_status_wait: ho_data.story.status.status_dev_wait,
+        story_status_doing: ho_data.story.status.status_developing,
+        story_status_done: ho_data.story.status.status_dev_done,
+
+        story_status_raseTestDelay: ho_data.story.status.status_raisetest_delay,
+        story_status_raseTestWait: ho_data.story.status.status_un_raisetest,
+        story_status_raseTestDone: ho_data.story.status.status_raisetest_done,
+
+        story_status_testDelay: ho_data.story.status.status_testtask_delay,
+        story_status_testWait: ho_data.story.status.status_test_wait,
+        story_status_testDoing: ho_data.story.status.status_testing,
+        story_status_testDone: ho_data.story.status.status_test_done,
+
+        // bug
+        story_bug_noAssign: '',
+        story_bug_noDeadline: '',
+        story_bug_prj_error: '',
+        story_bug_over_area: '',
+        story_bug_actived: '',
+        story_bug_resolved: '',
+        story_bug_vertified: '',
+        story_bug_closed: '',
+        story_bug_ac24: '',
+        story_bug_ac1624: '',
+        story_bug_ac0816: '',
+        story_bug_ac08: '',
+        story_bug_ve24: '',
+        story_bug_ve1624: '',
+        story_bug_ve0816: '',
+        story_bug_ve08: '',
+
+        // endregion
+
+        // region 任务
+        task_all_count: ho_data.task.allCount,
+
+        // 状态
+        task_status_noTask: ho_data.task.status.status_no_task,
+        task_status_noDeadline: ho_data.task.status.status_no_deadline,
+        task_status_noAssign: ho_data.task.status.status_no_assign,
+        task_status_noBug: ho_data.task.status.status_no_bug,
+        task_status_noModify: ho_data.task.status.status_un_modify,
+        task_status_prj_error: ho_data.task.status.status_proj_error,
+        task_status_over_area: ho_data.task.status.status_over_area,
+
+        task_status_taskDelay: ho_data.task.status.status_devtask_delay,
+        task_status_wait: ho_data.task.status.status_dev_wait,
+        task_status_doing: ho_data.task.status.status_developing,
+        task_status_done: ho_data.task.status.status_dev_done,
+
+        task_status_raseTestDelay: ho_data.task.status.status_raisetest_delay,
+        task_status_raseTestWait: '',
+        task_status_raseTestDone: '',
+
+        task_status_testDelay: ho_data.task.status.status_testtask_delay,
+        task_status_testWait: ho_data.task.status.status_test_wait,
+        task_status_testDoing: ho_data.task.status.status_testing,
+        task_status_testDone: ho_data.task.status.status_test_done,
+
+        // bug
+        task_bug_noAssign: ho_data.task.bug.Bug_no_assign,
+        task_bug_noDeadline: ho_data.task.bug.Bug_no_deadline,
+        task_bug_prj_error: ho_data.task.bug.Bug_proj_error,
+        task_bug_over_area: ho_data.task.bug.Bug_over_area,
+
+        task_bug_actived: ho_data.task.bug.Bug_actived,
+        task_bug_resolved: ho_data.task.bug.Bug_resolved,
+        task_bug_vertified: ho_data.task.bug.Bug_verified,
+        task_bug_closed: ho_data.task.bug.Bug_closed,
+
+        task_bug_ac24: '',
+        task_bug_ac1624: '',
+        task_bug_ac0816: '',
+        task_bug_ac08: '',
+
+        task_bug_ve24: '',
+        task_bug_ve1624: '',
+        task_bug_ve0816: '',
+        task_bug_ve08: '',
+
+        // endregion
+
+        // region bug
+
+        all_bug_counts: ho_data.bug.all_bug_count,
+
+        bug_noAssign: ho_data.bug.Bug_no_assign,
+        bug_noDeadline: ho_data.bug.Bug_no_deadline,
+        bug_prj_error: '',
+        bug_over_area: '',
+
+        bug_actived: ho_data.bug.Bug_actived,
+        bug_resolved: ho_data.bug.Bug_resolved,
+        bug_vertified: ho_data.bug.Bug_verified,
+        bug_closed: ho_data.Bug_closed,
+
+        bug_ac24: '',
+        bug_ac1624: '',
+        bug_ac0816: '',
+        bug_ac08: '',
+
+        bug_ve24: '',
+        bug_ve1624: '',
+        bug_ve0816: '',
+        bug_ve08: ''
+        // endregion
+      });
+
     }
+    console.log("ho_data", ho_data);
 
     // sprint 初始值赋值
     if (JSON.stringify(sp_data) !== "{}" && sprint.story_status_draft === '') {
       setsprint({
         // region 需求
+        story_all_count: sp_data.story.allCount,
 
         // 状态
         story_status_draft: sp_data.story.status.status_draft,
@@ -894,6 +1021,7 @@ const DashBoard: React.FC<any> = () => {
         // endregion
 
         // region 任务
+        task_all_count: sp_data.task.allCount,
 
         // 状态
         task_status_noTask: sp_data.task.status.status_no_task,
@@ -942,6 +1070,7 @@ const DashBoard: React.FC<any> = () => {
         // endregion
 
         // region bug
+        all_bug_counts: sp_data.bug.all_bug_count,
 
         bug_noAssign: sp_data.bug.Bug_no_assign,
         bug_noDeadline: sp_data.bug.Bug_no_deadline,
@@ -964,8 +1093,10 @@ const DashBoard: React.FC<any> = () => {
         bug_ve08: ''
         // endregion
       });
+
     }
 
+    console.log("sp_data", sp_data);
 
     if (ho_story_hidden === true && ho_task_hidden === true && ho_bug_hidden === true) {  // 如果初始化所有hotfix都没有数据，那么就显示所有的hotfix项
       // 设置可见性
@@ -985,7 +1116,7 @@ const DashBoard: React.FC<any> = () => {
       });
     }
 
-  }, [em_data.Bug_no_deadline]);
+  }, [em_data.Bug_no_deadline]);   //   sp_data.story.status.status_lack_task
 
   return (
 
@@ -1020,7 +1151,7 @@ const DashBoard: React.FC<any> = () => {
                   backgroundColor: "white"
                 }}>&nbsp;hotfix &nbsp;
                   <Link
-                    to={`/sprint/basicTable/bugs/bugAll?${emergency_url}`}>10</Link> &nbsp;个
+                    to={`/sprint/basicTable/bugs/bugAll?${emergency_url}`}>{emergency.all_count_bug}</Link> &nbsp;个
                 </div>
 
                 <Row gutter={8} align={"middle"}>   {/* gutter 每一列的间隔距离 */}
@@ -1153,7 +1284,8 @@ const DashBoard: React.FC<any> = () => {
                     fontSize: "15px",
                     backgroundColor: "white"
                   }}>&nbsp;需求 &nbsp;
-                    <Link to={`/sprint/basicTable/stories/storyAll?${hotfix_url}`}>10</Link> &nbsp;个
+                    <Link
+                      to={`/sprint/basicTable/stories/storyAll?${hotfix_url}`}>{hotfix.story_all_count}</Link> &nbsp;个
                   </div>
 
                   {/* 需求-状态 */}
@@ -1386,7 +1518,8 @@ const DashBoard: React.FC<any> = () => {
                     fontSize: "15px",
                     backgroundColor: "white"
                   }}>&nbsp;任务 &nbsp;
-                    <Link to={`/sprint/basicTable/tasks/taskAll?${hotfix_url}`}>10</Link> &nbsp;个
+                    <Link
+                      to={`/sprint/basicTable/tasks/taskAll?${hotfix_url}`}>{hotfix.task_all_count}</Link> &nbsp;个
                   </div>
 
                   {/* 任务-状态 */}
@@ -1614,7 +1747,7 @@ const DashBoard: React.FC<any> = () => {
                     backgroundColor: "white"
                   }}>&nbsp;hotfix &nbsp;
                     <Link
-                      to={`/sprint/basicTable/bugs/bugAll?${hotfix_url}`}>10</Link> &nbsp;个
+                      to={`/sprint/basicTable/bugs/bugAll?${hotfix_url}`}>{hotfix.all_bug_counts}</Link> &nbsp;个
                   </div>
 
                   <Row gutter={8} align={"middle"}>   {/* gutter 每一列的间隔距离 */}
@@ -1756,7 +1889,8 @@ const DashBoard: React.FC<any> = () => {
                     fontSize: "15px",
                     backgroundColor: "white"
                   }}>&nbsp;需求 &nbsp;
-                    <Link to={`/sprint/basicTable/stories/storyAll?${sprint_url}`}>10</Link> &nbsp;个
+                    <Link
+                      to={`/sprint/basicTable/stories/storyAll?${sprint_url}`}>{sprint.story_all_count}</Link> &nbsp;个
                   </div>
 
                   {/* 需求-状态 */}
@@ -1988,7 +2122,8 @@ const DashBoard: React.FC<any> = () => {
                     fontSize: "15px",
                     backgroundColor: "white"
                   }}>&nbsp;任务 &nbsp;
-                    <Link to={`/sprint/basicTable/tasks/taskAll?${sprint_url}`}>10</Link> &nbsp;个
+                    <Link
+                      to={`/sprint/basicTable/tasks/taskAll?${sprint_url}`}>{sprint.task_all_count}</Link> &nbsp;个
                   </div>
 
                   {/* 任务-状态 */}
@@ -2215,7 +2350,7 @@ const DashBoard: React.FC<any> = () => {
                     backgroundColor: "white"
                   }}>&nbsp;hotfix &nbsp;
                     <Link
-                      to={`/sprint/basicTable/bugs/bugAll?${sprint_url}`}>10</Link> &nbsp;个
+                      to={`/sprint/basicTable/bugs/bugAll?${sprint_url}`}>{sprint.all_bug_counts}</Link> &nbsp;个
                   </div>
 
                   <Row gutter={8} align={"middle"}>   {/* gutter 每一列的间隔距离 */}

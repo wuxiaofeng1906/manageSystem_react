@@ -214,7 +214,7 @@ const storyBugDeal = (itemArray: any) => {
   return storyBugCount;
 };
 
-const storyResultDeals = (countArray: any) => {
+const storyResultDeals = (countArray: any, count: string) => {
   let statusData = Object();
   let bugData = Object();
 
@@ -228,7 +228,7 @@ const storyResultDeals = (countArray: any) => {
     }
   }
 
-  return {status: statusData, bug: bugData};
+  return {status: statusData, bug: bugData, allCount: count};
 };
 
 // endregion
@@ -383,7 +383,7 @@ const taskBugDeal = (itemArray: any) => {
   return taskBugCount;
 };
 
-const taskResultDeals = (countArray: any) => {
+const taskResultDeals = (countArray: any, count: string) => {
 
   let statusData = Object();
   let bugData = Object();
@@ -398,19 +398,22 @@ const taskResultDeals = (countArray: any) => {
     }
   }
 
-  return {status: statusData, bug: bugData};
+  return {status: statusData, bug: bugData, allCount: count};
 };
 
 // endregion
 
 
-const shBugResultDeals = (countArray: any) => {
+const shBugResultDeals = (countArray: any, allCount: string) => {
+  const hotfixBugCount = Object();
+  hotfixBugCount.all_bug_count = allCount;
+
   let itemArray = [];
   if (countArray.length > 0) {
     itemArray = countArray[0].data;
+
   }
 
-  const hotfixBugCount = Object();
   for (let i = 0; i < itemArray.length; i += 1) {
     const count = itemArray[i].value === null ? 0 : itemArray[i].value;
     switch (itemArray[i].item) {
@@ -480,24 +483,27 @@ const shBugResultDeals = (countArray: any) => {
   return hotfixBugCount;
 };
 
-
+// emergency 的bug解析
 const bugResultDeals = (countArray: any) => {
+  const hotfixBugCount = Object();
+
   if (countArray === null) {
     return {};
   }
   let itemArray = [];
   if (countArray.length > 0) {
     const temp = countArray[0].data;
+    hotfixBugCount.all_bug_count = countArray[0].count;
+
     if (temp.length > 0) {
       itemArray = temp[0].data;
     }
-
   }
 
   // console.log("itemArray", itemArray);
-  const hotfixBugCount = Object();
   for (let i = 0; i < itemArray.length; i += 1) {
     const count = itemArray[i].value === null ? 0 : itemArray[i].value;
+
     switch (itemArray[i].item) {
       // 规范检查
       case "bug_no_assign": // 无指派
@@ -577,13 +583,13 @@ const sp_hotResultDeals = (params: any) => {
 
   for (let index = 0; index < params.length; index += 1) {
     if (params[index].name === "story") {
-      storyDt = storyResultDeals(params[index].data);
+      storyDt = storyResultDeals(params[index].data, params[index].count);
 
     } else if (params[index].name === "task") {
-      taskDt = taskResultDeals(params[index].data);
+      taskDt = taskResultDeals(params[index].data, params[index].count);
 
     } else {
-      bugDt = shBugResultDeals(params[index].data);
+      bugDt = shBugResultDeals(params[index].data, params[index].count);
 
     }
 

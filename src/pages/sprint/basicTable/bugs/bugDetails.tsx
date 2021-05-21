@@ -128,7 +128,7 @@ const addNewAttributes = (source: any) => {
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   const {data} = await client.query(`
       {
-       dashSingleItem(project:${params.prjId},kindName:${params.kind}",itemName:${params.item}") {
+       dashSingleItem(project:${params.prjId},kindName:"${params.kind}",itemName:"${params.itemName}") {
         name
         data{
            id

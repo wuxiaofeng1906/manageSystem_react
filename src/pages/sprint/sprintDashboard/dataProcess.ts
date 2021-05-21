@@ -33,7 +33,7 @@ const storyStatusDeal = (itemArray: any) => {
   // };
   const storyStatusCount = Object();
   for (let i = 0; i < itemArray.length; i += 1) {
-    const count = itemArray[i].value === null ? 0 : itemArray[i].value;
+    const count = itemArray[i].value === null ? '' : itemArray[i].value;
     switch (itemArray[i].item) {
       // 规范检查
       case "draft":
@@ -145,7 +145,7 @@ const storyBugDeal = (itemArray: any) => {
 
   const storyBugCount = Object();
   for (let i = 0; i < itemArray.length; i += 1) {
-    const count = itemArray[i].value === null ? 0 : itemArray[i].value;
+    const count = itemArray[i].value === null ? '' : itemArray[i].value;
 
     switch (itemArray[i].item) {
       // 规范检查
@@ -238,7 +238,7 @@ const taskStatusDeal = (itemArray: any) => {
 
   const taskStatusCount = Object();
   for (let i = 0; i < itemArray.length; i += 1) {
-    const count = itemArray[i].value === null ? 0 : itemArray[i].value;
+    const count = itemArray[i].value === null ? '' : itemArray[i].value;
     switch (itemArray[i].item) {
       // 规范检查
       case "no_task": // 无任务
@@ -315,7 +315,7 @@ const taskBugDeal = (itemArray: any) => {
 
   const taskBugCount = Object();
   for (let i = 0; i < itemArray.length; i += 1) {
-    const count = itemArray[i].value === null ? 0 : itemArray[i].value;
+    const count = itemArray[i].value === null ? '' : itemArray[i].value;
     switch (itemArray[i].item) {
       // 规范检查
       case "bug_no_assign": // 无指派
@@ -415,7 +415,7 @@ const shBugResultDeals = (countArray: any, allCount: string) => {
   }
 
   for (let i = 0; i < itemArray.length; i += 1) {
-    const count = itemArray[i].value === null ? 0 : itemArray[i].value;
+    const count = itemArray[i].value === null ? '' : itemArray[i].value;
     switch (itemArray[i].item) {
       // 规范检查
       case "bug_no_assign": // 无指派
@@ -502,7 +502,7 @@ const bugResultDeals = (countArray: any) => {
 
   // console.log("itemArray", itemArray);
   for (let i = 0; i < itemArray.length; i += 1) {
-    const count = itemArray[i].value === null ? 0 : itemArray[i].value;
+    const count = itemArray[i].value === null ? '' : itemArray[i].value;
 
     switch (itemArray[i].item) {
       // 规范检查

@@ -25,10 +25,10 @@ const wxLogin = () => {
 
     (window as any).WwLogin({
       "id": "container",
-      "appid": "ww90adb0abc37b79c8",
-      "agentid": 1000002,
+      "appid": "wwcba5faed367cdeee",
+      "agentid": 1000021,
       "redirect_uri": encodeURIComponent('http://dms.q7link.com:8000/welcomes'),
-      "state": "ww90adb0abc37b79c8",
+      "state": "wwcba5faed367cdeee",
       "href": "",
     });
   }, 500);
@@ -56,7 +56,7 @@ const Login: React.FC<{}> = () => {
 
     const userInfo = {
       name: "admin",
-      // access: 'admin',
+      access: 'admin',
       address: "西湖区工专路 77 号",
       avatar: "https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png",
       country: "China",

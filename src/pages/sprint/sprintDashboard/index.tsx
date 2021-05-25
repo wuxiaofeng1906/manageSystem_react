@@ -428,6 +428,7 @@ const DashBoard: React.FC<any> = () => {
       }
     }
   }
+
   // region 动态生成项目下拉框 以及下拉框事件
   const project: any = useRequest(() => queryProjectViews(gqlClient)).data;
   let emergencySelect = Array();
@@ -1116,7 +1117,7 @@ const DashBoard: React.FC<any> = () => {
       });
     }
 
-  }, [em_data.Bug_no_deadline]);   //   sp_data.story.status.status_lack_task
+  }, [sp_data.showFlag]);   //   sp_data.story.status.status_lack_task   em_data.Bug_no_deadline
 
   return (
 

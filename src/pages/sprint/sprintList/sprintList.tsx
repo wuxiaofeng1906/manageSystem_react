@@ -259,14 +259,12 @@ const SprintList: React.FC<any> = () => {
       start: formatMomentTime(params[0]),
       end: formatMomentTime(params[1]),
     };
-    debugger;
     updateGrid();
 
   };
 
   // 选择项目状态
   const prjStatusChanged = async (value: any, params: any) => {
-    console.log(value, params);
     queryCondition.projectStatus = value;
     updateGrid();
 
@@ -298,16 +296,18 @@ const SprintList: React.FC<any> = () => {
   const [modal, setmodal] = useState({title: '新增项目'});
   const addProject = () => {
     const currentDate = moment(new Date()).add('year', 0);
+    const privDate = moment(new Date()).add('year', 0).subtract('day', 1);
+
     formForAddAnaMod.setFieldsValue({
       prjLable: '',
       prjNames: null,
       prjDate: formatMomentTime(currentDate),
-      starttime: formatMomentTime(currentDate),
+      starttime: formatMomentTime(privDate),
       testCutoff: formatMomentTime(currentDate),
       testFinnished: formatMomentTime(currentDate),
       planOnline: formatMomentTime(currentDate),
       planHuidu: formatMomentTime(currentDate),
-      prjStatus: null,
+      prjStatus: "wait"
     });
 
     setmodal({title: '新增项目'});

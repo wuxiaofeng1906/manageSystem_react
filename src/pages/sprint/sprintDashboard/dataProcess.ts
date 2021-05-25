@@ -32,6 +32,7 @@ const storyStatusDeal = (itemArray: any) => {
   //
   // };
   const storyStatusCount = Object();
+
   for (let i = 0; i < itemArray.length; i += 1) {
     const count = itemArray[i].value === null ? '' : itemArray[i].value;
     switch (itemArray[i].item) {
@@ -595,7 +596,7 @@ const sp_hotResultDeals = (params: any) => {
 
   }
 
-  return {story: storyDt, task: taskDt, bug: bugDt};
+  return {story: storyDt, task: taskDt, bug: bugDt, showFlag: 1};
 
 };
 

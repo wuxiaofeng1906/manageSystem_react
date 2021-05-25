@@ -33,7 +33,7 @@ export default [
   //   path: '/admin',
   //   name: 'admin',
   //   icon: 'crown',
-  //   access: 'canAdmin',
+  //   access: 'asd',
   //   component: './Admin',
   //   routes: [
   //     {
@@ -60,7 +60,7 @@ export default [
     name: 'sprint 工作台',
     icon: 'table',
     path: '/sprint',
-    // hideInMenu: true,
+    access: "asd",
     routes: [
       {
         name: 'dsahboard',

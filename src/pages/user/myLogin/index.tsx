@@ -55,8 +55,8 @@ const Login: React.FC<{}> = () => {
   const fetchUserInfo = async () => {
 
     const userInfo = {
-      name: "admin",
-      access: 'admin',
+      name: "testAccount",
+      // access: 'admin',
       address: "西湖区工专路 77 号",
       avatar: "https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png",
       country: "China",

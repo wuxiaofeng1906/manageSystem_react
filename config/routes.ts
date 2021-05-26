@@ -118,7 +118,7 @@ export default [
     name: '研发绩效数据',
     icon: 'table',
     path: '/kpi',
-    // access: 'canAdmin|testAccess',
+    access: 'canAdmin',
     authority: ['user'],
     routes: [{
       name: '绩效指标',

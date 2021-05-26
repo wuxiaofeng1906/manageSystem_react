@@ -60,7 +60,6 @@ export default [
     name: 'sprint 工作台',
     icon: 'table',
     path: '/sprint',
-    access: "asd",
     routes: [
       {
         name: 'dsahboard',
@@ -119,7 +118,6 @@ export default [
     icon: 'table',
     path: '/kpi',
     // access: 'canAdmin',
-    authority: ['user'],
     routes: [{
       name: '绩效指标',
       icon: 'table',

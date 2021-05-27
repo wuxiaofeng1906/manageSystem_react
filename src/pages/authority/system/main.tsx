@@ -163,31 +163,37 @@ const Authority: React.FC<any> = () => {
 
 
   const columns = [
+    // {
+    //   title: "测试列",
+    //   dataIndex: 'groupName',
+    //   key: 'groupName',
+    //   width: 70
+    // },
     {
-      title: <span style={{fontWeight: "bold", fontSize: "16px"}}> 编号</span>,
+      title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 编号</span>,
       dataIndex: 'id',
       key: 'id',
-      width: 50
+      width: 60
     },
     {
-      title: <span style={{fontWeight: "bold", fontSize: "16px"}}> 组名</span>,
+      title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 组名</span>,
       dataIndex: 'groupName',
       key: 'groupName',
-      width: 50
+      width: 60
     },
     {
-      title: <span style={{fontWeight: "bold", fontSize: "16px"}}> 描述</span>,
+      title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 描述</span>,
       dataIndex: 'describe',
       key: 'describe',
-      width: 50
+      width: 60
     },
     {
-      title: <span style={{fontWeight: "bold", fontSize: "16px"}}> 用户列表</span>,
+      title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 用户列表</span>,
       dataIndex: 'userList',
       key: 'userList',
     },
     {
-      title: <span style={{fontWeight: "bold", fontSize: "16px"}}> 操作</span>,
+      title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 操作</span>,
       key: 'action',
       // fixed: 'right',
       render: (text: any) => (
@@ -225,6 +231,7 @@ const Authority: React.FC<any> = () => {
                dataSource={data}
                pagination={false}  // 禁止分页
                size="small"  // 紧凑型
+               bordered={true}
         />
       </div>
 

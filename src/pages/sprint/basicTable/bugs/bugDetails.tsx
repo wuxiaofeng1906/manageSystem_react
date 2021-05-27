@@ -113,19 +113,24 @@ const colums = () => {
 };
 
 const addNewAttributes = (source: any) => {
+  debugger;
   const result = [];
-  console.log("原始数据");
+
   const {data} = source[0];
-  for (let index = 0; index < data.length; index += 1) {
-    const details = data[index];
-    details["category"] = "bug";
-    result.push(details);
+  if (data !== null) {
+    for (let index = 0; index < data.length; index += 1) {
+      const details = data[index];
+      details["category"] = "bug";
+      result.push(details);
+    }
   }
+
   return result;
 };
 
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
+  debugger;
   const {data} = await client.query(`
       {
        dashSingleItem(project:${params.prjId},kindName:"${params.kind}",itemName:"${params.itemName}") {

@@ -792,12 +792,14 @@ const DashBoard: React.FC<any> = () => {
 
   useEffect(() => {
 
+
     setSelectedName({
 
       emergency: emergencyPrjInfo.prjName === "" ? "emergency" : emergencyPrjInfo.prjName,
-      hotfix: "hotfix", // hotfixPrjInfo.prjName === "" ? "hotfix" : hotfixPrjInfo.prjName,
+      hotfix: hotfixPrjInfo.prjName === "" ? "hotfix" : hotfixPrjInfo.prjName,
       sprint: sprintPrjInfo.prjName === "" ? "sprint" : sprintPrjInfo.prjName
     });
+
 
     let em_bug_hidden = true;
     let ho_story_hidden = true;
@@ -826,7 +828,7 @@ const DashBoard: React.FC<any> = () => {
       });
       em_bug_hidden = false;
     }
-    console.log("em_data", em_data);
+    // console.log("em_data", em_data);
 
     // hotfix 初始值赋值
     if (JSON.stringify(ho_data) !== "{}" && hotfix.story_status_draft === '') {
@@ -968,7 +970,7 @@ const DashBoard: React.FC<any> = () => {
       });
 
     }
-    console.log("ho_data", ho_data);
+    // console.log("ho_data", ho_data);
 
     // sprint 初始值赋值
     if (JSON.stringify(sp_data) !== "{}" && sprint.story_status_draft === '') {
@@ -1097,7 +1099,7 @@ const DashBoard: React.FC<any> = () => {
 
     }
 
-    console.log("sp_data", sp_data);
+    // console.log("sp_data", sp_data);
 
     if (ho_story_hidden === true && ho_task_hidden === true && ho_bug_hidden === true) {  // 如果初始化所有hotfix都没有数据，那么就显示所有的hotfix项
       // 设置可见性
@@ -1116,6 +1118,7 @@ const DashBoard: React.FC<any> = () => {
         ho_bug: ho_bug_hidden
       });
     }
+
 
   }, [sp_data.showFlag]);   //   sp_data.story.status.status_lack_task   em_data.Bug_no_deadline
 
@@ -1204,7 +1207,7 @@ const DashBoard: React.FC<any> = () => {
                           to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=resolved`}>{emergency.resolved}</Link> &nbsp;个
                         </div>
                         <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-                          to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=verified`}>{emergency.vertified}</Link> &nbsp;个
+                          to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=bug_verified`}>{emergency.vertified}</Link> &nbsp;个
                         </div>
                         <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
                           to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=closed`}>{emergency.closed}</Link> &nbsp;个
@@ -1453,7 +1456,7 @@ const DashBoard: React.FC<any> = () => {
                             to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=resolved`}>{hotfix.story_bug_resolved}</Link> &nbsp;个
                           </div>
                           <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=verified`}>{hotfix.story_bug_vertified}</Link> &nbsp;个
+                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_verified`}>{hotfix.story_bug_vertified}</Link> &nbsp;个
                           </div>
                           <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
                             to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=closed`}>{hotfix.story_bug_closed}</Link> &nbsp;个
@@ -1682,7 +1685,7 @@ const DashBoard: React.FC<any> = () => {
                             to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=resolved`}>{hotfix.task_bug_resolved}</Link> &nbsp;个
                           </div>
                           <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=verified`}>{hotfix.task_bug_vertified}</Link> &nbsp;个
+                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_verified`}>{hotfix.task_bug_vertified}</Link> &nbsp;个
                           </div>
                           <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
                             to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=closed`}>{hotfix.task_bug_closed}</Link> &nbsp;个
@@ -1800,7 +1803,7 @@ const DashBoard: React.FC<any> = () => {
                             to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=resolved`}>{hotfix.bug_resolved}</Link> &nbsp;个
                           </div>
                           <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=verified`}>{hotfix.bug_vertified}</Link> &nbsp;个
+                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_verified`}>{hotfix.bug_vertified}</Link> &nbsp;个
                           </div>
                           <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
                             to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=closed`}>{hotfix.bug_closed}</Link> &nbsp;个
@@ -2058,7 +2061,7 @@ const DashBoard: React.FC<any> = () => {
                             to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=resolved`}>{sprint.story_bug_resolved}</Link> &nbsp;个
                           </div>
                           <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=verified`}>{sprint.story_bug_vertified}</Link> &nbsp;个
+                            to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_verified`}>{sprint.story_bug_vertified}</Link> &nbsp;个
                           </div>
                           <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
                             to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=closed`}>{sprint.story_bug_closed}</Link> &nbsp;个
@@ -2286,7 +2289,7 @@ const DashBoard: React.FC<any> = () => {
                             to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=resolved`}>{sprint.task_bug_resolved}</Link> &nbsp;个
                           </div>
                           <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=verified`}>{sprint.task_bug_vertified}</Link> &nbsp;个
+                            to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_verified`}>{sprint.task_bug_vertified}</Link> &nbsp;个
                           </div>
                           <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
                             to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=closed`}>{sprint.task_bug_closed}</Link> &nbsp;个
@@ -2403,7 +2406,7 @@ const DashBoard: React.FC<any> = () => {
                             to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=resolved`}>{sprint.bug_resolved}</Link> &nbsp;个
                           </div>
                           <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=verified`}>{sprint.bug_vertified}</Link> &nbsp;个
+                            to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_verified`}>{sprint.bug_vertified}</Link> &nbsp;个
                           </div>
                           <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
                             to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=closed`}>{sprint.bug_closed}</Link> &nbsp;个

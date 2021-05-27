@@ -22,23 +22,23 @@ const goto = () => {
 
 const wxLogin = () => {
   setTimeout(function () {
-    (window as any).WwLogin({
-      "id": "container",
-      "appid": "ww90adb0abc37b79c8",
-      "agentid": 1000002,
-      "redirect_uri": encodeURIComponent('http://6ce224098541.ngrok.io/user/myLogin'),
-      "state": "ww90adb0abc37b79c8",
-      "href": "",
-    });
-
     // (window as any).WwLogin({
     //   "id": "container",
-    //   "appid": "wwcba5faed367cdeee",
-    //   "agentid": 1000021,
-    //   "redirect_uri": encodeURIComponent('http://dms.q7link.com:8000/welcomes'),
-    //   "state": "wwcba5faed367cdeee",
+    //   "appid": "ww90adb0abc37b79c8",
+    //   "agentid": 1000002,
+    //   "redirect_uri": encodeURIComponent('http://6ce224098541.ngrok.io/user/myLogin'),
+    //   "state": "ww90adb0abc37b79c8",
     //   "href": "",
     // });
+
+    (window as any).WwLogin({
+      "id": "container",
+      "appid": "wwcba5faed367cdeee",
+      "agentid": 1000021,
+      "redirect_uri": encodeURIComponent('http://dms.q7link.com:8000/user/myLogin'),
+      "state": "wwcba5faed367cdeee",
+      "href": "",
+    });
   }, 500);
 };
 

@@ -299,6 +299,18 @@ export default [
     }
     ]
   },
+  {
+    name: '系统管理',
+    icon: 'table',
+    path: '/authority',
+    routes: [
+      {
+        name: '权限管理',
+        path: 'main',
+        component: './authority/system/main',
+      }
+    ],
+  },
 
   {
     path: '/',

@@ -13,10 +13,11 @@ import {
 
 import {Table, Space, Button, Tooltip, message, Modal, Form, Input} from 'antd';
 import axios from "axios";
+import {history} from "@@/core/history";
 
 const authorityClick = (params: any) => {
-  console.log("权限维护：", params);
-  return "";
+  // console.log("权限维护：", params);
+  history.push(`/authority/autority_details?groupname=${params.groupName}`);
 };
 
 const memberClick = (params: any) => {

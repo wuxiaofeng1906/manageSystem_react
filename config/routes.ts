@@ -308,6 +308,10 @@ export default [
         name: '权限管理',
         path: 'main',
         component: './authority/system/main',
+      }, {
+        name: '权限明细',
+        path: 'autority_details',
+        component: './authority/system/autority_details',
       }
     ],
   },

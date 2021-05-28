@@ -190,6 +190,8 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       });
 
       const usersData = data[i].users;
+
+      console.log("usersData", usersData);
       if (usersData !== null) {
         for (let m = 0; m < usersData.length; m += 1) {
           const username = usersData[m].userName;
@@ -223,6 +225,13 @@ const converseFormatForAgGrid = (oraDatas: any) => {
               "username": username,
               [starttime]: usersData[m].kpi
             });
+          } else if (username === "李均会") {
+            arrays.splice(3, 0, {
+              devCenter: "研发中心",
+              "username": username,
+              [starttime]: usersData[m].kpi
+            });
+
           } else if (data[i].parent === null || data[i].parent.deptName === "北京研发中心" || data[i].parent.deptName === "成都研发中心") {  // 如果是（北京或成都）研发中心，去掉部门的显示
             arrays.push({
                 devCenter: "研发中心",

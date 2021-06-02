@@ -12,14 +12,14 @@ const removeElement = (arrays: any, values: string) => {
 
 const addOrRemoveElement = (arrays: any, values: any) => {
 
-  for (let index = 0; index < values.length; index += 1) {
-    const flag = arrays.indexOf(values[index]);
+  // for (let index = 0; index < values.length; index += 1) {
+    const flag = arrays.indexOf(values);
     if (flag > -1) {
       arrays.splice(flag, 1);
     } else {
-      arrays.push(values[index]);
+      arrays.push(values);
     }
-  }
+  // }
 
   return arrays;
 };

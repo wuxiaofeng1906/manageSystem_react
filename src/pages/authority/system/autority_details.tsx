@@ -3,16 +3,20 @@ import {getHeight} from '@/publicMethods/pageSet';
 import {PageContainer} from "@ant-design/pro-layout";
 import {Table, Space, Button, Checkbox} from 'antd';
 import {history} from "@@/core/history";
-import {removeElement, addOrRemoveElement} from '@/publicMethods/arrayMethod';
+import {addOrRemoveElement} from '@/publicMethods/arrayMethod';
 
 const CheckboxGroup = Checkbox.Group;
-
 
 // 组件初始化
 const AuthorityDetails: React.FC<any> = () => {
   const clickedRowData = {
     module: [],
     method: []
+  };
+
+  const clickedValue = {
+    module: "",
+    method: ""
   };
   // 测试数据
   const datas = [
@@ -30,55 +34,42 @@ const AuthorityDetails: React.FC<any> = () => {
 
   // endregion
 
-  // region 模块勾选动作
-
-  const [moduleList, setModuleList] = useState(['我的地盘']);
-
-  const onModuleChange = (params: any) => {
-    let moduleGroup = [];
-    for (let index = 0; index < moduleList.length; index += 1) {
-      moduleGroup.push(moduleList[index]);  // 将默认的数据添加到新数组中
-    }
-    const data: any = clickedRowData.module[0];
-    if (params.length === 0 && clickedRowData.module.length > 0) {
-      // 为取消动作：整体数组减去点击的行
-      moduleGroup = removeElement(moduleGroup, data);
-
-    } else {
-      // 为添加动作：整体数组添加点击的行
-      moduleGroup.push(data);
-    }
-    setModuleList(moduleGroup);
-  };
-
-  // endregion
-
   /* region 方法勾选动作 */
   const [methodList, setMethodList] = useState(['功能二', '功能三']);
 
   // 方法勾选动作
-  const onMethodChange = (params: any) => {
+  const onMethodChange = () => {
 
     const methodGroup = [];
     for (let index = 0; index < methodList.length; index += 1) {
       methodGroup.push(methodList[index]);  // 将默认的数据添加到新数组中
     }
-    const groups = addOrRemoveElement(methodGroup, params);
-    const data: any = clickedRowData.method;
-    // if (params.length === 0 && clickedRowData.method.length > 0) {
-    //   // 为取消动作：整体数组减去点击的行
-    //   methodGroup = removeElement(methodGroup, data);
-    //
-    // } else {
-    //   // 为添加动作：整体数组添加点击行的数据
-    //   methodGroup.push(params[0]);
-    //   // data.forEach((element: string) => {
-    //   //   methodGroup.push(element);
-    //   // });
-    // }
+    const groups = addOrRemoveElement(methodGroup, clickedValue.method);
+
     setMethodList(groups);
   };
   /* endregion */
+
+  // region 模块勾选动作
+
+  const [moduleList, setModuleList] = useState(['我的地盘']);
+
+  const onModuleChange = () => {
+
+    const moduleGroup = [];
+    for (let index = 0; index < moduleList.length; index += 1) {
+      moduleGroup.push(moduleList[index]);  // 将默认的数据添加到新数组中
+    }
+    const groups = addOrRemoveElement(moduleGroup, clickedValue.method);
+
+    setModuleList(groups);
+    setMethodList(["功能四", "功能五", "功能六"]);  // 需要获取响应的模块的所有方法
+
+
+  };
+
+  // endregion
+
 
   /* region 全选功能 */
   const [checkAll, setCheckAll] = useState(false);
@@ -124,12 +115,7 @@ const AuthorityDetails: React.FC<any> = () => {
       title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 方法</span>,
       key: 'method',
       render: (text: any) => (
-        <Space size="middle">
-          <div>
-            <CheckboxGroup options={text.method} value={methodList} onChange={onMethodChange}/>
-
-          </div>
-        </Space>
+        <CheckboxGroup options={text.method} value={methodList} onChange={onMethodChange}/>
       ),
     },
   ];
@@ -174,10 +160,13 @@ const AuthorityDetails: React.FC<any> = () => {
                  </Table.Summary.Row>
                )}
 
-               onRow={(record: any) => {
+               onRow={(key: any, record: any) => {
                  return {
-                   onClick: () => {
-                     // console.log("record", record);
+                   onClick: (param: any) => {
+
+                     // console.log("param", param);
+                     // clickedValue.module = param.target.innerText;
+                     clickedValue.method = param.target.defaultValue;
                      clickedRowData.module = record.module;
                      clickedRowData.method = record.method;
                    }

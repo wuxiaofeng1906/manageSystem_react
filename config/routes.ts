@@ -312,6 +312,10 @@ export default [
         name: '权限明细',
         path: 'autority_details',
         component: './authority/system/autority_details',
+      }, {
+        name: '成员明细',
+        path: 'user',
+        component: './authority/system/user',
       }
     ],
   },

@@ -180,13 +180,13 @@ const Authority: React.FC<any> = () => {
       title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 组名</span>,
       dataIndex: 'groupName',
       key: 'groupName',
-      width: 60
+      width: 100
     },
     {
       title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 描述</span>,
       dataIndex: 'describe',
       key: 'describe',
-      width: 60
+      width: 100
     },
     {
       title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 用户列表</span>,

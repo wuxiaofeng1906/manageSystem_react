@@ -108,17 +108,16 @@ const UserDetails: React.FC<any> = () => {
         <Row gutter={16}>
           {/* 部门tree */}
           <Col span={6}
-               style={{backgroundColor: "white", boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2'}}>
+               style={{backgroundColor: "white"}}>
 
-            <div style={{marginTop: "5px"}}>
+            <div>
               <Tree
                 showLine
                 switcherIcon={<DownOutlined/>}
-                // defaultExpandedKeys={['0-0-0']}
                 defaultExpandAll={true}
                 onSelect={onSelect}
                 treeData={groups}
-                // style={{boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2'}} // 左 上
+                style={{boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2'}} // 左 上
               />
             </div>
 

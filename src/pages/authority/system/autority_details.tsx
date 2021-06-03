@@ -4,11 +4,36 @@ import {PageContainer} from "@ant-design/pro-layout";
 import {Table, Space, Button, Checkbox} from 'antd';
 import {history} from "@@/core/history";
 import {addOrRemoveElement} from '@/publicMethods/arrayMethod';
+import {GqlClient, useGqlClient} from "@/hooks";
+import {useRequest} from "ahooks";
 
 const CheckboxGroup = Checkbox.Group;
 
-// 组件初始化
+const querydetailsViews = async (client: GqlClient<object>) => {
+  const {data} = await client.query(`
+      {
+        roleAuthority(group:1){
+          name
+          description
+          authorities{
+            id
+            name
+            parent
+            description
+          }
+        }
+      }
+  `);
+
+  return data?.roleAuthority;
+};
+
+
 const AuthorityDetails: React.FC<any> = () => {
+  const gqlClient = useGqlClient();
+  const {data} = useRequest(() => querydetailsViews(gqlClient));
+
+
   const clickedRowData = {
     module: [],
     method: []
@@ -143,7 +168,7 @@ const AuthorityDetails: React.FC<any> = () => {
       {/* 表格控件 */}
       <div>
         <Table columns={columns}
-               dataSource={datas}
+               dataSource={data}
                pagination={false}  // 禁止分页
                size="small"  // 紧凑型
                bordered={true}

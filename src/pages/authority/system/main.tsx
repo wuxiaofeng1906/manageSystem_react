@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 // import {useRequest} from 'ahooks';
 // import {GqlClient, useGqlClient} from '@/hooks';
 import {getHeight} from '@/publicMethods/pageSet';
@@ -14,6 +14,8 @@ import {
 import {Table, Space, Button, Tooltip, message, Modal, Form, Input} from 'antd';
 import axios from "axios";
 import {history} from "@@/core/history";
+import {GqlClient, useGqlClient} from "@/hooks";
+import {useRequest} from "ahooks";
 
 const authorityClick = (params: any) => {
   // console.log("权限维护：", params);
@@ -27,34 +29,65 @@ const memberClick = (params: any) => {
 };
 
 
-const data = [
-  {
-    id: '1',
-    groupName: '管理员',
-    describe: '系统管理员',
-    userList: '陈欢，胡玉，何江，谭杰，吴晓凤',
-  },
-  {
-    id: '2',
-    groupName: '研发',
-    describe: '研发人员',
-    userList: '邬波，那超，陈楷，王东帆，李昕宇，李小雷，胡小雯，丁鑫，欧兴扬，时新威，朱秀杰，刘学斌，张学鹏，贾洋，张燕茹，任毅，周毅，黄义森，杨小美，龙喻，刘云鹏，陈泽鹏，赵增辉，陈震华，郎志强，杨志强，许智远，王濯'
-  }, {
-    id: '3',
-    groupName: '测试',
-    describe: '测试人员',
-    userList: '刘潮，徐超，胡志立，谭国治，王鹄，左江令，邓九洲，袁俊，胡李，冯林，周丽莎，刘梦，张倩，孟庆双，龚蓉蓉，罗天刚，自动化测试账号，陈雯静，帅霞，吴小兰，董绪瀚，徐睿，焦艳秋，赵宇飞，余志强，冯紫琳'
-  }, {
-    id: '4',
-    groupName: '项目经理',
-    describe: '项目经理',
-    userList: '黄朝阳，曾晨，陈锴，王东帆，李昕宇，闫坤杰，郭俊，何羽，胡敬华，唐力，袁烈权，刘黎明，罗林，欧治成，任航，蒲姣，杨期成，吴生祥，雷远亮，郑江，蒋宗良，李小雷，欧兴扬，朱秀杰，刘学斌，张燕茹，任毅，杨小美，刘云鹏，赵增辉'
-  },
-];
+const analAuthGroup = (params: any) => {
+  const data = Array();
+
+  for (let index = 0; index < params.length; index += 1) {
+    const details = {
+      id: index + 1,
+      groupId: params[index].id,
+      groupName: params[index].name,
+      describe: params[index].description,
+      userList: "",
+    };
+
+    const userlist = params[index].users;
+    let userString: string = "";
+    userlist.forEach((user: any) => {
+      userString = userString === "" ? user.userName : `${user.userName}，${userString}`;
+    });
+    details.userList = userString;
+    data.push(details);
+  }
+
+  return data;
+};
+
+const queryAuthGroupViews = async (client: GqlClient<object>) => {
+
+  const {data} = await client.query(`
+    {
+      roleGroup {
+        id,
+        name,
+        description,
+        users{
+          id,
+          userName
+        }
+      }
+    }
+  `);
+
+
+  return analAuthGroup(data?.roleGroup);
+};
+
 
 // 组件初始化
 const Authority: React.FC<any> = () => {
-  // 删除提醒表单
+  /* region 数据查询 */
+  const [tableData, setTableData] = useState([]);
+
+  const gqlClient = useGqlClient();
+  const {data}: any = useRequest(() => queryAuthGroupViews(gqlClient));
+
+  const updateGrid = async () => {
+    const datas: any = await queryAuthGroupViews(gqlClient);
+    setTableData(datas);
+  };
+
+  /* endregion */
 
   /* region 新增/修改组 */
   const [formForAddAndModify] = Form.useForm();
@@ -74,7 +107,9 @@ const Authority: React.FC<any> = () => {
     setGroupTitle({title: '编辑分组'});
     formForAddAndModify.setFieldsValue({
       groupName: params.groupName,
-      groupDesc: params.describe
+      groupDesc: params.describe,
+      groupId: params.groupId,
+      oldGroupName: params.groupName
     });
     setIsAddModalVisible(true);
   };
@@ -98,11 +133,86 @@ const Authority: React.FC<any> = () => {
       return;
     }
 
+
     // 判断组名是否为空
     if (groupTitle.title === '新增分组') {
-      console.log("调用新增接口");
+      const groupInfos = {
+        "roleName": groupInfo.groupName,
+        "roleDesc": groupInfo.groupDesc
+      };
+      axios
+        .post('/api/role', groupInfos)
+        .then(function (res) {
+
+          if (res.data.ok === true) {
+            setIsAddModalVisible(false);
+            updateGrid();
+            message.info({
+              content: res.data.message,
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          } else {
+            message.error({
+              content: res.data.message,
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          }
+        })
+        .catch(function (error) {
+          message.error({
+            content: error.toString(),
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        });
+
     } else {
-      console.log("调用修改接口");
+
+      const groupInfos = Object();
+      if (groupInfo.oldGroupName !== groupInfo.groupName) {  // 新旧组名一致，则组名字段不进行上传
+        groupInfos.roleName = groupInfo.groupName;
+      }
+      groupInfos.roleDesc = groupInfo.groupDesc;
+
+      axios.put(`/api/role/${groupInfo.groupId}`, groupInfos)
+        .then(function (res) {
+          if (res.data.ok === true) {
+            setIsAddModalVisible(false);
+            updateGrid();
+            message.info({
+              content: res.data.message,
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          } else {
+            message.error({
+              content: `${res.data.message}`,
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          }
+        })
+        .catch(function (error) {
+          message.error({
+            content: error.toString(),
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        });
     }
   };
   /* endregion 删除组 */
@@ -115,7 +225,10 @@ const Authority: React.FC<any> = () => {
 
   // 点击删除按钮
   const deleteClick = (params: any) => {
-    console.log("删除：", params);
+
+    formForDel.setFieldsValue({
+      groupId: params.groupId
+    });
     setIsDelModalVisible(true);
   };
 
@@ -126,13 +239,14 @@ const Authority: React.FC<any> = () => {
 
   // 确定删除
   const delGroup = () => {
+    const groupInfo = formForDel.getFieldsValue();
 
-    const url = ``;
     axios
-      .delete(url)
+      .delete(`/api/role/${groupInfo.groupId}`)
       .then(function (res) {
         if (res.data.ok === true) {
           setIsDelModalVisible(false);
+          updateGrid();
           message.info({
             content: res.data.message,
             duration: 1,
@@ -165,12 +279,6 @@ const Authority: React.FC<any> = () => {
 
 
   const columns = [
-    // {
-    //   title: "测试列",
-    //   dataIndex: 'groupName',
-    //   key: 'groupName',
-    //   width: 70
-    // },
     {
       title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 编号</span>,
       dataIndex: 'id',
@@ -181,13 +289,13 @@ const Authority: React.FC<any> = () => {
       title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 组名</span>,
       dataIndex: 'groupName',
       key: 'groupName',
-      width: 100
+      width: 150
     },
     {
       title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 描述</span>,
       dataIndex: 'describe',
       key: 'describe',
-      width: 100
+      width: 150
     },
     {
       title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 用户列表</span>,
@@ -197,6 +305,7 @@ const Authority: React.FC<any> = () => {
     {
       title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 操作</span>,
       key: 'action',
+      width: 150,
       // fixed: 'right',
       render: (text: any) => (
 
@@ -218,6 +327,11 @@ const Authority: React.FC<any> = () => {
       ),
     },
   ];
+
+  useEffect(() => {
+
+    setTableData(data);
+  }, [data]);
   return (
     <PageContainer style={{height: getHeight(), backgroundColor: "#F2F2F2"}}>
       {/* 新增分组按钮 */}
@@ -230,7 +344,7 @@ const Authority: React.FC<any> = () => {
       <div>
 
         <Table columns={columns}
-               dataSource={data}
+               dataSource={tableData}
                pagination={false}  // 禁止分页
                size="small"  // 紧凑型
                bordered={true}
@@ -257,10 +371,17 @@ const Authority: React.FC<any> = () => {
               <Input.TextArea/>
             </Form.Item>
             <Form.Item>
-              <Button type="primary" style={{marginLeft: '200px'}} onClick={confirmAdd}>
+              <Button type="primary" style={{marginLeft: '190px'}} onClick={confirmAdd}>
                 保存
               </Button>
+            </Form.Item>
 
+            <Form.Item name="groupId" style={{display: "none", width: "32px", marginTop: "-55px", marginLeft: "270px"}}>
+              <Input/>
+            </Form.Item>
+            <Form.Item name="oldGroupName"
+                       style={{display: "none", width: "32px", marginTop: "-55px", marginLeft: "320px"}}>
+              <Input/>
             </Form.Item>
           </Form>
         </Modal>
@@ -286,6 +407,10 @@ const Authority: React.FC<any> = () => {
               <Button type="primary" style={{marginLeft: '20px'}} onClick={DelCancel}>
                 取消
               </Button>
+            </Form.Item>
+
+            <Form.Item name="groupId" style={{display: "none", width: "32px", marginTop: "-55px", marginLeft: "270px"}}>
+              <Input/>
             </Form.Item>
           </Form>
         </Modal>

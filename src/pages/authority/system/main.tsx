@@ -19,12 +19,12 @@ import {useRequest} from "ahooks";
 
 const authorityClick = (params: any) => {
   // console.log("权限维护：", params);
-  history.push(`/authority/autority_details?groupname=${params.groupName}`);
+  history.push(`/authority/autority_details?groupid=${params.groupId}&groupname=${params.groupName}`);
 };
 
 const memberClick = (params: any) => {
   console.log("成员维护：", params);
-  history.push(`/authority/user?groupname=${params.groupName}`);
+  history.push(`/authority/user?groupid=${params.groupId}&groupname=${params.groupName}`);
 
 };
 

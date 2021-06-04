@@ -23,7 +23,6 @@ const authorityClick = (params: any) => {
 };
 
 const memberClick = (params: any) => {
-  console.log("成员维护：", params);
   history.push(`/authority/user?groupid=${params.groupId}&groupname=${params.groupName}`);
 
 };

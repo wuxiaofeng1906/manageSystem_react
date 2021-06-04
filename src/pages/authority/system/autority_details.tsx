@@ -241,7 +241,6 @@ const AuthorityDetails: React.FC<any> = () => {
 
   // endregion
 
-
   /* region 全选功能 */
   const [checkAll, setCheckAll] = useState(false);
   // 所有功能全选
@@ -314,7 +313,7 @@ const AuthorityDetails: React.FC<any> = () => {
       .then(function (res) {
         if (res.data.ok === true) {
           message.info({
-            content: res.data.message,
+            content: "权限保存成功！",
             duration: 1,
             style: {
               marginTop: '50vh',

@@ -1,15 +1,17 @@
 import React, {useEffect, useState} from 'react';
 import {getHeight} from '@/publicMethods/pageSet';
 import {PageContainer} from "@ant-design/pro-layout";
-import {Table, Space, Button, Checkbox} from 'antd';
+import {Table, Space, Button, Checkbox, message} from 'antd';
 import {history} from "@@/core/history";
 import {addOrRemoveElement} from '@/publicMethods/arrayMethod';
 import type {GqlClient} from "@/hooks";
 import {useGqlClient} from "@/hooks";
 import {useRequest} from "ahooks";
+import axios from "axios";
 
 const CheckboxGroup = Checkbox.Group;
 
+/* region 已选择的方法功能 */
 const alaySelectedAuthority = (params: any) => {
 
   const moduleArray = Array();
@@ -55,44 +57,46 @@ const queryselectedAuthorityViews = async (client: GqlClient<object>, groupId: a
 
   return alaySelectedAuthority(data?.roleAuthority);
 };
+/* endregion */
 
+/* region 获取所有的方法功能 */
 const alayAllAuthority = (params: any) => {
   const datas = [];
   const allModule: any = [];
   const allMethod: any = [];
-
-  // 先找寻parent（parent就是模块）
-  const moduleArray = Array();
-  params.forEach((ele: any) => {
-    if (moduleArray.indexOf(ele.parent.id) === -1) {
-      moduleArray.push(ele.parent.id);
-    }
-  });
-
-
-  for (let index = 0; index < moduleArray.length; index += 1) {
-
-    const myModule: any = Array();
-    const myMethod: any = [];
-    params.forEach((me: any) => {
-      if (moduleArray[index] === me.parent.id) {
-        if (myModule.indexOf(me.parent.description) === -1) {
-          myModule.push(me.parent.description);
-          allModule.push(me.parent.description);
-        }
-        myMethod.push(me.description);
-        allMethod.push(me.description);
+  if (params !== undefined) {
+    // 先找寻parent（parent就是模块）
+    const moduleArray = Array();
+    params.forEach((ele: any) => {
+      if (moduleArray.indexOf(ele.parent.id) === -1) {
+        moduleArray.push(ele.parent.id);
       }
-
     });
 
-    datas.push(
-      {
-        id: index + 1,
-        module: myModule,
-        method: myMethod
+    for (let index = 0; index < moduleArray.length; index += 1) {
+
+      const myModule: any = Array();
+      const myMethod: any = [];
+      params.forEach((me: any) => {
+        if (moduleArray[index] === me.parent.id) {
+          if (myModule.indexOf(me.parent.description) === -1) {
+            myModule.push(me.parent.description);
+            allModule.push(me.parent.description);
+          }
+          myMethod.push(me.description);
+          allMethod.push(me.description);
+        }
+
       });
 
+      datas.push(
+        {
+          id: index + 1,
+          module: myModule,
+          method: myMethod
+        });
+
+    }
   }
 
 
@@ -115,10 +119,12 @@ const queryAllAuthorityViews = async (client: GqlClient<object>) => {
       }
   `);
 
-  return alayAllAuthority(data?.authorityItems);
+  return data?.authorityItems;
 };
 
-// 获取某个模块下的方法
+/* endregion */
+
+// 获取某个模块下的所有方法
 const getChildMethod = (parent: any, module: any) => {
   let methodFOrModule: any = [];
   for (let mIndex = 0; mIndex < module.length; mIndex += 1) {
@@ -136,6 +142,34 @@ const getChildMethod = (parent: any, module: any) => {
 
   return methodFOrModule;
 };
+
+const getselectedId = (alls: any, sModule: any, sMethod: any) => {
+  const selectedIdArray = [];
+
+  // 获取被选中的id
+  for (let index = 0; index < alls.length; index += 1) {
+
+    // 方法id
+    for (let nIndex = 0; nIndex < sMethod.length; nIndex += 1) {
+      if (sMethod[nIndex] === alls[index].description) {
+        selectedIdArray.push(alls[index].id);
+        break;
+      }
+    }
+
+    // 模块id
+    const moduleInfo = alls[index].parent;
+    for (let mIndex = 0; mIndex < sModule.length; mIndex += 1) {
+      if (sModule[mIndex] === moduleInfo.description) {
+        selectedIdArray.push(moduleInfo.id);
+        break;
+      }
+    }
+  }
+
+  return selectedIdArray;
+};
+
 const AuthorityDetails: React.FC<any> = () => {
 
   const clickedRowData = {
@@ -155,11 +189,18 @@ const AuthorityDetails: React.FC<any> = () => {
 
   // endregion
 
+  /* region 数据查询 */
   const gqlClient = useGqlClient();
+  // 查询所有权限
   const {data} = useRequest(() => queryAllAuthorityViews(gqlClient));
-  const oraData = data === undefined ? [] : data.datas;
+  // 将数据解析成表格可用的格式
+  const alaieddata = alayAllAuthority(data);
+  const oraData = data === undefined ? [] : alaieddata.datas; // 拿去表格需要的数据
 
+  // 初始化已选择的权限
   const selectedAuthority: any = useRequest(() => queryselectedAuthorityViews(gqlClient, groupId)).data;
+
+  /* endregion */
 
   /* region 方法勾选动作 */
   const [methodList, setMethodList] = useState(['']);
@@ -200,19 +241,21 @@ const AuthorityDetails: React.FC<any> = () => {
 
   // endregion
 
+
   /* region 全选功能 */
   const [checkAll, setCheckAll] = useState(false);
   // 所有功能全选
   const selectAll = (params: any) => {
     if (params.target.checked === true) {
-      if (data !== undefined) {
+      if (alaieddata !== undefined) {
 
         // 选中所有的项目
-        setMethodList(data.allMethod);
-        setModuleList(data.allModule);
+        setMethodList(alaieddata.allMethod);
+        setModuleList(alaieddata.allModule);
       }
       setCheckAll(true);
     } else {
+      // 所有选中状态置为空
       setCheckAll(false);
       setMethodList([]);
       setModuleList([]);
@@ -252,12 +295,51 @@ const AuthorityDetails: React.FC<any> = () => {
   // region 最终按钮功能
   // 保存权限按钮
   const saveAuthority = () => {
-    console.log("保存权限");
 
-    // 1.获取当前角色（用户组）
-    // pageTitle就是组名
+    // 1.获取当前角色id（用户组id）  上面已获取到
+    const methodGroup: any = [];
+    for (let index = 0; index < methodList.length; index += 1) {
+      methodGroup.push(methodList[index]);  // 将默认的数据添加到新数组中
+    }
 
-    // 2.获取已勾选的权限
+    const moduleGroup = [];
+    for (let index = 0; index < moduleList.length; index += 1) {
+      moduleGroup.push(moduleList[index]);  // 将默认的数据添加到新数组中
+    }
+
+    const idArray = getselectedId(data, moduleGroup, methodGroup);
+
+    // 2.获取已勾选的权限id
+    axios.put(`/api/role/authority/${groupId}`, {data: idArray})
+      .then(function (res) {
+        if (res.data.ok === true) {
+          message.info({
+            content: res.data.message,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+
+          message.error({
+            content: `${res.data.message}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+      })
+      .catch(function (error) {
+        message.error({
+          content: `连接异常${error.toString()}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      });
 
   };
 
@@ -268,7 +350,6 @@ const AuthorityDetails: React.FC<any> = () => {
 
   // endregion
 
-
   useEffect(() => {
     if (selectedAuthority !== undefined) {
       console.log("selectedAuthority.methodData", selectedAuthority.moduleData);
@@ -276,6 +357,7 @@ const AuthorityDetails: React.FC<any> = () => {
       setModuleList(selectedAuthority.moduleData);
     }
   }, [selectedAuthority]);
+
   return (
     <PageContainer title={pageTitle} style={{height: getHeight(), backgroundColor: "#F2F2F2"}}>
       {/* 表格控件 */}

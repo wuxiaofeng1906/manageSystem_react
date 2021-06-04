@@ -48,13 +48,14 @@ const queryAuthUsers = async (client: GqlClient<object>, groupId: any) => {
 
 
 const queryGroupAllUsers = async (client: GqlClient<object>, groupId: any) => {
+  console.log(client, groupId);
   // const {data} = await client.query(`
   //     {
   //     }
   // `);
   // return data;
 
-  return ['胡玉', '吴晓凤', '何江', '陈欢', '谭杰','哈哈'];
+  return ['胡玉', '吴晓凤', '何江', '陈欢', '谭杰', '哈哈'];
 };
 
 
@@ -76,7 +77,7 @@ const UserDetails: React.FC<any> = () => {
   /* region 获取默认显示的人员和组 */
   const gqlClient = useGqlClient();
   // 查询部门组织架构
-  // const {data} = useRequest(() => queryDeptment(gqlClient));
+  const {data} = useRequest(() => queryDeptment(gqlClient));
   const groups = [
     {
       title: 'parent 1',
@@ -138,27 +139,26 @@ const UserDetails: React.FC<any> = () => {
   /* endregion */
 
   /* region 部门树选择事件 */
-
+  const [selectedUser, setSelectedUser] = useState(['']);
   const [allMember, setAllMember] = useState(['']);
 
   const onSelect = async (selectedKeys: any, info: any) => {
     console.log('selected', selectedKeys, info);
     const deptMember = await queryGroupAllUsers(gqlClient, 1);
     setAllMember(deptMember);
+    setSelectedUser(initSelectedUser);
 
   };
 
   /* endregion */
 
   /* region 人员选择触发事件 */
-  const [selectedUser, setSelectedUser] = useState(['']);
 
   const userSelectChange = (checkedValues: any) => {
     setSelectedUser(checkedValues);
   };
 
   /* endregion */
-
 
   /* region 按钮点击事件 */
   const saveUsers = () => {
@@ -173,6 +173,7 @@ const UserDetails: React.FC<any> = () => {
     setAllMember(allGroupMember);
     setSelectedUser(initSelectedUser);
   }, [initSelectedUser]);
+
   return (
     <PageContainer title={pageTitle} style={{height: window.innerHeight, backgroundColor: "white"}}>
 

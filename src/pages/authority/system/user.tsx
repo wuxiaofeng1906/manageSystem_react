@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {getHeight} from '@/publicMethods/pageSet';
 import {PageContainer} from "@ant-design/pro-layout";
-import {Button, Checkbox, Row, Col, Tree} from 'antd';
+import {Button, Checkbox, Row, Col, Tree, message} from 'antd';
 import {history} from "@@/core/history";
 import {DownOutlined} from "@ant-design/icons";
 import type {GqlClient} from "@/hooks";
 import {useGqlClient} from "@/hooks";
 import {useRequest} from "ahooks";
+import axios from "axios";
 
 const parTree = (oraData: any) => {
 
@@ -34,6 +34,7 @@ const parTree = (oraData: any) => {
           if (typeof (parent.children) !== 'undefined') {
             parent.children.push(current);
           } else {
+            // eslint-disable-next-line no-param-reassign
             parent.children = [current];
           }
         }
@@ -44,7 +45,6 @@ const parTree = (oraData: any) => {
   translator(parents, children);
   return parents;
 };
-
 
 const queryDeptment = async (client: GqlClient<object>) => {
   const {data} = await client.query(`
@@ -128,9 +128,8 @@ const queryGroupAllUsers = async (client: GqlClient<object>, deptId: any) => {
   `);
   }
 
-  return getAllusers(users.data.organization);
+  return {nameArray: getAllusers(users.data.organization), idArray: users.data.organization.users};
 
-  // return ['胡玉', '吴晓凤', '何江', '陈欢', '谭杰', '哈哈'];
 };
 
 // 组件初始化
@@ -170,7 +169,7 @@ const UserDetails: React.FC<any> = () => {
     console.log('selected', selectedKeys, info);
     const keys = selectedKeys[0];
     const deptMember = await queryGroupAllUsers(gqlClient, keys);
-    setAllMember(deptMember);
+    setAllMember(deptMember.nameArray);
     setSelectedUser(initSelectedUser);
 
   };
@@ -187,7 +186,51 @@ const UserDetails: React.FC<any> = () => {
 
   /* region 按钮点击事件 */
   const saveUsers = () => {
+    const idData = allGroupMember.idArray;
     // 保存人员
+    const idArray: any = [];
+
+    selectedUser.forEach((eles: string) => {
+      for (let index = 0; index < idData.length; index += 1) {
+        const dets = idData[index];
+        if (dets.name === eles) {
+          idArray.push(dets.userid);
+          break;
+        }
+      }
+    });
+
+    axios.put(`/api/role/user/${groupId}`, {data: idArray})
+      .then(function (res) {
+        if (res.data.ok === true) {
+          message.info({
+            content: "人员保存成功！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+
+          message.error({
+            content: `${res.data.message}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+      })
+      .catch(function (error) {
+        message.error({
+          content: `连接异常${error.toString()}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      });
+
   };
   const returns = () => {
     history.push(`/authority/main`);
@@ -197,7 +240,7 @@ const UserDetails: React.FC<any> = () => {
   useEffect(() => {
 
     if (allGroupMember !== undefined) {
-      setAllMember(allGroupMember);
+      setAllMember(allGroupMember.nameArray);
     }
     setSelectedUser(initSelectedUser);
   }, [initSelectedUser, allGroupMember]);

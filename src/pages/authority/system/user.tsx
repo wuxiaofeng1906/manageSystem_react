@@ -8,14 +8,59 @@ import type {GqlClient} from "@/hooks";
 import {useGqlClient} from "@/hooks";
 import {useRequest} from "ahooks";
 
+const parTree = (oraData: any) => {
+
+  const oldData = oraData.organization;
+
+  // 更换Key
+  const parentData = oldData.map((item: any) => {
+    return {
+      key: item.id,
+      title: item.name,
+      parent: item.parent
+    };
+  });
+
+  const parents = parentData.filter((value: any) => value.parent === 'undefined' || value.parent === null || value.parent === 0);
+  const children = parentData.filter((value: any) => value.parent !== 'undefined' && value.parent != null);
+  const translator = (parentB: any, childrenB: any) => {
+    parentB.forEach((parent: any) => {
+      childrenB.forEach((current: any, index: any) => {
+        if (current.parent === parent.key) {
+          const temp: any = JSON.parse(JSON.stringify(childrenB));
+          temp.splice(index, 1);
+          translator([current], temp);
+
+          if (typeof (parent.children) !== 'undefined') {
+            parent.children.push(current);
+          } else {
+            parent.children = [current];
+          }
+        }
+      });
+    });
+  };
+
+  translator(parents, children);
+  return parents;
+};
+
+
 const queryDeptment = async (client: GqlClient<object>) => {
   const {data} = await client.query(`
       {
-
+        organization{
+          organization{
+            id
+            name
+            parent
+            parentName
+          }
+        }
       }
   `);
 
-  return data;
+  return parTree(data?.organization);
 };
 
 // 组里面已存在的有权限的成员
@@ -49,11 +94,7 @@ const queryAuthUsers = async (client: GqlClient<object>, groupId: any) => {
 
 
 const getAllusers = (oraData: any) => {
-  debugger;
   const users = [];
-  // if (oraData.data === undefined) {
-  //   return [];
-  // }
   const userData = oraData.users;
 
   for (let index = 0; index < userData.length; index += 1) {
@@ -110,63 +151,11 @@ const UserDetails: React.FC<any> = () => {
   /* region 获取默认显示的人员和组 */
   const gqlClient = useGqlClient();
   // 查询部门组织架构
-  const {data} = useRequest(() => queryDeptment(gqlClient));
-  const groups = [
-    {
-      title: 'parent 1',
-      key: '0-0',
-      children: [
-        {
-          title: 'parent 1-0',
-          key: '0-0-0',
-          children: [
-            {
-              title: 'leaf',
-              key: '0-0-0-0',
-            },
-            {
-              title: 'leaf',
-              key: '0-0-0-1',
-            },
-            {
-              title: 'leaf',
-              key: '0-0-0-2',
-            },
-          ],
-        },
-        {
-          title: 'parent 1-1',
-          key: '0-0-1',
-          children: [
-            {
-              title: 'leaf',
-              key: '0-0-1-0',
-            },
-          ],
-        },
-        {
-          title: 'parent 1-2',
-          key: '0-0-2',
-          children: [
-            {
-              title: 'leaf',
-              key: '0-0-2-0',
-            },
-            {
-              title: 'leaf',
-              key: '0-0-2-1',
-            },
-          ],
-        },
-      ],
-    },
-  ];
+  const treeDept = useRequest(() => queryDeptment(gqlClient)).data;
 
   // 查询组织架构对应的所有成员
   const allGroupMember: any = useRequest(() => queryGroupAllUsers(gqlClient, 0)).data;
 
-  // const allGroupMember = getAllusers(groupMember);
-  debugger;
   // 查询已勾选的成员
   const initSelectedUser: any = useRequest(() => queryAuthUsers(gqlClient, groupId)).data;
 
@@ -179,7 +168,8 @@ const UserDetails: React.FC<any> = () => {
 
   const onSelect = async (selectedKeys: any, info: any) => {
     console.log('selected', selectedKeys, info);
-    const deptMember = await queryGroupAllUsers(gqlClient, 1);
+    const keys = selectedKeys[0];
+    const deptMember = await queryGroupAllUsers(gqlClient, keys);
     setAllMember(deptMember);
     setSelectedUser(initSelectedUser);
 
@@ -213,7 +203,7 @@ const UserDetails: React.FC<any> = () => {
   }, [initSelectedUser, allGroupMember]);
 
   return (
-    <PageContainer title={pageTitle} style={{height: window.innerHeight-100, backgroundColor: "white"}}>
+    <PageContainer title={pageTitle} style={{height: window.innerHeight - 100, backgroundColor: "white"}}>
 
       <div style={{}}>
 
@@ -228,8 +218,11 @@ const UserDetails: React.FC<any> = () => {
                 switcherIcon={<DownOutlined/>}
                 defaultExpandAll={true}
                 onSelect={onSelect}
-                treeData={groups}
-                style={{height:window.innerHeight-250,boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2'}} // 左 上
+                treeData={treeDept}
+                style={{
+                  height: window.innerHeight - 250,
+                  boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2'
+                }} // 左 上
               />
             </div>
 
@@ -237,7 +230,11 @@ const UserDetails: React.FC<any> = () => {
 
           {/* 组内成员 */}
           <Col span={18}
-               style={{height:window.innerHeight-250,backgroundColor: "white", boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2'}}>
+               style={{
+                 height: window.innerHeight - 250,
+                 backgroundColor: "white",
+                 boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2'
+               }}>
             <div>
               <div>
                 <Checkbox.Group options={allMember} value={selectedUser} onChange={userSelectChange}/>

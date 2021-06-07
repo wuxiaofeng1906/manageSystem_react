@@ -60,6 +60,7 @@ export default [
     name: 'sprint 工作台',
     icon: 'table',
     path: '/sprint',
+    hideInMenu: true,
     routes: [
       {
         name: 'dsahboard',
@@ -303,6 +304,7 @@ export default [
     name: '系统管理',
     icon: 'table',
     path: '/authority',
+    hideInMenu: true,
     routes: [
       {
         name: '权限管理',

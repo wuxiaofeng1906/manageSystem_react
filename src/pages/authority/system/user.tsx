@@ -4,7 +4,8 @@ import {PageContainer} from "@ant-design/pro-layout";
 import {Button, Checkbox, Row, Col, Tree} from 'antd';
 import {history} from "@@/core/history";
 import {DownOutlined} from "@ant-design/icons";
-import {GqlClient, useGqlClient} from "@/hooks";
+import type {GqlClient} from "@/hooks";
+import {useGqlClient} from "@/hooks";
 import {useRequest} from "ahooks";
 
 const queryDeptment = async (client: GqlClient<object>) => {
@@ -47,17 +48,49 @@ const queryAuthUsers = async (client: GqlClient<object>, groupId: any) => {
 };
 
 
-const queryGroupAllUsers = async (client: GqlClient<object>, groupId: any) => {
-  console.log(client, groupId);
-  // const {data} = await client.query(`
-  //     {
-  //     }
-  // `);
-  // return data;
+const getAllusers = (oraData: any) => {
+  debugger;
+  const users = [];
+  // if (oraData.data === undefined) {
+  //   return [];
+  // }
+  const userData = oraData.users;
 
-  return ['胡玉', '吴晓凤', '何江', '陈欢', '谭杰', '哈哈'];
+  for (let index = 0; index < userData.length; index += 1) {
+    users.push(userData[index].name);
+  }
+  return users;
 };
+const queryGroupAllUsers = async (client: GqlClient<object>, deptId: any) => {
+  let users = Object();
+  if (deptId === 0) {
+    users = await client.query(`
+      {
+          organization{
+          users{
+            userid
+            name
+          }
+        }
+      }
+  `);
+  } else {
+    users = await client.query(`
+      {
+          organization(dept:${deptId}){
+          users{
+            userid
+            name
+          }
+        }
+      }
+  `);
+  }
 
+  return getAllusers(users.data.organization);
+
+  // return ['胡玉', '吴晓凤', '何江', '陈欢', '谭杰', '哈哈'];
+};
 
 // 组件初始化
 const UserDetails: React.FC<any> = () => {
@@ -130,8 +163,10 @@ const UserDetails: React.FC<any> = () => {
   ];
 
   // 查询组织架构对应的所有成员
-  const allGroupMember: any = useRequest(() => queryGroupAllUsers(gqlClient, 1)).data;
+  const allGroupMember: any = useRequest(() => queryGroupAllUsers(gqlClient, 0)).data;
 
+  // const allGroupMember = getAllusers(groupMember);
+  debugger;
   // 查询已勾选的成员
   const initSelectedUser: any = useRequest(() => queryAuthUsers(gqlClient, groupId)).data;
 
@@ -170,14 +205,17 @@ const UserDetails: React.FC<any> = () => {
   /* endregion */
 
   useEffect(() => {
-    setAllMember(allGroupMember);
+
+    if (allGroupMember !== undefined) {
+      setAllMember(allGroupMember);
+    }
     setSelectedUser(initSelectedUser);
-  }, [initSelectedUser]);
+  }, [initSelectedUser, allGroupMember]);
 
   return (
-    <PageContainer title={pageTitle} style={{height: window.innerHeight, backgroundColor: "white"}}>
+    <PageContainer title={pageTitle} style={{height: window.innerHeight-100, backgroundColor: "white"}}>
 
-      <div style={{height: getHeight()}}>
+      <div style={{}}>
 
         <Row gutter={16}>
           {/* 部门tree */}
@@ -191,7 +229,7 @@ const UserDetails: React.FC<any> = () => {
                 defaultExpandAll={true}
                 onSelect={onSelect}
                 treeData={groups}
-                style={{boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2'}} // 左 上
+                style={{height:window.innerHeight-250,boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2'}} // 左 上
               />
             </div>
 
@@ -199,7 +237,7 @@ const UserDetails: React.FC<any> = () => {
 
           {/* 组内成员 */}
           <Col span={18}
-               style={{backgroundColor: "white", boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2'}}>
+               style={{height:window.innerHeight-250,backgroundColor: "white", boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2'}}>
             <div>
               <div>
                 <Checkbox.Group options={allMember} value={selectedUser} onChange={userSelectChange}/>

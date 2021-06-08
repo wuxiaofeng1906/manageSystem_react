@@ -105,8 +105,8 @@ const getUsersInfo = async (windowURL: any) => {
       username: "testUser",
       password: userCode
     };
-
-    axios
+debugger;
+    await axios
       .post('/api/auth/login', data)
       .then(function (res) {
 
@@ -115,7 +115,7 @@ const getUsersInfo = async (windowURL: any) => {
           userInfos = res.data;
         } else {
           message.error({
-            content: res.data.message,
+            content: '无权登录！',
             duration: 1,
             style: {
               marginTop: '50vh',
@@ -125,7 +125,7 @@ const getUsersInfo = async (windowURL: any) => {
       })
       .catch(function (error) {
         message.error({
-          content: error.toString(),
+          content: `访问异常:${error.toString()}`,
           duration: 1,
           style: {
             marginTop: '50vh',

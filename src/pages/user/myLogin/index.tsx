@@ -77,7 +77,7 @@ const Login: React.FC<{}> = () => {
     }
   };
 
-  const getUsersInfo = async (windowURL: any) => {
+  const getUsersInfo = (windowURL: any) => {
     debugger;
     let okFlag = false;
     let userCode = "";
@@ -94,7 +94,7 @@ const Login: React.FC<{}> = () => {
         username: "testUser",
         password: userCode
       };
-      await axios
+      axios
         .post('/api/auth/login', data)
         .then(function (res) {
 
@@ -126,8 +126,10 @@ const Login: React.FC<{}> = () => {
   };
 
 
-  const flag = useRequest(() => getUsersInfo(window.location.href)).data;
+  // const flag = useRequest(() => getUsersInfo(window.location.href));
+  const flag = getUsersInfo(window.location.href);
 
+  debugger;
   const handleSubmit = async () => {
     const userInfos = {
       name: 'testUser',

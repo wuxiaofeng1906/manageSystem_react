@@ -94,7 +94,7 @@ const Login: React.FC<{}> = () => {
         username: "testUser",
         password: userCode
       };
-      axios
+      await axios
         .post('/api/auth/login', data)
         .then(function (res) {
 
@@ -150,14 +150,9 @@ const Login: React.FC<{}> = () => {
   };
 
   useEffect(() => {
-    setTimeout(function () {
-
-      if (flag === false) {
-        wxLogin();
-      }
-
-    }, 500);
-
+    if (flag === false) {
+      wxLogin();
+    }
 
   }, [flag]);
 

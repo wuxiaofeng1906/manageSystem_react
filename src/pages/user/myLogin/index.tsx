@@ -77,7 +77,7 @@ const Login: React.FC<{}> = () => {
     }
   };
 
-  const getUsersInfo = (windowURL: any) => {
+  const getUsersInfo = async (windowURL: any) => {
     debugger;
 
     let userCode = "";
@@ -95,7 +95,7 @@ const Login: React.FC<{}> = () => {
         password: userCode
       };
 
-      return axios
+      return await axios
         .post('/api/auth/login', data)
         .then(function (res) {
 

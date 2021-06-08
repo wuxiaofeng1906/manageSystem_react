@@ -134,6 +134,7 @@ const queryGroupAllUsers = async (client: GqlClient<object>, deptId: any) => {
 
 // 组件初始化
 const UserDetails: React.FC<any> = () => {
+  let allChoicedUser = [];
 
   // region title获取
   let pageTitle: string = '';
@@ -179,6 +180,8 @@ const UserDetails: React.FC<any> = () => {
   /* region 人员选择触发事件 */
 
   const userSelectChange = (checkedValues: any) => {
+    debugger;
+    allChoicedUser.push(checkedValues);
     setSelectedUser(checkedValues);
   };
 
@@ -190,7 +193,22 @@ const UserDetails: React.FC<any> = () => {
     // 保存人员
     const idArray: any = [];
 
+    debugger;
+    // 将原有的人也一并加进去
+    // const initUsers = initSelectedUser;
+    // initUsers.forEach((eles: string) => {
+    //   for (let index = 0; index < idData.length; index += 1) {
+    //     const dets = idData[index];
+    //     if (dets.name === eles) {
+    //       idArray.push(dets.userid);
+    //       break;
+    //     }
+    //   }
+    // });
+
+
     selectedUser.forEach((eles: string) => {
+
       for (let index = 0; index < idData.length; index += 1) {
         const dets = idData[index];
         if (dets.name === eles) {

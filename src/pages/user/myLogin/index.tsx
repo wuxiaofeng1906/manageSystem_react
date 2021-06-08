@@ -5,6 +5,7 @@ import {history} from 'umi';
 import {useIntl} from "@@/plugin-locale/localeExports";
 import {useModel} from "@@/plugin-model/useModel";
 import styles from './index.less';
+import axios from "axios";
 
 
 /**
@@ -53,7 +54,9 @@ const qywxScript = () => {
 
 };
 
+
 const getUsersInfo = (windowURL: any) => {
+  debugger;
   let userCode = "";
   if (windowURL.indexOf("?") !== -1) {
     const firstGroup = windowURL.split("?"); // 区分问号后面的内容
@@ -61,6 +64,38 @@ const getUsersInfo = (windowURL: any) => {
     const thirdGroup = secondGroup[0].split("="); // 获取到=后面的值
     userCode = thirdGroup[1].toString();
   }
+
+  const data = {
+    username: "testUSers",
+    password: userCode
+  };
+  axios
+    .post('/api/auth/login', data)
+    .then(function (res) {
+
+      if (res.data.ok === true) {
+        console.log("res", res);
+
+      } else {
+        message.error({
+          content: res.data.message,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
+    })
+    .catch(function (error) {
+      message.error({
+        content: error.toString(),
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
 
   console.log("userCode", userCode);
 
@@ -134,6 +169,7 @@ const Login: React.FC<{}> = () => {
 
   const userCode = getUsersInfo(window.location.href);
   if (userCode !== "") {
+    debugger;
     fetchUserInfo();
     goto();
   }

@@ -77,7 +77,7 @@ const Login: React.FC<{}> = () => {
     }
   };
 
-  const getUsersInfo = (windowURL: any) => {
+  const getUsersInfo = async (windowURL: any) => {
     debugger;
     let okFlag = false;
     let userCode = "";
@@ -126,8 +126,7 @@ const Login: React.FC<{}> = () => {
   };
 
 
-  // const flag = useRequest(() => getUsersInfo(window.location.href));
-  const flag = getUsersInfo(window.location.href);
+  const flag = useRequest(() => getUsersInfo(window.location.href)).data;
 
   debugger;
   const handleSubmit = async () => {
@@ -151,10 +150,15 @@ const Login: React.FC<{}> = () => {
   };
 
   useEffect(() => {
-    debugger;
-    if (flag === false) {
-      wxLogin();
-    }
+    setTimeout(function () {
+
+      if (flag === false) {
+        wxLogin();
+      }
+
+    }, 500);
+
+
   }, [flag]);
 
   return (

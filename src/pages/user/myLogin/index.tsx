@@ -184,7 +184,7 @@ const Login: React.FC<{}> = () => {
   };
 
   useEffect(() => {
-    if (userInfo.ok !== true) {
+    if (userInfo === undefined) {
       wxLogin();
     }
   }, [1]);

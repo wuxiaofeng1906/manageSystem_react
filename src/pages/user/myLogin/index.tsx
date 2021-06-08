@@ -56,46 +56,50 @@ const qywxScript = () => {
 };
 
 const Login: React.FC<{}> = () => {
-    const [submitting] = useState(false);
-    const {initialState, setInitialState} = useModel('@@initialState');
-    const intl = useIntl();
+  const [submitting] = useState(false);
+  const {initialState, setInitialState} = useModel('@@initialState');
+  const intl = useIntl();
 
-    const fetchUserInfo = async (userInfos: any) => {
-      const userInfo = {
-        name: userInfos.user.userName,
-        userid: userInfos.user.id,
-        group: '蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED',
-        authority: '',
-        access: userInfos.role.name === "superGroup" ? 'admin' : 'user'
-      };
-
-      if (userInfo) {
-        setInitialState({
-          ...initialState,
-          currentUser: userInfo,
-        });
-      }
+  const fetchUserInfo = async (userInfos: any) => {
+    const userInfo = {
+      name: userInfos.user.userName,
+      userid: userInfos.user.id,
+      group: '蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED',
+      authority: '',
+      access: userInfos.role.name === "superGroup" ? 'admin' : 'user'
     };
 
-    const getUsersInfo = async (windowURL: any) => {
-      let userCode = "";
-      if (windowURL.indexOf("?") !== -1) {
-        const firstGroup = windowURL.split("?"); // 区分问号后面的内容
-        const secondGroup = firstGroup[1].split("&"); // 区分code和其他属性
-        const thirdGroup = secondGroup[0].split("="); // 获取到=后面的值
-        userCode = thirdGroup[1].toString();
-      }
+    if (userInfo) {
+      setInitialState({
+        ...initialState,
+        currentUser: userInfo,
+      });
+    }
+  };
 
-      // 如果获取到了usercode，则拿取用户信息和权限
+  const getUsersInfo = async (windowURL: any) => {
+    debugger;
+    let okFlag = false;
+    let userCode = "";
+    if (windowURL.indexOf("?") !== -1) {
+      const firstGroup = windowURL.split("?"); // 区分问号后面的内容
+      const secondGroup = firstGroup[1].split("&"); // 区分code和其他属性
+      const thirdGroup = secondGroup[0].split("="); // 获取到=后面的值
+      userCode = thirdGroup[1].toString();
+    }
+
+    // 如果获取到了usercode，则拿取用户信息和权限
+    if (userCode !== "") {
       const data = {
         username: "testUser",
         password: userCode
       };
-      return await axios
+      await axios
         .post('/api/auth/login', data)
         .then(function (res) {
 
           if (res.data.ok === true) {
+            okFlag = true;
             fetchUserInfo(res.data);
             goto();
           } else {
@@ -117,86 +121,87 @@ const Login: React.FC<{}> = () => {
             },
           });
         });
+    }
+    return okFlag;
+  };
 
+
+  const flag = useRequest(() => getUsersInfo(window.location.href)).data;
+
+  debugger;
+  const handleSubmit = async () => {
+    const userInfos = {
+      name: 'testUser',
+      userid: 'test',
+      group: '蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED',
+      authority: '',
+      access: 'admin'
     };
 
 
-    const flag = useRequest(() => getUsersInfo(window.location.href)).data;
+    if (userInfos) {
+      setInitialState({
+        ...initialState,
+        currentUser: userInfos,
+      });
+    }
 
-    console.log("flag", flag);
+    goto();
+  };
 
-    debugger;
-    const handleSubmit = async () => {
-      const userInfos = {
-        name: 'testUser',
-        userid: 'test',
-        group: '蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED',
-        authority: '',
-        access: 'admin'
-      };
+  useEffect(() => {
+    if (flag === false) {
+      wxLogin();
+    }
 
+  }, [flag]);
 
-      if (userInfos) {
-        setInitialState({
-          ...initialState,
-          currentUser: userInfos,
-        });
-      }
+  return (
+    <div className={styles.container}>
 
-      goto();
-    };
+      <div className={styles.content}>
 
-    useEffect(() => {
-         wxLogin();
-    }, [flag]);
-
-    return (
-      <div className={styles.container}>
-
-        <div className={styles.content}>
-
-          {/* logo  */}
-          <div className={styles.top}>
-            <div className={styles.header}>
-              <img alt="logo" className={styles.logo} src="/logo.svg"/>
-              <span className={styles.title}>企企研发管理平台</span>
-            </div>
-            <div className={styles.desc}></div>
+        {/* logo  */}
+        <div className={styles.top}>
+          <div className={styles.header}>
+            <img alt="logo" className={styles.logo} src="/logo.svg"/>
+            <span className={styles.title}>企企研发管理平台</span>
           </div>
-
-          {/* 登录 */}
-          <div className={styles.main}>
-            {/* 自动登录 */}
-            {qywxScript()}
-            <div className={styles.desc} id="container"></div>
-
-            {/* 手动登录 */}
-            <ProForm submitter={{
-              searchConfig: {
-                submitText: intl.formatMessage({
-                  id: 'pages.login.submit',
-                  defaultMessage: '登录',
-                }),
-              },
-              render: (_, dom) => dom.pop(),
-              submitButtonProps: {
-                loading: submitting,
-                size: 'large',
-                style: {
-                  width: '100%',
-                },
-              },
-            }} onFinish={async () => {
-              handleSubmit();
-            }}>
-            </ProForm>
-
-          </div>
+          <div className={styles.desc}></div>
         </div>
 
+        {/* 登录 */}
+        <div className={styles.main}>
+          {/* 自动登录 */}
+          {qywxScript()}
+          <div className={styles.desc} id="container"></div>
+
+          {/* 手动登录 */}
+          <ProForm submitter={{
+            searchConfig: {
+              submitText: intl.formatMessage({
+                id: 'pages.login.submit',
+                defaultMessage: '登录',
+              }),
+            },
+            render: (_, dom) => dom.pop(),
+            submitButtonProps: {
+              loading: submitting,
+              size: 'large',
+              style: {
+                width: '100%',
+              },
+            },
+          }} onFinish={async () => {
+            handleSubmit();
+          }}>
+          </ProForm>
+
+        </div>
       </div>
-    );
-  }
-;
+
+    </div>
+  );
+};
 
 export default Login;

@@ -28,7 +28,7 @@ const wxLogin = () => {
     //   "id": "container",
     //   "appid": "ww90adb0abc37b79c8",
     //   "agentid": 1000002,
-    //   "redirect_uri": encodeURIComponent('http://6ce224098541.ngrok.io/user/myLogin'),
+    //   "redirect_uri": encodeURIComponent('http://5c2e3d6e2a1b.ngrok.io/user/myLogin'),
     //   "state": "ww90adb0abc37b79c8",
     //   "href": "",
     // });
@@ -77,9 +77,9 @@ const Login: React.FC<{}> = () => {
     }
   };
 
-  const getUsersInfo = async (windowURL: any) => {
+  const getUsersInfo = (windowURL: any) => {
     debugger;
-    let result ;
+
     let userCode = "";
     if (windowURL.indexOf("?") !== -1) {
       const firstGroup = windowURL.split("?"); // 区分问号后面的内容
@@ -94,21 +94,47 @@ const Login: React.FC<{}> = () => {
         username: "testUser",
         password: userCode
       };
-      result = await axios.post('/api/auth/login', data);
-    }
 
-    return result;
+      return axios
+        .post('/api/auth/login', data)
+        .then(function (res) {
+
+          if (res.data.ok === true) {
+            fetchUserInfo(res.data);
+            goto();
+          } else {
+            message.error({
+              content: '无权登录！',
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          }
+        })
+        .catch(function (error) {
+          message.error({
+            content: `访问异常:${error.toString()}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        });
+    }
+    return "";
   };
 
 
-  const flag = useRequest(() => getUsersInfo(window.location.href)).data;
+  const flag = getUsersInfo(window.location.href);
 
   debugger;
+
   const handleSubmit = async () => {
     const userInfos = {
       name: 'testUser',
       userid: 'test',
-      group: '蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED',
+      group: '',
       authority: '',
       access: 'admin'
     };
@@ -125,13 +151,11 @@ const Login: React.FC<{}> = () => {
   };
 
   useEffect(() => {
-    // if (flag === false) {
-    //   wxLogin();
-    // }
 
     wxLogin();
 
-  }, [flag]);
+
+  }, [1]);
 
   return (
     <div className={styles.container}>

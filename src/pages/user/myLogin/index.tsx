@@ -89,9 +89,7 @@ const getAcctoken = () => {
 };
 const getUsersInfo = async (windowURL: any) => {
   let userInfos = Object();
-
   let userCode = "";
-
   if (windowURL.indexOf("?") !== -1) {
     const firstGroup = windowURL.split("?"); // 区分问号后面的内容
     const secondGroup = firstGroup[1].split("&"); // 区分code和其他属性
@@ -105,13 +103,11 @@ const getUsersInfo = async (windowURL: any) => {
       username: "testUser",
       password: userCode
     };
-debugger;
     await axios
       .post('/api/auth/login', data)
       .then(function (res) {
 
         if (res.data.ok === true) {
-          console.log("res", res);
           userInfos = res.data;
         } else {
           message.error({
@@ -144,20 +140,12 @@ const Login: React.FC<{}> = () => {
 
   const fetchUserInfo = async (userInfos: any) => {
     const userInfo = {
-      name: userInfos.user.name,
-      userid: userInfos.user.userid,
+      name: userInfos.user.userName,
+      userid: userInfos.user.id,
       group: '蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED',
       authority: '',
       access: userInfos.role.name === "superGroup" ? 'admin' : 'user'
     };
-    // const userInfo = {
-    //   name: 'xiaofeng.wu',
-    //   userid: '',
-    //   group: '蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED',
-    //   authority: '',
-    //   access: 'admin'
-    // };
-
 
     if (userInfo) {
       setInitialState({
@@ -178,8 +166,22 @@ const Login: React.FC<{}> = () => {
 
 
   const handleSubmit = async () => {
-    message.success('登录成功！');
-    await fetchUserInfo({});
+    const userInfos = {
+      name: 'testUser',
+      userid: 'test',
+      group: '蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED',
+      authority: '',
+      access: 'admin'
+    };
+
+
+    if (userInfo) {
+      setInitialState({
+        ...initialState,
+        currentUser: userInfos,
+      });
+    }
+
     goto();
   };
 
@@ -187,7 +189,7 @@ const Login: React.FC<{}> = () => {
     if (userInfo === undefined) {
       wxLogin();
     }
-  }, [1]);
+  }, [userInfo]);
 
   return (
     <div className={styles.container}>

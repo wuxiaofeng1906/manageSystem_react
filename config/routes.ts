@@ -304,6 +304,7 @@ export default [
     name: '系统管理',
     icon: 'table',
     path: '/authority',
+    access: 'canAdmin',
     // hideInMenu: true,
     routes: [
       {

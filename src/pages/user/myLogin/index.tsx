@@ -6,6 +6,7 @@ import {useIntl} from "@@/plugin-locale/localeExports";
 import {useModel} from "@@/plugin-model/useModel";
 import styles from './index.less';
 import axios from "axios";
+import {useRequest} from "ahooks";
 
 
 /**
@@ -86,7 +87,7 @@ const getAcctoken = () => {
 
   return accssToken;
 };
-const getUsersInfo = (windowURL: any) => {
+const getUsersInfo = async (windowURL: any) => {
   let userInfos = Object();
 
   let userCode = "";
@@ -104,8 +105,6 @@ const getUsersInfo = (windowURL: any) => {
       username: "testUser",
       password: userCode
     };
-
-    debugger;
 
     axios
       .post('/api/auth/login', data)
@@ -151,6 +150,14 @@ const Login: React.FC<{}> = () => {
       authority: '',
       access: userInfos.role.name === "superGroup" ? 'admin' : 'user'
     };
+    // const userInfo = {
+    //   name: 'xiaofeng.wu',
+    //   userid: '',
+    //   group: '蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED',
+    //   authority: '',
+    //   access: 'admin'
+    // };
+
 
     if (userInfo) {
       setInitialState({
@@ -160,7 +167,10 @@ const Login: React.FC<{}> = () => {
     }
   };
 
-  const userInfo = getUsersInfo(window.location.href);
+
+  const userInfo = useRequest(() => getUsersInfo(window.location.href)).data;
+
+  debugger;
   if (userInfo.ok === true) {
     fetchUserInfo(userInfo);
     goto();

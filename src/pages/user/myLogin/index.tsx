@@ -171,7 +171,7 @@ const Login: React.FC<{}> = () => {
   const userInfo = useRequest(() => getUsersInfo(window.location.href)).data;
 
   debugger;
-  if (userInfo.ok === true) {
+  if (userInfo !== undefined && userInfo.ok === true) {
     fetchUserInfo(userInfo);
     goto();
   }

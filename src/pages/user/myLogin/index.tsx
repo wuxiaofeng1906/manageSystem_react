@@ -78,6 +78,7 @@ const Login: React.FC<{}> = () => {
   };
 
   const getUsersInfo = async (windowURL: any) => {
+    let okFlag = false;
     let userCode = "";
     if (windowURL.indexOf("?") !== -1) {
       const firstGroup = windowURL.split("?"); // 区分问号后面的内容
@@ -97,6 +98,7 @@ const Login: React.FC<{}> = () => {
         .then(function (res) {
 
           if (res.data.ok === true) {
+            okFlag = true;
             fetchUserInfo(res.data);
             goto();
           } else {
@@ -119,12 +121,11 @@ const Login: React.FC<{}> = () => {
           });
         });
     }
-
+    return okFlag;
   };
 
 
-  const userInfo = useRequest(() => getUsersInfo(window.location.href)).data;
-
+  const flag = useRequest(() => getUsersInfo(window.location.href)).data;
 
   const handleSubmit = async () => {
     const userInfos = {
@@ -136,7 +137,7 @@ const Login: React.FC<{}> = () => {
     };
 
 
-    if (userInfo) {
+    if (userInfos) {
       setInitialState({
         ...initialState,
         currentUser: userInfos,
@@ -147,10 +148,8 @@ const Login: React.FC<{}> = () => {
   };
 
   useEffect(() => {
-    if (userInfo === undefined) {
-      wxLogin();
-    }
-  }, [1]);
+    wxLogin();
+  }, [flag]);
 
   return (
     <div className={styles.container}>

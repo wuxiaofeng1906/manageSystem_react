@@ -79,7 +79,7 @@ const Login: React.FC<{}> = () => {
 
   const getUsersInfo = async (windowURL: any) => {
     debugger;
-    let okFlag = false;
+    let result ;
     let userCode = "";
     if (windowURL.indexOf("?") !== -1) {
       const firstGroup = windowURL.split("?"); // 区分问号后面的内容
@@ -94,35 +94,10 @@ const Login: React.FC<{}> = () => {
         username: "testUser",
         password: userCode
       };
-      await axios
-        .post('/api/auth/login', data)
-        .then(function (res) {
-
-          if (res.data.ok === true) {
-            okFlag = true;
-            fetchUserInfo(res.data);
-            goto();
-          } else {
-            message.error({
-              content: '无权登录！',
-              duration: 1,
-              style: {
-                marginTop: '50vh',
-              },
-            });
-          }
-        })
-        .catch(function (error) {
-          message.error({
-            content: `访问异常:${error.toString()}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        });
+      result = await axios.post('/api/auth/login', data);
     }
-    return okFlag;
+
+    return result;
   };
 
 
@@ -150,9 +125,11 @@ const Login: React.FC<{}> = () => {
   };
 
   useEffect(() => {
-    if (flag === false) {
-      wxLogin();
-    }
+    // if (flag === false) {
+    //   wxLogin();
+    // }
+
+    wxLogin();
 
   }, [flag]);
 

@@ -55,84 +55,6 @@ const qywxScript = () => {
 
 };
 
-
-const getAcctoken = () => {
-  let accssToken = '';
-  const url = `https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=ID&corpsecret=SECRET`;
-  axios.post(url, {})
-    .then(function (res) {
-
-      if (res.data.ok === true) {
-        console.log("res", res);
-        accssToken = res.data.access_token;
-      } else {
-        message.error({
-          content: res.data.message,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      }
-    })
-    .catch(function (error) {
-      message.error({
-        content: error.toString(),
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    });
-
-  return accssToken;
-};
-const getUsersInfo = async (windowURL: any) => {
-  let userInfos = Object();
-  let userCode = "";
-  if (windowURL.indexOf("?") !== -1) {
-    const firstGroup = windowURL.split("?"); // 区分问号后面的内容
-    const secondGroup = firstGroup[1].split("&"); // 区分code和其他属性
-    const thirdGroup = secondGroup[0].split("="); // 获取到=后面的值
-    userCode = thirdGroup[1].toString();
-  }
-
-  // 如果获取到了usercode，则拿取用户信息和权限
-  if (userCode !== "") {
-    const data = {
-      username: "testUser",
-      password: userCode
-    };
-    await axios
-      .post('/api/auth/login', data)
-      .then(function (res) {
-
-        if (res.data.ok === true) {
-          userInfos = res.data;
-        } else {
-          message.error({
-            content: '无权登录！',
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-      })
-      .catch(function (error) {
-        message.error({
-          content: `访问异常:${error.toString()}`,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      });
-  }
-
-  return userInfos;
-};
-
 const Login: React.FC<{}> = () => {
   const [submitting] = useState(false);
   const {initialState, setInitialState} = useModel('@@initialState');
@@ -155,14 +77,53 @@ const Login: React.FC<{}> = () => {
     }
   };
 
+  const getUsersInfo = async (windowURL: any) => {
+    let userCode = "";
+    if (windowURL.indexOf("?") !== -1) {
+      const firstGroup = windowURL.split("?"); // 区分问号后面的内容
+      const secondGroup = firstGroup[1].split("&"); // 区分code和其他属性
+      const thirdGroup = secondGroup[0].split("="); // 获取到=后面的值
+      userCode = thirdGroup[1].toString();
+    }
+
+    // 如果获取到了usercode，则拿取用户信息和权限
+    if (userCode !== "") {
+      const data = {
+        username: "testUser",
+        password: userCode
+      };
+      await axios
+        .post('/api/auth/login', data)
+        .then(function (res) {
+
+          if (res.data.ok === true) {
+            fetchUserInfo(res.data);
+            goto();
+          } else {
+            message.error({
+              content: '无权登录！',
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          }
+        })
+        .catch(function (error) {
+          message.error({
+            content: `访问异常:${error.toString()}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        });
+    }
+
+  };
+
 
   const userInfo = useRequest(() => getUsersInfo(window.location.href)).data;
-
-  debugger;
-  if (userInfo !== undefined && userInfo.ok === true) {
-    fetchUserInfo(userInfo);
-    goto();
-  }
 
 
   const handleSubmit = async () => {
@@ -189,7 +150,7 @@ const Login: React.FC<{}> = () => {
     if (userInfo === undefined) {
       wxLogin();
     }
-  }, [userInfo]);
+  }, [1]);
 
   return (
     <div className={styles.container}>

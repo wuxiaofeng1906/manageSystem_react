@@ -55,27 +55,15 @@ const qywxScript = () => {
 };
 
 
-const getUsersInfo = (windowURL: any) => {
-  debugger;
-  let userCode = "";
-  if (windowURL.indexOf("?") !== -1) {
-    const firstGroup = windowURL.split("?"); // 区分问号后面的内容
-    const secondGroup = firstGroup[1].split("&"); // 区分code和其他属性
-    const thirdGroup = secondGroup[0].split("="); // 获取到=后面的值
-    userCode = thirdGroup[1].toString();
-  }
-
-  const data = {
-    username: "testUSers",
-    password: userCode
-  };
-  axios
-    .post('/api/auth/login', data)
+const getAcctoken = () => {
+  let accssToken = '';
+  const url = `https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=ID&corpsecret=SECRET`;
+  axios.post(url, {})
     .then(function (res) {
 
       if (res.data.ok === true) {
         console.log("res", res);
-
+        accssToken = res.data.access_token;
       } else {
         message.error({
           content: res.data.message,
@@ -96,10 +84,58 @@ const getUsersInfo = (windowURL: any) => {
       });
     });
 
+  return accssToken;
+};
+const getUsersInfo = (windowURL: any) => {
+  let userInfos = Object();
 
-  console.log("userCode", userCode);
+  let userCode = "";
 
-  return userCode;
+  if (windowURL.indexOf("?") !== -1) {
+    const firstGroup = windowURL.split("?"); // 区分问号后面的内容
+    const secondGroup = firstGroup[1].split("&"); // 区分code和其他属性
+    const thirdGroup = secondGroup[0].split("="); // 获取到=后面的值
+    userCode = thirdGroup[1].toString();
+  }
+
+  // 如果获取到了usercode，则拿取用户信息和权限
+  if (userCode !== "") {
+    const data = {
+      username: "testUser",
+      password: userCode
+    };
+
+    debugger;
+
+    axios
+      .post('/api/auth/login', data)
+      .then(function (res) {
+
+        if (res.data.ok === true) {
+          console.log("res", res);
+          userInfos = res.data;
+        } else {
+          message.error({
+            content: res.data.message,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+      })
+      .catch(function (error) {
+        message.error({
+          content: error.toString(),
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      });
+  }
+
+  return userInfos;
 };
 
 const Login: React.FC<{}> = () => {
@@ -107,58 +143,15 @@ const Login: React.FC<{}> = () => {
   const {initialState, setInitialState} = useModel('@@initialState');
   const intl = useIntl();
 
-  const fetchUserInfo = async () => {
+  const fetchUserInfo = async (userInfos: any) => {
     const userInfo = {
-      name: 'Serati Ma',
-      avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
-      userid: '00000001',
-      email: 'antdesign@alipay.com',
-      signature: '海纳百川，有容乃大',
-      title: '交互专家',
+      name: userInfos.user.name,
+      userid: userInfos.user.userid,
       group: '蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED',
-      tags: [
-        {
-          key: '0',
-          label: '很有想法的',
-        },
-        {
-          key: '1',
-          label: '专注设计',
-        },
-        {
-          key: '2',
-          label: '辣~',
-        },
-        {
-          key: '3',
-          label: '大长腿',
-        },
-        {
-          key: '4',
-          label: '川妹子',
-        },
-        {
-          key: '5',
-          label: '海纳百川',
-        },
-      ],
-      notifyCount: 12,
-      unreadCount: 11,
-      country: 'China',
-      access: 'tester',
-      geographic: {
-        province: {
-          label: '浙江省',
-          key: '330000',
-        },
-        city: {
-          label: '杭州市',
-          key: '330100',
-        },
-      },
-      address: '西湖区工专路 77 号',
-      phone: '0752-268888888',
+      authority: '',
+      access: userInfos.role.name === "superGroup" ? 'admin' : 'user'
     };
+
     if (userInfo) {
       setInitialState({
         ...initialState,
@@ -167,22 +160,21 @@ const Login: React.FC<{}> = () => {
     }
   };
 
-  const userCode = getUsersInfo(window.location.href);
-  if (userCode !== "") {
-    debugger;
-    fetchUserInfo();
+  const userInfo = getUsersInfo(window.location.href);
+  if (userInfo.ok === true) {
+    fetchUserInfo(userInfo);
     goto();
   }
 
 
   const handleSubmit = async () => {
     message.success('登录成功！');
-    await fetchUserInfo();
+    await fetchUserInfo({});
     goto();
   };
 
   useEffect(() => {
-    if (userCode === "") {
+    if (userInfo.ok !== true) {
       wxLogin();
     }
   }, [1]);

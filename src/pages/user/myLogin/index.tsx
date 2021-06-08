@@ -78,6 +78,7 @@ const Login: React.FC<{}> = () => {
   };
 
   const getUsersInfo = async (windowURL: any) => {
+    debugger;
     let okFlag = false;
     let userCode = "";
     if (windowURL.indexOf("?") !== -1) {
@@ -148,7 +149,10 @@ const Login: React.FC<{}> = () => {
   };
 
   useEffect(() => {
-    wxLogin();
+    debugger;
+    if (flag === false) {
+      wxLogin();
+    }
   }, [flag]);
 
   return (

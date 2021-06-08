@@ -28,7 +28,7 @@ const wxLogin = () => {
     //   "id": "container",
     //   "appid": "ww90adb0abc37b79c8",
     //   "agentid": 1000002,
-    //   "redirect_uri": encodeURIComponent('http://5c2e3d6e2a1b.ngrok.io/user/myLogin'),
+    //   "redirect_uri": encodeURIComponent('http://6ce224098541.ngrok.io/user/myLogin'),
     //   "state": "ww90adb0abc37b79c8",
     //   "href": "",
     // });
@@ -78,8 +78,7 @@ const Login: React.FC<{}> = () => {
   };
 
   const getUsersInfo = async (windowURL: any) => {
-    debugger;
-
+    let okFlag = false;
     let userCode = "";
     if (windowURL.indexOf("?") !== -1) {
       const firstGroup = windowURL.split("?"); // 区分问号后面的内容
@@ -94,12 +93,12 @@ const Login: React.FC<{}> = () => {
         username: "testUser",
         password: userCode
       };
-
-      return await axios
+      await axios
         .post('/api/auth/login', data)
         .then(function (res) {
 
           if (res.data.ok === true) {
+            okFlag = true;
             fetchUserInfo(res.data);
             goto();
           } else {
@@ -122,19 +121,21 @@ const Login: React.FC<{}> = () => {
           });
         });
     }
-    return "";
+    return okFlag;
   };
 
-
-  const flag = getUsersInfo(window.location.href);
+  let showFlag = true;
+  const flag = useRequest(() => getUsersInfo(window.location.href)).data;
+  if (flag === false) {
+    showFlag = false;
+  }
 
   debugger;
-
   const handleSubmit = async () => {
     const userInfos = {
       name: 'testUser',
       userid: 'test',
-      group: '',
+      group: '蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED',
       authority: '',
       access: 'admin'
     };
@@ -151,11 +152,11 @@ const Login: React.FC<{}> = () => {
   };
 
   useEffect(() => {
+    if (showFlag === true) {
+      wxLogin();
+    }
 
-    wxLogin();
-
-
-  }, [1]);
+  }, [flag]);
 
   return (
     <div className={styles.container}>

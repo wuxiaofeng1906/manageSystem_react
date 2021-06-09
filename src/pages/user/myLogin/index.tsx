@@ -61,7 +61,7 @@ const Login: React.FC<{}> = () => {
   const intl = useIntl();
 
   const fetchUserInfo = async (userInfos: any) => {
-
+debugger;
     localStorage.setItem("accessId", userInfos.access_token);
     localStorage.setItem("authority", JSON.stringify(userInfos.authorities));
 

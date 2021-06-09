@@ -8,6 +8,7 @@ import type {GqlClient} from "@/hooks";
 import {useGqlClient} from "@/hooks";
 import {useRequest} from "ahooks";
 import axios from "axios";
+import {judgeAuthority} from "@/publicMethods/authorityJudge";
 
 const CheckboxGroup = Checkbox.Group;
 
@@ -172,8 +173,6 @@ const getselectedId = (alls: any, sModule: any, sMethod: any) => {
 
 const AuthorityDetails: React.FC<any> = () => {
   const sys_accessToken = localStorage.getItem("accessId");
-  const myAuth: any = localStorage.getItem("authority");
-  const sys_authority: any = JSON.parse(myAuth);
   debugger;
 
   const clickedRowData = {
@@ -312,7 +311,6 @@ const AuthorityDetails: React.FC<any> = () => {
 
     const idArray = getselectedId(data, moduleGroup, methodGroup);
 
-    debugger;
     // 2.获取已勾选的权限id
     axios.put(`/api/role/authority/${groupId}`, {data: idArray}, {headers: {Authorization: `Bearer ${sys_accessToken}`}})
       .then(function (res) {
@@ -379,7 +377,7 @@ const AuthorityDetails: React.FC<any> = () => {
                      <Checkbox checked={checkAll} onChange={selectAll}>全选</Checkbox>
                    </Table.Summary.Cell>
                    <Table.Summary.Cell index={2}>
-                     <div><Button type="primary" onClick={saveAuthority}> 保存 </Button> <Button
+                     <div><Button type="primary" style={{display: judgeAuthority("修改权限组的人员") === true ? "inline" : "none"}} onClick={saveAuthority}> 保存 </Button> <Button
                        onClick={returns}> 返回 </Button></div>
                    </Table.Summary.Cell>
                  </Table.Summary.Row>

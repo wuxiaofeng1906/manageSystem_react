@@ -1,6 +1,4 @@
 import React, {useEffect, useState} from 'react';
-// import {useRequest} from 'ahooks';
-// import {GqlClient, useGqlClient} from '@/hooks';
 import {getHeight} from '@/publicMethods/pageSet';
 import {PageContainer} from "@ant-design/pro-layout";
 import {
@@ -16,9 +14,9 @@ import axios from "axios";
 import {history} from "@@/core/history";
 import {GqlClient, useGqlClient} from "@/hooks";
 import {useRequest} from "ahooks";
+import {judgeAuthority} from "@/publicMethods/authorityJudge";
 
 const authorityClick = (params: any) => {
-  // console.log("权限维护：", params);
   history.push(`/authority/autority_details?groupid=${params.groupId}&groupname=${params.groupName}`);
 };
 
@@ -26,7 +24,6 @@ const memberClick = (params: any) => {
   history.push(`/authority/user?groupid=${params.groupId}&groupname=${params.groupName}`);
 
 };
-
 
 const analAuthGroup = (params: any) => {
   const data = Array();
@@ -72,16 +69,9 @@ const queryAuthGroupViews = async (client: GqlClient<object>) => {
   return analAuthGroup(data?.roleGroup);
 };
 
-
-// 组件初始化
 const Authority: React.FC<any> = () => {
 
   const sys_accessToken = localStorage.getItem("accessId");
-  const myAuth: any = localStorage.getItem("authority");
-  const sys_authority: any = JSON.parse(myAuth);
-
-  console.log(sys_accessToken, sys_authority);
-  debugger;
   /* region 数据查询 */
   const [tableData, setTableData] = useState([]);
 
@@ -312,7 +302,6 @@ const Authority: React.FC<any> = () => {
       title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 操作</span>,
       key: 'action',
       width: 150,
-      // fixed: 'right',
       render: (text: any) => (
 
         <Space size="middle">
@@ -324,10 +313,13 @@ const Authority: React.FC<any> = () => {
             <Button shape="circle" icon={<IdcardTwoTone/>} onClick={() => memberClick(text)}/>
           </Tooltip>
           <Tooltip title="编辑">
-            <Button shape="circle" icon={<EditTwoTone/>} onClick={() => editClick(text)}/>
+            <Button shape="circle" style={{display: judgeAuthority("修改权限组详情") === true ? "inline" : "none"}}
+                    icon={<EditTwoTone/>} onClick={() => editClick(text)}/>
           </Tooltip>
-          <Tooltip title="删除" style={{marginTop: "100px"}}>
-            <Button shape="circle" icon={<DeleteTwoTone/>} onClick={() => deleteClick(text)}/>
+          <Tooltip title="删除"
+                   style={{marginTop: "100px"}}>
+            <Button shape="circle" style={{display: judgeAuthority("修改权限组详情") === true ? "inline" : "none"}}
+                    icon={<DeleteTwoTone/>} onClick={() => deleteClick(text)}/>
           </Tooltip>
         </Space>
       ),
@@ -343,7 +335,13 @@ const Authority: React.FC<any> = () => {
       {/* 新增分组按钮 */}
       <div style={{width: "100%", height: "40px", background: 'white'}}>
         <Button></Button>
-        <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<FolderAddTwoTone/>}
+        <Button type="text"
+                style={{
+                  color: '#1890FF',
+                  float: 'right',
+                  display: judgeAuthority("增加权限组") === true ? "inline" : "none"
+                }}
+                icon={<FolderAddTwoTone/>}
                 size={'large'} onClick={addGroup}>新增分组</Button>
       </div>
       {/* 表格控件 */}

@@ -7,6 +7,7 @@ import type {GqlClient} from "@/hooks";
 import {useGqlClient} from "@/hooks";
 import {useRequest} from "ahooks";
 import axios from "axios";
+import {judgeAuthority} from "@/publicMethods/authorityJudge";
 
 const parTree = (oraData: any) => {
 
@@ -307,7 +308,8 @@ const UserDetails: React.FC<any> = () => {
                 position: "absolute",
                 bottom: 0
               }}>
-                <Button style={{marginLeft: '40%'}} type="primary" onClick={saveUsers}> 保存 </Button>
+                <Button style={{display: judgeAuthority("修改权限组的人员") === true ? "inline" : "none"}}
+                        type="primary" onClick={saveUsers}> 保存 </Button>
                 <Button style={{marginLeft: "30px"}} type="primary" onClick={returns}> 返回 </Button>
               </div>
             </div>

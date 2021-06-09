@@ -294,7 +294,6 @@ const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
 const SprintList: React.FC<any> = () => {
     const sys_accessToken = localStorage.getItem("accessId");
     axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
-debugger;
     /* 获取网页的项目id */
     let prjId: string = '';
     let prjNames: string = '';
@@ -1219,8 +1218,15 @@ debugger;
       const values = formForMoveAddAnaMod.getFieldsValue();
       const prjName = `${values.prjNames}${values.prjDate.format('YYYYMMDD')}`;
       const datas: any = await queryRepeats(gqlClient, prjName);
-      // 时间选择后禁用某些控件
-      if (datas.ok === true) {
+      if (datas === null) {
+        message.error({
+          content: '判断重复数据失败！',
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      } else if (datas.ok === true) {  //  // 时间选择后禁用某些控件
         // 可以新增项目
         setisAble({shown: false});
         formForMoveAddAnaMod.setFieldsValue({
@@ -1233,6 +1239,8 @@ debugger;
           // prjStatus: data.data.status  // data 可能没有数据
         });
       }
+
+
     };
 
     const commitAddProject = async () => {
@@ -1352,7 +1360,6 @@ debugger;
     };
 
     const modFlowStage = (stage: number) => {
-      debugger;
       const selRows: any = gridApi.current?.getSelectedRows();
       const selIds = [];
       for (let index = 0; index < selRows.length; index += 1) {

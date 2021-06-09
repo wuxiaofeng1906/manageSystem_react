@@ -105,7 +105,7 @@ const SprintList: React.FC<any> = () => {
 
   const sys_accessToken = localStorage.getItem("accessId");
   axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
-
+  debugger;
   // 定义列名
   const colums = () => {
     const component = new Array();
@@ -477,6 +477,7 @@ const SprintList: React.FC<any> = () => {
       creator: 'admin',
     };
 
+    debugger;
     //  判断是修改还是新增
     if (modal.title === '新增项目') {
       axios

@@ -294,7 +294,7 @@ const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
 const SprintList: React.FC<any> = () => {
     const sys_accessToken = localStorage.getItem("accessId");
     axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
-
+debugger;
     /* 获取网页的项目id */
     let prjId: string = '';
     let prjNames: string = '';
@@ -1352,6 +1352,7 @@ const SprintList: React.FC<any> = () => {
     };
 
     const modFlowStage = (stage: number) => {
+      debugger;
       const selRows: any = gridApi.current?.getSelectedRows();
       const selIds = [];
       for (let index = 0; index < selRows.length; index += 1) {

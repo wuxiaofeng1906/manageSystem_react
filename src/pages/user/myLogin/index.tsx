@@ -123,18 +123,15 @@ const Login: React.FC<{}> = () => {
         });
     }
 
-    setTimeout(function () {
-      console.log("等待延时");
-    }, 3000);
-
-
     return okFlag;
   };
 
 
   const flag = useRequest(() => getUsersInfo(window.location.href)).data;
 
-  debugger;
+  setTimeout(function () {
+    console.log("等待延时");
+  }, 3000);
   const handleSubmit = async () => {
     const userInfos = {
       name: 'testUser',

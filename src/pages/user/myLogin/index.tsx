@@ -41,7 +41,7 @@ const wxLogin = () => {
       "state": "wwcba5faed367cdeee",
       "href": "",
     });
-  }, 500);
+  }, 1000);
 };
 
 // 添加企业微信需要的script标签

@@ -154,7 +154,7 @@ const Login: React.FC<{}> = () => {
 
   useEffect(() => {
     wxLogin();
-  }, [1]);
+  }, []);
 
   return (
     <div className={styles.container}>

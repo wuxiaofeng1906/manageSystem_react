@@ -128,14 +128,9 @@ const Login: React.FC<{}> = () => {
 
   const {data, loading} = useRequest(() => getUsersInfo(window.location.href));
 
-  console.log(loading);
+  console.log(data, loading);
   debugger;
-  const flag = data;
-  if (flag === false) {
-    setTimeout(function () {
-      console.log("等待延时");
-    }, 3000);
-  }
+
 
   const handleSubmit = async () => {
     const userInfos = {
@@ -158,11 +153,8 @@ const Login: React.FC<{}> = () => {
   };
 
   useEffect(() => {
-    if (flag === false) {
-      wxLogin();
-    }
-
-  }, [flag]);
+    wxLogin();
+  }, [1]);
 
   return (
     <div className={styles.container}>

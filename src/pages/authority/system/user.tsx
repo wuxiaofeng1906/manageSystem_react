@@ -135,6 +135,9 @@ const queryGroupAllUsers = async (client: GqlClient<object>, deptId: any) => {
 
 // 组件初始化
 const UserDetails: React.FC<any> = () => {
+  const sys_accessToken = localStorage.getItem("accessId");
+  axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
+
 
   // region title获取
   let pageTitle: string = '';

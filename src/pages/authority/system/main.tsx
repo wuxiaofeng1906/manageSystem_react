@@ -16,6 +16,7 @@ import {GqlClient, useGqlClient} from "@/hooks";
 import {useRequest} from "ahooks";
 import {judgeAuthority} from "@/publicMethods/authorityJudge";
 
+
 const authorityClick = (params: any) => {
   history.push(`/authority/autority_details?groupid=${params.groupId}&groupname=${params.groupName}`);
 };
@@ -72,6 +73,8 @@ const queryAuthGroupViews = async (client: GqlClient<object>) => {
 const Authority: React.FC<any> = () => {
 
   const sys_accessToken = localStorage.getItem("accessId");
+  axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
+
   /* region 数据查询 */
   const [tableData, setTableData] = useState([]);
 
@@ -128,7 +131,6 @@ const Authority: React.FC<any> = () => {
       });
       return;
     }
-
 
     // 判断组名是否为空
     if (groupTitle.title === '新增分组') {

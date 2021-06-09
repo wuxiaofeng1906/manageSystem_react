@@ -152,8 +152,14 @@ const Login: React.FC<{}> = () => {
     goto();
   };
 
+  const [showFlag, setShowFlag] = useState(true);
+
   useEffect(() => {
-    wxLogin();
+    if (showFlag === true) {
+      wxLogin();
+
+    }
+    setShowFlag(false);
   }, []);
 
   return (

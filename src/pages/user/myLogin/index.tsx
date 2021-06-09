@@ -61,11 +61,15 @@ const Login: React.FC<{}> = () => {
   const intl = useIntl();
 
   const fetchUserInfo = async (userInfos: any) => {
+
+    localStorage.setItem("accessId", userInfos.access_token);
+    localStorage.setItem("authority", JSON.stringify(userInfos.authorities));
+
     const userInfo = {
       name: userInfos.user.userName,
       userid: userInfos.user.id,
-      group: '蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED',
-      authority: '',
+      group: userInfos.role.desc,
+      authority: userInfos.authorities,
       access: userInfos.role.name === "superGroup" ? 'admin' : 'user'
     };
 
@@ -129,8 +133,6 @@ const Login: React.FC<{}> = () => {
   const {data, loading} = useRequest(() => getUsersInfo(window.location.href));
 
   console.log(data, loading);
-  debugger;
-
 
   const handleSubmit = async () => {
     const userInfos = {
@@ -140,7 +142,6 @@ const Login: React.FC<{}> = () => {
       authority: '',
       access: 'admin'
     };
-
 
     if (userInfos) {
       setInitialState({
@@ -152,14 +153,8 @@ const Login: React.FC<{}> = () => {
     goto();
   };
 
-  const [showFlag, setShowFlag] = useState(true);
-
   useEffect(() => {
-    if (showFlag === true) {
-      wxLogin();
-
-    }
-    setShowFlag(false);
+    wxLogin();
   }, []);
 
   return (

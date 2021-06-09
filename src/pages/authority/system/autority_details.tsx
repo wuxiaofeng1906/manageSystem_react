@@ -171,6 +171,10 @@ const getselectedId = (alls: any, sModule: any, sMethod: any) => {
 };
 
 const AuthorityDetails: React.FC<any> = () => {
+  const sys_accessToken = localStorage.getItem("accessId");
+  const myAuth: any = localStorage.getItem("authority");
+  const sys_authority: any = JSON.parse(myAuth);
+  debugger;
 
   const clickedRowData = {
     module: [],
@@ -308,9 +312,11 @@ const AuthorityDetails: React.FC<any> = () => {
 
     const idArray = getselectedId(data, moduleGroup, methodGroup);
 
+    debugger;
     // 2.获取已勾选的权限id
-    axios.put(`/api/role/authority/${groupId}`, {data: idArray})
+    axios.put(`/api/role/authority/${groupId}`, {data: idArray}, {headers: {Authorization: `Bearer ${sys_accessToken}`}})
       .then(function (res) {
+
         if (res.data.ok === true) {
           message.info({
             content: "权限保存成功！",

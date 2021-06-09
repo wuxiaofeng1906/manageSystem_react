@@ -75,6 +75,13 @@ const queryAuthGroupViews = async (client: GqlClient<object>) => {
 
 // 组件初始化
 const Authority: React.FC<any> = () => {
+
+  const sys_accessToken = localStorage.getItem("accessId");
+  const myAuth: any = localStorage.getItem("authority");
+  const sys_authority: any = JSON.parse(myAuth);
+
+  console.log(sys_accessToken, sys_authority);
+  debugger;
   /* region 数据查询 */
   const [tableData, setTableData] = useState([]);
 

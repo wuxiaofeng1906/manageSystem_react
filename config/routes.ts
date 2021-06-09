@@ -104,6 +104,7 @@ export default [
       {
         name: 'sprint 列表',
         path: 'sprintList',
+        access: 'canAdmin',
         component: './sprint/sprintList/sprintList',
       },
       {
@@ -118,7 +119,6 @@ export default [
     name: '研发绩效数据',
     icon: 'table',
     path: '/kpi',
-    // access: 'canAdmin',
     routes: [{
       name: '绩效指标',
       icon: 'table',

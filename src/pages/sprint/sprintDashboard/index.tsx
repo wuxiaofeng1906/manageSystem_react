@@ -11,6 +11,7 @@ import {GqlClient, useGqlClient} from "@/hooks";
 import {useRequest} from "ahooks";
 import {bugResultDeals, sp_hotResultDeals} from "./dataProcess";
 import {getWeeksRange} from '@/publicMethods/timeMethods';
+import {judgeAuthority} from "@/publicMethods/authorityJudge";
 
 const {Option} = Select;
 // 全局变量
@@ -1135,10 +1136,22 @@ const DashBoard: React.FC<any> = () => {
               {/* emergency 下拉框 */}
               <div>
                 <Select value={selectedName.emergency}
-                        style={{width: '200px', marginLeft: "20px", marginTop: '20px', fontSize: "15px"}}
+                        style={{
+                          width: '200px',
+                          marginLeft: "20px",
+                          marginTop: '20px',
+                          fontSize: "15px",
+                        }}
+                        disabled={judgeAuthority("查看下拉列表") !== true}
                         showSearch={true} optionFilterProp="children"
                         onChange={emergencyChanged}>{emergencySelect}</Select>
-                <Button type="text" style={{float: "right", color: 'black', marginTop: '20px', marginRight: "10px"}}
+                <Button type="text" style={{
+                  float: "right",
+                  color: 'black',
+                  marginTop: '20px',
+                  marginRight: "10px",
+                  display: judgeAuthority("查看项目清单All") === true ? "inline" : "none"
+                }}
                         icon={<SearchOutlined/>}
                         size={'large'}
                         onClick={() => {
@@ -1267,9 +1280,19 @@ const DashBoard: React.FC<any> = () => {
               {/* hotfix 下拉框 */}
               <div style={{marginTop: "20px"}}>
                 <Select value={selectedName.hotfix}
-                        style={{width: '200px', marginLeft: "20px", fontSize: "15px"}}
+                        style={{
+                          width: '200px',
+                          marginLeft: "20px",
+                          fontSize: "15px",
+                        }}
+                        disabled={judgeAuthority("查看下拉列表") !== true}
                         showSearch optionFilterProp="children" onChange={hotfixChanged}>{hotfixSelect}</Select>
-                <Button type="text" style={{float: "right", color: 'black', marginRight: "10px"}}
+                <Button type="text" style={{
+                  float: "right",
+                  color: 'black',
+                  marginRight: "10px",
+                  display: judgeAuthority("查看项目清单All") === true ? "inline" : "none"
+                }}
                         icon={<SearchOutlined/>}
                         size={'large'}
                         onClick={() => {
@@ -1871,10 +1894,23 @@ const DashBoard: React.FC<any> = () => {
               {/* sprint 下拉框 */}
               <div>
                 <Select value={selectedName.sprint}
-                        style={{width: '200px', marginLeft: "20px", marginTop: '20px', fontSize: "15px"}}
+                        style={{
+                          width: '200px',
+                          marginLeft: "20px",
+                          marginTop: '20px',
+                          fontSize: "15px",
+                        }}
+                        disabled={judgeAuthority("查看下拉列表") !== true}
                         showSearch={true} optionFilterProp="children"
                         onChange={sprintChanged}>{sprintSelect}</Select>
-                <Button type="text" style={{float: "right", color: 'black', marginTop: '20px', marginRight: "10px"}}
+                <Button type="text" style={{
+                  float: "right",
+                  color: 'black',
+                  marginTop: '20px',
+                  marginRight: "10px",
+                  display: judgeAuthority("查看项目清单All") === true ? "inline" : "none"
+                }}
+
                         icon={<SearchOutlined/>}
                         size={'large'}
                         onClick={() => {

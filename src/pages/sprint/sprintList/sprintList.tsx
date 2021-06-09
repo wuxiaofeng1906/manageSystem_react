@@ -15,6 +15,7 @@ import {getHeight} from '@/publicMethods/pageSet';
 
 import axios from 'axios';
 import {history} from 'umi';
+import {judgeAuthority} from "@/publicMethods/authorityJudge";
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
@@ -101,6 +102,9 @@ const queryDeleteCount = async (client: GqlClient<object>, params: any) => {
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
+
+  const sys_accessToken = localStorage.getItem("accessId");
+  axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
 
   // 定义列名
   const colums = () => {
@@ -265,6 +269,7 @@ const SprintList: React.FC<any> = () => {
 
   // 选择项目状态
   const prjStatusChanged = async (value: any, params: any) => {
+    console.log(params);
     queryCondition.projectStatus = value;
     updateGrid();
 
@@ -726,15 +731,22 @@ const SprintList: React.FC<any> = () => {
       {/* 新增、修改、删除按钮栏 */}
       <div style={{background: 'white'}}>
         {/* 使用一个图标就要导入一个图标 */}
-        <Button type="text" style={{color: 'black'}} size={'large'} onClick={showDefalultValue}>
+        <Button type="text" style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}
+                size={'large'} onClick={showDefalultValue}>
           默认：</Button>
-        <label style={{color: 'black'}}> 近1月未关闭的</label>
+        <label style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}> 近1月未关闭的</label>
         {/* <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}> 近1月未关闭的 </Button> */}
-        <Button type="text" style={{color: 'black', float: 'right'}} icon={<DeleteTwoTone/>} size={'large'}
+        <Button type="text"
+                style={{color: 'black', float: 'right', display: judgeAuthority("删除项目") === true ? "inline" : "none"}}
+                icon={<DeleteTwoTone/>} size={'large'}
                 onClick={deleteSprintList}>删除</Button>
-        <Button type="text" style={{color: 'black', float: 'right'}} icon={<EditTwoTone/>} size={'large'}
+        <Button type="text"
+                style={{color: 'black', float: 'right', display: judgeAuthority("修改项目名称") === true ? "inline" : "none"}}
+                icon={<EditTwoTone/>} size={'large'}
                 onClick={modifyProject}>修改</Button>
-        <Button type="text" style={{color: 'black', float: 'right'}} icon={<FolderAddTwoTone/>} size={'large'}
+        <Button type="text"
+                style={{color: 'black', float: 'right', display: judgeAuthority("新增项目") === true ? "inline" : "none"}}
+                icon={<FolderAddTwoTone/>} size={'large'}
                 onClick={addProject}>新增</Button>
       </div>
 
@@ -821,8 +833,8 @@ const SprintList: React.FC<any> = () => {
           <Row gutter={16}>
             <Col className="gutter-row">
               <div style={rightStyle}>
-                <Form.Item name="starttime" label="开始时间">
-                  <DatePicker style={widths} allowClear={false}/>
+                <Form.Item name="starttime" label="开始时间"  >
+                  <DatePicker style={widths} disabled={true} allowClear={false}/>
                 </Form.Item>
               </div>
             </Col>

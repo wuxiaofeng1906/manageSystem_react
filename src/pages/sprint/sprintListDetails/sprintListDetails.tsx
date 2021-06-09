@@ -31,6 +31,7 @@ import {
 import axios from 'axios';
 import moment from "moment";
 import {getHeight} from '@/publicMethods/pageSet';
+import {judgeAuthority} from "@/publicMethods/authorityJudge";
 
 const {Option} = Select;
 
@@ -291,6 +292,9 @@ const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
+    const sys_accessToken = localStorage.getItem("accessId");
+    axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
+
     /* 获取网页的项目id */
     let prjId: string = '';
     let prjNames: string = '';
@@ -1450,24 +1454,45 @@ const SprintList: React.FC<any> = () => {
         <div style={{background: 'white', marginTop: "20px"}}>
           {/* 使用一个图标就要导入一个图标 */}
           {/* 明细操作按钮 */}
-          <Button type="text" style={{color: 'black'}} icon={<FolderAddTwoTone/>} size={'large'}
+
+          <Button type="text" style={{color: 'black', display: judgeAuthority("新增项目明细行") === true ? "inline" : "none"}}
+                  icon={<FolderAddTwoTone/>} size={'large'}
                   onClick={addProject}>新增</Button>
-          <Button type="text" style={{color: 'black'}} icon={<EditTwoTone/>} size={'large'}
+          <Button type="text" style={{color: 'black', display: judgeAuthority("修改项目明细行") === true ? "inline" : "none"}}
+                  icon={<EditTwoTone/>} size={'large'}
                   onClick={btnModifyProject}>修改</Button>
-          <Button type="text" style={{color: 'black'}} icon={<DeleteTwoTone/>} size={'large'}
+          <Button type="text" style={{color: 'black', display: judgeAuthority("删除项目明细行") === true ? "inline" : "none"}}
+                  icon={<DeleteTwoTone/>} size={'large'}
                   onClick={deleteSprintDetails}>删除</Button>
-          <Button type="text" style={{color: 'black'}} icon={<SnippetsTwoTone/>} size={'large'}
+          <Button type="text" style={{color: 'black', display: judgeAuthority("移动项目明细行") === true ? "inline" : "none"}}
+                  icon={<SnippetsTwoTone/>} size={'large'}
                   onClick={moveProject}>移动</Button>
           {/* 操作流程按钮 */}
-          <Button type="text" style={{color: 'black', float: 'right'}} icon={<CheckSquareTwoTone/>} size={'large'}
+          <Button type="text" style={{color: 'black'}} size={'large'}> </Button>
+
+          <Button type="text"
+                  style={{color: 'black', float: 'right', display: judgeAuthority("线上已验证") === true ? "inline" : "none"}}
+                  icon={<CheckSquareTwoTone/>} size={'large'}
                   onClick={flowForOnlineChecked}>线上已验证</Button>
-          <Button type="text" style={{color: 'black', float: 'right'}} icon={<CheckSquareTwoTone/>} size={'large'}
+          <Button type="text"
+                  style={{color: 'black', float: 'right', display: judgeAuthority("灰度已验证") === true ? "inline" : "none"}}
+                  icon={<CheckSquareTwoTone/>} size={'large'}
                   onClick={flowForHuiduChecked}>灰度已验证</Button>
-          <Button type="text" style={{color: 'black', float: 'right'}} icon={<CheckSquareTwoTone/>} size={'large'}
+          <Button type="text" style={{
+            color: 'black',
+            float: 'right',
+            display: judgeAuthority("测试已验revert") === true ? "inline" : "none"
+          }} icon={<CheckSquareTwoTone/>} size={'large'}
                   onClick={flowForTestRevert}>测试已验revert</Button>
-          <Button type="text" style={{color: 'black', float: 'right'}} icon={<CheckSquareTwoTone/>} size={'large'}
+          <Button type="text" style={{
+            color: 'black',
+            float: 'right',
+            display: judgeAuthority("开发已revert") === true ? "inline" : "none"
+          }} icon={<CheckSquareTwoTone/>} size={'large'}
                   onClick={flowForDevRevert}>开发已revert</Button>
-          <Button type="text" style={{color: 'black', float: 'right'}} icon={<CloseSquareTwoTone/>} size={'large'}
+          <Button type="text"
+                  style={{color: 'black', float: 'right', display: judgeAuthority("取消") === true ? "inline" : "none"}}
+                  icon={<CloseSquareTwoTone/>} size={'large'}
                   onClick={flowForCancle}>取消</Button>
           <label style={{marginTop: '10px', color: 'black', fontWeight: 'bold', float: 'right'}}>操作流程:</label>
         </div>

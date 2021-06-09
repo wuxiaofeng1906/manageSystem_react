@@ -122,6 +122,12 @@ const Login: React.FC<{}> = () => {
           });
         });
     }
+
+    setTimeout(function () {
+      console.log("等待延时");
+    }, 3000);
+
+
     return okFlag;
   };
 

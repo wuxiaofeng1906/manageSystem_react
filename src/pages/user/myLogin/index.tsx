@@ -78,7 +78,6 @@ const Login: React.FC<{}> = () => {
   };
 
   const getUsersInfo = async (windowURL: any) => {
-    debugger;
     let okFlag = false;
     let userCode = "";
     if (windowURL.indexOf("?") !== -1) {
@@ -127,8 +126,11 @@ const Login: React.FC<{}> = () => {
   };
 
 
-  const flag = useRequest(() => getUsersInfo(window.location.href)).data;
+  const {data, loading} = useRequest(() => getUsersInfo(window.location.href));
 
+  console.log(loading);
+  debugger;
+  const flag = data;
   if (flag === false) {
     setTimeout(function () {
       console.log("等待延时");

@@ -1066,24 +1066,35 @@ const SprintList: React.FC<any> = () => {
         });
         return;
       }
-      if (selRows.length > 1) {
-        message.error({
-          content: '一次只能删除一条数据!',
-          duration: 1,
-          className: 'delMore',
-          style: {
-            marginTop: '50vh',
-          },
-        });
-        return;
-      }
+      // if (selRows.length > 1) {
+      //   message.error({
+      //     content: '一次只能删除一条数据!',
+      //     duration: 1,
+      //     className: 'delMore',
+      //     style: {
+      //       marginTop: '50vh',
+      //     },
+      //   });
+      //   return;
+      // }
       setIsDelModalVisible(true);
     };
 
     const delSprintList = () => {
       const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
-      const detailsId = selRows[0].id;
-      const url = `/api/sprint/project/child/${detailsId}`;
+      const deleteIdArray: any = [];
+      selRows.forEach((rows: any) => {
+        const {id} = rows;
+        if (rows.category === 1) {
+          deleteIdArray.push(`BUG_${id}`);
+        } else if (rows.category === 2) {
+          deleteIdArray.push(`TASK_${id}`);
+        } else if (rows.category === 3) {
+          deleteIdArray.push(`STORY_${id}`);
+        }
+
+      });
+      const url = `/api/sprint/project/child/${deleteIdArray}`;
       axios
         .delete(url)
         .then(function (res) {

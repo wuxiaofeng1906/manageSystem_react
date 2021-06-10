@@ -61,9 +61,9 @@ const Login: React.FC<{}> = () => {
   const intl = useIntl();
 
   const fetchUserInfo = async (userInfos: any) => {
-    debugger;
-    // console.log("userInfos.authorities", JSON.stringify(userInfos.authorities));
-    localStorage.setItem("accessId", userInfos.access_token);
+
+    // 测试时的token
+    localStorage.setItem("accessId", userInfos.access_token); // 正式环境应放开
     localStorage.setItem("authority", JSON.stringify(userInfos.authorities));
 
     let accessRole = "user";
@@ -531,7 +531,7 @@ const Login: React.FC<{}> = () => {
         "parent": {"id": 4, "name": "authority", "level": 0, "description": "权限", "parentId": null}
       }];
 
-    localStorage.setItem("accessId", 'testID');
+    localStorage.setItem("accessId", 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IuWQtOaZk-WHpCIsInN1YiI6Ild1WGlhb0ZlbmciLCJpYXQiOjE2MjMzMTExMzcsImV4cCI6MTYyMzMxNDczN30.x_lgUYPwwPW8Wjzmhj2nestCh8RhMdzAX3lTjIeSr2k');
     localStorage.setItem("authority", JSON.stringify(te));
 
     const userInfos = {

@@ -301,6 +301,7 @@ const UserDetails: React.FC<any> = () => {
               <div>
                 <Checkbox.Group options={allMember} value={selectedUser} onChange={userSelectChange}/>
               </div>
+
               {/* <div style={{position: "absolute", bottom: 0}}> */}
               <div style={{
                 marginLeft: "-6px",

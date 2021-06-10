@@ -121,25 +121,9 @@ const queryAllAuthorityViews = async (client: GqlClient<object>) => {
         }
       }
   `);
-  const {errors} = await client.query(`
-      {
-        authorityItems{
-          id
-          name
-          description
-          parent{
-            id
-            name
-            description
-          }
-        }
-      }
-  `);
 
-
-
-  console.log("获取所有的方法功能 data?.authorityItems", data?.authorityItems);
-  console.log("获取所有的方法功能 errors", errors);
+  // console.log("获取所有的方法功能 data?.authorityItems", data?.authorityItems);
+  // console.log("获取所有的方法功能 errors", errors);
   return data?.authorityItems;
 };
 

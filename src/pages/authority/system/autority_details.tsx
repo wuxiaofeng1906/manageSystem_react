@@ -65,7 +65,7 @@ const alayAllAuthority = (params: any) => {
   const datas = [];
   const allModule: any = [];
   const allMethod: any = [];
-  if (params !== undefined) {
+  if (params !== undefined && params !== null) {
     // 先找寻parent（parent就是模块）
     const moduleArray = Array();
     params.forEach((ele: any) => {
@@ -377,7 +377,9 @@ const AuthorityDetails: React.FC<any> = () => {
                      <Checkbox checked={checkAll} onChange={selectAll}>全选</Checkbox>
                    </Table.Summary.Cell>
                    <Table.Summary.Cell index={2}>
-                     <div><Button type="primary" style={{display: judgeAuthority("修改权限组的人员") === true ? "inline" : "none"}} onClick={saveAuthority}> 保存 </Button> <Button
+                     <div><Button type="primary"
+                                  style={{display: judgeAuthority("修改权限组的人员") === true ? "inline" : "none"}}
+                                  onClick={saveAuthority}> 保存 </Button> <Button
                        onClick={returns}> 返回 </Button></div>
                    </Table.Summary.Cell>
                  </Table.Summary.Row>

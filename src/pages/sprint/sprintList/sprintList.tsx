@@ -105,7 +105,7 @@ const SprintList: React.FC<any> = () => {
 
   const sys_accessToken = localStorage.getItem("accessId");
   axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
-  debugger;
+
   // 定义列名
   const colums = () => {
     const component = new Array();

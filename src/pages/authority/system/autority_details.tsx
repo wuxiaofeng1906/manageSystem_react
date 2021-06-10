@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {getHeight} from '@/publicMethods/pageSet';
 import {PageContainer} from "@ant-design/pro-layout";
-import {Table, Space, Button, Checkbox, message} from 'antd';
+import {Table, Space, Button, Checkbox, message, Row, Col} from 'antd';
 import {history} from "@@/core/history";
 import {addOrRemoveElement} from '@/publicMethods/arrayMethod';
 import type {GqlClient} from "@/hooks";
@@ -270,6 +270,21 @@ const AuthorityDetails: React.FC<any> = () => {
 
   /* endregion */
 
+  const GetMethod = (method: any) => {
+    const methodArray = method.params;
+    return <Row>
+      <Col>
+        {
+          methodArray.map((item: string) => {
+            return <Checkbox style={{marginLeft: "10px", width: "150px", whiteSpace: "nowrap", overflow: "hidden",textOverflow:"ellipsis"}}
+                             value={item}>{item}</Checkbox>;
+          })
+        }
+      </Col>
+    </Row>;
+  };
+
+
   // 列的定义
   const columns = [
     {
@@ -293,7 +308,9 @@ const AuthorityDetails: React.FC<any> = () => {
       title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 方法</span>,
       key: 'method',
       render: (text: any) => (
-        <CheckboxGroup options={text.method} value={methodList} onChange={onMethodChange}/>
+        <Checkbox.Group value={methodList} onChange={onMethodChange}>
+          <GetMethod params={text.method}/>
+        </Checkbox.Group>
       ),
     },
   ];

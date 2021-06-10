@@ -162,11 +162,90 @@ const UserDetails: React.FC<any> = () => {
   // 查询已勾选的成员
   const initSelectedUser: any = useRequest(() => queryAuthUsers(gqlClient, groupId)).data;
 
+  // 组内人员
+  const GetInGroupusers = () => {
+    if (initSelectedUser === undefined) {
+      return <label></label>;
+    }
+
+    return <Row>
+      <Col>
+        {
+          initSelectedUser.map((item: string) => {
+            return <Checkbox
+              style={{
+                width: "85px",
+                marginLeft: "10px",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis"
+              }}
+              value={item}>{item}</Checkbox>;
+          })
+        }
+      </Col>
+    </Row>;
+  };
+
+  // 组外人员
+  const GetOutGroupusers = () => {
+    if (allGroupMember === undefined) {
+      return <label></label>;
+    }
+    const arrays = allGroupMember.nameArray;
+    if (initSelectedUser.length > 0) {
+      // 要去除已选择的人员放到组内人员中去
+      return <Row>
+        <Col>
+          {
+            arrays.map((item: string) => {
+              if (initSelectedUser.indexOf(item) === -1) {
+                return <Checkbox
+                  style={{
+                    width: "85px",
+                    marginLeft: "10px",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis"
+                  }}
+                  value={item}>{item}
+                </Checkbox>;
+              }
+              return <label></label>;
+            })
+          }
+        </Col>
+      </Row>;
+
+    }
+    return <Row>
+      <Col>
+        {
+          arrays.map((item: string) => {
+
+            return <Checkbox
+              style={{
+                width: "85px",
+                marginLeft: "10px",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis"
+              }}
+              value={item}>{item}</Checkbox>;
+          })
+        }
+      </Col>
+    </Row>;
+
+  };
+
 
   /* endregion */
 
   /* region 部门树选择事件 */
-  const [selectedUser, setSelectedUser] = useState(['']);
+  const [inGroupUser, setIngroupUser] = useState(['']);
+  const [outGroupUser, setOutGroupUser] = useState(['']);
+
   const [allMember, setAllMember] = useState(['']);
 
   const onSelect = async (selectedKeys: any, info: any) => {
@@ -174,7 +253,7 @@ const UserDetails: React.FC<any> = () => {
     const keys = selectedKeys[0];
     const deptMember = await queryGroupAllUsers(gqlClient, keys);
     setAllMember(deptMember.nameArray);
-    setSelectedUser(initSelectedUser);
+    setIngroupUser(initSelectedUser);
 
   };
 
@@ -182,10 +261,16 @@ const UserDetails: React.FC<any> = () => {
 
   /* region 人员选择触发事件 */
 
-  const userSelectChange = (checkedValues: any) => {
-
-    setSelectedUser(checkedValues);
+  // 组内人员出发
+  const userInGroupSelectChange = (checkedValues: any) => {
+    setIngroupUser(checkedValues);
   };
+
+  // 组外人员触发
+  const userOutGroupSelectChange = (checkedValues: any) => {
+    setOutGroupUser(checkedValues);
+  };
+
 
   /* endregion */
 
@@ -195,20 +280,18 @@ const UserDetails: React.FC<any> = () => {
     // 保存人员
     const idArray: any = [];
 
-    // 将原有的人也一并加进去
-    // const initUsers = initSelectedUser;
-    // initUsers.forEach((eles: string) => {
-    //   for (let index = 0; index < idData.length; index += 1) {
-    //     const dets = idData[index];
-    //     if (dets.name === eles) {
-    //       idArray.push(dets.userid);
-    //       break;
-    //     }
-    //   }
-    // });
+    outGroupUser.forEach((eles: string) => {
 
+      for (let index = 0; index < idData.length; index += 1) {
+        const dets = idData[index];
+        if (dets.name === eles) {
+          idArray.push(dets.userid);
+          break;
+        }
+      }
+    });
 
-    selectedUser.forEach((eles: string) => {
+    inGroupUser.forEach((eles: string) => {
 
       for (let index = 0; index < idData.length; index += 1) {
         const dets = idData[index];
@@ -261,8 +344,9 @@ const UserDetails: React.FC<any> = () => {
     if (allGroupMember !== undefined) {
       setAllMember(allGroupMember.nameArray);
     }
-    setSelectedUser(initSelectedUser);
+    setIngroupUser(initSelectedUser);
   }, [initSelectedUser, allGroupMember]);
+
 
   return (
     <PageContainer title={pageTitle} style={{height: window.innerHeight - 100, backgroundColor: "white"}}>
@@ -271,52 +355,77 @@ const UserDetails: React.FC<any> = () => {
 
         <Row gutter={16}>
           {/* 部门tree */}
-          <Col span={6}
-               style={{backgroundColor: "white"}}>
+          <Col span={6} style={{backgroundColor: "white"}}>
 
             <div>
               <Tree
                 showLine
                 switcherIcon={<DownOutlined/>}
-                defaultExpandAll={true}
+
                 onSelect={onSelect}
                 treeData={treeDept}
                 style={{
-                  height: window.innerHeight - 250,
+                  // height: window.innerHeight ,
                   boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2'
                 }} // 左 上
-              />
+                defaultExpandAll={true}
+                defaultExpandParent={true}
+              />{null}
             </div>
 
           </Col>
 
           {/* 组内成员 */}
-          <Col span={18}
-               style={{
-                 height: window.innerHeight - 250,
-                 backgroundColor: "white",
-                 boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2'
-               }}>
-            <div>
-              <div>
-                <Checkbox.Group options={allMember} value={selectedUser} onChange={userSelectChange}/>
-              </div>
+          <Col span={18} style={{
 
-              {/* <div style={{position: "absolute", bottom: 0}}> */}
+            // height: window.innerHeight ,
+
+            backgroundColor: "white",
+            boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2'
+          }}>
+
+            {/* 组内成员 */}
+
+            <Row style={{marginLeft: "-7px", width: "101%", backgroundColor: "#F2F2F2"}}>
+              <Col span={2}>
+                <label style={{fontWeight: "bold", marginLeft: "10px"}}> 组内用户</label>
+              </Col>
+              <Col span={22}>
+                <Checkbox.Group onChange={userInGroupSelectChange} value={inGroupUser}>
+                  <GetInGroupusers/>
+                </Checkbox.Group>
+              </Col>
+            </Row>
+
+            {/* 组外成员 */}
+
+            <Row style={{marginTop: "20px", marginLeft: "-7px", width: "101%"}}>
+              <Col span={2}>
+                <label style={{fontWeight: "bold", marginLeft: "10px"}}> 组外用户</label>
+              </Col>
+              <Col span={22}>
+                <Checkbox.Group onChange={userOutGroupSelectChange}>
+                  <GetOutGroupusers/>
+                </Checkbox.Group>
+
+              </Col>
+            </Row>
+
+            <Row>
               <div style={{
                 marginLeft: "-6px",
-                width: "100%",
-                boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2',
-                marginTop: "50px",
+                width: "120%",
+                marginTop: "20px",
+                // boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2',
                 backgroundColor: "#F2F2F2",
-                position: "absolute",
-                bottom: 0
+
               }}>
-                <Button style={{display: judgeAuthority("修改权限组的人员") === true ? "inline" : "none"}}
+                <Button style={{marginLeft: "40%", display: judgeAuthority("修改权限组的人员") === true ? "inline" : "none"}}
                         type="primary" onClick={saveUsers}> 保存 </Button>
-                <Button style={{marginLeft: "30px"}} type="primary" onClick={returns}> 返回 </Button>
+                <Button style={{marginLeft: judgeAuthority("修改权限组的人员") === true ? "30px" : "40%"}} type="primary"
+                        onClick={returns}> 返回 </Button>
               </div>
-            </div>
+            </Row>
 
           </Col>
         </Row>

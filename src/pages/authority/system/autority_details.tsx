@@ -197,7 +197,6 @@ const AuthorityDetails: React.FC<any> = () => {
 
   /* region 数据查询 */
   const gqlClient = useGqlClient();
-  debugger;
   // 查询所有权限
   const {data} = useRequest(() => queryAllAuthorityViews(gqlClient));
   // 将数据解析成表格可用的格式
@@ -276,8 +275,13 @@ const AuthorityDetails: React.FC<any> = () => {
       <Col>
         {
           methodArray.map((item: string) => {
-            return <Checkbox style={{marginLeft: "10px", width: "150px", whiteSpace: "nowrap", overflow: "hidden",textOverflow:"ellipsis"}}
-                             value={item}>{item}</Checkbox>;
+            return <Checkbox style={{
+              marginLeft: "10px",
+              width: "150px",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis"
+            }} value={item}>{item}</Checkbox>;
           })
         }
       </Col>

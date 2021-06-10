@@ -56,8 +56,8 @@ const queryselectedAuthorityViews = async (client: GqlClient<object>, groupId: a
       }
   `);
 
-  console.log("已选择的方法功能 data?.roleAuthority",data?.roleAuthority);
-
+  console.log("已选择的方法功能 data?.roleAuthority", data?.roleAuthority);
+  console.log("已选择的方法功能 errors", data?.errors);
   return alaySelectedAuthority(data?.roleAuthority);
 };
 /* endregion */
@@ -122,7 +122,8 @@ const queryAllAuthorityViews = async (client: GqlClient<object>) => {
       }
   `);
 
-  console.log("获取所有的方法功能 data?.authorityItems",data?.authorityItems);
+  console.log("获取所有的方法功能 data?.authorityItems", data?.authorityItems);
+  console.log("获取所有的方法功能 errors", data?.errors);
   return data?.authorityItems;
 };
 

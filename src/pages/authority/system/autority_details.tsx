@@ -56,6 +56,8 @@ const queryselectedAuthorityViews = async (client: GqlClient<object>, groupId: a
       }
   `);
 
+  console.log("已选择的方法功能 data?.roleAuthority",data?.roleAuthority);
+
   return alaySelectedAuthority(data?.roleAuthority);
 };
 /* endregion */
@@ -120,6 +122,7 @@ const queryAllAuthorityViews = async (client: GqlClient<object>) => {
       }
   `);
 
+  console.log("获取所有的方法功能 data?.authorityItems",data?.authorityItems);
   return data?.authorityItems;
 };
 
@@ -173,7 +176,6 @@ const getselectedId = (alls: any, sModule: any, sMethod: any) => {
 
 const AuthorityDetails: React.FC<any> = () => {
   const sys_accessToken = localStorage.getItem("accessId");
-  debugger;
 
   const clickedRowData = {
     module: [],
@@ -194,6 +196,7 @@ const AuthorityDetails: React.FC<any> = () => {
 
   /* region 数据查询 */
   const gqlClient = useGqlClient();
+  debugger;
   // 查询所有权限
   const {data} = useRequest(() => queryAllAuthorityViews(gqlClient));
   // 将数据解析成表格可用的格式

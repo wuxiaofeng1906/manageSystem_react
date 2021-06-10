@@ -57,7 +57,7 @@ const queryselectedAuthorityViews = async (client: GqlClient<object>, groupId: a
   `);
 
   console.log("已选择的方法功能 data?.roleAuthority", data?.roleAuthority);
-  console.log("已选择的方法功能 errors", data?.errors);
+
   return alaySelectedAuthority(data?.roleAuthority);
 };
 /* endregion */
@@ -121,9 +121,25 @@ const queryAllAuthorityViews = async (client: GqlClient<object>) => {
         }
       }
   `);
+  const {errors} = await client.query(`
+      {
+        authorityItems{
+          id
+          name
+          description
+          parent{
+            id
+            name
+            description
+          }
+        }
+      }
+  `);
+
+
 
   console.log("获取所有的方法功能 data?.authorityItems", data?.authorityItems);
-  console.log("获取所有的方法功能 errors", data?.errors);
+  console.log("获取所有的方法功能 errors", errors);
   return data?.authorityItems;
 };
 
@@ -359,7 +375,7 @@ const AuthorityDetails: React.FC<any> = () => {
 
   useEffect(() => {
     if (selectedAuthority !== undefined) {
-      console.log("selectedAuthority.methodData", selectedAuthority.moduleData);
+      // console.log("selectedAuthority.methodData", selectedAuthority.moduleData);
       setMethodList(selectedAuthority.methodData);
       setModuleList(selectedAuthority.moduleData);
     }

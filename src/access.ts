@@ -2,6 +2,7 @@
 export default function access(initialState: { currentUser?: API.CurrentUser | undefined }) {
   const {currentUser} = initialState || {};
   return {
-    canAdmin: currentUser && currentUser.access === 'admin',
+    sysAdmin: currentUser && currentUser.access === 'sys_admin',
+    spAdmin: currentUser && (currentUser.access === 'sys_admin' || currentUser.access === 'sprint_admin'),
   };
 }

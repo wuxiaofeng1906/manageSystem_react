@@ -60,8 +60,7 @@ export default [
     name: 'sprint 工作台',
     icon: 'table',
     path: '/sprint',
-    // hideInMenu: true,
-    routes: [
+     routes: [
       {
         name: 'dsahboard',
         path: 'sprintDashboard',
@@ -104,7 +103,7 @@ export default [
       {
         name: 'sprint 列表',
         path: 'sprintList',
-        access: 'canAdmin',
+        access: 'spAdmin',
         component: './sprint/sprintList/sprintList',
       },
       {
@@ -304,9 +303,8 @@ export default [
     name: '系统管理',
     icon: 'table',
     path: '/authority',
-    access: 'canAdmin',
-    // hideInMenu: true,
-    routes: [
+    access: 'sysAdmin',
+     routes: [
       {
         name: '权限管理',
         path: 'main',

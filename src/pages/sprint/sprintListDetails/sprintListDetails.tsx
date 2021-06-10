@@ -32,6 +32,7 @@ import axios from 'axios';
 import moment from "moment";
 import {getHeight} from '@/publicMethods/pageSet';
 import {judgeAuthority} from "@/publicMethods/authorityJudge";
+import {useModel} from "@@/plugin-model/useModel";
 
 const {Option} = Select;
 
@@ -292,6 +293,9 @@ const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
+    const {initialState} = useModel('@@initialState');
+    debugger;
+
     const sys_accessToken = localStorage.getItem("accessId");
     axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
     /* 获取网页的项目id */
@@ -977,24 +981,32 @@ const SprintList: React.FC<any> = () => {
     // 不同权限修改不同页面
     const authorityForMod = (detailsInfo: any) => {
       // 判断人员权限（admin，测试，开发经理（开发）,UED）
-      let currentUser = '';
-      currentUser = 'admin';
-      switch (currentUser) {
-        case 'admin':
-          adminModify(detailsInfo);
-          break;
-        case 'tester':
-          testerModify(detailsInfo);
-          break;
-        case 'manager':
-          managerModify(detailsInfo);
-          break;
-        case 'UED':
-          uedModify(detailsInfo);
-          break;
-        default:
-          break;
+      let currentUser;
+      if (initialState?.currentUser) {
+        currentUser = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
       }
+
+      if (currentUser !== undefined) {
+        switch (currentUser.toString()) {
+          case 'superGroup':
+          case 'projectListMG':
+            adminModify(detailsInfo);
+            break;
+          case 'testGroup':
+            testerModify(detailsInfo);
+            break;
+          case 'devManageGroup':
+          case 'devGroup':
+            managerModify(detailsInfo);
+            break;
+          case 'UedGroup':
+            uedModify(detailsInfo);
+            break;
+          default:
+            break;
+        }
+      }
+
     };
 
     // 修改按钮点击事件

@@ -9,6 +9,7 @@ import {ApolloClient, InMemoryCache} from '@apollo/client';
 import {GqlClient} from "@/hooks";
 import {queryCurrent} from './services/user';
 import defaultSettings from '../config/defaultSettings';
+import axios from "axios";
 
 /**
  * 获取用户信息比较慢的时候会展示一个 loading
@@ -17,9 +18,14 @@ export const initialStateConfig = {
   loading: <PageLoading/>,
 };
 
+const sys_accessToken = localStorage.getItem("accessId");
+debugger;
+console.log("sys_accessToken",sys_accessToken);
+
 const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
   uri: "/api/graphql",
+  headers:{Authorization:`Bearer ${localStorage.getItem("accessId")}`},
   defaultOptions: {
     watchQuery: {
       fetchPolicy: 'no-cache',

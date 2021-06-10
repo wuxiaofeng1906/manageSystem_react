@@ -1085,11 +1085,11 @@ const SprintList: React.FC<any> = () => {
       const deleteIdArray: any = [];
       selRows.forEach((rows: any) => {
         const {id} = rows;
-        if (rows.category === 1) {
+        if (rows.category === "1") {
           deleteIdArray.push(`BUG_${id}`);
-        } else if (rows.category === 2) {
+        } else if (rows.category === "2") {
           deleteIdArray.push(`TASK_${id}`);
-        } else if (rows.category === 3) {
+        } else if (rows.category === "3") {
           deleteIdArray.push(`STORY_${id}`);
         }
 

@@ -1049,9 +1049,9 @@ const SprintList: React.FC<any> = () => {
 
     /* region 删除功能 */
 
-// 删除sprint列表
+    // 删除sprint列表
     const [isdelModalVisible, setIsDelModalVisible] = useState(false);
-// 删除按钮点击
+    // 删除按钮点击
     const deleteSprintDetails = () => {
       // 判断是否选中数据
       const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
@@ -1386,7 +1386,15 @@ const SprintList: React.FC<any> = () => {
       const selRows: any = gridApi.current?.getSelectedRows();
       const selIds = [];
       for (let index = 0; index < selRows.length; index += 1) {
-        selIds.push(selRows[index].id);
+
+        const rows = selRows[index];
+        if (rows.category === "1") {
+          selIds.push(`BUG_${rows.id}`);
+        } else if (rows.category === "2") {
+          selIds.push(`TASK_${rows.id}`);
+        } else if (rows.category === "3") {
+          selIds.push(`STORY_${rows.id}`);
+        }
       }
       const params = {
         id: selIds,

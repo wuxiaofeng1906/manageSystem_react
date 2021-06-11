@@ -101,7 +101,7 @@ export default [
         hideInMenu: true,
       },
       {
-        name: 'sprint 列表',
+        name: '项目列表',
         path: 'sprintList',
         access: 'spAdmin',
         component: './sprint/sprintList/sprintList',

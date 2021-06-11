@@ -208,7 +208,7 @@ const SprintList: React.FC<any> = () => {
         headerName: '访问禅道',
         field: 'ztId',
         cellRenderer: (params: any) => {
-          return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://172.31.1.219:8384/zentao/project-task-${params.value}.html'>去禅道</a>`;
+          return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/project-task-${params.value}.html'>去禅道</a>`;
         },
       },
     );

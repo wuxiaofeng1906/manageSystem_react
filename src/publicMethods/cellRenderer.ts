@@ -220,7 +220,7 @@ const linkToZentaoPage = (params: any) => {
     default:
       break;
   }
-  return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://172.31.1.219:8384/zentao/${ztCategory}-view-${params.value}.html'>${params.value}</a>`;
+  return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/${ztCategory}-view-${params.value}.html'>${params.value}</a>`;
 
 };
 

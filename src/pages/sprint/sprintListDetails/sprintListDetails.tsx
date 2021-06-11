@@ -1547,10 +1547,13 @@ const SprintList: React.FC<any> = () => {
               filter: true,
               flex: 1,
               minWidth: 100,
+              cellStyle: {"line-height":"30px"}
             }}
             autoGroupColumnDef={{
               minWidth: 100,
             }}
+            rowHeight={32}
+            headerHeight={35}
             rowSelection={'multiple'} // 设置多行选中
             groupDefaultExpanded={9} // 展开分组
             onGridReady={onGridReady}

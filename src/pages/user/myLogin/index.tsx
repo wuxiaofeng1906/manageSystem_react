@@ -531,7 +531,7 @@ const Login: React.FC<{}> = () => {
         "parent": {"id": 4, "name": "authority", "level": 0, "description": "权限", "parentId": null}
       }];
 
-    localStorage.setItem("accessId", 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IuWQtOaZk-WHpCIsInN1YiI6Ild1WGlhb0ZlbmciLCJpYXQiOjE2MjMzNzg4OTAsImV4cCI6MTYyMzM4MjQ5MH0.knMp7c28Ta4c4IVLtWWyi7JZ359KjnOAEIY5z3e90CI');
+    localStorage.setItem("accessId", 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IuWQtOaZk-WHpCIsInN1YiI6Ild1WGlhb0ZlbmciLCJpYXQiOjE2MjMzOTEwOTEsImV4cCI6MTYyMzM5NDY5MX0.5W3sBGnmq4tbFWmvpUYDFIaNK-tBPYj5vcetoZZONuI');
     localStorage.setItem("authority", JSON.stringify(te));
 
     const userInfos = {

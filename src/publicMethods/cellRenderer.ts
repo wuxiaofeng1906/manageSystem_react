@@ -1,4 +1,7 @@
 const numberRenderToYesNo = (params: any) => {
+  if (params.value === "") {
+    return "";
+  }
   if (params.value === "0") {
     return "否";
   }
@@ -6,6 +9,9 @@ const numberRenderToYesNo = (params: any) => {
 };
 
 const numberRenderTopass = (params: any) => {
+  if (params.value === "") {
+    return "";
+  }
   if (params.value === "0") {
     return "未通过";
   }
@@ -65,17 +71,62 @@ const numberRenderToCurrentStage = (params: any) => {
   }
 
   return stage;
-  //   WAIT = 1,
-  //   ON_DEVELOP = 2,
-  //   SUBMIT_TEST = 3,
-  //   ON_TEST = 4,
-  //   TE_PASS = 5,
-  //   UED_PASS = 6,
-  //   CANCELLED = 7,
-  //   DEVELOP_REVERT = 8,
-  //   TESTER_REVERT = 9,
-  //   STAGE_CHECKED = 10,
-  //   ONLINE_CHECKED = 11,
+
+};
+
+const numberRenderToCurrentStageForColor = (params: any) => {
+  let stage = "";
+
+  if (params.value !== null) {
+    switch (params.value.toString()) {
+      case "1":
+        stage = "未开始";
+        break;
+      case "2":
+        stage = "开发中";
+        break;
+      case "3":
+        stage = "开发完";
+        break;
+      case "4":
+        stage = "已提测";
+        break;
+      case "5":
+        stage = "测试中";
+        break;
+      case "6":
+        stage = "TE测试环境已验过";
+        break;
+      case "7":
+        stage = "UED测试环境已验过";
+        break;
+      case "8":
+        stage = "已取消";
+        break;
+      case "9":
+        stage = "开发已revert";
+        break;
+      case "10":
+        stage = "测试已验证revert";
+        break;
+      case "11":
+        stage = "灰度已验过";
+        break;
+      case "12":
+        stage = "线上已验过";
+        break;
+
+      default:
+        break;
+    }
+
+  }
+
+
+  if (stage === "未开始") {
+    return `<span style="color: red"> ${stage} </span>`;
+  }
+  return stage;
 
 };
 
@@ -164,6 +215,53 @@ const numberRenderToZentaoStatus = (params: any) => {
       break;
     default:
       break;
+  }
+  return status;
+};
+
+const numberRenderToZentaoStatusForRed = (params: any) => {
+
+  let status = "";
+  switch (params.value) {
+    case "active":
+      status = "激活";
+      break;
+    case "closed":
+      status = "已关闭";
+      break;
+    case "verified":
+      status = " 已验证";
+      break;
+    case "resolved":
+      status = "已解决";
+      break;
+    case "wait":
+      status = "未开始";
+      break;
+    case "doing":
+      status = "进行中";
+      break;
+    case "done":
+      status = "已完成";
+      break;
+    case "pause":
+      status = "已暂停";
+      break;
+    case "cancel":
+      status = "已取消";
+      break;
+    case "changed":
+      status = "已更改";
+      break;
+    case "draft":
+      status = "已草拟";
+      break;
+    default:
+      break;
+  }
+
+  if (status === "激活" || status === "未开始") {
+    return `<span style="color: red"> ${status} </span>`;
   }
   return status;
 };
@@ -267,6 +365,8 @@ export {
   numberRenderToSource,
   linkToZentaoPage,
   moduleChange,
-  colorRender
+  colorRender,
+  numberRenderToZentaoStatusForRed,
+  numberRenderToCurrentStageForColor
 };
 

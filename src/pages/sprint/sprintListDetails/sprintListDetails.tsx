@@ -22,11 +22,13 @@ import {
   numberRenderToYesNo,
   numberRenderTopass,
   numberRenderToCurrentStage,
+  numberRenderToCurrentStageForColor,
   numberRenderToZentaoType,
   numberRenderToZentaoSeverity,
   numberRenderToZentaoStatus,
   numberRenderToSource,
   linkToZentaoPage,
+  numberRenderToZentaoStatusForRed
 } from '@/publicMethods/cellRenderer';
 import axios from 'axios';
 import moment from "moment";
@@ -58,7 +60,7 @@ const colums = () => {
     {
       headerName: '当前阶段',
       field: 'stage',
-      cellRenderer: numberRenderToCurrentStage,
+      cellRenderer: numberRenderToCurrentStageForColor,
     },
     {
       headerName: '测试负责人填写',
@@ -102,7 +104,7 @@ const colums = () => {
         {
           headerName: '禅道状态',
           field: 'ztStatus',
-          cellRenderer: numberRenderToZentaoStatus,
+          cellRenderer: numberRenderToZentaoStatusForRed,
         },
         {
           headerName: '相关需求数',
@@ -328,6 +330,7 @@ const SprintList: React.FC<any> = () => {
     const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
     const gqlClient = useGqlClient();
     const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, prjId));
+    debugger;
     const onGridReady = (params: GridReadyEvent) => {
       gridApi.current = params.api;
       params.api.sizeColumnsToFit();
@@ -1547,7 +1550,7 @@ const SprintList: React.FC<any> = () => {
               filter: true,
               flex: 1,
               minWidth: 100,
-              cellStyle: {"line-height":"30px"}
+              cellStyle: {"line-height": "30px"}
             }}
             autoGroupColumnDef={{
               minWidth: 100,

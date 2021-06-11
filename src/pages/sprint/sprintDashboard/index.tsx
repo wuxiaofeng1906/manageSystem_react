@@ -3,7 +3,7 @@ import {PageContainer} from '@ant-design/pro-layout';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {Row, Col, Select, Card, Button} from 'antd';
+import {Row, Col, Select, Card, Button, Typography} from 'antd';
 import {Link} from 'umi';
 import {SearchOutlined} from "@ant-design/icons";
 import {history} from "@@/core/history";
@@ -14,6 +14,7 @@ import {getWeeksRange} from '@/publicMethods/timeMethods';
 import {judgeAuthority} from "@/publicMethods/authorityJudge";
 
 const {Option} = Select;
+const {Text} = Typography;
 // 全局变量
 const sprintPrjInfo = {
   prjID: "",
@@ -1123,6 +1124,12 @@ const DashBoard: React.FC<any> = () => {
 
   }, [sp_data.showFlag]);   //   sp_data.story.status.status_lack_task   em_data.Bug_no_deadline
 
+
+  const cssStyle = {
+    itemStyle: {display: "inline-block", width: "60px"},
+    linkStyle: {display: "inline-block", width: "10px"},
+    unitStyle: {marginLeft: "8px"}
+  };
   return (
 
     <PageContainer style={{height: "102%", backgroundColor: "white"}}>
@@ -1947,22 +1954,47 @@ const DashBoard: React.FC<any> = () => {
                     {/* 规范检查 */}
                     <Col span={5}>
                       <Card title={<div style={{marginTop: "-5px"}}> 规范检查 </div>}
-                            headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
+                            headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue"}}
                             bodyStyle={{height: "205px", textAlign: "left"}}>
 
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>草稿&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=draft`}>{sprint.story_status_draft}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}> 草稿</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=draft`}>
+                                {sprint.story_status_draft}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>无任务&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=no_task`}>{sprint.story_status_noTask}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}> 无任务</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=no_task`}>
+                                {sprint.story_status_noTask}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>缺任务&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=lack_task`}>{sprint.story_status_lackTask}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}> 缺任务</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=lack_task`}>
+                                {sprint.story_status_lackTask}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>无排期&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=no_deadline`}>{sprint.story_status_noDeadline}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}> 无排期</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=no_deadline`}>
+                                {sprint.story_status_noDeadline}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                           <div style={{whiteSpace: "nowrap"}}>无指派&nbsp;<Link
                             to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=no_assign`}>{sprint.story_status_noAssign}</Link>&nbsp;个
                           </div>

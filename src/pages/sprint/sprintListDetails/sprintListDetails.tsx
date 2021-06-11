@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -217,6 +217,22 @@ const colums = () => {
   return component;
 };
 
+const calTypeCount = (data: any) => {
+  let bug = 0;
+  let task = 0;
+  let story = 0;
+  data.forEach((ele: any) => {
+    if (ele.category === "1") {
+      bug += 1;
+    } else if (ele.category === "2") {
+      task += 1;
+    } else {
+      story += 1;
+    }
+
+  });
+  return {bug, task, story};
+};
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   const {data} = await client.query(`
@@ -260,7 +276,7 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
           }
       }
   `);
-  return data?.proDetail;
+  return {result: data?.proDetail, resCount: calTypeCount(data?.proDetail)};
 };
 
 // 查询是否有重复数据
@@ -296,7 +312,6 @@ const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
 // 组件初始化
 const SprintList: React.FC<any> = () => {
     const {initialState} = useModel('@@initialState');
-    debugger;
 
     const sys_accessToken = localStorage.getItem("accessId");
     axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
@@ -324,13 +339,14 @@ const SprintList: React.FC<any> = () => {
     const [formForMove] = Form.useForm();
     // 移动新增项目
     const [formForMoveAddAnaMod] = Form.useForm();
-
+    const [pageTitle, setPageTitle] = useState("");
 
     /* region  表格相关事件 */
     const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
     const gqlClient = useGqlClient();
     const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, prjId));
-    debugger;
+
+
     const onGridReady = (params: GridReadyEvent) => {
       gridApi.current = params.api;
       params.api.sizeColumnsToFit();
@@ -346,7 +362,13 @@ const SprintList: React.FC<any> = () => {
     /* region 其他 */
     const updateGrid = async () => {
       const datas: any = await queryDevelopViews(gqlClient, prjId);
-      gridApi.current?.setRowData(datas);
+      gridApi.current?.setRowData(datas?.result);
+
+      const bugs = datas?.resCount.bug === undefined ? 0 : datas?.resCount.bug;
+      const tasks = datas?.resCount.task === undefined ? 0 : datas?.resCount.task;
+      const storys = datas?.resCount.story === undefined ? 0 : datas?.resCount.story;
+      setPageTitle(`${prjNames}:bug ${bugs} 个，task ${tasks} 个，story ${storys} 个`);
+
     };
     // 获取部门数据
     const GetDeptMemner = (params: any) => {
@@ -1480,13 +1502,22 @@ const SprintList: React.FC<any> = () => {
         breadcrumbName: '项目详情',
       }];
 
+    useEffect(() => {
+
+      const bugs = data?.resCount.bug === undefined ? 0 : data?.resCount.bug;
+      const tasks = data?.resCount.task === undefined ? 0 : data?.resCount.task;
+      const storys = data?.resCount.story === undefined ? 0 : data?.resCount.story;
+
+      setPageTitle(`${prjNames}:bug ${bugs} 个，task ${tasks} 个，story ${storys} 个`);
+    }, [data]);
+
     return (
 
       <div style={{marginTop: "-20px"}}>
 
         <PageHeader
           ghost={false}
-          title={prjNames}
+          title={pageTitle}
           style={{height: "100px"}}
           breadcrumb={{routes}}
         />
@@ -1543,7 +1574,7 @@ const SprintList: React.FC<any> = () => {
         <div className="ag-theme-alpine" style={{height: getHeight(), width: '100%'}}>
           <AgGridReact
             columnDefs={colums()} // 定义列
-            rowData={data} // 数据绑定
+            rowData={data?.result} // 数据绑定
             defaultColDef={{
               resizable: true,
               sortable: true,

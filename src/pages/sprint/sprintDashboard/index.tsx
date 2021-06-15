@@ -1195,20 +1195,43 @@ const DashBoard: React.FC<any> = () => {
                           bodyStyle={{height: "110px", textAlign: "left"}}>
 
                       <div style={{marginTop: "-15px"}}>
-                        <div style={{whiteSpace: "nowrap"}}>无指派  &nbsp;<Link
-                          to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=bug_no_assign`}>{emergency.noAssign}</Link> &nbsp;个
+
+                        <div style={{whiteSpace: "nowrap"}}>
+                          <label style={cssStyle.itemStyle}>无指派</label>
+                          <label style={cssStyle.linkStyle}>
+                            <Link
+                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=bug_no_assign`}>{emergency.noAssign}</Link>
+                          </label>
+                          <label style={cssStyle.unitStyle}>个</label>
                         </div>
-                        <div style={{whiteSpace: "nowrap"}}>无排期  &nbsp;<Link
-                          to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=bug_no_deadline`}>{emergency.noDeadline}</Link> &nbsp;个
+
+                        <div style={{whiteSpace: "nowrap"}}>
+                          <label style={cssStyle.itemStyle}>无排期</label>
+                          <label style={cssStyle.linkStyle}>
+                            <Link
+                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=bug_no_deadline`}>{emergency.noDeadline}</Link>
+                          </label>
+                          <label style={cssStyle.unitStyle}>个</label>
                         </div>
-                        <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-                          <Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=bug_proj_error`}>{emergency.prj_error}</Link>&nbsp;个
+
+                        <div style={{whiteSpace: "nowrap"}}>
+                          <label style={cssStyle.itemStyle}>项目错误</label>
+                          <label style={cssStyle.linkStyle}>
+                            <Link
+                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=bug_proj_error`}>{emergency.prj_error}</Link>
+                          </label>
+                          <label style={cssStyle.unitStyle}>个</label>
                         </div>
-                        <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                          <Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=bug_over_area`}>{emergency.over_area}</Link>&nbsp;个
+
+                        <div style={{whiteSpace: "nowrap"}}>
+                          <label style={cssStyle.itemStyle}>超范围</label>
+                          <label style={cssStyle.linkStyle}>
+                            <Link
+                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=bug_over_area`}>{emergency.over_area}</Link>
+                          </label>
+                          <label style={cssStyle.unitStyle}>个</label>
                         </div>
+
                       </div>
                     </Card>
                   </Col>
@@ -1219,19 +1242,42 @@ const DashBoard: React.FC<any> = () => {
                           headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                           bodyStyle={{height: "110px", textAlign: "left"}}>
                       <div style={{marginTop: "-15px"}}>
-                        <div style={{whiteSpace: "nowrap"}}>激活 &nbsp;
-                          <Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=actived`}>{emergency.actived}</Link>&nbsp;个
+                        <div style={{whiteSpace: "nowrap"}}>
+                          <label style={cssStyle.itemStyle}>激活</label>
+                          <label style={cssStyle.linkStyle}>
+                            <Link
+                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=actived`}>{emergency.actived}</Link>
+                          </label>
+                          <label style={cssStyle.unitStyle}>个</label>
                         </div>
-                        <div style={{whiteSpace: "nowrap"}}>已解决 &nbsp;<Link
-                          to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=resolved`}>{emergency.resolved}</Link> &nbsp;个
+
+                        <div style={{whiteSpace: "nowrap"}}>
+                          <label style={cssStyle.itemStyle}>已解决</label>
+                          <label style={cssStyle.linkStyle}>
+                            <Link
+                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=resolved`}>{emergency.resolved}</Link>
+                          </label>
+                          <label style={cssStyle.unitStyle}>个</label>
                         </div>
-                        <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-                          to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=bug_verified`}>{emergency.vertified}</Link> &nbsp;个
+
+                        <div style={{whiteSpace: "nowrap"}}>
+                          <label style={cssStyle.itemStyle}>已验证</label>
+                          <label style={cssStyle.linkStyle}>
+                            <Link
+                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=bug_verified`}>{emergency.vertified}</Link>
+                          </label>
+                          <label style={cssStyle.unitStyle}>个</label>
                         </div>
-                        <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
-                          to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=closed`}>{emergency.closed}</Link> &nbsp;个
+
+                        <div style={{whiteSpace: "nowrap"}}>
+                          <label style={cssStyle.itemStyle}>已关闭</label>
+                          <label style={cssStyle.linkStyle}>
+                            <Link
+                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=closed`}>{emergency.closed}</Link>
+                          </label>
+                          <label style={cssStyle.unitStyle}>个</label>
                         </div>
+
                       </div>
                     </Card>
                   </Col>
@@ -1242,18 +1288,42 @@ const DashBoard: React.FC<any> = () => {
                           headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                           bodyStyle={{height: "110px", textAlign: "left"}}>
                       <div style={{marginTop: "-15px"}}>
-                        <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
-                          to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ac_>24H`}>{emergency.ac24}</Link> &nbsp;个
+                        <div style={{whiteSpace: "nowrap"}}>
+                          <label style={cssStyle.itemStyle}>&gt;24H</label>
+                          <label style={cssStyle.linkStyle}>
+                            <Link
+                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ac_>24H`}>{emergency.ac24}</Link>
+                          </label>
+                          <label style={cssStyle.unitStyle}>个</label>
                         </div>
-                        <div style={{whiteSpace: "nowrap"}}>16-24H&nbsp;<Link
-                          to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ac_16-24H`}>{emergency.ac1624}</Link> &nbsp;个
+
+                        <div style={{whiteSpace: "nowrap"}}>
+                          <label style={cssStyle.itemStyle}>16-24H</label>
+                          <label style={cssStyle.linkStyle}>
+                            <Link
+                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ac_16-24H`}>{emergency.ac1624}</Link>
+                          </label>
+                          <label style={cssStyle.unitStyle}>个</label>
                         </div>
-                        <div style={{whiteSpace: "nowrap"}}>8-16H&nbsp;<Link
-                          to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ac_8-16H`}>{emergency.ac0816}</Link> &nbsp;个
+
+                        <div style={{whiteSpace: "nowrap"}}>
+                          <label style={cssStyle.itemStyle}>8-16H</label>
+                          <label style={cssStyle.linkStyle}>
+                            <Link
+                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ac_8-16H`}>{emergency.ac0816}</Link>
+                          </label>
+                          <label style={cssStyle.unitStyle}>个</label>
                         </div>
-                        <div style={{whiteSpace: "nowrap"}}>&lt;8H&nbsp;<Link
-                          to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ac_<8H`}>{emergency.ac08}</Link> &nbsp;个
+
+                        <div style={{whiteSpace: "nowrap"}}>
+                          <label style={cssStyle.itemStyle}>&lt;8H</label>
+                          <label style={cssStyle.linkStyle}>
+                            <Link
+                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ac_<8H`}>{emergency.ac08}</Link>
+                          </label>
+                          <label style={cssStyle.unitStyle}>个</label>
                         </div>
+
                       </div>
                     </Card>
                   </Col>
@@ -1264,18 +1334,43 @@ const DashBoard: React.FC<any> = () => {
                           headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                           bodyStyle={{height: "110px", textAlign: "left"}}>
                       <div style={{marginTop: "-15px"}}>
-                        <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
-                          to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ve_>24H`}>{emergency.ve24}</Link> &nbsp;个
+                        <div style={{whiteSpace: "nowrap"}}>
+                          <label style={cssStyle.itemStyle}>&gt;24H</label>
+                          <label style={cssStyle.linkStyle}>
+                            <Link
+                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ve_>24H`}>{emergency.ve24}</Link>
+                          </label>
+                          <label style={cssStyle.unitStyle}>个</label>
                         </div>
-                        <div style={{whiteSpace: "nowrap"}}>16-24H&nbsp;<Link
-                          to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ve_16-24H`}>{emergency.ve1624}</Link> &nbsp;个
+
+                        <div style={{whiteSpace: "nowrap"}}>
+                          <label style={cssStyle.itemStyle}>16-24H</label>
+                          <label style={cssStyle.linkStyle}>
+                            <Link
+                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ve_16-24H`}>{emergency.ve1624}</Link>
+                          </label>
+                          <label style={cssStyle.unitStyle}>个</label>
                         </div>
-                        <div style={{whiteSpace: "nowrap"}}>8-16H&nbsp;<Link
-                          to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ve_8-16H`}>{emergency.ve0816}</Link>&nbsp;个
+
+
+                        <div style={{whiteSpace: "nowrap"}}>
+                          <label style={cssStyle.itemStyle}>8-16H</label>
+                          <label style={cssStyle.linkStyle}>
+                            <Link
+                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ve_8-16H`}>{emergency.ve0816}</Link>
+                          </label>
+                          <label style={cssStyle.unitStyle}>个</label>
                         </div>
-                        <div style={{whiteSpace: "nowrap"}}>&lt;8H&nbsp;<Link
-                          to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ve_<8H`}>{emergency.ve08}</Link>&nbsp;个
+
+                        <div style={{whiteSpace: "nowrap"}}>
+                          <label style={cssStyle.itemStyle}>&lt;8H</label>
+                          <label style={cssStyle.linkStyle}>
+                            <Link
+                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ve_<8H`}>{emergency.ve08}</Link>
+                          </label>
+                          <label style={cssStyle.unitStyle}>个</label>
                         </div>
+
                       </div>
                     </Card>
                   </Col>
@@ -1340,34 +1435,88 @@ const DashBoard: React.FC<any> = () => {
                             bodyStyle={{height: "205px", textAlign: "left"}}>
 
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>草稿&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=draft`}>{hotfix.story_status_draft}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>草稿</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=draft`}>{hotfix.story_status_draft}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>无任务&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=no_task`}>{hotfix.story_status_noTask}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>无任务</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=no_task`}>{hotfix.story_status_noTask}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>缺任务&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=lack_task`}>{hotfix.story_status_lackTask}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>缺任务</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=lack_task`}>{hotfix.story_status_lackTask}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>无排期&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=no_deadline`}>{hotfix.story_status_noDeadline}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>无排期</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=no_deadline`}>{hotfix.story_status_noDeadline}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>无指派&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=no_assign`}>{hotfix.story_status_noAssign}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>无指派</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=no_assign`}>{hotfix.story_status_noAssign}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>无bug  &nbsp;&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=no_bug`}>{hotfix.story_status_noBug}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>无bug</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=no_bug`}>{hotfix.story_status_noBug}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>未更新&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=un_modify`}>{hotfix.story_status_noModify}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>未更新</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=un_modify`}>{hotfix.story_status_noModify}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>项目错误 &nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=proj_error`}>{hotfix.story_status_prj_error}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>项目错误</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=proj_error`}>{hotfix.story_status_prj_error}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                            <Link
-                              to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=over_area`}>{hotfix.story_status_over_area}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>超范围</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=over_area`}>{hotfix.story_status_over_area}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>
@@ -1378,18 +1527,44 @@ const DashBoard: React.FC<any> = () => {
                             headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                             bodyStyle={{height: "205px", textAlign: "left"}}>
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=devtask_delay`}>{hotfix.story_status_delay}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>任务延期</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=devtask_delay`}>{hotfix.story_status_delay}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=dev_wait`}>{hotfix.story_status_wait}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>未开始</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=dev_wait`}>{hotfix.story_status_wait}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>开发中&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=developing`}>{hotfix.story_status_doing}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>开发中</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=developing`}>{hotfix.story_status_doing}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>开发完&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=dev_done`}>{hotfix.story_status_done}</Link>&nbsp;个
+
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>开发完</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=dev_done`}>{hotfix.story_status_done}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>
@@ -1400,14 +1575,31 @@ const DashBoard: React.FC<any> = () => {
                             headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                             bodyStyle={{height: "205px", textAlign: "left"}}>
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>提测延期&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=raisetest_delay`}>{hotfix.story_status_raseTestDelay}</Link>&nbsp;个
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>提测延期</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=raisetest_delay`}>{hotfix.story_status_raseTestDelay}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>未提测&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=un_raisetest`}>{hotfix.story_status_raseTestWait}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>未提测</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=un_raisetest`}>{hotfix.story_status_raseTestWait}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>已提测&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=raisetest_done`}>{hotfix.story_status_raseTestDone}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>已提测</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=raisetest_done`}>{hotfix.story_status_raseTestDone}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
 
                         </div>
@@ -1420,18 +1612,42 @@ const DashBoard: React.FC<any> = () => {
                             headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                             bodyStyle={{height: "205px", textAlign: "left"}}>
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=testtask_delay`}>{hotfix.story_status_testDelay}</Link>&nbsp;个
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>任务延期</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=testtask_delay`}>{hotfix.story_status_testDelay}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=test_wait`}>{hotfix.story_status_testWait}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>未开始</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=test_wait`}>{hotfix.story_status_testWait}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>测试中&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=testing`}>{hotfix.story_status_testDoing}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>测试中</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=testing`}>{hotfix.story_status_testDoing}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>测试完&nbsp;<Link
-                            to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=test_done`}>{hotfix.story_status_testDone}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>测试完</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=test_done`}>{hotfix.story_status_testDone}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>
@@ -1455,20 +1671,43 @@ const DashBoard: React.FC<any> = () => {
                             bodyStyle={{height: "100px", textAlign: "left"}}>
 
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>无指派  &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}>{hotfix.story_bug_noAssign}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>无指派</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}>{hotfix.story_bug_noAssign}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>无排期  &nbsp;&nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_deadline`}>{hotfix.story_bug_noDeadline}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>无排期</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_deadline`}>{hotfix.story_bug_noDeadline}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-                            <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_proj_error`}>{hotfix.story_bug_prj_error}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>项目错误</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_proj_error`}>{hotfix.story_bug_prj_error}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                            <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_over_area`}>{hotfix.story_bug_over_area}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>超范围</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_over_area`}>{hotfix.story_bug_over_area}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>
@@ -1479,18 +1718,42 @@ const DashBoard: React.FC<any> = () => {
                             headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                             bodyStyle={{height: "100px", textAlign: "left"}}>
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>激活 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=actived`}>{hotfix.story_bug_actived}</Link> &nbsp;个
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>激活</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=actived`}>{hotfix.story_bug_actived}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>已解决 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=resolved`}>{hotfix.story_bug_resolved}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>已解决</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=resolved`}>{hotfix.story_bug_resolved}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_verified`}>{hotfix.story_bug_vertified}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>已验证</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_verified`}>{hotfix.story_bug_vertified}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=closed`}>{hotfix.story_bug_closed}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>已关闭</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=closed`}>{hotfix.story_bug_closed}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>
@@ -1501,18 +1764,42 @@ const DashBoard: React.FC<any> = () => {
                             headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                             bodyStyle={{height: "100px", textAlign: "left"}}>
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_>24H`}>{hotfix.story_bug_ac24}</Link> &nbsp;个
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>&gt;24H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_>24H`}>{hotfix.story_bug_ac24}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>16-24H  &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_16-24H`}>{hotfix.story_bug_ac1624}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>16-24H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_16-24H`}>{hotfix.story_bug_ac1624}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>8-16H  &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_8-16H`}>{hotfix.story_bug_ac0816}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>8-16H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_8-16H`}>{hotfix.story_bug_ac0816}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>&lt;8H  &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_<8H`}>{hotfix.story_bug_ac08}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>&lt;8H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_<8H`}>{hotfix.story_bug_ac08}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>
@@ -1523,18 +1810,44 @@ const DashBoard: React.FC<any> = () => {
                             headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                             bodyStyle={{height: "100px", textAlign: "left"}}>
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_>24H`}>{hotfix.story_bug_ve24}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>&gt;24H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_>24H`}>{hotfix.story_bug_ve24}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>16-24H&nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_16-24H`}>{hotfix.story_bug_ve1624}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>16-24H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_16-24H`}>{hotfix.story_bug_ve1624}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>8-16H&nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_8-16H`}>{hotfix.story_bug_ve0816}</Link>&nbsp;个
+
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>8-16H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_8-16H`}>{hotfix.story_bug_ve0816}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>&lt;8H&nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_<8H`}>{hotfix.story_bug_ve08}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>&lt;8H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_<8H`}>{hotfix.story_bug_ve08}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>
@@ -1573,28 +1886,68 @@ const DashBoard: React.FC<any> = () => {
                             headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                             bodyStyle={{height: "160px", textAlign: "left"}}>
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>无任务&nbsp;<Link
-                            to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item='no_task`}>{hotfix.task_status_noTask}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>无任务</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item='no_task`}>{hotfix.task_status_noTask}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>无排期&nbsp;<Link
-                            to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=no_deadline`}>{hotfix.task_status_noDeadline}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>无排期</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=no_deadline`}>{hotfix.task_status_noDeadline}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>无指派&nbsp;<Link
-                            to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=no_assign`}>{hotfix.task_status_noAssign}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>无指派</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=no_assign`}>{hotfix.task_status_noAssign}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>无bug  &nbsp;<Link
-                            to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=no_bug`}>{hotfix.task_status_noBug}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>无bug</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=no_bug`}>{hotfix.task_status_noBug}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>未更新&nbsp;<Link
-                            to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=un_modify`}>{hotfix.task_status_noModify}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>未更新</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=un_modify`}>{hotfix.task_status_noModify}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-                            <Link
-                              to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=proj_error`}>{hotfix.task_status_prj_error}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>项目错误</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=proj_error`}>{hotfix.task_status_prj_error}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                            <Link
-                              to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=over_area`}>{hotfix.task_status_over_area}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>超范围</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=over_area`}>{hotfix.task_status_over_area}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
 
                         </div>
@@ -1607,18 +1960,42 @@ const DashBoard: React.FC<any> = () => {
                             headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                             bodyStyle={{height: "160px", textAlign: "left"}}>
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;<Link
-                            to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=devtask_delay`}>{hotfix.task_status_taskDelay}</Link>&nbsp;个
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>任务延期</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=devtask_delay`}>{hotfix.task_status_taskDelay}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                            to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=dev_wait`}>{hotfix.task_status_wait}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>未开始</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=dev_wait`}>{hotfix.task_status_wait}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>开发中&nbsp;<Link
-                            to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=developing`}>{hotfix.task_status_doing}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>开发中</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=developing`}>{hotfix.task_status_doing}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>开发完&nbsp;<Link
-                            to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=dev_done`}>{hotfix.task_status_done}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>开发完</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=dev_done`}>{hotfix.task_status_done}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>
@@ -1629,15 +2006,34 @@ const DashBoard: React.FC<any> = () => {
                             headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                             bodyStyle={{height: "160px", textAlign: "left"}}>
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>提测延期&nbsp;<Link
-                            to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=raisetest_delay`}>{hotfix.task_status_raseTestDelay}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>提测延期</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=raisetest_delay`}>{hotfix.task_status_raseTestDelay}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>未提测&nbsp;<Link
-                            to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=un_raisetest`}>{hotfix.task_status_raseTestWait}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>未提测</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=un_raisetest`}>{hotfix.task_status_raseTestWait}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>已提测&nbsp;<Link
-                            to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=raisetest_done`}>{hotfix.task_status_raseTestDone}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>已提测</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=raisetest_done`}>{hotfix.task_status_raseTestDone}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>
@@ -1648,18 +2044,43 @@ const DashBoard: React.FC<any> = () => {
                             headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                             bodyStyle={{height: "160px", textAlign: "left"}}>
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>任务延期&nbsp;;<Link
-                            to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=testtask_delay`}>{hotfix.task_status_testDelay}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>任务延期</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=testtask_delay`}>{hotfix.task_status_testDelay}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>未开始&nbsp;<Link
-                            to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=test_wait`}>{hotfix.task_status_testWait}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>未开始</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=test_wait`}>{hotfix.task_status_testWait}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>测试中 &nbsp;<Link
-                            to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=testing`}>{hotfix.task_status_testDoing}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>测试中</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=testing`}>{hotfix.task_status_testDoing}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>测试完 &nbsp;<Link
-                            to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=test_done`}>{hotfix.task_status_testDone}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>测试完</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=test_done`}>{hotfix.task_status_testDone}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>
@@ -1684,20 +2105,42 @@ const DashBoard: React.FC<any> = () => {
                             bodyStyle={{height: "100px", textAlign: "left"}}>
 
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>无指派 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}>{hotfix.task_bug_noAssign}</Link> &nbsp;个
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>无指派</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}>{hotfix.task_bug_noAssign}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>无排期  &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_deadline`}>{hotfix.task_bug_noDeadline}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>无排期</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_deadline`}>{hotfix.task_bug_noDeadline}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-                            <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_proj_error`}>{hotfix.task_bug_prj_error}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>项目错误</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_proj_error`}>{hotfix.task_bug_prj_error}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                            <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_over_area`}>{hotfix.task_bug_over_area}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>超范围</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_over_area`}>{hotfix.task_bug_over_area}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>
@@ -1708,18 +2151,43 @@ const DashBoard: React.FC<any> = () => {
                             headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue"}}
                             bodyStyle={{height: "100px", textAlign: "left"}}>
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>激活 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=actived`}>{hotfix.task_bug_actived}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>激活</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=actived`}>{hotfix.task_bug_actived}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>已解决 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=resolved`}>{hotfix.task_bug_resolved}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>已解决</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=resolved`}>{hotfix.task_bug_resolved}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_verified`}>{hotfix.task_bug_vertified}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>已验证</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_verified`}>{hotfix.task_bug_vertified}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=closed`}>{hotfix.task_bug_closed}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>已关闭</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=closed`}>{hotfix.task_bug_closed}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>
@@ -1730,18 +2198,43 @@ const DashBoard: React.FC<any> = () => {
                             headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                             bodyStyle={{height: "100px", textAlign: "left"}}>
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>&gt;24H  &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_>24H`}>{hotfix.task_bug_ac24}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>&gt;24H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_>24H`}>{hotfix.task_bug_ac24}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>16-24H  &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_16-24H`}>{hotfix.task_bug_ac1624}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>16-24H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_16-24H`}>{hotfix.task_bug_ac1624}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>8-16H  &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_8-16H`}>{hotfix.task_bug_ac0816}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>8-16H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_8-16H`}>{hotfix.task_bug_ac0816}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>&lt;8H  &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_<8H`}>{hotfix.task_bug_ac08}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>&lt;8H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_<8H`}>{hotfix.task_bug_ac08}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>
@@ -1752,18 +2245,42 @@ const DashBoard: React.FC<any> = () => {
                             headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                             bodyStyle={{height: "100px", textAlign: "left"}}>
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>&gt;24H  &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_>24H`}>{hotfix.task_bug_ve24}</Link> &nbsp;个
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>&gt;24H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_>24H`}>{hotfix.task_bug_ve24}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>16-24H  &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_16-24H`}>{hotfix.task_bug_ve1624}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>16-24H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_16-24H`}>{hotfix.task_bug_ve1624}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>8-16H  &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_8-16H`}>{hotfix.task_bug_ve0816}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>8-16H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_8-16H`}>{hotfix.task_bug_ve0816}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>&lt;8H  &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_<8H`}>{hotfix.task_bug_ve08}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>&lt;8H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_<8H`}>{hotfix.task_bug_ve08}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>
@@ -1801,20 +2318,42 @@ const DashBoard: React.FC<any> = () => {
                             bodyStyle={{height: "110px", textAlign: "left"}}>
 
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>无指派  &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}>{hotfix.bug_noAssign}</Link> &nbsp;个
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>无指派</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}>{hotfix.bug_noAssign}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>无排期  &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_deadline`}>{hotfix.bug_noDeadline}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>无排期</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_deadline`}>{hotfix.bug_noDeadline}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>项目错误&nbsp;
-                            <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_proj_error`}>{hotfix.bug_prj_error}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>项目错误</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_proj_error`}>{hotfix.bug_prj_error}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>超范围&nbsp;
-                            <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_over_area`}>{hotfix.bug_over_area}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>超范围</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_over_area`}>{hotfix.bug_over_area}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>
@@ -1825,19 +2364,43 @@ const DashBoard: React.FC<any> = () => {
                             headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                             bodyStyle={{height: "110px", textAlign: "left"}}>
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>激活 &nbsp;
-                            <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=actived`}>{hotfix.bug_actived}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>激活</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=actived`}>{hotfix.bug_actived}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>已解决 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=resolved`}>{hotfix.bug_resolved}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>已解决</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=resolved`}>{hotfix.bug_resolved}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>已验证 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_verified`}>{hotfix.bug_vertified}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>已验证</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_verified`}>{hotfix.bug_vertified}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>已关闭 &nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=closed`}>{hotfix.bug_closed}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>已关闭</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=closed`}>{hotfix.bug_closed}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>
@@ -1848,18 +2411,43 @@ const DashBoard: React.FC<any> = () => {
                             headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                             bodyStyle={{height: "110px", textAlign: "left"}}>
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_>24H`}>{hotfix.bug_ac24}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>&gt;24H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_>24H`}>{hotfix.bug_ac24}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>16-24H&nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_16-24H`}>{hotfix.bug_ac1624}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>16-24H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_16-24H`}>{hotfix.bug_ac1624}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>8-16H&nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_8-16H`}>{hotfix.bug_ac0816}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>8-16H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_8-16H`}>{hotfix.bug_ac0816}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>&lt;8H&nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_<8H`}>{hotfix.bug_ac08}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>&lt;8H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_<8H`}>{hotfix.bug_ac08}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>
@@ -1870,18 +2458,42 @@ const DashBoard: React.FC<any> = () => {
                             headStyle={{textAlign: "center", height: "10px", backgroundColor: "AliceBlue  "}}
                             bodyStyle={{height: "110px", textAlign: "left"}}>
                         <div style={{marginTop: "-15px"}}>
-                          <div style={{whiteSpace: "nowrap"}}>&gt;24H&nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_>24H`}>{hotfix.bug_ve24}</Link> &nbsp;个
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>&gt;24H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_>24H`}>{hotfix.bug_ve24}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>16-24H&nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_16-24H`}>{hotfix.bug_ve1624}</Link> &nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>16-24H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_16-24H`}>{hotfix.bug_ve1624}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>8-16H&nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_8-16H`}>{hotfix.bug_ve0816}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>8-16H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_8-16H`}>{hotfix.bug_ve0816}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
-                          <div style={{whiteSpace: "nowrap"}}>&lt;8H&nbsp;<Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_<8H`}>{hotfix.bug_ve08}</Link>&nbsp;个
+
+                          <div style={{whiteSpace: "nowrap"}}>
+                            <label style={cssStyle.itemStyle}>&lt;8H</label>
+                            <label style={cssStyle.linkStyle}>
+                              <Link
+                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_<8H`}>{hotfix.bug_ve08}</Link>
+                            </label>
+                            <label style={cssStyle.unitStyle}>个</label>
                           </div>
+
                         </div>
                       </Card>
                     </Col>

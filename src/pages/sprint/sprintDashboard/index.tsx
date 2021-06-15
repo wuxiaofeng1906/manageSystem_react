@@ -3,7 +3,7 @@ import {PageContainer} from '@ant-design/pro-layout';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {Row, Col, Select, Card, Button, Typography} from 'antd';
+import {Row, Col, Select, Card, Button} from 'antd';
 import {Link} from 'umi';
 import {SearchOutlined} from "@ant-design/icons";
 import {history} from "@@/core/history";
@@ -14,7 +14,6 @@ import {getWeeksRange} from '@/publicMethods/timeMethods';
 import {judgeAuthority} from "@/publicMethods/authorityJudge";
 
 const {Option} = Select;
-const {Text} = Typography;
 // 全局变量
 const sprintPrjInfo = {
   prjID: "",

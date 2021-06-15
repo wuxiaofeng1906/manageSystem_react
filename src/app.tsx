@@ -18,7 +18,7 @@ export const initialStateConfig = {
 };
 
 
-console.log("sys_accessToken", localStorage.getItem("accessId"));
+console.log("GQL的token", localStorage.getItem("accessId"));
 const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
   uri: "/api/graphql",

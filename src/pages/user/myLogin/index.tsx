@@ -113,7 +113,7 @@ const Login: React.FC<{}> = () => {
         .post('/api/auth/login', data)
         .then(function (res) {
 
-          const resultData = res.data.data;
+          const resultData = res.data;
           if (resultData.ok === true) {
             okFlag = true;
             fetchUserInfo(resultData);
@@ -534,7 +534,7 @@ const Login: React.FC<{}> = () => {
         "parent": {"id": 4, "name": "authority", "level": 0, "description": "权限", "parentId": null}
       }];
 
-    localStorage.setItem("accessId", 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IuWQtOaZk-WHpCIsInN1YiI6Ild1WGlhb0ZlbmciLCJpYXQiOjE2MjM4MjMzNDQsImV4cCI6MTYyMzgyNjk0NH0.DsDHKG9mnf8L7JuOUyeB-ZWm6QGYEP3N9HCqGRzvVsI');
+    localStorage.setItem("accessId", 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IuWQtOaZk-WHpCIsInN1YiI6Ild1WGlhb0ZlbmciLCJpYXQiOjE2MjM4MzA2Nzd9.G3EjtMWppClX_E2NN0dFPXgX6OsGSrIXy4ReT_Rs5zI');
     localStorage.setItem("authority", JSON.stringify(te));
 
     const userInfos = {

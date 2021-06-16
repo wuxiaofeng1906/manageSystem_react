@@ -441,6 +441,7 @@ const SprintList: React.FC<any> = () => {
 
     // 失去焦点后查询值
     const checkZentaoInfo = (params: any) => {
+      debugger;
       const ztno = params.target.value;
       const addFormData = formForAdminToAddAnaMod.getFieldsValue();
       const chanDaoType = addFormData.adminChandaoType;

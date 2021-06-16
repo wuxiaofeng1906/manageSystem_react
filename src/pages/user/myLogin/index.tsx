@@ -63,7 +63,7 @@ const Login: React.FC<{}> = () => {
   const fetchUserInfo = async (userInfos: any) => {
 
     // 测试时的token
-    console.log("登录后的token",userInfos.access_token);
+    console.log("登录后的token", userInfos.access_token);
     localStorage.setItem("accessId", userInfos.access_token); // 正式环境应放开
     localStorage.setItem("authority", JSON.stringify(userInfos.authorities));
 
@@ -105,7 +105,7 @@ const Login: React.FC<{}> = () => {
     // 如果获取到了usercode，则拿取用户信息和权限
     if (userCode !== "") {
       const data = {
-        username: "testUser",
+        username: "users",
         password: userCode
       };
       debugger;
@@ -113,9 +113,10 @@ const Login: React.FC<{}> = () => {
         .post('/api/auth/login', data)
         .then(function (res) {
 
-          if (res.data.ok === true) {
+          const resultData = res.data.data;
+          if (resultData.ok === true) {
             okFlag = true;
-            fetchUserInfo(res.data);
+            fetchUserInfo(resultData);
             goto();
           } else {
             message.error({

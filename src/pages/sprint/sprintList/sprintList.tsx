@@ -128,7 +128,7 @@ const SprintList: React.FC<any> = () => {
       {
         headerName: '项目名称',
         field: 'name',
-        minWidth: 200,
+        minWidth: 140,
         cellRenderer: (params: any) => {
           return `<a  style="color:blue;text-decoration: underline" >${params.value}</a>`;
           // return `<a  style="color:blue;text-decoration: underline" onclick={ChangePages}>${params.value}</a>`;
@@ -152,26 +152,32 @@ const SprintList: React.FC<any> = () => {
       {
         headerName: '开始时间',
         field: 'startAt',
+        minWidth: 110,
       },
       {
         headerName: '提测截止日期',
         field: 'testEnd',
+        minWidth: 110,
       },
       {
         headerName: '测试完成日期',
         field: 'testFinish',
+        minWidth: 110,
       },
       {
         headerName: '计划灰度日期',
         field: 'expStage',
+        minWidth: 110,
       },
       {
         headerName: '计划上线日期',
         field: 'expOnline',
+        minWidth: 110,
       },
       {
         headerName: '创建日期',
         field: 'createAt',
+        minWidth: 165,
       },
       {
         headerName: '创建人',

@@ -84,6 +84,9 @@ const Login: React.FC<{}> = () => {
       access: accessRole
     };
 
+    localStorage.setItem("userLogins", JSON.stringify(userInfo)); // 正式环境应放开
+
+
     if (userInfo) {
       setInitialState({
         ...initialState,
@@ -545,6 +548,7 @@ const Login: React.FC<{}> = () => {
       avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
       access: 'sys_admin'
     };
+    localStorage.setItem("userLogins", JSON.stringify(userInfos)); // 正式环境应放开
 
     if (userInfos) {
       setInitialState({

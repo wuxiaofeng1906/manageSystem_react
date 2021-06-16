@@ -45,8 +45,23 @@ export async function getInitialState(): Promise<{
 }> {
   const fetchUserInfo = async () => {
     try {
-      const currentUser = await queryCurrent();
-      return currentUser;
+      // const currentUser = await queryCurrent();
+      // return currentUser;
+      debugger;
+
+      // 读取缓存信息
+      const myAuth: any = localStorage.getItem("userLogins");
+      return JSON.parse(myAuth);
+
+      //  return {
+      //   access: "sys_admin",
+      //   authority: "",
+      //   avatar: "https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png",
+      //   group: "superGroup",
+      //   name: "444",
+      //   userid: "test"
+      // };
+
     } catch (error) {
       // history.push('/user/login');
       history.push('/user/myLogin');

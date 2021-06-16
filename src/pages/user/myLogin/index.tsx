@@ -108,6 +108,7 @@ const Login: React.FC<{}> = () => {
         username: "testUser",
         password: userCode
       };
+      debugger;
       await axios
         .post('/api/auth/login', data)
         .then(function (res) {

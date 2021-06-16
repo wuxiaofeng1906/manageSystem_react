@@ -53,6 +53,7 @@ const colums = () => {
       headerName: '序号',
       maxWidth: 80,
       filter: false,
+      pinned: 'left',
       cellRenderer: (params: any) => {
         return Number(params.node.id) + 1;
       },
@@ -61,23 +62,28 @@ const colums = () => {
       headerName: '当前阶段',
       field: 'stage',
       cellRenderer: numberRenderToCurrentStageForColor,
+      pinned: 'left',
     },
     {
       headerName: '测试负责人填写',
+
       children: [
         {
           headerName: '对应测试',
           field: 'tester',
+          pinned: 'left'
         },
         {
           headerName: '禅道类型',
           field: 'category',
           cellRenderer: numberRenderToZentaoType,
+          pinned: 'left'
         },
         {
           headerName: '禅道编号',
           field: 'ztNo',
           cellRenderer: linkToZentaoPage,
+          pinned: 'left'
         },
       ],
     },
@@ -87,6 +93,7 @@ const colums = () => {
         {
           headerName: '标题内容',
           field: 'title',
+          pinned: 'left',
         },
         {
           headerName: '严重程度',

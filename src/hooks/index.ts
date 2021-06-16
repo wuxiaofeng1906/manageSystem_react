@@ -14,7 +14,7 @@ export class GqlClient<T> {
     return this.apolloClient.query({
       query: gql(query),
       context: {
-        headers: {"Authorization": `Bearer ${localStorage.getItem("accessId")}`},
+        headers: {"Authorization": `Bearer ${localStorage.getItem("accessId")}`},  // 添加headers请求头，用于权限控制
       }
     });
   };

@@ -18,11 +18,11 @@ export const initialStateConfig = {
 };
 
 
-console.log("GQL的token", localStorage.getItem("accessId"));
+// console.log("GQL的token", localStorage.getItem("accessId"));
 const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
   uri: "/api/graphql",
-  headers: {"Authorization": `Bearer ${localStorage.getItem("accessId")}`},
+  // headers: {"Authorization": `Bearer ${localStorage.getItem("accessId")}`},
   defaultOptions: {
     watchQuery: {
       fetchPolicy: 'no-cache',

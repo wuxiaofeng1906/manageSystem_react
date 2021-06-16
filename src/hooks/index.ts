@@ -9,9 +9,13 @@ export class GqlClient<T> {
   }
 
   query = (query: string) => {
+    console.log("query中GQL的token", localStorage.getItem("accessId"));
 
     return this.apolloClient.query({
-      query: gql(query)
+      query: gql(query),
+      context: {
+        headers: {"Authorization": `Bearer ${localStorage.getItem("accessId")}`},
+      }
     });
   };
 }

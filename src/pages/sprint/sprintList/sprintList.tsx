@@ -834,7 +834,7 @@ const SprintList: React.FC<any> = () => {
           <Row gutter={16}>
             <Col className="gutter-row">
               <div style={rightStyle}>
-                <Form.Item name="starttime" label="开始时间"  >
+                <Form.Item name="starttime" label="开始时间">
                   <DatePicker style={widths} disabled={true} allowClear={false}/>
                 </Form.Item>
               </div>

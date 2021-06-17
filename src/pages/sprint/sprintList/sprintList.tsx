@@ -17,6 +17,7 @@ import axios from 'axios';
 import {history} from 'umi';
 import {judgeAuthority} from "@/publicMethods/authorityJudge";
 import {useModel} from "@@/plugin-model/useModel";
+import dayjs from "dayjs";
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
@@ -183,7 +184,11 @@ const SprintList: React.FC<any> = () => {
       {
         headerName: '创建日期',
         field: 'createAt',
-        minWidth: 165,
+        minWidth: 110,
+        cellRenderer: (params: any) => {
+
+          return dayjs(params.value).format("YYYY-MM-DD");
+        }
       },
       {
         headerName: '创建人',
@@ -744,7 +749,7 @@ const SprintList: React.FC<any> = () => {
       <div style={{background: 'white'}}>
         {/* 使用一个图标就要导入一个图标 */}
         <Button type="text" style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}
-                icon={<LogoutOutlined />} size={'large'} onClick={showDefalultValue}>
+                icon={<LogoutOutlined/>} size={'large'} onClick={showDefalultValue}>
           默认：</Button>
         <label style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}> 近1月未关闭的</label>
         {/* <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}> 近1月未关闭的 </Button> */}

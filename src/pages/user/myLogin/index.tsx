@@ -105,7 +105,7 @@ const Login: React.FC<{}> = () => {
       const secondGroup = firstGroup[1].split("&"); // 区分code和其他属性
       const thirdGroup = secondGroup[0].split("="); // 获取到=后面的值
       userCode = thirdGroup[1].toString();
-      if (!windowURL.included("redirect")) {  // 不是重定向的时候才禁用
+      if (!windowURL.includes("redirect")) {  // 不是重定向的时候才禁用
         setTitleShown(true); // 设置为不可见
       }
     }

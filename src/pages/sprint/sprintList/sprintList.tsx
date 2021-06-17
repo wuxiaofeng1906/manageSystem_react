@@ -269,13 +269,12 @@ const SprintList: React.FC<any> = () => {
   };
 
   // 时间选择事件
-  const onTimeSelected = async (params: any) => {
+  const onTimeSelected = async (params: any, dateString: any) => {
     queryCondition.dateRange = {
-      start: formatMomentTime(params[0]),
-      end: formatMomentTime(params[1]),
+      start: dateString[0],
+      end: dateString[1],
     };
     updateGrid();
-
   };
 
   // 选择项目状态

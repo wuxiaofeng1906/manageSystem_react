@@ -9,7 +9,7 @@ import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import moment from 'moment';
 import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col} from 'antd';
-import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone, SearchOutlined} from '@ant-design/icons';
+import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone, LogoutOutlined} from '@ant-design/icons';
 import {getRecentMonth, formatMomentTime} from '@/publicMethods/timeMethods';
 import {getHeight} from '@/publicMethods/pageSet';
 
@@ -710,7 +710,7 @@ const SprintList: React.FC<any> = () => {
           <RangePicker
             className={'times'}
             style={{width: '18%'}}
-            defaultValue={[moment(getRecentMonth().start), moment()]}
+            defaultValue={[moment(getRecentMonth().start), moment(getRecentMonth().end)]}
             onChange={onTimeSelected}
           />
 
@@ -744,7 +744,7 @@ const SprintList: React.FC<any> = () => {
       <div style={{background: 'white'}}>
         {/* 使用一个图标就要导入一个图标 */}
         <Button type="text" style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}
-                icon={<SearchOutlined/>} size={'large'} onClick={showDefalultValue}>
+                icon={<LogoutOutlined />} size={'large'} onClick={showDefalultValue}>
           默认：</Button>
         <label style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}> 近1月未关闭的</label>
         {/* <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}> 近1月未关闭的 </Button> */}

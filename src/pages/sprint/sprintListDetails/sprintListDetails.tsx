@@ -1127,17 +1127,15 @@ const SprintList: React.FC<any> = () => {
         }
 
       });
-      const url = `/api/sprint/project/child/${deleteIdArray}`;
-      axios
-        .delete(url)
+debugger;
+      axios.delete('/api/sprint/project/child', {data: {data: deleteIdArray}})
         .then(function (res) {
           if (res.data.ok === true) {
             setIsDelModalVisible(false);
             updateGrid();
             message.info({
-              content: res.data.message,
+              content: "记录删除成功！",
               duration: 1, // 1S 后自动关闭
-              className: 'delSuccess',
               style: {
                 marginTop: '50vh',
               },
@@ -1146,7 +1144,6 @@ const SprintList: React.FC<any> = () => {
             message.error({
               content: `${res.data.message}`,
               duration: 1, // 1S 后自动关闭
-              className: 'MdelNon',
               style: {
                 marginTop: '50vh',
               },
@@ -1157,7 +1154,6 @@ const SprintList: React.FC<any> = () => {
           message.error({
             content: error.toString(),
             duration: 1,
-            className: 'MdelError',
             style: {
               marginTop: '50vh',
             },

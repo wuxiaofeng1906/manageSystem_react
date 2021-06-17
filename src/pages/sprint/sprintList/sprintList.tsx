@@ -626,7 +626,7 @@ const SprintList: React.FC<any> = () => {
           setIsDelModalVisible(false);
           updateGrid();
           message.info({
-            content: res.data.message,
+            content: "项目删除成功！",
             duration: 1,
             className: 'delSuccess',
             style: {

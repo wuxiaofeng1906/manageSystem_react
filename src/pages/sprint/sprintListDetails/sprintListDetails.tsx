@@ -1127,7 +1127,7 @@ const SprintList: React.FC<any> = () => {
         }
 
       });
-debugger;
+
       axios.delete('/api/sprint/project/child', {data: {data: deleteIdArray}})
         .then(function (res) {
           if (res.data.ok === true) {

@@ -1014,13 +1014,13 @@ const SprintList: React.FC<any> = () => {
     // 不同权限修改不同页面
     const authorityForMod = (detailsInfo: any) => {
       // 判断人员权限（admin，测试，开发经理（开发）,UED）
-      let currentUser;
+      let currentUserGroup;
       if (initialState?.currentUser) {
-        currentUser = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
+        currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
       }
 
-      if (currentUser !== undefined) {
-        switch (currentUser.toString()) {
+      if (currentUserGroup !== undefined) {
+        switch (currentUserGroup.toString()) {
           case 'superGroup':
           case 'projectListMG':
             adminModify(detailsInfo);

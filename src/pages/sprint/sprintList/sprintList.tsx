@@ -16,6 +16,7 @@ import {getHeight} from '@/publicMethods/pageSet';
 import axios from 'axios';
 import {history} from 'umi';
 import {judgeAuthority} from "@/publicMethods/authorityJudge";
+import {useModel} from "@@/plugin-model/useModel";
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
@@ -105,7 +106,11 @@ const SprintList: React.FC<any> = () => {
 
   const sys_accessToken = localStorage.getItem("accessId");
   axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
-
+  const {initialState} = useModel('@@initialState');
+  let currentUser: any;
+  if (initialState?.currentUser) {
+    currentUser = initialState.currentUser === undefined ? "" : initialState.currentUser.userid;
+  }
   // 定义列名
   const colums = () => {
     const component = new Array();
@@ -480,7 +485,7 @@ const SprintList: React.FC<any> = () => {
       stageAt: (values.planHuidu).format("YYYY-MM-DD"), // formatMomentTime(values.planHuidu),
       onlineAt: (values.planOnline).format("YYYY-MM-DD"), // formatMomentTime(values.planOnline),
       status: values.prjStatus,
-      creator: 'admin',
+      creator: currentUser.toString(),
     };
 
     debugger;

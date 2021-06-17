@@ -98,17 +98,20 @@ const Login: React.FC<{}> = () => {
   };
 
   const getUsersInfo = async (windowURL: any) => {
+    debugger;
     let userCode = "";
     if (windowURL.indexOf("?") !== -1) {
       const firstGroup = windowURL.split("?"); // 区分问号后面的内容
       const secondGroup = firstGroup[1].split("&"); // 区分code和其他属性
       const thirdGroup = secondGroup[0].split("="); // 获取到=后面的值
       userCode = thirdGroup[1].toString();
+      if (!windowURL.included("redirect")) {  // 不是重定向的时候才禁用
+        setTitleShown(true); // 设置为不可见
+      }
     }
 
     // 如果获取到了usercode，则拿取用户信息和权限
     if (userCode !== "") {
-      setTitleShown(true); // 设置为不可见
 
       const data = {
         username: "users",

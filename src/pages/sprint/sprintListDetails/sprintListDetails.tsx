@@ -244,7 +244,7 @@ const calTypeCount = (data: any) => {
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   const {data} = await client.query(`
       {
-         proDetail(project:${params}){
+         proDetail(project:${params},order:ASC){
             id
             stage
             tester

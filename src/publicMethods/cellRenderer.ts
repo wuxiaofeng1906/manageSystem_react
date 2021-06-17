@@ -1,5 +1,5 @@
 const numberRenderToYesNo = (params: any) => {
-  if (params.value === "") {
+  if (params.value === null) {
     return "";
   }
   if (params.value === "0") {
@@ -9,7 +9,7 @@ const numberRenderToYesNo = (params: any) => {
 };
 
 const numberRenderTopass = (params: any) => {
-  if (params.value === "") {
+  if (params.value === null) {
     return "";
   }
   if (params.value === "0") {

@@ -34,10 +34,11 @@ let delCounts = 0;
 
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
+  debugger;
   const range = `{start:"${params.dateRange.start}", end:"${params.dateRange.end}"}`;
   const {data} = await client.query(`
       {
-         project(name:"${params.projectName}",category:[${params.projectType}], range:${range},status:[${params.projectStatus}]){
+         project(name:"${params.projectName}",category:[${params.projectType}], range:${range},status:[${params.projectStatus}],order:ASC){
           id
           name
           type

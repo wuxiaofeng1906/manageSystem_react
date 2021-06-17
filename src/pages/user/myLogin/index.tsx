@@ -19,7 +19,7 @@ const goto = () => {
     const {query} = history.location;
     const {redirect} = query as { redirect: string };
     history.push(redirect || '/');
-  }, 10);
+  }, 20);
 };
 
 const wxLogin = () => {
@@ -57,6 +57,8 @@ const qywxScript = () => {
 
 const Login: React.FC<{}> = () => {
   const [submitting] = useState(false);
+  const [showTitle, setTitleShown] = useState(false);
+
   const {initialState, setInitialState} = useModel('@@initialState');
   const intl = useIntl();
 
@@ -96,7 +98,6 @@ const Login: React.FC<{}> = () => {
   };
 
   const getUsersInfo = async (windowURL: any) => {
-    let okFlag = false;
     let userCode = "";
     if (windowURL.indexOf("?") !== -1) {
       const firstGroup = windowURL.split("?"); // 区分问号后面的内容
@@ -118,7 +119,7 @@ const Login: React.FC<{}> = () => {
 
           const resultData = res.data;
           if (resultData.ok === true) {
-            okFlag = true;
+            setTitleShown(true); // 设置为不可见
             fetchUserInfo(resultData);
             goto();
           } else {
@@ -141,12 +142,9 @@ const Login: React.FC<{}> = () => {
           });
         });
     }
-
-    return okFlag;
   };
 
-
-  const {data, loading} = useRequest(() => getUsersInfo(window.location.href));
+  useRequest(() => getUsersInfo(window.location.href));
 
   const handleSubmit = async () => {
 
@@ -567,7 +565,7 @@ const Login: React.FC<{}> = () => {
   return (
     <div className={styles.container}>
 
-      <div className={styles.content}>
+      <div className={styles.content} hidden={showTitle}>
 
         {/* logo  */}
         <div className={styles.top}>

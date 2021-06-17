@@ -1425,6 +1425,7 @@ const SprintList: React.FC<any> = () => {
           selIds.push(`STORY_${rows.id}`);
         }
       }
+      debugger;
       const params = {
         id: selIds,
         attribute: "stage",
@@ -1469,19 +1470,19 @@ const SprintList: React.FC<any> = () => {
     const commitFlow = () => {
       switch (flowHitmessage.hintMessage) {
         case '已取消':
-          modFlowStage(7);
-          break;
-        case '开发已revert':
           modFlowStage(8);
           break;
-        case '测试已验证revert':
+        case '开发已revert':
           modFlowStage(9);
           break;
-        case '灰度已验过':
+        case '测试已验证revert':
           modFlowStage(10);
           break;
-        case '线上已验过':
+        case '灰度已验过':
           modFlowStage(11);
+          break;
+        case '线上已验过':
+          modFlowStage(12);
           break;
         default:
           break;

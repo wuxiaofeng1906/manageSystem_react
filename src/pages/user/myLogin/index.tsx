@@ -117,7 +117,6 @@ const Login: React.FC<{}> = () => {
         username: "users",
         password: userCode
       };
-      debugger;
       await axios
         .post('/api/auth/login', data)
         .then(function (res) {
@@ -128,7 +127,7 @@ const Login: React.FC<{}> = () => {
             goto();
           } else {
             message.error({
-              content: '无权登录！',
+              content: '您无权登录！',
               duration: 1,
               style: {
                 marginTop: '50vh',

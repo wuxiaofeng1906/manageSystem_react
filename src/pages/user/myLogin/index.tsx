@@ -108,6 +108,8 @@ const Login: React.FC<{}> = () => {
 
     // 如果获取到了usercode，则拿取用户信息和权限
     if (userCode !== "") {
+      setTitleShown(true); // 设置为不可见
+
       const data = {
         username: "users",
         password: userCode
@@ -119,7 +121,6 @@ const Login: React.FC<{}> = () => {
 
           const resultData = res.data;
           if (resultData.ok === true) {
-            setTitleShown(true); // 设置为不可见
             fetchUserInfo(resultData);
             goto();
           } else {

@@ -125,8 +125,8 @@ const SprintList: React.FC<any> = () => {
         pinned: 'left',
       },
       {
-        headerName: '序号',
-        maxWidth: 80,
+        headerName: 'NO.',
+        maxWidth: 60,
         filter: false,
         cellRenderer: (params: any) => {
           return Number(params.node.id) + 1;
@@ -135,11 +135,9 @@ const SprintList: React.FC<any> = () => {
       {
         headerName: '项目名称',
         field: 'name',
-        minWidth: 140,
+        minWidth: 155,
         cellRenderer: (params: any) => {
           return `<a  style="color:blue;text-decoration: underline" >${params.value}</a>`;
-          // return `<a  style="color:blue;text-decoration: underline" onclick={ChangePages}>${params.value}</a>`;
-          // return `<a href="/sprint/sprintListDetails" style="color:blue;text-decoration: underline" >${params.value}</a>`;
         },
         onCellClicked: (params: any) => {
           console.log('params', params.data);
@@ -147,55 +145,56 @@ const SprintList: React.FC<any> = () => {
         },
       },
       {
-        headerName: '来源类型',
+        headerName: '来源',
         field: 'type',
+        minWidth: 70,
         cellRenderer: (params: any) => {
           if (params.value === 'AUTO') {
-            return '自动创建';
+            return '自动';
           }
-          return '人工创建';
+          return '人工';
         },
       },
       {
         headerName: '开始时间',
         field: 'startAt',
-        minWidth: 130,
+        minWidth: 125,
       },
       {
         headerName: '提测截止日期',
         field: 'testEnd',
-        minWidth: 130,
+        minWidth: 125,
       },
       {
         headerName: '测试完成日期',
         field: 'testFinish',
-        minWidth: 130,
+        minWidth: 125,
       },
       {
         headerName: '计划灰度日期',
         field: 'expStage',
-        minWidth: 130,
+        minWidth: 125,
       },
       {
         headerName: '计划上线日期',
         field: 'expOnline',
-        minWidth: 130,
+        minWidth: 125,
       },
       {
         headerName: '创建日期',
         field: 'createAt',
-        minWidth: 130,
+        minWidth: 125,
         cellRenderer: (params: any) => {
-
           return dayjs(params.value).format("YYYY-MM-DD");
         }
       },
       {
         headerName: '创建人',
         field: 'creator',
+        minWidth: 80,
       },
       {
-        headerName: '项目状态',
+        headerName: '状态',
         field: 'status',
         cellRenderer: (params: any) => {
           let returnValue = '';
@@ -222,7 +221,7 @@ const SprintList: React.FC<any> = () => {
         },
       },
       {
-        headerName: '访问禅道',
+        headerName: '去禅道',
         field: 'ztId',
         cellRenderer: (params: any) => {
           return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/project-task-${params.value}.html'>去禅道</a>`;
@@ -779,6 +778,7 @@ const SprintList: React.FC<any> = () => {
             filter: true,
             flex: 1,
             minWidth: 100,
+            suppressMenu: true,
           }}
           autoGroupColumnDef={{
             minWidth: 100,

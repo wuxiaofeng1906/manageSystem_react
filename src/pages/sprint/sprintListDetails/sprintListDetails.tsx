@@ -28,7 +28,8 @@ import {
   numberRenderToZentaoStatus,
   numberRenderToSource,
   linkToZentaoPage,
-  numberRenderToZentaoStatusForRed
+  numberRenderToZentaoStatusForRed,
+  stageForLineThrough
 } from '@/publicMethods/cellRenderer';
 import axios from 'axios';
 import moment from "moment";
@@ -64,12 +65,14 @@ const colums = () => {
       pinned: 'left',
       cellRenderer: numberRenderToCurrentStageForColor,
       minWidth: 120,
+
     },
     {
       headerName: '测试',
       field: 'tester',
       pinned: 'left',
       minWidth: 80,
+      cellRenderer: stageForLineThrough
     },
     {
       headerName: '类型',
@@ -90,6 +93,8 @@ const colums = () => {
       field: 'title',
       pinned: 'left',
       minWidth: 200,
+      cellRenderer: stageForLineThrough
+
     },
     {
       headerName: '严重程度',
@@ -105,6 +110,8 @@ const colums = () => {
       headerName: '模块',
       field: 'moduleName',
       minWidth: 100,
+      cellRenderer: stageForLineThrough
+
     },
     {
       headerName: '状态',
@@ -116,39 +123,55 @@ const colums = () => {
       headerName: '发布环境',
       field: 'publishEnv',
       minWidth: 80,
+      cellRenderer: stageForLineThrough
+
     },
     {
       headerName: '指派给',
       field: 'assignedTo',
       minWidth: 80,
+      cellRenderer: stageForLineThrough
+
     },
     {
       headerName: '解决/完成人',
       field: 'finishedBy',
       minWidth: 80,
+      cellRenderer: stageForLineThrough
+
     },
     {
       headerName: '关闭人',
       field: 'closedBy',
       minWidth: 80,
+      cellRenderer: stageForLineThrough
+
     }, {
       headerName: '备注',
       field: 'memo',
       minWidth: 150,
+      cellRenderer: stageForLineThrough
+
     }, {
       headerName: '相关需求',
       field: 'relatedStories',
       minWidth: 80,
+      cellRenderer: stageForLineThrough
+
     },
     {
       headerName: '相关任务',
       field: 'relatedTasks',
       minWidth: 80,
+      cellRenderer: stageForLineThrough
+
     },
     {
       headerName: '相关bug',
       field: 'relatedBugs',
       minWidth: 80,
+      cellRenderer: stageForLineThrough
+
     },
     {
       headerName: '是否可热更',
@@ -178,10 +201,14 @@ const colums = () => {
     {
       headerName: '验证范围建议',
       field: 'scopeLimit',
+      cellRenderer: stageForLineThrough
+
     },
     {
       headerName: 'UED',
       field: 'uedName',
+      cellRenderer: stageForLineThrough
+
     },
     {
       headerName: 'UED测试环境验证',
@@ -201,6 +228,8 @@ const colums = () => {
     {
       headerName: '反馈人',
       field: 'feedback',
+      cellRenderer: stageForLineThrough
+
     }
   );
 
@@ -340,6 +369,7 @@ const SprintList: React.FC<any> = () => {
     const onGridReady = (params: GridReadyEvent) => {
       gridApi.current = params.api;
       params.api.sizeColumnsToFit();
+
     };
 
     if (gridApi.current) {
@@ -1573,6 +1603,8 @@ const SprintList: React.FC<any> = () => {
               suppressMenu: true,
               cellStyle: {"line-height": "30px"}
             }}
+
+
             autoGroupColumnDef={{
               minWidth: 100,
             }}
@@ -1582,6 +1614,8 @@ const SprintList: React.FC<any> = () => {
             groupDefaultExpanded={9} // 展开分组
             onGridReady={onGridReady}
             onRowDoubleClicked={rowClicked}
+            excelStyles={[]}
+
           />
 
         </div>

@@ -3,7 +3,13 @@ const numberRenderToYesNo = (params: any) => {
     return "";
   }
   if (params.value === "0") {
+    if (params.data.stage === 8) {
+      return `<span style="text-decoration:line-through"> 否 </span>`;
+    }
     return "否";
+  }
+  if (params.data.stage === 8) {
+    return `<span style="text-decoration:line-through"> 是 </span>`;
   }
   return "是";
 };
@@ -13,12 +19,20 @@ const numberRenderTopass = (params: any) => {
     return "";
   }
   if (params.value === "0") {
+    if (params.data.stage === 8) {
+      return `<span style="text-decoration:line-through"> 未通过 </span>`;
+    }
     return "未通过";
   }
   if (params.value === "1") {
+    if (params.data.stage === 8) {
+      return `<span style="text-decoration:line-through"> 验证通过 </span>`;
+    }
     return "验证通过";
   }
-
+  if (params.data.stage === 8) {
+    return `<span style="text-decoration:line-through"> 无需验证 </span>`;
+  }
   return "无需验证";
 };
 
@@ -74,6 +88,19 @@ const numberRenderToCurrentStage = (params: any) => {
 
 };
 
+
+const stageForLineThrough = (params: any) => {
+  if (params.value === null) {
+    return "";
+  }
+  if (params.data.stage === 8) {
+    return `<span style="text-decoration:line-through"> ${params.value} </span>`;
+  }
+  return params.value;
+
+};
+
+
 const numberRenderToCurrentStageForColor = (params: any) => {
   let stage = "";
 
@@ -126,6 +153,9 @@ const numberRenderToCurrentStageForColor = (params: any) => {
   if (stage === "未开始") {
     return `<span style="color: red"> ${stage} </span>`;
   }
+  if (stage === "已取消") {
+    return `<span style="text-decoration:line-through"> ${stage} </span>`;
+  }
   return stage;
 
 };
@@ -147,6 +177,11 @@ const numberRenderToZentaoType = (params: any) => {
       break;
     default:
       break;
+  }
+
+  if (params.data.stage === 8) {
+    return `<span style="text-decoration:line-through"> ${type} </span>`;
+
   }
   return type;
 };
@@ -173,6 +208,10 @@ const numberRenderToZentaoSeverity = (params: any) => {
     default:
       break;
   }
+  if (params.data.stage === 8) {
+    return `<span style="text-decoration:line-through"> ${severity} </span>`;
+  }
+
   return severity;
 };
 
@@ -261,7 +300,14 @@ const numberRenderToZentaoStatusForRed = (params: any) => {
   }
 
   if (status === "激活" || status === "未开始") {
+    if (params.data.stage === 8) {
+      return `<span style="color: red;text-decoration:line-through"> ${status} </span>`;
+    }
     return `<span style="color: red"> ${status} </span>`;
+  }
+
+  if (params.data.stage === 8) {
+    return `<span style="text-decoration:line-through"> ${status} </span>`;
   }
   return status;
 };
@@ -299,6 +345,11 @@ const numberRenderToSource = (params: any) => {
     default:
       break;
   }
+
+  if (params.data.stage === 8) {
+    return `<span style="text-decoration:line-through"> ${source} </span>`;
+  }
+
   return source;
 };
 
@@ -317,6 +368,11 @@ const linkToZentaoPage = (params: any) => {
       break;
     default:
       break;
+  }
+
+  if (params.data.stage === 8) {
+    // return `<span style="text-decoration:line-through"> ${type} </span>`;
+    return `<a target="_blank" style="color:blue;text-decoration: line-through" href='http://zentao.77hub.com/zentao/${ztCategory}-view-${params.value}.html'>${params.value}</a>`;
   }
   return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/${ztCategory}-view-${params.value}.html'>${params.value}</a>`;
 
@@ -367,6 +423,7 @@ export {
   moduleChange,
   colorRender,
   numberRenderToZentaoStatusForRed,
-  numberRenderToCurrentStageForColor
+  numberRenderToCurrentStageForColor,
+  stageForLineThrough
 };
 

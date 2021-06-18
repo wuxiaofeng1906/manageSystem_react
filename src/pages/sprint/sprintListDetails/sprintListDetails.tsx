@@ -357,7 +357,7 @@ const SprintList: React.FC<any> = () => {
       const bugs = datas?.resCount.bug === undefined ? 0 : datas?.resCount.bug;
       const tasks = datas?.resCount.task === undefined ? 0 : datas?.resCount.task;
       const storys = datas?.resCount.story === undefined ? 0 : datas?.resCount.story;
-      setPageTitle(`${prjNames}:bug ${bugs} 个，task ${tasks} 个，story ${storys} 个`);
+      setPageTitle(`共${bugs + tasks + storys}个，bug ${bugs} 个，task ${tasks} 个，story ${storys} 个`);
 
     };
     // 获取部门数据
@@ -1496,7 +1496,7 @@ const SprintList: React.FC<any> = () => {
       const tasks = data?.resCount.task === undefined ? 0 : data?.resCount.task;
       const storys = data?.resCount.story === undefined ? 0 : data?.resCount.story;
 
-      setPageTitle(`${prjNames}:bug ${bugs} 个，task ${tasks} 个，story ${storys} 个`);
+      setPageTitle(`共 ${bugs + tasks + storys} 个，bug ${bugs} 个，task ${tasks} 个，story ${storys} 个`);
     }, [data]);
 
     return (
@@ -1505,7 +1505,8 @@ const SprintList: React.FC<any> = () => {
 
         <PageHeader
           ghost={false}
-          title={pageTitle}
+          title={prjNames}
+          subTitle={<div style={{color: "black"}}> {pageTitle}</div>}
           style={{height: "100px"}}
           breadcrumb={{routes}}
         />

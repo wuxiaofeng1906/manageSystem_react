@@ -145,17 +145,6 @@ const SprintList: React.FC<any> = () => {
         },
       },
       {
-        headerName: '来源',
-        field: 'type',
-        minWidth: 70,
-        cellRenderer: (params: any) => {
-          if (params.value === 'AUTO') {
-            return '自动';
-          }
-          return '人工';
-        },
-      },
-      {
         headerName: '开始时间',
         field: 'startAt',
         minWidth: 125,
@@ -196,6 +185,7 @@ const SprintList: React.FC<any> = () => {
       {
         headerName: '状态',
         field: 'status',
+        minWidth: 80,
         cellRenderer: (params: any) => {
           let returnValue = '';
           switch (params.value) {
@@ -223,8 +213,19 @@ const SprintList: React.FC<any> = () => {
       {
         headerName: '去禅道',
         field: 'ztId',
+        minWidth: 80,
         cellRenderer: (params: any) => {
           return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/project-task-${params.value}.html'>去禅道</a>`;
+        },
+      }, {
+        headerName: '来源',
+        field: 'type',
+        minWidth: 70,
+        cellRenderer: (params: any) => {
+          if (params.value === 'AUTO') {
+            return '自动';
+          }
+          return '人工';
         },
       },
     );
@@ -236,6 +237,10 @@ const SprintList: React.FC<any> = () => {
   const [formForAddAnaMod] = Form.useForm();
   const [formForDel] = Form.useForm();
 
+  const [choicedDateTime, setchoicedDateTime] = useState({
+    start: getRecentMonth().start,
+    end: getRecentMonth().end
+  });
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
@@ -279,6 +284,13 @@ const SprintList: React.FC<any> = () => {
       start: dateString[0],
       end: dateString[1],
     };
+    console.log(params);
+    debugger;
+    setchoicedDateTime({
+      start: dateString[0],
+      end: dateString[1]
+    });
+
     updateGrid();
   };
 
@@ -301,6 +313,10 @@ const SprintList: React.FC<any> = () => {
       dateRange: getRecentMonth(),
       projectStatus: ['wait', 'doing', 'suspended'],
     };
+    setchoicedDateTime({
+      start: getRecentMonth().start,
+      end: getRecentMonth().end
+    });
     const datas: any = await queryDevelopViews(gqlClient, defalutCondition);
     gridApi.current?.setRowData(datas);
   };
@@ -714,7 +730,10 @@ const SprintList: React.FC<any> = () => {
           <RangePicker
             className={'times'}
             style={{width: '18%'}}
-            defaultValue={[moment(getRecentMonth().start), moment(getRecentMonth().end)]}
+            // defaultValue={[moment(getRecentMonth().start), moment(getRecentMonth().end)]}
+            // defaultValue={[choicedDateTime.start, choicedDateTime.end]}
+            value={[moment(choicedDateTime.start), moment(choicedDateTime.end)]}
+
             onChange={onTimeSelected}
           />
 
@@ -750,7 +769,7 @@ const SprintList: React.FC<any> = () => {
         <Button type="text" style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}
                 icon={<LogoutOutlined/>} size={'large'} onClick={showDefalultValue}>
           默认：</Button>
-        <label style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}> 近1月未关闭的</label>
+        <label style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}> 近2月未关闭的</label>
         {/* <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}> 近1月未关闭的 </Button> */}
         <Button type="text"
                 style={{color: 'black', float: 'right', display: judgeAuthority("删除项目") === true ? "inline" : "none"}}

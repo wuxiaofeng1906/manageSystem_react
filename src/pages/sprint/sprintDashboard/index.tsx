@@ -648,6 +648,7 @@ const DashBoard: React.FC<any> = () => {
 
   // sprint赋值和下拉框事件
   const sprintChanged = async (value: string, other: any) => {
+    debugger;
     sprintPrjInfo.prjID = other.key;
     sprintPrjInfo.prjName = other.value;
     const datas: any = await queryProjectALL(gqlClient, other.key);
@@ -2532,6 +2533,7 @@ const DashBoard: React.FC<any> = () => {
                         icon={<SearchOutlined/>}
                         size={'large'}
                         onClick={() => {
+                          debugger;
                           history.push(`/sprint/sprintListDetails?projectid=${sprintPrjInfo.prjID}&project=${sprintPrjInfo.prjName}`);
                         }}>查看项目清单All</Button>
               </div>

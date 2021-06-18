@@ -59,164 +59,149 @@ const colums = () => {
     //   },
     // },
     {
-      headerName: '当前阶段',
+      headerName: '阶段',
       field: 'stage',
-      cellRenderer: numberRenderToCurrentStageForColor,
       pinned: 'left',
+      cellRenderer: numberRenderToCurrentStageForColor,
+      minWidth: 120,
     },
     {
-      headerName: '测试负责人填写',
-
-      children: [
-        {
-          headerName: '测试',
-          field: 'tester',
-          pinned: 'left'
-        },
-        {
-          headerName: '类型',
-          field: 'category',
-          cellRenderer: numberRenderToZentaoType,
-          pinned: 'left'
-        },
-        {
-          headerName: '编号',
-          field: 'ztNo',
-          cellRenderer: linkToZentaoPage,
-          pinned: 'left'
-        },
-      ],
+      headerName: '测试',
+      field: 'tester',
+      pinned: 'left',
+      minWidth: 80,
     },
     {
-      headerName: '禅道自动实时获取',
-      children: [
-        {
-          headerName: '标题内容',
-          field: 'title',
-          pinned: 'left',
-        },
-        {
-          headerName: '严重程度',
-          field: 'severity',
-          cellRenderer: numberRenderToZentaoSeverity,
-        },
-        // {
-        //   headerName: '优先级',
-        //   field: 'priority',
-        // },
-        {
-          headerName: '模块',
-          field: 'moduleName',
-        },
-        {
-          headerName: '状态',
-          field: 'ztStatus',
-          cellRenderer: numberRenderToZentaoStatusForRed,
-        },
-        {
-          headerName: '发布环境',
-          field: 'publishEnv',
-        },
-        {
-          headerName: '指派给',
-          field: 'assignedTo',
-        },
-        {
-          headerName: '解决/完成人',
-          field: 'finishedBy',
-        },
-        {
-          headerName: '关闭人',
-          field: 'closedBy',
-        }, {
-          headerName: '备注',
-          field: 'memo',
-        }, {
-          headerName: '相关需求',
-          field: 'relatedStories',
-        },
-        {
-          headerName: '相关任务',
-          field: 'relatedTasks',
-        },
-        {
-          headerName: '相关bug',
-          field: 'relatedBugs',
-        },
-      ],
+      headerName: '类型',
+      field: 'category',
+      cellRenderer: numberRenderToZentaoType,
+      pinned: 'left',
+      minWidth: 70,
     },
     {
-      headerName: '开发经理填写',
-      children: [
-        {
-          headerName: '是否可热更',
-          field: 'hotUpdate',
-          cellRenderer: numberRenderToYesNo,
-        },
-        {
-          headerName: '是否有数据升级',
-          field: 'dataUpdate',
-          cellRenderer: numberRenderToYesNo,
-        },
-        {
-          headerName: '是否有接口升级',
-          field: 'interUpdate',
-          cellRenderer: numberRenderToYesNo,
-        },
-        {
-          headerName: '是否有预置数据修改',
-          field: 'presetData',
-          cellRenderer: numberRenderToYesNo,
-        },
-        {
-          headerName: '是否需要测试验证',
-          field: 'testCheck',
-          cellRenderer: numberRenderToYesNo,
-        },
-        {
-          headerName: '验证范围建议',
-          field: 'scopeLimit',
-        }
-      ],
+      headerName: '编号',
+      field: 'ztNo',
+      cellRenderer: linkToZentaoPage,
+      pinned: 'left',
+      minWidth: 75,
     },
     {
-      headerName: 'UED填写',
-      children: [
-        {
-          headerName: 'UED',
-          field: 'uedName',
-        },
-        {
-          headerName: 'UED测试环境验证',
-          field: 'uedEnvCheck',
-          cellRenderer: numberRenderTopass,
-        },
-        {
-          headerName: 'UED线上验证',
-          field: 'uedOnlineCheck',
-          cellRenderer: numberRenderTopass,
-        },
-      ],
+      headerName: '标题内容',
+      field: 'title',
+      pinned: 'left',
+      minWidth: 200,
     },
     {
-      headerName: '测试/UED填写',
-      children: [
-        {
-          headerName: '来源',
-          field: 'source',
-          cellRenderer: numberRenderToSource,
-        },
-      ],
+      headerName: '严重程度',
+      field: 'severity',
+      cellRenderer: numberRenderToZentaoSeverity,
+      minWidth: 75,
+    },
+    // {
+    //   headerName: '优先级',
+    //   field: 'priority',
+    // },
+    {
+      headerName: '模块',
+      field: 'moduleName',
+      minWidth: 100,
     },
     {
-      headerName: '自动生成',
-      children: [
-        {
-          headerName: '反馈人',
-          field: 'feedback',
-        },
-      ],
+      headerName: '状态',
+      field: 'ztStatus',
+      cellRenderer: numberRenderToZentaoStatusForRed,
+      minWidth: 80,
     },
+    {
+      headerName: '发布环境',
+      field: 'publishEnv',
+      minWidth: 80,
+    },
+    {
+      headerName: '指派给',
+      field: 'assignedTo',
+      minWidth: 80,
+    },
+    {
+      headerName: '解决/完成人',
+      field: 'finishedBy',
+      minWidth: 80,
+    },
+    {
+      headerName: '关闭人',
+      field: 'closedBy',
+      minWidth: 80,
+    }, {
+      headerName: '备注',
+      field: 'memo',
+      minWidth: 150,
+    }, {
+      headerName: '相关需求',
+      field: 'relatedStories',
+      minWidth: 80,
+    },
+    {
+      headerName: '相关任务',
+      field: 'relatedTasks',
+      minWidth: 80,
+    },
+    {
+      headerName: '相关bug',
+      field: 'relatedBugs',
+      minWidth: 80,
+    },
+    {
+      headerName: '是否可热更',
+      field: 'hotUpdate',
+      cellRenderer: numberRenderToYesNo,
+    },
+    {
+      headerName: '是否有数据升级',
+      field: 'dataUpdate',
+      cellRenderer: numberRenderToYesNo,
+    },
+    {
+      headerName: '是否有接口升级',
+      field: 'interUpdate',
+      cellRenderer: numberRenderToYesNo,
+    },
+    {
+      headerName: '是否有预置数据修改',
+      field: 'presetData',
+      cellRenderer: numberRenderToYesNo,
+    },
+    {
+      headerName: '是否需要测试验证',
+      field: 'testCheck',
+      cellRenderer: numberRenderToYesNo,
+    },
+    {
+      headerName: '验证范围建议',
+      field: 'scopeLimit',
+    },
+    {
+      headerName: 'UED',
+      field: 'uedName',
+    },
+    {
+      headerName: 'UED测试环境验证',
+      field: 'uedEnvCheck',
+      cellRenderer: numberRenderTopass,
+    },
+    {
+      headerName: 'UED线上验证',
+      field: 'uedOnlineCheck',
+      cellRenderer: numberRenderTopass,
+    },
+    {
+      headerName: '来源',
+      field: 'source',
+      cellRenderer: numberRenderToSource,
+    },
+    {
+      headerName: '反馈人',
+      field: 'feedback',
+    }
   );
 
   return component;
@@ -1584,6 +1569,7 @@ const SprintList: React.FC<any> = () => {
               filter: true,
               flex: 1,
               minWidth: 100,
+              suppressMenu: true,
               cellStyle: {"line-height": "30px"}
             }}
             autoGroupColumnDef={{

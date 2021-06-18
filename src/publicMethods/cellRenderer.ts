@@ -143,7 +143,7 @@ const numberRenderToZentaoType = (params: any) => {
       type = "Task";
       break;
     case "3":
-      type = "需求";
+      type = "story";
       break;
     default:
       break;

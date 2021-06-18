@@ -92,7 +92,7 @@ const colums = () => {
       headerName: '标题内容',
       field: 'title',
       pinned: 'left',
-      minWidth: 200,
+      minWidth: 350,
       cellRenderer: stageForLineThrough
 
     },

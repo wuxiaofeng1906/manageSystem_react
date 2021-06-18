@@ -159,32 +159,32 @@ const SprintList: React.FC<any> = () => {
       {
         headerName: '开始时间',
         field: 'startAt',
-        minWidth: 110,
+        minWidth: 130,
       },
       {
         headerName: '提测截止日期',
         field: 'testEnd',
-        minWidth: 110,
+        minWidth: 130,
       },
       {
         headerName: '测试完成日期',
         field: 'testFinish',
-        minWidth: 110,
+        minWidth: 130,
       },
       {
         headerName: '计划灰度日期',
         field: 'expStage',
-        minWidth: 110,
+        minWidth: 130,
       },
       {
         headerName: '计划上线日期',
         field: 'expOnline',
-        minWidth: 110,
+        minWidth: 130,
       },
       {
         headerName: '创建日期',
         field: 'createAt',
-        minWidth: 110,
+        minWidth: 130,
         cellRenderer: (params: any) => {
 
           return dayjs(params.value).format("YYYY-MM-DD");

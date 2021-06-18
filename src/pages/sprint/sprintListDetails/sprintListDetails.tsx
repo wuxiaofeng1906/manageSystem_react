@@ -49,15 +49,15 @@ const colums = () => {
       maxWidth: 50,
       pinned: 'left',
     },
-    {
-      headerName: '序号',
-      maxWidth: 80,
-      filter: false,
-      pinned: 'left',
-      cellRenderer: (params: any) => {
-        return Number(params.node.id) + 1;
-      },
-    },
+    // {
+    //   headerName: '序号',
+    //   maxWidth: 80,
+    //   filter: false,
+    //   pinned: 'left',
+    //   cellRenderer: (params: any) => {
+    //     return Number(params.node.id) + 1;
+    //   },
+    // },
     {
       headerName: '当前阶段',
       field: 'stage',
@@ -69,18 +69,18 @@ const colums = () => {
 
       children: [
         {
-          headerName: '对应测试',
+          headerName: '测试',
           field: 'tester',
           pinned: 'left'
         },
         {
-          headerName: '禅道类型',
+          headerName: '类型',
           field: 'category',
           cellRenderer: numberRenderToZentaoType,
           pinned: 'left'
         },
         {
-          headerName: '禅道编号',
+          headerName: '编号',
           field: 'ztNo',
           cellRenderer: linkToZentaoPage,
           pinned: 'left'
@@ -100,42 +100,48 @@ const colums = () => {
           field: 'severity',
           cellRenderer: numberRenderToZentaoSeverity,
         },
+        // {
+        //   headerName: '优先级',
+        //   field: 'priority',
+        // },
         {
-          headerName: '优先级',
-          field: 'priority',
-        },
-        {
-          headerName: '所属模块',
+          headerName: '模块',
           field: 'moduleName',
         },
         {
-          headerName: '禅道状态',
+          headerName: '状态',
           field: 'ztStatus',
           cellRenderer: numberRenderToZentaoStatusForRed,
         },
         {
-          headerName: '相关需求数',
-          field: 'relatedStories',
-        },
-        {
-          headerName: '相关任务数',
-          field: 'relatedTasks',
-        },
-        {
-          headerName: '相关bug数',
-          field: 'relatedBugs',
+          headerName: '发布环境',
+          field: 'publishEnv',
         },
         {
           headerName: '指派给',
           field: 'assignedTo',
         },
         {
-          headerName: '由谁解决/完成',
+          headerName: '解决/完成人',
           field: 'finishedBy',
         },
         {
-          headerName: '由谁关闭',
+          headerName: '关闭人',
           field: 'closedBy',
+        }, {
+          headerName: '备注',
+          field: 'memo',
+        }, {
+          headerName: '相关需求',
+          field: 'relatedStories',
+        },
+        {
+          headerName: '相关任务',
+          field: 'relatedTasks',
+        },
+        {
+          headerName: '相关bug',
+          field: 'relatedBugs',
         },
       ],
     },
@@ -143,7 +149,7 @@ const colums = () => {
       headerName: '开发经理填写',
       children: [
         {
-          headerName: '是否支持热更新',
+          headerName: '是否可热更',
           field: 'hotUpdate',
           cellRenderer: numberRenderToYesNo,
         },
@@ -170,18 +176,14 @@ const colums = () => {
         {
           headerName: '验证范围建议',
           field: 'scopeLimit',
-        },
-        {
-          headerName: '发布环境',
-          field: 'publishEnv',
-        },
+        }
       ],
     },
     {
       headerName: 'UED填写',
       children: [
         {
-          headerName: '对应UED',
+          headerName: 'UED',
           field: 'uedName',
         },
         {
@@ -199,10 +201,6 @@ const colums = () => {
     {
       headerName: '测试/UED填写',
       children: [
-        {
-          headerName: '备注',
-          field: 'memo',
-        },
         {
           headerName: '来源',
           field: 'source',

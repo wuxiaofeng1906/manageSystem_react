@@ -494,6 +494,7 @@ const bugResultDeals = (countArray: any) => {
   let itemArray = [];
   if (countArray.length > 0) {
     const temp = countArray[0].data;
+    debugger;
     hotfixBugCount.all_bug_count = countArray[0].count;
 
     if (temp.length > 0) {

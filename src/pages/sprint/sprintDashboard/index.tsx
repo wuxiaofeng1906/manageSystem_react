@@ -14,19 +14,7 @@ import {getWeeksRange} from '@/publicMethods/timeMethods';
 import {judgeAuthority} from "@/publicMethods/authorityJudge";
 
 const {Option} = Select;
-// 全局变量
-const sprintPrjInfo = {
-  prjID: "",
-  prjName: ""
-};
-const hotfixPrjInfo = {
-  prjID: "",
-  prjName: ""
-};
-const emergencyPrjInfo = {
-  prjID: "",
-  prjName: ""
-};
+
 
 const queryDashboardViews = async (client: GqlClient<object>) => {
   const times = getWeeksRange(1)[0].to;
@@ -399,9 +387,9 @@ const DashBoard: React.FC<any> = () => {
     // endregion
   });
   const [selectedName, setSelectedName] = useState({
-    emergency: "",
-    hotfix: "",
-    sprint: ""
+    emergency: {id: "", name: ""},
+    hotfix: {id: "", name: ""},
+    sprint: {id: "", name: ""}
   });
 
   // 界面展示数据获取和解析
@@ -409,22 +397,29 @@ const DashBoard: React.FC<any> = () => {
   let sp_data = Object();
   let ho_data = Object();
   let em_data = Object();
+  let oraProject = {
+    sprint: {id: "", name: ""},
+    hotfix: {id: "", name: ""},
+    emergency: {id: "", name: ""},
+  };
   if (data !== undefined) {
     for (let index = 0; index < data.length; index += 1) {
       const details = data[index];
       if (details.category === "sprint") {
-        sprintPrjInfo.prjName = details.name;
-        sprintPrjInfo.prjID = details.id;
+        oraProject.sprint.id = details.id;
+        oraProject.sprint.name = details.name;
+
         sp_data = sp_hotResultDeals(details.data);
 
       } else if (details.category === "hotfix") {
-        hotfixPrjInfo.prjName = details.name;
-        hotfixPrjInfo.prjID = details.id;
+        oraProject.hotfix.id = details.id;
+        oraProject.hotfix.name = details.name;
         ho_data = sp_hotResultDeals(details.data);
 
       } else {
-        emergencyPrjInfo.prjName = details.name;
-        emergencyPrjInfo.prjID = details.id;
+        oraProject.emergency.id = details.id;
+        oraProject.emergency.name = details.name;
+
         em_data = bugResultDeals(details.data);
       }
     }
@@ -445,25 +440,24 @@ const DashBoard: React.FC<any> = () => {
   // emergency赋值和下拉框事件
   const emergencyChanged = async (value: string, other: any) => {
     let hidde = false;
-    emergencyPrjInfo.prjID = other.key;
-    emergencyPrjInfo.prjName = other.value;
     const datas: any = await queryProjectALL(gqlClient, other.key);
     const em_datas = bugResultDeals(datas);
 
+    debugger;
     if (JSON.stringify(em_datas) === "{}" || datas === null) {
       hidde = true;
     }
 
     setSelectedName({
       ...selectedName,
-      emergency: other.value
+      emergency: {id: other.key, name: other.value}
     });
     setHidden({
       ...hidden,
       em_bug: hidde,
     });
     setEmergency({
-      all_count_bug: em_datas.all_count_bug,
+      all_count_bug: em_datas.all_count_bug === undefined ? 0 : em_datas.all_count_bug,
       noAssign: em_datas.Bug_no_assign,
       noDeadline: em_datas.Bug_no_deadline,
       prj_error: '',
@@ -490,9 +484,6 @@ const DashBoard: React.FC<any> = () => {
     let story_task = false;
     let story_bug = false;
 
-    hotfixPrjInfo.prjID = other.key;
-    hotfixPrjInfo.prjName = other.value;
-
     const datas: any = await queryProjectALL(gqlClient, other.key);
     if (datas === null) {
       return;
@@ -509,7 +500,7 @@ const DashBoard: React.FC<any> = () => {
     }
     setSelectedName({
       ...selectedName,
-      hotfix: other.value
+      hotfix: {id: other.key, name: other.value}
     });
 
     if (ho_datas === null) {
@@ -648,15 +639,12 @@ const DashBoard: React.FC<any> = () => {
 
   // sprint赋值和下拉框事件
   const sprintChanged = async (value: string, other: any) => {
-    debugger;
-    sprintPrjInfo.prjID = other.key;
-    sprintPrjInfo.prjName = other.value;
     const datas: any = await queryProjectALL(gqlClient, other.key);
     const sp_datas = sp_hotResultDeals(datas);
 
     setSelectedName({
       ...selectedName,
-      sprint: other.value
+      sprint: {id: other.key, name: other.value}
     });
 
     if (sp_datas === null) {
@@ -788,20 +776,27 @@ const DashBoard: React.FC<any> = () => {
 
   // endregion
 
-  const emergency_url = `projectid=${emergencyPrjInfo.prjID}&project=${emergencyPrjInfo.prjName}`;
-  const hotfix_url = `projectid=${hotfixPrjInfo.prjID}&project=${hotfixPrjInfo.prjName}`;
-  const sprint_url = `projectid=${sprintPrjInfo.prjID}&project=${sprintPrjInfo.prjName}`;
+  const emergency_url = `projectid=${selectedName.emergency.id}&project=${selectedName.emergency.name}`;
+  const hotfix_url = `projectid=${selectedName.hotfix.id}&project=${selectedName.hotfix.name}`;
+  const sprint_url = `projectid=${selectedName.sprint.id}&project=${selectedName.sprint.name}`;
 
   useEffect(() => {
 
-
     setSelectedName({
 
-      emergency: emergencyPrjInfo.prjName === "" ? "emergency" : emergencyPrjInfo.prjName,
-      hotfix: hotfixPrjInfo.prjName === "" ? "hotfix" : hotfixPrjInfo.prjName,
-      sprint: sprintPrjInfo.prjName === "" ? "sprint" : sprintPrjInfo.prjName
+      emergency: {
+        id: oraProject.emergency.id === "" ? "" : oraProject.emergency.id,
+        name: oraProject.emergency.name === "" ? "emergency" : oraProject.emergency.name
+      },
+      hotfix: {
+        id: oraProject.hotfix.id === "" ? "" : oraProject.hotfix.id,
+        name: oraProject.hotfix.name === "" ? "hotfix" : oraProject.hotfix.name
+      },
+      sprint: {
+        id: oraProject.sprint.id === "" ? "" : oraProject.sprint.id,
+        name: oraProject.sprint.name === "" ? "sprint" : oraProject.sprint.name
+      },
     });
-
 
     let em_bug_hidden = true;
     let ho_story_hidden = true;
@@ -1142,7 +1137,7 @@ const DashBoard: React.FC<any> = () => {
 
               {/* emergency 下拉框 */}
               <div>
-                <Select value={selectedName.emergency}
+                <Select value={selectedName.emergency.name}
                         style={{
                           width: '200px',
                           marginLeft: "20px",
@@ -1162,7 +1157,7 @@ const DashBoard: React.FC<any> = () => {
                         icon={<SearchOutlined/>}
                         size={'large'}
                         onClick={() => {
-                          history.push(`/sprint/sprintListDetails?projectid=${emergencyPrjInfo.prjID}&project=${emergencyPrjInfo.prjName}`);
+                          history.push(`/sprint/sprintListDetails?projectid=${selectedName.emergency.id}&project=${selectedName.emergency.name}`);
                         }}>查看项目清单All</Button>
               </div>
               {/* emergency 数据显示div */}
@@ -1381,7 +1376,7 @@ const DashBoard: React.FC<any> = () => {
 
               {/* hotfix 下拉框 */}
               <div style={{marginTop: "20px"}}>
-                <Select value={selectedName.hotfix}
+                <Select value={selectedName.hotfix.name}
                         style={{
                           width: '200px',
                           marginLeft: "20px",
@@ -1398,7 +1393,7 @@ const DashBoard: React.FC<any> = () => {
                         icon={<SearchOutlined/>}
                         size={'large'}
                         onClick={() => {
-                          history.push(`/sprint/sprintListDetails?projectid=${hotfixPrjInfo.prjID}&project=${hotfixPrjInfo.prjName}`);
+                          history.push(`/sprint/sprintListDetails?projectid=${selectedName.hotfix.id}&project=${selectedName.hotfix.name}`);
                         }}>查看项目清单All</Button>
               </div>
               {/* hotfix数据显示div */}
@@ -2512,7 +2507,7 @@ const DashBoard: React.FC<any> = () => {
             <div style={{height: '101%', backgroundColor: "#F2F2F2"}}>
               {/* sprint 下拉框 */}
               <div>
-                <Select value={selectedName.sprint}
+                <Select value={selectedName.sprint.name}
                         style={{
                           width: '200px',
                           marginLeft: "20px",
@@ -2533,8 +2528,7 @@ const DashBoard: React.FC<any> = () => {
                         icon={<SearchOutlined/>}
                         size={'large'}
                         onClick={() => {
-                          debugger;
-                          history.push(`/sprint/sprintListDetails?projectid=${sprintPrjInfo.prjID}&project=${sprintPrjInfo.prjName}`);
+                          history.push(`/sprint/sprintListDetails?projectid=${selectedName.sprint.id}&project=${selectedName.sprint.name}`);
                         }}>查看项目清单All</Button>
               </div>
 

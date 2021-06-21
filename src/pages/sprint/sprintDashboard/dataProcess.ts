@@ -493,8 +493,8 @@ const bugResultDeals = (countArray: any) => {
   }
   let itemArray = [];
   if (countArray.length > 0) {
-    const temp = countArray[0].data;
     debugger;
+    const temp = countArray[0].data;
     hotfixBugCount.all_bug_count = countArray[0].count;
 
     if (temp.length > 0) {
@@ -584,6 +584,7 @@ const sp_hotResultDeals = (params: any) => {
   let bugDt = Object();
 
   for (let index = 0; index < params.length; index += 1) {
+    debugger;
     if (params[index].name === "story") {
       storyDt = storyResultDeals(params[index].data, params[index].count);
 

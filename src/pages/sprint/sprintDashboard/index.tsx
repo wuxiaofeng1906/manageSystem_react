@@ -101,10 +101,12 @@ const projectLoad = (params: any) => {
 
 // 动态查询下拉框所选数据
 const queryProjectALL = async (client: GqlClient<object>, params: any) => {
+  debugger;
   const {data} = await client.query(`
       {
           dashProjectAll(project:${params}){
           name
+          count
           data{
             name
             data{
@@ -397,7 +399,7 @@ const DashBoard: React.FC<any> = () => {
   let sp_data = Object();
   let ho_data = Object();
   let em_data = Object();
-  let oraProject = {
+  const oraProject = {
     sprint: {id: "", name: ""},
     hotfix: {id: "", name: ""},
     emergency: {id: "", name: ""},
@@ -408,7 +410,6 @@ const DashBoard: React.FC<any> = () => {
       if (details.category === "sprint") {
         oraProject.sprint.id = details.id;
         oraProject.sprint.name = details.name;
-
         sp_data = sp_hotResultDeals(details.data);
 
       } else if (details.category === "hotfix") {
@@ -443,7 +444,6 @@ const DashBoard: React.FC<any> = () => {
     const datas: any = await queryProjectALL(gqlClient, other.key);
     const em_datas = bugResultDeals(datas);
 
-    debugger;
     if (JSON.stringify(em_datas) === "{}" || datas === null) {
       hidde = true;
     }
@@ -457,7 +457,7 @@ const DashBoard: React.FC<any> = () => {
       em_bug: hidde,
     });
     setEmergency({
-      all_count_bug: em_datas.all_count_bug === undefined ? 0 : em_datas.all_count_bug,
+      all_count_bug: em_datas.all_bug_count === undefined ? 0 : em_datas.all_bug_count,
       noAssign: em_datas.Bug_no_assign,
       noDeadline: em_datas.Bug_no_deadline,
       prj_error: '',
@@ -750,7 +750,7 @@ const DashBoard: React.FC<any> = () => {
       // endregion
 
       // region bug
-      all_bug_counts: sp_datas.bug.all_count_bug,
+      all_bug_counts: sp_datas.bug.all_bug_count,
       bug_noAssign: sp_datas.bug.Bug_no_assign,
       bug_noDeadline: sp_datas.bug.Bug_no_deadline,
       bug_prj_error: '',

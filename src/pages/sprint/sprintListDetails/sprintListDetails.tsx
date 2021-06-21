@@ -24,13 +24,14 @@ import {
   numberRenderToCurrentStage,
   numberRenderToCurrentStageForColor,
   numberRenderToZentaoType,
+  numberRenderToZentaoTypeForLine,
   numberRenderToZentaoSeverity,
   numberRenderToZentaoStatus,
   numberRenderToSource,
   linkToZentaoPage,
   numberRenderToZentaoStatusForRed,
   stageForLineThrough,
-  numRenderForSevAndpri
+  numRenderForSevAndpriForLine
 } from '@/publicMethods/cellRenderer';
 import axios from 'axios';
 import moment from "moment";
@@ -78,7 +79,7 @@ const colums = () => {
     {
       headerName: '类型',
       field: 'category',
-      cellRenderer: numberRenderToZentaoType,
+      cellRenderer: numberRenderToZentaoTypeForLine,
       pinned: 'left',
       minWidth: 70,
     },
@@ -100,7 +101,7 @@ const colums = () => {
     {
       headerName: '严重等级',
       field: 'severity',
-      cellRenderer: numRenderForSevAndpri,
+      cellRenderer: numRenderForSevAndpriForLine,
       minWidth: 90
     },
     // {
@@ -455,7 +456,6 @@ const SprintList: React.FC<any> = () => {
 
     // 失去焦点后查询值
     const checkZentaoInfo = (params: any) => {
-      debugger;
       const ztno = params.target.value;
       const addFormData = formForAdminToAddAnaMod.getFieldsValue();
       const chanDaoType = addFormData.adminChandaoType;

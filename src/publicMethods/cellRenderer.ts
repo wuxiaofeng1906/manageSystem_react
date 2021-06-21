@@ -160,7 +160,29 @@ const numberRenderToCurrentStageForColor = (params: any) => {
 
 };
 
-const numberRenderToZentaoType = (params: any) => {
+const numberRenderToZentaoType = (params: any,) => {
+  // BUG = 1,
+  // TASK = 2,
+  // STORY = 3,
+  let type = "";
+  switch (params.value) {
+    case "1":
+      type = "Bug";
+      break;
+    case "2":
+      type = "Task";
+      break;
+    case "3":
+      type = "story";
+      break;
+    default:
+      break;
+  }
+
+  return type;
+};
+
+const numberRenderToZentaoTypeForLine = (params: any,) => {
   // BUG = 1,
   // TASK = 2,
   // STORY = 3,
@@ -209,14 +231,34 @@ const numberRenderToZentaoSeverity = (params: any) => {
     default:
       break;
   }
-  if (params.data.stage === 8) {
-    return `<span style="text-decoration:line-through"> ${severity} </span>`;
-  }
 
   return severity;
 };
 
 const numRenderForSevAndpri = (params: any) => {
+  let severity = "";
+  switch (params.value) {
+    case "1":
+      severity = "P0";
+      break;
+    case "2":
+      severity = "P1";
+      break;
+    case "3":
+      severity = "P2";
+      break;
+    case "4":
+      severity = "P3";
+      break;
+    default:
+      break;
+  }
+
+
+  return severity;
+};
+
+const numRenderForSevAndpriForLine = (params: any) => {
   let severity = "";
   switch (params.value) {
     case "1":
@@ -443,7 +485,9 @@ export {
   numberRenderTopass,
   numberRenderToCurrentStage,
   numberRenderToZentaoType,
+  numberRenderToZentaoTypeForLine,
   numberRenderToZentaoSeverity,
+  numRenderForSevAndpriForLine,
   numberRenderToZentaoStatus,
   numberRenderToSource,
   linkToZentaoPage,
@@ -452,6 +496,7 @@ export {
   numberRenderToZentaoStatusForRed,
   numberRenderToCurrentStageForColor,
   stageForLineThrough,
-  numRenderForSevAndpri
+  numRenderForSevAndpri,
+
 };
 

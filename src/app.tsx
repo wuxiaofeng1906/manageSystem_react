@@ -47,7 +47,6 @@ export async function getInitialState(): Promise<{
     try {
       // const currentUser = await queryCurrent();
       // return currentUser;
-      debugger;
 
       // 读取缓存信息
       const myAuth: any = localStorage.getItem("userLogins");

@@ -187,6 +187,7 @@ const numberRenderToZentaoType = (params: any) => {
 };
 
 const numberRenderToZentaoSeverity = (params: any) => {
+
   // P0 = 1,
   //  P1 = 2,
   //  P2 = 3,
@@ -214,6 +215,32 @@ const numberRenderToZentaoSeverity = (params: any) => {
 
   return severity;
 };
+
+const numRenderForSevAndpri = (params: any) => {
+  let severity = "";
+  switch (params.value) {
+    case "1":
+      severity = "P0-";
+      break;
+    case "2":
+      severity = "P1-";
+      break;
+    case "3":
+      severity = "P2-";
+      break;
+    case "4":
+      severity = "P3-";
+      break;
+    default:
+      break;
+  }
+  if (params.data.stage === 8) {
+    return `<span style="text-decoration:line-through">  ${severity}${params.data.priority}级 </span>`;
+  }
+
+  return `${severity}${params.data.priority}级`;
+};
+
 
 const numberRenderToZentaoStatus = (params: any) => {
 
@@ -424,6 +451,7 @@ export {
   colorRender,
   numberRenderToZentaoStatusForRed,
   numberRenderToCurrentStageForColor,
-  stageForLineThrough
+  stageForLineThrough,
+  numRenderForSevAndpri
 };
 

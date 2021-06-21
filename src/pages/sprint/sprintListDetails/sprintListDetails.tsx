@@ -29,7 +29,8 @@ import {
   numberRenderToSource,
   linkToZentaoPage,
   numberRenderToZentaoStatusForRed,
-  stageForLineThrough
+  stageForLineThrough,
+  numRenderForSevAndpri
 } from '@/publicMethods/cellRenderer';
 import axios from 'axios';
 import moment from "moment";
@@ -97,10 +98,10 @@ const colums = () => {
 
     },
     {
-      headerName: '严重程度',
+      headerName: '严重等级',
       field: 'severity',
-      cellRenderer: numberRenderToZentaoSeverity,
-      minWidth: 75,
+      cellRenderer: numRenderForSevAndpri,
+      minWidth: 90
     },
     // {
     //   headerName: '优先级',

@@ -6,7 +6,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient, useQuery} from '@/hooks';
-import {PageHeader, Button, message, Form, Select, Modal, Input, Row, Col, DatePicker} from 'antd';
+import {PageHeader, Button, message, Form, Select, Modal, Input, Row, Col, DatePicker, Checkbox} from 'antd';
 import {formatMomentTime} from '@/publicMethods/timeMethods';
 import dayjs from "dayjs";
 import {
@@ -16,6 +16,7 @@ import {
   EditTwoTone,
   CloseSquareTwoTone,
   CheckSquareTwoTone,
+  SettingOutlined
 } from '@ant-design/icons';
 import {history} from 'umi';
 import {
@@ -44,14 +45,17 @@ import {useModel} from "@@/plugin-model/useModel";
 const {Option} = Select;
 
 // 定义列名
-const colums = () => {
-  const component = new Array();
-  component.push(
+const getColums = () => {
+
+  // 获取缓存的字段
+  const fields = localStorage.getItem("sp_details_filed");
+  debugger;
+  const oraFields = [
     {
-      headerName: '',
+      headerName: '选择',
       checkboxSelection: true,
       headerCheckboxSelection: true,
-      maxWidth: 50,
+      maxWidth: 30,
       pinned: 'left',
     },
     // {
@@ -150,18 +154,19 @@ const colums = () => {
       minWidth: 80,
       cellRenderer: stageForLineThrough
 
-    }, {
+    },
+    {
       headerName: '备注',
       field: 'memo',
       minWidth: 150,
       cellRenderer: stageForLineThrough
 
-    }, {
+    },
+    {
       headerName: '相关需求',
       field: 'relatedStories',
       minWidth: 80,
       cellRenderer: stageForLineThrough
-
     },
     {
       headerName: '相关任务',
@@ -235,7 +240,21 @@ const colums = () => {
       cellRenderer: stageForLineThrough
 
     }
-  );
+  ];
+
+  if (fields === null) {
+    return oraFields;
+  }
+  const myFields = JSON.parse(fields);
+  const component = new Array();
+
+  oraFields.forEach((ele: any) => {
+    const newElement = ele;
+    if (!myFields.includes(ele.headerName)) {
+      newElement.hide = true;
+    }
+    component.push(newElement);
+  });
 
   return component;
 };
@@ -1594,6 +1613,51 @@ const SprintList: React.FC<any> = () => {
 
     /* endregion */
 
+    /* region 设置字段 */
+
+    const [isFieldModalVisible, setFieldModalVisible] = useState(false);
+    const [selectedFiled, setSelectedFiled] = useState(['']);
+
+    const onSetFieldsChange = (checkedValues: any) => {
+      // console.log('checked = ', checkedValues);
+      setSelectedFiled(checkedValues);
+
+    };
+
+    // 界面显示
+    const showFieldsModal = () => {
+      const fields = localStorage.getItem("sp_details_filed");
+      if (fields === null) {
+        setSelectedFiled([]);
+      } else {
+        setSelectedFiled(JSON.parse(fields));
+      }
+      setFieldModalVisible(true);
+    };
+
+    // 保存按钮
+    const commitField = () => {
+      localStorage.setItem("sp_details_filed", JSON.stringify(selectedFiled));
+      setFieldModalVisible(false);
+
+      // history.push(`/sprint/sprintListDetails/sprintListDetails`);
+      message.info({
+        content: "保存成功！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+    };
+    // 取消 按钮
+    const fieldCancel = () => {
+      setFieldModalVisible(false);
+    };
+
+
+    /* endregion */
+
     const leftStyle = {marginLeft: '20px'};
     const rightStyle = {marginLeft: '30px'};
     const widths = {width: '200px', color: 'black'};
@@ -1645,6 +1709,14 @@ const SprintList: React.FC<any> = () => {
           <Button type="text" style={{color: 'black', display: judgeAuthority("移动项目明细行") === true ? "inline" : "none"}}
                   icon={<SnippetsTwoTone/>} size={'large'}
                   onClick={moveProject}>移动</Button>
+
+          <Button type="text"
+                  style={{color: 'black', float: 'right'}}
+                  icon={<SettingOutlined/>} size={'large'}
+                  onClick={showFieldsModal}> </Button>
+          {/* <label style={{marginTop: '10px', color: 'black', fontWeight: 'bold', float: 'right'}}>设置：</label> */}
+
+
           {/* 操作流程按钮 */}
           <Button type="text" style={{color: 'black'}} size={'large'}> </Button>
 
@@ -1673,12 +1745,13 @@ const SprintList: React.FC<any> = () => {
                   icon={<CloseSquareTwoTone/>} size={'large'}
                   onClick={flowForCancle}>取消</Button>
           <label style={{marginTop: '10px', color: 'black', fontWeight: 'bold', float: 'right'}}>操作流程:</label>
+
         </div>
 
         {/* ag-grid 表格定义 */}
         <div className="ag-theme-alpine" style={{height: getHeight(), width: '100%'}}>
           <AgGridReact
-            columnDefs={colums()} // 定义列
+            columnDefs={getColums()} // 定义列
             rowData={data?.result} // 数据绑定
             defaultColDef={{
               resizable: true,
@@ -2618,6 +2691,118 @@ const SprintList: React.FC<any> = () => {
             </Form.Item>
           </Form>
         </Modal>
+
+        <Modal
+          title={'自定义字段'}
+          visible={isFieldModalVisible}
+          onCancel={fieldCancel}
+          centered={true}
+          footer={null}
+          width={920}
+        >
+          <Form>
+            <div>
+              <Checkbox.Group style={{width: '100%'}} value={selectedFiled} onChange={onSetFieldsChange}>
+                <Row>
+                  <Col span={4}>
+                    <Checkbox defaultChecked disabled value="选择">选择</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox defaultChecked disabled value="类型">类型</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox defaultChecked disabled value="编号">编号</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="阶段">阶段</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="测试">测试</Checkbox>
+                  </Col>
+
+                  <Col span={4}>
+                    <Checkbox value="标题内容">标题内容</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="严重等级">严重等级</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="模块">模块</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="状态">状态</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="发布环境">发布环境</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="指派给">指派给</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="解决/完成人">解决/完成人</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="关闭人">关闭人</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="备注">备注</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="相关需求">相关需求</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="相关任务">相关任务</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="相关bug">相关bug</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="是否可热更">是否可热更</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="是否有数据升级">是否有数据升级</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="是否有接口升级">是否有接口升级</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="是否有预置数据">是否有预置数据</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="是否需要测试验证">是否需要测试验证</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="验证范围建议">验证范围建议</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="UED">UED</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="UED测试环境验证">UED测试环境验证</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="UED线上验证">UED线上验证</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="来源">来源</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="反馈人">反馈人</Checkbox>
+                  </Col>
+                </Row>
+              </Checkbox.Group>,
+            </div>
+
+            <div>
+              <Button type="primary" style={{marginLeft: '360px'}} onClick={commitField}>
+                确定</Button>
+              <Button type="primary" style={{marginLeft: '20px'}} onClick={fieldCancel}>
+                取消</Button>
+            </div>
+
+          </Form>
+        </Modal>
+
       </div>
     );
   }

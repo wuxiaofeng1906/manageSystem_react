@@ -49,14 +49,13 @@ const getColums = () => {
 
   // 获取缓存的字段
   const fields = localStorage.getItem("sp_details_filed");
-  debugger;
   const oraFields = [
     {
       headerName: '选择',
+      pinned: 'left',
       checkboxSelection: true,
       headerCheckboxSelection: true,
       maxWidth: 30,
-      pinned: 'left',
     },
     // {
     //   headerName: '序号',
@@ -73,13 +72,14 @@ const getColums = () => {
       pinned: 'left',
       cellRenderer: numberRenderToCurrentStageForColor,
       minWidth: 120,
-
+      maxWidth: 150,
     },
     {
       headerName: '测试',
       field: 'tester',
       pinned: 'left',
       minWidth: 80,
+      maxWidth: 80,
       cellRenderer: stageForLineThrough
     },
     {
@@ -88,6 +88,7 @@ const getColums = () => {
       cellRenderer: numberRenderToZentaoTypeForLine,
       pinned: 'left',
       minWidth: 70,
+      maxWidth: 80,
     },
     {
       headerName: '编号',
@@ -95,6 +96,7 @@ const getColums = () => {
       cellRenderer: linkToZentaoPage,
       pinned: 'left',
       minWidth: 75,
+      maxWidth: 90,
     },
     {
       headerName: '标题内容',
@@ -250,7 +252,9 @@ const getColums = () => {
 
   oraFields.forEach((ele: any) => {
     const newElement = ele;
-    if (!myFields.includes(ele.headerName)) {
+    if (myFields.includes(ele.headerName)) {
+      newElement.hide = false;
+    } else {
       newElement.hide = true;
     }
     component.push(newElement);
@@ -1639,8 +1643,9 @@ const SprintList: React.FC<any> = () => {
     const commitField = () => {
       localStorage.setItem("sp_details_filed", JSON.stringify(selectedFiled));
       setFieldModalVisible(false);
+      // 首先需要清空原有列，否则会导致列混乱
+      gridApi.current?.setColumnDefs([]);
 
-      // history.push(`/sprint/sprintListDetails/sprintListDetails`);
       message.info({
         content: "保存成功！",
         duration: 1,

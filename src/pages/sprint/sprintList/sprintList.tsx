@@ -12,11 +12,11 @@ import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col} from 
 import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone, LogoutOutlined} from '@ant-design/icons';
 import {getRecentMonth, formatMomentTime} from '@/publicMethods/timeMethods';
 import {getHeight} from '@/publicMethods/pageSet';
-
 import axios from 'axios';
 import {history} from 'umi';
 import {judgeAuthority} from "@/publicMethods/authorityJudge";
 import {useModel} from "@@/plugin-model/useModel";
+
 import dayjs from "dayjs";
 
 const {RangePicker} = DatePicker;
@@ -24,6 +24,13 @@ const {Option} = Select;
 
 // 默认条件：近一个月；未关闭的
 const queryCondition: any = {
+  projectName: '',
+  projectType: [],
+  dateRange: getRecentMonth(),
+  projectStatus: ['wait', 'doing', 'suspended'],
+};
+
+const defalutCondition: any = {
   projectName: '',
   projectType: [],
   dateRange: getRecentMonth(),
@@ -244,7 +251,7 @@ const SprintList: React.FC<any> = () => {
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, queryCondition));
+  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, defalutCondition));
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -261,7 +268,7 @@ const SprintList: React.FC<any> = () => {
   /* region 条件查询功能 */
 
   const updateGrid = async () => {
-    const datas: any = await queryDevelopViews(gqlClient, queryCondition);
+     const datas: any = await queryDevelopViews(gqlClient, queryCondition);
     gridApi.current?.setRowData(datas);
   };
 
@@ -284,8 +291,6 @@ const SprintList: React.FC<any> = () => {
       start: dateString[0],
       end: dateString[1],
     };
-    console.log(params);
-    debugger;
     setchoicedDateTime({
       start: dateString[0],
       end: dateString[1]
@@ -307,12 +312,7 @@ const SprintList: React.FC<any> = () => {
   /* region 显示默认数据  */
 
   const showDefalultValue = async () => {
-    const defalutCondition: any = {
-      projectName: '',
-      projectType: [],
-      dateRange: getRecentMonth(),
-      projectStatus: ['wait', 'doing', 'suspended'],
-    };
+
     setchoicedDateTime({
       start: getRecentMonth().start,
       end: getRecentMonth().end
@@ -508,7 +508,6 @@ const SprintList: React.FC<any> = () => {
       creator: currentUser.toString(),
     };
 
-    debugger;
     //  判断是修改还是新增
     if (modal.title === '新增项目') {
       axios

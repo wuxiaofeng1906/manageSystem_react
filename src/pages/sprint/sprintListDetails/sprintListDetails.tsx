@@ -444,7 +444,7 @@ const SprintList: React.FC<any> = () => {
 
     const LoadCombobox = (params: any) => {
       const deptMan = [];
-      let deptMember="";
+      let deptMember = "";
 
       if (params === "all") {
 
@@ -787,6 +787,7 @@ const SprintList: React.FC<any> = () => {
         return;
       }
       const datas = {
+        stage: Number(oradata.adminCurStage),
         category: oradata.adminChandaoType,
         hotUpdate: oradata.adminAddHotUpdate,
         dataUpdate: oradata.adminAddDataUpgrade,
@@ -965,7 +966,12 @@ const SprintList: React.FC<any> = () => {
 
     /* region 测试 权限操作 */
     // 测试 修改
-    const testerModify = (datas: any) => {
+    const testerModify = async (datas: any) => {
+      // 还要获取英文名
+      const teters = datas.tester.split(';');
+      const deptUsers = await getDeptMemner(gqlClient, "测试");
+      const nameIdArray = getUsersId(deptUsers, teters);
+
       formForTesterToMod.setFieldsValue({
         testerChandaoType: numberRenderToZentaoType({value: datas.category === null ? '' : datas.category.toString()}),
         testerCHandaoID: datas.ztNo,
@@ -973,7 +979,7 @@ const SprintList: React.FC<any> = () => {
         testChandaoStatus: numberRenderToZentaoStatus({
           value: datas.ztStatus === null ? '' : datas.ztStatus.toString(),
         }),
-        testToTester: datas.tester.split(';'),
+        testToTester: nameIdArray,
         testerRemark: datas.memo
 
       });
@@ -1719,15 +1725,16 @@ const SprintList: React.FC<any> = () => {
                       {[
                         <Option key={'1'} value={'1'}>未开始</Option>,
                         <Option key={'2'} value={'2'}>开发中</Option>,
-                        <Option key={'3'} value={'3'}>已提测</Option>,
-                        <Option key={'4'} value={'4'}>测试中</Option>,
-                        <Option key={'5'} value={'5'}>TE测试环境已验过</Option>,
-                        <Option key={'6'} value={'6'}>UED测试环境已验过</Option>,
-                        <Option key={'7'} value={'7'}>已取消</Option>,
-                        <Option key={'8'} value={'8'}>开发已revert</Option>,
-                        <Option key={'9'} value={'9'}>测试已验证revert</Option>,
-                        <Option key={'10'} value={'10'}>灰度已验过</Option>,
-                        <Option key={'11'} value={'11'}>线上已验过</Option>,
+                        <Option key={'3'} value={'3'}>开发完</Option>,
+                        <Option key={'3'} value={'4'}>已提测</Option>,
+                        <Option key={'4'} value={'5'}>测试中</Option>,
+                        <Option key={'5'} value={'6'}>TE测试环境已验过</Option>,
+                        <Option key={'6'} value={'7'}>UED测试环境已验过</Option>,
+                        <Option key={'7'} value={'8'}>已取消</Option>,
+                        <Option key={'8'} value={'9'}>开发已revert</Option>,
+                        <Option key={'9'} value={'10'}>测试已验证revert</Option>,
+                        <Option key={'10'} value={'11'}>灰度已验过</Option>,
+                        <Option key={'11'} value={'12'}>线上已验过</Option>,
                       ]}
                     </Select>
                   </Form.Item>

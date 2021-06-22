@@ -160,6 +160,57 @@ const numberRenderToCurrentStageForColor = (params: any) => {
 
 };
 
+const stageChangeToNumber = (params: string) => {
+  debugger;
+  let stageNum = -1;
+
+  if (params !== null) {
+    switch (params.toString()) {
+      case "未开始":
+        stageNum = 1;
+        break;
+      case "开发中":
+        stageNum = 2;
+        break;
+      case "开发完":
+        stageNum = 3;
+        break;
+      case "已提测":
+        stageNum = 4;
+        break;
+      case "测试中":
+        stageNum = 5;
+        break;
+      case "TE测试环境已验过":
+        stageNum = 6;
+        break;
+      case "UED测试环境已验过":
+        stageNum = 7;
+        break;
+      case "已取消":
+        stageNum = 8;
+        break;
+      case "开发已revert":
+        stageNum = 9;
+        break;
+      case "测试已验证revert":
+        stageNum = 10;
+        break;
+      case "灰度已验过":
+        stageNum = 11;
+        break;
+      case "线上已验过":
+        stageNum = 12;
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  return stageNum;
+};
+
 const numberRenderToZentaoType = (params: any,) => {
   // BUG = 1,
   // TASK = 2,
@@ -495,6 +546,7 @@ export {
   colorRender,
   numberRenderToZentaoStatusForRed,
   numberRenderToCurrentStageForColor,
+  stageChangeToNumber,
   stageForLineThrough,
   numRenderForSevAndpri,
 

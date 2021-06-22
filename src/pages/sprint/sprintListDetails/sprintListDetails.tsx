@@ -33,6 +33,8 @@ import {
   stageForLineThrough,
   numRenderForSevAndpriForLine
 } from '@/publicMethods/cellRenderer';
+import {getUsersId} from '@/publicMethods/userMethod';
+
 import axios from 'axios';
 import moment from "moment";
 import {getHeight} from '@/publicMethods/pageSet';
@@ -330,6 +332,52 @@ const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
   return data?.proExist;
 };
 
+
+// 获取部门数据
+const getDeptMemner = async (client: GqlClient<object>, params: any) => {
+  let deptMember = "";
+
+  if (params === "all") {
+
+    deptMember = `
+          {
+            WxDeptUsers{
+               id
+              userName
+            }
+          }
+      `;
+  }
+  if (params === "UED") {
+
+    deptMember = `
+          {
+            WxDeptUsers(deptNames:["UED"]){
+               id
+              userName
+            }
+          }
+      `;
+  }
+
+  if (params === "测试") {
+
+    deptMember = `
+          {
+            WxDeptUsers(deptNames:["测试","业务"], techs:[TEST]){
+                id
+                userName
+              }
+          }
+      `;
+  }
+
+  const {data} = await client.query(deptMember);
+
+  return data?.WxDeptUsers;
+};
+
+
 // 组件初始化
 const SprintList: React.FC<any> = () => {
     const {initialState} = useModel('@@initialState');
@@ -392,10 +440,11 @@ const SprintList: React.FC<any> = () => {
       setPageTitle(`共${bugs + tasks + storys}个，bug ${bugs} 个，task ${tasks} 个，story ${storys} 个`);
 
     };
-    // 获取部门数据
-    const GetDeptMemner = (params: any) => {
+
+
+    const LoadCombobox = (params: any) => {
       const deptMan = [];
-      let deptMember;
+      let deptMember="";
 
       if (params === "all") {
 
@@ -407,14 +456,27 @@ const SprintList: React.FC<any> = () => {
             }
           }
       `;
-      } else {
+      }
+      if (params === "UED") {
 
         deptMember = `
           {
-            WxDeptUsers(deptNames:${params}){
+            WxDeptUsers(deptNames:["UED"]){
                id
               userName
             }
+          }
+      `;
+      }
+
+      if (params === "测试") {
+
+        deptMember = `
+          {
+            WxDeptUsers(deptNames:["测试","业务"], techs:[TEST]){
+                id
+                userName
+              }
           }
       `;
       }
@@ -427,7 +489,9 @@ const SprintList: React.FC<any> = () => {
         );
       }
       return deptMan;
+
     };
+
     const GetSprintProject = () => {
       const projectArray = [];
 
@@ -562,7 +626,7 @@ const SprintList: React.FC<any> = () => {
     const addProject = () => {
       formForAdminToAddAnaMod.setFieldsValue({
         adminCurStage: '',
-        adminAddTester: '',
+        adminAddTester: undefined,
         adminChandaoType: '',
         adminChandaoId: '',
         adminAddChandaoTitle: '',
@@ -692,7 +756,7 @@ const SprintList: React.FC<any> = () => {
     // 提交admin 新增和修改的操作
     const commitSprintDetails = () => {
       const oradata = formForAdminToAddAnaMod.getFieldsValue();
-      if (oradata.adminAddTester === '' || oradata.adminAddTester === null) {
+      if (oradata.adminAddTester === '' || oradata.adminAddTester === null || oradata.adminAddTester === undefined) {
         message.error({
           content: `对应测试不能为空！`,
           duration: 1,
@@ -703,6 +767,14 @@ const SprintList: React.FC<any> = () => {
         });
         return;
       }
+
+      // 用;拼接测试人员
+      let testers = "";
+      oradata.adminAddTester.forEach((eles: any) => {
+        testers = testers === "" ? eles : `${testers};${eles}`;
+      });
+
+
       if (oradata.adminChandaoType === '' || oradata.adminChandaoId === '') {
         message.error({
           content: `禅道类型以及禅道编号不能为空！`,
@@ -749,7 +821,7 @@ const SprintList: React.FC<any> = () => {
         datas['project'] = prjId;
         datas["source"] = 7;
         datas["ztNo"] = oradata.adminChandaoId;
-        datas["tester"] = oradata.adminAddTester;
+        datas["tester"] = testers;
         datas["uedName"] = oradata.adminAddForUED;
         datas["feedback"] = oradata.adminAddFeedbacker;
 
@@ -763,7 +835,7 @@ const SprintList: React.FC<any> = () => {
         }
 
         if (formForAdminToAddAnaMod.isFieldTouched('adminAddTester')) {
-          datas["tester"] = oradata.adminAddTester;
+          datas["tester"] = testers;
         }
 
         if (formForAdminToAddAnaMod.isFieldTouched('adminAddForUED')) {
@@ -780,12 +852,20 @@ const SprintList: React.FC<any> = () => {
     };
 
     // admin 修改
-    const adminModify = (datas: any) => {
+    const adminModify = async (datas: any) => {
+
+      // 还要获取英文名
+      const teters = datas.tester.split(';');
+      const deptUsers = await getDeptMemner(gqlClient, "测试");
+
+      const nameIdArray = getUsersId(deptUsers, teters);
+
+      //  解析测试人员
       formForAdminToAddAnaMod.setFieldsValue({
         adminCurStage: numberRenderToCurrentStage({
           value: datas.stage === null ? '' : datas.stage.toString(),
         }),
-        adminAddTester: datas.tester,
+        adminAddTester: nameIdArray,
         adminChandaoType: datas.category,
         adminChandaoId: datas.ztNo,
         adminAddChandaoTitle: datas.title,
@@ -893,7 +973,7 @@ const SprintList: React.FC<any> = () => {
         testChandaoStatus: numberRenderToZentaoStatus({
           value: datas.ztStatus === null ? '' : datas.ztStatus.toString(),
         }),
-        testToTester: datas.tester,
+        testToTester: datas.tester.split(';'),
         testerRemark: datas.memo
 
       });
@@ -1439,7 +1519,6 @@ const SprintList: React.FC<any> = () => {
           selIds.push(`STORY_${rows.id}`);
         }
       }
-      debugger;
       const params = {
         id: selIds,
         attribute: "stage",
@@ -1657,8 +1736,13 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddTester" label="对应测试:" rules={[{required: true}]}>
-                    <Select placeholder="请选择" style={widths} showSearch optionFilterProp="children">
-                      {GetDeptMemner('["测试","业务"]')}
+                    <Select
+                      mode="tags"
+                      style={widths}
+                      placeholder="请输入"
+                      optionFilterProp="children"
+                    >
+                      {LoadCombobox('测试')}
                     </Select>
                   </Form.Item>
                 </div>
@@ -1854,7 +1938,7 @@ const SprintList: React.FC<any> = () => {
                 <div style={leftStyle}>
                   <Form.Item name="adminAddForUED" label="对应UED：">
                     <Select placeholder="请选择" style={widths}>
-                      {GetDeptMemner('["UED"]')}
+                      {LoadCombobox('UED')}
                     </Select>
                   </Form.Item>
                 </div>
@@ -1914,7 +1998,7 @@ const SprintList: React.FC<any> = () => {
                 <div style={leftStyle}>
                   <Form.Item name="adminAddFeedbacker" label="反馈人:">
                     <Select placeholder="请选择" style={widths} showSearch optionFilterProp="children">
-                      {GetDeptMemner('all')}
+                      {LoadCombobox('all')}
                     </Select>
                   </Form.Item>
                 </div>
@@ -2162,8 +2246,11 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={{marginLeft: '50px'}}>
                   <Form.Item name="testToTester" label="对应测试:" rules={[{required: true}]}>
-                    <Select placeholder="请选择" style={widths} showSearch optionFilterProp="children">
-                      {GetDeptMemner('["测试","业务"]')}
+                    <Select placeholder="请选择"
+                            style={widths}
+                            mode="tags"
+                            optionFilterProp="children">
+                      {LoadCombobox('测试')}
                     </Select>
                   </Form.Item>
                 </div>
@@ -2239,7 +2326,7 @@ const SprintList: React.FC<any> = () => {
                 <div style={leftStyle}>
                   <Form.Item name="uedForUED" label="对应UED：">
                     <Select placeholder="请选择" style={widths}>
-                      {GetDeptMemner('["UED"]')}
+                      {LoadCombobox('UED')}
                     </Select>
                   </Form.Item>
                 </div>

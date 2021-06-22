@@ -114,7 +114,6 @@ const addNewAttributes = (source: any) => {
 
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
-  debugger;
   const {data} = await client.query(`
       {
        dashSingleItem(project:${params.prjId},kindName:"${params.prjKind}",itemName:"${params.itemName}") {

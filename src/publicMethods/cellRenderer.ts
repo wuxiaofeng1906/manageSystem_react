@@ -161,7 +161,7 @@ const numberRenderToCurrentStageForColor = (params: any) => {
 };
 
 const stageChangeToNumber = (params: string) => {
-  debugger;
+
   let stageNum = -1;
 
   if (params !== null) {

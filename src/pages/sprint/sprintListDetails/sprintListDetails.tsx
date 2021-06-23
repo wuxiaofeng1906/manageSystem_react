@@ -24,6 +24,7 @@ import {
   numberRenderTopass,
   numberRenderToCurrentStage,
   numberRenderToCurrentStageForColor,
+  stageChangeToNumber,
   numberRenderToZentaoType,
   numberRenderToZentaoTypeForLine,
   numberRenderToZentaoSeverity,
@@ -128,6 +129,10 @@ const getColums = () => {
       field: 'ztStatus',
       cellRenderer: numberRenderToZentaoStatusForRed,
       minWidth: 80,
+    },
+    {
+      headerName: '已提测',
+      field: '',
     },
     {
       headerName: '发布环境',
@@ -801,7 +806,6 @@ const SprintList: React.FC<any> = () => {
       if (oradata.adminChandaoType === '' || oradata.adminChandaoId === '') {
         message.error({
           content: `禅道类型以及禅道编号不能为空！`,
-          className: 'MNone',
           duration: 1,
           style: {
             marginTop: '50vh',
@@ -810,7 +814,7 @@ const SprintList: React.FC<any> = () => {
         return;
       }
       const datas = {
-        stage: Number(oradata.adminCurStage),
+        stage: Number(oradata.adminCurStage).toString() === "NaN" ? stageChangeToNumber(oradata.adminCurStage) : Number(oradata.adminCurStage),
         category: oradata.adminChandaoType,
         hotUpdate: oradata.adminAddHotUpdate,
         dataUpdate: oradata.adminAddDataUpgrade,
@@ -853,6 +857,7 @@ const SprintList: React.FC<any> = () => {
       } else {
         const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
         datas['id'] = curRow[0].id;
+
         // 判断是否被修改过 禅道id 对应测试、对应UED、反馈人
         if (curRow[0].ztNo !== oradata.adminChandaoId) {
           datas["ztNo"] = oradata.adminChandaoId;
@@ -1141,7 +1146,7 @@ const SprintList: React.FC<any> = () => {
       if (initialState?.currentUser) {
         currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
       }
-
+      // const currentUserGroup = 'devGroup';
       if (currentUserGroup !== undefined) {
         switch (currentUserGroup.toString()) {
           case 'superGroup':
@@ -1622,7 +1627,7 @@ const SprintList: React.FC<any> = () => {
     const [isFieldModalVisible, setFieldModalVisible] = useState(false);
     const [selectedFiled, setSelectedFiled] = useState(['']);
     const nessField = ['选择', '类型', '编号'];
-    const unNessField = ['阶段', '测试', '标题内容', '严重等级', '模块', '状态', '发布环境',
+    const unNessField = ['阶段', '测试', '标题内容', '严重等级', '模块', '状态', '已提测', '发布环境',
       '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', '是否可热更', '是否有数据升级',
       '是否有接口升级', '是否有预置数据', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人'];
 
@@ -1847,7 +1852,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminChandaoType" label="禅道类型：" rules={[{required: true}]}>
-                    <Select placeholder="请选择" style={widths}>
+                    <Select placeholder="请选择" style={{width: '180px', color: 'black'}}>
                       {[
                         <Option value={'1'}> Bug </Option>,
                         <Option value={'3'}> 需求 </Option>,
@@ -1860,7 +1865,7 @@ const SprintList: React.FC<any> = () => {
             </Row>
             <Row gutter={16}>
               <Col className="gutter-row">
-                <div style={leftStyle}>
+                <div style={{marginLeft: '10px'}}>
                   <Form.Item name="adminChandaoId" label="禅道编号:" rules={[{required: true}]}>
                     <Input placeholder="请输入" style={widths} onBlur={checkZentaoInfo}/>
                   </Form.Item>
@@ -1890,9 +1895,9 @@ const SprintList: React.FC<any> = () => {
                 </div>
               </Col>
               <Col className="gutter-row">
-                <div style={leftStyle}>
+                <div style={{marginLeft: "35px"}}>
                   <Form.Item name="adminAddPriority" label="优先级：">
-                    <Select disabled={true} placeholder="请选择" style={widths}>
+                    <Select disabled={true} placeholder="请选择" style={{width: '210px', color: 'black'}}>
                       {[
                         <Option value={'1'}>1</Option>,
                         <Option value={'2'}>2</Option>,
@@ -1904,9 +1909,9 @@ const SprintList: React.FC<any> = () => {
                 </div>
               </Col>
               <Col className="gutter-row">
-                <div style={leftStyle}>
+                <div style={{marginLeft: "30px"}}>
                   <Form.Item name="adminAddModule" label="所属模块:">
-                    <Input disabled={true} style={{width: '218px'}}/>
+                    <Input disabled={true} style={{width: '188px'}}/>
                   </Form.Item>
                 </div>
               </Col>
@@ -1920,16 +1925,16 @@ const SprintList: React.FC<any> = () => {
                 </div>
               </Col>
               <Col className="gutter-row">
-                <div style={leftStyle}>
+                <div style={{marginLeft: '33px'}}>
                   <Form.Item name="adminAddAssignTo" label="指派给:">
-                    <Input disabled={true} style={widths}/>
+                    <Input disabled={true} style={{width: '212px', color: 'black'}}/>
                   </Form.Item>
                 </div>
               </Col>
               <Col className="gutter-row">
                 <div style={leftStyle}>
-                  <Form.Item name="adminAddSolvedBy" label="由谁解决/完成:">
-                    <Input disabled={true} style={{width: '185px', color: 'black'}}/>
+                  <Form.Item name="adminAddSolvedBy" label="解决/完成人:">
+                    <Input disabled={true} style={{width: '180px', color: 'black'}}/>
                   </Form.Item>
                 </div>
               </Col>
@@ -1945,8 +1950,8 @@ const SprintList: React.FC<any> = () => {
 
               <Col className="gutter-row">
                 <div style={leftStyle}>
-                  <Form.Item name="adminAddHotUpdate" label="是否支持热更新:">
-                    <Select placeholder="请选择" style={{width: '150px'}}>
+                  <Form.Item name="adminAddHotUpdate" label="是否可热更:">
+                    <Select placeholder="请选择" style={{width: '195px'}}>
                       {[
                         <Option key={'1'} value={'1'}>是</Option>,
                         <Option key={'0'} value={'0'}>否</Option>,
@@ -1958,7 +1963,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddDataUpgrade" label="是否有数据升级:">
-                    <Select placeholder="请选择" style={{width: '170px'}}>
+                    <Select placeholder="请选择" style={{width: '160px'}}>
                       {[
                         <Option key={'1'} value={'1'}>是</Option>,
                         <Option key={'0'} value={'0'}>否</Option>,
@@ -1985,7 +1990,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddPreData" label="是否有预置数据:">
-                    <Select placeholder="请选择" style={{width: '150px'}}>
+                    <Select placeholder="请选择" style={{width: '165px'}}>
                       {[
                         <Option key={'1'} value={'1'}>是</Option>,
                         <Option key={'0'} value={'0'}>否</Option>,
@@ -1998,7 +2003,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddtesterVerifi" label="是否需要测试验证：">
-                    <Select placeholder="请选择" style={{width: '155px'}}>
+                    <Select placeholder="请选择" style={{width: '148px'}}>
                       {[
                         <Option key={'1'} value={'1'}>是</Option>,
                         <Option key={'0'} value={'0'}>否</Option>,
@@ -2010,9 +2015,22 @@ const SprintList: React.FC<any> = () => {
             </Row>
             <Row gutter={16}>
               <Col className="gutter-row">
+                <div style={{marginLeft: '35px'}}>
+                  <Form.Item name="adminAddtesterTested" label="已提测：">
+                    <Select placeholder="请选择" style={{width: '200px'}}>
+                      {[
+                        <Option key={'1'} value={'1'}>是</Option>,
+                        <Option key={'0'} value={'0'}>否</Option>,
+                        <Option key={'免'} value={'免'}>免</Option>,
+                      ]}
+                    </Select>
+                  </Form.Item>
+                </div>
+              </Col>
+              <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddSuggestion" label="验证范围建议:">
-                    <Input style={{width: '790px'}}/>
+                    <Input style={{width: '490px'}}/>
                   </Form.Item>
                 </div>
               </Col>
@@ -2032,7 +2050,7 @@ const SprintList: React.FC<any> = () => {
                 </div>
               </Col>
               <Col className="gutter-row">
-                <div style={leftStyle}>
+                <div style={{marginLeft: '30px'}}>
                   <Form.Item name="adminAddForUED" label="对应UED：">
                     <Select placeholder="请选择" style={widths}>
                       {LoadCombobox('UED')}
@@ -2043,7 +2061,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddForUedVerify" label="UED测试环境验证：">
-                    <Select placeholder="请选择" style={{width: '158px'}}>
+                    <Select placeholder="请选择" style={{width: '150px'}}>
                       {[
                         <Option key={'1'} value={'1'}>验证通过</Option>,
                         <Option key={'0'} value={'0'}>未通过</Option>,
@@ -2058,7 +2076,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAdminUedOnline" label="UED线上验证:">
-                    <Select placeholder="请选择" style={widths}>
+                    <Select placeholder="请选择" style={{width: '175px', color: 'black'}}>
                       {[
                         <Option key={'1'} value={'1'}>验证通过</Option>,
                         <Option key={'0'} value={'0'}>未通过</Option>,
@@ -2069,13 +2087,13 @@ const SprintList: React.FC<any> = () => {
                 </div>
               </Col>
               <Col className="gutter-row">
-                <div style={leftStyle}>
+                <div style={{marginLeft: '50px'}}>
                   <Form.Item name="adminAddSource" label="来源:">
                     <Select
                       placeholder="请选择"
                       defaultValue={['手工录入']}
                       disabled={true}
-                      style={widths}
+                      style={{width: '210px', color: 'black'}}
                     >
                       {[
                         <Option key={'6'} value={'6'}>禅道自动写入</Option>,
@@ -2092,7 +2110,7 @@ const SprintList: React.FC<any> = () => {
               </Col>
 
               <Col className="gutter-row">
-                <div style={leftStyle}>
+                <div style={{marginLeft: "35px"}}>
                   <Form.Item name="adminAddFeedbacker" label="反馈人:">
                     <Select placeholder="请选择" style={widths} showSearch optionFilterProp="children">
                       {LoadCombobox('all')}
@@ -2105,7 +2123,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddRemark" label="备注:">
-                    <Input style={{width: '860px'}}/>
+                    <Input style={{width: '855px'}}/>
                   </Form.Item>
                 </div>
               </Col>
@@ -2269,9 +2287,22 @@ const SprintList: React.FC<any> = () => {
             </Row>
             <Row gutter={16}>
               <Col className="gutter-row">
+                <div style={{marginLeft: '35px'}}>
+                  <Form.Item name="managerTested" label="已提测：">
+                    <Select placeholder="请选择" style={{width: '210px'}}>
+                      {[
+                        <Option key={'1'} value={'1'}>是</Option>,
+                        <Option key={'0'} value={'0'}>否</Option>,
+                        <Option key={'免'} value={'免'}>免</Option>,
+                      ]}
+                    </Select>
+                  </Form.Item>
+                </div>
+              </Col>
+              <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="managerSuggestion" label="验证范围建议:">
-                    <Input style={{width: '520px'}}/>
+                    <Input style={{width: '540px'}}/>
                   </Form.Item>
                 </div>
               </Col>
@@ -2356,9 +2387,23 @@ const SprintList: React.FC<any> = () => {
 
             <Row gutter={16}>
               <Col className="gutter-row">
+                <div style={{marginLeft: '35px'}}>
+                  <Form.Item name="testerTested" label="已提测：">
+                    <Select placeholder="请选择" style={{width: '200px'}}>
+                      {[
+                        <Option key={'1'} value={'1'}>是</Option>,
+                        <Option key={'0'} value={'0'}>否</Option>,
+                        <Option key={'免'} value={'免'}>免</Option>,
+                      ]}
+                    </Select>
+                  </Form.Item>
+                </div>
+              </Col>
+
+              <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="testerRemark" label="备 注:">
-                    <Input style={{width: '570px'}}/>
+                    <Input style={{width: '270px'}}/>
                   </Form.Item>
                 </div>
               </Col>
@@ -2751,6 +2796,9 @@ const SprintList: React.FC<any> = () => {
                   </Col>
                   <Col span={4}>
                     <Checkbox value="发布环境">发布环境</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="已提测">已提测</Checkbox>
                   </Col>
                   <Col span={4}>
                     <Checkbox value="指派给">指派给</Checkbox>

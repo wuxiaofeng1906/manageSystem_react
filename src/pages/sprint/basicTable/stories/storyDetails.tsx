@@ -56,6 +56,7 @@ const colums = () => {
       headerName: '严重程度',
       field: 'severity',
       cellRenderer: numberRenderToZentaoSeverity,
+      hide: true
     },
     {
       headerName: '优先级',

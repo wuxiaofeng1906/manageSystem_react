@@ -1632,7 +1632,7 @@ const SprintList: React.FC<any> = () => {
     const showFieldsModal = () => {
       const fields = localStorage.getItem("sp_details_filed");
       if (fields === null) {
-        setSelectedFiled([]);
+        setSelectedFiled(['选择','类型','编号']);
       } else {
         setSelectedFiled(JSON.parse(fields));
       }

@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -23,13 +23,6 @@ const {RangePicker} = DatePicker;
 const {Option} = Select;
 
 // 默认条件：近一个月；未关闭的
-const queryCondition: any = {
-  projectName: '',
-  projectType: [],
-  dateRange: getRecentMonth(),
-  projectStatus: ['wait', 'doing', 'suspended'],
-};
-
 const defalutCondition: any = {
   projectName: '',
   projectType: [],
@@ -42,7 +35,6 @@ let delCounts = 0;
 
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
-  debugger;
   const range = `{start:"${params.dateRange.start}", end:"${params.dateRange.end}"}`;
   const {data} = await client.query(`
       {
@@ -244,9 +236,11 @@ const SprintList: React.FC<any> = () => {
   const [formForAddAnaMod] = Form.useForm();
   const [formForDel] = Form.useForm();
 
-  const [choicedDateTime, setchoicedDateTime] = useState({
-    start: getRecentMonth().start,
-    end: getRecentMonth().end
+  const [choicedCondition, setQueryCondition] = useState({
+    projectName: '',
+    projectType: [],
+    dateRange: getRecentMonth(),
+    projectStatus: ['wait', 'doing', 'suspended']
   });
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
@@ -268,42 +262,53 @@ const SprintList: React.FC<any> = () => {
   /* region 条件查询功能 */
 
   const updateGrid = async () => {
-     const datas: any = await queryDevelopViews(gqlClient, queryCondition);
+    const datas: any = await queryDevelopViews(gqlClient, choicedCondition);
     gridApi.current?.setRowData(datas);
   };
 
   // 项目名称输入事件
-  const projectChanged = async (params: any) => {
-    queryCondition.projectName = params.target.value;
-    updateGrid();
+  const projectChanged = (params: any) => {
+    //  输入后在useEffect中实现查询
+    setQueryCondition({
+      ...choicedCondition,
+      projectName: params.target.value
+    });
+
   };
 
   // 项目类型选择事件
-  const prjTypeChanged = async (value: any, params: any) => {
+  const prjTypeChanged = (value: any, params: any) => {
+    //  输入后在useEffect中实现查询
     console.log(value, params);
-    queryCondition.projectType = value;
-    updateGrid();
+    setQueryCondition({
+      ...choicedCondition,
+      projectType: value
+    });
+
   };
 
   // 时间选择事件
   const onTimeSelected = async (params: any, dateString: any) => {
-    queryCondition.dateRange = {
-      start: dateString[0],
-      end: dateString[1],
-    };
-    setchoicedDateTime({
-      start: dateString[0],
-      end: dateString[1]
-    });
+    //  输入后在useEffect中实现查询
+    setQueryCondition({
+      ...choicedCondition,
+      dateRange: {
+        start: dateString[0],
+        end: dateString[1]
+      }
 
-    updateGrid();
+    });
   };
 
   // 选择项目状态
   const prjStatusChanged = async (value: any, params: any) => {
+    //  输入后在useEffect中实现查询
     console.log(params);
-    queryCondition.projectStatus = value;
-    updateGrid();
+    setQueryCondition({
+      ...choicedCondition,
+      projectStatus: value
+
+    });
 
   };
 
@@ -313,9 +318,11 @@ const SprintList: React.FC<any> = () => {
 
   const showDefalultValue = async () => {
 
-    setchoicedDateTime({
-      start: getRecentMonth().start,
-      end: getRecentMonth().end
+    setQueryCondition({
+      projectName: '',
+      projectType: [],
+      dateRange: getRecentMonth(),
+      projectStatus: ['wait', 'doing', 'suspended'],
     });
     const datas: any = await queryDevelopViews(gqlClient, defalutCondition);
     gridApi.current?.setRowData(datas);
@@ -684,6 +691,11 @@ const SprintList: React.FC<any> = () => {
   const leftStyle = {marginLeft: '120px'};
   const widths = {width: '150px'};
 
+
+  useEffect(() => {
+    updateGrid();
+  }, [choicedCondition]);
+
   // 返回渲染的组件
   return (
     <PageContainer>
@@ -699,6 +711,7 @@ const SprintList: React.FC<any> = () => {
             style={{width: '18%'}}
             allowClear={true}
             onChange={projectChanged}
+            value={choicedCondition.projectName}
           />
           {/* <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjTypeHandleChange} */}
           {/*        tokenSeparators={[',']}> {[ */}
@@ -711,6 +724,7 @@ const SprintList: React.FC<any> = () => {
             placeholder="请选择"
             mode="tags"
             style={{width: '18%'}}
+            value={choicedCondition.projectType}
             onChange={prjTypeChanged}
           >{[
             <Option key={'sprint'} value={'sprint'}>
@@ -731,7 +745,7 @@ const SprintList: React.FC<any> = () => {
             style={{width: '18%'}}
             // defaultValue={[moment(getRecentMonth().start), moment(getRecentMonth().end)]}
             // defaultValue={[choicedDateTime.start, choicedDateTime.end]}
-            value={[moment(choicedDateTime.start), moment(choicedDateTime.end)]}
+            value={[moment(choicedCondition.dateRange.start), moment(choicedCondition.dateRange.end)]}
 
             onChange={onTimeSelected}
           />
@@ -742,7 +756,8 @@ const SprintList: React.FC<any> = () => {
             mode="tags"
             style={{width: '18%'}}
             onChange={prjStatusChanged}
-            defaultValue={['doing', 'suspended', 'wait']}
+            value={choicedCondition.projectStatus}
+
           >
             {[
               <Option key={'closed'} value={'closed'}>

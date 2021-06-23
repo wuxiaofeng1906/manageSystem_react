@@ -1694,7 +1694,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
 
-                          <div style={{whiteSpace: "nowrap"}}>
+                          <div style={{whiteSpace: "nowrap",display:"none"}} >
                             <label style={cssStyle.itemStyle}>超范围</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
@@ -2127,7 +2127,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
 
-                          <div style={{whiteSpace: "nowrap"}}>
+                          <div style={{whiteSpace: "nowrap",display:"none"}}>
                             <label style={cssStyle.itemStyle}>超范围</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
@@ -2831,7 +2831,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
 
-                          <div style={{whiteSpace: "nowrap"}}>
+                          <div style={{whiteSpace: "nowrap",display:"none"}}>
                             <label style={cssStyle.itemStyle}> 超范围</label>
                             <label style={cssStyle.linkStyle}>
                               <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_over_area`}>
@@ -3267,7 +3267,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
 
-                          <div style={{whiteSpace: "nowrap"}}>
+                          <div style={{whiteSpace: "nowrap",display:"none"}}>
                             <label style={cssStyle.itemStyle}>超范围</label>
                             <label style={cssStyle.linkStyle}>
                               <Link

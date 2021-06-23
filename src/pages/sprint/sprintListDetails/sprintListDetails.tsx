@@ -1621,22 +1621,34 @@ const SprintList: React.FC<any> = () => {
 
     const [isFieldModalVisible, setFieldModalVisible] = useState(false);
     const [selectedFiled, setSelectedFiled] = useState(['']);
+    const nessField = ['选择', '类型', '编号'];
+    const unNessField = ['阶段', '测试', '标题内容', '严重等级', '模块', '状态', '发布环境',
+      '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', '是否可热更', '是否有数据升级',
+      '是否有接口升级', '是否有预置数据', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人'];
+
 
     const onSetFieldsChange = (checkedValues: any) => {
-      // console.log('checked = ', checkedValues);
       setSelectedFiled(checkedValues);
-
     };
 
     // 界面显示
     const showFieldsModal = () => {
       const fields = localStorage.getItem("sp_details_filed");
       if (fields === null) {
-        setSelectedFiled(['选择','类型','编号']);
+        setSelectedFiled(nessField.concat(unNessField));
       } else {
         setSelectedFiled(JSON.parse(fields));
       }
       setFieldModalVisible(true);
+    };
+
+    const selectAllField = (e: any) => {
+      if (e.target.checked === true) {
+        setSelectedFiled(nessField.concat(unNessField));
+      } else {
+        setSelectedFiled(nessField);
+      }
+
     };
 
     // 保存按钮
@@ -2799,7 +2811,9 @@ const SprintList: React.FC<any> = () => {
             </div>
 
             <div>
-              <Button type="primary" style={{marginLeft: '360px'}} onClick={commitField}>
+              <Checkbox onChange={selectAllField}>全选</Checkbox>
+
+              <Button type="primary" style={{marginLeft: '300px'}} onClick={commitField}>
                 确定</Button>
               <Button type="primary" style={{marginLeft: '20px'}} onClick={fieldCancel}>
                 取消</Button>

@@ -56,7 +56,7 @@ const getColums = () => {
       pinned: 'left',
       checkboxSelection: true,
       headerCheckboxSelection: true,
-      maxWidth: 30,
+      maxWidth: 35,
     },
     // {
     //   headerName: '序号',
@@ -73,15 +73,15 @@ const getColums = () => {
       pinned: 'left',
       cellRenderer: numberRenderToCurrentStageForColor,
       minWidth: 120,
-      maxWidth: 150,
+      // tooltipField: "stage"
     },
     {
       headerName: '测试',
       field: 'tester',
       pinned: 'left',
       minWidth: 80,
-      maxWidth: 80,
-      cellRenderer: stageForLineThrough
+      cellRenderer: stageForLineThrough,
+      tooltipField: "tester"
     },
     {
       headerName: '类型',
@@ -89,7 +89,8 @@ const getColums = () => {
       cellRenderer: numberRenderToZentaoTypeForLine,
       pinned: 'left',
       minWidth: 70,
-      maxWidth: 80,
+      // tooltipField: "category"
+
     },
     {
       headerName: '编号',
@@ -97,21 +98,23 @@ const getColums = () => {
       cellRenderer: linkToZentaoPage,
       pinned: 'left',
       minWidth: 75,
-      maxWidth: 90,
+      // tooltipField: "ztNo"
     },
     {
       headerName: '标题内容',
       field: 'title',
       pinned: 'left',
       minWidth: 350,
-      cellRenderer: stageForLineThrough
+      cellRenderer: stageForLineThrough,
+      tooltipField: "title"
 
     },
     {
       headerName: '严重等级',
       field: 'severity',
       cellRenderer: numRenderForSevAndpriForLine,
-      minWidth: 90
+      minWidth: 90,
+      // tooltipField: "severity"
     },
     // {
     //   headerName: '优先级',
@@ -121,131 +124,151 @@ const getColums = () => {
       headerName: '模块',
       field: 'moduleName',
       minWidth: 100,
-      cellRenderer: stageForLineThrough
-
+      cellRenderer: stageForLineThrough,
+      tooltipField: "moduleName"
     },
     {
       headerName: '状态',
       field: 'ztStatus',
       cellRenderer: numberRenderToZentaoStatusForRed,
       minWidth: 80,
+      // tooltipField: "ztStatus"
     },
     {
       headerName: '已提测',
       field: '',
+      // tooltipField: ""
+
     },
     {
       headerName: '发布环境',
       field: 'publishEnv',
       minWidth: 80,
-      cellRenderer: stageForLineThrough
+      cellRenderer: stageForLineThrough,
+      tooltipField: "publishEnv"
 
     },
     {
       headerName: '指派给',
       field: 'assignedTo',
       minWidth: 80,
-      cellRenderer: stageForLineThrough
+      cellRenderer: stageForLineThrough,
+      tooltipField: "assignedTo"
 
     },
     {
       headerName: '解决/完成人',
       field: 'finishedBy',
       minWidth: 80,
-      cellRenderer: stageForLineThrough
+      cellRenderer: stageForLineThrough,
+      tooltipField: "finishedBy"
 
     },
     {
       headerName: '关闭人',
       field: 'closedBy',
       minWidth: 80,
-      cellRenderer: stageForLineThrough
+      cellRenderer: stageForLineThrough,
+      tooltipField: "closedBy"
 
     },
     {
       headerName: '备注',
       field: 'memo',
       minWidth: 150,
-      cellRenderer: stageForLineThrough
+      cellRenderer: stageForLineThrough,
+      tooltipField: "memo"
 
     },
     {
       headerName: '相关需求',
       field: 'relatedStories',
       minWidth: 80,
-      cellRenderer: stageForLineThrough
+      cellRenderer: stageForLineThrough,
+      // tooltipField: "relatedStories"
     },
     {
       headerName: '相关任务',
       field: 'relatedTasks',
       minWidth: 80,
-      cellRenderer: stageForLineThrough
+      cellRenderer: stageForLineThrough,
+      // tooltipField: "relatedTasks"
 
     },
     {
       headerName: '相关bug',
       field: 'relatedBugs',
       minWidth: 80,
-      cellRenderer: stageForLineThrough
+      cellRenderer: stageForLineThrough,
+      // tooltipField: "relatedBugs"
 
     },
     {
       headerName: '是否可热更',
       field: 'hotUpdate',
       cellRenderer: numberRenderToYesNo,
+      // tooltipField: "hotUpdate"
     },
     {
       headerName: '是否有数据升级',
       field: 'dataUpdate',
       cellRenderer: numberRenderToYesNo,
+      // tooltipField: "dataUpdate"
     },
     {
       headerName: '是否有接口升级',
       field: 'interUpdate',
       cellRenderer: numberRenderToYesNo,
+      // tooltipField: "interUpdate"
     },
     {
       headerName: '是否有预置数据修改',
       field: 'presetData',
       cellRenderer: numberRenderToYesNo,
+      // tooltipField: "presetData"
     },
     {
       headerName: '是否需要测试验证',
       field: 'testCheck',
       cellRenderer: numberRenderToYesNo,
+      // tooltipField: "testCheck"
     },
     {
       headerName: '验证范围建议',
       field: 'scopeLimit',
-      cellRenderer: stageForLineThrough
-
+      cellRenderer: stageForLineThrough,
+      // tooltipField: "scopeLimit"
     },
     {
       headerName: 'UED',
       field: 'uedName',
-      cellRenderer: stageForLineThrough
-
+      cellRenderer: stageForLineThrough,
+      // tooltipField: "uedName"
     },
     {
       headerName: 'UED测试环境验证',
       field: 'uedEnvCheck',
       cellRenderer: numberRenderTopass,
+      // tooltipField: "uedEnvCheck"
+
     },
     {
       headerName: 'UED线上验证',
       field: 'uedOnlineCheck',
       cellRenderer: numberRenderTopass,
+      // tooltipField: "uedOnlineCheck"
     },
     {
       headerName: '来源',
       field: 'source',
       cellRenderer: numberRenderToSource,
+      // tooltipField: "source"
     },
     {
       headerName: '反馈人',
       field: 'feedback',
-      cellRenderer: stageForLineThrough
-
+      cellRenderer: stageForLineThrough,
+      // tooltipField: "feedback"
     }
   ];
 
@@ -1782,9 +1805,8 @@ const SprintList: React.FC<any> = () => {
               flex: 1,
               minWidth: 100,
               suppressMenu: true,
-              cellStyle: {"line-height": "30px"}
+              cellStyle: {"line-height": "30px"},
             }}
-
 
             autoGroupColumnDef={{
               minWidth: 100,

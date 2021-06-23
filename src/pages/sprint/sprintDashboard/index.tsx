@@ -1666,7 +1666,9 @@ const DashBoard: React.FC<any> = () => {
                     <Col span={2}>
                       <div style={{backgroundColor: "white", height: "135px", textAlign: "center"}}>
                         <button
-                          style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug1
+                          style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug
+                          <Link
+                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}> 0</Link> 个
                         </button>
                       </div>
                     </Col>
@@ -2101,6 +2103,8 @@ const DashBoard: React.FC<any> = () => {
                       <div style={{backgroundColor: "white", height: "135px", textAlign: "center"}}>
                         <button
                           style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug
+                          <Link
+                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}> 0</Link> 个
                         </button>
                       </div>
                     </Col>
@@ -2813,6 +2817,8 @@ const DashBoard: React.FC<any> = () => {
                       <div style={{backgroundColor: "white", height: "138px", textAlign: "center"}}>
                         <button
                           style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug
+                          <Link
+                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}> 0</Link> 个
                         </button>
                       </div>
                     </Col>
@@ -3249,6 +3255,8 @@ const DashBoard: React.FC<any> = () => {
                       <div style={{backgroundColor: "white", height: "135px", textAlign: "center"}}>
                         <button
                           style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug
+                          <Link
+                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}> 0</Link> 个
                         </button>
                       </div>
                     </Col>

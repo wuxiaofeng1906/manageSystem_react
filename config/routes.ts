@@ -103,7 +103,7 @@ export default [
       {
         name: '项目列表',
         path: 'sprintList',
-        access: 'spAdmin',
+        // access: 'spAdmin',
         component: './sprint/sprintList/sprintList',
       },
       {

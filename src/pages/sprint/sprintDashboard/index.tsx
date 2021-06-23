@@ -5,7 +5,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {Row, Col, Select, Card, Button} from 'antd';
 import {Link} from 'umi';
-import {SearchOutlined} from "@ant-design/icons";
+import {ContainerOutlined} from "@ant-design/icons";
 import {history} from "@@/core/history";
 import {GqlClient, useGqlClient} from "@/hooks";
 import {useRequest} from "ahooks";
@@ -101,7 +101,6 @@ const projectLoad = (params: any) => {
 
 // 动态查询下拉框所选数据
 const queryProjectALL = async (client: GqlClient<object>, params: any) => {
-  debugger;
   const {data} = await client.query(`
       {
           dashProjectAll(project:${params}){
@@ -1147,18 +1146,23 @@ const DashBoard: React.FC<any> = () => {
                         disabled={judgeAuthority("查看下拉列表") !== true}
                         showSearch={true} optionFilterProp="children"
                         onChange={emergencyChanged}>{emergencySelect}</Select>
-                <Button type="text" style={{
-                  float: "right",
-                  color: 'black',
-                  marginTop: '20px',
-                  marginRight: "10px",
-                  display: judgeAuthority("查看项目清单All") === true ? "inline" : "none"
-                }}
-                        icon={<SearchOutlined/>}
+                <Button type="text"
+                        style={{
+                          float: "right", color: 'black', marginTop: '20px', marginRight: "10px",
+                          display: judgeAuthority("查看项目清单All") === true ? "inline" : "none"
+                        }}
+                        icon={<ContainerOutlined/>}
                         size={'large'}
                         onClick={() => {
                           history.push(`/sprint/sprintListDetails?projectid=${selectedName.emergency.id}&project=${selectedName.emergency.name}`);
                         }}>查看项目清单All</Button>
+                <Button type="text" style={{float: "right", color: 'black', marginTop: '20px', marginRight: "10px"}}
+                        icon={<ContainerOutlined/>}
+                        size={'large'}
+                        onClick={() => {
+                          history.push(`/sprint/sprintListDetails?projectid=${selectedName.emergency.id}&project=${selectedName.emergency.name}`);
+                        }}> 超范围清单 </Button>
+
               </div>
               {/* emergency 数据显示div */}
               <div className="site-card-wrapper" style={{marginTop: '30px', marginLeft: "20px", marginRight: "20px"}}
@@ -1390,11 +1394,19 @@ const DashBoard: React.FC<any> = () => {
                   marginRight: "10px",
                   display: judgeAuthority("查看项目清单All") === true ? "inline" : "none"
                 }}
-                        icon={<SearchOutlined/>}
+                        icon={<ContainerOutlined/>}
                         size={'large'}
                         onClick={() => {
                           history.push(`/sprint/sprintListDetails?projectid=${selectedName.hotfix.id}&project=${selectedName.hotfix.name}`);
                         }}>查看项目清单All</Button>
+
+                <Button type="text" style={{float: "right", color: 'black', marginRight: "10px"}}
+                        icon={<ContainerOutlined/>}
+                        size={'large'}
+                        onClick={() => {
+                          history.push(`/sprint/sprintListDetails?projectid=${selectedName.hotfix.id}&project=${selectedName.hotfix.name}`);
+                        }}>超范围清单</Button>
+
               </div>
               {/* hotfix数据显示div */}
               <div>
@@ -1654,7 +1666,7 @@ const DashBoard: React.FC<any> = () => {
                     <Col span={2}>
                       <div style={{backgroundColor: "white", height: "135px", textAlign: "center"}}>
                         <button
-                          style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug
+                          style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug1
                         </button>
                       </div>
                     </Col>
@@ -1694,7 +1706,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
 
-                          <div style={{whiteSpace: "nowrap",display:"none"}} >
+                          <div style={{whiteSpace: "nowrap", display: "none"}}>
                             <label style={cssStyle.itemStyle}>超范围</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
@@ -2127,7 +2139,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
 
-                          <div style={{whiteSpace: "nowrap",display:"none"}}>
+                          <div style={{whiteSpace: "nowrap", display: "none"}}>
                             <label style={cssStyle.itemStyle}>超范围</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
@@ -2517,19 +2529,28 @@ const DashBoard: React.FC<any> = () => {
                         disabled={judgeAuthority("查看下拉列表") !== true}
                         showSearch={true} optionFilterProp="children"
                         onChange={sprintChanged}>{sprintSelect}</Select>
-                <Button type="text" style={{
-                  float: "right",
-                  color: 'black',
-                  marginTop: '20px',
-                  marginRight: "10px",
-                  display: judgeAuthority("查看项目清单All") === true ? "inline" : "none"
-                }}
-
-                        icon={<SearchOutlined/>}
+                <Button type="text"
+                        style={{
+                          float: "right",
+                          color: 'black',
+                          marginTop: '20px',
+                          marginRight: "10px",
+                          display: judgeAuthority("查看项目清单All") === true ? "inline" : "none"
+                        }}
+                        icon={<ContainerOutlined/>}
                         size={'large'}
                         onClick={() => {
                           history.push(`/sprint/sprintListDetails?projectid=${selectedName.sprint.id}&project=${selectedName.sprint.name}`);
                         }}>查看项目清单All</Button>
+
+                <Button type="text" style={{float: "right", color: 'black', marginTop: '20px', marginRight: "10px"}}
+                        icon={<ContainerOutlined/>}
+                        size={'large'}
+                        onClick={() => {
+                          history.push(`/sprint/sprintListDetails?projectid=${selectedName.sprint.id}&project=${selectedName.sprint.name}`);
+                        }}>超范围清单</Button>
+
+
               </div>
 
               {/* sprint数据显示div */}
@@ -2831,7 +2852,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
 
-                          <div style={{whiteSpace: "nowrap",display:"none"}}>
+                          <div style={{whiteSpace: "nowrap", display: "none"}}>
                             <label style={cssStyle.itemStyle}> 超范围</label>
                             <label style={cssStyle.linkStyle}>
                               <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_over_area`}>
@@ -3267,7 +3288,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
 
-                          <div style={{whiteSpace: "nowrap",display:"none"}}>
+                          <div style={{whiteSpace: "nowrap", display: "none"}}>
                             <label style={cssStyle.itemStyle}>超范围</label>
                             <label style={cssStyle.linkStyle}>
                               <Link

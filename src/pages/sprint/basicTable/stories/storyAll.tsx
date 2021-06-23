@@ -75,11 +75,11 @@ const colums = () => {
       headerName: '标题内容',
       field: 'title',
     },
-    {
-      headerName: '严重程度',
-      field: 'severity',
-      cellRenderer: numberRenderToZentaoSeverity,
-    },
+    // {
+    //   headerName: '严重程度',
+    //   field: 'severity',
+    //   cellRenderer: numberRenderToZentaoSeverity,
+    // },
     {
       headerName: '优先级',
       field: 'priority',

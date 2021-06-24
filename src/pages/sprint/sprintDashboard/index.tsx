@@ -757,8 +757,8 @@ const DashBoard: React.FC<any> = () => {
       all_bug_counts: sp_datas.bug.all_bug_count,
       bug_noAssign: sp_datas.bug.Bug_no_assign,
       bug_noDeadline: sp_datas.bug.Bug_no_deadline,
-      bug_prj_error: '',
-      bug_over_area: '',
+      bug_prj_error: sp_datas.bug.Bug_proj_error,
+      bug_over_area: sp_datas.bug.Bug_over_area,
 
       bug_actived: sp_datas.bug.Bug_actived,
       bug_resolved: sp_datas.bug.Bug_resolved,
@@ -1082,23 +1082,23 @@ const DashBoard: React.FC<any> = () => {
 
         bug_noAssign: sp_data.bug.Bug_no_assign,
         bug_noDeadline: sp_data.bug.Bug_no_deadline,
-        bug_prj_error: '',
-        bug_over_area: '',
+        bug_prj_error: sp_data.bug.Bug_proj_error,
+        bug_over_area: sp_data.bug.Bug_over_area,
 
         bug_actived: sp_data.bug.Bug_actived,
         bug_resolved: sp_data.bug.Bug_resolved,
         bug_vertified: sp_data.bug.Bug_verified,
         bug_closed: sp_data.Bug_closed,
 
-        bug_ac24: sp_data.Bug_ac_24,
-        bug_ac1624: sp_data.Bug_ac_1624,
-        bug_ac0816: sp_data.Bug_ac_0816,
-        bug_ac08: sp_data.Bug_ac_08,
+        bug_ac24: sp_data.bug.Bug_ac_24,
+        bug_ac1624: sp_data.bug.Bug_ac_1624,
+        bug_ac0816: sp_data.bug.Bug_ac_0816,
+        bug_ac08: sp_data.bug.Bug_ac_08,
 
-        bug_ve24: sp_data.Bug_ve_24,
-        bug_ve1624: sp_data.Bug_ve_1624,
-        bug_ve0816: sp_data.Bug_ve_0816,
-        bug_ve08: sp_data.Bug_ve_08
+        bug_ve24: sp_data.bug.Bug_ve_24,
+        bug_ve1624: sp_data.bug.Bug_ve_1624,
+        bug_ve0816: sp_data.bug.Bug_ve_0816,
+        bug_ve08: sp_data.bug.Bug_ve_08
         // endregion
       });
 

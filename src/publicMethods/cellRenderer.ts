@@ -246,7 +246,7 @@ const numberRenderToZentaoTypeForLine = (params: any,) => {
       type = "Task";
       break;
     case "3":
-      type = "story";
+      type = "Story";
       break;
     default:
       break;

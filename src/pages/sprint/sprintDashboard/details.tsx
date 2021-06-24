@@ -246,14 +246,15 @@ const getColums = () => {
 
 const addNewAttributes = (source: any, category: string) => {
 
+  debugger;
   const result = [];
   let type = "";
   if (category === "bug") {
-    type = "0";
-  } else if (category === "task") {
     type = "1";
-  } else {
+  } else if (category === "task") {
     type = "2";
+  } else {
+    type = "3";
   }
   const {data} = source[0];
   if (data !== null) {
@@ -264,7 +265,6 @@ const addNewAttributes = (source: any, category: string) => {
     }
   }
 
-  debugger;
   return result;
 };
 // 查询数据
@@ -303,6 +303,7 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
 
 // 组件初始化
 const DetailsList: React.FC<any> = () => {
+  debugger;
     /* 获取网页的项目id */
     const projectInfo = {
       prjId: -1,
@@ -338,7 +339,7 @@ const DetailsList: React.FC<any> = () => {
 
     const [isFieldModalVisible, setFieldModalVisible] = useState(false);
     const [selectedFiled, setSelectedFiled] = useState(['']);
-    const nessField = ['序号','类型', '编号'];
+    const nessField = ['序号', '类型', '编号'];
     const unNessField = ['阶段', '测试', '标题内容', '严重等级', '模块', '状态', '已提测', '发布环境',
       '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', '是否可热更', '是否有数据升级',
       '是否有接口升级', '是否有预置数据', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人'];
@@ -411,7 +412,7 @@ const DetailsList: React.FC<any> = () => {
           style={{height: "100px"}}
           breadcrumb={{routes}}
         />
-        <div style={{background: 'white', marginTop: "20px",width:"100%"}}>
+        <div style={{background: 'white', marginTop: "20px", width: "100%"}}>
 
           <Button type="text"
                   style={{color: 'black', float: 'right'}}
@@ -423,7 +424,7 @@ const DetailsList: React.FC<any> = () => {
         </div>
 
         {/* ag-grid 表格定义 */}
-        <div className="ag-theme-alpine" style={{height: getHeight(), width: '100%',marginTop:"9px"}}>
+        <div className="ag-theme-alpine" style={{height: getHeight(), width: '100%', marginTop: "9px"}}>
           <AgGridReact
             columnDefs={getColums()} // 定义列
             rowData={data} // 数据绑定

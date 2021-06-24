@@ -986,6 +986,7 @@ const SprintList: React.FC<any> = () => {
 
     // 开发经理提交修改
     const commitManagerModify = () => {
+      debugger;
       const oradata = formForManagerToMod.getFieldsValue();
       if (oradata.testerChandaoType === '' || oradata.testerCHandaoID === '') {
         message.error({
@@ -1175,11 +1176,11 @@ const SprintList: React.FC<any> = () => {
     // 不同权限修改不同页面
     const authorityForMod = (detailsInfo: any) => {
       // 判断人员权限（admin，测试，开发经理（开发）,UED）
-      let currentUserGroup;
-      if (initialState?.currentUser) {
-        currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
-      }
-      // const currentUserGroup = 'devGroup';
+      // let currentUserGroup;
+      // if (initialState?.currentUser) {
+      //   currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
+      // }
+      const currentUserGroup = 'devGroup';
       if (currentUserGroup !== undefined) {
         switch (currentUserGroup.toString()) {
           case 'superGroup':

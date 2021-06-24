@@ -1206,7 +1206,7 @@ const DashBoard: React.FC<any> = () => {
                           <label style={cssStyle.itemStyle}>无指派</label>
                           <label style={cssStyle.linkStyle}>
                             <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=bug_no_assign`}>{emergency.noAssign}</Link>
+                              to={`/sprint/details?${emergency_url}&kind=bug&item=bug_no_assign`}>{emergency.noAssign}</Link>
                           </label>
                           <label style={cssStyle.unitStyle}>个</label>
                         </div>
@@ -1215,7 +1215,7 @@ const DashBoard: React.FC<any> = () => {
                           <label style={cssStyle.itemStyle}>无排期</label>
                           <label style={cssStyle.linkStyle}>
                             <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=bug_no_deadline`}>{emergency.noDeadline}</Link>
+                              to={`/sprint/details?${emergency_url}&kind=bug&item=bug_no_deadline`}>{emergency.noDeadline}</Link>
                           </label>
                           <label style={cssStyle.unitStyle}>个</label>
                         </div>
@@ -1224,7 +1224,7 @@ const DashBoard: React.FC<any> = () => {
                           <label style={cssStyle.itemStyle}>项目错误</label>
                           <label style={cssStyle.linkStyle}>
                             <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=bug_proj_error`}>{emergency.prj_error}</Link>
+                              to={`/sprint/details?${emergency_url}&kind=bug&item=bug_proj_error`}>{emergency.prj_error}</Link>
                           </label>
                           <label style={cssStyle.unitStyle}>个</label>
                         </div>
@@ -1233,7 +1233,7 @@ const DashBoard: React.FC<any> = () => {
                           <label style={cssStyle.itemStyle}>超范围</label>
                           <label style={cssStyle.linkStyle}>
                             <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=bug_over_area`}>{emergency.over_area}</Link>
+                              to={`/sprint/details?${emergency_url}&kind=bug&item=bug_over_area`}>{emergency.over_area}</Link>
                           </label>
                           <label style={cssStyle.unitStyle}>个</label>
                         </div>
@@ -1252,7 +1252,7 @@ const DashBoard: React.FC<any> = () => {
                           <label style={cssStyle.itemStyle}>激活</label>
                           <label style={cssStyle.linkStyle}>
                             <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=actived`}>{emergency.actived}</Link>
+                              to={`/sprint/details?${emergency_url}&kind=bug&item=actived`}>{emergency.actived}</Link>
                           </label>
                           <label style={cssStyle.unitStyle}>个</label>
                         </div>
@@ -1261,7 +1261,7 @@ const DashBoard: React.FC<any> = () => {
                           <label style={cssStyle.itemStyle}>已解决</label>
                           <label style={cssStyle.linkStyle}>
                             <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=resolved`}>{emergency.resolved}</Link>
+                              to={`/sprint/details?${emergency_url}&kind=bug&item=resolved`}>{emergency.resolved}</Link>
                           </label>
                           <label style={cssStyle.unitStyle}>个</label>
                         </div>
@@ -1270,7 +1270,7 @@ const DashBoard: React.FC<any> = () => {
                           <label style={cssStyle.itemStyle}>已验证</label>
                           <label style={cssStyle.linkStyle}>
                             <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=bug_verified`}>{emergency.vertified}</Link>
+                              to={`/sprint/details?${emergency_url}&kind=bug&item=bug_verified`}>{emergency.vertified}</Link>
                           </label>
                           <label style={cssStyle.unitStyle}>个</label>
                         </div>
@@ -1279,7 +1279,7 @@ const DashBoard: React.FC<any> = () => {
                           <label style={cssStyle.itemStyle}>已关闭</label>
                           <label style={cssStyle.linkStyle}>
                             <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=closed`}>{emergency.closed}</Link>
+                              to={`/sprint/details?${emergency_url}&kind=bug&item=closed`}>{emergency.closed}</Link>
                           </label>
                           <label style={cssStyle.unitStyle}>个</label>
                         </div>
@@ -1298,7 +1298,7 @@ const DashBoard: React.FC<any> = () => {
                           <label style={cssStyle.itemStyle}>&gt;24H</label>
                           <label style={cssStyle.linkStyle}>
                             <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ac_>24H`}>{emergency.ac24}</Link>
+                              to={`/sprint/details?${emergency_url}&kind=bug&item=ac_>24H`}>{emergency.ac24}</Link>
                           </label>
                           <label style={cssStyle.unitStyle}>个</label>
                         </div>
@@ -1307,7 +1307,7 @@ const DashBoard: React.FC<any> = () => {
                           <label style={cssStyle.itemStyle}>16-24H</label>
                           <label style={cssStyle.linkStyle}>
                             <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ac_16-24H`}>{emergency.ac1624}</Link>
+                              to={`/sprint/details?${emergency_url}&kind=bug&item=ac_16-24H`}>{emergency.ac1624}</Link>
                           </label>
                           <label style={cssStyle.unitStyle}>个</label>
                         </div>
@@ -1316,7 +1316,7 @@ const DashBoard: React.FC<any> = () => {
                           <label style={cssStyle.itemStyle}>8-16H</label>
                           <label style={cssStyle.linkStyle}>
                             <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ac_8-16H`}>{emergency.ac0816}</Link>
+                              to={`/sprint/details?${emergency_url}&kind=bug&item=ac_8-16H`}>{emergency.ac0816}</Link>
                           </label>
                           <label style={cssStyle.unitStyle}>个</label>
                         </div>
@@ -1325,7 +1325,7 @@ const DashBoard: React.FC<any> = () => {
                           <label style={cssStyle.itemStyle}>&lt;8H</label>
                           <label style={cssStyle.linkStyle}>
                             <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ac_<8H`}>{emergency.ac08}</Link>
+                              to={`/sprint/details?${emergency_url}&kind=bug&item=ac_<8H`}>{emergency.ac08}</Link>
                           </label>
                           <label style={cssStyle.unitStyle}>个</label>
                         </div>
@@ -1344,7 +1344,7 @@ const DashBoard: React.FC<any> = () => {
                           <label style={cssStyle.itemStyle}>&gt;24H</label>
                           <label style={cssStyle.linkStyle}>
                             <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ve_>24H`}>{emergency.ve24}</Link>
+                              to={`/sprint/details?${emergency_url}&kind=bug&item=ve_>24H`}>{emergency.ve24}</Link>
                           </label>
                           <label style={cssStyle.unitStyle}>个</label>
                         </div>
@@ -1353,7 +1353,7 @@ const DashBoard: React.FC<any> = () => {
                           <label style={cssStyle.itemStyle}>16-24H</label>
                           <label style={cssStyle.linkStyle}>
                             <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ve_16-24H`}>{emergency.ve1624}</Link>
+                              to={`/sprint/details?${emergency_url}&kind=bug&item=ve_16-24H`}>{emergency.ve1624}</Link>
                           </label>
                           <label style={cssStyle.unitStyle}>个</label>
                         </div>
@@ -1363,7 +1363,7 @@ const DashBoard: React.FC<any> = () => {
                           <label style={cssStyle.itemStyle}>8-16H</label>
                           <label style={cssStyle.linkStyle}>
                             <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ve_8-16H`}>{emergency.ve0816}</Link>
+                              to={`/sprint/details?${emergency_url}&kind=bug&item=ve_8-16H`}>{emergency.ve0816}</Link>
                           </label>
                           <label style={cssStyle.unitStyle}>个</label>
                         </div>
@@ -1372,7 +1372,7 @@ const DashBoard: React.FC<any> = () => {
                           <label style={cssStyle.itemStyle}>&lt;8H</label>
                           <label style={cssStyle.linkStyle}>
                             <Link
-                              to={`/sprint/basicTable/bugs/bugDetails?${emergency_url}&item=ve_<8H`}>{emergency.ve08}</Link>
+                              to={`/sprint/details?${emergency_url}&kind=bug&item=ve_<8H`}>{emergency.ve08}</Link>
                           </label>
                           <label style={cssStyle.unitStyle}>个</label>
                         </div>
@@ -1456,7 +1456,8 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>草稿</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=draft`}>{hotfix.story_status_draft}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=draft`}>{hotfix.story_status_draft}</Link>
+
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1465,7 +1466,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无任务</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=no_task`}>{hotfix.story_status_noTask}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=no_task`}>{hotfix.story_status_noTask}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1474,7 +1475,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>缺任务</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=lack_task`}>{hotfix.story_status_lackTask}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=lack_task`}>{hotfix.story_status_lackTask}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1483,7 +1484,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无排期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=no_deadline`}>{hotfix.story_status_noDeadline}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=no_deadline`}>{hotfix.story_status_noDeadline}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1492,7 +1493,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无指派</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=no_assign`}>{hotfix.story_status_noAssign}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=no_assign`}>{hotfix.story_status_noAssign}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1501,7 +1502,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无bug</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=no_bug`}>{hotfix.story_status_noBug}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=no_bug`}>{hotfix.story_status_noBug}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1510,7 +1511,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>未更新</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=un_modify`}>{hotfix.story_status_noModify}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=un_modify`}>{hotfix.story_status_noModify}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1519,7 +1520,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>项目错误</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=proj_error`}>{hotfix.story_status_prj_error}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=proj_error`}>{hotfix.story_status_prj_error}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1528,7 +1529,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>超范围</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=over_area`}>{hotfix.story_status_over_area}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=over_area`}>{hotfix.story_status_over_area}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1548,7 +1549,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>任务延期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=devtask_delay`}>{hotfix.story_status_delay}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=devtask_delay`}>{hotfix.story_status_delay}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1557,7 +1558,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>未开始</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=dev_wait`}>{hotfix.story_status_wait}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=dev_wait`}>{hotfix.story_status_wait}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1566,7 +1567,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>开发中</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=developing`}>{hotfix.story_status_doing}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=developing`}>{hotfix.story_status_doing}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1576,7 +1577,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>开发完</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=dev_done`}>{hotfix.story_status_done}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=dev_done`}>{hotfix.story_status_done}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1595,7 +1596,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>提测延期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=raisetest_delay`}>{hotfix.story_status_raseTestDelay}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=raisetest_delay`}>{hotfix.story_status_raseTestDelay}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1604,7 +1605,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>未提测</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=un_raisetest`}>{hotfix.story_status_raseTestWait}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=un_raisetest`}>{hotfix.story_status_raseTestWait}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1613,7 +1614,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已提测</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=raisetest_done`}>{hotfix.story_status_raseTestDone}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=raisetest_done`}>{hotfix.story_status_raseTestDone}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1632,7 +1633,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>任务延期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=testtask_delay`}>{hotfix.story_status_testDelay}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=testtask_delay`}>{hotfix.story_status_testDelay}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1641,7 +1642,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>未开始</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=test_wait`}>{hotfix.story_status_testWait}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=test_wait`}>{hotfix.story_status_testWait}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1650,7 +1651,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>测试中</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=testing`}>{hotfix.story_status_testDoing}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=testing`}>{hotfix.story_status_testDoing}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1659,7 +1660,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>测试完</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/stories/storyDetails?${hotfix_url}&item=test_done`}>{hotfix.story_status_testDone}</Link>
+                                to={`sprint/details?${hotfix_url}&kind=story&item=test_done`}>{hotfix.story_status_testDone}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1694,7 +1695,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无指派</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}>{hotfix.story_bug_noAssign}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=bug_no_assign`}>{hotfix.story_bug_noAssign}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1703,7 +1704,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无排期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_deadline`}>{hotfix.story_bug_noDeadline}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=bug_no_deadline`}>{hotfix.story_bug_noDeadline}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1712,7 +1713,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>项目错误</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_proj_error`}>{hotfix.story_bug_prj_error}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=bug_proj_error`}>{hotfix.story_bug_prj_error}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1721,7 +1722,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>超范围</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_over_area`}>{hotfix.story_bug_over_area}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=bug_over_area`}>{hotfix.story_bug_over_area}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1740,7 +1741,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>激活</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=actived`}>{hotfix.story_bug_actived}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=actived`}>{hotfix.story_bug_actived}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1749,7 +1750,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已解决</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=resolved`}>{hotfix.story_bug_resolved}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=resolved`}>{hotfix.story_bug_resolved}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1758,7 +1759,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已验证</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_verified`}>{hotfix.story_bug_vertified}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=bug_verified`}>{hotfix.story_bug_vertified}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1767,7 +1768,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已关闭</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=closed`}>{hotfix.story_bug_closed}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=closed`}>{hotfix.story_bug_closed}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1786,7 +1787,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&gt;24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_>24H`}>{hotfix.story_bug_ac24}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=ac_>24H`}>{hotfix.story_bug_ac24}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1795,7 +1796,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>16-24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_16-24H`}>{hotfix.story_bug_ac1624}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=ac_16-24H`}>{hotfix.story_bug_ac1624}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1804,7 +1805,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>8-16H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_8-16H`}>{hotfix.story_bug_ac0816}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=ac_8-16H`}>{hotfix.story_bug_ac0816}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1813,7 +1814,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&lt;8H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_<8H`}>{hotfix.story_bug_ac08}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=ac_<8H`}>{hotfix.story_bug_ac08}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1833,7 +1834,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&gt;24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_>24H`}>{hotfix.story_bug_ve24}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=ve_>24H`}>{hotfix.story_bug_ve24}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1842,7 +1843,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>16-24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_16-24H`}>{hotfix.story_bug_ve1624}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=ve_16-24H`}>{hotfix.story_bug_ve1624}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1852,7 +1853,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>8-16H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_8-16H`}>{hotfix.story_bug_ve0816}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=ve_8-16H`}>{hotfix.story_bug_ve0816}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1861,7 +1862,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&lt;8H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_<8H`}>{hotfix.story_bug_ve08}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=ve_<8H`}>{hotfix.story_bug_ve08}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1910,7 +1911,8 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无任务</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item='no_task`}>{hotfix.task_status_noTask}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item='no_task`}>{hotfix.task_status_noTask}</Link>
+
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1919,7 +1921,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无排期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=no_deadline`}>{hotfix.task_status_noDeadline}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=no_deadline`}>{hotfix.task_status_noDeadline}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1928,7 +1930,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无指派</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=no_assign`}>{hotfix.task_status_noAssign}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=no_assign`}>{hotfix.task_status_noAssign}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1937,7 +1939,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无bug</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=no_bug`}>{hotfix.task_status_noBug}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=no_bug`}>{hotfix.task_status_noBug}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1946,7 +1948,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>未更新</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=un_modify`}>{hotfix.task_status_noModify}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=un_modify`}>{hotfix.task_status_noModify}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1955,7 +1957,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>项目错误</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=proj_error`}>{hotfix.task_status_prj_error}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=proj_error`}>{hotfix.task_status_prj_error}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1964,7 +1966,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>超范围</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=over_area`}>{hotfix.task_status_over_area}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=over_area`}>{hotfix.task_status_over_area}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1983,7 +1985,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>任务延期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=devtask_delay`}>{hotfix.task_status_taskDelay}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=devtask_delay`}>{hotfix.task_status_taskDelay}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1992,7 +1994,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>未开始</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=dev_wait`}>{hotfix.task_status_wait}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=dev_wait`}>{hotfix.task_status_wait}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2001,7 +2003,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>开发中</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=developing`}>{hotfix.task_status_doing}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=developing`}>{hotfix.task_status_doing}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2010,7 +2012,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>开发完</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=dev_done`}>{hotfix.task_status_done}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=dev_done`}>{hotfix.task_status_done}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2030,7 +2032,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>提测延期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=raisetest_delay`}>{hotfix.task_status_raseTestDelay}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=raisetest_delay`}>{hotfix.task_status_raseTestDelay}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2039,7 +2041,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>未提测</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=un_raisetest`}>{hotfix.task_status_raseTestWait}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=un_raisetest`}>{hotfix.task_status_raseTestWait}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2048,7 +2050,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已提测</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=raisetest_done`}>{hotfix.task_status_raseTestDone}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=raisetest_done`}>{hotfix.task_status_raseTestDone}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2068,7 +2070,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>任务延期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=testtask_delay`}>{hotfix.task_status_testDelay}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=testtask_delay`}>{hotfix.task_status_testDelay}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2077,7 +2079,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>未开始</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=test_wait`}>{hotfix.task_status_testWait}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=test_wait`}>{hotfix.task_status_testWait}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2086,7 +2088,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>测试中</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=testing`}>{hotfix.task_status_testDoing}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=testing`}>{hotfix.task_status_testDoing}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2095,7 +2097,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>测试完</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${hotfix_url}&item=test_done`}>{hotfix.task_status_testDone}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=test_done`}>{hotfix.task_status_testDone}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2130,7 +2132,8 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无指派</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}>{hotfix.task_bug_noAssign}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=bug_no_assign`}>{hotfix.task_bug_noAssign}</Link>
+
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2139,7 +2142,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无排期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_deadline`}>{hotfix.task_bug_noDeadline}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=bug_no_deadline`}>{hotfix.task_bug_noDeadline}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2148,7 +2151,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>项目错误</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_proj_error`}>{hotfix.task_bug_prj_error}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=bug_proj_error`}>{hotfix.task_bug_prj_error}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2157,7 +2160,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>超范围</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_over_area`}>{hotfix.task_bug_over_area}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=bug_over_area`}>{hotfix.task_bug_over_area}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2177,7 +2180,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>激活</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=actived`}>{hotfix.task_bug_actived}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=actived`}>{hotfix.task_bug_actived}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2186,7 +2189,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已解决</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=resolved`}>{hotfix.task_bug_resolved}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=resolved`}>{hotfix.task_bug_resolved}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2195,7 +2198,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已验证</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_verified`}>{hotfix.task_bug_vertified}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=bug_verified`}>{hotfix.task_bug_vertified}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2204,7 +2207,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已关闭</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=closed`}>{hotfix.task_bug_closed}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=closed`}>{hotfix.task_bug_closed}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2224,7 +2227,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&gt;24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_>24H`}>{hotfix.task_bug_ac24}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=ac_>24H`}>{hotfix.task_bug_ac24}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2233,7 +2236,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>16-24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_16-24H`}>{hotfix.task_bug_ac1624}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=ac_16-24H`}>{hotfix.task_bug_ac1624}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2242,7 +2245,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>8-16H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_8-16H`}>{hotfix.task_bug_ac0816}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=ac_8-16H`}>{hotfix.task_bug_ac0816}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2251,7 +2254,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&lt;8H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_<8H`}>{hotfix.task_bug_ac08}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=ac_<8H`}>{hotfix.task_bug_ac08}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2270,7 +2273,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&gt;24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_>24H`}>{hotfix.task_bug_ve24}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=ve_>24H`}>{hotfix.task_bug_ve24}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2279,7 +2282,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>16-24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_16-24H`}>{hotfix.task_bug_ve1624}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=ve_16-24H`}>{hotfix.task_bug_ve1624}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2288,7 +2291,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>8-16H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_8-16H`}>{hotfix.task_bug_ve0816}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=ve_8-16H`}>{hotfix.task_bug_ve0816}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2297,7 +2300,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&lt;8H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_<8H`}>{hotfix.task_bug_ve08}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=task&item=ve_<8H`}>{hotfix.task_bug_ve08}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2344,7 +2347,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无指派</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}>{hotfix.bug_noAssign}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=bug&item=bug_no_assign`}>{hotfix.bug_noAssign}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2353,7 +2356,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无排期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_deadline`}>{hotfix.bug_noDeadline}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=bug&item=bug_no_deadline`}>{hotfix.bug_noDeadline}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2362,7 +2365,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>项目错误</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_proj_error`}>{hotfix.bug_prj_error}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=bug&item=bug_proj_error`}>{hotfix.bug_prj_error}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2371,7 +2374,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>超范围</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_over_area`}>{hotfix.bug_over_area}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=bug&item=bug_over_area`}>{hotfix.bug_over_area}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2391,7 +2394,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>激活</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=actived`}>{hotfix.bug_actived}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=bug&item=actived`}>{hotfix.bug_actived}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2400,7 +2403,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已解决</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=resolved`}>{hotfix.bug_resolved}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=bug&item=resolved`}>{hotfix.bug_resolved}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2409,7 +2412,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已验证</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_verified`}>{hotfix.bug_vertified}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=bug&item=bug_verified`}>{hotfix.bug_vertified}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2418,7 +2421,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已关闭</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=closed`}>{hotfix.bug_closed}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=bug&item=closed`}>{hotfix.bug_closed}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2438,7 +2441,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&gt;24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_>24H`}>{hotfix.bug_ac24}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=bug&item=ac_>24H`}>{hotfix.bug_ac24}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2447,7 +2450,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>16-24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_16-24H`}>{hotfix.bug_ac1624}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=bug&item=ac_16-24H`}>{hotfix.bug_ac1624}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2456,7 +2459,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>8-16H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_8-16H`}>{hotfix.bug_ac0816}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=bug&item=ac_8-16H`}>{hotfix.bug_ac0816}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2465,7 +2468,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&lt;8H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ac_<8H`}>{hotfix.bug_ac08}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=bug&item=ac_<8H`}>{hotfix.bug_ac08}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2484,7 +2487,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&gt;24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_>24H`}>{hotfix.bug_ve24}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=bug&item=ve_>24H`}>{hotfix.bug_ve24}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2493,7 +2496,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>16-24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_16-24H`}>{hotfix.bug_ve1624}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=bug&item=ve_16-24H`}>{hotfix.bug_ve1624}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2502,7 +2505,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>8-16H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_8-16H`}>{hotfix.bug_ve0816}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=bug&item=ve_8-16H`}>{hotfix.bug_ve0816}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2511,7 +2514,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&lt;8H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=ve_<8H`}>{hotfix.bug_ve08}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=bug&item=ve_<8H`}>{hotfix.bug_ve08}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -2846,7 +2849,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 无指派</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_no_assign`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=bug_no_assign`}>
                                 {sprint.story_bug_noAssign}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2855,7 +2858,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 无排期</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_no_deadline`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=bug_no_deadline`}>
                                 {sprint.story_bug_noDeadline}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2864,7 +2867,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 项目错误</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_proj_error`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=bug_proj_error`}>
                                 {sprint.story_bug_prj_error}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2873,7 +2876,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap", display: "none"}}>
                             <label style={cssStyle.itemStyle}> 超范围</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_over_area`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=bug_over_area`}>
                                 {sprint.story_bug_over_area}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2893,7 +2896,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 激活</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=actived`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=actived`}>
                                 {sprint.story_bug_actived}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2902,7 +2905,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 已解决</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=resolved`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=resolved`}>
                                 {sprint.story_bug_resolved}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2911,7 +2914,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 已验证</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_verified`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=bug_verified`}>
                                 {sprint.story_bug_vertified}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2920,7 +2923,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 已关闭</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=closed`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=closed`}>
                                 {sprint.story_bug_closed}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2940,7 +2943,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> &gt;24H</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ac_>24H`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=ac_>24H`}>
                                 {sprint.story_bug_ac24}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2949,7 +2952,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 16-24H</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ac_16-24H`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=ac_16-24H`}>
                                 {sprint.story_bug_ac1624}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2958,7 +2961,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 8-16H</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ac_8-16H`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=ac_8-16H`}>
                                 {sprint.story_bug_ac0816}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2967,7 +2970,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}>&lt;8H</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ac_<8H`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=ac_<8H`}>
                                 {sprint.story_bug_ac08}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2987,7 +2990,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}>&gt;24H</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ve_>24H`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=ve_>24H`}>
                                 {sprint.story_bug_ve24}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2996,7 +2999,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}>16-24H</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ve_16-24H`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=ve_16-24H`}>
                                 {sprint.story_bug_ve1624}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -3006,7 +3009,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}>8-16H</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ve_8-16H`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=ve_8-16H`}>
                                 {sprint.story_bug_ve0816}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -3015,7 +3018,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}>&lt;8H</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ve_<8H`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=ve_<8H`}>
                                 {sprint.story_bug_ve08}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -3053,7 +3056,7 @@ const DashBoard: React.FC<any> = () => {
                       </div>
                     </Col>
 
-                    {/*  */}
+                    {/* 规范检查 */}
                     <Col span={5}>
                       <Card title="规范检查" size={"small"}
                             headStyle={{textAlign: "center", backgroundColor: "AliceBlue"}}
@@ -3063,7 +3066,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}>无任务</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item='no_task`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=task&item='no_task`}>
                                 {sprint.task_status_noTask}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -3072,7 +3075,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}>无排期</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item=no_deadline`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=task&item=no_deadline`}>
                                 {sprint.task_status_noDeadline}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -3081,7 +3084,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}>无指派</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item=no_assign`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=task&item=no_assign`}>
                                 {sprint.task_status_noAssign}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -3090,7 +3093,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}>无bug</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item=no_bug`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=task&item=no_bug`}>
                                 {sprint.task_status_noBug}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -3099,7 +3102,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}>未更新</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item=un_modify`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=task&item=un_modify`}>
                                 {sprint.task_status_noModify}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -3108,7 +3111,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}>项目错误</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item=proj_error`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=task&item=proj_error`}>
                                 {sprint.task_status_prj_error}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -3117,7 +3120,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}>超范围</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item=over_area`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=task&item=over_area`}>
                                 {sprint.task_status_over_area}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -3138,7 +3141,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>任务延期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item=devtask_delay`}>{sprint.task_status_taskDelay}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=devtask_delay`}>{sprint.task_status_taskDelay}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3147,7 +3150,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>未开始</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item=dev_wait`}>{sprint.task_status_wait}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=dev_wait`}>{sprint.task_status_wait}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3156,7 +3159,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>开发中</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item=developing`}>{sprint.task_status_doing}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=developing`}>{sprint.task_status_doing}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3165,7 +3168,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>开发完</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item=dev_done`}>{sprint.task_status_done}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=dev_done`}>{sprint.task_status_done}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3185,7 +3188,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>提测延期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item=raisetest_delay`}>{sprint.task_status_raseTestDelay}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=raisetest_delay`}>{sprint.task_status_raseTestDelay}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3194,7 +3197,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>未提测</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item=un_raisetest`}>{sprint.task_status_raseTestWait}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=un_raisetest`}>{sprint.task_status_raseTestWait}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3203,7 +3206,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已提测</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item=raisetest_done`}>{sprint.task_status_raseTestDone}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=raisetest_done`}>{sprint.task_status_raseTestDone}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3223,7 +3226,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>任务延期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item=testtask_delay`}>{sprint.task_status_testDelay}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=testtask_delay`}>{sprint.task_status_testDelay}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3232,7 +3235,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>未开始</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item=test_wait`}>{sprint.task_status_testWait}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=test_wait`}>{sprint.task_status_testWait}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3241,7 +3244,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>测试中</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item=testing`}>{sprint.task_status_testDoing}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=testing`}>{sprint.task_status_testDoing}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3250,7 +3253,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>测试完</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/tasks/taskDetails?${sprint_url}&item=test_done`}>{sprint.task_status_testDone}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=test_done`}>{sprint.task_status_testDone}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3263,6 +3266,7 @@ const DashBoard: React.FC<any> = () => {
 
                   {/* 任务-bug */}
                   <Row gutter={8} align={"middle"} style={{marginTop: "10px"}}>   {/* gutter 每一列的间隔距离 */}
+
 
                     <Col span={2}>
                       <div style={{backgroundColor: "white", height: "135px", textAlign: "center"}}>
@@ -3286,7 +3290,8 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无指派</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_no_assign`}>{sprint.task_bug_noAssign}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=bug_no_assign`}>{sprint.task_bug_noAssign}</Link>
+
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3295,7 +3300,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无排期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_no_deadline`}>{sprint.task_bug_noDeadline}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=bug_no_deadline`}>{sprint.task_bug_noDeadline}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3304,7 +3309,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>项目错误</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_proj_error`}>{sprint.task_bug_prj_error}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=bug_proj_error`}>{sprint.task_bug_prj_error}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3313,7 +3318,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>超范围</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_over_area`}>{sprint.task_bug_over_area}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=bug_over_area`}>{sprint.task_bug_over_area}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3333,7 +3338,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>激活</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=actived`}>{sprint.task_bug_actived}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=actived`}>{sprint.task_bug_actived}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3342,7 +3347,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已解决</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=resolved`}>{sprint.task_bug_resolved}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=resolved`}>{sprint.task_bug_resolved}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3351,7 +3356,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已验证</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_verified`}>{sprint.task_bug_vertified}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=bug_verified`}>{sprint.task_bug_vertified}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3360,7 +3365,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已关闭</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=closed`}>{sprint.task_bug_closed}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=closed`}>{sprint.task_bug_closed}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3380,7 +3385,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&gt;24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ac_>24H`}>{sprint.task_bug_ac24}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=ac_>24H`}>{sprint.task_bug_ac24}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3389,7 +3394,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>16-24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ac_16-24H`}>{sprint.task_bug_ac1624}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=ac_16-24H`}>{sprint.task_bug_ac1624}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3398,7 +3403,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>8-16H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ac_8-16H`}>{sprint.task_bug_ac0816}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=ac_8-16H`}>{sprint.task_bug_ac0816}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3407,7 +3412,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&lt;8H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ac_<8H`}>{sprint.task_bug_ac08}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=ac_<8H`}>{sprint.task_bug_ac08}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3426,7 +3431,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&gt;24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ve_>24H`}>{sprint.task_bug_ve24}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=ve_>24H`}>{sprint.task_bug_ve24}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3435,7 +3440,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>16-24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ve_16-24H`}>{sprint.task_bug_ve1624}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=ve_16-24H`}>{sprint.task_bug_ve1624}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3444,7 +3449,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>8-16H </label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ve_8-16H`}>{sprint.task_bug_ve0816}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=ve_8-16H`}>{sprint.task_bug_ve0816}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3453,7 +3458,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&lt;8H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ve_<8H`}>{sprint.task_bug_ve08}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=task&item=ve_<8H`}>{sprint.task_bug_ve08}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3499,7 +3504,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无指派</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_no_assign`}>{sprint.bug_noAssign}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=bug&item=bug_no_assign`}>{sprint.bug_noAssign}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3508,7 +3513,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无排期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_no_deadline`}>{sprint.bug_noDeadline}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=bug&item=bug_no_deadline`}>{sprint.bug_noDeadline}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3517,7 +3522,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>项目错误</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_proj_error`}>{sprint.bug_prj_error}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=bug&item=bug_proj_error`}>{sprint.bug_prj_error}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3526,7 +3531,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>超范围</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_over_area`}>{sprint.bug_over_area}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=bug&item=bug_over_area`}>{sprint.bug_over_area}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3546,7 +3551,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>激活</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=actived`}>{sprint.bug_actived}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=bug&item=actived`}>{sprint.bug_actived}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3555,7 +3560,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已解决</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=resolved`}>{sprint.bug_resolved}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=bug&item=resolved`}>{sprint.bug_resolved}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3564,7 +3569,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已验证</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=bug_verified`}>{sprint.bug_vertified}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=bug&item=bug_verified`}>{sprint.bug_vertified}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3573,7 +3578,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已关闭</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=closed`}>{sprint.bug_closed}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=bug&item=closed`}>{sprint.bug_closed}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3593,7 +3598,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&gt;24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ac_>24H`}>{sprint.bug_ac24}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=bug&item=ac_>24H`}>{sprint.bug_ac24}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3602,7 +3607,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>16-24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ac_16-24H`}>{sprint.bug_ac1624}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=bug&item=ac_16-24H`}>{sprint.bug_ac1624}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3611,7 +3616,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>8-16H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ac_8-16H`}>{sprint.bug_ac0816}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=bug&item=ac_8-16H`}>{sprint.bug_ac0816}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3621,7 +3626,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&lt;8H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ac_<8H`}>{sprint.bug_ac08}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=bug&item=ac_<8H`}>{sprint.bug_ac08}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3641,7 +3646,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&gt;24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ve_>24H`}>{sprint.bug_ve24}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=bug&item=ve_>24H`}>{sprint.bug_ve24}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3650,7 +3655,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>16-24H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ve_16-24H`}>{sprint.bug_ve1624}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=bug&item=ve_16-24H`}>{sprint.bug_ve1624}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3659,7 +3664,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>8-16H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ve_8-16H`}>{sprint.bug_ve0816}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=bug&item=ve_8-16H`}>{sprint.bug_ve0816}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -3668,7 +3673,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>&lt;8H</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`/sprint/basicTable/bugs/bugDetails?${sprint_url}&item=ve_<8H`}>{sprint.bug_ve08}</Link>
+                                to={`/sprint/details?${sprint_url}&kind=bug&item=ve_<8H`}>{sprint.bug_ve08}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>

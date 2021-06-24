@@ -958,17 +958,17 @@ const DashBoard: React.FC<any> = () => {
         bug_actived: ho_data.bug.Bug_actived,
         bug_resolved: ho_data.bug.Bug_resolved,
         bug_vertified: ho_data.bug.Bug_verified,
-        bug_closed: ho_data.Bug_closed,
+        bug_closed: ho_data.bug.Bug_closed,
 
-        bug_ac24: ho_data.Bug_ac_24,
-        bug_ac1624: ho_data.Bug_ac_1624,
-        bug_ac0816: ho_data.Bug_ac_0816,
-        bug_ac08: ho_data.Bug_ac_08,
+        bug_ac24: ho_data.bug.Bug_ac_24,
+        bug_ac1624: ho_data.bug.Bug_ac_1624,
+        bug_ac0816: ho_data.bug.Bug_ac_0816,
+        bug_ac08: ho_data.bug.Bug_ac_08,
 
-        bug_ve24: ho_data.Bug_ve_24,
-        bug_ve1624: ho_data.Bug_ve_1624,
-        bug_ve0816: ho_data.Bug_ve_0816,
-        bug_ve08: ho_data.Bug_ve_08
+        bug_ve24: ho_data.bug.Bug_ve_24,
+        bug_ve1624: ho_data.bug.Bug_ve_1624,
+        bug_ve0816: ho_data.bug.Bug_ve_0816,
+        bug_ve08: ho_data.bug.Bug_ve_08
         // endregion
       });
 
@@ -1088,7 +1088,7 @@ const DashBoard: React.FC<any> = () => {
         bug_actived: sp_data.bug.Bug_actived,
         bug_resolved: sp_data.bug.Bug_resolved,
         bug_vertified: sp_data.bug.Bug_verified,
-        bug_closed: sp_data.Bug_closed,
+        bug_closed: sp_data.bug.Bug_closed,
 
         bug_ac24: sp_data.bug.Bug_ac_24,
         bug_ac1624: sp_data.bug.Bug_ac_1624,

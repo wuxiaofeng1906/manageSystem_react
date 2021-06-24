@@ -2623,7 +2623,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 缺任务</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=lack_task`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=lack_task`}>
                                 {sprint.story_status_lackTask}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>

@@ -60,11 +60,17 @@ export default [
     name: 'sprint 工作台',
     icon: 'table',
     path: '/sprint',
-     routes: [
+    routes: [
       {
         name: 'dsahboard',
         path: 'sprintDashboard',
-        component: './sprint/sprintDashboard',
+        component: './sprint/sprintDashboard/index',
+      },
+      {
+        name: 'details',
+        path: 'details',
+        component: './sprint/sprintDashboard/details',
+        hideInMenu: true,
       },
       {
         name: 'bug',
@@ -304,7 +310,7 @@ export default [
     icon: 'table',
     path: '/authority',
     access: 'sysAdmin',
-     routes: [
+    routes: [
       {
         name: '权限管理',
         path: 'main',

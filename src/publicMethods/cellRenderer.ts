@@ -1,5 +1,5 @@
 const numberRenderToYesNo = (params: any) => {
-  if (params.value === null) {
+  if (params.value === null || params.value === undefined) {
     return "";
   }
   if (params.value === "0") {
@@ -15,7 +15,7 @@ const numberRenderToYesNo = (params: any) => {
 };
 
 const numberRenderTopass = (params: any) => {
-  if (params.value === null) {
+  if (params.value === null || params.value === undefined) {
     return "";
   }
   if (params.value === "0") {
@@ -39,7 +39,7 @@ const numberRenderTopass = (params: any) => {
 const numberRenderToCurrentStage = (params: any) => {
   let stage = "";
 
-  if (params.value !== null) {
+  if (params.value !== null && params.value !== undefined) {
     switch (params.value.toString()) {
       case "1":
         stage = "未开始";
@@ -90,7 +90,7 @@ const numberRenderToCurrentStage = (params: any) => {
 
 
 const stageForLineThrough = (params: any) => {
-  if (params.value === null) {
+  if (params.value === null || params.value === undefined) {
     return "";
   }
   if (params.data.stage === 8) {
@@ -104,7 +104,7 @@ const stageForLineThrough = (params: any) => {
 const numberRenderToCurrentStageForColor = (params: any) => {
   let stage = "";
 
-  if (params.value !== null) {
+  if (params.value !== null && params.value !== undefined) {
     switch (params.value.toString()) {
       case "1":
         stage = "未开始";
@@ -164,7 +164,7 @@ const stageChangeToNumber = (params: string) => {
 
   let stageNum = -1;
 
-  if (params !== null) {
+  if (params !== null && params !== undefined) {
     switch (params.toString()) {
       case "未开始":
         stageNum = 1;

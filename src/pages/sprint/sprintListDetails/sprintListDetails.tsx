@@ -837,6 +837,8 @@ const SprintList: React.FC<any> = () => {
         return;
       }
       const datas = {
+        // 新增使用的是project id
+        project: prjId,
         stage: Number(oradata.adminCurStage).toString() === "NaN" ? stageChangeToNumber(oradata.adminCurStage) : Number(oradata.adminCurStage),
         category: oradata.adminChandaoType,
         hotUpdate: oradata.adminAddHotUpdate,
@@ -868,8 +870,7 @@ const SprintList: React.FC<any> = () => {
 
       }
       if (modal.title === '新增明细行') {
-        // 新增使用的是project id
-        datas['project'] = prjId;
+
         datas["source"] = 7;
         datas["ztNo"] = oradata.adminChandaoId;
         datas["tester"] = testers;
@@ -879,6 +880,7 @@ const SprintList: React.FC<any> = () => {
         addCommitDetails(datas);
       } else {
         const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+        debugger;
         datas['id'] = curRow[0].id;
 
         // 判断是否被修改过 禅道id 对应测试、对应UED、反馈人
@@ -894,7 +896,7 @@ const SprintList: React.FC<any> = () => {
           datas["uedName"] = oradata.adminAddForUED;
         }
 
-        if (formForAdminToAddAnaMod.isFieldTouched('adminAddFeedbacker')) {
+        if (curRow[0].feedback !== oradata.adminAddFeedbacker ) {
           datas["feedback"] = oradata.adminAddFeedbacker;
         }
 

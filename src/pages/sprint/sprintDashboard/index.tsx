@@ -407,20 +407,22 @@ const DashBoard: React.FC<any> = () => {
     for (let index = 0; index < data.length; index += 1) {
       const details = data[index];
       if (details.category === "sprint") {
+
         oraProject.sprint.id = details.id;
         oraProject.sprint.name = details.name;
         sp_data = sp_hotResultDeals(details.data);
-
+        console.log("sp_data", sp_data);
       } else if (details.category === "hotfix") {
         oraProject.hotfix.id = details.id;
         oraProject.hotfix.name = details.name;
         ho_data = sp_hotResultDeals(details.data);
+        console.log("ho_data", ho_data);
 
       } else {
         oraProject.emergency.id = details.id;
         oraProject.emergency.name = details.name;
-
         em_data = bugResultDeals(details.data);
+        console.log("em_data", em_data);
       }
     }
   }
@@ -526,8 +528,8 @@ const DashBoard: React.FC<any> = () => {
       story_status_done: ho_datas.story.status.status_dev_done,
 
       story_status_raseTestDelay: ho_datas.story.status.status_raisetest_delay,
-      story_status_raseTestWait: '',
-      story_status_raseTestDone: '',
+      story_status_raseTestWait: ho_datas.story.status.status_un_raisetest,
+      story_status_raseTestDone: ho_datas.story.status.status_raisetest_done,
 
       story_status_testDelay: ho_datas.story.status.status_testtask_delay,
       story_status_testWait: ho_datas.story.status.status_test_wait,
@@ -539,18 +541,21 @@ const DashBoard: React.FC<any> = () => {
       story_bug_noDeadline: ho_datas.story.bug.Bug_no_deadline,
       story_bug_prj_error: ho_datas.story.bug.Bug_proj_error,
       story_bug_over_area: ho_datas.story.bug.Bug_over_area,
+
       story_bug_actived: ho_datas.story.bug.Bug_actived,
       story_bug_resolved: ho_datas.story.bug.Bug_resolved,
       story_bug_vertified: ho_datas.story.bug.Bug_verified,
       story_bug_closed: ho_datas.story.bug.Bug_closed,
-      story_bug_ac24: '',
-      story_bug_ac1624: '',
-      story_bug_ac0816: '',
-      story_bug_ac08: '',
-      story_bug_ve24: '',
-      story_bug_ve1624: '',
-      story_bug_ve0816: '',
-      story_bug_ve08: '',
+
+      story_bug_ac24: ho_datas.story.bug.Bug_ac_24,
+      story_bug_ac1624: ho_datas.story.bug.Bug_ac_1624,
+      story_bug_ac0816: ho_datas.story.bug.Bug_ac_0816,
+      story_bug_ac08: ho_datas.story.bug.Bug_ac_08,
+
+      story_bug_ve24: ho_datas.story.bug.Bug_ve_24,
+      story_bug_ve1624: ho_datas.story.bug.Bug_ve_1624,
+      story_bug_ve0816: ho_datas.story.bug.Bug_ve_0816,
+      story_bug_ve08: ho_datas.story.bug.Bug_ve_08,
 
       // endregion
 
@@ -591,15 +596,15 @@ const DashBoard: React.FC<any> = () => {
       task_bug_vertified: ho_datas.task.bug.Bug_verified,
       task_bug_closed: ho_datas.task.bug.Bug_closed,
 
-      task_bug_ac24: '',
-      task_bug_ac1624: '',
-      task_bug_ac0816: '',
-      task_bug_ac08: '',
+      task_bug_ac24: ho_datas.task.bug.Bug_ac_24,
+      task_bug_ac1624: ho_datas.task.bug.Bug_ac_1624,
+      task_bug_ac0816: ho_datas.task.bug.Bug_ac_0816,
+      task_bug_ac08: ho_datas.task.bug.Bug_ac_08,
 
-      task_bug_ve24: '',
-      task_bug_ve1624: '',
-      task_bug_ve0816: '',
-      task_bug_ve08: '',
+      task_bug_ve24: ho_datas.task.bug.Bug_ve_24,
+      task_bug_ve1624: ho_datas.task.bug.Bug_ve_1624,
+      task_bug_ve0816: ho_datas.task.bug.Bug_ve_0816,
+      task_bug_ve08: ho_datas.task.bug.Bug_ve_08,
 
       // endregion
 
@@ -616,15 +621,15 @@ const DashBoard: React.FC<any> = () => {
       bug_vertified: ho_datas.bug.Bug_verified,
       bug_closed: ho_datas.bug.Bug_closed,
 
-      bug_ac24: '',
-      bug_ac1624: '',
-      bug_ac0816: '',
-      bug_ac08: '',
+      bug_ac24: ho_datas.bug.Bug_ac_24,
+      bug_ac1624: ho_datas.bug.Bug_ac_1624,
+      bug_ac0816: ho_datas.bug.Bug_ac_0816,
+      bug_ac08: ho_datas.bug.Bug_ac_08,
 
-      bug_ve24: '',
-      bug_ve1624: '',
-      bug_ve0816: '',
-      bug_ve08: ''
+      bug_ve24: ho_datas.bug.Bug_ve_24,
+      bug_ve1624: ho_datas.bug.Bug_ve_1624,
+      bug_ve0816: ho_datas.bug.Bug_ve_0816,
+      bug_ve08: ho_datas.bug.Bug_ve_08
       // endregion
 
     });
@@ -688,14 +693,14 @@ const DashBoard: React.FC<any> = () => {
       story_bug_resolved: sp_datas.story.bug.Bug_resolved,
       story_bug_vertified: sp_datas.story.bug.Bug_verified,
       story_bug_closed: sp_datas.story.bug.Bug_closed,
-      story_bug_ac24: '',
-      story_bug_ac1624: '',
-      story_bug_ac0816: '',
-      story_bug_ac08: '',
-      story_bug_ve24: '',
-      story_bug_ve1624: '',
-      story_bug_ve0816: '',
-      story_bug_ve08: '',
+      story_bug_ac24: sp_datas.story.bug.Bug_ac_24,
+      story_bug_ac1624: sp_datas.story.bug.Bug_ac_1624,
+      story_bug_ac0816: sp_datas.story.bug.Bug_ac_0816,
+      story_bug_ac08: sp_datas.story.bug.Bug_ac_08,
+      story_bug_ve24: sp_datas.story.bug.Bug_ve_24,
+      story_bug_ve1624: sp_datas.story.bug.Bug_ve_1624,
+      story_bug_ve0816: sp_datas.story.bug.Bug_ve_0816,
+      story_bug_ve08: sp_datas.story.bug.Bug_ve_08,
 
       // endregion
 
@@ -736,15 +741,15 @@ const DashBoard: React.FC<any> = () => {
       task_bug_vertified: sp_datas.task.bug.Bug_verified,
       task_bug_closed: sp_datas.task.bug.Bug_closed,
 
-      task_bug_ac24: '',
-      task_bug_ac1624: '',
-      task_bug_ac0816: '',
-      task_bug_ac08: '',
+      task_bug_ac24: sp_datas.task.bug.Bug_ac_24,
+      task_bug_ac1624: sp_datas.task.bug.Bug_ac_1624,
+      task_bug_ac0816: sp_datas.task.bug.Bug_ac_0816,
+      task_bug_ac08: sp_datas.task.bug.Bug_ac_08,
 
-      task_bug_ve24: '',
-      task_bug_ve1624: '',
-      task_bug_ve0816: '',
-      task_bug_ve08: '',
+      task_bug_ve24: sp_datas.task.bug.Bug_ve_24,
+      task_bug_ve1624: sp_datas.task.bug.Bug_ve_1624,
+      task_bug_ve0816: sp_datas.task.bug.Bug_ve_0816,
+      task_bug_ve08: sp_datas.task.bug.Bug_ve_08,
 
       // endregion
 
@@ -760,15 +765,15 @@ const DashBoard: React.FC<any> = () => {
       bug_vertified: sp_datas.bug.Bug_verified,
       bug_closed: sp_datas.bug.Bug_closed,
 
-      bug_ac24: '',
-      bug_ac1624: '',
-      bug_ac0816: '',
-      bug_ac08: '',
+      bug_ac24: sp_datas.bug.Bug_ac_24,
+      bug_ac1624: sp_datas.bug.Bug_ac_1624,
+      bug_ac0816: sp_datas.bug.Bug_ac_0816,
+      bug_ac08: sp_datas.bug.Bug_ac_08,
 
-      bug_ve24: '',
-      bug_ve1624: '',
-      bug_ve0816: '',
-      bug_ve08: ''
+      bug_ve24: sp_datas.bug.Bug_ve_24,
+      bug_ve1624: sp_datas.bug.Bug_ve_1624,
+      bug_ve0816: sp_datas.bug.Bug_ve_0816,
+      bug_ve08: sp_datas.bug.Bug_ve_08
       // endregion
     });
   };
@@ -824,7 +829,6 @@ const DashBoard: React.FC<any> = () => {
       });
       em_bug_hidden = false;
     }
-    // console.log("em_data", em_data);
 
     // hotfix 初始值赋值
     if (JSON.stringify(ho_data) !== "{}" && hotfix.story_status_draft === '') {
@@ -871,22 +875,25 @@ const DashBoard: React.FC<any> = () => {
         story_status_testDone: ho_data.story.status.status_test_done,
 
         // bug
-        story_bug_noAssign: '',
-        story_bug_noDeadline: '',
-        story_bug_prj_error: '',
-        story_bug_over_area: '',
-        story_bug_actived: '',
-        story_bug_resolved: '',
-        story_bug_vertified: '',
-        story_bug_closed: '',
-        story_bug_ac24: '',
-        story_bug_ac1624: '',
-        story_bug_ac0816: '',
-        story_bug_ac08: '',
-        story_bug_ve24: '',
-        story_bug_ve1624: '',
-        story_bug_ve0816: '',
-        story_bug_ve08: '',
+        story_bug_noAssign: ho_data.story.bug.Bug_no_assign,
+        story_bug_noDeadline: ho_data.story.bug.Bug_no_deadline,
+        story_bug_prj_error: ho_data.story.bug.Bug_proj_error,
+        story_bug_over_area: ho_data.story.bug.Bug_over_area,
+
+        story_bug_actived: ho_data.story.bug.Bug_actived,
+        story_bug_resolved: ho_data.story.bug.Bug_resolved,
+        story_bug_vertified: ho_data.story.bug.Bug_verified,
+        story_bug_closed: ho_data.story.bug.Bug_closed,
+
+        story_bug_ac24: ho_data.story.bug.Bug_ac_24,
+        story_bug_ac1624: ho_data.story.bug.Bug_ac_1624,
+        story_bug_ac0816: ho_data.story.bug.Bug_ac_0816,
+        story_bug_ac08: ho_data.story.bug.Bug_ac_08,
+
+        story_bug_ve24: ho_data.story.bug.Bug_ve_24,
+        story_bug_ve1624: ho_data.story.bug.Bug_ve_1624,
+        story_bug_ve0816: ho_data.story.bug.Bug_ve_0816,
+        story_bug_ve08: ho_data.story.bug.Bug_ve_08,
 
         // endregion
 
@@ -927,15 +934,15 @@ const DashBoard: React.FC<any> = () => {
         task_bug_vertified: ho_data.task.bug.Bug_verified,
         task_bug_closed: ho_data.task.bug.Bug_closed,
 
-        task_bug_ac24: '',
-        task_bug_ac1624: '',
-        task_bug_ac0816: '',
-        task_bug_ac08: '',
+        task_bug_ac24: ho_data.task.bug.Bug_ac_24,
+        task_bug_ac1624: ho_data.task.bug.Bug_ac_1624,
+        task_bug_ac0816: ho_data.task.bug.Bug_ac_0816,
+        task_bug_ac08: ho_data.task.bug.Bug_ac_08,
 
-        task_bug_ve24: '',
-        task_bug_ve1624: '',
-        task_bug_ve0816: '',
-        task_bug_ve08: '',
+        task_bug_ve24: ho_data.task.bug.Bug_ve_24,
+        task_bug_ve1624: ho_data.task.bug.Bug_ve_1624,
+        task_bug_ve0816: ho_data.task.bug.Bug_ve_0816,
+        task_bug_ve08: ho_data.task.bug.Bug_ve_08,
 
         // endregion
 
@@ -953,20 +960,19 @@ const DashBoard: React.FC<any> = () => {
         bug_vertified: ho_data.bug.Bug_verified,
         bug_closed: ho_data.Bug_closed,
 
-        bug_ac24: '',
-        bug_ac1624: '',
-        bug_ac0816: '',
-        bug_ac08: '',
+        bug_ac24: ho_data.Bug_ac_24,
+        bug_ac1624: ho_data.Bug_ac_1624,
+        bug_ac0816: ho_data.Bug_ac_0816,
+        bug_ac08: ho_data.Bug_ac_08,
 
-        bug_ve24: '',
-        bug_ve1624: '',
-        bug_ve0816: '',
-        bug_ve08: ''
+        bug_ve24: ho_data.Bug_ve_24,
+        bug_ve1624: ho_data.Bug_ve_1624,
+        bug_ve0816: ho_data.Bug_ve_0816,
+        bug_ve08: ho_data.Bug_ve_08
         // endregion
       });
 
     }
-    // console.log("ho_data", ho_data);
 
     // sprint 初始值赋值
     if (JSON.stringify(sp_data) !== "{}" && sprint.story_status_draft === '') {
@@ -1008,14 +1014,17 @@ const DashBoard: React.FC<any> = () => {
         story_bug_resolved: sp_data.story.bug.Bug_resolved,
         story_bug_vertified: sp_data.story.bug.Bug_verified,
         story_bug_closed: sp_data.story.bug.Bug_closed,
-        story_bug_ac24: '',
-        story_bug_ac1624: '',
-        story_bug_ac0816: '',
-        story_bug_ac08: '',
-        story_bug_ve24: '',
-        story_bug_ve1624: '',
-        story_bug_ve0816: '',
-        story_bug_ve08: '',
+
+        story_bug_ac24: sp_data.story.bug.Bug_ac_24,
+        story_bug_ac1624: sp_data.story.bug.Bug_ac_1624,
+        story_bug_ac0816: sp_data.story.bug.Bug_ac_0816,
+        story_bug_ac08: sp_data.story.bug.Bug_ac_08,
+
+        story_bug_ve24: sp_data.story.bug.Bug_ve_24,
+        story_bug_ve1624: sp_data.story.bug.Bug_ve_1624,
+        story_bug_ve0816: sp_data.story.bug.Bug_ve_0816,
+        story_bug_ve08: sp_data.story.bug.Bug_ve_08,
+
 
         // endregion
 
@@ -1056,15 +1065,15 @@ const DashBoard: React.FC<any> = () => {
         task_bug_vertified: sp_data.task.bug.Bug_verified,
         task_bug_closed: sp_data.task.bug.Bug_closed,
 
-        task_bug_ac24: '',
-        task_bug_ac1624: '',
-        task_bug_ac0816: '',
-        task_bug_ac08: '',
+        task_bug_ac24: sp_data.task.bug.Bug_ac_24,
+        task_bug_ac1624: sp_data.task.bug.Bug_ac_1624,
+        task_bug_ac0816: sp_data.task.bug.Bug_ac_0816,
+        task_bug_ac08: sp_data.task.bug.Bug_ac_08,
 
-        task_bug_ve24: '',
-        task_bug_ve1624: '',
-        task_bug_ve0816: '',
-        task_bug_ve08: '',
+        task_bug_ve24: sp_data.task.bug.Bug_ve_24,
+        task_bug_ve1624: sp_data.task.bug.Bug_ve_1624,
+        task_bug_ve0816: sp_data.task.bug.Bug_ve_0816,
+        task_bug_ve08: sp_data.task.bug.Bug_ve_08,
 
         // endregion
 
@@ -1081,21 +1090,19 @@ const DashBoard: React.FC<any> = () => {
         bug_vertified: sp_data.bug.Bug_verified,
         bug_closed: sp_data.Bug_closed,
 
-        bug_ac24: '',
-        bug_ac1624: '',
-        bug_ac0816: '',
-        bug_ac08: '',
+        bug_ac24: sp_data.Bug_ac_24,
+        bug_ac1624: sp_data.Bug_ac_1624,
+        bug_ac0816: sp_data.Bug_ac_0816,
+        bug_ac08: sp_data.Bug_ac_08,
 
-        bug_ve24: '',
-        bug_ve1624: '',
-        bug_ve0816: '',
-        bug_ve08: ''
+        bug_ve24: sp_data.Bug_ve_24,
+        bug_ve1624: sp_data.Bug_ve_1624,
+        bug_ve0816: sp_data.Bug_ve_0816,
+        bug_ve08: sp_data.Bug_ve_08
         // endregion
       });
 
     }
-
-    // console.log("sp_data", sp_data);
 
     if (ho_story_hidden === true && ho_task_hidden === true && ho_bug_hidden === true) {  // 如果初始化所有hotfix都没有数据，那么就显示所有的hotfix项
       // 设置可见性
@@ -1116,7 +1123,7 @@ const DashBoard: React.FC<any> = () => {
     }
 
 
-  }, [sp_data.showFlag]);   //   sp_data.story.status.status_lack_task   em_data.Bug_no_deadline
+  }, [sp_data.showFlag]);
 
 
   const cssStyle = {

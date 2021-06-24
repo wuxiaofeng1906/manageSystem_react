@@ -179,30 +179,30 @@ const storyBugDeal = (itemArray: any) => {
         break;
 
       // 激活时长
-      case "bug_ac_>24H":
+      case "ac_>24H":
         storyBugCount.Bug_ac_24 = count;
         break;
-      case "bug_ac_16-24H":
+      case "ac_16-24H":
         storyBugCount.Bug_ac_1624 = count;
         break;
-      case "bug_ac_8-16H":
+      case "ac_8-16H":
         storyBugCount.Bug_ac_0816 = count;
         break;
-      case "bug_ac_<8H":
+      case "ac_<8H":
         storyBugCount.Bug_ac_08 = count;
         break;
 
       // 待回验进展
-      case "bug_ve_>24H":
+      case "ve_>24H":
         storyBugCount.Bug_ve_24 = count;
         break;
-      case "bug_ve_16-24H":
+      case "ve_16-24H":
         storyBugCount.Bug_ve_1624 = count;
         break;
-      case "bug_ve_8-16H":
+      case "ve_8-16H":
         storyBugCount.Bug_ve_0816 = count;
         break;
-      case "bug_ve_<8H":
+      case "ve_<8H":
         storyBugCount.Bug_ve_08 = count;
         break;
 
@@ -416,7 +416,7 @@ const shBugResultDeals = (countArray: any, allCount: string) => {
   }
 
   for (let i = 0; i < itemArray.length; i += 1) {
-    const count = itemArray[i].value === null ? '' : itemArray[i].value;
+     const count = itemArray[i].value === null ? '' : itemArray[i].value;
     switch (itemArray[i].item) {
       // 规范检查
       case "bug_no_assign": // 无指派
@@ -574,6 +574,7 @@ const bugResultDeals = (countArray: any) => {
 
 
 const sp_hotResultDeals = (params: any) => {
+
   if (params === null) {
     return null;
 
@@ -583,7 +584,7 @@ const sp_hotResultDeals = (params: any) => {
   let bugDt = Object();
 
   for (let index = 0; index < params.length; index += 1) {
-    debugger;
+
     if (params[index].name === "story") {
       storyDt = storyResultDeals(params[index].data, params[index].count);
 

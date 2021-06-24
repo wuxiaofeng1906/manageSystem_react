@@ -5,7 +5,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {Row, Col, Select, Card, Button} from 'antd';
 import {Link} from 'umi';
-import {ContainerOutlined} from "@ant-design/icons";
+import {SearchOutlined} from "@ant-design/icons";
 import {history} from "@@/core/history";
 import {GqlClient, useGqlClient} from "@/hooks";
 import {useRequest} from "ahooks";
@@ -1151,13 +1151,13 @@ const DashBoard: React.FC<any> = () => {
                           float: "right", color: 'black', marginTop: '20px', marginRight: "10px",
                           display: judgeAuthority("查看项目清单All") === true ? "inline" : "none"
                         }}
-                        icon={<ContainerOutlined/>}
+                        icon={<SearchOutlined/>}
                         size={'large'}
                         onClick={() => {
                           history.push(`/sprint/sprintListDetails?projectid=${selectedName.emergency.id}&project=${selectedName.emergency.name}`);
-                        }}>查看项目清单All</Button>
+                        }}>项目清单</Button>
                 <Button type="text" style={{float: "right", color: 'black', marginTop: '20px', marginRight: "10px"}}
-                        icon={<ContainerOutlined/>}
+                        icon={<SearchOutlined/>}
                         size={'large'}
                         onClick={() => {
                           history.push(`/sprint/sprintListDetails?projectid=${selectedName.emergency.id}&project=${selectedName.emergency.name}`);
@@ -1394,14 +1394,14 @@ const DashBoard: React.FC<any> = () => {
                   marginRight: "10px",
                   display: judgeAuthority("查看项目清单All") === true ? "inline" : "none"
                 }}
-                        icon={<ContainerOutlined/>}
+                        icon={<SearchOutlined/>}
                         size={'large'}
                         onClick={() => {
                           history.push(`/sprint/sprintListDetails?projectid=${selectedName.hotfix.id}&project=${selectedName.hotfix.name}`);
-                        }}>查看项目清单All</Button>
+                        }}>项目清单</Button>
 
                 <Button type="text" style={{float: "right", color: 'black', marginRight: "10px"}}
-                        icon={<ContainerOutlined/>}
+                        icon={<SearchOutlined/>}
                         size={'large'}
                         onClick={() => {
                           history.push(`/sprint/sprintListDetails?projectid=${selectedName.hotfix.id}&project=${selectedName.hotfix.name}`);
@@ -2541,14 +2541,14 @@ const DashBoard: React.FC<any> = () => {
                           marginRight: "10px",
                           display: judgeAuthority("查看项目清单All") === true ? "inline" : "none"
                         }}
-                        icon={<ContainerOutlined/>}
+                        icon={<SearchOutlined/>}
                         size={'large'}
                         onClick={() => {
                           history.push(`/sprint/sprintListDetails?projectid=${selectedName.sprint.id}&project=${selectedName.sprint.name}`);
-                        }}>查看项目清单All</Button>
+                        }}>项目清单</Button>
 
                 <Button type="text" style={{float: "right", color: 'black', marginTop: '20px', marginRight: "10px"}}
-                        icon={<ContainerOutlined/>}
+                        icon={<SearchOutlined/>}
                         size={'large'}
                         onClick={() => {
                           history.push(`/sprint/sprintListDetails?projectid=${selectedName.sprint.id}&project=${selectedName.sprint.name}`);

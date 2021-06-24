@@ -1174,7 +1174,7 @@ const DashBoard: React.FC<any> = () => {
                   backgroundColor: "white"
                 }}>&nbsp;hotfix &nbsp;
                   <Link
-                    to={`/sprint/basicTable/bugs/bugAll?${emergency_url}`}>{emergency.all_count_bug}</Link> &nbsp;个
+                    to={`/sprint/sprintListDetails?${emergency_url}&type=BUG`}>{emergency.all_count_bug}</Link> &nbsp;个
                 </div>
 
                 <Row gutter={8} align={"middle"}>   {/* gutter 每一列的间隔距离 */}
@@ -1420,8 +1420,10 @@ const DashBoard: React.FC<any> = () => {
                     fontSize: "15px",
                     backgroundColor: "white"
                   }}>&nbsp;需求 &nbsp;
+                    {/* <Link to={`/sprint/basicTable/stories/storyAll?${hotfix_url}`}>{hotfix.story_all_count}</Link> &nbsp;个 */}
                     <Link
-                      to={`/sprint/basicTable/stories/storyAll?${hotfix_url}`}>{hotfix.story_all_count}</Link> &nbsp;个
+                      to={`/sprint/sprintListDetails?${hotfix_url}&type=STORY`}>{hotfix.story_all_count}</Link> &nbsp;个
+
                   </div>
 
                   {/* 需求-状态 */}
@@ -1874,8 +1876,9 @@ const DashBoard: React.FC<any> = () => {
                     fontSize: "15px",
                     backgroundColor: "white"
                   }}>&nbsp;任务 &nbsp;
+                    {/* <Link to={`/sprint/basicTable/tasks/taskAll?${hotfix_url}`}>{hotfix.task_all_count}</Link> &nbsp;个 */}
                     <Link
-                      to={`/sprint/basicTable/tasks/taskAll?${hotfix_url}`}>{hotfix.task_all_count}</Link> &nbsp;个
+                      to={`/sprint/sprintListDetails?${hotfix_url}&type=TASK`}>{hotfix.task_all_count}</Link> &nbsp;个
                   </div>
 
                   {/* 任务-状态 */}
@@ -2308,8 +2311,9 @@ const DashBoard: React.FC<any> = () => {
                     fontSize: "15px",
                     backgroundColor: "white"
                   }}>&nbsp;hotfix &nbsp;
+                    {/* <Link to={`/sprint/basicTable/bugs/bugAll?${hotfix_url}`}>{hotfix.all_bug_counts}</Link> &nbsp;个 */}
                     <Link
-                      to={`/sprint/basicTable/bugs/bugAll?${hotfix_url}`}>{hotfix.all_bug_counts}</Link> &nbsp;个
+                      to={`/sprint/sprintListDetails?${hotfix_url}&type=BUG`}>{hotfix.all_bug_counts}</Link> &nbsp;个
                   </div>
 
                   <Row gutter={8} align={"middle"}>   {/* gutter 每一列的间隔距离 */}
@@ -2568,8 +2572,9 @@ const DashBoard: React.FC<any> = () => {
                     fontSize: "15px",
                     backgroundColor: "white"
                   }}>&nbsp;需求 &nbsp;
+                    {/* <Link to={`/sprint/basicTable/stories/storyAll?${sprint_url}`}>{sprint.story_all_count}</Link> &nbsp;个 */}
                     <Link
-                      to={`/sprint/basicTable/stories/storyAll?${sprint_url}`}>{sprint.story_all_count}</Link> &nbsp;个
+                      to={`/sprint/sprintListDetails?${sprint_url}&type=STORY`}>{sprint.story_all_count}</Link> &nbsp;个
                   </div>
 
                   {/* 需求-状态 */}
@@ -3025,8 +3030,9 @@ const DashBoard: React.FC<any> = () => {
                     fontSize: "15px",
                     backgroundColor: "white"
                   }}>&nbsp;任务 &nbsp;
+                    {/* <Link to={`/sprint/basicTable/tasks/taskAll?${sprint_url}`}>{sprint.task_all_count}</Link> &nbsp;个 */}
                     <Link
-                      to={`/sprint/basicTable/tasks/taskAll?${sprint_url}`}>{sprint.task_all_count}</Link> &nbsp;个
+                      to={`/sprint/sprintListDetails?${sprint_url}&type=TASK`}>{sprint.task_all_count}</Link> &nbsp;个
                   </div>
 
                   {/* 任务-状态 */}
@@ -3460,8 +3466,8 @@ const DashBoard: React.FC<any> = () => {
                     fontSize: "15px",
                     backgroundColor: "white"
                   }}>&nbsp;hotfix &nbsp;
-                    <Link
-                      to={`/sprint/basicTable/bugs/bugAll?${sprint_url}`}>{sprint.all_bug_counts}</Link> &nbsp;个
+                    {/* <Link to={`/sprint/basicTable/bugs/bugAll?${sprint_url}`}>{sprint.all_bug_counts}</Link> &nbsp;个 */}
+                    <Link to={`/sprint/sprintListDetails?${sprint_url}&type=BUG`}>{sprint.all_bug_counts}</Link> &nbsp;个
                   </div>
 
                   <Row gutter={8} align={"middle"}>   {/* gutter 每一列的间隔距离 */}

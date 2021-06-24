@@ -308,10 +308,10 @@ const calTypeCount = (data: any) => {
   return {bug, task, story};
 };
 // 查询数据
-const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
+const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any) => {
   const {data} = await client.query(`
       {
-         proDetail(project:${params},order:ASC){
+         proDetail(project:${prjID},category:"${prjType}",order:ASC){
             id
             stage
             tester
@@ -438,13 +438,18 @@ const SprintList: React.FC<any> = () => {
     /* 获取网页的项目id */
     let prjId: string = '';
     let prjNames: string = '';
+    let prjType: string = '';
     const location = history.location.query;
     if (location !== undefined && location.projectid !== null) {
       prjId = location.projectid.toString();
       prjNames = location.project === null ? '' : location.project.toString();
     }
 
-    /* 整个模块都需要用到的 */
+    if (location !== undefined && location.type !== undefined && location.type !== null) {
+      prjType = location.type.toString();
+    }
+
+    /* region 整个模块都需要用到的表单定义 */
     // admin 新增和修改from表单
     const [formForAdminToAddAnaMod] = Form.useForm();
     // 开发经理修改from表单
@@ -461,10 +466,12 @@ const SprintList: React.FC<any> = () => {
     const [formForMoveAddAnaMod] = Form.useForm();
     const [pageTitle, setPageTitle] = useState("");
 
+    /* endregion */
+
     /* region  表格相关事件 */
     const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
     const gqlClient = useGqlClient();
-    const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, prjId));
+    const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, prjId, prjType));
 
 
     const onGridReady = (params: GridReadyEvent) => {
@@ -482,7 +489,7 @@ const SprintList: React.FC<any> = () => {
 
     /* region 其他 */
     const updateGrid = async () => {
-      const datas: any = await queryDevelopViews(gqlClient, prjId);
+      const datas: any = await queryDevelopViews(gqlClient, prjId, prjType);
       gridApi.current?.setRowData(datas?.result);
 
       const bugs = datas?.resCount.bug === undefined ? 0 : datas?.resCount.bug;
@@ -880,7 +887,6 @@ const SprintList: React.FC<any> = () => {
         addCommitDetails(datas);
       } else {
         const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
-        debugger;
         datas['id'] = curRow[0].id;
 
         // 判断是否被修改过 禅道id 对应测试、对应UED、反馈人
@@ -896,7 +902,7 @@ const SprintList: React.FC<any> = () => {
           datas["uedName"] = oradata.adminAddForUED;
         }
 
-        if (curRow[0].feedback !== oradata.adminAddFeedbacker ) {
+        if (curRow[0].feedback !== oradata.adminAddFeedbacker) {
           datas["feedback"] = oradata.adminAddFeedbacker;
         }
 

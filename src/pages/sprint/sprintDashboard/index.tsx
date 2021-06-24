@@ -2605,7 +2605,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 草稿</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=draft`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=draft`}>
                                 {sprint.story_status_draft}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2614,7 +2614,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 无任务</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=no_task`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=no_task`}>
                                 {sprint.story_status_noTask}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2632,7 +2632,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 无排期</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=no_deadline`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=no_deadline`}>
                                 {sprint.story_status_noDeadline}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2641,7 +2641,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 无指派</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=no_assign`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=no_assign`}>
                                 {sprint.story_status_noAssign}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2650,7 +2650,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 无bug</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=no_bug`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=no_bug`}>
                                 {sprint.story_status_noBug}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2659,7 +2659,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 未更新</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=un_modify`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=un_modify`}>
                                 {sprint.story_status_noModify}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2668,7 +2668,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 项目错误</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=proj_error`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=proj_error`}>
                                 {sprint.story_status_prj_error}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2677,7 +2677,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 超范围</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=over_area`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=over_area`}>
                                 {sprint.story_status_over_area}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2697,7 +2697,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 任务延期</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=devtask_delay`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=devtask_delay`}>
                                 {sprint.story_status_delay}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2706,7 +2706,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 未开始</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=dev_wait`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=dev_wait`}>
                                 {sprint.story_status_wait}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2715,7 +2715,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 开发中</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=developing`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=developing`}>
                                 {sprint.story_status_doing}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2724,7 +2724,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 开发完</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=dev_done`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=dev_done`}>
                                 {sprint.story_status_done}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2744,7 +2744,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 提测延期</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=raisetest_delay`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=raisetest_delay`}>
                                 {sprint.story_status_raseTestDelay}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2753,7 +2753,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 未提测</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=un_raisetest`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=un_raisetest`}>
                                 {sprint.story_status_raseTestWait}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2763,7 +2763,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 已提测</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=raisetest_done`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=raisetest_done`}>
                                 {sprint.story_status_raseTestDone}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2784,7 +2784,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 任务延期</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=testtask_delay`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=testtask_delay`}>
                                 {sprint.story_status_testDelay}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2793,7 +2793,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 未开始</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=test_wait`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=test_wait`}>
                                 {sprint.story_status_testWait}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2802,7 +2802,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 测试中</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=testing`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=testing`}>
                                 {sprint.story_status_testDoing}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -2811,7 +2811,7 @@ const DashBoard: React.FC<any> = () => {
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}> 测试完</label>
                             <label style={cssStyle.linkStyle}>
-                              <Link to={`/sprint/basicTable/stories/storyDetails?${sprint_url}&item=test_done`}>
+                              <Link to={`/sprint/details?${sprint_url}&kind=story&item=test_done`}>
                                 {sprint.story_status_testDone}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>

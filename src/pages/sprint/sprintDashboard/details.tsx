@@ -29,15 +29,15 @@ const getColums = () => {
   // 获取缓存的字段
   const fields = localStorage.getItem("da_details_filed");
   const oraFields = [
-    // {
-    //   headerName: '序号',
-    //   maxWidth: 80,
-    //   filter: false,
-    //   pinned: 'left',
-    //   cellRenderer: (params: any) => {
-    //     return Number(params.node.id) + 1;
-    //   },
-    // },
+    {
+      headerName: '序号',
+      maxWidth: 80,
+      filter: false,
+      pinned: 'left',
+      cellRenderer: (params: any) => {
+        return Number(params.node.id) + 1;
+      },
+    },
     {
       headerName: '阶段',
       field: 'stage',
@@ -338,7 +338,7 @@ const DetailsList: React.FC<any> = () => {
 
     const [isFieldModalVisible, setFieldModalVisible] = useState(false);
     const [selectedFiled, setSelectedFiled] = useState(['']);
-    const nessField = ['类型', '编号'];
+    const nessField = ['序号','类型', '编号'];
     const unNessField = ['阶段', '测试', '标题内容', '严重等级', '模块', '状态', '已提测', '发布环境',
       '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', '是否可热更', '是否有数据升级',
       '是否有接口升级', '是否有预置数据', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人'];
@@ -462,7 +462,7 @@ const DetailsList: React.FC<any> = () => {
               <Checkbox.Group style={{width: '100%'}} value={selectedFiled} onChange={onSetFieldsChange}>
                 <Row>
                   <Col span={4}>
-                    <Checkbox defaultChecked disabled value="选择">选择</Checkbox>
+                    <Checkbox defaultChecked disabled value="序号">序号</Checkbox>
                   </Col>
                   <Col span={4}>
                     <Checkbox defaultChecked disabled value="类型">类型</Checkbox>

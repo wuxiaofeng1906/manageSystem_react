@@ -81,7 +81,8 @@ const getColums = () => {
       pinned: 'left',
       minWidth: 80,
       cellRenderer: stageForLineThrough,
-      tooltipField: "tester"
+      tooltipField: "tester",
+      suppressMenu: false
     },
     {
       headerName: '类型',
@@ -89,6 +90,7 @@ const getColums = () => {
       cellRenderer: numberRenderToZentaoTypeForLine,
       pinned: 'left',
       minWidth: 70,
+      suppressMenu: false,
       // tooltipField: "category"
 
     },

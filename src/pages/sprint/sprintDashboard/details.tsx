@@ -307,7 +307,7 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
 
 // 组件初始化
 const DetailsList: React.FC<any> = () => {
-  debugger;
+
     /* 获取网页的项目id */
     const projectInfo = {
       prjId: -1,

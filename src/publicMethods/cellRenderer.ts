@@ -333,6 +333,10 @@ const numRenderForSevAndpri = (params: any) => {
 
 const numRenderForSevAndpriForLine = (params: any) => {
   debugger;
+
+  if (params.value === null) {
+    return "";
+  }
   let severity = "";
   switch (params.value.toString()) {
     case "1":

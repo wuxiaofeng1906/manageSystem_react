@@ -486,6 +486,7 @@ const DashBoard: React.FC<any> = () => {
     let story_bug = false;
 
     const datas: any = await queryProjectALL(gqlClient, other.key);
+    debugger;
     if (datas === null) {
       return;
     }
@@ -613,8 +614,8 @@ const DashBoard: React.FC<any> = () => {
 
       bug_noAssign: ho_datas.bug.Bug_no_assign,
       bug_noDeadline: ho_datas.bug.Bug_no_deadline,
-      bug_prj_error: '',
-      bug_over_area: '',
+      bug_prj_error: ho_datas.bug.Bug_proj_error,
+      bug_over_area: ho_datas.bug.Bug_over_area,
 
       bug_actived: ho_datas.bug.Bug_actived,
       bug_resolved: ho_datas.bug.Bug_resolved,
@@ -952,8 +953,9 @@ const DashBoard: React.FC<any> = () => {
 
         bug_noAssign: ho_data.bug.Bug_no_assign,
         bug_noDeadline: ho_data.bug.Bug_no_deadline,
-        bug_prj_error: '',
-        bug_over_area: '',
+        bug_prj_error: ho_data.bug.Bug_proj_error,
+        bug_over_area: ho_data.bug.Bug_over_area,
+
 
         bug_actived: ho_data.bug.Bug_actived,
         bug_resolved: ho_data.bug.Bug_resolved,

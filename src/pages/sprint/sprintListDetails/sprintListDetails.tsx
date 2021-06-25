@@ -562,7 +562,7 @@ const SprintList: React.FC<any> = () => {
       const projectArray = [];
 
       const {data: {project = []} = {}} = useQuery(`{
-        project(range:{start:"", end:""}){
+        project(range:{start:"", end:""},,order:DESC){
         id
         name
       }

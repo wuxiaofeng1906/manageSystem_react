@@ -992,7 +992,7 @@ const SprintList: React.FC<any> = () => {
 
     // 开发经理提交修改
     const commitManagerModify = () => {
-      debugger;
+
       const oradata = formForManagerToMod.getFieldsValue();
       if (oradata.testerChandaoType === '' || oradata.testerCHandaoID === '') {
         message.error({
@@ -1084,11 +1084,11 @@ const SprintList: React.FC<any> = () => {
         return;
       }
       const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
-      debugger;
+
       const datas = {
         id: curRow[0].id,
         memo: oradata.testerRemark,
-        category: zentaoTypeRenderToNumber(oradata.managerChandaoType),
+        category: zentaoTypeRenderToNumber(oradata.testerChandaoType),
         // ztNo: oradata.testerCHandaoID,
         // hotUpdate: rowDatas.hotUpdate,
         // dataUpdate: rowDatas.dataUpdate,
@@ -1105,7 +1105,14 @@ const SprintList: React.FC<any> = () => {
 
       };
       if (formForTesterToMod.isFieldTouched('testToTester')) {
-        datas["tester"] = oradata.testToTester;
+
+        // 用;拼接测试人员
+        let testers = "";
+        oradata.testToTester.forEach((eles: any) => {
+          testers = testers === "" ? eles : `${testers};${eles}`;
+        });
+
+        datas["tester"] = testers;
       }
       modCommitDetails(datas);
     };
@@ -1151,7 +1158,7 @@ const SprintList: React.FC<any> = () => {
 
       const datas = {
         id: rowDatas.id,
-        category: zentaoTypeRenderToNumber(oradata.managerChandaoType),
+        category: zentaoTypeRenderToNumber(oradata.uedChandaoType),
         // tester: rowDatas.tester,
         // ztNo: oradata.uedCHandaoID,
         // hotUpdate: rowDatas.hotUpdate,
@@ -1181,11 +1188,11 @@ const SprintList: React.FC<any> = () => {
     // 不同权限修改不同页面
     const authorityForMod = (detailsInfo: any) => {
       // 判断人员权限（admin，测试，开发经理（开发）,UED）
-      // let currentUserGroup;
-      // if (initialState?.currentUser) {
-      //   currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
-      // }
-      const currentUserGroup = 'devGroup';
+      let currentUserGroup;
+      if (initialState?.currentUser) {
+        currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
+      }
+      // const currentUserGroup = 'superGroup';
       if (currentUserGroup !== undefined) {
         switch (currentUserGroup.toString()) {
           case 'superGroup':

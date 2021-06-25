@@ -68,7 +68,7 @@ const getColums = () => {
       field: 'ztNo',
       cellRenderer: linkToZentaoPage,
       pinned: 'left',
-      minWidth: 75,
+      minWidth: 90,
     },
     {
       headerName: '标题内容',
@@ -120,7 +120,8 @@ const getColums = () => {
       field: 'assignedTo',
       minWidth: 80,
       cellRenderer: stageForLineThrough,
-      tooltipField: "assignedTo"
+      tooltipField: "assignedTo",
+      suppressMenu: false,
 
     },
     {
@@ -128,7 +129,8 @@ const getColums = () => {
       field: 'finishedBy',
       minWidth: 80,
       cellRenderer: stageForLineThrough,
-      tooltipField: "finishedBy"
+      tooltipField: "finishedBy",
+      suppressMenu: false,
 
     },
     {
@@ -136,7 +138,8 @@ const getColums = () => {
       field: 'closedBy',
       minWidth: 80,
       cellRenderer: stageForLineThrough,
-      tooltipField: "closedBy"
+      tooltipField: "closedBy",
+      suppressMenu: false,
 
     },
     {
@@ -201,6 +204,7 @@ const getColums = () => {
       headerName: 'UED',
       field: 'uedName',
       cellRenderer: stageForLineThrough,
+      suppressMenu: false,
     },
     {
       headerName: 'UED测试环境验证',
@@ -222,6 +226,7 @@ const getColums = () => {
       headerName: '反馈人',
       field: 'feedback',
       cellRenderer: stageForLineThrough,
+      suppressMenu: false,
     }
   ];
 

@@ -54,15 +54,15 @@ const getColums = () => {
       tooltipField: "tester",
       suppressMenu: false
     },
-    {
-      headerName: '类型',
-      field: 'category',
-      cellRenderer: numberRenderToZentaoTypeForLine,
-      pinned: 'left',
-      minWidth: 70,
-      suppressMenu: false,
-
-    },
+    // {
+    //   headerName: '类型',
+    //   field: 'category',
+    //   cellRenderer: numberRenderToZentaoTypeForLine,
+    //   pinned: 'left',
+    //   minWidth: 70,
+    //   suppressMenu: false,
+    //
+    // },
     {
       headerName: '编号',
       field: 'ztNo',
@@ -251,7 +251,6 @@ const getColums = () => {
 
 const addNewAttributes = (source: any, category: string) => {
 
-  debugger;
   const result = [];
   let type = "";
   if (category === "bug") {

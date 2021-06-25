@@ -153,7 +153,7 @@ const numberRenderToCurrentStageForColor = (params: any) => {
   if (stage === "未开始") {
     return `<span style="color: red"> ${stage} </span>`;
   }
-  if (stage === "已取消" || stage === "开发已revert"|| stage === "测试已验证revert") {  //
+  if (stage === "已取消" || stage === "开发已revert" || stage === "测试已验证revert") {  //
     return `<span style="text-decoration:line-through"> ${stage} </span>`;
   }
   return stage;
@@ -332,8 +332,9 @@ const numRenderForSevAndpri = (params: any) => {
 };
 
 const numRenderForSevAndpriForLine = (params: any) => {
+  debugger;
   let severity = "";
-  switch (params.value) {
+  switch (params.value.toString()) {
     case "1":
       severity = "P0-";
       break;
@@ -349,11 +350,13 @@ const numRenderForSevAndpriForLine = (params: any) => {
     default:
       break;
   }
+  const pri = params.data.priority === null ? "" : params.data.priority;
+
   if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
-    return `<span style="text-decoration:line-through">  ${severity}${params.data.priority}级 </span>`;
+    return `<span style="text-decoration:line-through">  ${severity}${pri}级 </span>`;
   }
 
-  return `${severity}${params.data.priority}级`;
+  return `${severity}${pri}级`;
 };
 
 

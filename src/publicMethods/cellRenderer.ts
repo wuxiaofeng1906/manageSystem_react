@@ -233,6 +233,28 @@ const numberRenderToZentaoType = (params: any,) => {
   return type;
 };
 
+const zentaoTypeRenderToNumber = (value: any,) => {
+  // BUG = 1,
+  // TASK = 2,
+  // STORY = 3,
+  let type = -1;
+  switch (value.toLowerCase()) {
+    case "bug":
+      type = 1;
+      break;
+    case "task":
+      type = 2;
+      break;
+    case "story":
+      type = 3;
+      break;
+    default:
+      break;
+  }
+
+  return type;
+};
+
 const numberRenderToZentaoTypeForLine = (params: any,) => {
   // BUG = 1,
   // TASK = 2,
@@ -549,6 +571,6 @@ export {
   stageChangeToNumber,
   stageForLineThrough,
   numRenderForSevAndpri,
-
+  zentaoTypeRenderToNumber
 };
 

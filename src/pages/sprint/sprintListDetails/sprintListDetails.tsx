@@ -26,6 +26,7 @@ import {
   numberRenderToCurrentStageForColor,
   stageChangeToNumber,
   numberRenderToZentaoType,
+  zentaoTypeRenderToNumber,
   numberRenderToZentaoTypeForLine,
   numberRenderToZentaoSeverity,
   numberRenderToZentaoStatus,
@@ -776,7 +777,7 @@ const SprintList: React.FC<any> = () => {
         });
     };
 
-    // admin 修改项目
+    //   修改项目
     const modCommitDetails = (datas: any) => {
       axios
         .put('/api/sprint/project/child', datas)
@@ -1010,7 +1011,7 @@ const SprintList: React.FC<any> = () => {
       const datas = {
         id: rowDatas.id,
         // tester: rowDatas.tester,
-        // category: oradata.managerChandaoType,
+        category: zentaoTypeRenderToNumber(oradata.managerChandaoType),
         // ztNo: oradata.managerCHandaoID,
         hotUpdate: oradata.managerHotUpdate,
         dataUpdate: oradata.managerDataUpgrade,
@@ -1083,12 +1084,11 @@ const SprintList: React.FC<any> = () => {
         return;
       }
       const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
-
+      debugger;
       const datas = {
         id: curRow[0].id,
         memo: oradata.testerRemark,
-
-        // category: oradata.testerChandaoType,
+        category: zentaoTypeRenderToNumber(oradata.managerChandaoType),
         // ztNo: oradata.testerCHandaoID,
         // hotUpdate: rowDatas.hotUpdate,
         // dataUpdate: rowDatas.dataUpdate,
@@ -1151,8 +1151,8 @@ const SprintList: React.FC<any> = () => {
 
       const datas = {
         id: rowDatas.id,
+        category: zentaoTypeRenderToNumber(oradata.managerChandaoType),
         // tester: rowDatas.tester,
-        // category: oradata.uedChandaoType,
         // ztNo: oradata.uedCHandaoID,
         // hotUpdate: rowDatas.hotUpdate,
         // dataUpdate: rowDatas.dataUpdate,

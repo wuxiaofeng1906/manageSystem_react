@@ -573,7 +573,7 @@ const Login: React.FC<{}> = () => {
         {/* logo  */}
         <div className={styles.top}>
           <div className={styles.header}>
-            <img alt="logo" className={styles.logo} src="/logo.svg"/>
+            <img alt="logo" className={styles.logo} src="/77Logo.png"/>
             <span className={styles.title}>企企研发管理平台</span>
           </div>
           <div className={styles.desc}></div>

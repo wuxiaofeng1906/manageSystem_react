@@ -138,7 +138,6 @@ const UserDetails: React.FC<any> = () => {
   const sys_accessToken = localStorage.getItem("accessId");
   axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
 
-
   // region title获取
   let pageTitle: string = '';
   let groupId = 0;
@@ -188,11 +187,12 @@ const UserDetails: React.FC<any> = () => {
   };
 
   // 组外人员
-  const GetOutGroupusers = () => {
-    if (allGroupMember === undefined) {
+  const GetOutGroupusers = (params: any) => {
+
+    if (params.users === undefined || params.users.length <= 1) {
       return <label></label>;
     }
-    const arrays = allGroupMember.nameArray;
+    const arrays = params.users;
     if (initSelectedUser.length > 0) {
       // 要去除已选择的人员放到组内人员中去
       return <Row>
@@ -218,6 +218,7 @@ const UserDetails: React.FC<any> = () => {
       </Row>;
 
     }
+
     return <Row>
       <Col>
         {
@@ -245,14 +246,13 @@ const UserDetails: React.FC<any> = () => {
   /* region 部门树选择事件 */
   const [inGroupUser, setIngroupUser] = useState(['']);
   const [outGroupUser, setOutGroupUser] = useState(['']);
+  const [selectDeptUser, setSelectDeptUser] = useState(['']);
 
-  const [allMember, setAllMember] = useState(['']);
-
-  const onSelect = async (selectedKeys: any, info: any) => {
-    console.log('selected', selectedKeys, info);
+  const onSelect = async (selectedKeys: any) => {
+    // console.log('selected', selectedKeys, info);
     const keys = selectedKeys[0];
     const deptMember = await queryGroupAllUsers(gqlClient, keys);
-    setAllMember(deptMember.nameArray);
+    setSelectDeptUser(deptMember.nameArray);
     setIngroupUser(initSelectedUser);
 
   };
@@ -341,9 +341,7 @@ const UserDetails: React.FC<any> = () => {
 
   useEffect(() => {
 
-    if (allGroupMember !== undefined) {
-      setAllMember(allGroupMember.nameArray);
-    }
+    setSelectDeptUser(allGroupMember === undefined ? [] : allGroupMember.nameArray);
     setIngroupUser(initSelectedUser);
   }, [initSelectedUser, allGroupMember]);
 
@@ -405,7 +403,7 @@ const UserDetails: React.FC<any> = () => {
               </Col>
               <Col span={22}>
                 <Checkbox.Group onChange={userOutGroupSelectChange}>
-                  <GetOutGroupusers/>
+                  <GetOutGroupusers users={selectDeptUser}/>
                 </Checkbox.Group>
 
               </Col>

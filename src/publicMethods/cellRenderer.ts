@@ -333,27 +333,27 @@ const numRenderForSevAndpri = (params: any) => {
 
 const numRenderForSevAndpriForLine = (params: any) => {
   debugger;
-
-  if (params.value === null) {
-    return "";
-  }
   let severity = "";
-  switch (params.value.toString()) {
-    case "1":
-      severity = "P0-";
-      break;
-    case "2":
-      severity = "P1-";
-      break;
-    case "3":
-      severity = "P2-";
-      break;
-    case "4":
-      severity = "P3-";
-      break;
-    default:
-      break;
+
+  if (params.value !== null) {
+    switch (params.value.toString()) {
+      case "1":
+        severity = "P0-";
+        break;
+      case "2":
+        severity = "P1-";
+        break;
+      case "3":
+        severity = "P2-";
+        break;
+      case "4":
+        severity = "P3-";
+        break;
+      default:
+        break;
+    }
   }
+
   const pri = params.data.priority === null ? "" : params.data.priority;
 
   if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {

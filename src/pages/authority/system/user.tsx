@@ -10,6 +10,7 @@ import axios from "axios";
 import {judgeAuthority} from "@/publicMethods/authorityJudge";
 
 const parTree = (oraData: any) => {
+  const parentID: any = [];
 
   const oldData = oraData.organization;
 
@@ -28,6 +29,11 @@ const parTree = (oraData: any) => {
     parentB.forEach((parent: any) => {
       childrenB.forEach((current: any, index: any) => {
         if (current.parent === parent.key) {
+          debugger;
+          // if (current.title === "研发中心") {
+          parentID.push(parent.key);
+
+          // }
           const temp: any = JSON.parse(JSON.stringify(childrenB));
           temp.splice(index, 1);
           translator([current], temp);
@@ -37,6 +43,7 @@ const parTree = (oraData: any) => {
           } else {
             // eslint-disable-next-line no-param-reassign
             parent.children = [current];
+
           }
         }
       });
@@ -44,7 +51,8 @@ const parTree = (oraData: any) => {
   };
 
   translator(parents, children);
-  return parents;
+
+  return {dept: parents, deptId: parentID};
 };
 
 const queryDeptment = async (client: GqlClient<object>) => {
@@ -357,17 +365,16 @@ const UserDetails: React.FC<any> = () => {
 
             <div>
               <Tree
+                height={600}
                 showLine
                 switcherIcon={<DownOutlined/>}
-
                 onSelect={onSelect}
-                treeData={treeDept}
+                treeData={treeDept?.dept}
                 style={{
-                  // height: window.innerHeight ,
-                  boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2'
+                  // boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2'
                 }} // 左 上
-                defaultExpandAll={true}
-                defaultExpandParent={true}
+                expandedKeys={treeDept?.deptId}   // 展开指定节点
+
               />{null}
             </div>
 

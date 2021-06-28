@@ -643,11 +643,18 @@ const SprintList: React.FC<any> = () => {
               resolveTime_hidden: dayjs(queryDatas.resolvedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.resolvedAt).format("YYYY-MM-DD HH:mm:ss")
             });
           } else {
-            if (res.data.code === '404') {
+            if (Number(res.data.code) === 404) {
               message.error({
-                content: `禅道不存在ID为${ztno}的${chanDaoType}`,
+                content: `禅道不存在ID为${ztno}的${numberRenderToZentaoType({value: chanDaoType})}`,
                 duration: 1, // 1S 后自动关闭
-                className: 'ModNone',
+                style: {
+                  marginTop: '50vh',
+                },
+              });
+            } else if (Number(res.data.code) === 409) {
+              message.error({
+                content: `【${prjNames}】已存在ID为${ztno}的${numberRenderToZentaoType({value: chanDaoType})}`,
+                duration: 1, // 1S 后自动关闭
                 style: {
                   marginTop: '50vh',
                 },
@@ -656,7 +663,6 @@ const SprintList: React.FC<any> = () => {
               message.error({
                 content: `${res.data.message}`,
                 duration: 1, // 1S 后自动关闭
-                className: 'ModNone',
                 style: {
                   marginTop: '50vh',
                 },
@@ -749,7 +755,6 @@ const SprintList: React.FC<any> = () => {
             message.info({
               content: res.data.message,
               duration: 1, // 1S 后自动关闭
-              className: 'AddSuccess',
               style: {
                 marginTop: '50vh',
               },
@@ -758,7 +763,6 @@ const SprintList: React.FC<any> = () => {
             message.error({
               content: `${res.data.message}`,
               duration: 1, // 1S 后自动关闭
-              className: 'AddNone',
               style: {
                 marginTop: '50vh',
               },
@@ -769,7 +773,6 @@ const SprintList: React.FC<any> = () => {
           message.error({
             content: error.toString(),
             duration: 1, // 1S 后自动关闭
-            className: 'AddError',
             style: {
               marginTop: '50vh',
             },
@@ -791,7 +794,14 @@ const SprintList: React.FC<any> = () => {
             message.info({
               content: res.data.message,
               duration: 1, // 1S 后自动关闭
-              className: 'ModSuccess',
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          } else if (Number(res.data.code) === 409) {
+            message.error({
+              content: `【${prjNames}】已存在ID为${datas.ztNo}的${numberRenderToZentaoType({value: datas.category})}`,
+              duration: 1, // 1S 后自动关闭
               style: {
                 marginTop: '50vh',
               },
@@ -800,7 +810,6 @@ const SprintList: React.FC<any> = () => {
             message.error({
               content: `${res.data.message}`,
               duration: 1, // 1S 后自动关闭
-              className: 'ModNone',
               style: {
                 marginTop: '50vh',
               },

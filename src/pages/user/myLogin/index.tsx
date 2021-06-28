@@ -69,12 +69,20 @@ const Login: React.FC<{}> = () => {
     localStorage.setItem("accessId", userInfos.access_token); // 正式环境应放开
     localStorage.setItem("authority", JSON.stringify(userInfos.authorities));
 
-    let accessRole = "user";
-    if (userInfos.role.name === "superGroup") {
-      accessRole = 'sys_admin';
-    } else if (userInfos.role.name === "projectListMG") {
-      accessRole = 'sprint_admin';
-    }
+    // 权限分组：
+    // 系统管理员：拥有所有权限。
+    // sprint管理员：除了系统设置，其他权限全有
+    // 研发中心：所有除了客服和顾问的人员
+    // 还有其他用户
+
+    // 接下来需要判断用户
+
+    // let accessRole = userInfos.role.name;
+    // if (userInfos.role.name === "superGroup") {
+    //   accessRole = 'sys_admin';
+    // } else if (userInfos.role.name === "projectListMG") {
+    //   accessRole = 'sprint_admin';
+    // }
 
     const userInfo = {
       name: userInfos.user.userName,
@@ -83,7 +91,7 @@ const Login: React.FC<{}> = () => {
       userid: userInfos.user.id,
       group: userInfos.role.name,
       authority: userInfos.authorities,
-      access: accessRole
+      access: userInfos.role.name
     };
     // 缓存状态
     localStorage.setItem("userLogins", JSON.stringify(userInfo)); // 正式环境应放开
@@ -547,7 +555,7 @@ const Login: React.FC<{}> = () => {
       group: 'superGroup',
       authority: '',
       avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
-      access: 'sys_admin'
+      access: 'superGroup'
     };
     localStorage.setItem("userLogins", JSON.stringify(userInfos)); // 正式环境应放开
 

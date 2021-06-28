@@ -124,6 +124,7 @@ export default [
     name: '研发绩效数据',
     icon: 'table',
     path: '/kpi',
+    access: 'devCenter',
     routes: [{
       name: '绩效指标',
       icon: 'table',

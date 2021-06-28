@@ -10,7 +10,7 @@ declare namespace API {
       label: string;
     }[];
     userid?: string;
-    access?: 'user' | 'guest' | 'sys_admin'|'sprint_admin';
+    access?: 'user' | 'guest' | 'superGroup'|'projectListMG'|'service';
     unreadCount?: number;
   }
 

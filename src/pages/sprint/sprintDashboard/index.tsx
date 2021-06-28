@@ -486,7 +486,7 @@ const DashBoard: React.FC<any> = () => {
     let story_bug = false;
 
     const datas: any = await queryProjectALL(gqlClient, other.key);
-    debugger;
+
     if (datas === null) {
       return;
     }
@@ -808,7 +808,7 @@ const DashBoard: React.FC<any> = () => {
     let ho_task_hidden = true;
     let ho_bug_hidden = true;
     // emergency 初始值赋值
-    if (JSON.stringify(em_data) !== "{}" && emergency.noAssign === '') {
+    if (JSON.stringify(em_data) !== "{}") {
       setEmergency({
         all_count_bug: em_data.all_bug_count,
         noAssign: em_data.Bug_no_assign,
@@ -832,16 +832,16 @@ const DashBoard: React.FC<any> = () => {
     }
 
     // hotfix 初始值赋值
-    if (JSON.stringify(ho_data) !== "{}" && hotfix.story_status_draft === '') {
-      if (ho_data.story !== "{}") {
+    if (JSON.stringify(ho_data) !== "{}") {
+      if (ho_data.story.allCount !== 0) {
         ho_story_hidden = false;
 
       }
-      if (ho_data.task !== "{}") {
+      if (ho_data.task.allCount !== 0) {
         ho_task_hidden = false;
 
       }
-      if (ho_data.bug !== "{}") {
+      if (ho_data.bug.all_bug_count !== 0) {
         ho_bug_hidden = false;
 
       }
@@ -977,7 +977,7 @@ const DashBoard: React.FC<any> = () => {
     }
 
     // sprint 初始值赋值
-    if (JSON.stringify(sp_data) !== "{}" && sprint.story_status_draft === '') {
+    if (JSON.stringify(sp_data) !== "{}") {
       setsprint({
         // region 需求
         story_all_count: sp_data.story.allCount,

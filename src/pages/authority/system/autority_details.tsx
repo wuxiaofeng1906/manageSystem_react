@@ -230,18 +230,45 @@ const AuthorityDetails: React.FC<any> = () => {
 
   const onModuleChange = () => {
 
+    // 获取已有模块
     const moduleGroup = [];
     for (let index = 0; index < moduleList.length; index += 1) {
       moduleGroup.push(moduleList[index]);  // 将默认的数据添加到新数组中
     }
 
-    const groups = addOrRemoveElement(moduleGroup, clickedValue);
+    // 获取已有方法
+    let methodGroup: any = [];
+    for (let index = 0; index < methodList.length; index += 1) {
+      methodGroup.push(methodList[index]);  // 将默认的数据添加到新数组中
+    }
 
-    // 获取模块对应的方法
-    const methodArray = getChildMethod(oraData, groups);
+    const clickedModule = [clickedValue];
 
-    setModuleList(groups);// 选中模块
-    setMethodList(methodArray);  // 选中方法
+    const flag = moduleGroup.indexOf(clickedValue);
+    if (flag > -1) {
+      // 如果是移除模块，则移除已有模块和已有方法。
+      moduleGroup.splice(flag, 1); // 移除模块
+
+      const methodArray = getChildMethod(oraData, clickedModule); // 获取被选中的模块所有方法
+      // 从原有方法中移除被移除模块对应的所有方法
+      methodArray.forEach((item: any) => {
+        const delFlag = methodGroup.indexOf(item);
+        if (delFlag > -1) {
+          // 删除有的方法
+          methodGroup.splice(delFlag, 1);
+        }
+      });
+
+    } else {
+      // 如果是新增模块，则新增模块和方法。
+      moduleGroup.push(clickedValue); // 增加模块
+
+      const methodArray = getChildMethod(oraData, clickedModule);
+      methodGroup = methodGroup.concat(methodArray); // 将已有方法和现有方法链接起来。
+    }
+
+    setModuleList(moduleGroup);// 选中模块
+    setMethodList(methodGroup);  // 选中方法
 
   };
 

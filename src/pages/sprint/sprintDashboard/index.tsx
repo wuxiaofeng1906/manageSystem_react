@@ -1439,7 +1439,7 @@ const DashBoard: React.FC<any> = () => {
                   <Row gutter={8} align={"middle"}>   {/* gutter 每一列的间隔距离 */}
 
                     <Col span={2}>
-                      <div style={{backgroundColor: "white", height: "240px", textAlign: "center"}}>
+                      <div style={{backgroundColor: "white", height: "247px", textAlign: "center"}}>
                         <button
                           style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "100px"}}>状态
                         </button>
@@ -1450,7 +1450,7 @@ const DashBoard: React.FC<any> = () => {
                     <Col span={5}>
                       <Card title="规范检查" size={"small"}
                             headStyle={{textAlign: "center", backgroundColor: "AliceBlue"}}
-                            bodyStyle={{height: "205px", textAlign: "left"}}>
+                            bodyStyle={{height: "212px", textAlign: "left"}}>
 
                         <div>
 
@@ -1544,7 +1544,7 @@ const DashBoard: React.FC<any> = () => {
                     <Col span={5}>
                       <Card title="开发进展" size={"small"}
                             headStyle={{textAlign: "center", backgroundColor: "AliceBlue"}}
-                            bodyStyle={{height: "205px", textAlign: "left"}}>
+                            bodyStyle={{height: "212px", textAlign: "left"}}>
                         <div>
 
                           <div style={{whiteSpace: "nowrap"}}>
@@ -1592,7 +1592,7 @@ const DashBoard: React.FC<any> = () => {
                     <Col span={6}>
                       <Card title="提测进展" size={"small"}
                             headStyle={{textAlign: "center", backgroundColor: "AliceBlue"}}
-                            bodyStyle={{height: "205px", textAlign: "left"}}>
+                            bodyStyle={{height: "212px", textAlign: "left"}}>
                         <div>
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}>提测延期</label>
@@ -1629,7 +1629,7 @@ const DashBoard: React.FC<any> = () => {
                     <Col span={6}>
                       <Card title="测试进展" size={"small"}
                             headStyle={{textAlign: "center", backgroundColor: "AliceBlue"}}
-                            bodyStyle={{height: "205px", textAlign: "left"}}>
+                            bodyStyle={{height: "212px", textAlign: "left"}}>
                         <div>
                           <div style={{whiteSpace: "nowrap"}}>
                             <label style={cssStyle.itemStyle}>任务延期</label>
@@ -2593,7 +2593,7 @@ const DashBoard: React.FC<any> = () => {
                   <Row gutter={8} align={"middle"}>   {/* gutter 每一列的间隔距离 */}
 
                     <Col span={2}>
-                      <div style={{backgroundColor: "white", height: "240px", textAlign: "center"}}>
+                      <div style={{backgroundColor: "white", height: "247px", textAlign: "center"}}>
                         <button
                           style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "100px"}}>状态
                         </button>
@@ -2604,7 +2604,7 @@ const DashBoard: React.FC<any> = () => {
                     <Col span={5}>
                       <Card title="规范检查" size={"small"}
                             headStyle={{textAlign: "center", backgroundColor: "AliceBlue"}}
-                            bodyStyle={{height: "205px", textAlign: "left"}}>
+                            bodyStyle={{height: "212px", textAlign: "left"}}>
                         <div>
 
                           <div style={{whiteSpace: "nowrap"}}>
@@ -2696,7 +2696,7 @@ const DashBoard: React.FC<any> = () => {
                     <Col span={5}>
                       <Card title="开发进展" size={"small"}
                             headStyle={{textAlign: "center", backgroundColor: "AliceBlue"}}
-                            bodyStyle={{height: "205px", textAlign: "left"}}>
+                            bodyStyle={{height: "212px", textAlign: "left"}}>
                         <div>
 
                           <div style={{whiteSpace: "nowrap"}}>
@@ -2743,7 +2743,7 @@ const DashBoard: React.FC<any> = () => {
                     <Col span={6}>
                       <Card title="提测进展" size={"small"}
                             headStyle={{textAlign: "center", backgroundColor: "AliceBlue"}}
-                            bodyStyle={{height: "205px", textAlign: "left"}}>
+                            bodyStyle={{height: "212px", textAlign: "left"}}>
                         <div>
 
                           <div style={{whiteSpace: "nowrap"}}>
@@ -2782,7 +2782,7 @@ const DashBoard: React.FC<any> = () => {
                     <Col span={6}>
                       <Card title="测试进展" size={"small"}
                             headStyle={{textAlign: "center", backgroundColor: "AliceBlue"}}
-                            bodyStyle={{height: "205px", textAlign: "left"}}>
+                            bodyStyle={{height: "212px", textAlign: "left"}}>
 
                         <div>
 
@@ -3051,7 +3051,7 @@ const DashBoard: React.FC<any> = () => {
                   <Row gutter={8} align={"middle"}>   {/* gutter 每一列的间隔距离 */}
 
                     <Col span={2}>
-                      <div style={{backgroundColor: "white", height: "195px", textAlign: "center"}}>
+                      <div style={{backgroundColor: "white", height: "202px", textAlign: "center"}}>
                         <button
                           style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>状态
                         </button>
@@ -3062,7 +3062,7 @@ const DashBoard: React.FC<any> = () => {
                     <Col span={5}>
                       <Card title="规范检查" size={"small"}
                             headStyle={{textAlign: "center", backgroundColor: "AliceBlue"}}
-                            bodyStyle={{height: "160px", textAlign: "left"}}>
+                            bodyStyle={{height: "167px", textAlign: "left"}}>
                         <div>
 
                           <div style={{whiteSpace: "nowrap"}}>
@@ -3136,7 +3136,7 @@ const DashBoard: React.FC<any> = () => {
                     <Col span={5}>
                       <Card title="开发进展" size={"small"}
                             headStyle={{textAlign: "center", backgroundColor: "AliceBlue"}}
-                            bodyStyle={{height: "160px", textAlign: "left"}}>
+                            bodyStyle={{height: "167px", textAlign: "left"}}>
                         <div>
 
                           <div style={{whiteSpace: "nowrap"}}>
@@ -3183,7 +3183,7 @@ const DashBoard: React.FC<any> = () => {
                     <Col span={6}>
                       <Card title="提测进展" size={"small"}
                             headStyle={{textAlign: "center", backgroundColor: "AliceBlue"}}
-                            bodyStyle={{height: "160px", textAlign: "left"}}>
+                            bodyStyle={{height: "167px", textAlign: "left"}}>
 
                         <div>
                           <div style={{whiteSpace: "nowrap"}}>
@@ -3221,7 +3221,7 @@ const DashBoard: React.FC<any> = () => {
                     <Col span={6}>
                       <Card title="测试进展" size={"small"}
                             headStyle={{textAlign: "center", backgroundColor: "AliceBlue"}}
-                            bodyStyle={{height: "160px", textAlign: "left"}}>
+                            bodyStyle={{height: "167px", textAlign: "left"}}>
                         <div>
 
                           <div style={{whiteSpace: "nowrap"}}>

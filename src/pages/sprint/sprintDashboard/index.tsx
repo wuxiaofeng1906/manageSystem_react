@@ -1458,7 +1458,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>草稿</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=draft`}>{hotfix.story_status_draft}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=draft`}>{hotfix.story_status_draft}</Link>
 
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
@@ -1468,7 +1468,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无任务</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=no_task`}>{hotfix.story_status_noTask}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=no_task`}>{hotfix.story_status_noTask}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1477,7 +1477,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>缺任务</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=lack_task`}>{hotfix.story_status_lackTask}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=lack_task`}>{hotfix.story_status_lackTask}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1486,7 +1486,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无排期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=no_deadline`}>{hotfix.story_status_noDeadline}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=no_deadline`}>{hotfix.story_status_noDeadline}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1495,7 +1495,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无指派</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=no_assign`}>{hotfix.story_status_noAssign}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=no_assign`}>{hotfix.story_status_noAssign}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1504,7 +1504,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>无bug</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=no_bug`}>{hotfix.story_status_noBug}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=no_bug`}>{hotfix.story_status_noBug}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1513,7 +1513,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>未更新</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=un_modify`}>{hotfix.story_status_noModify}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=un_modify`}>{hotfix.story_status_noModify}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1522,7 +1522,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>项目错误</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=proj_error`}>{hotfix.story_status_prj_error}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=proj_error`}>{hotfix.story_status_prj_error}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1531,7 +1531,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>超范围</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=over_area`}>{hotfix.story_status_over_area}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=over_area`}>{hotfix.story_status_over_area}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1551,7 +1551,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>任务延期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=devtask_delay`}>{hotfix.story_status_delay}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=devtask_delay`}>{hotfix.story_status_delay}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1560,7 +1560,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>未开始</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=dev_wait`}>{hotfix.story_status_wait}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=dev_wait`}>{hotfix.story_status_wait}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1569,7 +1569,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>开发中</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=developing`}>{hotfix.story_status_doing}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=developing`}>{hotfix.story_status_doing}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1579,7 +1579,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>开发完</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=dev_done`}>{hotfix.story_status_done}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=dev_done`}>{hotfix.story_status_done}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1598,7 +1598,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>提测延期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=raisetest_delay`}>{hotfix.story_status_raseTestDelay}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=raisetest_delay`}>{hotfix.story_status_raseTestDelay}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1607,7 +1607,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>未提测</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=un_raisetest`}>{hotfix.story_status_raseTestWait}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=un_raisetest`}>{hotfix.story_status_raseTestWait}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1616,7 +1616,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>已提测</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=raisetest_done`}>{hotfix.story_status_raseTestDone}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=raisetest_done`}>{hotfix.story_status_raseTestDone}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1635,7 +1635,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>任务延期</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=testtask_delay`}>{hotfix.story_status_testDelay}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=testtask_delay`}>{hotfix.story_status_testDelay}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1644,7 +1644,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>未开始</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=test_wait`}>{hotfix.story_status_testWait}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=test_wait`}>{hotfix.story_status_testWait}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1653,7 +1653,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>测试中</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=testing`}>{hotfix.story_status_testDoing}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=testing`}>{hotfix.story_status_testDoing}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>
@@ -1662,7 +1662,7 @@ const DashBoard: React.FC<any> = () => {
                             <label style={cssStyle.itemStyle}>测试完</label>
                             <label style={cssStyle.linkStyle}>
                               <Link
-                                to={`sprint/details?${hotfix_url}&kind=story&item=test_done`}>{hotfix.story_status_testDone}</Link>
+                                to={`/sprint/details?${hotfix_url}&kind=story&item=test_done`}>{hotfix.story_status_testDone}</Link>
                             </label>
                             <label style={cssStyle.unitStyle}>个</label>
                           </div>

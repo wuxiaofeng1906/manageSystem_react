@@ -106,7 +106,6 @@ const Login: React.FC<{}> = () => {
   };
 
   const getUsersInfo = async (windowURL: any) => {
-    debugger;
     let userCode = "";
     if (windowURL.indexOf("?") !== -1) {
       const firstGroup = windowURL.split("?"); // 区分问号后面的内容
@@ -144,13 +143,14 @@ const Login: React.FC<{}> = () => {
           }
         })
         .catch(function (error) {
-          message.error({
-            content: `访问异常:${error.toString()}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
+          console.log("登陆界面异常：", error);
+          // message.error({
+          //   // content: `访问异常:${error.toString()}`,
+          //   duration: 1,
+          //   style: {
+          //     marginTop: '50vh',
+          //   },
+          // });
         });
     }
   };

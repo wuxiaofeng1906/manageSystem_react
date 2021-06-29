@@ -1916,20 +1916,21 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminCurStage" label="当前阶段:">
-                    <Select placeholder="请选择" style={widths} showSearch optionFilterProp="children">
+                    <Select style={widths}>
                       {[
                         <Option key={'1'} value={'1'}>未开始</Option>,
                         <Option key={'2'} value={'2'}>开发中</Option>,
                         <Option key={'3'} value={'3'}>开发完</Option>,
-                        <Option key={'3'} value={'4'}>已提测</Option>,
-                        <Option key={'4'} value={'5'}>测试中</Option>,
-                        <Option key={'5'} value={'6'}>TE测试环境已验过</Option>,
-                        <Option key={'6'} value={'7'}>UED测试环境已验过</Option>,
-                        <Option key={'7'} value={'8'}>已取消</Option>,
-                        <Option key={'8'} value={'9'}>开发已revert</Option>,
-                        <Option key={'9'} value={'10'}>测试已验证revert</Option>,
-                        <Option key={'10'} value={'11'}>灰度已验过</Option>,
-                        <Option key={'11'} value={'12'}>线上已验过</Option>,
+                        <Option key={'4'} value={'4'}>已提测</Option>,
+                        <Option key={'5'} value={'5'}>测试中</Option>,
+                        <Option key={'6'} value={'6'}>TE测试环境已验过</Option>,
+                        <Option key={'7'} value={'7'}>UED测试环境已验过</Option>,
+                        <Option key={'8'} value={'8'}>已取消</Option>,
+                        <Option key={'9'} value={'9'}>开发已revert</Option>,
+                        <Option key={'10'} value={'10'}>测试已验证revert</Option>,
+                        <Option key={'11'} value={'11'}>灰度已验过</Option>,
+                        <Option key={'12'} value={'12'}>线上已验过</Option>
+
                       ]}
                     </Select>
                   </Form.Item>

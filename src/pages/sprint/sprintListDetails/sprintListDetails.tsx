@@ -1196,9 +1196,18 @@ const SprintList: React.FC<any> = () => {
 
       const datas = {
         id: rowDatas.id,
+        project: prjId,
         category: zentaoTypeRenderToNumber(oradata.uedChandaoType),
+        ztNo: oradata.uedCHandaoID,
+        // 以上为必填字段
+
+        uedEnvCheck: oradata.uedForUedVerify,
+        uedOnlineCheck: oradata.UedOnlineVerti,
+        memo: oradata.uedRemark,
+
+        // source: rowDatas.uedSource,
+        // feedback: rowDatas.feedback,
         // tester: rowDatas.tester,
-        // ztNo: oradata.uedCHandaoID,
         // hotUpdate: rowDatas.hotUpdate,
         // dataUpdate: rowDatas.dataUpdate,
         // interUpdate: rowDatas.interUpdate,
@@ -1207,11 +1216,6 @@ const SprintList: React.FC<any> = () => {
         // scopeLimit: rowDatas.scopeLimit,
         // publish: rowDatas.publishEnv,
 
-        uedEnvCheck: oradata.uedForUedVerify,
-        uedOnlineCheck: oradata.UedOnlineVerti,
-        // source: rowDatas.uedSource,
-        // feedback: rowDatas.feedback,
-        memo: oradata.uedRemark,
       };
 
       if (formForUEDToMod.isFieldTouched('uedForUED')) {
@@ -1223,14 +1227,14 @@ const SprintList: React.FC<any> = () => {
 
     /* endregion */
 
-    // 不同权限修改不同页面
+    // 权限判定-----------------------不同权限修改不同页面
     const authorityForMod = (detailsInfo: any) => {
       // 判断人员权限（admin，测试，开发经理（开发）,UED）
       let currentUserGroup;
       if (initialState?.currentUser) {
         currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
       }
-      currentUserGroup = 'devGroup';
+      // currentUserGroup = 'superGroup';
       if (currentUserGroup !== undefined) {
         switch (currentUserGroup.toString()) {
           case 'superGroup':

@@ -886,12 +886,14 @@ const SprintList: React.FC<any> = () => {
       oradata.adminAddTester.forEach((eles: any) => {
         testers = testers === "" ? eles : `${testers};${eles}`;
       });
-
       // 用;拼接发布环境
       let pubEnv = "";
-      oradata.adminAddEnvironment.forEach((eles: any) => {
-        pubEnv = pubEnv === "" ? eles : `${pubEnv};${eles}`;
-      });
+      if (oradata.adminAddEnvironment !== undefined) {
+        oradata.adminAddEnvironment.forEach((eles: any) => {
+          pubEnv = pubEnv === "" ? eles : `${pubEnv};${eles}`;
+        });
+      }
+
 
       if (oradata.adminChandaoType === '' || oradata.adminChandaoId === '') {
         message.error({
@@ -1035,9 +1037,12 @@ const SprintList: React.FC<any> = () => {
 
       // 用;拼接发布环境
       let pubEnv = "";
-      oradata.managerEnvironment.forEach((eles: any) => {
-        pubEnv = pubEnv === "" ? eles : `${pubEnv};${eles}`;
-      });
+      if (oradata.managerEnvironment !== undefined) {
+        oradata.managerEnvironment.forEach((eles: any) => {
+          pubEnv = pubEnv === "" ? eles : `${pubEnv};${eles}`;
+        });
+      }
+
 
       const datas = {
         id: rowDatas.id,
@@ -1387,6 +1392,7 @@ const SprintList: React.FC<any> = () => {
     const [isMoveAddModalVisible, setIsMoveAddModalVisible] = useState(false);
     const [isAble, setisAble] = useState({shown: false});
 
+    // 窗口弹出，并赋值
     const moveProject = () => {
       const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
       if (selRows.length <= 0) {
@@ -1407,11 +1413,14 @@ const SprintList: React.FC<any> = () => {
       setIsMoveModalVisible(true);
     };
 
+    // 取消
     const moveCancel = () => {
       setIsMoveModalVisible(false);
     };
 
+    // 发送请求
     const moveSprintList = () => {
+      debugger;
       // 获取被选择明细项
       const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
       const idArray = [];
@@ -1458,13 +1467,14 @@ const SprintList: React.FC<any> = () => {
           });
         });
 
-
     };
 
+    // 取消新增项目
     const addPrjCancel = () => {
       setIsMoveAddModalVisible(false);
     };
 
+    // 新增项目赋值
     const addNewProject = () => {
       const currentDate = moment(new Date()).add('year', 0);
       formForMoveAddAnaMod.setFieldsValue({
@@ -1482,6 +1492,7 @@ const SprintList: React.FC<any> = () => {
       setIsMoveAddModalVisible(true);
     };
 
+    // 时间选择事件
     const formTimeSelected = async () => {
       const values = formForMoveAddAnaMod.getFieldsValue();
       const prjName = `${values.prjNames}${values.prjDate.format('YYYYMMDD')}`;
@@ -1511,6 +1522,7 @@ const SprintList: React.FC<any> = () => {
 
     };
 
+    // 发送请求新增项目
     const commitAddProject = async () => {
       const values = formForMoveAddAnaMod.getFieldsValue();
       const prjtype = values.prjNames;

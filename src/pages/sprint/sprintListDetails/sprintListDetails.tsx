@@ -993,11 +993,13 @@ const SprintList: React.FC<any> = () => {
 
     // 开发经理（开发）manager 修改
     const managerModify = (datas: any) => {
+      const pubEnv = datas.publishEnv.split(';');
       formForManagerToMod.setFieldsValue({
         managerCHandaoID: datas.ztNo,
         managerChandaoType: numberRenderToZentaoType({value: datas.category === null ? '' : datas.category.toString()}),
         managerDataUpgrade: datas.dataUpdate,
-        managerEnvironment: datas.publishEnv,
+        managerProTested: datas.proposedTest,
+        managerEnvironment: pubEnv,
         managerHotUpdate: datas.hotUpdate,
         managerInteUpgrade: datas.interUpdate,
         managerPreData: datas.presetData,
@@ -1031,18 +1033,27 @@ const SprintList: React.FC<any> = () => {
       const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
       const rowDatas = curRow[0];
 
+      // 用;拼接发布环境
+      let pubEnv = "";
+      oradata.managerEnvironment.forEach((eles: any) => {
+        pubEnv = pubEnv === "" ? eles : `${pubEnv};${eles}`;
+      });
+
       const datas = {
         id: rowDatas.id,
-        // tester: rowDatas.tester,
+        project: prjId,
         category: zentaoTypeRenderToNumber(oradata.managerChandaoType),
-        // ztNo: oradata.managerCHandaoID,
+        ztNo: oradata.managerCHandaoID,
+        // 以上为必填项
         hotUpdate: oradata.managerHotUpdate,
         dataUpdate: oradata.managerDataUpgrade,
         interUpdate: oradata.managerInteUpgrade,
         presetData: oradata.managerPreData,
         testCheck: oradata.managertesterVerifi,
         scopeLimit: oradata.managerSuggestion,
-        // publish: oradata.managerEnvironment,
+        proposedTest: oradata.managerProTested === "" ? null : oradata.managerProTested,
+        publishEnv: pubEnv,
+        // tester: rowDatas.tester,
         // uedName: rowDatas.uedName,
         // uedEnvCheck: rowDatas.uedEnvCheck,
         // uedOnlineCheck: rowDatas.uedOnlineCheck,
@@ -1219,7 +1230,7 @@ const SprintList: React.FC<any> = () => {
       if (initialState?.currentUser) {
         currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
       }
-      currentUserGroup = 'testGroup';
+      currentUserGroup = 'devGroup';
       if (currentUserGroup !== undefined) {
         switch (currentUserGroup.toString()) {
           case 'superGroup':
@@ -2347,9 +2358,27 @@ const SprintList: React.FC<any> = () => {
               </Col>
 
               <Col className="gutter-row">
+                <div style={{marginLeft: '65px'}}>
+                  <Form.Item name="managerProTested" label="已提测：">
+                    <Select placeholder="请选择" style={{width: '200px'}}>
+                      {[
+                        <Option key={''} value={''}> </Option>,
+                        <Option key={'0'} value={'0'}>否</Option>,
+                        <Option key={'1'} value={'1'}>是</Option>,
+                        <Option key={'2'} value={'2'}>免</Option>,
+                      ]}
+                    </Select>
+                  </Form.Item>
+                </div>
+              </Col>
+
+            </Row>
+
+            <Row gutter={16}>
+              <Col className="gutter-row">
                 <div style={{marginLeft: '50px'}}>
                   <Form.Item name="managerEnvironment" label="发布环境:">
-                    <Select placeholder="请选择" style={widths} mode="tags"
+                    <Select placeholder="请选择" style={{width: '515px'}} mode="tags"
                             optionFilterProp="children">
                       {[
                         <Option key={'集群1'} value={'集群1'}>集群1</Option>,
@@ -2362,25 +2391,12 @@ const SprintList: React.FC<any> = () => {
                 </div>
               </Col>
             </Row>
+
             <Row gutter={16}>
-              <Col className="gutter-row">
-                <div style={{marginLeft: '35px'}}>
-                  <Form.Item name="managerTested" label="已提测：">
-                    <Select placeholder="请选择" style={{width: '210px'}}>
-                      {[
-                        <Option key={''} value={''}> </Option>,
-                        <Option key={'0'} value={'0'}>否</Option>,
-                        <Option key={'1'} value={'1'}>是</Option>,
-                        <Option key={'2'} value={'2'}>免</Option>,
-                      ]}
-                    </Select>
-                  </Form.Item>
-                </div>
-              </Col>
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="managerSuggestion" label="验证范围建议:">
-                    <Input style={{width: '540px'}}/>
+                    <Input style={{width: '515px'}}/>
                   </Form.Item>
                 </div>
               </Col>

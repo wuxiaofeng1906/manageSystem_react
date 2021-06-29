@@ -995,7 +995,11 @@ const SprintList: React.FC<any> = () => {
 
     // 开发经理（开发）manager 修改
     const managerModify = (datas: any) => {
-      const pubEnv = datas.publishEnv.split(';');
+      let pubEnv = [];
+      if (datas.publishEnv !== null) {
+        pubEnv = datas.publishEnv.split(';');
+      }
+
       formForManagerToMod.setFieldsValue({
         managerCHandaoID: datas.ztNo,
         managerChandaoType: numberRenderToZentaoType({value: datas.category === null ? '' : datas.category.toString()}),
@@ -1239,7 +1243,7 @@ const SprintList: React.FC<any> = () => {
       if (initialState?.currentUser) {
         currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
       }
-      // currentUserGroup = 'superGroup';
+      // currentUserGroup = 'devManageGroup';
       if (currentUserGroup !== undefined) {
         switch (currentUserGroup.toString()) {
           case 'superGroup':

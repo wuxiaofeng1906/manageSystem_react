@@ -360,7 +360,7 @@ const numRenderForSevAndpri = (params: any) => {
 };
 
 const numRenderForSevAndpriForLine = (params: any) => {
-  debugger;
+
   let severity = "";
 
   if (params.value !== null) {

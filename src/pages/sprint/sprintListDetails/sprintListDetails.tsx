@@ -1420,17 +1420,18 @@ const SprintList: React.FC<any> = () => {
 
     // 发送请求
     const moveSprintList = () => {
-      debugger;
+
       // 获取被选择明细项
       const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
       const idArray = [];
       for (let index = 0; index < selRows.length; index += 1) {
-        idArray.push(selRows[index].id);
+        const ztType = numberRenderToZentaoType({value: selRows[index].category});
+        idArray.push(`${ztType.toUpperCase()}_${selRows[index].id}`);
       }
       const oradata = formForMove.getFieldsValue();
 
       const params = {
-        "id": idArray,
+        "ids": idArray,
         "source": prjId,
         "target": oradata.moveNewPrj
       };

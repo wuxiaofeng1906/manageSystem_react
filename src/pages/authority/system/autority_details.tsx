@@ -375,6 +375,14 @@ const AuthorityDetails: React.FC<any> = () => {
               marginTop: '50vh',
             },
           });
+        } else if (Number(res.data.code) === 403) {
+          message.info({
+            content: "您无权限修改！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
         } else {
 
           message.error({
@@ -388,7 +396,7 @@ const AuthorityDetails: React.FC<any> = () => {
       })
       .catch(function (error) {
         message.error({
-          content: `连接异常${error.toString()}`,
+          content: `异常信息${error.toString()}`,
           duration: 1,
           style: {
             marginTop: '50vh',

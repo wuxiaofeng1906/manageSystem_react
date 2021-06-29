@@ -524,9 +524,16 @@ const SprintList: React.FC<any> = () => {
             setIsAddModalVisible(false);
             updateGrid();
             message.info({
-              content: res.data.message,
+              content: "项目新增成功！",
               duration: 1,
-              className: 'AddSuccess',
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          } else if (Number(res.data.code)=== 403) {
+            message.info({
+              content: "您无权新增项目！",
+              duration: 1,
               style: {
                 marginTop: '50vh',
               },
@@ -535,7 +542,6 @@ const SprintList: React.FC<any> = () => {
             message.error({
               content: `${res.data.message}`,
               duration: 1,
-              className: 'AddNone',
               style: {
                 marginTop: '50vh',
               },
@@ -545,9 +551,8 @@ const SprintList: React.FC<any> = () => {
         .catch(function (error) {
           // console.log("error", error);
           message.error({
-            content: error.toString(),
+            content: `异常信息：${error.toString()}`,
             duration: 1,
-            className: 'AddError',
             style: {
               marginTop: '50vh',
             },
@@ -566,19 +571,24 @@ const SprintList: React.FC<any> = () => {
             setIsAddModalVisible(false);
             updateGrid();
             message.info({
-              content: res.data.message,
+              content: "项目修改成功!",
               duration: 1,
-              className: 'ModSuccess',
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          } else if (Number(res.data.code) === 403) {
+            message.info({
+              content: "您无权修改项目！",
+              duration: 1,
               style: {
                 marginTop: '50vh',
               },
             });
           } else {
-
             message.error({
               content: `${res.data.message}`,
               duration: 1,
-              className: 'ModNone',
               style: {
                 marginTop: '50vh',
               },
@@ -587,7 +597,7 @@ const SprintList: React.FC<any> = () => {
         })
         .catch(function (error) {
           message.error({
-            content: error.toString(),
+            content: `异常信息：${error.toString()}`,
             duration: 1,
             className: 'ModError',
             style: {
@@ -659,11 +669,18 @@ const SprintList: React.FC<any> = () => {
               marginTop: '50vh',
             },
           });
+        } else if (Number(res.data.code)=== 403) {
+          message.info({
+            content: "您无权删除项目！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
         } else {
           message.error({
             content: `${res.data.message}`,
             duration: 1,
-            className: 'MdelNone',
             style: {
               marginTop: '50vh',
             },
@@ -672,9 +689,8 @@ const SprintList: React.FC<any> = () => {
       })
       .catch(function (error) {
         message.error({
-          content: error.toString(),
+          content: `异常信息：${error.toString()}`,
           duration: 1,
-          className: 'MdelError',
           style: {
             marginTop: '50vh',
           },

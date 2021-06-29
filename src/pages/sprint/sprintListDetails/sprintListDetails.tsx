@@ -661,6 +661,14 @@ const SprintList: React.FC<any> = () => {
                   marginTop: '50vh',
                 },
               });
+            } else if (Number(res.data.code) === 403) {
+              message.info({
+                content: "您无权查询权限！",
+                duration: 1,
+                style: {
+                  marginTop: '50vh',
+                },
+              });
             } else {
               message.error({
                 content: `${res.data.message}`,
@@ -684,9 +692,8 @@ const SprintList: React.FC<any> = () => {
         })
         .catch(function (error) {
           message.error({
-            content: error.toString(),
+            content: `异常信息:${error.toString()}`,
             duration: 1, // 1S 后自动关闭
-            className: 'ModError',
             style: {
               marginTop: '50vh',
             },
@@ -795,6 +802,14 @@ const SprintList: React.FC<any> = () => {
                 marginTop: '50vh',
               },
             });
+          } else if (Number(res.data.code) === 403) {
+            message.info({
+              content: "您无权新增明细！",
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
           } else {
             message.error({
               content: `${res.data.message}`,
@@ -807,7 +822,7 @@ const SprintList: React.FC<any> = () => {
         })
         .catch(function (error) {
           message.error({
-            content: error.toString(),
+            content: `异常信息：${error.toString()}`,
             duration: 1, // 1S 后自动关闭
             style: {
               marginTop: '50vh',
@@ -842,7 +857,15 @@ const SprintList: React.FC<any> = () => {
                 marginTop: '50vh',
               },
             });
-          } else {
+          } else if (Number(res.data.code) === 403) {
+            message.info({
+              content: "您无修改权限！",
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          }else {
             message.error({
               content: `${res.data.message}`,
               duration: 1, // 1S 后自动关闭
@@ -1365,6 +1388,14 @@ const SprintList: React.FC<any> = () => {
                 marginTop: '50vh',
               },
             });
+          } else if (Number(res.data.code) === 403) {
+            message.info({
+              content: "您无权删除明细！",
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
           } else {
             message.error({
               content: `${res.data.message}`,
@@ -1452,6 +1483,14 @@ const SprintList: React.FC<any> = () => {
                 marginTop: '50vh',
               },
             });
+          } else if (Number(res.data.code) === 403) {
+            message.info({
+              content: "您无权移动明细！",
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
           } else {
             message.error({
               content: res.data.verify === undefined ? res.data.message : res.data.verify,
@@ -1464,7 +1503,7 @@ const SprintList: React.FC<any> = () => {
         })
         .catch(function (error) {
           message.error({
-            content: error.toString(),
+            content: `异常信息：${error.toString()}`,
             duration: 1,
             style: {
               marginTop: '50vh',
@@ -1577,7 +1616,14 @@ const SprintList: React.FC<any> = () => {
             message.info({
               content: res.data.message,
               duration: 1,
-              className: 'AddSuccess',
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          } else if (Number(res.data.code) === 403) {
+            message.info({
+              content: "您无权新增项目！",
+              duration: 1,
               style: {
                 marginTop: '50vh',
               },
@@ -1586,7 +1632,6 @@ const SprintList: React.FC<any> = () => {
             message.error({
               content: `${res.data.message}${res.data.zt.message.end[0]}`,
               duration: 1,
-              className: 'AddNone',
               style: {
                 marginTop: '50vh',
               },
@@ -1596,9 +1641,8 @@ const SprintList: React.FC<any> = () => {
         .catch(function (error) {
           // console.log("error", error);
           message.error({
-            content: error.toString(),
+            content: `异常信息：${error.toString()}`,
             duration: 1,
-            className: 'AddError',
             style: {
               marginTop: '50vh',
             },
@@ -1677,6 +1721,14 @@ const SprintList: React.FC<any> = () => {
                 marginTop: '50vh',
               },
             });
+          } else if (Number(res.data.code) === 403) {
+            message.info({
+              content: "您修改权限！",
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
           } else {
             message.error({
               content: `${res.data.message}`,
@@ -1689,7 +1741,7 @@ const SprintList: React.FC<any> = () => {
         })
         .catch(function (error) {
           message.error({
-            content: error.toString(),
+            content: `异常信息：${error.toString()}`,
             duration: 1,
             style: {
               marginTop: '50vh',

@@ -320,6 +320,14 @@ const UserDetails: React.FC<any> = () => {
               marginTop: '50vh',
             },
           });
+        } else if (Number(res.data.code) === 403) {
+          message.info({
+            content: "您无修改权限！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
         } else {
 
           message.error({
@@ -333,7 +341,7 @@ const UserDetails: React.FC<any> = () => {
       })
       .catch(function (error) {
         message.error({
-          content: `连接异常${error.toString()}`,
+          content: `异常信息${error.toString()}`,
           duration: 1,
           style: {
             marginTop: '50vh',

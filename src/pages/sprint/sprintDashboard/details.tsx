@@ -18,7 +18,7 @@ import {
   linkToZentaoPage,
   numberRenderToZentaoStatusForRed,
   stageForLineThrough,
-  numRenderForSevAndpriForLine
+  numRenderForSevAndpriForLine, proposedTestRender
 } from '@/publicMethods/cellRenderer';
 
 import {getHeight} from '@/publicMethods/pageSet';
@@ -104,8 +104,8 @@ const getColums = () => {
     },
     {
       headerName: '已提测',
-      field: '',
-
+      field: 'proposedTest',
+      cellRenderer: proposedTestRender,
     },
     {
       headerName: '发布环境',

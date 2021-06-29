@@ -989,7 +989,6 @@ const SprintList: React.FC<any> = () => {
     };
     /* endregion */
 
-
     /* region 开发经理 权限操作 */
 
     // 开发经理（开发）manager 修改
@@ -1059,7 +1058,7 @@ const SprintList: React.FC<any> = () => {
     /* region 测试 权限操作 */
     // 测试 修改
     const testerModify = async (datas: any) => {
-      // 还要获取英文名
+      // 获取英文名
       const teters = datas.tester.split(';');
       const deptUsers = await getDeptMemner(gqlClient, "测试");
       const nameIdArray = getUsersId(deptUsers, teters);
@@ -1072,6 +1071,7 @@ const SprintList: React.FC<any> = () => {
           value: datas.ztStatus === null ? '' : datas.ztStatus.toString(),
         }),
         testToTester: nameIdArray,
+        testerProTested: datas.proposedTest,
         testerRemark: datas.memo
 
       });
@@ -1111,9 +1111,13 @@ const SprintList: React.FC<any> = () => {
 
       const datas = {
         id: curRow[0].id,
-        memo: oradata.testerRemark,
+        project: prjId,
         category: zentaoTypeRenderToNumber(oradata.testerChandaoType),
-        // ztNo: oradata.testerCHandaoID,
+        ztNo: oradata.testerCHandaoID,
+        // 以上为必填字段
+        proposedTest: oradata.testerProTested === "" ? null : oradata.testerProTested,
+        memo: oradata.testerRemark,
+
         // hotUpdate: rowDatas.hotUpdate,
         // dataUpdate: rowDatas.dataUpdate,
         // interUpdate: rowDatas.interUpdate,
@@ -1128,14 +1132,13 @@ const SprintList: React.FC<any> = () => {
         // feedback: rowDatas.feedback,
 
       };
-      if (formForTesterToMod.isFieldTouched('testToTester')) {
 
+      if (formForTesterToMod.isFieldTouched('testToTester')) {
         // 用;拼接测试人员
         let testers = "";
         oradata.testToTester.forEach((eles: any) => {
           testers = testers === "" ? eles : `${testers};${eles}`;
         });
-
         datas["tester"] = testers;
       }
       modCommitDetails(datas);
@@ -2436,7 +2439,6 @@ const SprintList: React.FC<any> = () => {
                 </div>
               </Col>
             </Row>
-
             <Row gutter={16}>
               <Col className="gutter-row">
                 <div style={leftStyle}>
@@ -2459,11 +2461,10 @@ const SprintList: React.FC<any> = () => {
                 </div>
               </Col>
             </Row>
-
             <Row gutter={16}>
               <Col className="gutter-row">
                 <div style={{marginLeft: '35px'}}>
-                  <Form.Item name="testerTested" label="已提测：">
+                  <Form.Item name="testerProTested" label="已提测：">
                     <Select placeholder="请选择" style={{width: '200px'}}>
                       {[
                         <Option key={''} value={''}> </Option>,

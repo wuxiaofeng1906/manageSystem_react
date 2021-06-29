@@ -88,6 +88,34 @@ const numberRenderToCurrentStage = (params: any) => {
 
 };
 
+const proposedTestRender = (params: any) => {
+  if (params.value === null || params.value === undefined) {
+    return "";
+  }
+
+  let test = "";
+  switch (params.value.toString()) {
+    case "0":
+      test = "否";
+      break;
+    case "1":
+      test = "是";
+      break;
+    case "2":
+      test = "免";
+      break;
+
+    default:
+      break;
+  }
+
+
+  if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+    return `<span style="text-decoration:line-through"> ${test} </span>`;
+  }
+
+  return test;
+};
 
 const stageForLineThrough = (params: any) => {
   if (params.value === null || params.value === undefined) {
@@ -578,6 +606,7 @@ export {
   stageChangeToNumber,
   stageForLineThrough,
   numRenderForSevAndpri,
-  zentaoTypeRenderToNumber
+  zentaoTypeRenderToNumber,
+  proposedTestRender
 };
 

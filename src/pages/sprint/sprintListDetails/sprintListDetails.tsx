@@ -34,7 +34,8 @@ import {
   linkToZentaoPage,
   numberRenderToZentaoStatusForRed,
   stageForLineThrough,
-  numRenderForSevAndpriForLine
+  numRenderForSevAndpriForLine,
+  proposedTestRender
 } from '@/publicMethods/cellRenderer';
 import {getUsersId} from '@/publicMethods/userMethod';
 
@@ -139,9 +140,8 @@ const getColums = () => {
     },
     {
       headerName: '已提测',
-      field: '',
-      // tooltipField: ""
-
+      field: 'proposedTest',
+      cellRenderer: proposedTestRender,
     },
     {
       headerName: '发布环境',
@@ -339,6 +339,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             presetData
             testCheck
             scopeLimit
+            proposedTest
             publishEnv
             uedName
             uedEnvCheck
@@ -507,7 +508,6 @@ const SprintList: React.FC<any> = () => {
 
     };
 
-
     const LoadCombobox = (params: any) => {
       const deptMan = [];
       let deptMember = "";
@@ -578,11 +578,13 @@ const SprintList: React.FC<any> = () => {
 
     /* endregion */
 
-    /* region 新增功能 */
-
-    // 隐藏
-    //   const [isChandaoInfoEdit, setChandaoInfoEdit] = useState({isEdit: true});
-    // setChandaoInfoEdit({isEdit: true});
+    /* region admin 的新增功能和修改功能  */
+    //  弹出框
+    const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+    const [isformForManagerToModVisible, setformForManagerToModVisible] = useState(false);
+    const [isformForTesterToModVisible, setformForTesterToModVisible] = useState(false);
+    const [isformForUEDToModVisible, setformForUEDToModVisible] = useState(false);
+    const [modal, setmodal] = useState({title: '新增明细行'});
 
     // 失去焦点后查询值
     const checkZentaoInfo = (params: any) => {
@@ -692,9 +694,7 @@ const SprintList: React.FC<any> = () => {
         });
     };
 
-    // 添加项目
-    const [isAddModalVisible, setIsAddModalVisible] = useState(false);
-    const [modal, setmodal] = useState({title: '新增明细行'});
+    // 点击新增按钮赋值弹出窗
     const addProject = () => {
       formForAdminToAddAnaMod.setFieldsValue({
         adminCurStage: '',
@@ -715,7 +715,8 @@ const SprintList: React.FC<any> = () => {
         adminAddPreData: '',
         adminAddtesterVerifi: '',
         adminAddSuggestion: '',
-        adminAddEnvironment: '',
+        adminAddProposedTest: '',
+        adminAddEnvironment: undefined,
         adminAddForUED: '',
         adminAddForUedVerify: '',
         adminAdminUedOnline: '',
@@ -729,22 +730,57 @@ const SprintList: React.FC<any> = () => {
       setIsAddModalVisible(true);
     };
 
-    /* endregion */
+    // 点击修改按钮赋值弹出窗
+    const adminModify = async (datas: any) => {
+      // 还要获取英文名
+      const teters = datas.tester.split(';');
+      const deptUsers = await getDeptMemner(gqlClient, "测试");
+      const nameIdArray = getUsersId(deptUsers, teters);
 
-    /* region 修改功能  */
-
-    const [isformForManagerToModVisible, setformForManagerToModVisible] = useState(false);
-    const [isformForTesterToModVisible, setformForTesterToModVisible] = useState(false);
-    const [isformForUEDToModVisible, setformForUEDToModVisible] = useState(false);
-
-    /* region admin 权限操作 */
-    // 新增和修改弹出层取消按钮事件
-    const handleCancel = () => {
-      setIsAddModalVisible(false);
+      let publishEnv: any = [];
+      if (datas.publishEnv !== null) {
+        publishEnv = datas.publishEnv.split(';');
+      }
+      //  解析测试人员
+      formForAdminToAddAnaMod.setFieldsValue({
+        adminCurStage: numberRenderToCurrentStage({
+          value: datas.stage === null ? '' : datas.stage.toString(),
+        }),
+        adminAddTester: nameIdArray,
+        adminChandaoType: datas.category,
+        adminChandaoId: datas.ztNo,
+        adminAddChandaoTitle: datas.title,
+        adminAddSeverity: datas.severity,
+        adminAddPriority: datas.priority,
+        adminAddModule: datas.moduleName,
+        adminAddChandaoStatus: numberRenderToZentaoStatus({
+          value: datas.ztStatus === null ? '' : datas.ztStatus.toString(),
+        }),
+        adminAddAssignTo: datas.assignedTo,
+        adminAddSolvedBy: datas.finishedBy,
+        adminAddClosedBy: datas.closedBy,
+        adminAddHotUpdate: datas.hotUpdate,
+        adminAddDataUpgrade: datas.dataUpdate,
+        adminAddInteUpgrade: datas.interUpdate,
+        adminAddPreData: datas.presetData,
+        adminAddtesterVerifi: datas.testCheck,
+        adminAddSuggestion: datas.scopeLimit,
+        adminAddProposedTest: datas.proposedTest,
+        adminAddEnvironment: publishEnv,
+        adminAddForUED: datas.uedName,
+        adminAddForUedVerify: datas.uedEnvCheck,
+        adminAdminUedOnline: datas.uedOnlineCheck,
+        adminAddSource: datas.source,
+        adminAddFeedbacker: datas.feedback,
+        adminAddRemark: datas.memo,
+      });
+      setmodal({title: '修改明细行(admin)'});
+      setIsAddModalVisible(true);
     };
 
-    // admin新增项目
+    //  发送请求 新增数据
     const addCommitDetails = (datas: any) => {
+      console.log("datas", datas);
       axios
         .post('/api/sprint/project/child', datas)
         .then(function (res) {
@@ -780,7 +816,7 @@ const SprintList: React.FC<any> = () => {
         });
     };
 
-    //   修改项目
+    //   发送请求 修改数据
     const modCommitDetails = (datas: any) => {
       axios
         .put('/api/sprint/project/child', datas)
@@ -828,8 +864,10 @@ const SprintList: React.FC<any> = () => {
         });
     };
 
-    // 提交admin 新增和修改的操作
+    // commit 事件 admin 新增和修改的操作
     const commitSprintDetails = () => {
+
+      /* region 数据获取和提醒 */
       const oradata = formForAdminToAddAnaMod.getFieldsValue();
       if (oradata.adminAddTester === '' || oradata.adminAddTester === null || oradata.adminAddTester === undefined) {
         message.error({
@@ -849,6 +887,11 @@ const SprintList: React.FC<any> = () => {
         testers = testers === "" ? eles : `${testers};${eles}`;
       });
 
+      // 用;拼接发布环境
+      let pubEnv = "";
+      oradata.adminAddEnvironment.forEach((eles: any) => {
+        pubEnv = pubEnv === "" ? eles : `${pubEnv};${eles}`;
+      });
 
       if (oradata.adminChandaoType === '' || oradata.adminChandaoId === '') {
         message.error({
@@ -860,8 +903,10 @@ const SprintList: React.FC<any> = () => {
         });
         return;
       }
+
+      /* #endregion */
+
       const datas = {
-        // 新增使用的是project id
         project: prjId,
         stage: Number(oradata.adminCurStage).toString() === "NaN" ? stageChangeToNumber(oradata.adminCurStage) : Number(oradata.adminCurStage),
         category: oradata.adminChandaoType,
@@ -871,7 +916,8 @@ const SprintList: React.FC<any> = () => {
         presetData: oradata.adminAddPreData,
         testCheck: oradata.adminAddtesterVerifi,
         scopeLimit: oradata.adminAddSuggestion,
-        publish: oradata.adminAddEnvironment,
+        proposedTest: oradata.adminAddProposedTest === "" ? null : oradata.adminAddProposedTest,
+        publishEnv: pubEnv,
         uedEnvCheck: oradata.adminAddForUedVerify,
         uedOnlineCheck: oradata.adminAdminUedOnline,
         memo: oradata.adminAddRemark,
@@ -893,6 +939,8 @@ const SprintList: React.FC<any> = () => {
         datas['activedAt'] = oradata.activeTime_hidden;
 
       }
+
+      // 判断是管理员新增明细还是管理员修改明细行
       if (modal.title === '新增明细行') {
 
         datas["source"] = 7;
@@ -911,6 +959,12 @@ const SprintList: React.FC<any> = () => {
           datas["ztNo"] = oradata.adminChandaoId;
         }
 
+        // 如果修改了禅道类型，那么category传入旧值，newCategory传入新值。
+        if (curRow[0].category !== oradata.adminChandaoType) {
+          datas["category"] = curRow[0].category;
+          datas["newCategory"] = oradata.adminChandaoType;
+        }
+
         if (formForAdminToAddAnaMod.isFieldTouched('adminAddTester')) {
           datas["tester"] = testers;
         }
@@ -926,54 +980,15 @@ const SprintList: React.FC<any> = () => {
         modCommitDetails(datas);
 
       }
+
     };
 
-    // admin 修改
-    const adminModify = async (datas: any) => {
-
-      // 还要获取英文名
-      const teters = datas.tester.split(';');
-      const deptUsers = await getDeptMemner(gqlClient, "测试");
-
-      const nameIdArray = getUsersId(deptUsers, teters);
-
-      //  解析测试人员
-      formForAdminToAddAnaMod.setFieldsValue({
-        adminCurStage: numberRenderToCurrentStage({
-          value: datas.stage === null ? '' : datas.stage.toString(),
-        }),
-        adminAddTester: nameIdArray,
-        adminChandaoType: datas.category,
-        adminChandaoId: datas.ztNo,
-        adminAddChandaoTitle: datas.title,
-        adminAddSeverity: datas.severity,
-        adminAddPriority: datas.priority,
-        adminAddModule: datas.moduleName,
-        adminAddChandaoStatus: numberRenderToZentaoStatus({
-          value: datas.ztStatus === null ? '' : datas.ztStatus.toString(),
-        }),
-        adminAddAssignTo: datas.assignedTo,
-        adminAddSolvedBy: datas.finishedBy,
-        adminAddClosedBy: datas.closedBy,
-        adminAddHotUpdate: datas.hotUpdate,
-        adminAddDataUpgrade: datas.dataUpdate,
-        adminAddInteUpgrade: datas.interUpdate,
-        adminAddPreData: datas.presetData,
-        adminAddtesterVerifi: datas.testCheck,
-        adminAddSuggestion: datas.scopeLimit,
-        adminAddEnvironment: datas.publishEnv,
-        adminAddForUED: datas.uedName,
-        adminAddForUedVerify: datas.uedEnvCheck,
-        adminAdminUedOnline: datas.uedOnlineCheck,
-        adminAddSource: datas.source,
-        adminAddFeedbacker: datas.feedback,
-        adminAddRemark: datas.memo,
-      });
-      setmodal({title: '修改明细行(admin)'});
-      setIsAddModalVisible(true);
+    // 新增和修改 弹出层取消按钮事件
+    const handleCancel = () => {
+      setIsAddModalVisible(false);
     };
-
     /* endregion */
+
 
     /* region 开发经理 权限操作 */
 
@@ -1201,7 +1216,7 @@ const SprintList: React.FC<any> = () => {
       if (initialState?.currentUser) {
         currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
       }
-      //   currentUserGroup = 'superGroup';
+      currentUserGroup = 'testGroup';
       if (currentUserGroup !== undefined) {
         switch (currentUserGroup.toString()) {
           case 'superGroup':
@@ -2070,12 +2085,13 @@ const SprintList: React.FC<any> = () => {
             <Row gutter={16}>
               <Col className="gutter-row">
                 <div style={{marginLeft: '35px'}}>
-                  <Form.Item name="adminAddtesterTested" label="已提测：">
+                  <Form.Item name="adminAddProposedTest" label="已提测：">
                     <Select placeholder="请选择" style={{width: '200px'}}>
                       {[
-                        <Option key={'1'} value={'1'}>是</Option>,
+                        <Option key={''} value={''}> </Option>,
                         <Option key={'0'} value={'0'}>否</Option>,
-                        <Option key={'免'} value={'免'}>免</Option>,
+                        <Option key={'1'} value={'1'}>是</Option>,
+                        <Option key={'2'} value={'2'}>免</Option>
                       ]}
                     </Select>
                   </Form.Item>
@@ -2093,11 +2109,13 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddEnvironment" label="发布环境:">
-                    <Select placeholder="请选择" style={widths}>
+                    <Select placeholder="请选择" style={widths} mode="tags"
+                            optionFilterProp="children">
                       {[
-                        <Option key={'1'} value={'1'}>集群1</Option>,
-                        <Option key={'2'} value={'2'}>集群2</Option>,
-                        <Option key={'3'} value={'3'}>集群3</Option>,
+                        <Option key={'集群1'} value={'集群1'}>集群1</Option>,
+                        <Option key={'集群2'} value={'集群2'}>集群2</Option>,
+                        <Option key={'集群3'} value={'集群3'}>集群3</Option>,
+                        <Option key={'集群4'} value={'集群4'}>集群4</Option>
                       ]}
                     </Select>
                   </Form.Item>
@@ -2328,11 +2346,13 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={{marginLeft: '50px'}}>
                   <Form.Item name="managerEnvironment" label="发布环境:">
-                    <Select placeholder="请选择" style={widths}>
+                    <Select placeholder="请选择" style={widths} mode="tags"
+                            optionFilterProp="children">
                       {[
                         <Option key={'集群1'} value={'集群1'}>集群1</Option>,
                         <Option key={'集群2'} value={'集群2'}>集群2</Option>,
                         <Option key={'集群3'} value={'集群3'}>集群3</Option>,
+                        <Option key={'集群4'} value={'集群4'}>集群4</Option>
                       ]}
                     </Select>
                   </Form.Item>
@@ -2345,9 +2365,10 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="managerTested" label="已提测：">
                     <Select placeholder="请选择" style={{width: '210px'}}>
                       {[
-                        <Option key={'1'} value={'1'}>是</Option>,
+                        <Option key={''} value={''}> </Option>,
                         <Option key={'0'} value={'0'}>否</Option>,
-                        <Option key={'免'} value={'免'}>免</Option>,
+                        <Option key={'1'} value={'1'}>是</Option>,
+                        <Option key={'2'} value={'2'}>免</Option>,
                       ]}
                     </Select>
                   </Form.Item>
@@ -2445,9 +2466,10 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="testerTested" label="已提测：">
                     <Select placeholder="请选择" style={{width: '200px'}}>
                       {[
-                        <Option key={'1'} value={'1'}>是</Option>,
+                        <Option key={''} value={''}> </Option>,
                         <Option key={'0'} value={'0'}>否</Option>,
-                        <Option key={'免'} value={'免'}>免</Option>,
+                        <Option key={'1'} value={'1'}>是</Option>,
+                        <Option key={'2'} value={'2'}>免</Option>,
                       ]}
                     </Select>
                   </Form.Item>

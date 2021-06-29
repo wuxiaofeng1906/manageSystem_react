@@ -367,7 +367,20 @@ const SprintList: React.FC<any> = () => {
       return;
     }
     const prjName = `${values.prjNames}${values.prjDate.format('YYYYMMDD')}`;
+
     const datas: any = await queryRepeats(gqlClient, prjName);
+
+    if (datas === null) {
+      message.error({
+        content: '您无权新增或修改!',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      setisAble({shown: true});
+      return;
+    }
     // 时间选择后禁用某些控件
     if (datas.ok === true) {
       // 可以新增项目
@@ -515,6 +528,7 @@ const SprintList: React.FC<any> = () => {
       creator: currentUser.toString(),
     };
 
+    debugger;
     //  判断是修改还是新增
     if (modal.title === '新增项目') {
       axios
@@ -530,7 +544,7 @@ const SprintList: React.FC<any> = () => {
                 marginTop: '50vh',
               },
             });
-          } else if (Number(res.data.code)=== 403) {
+          } else if (Number(res.data.code) === 403) {
             message.info({
               content: "您无权新增项目！",
               duration: 1,
@@ -549,14 +563,24 @@ const SprintList: React.FC<any> = () => {
           }
         })
         .catch(function (error) {
-          // console.log("error", error);
-          message.error({
-            content: `异常信息：${error.toString()}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
+          if (error.toString().includes("403")) {
+            message.info({
+              content: "您无权新增项目！",
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          } else {
+            message.error({
+              content: `异常信息：${error.toString()}`,
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          }
+
         });
     } else {
 
@@ -596,14 +620,25 @@ const SprintList: React.FC<any> = () => {
           }
         })
         .catch(function (error) {
-          message.error({
-            content: `异常信息：${error.toString()}`,
-            duration: 1,
-            className: 'ModError',
-            style: {
-              marginTop: '50vh',
-            },
-          });
+          if (error.toString().includes("403")) {
+            message.info({
+              content: "您无权修改项目！",
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          } else {
+            message.error({
+              content: `异常信息：${error.toString()}`,
+              duration: 1,
+              className: 'ModError',
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          }
+
         });
     }
   };
@@ -669,7 +704,7 @@ const SprintList: React.FC<any> = () => {
               marginTop: '50vh',
             },
           });
-        } else if (Number(res.data.code)=== 403) {
+        } else if (Number(res.data.code) === 403) {
           message.info({
             content: "您无权删除项目！",
             duration: 1,
@@ -688,13 +723,24 @@ const SprintList: React.FC<any> = () => {
         }
       })
       .catch(function (error) {
-        message.error({
-          content: `异常信息：${error.toString()}`,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
+        if (error.toString().includes("403")) {
+          message.info({
+            content: "您无权删除项目！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+          message.error({
+            content: `异常信息：${error.toString()}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
       });
   };
 

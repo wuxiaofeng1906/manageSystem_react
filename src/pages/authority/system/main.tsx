@@ -153,7 +153,7 @@ const Authority: React.FC<any> = () => {
               },
             });
           } else if (Number(res.data.code) === 403) {
-            message.info({
+            message.error({
               content: "您无新增权限！",
               duration: 1,
               style: {
@@ -171,13 +171,24 @@ const Authority: React.FC<any> = () => {
           }
         })
         .catch(function (error) {
-          message.error({
-            content: `异常信息:${error.toString()}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
+          if (error.toString().includes("403")) {
+            message.error({
+              content: "您无新增权限！",
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          } else {
+            message.error({
+              content: `异常信息:${error.toString()}`,
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          }
+
         });
 
     } else {
@@ -219,13 +230,24 @@ const Authority: React.FC<any> = () => {
           }
         })
         .catch(function (error) {
-          message.error({
-            content: `异常信息：${error.toString()}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
+          if (error.toString().includes("403")) {
+            message.info({
+              content: "您无修改权限！",
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          } else {
+            message.error({
+              content: `异常信息：${error.toString()}`,
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          }
+
         });
     }
   };
@@ -269,7 +291,7 @@ const Authority: React.FC<any> = () => {
             },
           });
         } else if (Number(res.data.code) === 403) {
-          message.info({
+          message.error({
             content: "您删除权限！",
             duration: 1,
             style: {
@@ -287,13 +309,24 @@ const Authority: React.FC<any> = () => {
         }
       })
       .catch(function (error) {
-        message.error({
-          content:`异常信息：${error.toString()}` ,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
+        if (error.toString().includes("403")) {
+          message.error({
+            content: "您删除权限！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+          message.error({
+            content: `异常信息：${error.toString()}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
       });
   };
 

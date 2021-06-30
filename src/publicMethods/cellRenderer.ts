@@ -360,10 +360,11 @@ const numRenderForSevAndpri = (params: any) => {
 };
 
 const numRenderForSevAndpriForLine = (params: any) => {
+  debugger;
 
   let severity = "";
 
-  if (params.value !== null) {
+  if (params.value !== null && params.value !== undefined) {
     switch (params.value.toString()) {
       case "1":
         severity = "P0-";

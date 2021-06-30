@@ -18,7 +18,8 @@ import {
   linkToZentaoPage,
   numberRenderToZentaoStatusForRed,
   stageForLineThrough,
-  numRenderForSevAndpriForLine, proposedTestRender
+  numRenderForSevAndpriForLine,
+  proposedTestRender
 } from '@/publicMethods/cellRenderer';
 
 import {getHeight} from '@/publicMethods/pageSet';
@@ -54,15 +55,15 @@ const getColums = () => {
       tooltipField: "tester",
       suppressMenu: false
     },
-    // {
-    //   headerName: '类型',
-    //   field: 'category',
-    //   cellRenderer: numberRenderToZentaoTypeForLine,
-    //   pinned: 'left',
-    //   minWidth: 70,
-    //   suppressMenu: false,
-    //
-    // },
+    {
+      headerName: '类型',
+      field: 'category',
+      cellRenderer: numberRenderToZentaoTypeForLine,
+      pinned: 'left',
+      minWidth: 70,
+      suppressMenu: false,
+
+    },
     {
       headerName: '编号',
       field: 'ztNo',
@@ -302,7 +303,9 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
       }
   `);
 
-  return addNewAttributes(data?.dashSingleItem, params.prjKind);
+  return addNewAttributes(data?.dashSingleItem, params.itemKind);
+  // const datas = data?.dashSingleItem;
+  // return datas[0].data;
 };
 
 // 组件初始化
@@ -313,15 +316,18 @@ const DetailsList: React.FC<any> = () => {
       prjId: -1,
       prjNames: "",
       prjKind: "",
-      itemName: ""
+      itemName: "",
+      itemKind: ""
     };
 
     const location = history.location.query;
     if (location !== undefined && location.projectid !== null) {
       projectInfo.prjId = Number(location.projectid);
       projectInfo.prjNames = location.project === null ? '' : location.project.toString();
-      projectInfo.itemName = location.item === null ? '' : location.item.toString();
       projectInfo.prjKind = location.kind === null ? '' : location.kind.toString();
+      const item = location.item === null ? '' : location.item.toString().split("|");
+      projectInfo.itemKind = item[0].toString();
+      projectInfo.itemName = item[1].toString();
     }
 
     const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件

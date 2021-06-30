@@ -29,11 +29,7 @@ const parTree = (oraData: any) => {
     parentB.forEach((parent: any) => {
       childrenB.forEach((current: any, index: any) => {
         if (current.parent === parent.key) {
-          debugger;
-          // if (current.title === "研发中心") {
           parentID.push(parent.key);
-
-          // }
           const temp: any = JSON.parse(JSON.stringify(childrenB));
           temp.splice(index, 1);
           translator([current], temp);
@@ -197,7 +193,7 @@ const UserDetails: React.FC<any> = () => {
   // 组外人员
   const GetOutGroupusers = (params: any) => {
 
-    if (params.users === undefined || params.users.length <= 1) {
+    if (params.users === undefined || params.users.length <= 1 || initSelectedUser === null) {
       return <label></label>;
     }
     const arrays = params.users;
@@ -251,11 +247,12 @@ const UserDetails: React.FC<any> = () => {
 
   /* endregion */
 
-  /* region 部门树选择事件 */
+
   const [inGroupUser, setIngroupUser] = useState(['']);
   const [outGroupUser, setOutGroupUser] = useState(['']);
   const [selectDeptUser, setSelectDeptUser] = useState(['']);
 
+  /* region 部门树选择事件 */
   const onSelect = async (selectedKeys: any) => {
     // console.log('selected', selectedKeys, info);
     const keys = selectedKeys[0];
@@ -269,13 +266,14 @@ const UserDetails: React.FC<any> = () => {
 
   /* region 人员选择触发事件 */
 
-  // 组内人员出发
+  // 组内人员触发
   const userInGroupSelectChange = (checkedValues: any) => {
     setIngroupUser(checkedValues);
   };
 
   // 组外人员触发
   const userOutGroupSelectChange = (checkedValues: any) => {
+
     setOutGroupUser(checkedValues);
   };
 
@@ -287,19 +285,26 @@ const UserDetails: React.FC<any> = () => {
   const [inGpSelAll, setInGpSelAll] = useState(true);
   const [outGpSelAll, setOutGpSelAll] = useState(false);
 
+  // 组内用户
   const inGroupSelectedAll = (params: any) => {
+
     if (params.target.checked) {
       setInGpSelAll(true);
+      setIngroupUser(initSelectedUser);
     } else {
       setInGpSelAll(false);
+      setIngroupUser([]);
     }
   };
 
+  // 组外用户
   const outGroupSelectedAll = (params: any) => {
     if (params.target.checked) {
       setOutGpSelAll(true);
+      setOutGroupUser(selectDeptUser);
     } else {
       setOutGpSelAll(false);
+      setOutGroupUser([]);
     }
   };
 
@@ -423,9 +428,6 @@ const UserDetails: React.FC<any> = () => {
 
           {/* 组内成员 */}
           <Col span={18} style={{
-
-            // height: window.innerHeight ,
-
             backgroundColor: "white",
             boxShadow: '-2px -2px 0px 0px #F2F2F2,2px 2px 0px 0px #F2F2F2'
           }}>
@@ -436,7 +438,7 @@ const UserDetails: React.FC<any> = () => {
               <Col span={2}>
                 {/* <label style={{fontWeight: "bold", marginLeft: "10px"}}> 组内用户</label> */}
                 <Checkbox style={{fontWeight: "bold", marginLeft: "10px"}} onChange={inGroupSelectedAll}
-                          value={inGpSelAll}>组内用户</Checkbox>
+                          checked={inGpSelAll}>组内用户</Checkbox>
               </Col>
               <Col span={22}>
                 <Checkbox.Group onChange={userInGroupSelectChange} value={inGroupUser}>
@@ -450,11 +452,11 @@ const UserDetails: React.FC<any> = () => {
             <Row style={{marginTop: "20px", marginLeft: "-7px", width: "101%"}}>
               <Col span={2}>
                 {/* <label style={{fontWeight: "bold", marginLeft: "10px"}}> 组外用户</label> */}
-                <Checkbox style={{fontWeight: "bold", marginLeft: "10px"}} value={outGpSelAll}
+                <Checkbox style={{fontWeight: "bold", marginLeft: "10px"}} checked={outGpSelAll}
                           onChange={outGroupSelectedAll}>组外用户</Checkbox>
               </Col>
               <Col span={22}>
-                <Checkbox.Group onChange={userOutGroupSelectChange}>
+                <Checkbox.Group onChange={userOutGroupSelectChange} value={outGroupUser}>
                   <GetOutGroupusers users={selectDeptUser}/>
                 </Checkbox.Group>
 

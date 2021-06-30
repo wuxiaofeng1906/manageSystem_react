@@ -348,8 +348,8 @@ const SprintList: React.FC<any> = () => {
       starttime: formatMomentTime(privDate),
       testCutoff: formatMomentTime(currentDate),
       testFinnished: formatMomentTime(currentDate),
-      planOnline: formatMomentTime(currentDate),
       planHuidu: formatMomentTime(currentDate),
+      planOnline: formatMomentTime(currentDate),
       prjStatus: "wait"
     });
 
@@ -370,6 +370,7 @@ const SprintList: React.FC<any> = () => {
 
     const datas: any = await queryRepeats(gqlClient, prjName);
 
+
     if (datas === null) {
       message.error({
         content: '您无权新增或修改!',
@@ -381,13 +382,22 @@ const SprintList: React.FC<any> = () => {
       setisAble({shown: true});
       return;
     }
+
     // 时间选择后禁用某些控件
     if (datas.ok === true) {
+
+      const privDate = moment(values.prjDate).subtract('day', 1);
       // 可以新增项目
       setisAble({shown: false});
       formForAddAnaMod.setFieldsValue({
         prjLable: '',
+        starttime: formatMomentTime(privDate),
+        testCutoff: formatMomentTime(values.prjDate),
+        testFinnished: formatMomentTime(values.prjDate),
+        planHuidu: formatMomentTime(values.prjDate),
+        planOnline: formatMomentTime(values.prjDate),
       });
+
     } else {
       setisAble({shown: true});
       formForAddAnaMod.setFieldsValue({

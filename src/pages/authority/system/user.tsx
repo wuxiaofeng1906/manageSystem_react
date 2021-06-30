@@ -282,6 +282,29 @@ const UserDetails: React.FC<any> = () => {
 
   /* endregion */
 
+  /* region全选事件 */
+
+  const [inGpSelAll, setInGpSelAll] = useState(true);
+  const [outGpSelAll, setOutGpSelAll] = useState(false);
+
+  const inGroupSelectedAll = (params: any) => {
+    if (params.target.checked) {
+      setInGpSelAll(true);
+    } else {
+      setInGpSelAll(false);
+    }
+  };
+
+  const outGroupSelectedAll = (params: any) => {
+    if (params.target.checked) {
+      setOutGpSelAll(true);
+    } else {
+      setOutGpSelAll(false);
+    }
+  };
+
+  /* endregion */
+
   /* region 按钮点击事件 */
   const saveUsers = () => {
     const idData = allGroupMember.idArray;
@@ -411,7 +434,9 @@ const UserDetails: React.FC<any> = () => {
 
             <Row style={{marginLeft: "-7px", width: "101%", backgroundColor: "#F2F2F2"}}>
               <Col span={2}>
-                <label style={{fontWeight: "bold", marginLeft: "10px"}}> 组内用户</label>
+                {/* <label style={{fontWeight: "bold", marginLeft: "10px"}}> 组内用户</label> */}
+                <Checkbox style={{fontWeight: "bold", marginLeft: "10px"}} onChange={inGroupSelectedAll}
+                          value={inGpSelAll}>组内用户</Checkbox>
               </Col>
               <Col span={22}>
                 <Checkbox.Group onChange={userInGroupSelectChange} value={inGroupUser}>
@@ -424,7 +449,9 @@ const UserDetails: React.FC<any> = () => {
 
             <Row style={{marginTop: "20px", marginLeft: "-7px", width: "101%"}}>
               <Col span={2}>
-                <label style={{fontWeight: "bold", marginLeft: "10px"}}> 组外用户</label>
+                {/* <label style={{fontWeight: "bold", marginLeft: "10px"}}> 组外用户</label> */}
+                <Checkbox style={{fontWeight: "bold", marginLeft: "10px"}} value={outGpSelAll}
+                          onChange={outGroupSelectedAll}>组外用户</Checkbox>
               </Col>
               <Col span={22}>
                 <Checkbox.Group onChange={userOutGroupSelectChange}>

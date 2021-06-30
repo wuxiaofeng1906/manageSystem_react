@@ -250,7 +250,11 @@ const UserDetails: React.FC<any> = () => {
 
   const [inGroupUser, setIngroupUser] = useState(['']);
   const [outGroupUser, setOutGroupUser] = useState(['']);
+  // 已选择的部门人员：用于动态显示checkbox
   const [selectDeptUser, setSelectDeptUser] = useState(['']);
+  // 全选事件
+  const [inGpSelAll, setInGpSelAll] = useState(true);
+  const [outGpSelAll, setOutGpSelAll] = useState(false);
 
   /* region 部门树选择事件 */
   const onSelect = async (selectedKeys: any) => {
@@ -259,7 +263,7 @@ const UserDetails: React.FC<any> = () => {
     const deptMember = await queryGroupAllUsers(gqlClient, keys);
     setSelectDeptUser(deptMember.nameArray);
     setIngroupUser(initSelectedUser);
-
+    setInGpSelAll(true);
   };
 
   /* endregion */
@@ -282,8 +286,6 @@ const UserDetails: React.FC<any> = () => {
 
   /* region全选事件 */
 
-  const [inGpSelAll, setInGpSelAll] = useState(true);
-  const [outGpSelAll, setOutGpSelAll] = useState(false);
 
   // 组内用户
   const inGroupSelectedAll = (params: any) => {

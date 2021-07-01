@@ -360,7 +360,6 @@ const numRenderForSevAndpri = (params: any) => {
 };
 
 const numRenderForSevAndpriForLine = (params: any) => {
-  debugger;
 
   let severity = "";
 
@@ -477,7 +476,18 @@ const numberRenderToZentaoStatusForRed = (params: any) => {
       break;
   }
 
-  if (status === "激活" || status === "未开始") {
+  debugger;
+  if (params.data.category === "1" && status === "激活") {  // bug的激活要标红,其他类型的不标红
+
+    if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+      return `<span style="color: red;text-decoration:line-through"> ${status} </span>`;
+    }
+    return `<span style="color: red"> ${status} </span>`;
+
+  }
+
+  // 所有类型的未开始要标红
+  if (status === "未开始") {
     if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
       return `<span style="color: red;text-decoration:line-through"> ${status} </span>`;
     }

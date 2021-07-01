@@ -75,8 +75,8 @@ const getColums = () => {
       pinned: 'left',
       cellRenderer: numberRenderToCurrentStageForColor,
       minWidth: 120,
-      // tooltipField: "stage"
-    },
+      suppressMenu: false
+     },
     {
       headerName: '测试',
       field: 'tester',

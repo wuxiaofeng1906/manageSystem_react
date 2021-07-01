@@ -75,8 +75,10 @@ const getColums = () => {
       pinned: 'left',
       cellRenderer: numberRenderToCurrentStageForColor,
       minWidth: 120,
-      suppressMenu: false
-     },
+      suppressMenu: false,
+      // filter: "agSetColumnFilter",
+      filterParams: {cellRenderer: numberRenderToCurrentStage}
+    },
     {
       headerName: '测试',
       field: 'tester',

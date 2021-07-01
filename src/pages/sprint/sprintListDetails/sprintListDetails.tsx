@@ -752,15 +752,17 @@ const SprintList: React.FC<any> = () => {
 
     // 点击修改按钮赋值弹出窗
     const adminModify = async (datas: any) => {
+
       // 还要获取英文名
       const teters = datas.tester.split(';');
       const deptUsers = await getDeptMemner(gqlClient, "测试");
       const nameIdArray = getUsersId(deptUsers, teters);
 
       let publishEnv: any = [];
-      if (datas.publishEnv !== null) {
+      if (datas.publishEnv !== null && datas.publishEnv !== "") {
         publishEnv = datas.publishEnv.split(';');
       }
+
       //  解析测试人员
       formForAdminToAddAnaMod.setFieldsValue({
         adminCurStage: numberRenderToCurrentStage({
@@ -1054,7 +1056,7 @@ const SprintList: React.FC<any> = () => {
     // 开发经理（开发）manager 修改
     const managerModify = (datas: any) => {
       let pubEnv = [];
-      if (datas.publishEnv !== null) {
+      if (datas.publishEnv !== null && datas.publishEnv !== "") {
         pubEnv = datas.publishEnv.split(';');
       }
 

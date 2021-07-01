@@ -1164,7 +1164,7 @@ const SprintList: React.FC<any> = () => {
     };
 
     const commitTesterModify = () => {
-
+debugger;
       const oradata = formForTesterToMod.getFieldsValue();
 
       if (oradata.testToTester === '' || oradata.testToTester === null) {

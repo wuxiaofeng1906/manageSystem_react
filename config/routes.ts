@@ -65,6 +65,7 @@ export default [
         name: 'dsahboard',
         path: 'sprintDashboard',
         component: './sprint/sprintDashboard/index',
+        access: 'sysAdmin',
       },
       {
         name: 'details',
@@ -77,7 +78,8 @@ export default [
         path: 'basicTable/bugs/bugAll',
         component: './sprint/basicTable/bugs/bugAll',
         hideInMenu: true,
-      }, {
+      },
+      {
         name: 'bug明细',
         path: 'basicTable/bugs/bugDetails',
         component: './sprint/basicTable/bugs/bugDetails',
@@ -100,7 +102,8 @@ export default [
         path: 'basicTable/tasks/taskAll',
         component: './sprint/basicTable/tasks/taskAll',
         hideInMenu: true,
-      }, {
+      },
+      {
         name: 'task明细',
         path: 'basicTable/tasks/taskDetails',
         component: './sprint/basicTable/tasks/taskDetails',
@@ -109,7 +112,6 @@ export default [
       {
         name: '项目列表',
         path: 'sprintList',
-        // access: 'spAdmin',
         component: './sprint/sprintList/sprintList',
       },
       {
@@ -310,7 +312,7 @@ export default [
     name: '系统管理',
     icon: 'table',
     path: '/authority',
-    access: 'sysAdmin',
+    access: '',
     routes: [
       {
         name: '权限管理',

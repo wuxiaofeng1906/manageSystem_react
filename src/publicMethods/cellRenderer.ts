@@ -246,6 +246,9 @@ const stageChangeToNumber = (params: string) => {
 };
 
 const numberRenderToZentaoType = (params: any,) => {
+  if (!params.value || params.value === '(Select All)') {
+    return params.value;
+  }
   // BUG = 1,
   // TASK = 2,
   // STORY = 3,

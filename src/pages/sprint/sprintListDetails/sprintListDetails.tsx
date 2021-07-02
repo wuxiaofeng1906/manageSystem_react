@@ -95,6 +95,8 @@ const getColums = () => {
       pinned: 'left',
       minWidth: 70,
       suppressMenu: false,
+      filterParams: {cellRenderer: numberRenderToZentaoType}
+
       // tooltipField: "category"
 
     },

@@ -19,7 +19,7 @@ import {
   numberRenderToZentaoStatusForRed,
   stageForLineThrough,
   numRenderForSevAndpriForLine,
-  proposedTestRender
+  proposedTestRender, numberRenderToZentaoType, numberRenderToCurrentStage
 } from '@/publicMethods/cellRenderer';
 
 import {getHeight} from '@/publicMethods/pageSet';
@@ -45,6 +45,8 @@ const getColums = () => {
       pinned: 'left',
       cellRenderer: numberRenderToCurrentStageForColor,
       minWidth: 120,
+      suppressMenu: false,
+      filterParams: {cellRenderer: numberRenderToCurrentStage}
     },
     {
       headerName: '测试',
@@ -62,6 +64,8 @@ const getColums = () => {
       pinned: 'left',
       minWidth: 70,
       suppressMenu: false,
+      filterParams: {cellRenderer: numberRenderToZentaoType}
+
 
     },
     {

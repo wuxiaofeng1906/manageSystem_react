@@ -121,12 +121,12 @@ export default [
     ],
   },
   {
-    name: '研发绩效数据',
+    name: '研发过程数据',
     icon: 'table',
     path: '/kpi',
     access: 'devCenter',
     routes: [{
-      name: '绩效指标',
+      name: '度量指标',
       icon: 'table',
       path: '/kpi/performance',
       routes: [{

@@ -855,7 +855,7 @@ const SprintList: React.FC<any> = () => {
         <Button type="text" style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}
                 icon={<LogoutOutlined/>} size={'large'} onClick={showDefalultValue}>
           默认：</Button>
-        <label style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}> 近2月未关闭的</label>
+        <label style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}> 近2个月未关闭项目</label>
         {/* <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}> 近1月未关闭的 </Button> */}
         <Button type="text"
                 style={{color: 'black', float: 'right', display: judgeAuthority("删除项目") === true ? "inline" : "none"}}

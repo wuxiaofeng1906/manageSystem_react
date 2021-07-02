@@ -312,7 +312,7 @@ export default [
     name: '系统管理',
     icon: 'table',
     path: '/authority',
-    access: '',
+    access: 'sysAdmin',
     routes: [
       {
         name: '权限管理',

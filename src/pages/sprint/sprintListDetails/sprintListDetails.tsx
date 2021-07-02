@@ -1112,7 +1112,7 @@ const SprintList: React.FC<any> = () => {
         id: rowDatas.id,
         project: prjId,
         category: zentaoTypeRenderToNumber(oradata.managerChandaoType),
-        ztNo: oradata.managerCHandaoID,
+        // ztNo: oradata.managerCHandaoID,
         // 以上为必填项
         hotUpdate: oradata.managerHotUpdate,
         dataUpdate: oradata.managerDataUpgrade,
@@ -1164,7 +1164,6 @@ const SprintList: React.FC<any> = () => {
     };
 
     const commitTesterModify = () => {
-debugger;
       const oradata = formForTesterToMod.getFieldsValue();
 
       if (oradata.testToTester === '' || oradata.testToTester === null) {
@@ -1224,6 +1223,7 @@ debugger;
         });
         datas["tester"] = testers;
       }
+
       modCommitDetails(datas);
     };
 
@@ -1270,7 +1270,7 @@ debugger;
         id: rowDatas.id,
         project: prjId,
         category: zentaoTypeRenderToNumber(oradata.uedChandaoType),
-        ztNo: oradata.uedCHandaoID,
+        // ztNo: oradata.uedCHandaoID,
         // 以上为必填字段
 
         uedEnvCheck: oradata.uedForUedVerify,
@@ -1306,7 +1306,7 @@ debugger;
       if (initialState?.currentUser) {
         currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
       }
-      // currentUserGroup = 'testGroup';
+      currentUserGroup = 'UedGroup';
       if (currentUserGroup !== undefined) {
         switch (currentUserGroup.toString()) {
           case 'superGroup':

@@ -444,7 +444,7 @@ const DashBoard: React.FC<any> = () => {
     let hidde = false;
     const datas: any = await queryProjectALL(gqlClient, other.key);
     const em_datas = bugResultDeals(datas);
-
+    debugger;
     if (JSON.stringify(em_datas) === "{}" || datas === null) {
       hidde = true;
     }
@@ -461,8 +461,8 @@ const DashBoard: React.FC<any> = () => {
       all_count_bug: em_datas.all_bug_count === undefined ? 0 : em_datas.all_bug_count,
       noAssign: em_datas.Bug_no_assign,
       noDeadline: em_datas.Bug_no_deadline,
-      prj_error: '',
-      over_area: '',
+      prj_error: em_datas.Bug_proj_error,
+      over_area: em_datas.Bug_over_area,
       actived: em_datas.Bug_actived,
       resolved: em_datas.Bug_resolved,
       vertified: em_datas.Bug_verified,
@@ -813,8 +813,10 @@ const DashBoard: React.FC<any> = () => {
         all_count_bug: em_data.all_bug_count,
         noAssign: em_data.Bug_no_assign,
         noDeadline: em_data.Bug_no_deadline,
-        prj_error: '',
-        over_area: '',
+        prj_error: em_data.Bug_proj_error,
+        over_area: em_data.Bug_over_area,
+        // prj_error: '',
+        // over_area: '',
         actived: em_data.Bug_actived,
         resolved: em_data.Bug_resolved,
         vertified: em_data.Bug_verified,

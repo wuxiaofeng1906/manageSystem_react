@@ -146,6 +146,10 @@ const converseFormatForAgGrid = (oraDatas: any, type: string) => {
 
     const data = oraDatas[index].datas;
     for (let i = 0; i < data.length; i += 1) {
+      if (data[i].deptName === "产品研发部") {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
 
       groupValues.push({
         time: starttime,

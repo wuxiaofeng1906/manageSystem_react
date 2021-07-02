@@ -1528,7 +1528,8 @@ const SprintList: React.FC<any> = () => {
             setIsMoveModalVisible(false);
             updateGrid();
             message.info({
-              content: res.data.message,
+              // content: res.data.message,
+              content: "明细移动成功！",
               duration: 1,
               style: {
                 marginTop: '50vh',

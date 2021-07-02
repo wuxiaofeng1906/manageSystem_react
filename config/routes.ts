@@ -62,7 +62,7 @@ export default [
     path: '/sprint',
     routes: [
       {
-        name: 'dsahboard',
+        name: 'dsahboard（开发中）',
         path: 'sprintDashboard',
         component: './sprint/sprintDashboard/index',
         access: 'sysAdmin',

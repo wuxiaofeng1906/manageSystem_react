@@ -12,14 +12,13 @@ import {history} from 'umi';
 import {
   numberRenderToYesNo,
   numberRenderTopass,
-  numberRenderToCurrentStageForColor,
   numberRenderToZentaoTypeForLine,
   numberRenderToSource,
   linkToZentaoPage,
   numberRenderToZentaoStatusForRed,
   stageForLineThrough,
   numRenderForSevAndpriForLine,
-  proposedTestRender, numberRenderToZentaoType, numberRenderToCurrentStage
+  proposedTestRender, numberRenderToZentaoType
 } from '@/publicMethods/cellRenderer';
 
 import {getHeight} from '@/publicMethods/pageSet';
@@ -39,15 +38,15 @@ const getColums = () => {
         return Number(params.node.id) + 1;
       },
     },
-    {
-      headerName: '阶段',
-      field: 'stage',
-      pinned: 'left',
-      cellRenderer: numberRenderToCurrentStageForColor,
-      minWidth: 120,
-      suppressMenu: false,
-      filterParams: {cellRenderer: numberRenderToCurrentStage}
-    },
+    // {
+    //   headerName: '阶段',
+    //   field: 'stage',
+    //   pinned: 'left',
+    //   cellRenderer: numberRenderToCurrentStageForColor,
+    //   minWidth: 120,
+    //   suppressMenu: false,
+    //   filterParams: {cellRenderer: numberRenderToCurrentStage}
+    // },
     {
       headerName: '测试',
       field: 'tester',

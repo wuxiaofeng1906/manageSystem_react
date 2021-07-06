@@ -124,8 +124,7 @@ const Login: React.FC<{}> = () => {
         username: "users",
         password: userCode
       };
-      await axios
-        .post('/api/auth/login', data)
+      await axios.post('/api/auth/login', data)
         .then(function (res) {
 
           const resultData = res.data;
@@ -159,7 +158,7 @@ const Login: React.FC<{}> = () => {
 
   const handleSubmit = async () => {
 
-    const te = [
+    const testAuth = [
       {
         "id": 5,
         "name": "showpage",
@@ -547,7 +546,7 @@ const Login: React.FC<{}> = () => {
       }];
 
     localStorage.setItem("accessId", 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IuWQtOaZk-WHpCIsInN1YiI6Ild1WGlhb0ZlbmciLCJpYXQiOjE2MjM4MzA2Nzd9.G3EjtMWppClX_E2NN0dFPXgX6OsGSrIXy4ReT_Rs5zI');
-    localStorage.setItem("authority", JSON.stringify(te));
+    localStorage.setItem("authority", JSON.stringify(testAuth));
 
     const userInfos = {
       name: 'testUser',
@@ -594,25 +593,28 @@ const Login: React.FC<{}> = () => {
           <div className={styles.desc} id="container"></div>
 
           {/* 手动登录 */}
-          {/*<ProForm submitter={{*/}
-          {/*  searchConfig: {*/}
-          {/*    submitText: intl.formatMessage({*/}
-          {/*      id: 'pages.login.submit',*/}
-          {/*      defaultMessage: '登录',*/}
-          {/*    }),*/}
-          {/*  },*/}
-          {/*  render: (_, dom) => dom.pop(),*/}
-          {/*  submitButtonProps: {*/}
-          {/*    loading: submitting,*/}
-          {/*    size: 'large',*/}
-          {/*    style: {*/}
-          {/*      width: '100%',*/}
-          {/*    },*/}
-          {/*  },*/}
-          {/*}} onFinish={async () => {*/}
-          {/*  handleSubmit();*/}
-          {/*}}>*/}
-          {/*</ProForm>*/}
+
+          {/*
+          <ProForm submitter={{
+            searchConfig: {
+              submitText: intl.formatMessage({
+                id: 'pages.login.submit',
+                defaultMessage: '登录',
+              }),
+            },
+            render: (_, dom) => dom.pop(),
+            submitButtonProps: {
+              loading: submitting,
+              size: 'large',
+              style: {
+                width: '100%',
+              },
+            },
+          }} onFinish={async () => {
+            handleSubmit();
+          }}>
+          </ProForm>
+      */}
 
         </div>
       </div>

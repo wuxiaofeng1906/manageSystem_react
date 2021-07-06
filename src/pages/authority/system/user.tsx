@@ -344,7 +344,7 @@ const UserDetails: React.FC<any> = () => {
       .then(function (res) {
         if (res.data.ok === true) {
           message.info({
-            content: "人员保存成功！",
+            content: "人员修改成功！",
             duration: 1,
             style: {
               marginTop: '50vh',

@@ -146,7 +146,7 @@ const Authority: React.FC<any> = () => {
             setIsAddModalVisible(false);
             updateGrid();
             message.info({
-              content: res.data.message,
+              content: "新增分组成功！",
               duration: 1,
               style: {
                 marginTop: '50vh',
@@ -205,7 +205,7 @@ const Authority: React.FC<any> = () => {
             setIsAddModalVisible(false);
             updateGrid();
             message.info({
-              content: res.data.message,
+              content: "组名修改成功！",
               duration: 1,
               style: {
                 marginTop: '50vh',
@@ -284,7 +284,7 @@ const Authority: React.FC<any> = () => {
           setIsDelModalVisible(false);
           updateGrid();
           message.info({
-            content: res.data.message,
+            content: "组名删除成功！",
             duration: 1,
             style: {
               marginTop: '50vh',

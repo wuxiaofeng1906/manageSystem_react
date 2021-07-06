@@ -619,14 +619,13 @@ const SprintList: React.FC<any> = () => {
         return;
       }
 
-      axios
-        .get('/api/sprint/project/child', {
-          params: {
-            project: prjId,
-            category: chanDaoType,
-            ztNo: ztno,
-          },
-        })
+      axios.get('/api/sprint/project/child', {
+        params: {
+          project: prjId,
+          category: chanDaoType,
+          ztNo: ztno,
+        },
+      })
         .then(function (res) {
           if (res.data.ok === true) {
             const queryDatas = res.data.ztRecord;
@@ -804,7 +803,6 @@ const SprintList: React.FC<any> = () => {
 
     //  发送请求 新增数据
     const addCommitDetails = (datas: any) => {
-      console.log("datas", datas);
       axios
         .post('/api/sprint/project/child', datas)
         .then(function (res) {
@@ -813,7 +811,7 @@ const SprintList: React.FC<any> = () => {
             setIsAddModalVisible(false);
             updateGrid();
             message.info({
-              content: res.data.message,
+              content: "明细新增成功！",
               duration: 1, // 1S 后自动关闭
               style: {
                 marginTop: '50vh',
@@ -871,7 +869,7 @@ const SprintList: React.FC<any> = () => {
             setformForUEDToModVisible(false);
             updateGrid();
             message.info({
-              content: res.data.message,
+              content: "修改成功！",
               duration: 1, // 1S 后自动关闭
               style: {
                 marginTop: '50vh',
@@ -1679,7 +1677,7 @@ const SprintList: React.FC<any> = () => {
             setIsMoveAddModalVisible(false);
             // updateGrid();
             message.info({
-              content: res.data.message,
+              content: "新增项目成功！",
               duration: 1,
               style: {
                 marginTop: '50vh',
@@ -1783,14 +1781,13 @@ const SprintList: React.FC<any> = () => {
         value: stage,
       };
 
-      axios
-        .patch('/api/sprint/project/child', params)
+      axios.patch('/api/sprint/project/child', params)
         .then(function (res) {
           if (res.data.ok === true) {
             setIsFlowModalVisible(false);
             updateGrid();
             message.info({
-              content: res.data.message,
+              content: "修改成功！",
               duration: 1,
               style: {
                 marginTop: '50vh',
@@ -1798,7 +1795,7 @@ const SprintList: React.FC<any> = () => {
             });
           } else if (Number(res.data.code) === 403) {
             message.error({
-              content: "您修改权限！",
+              content: "您无修改权限！",
               duration: 1,
               style: {
                 marginTop: '50vh',

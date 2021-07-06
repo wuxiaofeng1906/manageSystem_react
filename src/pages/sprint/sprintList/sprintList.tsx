@@ -538,7 +538,6 @@ const SprintList: React.FC<any> = () => {
       creator: currentUser.toString(),
     };
 
-    debugger;
     //  判断是修改还是新增
     if (modal.title === '新增项目') {
       axios

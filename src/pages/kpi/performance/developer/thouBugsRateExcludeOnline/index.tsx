@@ -168,14 +168,16 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     for (let i = 0; i < data.length; i += 1) {
 
       groupValues.push({
-        time: starttime,
-        group: data[i].deptName,
-        values: Number(data[i].kpi).toFixed(2)
-      }, {
-        time: starttime,
-        group: data[i].parent === null ? "" : data[i].parent.deptName,
-        values: data[i].parent === null ? "" : Number(data[i].parent.kpi).toFixed(2)
-      });
+          time: starttime,
+          group: data[i].deptName,
+          values: Number(data[i].kpi).toFixed(2)
+        }
+        // , {
+        //   time: starttime,
+        //   group: data[i].parent === null ? "" : data[i].parent.deptName,
+        //   values: data[i].parent === null ? "" : Number(data[i].parent.kpi).toFixed(2)
+        // }
+      );
 
       moduleValues.push({
         time: starttime,
@@ -189,26 +191,27 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         values: data[i].side === null ? "" : data[i].side.backend
       });
 
+      // 获取产品研发部前后端的数据
+      if (data[i].deptName === "产品研发部") {
+        arrays.push({
+            devCenter: "研发中心",
+            dept: "产品研发部",
+            "username": "前端 ",
+            [starttime]: data[i].side === null ? "" : Number(data[i].side.front).toFixed(2)
+          }, {
+            devCenter: "研发中心",
+            dept: "产品研发部",
+            "username": "后端 ",   // 故意空一格，以便于区分上一个前后端
+            [starttime]: data[i].side === null ? "" : Number(data[i].side.backend).toFixed(2)
+          }
+        );
+      }
+
       const usersData = data[i].users;
       if (usersData !== null) {
         for (let m = 0; m < usersData.length; m += 1) {
           const username = usersData[m].userName;
 
-          // 获取产品研发部前后端的数据
-          if (data[i].deptName === "产品研发部") {
-            arrays.push({
-                devCenter: "研发中心",
-                dept: "产品研发部",
-                "username": "前端 ",
-                [starttime]: data[i].side === null ? "" : Number(data[i].side.front).toFixed(2)
-              }, {
-                devCenter: "研发中心",
-                dept: "产品研发部",
-                "username": "后端 ",   // 故意空一格，以便于区分上一个前后端
-                [starttime]: data[i].side === null ? "" : Number(data[i].side.backend).toFixed(2)
-              }
-            );
-          }
           // 特殊处理宋老师和王润燕的部门和组
           if (username === "王润燕") {
             arrays.push({

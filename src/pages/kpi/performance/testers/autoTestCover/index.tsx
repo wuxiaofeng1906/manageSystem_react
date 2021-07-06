@@ -56,7 +56,7 @@ function codeNumberRender(values: any) {
       if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
         return ` <span style="color: Silver  ">  ${0} </span> `;
       }
-      return ` <span style="font-weight: bold">  ${(Number(datas.values)*100).toFixed(2)} </span> `;
+      return ` <span style="font-weight: bold">  ${(Number(datas.values) * 100).toFixed(2)} </span> `;
     }
   }
 
@@ -72,7 +72,7 @@ function colorRender(params: any) {
 
   if (Number.isNaN(Number(params.value)) === false) {
 
-    return (Number(params.value)*100).toFixed(2);
+    return (Number(params.value) * 100).toFixed(2);
   }
 
   return params.value;  // 为了将聚合函数实现格式化
@@ -152,14 +152,16 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     for (let i = 0; i < data.length; i += 1) {
 
       groupValues.push({
-        time: starttime,
-        group: data[i].deptName,
-        values: data[i].kpi
-      }, {
-        time: starttime,
-        group: data[i].parent === null ? "" : data[i].parent.deptName,
-        values: data[i].parent === null ? "" : data[i].parent.kpi
-      });
+          time: starttime,
+          group: data[i].deptName,
+          values: data[i].kpi
+        }
+        // ,{
+        //   time: starttime,
+        //   group: data[i].parent === null ? "" : data[i].parent.deptName,
+        //   values: data[i].parent === null ? "" : data[i].parent.kpi
+        // }
+      );
 
 
       const usersData = data[i].users;

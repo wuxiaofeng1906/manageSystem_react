@@ -147,14 +147,16 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     for (let i = 0; i < data.length; i += 1) {
 
       groupValues.push({
-        time: starttime,
-        group: data[i].deptName,
-        values: data[i].kpi
-      }, {
-        time: starttime,
-        group: data[i].parent === null ? "" : data[i].parent.deptName,
-        values: data[i].parent === null ? "" : data[i].parent.kpi
-      });
+          time: starttime,
+          group: data[i].deptName,
+          values: data[i].kpi
+        }
+        // , {
+        //   time: starttime,
+        //   group: data[i].parent === null ? "" : data[i].parent.deptName,
+        //   values: data[i].parent === null ? "" : data[i].parent.kpi
+        // }
+      );
 
       const usersData = data[i].users;
       if (usersData !== null) {
@@ -208,7 +210,7 @@ const converseArrayToOne = (data: any) => {
 };
 
 const queryBugResolutionCount = async (client: GqlClient<object>, params: string) => {
-  const condition = getParamsByType(params,true);
+  const condition = getParamsByType(params, true);
   if (condition.typeFlag === 0) {
     return [];
   }

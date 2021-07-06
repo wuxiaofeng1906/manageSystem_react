@@ -129,7 +129,6 @@ const columsForQuarters = () => {
 
 // 转化为ag-grid能被显示的格式
 const converseFormatForAgGrid = (oraDatas: any) => {
-  debugger;
 
   groupValues.length = 0;
   moduleValues.length = 0;
@@ -153,14 +152,16 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     for (let i = 0; i < data.length; i += 1) {
 
       groupValues.push({
-        time: starttime,
-        group: data[i].deptName,
-        values: data[i].kpi
-      }, {
-        time: starttime,
-        group: data[i].parent === null ? "" : data[i].parent.deptName,
-        values: data[i].parent === null ? "" : data[i].parent.kpi
-      });
+          time: starttime,
+          group: data[i].deptName,
+          values: data[i].kpi
+        }
+        // , {
+        //   time: starttime,
+        //   group: data[i].parent === null ? "" : data[i].parent.deptName,
+        //   values: data[i].parent === null ? "" : data[i].parent.kpi
+        // }
+      );
 
 
       const usersData = data[i].users;

@@ -188,11 +188,13 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         time: starttime,
         group: data[i].deptName,
         values: data[i].kpi
-      }, {
-        time: starttime,
-        group: data[i].parent === null ? "" : data[i].parent.deptName,
-        values: data[i].parent === null ? "" : data[i].parent.kpi
-      });
+      }
+        // , {
+        //   time: starttime,
+        //   group: data[i].parent === null ? "" : data[i].parent.deptName,
+        //   values: data[i].parent === null ? "" : data[i].parent.kpi
+        // }
+      );
 
 
       const usersData = data[i].users;

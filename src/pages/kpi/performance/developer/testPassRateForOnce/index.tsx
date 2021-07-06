@@ -189,6 +189,8 @@ const converseFormatForAgGrid = (oraDatas: any) => {
 
   for (let index = 0; index < oraDatas.length; index += 1) {
     const starttime = oraDatas[index].range.start;
+
+    // region 统计研发中心的前后端数据
     arrays.push({
         devCenter: "研发中心",
         "username": "前端",
@@ -208,18 +210,24 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       values: oraDatas[index].total.kpi
     });
 
+    // endregion
+
     const data = oraDatas[index].datas;
     for (let i = 0; i < data.length; i += 1) {
 
+      // region 统计部门的数据
       groupValues.push({
-        time: starttime,
-        group: data[i].deptName,
-        values: data[i].kpi
-      }, {
-        time: starttime,
-        group: data[i].parent === null ? null : data[i].parent.deptName,
-        values: data[i].parent === null ? null : data[i].parent.kpi
-      });
+          time: starttime,
+          group: data[i].deptName,
+          values: data[i].kpi
+        }
+        // , {
+        //     time: starttime,
+        //       group: data[i].parent === null ? null : data[i].parent.deptName,
+        //       values: data[i].parent === null ? null : data[i].parent.kpi
+        //   }
+      );
+
 
       moduleValues.push({
         time: starttime,
@@ -233,26 +241,30 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         values: data[i].side === null ? null : data[i].side.backend
       });
 
+      // endregion
+
+      // 获取产品研发部前后端的数据（暂时不显示）
+      if (data[i].deptName === "产品研发部") {
+        arrays.push({
+            devCenter: "研发中心",
+            dept: "产品研发部",
+            "username": "前端 ",
+            [starttime]: data[i].side === null ? null : data[i].side.front
+          }, {
+            devCenter: "研发中心",
+            dept: "产品研发部",
+            "username": "后端 ",   // 故意空一格，以便于区分上一个前后端
+            [starttime]: data[i].side === null ? null : data[i].side.backend
+          }
+        );
+      }
+
       const usersData = data[i].users;
       if (usersData !== null) {
         for (let m = 0; m < usersData.length; m += 1) {
           const username = usersData[m].userName;
 
-          // 获取产品研发部前后端的数据
-          if (data[i].deptName === "产品研发部") {
-            arrays.push({
-                devCenter: "研发中心",
-                dept: "产品研发部",
-                "username": "前端 ",
-                [starttime]: data[i].side === null ? null : data[i].side.front
-              }, {
-                devCenter: "研发中心",
-                dept: "产品研发部",
-                "username": "后端 ",   // 故意空一格，以便于区分上一个前后端
-                [starttime]: data[i].side === null ? null : data[i].side.backend
-              }
-            );
-          }
+          // region 处理个人信息
           // 特殊处理宋老师和王润燕的部门和组
           if (username === "王润燕") {
             arrays.push({
@@ -287,10 +299,12 @@ const converseFormatForAgGrid = (oraDatas: any) => {
             });
           }
 
+          // endregion
         }
       }
     }
   }
+
 
   return arrays;
 };
@@ -332,10 +346,10 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
   if (condition.typeFlag === 0) {
     return [];
   }
-
+//     kpiCarryTest(kind: "3", ends: ["2021-06-30"]){
   const {data} = await client.query(`
       {
-          kpiCarryTest(kind: "${condition.typeFlag}", ends: ${condition.ends}){
+        kpiCarryTest(kind: "${condition.typeFlag}", ends: ${condition.ends}){
             total {
               dept
               deptName
@@ -373,6 +387,7 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
           }
       }
   `);
+
 
   const datas = converseFormatForAgGrid(data?.kpiCarryTest);
   return converseArrayToOne(datas);

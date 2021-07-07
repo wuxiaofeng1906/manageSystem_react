@@ -9,16 +9,12 @@ import {GqlClient, useGqlClient} from '@/hooks';
 import {PageHeader} from 'antd';
 import {history} from 'umi';
 import {
-  numberRenderToYesNo,
-  numberRenderTopass,
-  numberRenderToZentaoTypeForLine,
-  numberRenderToSource,
   linkToZentaoPage,
   numberRenderToZentaoStatusForRed,
   stageForLineThrough,
   numRenderForSevAndpriForLine,
-  proposedTestRender,
   numberRenderToZentaoType,
+  numberRenderToCurrentStage
 
 } from '@/publicMethods/cellRenderer';
 
@@ -39,10 +35,8 @@ const getColums = () => {
     {
       headerName: '类型',
       field: 'category',
-      cellRenderer: numberRenderToZentaoTypeForLine,
+      cellRenderer: numberRenderToZentaoType,
       minWidth: 70,
-      suppressMenu: false,
-      filterParams: {cellRenderer: numberRenderToZentaoType}
     },
     {
       headerName: '编号',
@@ -57,10 +51,7 @@ const getColums = () => {
     {
       headerName: '阶段',
       field: 'stage',
-      // cellRenderer: numberRenderToCurrentStageForColor,
-      // minWidth: 120,
-      // suppressMenu: false,
-      // filterParams: {cellRenderer: numberRenderToCurrentStage}
+      cellRenderer: numberRenderToCurrentStage
     },
     {
       headerName: '测试',

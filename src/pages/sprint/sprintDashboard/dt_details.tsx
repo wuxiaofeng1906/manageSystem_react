@@ -33,7 +33,7 @@ const getColums = () => {
       },
     },
     {
-      headerName: '类型',
+      headerName: '禅道类型',
       field: 'category',
       cellRenderer: numberRenderToZentaoType,
       minWidth: 70,
@@ -45,16 +45,16 @@ const getColums = () => {
       minWidth: 90,
     },
     {
-      headerName: '项目',
+      headerName: '所属项目',
       field: 'project',
     },
     {
-      headerName: '阶段',
+      headerName: '当前阶段',
       field: 'stage',
       cellRenderer: numberRenderToCurrentStage
     },
     {
-      headerName: '测试',
+      headerName: '相关测试',
       field: 'tester',
       minWidth: 80,
       tooltipField: "tester",
@@ -76,14 +76,14 @@ const getColums = () => {
     },
 
     {
-      headerName: '模块',
+      headerName: '所属模块',
       field: 'moduleName',
       minWidth: 100,
       cellRenderer: stageForLineThrough,
       tooltipField: "moduleName"
     },
     {
-      headerName: '状态',
+      headerName: '当前状态',
       field: 'ztStatus',
       cellRenderer: numberRenderToZentaoStatusForRed,
       minWidth: 80,

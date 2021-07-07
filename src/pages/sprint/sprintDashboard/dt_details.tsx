@@ -207,7 +207,7 @@ const DtDetailsList: React.FC<any> = () => {
 
         <PageHeader
           ghost={false}
-          title={`${paramsInfo.category}${paramsInfo.ztNo}`}
+          title={`${numberRenderToZentaoType({value: paramsInfo.category})} ${paramsInfo.ztNo}`}
           style={{height: "100px"}}
           breadcrumb={{routes}}
         />

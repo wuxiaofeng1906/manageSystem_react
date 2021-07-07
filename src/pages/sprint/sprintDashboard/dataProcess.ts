@@ -145,6 +145,7 @@ const storyBugDeal = (itemArray: any) => {
   // };
 
   const storyBugCount = Object();
+  let bug_count = 0;
   for (let i = 0; i < itemArray.length; i += 1) {
     const count = itemArray[i].value === null ? '' : itemArray[i].value;
 
@@ -167,15 +168,21 @@ const storyBugDeal = (itemArray: any) => {
       // bug状态
       case "bug_actived":
         storyBugCount.Bug_actived = count;
+        bug_count = Number(count) + bug_count;
         break;
       case "bug_resolved":
         storyBugCount.Bug_resolved = count;
+        bug_count = Number(count) + bug_count;
         break;
       case "bug_verified":
         storyBugCount.Bug_verified = count;
+        bug_count = Number(count) + bug_count;
+
         break;
       case "bug_closed":
         storyBugCount.Bug_closed = count;
+        bug_count = Number(count) + bug_count;
+
         break;
 
       // 激活时长
@@ -209,8 +216,8 @@ const storyBugDeal = (itemArray: any) => {
       default:
         break;
     }
-
   }
+  storyBugCount.Bug_details_all = bug_count; // dashboard  左边bug个数
 
   return storyBugCount;
 };
@@ -315,7 +322,10 @@ const taskStatusDeal = (itemArray: any) => {
 const taskBugDeal = (itemArray: any) => {
 
   const taskBugCount = Object();
+  let bug_count = 0;
+
   for (let i = 0; i < itemArray.length; i += 1) {
+
     const count = itemArray[i].value === null ? '' : itemArray[i].value;
     switch (itemArray[i].item) {
       // 规范检查
@@ -336,15 +346,23 @@ const taskBugDeal = (itemArray: any) => {
       // bug状态
       case "bug_actived": // 激活
         taskBugCount.Bug_actived = count;
+        bug_count = Number(count) + bug_count;
+
         break;
       case "bug_resolved": // 已解决
         taskBugCount.Bug_resolved = count;
+        bug_count = Number(count) + bug_count;
+
         break;
       case "bug_verified": // 已验证
         taskBugCount.Bug_verified = count;
+        bug_count = Number(count) + bug_count;
+
         break;
       case "bug_closed": // 已关闭
         taskBugCount.Bug_closed = count;
+        bug_count = Number(count) + bug_count;
+
         break;
 
       // 激活时长
@@ -378,9 +396,8 @@ const taskBugDeal = (itemArray: any) => {
       default:
         break;
     }
-
   }
-
+  taskBugCount.Bug_details_all = bug_count; // dashboard  左边bug个数
   return taskBugCount;
 };
 
@@ -416,7 +433,7 @@ const shBugResultDeals = (countArray: any, allCount: string) => {
   }
 
   for (let i = 0; i < itemArray.length; i += 1) {
-     const count = itemArray[i].value === null ? '' : itemArray[i].value;
+    const count = itemArray[i].value === null ? '' : itemArray[i].value;
     switch (itemArray[i].item) {
       // 规范检查
       case "bug_no_assign": // 无指派

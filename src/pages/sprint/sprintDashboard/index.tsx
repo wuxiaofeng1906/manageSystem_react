@@ -177,6 +177,7 @@ const DashBoard: React.FC<any> = () => {
     story_status_testDone: '',
 
     // bug
+    story_bug_bugAll: '',
     story_bug_noAssign: '',
     story_bug_noDeadline: '',
     story_bug_prj_error: '',
@@ -222,6 +223,7 @@ const DashBoard: React.FC<any> = () => {
     task_status_testDone: '',
 
     // bug
+    task_bug_bugAll: '',
     task_bug_noAssign: '',
     task_bug_noDeadline: '',
     task_bug_prj_error: '',
@@ -296,6 +298,7 @@ const DashBoard: React.FC<any> = () => {
     story_status_testDone: '',
 
     // bug
+    story_bug_bugAll: '',
     story_bug_noAssign: '',
     story_bug_noDeadline: '',
     story_bug_prj_error: '',
@@ -341,6 +344,7 @@ const DashBoard: React.FC<any> = () => {
     task_status_testDone: '',
 
     // bug
+    task_bug_bugAll: '',
     task_bug_noAssign: '',
     task_bug_noDeadline: '',
     task_bug_prj_error: '',
@@ -444,7 +448,7 @@ const DashBoard: React.FC<any> = () => {
     let hidde = false;
     const datas: any = await queryProjectALL(gqlClient, other.key);
     const em_datas = bugResultDeals(datas);
-    debugger;
+
     if (JSON.stringify(em_datas) === "{}" || datas === null) {
       hidde = true;
     }
@@ -538,6 +542,7 @@ const DashBoard: React.FC<any> = () => {
       story_status_testDone: ho_datas.story.status.status_test_done,
 
       // bug
+      story_bug_bugAll: ho_datas.story.bug.Bug_details_all,  // 左侧bug总数
       story_bug_noAssign: ho_datas.story.bug.Bug_no_assign,
       story_bug_noDeadline: ho_datas.story.bug.Bug_no_deadline,
       story_bug_prj_error: ho_datas.story.bug.Bug_proj_error,
@@ -587,6 +592,7 @@ const DashBoard: React.FC<any> = () => {
       task_status_testDone: ho_datas.task.status.status_test_done,
 
       // bug
+      task_bug_bugAll: ho_datas.task.bug.Bug_details_all,  // 左侧bug总数
       task_bug_noAssign: ho_datas.task.bug.Bug_no_assign,
       task_bug_noDeadline: ho_datas.task.bug.Bug_no_deadline,
       task_bug_prj_error: ho_datas.task.bug.Bug_proj_error,
@@ -646,7 +652,6 @@ const DashBoard: React.FC<any> = () => {
   const sprintChanged = async (value: string, other: any) => {
     const datas: any = await queryProjectALL(gqlClient, other.key);
     const sp_datas = sp_hotResultDeals(datas);
-
     setSelectedName({
       ...selectedName,
       sprint: {id: other.key, name: other.value}
@@ -686,6 +691,7 @@ const DashBoard: React.FC<any> = () => {
       story_status_testDone: sp_datas.story.status.status_test_done,
 
       // bug
+      story_bug_bugAll: sp_datas.story.bug.Bug_details_all,  // 左侧bug总数
       story_bug_noAssign: sp_datas.story.bug.Bug_no_assign,
       story_bug_noDeadline: sp_datas.story.bug.Bug_no_deadline,
       story_bug_prj_error: sp_datas.story.bug.Bug_proj_error,
@@ -732,6 +738,7 @@ const DashBoard: React.FC<any> = () => {
       task_status_testDone: sp_datas.task.status.status_test_done,
 
       // bug
+      task_bug_bugAll: sp_datas.task.bug.Bug_details_all,  // 左侧bug总数
       task_bug_noAssign: sp_datas.task.bug.Bug_no_assign,
       task_bug_noDeadline: sp_datas.task.bug.Bug_no_deadline,
       task_bug_prj_error: sp_datas.task.bug.Bug_proj_error,
@@ -878,6 +885,7 @@ const DashBoard: React.FC<any> = () => {
         story_status_testDone: ho_data.story.status.status_test_done,
 
         // bug
+        story_bug_bugAll: ho_data.story.bug.Bug_details_all,  // 左侧bug总数
         story_bug_noAssign: ho_data.story.bug.Bug_no_assign,
         story_bug_noDeadline: ho_data.story.bug.Bug_no_deadline,
         story_bug_prj_error: ho_data.story.bug.Bug_proj_error,
@@ -927,6 +935,7 @@ const DashBoard: React.FC<any> = () => {
         task_status_testDone: ho_data.task.status.status_test_done,
 
         // bug
+        task_bug_bugAll: ho_data.task.bug.Bug_details_all,  // 左侧bug总数
         task_bug_noAssign: ho_data.task.bug.Bug_no_assign,
         task_bug_noDeadline: ho_data.task.bug.Bug_no_deadline,
         task_bug_prj_error: ho_data.task.bug.Bug_proj_error,
@@ -1010,6 +1019,7 @@ const DashBoard: React.FC<any> = () => {
         story_status_testDone: sp_data.story.status.status_test_done,
 
         // bug
+        story_bug_bugAll: sp_data.story.bug.Bug_details_all,  // 左侧bug总数
         story_bug_noAssign: sp_data.story.bug.Bug_no_assign,
         story_bug_noDeadline: sp_data.story.bug.Bug_no_deadline,
         story_bug_prj_error: sp_data.story.bug.Bug_proj_error,
@@ -1059,6 +1069,8 @@ const DashBoard: React.FC<any> = () => {
         task_status_testDone: sp_data.task.status.status_test_done,
 
         // bug
+        task_bug_bugAll: sp_data.task.bug.Bug_details_all,  // 左侧bug总数
+
         task_bug_noAssign: sp_data.task.bug.Bug_no_assign,
         task_bug_noDeadline: sp_data.task.bug.Bug_no_deadline,
         task_bug_prj_error: sp_data.task.bug.Bug_proj_error,
@@ -1682,7 +1694,7 @@ const DashBoard: React.FC<any> = () => {
                         <button
                           style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug
                           <Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}> 0</Link> 个
+                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}> {hotfix.task_bug_bugAll}</Link> 个
                         </button>
                       </div>
                     </Col>
@@ -2120,7 +2132,7 @@ const DashBoard: React.FC<any> = () => {
                         <button
                           style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug
                           <Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}> 0</Link> 个
+                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}> {hotfix.story_bug_bugAll}</Link> 个
                         </button>
                       </div>
                     </Col>
@@ -2837,7 +2849,7 @@ const DashBoard: React.FC<any> = () => {
                         <button
                           style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug
                           <Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}> 0</Link> 个
+                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}> {sprint.story_bug_bugAll}</Link> 个
                         </button>
                       </div>
                     </Col>
@@ -3277,7 +3289,7 @@ const DashBoard: React.FC<any> = () => {
                         <button
                           style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug
                           <Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}> 0</Link> 个
+                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}>  {sprint.task_bug_bugAll}</Link> 个
                         </button>
                       </div>
                     </Col>

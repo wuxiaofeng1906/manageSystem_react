@@ -74,6 +74,12 @@ export default [
         hideInMenu: true,
       },
       {
+        name: 'dt_details',
+        path: 'dt_details',
+        component: './sprint/sprintDashboard/dt_details',
+        hideInMenu: true,
+      },
+      {
         name: 'bug',
         path: 'basicTable/bugs/bugAll',
         component: './sprint/basicTable/bugs/bugAll',

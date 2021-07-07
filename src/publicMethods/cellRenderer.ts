@@ -134,6 +134,14 @@ const stageForLineThrough = (params: any) => {
 
 };
 
+const relatedNumberRender = (params: any) => {
+  if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+    return `<a target="_blank" style="color:blue;text-decoration: line-through">${Number(params.value)}</a>`;
+  }
+  return `<a target="_blank" style="color:blue;text-decoration: underline">${Number(params.value)}</a>`;
+
+};
+
 
 const numberRenderToCurrentStageForColor = (params: any) => {
   let stage = "";
@@ -393,6 +401,10 @@ const numRenderForSevAndpriForLine = (params: any) => {
 
   const pri = params.data.priority === null ? "" : params.data.priority;
 
+  if (pri === "" && severity === "") {
+    return "";
+  }
+
   if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
     return `<span style="text-decoration:line-through">  ${severity}${pri}级 </span>`;
   }
@@ -626,6 +638,7 @@ export {
   stageForLineThrough,
   numRenderForSevAndpri,
   zentaoTypeRenderToNumber,
-  proposedTestRender
+  proposedTestRender,
+  relatedNumberRender
 };
 

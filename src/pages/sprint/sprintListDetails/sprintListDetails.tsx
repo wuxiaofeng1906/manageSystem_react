@@ -512,6 +512,7 @@ const SprintList: React.FC<any> = () => {
 
     };
 
+    // 获取UED和所有人员，生成下拉框
     const LoadCombobox = (params: any) => {
       const deptMan = [];
       let deptMember = "";
@@ -552,6 +553,26 @@ const SprintList: React.FC<any> = () => {
       }
 
       const {data: {WxDeptUsers = []} = {}} = useQuery(deptMember);
+
+      for (let index = 0; index < WxDeptUsers.length; index += 1) {
+        deptMan.push(
+          <Option value={WxDeptUsers[index].id}> {WxDeptUsers[index].userName}</Option>,
+        );
+      }
+      return deptMan;
+
+    };
+
+    const LoadTesterCombobox = () => {
+      const deptMan = [<Option value="NA">NA</Option>];
+      const {data: {WxDeptUsers = []} = {}} = useQuery(`
+          {
+            WxDeptUsers(deptNames:["测试","业务"], techs:[TEST]){
+                id
+                userName
+              }
+          }
+      `);
 
       for (let index = 0; index < WxDeptUsers.length; index += 1) {
         deptMan.push(
@@ -758,6 +779,7 @@ const SprintList: React.FC<any> = () => {
       const teters = datas.tester.split(';');
       const deptUsers = await getDeptMemner(gqlClient, "测试");
       const nameIdArray = getUsersId(deptUsers, teters);
+
 
       let publishEnv: any = [];
       if (datas.publishEnv !== null && datas.publishEnv !== "") {
@@ -1138,6 +1160,7 @@ const SprintList: React.FC<any> = () => {
     /* region 测试 权限操作 */
     // 测试 修改
     const testerModify = async (datas: any) => {
+
       // 获取英文名
       const teters = datas.tester.split(';');
       const deptUsers = await getDeptMemner(gqlClient, "测试");
@@ -1194,7 +1217,7 @@ const SprintList: React.FC<any> = () => {
         id: curRow[0].id,
         project: prjId,
         category: zentaoTypeRenderToNumber(oradata.testerChandaoType),
-        ztNo: oradata.testerCHandaoID,
+        // ztNo: oradata.testerCHandaoID,
         // 以上为必填字段
         proposedTest: oradata.testerProTested === "" ? null : oradata.testerProTested,
         stage: Number(oradata.testerStage).toString() === "NaN" ? stageChangeToNumber(oradata.testerStage) : Number(oradata.testerStage),
@@ -1306,7 +1329,7 @@ const SprintList: React.FC<any> = () => {
       if (initialState?.currentUser) {
         currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
       }
-      // currentUserGroup = 'UedGroup';
+      currentUserGroup = 'testGroup';
       if (currentUserGroup !== undefined) {
         switch (currentUserGroup.toString()) {
           case 'superGroup':
@@ -2083,7 +2106,7 @@ const SprintList: React.FC<any> = () => {
                       placeholder="请输入"
                       optionFilterProp="children"
                     >
-                      {LoadCombobox('测试')}
+                      {LoadTesterCombobox()}
                     </Select>
                   </Form.Item>
                 </div>
@@ -2627,7 +2650,7 @@ const SprintList: React.FC<any> = () => {
                             style={widths}
                             mode="tags"
                             optionFilterProp="children">
-                      {LoadCombobox('测试')}
+                      {LoadTesterCombobox()}
                     </Select>
                   </Form.Item>
                 </div>

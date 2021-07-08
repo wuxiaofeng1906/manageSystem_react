@@ -288,8 +288,46 @@ const addNewAttributes = (source: any, category: string) => {
 
   return result;
 };
+const addNewAttributesForBugs = (source: any, category: string) => {
+  const result = [];
+  if (source !== null) {
+    for (let index = 0; index < source.length; index += 1) {
+      const details = source[index];
+      details["category"] = category;
+      result.push(details);
+    }
+  }
+  debugger;
+  return result;
+};
+
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
+  if (params.bugQuery === true) {
+    // 如果是bug总数的明细查询
+    const {data} = await client.query(`
+      {
+         relatedBugs(category:"${params.prjKind}",projectId:${params.prjId},needQuery:${params.needQuery}) {
+          id
+          project
+          stage
+          tester
+          ztNo
+          title
+          severity
+          priority
+          moduleName
+          ztStatus
+          assignedTo
+          finishedBy
+          feedback
+        }
+      }
+  `);
+    return addNewAttributesForBugs(data?.relatedBugs, params.prjKind);
+
+  }
+
   const {data} = await client.query(`
       {
        dashSingleItem(project:${params.prjId},kindName:"${params.prjKind}",itemName:"${params.itemName}") {
@@ -319,32 +357,44 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
       }
       }
   `);
-
   return addNewAttributes(data?.dashSingleItem, params.itemKind);
-  // const datas = data?.dashSingleItem;
-  // return datas[0].data;
+
+
 };
 
 // 组件初始化
 const DetailsList: React.FC<any> = () => {
 
-    /* 获取网页的项目id */
+    /* 详细item相关参数 */
     const projectInfo = {
       prjId: -1,
       prjNames: "",
       prjKind: "",
       itemName: "",
-      itemKind: ""
+      itemKind: "",
+      needQuery: false,    // bug 个数明细查询使用
+      bugQuery: false
     };
 
     const location = history.location.query;
+
     if (location !== undefined && location.projectid !== null) {
       projectInfo.prjId = Number(location.projectid);
       projectInfo.prjNames = location.project === null ? '' : location.project.toString();
       projectInfo.prjKind = location.kind === null ? '' : location.kind.toString();
-      const item = location.item === null ? '' : location.item.toString().split("|");
-      projectInfo.itemKind = item[0].toString();
-      projectInfo.itemName = item[1].toString();
+
+      if (location.count) {  // 如果count有值，那么就属于bug总数明细查询
+        if (Number(location.count) > 0) {
+          projectInfo.needQuery = true;
+        }
+        projectInfo.bugQuery = true;
+
+      } else {// 如果count没有值，那么就属于item 明细查询
+        const item = location.item === null ? '' : location.item.toString().split("|");
+        projectInfo.itemKind = item[0].toString();
+        projectInfo.itemName = item[1].toString();
+
+      }
     }
 
     const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件

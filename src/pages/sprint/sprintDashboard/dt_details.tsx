@@ -168,6 +168,7 @@ const DtDetailsList: React.FC<any> = () => {
       needQuery: false,
     };
 
+    debugger;
     const location = history.location.query;
     if (location) {
       paramsInfo.category = location.kind;

@@ -1694,7 +1694,7 @@ const DashBoard: React.FC<any> = () => {
                         <button
                           style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug
                           <Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}> {hotfix.task_bug_bugAll}</Link> 个
+                            to={`/sprint/details?${hotfix_url}&kind=3&count=${hotfix.task_bug_bugAll}`}> {hotfix.task_bug_bugAll}</Link> 个
                         </button>
                       </div>
                     </Col>
@@ -2132,7 +2132,7 @@ const DashBoard: React.FC<any> = () => {
                         <button
                           style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug
                           <Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}> {hotfix.story_bug_bugAll}</Link> 个
+                            to={`/sprint/details?${hotfix_url}&kind=2&count=${hotfix.story_bug_bugAll}`}> {hotfix.story_bug_bugAll}</Link> 个
                         </button>
                       </div>
                     </Col>
@@ -2849,7 +2849,7 @@ const DashBoard: React.FC<any> = () => {
                         <button
                           style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug
                           <Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}> {sprint.story_bug_bugAll}</Link> 个
+                            to={`/sprint/details?${sprint_url}&kind=3&count=${sprint.story_bug_bugAll}`}> {sprint.story_bug_bugAll}</Link> 个
                         </button>
                       </div>
                     </Col>
@@ -3289,7 +3289,7 @@ const DashBoard: React.FC<any> = () => {
                         <button
                           style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug
                           <Link
-                            to={`/sprint/basicTable/bugs/bugDetails?${hotfix_url}&item=bug_no_assign`}>  {sprint.task_bug_bugAll}</Link> 个
+                            to={`/sprint/details?${sprint_url}&kind=2&count=${sprint.task_bug_bugAll}`}>  {sprint.task_bug_bugAll}</Link> 个
                         </button>
                       </div>
                     </Col>

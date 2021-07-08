@@ -135,10 +135,15 @@ const stageForLineThrough = (params: any) => {
 };
 
 const relatedNumberRender = (params: any) => {
-  if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
-    return `<a target="_blank" style="color:blue;text-decoration: line-through">${Number(params.value)}</a>`;
+
+  let count = 0;
+  if (params.value) {
+    count = Number(params.value);
   }
-  return `<a target="_blank" style="color:blue;text-decoration: underline">${Number(params.value)}</a>`;
+  if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+    return `<a target="_blank" style="color:blue;text-decoration: line-through">${count}</a>`;
+  }
+  return `<a target="_blank" style="color:blue;text-decoration: underline">${count}</a>`;
 
 };
 

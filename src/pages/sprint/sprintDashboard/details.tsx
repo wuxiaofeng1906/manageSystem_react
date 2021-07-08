@@ -288,16 +288,15 @@ const addNewAttributes = (source: any, category: string) => {
 
   return result;
 };
-const addNewAttributesForBugs = (source: any, category: string) => {
+const addNewAttributesForBugs = (source: any) => {
   const result = [];
   if (source !== null) {
     for (let index = 0; index < source.length; index += 1) {
       const details = source[index];
-      details["category"] = category;
+      details["category"] = "1";
       result.push(details);
     }
   }
-  debugger;
   return result;
 };
 
@@ -324,10 +323,11 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
         }
       }
   `);
-    return addNewAttributesForBugs(data?.relatedBugs, params.prjKind);
+    return addNewAttributesForBugs(data?.relatedBugs);
 
   }
 
+  // 如果是其他的明细查询
   const {data} = await client.query(`
       {
        dashSingleItem(project:${params.prjId},kindName:"${params.prjKind}",itemName:"${params.itemName}") {
@@ -358,7 +358,6 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
       }
   `);
   return addNewAttributes(data?.dashSingleItem, params.itemKind);
-
 
 };
 

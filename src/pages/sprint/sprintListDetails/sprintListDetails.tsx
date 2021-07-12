@@ -829,6 +829,9 @@ const SprintList: React.FC<any> = () => {
         .post('/api/sprint/project/child', datas)
         .then(function (res) {
 
+          debugger;
+
+
           if (res.data.ok === true) {
             setIsAddModalVisible(false);
             updateGrid();
@@ -843,6 +846,14 @@ const SprintList: React.FC<any> = () => {
             message.error({
               content: "您无权新增明细！",
               duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          } else if (Number(res.data.code) === 409) {
+            message.error({
+              content: `【${prjNames}】已存在ID为${datas.ztNo}的${numberRenderToZentaoType({value: datas.category})}`,
+              duration: 1, // 1S 后自动关闭
               style: {
                 marginTop: '50vh',
               },

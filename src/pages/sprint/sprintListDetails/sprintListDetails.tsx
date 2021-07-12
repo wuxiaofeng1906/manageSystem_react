@@ -478,7 +478,7 @@ const SprintList: React.FC<any> = () => {
     // 移动新增项目
     const [formForMoveAddAnaMod] = Form.useForm();
     const [pageTitle, setPageTitle] = useState("");
-
+    const [isSelectType, setIsSelectType] = useState(false);
     /* endregion */
 
     /* region  表格相关事件 */
@@ -738,10 +738,17 @@ const SprintList: React.FC<any> = () => {
 
     // 点击新增按钮赋值弹出窗
     const addProject = () => {
+      let zenType = "";
+      if (initialState?.currentUser && initialState.currentUser.group === 'testGroup') {
+        zenType = '1';
+        setIsSelectType(true);
+      }
+
+
       formForAdminToAddAnaMod.setFieldsValue({
         adminCurStage: '',
         adminAddTester: undefined,
-        adminChandaoType: '',
+        adminChandaoType: zenType,
         adminChandaoId: '',
         adminAddChandaoTitle: '',
         adminAddSeverity: '',
@@ -2122,7 +2129,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminChandaoType" label="禅道类型：" rules={[{required: true}]}>
-                    <Select placeholder="请选择" style={{width: '180px', color: 'black'}}>
+                    <Select placeholder="请选择" disabled={isSelectType} style={{width: '180px', color: 'black'}}>
                       {[
                         <Option value={'1'}> Bug </Option>,
                         <Option value={'3'}> 需求 </Option>,

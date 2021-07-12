@@ -107,7 +107,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu}) => {
     <HeaderDropdown overlay={menuHeaderDropdown}>
       <span className={`${styles.action} ${styles.account}`}>
         <Avatar size="small" className={styles.avatar} src={currentUser.avatar} alt="avatar"/>
-        <span className={`${styles.name} anticon`}>{currentUser.name}</span> {/* 可以修改登录名显示 */}
+        <span className={`${styles.name} anticon`}>{currentUser.name} ({currentUser.group})</span> {/* 可以修改登录名显示 */}
       </span>
     </HeaderDropdown>
   );

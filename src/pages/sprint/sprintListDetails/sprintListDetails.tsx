@@ -829,9 +829,6 @@ const SprintList: React.FC<any> = () => {
         .post('/api/sprint/project/child', datas)
         .then(function (res) {
 
-          debugger;
-
-
           if (res.data.ok === true) {
             setIsAddModalVisible(false);
             updateGrid();

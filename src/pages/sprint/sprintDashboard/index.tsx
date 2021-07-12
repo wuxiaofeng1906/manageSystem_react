@@ -1183,7 +1183,7 @@ const DashBoard: React.FC<any> = () => {
                         icon={<SearchOutlined/>}
                         size={'large'}
                         onClick={() => {
-                          history.push(`/sprint/sprintListDetails?projectid=${selectedName.emergency.id}&project=${selectedName.emergency.name}`);
+                          history.push(`/sprint/details?${emergency_url}&overArea=true`);
                         }}> 超范围清单 </Button>
 
               </div>
@@ -1427,7 +1427,8 @@ const DashBoard: React.FC<any> = () => {
                         icon={<SearchOutlined/>}
                         size={'large'}
                         onClick={() => {
-                          history.push(`/sprint/sprintListDetails?projectid=${selectedName.hotfix.id}&project=${selectedName.hotfix.name}`);
+                          history.push(`/sprint/details?${hotfix_url}&overArea=true`);
+                          // history.push(`/sprint/sprintListDetails?projectid=${selectedName.hotfix.id}&project=${selectedName.hotfix.name}`);
                         }}>超范围清单</Button>
 
               </div>
@@ -2581,7 +2582,8 @@ const DashBoard: React.FC<any> = () => {
                         icon={<SearchOutlined/>}
                         size={'large'}
                         onClick={() => {
-                          history.push(`/sprint/sprintListDetails?projectid=${selectedName.sprint.id}&project=${selectedName.sprint.name}`);
+                          history.push(`/sprint/details?${sprint_url}&overArea=true`);
+                          // history.push(`/sprint/sprintListDetails?projectid=${selectedName.sprint.id}&project=${selectedName.sprint.name}`);
                         }}>超范围清单</Button>
 
 

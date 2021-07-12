@@ -302,6 +302,8 @@ const addNewAttributesForBugs = (source: any) => {
 
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
+
+  // 查询bug 总数明细
   if (params.bugQuery === true) {
     // 如果是bug总数的明细查询
     const {data} = await client.query(`
@@ -324,7 +326,31 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
       }
   `);
     return addNewAttributesForBugs(data?.relatedBugs);
+  }
 
+  // 查询超范围清单
+  if (params.overArea === true) {
+    const {data} = await client.query(`
+      {
+        overAreaList (projectId:${params.prjId}) {
+            id
+            category
+            project
+            stage
+            tester
+            ztNo
+            title
+            severity
+            priority
+            moduleName
+            ztStatus
+            assignedTo
+            finishedBy
+            feedback
+        }
+      }
+  `);
+    return data?.overAreaList;
   }
 
   // 如果是其他的明细查询
@@ -359,10 +385,12 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   `);
   return addNewAttributes(data?.dashSingleItem, params.itemKind);
 
+
 };
 
 // 组件初始化
 const DetailsList: React.FC<any> = () => {
+    let title = "明细";
 
     /* 详细item相关参数 */
     const projectInfo = {
@@ -372,7 +400,8 @@ const DetailsList: React.FC<any> = () => {
       itemName: "",
       itemKind: "",
       needQuery: false,    // bug 个数明细查询使用
-      bugQuery: false
+      bugQuery: false,
+      overArea: false
     };
 
     const location = history.location.query;
@@ -380,15 +409,21 @@ const DetailsList: React.FC<any> = () => {
     if (location !== undefined && location.projectid !== null) {
       projectInfo.prjId = Number(location.projectid);
       projectInfo.prjNames = location.project === null ? '' : location.project.toString();
-      projectInfo.prjKind = location.kind === null ? '' : location.kind.toString();
 
       if (location.count) {  // 如果count有值，那么就属于bug总数明细查询
+        projectInfo.prjKind = location.kind === null ? '' : location.kind.toString();
         if (Number(location.count) > 0) {
           projectInfo.needQuery = true;
         }
         projectInfo.bugQuery = true;
+        title = "bug总数";
 
+      } else if (location.overArea) {  // 如果overArea 属性，则查询超范围清单
+
+        projectInfo.overArea = true;
+        title = "超范围清单";
       } else {// 如果count没有值，那么就属于item 明细查询
+        projectInfo.prjKind = location.kind === null ? '' : location.kind.toString();
         const item = location.item === null ? '' : location.item.toString().split("|");
         projectInfo.itemKind = item[0].toString();
         projectInfo.itemName = item[1].toString();
@@ -475,7 +510,7 @@ const DetailsList: React.FC<any> = () => {
         breadcrumbName: 'sprint 工作台',
       }, {
         path: '',
-        breadcrumbName: '内容详情',
+        breadcrumbName: `内容详情（${title}）`,
       }];
 
 

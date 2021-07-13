@@ -20,7 +20,8 @@ import {
   numRenderForSevAndpriForLine,
   proposedTestRender,
   numberRenderToZentaoType,
-  relatedNumberRender
+  relatedNumberRender,
+  timestampChanges
 
 } from '@/publicMethods/cellRenderer';
 
@@ -87,7 +88,7 @@ const getColums = () => {
     {
       headerName: '截止日期',
       field: 'deadline',
-      cellRenderer: stageForLineThrough,
+      cellRenderer: timestampChanges,
     },
     {
       headerName: '严重等级',
@@ -357,8 +358,7 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
         }
       }
   `);
-    debugger;
-    return data?.overAreaList;
+     return data?.overAreaList;
   }
 
   // 如果是其他的明细查询
@@ -443,6 +443,7 @@ const DetailsList: React.FC<any> = () => {
     const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
     const gqlClient = useGqlClient();
     const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, projectInfo));
+
 
     const onGridReady = (params: GridReadyEvent) => {
       gridApi.current = params.api;

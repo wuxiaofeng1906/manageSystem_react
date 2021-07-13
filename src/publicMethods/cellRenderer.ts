@@ -1,3 +1,5 @@
+import * as dayjs from 'dayjs';
+
 const numberRenderToYesNo = (params: any) => {
   if (params.value === null || params.value === undefined) {
     return "";
@@ -132,6 +134,70 @@ const stageForLineThrough = (params: any) => {
   }
   return params.value;
 
+};
+
+const timestampChanges = (params: any) => {
+
+  let times;
+  debugger;
+  if (params.value) {
+    times = dayjs(Number(params.value)).format("YYYY-MM-DD");
+    const diffDay = dayjs('2021-07-12').diff(dayjs(), 'day');
+    // 没延期
+    if (diffDay >= 0) {
+      if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+        return `<a target="_blank" style="color:blue;text-decoration: line-through">${times}</a>`;
+      }
+      return times;
+    }
+
+
+    // 延期了
+    // 判断有没有超时，有超时则判断
+    // BUG = 1,
+    // TASK = 2,
+    // STORY = 3,
+
+    // 如果是bug，状态为 激活 的标红
+    if (params.data.category === "1") {
+      if (params.data.ztStatus === "active") {
+        if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+          return `<a target="_blank" style="color:red;text-decoration: line-through">${times}</a>`;
+        }
+        return `<a target="_blank" style="color:red;">${times}</a>`;
+
+      }
+
+      if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+        return `<a target="_blank" style="color:black;text-decoration: line-through">${times}</a>`;
+      }
+      return times;
+    }
+
+    // 如果是task，状态为 未开始 或 进行中   的标红
+    if (params.data.category === "2") {
+      if (params.data.ztStatus === "wait" || params.data.ztStatus === "doing") {
+        if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+          return `<a target="_blank" style="color:red;text-decoration: line-through">${times}</a>`;
+        }
+        return `<a target="_blank" style="color:red;">${times}</a>`;
+
+      }
+
+      if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+        return `<a target="_blank" style="color:black;text-decoration: line-through">${times}</a>`;
+      }
+      return times;
+    }
+
+    // 如果是story，则，需求下任务延期了就延期（暂定不做）
+    // if (params.data.category === "3") {
+    //
+    // }
+
+  }
+
+  return "";
 };
 
 const relatedNumberRender = (params: any) => {
@@ -644,6 +710,7 @@ export {
   numRenderForSevAndpri,
   zentaoTypeRenderToNumber,
   proposedTestRender,
-  relatedNumberRender
+  relatedNumberRender,
+  timestampChanges
 };
 

@@ -14,7 +14,7 @@ import {
   stageForLineThrough,
   numRenderForSevAndpriForLine,
   numberRenderToZentaoType,
-  numberRenderToCurrentStage
+  numberRenderToCurrentStage, timestampChanges
 
 } from '@/publicMethods/cellRenderer';
 
@@ -116,7 +116,7 @@ const getColums = () => {
     {
       headerName: '截止日期',
       field: 'deadline',
-      cellRenderer: stageForLineThrough,
+      cellRenderer: timestampChanges,
     },
   ];
 

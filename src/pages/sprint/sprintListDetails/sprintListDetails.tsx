@@ -35,7 +35,7 @@ import {
   numberRenderToZentaoStatusForRed,
   stageForLineThrough,
   numRenderForSevAndpriForLine,
-  proposedTestRender
+  proposedTestRender, relatedNumberRender
 } from '@/publicMethods/cellRenderer';
 import {getUsersId} from '@/publicMethods/userMethod';
 
@@ -93,7 +93,7 @@ const getColums = () => {
       field: 'category',
       cellRenderer: numberRenderToZentaoTypeForLine,
       pinned: 'left',
-      minWidth: 70,
+      minWidth: 80,
       suppressMenu: false,
       filterParams: {cellRenderer: numberRenderToZentaoType}
 
@@ -194,14 +194,23 @@ const getColums = () => {
       headerName: '相关需求',
       field: 'relatedStories',
       minWidth: 80,
-      cellRenderer: stageForLineThrough,
+      cellRenderer: relatedNumberRender,
+      onCellClicked: (params: any) => {
+        // BUG = 1,
+        // TASK = 2,
+        // STORY = 3,
+        history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=3&count=${params.value}`);
+      },
       // tooltipField: "relatedStories"
     },
     {
       headerName: '相关任务',
       field: 'relatedTasks',
       minWidth: 80,
-      cellRenderer: stageForLineThrough,
+      cellRenderer: relatedNumberRender,
+      onCellClicked: (params: any) => {
+        history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=2&count=${params.value}`);
+      },
       // tooltipField: "relatedTasks"
 
     },
@@ -209,7 +218,10 @@ const getColums = () => {
       headerName: '相关bug',
       field: 'relatedBugs',
       minWidth: 80,
-      cellRenderer: stageForLineThrough,
+      cellRenderer: relatedNumberRender,
+      onCellClicked: (params: any) => {
+        history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=1&count=${params.value}`);
+      },
       // tooltipField: "relatedBugs"
 
     },

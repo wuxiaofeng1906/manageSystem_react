@@ -123,11 +123,11 @@ const getColums = () => {
       minWidth: 90,
       // tooltipField: "severity"
     },
-    {
-      headerName: '截止日期',
-      field: 'deadline',
-      cellRenderer: stageForLineThrough,
-    },
+    // {
+    //   headerName: '截止日期',
+    //   field: 'deadline',
+    //   cellRenderer: stageForLineThrough,
+    // },
     // {
     //   headerName: '优先级',
     //   field: 'priority',
@@ -1921,7 +1921,7 @@ const SprintList: React.FC<any> = () => {
     const [isFieldModalVisible, setFieldModalVisible] = useState(false);
     const [selectedFiled, setSelectedFiled] = useState(['']);
     const nessField = ['选择', '类型', '编号'];
-    const unNessField = ['阶段', '测试', '标题内容', '严重等级', '截止日期', '模块', '状态', '已提测', '发布环境',
+    const unNessField = ['阶段', '测试', '标题内容', '严重等级', '模块', '状态', '已提测', '发布环境',
       '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', '是否可热更', '是否有数据升级',
       '是否有接口升级', '是否有预置数据', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人'];
 
@@ -3130,9 +3130,9 @@ const SprintList: React.FC<any> = () => {
                   <Col span={4}>
                     <Checkbox value="严重等级">严重等级</Checkbox>
                   </Col>
-                  <Col span={4}>
-                    <Checkbox value="截止日期">截止日期</Checkbox>
-                  </Col>
+                  {/*<Col span={4}>*/}
+                  {/*  <Checkbox value="截止日期">截止日期</Checkbox>*/}
+                  {/*</Col>*/}
 
                   <Col span={4}>
                     <Checkbox value="模块">模块</Checkbox>

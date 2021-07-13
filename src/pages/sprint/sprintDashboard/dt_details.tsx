@@ -117,6 +117,7 @@ const getColums = () => {
       headerName: '截止日期',
       field: 'deadline',
       cellRenderer: timestampChanges,
+      minWidth: 120,
     },
   ];
 

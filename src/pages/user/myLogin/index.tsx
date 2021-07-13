@@ -68,6 +68,7 @@ const Login: React.FC<{}> = () => {
     console.log("登录后的token", userInfos.access_token);
     localStorage.setItem("accessId", userInfos.access_token); // 正式环境应放开
     localStorage.setItem("authority", JSON.stringify(userInfos.authorities));
+    console.log("myauth",JSON.stringify(userInfos.authorities));
 
     // 权限分组：
     // 系统管理员：拥有所有权限。

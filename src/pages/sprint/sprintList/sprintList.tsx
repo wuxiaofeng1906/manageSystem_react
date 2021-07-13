@@ -834,7 +834,7 @@ const SprintList: React.FC<any> = () => {
           <Select
             placeholder="请选择"
             mode="multiple"
-            style={{width: '18%'}}
+            style={{width: '20%'}}
             onChange={prjStatusChanged}
             value={choicedCondition.projectStatus}
 

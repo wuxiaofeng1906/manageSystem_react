@@ -414,37 +414,8 @@ const SprintList: React.FC<any> = () => {
   /* endregion */
 
   /* region 修改功能  */
-  // 修改项目
-  const modifyProject = () => {
-    const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
-    // 没有选中则提醒
-    if (selRows.length === 0) {
-      message.error({
-        content: '请选中需要修改的数据!',
-        duration: 1,
-        className: 'modifyNone',
-        style: {
-          marginTop: '50vh',
-        },
-      });
-      return;
-    }
 
-    // 一次只能修改一条数据
-    if (selRows.length > 1) {
-      message.error({
-        content: '一次只能修改一条数据!',
-        duration: 1,
-        className: 'modifyMore',
-        style: {
-          marginTop: '50vh',
-        },
-      });
-      return;
-    }
-
-    const detailsInfo = selRows[0];
-    console.log('detailsInfo', detailsInfo);
+  const showEditForm = (detailsInfo: any) => {
     const prjNames = detailsInfo.name.toString();
     orgPrjname = prjNames;
     let projectType = '';
@@ -474,7 +445,45 @@ const SprintList: React.FC<any> = () => {
     setmodal({title: '修改项目'});
     setIsAddModalVisible(true);
     setisAble({shown: false});
+  };
 
+
+  // 修改项目
+  const modifyProject = () => {
+
+    const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+    // 没有选中则提醒
+    if (selRows.length === 0) {
+      message.error({
+        content: '请选中需要修改的数据!',
+        duration: 1,
+        className: 'modifyNone',
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+    // 一次只能修改一条数据
+    if (selRows.length > 1) {
+      message.error({
+        content: '一次只能修改一条数据!',
+        duration: 1,
+        className: 'modifyMore',
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+
+    showEditForm(JSON.parse(JSON.stringify(selRows[0])));
+  };
+
+  // 行事件双击
+  const rowClicked = (params: any) => {
+    // authorityForMod(params.data);
+    showEditForm(params.data);
   };
 
   /* endregion */
@@ -892,6 +901,7 @@ const SprintList: React.FC<any> = () => {
           // suppressMakeColumnVisibleAfterUnGroup // 如果用户在移动列时不小心将列移出了网格，但并不打算将其隐藏，那么这就很方便。
           // rowGroupPanelShow="always"
           onGridReady={onGridReady}
+          onRowDoubleClicked={rowClicked}
         >
         </AgGridReact>
       </div>

@@ -2085,6 +2085,7 @@ const SprintList: React.FC<any> = () => {
           centered={true}
           footer={null}
           width={1000}
+
         >
           {/* admin 权限组新增和修改的界面 */}
           <Form form={formForAdminToAddAnaMod}>
@@ -2410,7 +2411,7 @@ const SprintList: React.FC<any> = () => {
               </Col>
             </Row>
             {/* 以下为不用显示出来但是需要传递的数据 */}
-            <Row gutter={16}>
+            <Row gutter={16} style={{marginTop: "-50px"}}>
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="createTime_hidden">
@@ -2434,12 +2435,19 @@ const SprintList: React.FC<any> = () => {
               </Col>
             </Row>
 
-            <Form.Item>
-              <Button type="primary" style={{marginLeft: '400px'}} onClick={commitSprintDetails}>
-                确定</Button>
-              <Button type="primary" style={{marginLeft: '20px'}} onClick={handleCancel}>
-                取消</Button>
-            </Form.Item>
+            <Row gutter={16}>
+              <Col className="gutter-row">
+
+                <Form.Item style={{marginTop: "-10px"}}>
+                  <Button type="primary" style={{marginLeft: '400px'}} onClick={commitSprintDetails}>
+                    确定</Button>
+                  <Button type="primary" style={{marginLeft: '20px'}} onClick={handleCancel}>
+                    取消</Button>
+                </Form.Item>
+
+              </Col>
+            </Row>
+
           </Form>
         </Modal>
 

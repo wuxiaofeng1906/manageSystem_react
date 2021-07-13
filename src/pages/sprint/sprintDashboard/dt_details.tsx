@@ -112,7 +112,12 @@ const getColums = () => {
       field: 'feedback',
       cellRenderer: stageForLineThrough,
       suppressMenu: false,
-    }
+    },
+    {
+      headerName: '截止日期',
+      field: 'deadline',
+      cellRenderer: stageForLineThrough,
+    },
   ];
 
   return component;
@@ -150,6 +155,7 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
           assignedTo
           finishedBy
           feedback
+          deadline
         }
       }
   `);

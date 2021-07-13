@@ -1034,8 +1034,8 @@ const SprintList: React.FC<any> = () => {
         scopeLimit: oradata.adminAddSuggestion,
         proposedTest: oradata.adminAddProposedTest === "" ? null : oradata.adminAddProposedTest,
         publishEnv: pubEnv,
-        uedEnvCheck: oradata.adminAddForUedVerify,
-        uedOnlineCheck: oradata.adminAdminUedOnline,
+        uedEnvCheck: oradata.adminAddForUedVerify === "" ? null : oradata.adminAddForUedVerify,
+        uedOnlineCheck: oradata.adminAdminUedOnline === "" ? null : oradata.adminAdminUedOnline,
         memo: oradata.adminAddRemark,
 
         // 隐藏的字段
@@ -1306,6 +1306,7 @@ const SprintList: React.FC<any> = () => {
     };
 
     const commitUedModify = () => {
+      debugger;
       const oradata = formForUEDToMod.getFieldsValue();
       if (oradata.uedChandaoType === '' || oradata.uedCHandaoID === '') {
         message.error({
@@ -1328,8 +1329,8 @@ const SprintList: React.FC<any> = () => {
         // ztNo: oradata.uedCHandaoID,
         // 以上为必填字段
 
-        uedEnvCheck: oradata.uedForUedVerify,
-        uedOnlineCheck: oradata.UedOnlineVerti,
+        uedEnvCheck: oradata.uedForUedVerify === "" ? null : oradata.uedForUedVerify,
+        uedOnlineCheck: oradata.UedOnlineVerti === "" ? null : oradata.UedOnlineVerti,
         memo: oradata.uedRemark,
 
         // source: rowDatas.uedSource,
@@ -1361,7 +1362,7 @@ const SprintList: React.FC<any> = () => {
       if (initialState?.currentUser) {
         currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
       }
-      // currentUserGroup = 'testGroup';
+      // currentUserGroup = 'UedGroup';
       if (currentUserGroup !== undefined) {
         switch (currentUserGroup.toString()) {
           case 'superGroup':
@@ -2363,6 +2364,7 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminAddForUedVerify" label="UED测试环境验证：">
                     <Select placeholder="请选择" style={{width: '150px'}}>
                       {[
+                        <Option key={''} value={''}> </Option>,
                         <Option key={'1'} value={'1'}>验证通过</Option>,
                         <Option key={'0'} value={'0'}>未通过</Option>,
                         <Option key={'2'} value={'2'}>无需验证</Option>,
@@ -2378,6 +2380,7 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminAdminUedOnline" label="UED线上验证:">
                     <Select placeholder="请选择" style={{width: '175px', color: 'black'}}>
                       {[
+                        <Option key={''} value={''}> </Option>,
                         <Option key={'1'} value={'1'}>验证通过</Option>,
                         <Option key={'0'} value={'0'}>未通过</Option>,
                         <Option key={'2'} value={'2'}>无需验证</Option>,
@@ -2820,6 +2823,7 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="uedForUedVerify" label="UED测试环境验证：">
                     <Select placeholder="请选择" style={{width: '180px'}}>
                       {[
+                        <Option key={''} value={''}> </Option>,
                         <Option key={'1'} value={'1'}>验证通过</Option>,
                         <Option key={'0'} value={'0'}>未通过</Option>,
                         <Option key={'2'} value={'2'}>无需验证</Option>,
@@ -2836,6 +2840,7 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="UedOnlineVerti" label="UED线上验证:">
                     <Select placeholder="请选择" style={widths}>
                       {[
+                        <Option key={''} value={''}> </Option>,
                         <Option key={'1'} value={'1'}>验证通过</Option>,
                         <Option key={'0'} value={'0'}>未通过</Option>,
                         <Option key={'2'} value={'2'}>无需验证</Option>,

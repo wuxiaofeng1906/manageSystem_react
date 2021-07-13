@@ -802,7 +802,7 @@ const SprintList: React.FC<any> = () => {
           <label style={{marginLeft: '10px'}}>项目类型：</label>
           <Select
             placeholder="请选择"
-            mode="tags"
+            mode="multiple"
             style={{width: '18%'}}
             value={choicedCondition.projectType}
             onChange={prjTypeChanged}
@@ -833,7 +833,7 @@ const SprintList: React.FC<any> = () => {
           <label style={{marginLeft: '10px'}}>项目状态：</label>
           <Select
             placeholder="请选择"
-            mode="tags"
+            mode="multiple"
             style={{width: '18%'}}
             onChange={prjStatusChanged}
             value={choicedCondition.projectStatus}

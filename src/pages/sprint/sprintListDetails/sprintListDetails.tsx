@@ -2116,7 +2116,8 @@ const SprintList: React.FC<any> = () => {
                 <div style={leftStyle}>
                   <Form.Item name="adminAddTester" label="对应测试:" rules={[{required: true}]}>
                     <Select
-                      mode="tags"
+                      // mode="tags"
+                      mode="multiple"
                       style={widths}
                       placeholder="请输入"
                       optionFilterProp="children"
@@ -2317,7 +2318,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminAddEnvironment" label="发布环境:">
-                    <Select placeholder="请选择" style={widths} mode="tags"
+                    <Select placeholder="请选择" style={widths} mode="multiple"
                             optionFilterProp="children">
                       {[
                         <Option key={'集群1'} value={'集群1'}>集群1</Option>,
@@ -2572,7 +2573,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={{marginLeft: '50px'}}>
                   <Form.Item name="managerEnvironment" label="发布环境:">
-                    <Select placeholder="请选择" style={{width: '515px'}} mode="tags"
+                    <Select placeholder="请选择" style={{width: '515px'}} mode="multiple"
                             optionFilterProp="children">
                       {[
                         <Option key={'集群1'} value={'集群1'}>集群1</Option>,
@@ -2663,7 +2664,7 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="testToTester" label="对应测试:" rules={[{required: true}]}>
                     <Select placeholder="请选择"
                             style={widths}
-                            mode="tags"
+                            mode="multiple"
                             optionFilterProp="children">
                       {LoadTesterCombobox()}
                     </Select>

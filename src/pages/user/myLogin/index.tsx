@@ -1,4 +1,4 @@
-import {message} from 'antd';
+import {message, Input} from 'antd';
 import React, {useState, useEffect} from 'react';
 import ProForm from '@ant-design/pro-form';
 import {history} from 'umi';
@@ -7,6 +7,8 @@ import {useModel} from "@@/plugin-model/useModel";
 import styles from './index.less';
 import axios from "axios";
 import {useRequest} from "ahooks";
+
+const {TextArea} = Input;
 
 
 /**
@@ -157,8 +159,24 @@ const Login: React.FC<{}> = () => {
 
   useRequest(() => getUsersInfo(window.location.href));
 
+  let codeValues = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IuWQtOaZk-WHpCIsInN1YiI6Ild1WGlhb0ZlbmciLCJpYXQiOjE2MjM4MzA2Nzd9.G3EjtMWppClX_E2NN0dFPXgX6OsGSrIXy4ReT_Rs5zI";
+  const codeChanges = (params: any) => {
+    codeValues = params.target.value;
+  };
+
   const handleSubmit = async () => {
 
+    // if (codeValues === "") {
+    //   message.error({
+    //     content: `code不能为空！`,
+    //     duration: 1,
+    //     style: {
+    //       marginTop: '50vh',
+    //     },
+    //   });
+    //   return;
+    // }
+    localStorage.setItem("accessId", codeValues);
     // 不同组，权限不同
     const testAuth = [{
       "id": 5,
@@ -769,9 +787,9 @@ const Login: React.FC<{}> = () => {
       "RdSysRolePermission": {"id": 1547, "permissionId": 81, "roleId": 1},
       "parent": {"id": 3, "name": "projects", "level": 0, "description": "项目列表", "parentId": null}
     }];
-
-    localStorage.setItem("accessId", 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IuWQtOaZk-WHpCIsInN1YiI6Ild1WGlhb0ZlbmciLCJpYXQiOjE2MjM4MzA2Nzd9.G3EjtMWppClX_E2NN0dFPXgX6OsGSrIXy4ReT_Rs5zI');
     localStorage.setItem("authority", JSON.stringify(testAuth));
+
+    // console.log("登陆后的token", localStorage.getItem("accessId"));
 
     const userInfos = {
       name: 'testUser',
@@ -816,6 +834,8 @@ const Login: React.FC<{}> = () => {
           {/* 自动登录 */}
           {qywxScript()}
           <div className={styles.desc} id="container"></div>
+
+          {/*<TextArea rows={4} onChange={codeChanges}/>*/}
 
           {/* 手动登录 */}
 

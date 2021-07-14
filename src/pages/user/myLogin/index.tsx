@@ -817,8 +817,7 @@ const Login: React.FC<{}> = () => {
           {qywxScript()}
           <div className={styles.desc} id="container"></div>
 
-          {/* 手动登录
-
+          {/* 手动登录 */}
 
           <ProForm submitter={{
             searchConfig: {
@@ -840,7 +839,7 @@ const Login: React.FC<{}> = () => {
           }}>
           </ProForm>
 
-*/}
+
         </div>
       </div>
 

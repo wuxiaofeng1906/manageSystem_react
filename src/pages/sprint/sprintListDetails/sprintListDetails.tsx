@@ -35,7 +35,9 @@ import {
   numberRenderToZentaoStatusForRed,
   stageForLineThrough,
   numRenderForSevAndpriForLine,
-  proposedTestRender, relatedNumberRender
+  proposedTestRender,
+  relatedNumberRender,
+  relatedNumberAndIdRender
 } from '@/publicMethods/cellRenderer';
 import {getUsersId} from '@/publicMethods/userMethod';
 
@@ -198,12 +200,14 @@ const getColums = () => {
       headerName: '相关需求',
       field: 'relatedStories',
       minWidth: 80,
-      cellRenderer: relatedNumberRender,
+      cellRenderer: relatedNumberAndIdRender,
       onCellClicked: (params: any) => {
         // BUG = 1,
         // TASK = 2,
         // STORY = 3,
-        history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=3&count=${params.value}`);
+        if (Number(params.value) < 500) {
+          history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=3&count=${params.value}`);
+        }
       },
       // tooltipField: "relatedStories"
     },
@@ -211,9 +215,11 @@ const getColums = () => {
       headerName: '相关任务',
       field: 'relatedTasks',
       minWidth: 80,
-      cellRenderer: relatedNumberRender,
+      cellRenderer: relatedNumberAndIdRender,
       onCellClicked: (params: any) => {
-        history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=2&count=${params.value}`);
+        if (Number(params.value) < 500) {
+          history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=2&count=${params.value}`);
+        }
       },
       // tooltipField: "relatedTasks"
 
@@ -335,8 +341,28 @@ const calTypeCount = (data: any) => {
   });
   return {bug, task, story};
 };
+
+const showBelongItem = (data: any) => {
+
+  const re_data: any = [];
+  for (let index = 0; index < data.length; index += 1) {
+
+    const details = data[index];
+
+    if (details.belongStory) {
+      details.relatedStories = details.belongStory;
+    }
+
+    if (details.belongStory) {
+      details.belongTask = details.relatedTasks;
+    }
+    re_data.push(details);
+  }
+  return re_data;
+};
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any) => {
+
   const {data} = await client.query(`
       {
          proDetail(project:${prjID},category:"${prjType}",order:ASC){
@@ -377,10 +403,12 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             relatedTasks
             relatedStories
             deadline
+            belongStory
+            belongTask
           }
       }
   `);
-  return {result: data?.proDetail, resCount: calTypeCount(data?.proDetail)};
+  return {result: showBelongItem(data?.proDetail), resCount: calTypeCount(data?.proDetail)};
 };
 
 // 查询是否有重复数据

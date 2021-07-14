@@ -213,6 +213,35 @@ const relatedNumberRender = (params: any) => {
 
 };
 
+const relatedNumberAndIdRender = (params: any) => {
+  debugger;
+
+  let count = 0;
+  if (params.value) {
+    count = Number(params.value);
+  }
+
+  // 如果是个数
+  if (count < 500) {
+    if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+      return `<a target="_blank" style="color:blue;text-decoration: line-through">${count}</a>`;
+    }
+    return `<a target="_blank" style="color:blue;text-decoration: underline">${count}</a>`;
+  }
+
+
+  // 如果是禅道id
+  let zetaoType = "task";
+  if (params.colDef.field === "relatedStories") {
+    zetaoType = "story";
+  }
+
+  if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+    return `<a target="_blank" style="color:blue;text-decoration: line-through" href='http://zentao.77hub.com/zentao/${zetaoType}-view-${count}.html'>${count}</a>`;
+  }
+  return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/${zetaoType}-view-${count}.html'>${count}</a>`;
+};
+
 
 const numberRenderToCurrentStageForColor = (params: any) => {
   let stage = "";
@@ -711,6 +740,7 @@ export {
   zentaoTypeRenderToNumber,
   proposedTestRender,
   relatedNumberRender,
-  timestampChanges
+  timestampChanges,
+  relatedNumberAndIdRender
 };
 

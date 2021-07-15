@@ -214,7 +214,6 @@ const relatedNumberRender = (params: any) => {
 };
 
 const relatedNumberAndIdRender = (params: any) => {
-  debugger;
 
   let count = 0;
   if (params.value) {
@@ -228,7 +227,6 @@ const relatedNumberAndIdRender = (params: any) => {
     }
     return `<a target="_blank" style="color:blue;text-decoration: underline">${count}</a>`;
   }
-
 
   // 如果是禅道id
   let zetaoType = "task";

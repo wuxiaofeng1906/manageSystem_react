@@ -342,6 +342,7 @@ const calTypeCount = (data: any) => {
   return {bug, task, story};
 };
 
+// 将是相关需求或者相关任务的编号显示刀所属需求或者所属任务对应列。
 const showBelongItem = (data: any) => {
 
   const re_data: any = [];
@@ -353,13 +354,50 @@ const showBelongItem = (data: any) => {
       details.relatedStories = details.belongStory;
     }
 
-    if (details.belongStory) {
-      details.belongTask = details.relatedTasks;
+    if (details.belongTask) {
+      details.relatedTasks = details.belongTask;
     }
     re_data.push(details);
   }
   return re_data;
 };
+
+const changeRowPosition = (data: any) => {
+  const tempArrays = data;
+  const arrays = [];
+
+  for (let index = 0; index < data.length; index += 1) {
+    const be_story = data[index].belongStory;
+    const be_task = data[index].belongTask;
+
+    // 如果所属需求不为空，则寻找相关需求bug
+    if (be_story) {
+
+      data.forEach((ele: any, ids: Number) => {
+        if (ele.ztNo === be_story) {
+          arrays.push(ele);
+          data.splice(ids, 1);
+        }
+      });
+      arrays.push(data[index]);
+      data.splice(index, 1);
+    }
+    // 如果所属任务不为空，则寻找相关任务bug
+    if (be_task) {
+      data.forEach((ele: any, ids: Number) => {
+        if (ele.ztNo === be_task) {
+          arrays.push(ele);
+          data.splice(ids, 1);
+        }
+      });
+      arrays.push(data[index]);
+      data.splice(index, 1);
+    }
+  }
+
+  return arrays;
+};
+
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any) => {
 
@@ -408,6 +446,8 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
           }
       }
   `);
+
+  // const changedData = changeRowPosition(data?.proDetail);
   return {result: showBelongItem(data?.proDetail), resCount: calTypeCount(data?.proDetail)};
 };
 

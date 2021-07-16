@@ -447,6 +447,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
       }
   `);
 
+
   // const changedData = changeRowPosition(data?.proDetail);
   return {result: showBelongItem(data?.proDetail), resCount: calTypeCount(data?.proDetail)};
 };
@@ -1229,7 +1230,7 @@ const SprintList: React.FC<any> = () => {
         });
       }
 
-
+debugger;
       const datas = {
         id: rowDatas.id,
         project: prjId,
@@ -1374,7 +1375,7 @@ const SprintList: React.FC<any> = () => {
     };
 
     const commitUedModify = () => {
-      debugger;
+
       const oradata = formForUEDToMod.getFieldsValue();
       if (oradata.uedChandaoType === '' || oradata.uedCHandaoID === '') {
         message.error({
@@ -1430,7 +1431,7 @@ const SprintList: React.FC<any> = () => {
       if (initialState?.currentUser) {
         currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
       }
-      // currentUserGroup = 'UedGroup';
+      currentUserGroup = 'devManageGroup';
       if (currentUserGroup !== undefined) {
         switch (currentUserGroup.toString()) {
           case 'superGroup':
@@ -2387,7 +2388,8 @@ const SprintList: React.FC<any> = () => {
                         <Option key={''} value={''}> </Option>,
                         <Option key={'0'} value={'0'}>否</Option>,
                         <Option key={'1'} value={'1'}>是</Option>,
-                        <Option key={'2'} value={'2'}>免</Option>
+                        <Option key={'2'} value={'2'}>免</Option>,
+                        <Option key={'3'} value={'3'}>驳回修改中</Option>
                       ]}
                     </Select>
                   </Form.Item>
@@ -2658,6 +2660,7 @@ const SprintList: React.FC<any> = () => {
                         <Option key={'0'} value={'0'}>否</Option>,
                         <Option key={'1'} value={'1'}>是</Option>,
                         <Option key={'2'} value={'2'}>免</Option>,
+                        <Option key={'3'} value={'3'}>驳回修改中</Option>
                       ]}
                     </Select>
                   </Form.Item>
@@ -2804,6 +2807,7 @@ const SprintList: React.FC<any> = () => {
                         <Option key={'0'} value={'0'}>否</Option>,
                         <Option key={'1'} value={'1'}>是</Option>,
                         <Option key={'2'} value={'2'}>免</Option>,
+                        <Option key={'3'} value={'3'}>驳回修改中</Option>
                       ]}
                     </Select>
                   </Form.Item>
@@ -3203,9 +3207,9 @@ const SprintList: React.FC<any> = () => {
                   <Col span={4}>
                     <Checkbox value="严重等级">严重等级</Checkbox>
                   </Col>
-                  {/*<Col span={4}>*/}
-                  {/*  <Checkbox value="截止日期">截止日期</Checkbox>*/}
-                  {/*</Col>*/}
+                  {/* <Col span={4}>
+                    <Checkbox value="截止日期">截止日期</Checkbox>
+                   </Col> */}
 
                   <Col span={4}>
                     <Checkbox value="模块">模块</Checkbox>

@@ -112,7 +112,9 @@ const proposedTestRender = (params: any) => {
     case "2":
       test = "免";
       break;
-
+    case "3":
+      test = "驳回修改中";
+      break;
     default:
       break;
   }

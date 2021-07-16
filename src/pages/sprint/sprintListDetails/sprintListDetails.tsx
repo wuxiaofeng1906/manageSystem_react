@@ -982,6 +982,7 @@ const SprintList: React.FC<any> = () => {
 
     //   发送请求 修改数据
     const modCommitDetails = (datas: any) => {
+      debugger;
       axios
         .put('/api/sprint/project/child', datas)
         .then(function (res) {
@@ -1431,7 +1432,7 @@ debugger;
       if (initialState?.currentUser) {
         currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
       }
-      // currentUserGroup = 'devManageGroup';
+      currentUserGroup = 'testGroup';
       if (currentUserGroup !== undefined) {
         switch (currentUserGroup.toString()) {
           case 'superGroup':

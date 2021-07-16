@@ -1231,7 +1231,7 @@ const SprintList: React.FC<any> = () => {
         });
       }
 
-debugger;
+      debugger;
       const datas = {
         id: rowDatas.id,
         project: prjId,
@@ -1432,7 +1432,7 @@ debugger;
       if (initialState?.currentUser) {
         currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
       }
-      currentUserGroup = 'devManageGroup';
+      // currentUserGroup = 'UedGroup';
       if (currentUserGroup !== undefined) {
         switch (currentUserGroup.toString()) {
           case 'superGroup':

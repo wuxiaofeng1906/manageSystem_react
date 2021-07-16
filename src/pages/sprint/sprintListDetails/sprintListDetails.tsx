@@ -1431,7 +1431,7 @@ debugger;
       if (initialState?.currentUser) {
         currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
       }
-      currentUserGroup = 'devManageGroup';
+      // currentUserGroup = 'devManageGroup';
       if (currentUserGroup !== undefined) {
         switch (currentUserGroup.toString()) {
           case 'superGroup':

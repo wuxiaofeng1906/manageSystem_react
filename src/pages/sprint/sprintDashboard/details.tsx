@@ -393,6 +393,7 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
       }
       }
   `);
+
   return addNewAttributes(data?.dashSingleItem, params.itemKind);
 
 

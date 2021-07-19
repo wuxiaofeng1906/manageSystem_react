@@ -139,9 +139,9 @@ const stageForLineThrough = (params: any) => {
 };
 
 const timestampChanges = (params: any) => {
-
+debugger;
   let times;
-  debugger;
+
   if (params.value) {
     times = dayjs(Number(params.value)).format("YYYY-MM-DD");
     const diffDay = dayjs('2021-07-12').diff(dayjs(), 'day');
@@ -192,14 +192,17 @@ const timestampChanges = (params: any) => {
       return times;
     }
 
-    // 如果是story，则，需求下任务延期了就延期（暂定不做）
-    // if (params.data.category === "3") {
-    //
-    // }
+    // 如果是story，则需求下任务延期了就延期（暂定不做）
+    if (params.data.category === "3") {
+      if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+        return `<a target="_blank" style="color:black;text-decoration: line-through">${times}</a>`;
+      }
+      return times;
+    }
 
   }
 
-  return "";
+  return "0000-00-00";
 };
 
 const relatedNumberRender = (params: any) => {

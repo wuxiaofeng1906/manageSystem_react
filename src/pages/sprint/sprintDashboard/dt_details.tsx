@@ -14,7 +14,8 @@ import {
   stageForLineThrough,
   numRenderForSevAndpriForLine,
   numberRenderToZentaoType,
-  numberRenderToCurrentStage, timestampChanges
+  numberRenderToCurrentStage,
+  timestampChanges
 
 } from '@/publicMethods/cellRenderer';
 

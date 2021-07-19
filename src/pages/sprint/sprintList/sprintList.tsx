@@ -134,7 +134,7 @@ const SprintList: React.FC<any> = () => {
       {
         headerName: '项目名称',
         field: 'name',
-        minWidth: 190,
+        minWidth: 188,
         cellRenderer: (params: any) => {
           return `<a  style="color:blue;text-decoration: underline" >${params.value}</a>`;
         },

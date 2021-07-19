@@ -835,9 +835,9 @@ const Login: React.FC<{}> = () => {
           {qywxScript()}
           <div className={styles.desc} id="container"></div>
 
-          {/*<TextArea rows={4} onChange={codeChanges}/>*/}
+          {/* <TextArea rows={4} onChange={codeChanges}/> */}
 
-          {/* 手动登录 */}
+          {/* 手动登录
 
           <ProForm submitter={{
             searchConfig: {
@@ -859,7 +859,7 @@ const Login: React.FC<{}> = () => {
           }}>
           </ProForm>
 
-
+*/}
         </div>
       </div>
 

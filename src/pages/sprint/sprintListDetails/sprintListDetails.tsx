@@ -2073,7 +2073,7 @@ const SprintList: React.FC<any> = () => {
         <PageHeader
           ghost={false}
           title={prjNames}
-          subTitle={<div style={{color: "black"}}> {pageTitle}</div>}
+          subTitle={<div style={{color: "blue"}}> {pageTitle}</div>}
           style={{height: "100px"}}
           breadcrumb={{routes}}
         />

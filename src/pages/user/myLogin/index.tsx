@@ -145,14 +145,19 @@ const Login: React.FC<{}> = () => {
           }
         })
         .catch(function (error) {
-          console.log("登陆界面异常：", error);
-          // message.error({
-          //   // content: `访问异常:${error.toString()}`,
-          //   duration: 1,
-          //   style: {
-          //     marginTop: '50vh',
-          //   },
-          // });
+
+          if (error.toString().includes("401")) {
+            message.error({
+              content: `您无权登录！`,
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          } else {
+            console.log("登陆失败，异常信息：", error);
+          }
+
         });
     }
   };

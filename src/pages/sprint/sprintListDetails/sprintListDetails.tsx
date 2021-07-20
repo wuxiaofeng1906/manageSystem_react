@@ -362,40 +362,66 @@ const showBelongItem = (data: any) => {
   return re_data;
 };
 
-const changeRowPosition = (data: any) => {
-  const tempArrays = data;
-  const arrays = [];
+const addPositionData = (inStoryAndTask: any, oraData: any) => {
 
-  for (let index = 0; index < data.length; index += 1) {
-    const be_story = data[index].belongStory;
-    const be_task = data[index].belongTask;
+  inStoryAndTask.forEach((ele: any) => {
 
-    // 如果所属需求不为空，则寻找相关需求bug
-    if (be_story) {
+    const be_story = ele.belongStory;
+    const be_task = ele.belongTask;
 
-      data.forEach((ele: any, ids: Number) => {
-        if (ele.ztNo === be_story) {
-          arrays.push(ele);
-          data.splice(ids, 1);
+    for (let index = 0; index < oraData.length; index += 1) {
+      const details = oraData[index];
+
+      // 如果只是 需求 有值，并且禅道类型和禅道编号能对应，则添加到原始data上一个位置，然后break，否则会造成死循环
+      if (be_story !== null && be_task === null) {
+        if (ele.belongStory === details.ztNo && details.category === "3") { // 如果对应的是需求
+          oraData.splice(index + 1, 0, ele);
+          break;
         }
-      });
-      arrays.push(data[index]);
-      data.splice(index, 1);
+      }
+
+      // 如果只是 任务 有值，并且禅道类型和禅道编号能对应，则添加到原始data上一个位置，然后break，否则会造成死循环
+      if (be_story === null && be_task !== null) {
+        if (ele.belongTask === details.ztNo && details.category === "2") { // 如果对应的是任务
+          oraData.splice(index + 1, 0, ele);
+          break;
+        }
+      }
+
+      // 如果 需求和任务 都有值，那么不需要判断禅道类型，只需要禅道编号能对应，则添加到原始data上一个位置，然后break，否则会造成死循环
+      if (be_story !== null && be_task !== null) {
+        if (ele.belongStory === details.ztNo) { // 如果对应的是需求
+          oraData.splice(index + 1, 0, ele);
+          break;
+        }
+      }
     }
-    // 如果所属任务不为空，则寻找相关任务bug
-    if (be_task) {
-      data.forEach((ele: any, ids: Number) => {
-        if (ele.ztNo === be_task) {
-          arrays.push(ele);
-          data.splice(ids, 1);
-        }
-      });
+  });
+
+  return oraData;
+};
+
+const changeRowPosition = (data: any) => {
+  const arrays: any = [];
+  const inStoryAndTask = [];
+
+  // 如果所属需求或者任务不为空，则添加到新的数组里面
+  for (let index = 0; index < data.length; index += 1) {
+    if (data[index].belongStory || data[index].belongTask) {
+      inStoryAndTask.push(data[index]);
+    }
+
+    // if (data[index].belongTask) {  // 如果所属任务不为空，则寻找相关任务bug
+    //   inStoryAndTask.push(data[index]);
+    // }
+
+    // 上面两种情况都不满足时,直接添加数据
+    if (!data[index].belongTask && !data[index].belongStory) {
       arrays.push(data[index]);
-      data.splice(index, 1);
     }
   }
 
-  return arrays;
+  return addPositionData(inStoryAndTask, arrays);
 };
 
 // 查询数据
@@ -448,8 +474,8 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
   `);
 
 
-  // const changedData = changeRowPosition(data?.proDetail);
-  return {result: showBelongItem(data?.proDetail), resCount: calTypeCount(data?.proDetail)};
+  const changedData = changeRowPosition(data?.proDetail); // 对数据进行想要的顺序排序
+  return {result: showBelongItem(changedData), resCount: calTypeCount(changedData)};
 };
 
 // 查询是否有重复数据

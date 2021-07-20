@@ -120,8 +120,9 @@ const Login: React.FC<{}> = () => {
       }
     }
 
+    console.log("usercode", userCode);
     // 如果获取到了usercode，则拿取用户信息和权限
-    if (userCode !== "" && userCode !== "%2Fwelcomes") {
+    if (userCode !== "" && !userCode.includes("%")) {
 
       const data = {
         username: "users",

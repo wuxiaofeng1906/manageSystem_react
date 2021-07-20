@@ -592,7 +592,7 @@ const SprintList: React.FC<any> = () => {
     // 移动新增项目
     const [formForMoveAddAnaMod] = Form.useForm();
     const [pageTitle, setPageTitle] = useState("");
-    const [isSelectType, setIsSelectType] = useState(false);
+    // const [isSelectType, setIsSelectType] = useState(false);
     /* endregion */
 
     /* region  表格相关事件 */
@@ -852,17 +852,17 @@ const SprintList: React.FC<any> = () => {
 
     // 点击新增按钮赋值弹出窗
     const addProject = () => {
-      let zenType = "";
-      if (initialState?.currentUser && initialState.currentUser.group === 'testGroup') {
-        zenType = '1';
-        setIsSelectType(true);
-      }
+      // let zenType = "";
+      // if (initialState?.currentUser && initialState.currentUser.group === 'testGroup') {
+      //   zenType = '1';
+      //   setIsSelectType(true);
+      // }
 
 
       formForAdminToAddAnaMod.setFieldsValue({
         adminCurStage: '',
         adminAddTester: undefined,
-        adminChandaoType: zenType,
+        adminChandaoType: '',
         adminChandaoId: '',
         adminAddChandaoTitle: '',
         adminAddSeverity: '',
@@ -1010,7 +1010,7 @@ const SprintList: React.FC<any> = () => {
 
     //   发送请求 修改数据
     const modCommitDetails = (datas: any) => {
-      debugger;
+
       axios
         .put('/api/sprint/project/child', datas)
         .then(function (res) {
@@ -1259,7 +1259,7 @@ const SprintList: React.FC<any> = () => {
         });
       }
 
-      debugger;
+
       const datas = {
         id: rowDatas.id,
         project: prjId,
@@ -1460,7 +1460,7 @@ const SprintList: React.FC<any> = () => {
       if (initialState?.currentUser) {
         currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
       }
-      // currentUserGroup = 'UedGroup';
+      // currentUserGroup = 'testGroup';
       if (currentUserGroup !== undefined) {
         switch (currentUserGroup.toString()) {
           case 'superGroup':
@@ -2247,7 +2247,7 @@ const SprintList: React.FC<any> = () => {
               <Col className="gutter-row">
                 <div style={leftStyle}>
                   <Form.Item name="adminChandaoType" label="禅道类型：" rules={[{required: true}]}>
-                    <Select placeholder="请选择" disabled={isSelectType} style={{width: '180px', color: 'black'}}>
+                    <Select placeholder="请选择" style={{width: '180px', color: 'black'}}> {/* disabled={isSelectType} */}
                       {[
                         <Option value={'1'}> Bug </Option>,
                         <Option value={'3'}> 需求 </Option>,

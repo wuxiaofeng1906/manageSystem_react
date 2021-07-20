@@ -121,7 +121,7 @@ const Login: React.FC<{}> = () => {
     }
 
     // 如果获取到了usercode，则拿取用户信息和权限
-    if (userCode !== "") {
+    if (userCode !== "" && userCode !== "%2Fwelcomes") {
 
       const data = {
         username: "users",
@@ -135,13 +135,13 @@ const Login: React.FC<{}> = () => {
             fetchUserInfo(resultData);
             goto();
           } else {
-            // message.error({
-            //   content: '您无权登录！',
-            //   duration: 1,
-            //   style: {
-            //     marginTop: '50vh',
-            //   },
-            // });
+            message.error({
+              content: '您无权登录！',
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
           }
         })
         .catch(function (error) {

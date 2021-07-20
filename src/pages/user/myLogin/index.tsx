@@ -135,13 +135,13 @@ const Login: React.FC<{}> = () => {
             fetchUserInfo(resultData);
             goto();
           } else {
-            message.error({
-              content: '您无权登录！',
-              duration: 1,
-              style: {
-                marginTop: '50vh',
-              },
-            });
+            // message.error({
+            //   content: '您无权登录！',
+            //   duration: 1,
+            //   style: {
+            //     marginTop: '50vh',
+            //   },
+            // });
           }
         })
         .catch(function (error) {

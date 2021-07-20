@@ -171,7 +171,10 @@ const getColums = () => {
         // BUG = 1,
         // TASK = 2,
         // STORY = 3,
-        history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=3&count=${params.value}`);
+        if (Number(params.value) < 500 && Number(params.value) > 0) {
+          history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=3&count=${params.value}`);
+
+        }
       },
     },
     {
@@ -180,7 +183,9 @@ const getColums = () => {
       minWidth: 80,
       cellRenderer: relatedNumberRender,
       onCellClicked: (params: any) => {
-        history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=2&count=${params.value}`);
+        if (Number(params.value) < 500 && Number(params.value) > 0) {
+          history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=2&count=${params.value}`);
+        }
       },
 
     },
@@ -190,7 +195,9 @@ const getColums = () => {
       minWidth: 80,
       cellRenderer: relatedNumberRender,
       onCellClicked: (params: any) => {
-        history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=1&count=${params.value}`);
+        if (Number(params.value) > 0) {
+          history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=1&count=${params.value}`);
+        }
       },
 
     },
@@ -359,7 +366,7 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
         }
       }
   `);
-     return data?.overAreaList;
+    return data?.overAreaList;
   }
 
   // 如果是其他的明细查询
@@ -463,7 +470,7 @@ const DetailsList: React.FC<any> = () => {
     const [isFieldModalVisible, setFieldModalVisible] = useState(false);
     const [selectedFiled, setSelectedFiled] = useState(['']);
     const nessField = ['序号', '类型', '编号'];
-    const unNessField = ['测试', '标题内容', '严重等级', '截止日期','模块', '状态', '已提测', '发布环境',
+    const unNessField = ['测试', '标题内容', '严重等级', '截止日期', '模块', '状态', '已提测', '发布环境',
       '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', '是否可热更', '是否有数据升级',
       '是否有接口升级', '是否有预置数据', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人'];
 

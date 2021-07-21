@@ -351,6 +351,10 @@ const showBelongItem = (data: any) => {
   for (let index = 0; index < data.length; index += 1) {
 
     const details = data[index];
+    // 对标题中有转义字符进行替换。
+    if (details.title.includes('&quot;')) {
+      details.title = details.title.replace(/&quot;/g, '"');
+    }
 
     if (details.belongStory) {
       details.relatedStories = details.belongStory;

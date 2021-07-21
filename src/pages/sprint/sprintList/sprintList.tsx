@@ -289,6 +289,8 @@ const SprintList: React.FC<any> = () => {
 
   // 时间选择事件
   const onTimeSelected = async (params: any, dateString: any) => {
+    // if(dateString ===)
+
     //  输入后在useEffect中实现查询
     setQueryCondition({
       ...choicedCondition,
@@ -825,7 +827,8 @@ const SprintList: React.FC<any> = () => {
             style={{width: '18%'}}
             // defaultValue={[moment(getRecentMonth().start), moment(getRecentMonth().end)]}
             // defaultValue={[choicedDateTime.start, choicedDateTime.end]}
-            value={[moment(choicedCondition.dateRange.start), moment(choicedCondition.dateRange.end)]}
+            value={[choicedCondition.dateRange.start === "" ? null : moment(choicedCondition.dateRange.start),
+              choicedCondition.dateRange.end === "" ? null : moment(choicedCondition.dateRange.end)]}
 
             onChange={onTimeSelected}
           />

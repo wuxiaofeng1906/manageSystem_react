@@ -65,7 +65,7 @@ export default [
         name: 'dashboard（开发中）',
         path: 'sprintDashboard',
         component: './sprint/sprintDashboard/index',
-        access: 'sysAdmin',
+        access: 'spAdmin',
       },
       {
         name: 'details',

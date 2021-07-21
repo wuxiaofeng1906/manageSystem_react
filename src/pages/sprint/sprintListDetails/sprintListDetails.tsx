@@ -1010,7 +1010,7 @@ const SprintList: React.FC<any> = () => {
 
     //   发送请求 修改数据
     const modCommitDetails = (datas: any) => {
-
+      debugger;
       axios
         .put('/api/sprint/project/child', datas)
         .then(function (res) {
@@ -1236,6 +1236,7 @@ const SprintList: React.FC<any> = () => {
     // 开发经理提交修改
     const commitManagerModify = () => {
 
+      debugger;
       const oradata = formForManagerToMod.getFieldsValue();
       if (oradata.testerChandaoType === '' || oradata.testerCHandaoID === '') {
         message.error({
@@ -1460,7 +1461,7 @@ const SprintList: React.FC<any> = () => {
       if (initialState?.currentUser) {
         currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
       }
-      // currentUserGroup = 'testGroup';
+      currentUserGroup = 'devManageGroup';
       if (currentUserGroup !== undefined) {
         switch (currentUserGroup.toString()) {
           case 'superGroup':

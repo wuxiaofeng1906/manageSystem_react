@@ -105,6 +105,7 @@ const queryDeleteCount = async (client: GqlClient<object>, params: any) => {
 // 组件初始化
 const SprintList: React.FC<any> = () => {
 
+
   const sys_accessToken = localStorage.getItem("accessId");
   axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
   const {initialState} = useModel('@@initialState');
@@ -219,14 +220,14 @@ const SprintList: React.FC<any> = () => {
       }, {
         headerName: '来源',
         field: 'type',
-        minWidth: 70,
+        // minWidth: 70,
         cellRenderer: (params: any) => {
           if (params.value === 'AUTO') {
             return '自动';
           }
           return '人工';
         },
-      },
+      }
     );
 
     return component;
@@ -257,7 +258,15 @@ const SprintList: React.FC<any> = () => {
     else gridApi.current.hideOverlay();
   }
 
+  // 表格的屏幕大小自适应
+  const [gridHeight, setGridHeight] = useState(getHeight());
+  window.onresize = function () {
+    // console.log("新高度：", getHeight());
+    setGridHeight(getHeight());
+    gridApi.current?.sizeColumnsToFit();
+  };
   /* endregion */
+
 
   /* region 条件查询功能 */
 
@@ -883,7 +892,7 @@ const SprintList: React.FC<any> = () => {
       </div>
 
       {/* ag-grid 表格定义 */}
-      <div className="ag-theme-alpine" style={{height: getHeight(), width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
         <AgGridReact
           columnDefs={colums()} // 定义列
           rowData={data} // 数据绑定
@@ -1076,4 +1085,5 @@ const SprintList: React.FC<any> = () => {
     </PageContainer>
   );
 };
+
 export default SprintList;

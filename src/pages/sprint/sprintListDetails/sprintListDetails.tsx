@@ -1110,7 +1110,6 @@ const SprintList: React.FC<any> = () => {
         });
       }
 
-
       if (oradata.adminChandaoType === '' || oradata.adminChandaoId === '') {
         message.error({
           content: `禅道类型以及禅道编号不能为空！`,
@@ -1128,11 +1127,11 @@ const SprintList: React.FC<any> = () => {
         project: prjId,
         stage: Number(oradata.adminCurStage).toString() === "NaN" ? stageChangeToNumber(oradata.adminCurStage) : Number(oradata.adminCurStage),
         category: oradata.adminChandaoType,
-        hotUpdate: oradata.adminAddHotUpdate,
-        dataUpdate: oradata.adminAddDataUpgrade,
-        interUpdate: oradata.adminAddInteUpgrade,
-        presetData: oradata.adminAddPreData,
-        testCheck: oradata.adminAddtesterVerifi,
+        hotUpdate: oradata.adminAddHotUpdate === "" ? null : oradata.adminAddHotUpdate,
+        dataUpdate: oradata.adminAddDataUpgrade === "" ? null : oradata.adminAddDataUpgrade,
+        interUpdate: oradata.adminAddInteUpgrade === "" ? null : oradata.adminAddInteUpgrade,
+        presetData: oradata.adminAddPreData === "" ? null : oradata.adminAddPreData,
+        testCheck: oradata.adminAddtesterVerifi === "" ? null : oradata.adminAddtesterVerifi,
         scopeLimit: oradata.adminAddSuggestion,
         proposedTest: oradata.adminAddProposedTest === "" ? null : oradata.adminAddProposedTest,
         publishEnv: pubEnv,
@@ -1271,11 +1270,11 @@ const SprintList: React.FC<any> = () => {
         category: zentaoTypeRenderToNumber(oradata.managerChandaoType),
         // ztNo: oradata.managerCHandaoID,
         // 以上为必填项
-        hotUpdate: oradata.managerHotUpdate,
-        dataUpdate: oradata.managerDataUpgrade,
-        interUpdate: oradata.managerInteUpgrade,
-        presetData: oradata.managerPreData,
-        testCheck: oradata.managertesterVerifi,
+        hotUpdate: oradata.managerHotUpdate === "" ? null : oradata.managerHotUpdate,
+        dataUpdate: oradata.managerDataUpgrade === "" ? null : oradata.managerDataUpgrade,
+        interUpdate: oradata.managerInteUpgrade === "" ? null : oradata.managerInteUpgrade,
+        presetData: oradata.managerPreData === "" ? null : oradata.managerPreData,
+        testCheck: oradata.managertesterVerifi === "" ? null : oradata.managertesterVerifi,
         scopeLimit: oradata.managerSuggestion,
         proposedTest: oradata.managerProTested === "" ? null : oradata.managerProTested,
         publishEnv: pubEnv,
@@ -1465,7 +1464,7 @@ const SprintList: React.FC<any> = () => {
       if (initialState?.currentUser) {
         currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
       }
-      // currentUserGroup = 'devManageGroup';
+      // currentUserGroup = 'UedGroup';
       if (currentUserGroup !== undefined) {
         switch (currentUserGroup.toString()) {
           case 'superGroup':
@@ -2353,6 +2352,7 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminAddHotUpdate" label="是否可热更:">
                     <Select placeholder="请选择" style={{width: '195px'}}>
                       {[
+                        <Option key={''} value={''}> </Option>,
                         <Option key={'1'} value={'1'}>是</Option>,
                         <Option key={'0'} value={'0'}>否</Option>,
                       ]}
@@ -2365,6 +2365,7 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminAddDataUpgrade" label="是否有数据升级:">
                     <Select placeholder="请选择" style={{width: '160px'}}>
                       {[
+                        <Option key={''} value={''}> </Option>,
                         <Option key={'1'} value={'1'}>是</Option>,
                         <Option key={'0'} value={'0'}>否</Option>,
                       ]}
@@ -2379,6 +2380,7 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminAddInteUpgrade" label="是否有接口升级：">
                     <Select placeholder="请选择" style={{width: '160px'}}>
                       {[
+                        <Option key={''} value={''}> </Option>,
                         <Option key={'1'} value={'1'}>是</Option>,
                         <Option key={'0'} value={'0'}>否</Option>,
                       ]}
@@ -2392,6 +2394,7 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminAddPreData" label="是否有预置数据:">
                     <Select placeholder="请选择" style={{width: '165px'}}>
                       {[
+                        <Option key={''} value={''}> </Option>,
                         <Option key={'1'} value={'1'}>是</Option>,
                         <Option key={'0'} value={'0'}>否</Option>,
                       ]}
@@ -2405,6 +2408,7 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="adminAddtesterVerifi" label="是否需要测试验证：">
                     <Select placeholder="请选择" style={{width: '148px'}}>
                       {[
+                        <Option key={''} value={''}> </Option>,
                         <Option key={'1'} value={'1'}>是</Option>,
                         <Option key={'0'} value={'0'}>否</Option>,
                       ]}
@@ -2624,8 +2628,9 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="managerHotUpdate" label="是否支持热更新:">
                     <Select placeholder="请选择" style={{width: '150px'}}>
                       {[
-                        <Option value={'1'}>是</Option>,
-                        <Option value={'0'}>否</Option>,
+                        <Option key={''} value={''}> </Option>,
+                        <Option key={'1'} value={'1'}>是</Option>,
+                        <Option key={'0'} value={'0'}>否</Option>,
                       ]}
                     </Select>
                   </Form.Item>
@@ -2636,6 +2641,7 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="managerDataUpgrade" label="是否有数据升级:">
                     <Select placeholder="请选择" style={{width: '170px'}}>
                       {[
+                        <Option key={''} value={''}> </Option>,
                         <Option key={'1'} value={'1'}>是</Option>,
                         <Option key={'0'} value={'0'}>否</Option>,
                       ]}
@@ -2650,6 +2656,7 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="managerInteUpgrade" label="是否有接口升级：">
                     <Select placeholder="请选择" style={{width: '155px'}}>
                       {[
+                        <Option key={''} value={''}> </Option>,
                         <Option key={'1'} value={'1'}>是</Option>,
                         <Option key={'0'} value={'0'}>否</Option>,
                       ]}
@@ -2663,6 +2670,7 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="managerPreData" label="是否有预置数据:">
                     <Select placeholder="请选择" style={{width: '170px'}}>
                       {[
+                        <Option key={''} value={''}> </Option>,
                         <Option key={'1'} value={'1'}>是</Option>,
                         <Option key={'0'} value={'0'}>否</Option>,
                       ]}
@@ -2677,6 +2685,7 @@ const SprintList: React.FC<any> = () => {
                   <Form.Item name="managertesterVerifi" label="是否需要测试验证：">
                     <Select placeholder="请选择" style={{width: '150px'}}>
                       {[
+                        <Option key={''} value={''}> </Option>,
                         <Option key={'1'} value={'1'}>是</Option>,
                         <Option key={'0'} value={'0'}>否</Option>,
                       ]}

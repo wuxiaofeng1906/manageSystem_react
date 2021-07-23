@@ -824,7 +824,7 @@ const Login: React.FC<{}> = () => {
   };
 
   useEffect(() => {
-    wxLogin();
+    // wxLogin();
   }, []);
 
   return (

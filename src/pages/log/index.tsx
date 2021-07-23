@@ -6,10 +6,9 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient} from '@/hooks';
+import {GqlClient, useGqlClient, useQuery} from '@/hooks';
 import moment from 'moment';
 import {Form, DatePicker, Select} from 'antd';
-import {getRecentMonth} from '@/publicMethods/timeMethods';
 import {getHeight} from '@/publicMethods/pageSet';
 import axios from 'axios';
 import dayjs from "dayjs";
@@ -24,12 +23,11 @@ const defalutCondition: any = {
   end: dayjs().format("YYYY-MM-DD")
 };
 
-
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   let query = `optionAt:{start:"${params.start}",end:"${params.end}"}`;
   if (params.operator !== "") {
-    query = `userId:"WuXiaoFeng",${query}`;
+    query = `userId:"${params.operator}",${query}`;
   }
 
   const {data} = await client.query(`
@@ -97,15 +95,29 @@ const LogList: React.FC<any> = () => {
 
     return component;
   };
+  const LoadUserCombobox = () => {
+    const deptMan = [];
+    const {data: {WxDeptUsers = []} = {}} = useQuery(` {
+            WxDeptUsers{
+               id
+              userName
+            }
+          }`);
 
-  /* 整个模块都需要用到的 */
+    for (let index = 0; index < WxDeptUsers.length; index += 1) {
+      deptMan.push(
+        <Option value={WxDeptUsers[index].id}> {WxDeptUsers[index].userName}</Option>,
+      );
+    }
+    return deptMan;
+
+  };
 
 
   const [choicedCondition, setQueryCondition] = useState({
-    projectName: '',
-    projectType: [],
-    dateRange: getRecentMonth(),
-    projectStatus: ['wait', 'doing', 'suspended']
+    operator: "",
+    start: dayjs().format("YYYY-MM-DD"),
+    end: dayjs().format("YYYY-MM-DD")
   });
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
@@ -135,33 +147,27 @@ const LogList: React.FC<any> = () => {
   /* region 条件查询功能 */
 
   const updateGrid = async () => {
+
     const datas: any = await queryDevelopViews(gqlClient, choicedCondition);
     gridApi.current?.setRowData(datas);
   };
 
+  const uerChanged = (params: any) => {
 
-  // 项目类型选择事件
-  const prjTypeChanged = (value: any, params: any) => {
-    //  输入后在useEffect中实现查询
-    console.log(value, params);
     setQueryCondition({
       ...choicedCondition,
-      projectType: value
+      operator: params.toString()
     });
-
   };
 
   // 时间选择事件
   const onTimeSelected = async (params: any, dateString: any) => {
-    // if(dateString ===)
 
     //  输入后在useEffect中实现查询
     setQueryCondition({
       ...choicedCondition,
-      dateRange: {
-        start: dateString[0],
-        end: dateString[1]
-      }
+      start: dateString[0],
+      end: dateString[1]
     });
   };
 
@@ -176,45 +182,28 @@ const LogList: React.FC<any> = () => {
   return (
     <PageContainer>
       {/* 查询条件 */}
-      {/*<div style={{width: '100%', overflow: 'auto', whiteSpace: 'nowrap'}}>*/}
+      <div style={{width: '100%', overflow: 'auto', whiteSpace: 'nowrap', marginTop: "-10px"}}>
 
-      {/*  <Form.Item name="prjName">*/}
-      {/*    <label style={{marginLeft: '10px'}}>项目类型：</label>*/}
-      {/*    <Select*/}
-      {/*      placeholder="请选择"*/}
-      {/*      mode="multiple"*/}
-      {/*      style={{width: '18%'}}*/}
-      {/*      value={choicedCondition.projectType}*/}
-      {/*      onChange={prjTypeChanged}*/}
-      {/*    >{[*/}
-      {/*      <Option key={'sprint'} value={'sprint'}>*/}
-      {/*        sprint{' '}*/}
-      {/*      </Option>,*/}
-      {/*      <Option key={'hotfix'} value={'hotfix'}>*/}
-      {/*        hotfix{' '}*/}
-      {/*      </Option>,*/}
-      {/*      <Option key={'emergency'} value={'emergency'}>*/}
-      {/*        emergency{' '}*/}
-      {/*      </Option>,*/}
-      {/*    ]}*/}
-      {/*    </Select>*/}
+        <Form.Item name="prjName">
+          <label style={{marginLeft: '10px'}}>操作人：</label>
+          <Select placeholder="请选择" style={{width: "18%"}} onChange={uerChanged} showSearch optionFilterProp="children">
+            {LoadUserCombobox()}
+          </Select>
 
-      {/*    <label style={{marginLeft: '10px'}}>时间：</label>*/}
-      {/*    <RangePicker*/}
-      {/*      className={'times'}*/}
-      {/*      style={{width: '18%'}}*/}
-      {/*      value={[choicedCondition.dateRange.start === "" ? null : moment(choicedCondition.dateRange.start),*/}
-      {/*        choicedCondition.dateRange.end === "" ? null : moment(choicedCondition.dateRange.end)]}*/}
+          <label style={{marginLeft: '20px'}}>时间：</label>
+          <RangePicker
+            className={'times'}
+            style={{width: '22%'}}
+            value={[choicedCondition.start === "" ? null : moment(choicedCondition.start),
+              choicedCondition.end === "" ? null : moment(choicedCondition.end)]}
+            onChange={onTimeSelected}
+          />
 
-      {/*      onChange={onTimeSelected}*/}
-      {/*    />*/}
-
-
-      {/*  </Form.Item>*/}
-      {/*</div>*/}
+        </Form.Item>
+      </div>
 
       {/* ag-grid 表格定义 */}
-      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%', marginTop: "-10px"}}>
         <AgGridReact
           columnDefs={colums()} // 定义列
           rowData={data} // 数据绑定
@@ -226,7 +215,10 @@ const LogList: React.FC<any> = () => {
             flex: 1,
             minWidth: 100,
             suppressMenu: true,
+            cellStyle: {"line-height": "30px"},
           }}
+          rowHeight={32}
+          headerHeight={35}
           autoGroupColumnDef={{
             minWidth: 100,
           }}

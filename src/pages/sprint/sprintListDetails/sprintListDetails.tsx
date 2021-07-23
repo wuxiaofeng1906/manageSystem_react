@@ -401,6 +401,7 @@ const addPositionData = (inStoryAndTask: any, oraData: any) => {
           break;
         }
       }
+
     }
   });
 
@@ -479,9 +480,12 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
       }
   `);
 
-  debugger;
-  const changedData = changeRowPosition(data?.proDetail); // 对数据进行想要的顺序排序
-  return {result: showBelongItem(changedData), resCount: calTypeCount(changedData)};
+  let oraData: any = data?.proDetail;
+  if (prjType === "") {
+    oraData = changeRowPosition(data?.proDetail); // 对数据进行想要的顺序排序
+  }
+
+  return {result: showBelongItem(oraData), resCount: calTypeCount(oraData)};
 };
 
 // 查询是否有重复数据

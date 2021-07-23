@@ -1361,7 +1361,8 @@ const SprintList: React.FC<any> = () => {
       // ztNo: oradata.testerCHandaoID,
       // 以上为必填字段
       proposedTest: oradata.testerProTested === "" ? null : oradata.testerProTested,
-      stage: Number(oradata.testerStage).toString() === "NaN" ? stageChangeToNumber(oradata.testerStage) : Number(oradata.testerStage),
+      // 测试不能修改当前阶段
+      // stage: Number(oradata.testerStage).toString() === "NaN" ? stageChangeToNumber(oradata.testerStage) : Number(oradata.testerStage),
       memo: oradata.testerRemark,
 
       // hotUpdate: rowDatas.hotUpdate,
@@ -1464,6 +1465,8 @@ const SprintList: React.FC<any> = () => {
 
   /* endregion */
 
+  const [stageEdit, setStageEdit] = useState(true);
+
   // 权限判定-----------------------不同权限修改不同页面
   const authorityForMod = (detailsInfo: any) => {
     // 判断人员权限（admin，测试，开发经理（开发）,UED）
@@ -1471,10 +1474,13 @@ const SprintList: React.FC<any> = () => {
     if (initialState?.currentUser) {
       currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
     }
-    // currentUserGroup = 'UedGroup';
+    // currentUserGroup = 'projectListMG';
     if (currentUserGroup !== undefined) {
       switch (currentUserGroup.toString()) {
         case 'superGroup':
+          setStageEdit(false);
+          adminModify(detailsInfo);
+          break;
         case 'projectListMG':
           adminModify(detailsInfo);
           break;
@@ -2258,7 +2264,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminCurStage" label="当前阶段:">
-                  <Select style={widths}>
+                  <Select style={widths} disabled={stageEdit}>
                     {[
                       <Option key={'1'} value={'1'}>未开始</Option>,
                       <Option key={'2'} value={'2'}>开发中</Option>,
@@ -2865,7 +2871,7 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="testerStage" label="当前阶段:">
-                  <Select style={widths}>
+                  <Select style={widths} disabled={true}>
                     {[
                       <Option key={'1'} value={'1'}>未开始</Option>,
                       <Option key={'2'} value={'2'}>开发中</Option>,

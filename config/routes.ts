@@ -334,6 +334,10 @@ export default [
         path: 'user',
         component: './authority/system/user',
         hideInMenu: true
+      }, {
+        name: '日志查询',
+        path: 'logs',
+        component: './log',
       }
     ],
   },

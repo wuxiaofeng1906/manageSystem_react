@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -176,7 +176,7 @@ const DtDetailsList: React.FC<any> = () => {
       needQuery: false,
     };
 
-    debugger;
+
     const location = history.location.query;
     if (location) {
       paramsInfo.category = location.kind;
@@ -201,6 +201,13 @@ const DtDetailsList: React.FC<any> = () => {
       else gridApi.current.hideOverlay();
     }
 
+    // 表格的屏幕大小自适应
+    const [gridHeight, setGridHeight] = useState(getHeight());
+    window.onresize = function () {
+      // console.log("新高度：", getHeight());
+      setGridHeight(getHeight());
+      gridApi.current?.sizeColumnsToFit();
+    };
 
     const routes = [
       {
@@ -223,7 +230,7 @@ const DtDetailsList: React.FC<any> = () => {
 
 
         {/* ag-grid 表格定义 */}
-        <div className="ag-theme-alpine" style={{height: getHeight(), width: '100%', marginTop: "9px"}}>
+        <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%', marginTop: "9px"}}>
           <AgGridReact
             columnDefs={getColums()} // 定义列
             rowData={data} // 数据绑定

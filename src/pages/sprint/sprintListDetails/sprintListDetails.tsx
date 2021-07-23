@@ -479,7 +479,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
       }
   `);
 
-
+  debugger;
   const changedData = changeRowPosition(data?.proDetail); // 对数据进行想要的顺序排序
   return {result: showBelongItem(changedData), resCount: calTypeCount(changedData)};
 };
@@ -571,14 +571,18 @@ const SprintList: React.FC<any> = () => {
   let prjNames: string = '';
   let prjType: string = '';
   const location = history.location.query;
-  if (location !== undefined && location.projectid !== null) {
-    prjId = location.projectid.toString();
-    prjNames = location.project === null ? '' : location.project.toString();
+  if (JSON.stringify(location) !== '{}') {
+    if (location !== undefined && location.projectid !== null) {
+
+      prjId = location.projectid.toString();
+      prjNames = location.project === null ? '' : location.project.toString();
+    }
+
+    if (location !== undefined && location.type !== undefined && location.type !== null) {
+      prjType = location.type.toString();
+    }
   }
 
-  if (location !== undefined && location.type !== undefined && location.type !== null) {
-    prjType = location.type.toString();
-  }
 
   /* region 整个模块都需要用到的表单定义 */
   // admin 新增和修改from表单

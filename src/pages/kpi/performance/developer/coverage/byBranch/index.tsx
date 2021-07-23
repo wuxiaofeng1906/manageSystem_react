@@ -10,6 +10,7 @@ import {GqlClient, useGqlClient} from '@/hooks';
 import * as dayjs from 'dayjs';
 import {Button, Drawer} from "antd";
 import {QuestionCircleTwoTone} from "@ant-design/icons";
+import {getHeight} from "@/publicMethods/pageSet";
 
 const queryBranchViews = async (client: GqlClient<object>) => {
   const {data} = await client.query(`
@@ -82,6 +83,14 @@ const BranchTableList: React.FC<any> = () => {
     else gridApi.current.hideOverlay();
   }
 
+  // 表格的屏幕大小自适应
+  const [gridHeight, setGridHeight] = useState(getHeight());
+  window.onresize = function () {
+    // console.log("新高度：", getHeight());
+    setGridHeight(getHeight());
+    gridApi.current?.sizeColumnsToFit();
+  };
+
   /* region 提示规则显示 */
   const [messageVisible, setVisible] = useState(false);
   const showRules = () => {
@@ -102,7 +111,7 @@ const BranchTableList: React.FC<any> = () => {
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>
 
-      <div className="ag-theme-alpine" style={{height: 570, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
         <AgGridReact
           rowData={data}
           defaultColDef={{

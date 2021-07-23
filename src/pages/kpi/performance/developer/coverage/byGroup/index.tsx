@@ -493,6 +493,14 @@ const CodeReviewTableList: React.FC<any> = () => {
     else gridApi.current.hideOverlay();
   }
 
+  // 表格的屏幕大小自适应
+  const [gridHeight, setGridHeight] = useState(getHeight());
+  window.onresize = function () {
+    // console.log("新高度：", getHeight());
+    setGridHeight(getHeight());
+    gridApi.current?.sizeColumnsToFit();
+  };
+
   /* endregion */
 
   /* region 按钮点击事件 */
@@ -558,7 +566,7 @@ const CodeReviewTableList: React.FC<any> = () => {
 
       </div>
 
-      <div className="ag-theme-alpine" style={{height: getHeight(), width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
         <AgGridReact
           columnDefs={columsForQuarters()} // 定义列
           rowData={data} // 数据绑定

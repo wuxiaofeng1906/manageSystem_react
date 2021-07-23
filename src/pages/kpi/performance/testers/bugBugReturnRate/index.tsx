@@ -185,10 +185,10 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     for (let i = 0; i < data.length; i += 1) {
 
       groupValues.push({
-        time: starttime,
-        group: data[i].deptName,
-        values: data[i].kpi
-      }
+          time: starttime,
+          group: data[i].deptName,
+          values: data[i].kpi
+        }
         // , {
         //   time: starttime,
         //   group: data[i].parent === null ? "" : data[i].parent.deptName,
@@ -202,7 +202,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         for (let m = 0; m < usersData.length; m += 1) {
           const username = usersData[m].userName;
 
-           if (username === "陈诺") {
+          if (username === "陈诺") {
             arrays.push({
               devCenter: "研发中心",
               dept: "测试部",
@@ -261,7 +261,7 @@ const converseArrayToOne = (data: any) => {
 
 
 const queryBugResolutionCount = async (client: GqlClient<object>, params: string) => {
-  const condition = getParamsByType(params,true);
+  const condition = getParamsByType(params, true);
   if (condition.typeFlag === 0) {
     return [];
   }
@@ -316,6 +316,13 @@ const BugReopenTableList: React.FC<any> = () => {
     else gridApi.current.hideOverlay();
   }
 
+  // 表格的屏幕大小自适应
+  const [gridHeight, setGridHeight] = useState(getHeight());
+  window.onresize = function () {
+    // console.log("新高度：", getHeight());
+    setGridHeight(getHeight());
+    gridApi.current?.sizeColumnsToFit();
+  };
   /* endregion */
 
   // 按周统计
@@ -377,7 +384,7 @@ const BugReopenTableList: React.FC<any> = () => {
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>
 
-      <div className="ag-theme-alpine" style={{height: getHeight(), width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
         <AgGridReact
           columnDefs={columsForQuarters()} // 定义列
           rowData={data} // 数据绑定

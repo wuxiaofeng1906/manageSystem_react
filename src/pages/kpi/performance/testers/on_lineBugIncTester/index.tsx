@@ -278,6 +278,14 @@ const TestBugRateTableList: React.FC<any> = () => {
     else gridApi.current.hideOverlay();
   }
 
+  // 表格的屏幕大小自适应
+  const [gridHeight, setGridHeight] = useState(getHeight());
+  window.onresize = function () {
+    // console.log("新高度：", getHeight());
+    setGridHeight(getHeight());
+    gridApi.current?.sizeColumnsToFit();
+  };
+
   /* endregion */
 
   // 按周统计
@@ -337,7 +345,7 @@ const TestBugRateTableList: React.FC<any> = () => {
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>
 
-      <div className="ag-theme-alpine" style={{height: getHeight(), width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
         <AgGridReact
           columnDefs={columsForQuarters()} // 定义列
           rowData={data} // 数据绑定

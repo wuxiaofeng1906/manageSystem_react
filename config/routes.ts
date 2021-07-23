@@ -79,42 +79,42 @@ export default [
         component: './sprint/sprintDashboard/dt_details',
         hideInMenu: true,
       },
-      {
-        name: 'bug',
-        path: 'basicTable/bugs/bugAll',
-        component: './sprint/basicTable/bugs/bugAll',
-        hideInMenu: true,
-      },
-      {
-        name: 'bug明细',
-        path: 'basicTable/bugs/bugDetails',
-        component: './sprint/basicTable/bugs/bugDetails',
-        hideInMenu: true,
-      },
-      {
-        name: 'story',
-        path: 'basicTable/stories/storyAll',
-        component: './sprint/basicTable/stories/storyAll',
-        hideInMenu: true,
-      },
-      {
-        name: 'story明细',
-        path: 'basicTable/stories/storyDetails',
-        component: './sprint/basicTable/stories/storyDetails',
-        hideInMenu: true,
-      },
-      {
-        name: 'task',
-        path: 'basicTable/tasks/taskAll',
-        component: './sprint/basicTable/tasks/taskAll',
-        hideInMenu: true,
-      },
-      {
-        name: 'task明细',
-        path: 'basicTable/tasks/taskDetails',
-        component: './sprint/basicTable/tasks/taskDetails',
-        hideInMenu: true,
-      },
+      // {
+      //   name: 'bug',
+      //   path: 'basicTable/bugs/bugAll',
+      //   component: './sprint/basicTable/bugs/bugAll',
+      //   hideInMenu: true,
+      // },
+      // {
+      //   name: 'bug明细',
+      //   path: 'basicTable/bugs/bugDetails',
+      //   component: './sprint/basicTable/bugs/bugDetails',
+      //   hideInMenu: true,
+      // },
+      // {
+      //   name: 'story',
+      //   path: 'basicTable/stories/storyAll',
+      //   component: './sprint/basicTable/stories/storyAll',
+      //   hideInMenu: true,
+      // },
+      // {
+      //   name: 'story明细',
+      //   path: 'basicTable/stories/storyDetails',
+      //   component: './sprint/basicTable/stories/storyDetails',
+      //   hideInMenu: true,
+      // },
+      // {
+      //   name: 'task',
+      //   path: 'basicTable/tasks/taskAll',
+      //   component: './sprint/basicTable/tasks/taskAll',
+      //   hideInMenu: true,
+      // },
+      // {
+      //   name: 'task明细',
+      //   path: 'basicTable/tasks/taskDetails',
+      //   component: './sprint/basicTable/tasks/taskDetails',
+      //   hideInMenu: true,
+      // },
       {
         name: '项目列表',
         path: 'sprintList',
@@ -337,7 +337,6 @@ export default [
       }
     ],
   },
-
   {
     path: '/',
     redirect: './welcomes',

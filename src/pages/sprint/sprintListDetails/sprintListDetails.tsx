@@ -1898,42 +1898,74 @@ const SprintList: React.FC<any> = () => {
   /* endregion */
 
   /* region 操作流程 */
-  const [isFlowModalVisible, setIsFlowModalVisible] = useState(false);
+
+
+  // /////// 以下为流程操作
+  const [isRevokeModalVisible, setIsRevokeModalVisible] = useState(false); // 撤销操作
+  const [isFlowModalVisible, setIsFlowModalVisible] = useState(false); // 其他流程按钮
   const [flowHitmessage, setFlowHitmessage] = useState({hintMessage: ''});
+
+  // 判断是否有勾选一条数据
+  const judgingSelectdRow = () => {
+    const selRows: any = gridApi.current?.getSelectedRows();
+    if (selRows.length > 0) {
+      return true;
+    }
+
+    message.error({
+      content: `请至少选中一条记录进行操作！`,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+    return false;
+  };
 
   // 流程-取消
   const flowForCancle = () => {
-    setFlowHitmessage({hintMessage: '已取消'});
-    setIsFlowModalVisible(true);
+    if (judgingSelectdRow()) {
+      setFlowHitmessage({hintMessage: '已取消'});
+      setIsFlowModalVisible(true);
+    }
   };
+
   // 流程-开发已revert
   const flowForDevRevert = () => {
-    setFlowHitmessage({hintMessage: '开发已revert'});
-
-    setIsFlowModalVisible(true);
+    if (judgingSelectdRow()) {
+      setFlowHitmessage({hintMessage: '开发已revert'});
+      setIsFlowModalVisible(true);
+    }
   };
 
   // 流程-测试已验revert
   const flowForTestRevert = () => {
-    setFlowHitmessage({hintMessage: '测试已验证revert'});
+    if (judgingSelectdRow()) {
+      setFlowHitmessage({hintMessage: '测试已验证revert'});
+      setIsFlowModalVisible(true);
+    }
 
-    setIsFlowModalVisible(true);
   };
+
   // 流程-灰度已验
   const flowForHuiduChecked = () => {
-    setFlowHitmessage({hintMessage: '灰度已验过'});
-
-    setIsFlowModalVisible(true);
+    if (judgingSelectdRow()) {
+      setFlowHitmessage({hintMessage: '灰度已验过'});
+      setIsFlowModalVisible(true);
+    }
   };
+
   // 流程-线上已验证
   const flowForOnlineChecked = () => {
-    setFlowHitmessage({hintMessage: '线上已验过'});
-
-    setIsFlowModalVisible(true);
+    if (judgingSelectdRow()) {
+      setFlowHitmessage({hintMessage: '线上已验过'});
+      setIsFlowModalVisible(true);
+    }
   };
 
   const modFlowStage = (stage: number) => {
     const selRows: any = gridApi.current?.getSelectedRows();
+
     const selIds = [];
     for (let index = 0; index < selRows.length; index += 1) {
 
@@ -1956,6 +1988,7 @@ const SprintList: React.FC<any> = () => {
       .then(function (res) {
         if (res.data.ok === true) {
           setIsFlowModalVisible(false);
+          setIsRevokeModalVisible(false);
           updateGrid();
           message.info({
             content: "修改成功！",
@@ -2028,6 +2061,21 @@ const SprintList: React.FC<any> = () => {
 
   const flowCancel = () => {
     setIsFlowModalVisible(false);
+  };
+
+
+  // 以下为撤销操作
+  const flowForRevoke = () => {
+    if (judgingSelectdRow()) {
+      setIsRevokeModalVisible(true);
+    }
+  };
+  const revokeCancel = () => {
+    setIsRevokeModalVisible(false);
+  };
+
+  const commitRevoke = () => {
+    modFlowStage(13);
   };
 
   /* endregion */
@@ -2171,6 +2219,12 @@ const SprintList: React.FC<any> = () => {
           <div>
             {/* <Button type="text" style={{color: 'black'}} size={'large'}> </Button> */}
             <label style={{marginTop: '10px', color: 'black', fontWeight: 'bold'}}>操作流程:</label>
+
+            <Button type="text"
+                    style={{color: 'black', display: judgeAuthority("撤销") === true ? "inline" : "none"}}
+                    icon={<CloseSquareTwoTone/>} size={'large'}
+                    onClick={flowForRevoke}>撤销</Button>
+
             <Button type="text"
                     style={{color: 'black', display: judgeAuthority("取消") === true ? "inline" : "none"}}
                     icon={<CloseSquareTwoTone/>} size={'large'}
@@ -3262,6 +3316,31 @@ const SprintList: React.FC<any> = () => {
             <Button type="primary" style={{marginLeft: '150px'}} onClick={commitFlow}>
               确定</Button>
             <Button type="primary" style={{marginLeft: '20px'}} onClick={flowCancel}>
+              取消</Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* 撤销操作 */}
+      <Modal
+        title={'撤销提示'}
+        visible={isRevokeModalVisible}
+        onCancel={revokeCancel}
+        centered={true}
+        footer={null}
+        width={400}
+      >
+        <Form>
+          <Form.Item>
+            <label style={{marginLeft: '20px'}}>
+              是否确定进行撤销操作？
+            </label>
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" style={{marginLeft: '100px'}} onClick={commitRevoke}>
+              确定</Button>
+            <Button type="primary" style={{marginLeft: '20px'}} onClick={revokeCancel}>
               取消</Button>
           </Form.Item>
         </Form>

@@ -792,6 +792,12 @@ const Login: React.FC<{}> = () => {
       "parentId": 3,
       "RdSysRolePermission": {"id": 1547, "permissionId": 81, "roleId": 1},
       "parent": {"id": 3, "name": "projects", "level": 0, "description": "项目列表", "parentId": null}
+    }, {
+      "id": 82,
+      "name": "showRevokedButton",
+      "level": 1,
+      "description": "撤销",
+      "parentId": 3,
     }];
     localStorage.setItem("authority", JSON.stringify(testAuth));
 
@@ -843,7 +849,7 @@ const Login: React.FC<{}> = () => {
 
           {/* <TextArea rows={4} onChange={codeChanges}/> */}
 
-          {/* 手动登录
+          {/* 手动登录 */}
 
           <ProForm submitter={{
             searchConfig: {
@@ -865,7 +871,7 @@ const Login: React.FC<{}> = () => {
           }}>
           </ProForm>
 
-*/}
+
         </div>
       </div>
 

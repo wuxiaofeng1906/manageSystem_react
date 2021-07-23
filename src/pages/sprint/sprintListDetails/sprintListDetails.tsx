@@ -616,6 +616,13 @@ const SprintList: React.FC<any> = () => {
     else gridApi.current.hideOverlay();
   }
 
+  // 表格的屏幕大小自适应
+  const [gridHeight, setGridHeight] = useState(getHeight());
+  window.onresize = function () {
+    // console.log("新高度：", getHeight());
+    setGridHeight(getHeight());
+    gridApi.current?.sizeColumnsToFit();
+  };
   /* endregion */
 
   /* region 其他 */
@@ -2206,7 +2213,7 @@ const SprintList: React.FC<any> = () => {
       </Row>
 
       {/* ag-grid 表格定义 */}
-      <div className="ag-theme-alpine" style={{height: getHeight(),  width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
         <AgGridReact
           columnDefs={getColums()} // 定义列
           rowData={data?.result} // 数据绑定

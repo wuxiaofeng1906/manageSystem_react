@@ -548,18 +548,19 @@ const SprintList: React.FC<any> = () => {
 
     const datas = {
       name: `${prjtype}${prjdate}`,
-      type: 'MANUAL',
       startAt: (values.starttime).format("YYYY-MM-DD"),// formatMomentTime(values.starttime),
       endAt: (values.testCutoff).format("YYYY-MM-DD"), // formatMomentTime(values.testCutoff),
       finishAt: (values.testFinnished).format("YYYY-MM-DD"), // formatMomentTime(values.testFinnished),
       stageAt: (values.planHuidu).format("YYYY-MM-DD"), // formatMomentTime(values.planHuidu),
       onlineAt: (values.planOnline).format("YYYY-MM-DD"), // formatMomentTime(values.planOnline),
       status: values.prjStatus,
-      creator: currentUser.toString(),
     };
 
     //  判断是修改还是新增
     if (modal.title === '新增项目') {
+      datas['type'] = 'MANUAL';
+      datas['creator'] = currentUser.toString();
+
       axios
         .post('/api/sprint/project', datas)
         .then(function (res) {

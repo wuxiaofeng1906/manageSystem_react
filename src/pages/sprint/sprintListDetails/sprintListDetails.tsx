@@ -2226,15 +2226,24 @@ const SprintList: React.FC<any> = () => {
 
           <div>
             {/* <Button type="text" style={{color: 'black'}} size={'large'}> </Button> */}
-            <label style={{marginTop: '10px', color: 'black', fontWeight: 'bold'}}>操作流程:</label>
-
+            <label style={{
+              marginTop: '10px',
+              marginRight: judgeAuthority("撤销") === true ? "0px" : "20px", // 判断有无撤销，入股有的话，就要
+              color: 'black',
+              fontWeight: 'bold'
+            }}>操作流程:</label>
+            {/* */}
             <Button type="text"
                     style={{color: 'black', display: judgeAuthority("撤销") === true ? "inline" : "none"}}
                     icon={<CloseSquareTwoTone/>} size={'large'}
                     onClick={flowForRevoke}>撤销</Button>
 
             <Button type="text"
-                    style={{color: 'black', display: judgeAuthority("取消") === true ? "inline" : "none"}}
+                    style={{
+                      color: 'black',
+                      marginLeft: "-20px",
+                      display: judgeAuthority("取消") === true ? "inline" : "none"
+                    }}
                     icon={<CloseSquareTwoTone/>} size={'large'}
                     onClick={flowForCancle}>取消</Button>
 

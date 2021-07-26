@@ -19,6 +19,7 @@ const {Option} = Select;
 
 const defalutCondition: any = {
   operator: "",
+  project: "",
   start: dayjs().format("YYYY-MM-DD"),
   end: dayjs().format("YYYY-MM-DD")
 };
@@ -26,6 +27,10 @@ const defalutCondition: any = {
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   let query = `optionAt:{start:"${params.start}",end:"${params.end}"}`;
+
+  if (params.project !== "") {
+    query = `objectId:"${params.project}",${query}`;
+  }
   if (params.operator !== "") {
     query = `userId:"${params.operator}",${query}`;
   }
@@ -96,7 +101,12 @@ const LogList: React.FC<any> = () => {
     return component;
   };
   const LoadUserCombobox = () => {
+
     const deptMan = [];
+    deptMan.push(
+      <Option value={""}> {""}</Option>,
+    );
+
     const {data: {WxDeptUsers = []} = {}} = useQuery(` {
             WxDeptUsers{
                id
@@ -113,9 +123,32 @@ const LogList: React.FC<any> = () => {
 
   };
 
+  const LoadPrjCombobox = () => {
+
+    const projects = [];
+    projects.push(
+      <Option value={""}> {""}</Option>,
+    );
+
+    const {data: {project = []} = {}} = useQuery(` {
+       project(order:DESC){
+              id
+              name
+            }
+          }`);
+
+    for (let index = 0; index < project.length; index += 1) {
+      projects.push(
+        <Option value={project[index].id}> {project[index].name}</Option>,
+      );
+    }
+    return projects;
+
+  };
 
   const [choicedCondition, setQueryCondition] = useState({
     operator: "",
+    project: "",
     start: dayjs().format("YYYY-MM-DD"),
     end: dayjs().format("YYYY-MM-DD")
   });
@@ -160,6 +193,14 @@ const LogList: React.FC<any> = () => {
     });
   };
 
+  const prjChanged = (params: any) => {
+
+    setQueryCondition({
+      ...choicedCondition,
+      project: params.toString()
+    });
+  };
+
   // 时间选择事件
   const onTimeSelected = async (params: any, dateString: any) => {
 
@@ -188,6 +229,11 @@ const LogList: React.FC<any> = () => {
           <label style={{marginLeft: '10px'}}>操作人：</label>
           <Select placeholder="请选择" style={{width: "18%"}} onChange={uerChanged} showSearch optionFilterProp="children">
             {LoadUserCombobox()}
+          </Select>
+
+          <label style={{marginLeft: '10px'}}>项目：</label>
+          <Select placeholder="请选择" style={{width: "18%"}} onChange={prjChanged} showSearch optionFilterProp="children">
+            {LoadPrjCombobox()}
           </Select>
 
           <label style={{marginLeft: '20px'}}>时间：</label>

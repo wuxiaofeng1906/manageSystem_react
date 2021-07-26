@@ -1695,7 +1695,7 @@ const DashBoard: React.FC<any> = () => {
                         <button
                           style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug
                           <Link
-                            to={`/sprint/details?${hotfix_url}&kind=3&count=${hotfix.task_bug_bugAll}`}> {hotfix.task_bug_bugAll}</Link> 个
+                            to={`/sprint/details?${hotfix_url}&kind=3&count=${hotfix.story_bug_bugAll}`}> {hotfix.story_bug_bugAll}</Link> 个
                         </button>
                       </div>
                     </Col>
@@ -2133,7 +2133,7 @@ const DashBoard: React.FC<any> = () => {
                         <button
                           style={{backgroundColor: "white", border: "none", fontSize: "15px", marginTop: "65px"}}>Bug
                           <Link
-                            to={`/sprint/details?${hotfix_url}&kind=2&count=${hotfix.story_bug_bugAll}`}> {hotfix.story_bug_bugAll}</Link> 个
+                            to={`/sprint/details?${hotfix_url}&kind=2&count=${hotfix.task_bug_bugAll}`}> {hotfix.task_bug_bugAll}</Link> 个
                         </button>
                       </div>
                     </Col>

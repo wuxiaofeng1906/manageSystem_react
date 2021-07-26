@@ -115,6 +115,7 @@ const storyStatusDeal = (itemArray: any) => {
 
 const storyBugDeal = (itemArray: any) => {
 
+
   // const storyBugCount: any = {
   //
   //   // 规范检查
@@ -423,6 +424,7 @@ const taskResultDeals = (countArray: any, count: string) => {
 
 
 const shBugResultDeals = (countArray: any, allCount: string) => {
+
   const hotfixBugCount = Object();
   hotfixBugCount.all_bug_count = allCount;
 

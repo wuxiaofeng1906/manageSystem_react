@@ -2243,7 +2243,7 @@ const SprintList: React.FC<any> = () => {
             {/* <Button type="text" style={{color: 'black'}} size={'large'}> </Button> */}
             <label style={{
               marginTop: '10px',
-              marginRight: judgeAuthority("撤销") === true ? "0px" : "20px", // 判断有无撤销，入股有的话，就要
+              marginRight: judgeAuthority("撤销") === true ? "0px" : "20px", // 判断有无撤销，如果有的话，就要
               color: 'black',
               fontWeight: 'bold'
             }}>操作流程:</label>

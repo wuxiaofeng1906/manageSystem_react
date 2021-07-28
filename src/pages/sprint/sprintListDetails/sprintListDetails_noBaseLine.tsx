@@ -1910,8 +1910,6 @@ const SprintList: React.FC<any> = () => {
 
   // /////// 以下为流程操作
   const [isRevokeModalVisible, setIsRevokeModalVisible] = useState(false); // 撤销操作
-  const [buttonMessage, setButtonHintMessage] = useState({hintMessage: ''});
-
   const [isFlowModalVisible, setIsFlowModalVisible] = useState(false); // 其他流程按钮
   const [flowHitmessage, setFlowHitmessage] = useState({hintMessage: ''});
 
@@ -2074,31 +2072,18 @@ const SprintList: React.FC<any> = () => {
   };
 
 
-  // 以下为撤销和基线操作
+  // 以下为撤销操作
   const flowForRevoke = () => {
     if (judgingSelectdRow()) {
-      setButtonHintMessage({hintMessage: "撤销"});
       setIsRevokeModalVisible(true);
     }
   };
-
-  const flowForBaseLine = () => {
-    if (judgingSelectdRow()) {
-      setButtonHintMessage({hintMessage: "基线"});
-      setIsRevokeModalVisible(true);
-    }
-  };
-
   const revokeCancel = () => {
     setIsRevokeModalVisible(false);
   };
 
   const commitRevoke = () => {
-    if (buttonMessage.hintMessage === "撤销") {
-      modFlowStage(13);
-    } else if (buttonMessage.hintMessage === "基线") {
-      console.log('基线');
-    }
+    modFlowStage(13);
   };
 
   /* endregion */
@@ -2247,11 +2232,6 @@ const SprintList: React.FC<any> = () => {
               color: 'black',
               fontWeight: 'bold'
             }}>操作流程:</label>
-
-            <Button type="text"
-                    style={{color: 'black'}}
-                    icon={<CheckSquareTwoTone/>} size={'large'}
-                    onClick={flowForBaseLine}>基线</Button>
 
             <Button type="text"
                     style={{
@@ -2660,7 +2640,6 @@ const SprintList: React.FC<any> = () => {
                       <Option key={'3'} value={'3'}>《开发hotfix申请》</Option>,
                       <Option key={'4'} value={'4'}>《emergency申请》</Option>,
                       <Option key={'5'} value={'5'}>《开发热更新申请》</Option>,
-                      <Option key={'8'} value={'8'}>自动获取</Option>,
                     ]}
                   </Select>
                 </Form.Item>
@@ -3365,7 +3344,7 @@ const SprintList: React.FC<any> = () => {
 
       {/* 撤销操作 */}
       <Modal
-        title={`${buttonMessage.hintMessage}提示`}
+        title={'撤销提示'}
         visible={isRevokeModalVisible}
         onCancel={revokeCancel}
         centered={true}
@@ -3375,7 +3354,7 @@ const SprintList: React.FC<any> = () => {
         <Form>
           <Form.Item>
             <label style={{marginLeft: '20px'}}>
-              是否确定进行{buttonMessage.hintMessage}操作？
+              是否确定进行撤销操作？
             </label>
           </Form.Item>
 

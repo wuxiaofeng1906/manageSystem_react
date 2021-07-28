@@ -139,7 +139,7 @@ const stageForLineThrough = (params: any) => {
 };
 
 const timestampChanges = (params: any) => {
-debugger;
+  debugger;
   let times;
 
   if (params.value) {
@@ -652,6 +652,9 @@ const numberRenderToSource = (params: any) => {
       break;
     case "7":
       source = "手工录入";
+      break;
+    case "8":
+      source = "自动获取";
       break;
     default:
       break;

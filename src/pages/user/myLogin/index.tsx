@@ -1468,25 +1468,25 @@ const Login: React.FC<{}> = () => {
 
           {/* 手动登录 */}
 
-          <ProForm submitter={{
-            searchConfig: {
-              submitText: intl.formatMessage({
-                id: 'pages.login.submit',
-                defaultMessage: '登录',
-              }),
-            },
-            render: (_, dom) => dom.pop(),
-            submitButtonProps: {
-              loading: submitting,
-              size: 'large',
-              style: {
-                width: '100%',
-              },
-            },
-          }} onFinish={async () => {
-            handleSubmit();
-          }}>
-          </ProForm>
+          {/*<ProForm submitter={{*/}
+          {/*  searchConfig: {*/}
+          {/*    submitText: intl.formatMessage({*/}
+          {/*      id: 'pages.login.submit',*/}
+          {/*      defaultMessage: '登录',*/}
+          {/*    }),*/}
+          {/*  },*/}
+          {/*  render: (_, dom) => dom.pop(),*/}
+          {/*  submitButtonProps: {*/}
+          {/*    loading: submitting,*/}
+          {/*    size: 'large',*/}
+          {/*    style: {*/}
+          {/*      width: '100%',*/}
+          {/*    },*/}
+          {/*  },*/}
+          {/*}} onFinish={async () => {*/}
+          {/*  handleSubmit();*/}
+          {/*}}>*/}
+          {/*</ProForm>*/}
 
 
         </div>

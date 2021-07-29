@@ -434,6 +434,24 @@ const changeRowPosition = (data: any) => {
   return addPositionData(inStoryAndTask, arrays);
 };
 
+// 将未基线的数据放到最前面显示
+const changeBaseLinePosition = (data: any) => {
+
+  const baseLineArray: any = [];
+  const noBaseLineArray: any = [];
+  data.forEach((ele: any) => {
+    if (ele.baseline === '0') {
+      noBaseLineArray.push(ele);
+    } else {
+      baseLineArray.push(ele);
+    }
+
+  });
+
+  return noBaseLineArray.concat(baseLineArray);
+
+};
+
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any) => {
 
@@ -486,7 +504,9 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
 
   let oraData: any = data?.proDetail;
   if (prjType === "") {
-    oraData = changeRowPosition(data?.proDetail); // 对数据进行想要的顺序排序
+    const changedRow = changeRowPosition(data?.proDetail); // 对数据进行想要的顺序排序(将需求相关的bug放到相关需求后面)
+    oraData = changeBaseLinePosition(changedRow); //  将基线值为0的数据统一起来，放到页面最前面
+
   }
 
   return {result: showBelongItem(oraData), resCount: calTypeCount(oraData)};

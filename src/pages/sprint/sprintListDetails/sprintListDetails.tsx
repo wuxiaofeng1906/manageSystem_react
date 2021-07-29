@@ -114,7 +114,7 @@ const getColums = () => {
       headerName: '标题内容',
       field: 'title',
       pinned: 'left',
-      minWidth: 350,
+      minWidth: 235,
       cellRenderer: stageForLineThrough,
       tooltipField: "title"
     },
@@ -147,21 +147,7 @@ const getColums = () => {
       cellRenderer: numberRenderToZentaoStatusForRed,
       minWidth: 80,
       // tooltipField: "ztStatus"
-    },
-    {
-      headerName: '已提测',
-      field: 'proposedTest',
-      cellRenderer: proposedTestRender,
-    },
-    {
-      headerName: '发布环境',
-      field: 'publishEnv',
-      minWidth: 80,
-      cellRenderer: stageForLineThrough,
-      tooltipField: "publishEnv"
-
-    },
-    {
+    }, {
       headerName: '指派给',
       field: 'assignedTo',
       minWidth: 80,
@@ -177,6 +163,48 @@ const getColums = () => {
       cellRenderer: stageForLineThrough,
       tooltipField: "finishedBy",
       suppressMenu: false,
+    },
+    {
+      headerName: '是否可热更',
+      field: 'hotUpdate',
+      cellRenderer: numberRenderToYesNo,
+      // tooltipField: "hotUpdate"
+    },
+    {
+      headerName: '是否有数据升级',
+      field: 'dataUpdate',
+      cellRenderer: numberRenderToYesNo,
+      // tooltipField: "dataUpdate"
+    },
+    {
+      headerName: '是否有接口升级',
+      field: 'interUpdate',
+      cellRenderer: numberRenderToYesNo,
+      // tooltipField: "interUpdate"
+    },
+    {
+      headerName: '是否有预置数据修改',
+      field: 'presetData',
+      cellRenderer: numberRenderToYesNo,
+      // tooltipField: "presetData"
+    },
+    {
+      headerName: '是否需要测试验证',
+      field: 'testCheck',
+      cellRenderer: numberRenderToYesNo,
+      // tooltipField: "testCheck"
+    },
+    {
+      headerName: '已提测',
+      field: 'proposedTest',
+      cellRenderer: proposedTestRender,
+    },
+    {
+      headerName: '发布环境',
+      field: 'publishEnv',
+      minWidth: 80,
+      cellRenderer: stageForLineThrough,
+      tooltipField: "publishEnv"
 
     },
     {
@@ -238,36 +266,6 @@ const getColums = () => {
 
     },
     {
-      headerName: '是否可热更',
-      field: 'hotUpdate',
-      cellRenderer: numberRenderToYesNo,
-      // tooltipField: "hotUpdate"
-    },
-    {
-      headerName: '是否有数据升级',
-      field: 'dataUpdate',
-      cellRenderer: numberRenderToYesNo,
-      // tooltipField: "dataUpdate"
-    },
-    {
-      headerName: '是否有接口升级',
-      field: 'interUpdate',
-      cellRenderer: numberRenderToYesNo,
-      // tooltipField: "interUpdate"
-    },
-    {
-      headerName: '是否有预置数据修改',
-      field: 'presetData',
-      cellRenderer: numberRenderToYesNo,
-      // tooltipField: "presetData"
-    },
-    {
-      headerName: '是否需要测试验证',
-      field: 'testCheck',
-      cellRenderer: numberRenderToYesNo,
-      // tooltipField: "testCheck"
-    },
-    {
       headerName: '验证范围建议',
       field: 'scopeLimit',
       cellRenderer: stageForLineThrough,
@@ -305,7 +303,12 @@ const getColums = () => {
       cellRenderer: stageForLineThrough,
       suppressMenu: false,
       // tooltipField: "feedback"
-    }
+    },
+    // {
+    //   headerName: '基线',
+    //   field: 'baseline',
+    //   suppressMenu: false,
+    // }
   ];
 
   if (fields === null) {
@@ -476,6 +479,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             deadline
             belongStory
             belongTask
+            baseline
           }
       }
   `);
@@ -1545,6 +1549,13 @@ const SprintList: React.FC<any> = () => {
     authorityForMod(params.data);
   };
 
+  const setRowColor = (params: any) => {
+    if (params.data.baseline === '0') {  // 如果基线为0，则整行都渲染颜色
+      return {'background-color': '#FFF8F8'};  //  FFF6F7-> FFFAFA->FFFCFC
+    }
+    return {'background-color': 'white'};
+  };
+
   /* endregion */
 
   /* region 删除功能 */
@@ -2337,7 +2348,8 @@ const SprintList: React.FC<any> = () => {
           groupDefaultExpanded={9} // 展开分组
           onGridReady={onGridReady}
           onRowDoubleClicked={rowClicked}
-          excelStyles={[]}
+          // excelStyles={[]}
+          getRowStyle={setRowColor}
 
         />
 

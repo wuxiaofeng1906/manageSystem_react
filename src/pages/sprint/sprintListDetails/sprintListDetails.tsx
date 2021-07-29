@@ -1551,7 +1551,7 @@ const SprintList: React.FC<any> = () => {
 
   const setRowColor = (params: any) => {
     if (params.data.baseline === '0') {  // 如果基线为0，则整行都渲染颜色
-      return {'background-color': '#FFF7F7'};  //  FFF6F7-> FFFAFA->FFFCFC
+      return {'background-color': '#FFF6F6'};  //  FFF6F7-> FFF7F7->FFFAFA->FFFCFC
     }
     return {'background-color': 'white'};
   };

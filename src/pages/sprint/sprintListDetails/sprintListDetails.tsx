@@ -455,6 +455,7 @@ const changeBaseLinePosition = (data: any) => {
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any) => {
 
+  // baseline
   const {data} = await client.query(`
       {
          proDetail(project:${prjID},category:"${prjType}",order:ASC){
@@ -497,7 +498,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             deadline
             belongStory
             belongTask
-            baseline
+
           }
       }
   `);

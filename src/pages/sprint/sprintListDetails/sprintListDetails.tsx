@@ -2004,7 +2004,7 @@ const SprintList: React.FC<any> = () => {
     }
   };
 
-  const modFlowStage = (stage: number) => {
+  const modFlowStage = (content: any, values: any) => {
     const selRows: any = gridApi.current?.getSelectedRows();
 
     const selIds = [];
@@ -2021,8 +2021,8 @@ const SprintList: React.FC<any> = () => {
     }
     const params = {
       id: selIds,
-      attribute: "stage",
-      value: stage,
+      attribute: content,
+      value: values,
     };
 
     axios.patch('/api/sprint/project/child', params)
@@ -2059,7 +2059,7 @@ const SprintList: React.FC<any> = () => {
       .catch(function (error) {
         if (error.toString().includes("403")) {
           message.error({
-            content: "您修改权限！",
+            content: "您无修改权限！",
             duration: 1,
             style: {
               marginTop: '50vh',
@@ -2081,19 +2081,19 @@ const SprintList: React.FC<any> = () => {
   const commitFlow = () => {
     switch (flowHitmessage.hintMessage) {
       case '已取消':
-        modFlowStage(8);
+        modFlowStage("stage", 8);
         break;
       case '开发已revert':
-        modFlowStage(9);
+        modFlowStage("stage", 9);
         break;
       case '测试已验证revert':
-        modFlowStage(10);
+        modFlowStage("stage", 10);
         break;
       case '灰度已验过':
-        modFlowStage(11);
+        modFlowStage("stage", 11);
         break;
       case '线上已验过':
-        modFlowStage(12);
+        modFlowStage("stage", 12);
         break;
       default:
         break;
@@ -2126,9 +2126,9 @@ const SprintList: React.FC<any> = () => {
 
   const commitRevoke = () => {
     if (buttonMessage.hintMessage === "撤销") {
-      modFlowStage(13);
+      modFlowStage("stage", 13);
     } else if (buttonMessage.hintMessage === "基线") {
-      console.log('基线');
+      modFlowStage('baseline', '1');
     }
   };
 

@@ -498,7 +498,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             deadline
             belongStory
             belongTask
-
+            baseline
           }
       }
   `);

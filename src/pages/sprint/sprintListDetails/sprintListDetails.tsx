@@ -1571,7 +1571,7 @@ const SprintList: React.FC<any> = () => {
 
   const setRowColor = (params: any) => {
     if (params.data.baseline === '0') {  // 如果基线为0，则整行都渲染颜色
-      return {'background-color': '#FFF6F6'};  //  FFF6F7-> FFF7F7->FFFAFA->FFFCFC
+      return {'background-color': '#FFF6F6'};
     }
     return {'background-color': 'white'};
   };
@@ -2274,13 +2274,13 @@ const SprintList: React.FC<any> = () => {
             {/* <Button type="text" style={{color: 'black'}} size={'large'}> </Button> */}
             <label style={{
               marginTop: '10px',
-              marginRight: judgeAuthority("撤销") === true ? "0px" : "20px", // 判断有无撤销，如果有的话，就要
+              marginRight: judgeAuthority("打基线") === true ? "0px" : "20px", // 判断有无基线，如果有的话，就要
               color: 'black',
               fontWeight: 'bold'
             }}>操作流程:</label>
 
             <Button type="text"
-                    style={{color: 'black'}}
+                    style={{color: 'black', display: judgeAuthority("打基线") === true ? "inline" : "none"}}
                     icon={<CheckSquareTwoTone/>} size={'large'}
                     onClick={flowForBaseLine}>基线</Button>
 
@@ -2370,6 +2370,7 @@ const SprintList: React.FC<any> = () => {
           onRowDoubleClicked={rowClicked}
           // excelStyles={[]}
           getRowStyle={setRowColor}
+
 
         />
 

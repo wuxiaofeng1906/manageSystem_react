@@ -1415,6 +1415,12 @@ const Login: React.FC<{}> = () => {
       "parentId": 3,
       "RdSysRolePermission": {"id": 1682, "permissionId": 82, "roleId": 1},
       "parent": {"id": 3, "name": "projects", "level": 0, "description": "项目列表", "parentId": null}
+    }, {
+      "id": 83,
+      "name": "showBaselineButton",
+      "level": 1,
+      "description": "打基线",
+      "parentId": 3,
     }];
     localStorage.setItem("authority", JSON.stringify(testAuth));
 
@@ -1468,25 +1474,25 @@ const Login: React.FC<{}> = () => {
 
           {/* 手动登录 */}
 
-          {/*<ProForm submitter={{*/}
-          {/*  searchConfig: {*/}
-          {/*    submitText: intl.formatMessage({*/}
-          {/*      id: 'pages.login.submit',*/}
-          {/*      defaultMessage: '登录',*/}
-          {/*    }),*/}
-          {/*  },*/}
-          {/*  render: (_, dom) => dom.pop(),*/}
-          {/*  submitButtonProps: {*/}
-          {/*    loading: submitting,*/}
-          {/*    size: 'large',*/}
-          {/*    style: {*/}
-          {/*      width: '100%',*/}
-          {/*    },*/}
-          {/*  },*/}
-          {/*}} onFinish={async () => {*/}
-          {/*  handleSubmit();*/}
-          {/*}}>*/}
-          {/*</ProForm>*/}
+          <ProForm submitter={{
+            searchConfig: {
+              submitText: intl.formatMessage({
+                id: 'pages.login.submit',
+                defaultMessage: '登录',
+              }),
+            },
+            render: (_, dom) => dom.pop(),
+            submitButtonProps: {
+              loading: submitting,
+              size: 'large',
+              style: {
+                width: '100%',
+              },
+            },
+          }} onFinish={async () => {
+            handleSubmit();
+          }}>
+          </ProForm>
 
 
         </div>

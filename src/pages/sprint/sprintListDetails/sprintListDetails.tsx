@@ -2245,7 +2245,7 @@ const SprintList: React.FC<any> = () => {
       {/* 明细操作按钮   */}
       <Row style={{background: 'white', marginTop: "20px"}}>
 
-        <Col span={22}>
+        <Col span={23}>
 
           <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap"}}>
 
@@ -2320,14 +2320,14 @@ const SprintList: React.FC<any> = () => {
         </Col>
 
 
-        <Col span={2} style={{
+        <Col span={1} style={{
           textAlign: "right",
-          display: "flex",
-          flexDirection: "row-reverse",
-          flexWrap: "wrap",
+          // display: "flex",
+          // flexDirection: "row-reverse",
+          // flexWrap: "wrap",
         }}>
 
-          <Button type="text" icon={<SettingOutlined/>} size={'large'} onClick={showFieldsModal}> 自定义字段</Button>
+          <Button type="text" icon={<SettingOutlined/>} size={'large'} onClick={showFieldsModal}> </Button>
         </Col>
 
       </Row>

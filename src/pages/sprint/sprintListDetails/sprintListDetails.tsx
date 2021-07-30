@@ -50,11 +50,11 @@ import {useModel} from "@@/plugin-model/useModel";
 const {Option} = Select;
 
 // 定义列名
-const getColums = () => {
+const getColums = (prjNames: any) => {
 
   // 获取缓存的字段
   const fields = localStorage.getItem("sp_details_filed");
-  const oraFields = [
+  const oraFields: any = [
     {
       headerName: '选择',
       pinned: 'left',
@@ -310,6 +310,16 @@ const getColums = () => {
     //   suppressMenu: false,
     // }
   ];
+
+  if (prjNames === "多组织阻塞bug跟踪") {
+    oraFields.splice(16, 0, {
+      headerName: '解决时间',
+      field: '',
+      minWidth: 80,
+      cellRenderer: stageForLineThrough,
+      suppressMenu: false
+    });
+  }
 
   if (fields === null) {
     return oraFields;
@@ -2140,7 +2150,7 @@ const SprintList: React.FC<any> = () => {
   const [isFieldModalVisible, setFieldModalVisible] = useState(false);
   const [selectedFiled, setSelectedFiled] = useState(['']);
   const nessField = ['选择', '类型', '编号'];
-  const unNessField = ['阶段', '测试', '标题内容', '严重等级', '模块', '状态', '已提测', '发布环境',
+  const unNessField = ['阶段', '测试', '标题内容', '解决时间', '严重等级', '模块', '状态', '已提测', '发布环境',
     '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', '是否可热更', '是否有数据升级',
     '是否有接口升级', '是否有预置数据', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人'];
 
@@ -2348,7 +2358,7 @@ const SprintList: React.FC<any> = () => {
       {/* ag-grid 表格定义 */}
       <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
         <AgGridReact
-          columnDefs={getColums()} // 定义列
+          columnDefs={getColums(prjNames)} // 定义列
           rowData={data?.result} // 数据绑定
           defaultColDef={{
             resizable: true,
@@ -3507,6 +3517,9 @@ const SprintList: React.FC<any> = () => {
                 </Col>
                 <Col span={4}>
                   <Checkbox value="是否需要测试验证">是否需要测试验证</Checkbox>
+                </Col>
+                <Col span={4}>
+                  <Checkbox value="解决时间">解决时间</Checkbox>
                 </Col>
                 <Col span={4}>
                   <Checkbox value="验证范围建议">验证范围建议</Checkbox>

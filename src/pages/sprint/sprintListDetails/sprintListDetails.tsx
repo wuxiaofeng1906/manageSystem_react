@@ -993,6 +993,7 @@ const SprintList: React.FC<any> = () => {
       adminAddSource: datas.source,
       adminAddFeedbacker: datas.feedback,
       adminAddRemark: datas.memo,
+      adminAddBaseLine: datas.baseline
     });
     setmodal({title: '修改明细行(admin)'});
     setIsAddModalVisible(true);
@@ -1188,7 +1189,7 @@ const SprintList: React.FC<any> = () => {
       uedEnvCheck: oradata.adminAddForUedVerify === "" ? null : oradata.adminAddForUedVerify,
       uedOnlineCheck: oradata.adminAdminUedOnline === "" ? null : oradata.adminAdminUedOnline,
       memo: oradata.adminAddRemark,
-
+      baseline: oradata.adminAddBaseLine === "" ? null : oradata.adminAddBaseLine
       // 隐藏的字段
       // openedAt: oradata.createTime_hidden === "" ? null : oradata.createTime_hidden,
       // resolvedAt: oradata.resolveTime_hidden=== "" ? null : oradata.resolveTime_hidden,
@@ -1215,7 +1216,7 @@ const SprintList: React.FC<any> = () => {
       datas["tester"] = testers;
       datas["uedName"] = oradata.adminAddForUED;
       datas["feedback"] = oradata.adminAddFeedbacker;
-      datas["baseline"] = '1';
+
 
       addCommitDetails(datas);
     } else {
@@ -2725,7 +2726,20 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddRemark" label="备注:">
-                  <Input style={{width: '855px'}}/>
+                  <Input style={{width: '600px'}}/>
+                </Form.Item>
+              </div>
+            </Col>
+            <Col className="gutter-row">
+              <div style={leftStyle}>
+                <Form.Item name="adminAddBaseLine" label="是否基线：">
+                  <Select placeholder="请选择" style={{width: '148px'}}>
+                    {[
+                      <Option key={''} value={''}> </Option>,
+                      <Option key={'1'} value={'1'}>是</Option>,
+                      <Option key={'0'} value={'0'}>否</Option>,
+                    ]}
+                  </Select>
                 </Form.Item>
               </div>
             </Col>

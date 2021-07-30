@@ -2278,7 +2278,7 @@ const SprintList: React.FC<any> = () => {
                     icon={<SnippetsTwoTone/>} size={'large'}
                     onClick={moveProject}>移动</Button>
 
-            <label style={{marginTop: '10px', fontWeight: 'bold', marginLeft: "30px"}}>操作流程:</label>
+            <label style={{marginTop: '10px', fontWeight: 'bold', marginLeft: "10px"}}>操作流程:</label>
 
             <Button type="text"
                     style={{display: judgeAuthority("打基线") === true ? "inline" : "none"}}

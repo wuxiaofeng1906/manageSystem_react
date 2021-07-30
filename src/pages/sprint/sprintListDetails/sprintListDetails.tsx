@@ -2241,123 +2241,97 @@ const SprintList: React.FC<any> = () => {
 
       />
 
-      {/* 明细操作按钮 */}
-      <Row style={{background: 'white', marginTop: "20px"}}>
-        {/* 新增、修改、删除、移动 按钮栏 */}
-        <Col span={8}>
 
-          <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap",}}>
+      {/* 明细操作按钮   */}
+      <Row style={{background: 'white', marginTop: "20px"}}>
+
+        <Col span={22}>
+
+          <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap"}}>
 
             <Button type="text"
-                    style={{color: 'black', display: judgeAuthority("新增项目明细行") === true ? "inline" : "none"}}
+                    style={{
+                      marginLeft: "-10px",
+                      display: judgeAuthority("新增项目明细行") === true ? "inline" : "none"
+                    }}
                     icon={<FolderAddTwoTone/>} size={'large'}
                     onClick={addProject}>新增</Button>
             <Button type="text"
                     style={{
-                      color: 'black',
+                      marginLeft: "-10px",
                       display: judgeAuthority("修改项目明细行") === true ? "inline" : "none"
                     }}
                     icon={<EditTwoTone/>} size={'large'}
                     onClick={btnModifyProject}>修改</Button>
             <Button type="text"
                     style={{
-                      color: 'black',
+                      marginLeft: "-10px",
                       display: judgeAuthority("删除项目明细行") === true ? "inline" : "none"
                     }}
                     icon={<DeleteTwoTone/>} size={'large'}
                     onClick={deleteSprintDetails}>删除</Button>
             <Button type="text"
                     style={{
-                      color: 'black',
+                      marginLeft: "-10px",
                       display: judgeAuthority("移动项目明细行") === true ? "inline" : "none"
                     }}
                     icon={<SnippetsTwoTone/>} size={'large'}
                     onClick={moveProject}>移动</Button>
+
+            <label style={{marginTop: '10px', fontWeight: 'bold', marginLeft: "30px"}}>操作流程:</label>
+
+            <Button type="text"
+                    style={{display: judgeAuthority("打基线") === true ? "inline" : "none"}}
+                    icon={<CheckSquareTwoTone/>} size={'large'}
+                    onClick={flowForBaseLine}>基线</Button>
+
+            <Button type="text"
+                    style={{marginLeft: "-10px", display: judgeAuthority("撤销") === true ? "inline" : "none"}}
+                    icon={<CloseSquareTwoTone/>} size={'large'}
+                    onClick={flowForRevoke}>撤销</Button>
+
+            <Button type="text"
+                    style={{marginLeft: "-10px", display: judgeAuthority("取消") === true ? "inline" : "none"}}
+                    icon={<CloseSquareTwoTone/>} size={'large'}
+                    onClick={flowForCancle}>取消</Button>
+
+            <Button type="text"
+                    style={{marginLeft: "-10px", display: judgeAuthority("开发已revert") === true ? "inline" : "none"}}
+                    icon={<CheckSquareTwoTone/>} size={'large'}
+                    onClick={flowForDevRevert}>开发已revert</Button>
+
+            <Button type="text"
+                    style={{marginLeft: "-10px", display: judgeAuthority("测试已验revert") === true ? "inline" : "none"}}
+                    icon={<CheckSquareTwoTone/>} size={'large'}
+                    onClick={flowForTestRevert}>测试已验revert</Button>
+
+            <Button type="text"
+                    style={{marginLeft: "-10px", display: judgeAuthority("灰度已验证") === true ? "inline" : "none"}}
+                    icon={<CheckSquareTwoTone/>} size={'large'}
+                    onClick={flowForHuiduChecked}>灰度已验证</Button>
+
+            <Button type="text"
+                    style={{marginLeft: "-10px", display: judgeAuthority("线上已验证") === true ? "inline" : "none"}}
+                    icon={<CheckSquareTwoTone/>} size={'large'}
+                    onClick={flowForOnlineChecked}>线上已验证</Button>
+
           </div>
 
         </Col>
 
-        {/* 操作流程按钮 */}
-        <Col span={16} style={{
+
+        <Col span={2} style={{
           textAlign: "right",
           display: "flex",
           flexDirection: "row-reverse",
           flexWrap: "wrap",
         }}>
 
-          <div>
-            {/* <Button type="text" style={{color: 'black'}} size={'large'}> </Button> */}
-            <label style={{
-              marginTop: '10px',
-              marginRight: judgeAuthority("打基线") === true ? "0px" : "20px", // 判断有无基线，如果有的话，就要
-              color: 'black',
-              fontWeight: 'bold'
-            }}>操作流程:</label>
-
-            <Button type="text"
-                    style={{color: 'black', display: judgeAuthority("打基线") === true ? "inline" : "none"}}
-                    icon={<CheckSquareTwoTone/>} size={'large'}
-                    onClick={flowForBaseLine}>基线</Button>
-
-            <Button type="text"
-                    style={{
-                      color: 'black',
-                      marginLeft: "-20px",
-                      display: judgeAuthority("撤销") === true ? "inline" : "none"
-                    }}
-                    icon={<CloseSquareTwoTone/>} size={'large'}
-                    onClick={flowForRevoke}>撤销</Button>
-
-            <Button type="text"
-                    style={{
-                      color: 'black',
-                      marginLeft: "-20px",
-                      display: judgeAuthority("取消") === true ? "inline" : "none"
-                    }}
-                    icon={<CloseSquareTwoTone/>} size={'large'}
-                    onClick={flowForCancle}>取消</Button>
-
-            <Button type="text" style={{
-              color: 'black',
-              marginLeft: "-20px",
-              display: judgeAuthority("开发已revert") === true ? "inline" : "none"
-            }} icon={<CheckSquareTwoTone/>} size={'large'}
-                    onClick={flowForDevRevert}>开发已revert</Button>
-
-            <Button type="text" style={{
-              color: 'black',
-              marginLeft: "-20px",
-              display: judgeAuthority("测试已验revert") === true ? "inline" : "none"
-            }} icon={<CheckSquareTwoTone/>} size={'large'}
-                    onClick={flowForTestRevert}>测试已验revert</Button>
-
-            <Button type="text"
-                    style={{
-                      color: 'black',
-                      marginLeft: "-20px",
-                      display: judgeAuthority("灰度已验证") === true ? "inline" : "none"
-                    }}
-                    icon={<CheckSquareTwoTone/>} size={'large'}
-                    onClick={flowForHuiduChecked}>灰度已验证</Button>
-
-            <Button type="text"
-                    style={{
-                      color: 'black',
-                      marginLeft: "-20px",
-                      display: judgeAuthority("线上已验证") === true ? "inline" : "none"
-                    }}
-                    icon={<CheckSquareTwoTone/>} size={'large'}
-                    onClick={flowForOnlineChecked}>线上已验证</Button>
-
-            <Button type="text"
-                    style={{color: 'black'}}
-                    icon={<SettingOutlined/>} size={'large'}
-                    onClick={showFieldsModal}> </Button>
-          </div>
-
+          <Button type="text" icon={<SettingOutlined/>} size={'large'} onClick={showFieldsModal}> 自定义字段</Button>
         </Col>
 
       </Row>
+
 
       {/* ag-grid 表格定义 */}
       <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>

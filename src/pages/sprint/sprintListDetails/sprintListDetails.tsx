@@ -818,6 +818,7 @@ const SprintList: React.FC<any> = () => {
       .then(function (res) {
         if (res.data.ok === true) {
           const queryDatas = res.data.ztRecord;
+
           formForAdminToAddAnaMod.setFieldsValue({
             adminCurStage: numberRenderToCurrentStage({
               value: queryDatas.stage === undefined ? '' : queryDatas.stage.toString(),
@@ -830,8 +831,9 @@ const SprintList: React.FC<any> = () => {
             adminAddModule: queryDatas.module,
             adminAddChandaoStatus: numberRenderToZentaoStatus({value: queryDatas.ztStatus === null ? '' : queryDatas.ztStatus.toString()}),
             adminAddAssignTo: queryDatas.assignedTo,
-            adminAddSolvedBy: queryDatas.finishedBy,
+            adminAddSolvedBy: queryDatas.finishedBy === undefined ? queryDatas.resolvedBy : queryDatas.finishedBy,
             adminAddClosedBy: queryDatas.closedBy,
+            // adminAddFeedbacker: queryDatas.feedback,
             createTime_hidden: dayjs(queryDatas.openedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.openedAt).format("YYYY-MM-DD HH:mm:ss"),
             activeTime_hidden: dayjs(queryDatas.activedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.activedAt).format("YYYY-MM-DD HH:mm:ss"),
             resolveTime_hidden: dayjs(queryDatas.resolvedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.resolvedAt).format("YYYY-MM-DD HH:mm:ss")
@@ -940,6 +942,7 @@ const SprintList: React.FC<any> = () => {
       // adminAddSource: "",
       adminAddFeedbacker: '',
       adminAddRemark: '',
+      adminAddBaseLine: ''
     });
 
     setmodal({title: '新增明细行'});

@@ -127,6 +127,20 @@ const proposedTestRender = (params: any) => {
   return test;
 };
 
+const testerRender = (params: any) => {
+
+  let testers = 'NA';
+  if (params.value !== null && params.value !== undefined && params.value !== "") {
+    testers = params.value;
+  }
+
+  if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+    return `<span style="text-decoration:line-through"> ${testers} </span>`;
+  }
+  return testers;
+
+};
+
 const stageForLineThrough = (params: any) => {
   if (params.value === null || params.value === undefined) {
     return "";
@@ -139,7 +153,7 @@ const stageForLineThrough = (params: any) => {
 };
 
 const timestampChanges = (params: any) => {
-  debugger;
+
   let times;
 
   if (params.value) {
@@ -747,6 +761,7 @@ export {
   proposedTestRender,
   relatedNumberRender,
   timestampChanges,
-  relatedNumberAndIdRender
+  relatedNumberAndIdRender,
+  testerRender
 };
 

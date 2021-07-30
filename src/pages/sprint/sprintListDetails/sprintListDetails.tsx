@@ -37,7 +37,8 @@ import {
   numRenderForSevAndpriForLine,
   proposedTestRender,
   relatedNumberRender,
-  relatedNumberAndIdRender
+  relatedNumberAndIdRender,
+  testerRender
 } from '@/publicMethods/cellRenderer';
 import {getUsersId} from '@/publicMethods/userMethod';
 
@@ -86,7 +87,7 @@ const getColums = (prjNames: any) => {
       field: 'tester',
       pinned: 'left',
       minWidth: 80,
-      cellRenderer: stageForLineThrough,
+      cellRenderer: testerRender,
       tooltipField: "tester",
       suppressMenu: false
     },

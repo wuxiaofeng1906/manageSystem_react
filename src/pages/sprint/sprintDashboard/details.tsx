@@ -21,7 +21,8 @@ import {
   proposedTestRender,
   numberRenderToZentaoType,
   relatedNumberRender,
-  timestampChanges
+  timestampChanges,
+  testerRender
 
 } from '@/publicMethods/cellRenderer';
 
@@ -56,7 +57,7 @@ const getColums = () => {
       field: 'tester',
       pinned: 'left',
       minWidth: 80,
-      cellRenderer: stageForLineThrough,
+      cellRenderer: testerRender,
       tooltipField: "tester",
       suppressMenu: false
     },

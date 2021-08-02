@@ -152,6 +152,20 @@ const stageForLineThrough = (params: any) => {
 
 };
 
+const timeForLineThrough = (params: any) => {
+
+  if (params.value === null || params.value === undefined) {
+    return "";
+  }
+
+  const times = dayjs(Number(params.value)).subtract(8, 'hour').format('YYYY-MM-DD HH:mm:ss');
+  if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+    return `<span style="text-decoration:line-through"> ${times} </span>`;
+  }
+  return times;
+
+};
+
 const timestampChanges = (params: any) => {
 
   let times;
@@ -762,6 +776,7 @@ export {
   relatedNumberRender,
   timestampChanges,
   relatedNumberAndIdRender,
-  testerRender
+  testerRender,
+  timeForLineThrough
 };
 

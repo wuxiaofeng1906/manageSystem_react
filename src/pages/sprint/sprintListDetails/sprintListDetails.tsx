@@ -38,7 +38,8 @@ import {
   proposedTestRender,
   relatedNumberRender,
   relatedNumberAndIdRender,
-  testerRender
+  testerRender,
+  timeForLineThrough
 } from '@/publicMethods/cellRenderer';
 import {getUsersId} from '@/publicMethods/userMethod';
 
@@ -315,9 +316,9 @@ const getColums = (prjNames: any) => {
   if (prjNames === "多组织阻塞bug跟踪") {
     oraFields.splice(16, 0, {
       headerName: '解决时间',
-      field: '',
+      field: 'resolvedAt',
       minWidth: 80,
-      cellRenderer: stageForLineThrough,
+      cellRenderer: timeForLineThrough,
       suppressMenu: false
     });
   }
@@ -510,6 +511,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             belongStory
             belongTask
             baseline
+            resolvedAt
           }
       }
   `);

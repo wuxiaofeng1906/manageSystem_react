@@ -318,7 +318,7 @@ const getColums = (prjNames: any) => {
     oraFields.splice(16, 0, {
       headerName: '解决时间',
       field: 'resolvedAt',
-      minWidth: 80,
+      minWidth: 150,
       cellRenderer: timeForLineThrough,
       suppressMenu: false
     });

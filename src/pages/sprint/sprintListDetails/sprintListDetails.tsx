@@ -128,11 +128,6 @@ const getColums = (prjNames: any) => {
       minWidth: 90,
       // tooltipField: "severity"
     },
-    {
-      headerName: '截止日期',
-      field: 'deadline',
-      cellRenderer: timestampChanges,
-    },
     // {
     //   headerName: '优先级',
     //   field: 'priority',
@@ -166,6 +161,11 @@ const getColums = (prjNames: any) => {
       cellRenderer: stageForLineThrough,
       tooltipField: "finishedBy",
       suppressMenu: false,
+    },
+    {
+      headerName: '截止日期',
+      field: 'deadline',
+      cellRenderer: timestampChanges,
     },
     {
       headerName: '是否可热更',
@@ -315,7 +315,7 @@ const getColums = (prjNames: any) => {
   ];
 
   if (prjNames === "多组织阻塞bug跟踪") {
-    oraFields.splice(16, 0, {
+    oraFields.splice(11, 0, {
       headerName: '解决时间',
       field: 'resolvedAt',
       minWidth: 150,

@@ -169,10 +169,10 @@ const timeForLineThrough = (params: any) => {
 const timestampChanges = (params: any) => {
 
   let times;
-
   if (params.value) {
     times = dayjs(Number(params.value)).format("YYYY-MM-DD");
-    const diffDay = dayjs('2021-07-12').diff(dayjs(), 'day');
+
+    const diffDay = dayjs(times).diff(dayjs(), 'day');  // diffDay 代表延期多少天（-1：延期1天）
     // 没延期
     if (diffDay >= 0) {
       if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
@@ -450,6 +450,36 @@ const numberRenderToZentaoTypeForLine = (params: any,) => {
       break;
   }
 
+  if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+    return `<span style="text-decoration:line-through"> ${type} </span>`;
+
+  }
+  return type;
+};
+
+const numRenderToTypeForLineAndFromBug = (params: any,) => {
+  // BUG = 1,
+  // TASK = 2,
+  // STORY = 3,
+  let type = "";
+  switch (params.value) {
+    case "1":
+      type = "Bug";
+      break;
+    case "2":
+      type = "Task";
+      break;
+    case "3":
+      type = "Story";
+      break;
+    default:
+      break;
+  }
+
+
+  if (params.data.fromBug) {
+    type = `B-${type}`;
+  }
   if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
     return `<span style="text-decoration:line-through"> ${type} </span>`;
 
@@ -777,6 +807,7 @@ export {
   timestampChanges,
   relatedNumberAndIdRender,
   testerRender,
-  timeForLineThrough
+  timeForLineThrough,
+  numRenderToTypeForLineAndFromBug
 };
 

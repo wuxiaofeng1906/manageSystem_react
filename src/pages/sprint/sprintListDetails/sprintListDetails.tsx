@@ -40,7 +40,8 @@ import {
   relatedNumberAndIdRender,
   testerRender,
   timeForLineThrough,
-  timestampChanges
+  timestampChanges,
+  numberRenderToZentaoTypeFilter
 } from '@/publicMethods/cellRenderer';
 import {getUsersId} from '@/publicMethods/userMethod';
 
@@ -100,7 +101,7 @@ const getColums = (prjNames: any) => {
       pinned: 'left',
       minWidth: 95,
       suppressMenu: false,
-      filterParams: {cellRenderer: numberRenderToZentaoType}
+      filterParams: {cellRenderer: numberRenderToZentaoTypeFilter}
 
       // tooltipField: "category"
 
@@ -347,17 +348,21 @@ const calTypeCount = (data: any) => {
   let bug = 0;
   let task = 0;
   let story = 0;
+  let B_story = 0;
+
   data.forEach((ele: any) => {
     if (ele.category === "1") {
       bug += 1;
     } else if (ele.category === "2") {
       task += 1;
+    } else if (ele.category === "3" && ele.fromBug) {
+      B_story += 1;
     } else {
       story += 1;
     }
 
   });
-  return {bug, task, story};
+  return {bug, task, story, B_story};
 };
 
 // 将是相关需求或者相关任务的编号显示刀所属需求或者所属任务对应列。
@@ -681,7 +686,8 @@ const SprintList: React.FC<any> = () => {
     const bugs = datas?.resCount.bug === undefined ? 0 : datas?.resCount.bug;
     const tasks = datas?.resCount.task === undefined ? 0 : datas?.resCount.task;
     const storys = datas?.resCount.story === undefined ? 0 : datas?.resCount.story;
-    setPageTitle(`共${bugs + tasks + storys}个，bug ${bugs} 个，task ${tasks} 个，story ${storys} 个`);
+    const B_story = datas?.resCount.B_story === undefined ? 0 : datas?.resCount.B_story;
+    setPageTitle(`共${bugs + tasks + storys + B_story}个，bug ${bugs} 个，task ${tasks} 个，story ${storys} 个，B-story ${B_story} 个`);
 
   };
 
@@ -2229,8 +2235,9 @@ const SprintList: React.FC<any> = () => {
     const bugs = data?.resCount.bug === undefined ? 0 : data?.resCount.bug;
     const tasks = data?.resCount.task === undefined ? 0 : data?.resCount.task;
     const storys = data?.resCount.story === undefined ? 0 : data?.resCount.story;
+    const B_story = data?.resCount.B_story === undefined ? 0 : data?.resCount.B_story;
 
-    setPageTitle(`共 ${bugs + tasks + storys} 个，bug ${bugs} 个，task ${tasks} 个，story ${storys} 个`);
+    setPageTitle(`共 ${bugs + tasks + storys + B_story} 个，bug ${bugs} 个，task ${tasks} 个，story ${storys} 个，B-story ${B_story} 个`);
   }, [data]);
 
   return (

@@ -385,6 +385,33 @@ const stageChangeToNumber = (params: string) => {
 };
 
 const numberRenderToZentaoType = (params: any,) => {
+  if (!params.value) {
+    return params.value;
+  }
+  // BUG = 1,
+  // TASK = 2,
+  // STORY = 3,
+  let type = "";
+  switch (params.value) {
+    case "1":
+      type = "Bug";
+      break;
+    case "2":
+      type = "Task";
+      break;
+    case "3":
+      type = "Story";
+      break;
+    default:
+      break;
+  }
+
+  return type;
+};
+
+
+const numberRenderToZentaoTypeFilter = (params: any,test:any) => {
+  debugger;
   if (!params.value || params.value === '(Select All)') {
     return params.value;
   }
@@ -400,7 +427,13 @@ const numberRenderToZentaoType = (params: any,) => {
       type = "Task";
       break;
     case "3":
-      type = "story";
+
+      // if (params.data.fromBug) {
+        type = "Story";
+      // } else {
+      //   type = "B-Story";
+      // }
+
       break;
     default:
       break;
@@ -808,6 +841,7 @@ export {
   relatedNumberAndIdRender,
   testerRender,
   timeForLineThrough,
-  numRenderToTypeForLineAndFromBug
+  numRenderToTypeForLineAndFromBug,
+  numberRenderToZentaoTypeFilter
 };
 

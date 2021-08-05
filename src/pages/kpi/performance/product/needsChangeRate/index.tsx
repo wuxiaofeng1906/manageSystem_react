@@ -51,7 +51,7 @@ function codeNumberRender(values: any) {
       if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
         return ` <span style="color: Silver  ">  ${0} </span> `;
       }
-      return ` <span style="font-weight: bold">  ${(Number(datas.values) * 100).toFixed(2)} </span> `;
+      return ` <span style="font-weight: bold">  ${(Number(datas.values) * 100).toFixed(5)} </span> `;
     }
   }
 
@@ -66,7 +66,7 @@ function colorRender(params: any) {
 
   if (Number.isNaN(Number(params.value)) === false) {
 
-    return (Number(params.value) * 100).toFixed(2);
+    return (Number(params.value) * 100).toFixed(5);
   }
 
   return params.value;  // 为了将聚合函数实现格式化

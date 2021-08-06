@@ -1,19 +1,21 @@
-import React, {useRef, useState} from 'react';
-import {PageContainer} from '@ant-design/pro-layout';
-import {AgGridColumn, AgGridReact} from 'ag-grid-react';
+import React, { useRef, useState } from 'react';
+import { PageContainer } from '@ant-design/pro-layout';
+import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {useRequest} from 'ahooks';
-import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient} from '@/hooks';
+import { useRequest } from 'ahooks';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GqlClient, useGqlClient, useQuery } from '@/hooks';
 import * as dayjs from 'dayjs';
-import {Button, Drawer} from "antd";
-import {QuestionCircleTwoTone} from "@ant-design/icons";
-import {getHeight} from "@/publicMethods/pageSet";
+import { Button, Drawer, Form, Select } from 'antd';
+import { QuestionCircleTwoTone } from '@ant-design/icons';
+import { getHeight } from '@/publicMethods/pageSet';
+
+const { Option } = Select;
 
 const queryBranchViews = async (client: GqlClient<object>) => {
-  const {data} = await client.query(`
+  const { data } = await client.query(`
     {
       fileCovers
       {
@@ -67,11 +69,27 @@ function coverageCellRenderer(params: any) {
   return values.toString();
 }
 
-const BranchTableList: React.FC<any> = () => {
+const LoadCombobox = () => {
+  const deptMan = [<Option value="NA">NA</Option>];
+  const { data: { WxDeptUsers = [] } = {} } = useQuery(`
+          {
+            WxDeptUsers(deptNames:["测试","业务"], techs:[TEST]){
+                id
+                userName
+              }
+          }
+      `);
 
+  for (let index = 0; index < WxDeptUsers.length; index += 1) {
+    deptMan.push(<Option value={WxDeptUsers[index].id}> {WxDeptUsers[index].userName}</Option>);
+  }
+  return deptMan;
+};
+
+const BranchTableList: React.FC<any> = () => {
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryBranchViews(gqlClient));
+  const { data, loading } = useRequest(() => queryBranchViews(gqlClient));
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -91,6 +109,21 @@ const BranchTableList: React.FC<any> = () => {
     gridApi.current?.sizeColumnsToFit();
   };
 
+  const updateGrid = async () => {
+    // const datas: any = await queryBranchViews(gqlClient);
+    // gridApi.current?.setRowData(datas);
+  };
+
+  const frontLibChanged = (values: any) => {
+    console.log(values);
+    updateGrid();
+  };
+
+  const backendLibChanged = (values: any) => {
+    console.log(values);
+    updateGrid();
+  };
+
   /* region 提示规则显示 */
   const [messageVisible, setVisible] = useState(false);
   const showRules = () => {
@@ -100,18 +133,48 @@ const BranchTableList: React.FC<any> = () => {
     setVisible(false);
   };
 
-  const cssIndent = {textIndent: '2em'};
+  const cssIndent = { textIndent: '2em' };
   /* endregion */
 
   return (
     <PageContainer>
-      <div style={{background: 'white'}}>
-        <Button type="text" style={{color: 'black'}} size={'large'}></Button>
-        <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
-                size={'large'} onClick={showRules}>计算规则</Button>
+      <div style={{ background: 'white' }}>
+        <Form.Item>
+          <label style={{ marginLeft: '10px' }}>前端库：</label>
+          <Select
+            placeholder="请选择"
+            style={{ width: '230px', marginTop: '5px' }}
+            showSearch
+            optionFilterProp="children"
+            onChange={frontLibChanged}
+          >
+            {LoadCombobox()}
+          </Select>
+
+          <label style={{ marginLeft: '20px' }}>后端库：</label>
+          <Select
+            placeholder="请选择"
+            style={{ width: '230px' }}
+            showSearch
+            optionFilterProp="children"
+            onChange={backendLibChanged}
+          >
+            {LoadCombobox()}
+          </Select>
+
+          <Button
+            type="text"
+            style={{ color: '#1890FF', float: 'right' }}
+            icon={<QuestionCircleTwoTone />}
+            size={'large'}
+            onClick={showRules}
+          >
+            计算规则
+          </Button>
+        </Form.Item>
       </div>
 
-      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{ height: gridHeight, width: '100%' }}>
         <AgGridReact
           rowData={data}
           defaultColDef={{
@@ -120,7 +183,7 @@ const BranchTableList: React.FC<any> = () => {
             filter: true,
             flex: 1,
             minWidth: 100,
-            cellStyle: {"margin-top": "-5px"}
+            cellStyle: { 'margin-top': '-5px' },
           }}
           autoGroupColumnDef={{
             minWidth: 100,
@@ -139,8 +202,9 @@ const BranchTableList: React.FC<any> = () => {
             enableRowGroup
             cellRenderer={sideCellRenderer}
           />
-          <AgGridColumn field="branch" headerName="分支名" width={200}/>
-          <AgGridColumn field="reportDate" headerName="日期" cellRenderer={dateCellRenderer}/>
+          <AgGridColumn field="" headerName="项目名" width={100} />
+          <AgGridColumn field="branch" headerName="分支名" width={200} />
+          <AgGridColumn field="reportDate" headerName="日期" cellRenderer={dateCellRenderer} />
           <AgGridColumn
             field="instCove"
             headerName="结构覆盖率"
@@ -153,31 +217,37 @@ const BranchTableList: React.FC<any> = () => {
             // type="numericColumn"
             cellRenderer={coverageCellRenderer}
           />
-          <AgGridColumn
-            field="createAt"
-            headerName="扫描时间"
-          />
-
+          <AgGridColumn field="createAt" headerName="扫描时间" />
         </AgGridReact>
       </div>
 
       <div>
-        <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
-                placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
-          <p><strong>1.统计周期</strong></p>
+        <Drawer
+          title={<label style={{ fontWeight: 'bold', fontSize: 20 }}>计算规则</label>}
+          placement="right"
+          width={300}
+          closable={false}
+          onClose={onClose}
+          visible={messageVisible}
+        >
+          <p>
+            <strong>1.统计周期</strong>
+          </p>
           <p style={cssIndent}>按周统计：覆盖率为当周最新的覆盖率(累计)；</p>
           <p style={cssIndent}>按月统计：覆盖率为当月最新的覆盖率(累计)；</p>
           <p style={cssIndent}>按季统计：覆盖率为当季度最新的覆盖率(累计)；</p>
-          <p><strong>2.统计公式说明</strong></p>
+          <p>
+            <strong>2.统计公式说明</strong>
+          </p>
           <p style={cssIndent}>结构覆盖率 = 所拥有文件结构覆盖数之和/所有拥有文件总结构数之和； </p>
           <p style={cssIndent}>分支覆盖率 = 所拥有文件分支覆盖数之和/所有拥有文件总分支数之和； </p>
-          <p><strong>3.取值方式</strong></p>
+          <p>
+            <strong>3.取值方式</strong>
+          </p>
           <p style={cssIndent}>前端：结构数：Statements 分支数：Branches；</p>
           <p style={cssIndent}>后端：结构数：Instructions Cov 分支数：Branches；</p>
-
         </Drawer>
       </div>
-
     </PageContainer>
   );
 };

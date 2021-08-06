@@ -111,7 +111,7 @@ const BranchTableList: React.FC<any> = () => {
 
   const updateGrid = async () => {
     // 测试提交
-    // const y =[];
+    const y =[];
     const datas: any = await queryBranchViews(gqlClient);
     // gridApi.current?.setRowData(datas);
   };

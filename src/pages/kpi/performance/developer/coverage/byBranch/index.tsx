@@ -110,8 +110,8 @@ const BranchTableList: React.FC<any> = () => {
   };
 
   const updateGrid = async () => {
-    const datas: any = await queryBranchViews(gqlClient);
-    gridApi.current?.setRowData(datas);
+    // const datas: any = await queryBranchViews(gqlClient);
+    // gridApi.current?.setRowData(datas);
   };
 
   const frontLibChanged = (values: any) => {

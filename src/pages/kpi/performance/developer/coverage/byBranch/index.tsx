@@ -35,6 +35,11 @@ const queryBranchViews = async (client: GqlClient<object>, queryCondition: any) 
 
 // 日期渲染（加上latest）
 function dateCellRenderer(params: any) {
+
+  if (params.value === undefined) {
+    return "";
+  }
+
   const times: any = params.value;
   const currentTime: string = dayjs().subtract(1, 'day').format('YYYY-MM-DD');
   if (times <= currentTime) {
@@ -58,6 +63,9 @@ function sideCellRenderer(params: any) {
 
 // 值为0显示为蓝色
 function coverageCellRenderer(params: any) {
+  if (params.value === undefined) {
+    return "";
+  }
   let values: number = 0;
   if (params.value === '' || params.value == null) {
     values = 0;
@@ -222,7 +230,7 @@ const BranchTableList: React.FC<any> = () => {
             filter: true,
             flex: 1,
             minWidth: 100,
-            cellStyle: {"line-height": "32px"},
+            cellStyle: {"margin-top": "-5px"}
           }}
 
           autoGroupColumnDef={{
@@ -230,8 +238,10 @@ const BranchTableList: React.FC<any> = () => {
           }}
           rowHeight={32}
           headerHeight={35}
-          suppressDragLeaveHidesColumns
-          suppressMakeColumnVisibleAfterUnGroup
+          groupDefaultExpanded={9} // 展开分组
+
+          // suppressDragLeaveHidesColumns
+          // suppressMakeColumnVisibleAfterUnGroup
           onGridReady={onGridReady}
         >
           <AgGridColumn
@@ -239,8 +249,8 @@ const BranchTableList: React.FC<any> = () => {
             headerName="技术侧"
             sort='desc'
             maxWidth={150}
-            // rowGroup={true}
-            // hide={true}
+            rowGroup={true}
+            hide={true}
             cellRenderer={sideCellRenderer}
           />
           <AgGridColumn field="moduleName" headerName="项目名" width={100}/>
@@ -249,7 +259,6 @@ const BranchTableList: React.FC<any> = () => {
           <AgGridColumn
             field="instCove"
             headerName="结构覆盖率"
-            // type="numericColumn"
             cellRenderer={coverageCellRenderer}
           />
           <AgGridColumn

@@ -14,6 +14,7 @@ import {getHeight} from '@/publicMethods/pageSet';
 
 const {Option} = Select;
 
+
 const queryBranchViews = async (client: GqlClient<object>, queryCondition: any) => {
   const {data} = await client.query(`
     {
@@ -78,21 +79,47 @@ function coverageCellRenderer(params: any) {
   return values.toString();
 }
 
-const LoadCombobox = () => {
-  const deptMan = [<Option value="NA">NA</Option>];
-  const {data: {WxDeptUsers = []} = {}} = useQuery(`
+const LoadBranchCombobox = (module: any) => {
+
+  const combobox = [<Option value=""> </Option>];
+
+  // 传入的参数module不能是任何类型的数据。在后端，FRONT 和 BACKEND 本身就是一个类型，因此需要将传入的字符串双引号去掉。
+  const {data: {fileCoverBrachRepository = []} = {}} = useQuery(`
           {
-            WxDeptUsers(deptNames:["测试","业务"], techs:[TEST]){
-                id
-                userName
-              }
+             fileCoverBrachRepository(side:${module.replaceAll('"', '')}){
+              side
+              name
+            }
           }
       `);
 
-  for (let index = 0; index < WxDeptUsers.length; index += 1) {
-    deptMan.push(<Option value={WxDeptUsers[index].id}> {WxDeptUsers[index].userName}</Option>);
+
+  for (let index = 0; index < fileCoverBrachRepository.length; index += 1) {
+    combobox.push(<Option
+      value={fileCoverBrachRepository[index].name}> {fileCoverBrachRepository[index].name}</Option>);
   }
-  return deptMan;
+  return combobox;
+};
+
+const LoadProjectCombobox = () => {
+
+  const combobox = [<Option value=""> </Option>];
+
+  // 传入的参数module不能是任何类型的数据。在后端，FRONT 和 BACKEND 本身就是一个类型，因此需要将传入的字符串双引号去掉。
+  const {data: {fileCoverBrachModule = []} = {}} = useQuery(`
+          {
+            fileCoverBrachModule{
+              name
+            }
+          }
+      `);
+
+
+  for (let index = 0; index < fileCoverBrachModule.length; index += 1) {
+    combobox.push(<Option
+      value={fileCoverBrachModule[index].name}> {fileCoverBrachModule[index].name}</Option>);
+  }
+  return combobox;
 };
 
 const BranchTableList: React.FC<any> = () => {
@@ -184,7 +211,7 @@ const BranchTableList: React.FC<any> = () => {
             optionFilterProp="children"
             onChange={projectChanged}
           >
-            {LoadCombobox()}
+            {LoadProjectCombobox()}
           </Select>
 
           <label style={{marginLeft: '20px'}}>前端库：</label>
@@ -195,7 +222,7 @@ const BranchTableList: React.FC<any> = () => {
             optionFilterProp="children"
             onChange={frontLibChanged}
           >
-            {LoadCombobox()}
+            {LoadBranchCombobox("FRONT")}
           </Select>
 
           <label style={{marginLeft: '20px'}}>后端库：</label>
@@ -206,7 +233,7 @@ const BranchTableList: React.FC<any> = () => {
             optionFilterProp="children"
             onChange={backendLibChanged}
           >
-            {LoadCombobox()}
+            {LoadBranchCombobox("BACKEND")}
           </Select>
 
           <Button
@@ -234,12 +261,11 @@ const BranchTableList: React.FC<any> = () => {
           }}
 
           autoGroupColumnDef={{
-            minWidth: 100,
+            maxWidth: 150,  // rowGroup 的最大宽度
           }}
           rowHeight={32}
           headerHeight={35}
           groupDefaultExpanded={9} // 展开分组
-
           // suppressDragLeaveHidesColumns
           // suppressMakeColumnVisibleAfterUnGroup
           onGridReady={onGridReady}

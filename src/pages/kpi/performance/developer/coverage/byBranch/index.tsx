@@ -16,9 +16,18 @@ const {Option} = Select;
 
 
 const queryBranchViews = async (client: GqlClient<object>, queryCondition: any) => {
+  let qurStr = "";
+  if (queryCondition.project) { // 不为空
+    qurStr = `(module:"${queryCondition.project}"`;
+  }
+
+  if (qurStr) {
+    qurStr = `${qurStr})`
+  }
+
   const {data} = await client.query(`
     {
-      fileCovers
+      fileCovers${qurStr}
       {
           side
           branch
@@ -31,7 +40,21 @@ const queryBranchViews = async (client: GqlClient<object>, queryCondition: any) 
       }
     }
     `);
-  return data?.fileCovers;
+
+
+  const datas = data?.fileCovers;
+  const front: any = [];
+  const backend: any = [];
+
+  datas.forEach((ele: any) => {
+    if (ele.side === "FRONT") {
+      front.push(ele);
+    } else {
+      backend.push(ele);
+    }
+  });
+
+  return front.concat(backend);
 };
 
 // 日期渲染（加上latest）
@@ -105,7 +128,6 @@ const LoadProjectCombobox = () => {
 
   const combobox = [<Option value=""> </Option>];
 
-  // 传入的参数module不能是任何类型的数据。在后端，FRONT 和 BACKEND 本身就是一个类型，因此需要将传入的字符串双引号去掉。
   const {data: {fileCoverBrachModule = []} = {}} = useQuery(`
           {
             fileCoverBrachModule{
@@ -273,7 +295,6 @@ const BranchTableList: React.FC<any> = () => {
           <AgGridColumn
             field="side"
             headerName="技术侧"
-            sort='desc'
             maxWidth={150}
             rowGroup={true}
             hide={true}

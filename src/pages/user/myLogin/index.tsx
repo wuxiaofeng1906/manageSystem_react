@@ -171,6 +171,7 @@ const Login: React.FC<{}> = () => {
   };
 
   const handleSubmit = async () => {
+    console.log("test dev 测试合并");
 
     // if (codeValues === "") {
     //   message.error({

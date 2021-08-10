@@ -1,5 +1,5 @@
 ﻿// @ts-ignore
-import { MenuDataItem } from '@@/plugin-layout/runtime';
+import {MenuDataItem} from '@@/plugin-layout/runtime';
 
 export default [
   {
@@ -302,6 +302,26 @@ export default [
                 icon: 'table',
                 path: 'avgAdviserFeedbackTime',
                 component: './kpi/performance/product/avgAdviserFeedbackTime',
+              },
+            ],
+          },
+          {
+            name: '服务',
+            icon: 'table',
+            access: 'sysAdmin',
+            path: '/kpi/performance/service',
+            routes: [
+              {
+                name: '平均上线时长',
+                icon: 'table',
+                path: 'avgLaunchTime',
+                component: './kpi/performance/service/avgLaunchTime',
+              },
+              {
+                name: '平均立项时长',
+                icon: 'table',
+                path: 'avgEstablishTime',
+                component: './kpi/performance/service/avgEstablishTime',
               },
             ],
           },

@@ -297,7 +297,7 @@ const BranchTableList: React.FC<any> = () => {
           }}
 
           autoGroupColumnDef={{
-            maxWidth: 150,  // rowGroup 的最大宽度
+            minWidth: 120,  // rowGroup 的最大宽度
           }}
           rowHeight={32}
           headerHeight={35}
@@ -309,14 +309,14 @@ const BranchTableList: React.FC<any> = () => {
           <AgGridColumn
             field="side"
             headerName="技术侧"
-            maxWidth={150}
+            // minWidth={150}
             rowGroup={true}
             hide={true}
             cellRenderer={sideCellRenderer}
           />
-          <AgGridColumn field="moduleName" headerName="项目名" width={100}/>
-          <AgGridColumn field="branch" headerName="分支名" width={200}/>
-          <AgGridColumn field="reportDate" headerName="日期" cellRenderer={dateCellRenderer}/>
+          <AgGridColumn field="moduleName" headerName="项目名" minWidth={150}/>
+          <AgGridColumn field="branch" headerName="分支名" minWidth={150}/>
+          <AgGridColumn field="reportDate" headerName="日期" minWidth={150} cellRenderer={dateCellRenderer}/>
           <AgGridColumn
             field="instCove"
             headerName="结构覆盖率"

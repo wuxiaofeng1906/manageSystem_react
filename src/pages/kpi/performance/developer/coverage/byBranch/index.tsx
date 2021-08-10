@@ -16,13 +16,27 @@ const {Option} = Select;
 
 
 const queryBranchViews = async (client: GqlClient<object>, queryCondition: any) => {
-  let qurStr = "";
-  if (queryCondition.project) { // 不为空
-    qurStr = `(module:"${queryCondition.project}"`;
+
+  let project = "";  // 拼接gql 需要的数组
+  if (queryCondition.frontLib) {
+    project = `"${queryCondition.frontLib}"`;
+  }
+
+  if (queryCondition.backendLib) {
+    project = project === "" ? `"${queryCondition.backendLib}"` : `${project},"${queryCondition.backendLib}"`;
+  }
+
+  let qurStr: any = "";
+  if (queryCondition.module) {
+    qurStr = `module:"${queryCondition.module}"`;
+  }
+
+  if (project) {
+    qurStr = qurStr === "" ? `project:[${project}]` : `${qurStr},project:[${project}]`;
   }
 
   if (qurStr) {
-    qurStr = `${qurStr})`
+    qurStr = `(${qurStr})`
   }
 
   const {data} = await client.query(`
@@ -148,7 +162,7 @@ const BranchTableList: React.FC<any> = () => {
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
   const [conditon, setCondition] = useState({
-    project: "",
+    module: "",
     frontLib: "",
     backendLib: ""
   });
@@ -183,7 +197,7 @@ const BranchTableList: React.FC<any> = () => {
     console.log(values);
     setCondition({
       ...conditon,
-      project: values
+      module: values
     });
   };
 

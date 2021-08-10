@@ -1447,7 +1447,7 @@ const Login: React.FC<{}> = () => {
   };
 
   useEffect(() => {
-    // wxLogin();
+    wxLogin();
   }, []);
 
   return (
@@ -1472,7 +1472,7 @@ const Login: React.FC<{}> = () => {
 
           {/* <TextArea rows={4} onChange={codeChanges}/> */}
 
-          {/* 手动登录*/}
+          {/* 手动登录
 
           <ProForm submitter={{
             searchConfig: {
@@ -1492,7 +1492,7 @@ const Login: React.FC<{}> = () => {
           }} onFinish={async () => {
             handleSubmit();
           }}>
-          </ProForm>
+          </ProForm> */}
 
 
         </div>

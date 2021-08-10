@@ -468,35 +468,28 @@ const EstablishTime: React.FC<any> = () => {
         <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
                 placement="right" width={"300px"} closable={false} onClose={onClose} visible={messageVisible}>
 
-          {/*
           <p><strong>1.统计周期</strong></p>
-          <p style={cssIndent}>按周统计：代码提交日期为周一00:00:00--周日23:59:59的代码量；</p>
-          <p style={cssIndent}>按月统计：代码提交日期为每月1号00:00:00--每月最后1天23:59:59；</p>
-          <p style={cssIndent}>按季统计：代码提交日期每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
-          <p style={cssIndent}>特殊情况：当月或季度的开始日期或结束日期在周中（不为整数周）时，不计算该周周数和对应该周的代码量；</p>
+          <p style={cssIndent}>按周统计：关联项目时间在周一00:00:00至周天23:59:59的；</p>
+          <p style={cssIndent}>按月统计：关联项目时间在该月第一天00:00:00至该月最后一天23:59:59的；</p>
+          <p style={cssIndent}>按季统计：关联项目时间在该季第一天00:00:00至该季最后一天23:59:59的；</p>
 
-          <p style={{color: "#1890FF"}}><strong>2.计算公式说明</strong></p>
-          <p> 2.1 按人统计： </p>
-          <p style={cssIndent}>周报：周一至周天代码量求和；</p>
-          <p style={cssIndent}>月报：当月整周数对应的代码量之和/当月整周数；</p>
-          <p style={cssIndent}>季报：当季整周数对应的代码量之和/当季整周数；</p>
-          <p> 2.2 按端统计： </p>
-          <p style={cssIndent}>周报：该端周一至周天代码量求和/该端人数；</p>
-          <p style={cssIndent}>月报：该端所有人员当月整周数对应的代码量之和/当月整周数/该端所有人数；</p>
-          <p style={cssIndent}>季报：该端所有人员当季整周数对应的代码量之和/当季整周数/该端所有人数；</p>
-          <p> 2.3 按组统计： </p>
-          <p style={cssIndent}>周报：该组周一至周天代码量求和/该组人数；</p>
-          <p style={cssIndent}>月报：该组所有人员当月整周数对应的代码量之和/当月整周数/该组所有人数；</p>
-          <p style={cssIndent}>季报：该组所有人员当季整周数对应的代码量之和/当季整周数/该组所有人数；</p>
-          <p> 2.4 按部门统计： </p>
-          <p style={cssIndent}>周报：该部门周一至周天代码量求和/该部门所有人数；</p>
-          <p style={cssIndent}>月报：该部门所有人员当月整周数对应的代码量之和/当月整周数/该部门所有人数；</p>
-          <p style={cssIndent}>季报：该部门所有人员当季整周数对应的代码量之和/当季整周数/该部门所有人数；</p>
-          <p> 2.4 按研发中心统计： </p>
-          <p style={cssIndent}>周报：该中心所有人员周一至周天代码量求和/该中心所有人数；</p>
-          <p style={cssIndent}>月报：该中心所有人员当月整周数对应的代码量之和/当月整周数/该中心所有人数；</p>
-          <p style={cssIndent}>季报：该中心所有人员当季整周数对应的代码量之和/当季整周数/该中心所有人数；</p>
-*/}
+          <p><strong>2.统计范围</strong></p>
+          <p style={cssIndent}>产品id=7or11；</p>
+          <p style={cssIndent}>需求创建日期&gt;=2021-7-16 00:00:00；</p>
+          <p style={cssIndent}>需求历史信息有关联项目的；</p>
+          <p style={cssIndent}> 需求创建人是顾问或客服或者[需求创建人是产品、UED、测试、开发的，
+            （需求关联项目名称包含“emergency/hotfix/sprint”的，或者“需求来源”的值为bug的，或者“条目类型”字段值为bug的）]，
+            ，并且数据去重 </p>
+
+          <p><strong>3.统计规则 </strong></p>
+          <p style={cssIndent}>需求关联项目时间取值规则：需求多次关联项目的，取最后1次需求关联项目的时间；</p>
+          <p style={cssIndent}>需求立项时长=需求关联项目时间减去需求创建时间减去周末和法定假日；</p>
+
+          <p><strong>4.统计公式 </strong></p>
+          <p style={cssIndent}>按周统计：AVG(当周所有关联项目的需求立项时长)；</p>
+          <p style={cssIndent}>按月统计：AVG(当月所有关联项目的需求立项时长)；</p>
+          <p style={cssIndent}>按季统计：AVG(当季所有关联项目的需求立项时长)；</p>
+
         </Drawer>
       </div>
 

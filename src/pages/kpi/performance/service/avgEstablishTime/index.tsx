@@ -31,30 +31,32 @@ const moduleValues: any[] = [];
 /* region 动态定义列 */
 const compColums = [
   {
-    headerName: '研发中心',
+    headerName: '组',
     field: 'devCenter',
     rowGroup: true,
     hide: true,
-  }, {
-    headerName: '所属部门',
-    field: 'dept',
-    rowGroup: true,
-    hide: true,
-  }, {
-    headerName: '组名',
-    field: 'group',
-    rowGroup: true,
-    hide: true,
-  }, {
-    headerName: '所属端',
-    field: 'module',
-    rowGroup: true,
-    hide: true,
-
-  }, {
-    headerName: '姓名',
-    field: 'username',
-  }];
+  },
+  // {
+  //   headerName: '所属部门',
+  //   field: 'dept',
+  //   rowGroup: true,
+  //   hide: true,
+  // }, {
+  //   headerName: '组名',
+  //   field: 'group',
+  //   rowGroup: true,
+  //   hide: true,
+  // }, {
+  //   headerName: '所属端',
+  //   field: 'module',
+  //   rowGroup: true,
+  //   hide: true,
+  //
+  // }, {
+  //   headerName: '姓名',
+  //   field: 'username',
+  // }
+  ];
 
 function codeNumberRender(values: any) {
   const rowName = values.rowNode.key;

@@ -14,8 +14,7 @@ import {
   getFourQuarterTime,
   getParamsByType
 } from '@/publicMethods/timeMethods';
-import {colorRender, moduleChange} from '@/publicMethods/cellRenderer';
-import {customRound, getHeight} from '@/publicMethods/pageSet';
+import {getHeight} from '@/publicMethods/pageSet';
 
 import {Button, Drawer} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
@@ -185,7 +184,7 @@ const converseArrayToOne = (data: any) => {
   return resultData;
 };
 
-const queryBugResolutionCount = async (client: GqlClient<object>, params: string) => {
+const queryLanchTime = async (client: GqlClient<object>, params: string) => {
 
   const condition = getParamsByType(params);
   if (condition.typeFlag === 0) {
@@ -223,7 +222,7 @@ const LaunchTimeTableList: React.FC<any> = () => {
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
-    queryBugResolutionCount(gqlClient, 'quarter'),
+    queryLanchTime(gqlClient, 'quarter'),
   );
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -250,7 +249,7 @@ const LaunchTimeTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const weekColums = columsForWeeks();
     gridApi.current?.setColumnDefs(weekColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'week');
+    const datas: any = await queryLanchTime(gqlClient, 'week');
     gridApi.current?.setRowData(datas);
 
   };
@@ -261,7 +260,7 @@ const LaunchTimeTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const monthColums = columsForMonths();
     gridApi.current?.setColumnDefs(monthColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'month');
+    const datas: any = await queryLanchTime(gqlClient, 'month');
     gridApi.current?.setRowData(datas);
 
   };
@@ -272,7 +271,7 @@ const LaunchTimeTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const quartersColums = columsForQuarters();
     gridApi.current?.setColumnDefs(quartersColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'quarter');
+    const datas: any = await queryLanchTime(gqlClient, 'quarter');
     gridApi.current?.setRowData(datas);
   };
 
@@ -315,7 +314,7 @@ const LaunchTimeTableList: React.FC<any> = () => {
             cellStyle: {"margin-top": "-5px"}
           }}
           autoGroupColumnDef={{
-            minWidth: 250,
+            minWidth: 150,
             // sort: 'asc'
           }}
           groupDefaultExpanded={9} // 展开分组

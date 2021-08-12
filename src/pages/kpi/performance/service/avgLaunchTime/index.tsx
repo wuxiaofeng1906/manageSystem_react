@@ -26,48 +26,48 @@ const weekRanges = getWeeksRange(8);
 const monthRanges = getTwelveMonthTime();
 const quarterTime = getFourQuarterTime();
 const groupValues: any[] = [];
-const moduleValues: any[] = [];
 
 /* region 动态定义列 */
 const compColums = [
   {
-    headerName: '组名',
+    headerName: '研发中心',
     field: 'devCenter',
     rowGroup: true,
     hide: true,
   },
-  // {
-  //   headerName: '姓名',
-  //   field: 'username',
-  // }
+  {
+    headerName: '组名',
+    field: 'group',
+  }
 ];
 
 function codeNumberRender(values: any) {
   const rowName = values.rowNode.key;
-  if (rowName === "前端" || rowName === "后端") {
-    for (let i = 0; i < moduleValues.length; i += 1) {
-      const moduleInfo = moduleValues[i];
-      if (values.colDef.field === moduleInfo.time && rowName === moduleInfo.module && values.rowNode.parent.key === moduleInfo.parent) {
-        if (moduleInfo.values === "" || moduleInfo.values === null || moduleInfo.values === undefined || Number(moduleInfo.values) === 0) {
-          return ` <span style="color: Silver  ">  ${0} </span> `;
-        }
-        return ` <span style="font-weight: bold">  ${customRound(Number(moduleInfo.values), 2)} </span> `;
+  if(rowName === undefined){
+    return  0;
+  }
+
+  for (let i = 0; i < groupValues.length; i += 1) {
+    const datas = groupValues[i];
+    if (values.colDef.field === datas.time && rowName === datas.devCenter) {
+      if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
+        return 0  ;
       }
-    }
-  } else {
-    for (let i = 0; i < groupValues.length; i += 1) {
-      const datas = groupValues[i];
-      if (values.colDef.field === datas.time && rowName === datas.group) {
-        if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
-          return ` <span style="color: Silver  ">  ${0} </span> `;
-        }
-        return ` <span style="font-weight: bold">  ${customRound(Number(datas.values), 2)} </span> `;
-      }
+      return Number(datas.values).toFixed(2);
     }
   }
-  return ` <span style="color: Silver  ">  ${0} </span> `;
+
+  return 0;
 }
 
+
+const rowrender = (params: any)=>{
+
+  if(params.value){
+    return Number(params.value).toFixed(2);
+  }
+  return 0;
+}
 
 const columsForWeeks = () => {
   const component = new Array();
@@ -78,8 +78,8 @@ const columsForWeeks = () => {
       headerName: weekName,
       field: starttime.toString(),
       aggFunc: codeNumberRender,
-      cellRenderer: colorRender
-    });
+      cellRenderer:rowrender
+     });
 
   }
   return compColums.concat(component);
@@ -92,7 +92,7 @@ const columsForMonths = () => {
       headerName: monthRanges[index].title,
       field: monthRanges[index].start,
       aggFunc: codeNumberRender,
-      cellRenderer: colorRender
+      cellRenderer:rowrender
     });
 
   }
@@ -106,7 +106,7 @@ const columsForQuarters = () => {
       headerName: quarterTime[index].title,
       field: quarterTime[index].start,
       aggFunc: codeNumberRender,
-      cellRenderer: colorRender
+      cellRenderer:rowrender
     });
 
   }
@@ -121,8 +121,6 @@ const columsForQuarters = () => {
 // 转化为ag-grid能被显示的格式
 const converseFormatForAgGrid = (oraDatas: any) => {
   groupValues.length = 0;
-  moduleValues.length = 0;
-
   const arrays: any[] = [];
   if (oraDatas === null) {
     return arrays;
@@ -131,130 +129,38 @@ const converseFormatForAgGrid = (oraDatas: any) => {
   for (let index = 0; index < oraDatas.length; index += 1) {
 
     const starttime = oraDatas[index].range.start;
-    arrays.push({
-        devCenter: "研发中心",
-        "username": "前端",
-        [starttime]: customRound(Number(oraDatas[index].side.front), 2)
-      }
-    );
-    arrays.push({
-        devCenter: "研发中心",
-        "username": "后端",
-        [starttime]: customRound(Number(oraDatas[index].side.backend), 2)
-      }
-    );
 
     groupValues.push({
+      devCenter: "研发中心",
       time: starttime,
-      group: "研发中心",
-      values: oraDatas[index].total.kpi
+       values: oraDatas[index].total.kpi   // 对研发中心的值进行特殊处理等于部门的值
+
     });
 
     const data = oraDatas[index].datas;
     for (let i = 0; i < data.length; i += 1) {
 
-      groupValues.push({
-          time: starttime,
-          group: data[i].deptName,
-          values: data[i].kpi
-        }
-        // , {
-        //   time: starttime,
-        //   group: data[i].parent === null ? "" : data[i].parent.deptName,
-        //   values: data[i].parent === null ? "" : data[i].parent.kpi
-        // }
-      );
-
-      moduleValues.push({
-        time: starttime,
-        module: "前端",
-        parent: data[i].deptName,
-        values: data[i].side === null ? "" : data[i].side.front
-      }, {
-        time: starttime,
-        module: "后端",
-        parent: data[i].deptName,
-        values: data[i].side === null ? "" : data[i].side.backend
+      arrays.push({
+        devCenter: "研发中心",
+       group: data[i].group,
+        [starttime]: data[i].kpi
       });
 
-      const usersData = data[i].users;
-
-      console.log("usersData", usersData);
-      if (usersData !== null) {
-        for (let m = 0; m < usersData.length; m += 1) {
-          const username = usersData[m].userName;
-
-          // 获取产品研发部前后端的数据
-          if (data[i].deptName === "产品研发部") {
-            arrays.push({
-                devCenter: "研发中心",
-                dept: "产品研发部",
-                "username": "前端 ",
-                [starttime]: data[i].side === null ? "" : customRound(Number(data[i].side.front), 2)
-              }, {
-                devCenter: "研发中心",
-                dept: "产品研发部",
-                "username": "后端 ",   // 故意空一格，以便于区分上一个前后端
-                [starttime]: data[i].side === null ? "" : customRound(Number(data[i].side.backend), 2)
-              }
-            );
-          }
-          // 特殊处理宋老师和王润燕的部门和组
-          if (username === "王润燕") {
-            arrays.push({
-              devCenter: "研发中心",
-              dept: "产品研发部",
-              "username": username,
-              [starttime]: usersData[m].kpi
-            });
-          } else if (username === "宋永强") {
-            arrays.push({
-              devCenter: "研发中心",
-              "username": username,
-              [starttime]: usersData[m].kpi
-            });
-          } else if (username === "李均会") {
-            arrays.splice(3, 0, {
-              devCenter: "研发中心",
-              "username": username,
-              [starttime]: usersData[m].kpi
-            });
-
-          } else if (data[i].parent === null || data[i].parent.deptName === "北京研发中心" || data[i].parent.deptName === "成都研发中心") {  // 如果是（北京或成都）研发中心，去掉部门的显示
-            arrays.push({
-                devCenter: "研发中心",
-                group: data[i].deptName,
-                module: moduleChange(usersData[m].tech),
-                "username": username,
-                [starttime]: usersData[m].kpi
-              }
-            );
-          } else {
-            arrays.push({
-              devCenter: "研发中心",
-              dept: data[i].parent.deptName,
-              group: data[i].deptName,
-              module: moduleChange(usersData[m].tech),
-              "username": username,
-              [starttime]: usersData[m].kpi
-            });
-          }
-
-        }
-      }
     }
   }
 
   return arrays;
 };
 
+
 const converseArrayToOne = (data: any) => {
+
   const resultData = new Array();
   for (let index = 0; index < data.length; index += 1) {
     let repeatFlag = false;
     // 判断原有数组是否包含有名字
     for (let m = 0; m < resultData.length; m += 1) {
-      if (resultData[m].username === data[index].username) {
+      if (resultData[m].group === data[index].group) {
         repeatFlag = true;
         break;
       }
@@ -263,9 +169,9 @@ const converseArrayToOne = (data: any) => {
     if (repeatFlag === false) {
       const tempData = {};
       for (let index2 = 0; index2 < data.length; index2 += 1) {
-        tempData["username"] = data[index].username;
+        tempData["group"] = data[index].group;
 
-        if (data[index].username === data[index2].username) {
+        if (data[index].group === data[index2].group) {
           const key = Object.keys(data[index2]);  // 获取所有的Key值
           key.forEach(function (item) {
             tempData[item] = data[index2][item];
@@ -287,49 +193,26 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
   }
   const {data} = await client.query(`
       {
-
-        avgCodeDept(kind:"${condition.typeFlag}",ends:${condition.ends}) {
-          total {
-            dept
-            deptName
-            kpi
-          }
-          range {
-            start
-            end
-          }
-          side{
-            both
-            front
-            backend
-          }
-          datas {
-            dept
-            deptName
-            kpi
-            parent {
-              dept
-              deptName
-            }
-            side{
-              both
-              front
-              backend
-            }
-            users {
-              userId
-              userName
+           problemAvgOnline(kind:"${condition.typeFlag}",ends:${condition.ends}){
+            total{
+              group
               kpi
-              tech
+            }
+            range{
+              start
+              end
+            }
+            datas{
+              group
+              kpi
             }
           }
-        }
       }
   `);
 
-  // const datas = converseFormatForAgGrid(data?.avgCodeDept);
-  // return converseArrayToOne(datas);
-  return [];
+   const result = converseFormatForAgGrid(data?.problemAvgOnline);
+  return converseArrayToOne(result);
+
 };
 
 /* endregion */

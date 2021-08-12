@@ -312,13 +312,13 @@ export default [
             path: '/kpi/performance/service',
             routes: [
               {
-                name: '平均上线时长',
+                name: '线上问题平均上线时长',
                 icon: 'table',
                 path: 'avgLaunchTime',
                 component: './kpi/performance/service/avgLaunchTime',
               },
               {
-                name: '平均立项时长',
+                name: '线上问题平均立项时长',
                 icon: 'table',
                 path: 'avgEstablishTime',
                 component: './kpi/performance/service/avgEstablishTime',

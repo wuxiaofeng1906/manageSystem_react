@@ -10,6 +10,7 @@ export class GqlClient<T> {
 
   query = (query: string) => {
     console.log("query中GQL的token", localStorage.getItem("accessId"));
+    // gql 浏览器页面下面的 HTTP HEADERS 下面需要写：{"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IuWQtOaZk-WHpCIsInN1YiI6Ild1WGlhb0ZlbmciLCJpYXQiOjE2MjM4MzA2Nzd9.G3EjtMWppClX_E2NN0dFPXgX6OsGSrIXy4ReT_Rs5zI"}
 
     return this.apolloClient.query({
       query: gql(query),

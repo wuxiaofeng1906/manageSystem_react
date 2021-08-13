@@ -42,15 +42,15 @@ const compColums = [
 
 function codeNumberRender(values: any) {
   const rowName = values.rowNode.key;
-  if(rowName === undefined){
-    return  0;
+  if (rowName === undefined) {
+    return 0;
   }
 
   for (let i = 0; i < groupValues.length; i += 1) {
     const datas = groupValues[i];
     if (values.colDef.field === datas.time && rowName === datas.devCenter) {
       if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
-        return 0  ;
+        return 0;
       }
       return Number(datas.values).toFixed(2);
     }
@@ -60,9 +60,9 @@ function codeNumberRender(values: any) {
 }
 
 
-const rowrender = (params: any)=>{
+const rowrender = (params: any) => {
 
-  if(params.value){
+  if (params.value) {
     return Number(params.value).toFixed(2);
   }
   return 0;
@@ -77,7 +77,7 @@ const columsForWeeks = () => {
       headerName: weekName,
       field: starttime.toString(),
       aggFunc: codeNumberRender,
-      cellRenderer:rowrender
+      cellRenderer: rowrender
     });
 
   }
@@ -91,7 +91,7 @@ const columsForMonths = () => {
       headerName: monthRanges[index].title,
       field: monthRanges[index].start,
       aggFunc: codeNumberRender,
-      cellRenderer:rowrender
+      cellRenderer: rowrender
     });
 
   }
@@ -105,7 +105,7 @@ const columsForQuarters = () => {
       headerName: quarterTime[index].title,
       field: quarterTime[index].start,
       aggFunc: codeNumberRender,
-      cellRenderer:rowrender
+      cellRenderer: rowrender
     });
 
   }
@@ -343,17 +343,18 @@ const EstablishTime: React.FC<any> = () => {
 
           <p><strong>2.统计范围</strong></p>
           <p style={cssIndent}>产品id=7or11；</p>
-          <p style={cssIndent}>需求创建日期&gt;=2021-7-16 00:00:00；</p>
           <p style={cssIndent}>需求历史信息有关联项目的；</p>
-          <p style={cssIndent}> 需求创建人是顾问或客服或者[需求创建人是产品、UED、测试、开发的，
-            （需求关联项目名称包含“emergency/hotfix/sprint”的，或者“需求来源”的值为bug的，或者“条目类型”字段值为bug的）]，
+          <p style={cssIndent}>需求创建人是顾问或客服的（不限创建时间）；</p>
+          <p style={cssIndent}> 需求创建人是产品、UED、测试、开发的，且需求创建日期&gt;=2021-7-16 00:00:00的
+            （需求关联项目名称包含“emergency/hotfix/sprint”的，或者“需求来源”的值为bug的，或者“条目类型”字段值为bug的）
             ，并且数据去重 </p>
+          <p style={cssIndent}>做分组统计的时候，是bug转需求的，算在bug创建人所在组；</p>
 
           <p><strong>3.统计规则 </strong></p>
           <p style={cssIndent}>需求关联项目时间取值规则：需求多次关联项目的，取最后1次需求关联项目的时间；</p>
           <p style={cssIndent}>需求立项时长=需求关联项目时间减去需求创建时间减去周末和法定假日；</p>
 
-          <p><strong>4.统计公式 </strong></p>
+          <p><strong>4.统计公式(单位：天) </strong></p>
           <p style={cssIndent}>按周统计：AVG(当周所有关联项目的需求立项时长)；</p>
           <p style={cssIndent}>按月统计：AVG(当月所有关联项目的需求立项时长)；</p>
           <p style={cssIndent}>按季统计：AVG(当季所有关联项目的需求立项时长)；</p>

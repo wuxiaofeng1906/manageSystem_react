@@ -41,6 +41,7 @@ const compColums = [
 ];
 
 function codeNumberRender(values: any) {
+  debugger;
   const rowName = values.rowNode.key;
   if (rowName === undefined) {
     return 0;
@@ -52,7 +53,7 @@ function codeNumberRender(values: any) {
       if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
         return 0;
       }
-      return (Number(datas.values) / 86400).toFixed(2);
+      return datas.values;
     }
   }
 

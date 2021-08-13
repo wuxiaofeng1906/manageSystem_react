@@ -308,7 +308,6 @@ export default [
           {
             name: '服务',
             icon: 'table',
-            access: 'sysAdmin',
             path: '/kpi/performance/service',
             routes: [
               {

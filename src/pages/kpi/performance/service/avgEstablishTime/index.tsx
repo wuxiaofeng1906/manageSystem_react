@@ -345,7 +345,7 @@ const EstablishTime: React.FC<any> = () => {
           <p><strong>2.统计范围</strong></p>
           <p style={cssIndent}>产品id=7or11；</p>
           <p style={cssIndent}>需求历史信息有关联项目的；</p>
-          <p style={cssIndent}>需求创建人是顾问或客服的（不限创建时间）；</p>
+          <p style={cssIndent}>需求创建人是顾问或客服的，创建时间&gt;=2021-01-01 00:00:00；</p>
           <p style={cssIndent}> 需求创建人是产品、UED、测试、开发的，且需求创建日期&gt;=2021-7-16 00:00:00的
             （需求关联项目名称包含“emergency/hotfix/sprint”的，或者“需求来源”的值为bug的，或者“条目类型”字段值为bug的）
             ，并且数据去重 </p>

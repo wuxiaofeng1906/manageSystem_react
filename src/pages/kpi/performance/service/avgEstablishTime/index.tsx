@@ -52,7 +52,7 @@ function codeNumberRender(values: any) {
       if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
         return 0;
       }
-      return Number(datas.values).toFixed(2);
+      return (Number(datas.values)/86400).toFixed(2);
     }
   }
 
@@ -63,7 +63,7 @@ function codeNumberRender(values: any) {
 const rowrender = (params: any) => {
 
   if (params.value) {
-    return Number(params.value).toFixed(2);
+    return (Number(params.value)/86400).toFixed(2);
   }
   return 0;
 }
@@ -298,6 +298,7 @@ const EstablishTime: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
+        <label style={{fontWeight: "bold"}}>(统计单位：天)</label>
         <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>

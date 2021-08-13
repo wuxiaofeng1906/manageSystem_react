@@ -42,17 +42,17 @@ const compColums = [
 
 function codeNumberRender(values: any) {
   const rowName = values.rowNode.key;
-  if(rowName === undefined){
-    return  0;
+  if (rowName === undefined) {
+    return 0;
   }
 
   for (let i = 0; i < groupValues.length; i += 1) {
     const datas = groupValues[i];
     if (values.colDef.field === datas.time && rowName === datas.devCenter) {
       if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
-        return 0  ;
+        return 0;
       }
-      return Number(datas.values).toFixed(2);
+      return (Number(datas.values) / 86400).toFixed(2);
     }
   }
 
@@ -60,10 +60,10 @@ function codeNumberRender(values: any) {
 }
 
 
-const rowrender = (params: any)=>{
+const rowrender = (params: any) => {
 
-  if(params.value){
-    return Number(params.value).toFixed(2);
+  if (params.value) {
+    return (Number(params.value) / 86400).toFixed(2);
   }
   return 0;
 }
@@ -77,8 +77,8 @@ const columsForWeeks = () => {
       headerName: weekName,
       field: starttime.toString(),
       aggFunc: codeNumberRender,
-      cellRenderer:rowrender
-     });
+      cellRenderer: rowrender
+    });
 
   }
   return compColums.concat(component);
@@ -91,7 +91,7 @@ const columsForMonths = () => {
       headerName: monthRanges[index].title,
       field: monthRanges[index].start,
       aggFunc: codeNumberRender,
-      cellRenderer:rowrender
+      cellRenderer: rowrender
     });
 
   }
@@ -105,7 +105,7 @@ const columsForQuarters = () => {
       headerName: quarterTime[index].title,
       field: quarterTime[index].start,
       aggFunc: codeNumberRender,
-      cellRenderer:rowrender
+      cellRenderer: rowrender
     });
 
   }
@@ -132,7 +132,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     groupValues.push({
       devCenter: "研发中心",
       time: starttime,
-       values: oraDatas[index].total.kpi   // 对研发中心的值进行特殊处理等于部门的值
+      values: oraDatas[index].total.kpi   // 对研发中心的值进行特殊处理等于部门的值
 
     });
 
@@ -141,7 +141,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
 
       arrays.push({
         devCenter: "研发中心",
-       group: data[i].group,
+        group: data[i].group,
         [starttime]: data[i].kpi
       });
 
@@ -209,7 +209,7 @@ const queryLanchTime = async (client: GqlClient<object>, params: string) => {
       }
   `);
 
-   const result = converseFormatForAgGrid(data?.problemAvgOnline);
+  const result = converseFormatForAgGrid(data?.problemAvgOnline);
   return converseArrayToOne(result);
 
 };
@@ -298,6 +298,7 @@ const LaunchTimeTableList: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
+        <label style={{fontWeight: "bold"}}>(统计单位：天)</label>
         <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>
@@ -339,7 +340,7 @@ const LaunchTimeTableList: React.FC<any> = () => {
 
           <p><strong>2.统计范围</strong></p>
           <p style={cssIndent}>产品id=7or11；</p>
-           <p style={cssIndent}>需求阶段=已发布或需求状态=已关闭；</p>
+          <p style={cssIndent}>需求阶段=已发布或需求状态=已关闭；</p>
           <p style={cssIndent}>需求创建人是顾问或客服的（不限创建时间）；</p>
           <p style={cssIndent}> 需求创建人是产品、UED、测试、开发的，且需求创建日期&gt;=2021-7-16 00:00:00的
             （需求所属计划或关联项目名称包含“emergency/hotfix/sprint”的，或者“需求来源”的值为bug的，或者“条目类型”字段值为bug的）

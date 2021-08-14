@@ -130,13 +130,13 @@ export default [
   },
   {
     name: '研发过程数据',
+    access: 'devCenter',  // 仅研发中心人员可见，客服不可见
     icon: 'table',
     path: '/kpi',
     routes: [
       {
         name: '度量指标',
         icon: 'table',
-        access: 'devCenter',
         path: '/kpi/performance',
         routes: [
           {

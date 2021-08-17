@@ -7,7 +7,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
-import {Button, Col, DatePicker, Form, Tabs} from 'antd';
+import {Button, Checkbox, Col, DatePicker, Form, message, Modal, Row, Tabs} from 'antd';
 import {FundTwoTone, DatabaseTwoTone, LogoutOutlined, SettingOutlined} from '@ant-design/icons';
 import {getHeight} from '@/publicMethods/pageSet';
 import * as echarts from 'echarts';// 引入 ECharts 主模块
@@ -311,10 +311,60 @@ const CodeTableList: React.FC<any> = () => {
   };
 
 
-// 显示自定义字段
+  /* region 显示自定义字段 */
+  const [isFieldModalVisible, setFieldModalVisible] = useState(false);
+  const [selectedFiled, setSelectedFiled] = useState(['']);
+  const nessField = ['NO.', '姓名'];
+  const unNessField = ['最大值', '平均值', '最小值', '部门', '组', '端', '地域', '职务', '岗位类型', '类型',
+    '出勤状态', '项目阶段'];
+
+  // 弹出字段显示层
   const showFieldsModal = () => {
+    const fields = localStorage.getItem("data_alaysis_code_Source");
+    if (fields === null) {
+      setSelectedFiled(nessField.concat(unNessField));
+    } else {
+      setSelectedFiled(JSON.parse(fields));
+    }
+    setFieldModalVisible(true);
+  };
+
+  // 全选
+  const selectAllField = (e: any) => {
+    if (e.target.checked === true) {
+      setSelectedFiled(nessField.concat(unNessField));
+    } else {
+      setSelectedFiled(nessField);
+    }
+  };
+
+  // 保存按钮
+  const commitField = () => {
+    localStorage.setItem("data_alaysis_code_Source", JSON.stringify(selectedFiled));
+    setFieldModalVisible(false);
+    // 首先需要清空原有列，否则会导致列混乱
+    gridApiForSource.current?.setColumnDefs([]);
+
+    message.info({
+      content: "保存成功！",
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
 
   };
+// 取消
+  const fieldCancel = () => {
+    setFieldModalVisible(false);
+  };
+
+  // 缓存到state
+  const onSetFieldsChange = (checkedValues: any) => {
+    setSelectedFiled(checkedValues);
+  };
+  /* endregion */
+
   /* endregion */
 
 
@@ -396,6 +446,77 @@ const CodeTableList: React.FC<any> = () => {
           </TabPane>
 
         </Tabs>
+
+        <Modal
+          title={'自定义字段'}
+          visible={isFieldModalVisible}
+          onCancel={fieldCancel}
+          centered={true}
+          footer={null}
+          width={920}
+        >
+          <Form>
+            <div>
+              <Checkbox.Group style={{width: '100%'}} value={selectedFiled} onChange={onSetFieldsChange}>
+                <Row>
+                  <Col span={4}>
+                    <Checkbox defaultChecked disabled value="NO.">NO.</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox defaultChecked disabled value="姓名">姓名</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="最大值">最大值</Checkbox>
+                    <Col span={4}>
+                      <Checkbox value="平均值">平均值</Checkbox>
+                    </Col>
+                    <Col span={4}>
+                      <Checkbox value="最小值">最小值</Checkbox>
+                    </Col>
+                    <Col span={4}>
+                      <Checkbox value="部门">部门</Checkbox>
+                    </Col>
+                    <Col span={4}>
+                      <Checkbox value="组">组</Checkbox>
+                    </Col>
+                    <Col span={4}>
+                      <Checkbox value="端">端</Checkbox>
+                    </Col>
+                    <Col span={4}>
+                      <Checkbox value="地域">地域</Checkbox>
+                    </Col>
+                    <Col span={4}>
+                      <Checkbox value="职务">职务</Checkbox>
+                    </Col>
+                    <Col span={4}>
+                      <Checkbox value="岗位类型">岗位类型</Checkbox>
+                    </Col>
+                    <Col span={4}>
+                      <Checkbox value="类型">类型</Checkbox>
+                    </Col>
+                    <Col span={4}>
+                      <Checkbox value="出勤状态">出勤状态</Checkbox>
+                    </Col>
+                    <Col span={4}>
+                      <Checkbox value="项目阶段">项目阶段</Checkbox>
+                    </Col>
+                  </Col>
+                </Row>
+              </Checkbox.Group>,
+            </div>
+
+            <div>
+              <Checkbox onChange={selectAllField}>全选</Checkbox>
+
+              <Button type="primary" style={{marginLeft: '300px'}} onClick={commitField}>
+                确定</Button>
+              <Button type="primary" style={{marginLeft: '20px'}} onClick={fieldCancel}>
+                取消</Button>
+            </div>
+
+          </Form>
+        </Modal>
+
       </div>
 
 

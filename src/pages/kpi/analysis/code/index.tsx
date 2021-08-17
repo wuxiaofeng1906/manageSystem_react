@@ -7,143 +7,257 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
-import {Tabs} from 'antd';
-import {FundTwoTone, DatabaseTwoTone} from '@ant-design/icons';
+import {Button, Col, DatePicker, Form, Tabs} from 'antd';
+import {FundTwoTone, DatabaseTwoTone, LogoutOutlined, SettingOutlined} from '@ant-design/icons';
 import {getHeight} from '@/publicMethods/pageSet';
-// 引入 ECharts 主模块
-import * as echarts from 'echarts';
-// 引入柱状图
-import  'echarts/lib/chart/bar';
-// 引入提示框和标题组件
-import 'echarts/lib/component/tooltip';
+import * as echarts from 'echarts';// 引入 ECharts 主模块
+import 'echarts/lib/chart/bar';// 引入柱状图
+import 'echarts/lib/component/tooltip';// 引入提示框和标题组件
 import 'echarts/lib/component/title';
+import {judgeAuthority} from "@/publicMethods/authorityJudge";
+import {moduleChange, areaRender,groupRender} from "@/publicMethods/cellRenderer";
+
 
 const {TabPane} = Tabs;
+const {RangePicker} = DatePicker;
 
 /* region 分析报告页面 */
 
 /* endregion */
 
 /* region 源数据页面 */
-const compColums = [
-  {
-    headerName: '研发中心',
-    field: 'devCenter',
-    rowGroup: true,
-    hide: true,
-  },
-  {
-    headerName: '所属部门',
-    field: 'dept',
-    rowGroup: true,
-    hide: true,
-  },
-  {
-    headerName: '组名',
-    field: 'group',
-    rowGroup: true,
-    hide: true,
-  },
-  {
-    headerName: '所属端',
-    field: 'module',
-    rowGroup: true,
-    hide: true,
-  },
-  {
-    headerName: '姓名',
-    field: 'username',
-  },
-];
+
+// 定义列名
+const getSourceColums = () => {
+
+  // 获取缓存的字段
+  const fields = localStorage.getItem("sp_details_filed");
+  const oraFields: any = [
+    // {
+    //   headerName: '选择',
+    //   pinned: 'left',
+    //   checkboxSelection: true,
+    //   headerCheckboxSelection: true,
+    //   maxWidth: 35,
+    // },
+    {
+      headerName: 'NO.',
+      minWidth: 60,
+      maxWidth: 80,
+      filter: false,
+      pinned: 'left',
+      suppressMenu: true,
+      cellRenderer: (params: any) => {
+        return Number(params.node.id) + 1;
+      },
+    },
+    {
+      headerName: '姓名',
+      field: 'userName',
+      pinned: 'left',
+      minWidth: 80,
+    },
+    {
+      headerName: '最大值',
+      field: 'maxLines',
+      minWidth: 80,
+      suppressMenu: true,
+    },
+    {
+      headerName: '平均值',
+      field: 'avgLines',
+      minWidth: 80,
+      suppressMenu: true,
+
+    },
+    {
+      headerName: '最小值',
+      field: 'minLines',
+      minWidth: 80,
+      suppressMenu: true,
+    },
+    {
+      headerName: '部门',
+      field: 'deptName',
+      minWidth: 135,
+    },
+    {
+      headerName: '组',
+      field: 'groupName',
+      minWidth: 135,
+      cellRenderer: groupRender,
+      // filterParams: {cellRenderer:groupRender}
+    },
+    {
+      headerName: '端',
+      field: 'tech',
+      minWidth: 70,
+      cellRenderer: (params: any) => {
+        return moduleChange(params.value);
+      },
+      filterParams: {
+        cellRenderer: (params: any) => {
+          return moduleChange(params.value);
+        }
+      }
+    },
+    {
+      headerName: '地域',
+      field: 'area',
+      minWidth: 80,
+      cellRenderer: areaRender,
+      filterParams: {cellRenderer: areaRender}
+    }, {
+      headerName: '职务',
+      field: 'job',
+      minWidth: 95,
+    },
+    {
+      headerName: '岗位类型',
+      field: 'position',
+      minWidth: 135,
+    },
+    {
+      headerName: '类型',
+      field: 'labour',
+      minWidth: 80,
+    },
+    {
+      headerName: '出勤状态',
+      field: 'attendance',
+      minWidth: 110,
+    },
+    {
+      headerName: '项目阶段',
+      field: 'stage',
+      minWidth: 110,
+    },
+  ];
+  if (fields === null) {
+    return oraFields;
+  }
+  const myFields = JSON.parse(fields);
+  const component = new Array();
+
+  oraFields.forEach((ele: any) => {
+    const newElement = ele;
+    if (myFields.includes(ele.headerName)) {
+      newElement.hide = false;
+    } else {
+      newElement.hide = true;
+    }
+    component.push(newElement);
+  });
+
+  return oraFields;
+};
+
 
 const queryBugResolutionCount = async (client: GqlClient<object>, params: string) => {
 
-  // const { data } = await client.query(`
-  //     {
-  //
-  //
-  //     }
-  // `);
+  const {data} = await client.query(`
+      {
+        avgCodeAnalysis(start:"2021-07-12",end:"2021-08-01"){
+        userId
+        userName
+        maxLines
+        avgLines
+        minLines
+        deptName
+        groupName
+        tech
+        area
+        position
+        job
+        labour
+        attendance
+        stage
+      }
 
-  return [];
+      }
+  `);
+
+  return data?.avgCodeAnalysis;
 };
+
 /* endregion */
 
 const CodeTableList: React.FC<any> = () => {
+
   /* region 分析报告页面 */
-  const showTestChart=()=>{
+  const showTestChart = () => {
     const bom = document.getElementById('main');
     if (bom) {
       // 基于准备好的dom，初始化echarts实例
-      var myChart = echarts.init(bom);
+      const myChart = echarts.init(bom);
       console.log("myChart", myChart)
       // 绘制图表
       myChart.setOption({
-        title : {
+        title: {
           text: '未来一周气温变化',
           subtext: '纯属虚构'
         },
-        tooltip : {
+        tooltip: {
           trigger: 'axis'
         },
         legend: {
-          data:['最高气温','最低气温']
+          data: ['最高气温', '最低气温']
         },
         toolbox: {
-          show : true,
-          feature : {
-            mark : {show: true},
-            dataView : {show: true, readOnly: false},
-            magicType : {show: true, type: ['line', 'bar']},
-            restore : {show: true},
-            saveAsImage : {show: true}
+          show: true,
+          feature: {
+            mark: {show: true},
+            dataView: {show: true, readOnly: false},
+            magicType: {show: true, type: ['line', 'bar']},
+            restore: {show: true},
+            saveAsImage: {show: true}
           }
         },
-        calculable : true,
-        xAxis : [
+        calculable: true,
+        xAxis: [
           {
-            type : 'category',
-            boundaryGap : false,
-            data : ['周一','周二','周三','周四','周五','周六','周日']
+            type: 'category',
+            boundaryGap: false,
+            data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
           }
         ],
-        yAxis : [
+        yAxis: [
           {
-            type : 'value',
-            axisLabel : {
+            type: 'value',
+            axisLabel: {
               formatter: '{value} °C'
             }
           }
         ],
-        series : [
+        series: [
           {
-            name:'最高气温',
-            type:'line',
-            data:[11, 11, 15, 13, 12, 13, 10],
-            markPoint : {
-              data : [
-                {type : 'max', name: '最大值'},
-                {type : 'min', name: '最小值'}
+            name: '最高气温',
+            type: 'line',
+            data: [11, 11, 15, 13, 12, 13, 10],
+            markPoint: {
+              data: [
+                {type: 'max', name: '最大值'},
+                {type: 'min', name: '最小值'}
               ]
             },
-            markLine : {
-              data : [
-                {type : 'average', name: '平均值'}
+            markLine: {
+              data: [
+                {type: 'average', name: '平均值'}
               ]
             }
           },
           {
-            name:'最低气温',
-            type:'line',
-            data:[1, -2, 2, 5, 3, 2, 0],
-            markPoint : {
-              data : [
-                {name : '周最低', value : -2, xAxis: 1, yAxis: -1.5}
+            name: '最低气温',
+            type: 'line',
+            data: [1, -2, 2, 5, 3, 2, 0],
+            markPoint: {
+              data: [
+                {name: '周最低', value: -2, xAxis: 1, yAxis: -1.5}
               ]
             },
-            markLine : {
-              data : [
-                {type : 'average', name : '平均值'}
+            markLine: {
+              data: [
+                {type: 'average', name: '平均值'}
               ]
             }
           }
@@ -171,55 +285,88 @@ const CodeTableList: React.FC<any> = () => {
   }
 
   // 表格的屏幕大小自适应
-  const [gridHeight, setGridHeight] = useState(getHeight());
+  const [gridHeight, setGridHeight] = useState(Number(getHeight())-64 );
   window.onresize = function () {
-    // console.log("新高度：", getHeight());
-    setGridHeight(getHeight());
+
+    setGridHeight(Number(getHeight())-64 );
     gridApi.current?.sizeColumnsToFit();
   };
 
   /* endregion */
 
+  const onDataTimeSelected = () => {
+
+  };
+
+  const showDefalultSource = () => {
+
+  };
+
+  const showFieldsModal = () => {
+
+  };
   /* endregion */
 
 
   const callback = (clickTab: any) => {
     console.log(clickTab);
-    if(clickTab === "sourceData"){
+    if (clickTab === "sourceData") {
 
-    }else{
+    } else {
       showTestChart();
     }
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     // showTestChart();
-  },[]);
+  }, []);
 
 
   return (
     <PageContainer>
       <div style={{marginTop: "-35px"}}>
         <Tabs defaultActiveKey="sourceData" onChange={callback} size={"large"}>
-
+          {/* 分析页面 */}
           <TabPane tab={<span> <FundTwoTone/>分析报告</span>} key="analysisReport">
 
-            <div id="main" style={{marginTop:30, height:500}}>
+            <div id="main" style={{marginTop: 30, height: 500}}>
 
             </div>
           </TabPane>
 
+          {/* 数据源页面 */}
           <TabPane tab={<span> <DatabaseTwoTone/>源数据</span>} key="sourceData">
-            <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
+            <div style={{width: '100%', overflow: 'auto', whiteSpace: 'nowrap'}}>
+              <Form.Item>
+
+                <label style={{marginLeft: "10px"}}>时间：</label>
+                <RangePicker
+                  style={{width: '30%'}} onChange={onDataTimeSelected}
+                />
+
+                <Button type="text" style={{marginLeft: "20px", color: 'black'}}
+                        icon={<LogoutOutlined/>} size={'small'} onClick={showDefalultSource}>
+                  默认：</Button>
+                <label style={{marginLeft: "-10px", color: 'black'}}> 默认8周</label>
+
+                <Button type="text" icon={<SettingOutlined/>} size={'large'} onClick={showFieldsModal}
+                        style={{float: "right"}}> </Button>
+
+              </Form.Item>
+
+
+            </div>
+
+            <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%', marginTop: -10}}>
               <AgGridReact
-                columnDefs={compColums} // 定义列
+                columnDefs={getSourceColums()} // 定义列
                 rowData={data} // 数据绑定
                 defaultColDef={{
                   resizable: true,
                   sortable: true,
                   filter: true,
                   flex: 1,
-                  cellStyle: {'margin-top': '-5px'},
+                  cellStyle: {"line-height": "28px"},
                 }}
                 autoGroupColumnDef={{
                   minWidth: 250,
@@ -227,7 +374,7 @@ const CodeTableList: React.FC<any> = () => {
                 }}
                 groupDefaultExpanded={9} // 展开分组
                 suppressAggFuncInHeader={true} // 不显示标题聚合函数的标识
-                rowHeight={32}
+                rowHeight={30}
                 headerHeight={35}
                 onGridReady={onGridReady}
                 suppressScrollOnNewData={false}

@@ -410,7 +410,7 @@ const numberRenderToZentaoType = (params: any,) => {
 };
 
 
-const numberRenderToZentaoTypeFilter = (params: any,test:any) => {
+const numberRenderToZentaoTypeFilter = (params: any, test: any) => {
   debugger;
   if (!params.value || params.value === '(Select All)') {
     return params.value;
@@ -429,7 +429,7 @@ const numberRenderToZentaoTypeFilter = (params: any,test:any) => {
     case "3":
 
       // if (params.data.fromBug) {
-        type = "Story";
+      type = "Story";
       // } else {
       //   type = "B-Story";
       // }
@@ -784,6 +784,10 @@ const linkToZentaoPage = (params: any) => {
 };
 
 const moduleChange = (params: string) => {
+  if (!params || params === '(Select All)') {
+    return params;
+  }
+
 
   let module = "";
   switch (params) {
@@ -816,6 +820,53 @@ function colorRender(params: any) {
   return params.value;  // 为了将聚合函数实现格式化
 }
 
+const areaRender = (params: any) => {
+
+  if (params.value) {
+    if (params.value === "CD") {
+      return "成都";
+    }
+    if (params.value === "BJ") {
+      return "北京";
+    }
+  }
+
+  return params.value;
+
+};
+
+
+const groupRender = (params: any) => {
+
+  if (!params.value) {
+    if (params.data) {
+      switch (params.data.deptName) {
+        case "前端平台研发部":
+          return "前端平台";
+          break;
+        case "应用架构部":
+          return "应用架构";
+          break;
+        case "平台研发部":
+          return "平台研发";
+          break;
+        case "业务开发部":
+          return "业务开发";
+          break;
+
+        default:
+          return params.value;
+          break;
+      }
+    }
+    return params.value;
+
+  }
+
+  return params.value;
+
+};
+
 export {
   numberRenderToYesNo,
   numberRenderTopass,
@@ -842,6 +893,8 @@ export {
   testerRender,
   timeForLineThrough,
   numRenderToTypeForLineAndFromBug,
-  numberRenderToZentaoTypeFilter
+  numberRenderToZentaoTypeFilter,
+  groupRender,
+  areaRender
 };
 

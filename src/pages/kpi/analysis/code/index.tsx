@@ -4,7 +4,7 @@ import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {useRequest} from 'ahooks';
+
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import {Button, Col, DatePicker, Form, Tabs} from 'antd';
@@ -14,8 +14,8 @@ import * as echarts from 'echarts';// 引入 ECharts 主模块
 import 'echarts/lib/chart/bar';// 引入柱状图
 import 'echarts/lib/component/tooltip';// 引入提示框和标题组件
 import 'echarts/lib/component/title';
-import {judgeAuthority} from "@/publicMethods/authorityJudge";
-import {moduleChange, areaRender,groupRender} from "@/publicMethods/cellRenderer";
+import {moduleChange, areaRender, groupRender} from "@/publicMethods/cellRenderer";
+import {getWeeksRange} from "@/publicMethods/timeMethods";
 
 
 const {TabPane} = Tabs;
@@ -153,11 +153,11 @@ const getSourceColums = () => {
 };
 
 
-const queryBugResolutionCount = async (client: GqlClient<object>, params: string) => {
+const querySourceData = async (client: GqlClient<object>, params: any) => {
 
   const {data} = await client.query(`
       {
-        avgCodeAnalysis(start:"2021-07-12",end:"2021-08-01"){
+        avgCodeAnalysis(start:"${params.start}",end:"${params.end}"){
         userId
         userName
         maxLines
@@ -183,6 +183,8 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
 /* endregion */
 
 const CodeTableList: React.FC<any> = () => {
+  // 公共定义
+  const gqlClient = useGqlClient();
 
   /* region 分析报告页面 */
   const showTestChart = () => {
@@ -271,47 +273,56 @@ const CodeTableList: React.FC<any> = () => {
 
   /* region 源数据页面 */
 
-  /* region ag-grid */
-  const gridApi = useRef<GridApi>();
-  const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryBugResolutionCount(gqlClient, 'quarter'));
-  const onGridReady = (params: GridReadyEvent) => {
-    gridApi.current = params.api;
+  const gridApiForSource = useRef<GridApi>();
+  const onSourceGridReady = (params: GridReadyEvent) => {
+    gridApiForSource.current = params.api;
     params.api.sizeColumnsToFit();
   };
-  if (gridApi.current) {
-    if (loading) gridApi.current.showLoadingOverlay();
-    else gridApi.current.hideOverlay();
-  }
 
   // 表格的屏幕大小自适应
-  const [gridHeight, setGridHeight] = useState(Number(getHeight())-64 );
+  const [sourceGridHeight, setGridHeight] = useState(Number(getHeight()) - 64);
   window.onresize = function () {
-
-    setGridHeight(Number(getHeight())-64 );
-    gridApi.current?.sizeColumnsToFit();
+    setGridHeight(Number(getHeight()) - 64);
+    gridApiForSource.current?.sizeColumnsToFit();
   };
 
-  /* endregion */
 
-  const onDataTimeSelected = () => {
+  // 初始化显示和显示默认数据
+  const showSourceData = async () => {
+    const weekRanges = getWeeksRange(8);
+    const range = {
+      start: weekRanges[0].from,
+      end: weekRanges[7].to
+    };
+    const datas: any = await querySourceData(gqlClient, range);
+    gridApiForSource.current?.setRowData(datas);
+  };
+
+  // 时间选择事件
+  const onDataTimeSelected = async (params: any, dateString: any) => {
+
+    const range = {
+      start: dateString[0],
+      end: dateString[1]
+    };
+    const datas: any = await querySourceData(gqlClient, range);
+    gridApiForSource.current?.setRowData(datas);
 
   };
 
-  const showDefalultSource = () => {
 
-  };
-
+// 显示自定义字段
   const showFieldsModal = () => {
 
   };
   /* endregion */
 
 
+  // tab 切换事件
   const callback = (clickTab: any) => {
-    console.log(clickTab);
-    if (clickTab === "sourceData") {
 
+    if (clickTab === "sourceData") {
+      showSourceData();
     } else {
       showTestChart();
     }
@@ -325,7 +336,7 @@ const CodeTableList: React.FC<any> = () => {
   return (
     <PageContainer>
       <div style={{marginTop: "-35px"}}>
-        <Tabs defaultActiveKey="sourceData" onChange={callback} size={"large"}>
+        <Tabs defaultActiveKey="analysisReport" onChange={callback} size={"large"}>
           {/* 分析页面 */}
           <TabPane tab={<span> <FundTwoTone/>分析报告</span>} key="analysisReport">
 
@@ -345,7 +356,7 @@ const CodeTableList: React.FC<any> = () => {
                 />
 
                 <Button type="text" style={{marginLeft: "20px", color: 'black'}}
-                        icon={<LogoutOutlined/>} size={'small'} onClick={showDefalultSource}>
+                        icon={<LogoutOutlined/>} size={'small'} onClick={showSourceData}>
                   默认：</Button>
                 <label style={{marginLeft: "-10px", color: 'black'}}> 默认8周</label>
 
@@ -354,13 +365,12 @@ const CodeTableList: React.FC<any> = () => {
 
               </Form.Item>
 
-
             </div>
 
-            <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%', marginTop: -10}}>
+            <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: -10}}>
               <AgGridReact
                 columnDefs={getSourceColums()} // 定义列
-                rowData={data} // 数据绑定
+                rowData={[]} // 数据绑定
                 defaultColDef={{
                   resizable: true,
                   sortable: true,
@@ -376,7 +386,7 @@ const CodeTableList: React.FC<any> = () => {
                 suppressAggFuncInHeader={true} // 不显示标题聚合函数的标识
                 rowHeight={30}
                 headerHeight={35}
-                onGridReady={onGridReady}
+                onGridReady={onSourceGridReady}
                 suppressScrollOnNewData={false}
               >
 

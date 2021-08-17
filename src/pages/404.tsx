@@ -2,7 +2,7 @@ import { Button, Result } from 'antd';
 import React from 'react';
 import { history } from 'umi';
 
-const test = 1;
+const test = 2;
 
 const NoFoundPage: React.FC<{}> = () => (
   <Result

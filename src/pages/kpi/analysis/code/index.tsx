@@ -240,10 +240,14 @@ const querySourceData = async (client: GqlClient<object>, params: any) => {
 /* endregion */
 
 const CodeTableList: React.FC<any> = () => {
+  const sys_accessToken = localStorage.getItem("accessId");
+  axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
   // 公共定义
   const gqlClient = useGqlClient();
 
   /* region 分析报告页面 */
+  /* 第一行图表 */
+
   const showTestChart = () => {
     const bom = document.getElementById('main');
     if (bom) {
@@ -326,7 +330,44 @@ const CodeTableList: React.FC<any> = () => {
   }
 
   /* endregion */
+  const getTotalColums = () => {
 
+    return [
+      {
+        headerName: '阶段/领域',
+        field: 'userName',
+        pinned: 'left',
+        minWidth: 80,
+      },
+      {
+        headerName: '出勤状态',
+        field: 'maxLines',
+        minWidth: 80,
+      },
+      {
+        headerName: '统计项',
+        field: 'avgLines',
+        minWidth: 80,
+      },
+      {
+        headerName: '正式开发',
+        field: 'minLines',
+        minWidth: 80,
+
+      },
+      {
+        headerName: '试用开发',
+        field: 'deptName',
+        minWidth: 135,
+      },
+      {
+        headerName: '技术管理',
+        field: 'groupName',
+        minWidth: 135,
+      },
+    ];
+
+  };
 
   /* region 源数据页面 */
 
@@ -524,7 +565,7 @@ const CodeTableList: React.FC<any> = () => {
   }
 
   useEffect(() => {
-    // showTestChart();
+    showTestChart();
   }, []);
 
 
@@ -535,9 +576,45 @@ const CodeTableList: React.FC<any> = () => {
           {/* 分析页面 */}
           <TabPane tab={<span> <FundTwoTone/>分析报告</span>} key="analysisReport">
 
-            <div id="main" style={{marginTop: 30, height: 500}}>
+            {/* 第一行图表页面 */}
+            <div>
+              <Row style={{backgroundColor:"white"}}>
+                <Col span={12}>
+                  <div className="ag-theme-alpine" style={{height: 300, width: '100%', marginTop: 10}}>
+                    <AgGridReact
+                      columnDefs={getTotalColums()} // 定义列
+                      rowData={[]} // 数据绑定
+                      defaultColDef={{
+                        resizable: true,
+                        sortable: true,
+                        filter: true,
+                        flex: 1,
+                        cellStyle: {"line-height": "28px"},
+                      }}
+                      autoGroupColumnDef={{
+                        minWidth: 250,
+                        // sort: 'asc'
+                      }}
+                      groupDefaultExpanded={9} // 展开分组
+                      suppressAggFuncInHeader={true} // 不显示标题聚合函数的标识
+                      rowHeight={28}
+                      headerHeight={33}
 
+                      onGridReady={onSourceGridReady}
+                      suppressScrollOnNewData={false}
+                      onCellEditingStopped={onSourceCellEdited}
+                    >
+
+                    </AgGridReact>
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div id="main" style={{marginTop: 30, height: 300}}>
+                  </div>
+                </Col>
+              </Row>
             </div>
+
           </TabPane>
 
           {/* 数据源页面 */}

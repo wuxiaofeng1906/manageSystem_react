@@ -31,7 +31,7 @@ const {RangePicker} = DatePicker;
 const getSourceColums = () => {
 
   // 获取缓存的字段
-  const fields = localStorage.getItem("sp_details_filed");
+  const fields = localStorage.getItem("data_alaysis_code_Source");
   const oraFields: any = [
     // {
     //   headerName: '选择',
@@ -149,7 +149,7 @@ const getSourceColums = () => {
     component.push(newElement);
   });
 
-  return oraFields;
+  return component;
 };
 
 
@@ -443,79 +443,79 @@ const CodeTableList: React.FC<any> = () => {
               </AgGridReact>
             </div>
 
+            <Modal
+              title={'自定义字段'}
+              visible={isFieldModalVisible}
+              onCancel={fieldCancel}
+              centered={true}
+              footer={null}
+              width={920}
+            >
+              <Form>
+                <div>
+                  <Checkbox.Group style={{width: '100%'}} value={selectedFiled} onChange={onSetFieldsChange}>
+                    <Row>
+                      <Col span={4}>
+                        <Checkbox defaultChecked disabled value="NO.">NO.</Checkbox>
+                      </Col>
+                      <Col span={4}>
+                        <Checkbox defaultChecked disabled value="姓名">姓名</Checkbox>
+                      </Col>
+                      <Col span={4}>
+                        <Checkbox value="最大值">最大值</Checkbox>
+                      </Col>
+                      <Col span={4}>
+                        <Checkbox value="平均值">平均值</Checkbox>
+                      </Col>
+                      <Col span={4}>
+                        <Checkbox value="最小值">最小值</Checkbox>
+                      </Col>
+                      <Col span={4}>
+                        <Checkbox value="部门">部门</Checkbox>
+                      </Col>
+                      <Col span={4}>
+                        <Checkbox value="组">组</Checkbox>
+                      </Col>
+                      <Col span={4}>
+                        <Checkbox value="端">端</Checkbox>
+                      </Col>
+                      <Col span={4}>
+                        <Checkbox value="地域">地域</Checkbox>
+                      </Col>
+                      <Col span={4}>
+                        <Checkbox value="职务">职务</Checkbox>
+                      </Col>
+                      <Col span={4}>
+                        <Checkbox value="岗位类型">岗位类型</Checkbox>
+                      </Col>
+                      <Col span={4}>
+                        <Checkbox value="类型">类型</Checkbox>
+                      </Col>
+                      <Col span={4}>
+                        <Checkbox value="出勤状态">出勤状态</Checkbox>
+                      </Col>
+                      <Col span={4}>
+                        <Checkbox value="项目阶段">项目阶段</Checkbox>
+                      </Col>
+                    </Row>
+                  </Checkbox.Group>,
+                </div>
+
+                <div>
+                  <Checkbox onChange={selectAllField}>全选</Checkbox>
+
+                  <Button type="primary" style={{marginLeft: '300px'}} onClick={commitField}>
+                    确定</Button>
+                  <Button type="primary" style={{marginLeft: '20px'}} onClick={fieldCancel}>
+                    取消</Button>
+                </div>
+
+              </Form>
+            </Modal>
           </TabPane>
 
         </Tabs>
 
-        <Modal
-          title={'自定义字段'}
-          visible={isFieldModalVisible}
-          onCancel={fieldCancel}
-          centered={true}
-          footer={null}
-          width={920}
-        >
-          <Form>
-            <div>
-              <Checkbox.Group style={{width: '100%'}} value={selectedFiled} onChange={onSetFieldsChange}>
-                <Row>
-                  <Col span={4}>
-                    <Checkbox defaultChecked disabled value="NO.">NO.</Checkbox>
-                  </Col>
-                  <Col span={4}>
-                    <Checkbox defaultChecked disabled value="姓名">姓名</Checkbox>
-                  </Col>
-                  <Col span={4}>
-                    <Checkbox value="最大值">最大值</Checkbox>
-                    <Col span={4}>
-                      <Checkbox value="平均值">平均值</Checkbox>
-                    </Col>
-                    <Col span={4}>
-                      <Checkbox value="最小值">最小值</Checkbox>
-                    </Col>
-                    <Col span={4}>
-                      <Checkbox value="部门">部门</Checkbox>
-                    </Col>
-                    <Col span={4}>
-                      <Checkbox value="组">组</Checkbox>
-                    </Col>
-                    <Col span={4}>
-                      <Checkbox value="端">端</Checkbox>
-                    </Col>
-                    <Col span={4}>
-                      <Checkbox value="地域">地域</Checkbox>
-                    </Col>
-                    <Col span={4}>
-                      <Checkbox value="职务">职务</Checkbox>
-                    </Col>
-                    <Col span={4}>
-                      <Checkbox value="岗位类型">岗位类型</Checkbox>
-                    </Col>
-                    <Col span={4}>
-                      <Checkbox value="类型">类型</Checkbox>
-                    </Col>
-                    <Col span={4}>
-                      <Checkbox value="出勤状态">出勤状态</Checkbox>
-                    </Col>
-                    <Col span={4}>
-                      <Checkbox value="项目阶段">项目阶段</Checkbox>
-                    </Col>
-                  </Col>
-                </Row>
-              </Checkbox.Group>,
-            </div>
-
-            <div>
-              <Checkbox onChange={selectAllField}>全选</Checkbox>
-
-              <Button type="primary" style={{marginLeft: '300px'}} onClick={commitField}>
-                确定</Button>
-              <Button type="primary" style={{marginLeft: '20px'}} onClick={fieldCancel}>
-                取消</Button>
-            </div>
-
-          </Form>
-        </Modal>
 
       </div>
 

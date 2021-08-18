@@ -15,7 +15,8 @@ import 'echarts/lib/chart/bar';// 引入柱状图
 import 'echarts/lib/component/tooltip';// 引入提示框和标题组件
 import 'echarts/lib/component/title';
 import {moduleChange, areaRender, groupRender} from "@/publicMethods/cellRenderer";
-import {getWeeksRange} from "@/publicMethods/timeMethods";
+import {getRecentMonth, getWeeksRange} from "@/publicMethods/timeMethods";
+import moment from "moment";
 
 
 const {TabPane} = Tabs;
@@ -286,10 +287,19 @@ const CodeTableList: React.FC<any> = () => {
     gridApiForSource.current?.sizeColumnsToFit();
   };
 
+  const [choicedCondition, setQueryCondition] = useState({
+    start: "",
+    end: ""
+  });
 
   // 初始化显示和显示默认数据
   const showSourceData = async () => {
     const weekRanges = getWeeksRange(8);
+    setQueryCondition({
+      start: weekRanges[0].from,
+      end: weekRanges[7].to
+    });
+
     const range = {
       start: weekRanges[0].from,
       end: weekRanges[7].to
@@ -300,6 +310,10 @@ const CodeTableList: React.FC<any> = () => {
 
   // 时间选择事件
   const onDataTimeSelected = async (params: any, dateString: any) => {
+    setQueryCondition({
+      start: dateString[0],
+      end: dateString[1]
+    });
 
     const range = {
       start: dateString[0],
@@ -403,6 +417,8 @@ const CodeTableList: React.FC<any> = () => {
                 <label style={{marginLeft: "10px"}}>时间：</label>
                 <RangePicker
                   style={{width: '30%'}} onChange={onDataTimeSelected}
+                  value={[choicedCondition.start === "" ? null : moment(choicedCondition.start),
+                    choicedCondition.end === "" ? null : moment(choicedCondition.end)]}
                 />
 
                 <Button type="text" style={{marginLeft: "20px", color: 'black'}}

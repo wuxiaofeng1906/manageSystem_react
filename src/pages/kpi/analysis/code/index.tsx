@@ -15,7 +15,7 @@ import 'echarts/lib/chart/bar';// 引入柱状图
 import 'echarts/lib/component/tooltip';// 引入提示框和标题组件
 import 'echarts/lib/component/title';
 import {moduleChange, areaRender, groupRender} from "@/publicMethods/cellRenderer";
-import {getRecentMonth, getWeeksRange} from "@/publicMethods/timeMethods";
+import {getWeeksRange} from "@/publicMethods/timeMethods";
 import moment from "moment";
 
 
@@ -400,7 +400,7 @@ const CodeTableList: React.FC<any> = () => {
   return (
     <PageContainer>
       <div style={{marginTop: "-35px"}}>
-        <Tabs defaultActiveKey="analysisReport" onChange={callback} size={"large"}>
+        <Tabs defaultActiveKey="analysisReport" onChange={callback} size={"large"} >
           {/* 分析页面 */}
           <TabPane tab={<span> <FundTwoTone/>分析报告</span>} key="analysisReport">
 
@@ -410,13 +410,15 @@ const CodeTableList: React.FC<any> = () => {
           </TabPane>
 
           {/* 数据源页面 */}
-          <TabPane tab={<span> <DatabaseTwoTone/>源数据</span>} key="sourceData">
-            <div style={{width: '100%', overflow: 'auto', whiteSpace: 'nowrap'}}>
+          <TabPane tab={<span> <DatabaseTwoTone/>源数据</span>} key="sourceData" style={{marginTop:-10, backgroundColor:"default"}}>
+
+            {/* 查询条件 */}
+            <div style={{width: '100%',height:45,marginTop: 15,backgroundColor:"white"}}>
               <Form.Item>
 
-                <label style={{marginLeft: "10px"}}>时间：</label>
+                <label style={{marginLeft: "10px",marginTop:7}}>时间：</label>
                 <RangePicker
-                  style={{width: '30%'}} onChange={onDataTimeSelected}
+                  style={{width: '30%',marginTop:7}} onChange={onDataTimeSelected}
                   value={[choicedCondition.start === "" ? null : moment(choicedCondition.start),
                     choicedCondition.end === "" ? null : moment(choicedCondition.end)]}
                 />
@@ -427,13 +429,14 @@ const CodeTableList: React.FC<any> = () => {
                 <label style={{marginLeft: "-10px", color: 'black'}}> 默认8周</label>
 
                 <Button type="text" icon={<SettingOutlined/>} size={'large'} onClick={showFieldsModal}
-                        style={{float: "right"}}> </Button>
+                        style={{float: "right",marginTop:5}}> </Button>
 
               </Form.Item>
 
             </div>
 
-            <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: -10}}>
+            {/* 数据表格 */}
+            <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%',marginTop: 10}}>
               <AgGridReact
                 columnDefs={getSourceColums()} // 定义列
                 rowData={[]} // 数据绑定
@@ -459,6 +462,7 @@ const CodeTableList: React.FC<any> = () => {
               </AgGridReact>
             </div>
 
+            {/* 自定义字段 */}
             <Modal
               title={'自定义字段'}
               visible={isFieldModalVisible}
@@ -528,6 +532,7 @@ const CodeTableList: React.FC<any> = () => {
 
               </Form>
             </Modal>
+
           </TabPane>
 
         </Tabs>

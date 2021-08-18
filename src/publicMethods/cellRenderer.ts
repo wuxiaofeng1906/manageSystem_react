@@ -835,7 +835,6 @@ const areaRender = (params: any) => {
 
 };
 
-
 const groupRender = (params: any) => {
 
   if (!params.value) {
@@ -867,6 +866,61 @@ const groupRender = (params: any) => {
 
 };
 
+const attendanceRender = (params: any) => {
+  let values = params.value;
+  if (params.value) {
+    switch (params.value) {
+      case "normal":
+        values = "正常";
+        break;
+      case "vacation":
+        values = "休假";
+        break;
+      case "leave":
+        values = "离职";
+        break;
+      default:
+        break;
+    }
+  }
+
+  return values;
+};
+
+const projectStageRender = (params: any) => {
+  let values = params.value;
+  if (params.value) {
+    switch (params.value) {
+      case "story":
+        values = "需求";
+        break;
+      case "design":
+        values = "设计";
+        break;
+      case "developing":
+        values = "开发";
+        break;
+      case "submit":
+        values = "提测";
+        break;
+      case "testing":
+        values = "测试";
+        break;
+      case "released":
+        values = "发布";
+        break;
+      case "learning":
+        values = "学习";
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  return values;
+};
+
 export {
   numberRenderToYesNo,
   numberRenderTopass,
@@ -895,6 +949,8 @@ export {
   numRenderToTypeForLineAndFromBug,
   numberRenderToZentaoTypeFilter,
   groupRender,
-  areaRender
+  areaRender,
+  attendanceRender,
+  projectStageRender
 };
 

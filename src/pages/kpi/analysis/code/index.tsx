@@ -14,9 +14,14 @@ import * as echarts from 'echarts';// 引入 ECharts 主模块
 import 'echarts/lib/chart/bar';// 引入柱状图
 import 'echarts/lib/component/tooltip';// 引入提示框和标题组件
 import 'echarts/lib/component/title';
-import {moduleChange, areaRender, groupRender} from "@/publicMethods/cellRenderer";
+import {
+  moduleChange,
+  areaRender,
+  groupRender
+} from "@/publicMethods/cellRenderer";
 import {getWeeksRange} from "@/publicMethods/timeMethods";
 import moment from "moment";
+import axios from "axios";
 
 
 const {TabPane} = Tabs;
@@ -27,6 +32,35 @@ const {RangePicker} = DatePicker;
 /* endregion */
 
 /* region 源数据页面 */
+
+// 出勤状态
+const attendanceMappings = {
+  "": "",
+  normal: '正常',
+  vacation: '休假',
+  leave: '离职',
+};
+
+const attStageRender = () => {
+  return Object.keys(attendanceMappings);
+};
+
+// 项目阶段
+const prjStageMappings = {
+  "": "",
+  story: '需求',
+  design: '设计',
+  developing: "开发",
+  submit: "提测",
+  testing: "测试",
+  released: "发布",
+  learning: "学习",
+};
+
+const prjStageRender = () => {
+  return Object.keys(prjStageMappings);
+};
+
 
 // 定义列名
 const getSourceColums = () => {
@@ -127,12 +161,34 @@ const getSourceColums = () => {
       headerName: '出勤状态',
       field: 'attendance',
       minWidth: 110,
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {values: attStageRender()},
+      filterParams: {
+        valueFormatter: (params: any) => {
+          return attendanceMappings[params.value];
+        },
+      },
+      valueFormatter: (params: any) => {
+        return attendanceMappings[params.value];
+      },
     },
     {
       headerName: '项目阶段',
       field: 'stage',
       minWidth: 110,
-    },
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {values: prjStageRender()},
+      filterParams: {
+        valueFormatter: (params: any) => {
+          return prjStageMappings[params.value];
+        },
+      },
+      valueFormatter: (params: any) => {
+        return prjStageMappings[params.value];
+      },
+    }
   ];
   if (fields === null) {
     return oraFields;
@@ -324,6 +380,81 @@ const CodeTableList: React.FC<any> = () => {
 
   };
 
+  const updateStage = (values: any) => {
+    axios.post('/api/kpi/analysis/code', values)
+      .then(function (res) {
+        if (res.data.ok === true) {
+
+          message.info({
+            content: "数据保存成功！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else if (Number(res.data.code) === 403) {
+          message.info({
+            content: "您无权修改数据！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+          message.error({
+            content: `${res.data.message}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+      })
+      .catch(function (error) {
+        if (error.toString().includes("403")) {
+          message.info({
+            content: "您无权修改数据！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+          message.error({
+            content: `异常信息：${error.toString()}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+      });
+  };
+
+  /* region 单元格编辑事件 */
+  const onSourceCellEdited = (event: any) => {
+
+    const values: any = {
+      userId: event.data.userId
+    };
+
+    // 如果修改字段为出勤状态 并且新旧值不相等
+    if (event.colDef.field === "attendance" && event.oldValue !== event.newValue) {
+      values.attendance = event.newValue;
+      updateStage(values);
+    }
+
+    // 如果修改字段为项目阶段 并且新旧值不相等
+    if (event.colDef.field === "stage" && event.oldValue !== event.newValue) {
+      values.stage = event.newValue;
+      updateStage(values);
+    }
+
+  };
+
+  /* endregion */
+
 
   /* region 显示自定义字段 */
   const [isFieldModalVisible, setFieldModalVisible] = useState(false);
@@ -400,7 +531,7 @@ const CodeTableList: React.FC<any> = () => {
   return (
     <PageContainer>
       <div style={{marginTop: "-35px"}}>
-        <Tabs defaultActiveKey="analysisReport" onChange={callback} size={"large"} >
+        <Tabs defaultActiveKey="analysisReport" onChange={callback} size={"large"}>
           {/* 分析页面 */}
           <TabPane tab={<span> <FundTwoTone/>分析报告</span>} key="analysisReport">
 
@@ -410,15 +541,16 @@ const CodeTableList: React.FC<any> = () => {
           </TabPane>
 
           {/* 数据源页面 */}
-          <TabPane tab={<span> <DatabaseTwoTone/>源数据</span>} key="sourceData" style={{marginTop:-10, backgroundColor:"default"}}>
+          <TabPane tab={<span> <DatabaseTwoTone/>源数据</span>} key="sourceData"
+                   style={{marginTop: -10, backgroundColor: "default"}}>
 
             {/* 查询条件 */}
-            <div style={{width: '100%',height:45,marginTop: 15,backgroundColor:"white"}}>
+            <div style={{width: '100%', height: 45, marginTop: 15, backgroundColor: "white"}}>
               <Form.Item>
 
-                <label style={{marginLeft: "10px",marginTop:7}}>时间：</label>
+                <label style={{marginLeft: "10px", marginTop: 7}}>时间：</label>
                 <RangePicker
-                  style={{width: '30%',marginTop:7}} onChange={onDataTimeSelected}
+                  style={{width: '30%', marginTop: 7}} onChange={onDataTimeSelected}
                   value={[choicedCondition.start === "" ? null : moment(choicedCondition.start),
                     choicedCondition.end === "" ? null : moment(choicedCondition.end)]}
                 />
@@ -429,14 +561,14 @@ const CodeTableList: React.FC<any> = () => {
                 <label style={{marginLeft: "-10px", color: 'black'}}> 默认8周</label>
 
                 <Button type="text" icon={<SettingOutlined/>} size={'large'} onClick={showFieldsModal}
-                        style={{float: "right",marginTop:5}}> </Button>
+                        style={{float: "right", marginTop: 5}}> </Button>
 
               </Form.Item>
 
             </div>
 
             {/* 数据表格 */}
-            <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%',marginTop: 10}}>
+            <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: 10}}>
               <AgGridReact
                 columnDefs={getSourceColums()} // 定义列
                 rowData={[]} // 数据绑定
@@ -455,8 +587,10 @@ const CodeTableList: React.FC<any> = () => {
                 suppressAggFuncInHeader={true} // 不显示标题聚合函数的标识
                 rowHeight={30}
                 headerHeight={35}
+
                 onGridReady={onSourceGridReady}
                 suppressScrollOnNewData={false}
+                onCellEditingStopped={onSourceCellEdited}
               >
 
               </AgGridReact>

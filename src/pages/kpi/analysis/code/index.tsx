@@ -267,7 +267,9 @@ const CodeTableList: React.FC<any> = () => {
     }
 
 
-    // 定义总计表列名
+    /* region 表格总数据展示 */
+
+    // 格式化单元格内容
     const cellFormat = (params: any) => {
       if (Number(params.value)) {
         return Number(params.value).toFixed(2);
@@ -315,12 +317,7 @@ const CodeTableList: React.FC<any> = () => {
       },
     ];
 
-    /* region 条件查询 */
-
-    const [choicedConditionForChart, setQueryConditionForChart] = useState({
-      start: thisWeekTime[0].from,
-      end: thisWeekTime[0].to
-    });
+    // 获取和解析数据
     const pushArrays = (title: string, itemData: any) => {
       const array = [];
       if (title === "需求阶段" || title === "设计阶段" || title === "开发阶段" || title === "测试阶段") {
@@ -439,7 +436,6 @@ const CodeTableList: React.FC<any> = () => {
 
       return array;
     };
-
     const getTotalData = (params: any) => {
 
       const url = `/api/kpi/analysis/statistic?start=${params.start}&end=${params.end}`;
@@ -483,6 +479,140 @@ const CodeTableList: React.FC<any> = () => {
         });
 
     }
+    /* endregion 表格总数据展示 */
+
+
+    // 图表
+    const [chartDataForTotal, setChartDataForTotal] = useState({
+      payAttention: "",  // 关注人员
+      Development: 0,  // 开发
+      Architecture: 0,// 架构
+      Technology: 0,// 技术管理
+      Attendance: 0,// 出勤
+      Vacation: 0// 请假
+
+    });
+    const showTestChart = (params: any) => {
+      const totalChartData: any = [
+        {value: params.Development, name: '开发人数'},
+        {value: params.Architecture, name: '架构师人数'},
+        {value: params.Technology, name: '技术管理人数'}
+      ];
+      const bom = document.getElementById('totalPieChart');
+      if (bom) {
+        // 基于准备好的dom，初始化echarts实例
+        const myChart = echarts.init(bom);
+        // 绘制图表
+        myChart.setOption({
+          grid: {
+            x: 0,
+            top: '5% '
+          },
+          tooltip: {
+            trigger: 'item'
+          },
+          legend: {
+            x: '80%',
+            y: '10px',
+            orient: 'Vertical',
+            //   left: 'right',
+          },
+          series: [
+            {
+              type: 'pie',
+              radius: '50%',
+              label: {
+                normal: {
+                  show: false,  // 不显示每个扇形支出来的说明文字
+                },
+              },
+              data: totalChartData,
+              emphasis: {
+                itemStyle: {
+                  shadowBlur: 10,
+                  shadowOffsetX: 0,
+                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+              }
+            }
+          ]
+        });
+      }
+    }
+
+    const getTotalChartData = (params: any) => {
+      debugger;
+
+      const url = `/api/kpi/analysis/overview?start=${params.start}&end=${params.end}`;
+      axios.get(url, {})
+        .then(function (res) {
+          if (res.status === 200) {
+            const {data} = res;
+
+            let payAttMan = "";
+            const arrays = data["关注"];
+            if (arrays !== null) {
+              arrays.forEach((ele: string) => {
+                payAttMan = payAttMan === "" ? ele : `${payAttMan}、${ele}`;
+              });
+            }
+
+            setChartDataForTotal({
+              payAttention: payAttMan,
+              Development: data["开发"],
+              Architecture: data["架构"],
+              Technology: data["技术管理"],
+              Attendance: data["出勤"],
+              Vacation: data["请假"]
+            });
+
+            showTestChart({
+              payAttention: payAttMan,
+              Development: data["开发"],
+              Architecture: data["架构"],
+              Technology: data["技术管理"],
+              Attendance: data["出勤"],
+              Vacation: data["请假"]
+            });
+
+          } else {
+            message.error({
+              content: `${res.data.message}`,
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          }
+        })
+        .catch(function (error) {
+          if (error.toString().includes("403")) {
+            message.error({
+              content: "您无权查询权限！",
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          } else {
+            message.error({
+              content: `异常信息:${error.toString()}`,
+              duration: 1, // 1S 后自动关闭
+              style: {
+                marginTop: '50vh',
+              },
+            });
+          }
+
+        });
+
+    }
+
+    /* region 条件查询 */
+    const [choicedConditionForChart, setQueryConditionForChart] = useState({
+      start: thisWeekTime[0].from,
+      end: thisWeekTime[0].to
+    });
 
     // 时间选择事件
     const onChartTimeSelected = async (params: any, dateString: any) => {
@@ -498,83 +628,34 @@ const CodeTableList: React.FC<any> = () => {
 
       // 汇总表格数据显示
       getTotalData(range);
+      // 汇总图表显示
+      getTotalChartData(range);
 
     };
 
     // 初始化显示和显示默认数据
     const showChartDefaultData = async () => {
-      const weekRanges = getWeeksRange(8);
+      const weekRanges = getWeeksRange(1);
       setQueryConditionForChart({
         start: weekRanges[0].from,
-        end: weekRanges[7].to
+        end: weekRanges[0].to
       });
 
       const range = {
         start: weekRanges[0].from,
-        end: weekRanges[7].to
+        end: weekRanges[0].to
       };
 
       // 汇总表格数据显示
       getTotalData(range);
+
+      // 汇总图-饼图
+      getTotalChartData(range);
+
     };
 
     /* endregion */
 
-
-    // 图表
-    const showTestChart = () => {
-      const bom = document.getElementById('main');
-      if (bom) {
-        // 基于准备好的dom，初始化echarts实例
-        const myChart = echarts.init(bom);
-        // 绘制图表
-        myChart.setOption({
-          grid: {
-            x: 0,
-            top: '5% '
-          },
-          tooltip: {
-            trigger: 'item'
-          },
-          // legend: {
-          //   orient: 'vertical',
-          //   left: 'right',
-          // },
-          legend: {
-            x: '80%',
-            y: '10px',
-            orient: 'Vertical',
-
-          },
-          series: [
-            {
-              name: '访问来源',
-              type: 'pie',
-              radius: '50%',
-              label: {
-                normal: {
-                  show: false,
-                },
-              },
-              data: [
-                {value: 1048, name: '搜索引擎'},
-                {value: 735, name: '直接访问'},
-                {value: 580, name: '邮件营销'},
-                {value: 484, name: '联盟广告'},
-                {value: 300, name: '视频广告'}
-              ],
-              emphasis: {
-                itemStyle: {
-                  shadowBlur: 10,
-                  shadowOffsetX: 0,
-                  shadowColor: 'rgba(0, 0, 0, 0.5)'
-                }
-              }
-            }
-          ]
-        });
-      }
-    }
 
     /* endregion */
 
@@ -604,15 +685,15 @@ const CodeTableList: React.FC<any> = () => {
 
 // 初始化显示和显示默认数据
     const showSourceDefaultData = async () => {
-      const weekRanges = getWeeksRange(8);
+      const weekRanges = getWeeksRange(1);
       setQueryConditionForSource({
         start: weekRanges[0].from,
-        end: weekRanges[7].to
+        end: weekRanges[0].to
       });
 
       const range = {
         start: weekRanges[0].from,
-        end: weekRanges[7].to
+        end: weekRanges[0].to
       };
       const datas: any = await querySourceData(gqlClient, range);
       gridApiForSource.current?.setRowData(datas);
@@ -773,16 +854,15 @@ const CodeTableList: React.FC<any> = () => {
       if (clickTab === "sourceData") {
         showSourceDefaultData();
       } else {
-        showTestChart();
+        // getTotalChartData();
       }
     }
 
     useEffect(() => {
-      showTestChart();
-      getTotalData({
-        start: thisWeekTime[0].from,
-        to: thisWeekTime[0].to
-      });
+
+      getTotalData({start: thisWeekTime[0].from, end: thisWeekTime[0].to});
+      getTotalChartData({start: thisWeekTime[0].from, end: thisWeekTime[0].to});
+
     }, []);
 
 
@@ -844,31 +924,33 @@ const CodeTableList: React.FC<any> = () => {
                       <table border={1} style={{width: '100%', height: 520, backgroundColor: "white"}}>
                         <tr style={{backgroundColor: "#FF9495"}}>
                           <td width={'20%'}>本周重点关注人员</td>
-                          <td colSpan={2}>XXXXXXXXXXXXXXXXXXXX</td>
+                          <td colSpan={2}> {chartDataForTotal.payAttention}</td>
                         </tr>
                         <tr>
                           <td>开发人数</td>
-                          <td align={"center"}> 69</td>
-                          <td rowSpan={3} width={'70%'}></td>
+                          <td align={"center"}> {chartDataForTotal.Development}</td>
+                          <td rowSpan={3} width={'70%'}>
+                            <div id="totalPieChart" style={{marginTop: 30, height: 300}}></div>
+                          </td>
                         </tr>
                         <tr>
                           <td>架构人数</td>
-                          <td align={"center"}> 44</td>
+                          <td align={"center"}>  {chartDataForTotal.Architecture}</td>
                         </tr>
                         <tr>
                           <td>技术管理人数</td>
-                          <td align={"center"}> 69</td>
+                          <td align={"center"}>  {chartDataForTotal.Technology}</td>
                         </tr>
                         <tr>
                           <td>出勤人数</td>
-                          <td align={"center"}> 69</td>
+                          <td align={"center"}>  {chartDataForTotal.Attendance}</td>
                           <td rowSpan={2}>
-                            {/* <div id="main" style={{marginTop: 30, height: 300}}> </div> */}
+
                           </td>
                         </tr>
                         <tr>
                           <td>请假人数</td>
-                          <td align={"center"}> 69</td>
+                          <td align={"center"}>  {chartDataForTotal.Vacation}</td>
                         </tr>
                       </table>
                     </div>

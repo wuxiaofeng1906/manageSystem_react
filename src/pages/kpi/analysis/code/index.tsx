@@ -144,12 +144,12 @@ const getSourceColums = () => {
       filterParams: {cellRenderer: areaRender}
     }, {
       headerName: '职务',
-      field: 'job',
+      field: 'position',
       minWidth: 95,
     },
     {
       headerName: '岗位类型',
-      field: 'position',
+      field: 'job',
       minWidth: 135,
     },
     {
@@ -246,8 +246,88 @@ const CodeTableList: React.FC<any> = () => {
   const gqlClient = useGqlClient();
 
   /* region 分析报告页面 */
-  /* 第一行图表 */
 
+  /* region 条件查询 */
+  const [choicedConditionForChart, setQueryConditionForChart] = useState({
+    start: "",
+    end: ""
+  });
+
+  // 时间选择事件
+  const onChartTimeSelected = async (params: any, dateString: any) => {
+    setQueryConditionForChart({
+      start: dateString[0],
+      end: dateString[1]
+    });
+
+    const range = {
+      start: dateString[0],
+      end: dateString[1]
+    };
+    const datas: any = await querySourceData(gqlClient, range);
+    console.log(datas);
+
+  };
+
+
+  // 初始化显示和显示默认数据
+  const showChartDefaultData = async () => {
+    const weekRanges = getWeeksRange(8);
+    setQueryConditionForChart({
+      start: weekRanges[0].from,
+      end: weekRanges[7].to
+    });
+
+    const range = {
+      start: weekRanges[0].from,
+      end: weekRanges[7].to
+    };
+    const datas: any = await querySourceData(gqlClient, range);
+    console.log(datas);
+  };
+
+  /* endregion */
+
+  /* region 第一行图表：只显示查询日期中最近的一周数据：比如查询的是最近8周，那么，这边就显示本周的数据（最近一周） */
+
+  // 定义总计表列名
+  const getTotalColums = [
+    {
+      headerName: '阶段/领域',
+      field: 'userName',
+      pinned: 'left',
+      minWidth: 80,
+
+    },
+    {
+      headerName: '出勤状态',
+      field: 'maxLines',
+      minWidth: 80,
+    },
+    {
+      headerName: '统计项',
+      field: 'avgLines',
+      minWidth: 80,
+    },
+    {
+      headerName: '正式开发',
+      field: 'minLines',
+      minWidth: 80,
+
+    },
+    {
+      headerName: '试用开发',
+      field: 'deptName',
+      minWidth: 80,
+    },
+    {
+      headerName: '技术管理',
+      field: 'groupName',
+      minWidth: 80,
+    },
+  ];
+
+  // 图表
   const showTestChart = () => {
     const bom = document.getElementById('main');
     if (bom) {
@@ -330,44 +410,10 @@ const CodeTableList: React.FC<any> = () => {
   }
 
   /* endregion */
-  const getTotalColums = () => {
 
-    return [
-      {
-        headerName: '阶段/领域',
-        field: 'userName',
-        pinned: 'left',
-        minWidth: 80,
-      },
-      {
-        headerName: '出勤状态',
-        field: 'maxLines',
-        minWidth: 80,
-      },
-      {
-        headerName: '统计项',
-        field: 'avgLines',
-        minWidth: 80,
-      },
-      {
-        headerName: '正式开发',
-        field: 'minLines',
-        minWidth: 80,
 
-      },
-      {
-        headerName: '试用开发',
-        field: 'deptName',
-        minWidth: 135,
-      },
-      {
-        headerName: '技术管理',
-        field: 'groupName',
-        minWidth: 135,
-      },
-    ];
+  /* endregion */
 
-  };
 
   /* region 源数据页面 */
 
@@ -384,15 +430,15 @@ const CodeTableList: React.FC<any> = () => {
     gridApiForSource.current?.sizeColumnsToFit();
   };
 
-  const [choicedCondition, setQueryCondition] = useState({
+  const [choicedConditionForSource, setQueryConditionForSource] = useState({
     start: "",
     end: ""
   });
 
   // 初始化显示和显示默认数据
-  const showSourceData = async () => {
+  const showSourceDefaultData = async () => {
     const weekRanges = getWeeksRange(8);
-    setQueryCondition({
+    setQueryConditionForSource({
       start: weekRanges[0].from,
       end: weekRanges[7].to
     });
@@ -406,8 +452,8 @@ const CodeTableList: React.FC<any> = () => {
   };
 
   // 时间选择事件
-  const onDataTimeSelected = async (params: any, dateString: any) => {
-    setQueryCondition({
+  const onSourceTimeSelected = async (params: any, dateString: any) => {
+    setQueryConditionForSource({
       start: dateString[0],
       end: dateString[1]
     });
@@ -558,7 +604,7 @@ const CodeTableList: React.FC<any> = () => {
   const callback = (clickTab: any) => {
 
     if (clickTab === "sourceData") {
-      showSourceData();
+      showSourceDefaultData();
     } else {
       showTestChart();
     }
@@ -576,24 +622,46 @@ const CodeTableList: React.FC<any> = () => {
           {/* 分析页面 */}
           <TabPane tab={<span> <FundTwoTone/>分析报告</span>} key="analysisReport">
 
-            {/* 第一行图表页面 */}
-            <div>
-              <Row style={{backgroundColor:"white"}}>
+            <div style={{marginTop: -10}}>
+              {/* 查询条件 */}
+              <Row>
+
+                <div style={{width: '100%', height: 45, marginTop: 15, border: "solid 2px white"}}>
+                  <Form.Item>
+
+                    <label style={{marginLeft: "10px", marginTop: 7}}>查询周期：</label>
+                    <RangePicker
+                      style={{width: '30%', marginTop: 7}} onChange={onChartTimeSelected}
+                      value={[choicedConditionForChart.start === "" ? null : moment(choicedConditionForChart.start),
+                        choicedConditionForChart.end === "" ? null : moment(choicedConditionForChart.end)]}
+                    />
+
+                    <Button type="text" style={{marginLeft: "20px", color: 'black'}}
+                            icon={<LogoutOutlined/>} size={'small'} onClick={showChartDefaultData}>
+                      默认：</Button>
+                    <label style={{marginLeft: "-10px", color: 'black'}}> 默认8周</label>
+
+                  </Form.Item>
+                </div>
+              </Row>
+
+              {/* 第一行图表页面 */}
+              <Row style={{backgroundColor: "white"}}>
                 <Col span={12}>
-                  <div className="ag-theme-alpine" style={{height: 300, width: '100%', marginTop: 10}}>
+                  <div className="ag-theme-alpine" style={{height: 300, width: '100%', marginTop: 5}}>
                     <AgGridReact
-                      columnDefs={getTotalColums()} // 定义列
+                      columnDefs={getTotalColums} // 定义列
                       rowData={[]} // 数据绑定
                       defaultColDef={{
                         resizable: true,
                         sortable: true,
                         filter: true,
                         flex: 1,
+                        suppressMenu: true,
                         cellStyle: {"line-height": "28px"},
                       }}
                       autoGroupColumnDef={{
                         minWidth: 250,
-                        // sort: 'asc'
                       }}
                       groupDefaultExpanded={9} // 展开分组
                       suppressAggFuncInHeader={true} // 不显示标题聚合函数的标识
@@ -625,15 +693,15 @@ const CodeTableList: React.FC<any> = () => {
             <div style={{width: '100%', height: 45, marginTop: 15, backgroundColor: "white"}}>
               <Form.Item>
 
-                <label style={{marginLeft: "10px", marginTop: 7}}>时间：</label>
+                <label style={{marginLeft: "10px", marginTop: 7}}>查询周期：</label>
                 <RangePicker
-                  style={{width: '30%', marginTop: 7}} onChange={onDataTimeSelected}
-                  value={[choicedCondition.start === "" ? null : moment(choicedCondition.start),
-                    choicedCondition.end === "" ? null : moment(choicedCondition.end)]}
+                  style={{width: '30%', marginTop: 7}} onChange={onSourceTimeSelected}
+                  value={[choicedConditionForSource.start === "" ? null : moment(choicedConditionForSource.start),
+                    choicedConditionForSource.end === "" ? null : moment(choicedConditionForSource.end)]}
                 />
 
                 <Button type="text" style={{marginLeft: "20px", color: 'black'}}
-                        icon={<LogoutOutlined/>} size={'small'} onClick={showSourceData}>
+                        icon={<LogoutOutlined/>} size={'small'} onClick={showSourceDefaultData}>
                   默认：</Button>
                 <label style={{marginLeft: "-10px", color: 'black'}}> 默认8周</label>
 

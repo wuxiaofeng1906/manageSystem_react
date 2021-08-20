@@ -7,7 +7,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
-import {Button, Checkbox, Col, DatePicker, Form, message, Modal, Row, Tabs, Table} from 'antd';
+import {Button, Checkbox, Col, DatePicker, Form, message, Modal, Row, Tabs} from 'antd';
 import {FundTwoTone, DatabaseTwoTone, LogoutOutlined, SettingOutlined} from '@ant-design/icons';
 import {getHeight} from '@/publicMethods/pageSet';
 import * as echarts from 'echarts';// 引入 ECharts 主模块
@@ -19,11 +19,9 @@ import {
   areaRender,
   groupRender,
 } from "@/publicMethods/cellRenderer";
-import {getMonthWeek, getWeeksRange} from "@/publicMethods/timeMethods";
+import {getMonthWeek, getWeeksRange, getWeekStartAndEndTime} from "@/publicMethods/timeMethods";
 import moment from "moment";
 import axios from "axios";
-import dayjs from "dayjs";
-
 
 const {TabPane} = Tabs;
 const {RangePicker} = DatePicker;
@@ -56,6 +54,7 @@ const prjStageMappings = {
   testing: "测试",
   released: "发布",
   learning: "学习",
+  abnormal: "异常"
 };
 
 const prjStageRender = () => {
@@ -212,7 +211,8 @@ const getSourceColums = () => {
 
 
 const querySourceData = async (client: GqlClient<object>, params: any) => {
-
+  // debugger;
+  // console.log("params",params);
   const {data} = await client.query(`
       {
         avgCodeAnalysis(start:"${params.start}",end:"${params.end}"){
@@ -686,11 +686,12 @@ const CodeTableList: React.FC<any> = () => {
         end: dateString[1]
       });
 
-      const range = {
-        start: dateString[0],
-        end: dateString[1]
-      };
+      // const range = {
+      //   start: dateString[0],
+      //   end: dateString[1]
+      // };
 
+      const range = getWeekStartAndEndTime(dateString[0], dateString[1]);
       // 汇总表格数据显示
       getTotalData(range);
       // 汇总图表显示
@@ -736,7 +737,7 @@ const CodeTableList: React.FC<any> = () => {
       params.api.sizeColumnsToFit();
     };
 
-// 表格的屏幕大小自适应
+    // 表格的屏幕大小自适应
     const [sourceGridHeight, setGridHeight] = useState(Number(getHeight()) - 64);
     window.onresize = function () {
       setGridHeight(Number(getHeight()) - 64);
@@ -748,7 +749,7 @@ const CodeTableList: React.FC<any> = () => {
       end: ""
     });
 
-// 初始化显示和显示默认数据
+    // 初始化显示和显示默认数据
     const showSourceDefaultData = async () => {
       const weekRanges = getWeeksRange(1);
       setQueryConditionForSource({
@@ -764,17 +765,19 @@ const CodeTableList: React.FC<any> = () => {
       gridApiForSource.current?.setRowData(datas);
     };
 
-// 时间选择事件
+    // 时间选择事件
     const onSourceTimeSelected = async (params: any, dateString: any) => {
+
       setQueryConditionForSource({
         start: dateString[0],
         end: dateString[1]
       });
 
-      const range = {
-        start: dateString[0],
-        end: dateString[1]
-      };
+      const range = getWeekStartAndEndTime(dateString[0], dateString[1]);
+      // const range = {
+      //   start: dateString[0],
+      //   end: dateString[1]
+      // };
       const datas: any = await querySourceData(gqlClient, range);
       gridApiForSource.current?.setRowData(datas);
 
@@ -984,7 +987,8 @@ const CodeTableList: React.FC<any> = () => {
                   </Col>
                   <Col span={9}>
                     <div style={{marginLeft: 20}}>
-                      <table border={1} style={{width: '100%', height: 520, backgroundColor: "white"}}>
+                      <table border={1}
+                             style={{width: '100%', height: 520, backgroundColor: "white", overflow: "scroll"}}>
                         <tr style={{backgroundColor: "#FF9495"}}>
                           <td width={'20%'}>本周重点关注人员</td>
                           <td colSpan={2}> {chartDataForTotal.payAttention}</td>
@@ -993,7 +997,7 @@ const CodeTableList: React.FC<any> = () => {
                           <td>开发人数</td>
                           <td align={"center"}> {chartDataForTotal.Development}</td>
                           <td rowSpan={3} width={'70%'} align={"left"} valign={"bottom"}>
-                              <div id="totalPieChart" style={{  height: 300, width: 400, backgroundColor: "white"}}> </div>
+                            <div id="totalPieChart" style={{height: 300, width: 400, backgroundColor: "white"}}></div>
                           </td>
                         </tr>
                         <tr>
@@ -1008,7 +1012,8 @@ const CodeTableList: React.FC<any> = () => {
                           <td>出勤人数</td>
                           <td align={"center"}>  {chartDataForTotal.Attendance}</td>
                           <td rowSpan={2}>
-                            <div id="totalHistogramChart" style={{width:450, height: 100,backgroundColor: "white"}}></div>
+                            <div id="totalHistogramChart"
+                                 style={{width: 450, height: 100, backgroundColor: "white"}}></div>
                           </td>
                         </tr>
                         <tr>

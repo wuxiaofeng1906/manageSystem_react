@@ -19,7 +19,7 @@ import {
   areaRender,
   groupRender,
 } from "@/publicMethods/cellRenderer";
-import {getWeeksRange} from "@/publicMethods/timeMethods";
+import {getMonthWeek, getWeeksRange} from "@/publicMethods/timeMethods";
 import moment from "moment";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -492,7 +492,7 @@ const CodeTableList: React.FC<any> = () => {
       Vacation: 0// 请假
 
     });
-    const showTestChart = (params: any) => {
+    const showTotalPieChart = (params: any) => {
       const totalChartData: any = [
         {value: params.Development, name: '开发人数'},
         {value: params.Architecture, name: '架构师人数'},
@@ -505,8 +505,10 @@ const CodeTableList: React.FC<any> = () => {
         // 绘制图表
         myChart.setOption({
           grid: {
-            x: 0,
-            top: '5% '
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
           },
           tooltip: {
             trigger: 'item'
@@ -540,9 +542,73 @@ const CodeTableList: React.FC<any> = () => {
       }
     }
 
-    const getTotalChartData = (params: any) => {
-      debugger;
+    const showTotalHistogramChart = (weekName: string, params: any) => {
+      const chartDom = document.getElementById('totalHistogramChart');
+      if (chartDom) {
+        // 基于准备好的dom，初始化echarts实例
+        const myChart = echarts.init(chartDom);
+        // 绘制图表
+        myChart.setOption({
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: {            // Use axis to trigger tooltip
+              type: 'shadow'        // 'shadow' as default; can also be 'line' or 'shadow'
+            }
+          },
+          legend: {
 
+            x: '65%',
+            // y: '10px',
+            // data: ['出勤', '请假']
+          },
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+          },
+          xAxis: {
+            type: 'value'
+          },
+          yAxis: {
+            type: 'category',
+            data: [weekName]
+          },
+          series: [
+
+            {
+              name: '出勤',
+              type: 'bar',
+              stack: 'total',
+              label: {
+                show: true
+              },
+              emphasis: {
+                focus: 'series'
+              },
+              data: [params.Attendance]
+              // data: [67],
+            },
+            {
+              name: '请假',
+              type: 'bar',
+              stack: 'total',
+              label: {
+                show: true
+              },
+              emphasis: {
+                focus: 'series'
+              },
+              data: [params.Vacation],
+            }
+          ]
+        });
+      }
+
+    };
+
+    const getTotalChartData = (params: any) => {
+      const weekName = getMonthWeek(params.start);
       const url = `/api/kpi/analysis/overview?start=${params.start}&end=${params.end}`;
       axios.get(url, {})
         .then(function (res) {
@@ -566,14 +632,18 @@ const CodeTableList: React.FC<any> = () => {
               Vacation: data["请假"]
             });
 
-            showTestChart({
-              payAttention: payAttMan,
+            showTotalPieChart({
               Development: data["开发"],
               Architecture: data["架构"],
-              Technology: data["技术管理"],
-              Attendance: data["出勤"],
-              Vacation: data["请假"]
+              Technology: data["技术管理"]
+
             });
+
+            showTotalHistogramChart(weekName, {
+                Attendance: data["出勤"],
+                Vacation: data["请假"]
+              }
+            );
 
           } else {
             message.error({
@@ -853,8 +923,6 @@ const CodeTableList: React.FC<any> = () => {
 
       if (clickTab === "sourceData") {
         showSourceDefaultData();
-      } else {
-        // getTotalChartData();
       }
     }
 
@@ -945,7 +1013,7 @@ const CodeTableList: React.FC<any> = () => {
                           <td>出勤人数</td>
                           <td align={"center"}>  {chartDataForTotal.Attendance}</td>
                           <td rowSpan={2}>
-
+                            <div id="totalHistogramChart" style={{marginTop: 30, height: 100}}></div>
                           </td>
                         </tr>
                         <tr>

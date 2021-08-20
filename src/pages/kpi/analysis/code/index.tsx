@@ -504,17 +504,12 @@ const CodeTableList: React.FC<any> = () => {
         const myChart = echarts.init(bom);
         // 绘制图表
         myChart.setOption({
-          grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-          },
+
           tooltip: {
             trigger: 'item'
           },
           legend: {
-            x: '80%',
+            x: '70%',
             y: '10px',
             orient: 'Vertical',
             //   left: 'right',
@@ -997,8 +992,8 @@ const CodeTableList: React.FC<any> = () => {
                         <tr>
                           <td>开发人数</td>
                           <td align={"center"}> {chartDataForTotal.Development}</td>
-                          <td rowSpan={3} width={'70%'}>
-                            <div id="totalPieChart" style={{marginTop: 30, height: 300}}></div>
+                          <td rowSpan={3} width={'70%'} align={"left"} valign={"bottom"}>
+                              <div id="totalPieChart" style={{  height: 300, width: 400, backgroundColor: "white"}}> </div>
                           </td>
                         </tr>
                         <tr>
@@ -1013,7 +1008,7 @@ const CodeTableList: React.FC<any> = () => {
                           <td>出勤人数</td>
                           <td align={"center"}>  {chartDataForTotal.Attendance}</td>
                           <td rowSpan={2}>
-                            <div id="totalHistogramChart" style={{marginTop: 30, height: 100}}></div>
+                            <div id="totalHistogramChart" style={{width:450, height: 100,backgroundColor: "white"}}></div>
                           </td>
                         </tr>
                         <tr>

@@ -5,8 +5,9 @@ import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
-import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient} from '@/hooks';
+import type {GridApi, GridReadyEvent} from 'ag-grid-community';
+import type {GqlClient} from '@/hooks';
+import {useGqlClient} from '@/hooks';
 import {Button, Checkbox, Col, DatePicker, Form, message, Modal, Row, Tabs} from 'antd';
 import {FundTwoTone, DatabaseTwoTone, LogoutOutlined, SettingOutlined} from '@ant-design/icons';
 import {getHeight} from '@/publicMethods/pageSet';
@@ -210,17 +211,27 @@ const getSourceColums = () => {
 };
 
 
-const querySourceData = async (client: GqlClient<object>, params: any) => {
-  // debugger;
-  // console.log("params",params);
+/* endregion */
+
+// 公共查询方法
+const querySourceData = async (client: GqlClient<object>, params: any, queryCount: number) => {
+
+  // module =》All：查询所在时间内的所有数据，
+  let conditon = `start:"${params.start}",end:"${params.end}"`;
+
+  if (queryCount !== 0) {
+    conditon = `${conditon},threshold:${queryCount}`;
+  }
+
   const {data} = await client.query(`
       {
-        avgCodeAnalysis(start:"${params.start}",end:"${params.end}"){
+        avgCodeAnalysis(${conditon}){
         userId
         userName
         maxLines
         avgLines
         minLines
+        weekLines
         deptName
         groupName
         tech
@@ -235,14 +246,13 @@ const querySourceData = async (client: GqlClient<object>, params: any) => {
       }
   `);
 
+  // const te = data?.avgCodeAnalysis;
   return data?.avgCodeAnalysis;
 };
 
-/* endregion */
-
 const CodeTableList: React.FC<any> = () => {
     const sys_accessToken = localStorage.getItem("accessId");
-    axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
+    axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
     // 公共定义
     const gqlClient = useGqlClient();
 
@@ -425,7 +435,7 @@ const CodeTableList: React.FC<any> = () => {
             array = array.concat(pushArrays("技术管理", data.manager));
             break;
           case "_developing":
-            array = array.concat(pushArrays("_开发阶段", data["_developing"]));
+            array = array.concat(pushArrays("_开发阶段", data._developing));
             break;
 
           default:
@@ -673,6 +683,137 @@ const CodeTableList: React.FC<any> = () => {
 
     }
 
+
+    /* endregion */
+    const dataAlaysis = (source: any) => {
+      debugger;
+      const legendName: any = [];  // 图例
+
+      const seriesArray: any = [];
+      source.forEach((ele: any) => {
+        legendName.push(ele.userName);
+
+      });
+
+      return {"legendName": legendName, "seriesArray": seriesArray}
+    }
+
+    const showCodesChart = (source: any, domName: any) => {
+
+
+      const chartDom = document.getElementById(domName);
+      if (chartDom) {
+        // 基于准备好的dom，初始化echarts实例
+        const myChart = echarts.init(chartDom);
+        // 绘制图表
+        myChart.setOption({
+
+          tooltip: {
+            trigger: 'axis'
+          },
+          legend: {
+            data: []   // 人名
+          },
+          xAxis: {
+            type: 'category',
+            data: ["第一周", "第二周", "第三周", "第四周", "第五周", "第六周", "第七周", "第八周"]  // 几月第几周
+            // data: source.week  // 几月第几周
+          },
+          yAxis: {
+            type: 'value',
+          },
+          series: []
+          // [
+          // {
+          //   name: '最高气温',
+          //   type: 'line',
+          //   data: [10, 11, 13, 11, 12, 12, 9],
+          // },
+          //   {
+          //     name: '最低气温',
+          //     type: 'line',
+          //     data: [1, -2, 2, 5, 3, 2, 0],
+          //   }
+          // ]
+        });
+      }
+    };
+
+
+    /* region 第二行：近八周持续高贡献者数据 */
+    const gridApiForHightestCode = useRef<GridApi>();
+    const onToHightestCodeGridReady = (params: GridReadyEvent) => {
+      gridApiForHightestCode.current = params.api;
+      params.api.sizeColumnsToFit();
+    };
+    const getHighesCodeColums = [
+      {
+        headerName: '姓名',
+        field: 'userName',
+        minWidth: 80,
+      },
+      {
+        headerName: '平均代码量',
+        field: 'avgLines',
+        minWidth: 80,
+      },
+      {
+        headerName: '最高代码量',
+        field: 'maxLines',
+        minWidth: 80,
+      },
+      {
+        headerName: '本周代码量',
+        field: 'weekLines',
+        minWidth: 80,
+      }
+    ];
+
+    const queryPersonCode = async (client: GqlClient<object>, params: any, usersId: string) => {
+      debugger;
+
+      const {data} = await client.query(`
+      {
+         userWeekLines(start:"${params.start}", end:"${params.end}",userIds:[${usersId}]){
+          userId
+          weekLines{
+            lines
+            startAt
+            endAt
+          }
+        }
+      }
+  `);
+
+      debugger;
+      return data?.userWeekLines;
+    };
+
+    const getHightestCodeData = async (Range: any) => {
+
+
+      const datas = await querySourceData(gqlClient, Range, 1500);
+      gridApiForHightestCode.current?.setRowData(datas);
+      if (datas.length > 0) {
+        // 通过datas 里面的userid 获取八周的数据
+        // 获取userid 数组
+        let useridStr = "";
+        datas.forEach((dts: any) => {
+          useridStr = useridStr === "" ? `"${dts.userId}"` : `${useridStr},"${dts.userId}"`;
+        });
+        const codedata = await queryPersonCode(gqlClient, Range, useridStr.toString());
+
+        const alayResult = dataAlaysis(datas);
+
+        showCodesChart(datas, "_8WeeksHighestNumChart");
+
+      }
+
+    };
+
+
+    /* endregion */
+
     /* region 条件查询 */
     const [choicedConditionForChart, setQueryConditionForChart] = useState({
       start: thisWeekTime[0].from,
@@ -697,6 +838,9 @@ const CodeTableList: React.FC<any> = () => {
       // 汇总图表显示
       getTotalChartData(range);
 
+      // 连续八周最高贡献者数据显示
+      getHightestCodeData(range);
+
     };
 
     // 初始化显示和显示默认数据
@@ -718,13 +862,12 @@ const CodeTableList: React.FC<any> = () => {
       // 汇总图-饼图
       getTotalChartData(range);
 
+      // 连续八周最高贡献者数据显示
+      getHightestCodeData(range);
+
     };
 
     /* endregion */
-
-
-    /* endregion */
-
 
     /* endregion */
 
@@ -761,7 +904,7 @@ const CodeTableList: React.FC<any> = () => {
         start: weekRanges[0].from,
         end: weekRanges[0].to
       };
-      const datas: any = await querySourceData(gqlClient, range);
+      const datas: any = await querySourceData(gqlClient, range, 0);
       gridApiForSource.current?.setRowData(datas);
     };
 
@@ -778,7 +921,7 @@ const CodeTableList: React.FC<any> = () => {
       //   start: dateString[0],
       //   end: dateString[1]
       // };
-      const datas: any = await querySourceData(gqlClient, range);
+      const datas: any = await querySourceData(gqlClient, range, 0);
       gridApiForSource.current?.setRowData(datas);
 
     };
@@ -926,8 +1069,12 @@ const CodeTableList: React.FC<any> = () => {
 
     useEffect(() => {
 
+      // 第一行 ：统计页面
       getTotalData({start: thisWeekTime[0].from, end: thisWeekTime[0].to});
       getTotalChartData({start: thisWeekTime[0].from, end: thisWeekTime[0].to});
+
+      // 第二行：持续最高贡献者数据
+      getHightestCodeData({start: thisWeekTime[0].from, end: thisWeekTime[0].to});
 
     }, []);
 
@@ -997,7 +1144,8 @@ const CodeTableList: React.FC<any> = () => {
                           <td>开发人数</td>
                           <td align={"center"}> {chartDataForTotal.Development}</td>
                           <td rowSpan={3} width={'70%'} align={"left"} valign={"bottom"}>
-                            <div id="totalPieChart" style={{height: 300, width: 400, backgroundColor: "white"}}></div>
+                            <div id="totalPieChart" style={{height: 300, width: 400, backgroundColor: "white"}}>
+                            </div>
                           </td>
                         </tr>
                         <tr>
@@ -1012,8 +1160,8 @@ const CodeTableList: React.FC<any> = () => {
                           <td>出勤人数</td>
                           <td align={"center"}>  {chartDataForTotal.Attendance}</td>
                           <td rowSpan={2}>
-                            <div id="totalHistogramChart"
-                                 style={{width: 450, height: 100, backgroundColor: "white"}}></div>
+                            <div id="totalHistogramChart" style={{width: 450, height: 100, backgroundColor: "white"}}>
+                            </div>
                           </td>
                         </tr>
                         <tr>
@@ -1024,6 +1172,33 @@ const CodeTableList: React.FC<any> = () => {
                     </div>
 
 
+                  </Col>
+                </Row>
+
+                {/* 第二行 近八周持续高贡献者数据 */}
+                <Row>
+                  <Col span={8}>
+                    <div className="ag-theme-alpine" style={{height: 200, width: '100%', marginTop: 5}}>
+                      <AgGridReact
+                        columnDefs={getHighesCodeColums} // 定义列
+                        rowData={[]} // 数据绑定
+                        defaultColDef={{
+                          resizable: true,
+                          suppressMenu: true,
+                          cellStyle: {"line-height": "25px"},
+                        }}
+                        suppressRowTransform={true}
+                        rowHeight={25}
+                        headerHeight={30}
+                        onGridReady={onToHightestCodeGridReady}
+                      >
+
+                      </AgGridReact>
+                    </div>
+                  </Col>
+                  <Col span={16}>
+                    <div id="_8WeeksHighestNumChart" style={{width: '100%', height: 200, backgroundColor: "white"}}>
+                    </div>
                   </Col>
                 </Row>
               </div>

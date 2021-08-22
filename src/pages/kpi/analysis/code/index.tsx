@@ -685,15 +685,39 @@ const CodeTableList: React.FC<any> = () => {
 
   /* endregion */
 
-  /* region 第二行：近八周持续高贡献者数据 */
+
+  /* 二、三、四行公共方法 */
+  const getHighesCodeColums = [
+    {
+      headerName: '姓名',
+      field: 'userName',
+      minWidth: 80,
+    },
+    {
+      headerName: '平均代码量',
+      field: 'avgLines',
+      minWidth: 80,
+    },
+    {
+      headerName: '最高代码量',
+      field: 'maxLines',
+      minWidth: 80,
+    },
+    {
+      headerName: '本周代码量',
+      field: 'weekLines',
+      minWidth: 80,
+    }
+  ];
   const dataAlaysis = (source: any) => {
     const legendName: any = [];  // 图例  -- 人名
     const x_time: any = [];  // X轴数据：时间，几月第几周
     const seriesArray: any = [];  // 时间
     source.forEach((ele: any, index: number) => {
       legendName.push(ele.userId);
-      const {weekLines} = ele;
+      const weekLines = ele.weekLines === null ? [] : ele.weekLines;
       const weekArray: any = []; // 用于接收每个人每周的数据
+
       weekLines.forEach((t_data: any) => {
         // 只循环一次，用于获取X轴的时间
         if (index === 0) {
@@ -711,7 +735,6 @@ const CodeTableList: React.FC<any> = () => {
 
     return {"legendName": legendName, "x_time": x_time, "seriesArray": seriesArray};
   };
-
   const showCodesChart = (source: any, domName: any) => {
 
     const chartDom = document.getElementById(domName);
@@ -752,35 +775,6 @@ const CodeTableList: React.FC<any> = () => {
       });
     }
   };
-
-  const gridApiForHightestCode = useRef<GridApi>();
-  const onToHightestCodeGridReady = (params: GridReadyEvent) => {
-    gridApiForHightestCode.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-  const getHighesCodeColums = [
-    {
-      headerName: '姓名',
-      field: 'userName',
-      minWidth: 80,
-    },
-    {
-      headerName: '平均代码量',
-      field: 'avgLines',
-      minWidth: 80,
-    },
-    {
-      headerName: '最高代码量',
-      field: 'maxLines',
-      minWidth: 80,
-    },
-    {
-      headerName: '本周代码量',
-      field: 'weekLines',
-      minWidth: 80,
-    }
-  ];
-
   const queryPersonCode = async (client: GqlClient<object>, params: any, usersId: string) => {
 
     const {data} = await client.query(`
@@ -795,34 +789,72 @@ const CodeTableList: React.FC<any> = () => {
         }
       }
   `);
-
-
     return data?.userWeekLines;
   };
-
-  const getHightestCodeData = async (Range: any) => {
-
-    const datas = await querySourceData(gqlClient, Range, 1500);
-    gridApiForHightestCode.current?.setRowData(datas);
-
+  const getDetailsAndShowChart = async (datas: any, Range: any, domName: string) => {
+    let useridStr = "";
     if (datas.length > 0) {
       // 通过datas 里面的userid 获取八周的数据
       // 获取userid 数组
-      let useridStr = "";
       datas.forEach((dts: any) => {
         useridStr = useridStr === "" ? `"${dts.userId}"` : `${useridStr},"${dts.userId}"`;
       });
 
+      debugger;
       const codeDetails = await queryPersonCode(gqlClient, Range, useridStr.toString());
       const alayResult = dataAlaysis(codeDetails);
-      showCodesChart(alayResult, "_8WeeksHighestNumChart");
-
+      showCodesChart(alayResult, domName);
     }
 
   };
 
 
+  /* region 第二行：近八周持续高贡献者数据 */
+
+  const gridApiForHightestCode = useRef<GridApi>();
+  const onToHightestCodeGridReady = (params: GridReadyEvent) => {
+    gridApiForHightestCode.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  const getHightestCodeData = async (Range: any) => {
+    const datas = await querySourceData(gqlClient, Range, 1500);
+    gridApiForHightestCode.current?.setRowData(datas);
+    await getDetailsAndShowChart(datas, Range, "_8WeeksHighestNumChart");
+  };
+
+
   /* endregion */
+
+  /* region  第三行，持续高于1200 */
+  const gridApiFor1200Code = useRef<GridApi>();
+  const onTo1200CodeGridReady = (params: GridReadyEvent) => {
+    gridApiFor1200Code.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  const get1200CodeData = async (Range: any) => {
+    const datas = await querySourceData(gqlClient, Range, 1200);
+    gridApiFor1200Code.current?.setRowData(datas);
+    await getDetailsAndShowChart(datas, Range, "_8Weeks1200NumChart");
+  };
+  /* endregion  */
+
+  /* region  第四行，持续低于600 */
+  const gridApiFor600Code = useRef<GridApi>();
+  const onTo600CodeGridReady = (params: GridReadyEvent) => {
+    gridApiFor600Code.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  const get600CodeData = async (Range: any) => {
+    const datas = await querySourceData(gqlClient, Range, 600);
+    gridApiFor600Code.current?.setRowData(datas);
+    await getDetailsAndShowChart(datas, Range, "_8Weeks600NumChart");
+  };
+
+  /* endregion  */
+
 
   /* region 条件查询 */
   const [choicedConditionForChart, setQueryConditionForChart] = useState({
@@ -836,7 +868,7 @@ const CodeTableList: React.FC<any> = () => {
       start: dateString[0],
       end: dateString[1]
     });
-    debugger;
+
     const range = getWeekStartAndEndTime(dateString[0], dateString[1]);
     // 汇总表格数据显示
     getTotalData(range);
@@ -845,6 +877,12 @@ const CodeTableList: React.FC<any> = () => {
 
     // 连续八周最高贡献者数据显示
     getHightestCodeData(range);
+
+    // 持续高于1200的数据
+    get1200CodeData(range);
+
+    // 持续低于600的数据
+    get600CodeData(range);
 
   };
 
@@ -869,6 +907,12 @@ const CodeTableList: React.FC<any> = () => {
 
     // 连续八周最高贡献者数据显示
     getHightestCodeData(range);
+
+    // 持续高于1200的数据
+    get1200CodeData(range);
+
+    // 持续低于600的数据
+    get600CodeData(range);
 
   };
 
@@ -1064,7 +1108,7 @@ const CodeTableList: React.FC<any> = () => {
   /* endregion */
 
 
-// tab 切换事件
+  // tab 切换事件
   const callback = (clickTab: any) => {
 
     if (clickTab === "sourceData") {
@@ -1080,6 +1124,12 @@ const CodeTableList: React.FC<any> = () => {
 
     // 第二行：持续最高贡献者数据
     getHightestCodeData({start: thisWeekTime[0].from, end: thisWeekTime[0].to});
+
+    // 第三行 持续高于1200的数据
+    get1200CodeData({start: thisWeekTime[0].from, end: thisWeekTime[0].to});
+
+    // 持续低于600的数据
+    get600CodeData({start: thisWeekTime[0].from, end: thisWeekTime[0].to});
 
   }, []);
 
@@ -1205,6 +1255,61 @@ const CodeTableList: React.FC<any> = () => {
                   </div>
                 </Col>
               </Row>
+
+              {/* 第三行 高于1200 */}
+              <Row>
+                <Col span={8}>
+                  <div className="ag-theme-alpine" style={{height: 200, width: '100%', marginTop: 5}}>
+                    <AgGridReact
+                      columnDefs={getHighesCodeColums} // 定义列
+                      rowData={[]} // 数据绑定
+                      defaultColDef={{
+                        resizable: true,
+                        suppressMenu: true,
+                        cellStyle: {"line-height": "25px"},
+                      }}
+                      suppressRowTransform={true}
+                      rowHeight={25}
+                      headerHeight={30}
+                      onGridReady={onTo1200CodeGridReady}
+                    >
+
+                    </AgGridReact>
+                  </div>
+                </Col>
+                <Col span={16}>
+                  <div id="_8Weeks1200NumChart" style={{width: '100%', height: 200, backgroundColor: "white"}}>
+                  </div>
+                </Col>
+              </Row>
+
+              {/* 第四行 低于600 */}
+              <Row>
+                <Col span={8}>
+                  <div className="ag-theme-alpine" style={{height: 200, width: '100%', marginTop: 5}}>
+                    <AgGridReact
+                      columnDefs={getHighesCodeColums} // 定义列
+                      rowData={[]} // 数据绑定
+                      defaultColDef={{
+                        resizable: true,
+                        suppressMenu: true,
+                        cellStyle: {"line-height": "25px"},
+                      }}
+                      suppressRowTransform={true}
+                      rowHeight={25}
+                      headerHeight={30}
+                      onGridReady={onTo600CodeGridReady}
+                    >
+
+                    </AgGridReact>
+                  </div>
+                </Col>
+                <Col span={16}>
+                  <div id="_8Weeks600NumChart" style={{width: '100%', height: 200, backgroundColor: "white"}}>
+                  </div>
+                </Col>
+              </Row>
+
             </div>
 
           </TabPane>

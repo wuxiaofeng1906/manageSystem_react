@@ -943,15 +943,16 @@ const CodeTableList: React.FC<any> = () => {
 
   // 初始化显示和显示默认数据
   const showSourceDefaultData = async () => {
-    const weekRanges = getWeeksRange(1);
+
+    const weekRanges = getWeeksRange(8);
     setQueryConditionForSource({
       start: weekRanges[0].from,
-      end: weekRanges[0].to
+      end: weekRanges[7].to
     });
 
     const range = {
       start: weekRanges[0].from,
-      end: weekRanges[0].to
+      end: weekRanges[7].to
     };
     const datas: any = await querySourceData(gqlClient, range, 0);
     gridApiForSource.current?.setRowData(datas);
@@ -976,6 +977,7 @@ const CodeTableList: React.FC<any> = () => {
   };
 
   const updateStage = (values: any) => {
+    debugger;
     axios.post('/api/kpi/analysis/code', values)
       .then(function (res) {
         if (res.data.ok === true) {
@@ -997,7 +999,7 @@ const CodeTableList: React.FC<any> = () => {
           });
         } else {
           message.error({
-            content: `${res.data.message}`,
+            content: `数据保存失败！`,
             duration: 1,
             style: {
               marginTop: '50vh',

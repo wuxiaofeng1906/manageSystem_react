@@ -520,24 +520,22 @@ const CodeTableList: React.FC<any> = () => {
     const bom = document.getElementById('totalPieChart');
     if (bom) {
       // 基于准备好的dom，初始化echarts实例
-      const myChart = echarts.init(bom);
+      const pieChart = echarts.init(bom);
       // 绘制图表
-      myChart.setOption({
+      pieChart.setOption({
         tooltip: {
           trigger: 'item'
         },
         legend: {
-          // x: '70%',
-          // y: '50',
+          x:"70%",
           orient: 'Vertical',
-          left: 'left',
 
         },
         series: [
           {
             radius: "100%",  // 显示在容器里100%大小，如果需要饼图小一点，就设置低于100%就ok
             type: 'pie',
-
+            center: ['30%', '50%'],  // 第一个值调整左右，第二个值调整上下，也可以设置具体数字像素值，center: [200, 300],
             label: {
               normal: {
                 show: false,  // 不显示每个扇形支出来的说明文字
@@ -553,25 +551,10 @@ const CodeTableList: React.FC<any> = () => {
             }
           }
         ],
-        // grid: {
-        //
-        //   x: 60,
-        //   y: 60,
-        //   x2: 60,
-        //   y2: 60,
-        //   backgroundColor:"aliceblue",
-        //
-        //   show: true,
-        //   // top: "12px",
-        //   // left: '12px',
-        //   // right: "12px",
-        //   // bottom: "12px",
-        //   containLable: true
-        // },
       });
       // 窗口缩放后重新调整图标尺寸
       window.onresize = function () {
-        myChart.resize();
+        pieChart.resize();
       }
     }
   };
@@ -590,14 +573,14 @@ const CodeTableList: React.FC<any> = () => {
           }
         },
         legend: {
-
-          x: '65%',
-          // y: '10px',
-          // data: ['出勤', '请假']
+          x: '70%',
+          y: '10px',
         },
         grid: {
           left: '80px',
-          bottom: "10px"
+          bottom: "20px",
+          // show:true,
+          // backGroundColor:"aliceblue"
         },
         xAxis: {
           type: 'value'
@@ -607,7 +590,6 @@ const CodeTableList: React.FC<any> = () => {
           data: [weekName]
         },
         series: [
-
           {
             name: '出勤',
             type: 'bar',
@@ -625,6 +607,7 @@ const CodeTableList: React.FC<any> = () => {
             name: '请假',
             type: 'bar',
             stack: 'total',
+            barWidth: 70,
             label: {
               show: true
             },
@@ -635,9 +618,9 @@ const CodeTableList: React.FC<any> = () => {
           }
         ]
       });
-      window.onresize = function () {
-        myChart.resize();
-      }
+      window.addEventListener('resize', () => {
+        myChart.resize()
+      });
     }
 
   };
@@ -716,7 +699,7 @@ const CodeTableList: React.FC<any> = () => {
 
   /* endregion */
 
-  /* 二、三、四行公共方法 */
+  /* region 二、三、四行公共方法 */
   const getHighesCodeColums = [
     {
       headerName: '姓名',
@@ -791,9 +774,8 @@ const CodeTableList: React.FC<any> = () => {
         grid: {
           x: 50,
           y: 20,
-          x2: 100,
+          x2: 90,
           y2: 20,
-          // backgroundColor: "aliceblue",
           show: true,
           containLable: true
         },
@@ -826,7 +808,7 @@ const CodeTableList: React.FC<any> = () => {
 
       window.addEventListener('resize', () => {
         myChart.resize()
-      })
+      });
     }
   };
   const getDetailsAndShowChart = async (datas: any, Range: any, domName: string) => {
@@ -845,6 +827,8 @@ const CodeTableList: React.FC<any> = () => {
     const alayResult = dataAlaysis(codeDetails, datas);
     showCodesChart(alayResult, domName);
   };
+
+  /* endregion */
 
   /* region 第二行：近八周持续高贡献者数据 */
 
@@ -1219,17 +1203,22 @@ const CodeTableList: React.FC<any> = () => {
                 </Col>
                 <Col span={12}>
                   <div style={{marginLeft: 20}}>
-                    <table border={1}
-                           style={{width: '100%', height: 520, backgroundColor: "white", overflow: "scroll"}}>
+                    <table border={1} style={{
+                      textAlign: "center",
+                      width: '100%',
+                      height: 520,
+                      backgroundColor: "white",
+                      whiteSpace: "nowrap"
+                    }}>
                       <tr style={{backgroundColor: "#FF9495"}}>
-                        <td width={'20%'}>
+                        <td>
                           <label style={{overflow: "hidden"}}>本周重点关注人员</label>
                         </td>
                         <td colSpan={2}> {chartDataForTotal.payAttention}</td>
                       </tr>
                       <tr>
                         <td>开发人数</td>
-                        <td align={"center"}> {chartDataForTotal.Development}</td>
+                        <td align={"center"} width={'15%'}> {chartDataForTotal.Development}</td>
                         <td rowSpan={3} style={{backgroundColor: "white", textAlign: "left"}}>
                           <div>
                             <div id="totalPieChart" style={{height: 200, backgroundColor: "white"}}>
@@ -1253,7 +1242,6 @@ const CodeTableList: React.FC<any> = () => {
                             <div id="totalHistogramChart" style={{width: 450, height: 100, backgroundColor: "white"}}>
                             </div>
                           </div>
-
                         </td>
                       </tr>
                       <tr>
@@ -1304,7 +1292,7 @@ const CodeTableList: React.FC<any> = () => {
                 </Col>
                 <Col span={16}>
                   <div id="_8WeeksHighestNumChart"
-                       style={{marginTop: 10, width: '100%', height: 330, backgroundColor: "white"}}>
+                       style={{marginLeft: 10, marginTop: 10, width: '100%', height: 330, backgroundColor: "white"}}>
                   </div>
                 </Col>
               </Row>
@@ -1346,7 +1334,7 @@ const CodeTableList: React.FC<any> = () => {
                 </Col>
                 <Col span={16}>
                   <div id="_8Weeks600NumChart"
-                       style={{marginTop: 10, width: '100%', height: 330, backgroundColor: "white"}}>
+                       style={{marginLeft: 10, marginTop: 10, width: '100%', height: 330, backgroundColor: "white"}}>
                   </div>
                 </Col>
               </Row>
@@ -1388,7 +1376,7 @@ const CodeTableList: React.FC<any> = () => {
                 </Col>
                 <Col span={16}>
                   <div id="_8Weeks1200NumChart"
-                       style={{marginTop: 10, width: '100%', height: 330, backgroundColor: "white"}}>
+                       style={{marginLeft: 10, marginTop: 10, width: '100%', height: 330, backgroundColor: "white"}}>
                   </div>
                 </Col>
               </Row>

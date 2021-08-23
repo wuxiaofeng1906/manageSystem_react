@@ -820,9 +820,13 @@ const CodeTableList: React.FC<any> = () => {
         series: source.seriesArray
       });
 
-      window.onresize = function () {
-        myChart.resize();
-      }
+      // window.onresize = function () {
+      //   myChart.resize();
+      // }
+
+      window.addEventListener('resize', () => {
+        myChart.resize()
+      })
     }
   };
   const getDetailsAndShowChart = async (datas: any, Range: any, domName: string) => {

@@ -511,11 +511,56 @@ const CodeTableList: React.FC<any> = () => {
     Vacation: 0// 请假
 
   });
+
+  const rendererColorStyle = {
+    pink: {
+      normal: {
+        color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [{ // 颜色渐变函数 前四个参数分别表示四个位置依次为左、下、右、上
+
+          offset: 0,
+          color: '#ff6681'  // 深色
+        }, {
+          offset: 1,
+          color: '#ffe5ea'  // 浅色
+        }])
+      }
+    },
+    blue: {
+      normal: {
+        color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [{ // 颜色渐变函数 前四个参数分别表示四个位置依次为左、下、右、上
+
+          offset: 0,
+          color: '#3385ff'
+        }, {
+          offset: 1,
+          color: '#cce1ff'
+        }])
+      }
+    },
+    green: {
+      normal: {
+        color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [{ // 颜色渐变函数 前四个参数分别表示四个位置依次为左、下、右、上
+
+          offset: 0,
+          color: '#99ff99'
+        }, {
+          offset: 1,
+          color: '#e5ffe5'
+        }])
+      }
+    }
+  };
   const showTotalPieChart = (params: any) => {
     const totalChartData: any = [
-      {value: params.Development, name: '开发人数'},
-      {value: params.Architecture, name: '架构师人数'},
-      {value: params.Technology, name: '技术管理人数'}
+      {
+        value: params.Development, name: '开发人数', itemStyle: rendererColorStyle.blue
+      },
+      {
+        value: params.Architecture, name: '架构师人数', itemStyle: rendererColorStyle.pink
+      },
+      {
+        value: params.Technology, name: '技术管理人数', itemStyle: rendererColorStyle.green
+      }
     ];
     const bom = document.getElementById('totalPieChart');
     if (bom) {
@@ -527,7 +572,7 @@ const CodeTableList: React.FC<any> = () => {
           trigger: 'item'
         },
         legend: {
-          x:"70%",
+          x: "70%",
           orient: 'Vertical',
 
         },
@@ -600,8 +645,8 @@ const CodeTableList: React.FC<any> = () => {
             emphasis: {
               focus: 'series'
             },
-            data: [params.Attendance]
-            // data: [67],
+            data: [params.Attendance],
+            itemStyle: rendererColorStyle.blue
           },
           {
             name: '请假',
@@ -615,6 +660,7 @@ const CodeTableList: React.FC<any> = () => {
               focus: 'series'
             },
             data: [params.Vacation],
+            itemStyle: rendererColorStyle.pink
           }
         ]
       });

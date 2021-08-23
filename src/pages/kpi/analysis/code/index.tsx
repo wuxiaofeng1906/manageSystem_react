@@ -523,20 +523,21 @@ const CodeTableList: React.FC<any> = () => {
       const myChart = echarts.init(bom);
       // 绘制图表
       myChart.setOption({
-
         tooltip: {
           trigger: 'item'
         },
         legend: {
-          x: '70%',
-          y: '10px',
+          // x: '70%',
+          // y: '50',
           orient: 'Vertical',
-          //   left: 'right',
+          left: 'left',
+
         },
         series: [
           {
+            radius: "100%",  // 显示在容器里100%大小，如果需要饼图小一点，就设置低于100%就ok
             type: 'pie',
-            radius: '50%',
+
             label: {
               normal: {
                 show: false,  // 不显示每个扇形支出来的说明文字
@@ -551,8 +552,27 @@ const CodeTableList: React.FC<any> = () => {
               }
             }
           }
-        ]
+        ],
+        // grid: {
+        //
+        //   x: 60,
+        //   y: 60,
+        //   x2: 60,
+        //   y2: 60,
+        //   backgroundColor:"aliceblue",
+        //
+        //   show: true,
+        //   // top: "12px",
+        //   // left: '12px',
+        //   // right: "12px",
+        //   // bottom: "12px",
+        //   containLable: true
+        // },
       });
+      // 窗口缩放后重新调整图标尺寸
+      window.onresize = function () {
+        myChart.resize();
+      }
     }
   };
   const showTotalHistogramChart = (weekName: string, params: any) => {
@@ -562,10 +582,11 @@ const CodeTableList: React.FC<any> = () => {
       const myChart = echarts.init(chartDom);
       // 绘制图表
       myChart.setOption({
+
         tooltip: {
           trigger: 'axis',
-          axisPointer: {            // Use axis to trigger tooltip
-            type: 'shadow'        // 'shadow' as default; can also be 'line' or 'shadow'
+          axisPointer: {
+            type: 'shadow'
           }
         },
         legend: {
@@ -575,10 +596,8 @@ const CodeTableList: React.FC<any> = () => {
           // data: ['出勤', '请假']
         },
         grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          containLabel: true
+          left: '80px',
+          bottom: "10px"
         },
         xAxis: {
           type: 'value'
@@ -616,6 +635,9 @@ const CodeTableList: React.FC<any> = () => {
           }
         ]
       });
+      window.onresize = function () {
+        myChart.resize();
+      }
     }
 
   };
@@ -766,12 +788,26 @@ const CodeTableList: React.FC<any> = () => {
       myChart.clear();
       // 绘制图表
       myChart.setOption({
+        grid: {
+          x: 50,
+          y: 20,
+          x2: 100,
+          y2: 20,
+          // backgroundColor: "aliceblue",
+          show: true,
+          containLable: true
+        },
 
         tooltip: {
           trigger: 'axis'
         },
         legend: {
-          data: source.legendName  // 人名
+          orient: 'vertical',
+          data: source.legendName,  // 人名
+          type: 'scroll',
+          right: 10,
+          top: 15,
+          bottom: 20,
         },
         xAxis: {
           type: 'category',
@@ -782,19 +818,11 @@ const CodeTableList: React.FC<any> = () => {
           type: 'value',
         },
         series: source.seriesArray
-        // [
-        // {
-        //   name: '最高气温',
-        //   type: 'line',
-        //   data: [10, 11, 13, 11, 12, 12, 9],
-        // },
-        //   {
-        //     name: '最低气温',
-        //     type: 'line',
-        //     data: [1, -2, 2, 5, 3, 2, 0],
-        //   }
-        // ]
       });
+
+      window.onresize = function () {
+        myChart.resize();
+      }
     }
   };
   const getDetailsAndShowChart = async (datas: any, Range: any, domName: string) => {
@@ -1161,7 +1189,7 @@ const CodeTableList: React.FC<any> = () => {
 
               {/* 第一行图表页面 */}
               <Row>
-                <Col span={15}>
+                <Col span={12}>
                   <div className="ag-theme-alpine" style={{height: 520, width: '100%', marginTop: 5}}>
                     <AgGridReact
                       columnDefs={getTotalColums} // 定义列
@@ -1181,7 +1209,7 @@ const CodeTableList: React.FC<any> = () => {
                     </AgGridReact>
                   </div>
                 </Col>
-                <Col span={9}>
+                <Col span={12}>
                   <div style={{marginLeft: 20}}>
                     <table border={1}
                            style={{width: '100%', height: 520, backgroundColor: "white", overflow: "scroll"}}>
@@ -1194,8 +1222,10 @@ const CodeTableList: React.FC<any> = () => {
                       <tr>
                         <td>开发人数</td>
                         <td align={"center"}> {chartDataForTotal.Development}</td>
-                        <td rowSpan={3} width={'70%'} align={"left"} valign={"bottom"}>
-                          <div id="totalPieChart" style={{height: 300, width: 400, backgroundColor: "white"}}>
+                        <td rowSpan={3} style={{backgroundColor: "white", textAlign: "left"}}>
+                          <div>
+                            <div id="totalPieChart" style={{height: 200, backgroundColor: "white"}}>
+                            </div>
                           </div>
                         </td>
                       </tr>
@@ -1211,8 +1241,11 @@ const CodeTableList: React.FC<any> = () => {
                         <td>出勤人数</td>
                         <td align={"center"}>  {chartDataForTotal.Attendance}</td>
                         <td rowSpan={2}>
-                          <div id="totalHistogramChart" style={{width: 450, height: 100, backgroundColor: "white"}}>
+                          <div style={{width: "100%", height: "100%"}}>
+                            <div id="totalHistogramChart" style={{width: 450, height: 100, backgroundColor: "white"}}>
+                            </div>
                           </div>
+
                         </td>
                       </tr>
                       <tr>
@@ -1229,7 +1262,7 @@ const CodeTableList: React.FC<any> = () => {
               {/* 第二行 近八周持续高贡献者数据 */}
               <Row>
                 <Col span={8}>
-                  <div className="ag-theme-alpine" style={{height: 200, width: '100%', marginTop: 5}}>
+                  <div className="ag-theme-alpine" style={{height: 300, width: '100%', marginTop: 5}}>
                     <AgGridReact
                       columnDefs={getHighesCodeColums} // 定义列
                       rowData={[]} // 数据绑定
@@ -1248,7 +1281,7 @@ const CodeTableList: React.FC<any> = () => {
                   </div>
                 </Col>
                 <Col span={16}>
-                  <div id="_8WeeksHighestNumChart" style={{width: '100%', height: 200, backgroundColor: "white"}}>
+                  <div id="_8WeeksHighestNumChart" style={{width: '100%', height: 300, backgroundColor: "white"}}>
                   </div>
                 </Col>
               </Row>
@@ -1256,7 +1289,7 @@ const CodeTableList: React.FC<any> = () => {
               {/* 第三行 持续低贡献者数据小于600 */}
               <Row>
                 <Col span={8}>
-                  <div className="ag-theme-alpine" style={{height: 200, width: '100%', marginTop: 5}}>
+                  <div className="ag-theme-alpine" style={{height: 300, width: '100%', marginTop: 5}}>
                     <AgGridReact
                       columnDefs={getHighesCodeColums} // 定义列
                       rowData={[]} // 数据绑定
@@ -1275,7 +1308,7 @@ const CodeTableList: React.FC<any> = () => {
                   </div>
                 </Col>
                 <Col span={16}>
-                  <div id="_8Weeks600NumChart" style={{width: '100%', height: 200, backgroundColor: "white"}}>
+                  <div id="_8Weeks600NumChart" style={{width: '100%', height: 300, backgroundColor: "white"}}>
                   </div>
                 </Col>
               </Row>
@@ -1283,7 +1316,7 @@ const CodeTableList: React.FC<any> = () => {
               {/* 第四行 最大贡献小于1200 */}
               <Row>
                 <Col span={8}>
-                  <div className="ag-theme-alpine" style={{height: 200, width: '100%', marginTop: 5}}>
+                  <div className="ag-theme-alpine" style={{height: 300, width: '100%', marginTop: 5}}>
                     <AgGridReact
                       columnDefs={getHighesCodeColums} // 定义列
                       rowData={[]} // 数据绑定
@@ -1302,7 +1335,7 @@ const CodeTableList: React.FC<any> = () => {
                   </div>
                 </Col>
                 <Col span={16}>
-                  <div id="_8Weeks1200NumChart" style={{width: '100%', height: 200, backgroundColor: "white"}}>
+                  <div id="_8Weeks1200NumChart" style={{width: '100%', height: 300, backgroundColor: "white"}}>
                   </div>
                 </Col>
               </Row>

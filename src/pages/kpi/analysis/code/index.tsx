@@ -896,6 +896,8 @@ const CodeTableList: React.FC<any> = () => {
     end: ""
   });
 
+  const [weeksNum, setWeeksNum] = useState(8);
+
   // 时间选择事件
   const onChartTimeSelected = async (params: any, dateString: any) => {
     setQueryConditionForChart({
@@ -904,6 +906,8 @@ const CodeTableList: React.FC<any> = () => {
     });
 
     const range = getWeekStartAndEndTime(dateString[0], dateString[1]);
+    const timeDiff = dayjs(range.end).diff(dayjs(range.start), 'day') + 1;
+    setWeeksNum(timeDiff / 7);   // 因为range里面的时间是周一到周日的完整时间，所以直接除以7就可以得出有多少周
     // 汇总表格数据显示
     getTotalData(range);
     // 汇总图表显示  -- 选择时间的最后一周的开始时间和结束时间
@@ -1262,26 +1266,41 @@ const CodeTableList: React.FC<any> = () => {
               {/* 第二行 近八周持续高贡献者数据 */}
               <Row>
                 <Col span={8}>
-                  <div className="ag-theme-alpine" style={{height: 300, width: '100%', marginTop: 5}}>
-                    <AgGridReact
-                      columnDefs={getHighesCodeColums} // 定义列
-                      rowData={[]} // 数据绑定
-                      defaultColDef={{
-                        resizable: true,
-                        suppressMenu: true,
-                        cellStyle: {"line-height": "25px"},
-                      }}
-                      suppressRowTransform={true}
-                      rowHeight={25}
-                      headerHeight={30}
-                      onGridReady={onToHightestCodeGridReady}
-                    >
+                  <div style={{marginTop: "10px"}}>
+                    <div style={{
+                      height: "30px",
+                      lineHeight: "30px",
+                      verticalAlign: "middle",
+                      textAlign: "center",
+                      backgroundColor: "#F8F8F8",
+                      fontWeight: "bold",
+                      width: '100%',
+                      border: "solid 1px #CCCCCC"
+                    }}> 近{weeksNum}周持续高贡献者数据
+                    </div>
+                    <div className="ag-theme-alpine" style={{marginTop: "-5", height: 300, width: '100%'}}>
+                      <AgGridReact
+                        columnDefs={getHighesCodeColums} // 定义列
+                        rowData={[]} // 数据绑定
+                        defaultColDef={{
+                          resizable: true,
+                          suppressMenu: true,
+                          cellStyle: {"line-height": "25px"},
+                        }}
+                        suppressRowTransform={true}
+                        rowHeight={25}
+                        headerHeight={30}
+                        onGridReady={onToHightestCodeGridReady}
+                      >
 
-                    </AgGridReact>
+                      </AgGridReact>
+                    </div>
                   </div>
+
                 </Col>
                 <Col span={16}>
-                  <div id="_8WeeksHighestNumChart" style={{width: '100%', height: 300, backgroundColor: "white"}}>
+                  <div id="_8WeeksHighestNumChart"
+                       style={{marginTop: 10, width: '100%', height: 330, backgroundColor: "white"}}>
                   </div>
                 </Col>
               </Row>
@@ -1289,26 +1308,41 @@ const CodeTableList: React.FC<any> = () => {
               {/* 第三行 持续低贡献者数据小于600 */}
               <Row>
                 <Col span={8}>
-                  <div className="ag-theme-alpine" style={{height: 300, width: '100%', marginTop: 5}}>
-                    <AgGridReact
-                      columnDefs={getHighesCodeColums} // 定义列
-                      rowData={[]} // 数据绑定
-                      defaultColDef={{
-                        resizable: true,
-                        suppressMenu: true,
-                        cellStyle: {"line-height": "25px"},
-                      }}
-                      suppressRowTransform={true}
-                      rowHeight={25}
-                      headerHeight={30}
-                      onGridReady={onTo600CodeGridReady}
-                    >
+                  <div style={{marginTop: "10px"}}>
+                    <div style={{
+                      height: "30px",
+                      lineHeight: "30px",
+                      verticalAlign: "middle",
+                      textAlign: "center",
+                      backgroundColor: "#F8F8F8",
+                      fontWeight: "bold",
+                      width: '100%',
+                      border: "solid 1px #CCCCCC"
+                    }}> 近{weeksNum}周持续低贡献者数据小于600
+                    </div>
+                    <div className="ag-theme-alpine" style={{height: 300, width: '100%', marginTop: "-5"}}>
+                      <AgGridReact
+                        columnDefs={getHighesCodeColums} // 定义列
+                        rowData={[]} // 数据绑定
+                        defaultColDef={{
+                          resizable: true,
+                          suppressMenu: true,
+                          cellStyle: {"line-height": "25px"},
+                        }}
+                        suppressRowTransform={true}
+                        rowHeight={25}
+                        headerHeight={30}
+                        onGridReady={onTo600CodeGridReady}
+                      >
 
-                    </AgGridReact>
+                      </AgGridReact>
+                    </div>
                   </div>
+
                 </Col>
                 <Col span={16}>
-                  <div id="_8Weeks600NumChart" style={{width: '100%', height: 300, backgroundColor: "white"}}>
+                  <div id="_8Weeks600NumChart"
+                       style={{marginTop: 10, width: '100%', height: 330, backgroundColor: "white"}}>
                   </div>
                 </Col>
               </Row>
@@ -1316,26 +1350,41 @@ const CodeTableList: React.FC<any> = () => {
               {/* 第四行 最大贡献小于1200 */}
               <Row>
                 <Col span={8}>
-                  <div className="ag-theme-alpine" style={{height: 300, width: '100%', marginTop: 5}}>
-                    <AgGridReact
-                      columnDefs={getHighesCodeColums} // 定义列
-                      rowData={[]} // 数据绑定
-                      defaultColDef={{
-                        resizable: true,
-                        suppressMenu: true,
-                        cellStyle: {"line-height": "25px"},
-                      }}
-                      suppressRowTransform={true}
-                      rowHeight={25}
-                      headerHeight={30}
-                      onGridReady={onTo1200CodeGridReady}
-                    >
+                  <div style={{marginTop: "10px"}}>
+                    <div style={{
+                      height: "30px",
+                      lineHeight: "30px",
+                      verticalAlign: "middle",
+                      textAlign: "center",
+                      backgroundColor: "#F8F8F8",
+                      fontWeight: "bold",
+                      width: '100%',
+                      border: "solid 1px #CCCCCC"
+                    }}> 近{weeksNum}周最大贡献小于1200
+                    </div>
+                    <div className="ag-theme-alpine" style={{height: 300, width: '100%', marginTop: "-5px"}}>
+                      <AgGridReact
+                        columnDefs={getHighesCodeColums} // 定义列
+                        rowData={[]} // 数据绑定
+                        defaultColDef={{
+                          resizable: true,
+                          suppressMenu: true,
+                          cellStyle: {"line-height": "25px"},
+                        }}
+                        suppressRowTransform={true}
+                        rowHeight={25}
+                        headerHeight={30}
+                        onGridReady={onTo1200CodeGridReady}
+                      >
 
-                    </AgGridReact>
+                      </AgGridReact>
+                    </div>
                   </div>
+
                 </Col>
                 <Col span={16}>
-                  <div id="_8Weeks1200NumChart" style={{width: '100%', height: 300, backgroundColor: "white"}}>
+                  <div id="_8Weeks1200NumChart"
+                       style={{marginTop: 10, width: '100%', height: 330, backgroundColor: "white"}}>
                   </div>
                 </Col>
               </Row>

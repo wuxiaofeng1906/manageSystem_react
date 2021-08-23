@@ -22,6 +22,7 @@ import {
 import {getMonthWeek, getWeeksRange, getWeekStartAndEndTime} from "@/publicMethods/timeMethods";
 import moment from "moment";
 import axios from "axios";
+import * as dayjs from "dayjs";
 
 const {TabPane} = Tabs;
 const {RangePicker} = DatePicker;
@@ -619,6 +620,8 @@ const CodeTableList: React.FC<any> = () => {
 
   };
   const getTotalChartData = (params: any) => {
+
+
     const weekName = getMonthWeek(params.start);
     const url = `/api/kpi/analysis/overview?start=${params.start}&end=${params.end}`;
     axios.get(url, {})
@@ -875,8 +878,9 @@ const CodeTableList: React.FC<any> = () => {
     const range = getWeekStartAndEndTime(dateString[0], dateString[1]);
     // 汇总表格数据显示
     getTotalData(range);
-    // 汇总图表显示
-    getTotalChartData(range);
+    // 汇总图表显示  -- 选择时间的最后一周的开始时间和结束时间
+
+    getTotalChartData({start: dayjs(range.end).subtract(6, 'day').format("YYYY-MM-DD"), end: range.end});
 
     // 连续八周最高贡献者数据显示
     getHightestCodeData(range);
@@ -906,8 +910,8 @@ const CodeTableList: React.FC<any> = () => {
     // 汇总表格数据显示
     getTotalData(range);
 
-    // 汇总图-饼图
-    getTotalChartData(range);
+    // 汇总图-饼图(本周数据)-- 所以只传本周的时间
+    getTotalChartData({start: weekRanges[7].from, end: weekRanges[7].to});
 
     // 连续八周最高贡献者数据显示
     getHightestCodeData(range);
@@ -1182,7 +1186,9 @@ const CodeTableList: React.FC<any> = () => {
                     <table border={1}
                            style={{width: '100%', height: 520, backgroundColor: "white", overflow: "scroll"}}>
                       <tr style={{backgroundColor: "#FF9495"}}>
-                        <td width={'20%'}>本周重点关注人员</td>
+                        <td width={'20%'}>
+                          <label style={{overflow: "hidden"}}>本周重点关注人员</label>
+                        </td>
                         <td colSpan={2}> {chartDataForTotal.payAttention}</td>
                       </tr>
                       <tr>

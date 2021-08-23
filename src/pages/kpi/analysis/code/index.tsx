@@ -578,7 +578,7 @@ const CodeTableList: React.FC<any> = () => {
         },
         series: [
           {
-            radius: "100%",  // 显示在容器里100%大小，如果需要饼图小一点，就设置低于100%就ok
+            radius: "90%",  // 显示在容器里100%大小，如果需要饼图小一点，就设置低于100%就ok
             type: 'pie',
             center: ['30%', '50%'],  // 第一个值调整左右，第二个值调整上下，也可以设置具体数字像素值，center: [200, 300],
             label: {
@@ -607,9 +607,9 @@ const CodeTableList: React.FC<any> = () => {
     const chartDom = document.getElementById('totalHistogramChart');
     if (chartDom) {
       // 基于准备好的dom，初始化echarts实例
-      const myChart = echarts.init(chartDom);
+      const histogramChart = echarts.init(chartDom);
       // 绘制图表
-      myChart.setOption({
+      histogramChart.setOption({
 
         tooltip: {
           trigger: 'axis',
@@ -665,7 +665,7 @@ const CodeTableList: React.FC<any> = () => {
         ]
       });
       window.addEventListener('resize', () => {
-        myChart.resize()
+        histogramChart.resize()
       });
     }
 
@@ -1267,7 +1267,7 @@ const CodeTableList: React.FC<any> = () => {
                         <td align={"center"} width={'15%'}> {chartDataForTotal.Development}</td>
                         <td rowSpan={3} style={{backgroundColor: "white", textAlign: "left"}}>
                           <div>
-                            <div id="totalPieChart" style={{height: 200, backgroundColor: "white"}}>
+                            <div id="totalPieChart" style={{height: 250, backgroundColor: "white"}}>
                             </div>
                           </div>
                         </td>

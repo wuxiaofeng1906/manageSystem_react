@@ -4,7 +4,6 @@ import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-
 import type {GridApi, GridReadyEvent} from 'ag-grid-community';
 import type {GqlClient} from '@/hooks';
 import {useGqlClient} from '@/hooks';
@@ -260,8 +259,6 @@ const CodeTableList: React.FC<any> = () => {
 
 
   /* region 第一行图表：只显示查询日期中最近的一周数据：比如查询的是最近8周，那么，这边就显示本周的数据（最近一周） */
-
-  const thisWeekTime = getWeeksRange(1);
 
   const gridApiForTotal = useRef<GridApi>();
   const onTotalGridReady = (params: GridReadyEvent) => {
@@ -709,25 +706,39 @@ const CodeTableList: React.FC<any> = () => {
       minWidth: 80,
     }
   ];
-  const dataAlaysis = (source: any) => {
+  const dataAlaysis = (source: any, oraData: any) => {
+
     const legendName: any = [];  // 图例  -- 人名
     const x_time: any = [];  // X轴数据：时间，几月第几周
     const seriesArray: any = [];  // 时间
     source.forEach((ele: any, index: number) => {
-      legendName.push(ele.userId);
+      // 获取用户（英文对应中文，oraData 只是用于英文名字对应中文名字作用）
+      let usernName = "";
+      for (let i = 0; i < oraData.length; i += 1) {
+        if (oraData[i].userId === ele.userId) {
+          usernName = oraData[i].userName;
+          break;
+        }
+      }
+
+      // 加入图例数据
+      legendName.push(usernName);
+
+      // 获取每个人的周数据
       const weekLines = ele.weekLines === null ? [] : ele.weekLines;
       const weekArray: any = []; // 用于接收每个人每周的数据
-
       weekLines.forEach((t_data: any) => {
         // 只循环一次，用于获取X轴的时间
         if (index === 0) {
           const start = getMonthWeek(t_data.startAt);
-          x_time.push(start);
+          x_time.push(start);  // X轴标识
         }
         weekArray.push(Number(t_data.lines));
       });
+
+      // 具体数据
       seriesArray.push({
-        name: ele.userId,
+        name: usernName,
         type: 'line',
         data: weekArray
       });
@@ -792,6 +803,7 @@ const CodeTableList: React.FC<any> = () => {
     return data?.userWeekLines;
   };
   const getDetailsAndShowChart = async (datas: any, Range: any, domName: string) => {
+    debugger;
     let useridStr = "";
     if (datas.length > 0) {
       // 通过datas 里面的userid 获取八周的数据
@@ -800,12 +812,12 @@ const CodeTableList: React.FC<any> = () => {
         useridStr = useridStr === "" ? `"${dts.userId}"` : `${useridStr},"${dts.userId}"`;
       });
 
-      debugger;
-      const codeDetails = await queryPersonCode(gqlClient, Range, useridStr.toString());
-      const alayResult = dataAlaysis(codeDetails);
-      showCodesChart(alayResult, domName);
     }
 
+    debugger;
+    const codeDetails = await queryPersonCode(gqlClient, Range, useridStr.toString());
+    const alayResult = dataAlaysis(codeDetails, datas);
+    showCodesChart(alayResult, domName);
   };
 
 
@@ -826,7 +838,24 @@ const CodeTableList: React.FC<any> = () => {
 
   /* endregion */
 
-  /* region  第三行，持续高于1200 */
+  /* region  第三行，最低贡献者小于600 */
+  const gridApiFor600Code = useRef<GridApi>();
+  const onTo600CodeGridReady = (params: GridReadyEvent) => {
+    gridApiFor600Code.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  const get600CodeData = async (Range: any) => {
+    const datas = await querySourceData(gqlClient, Range, 600);
+    gridApiFor600Code.current?.setRowData(datas);
+    await getDetailsAndShowChart(datas, Range, "_8Weeks600NumChart");
+  };
+
+
+  /* endregion  */
+
+  /* region  第四行，最大贡献小于1200 */
+
   const gridApiFor1200Code = useRef<GridApi>();
   const onTo1200CodeGridReady = (params: GridReadyEvent) => {
     gridApiFor1200Code.current = params.api;
@@ -840,26 +869,11 @@ const CodeTableList: React.FC<any> = () => {
   };
   /* endregion  */
 
-  /* region  第四行，持续低于600 */
-  const gridApiFor600Code = useRef<GridApi>();
-  const onTo600CodeGridReady = (params: GridReadyEvent) => {
-    gridApiFor600Code.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-
-  const get600CodeData = async (Range: any) => {
-    const datas = await querySourceData(gqlClient, Range, 600);
-    gridApiFor600Code.current?.setRowData(datas);
-    await getDetailsAndShowChart(datas, Range, "_8Weeks600NumChart");
-  };
-
-  /* endregion  */
-
 
   /* region 条件查询 */
   const [choicedConditionForChart, setQueryConditionForChart] = useState({
-    start: thisWeekTime[0].from,
-    end: thisWeekTime[0].to
+    start: "",
+    end: ""
   });
 
   // 时间选择事件
@@ -888,15 +902,16 @@ const CodeTableList: React.FC<any> = () => {
 
   // 初始化显示和显示默认数据
   const showChartDefaultData = async () => {
-    const weekRanges = getWeeksRange(1);
+    const weekRanges = getWeeksRange(8);
+
     setQueryConditionForChart({
       start: weekRanges[0].from,
-      end: weekRanges[0].to
+      end: weekRanges[7].to
     });
 
     const range = {
       start: weekRanges[0].from,
-      end: weekRanges[0].to
+      end: weekRanges[7].to
     };
 
     // 汇总表格数据显示
@@ -1119,20 +1134,7 @@ const CodeTableList: React.FC<any> = () => {
   };
 
   useEffect(() => {
-
-    // 第一行 ：统计页面
-    getTotalData({start: thisWeekTime[0].from, end: thisWeekTime[0].to});
-    getTotalChartData({start: thisWeekTime[0].from, end: thisWeekTime[0].to});
-
-    // 第二行：持续最高贡献者数据
-    getHightestCodeData({start: thisWeekTime[0].from, end: thisWeekTime[0].to});
-
-    // 第三行 持续高于1200的数据
-    get1200CodeData({start: thisWeekTime[0].from, end: thisWeekTime[0].to});
-
-    // 持续低于600的数据
-    get600CodeData({start: thisWeekTime[0].from, end: thisWeekTime[0].to});
-
+    showChartDefaultData();
   }, []);
 
 
@@ -1258,7 +1260,34 @@ const CodeTableList: React.FC<any> = () => {
                 </Col>
               </Row>
 
-              {/* 第三行 高于1200 */}
+              {/* 第三行 持续低贡献者数据小于600 */}
+              <Row>
+                <Col span={8}>
+                  <div className="ag-theme-alpine" style={{height: 200, width: '100%', marginTop: 5}}>
+                    <AgGridReact
+                      columnDefs={getHighesCodeColums} // 定义列
+                      rowData={[]} // 数据绑定
+                      defaultColDef={{
+                        resizable: true,
+                        suppressMenu: true,
+                        cellStyle: {"line-height": "25px"},
+                      }}
+                      suppressRowTransform={true}
+                      rowHeight={25}
+                      headerHeight={30}
+                      onGridReady={onTo600CodeGridReady}
+                    >
+
+                    </AgGridReact>
+                  </div>
+                </Col>
+                <Col span={16}>
+                  <div id="_8Weeks600NumChart" style={{width: '100%', height: 200, backgroundColor: "white"}}>
+                  </div>
+                </Col>
+              </Row>
+
+              {/* 第四行 最大贡献小于1200 */}
               <Row>
                 <Col span={8}>
                   <div className="ag-theme-alpine" style={{height: 200, width: '100%', marginTop: 5}}>
@@ -1285,32 +1314,6 @@ const CodeTableList: React.FC<any> = () => {
                 </Col>
               </Row>
 
-              {/* 第四行 低于600 */}
-              <Row>
-                <Col span={8}>
-                  <div className="ag-theme-alpine" style={{height: 200, width: '100%', marginTop: 5}}>
-                    <AgGridReact
-                      columnDefs={getHighesCodeColums} // 定义列
-                      rowData={[]} // 数据绑定
-                      defaultColDef={{
-                        resizable: true,
-                        suppressMenu: true,
-                        cellStyle: {"line-height": "25px"},
-                      }}
-                      suppressRowTransform={true}
-                      rowHeight={25}
-                      headerHeight={30}
-                      onGridReady={onTo600CodeGridReady}
-                    >
-
-                    </AgGridReact>
-                  </div>
-                </Col>
-                <Col span={16}>
-                  <div id="_8Weeks600NumChart" style={{width: '100%', height: 200, backgroundColor: "white"}}>
-                  </div>
-                </Col>
-              </Row>
 
             </div>
 

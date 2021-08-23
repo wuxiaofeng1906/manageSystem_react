@@ -280,7 +280,10 @@ const CodeTableList: React.FC<any> = () => {
     gridApiForTotal.current = params.api;
     params.api.sizeColumnsToFit();
   };
-
+  // 窗口变化自适应屏幕大小
+  window.addEventListener('resize', () => {
+    gridApiForTotal.current?.sizeColumnsToFit();
+  });
   const test = (params: any) => {
     if (params.data.stage === "需求阶段") {
       return 3;
@@ -883,7 +886,10 @@ const CodeTableList: React.FC<any> = () => {
     gridApiForHightestCode.current = params.api;
     params.api.sizeColumnsToFit();
   };
-
+  // 窗口变化自适应屏幕大小
+  window.addEventListener('resize', () => {
+    gridApiForHightestCode.current?.sizeColumnsToFit();
+  });
   const getHightestCodeData = async (Range: any) => {
     const datas = await querySourceData(gqlClient, Range, 1500);
     gridApiForHightestCode.current?.setRowData(datas);
@@ -899,6 +905,11 @@ const CodeTableList: React.FC<any> = () => {
     gridApiFor600Code.current = params.api;
     params.api.sizeColumnsToFit();
   };
+
+  // 窗口变化自适应屏幕大小
+  window.addEventListener('resize', () => {
+    gridApiFor600Code.current?.sizeColumnsToFit();
+  });
 
   const get600CodeData = async (Range: any) => {
     const datas = await querySourceData(gqlClient, Range, 600);
@@ -916,6 +927,11 @@ const CodeTableList: React.FC<any> = () => {
     gridApiFor1200Code.current = params.api;
     params.api.sizeColumnsToFit();
   };
+
+  // 窗口变化自适应屏幕大小
+  window.addEventListener('resize', () => {
+    gridApiFor1200Code.current?.sizeColumnsToFit();
+  });
 
   const get1200CodeData = async (Range: any) => {
     const datas = await querySourceData(gqlClient, Range, 1200);

@@ -27,7 +27,22 @@ const {TabPane} = Tabs;
 const {RangePicker} = DatePicker;
 
 /* region 分析报告页面 */
+const queryPersonCode = async (client: GqlClient<object>, params: any, usersId: string) => {
 
+  const {data} = await client.query(`
+      {
+         userWeekLines(start:"${params.start}", end:"${params.end}",userIds:[${usersId}]){
+          userId
+          weekLines{
+            lines
+            startAt
+            endAt
+          }
+        }
+      }
+  `);
+  return data?.userWeekLines;
+};
 /* endregion */
 
 /* region 源数据页面 */
@@ -257,7 +272,6 @@ const CodeTableList: React.FC<any> = () => {
 
   /* region 分析报告页面 */
 
-
   /* region 第一行图表：只显示查询日期中最近的一周数据：比如查询的是最近8周，那么，这边就显示本周的数据（最近一周） */
 
   const gridApiForTotal = useRef<GridApi>();
@@ -272,7 +286,6 @@ const CodeTableList: React.FC<any> = () => {
     }
     return 1;
   };
-
 
   /* region 表格总数据展示 */
 
@@ -487,8 +500,7 @@ const CodeTableList: React.FC<any> = () => {
   };
   /* endregion 表格总数据展示 */
 
-
-  // 图表
+  // 饼图和柱状图数据显示
   const [chartDataForTotal, setChartDataForTotal] = useState({
     payAttention: "",  // 关注人员
     Development: 0,  // 开发
@@ -542,7 +554,6 @@ const CodeTableList: React.FC<any> = () => {
       });
     }
   };
-
   const showTotalHistogramChart = (weekName: string, params: any) => {
     const chartDom = document.getElementById('totalHistogramChart');
     if (chartDom) {
@@ -607,7 +618,6 @@ const CodeTableList: React.FC<any> = () => {
     }
 
   };
-
   const getTotalChartData = (params: any) => {
     const weekName = getMonthWeek(params.start);
     const url = `/api/kpi/analysis/overview?start=${params.start}&end=${params.end}`;
@@ -679,9 +689,7 @@ const CodeTableList: React.FC<any> = () => {
 
   };
 
-
   /* endregion */
-
 
   /* 二、三、四行公共方法 */
   const getHighesCodeColums = [
@@ -786,24 +794,8 @@ const CodeTableList: React.FC<any> = () => {
       });
     }
   };
-  const queryPersonCode = async (client: GqlClient<object>, params: any, usersId: string) => {
-
-    const {data} = await client.query(`
-      {
-         userWeekLines(start:"${params.start}", end:"${params.end}",userIds:[${usersId}]){
-          userId
-          weekLines{
-            lines
-            startAt
-            endAt
-          }
-        }
-      }
-  `);
-    return data?.userWeekLines;
-  };
   const getDetailsAndShowChart = async (datas: any, Range: any, domName: string) => {
-    debugger;
+
     let useridStr = "";
     if (datas.length > 0) {
       // 通过datas 里面的userid 获取八周的数据
@@ -814,12 +806,10 @@ const CodeTableList: React.FC<any> = () => {
 
     }
 
-    debugger;
     const codeDetails = await queryPersonCode(gqlClient, Range, useridStr.toString());
     const alayResult = dataAlaysis(codeDetails, datas);
     showCodesChart(alayResult, domName);
   };
-
 
   /* region 第二行：近八周持续高贡献者数据 */
 
@@ -868,7 +858,6 @@ const CodeTableList: React.FC<any> = () => {
     await getDetailsAndShowChart(datas, Range, "_8Weeks1200NumChart");
   };
   /* endregion  */
-
 
   /* region 条件查询 */
   const [choicedConditionForChart, setQueryConditionForChart] = useState({
@@ -935,7 +924,6 @@ const CodeTableList: React.FC<any> = () => {
 
   /* endregion */
 
-
   /* region 源数据页面 */
 
   const gridApiForSource = useRef<GridApi>();
@@ -992,7 +980,7 @@ const CodeTableList: React.FC<any> = () => {
   };
 
   const updateStage = (values: any) => {
-    debugger;
+
     axios.post('/api/kpi/analysis/code', values)
       .then(function (res) {
         if (res.data.ok === true) {
@@ -1136,7 +1124,6 @@ const CodeTableList: React.FC<any> = () => {
   useEffect(() => {
     showChartDefaultData();
   }, []);
-
 
   return (
     <PageContainer>

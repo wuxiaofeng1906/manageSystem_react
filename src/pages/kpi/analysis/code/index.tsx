@@ -268,6 +268,41 @@ const querySourceData = async (client: GqlClient<object>, params: any, queryCoun
   return data?.avgCodeAnalysis;
 };
 
+const query_600_1200Data = async (client: GqlClient<object>, params: any, queryCount: number) => {
+
+  // module =》All：查询所在时间内的所有数据，
+  let conditon = `start:"${params.start}",end:"${params.end}"`;
+
+  if (queryCount !== 0) {
+    conditon = `${conditon},threshold:${queryCount}`;
+  }
+
+  const {data} = await client.query(`
+      {
+        codeThreshold(${conditon}){
+        userId
+        userName
+        maxLines
+        avgLines
+        minLines
+        weekLines
+        deptName
+        groupName
+        tech
+        area
+        position
+        job
+        labour
+        attendance
+        stage
+      }
+
+      }
+  `);
+
+  return data?.codeThreshold;
+};
+
 const CodeTableList: React.FC<any> = () => {
 
   const sys_accessToken = localStorage.getItem("accessId");
@@ -985,7 +1020,7 @@ const CodeTableList: React.FC<any> = () => {
   });
 
   const get600CodeData = async (Range: any) => {
-    const datas = await querySourceData(gqlClient, Range, 600);
+    const datas = await query_600_1200Data(gqlClient, Range, 600);
     const selecteddata = selected7ItemsToShow(datas, false);
     gridApiFor600Code.current?.setRowData(datas);
     await getDetailsAndShowChart(datas, Range, "_8Weeks600NumChart", selecteddata);
@@ -1008,7 +1043,7 @@ const CodeTableList: React.FC<any> = () => {
   });
 
   const get1200CodeData = async (Range: any) => {
-    const datas = await querySourceData(gqlClient, Range, 1200);
+    const datas = await query_600_1200Data(gqlClient, Range, 1200);
     gridApiFor1200Code.current?.setRowData(datas);
     const selecteddata = selected7ItemsToShow(datas, false);
     await getDetailsAndShowChart(datas, Range, "_8Weeks1200NumChart", selecteddata);

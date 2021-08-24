@@ -1386,7 +1386,7 @@ const CodeTableList: React.FC<any> = () => {
                       fontWeight: "bold",
                       width: '100%',
                       border: "solid 1px #CCCCCC"
-                    }}> 近{weeksNum}周持续高贡献者数据
+                    }}> 近{weeksNum}周持续高贡献者数据 &gt;=1500
                     </div>
                     <div className="ag-theme-alpine" style={{marginTop: "-5", height: 300, width: '100%'}}>
                       <AgGridReact
@@ -1428,7 +1428,7 @@ const CodeTableList: React.FC<any> = () => {
                       fontWeight: "bold",
                       width: '100%',
                       border: "solid 1px #CCCCCC"
-                    }}> 近{weeksNum}周持续低贡献者数据小于600
+                    }}> 近{weeksNum}周持续低贡献者数据 &lt;600
                     </div>
                     <div className="ag-theme-alpine" style={{height: 300, width: '100%', marginTop: "-5"}}>
                       <AgGridReact
@@ -1470,7 +1470,7 @@ const CodeTableList: React.FC<any> = () => {
                       fontWeight: "bold",
                       width: '100%',
                       border: "solid 1px #CCCCCC"
-                    }}> 近{weeksNum}周最大贡献小于1200
+                    }}> 近{weeksNum}周最大贡献&lt;1200
                     </div>
                     <div className="ag-theme-alpine" style={{height: 300, width: '100%', marginTop: "-5px"}}>
                       <AgGridReact

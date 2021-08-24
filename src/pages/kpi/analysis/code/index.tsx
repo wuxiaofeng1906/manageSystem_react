@@ -19,6 +19,7 @@ import {
   areaRender,
   groupRender,
 } from "@/publicMethods/cellRenderer";
+import "./styles.css";
 import {getMonthWeek, getWeeksRange, getWeekStartAndEndTime} from "@/publicMethods/timeMethods";
 import moment from "moment";
 import axios from "axios";
@@ -266,6 +267,7 @@ const querySourceData = async (client: GqlClient<object>, params: any, queryCoun
 };
 
 const CodeTableList: React.FC<any> = () => {
+
   const sys_accessToken = localStorage.getItem("accessId");
   axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
   // 公共定义
@@ -284,12 +286,7 @@ const CodeTableList: React.FC<any> = () => {
   window.addEventListener('resize', () => {
     gridApiForTotal.current?.sizeColumnsToFit();
   });
-  const test = (params: any) => {
-    if (params.data.stage === "需求阶段") {
-      return 3;
-    }
-    return 1;
-  };
+
 
   /* region 表格总数据展示 */
 
@@ -301,19 +298,41 @@ const CodeTableList: React.FC<any> = () => {
 
     return params.value;
   };
+
+  const rowSpans = (params: any) => {
+    const stages = params.data.stage;
+
+    if (stages === "需求阶段" || stages === "设计阶段" || stages === "测试阶段" || stages === "技术管理") {
+      return 3;
+    }
+
+    if (stages === "开发阶段") {
+      if (params.data.item === "最高贡献者") {
+        return 4;
+      }
+      return 3;
+    }
+    return 1;
+  };
+
   const getTotalColums = [
     {
       headerName: '阶段/领域',
       field: 'stage',
       minWidth: 80,
-      rowSpan: test,
-      cellClassRules: {backgroundColor: "red"}
-
+      rowSpan: rowSpans,
+      cellClassRules: {
+        'cell-span': "value !== undefined"
+      }
     },
     {
       headerName: '出勤状态',
       field: 'attendance',
       minWidth: 80,
+      rowSpan: rowSpans,
+      cellClassRules: {
+        'cell-span': "value !== undefined"
+      }
     },
     {
       headerName: '统计项',
@@ -354,14 +373,14 @@ const CodeTableList: React.FC<any> = () => {
         tryDev: itemData.trial.personNums,
         techManager: "-"
       }, {
-        stage: title,
+        stage: "",  // 为了进行单元格合并，需要将stage置为空
         attendance: "正常",
         item: "代码总行数",
         formalDev: itemData.offical === null ? 0 : itemData.offical.sumLines,
         tryDev: itemData.trial.sumLines,
         techManager: "-"
       }, {
-        stage: title,
+        stage: "",
         attendance: "正常",
         item: "代码人均行数",
         formalDev: itemData.offical === null ? 0 : itemData.offical.avgLines,
@@ -377,14 +396,14 @@ const CodeTableList: React.FC<any> = () => {
         tryDev: "-",
         techManager: itemData.personNums
       }, {
-        stage: title,
+        stage: "",
         attendance: "正常",
         item: "代码总行数",
         formalDev: "-",
         tryDev: "-",
         techManager: itemData.sumLines
       }, {
-        stage: title,
+        stage: "",
         attendance: "正常",
         item: "代码人均行数",
         formalDev: "-",
@@ -401,21 +420,21 @@ const CodeTableList: React.FC<any> = () => {
         tryDev: itemData === null ? 0 : itemData.trial.highest[0],
         techManager: "-"
       }, {
-        stage: "开发阶段",
+        stage: "",
         attendance: "正常",
         item: "最高贡献代码量",
         formalDev: itemData === null ? 0 : itemData.offical.highest[1],
         tryDev: itemData === null ? 0 : itemData.trial.highest[1],
         techManager: "-"
       }, {
-        stage: "开发阶段",
+        stage: "",
         attendance: "正常",
         item: "最低贡献者",
         formalDev: itemData === null ? 0 : itemData.offical.lowest[0],
         tryDev: itemData === null ? 0 : itemData.trial.lowest[0],
         techManager: "-"
       }, {
-        stage: "开发阶段",
+        stage: "",
         attendance: "正常",
         item: "最低贡献代码量",
         formalDev: itemData === null ? 0 : itemData.offical.lowest[1],
@@ -1244,9 +1263,10 @@ const CodeTableList: React.FC<any> = () => {
               {/* 第一行图表页面 */}
               <Row>
                 <Col span={12}>
-                  <div className="ag-theme-alpine" style={{height: 520, width: '100%', marginTop: 5}}>
+                  <div className="ag-theme-alpine" style={{height: 509, width: '100%', marginTop: 5}}>
                     <AgGridReact
                       columnDefs={getTotalColums} // 定义列
+                      suppressRowTransform={true}
                       rowData={[]} // 数据绑定
                       defaultColDef={{
                         resizable: true,
@@ -1254,7 +1274,6 @@ const CodeTableList: React.FC<any> = () => {
                         cellStyle: {"line-height": "25px"},
                       }}
 
-                      suppressRowTransform={true}
                       rowHeight={25}
                       headerHeight={30}
                       onGridReady={onTotalGridReady}
@@ -1268,7 +1287,7 @@ const CodeTableList: React.FC<any> = () => {
                     <table border={1} style={{
                       textAlign: "center",
                       width: '100%',
-                      height: 520,
+                      height: 510,
                       backgroundColor: "white",
                       whiteSpace: "nowrap"
                     }}>
@@ -1280,7 +1299,7 @@ const CodeTableList: React.FC<any> = () => {
                       </tr>
                       <tr>
                         <td>开发人数</td>
-                        <td align={"center"} width={'15%'}> {chartDataForTotal.Development}</td>
+                        <td align={"center"} width={"40px"}> {chartDataForTotal.Development}</td>
                         <td rowSpan={3} style={{backgroundColor: "white", textAlign: "left"}}>
                           <div>
                             <div id="totalPieChart" style={{height: 250, backgroundColor: "white"}}>

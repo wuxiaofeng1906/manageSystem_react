@@ -594,7 +594,7 @@ const CodeTableList: React.FC<any> = () => {
           trigger: 'item'
         },
         legend: {
-          x: "70%",
+          x: "60%",
           orient: 'Vertical',
 
         },
@@ -640,14 +640,14 @@ const CodeTableList: React.FC<any> = () => {
           }
         },
         legend: {
-          x: '70%',
+          right: "right",
+          // x: '50%',
           y: '10px',
         },
         grid: {
           left: '80px',
           bottom: "20px",
-          // show:true,
-          // backGroundColor:"aliceblue"
+
         },
         xAxis: {
           type: 'value'
@@ -1291,15 +1291,24 @@ const CodeTableList: React.FC<any> = () => {
                       backgroundColor: "white",
                       whiteSpace: "nowrap"
                     }}>
+                      {/* 第一行：本周重点关注人员 */}
                       <tr style={{backgroundColor: "#FF9495"}}>
                         <td>
-                          <label style={{overflow: "hidden"}}>本周重点关注人员</label>
+                          <div style={{marginLeft: 5, marginRight: 5}}>
+                            本周重点<br/>关注人员
+                          </div>
                         </td>
                         <td colSpan={2}> {chartDataForTotal.payAttention}</td>
                       </tr>
+
+                      {/* 第二行：开发人数 */}
                       <tr>
                         <td>开发人数</td>
-                        <td align={"center"} width={"40px"}> {chartDataForTotal.Development}</td>
+                        <td align={"center"}>
+                          <div style={{width: 30}}>
+                            {chartDataForTotal.Development}
+                          </div>
+                        </td>
                         <td rowSpan={3} style={{backgroundColor: "white", textAlign: "left"}}>
                           <div>
                             <div id="totalPieChart" style={{height: 250, backgroundColor: "white"}}>
@@ -1307,14 +1316,20 @@ const CodeTableList: React.FC<any> = () => {
                           </div>
                         </td>
                       </tr>
+
+                      {/* 第三行：架构人数 */}
                       <tr>
                         <td>架构人数</td>
                         <td align={"center"}>  {chartDataForTotal.Architecture}</td>
                       </tr>
+
+                      {/* 第四行：技术管理人数 */}
                       <tr>
-                        <td>技术管理人数</td>
+                        <td>技术管理<br/>人数</td>
                         <td align={"center"}>  {chartDataForTotal.Technology}</td>
                       </tr>
+
+                      {/* 第五行：出勤人数 */}
                       <tr>
                         <td>出勤人数</td>
                         <td align={"center"}>  {chartDataForTotal.Attendance}</td>
@@ -1325,9 +1340,10 @@ const CodeTableList: React.FC<any> = () => {
                           </div>
                         </td>
                       </tr>
+                      {/* 第五行：请假人数 */}
                       <tr>
                         <td>请假人数</td>
-                        <td align={"center"}>  {chartDataForTotal.Vacation}</td>
+                        <td align={"center"} width={"200px"}>  {chartDataForTotal.Vacation}</td>
                       </tr>
                     </table>
                   </div>

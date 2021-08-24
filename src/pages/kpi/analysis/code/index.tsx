@@ -342,7 +342,7 @@ const CodeTableList: React.FC<any> = () => {
     {
       headerName: '统计项',
       field: 'item',
-      minWidth: 130,
+      minWidth: 135,
     },
     {
       headerName: '正式开发',
@@ -1381,7 +1381,7 @@ const CodeTableList: React.FC<any> = () => {
 
                       {/* 第四行：技术管理人数 */}
                       <tr>
-                        <td>技术管理<br/>人数</td>
+                        <td>技术管理人数</td>
                         <td align={"center"}>  {chartDataForTotal.Technology}</td>
                       </tr>
 

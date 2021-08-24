@@ -321,7 +321,7 @@ const CodeTableList: React.FC<any> = () => {
     {
       headerName: '阶段/领域',
       field: 'stage',
-      minWidth: 80,
+      minWidth: 100,
       rowSpan: rowSpans,
       cellClassRules: {
         'cell-span': "value !== undefined"
@@ -330,7 +330,7 @@ const CodeTableList: React.FC<any> = () => {
     {
       headerName: '出勤状态',
       field: 'attendance',
-      minWidth: 80,
+      minWidth: 90,
       rowSpan: rowSpans,
       cellClassRules: {
         'cell-span': "value !== undefined"
@@ -339,25 +339,25 @@ const CodeTableList: React.FC<any> = () => {
     {
       headerName: '统计项',
       field: 'item',
-      minWidth: 80,
+      minWidth: 130,
     },
     {
       headerName: '正式开发',
       field: 'formalDev',
-      minWidth: 80,
+      minWidth: 90,
       valueFormatter: cellFormat
 
     },
     {
       headerName: '试用开发',
       field: 'tryDev',
-      minWidth: 80,
+      minWidth: 90,
       valueFormatter: cellFormat
     },
     {
       headerName: '技术管理',
       field: 'techManager',
-      minWidth: 80,
+      minWidth: 90,
       valueFormatter: cellFormat
     },
   ];
@@ -1285,16 +1285,16 @@ const CodeTableList: React.FC<any> = () => {
 
   return (
     <PageContainer>
-      <div style={{marginTop: "-35px"}}>
+      <div style={{marginTop: "-40px"}}>
         <Tabs defaultActiveKey="analysisReport" onChange={callback} size={"large"}>
           {/* 分析页面 */}
           <TabPane tab={<span> <FundTwoTone/>分析报告</span>} key="analysisReport">
 
-            <div style={{marginTop: -10}}>
+            <div style={{marginTop: -28}}>
               {/* 查询条件 */}
               <Row>
 
-                <div style={{width: '100%', height: 45, marginTop: 15, border: "solid 2px white"}}>
+                <div style={{width: '100%', height: 45, marginTop: 15,backgroundColor:"white"}}>
                   <Form.Item>
 
                     <label style={{marginLeft: "10px", marginTop: 7}}>查询周期：</label>
@@ -1538,7 +1538,7 @@ const CodeTableList: React.FC<any> = () => {
 
           {/* 数据源页面 */}
           <TabPane tab={<span> <DatabaseTwoTone/>源数据</span>} key="sourceData"
-                   style={{marginTop: -10, backgroundColor: "default"}}>
+                   style={{marginTop: -30, backgroundColor: "default"}}>
 
             {/* 查询条件 */}
             <div style={{width: '100%', height: 45, marginTop: 15, backgroundColor: "white"}}>

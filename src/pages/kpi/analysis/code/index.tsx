@@ -601,15 +601,14 @@ const CodeTableList: React.FC<any> = () => {
           trigger: 'item'
         },
         legend: {
-          x: "60%",
+          x: "75%",
           orient: 'Vertical',
-
         },
         series: [
           {
             radius: "95%",  // 显示在容器里100%大小，如果需要饼图小一点，就设置低于100%就ok
             type: 'pie',
-            center: ['35%', '50%'],  // 第一个值调整左右，第二个值调整上下，也可以设置具体数字像素值，center: [200, 300],
+            center: ['50%', '50%'],  // 第一个值调整左右，第二个值调整上下，也可以设置具体数字像素值，center: [200, 300],
             label: {  // 饼图标签相关
               normal: {
                 show: true,
@@ -651,16 +650,13 @@ const CodeTableList: React.FC<any> = () => {
         tooltip: {
           trigger: 'axis',
         },
-
         legend: {
           right: "right",
-          // x: '50%',
           y: '10px',
         },
         grid: {
-          left: '80px',
+          left: "65px",
           bottom: "20px",
-
         },
         xAxis: {
           type: 'value'
@@ -714,6 +710,7 @@ const CodeTableList: React.FC<any> = () => {
           }
         ]
       });
+
       window.addEventListener('resize', () => {
         histogramChart.resize()
       });
@@ -1368,7 +1365,7 @@ const CodeTableList: React.FC<any> = () => {
                             {chartDataForTotal.Development}
                           </div>
                         </td>
-                        <td rowSpan={3} style={{backgroundColor: "white", textAlign: "left"}}>
+                        <td rowSpan={3} style={{backgroundColor: "white"}}>
                           <div>
                             <div id="totalPieChart" style={{height: 250, backgroundColor: "white"}}>
                             </div>
@@ -1392,9 +1389,10 @@ const CodeTableList: React.FC<any> = () => {
                       <tr>
                         <td>出勤人数</td>
                         <td align={"center"}>  {chartDataForTotal.Attendance}</td>
-                        <td rowSpan={2}>
+                        <td rowSpan={2} align={"center"}>
                           <div style={{width: "100%", height: "100%"}}>
-                            <div id="totalHistogramChart" style={{width: 450, height: 100, backgroundColor: "white"}}>
+                            <div id="totalHistogramChart"
+                                 style={{width: '400px', height: 100, backgroundColor: "white"}}>
                             </div>
                           </div>
                         </td>

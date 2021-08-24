@@ -789,28 +789,33 @@ const CodeTableList: React.FC<any> = () => {
   /* endregion */
 
   /* region 二、三、四行公共方法 */
-  const getHighesCodeColums = [
-    {
-      headerName: '姓名',
-      field: 'userName',
-      minWidth: 80,
-    },
-    {
-      headerName: '平均代码量',
-      field: 'avgLines',
-      minWidth: 80,
-    },
-    {
-      headerName: '最高代码量',
-      field: 'maxLines',
-      minWidth: 80,
-    },
-    {
-      headerName: '本周代码量',
-      field: 'weekLines',
-      minWidth: 80,
-    }
-  ];
+  const getHighesCodeColums = (sortMethod: string) => {
+    return [
+      {
+        headerName: '姓名',
+        field: 'userName',
+        minWidth: 80,
+      },
+      {
+        headerName: '平均代码量',
+        field: 'avgLines',
+        minWidth: 80,
+        sort: sortMethod
+      },
+      {
+        headerName: '最高代码量',
+        field: 'maxLines',
+        minWidth: 80,
+      },
+      {
+        headerName: '本周代码量',
+        field: 'weekLines',
+        minWidth: 80,
+      }
+    ];
+  }
+
+
   const dataAlaysis = (source: any, oraData: any) => {
 
     const legendName: any = [];  // 图例  -- 人名
@@ -1390,7 +1395,7 @@ const CodeTableList: React.FC<any> = () => {
                     </div>
                     <div className="ag-theme-alpine" style={{marginTop: "-5", height: 300, width: '100%'}}>
                       <AgGridReact
-                        columnDefs={getHighesCodeColums} // 定义列
+                        columnDefs={getHighesCodeColums("desc")} // 定义列
                         rowData={[]} // 数据绑定
                         defaultColDef={{
                           resizable: true,
@@ -1432,7 +1437,7 @@ const CodeTableList: React.FC<any> = () => {
                     </div>
                     <div className="ag-theme-alpine" style={{height: 300, width: '100%', marginTop: "-5"}}>
                       <AgGridReact
-                        columnDefs={getHighesCodeColums} // 定义列
+                        columnDefs={getHighesCodeColums("asc")} // 定义列
                         rowData={[]} // 数据绑定
                         defaultColDef={{
                           resizable: true,
@@ -1474,7 +1479,7 @@ const CodeTableList: React.FC<any> = () => {
                     </div>
                     <div className="ag-theme-alpine" style={{height: 300, width: '100%', marginTop: "-5px"}}>
                       <AgGridReact
-                        columnDefs={getHighesCodeColums} // 定义列
+                        columnDefs={getHighesCodeColums("asc")} // 定义列
                         rowData={[]} // 数据绑定
                         defaultColDef={{
                           resizable: true,

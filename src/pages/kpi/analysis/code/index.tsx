@@ -19,6 +19,8 @@ import {
   areaRender,
   groupRender,
 } from "@/publicMethods/cellRenderer";
+
+import {objectArraySortByDesc, objectArraySortByAsc} from "@/publicMethods/arrayMethod";
 import "./styles.css";
 import {getMonthWeek, getWeeksRange, getWeekStartAndEndTime} from "@/publicMethods/timeMethods";
 import moment from "moment";
@@ -814,13 +816,12 @@ const CodeTableList: React.FC<any> = () => {
       }
     ];
   }
-
-
   const dataAlaysis = (source: any, oraData: any) => {
 
     const legendName: any = [];  // 图例  -- 人名
     const x_time: any = [];  // X轴数据：时间，几月第几周
     const seriesArray: any = [];  // 时间
+
     source.forEach((ele: any, index: number) => {
       // 获取用户（英文对应中文，oraData 只是用于英文名字对应中文名字作用）
       let usernName = "";
@@ -856,7 +857,7 @@ const CodeTableList: React.FC<any> = () => {
 
     return {"legendName": legendName, "x_time": x_time, "seriesArray": seriesArray};
   };
-  const showCodesChart = (source: any, domName: any) => {
+  const showCodesChart = (source: any, domName: any, selecteddata: any) => {
 
     const chartDom = document.getElementById(domName);
     if (chartDom) {
@@ -884,6 +885,13 @@ const CodeTableList: React.FC<any> = () => {
           right: 10,
           top: 15,
           bottom: 20,
+          selected: selecteddata
+          //   {
+          //   // 选中'系列1'
+          //   // '系列1': true,
+          //   // 不选中'系列2'
+          //   '王濯': false
+          // }
         },
         xAxis: {
           type: 'category',
@@ -896,16 +904,12 @@ const CodeTableList: React.FC<any> = () => {
         series: source.seriesArray
       });
 
-      // window.onresize = function () {
-      //   myChart.resize();
-      // }
-
       window.addEventListener('resize', () => {
         myChart.resize()
       });
     }
   };
-  const getDetailsAndShowChart = async (datas: any, Range: any, domName: string) => {
+  const getDetailsAndShowChart = async (datas: any, Range: any, domName: string, selecteddata: any) => {
 
     let useridStr = "";
     if (datas.length > 0) {
@@ -914,12 +918,33 @@ const CodeTableList: React.FC<any> = () => {
       datas.forEach((dts: any) => {
         useridStr = useridStr === "" ? `"${dts.userId}"` : `${useridStr},"${dts.userId}"`;
       });
-
     }
 
     const codeDetails = await queryPersonCode(gqlClient, Range, useridStr.toString());
     const alayResult = dataAlaysis(codeDetails, datas);
-    showCodesChart(alayResult, domName);
+    showCodesChart(alayResult, domName, selecteddata);
+  };
+
+  // 解析出平均值中最高(低)数据的7个人
+  const selected7ItemsToShow = (source: any, Top: boolean) => {
+    const selected = Object();
+    if (!source) return selected;
+    let sortedDts = [];
+    if (Top) {  // 近8周持续高贡献者显示平均值最高的7个人
+      sortedDts = source.sort(objectArraySortByDesc("avgLines"));
+    } else {  // 小于600和小于1200的显示最低的7个人
+      sortedDts = source.sort(objectArraySortByAsc("avgLines"));
+    }
+    for (let index = 0; index < sortedDts.length; index += 1) {
+      const {userName} = sortedDts[index];
+      if (index < 7) {  // 显示top7
+        selected[userName] = true;
+      } else {
+        selected[userName] = false;
+      }
+    }
+
+    return selected;
   };
 
   /* endregion */
@@ -937,10 +962,10 @@ const CodeTableList: React.FC<any> = () => {
   });
   const getHightestCodeData = async (Range: any) => {
     const datas = await querySourceData(gqlClient, Range, 1500);
+    const selecteddata = selected7ItemsToShow(datas, true);
     gridApiForHightestCode.current?.setRowData(datas);
-    await getDetailsAndShowChart(datas, Range, "_8WeeksHighestNumChart");
+    await getDetailsAndShowChart(datas, Range, "_8WeeksHighestNumChart", selecteddata);
   };
-
 
   /* endregion */
 
@@ -958,8 +983,9 @@ const CodeTableList: React.FC<any> = () => {
 
   const get600CodeData = async (Range: any) => {
     const datas = await querySourceData(gqlClient, Range, 600);
+    const selecteddata = selected7ItemsToShow(datas, false);
     gridApiFor600Code.current?.setRowData(datas);
-    await getDetailsAndShowChart(datas, Range, "_8Weeks600NumChart");
+    await getDetailsAndShowChart(datas, Range, "_8Weeks600NumChart", selecteddata);
   };
 
 
@@ -981,7 +1007,8 @@ const CodeTableList: React.FC<any> = () => {
   const get1200CodeData = async (Range: any) => {
     const datas = await querySourceData(gqlClient, Range, 1200);
     gridApiFor1200Code.current?.setRowData(datas);
-    await getDetailsAndShowChart(datas, Range, "_8Weeks1200NumChart");
+    const selecteddata = selected7ItemsToShow(datas, false);
+    await getDetailsAndShowChart(datas, Range, "_8Weeks1200NumChart", selecteddata);
   };
   /* endregion  */
 

@@ -805,17 +805,20 @@ const CodeTableList: React.FC<any> = () => {
         headerName: '平均代码量',
         field: 'avgLines',
         minWidth: 80,
-        sort: sortMethod
+        sort: sortMethod,
+        valueFormatter: cellFormat
       },
       {
         headerName: '最高代码量',
         field: 'maxLines',
         minWidth: 80,
+        valueFormatter: cellFormat
       },
       {
         headerName: '本周代码量',
         field: 'weekLines',
         minWidth: 80,
+        valueFormatter: cellFormat
       }
     ];
   }

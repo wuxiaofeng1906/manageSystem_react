@@ -1,7 +1,6 @@
 .cell-span {
   background-color: white;
-
-  /* 绘制边框颜色 */
+  text-align: center;
   border-right: 1px solid lightgrey !important;
   border-bottom: 1px solid lightgrey !important;
 }

@@ -558,6 +558,8 @@ const CodeTableList: React.FC<any> = () => {
           color: '#cce1ff'
         }])
       }
+
+
     },
     green: {
       normal: {
@@ -600,22 +602,30 @@ const CodeTableList: React.FC<any> = () => {
         },
         series: [
           {
-            radius: "90%",  // 显示在容器里100%大小，如果需要饼图小一点，就设置低于100%就ok
+            radius: "95%",  // 显示在容器里100%大小，如果需要饼图小一点，就设置低于100%就ok
             type: 'pie',
-            center: ['30%', '50%'],  // 第一个值调整左右，第二个值调整上下，也可以设置具体数字像素值，center: [200, 300],
-            label: {
+            center: ['35%', '50%'],  // 第一个值调整左右，第二个值调整上下，也可以设置具体数字像素值，center: [200, 300],
+            label: {  // 饼图标签相关
               normal: {
-                show: false,  // 不显示每个扇形支出来的说明文字
-              },
+                show: true,
+                position: 'inner', // 标签的位置
+                textStyle: {
+                  // fontWeight: 100,
+                  fontSize: 13,  // 文字的字体大小
+                  color: "black"  // 文字颜色
+                },
+                formatter: '{d}%'
+              }
             },
             data: totalChartData,
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)'
-              }
-            }
+            // emphasis: {  // 阴影显示
+            //   itemStyle: {
+            //     shadowBlur: 10,
+            //     shadowOffsetX: 0,
+            //     shadowColor: 'rgba(0, 0, 0, 0.5)'
+            //   }
+            // },
+
           }
         ],
       });
@@ -635,10 +645,8 @@ const CodeTableList: React.FC<any> = () => {
 
         tooltip: {
           trigger: 'axis',
-          axisPointer: {
-            type: 'shadow'
-          }
         },
+
         legend: {
           right: "right",
           // x: '50%',
@@ -661,28 +669,43 @@ const CodeTableList: React.FC<any> = () => {
             name: '出勤',
             type: 'bar',
             stack: 'total',
-            label: {
-              show: true
-            },
-            emphasis: {
-              focus: 'series'
-            },
             data: [params.Attendance],
-            itemStyle: rendererColorStyle.blue
+            itemStyle: rendererColorStyle.blue,
+            label: {
+              show: true, // 开启显示
+              textStyle: {
+                color: 'black',
+              },
+              formatter: () => {// 设置显示的数据
+
+                if (params.Attendance === 0) {
+                  return '0%';
+                }
+                const number = Number(params.Attendance) / (Number(params.Vacation) + Number(params.Attendance)) * 100;
+                return `${number.toFixed(0).toString()}%`;
+              }
+            }
           },
           {
             name: '请假',
             type: 'bar',
             stack: 'total',
             barWidth: 70,
-            label: {
-              show: true
-            },
-            emphasis: {
-              focus: 'series'
-            },
             data: [params.Vacation],
-            itemStyle: rendererColorStyle.pink
+            itemStyle: rendererColorStyle.pink,
+            label: {
+              show: true, // 开启显示
+              textStyle: {
+                color: 'black',
+              },
+              formatter: () => { // 设置显示的数据
+                if (params.Vacation === 0) {
+                  return '0%';
+                }
+                const number = Number(params.Vacation) / (Number(params.Vacation) + Number(params.Attendance)) * 100;
+                return `${number.toFixed(0).toString()}%`;
+              }
+            }
           }
         ]
       });
@@ -693,8 +716,6 @@ const CodeTableList: React.FC<any> = () => {
 
   };
   const getTotalChartData = (params: any) => {
-
-
     const weekName = getMonthWeek(params.start);
     const url = `/api/kpi/analysis/overview?start=${params.start}&end=${params.end}`;
     axios.get(url, {})

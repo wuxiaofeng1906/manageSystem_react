@@ -295,9 +295,12 @@ const CodeTableList: React.FC<any> = () => {
   // 格式化单元格内容
   const cellFormat = (params: any) => {
     if (Number(params.value)) {
-      return Number(params.value).toFixed(2);
+      const numbers = params.value.toString();
+      if (numbers.indexOf(".") > -1) { // 判断有无小数点
+        return Number(params.value).toFixed(2);
+      }
+      return Number(params.value);
     }
-
     return params.value;
   };
 
@@ -1294,7 +1297,7 @@ const CodeTableList: React.FC<any> = () => {
               {/* 查询条件 */}
               <Row>
 
-                <div style={{width: '100%', height: 45, marginTop: 15,backgroundColor:"white"}}>
+                <div style={{width: '100%', height: 45, marginTop: 15, backgroundColor: "white"}}>
                   <Form.Item>
 
                     <label style={{marginLeft: "10px", marginTop: 7}}>查询周期：</label>
@@ -1351,7 +1354,7 @@ const CodeTableList: React.FC<any> = () => {
                             本周重点<br/>关注人员
                           </div>
                         </td>
-                        <td colSpan={2}> {chartDataForTotal.payAttention}</td>
+                        <td colSpan={2} align={"left"}> {chartDataForTotal.payAttention}</td>
                       </tr>
 
                       {/* 第二行：开发人数 */}

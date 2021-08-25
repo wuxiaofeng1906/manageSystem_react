@@ -644,14 +644,14 @@ const CodeTableList: React.FC<any> = () => {
           trigger: 'item'
         },
         legend: {
-          x: "75%",
+          x: "70%",
           orient: 'Vertical',
         },
         series: [
           {
             radius: "95%",  // 显示在容器里100%大小，如果需要饼图小一点，就设置低于100%就ok
             type: 'pie',
-            center: ['50%', '50%'],  // 第一个值调整左右，第二个值调整上下，也可以设置具体数字像素值，center: [200, 300],
+            center: ['40%', '50%'],  // 第一个值调整左右，第二个值调整上下，也可以设置具体数字像素值，center: [200, 300],
             label: {  // 饼图标签相关
               normal: {
                 show: true,
@@ -694,6 +694,7 @@ const CodeTableList: React.FC<any> = () => {
           trigger: 'axis',
         },
         legend: {
+
           right: "right",
           y: '10px',
         },

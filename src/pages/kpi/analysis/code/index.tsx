@@ -386,25 +386,28 @@ const CodeTableList: React.FC<any> = () => {
       headerName: '统计项',
       field: 'item',
       minWidth: 135,
+
     },
     {
       headerName: '正式开发',
       field: 'formalDev',
       minWidth: 90,
-      valueFormatter: cellFormat
-
+      valueFormatter: cellFormat,
+      tooltipField: "formalDev"
     },
     {
       headerName: '试用开发',
       field: 'tryDev',
       minWidth: 90,
-      valueFormatter: cellFormat
+      valueFormatter: cellFormat,
+      tooltipField: "tryDev"
     },
     {
       headerName: '技术管理',
       field: 'techManager',
       minWidth: 90,
-      valueFormatter: cellFormat
+      valueFormatter: cellFormat,
+      tooltipField: "techManager"
     },
   ];
 

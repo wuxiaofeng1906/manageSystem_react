@@ -35,6 +35,21 @@ import * as dayjs from "dayjs";
 const {TabPane} = Tabs;
 const {RangePicker} = DatePicker;
 
+/* region 公共方法 */
+// 格式化单元格内容
+const cellFormat = (params: any) => {
+  if (Number(params.value)) {
+    const numbers = params.value.toString();
+    if (numbers.indexOf(".") > -1) { // 判断有无小数点
+      return Number(params.value).toFixed(2);
+    }
+    return Number(params.value);
+  }
+  return params.value;
+};
+
+/* endregion */
+
 /* region 分析报告页面 */
 const queryPersonCode = async (client: GqlClient<object>, params: any, usersId: string) => {
 
@@ -119,15 +134,15 @@ const getSourceColums = () => {
     {
       headerName: '最大值',
       field: 'maxLines',
-      minWidth: 80,
+      minWidth: 100,
       suppressMenu: true,
     },
     {
       headerName: '平均值',
       field: 'avgLines',
-      minWidth: 80,
+      minWidth: 100,
       suppressMenu: true,
-
+      valueFormatter: cellFormat
     },
     {
       headerName: '最小值',
@@ -174,7 +189,7 @@ const getSourceColums = () => {
     {
       headerName: '岗位类型',
       field: 'job',
-      minWidth: 135,
+      minWidth: 110,
     },
     {
       headerName: '类型',
@@ -331,18 +346,6 @@ const CodeTableList: React.FC<any> = () => {
 
 
   /* region 表格总数据展示 */
-
-  // 格式化单元格内容
-  const cellFormat = (params: any) => {
-    if (Number(params.value)) {
-      const numbers = params.value.toString();
-      if (numbers.indexOf(".") > -1) { // 判断有无小数点
-        return Number(params.value).toFixed(2);
-      }
-      return Number(params.value);
-    }
-    return params.value;
-  };
 
   const rowSpans = (params: any) => {
     const stages = params.data.stage;

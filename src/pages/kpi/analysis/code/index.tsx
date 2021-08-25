@@ -22,7 +22,12 @@ import {
 
 import {objectArraySortByDesc, objectArraySortByAsc} from "@/publicMethods/arrayMethod";
 import "./styles.css";
-import {getMonthWeek, getWeeksRange, getWeekStartAndEndTime} from "@/publicMethods/timeMethods";
+import {
+  getMonthWeek,
+  getWeeksRange,
+  getWeekStartAndEndTime,
+  getWeekStartAndEndTimeByEndtime
+} from "@/publicMethods/timeMethods";
 import moment from "moment";
 import axios from "axios";
 import * as dayjs from "dayjs";
@@ -53,10 +58,10 @@ const queryPersonCode = async (client: GqlClient<object>, params: any, usersId: 
 
 // 出勤状态
 const attendanceMappings = {
-  "": "",
   normal: '正常',
   vacation: '休假',
   leave: '离职',
+  "": "",
 };
 
 const attStageRender = () => {
@@ -65,7 +70,6 @@ const attStageRender = () => {
 
 // 项目阶段
 const prjStageMappings = {
-  "": "",
   story: '需求',
   design: '设计',
   developing: "开发",
@@ -73,7 +77,8 @@ const prjStageMappings = {
   testing: "测试",
   released: "发布",
   learning: "学习",
-  abnormal: "异常"
+  abnormal: "异常",
+  "": "",
 };
 
 const prjStageRender = () => {
@@ -753,6 +758,7 @@ const CodeTableList: React.FC<any> = () => {
 
   };
   const getTotalChartData = (params: any) => {
+
     const weekName = getMonthWeek(params.start);
     const url = `/api/kpi/analysis/overview?start=${params.start}&end=${params.end}`;
     axios.get(url, {})
@@ -1070,9 +1076,9 @@ const CodeTableList: React.FC<any> = () => {
     setWeeksNum(timeDiff / 7);   // 因为range里面的时间是周一到周日的完整时间，所以直接除以7就可以得出有多少周
     // 汇总表格数据显示
     getTotalData(range);
-    // 汇总图表显示  -- 选择时间的最后一周的开始时间和结束时间
 
-    getTotalChartData({start: dayjs(range.end).subtract(6, 'day').format("YYYY-MM-DD"), end: range.end});
+    // 汇总图表显示  -- 选择时间的最后一周的开始时间和结束时间
+    getTotalChartData({start: getWeekStartAndEndTimeByEndtime(range.end).start, end: range.end});
 
     // 连续八周最高贡献者数据显示
     getHightestCodeData(range);
@@ -1085,10 +1091,11 @@ const CodeTableList: React.FC<any> = () => {
 
   };
 
-  // 初始化显示和显示默认数据
+  // 初始化显示和显示默认数据（近八周数据）
   const showChartDefaultData = async () => {
     const weekRanges = getWeeksRange(8);
 
+    // 需要近八周的时间，第一周的周一时间和最后一周的周日时间
     setQueryConditionForChart({
       start: weekRanges[0].from,
       end: weekRanges[7].to
@@ -1098,6 +1105,7 @@ const CodeTableList: React.FC<any> = () => {
       start: weekRanges[0].from,
       end: weekRanges[7].to
     };
+
 
     // 汇总表格数据显示
     getTotalData(range);
@@ -1140,7 +1148,7 @@ const CodeTableList: React.FC<any> = () => {
     end: ""
   });
 
-  // 初始化显示和显示默认数据
+  // 初始化显示和显示默认数据（默认显示近八周的数据）
   const showSourceDefaultData = async () => {
 
     const weekRanges = getWeeksRange(8);
@@ -1157,7 +1165,7 @@ const CodeTableList: React.FC<any> = () => {
     gridApiForSource.current?.setRowData(datas);
   };
 
-  // 时间选择事件
+  // 时间选择事件： 查询范围：选中的时间中开始时间的周一，和结束时间的周末
   const onSourceTimeSelected = async (params: any, dateString: any) => {
 
     setQueryConditionForSource({
@@ -1165,11 +1173,8 @@ const CodeTableList: React.FC<any> = () => {
       end: dateString[1]
     });
 
+    // 根据开始时间获取开始时间所属周的周一；根据结束时间，获取结束时间所属周的周末
     const range = getWeekStartAndEndTime(dateString[0], dateString[1]);
-    // const range = {
-    //   start: dateString[0],
-    //   end: dateString[1]
-    // };
     const datas: any = await querySourceData(gqlClient, range, 0);
     gridApiForSource.current?.setRowData(datas);
 
@@ -1231,7 +1236,12 @@ const CodeTableList: React.FC<any> = () => {
   /* region 单元格编辑事件 */
   const onSourceCellEdited = (event: any) => {
 
+    // 根据选中时间中的结束时间，获取到选中日期所在周的周一和周日的时间
+    const weeks = getWeekStartAndEndTimeByEndtime(choicedConditionForSource.end);
+    // 时间：只传选中日期的最后一周的时间
     const values: any = {
+      startAt: weeks.start,
+      endAt: weeks.end,
       userId: event.data.userId
     };
 

@@ -275,6 +275,29 @@ const getWeekStartAndEndTime = (start_time: string, end_time: string) => {
   return range;
 };
 
+// 根据开始和结束时间，获取开始时间当周的周一和结束时间当周的周末。
+const getWeekStartAndEndTimeByEndtime = (end_time: string) => {
+  const range = {
+    start: "",
+    end: ""
+  }
+
+  // 先计算结束日期的周末，endWeekday是几，开始日期就加上（7-endWeekday）天，就是周末的日期
+  const endWeekday = dayjs(end_time).day();
+
+  if (endWeekday === 0) {  // 当天就是周日
+    range.end = end_time;
+  } else {
+    range.end = dayjs(end_time).add((7 - endWeekday), 'day').format("YYYY-MM-DD");
+  }
+
+  // 周日的日期减去6天就是周一的日期
+  range.start = dayjs(range.end).subtract(6, 'day').format("YYYY-MM-DD");
+
+
+  return range;
+};
+
 export {
   getWeeksRange,
   getMonthWeek,
@@ -284,5 +307,6 @@ export {
   formatMomentTime,
   getParamsByType,
   getCurrentQuarterTime,
-  getWeekStartAndEndTime
+  getWeekStartAndEndTime,
+  getWeekStartAndEndTimeByEndtime
 };

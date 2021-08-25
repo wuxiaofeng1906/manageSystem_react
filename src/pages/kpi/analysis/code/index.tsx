@@ -731,7 +731,8 @@ const CodeTableList: React.FC<any> = () => {
         },
         legend: {
 
-          right: "right",
+          // right: "right",
+          x: '80%',
           y: '10px',
         },
         grid: {
@@ -1405,31 +1406,45 @@ const CodeTableList: React.FC<any> = () => {
               {/* 第一行图表页面 */}
               <Row>
                 <Col span={12}>
-                  <div className="ag-theme-alpine" style={{height: 509, width: '100%', marginTop: 5}}>
-                    <AgGridReact
-                      columnDefs={getTotalColums} // 定义列
-                      suppressRowTransform={true}
-                      rowData={[]} // 数据绑定
-                      defaultColDef={{
-                        resizable: true,
-                        suppressMenu: true,
-                        cellStyle: {"line-height": "25px"},
-                      }}
+                  <div style={{marginTop:5}}>
+                    <div style={{
+                      height: "30px",
+                      lineHeight: "30px",
+                      verticalAlign: "middle",
+                      textAlign: "center",
+                      backgroundColor: "#F8F8F8",
+                      fontWeight: "bold",
+                      width: '100%',
+                      border: "solid 1px #CCCCCC"
+                    }}> 近1周代码贡献分析
+                    </div>
+                    <div className="ag-theme-alpine" style={{marginTop: "-5", height: 509, width: '100%'}}>
+                      <AgGridReact
+                        columnDefs={getTotalColums} // 定义列
+                        suppressRowTransform={true}
+                        rowData={[]} // 数据绑定
+                        defaultColDef={{
+                          resizable: true,
+                          suppressMenu: true,
+                          cellStyle: {"line-height": "25px"},
+                        }}
 
-                      rowHeight={25}
-                      headerHeight={30}
-                      onGridReady={onTotalGridReady}
-                    >
+                        rowHeight={25}
+                        headerHeight={30}
+                        onGridReady={onTotalGridReady}
+                      >
 
-                    </AgGridReact>
+                      </AgGridReact>
+                    </div>
                   </div>
+
                 </Col>
                 <Col span={12}>
-                  <div style={{marginLeft: 20}}>
+                  <div style={{marginLeft: 20,marginTop:5}}>
                     <table border={1} style={{
                       textAlign: "center",
                       width: '100%',
-                      height: 510,
+                      height: 538,
                       backgroundColor: "white",
                       whiteSpace: "nowrap"
                     }}>

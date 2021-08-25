@@ -463,35 +463,68 @@ const CodeTableList: React.FC<any> = () => {
       });
     } else if (title === "_开发阶段") {
 
-      array.push({
-        stage: "开发阶段",
-        attendance: "正常",
-        item: "最高贡献者",
-        formalDev: itemData === null ? 0 : itemData.offical.highest[0],
-        tryDev: itemData === null ? 0 : itemData.trial.highest[0],
-        techManager: "-"
-      }, {
-        stage: "",
-        attendance: "正常",
-        item: "最高贡献代码量",
-        formalDev: itemData === null ? 0 : itemData.offical.highest[1],
-        tryDev: itemData === null ? 0 : itemData.trial.highest[1],
-        techManager: "-"
-      }, {
-        stage: "",
-        attendance: "正常",
-        item: "最低贡献者",
-        formalDev: itemData === null ? 0 : itemData.offical.lowest[0],
-        tryDev: itemData === null ? 0 : itemData.trial.lowest[0],
-        techManager: "-"
-      }, {
-        stage: "",
-        attendance: "正常",
-        item: "最低贡献代码量",
-        formalDev: itemData === null ? 0 : itemData.offical.lowest[1],
-        tryDev: itemData === null ? 0 : itemData.trial.lowest[1],
-        techManager: "-"
-      });
+      if (itemData === null) {
+        array.push({
+          stage: "开发阶段",
+          attendance: "正常",
+          item: "最高贡献者",
+          formalDev: 0,
+          tryDev: 0,
+          techManager: "-"
+        }, {
+          stage: "",
+          attendance: "正常",
+          item: "最高贡献代码量",
+          formalDev: 0,
+          tryDev: 0,
+          techManager: "-"
+        }, {
+          stage: "",
+          attendance: "正常",
+          item: "最低贡献者",
+          formalDev: 0,
+          tryDev: 0,
+          techManager: "-"
+        }, {
+          stage: "",
+          attendance: "正常",
+          item: "最低贡献代码量",
+          formalDev: 0,
+          tryDev: 0,
+          techManager: "-"
+        });
+      } else {
+        array.push({
+          stage: "开发阶段",
+          attendance: "正常",
+          item: "最高贡献者",
+          formalDev: itemData.offical.highest === null ? 0 : itemData.offical.highest[0],
+          tryDev: itemData.trial.highest === null ? 0 : itemData.trial.highest[0],
+          techManager: "-"
+        }, {
+          stage: "",
+          attendance: "正常",
+          item: "最高贡献代码量",
+          formalDev: itemData.offical.highest === null ? 0 : itemData.offical.highest[1],
+          tryDev: itemData.trial.highest === null ? 0 : itemData.trial.highest[1],
+          techManager: "-"
+        }, {
+          stage: "",
+          attendance: "正常",
+          item: "最低贡献者",
+          formalDev: itemData.offical.lowest === null ? 0 : itemData.offical.lowest[0],
+          tryDev: itemData.trial.lowest === null ? 0 : itemData.trial.lowest[0],
+          techManager: "-"
+        }, {
+          stage: "",
+          attendance: "正常",
+          item: "最低贡献代码量",
+          formalDev: itemData.offical.lowest === null ? 0 : itemData.offical.lowest[1],
+          tryDev: itemData.trial.lowest === null ? 0 : itemData.trial.lowest[1],
+          techManager: "-"
+        });
+      }
+
     }
 
     return array;
@@ -1081,13 +1114,14 @@ const CodeTableList: React.FC<any> = () => {
     const range = getWeekStartAndEndTime(dateString[0], dateString[1]);
     const timeDiff = dayjs(range.end).diff(dayjs(range.start), 'day') + 1;
     setWeeksNum(timeDiff / 7);   // 因为range里面的时间是周一到周日的完整时间，所以直接除以7就可以得出有多少周
-    // 汇总表格数据显示
-    getTotalData(range);
+
+    // 汇总表格数据显示-- 选择时间的最后一周的开始时间和结束时间
+    getTotalData({start: getWeekStartAndEndTimeByEndtime(range.end).start, end: range.end});
 
     // 汇总图表显示  -- 选择时间的最后一周的开始时间和结束时间
     getTotalChartData({start: getWeekStartAndEndTimeByEndtime(range.end).start, end: range.end});
 
-    // 连续八周最高贡献者数据显示
+    // 连续八周最高贡献者数据显示 传所选时间所在开始周的周一和所选最后周的周末时间
     getHightestCodeData(range);
 
     // 持续高于1200的数据
@@ -1114,8 +1148,8 @@ const CodeTableList: React.FC<any> = () => {
     };
 
 
-    // 汇总表格数据显示
-    getTotalData(range);
+    // 汇总表格数据显示:只传本周的时间
+    getTotalData({start: weekRanges[7].from, end: weekRanges[7].to});
 
     // 汇总图-饼图(本周数据)-- 所以只传本周的时间
     getTotalChartData({start: weekRanges[7].from, end: weekRanges[7].to});

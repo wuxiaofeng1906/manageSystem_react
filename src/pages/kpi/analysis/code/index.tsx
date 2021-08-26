@@ -1234,7 +1234,7 @@ const CodeTableList: React.FC<any> = () => {
 
   // 设置checkbox框是否被选中
   const [checkbox, setCheckbox] = useState({
-    attendenceStatus: true,
+    attendenceChecked: true,
     stageChecked: true
   });
 
@@ -1346,12 +1346,15 @@ const CodeTableList: React.FC<any> = () => {
 
   // 弹出选择框
   const showModifyPage = () => {
+
+    debugger;
     // 判断又没有选中数据
 
     const selectedRows: any = gridApiForSource.current?.getSelectedRows()
     if (selectedRows.length > 0) {
-      const row = selectedRows[0];
+      setModifyStageAndStatusVisible(true);
 
+      const row = selectedRows[0];
 
       // 获取第一行的出勤状态和项目阶段显示。
       formForModify.setFieldsValue({
@@ -1361,7 +1364,7 @@ const CodeTableList: React.FC<any> = () => {
 
       // checkbox 框默认弹出就被选中
       setCheckbox({
-        attendenceStatus: true,
+        attendenceChecked: true,
         stageChecked: true
       });
 
@@ -1371,7 +1374,6 @@ const CodeTableList: React.FC<any> = () => {
         stage: false
       });
 
-      setModifyStageAndStatusVisible(true);
 
     } else {
       message.error({
@@ -1412,8 +1414,8 @@ const CodeTableList: React.FC<any> = () => {
     values.userIds = userIds;
 
     // 判断checkbox框是否有被选中
-    if (checkbox.attendenceStatus || checkbox.stageChecked) {
-      if (checkbox.attendenceStatus) {
+    if (checkbox.attendenceChecked || checkbox.stageChecked) {
+      if (checkbox.attendenceChecked) {
         values.attendance = modifyFIleds.attendanceStatus;
       }
 
@@ -1467,7 +1469,7 @@ const CodeTableList: React.FC<any> = () => {
     // 设置是否选中checkbox
     setCheckbox({
       ...checkbox,
-      attendenceStatus: isChecked
+      attendenceChecked: isChecked
     });
   };
 
@@ -1986,7 +1988,8 @@ const CodeTableList: React.FC<any> = () => {
                         <Option key={""} value=""> </Option>
 
                       </Select>
-                      <Checkbox style={{marginLeft: 10}} defaultChecked onChange={attendenceOnChange}> </Checkbox>
+                      <Checkbox style={{marginLeft: 10}} defaultChecked={checkbox.attendenceChecked}
+                                onChange={attendenceOnChange}> </Checkbox>
                     </Form.Item>
                   </div>
 
@@ -2011,7 +2014,8 @@ const CodeTableList: React.FC<any> = () => {
 
 
                       </Select>
-                      <Checkbox style={{marginLeft: 10}} defaultChecked onChange={stageOnChange}> </Checkbox>
+                      <Checkbox style={{marginLeft: 10}} defaultChecked={checkbox.stageChecked}
+                                onChange={stageOnChange}> </Checkbox>
 
                     </Form.Item>
                   </div>

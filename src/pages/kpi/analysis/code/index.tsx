@@ -39,6 +39,7 @@ const {Option} = Select;
 /* region 公共方法 */
 // 格式化单元格内容
 const cellFormat = (params: any) => {
+
   if (Number(params.value)) {
     const numbers = params.value.toString();
     if (numbers.indexOf(".") > -1) { // 判断有无小数点
@@ -46,7 +47,7 @@ const cellFormat = (params: any) => {
     }
     return Number(params.value);
   }
-  return params.value;
+  return 0;
 };
 
 /* endregion */
@@ -137,6 +138,7 @@ const getSourceColums = () => {
       field: 'maxLines',
       minWidth: 100,
       suppressMenu: true,
+      valueFormatter: cellFormat
     },
     {
       headerName: '平均值',
@@ -150,6 +152,7 @@ const getSourceColums = () => {
       field: 'minLines',
       minWidth: 80,
       suppressMenu: true,
+      valueFormatter: cellFormat
     },
     {
       headerName: '部门',
@@ -159,7 +162,7 @@ const getSourceColums = () => {
     {
       headerName: '组',
       field: 'groupName',
-      minWidth: 135,
+      minWidth: 130,
       cellRenderer: groupRender,
       // filterParams: {cellRenderer:groupRender}
     },
@@ -198,9 +201,9 @@ const getSourceColums = () => {
       minWidth: 80,
     },
     {
-      headerName: '出勤状态',
+      headerName: '出勤',
       field: 'attendance',
-      minWidth: 110,
+      minWidth: 80,
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {values: attStageRender()},
@@ -1387,7 +1390,7 @@ const CodeTableList: React.FC<any> = () => {
   const [selectedFiled, setSelectedFiled] = useState(['']);
   const nessField = ['NO.', '姓名'];
   const unNessField = ['最大值', '平均值', '最小值', '部门', '组', '端', '地域', '职务', '岗位类型', '类型',
-    '出勤状态', '项目阶段', '选择'];
+    '出勤', '项目阶段', '选择'];
 
 // 弹出字段显示层
   const showFieldsModal = () => {
@@ -1828,7 +1831,7 @@ const CodeTableList: React.FC<any> = () => {
                         <Checkbox value="类型">类型</Checkbox>
                       </Col>
                       <Col span={4}>
-                        <Checkbox value="出勤状态">出勤状态</Checkbox>
+                        <Checkbox value="出勤">出勤</Checkbox>
                       </Col>
                       <Col span={4}>
                         <Checkbox value="项目阶段">项目阶段</Checkbox>
@@ -1862,7 +1865,7 @@ const CodeTableList: React.FC<any> = () => {
               width={400}
             >
               <Form form={formForModify}>
-                <div style={{marginLeft:35}}>
+                <div style={{marginLeft: 35}}>
                   <div>
                     <Form.Item
                       label="出勤状态:"

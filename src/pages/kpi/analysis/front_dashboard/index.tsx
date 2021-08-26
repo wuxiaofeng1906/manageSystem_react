@@ -10,7 +10,6 @@ import {useGqlClient} from '@/hooks';
 import {Button, Checkbox, Col, DatePicker, Form, message, Modal, Row} from 'antd';
 import {LogoutOutlined, SettingOutlined} from '@ant-design/icons';
 import {getHeight} from '@/publicMethods/pageSet';
-import {getWeekStartAndEndTime} from "@/publicMethods/timeMethods";
 import moment from "moment";
 import {useRequest} from "ahooks";
 import dayjs from 'dayjs'
@@ -28,28 +27,6 @@ const cellFormat = (params: any) => {
   }
   return params.value;
 };
-
-// 使用递归，自己调用自己
-// const getColumn = (allField: any, selected: any, component: any) => {
-//
-//   allField.forEach((ele: any) => {
-//     if (ele.children) { // 如果包含children，表示有二级title,则继续调用自己，循环下一层
-//       const secondTitle = ele.children;
-//       getColumn(secondTitle, selected, component);
-//
-//     } else {
-//       const newElement = ele;
-//       if (selected.includes(ele.headerName)) {
-//         newElement.hide = false;
-//       } else {
-//         newElement.hide = true;
-//       }
-//       component.push(newElement);
-//     }
-//   });
-//
-//   return component;
-// };
 
 // 定义列名
 const getSourceColums = () => {
@@ -230,9 +207,6 @@ const FrontTableList: React.FC<any> = () => {
   const g_currentMonth_start = dayjs().startOf('month').format("YYYY-MM-DD");
   const g_currentMonth_end = dayjs().endOf('month').format("YYYY-MM-DD");
 
-  // const sys_accessToken = localStorage.getItem("accessId");
-  // axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
-
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() => querySourceData(gqlClient, 'quarter'),);
   const gridApiForFront = useRef<GridApi>();
@@ -240,6 +214,7 @@ const FrontTableList: React.FC<any> = () => {
     gridApiForFront.current = params.api;
     params.api.sizeColumnsToFit();
   };
+
   if (gridApiForFront.current) {
     if (loading) gridApiForFront.current.showLoadingOverlay();
     else gridApiForFront.current.hideOverlay();
@@ -281,6 +256,7 @@ const FrontTableList: React.FC<any> = () => {
       start: dateString[0],
       end: dateString[1]
     };
+
     const datas: any = await querySourceData(gqlClient, range);
     gridApiForFront.current?.setRowData(datas);
 

@@ -137,6 +137,21 @@ const getSourceColums = () => {
           headerName: '修复Bug数',
           field: 'stage',
           minWidth: 105,
+        },
+        {
+          headerName: '进行中任务数',
+          field: 'stage',
+          minWidth: 115,
+        },
+        {
+          headerName: '代码提交次数',
+          field: 'stage',
+          minWidth: 115,
+        },
+        {
+          headerName: '代码新增行数',
+          field: 'stage',
+          minWidth: 115,
         }
       ]
     }
@@ -267,7 +282,7 @@ const FrontTableList: React.FC<any> = () => {
   const [selectedFiled, setSelectedFiled] = useState(['']);
   const nessField = ['NO.', '姓名'];
   const unNessField = ['Bug解决时长(H)', 'Bug数量', '任务燃尽图', '初始需求数', '初始需求完成数', '追加需求数', '追加需求完成数',
-    '请求数', '请求平均停留时长', '交付需求数', '完成任务数', '修复Bug数'];
+    '请求数', '请求平均停留时长', '交付需求数', '完成任务数', '修复Bug数','进行中任务数','代码提交次数','代码新增行数'];
 
 // 弹出字段显示层
   const showFieldsModal = () => {
@@ -430,7 +445,15 @@ const FrontTableList: React.FC<any> = () => {
                   <Col span={4}>
                     <Checkbox value="修复Bug数">修复Bug数</Checkbox>
                   </Col>
-
+                  <Col span={4}>
+                    <Checkbox value="进行中任务数">进行中任务数</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="代码提交次数">代码提交次数</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="代码新增行数">代码新增行数</Checkbox>
+                  </Col>
                 </Row>
               </Checkbox.Group>,
             </div>

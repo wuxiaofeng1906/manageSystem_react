@@ -10,9 +10,10 @@ import {useGqlClient} from '@/hooks';
 import {Button, Checkbox, Col, DatePicker, Form, message, Modal, Row} from 'antd';
 import {LogoutOutlined, SettingOutlined} from '@ant-design/icons';
 import {getHeight} from '@/publicMethods/pageSet';
-import {getWeeksRange, getWeekStartAndEndTime} from "@/publicMethods/timeMethods";
+import {getWeekStartAndEndTime} from "@/publicMethods/timeMethods";
 import moment from "moment";
 import {useRequest} from "ahooks";
+import dayjs from 'dayjs'
 
 const {RangePicker} = DatePicker;
 
@@ -49,6 +50,7 @@ const cellFormat = (params: any) => {
 //
 //   return component;
 // };
+
 // 定义列名
 const getSourceColums = () => {
 
@@ -76,23 +78,22 @@ const getSourceColums = () => {
           field: 'userName',
           pinned: 'left',
           minWidth: 80,
+          suppressMenu: false,
         },]
     },
     {
       headerName: '周期时间',
       children: [
         {
-          headerName: 'Bug解决时长（H）',
+          headerName: 'Bug解决时长(H)',
           field: 'maxLines',
-          minWidth: 100,
-          suppressMenu: true,
+          minWidth: 133,
           valueFormatter: cellFormat
         },
         {
           headerName: 'Bug数量',
           field: 'avgLines',
-          minWidth: 100,
-          suppressMenu: true,
+          minWidth: 88,
         }
       ]
     },
@@ -101,8 +102,7 @@ const getSourceColums = () => {
       children: [{
         headerName: '任务燃尽图',
         field: 'minLines',
-        minWidth: 80,
-        suppressMenu: true,
+        minWidth: 120,
       }]
     },
     {
@@ -111,22 +111,22 @@ const getSourceColums = () => {
         {
           headerName: '初始需求数',
           field: 'deptName',
-          minWidth: 135,
+          minWidth: 105,
         },
         {
           headerName: '初始需求完成数',
           field: 'groupName',
-          minWidth: 135,
+          minWidth: 130,
         },
         {
           headerName: '追加需求数',
           field: 'tech',
-          minWidth: 70,
+          minWidth: 105,
         },
         {
           headerName: '追加需求完成数',
           field: 'area',
-          minWidth: 80,
+          minWidth: 130,
         }
       ]
     },
@@ -135,12 +135,12 @@ const getSourceColums = () => {
       children: [{
         headerName: '请求数',
         field: 'position',
-        minWidth: 95,
+        minWidth: 85,
       },
         {
           headerName: '请求平均停留时长',
           field: 'job',
-          minWidth: 110,
+          minWidth: 140,
         }]
     },
     {
@@ -149,17 +149,17 @@ const getSourceColums = () => {
         {
           headerName: '交付需求数',
           field: 'labour',
-          minWidth: 80,
+          minWidth: 105,
         },
         {
           headerName: '完成任务数',
           field: 'attendance',
-          minWidth: 110
+          minWidth: 105
         },
         {
           headerName: '修复Bug数',
           field: 'stage',
-          minWidth: 110,
+          minWidth: 105,
         }
       ]
     }
@@ -227,10 +227,12 @@ const querySourceData = async (client: GqlClient<object>, params: any) => {
 };
 
 const FrontTableList: React.FC<any> = () => {
+  const g_currentMonth_start = dayjs().startOf('month').format("YYYY-MM-DD");
+  const g_currentMonth_end = dayjs().endOf('month').format("YYYY-MM-DD");
 
   // const sys_accessToken = localStorage.getItem("accessId");
   // axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
-  // 公共定义
+
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() => querySourceData(gqlClient, 'quarter'),);
   const gridApiForFront = useRef<GridApi>();
@@ -251,27 +253,21 @@ const FrontTableList: React.FC<any> = () => {
   };
 
   const [choicedConditionForSource, setQueryConditionForSource] = useState({
-    start: "",
-    end: ""
+    start: g_currentMonth_start,
+    end: g_currentMonth_end
   });
 
   // 默认数据（默认显示近八周的数据）
   const showSourceDefaultData = async () => {
 
-    const weekRanges = getWeeksRange(8);
-    setQueryConditionForSource({
-      start: weekRanges[0].from,
-      end: weekRanges[7].to
-    });
-
+    // 默认显示本月数据（1号-31号）
     const range = {
-      start: weekRanges[0].from,
-      end: weekRanges[7].to
+      start: g_currentMonth_start,
+      end: g_currentMonth_end
     };
     const datas: any = await querySourceData(gqlClient, range);
     gridApiForFront.current?.setRowData(datas);
   };
-
 
   // 时间选择事件： 查询范围：选中的时间中开始时间的周一，和结束时间的周末
   const onSourceTimeSelected = async (params: any, dateString: any) => {
@@ -281,19 +277,20 @@ const FrontTableList: React.FC<any> = () => {
       end: dateString[1]
     });
 
-    // 根据开始时间获取开始时间所属周的周一；根据结束时间，获取结束时间所属周的周末
-    const range = getWeekStartAndEndTime(dateString[0], dateString[1]);
+    const range = {
+      start: dateString[0],
+      end: dateString[1]
+    };
     const datas: any = await querySourceData(gqlClient, range);
     gridApiForFront.current?.setRowData(datas);
 
   };
 
-
   /* region 显示自定义字段 */
   const [isFieldModalVisible, setFieldModalVisible] = useState(false);
   const [selectedFiled, setSelectedFiled] = useState(['']);
   const nessField = ['NO.', '姓名'];
-  const unNessField = ['Bug解决时长（H）', 'Bug数量', '任务燃尽图', '初始需求数', '初始需求完成数', '追加需求数', '追加需求完成数',
+  const unNessField = ['Bug解决时长(H)', 'Bug数量', '任务燃尽图', '初始需求数', '初始需求完成数', '追加需求数', '追加需求完成数',
     '请求数', '请求平均停留时长', '交付需求数', '完成任务数', '修复Bug数'];
 
 // 弹出字段显示层
@@ -383,6 +380,7 @@ const FrontTableList: React.FC<any> = () => {
               filter: true,
               flex: 1,
               cellStyle: {"line-height": "28px"},
+              suppressMenu: true,
             }}
             autoGroupColumnDef={{
               minWidth: 250,
@@ -421,7 +419,7 @@ const FrontTableList: React.FC<any> = () => {
                     <Checkbox defaultChecked disabled value="姓名">姓名</Checkbox>
                   </Col>
                   <Col span={4}>
-                    <Checkbox value="Bug解决时长（H）">Bug解决时长</Checkbox>
+                    <Checkbox value="Bug解决时长(H)">Bug解决时长</Checkbox>
                   </Col>
                   <Col span={4}>
                     <Checkbox value="Bug数量">Bug数量</Checkbox>

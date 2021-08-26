@@ -1226,6 +1226,39 @@ const CodeTableList: React.FC<any> = () => {
 
   };
 
+  /* region 项目阶段和出勤状态修改 事件 */
+  const [formForModify] = Form.useForm();
+
+  // 弹出框是否显示
+  const [isModifyStageAndStatusVisible, setModifyStageAndStatusVisible] = useState(false);
+
+  // 设置checkbox框是否被选中
+  const [checkbox, setCheckbox] = useState({
+    attendenceStatus: true,
+    stageChecked: true
+  });
+
+  // 设置下拉框是否被禁用
+  const [disableValue, setDisableValue] = useState({
+    attendenceStatus: false,
+    stage: false
+  });
+
+  // 记录下拉框的值
+  const [modifyFIleds, setModifyFIleds] = useState({
+    attendanceStatus: "",
+    projectStage: ""
+  })
+
+  // 数据修改过后刷新
+  const refreshSourceData = async () => {
+
+    const range = getWeekStartAndEndTime(choicedConditionForSource.start, choicedConditionForSource.end);
+    const datas: any = await querySourceData(gqlClient, range, 0);
+    gridApiForSource.current?.setRowData(datas);
+  };
+
+  // 数据修改请求
   const updateStage = (values: any) => {
 
     axios.post('/api/kpi/analysis/code_multi', values)
@@ -1239,6 +1272,12 @@ const CodeTableList: React.FC<any> = () => {
               marginTop: '50vh',
             },
           });
+
+
+          // 成功之后刷新页面数据
+          setModifyStageAndStatusVisible(false);
+          refreshSourceData();
+
         } else if (Number(res.data.code) === 403) {
           message.info({
             content: "您无权修改数据！",
@@ -1279,7 +1318,7 @@ const CodeTableList: React.FC<any> = () => {
       });
   };
 
-  /* region 单元格编辑事件 */
+  // 单元格点击事件
   const onSourceCellEdited = (event: any) => {
 
     // 根据选中时间中的结束时间，获取到选中日期所在周的周一和周日的时间
@@ -1305,15 +1344,7 @@ const CodeTableList: React.FC<any> = () => {
 
   };
 
-  /* endregion */
-
-  /* region  */
-  const [formForModify] = Form.useForm();
-  const [isModifyStageAndStatusVisible, setModifyStageAndStatusVisible] = useState(false);
-  const [modifyFIleds, setModifyFIleds] = useState({
-    attendanceStatus: "",
-    projectStage: ""
-  })
+  // 弹出选择框
   const showModifyPage = () => {
     // 判断又没有选中数据
 
@@ -1321,13 +1352,26 @@ const CodeTableList: React.FC<any> = () => {
     if (selectedRows.length > 0) {
       const row = selectedRows[0];
 
-      setModifyStageAndStatusVisible(true);
+
       // 获取第一行的出勤状态和项目阶段显示。
-      formForModify.setFieldsValue(
-        {
-          attenceStatus: row.attendance,
-          projectStage: row.stage
-        });
+      formForModify.setFieldsValue({
+        attenceStatus: row.attendance,
+        projectStage: row.stage
+      });
+
+      // checkbox 框默认弹出就被选中
+      setCheckbox({
+        attendenceStatus: true,
+        stageChecked: true
+      });
+
+      // 两个下拉框都不被禁用
+      setDisableValue({
+        attendenceStatus: false,
+        stage: false
+      });
+
+      setModifyStageAndStatusVisible(true);
 
     } else {
       message.error({
@@ -1340,9 +1384,14 @@ const CodeTableList: React.FC<any> = () => {
     }
 
   };
+
+  // 取消
   const modifyCancel = () => {
     setModifyStageAndStatusVisible(false);
   };
+
+
+  // 提交请求
   const commitModify = () => {
 
     // 根据选中时间中的结束时间，获取到选中日期所在周的周一和周日的时间
@@ -1361,12 +1410,33 @@ const CodeTableList: React.FC<any> = () => {
       userIds.push(ele.userId);
     });
     values.userIds = userIds;
-    values.attendance = modifyFIleds.attendanceStatus;
-    values.stage = modifyFIleds.projectStage;
-    updateStage(values);
+
+    // 判断checkbox框是否有被选中
+    if (checkbox.attendenceStatus || checkbox.stageChecked) {
+      if (checkbox.attendenceStatus) {
+        values.attendance = modifyFIleds.attendanceStatus;
+      }
+
+      if (checkbox.stageChecked) {
+        values.stage = modifyFIleds.projectStage;
+      }
+
+      updateStage(values);
+
+    } else {
+      message.error({
+        content: '请至少勾选一项需要修改的字段！',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+
 
   };
 
+  // 出勤状态下拉框变化
   const onStatusChanged = (values: any) => {
 
     setModifyFIleds({
@@ -1375,12 +1445,46 @@ const CodeTableList: React.FC<any> = () => {
     });
 
   };
-
+  // 项目阶段下拉框变化
   const onStageChanged = (values: any) => {
 
     setModifyFIleds({
       ...modifyFIleds,
       projectStage: values
+    });
+  };
+
+  // 出勤状态checkbox  框变化
+  const attendenceOnChange = (checked: any) => {
+
+    const isChecked = checked.target.checked;
+    // 设置是否禁用选择框
+    setDisableValue({
+      ...disableValue,
+      attendenceStatus: !isChecked   // disable属性 为true 的时候才禁用
+    });
+
+    // 设置是否选中checkbox
+    setCheckbox({
+      ...checkbox,
+      attendenceStatus: isChecked
+    });
+  };
+
+  // 项目阶段checkbox  框变化
+  const stageOnChange = (checked: any) => {
+
+    const isChecked = checked.target.checked;
+    // 设置是否禁用选择框
+    setDisableValue({
+      ...disableValue,
+      stage: !isChecked   // disable属性 为true 的时候才禁用
+    });
+
+    // 设置是否选中checkbox
+    setCheckbox({
+      ...checkbox,
+      stageChecked: isChecked
     });
   };
   /* endregion */
@@ -1874,6 +1978,7 @@ const CodeTableList: React.FC<any> = () => {
                       <Select
                         style={{width: 200}}
                         onChange={onStatusChanged}
+                        disabled={disableValue.attendenceStatus}
                       >
                         <Option key={"normal"} value={"normal"}> 正常 </Option>
                         <Option key={"vacation"} value="vacation"> 休假 </Option>
@@ -1881,6 +1986,7 @@ const CodeTableList: React.FC<any> = () => {
                         <Option key={""} value=""> </Option>
 
                       </Select>
+                      <Checkbox style={{marginLeft: 10}} defaultChecked onChange={attendenceOnChange}> </Checkbox>
                     </Form.Item>
                   </div>
 
@@ -1892,6 +1998,7 @@ const CodeTableList: React.FC<any> = () => {
                       <Select
                         style={{width: 200}}
                         onChange={onStageChanged}
+                        disabled={disableValue.stage}
                       >
                         <Option key={"story"} value={"story"}> 需求 </Option>
                         <Option key={"design"} value="design"> 设计 </Option>
@@ -1904,6 +2011,8 @@ const CodeTableList: React.FC<any> = () => {
 
 
                       </Select>
+                      <Checkbox style={{marginLeft: 10}} defaultChecked onChange={stageOnChange}> </Checkbox>
+
                     </Form.Item>
                   </div>
 

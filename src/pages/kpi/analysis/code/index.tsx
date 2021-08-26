@@ -7,8 +7,8 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import type {GridApi, GridReadyEvent} from 'ag-grid-community';
 import type {GqlClient} from '@/hooks';
 import {useGqlClient} from '@/hooks';
-import {Button, Checkbox, Col, DatePicker, Form, message, Modal, Row, Tabs} from 'antd';
-import {FundTwoTone, DatabaseTwoTone, LogoutOutlined, SettingOutlined} from '@ant-design/icons';
+import {Select, Button, Checkbox, Col, DatePicker, Form, message, Modal, Row, Tabs} from 'antd';
+import {FundTwoTone, DatabaseTwoTone, LogoutOutlined, SettingOutlined, EditTwoTone} from '@ant-design/icons';
 import {getHeight} from '@/publicMethods/pageSet';
 import * as echarts from 'echarts';// 引入 ECharts 主模块
 import 'echarts/lib/chart/bar';// 引入柱状图
@@ -34,6 +34,7 @@ import * as dayjs from "dayjs";
 
 const {TabPane} = Tabs;
 const {RangePicker} = DatePicker;
+const {Option} = Select;
 
 /* region 公共方法 */
 // 格式化单元格内容
@@ -107,13 +108,13 @@ const getSourceColums = () => {
   // 获取缓存的字段
   const fields = localStorage.getItem("data_alaysis_code_Source");
   const oraFields: any = [
-    // {
-    //   headerName: '选择',
-    //   pinned: 'left',
-    //   checkboxSelection: true,
-    //   headerCheckboxSelection: true,
-    //   maxWidth: 35,
-    // },
+    {
+      headerName: '选择',
+      pinned: 'left',
+      checkboxSelection: true,
+      headerCheckboxSelection: true,
+      maxWidth: 35,
+    },
     {
       headerName: 'NO.',
       minWidth: 60,
@@ -1224,7 +1225,7 @@ const CodeTableList: React.FC<any> = () => {
 
   const updateStage = (values: any) => {
 
-    axios.post('/api/kpi/analysis/code', values)
+    axios.post('/api/kpi/analysis/code_multi', values)
       .then(function (res) {
         if (res.data.ok === true) {
 
@@ -1284,7 +1285,7 @@ const CodeTableList: React.FC<any> = () => {
     const values: any = {
       startAt: weeks.start,
       endAt: weeks.end,
-      userId: event.data.userId
+      userIds: [event.data.userId]
     };
 
     // 如果修改字段为出勤状态 并且新旧值不相等
@@ -1303,13 +1304,90 @@ const CodeTableList: React.FC<any> = () => {
 
   /* endregion */
 
+  /* region  */
+  const [formForModify] = Form.useForm();
+  const [isModifyStageAndStatusVisible, setModifyStageAndStatusVisible] = useState(false);
+  const [modifyFIleds, setModifyFIleds] = useState({
+    attendanceStatus: "",
+    projectStage: ""
+  })
+  const showModifyPage = () => {
+    // 判断又没有选中数据
+
+    const selectedRows: any = gridApiForSource.current?.getSelectedRows()
+    if (selectedRows.length > 0) {
+      const row = selectedRows[0];
+
+      setModifyStageAndStatusVisible(true);
+      // 获取第一行的出勤状态和项目阶段显示。
+      formForModify.setFieldsValue(
+        {
+          attenceStatus: row.attendance,
+          projectStage: row.stage
+        });
+
+    } else {
+      message.error({
+        content: '请选中需要修改的数据!',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+
+  };
+  const modifyCancel = () => {
+    setModifyStageAndStatusVisible(false);
+  };
+  const commitModify = () => {
+
+    // 根据选中时间中的结束时间，获取到选中日期所在周的周一和周日的时间
+    const weeks = getWeekStartAndEndTimeByEndtime(choicedConditionForSource.end);
+    // 时间：只传选中日期的最后一周的时间
+    const values: any = {
+      startAt: weeks.start,
+      endAt: weeks.end,
+    };
+
+    // 获取选中的userId
+    const userIds: any = [];
+    const selectedRows: any = gridApiForSource.current?.getSelectedRows()
+
+    selectedRows.forEach((ele: any) => {
+      userIds.push(ele.userId);
+    });
+    values.userIds = userIds;
+    values.attendance = modifyFIleds.attendanceStatus;
+    values.stage = modifyFIleds.projectStage;
+    updateStage(values);
+
+  };
+
+  const onStatusChanged = (values: any) => {
+
+    setModifyFIleds({
+      ...modifyFIleds,
+      attendanceStatus: values
+    });
+
+  };
+
+  const onStageChanged = (values: any) => {
+
+    setModifyFIleds({
+      ...modifyFIleds,
+      projectStage: values
+    });
+  };
+  /* endregion */
 
   /* region 显示自定义字段 */
   const [isFieldModalVisible, setFieldModalVisible] = useState(false);
   const [selectedFiled, setSelectedFiled] = useState(['']);
   const nessField = ['NO.', '姓名'];
   const unNessField = ['最大值', '平均值', '最小值', '部门', '组', '端', '地域', '职务', '岗位类型', '类型',
-    '出勤状态', '项目阶段'];
+    '出勤状态', '项目阶段', '选择'];
 
 // 弹出字段显示层
   const showFieldsModal = () => {
@@ -1406,7 +1484,7 @@ const CodeTableList: React.FC<any> = () => {
               {/* 第一行图表页面 */}
               <Row>
                 <Col span={12}>
-                  <div style={{marginTop:5}}>
+                  <div style={{marginTop: 5}}>
                     <div style={{
                       height: "30px",
                       lineHeight: "30px",
@@ -1440,7 +1518,7 @@ const CodeTableList: React.FC<any> = () => {
 
                 </Col>
                 <Col span={12}>
-                  <div style={{marginLeft: 20,marginTop:5}}>
+                  <div style={{marginLeft: 20, marginTop: 5}}>
                     <table border={1} style={{
                       textAlign: "center",
                       width: '100%',
@@ -1663,6 +1741,8 @@ const CodeTableList: React.FC<any> = () => {
 
                 <Button type="text" icon={<SettingOutlined/>} size={'large'} onClick={showFieldsModal}
                         style={{float: "right", marginTop: 5}}> </Button>
+                <Button type="text" icon={<EditTwoTone/>} size={'large'} onClick={showModifyPage}
+                        style={{float: "right", marginTop: 5}}>修改</Button>
 
               </Form.Item>
 
@@ -1684,6 +1764,7 @@ const CodeTableList: React.FC<any> = () => {
                   minWidth: 250,
                   // sort: 'asc'
                 }}
+                rowSelection={'multiple'} // 设置多行选中
                 groupDefaultExpanded={9} // 展开分组
                 suppressAggFuncInHeader={true} // 不显示标题聚合函数的标识
                 rowHeight={30}
@@ -1752,6 +1833,9 @@ const CodeTableList: React.FC<any> = () => {
                       <Col span={4}>
                         <Checkbox value="项目阶段">项目阶段</Checkbox>
                       </Col>
+                      <Col span={4}>
+                        <Checkbox value="选择">选择</Checkbox>
+                      </Col>
                     </Row>
                   </Checkbox.Group>,
                 </div>
@@ -1768,11 +1852,72 @@ const CodeTableList: React.FC<any> = () => {
               </Form>
             </Modal>
 
+            {/* 批量修改项目阶段和出勤状态 */}
+            <Modal
+              title={'字段修改'}
+              visible={isModifyStageAndStatusVisible}
+              onCancel={modifyCancel}
+              centered={true}
+              footer={null}
+              width={400}
+            >
+              <Form form={formForModify}>
+                <div style={{marginLeft:35}}>
+                  <div>
+                    <Form.Item
+                      label="出勤状态:"
+                      name="attenceStatus"
+                    >
+                      <Select
+                        style={{width: 200}}
+                        onChange={onStatusChanged}
+                      >
+                        <Option key={"normal"} value={"normal"}> 正常 </Option>
+                        <Option key={"vacation"} value="vacation"> 休假 </Option>
+                        <Option key={"leave"} value="leave"> 离职 </Option>
+                        <Option key={""} value=""> </Option>
+
+                      </Select>
+                    </Form.Item>
+                  </div>
+
+                  <div>
+                    <Form.Item
+                      label="项目阶段:"
+                      name="projectStage"
+                    >
+                      <Select
+                        style={{width: 200}}
+                        onChange={onStageChanged}
+                      >
+                        <Option key={"story"} value={"story"}> 需求 </Option>
+                        <Option key={"design"} value="design"> 设计 </Option>
+                        <Option key={"developing"} value="developing"> 开发 </Option>
+                        <Option key={"submit"} value="submit"> 提测 </Option>
+                        <Option key={"testing"} value="testing"> 测试 </Option>
+                        <Option key={"released"} value="released"> 发布 </Option>
+                        <Option key={"learning"} value="learning"> 学习 </Option>
+                        <Option key={""} value=""> </Option>
+
+
+                      </Select>
+                    </Form.Item>
+                  </div>
+
+                  <div>
+                    <Button type="primary" style={{marginLeft: '80px'}} onClick={commitModify}>
+                      确定</Button>
+                    <Button type="primary" style={{marginLeft: '20px'}} onClick={modifyCancel}>
+                      取消</Button>
+                  </div>
+                </div>
+
+              </Form>
+            </Modal>
+
           </TabPane>
 
         </Tabs>
-
-
       </div>
 
 

@@ -344,13 +344,19 @@ export default [
         name: '数据分析',
         icon: 'table',
         path: '/kpi/analysis',
+        access: 'sysAdmin',
         routes: [
           {
             name: '代码贡献',
             icon: 'table',
             path: 'code',
-            access: 'sysAdmin',
             component: './kpi/analysis/code',
+          },
+          {
+            name: '前端 Dashboard',
+            icon: 'table',
+            path: 'front_dashboard',
+            component: './kpi/analysis/front_dashboard',
           },
         ],
       },

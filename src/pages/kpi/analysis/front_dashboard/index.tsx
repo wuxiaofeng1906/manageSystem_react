@@ -1,0 +1,481 @@
+import React, {useRef, useState} from 'react';
+import {PageContainer} from '@ant-design/pro-layout';
+import {AgGridReact} from 'ag-grid-react';
+import 'ag-grid-enterprise';
+import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
+import type {GridApi, GridReadyEvent} from 'ag-grid-community';
+import type {GqlClient} from '@/hooks';
+import {useGqlClient} from '@/hooks';
+import {Button, Checkbox, Col, DatePicker, Form, message, Modal, Row} from 'antd';
+import {LogoutOutlined, SettingOutlined} from '@ant-design/icons';
+import {getHeight} from '@/publicMethods/pageSet';
+import {getWeeksRange, getWeekStartAndEndTime} from "@/publicMethods/timeMethods";
+import moment from "moment";
+import {useRequest} from "ahooks";
+
+const {RangePicker} = DatePicker;
+
+// 格式化单元格内容
+const cellFormat = (params: any) => {
+  if (Number(params.value)) {
+    const numbers = params.value.toString();
+    if (numbers.indexOf(".") > -1) { // 判断有无小数点
+      return Number(params.value).toFixed(2);
+    }
+    return Number(params.value);
+  }
+  return params.value;
+};
+
+// 使用递归，自己调用自己
+// const getColumn = (allField: any, selected: any, component: any) => {
+//
+//   allField.forEach((ele: any) => {
+//     if (ele.children) { // 如果包含children，表示有二级title,则继续调用自己，循环下一层
+//       const secondTitle = ele.children;
+//       getColumn(secondTitle, selected, component);
+//
+//     } else {
+//       const newElement = ele;
+//       if (selected.includes(ele.headerName)) {
+//         newElement.hide = false;
+//       } else {
+//         newElement.hide = true;
+//       }
+//       component.push(newElement);
+//     }
+//   });
+//
+//   return component;
+// };
+// 定义列名
+const getSourceColums = () => {
+
+  // 获取缓存的字段
+  const fields = localStorage.getItem("data_front_dashboard");
+
+  // 定义的原始字段
+  const oraFields: any = [
+    {
+      headerName: "",
+      children: [
+        {
+          headerName: 'NO.',
+          minWidth: 60,
+          maxWidth: 80,
+          filter: false,
+          pinned: 'left',
+          suppressMenu: true,
+          cellRenderer: (params: any) => {
+            return Number(params.node.id) + 1;
+          },
+        },
+        {
+          headerName: '姓名',
+          field: 'userName',
+          pinned: 'left',
+          minWidth: 80,
+        },]
+    },
+    {
+      headerName: '周期时间',
+      children: [
+        {
+          headerName: 'Bug解决时长（H）',
+          field: 'maxLines',
+          minWidth: 100,
+          suppressMenu: true,
+          valueFormatter: cellFormat
+        },
+        {
+          headerName: 'Bug数量',
+          field: 'avgLines',
+          minWidth: 100,
+          suppressMenu: true,
+        }
+      ]
+    },
+    {
+      headerName: '',
+      children: [{
+        headerName: '任务燃尽图',
+        field: 'minLines',
+        minWidth: 80,
+        suppressMenu: true,
+      }]
+    },
+    {
+      headerName: '速度',
+      children: [
+        {
+          headerName: '初始需求数',
+          field: 'deptName',
+          minWidth: 135,
+        },
+        {
+          headerName: '初始需求完成数',
+          field: 'groupName',
+          minWidth: 135,
+        },
+        {
+          headerName: '追加需求数',
+          field: 'tech',
+          minWidth: 70,
+        },
+        {
+          headerName: '追加需求完成数',
+          field: 'area',
+          minWidth: 80,
+        }
+      ]
+    },
+    {
+      headerName: '对外请求',
+      children: [{
+        headerName: '请求数',
+        field: 'position',
+        minWidth: 95,
+      },
+        {
+          headerName: '请求平均停留时长',
+          field: 'job',
+          minWidth: 110,
+        }]
+    },
+    {
+      headerName: '吞吐量',
+      children: [
+        {
+          headerName: '交付需求数',
+          field: 'labour',
+          minWidth: 80,
+        },
+        {
+          headerName: '完成任务数',
+          field: 'attendance',
+          minWidth: 110
+        },
+        {
+          headerName: '修复Bug数',
+          field: 'stage',
+          minWidth: 110,
+        }
+      ]
+    }
+
+  ];
+
+  if (fields === null) {
+    return oraFields;
+  }
+
+  const selected = JSON.parse(fields);
+
+  const component: any = [];
+  oraFields.forEach((parent: any) => {
+    const p_details = parent.children;
+    const childs: any = [];
+    p_details.forEach((c_details: any) => {
+      const newElement = c_details;
+      if (selected.includes(c_details.headerName)) {
+        newElement.hide = false;
+      } else {
+        newElement.hide = true;
+      }
+      childs.push(newElement);
+    });
+
+    component.push({
+      headerName: parent.headerName,
+      children: childs,
+    })
+
+  });
+
+  return component;
+};
+
+// 公共查询方法
+const querySourceData = async (client: GqlClient<object>, params: any) => {
+
+  const {data} = await client.query(`
+      {
+        avgCodeAnalysis(start:"${params.start}",end:"${params.end}"){
+        userId
+        userName
+        maxLines
+        avgLines
+        minLines
+        weekLines
+        deptName
+        groupName
+        tech
+        area
+        position
+        job
+        labour
+        attendance
+        stage
+      }
+
+      }
+  `);
+
+  // const te = data?.avgCodeAnalysis;
+  return data?.avgCodeAnalysis;
+};
+
+const FrontTableList: React.FC<any> = () => {
+
+  // const sys_accessToken = localStorage.getItem("accessId");
+  // axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
+  // 公共定义
+  const gqlClient = useGqlClient();
+  const {data, loading} = useRequest(() => querySourceData(gqlClient, 'quarter'),);
+  const gridApiForFront = useRef<GridApi>();
+  const onSourceGridReady = (params: GridReadyEvent) => {
+    gridApiForFront.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+  if (gridApiForFront.current) {
+    if (loading) gridApiForFront.current.showLoadingOverlay();
+    else gridApiForFront.current.hideOverlay();
+  }
+
+  // 表格的屏幕大小自适应
+  const [sourceGridHeight, setGridHeight] = useState(Number(getHeight()));
+  window.onresize = function () {
+    setGridHeight(Number(getHeight()) - 64);
+    gridApiForFront.current?.sizeColumnsToFit();
+  };
+
+  const [choicedConditionForSource, setQueryConditionForSource] = useState({
+    start: "",
+    end: ""
+  });
+
+  // 默认数据（默认显示近八周的数据）
+  const showSourceDefaultData = async () => {
+
+    const weekRanges = getWeeksRange(8);
+    setQueryConditionForSource({
+      start: weekRanges[0].from,
+      end: weekRanges[7].to
+    });
+
+    const range = {
+      start: weekRanges[0].from,
+      end: weekRanges[7].to
+    };
+    const datas: any = await querySourceData(gqlClient, range);
+    gridApiForFront.current?.setRowData(datas);
+  };
+
+
+  // 时间选择事件： 查询范围：选中的时间中开始时间的周一，和结束时间的周末
+  const onSourceTimeSelected = async (params: any, dateString: any) => {
+
+    setQueryConditionForSource({
+      start: dateString[0],
+      end: dateString[1]
+    });
+
+    // 根据开始时间获取开始时间所属周的周一；根据结束时间，获取结束时间所属周的周末
+    const range = getWeekStartAndEndTime(dateString[0], dateString[1]);
+    const datas: any = await querySourceData(gqlClient, range);
+    gridApiForFront.current?.setRowData(datas);
+
+  };
+
+
+  /* region 显示自定义字段 */
+  const [isFieldModalVisible, setFieldModalVisible] = useState(false);
+  const [selectedFiled, setSelectedFiled] = useState(['']);
+  const nessField = ['NO.', '姓名'];
+  const unNessField = ['Bug解决时长（H）', 'Bug数量', '任务燃尽图', '初始需求数', '初始需求完成数', '追加需求数', '追加需求完成数',
+    '请求数', '请求平均停留时长', '交付需求数', '完成任务数', '修复Bug数'];
+
+// 弹出字段显示层
+  const showFieldsModal = () => {
+    const fields = localStorage.getItem("data_front_dashboard");
+    if (fields === null) {
+      setSelectedFiled(nessField.concat(unNessField));
+    } else {
+      setSelectedFiled(JSON.parse(fields));
+    }
+    setFieldModalVisible(true);
+  };
+
+// 全选
+  const selectAllField = (e: any) => {
+    if (e.target.checked === true) {
+      setSelectedFiled(nessField.concat(unNessField));
+    } else {
+      setSelectedFiled(nessField);
+    }
+  };
+
+// 保存按钮
+  const commitField = () => {
+    localStorage.setItem("data_front_dashboard", JSON.stringify(selectedFiled));
+    setFieldModalVisible(false);
+    // 首先需要清空原有列，否则会导致列混乱
+    gridApiForFront.current?.setColumnDefs([]);
+
+    message.info({
+      content: "保存成功！",
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+
+  };
+// 取消
+  const fieldCancel = () => {
+    setFieldModalVisible(false);
+  };
+
+// 缓存到state
+  const onSetFieldsChange = (checkedValues: any) => {
+    setSelectedFiled(checkedValues);
+  };
+  /* endregion */
+
+
+  return (
+    <PageContainer>
+
+      <div>
+        {/* 查询条件 */}
+        <div style={{width: '100%', height: 45, marginTop: 15, backgroundColor: "white"}}>
+          <Form.Item>
+
+            <label style={{marginLeft: "10px", marginTop: 7}}>查询周期：</label>
+            <RangePicker
+              style={{width: '30%', marginTop: 7}} onChange={onSourceTimeSelected}
+              value={[choicedConditionForSource.start === "" ? null : moment(choicedConditionForSource.start),
+                choicedConditionForSource.end === "" ? null : moment(choicedConditionForSource.end)]}
+            />
+
+            <Button type="text" style={{marginLeft: "20px", color: 'black'}}
+                    icon={<LogoutOutlined/>} size={'small'} onClick={showSourceDefaultData}>
+              默认：</Button>
+            <label style={{marginLeft: "-10px", color: 'black'}}> 默认数据</label>
+
+            <Button type="text" icon={<SettingOutlined/>} size={'large'} onClick={showFieldsModal}
+                    style={{float: "right", marginTop: 5}}> </Button>
+
+
+          </Form.Item>
+
+        </div>
+
+        {/* 数据表格 */}
+        <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: 10}}>
+          <AgGridReact
+            columnDefs={getSourceColums()} // 定义列
+            rowData={data} // 数据绑定
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true,
+              flex: 1,
+              cellStyle: {"line-height": "28px"},
+            }}
+            autoGroupColumnDef={{
+              minWidth: 250,
+              // sort: 'asc'
+            }}
+            rowSelection={'multiple'} // 设置多行选中
+            groupDefaultExpanded={9} // 展开分组
+            suppressAggFuncInHeader={true} // 不显示标题聚合函数的标识
+            rowHeight={30}
+            headerHeight={35}
+
+            onGridReady={onSourceGridReady}
+            suppressScrollOnNewData={false}
+          >
+
+          </AgGridReact>
+        </div>
+
+        {/* 自定义字段 */}
+        <Modal
+          title={'自定义字段'}
+          visible={isFieldModalVisible}
+          onCancel={fieldCancel}
+          centered={true}
+          footer={null}
+          width={920}
+        >
+          <Form>
+            <div>
+              <Checkbox.Group style={{width: '100%'}} value={selectedFiled} onChange={onSetFieldsChange}>
+                <Row>
+                  <Col span={4}>
+                    <Checkbox defaultChecked disabled value="NO.">NO.</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox defaultChecked disabled value="姓名">姓名</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="Bug解决时长（H）">Bug解决时长</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="Bug数量">Bug数量</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="任务燃尽图">任务燃尽图</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="初始需求数">初始需求数</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="初始需求完成数">初始需求完成数</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="追加需求数">追加需求数</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="追加需求完成数">追加需求完成数</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="请求数">请求数</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="请求平均停留时长">请求平均停留时长</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="交付需求数">交付需求数</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="完成任务数">完成任务数</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox value="修复Bug数">修复Bug数</Checkbox>
+                  </Col>
+
+                </Row>
+              </Checkbox.Group>,
+            </div>
+
+            <div>
+              <Checkbox onChange={selectAllField}>全选</Checkbox>
+
+              <Button type="primary" style={{marginLeft: '300px'}} onClick={commitField}>
+                确定</Button>
+              <Button type="primary" style={{marginLeft: '20px'}} onClick={fieldCancel}>
+                取消</Button>
+            </div>
+
+          </Form>
+        </Modal>
+      </div>
+
+    </PageContainer>
+  );
+};
+
+export default FrontTableList;

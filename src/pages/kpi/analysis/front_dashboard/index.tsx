@@ -137,25 +137,25 @@ const getSourceColums = () => {
         },
         {
           headerName: '修复Bug数',
-          field: 'stage',
+          field: 'resolvedBug',
           minWidth: 105,
           valueFormatter: cellFormat
         },
         {
           headerName: '进行中任务数',
-          field: 'stage',
+          field: 'doingTask',
           minWidth: 115,
           valueFormatter: cellFormat
         },
         {
           headerName: '代码提交次数',
-          field: 'stage',
+          field: 'codeCommit',
           minWidth: 115,
           valueFormatter: cellFormat
         },
         {
           headerName: '代码新增行数',
-          field: 'stage',
+          field: 'newLine',
           minWidth: 115,
           valueFormatter: cellFormat
         }
@@ -202,6 +202,10 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
             userName
             finiStory
             finiTask
+            resolvedBug
+            doingTask
+            codeCommit
+            newLine
           }
 
       }

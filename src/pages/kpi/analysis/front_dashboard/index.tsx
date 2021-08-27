@@ -12,12 +12,13 @@ import {LogoutOutlined, SettingOutlined} from '@ant-design/icons';
 import {getHeight} from '@/publicMethods/pageSet';
 import moment from "moment";
 import {useRequest} from "ahooks";
-import dayjs from 'dayjs'
+import dayjs from 'dayjs';
 
 const {RangePicker} = DatePicker;
 
 // 格式化单元格内容
 const cellFormat = (params: any) => {
+
   if (Number(params.value)) {
     const numbers = params.value.toString();
     if (numbers.indexOf(".") > -1) { // 判断有无小数点
@@ -25,7 +26,7 @@ const cellFormat = (params: any) => {
     }
     return Number(params.value);
   }
-  return params.value;
+  return 0;
 };
 
 // 定义列名

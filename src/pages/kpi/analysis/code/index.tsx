@@ -367,7 +367,7 @@ const CodeTableList: React.FC<any> = () => {
     return 1;
   };
 
-  const getTotalColums = [
+  const getTotalColumsForStatic: any = [
     {
       headerName: '阶段/领域',
       field: 'stage',
@@ -877,7 +877,7 @@ const CodeTableList: React.FC<any> = () => {
   /* endregion */
 
   /* region 二、三、四行公共方法 */
-  const getHighesCodeColums = (sortMethod: string) => {
+  const getHighesCodeColums: any = (sortMethod: string) => {
     return [
       {
         headerName: '姓名',
@@ -1347,19 +1347,19 @@ const CodeTableList: React.FC<any> = () => {
   // 弹出选择框
   const showModifyPage = () => {
 
-    debugger;
     // 判断又没有选中数据
-
     const selectedRows: any = gridApiForSource.current?.getSelectedRows()
     if (selectedRows.length > 0) {
       setModifyStageAndStatusVisible(true);
 
       const row = selectedRows[0];
-
+      const {attendance, stage} = row;
       // 获取第一行的出勤状态和项目阶段显示。
       formForModify.setFieldsValue({
-        attenceStatus: row.attendance,
-        projectStage: row.stage
+        attendenceName: attendance,
+        projectStageName: stage,
+        attenceCheckbox: "true",
+        stageCheckbox: "true"
       });
 
       // checkbox 框默认弹出就被选中
@@ -1374,7 +1374,6 @@ const CodeTableList: React.FC<any> = () => {
         stage: false
       });
 
-
     } else {
       message.error({
         content: '请选中需要修改的数据!',
@@ -1384,57 +1383,6 @@ const CodeTableList: React.FC<any> = () => {
         },
       });
     }
-
-  };
-
-  // 取消
-  const modifyCancel = () => {
-    setModifyStageAndStatusVisible(false);
-  };
-
-
-  // 提交请求
-  const commitModify = () => {
-
-    // 根据选中时间中的结束时间，获取到选中日期所在周的周一和周日的时间
-    const weeks = getWeekStartAndEndTimeByEndtime(choicedConditionForSource.end);
-    // 时间：只传选中日期的最后一周的时间
-    const values: any = {
-      startAt: weeks.start,
-      endAt: weeks.end,
-    };
-
-    // 获取选中的userId
-    const userIds: any = [];
-    const selectedRows: any = gridApiForSource.current?.getSelectedRows()
-
-    selectedRows.forEach((ele: any) => {
-      userIds.push(ele.userId);
-    });
-    values.userIds = userIds;
-
-    // 判断checkbox框是否有被选中
-    if (checkbox.attendenceChecked || checkbox.stageChecked) {
-      if (checkbox.attendenceChecked) {
-        values.attendance = modifyFIleds.attendanceStatus;
-      }
-
-      if (checkbox.stageChecked) {
-        values.stage = modifyFIleds.projectStage;
-      }
-
-      updateStage(values);
-
-    } else {
-      message.error({
-        content: '请至少勾选一项需要修改的字段！',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    }
-
 
   };
 
@@ -1489,6 +1437,57 @@ const CodeTableList: React.FC<any> = () => {
       stageChecked: isChecked
     });
   };
+
+  // 取消
+  const modifyCancel = () => {
+    setModifyStageAndStatusVisible(false);
+  };
+
+  // 提交请求
+  const commitModify = () => {
+
+    // 根据选中时间中的结束时间，获取到选中日期所在周的周一和周日的时间
+    const weeks = getWeekStartAndEndTimeByEndtime(choicedConditionForSource.end);
+    // 时间：只传选中日期的最后一周的时间
+    const values: any = {
+      startAt: weeks.start,
+      endAt: weeks.end,
+    };
+
+    // 获取选中的userId
+    const userIds: any = [];
+    const selectedRows: any = gridApiForSource.current?.getSelectedRows()
+
+    selectedRows.forEach((ele: any) => {
+      userIds.push(ele.userId);
+    });
+    values.userIds = userIds;
+
+    // 判断checkbox框是否有被选中
+    if (checkbox.attendenceChecked || checkbox.stageChecked) {
+      if (checkbox.attendenceChecked) {
+        values.attendance = modifyFIleds.attendanceStatus;
+      }
+
+      if (checkbox.stageChecked) {
+        values.stage = modifyFIleds.projectStage;
+      }
+
+      updateStage(values);
+
+    } else {
+      message.error({
+        content: '请至少勾选一项需要修改的字段！',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+
+
+  };
+
   /* endregion */
 
   /* region 显示自定义字段 */
@@ -1607,7 +1606,7 @@ const CodeTableList: React.FC<any> = () => {
                     </div>
                     <div className="ag-theme-alpine" style={{marginTop: "-5", height: 509, width: '100%'}}>
                       <AgGridReact
-                        columnDefs={getTotalColums} // 定义列
+                        columnDefs={getTotalColumsForStatic} // 定义列
                         suppressRowTransform={true}
                         rowData={[]} // 数据绑定
                         defaultColDef={{
@@ -1963,63 +1962,59 @@ const CodeTableList: React.FC<any> = () => {
 
             {/* 批量修改项目阶段和出勤状态 */}
             <Modal
-              title={'字段修改'}
-              visible={isModifyStageAndStatusVisible}
-              onCancel={modifyCancel}
-              centered={true}
-              footer={null}
-              width={400}
+              title={'字段修改'} visible={isModifyStageAndStatusVisible} onCancel={modifyCancel} centered={true}
+              footer={null} width={400}
             >
               <Form form={formForModify}>
                 <div style={{marginLeft: 35}}>
-                  <div>
-                    <Form.Item
-                      label="出勤状态:"
-                      name="attenceStatus"
-                    >
-                      <Select
-                        style={{width: 200}}
-                        onChange={onStatusChanged}
-                        disabled={disableValue.attendenceStatus}
-                      >
-                        <Option key={"normal"} value={"normal"}> 正常 </Option>
-                        <Option key={"vacation"} value="vacation"> 休假 </Option>
-                        <Option key={"leave"} value="leave"> 离职 </Option>
-                        <Option key={""} value=""> </Option>
-
-                      </Select>
-                      <Checkbox style={{marginLeft: 10}} defaultChecked={checkbox.attendenceChecked}
-                                onChange={attendenceOnChange}> </Checkbox>
-                    </Form.Item>
-                  </div>
-
-                  <div>
-                    <Form.Item
-                      label="项目阶段:"
-                      name="projectStage"
-                    >
-                      <Select
-                        style={{width: 200}}
-                        onChange={onStageChanged}
-                        disabled={disableValue.stage}
-                      >
-                        <Option key={"story"} value={"story"}> 需求 </Option>
-                        <Option key={"design"} value="design"> 设计 </Option>
-                        <Option key={"developing"} value="developing"> 开发 </Option>
-                        <Option key={"submit"} value="submit"> 提测 </Option>
-                        <Option key={"testing"} value="testing"> 测试 </Option>
-                        <Option key={"released"} value="released"> 发布 </Option>
-                        <Option key={"learning"} value="learning"> 学习 </Option>
-                        <Option key={""} value=""> </Option>
+                  <Row>
+                    <Col>
+                      <Form.Item label="出勤状态:" name="attendenceName">
+                        <Select style={{width: 200}} onChange={onStatusChanged}
+                                disabled={disableValue.attendenceStatus}>
+                          <Option key={"normal"} value={"normal"}> 正常 </Option>
+                          <Option key={"vacation"} value="vacation"> 休假 </Option>
+                          <Option key={"leave"} value="leave"> 离职 </Option>
+                          <Option key={""} value=""> </Option>
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                    <Col>
+                      <Form.Item name="attenceCheckbox">
+                        <Checkbox style={{marginLeft: 10, marginTop: 5}} checked={checkbox.attendenceChecked}
+                                  onChange={attendenceOnChange}> </Checkbox>
+                      </Form.Item>
 
 
-                      </Select>
-                      <Checkbox style={{marginLeft: 10}} defaultChecked={checkbox.stageChecked}
-                                onChange={stageOnChange}> </Checkbox>
+                    </Col>
+                  </Row>
 
-                    </Form.Item>
-                  </div>
+                  <Row>
+                    <Col>
 
+                      <Form.Item label="项目阶段:" name="projectStageName">
+                        <Select style={{width: 200}} onChange={onStageChanged} disabled={disableValue.stage}>
+                          <Option key={"story"} value={"story"}> 需求 </Option>
+                          <Option key={"design"} value="design"> 设计 </Option>
+                          <Option key={"developing"} value="developing"> 开发 </Option>
+                          <Option key={"submit"} value="submit"> 提测 </Option>
+                          <Option key={"testing"} value="testing"> 测试 </Option>
+                          <Option key={"released"} value="released"> 发布 </Option>
+                          <Option key={"learning"} value="learning"> 学习 </Option>
+                          <Option key={""} value=""> </Option>
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                    <Col>
+
+                      <Form.Item name="stageCheckbox">
+                        <Checkbox style={{marginLeft: 10, marginTop: 5}} checked={checkbox.stageChecked}
+                                  onChange={stageOnChange}> </Checkbox>
+                      </Form.Item>
+
+
+                    </Col>
+                  </Row>
                   <div>
                     <Button type="primary" style={{marginLeft: '80px'}} onClick={commitModify}>
                       确定</Button>

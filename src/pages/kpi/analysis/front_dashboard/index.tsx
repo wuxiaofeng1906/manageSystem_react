@@ -58,100 +58,106 @@ const getSourceColums = () => {
           suppressMenu: false,
         },]
     },
-    {
-      headerName: '周期时间',
-      children: [
-        {
-          headerName: 'Bug解决时长(H)',
-          field: 'maxLines',
-          minWidth: 133,
-          valueFormatter: cellFormat
-        },
-        {
-          headerName: 'Bug数量',
-          field: 'avgLines',
-          minWidth: 88,
-        }
-      ]
-    },
-    {
-      headerName: '',
-      children: [{
-        headerName: '任务燃尽图',
-        field: 'minLines',
-        minWidth: 120,
-      }]
-    },
-    {
-      headerName: '速度',
-      children: [
-        {
-          headerName: '初始需求数',
-          field: 'deptName',
-          minWidth: 105,
-        },
-        {
-          headerName: '初始需求完成数',
-          field: 'groupName',
-          minWidth: 130,
-        },
-        {
-          headerName: '追加需求数',
-          field: 'tech',
-          minWidth: 105,
-        },
-        {
-          headerName: '追加需求完成数',
-          field: 'area',
-          minWidth: 130,
-        }
-      ]
-    },
-    {
-      headerName: '对外请求',
-      children: [{
-        headerName: '请求数',
-        field: 'position',
-        minWidth: 85,
-      },
-        {
-          headerName: '请求平均停留时长',
-          field: 'job',
-          minWidth: 140,
-        }]
-    },
+    // {
+    //   headerName: '周期时间',
+    //   children: [
+    //     {
+    //       headerName: 'Bug解决时长(H)',
+    //       field: 'maxLines',
+    //       minWidth: 133,
+    //       valueFormatter: cellFormat
+    //     },
+    //     {
+    //       headerName: 'Bug数量',
+    //       field: 'avgLines',
+    //       minWidth: 88,
+    //     }
+    //   ]
+    // },
+    // {
+    //   headerName: '',
+    //   children: [{
+    //     headerName: '任务燃尽图',
+    //     field: 'minLines',
+    //     minWidth: 120,
+    //   }]
+    // },
+    // {
+    //   headerName: '速度',
+    //   children: [
+    //     {
+    //       headerName: '初始需求数',
+    //       field: 'deptName',
+    //       minWidth: 105,
+    //     },
+    //     {
+    //       headerName: '初始需求完成数',
+    //       field: 'groupName',
+    //       minWidth: 130,
+    //     },
+    //     {
+    //       headerName: '追加需求数',
+    //       field: 'tech',
+    //       minWidth: 105,
+    //     },
+    //     {
+    //       headerName: '追加需求完成数',
+    //       field: 'area',
+    //       minWidth: 130,
+    //     }
+    //   ]
+    // },
+    // {
+    //   headerName: '对外请求',
+    //   children: [{
+    //     headerName: '请求数',
+    //     field: 'position',
+    //     minWidth: 85,
+    //   },
+    //     {
+    //       headerName: '请求平均停留时长',
+    //       field: 'job',
+    //       minWidth: 140,
+    //     }]
+    // },
     {
       headerName: '吞吐量',
       children: [
         {
           headerName: '交付需求数',
-          field: 'labour',
+          field: 'finiStory',
           minWidth: 105,
+          valueFormatter: cellFormat
         },
         {
           headerName: '完成任务数',
-          field: 'attendance',
-          minWidth: 105
+          field: 'finiTask',
+          minWidth: 105,
+          valueFormatter: cellFormat
         },
         {
           headerName: '修复Bug数',
           field: 'stage',
           minWidth: 105,
+          valueFormatter: cellFormat
         },
         {
           headerName: '进行中任务数',
           field: 'stage',
           minWidth: 115,
+          valueFormatter: cellFormat
         },
         {
           headerName: '代码提交次数',
           field: 'stage',
           minWidth: 115,
+          valueFormatter: cellFormat
         },
         {
           headerName: '代码新增行数',
           field: 'stage',
           minWidth: 115,
+          valueFormatter: cellFormat
         }
       ]
     }
@@ -189,41 +195,30 @@ const getSourceColums = () => {
 };
 
 // 公共查询方法
-const querySourceData = async (client: GqlClient<object>, params: any) => {
+const queryFrontData = async (client: GqlClient<object>, params: any) => {
 
-  const {data} = await client.query(`
-      {
-        avgCodeAnalysis(start:"${params.start}",end:"${params.end}"){
-        userId
-        userName
-        maxLines
-        avgLines
-        minLines
-        weekLines
-        deptName
-        groupName
-        tech
-        area
-        position
-        job
-        labour
-        attendance
-        stage
-      }
+  const {data} = await client.query(`{
+          dashFront(start:"${params.start}",end:"${params.end}"){
+            userName
+            finiStory
+            finiTask
+          }
 
       }
   `);
 
-  // const te = data?.avgCodeAnalysis;
-  return data?.avgCodeAnalysis;
+
+  return data?.dashFront;
 };
 
 const FrontTableList: React.FC<any> = () => {
-  const g_currentMonth_start = dayjs().startOf('month').format("YYYY-MM-DD");
-  const g_currentMonth_end = dayjs().endOf('month').format("YYYY-MM-DD");
+  const g_currentMonth_range = {
+    start: dayjs().startOf('month').format("YYYY-MM-DD"),
+    end: dayjs().endOf('month').format("YYYY-MM-DD")
+  };
 
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => querySourceData(gqlClient, 'quarter'),);
+  const {data, loading} = useRequest(() => queryFrontData(gqlClient, g_currentMonth_range),);
   const gridApiForFront = useRef<GridApi>();
   const onSourceGridReady = (params: GridReadyEvent) => {
     gridApiForFront.current = params.api;
@@ -243,19 +238,13 @@ const FrontTableList: React.FC<any> = () => {
   };
 
   const [choicedConditionForSource, setQueryConditionForSource] = useState({
-    start: g_currentMonth_start,
-    end: g_currentMonth_end
+    start: g_currentMonth_range.start,
+    end: g_currentMonth_range.end
   });
 
-  // 默认数据（默认显示近八周的数据）
+  //  默认显示本月数据（1号-31号）
   const showSourceDefaultData = async () => {
-
-    // 默认显示本月数据（1号-31号）
-    const range = {
-      start: g_currentMonth_start,
-      end: g_currentMonth_end
-    };
-    const datas: any = await querySourceData(gqlClient, range);
+    const datas: any = await queryFrontData(gqlClient, g_currentMonth_range);
     gridApiForFront.current?.setRowData(datas);
   };
 
@@ -272,7 +261,7 @@ const FrontTableList: React.FC<any> = () => {
       end: dateString[1]
     };
 
-    const datas: any = await querySourceData(gqlClient, range);
+    const datas: any = await queryFrontData(gqlClient, range);
     gridApiForFront.current?.setRowData(datas);
 
   };
@@ -282,7 +271,7 @@ const FrontTableList: React.FC<any> = () => {
   const [selectedFiled, setSelectedFiled] = useState(['']);
   const nessField = ['NO.', '姓名'];
   const unNessField = ['Bug解决时长(H)', 'Bug数量', '任务燃尽图', '初始需求数', '初始需求完成数', '追加需求数', '追加需求完成数',
-    '请求数', '请求平均停留时长', '交付需求数', '完成任务数', '修复Bug数','进行中任务数','代码提交次数','代码新增行数'];
+    '请求数', '请求平均停留时长', '交付需求数', '完成任务数', '修复Bug数', '进行中任务数', '代码提交次数', '代码新增行数'];
 
 // 弹出字段显示层
   const showFieldsModal = () => {
@@ -350,7 +339,7 @@ const FrontTableList: React.FC<any> = () => {
             <Button type="text" style={{marginLeft: "20px", color: 'black'}}
                     icon={<LogoutOutlined/>} size={'small'} onClick={showSourceDefaultData}>
               默认：</Button>
-            <label style={{marginLeft: "-10px", color: 'black'}}> 默认数据</label>
+            <label style={{marginLeft: "-10px", color: 'black'}}> 默认1个月</label>
 
             <Button type="text" icon={<SettingOutlined/>} size={'large'} onClick={showFieldsModal}
                     style={{float: "right", marginTop: 5}}> </Button>

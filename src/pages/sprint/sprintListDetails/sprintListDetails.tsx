@@ -316,7 +316,7 @@ const getColums = (prjNames: any) => {
   ];
 
   if (prjNames === "多组织阻塞bug跟踪") {
-    oraFields.splice(10, 0, {
+    oraFields.splice(11, 0, {
       headerName: '创建时间',
       field: 'openedAt',
       minWidth: 150,
@@ -324,7 +324,7 @@ const getColums = (prjNames: any) => {
       suppressMenu: false
     });
 
-    oraFields.splice(11, 0, {
+    oraFields.splice(12, 0, {
       headerName: '解决时间',
       field: 'resolvedAt',
       minWidth: 150,

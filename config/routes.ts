@@ -344,6 +344,7 @@ export default [
         name: '数据分析',
         icon: 'table',
         path: '/kpi/analysis',
+        hideInMenu: true,
         access: 'sysAdmin',
         routes: [
           {

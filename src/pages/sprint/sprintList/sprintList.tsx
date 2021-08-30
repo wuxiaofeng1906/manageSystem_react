@@ -10,7 +10,7 @@ import {GqlClient, useGqlClient} from '@/hooks';
 import moment from 'moment';
 import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col} from 'antd';
 import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone, LogoutOutlined} from '@ant-design/icons';
-import {getRecentMonth, formatMomentTime} from '@/publicMethods/timeMethods';
+import {formatMomentTime} from '@/publicMethods/timeMethods';
 import {getHeight} from '@/publicMethods/pageSet';
 import axios from 'axios';
 import {history} from 'umi';

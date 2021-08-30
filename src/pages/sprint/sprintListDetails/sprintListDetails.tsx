@@ -316,6 +316,14 @@ const getColums = (prjNames: any) => {
   ];
 
   if (prjNames === "多组织阻塞bug跟踪") {
+    oraFields.splice(10, 0, {
+      headerName: '创建时间',
+      field: 'openedAt',
+      minWidth: 150,
+      cellRenderer: timeForLineThrough,
+      suppressMenu: false
+    });
+
     oraFields.splice(11, 0, {
       headerName: '解决时间',
       field: 'resolvedAt',
@@ -473,6 +481,7 @@ const changeBaseLinePosition = (data: any) => {
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any) => {
 
+  debugger;
   // baseline
   const {data} = await client.query(`
       {
@@ -519,6 +528,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             baseline
             resolvedAt
             fromBug
+            openedAt
           }
       }
   `);
@@ -2165,7 +2175,7 @@ const SprintList: React.FC<any> = () => {
   const [isFieldModalVisible, setFieldModalVisible] = useState(false);
   const [selectedFiled, setSelectedFiled] = useState(['']);
   const nessField = ['选择', '类型', '编号'];
-  const unNessField = ['阶段', '测试', '标题内容', '解决时间', '严重等级', '截止日期', '模块', '状态', '已提测', '发布环境',
+  const unNessField = ['阶段', '测试', '标题内容','创建时间', '解决时间', '严重等级', '截止日期', '模块', '状态', '已提测', '发布环境',
     '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', '是否可热更', '是否有数据升级',
     '是否有接口升级', '是否有预置数据', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人'];
 
@@ -3519,6 +3529,9 @@ const SprintList: React.FC<any> = () => {
                 </Col>
                 <Col span={4}>
                   <Checkbox value="是否需要测试验证">是否需要测试验证</Checkbox>
+                </Col>
+                <Col span={4}>
+                  <Checkbox value="创建时间">创建时间</Checkbox>
                 </Col>
                 <Col span={4}>
                   <Checkbox value="解决时间">解决时间</Checkbox>

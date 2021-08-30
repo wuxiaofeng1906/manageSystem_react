@@ -26,7 +26,7 @@ const {Option} = Select;
 const defalutCondition: any = {
   projectName: '',
   projectType: [],
-  dateRange: getRecentMonth(),
+  dateRange: {start: "", end: ""},
   projectStatus: ['wait', 'doing', 'suspended'],
 };
 
@@ -247,7 +247,7 @@ const SprintList: React.FC<any> = () => {
   const [choicedCondition, setQueryCondition] = useState({
     projectName: '',
     projectType: [],
-    dateRange: getRecentMonth(),
+    dateRange: {start: "", end: ""},
     projectStatus: ['wait', 'doing', 'suspended']
   });
   /* region  表格相关事件 */
@@ -339,7 +339,7 @@ const SprintList: React.FC<any> = () => {
     setQueryCondition({
       projectName: '',
       projectType: [],
-      dateRange: getRecentMonth(),
+      dateRange: {start: "", end: ""},
       projectStatus: ['wait', 'doing', 'suspended'],
     });
     const datas: any = await queryDevelopViews(gqlClient, defalutCondition);
@@ -883,7 +883,7 @@ const SprintList: React.FC<any> = () => {
         <Button type="text" style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}
                 icon={<LogoutOutlined/>} size={'large'} onClick={showDefalultValue}>
           默认：</Button>
-        <label style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}> 近2个月未关闭项目</label>
+        <label style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}> 未关闭项目</label>
         {/* <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}> 近1月未关闭的 </Button> */}
         <Button type="text"
                 style={{color: 'black', float: 'right', display: judgeAuthority("删除项目") === true ? "inline" : "none"}}

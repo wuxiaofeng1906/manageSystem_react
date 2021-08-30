@@ -481,7 +481,6 @@ const changeBaseLinePosition = (data: any) => {
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any) => {
 
-  debugger;
   // baseline
   const {data} = await client.query(`
       {

@@ -126,7 +126,7 @@ const SprintList: React.FC<any> = () => {
       },
       {
         headerName: 'NO.',
-        maxWidth: 60,
+        maxWidth: 70,
         filter: false,
         cellRenderer: (params: any) => {
           return Number(params.node.id) + 1;

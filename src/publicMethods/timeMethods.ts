@@ -298,6 +298,9 @@ const getWeekStartAndEndTimeByEndtime = (end_time: string) => {
   return range;
 };
 
+const getDayTimeForWeek = () => {
+
+};
 export {
   getWeeksRange,
   getMonthWeek,
@@ -308,5 +311,6 @@ export {
   getParamsByType,
   getCurrentQuarterTime,
   getWeekStartAndEndTime,
-  getWeekStartAndEndTimeByEndtime
+  getWeekStartAndEndTimeByEndtime,
+  getDayTimeForWeek
 };

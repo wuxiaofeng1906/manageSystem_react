@@ -13,6 +13,7 @@ import {getHeight} from '@/publicMethods/pageSet';
 import moment from "moment";
 import {useRequest} from "ahooks";
 import dayjs from 'dayjs';
+import {getDayTimeForWeek} from '@/publicMethods/timeMethods';
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
@@ -30,45 +31,64 @@ const cellFormat = (params: any) => {
   return 0;
 };
 
+
 // 定义列名
 const getSourceColums = () => {
-  // 定义的原始字段
-  const oraFields: any = [
+  // 定义基础字段
+  const Fields: any = [
     {
-      headerName: '创建日期',
-      field: 'finiStory',
-      minWidth: 105,
-      pinned: 'left',
-    },
-    {
-      headerName: '新增',
-      field: 'finiStory',
-      minWidth: 80,
-      pinned: 'left',
-    },
-    {
-      headerName: '状态',
-      field: 'finiStory',
-      minWidth: 80,
-      pinned: 'left',
-    },
-    {
-      headerName: '级别',
-      field: 'finiStory',
-      minWidth: 80,
-      pinned: 'left',
-    },
-    {
-      headerName: '初始',
-      field: 'finiStory',
-      minWidth: 80,
-      pinned: 'left',
+      headerName: "",
+      children: [{
+        headerName: '创建日期',
+        field: 'finiStory',
+        minWidth: 105,
+        pinned: 'left',
+      },
+        {
+          headerName: '新增',
+          field: 'finiStory',
+          minWidth: 63,
+          pinned: 'left',
+        },
+        {
+          headerName: '状态',
+          field: 'finiStory',
+          minWidth: 63,
+          pinned: 'left',
+        },
+        {
+          headerName: '级别',
+          field: 'finiStory',
+          minWidth: 80,
+          pinned: 'left',
+        },
+        {
+          headerName: '初始',
+          field: 'finiStory',
+          minWidth: 63,
+          pinned: 'left',
+        }]
     }
-
   ];
+  // const monday = dayjs().startOf('week').add(1, 'day');
 
+  for (let index = 0; index < 7; index += 1) {
+    const current = dayjs().subtract(index, 'day');
+    Fields.push({
+      headerName: current.format("MM月DD日"),
+      children: [{
+        headerName: `变化`,
+        field: `${current.format("MMDD")}变化`,
+        minWidth: 63,
+      }, {
+        headerName: `余量`,
+        field: `${current.format("MMDD")}余量`,
+        minWidth: 63,
+      }]
+    });
+  }
 
-  return oraFields;
+  return Fields;
 };
 
 // 公共查询方法
@@ -106,8 +126,10 @@ const GetSprintProject = () => {
 
 const FrontTableList: React.FC<any> = () => {
   const g_currentMonth_range = {
-    start: dayjs().startOf('week').format("YYYY-MM-DD"),
-    end: dayjs().endOf('week').format("YYYY-MM-DD")
+    // start: dayjs().startOf('week').add(1,'day').format("YYYY-MM-DD"),
+    // end: dayjs().startOf('week').subtract(5,'day').format("YYYY-MM-DD")
+    start: dayjs().format("YYYY-MM-DD"),
+    end: dayjs().subtract(6,'day').format("YYYY-MM-DD")
   };
 
   const gqlClient = useGqlClient();
@@ -169,6 +191,7 @@ const FrontTableList: React.FC<any> = () => {
 
   // 项目名称选择事件
   const prjNameChanged = async (value: any, params: any) => {
+    console.log("params", params);
 
     const range = {
       prjNames: value,

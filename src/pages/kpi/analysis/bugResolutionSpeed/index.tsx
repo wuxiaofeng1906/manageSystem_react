@@ -13,7 +13,6 @@ import {getHeight} from '@/publicMethods/pageSet';
 import moment from "moment";
 import {useRequest} from "ahooks";
 import dayjs from 'dayjs';
-import {getDayTimeForWeek} from '@/publicMethods/timeMethods';
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;

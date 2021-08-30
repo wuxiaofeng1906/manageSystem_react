@@ -249,6 +249,10 @@ const FrontTableList: React.FC<any> = () => {
 
   //  默认显示本月数据（1号-31号）
   const showSourceDefaultData = async () => {
+    setQueryConditionForSource({
+      start: g_currentMonth_range.start,
+      end: g_currentMonth_range.end
+    });
     const datas: any = await queryFrontData(gqlClient, g_currentMonth_range);
     gridApiForFront.current?.setRowData(datas);
   };

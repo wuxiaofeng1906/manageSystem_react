@@ -344,7 +344,7 @@ export default [
         name: '数据分析',
         icon: 'table',
         path: '/kpi/analysis',
-        hideInMenu: true,
+        // hideInMenu: true,
         access: 'sysAdmin',
         routes: [
           {
@@ -358,6 +358,12 @@ export default [
             icon: 'table',
             path: 'front_dashboard',
             component: './kpi/analysis/front_dashboard',
+          },
+          {
+            name: 'Bug解决速能',
+            icon: 'table',
+            path: 'bugResolutionSpeed',
+            component: './kpi/analysis/bugResolutionSpeed',
           },
         ],
       },

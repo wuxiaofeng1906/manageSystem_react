@@ -1,6 +1,7 @@
 import React, {useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {AgGridReact} from 'ag-grid-react';
+import './style.css';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
@@ -13,6 +14,7 @@ import {getHeight} from '@/publicMethods/pageSet';
 import moment from "moment";
 import {useRequest} from "ahooks";
 import dayjs from 'dayjs';
+
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
@@ -37,33 +39,68 @@ const getSourceColums = () => {
   const Fields: any = [
     {
       headerName: "",
-      children: [{
-        headerName: '创建日期',
-        field: 'finiStory',
-        minWidth: 105,
-        pinned: 'left',
-      },
+      children: [
+        {
+          headerName: '创建日期',
+          field: 'createAt',
+          minWidth: 110,
+          pinned: 'left',
+          rowSpan: (params: any) => {
+
+            if (params.data.createAt !== "") {
+              return 6;
+            }
+            return 1;
+
+          },
+          cellClassRules: {
+            'cell-span': "value !== null"
+          }
+        },
         {
           headerName: '新增',
-          field: 'finiStory',
+          field: 'newAdd',
           minWidth: 63,
           pinned: 'left',
+          rowSpan: (params: any) => {
+
+            if (params.data.createAt !=="") {
+              return 6;
+            }
+            return 1;
+
+          },
+          cellClassRules: {
+            'cell-span': "value !== null"
+          }
         },
         {
           headerName: '状态',
-          field: 'finiStory',
-          minWidth: 63,
+          field: 'status',
+          minWidth: 80,
           pinned: 'left',
+          rowSpan: (params: any) => {
+
+            if (params.data.status === '激活') {
+              return 4;
+            }
+            return 1;
+
+          },
+          cellClassRules: {
+            'cell-span': "value === '激活'"
+          }
+
         },
         {
           headerName: '级别',
-          field: 'finiStory',
+          field: 'pri',
           minWidth: 80,
           pinned: 'left',
         },
         {
           headerName: '初始',
-          field: 'finiStory',
+          field: 'orain',
           minWidth: 63,
           pinned: 'left',
         }]
@@ -128,7 +165,7 @@ const FrontTableList: React.FC<any> = () => {
     // start: dayjs().startOf('week').add(1,'day').format("YYYY-MM-DD"),
     // end: dayjs().startOf('week').subtract(5,'day').format("YYYY-MM-DD")
     start: dayjs().format("YYYY-MM-DD"),
-    end: dayjs().subtract(6,'day').format("YYYY-MM-DD")
+    end: dayjs().subtract(6, 'day').format("YYYY-MM-DD")
   };
 
   const gqlClient = useGqlClient();
@@ -204,6 +241,312 @@ const FrontTableList: React.FC<any> = () => {
   };
 
 
+  const testData = [
+    {
+      createAt: "2021-08-31",
+      newAdd: 100,
+      status: "激活",
+      pri: "P0",
+      orain: "0"
+
+    },
+    {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: "P1",
+      orain: "0"
+
+    },
+    {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: "P2",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: ">=P3",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "已解决",
+      pri: ">=P0",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "已关闭",
+      pri: ">=P0",
+      orain: "0"
+    },
+    {
+      createAt: "2021-08-30",
+      newAdd: 100,
+      status: "激活",
+      pri: "P0",
+      orain: "0"
+
+    },
+    {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: "P1",
+      orain: "0"
+
+    },
+    {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: "P2",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: ">=P3",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "已解决",
+      pri: ">=P0",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "已关闭",
+      pri: ">=P0",
+      orain: "0"
+    },  {
+      createAt: "2021-08-29",
+      newAdd: 100,
+      status: "激活",
+      pri: "P0",
+      orain: "0"
+
+    },
+    {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: "P1",
+      orain: "0"
+
+    },
+    {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: "P2",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: ">=P3",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "已解决",
+      pri: ">=P0",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "已关闭",
+      pri: ">=P0",
+      orain: "0"
+    },
+    {
+      createAt: "2021-08-28",
+      newAdd: 100,
+      status: "激活",
+      pri: "P0",
+      orain: "0"
+
+    },
+    {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: "P1",
+      orain: "0"
+
+    },
+    {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: "P2",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: ">=P3",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "已解决",
+      pri: ">=P0",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "已关闭",
+      pri: ">=P0",
+      orain: "0"
+    },  {
+      createAt: "2021-08-27",
+      newAdd: 100,
+      status: "激活",
+      pri: "P0",
+      orain: "0"
+
+    },
+    {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: "P1",
+      orain: "0"
+
+    },
+    {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: "P2",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: ">=P3",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "已解决",
+      pri: ">=P0",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "已关闭",
+      pri: ">=P0",
+      orain: "0"
+    },  {
+      createAt: "2021-08-26",
+      newAdd: 100,
+      status: "激活",
+      pri: "P0",
+      orain: "0"
+
+    },
+    {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: "P1",
+      orain: "0"
+
+    },
+    {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: "P2",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: ">=P3",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "已解决",
+      pri: ">=P0",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "已关闭",
+      pri: ">=P0",
+      orain: "0"
+    },  {
+      createAt: "2021-08-25",
+      newAdd: 100,
+      status: "激活",
+      pri: "P0",
+      orain: "0"
+
+    },
+    {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: "P1",
+      orain: "0"
+
+    },
+    {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: "P2",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "",
+      pri: ">=P3",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "已解决",
+      pri: ">=P0",
+      orain: "0"
+
+    }, {
+      createAt: "",
+      newAdd: 100,
+      status: "已关闭",
+      pri: ">=P0",
+      orain: "0"
+    },
+  ]
   return (
     <PageContainer>
 
@@ -239,27 +582,20 @@ const FrontTableList: React.FC<any> = () => {
         <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: 10}}>
           <AgGridReact
             columnDefs={getSourceColums()} // 定义列
-            rowData={data} // 数据绑定
+            rowData={testData} // 数据绑定
             defaultColDef={{
               resizable: true,
               sortable: true,
               filter: true,
               flex: 1,
-              cellStyle: {"line-height": "28px"},
+              cellStyle: {"line-height": "28px","border-left":"1px solid lightgrey"},
               suppressMenu: true,
             }}
-            autoGroupColumnDef={{
-              minWidth: 250,
-              // sort: 'asc'
-            }}
-            rowSelection={'multiple'} // 设置多行选中
-            groupDefaultExpanded={9} // 展开分组
-            suppressAggFuncInHeader={true} // 不显示标题聚合函数的标识
             rowHeight={30}
             headerHeight={35}
-
+            suppressRowTransform={true}
             onGridReady={onSourceGridReady}
-            suppressScrollOnNewData={false}
+
           >
 
           </AgGridReact>

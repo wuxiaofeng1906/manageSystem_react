@@ -20,21 +20,22 @@ const {RangePicker} = DatePicker;
 const {Option} = Select;
 
 // 格式化单元格内容
-const cellFormat = (params: any) => {
-
-  if (Number(params.value)) {
-    const numbers = params.value.toString();
-    if (numbers.indexOf(".") > -1) { // 判断有无小数点
-      return Number(params.value).toFixed(2);
-    }
-    return Number(params.value);
-  }
-  return 0;
-};
+// const cellFormat = (params: any) => {
+//
+//   if (Number(params.value)) {
+//     const numbers = params.value.toString();
+//     if (numbers.indexOf(".") > -1) { // 判断有无小数点
+//       return Number(params.value).toFixed(2);
+//     }
+//     return Number(params.value);
+//   }
+//   return 0;
+// };
 
 
 // 定义列名
-const getSourceColums = () => {
+const getSourceColums = (starttime: any, endTime: any) => {
+  debugger;
   // 定义基础字段
   const Fields: any = [
     {
@@ -123,8 +124,11 @@ const getSourceColums = () => {
     }
   ];
 
-  for (let index = 6; index >= 0; index -= 1) {
-    const current = dayjs().subtract(index, 'day');
+  const dayDiff = Number(dayjs(endTime).diff(dayjs(starttime), 'day')) + 1;
+
+  for (let index = 0; index < dayDiff; index += 1) {
+
+    const current = dayjs(starttime).add(index, 'day');
     Fields.push({
       headerName: current.format("MM月DD日"),
       children: [{
@@ -224,6 +228,7 @@ const alaysisData = (data: any) => {
 };
 // 公共查询方法
 const queryFrontData = async (client: GqlClient<object>, params: any) => {
+  debugger;
   let conditionStr = `start:"${params.start}", end:"${params.end}"`;
 
   if (params.projects.length > 0) {
@@ -329,11 +334,17 @@ const FrontTableList: React.FC<any> = () => {
       end: g_currentMonth_range.end,
       showEnd: g_currentMonth_range.showEnd
     });
+
+    // 获取动态列名
+    const cloumnName = getSourceColums(g_currentMonth_range.start, g_currentMonth_range.end);
+    gridApiForFront.current?.setColumnDefs(cloumnName);
+
     const datas: any = await queryFrontData(gqlClient, {
       projects: [],
       start: g_currentMonth_range.start,
       end: g_currentMonth_range.end
     });
+
     gridApiForFront.current?.setRowData(datas);
   };
 
@@ -352,6 +363,9 @@ const FrontTableList: React.FC<any> = () => {
       start: dateString[0],
       end: dayjs(dateString[1]).add(1, 'day').format("YYYY-MM-DD"),
     };
+
+    const cloumnName = getSourceColums(dateString[0], dateString[1]);
+    gridApiForFront.current?.setColumnDefs(cloumnName);
 
     const datas: any = await queryFrontData(gqlClient, range);
     gridApiForFront.current?.setRowData(datas);
@@ -715,7 +729,7 @@ const FrontTableList: React.FC<any> = () => {
         {/* 数据表格 */}
         <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: 10}}>
           <AgGridReact
-            columnDefs={getSourceColums()} // 定义列
+            columnDefs={getSourceColums(g_currentMonth_range.start, g_currentMonth_range.showEnd)} // 定义列
             rowData={data} // 数据绑定
             defaultColDef={{
               resizable: true,

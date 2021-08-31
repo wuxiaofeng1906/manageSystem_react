@@ -375,6 +375,10 @@ const CodeTableList: React.FC<any> = () => {
       rowSpan: rowSpans,
       cellClassRules: {
         'cell-span': "value !== undefined"
+      },
+      cellRenderer: (params: any) => {
+        return `<div style="margin-top: 25px">${params.value} </div>`;
+
       }
     },
     {
@@ -384,6 +388,10 @@ const CodeTableList: React.FC<any> = () => {
       rowSpan: rowSpans,
       cellClassRules: {
         'cell-span': "value !== undefined"
+      },
+      cellRenderer: (params: any) => {
+        return `<div style="margin-top: 25px">${params.value} </div>`;
+
       }
     },
     {

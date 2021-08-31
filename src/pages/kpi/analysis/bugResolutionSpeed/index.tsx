@@ -55,6 +55,10 @@ const getSourceColums = () => {
           },
           cellClassRules: {
             'cell-span': "value !== null"
+          },
+          cellRenderer: (params: any) => {
+            return `<div style="margin-top: 75px">${params.value} </div>`;
+
           }
         },
         {
@@ -64,7 +68,7 @@ const getSourceColums = () => {
           pinned: 'left',
           rowSpan: (params: any) => {
 
-            if (params.data.createAt !=="") {
+            if (params.data.createAt !== "") {
               return 6;
             }
             return 1;
@@ -72,6 +76,10 @@ const getSourceColums = () => {
           },
           cellClassRules: {
             'cell-span': "value !== null"
+          },
+          cellRenderer: (params: any) => {
+            return `<div style="margin-top: 75px">${params.value} </div>`;
+
           }
         },
         {
@@ -89,6 +97,14 @@ const getSourceColums = () => {
           },
           cellClassRules: {
             'cell-span': "value === '激活'"
+          },
+          cellRenderer: (params: any) => {
+            if (params.value === "激活") {
+              return `<div style="margin-top: 50px">${params.value} </div>`;
+
+            }
+            return `<div>${params.value} </div>`;
+
           }
 
         },
@@ -329,7 +345,7 @@ const FrontTableList: React.FC<any> = () => {
       status: "已关闭",
       pri: ">=P0",
       orain: "0"
-    },  {
+    }, {
       createAt: "2021-08-29",
       newAdd: 100,
       status: "激活",
@@ -416,7 +432,7 @@ const FrontTableList: React.FC<any> = () => {
       status: "已关闭",
       pri: ">=P0",
       orain: "0"
-    },  {
+    }, {
       createAt: "2021-08-27",
       newAdd: 100,
       status: "激活",
@@ -459,7 +475,7 @@ const FrontTableList: React.FC<any> = () => {
       status: "已关闭",
       pri: ">=P0",
       orain: "0"
-    },  {
+    }, {
       createAt: "2021-08-26",
       newAdd: 100,
       status: "激活",
@@ -502,7 +518,7 @@ const FrontTableList: React.FC<any> = () => {
       status: "已关闭",
       pri: ">=P0",
       orain: "0"
-    },  {
+    }, {
       createAt: "2021-08-25",
       newAdd: 100,
       status: "激活",
@@ -588,7 +604,7 @@ const FrontTableList: React.FC<any> = () => {
               sortable: true,
               filter: true,
               flex: 1,
-              cellStyle: {"line-height": "28px","border-left":"1px solid lightgrey"},
+              cellStyle: {"line-height": "28px", "border-left": "1px solid lightgrey"},
               suppressMenu: true,
             }}
             rowHeight={30}

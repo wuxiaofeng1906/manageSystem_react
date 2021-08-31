@@ -193,29 +193,36 @@ const alaysisData = (data: any) => {
       details.forEach((day_datas: any) => {
         const days = day_datas.date;
 
+
         // 激活-p0行的数据
-        baseData[0][`${days}变化`] = day_datas.data.p0;
-        baseData[0][`${days}余量`] = day_datas.data.p0;
+        const P0 = day_datas.data.p0;
+        baseData[0][`${days}变化`] = P0[0].toString();
+        baseData[0][`${days}余量`] = P0[1].toString();
 
         // 激活-p1行的数据
-        baseData[1][`${days}变化`] = day_datas.data.p1;
-        baseData[1][`${days}余量`] = day_datas.data.p1;
+        const P1 = day_datas.data.p1;
+        baseData[1][`${days}变化`] = P1[0].toString();
+        baseData[1][`${days}余量`] = P1[1].toString();
 
         // 激活-p2行的数据
-        baseData[2][`${days}变化`] = day_datas.data.p2;
-        baseData[2][`${days}余量`] = day_datas.data.p2;
+        const P2 = day_datas.data.p2;
+        baseData[2][`${days}变化`] = P2[0].toString();
+        baseData[2][`${days}余量`] = P2[1].toString();
 
         // 激活-p3行的数据
-        baseData[3][`${days}变化`] = day_datas.data.p3;
-        baseData[3][`${days}余量`] = day_datas.data.p3;
+        const P3 = day_datas.data.p3;
+        baseData[3][`${days}变化`] = P3[0].toString();
+        baseData[3][`${days}余量`] = P3[1].toString();
 
         // 已解决  >=P0行的数据
-        baseData[4][`${days}变化`] = day_datas.data.resolved;
-        baseData[4][`${days}余量`] = day_datas.data.resolved;
+        const {resolved} = day_datas.data;
+        baseData[4][`${days}变化`] = resolved[0].toString();
+        baseData[4][`${days}余量`] = resolved[1].toString();
 
         // 已关闭 >=P0 行的数据
-        baseData[5][`${days}变化`] = day_datas.data.closed;
-        baseData[5][`${days}余量`] = day_datas.data.closed;
+        const {closed} = day_datas.data;
+        baseData[5][`${days}变化`] = closed[0].toString();
+        baseData[5][`${days}余量`] = closed[1].toString();
 
       });
       results = results.concat(baseData);
@@ -228,7 +235,7 @@ const alaysisData = (data: any) => {
 };
 // 公共查询方法
 const queryFrontData = async (client: GqlClient<object>, params: any) => {
-  debugger;
+
   let conditionStr = `start:"${params.start}", end:"${params.end}"`;
 
   if (params.projects.length > 0) {
@@ -733,7 +740,7 @@ const FrontTableList: React.FC<any> = () => {
             rowData={data} // 数据绑定
             defaultColDef={{
               resizable: true,
-              sortable: true,
+              sortable: false,
               filter: true,
               flex: 1,
               cellStyle: {"line-height": "28px", "border-left": "1px solid lightgrey"},

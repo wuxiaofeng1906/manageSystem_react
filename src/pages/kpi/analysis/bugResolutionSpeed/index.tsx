@@ -144,88 +144,95 @@ const getSourceColums = () => {
 
 const alaysisData = (data: any) => {
   let results: any = [];
+  if (data !== null) {
+    data.forEach((eve_datas: any) => {
 
-  data.forEach((eve_datas: any) => {
+      const baseData = [{
+        createAt: dayjs(eve_datas.date).format("MM月DD日"),
+        newAdd: eve_datas.init.total,
+        status: "激活",
+        level: "P0",
+        initial: eve_datas.init.p0
+      }, {
+        createAt: "",
+        newAdd: "",
+        status: "",
+        level: "P1",
+        initial: eve_datas.init.p1
+      }, {
+        createAt: "",
+        newAdd: "",
+        status: "",
+        level: "P2",
+        initial: eve_datas.init.p2
+      }, {
+        createAt: "",
+        newAdd: "",
+        status: "",
+        level: ">=P3",
+        initial: eve_datas.init.p3
+      }, {
+        createAt: "",
+        newAdd: "",
+        status: "已解决",
+        level: ">=P0",
+        initial: eve_datas.init.resolved
+      }, {
+        createAt: "",
+        newAdd: "",
+        status: "已关闭",
+        level: ">=P0",
+        initial: eve_datas.init.closed
+      }];
 
-    let baseData = [{
-      createAt: dayjs(eve_datas.date).format("MM月DD日"),
-      newAdd: eve_datas.init.total,
-      status: "激活",
-      level: "P0",
-      initial: eve_datas.init.p0
-    }, {
-      createAt: "",
-      newAdd: "",
-      status: "",
-      level: "P1",
-      initial: eve_datas.init.p1
-    }, {
-      createAt: "",
-      newAdd: "",
-      status: "",
-      level: "P2",
-      initial: eve_datas.init.p2
-    }, {
-      createAt: "",
-      newAdd: "",
-      status: "",
-      level: ">=P3",
-      initial: eve_datas.init.p3
-    }, {
-      createAt: "",
-      newAdd: "",
-      status: "已解决",
-      level: ">=P0",
-      initial: eve_datas.init.resolved
-    }, {
-      createAt: "",
-      newAdd: "",
-      status: "已关闭",
-      level: ">=P0",
-      initial: eve_datas.init.closed
-    }];
+      const details = eve_datas.data;
+      details.forEach((day_datas: any) => {
+        const days = day_datas.date;
 
-    const details = eve_datas.data;
-    details.forEach((day_datas: any) => {
-      const days = day_datas.date;
+        // 激活-p0行的数据
+        baseData[0][`${days}变化`] = day_datas.data.p0;
+        baseData[0][`${days}余量`] = day_datas.data.p0;
 
-      // 激活-p0行的数据
-      baseData[0][`${days}变化`] = day_datas.data.p0;
-      baseData[0][`${days}余量`] = day_datas.data.p0;
+        // 激活-p1行的数据
+        baseData[1][`${days}变化`] = day_datas.data.p1;
+        baseData[1][`${days}余量`] = day_datas.data.p1;
 
-      // 激活-p1行的数据
-      baseData[1][`${days}变化`] = day_datas.data.p1;
-      baseData[1][`${days}余量`] = day_datas.data.p1;
+        // 激活-p2行的数据
+        baseData[2][`${days}变化`] = day_datas.data.p2;
+        baseData[2][`${days}余量`] = day_datas.data.p2;
 
-      // 激活-p2行的数据
-      baseData[2][`${days}变化`] = day_datas.data.p2;
-      baseData[2][`${days}余量`] = day_datas.data.p2;
+        // 激活-p3行的数据
+        baseData[3][`${days}变化`] = day_datas.data.p3;
+        baseData[3][`${days}余量`] = day_datas.data.p3;
 
-      // 激活-p3行的数据
-      baseData[3][`${days}变化`] = day_datas.data.p3;
-      baseData[3][`${days}余量`] = day_datas.data.p3;
+        // 已解决  >=P0行的数据
+        baseData[4][`${days}变化`] = day_datas.data.resolved;
+        baseData[4][`${days}余量`] = day_datas.data.resolved;
 
-      // 已解决  >=P0行的数据
-      baseData[4][`${days}变化`] = day_datas.data.resolved;
-      baseData[4][`${days}余量`] = day_datas.data.resolved;
+        // 已关闭 >=P0 行的数据
+        baseData[5][`${days}变化`] = day_datas.data.closed;
+        baseData[5][`${days}余量`] = day_datas.data.closed;
 
-      // 已关闭 >=P0 行的数据
-      baseData[5][`${days}变化`] = day_datas.data.closed;
-      baseData[5][`${days}余量`] = day_datas.data.closed;
-
+      });
+      results = results.concat(baseData);
     });
-    results = results.concat(baseData);
-  });
+  }
 
-  debugger;
+
   return results;
 
 };
 // 公共查询方法
 const queryFrontData = async (client: GqlClient<object>, params: any) => {
+  let conditionStr = `start:"${params.start}", end:"${params.end}"`;
+
+  if (params.projects.length > 0) {
+    const projectArray: any = [];
+    conditionStr = `${conditionStr},projects:${projectArray}`
+  }
 
   const {data} = await client.query(`{
-        moEfficiency(start:"2021-08-25", end:"2021-09-01") {
+        moEfficiency(${conditionStr}) {
           date
           init{
             p0
@@ -284,7 +291,11 @@ const FrontTableList: React.FC<any> = () => {
   };
 
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryFrontData(gqlClient, g_currentMonth_range),);
+  const {data, loading} = useRequest(() => queryFrontData(gqlClient, {
+    projects: [],
+    start: g_currentMonth_range.start,
+    end: g_currentMonth_range.end
+  }));
   const gridApiForFront = useRef<GridApi>();
   const onSourceGridReady = (params: GridReadyEvent) => {
     gridApiForFront.current = params.api;
@@ -318,7 +329,11 @@ const FrontTableList: React.FC<any> = () => {
       end: g_currentMonth_range.end,
       showEnd: g_currentMonth_range.showEnd
     });
-    const datas: any = await queryFrontData(gqlClient, g_currentMonth_range);
+    const datas: any = await queryFrontData(gqlClient, {
+      projects: [],
+      start: g_currentMonth_range.start,
+      end: g_currentMonth_range.end
+    });
     gridApiForFront.current?.setRowData(datas);
   };
 
@@ -328,13 +343,14 @@ const FrontTableList: React.FC<any> = () => {
     setQueryConditionForSource({
       ...choicedCondition,
       start: dateString[0],
-      end: dateString[1]
+      end: dayjs(dateString[1]).add(1, 'day').format("YYYY-MM-DD"),
+      showEnd: dateString[1]
     });
 
     const range = {
-      prjNames: choicedCondition.prjName,
+      projects: choicedCondition.prjName,
       start: dateString[0],
-      end: dateString[1]
+      end: dayjs(dateString[1]).add(1, 'day').format("YYYY-MM-DD"),
     };
 
     const datas: any = await queryFrontData(gqlClient, range);
@@ -344,10 +360,10 @@ const FrontTableList: React.FC<any> = () => {
 
   // 项目名称选择事件
   const prjNameChanged = async (value: any, params: any) => {
-
+    console.log(params);
 
     const range = {
-      prjNames: value,
+      projects: value,
       start: choicedCondition.start,
       end: choicedCondition.end
     };

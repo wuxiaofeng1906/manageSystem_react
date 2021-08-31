@@ -110,20 +110,20 @@ const getSourceColums = () => {
         },
         {
           headerName: '级别',
-          field: 'pri',
+          field: 'level',
           minWidth: 80,
           pinned: 'left',
         },
         {
           headerName: '初始',
-          field: 'orain',
+          field: 'initial',
           minWidth: 63,
           pinned: 'left',
         }]
     }
   ];
 
-  for (let index = 7; index > 0; index -= 1) {
+  for (let index = 6; index >= 0; index -= 1) {
     const current = dayjs().subtract(index, 'day');
     Fields.push({
       headerName: current.format("MM月DD日"),
@@ -142,19 +142,118 @@ const getSourceColums = () => {
   return Fields;
 };
 
+const alaysisData = (data: any) => {
+  let results: any = [];
+
+  data.forEach((eve_datas: any) => {
+
+    let baseData = [{
+      createAt: dayjs(eve_datas.date).format("MM月DD日"),
+      newAdd: eve_datas.init.total,
+      status: "激活",
+      level: "P0",
+      initial: eve_datas.init.p0
+    }, {
+      createAt: "",
+      newAdd: "",
+      status: "",
+      level: "P1",
+      initial: eve_datas.init.p1
+    }, {
+      createAt: "",
+      newAdd: "",
+      status: "",
+      level: "P2",
+      initial: eve_datas.init.p2
+    }, {
+      createAt: "",
+      newAdd: "",
+      status: "",
+      level: ">=P3",
+      initial: eve_datas.init.p3
+    }, {
+      createAt: "",
+      newAdd: "",
+      status: "已解决",
+      level: ">=P0",
+      initial: eve_datas.init.resolved
+    }, {
+      createAt: "",
+      newAdd: "",
+      status: "已关闭",
+      level: ">=P0",
+      initial: eve_datas.init.closed
+    }];
+
+    const details = eve_datas.data;
+    details.forEach((day_datas: any) => {
+      const days = day_datas.date;
+
+      // 激活-p0行的数据
+      baseData[0][`${days}变化`] = day_datas.data.p0;
+      baseData[0][`${days}余量`] = day_datas.data.p0;
+
+      // 激活-p1行的数据
+      baseData[1][`${days}变化`] = day_datas.data.p1;
+      baseData[1][`${days}余量`] = day_datas.data.p1;
+
+      // 激活-p2行的数据
+      baseData[2][`${days}变化`] = day_datas.data.p2;
+      baseData[2][`${days}余量`] = day_datas.data.p2;
+
+      // 激活-p3行的数据
+      baseData[3][`${days}变化`] = day_datas.data.p3;
+      baseData[3][`${days}余量`] = day_datas.data.p3;
+
+      // 已解决  >=P0行的数据
+      baseData[4][`${days}变化`] = day_datas.data.resolved;
+      baseData[4][`${days}余量`] = day_datas.data.resolved;
+
+      // 已关闭 >=P0 行的数据
+      baseData[5][`${days}变化`] = day_datas.data.closed;
+      baseData[5][`${days}余量`] = day_datas.data.closed;
+
+    });
+    results = results.concat(baseData);
+  });
+
+  debugger;
+  return results;
+
+};
 // 公共查询方法
 const queryFrontData = async (client: GqlClient<object>, params: any) => {
 
   const {data} = await client.query(`{
-          dashFront(start:"${params.start}",end:"${params.end}"){
-
+        moEfficiency(start:"2021-08-25", end:"2021-09-01") {
+          date
+          init{
+            p0
+            p1
+            p2
+            p3
+            resolved
+            closed
+            total
           }
+          data{
+            date
+            data{
+              p0
+              p1
+              p2
+              p3
+              resolved
+              closed
+            }
+          }
+        }
 
       }
   `);
 
 
-  return data?.dashFront;
+  return alaysisData(data?.moEfficiency);
 };
 
 const GetSprintProject = () => {
@@ -258,313 +357,314 @@ const FrontTableList: React.FC<any> = () => {
 
   };
 
+  //
+  // const testData = [
+  //   {
+  //     createAt: "2021-08-31",
+  //     newAdd: 100,
+  //     status: "激活",
+  //     pri: "P0",
+  //     orain: "0"
+  //
+  //   },
+  //   {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: "P1",
+  //     orain: "0"
+  //
+  //   },
+  //   {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: "P2",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: ">=P3",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "已解决",
+  //     pri: ">=P0",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "已关闭",
+  //     pri: ">=P0",
+  //     orain: "0"
+  //   },
+  //   {
+  //     createAt: "2021-08-30",
+  //     newAdd: 100,
+  //     status: "激活",
+  //     pri: "P0",
+  //     orain: "0"
+  //
+  //   },
+  //   {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: "P1",
+  //     orain: "0"
+  //
+  //   },
+  //   {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: "P2",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: ">=P3",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "已解决",
+  //     pri: ">=P0",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "已关闭",
+  //     pri: ">=P0",
+  //     orain: "0"
+  //   }, {
+  //     createAt: "2021-08-29",
+  //     newAdd: 100,
+  //     status: "激活",
+  //     pri: "P0",
+  //     orain: "0"
+  //
+  //   },
+  //   {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: "P1",
+  //     orain: "0"
+  //
+  //   },
+  //   {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: "P2",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: ">=P3",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "已解决",
+  //     pri: ">=P0",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "已关闭",
+  //     pri: ">=P0",
+  //     orain: "0"
+  //   },
+  //   {
+  //     createAt: "2021-08-28",
+  //     newAdd: 100,
+  //     status: "激活",
+  //     pri: "P0",
+  //     orain: "0"
+  //
+  //   },
+  //   {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: "P1",
+  //     orain: "0"
+  //
+  //   },
+  //   {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: "P2",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: ">=P3",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "已解决",
+  //     pri: ">=P0",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "已关闭",
+  //     pri: ">=P0",
+  //     orain: "0"
+  //   }, {
+  //     createAt: "2021-08-27",
+  //     newAdd: 100,
+  //     status: "激活",
+  //     pri: "P0",
+  //     orain: "0"
+  //
+  //   },
+  //   {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: "P1",
+  //     orain: "0"
+  //
+  //   },
+  //   {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: "P2",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: ">=P3",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "已解决",
+  //     pri: ">=P0",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "已关闭",
+  //     pri: ">=P0",
+  //     orain: "0"
+  //   }, {
+  //     createAt: "2021-08-26",
+  //     newAdd: 100,
+  //     status: "激活",
+  //     pri: "P0",
+  //     orain: "0"
+  //
+  //   },
+  //   {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: "P1",
+  //     orain: "0"
+  //
+  //   },
+  //   {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: "P2",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: ">=P3",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "已解决",
+  //     pri: ">=P0",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "已关闭",
+  //     pri: ">=P0",
+  //     orain: "0"
+  //   }, {
+  //     createAt: "2021-08-25",
+  //     newAdd: 100,
+  //     status: "激活",
+  //     pri: "P0",
+  //     orain: "0"
+  //
+  //   },
+  //   {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: "P1",
+  //     orain: "0"
+  //
+  //   },
+  //   {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: "P2",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "",
+  //     pri: ">=P3",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "已解决",
+  //     pri: ">=P0",
+  //     orain: "0"
+  //
+  //   }, {
+  //     createAt: "",
+  //     newAdd: 100,
+  //     status: "已关闭",
+  //     pri: ">=P0",
+  //     orain: "0"
+  //   },
+  // ];
 
-  const testData = [
-    {
-      createAt: "2021-08-31",
-      newAdd: 100,
-      status: "激活",
-      pri: "P0",
-      orain: "0"
-
-    },
-    {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: "P1",
-      orain: "0"
-
-    },
-    {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: "P2",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: ">=P3",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "已解决",
-      pri: ">=P0",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "已关闭",
-      pri: ">=P0",
-      orain: "0"
-    },
-    {
-      createAt: "2021-08-30",
-      newAdd: 100,
-      status: "激活",
-      pri: "P0",
-      orain: "0"
-
-    },
-    {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: "P1",
-      orain: "0"
-
-    },
-    {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: "P2",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: ">=P3",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "已解决",
-      pri: ">=P0",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "已关闭",
-      pri: ">=P0",
-      orain: "0"
-    }, {
-      createAt: "2021-08-29",
-      newAdd: 100,
-      status: "激活",
-      pri: "P0",
-      orain: "0"
-
-    },
-    {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: "P1",
-      orain: "0"
-
-    },
-    {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: "P2",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: ">=P3",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "已解决",
-      pri: ">=P0",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "已关闭",
-      pri: ">=P0",
-      orain: "0"
-    },
-    {
-      createAt: "2021-08-28",
-      newAdd: 100,
-      status: "激活",
-      pri: "P0",
-      orain: "0"
-
-    },
-    {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: "P1",
-      orain: "0"
-
-    },
-    {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: "P2",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: ">=P3",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "已解决",
-      pri: ">=P0",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "已关闭",
-      pri: ">=P0",
-      orain: "0"
-    }, {
-      createAt: "2021-08-27",
-      newAdd: 100,
-      status: "激活",
-      pri: "P0",
-      orain: "0"
-
-    },
-    {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: "P1",
-      orain: "0"
-
-    },
-    {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: "P2",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: ">=P3",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "已解决",
-      pri: ">=P0",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "已关闭",
-      pri: ">=P0",
-      orain: "0"
-    }, {
-      createAt: "2021-08-26",
-      newAdd: 100,
-      status: "激活",
-      pri: "P0",
-      orain: "0"
-
-    },
-    {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: "P1",
-      orain: "0"
-
-    },
-    {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: "P2",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: ">=P3",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "已解决",
-      pri: ">=P0",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "已关闭",
-      pri: ">=P0",
-      orain: "0"
-    }, {
-      createAt: "2021-08-25",
-      newAdd: 100,
-      status: "激活",
-      pri: "P0",
-      orain: "0"
-
-    },
-    {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: "P1",
-      orain: "0"
-
-    },
-    {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: "P2",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "",
-      pri: ">=P3",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "已解决",
-      pri: ">=P0",
-      orain: "0"
-
-    }, {
-      createAt: "",
-      newAdd: 100,
-      status: "已关闭",
-      pri: ">=P0",
-      orain: "0"
-    },
-  ]
   return (
     <PageContainer>
 
@@ -600,7 +700,7 @@ const FrontTableList: React.FC<any> = () => {
         <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: 10}}>
           <AgGridReact
             columnDefs={getSourceColums()} // 定义列
-            rowData={testData} // 数据绑定
+            rowData={data} // 数据绑定
             defaultColDef={{
               resizable: true,
               sortable: true,

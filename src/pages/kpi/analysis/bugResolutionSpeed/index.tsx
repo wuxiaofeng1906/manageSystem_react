@@ -122,9 +122,8 @@ const getSourceColums = () => {
         }]
     }
   ];
-  // const monday = dayjs().startOf('week').add(1, 'day');
 
-  for (let index = 0; index < 7; index += 1) {
+  for (let index = 7; index > 0; index -= 1) {
     const current = dayjs().subtract(index, 'day');
     Fields.push({
       headerName: current.format("MM月DD日"),
@@ -180,8 +179,9 @@ const FrontTableList: React.FC<any> = () => {
   const g_currentMonth_range = {
     // start: dayjs().startOf('week').add(1,'day').format("YYYY-MM-DD"),
     // end: dayjs().startOf('week').subtract(5,'day').format("YYYY-MM-DD")
-    start: dayjs().format("YYYY-MM-DD"),
-    end: dayjs().subtract(6, 'day').format("YYYY-MM-DD")
+    start: dayjs().subtract(6, 'day').format("YYYY-MM-DD"),
+    showEnd: dayjs().format("YYYY-MM-DD"),
+    end: dayjs().add(1, 'day').format("YYYY-MM-DD"),
   };
 
   const gqlClient = useGqlClient();
@@ -207,7 +207,8 @@ const FrontTableList: React.FC<any> = () => {
   const [choicedCondition, setQueryConditionForSource] = useState({
     prjName: [],
     start: g_currentMonth_range.start,
-    end: g_currentMonth_range.end
+    end: g_currentMonth_range.end,
+    showEnd:g_currentMonth_range.showEnd
   });
 
   //  默认显示
@@ -215,7 +216,8 @@ const FrontTableList: React.FC<any> = () => {
     setQueryConditionForSource({
       prjName: [],
       start: g_currentMonth_range.start,
-      end: g_currentMonth_range.end
+      end: g_currentMonth_range.end,
+      showEnd:g_currentMonth_range.showEnd
     });
     const datas: any = await queryFrontData(gqlClient, g_currentMonth_range);
     gridApiForFront.current?.setRowData(datas);
@@ -243,7 +245,7 @@ const FrontTableList: React.FC<any> = () => {
 
   // 项目名称选择事件
   const prjNameChanged = async (value: any, params: any) => {
-    console.log("params", params);
+
 
     const range = {
       prjNames: value,
@@ -582,7 +584,7 @@ const FrontTableList: React.FC<any> = () => {
             <RangePicker
               style={{width: '20%', marginTop: 7}} onChange={onSourceTimeSelected}
               value={[choicedCondition.start === "" ? null : moment(choicedCondition.start),
-                choicedCondition.end === "" ? null : moment(choicedCondition.end)]}
+                choicedCondition.end === "" ? null : moment(choicedCondition.showEnd)]}
             />
 
             <Button type="text" style={{marginLeft: "20px", color: 'black'}}

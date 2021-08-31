@@ -8,4 +8,7 @@
 
 }
 
-
+/* 对表格的表头进行渲染 */
+.ag-header-cell-label {
+  color: black;
+}

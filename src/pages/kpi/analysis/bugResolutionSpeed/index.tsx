@@ -62,7 +62,7 @@ const getSourceColums = () => {
           }
         },
         {
-          headerName: '新增',
+          headerName: "新增",
           field: 'newAdd',
           minWidth: 63,
           pinned: 'left',
@@ -129,11 +129,11 @@ const getSourceColums = () => {
       headerName: current.format("MM月DD日"),
       children: [{
         headerName: `变化`,
-        field: `${current.format("MMDD")}变化`,
+        field: `${current.format("YYYYMMDD")}变化`,
         minWidth: 63,
       }, {
         headerName: `余量`,
-        field: `${current.format("MMDD")}余量`,
+        field: `${current.format("YYYYMMDD")}余量`,
         minWidth: 63,
       }]
     });
@@ -208,7 +208,7 @@ const FrontTableList: React.FC<any> = () => {
     prjName: [],
     start: g_currentMonth_range.start,
     end: g_currentMonth_range.end,
-    showEnd:g_currentMonth_range.showEnd
+    showEnd: g_currentMonth_range.showEnd
   });
 
   //  默认显示
@@ -217,7 +217,7 @@ const FrontTableList: React.FC<any> = () => {
       prjName: [],
       start: g_currentMonth_range.start,
       end: g_currentMonth_range.end,
-      showEnd:g_currentMonth_range.showEnd
+      showEnd: g_currentMonth_range.showEnd
     });
     const datas: any = await queryFrontData(gqlClient, g_currentMonth_range);
     gridApiForFront.current?.setRowData(datas);
@@ -608,11 +608,53 @@ const FrontTableList: React.FC<any> = () => {
               flex: 1,
               cellStyle: {"line-height": "28px", "border-left": "1px solid lightgrey"},
               suppressMenu: true,
+              headerComponentParams: (params: any) => {
+
+                const columnName = params.column.colId;
+                const weekday = dayjs(columnName.substring(0, 8)).day();
+
+                // 如果是周六或者周天的话，title要显示成紫色的
+                if (weekday === 0 || weekday === 6) {
+
+                  return {
+                    // menuIcon: 'fa-bars',
+                    template:
+                      '<div class="ag-cell-label-container" role="presentation">' +
+                      '  <span ref="eMenu" class="ag-header-icon ag-header-cell-menu-button"></span>' +
+                      '  <div ref="eLabel" class="ag-header-cell-label" role="presentation">' +
+                      '    <span ref="eSortOrder" class="ag-header-icon ag-sort-order" ></span>' +
+                      '    <span ref="eSortAsc" class="ag-header-icon ag-sort-ascending-icon" ></span>' +
+                      '    <span ref="eSortDesc" class="ag-header-icon ag-sort-descending-icon" ></span>' +
+                      '    <span ref="eSortNone" class="ag-header-icon ag-sort-none-icon" ></span>' +
+                      '      <span style="color: mediumpurple" ref="eText" class="ag-header-cell-text" role="columnheader"></span>' +
+                      '    <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>' +
+                      '  </div>' +
+                      '</div>'
+                  };
+                }
+                return {
+                  // menuIcon: 'fa-bars',
+                  template:
+                    '<div  class="ag-cell-label-container" role="presentation">' +
+                    '  <span ref="eMenu" class="ag-header-icon ag-header-cell-menu-button"></span>' +
+                    '  <div ref="eLabel" class="ag-header-cell-label" role="presentation">' +
+                    '    <span ref="eSortOrder" class="ag-header-icon ag-sort-order" ></span>' +
+                    '    <span ref="eSortAsc" class="ag-header-icon ag-sort-ascending-icon" ></span>' +
+                    '    <span ref="eSortDesc" class="ag-header-icon ag-sort-descending-icon" ></span>' +
+                    '    <span ref="eSortNone" class="ag-header-icon ag-sort-none-icon" ></span>' +
+                    '    <span ref="eText" class="ag-header-cell-text" role="columnheader"></span>' +
+                    '    <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>' +
+                    '  </div>' +
+                    '</div>'
+                };
+              }
+
             }}
             rowHeight={30}
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onSourceGridReady}
+
 
           >
 

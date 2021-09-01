@@ -8,6 +8,11 @@
 
 }
 
+.cell-span-total {
+  background-color: #F8F8F8;
+  border-bottom: 1px solid lightgrey !important;
+}
+
 /* 对表格的表头进行渲染 */
 .ag-header-cell-label {
   color: black;

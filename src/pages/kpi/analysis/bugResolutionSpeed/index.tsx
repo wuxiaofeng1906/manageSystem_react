@@ -15,24 +15,20 @@ import moment from "moment";
 import {useRequest} from "ahooks";
 import dayjs from 'dayjs';
 
-
 const {RangePicker} = DatePicker;
 const {Option} = Select;
 
-// 格式化单元格内容
-// const cellFormat = (params: any) => {
-//
-//   if (Number(params.value)) {
-//     const numbers = params.value.toString();
-//     if (numbers.indexOf(".") > -1) { // 判断有无小数点
-//       return Number(params.value).toFixed(2);
-//     }
-//     return Number(params.value);
-//   }
-//   return 0;
-// };
 
+const ragCellClassRules = {
+  'cell-span-total': (params: any) => {
+    return params.data.createAt === '合计' || params.data.createAt === '合计列';
+  },
 
+  'cell-span': (params: any) => {
+    return params.data.createAt !== '合计';
+  }
+
+};
 // 定义列名
 const getSourceColums = (starttime: any, endTime: any) => {
 
@@ -51,18 +47,15 @@ const getSourceColums = (starttime: any, endTime: any) => {
               return 7;
             }
 
-            if (params.data.createAt !== "") {
+            if (params.data.createAt !== "" && params.data.createAt !== "合计列") {
               return 6;
             }
             return 1;
 
           },
-          cellClassRules: {
-            'cell-span': "value !== null"
-          },
+          cellClassRules: ragCellClassRules,
           cellRenderer: (params: any) => {
             return `<div style="margin-left: -5px;margin-top: 75px ">${params.value} </div>`;
-
           }
         },
         {
@@ -75,18 +68,15 @@ const getSourceColums = (starttime: any, endTime: any) => {
               return 7;
             }
 
-            if (params.data.createAt !== "") {
+            if (params.data.createAt !== "" && params.data.createAt !== "合计列") {
               return 6;
             }
             return 1;
 
           },
-          cellClassRules: {
-            'cell-span': "value !== null"
-          },
+          cellClassRules: ragCellClassRules,
           cellRenderer: (params: any) => {
             return `<div style="margin-top: 75px">${params.value} </div>`;
-
           }
         },
         {
@@ -107,18 +97,13 @@ const getSourceColums = (starttime: any, endTime: any) => {
             return 1;
 
           },
-          cellClassRules: {
-            'cell-span': "value === '激活'"
-          },
+          cellClassRules: ragCellClassRules,
           cellRenderer: (params: any) => {
             if (params.value === "激活") {
               return `<div style="margin-top: 50px">${params.value} </div>`;
-
             }
             return `<div>${params.value} </div>`;
-
           }
-
         },
         {
           headerName: '级别',
@@ -261,37 +246,37 @@ const alaysisTotals = (totalInfo: any) => {
         initial: initTotal.total
       },
       {
-        createAt: '',
+        createAt: '合计列',
         newAdd: "",
         status: "",
         level: "P0",
         initial: initTotal.p0
       }, {
-        createAt: "",
+        createAt: "合计列",
         newAdd: "",
         status: "",
         level: "P1",
         initial: initTotal.p1
       }, {
-        createAt: "",
+        createAt: "合计列",
         newAdd: "",
         status: "",
         level: "P2",
         initial: initTotal.p2
       }, {
-        createAt: "",
+        createAt: "合计列",
         newAdd: "",
         status: "",
         level: ">=P3",
         initial: initTotal.p3
       }, {
-        createAt: "",
+        createAt: "合计列",
         newAdd: "",
         status: "已解决",
         level: ">=P0",
         initial: initTotal.resolved
       }, {
-        createAt: "",
+        createAt: "合计列",
         newAdd: "",
         status: "已关闭",
         level: ">=P0",
@@ -347,7 +332,6 @@ const alaysisTotals = (totalInfo: any) => {
 };
 
 const alaysisData = (sorceData: any) => {
-  debugger;
 
   if (sorceData === null) {
     return {details: [], totals: []};
@@ -588,6 +572,18 @@ const FrontTableList: React.FC<any> = () => {
     };
 
 
+    const changRowColor = (param: any) => {
+
+      if (param.data.createAt === "合计" || param.data.createAt === "合计列") {
+        return {
+          'background-color': '#F8F8F8'     // 颜色可以用英文、rgb以及十六进制
+        }
+      }
+      return {
+        'background-color': 'white'
+      }
+
+    };
     return (
       <PageContainer>
 
@@ -630,7 +626,12 @@ const FrontTableList: React.FC<any> = () => {
                 sortable: false,
                 filter: true,
                 flex: 1,
-                cellStyle: {"line-height": "25px", "border-left": "1px solid lightgrey", "text-align": "center"}, // "background-color":"white"
+                cellStyle: {
+                  "line-height": "25px",
+                  "border-left": "1px solid lightgrey",
+                  // "background-color": "slategray",
+                  "text-align": "center"
+                }, // "background-color":"white"
                 suppressMenu: true,
                 headerComponentParams: (params: any) => {
 
@@ -678,7 +679,7 @@ const FrontTableList: React.FC<any> = () => {
               headerHeight={30}
               suppressRowTransform={true}
               onGridReady={onSourceGridReady}
-
+              getRowStyle={changRowColor}
 
             >
 

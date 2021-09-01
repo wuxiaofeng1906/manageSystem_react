@@ -355,10 +355,17 @@ const alaysisData = (sorceData: any) => {
 
   // 合计信息
   const totalInfo = sorceData.totalize;
+  const TotalResult = alaysisTotals(totalInfo);
   // 明细信息
   const detailInfo = sorceData.custom;
+  const detailsresult = alaysisDetails(detailInfo);
 
-  return {details: alaysisDetails(detailInfo), totals: alaysisTotals(totalInfo)};
+  // 有明细数据才显示合计，没有的话，连合计也不显示
+  if (detailsresult.length > 0) {
+    return {details: detailsresult, totals: TotalResult};
+  }
+
+  return {details: [], totals: []};
 
 };
 // 公共查询方法

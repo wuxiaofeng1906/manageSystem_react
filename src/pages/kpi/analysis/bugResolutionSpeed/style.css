@@ -1,6 +1,6 @@
 .cell-span {
   background-color: white;
-  text-align: center;
+  /*  text-align: center;*/
   /*border-right: 1px solid lightgrey !important;*/
   border-bottom: 1px solid lightgrey !important;
 
@@ -11,4 +11,5 @@
 /* 对表格的表头进行渲染 */
 .ag-header-cell-label {
   color: black;
+  font-size: x-small;
 }

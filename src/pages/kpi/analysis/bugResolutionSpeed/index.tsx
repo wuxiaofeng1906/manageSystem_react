@@ -44,7 +44,7 @@ const getSourceColums = (starttime: any, endTime: any) => {
         {
           headerName: '创建日期',
           field: 'createAt',
-          minWidth: 110,
+          minWidth: 85,
           pinned: 'left',
           rowSpan: (params: any) => {
             if (params.data.createAt === "合计") {
@@ -68,7 +68,7 @@ const getSourceColums = (starttime: any, endTime: any) => {
         {
           headerName: "新增",
           field: 'newAdd',
-          minWidth: 63,
+          minWidth: 60,
           pinned: 'left',
           rowSpan: (params: any) => {
             if (params.data.createAt === "合计") {
@@ -92,8 +92,9 @@ const getSourceColums = (starttime: any, endTime: any) => {
         {
           headerName: '状态',
           field: 'status',
-          minWidth: 80,
+          minWidth: 68,
           pinned: 'left',
+
           rowSpan: (params: any) => {
 
             if (params.data.createAt === "合计" && params.data.status === '激活') {
@@ -122,13 +123,13 @@ const getSourceColums = (starttime: any, endTime: any) => {
         {
           headerName: '级别',
           field: 'level',
-          minWidth: 80,
+          minWidth: 75,
           pinned: 'left',
         },
         {
           headerName: '初始',
           field: 'initial',
-          minWidth: 63,
+          minWidth: 70,
           pinned: 'left',
         }]
     }
@@ -346,6 +347,9 @@ const alaysisTotals = (totalInfo: any) => {
 };
 
 const alaysisData = (sorceData: any) => {
+  if (sorceData === null) {
+    return {details: [], totals: []};
+  }
 
   // 合计信息
   const totalInfo = sorceData.totalize;
@@ -588,7 +592,7 @@ const FrontTableList: React.FC<any> = () => {
               sortable: false,
               filter: true,
               flex: 1,
-              cellStyle: {"line-height": "28px", "border-left": "1px solid lightgrey"},
+              cellStyle: {"line-height": "25px", "border-left": "1px solid lightgrey", "text-align": "center"}, // "background-color":"white"
               suppressMenu: true,
               headerComponentParams: (params: any) => {
 
@@ -632,8 +636,8 @@ const FrontTableList: React.FC<any> = () => {
               }
 
             }}
-            rowHeight={30}
-            headerHeight={35}
+            rowHeight={25}
+            headerHeight={30}
             suppressRowTransform={true}
             onGridReady={onSourceGridReady}
 

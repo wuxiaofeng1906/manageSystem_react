@@ -454,8 +454,7 @@ const FrontTableList: React.FC<any> = () => {
     // start: dayjs().startOf('week').add(1,'day').format("YYYY-MM-DD"),
     // end: dayjs().startOf('week').subtract(5,'day').format("YYYY-MM-DD")
     start: dayjs().subtract(6, 'day').format("YYYY-MM-DD"),
-    showEnd: dayjs().format("YYYY-MM-DD"),
-    end: dayjs().add(1, 'day').format("YYYY-MM-DD"),
+    end: dayjs().format("YYYY-MM-DD"),
   };
 
   const gqlClient = useGqlClient();
@@ -476,9 +475,9 @@ const FrontTableList: React.FC<any> = () => {
   }
 
   // 表格的屏幕大小自适应
-  const [sourceGridHeight, setGridHeight] = useState(Number(getHeight())+10);
+  const [sourceGridHeight, setGridHeight] = useState(Number(getHeight()) + 10);
   window.onresize = function () {
-    setGridHeight(Number(getHeight()) +10);
+    setGridHeight(Number(getHeight()) + 10);
     gridApiForFront.current?.sizeColumnsToFit();
   };
 
@@ -486,7 +485,6 @@ const FrontTableList: React.FC<any> = () => {
     projects: [],
     start: g_currentMonth_range.start,
     end: g_currentMonth_range.end,
-    showEnd: g_currentMonth_range.showEnd
   });
 
   //  点击默认显示按钮触发事件
@@ -495,7 +493,7 @@ const FrontTableList: React.FC<any> = () => {
       projects: [],
       start: g_currentMonth_range.start,
       end: g_currentMonth_range.end,
-      showEnd: g_currentMonth_range.showEnd
+
     });
 
     // 获取动态列名
@@ -523,14 +521,14 @@ const FrontTableList: React.FC<any> = () => {
     setQueryConditionForSource({
       ...choicedCondition,
       start: dateString[0],
-      end: dayjs(dateString[1]).add(1, 'day').format("YYYY-MM-DD"),
-      showEnd: dateString[1]
+      end: dateString[1],
+
     });
 
     const range = {
       projects: choicedCondition.projects,
       start: dateString[0],
-      end: dayjs(dateString[1]).add(1, 'day').format("YYYY-MM-DD"),
+      end: dateString[1],
     };
 
     const cloumnName = getSourceColums(dateString[0], dateString[1]);
@@ -587,9 +585,9 @@ const FrontTableList: React.FC<any> = () => {
 
   };
   return (
-    <PageContainer style={{marginTop:-30}}>
+    <PageContainer style={{marginTop: -30}}>
 
-      <div style={{marginTop:-20}}>
+      <div style={{marginTop: -20}}>
         {/* 查询条件 */}
         <div style={{width: '100%', height: 45, marginTop: 5, backgroundColor: "white"}}>
           <Form.Item>
@@ -605,7 +603,7 @@ const FrontTableList: React.FC<any> = () => {
             <RangePicker
               style={{width: '20%', marginTop: 7}} onChange={onSourceTimeSelected} allowClear={false}
               value={[choicedCondition.start === "" ? null : moment(choicedCondition.start),
-                choicedCondition.showEnd === "" ? null : moment(choicedCondition.showEnd)]}
+                choicedCondition.end === "" ? null : moment(choicedCondition.end)]}
             />
 
             <Button type="text" style={{marginLeft: "20px", color: 'black'}}
@@ -620,7 +618,7 @@ const FrontTableList: React.FC<any> = () => {
         {/* 数据表格 */}
         <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: 5}}>
           <AgGridReact
-            columnDefs={getSourceColums(g_currentMonth_range.start, g_currentMonth_range.showEnd)} // 定义列
+            columnDefs={getSourceColums(g_currentMonth_range.start, g_currentMonth_range.end)} // 定义列
             rowData={data?.details} // 数据绑定
             pinnedTopRowData={data?.totals}
             defaultColDef={{

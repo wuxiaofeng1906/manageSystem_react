@@ -35,7 +35,7 @@ const {Option} = Select;
 
 // 定义列名
 const getSourceColums = (starttime: any, endTime: any) => {
-  debugger;
+
   // 定义基础字段
   const Fields: any = [
     {
@@ -146,10 +146,18 @@ const getSourceColums = (starttime: any, endTime: any) => {
   return Fields;
 };
 
-const alaysisData = (data: any) => {
-  let results: any = [];
-  if (data !== null) {
-    data.forEach((eve_datas: any) => {
+const alaysisData = (sorceData: any) => {
+
+  // 合计信息
+  const totalInfo = sorceData.totalize;
+
+// 明细信息
+  const detailInfo = sorceData.custom;
+
+  debugger;
+  let detailsResult: any = [];
+  if (detailInfo !== null) {
+    detailInfo.forEach((eve_datas: any) => {
 
       const baseData = [{
         createAt: dayjs(eve_datas.date).format("MM月DD日"),
@@ -225,12 +233,11 @@ const alaysisData = (data: any) => {
         baseData[5][`${days}余量`] = closed[1].toString();
 
       });
-      results = results.concat(baseData);
+      detailsResult = detailsResult.concat(baseData);
     });
   }
 
-
-  return results;
+  return {details: detailsResult};
 
 };
 // 公共查询方法
@@ -245,25 +252,49 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
 
   const {data} = await client.query(`{
         moEfficiency(${conditionStr}) {
-          date
-          init{
-            p0
-            p1
-            p2
-            p3
-            resolved
-            closed
-            total
-          }
-          data{
-            date
-            data{
+          totalize{
+            total{
               p0
               p1
               p2
               p3
               resolved
               closed
+              total
+            }
+            data{
+              date
+              data{
+                p0
+                p1
+                p2
+                p3
+              }
+              total
+              surplus
+            }
+          }
+          custom{
+            date
+            init{
+              p0
+              p1
+              p2
+              p3
+              resolved
+              closed
+              total
+            }
+            data{
+              date
+              data{
+                p0
+                p1
+                p2
+                p3
+                resolved
+                closed
+              }
             }
           }
         }
@@ -352,7 +383,7 @@ const FrontTableList: React.FC<any> = () => {
       end: g_currentMonth_range.end
     });
 
-    gridApiForFront.current?.setRowData(datas);
+    gridApiForFront.current?.setRowData(datas.details);
   };
 
   // 时间选择事件： 查询范围：选中的时间中开始时间的周一，和结束时间的周末
@@ -375,7 +406,7 @@ const FrontTableList: React.FC<any> = () => {
     gridApiForFront.current?.setColumnDefs(cloumnName);
 
     const datas: any = await queryFrontData(gqlClient, range);
-    gridApiForFront.current?.setRowData(datas);
+    gridApiForFront.current?.setRowData(datas.details);
 
   };
 
@@ -394,313 +425,6 @@ const FrontTableList: React.FC<any> = () => {
 
   };
 
-  //
-  // const testData = [
-  //   {
-  //     createAt: "2021-08-31",
-  //     newAdd: 100,
-  //     status: "激活",
-  //     pri: "P0",
-  //     orain: "0"
-  //
-  //   },
-  //   {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: "P1",
-  //     orain: "0"
-  //
-  //   },
-  //   {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: "P2",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: ">=P3",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "已解决",
-  //     pri: ">=P0",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "已关闭",
-  //     pri: ">=P0",
-  //     orain: "0"
-  //   },
-  //   {
-  //     createAt: "2021-08-30",
-  //     newAdd: 100,
-  //     status: "激活",
-  //     pri: "P0",
-  //     orain: "0"
-  //
-  //   },
-  //   {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: "P1",
-  //     orain: "0"
-  //
-  //   },
-  //   {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: "P2",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: ">=P3",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "已解决",
-  //     pri: ">=P0",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "已关闭",
-  //     pri: ">=P0",
-  //     orain: "0"
-  //   }, {
-  //     createAt: "2021-08-29",
-  //     newAdd: 100,
-  //     status: "激活",
-  //     pri: "P0",
-  //     orain: "0"
-  //
-  //   },
-  //   {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: "P1",
-  //     orain: "0"
-  //
-  //   },
-  //   {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: "P2",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: ">=P3",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "已解决",
-  //     pri: ">=P0",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "已关闭",
-  //     pri: ">=P0",
-  //     orain: "0"
-  //   },
-  //   {
-  //     createAt: "2021-08-28",
-  //     newAdd: 100,
-  //     status: "激活",
-  //     pri: "P0",
-  //     orain: "0"
-  //
-  //   },
-  //   {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: "P1",
-  //     orain: "0"
-  //
-  //   },
-  //   {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: "P2",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: ">=P3",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "已解决",
-  //     pri: ">=P0",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "已关闭",
-  //     pri: ">=P0",
-  //     orain: "0"
-  //   }, {
-  //     createAt: "2021-08-27",
-  //     newAdd: 100,
-  //     status: "激活",
-  //     pri: "P0",
-  //     orain: "0"
-  //
-  //   },
-  //   {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: "P1",
-  //     orain: "0"
-  //
-  //   },
-  //   {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: "P2",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: ">=P3",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "已解决",
-  //     pri: ">=P0",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "已关闭",
-  //     pri: ">=P0",
-  //     orain: "0"
-  //   }, {
-  //     createAt: "2021-08-26",
-  //     newAdd: 100,
-  //     status: "激活",
-  //     pri: "P0",
-  //     orain: "0"
-  //
-  //   },
-  //   {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: "P1",
-  //     orain: "0"
-  //
-  //   },
-  //   {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: "P2",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: ">=P3",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "已解决",
-  //     pri: ">=P0",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "已关闭",
-  //     pri: ">=P0",
-  //     orain: "0"
-  //   }, {
-  //     createAt: "2021-08-25",
-  //     newAdd: 100,
-  //     status: "激活",
-  //     pri: "P0",
-  //     orain: "0"
-  //
-  //   },
-  //   {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: "P1",
-  //     orain: "0"
-  //
-  //   },
-  //   {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: "P2",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "",
-  //     pri: ">=P3",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "已解决",
-  //     pri: ">=P0",
-  //     orain: "0"
-  //
-  //   }, {
-  //     createAt: "",
-  //     newAdd: 100,
-  //     status: "已关闭",
-  //     pri: ">=P0",
-  //     orain: "0"
-  //   },
-  // ];
 
   return (
     <PageContainer>
@@ -737,7 +461,7 @@ const FrontTableList: React.FC<any> = () => {
         <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: 10}}>
           <AgGridReact
             columnDefs={getSourceColums(g_currentMonth_range.start, g_currentMonth_range.showEnd)} // 定义列
-            rowData={data} // 数据绑定
+            rowData={data?.details} // 数据绑定
             defaultColDef={{
               resizable: true,
               sortable: false,

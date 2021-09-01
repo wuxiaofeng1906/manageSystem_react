@@ -130,7 +130,7 @@ const getSourceColums = (starttime: any, endTime: any) => {
       children: [{
         headerName: `变化`,
         field: `${current.format("YYYYMMDD")}变化`,
-        minWidth: 65,
+        minWidth: 65
       }, {
         headerName: `余量`,
         field: `${current.format("YYYYMMDD")}余量`,
@@ -572,7 +572,6 @@ const FrontTableList: React.FC<any> = () => {
 
 
   const changRowColor = (param: any) => {
-
     if (param.data.createAt === "合计" || param.data.createAt === "合计列") {
       return {
         'background-color': '#F8F8F8'
@@ -581,7 +580,24 @@ const FrontTableList: React.FC<any> = () => {
     return {
       'background-color': 'white'
     }
+  };
 
+  const setCellStyle = (params: any) => {
+    if (params.value === undefined) {
+
+      return {
+        "line-height": "25px",
+        "border-left": "1px solid lightgrey",
+        "text-align": "center",
+        "background-color": '#F8F8F8'
+      }
+    }
+
+    return {
+      "line-height": "25px",
+      "border-left": "1px solid lightgrey",
+      "text-align": "center"
+    }
   };
   return (
     <PageContainer style={{marginTop: -30}}>
@@ -612,7 +628,6 @@ const FrontTableList: React.FC<any> = () => {
 
         </Form.Item>
 
-
         {/* 数据表格 */}
         <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: -18}}>
           <AgGridReact
@@ -624,11 +639,8 @@ const FrontTableList: React.FC<any> = () => {
               sortable: false,
               filter: true,
               flex: 1,
-              cellStyle: {
-                "line-height": "25px",
-                "border-left": "1px solid lightgrey",
-                "text-align": "center"
-              },
+              cellStyle: setCellStyle,
+
               suppressMenu: true,
               headerComponentParams: (params: any) => {
 

@@ -130,11 +130,11 @@ const getSourceColums = (starttime: any, endTime: any) => {
       children: [{
         headerName: `变化`,
         field: `${current.format("YYYYMMDD")}变化`,
-        minWidth: 63,
+        minWidth: 65,
       }, {
         headerName: `余量`,
         field: `${current.format("YYYYMMDD")}余量`,
-        minWidth: 63,
+        minWidth: 65,
       }]
     });
   }
@@ -609,7 +609,7 @@ const FrontTableList: React.FC<any> = () => {
               <Button type="text" style={{marginLeft: "20px", color: 'black'}}
                       icon={<LogoutOutlined/>} size={'small'} onClick={showSourceDefaultData}>
                 默认：</Button>
-              <label style={{marginLeft: "-10px", color: 'black'}}> 默认1周</label>
+              <label style={{marginLeft: "-10px", color: 'black'}}> 最近7天</label>
 
             </Form.Item>
 

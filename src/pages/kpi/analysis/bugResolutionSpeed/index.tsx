@@ -192,7 +192,6 @@ const alaysisDetails = (detailInfo: any) => {
       details.forEach((day_datas: any) => {
         const days = day_datas.date;
 
-
         // 激活-p0行的数据
         const P0 = day_datas.data.p0;
         baseData[0][`${days}变化`] = P0[0].toString();
@@ -589,34 +588,34 @@ const FrontTableList: React.FC<any> = () => {
 
       <div style={{marginTop: -20}}>
         {/* 查询条件 */}
-        <div style={{width: '100%', height: 45, marginTop: 5, backgroundColor: "white"}}>
-          <Form.Item>
+
+          <Form.Item style={{minHeight:"45px", verticalAlign:"middle", backgroundColor:"white"}}>
 
             <label style={{marginLeft: '10px'}}>项目名称：</label>
-            <Select placeholder="请选择" style={{width: '20%'}} mode="multiple" maxTagCount={'responsive'} showSearch
+            <Select placeholder="请选择" style={{minWidth: '250px', width: "auto"}} mode="multiple" showSearch
                     optionFilterProp="children" value={choicedCondition.projects}
                     onChange={prjNameChanged}>
               {GetProjects()}
             </Select>
 
-            <label style={{marginLeft: "20px", marginTop: 7}}>查询周期：</label>
+            <label style={{marginLeft: "10px", marginTop: 7}}>查询周期：</label>
             <RangePicker
               style={{width: '20%', marginTop: 7}} onChange={onSourceTimeSelected} allowClear={false}
               value={[choicedCondition.start === "" ? null : moment(choicedCondition.start),
                 choicedCondition.end === "" ? null : moment(choicedCondition.end)]}
             />
 
-            <Button type="text" style={{marginLeft: "20px", color: 'black'}}
+            <Button type="text" style={{marginLeft: "10px", color: 'black'}}
                     icon={<LogoutOutlined/>} size={'small'} onClick={showSourceDefaultData}>
               默认：</Button>
-            <label style={{marginLeft: "-10px", color: 'black'}}> 最近7天</label>
+            <label style={{ color: 'black'}}> 最近7天</label>
 
           </Form.Item>
 
-        </div>
+
 
         {/* 数据表格 */}
-        <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: 5}}>
+        <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: -18}}>
           <AgGridReact
             columnDefs={getSourceColums(g_currentMonth_range.start, g_currentMonth_range.end)} // 定义列
             rowData={data?.details} // 数据绑定

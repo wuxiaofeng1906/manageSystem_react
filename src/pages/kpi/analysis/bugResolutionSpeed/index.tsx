@@ -194,33 +194,33 @@ const alaysisDetails = (detailInfo: any) => {
 
         // 激活-p0行的数据
         const P0 = day_datas.data.p0;
-        baseData[0][`${days}变化`] = P0[0].toString();
-        baseData[0][`${days}余量`] = P0[1].toString();
+        baseData[0][`${days}变化`] = P0[0] === null ? "0" : P0[0].toString();
+        baseData[0][`${days}余量`] = P0[1] === null ? "0" : P0[1].toString();
 
         // 激活-p1行的数据
         const P1 = day_datas.data.p1;
-        baseData[1][`${days}变化`] = P1[0].toString();
-        baseData[1][`${days}余量`] = P1[1].toString();
+        baseData[1][`${days}变化`] = P1[0] === null ? "0" : P1[0].toString();
+        baseData[1][`${days}余量`] = P1[1] === null ? "0" : P1[1].toString();
 
         // 激活-p2行的数据
         const P2 = day_datas.data.p2;
-        baseData[2][`${days}变化`] = P2[0].toString();
-        baseData[2][`${days}余量`] = P2[1].toString();
+        baseData[2][`${days}变化`] = P2[0] === null ? "0" : P2[0].toString();
+        baseData[2][`${days}余量`] = P2[1] === null ? "0" : P2[1].toString();
 
         // 激活-p3行的数据
         const P3 = day_datas.data.p3;
-        baseData[3][`${days}变化`] = P3[0].toString();
-        baseData[3][`${days}余量`] = P3[1].toString();
+        baseData[3][`${days}变化`] = P3[0] === null ? "0" : P3[0].toString();
+        baseData[3][`${days}余量`] = P3[1] === null ? "0" : P3[1].toString();
 
         // 已解决  >=P0行的数据
         const {resolved} = day_datas.data;
-        baseData[4][`${days}变化`] = resolved[0].toString();
-        baseData[4][`${days}余量`] = resolved[1].toString();
+        baseData[4][`${days}变化`] = resolved[0] === null ? "0" : resolved[0].toString();
+        baseData[4][`${days}余量`] = resolved[1] === null ? "0" : resolved[1].toString();
 
         // 已关闭 >=P0 行的数据
         const {closed} = day_datas.data;
-        baseData[5][`${days}变化`] = closed[0].toString();
-        baseData[5][`${days}余量`] = closed[1].toString();
+        baseData[5][`${days}变化`] = closed[0] === null ? "0" : closed[0].toString();
+        baseData[5][`${days}余量`] = closed[1] === null ? "0" : closed[1].toString();
 
       });
       detailsResult = detailsResult.concat(baseData);
@@ -294,33 +294,33 @@ const alaysisTotals = (totalInfo: any) => {
 
       // 激活-p0行的数据
       const P0 = totalDts.data.p0;
-      baseData[1][`${days}变化`] = P0[0].toString();
-      baseData[1][`${days}余量`] = P0[1].toString();
+      baseData[1][`${days}变化`] = P0[0] === null ? "0" : P0[0].toString();
+      baseData[1][`${days}余量`] = P0[1] === null ? "0" : P0[1].toString();
 
       // 激活-p1行的数据
       const P1 = totalDts.data.p1;
-      baseData[2][`${days}变化`] = P1[0].toString();
-      baseData[2][`${days}余量`] = P1[1].toString();
+      baseData[2][`${days}变化`] = P1[0] === null ? "0" : P1[0].toString();
+      baseData[2][`${days}余量`] = P1[1] === null ? "0" : P1[1].toString();
 
       // 激活-p2行的数据
       const P2 = totalDts.data.p2;
-      baseData[3][`${days}变化`] = P2[0].toString();
-      baseData[3][`${days}余量`] = P2[1].toString();
+      baseData[3][`${days}变化`] = P2[0] === null ? "0" : P2[0].toString();
+      baseData[3][`${days}余量`] = P2[1] === null ? "0" : P2[1].toString();
 
       // 激活-p3行的数据
       const P3 = totalDts.data.p3;
-      baseData[4][`${days}变化`] = P3[0].toString();
-      baseData[4][`${days}余量`] = P3[1].toString();
+      baseData[4][`${days}变化`] = P3[0] === null ? "0" : P3[0].toString();
+      baseData[4][`${days}余量`] = P3[1] === null ? "0" : P3[1].toString();
 
       // 已解决  >=P0行的数据
       const {resolved} = totalDts.data;
-      baseData[5][`${days}变化`] = resolved === null ? 0 : resolved[0].toString();
-      baseData[5][`${days}余量`] = resolved === null ? 0 : resolved[1].toString();
+      baseData[5][`${days}变化`] = resolved[0] === null ? "0" : resolved[0].toString();
+      baseData[5][`${days}余量`] = resolved[1] === null ? "0" : resolved[1].toString();
 
       // 已关闭 >=P0 行的数据
       const {closed} = totalDts.data;
-      baseData[6][`${days}变化`] = closed === null ? 0 : closed[0].toString();
-      baseData[6][`${days}余量`] = closed === null ? 0 : closed[1].toString();
+      baseData[6][`${days}变化`] = closed[0] === null ? "0" : closed[0].toString();
+      baseData[6][`${days}余量`] = closed[1] === null ? "0" : closed[1].toString();
 
     });
     totalResult = totalResult.concat(baseData);
@@ -589,29 +589,28 @@ const FrontTableList: React.FC<any> = () => {
       <div style={{marginTop: -20}}>
         {/* 查询条件 */}
 
-          <Form.Item style={{minHeight:"45px", verticalAlign:"middle", backgroundColor:"white"}}>
+        <Form.Item style={{minHeight: "45px", verticalAlign: "middle", backgroundColor: "white"}}>
 
-            <label style={{marginLeft: '10px'}}>项目名称：</label>
-            <Select placeholder="请选择" style={{minWidth: '250px', width: "auto"}} mode="multiple" showSearch
-                    optionFilterProp="children" value={choicedCondition.projects}
-                    onChange={prjNameChanged}>
-              {GetProjects()}
-            </Select>
+          <label style={{marginLeft: '10px'}}>项目名称：</label>
+          <Select placeholder="请选择" style={{minWidth: '250px', width: "auto"}} mode="multiple" showSearch
+                  optionFilterProp="children" value={choicedCondition.projects}
+                  onChange={prjNameChanged}>
+            {GetProjects()}
+          </Select>
 
-            <label style={{marginLeft: "10px", marginTop: 7}}>查询周期：</label>
-            <RangePicker
-              style={{width: '20%', marginTop: 7}} onChange={onSourceTimeSelected} allowClear={false}
-              value={[choicedCondition.start === "" ? null : moment(choicedCondition.start),
-                choicedCondition.end === "" ? null : moment(choicedCondition.end)]}
-            />
+          <label style={{marginLeft: "10px", marginTop: 7}}>查询周期：</label>
+          <RangePicker
+            style={{width: '20%', marginTop: 7}} onChange={onSourceTimeSelected} allowClear={false}
+            value={[choicedCondition.start === "" ? null : moment(choicedCondition.start),
+              choicedCondition.end === "" ? null : moment(choicedCondition.end)]}
+          />
 
-            <Button type="text" style={{marginLeft: "10px", color: 'black'}}
-                    icon={<LogoutOutlined/>} size={'small'} onClick={showSourceDefaultData}>
-              默认：</Button>
-            <label style={{ color: 'black'}}> 最近7天</label>
+          <Button type="text" style={{marginLeft: "10px", color: 'black'}}
+                  icon={<LogoutOutlined/>} size={'small'} onClick={showSourceDefaultData}>
+            默认：</Button>
+          <label style={{color: 'black'}}> 最近7天</label>
 
-          </Form.Item>
-
+        </Form.Item>
 
 
         {/* 数据表格 */}

@@ -146,15 +146,9 @@ const getSourceColums = (starttime: any, endTime: any) => {
   return Fields;
 };
 
-const alaysisData = (sorceData: any) => {
+// 解析明细数据
+const alaysisDetails = (detailInfo: any) => {
 
-  // 合计信息
-  const totalInfo = sorceData.totalize;
-
-// 明细信息
-  const detailInfo = sorceData.custom;
-
-  debugger;
   let detailsResult: any = [];
   if (detailInfo !== null) {
     detailInfo.forEach((eve_datas: any) => {
@@ -237,7 +231,116 @@ const alaysisData = (sorceData: any) => {
     });
   }
 
-  return {details: detailsResult};
+  return detailsResult;
+};
+
+// 解析合计数据
+const alaysisTotals = (totalInfo: any) => {
+  let totalResult: any = [];
+  if (totalInfo !== null) {
+    const initTotal = totalInfo.total;
+    const baseData = [
+      {
+        createAt: '合计',
+        newAdd: initTotal.total,
+        status: "激活",
+        level: "合计",
+        initial: initTotal.total
+      },
+      {
+        createAt: '',
+        newAdd: "",
+        status: "",
+        level: "P0",
+        initial: initTotal.p0
+      }, {
+        createAt: "",
+        newAdd: "",
+        status: "",
+        level: "P1",
+        initial: initTotal.p1
+      }, {
+        createAt: "",
+        newAdd: "",
+        status: "",
+        level: "P2",
+        initial: initTotal.p2
+      }, {
+        createAt: "",
+        newAdd: "",
+        status: "",
+        level: ">=P3",
+        initial: initTotal.p3
+      }, {
+        createAt: "",
+        newAdd: "",
+        status: "已解决",
+        level: ">=P0",
+        initial: initTotal.resolved
+      }, {
+        createAt: "",
+        newAdd: "",
+        status: "已关闭",
+        level: ">=P0",
+        initial: initTotal.closed
+      }];
+
+    const details = initTotal.data;
+    details.forEach((totalDts: any) => {
+      const days = totalDts.date;
+
+      // 合计-合计行的数据
+      baseData[0][`${days}变化`] = totalDts.total;
+      baseData[0][`${days}余量`] = totalDts.surplus;
+
+      // 激活-p0行的数据
+      const P0 = totalDts.data.p0;
+      baseData[0][`${days}变化`] = P0[0].toString();
+      baseData[0][`${days}余量`] = P0[1].toString();
+
+      // 激活-p1行的数据
+      const P1 = totalDts.data.p1;
+      baseData[1][`${days}变化`] = P1[0].toString();
+      baseData[1][`${days}余量`] = P1[1].toString();
+
+      // 激活-p2行的数据
+      const P2 = totalDts.data.p2;
+      baseData[2][`${days}变化`] = P2[0].toString();
+      baseData[2][`${days}余量`] = P2[1].toString();
+
+      // 激活-p3行的数据
+      const P3 = totalDts.data.p3;
+      baseData[3][`${days}变化`] = P3[0].toString();
+      baseData[3][`${days}余量`] = P3[1].toString();
+
+      // 已解决  >=P0行的数据
+      const {resolved} = totalDts.data;
+      baseData[4][`${days}变化`] = resolved[0].toString();
+      baseData[4][`${days}余量`] = resolved[1].toString();
+
+      // 已关闭 >=P0 行的数据
+      const {closed} = totalDts.data;
+      baseData[5][`${days}变化`] = closed[0].toString();
+      baseData[5][`${days}余量`] = closed[1].toString();
+
+    });
+    totalResult = totalResult.concat(baseData);
+
+  }
+
+  debugger;
+  return totalResult;
+
+};
+
+const alaysisData = (sorceData: any) => {
+
+  // 合计信息
+  const totalInfo = sorceData.totalize;
+  // 明细信息
+  const detailInfo = sorceData.custom;
+
+  return {details: alaysisDetails(detailInfo), totals: alaysisTotals(totalInfo)};
 
 };
 // 公共查询方法

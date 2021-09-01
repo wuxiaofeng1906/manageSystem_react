@@ -61,7 +61,7 @@ const getSourceColums = (starttime: any, endTime: any) => {
             'cell-span': "value !== null"
           },
           cellRenderer: (params: any) => {
-            return `<div style="margin-top: 75px">${params.value} </div>`;
+            return `<div style="margin-left: -5px;margin-top: 75px ">${params.value} </div>`;
 
           }
         },
@@ -347,6 +347,8 @@ const alaysisTotals = (totalInfo: any) => {
 };
 
 const alaysisData = (sorceData: any) => {
+  debugger;
+
   if (sorceData === null) {
     return {details: [], totals: []};
   }
@@ -361,13 +363,21 @@ const alaysisData = (sorceData: any) => {
 };
 // 公共查询方法
 const queryFrontData = async (client: GqlClient<object>, params: any) => {
-
+  debugger;
   let conditionStr = `start:"${params.start}", end:"${params.end}"`;
 
+
   if (params.projects.length > 0) {
-    const projectArray: any = [];
-    conditionStr = `${conditionStr},projects:${projectArray}`
+
+    // 连接project为数组
+    let projectArray = "";
+    (params.projects).forEach((ele: any) => {
+      projectArray = projectArray === "" ? `${ele}` : `${projectArray},${ele}`;
+    });
+
+    conditionStr = `${conditionStr},projects:[${projectArray}]`
   }
+
 
   const {data} = await client.query(`{
         moEfficiency(${conditionStr}) {
@@ -422,24 +432,25 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
 
       }
   `);
-
-
   return alaysisData(data?.moEfficiency);
 };
 
-const GetSprintProject = () => {
+const GetProjects = () => {
   const projectArray = [];
 
-  const {data: {project = []} = {}} = useQuery(`{
-        project(range:{start:"", end:""},,order:DESC){
-        id
-        name
-      }
+  const {data: {ztProjectList = []} = {}} = useQuery(`{
+      ztProjectList{
+          pId
+          pName
+          pOpenedat
+          product
+        }
     }`);
 
-  for (let index = 0; index < project.length; index += 1) {
+  for (let index = 0; index < ztProjectList.length; index += 1) {
     projectArray.push(
-      <Option key={project[index].id.toString()} value={project[index].id.toString()}> {project[index].name}</Option>,
+      <Option key={ztProjectList[index].pId.toString()}
+              value={ztProjectList[index].pId.toString()}> {ztProjectList[index].pName}</Option>,
     );
   }
   return projectArray;
@@ -479,7 +490,7 @@ const FrontTableList: React.FC<any> = () => {
     };
 
     const [choicedCondition, setQueryConditionForSource] = useState({
-      prjName: [],
+      projects: [],
       start: g_currentMonth_range.start,
       end: g_currentMonth_range.end,
       showEnd: g_currentMonth_range.showEnd
@@ -488,7 +499,7 @@ const FrontTableList: React.FC<any> = () => {
     //  点击默认显示按钮触发事件
     const showSourceDefaultData = async () => {
       setQueryConditionForSource({
-        prjName: [],
+        projects: [],
         start: g_currentMonth_range.start,
         end: g_currentMonth_range.end,
         showEnd: g_currentMonth_range.showEnd
@@ -507,6 +518,8 @@ const FrontTableList: React.FC<any> = () => {
         end: g_currentMonth_range.end
       });
 
+      gridApiForFront.current?.setRowData([]);
+      gridApiForFront.current?.setPinnedTopRowData([])
       gridApiForFront.current?.setRowData(datas.details);
       gridApiForFront.current?.setPinnedTopRowData(datas.totals)
     };
@@ -522,7 +535,7 @@ const FrontTableList: React.FC<any> = () => {
       });
 
       const range = {
-        projects: choicedCondition.prjName,
+        projects: choicedCondition.projects,
         start: dateString[0],
         end: dayjs(dateString[1]).add(1, 'day').format("YYYY-MM-DD"),
       };
@@ -535,6 +548,8 @@ const FrontTableList: React.FC<any> = () => {
       gridApiForFront.current?.sizeColumnsToFit();
 
       const datas: any = await queryFrontData(gqlClient, range);
+      gridApiForFront.current?.setRowData([]);
+      gridApiForFront.current?.setPinnedTopRowData([])  // 重新赋值之前最好也进行清空
       gridApiForFront.current?.setRowData(datas.details);
       gridApiForFront.current?.setPinnedTopRowData(datas.totals)
 
@@ -551,8 +566,17 @@ const FrontTableList: React.FC<any> = () => {
         end: choicedCondition.end
       };
 
+
+      setQueryConditionForSource({
+        ...choicedCondition,
+        projects: value
+      });
       const datas: any = await queryFrontData(gqlClient, range);
-      gridApiForFront.current?.setRowData(datas);
+      gridApiForFront.current?.setRowData([]);
+      gridApiForFront.current?.setPinnedTopRowData([])  // 重新赋值之前最好也进行清空
+      gridApiForFront.current?.setRowData(datas.details);
+      gridApiForFront.current?.setPinnedTopRowData(datas.totals)
+
 
     };
 
@@ -567,16 +591,16 @@ const FrontTableList: React.FC<any> = () => {
 
               <label style={{marginLeft: '10px'}}>项目名称：</label>
               <Select placeholder="请选择" style={{width: '20%'}} mode="multiple" maxTagCount={'responsive'} showSearch
-                      optionFilterProp="children"
+                      optionFilterProp="children" value={choicedCondition.projects}
                       onChange={prjNameChanged}>
-                {GetSprintProject()}
+                {GetProjects()}
               </Select>
 
               <label style={{marginLeft: "20px", marginTop: 7}}>查询周期：</label>
               <RangePicker
-                style={{width: '20%', marginTop: 7}} onChange={onSourceTimeSelected}
+                style={{width: '20%', marginTop: 7}} onChange={onSourceTimeSelected} allowClear={false}
                 value={[choicedCondition.start === "" ? null : moment(choicedCondition.start),
-                  choicedCondition.end === "" ? null : moment(choicedCondition.showEnd)]}
+                  choicedCondition.showEnd === "" ? null : moment(choicedCondition.showEnd)]}
               />
 
               <Button type="text" style={{marginLeft: "20px", color: 'black'}}

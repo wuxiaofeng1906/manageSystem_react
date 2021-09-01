@@ -47,6 +47,9 @@ const getSourceColums = (starttime: any, endTime: any) => {
           minWidth: 110,
           pinned: 'left',
           rowSpan: (params: any) => {
+            if (params.data.createAt === "合计") {
+              return 7;
+            }
 
             if (params.data.createAt !== "") {
               return 6;
@@ -68,6 +71,9 @@ const getSourceColums = (starttime: any, endTime: any) => {
           minWidth: 63,
           pinned: 'left',
           rowSpan: (params: any) => {
+            if (params.data.createAt === "合计") {
+              return 7;
+            }
 
             if (params.data.createAt !== "") {
               return 6;
@@ -89,6 +95,10 @@ const getSourceColums = (starttime: any, endTime: any) => {
           minWidth: 80,
           pinned: 'left',
           rowSpan: (params: any) => {
+
+            if (params.data.createAt === "合计" && params.data.status === '激活') {
+              return 5;
+            }
 
             if (params.data.status === '激活') {
               return 4;
@@ -238,6 +248,8 @@ const alaysisDetails = (detailInfo: any) => {
 const alaysisTotals = (totalInfo: any) => {
   let totalResult: any = [];
   if (totalInfo !== null) {
+
+    // 统计初始值
     const initTotal = totalInfo.total;
     const baseData = [
       {
@@ -285,8 +297,9 @@ const alaysisTotals = (totalInfo: any) => {
         initial: initTotal.closed
       }];
 
-    const details = initTotal.data;
-    details.forEach((totalDts: any) => {
+    // 统计明细项
+    const detailsTotal = totalInfo.data;
+    detailsTotal.forEach((totalDts: any) => {
       const days = totalDts.date;
 
       // 合计-合计行的数据
@@ -295,40 +308,39 @@ const alaysisTotals = (totalInfo: any) => {
 
       // 激活-p0行的数据
       const P0 = totalDts.data.p0;
-      baseData[0][`${days}变化`] = P0[0].toString();
-      baseData[0][`${days}余量`] = P0[1].toString();
+      baseData[1][`${days}变化`] = P0[0].toString();
+      baseData[1][`${days}余量`] = P0[1].toString();
 
       // 激活-p1行的数据
       const P1 = totalDts.data.p1;
-      baseData[1][`${days}变化`] = P1[0].toString();
-      baseData[1][`${days}余量`] = P1[1].toString();
+      baseData[2][`${days}变化`] = P1[0].toString();
+      baseData[2][`${days}余量`] = P1[1].toString();
 
       // 激活-p2行的数据
       const P2 = totalDts.data.p2;
-      baseData[2][`${days}变化`] = P2[0].toString();
-      baseData[2][`${days}余量`] = P2[1].toString();
+      baseData[3][`${days}变化`] = P2[0].toString();
+      baseData[3][`${days}余量`] = P2[1].toString();
 
       // 激活-p3行的数据
       const P3 = totalDts.data.p3;
-      baseData[3][`${days}变化`] = P3[0].toString();
-      baseData[3][`${days}余量`] = P3[1].toString();
+      baseData[4][`${days}变化`] = P3[0].toString();
+      baseData[4][`${days}余量`] = P3[1].toString();
 
       // 已解决  >=P0行的数据
       const {resolved} = totalDts.data;
-      baseData[4][`${days}变化`] = resolved[0].toString();
-      baseData[4][`${days}余量`] = resolved[1].toString();
+      baseData[5][`${days}变化`] = resolved === null ? 0 : resolved[0].toString();
+      baseData[5][`${days}余量`] = resolved === null ? 0 : resolved[1].toString();
 
       // 已关闭 >=P0 行的数据
       const {closed} = totalDts.data;
-      baseData[5][`${days}变化`] = closed[0].toString();
-      baseData[5][`${days}余量`] = closed[1].toString();
+      baseData[6][`${days}变化`] = closed === null ? 0 : closed[0].toString();
+      baseData[6][`${days}余量`] = closed === null ? 0 : closed[1].toString();
 
     });
     totalResult = totalResult.concat(baseData);
 
   }
 
-  debugger;
   return totalResult;
 
 };
@@ -372,6 +384,8 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
                 p1
                 p2
                 p3
+                resolved
+                closed
               }
               total
               surplus
@@ -467,7 +481,7 @@ const FrontTableList: React.FC<any> = () => {
     showEnd: g_currentMonth_range.showEnd
   });
 
-  //  默认显示
+  //  点击默认显示按钮触发事件
   const showSourceDefaultData = async () => {
     setQueryConditionForSource({
       prjName: [],
@@ -487,6 +501,7 @@ const FrontTableList: React.FC<any> = () => {
     });
 
     gridApiForFront.current?.setRowData(datas.details);
+    gridApiForFront.current?.setPinnedTopRowData(datas.totals)
   };
 
   // 时间选择事件： 查询范围：选中的时间中开始时间的周一，和结束时间的周末
@@ -510,6 +525,8 @@ const FrontTableList: React.FC<any> = () => {
 
     const datas: any = await queryFrontData(gqlClient, range);
     gridApiForFront.current?.setRowData(datas.details);
+    gridApiForFront.current?.setPinnedTopRowData(datas.totals)
+
 
   };
 
@@ -565,6 +582,7 @@ const FrontTableList: React.FC<any> = () => {
           <AgGridReact
             columnDefs={getSourceColums(g_currentMonth_range.start, g_currentMonth_range.showEnd)} // 定义列
             rowData={data?.details} // 数据绑定
+            pinnedTopRowData={data?.totals}
             defaultColDef={{
               resizable: true,
               sortable: false,

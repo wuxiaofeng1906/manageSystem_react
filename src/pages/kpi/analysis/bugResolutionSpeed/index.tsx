@@ -149,43 +149,44 @@ const alaysisDetails = (detailInfo: any) => {
   if (detailInfo !== null) {
     detailInfo.forEach((eve_datas: any) => {
 
-      const baseData = [{
-        createAt: dayjs(eve_datas.date).format("MM月DD日"),
-        newAdd: eve_datas.init.total,
-        status: "激活",
-        level: "P0",
-        initial: eve_datas.init.p0
-      }, {
-        createAt: "",
-        newAdd: "",
-        status: "",
-        level: "P1",
-        initial: eve_datas.init.p1
-      }, {
-        createAt: "",
-        newAdd: "",
-        status: "",
-        level: "P2",
-        initial: eve_datas.init.p2
-      }, {
-        createAt: "",
-        newAdd: "",
-        status: "",
-        level: ">=P3",
-        initial: eve_datas.init.p3
-      }, {
-        createAt: "",
-        newAdd: "",
-        status: "已解决",
-        level: ">=P0",
-        initial: eve_datas.init.resolved
-      }, {
-        createAt: "",
-        newAdd: "",
-        status: "已关闭",
-        level: ">=P0",
-        initial: eve_datas.init.closed
-      }];
+      const baseData = [
+        {
+          createAt: dayjs(eve_datas.date).format("MM月DD日"),
+          newAdd: eve_datas.init.total,
+          status: "激活",
+          level: "P0",
+          initial: eve_datas.init.p0
+        }, {
+          createAt: "",
+          newAdd: "",
+          status: "",
+          level: "P1",
+          initial: eve_datas.init.p1
+        }, {
+          createAt: "",
+          newAdd: "",
+          status: "",
+          level: "P2",
+          initial: eve_datas.init.p2
+        }, {
+          createAt: "",
+          newAdd: "",
+          status: "",
+          level: ">=P3",
+          initial: eve_datas.init.p3
+        }, {
+          createAt: "",
+          newAdd: "",
+          status: "已解决",
+          level: ">=P0",
+          initial: eve_datas.init.resolved
+        }, {
+          createAt: "",
+          newAdd: "",
+          status: "已关闭",
+          level: ">=P0",
+          initial: eve_datas.init.closed
+        }];
 
       const details = eve_datas.data;
       details.forEach((day_datas: any) => {
@@ -475,9 +476,9 @@ const FrontTableList: React.FC<any> = () => {
   }
 
   // 表格的屏幕大小自适应
-  const [sourceGridHeight, setGridHeight] = useState(Number(getHeight()));
+  const [sourceGridHeight, setGridHeight] = useState(Number(getHeight())+10);
   window.onresize = function () {
-    setGridHeight(Number(getHeight()) - 64);
+    setGridHeight(Number(getHeight()) +10);
     gridApiForFront.current?.sizeColumnsToFit();
   };
 
@@ -586,9 +587,9 @@ const FrontTableList: React.FC<any> = () => {
 
   };
   return (
-    <PageContainer>
+    <PageContainer style={{marginTop:-30}}>
 
-      <div>
+      <div style={{marginTop:-20}}>
         {/* 查询条件 */}
         <div style={{width: '100%', height: 45, marginTop: 5, backgroundColor: "white"}}>
           <Form.Item>
@@ -617,7 +618,7 @@ const FrontTableList: React.FC<any> = () => {
         </div>
 
         {/* 数据表格 */}
-        <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: 10}}>
+        <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: 5}}>
           <AgGridReact
             columnDefs={getSourceColums(g_currentMonth_range.start, g_currentMonth_range.showEnd)} // 定义列
             rowData={data?.details} // 数据绑定

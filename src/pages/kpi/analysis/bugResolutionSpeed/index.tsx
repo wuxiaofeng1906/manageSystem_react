@@ -640,13 +640,10 @@ const FrontTableList: React.FC<any> = () => {
               filter: true,
               flex: 1,
               cellStyle: setCellStyle,
-
               suppressMenu: true,
               headerComponentParams: (params: any) => {
-
                 const columnName = params.column.colId;
                 const weekday = dayjs(columnName.substring(0, 8)).day();
-
                 // 如果是周六或者周天的话，title要显示成紫色的
                 if (weekday === 0 || weekday === 6) {
 
@@ -682,7 +679,6 @@ const FrontTableList: React.FC<any> = () => {
                     '</div>'
                 };
               }
-
             }}
             rowHeight={25}
             headerHeight={30}

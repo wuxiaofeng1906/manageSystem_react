@@ -55,7 +55,7 @@ const getSourceColums = (starttime: any, endTime: any) => {
           },
           cellClassRules: ragCellClassRules,
           cellRenderer: (params: any) => {
-            return `<div style="margin-left: -5px;margin-top: 75px ">${params.value} </div>`;
+            return `<div style="margin-left: -5px;margin-top: 70px ">${params.value} </div>`;
           }
         },
         {
@@ -76,7 +76,7 @@ const getSourceColums = (starttime: any, endTime: any) => {
           },
           cellClassRules: ragCellClassRules,
           cellRenderer: (params: any) => {
-            return `<div style="margin-top: 75px">${params.value} </div>`;
+            return `<div style="margin-top: 70px">${params.value} </div>`;
           }
         },
         {
@@ -100,7 +100,7 @@ const getSourceColums = (starttime: any, endTime: any) => {
           cellClassRules: ragCellClassRules,
           cellRenderer: (params: any) => {
             if (params.value === "激活") {
-              return `<div style="margin-top: 50px">${params.value} </div>`;
+              return `<div style="margin-top: 40px">${params.value} </div>`;
             }
             return `<div>${params.value} </div>`;
           }
@@ -331,6 +331,7 @@ const alaysisTotals = (totalInfo: any) => {
 
 };
 
+// 解析数据
 const alaysisData = (sorceData: any) => {
 
   if (sorceData === null) {
@@ -352,11 +353,11 @@ const alaysisData = (sorceData: any) => {
   return {details: [], totals: []};
 
 };
+
 // 公共查询方法
 const queryFrontData = async (client: GqlClient<object>, params: any) => {
-  debugger;
-  let conditionStr = `start:"${params.start}", end:"${params.end}"`;
 
+  let conditionStr = `start:"${params.start}", end:"${params.end}"`;
 
   if (params.projects.length > 0) {
 
@@ -368,7 +369,6 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
 
     conditionStr = `${conditionStr},projects:[${projectArray}]`
   }
-
 
   const {data} = await client.query(`{
         moEfficiency(${conditionStr}) {
@@ -426,6 +426,7 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
   return alaysisData(data?.moEfficiency);
 };
 
+// 获取下拉框项目
 const GetProjects = () => {
   const projectArray = [];
 
@@ -448,249 +449,246 @@ const GetProjects = () => {
 };
 
 const FrontTableList: React.FC<any> = () => {
-    const g_currentMonth_range = {
-      // start: dayjs().startOf('week').add(1,'day').format("YYYY-MM-DD"),
-      // end: dayjs().startOf('week').subtract(5,'day').format("YYYY-MM-DD")
-      start: dayjs().subtract(6, 'day').format("YYYY-MM-DD"),
-      showEnd: dayjs().format("YYYY-MM-DD"),
-      end: dayjs().add(1, 'day').format("YYYY-MM-DD"),
-    };
+  const g_currentMonth_range = {
+    // start: dayjs().startOf('week').add(1,'day').format("YYYY-MM-DD"),
+    // end: dayjs().startOf('week').subtract(5,'day').format("YYYY-MM-DD")
+    start: dayjs().subtract(6, 'day').format("YYYY-MM-DD"),
+    showEnd: dayjs().format("YYYY-MM-DD"),
+    end: dayjs().add(1, 'day').format("YYYY-MM-DD"),
+  };
 
-    const gqlClient = useGqlClient();
-    const {data, loading} = useRequest(() => queryFrontData(gqlClient, {
-      projects: [],
-      start: g_currentMonth_range.start,
-      end: g_currentMonth_range.end
-    }));
-    const gridApiForFront = useRef<GridApi>();
-    const onSourceGridReady = (params: GridReadyEvent) => {
-      gridApiForFront.current = params.api;
-      params.api.sizeColumnsToFit();
-    };
+  const gqlClient = useGqlClient();
+  const {data, loading} = useRequest(() => queryFrontData(gqlClient, {
+    projects: [],
+    start: g_currentMonth_range.start,
+    end: g_currentMonth_range.end
+  }));
+  const gridApiForFront = useRef<GridApi>();
+  const onSourceGridReady = (params: GridReadyEvent) => {
+    gridApiForFront.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
 
-    if (gridApiForFront.current) {
-      if (loading) gridApiForFront.current.showLoadingOverlay();
-      else gridApiForFront.current.hideOverlay();
-    }
+  if (gridApiForFront.current) {
+    if (loading) gridApiForFront.current.showLoadingOverlay();
+    else gridApiForFront.current.hideOverlay();
+  }
 
-    // 表格的屏幕大小自适应
-    const [sourceGridHeight, setGridHeight] = useState(Number(getHeight()));
-    window.onresize = function () {
-      setGridHeight(Number(getHeight()) - 64);
-      gridApiForFront.current?.sizeColumnsToFit();
-    };
+  // 表格的屏幕大小自适应
+  const [sourceGridHeight, setGridHeight] = useState(Number(getHeight()));
+  window.onresize = function () {
+    setGridHeight(Number(getHeight()) - 64);
+    gridApiForFront.current?.sizeColumnsToFit();
+  };
 
-    const [choicedCondition, setQueryConditionForSource] = useState({
+  const [choicedCondition, setQueryConditionForSource] = useState({
+    projects: [],
+    start: g_currentMonth_range.start,
+    end: g_currentMonth_range.end,
+    showEnd: g_currentMonth_range.showEnd
+  });
+
+  //  点击默认显示按钮触发事件
+  const showSourceDefaultData = async () => {
+    setQueryConditionForSource({
       projects: [],
       start: g_currentMonth_range.start,
       end: g_currentMonth_range.end,
       showEnd: g_currentMonth_range.showEnd
     });
 
-    //  点击默认显示按钮触发事件
-    const showSourceDefaultData = async () => {
-      setQueryConditionForSource({
-        projects: [],
-        start: g_currentMonth_range.start,
-        end: g_currentMonth_range.end,
-        showEnd: g_currentMonth_range.showEnd
-      });
+    // 获取动态列名
+    const cloumnName = getSourceColums(g_currentMonth_range.start, g_currentMonth_range.end);
+    // 重新设置列名前清空列，并且设置列名后调用sizeColumnsToFit适应表格
+    gridApiForFront.current?.setColumnDefs([]);
+    gridApiForFront.current?.setColumnDefs(cloumnName);
+    gridApiForFront.current?.sizeColumnsToFit();
 
-      // 获取动态列名
-      const cloumnName = getSourceColums(g_currentMonth_range.start, g_currentMonth_range.end);
-      // 重新设置列名前清空列，并且设置列名后调用sizeColumnsToFit适应表格
-      gridApiForFront.current?.setColumnDefs([]);
-      gridApiForFront.current?.setColumnDefs(cloumnName);
-      gridApiForFront.current?.sizeColumnsToFit();
+    const datas: any = await queryFrontData(gqlClient, {
+      projects: [],
+      start: g_currentMonth_range.start,
+      end: g_currentMonth_range.end
+    });
 
-      const datas: any = await queryFrontData(gqlClient, {
-        projects: [],
-        start: g_currentMonth_range.start,
-        end: g_currentMonth_range.end
-      });
+    gridApiForFront.current?.setRowData([]);
+    gridApiForFront.current?.setPinnedTopRowData([])
+    gridApiForFront.current?.setRowData(datas.details);
+    gridApiForFront.current?.setPinnedTopRowData(datas.totals)
+  };
 
-      gridApiForFront.current?.setRowData([]);
-      gridApiForFront.current?.setPinnedTopRowData([])
-      gridApiForFront.current?.setRowData(datas.details);
-      gridApiForFront.current?.setPinnedTopRowData(datas.totals)
+  // 时间选择事件： 查询范围：选中的时间中开始时间的周一，和结束时间的周末
+  const onSourceTimeSelected = async (params: any, dateString: any) => {
+
+    setQueryConditionForSource({
+      ...choicedCondition,
+      start: dateString[0],
+      end: dayjs(dateString[1]).add(1, 'day').format("YYYY-MM-DD"),
+      showEnd: dateString[1]
+    });
+
+    const range = {
+      projects: choicedCondition.projects,
+      start: dateString[0],
+      end: dayjs(dateString[1]).add(1, 'day').format("YYYY-MM-DD"),
     };
 
-    // 时间选择事件： 查询范围：选中的时间中开始时间的周一，和结束时间的周末
-    const onSourceTimeSelected = async (params: any, dateString: any) => {
+    const cloumnName = getSourceColums(dateString[0], dateString[1]);
 
-      setQueryConditionForSource({
-        ...choicedCondition,
-        start: dateString[0],
-        end: dayjs(dateString[1]).add(1, 'day').format("YYYY-MM-DD"),
-        showEnd: dateString[1]
-      });
+    // 重新设置列名前清空列，并且设置列名后调用sizeColumnsToFit适应表格
+    gridApiForFront.current?.setColumnDefs([]);
+    gridApiForFront.current?.setColumnDefs(cloumnName);
+    gridApiForFront.current?.sizeColumnsToFit();
 
-      const range = {
-        projects: choicedCondition.projects,
-        start: dateString[0],
-        end: dayjs(dateString[1]).add(1, 'day').format("YYYY-MM-DD"),
-      };
-
-      const cloumnName = getSourceColums(dateString[0], dateString[1]);
-
-      // 重新设置列名前清空列，并且设置列名后调用sizeColumnsToFit适应表格
-      gridApiForFront.current?.setColumnDefs([]);
-      gridApiForFront.current?.setColumnDefs(cloumnName);
-      gridApiForFront.current?.sizeColumnsToFit();
-
-      const datas: any = await queryFrontData(gqlClient, range);
-      gridApiForFront.current?.setRowData([]);
-      gridApiForFront.current?.setPinnedTopRowData([])  // 重新赋值之前最好也进行清空
-      gridApiForFront.current?.setRowData(datas.details);
-      gridApiForFront.current?.setPinnedTopRowData(datas.totals)
+    const datas: any = await queryFrontData(gqlClient, range);
+    gridApiForFront.current?.setRowData([]);
+    gridApiForFront.current?.setPinnedTopRowData([])  // 重新赋值之前最好也进行清空
+    gridApiForFront.current?.setRowData(datas.details);
+    gridApiForFront.current?.setPinnedTopRowData(datas.totals)
 
 
-    };
+  };
 
-    // 项目名称选择事件
-    const prjNameChanged = async (value: any, params: any) => {
-      console.log(params);
+  // 项目名称选择事件
+  const prjNameChanged = async (value: any, params: any) => {
+    console.log(params);
 
-      const range = {
-        projects: value,
-        start: choicedCondition.start,
-        end: choicedCondition.end
-      };
-
-
-      setQueryConditionForSource({
-        ...choicedCondition,
-        projects: value
-      });
-      const datas: any = await queryFrontData(gqlClient, range);
-      gridApiForFront.current?.setRowData([]);
-      gridApiForFront.current?.setPinnedTopRowData([])  // 重新赋值之前最好也进行清空
-      gridApiForFront.current?.setRowData(datas.details);
-      gridApiForFront.current?.setPinnedTopRowData(datas.totals)
-
-
+    const range = {
+      projects: value,
+      start: choicedCondition.start,
+      end: choicedCondition.end
     };
 
 
-    const changRowColor = (param: any) => {
+    setQueryConditionForSource({
+      ...choicedCondition,
+      projects: value
+    });
+    const datas: any = await queryFrontData(gqlClient, range);
+    gridApiForFront.current?.setRowData([]);
+    gridApiForFront.current?.setPinnedTopRowData([])  // 重新赋值之前最好也进行清空
+    gridApiForFront.current?.setRowData(datas.details);
+    gridApiForFront.current?.setPinnedTopRowData(datas.totals)
 
-      if (param.data.createAt === "合计" || param.data.createAt === "合计列") {
-        return {
-          'background-color': '#F8F8F8'     // 颜色可以用英文、rgb以及十六进制
-        }
-      }
+
+  };
+
+
+  const changRowColor = (param: any) => {
+
+    if (param.data.createAt === "合计" || param.data.createAt === "合计列") {
       return {
-        'background-color': 'white'
+        'background-color': '#F8F8F8'
       }
+    }
+    return {
+      'background-color': 'white'
+    }
 
-    };
-    return (
-      <PageContainer>
+  };
+  return (
+    <PageContainer>
 
-        <div>
-          {/* 查询条件 */}
-          <div style={{width: '100%', height: 45, marginTop: 5, backgroundColor: "white"}}>
-            <Form.Item>
+      <div>
+        {/* 查询条件 */}
+        <div style={{width: '100%', height: 45, marginTop: 5, backgroundColor: "white"}}>
+          <Form.Item>
 
-              <label style={{marginLeft: '10px'}}>项目名称：</label>
-              <Select placeholder="请选择" style={{width: '20%'}} mode="multiple" maxTagCount={'responsive'} showSearch
-                      optionFilterProp="children" value={choicedCondition.projects}
-                      onChange={prjNameChanged}>
-                {GetProjects()}
-              </Select>
+            <label style={{marginLeft: '10px'}}>项目名称：</label>
+            <Select placeholder="请选择" style={{width: '20%'}} mode="multiple" maxTagCount={'responsive'} showSearch
+                    optionFilterProp="children" value={choicedCondition.projects}
+                    onChange={prjNameChanged}>
+              {GetProjects()}
+            </Select>
 
-              <label style={{marginLeft: "20px", marginTop: 7}}>查询周期：</label>
-              <RangePicker
-                style={{width: '20%', marginTop: 7}} onChange={onSourceTimeSelected} allowClear={false}
-                value={[choicedCondition.start === "" ? null : moment(choicedCondition.start),
-                  choicedCondition.showEnd === "" ? null : moment(choicedCondition.showEnd)]}
-              />
+            <label style={{marginLeft: "20px", marginTop: 7}}>查询周期：</label>
+            <RangePicker
+              style={{width: '20%', marginTop: 7}} onChange={onSourceTimeSelected} allowClear={false}
+              value={[choicedCondition.start === "" ? null : moment(choicedCondition.start),
+                choicedCondition.showEnd === "" ? null : moment(choicedCondition.showEnd)]}
+            />
 
-              <Button type="text" style={{marginLeft: "20px", color: 'black'}}
-                      icon={<LogoutOutlined/>} size={'small'} onClick={showSourceDefaultData}>
-                默认：</Button>
-              <label style={{marginLeft: "-10px", color: 'black'}}> 最近7天</label>
+            <Button type="text" style={{marginLeft: "20px", color: 'black'}}
+                    icon={<LogoutOutlined/>} size={'small'} onClick={showSourceDefaultData}>
+              默认：</Button>
+            <label style={{marginLeft: "-10px", color: 'black'}}> 最近7天</label>
 
-            </Form.Item>
+          </Form.Item>
 
-          </div>
+        </div>
 
-          {/* 数据表格 */}
-          <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: 10}}>
-            <AgGridReact
-              columnDefs={getSourceColums(g_currentMonth_range.start, g_currentMonth_range.showEnd)} // 定义列
-              rowData={data?.details} // 数据绑定
-              pinnedTopRowData={data?.totals}
-              defaultColDef={{
-                resizable: true,
-                sortable: false,
-                filter: true,
-                flex: 1,
-                cellStyle: {
-                  "line-height": "25px",
-                  "border-left": "1px solid lightgrey",
-                  // "background-color": "slategray",
-                  "text-align": "center"
-                }, // "background-color":"white"
-                suppressMenu: true,
-                headerComponentParams: (params: any) => {
+        {/* 数据表格 */}
+        <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: 10}}>
+          <AgGridReact
+            columnDefs={getSourceColums(g_currentMonth_range.start, g_currentMonth_range.showEnd)} // 定义列
+            rowData={data?.details} // 数据绑定
+            pinnedTopRowData={data?.totals}
+            defaultColDef={{
+              resizable: true,
+              sortable: false,
+              filter: true,
+              flex: 1,
+              cellStyle: {
+                "line-height": "25px",
+                "border-left": "1px solid lightgrey",
+                "text-align": "center"
+              },
+              suppressMenu: true,
+              headerComponentParams: (params: any) => {
 
-                  const columnName = params.column.colId;
-                  const weekday = dayjs(columnName.substring(0, 8)).day();
+                const columnName = params.column.colId;
+                const weekday = dayjs(columnName.substring(0, 8)).day();
 
-                  // 如果是周六或者周天的话，title要显示成紫色的
-                  if (weekday === 0 || weekday === 6) {
+                // 如果是周六或者周天的话，title要显示成紫色的
+                if (weekday === 0 || weekday === 6) {
 
-                    return {
-                      // menuIcon: 'fa-bars',
-                      template:
-                        '<div class="ag-cell-label-container" role="presentation">' +
-                        '  <span ref="eMenu" class="ag-header-icon ag-header-cell-menu-button"></span>' +
-                        '  <div ref="eLabel" class="ag-header-cell-label" role="presentation">' +
-                        '    <span ref="eSortOrder" class="ag-header-icon ag-sort-order" ></span>' +
-                        '    <span ref="eSortAsc" class="ag-header-icon ag-sort-ascending-icon" ></span>' +
-                        '    <span ref="eSortDesc" class="ag-header-icon ag-sort-descending-icon" ></span>' +
-                        '    <span ref="eSortNone" class="ag-header-icon ag-sort-none-icon" ></span>' +
-                        '      <span style="color: mediumpurple" ref="eText" class="ag-header-cell-text" role="columnheader"></span>' +
-                        '    <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>' +
-                        '  </div>' +
-                        '</div>'
-                    };
-                  }
                   return {
                     // menuIcon: 'fa-bars',
                     template:
-                      '<div  class="ag-cell-label-container" role="presentation">' +
+                      '<div class="ag-cell-label-container" role="presentation">' +
                       '  <span ref="eMenu" class="ag-header-icon ag-header-cell-menu-button"></span>' +
                       '  <div ref="eLabel" class="ag-header-cell-label" role="presentation">' +
                       '    <span ref="eSortOrder" class="ag-header-icon ag-sort-order" ></span>' +
                       '    <span ref="eSortAsc" class="ag-header-icon ag-sort-ascending-icon" ></span>' +
                       '    <span ref="eSortDesc" class="ag-header-icon ag-sort-descending-icon" ></span>' +
                       '    <span ref="eSortNone" class="ag-header-icon ag-sort-none-icon" ></span>' +
-                      '    <span ref="eText" class="ag-header-cell-text" role="columnheader"></span>' +
+                      '      <span style="color: gray" ref="eText" class="ag-header-cell-text" role="columnheader"></span>' +
                       '    <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>' +
                       '  </div>' +
                       '</div>'
                   };
                 }
+                return {
+                  // menuIcon: 'fa-bars',
+                  template:
+                    '<div  class="ag-cell-label-container" role="presentation">' +
+                    '  <span ref="eMenu" class="ag-header-icon ag-header-cell-menu-button"></span>' +
+                    '  <div ref="eLabel" class="ag-header-cell-label" role="presentation">' +
+                    '    <span ref="eSortOrder" class="ag-header-icon ag-sort-order" ></span>' +
+                    '    <span ref="eSortAsc" class="ag-header-icon ag-sort-ascending-icon" ></span>' +
+                    '    <span ref="eSortDesc" class="ag-header-icon ag-sort-descending-icon" ></span>' +
+                    '    <span ref="eSortNone" class="ag-header-icon ag-sort-none-icon" ></span>' +
+                    '    <span ref="eText" class="ag-header-cell-text" role="columnheader"></span>' +
+                    '    <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>' +
+                    '  </div>' +
+                    '</div>'
+                };
+              }
 
-              }}
-              rowHeight={25}
-              headerHeight={30}
-              suppressRowTransform={true}
-              onGridReady={onSourceGridReady}
-              getRowStyle={changRowColor}
+            }}
+            rowHeight={25}
+            headerHeight={30}
+            suppressRowTransform={true}
+            onGridReady={onSourceGridReady}
+            getRowStyle={changRowColor}
+          >
 
-            >
-
-            </AgGridReact>
-          </div>
-
+          </AgGridReact>
         </div>
 
-      </PageContainer>
-    );
-  }
-;
+      </div>
+
+    </PageContainer>
+  );
+};
 
 export default FrontTableList;

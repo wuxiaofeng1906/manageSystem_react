@@ -152,40 +152,40 @@ const alaysisDetails = (detailInfo: any) => {
       const baseData = [
         {
           createAt: dayjs(eve_datas.date).format("MM月DD日"),
-          newAdd: eve_datas.init.total,
+          newAdd: eve_datas.init.total === null ? "0" : eve_datas.init.total,
           status: "激活",
           level: "P0",
-          initial: eve_datas.init.p0
+          initial: eve_datas.init.p0 === null ? "0" : eve_datas.init.p0
         }, {
           createAt: "",
           newAdd: "",
           status: "",
           level: "P1",
-          initial: eve_datas.init.p1
+          initial: eve_datas.init.p1 === null ? "0" : eve_datas.init.p1
         }, {
           createAt: "",
           newAdd: "",
           status: "",
           level: "P2",
-          initial: eve_datas.init.p2
+          initial: eve_datas.init.p2 === null ? "0" : eve_datas.init.p2
         }, {
           createAt: "",
           newAdd: "",
           status: "",
           level: ">=P3",
-          initial: eve_datas.init.p3
+          initial: eve_datas.init.p3 === null ? "0" : eve_datas.init.p3
         }, {
           createAt: "",
           newAdd: "",
           status: "已解决",
           level: ">=P0",
-          initial: eve_datas.init.resolved
+          initial: eve_datas.init.resolved === null ? "0" : eve_datas.init.resolved
         }, {
           createAt: "",
           newAdd: "",
           status: "已关闭",
           level: ">=P0",
-          initial: eve_datas.init.closed
+          initial: eve_datas.init.closed === null ? "0" : eve_datas.init.closed
         }];
 
       const details = eve_datas.data;
@@ -240,47 +240,47 @@ const alaysisTotals = (totalInfo: any) => {
     const baseData = [
       {
         createAt: '合计',
-        newAdd: initTotal.total,
+        newAdd: initTotal.total === null ? "0" : initTotal.total,
         status: "激活",
         level: "合计",
-        initial: initTotal.total
+        initial: initTotal.total === null ? "0" : initTotal.total,
       },
       {
         createAt: '合计列',
         newAdd: "",
         status: "",
         level: "P0",
-        initial: initTotal.p0
+        initial: initTotal.p0 === null ? "0" : initTotal.p0
       }, {
         createAt: "合计列",
         newAdd: "",
         status: "",
         level: "P1",
-        initial: initTotal.p1
+        initial: initTotal.p1 === null ? "0" : initTotal.p1
       }, {
         createAt: "合计列",
         newAdd: "",
         status: "",
         level: "P2",
-        initial: initTotal.p2
+        initial: initTotal.p2 === null ? "0" : initTotal.p2
       }, {
         createAt: "合计列",
         newAdd: "",
         status: "",
         level: ">=P3",
-        initial: initTotal.p3
+        initial: initTotal.p3 === null ? "0" : initTotal.p3
       }, {
         createAt: "合计列",
         newAdd: "",
         status: "已解决",
         level: ">=P0",
-        initial: initTotal.resolved
+        initial: initTotal.resolved === null ? "0" : initTotal.resolved
       }, {
         createAt: "合计列",
         newAdd: "",
         status: "已关闭",
         level: ">=P0",
-        initial: initTotal.closed
+        initial: initTotal.closed === null ? "0" : initTotal.closed
       }];
 
     // 统计明细项

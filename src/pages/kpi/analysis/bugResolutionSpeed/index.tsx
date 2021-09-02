@@ -114,7 +114,7 @@ const getSourceColums = (starttime: any, endTime: any) => {
         {
           headerName: '初始',
           field: 'initial',
-          minWidth: 70,
+          minWidth: 75,
           pinned: 'left',
         }]
     }

@@ -90,9 +90,9 @@ const prjStageMappings = {
   story: '需求',
   design: '设计',
   developing: "开发",
-  submit: "提测",
+  // submit: "提测",
   testing: "测试",
-  released: "发布",
+  // released: "发布",
   learning: "学习",
   abnormal: "异常",
   "": "",
@@ -2005,9 +2005,9 @@ const CodeTableList: React.FC<any> = () => {
                           <Option key={"story"} value={"story"}> 需求 </Option>
                           <Option key={"design"} value="design"> 设计 </Option>
                           <Option key={"developing"} value="developing"> 开发 </Option>
-                          <Option key={"submit"} value="submit"> 提测 </Option>
+                          {/* <Option key={"submit"} value="submit"> 提测 </Option> */}
                           <Option key={"testing"} value="testing"> 测试 </Option>
-                          <Option key={"released"} value="released"> 发布 </Option>
+                          {/* <Option key={"released"} value="released"> 发布 </Option> */}
                           <Option key={"learning"} value="learning"> 学习 </Option>
                           <Option key={""} value=""> </Option>
                         </Select>

@@ -51,11 +51,13 @@ const cellFormat = (params: any) => {
 };
 
 const latestCellFormat = (params: any) => {
-  if (params.value === null) {
-    return 0;
+  if (Number(params.value)) {
+    const numbers = params.value.toString();
+    if (numbers.indexOf(".") > -1) { // 判断有无小数点
+      return Number(params.value).toFixed(2);
+    }
+    return Number(params.value);
   }
-
-
   return params.value;
 };
 
@@ -385,6 +387,10 @@ const CodeTableList: React.FC<any> = () => {
         'cell-span': "value !== undefined"
       },
       cellRenderer: (params: any) => {
+
+        if (params.data.item === "最高贡献者") {
+          return `<div style="margin-top: 35px">${params.value} </div>`;
+        }
         return `<div style="margin-top: 25px">${params.value} </div>`;
 
       }
@@ -398,6 +404,9 @@ const CodeTableList: React.FC<any> = () => {
         'cell-span': "value !== undefined"
       },
       cellRenderer: (params: any) => {
+        if (params.data.item === "最高贡献者") {
+          return `<div style="margin-top: 35px">${params.value} </div>`;
+        }
         return `<div style="margin-top: 25px">${params.value} </div>`;
 
       }
@@ -516,7 +525,7 @@ const CodeTableList: React.FC<any> = () => {
           techManager: "-"
         });
       } else {
-        debugger;
+
         array.push({
           stage: "开发阶段",
           attendance: "正常",

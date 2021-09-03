@@ -644,7 +644,7 @@ const FrontTableList: React.FC<any> = () => {
               headerComponentParams: (params: any) => {
                 const columnName = params.column.colId;
                 const weekday = dayjs(columnName.substring(0, 8)).day();
-                // 如果是周六或者周天的话，title要显示成紫色的
+                // 如果是周六或者周天的话，title要显示成灰色的
                 if (weekday === 0 || weekday === 6) {
 
                   return {

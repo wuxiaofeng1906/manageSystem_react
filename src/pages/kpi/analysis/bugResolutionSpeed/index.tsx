@@ -608,7 +608,7 @@ const FrontTableList: React.FC<any> = () => {
         <Form.Item style={{minHeight: "45px", verticalAlign: "middle", backgroundColor: "white"}}>
 
           <label style={{marginLeft: '10px'}}>项目名称：</label>
-          <Select placeholder="请选择" style={{minWidth: '250px', width: "auto"}} mode="multiple" showSearch
+          <Select placeholder="请选择" style={{minWidth: '300px', width: "auto"}} mode="multiple" showSearch
                   optionFilterProp="children" value={choicedCondition.projects}
                   onChange={prjNameChanged}>
             {GetProjects()}

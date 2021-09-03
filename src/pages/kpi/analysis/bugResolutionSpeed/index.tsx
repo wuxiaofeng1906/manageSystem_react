@@ -130,7 +130,7 @@ const getSourceColums = (starttime: any, endTime: any) => {
       children: [{
         headerName: `变化`,
         field: `${current.format("YYYYMMDD")}变化`,
-        minWidth: 65
+        minWidth: 70
       }, {
         headerName: `余量`,
         field: `${current.format("YYYYMMDD")}余量`,

@@ -616,7 +616,7 @@ const FrontTableList: React.FC<any> = () => {
 
           <label style={{marginLeft: "10px", marginTop: 7}}>查询周期：</label>
           <RangePicker
-            style={{minWidth:220,width: '20%', marginTop: 7}} onChange={onSourceTimeSelected} allowClear={false}
+            style={{minWidth: 220, width: '20%', marginTop: 7}} onChange={onSourceTimeSelected} allowClear={false}
             value={[choicedCondition.start === "" ? null : moment(choicedCondition.start),
               choicedCondition.end === "" ? null : moment(choicedCondition.end)]}
           />
@@ -650,33 +650,58 @@ const FrontTableList: React.FC<any> = () => {
                   return {
                     // menuIcon: 'fa-bars',
                     template:
-                      '<div class="ag-cell-label-container" role="presentation">' +
-                      '  <span ref="eMenu" class="ag-header-icon ag-header-cell-menu-button"></span>' +
-                      '  <div ref="eLabel" class="ag-header-cell-label" role="presentation">' +
-                      '    <span ref="eSortOrder" class="ag-header-icon ag-sort-order" ></span>' +
-                      '    <span ref="eSortAsc" class="ag-header-icon ag-sort-ascending-icon" ></span>' +
-                      '    <span ref="eSortDesc" class="ag-header-icon ag-sort-descending-icon" ></span>' +
-                      '    <span ref="eSortNone" class="ag-header-icon ag-sort-none-icon" ></span>' +
-                      '      <span style="color: gray" ref="eText" class="ag-header-cell-text" role="columnheader"></span>' +
-                      '    <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>' +
-                      '  </div>' +
-                      '</div>'
+
+                      `<div class="ag-cell-label-container" role="presentation">
+                            <span ref="eMenu" class="ag-header-icon ag-header-cell-menu-button"></span>
+                            <div ref="eLabel" class="ag-header-cell-label" role="presentation">
+                                <span ref="eSortOrder" class="ag-header-icon ag-sort-order" ></span>
+                                <span ref="eSortAsc" class="ag-header-icon ag-sort-ascending-icon" ></span>
+                                <span ref="eSortDesc" class="ag-header-icon ag-sort-descending-icon" ></span>
+                                <span ref="eSortNone" class="ag-header-icon ag-sort-none-icon" ></span>
+                                <span style="color: gray" ref="eText" class="ag-header-cell-text" role="columnheader"></span>
+                                <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>
+                            </div>
+                        </div>`
+
+                    // '<div style="background-color: #1890ff" class="ag-cell-label-container" role="presentation">' +
+                    // '  <span ref="eMenu" class="ag-header-icon ag-header-cell-menu-button"></span>' +
+                    // '  <div ref="eLabel" class="ag-header-cell-label" role="presentation">' +
+                    // '    <span ref="eSortOrder" class="ag-header-icon ag-sort-order" ></span>' +
+                    // '    <span ref="eSortAsc" class="ag-header-icon ag-sort-ascending-icon" ></span>' +
+                    // '    <span ref="eSortDesc" class="ag-header-icon ag-sort-descending-icon" ></span>' +
+                    // '    <span ref="eSortNone" class="ag-header-icon ag-sort-none-icon" ></span>' +
+                    // '      <span style="color: gray" ref="eText" class="ag-header-cell-text" role="columnheader"></span>' +
+                    // '    <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>' +
+                    // '  </div>' +
+                    // '</div>'
                   };
                 }
                 return {
                   // menuIcon: 'fa-bars',
                   template:
-                    '<div  class="ag-cell-label-container" role="presentation">' +
-                    '  <span ref="eMenu" class="ag-header-icon ag-header-cell-menu-button"></span>' +
-                    '  <div ref="eLabel" class="ag-header-cell-label" role="presentation">' +
-                    '    <span ref="eSortOrder" class="ag-header-icon ag-sort-order" ></span>' +
-                    '    <span ref="eSortAsc" class="ag-header-icon ag-sort-ascending-icon" ></span>' +
-                    '    <span ref="eSortDesc" class="ag-header-icon ag-sort-descending-icon" ></span>' +
-                    '    <span ref="eSortNone" class="ag-header-icon ag-sort-none-icon" ></span>' +
-                    '    <span ref="eText" class="ag-header-cell-text" role="columnheader"></span>' +
-                    '    <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>' +
-                    '  </div>' +
-                    '</div>'
+                    `<div class="ag-cell-label-container" role="presentation">
+                            <span ref="eMenu" class="ag-header-icon ag-header-cell-menu-button"></span>
+                            <div ref="eLabel" class="ag-header-cell-label" role="presentation">
+                                <span ref="eSortOrder" class="ag-header-icon ag-sort-order" ></span>
+                                <span ref="eSortAsc" class="ag-header-icon ag-sort-ascending-icon" ></span>
+                                <span ref="eSortDesc" class="ag-header-icon ag-sort-descending-icon" ></span>
+                                <span ref="eSortNone" class="ag-header-icon ag-sort-none-icon" ></span>
+                                <span ref="eText" class="ag-header-cell-text" role="columnheader"></span>
+                                <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>
+                            </div>
+                        </div>`
+
+                  // '<div  class="ag-cell-label-container" role="presentation">' +
+                  // '  <span ref="eMenu" class="ag-header-icon ag-header-cell-menu-button"></span>' +
+                  // '  <div ref="eLabel" class="ag-header-cell-label" role="presentation">' +
+                  // '    <span ref="eSortOrder" class="ag-header-icon ag-sort-order" ></span>' +
+                  // '    <span ref="eSortAsc" class="ag-header-icon ag-sort-ascending-icon" ></span>' +
+                  // '    <span ref="eSortDesc" class="ag-header-icon ag-sort-descending-icon" ></span>' +
+                  // '    <span ref="eSortNone" class="ag-header-icon ag-sort-none-icon" ></span>' +
+                  // '    <span ref="eText" class="ag-header-cell-text" role="columnheader"></span>' +
+                  // '    <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>' +
+                  // '  </div>' +
+                  // '</div>'
                 };
               }
             }}

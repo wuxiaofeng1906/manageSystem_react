@@ -297,7 +297,7 @@ const BranchTableList: React.FC<any> = () => {
           }}
 
           autoGroupColumnDef={{
-            minWidth: 120,  // rowGroup 的最大宽度
+            minWidth: 130,  // rowGroup 的最大宽度
           }}
           rowHeight={32}
           headerHeight={35}

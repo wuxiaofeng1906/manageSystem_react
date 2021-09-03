@@ -63,7 +63,9 @@ function codeNumberRender(values: any) {
 const rowrender = (params: any) => {
 
   if (params.value) {
-    return (Number(params.value)/86400).toFixed(2);
+    const values = (Number(params.value) / 86400).toFixed(2);
+    return values === "0.00" ? 0 : values;
+    // return values;
   }
   return 0;
 }

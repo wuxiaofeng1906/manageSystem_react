@@ -382,6 +382,7 @@ const FrontTableList: React.FC<any> = () => {
             headerHeight={35}
 
             onGridReady={onSourceGridReady}
+            onGridSizeChanged={onSourceGridReady}
             suppressScrollOnNewData={false}
           >
 

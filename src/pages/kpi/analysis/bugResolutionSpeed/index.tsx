@@ -684,6 +684,7 @@ const FrontTableList: React.FC<any> = () => {
             headerHeight={30}
             suppressRowTransform={true}
             onGridReady={onSourceGridReady}
+            onGridSizeChanged={onSourceGridReady}
             getRowStyle={changRowColor}
           >
 

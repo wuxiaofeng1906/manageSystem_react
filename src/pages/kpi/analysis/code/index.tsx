@@ -348,7 +348,6 @@ const CodeTableList: React.FC<any> = () => {
     gridApiForTotal.current?.sizeColumnsToFit();
   });
 
-
   /* region 表格总数据展示 */
 
   const rowSpans = (params: any) => {
@@ -420,7 +419,7 @@ const CodeTableList: React.FC<any> = () => {
       minWidth: 90,
       valueFormatter: cellFormat,
       tooltipField: "techManager"
-    },
+    }
   ];
 
   // 获取和解析数据
@@ -1626,6 +1625,7 @@ const CodeTableList: React.FC<any> = () => {
                         rowHeight={25}
                         headerHeight={30}
                         onGridReady={onTotalGridReady}
+                        onGridSizeChanged={onTotalGridReady}
                       >
 
                       </AgGridReact>
@@ -1732,6 +1732,7 @@ const CodeTableList: React.FC<any> = () => {
                         rowHeight={25}
                         headerHeight={30}
                         onGridReady={onToHightestCodeGridReady}
+                        onGridSizeChanged={onToHightestCodeGridReady}
                       >
 
                       </AgGridReact>
@@ -1774,6 +1775,7 @@ const CodeTableList: React.FC<any> = () => {
                         rowHeight={25}
                         headerHeight={30}
                         onGridReady={onTo600CodeGridReady}
+                        onGridSizeChanged={onTo600CodeGridReady}
                       >
 
                       </AgGridReact>
@@ -1816,6 +1818,7 @@ const CodeTableList: React.FC<any> = () => {
                         rowHeight={25}
                         headerHeight={30}
                         onGridReady={onTo1200CodeGridReady}
+                        onGridSizeChanged={onTo1200CodeGridReady}
                       >
 
                       </AgGridReact>
@@ -1889,6 +1892,7 @@ const CodeTableList: React.FC<any> = () => {
                 onGridReady={onSourceGridReady}
                 suppressScrollOnNewData={false}
                 onCellEditingStopped={onSourceCellEdited}
+                onGridSizeChanged={onSourceGridReady}
               >
 
               </AgGridReact>

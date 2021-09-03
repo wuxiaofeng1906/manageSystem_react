@@ -1058,7 +1058,7 @@ const CodeTableList: React.FC<any> = () => {
     }
     for (let index = 0; index < sortedDts.length; index += 1) {
       const {userName} = sortedDts[index];
-      if (index < 7) {  // 显示top7
+      if (index < 3) {  // 显示top7
         selected[userName] = true;
       } else {
         selected[userName] = false;

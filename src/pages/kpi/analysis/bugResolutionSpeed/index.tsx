@@ -608,7 +608,7 @@ const FrontTableList: React.FC<any> = () => {
         <Form.Item style={{minHeight: "45px", verticalAlign: "middle", backgroundColor: "white"}}>
 
           <label style={{marginLeft: '10px'}}>项目名称：</label>
-          <Select placeholder="请选择" style={{minWidth: '300px', width: "auto"}} mode="multiple" showSearch
+          <Select placeholder="请选择" style={{minWidth: '250px', width: "auto"}} mode="multiple" showSearch
                   optionFilterProp="children" value={choicedCondition.projects}
                   onChange={prjNameChanged}>
             {GetProjects()}
@@ -616,7 +616,7 @@ const FrontTableList: React.FC<any> = () => {
 
           <label style={{marginLeft: "10px", marginTop: 7}}>查询周期：</label>
           <RangePicker
-            style={{minWidth: 220, width: '20%', marginTop: 7}} onChange={onSourceTimeSelected} allowClear={false}
+            style={{minWidth: 250, width: '20%', marginTop: 7}} onChange={onSourceTimeSelected} allowClear={false}
             value={[choicedCondition.start === "" ? null : moment(choicedCondition.start),
               choicedCondition.end === "" ? null : moment(choicedCondition.end)]}
           />

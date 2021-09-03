@@ -58,6 +58,10 @@ const latestCellFormat = (params: any) => {
     }
     return Number(params.value);
   }
+
+  if (params.value === null) {
+    return 0;
+  }
   return params.value;
 };
 

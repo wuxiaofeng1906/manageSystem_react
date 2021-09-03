@@ -50,6 +50,15 @@ const cellFormat = (params: any) => {
   return 0;
 };
 
+const latestCellFormat = (params: any) => {
+  if (params.value === null) {
+    return 0;
+  }
+
+
+  return params.value;
+};
+
 /* endregion */
 
 /* region 分析报告页面 */
@@ -403,52 +412,54 @@ const CodeTableList: React.FC<any> = () => {
       headerName: '正式开发',
       field: 'formalDev',
       minWidth: 90,
-      valueFormatter: cellFormat,
+      valueFormatter: latestCellFormat,
       tooltipField: "formalDev"
     },
     {
       headerName: '试用开发',
       field: 'tryDev',
       minWidth: 90,
-      valueFormatter: cellFormat,
+      valueFormatter: latestCellFormat,
       tooltipField: "tryDev"
     },
     {
       headerName: '技术管理',
       field: 'techManager',
       minWidth: 90,
-      valueFormatter: cellFormat,
+      valueFormatter: latestCellFormat,
       tooltipField: "techManager"
     }
   ];
 
   // 获取和解析数据
   const pushArrays = (title: string, itemData: any) => {
+
     const array = [];
     if (title === "需求阶段" || title === "设计阶段" || title === "开发阶段" || title === "测试阶段") {
 
-      array.push({
-        stage: title,
-        attendance: "正常",
-        item: "人数",
-        formalDev: itemData.offical === null ? 0 : itemData.offical.personNums,
-        tryDev: itemData.trial.personNums,
-        techManager: "-"
-      }, {
-        stage: "",  // 为了进行单元格合并，需要将stage置为空
-        attendance: "正常",
-        item: "代码总行数",
-        formalDev: itemData.offical === null ? 0 : itemData.offical.sumLines,
-        tryDev: itemData.trial.sumLines,
-        techManager: "-"
-      }, {
-        stage: "",
-        attendance: "正常",
-        item: "代码人均行数",
-        formalDev: itemData.offical === null ? 0 : itemData.offical.avgLines,
-        tryDev: itemData.trial.avgLines,
-        techManager: "-"
-      });
+      array.push(
+        {
+          stage: title,
+          attendance: "正常",
+          item: "人数",
+          formalDev: itemData.offical === null ? 0 : itemData.offical.personNums,
+          tryDev: itemData.trial.personNums,
+          techManager: "-"
+        }, {
+          stage: "",  // 为了进行单元格合并，需要将stage置为空
+          attendance: "正常",
+          item: "代码总行数",
+          formalDev: itemData.offical === null ? 0 : itemData.offical.sumLines,
+          tryDev: itemData.trial.sumLines,
+          techManager: "-"
+        }, {
+          stage: "",
+          attendance: "正常",
+          item: "代码人均行数",
+          formalDev: itemData.offical === null ? 0 : itemData.offical.avgLines,
+          tryDev: itemData.trial.avgLines,
+          techManager: "-"
+        });
     } else if (title === "技术管理") {
       array.push({
         stage: title,
@@ -505,12 +516,13 @@ const CodeTableList: React.FC<any> = () => {
           techManager: "-"
         });
       } else {
+        debugger;
         array.push({
           stage: "开发阶段",
           attendance: "正常",
           item: "最高贡献者",
-          formalDev: itemData.offical.highest === null ? 0 : itemData.offical.highest[0],
-          tryDev: itemData.trial.highest === null ? 0 : itemData.trial.highest[0],
+          formalDev: itemData.offical.highest === null ? "NA" : itemData.offical.highest[0],
+          tryDev: itemData.trial.highest === null ? "NA" : itemData.trial.highest[0],
           techManager: "-"
         }, {
           stage: "",
@@ -523,8 +535,8 @@ const CodeTableList: React.FC<any> = () => {
           stage: "",
           attendance: "正常",
           item: "最低贡献者",
-          formalDev: itemData.offical.lowest === null ? 0 : itemData.offical.lowest[0],
-          tryDev: itemData.trial.lowest === null ? 0 : itemData.trial.lowest[0],
+          formalDev: itemData.offical.lowest === null ? "NA" : itemData.offical.lowest[0],
+          tryDev: itemData.trial.lowest === null ? "NA" : itemData.trial.lowest[0],
           techManager: "-"
         }, {
           stage: "",

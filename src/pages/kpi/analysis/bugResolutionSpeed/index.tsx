@@ -616,7 +616,7 @@ const FrontTableList: React.FC<any> = () => {
 
           <label style={{marginLeft: "10px", marginTop: 7}}>查询周期：</label>
           <RangePicker
-            style={{width: '20%', marginTop: 7}} onChange={onSourceTimeSelected} allowClear={false}
+            style={{minWidth:220,width: '20%', marginTop: 7}} onChange={onSourceTimeSelected} allowClear={false}
             value={[choicedCondition.start === "" ? null : moment(choicedCondition.start),
               choicedCondition.end === "" ? null : moment(choicedCondition.end)]}
           />

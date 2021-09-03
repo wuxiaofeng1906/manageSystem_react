@@ -344,7 +344,6 @@ export default [
         name: '数据分析',
         icon: 'table',
         path: '/kpi/analysis',
-        // hideInMenu: true,
         access: 'sysAdmin',
         routes: [
           {
@@ -357,6 +356,7 @@ export default [
             name: '前端 Dashboard',
             icon: 'table',
             path: 'front_dashboard',
+            hideInMenu: true,
             component: './kpi/analysis/front_dashboard',
           },
           {

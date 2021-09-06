@@ -18,3 +18,9 @@
   color: black;
   font-size: x-small;
 }
+
+/* 多表头样式设置 */
+.ag-pivot-off .ag-header-group-cell {
+  /* font-size: 50px; */
+  color: black;
+}

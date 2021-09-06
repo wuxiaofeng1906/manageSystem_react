@@ -16,17 +16,33 @@ const {Option} = Select;
 
 
 const queryBranchViews = async (client: GqlClient<object>, queryCondition: any) => {
+  debugger;
 
+  let project = "";  // 拼接gql 需要的数组
+  if (queryCondition.frontLib) {
+    project = `"${queryCondition.frontLib}"`;
+  }
+
+  if (queryCondition.backendLib) {
+    project = project === "" ? `"${queryCondition.backendLib}"` : `${project},"${queryCondition.backendLib}"`;
+  }
 
   let qurStr: any = "";
   if (queryCondition.module) {
-    qurStr = `(branchs:"${queryCondition.module}")`;
+    qurStr = `module:"${queryCondition.module}"`;
   }
 
+  if (project) {
+    qurStr = qurStr === "" ? `project:[${project}]` : `${qurStr},project:[${project}]`;
+  }
+
+  if (qurStr) {
+    qurStr = `(${qurStr})`
+  }
 
   const {data} = await client.query(`
     {
-      fileCoverOfExpectModule${qurStr}
+      fileCovers${qurStr}
       {
           side
           branch
@@ -41,7 +57,7 @@ const queryBranchViews = async (client: GqlClient<object>, queryCondition: any) 
     `);
 
 
-  const datas = data?.fileCoverOfExpectModule;
+  const datas = data?.fileCovers;
   const front: any = [];
   const backend: any = [];
 
@@ -69,15 +85,6 @@ function dateCellRenderer(params: any) {
     return ` <span><span>  ${times} </span> <span style='color: darkorange'> (latest) </span></span>`;
   }
   return ` <span>  ${times} </span>`;
-}
-
-// 时间戳转换 毫秒转为时间
-const getDateCellRenderer = (params: any) => {
-  if (params.value) {
-    return dayjs(Number(params.value)).format("YYYY-MM-DD HH:mm:ss");
-  }
-  return params.value;
-
 }
 
 // 区分前端或者后端
@@ -110,29 +117,29 @@ function coverageCellRenderer(params: any) {
   return values.toString();
 }
 
-// const LoadBranchCombobox = (module: any) => {
-//
-//   const combobox = [<Option value=""> </Option>];
-//
-//   // 传入的参数module不能是任何类型的数据。在后端，FRONT 和 BACKEND 本身就是一个类型，因此需要将传入的字符串双引号去掉。
-//   const {data: {fileCoverBrachRepository = []} = {}} = useQuery(`
-//           {
-//              fileCoverBrachRepository(side:${module.replaceAll('"', '')}){
-//               side
-//               name
-//             }
-//           }
-//       `);
-//
-//   if (fileCoverBrachRepository === null) {
-//     return combobox;
-//   }
-//   for (let index = 0; index < fileCoverBrachRepository.length; index += 1) {
-//     combobox.push(<Option
-//       value={fileCoverBrachRepository[index].name}> {fileCoverBrachRepository[index].name}</Option>);
-//   }
-//   return combobox;
-// };
+const LoadBranchCombobox = (module: any) => {
+
+  const combobox = [<Option value=""> </Option>];
+
+  // 传入的参数module不能是任何类型的数据。在后端，FRONT 和 BACKEND 本身就是一个类型，因此需要将传入的字符串双引号去掉。
+  const {data: {fileCoverBrachRepository = []} = {}} = useQuery(`
+          {
+             fileCoverBrachRepository(side:${module.replaceAll('"', '')}){
+              side
+              name
+            }
+          }
+      `);
+
+  if (fileCoverBrachRepository === null) {
+    return combobox;
+  }
+  for (let index = 0; index < fileCoverBrachRepository.length; index += 1) {
+    combobox.push(<Option
+      value={fileCoverBrachRepository[index].name}> {fileCoverBrachRepository[index].name}</Option>);
+  }
+  return combobox;
+};
 
 const LoadProjectCombobox = () => {
 
@@ -142,16 +149,14 @@ const LoadProjectCombobox = () => {
           {
             fileCoverBrachModule{
               name
-              branch
             }
           }
       `);
 
 
   for (let index = 0; index < fileCoverBrachModule.length; index += 1) {
-    combobox.push(
-      <Option key={fileCoverBrachModule[index].branch}
-              value={fileCoverBrachModule[index].branch}> {fileCoverBrachModule[index].name}</Option>);
+    combobox.push(<Option
+      value={fileCoverBrachModule[index].name}> {fileCoverBrachModule[index].name}</Option>);
   }
   return combobox;
 };
@@ -160,9 +165,9 @@ const BranchTableList: React.FC<any> = () => {
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
   const [conditon, setCondition] = useState({
-    module: "feature-multi-org2",  // 默认为多组织的分支
-    // frontLib: "",
-    // backendLib: ""
+    module: "",
+    frontLib: "",
+    backendLib: ""
   });
   const {data, loading} = useRequest(() => queryBranchViews(gqlClient, conditon));
 
@@ -192,7 +197,6 @@ const BranchTableList: React.FC<any> = () => {
   };
 
   const projectChanged = (values: any) => {
-    debugger;
     console.log(values);
     setCondition({
       ...conditon,
@@ -200,28 +204,28 @@ const BranchTableList: React.FC<any> = () => {
     });
   };
 
-  // const frontLibChanged = (values: any) => {
-  //   console.log(values);
-  //   setCondition({
-  //     ...conditon,
-  //     frontLib: values
-  //   });
-  //
-  // };
+  const frontLibChanged = (values: any) => {
+    console.log(values);
+    setCondition({
+      ...conditon,
+      frontLib: values
+    });
 
-  // const backendLibChanged = (values: any) => {
-  //   console.log(values);
-  //   setCondition({
-  //     ...conditon,
-  //     backendLib: values
-  //   });
-  // };
+  };
+
+  const backendLibChanged = (values: any) => {
+    console.log(values);
+    setCondition({
+      ...conditon,
+      backendLib: values
+    });
+  };
 
   /* region 提示规则显示 */
   const [messageVisible, setVisible] = useState(false);
-  // const showRules = () => {
-  //   setVisible(true);
-  // };
+  const showRules = () => {
+    setVisible(true);
+  };
   const onClose = () => {
     setVisible(false);
   };
@@ -245,11 +249,10 @@ const BranchTableList: React.FC<any> = () => {
             showSearch
             optionFilterProp="children"
             onChange={projectChanged}
-            value={conditon.module}
           >
             {LoadProjectCombobox()}
           </Select>
-          {/*
+
           <label style={{marginLeft: '20px'}}>前端库：</label>
           <Select
             placeholder="请选择"
@@ -281,7 +284,6 @@ const BranchTableList: React.FC<any> = () => {
           >
             计算规则
           </Button>
-          */}
         </Form.Item>
       </div>
 
@@ -303,6 +305,8 @@ const BranchTableList: React.FC<any> = () => {
           rowHeight={32}
           headerHeight={35}
           groupDefaultExpanded={9} // 展开分组
+          // suppressDragLeaveHidesColumns
+          // suppressMakeColumnVisibleAfterUnGroup
           onGridReady={onGridReady}
         >
           <AgGridColumn
@@ -313,7 +317,7 @@ const BranchTableList: React.FC<any> = () => {
             hide={true}
             cellRenderer={sideCellRenderer}
           />
-          <AgGridColumn field="project" headerName="仓库名" minWidth={150}/>
+          <AgGridColumn field="moduleName" headerName="项目名" minWidth={150}/>
           <AgGridColumn field="branch" headerName="分支名" minWidth={150}/>
           <AgGridColumn field="reportDate" headerName="日期" minWidth={150} cellRenderer={dateCellRenderer}/>
           <AgGridColumn
@@ -327,7 +331,7 @@ const BranchTableList: React.FC<any> = () => {
             // type="numericColumn"
             cellRenderer={coverageCellRenderer}
           />
-          <AgGridColumn field="createAt" headerName="扫描时间" cellRenderer={getDateCellRenderer}/>
+          <AgGridColumn field="createAt" headerName="扫描时间"/>
         </AgGridReact>
       </div>
 

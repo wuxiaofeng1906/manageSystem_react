@@ -168,6 +168,11 @@ export default [
                 path: '/kpi/performance/developer/coverage',
                 routes: [
                   {
+                    name: '按仓库',
+                    icon: 'table',
+                    path: '/kpi/performance/developer/coverage/byStorehouse',
+                    component: './kpi/performance/developer/coverage/byStorehouse',
+                  },{
                     name: '按分支',
                     icon: 'table',
                     path: '/kpi/performance/developer/coverage/byBranch',

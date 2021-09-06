@@ -21,11 +21,12 @@ const {Option} = Select;
 
 const ragCellClassRules = {
   'cell-span-total': (params: any) => {
+    // 为了区分，“合计”字段所在的列内容设置为了合计和合计列
     return params.data.createAt === '合计' || params.data.createAt === '合计列';
   },
 
   'cell-span': (params: any) => {
-    return params.data.createAt !== '合计';
+    return params.data.createAt !== '合计' && params.data.createAt !== '合计列';
   }
 
 };
@@ -86,6 +87,7 @@ const getSourceColums = (starttime: any, endTime: any) => {
           pinned: 'left',
 
           rowSpan: (params: any) => {
+            debugger;
 
             if (params.data.createAt === "合计" && params.data.status === '激活') {
               return 5;

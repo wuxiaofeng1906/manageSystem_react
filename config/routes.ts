@@ -361,7 +361,7 @@ export default [
             name: '前端 Dashboard',
             icon: 'table',
             path: 'front_dashboard',
-            // hideInMenu: true,
+            hideInMenu: true,
             component: './kpi/analysis/front_dashboard',
           },
           {

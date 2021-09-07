@@ -37,90 +37,97 @@ const getSourceColums = () => {
 
   // 定义的原始字段
   const oraFields: any = [
+    // {
+    //   headerName: "",
+    //
+    //   children: [
+    //     {
+    //       headerName: '部门',
+    //       field: 'dept',
+    //       minWidth: 100,
+    //       enableRowGroup:true,
+    //       rowGroupIndex:0,
+    //       hide:true
+    //     },
+    //     {
+    //       headerName: '组',
+    //       field: 'group',
+    //       minWidth: 100,
+    //
+    //       enableRowGroup:true,
+    //       rowGroupIndex:1,
+    //       hide:true
+    //     },
+    //     {
+    //       headerName: '姓名',
+    //       field: 'userName',
+    //       minWidth: 80,
+    //       suppressMenu: false,
+    //
+    //     },]
+    // },
     {
-      headerName: "",
+      headerName: '周期时间',
       children: [
         {
-          headerName: 'NO.',
-          minWidth: 60,
-          maxWidth: 80,
-          filter: false,
-          pinned: 'left',
-          suppressMenu: true,
-          cellRenderer: (params: any) => {
-            return Number(params.node.id) + 1;
-          },
+          headerName: 'Bug解决时长(H)',
+          field: 'time',
+          minWidth: 133,
+
         },
         {
-          headerName: '姓名',
-          field: 'userName',
-          pinned: 'left',
-          minWidth: 80,
-          suppressMenu: false,
-        },]
+          headerName: 'Bug数量',
+          field: 'avgLines',
+          minWidth: 88,
+        }
+      ]
     },
-    // {
-    //   headerName: '周期时间',
-    //   children: [
-    //     {
-    //       headerName: 'Bug解决时长(H)',
-    //       field: 'maxLines',
-    //       minWidth: 133,
-    //       valueFormatter: cellFormat
-    //     },
-    //     {
-    //       headerName: 'Bug数量',
-    //       field: 'avgLines',
-    //       minWidth: 88,
-    //     }
-    //   ]
-    // },
-    // {
-    //   headerName: '',
-    //   children: [{
-    //     headerName: '任务燃尽图',
-    //     field: 'minLines',
-    //     minWidth: 120,
-    //   }]
-    // },
-    // {
-    //   headerName: '速度',
-    //   children: [
-    //     {
-    //       headerName: '初始需求数',
-    //       field: 'deptName',
-    //       minWidth: 105,
-    //     },
-    //     {
-    //       headerName: '初始需求完成数',
-    //       field: 'groupName',
-    //       minWidth: 130,
-    //     },
-    //     {
-    //       headerName: '追加需求数',
-    //       field: 'tech',
-    //       minWidth: 105,
-    //     },
-    //     {
-    //       headerName: '追加需求完成数',
-    //       field: 'area',
-    //       minWidth: 130,
-    //     }
-    //   ]
-    // },
-    // {
-    //   headerName: '对外请求',
-    //   children: [{
-    //     headerName: '请求数',
-    //     field: 'position',
-    //     minWidth: 85,
-    //   },
-    //     {
-    //       headerName: '请求平均停留时长',
-    //       field: 'job',
-    //       minWidth: 140,
-    //     }]
-    // },
+    {
+      headerName: '',
+      children: [{
+        headerName: '任务燃尽图',
+        field: 'minLines',
+        minWidth: 120,
+      }]
+    },
+    {
+      headerName: '速度',
+      children: [
+        {
+          headerName: '初始需求数',
+          field: 'deptName',
+          minWidth: 105,
+        },
+        {
+          headerName: '初始需求完成数',
+          field: 'groupName',
+          minWidth: 130,
+        },
+        {
+          headerName: '追加需求数',
+          field: 'tech',
+          minWidth: 105,
+        },
+        {
+          headerName: '追加需求完成数',
+          field: 'area',
+          minWidth: 130,
+        }
+      ]
+    },
+    {
+      headerName: '对外请求',
+      children: [{
+        headerName: '请求数',
+        field: 'position',
+        minWidth: 85,
+      },
+        {
+          headerName: '请求平均停留时长',
+          field: 'job',
+          minWidth: 140,
+        }]
+    },
     {
       headerName: '吞吐量',
       children: [
@@ -192,7 +199,65 @@ const getSourceColums = () => {
 
   });
 
-  return component;
+
+  const basicFiled = [
+    {
+      headerName: '部门',
+      field: 'dept',
+      minWidth: 100,
+      rowGroup: true,
+      hide: true,
+    },
+    {
+      headerName: '组',
+      field: 'group',
+      minWidth: 100,
+      rowGroup: true,
+      hide: true,
+    },
+    {
+      headerName: '姓名',
+      field: 'userName',
+      minWidth: 80,
+      suppressMenu: false,
+    }];
+  return basicFiled.concat(oraFields);
+
+
+};
+
+const alaysisData = (source: any) => {
+  const data: any = [];
+  source.forEach((dts: any) => {
+    let deptname = "";
+    let groupname = "";
+    const dept_group = dts.deptsName;
+    if (dept_group) {
+
+      groupname = dept_group[0].toString();
+
+      if (dept_group[1]) {
+        deptname = dept_group[1].toString();
+      } else {
+        deptname = groupname;
+      }
+    }
+
+    data.push({
+      userName: dts.userName,
+      dept: deptname,
+      group: groupname,
+      finiStory: dts.finiStory,
+      finiTask: dts.finiTask,
+      resolvedBug: dts.resolvedBug,
+      doingTask: dts.doingTask,
+      codeCommit: dts.codeCommit,
+      newLine: dts.newLine
+    })
+
+  });
+
+  return data;
 };
 
 // 公共查询方法
@@ -201,6 +266,7 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
   const {data} = await client.query(`{
           dashFront(start:"${params.start}",end:"${params.end}"){
             userName
+            deptsName
             finiStory
             finiTask
             resolvedBug
@@ -213,7 +279,7 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
   `);
 
 
-  return data?.dashFront;
+  return alaysisData(data?.dashFront);
 };
 
 const FrontTableList: React.FC<any> = () => {
@@ -278,7 +344,7 @@ const FrontTableList: React.FC<any> = () => {
   /* region 显示自定义字段 */
   const [isFieldModalVisible, setFieldModalVisible] = useState(false);
   const [selectedFiled, setSelectedFiled] = useState(['']);
-  const nessField = ['NO.', '姓名'];
+  const nessField = ['NO.', '部门', '组', '姓名'];
   const unNessField = ['Bug解决时长(H)', 'Bug数量', '任务燃尽图', '初始需求数', '初始需求完成数', '追加需求数', '追加需求完成数',
     '请求数', '请求平均停留时长', '交付需求数', '完成任务数', '修复Bug数', '进行中任务数', '代码提交次数', '代码新增行数'];
 
@@ -288,7 +354,7 @@ const FrontTableList: React.FC<any> = () => {
     if (fields === null) {
       setSelectedFiled(nessField.concat(unNessField));
     } else {
-      setSelectedFiled(JSON.parse(fields));
+      setSelectedFiled(JSON.parse(fields).concat(nessField));  // 无论如何，必选字段必须被勾选
     }
     setFieldModalVisible(true);
   };
@@ -368,22 +434,16 @@ const FrontTableList: React.FC<any> = () => {
               sortable: true,
               filter: true,
               flex: 1,
-              cellStyle: {"line-height": "28px"},
               suppressMenu: true,
             }}
             autoGroupColumnDef={{
               minWidth: 250,
-              // sort: 'asc'
+              sort: 'desc'
             }}
-            rowSelection={'multiple'} // 设置多行选中
             groupDefaultExpanded={9} // 展开分组
-            suppressAggFuncInHeader={true} // 不显示标题聚合函数的标识
-            rowHeight={30}
-            headerHeight={35}
-
             onGridReady={onSourceGridReady}
             onGridSizeChanged={onSourceGridReady}
-            suppressScrollOnNewData={false}
+
           >
 
           </AgGridReact>
@@ -403,10 +463,17 @@ const FrontTableList: React.FC<any> = () => {
               <Checkbox.Group style={{width: '100%'}} value={selectedFiled} onChange={onSetFieldsChange}>
                 <Row>
                   <Col span={4}>
-                    <Checkbox defaultChecked disabled value="NO.">NO.</Checkbox>
+                    <Checkbox disabled value="NO.">NO.</Checkbox>
                   </Col>
                   <Col span={4}>
-                    <Checkbox defaultChecked disabled value="姓名">姓名</Checkbox>
+                    <Checkbox disabled value="部门">部门</Checkbox>
+                  </Col>
+                  <Col span={4}>
+                    <Checkbox disabled value="组">组</Checkbox>
+                  </Col>
+
+                  <Col span={4}>
+                    <Checkbox disabled value="姓名">姓名</Checkbox>
                   </Col>
                   <Col span={4}>
                     <Checkbox value="Bug解决时长(H)">Bug解决时长</Checkbox>

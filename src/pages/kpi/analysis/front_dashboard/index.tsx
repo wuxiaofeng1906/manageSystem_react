@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -13,6 +13,8 @@ import {getHeight} from '@/publicMethods/pageSet';
 import moment from "moment";
 import {useRequest} from "ahooks";
 import dayjs from 'dayjs';
+import * as echarts from "echarts";
+// import ReactEcharts from 'echarts-for-react';
 
 const {RangePicker} = DatePicker;
 
@@ -27,203 +29,6 @@ const cellFormat = (params: any) => {
     return Number(params.value);
   }
   return 0;
-};
-
-// 定义列名
-const getSourceColums = () => {
-
-  // 获取缓存的字段
-  const fields = localStorage.getItem("data_front_dashboard");
-
-  // 定义的原始字段
-  const oraFields: any = [
-    // {
-    //   headerName: "",
-    //
-    //   children: [
-    //     {
-    //       headerName: '部门',
-    //       field: 'dept',
-    //       minWidth: 100,
-    //       enableRowGroup:true,
-    //       rowGroupIndex:0,
-    //       hide:true
-    //     },
-    //     {
-    //       headerName: '组',
-    //       field: 'group',
-    //       minWidth: 100,
-    //
-    //       enableRowGroup:true,
-    //       rowGroupIndex:1,
-    //       hide:true
-    //     },
-    //     {
-    //       headerName: '姓名',
-    //       field: 'userName',
-    //       minWidth: 80,
-    //       suppressMenu: false,
-    //
-    //     },]
-    // },
-    {
-      headerName: '周期时间',
-      children: [
-        {
-          headerName: 'Bug解决时长(H)',
-          field: 'time',
-          minWidth: 133,
-
-        },
-        {
-          headerName: 'Bug数量',
-          field: 'avgLines',
-          minWidth: 88,
-        }
-      ]
-    },
-    {
-      headerName: '',
-      children: [{
-        headerName: '任务燃尽图',
-        field: 'minLines',
-        minWidth: 120,
-      }]
-    },
-    {
-      headerName: '速度',
-      children: [
-        {
-          headerName: '初始需求数',
-          field: 'deptName',
-          minWidth: 105,
-        },
-        {
-          headerName: '初始需求完成数',
-          field: 'groupName',
-          minWidth: 130,
-        },
-        {
-          headerName: '追加需求数',
-          field: 'tech',
-          minWidth: 105,
-        },
-        {
-          headerName: '追加需求完成数',
-          field: 'area',
-          minWidth: 130,
-        }
-      ]
-    },
-    {
-      headerName: '对外请求',
-      children: [{
-        headerName: '请求数',
-        field: 'position',
-        minWidth: 85,
-      },
-        {
-          headerName: '请求平均停留时长',
-          field: 'job',
-          minWidth: 140,
-        }]
-    },
-    {
-      headerName: '吞吐量',
-      children: [
-        {
-          headerName: '交付需求数',
-          field: 'finiStory',
-          minWidth: 105,
-          valueFormatter: cellFormat
-        },
-        {
-          headerName: '完成任务数',
-          field: 'finiTask',
-          minWidth: 105,
-          valueFormatter: cellFormat
-        },
-        {
-          headerName: '修复Bug数',
-          field: 'resolvedBug',
-          minWidth: 105,
-          valueFormatter: cellFormat
-        },
-        {
-          headerName: '进行中任务数',
-          field: 'doingTask',
-          minWidth: 115,
-          valueFormatter: cellFormat
-        },
-        {
-          headerName: '代码提交次数',
-          field: 'codeCommit',
-          minWidth: 115,
-          valueFormatter: cellFormat
-        },
-        {
-          headerName: '代码新增行数',
-          field: 'newLine',
-          minWidth: 115,
-          valueFormatter: cellFormat
-        }
-      ]
-    }
-
-  ];
-
-  if (fields === null) {
-    return oraFields;
-  }
-
-  const selected = JSON.parse(fields);
-
-  const component: any = [];
-  oraFields.forEach((parent: any) => {
-    const p_details = parent.children;
-    const childs: any = [];
-    p_details.forEach((c_details: any) => {
-      const newElement = c_details;
-      if (selected.includes(c_details.headerName)) {
-        newElement.hide = false;
-      } else {
-        newElement.hide = true;
-      }
-      childs.push(newElement);
-    });
-
-    component.push({
-      headerName: parent.headerName,
-      children: childs,
-    })
-
-  });
-
-
-  const basicFiled = [
-    {
-      headerName: '部门',
-      field: 'dept',
-      minWidth: 100,
-      rowGroup: true,
-      hide: true,
-    },
-    {
-      headerName: '组',
-      field: 'group',
-      minWidth: 100,
-      rowGroup: true,
-      hide: true,
-    },
-    {
-      headerName: '姓名',
-      field: 'userName',
-      minWidth: 80,
-      suppressMenu: false,
-    }];
-  return basicFiled.concat(oraFields);
-
-
 };
 
 const alaysisData = (source: any) => {
@@ -283,6 +88,224 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
 };
 
 const FrontTableList: React.FC<any> = () => {
+
+  const ShowCharts = (eleId: string) => {
+
+    const container = document.getElementById(eleId);
+    if (container) {
+      const myChart = echarts.init(container);
+
+      const option = {
+        xAxis: {
+          type: 'category',
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [{
+          data: [150, 230, 224, 218, 135, 147, 260],
+          type: 'line'
+        }]
+      };
+
+      myChart.setOption(option)
+    }
+
+  };
+
+  const render = (params: any) => {
+
+    // return (
+    //   <ReactEcharts
+    //     option={this.getOtion()}
+    //     style={{height: '350px', width: '1000px'}}
+    //     className='react_for_echarts' />
+    // );
+
+    // debugger;
+    // if (params.data) {
+    //   return `<div id=${params.data.userName}>  </div>`;
+    // }
+    return "";
+  };
+
+
+// 定义列名
+  const getSourceColums = () => {
+
+
+    // 获取缓存的字段
+    const fields = localStorage.getItem("data_front_dashboard");
+
+    // 定义的原始字段
+    const oraFields: any = [
+
+      // {
+      //   headerName: '周期时间',
+      //   children: [
+      //     {
+      //       headerName: 'Bug解决时长(H)',
+      //       field: 'time',
+      //       minWidth: 133,
+      //
+      //     },
+      //     {
+      //       headerName: 'Bug数量',
+      //       field: 'avgLines',
+      //       minWidth: 88,
+      //     }
+      //   ]
+      // },
+      {
+        headerName: '',
+        children: [{
+          id: "taskChart",
+          headerName: '任务燃尽图',
+          field: 'minLines',
+          minWidth: 120,
+          // cellRendererFramework: render,
+          // cellRenderer: render,
+
+        }]
+      },
+      // {
+      //   headerName: '速度',
+      //   children: [
+      //     {
+      //       headerName: '初始需求数',
+      //       field: 'deptName',
+      //       minWidth: 105,
+      //     },
+      //     {
+      //       headerName: '初始需求完成数',
+      //       field: 'groupName',
+      //       minWidth: 130,
+      //     },
+      //     {
+      //       headerName: '追加需求数',
+      //       field: 'tech',
+      //       minWidth: 105,
+      //     },
+      //     {
+      //       headerName: '追加需求完成数',
+      //       field: 'area',
+      //       minWidth: 130,
+      //     }
+      //   ]
+      // },
+      // {
+      //   headerName: '对外请求',
+      //   children: [{
+      //     headerName: '请求数',
+      //     field: 'position',
+      //     minWidth: 85,
+      //   },
+      //     {
+      //       headerName: '请求平均停留时长',
+      //       field: 'job',
+      //       minWidth: 140,
+      //     }]
+      // },
+      {
+        headerName: '吞吐量',
+        children: [
+          {
+            headerName: '交付需求数',
+            field: 'finiStory',
+            minWidth: 105,
+            valueFormatter: cellFormat
+          },
+          {
+            headerName: '完成任务数',
+            field: 'finiTask',
+            minWidth: 105,
+            valueFormatter: cellFormat
+          },
+          {
+            headerName: '修复Bug数',
+            field: 'resolvedBug',
+            minWidth: 105,
+            valueFormatter: cellFormat
+          },
+          {
+            headerName: '进行中任务数',
+            field: 'doingTask',
+            minWidth: 115,
+            valueFormatter: cellFormat
+          },
+          {
+            headerName: '代码提交次数',
+            field: 'codeCommit',
+            minWidth: 115,
+            valueFormatter: cellFormat
+          },
+          {
+            headerName: '代码新增行数',
+            field: 'newLine',
+            minWidth: 115,
+            valueFormatter: cellFormat
+          }
+        ]
+      }
+
+    ];
+
+    if (fields === null) {
+      return oraFields;
+    }
+
+    const selected = JSON.parse(fields);
+
+    const component: any = [];
+    oraFields.forEach((parent: any) => {
+      const p_details = parent.children;
+      const childs: any = [];
+      p_details.forEach((c_details: any) => {
+        const newElement = c_details;
+        if (selected.includes(c_details.headerName)) {
+          newElement.hide = false;
+        } else {
+          newElement.hide = true;
+        }
+        childs.push(newElement);
+      });
+
+      component.push({
+        headerName: parent.headerName,
+        children: childs,
+      })
+
+    });
+
+
+    const basicFiled = [
+      {
+        headerName: '部门',
+        field: 'dept',
+        minWidth: 100,
+        rowGroup: true,
+        hide: true,
+      },
+      {
+        headerName: '组',
+        field: 'group',
+        minWidth: 100,
+        rowGroup: true,
+        hide: true,
+      },
+      {
+        headerName: '姓名',
+        field: 'userName',
+        minWidth: 80,
+        suppressMenu: false,
+      }];
+    return basicFiled.concat(oraFields);
+
+
+  };
+
+
   const g_currentMonth_range = {
     start: dayjs().startOf('month').format("YYYY-MM-DD"),
     end: dayjs().endOf('month').format("YYYY-MM-DD")
@@ -304,7 +327,7 @@ const FrontTableList: React.FC<any> = () => {
   // 表格的屏幕大小自适应
   const [sourceGridHeight, setGridHeight] = useState(Number(getHeight()));
   window.onresize = function () {
-    setGridHeight(Number(getHeight()) - 64);
+    setGridHeight(Number(getHeight()));
     gridApiForFront.current?.sizeColumnsToFit();
   };
 
@@ -396,12 +419,17 @@ const FrontTableList: React.FC<any> = () => {
   /* endregion */
 
 
+  // useEffect(() => {
+  //   showCharts();
+  // }, [data]);
+
   return (
     <PageContainer>
 
       <div>
+
         {/* 查询条件 */}
-        <div style={{width: '100%', height: 45, marginTop: 15, backgroundColor: "white"}}>
+        <div style={{width: '100%', height: 45, marginTop: -15, backgroundColor: "white"}}>
           <Form.Item>
 
             <label style={{marginLeft: "10px", marginTop: 7}}>查询周期：</label>
@@ -435,6 +463,7 @@ const FrontTableList: React.FC<any> = () => {
               filter: true,
               flex: 1,
               suppressMenu: true,
+              // cellStyle: setCellStyle,
             }}
             autoGroupColumnDef={{
               minWidth: 250,

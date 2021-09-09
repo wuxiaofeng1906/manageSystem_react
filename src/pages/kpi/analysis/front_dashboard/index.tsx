@@ -14,6 +14,7 @@ import moment from 'moment';
 import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 import * as echarts from 'echarts';
+
 // import ReactEcharts from 'echarts-for-react';
 
 const { RangePicker } = DatePicker;
@@ -33,7 +34,7 @@ const cellFormat = (params: any) => {
 
 // 定义列名
 
-const alaysisData = (source: any) => {
+const alaysisData = (source: any, startTime: string, endTime: string) => {
   const data: any = [];
   source.forEach((dts: any) => {
     let deptname = '';
@@ -60,6 +61,8 @@ const alaysisData = (source: any) => {
       doingTask: dts.doingTask,
       codeCommit: dts.codeCommit,
       newLine: dts.newLine,
+      start: startTime,
+      end: endTime,
     });
   });
 
@@ -84,13 +87,18 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
       }
   `);
 
-  return alaysisData(data?.dashFront);
+  return alaysisData(data?.dashFront, params.start.toString(), params.end.toString());
 };
 
 // 查询单人的燃尽图
-const queryBurnChartData = async (client: GqlClient<object>, userId: string, timeRange: any) => {
+const queryBurnChartData = async (
+  client: GqlClient<object>,
+  userId: string,
+  start: string,
+  end: string,
+) => {
   const { data } = await client.query(`{
-          burnoutDiagram(start:"${timeRange.string}",end:"${timeRange.end}",userIds:["${userId}"]){
+          burnoutDiagram(start:"${start}",end:"${end}",userIds:["${userId}"]){
             userId
             dates
             estimate
@@ -239,165 +247,167 @@ const FrontTableList: React.FC<any> = () => {
   });
 
   const showCodesChart = async (source: any) => {
-    const chartDom = document.getElementById('burnedChart');
-    if (chartDom) {
-      // 基于准备好的dom，初始化echarts实例
-      const myChart = echarts.init(chartDom);
-      myChart.clear();
-      // 绘制图表
-      myChart.setOption({
-        grid: {
-          x: 50,
-          y: 10,
-          x2: 90,
-          y2: 20,
-          show: true,
-          containLable: true,
-        },
-
-        tooltip: {
-          trigger: 'axis',
-        },
-        legend: {
-          orient: 'vertical',
-          data: ['预计工时', '总消耗', '总剩余'],
-
-          // type: 'scroll',
-          right: -5,
-          top: 15,
-          // bottom: 20,
-        },
-        xAxis: {
-          type: 'category',
-
-          // data: ['2021', '2023', '2025'] // 时间
-          data: source.dates,
-        },
-        yAxis: {
-          type: 'value',
-        },
-        series: [
-          {
-            name: '预计工时',
-            type: 'line',
-            data: source.estimate,
-            lineStyle: {
-              // 设置线条颜色等
-              normal: {
-                color: '#5FB404', // 连线颜色:绿色
-              },
-            },
-            itemStyle: {
-              // 设置线条上点的颜色等
-              normal: {
-                color: '#5FB404',
-              },
-            },
-            areaStyle: {
-              color: {
-                type: 'linear',
-                x: 0,
-                y: 0,
-                x2: 0,
-                y2: 1,
-                colorStops: [
-                  {
-                    offset: 0,
-                    color: '#5FB404', // 0% 处的颜色
-                  },
-                  {
-                    offset: 1,
-                    color: '#E0F8E0', // 100% 处的颜色
-                  },
-                ],
-                global: false,
-              },
-            },
+    if (source) {
+      const chartDom = document.getElementById('burnedChart');
+      if (chartDom) {
+        // 基于准备好的dom，初始化echarts实例
+        const myChart = echarts.init(chartDom);
+        myChart.clear();
+        // 绘制图表
+        myChart.setOption({
+          grid: {
+            x: 50,
+            y: 10,
+            x2: 90,
+            y2: 20,
+            show: true,
+            containLable: true,
           },
-          {
-            name: '总消耗',
-            type: 'line',
-            data: source.consumed,
-            lineStyle: {
-              normal: {
-                color: '#FFBF00', // 连线颜色：黄色
-              },
-            },
-            itemStyle: {
-              // 设置线条上点的颜色等
-              normal: {
-                color: '#FFBF00',
-              },
-            },
-            areaStyle: {
-              color: {
-                type: 'linear',
-                x: 0,
-                y: 0,
-                x2: 0,
-                y2: 1,
-                colorStops: [
-                  {
-                    offset: 0,
-                    color: '#FFBF00', // 0% 处的颜色
-                  },
-                  {
-                    offset: 1,
-                    color: '#F5ECCE', // 100% 处的颜色
-                  },
-                ],
-                global: false,
-              },
-            },
-          },
-          {
-            name: '总剩余',
-            type: 'line',
-            data: source.left,
-            lineStyle: {
-              normal: {
-                color: '#58D3F7', // 连线颜色：蓝色
-              },
-            },
-            itemStyle: {
-              // 设置线条上点的颜色等
-              normal: {
-                color: '#58D3F7',
-              },
-            },
-            areaStyle: {
-              color: {
-                type: 'linear',
-                x: 0,
-                y: 0,
-                x2: 0,
-                y2: 1,
-                colorStops: [
-                  {
-                    offset: 0,
-                    color: '#58D3F7', // 0% 处的颜色
-                  },
-                  {
-                    offset: 1,
-                    color: '#CEECF5', // 100% 处的颜色
-                  },
-                ],
-                global: false,
-              },
-            },
-          },
-        ],
-      });
 
-      window.addEventListener('resize', () => {
-        myChart.resize();
-      });
+          tooltip: {
+            trigger: 'axis',
+          },
+          legend: {
+            orient: 'vertical',
+            data: ['预计工时', '总消耗', '总剩余'],
+
+            // type: 'scroll',
+            right: -5,
+            top: 15,
+            // bottom: 20,
+          },
+          xAxis: {
+            type: 'category',
+
+            // data: ['2021', '2023', '2025'] // 时间
+            data: source.dates,
+          },
+          yAxis: {
+            type: 'value',
+          },
+          series: [
+            {
+              name: '预计工时',
+              type: 'line',
+              data: source.estimate,
+              lineStyle: {
+                // 设置线条颜色等
+                normal: {
+                  color: '#5FB404', // 连线颜色:绿色
+                },
+              },
+              itemStyle: {
+                // 设置线条上点的颜色等
+                normal: {
+                  color: '#5FB404',
+                },
+              },
+              areaStyle: {
+                color: {
+                  type: 'linear',
+                  x: 0,
+                  y: 0,
+                  x2: 0,
+                  y2: 1,
+                  colorStops: [
+                    {
+                      offset: 0,
+                      color: '#5FB404', // 0% 处的颜色
+                    },
+                    {
+                      offset: 1,
+                      color: '#E0F8E0', // 100% 处的颜色
+                    },
+                  ],
+                  global: false,
+                },
+              },
+            },
+            {
+              name: '总消耗',
+              type: 'line',
+              data: source.consumed,
+              lineStyle: {
+                normal: {
+                  color: '#FFBF00', // 连线颜色：黄色
+                },
+              },
+              itemStyle: {
+                // 设置线条上点的颜色等
+                normal: {
+                  color: '#FFBF00',
+                },
+              },
+              areaStyle: {
+                color: {
+                  type: 'linear',
+                  x: 0,
+                  y: 0,
+                  x2: 0,
+                  y2: 1,
+                  colorStops: [
+                    {
+                      offset: 0,
+                      color: '#FFBF00', // 0% 处的颜色
+                    },
+                    {
+                      offset: 1,
+                      color: '#F5ECCE', // 100% 处的颜色
+                    },
+                  ],
+                  global: false,
+                },
+              },
+            },
+            {
+              name: '总剩余',
+              type: 'line',
+              data: source.left,
+              lineStyle: {
+                normal: {
+                  color: '#58D3F7', // 连线颜色：蓝色
+                },
+              },
+              itemStyle: {
+                // 设置线条上点的颜色等
+                normal: {
+                  color: '#58D3F7',
+                },
+              },
+              areaStyle: {
+                color: {
+                  type: 'linear',
+                  x: 0,
+                  y: 0,
+                  x2: 0,
+                  y2: 1,
+                  colorStops: [
+                    {
+                      offset: 0,
+                      color: '#58D3F7', // 0% 处的颜色
+                    },
+                    {
+                      offset: 1,
+                      color: '#CEECF5', // 100% 处的颜色
+                    },
+                  ],
+                  global: false,
+                },
+              },
+            },
+          ],
+        });
+
+        window.addEventListener('resize', () => {
+          myChart.resize();
+        });
+      }
     }
   };
 
-  const loadBurnChart = async (userId: string) => {
+  const loadBurnChart = async (userId: string, start: string, end: string) => {
     // 查询数据
-    const chartDatas = await queryBurnChartData(gqlClient, userId, choicedConditionForSource);
+    const chartDatas = await queryBurnChartData(gqlClient, userId, start, end);
 
     // burnedChart 绘制
     await showCodesChart(chartDatas[0]);
@@ -424,7 +434,6 @@ const FrontTableList: React.FC<any> = () => {
           },
         ],
       },
-
       {
         headerName: '速度',
         children: [
@@ -521,7 +530,7 @@ const FrontTableList: React.FC<any> = () => {
                   show: true,
                   userName: params.data.userName,
                 });
-                loadBurnChart(params.data.userId);
+                loadBurnChart(params.data.userId, params.data.start, params.data.end);
               }
             },
           },

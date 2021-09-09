@@ -1,23 +1,23 @@
-import React, { useRef, useState } from 'react';
-import { PageContainer } from '@ant-design/pro-layout';
-import { AgGridReact } from 'ag-grid-react';
+import React, {useRef, useState} from 'react';
+import {PageContainer} from '@ant-design/pro-layout';
+import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import type { GridApi, GridReadyEvent } from 'ag-grid-community';
-import type { GqlClient } from '@/hooks';
-import { useGqlClient } from '@/hooks';
-import { Button, Checkbox, Col, DatePicker, Form, message, Modal, Row } from 'antd';
-import { LogoutOutlined, SettingOutlined } from '@ant-design/icons';
-import { getHeight } from '@/publicMethods/pageSet';
+import type {GridApi, GridReadyEvent} from 'ag-grid-community';
+import type {GqlClient} from '@/hooks';
+import {useGqlClient} from '@/hooks';
+import {Button, Checkbox, Col, DatePicker, Form, message, Modal, Row} from 'antd';
+import {LogoutOutlined, SettingOutlined} from '@ant-design/icons';
+import {getHeight} from '@/publicMethods/pageSet';
 import moment from 'moment';
-import { useRequest } from 'ahooks';
+import {useRequest} from 'ahooks';
 import dayjs from 'dayjs';
 import * as echarts from 'echarts';
 
 // import ReactEcharts from 'echarts-for-react';
 
-const { RangePicker } = DatePicker;
+const {RangePicker} = DatePicker;
 
 // 格式化单元格内容
 const cellFormat = (params: any) => {
@@ -71,7 +71,7 @@ const alaysisData = (source: any, startTime: string, endTime: string) => {
 
 // 公共查询方法
 const queryFrontData = async (client: GqlClient<object>, params: any) => {
-  const { data } = await client.query(`{
+  const {data} = await client.query(`{
           dashFront(start:"${params.start}",end:"${params.end}"){
             userId
             userName
@@ -97,7 +97,7 @@ const queryBurnChartData = async (
   start: string,
   end: string,
 ) => {
-  const { data } = await client.query(`{
+  const {data} = await client.query(`{
           burnoutDiagram(start:"${start}",end:"${end}",userIds:["${userId}"]){
             userId
             dates
@@ -119,7 +119,7 @@ const FrontTableList: React.FC<any> = () => {
 
   const gqlClient = useGqlClient();
 
-  const { data, loading } = useRequest(() => queryFrontData(gqlClient, g_currentMonth_range));
+  const {data, loading} = useRequest(() => queryFrontData(gqlClient, g_currentMonth_range));
   const gridApiForFront = useRef<GridApi>();
   const onSourceGridReady = (params: GridReadyEvent) => {
     gridApiForFront.current = params.api;
@@ -406,6 +406,7 @@ const FrontTableList: React.FC<any> = () => {
   };
 
   const loadBurnChart = async (userId: string, start: string, end: string) => {
+    debugger;
     // 查询数据
     const chartDatas = await queryBurnChartData(gqlClient, userId, start, end);
 
@@ -622,37 +623,35 @@ const FrontTableList: React.FC<any> = () => {
           className='react_for_echarts'/> */}
 
         {/* 查询条件 */}
-        <div style={{ width: '100%', height: 45, marginTop: -15, backgroundColor: 'white' }}>
+        <div style={{width: '100%', height: 45, marginTop: -15, backgroundColor: 'white'}}>
           <Form.Item>
-            <label style={{ marginLeft: '10px', marginTop: 7 }}>查询周期：</label>
+            <label style={{marginLeft: '10px', marginTop: 7}}>查询周期：</label>
             <RangePicker
-              style={{ width: '30%', marginTop: 7 }}
+              style={{width: '30%', marginTop: 7}}
               onChange={onSourceTimeSelected}
               value={[
-                choicedConditionForSource.start === ''
-                  ? null
-                  : moment(choicedConditionForSource.start),
+                choicedConditionForSource.start === '' ? null : moment(choicedConditionForSource.start),
                 choicedConditionForSource.end === '' ? null : moment(choicedConditionForSource.end),
               ]}
             />
 
             <Button
               type="text"
-              style={{ marginLeft: '20px', color: 'black' }}
-              icon={<LogoutOutlined />}
+              style={{marginLeft: '20px', color: 'black'}}
+              icon={<LogoutOutlined/>}
               size={'small'}
               onClick={showSourceDefaultData}
             >
               默认：
             </Button>
-            <label style={{ marginLeft: '-10px', color: 'black' }}> 默认1个月</label>
+            <label style={{marginLeft: '-10px', color: 'black'}}> 默认1个月</label>
 
             <Button
               type="text"
-              icon={<SettingOutlined />}
+              icon={<SettingOutlined/>}
               size={'large'}
               onClick={showFieldsModal}
-              style={{ float: 'right', marginTop: 5 }}
+              style={{float: 'right', marginTop: 5}}
             >
               {' '}
             </Button>
@@ -662,7 +661,7 @@ const FrontTableList: React.FC<any> = () => {
         {/* 数据表格 */}
         <div
           className="ag-theme-alpine"
-          style={{ height: sourceGridHeight, width: '100%', marginTop: 10 }}
+          style={{height: sourceGridHeight, width: '100%', marginTop: 10}}
         >
           <AgGridReact
             columnDefs={getSourceColums()} // 定义列
@@ -706,7 +705,7 @@ const FrontTableList: React.FC<any> = () => {
           <Form>
             <div>
               <Checkbox.Group
-                style={{ width: '100%' }}
+                style={{width: '100%'}}
                 value={selectedFiled}
                 onChange={onSetFieldsChange}
               >
@@ -785,10 +784,10 @@ const FrontTableList: React.FC<any> = () => {
             <div>
               <Checkbox onChange={selectAllField}>全选</Checkbox>
 
-              <Button type="primary" style={{ marginLeft: '300px' }} onClick={commitField}>
+              <Button type="primary" style={{marginLeft: '300px'}} onClick={commitField}>
                 确定
               </Button>
-              <Button type="primary" style={{ marginLeft: '20px' }} onClick={fieldCancel}>
+              <Button type="primary" style={{marginLeft: '20px'}} onClick={fieldCancel}>
                 取消
               </Button>
             </div>
@@ -806,7 +805,7 @@ const FrontTableList: React.FC<any> = () => {
         >
           <div
             id={'burnedChart'}
-            style={{ marginTop: -20, backgroundColor: 'white', height: 400 }}
+            style={{marginTop: -20, backgroundColor: 'white', height: 400}}
           ></div>
         </Modal>
       </div>

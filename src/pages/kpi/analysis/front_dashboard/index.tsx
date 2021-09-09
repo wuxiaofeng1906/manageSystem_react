@@ -247,13 +247,14 @@ const FrontTableList: React.FC<any> = () => {
   });
 
   const showCodesChart = async (source: any) => {
-    debugger;
-    if (source) {
-      const chartDom = document.getElementById('burnedChart');
-      if (chartDom) {
-        // 基于准备好的dom，初始化echarts实例
-        const myChart = echarts.init(chartDom);
-        myChart.clear();
+
+    const chartDom = document.getElementById('burnedChart');
+    if (chartDom) {
+      // 基于准备好的dom，初始化echarts实例
+      const myChart = echarts.init(chartDom);
+      myChart.clear();
+
+      if (source) {
         // 绘制图表
         myChart.setOption({
           grid: {
@@ -399,21 +400,15 @@ const FrontTableList: React.FC<any> = () => {
           ],
         });
 
-        window.addEventListener('resize', () => {
-          myChart.resize();
-        });
       }
+
+      window.addEventListener('resize', () => {
+        myChart.resize();
+      });
     }
+
   };
 
-  const loadBurnChart = async (userId: string, start: string, end: string) => {
-    debugger;
-    // 查询数据
-    const chartDatas = await queryBurnChartData(gqlClient, userId, start, end);
-    debugger;
-    // burnedChart 绘制
-    await showCodesChart(chartDatas[0]);
-  };
 
   const getSourceColums = () => {
     // 获取缓存的字段
@@ -527,14 +522,26 @@ const FrontTableList: React.FC<any> = () => {
             minWidth: 110,
             pinned: 'right',
             // cellRenderer: renderTest,
-            onCellClicked: (params: any) => {
+            onCellClicked: async (params: any) => {
               if (params.data) {
-                setShowChart({
-                  show: true,
-                  userName: params.data.userName,
-                });
-                debugger;
-                loadBurnChart(params.data.userId, params.data.start, params.data.end);
+
+                // 查询数据
+                const chartDatas = await queryBurnChartData(gqlClient, params.data.userId, params.data.start, params.data.end);
+                if (chartDatas) {
+                  setShowChart({
+                    show: true,
+                    userName: `${params.data.userName}(${params.data.start}-${params.data.end})`,
+                  });
+                  showCodesChart(chartDatas[0]);
+                }
+
+                // else {
+                //   setShowChart({
+                //     show: false,
+                //     userName: `${params.data.userName}(${params.data.start}-${params.data.end})`,
+                //   });
+                // }
+
               }
             },
           },

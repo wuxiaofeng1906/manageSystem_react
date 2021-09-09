@@ -247,6 +247,7 @@ const FrontTableList: React.FC<any> = () => {
   });
 
   const showCodesChart = async (source: any) => {
+    debugger;
     if (source) {
       const chartDom = document.getElementById('burnedChart');
       if (chartDom) {
@@ -409,7 +410,7 @@ const FrontTableList: React.FC<any> = () => {
     debugger;
     // 查询数据
     const chartDatas = await queryBurnChartData(gqlClient, userId, start, end);
-
+    debugger;
     // burnedChart 绘制
     await showCodesChart(chartDatas[0]);
   };
@@ -420,61 +421,62 @@ const FrontTableList: React.FC<any> = () => {
 
     // 定义的原始字段
     const oraFields: any = [
-      {
-        headerName: '周期时间',
-        children: [
-          {
-            headerName: 'Bug解决时长(H)',
-            field: 'time',
-            minWidth: 133,
-          },
-          {
-            headerName: 'Bug数量',
-            field: 'avgLines',
-            minWidth: 88,
-          },
-        ],
-      },
-      {
-        headerName: '速度',
-        children: [
-          {
-            headerName: '初始需求数',
-            field: 'deptName',
-            minWidth: 105,
-          },
-          {
-            headerName: '初始需求完成数',
-            field: 'groupName',
-            minWidth: 130,
-          },
-          {
-            headerName: '追加需求数',
-            field: 'tech',
-            minWidth: 105,
-          },
-          {
-            headerName: '追加需求完成数',
-            field: 'area',
-            minWidth: 130,
-          },
-        ],
-      },
-      {
-        headerName: '对外请求',
-        children: [
-          {
-            headerName: '请求数',
-            field: 'position',
-            minWidth: 85,
-          },
-          {
-            headerName: '请求平均停留时长',
-            field: 'job',
-            minWidth: 140,
-          },
-        ],
-      },
+      // {
+      //   headerName: '周期时间',
+      //   children: [
+      //     {
+      //       headerName: 'Bug解决时长(H)',
+      //       field: 'time',
+      //       minWidth: 133,
+      //     },
+      //     {
+      //       headerName: 'Bug数量',
+      //       field: 'avgLines',
+      //       minWidth: 88,
+      //     },
+      //   ],
+      // },
+      // {
+      //   headerName: '速度',
+      //   children: [
+      //     {
+      //       headerName: '初始需求数',
+      //       field: 'deptName',
+      //       minWidth: 105,
+      //     },
+      //     {
+      //       headerName: '初始需求完成数',
+      //       field: 'groupName',
+      //       minWidth: 130,
+      //     },
+      //     {
+      //       headerName: '追加需求数',
+      //       field: 'tech',
+      //       minWidth: 105,
+      //     },
+      //     {
+      //       headerName: '追加需求完成数',
+      //       field: 'area',
+      //       minWidth: 130,
+      //     },
+      //   ],
+      // },
+      // {
+      //   headerName: '对外请求',
+      //   children: [
+      //     {
+      //       headerName: '请求数',
+      //       field: 'position',
+      //       minWidth: 85,
+      //     },
+      //     {
+      //       headerName: '请求平均停留时长',
+      //       field: 'job',
+      //       minWidth: 140,
+      //     },
+      //   ],
+      // },
+
       {
         headerName: '吞吐量',
         children: [
@@ -531,6 +533,7 @@ const FrontTableList: React.FC<any> = () => {
                   show: true,
                   userName: params.data.userName,
                 });
+                debugger;
                 loadBurnChart(params.data.userId, params.data.start, params.data.end);
               }
             },

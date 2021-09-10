@@ -259,7 +259,7 @@ const FrontTableList: React.FC<any> = () => {
         myChart.setOption({
           grid: {
             x: 50,
-            y: 10,
+            y: 30,
             x2: 90,
             y2: 20,
             show: true,
@@ -281,13 +281,17 @@ const FrontTableList: React.FC<any> = () => {
           },
           yAxis: {
             type: 'value',
+            name: '单位：小时',
           },
           series: [
             {
               name: '预计工时',
               type: 'line',
               data: source.estimate,
-              // stack: ' ',
+              stack: 'lb',
+              emphasis: {  // 鼠标放上去显示本条线所在区域
+                focus: 'series'
+              },
               lineStyle: {
                 // 设置线条颜色等
                 normal: {
@@ -301,41 +305,35 @@ const FrontTableList: React.FC<any> = () => {
                 },
               },
               areaStyle: {
-                normal: {
-                  // 渐变填充色（线条下半部分）
-                  color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                    { offset: 0, color: "#BCF5A9" },
-                    { offset: 1, color: "white" }
-                  ])
-                }
 
-
-
-                // color: {
-                //   type: 'linear',
-                //   x: 0,
-                //   y: 0,
-                //   x2: 0,
-                //   y2: 1,
-                //   colorStops: [
-                //     {
-                //       offset: 0,
-                //       color: '#BCF5A9', // 0% 处的颜色
-                //     },
-                //     {
-                //       offset: 1,
-                //       color: 'white', // 100% 处的颜色
-                //     },
-                //   ],
-                //   global: false,
-                // },
+                color: {
+                  type: 'linear',
+                  x: 0,
+                  y: 0,
+                  x2: 0,
+                  y2: 1,
+                  colorStops: [
+                    {
+                      offset: 0,
+                      color: '#BCF5A9', // 0% 处的颜色
+                    },
+                    {
+                      offset: 1,
+                      color: 'white', // 100% 处的颜色
+                    },
+                  ],
+                  global: false,
+                },
               },
             },
             {
               name: '总消耗',
               type: 'line',
               data: source.consumed,
-              // stack: ' ',
+              stack: 'lb1',
+              emphasis: {
+                focus: 'series'
+              },
               lineStyle: {
                 normal: {
                   color: '#F5DA81', // 连线颜色：黄色
@@ -348,39 +346,35 @@ const FrontTableList: React.FC<any> = () => {
                 },
               },
               areaStyle: {
-                normal: {
-                  // 渐变填充色（线条下半部分）
-                  color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                    { offset: 0, color: "#F5DA81" },
-                    { offset: 1, color: "white" }
-                  ])
-                }
 
-                // color: {
-                //   type: 'linear',
-                //   x: 0,
-                //   y: 0,
-                //   x2: 0,
-                //   y2: 1,
-                //   colorStops: [
-                //     {
-                //       offset: 0,
-                //       color: '#F5DA81', // 0% 处的颜色
-                //     },
-                //     {
-                //       offset: 1,
-                //       color: 'white', // 100% 处的颜色
-                //     },
-                //   ],
-                //   global: false,
-                // },
+                color: {
+                  type: 'linear',
+                  x: 0,
+                  y: 0,
+                  x2: 0,
+                  y2: 1,
+                  colorStops: [
+                    {
+                      offset: 0,
+                      color: '#F5DA81', // 0% 处的颜色
+                    },
+                    {
+                      offset: 1,
+                      color: 'white', // 100% 处的颜色
+                    },
+                  ],
+                  global: false,
+                },
               },
             },
             {
               name: '总剩余',
               type: 'line',
               data: source.left,
-              // stack: ' ',
+              stack: 'lb2',
+              emphasis: {
+                focus: 'series'
+              },
               lineStyle: {
                 normal: {
                   color: '#A9F5F2', // 连线颜色：蓝色
@@ -393,157 +387,30 @@ const FrontTableList: React.FC<any> = () => {
                 },
               },
               areaStyle: {
-                normal: {
-                  // 渐变填充色（线条下半部分）
-                  color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                    { offset: 0, color: "#A9F5F2" },
-                    { offset: 1, color: "white" }
-                  ])
-                }
-                // color: {
-                //   type: 'linear',
-                //   x: 0,
-                //   y: 0,
-                //   x2: 0,
-                //   y2: 1,
-                //   colorStops: [
-                //     {
-                //       offset: 0,
-                //       color: '#A9F5F2', // 0% 处的颜色
-                //     },
-                //     {
-                //       offset: 1,
-                //       color: 'white', // 100% 处的颜色
-                //     },
-                //   ],
-                //   global: false,
-                // },
+
+                color: {
+                  type: 'linear',
+                  x: 0,
+                  y: 0,
+                  x2: 0,
+                  y2: 1,
+                  colorStops: [
+                    {
+                      offset: 0,
+                      color: '#A9F5F2', // 0% 处的颜色
+                    },
+                    {
+                      offset: 1,
+                      color: 'white', // 100% 处的颜色
+                    },
+                  ],
+                  global: false,
+                },
               },
             },
           ],
         });
 
-
-        // myChart.setOption({
-        //   backgroundColor: 'rgba(255,255,255,0)',
-        //   title: {
-        //     show: false,
-        //     text: '近半年各月新入驻企业情况',
-        //     subtext: '纯属虚构'
-        //   },
-        //   tooltip: {
-        //     trigger: 'axis',
-        //     textStyle: {
-        //       fontSize: 18
-        //     }
-        //   },
-        //   legend: {
-        //     icon: 'rect',
-        //     textStyle: {
-        //       color: '#000',
-        //       fontSize: 18
-        //     },
-        //     data: ['累积企业数', '新增企业数']
-        //   },
-        //   toolbox: {
-        //     show: false,
-        //     feature: {
-        //       mark: {
-        //         show: true
-        //       },
-        //       dataView: {
-        //         show: true,
-        //         readOnly: false
-        //       },
-        //       magicType: {
-        //         show: true,
-        //         type: ['line', 'bar', 'stack', 'tiled']
-        //       },
-        //       restore: {
-        //         show: true
-        //       },
-        //       saveAsImage: {
-        //         show: true
-        //       }
-        //     }
-        //   },
-        //   calculable: true,
-        //   xAxis: [{
-        //     nameTextStyle: {
-        //       color: '#000'
-        //     },
-        //     type: 'category',
-        //     boundaryGap: false,
-        //     asisLine: {
-        //       show: true,
-        //       onZero: true,
-        //       lineStyle: {
-        //         width: 1,
-        //         type: 'solid',
-        //         color: '#000'
-        //       }
-        //     },
-        //     splitLine: {
-        //       show: true,
-        //       lineStyle: {
-        //         color: 'black'
-        //       }
-        //     },
-        //     axisLabel: {
-        //       show: true,
-        //       textStyle: {
-        //         color: '#000',
-        //         fontSize: '18'
-        //       }
-        //     },
-        //     data: ['2013', '2014', '2015', '2016', '2017', '2018']
-        //   }],
-        //   yAxis: [{
-        //     type: 'value',
-        //     asisLine: {
-        //       show: true,
-        //       onZero: true,
-        //       lineStyle: {
-        //         width: 1,
-        //         type: 'solid',
-        //         color: '#000'
-        //       }
-        //     },
-        //     splitLine: {
-        //       show: true,
-        //       lineStyle: {
-        //         color: 'black'
-        //       }
-        //     },
-        //     axisLabel: {
-        //       textStyle: {
-        //         color: '#000',
-        //         fontSize: '18'
-        //       }
-        //     },
-        //   }],
-        //   series:[
-        //     {
-        //       type:'line',
-        //       areaStyle:{
-        //         color:{
-        //           //线性渐变
-        //           type: 'linear',
-        //           x: 0,
-        //           y: 0,
-        //           x2: 0,
-        //           y2: 1,
-        //           colorStops: [{
-        //             offset: 0, color: 'rgba(1, 255, 255, 0.8)', // 0% 处的颜色
-        //           }, {
-        //             offset: 0.6, color: 'rgba(1, 255, 255,0)', // 100% 处的颜色
-        //           }],
-        //           global: false, // 缺省为 false
-        //         },
-        //       },
-        //     }
-        //   ]
-        // });
       }
 
       window.addEventListener('resize', () => {

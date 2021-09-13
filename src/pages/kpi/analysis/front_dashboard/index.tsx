@@ -33,8 +33,7 @@ const cellFormat = (params: any) => {
 };
 
 // 定义列名
-
-const alaysisData = (source: any, startTime: string, endTime: string) => {
+const alayThroughputData = (source: any, startTime: string, endTime: string) => {
   const data: any = [];
   source.forEach((dts: any) => {
     let deptname = '';
@@ -69,10 +68,32 @@ const alaysisData = (source: any, startTime: string, endTime: string) => {
   return data;
 };
 
+const alayRequestDatas = (oldData: any, reqDatas: any) => {
+  const result: any = [];
+
+  oldData.forEach((o_dts: any) => {
+    const o_details = o_dts;
+    for (let index = 0; index < reqDatas.length; index += 1) {
+      const dts = reqDatas[index];
+      if (o_details.userId === dts.userId) {
+        o_details["reCount"] = dts.count;
+        result.push(o_details)
+        break;
+      }
+    }
+  });
+
+  debugger;
+  return result;
+}
+
 // 公共查询方法
 const queryFrontData = async (client: GqlClient<object>, params: any) => {
+  const condition = `start:"${params.start}",end:"${params.end}"`;
+
+  // 吞吐量:dashFront,对外请求未响应数:notResponse
   const {data} = await client.query(`{
-          dashFront(start:"${params.start}",end:"${params.end}"){
+          dashFront(${condition}){
             userId
             userName
             deptsName
@@ -84,19 +105,21 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
             newLine
           }
 
+        notResponse(${condition}){
+          userId
+          count
+        }
+
       }
   `);
 
-  return alaysisData(data?.dashFront, params.start.toString(), params.end.toString());
+  const throughputDatas = alayThroughputData(data?.dashFront, params.start.toString(), params.end.toString());
+  const requestDatas = alayRequestDatas(throughputDatas, data?.notResponse);
+  return requestDatas;
 };
 
 // 查询单人的燃尽图
-const queryBurnChartData = async (
-  client: GqlClient<object>,
-  userId: string,
-  start: string,
-  end: string,
-) => {
+const queryBurnChartData = async (client: GqlClient<object>, userId: string, start: string, end: string) => {
   const {data} = await client.query(`{
           burnoutDiagram(start:"${start}",end:"${end}",userIds:["${userId}"]){
             userId
@@ -467,21 +490,21 @@ const FrontTableList: React.FC<any> = () => {
       //     },
       //   ],
       // },
-      // {
-      //   headerName: '对外请求',
-      //   children: [
-      //     {
-      //       headerName: '请求数',
-      //       field: 'position',
-      //       minWidth: 85,
-      //     },
-      //     {
-      //       headerName: '请求平均停留时长',
-      //       field: 'job',
-      //       minWidth: 140,
-      //     },
-      //   ],
-      // },
+      {
+        headerName: '对外请求',
+        children: [
+          {
+            headerName: '请求数',
+            field: 'reCount',
+            minWidth: 85,
+          },
+          // {
+          //   headerName: '请求平均停留时长',
+          //   field: 'job',
+          //   minWidth: 140,
+          // },
+        ],
+      },
 
       {
         headerName: '吞吐量',

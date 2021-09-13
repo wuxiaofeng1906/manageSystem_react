@@ -14,6 +14,9 @@ import moment from 'moment';
 import {useRequest} from 'ahooks';
 import dayjs from 'dayjs';
 import * as echarts from 'echarts';
+import "./styles.css";
+import styles from "@/pages/user/myLogin/index.less";
+
 
 // import ReactEcharts from 'echarts-for-react';
 
@@ -645,6 +648,7 @@ const FrontTableList: React.FC<any> = () => {
 
   /* endregion */
 
+
   return (
     <PageContainer>
       <div>
@@ -717,21 +721,29 @@ const FrontTableList: React.FC<any> = () => {
               flex: 1,
               suppressMenu: true,
               cellStyle: {
-                // display: 'block',
-                // "vertical-align": "top",
-                // 'line-height': '28px',
-                "margin-top": "-5px",
-                // "padding-top":"-30px"
+                'line-height': '28px',
               },
             }}
             autoGroupColumnDef={{
+              headerName: '部门-组',
               minWidth: 170,
               sort: 'asc',
               pinned: 'left',
+              cellRendererParams: {
+                suppressCount: true,  // 不显示右边的计数
+              }
             }}
-            rowHeight={30}
-            headerHeight={32}
-            groupDefaultExpanded={9} // 展开分组
+            icons={{
+              groupExpanded:
+                '<img src="/tree-open.png"style="width: 20px;height:20px;margin-bottom: 10px"/>',
+
+              groupContracted:
+                '<img src="/tree-closed.png"style="width: 20px;height:20px;margin-bottom: 10px"/>',
+            }}
+
+            rowHeight={28}
+            headerHeight={30}
+            groupDefaultExpanded={-1} // 展开分组
             onGridReady={onSourceGridReady}
             onGridSizeChanged={onSourceGridReady}
           >

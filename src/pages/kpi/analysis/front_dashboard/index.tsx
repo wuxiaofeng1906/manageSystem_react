@@ -15,8 +15,6 @@ import {useRequest} from 'ahooks';
 import dayjs from 'dayjs';
 import * as echarts from 'echarts';
 import "./styles.css";
-import styles from "@/pages/user/myLogin/index.less";
-
 
 // import ReactEcharts from 'echarts-for-react';
 
@@ -556,9 +554,14 @@ const FrontTableList: React.FC<any> = () => {
           {
             headerName: '任务燃尽图',
             field: 'chart',
-            minWidth: 110,
+            minWidth: 105,
             pinned: 'right',
-            // cellRenderer: renderTest,
+            cellRenderer: (params: any) => {
+              if (params.data) {
+                return `<span style="color: blue"> 查看</span>`
+              }
+              return "";
+            },
             onCellClicked: async (params: any) => {
               if (params.data) {
 

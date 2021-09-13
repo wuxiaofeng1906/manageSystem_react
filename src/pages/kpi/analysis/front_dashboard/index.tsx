@@ -83,7 +83,6 @@ const alayRequestDatas = (oldData: any, reqDatas: any) => {
     }
   });
 
-  debugger;
   return result;
 }
 
@@ -497,6 +496,7 @@ const FrontTableList: React.FC<any> = () => {
             headerName: '请求数',
             field: 'reCount',
             minWidth: 85,
+            valueFormatter: cellFormat,
           },
           // {
           //   headerName: '请求平均停留时长',
@@ -717,10 +717,10 @@ const FrontTableList: React.FC<any> = () => {
               flex: 1,
               suppressMenu: true,
               cellStyle: {
-                display: 'block',
+                // display: 'block',
                 // "vertical-align": "top",
-                'line-height': '28px',
-                // "margin-top": "-5px",/
+                // 'line-height': '28px',
+                "margin-top": "-5px",
                 // "padding-top":"-30px"
               },
             }}
@@ -729,12 +729,13 @@ const FrontTableList: React.FC<any> = () => {
               sort: 'asc',
               pinned: 'left',
             }}
-            rowHeight={28}
-            headerHeight={30}
+            rowHeight={30}
+            headerHeight={32}
             groupDefaultExpanded={9} // 展开分组
             onGridReady={onSourceGridReady}
             onGridSizeChanged={onSourceGridReady}
-          ></AgGridReact>
+          >
+          </AgGridReact>
         </div>
 
         {/* 自定义字段 */}

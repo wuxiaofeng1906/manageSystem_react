@@ -1,11 +1,11 @@
-/*.ag-theme-alpine .ag-icon-pin::before {*/
-/*  content: '\\f08d';*/
-/*  background-color: red;*/
-/*}*/
+.ag-cell-expandable {
+  /*font-weight: bold;*/
+  /*color: blue;*/
+  margin-top: -6px;
+}
 
-/*.ag-theme-alpine .ag-icon-pin {*/
-/*  font-family: "Font Awesome 5 Free";*/
-/* */
-/*  font-weight: bold;*/
-/*  background-color: #1890ff;*/
+/*!* 对表格的表头进行渲染 *!*/
+/*.ag-header-cell-label {*/
+/*  color: red;*/
+/*  font-size: x-small;*/
 /*}*/

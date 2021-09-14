@@ -1,24 +1,24 @@
-import React, {useRef, useState} from 'react';
-import {PageContainer} from '@ant-design/pro-layout';
-import {AgGridReact} from 'ag-grid-react';
+import React, { useRef, useState } from 'react';
+import { PageContainer } from '@ant-design/pro-layout';
+import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import type {GridApi, GridReadyEvent} from 'ag-grid-community';
-import type {GqlClient} from '@/hooks';
-import {useGqlClient} from '@/hooks';
-import {Button, Checkbox, Col, DatePicker, Form, message, Modal, Row} from 'antd';
-import {LogoutOutlined, SettingOutlined} from '@ant-design/icons';
-import {getHeight} from '@/publicMethods/pageSet';
+import type { GridApi, GridReadyEvent } from 'ag-grid-community';
+import type { GqlClient } from '@/hooks';
+import { useGqlClient } from '@/hooks';
+import { Button, Checkbox, Col, DatePicker, Form, message, Modal, Row } from 'antd';
+import { LogoutOutlined, SettingOutlined } from '@ant-design/icons';
+import { getHeight } from '@/publicMethods/pageSet';
 import moment from 'moment';
-import {useRequest} from 'ahooks';
+import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 import * as echarts from 'echarts';
-import "./styles.css";
+import './styles.css';
 
 // import ReactEcharts from 'echarts-for-react';
 
-const {RangePicker} = DatePicker;
+const { RangePicker } = DatePicker;
 
 // 格式化单元格内容
 const cellFormat = (params: any) => {
@@ -77,22 +77,22 @@ const alayRequestDatas = (oldData: any, reqDatas: any) => {
     for (let index = 0; index < reqDatas.length; index += 1) {
       const dts = reqDatas[index];
       if (o_details.userId === dts.userId) {
-        o_details["reCount"] = dts.count;
-        result.push(o_details)
+        o_details['reCount'] = dts.count;
+        result.push(o_details);
         break;
       }
     }
   });
 
   return result;
-}
+};
 
 // 公共查询方法
 const queryFrontData = async (client: GqlClient<object>, params: any) => {
   const condition = `start:"${params.start}",end:"${params.end}"`;
 
   // 吞吐量:dashFront,对外请求未响应数:notResponse
-  const {data} = await client.query(`{
+  const { data } = await client.query(`{
           dashFront(${condition}){
             userId
             userName
@@ -113,14 +113,23 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
       }
   `);
 
-  const throughputDatas = alayThroughputData(data?.dashFront, params.start.toString(), params.end.toString());
+  const throughputDatas = alayThroughputData(
+    data?.dashFront,
+    params.start.toString(),
+    params.end.toString(),
+  );
   const requestDatas = alayRequestDatas(throughputDatas, data?.notResponse);
   return requestDatas;
 };
 
 // 查询单人的燃尽图
-const queryBurnChartData = async (client: GqlClient<object>, userId: string, start: string, end: string) => {
-  const {data} = await client.query(`{
+const queryBurnChartData = async (
+  client: GqlClient<object>,
+  userId: string,
+  start: string,
+  end: string,
+) => {
+  const { data } = await client.query(`{
           burnoutDiagram(start:"${start}",end:"${end}",userIds:["${userId}"]){
             userId
             dates
@@ -142,7 +151,7 @@ const FrontTableList: React.FC<any> = () => {
 
   const gqlClient = useGqlClient();
 
-  const {data, loading} = useRequest(() => queryFrontData(gqlClient, g_currentMonth_range));
+  const { data, loading } = useRequest(() => queryFrontData(gqlClient, g_currentMonth_range));
   const gridApiForFront = useRef<GridApi>();
   const onSourceGridReady = (params: GridReadyEvent) => {
     gridApiForFront.current = params.api;
@@ -270,7 +279,6 @@ const FrontTableList: React.FC<any> = () => {
   });
 
   const showCodesChart = async (source: any) => {
-
     const chartDom = document.getElementById('burnedChart');
     if (chartDom) {
       // 基于准备好的dom，初始化echarts实例
@@ -312,8 +320,9 @@ const FrontTableList: React.FC<any> = () => {
               type: 'line',
               data: source.estimate,
               stack: 'lb',
-              emphasis: {  // 鼠标放上去显示本条线所在区域
-                focus: 'series'
+              emphasis: {
+                // 鼠标放上去显示本条线所在区域
+                focus: 'series',
               },
               lineStyle: {
                 // 设置线条颜色等
@@ -328,7 +337,6 @@ const FrontTableList: React.FC<any> = () => {
                 },
               },
               areaStyle: {
-
                 color: {
                   type: 'linear',
                   x: 0,
@@ -355,7 +363,7 @@ const FrontTableList: React.FC<any> = () => {
               data: source.consumed,
               stack: 'lb1',
               emphasis: {
-                focus: 'series'
+                focus: 'series',
               },
               lineStyle: {
                 normal: {
@@ -369,7 +377,6 @@ const FrontTableList: React.FC<any> = () => {
                 },
               },
               areaStyle: {
-
                 color: {
                   type: 'linear',
                   x: 0,
@@ -396,7 +403,7 @@ const FrontTableList: React.FC<any> = () => {
               data: source.left,
               stack: 'lb2',
               emphasis: {
-                focus: 'series'
+                focus: 'series',
               },
               lineStyle: {
                 normal: {
@@ -410,7 +417,6 @@ const FrontTableList: React.FC<any> = () => {
                 },
               },
               areaStyle: {
-
                 color: {
                   type: 'linear',
                   x: 0,
@@ -433,16 +439,13 @@ const FrontTableList: React.FC<any> = () => {
             },
           ],
         });
-
       }
 
       window.addEventListener('resize', () => {
         myChart.resize();
       });
     }
-
   };
-
 
   const getSourceColums = () => {
     // 获取缓存的字段
@@ -558,15 +561,19 @@ const FrontTableList: React.FC<any> = () => {
             pinned: 'right',
             cellRenderer: (params: any) => {
               if (params.data) {
-                return `<span style="color: blue"> 查看</span>`
+                return `<span style="color: blue"> 查看</span>`;
               }
-              return "";
+              return '';
             },
             onCellClicked: async (params: any) => {
               if (params.data) {
-
                 // 查询数据
-                const chartDatas = await queryBurnChartData(gqlClient, params.data.userId, params.data.start, params.data.end);
+                const chartDatas = await queryBurnChartData(
+                  gqlClient,
+                  params.data.userId,
+                  params.data.start,
+                  params.data.end,
+                );
                 if (chartDatas) {
                   setShowChart({
                     show: true,
@@ -581,7 +588,6 @@ const FrontTableList: React.FC<any> = () => {
                 //     userName: `${params.data.userName}(${params.data.start}-${params.data.end})`,
                 //   });
                 // }
-
               }
             },
           },
@@ -651,7 +657,6 @@ const FrontTableList: React.FC<any> = () => {
 
   /* endregion */
 
-
   return (
     <PageContainer>
       <div>
@@ -674,35 +679,37 @@ const FrontTableList: React.FC<any> = () => {
           className='react_for_echarts'/> */}
 
         {/* 查询条件 */}
-        <div style={{width: '100%', height: 45, marginTop: -15, backgroundColor: 'white'}}>
+        <div style={{ width: '100%', height: 45, marginTop: -15, backgroundColor: 'white' }}>
           <Form.Item>
-            <label style={{marginLeft: '10px', marginTop: 7}}>查询周期：</label>
+            <label style={{ marginLeft: '10px', marginTop: 7 }}>查询周期：</label>
             <RangePicker
-              style={{width: '30%', marginTop: 7}}
+              style={{ width: '30%', marginTop: 7 }}
               onChange={onSourceTimeSelected}
               value={[
-                choicedConditionForSource.start === '' ? null : moment(choicedConditionForSource.start),
+                choicedConditionForSource.start === ''
+                  ? null
+                  : moment(choicedConditionForSource.start),
                 choicedConditionForSource.end === '' ? null : moment(choicedConditionForSource.end),
               ]}
             />
 
             <Button
               type="text"
-              style={{marginLeft: '20px', color: 'black'}}
-              icon={<LogoutOutlined/>}
+              style={{ marginLeft: '20px', color: 'black' }}
+              icon={<LogoutOutlined />}
               size={'small'}
               onClick={showSourceDefaultData}
             >
               默认：
             </Button>
-            <label style={{marginLeft: '-10px', color: 'black'}}> 默认1个月</label>
+            <label style={{ marginLeft: '-10px', color: 'black' }}> 默认1个月</label>
 
             <Button
               type="text"
-              icon={<SettingOutlined/>}
+              icon={<SettingOutlined />}
               size={'large'}
               onClick={showFieldsModal}
-              style={{float: 'right', marginTop: 5}}
+              style={{ float: 'right', marginTop: 5 }}
             >
               {' '}
             </Button>
@@ -712,7 +719,7 @@ const FrontTableList: React.FC<any> = () => {
         {/* 数据表格 */}
         <div
           className="ag-theme-alpine"
-          style={{height: sourceGridHeight, width: '100%', marginTop: 10}}
+          style={{ height: sourceGridHeight, width: '100%', marginTop: 10 }}
         >
           <AgGridReact
             columnDefs={getSourceColums()} // 定义列
@@ -723,8 +730,12 @@ const FrontTableList: React.FC<any> = () => {
               filter: true,
               flex: 1,
               suppressMenu: true,
-              cellStyle: {
-                'line-height': '28px',
+              cellStyle: (params: any) => {
+                // 判断是不是分组列，如果是的话就不需要设置line-height属性，如果不是的话就需要设置line-height（因为.ag-cell-expandable只对分组列有作用）
+                if (params.column.colId === 'ag-Grid-AutoColumn') {
+                  return {};
+                }
+                return { 'line-height': '28px' };
               },
             }}
             autoGroupColumnDef={{
@@ -732,25 +743,13 @@ const FrontTableList: React.FC<any> = () => {
               minWidth: 170,
               sort: 'asc',
               pinned: 'left',
-              cellRendererParams: {
-                suppressCount: true,  // 不显示右边的计数
-              }
             }}
-            icons={{
-              groupExpanded:
-                '<img src="/tree-open.png"style="width: 20px;height:20px;margin-bottom: 10px"/>',
-
-              groupContracted:
-                '<img src="/tree-closed.png"style="width: 20px;height:20px;margin-bottom: 10px"/>',
-            }}
-
             rowHeight={28}
             headerHeight={30}
             groupDefaultExpanded={-1} // 展开分组
             onGridReady={onSourceGridReady}
             onGridSizeChanged={onSourceGridReady}
-          >
-          </AgGridReact>
+          ></AgGridReact>
         </div>
 
         {/* 自定义字段 */}
@@ -765,7 +764,7 @@ const FrontTableList: React.FC<any> = () => {
           <Form>
             <div>
               <Checkbox.Group
-                style={{width: '100%'}}
+                style={{ width: '100%' }}
                 value={selectedFiled}
                 onChange={onSetFieldsChange}
               >
@@ -844,10 +843,10 @@ const FrontTableList: React.FC<any> = () => {
             <div>
               <Checkbox onChange={selectAllField}>全选</Checkbox>
 
-              <Button type="primary" style={{marginLeft: '300px'}} onClick={commitField}>
+              <Button type="primary" style={{ marginLeft: '300px' }} onClick={commitField}>
                 确定
               </Button>
-              <Button type="primary" style={{marginLeft: '20px'}} onClick={fieldCancel}>
+              <Button type="primary" style={{ marginLeft: '20px' }} onClick={fieldCancel}>
                 取消
               </Button>
             </div>
@@ -865,7 +864,7 @@ const FrontTableList: React.FC<any> = () => {
         >
           <div
             id={'burnedChart'}
-            style={{marginTop: -20, backgroundColor: 'white', height: 400}}
+            style={{ marginTop: -20, backgroundColor: 'white', height: 400 }}
           ></div>
         </Modal>
       </div>

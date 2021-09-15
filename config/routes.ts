@@ -172,7 +172,7 @@ export default [
                     icon: 'table',
                     path: '/kpi/performance/developer/coverage/byStorehouse',
                     component: './kpi/performance/developer/coverage/byStorehouse',
-                  },{
+                  }, {
                     name: '按分支',
                     icon: 'table',
                     path: '/kpi/performance/developer/coverage/byBranch',
@@ -372,6 +372,19 @@ export default [
           },
         ],
       },
+    ],
+  },
+  {
+    name: 'jenkins管理',
+    icon: 'table',
+    path: '/jenkins',
+    access: 'sysAdmin',
+    routes: [
+      {
+        name: '上线前检查',
+        path: 'checkBeforeOnline',
+        component: './jenkins/checkBeforeOnline',
+      }
     ],
   },
   {

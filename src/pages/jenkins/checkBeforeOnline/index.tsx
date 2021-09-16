@@ -8,7 +8,20 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 
-import {Button, InputNumber, message, Form, DatePicker, Select, Modal, Input, Row, Col} from 'antd';
+import {
+  Button,
+  InputNumber,
+  message,
+  Form,
+  DatePicker,
+  Select,
+  Modal,
+  Input,
+  Divider,
+  Card,
+  Switch,
+  Checkbox
+} from 'antd';
 import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone, LogoutOutlined} from '@ant-design/icons';
 import {formatMomentTime} from '@/publicMethods/timeMethods';
 import {getHeight} from '@/publicMethods/pageSet';
@@ -412,27 +425,135 @@ const JenkinsCheck: React.FC<any> = () => {
 
       <Modal
         title={'上线前任务检查'}
-        visible={isCheckModalVisible}
+        visible={true}
         onCancel={checkModalCancel}
         centered={true}
-        footer={null}
-        width={500}
+        width={550}
+        footer={[
+          <Button
+            style={{borderRadius: 5}}
+            onClick={checkModalCancel}>取消
+          </Button>,
+          <Button type="primary"
+                  style={{marginLeft: 10, color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}
+                  onClick={carryTask}>执行
+          </Button>
+        ]}
       >
-        <Form form={formForCarryTask}>
+        <Form form={formForCarryTask} style={{marginTop: -15}}>
 
-
-          <Form.Item>
-            <Button type="primary" style={{marginLeft: '150px'}} onClick={carryTask}>
-              执行
-            </Button>
-            <Button type="primary" style={{marginLeft: '20px'}} onClick={checkModalCancel}>
-              取消
-            </Button>
+          <Form.Item label="任务名称" name="taskName">
+            <Input defaultValue={"popup-online-check"} disabled={true} style={{color: "black"}}/>
           </Form.Item>
+
+          <Divider style={{marginTop: -20}}>任务参数</Divider>
+
+          {/* 版本检查card */}
+          <Card size="small" title="版本检查" style={{width: "100%", marginTop: -10, height: 230}}>
+            <Form.Item label="Check" name="verson_check">
+              <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 41}} defaultChecked/>
+            </Form.Item>
+
+            <Form.Item name="verson_server" label="Server" style={{marginTop: -15}}>
+              <Select placeholder="请选择相应的服务！" style={{marginLeft: 41, width: 382}}>
+                <Option value="apps">apps</Option>
+                <Option value="global">global</Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item name="verson_imagebranch" label="ImageBranch" style={{marginTop: -15}}>
+              <Select placeholder="请选择待检查分支！" showSearch>
+                <Option value="hotfix">hotfix</Option>
+                <Option value="release">release</Option>
+                <Option value="release-fix">release-fix</Option>
+                <Option value="emergency">emergency</Option>
+                <Option value="release-emergency">release-emergency</Option>
+                <Option value="hotfix-inte">hotfix-inte</Option>
+                <Option value="hotfix-emergency">hotfix-emergency</Option>
+                <Option value="hotfix-inte-emergency">hotfix-inte-emergency</Option>
+                <Option value="stage-emergency">stage-emergency</Option>
+
+              </Select>
+            </Form.Item>
+
+            <Form.Item name="verson_imageevn" label="ImageEvn" style={{marginTop: -15}}>
+              <Select placeholder="请选择对应的环境！" style={{marginLeft: 20, width: 382}} showSearch>
+
+                <Option value="nx-hotfix">nx-hotfix</Option>
+                <Option value="nx-hotfix-db">nx-hotfix-db</Option>
+                <Option value="nx-release">nx-release</Option>
+                <Option value="nx-release-db">nx-release-db</Option>
+                <Option value="nx-temp7">nx-temp7</Option>
+                <Option value="nx-hotfix-inte">nx-hotfix-inte</Option>
+
+                <Option value="bj-hotfix">bj-hotfix</Option>
+                <Option value="bj-hotfix-db">bj-hotfix-db</Option>
+                <Option value="bj-release">bj-release</Option>
+                <Option value="bj-release-db">bj-release-db</Option>
+                <Option value="bj-hotfix-inte">bj-hotfix-inte</Option>
+                <Option value="bj-reports">bj-reports</Option>
+
+                <Option value="bj-temp1">bj-temp1</Option>
+                <Option value="bj-temp2">bj-temp2</Option>
+                <Option value="bj-temp3">bj-temp3</Option>
+                <Option value="bj-temp4">bj-temp4</Option>
+                <Option value="bj-temp5">bj-temp5</Option>
+                <Option value="bj-temp6">bj-temp6</Option>
+                <Option value="bj-temp7">bj-temp7</Option>
+                <Option value="bj-temp8">bj-temp8</Option>
+
+              </Select>
+            </Form.Item>
+
+          </Card>
+
+          {/* 分支检查Card */}
+          <Card size="small" title="检查上线分支是否包含对比分支的提交" style={{width: "100%", marginTop: 10}}>
+            <Form.Item label="Check" name="branch_check">
+              <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 50}}/>
+            </Form.Item>
+
+            <Form.Item label="MainBranch" name="branch_mainBranch" style={{marginTop: -20,}}>
+              <Checkbox name={"stage"} style={{marginLeft: 15}}>stage</Checkbox>
+              <Checkbox name={"master"}>master</Checkbox>
+            </Form.Item>
+
+            <div style={{marginTop: -25, marginLeft: 103, fontSize: "x-small", color: "gray"}}>
+              被对比的主分支
+            </div>
+
+            <Form.Item label="TeachnicalSide" name="branch_teachnicalSide" style={{marginTop: 10}}>
+              <Checkbox name={"前端"}>前端</Checkbox>
+              <Checkbox name={"后端"}>后端</Checkbox>
+            </Form.Item>
+            <div style={{marginTop: -25, marginLeft: 103, fontSize: "x-small", color: "gray"}}>
+              技术测侧
+            </div>
+
+            <Form.Item label="TargetBranch" name="branch_targetBranch" style={{marginTop: 10}}>
+              <Input style={{marginLeft: 8, width: 370}}/>
+            </Form.Item>
+
+            <div style={{marginTop: -25, marginLeft: 103, fontSize: "x-small", color: "gray"}}>
+              待检查的上线分支。支持多个，中间以英文逗号进行分隔。<br/>示例：feature-budget,feature-project
+            </div>
+
+            <Form.Item label="MainSince" name="branch_mainSince" style={{marginTop: 10}}>
+              <DatePicker style={{marginLeft: 25, width: 370}}/>
+            </Form.Item>
+
+            <div style={{marginTop: -25, marginLeft: 103, fontSize: "x-small", color: "gray"}}>
+              默认查询近一周数据
+            </div>
+
+          </Card>
+
+
         </Form>
       </Modal>
     </PageContainer>
   );
 };
+
 
 export default JenkinsCheck;

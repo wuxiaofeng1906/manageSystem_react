@@ -236,15 +236,30 @@ const JenkinsCheck: React.FC<any> = () => {
   };
 
   /* endregion */
+  /* region 上线前检查任务弹出层相关事件 */
+  // 弹出层是否可见
+  const [isCheckModalVisible, setCheckModalVisible] = useState(false);
+  const [formForCarryTask] = Form.useForm();
 
+  const checkModalCancel = () => {
+    setCheckModalVisible(false);
+  }
 
   const runTask = () => {
-
+    setCheckModalVisible(true);
   };
 
+  // 确定执行任务
+  const carryTask = () => {
+
+  }
+
+  // 刷新表格
   const refreshGrid = () => {
 
   };
+
+  /* endregion */
 
   /* region 翻页以及页面跳转功能 */
   // https://www.ag-grid.com/react-data-grid/row-pagination/  数据分页
@@ -317,6 +332,7 @@ const JenkinsCheck: React.FC<any> = () => {
   return (
     <PageContainer style={{marginLeft: -30, marginRight: -30}}>
 
+      {/* 按钮 */}
       <div style={{background: 'white', marginTop: -20}}>
         {/* 使用一个图标就要导入一个图标 */}
 
@@ -329,6 +345,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
 
       </div>
+
       {/* ag-grid 表格定义 */}
       <div className="ag-theme-alpine" style={{marginTop: 3, height: gridHeight, width: '100%'}}>
         <AgGridReact
@@ -391,33 +408,29 @@ const JenkinsCheck: React.FC<any> = () => {
 
       </div>
 
-      {/*
+      {/* 弹出层：检查任务 */}
 
       <Modal
-        title={'删除项目'}
-        visible={isdelModalVisible}
-        onCancel={DelCancel}
+        title={'上线前任务检查'}
+        visible={isCheckModalVisible}
+        onCancel={checkModalCancel}
         centered={true}
         footer={null}
         width={500}
       >
-        <Form form={formForDel}>
-          <Form.Item>
-            <label style={{marginLeft: '20px'}}>
-              此项目包含【{delCounts}】条数据，请确认是否删除？
-            </label>
-          </Form.Item>
+        <Form form={formForCarryTask}>
+
 
           <Form.Item>
-            <Button type="primary" style={{marginLeft: '150px'}} onClick={delSprintList}>
-              确定
+            <Button type="primary" style={{marginLeft: '150px'}} onClick={carryTask}>
+              执行
             </Button>
-            <Button type="primary" style={{marginLeft: '20px'}} onClick={DelCancel}>
+            <Button type="primary" style={{marginLeft: '20px'}} onClick={checkModalCancel}>
               取消
             </Button>
           </Form.Item>
         </Form>
-      </Modal> */}
+      </Modal>
     </PageContainer>
   );
 };

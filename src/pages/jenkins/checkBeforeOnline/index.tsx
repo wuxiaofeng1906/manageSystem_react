@@ -7,7 +7,6 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
-
 import {
   Button,
   InputNumber,
@@ -22,17 +21,14 @@ import {
   Switch,
   Checkbox
 } from 'antd';
-import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone, LogoutOutlined} from '@ant-design/icons';
-import {formatMomentTime} from '@/publicMethods/timeMethods';
+
 import {getHeight} from '@/publicMethods/pageSet';
 import axios from 'axios';
-import {history} from 'umi';
-import {judgeAuthority} from "@/publicMethods/authorityJudge";
-import {useModel} from "@@/plugin-model/useModel";
+
 
 import dayjs from "dayjs";
 
-const {RangePicker} = DatePicker;
+
 const {Option} = Select;
 
 // 默认条件：近一个月；未关闭的
@@ -124,9 +120,165 @@ const JenkinsCheck: React.FC<any> = () => {
   // }
 
 
-  (window as any).showParams = (params: any) => {
+  /* region  表格相关事件 */
+  const gridApi = useRef<GridApi>();
+  const gqlClient = useGqlClient();
+  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, defalutCondition));
 
-    alert(`获取信息：${params.taskName.toString()}`)
+  const onGridReady = (params: GridReadyEvent) => {
+    gridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  if (gridApi.current) {
+    if (loading) gridApi.current.showLoadingOverlay();
+    else gridApi.current.hideOverlay();
+  }
+
+  // 表格的屏幕大小自适应
+  const [gridHeight, setGridHeight] = useState(getHeight() - 20);
+  window.onresize = function () {
+    setGridHeight(getHeight() - 20);
+    gridApi.current?.sizeColumnsToFit();
+  };
+
+  const onChangeGridReady = (params: GridReadyEvent) => {
+    gridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  /* endregion */
+
+  /* region 上线前检查任务弹出层相关事件 */
+  // 弹出层是否可见
+  const [isCheckModalVisible, setCheckModalVisible] = useState(false);
+  const [formForCarryTask] = Form.useForm();
+
+  const checkModalCancel = () => {
+    setCheckModalVisible(false);
+  }
+
+  const runTask = () => {
+    setCheckModalVisible(true);
+    // 设置显示的值。
+    formForCarryTask.setFieldsValue({
+      // 版本检查
+      verson_check: true,
+      verson_server: "apps",
+      verson_imagebranch: "hotfix",
+      verson_imageevn: "nx-hotfix",
+
+      // 检查上线分支是否包含对比分支的提交
+      branch_check: false,
+      branch_mainBranch: ["stage", "master"],
+      branch_teachnicalSide: ["前端", "后端"],
+      branch_targetBranch: "",
+      branch_mainSince: dayjs().subtract(6, 'day')
+    });
+  };
+
+  // 确定执行任务
+  const carryTask = () => {
+
+  }
+
+  // 刷新表格
+  const refreshGrid = () => {
+
+  };
+
+  /* endregion */
+
+  /* region 翻页以及页面跳转功能 */
+  // https://www.ag-grid.com/react-data-grid/row-pagination/  数据分页
+
+  const [Pages, setPages] = useState({
+    totalCounts: 4,
+    totalPages: 1,
+    currentPage: 1,
+  });
+
+  // 每页显示多少条数据
+  const showItemChange = (pageCOunt: any) => {
+
+    alert(`每页显示${pageCOunt}条数据`);
+
+  };
+
+  // 上一页
+  const showPreviousPage = () => {
+
+    // 上一页不能为负数或0
+    if (Pages.currentPage > 1) {
+      setPages({
+        ...Pages,
+        currentPage: Pages.currentPage - 1
+      });
+    }
+
+
+  };
+
+  // 下一页
+  const showNextPage = () => {
+    const nextPage = Pages.currentPage + 1;
+
+    // 下一页的页面不能超过总页面之和
+    if (nextPage <= Pages.totalPages) {
+      setPages({
+        ...Pages,
+        currentPage: Pages.currentPage + 1
+      });
+    }
+
+  };
+
+  // 跳转到第几页
+  const goToPage = (params: any) => {
+
+    const pageCounts = Number(params.currentTarget.defaultValue);
+    if (pageCounts > Pages.totalPages) {
+
+      // 提示已超过最大跳转页数
+      message.error({
+        content: '已超过最大跳转页数!',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+    } else {
+      alert(`跳转到第${params.currentTarget.defaultValue}页`)
+
+    }
+
+
+  }
+  /* endregion */
+
+  (window as any).showParams = (params: any) => {
+    setCheckModalVisible(true);
+
+
+    // alert(`获取信息：${params.taskName.toString()}`);
+
+
+    // 设置显示的值。
+    formForCarryTask.setFieldsValue({
+      // 版本检查
+      verson_check: true,
+      verson_server: "apps",
+      verson_imagebranch: "hotfix",
+      verson_imageevn: "nx-temp7",
+
+      // 检查上线分支是否包含对比分支的提交
+      branch_check: true,
+      branch_mainBranch: "master",
+      branch_teachnicalSide: "后端",
+      branch_targetBranch: "aaaaa,bbbbb,cccc",
+      branch_mainSince: dayjs("2021-09-09")
+    });
 
   };
 
@@ -221,127 +373,6 @@ const JenkinsCheck: React.FC<any> = () => {
   };
 
 
-  /* region  表格相关事件 */
-  const gridApi = useRef<GridApi>();
-  const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, defalutCondition));
-
-  const onGridReady = (params: GridReadyEvent) => {
-    gridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-
-  if (gridApi.current) {
-    if (loading) gridApi.current.showLoadingOverlay();
-    else gridApi.current.hideOverlay();
-  }
-
-  // 表格的屏幕大小自适应
-  const [gridHeight, setGridHeight] = useState(getHeight() - 20);
-  window.onresize = function () {
-    setGridHeight(getHeight() - 20);
-    gridApi.current?.sizeColumnsToFit();
-  };
-
-  const onChangeGridReady = (params: GridReadyEvent) => {
-    gridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-
-  /* endregion */
-  /* region 上线前检查任务弹出层相关事件 */
-  // 弹出层是否可见
-  const [isCheckModalVisible, setCheckModalVisible] = useState(false);
-  const [formForCarryTask] = Form.useForm();
-
-  const checkModalCancel = () => {
-    setCheckModalVisible(false);
-  }
-
-  const runTask = () => {
-    setCheckModalVisible(true);
-  };
-
-  // 确定执行任务
-  const carryTask = () => {
-
-  }
-
-  // 刷新表格
-  const refreshGrid = () => {
-
-  };
-
-  /* endregion */
-
-  /* region 翻页以及页面跳转功能 */
-  // https://www.ag-grid.com/react-data-grid/row-pagination/  数据分页
-
-  const [Pages, setPages] = useState({
-    totalCounts: 4,
-    totalPages: 1,
-    currentPage: 1,
-  });
-
-  // 每页显示多少条数据
-  const showItemChange = (pageCOunt: any) => {
-
-    alert(`每页显示${pageCOunt}条数据`);
-
-  };
-
-  // 上一页
-  const showPreviousPage = () => {
-
-    // 上一页不能为负数或0
-    if (Pages.currentPage > 1) {
-      setPages({
-        ...Pages,
-        currentPage: Pages.currentPage - 1
-      });
-    }
-
-
-  };
-
-  // 下一页
-  const showNextPage = () => {
-    const nextPage = Pages.currentPage + 1;
-
-    // 下一页的页面不能超过总页面之和
-    if (nextPage <= Pages.totalPages) {
-      setPages({
-        ...Pages,
-        currentPage: Pages.currentPage + 1
-      });
-    }
-
-  };
-
-  // 跳转到第几页
-  const goToPage = (params: any) => {
-
-    const pageCounts = Number(params.currentTarget.defaultValue);
-    if (pageCounts > Pages.totalPages) {
-
-      // 提示已超过最大跳转页数
-      message.error({
-        content: '已超过最大跳转页数!',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
-    } else {
-      alert(`跳转到第${params.currentTarget.defaultValue}页`)
-
-    }
-
-
-  }
-  /* endregion */
-
   return (
     <PageContainer style={{marginLeft: -30, marginRight: -30}}>
 
@@ -425,7 +456,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
       <Modal
         title={'上线前任务检查'}
-        visible={true}
+        visible={isCheckModalVisible}
         onCancel={checkModalCancel}
         centered={true}
         width={550}
@@ -439,6 +470,7 @@ const JenkinsCheck: React.FC<any> = () => {
                   onClick={carryTask}>执行
           </Button>
         ]}
+
       >
         <Form form={formForCarryTask} style={{marginTop: -15}}>
 
@@ -449,9 +481,9 @@ const JenkinsCheck: React.FC<any> = () => {
           <Divider style={{marginTop: -20}}>任务参数</Divider>
 
           {/* 版本检查card */}
-          <Card size="small" title="版本检查" style={{width: "100%", marginTop: -10, height: 230}}>
-            <Form.Item label="Check" name="verson_check">
-              <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 41}} defaultChecked/>
+          <Card size="small" title="版本检查" style={{width: "100%", marginTop: -10, height: 220}}>
+            <Form.Item name="verson_check" label="Check" valuePropName="checked">
+              <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 41}}/>
             </Form.Item>
 
             <Form.Item name="verson_server" label="Server" style={{marginTop: -15}}>
@@ -509,13 +541,15 @@ const JenkinsCheck: React.FC<any> = () => {
 
           {/* 分支检查Card */}
           <Card size="small" title="检查上线分支是否包含对比分支的提交" style={{width: "100%", marginTop: 10}}>
-            <Form.Item label="Check" name="branch_check">
+            <Form.Item label="Check" name="branch_check" valuePropName="checked">
               <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 50}}/>
             </Form.Item>
 
             <Form.Item label="MainBranch" name="branch_mainBranch" style={{marginTop: -20,}}>
-              <Checkbox name={"stage"} style={{marginLeft: 15}}>stage</Checkbox>
-              <Checkbox name={"master"}>master</Checkbox>
+              <Checkbox.Group>
+                <Checkbox value={"stage"} style={{marginLeft: 15}}>stage</Checkbox>
+                <Checkbox value={"master"}>master</Checkbox>
+              </Checkbox.Group>
             </Form.Item>
 
             <div style={{marginTop: -25, marginLeft: 103, fontSize: "x-small", color: "gray"}}>
@@ -523,11 +557,13 @@ const JenkinsCheck: React.FC<any> = () => {
             </div>
 
             <Form.Item label="TeachnicalSide" name="branch_teachnicalSide" style={{marginTop: 10}}>
-              <Checkbox name={"前端"}>前端</Checkbox>
-              <Checkbox name={"后端"}>后端</Checkbox>
+              <Checkbox.Group>
+                <Checkbox value={"前端"}>前端</Checkbox>
+                <Checkbox value={"后端"}>后端</Checkbox>
+              </Checkbox.Group>
             </Form.Item>
             <div style={{marginTop: -25, marginLeft: 103, fontSize: "x-small", color: "gray"}}>
-              技术测侧
+              技术侧
             </div>
 
             <Form.Item label="TargetBranch" name="branch_targetBranch" style={{marginTop: 10}}>
@@ -547,7 +583,6 @@ const JenkinsCheck: React.FC<any> = () => {
             </div>
 
           </Card>
-
 
         </Form>
       </Modal>

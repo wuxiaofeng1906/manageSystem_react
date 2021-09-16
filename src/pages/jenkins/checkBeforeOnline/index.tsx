@@ -150,6 +150,10 @@ const JenkinsCheck: React.FC<any> = () => {
   /* endregion */
 
   /* region 上线前检查任务弹出层相关事件 */
+
+  // 执行按钮是否禁用
+  const [isButtonClick, setIsButtonClick] = useState("none");
+
   // 弹出层是否可见
   const [isCheckModalVisible, setCheckModalVisible] = useState(false);
   const [formForCarryTask] = Form.useForm();
@@ -160,6 +164,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   const runTask = () => {
     setCheckModalVisible(true);
+    setIsButtonClick("inline");
     // 设置显示的值。
     formForCarryTask.setFieldsValue({
       // 版本检查
@@ -259,7 +264,8 @@ const JenkinsCheck: React.FC<any> = () => {
 
   (window as any).showParams = (params: any) => {
     setCheckModalVisible(true);
-
+    // 这个点击事件只能够进行查看
+    setIsButtonClick("none");
 
     // alert(`获取信息：${params.taskName.toString()}`);
 
@@ -466,7 +472,14 @@ const JenkinsCheck: React.FC<any> = () => {
             onClick={checkModalCancel}>取消
           </Button>,
           <Button type="primary"
-                  style={{marginLeft: 10, color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}
+                  style={{
+                    marginLeft: 10,
+                    color: '#46A0FC',
+                    backgroundColor: "#ECF5FF",
+                    borderRadius: 5,
+                    display: isButtonClick
+                  }}
+
                   onClick={carryTask}>执行
           </Button>
         ]}

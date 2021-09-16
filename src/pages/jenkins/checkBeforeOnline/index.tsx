@@ -209,10 +209,9 @@ const JenkinsCheck: React.FC<any> = () => {
 
 
   /* region  表格相关事件 */
-  const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
+  const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, defalutCondition));
-
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -225,9 +224,9 @@ const JenkinsCheck: React.FC<any> = () => {
   }
 
   // 表格的屏幕大小自适应
-  const [gridHeight, setGridHeight] = useState(getHeight() - 5);
+  const [gridHeight, setGridHeight] = useState(getHeight() - 20);
   window.onresize = function () {
-    setGridHeight(getHeight() - 5);
+    setGridHeight(getHeight() - 20);
     gridApi.current?.sizeColumnsToFit();
   };
 
@@ -247,30 +246,85 @@ const JenkinsCheck: React.FC<any> = () => {
 
   };
 
-  const showItemChange = () => {
+  /* region 翻页以及页面跳转功能 */
+  // https://www.ag-grid.com/react-data-grid/row-pagination/  数据分页
+
+  const [Pages, setPages] = useState({
+    totalCounts: 4,
+    totalPages: 1,
+    currentPage: 1,
+  });
+
+  // 每页显示多少条数据
+  const showItemChange = (pageCOunt: any) => {
+
+    alert(`每页显示${pageCOunt}条数据`);
 
   };
+
+  // 上一页
   const showPreviousPage = () => {
 
+    // 上一页不能为负数或0
+    if (Pages.currentPage > 1) {
+      setPages({
+        ...Pages,
+        currentPage: Pages.currentPage - 1
+      });
+    }
+
+
   };
 
+  // 下一页
   const showNextPage = () => {
+    const nextPage = Pages.currentPage + 1;
+
+    // 下一页的页面不能超过总页面之和
+    if (nextPage <= Pages.totalPages) {
+      setPages({
+        ...Pages,
+        currentPage: Pages.currentPage + 1
+      });
+    }
 
   };
 
+  // 跳转到第几页
+  const goToPage = (params: any) => {
 
-  // https://www.ag-grid.com/react-data-grid/row-pagination/  数据分页
+    const pageCounts = Number(params.currentTarget.defaultValue);
+    if (pageCounts > Pages.totalPages) {
+
+      // 提示已超过最大跳转页数
+      message.error({
+        content: '已超过最大跳转页数!',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+    } else {
+      alert(`跳转到第${params.currentTarget.defaultValue}页`)
+
+    }
+
+
+  }
+  /* endregion */
+
   return (
-    <PageContainer>
+    <PageContainer style={{marginLeft: -30, marginRight: -30}}>
 
       <div style={{background: 'white', marginTop: -20}}>
         {/* 使用一个图标就要导入一个图标 */}
 
-        <Button type="primary" style={{color: '#46A0FC', backgroundColor: "#ECF5FF"}}
+        <Button type="primary" style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}
                 onClick={runTask}>执行上线前检查任务</Button>
 
         <Button type="primary"
-                style={{marginLeft: 10, color: '#32D529', backgroundColor: "#ECF5FF"}}
+                style={{marginLeft: 10, color: '#32D529', backgroundColor: "#ECF5FF", borderRadius: 5}}
                 onClick={refreshGrid}>刷新</Button>
 
 
@@ -289,6 +343,8 @@ const JenkinsCheck: React.FC<any> = () => {
             wrapText: true,
             // 自动行高
             autoHeight: true,
+            cellStyle: {"border-right": "solid 0.5px #E3E6E6"}
+            //  BABFC7 lightgrey EAEDED E3E6E6
           }}
 
           onGridReady={onGridReady}
@@ -298,27 +354,39 @@ const JenkinsCheck: React.FC<any> = () => {
       </div>
 
       {/* 分页控件 */}
-      <div style={{background: 'white', marginTop: 2}}>
-        {/* 使用一个图标就要导入一个图标 */}
+      <div style={{background: 'white', marginTop: 2, height: 50, paddingTop: 10}}>
 
-        <label style={{marginLeft: 20, fontWeight: "bold"}}> Total 4</label>
-        <InputNumber style={{marginLeft: 20}} size={"middle"} min={1} max={10000} defaultValue={20}
+        {/* 共XX条 */}
+        <label style={{marginLeft: 20, fontWeight: "bold"}}> 共 {Pages.totalCounts} 条</label>
+
+        {/* 每页 XX 条 */}
+        <label style={{marginLeft: 20, fontWeight: "bold"}}>每页</label>
+        <InputNumber style={{marginLeft: 10}} size={"middle"} min={1} max={10000} defaultValue={20}
                      onChange={showItemChange}/>
+        <label style={{marginLeft: 10, fontWeight: "bold"}}>条</label>
 
+        <label style={{marginLeft: 10, fontWeight: "bold"}}>共 {Pages.totalPages} 页</label>
+
+        {/* 上一页 */}
         <Button size={"small"}
                 style={{fontWeight: "bold", marginLeft: 20, color: 'black', backgroundColor: "WhiteSmoke"}}
                 onClick={showPreviousPage}>&lt;</Button>
 
+        {/* 条数显示 */}
         <span style={{
           display: "inline-block", marginLeft: 10, textAlign: "center",
           fontWeight: "bold", backgroundColor: "#46A0FC", color: "white", width: "40px"
-        }}> 4 </span>
+        }}> {Pages.currentPage} </span>
 
+        {/* 下一页 */}
         <Button size={"small"}
                 style={{fontWeight: "bold", marginLeft: 10, color: 'black', backgroundColor: "WhiteSmoke"}}
                 onClick={showNextPage}>&gt;</Button>
-        <label style={{marginLeft: 20, fontWeight: "bold"}}> Go to </label>
-        <Input style={{textAlign: "center", width: 50, marginLeft: 6}} value={1}/>
+
+        {/* 跳转到第几页 */}
+        <label style={{marginLeft: 20, fontWeight: "bold"}}> 跳转到第 </label>
+        <Input style={{textAlign: "center", width: 50, marginLeft: 2}} defaultValue={1} onBlur={goToPage}/>
+        <label style={{marginLeft: 2, fontWeight: "bold"}}> 页 </label>
 
 
       </div>

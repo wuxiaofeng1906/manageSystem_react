@@ -458,12 +458,11 @@ const JenkinsCheck: React.FC<any> = () => {
 
       </div>
 
-      {/* 弹出层：检查任务 isCheckModalVisible */}
+      {/* 弹出层：检查任务  */}
 
       <Modal
         title={'上线前任务检查'}
-
-        visible={true}
+        visible={isCheckModalVisible}
         onCancel={checkModalCancel}
         centered={true}
         width={550}

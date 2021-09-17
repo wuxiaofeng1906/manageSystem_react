@@ -454,7 +454,32 @@ const FrontTableList: React.FC<any> = () => {
   const getSourceColums = () => {
     // 获取缓存的字段
     const fields = localStorage.getItem('data_front_dashboard');
-debugger;
+
+    // 定义基础字段
+    const basicFiled = [
+      {
+        headerName: '部门',
+        field: 'dept',
+        minWidth: 100,
+        rowGroup: true,
+        hide: true,
+      },
+      {
+        headerName: '组',
+        field: 'group',
+        minWidth: 100,
+        rowGroup: true,
+        hide: true,
+      },
+      {
+        headerName: '姓名',
+        field: 'userName',
+        minWidth: 80,
+        suppressMenu: false,
+        pinned: 'left',
+      },
+    ];
+
     // 定义的原始字段
     const oraFields: any = [
       // {
@@ -600,8 +625,8 @@ debugger;
       },
     ];
 
-    if (fields === null) {
-      return oraFields;
+    if (fields === null) {  // 如果没有缓存，则返回所有的字段来显示
+      return basicFiled.concat(oraFields);
     }
 
     const selected = JSON.parse(fields);
@@ -626,30 +651,8 @@ debugger;
       });
     });
 
-    const basicFiled = [
-      {
-        headerName: '部门',
-        field: 'dept',
-        minWidth: 100,
-        rowGroup: true,
-        hide: true,
-      },
-      {
-        headerName: '组',
-        field: 'group',
-        minWidth: 100,
-        rowGroup: true,
-        hide: true,
-      },
-      {
-        headerName: '姓名',
-        field: 'userName',
-        minWidth: 80,
-        suppressMenu: false,
-        pinned: 'left',
-      },
-    ];
-    return basicFiled.concat(oraFields);
+
+    return basicFiled.concat(component);
   };
 
   // 取消

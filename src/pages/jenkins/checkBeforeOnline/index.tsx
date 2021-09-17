@@ -558,17 +558,17 @@ const JenkinsCheck: React.FC<any> = () => {
           {/* 分支检查Card */}
           <Card size="small" title="检查上线分支是否包含对比分支的提交" style={{width: "100%", marginTop: 5, height: 270}}>
             <Form.Item label="Check" name="branch_check" valuePropName="checked" style={{marginTop: -13}}>
-              <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 50}}/>
+              <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 51}}/>
             </Form.Item>
 
             <Form.Item label="MainBranch" name="branch_mainBranch" style={{marginTop: -30}}>
               <Checkbox.Group>
-                <Checkbox value={"stage"} style={{marginLeft: 15}}>stage</Checkbox>
+                <Checkbox value={"stage"} style={{marginLeft: 17}}>stage</Checkbox>
                 <Checkbox value={"master"}>master</Checkbox>
               </Checkbox.Group>
             </Form.Item>
 
-            <div style={{marginTop: -30, marginLeft: 103, fontSize: "x-small", color: "gray"}}>
+            <div style={{marginTop: -30, marginLeft: 105, fontSize: "x-small", color: "gray"}}>
               被对比的主分支
             </div>
 
@@ -578,7 +578,7 @@ const JenkinsCheck: React.FC<any> = () => {
                 <Checkbox value={"后端"}>后端</Checkbox>
               </Checkbox.Group>
             </Form.Item>
-            <div style={{marginTop: -30, marginLeft: 103, fontSize: "x-small", color: "gray"}}>
+            <div style={{marginTop: -30, marginLeft: 105, fontSize: "x-small", color: "gray"}}>
               技术侧
             </div>
 

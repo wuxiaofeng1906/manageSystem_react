@@ -454,7 +454,7 @@ const FrontTableList: React.FC<any> = () => {
   const getSourceColums = () => {
     // 获取缓存的字段
     const fields = localStorage.getItem('data_front_dashboard');
-
+debugger;
     // 定义的原始字段
     const oraFields: any = [
       // {

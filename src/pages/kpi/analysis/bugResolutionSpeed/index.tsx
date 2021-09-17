@@ -30,13 +30,27 @@ const ragCellClassRules = {
   }
 
 };
+
+// 单元格表头样式设置
+const columnColor = (params: any) => {
+
+  const columnName = params.colDef.children;
+  const date = columnName[0].field.toString();
+  const weekday = dayjs(date.substring(0, 8)).day();
+  // 如果是周六或者周天的话，title要显示成灰色的 ；也可以设置背景色
+  if (weekday === 0 || weekday === 6) {
+    return "grayColor"
+  }
+  return "blackColor"
+
+};
 // 定义列名
 const getSourceColums = (starttime: any, endTime: any) => {
 
   // 定义基础字段
   const Fields: any = [
     {
-      headerName: "",
+      headerName: '',
       children: [
         {
           headerName: '创建日期',
@@ -87,7 +101,6 @@ const getSourceColums = (starttime: any, endTime: any) => {
           pinned: 'left',
 
           rowSpan: (params: any) => {
-            debugger;
 
             if (params.data.createAt === "合计" && params.data.status === '激活') {
               return 5;
@@ -129,10 +142,11 @@ const getSourceColums = (starttime: any, endTime: any) => {
     const current = dayjs(starttime).add(index, 'day');
     Fields.push({
       headerName: current.format("MM月DD日"),
+      headerClass: columnColor,
       children: [{
         headerName: `变化`,
         field: `${current.format("YYYYMMDD")}变化`,
-        minWidth: 70
+        minWidth: 70,
       }, {
         headerName: `余量`,
         field: `${current.format("YYYYMMDD")}余量`,
@@ -630,7 +644,7 @@ const FrontTableList: React.FC<any> = () => {
 
         </Form.Item>
 
-        {/* 数据表格 */}
+        {/* 数据表格   */}
         <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: -18}}>
           <AgGridReact
             columnDefs={getSourceColums(g_currentMonth_range.start, g_currentMonth_range.end)} // 定义列

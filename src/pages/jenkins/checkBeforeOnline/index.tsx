@@ -458,31 +458,35 @@ const JenkinsCheck: React.FC<any> = () => {
 
       </div>
 
-      {/* 弹出层：检查任务 */}
+      {/* 弹出层：检查任务 isCheckModalVisible */}
 
       <Modal
         title={'上线前任务检查'}
-        visible={isCheckModalVisible}
+
+        visible={true}
         onCancel={checkModalCancel}
         centered={true}
         width={550}
-        footer={[
-          <Button
-            style={{borderRadius: 5}}
-            onClick={checkModalCancel}>取消
-          </Button>,
-          <Button type="primary"
-                  style={{
-                    marginLeft: 10,
-                    color: '#46A0FC',
-                    backgroundColor: "#ECF5FF",
-                    borderRadius: 5,
-                    display: isButtonClick
-                  }}
+        bodyStyle={{height: 535}}
+        footer={
+          [
+            <Button
+              style={{borderRadius: 5, marginTop: -100}}
+              onClick={checkModalCancel}>取消
+            </Button>,
+            <Button type="primary"
+                    style={{
+                      marginLeft: 10,
+                      color: '#46A0FC',
+                      backgroundColor: "#ECF5FF",
+                      borderRadius: 5,
+                      display: isButtonClick
+                    }}
 
-                  onClick={carryTask}>执行
-          </Button>
-        ]}
+                    onClick={carryTask}>执行
+            </Button>
+          ]
+        }
 
       >
         <Form form={formForCarryTask} style={{marginTop: -15}}>
@@ -491,22 +495,22 @@ const JenkinsCheck: React.FC<any> = () => {
             <Input defaultValue={"popup-online-check"} disabled={true} style={{color: "black"}}/>
           </Form.Item>
 
-          <Divider style={{marginTop: -20}}>任务参数</Divider>
+          <Divider style={{marginTop: -25}}>任务参数</Divider>
 
           {/* 版本检查card */}
-          <Card size="small" title="版本检查" style={{width: "100%", marginTop: -10, height: 220}}>
-            <Form.Item name="verson_check" label="Check" valuePropName="checked">
+          <Card size="small" title="版本检查" style={{width: "100%", marginTop: -15, height: 190}}>
+            <Form.Item name="verson_check" label="Check" valuePropName="checked" style={{marginTop: -10}}>
               <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 41}}/>
             </Form.Item>
 
-            <Form.Item name="verson_server" label="Server" style={{marginTop: -15}}>
-              <Select placeholder="请选择相应的服务！" style={{marginLeft: 41, width: 382}}>
+            <Form.Item name="verson_server" label="Server" style={{marginTop: -22}}>
+              <Select placeholder="请选择相应的服务！" style={{marginLeft: 41, width: 375}}>
                 <Option value="apps">apps</Option>
                 <Option value="global">global</Option>
               </Select>
             </Form.Item>
 
-            <Form.Item name="verson_imagebranch" label="ImageBranch" style={{marginTop: -15}}>
+            <Form.Item name="verson_imagebranch" label="ImageBranch" style={{marginTop: -20, width: 468}}>
               <Select placeholder="请选择待检查分支！" showSearch>
                 <Option value="hotfix">hotfix</Option>
                 <Option value="release">release</Option>
@@ -521,8 +525,8 @@ const JenkinsCheck: React.FC<any> = () => {
               </Select>
             </Form.Item>
 
-            <Form.Item name="verson_imageevn" label="ImageEvn" style={{marginTop: -15}}>
-              <Select placeholder="请选择对应的环境！" style={{marginLeft: 20, width: 382}} showSearch>
+            <Form.Item name="verson_imageevn" label="ImageEvn" style={{marginTop: -20}}>
+              <Select placeholder="请选择对应的环境！" style={{marginLeft: 20, width: 375}} showSearch>
 
                 <Option value="nx-hotfix">nx-hotfix</Option>
                 <Option value="nx-hotfix-db">nx-hotfix-db</Option>
@@ -553,42 +557,42 @@ const JenkinsCheck: React.FC<any> = () => {
           </Card>
 
           {/* 分支检查Card */}
-          <Card size="small" title="检查上线分支是否包含对比分支的提交" style={{width: "100%", marginTop: 10}}>
-            <Form.Item label="Check" name="branch_check" valuePropName="checked">
+          <Card size="small" title="检查上线分支是否包含对比分支的提交" style={{width: "100%", marginTop: 5, height: 270}}>
+            <Form.Item label="Check" name="branch_check" valuePropName="checked" style={{marginTop: -13}}>
               <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 50}}/>
             </Form.Item>
 
-            <Form.Item label="MainBranch" name="branch_mainBranch" style={{marginTop: -20,}}>
+            <Form.Item label="MainBranch" name="branch_mainBranch" style={{marginTop: -30}}>
               <Checkbox.Group>
                 <Checkbox value={"stage"} style={{marginLeft: 15}}>stage</Checkbox>
                 <Checkbox value={"master"}>master</Checkbox>
               </Checkbox.Group>
             </Form.Item>
 
-            <div style={{marginTop: -25, marginLeft: 103, fontSize: "x-small", color: "gray"}}>
+            <div style={{marginTop: -30, marginLeft: 103, fontSize: "x-small", color: "gray"}}>
               被对比的主分支
             </div>
 
-            <Form.Item label="TeachnicalSide" name="branch_teachnicalSide" style={{marginTop: 10}}>
+            <Form.Item label="TeachnicalSide" name="branch_teachnicalSide" style={{marginTop: -3}}>
               <Checkbox.Group>
                 <Checkbox value={"前端"}>前端</Checkbox>
                 <Checkbox value={"后端"}>后端</Checkbox>
               </Checkbox.Group>
             </Form.Item>
-            <div style={{marginTop: -25, marginLeft: 103, fontSize: "x-small", color: "gray"}}>
+            <div style={{marginTop: -30, marginLeft: 103, fontSize: "x-small", color: "gray"}}>
               技术侧
             </div>
 
-            <Form.Item label="TargetBranch" name="branch_targetBranch" style={{marginTop: 10}}>
-              <Input style={{marginLeft: 8, width: 370}}/>
+            <Form.Item label="TargetBranch" name="branch_targetBranch" style={{marginTop: 0}}>
+              <Input style={{marginLeft: 8, width: 360}}/>
             </Form.Item>
 
             <div style={{marginTop: -25, marginLeft: 103, fontSize: "x-small", color: "gray"}}>
               待检查的上线分支。支持多个，中间以英文逗号进行分隔。<br/>示例：feature-budget,feature-project
             </div>
 
-            <Form.Item label="MainSince" name="branch_mainSince" style={{marginTop: 10}}>
-              <DatePicker style={{marginLeft: 25, width: 370}}/>
+            <Form.Item label="MainSince" name="branch_mainSince" style={{marginTop: 0}}>
+              <DatePicker style={{marginLeft: 25, width: 360}}/>
             </Form.Item>
 
             <div style={{marginTop: -25, marginLeft: 103, fontSize: "x-small", color: "gray"}}>

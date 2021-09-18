@@ -15,6 +15,7 @@ import {useRequest} from 'ahooks';
 import dayjs from 'dayjs';
 import * as echarts from 'echarts';
 import './styles.css';
+import {timestampChanges} from "@/publicMethods/cellRenderer";
 
 // import ReactEcharts from 'echarts-for-react';
 
@@ -35,6 +36,16 @@ const cellFormat = (params: any) => {
     return Number(params.value);
   }
   return 0;
+};
+
+const timeCellFormat = (params: any) => {
+
+  if (params.value === undefined) {
+    return "";
+  }
+
+  const duration = (Number(params.value) / 3600).toFixed(2)
+  return duration;
 };
 
 // 定义列名
@@ -73,22 +84,39 @@ const alayThroughputData = (source: any, startTime: string, endTime: string) => 
   return data;
 };
 
-const alayRequestDatas = (oldData: any, reqDatas: any) => {
-  const result: any = [];
+const alayRequestDatas = (oldData: any, reqDatas: any, avgRequestDura: any) => {
 
+  // 连接 对外请求--请求数
+  const reqResult: any = [];
   oldData.forEach((o_dts: any) => {
     const o_details = o_dts;
     for (let index = 0; index < reqDatas.length; index += 1) {
       const dts = reqDatas[index];
       if (o_details.userId === dts.userId) {
         o_details['reCount'] = dts.count;
-        result.push(o_details);
+        reqResult.push(o_details);
         break;
       }
     }
   });
 
-  return result;
+
+  // 连接 对外请求--请求平均停留时长
+  const waitDurResult: any = [];
+  reqResult.forEach((o_dts: any) => {
+    const o_details = o_dts;
+    for (let index = 0; index < avgRequestDura.length; index += 1) {
+      const dts = avgRequestDura[index];
+      if (o_details.userId === dts.userId) {
+        o_details['waitDura'] = dts.dura;
+        waitDurResult.push(o_details);
+        break;
+      }
+    }
+  });
+
+
+  return waitDurResult;
 };
 
 // 公共查询方法
@@ -114,6 +142,13 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
           count
         }
 
+        avgRequestDura(${condition}) {
+          userId
+          userName
+          deptsName
+          dura
+        }
+
       }
   `);
 
@@ -122,7 +157,7 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
     params.start.toString(),
     params.end.toString(),
   );
-  const requestDatas = alayRequestDatas(throughputDatas, data?.notResponse);
+  const requestDatas = alayRequestDatas(throughputDatas, data?.notResponse, data?.avgRequestDura);
   return requestDatas;
 };
 
@@ -532,11 +567,12 @@ const FrontTableList: React.FC<any> = () => {
             // aggFunc: 'sum',
             valueFormatter: cellFormat,
           },
-          // {
-          //   headerName: '请求平均停留时长',
-          //   field: 'job',
-          //   minWidth: 140,
-          // },
+          {
+            headerName: '请求平均停留时长',
+            field: 'waitDura',
+            minWidth: 140,
+            valueFormatter: timeCellFormat,
+          },
         ],
       },
 

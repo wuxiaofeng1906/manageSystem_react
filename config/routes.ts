@@ -375,7 +375,7 @@ export default [
     ],
   },
   {
-    name: 'jenkins管理',
+    name: '检查工具',
     icon: 'table',
     path: '/jenkins',
     access: 'sysAdmin',

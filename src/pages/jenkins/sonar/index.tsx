@@ -1,0 +1,530 @@
+import React, {useRef, useState} from 'react';
+import {PageContainer} from '@ant-design/pro-layout';
+import {AgGridReact} from 'ag-grid-react';
+import 'ag-grid-enterprise';
+import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
+import {useRequest} from 'ahooks';
+import {GridApi, GridReadyEvent} from 'ag-grid-community';
+import {GqlClient, useGqlClient} from '@/hooks';
+import {
+  Button,
+  InputNumber,
+  message,
+  Form,
+  DatePicker,
+  Select,
+  Modal,
+  Input,
+  Divider,
+  Card,
+  Switch,
+  Checkbox
+} from 'antd';
+
+import {getHeight} from '@/publicMethods/pageSet';
+import axios from 'axios';
+
+
+import dayjs from "dayjs";
+
+
+const {Option} = Select;
+
+
+// 查询数据
+const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
+  // const range = `{start:"${params.dateRange.start}", end:"${params.dateRange.end}"}`;
+  // const {data} = await client.query(`
+  //     {
+  //        project(name:"${params.projectName}",category:[${params.projectType}], range:${range},status:[${params.projectStatus}],order:ASC){
+  //         id
+  //         name
+  //         type
+  //         startAt
+  //         testEnd
+  //         testFinish
+  //         expStage
+  //         expOnline
+  //         creator
+  //         status
+  //         createAt
+  //         ztId
+  //       }
+  //     }
+  // `);
+  //
+  // return data?.project;
+  return [{
+    ID: "111",
+    taskName: "sonar-project-scan",
+    starttime: "2021-09-07 10:29:31",
+    endtime: "",
+    excUser: "王羽飞",
+    excStatus: "waiting",
+    excResult: "",
+    url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
+    taskLog: "https://ant.design/components/button-cn/",
+  }, {
+    ID: "110",
+    taskName: "sonar-project-scan",
+    starttime: "2021-09-07 10:29:31",
+    endtime: "2021-09-07 10:29:31",
+    excUser: "王羽飞",
+    excStatus: "running",
+    excResult: "",
+    url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
+    taskLog: "https://ant.design/components/button-cn/",
+  }, {
+    ID: "109",
+    taskName: "sonar-project-scan",
+    starttime: "2021-09-07 10:29:31",
+    endtime: "2021-09-07 10:29:31",
+    excUser: "王羽飞",
+    excStatus: "success",
+    excResult: "failure",
+    url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
+    taskLog: "https://ant.design/components/button-cn/",
+  }, {
+    ID: "108",
+    taskName: "sonar-project-scan",
+    starttime: "2021-09-07 10:29:31",
+    endtime: "2021-09-07 10:29:31",
+    excUser: "王羽飞",
+    excStatus: "success",
+    excResult: "success",
+    url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
+    taskLog: "https://ant.design/components/button-cn/",
+  }]
+};
+
+
+// 组件初始化
+const SonarCheck: React.FC<any> = () => {
+
+
+  const sys_accessToken = localStorage.getItem("accessId");
+  axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
+  // const {initialState} = useModel('@@initialState');
+  // let currentUser: any;
+  // if (initialState?.currentUser) {
+  //   currentUser = initialState.currentUser === undefined ? "" : initialState.currentUser.userid;
+  // }
+
+
+  /* region  表格相关事件 */
+  const gridApi = useRef<GridApi>();
+  const gqlClient = useGqlClient();
+  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, ""));
+
+  const onGridReady = (params: GridReadyEvent) => {
+    gridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  if (gridApi.current) {
+    if (loading) gridApi.current.showLoadingOverlay();
+    else gridApi.current.hideOverlay();
+  }
+
+  // 表格的屏幕大小自适应
+  const [gridHeight, setGridHeight] = useState(getHeight() - 20);
+  window.onresize = function () {
+    setGridHeight(getHeight() - 20);
+    gridApi.current?.sizeColumnsToFit();
+  };
+
+  const onChangeGridReady = (params: GridReadyEvent) => {
+    gridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  /* endregion */
+
+  /* region 上线前检查任务弹出层相关事件 */
+
+  // 执行按钮是否禁用
+  const [isButtonClick, setIsButtonClick] = useState("none");
+
+  // 弹出层是否可见
+  const [isCheckModalVisible, setCheckModalVisible] = useState(false);
+  const [formForCarrySonar] = Form.useForm();
+
+  const checkModalCancel = () => {
+    setCheckModalVisible(false);
+  }
+
+  const runTask = () => {
+    setCheckModalVisible(true);
+    setIsButtonClick("inline");
+    // 设置显示的值。
+    formForCarrySonar.setFieldsValue({
+
+      LanguageType: "java",
+      ProjectPath: "test",
+      BranchName: "test",
+      ProjectKey: "test",
+
+
+    });
+  };
+
+  // 确定执行任务
+  const carrySonarCheck = () => {
+
+  }
+
+  // 刷新表格
+  const refreshGrid = () => {
+
+  };
+
+  /* endregion */
+
+  /* region 翻页以及页面跳转功能 */
+  // https://www.ag-grid.com/react-data-grid/row-pagination/  数据分页
+
+  const [Pages, setPages] = useState({
+    totalCounts: 4,
+    totalPages: 1,
+    currentPage: 1,
+  });
+
+  // 每页显示多少条数据
+  const showItemChange = (pageCOunt: any) => {
+
+    alert(`每页显示${pageCOunt}条数据`);
+
+  };
+
+  // 上一页
+  const showPreviousPage = () => {
+
+    // 上一页不能为负数或0
+    if (Pages.currentPage > 1) {
+      setPages({
+        ...Pages,
+        currentPage: Pages.currentPage - 1
+      });
+    }
+
+
+  };
+
+  // 下一页
+  const showNextPage = () => {
+    const nextPage = Pages.currentPage + 1;
+
+    // 下一页的页面不能超过总页面之和
+    if (nextPage <= Pages.totalPages) {
+      setPages({
+        ...Pages,
+        currentPage: Pages.currentPage + 1
+      });
+    }
+
+  };
+
+  // 跳转到第几页
+  const goToPage = (params: any) => {
+
+    const pageCounts = Number(params.currentTarget.defaultValue);
+    if (pageCounts > Pages.totalPages) {
+
+      // 提示已超过最大跳转页数
+      message.error({
+        content: '已超过最大跳转页数!',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+    } else {
+      alert(`跳转到第${params.currentTarget.defaultValue}页`)
+
+    }
+
+
+  }
+  /* endregion */
+
+  (window as any).showParams = (params: any) => {
+    setCheckModalVisible(true);
+    // 这个点击事件只能够进行查看
+    setIsButtonClick("none");
+
+    // alert(`获取信息：${params.taskName.toString()}`);
+
+
+    // 设置显示的值。
+    formForCarrySonar.setFieldsValue({
+      LanguageType: "",
+      ProjectPath: "",
+      BranchName: "",
+      ProjectKey: "",
+    });
+
+  };
+
+  // 定义列名
+  const colums = () => {
+    const component: any = [
+      {
+        headerName: 'ID',
+        field: 'ID',
+        maxWidth: 70,
+      },
+      {
+        headerName: '任务名称',
+        field: 'taskName',
+        minWidth: 155,
+      },
+      {
+        headerName: '开始时间',
+        field: 'starttime',
+        minWidth: 110,
+      },
+      {
+        headerName: '结束时间',
+        field: 'endtime',
+        minWidth: 110,
+      },
+      {
+        headerName: '执行用户',
+        field: 'excUser',
+        minWidth: 90,
+      },
+      {
+        headerName: '执行状态',
+        field: 'excStatus',
+        minWidth: 95,
+        cellRenderer: (params: any) => {
+          let color = "gray";
+          if (params.value === "running") {
+            color = "#46A0FC";
+          }
+          if (params.value === "success") {
+            color = "#32D529";
+          }
+
+          return `<span style="font-size: medium; color:${color}">${params.value}</span>`;
+        }
+      },
+      {
+        headerName: '执行结果',
+        field: 'excResult',
+        minWidth: 95,
+        cellRenderer: (params: any) => {
+          let color = "black";
+          if (params.value === "failure") {
+            color = "red";
+          }
+
+          if (params.value === "success") {
+            color = "#32D529";
+          }
+
+          return `<span style="font-size: medium; color:${color}">${params.value}</span>`;
+        }
+      },
+      {
+        headerName: '任务URL',
+        field: 'url',
+        minWidth: 200,
+        cellRenderer: (params: any) => {
+          return `<a href="${params.value}" target="_blank" style="text-decoration: underline">${params.value}</a>`;
+        }
+      },
+      {
+        headerName: '任务日志',
+        field: 'taskLog',
+        minWidth: 200,
+        cellRenderer: (params: any) => {
+          return `<a href="${params.value}" target="_blank" style="text-decoration: underline">${params.value}</a>`;
+        }
+
+      }, {
+        headerName: '执行参数',
+        cellRenderer: (params: any) => {
+
+          const datas = JSON.stringify(params.data);
+          return `<button  style="width:100%;border: none; background-color: #AAAAAA; font-size: small; color: white" onclick='showParams(${datas})'> 查看参数 </button>`
+
+        }
+      }];
+
+    return component;
+  };
+
+
+  return (
+    <PageContainer style={{marginLeft: -30, marginRight: -30}}>
+
+      {/* 按钮 */}
+      <div style={{background: 'white', marginTop: -20}}>
+        {/* 使用一个图标就要导入一个图标 */}
+
+        <Button type="primary" style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}
+                onClick={runTask}>执行sonar扫描任务</Button>
+
+        <Button type="primary"
+                style={{marginLeft: 10, color: '#32D529', backgroundColor: "#ECF5FF", borderRadius: 5}}
+                onClick={refreshGrid}>刷新</Button>
+
+
+      </div>
+
+      {/* ag-grid 表格定义 */}
+      <div className="ag-theme-alpine" style={{marginTop: 3, height: gridHeight, width: '100%'}}>
+        <AgGridReact
+          columnDefs={colums()} // 定义列
+          rowData={data} // 数据绑定
+          defaultColDef={{
+            resizable: true,
+            sortable: true,
+            minWidth: 100,
+            suppressMenu: true,
+            // 自动换行显示
+            wrapText: true,
+            // 自动行高
+            autoHeight: true,
+            cellStyle: {"border-right": "solid 0.5px #E3E6E6"}
+            //  BABFC7 lightgrey EAEDED E3E6E6
+          }}
+
+          onGridReady={onGridReady}
+          onGridSizeChanged={onChangeGridReady}
+        >
+        </AgGridReact>
+      </div>
+
+      {/* 分页控件 */}
+      <div style={{background: 'white', marginTop: 2, height: 50, paddingTop: 10}}>
+
+        {/* 共XX条 */}
+        <label style={{marginLeft: 20, fontWeight: "bold"}}> 共 {Pages.totalCounts} 条</label>
+
+        {/* 每页 XX 条 */}
+        <label style={{marginLeft: 20, fontWeight: "bold"}}>每页</label>
+        <InputNumber style={{marginLeft: 10}} size={"middle"} min={1} max={10000} defaultValue={20}
+                     onChange={showItemChange}/>
+        <label style={{marginLeft: 10, fontWeight: "bold"}}>条</label>
+
+        <label style={{marginLeft: 10, fontWeight: "bold"}}>共 {Pages.totalPages} 页</label>
+
+        {/* 上一页 */}
+        <Button size={"small"}
+                style={{fontWeight: "bold", marginLeft: 20, color: 'black', backgroundColor: "WhiteSmoke"}}
+                onClick={showPreviousPage}>&lt;</Button>
+
+        {/* 条数显示 */}
+        <span style={{
+          display: "inline-block", marginLeft: 10, textAlign: "center",
+          fontWeight: "bold", backgroundColor: "#46A0FC", color: "white", width: "40px"
+        }}> {Pages.currentPage} </span>
+
+        {/* 下一页 */}
+        <Button size={"small"}
+                style={{fontWeight: "bold", marginLeft: 10, color: 'black', backgroundColor: "WhiteSmoke"}}
+                onClick={showNextPage}>&gt;</Button>
+
+        {/* 跳转到第几页 */}
+        <label style={{marginLeft: 20, fontWeight: "bold"}}> 跳转到第 </label>
+        <Input style={{textAlign: "center", width: 50, marginLeft: 2}} defaultValue={1} onBlur={goToPage}/>
+        <label style={{marginLeft: 2, fontWeight: "bold"}}> 页 </label>
+
+
+      </div>
+
+      {/* 弹出层：扫描任务  isCheckModalVisible */}
+
+      <Modal
+        title={'sonar扫描任务'}
+        visible={isCheckModalVisible}
+        onCancel={checkModalCancel}
+        centered={true}
+        width={550}
+        bodyStyle={{height: 300}}
+        footer={
+          [
+            <Button
+              style={{borderRadius: 5, marginTop: -100}}
+              onClick={checkModalCancel}>取消
+            </Button>,
+            <Button type="primary"
+                    style={{
+                      marginLeft: 10,
+                      color: '#46A0FC',
+                      backgroundColor: "#ECF5FF",
+                      borderRadius: 5,
+                      display: isButtonClick
+                    }}
+
+                    onClick={carrySonarCheck}>执行
+            </Button>
+          ]
+        }
+
+      >
+        <Form form={formForCarrySonar} style={{marginTop: -15}}>
+
+          <Form.Item label="任务名称" name="taskName">
+            <Input defaultValue={"sonar-project-scan"} disabled={true}
+                   style={{marginLeft: 35, width: 390, color: "black"}}/>
+          </Form.Item>
+
+          <Divider style={{marginTop: -25}}>任务参数</Divider>
+
+          <div>
+
+            <Form.Item name="LanguageType" label="LanguageType" style={{marginTop: -15}}>
+              <Select style={{width: 390}}>
+                <Option value="java">java</Option>
+                <Option value="ts">ts</Option>
+                <Option value="golang">go</Option>
+              </Select>
+            </Form.Item>
+            <div style={{marginTop: -23, marginLeft: 104, fontSize: "x-small", color: "gray"}}>
+              语言类型：默认是java；如果是前端，则选择ts；如果是golang，则选择go
+            </div>
+
+            <Form.Item name="ProjectPath" label="ProjectPath" style={{marginTop: 7}}>
+              <Select style={{marginLeft: 20, width: 390}}>
+                <Option value="apps">apps</Option>
+                <Option value="global">global</Option>
+              </Select>
+            </Form.Item>
+            <div style={{marginTop: -23, marginLeft: 104, fontSize: "x-small", color: "gray"}}>
+              项目路径：如：backend/apps/asset
+            </div>
+
+            <Form.Item name="BranchName" label="BranchName" style={{marginTop: 7}}>
+              <Select showSearch style={{marginLeft: 10, width: 390}}>
+                <Option value="hotfix">hotfix</Option>
+              </Select>
+            </Form.Item>
+            <div style={{marginTop: -23, marginLeft: 104, fontSize: "x-small", color: "gray"}}>
+              分支名称：如：feature-multi-org2
+            </div>
+
+
+            <Form.Item name="ProjectKey" label="ProjectKey" style={{marginTop: 7}}>
+              <Select style={{marginLeft: 25, width: 390}} showSearch>
+                <Option value="nx-hotfix">nx-hotfix</Option>
+                <Option value="nx-hotfix-db">nx-hotfix-db</Option>
+              </Select>
+            </Form.Item>
+            <div style={{marginTop: -23, marginLeft: 104, fontSize: "x-small", color: "gray"}}>
+              sonar中展示的项目名称，唯一
+            </div>
+
+          </div>
+        </Form>
+      </Modal>
+    </PageContainer>
+  );
+};
+
+
+export default SonarCheck;

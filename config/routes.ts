@@ -384,6 +384,11 @@ export default [
         name: '上线前检查',
         path: 'checkBeforeOnline',
         component: './jenkins/checkBeforeOnline',
+      },
+      {
+        name: 'sonar扫描',
+        path: 'sonar',
+        component: './jenkins/sonar',
       }
     ],
   },

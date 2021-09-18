@@ -279,7 +279,7 @@ const FrontTableList: React.FC<any> = () => {
     '追加需求数',
     '追加需求完成数',
     '请求数',
-    '请求平均停留时长',
+    '请求平均停留时长（H）',
     '交付需求数',
     '完成任务数',
     '修复Bug数',
@@ -592,9 +592,9 @@ const FrontTableList: React.FC<any> = () => {
             valueFormatter: cellFormat,
           },
           {
-            headerName: '请求平均停留时长',
+            headerName: '请求平均停留时长（H）',
             field: 'waitDura',
-            minWidth: 140,
+            minWidth: 180,
             valueFormatter: timeCellFormat,
           },
         ],
@@ -887,7 +887,7 @@ const FrontTableList: React.FC<any> = () => {
                     <Checkbox value="请求数">请求数</Checkbox>
                   </Col>
                   <Col span={4}>
-                    <Checkbox value="请求平均停留时长">请求平均停留时长</Checkbox>
+                    <Checkbox value="请求平均停留时长（H）">请求平均停留时长</Checkbox>
                   </Col>
                   <Col span={4}>
                     <Checkbox value="交付需求数">交付需求数</Checkbox>

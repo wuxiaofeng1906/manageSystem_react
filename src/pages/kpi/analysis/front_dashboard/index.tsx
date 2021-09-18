@@ -84,7 +84,7 @@ const alayThroughputData = (source: any, startTime: string, endTime: string) => 
   return data;
 };
 
-const alayRequestDatas = (oldData: any, reqDatas: any, avgRequestDura: any) => {
+const alayRequestDatas = (oldData: any, reqDatas: any, avgRequestDura: any, bugResponseDuraCount: any) => {
 
   // 连接 对外请求--请求数
   const reqResult: any = [];
@@ -116,7 +116,22 @@ const alayRequestDatas = (oldData: any, reqDatas: any, avgRequestDura: any) => {
   });
 
 
-  return waitDurResult;
+  const bugResponseDuraCountResult: any = [];
+  waitDurResult.forEach((o_dts: any) => {
+    const o_details = o_dts;
+    for (let index = 0; index < bugResponseDuraCount.length; index += 1) {
+      const dts = bugResponseDuraCount[index];
+      if (o_details.userId === dts.userId) {
+        o_details['solveCount'] = dts.count;
+        o_details['solveDur'] = dts.dura;
+        bugResponseDuraCountResult.push(o_details);
+        break;
+      }
+    }
+  });
+
+
+  return bugResponseDuraCountResult;
 };
 
 // 公共查询方法
@@ -149,6 +164,14 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
           dura
         }
 
+        bugResponseDuraCount(${condition}) {
+          userId
+          userName
+          deptsName
+          dura
+          count
+        }
+
       }
   `);
 
@@ -157,7 +180,7 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
     params.start.toString(),
     params.end.toString(),
   );
-  const requestDatas = alayRequestDatas(throughputDatas, data?.notResponse, data?.avgRequestDura);
+  const requestDatas = alayRequestDatas(throughputDatas, data?.notResponse, data?.avgRequestDura, data?.bugResponseDuraCount);
   return requestDatas;
 };
 
@@ -517,21 +540,22 @@ const FrontTableList: React.FC<any> = () => {
 
     // 定义的原始字段
     const oraFields: any = [
-      // {
-      //   headerName: '周期时间',
-      //   children: [
-      //     {
-      //       headerName: 'Bug解决时长(H)',
-      //       field: 'time',
-      //       minWidth: 133,
-      //     },
-      //     {
-      //       headerName: 'Bug数量',
-      //       field: 'avgLines',
-      //       minWidth: 88,
-      //     },
-      //   ],
-      // },
+      {
+        headerName: '周期时间',
+        children: [
+          {
+            headerName: 'Bug解决时长(H)',
+            field: 'solveDur',
+            minWidth: 133,
+            valueFormatter: timeCellFormat,
+          },
+          {
+            headerName: 'Bug数量',
+            field: 'solveCount',
+            minWidth: 88,
+          },
+        ],
+      },
       // {
       //   headerName: '速度',
       //   children: [

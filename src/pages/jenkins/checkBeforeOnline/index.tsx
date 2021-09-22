@@ -31,79 +31,96 @@ import dayjs from "dayjs";
 
 const {Option} = Select;
 
-// 默认条件：近一个月；未关闭的
-const defalutCondition: any = {
-  projectName: '',
-  projectType: [],
-  dateRange: {start: "", end: ""},
-  projectStatus: ['wait', 'doing', 'suspended'],
-};
-
 
 // 查询数据
-const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
-  // const range = `{start:"${params.dateRange.start}", end:"${params.dateRange.end}"}`;
-  // const {data} = await client.query(`
-  //     {
-  //        project(name:"${params.projectName}",category:[${params.projectType}], range:${range},status:[${params.projectStatus}],order:ASC){
-  //         id
-  //         name
-  //         type
-  //         startAt
-  //         testEnd
-  //         testFinish
-  //         expStage
-  //         expOnline
-  //         creator
-  //         status
-  //         createAt
-  //         ztId
-  //       }
-  //     }
-  // `);
-  //
-  // return data?.project;
-  return [{
-    ID: "111",
-    taskName: "werfsdf-gfjf-fghfg",
-    starttime: "2021-09-07 10:29:31",
-    endtime: "",
-    excUser: "张飞",
-    excStatus: "waiting",
-    excResult: "",
-    url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
-    taskLog: "https://ant.design/components/button-cn/",
-  }, {
-    ID: "110",
-    taskName: "twcvbxc-sdg-fsdgsd",
-    starttime: "2021-09-07 10:29:31",
-    endtime: "2021-09-07 10:29:31",
-    excUser: "张飞",
-    excStatus: "running",
-    excResult: "",
-    url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
-    taskLog: "https://ant.design/components/button-cn/",
-  }, {
-    ID: "109",
-    taskName: "vxzcv-fsg-lll",
-    starttime: "2021-09-07 10:29:31",
-    endtime: "2021-09-07 10:29:31",
-    excUser: "张飞",
-    excStatus: "success",
-    excResult: "failure",
-    url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
-    taskLog: "https://ant.design/components/button-cn/",
-  }, {
-    ID: "108",
-    taskName: "dasd-xcbxcbv-okp",
-    starttime: "2021-09-07 10:29:31",
-    endtime: "2021-09-07 10:29:31",
-    excUser: "张飞",
-    excStatus: "success",
-    excResult: "success",
-    url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
-    taskLog: "https://ant.design/components/button-cn/",
-  }]
+const queryDevelopViews = async () => {
+  debugger;
+  const datas: any = [];
+  await axios.get('/api/verify/job/build_info', {params: {name: "test_SQA"}})
+    .then(function (res) {
+
+      if (res.data.code === 200) {
+
+        const serverDatas = res.data.data;
+        serverDatas.forEach((ele: any, index: any) => {
+          datas.push({
+            ID: index,
+            taskName: ele.task_name,
+            starttime: ele.start_time,
+            endtime: ele.end_time,
+            excUser: ele.user_name,
+            excStatus: ele.result,
+            excResult: ele.result,
+            url: ele.task_url,
+            taskLog: ele.log_url,
+          });
+        });
+
+
+      } else {
+        message.error({
+          content: `错误：${res.data.msg}`,
+          duration: 1, // 1S 后自动关闭
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
+
+
+    }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+  return datas;
+  // return [{
+  //   ID: "111",
+  //   taskName: "werfsdf-gfjf-fghfg",
+  //   starttime: "2021-09-07 10:29:31",
+  //   endtime: "",
+  //   excUser: "张飞",
+  //   excStatus: "waiting",
+  //   excResult: "",
+  //   url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
+  //   taskLog: "https://ant.design/components/button-cn/",
+  // }, {
+  //   ID: "110",
+  //   taskName: "twcvbxc-sdg-fsdgsd",
+  //   starttime: "2021-09-07 10:29:31",
+  //   endtime: "2021-09-07 10:29:31",
+  //   excUser: "张飞",
+  //   excStatus: "running",
+  //   excResult: "",
+  //   url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
+  //   taskLog: "https://ant.design/components/button-cn/",
+  // }, {
+  //   ID: "109",
+  //   taskName: "vxzcv-fsg-lll",
+  //   starttime: "2021-09-07 10:29:31",
+  //   endtime: "2021-09-07 10:29:31",
+  //   excUser: "张飞",
+  //   excStatus: "success",
+  //   excResult: "failure",
+  //   url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
+  //   taskLog: "https://ant.design/components/button-cn/",
+  // }, {
+  //   ID: "108",
+  //   taskName: "dasd-xcbxcbv-okp",
+  //   starttime: "2021-09-07 10:29:31",
+  //   endtime: "2021-09-07 10:29:31",
+  //   excUser: "张飞",
+  //   excStatus: "success",
+  //   excResult: "success",
+  //   url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
+  //   taskLog: "https://ant.design/components/button-cn/",
+  // }]
 };
 
 
@@ -122,8 +139,8 @@ const JenkinsCheck: React.FC<any> = () => {
 
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>();
-  const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, defalutCondition));
+
+  const {data, loading} = useRequest(() => queryDevelopViews());
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;

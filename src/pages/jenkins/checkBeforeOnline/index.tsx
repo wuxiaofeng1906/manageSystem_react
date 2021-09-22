@@ -111,8 +111,8 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
 const JenkinsCheck: React.FC<any> = () => {
 
 
-  const sys_accessToken = localStorage.getItem("accessId");
-  axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
+  // const sys_accessToken = localStorage.getItem("accessId");
+  // axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
   // const {initialState} = useModel('@@initialState');
   // let currentUser: any;
   // if (initialState?.currentUser) {
@@ -162,8 +162,141 @@ const JenkinsCheck: React.FC<any> = () => {
     setCheckModalVisible(false);
   }
 
+  /* region 下拉框数据加载 */
+
+  // 加载请求Server下拉框
+  const [servers, setServers] = useState([]);
+  const LoadSeverCombobox = () => {
+    axios.get('/api/verify/project/server', {params: {}})
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+          const serverDatas = res.data.data;
+          const serversOp: any = [];
+          for (let index = 0; index < serverDatas.length; index += 1) {
+            const id = serverDatas[index].server_id;
+            const {server} = serverDatas[index]
+            serversOp.push(
+              <Option value={id}>{server}</Option>,
+            );
+          }
+
+          setServers(serversOp);
+        } else {
+          message.error({
+            content: `错误：${res.data.msg}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+      }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+
+  };
+
+  // 记载请求镜像分支下拉框
+  const [imageBranch, setImageBranch] = useState([]);
+  const LoadImageBranchCombobox = () => {
+    axios.get('/api/verify/project/image_branch', {params: {}})
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+          const branchDatas = res.data.data;
+          const branchOp: any = [];
+          for (let index = 0; index < branchDatas.length; index += 1) {
+            const id = branchDatas[index].branch_id;
+            const branch = branchDatas[index].image_branch
+            branchOp.push(
+              <Option value={id}>{branch}</Option>,
+            );
+          }
+
+          setImageBranch(branchOp);
+        } else {
+          message.error({
+            content: `错误：${res.data.msg}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+      }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+
+  };
+
+  // 记载请求镜像环境下拉框
+  const [imageEvn, setImageEvn] = useState([]);
+  const LoadImageEvnCombobox = () => {
+    axios.get('/api/verify/project/image_env', {params: {}})
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+          const imageDatas = res.data.data;
+          const imageOp: any = [];
+          for (let index = 0; index < imageDatas.length; index += 1) {
+            const id = imageDatas[index].env_id;
+            const image = imageDatas[index].image_env
+            imageOp.push(
+              <Option value={id}>{image}</Option>,
+            );
+          }
+
+          setImageEvn(imageOp);
+        } else {
+          message.error({
+            content: `错误：${res.data.msg}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+      }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+
+  };
+  /* endregion 下拉框数据加载 */
+
   const runTask = () => {
+    LoadSeverCombobox();
+    LoadImageBranchCombobox();
+    LoadImageEvnCombobox();
     setCheckModalVisible(true);
+
     setIsButtonClick("inline");
     // 设置显示的值。
     formForCarryTask.setFieldsValue({
@@ -504,52 +637,19 @@ const JenkinsCheck: React.FC<any> = () => {
 
             <Form.Item name="verson_server" label="Server" style={{marginTop: -22}}>
               <Select placeholder="请选择相应的服务！" style={{marginLeft: 41, width: 375}}>
-                <Option value="apps">apps</Option>
-                <Option value="global">global</Option>
+                {servers}
               </Select>
             </Form.Item>
 
             <Form.Item name="verson_imagebranch" label="ImageBranch" style={{marginTop: -20, width: 468}}>
               <Select placeholder="请选择待检查分支！" showSearch>
-                <Option value="hotfix">hotfix</Option>
-                <Option value="release">release</Option>
-                <Option value="release-fix">release-fix</Option>
-                <Option value="emergency">emergency</Option>
-                <Option value="release-emergency">release-emergency</Option>
-                <Option value="hotfix-inte">hotfix-inte</Option>
-                <Option value="hotfix-emergency">hotfix-emergency</Option>
-                <Option value="hotfix-inte-emergency">hotfix-inte-emergency</Option>
-                <Option value="stage-emergency">stage-emergency</Option>
-
+                {imageBranch}
               </Select>
             </Form.Item>
 
             <Form.Item name="verson_imageevn" label="ImageEvn" style={{marginTop: -20}}>
               <Select placeholder="请选择对应的环境！" style={{marginLeft: 20, width: 375}} showSearch>
-
-                <Option value="nx-hotfix">nx-hotfix</Option>
-                <Option value="nx-hotfix-db">nx-hotfix-db</Option>
-                <Option value="nx-release">nx-release</Option>
-                <Option value="nx-release-db">nx-release-db</Option>
-                <Option value="nx-temp7">nx-temp7</Option>
-                <Option value="nx-hotfix-inte">nx-hotfix-inte</Option>
-
-                <Option value="bj-hotfix">bj-hotfix</Option>
-                <Option value="bj-hotfix-db">bj-hotfix-db</Option>
-                <Option value="bj-release">bj-release</Option>
-                <Option value="bj-release-db">bj-release-db</Option>
-                <Option value="bj-hotfix-inte">bj-hotfix-inte</Option>
-                <Option value="bj-reports">bj-reports</Option>
-
-                <Option value="bj-temp1">bj-temp1</Option>
-                <Option value="bj-temp2">bj-temp2</Option>
-                <Option value="bj-temp3">bj-temp3</Option>
-                <Option value="bj-temp4">bj-temp4</Option>
-                <Option value="bj-temp5">bj-temp5</Option>
-                <Option value="bj-temp6">bj-temp6</Option>
-                <Option value="bj-temp7">bj-temp7</Option>
-                <Option value="bj-temp8">bj-temp8</Option>
-
+                {imageEvn}
               </Select>
             </Form.Item>
 

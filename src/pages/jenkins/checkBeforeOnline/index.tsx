@@ -39,9 +39,10 @@ const queryDevelopViews = async () => {
   await axios.get('/api/verify/job/build_info', {params: {name: "test_SQA"}})
     .then(function (res) {
 
+      debugger;
       if (res.data.code === 200) {
 
-        const serverDatas = res.data.data;
+        const serverDatas = res.data.data.data;
         serverDatas.forEach((ele: any, index: any) => {
           datas.push({
             ID: index,
@@ -80,47 +81,7 @@ const queryDevelopViews = async () => {
     });
 
   return datas;
-  // return [{
-  //   ID: "111",
-  //   taskName: "werfsdf-gfjf-fghfg",
-  //   starttime: "2021-09-07 10:29:31",
-  //   endtime: "",
-  //   excUser: "张飞",
-  //   excStatus: "waiting",
-  //   excResult: "",
-  //   url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
-  //   taskLog: "https://ant.design/components/button-cn/",
-  // }, {
-  //   ID: "110",
-  //   taskName: "twcvbxc-sdg-fsdgsd",
-  //   starttime: "2021-09-07 10:29:31",
-  //   endtime: "2021-09-07 10:29:31",
-  //   excUser: "张飞",
-  //   excStatus: "running",
-  //   excResult: "",
-  //   url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
-  //   taskLog: "https://ant.design/components/button-cn/",
-  // }, {
-  //   ID: "109",
-  //   taskName: "vxzcv-fsg-lll",
-  //   starttime: "2021-09-07 10:29:31",
-  //   endtime: "2021-09-07 10:29:31",
-  //   excUser: "张飞",
-  //   excStatus: "success",
-  //   excResult: "failure",
-  //   url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
-  //   taskLog: "https://ant.design/components/button-cn/",
-  // }, {
-  //   ID: "108",
-  //   taskName: "dasd-xcbxcbv-okp",
-  //   starttime: "2021-09-07 10:29:31",
-  //   endtime: "2021-09-07 10:29:31",
-  //   excUser: "张飞",
-  //   excStatus: "success",
-  //   excResult: "success",
-  //   url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
-  //   taskLog: "https://ant.design/components/button-cn/",
-  // }]
+
 };
 
 
@@ -471,15 +432,21 @@ const JenkinsCheck: React.FC<any> = () => {
         field: 'excStatus',
         minWidth: 95,
         cellRenderer: (params: any) => {
-          let color = "gray";
-          if (params.value === "running") {
-            color = "#46A0FC";
-          }
-          if (params.value === "success") {
-            color = "#32D529";
+          if (params.value === "ABORTED ") {
+            return `<span style="font-size: medium; color:gray">aborted</span>`;
           }
 
-          return `<span style="font-size: medium; color:${color}">${params.value}</span>`;
+          if (params.value === "None") {
+            return `<span style="font-size: medium; color:#46A0FC">running</span>`;
+          }
+          if (params.value === "SUCCESS") {
+            return `<span style="font-size: medium; color:#32D529">success</span>`;
+          }
+
+          if (params.value === "FAILURE") {
+            return `<span style="font-size: medium;color: red">failure</span>`;
+          }
+          return `<span style="font-size: medium;">${params.value}</span>`;
         }
       },
       {
@@ -487,16 +454,22 @@ const JenkinsCheck: React.FC<any> = () => {
         field: 'excResult',
         minWidth: 95,
         cellRenderer: (params: any) => {
-          let color = "black";
-          if (params.value === "failure") {
-            color = "red";
+
+          if (params.value === "ABORTED ") {
+            return `<span style="font-size: medium; color:gray">aborted</span>`;
           }
 
-          if (params.value === "success") {
-            color = "#32D529";
+          if (params.value === "None") {
+            return `<span style="font-size: medium; "> </span>`;
+          }
+          if (params.value === "SUCCESS") {
+            return `<span style="font-size: medium; color:#32D529">success</span>`;
           }
 
-          return `<span style="font-size: medium; color:${color}">${params.value}</span>`;
+          if (params.value === "FAILURE") {
+            return `<span style="font-size: medium;color: red">failure</span>`;
+          }
+          return `<span style="font-size: medium;">${params.value}</span>`;
         }
       },
       {

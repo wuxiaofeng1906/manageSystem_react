@@ -14,7 +14,8 @@ import {
   getFourQuarterTime,
   getParamsByType
 } from '@/publicMethods/timeMethods';
-import {customRound, getHeight} from '@/publicMethods/pageSet';
+import {getHeight} from '@/publicMethods/pageSet';
+import './styles.css';
 
 import {Button, Drawer} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
@@ -456,7 +457,13 @@ const LaunchTimeTableList: React.FC<any> = () => {
             filter: true,
             flex: 1,
             suppressMenu: true,
-            cellStyle: {"margin-top": "-5px"}
+            cellStyle: (params: any) => {
+              // 判断是不是分组列，如果是的话就不需要设置line-height属性，如果不是的话就需要设置line-height（因为.ag-cell-expandable只对分组列有作用）
+              if (params.column.colId === 'ag-Grid-AutoColumn') {
+                return {};
+              }
+              return {'line-height': '32px'};
+            },
           }}
           autoGroupColumnDef={{
             minWidth: 150,

@@ -1,0 +1,11 @@
+.ag-cell-expandable {
+  /*font-weight: bold;*/
+  /*color: blue;*/
+  margin-top: -4px;
+}
+
+/*!* 对表格的表头进行渲染 *!*/
+/*.ag-header-cell-label {*/
+/*  color: red;*/
+/*  font-size: x-small;*/
+/*}*/

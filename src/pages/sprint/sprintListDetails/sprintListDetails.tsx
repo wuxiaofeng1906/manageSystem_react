@@ -1250,7 +1250,6 @@ const SprintList: React.FC<any> = () => {
       datas["uedName"] = oradata.adminAddForUED;
       datas["feedback"] = oradata.adminAddFeedbacker;
 
-      debugger;
       addCommitDetails(datas);
     } else {
       const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
@@ -1306,6 +1305,7 @@ const SprintList: React.FC<any> = () => {
       managerDataUpgrade: datas.dataUpdate,
       managerProTested: datas.proposedTest,
       managerEnvironment: pubEnv,
+      managerPageAdjust: datas.pageAdjust,
       managerHotUpdate: datas.hotUpdate,
       managerInteUpgrade: datas.interUpdate,
       managerPreData: datas.presetData,
@@ -1354,6 +1354,7 @@ const SprintList: React.FC<any> = () => {
       category: zentaoTypeRenderToNumber(oradata.managerChandaoType),
       // ztNo: oradata.managerCHandaoID,
       // 以上为必填项
+      pageAdjust: oradata.managerPageAdjust === "" ? null : oradata.managerPageAdjust,
       hotUpdate: oradata.managerHotUpdate === "" ? null : oradata.managerHotUpdate,
       dataUpdate: oradata.managerDataUpgrade === "" ? null : oradata.managerDataUpgrade,
       interUpdate: oradata.managerInteUpgrade === "" ? null : oradata.managerInteUpgrade,
@@ -1551,7 +1552,7 @@ const SprintList: React.FC<any> = () => {
     if (initialState?.currentUser) {
       currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
     }
-    // currentUserGroup = 'testGroup';
+    // currentUserGroup = 'devGroup';
     if (currentUserGroup !== undefined) {
       switch (currentUserGroup.toString()) {
         case 'superGroup':
@@ -2927,9 +2928,26 @@ const SprintList: React.FC<any> = () => {
             </Col>
 
             <Col className="gutter-row">
+              <div style={leftStyle}>
+                <Form.Item name="managerPageAdjust" label="是否涉及页面调整：">
+                  <Select placeholder="请选择" style={{width: '170px'}}>
+                    {[
+                      <Option key={''} value={''}> </Option>,
+                      <Option key={'1'} value={'1'}>是</Option>,
+                      <Option key={'0'} value={'0'}>否</Option>,
+                    ]}
+                  </Select>
+                </Form.Item>
+              </div>
+            </Col>
+
+          </Row>
+
+          <Row gutter={16}>
+            <Col className="gutter-row">
               <div style={{marginLeft: '65px'}}>
                 <Form.Item name="managerProTested" label="已提测：">
-                  <Select placeholder="请选择" style={{width: '200px'}}>
+                  <Select placeholder="请选择" style={{width: 180}}>
                     {[
                       <Option key={''} value={''}> </Option>,
                       <Option key={'0'} value={'0'}>否</Option>,
@@ -2941,14 +2959,13 @@ const SprintList: React.FC<any> = () => {
                 </Form.Item>
               </div>
             </Col>
-
           </Row>
 
           <Row gutter={16}>
             <Col className="gutter-row">
               <div style={{marginLeft: '50px'}}>
                 <Form.Item name="managerEnvironment" label="发布环境:">
-                  <Select placeholder="请选择" style={{width: '515px'}} mode="multiple"
+                  <Select placeholder="请选择" style={{width: 515}} mode="multiple"
                           optionFilterProp="children">
                     {[
                       <Option key={'集群1'} value={'集群1'}>集群1</Option>,
@@ -2973,7 +2990,7 @@ const SprintList: React.FC<any> = () => {
             </Col>
           </Row>
 
-          <Form.Item style={{marginTop: '50px'}}>
+          <Form.Item>
             <Button type="primary" style={{marginLeft: '300px'}} onClick={commitManagerModify}>
               确定
             </Button>

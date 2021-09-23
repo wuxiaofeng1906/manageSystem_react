@@ -10,14 +10,14 @@ export default {
     '/api/': {
       // target: 'https://preview.pro.ant.design',
       // target: 'http://localhost:5000',
-      target: 'http://192.168.1.146:5000/',
+      target: 'http://10.0.144.53:8300/',
       changeOrigin: true,
       pathRewrite: {'^': ''},
     },
   },
   test: {
     '/api/': {
-      target: 'http://10.0.144.53:8300/',
+      target: 'http://192.168.1.146:5000/',
       changeOrigin: true,
       pathRewrite: {'^': ''},
     },

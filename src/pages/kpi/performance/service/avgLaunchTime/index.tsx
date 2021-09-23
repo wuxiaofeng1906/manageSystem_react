@@ -14,7 +14,7 @@ import {
   getFourQuarterTime,
   getParamsByType
 } from '@/publicMethods/timeMethods';
-import {getHeight} from '@/publicMethods/pageSet';
+import {customRound, getHeight} from '@/publicMethods/pageSet';
 
 import {Button, Drawer} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
@@ -24,7 +24,8 @@ import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone}
 const weekRanges = getWeeksRange(8);
 const monthRanges = getTwelveMonthTime();
 const quarterTime = getFourQuarterTime();
-const groupValues: any[] = [];
+const devCenterGroupValues: any[] = [];
+const groupGroupValues: any[] = [];
 
 /* region 动态定义列 */
 const compColums = [
@@ -37,25 +38,51 @@ const compColums = [
   {
     headerName: '组名',
     field: 'group',
+    rowGroup: true,
+    hide: true,
+  },
+  {
+    headerName: 'bug级别',
+    minWidth: 100,
+    field: 'level',
+    aggFunc: () => {
+      return "ALL"
+    },
+
   }
 ];
+
 
 function codeNumberRender(values: any) {
 
   const rowName = values.rowNode.key;
+
   if (rowName === undefined) {
     return 0;
   }
 
-  for (let i = 0; i < groupValues.length; i += 1) {
-    const datas = groupValues[i];
-    if (values.colDef.field === datas.time && rowName === datas.devCenter) {
-      if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
-        return 0;
+  if (rowName !== "研发中心") {
+    for (let i = 0; i < groupGroupValues.length; i += 1) {
+      const groupInfo = groupGroupValues[i];
+      if (values.colDef.field === groupInfo.time && rowName === groupInfo.group) {
+        if (groupInfo.values === "" || groupInfo.values === null || groupInfo.values === undefined || Number(groupInfo.values) === 0) {
+          return 0;
+        }
+        return groupInfo.values;
       }
-      return datas.values;
+    }
+  } else {
+    for (let i = 0; i < devCenterGroupValues.length; i += 1) {
+      const datas = devCenterGroupValues[i];
+      if (values.colDef.field === datas.time && rowName === datas.devCenter) {
+        if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
+          return 0;
+        }
+        return datas.values;
+      }
     }
   }
+
 
   return 0;
 }
@@ -64,7 +91,6 @@ function codeNumberRender(values: any) {
 const rowrender = (params: any) => {
 
   if (params.value) {
-    // return (Number(params.value) / 86400).toFixed(2);
 
     const values = (Number(params.value) / 86400).toFixed(2);
     return values === "0.00" ? 0 : values;
@@ -109,7 +135,8 @@ const columsForQuarters = () => {
       headerName: quarterTime[index].title,
       field: quarterTime[index].start,
       aggFunc: codeNumberRender,
-      cellRenderer: rowrender
+      cellRenderer: rowrender,
+
     });
 
   }
@@ -123,7 +150,9 @@ const columsForQuarters = () => {
 
 // 转化为ag-grid能被显示的格式
 const converseFormatForAgGrid = (oraDatas: any) => {
-  groupValues.length = 0;
+
+  devCenterGroupValues.length = 0;
+  groupGroupValues.length = 0;
   const arrays: any[] = [];
   if (oraDatas === null) {
     return arrays;
@@ -133,24 +162,122 @@ const converseFormatForAgGrid = (oraDatas: any) => {
 
     const starttime = oraDatas[index].range.start;
 
-    groupValues.push({
+    devCenterGroupValues.push({
       devCenter: "研发中心",
       time: starttime,
       values: oraDatas[index].total.kpi   // 对研发中心的值进行特殊处理等于部门的值
-
     });
+
+    let t_P0_value = "";
+    let t_P1_value = "";
+    let t_P2_value = "";
+    let t_P3_value = "";
+
+    const totalLevels = oraDatas[index].total.levels;
+    if (totalLevels) {
+      totalLevels.forEach((le_dts: any) => {
+
+        if (le_dts.level === "P0") {
+          t_P0_value = le_dts.kpi;
+        } else if (le_dts.level === "P1") {
+          t_P1_value = le_dts.kpi;
+
+        } else if (le_dts.level === "P2") {
+          t_P2_value = le_dts.kpi;
+        } else {
+          t_P3_value = le_dts.kpi;
+        }
+      });
+    }
+
+    arrays.push(
+      // {
+      //   devCenter: "研发中心",
+      //   level: "ALL",
+      //   [starttime]: oraDatas[index].total.kpi
+      // },
+      {
+        devCenter: "研发中心",
+        level: "P0",
+        [starttime]: t_P0_value
+      }, {
+        devCenter: "研发中心",
+        level: "P1",
+        [starttime]: t_P1_value
+      }, {
+        devCenter: "研发中心",
+        level: "P2",
+        [starttime]: t_P2_value
+      }, {
+        devCenter: "研发中心",
+        level: "P3",
+        [starttime]: t_P3_value
+      }
+    );
 
     const data = oraDatas[index].datas;
     for (let i = 0; i < data.length; i += 1) {
+      const detsils = data[i];
+      const levelArray = detsils.levels;
+      let P0_value = "";
+      let P1_value = "";
+      let P2_value = "";
+      let P3_value = "";
+      if (levelArray) {
+        levelArray.forEach((le_dts: any) => {
 
-      arrays.push({
-        devCenter: "研发中心",
-        group: data[i].group,
-        [starttime]: data[i].kpi
-      });
+          if (le_dts.level === "P0") {
+            P0_value = le_dts.kpi;
+          } else if (le_dts.level === "P1") {
+            P1_value = le_dts.kpi;
 
+          } else if (le_dts.level === "P2") {
+            P2_value = le_dts.kpi;
+          } else {
+            P3_value = le_dts.kpi;
+          }
+        });
+      }
+
+      groupGroupValues.push(
+        {
+          group: detsils.group,
+          time: starttime,
+          values: detsils.kpi
+        }
+      );
+
+      arrays.push(
+        // {
+        //   devCenter: "研发中心",
+        //   group: detsils.group,
+        //   level: "ALL",
+        //   [starttime]: detsils.kpi
+        // },
+        {
+          devCenter: "研发中心",
+          group: detsils.group,
+          level: "P0",
+          [starttime]: P0_value
+        }, {
+          devCenter: "研发中心",
+          group: detsils.group,
+          level: "P1",
+          [starttime]: P1_value
+        }, {
+          devCenter: "研发中心",
+          group: detsils.group,
+          level: "P2",
+          [starttime]: P2_value
+        }, {
+          devCenter: "研发中心",
+          group: detsils.group,
+          level: "P3",
+          [starttime]: P3_value
+        });
     }
   }
+
 
   return arrays;
 };
@@ -163,7 +290,7 @@ const converseArrayToOne = (data: any) => {
     let repeatFlag = false;
     // 判断原有数组是否包含有名字
     for (let m = 0; m < resultData.length; m += 1) {
-      if (resultData[m].group === data[index].group) {
+      if (resultData[m].group === data[index].group && data[index].level === resultData[m].level) {
         repeatFlag = true;
         break;
       }
@@ -174,7 +301,7 @@ const converseArrayToOne = (data: any) => {
       for (let index2 = 0; index2 < data.length; index2 += 1) {
         tempData["group"] = data[index].group;
 
-        if (data[index].group === data[index2].group) {
+        if (data[index].group === data[index2].group && data[index].level === data[index2].level) {
           const key = Object.keys(data[index2]);  // 获取所有的Key值
           key.forEach(function (item) {
             tempData[item] = data[index2][item];
@@ -184,6 +311,7 @@ const converseArrayToOne = (data: any) => {
       resultData.push(tempData);
     }
   }
+
 
   return resultData;
 };
@@ -197,17 +325,25 @@ const queryLanchTime = async (client: GqlClient<object>, params: string) => {
   const {data} = await client.query(`
       {
            problemAvgOnline(kind:"${condition.typeFlag}",ends:${condition.ends}){
-            total{
+             total{
               group
               kpi
+              levels{
+                level
+                kpi
+              }
             }
             range{
               start
               end
             }
-            datas{
+             datas{
               group
               kpi
+              levels{
+                level
+                kpi
+              }
             }
           }
       }
@@ -215,6 +351,9 @@ const queryLanchTime = async (client: GqlClient<object>, params: string) => {
 
   const result = converseFormatForAgGrid(data?.problemAvgOnline);
   return converseArrayToOne(result);
+
+  // return converseFormatForAgGrid(data?.problemAvgOnline);
+
 
 };
 
@@ -316,18 +455,20 @@ const LaunchTimeTableList: React.FC<any> = () => {
             sortable: true,
             filter: true,
             flex: 1,
+            suppressMenu: true,
             cellStyle: {"margin-top": "-5px"}
           }}
           autoGroupColumnDef={{
             minWidth: 150,
-            // sort: 'asc'
           }}
           groupDefaultExpanded={9} // 展开分组
           suppressAggFuncInHeader={true}   // 不显示标题聚合函数的标识
           rowHeight={32}
           headerHeight={35}
           onGridReady={onGridReady}
+          onGridSizeChanged={onGridReady}
           suppressScrollOnNewData={false}
+
         >
         </AgGridReact>
       </div>

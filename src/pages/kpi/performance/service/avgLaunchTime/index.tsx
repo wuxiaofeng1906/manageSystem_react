@@ -493,7 +493,7 @@ const LaunchTimeTableList: React.FC<any> = () => {
           <p><strong>2.统计范围</strong></p>
           <p style={cssIndent}>产品id=7or11；</p>
           <p style={cssIndent}>需求阶段=已发布或需求状态=已关闭；</p>
-          <p style={cssIndent}>需求创建人是顾问或客服的，创建时间&gt;=2021-01-01 00:00:00；</p>
+          <p style={cssIndent}>需求创建人是顾问或客服的（不限创建时间）；</p>
           <p style={cssIndent}> 需求创建人是产品、UED、测试、开发的，且需求创建日期&gt;=2021-7-16 00:00:00的
             （需求所属计划或关联项目名称包含“emergency/hotfix/sprint”的，或者“需求来源”的值为bug的，或者“条目类型”字段值为bug的）
             ，并且数据去重 </p>
@@ -504,7 +504,7 @@ const LaunchTimeTableList: React.FC<any> = () => {
           <p style={cssIndent}>需求状态已关闭（历史信息有关联发布的）：该需求关联发布的时间减去该需求创建时间减去周末法定节假日；</p>
           <p style={cssIndent}>需求状态已关闭（历史信息没有关联发布的）：该需求的关闭时间减去该需求创建时间减去周末法定节假日；</p>
 
-          <p><strong>4.统计公式（天） </strong></p>
+          <p><strong>4.统计公式（单位：天） </strong></p>
           <p style={cssIndent}>按周统计：当周所有已发布/已关闭的需求上线时长求平均；</p>
           <p style={cssIndent}>按月统计：当月所有已发布/已关闭的需求上线时长求平均；</p>
           <p style={cssIndent}>按季统计：当季所有已发布/已关闭的需求上线时长求平均；</p>

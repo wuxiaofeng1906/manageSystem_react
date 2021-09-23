@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -6,7 +6,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient} from '@/hooks';
+
 import {
   Button,
   InputNumber,
@@ -27,20 +27,39 @@ import axios from 'axios';
 
 
 import dayjs from "dayjs";
+import {log} from "echarts/types/src/util/log";
 
 
 const {Option} = Select;
 
 
 // 查询数据
-const queryDevelopViews = async () => {
-  debugger;
+const queryDevelopViews = async (pages: Number, pageSize: Number) => {
+
   const datas: any = [];
-  await axios.get('/api/verify/job/build_info', {params: {name: "test_SQA"}})
+  const pageInfo = {
+    itemCount: 0,
+    pageCount: 0,
+    pageSize: 0
+  };
+
+  await axios.get('/api/verify/job/build_info',
+    {
+      params:
+        {
+          name: "test_SQA",
+          page: pages,
+          page_size: pageSize
+        }
+    })
     .then(function (res) {
 
       debugger;
       if (res.data.code === 200) {
+
+        pageInfo.itemCount = res.data.data.count;
+        pageInfo.pageCount = res.data.data.page;
+        pageInfo.pageSize = res.data.data.page_size;
 
         const serverDatas = res.data.data.data;
         serverDatas.forEach((ele: any, index: any) => {
@@ -80,7 +99,7 @@ const queryDevelopViews = async () => {
       });
     });
 
-  return datas;
+  return {pageInfo, datas};
 
 };
 
@@ -101,7 +120,7 @@ const JenkinsCheck: React.FC<any> = () => {
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>();
 
-  const {data, loading} = useRequest(() => queryDevelopViews());
+  const {data, loading} = useRequest(() => queryDevelopViews(1, 20));
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -299,7 +318,10 @@ const JenkinsCheck: React.FC<any> = () => {
   }
 
   // 刷新表格
-  const refreshGrid = () => {
+  const refreshGrid = async () => {
+    const newData = await queryDevelopViews(1, 20);
+
+    gridApi.current?.setRowData(newData.datas);
 
   };
 
@@ -309,20 +331,35 @@ const JenkinsCheck: React.FC<any> = () => {
   // https://www.ag-grid.com/react-data-grid/row-pagination/  数据分页
 
   const [Pages, setPages] = useState({
-    totalCounts: 4,
-    totalPages: 1,
-    currentPage: 1,
+    totalCounts: 0,  // 总条数
+    countsOfPage: 20,  // 每页显示多少条
+    totalPages: 0,  // 一共多少页
+    currentPage: 0, // 当前是第几页
+    jumpToPage: 0  // 跳转到第几页
   });
 
-  // 每页显示多少条数据
-  const showItemChange = (pageCOunt: any) => {
 
-    alert(`每页显示${pageCOunt}条数据`);
+  // 每页显示多少条数据
+  const showItemChange = (pageCount: any) => {
+
+    setPages({
+      ...Pages,
+      countsOfPage: Number(pageCount),
+      totalPages: Math.ceil(Pages.totalCounts / Number(pageCount)),
+    });
+
+  };
+
+  // 输入每页显示多少条数据后再进行数据查询，
+  const showAssignedData = async () => {
+
+    const newData = await queryDevelopViews(Pages.currentPage, Pages.countsOfPage);
+    gridApi.current?.setRowData(newData.datas);
 
   };
 
   // 上一页
-  const showPreviousPage = () => {
+  const showPreviousPage = async () => {
 
     // 上一页不能为负数或0
     if (Pages.currentPage > 1) {
@@ -330,13 +367,17 @@ const JenkinsCheck: React.FC<any> = () => {
         ...Pages,
         currentPage: Pages.currentPage - 1
       });
+
+
     }
 
+    const newData = await queryDevelopViews(Pages.currentPage - 1, Pages.countsOfPage);
+    gridApi.current?.setRowData(newData.datas);
 
   };
 
   // 下一页
-  const showNextPage = () => {
+  const showNextPage = async () => {
     const nextPage = Pages.currentPage + 1;
 
     // 下一页的页面不能超过总页面之和
@@ -345,12 +386,38 @@ const JenkinsCheck: React.FC<any> = () => {
         ...Pages,
         currentPage: Pages.currentPage + 1
       });
+
+      const newData = await queryDevelopViews(Pages.currentPage + 1, Pages.countsOfPage);
+      gridApi.current?.setRowData(newData.datas);
     }
 
   };
 
   // 跳转到第几页
-  const goToPage = (params: any) => {
+
+  const jumpChange = (params: any) => {
+
+    const inputData = params.nativeEvent.data;
+    if (Number(inputData)) {
+
+      if (Number(inputData) > Pages.totalPages) {
+        setPages({
+          ...Pages,
+          jumpToPage: Number(inputData)
+
+        });
+      } else {
+        setPages({
+          ...Pages,
+          jumpToPage: Number(inputData),
+          currentPage: Number(inputData)
+        });
+      }
+
+    }
+  };
+
+  const goToPage = async (params: any) => {
 
     const pageCounts = Number(params.currentTarget.defaultValue);
     if (pageCounts > Pages.totalPages) {
@@ -365,7 +432,9 @@ const JenkinsCheck: React.FC<any> = () => {
       });
 
     } else {
-      alert(`跳转到第${params.currentTarget.defaultValue}页`)
+
+      const newData = await queryDevelopViews(Number(params.currentTarget.defaultValue), Pages.countsOfPage);
+      gridApi.current?.setRowData(newData.datas);
 
     }
 
@@ -501,6 +570,15 @@ const JenkinsCheck: React.FC<any> = () => {
     return component;
   };
 
+  useEffect(() => {
+    setPages({
+      totalCounts: Number(data?.pageInfo.itemCount),
+      countsOfPage: Number(data?.pageInfo.pageSize),
+      totalPages: Math.ceil(Number(data?.pageInfo.itemCount) / Number(data?.pageInfo.pageSize)),
+      currentPage: Number(data?.pageInfo.pageCount),
+      jumpToPage: 1
+    });
+  }, [loading])
 
   return (
     <PageContainer style={{marginLeft: -30, marginRight: -30}}>
@@ -523,7 +601,7 @@ const JenkinsCheck: React.FC<any> = () => {
       <div className="ag-theme-alpine" style={{marginTop: 3, height: gridHeight, width: '100%'}}>
         <AgGridReact
           columnDefs={colums()} // 定义列
-          rowData={data} // 数据绑定
+          rowData={data?.datas} // 数据绑定
           defaultColDef={{
             resizable: true,
             sortable: true,
@@ -551,8 +629,8 @@ const JenkinsCheck: React.FC<any> = () => {
 
         {/* 每页 XX 条 */}
         <label style={{marginLeft: 20, fontWeight: "bold"}}>每页</label>
-        <InputNumber style={{marginLeft: 10}} size={"middle"} min={1} max={10000} defaultValue={20}
-                     onChange={showItemChange}/>
+        <InputNumber style={{marginLeft: 10}} size={"middle"} min={1} max={10000} value={Pages.countsOfPage}
+                     onChange={showItemChange} onBlur={showAssignedData}/>
         <label style={{marginLeft: 10, fontWeight: "bold"}}>条</label>
 
         <label style={{marginLeft: 10, fontWeight: "bold"}}>共 {Pages.totalPages} 页</label>
@@ -575,7 +653,8 @@ const JenkinsCheck: React.FC<any> = () => {
 
         {/* 跳转到第几页 */}
         <label style={{marginLeft: 20, fontWeight: "bold"}}> 跳转到第 </label>
-        <Input style={{textAlign: "center", width: 50, marginLeft: 2}} defaultValue={1} onBlur={goToPage}/>
+        <Input style={{textAlign: "center", width: 50, marginLeft: 2}} value={Pages.jumpToPage} onChange={jumpChange}
+               onBlur={goToPage}/>
         <label style={{marginLeft: 2, fontWeight: "bold"}}> 页 </label>
 
 

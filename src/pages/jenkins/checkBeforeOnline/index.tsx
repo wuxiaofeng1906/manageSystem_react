@@ -329,10 +329,10 @@ const JenkinsCheck: React.FC<any> = () => {
         {name: "imageEnv", value: modalData.verson_imageevn},
 
         {name: "InclusionCheckFlag", value: modalData.branch_check},
-        {name: "MainBranch", value: modalData.branch_mainBranch},
-        {name: "technicalSide", value: modalData.branch_teachnicalSide},
+        // {name: "MainBranch", value: modalData.branch_mainBranch},
+        // {name: "technicalSide", value: modalData.branch_teachnicalSide},
         {name: "TargetBranch", value: modalData.branch_targetBranch},
-        {name: "MainSince", value: dayjs(modalData.branch_mainSince).format("YYYY-MM-DD HH-mm:ss")}
+        // {name: "MainSince", value: dayjs(modalData.branch_mainSince).format("YYYY-MM-DD HH-mm:ss")}
 
       ]
     };

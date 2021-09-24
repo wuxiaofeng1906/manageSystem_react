@@ -1,4 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
+import {useModel} from "@@/plugin-model/useModel";
 import {PageContainer} from '@ant-design/pro-layout';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -6,7 +7,6 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-
 import {
   Button,
   InputNumber,
@@ -27,11 +27,9 @@ import axios from 'axios';
 
 
 import dayjs from "dayjs";
-import {log} from "echarts/types/src/util/log";
-
+import moment from 'moment';
 
 const {Option} = Select;
-
 
 // 查询数据
 const queryDevelopViews = async (pages: Number, pageSize: Number) => {
@@ -47,14 +45,13 @@ const queryDevelopViews = async (pages: Number, pageSize: Number) => {
     {
       params:
         {
-          name: "test_SQA",
+          name: "popup-online-check",
           page: pages,
           page_size: pageSize
         }
     })
     .then(function (res) {
 
-      debugger;
       if (res.data.code === 200) {
 
         pageInfo.itemCount = res.data.data.count;
@@ -62,9 +59,9 @@ const queryDevelopViews = async (pages: Number, pageSize: Number) => {
         pageInfo.pageSize = res.data.data.page_size;
 
         const serverDatas = res.data.data.data;
-        serverDatas.forEach((ele: any, index: any) => {
+        serverDatas.forEach((ele: any) => {
           datas.push({
-            ID: index,
+            ID: ele.number,
             taskName: ele.task_name,
             starttime: ele.start_time,
             endtime: ele.end_time,
@@ -110,11 +107,13 @@ const JenkinsCheck: React.FC<any> = () => {
 
   // const sys_accessToken = localStorage.getItem("accessId");
   // axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
-  // const {initialState} = useModel('@@initialState');
-  // let currentUser: any;
-  // if (initialState?.currentUser) {
-  //   currentUser = initialState.currentUser === undefined ? "" : initialState.currentUser.userid;
-  // }
+  const {initialState} = useModel('@@initialState');
+  const currentUser: any = {user_name: "", user_id: ""};
+  if (initialState?.currentUser) {
+
+    currentUser.user_name = initialState.currentUser === undefined ? "" : initialState.currentUser.name;
+    currentUser.user_id = initialState.currentUser === undefined ? "" : initialState.currentUser.userid;
+  }
 
 
   /* region  表格相关事件 */
@@ -288,14 +287,14 @@ const JenkinsCheck: React.FC<any> = () => {
   };
   /* endregion 下拉框数据加载 */
 
-  const runTask = () => {
+  const runTaskBeforeOnline = () => {
     LoadSeverCombobox();
     LoadImageBranchCombobox();
     LoadImageEvnCombobox();
     setCheckModalVisible(true);
 
     setIsButtonClick("inline");
-    // 设置显示的值。
+    // 设置默认显示的值。
     formForCarryTask.setFieldsValue({
       // 版本检查
       verson_check: true,
@@ -306,20 +305,99 @@ const JenkinsCheck: React.FC<any> = () => {
       // 检查上线分支是否包含对比分支的提交
       branch_check: false,
       branch_mainBranch: ["stage", "master"],
-      branch_teachnicalSide: ["前端", "后端"],
+      branch_teachnicalSide: ["front", "backend"],
       branch_targetBranch: "",
-      branch_mainSince: dayjs().subtract(6, 'day')
+      branch_mainSince: moment(dayjs().subtract(6, 'day').format("YYYY-MM-DD"))
     });
   };
 
   // 确定执行任务
-  const carryTask = () => {
+  const commitCarryTask = () => {
+    const modalData = formForCarryTask.getFieldsValue()
 
-  }
+    console.log("modalData", modalData)
 
+    const datas = {
+      name: "popup-online-check",
+      user_name: currentUser.user_name,
+      user_id: currentUser.user_id,
+      job_parm: [
+        {name: "BackendVersionCkeckFlag", value: modalData.verson_check},
+        {name: "server", value: modalData.verson_server},
+        {name: "imageBranch", value: modalData.verson_imagebranch},
+        {name: "imageEnv", value: modalData.verson_imageevn},
+
+        {name: "InclusionCheckFlag", value: modalData.branch_check},
+        {name: "MainBranch", value: modalData.branch_mainBranch},
+        {name: "technicalSide", value: modalData.branch_teachnicalSide},
+        {name: "TargetBranch", value: modalData.branch_targetBranch},
+        {name: "MainSince", value: dayjs(modalData.branch_mainSince).format("YYYY-MM-DD HH-mm:ss")}
+
+      ]
+    };
+
+    // const datas = {
+    //   name: "popup-online-check",
+    //   user_name: currentUser.user_name,
+    //   user_id: currentUser.user_id,
+    //   job_parm: [
+    //     {"name": "BackendVersionCkeckFlag", "value": true},
+    //     {"name": "server", "value": "apps"},
+    //
+    //   ]
+    // }
+
+
+    debugger;
+
+    axios.post('/api/verify/job/build', datas).then(async function (res) {
+
+      if (res.data.code === 200) {
+        const newData = await queryDevelopViews(1, 20);
+
+        gridApi.current?.setRowData(newData.datas);
+        setCheckModalVisible(false);
+        message.info({
+          content: "执行完毕！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      } else {
+        message.error({
+          content: `${res.data.message}${res.data.zt.message.end[0]}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
+    })
+      .catch(function (error) {
+        message.error({
+          content: `异常信息：${error.toString()}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      });
+
+
+  };
+
+  const [Pages, setPages] = useState({
+    totalCounts: 0,  // 总条数
+    countsOfPage: 20,  // 每页显示多少条
+    totalPages: 0,  // 一共多少页
+    currentPage: 0, // 当前是第几页
+    jumpToPage: 0  // 跳转到第几页
+  });
   // 刷新表格
   const refreshGrid = async () => {
-    const newData = await queryDevelopViews(1, 20);
+
+    const newData = await queryDevelopViews(Pages.currentPage, Pages.countsOfPage);
 
     gridApi.current?.setRowData(newData.datas);
 
@@ -329,14 +407,6 @@ const JenkinsCheck: React.FC<any> = () => {
 
   /* region 翻页以及页面跳转功能 */
   // https://www.ag-grid.com/react-data-grid/row-pagination/  数据分页
-
-  const [Pages, setPages] = useState({
-    totalCounts: 0,  // 总条数
-    countsOfPage: 20,  // 每页显示多少条
-    totalPages: 0,  // 一共多少页
-    currentPage: 0, // 当前是第几页
-    jumpToPage: 0  // 跳转到第几页
-  });
 
 
   // 每页显示多少条数据
@@ -442,28 +512,111 @@ const JenkinsCheck: React.FC<any> = () => {
   }
   /* endregion */
 
+  /* region 定义列以及单元格的点击事件 */
+
   (window as any).showParams = (params: any) => {
+
     setCheckModalVisible(true);
     // 这个点击事件只能够进行查看
     setIsButtonClick("none");
 
     // alert(`获取信息：${params.taskName.toString()}`);
+    axios.get('/api/verify/job/build_info_param',
+      {
+        params: {
+          name: params.taskName,
+          num: params.ID
+        }
+      }).then(function (res: any) {
 
 
-    // 设置显示的值。
-    formForCarryTask.setFieldsValue({
-      // 版本检查
-      verson_check: true,
-      verson_server: "apps",
-      verson_imagebranch: "hotfix",
-      verson_imageevn: "nx-temp7",
+      if (res.data.code === 200) {
+        let versonChecked = false;
+        let versonServer = "";
+        let versonImagebranch = "";
+        let versonImageevn = "";
 
-      // 检查上线分支是否包含对比分支的提交
-      branch_check: true,
-      branch_mainBranch: "master",
-      branch_teachnicalSide: "后端",
-      branch_targetBranch: "aaaaa,bbbbb,cccc",
-      branch_mainSince: dayjs("2021-09-09")
+        let branchCheck = false;
+        let branchMainBranch = "";
+        let branchTeachnicalSide = "";
+        let branchTargetBranch = "";
+        let branchMainSince = "";
+
+        const result = res.data.data;
+        if (result) {
+          result.forEach((dts: any) => {
+            switch (dts.name) {
+              case "BackendVersionCkeckFlag":
+                versonChecked = dts.value;
+                break;
+              case "server":
+                versonServer = dts.value;
+                break;
+              case "imageBranch":
+                versonImagebranch = dts.value;
+                break;
+              case "imageEnv":
+                versonImageevn = dts.value;
+                break;
+              case "InclusionCheckFlag":
+                branchCheck = dts.value;
+                break;
+              case "MainBranch":
+                branchMainBranch = dts.value;
+                break;
+              case "technicalSide":
+                branchTeachnicalSide = dts.value;
+                break;
+              case "TargetBranch":
+                branchTargetBranch = dts.value;
+                break;
+              case "MainSince":
+                branchMainSince = dts.value;
+                break;
+              default:
+                break;
+            }
+
+          });
+
+        }
+
+        // 设置显示的值。
+        formForCarryTask.setFieldsValue({
+          // 版本检查
+          verson_check: versonChecked,
+          verson_server: versonServer,
+          verson_imagebranch: versonImagebranch,
+          verson_imageevn: versonImageevn,
+
+          // 检查上线分支是否包含对比分支的提交
+          branch_check: branchCheck,
+          branch_mainBranch: branchMainBranch,
+          branch_teachnicalSide: branchTeachnicalSide,
+          branch_targetBranch: branchTargetBranch,
+          branch_mainSince: moment(branchMainSince)
+        });
+
+
+      } else {
+        message.error({
+          content: `错误：${res.data.msg}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
+
+    }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
     });
 
   };
@@ -502,20 +655,20 @@ const JenkinsCheck: React.FC<any> = () => {
         minWidth: 95,
         cellRenderer: (params: any) => {
           if (params.value === "ABORTED ") {
-            return `<span style="font-size: medium; color:gray">aborted</span>`;
+            return `<span style="font-size: large; color:gray">aborted</span>`;
           }
 
-          if (params.value === "None") {
-            return `<span style="font-size: medium; color:#46A0FC">running</span>`;
+          if (params.value === null) {
+            return `<span style="font-size: large; color:#46A0FC">running</span>`;
           }
           if (params.value === "SUCCESS") {
-            return `<span style="font-size: medium; color:#32D529">success</span>`;
+            return `<span style="font-size: large; color:#32D529">success</span>`;
           }
 
           if (params.value === "FAILURE") {
-            return `<span style="font-size: medium;color: red">failure</span>`;
+            return `<span style="font-size: large;color: red">failure</span>`;
           }
-          return `<span style="font-size: medium;">${params.value}</span>`;
+          return `<span style="font-size: large;">${params.value}</span>`;
         }
       },
       {
@@ -525,20 +678,20 @@ const JenkinsCheck: React.FC<any> = () => {
         cellRenderer: (params: any) => {
 
           if (params.value === "ABORTED ") {
-            return `<span style="font-size: medium; color:gray">aborted</span>`;
+            return `<span style="font-size: large; color:gray">aborted</span>`;
           }
 
-          if (params.value === "None") {
-            return `<span style="font-size: medium; "> </span>`;
+          if (params.value === null) {
+            return `<span style="font-size: large; "> </span>`;
           }
           if (params.value === "SUCCESS") {
-            return `<span style="font-size: medium; color:#32D529">success</span>`;
+            return `<span style="font-size: large; color:#32D529">success</span>`;
           }
 
           if (params.value === "FAILURE") {
-            return `<span style="font-size: medium;color: red">failure</span>`;
+            return `<span style="font-size: large;color: red">failure</span>`;
           }
-          return `<span style="font-size: medium;">${params.value}</span>`;
+          return `<span style="font-size: large;">${params.value}</span>`;
         }
       },
       {
@@ -570,6 +723,8 @@ const JenkinsCheck: React.FC<any> = () => {
     return component;
   };
 
+  /* endregion */
+
   useEffect(() => {
     setPages({
       totalCounts: Number(data?.pageInfo.itemCount),
@@ -588,13 +743,11 @@ const JenkinsCheck: React.FC<any> = () => {
         {/* 使用一个图标就要导入一个图标 */}
 
         <Button type="primary" style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}
-                onClick={runTask}>执行上线前检查任务</Button>
+                onClick={runTaskBeforeOnline}>执行上线前检查任务</Button>
 
         <Button type="primary"
                 style={{marginLeft: 10, color: '#32D529', backgroundColor: "#ECF5FF", borderRadius: 5}}
                 onClick={refreshGrid}>刷新</Button>
-
-
       </div>
 
       {/* ag-grid 表格定义 */}
@@ -684,7 +837,7 @@ const JenkinsCheck: React.FC<any> = () => {
                       display: isButtonClick
                     }}
 
-                    onClick={carryTask}>执行
+                    onClick={commitCarryTask}>执行
             </Button>
           ]
         }
@@ -743,8 +896,8 @@ const JenkinsCheck: React.FC<any> = () => {
 
             <Form.Item label="TeachnicalSide" name="branch_teachnicalSide" style={{marginTop: -3}}>
               <Checkbox.Group>
-                <Checkbox value={"前端"}>前端</Checkbox>
-                <Checkbox value={"后端"}>后端</Checkbox>
+                <Checkbox value={"front"}>前端</Checkbox>
+                <Checkbox value={"backend"}>后端</Checkbox>
               </Checkbox.Group>
             </Form.Item>
             <div style={{marginTop: -30, marginLeft: 105, fontSize: "x-small", color: "gray"}}>

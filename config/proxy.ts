@@ -7,6 +7,12 @@
  */
 export default {
   dev: {
+
+    '/api/verify/': {
+      target: 'http://10.0.144.53:5000/',
+      changeOrigin: true,
+      pathRewrite: {'^': ''},
+    },
     '/api/': {
       // target: 'https://preview.pro.ant.design',
       // target: 'http://localhost:5000',

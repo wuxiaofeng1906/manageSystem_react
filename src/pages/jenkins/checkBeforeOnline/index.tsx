@@ -60,6 +60,7 @@ const queryDevelopViews = async (pages: Number, pageSize: Number) => {
 
         const serverDatas = res.data.data.data;
         serverDatas.forEach((ele: any) => {
+
           datas.push({
             ID: ele.number,
             taskName: ele.task_name,
@@ -335,20 +336,6 @@ const JenkinsCheck: React.FC<any> = () => {
 
       ]
     };
-
-    // const datas = {
-    //   name: "popup-online-check",
-    //   user_name: currentUser.user_name,
-    //   user_id: currentUser.user_id,
-    //   job_parm: [
-    //     {"name": "BackendVersionCkeckFlag", "value": true},
-    //     {"name": "server", "value": "apps"},
-    //
-    //   ]
-    // }
-
-
-    debugger;
 
     axios.post('/api/verify/job/build', datas).then(async function (res) {
 

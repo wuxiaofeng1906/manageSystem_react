@@ -171,10 +171,10 @@ const JenkinsCheck: React.FC<any> = () => {
           const serverDatas = res.data.data;
           const serversOp: any = [];
           for (let index = 0; index < serverDatas.length; index += 1) {
-            const id = serverDatas[index].server_id;
+            // const id = serverDatas[index].server_id;
             const {server} = serverDatas[index]
             serversOp.push(
-              <Option value={id}>{server}</Option>,
+              <Option value={server}>{server}</Option>,
             );
           }
 
@@ -213,10 +213,10 @@ const JenkinsCheck: React.FC<any> = () => {
           const branchDatas = res.data.data;
           const branchOp: any = [];
           for (let index = 0; index < branchDatas.length; index += 1) {
-            const id = branchDatas[index].branch_id;
+            // const id = branchDatas[index].branch_id;
             const branch = branchDatas[index].image_branch
             branchOp.push(
-              <Option value={id}>{branch}</Option>,
+              <Option value={branch}>{branch}</Option>,
             );
           }
 
@@ -255,10 +255,10 @@ const JenkinsCheck: React.FC<any> = () => {
           const imageDatas = res.data.data;
           const imageOp: any = [];
           for (let index = 0; index < imageDatas.length; index += 1) {
-            const id = imageDatas[index].env_id;
+            // const id = imageDatas[index].env_id;
             const image = imageDatas[index].image_env
             imageOp.push(
-              <Option value={id}>{image}</Option>,
+              <Option value={image}>{image}</Option>,
             );
           }
 
@@ -318,6 +318,8 @@ const JenkinsCheck: React.FC<any> = () => {
 
     console.log("modalData", modalData)
 
+    // 传入参数错误：422  ；连接问题：422
+
     const datas = {
       name: "popup-online-check",
       user_name: currentUser.user_name,
@@ -327,16 +329,16 @@ const JenkinsCheck: React.FC<any> = () => {
         {name: "server", value: modalData.verson_server},
         {name: "imageBranch", value: modalData.verson_imagebranch},
         {name: "imageEnv", value: modalData.verson_imageevn},
-
         {name: "InclusionCheckFlag", value: modalData.branch_check},
-        // {name: "MainBranch", value: modalData.branch_mainBranch},
-        // {name: "technicalSide", value: modalData.branch_teachnicalSide},
+        {name: "MainBranch", value: modalData.branch_mainBranch},
+        {name: "technicalSide", value: modalData.branch_teachnicalSide},
         {name: "TargetBranch", value: modalData.branch_targetBranch},
-        // {name: "MainSince", value: dayjs(modalData.branch_mainSince).format("YYYY-MM-DD HH-mm:ss")}
+        {name: "MainSince", value: dayjs(modalData.branch_mainSince).format("YYYY-MM-DD")}
 
       ]
     };
 
+    debugger;
     axios.post('/api/verify/job/build', datas).then(async function (res) {
 
       if (res.data.code === 200) {

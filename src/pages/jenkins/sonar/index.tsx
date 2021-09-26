@@ -12,21 +12,15 @@ import {
   InputNumber,
   message,
   Form,
-  DatePicker,
   Select,
   Modal,
   Input,
   Divider,
-  Card,
-  Switch,
-  Checkbox,
   Spin
 } from 'antd';
 
 import {getHeight} from '@/publicMethods/pageSet';
 import axios from 'axios';
-
-
 import dayjs from "dayjs";
 import moment from 'moment';
 
@@ -106,13 +100,9 @@ const queryDevelopViews = async (pages: Number, pageSize: Number) => {
 // 组件初始化
 const JenkinsCheck: React.FC<any> = () => {
 
-
-  // const sys_accessToken = localStorage.getItem("accessId");
-  // axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
   const {initialState} = useModel('@@initialState');
   const currentUser: any = {user_name: "", user_id: ""};
   if (initialState?.currentUser) {
-
     currentUser.user_name = initialState.currentUser === undefined ? "" : initialState.currentUser.name;
     currentUser.user_id = initialState.currentUser === undefined ? "" : initialState.currentUser.userid;
   }
@@ -147,7 +137,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   /* endregion */
 
-  /* region 上线前检查任务弹出层相关事件 */
+  /* region 弹出层相关事件 */
   // 判断是否显示loading状态
   const [loadState, setLoadSate] = useState(false);
 
@@ -156,7 +146,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   // 弹出层是否可见
   const [isCheckModalVisible, setCheckModalVisible] = useState(false);
-  const [formForCarryTask] = Form.useForm();
+  const [formForCarrySonar] = Form.useForm();
 
   const checkModalCancel = () => {
     setCheckModalVisible(false);
@@ -164,136 +154,14 @@ const JenkinsCheck: React.FC<any> = () => {
 
   /* region 下拉框数据加载 */
 
-  // 加载请求Server下拉框
-  const [servers, setServers] = useState([]);
-  const LoadSeverCombobox = () => {
-    axios.get('/api/verify/project/server', {params: {}})
-      .then(function (res) {
 
-        if (res.data.code === 200) {
-          const serverDatas = res.data.data;
-          const serversOp: any = [];
-          for (let index = 0; index < serverDatas.length; index += 1) {
-            // const id = serverDatas[index].server_id;
-            const {server} = serverDatas[index]
-            serversOp.push(
-              <Option value={server}>{server}</Option>,
-            );
-          }
+  // 记载ProjectPath下拉框，这个下拉框跟以下几个数据是联动的，因此需要记录id，name等数据
 
-          setServers(serversOp);
-        } else {
-          message.error({
-            content: `错误：${res.data.msg}`,
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-
-      }).catch(function (error) {
-
-      message.error({
-        content: `异常信息:${error.toString()}`,
-        duration: 1, // 1S 后自动关闭
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    });
-
-
-  };
-
-  // 记载请求镜像分支下拉框
-  const [imageBranch, setImageBranch] = useState([]);
-  const LoadImageBranchCombobox = () => {
-    axios.get('/api/verify/project/image_branch', {params: {}})
-      .then(function (res) {
-
-        if (res.data.code === 200) {
-          const branchDatas = res.data.data;
-          const branchOp: any = [];
-          for (let index = 0; index < branchDatas.length; index += 1) {
-            // const id = branchDatas[index].branch_id;
-            const branch = branchDatas[index].image_branch
-            branchOp.push(
-              <Option value={branch}>{branch}</Option>,
-            );
-          }
-
-          setImageBranch(branchOp);
-        } else {
-          message.error({
-            content: `错误：${res.data.msg}`,
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-
-      }).catch(function (error) {
-
-      message.error({
-        content: `异常信息:${error.toString()}`,
-        duration: 1, // 1S 后自动关闭
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    });
-
-
-  };
 
   // 记载请求镜像环境下拉框
-  const [imageEvn, setImageEvn] = useState([]);
-  const LoadImageEvnCombobox = () => {
-    axios.get('/api/verify/project/image_env', {params: {}})
-      .then(function (res) {
-
-        if (res.data.code === 200) {
-          const imageDatas = res.data.data;
-          const imageOp: any = [];
-          for (let index = 0; index < imageDatas.length; index += 1) {
-            // const id = imageDatas[index].env_id;
-            const image = imageDatas[index].image_env
-            imageOp.push(
-              <Option value={image}>{image}</Option>,
-            );
-          }
-
-          setImageEvn(imageOp);
-        } else {
-          message.error({
-            content: `错误：${res.data.msg}`,
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-
-      }).catch(function (error) {
-
-      message.error({
-        content: `异常信息:${error.toString()}`,
-        duration: 1, // 1S 后自动关闭
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    });
-
-
-  };
-
-  // 记载请求镜像环境下拉框
-  const [targetBranch, setTargetBranch] = useState([]);
-  const LoadTargetBranchCombobox = () => {
-    axios.get('/api/verify/sonar/branch', {params: {}})
+  const [branchName, setBranchName] = useState([]);
+  const LoadBranchNameCombobox = (projectId: any) => {
+    axios.get('/api/verify/sonar/branch', {params: {pro_id: projectId}})
       .then(function (res) {
 
         if (res.data.code === 200) {
@@ -306,7 +174,7 @@ const JenkinsCheck: React.FC<any> = () => {
             );
           }
 
-          setTargetBranch(branchOp);
+          setBranchName(branchOp);
         } else {
           message.error({
             content: `错误：${res.data.msg}`,
@@ -330,75 +198,129 @@ const JenkinsCheck: React.FC<any> = () => {
 
 
   };
+
+  const ProjectPathChanged = (values: any, params: any) => {
+
+    // 设置默认显示的值。
+    formForCarrySonar.setFieldsValue({
+
+      // LanguageType: "",
+      // ProjectPath: "",
+      // BranchName: "",
+      ProjectKey: params.keyName,
+
+    });
+
+    // key: "1038824"
+    // keyName: "go-business-flow"
+    // value: "front/go-business-flow"
+    LoadBranchNameCombobox(params.key);
+
+  };
+
+  const [projectPath, setProjectPath] = useState([]);
+  const LoadProjectPathCombobox = (language: string) => {
+    axios.get('/api/verify/sonar/project', {params: {kw: language}})
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+          const pathDatas = res.data.data;
+          const pathOp: any = [];
+          for (let index = 0; index < pathDatas.length; index += 1) {
+            const prjId = pathDatas[index].project_id
+            const prjName = pathDatas[index].project_name
+            const branch = pathDatas[index].project_path_with_namespace
+            pathOp.push(
+              <Option key={prjId} keyName={prjName} value={branch}>{branch}</Option>,
+            );
+          }
+
+          setProjectPath(pathOp);
+        } else {
+          message.error({
+            content: `错误：${res.data.msg}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+      }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+
+  };
+
+  const langeChanged = (value: any) => {
+    LoadProjectPathCombobox(value);
+  };
+
   /* endregion 下拉框数据加载 */
 
   const runSonarTask = () => {
-    LoadSeverCombobox();
-    LoadImageBranchCombobox();
-    LoadImageEvnCombobox();
-    LoadTargetBranchCombobox();
+
+
     setCheckModalVisible(true);
     setLoadSate(false);
     setIsButtonClick("inline");
-    // 设置默认显示的值。
-    formForCarryTask.setFieldsValue({
-      // 版本检查
-      verson_check: true,
-      verson_server: "apps",
-      verson_imagebranch: "hotfix",
-      verson_imageevn: "nx-hotfix",
+    formForCarrySonar.setFieldsValue({
+      LanguageType: "",
+      ProjectPath: "",
+      BranchName: "",
+      ProjectKey: "",
 
-      // 检查上线分支是否包含对比分支的提交
-      branch_check: false,
-      branch_mainBranch: ["stage", "master"],
-      branch_teachnicalSide: ["front", "backend"],
-      branch_targetBranch: undefined,
-      branch_mainSince: moment(dayjs().subtract(6, 'day').format("YYYY-MM-DD"))
     });
   };
 
   // 确定执行任务
-  const commitCarryTask = () => {
-    const modalData = formForCarryTask.getFieldsValue()
+  const carrySonarCheck = () => {
+    const modalData = formForCarrySonar.getFieldsValue()
 
-    // MainBranch 和 TeachnicalSide 不能为空
-    const mainBranch = modalData.branch_mainBranch;
-    if (mainBranch.length === 0) {
+    // LanguageType 、 ProjectPath 和 BranchName不能为空
+    const language = modalData.LanguageType;
+    if (language === undefined) {
       message.error({
-        content: `MainBranch 为必选项！`,
+        content: `LanguageType 为必选项！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+
+    const ProjectPaths = modalData.ProjectPath;
+    if (ProjectPaths === undefined) {
+      message.error({
+        content: `ProjectPaths 为必选项！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+
+    const BranchNames = modalData.BranchName;
+    if (BranchNames === undefined) {
+      message.error({
+        content: `BranchName 为必选项！`,
         duration: 1,
         style: {
           marginTop: '50vh',
         },
       });
 
-
     }
 
-    const teachnicalSide = modalData.branch_teachnicalSide;
-    if (teachnicalSide.length === 0) {
-      message.error({
-        content: `TeachnicalSide 为必选项！`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
-    }
-
-    const targets = modalData.branch_targetBranch;
-
-    let target_branch = "";
-    if (targets.length > 0) {
-      targets.forEach((dts: any) => {
-        target_branch = target_branch === "" ? dts : `${target_branch},${dts}`;
-
-      });
-
-    }
-
-    if (teachnicalSide.length > 0 && mainBranch.length > 0) {
+    if (language && ProjectPaths && BranchNames) {
       // 传入参数错误：422  ；连接问题：422
 
       const datas = {
@@ -406,16 +328,10 @@ const JenkinsCheck: React.FC<any> = () => {
         user_name: currentUser.user_name,
         user_id: currentUser.user_id,
         job_parm: [
-          {name: "BackendVersionCkeckFlag", value: modalData.verson_check},
-          {name: "server", value: modalData.verson_server},
-          {name: "imageBranch", value: modalData.verson_imagebranch},
-          {name: "imageEnv", value: modalData.verson_imageevn},
-          {name: "InclusionCheckFlag", value: modalData.branch_check},
-          {name: "MainBranch", value: mainBranch},
-          {name: "technicalSide", value: teachnicalSide},
-          {name: "TargetBranch", value: target_branch},
-          {name: "MainSince", value: dayjs(modalData.branch_mainSince).format("YYYY-MM-DD")}
-
+          {name: "languageType", value: language},
+          {name: "projectPath", value: ProjectPaths},
+          {name: "branchName", value: BranchNames},
+          {name: "projectKey", value: modalData.ProjectKey},
         ]
       };
 
@@ -606,71 +522,42 @@ const JenkinsCheck: React.FC<any> = () => {
 
 
       if (res.data.code === 200) {
-        let versonChecked = false;
-        let versonServer = "";
-        let versonImagebranch = "";
-        let versonImageevn = "";
+        let language = "";
+        let prjPath = "";
+        let branchNames = "";
+        let prjKey = "";
 
-        let branchCheck = false;
-        let branchMainBranch = "";
-        let branchTeachnicalSide = "";
-        let branchTargetBranch = "";
-        let branchMainSince = "";
 
         const result = res.data.data;
         if (result) {
           result.forEach((dts: any) => {
             switch (dts.name) {
-              case "BackendVersionCkeckFlag":
-                versonChecked = dts.value;
+              case "languageType":
+                language = dts.value;
                 break;
-              case "server":
-                versonServer = dts.value;
+              case "projectPath":
+                prjPath = dts.value;
                 break;
-              case "imageBranch":
-                versonImagebranch = dts.value;
+              case "branchName":
+                branchNames = dts.value;
                 break;
-              case "imageEnv":
-                versonImageevn = dts.value;
-                break;
-              case "InclusionCheckFlag":
-                branchCheck = dts.value;
-                break;
-              case "MainBranch":
-                branchMainBranch = dts.value;
-                break;
-              case "technicalSide":
-                branchTeachnicalSide = dts.value;
-                break;
-              case "TargetBranch":
-                branchTargetBranch = dts.value;
-                break;
-              case "MainSince":
-                branchMainSince = dts.value;
+              case "projectKey":
+                prjKey = dts.value;
                 break;
               default:
                 break;
             }
-
           });
-
         }
 
 
         // 设置显示的值。
-        formForCarryTask.setFieldsValue({
-          // 版本检查
-          verson_check: versonChecked,
-          verson_server: versonServer,
-          verson_imagebranch: versonImagebranch,
-          verson_imageevn: versonImageevn,
+        formForCarrySonar.setFieldsValue({
+          LanguageType: language,
+          ProjectPath: prjPath,
+          BranchName: branchNames,
+          ProjectKey: prjKey,
 
-          // 检查上线分支是否包含对比分支的提交
-          branch_check: branchCheck,
-          branch_mainBranch: branchMainBranch,
-          branch_teachnicalSide: branchTeachnicalSide,
-          branch_targetBranch: branchTargetBranch === "" ? undefined : branchTargetBranch.split(','),
-          branch_mainSince: branchMainSince === "" ? undefined : moment(branchMainSince)
         });
 
 
@@ -909,15 +796,15 @@ const JenkinsCheck: React.FC<any> = () => {
 
       </div>
 
-      {/* 弹出层：检查任务  */}
+      {/* 弹出层：扫描任务  isCheckModalVisible */}
 
       <Modal
-        title={'上线前任务检查'}
+        title={'sonar扫描任务'}
         visible={isCheckModalVisible}
         onCancel={checkModalCancel}
         centered={true}
         width={550}
-        bodyStyle={{height: 515}}
+        bodyStyle={{height: 300}}
         footer={
           [
             <Spin spinning={loadState} tip="Loading...">
@@ -925,7 +812,6 @@ const JenkinsCheck: React.FC<any> = () => {
                 style={{borderRadius: 5, marginTop: -100}}
                 onClick={checkModalCancel}>取消
               </Button>,
-
               <Button type="primary"
                       style={{
                         marginLeft: 10,
@@ -935,92 +821,64 @@ const JenkinsCheck: React.FC<any> = () => {
                         display: isButtonClick
                       }}
 
-                      onClick={commitCarryTask}>执行
+                      onClick={carrySonarCheck}>执行
               </Button>
             </Spin>
-
 
           ]
         }
 
       >
-        <Form form={formForCarryTask} style={{marginTop: -15}}>
+        <Form form={formForCarrySonar} style={{marginTop: -15}}>
 
           <Form.Item label="任务名称" name="taskName">
-            <Input defaultValue={"sonar-project-scan"} disabled={true} style={{color: "black"}}/>
+            <Input defaultValue={"sonar-project-scan"} disabled={true}
+                   style={{marginLeft: 35, width: 390, color: "black"}}/>
           </Form.Item>
 
           <Divider style={{marginTop: -25}}>任务参数</Divider>
 
-          {/* 版本检查card */}
-          <Card size="small" title="版本检查" style={{width: "100%", marginTop: -15, height: 190}}>
-            <Form.Item name="verson_check" label="Check" valuePropName="checked" style={{marginTop: -10}}>
-              <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 41}}/>
-            </Form.Item>
+          <div>
 
-            <Form.Item name="verson_server" label="Server" style={{marginTop: -22}}>
-              <Select placeholder="请选择相应的服务！" style={{marginLeft: 41, width: 375}}>
-                {servers}
+            <Form.Item name="LanguageType" label="LanguageType" style={{marginTop: -15}}>
+              <Select style={{width: 390}} onChange={langeChanged}>
+                <Option value="java">java</Option>
+                <Option value="ts">ts</Option>
+                <Option value="go">go</Option>
               </Select>
             </Form.Item>
-
-            <Form.Item name="verson_imagebranch" label="ImageBranch" style={{marginTop: -20, width: 468}}>
-              <Select placeholder="请选择待检查分支！" showSearch>
-                {imageBranch}
-              </Select>
-            </Form.Item>
-
-            <Form.Item name="verson_imageevn" label="ImageEvn" style={{marginTop: -20}}>
-              <Select placeholder="请选择对应的环境！" style={{marginLeft: 20, width: 375}} showSearch>
-                {imageEvn}
-              </Select>
-            </Form.Item>
-
-          </Card>
-
-          {/* 分支检查Card */}
-          <Card size="small" title="检查上线分支是否包含对比分支的提交" style={{width: "100%", marginTop: 5, height: 250}}>
-            <Form.Item label="Check" name="branch_check" valuePropName="checked" style={{marginTop: -13}}>
-              <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 51}}/>
-            </Form.Item>
-
-            <Form.Item label="MainBranch" name="branch_mainBranch" style={{marginTop: -30}}>
-              <Checkbox.Group>
-                <Checkbox value={"stage"} style={{marginLeft: 17}}>stage</Checkbox>
-                <Checkbox value={"master"}>master</Checkbox>
-              </Checkbox.Group>
-            </Form.Item>
-
-            <div style={{marginTop: -30, marginLeft: 105, fontSize: "x-small", color: "gray"}}>
-              被对比的主分支
+            <div style={{marginTop: -23, marginLeft: 104, fontSize: "x-small", color: "gray"}}>
+              语言类型：默认是java；如果是前端，则选择ts；如果是golang，则选择go
             </div>
 
-            <Form.Item label="TeachnicalSide" name="branch_teachnicalSide" style={{marginTop: -3}}>
-              <Checkbox.Group>
-                <Checkbox value={"front"}>前端</Checkbox>
-                <Checkbox value={"backend"}>后端</Checkbox>
-              </Checkbox.Group>
-            </Form.Item>
-            <div style={{marginTop: -30, marginLeft: 105, fontSize: "x-small", color: "gray"}}>
-              技术侧
-            </div>
-
-            <Form.Item label="TargetBranch" name="branch_targetBranch" style={{marginTop: 0}}>
-              <Select placeholder="请选择对应的目标分支！" style={{marginLeft: 8, width: 360}} showSearch mode="multiple">
-                {targetBranch}
+            <Form.Item name="ProjectPath" label="ProjectPath" style={{marginTop: 7}}>
+              <Select showSearch style={{marginLeft: 20, width: 390}} onChange={ProjectPathChanged}>
+                {projectPath}
               </Select>
             </Form.Item>
-
-            <Form.Item label="MainSince" name="branch_mainSince" style={{marginTop: -20}}>
-              <DatePicker style={{marginLeft: 25, width: 360}}/>
-            </Form.Item>
-
-            <div style={{marginTop: -25, marginLeft: 103, fontSize: "x-small", color: "gray"}}>
-              默认查询近一周数据
+            <div style={{marginTop: -23, marginLeft: 104, fontSize: "x-small", color: "gray"}}>
+              项目路径：如：backend/apps/asset
             </div>
 
-          </Card>
+            <Form.Item name="BranchName" label="BranchName" style={{marginTop: 7}}>
+              <Select showSearch style={{marginLeft: 10, width: 390}}>
+                {branchName}
+              </Select>
+            </Form.Item>
+            <div style={{marginTop: -23, marginLeft: 104, fontSize: "x-small", color: "gray"}}>
+              分支名称：如：feature-multi-org2
+            </div>
 
+
+            <Form.Item name="ProjectKey" label="ProjectKey" style={{marginTop: 7}}>
+
+              <Input style={{marginLeft: 25, width: 390}}/>
+            </Form.Item>
+            <div style={{marginTop: -23, marginLeft: 104, fontSize: "x-small", color: "gray"}}>
+              sonar中展示的项目名称，唯一
+            </div>
+
+          </div>
         </Form>
       </Modal>
 

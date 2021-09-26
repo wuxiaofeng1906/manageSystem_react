@@ -19,7 +19,8 @@ import {
   Divider,
   Card,
   Switch,
-  Checkbox
+  Checkbox,
+  Spin
 } from 'antd';
 
 import {getHeight} from '@/publicMethods/pageSet';
@@ -147,6 +148,8 @@ const JenkinsCheck: React.FC<any> = () => {
   /* endregion */
 
   /* region 上线前检查任务弹出层相关事件 */
+  // 判断是否显示loading状态
+  const [loadState, setLoadSate] = useState(false);
 
   // 执行按钮是否禁用
   const [isButtonClick, setIsButtonClick] = useState("none");
@@ -293,7 +296,7 @@ const JenkinsCheck: React.FC<any> = () => {
     LoadImageBranchCombobox();
     LoadImageEvnCombobox();
     setCheckModalVisible(true);
-
+    setLoadSate(false);
     setIsButtonClick("inline");
     // 设置默认显示的值。
     formForCarryTask.setFieldsValue({
@@ -316,62 +319,89 @@ const JenkinsCheck: React.FC<any> = () => {
   const commitCarryTask = () => {
     const modalData = formForCarryTask.getFieldsValue()
 
-    console.log("modalData", modalData)
-
-    // 传入参数错误：422  ；连接问题：422
-
-    const datas = {
-      name: "popup-online-check",
-      user_name: currentUser.user_name,
-      user_id: currentUser.user_id,
-      job_parm: [
-        {name: "BackendVersionCkeckFlag", value: modalData.verson_check},
-        {name: "server", value: modalData.verson_server},
-        {name: "imageBranch", value: modalData.verson_imagebranch},
-        {name: "imageEnv", value: modalData.verson_imageevn},
-        {name: "InclusionCheckFlag", value: modalData.branch_check},
-        {name: "MainBranch", value: modalData.branch_mainBranch},
-        {name: "technicalSide", value: modalData.branch_teachnicalSide},
-        {name: "TargetBranch", value: modalData.branch_targetBranch},
-        {name: "MainSince", value: dayjs(modalData.branch_mainSince).format("YYYY-MM-DD")}
-
-      ]
-    };
-
     debugger;
-    axios.post('/api/verify/job/build', datas).then(async function (res) {
-
-      if (res.data.code === 200) {
-        const newData = await queryDevelopViews(1, 20);
-
-        gridApi.current?.setRowData(newData.datas);
-        setCheckModalVisible(false);
-        message.info({
-          content: "执行完毕！",
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      } else {
-        message.error({
-          content: `${res.data.message}${res.data.zt.message.end[0]}`,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      }
-    })
-      .catch(function (error) {
-        message.error({
-          content: `异常信息：${error.toString()}`,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
+    // MainBranch 和 TeachnicalSide 不能为空
+    const mainBranch = modalData.branch_mainBranch;
+    if (mainBranch.length === 0) {
+      message.error({
+        content: `MainBranch 为必选项！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
       });
+
+
+    }
+
+    const teachnicalSide = modalData.branch_teachnicalSide;
+    if (teachnicalSide.length === 0) {
+      message.error({
+        content: `TeachnicalSide 为必选项！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+    }
+
+    if (teachnicalSide.length > 0 && mainBranch.length > 0) {
+      // 传入参数错误：422  ；连接问题：422
+
+      const datas = {
+        name: "popup-online-check",
+        user_name: currentUser.user_name,
+        user_id: currentUser.user_id,
+        job_parm: [
+          {name: "BackendVersionCkeckFlag", value: modalData.verson_check},
+          {name: "server", value: modalData.verson_server},
+          {name: "imageBranch", value: modalData.verson_imagebranch},
+          {name: "imageEnv", value: modalData.verson_imageevn},
+          {name: "InclusionCheckFlag", value: modalData.branch_check},
+          {name: "MainBranch", value: mainBranch},
+          {name: "technicalSide", value: teachnicalSide},
+          {name: "TargetBranch", value: modalData.branch_targetBranch},
+          {name: "MainSince", value: dayjs(modalData.branch_mainSince).format("YYYY-MM-DD")}
+
+        ]
+      };
+
+      setLoadSate(true);
+      axios.post('/api/verify/job/build', datas).then(async function (res) {
+
+        if (res.data.code === 200) {
+          const newData = await queryDevelopViews(1, 20);
+
+          gridApi.current?.setRowData(newData.datas);
+          setCheckModalVisible(false);
+          message.info({
+            content: "执行完毕！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+          message.error({
+            content: `${res.data.message}${res.data.zt.message.end[0]}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+      })
+        .catch(function (error) {
+          message.error({
+            content: `异常信息：${error.toString()}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        });
+    }
 
 
   };
@@ -506,6 +536,7 @@ const JenkinsCheck: React.FC<any> = () => {
   (window as any).showParams = (params: any) => {
 
     setCheckModalVisible(true);
+    setLoadSate(false);
     // 这个点击事件只能够进行查看
     setIsButtonClick("none");
 
@@ -688,6 +719,10 @@ const JenkinsCheck: React.FC<any> = () => {
         field: 'url',
         minWidth: 200,
         cellRenderer: (params: any) => {
+          if (params.value === undefined) {
+            return "";
+          }
+
           return `<a href="${params.value}" target="_blank" style="text-decoration: underline">${params.value}</a>`;
         }
       },
@@ -696,6 +731,9 @@ const JenkinsCheck: React.FC<any> = () => {
         field: 'taskLog',
         minWidth: 200,
         cellRenderer: (params: any) => {
+          if (params.value === undefined) {
+            return "";
+          }
           return `<a href="${params.value}" target="_blank" style="text-decoration: underline">${params.value}</a>`;
         }
 
@@ -715,7 +753,7 @@ const JenkinsCheck: React.FC<any> = () => {
   /* endregion */
 
   useEffect(() => {
-    debugger;
+
     let totalCount = 0;
     let countsOfPages = 1;
     let totalPage = 1;
@@ -826,21 +864,26 @@ const JenkinsCheck: React.FC<any> = () => {
         bodyStyle={{height: 535}}
         footer={
           [
-            <Button
-              style={{borderRadius: 5, marginTop: -100}}
-              onClick={checkModalCancel}>取消
-            </Button>,
-            <Button type="primary"
-                    style={{
-                      marginLeft: 10,
-                      color: '#46A0FC',
-                      backgroundColor: "#ECF5FF",
-                      borderRadius: 5,
-                      display: isButtonClick
-                    }}
+            <Spin spinning={loadState} tip="Loading...">
+              <Button
+                style={{borderRadius: 5, marginTop: -100}}
+                onClick={checkModalCancel}>取消
+              </Button>,
 
-                    onClick={commitCarryTask}>执行
-            </Button>
+              <Button type="primary"
+                      style={{
+                        marginLeft: 10,
+                        color: '#46A0FC',
+                        backgroundColor: "#ECF5FF",
+                        borderRadius: 5,
+                        display: isButtonClick
+                      }}
+
+                      onClick={commitCarryTask}>执行
+              </Button>
+            </Spin>
+
+
           ]
         }
 
@@ -926,6 +969,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
         </Form>
       </Modal>
+
     </PageContainer>
   );
 };

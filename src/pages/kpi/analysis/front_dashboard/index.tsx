@@ -84,55 +84,113 @@ const alayThroughputData = (source: any, startTime: string, endTime: string) => 
   return data;
 };
 
-const alayRequestDatas = (oldData: any, reqDatas: any, avgRequestDura: any, bugResponseDuraCount: any) => {
+const alayRequestDatas = (oldData: any, reqDatas: any, avgRequestDura: any, bugResponseDuraCount: any,
+                          appendFinishCount: any, appendStoryCount: any, initFinishCount: any, initStotryCount: any) => {
 
-  // 连接 对外请求--请求数
-  const reqResult: any = [];
-  oldData.forEach((o_dts: any) => {
-    const o_details = o_dts;
-    for (let index = 0; index < reqDatas.length; index += 1) {
-      const dts = reqDatas[index];
-      if (o_details.userId === dts.userId) {
-        o_details['reCount'] = dts.count;
-        reqResult.push(o_details);
-        break;
+    // 连接 对外请求--请求数
+    const reqResult: any = [];
+    oldData.forEach((o_dts: any) => {
+      const o_details = o_dts;
+      for (let index = 0; index < reqDatas.length; index += 1) {
+        const dts = reqDatas[index];
+        if (o_details.userId === dts.userId) {
+          o_details['reCount'] = dts.count;
+          reqResult.push(o_details);
+          break;
+        }
       }
-    }
-  });
+    });
 
 
-  // 连接 对外请求--请求平均停留时长
-  const waitDurResult: any = [];
-  reqResult.forEach((o_dts: any) => {
-    const o_details = o_dts;
-    for (let index = 0; index < avgRequestDura.length; index += 1) {
-      const dts = avgRequestDura[index];
-      if (o_details.userId === dts.userId) {
-        o_details['waitDura'] = dts.dura;
-        waitDurResult.push(o_details);
-        break;
+    // 连接 对外请求--请求平均停留时长
+    const waitDurResult: any = [];
+    reqResult.forEach((o_dts: any) => {
+      const o_details = o_dts;
+      for (let index = 0; index < avgRequestDura.length; index += 1) {
+        const dts = avgRequestDura[index];
+        if (o_details.userId === dts.userId) {
+          o_details['waitDura'] = dts.dura;
+          waitDurResult.push(o_details);
+          break;
+        }
       }
-    }
-  });
+    });
 
-
-  const bugResponseDuraCountResult: any = [];
-  waitDurResult.forEach((o_dts: any) => {
-    const o_details = o_dts;
-    for (let index = 0; index < bugResponseDuraCount.length; index += 1) {
-      const dts = bugResponseDuraCount[index];
-      if (o_details.userId === dts.userId) {
-        o_details['solveCount'] = dts.count;
-        o_details['solveDur'] = dts.dura;
-        bugResponseDuraCountResult.push(o_details);
-        break;
+    // bug响应时长+bug响应数量
+    const bugResponseDuraCountResult: any = [];
+    waitDurResult.forEach((o_dts: any) => {
+      const o_details = o_dts;
+      for (let index = 0; index < bugResponseDuraCount.length; index += 1) {
+        const dts = bugResponseDuraCount[index];
+        if (o_details.userId === dts.userId) {
+          o_details['solveCount'] = dts.count;
+          o_details['solveDur'] = dts.dura;
+          bugResponseDuraCountResult.push(o_details);
+          break;
+        }
       }
-    }
-  });
+    });
+
+    // 初始需求数
+    const initStotryCountResult: any = [];
+    bugResponseDuraCountResult.forEach((o_dts: any) => {
+      const o_details = o_dts;
+      for (let index = 0; index < initStotryCount.length; index += 1) {
+        const dts = initStotryCount[index];
+        if (o_details.userId === dts.userId) {
+          o_details['initCount'] = dts.count;
+          initStotryCountResult.push(o_details);
+          break;
+        }
+      }
+    });
+
+    // 初始需求完成数
+    const initFinishCountResult: any = [];
+    initStotryCountResult.forEach((o_dts: any) => {
+      const o_details = o_dts;
+      for (let index = 0; index < initFinishCount.length; index += 1) {
+        const dts = initFinishCount[index];
+        if (o_details.userId === dts.userId) {
+          o_details['initFinishCount'] = dts.count;
+          initFinishCountResult.push(o_details);
+          break;
+        }
+      }
+    });
+
+    // 追加需求数
+    const appendStoryCountResult: any = [];
+    initFinishCountResult.forEach((o_dts: any) => {
+      const o_details = o_dts;
+      for (let index = 0; index < appendStoryCount.length; index += 1) {
+        const dts = appendStoryCount[index];
+        if (o_details.userId === dts.userId) {
+          o_details['appStoryCount'] = dts.count;
+          appendStoryCountResult.push(o_details);
+          break;
+        }
+      }
+    });
+
+    // 追加需求完成数
+    const appendFinishCountResult: any = [];
+    appendStoryCountResult.forEach((o_dts: any) => {
+      const o_details = o_dts;
+      for (let index = 0; index < appendFinishCount.length; index += 1) {
+        const dts = appendFinishCount[index];
+        if (o_details.userId === dts.userId) {
+          o_details['appdFinishCount'] = dts.count;
+          appendFinishCountResult.push(o_details);
+          break;
+        }
+      }
+    });
 
 
-  return bugResponseDuraCountResult;
-};
+    return appendFinishCountResult;
+  }
+;
 
 // 公共查询方法
 const queryFrontData = async (client: GqlClient<object>, params: any) => {
@@ -172,6 +230,34 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
           count
         }
 
+        appendFinishCount(${condition}){
+          userId
+          userName
+          deptsName
+          count
+        }
+
+        appendStoryCount(${condition}){
+          userId
+          userName
+          deptsName
+          count
+        }
+
+        initFinishCount(${condition}){
+          userId
+          userName
+          deptsName
+          count
+        }
+
+        initStotryCount(${condition}){
+          userId
+          userName
+          deptsName
+          count
+        }
+
       }
   `);
 
@@ -180,17 +266,20 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
     params.start.toString(),
     params.end.toString(),
   );
-  const requestDatas = alayRequestDatas(throughputDatas, data?.notResponse, data?.avgRequestDura, data?.bugResponseDuraCount);
+  const requestDatas = alayRequestDatas(throughputDatas,
+    data?.notResponse,
+    data?.avgRequestDura,
+    data?.bugResponseDuraCount,
+    data?.appendFinishCount,
+    data?.appendStoryCount,
+    data?.initFinishCount,
+    data?.initStotryCount
+  );
   return requestDatas;
 };
 
 // 查询单人的燃尽图
-const queryBurnChartData = async (
-  client: GqlClient<object>,
-  userId: string,
-  start: string,
-  end: string,
-) => {
+const queryBurnChartData = async (client: GqlClient<object>, userId: string, start: string, end: string,) => {
   const {data} = await client.query(`{
           burnoutDiagram(start:"${start}",end:"${end}",userIds:["${userId}"]){
             userId
@@ -556,31 +645,31 @@ const FrontTableList: React.FC<any> = () => {
           },
         ],
       },
-      // {
-      //   headerName: '速度',
-      //   children: [
-      //     {
-      //       headerName: '初始需求数',
-      //       field: 'deptName',
-      //       minWidth: 105,
-      //     },
-      //     {
-      //       headerName: '初始需求完成数',
-      //       field: 'groupName',
-      //       minWidth: 130,
-      //     },
-      //     {
-      //       headerName: '追加需求数',
-      //       field: 'tech',
-      //       minWidth: 105,
-      //     },
-      //     {
-      //       headerName: '追加需求完成数',
-      //       field: 'area',
-      //       minWidth: 130,
-      //     },
-      //   ],
-      // },
+      {
+        headerName: '速度',
+        children: [
+          {
+            headerName: '初始需求数',
+            field: 'initCount',
+            minWidth: 105,
+          },
+          {
+            headerName: '初始需求完成数',
+            field: 'initFinishCount',
+            minWidth: 130,
+          },
+          {
+            headerName: '追加需求数',
+            field: 'appStoryCount',
+            minWidth: 105,
+          },
+          {
+            headerName: '追加需求完成数',
+            field: 'appdFinishCount',
+            minWidth: 130,
+          },
+        ],
+      },
       {
         headerName: '对外请求',
         children: [

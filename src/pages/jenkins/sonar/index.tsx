@@ -1,4 +1,5 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
+import {useModel} from "@@/plugin-model/useModel";
 import {PageContainer} from '@ant-design/pro-layout';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -6,7 +7,6 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient} from '@/hooks';
 import {
   Button,
   InputNumber,
@@ -19,7 +19,8 @@ import {
   Divider,
   Card,
   Switch,
-  Checkbox
+  Checkbox,
+  Spin
 } from 'antd';
 
 import {getHeight} from '@/publicMethods/pageSet';
@@ -27,95 +28,100 @@ import axios from 'axios';
 
 
 import dayjs from "dayjs";
-
+import moment from 'moment';
 
 const {Option} = Select;
 
-
 // 查询数据
-const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
-  // const range = `{start:"${params.dateRange.start}", end:"${params.dateRange.end}"}`;
-  // const {data} = await client.query(`
-  //     {
-  //        project(name:"${params.projectName}",category:[${params.projectType}], range:${range},status:[${params.projectStatus}],order:ASC){
-  //         id
-  //         name
-  //         type
-  //         startAt
-  //         testEnd
-  //         testFinish
-  //         expStage
-  //         expOnline
-  //         creator
-  //         status
-  //         createAt
-  //         ztId
-  //       }
-  //     }
-  // `);
-  //
-  // return data?.project;
-  return [{
-    ID: "111",
-    taskName: "sonar-project-scan",
-    starttime: "2021-09-07 10:29:31",
-    endtime: "",
-    excUser: "王羽飞",
-    excStatus: "waiting",
-    excResult: "",
-    url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
-    taskLog: "https://ant.design/components/button-cn/",
-  }, {
-    ID: "110",
-    taskName: "sonar-project-scan",
-    starttime: "2021-09-07 10:29:31",
-    endtime: "2021-09-07 10:29:31",
-    excUser: "王羽飞",
-    excStatus: "running",
-    excResult: "",
-    url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
-    taskLog: "https://ant.design/components/button-cn/",
-  }, {
-    ID: "109",
-    taskName: "sonar-project-scan",
-    starttime: "2021-09-07 10:29:31",
-    endtime: "2021-09-07 10:29:31",
-    excUser: "王羽飞",
-    excStatus: "success",
-    excResult: "failure",
-    url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
-    taskLog: "https://ant.design/components/button-cn/",
-  }, {
-    ID: "108",
-    taskName: "sonar-project-scan",
-    starttime: "2021-09-07 10:29:31",
-    endtime: "2021-09-07 10:29:31",
-    excUser: "王羽飞",
-    excStatus: "success",
-    excResult: "success",
-    url: "https://shimo.im/docs/BAQ7r3eVT9MHNJUd",
-    taskLog: "https://ant.design/components/button-cn/",
-  }]
+const queryDevelopViews = async (pages: Number, pageSize: Number) => {
+
+  const datas: any = [];
+  const pageInfo = {
+    itemCount: 0,
+    pageCount: 0,
+    pageSize: 0
+  };
+
+  await axios.get('/api/verify/job/build_info',
+    {
+      params:
+        {
+          name: "sonar-project-scan",
+          page: pages,
+          page_size: pageSize
+        }
+    })
+    .then(function (res) {
+
+      if (res.data.code === 200) {
+
+        pageInfo.itemCount = res.data.data.count;
+        pageInfo.pageCount = res.data.data.page;
+        pageInfo.pageSize = res.data.data.page_size;
+
+        const serverDatas = res.data.data.data;
+        serverDatas.forEach((ele: any) => {
+
+          datas.push({
+            ID: ele.number,
+            taskName: ele.task_name,
+            starttime: ele.start_time,
+            endtime: ele.end_time,
+            excUser: ele.user_name,
+            excStatus: ele.result,
+            excResult: ele.result,
+            url: ele.task_url,
+            taskLog: ele.log_url,
+          });
+        });
+
+
+      } else {
+        message.error({
+          content: `错误：${res.data.msg}`,
+          duration: 1, // 1S 后自动关闭
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
+
+
+    }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+  return {pageInfo, datas};
+
 };
 
 
 // 组件初始化
-const SonarCheck: React.FC<any> = () => {
+const JenkinsCheck: React.FC<any> = () => {
 
 
-  const sys_accessToken = localStorage.getItem("accessId");
-  axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
-  // const {initialState} = useModel('@@initialState');
-  // let currentUser: any;
-  // if (initialState?.currentUser) {
-  //   currentUser = initialState.currentUser === undefined ? "" : initialState.currentUser.userid;
-  // }
+  // const sys_accessToken = localStorage.getItem("accessId");
+  // axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
+  const {initialState} = useModel('@@initialState');
+  const currentUser: any = {user_name: "", user_id: ""};
+  if (initialState?.currentUser) {
+
+    currentUser.user_name = initialState.currentUser === undefined ? "" : initialState.currentUser.name;
+    currentUser.user_id = initialState.currentUser === undefined ? "" : initialState.currentUser.userid;
+  }
 
 
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>();
-  const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, ""));
+
+  const {data, loading} = useRequest(() => queryDevelopViews(1, 20));
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -142,40 +148,332 @@ const SonarCheck: React.FC<any> = () => {
   /* endregion */
 
   /* region 上线前检查任务弹出层相关事件 */
+  // 判断是否显示loading状态
+  const [loadState, setLoadSate] = useState(false);
 
   // 执行按钮是否禁用
   const [isButtonClick, setIsButtonClick] = useState("none");
 
   // 弹出层是否可见
   const [isCheckModalVisible, setCheckModalVisible] = useState(false);
-  const [formForCarrySonar] = Form.useForm();
+  const [formForCarryTask] = Form.useForm();
 
   const checkModalCancel = () => {
     setCheckModalVisible(false);
   }
 
-  const runTask = () => {
+  /* region 下拉框数据加载 */
+
+  // 加载请求Server下拉框
+  const [servers, setServers] = useState([]);
+  const LoadSeverCombobox = () => {
+    axios.get('/api/verify/project/server', {params: {}})
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+          const serverDatas = res.data.data;
+          const serversOp: any = [];
+          for (let index = 0; index < serverDatas.length; index += 1) {
+            // const id = serverDatas[index].server_id;
+            const {server} = serverDatas[index]
+            serversOp.push(
+              <Option value={server}>{server}</Option>,
+            );
+          }
+
+          setServers(serversOp);
+        } else {
+          message.error({
+            content: `错误：${res.data.msg}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+      }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+
+  };
+
+  // 记载请求镜像分支下拉框
+  const [imageBranch, setImageBranch] = useState([]);
+  const LoadImageBranchCombobox = () => {
+    axios.get('/api/verify/project/image_branch', {params: {}})
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+          const branchDatas = res.data.data;
+          const branchOp: any = [];
+          for (let index = 0; index < branchDatas.length; index += 1) {
+            // const id = branchDatas[index].branch_id;
+            const branch = branchDatas[index].image_branch
+            branchOp.push(
+              <Option value={branch}>{branch}</Option>,
+            );
+          }
+
+          setImageBranch(branchOp);
+        } else {
+          message.error({
+            content: `错误：${res.data.msg}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+      }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+
+  };
+
+  // 记载请求镜像环境下拉框
+  const [imageEvn, setImageEvn] = useState([]);
+  const LoadImageEvnCombobox = () => {
+    axios.get('/api/verify/project/image_env', {params: {}})
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+          const imageDatas = res.data.data;
+          const imageOp: any = [];
+          for (let index = 0; index < imageDatas.length; index += 1) {
+            // const id = imageDatas[index].env_id;
+            const image = imageDatas[index].image_env
+            imageOp.push(
+              <Option value={image}>{image}</Option>,
+            );
+          }
+
+          setImageEvn(imageOp);
+        } else {
+          message.error({
+            content: `错误：${res.data.msg}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+      }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+
+  };
+
+  // 记载请求镜像环境下拉框
+  const [targetBranch, setTargetBranch] = useState([]);
+  const LoadTargetBranchCombobox = () => {
+    axios.get('/api/verify/sonar/branch', {params: {}})
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+          const branchDatas = res.data.data;
+          const branchOp: any = [];
+          for (let index = 0; index < branchDatas.length; index += 1) {
+            const branch = branchDatas[index].branch_name
+            branchOp.push(
+              <Option value={branch}>{branch}</Option>,
+            );
+          }
+
+          setTargetBranch(branchOp);
+        } else {
+          message.error({
+            content: `错误：${res.data.msg}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+      }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+
+  };
+  /* endregion 下拉框数据加载 */
+
+  const runSonarTask = () => {
+    LoadSeverCombobox();
+    LoadImageBranchCombobox();
+    LoadImageEvnCombobox();
+    LoadTargetBranchCombobox();
     setCheckModalVisible(true);
+    setLoadSate(false);
     setIsButtonClick("inline");
-    // 设置显示的值。
-    formForCarrySonar.setFieldsValue({
+    // 设置默认显示的值。
+    formForCarryTask.setFieldsValue({
+      // 版本检查
+      verson_check: true,
+      verson_server: "apps",
+      verson_imagebranch: "hotfix",
+      verson_imageevn: "nx-hotfix",
 
-      LanguageType: "java",
-      ProjectPath: "test",
-      BranchName: "test",
-      ProjectKey: "test",
-
-
+      // 检查上线分支是否包含对比分支的提交
+      branch_check: false,
+      branch_mainBranch: ["stage", "master"],
+      branch_teachnicalSide: ["front", "backend"],
+      branch_targetBranch: undefined,
+      branch_mainSince: moment(dayjs().subtract(6, 'day').format("YYYY-MM-DD"))
     });
   };
 
   // 确定执行任务
-  const carrySonarCheck = () => {
+  const commitCarryTask = () => {
+    const modalData = formForCarryTask.getFieldsValue()
 
-  }
+    // MainBranch 和 TeachnicalSide 不能为空
+    const mainBranch = modalData.branch_mainBranch;
+    if (mainBranch.length === 0) {
+      message.error({
+        content: `MainBranch 为必选项！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
 
+
+    }
+
+    const teachnicalSide = modalData.branch_teachnicalSide;
+    if (teachnicalSide.length === 0) {
+      message.error({
+        content: `TeachnicalSide 为必选项！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+    }
+
+    const targets = modalData.branch_targetBranch;
+
+    let target_branch = "";
+    if (targets.length > 0) {
+      targets.forEach((dts: any) => {
+        target_branch = target_branch === "" ? dts : `${target_branch},${dts}`;
+
+      });
+
+    }
+
+    if (teachnicalSide.length > 0 && mainBranch.length > 0) {
+      // 传入参数错误：422  ；连接问题：422
+
+      const datas = {
+        name: "sonar-project-scan",
+        user_name: currentUser.user_name,
+        user_id: currentUser.user_id,
+        job_parm: [
+          {name: "BackendVersionCkeckFlag", value: modalData.verson_check},
+          {name: "server", value: modalData.verson_server},
+          {name: "imageBranch", value: modalData.verson_imagebranch},
+          {name: "imageEnv", value: modalData.verson_imageevn},
+          {name: "InclusionCheckFlag", value: modalData.branch_check},
+          {name: "MainBranch", value: mainBranch},
+          {name: "technicalSide", value: teachnicalSide},
+          {name: "TargetBranch", value: target_branch},
+          {name: "MainSince", value: dayjs(modalData.branch_mainSince).format("YYYY-MM-DD")}
+
+        ]
+      };
+
+      setLoadSate(true);
+      axios.post('/api/verify/job/build', datas).then(async function (res) {
+
+        if (res.data.code === 200) {
+          const newData = await queryDevelopViews(1, 20);
+
+          gridApi.current?.setRowData(newData.datas);
+          setCheckModalVisible(false);
+          message.info({
+            content: "执行完毕！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          setLoadSate(false);
+        } else {
+          message.error({
+            content: `${res.data.message}${res.data.zt.message.end[0]}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          setLoadSate(false);
+        }
+      })
+        .catch(function (error) {
+          message.error({
+            content: `异常信息：${error.toString()}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          setLoadSate(false);
+        });
+    }
+
+
+  };
+
+  const [Pages, setPages] = useState({
+    totalCounts: 0,  // 总条数
+    countsOfPage: 20,  // 每页显示多少条
+    totalPages: 0,  // 一共多少页
+    currentPage: 0, // 当前是第几页
+    jumpToPage: 0  // 跳转到第几页
+  });
   // 刷新表格
-  const refreshGrid = () => {
+  const refreshGrid = async () => {
+
+    const newData = await queryDevelopViews(Pages.currentPage, Pages.countsOfPage);
+
+    gridApi.current?.setRowData(newData.datas);
 
   };
 
@@ -184,21 +482,28 @@ const SonarCheck: React.FC<any> = () => {
   /* region 翻页以及页面跳转功能 */
   // https://www.ag-grid.com/react-data-grid/row-pagination/  数据分页
 
-  const [Pages, setPages] = useState({
-    totalCounts: 4,
-    totalPages: 1,
-    currentPage: 1,
-  });
 
   // 每页显示多少条数据
-  const showItemChange = (pageCOunt: any) => {
+  const showItemChange = (pageCount: any) => {
 
-    alert(`每页显示${pageCOunt}条数据`);
+    setPages({
+      ...Pages,
+      countsOfPage: Number(pageCount),
+      totalPages: Math.ceil(Pages.totalCounts / Number(pageCount)),
+    });
+
+  };
+
+  // 输入每页显示多少条数据后再进行数据查询，
+  const showAssignedData = async () => {
+
+    const newData = await queryDevelopViews(Pages.currentPage, Pages.countsOfPage);
+    gridApi.current?.setRowData(newData.datas);
 
   };
 
   // 上一页
-  const showPreviousPage = () => {
+  const showPreviousPage = async () => {
 
     // 上一页不能为负数或0
     if (Pages.currentPage > 1) {
@@ -206,13 +511,17 @@ const SonarCheck: React.FC<any> = () => {
         ...Pages,
         currentPage: Pages.currentPage - 1
       });
+
+
     }
 
+    const newData = await queryDevelopViews(Pages.currentPage - 1, Pages.countsOfPage);
+    gridApi.current?.setRowData(newData.datas);
 
   };
 
   // 下一页
-  const showNextPage = () => {
+  const showNextPage = async () => {
     const nextPage = Pages.currentPage + 1;
 
     // 下一页的页面不能超过总页面之和
@@ -221,12 +530,38 @@ const SonarCheck: React.FC<any> = () => {
         ...Pages,
         currentPage: Pages.currentPage + 1
       });
+
+      const newData = await queryDevelopViews(Pages.currentPage + 1, Pages.countsOfPage);
+      gridApi.current?.setRowData(newData.datas);
     }
 
   };
 
   // 跳转到第几页
-  const goToPage = (params: any) => {
+
+  const jumpChange = (params: any) => {
+
+    const inputData = params.nativeEvent.data;
+    if (Number(inputData)) {
+
+      if (Number(inputData) > Pages.totalPages) {
+        setPages({
+          ...Pages,
+          jumpToPage: Number(inputData)
+
+        });
+      } else {
+        setPages({
+          ...Pages,
+          jumpToPage: Number(inputData),
+          currentPage: Number(inputData)
+        });
+      }
+
+    }
+  };
+
+  const goToPage = async (params: any) => {
 
     const pageCounts = Number(params.currentTarget.defaultValue);
     if (pageCounts > Pages.totalPages) {
@@ -241,7 +576,9 @@ const SonarCheck: React.FC<any> = () => {
       });
 
     } else {
-      alert(`跳转到第${params.currentTarget.defaultValue}页`)
+
+      const newData = await queryDevelopViews(Number(params.currentTarget.defaultValue), Pages.countsOfPage);
+      gridApi.current?.setRowData(newData.datas);
 
     }
 
@@ -249,20 +586,113 @@ const SonarCheck: React.FC<any> = () => {
   }
   /* endregion */
 
+  /* region 定义列以及单元格的点击事件 */
+
   (window as any).showParams = (params: any) => {
+
     setCheckModalVisible(true);
+    setLoadSate(false);
     // 这个点击事件只能够进行查看
     setIsButtonClick("none");
 
     // alert(`获取信息：${params.taskName.toString()}`);
+    axios.get('/api/verify/job/build_info_param',
+      {
+        params: {
+          name: params.taskName,
+          num: params.ID
+        }
+      }).then(function (res: any) {
 
 
-    // 设置显示的值。
-    formForCarrySonar.setFieldsValue({
-      LanguageType: "",
-      ProjectPath: "",
-      BranchName: "",
-      ProjectKey: "",
+      if (res.data.code === 200) {
+        let versonChecked = false;
+        let versonServer = "";
+        let versonImagebranch = "";
+        let versonImageevn = "";
+
+        let branchCheck = false;
+        let branchMainBranch = "";
+        let branchTeachnicalSide = "";
+        let branchTargetBranch = "";
+        let branchMainSince = "";
+
+        const result = res.data.data;
+        if (result) {
+          result.forEach((dts: any) => {
+            switch (dts.name) {
+              case "BackendVersionCkeckFlag":
+                versonChecked = dts.value;
+                break;
+              case "server":
+                versonServer = dts.value;
+                break;
+              case "imageBranch":
+                versonImagebranch = dts.value;
+                break;
+              case "imageEnv":
+                versonImageevn = dts.value;
+                break;
+              case "InclusionCheckFlag":
+                branchCheck = dts.value;
+                break;
+              case "MainBranch":
+                branchMainBranch = dts.value;
+                break;
+              case "technicalSide":
+                branchTeachnicalSide = dts.value;
+                break;
+              case "TargetBranch":
+                branchTargetBranch = dts.value;
+                break;
+              case "MainSince":
+                branchMainSince = dts.value;
+                break;
+              default:
+                break;
+            }
+
+          });
+
+        }
+
+
+        // 设置显示的值。
+        formForCarryTask.setFieldsValue({
+          // 版本检查
+          verson_check: versonChecked,
+          verson_server: versonServer,
+          verson_imagebranch: versonImagebranch,
+          verson_imageevn: versonImageevn,
+
+          // 检查上线分支是否包含对比分支的提交
+          branch_check: branchCheck,
+          branch_mainBranch: branchMainBranch,
+          branch_teachnicalSide: branchTeachnicalSide,
+          branch_targetBranch: branchTargetBranch === "" ? undefined : branchTargetBranch.split(','),
+          branch_mainSince: branchMainSince === "" ? undefined : moment(branchMainSince)
+        });
+
+
+      } else {
+        message.error({
+          content: `错误：${res.data.msg}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
+
+    }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
     });
 
   };
@@ -278,7 +708,7 @@ const SonarCheck: React.FC<any> = () => {
       {
         headerName: '任务名称',
         field: 'taskName',
-        minWidth: 155,
+        minWidth: 150,
       },
       {
         headerName: '开始时间',
@@ -300,15 +730,21 @@ const SonarCheck: React.FC<any> = () => {
         field: 'excStatus',
         minWidth: 95,
         cellRenderer: (params: any) => {
-          let color = "gray";
-          if (params.value === "running") {
-            color = "#46A0FC";
-          }
-          if (params.value === "success") {
-            color = "#32D529";
+          if (params.value === "ABORTED ") {
+            return `<span style="font-size: large; color:gray">aborted</span>`;
           }
 
-          return `<span style="font-size: medium; color:${color}">${params.value}</span>`;
+          if (params.value === null) {
+            return `<span style="font-size: large; color:#46A0FC">running</span>`;
+          }
+          if (params.value === "SUCCESS") {
+            return `<span style="font-size: large; color:#32D529">success</span>`;
+          }
+
+          if (params.value === "FAILURE") {
+            return `<span style="font-size: large;color: red">failure</span>`;
+          }
+          return `<span style="font-size: large;">${params.value}</span>`;
         }
       },
       {
@@ -316,16 +752,22 @@ const SonarCheck: React.FC<any> = () => {
         field: 'excResult',
         minWidth: 95,
         cellRenderer: (params: any) => {
-          let color = "black";
-          if (params.value === "failure") {
-            color = "red";
+
+          if (params.value === "ABORTED ") {
+            return `<span style="font-size: large; color:gray">aborted</span>`;
           }
 
-          if (params.value === "success") {
-            color = "#32D529";
+          if (params.value === null) {
+            return `<span style="font-size: large; "> </span>`;
+          }
+          if (params.value === "SUCCESS") {
+            return `<span style="font-size: large; color:#32D529">success</span>`;
           }
 
-          return `<span style="font-size: medium; color:${color}">${params.value}</span>`;
+          if (params.value === "FAILURE") {
+            return `<span style="font-size: large;color: red">failure</span>`;
+          }
+          return `<span style="font-size: large;">${params.value}</span>`;
         }
       },
       {
@@ -333,6 +775,10 @@ const SonarCheck: React.FC<any> = () => {
         field: 'url',
         minWidth: 200,
         cellRenderer: (params: any) => {
+          if (params.value === undefined) {
+            return "";
+          }
+
           return `<a href="${params.value}" target="_blank" style="text-decoration: underline">${params.value}</a>`;
         }
       },
@@ -341,6 +787,9 @@ const SonarCheck: React.FC<any> = () => {
         field: 'taskLog',
         minWidth: 200,
         cellRenderer: (params: any) => {
+          if (params.value === undefined) {
+            return "";
+          }
           return `<a href="${params.value}" target="_blank" style="text-decoration: underline">${params.value}</a>`;
         }
 
@@ -357,6 +806,30 @@ const SonarCheck: React.FC<any> = () => {
     return component;
   };
 
+  /* endregion */
+
+  useEffect(() => {
+
+    let totalCount = 0;
+    let countsOfPages = 1;
+    let totalPage = 1;
+    let currentPages = 1;
+    if (data) {
+      totalCount = Number(data?.pageInfo.itemCount);
+      countsOfPages = Number(data?.pageInfo.pageSize);
+      totalPage = Number(data?.pageInfo.itemCount) === 0 ? 0 : Math.ceil(Number(data?.pageInfo.itemCount) / Number(data?.pageInfo.pageSize));
+      currentPages = Number(data?.pageInfo.pageCount);
+    }
+
+
+    setPages({
+      totalCounts: totalCount,
+      countsOfPage: countsOfPages,
+      totalPages: totalPage,
+      currentPage: currentPages,
+      jumpToPage: 1
+    });
+  }, [loading])
 
   return (
     <PageContainer style={{marginLeft: -30, marginRight: -30}}>
@@ -366,20 +839,18 @@ const SonarCheck: React.FC<any> = () => {
         {/* 使用一个图标就要导入一个图标 */}
 
         <Button type="primary" style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}
-                onClick={runTask}>执行sonar扫描任务</Button>
+                onClick={runSonarTask}>执行sonar扫描任务</Button>
 
         <Button type="primary"
                 style={{marginLeft: 10, color: '#32D529', backgroundColor: "#ECF5FF", borderRadius: 5}}
                 onClick={refreshGrid}>刷新</Button>
-
-
       </div>
 
       {/* ag-grid 表格定义 */}
       <div className="ag-theme-alpine" style={{marginTop: 3, height: gridHeight, width: '100%'}}>
         <AgGridReact
           columnDefs={colums()} // 定义列
-          rowData={data} // 数据绑定
+          rowData={data?.datas} // 数据绑定
           defaultColDef={{
             resizable: true,
             sortable: true,
@@ -407,8 +878,8 @@ const SonarCheck: React.FC<any> = () => {
 
         {/* 每页 XX 条 */}
         <label style={{marginLeft: 20, fontWeight: "bold"}}>每页</label>
-        <InputNumber style={{marginLeft: 10}} size={"middle"} min={1} max={10000} defaultValue={20}
-                     onChange={showItemChange}/>
+        <InputNumber style={{marginLeft: 10}} size={"middle"} min={1} max={10000} value={Pages.countsOfPage}
+                     onChange={showItemChange} onBlur={showAssignedData}/>
         <label style={{marginLeft: 10, fontWeight: "bold"}}>条</label>
 
         <label style={{marginLeft: 10, fontWeight: "bold"}}>共 {Pages.totalPages} 页</label>
@@ -431,100 +902,131 @@ const SonarCheck: React.FC<any> = () => {
 
         {/* 跳转到第几页 */}
         <label style={{marginLeft: 20, fontWeight: "bold"}}> 跳转到第 </label>
-        <Input style={{textAlign: "center", width: 50, marginLeft: 2}} defaultValue={1} onBlur={goToPage}/>
+        <Input style={{textAlign: "center", width: 50, marginLeft: 2}} value={Pages.jumpToPage} onChange={jumpChange}
+               onBlur={goToPage}/>
         <label style={{marginLeft: 2, fontWeight: "bold"}}> 页 </label>
 
 
       </div>
 
-      {/* 弹出层：扫描任务  isCheckModalVisible */}
+      {/* 弹出层：检查任务  */}
 
       <Modal
-        title={'sonar扫描任务'}
+        title={'上线前任务检查'}
         visible={isCheckModalVisible}
         onCancel={checkModalCancel}
         centered={true}
         width={550}
-        bodyStyle={{height: 300}}
+        bodyStyle={{height: 515}}
         footer={
           [
-            <Button
-              style={{borderRadius: 5, marginTop: -100}}
-              onClick={checkModalCancel}>取消
-            </Button>,
-            <Button type="primary"
-                    style={{
-                      marginLeft: 10,
-                      color: '#46A0FC',
-                      backgroundColor: "#ECF5FF",
-                      borderRadius: 5,
-                      display: isButtonClick
-                    }}
+            <Spin spinning={loadState} tip="Loading...">
+              <Button
+                style={{borderRadius: 5, marginTop: -100}}
+                onClick={checkModalCancel}>取消
+              </Button>,
 
-                    onClick={carrySonarCheck}>执行
-            </Button>
+              <Button type="primary"
+                      style={{
+                        marginLeft: 10,
+                        color: '#46A0FC',
+                        backgroundColor: "#ECF5FF",
+                        borderRadius: 5,
+                        display: isButtonClick
+                      }}
+
+                      onClick={commitCarryTask}>执行
+              </Button>
+            </Spin>
+
+
           ]
         }
 
       >
-        <Form form={formForCarrySonar} style={{marginTop: -15}}>
+        <Form form={formForCarryTask} style={{marginTop: -15}}>
 
           <Form.Item label="任务名称" name="taskName">
-            <Input defaultValue={"sonar-project-scan"} disabled={true}
-                   style={{marginLeft: 35, width: 390, color: "black"}}/>
+            <Input defaultValue={"sonar-project-scan"} disabled={true} style={{color: "black"}}/>
           </Form.Item>
 
           <Divider style={{marginTop: -25}}>任务参数</Divider>
 
-          <div>
+          {/* 版本检查card */}
+          <Card size="small" title="版本检查" style={{width: "100%", marginTop: -15, height: 190}}>
+            <Form.Item name="verson_check" label="Check" valuePropName="checked" style={{marginTop: -10}}>
+              <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 41}}/>
+            </Form.Item>
 
-            <Form.Item name="LanguageType" label="LanguageType" style={{marginTop: -15}}>
-              <Select style={{width: 390}}>
-                <Option value="java">java</Option>
-                <Option value="ts">ts</Option>
-                <Option value="golang">go</Option>
+            <Form.Item name="verson_server" label="Server" style={{marginTop: -22}}>
+              <Select placeholder="请选择相应的服务！" style={{marginLeft: 41, width: 375}}>
+                {servers}
               </Select>
             </Form.Item>
-            <div style={{marginTop: -23, marginLeft: 104, fontSize: "x-small", color: "gray"}}>
-              语言类型：默认是java；如果是前端，则选择ts；如果是golang，则选择go
-            </div>
 
-            <Form.Item name="ProjectPath" label="ProjectPath" style={{marginTop: 7}}>
-              <Select style={{marginLeft: 20, width: 390}}>
-                <Option value="apps">apps</Option>
-                <Option value="global">global</Option>
+            <Form.Item name="verson_imagebranch" label="ImageBranch" style={{marginTop: -20, width: 468}}>
+              <Select placeholder="请选择待检查分支！" showSearch>
+                {imageBranch}
               </Select>
             </Form.Item>
-            <div style={{marginTop: -23, marginLeft: 104, fontSize: "x-small", color: "gray"}}>
-              项目路径：如：backend/apps/asset
-            </div>
 
-            <Form.Item name="BranchName" label="BranchName" style={{marginTop: 7}}>
-              <Select showSearch style={{marginLeft: 10, width: 390}}>
-                <Option value="hotfix">hotfix</Option>
+            <Form.Item name="verson_imageevn" label="ImageEvn" style={{marginTop: -20}}>
+              <Select placeholder="请选择对应的环境！" style={{marginLeft: 20, width: 375}} showSearch>
+                {imageEvn}
               </Select>
             </Form.Item>
-            <div style={{marginTop: -23, marginLeft: 104, fontSize: "x-small", color: "gray"}}>
-              分支名称：如：feature-multi-org2
+
+          </Card>
+
+          {/* 分支检查Card */}
+          <Card size="small" title="检查上线分支是否包含对比分支的提交" style={{width: "100%", marginTop: 5, height: 250}}>
+            <Form.Item label="Check" name="branch_check" valuePropName="checked" style={{marginTop: -13}}>
+              <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 51}}/>
+            </Form.Item>
+
+            <Form.Item label="MainBranch" name="branch_mainBranch" style={{marginTop: -30}}>
+              <Checkbox.Group>
+                <Checkbox value={"stage"} style={{marginLeft: 17}}>stage</Checkbox>
+                <Checkbox value={"master"}>master</Checkbox>
+              </Checkbox.Group>
+            </Form.Item>
+
+            <div style={{marginTop: -30, marginLeft: 105, fontSize: "x-small", color: "gray"}}>
+              被对比的主分支
             </div>
 
+            <Form.Item label="TeachnicalSide" name="branch_teachnicalSide" style={{marginTop: -3}}>
+              <Checkbox.Group>
+                <Checkbox value={"front"}>前端</Checkbox>
+                <Checkbox value={"backend"}>后端</Checkbox>
+              </Checkbox.Group>
+            </Form.Item>
+            <div style={{marginTop: -30, marginLeft: 105, fontSize: "x-small", color: "gray"}}>
+              技术侧
+            </div>
 
-            <Form.Item name="ProjectKey" label="ProjectKey" style={{marginTop: 7}}>
-              <Select style={{marginLeft: 25, width: 390}} showSearch>
-                <Option value="nx-hotfix">nx-hotfix</Option>
-                <Option value="nx-hotfix-db">nx-hotfix-db</Option>
+            <Form.Item label="TargetBranch" name="branch_targetBranch" style={{marginTop: 0}}>
+              <Select placeholder="请选择对应的目标分支！" style={{marginLeft: 8, width: 360}} showSearch mode="multiple">
+                {targetBranch}
               </Select>
             </Form.Item>
-            <div style={{marginTop: -23, marginLeft: 104, fontSize: "x-small", color: "gray"}}>
-              sonar中展示的项目名称，唯一
+
+            <Form.Item label="MainSince" name="branch_mainSince" style={{marginTop: -20}}>
+              <DatePicker style={{marginLeft: 25, width: 360}}/>
+            </Form.Item>
+
+            <div style={{marginTop: -25, marginLeft: 103, fontSize: "x-small", color: "gray"}}>
+              默认查询近一周数据
             </div>
 
-          </div>
+          </Card>
+
         </Form>
       </Modal>
+
     </PageContainer>
   );
 };
 
 
-export default SonarCheck;
+export default JenkinsCheck;

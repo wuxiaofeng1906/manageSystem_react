@@ -715,11 +715,24 @@ const JenkinsCheck: React.FC<any> = () => {
   /* endregion */
 
   useEffect(() => {
+    debugger;
+    let totalCount = 0;
+    let countsOfPages = 1;
+    let totalPage = 1;
+    let currentPages = 1;
+    if (data) {
+      totalCount = Number(data?.pageInfo.itemCount);
+      countsOfPages = Number(data?.pageInfo.pageSize);
+      totalPage = Number(data?.pageInfo.itemCount) === 0 ? 0 : Math.ceil(Number(data?.pageInfo.itemCount) / Number(data?.pageInfo.pageSize));
+      currentPages = Number(data?.pageInfo.pageCount);
+    }
+
+
     setPages({
-      totalCounts: Number(data?.pageInfo.itemCount),
-      countsOfPage: Number(data?.pageInfo.pageSize),
-      totalPages: Math.ceil(Number(data?.pageInfo.itemCount) / Number(data?.pageInfo.pageSize)),
-      currentPage: Number(data?.pageInfo.pageCount),
+      totalCounts: totalCount,
+      countsOfPage: countsOfPages,
+      totalPages: totalPage,
+      currentPage: currentPages,
       jumpToPage: 1
     });
   }, [loading])

@@ -289,12 +289,54 @@ const JenkinsCheck: React.FC<any> = () => {
 
 
   };
+
+  // 记载请求镜像环境下拉框
+  const [targetBranch, setTargetBranch] = useState([]);
+  const LoadTargetBranchCombobox = () => {
+    axios.get('/api/verify/sonar/branch', {params: {}})
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+          const branchDatas = res.data.data;
+          const branchOp: any = [];
+          for (let index = 0; index < branchDatas.length; index += 1) {
+            const branch = branchDatas[index].branch_name
+            branchOp.push(
+              <Option value={branch}>{branch}</Option>,
+            );
+          }
+
+          setTargetBranch(branchOp);
+        } else {
+          message.error({
+            content: `错误：${res.data.msg}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+      }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+
+  };
   /* endregion 下拉框数据加载 */
 
   const runTaskBeforeOnline = () => {
     LoadSeverCombobox();
     LoadImageBranchCombobox();
     LoadImageEvnCombobox();
+    LoadTargetBranchCombobox();
     setCheckModalVisible(true);
     setLoadSate(false);
     setIsButtonClick("inline");
@@ -310,7 +352,7 @@ const JenkinsCheck: React.FC<any> = () => {
       branch_check: false,
       branch_mainBranch: ["stage", "master"],
       branch_teachnicalSide: ["front", "backend"],
-      branch_targetBranch: "",
+      branch_targetBranch: undefined,
       branch_mainSince: moment(dayjs().subtract(6, 'day').format("YYYY-MM-DD"))
     });
   };
@@ -319,7 +361,6 @@ const JenkinsCheck: React.FC<any> = () => {
   const commitCarryTask = () => {
     const modalData = formForCarryTask.getFieldsValue()
 
-    debugger;
     // MainBranch 和 TeachnicalSide 不能为空
     const mainBranch = modalData.branch_mainBranch;
     if (mainBranch.length === 0) {
@@ -346,6 +387,18 @@ const JenkinsCheck: React.FC<any> = () => {
 
     }
 
+    const targets = modalData.branch_targetBranch;
+
+    let target_branch = "";
+    if (targets.length > 0) {
+      targets.forEach((dts: any) => {
+        target_branch = target_branch === "" ? dts : `${target_branch},${dts}`;
+
+      })
+
+    }
+
+    debugger;
     if (teachnicalSide.length > 0 && mainBranch.length > 0) {
       // 传入参数错误：422  ；连接问题：422
 
@@ -361,7 +414,7 @@ const JenkinsCheck: React.FC<any> = () => {
           {name: "InclusionCheckFlag", value: modalData.branch_check},
           {name: "MainBranch", value: mainBranch},
           {name: "technicalSide", value: teachnicalSide},
-          {name: "TargetBranch", value: modalData.branch_targetBranch},
+          {name: "TargetBranch", value: target_branch},
           {name: "MainSince", value: dayjs(modalData.branch_mainSince).format("YYYY-MM-DD")}
 
         ]
@@ -382,6 +435,7 @@ const JenkinsCheck: React.FC<any> = () => {
               marginTop: '50vh',
             },
           });
+          setLoadSate(false);
         } else {
           message.error({
             content: `${res.data.message}${res.data.zt.message.end[0]}`,
@@ -390,6 +444,7 @@ const JenkinsCheck: React.FC<any> = () => {
               marginTop: '50vh',
             },
           });
+          setLoadSate(false);
         }
       })
         .catch(function (error) {
@@ -400,6 +455,7 @@ const JenkinsCheck: React.FC<any> = () => {
               marginTop: '50vh',
             },
           });
+          setLoadSate(false);
         });
     }
 
@@ -601,6 +657,8 @@ const JenkinsCheck: React.FC<any> = () => {
 
         }
 
+
+
         // 设置显示的值。
         formForCarryTask.setFieldsValue({
           // 版本检查
@@ -613,8 +671,8 @@ const JenkinsCheck: React.FC<any> = () => {
           branch_check: branchCheck,
           branch_mainBranch: branchMainBranch,
           branch_teachnicalSide: branchTeachnicalSide,
-          branch_targetBranch: branchTargetBranch,
-          branch_mainSince: moment(branchMainSince)
+          branch_targetBranch: branchTargetBranch === "" ? undefined : branchTargetBranch.split(','),
+          branch_mainSince: branchMainSince === "" ? undefined : moment(branchMainSince)
         });
 
 
@@ -861,7 +919,7 @@ const JenkinsCheck: React.FC<any> = () => {
         onCancel={checkModalCancel}
         centered={true}
         width={550}
-        bodyStyle={{height: 535}}
+        bodyStyle={{height: 515}}
         footer={
           [
             <Spin spinning={loadState} tip="Loading...">
@@ -923,7 +981,7 @@ const JenkinsCheck: React.FC<any> = () => {
           </Card>
 
           {/* 分支检查Card */}
-          <Card size="small" title="检查上线分支是否包含对比分支的提交" style={{width: "100%", marginTop: 5, height: 270}}>
+          <Card size="small" title="检查上线分支是否包含对比分支的提交" style={{width: "100%", marginTop: 5, height: 250}}>
             <Form.Item label="Check" name="branch_check" valuePropName="checked" style={{marginTop: -13}}>
               <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 51}}/>
             </Form.Item>
@@ -950,14 +1008,12 @@ const JenkinsCheck: React.FC<any> = () => {
             </div>
 
             <Form.Item label="TargetBranch" name="branch_targetBranch" style={{marginTop: 0}}>
-              <Input style={{marginLeft: 8, width: 360}}/>
+              <Select placeholder="请选择对应的目标分支！" style={{marginLeft: 8, width: 360}} showSearch mode="multiple">
+                {targetBranch}
+              </Select>
             </Form.Item>
 
-            <div style={{marginTop: -25, marginLeft: 103, fontSize: "x-small", color: "gray"}}>
-              待检查的上线分支。支持多个，中间以英文逗号进行分隔。<br/>示例：feature-budget,feature-project
-            </div>
-
-            <Form.Item label="MainSince" name="branch_mainSince" style={{marginTop: 0}}>
+            <Form.Item label="MainSince" name="branch_mainSince" style={{marginTop: -20}}>
               <DatePicker style={{marginLeft: 25, width: 360}}/>
             </Form.Item>
 

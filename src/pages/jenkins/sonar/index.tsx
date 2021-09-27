@@ -284,10 +284,11 @@ const JenkinsCheck: React.FC<any> = () => {
   // 确定执行任务
   const carrySonarCheck = () => {
     const modalData = formForCarrySonar.getFieldsValue()
+    debugger;
 
     // LanguageType 、 ProjectPath 和 BranchName不能为空
     const language = modalData.LanguageType;
-    if (language === undefined) {
+    if (!language) {
       message.error({
         content: `LanguageType 为必选项！`,
         duration: 1,
@@ -298,7 +299,7 @@ const JenkinsCheck: React.FC<any> = () => {
     }
 
     const ProjectPaths = modalData.ProjectPath;
-    if (ProjectPaths === undefined) {
+    if (!ProjectPaths) {
       message.error({
         content: `ProjectPaths 为必选项！`,
         duration: 1,
@@ -309,7 +310,7 @@ const JenkinsCheck: React.FC<any> = () => {
     }
 
     const BranchNames = modalData.BranchName;
-    if (BranchNames === undefined) {
+    if (!BranchNames) {
       message.error({
         content: `BranchName 为必选项！`,
         duration: 1,

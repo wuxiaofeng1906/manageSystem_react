@@ -737,7 +737,6 @@ const FrontTableList: React.FC<any> = () => {
             headerName: '任务燃尽图',
             field: 'chart',
             minWidth: 105,
-            pinned: 'right',
             cellRenderer: (params: any) => {
               if (params.data) {
                 return `<span style="color: blue"> 查看</span>`;

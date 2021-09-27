@@ -391,6 +391,18 @@ export default [
         component: './jenkins/sonar',
       }
     ],
+  }, {
+    name: '企业微信审批流',
+    icon: 'table',
+    path: '/ApprovalFlow',
+    access: 'sysAdmin',
+    routes: [
+      {
+        name: '开发hotfix上线申请',
+        path: 'devHotfixOnline',
+        component: './ApprovalFlow/devHotfixOnline',
+      }
+    ],
   },
   {
     name: '系统管理',

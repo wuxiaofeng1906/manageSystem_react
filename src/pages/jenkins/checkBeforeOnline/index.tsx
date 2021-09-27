@@ -9,7 +9,6 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {
   Button,
-  InputNumber,
   message,
   Form,
   DatePicker,
@@ -398,7 +397,6 @@ const JenkinsCheck: React.FC<any> = () => {
 
     }
 
-    debugger;
     if (teachnicalSide.length > 0 && mainBranch.length > 0) {
       // 传入参数错误：422  ；连接问题：422
 
@@ -485,7 +483,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
 
   // 每页显示多少条数据
-  const showItemChange = (pageCount: any) => {
+  const showItemChange = async (pageCount: any) => {
 
     setPages({
       ...Pages,
@@ -493,15 +491,10 @@ const JenkinsCheck: React.FC<any> = () => {
       totalPages: Math.ceil(Pages.totalCounts / Number(pageCount)),
     });
 
-  };
-
-  // 输入每页显示多少条数据后再进行数据查询，
-  const showAssignedData = async () => {
-
-    const newData = await queryDevelopViews(Pages.currentPage, Pages.countsOfPage);
+    const newData = await queryDevelopViews(Pages.currentPage, pageCount);
     gridApi.current?.setRowData(newData.datas);
-
   };
+
 
   // 上一页
   const showPreviousPage = async () => {
@@ -656,7 +649,6 @@ const JenkinsCheck: React.FC<any> = () => {
           });
 
         }
-
 
 
         // 设置显示的值。
@@ -880,8 +872,14 @@ const JenkinsCheck: React.FC<any> = () => {
 
         {/* 每页 XX 条 */}
         <label style={{marginLeft: 20, fontWeight: "bold"}}>每页</label>
-        <InputNumber style={{marginLeft: 10}} size={"middle"} min={1} max={10000} value={Pages.countsOfPage}
-                     onChange={showItemChange} onBlur={showAssignedData}/>
+
+        <Select style={{marginLeft: 10, width: 80}} onChange={showItemChange} value={Pages.countsOfPage}>
+          <Option value={20}>20 </Option>
+          <Option value={50}>50 </Option>
+          <Option value={100}>100 </Option>
+          <Option value={200}>200 </Option>
+        </Select>
+
         <label style={{marginLeft: 10, fontWeight: "bold"}}>条</label>
 
         <label style={{marginLeft: 10, fontWeight: "bold"}}>共 {Pages.totalPages} 页</label>

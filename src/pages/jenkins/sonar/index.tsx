@@ -9,7 +9,6 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {
   Button,
-  InputNumber,
   message,
   Form,
   Select,
@@ -21,8 +20,6 @@ import {
 
 import {getHeight} from '@/publicMethods/pageSet';
 import axios from 'axios';
-import dayjs from "dayjs";
-import moment from 'moment';
 
 const {Option} = Select;
 
@@ -284,7 +281,6 @@ const JenkinsCheck: React.FC<any> = () => {
   // 确定执行任务
   const carrySonarCheck = () => {
     const modalData = formForCarrySonar.getFieldsValue()
-    debugger;
 
     // LanguageType 、 ProjectPath 和 BranchName不能为空
     const language = modalData.LanguageType;
@@ -401,7 +397,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
 
   // 每页显示多少条数据
-  const showItemChange = (pageCount: any) => {
+  const showItemChange = async (pageCount: any) => {
 
     setPages({
       ...Pages,
@@ -409,12 +405,7 @@ const JenkinsCheck: React.FC<any> = () => {
       totalPages: Math.ceil(Pages.totalCounts / Number(pageCount)),
     });
 
-  };
-
-  // 输入每页显示多少条数据后再进行数据查询，
-  const showAssignedData = async () => {
-
-    const newData = await queryDevelopViews(Pages.currentPage, Pages.countsOfPage);
+    const newData = await queryDevelopViews(Pages.currentPage, pageCount);
     gridApi.current?.setRowData(newData.datas);
 
   };
@@ -766,8 +757,14 @@ const JenkinsCheck: React.FC<any> = () => {
 
         {/* 每页 XX 条 */}
         <label style={{marginLeft: 20, fontWeight: "bold"}}>每页</label>
-        <InputNumber style={{marginLeft: 10}} size={"middle"} min={1} max={10000} value={Pages.countsOfPage}
-                     onChange={showItemChange} onBlur={showAssignedData}/>
+        <Select style={{marginLeft: 10, width: 80}} onChange={showItemChange} value={Pages.countsOfPage}>
+          <Option value={20}>20 </Option>
+          <Option value={50}>50 </Option>
+          <Option value={100}>100 </Option>
+          <Option value={200}>200 </Option>
+        </Select>
+
+
         <label style={{marginLeft: 10, fontWeight: "bold"}}>条</label>
 
         <label style={{marginLeft: 10, fontWeight: "bold"}}>共 {Pages.totalPages} 页</label>

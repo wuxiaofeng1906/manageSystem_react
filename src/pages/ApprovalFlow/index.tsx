@@ -104,26 +104,6 @@ const JenkinsCheck: React.FC<any> = () => {
     setModalVisible(false);
   };
 
-  (window as any).showTest = (params: any) => {
-
-    setModalVisible(true);
-
-  };
-
-  const cellRendererForName = (params: any) => {
-    //
-
-    const content = JSON.stringify(params.value);
-    return `
-            <div>
-                <div style="margin-top: -15px">
-                     <button style="font-weight: bolder;border: none;background-color: transparent" onclick='showTest(${content})' > ... </button>
-                </div>
-
-                <div style="margin-top: -15px">${params.value}</div>
-
-            </div>`;
-  };
 
   const cellRendererForId = (params: any) => {
     return `
@@ -145,7 +125,6 @@ const JenkinsCheck: React.FC<any> = () => {
         headerName: '任务名称',
         field: 'taskName',
         minWidth: 150,
-        cellRenderer: cellRendererForName
       },
       {
         headerName: '开始时间',

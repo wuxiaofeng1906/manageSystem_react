@@ -1,5 +1,4 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {useModel} from "@@/plugin-model/useModel";
 import {PageContainer} from '@ant-design/pro-layout';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -7,7 +6,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {Button, message, Select, Input, Modal} from 'antd';
+import {Button, message, Select, Input} from 'antd';
 import {SearchOutlined} from '@ant-design/icons';
 import {getHeight} from '@/publicMethods/pageSet';
 import axios from 'axios';
@@ -333,7 +332,6 @@ const JenkinsCheck: React.FC<any> = () => {
             sortable: true,
             suppressMenu: true,
           }}
-
 
           rowHeight={70}
           onGridReady={onGridReady}

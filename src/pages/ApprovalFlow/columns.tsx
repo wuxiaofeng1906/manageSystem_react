@@ -34,7 +34,7 @@ const getChangeApplyColumns = () => {
     {
       headerName: '序号',
       field: 'ID',
-      maxWidth: 70,
+      minWidth: 70,
       pinned: 'left',
     },
     {
@@ -64,7 +64,7 @@ const getChangeApplyColumns = () => {
     {
       headerName: '变更来源',
       field: 'ID',
-      maxWidth: 100,
+      minWidth: 100,
       pinned: 'left',
     },
     {
@@ -94,7 +94,7 @@ const getChangeApplyColumns = () => {
     {
       headerName: '变更原因',
       field: '100',
-      maxWidth: 70,
+      minWidth: 70,
     },
     {
       headerName: '变更内容',
@@ -121,7 +121,7 @@ const getChangeApplyColumns = () => {
     {
       headerName: 'QA审批（Anyone）',
       field: 'ID',
-      maxWidth: 100,
+      minWidth: 100,
       cellRenderer: approvePerson
 
     },
@@ -154,7 +154,7 @@ const getChangeApplyColumns = () => {
     {
       headerName: '是否涉及交互修改',
       field: 'ID',
-      maxWidth: 100,
+      minWidth: 100,
     },
     {
       headerName: '原计划截止日期',
@@ -199,7 +199,7 @@ const getDevHotfixOnlineColumns = () => {
     {
       headerName: '序号',
       field: 'ID',
-      maxWidth: 70,
+      minWidth: 70,
       pinned: 'left',
     },
     {
@@ -229,7 +229,7 @@ const getDevHotfixOnlineColumns = () => {
     {
       headerName: '是否紧急修复',
       field: 'ID',
-      maxWidth: 100,
+      minWidth: 100,
       pinned: 'left',
     },
     {
@@ -259,7 +259,7 @@ const getDevHotfixOnlineColumns = () => {
     {
       headerName: 'hotfix编号',
       field: 'ID',
-      maxWidth: 100,
+      minWidth: 100,
     },
     {
       headerName: 'hotfix内容详情',
@@ -284,7 +284,7 @@ const getDevHotfixOnlineColumns = () => {
     {
       headerName: 'hotfix清单',
       field: 'ID',
-      maxWidth: 100,
+      minWidth: 100,
 
     },
     {
@@ -323,7 +323,7 @@ const getProductHotfixRepaireApplyColumns = () => {
     {
       headerName: '序号',
       field: 'ID',
-      maxWidth: 70,
+      minWidth: 70,
       pinned: 'left',
     },
     {
@@ -353,7 +353,7 @@ const getProductHotfixRepaireApplyColumns = () => {
     {
       headerName: '紧急程度',
       field: 'ID',
-      maxWidth: 100,
+      minWidth: 100,
       pinned: 'left',
     },
     {
@@ -383,7 +383,7 @@ const getProductHotfixRepaireApplyColumns = () => {
     {
       headerName: '备注',
       field: '100',
-      maxWidth: 70,
+      minWidth: 70,
     },
     {
       headerName: '指定审批人',
@@ -410,7 +410,7 @@ const getUEDHotfixApplyColumns = () => {
     {
       headerName: '序号',
       field: 'ID',
-      maxWidth: 70,
+      minWidth: 70,
       pinned: 'left',
     },
     {
@@ -440,7 +440,7 @@ const getUEDHotfixApplyColumns = () => {
     {
       headerName: '紧急程度',
       field: 'ID',
-      maxWidth: 100,
+      minWidth: 100,
       pinned: 'left',
     },
     {
@@ -470,7 +470,7 @@ const getUEDHotfixApplyColumns = () => {
     {
       headerName: 'hotfix修复内容',
       field: 'ID',
-      maxWidth: 100,
+      minWidth: 100,
     },
     {
       headerName: '修改说明/测试建议',
@@ -497,7 +497,7 @@ const getUEDHotfixApplyColumns = () => {
     {
       headerName: '测试经理审批（Anyone）',
       field: 'ID',
-      maxWidth: 100,
+      minWidth: 100,
       cellRenderer: approvePerson
 
     }
@@ -513,7 +513,7 @@ const getEmergencyApplyColumns = () => {
     {
       headerName: 'ID',
       field: 'ID',
-      maxWidth: 70,
+      minWidth: 70,
       pinned: 'left',
     },
     {
@@ -543,7 +543,7 @@ const getEmergencyApplyColumns = () => {
     {
       headerName: '开发经理',
       field: 'ID',
-      maxWidth: 100,
+      minWidth: 100,
       pinned: 'left',
     },
     {
@@ -573,7 +573,7 @@ const getEmergencyApplyColumns = () => {
     {
       headerName: 'emergency修复内容',
       field: 'ID',
-      maxWidth: 100,
+      minWidth: 100,
     },
     {
       headerName: '紧急原因及影响',

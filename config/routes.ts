@@ -396,13 +396,14 @@ export default [
     icon: 'table',
     path: '/ApprovalFlow',
     access: 'sysAdmin',
-    routes: [
-      {
-        name: '开发hotfix上线申请',
-        path: 'devHotfixOnline',
-        component: './ApprovalFlow/devHotfixOnline',
-      }
-    ],
+    component: './ApprovalFlow',
+    // routes: [
+    //   {
+    //     name: '开发hotfix上线申请',
+    //     path: 'devHotfixOnline',
+    //     component: './ApprovalFlow/devHotfixOnline',
+    //   }
+    // ],
   },
   {
     name: '系统管理',

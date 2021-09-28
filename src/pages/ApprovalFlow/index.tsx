@@ -7,11 +7,11 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {Button, message, Select, Input, Modal, Popconfirm} from 'antd';
-import {ExclamationCircleOutlined, SearchOutlined} from '@ant-design/icons';
-
+import {Button, message, Select, Input, Modal} from 'antd';
+import {SearchOutlined} from '@ant-design/icons';
 import {getHeight} from '@/publicMethods/pageSet';
 import axios from 'axios';
+import {getGridColums} from "./columns";
 
 const {Option} = Select;
 
@@ -85,69 +85,18 @@ const queryDevelopViews = async (pages: Number, pageSize: Number) => {
 
 };
 
+
 // 组件初始化
 const JenkinsCheck: React.FC<any> = () => {
 
-  const {initialState} = useModel('@@initialState');
-  const currentUser: any = {user_name: "", user_id: ""};
-  if (initialState?.currentUser) {
-    currentUser.user_name = initialState.currentUser === undefined ? "" : initialState.currentUser.name;
-    currentUser.user_id = initialState.currentUser === undefined ? "" : initialState.currentUser.userid;
-  }
+  const [approveType, setApproveType] = useState("emergency申请")
+  // const [condition, setCondition] = useState({
+  //
+  //
+  // });
 
 
   /* region  表格相关事件 */
-
-  /* region 定义列以及单元格的点击事件 */
-  const [isModalVisible, setModalVisible] = useState(false);
-  const handleCancel = () => {
-    setModalVisible(false);
-  };
-
-
-  const cellRendererForId = (params: any) => {
-    return `
-            <div>
-               <span style="display: inline-block; width: 140px">${params.value}</span>
-                 <label style="margin-left:10px;font-weight: bolder; color: #32D529">√</label>
-            </div>`;
-  };
-
-  // 定义列名
-  const colums = () => {
-    const component: any = [
-      {
-        headerName: 'ID',
-        field: 'ID',
-        maxWidth: 70,
-      },
-      {
-        headerName: '任务名称',
-        field: 'taskName',
-        minWidth: 150,
-      },
-      {
-        headerName: '开始时间',
-        field: 'starttime',
-        minWidth: 110,
-        cellRenderer: cellRendererForId
-      },
-      {
-        headerName: '结束时间',
-        field: 'endtime',
-        minWidth: 110,
-      },
-      {
-        headerName: '执行用户',
-        field: 'excUser',
-        minWidth: 90,
-      }
-    ];
-
-    return component;
-  };
-
-  /* endregion */
 
   const gridApi = useRef<GridApi>();
 
@@ -175,6 +124,9 @@ const JenkinsCheck: React.FC<any> = () => {
     params.api.sizeColumnsToFit();
   };
 
+
+  const columns: any = getGridColums("emergency申请");
+
   /* endregion */
 
 
@@ -194,11 +146,17 @@ const JenkinsCheck: React.FC<any> = () => {
 
   };
 
-  /* endregion */
+  // 切换审批类型
+  const changeAppType = (appType: any) => {
+    setApproveType(appType);
+
+    const new_columns: any = getGridColums(appType);
+    gridApi.current?.setColumnDefs(new_columns);
+
+  };
+
 
   /* region 翻页以及页面跳转功能 */
-  // https://www.ag-grid.com/react-data-grid/row-pagination/  数据分页
-
 
   // 每页显示多少条数据
   const showItemChange = async (pageCount: any) => {
@@ -223,10 +181,7 @@ const JenkinsCheck: React.FC<any> = () => {
         ...Pages,
         currentPage: Pages.currentPage - 1
       });
-
-
     }
-
     const newData = await queryDevelopViews(Pages.currentPage - 1, Pages.countsOfPage);
     gridApi.current?.setRowData(newData.datas);
 
@@ -329,7 +284,7 @@ const JenkinsCheck: React.FC<any> = () => {
       <div style={{height: 35, marginTop: -15, overflow: "hidden"}}>
 
         <label> 审批类型： </label>
-        <Select style={{width: '15%'}}>
+        <Select style={{width: '15%'}} onChange={changeAppType} value={approveType}>
           <Option value="开发hotfix上线申请">开发hotfix上线申请</Option>
           <Option value="产品hotfix修复申请">产品hotfix修复申请</Option>
           <Option value="UED-hotfix修复申请">UED-hotfix修复申请</Option>
@@ -371,16 +326,19 @@ const JenkinsCheck: React.FC<any> = () => {
       {/* ag-grid 表格定义 */}
       <div className="ag-theme-alpine" style={{marginTop: 3, height: gridHeight, width: '100%'}}>
         <AgGridReact
-          columnDefs={colums()} // 定义列
+          columnDefs={columns} // 定义列
           rowData={data?.datas} // 数据绑定
           defaultColDef={{
             resizable: true,
             sortable: true,
+            suppressMenu: true,
           }}
+
 
           rowHeight={70}
           onGridReady={onGridReady}
           onGridSizeChanged={onChangeGridReady}
+          onColumnEverythingChanged={onChangeGridReady}
         >
         </AgGridReact>
       </div>
@@ -427,17 +385,7 @@ const JenkinsCheck: React.FC<any> = () => {
                onBlur={goToPage}/>
         <label style={{marginLeft: 2, fontWeight: "bold"}}> 页 </label>
 
-
       </div>
-
-
-      <Modal title="Basic Modal" visible={isModalVisible} centered={true} onCancel={handleCancel}
-             footer={null}
-      >
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-      </Modal>
 
     </PageContainer>
   );

@@ -956,6 +956,7 @@ const FrontTableList: React.FC<any> = () => {
             groupDefaultExpanded={-1} // 展开分组
             onGridReady={onSourceGridReady}
             onGridSizeChanged={onSourceGridReady}
+            onColumnEverythingChanged={onSourceGridReady}
             suppressAggFuncInHeader={true} // 使用 aggFunc 时候不显示sum（。。） 就只显示名字
           >
 

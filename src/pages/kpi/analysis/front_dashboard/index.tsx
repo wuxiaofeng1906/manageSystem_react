@@ -44,12 +44,16 @@ const timeCellFormat = (params: any) => {
     return "";
   }
 
+  if (params.value === 0) {
+    return 0;
+  }
   const duration = (Number(params.value) / 3600).toFixed(2)
   return duration;
 };
 
 // 定义列名
 const alayThroughputData = (source: any, startTime: string, endTime: string) => {
+
   const data: any = [];
   source.forEach((dts: any) => {
     let deptname = '';
@@ -90,35 +94,52 @@ const alayRequestDatas = (oldData: any, reqDatas: any, avgRequestDura: any, bugR
     // 连接 对外请求--请求数
     const reqResult: any = [];
     oldData.forEach((o_dts: any) => {
+      let flag = 0;
       const o_details = o_dts;
       for (let index = 0; index < reqDatas.length; index += 1) {
         const dts = reqDatas[index];
+
         if (o_details.userId === dts.userId) {
           o_details['reCount'] = dts.count;
           reqResult.push(o_details);
+          flag = 1;
           break;
         }
+
+      }
+
+      if (flag === 0) {
+        o_details['reCount'] = 0;
+        reqResult.push(o_details);
       }
     });
 
-
+    // return reqResult;
     // 连接 对外请求--请求平均停留时长
     const waitDurResult: any = [];
     reqResult.forEach((o_dts: any) => {
+      let flag = 0;
       const o_details = o_dts;
       for (let index = 0; index < avgRequestDura.length; index += 1) {
         const dts = avgRequestDura[index];
         if (o_details.userId === dts.userId) {
           o_details['waitDura'] = dts.dura;
           waitDurResult.push(o_details);
+          flag = 1;
           break;
         }
       }
+      if (flag === 0) {
+        o_details['waitDura'] = 0;
+        waitDurResult.push(o_details);
+      }
+
     });
 
     // bug响应时长+bug响应数量
     const bugResponseDuraCountResult: any = [];
     waitDurResult.forEach((o_dts: any) => {
+      let flag = 0;
       const o_details = o_dts;
       for (let index = 0; index < bugResponseDuraCount.length; index += 1) {
         const dts = bugResponseDuraCount[index];
@@ -126,64 +147,96 @@ const alayRequestDatas = (oldData: any, reqDatas: any, avgRequestDura: any, bugR
           o_details['solveCount'] = dts.count;
           o_details['solveDur'] = dts.dura;
           bugResponseDuraCountResult.push(o_details);
+          flag = 1;
           break;
         }
       }
+      if (flag === 0) {
+        o_details['solveCount'] = 0;
+        o_details['solveDur'] = 0;
+        bugResponseDuraCountResult.push(o_details);
+      }
+
     });
 
     // 初始需求数
     const initStotryCountResult: any = [];
     bugResponseDuraCountResult.forEach((o_dts: any) => {
+      let flag = 0;
       const o_details = o_dts;
       for (let index = 0; index < initStotryCount.length; index += 1) {
         const dts = initStotryCount[index];
         if (o_details.userId === dts.userId) {
           o_details['initCount'] = dts.count;
           initStotryCountResult.push(o_details);
+          flag = 1;
           break;
         }
+      }
+      if (flag === 0) {
+        o_details['initCount'] = 0;
+        initStotryCountResult.push(o_details);
       }
     });
 
     // 初始需求完成数
     const initFinishCountResult: any = [];
     initStotryCountResult.forEach((o_dts: any) => {
+      let flag = 0;
       const o_details = o_dts;
       for (let index = 0; index < initFinishCount.length; index += 1) {
         const dts = initFinishCount[index];
         if (o_details.userId === dts.userId) {
           o_details['initFinishCount'] = dts.count;
           initFinishCountResult.push(o_details);
+          flag = 1;
           break;
         }
       }
+      if (flag === 0) {
+        o_details['initFinishCount'] = 0;
+        initFinishCountResult.push(o_details);
+      }
+
     });
 
     // 追加需求数
     const appendStoryCountResult: any = [];
     initFinishCountResult.forEach((o_dts: any) => {
+      let flag = 0;
       const o_details = o_dts;
       for (let index = 0; index < appendStoryCount.length; index += 1) {
         const dts = appendStoryCount[index];
         if (o_details.userId === dts.userId) {
           o_details['appStoryCount'] = dts.count;
           appendStoryCountResult.push(o_details);
+          flag = 1;
           break;
         }
+      }
+      if (flag === 0) {
+        o_details['appStoryCount'] = 0;
+        appendStoryCountResult.push(o_details);
       }
     });
 
     // 追加需求完成数
     const appendFinishCountResult: any = [];
     appendStoryCountResult.forEach((o_dts: any) => {
+      let flag = 0;
       const o_details = o_dts;
       for (let index = 0; index < appendFinishCount.length; index += 1) {
         const dts = appendFinishCount[index];
         if (o_details.userId === dts.userId) {
           o_details['appdFinishCount'] = dts.count;
           appendFinishCountResult.push(o_details);
+          flag = 1;
           break;
         }
+      }
+      if (flag === 0) {
+        o_details['appdFinishCount'] = 0;
+        appendFinishCountResult.push(o_details);
       }
     });
 

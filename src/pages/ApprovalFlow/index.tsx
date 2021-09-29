@@ -291,15 +291,7 @@ const JenkinsCheck: React.FC<any> = () => {
           <Option value="变更申请">变更申请</Option>
         </Select>
 
-        <label style={{marginLeft: 10}}> 项目经理： </label>
-        <Select style={{width: '10%'}}>
-          <Option value="开发hotfix上线申请">1</Option>
-          <Option value="产品hotfix修复申请">2</Option>
-          <Option value="UED-hotfix修复申请">UED-3</Option>
-          <Option value="emergency申请">4</Option>
-          <Option value="变更申请">5</Option>
-        </Select>
-        <label style={{marginLeft: 10}}> 变更申请人： </label>
+        <label style={{marginLeft: 10}}> 申请人： </label>
         <Select style={{width: '10%'}}>
           <Option value="开发hotfix上线申请">1</Option>
           <Option value="产品hotfix修复申请">2</Option>
@@ -307,6 +299,24 @@ const JenkinsCheck: React.FC<any> = () => {
           <Option value="emergency申请">4</Option>
           <Option value="变更申请">5</Option>
         </Select>
+        <label style={{marginLeft: 10, display: "hide"}}> 开发经理： </label>
+        <Select style={{width: '10%', display: "hide"}}>
+          <Option value="开发hotfix上线申请">1</Option>
+          <Option value="产品hotfix修复申请">2</Option>
+          <Option value="UED-hotfix修复申请">UED-3</Option>
+          <Option value="emergency申请">4</Option>
+          <Option value="变更申请">5</Option>
+        </Select>
+
+        <label style={{marginLeft: 10}}> 项目经理： </label>
+        <Select style={{width: '10%', display: "show"}}>
+          <Option value="开发hotfix上线申请">1</Option>
+          <Option value="产品hotfix修复申请">2</Option>
+          <Option value="UED-hotfix修复申请">UED-3</Option>
+          <Option value="emergency申请">4</Option>
+          <Option value="变更申请">5</Option>
+        </Select>
+
 
         <label style={{marginLeft: 10}}> 审批状态： </label>
         <Select style={{width: '10%'}}>

@@ -186,7 +186,11 @@ const getChangeApplyColumns = () => {
       headerName: '备注',
       field: 'excUser',
       minWidth: 90,
-    }
+    }, {
+      headerName: '提交时间',
+      field: 'excUser',
+      minWidth: 90,
+    },
   ];
 
   return columns;
@@ -294,6 +298,11 @@ const getDevHotfixOnlineColumns = () => {
 
     },
     {
+      headerName: '提交时间',
+      field: 'excUser',
+      minWidth: 90,
+    },
+    {
       headerName: '指定审批人',
       field: 'starttime',
       minWidth: 110,
@@ -384,6 +393,11 @@ const getProductHotfixRepaireApplyColumns = () => {
       headerName: '备注',
       field: '100',
       minWidth: 70,
+    },
+    {
+      headerName: '提交时间',
+      field: 'excUser',
+      minWidth: 90,
     },
     {
       headerName: '指定审批人',
@@ -481,6 +495,11 @@ const getUEDHotfixApplyColumns = () => {
       headerName: '备注',
       field: 'starttime',
       minWidth: 110,
+    },
+    {
+      headerName: '提交时间',
+      field: 'excUser',
+      minWidth: 90,
     },
     {
       headerName: '产妍负责人审批',
@@ -592,6 +611,11 @@ const getEmergencyApplyColumns = () => {
     },
     {
       headerName: '备注',
+      field: 'excUser',
+      minWidth: 90,
+    },
+    {
+      headerName: '提交时间',
       field: 'excUser',
       minWidth: 90,
     },

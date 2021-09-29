@@ -808,7 +808,7 @@ const JenkinsCheck: React.FC<any> = () => {
               <Button
                 style={{borderRadius: 5, marginTop: -100}}
                 onClick={checkModalCancel}>取消
-              </Button>,
+              </Button>
               <Button type="primary"
                       style={{
                         marginLeft: 10,

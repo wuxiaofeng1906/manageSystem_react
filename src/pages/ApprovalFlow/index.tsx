@@ -6,13 +6,14 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {Button, message, Select, Input} from 'antd';
+import {Button, message, Select, Input, DatePicker} from 'antd';
 import {SearchOutlined} from '@ant-design/icons';
 import {getHeight} from '@/publicMethods/pageSet';
 import axios from 'axios';
 import {getGridColums} from "./columns";
 
 const {Option} = Select;
+const {RangePicker} = DatePicker;
 
 // 查询数据
 const queryDevelopViews = async (pages: Number, pageSize: Number) => {
@@ -137,6 +138,11 @@ const JenkinsCheck: React.FC<any> = () => {
     jumpToPage: 0  // 跳转到第几页
   });
 
+  const [showCondition, setShowCondition] = useState({
+    devManager: "inline-block",
+    prjManager: "none"
+  });
+
   // 刷新表格
   const refreshGrid = async () => {
 
@@ -149,6 +155,17 @@ const JenkinsCheck: React.FC<any> = () => {
   const changeAppType = (appType: any) => {
     setApproveType(appType);
 
+    if (appType === "变更申请") {
+      setShowCondition({
+        devManager: "none",
+        prjManager: "inline-block"   // Internal
+      });
+    } else {
+      setShowCondition({
+        devManager: "inline-block",
+        prjManager: "none"
+      });
+    }
     const new_columns: any = getGridColums(appType);
     gridApi.current?.setColumnDefs(new_columns);
 
@@ -282,8 +299,8 @@ const JenkinsCheck: React.FC<any> = () => {
       {/* 按钮 */}
       <div style={{height: 35, marginTop: -15, overflow: "hidden"}}>
 
-        <label> 审批类型： </label>
-        <Select style={{width: '15%'}} onChange={changeAppType} value={approveType}>
+        <label> 类型： </label>
+        <Select style={{width: '10%'}} onChange={changeAppType} value={approveType}>
           <Option value="开发hotfix上线申请">开发hotfix上线申请</Option>
           <Option value="产品hotfix修复申请">产品hotfix修复申请</Option>
           <Option value="UED-hotfix修复申请">UED-hotfix修复申请</Option>
@@ -299,8 +316,9 @@ const JenkinsCheck: React.FC<any> = () => {
           <Option value="emergency申请">4</Option>
           <Option value="变更申请">5</Option>
         </Select>
-        <label style={{marginLeft: 10, display: "hide"}}> 开发经理： </label>
-        <Select style={{width: '10%', display: "hide"}}>
+
+        <label style={{marginLeft: 10, display: showCondition.devManager}}> 开发经理： </label>
+        <Select style={{width: '10%', display: showCondition.devManager,}}>
           <Option value="开发hotfix上线申请">1</Option>
           <Option value="产品hotfix修复申请">2</Option>
           <Option value="UED-hotfix修复申请">UED-3</Option>
@@ -308,8 +326,8 @@ const JenkinsCheck: React.FC<any> = () => {
           <Option value="变更申请">5</Option>
         </Select>
 
-        <label style={{marginLeft: 10}}> 项目经理： </label>
-        <Select style={{width: '10%', display: "show"}}>
+        <label style={{marginLeft: 10, display: showCondition.prjManager}}> 项目经理： </label>
+        <Select style={{width: '10%', display: showCondition.prjManager}}>
           <Option value="开发hotfix上线申请">1</Option>
           <Option value="产品hotfix修复申请">2</Option>
           <Option value="UED-hotfix修复申请">UED-3</Option>
@@ -318,7 +336,7 @@ const JenkinsCheck: React.FC<any> = () => {
         </Select>
 
 
-        <label style={{marginLeft: 10}}> 审批状态： </label>
+        <label style={{marginLeft: 10}}> 状态： </label>
         <Select style={{width: '10%'}}>
           <Option value="开发hotfix上线申请">全部</Option>
           <Option value="产品hotfix修复申请">审批中</Option>
@@ -326,6 +344,10 @@ const JenkinsCheck: React.FC<any> = () => {
           <Option value="emergency申请">审批通过</Option>
 
         </Select>
+
+
+        <label style={{marginLeft: 10}}> 时间： </label>
+        <RangePicker/>
 
         <Button icon={<SearchOutlined/>} style={{marginLeft: 10, borderRadius: 5}} onClick={refreshGrid}>查询</Button>
 

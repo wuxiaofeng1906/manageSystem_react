@@ -389,12 +389,10 @@ const JenkinsCheck: React.FC<any> = () => {
     const targets = modalData.branch_targetBranch;
 
     let target_branch = "";
-    if (targets.length > 0) {
+    if (targets !== undefined && targets.length > 0) {
       targets.forEach((dts: any) => {
         target_branch = target_branch === "" ? dts : `${target_branch},${dts}`;
-
       })
-
     }
 
     if (teachnicalSide.length > 0 && mainBranch.length > 0) {

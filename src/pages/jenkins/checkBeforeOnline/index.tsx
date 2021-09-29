@@ -398,23 +398,33 @@ const JenkinsCheck: React.FC<any> = () => {
     if (teachnicalSide.length > 0 && mainBranch.length > 0) {
       // 传入参数错误：422  ；连接问题：422
 
-      const datas = {
-        name: "popup-online-check",
-        user_name: currentUser.user_name,
-        user_id: currentUser.user_id,
-        job_parm: [
+      const params: any = [];
+      if (modalData.verson_check) {
+        params.push(
           {name: "BackendVersionCkeckFlag", value: modalData.verson_check},
           {name: "server", value: modalData.verson_server},
           {name: "imageBranch", value: modalData.verson_imagebranch},
-          {name: "imageEnv", value: modalData.verson_imageevn},
+          {name: "imageEnv", value: modalData.verson_imageevn}
+        );
+      }
+
+      if (modalData.branch_check) {
+        params.push(
           {name: "InclusionCheckFlag", value: modalData.branch_check},
           {name: "MainBranch", value: mainBranch},
           {name: "technicalSide", value: teachnicalSide},
           {name: "TargetBranch", value: target_branch},
           {name: "MainSince", value: dayjs(modalData.branch_mainSince).format("YYYY-MM-DD")}
+        );
+      }
 
-        ]
+      const datas = {
+        name: "popup-online-check",
+        user_name: currentUser.user_name,
+        user_id: currentUser.user_id,
+        job_parm: params
       };
+
 
       setLoadSate(true);
       axios.post('/api/verify/job/build', datas).then(async function (res) {

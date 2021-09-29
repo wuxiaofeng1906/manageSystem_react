@@ -216,8 +216,8 @@ const JenkinsCheck: React.FC<any> = () => {
   };
 
   const [projectPath, setProjectPath] = useState([]);
-  const LoadProjectPathCombobox = (language: string) => {
-    axios.get('/api/verify/sonar/project', {params: {kw: language}})
+  const LoadProjectPathCombobox = () => {
+    axios.get('/api/verify/sonar/project', {params: {}})
       .then(function (res) {
 
         if (res.data.code === 200) {
@@ -257,9 +257,6 @@ const JenkinsCheck: React.FC<any> = () => {
 
   };
 
-  const langeChanged = (value: any) => {
-    LoadProjectPathCombobox(value);
-  };
 
   /* endregion 下拉框数据加载 */
 
@@ -269,8 +266,9 @@ const JenkinsCheck: React.FC<any> = () => {
     setCheckModalVisible(true);
     setLoadSate(false);
     setIsButtonClick("inline");
+    LoadProjectPathCombobox();
     formForCarrySonar.setFieldsValue({
-      LanguageType: "",
+      LanguageType: "java",
       ProjectPath: "",
       BranchName: "",
       ProjectKey: "",
@@ -280,6 +278,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   // 确定执行任务
   const carrySonarCheck = () => {
+
     const modalData = formForCarrySonar.getFieldsValue()
 
     // LanguageType 、 ProjectPath 和 BranchName不能为空
@@ -839,7 +838,7 @@ const JenkinsCheck: React.FC<any> = () => {
           <div>
 
             <Form.Item name="LanguageType" label="LanguageType" style={{marginTop: -15}}>
-              <Select style={{width: 390}} onChange={langeChanged}>
+              <Select style={{width: 390}}>
                 <Option value="java">java</Option>
                 <Option value="ts">ts</Option>
                 <Option value="go">go</Option>

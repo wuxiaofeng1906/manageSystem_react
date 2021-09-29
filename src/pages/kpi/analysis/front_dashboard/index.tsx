@@ -15,9 +15,7 @@ import {useRequest} from 'ahooks';
 import dayjs from 'dayjs';
 import * as echarts from 'echarts';
 import './styles.css';
-import {timestampChanges} from "@/publicMethods/cellRenderer";
 
-// import ReactEcharts from 'echarts-for-react';
 
 const {RangePicker} = DatePicker;
 
@@ -413,8 +411,8 @@ const FrontTableList: React.FC<any> = () => {
   const [selectedFiled, setSelectedFiled] = useState(['']);
   const nessField = ['NO.', '部门', '组', '姓名'];
   const unNessField = [
-    'Bug解决时长(H)',
-    'Bug数量',
+    'Bug响应时长(H)',
+    'Bug响应数',
     '任务燃尽图',
     '初始需求数',
     '初始需求完成数',
@@ -686,13 +684,13 @@ const FrontTableList: React.FC<any> = () => {
         headerName: '周期时间',
         children: [
           {
-            headerName: 'Bug解决时长(H)',
+            headerName: 'Bug响应时长(H)',
             field: 'solveDur',
             minWidth: 133,
             valueFormatter: timeCellFormat,
           },
           {
-            headerName: 'Bug数量',
+            headerName: 'Bug响应数',
             field: 'solveCount',
             minWidth: 88,
           },
@@ -1004,10 +1002,10 @@ const FrontTableList: React.FC<any> = () => {
                     </Checkbox>
                   </Col>
                   <Col span={4}>
-                    <Checkbox value="Bug解决时长(H)">Bug解决时长</Checkbox>
+                    <Checkbox value="Bug响应时长(H)">Bug响应时长</Checkbox>
                   </Col>
                   <Col span={4}>
-                    <Checkbox value="Bug数量">Bug数量</Checkbox>
+                    <Checkbox value="Bug响应数">Bug响应数</Checkbox>
                   </Col>
                   <Col span={4}>
                     <Checkbox value="任务燃尽图">任务燃尽图</Checkbox>

@@ -140,12 +140,17 @@ const SprintList: React.FC<any> = () => {
           if (params.value === "emergency20210728") {
             return `<a  style="color:blue;text-decoration: underline" >多组织阻塞bug跟踪</a>`;
           }
+          if (params.value === "emergency20210930") {
+            return `<a  style="color:blue;text-decoration: underline" >线上问题跟踪</a>`;
+          }
           return `<a  style="color:blue;text-decoration: underline" >${params.value}</a>`;
         },
         onCellClicked: (params: any) => {
           // console.log('params', params.data);
           if (params.data.name === "emergency20210728") {
             history.push(`/sprint/sprintListDetails?projectid=${params.data.id}&project=多组织阻塞bug跟踪`);
+          } else if (params.value === "emergency20210930") {
+            history.push(`/sprint/sprintListDetails?projectid=${params.data.id}&project=线上问题跟踪`);
           } else {
             history.push(`/sprint/sprintListDetails?projectid=${params.data.id}&project=${params.data.name}`);
           }

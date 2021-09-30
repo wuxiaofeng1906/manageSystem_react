@@ -861,13 +861,13 @@ const JenkinsCheck: React.FC<any> = () => {
     <PageContainer style={{marginLeft: -30, marginRight: -30}}>
 
       {/* 按钮 */}
-      <div style={{background: 'white', marginTop: -22,height:42}}>
+      <div style={{background: 'white', marginTop: -22, height: 42}}>
         {/* 使用一个图标就要导入一个图标 */}
 
         {/*<Button type="primary" style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}*/}
         {/*        onClick={runTaskBeforeOnline}>执行上线前检查任务</Button>*/}
-        <Button type="text" onClick={runTaskBeforeOnline} style={{padding:10}}>
-          <img  src="../operate.png" width="22" height="22"   alt="执行上线前检查任务" title="执行上线前检查任务"/> &nbsp;执行上线前检查任务
+        <Button type="text" onClick={runTaskBeforeOnline} style={{padding: 10}}>
+          <img src="../operate.png" width="22" height="22" alt="执行上线前检查任务" title="执行上线前检查任务"/> &nbsp;执行上线前检查任务
         </Button>
 
 
@@ -964,7 +964,7 @@ const JenkinsCheck: React.FC<any> = () => {
               <Button
                 style={{borderRadius: 5, marginTop: -100}}
                 onClick={checkModalCancel}>取消
-              </Button>,
+              </Button>
 
               <Button type="primary"
                       style={{

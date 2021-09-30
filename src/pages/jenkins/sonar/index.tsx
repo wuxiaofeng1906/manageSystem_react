@@ -20,6 +20,7 @@ import {
 
 import {getHeight} from '@/publicMethods/pageSet';
 import axios from 'axios';
+import {history} from "@@/core/history";
 
 const {Option} = Select;
 
@@ -495,6 +496,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   /* region 定义列以及单元格的点击事件 */
 
+
   (window as any).showParams = (params: any) => {
 
     setCheckModalVisible(true);
@@ -586,17 +588,17 @@ const JenkinsCheck: React.FC<any> = () => {
       {
         headerName: '任务名称',
         field: 'taskName',
-        minWidth: 150,
+        minWidth: 170,
       },
       {
         headerName: '开始时间',
         field: 'starttime',
-        minWidth: 110,
+        minWidth: 170,
       },
       {
         headerName: '结束时间',
         field: 'endtime',
-        minWidth: 110,
+        minWidth: 170,
       },
       {
         headerName: '执行用户',
@@ -606,7 +608,7 @@ const JenkinsCheck: React.FC<any> = () => {
       {
         headerName: '执行状态',
         field: 'excStatus',
-        minWidth: 95,
+        minWidth: 100,
         cellRenderer: (params: any) => {
           if (params.value === "ABORTED ") {
             return `<span style="font-size: large; color:gray">aborted</span>`;
@@ -628,7 +630,7 @@ const JenkinsCheck: React.FC<any> = () => {
       {
         headerName: '执行结果',
         field: 'excResult',
-        minWidth: 95,
+        minWidth: 100,
         cellRenderer: (params: any) => {
 
           if (params.value === "ABORTED ") {
@@ -648,38 +650,58 @@ const JenkinsCheck: React.FC<any> = () => {
           return `<span style="font-size: large;">${params.value}</span>`;
         }
       },
+      // {
+      //   headerName: '任务URL',
+      //   field: 'url',
+      //   minWidth: 200,
+      //   cellRenderer: (params: any) => {
+      //     if (params.value === undefined) {
+      //       return "";
+      //     }
+      //
+      //     return `<a href="${params.value}" target="_blank" style="text-decoration: underline">${params.value}</a>`;
+      //   }
+      // },
+      // {
+      //   headerName: '任务日志',
+      //   field: 'taskLog',
+      //   minWidth: 200,
+      //   cellRenderer: (params: any) => {
+      //     if (params.value === undefined) {
+      //       return "";
+      //     }
+      //     return `<a href="${params.value}" target="_blank" style="text-decoration: underline">${params.value}</a>`;
+      //   }
+      //
+      // }, {
+      //   headerName: '执行参数',
+      //   cellRenderer: (params: any) => {
+      //
+      //     const datas = JSON.stringify(params.data);
+      //     return `<button  style="width:100%;border: none; background-color: #AAAAAA; font-size: small; color: white" onclick='showParams(${datas})'> 查看参数 </button>`
+      //
+      //   }
+      // },
       {
-        headerName: '任务URL',
-        field: 'url',
-        minWidth: 200,
-        cellRenderer: (params: any) => {
-          if (params.value === undefined) {
-            return "";
-          }
-
-          return `<a href="${params.value}" target="_blank" style="text-decoration: underline">${params.value}</a>`;
-        }
-      },
-      {
-        headerName: '任务日志',
-        field: 'taskLog',
-        minWidth: 200,
-        cellRenderer: (params: any) => {
-          if (params.value === undefined) {
-            return "";
-          }
-          return `<a href="${params.value}" target="_blank" style="text-decoration: underline">${params.value}</a>`;
-        }
-
-      }, {
-        headerName: '执行参数',
+        headerName: '操作',
+        minWidth: 130,
         cellRenderer: (params: any) => {
 
-          const datas = JSON.stringify(params.data);
-          return `<button  style="width:100%;border: none; background-color: #AAAAAA; font-size: small; color: white" onclick='showParams(${datas})'> 查看参数 </button>`
+          const paramData = JSON.stringify(params.data);
+          return `
+             <a href="${params.data.taskLog}" target="_blank" >
+               <img src="../taskUrl.png" width="20" height="20" alt="任务URL" title="任务URL">
+             </a>
+             <a href="${params.data.taskLog}" target="_blank" >
+               <img src="../logs.png" width="20" height="20" alt="任务日志" title="任务日志">
+             </a>
+            <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='showParams(${paramData})'>
+              <img src="../params.png" width="20" height="20" alt="执行参数" title="执行参数">
+            </Button>`;
 
         }
-      }];
+      }
+    ];
 
     return component;
   };
@@ -713,15 +735,25 @@ const JenkinsCheck: React.FC<any> = () => {
     <PageContainer style={{marginLeft: -30, marginRight: -30}}>
 
       {/* 按钮 */}
-      <div style={{background: 'white', marginTop: -20}}>
+      <div style={{background: 'white', marginTop: -20,height:42}}>
         {/* 使用一个图标就要导入一个图标 */}
 
-        <Button type="primary" style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}
-                onClick={runSonarTask}>执行sonar扫描任务</Button>
+        {/*<Button type="primary" style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}*/}
+        {/*        onClick={runSonarTask}>执行sonar扫描任务</Button>*/}
+        <Button type="text" onClick={runSonarTask} style={{padding: 10}}>
+          <img src="../operate.png" width="22" height="22" alt="执行sonar扫描任务" title="执行sonar扫描任务"/> &nbsp;执行上线前检查任务
+        </Button>
 
-        <Button type="primary"
-                style={{marginLeft: 10, color: '#32D529', backgroundColor: "#ECF5FF", borderRadius: 5}}
-                onClick={refreshGrid}>刷新</Button>
+
+        {/*<Button type="primary"*/}
+        {/*        style={{marginLeft: 10, color: '#32D529', backgroundColor: "#ECF5FF", borderRadius: 5}}*/}
+        {/*        onClick={refreshGrid}>刷新</Button>*/}
+
+        <Button type="text" onClick={refreshGrid}>
+          <img src="../refresh.png" width="30" height="30" alt="刷新" title="刷新"/> 刷新
+        </Button>
+
+
       </div>
 
       {/* ag-grid 表格定义 */}
@@ -732,12 +764,12 @@ const JenkinsCheck: React.FC<any> = () => {
           defaultColDef={{
             resizable: true,
             sortable: true,
-            minWidth: 100,
+            // minWidth: 100,
             suppressMenu: true,
             // 自动换行显示
-            wrapText: true,
+            // wrapText: true,
             // 自动行高
-            autoHeight: true,
+            // autoHeight: true,
             cellStyle: {"border-right": "solid 0.5px #E3E6E6"}
             //  BABFC7 lightgrey EAEDED E3E6E6
           }}

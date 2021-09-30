@@ -28,6 +28,9 @@ import axios from 'axios';
 
 import dayjs from "dayjs";
 import moment from 'moment';
+import {history} from "@@/core/history";
+import {judgeAuthority} from "@/publicMethods/authorityJudge";
+import {SnippetsTwoTone} from "@ant-design/icons";
 
 const {Option} = Select;
 
@@ -807,24 +810,24 @@ const JenkinsCheck: React.FC<any> = () => {
 
       {
         headerName: '操作',
-        minWidth: 150,
+        minWidth: 130,
         cellRenderer: (params: any) => {
 
-          const datas = JSON.stringify(params.data);
+          const paramData = JSON.stringify(params.data);
           return `
-            <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC;"  onclick='showParams(${datas})'>
-                <img src="../taskUrl.png" width="20" height="20" alt="任务URL" title="任务URL">
-           </Button>
-
-            <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='showParams(${datas})'>
-                <img src="../logs.png" width="20" height="20" alt="任务日志" title="任务日志">
-            </Button>
-            <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='showParams(${datas})'>
-              <img src="../params.png" width="20" height="20" alt="执行参数" title="执行参数">
+             <a href="${params.data.taskLog}" target="_blank" >
+               <img src="../taskUrl.png" width="20" height="20" alt="任务URL" title="任务URL" />
+             </a>
+             <a href="${params.data.taskLog}" target="_blank" >
+               <img src="../logs.png" width="20" height="20" alt="任务日志" title="任务日志" />
+             </a>
+            <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='showParams(${paramData})'>
+              <img src="../params.png" width="20" height="20" alt="执行参数" title="执行参数" />
             </Button>`;
 
         }
-      },];
+      }
+    ];
 
     return component;
   };
@@ -858,15 +861,23 @@ const JenkinsCheck: React.FC<any> = () => {
     <PageContainer style={{marginLeft: -30, marginRight: -30}}>
 
       {/* 按钮 */}
-      <div style={{background: 'white', marginTop: -20}}>
+      <div style={{background: 'white', marginTop: -22,height:42}}>
         {/* 使用一个图标就要导入一个图标 */}
 
-        <Button type="primary" style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}
-                onClick={runTaskBeforeOnline}>执行上线前检查任务</Button>
+        {/*<Button type="primary" style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}*/}
+        {/*        onClick={runTaskBeforeOnline}>执行上线前检查任务</Button>*/}
+        <Button type="text" onClick={runTaskBeforeOnline} style={{padding:10}}>
+          <img  src="../operate.png" width="22" height="22"   alt="执行上线前检查任务" title="执行上线前检查任务"/> &nbsp;执行上线前检查任务
+        </Button>
 
-        <Button type="primary"
-                style={{marginLeft: 10, color: '#32D529', backgroundColor: "#ECF5FF", borderRadius: 5}}
-                onClick={refreshGrid}>刷新</Button>
+
+        {/*<Button type="primary"*/}
+        {/*        style={{marginLeft: 10, color: '#32D529', backgroundColor: "#ECF5FF", borderRadius: 5}}*/}
+        {/*        onClick={refreshGrid}>刷新</Button>*/}
+
+        <Button type="text" onClick={refreshGrid}>
+          <img src="../refresh.png" width="30" height="30" alt="刷新" title="刷新"/> 刷新
+        </Button>
       </div>
 
       {/* ag-grid 表格定义 */}

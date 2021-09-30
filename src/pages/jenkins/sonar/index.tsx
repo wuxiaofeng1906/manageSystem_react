@@ -697,7 +697,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
           const paramData = JSON.stringify(params.data);
           return `
-             <a href="${params.data.taskLog}" target="_blank" >
+             <a href="${params.data.url}" target="_blank" >
                <img src="../taskUrl.png" width="20" height="20" alt="任务URL" title="任务URL">
              </a>
              <a href="${params.data.taskLog}" target="_blank" >

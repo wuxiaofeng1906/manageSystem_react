@@ -20,7 +20,6 @@ import {
 
 import {getHeight} from '@/publicMethods/pageSet';
 import axios from 'axios';
-import {history} from "@@/core/history";
 
 const {Option} = Select;
 
@@ -215,6 +214,15 @@ const JenkinsCheck: React.FC<any> = () => {
     LoadBranchNameCombobox(params.key);
 
   };
+
+  const branchChanged = (value: any) => {
+    const name = formForCarrySonar.getFieldsValue();
+    debugger;
+    formForCarrySonar.setFieldsValue({
+      ProjectKey: `${name.ProjectKey}-${value}`,
+
+    });
+  }
 
   const [projectPath, setProjectPath] = useState([]);
   const LoadProjectPathCombobox = () => {
@@ -735,7 +743,7 @@ const JenkinsCheck: React.FC<any> = () => {
     <PageContainer style={{marginLeft: -30, marginRight: -30}}>
 
       {/* 按钮 */}
-      <div style={{background: 'white', marginTop: -20,height:42}}>
+      <div style={{background: 'white', marginTop: -20, height: 42}}>
         {/* 使用一个图标就要导入一个图标 */}
 
         {/*<Button type="primary" style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}*/}
@@ -890,7 +898,7 @@ const JenkinsCheck: React.FC<any> = () => {
             </div>
 
             <Form.Item name="BranchName" label="BranchName" style={{marginTop: 7}}>
-              <Select showSearch style={{marginLeft: 10, width: 390}}>
+              <Select showSearch style={{marginLeft: 10, width: 390}} onChange={branchChanged}>
                 {branchName}
               </Select>
             </Form.Item>

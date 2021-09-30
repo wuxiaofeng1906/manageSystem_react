@@ -710,17 +710,17 @@ const JenkinsCheck: React.FC<any> = () => {
       {
         headerName: '任务名称',
         field: 'taskName',
-        minWidth: 150,
+        minWidth: 170,
       },
       {
         headerName: '开始时间',
         field: 'starttime',
-        minWidth: 110,
+        minWidth: 170,
       },
       {
         headerName: '结束时间',
         field: 'endtime',
-        minWidth: 110,
+        minWidth: 170,
       },
       {
         headerName: '执行用户',
@@ -730,7 +730,7 @@ const JenkinsCheck: React.FC<any> = () => {
       {
         headerName: '执行状态',
         field: 'excStatus',
-        minWidth: 95,
+        minWidth: 100,
         cellRenderer: (params: any) => {
           if (params.value === "ABORTED ") {
             return `<span style="font-size: large; color:gray">aborted</span>`;
@@ -752,7 +752,7 @@ const JenkinsCheck: React.FC<any> = () => {
       {
         headerName: '执行结果',
         field: 'excResult',
-        minWidth: 95,
+        minWidth: 100,
         cellRenderer: (params: any) => {
 
           if (params.value === "ABORTED ") {
@@ -772,38 +772,59 @@ const JenkinsCheck: React.FC<any> = () => {
           return `<span style="font-size: large;">${params.value}</span>`;
         }
       },
-      {
-        headerName: '任务URL',
-        field: 'url',
-        minWidth: 200,
-        cellRenderer: (params: any) => {
-          if (params.value === undefined) {
-            return "";
-          }
+      // {
+      //   headerName: '任务URL',
+      //   field: 'url',
+      //   minWidth: 100,
+      //   cellRenderer: (params: any) => {
+      //     if (params.value === undefined) {
+      //       return "";
+      //     }
+      //
+      //     return `<a href="${params.value}" target="_blank" style="text-decoration: underline">点击查看</a>`;
+      //   }
+      // },
+      // {
+      //   headerName: '任务日志',
+      //   field: 'taskLog',
+      //   minWidth: 100,
+      //   cellRenderer: (params: any) => {
+      //     if (params.value === undefined) {
+      //       return "";
+      //     }
+      //     return `<a href="${params.value}" target="_blank" style="text-decoration: underline">点击查看</a>`;
+      //   }
+      //
+      // }, {
+      //   headerName: '执行参数',
+      //   cellRenderer: (params: any) => {
+      //
+      //     const datas = JSON.stringify(params.data);
+      //     return `<button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='showParams(${datas})'> 点击查看 </button>`
+      //
+      //   }
+      // },
 
-          return `<a href="${params.value}" target="_blank" style="text-decoration: underline">${params.value}</a>`;
-        }
-      },
       {
-        headerName: '任务日志',
-        field: 'taskLog',
-        minWidth: 200,
-        cellRenderer: (params: any) => {
-          if (params.value === undefined) {
-            return "";
-          }
-          return `<a href="${params.value}" target="_blank" style="text-decoration: underline">${params.value}</a>`;
-        }
-
-      }, {
-        headerName: '执行参数',
+        headerName: '操作',
+        minWidth: 150,
         cellRenderer: (params: any) => {
 
           const datas = JSON.stringify(params.data);
-          return `<button  style="width:100%;border: none; background-color: #AAAAAA; font-size: small; color: white" onclick='showParams(${datas})'> 查看参数 </button>`
+          return `
+            <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC;"  onclick='showParams(${datas})'>
+                <img src="../taskUrl.png" width="20" height="20" alt="任务URL" title="任务URL">
+           </Button>
+
+            <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='showParams(${datas})'>
+                <img src="../logs.png" width="20" height="20" alt="任务日志" title="任务日志">
+            </Button>
+            <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='showParams(${datas})'>
+              <img src="../params.png" width="20" height="20" alt="执行参数" title="执行参数">
+            </Button>`;
 
         }
-      }];
+      },];
 
     return component;
   };
@@ -859,9 +880,9 @@ const JenkinsCheck: React.FC<any> = () => {
             minWidth: 100,
             suppressMenu: true,
             // 自动换行显示
-            wrapText: true,
+            // wrapText: true,
             // 自动行高
-            autoHeight: true,
+            // autoHeight: true,
             cellStyle: {"border-right": "solid 0.5px #E3E6E6"}
             //  BABFC7 lightgrey EAEDED E3E6E6
           }}

@@ -749,7 +749,7 @@ const JenkinsCheck: React.FC<any> = () => {
         {/*<Button type="primary" style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}*/}
         {/*        onClick={runSonarTask}>执行sonar扫描任务</Button>*/}
         <Button type="text" onClick={runSonarTask} style={{padding: 10}}>
-          <img src="../operate.png" width="22" height="22" alt="执行sonar扫描任务" title="执行sonar扫描任务"/> &nbsp;执行上线前检查任务
+          <img src="../operate.png" width="22" height="22" alt="执行sonar扫描任务" title="执行sonar扫描任务"/> &nbsp;执行sonar扫描任务
         </Button>
 
 

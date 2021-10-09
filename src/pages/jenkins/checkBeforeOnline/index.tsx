@@ -109,8 +109,8 @@ const queryDevelopViews = async (pages: Number, pageSize: Number) => {
 const JenkinsCheck: React.FC<any> = () => {
 
 
-  // const sys_accessToken = localStorage.getItem("accessId");
-  // axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
+  const sys_accessToken = localStorage.getItem("accessId");
+  axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
   const {initialState} = useModel('@@initialState');
   const currentUser: any = {user_name: "", user_id: ""};
   if (initialState?.currentUser) {
@@ -430,8 +430,10 @@ const JenkinsCheck: React.FC<any> = () => {
 
 
       setLoadSate(true);
-      axios.post('/api/verify/job/build', datas).then(async function (res) {
+      // axios.post('/api/verify/job/build', datas).then(async function (res) {
+      axios.post('/api/job/build', datas).then(async function (res) {
 
+        debugger;
         if (res.data.code === 200) {
           const newData = await queryDevelopViews(1, 20);
 
@@ -455,17 +457,16 @@ const JenkinsCheck: React.FC<any> = () => {
           });
           setLoadSate(false);
         }
-      })
-        .catch(function (error) {
-          message.error({
-            content: `异常信息：${error.toString()}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-          setLoadSate(false);
+      }).catch(function (error) {
+        message.error({
+          content: `异常信息：${error.toString()}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
         });
+        setLoadSate(false);
+      });
     }
 
 
@@ -736,20 +737,20 @@ const JenkinsCheck: React.FC<any> = () => {
         minWidth: 100,
         cellRenderer: (params: any) => {
           if (params.value === "ABORTED ") {
-            return `<span style="font-size: large; color:gray">aborted</span>`;
+            return `<span style="font-size:medium; color:gray">aborted</span>`;
           }
 
           if (params.value === null) {
-            return `<span style="font-size: large; color:#46A0FC">running</span>`;
+            return `<span style="font-size: medium; color:#46A0FC">running</span>`;
           }
           if (params.value === "SUCCESS") {
-            return `<span style="font-size: large; color:#32D529">success</span>`;
+            return `<span style="font-size: medium; color:#32D529">success</span>`;
           }
 
           if (params.value === "FAILURE") {
-            return `<span style="font-size: large;color: red">failure</span>`;
+            return `<span style="font-size: medium;color: red">failure</span>`;
           }
-          return `<span style="font-size: large;">${params.value}</span>`;
+          return `<span style="font-size: medium;">${params.value}</span>`;
         }
       },
       {
@@ -759,20 +760,20 @@ const JenkinsCheck: React.FC<any> = () => {
         cellRenderer: (params: any) => {
 
           if (params.value === "ABORTED ") {
-            return `<span style="font-size: large; color:gray">aborted</span>`;
+            return `<span style="font-size: medium; color:gray">aborted</span>`;
           }
 
           if (params.value === null) {
-            return `<span style="font-size: large; "> </span>`;
+            return `<span style="font-size: medium; "> </span>`;
           }
           if (params.value === "SUCCESS") {
-            return `<span style="font-size: large; color:#32D529">success</span>`;
+            return `<span style="font-size: medium; color:#32D529">success</span>`;
           }
 
           if (params.value === "FAILURE") {
-            return `<span style="font-size: large;color: red">failure</span>`;
+            return `<span style="font-size: medium;color: red">failure</span>`;
           }
-          return `<span style="font-size: large;">${params.value}</span>`;
+          return `<span style="font-size: medium;">${params.value}</span>`;
         }
       },
       // {

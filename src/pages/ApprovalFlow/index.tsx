@@ -89,6 +89,172 @@ const queryDevelopViews = async (pages: Number, pageSize: Number) => {
 // 组件初始化
 const JenkinsCheck: React.FC<any> = () => {
 
+
+  /* region 获取下拉框选项 */
+
+  const [approvalType, setApprovalType] = useState([]);
+  const getApprovalType = () => {
+    axios.get('/api/wechat/apply/template', {params: {}})
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+          const typeDatas = res.data.data;
+          const typeOp: any = [];
+          for (let index = 0; index < typeDatas.length; index += 1) {
+            const id = typeDatas[index].template_id;
+            const name = typeDatas[index].template_name
+            typeOp.push(
+              <Option value={id}>{name}</Option>,
+            );
+          }
+          setApprovalType(typeOp);
+        } else {
+          message.error({
+            content: `错误：${res.data.msg}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+      }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+
+  };
+
+  const [applicant, setApplicant] = useState([]);
+  const getApplicant = () => {
+    axios.get('/api/wechat/apply/applicant', {params: {}})
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+          const applicantDatas = res.data.data;
+          const applicantOp: any = [<Option key={""} value={""}>{""}</Option>];
+          for (let index = 0; index < applicantDatas.length; index += 1) {
+            const id = applicantDatas[index].user_id;
+            const name = applicantDatas[index].user_name
+            applicantOp.push(
+              <Option key={id} value={name}>{name}</Option>
+            );
+          }
+          setApplicant(applicantOp);
+        } else {
+          message.error({
+            content: `错误：${res.data.msg}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+      }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+
+  };
+
+  const [status, setStatus] = useState([]);
+  const getStatus = () => {
+    axios.get('/api/wechat/apply/approval_status', {params: {}})
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+          const statusDatas = res.data.data;
+          const statustOp: any = [<Option key={""} value={""}>{""}</Option>];
+          for (let index = 0; index < statusDatas.length; index += 1) {
+            const id = statusDatas[index].approval_id;
+            const name = statusDatas[index].approval_status
+            statustOp.push(
+              <Option key={id} value={name}>{name}</Option>
+            );
+          }
+          setStatus(statustOp);
+        } else {
+          message.error({
+            content: `错误：${res.data.msg}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+      }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+
+  };
+
+  const [managers, setManagers] = useState([]);
+  const getManagers = (appType: string) => {
+    axios.get('/api/wechat/apply/leader', {params: {temp_id: appType}})
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+          const managersDatas = res.data.data;
+          const managerstOp: any = [<Option key={""} value={""}>{""}</Option>];
+          for (let index = 0; index < managersDatas.length; index += 1) {
+            // const id = managersDatas[index].approval_id;
+            const name = managersDatas[index].leader
+            managerstOp.push(
+              <Option key={name} value={name}>{name}</Option>
+            );
+          }
+          setManagers(managerstOp);
+        } else {
+          message.error({
+            content: `错误：${res.data.msg}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+      }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+
+  };
+
+  /* endregion */
+
+
   const [approveType, setApproveType] = useState("emergency申请")
   // const [condition, setCondition] = useState({
   //
@@ -152,10 +318,13 @@ const JenkinsCheck: React.FC<any> = () => {
   };
 
   // 切换审批类型
-  const changeAppType = (appType: any) => {
+  const changeAppType = (appType: any, allParams: any) => {
+
+    // 根据单据类型显示不同的经理选项（项目经理和开发经理）
+    getManagers(appType);
     setApproveType(appType);
 
-    if (appType === "变更申请") {
+    if (appType === "Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt") {
       setShowCondition({
         devManager: "none",
         prjManager: "inline-block"   // Internal
@@ -166,7 +335,7 @@ const JenkinsCheck: React.FC<any> = () => {
         prjManager: "none"
       });
     }
-    const new_columns: any = getGridColums(appType);
+    const new_columns: any = getGridColums(allParams.children);
     gridApi.current?.setColumnDefs(new_columns);
 
   };
@@ -269,8 +438,11 @@ const JenkinsCheck: React.FC<any> = () => {
   }
   /* endregion */
 
-
   useEffect(() => {
+    getApprovalType();
+    getApplicant();
+    getStatus();
+    getManagers("Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu");
 
     let totalCount = 0;
     let countsOfPages = 1;
@@ -301,47 +473,52 @@ const JenkinsCheck: React.FC<any> = () => {
 
         <label> 类型： </label>
         <Select style={{width: '10%'}} onChange={changeAppType} value={approveType}>
-          <Option value="开发hotfix上线申请">开发hotfix上线申请</Option>
+          {approvalType}
+          {/* <Option value="开发hotfix上线申请">开发hotfix上线申请</Option>
           <Option value="产品hotfix修复申请">产品hotfix修复申请</Option>
           <Option value="UED-hotfix修复申请">UED-hotfix修复申请</Option>
           <Option value="emergency申请">emergency申请</Option>
-          <Option value="变更申请">变更申请</Option>
+          <Option value="变更申请">变更申请</Option> */}
         </Select>
 
         <label style={{marginLeft: 10}}> 申请人： </label>
-        <Select style={{width: '10%'}}>
-          <Option value="开发hotfix上线申请">1</Option>
+        <Select style={{width: '10%'}} showSearch>
+          {applicant}
+          {/* <Option value="开发hotfix上线申请">1</Option>
           <Option value="产品hotfix修复申请">2</Option>
           <Option value="UED-hotfix修复申请">3-hotfix修复申请</Option>
           <Option value="emergency申请">4</Option>
-          <Option value="变更申请">5</Option>
+          <Option value="变更申请">5</Option> */}
         </Select>
 
         <label style={{marginLeft: 10, display: showCondition.devManager}}> 开发经理： </label>
-        <Select style={{width: '10%', display: showCondition.devManager,}}>
-          <Option value="开发hotfix上线申请">1</Option>
+        <Select style={{width: '10%', display: showCondition.devManager}} showSearch>
+          {managers}
+          {/* <Option value="开发hotfix上线申请">1</Option>
           <Option value="产品hotfix修复申请">2</Option>
           <Option value="UED-hotfix修复申请">UED-3</Option>
           <Option value="emergency申请">4</Option>
-          <Option value="变更申请">5</Option>
+          <Option value="变更申请">5</Option> */}
         </Select>
 
         <label style={{marginLeft: 10, display: showCondition.prjManager}}> 项目经理： </label>
-        <Select style={{width: '10%', display: showCondition.prjManager}}>
-          <Option value="开发hotfix上线申请">1</Option>
+        <Select style={{width: '10%', display: showCondition.prjManager}} showSearch>
+          {managers}
+          {/*  <Option value="开发hotfix上线申请">1</Option>
           <Option value="产品hotfix修复申请">2</Option>
           <Option value="UED-hotfix修复申请">UED-3</Option>
           <Option value="emergency申请">4</Option>
-          <Option value="变更申请">5</Option>
+          <Option value="变更申请">5</Option> */}
         </Select>
 
 
         <label style={{marginLeft: 10}}> 状态： </label>
         <Select style={{width: '10%'}}>
-          <Option value="开发hotfix上线申请">全部</Option>
+          {status}
+          {/* <Option value="开发hotfix上线申请">全部</Option>
           <Option value="产品hotfix修复申请">审批中</Option>
           <Option value="UED-hotfix修复申请">已驳回</Option>
-          <Option value="emergency申请">审批通过</Option>
+          <Option value="emergency申请">审批通过</Option> */}
 
         </Select>
 
@@ -365,7 +542,6 @@ const JenkinsCheck: React.FC<any> = () => {
             suppressMenu: true,
           }}
 
-          rowHeight={70}
           onGridReady={onGridReady}
           onGridSizeChanged={onChangeGridReady}
           onColumnEverythingChanged={onChangeGridReady}

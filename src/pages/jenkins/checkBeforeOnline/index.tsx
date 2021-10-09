@@ -64,6 +64,7 @@ const queryDevelopViews = async (pages: Number, pageSize: Number) => {
         const serverDatas = res.data.data.data;
         serverDatas.forEach((ele: any) => {
 
+          debugger;
           datas.push({
             ID: ele.number,
             taskName: ele.task_name,
@@ -71,7 +72,7 @@ const queryDevelopViews = async (pages: Number, pageSize: Number) => {
             endtime: ele.end_time,
             excUser: ele.user_name,
             excStatus: ele.result,
-            excResult: ele.result,
+            excResult: ele.perform_result,
             url: ele.task_url,
             taskLog: ele.log_url,
           });
@@ -732,7 +733,7 @@ const JenkinsCheck: React.FC<any> = () => {
         minWidth: 90,
       },
       {
-        headerName: '执行状态',
+        headerName: '任务状态',
         field: 'excStatus',
         minWidth: 100,
         cellRenderer: (params: any) => {

@@ -109,7 +109,6 @@ const queryDevelopViews = async (pages: Number, pageSize: Number) => {
 // 组件初始化
 const JenkinsCheck: React.FC<any> = () => {
 
-
   const sys_accessToken = localStorage.getItem("accessId");
   axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
   const {initialState} = useModel('@@initialState');
@@ -375,7 +374,6 @@ const JenkinsCheck: React.FC<any> = () => {
         },
       });
 
-
     }
 
     const teachnicalSide = modalData.branch_teachnicalSide;
@@ -432,9 +430,8 @@ const JenkinsCheck: React.FC<any> = () => {
 
       setLoadSate(true);
       // axios.post('/api/verify/job/build', datas).then(async function (res) {
-      axios.post('/api/job/build', datas).then(async function (res) {
+      axios.post('/api/preOnline/job/build', datas).then(async function (res) {
 
-        debugger;
         if (res.data.code === 200) {
           const newData = await queryDevelopViews(1, 20);
 
@@ -459,13 +456,23 @@ const JenkinsCheck: React.FC<any> = () => {
           setLoadSate(false);
         }
       }).catch(function (error) {
-        message.error({
-          content: `异常信息：${error.toString()}`,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
+        if (error.toString().includes("403")) {
+          message.error({
+            content: `您无权限执行！`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+          message.error({
+            content: `异常信息：${error.toString()}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
         setLoadSate(false);
       });
     }
@@ -866,16 +873,16 @@ const JenkinsCheck: React.FC<any> = () => {
       <div style={{background: 'white', marginTop: -22, height: 42}}>
         {/* 使用一个图标就要导入一个图标 */}
 
-        {/*<Button type="primary" style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}*/}
-        {/*        onClick={runTaskBeforeOnline}>执行上线前检查任务</Button>*/}
+        {/* <Button type="primary" style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}
+          onClick={runTaskBeforeOnline}>执行上线前检查任务</Button> */}
         <Button type="text" onClick={runTaskBeforeOnline} style={{padding: 10}}>
           <img src="../operate.png" width="22" height="22" alt="执行上线前检查任务" title="执行上线前检查任务"/> &nbsp;执行上线前检查任务
         </Button>
 
 
-        {/*<Button type="primary"*/}
-        {/*        style={{marginLeft: 10, color: '#32D529', backgroundColor: "#ECF5FF", borderRadius: 5}}*/}
-        {/*        onClick={refreshGrid}>刷新</Button>*/}
+        {/* <Button type="primary"
+          style={{marginLeft: 10, color: '#32D529', backgroundColor: "#ECF5FF", borderRadius: 5}}
+           onClick={refreshGrid}>刷新</Button> */}
 
         <Button type="text" onClick={refreshGrid}>
           <img src="../refresh.png" width="30" height="30" alt="刷新" title="刷新"/> 刷新

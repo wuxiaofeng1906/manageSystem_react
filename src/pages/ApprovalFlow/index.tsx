@@ -25,15 +25,18 @@ const queryDevelopViews = async (pages: Number, pageSize: Number) => {
     pageSize: 0
   };
 
-  await axios.get('/api/verify/job/build_info',
-    {
-      params:
-        {
-          name: "sonar-project-scan",
-          page: pages,
-          page_size: pageSize
-        }
-    })
+  const paramData = {
+    temp_id: "",
+    start_time: "",
+    end_time: "",
+    leader_name: "",
+    approval_id: "",
+    user_id: "",
+    page: pages,
+    page_size: pageSize
+  };
+
+  await axios.get('/api/verify/apply/apply_data', {params: paramData})
     .then(function (res) {
 
       if (res.data.code === 200) {
@@ -94,7 +97,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   const [approvalType, setApprovalType] = useState([]);
   const getApprovalType = () => {
-    axios.get('/api/wechat/apply/template', {params: {}})
+    axios.get('/api/verify/apply/template', {params: {}})
       .then(function (res) {
 
         if (res.data.code === 200) {
@@ -134,7 +137,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   const [applicant, setApplicant] = useState([]);
   const getApplicant = () => {
-    axios.get('/api/wechat/apply/applicant', {params: {}})
+    axios.get('/api/verify/apply/applicant', {params: {}})
       .then(function (res) {
 
         if (res.data.code === 200) {
@@ -174,7 +177,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   const [status, setStatus] = useState([]);
   const getStatus = () => {
-    axios.get('/api/wechat/apply/approval_status', {params: {}})
+    axios.get('/api/verify/apply/approval_status', {params: {}})
       .then(function (res) {
 
         if (res.data.code === 200) {
@@ -214,7 +217,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   const [managers, setManagers] = useState([]);
   const getManagers = (appType: string) => {
-    axios.get('/api/wechat/apply/leader', {params: {temp_id: appType}})
+    axios.get('/api/verify/apply/leader', {params: {temp_id: appType}})
       .then(function (res) {
 
         if (res.data.code === 200) {

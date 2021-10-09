@@ -96,6 +96,8 @@ const queryDevelopViews = async (pages: Number, pageSize: Number) => {
 
 // 组件初始化
 const JenkinsCheck: React.FC<any> = () => {
+  const sys_accessToken = localStorage.getItem("accessId");
+  axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
 
   const {initialState} = useModel('@@initialState');
   const currentUser: any = {user_name: "", user_id: ""};
@@ -217,7 +219,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   const branchChanged = (value: any) => {
     const name = formForCarrySonar.getFieldsValue();
-    debugger;
+
     formForCarrySonar.setFieldsValue({
       ProjectKey: `${name.ProjectKey}-${value}`,
 
@@ -341,7 +343,7 @@ const JenkinsCheck: React.FC<any> = () => {
       };
 
       setLoadSate(true);
-      axios.post('/api/verify/job/build', datas).then(async function (res) {
+      axios.post('/api/sonar/job/build', datas).then(async function (res) {
 
         if (res.data.code === 200) {
           const newData = await queryDevelopViews(1, 20);
@@ -366,8 +368,16 @@ const JenkinsCheck: React.FC<any> = () => {
           });
           setLoadSate(false);
         }
-      })
-        .catch(function (error) {
+      }).catch(function (error) {
+        if(error.toString().includes("403")){
+          message.error({
+            content: `您无权限执行！`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }else{
           message.error({
             content: `异常信息：${error.toString()}`,
             duration: 1,
@@ -375,8 +385,10 @@ const JenkinsCheck: React.FC<any> = () => {
               marginTop: '50vh',
             },
           });
-          setLoadSate(false);
-        });
+        }
+
+        setLoadSate(false);
+      });
     }
 
 

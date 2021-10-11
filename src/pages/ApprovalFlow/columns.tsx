@@ -1,17 +1,40 @@
+// region 动态定义列名
+
+
 // 审批状态
 const approveStatus = (params: any) => {
-  if (params.value === "已驳回 ") {
-    return `<span style="font-size: large; color:gray">aborted</span>`;
+
+  let returnValue = params.value;
+  switch (params.value.toString()) {
+    case "1":
+      returnValue = `<span style="color:#46A0FC">审批中</span>`;
+      break;
+
+    case "2":
+      returnValue = `<span style="color:#32D529">已通过</span>`;
+      break;
+
+    case "3":
+      returnValue = `<span style="color:gray">已驳回</span>`;
+      break;
+    case "4":
+      returnValue = `<span>已撤销</span>`;
+      break;
+
+    case "6":
+      returnValue = `<span>通过后撤销</span>`;
+      break;
+
+    case "7":
+      returnValue = `<span>已删除</span>`;
+      break;
+
+    default:
+      break;
   }
 
-  if (params.value === "审批中") {
-    return `<span style="font-size: large; color:#46A0FC">running</span>`;
-  }
-  if (params.value === "已通过") {
-    return `<span style="font-size: large; color:#32D529">success</span>`;
-  }
 
-  return params.value;
+  return returnValue;
 };
 
 // 架构审批 、项目负责人审批、QA审批、CCB审批、总设确认、QA确认
@@ -532,114 +555,122 @@ const getEmergencyApplyColumns = () => {
     {
       headerName: 'ID',
       field: 'ID',
-      minWidth: 70,
+      minWidth: 55,
       pinned: 'left',
     },
     {
       headerName: '审批编号',
-      field: 'taskName',
-      minWidth: 150,
+      field: 'sp_no',
+      minWidth: 130,
       pinned: 'left',
     },
     {
-      headerName: 'emergency类型',
-      field: 'starttime',
-      minWidth: 110,
+      headerName: '类型',
+      field: 'emergency_type',
+      minWidth: 70,
       pinned: 'left',
     },
     {
       headerName: '禅道编号',
-      field: 'endtime',
-      minWidth: 110,
+      field: 'chandao_num',
+      minWidth: 90,
       pinned: 'left',
+      cellRenderer: (params: any) => {
+
+        if (params.data.emergency_type === "需求") {
+          return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/story-view-${params.value}.html'>${params.value}</a>`;
+        }
+        return params.value;
+
+      },
     },
     {
       headerName: '申请人',
-      field: 'excUser',
+      field: 'applicant',
       minWidth: 90,
       pinned: 'left',
     },
     {
       headerName: '开发经理',
-      field: 'ID',
-      minWidth: 100,
+      field: 'leader',
+      minWidth: 95,
       pinned: 'left',
     },
     {
       headerName: '所属端',
-      field: 'taskName',
-      minWidth: 150,
+      field: 'server',
+      minWidth: 75,
       pinned: 'left',
     },
     {
       headerName: '期望修复时间',
-      field: 'starttime',
-      minWidth: 110,
+      field: 'repair_time',
+      minWidth: 80,
       pinned: 'left',
     },
     {
       headerName: '当前审批状态',
-      field: 'endtime',
+      field: 'sp_status',
       minWidth: 110,
       cellRenderer: approveStatus,
       pinned: 'left',
     },
     {
       headerName: '申请标记',
-      field: 'excUser',
+      field: 'apply_tag',
       minWidth: 90,
     },
     {
-      headerName: 'emergency修复内容',
-      field: 'ID',
+      headerName: '修复内容',
+      field: 'emergency_content',
       minWidth: 100,
     },
     {
       headerName: '紧急原因及影响',
-      field: 'taskName',
+      field: 'emergency_degree',
       minWidth: 150,
     },
     {
       headerName: '修改说明/测试建议',
-      field: 'starttime',
+      field: 'test_advice',
       minWidth: 110,
     },
     {
       headerName: '发布环境',
-      field: 'endtime',
+      field: 'release_env',
       minWidth: 110,
     },
     {
       headerName: '备注',
-      field: 'excUser',
+      field: 'comment_content',
       minWidth: 90,
     },
     {
       headerName: '提交时间',
-      field: 'excUser',
+      field: 'apply_time',
       minWidth: 90,
     },
     {
       headerName: '指定审批人',
-      field: 'starttime',
+      field: 'spec_approval',
       minWidth: 110,
       cellRenderer: approvePerson
     },
     {
       headerName: 'CCB审批（Everyone）',
-      field: 'endtime',
+      field: 'ccb_approval',
       minWidth: 110,
       cellRenderer: approvePerson
 
     },
     {
       headerName: '测试经理审批（Anyone）',
-      field: 'excUser',
+      field: 'test_leader',
       minWidth: 90,
     },
     {
       headerName: '测试审批（Anyone）',
-      field: 'excUser',
+      field: 'test_approval',
       minWidth: 90,
     }
   ];
@@ -675,5 +706,95 @@ const getGridColums = (approveType: any) => {
 
 };
 
+// endregion
 
-export {getGridColums}
+// region 解析数据
+
+// 开发hotfix上线申请
+const getDevHotfixOnlineDatas = (oraDatas: any, start_id: number) => {
+
+
+};
+
+const getProductHotfixRepaireApplyDatas = (oraDatas: any, start_id: number) => {
+
+};
+
+const getUEDHotfixApplyDatas = (oraDatas: any, start_id: number) => {
+
+};
+
+const getEmergencyApplyDatas = (oraDatas: any, start_id: number) => {
+
+  const datas: any = [];
+  oraDatas.forEach((ele: any, index: number) => {
+
+    datas.push({
+      ID: start_id + index,
+      sp_no: ele.sp_no,
+      emergency_type: ele.emergency_type,
+      chandao_num: ele.chandao_num,
+      applicant: ele.applicant,
+      leader: ele.leader,
+      server: ele.server,
+      repair_time: ele.repair_time,
+      sp_status: ele.sp_status,
+      apply_tag: ele.apply_tag,
+      emergency_content: ele.emergency_content,
+      emergency_degree: ele.emergency_degree,
+      test_advice: ele.test_advice,
+      release_env: ele.release_env,
+      comment_content: ele.comment_content,
+      apply_time: ele.apply_time,
+      spec_approval: ele.spec_approval,
+      ccb_approval: ele.ccb_approval,
+      test_leader: ele.test_leader,
+      test_approval: ele.test_approval
+
+    });
+  });
+
+  return datas;
+};
+
+const getChangeApplyDatas = (oraDatas: any, start_id: number) => {
+
+};
+
+const getStartItemId = (page: number, pageSize: number) => {
+  const startId = 1 + pageSize * (page - 1);
+
+  return startId;
+
+};
+
+const alaysisDatas = (paramData: any, oraDatas: any) => {
+
+  const start_id = getStartItemId(paramData.page, paramData.pageSize);
+
+  switch (paramData.approvalType) {
+    case "Bs5Jhq7KtNGsJd4f9Zd2VedigHaBc634AEXhF6Vot":  // 开发hotfix上线申请
+      return getDevHotfixOnlineDatas(oraDatas, start_id);
+      break;
+    case "3TkaYnRhUKbC4ipUWXabjYJ6MSNNWPy6NcdYPxUx":  // 产品hotfix修复申请
+      return getProductHotfixRepaireApplyDatas(oraDatas, start_id);
+      break;
+    case "3TmAULSSURUQT3AbRexQt7HAbEq2x9B8ZxffP7PM": // UED-hotfix修复申请
+      return getUEDHotfixApplyDatas(oraDatas, start_id);
+      break;
+    case "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu": // emergency申请
+      return getEmergencyApplyDatas(oraDatas, start_id);
+      break;
+    case "Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt":  // 变更申请
+      return getChangeApplyDatas(oraDatas, start_id);
+      break;
+
+    default:
+      return [];
+      break;
+  }
+
+};
+
+// endregion
+export {getGridColums, alaysisDatas}

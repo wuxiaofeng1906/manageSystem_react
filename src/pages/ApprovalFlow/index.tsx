@@ -10,15 +10,15 @@ import {Button, message, Select, Input, DatePicker} from 'antd';
 import {SearchOutlined} from '@ant-design/icons';
 import {getHeight} from '@/publicMethods/pageSet';
 import axios from 'axios';
-import {getGridColums} from "./columns";
+import {getGridColums, alaysisDatas} from "./columns";
 
 const {Option} = Select;
 const {RangePicker} = DatePicker;
 
 // 查询数据
-const queryDevelopViews = async (pages: Number, pageSize: Number) => {
+const queryDevelopViews = async (condition: any) => {
 
-  const datas: any = [];
+  let datas: any = [];
   const pageInfo = {
     itemCount: 0,
     pageCount: 0,
@@ -26,14 +26,14 @@ const queryDevelopViews = async (pages: Number, pageSize: Number) => {
   };
 
   const paramData = {
-    temp_id: "",
-    start_time: "",
-    end_time: "",
-    leader_name: "",
-    approval_id: "",
-    user_id: "",
-    page: pages,
-    page_size: pageSize
+    temp_id: condition.approvalType,  // 类型
+    approval_id: condition.status, // 状态
+    leader_name: condition.manager, // 开发经理 or 项目经理
+    user_id: condition.applicant, // 申请人
+    start_time: condition.start, // 开始时间
+    end_time: condition.end,// 结束时间
+    page: condition.page, // 第几页
+    page_size: condition.pageSize  // 每页多少条
   };
 
   await axios.get('/api/verify/apply/apply_data', {params: paramData})
@@ -45,22 +45,7 @@ const queryDevelopViews = async (pages: Number, pageSize: Number) => {
         pageInfo.pageCount = res.data.data.page;
         pageInfo.pageSize = res.data.data.page_size;
 
-        const serverDatas = res.data.data.data;
-        serverDatas.forEach((ele: any) => {
-
-          datas.push({
-            ID: ele.number,
-            taskName: ele.task_name,
-            starttime: ele.start_time,
-            endtime: ele.end_time,
-            excUser: ele.user_name,
-            excStatus: ele.result,
-            excResult: ele.result,
-            url: ele.task_url,
-            taskLog: ele.log_url,
-          });
-        });
-
+        datas = alaysisDatas(condition, res.data.data.data);
 
       } else {
         message.error({
@@ -92,9 +77,21 @@ const queryDevelopViews = async (pages: Number, pageSize: Number) => {
 // 组件初始化
 const JenkinsCheck: React.FC<any> = () => {
 
+  const g_queryCondition = {
+    approvalType: "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu",
+    applicant: "",
+    manager: "",
+    status: "",
+    start: "",
+    end: "",
+    page: 1,
+    pageSize: 20
+  }
+
 
   /* region 获取下拉框选项 */
 
+  // 单据类型
   const [approvalType, setApprovalType] = useState([]);
   const getApprovalType = () => {
     axios.get('/api/verify/apply/template', {params: {}})
@@ -135,6 +132,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   };
 
+  // 申请人
   const [applicant, setApplicant] = useState([]);
   const getApplicant = () => {
     axios.get('/api/verify/apply/applicant', {params: {}})
@@ -175,6 +173,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   };
 
+  // 状态
   const [status, setStatus] = useState([]);
   const getStatus = () => {
     axios.get('/api/verify/apply/approval_status', {params: {}})
@@ -215,6 +214,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   };
 
+  // 经理（开发经理 or 项目经理）
   const [managers, setManagers] = useState([]);
   const getManagers = (appType: string) => {
     axios.get('/api/verify/apply/leader', {params: {temp_id: appType}})
@@ -259,17 +259,13 @@ const JenkinsCheck: React.FC<any> = () => {
 
 
   const [approveType, setApproveType] = useState("emergency申请")
-  // const [condition, setCondition] = useState({
-  //
-  //
-  // });
 
 
   /* region  表格相关事件 */
 
   const gridApi = useRef<GridApi>();
 
-  const {data, loading} = useRequest(() => queryDevelopViews(1, 20));
+  const {data, loading} = useRequest(() => queryDevelopViews(g_queryCondition));
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -314,8 +310,9 @@ const JenkinsCheck: React.FC<any> = () => {
 
   // 刷新表格
   const refreshGrid = async () => {
-
-    const newData = await queryDevelopViews(Pages.currentPage, Pages.countsOfPage);
+    g_queryCondition.page = Pages.currentPage;
+    g_queryCondition.pageSize = Pages.countsOfPage;
+    const newData = await queryDevelopViews(g_queryCondition);
     gridApi.current?.setRowData(newData.datas);
 
   };
@@ -355,7 +352,9 @@ const JenkinsCheck: React.FC<any> = () => {
       totalPages: Math.ceil(Pages.totalCounts / Number(pageCount)),
     });
 
-    const newData = await queryDevelopViews(Pages.currentPage, pageCount);
+    g_queryCondition.page = Pages.currentPage;
+    g_queryCondition.pageSize = pageCount;
+    const newData = await queryDevelopViews(g_queryCondition);
     gridApi.current?.setRowData(newData.datas);
 
   };
@@ -370,7 +369,12 @@ const JenkinsCheck: React.FC<any> = () => {
         currentPage: Pages.currentPage - 1
       });
     }
-    const newData = await queryDevelopViews(Pages.currentPage - 1, Pages.countsOfPage);
+
+
+    g_queryCondition.page = Pages.currentPage - 1;
+    g_queryCondition.pageSize = Pages.countsOfPage;
+
+    const newData = await queryDevelopViews(g_queryCondition);
     gridApi.current?.setRowData(newData.datas);
 
   };
@@ -386,7 +390,10 @@ const JenkinsCheck: React.FC<any> = () => {
         currentPage: Pages.currentPage + 1
       });
 
-      const newData = await queryDevelopViews(Pages.currentPage + 1, Pages.countsOfPage);
+      g_queryCondition.page = Pages.currentPage + 1;
+      g_queryCondition.pageSize = Pages.countsOfPage;
+
+      const newData = await queryDevelopViews(g_queryCondition);
       gridApi.current?.setRowData(newData.datas);
     }
 
@@ -432,7 +439,10 @@ const JenkinsCheck: React.FC<any> = () => {
 
     } else {
 
-      const newData = await queryDevelopViews(Number(params.currentTarget.defaultValue), Pages.countsOfPage);
+      g_queryCondition.page = Number(params.currentTarget.defaultValue);
+      g_queryCondition.pageSize = Pages.countsOfPage;
+
+      const newData = await queryDevelopViews(g_queryCondition);
       gridApi.current?.setRowData(newData.datas);
 
     }

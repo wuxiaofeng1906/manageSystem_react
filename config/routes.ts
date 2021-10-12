@@ -378,16 +378,17 @@ export default [
     name: '检查工具',
     icon: 'table',
     path: '/jenkins',
-    access: 'sysAdmin',
     routes: [
       {
         name: '上线前检查',
         path: 'checkBeforeOnline',
+        access: 'onlineCheck',
         component: './jenkins/checkBeforeOnline',
       },
       {
         name: 'sonar扫描',
         path: 'sonar',
+        access: 'sonarCheck',
         component: './jenkins/sonar',
       }
     ],

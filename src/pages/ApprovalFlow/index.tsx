@@ -78,7 +78,7 @@ const queryDevelopViews = async (condition: any) => {
 const JenkinsCheck: React.FC<any> = () => {
 
   const g_queryCondition = {
-    approvalType: "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu",
+    approvalType: "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu", // emergency id
     applicant: "",
     manager: "",
     status: "",
@@ -89,7 +89,7 @@ const JenkinsCheck: React.FC<any> = () => {
   }
 
 
-  /* region 获取下拉框选项 */
+  /* region 下拉框事件 */
 
   // 单据类型
   const [approvalType, setApprovalType] = useState([]);
@@ -172,6 +172,10 @@ const JenkinsCheck: React.FC<any> = () => {
 
 
   };
+  const getselectedApplicant = (values: any, params: any) => {
+
+    g_queryCondition.applicant = params.key;
+  };
 
   // 状态
   const [status, setStatus] = useState([]);
@@ -213,7 +217,10 @@ const JenkinsCheck: React.FC<any> = () => {
 
 
   };
+  const getSelectedStatus = (values: any, params: any) => {
 
+    g_queryCondition.status = params.key;
+  };
   // 经理（开发经理 or 项目经理）
   const [managers, setManagers] = useState([]);
   const getManagers = (appType: string) => {
@@ -254,7 +261,21 @@ const JenkinsCheck: React.FC<any> = () => {
 
 
   };
+  const getDevManager = (values: any, params: any) => {
 
+    g_queryCondition.manager = params.key;
+  };
+  const getprojectManager = (values: any, params: any) => {
+    g_queryCondition.manager = params.key;
+  };
+
+  // 已选择的时间
+  const getSelectedDateRange = (values: any, params: any) => {
+
+    g_queryCondition.start = `${params[0].toString()} 00:00:00`;
+    g_queryCondition.end = `${params[1].toString()} 23:59:59`;
+
+  }
   /* endregion */
 
 
@@ -307,6 +328,7 @@ const JenkinsCheck: React.FC<any> = () => {
     devManager: "inline-block",
     prjManager: "none"
   });
+
 
   // 刷新表格
   const refreshGrid = async () => {
@@ -448,7 +470,8 @@ const JenkinsCheck: React.FC<any> = () => {
     }
 
 
-  }
+  };
+
   /* endregion */
 
   useEffect(() => {
@@ -495,7 +518,7 @@ const JenkinsCheck: React.FC<any> = () => {
         </Select>
 
         <label style={{marginLeft: 10}}> 申请人： </label>
-        <Select style={{width: '10%'}} showSearch>
+        <Select style={{width: '10%'}} showSearch onChange={getselectedApplicant}>
           {applicant}
           {/* <Option value="开发hotfix上线申请">1</Option>
           <Option value="产品hotfix修复申请">2</Option>
@@ -505,7 +528,7 @@ const JenkinsCheck: React.FC<any> = () => {
         </Select>
 
         <label style={{marginLeft: 10, display: showCondition.devManager}}> 开发经理： </label>
-        <Select style={{width: '10%', display: showCondition.devManager}} showSearch>
+        <Select style={{width: '10%', display: showCondition.devManager}} showSearch onChange={getDevManager}>
           {managers}
           {/* <Option value="开发hotfix上线申请">1</Option>
           <Option value="产品hotfix修复申请">2</Option>
@@ -515,7 +538,7 @@ const JenkinsCheck: React.FC<any> = () => {
         </Select>
 
         <label style={{marginLeft: 10, display: showCondition.prjManager}}> 项目经理： </label>
-        <Select style={{width: '10%', display: showCondition.prjManager}} showSearch>
+        <Select style={{width: '10%', display: showCondition.prjManager}} showSearch onChange={getprojectManager}>
           {managers}
           {/*  <Option value="开发hotfix上线申请">1</Option>
           <Option value="产品hotfix修复申请">2</Option>
@@ -524,9 +547,8 @@ const JenkinsCheck: React.FC<any> = () => {
           <Option value="变更申请">5</Option> */}
         </Select>
 
-
         <label style={{marginLeft: 10}}> 状态： </label>
-        <Select style={{width: '10%'}}>
+        <Select style={{width: '10%'}} onChange={getSelectedStatus}>
           {status}
           {/* <Option value="开发hotfix上线申请">全部</Option>
           <Option value="产品hotfix修复申请">审批中</Option>
@@ -535,9 +557,8 @@ const JenkinsCheck: React.FC<any> = () => {
 
         </Select>
 
-
         <label style={{marginLeft: 10}}> 时间： </label>
-        <RangePicker/>
+        <RangePicker onChange={getSelectedDateRange}/>
 
         <Button icon={<SearchOutlined/>} style={{marginLeft: 10, borderRadius: 5}} onClick={refreshGrid}>查询</Button>
 

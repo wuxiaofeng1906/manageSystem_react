@@ -41,11 +41,50 @@ const approveStatus = (params: any) => {
 
 // 架构审批 、项目负责人审批、QA审批、CCB审批、总设确认、QA确认
 const approvePerson = (params: any) => {
-  return `
-            <div>
-               <span style="display: inline-block; width: 140px">${params.value}</span>
-                 <label style="margin-left:10px;font-weight: bolder; color: #32D529">√</label>
-            </div>`;
+
+  let returnDiv = "";
+  const appData = params.value;
+  appData.forEach((ele: any) => {
+
+    if (ele.sp_status === 2) {  // 2 为审批通过
+      returnDiv = returnDiv === "" ?
+        `<div>
+           <span style="display: inline-block; width: 45px">${ele.user_name}</span>
+           <label style="margin-left:10px;font-weight: bolder; color: #32D529">√</label>
+        </div>`
+        :
+        `${returnDiv}
+        <div style="margin-top: -20px">
+           <span style="display: inline-block; width: 45px">${ele.user_name}</span>
+           <label style="margin-left:10px;font-weight: bolder; color: #32D529">√</label>
+        </div>`
+    } else {
+      returnDiv = returnDiv === "" ?
+        `<div>
+           <span style="display: inline-block; ">${ele.user_name}</span>
+        </div>`
+        :
+        `${returnDiv}
+        <div style="margin-top: -20px">
+           <span style="display: inline-block; ">${ele.user_name}</span>
+        </div>`
+    }
+
+  });
+
+  return `<div> ${returnDiv} </div>`;
+};
+
+const approveForTester = (params: any) => {
+
+  let returnValue = "";
+  const appData = params.value;
+  if (appData[0].sp_status === 2) {
+    returnValue = appData[0].user_name;
+  } else {
+    returnValue = "待审批";
+  }
+  return returnValue;
 };
 
 // 渲染成链接，直接点击进入
@@ -582,6 +621,10 @@ const getEmergencyApplyColumns = () => {
         if (params.data.emergency_type === "需求") {
           return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/story-view-${params.value}.html'>${params.value}</a>`;
         }
+        if (params.data.emergency_type === "bug") {
+          return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/bug-view-${params.value}.html'>${params.value}</a>`;
+        }
+
         return params.value;
 
       },
@@ -650,30 +693,37 @@ const getEmergencyApplyColumns = () => {
     {
       headerName: '提交时间',
       field: 'apply_time',
-      minWidth: 90,
+      minWidth: 170,
     },
     {
       headerName: '指定审批人',
       field: 'spec_approval',
       minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
       cellRenderer: approvePerson
     },
     {
       headerName: 'CCB审批（Everyone）',
       field: 'ccb_approval',
       minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
       cellRenderer: approvePerson
-
     },
     {
       headerName: '测试经理审批（Anyone）',
       field: 'test_leader',
-      minWidth: 90,
+      minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
+      cellRenderer: approvePerson
     },
     {
       headerName: '测试审批（Anyone）',
       field: 'test_approval',
-      minWidth: 90,
+      minWidth: 110,
+      cellRenderer: approveForTester
     }
   ];
 

@@ -28,9 +28,6 @@ import axios from 'axios';
 
 import dayjs from "dayjs";
 import moment from 'moment';
-import {history} from "@@/core/history";
-import {judgeAuthority} from "@/publicMethods/authorityJudge";
-import {SnippetsTwoTone} from "@ant-design/icons";
 
 const {Option} = Select;
 
@@ -64,7 +61,6 @@ const queryDevelopViews = async (pages: Number, pageSize: Number) => {
         const serverDatas = res.data.data.data;
         serverDatas.forEach((ele: any) => {
 
-          debugger;
           datas.push({
             ID: ele.number,
             taskName: ele.task_name,
@@ -362,32 +358,6 @@ const JenkinsCheck: React.FC<any> = () => {
   // 确定执行任务
   const commitCarryTask = () => {
     const modalData = formForCarryTask.getFieldsValue()
-
-    // MainBranch 和 TeachnicalSide 不能为空
-    const mainBranch = modalData.branch_mainBranch;
-    if (mainBranch.length === 0) {
-      message.error({
-        content: `MainBranch 为必选项！`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
-    }
-
-    const teachnicalSide = modalData.branch_teachnicalSide;
-    if (teachnicalSide.length === 0) {
-      message.error({
-        content: `TeachnicalSide 为必选项！`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
-    }
-
     const targets = modalData.branch_targetBranch;
 
     let target_branch = "";
@@ -397,85 +367,123 @@ const JenkinsCheck: React.FC<any> = () => {
       })
     }
 
-    if (teachnicalSide.length > 0 && mainBranch.length > 0) {
-      // 传入参数错误：422  ；连接问题：422
+    // 传入参数错误：422  ；连接问题：422
 
-      const params: any = [];
-      if (modalData.verson_check) {
-        params.push(
-          {name: "BackendVersionCkeckFlag", value: modalData.verson_check},
-          {name: "server", value: modalData.verson_server},
-          {name: "imageBranch", value: modalData.verson_imagebranch},
-          {name: "imageEnv", value: modalData.verson_imageevn}
-        );
-      }
+    const params: any = [];
 
-      if (modalData.branch_check) {
-        params.push(
-          {name: "InclusionCheckFlag", value: modalData.branch_check},
-          {name: "MainBranch", value: mainBranch},
-          {name: "technicalSide", value: teachnicalSide},
-          {name: "TargetBranch", value: target_branch},
-          {name: "MainSince", value: dayjs(modalData.branch_mainSince).format("YYYY-MM-DD")}
-        );
-      }
-
-      const datas = {
-        name: "popup-online-check",
-        user_name: currentUser.user_name,
-        user_id: currentUser.user_id,
-        job_parm: params
-      };
-
-
-      setLoadSate(true);
-      // axios.post('/api/verify/job/build', datas).then(async function (res) {
-      axios.post('/api/preOnline/job/build', datas).then(async function (res) {
-
-        if (res.data.code === 200) {
-          const newData = await queryDevelopViews(1, 20);
-
-          gridApi.current?.setRowData(newData.datas);
-          setCheckModalVisible(false);
-          message.info({
-            content: "执行完毕！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-          setLoadSate(false);
-        } else {
-          message.error({
-            content: `${res.data.message}${res.data.zt.message.end[0]}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-          setLoadSate(false);
-        }
-      }).catch(function (error) {
-        if (error.toString().includes("403")) {
-          message.error({
-            content: `您无权限执行！`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `异常信息：${error.toString()}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-        setLoadSate(false);
-      });
+    // 版本检查选中
+    if (modalData.verson_check) {
+      params.push(
+        {name: "BackendVersionCkeckFlag", value: modalData.verson_check},
+        {name: "server", value: modalData.verson_server},
+        {name: "imageBranch", value: modalData.verson_imagebranch},
+        {name: "imageEnv", value: modalData.verson_imageevn}
+      );
     }
+
+    // 检查上线分支是否包含对比分支的提交
+    if (modalData.branch_check) {
+
+      // MainBranch 、 TargetBranch 和 TeachnicalSide 不能为空
+      const mainBranch = modalData.branch_mainBranch;
+      if (mainBranch.length === 0) {
+        message.error({
+          content: `MainBranch 为必选项！`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return;
+      }
+
+      const teachnicalSide = modalData.branch_teachnicalSide;
+      if (teachnicalSide.length === 0) {
+        message.error({
+          content: `TeachnicalSide 为必选项！`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return;
+      }
+
+      if (target_branch === "") {
+        message.error({
+          content: `TargetBranch不能为空！`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return;
+      }
+
+
+      params.push(
+        {name: "InclusionCheckFlag", value: modalData.branch_check},
+        {name: "MainBranch", value: mainBranch},
+        {name: "technicalSide", value: teachnicalSide},
+        {name: "TargetBranch", value: target_branch},
+        {name: "MainSince", value: dayjs(modalData.branch_mainSince).format("YYYY-MM-DD")}
+      );
+    }
+
+    const datas = {
+      name: "popup-online-check",
+      user_name: currentUser.user_name,
+      user_id: currentUser.user_id,
+      job_parm: params
+    };
+
+    setLoadSate(true);
+    // axios.post('/api/verify/job/build', datas).then(async function (res) {
+    axios.post('/api/preOnline/job/build', datas).then(async function (res) {
+
+      if (res.data.code === 200) {
+        const newData = await queryDevelopViews(1, 20);
+
+        gridApi.current?.setRowData(newData.datas);
+        setCheckModalVisible(false);
+        message.info({
+          content: "执行完毕！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        setLoadSate(false);
+      } else {
+        message.error({
+          content: `${res.data.message}${res.data.zt.message.end[0]}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        setLoadSate(false);
+      }
+    }).catch(function (error) {
+      if (error.toString().includes("403")) {
+        message.error({
+          content: `您无权限执行！`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      } else {
+        message.error({
+          content: `异常信息：${error.toString()}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
+      setLoadSate(false);
+    });
 
 
   };

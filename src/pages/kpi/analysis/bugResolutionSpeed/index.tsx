@@ -543,9 +543,9 @@ const FrontTableList: React.FC<any> = () => {
     // const cloumnName = getSourceColums(dateString[0], dateString[1]);
     //
     // // 重新设置列名前清空列，并且设置列名后调用sizeColumnsToFit适应表格
-    // gridApiForFront.current?.setColumnDefs([]);
+    gridApiForFront.current?.setColumnDefs([]);
     // gridApiForFront.current?.setColumnDefs(cloumnName);
-    // gridApiForFront.current?.sizeColumnsToFit();
+    gridApiForFront.current?.sizeColumnsToFit();
     //
 
     const datas: any = await queryFrontData(gqlClient, {

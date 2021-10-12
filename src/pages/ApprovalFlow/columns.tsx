@@ -4,35 +4,37 @@
 // 审批状态
 const approveStatus = (params: any) => {
 
+
   let returnValue = params.value;
-  switch (params.value.toString()) {
-    case "1":
-      returnValue = `<span style="color:#46A0FC">审批中</span>`;
-      break;
+  if (returnValue) {
+    switch (params.value.toString()) {
+      case "1":
+        returnValue = `<span style="color:#46A0FC">审批中</span>`;
+        break;
 
-    case "2":
-      returnValue = `<span style="color:#32D529">已通过</span>`;
-      break;
+      case "2":
+        returnValue = `<span style="color:#32D529">已通过</span>`;
+        break;
 
-    case "3":
-      returnValue = `<span style="color:gray">已驳回</span>`;
-      break;
-    case "4":
-      returnValue = `<span>已撤销</span>`;
-      break;
+      case "3":
+        returnValue = `<span style="color:gray">已驳回</span>`;
+        break;
+      case "4":
+        returnValue = `<span>已撤销</span>`;
+        break;
 
-    case "6":
-      returnValue = `<span>通过后撤销</span>`;
-      break;
+      case "6":
+        returnValue = `<span>通过后撤销</span>`;
+        break;
 
-    case "7":
-      returnValue = `<span>已删除</span>`;
-      break;
+      case "7":
+        returnValue = `<span>已删除</span>`;
+        break;
 
-    default:
-      break;
+      default:
+        break;
+    }
   }
-
 
   return returnValue;
 };
@@ -555,7 +557,7 @@ const getEmergencyApplyColumns = () => {
     {
       headerName: 'ID',
       field: 'ID',
-      minWidth: 55,
+      minWidth: 65,
       pinned: 'left',
     },
     {

@@ -15,16 +15,17 @@ import {getGridColums, alaysisDatas} from "./columns";
 const {Option} = Select;
 const {RangePicker} = DatePicker;
 
-const g_queryCondition = {
-  approvalType: "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu", // emergency id
-  applicant: "",
-  manager: "",
-  status: "",
-  start: "",
-  end: "",
-  page: 1,
-  pageSize: 20
-};
+const g_queryCondition =
+  {
+    approvalType: "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu", // emergency id
+    applicant: "",
+    manager: "",
+    status: "",
+    start: "",
+    end: "",
+    page: 1,
+    pageSize: 20
+  };
 
 // 查询数据
 const queryDevelopViews = async (condition: any) => {
@@ -47,6 +48,7 @@ const queryDevelopViews = async (condition: any) => {
     page_size: condition.pageSize  // 每页多少条
   };
 
+  debugger;
   await axios.get('/api/verify/apply/apply_data', {params: paramData})
     .then(function (res) {
 
@@ -314,14 +316,21 @@ const JenkinsCheck: React.FC<any> = () => {
   });
   const changeAppType = (appType: any, allParams: any) => {
 
+
+    const new_columns: any = getGridColums(allParams.children);
+    gridApi.current?.setColumnDefs(new_columns);
+    gridApi.current?.setRowData([]);
+
+
     // 根据单据类型显示不同的经理选项（项目经理和开发经理）
     getManagers(appType);
     setApproveType(appType);
+    g_queryCondition.approvalType = appType;
 
     if (appType === "Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt") {
       setShowCondition({
         devManager: "none",
-        prjManager: "inline-block"   // Internal
+        prjManager: "inline-block"
       });
     } else {
       setShowCondition({
@@ -329,8 +338,8 @@ const JenkinsCheck: React.FC<any> = () => {
         prjManager: "none"
       });
     }
-    const new_columns: any = getGridColums(allParams.children);
-    gridApi.current?.setColumnDefs(new_columns);
+
+
 
   };
 

@@ -33,6 +33,11 @@ export default {
 
   },
   pre: {
+    '/api/verify/': {
+      target: 'http://10.0.144.51:5000/',
+      changeOrigin: true,
+      pathRewrite: {'^': ''},
+    },
     '/api/': {
       target: 'http://dms.q7link.com:8300/',
       changeOrigin: true,

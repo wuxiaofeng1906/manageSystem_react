@@ -397,6 +397,7 @@ export default [
     icon: 'table',
     path: '/ApprovalFlow',
     access: 'sysAdmin',
+    hideInMenu: true,
     component: './ApprovalFlow',
     // routes: [
     //   {

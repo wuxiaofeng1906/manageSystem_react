@@ -15,6 +15,17 @@ import {getGridColums, alaysisDatas} from "./columns";
 const {Option} = Select;
 const {RangePicker} = DatePicker;
 
+const g_queryCondition = {
+  approvalType: "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu", // emergency id
+  applicant: "",
+  manager: "",
+  status: "",
+  start: "",
+  end: "",
+  page: 1,
+  pageSize: 20
+};
+
 // 查询数据
 const queryDevelopViews = async (condition: any) => {
 
@@ -73,21 +84,41 @@ const queryDevelopViews = async (condition: any) => {
 
 };
 
-
 // 组件初始化
 const JenkinsCheck: React.FC<any> = () => {
 
-  const g_queryCondition = {
-    approvalType: "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu", // emergency id
-    applicant: "",
-    manager: "",
-    status: "",
-    start: "",
-    end: "",
-    page: 1,
-    pageSize: 20
+  /* region  表格相关事件 */
+
+  const gridApi = useRef<GridApi>();
+
+  const {data, loading} = useRequest(() => queryDevelopViews(g_queryCondition));
+
+  const onGridReady = (params: GridReadyEvent) => {
+    gridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  if (gridApi.current) {
+    if (loading) gridApi.current.showLoadingOverlay();
+    else gridApi.current.hideOverlay();
   }
 
+  // 表格的屏幕大小自适应
+  const [gridHeight, setGridHeight] = useState(getHeight() - 20);
+  window.onresize = function () {
+    setGridHeight(getHeight() - 20);
+    gridApi.current?.sizeColumnsToFit();
+  };
+
+  const onChangeGridReady = (params: GridReadyEvent) => {
+    gridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+
+  const columns: any = getGridColums("emergency申请");
+
+  /* endregion */
 
   /* region 下拉框事件 */
 
@@ -221,6 +252,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
     g_queryCondition.status = params.key;
   };
+
   // 经理（开发经理 or 项目经理）
   const [managers, setManagers] = useState([]);
   const getManagers = (appType: string) => {
@@ -262,7 +294,6 @@ const JenkinsCheck: React.FC<any> = () => {
 
   };
   const getDevManager = (values: any, params: any) => {
-
     g_queryCondition.manager = params.key;
   };
   const getprojectManager = (values: any, params: any) => {
@@ -271,75 +302,16 @@ const JenkinsCheck: React.FC<any> = () => {
 
   // 已选择的时间
   const getSelectedDateRange = (values: any, params: any) => {
-
     g_queryCondition.start = `${params[0].toString()} 00:00:00`;
     g_queryCondition.end = `${params[1].toString()} 23:59:59`;
-
   }
-  /* endregion */
 
-
+  // 切换审批类型
   const [approveType, setApproveType] = useState("emergency申请")
-
-
-  /* region  表格相关事件 */
-
-  const gridApi = useRef<GridApi>();
-
-  const {data, loading} = useRequest(() => queryDevelopViews(g_queryCondition));
-
-  const onGridReady = (params: GridReadyEvent) => {
-    gridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-
-  if (gridApi.current) {
-    if (loading) gridApi.current.showLoadingOverlay();
-    else gridApi.current.hideOverlay();
-  }
-
-  // 表格的屏幕大小自适应
-  const [gridHeight, setGridHeight] = useState(getHeight() - 20);
-  window.onresize = function () {
-    setGridHeight(getHeight() - 20);
-    gridApi.current?.sizeColumnsToFit();
-  };
-
-  const onChangeGridReady = (params: GridReadyEvent) => {
-    gridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-
-
-  const columns: any = getGridColums("emergency申请");
-
-  /* endregion */
-
-
-  const [Pages, setPages] = useState({
-    totalCounts: 0,  // 总条数
-    countsOfPage: 20,  // 每页显示多少条
-    totalPages: 0,  // 一共多少页
-    currentPage: 0, // 当前是第几页
-    jumpToPage: 0  // 跳转到第几页
-  });
-
   const [showCondition, setShowCondition] = useState({
     devManager: "inline-block",
     prjManager: "none"
   });
-
-
-  // 刷新表格
-  const refreshGrid = async () => {
-    g_queryCondition.page = Pages.currentPage;
-    g_queryCondition.pageSize = Pages.countsOfPage;
-    const newData = await queryDevelopViews(g_queryCondition);
-    gridApi.current?.setRowData(newData.datas);
-
-  };
-
-  // 切换审批类型
   const changeAppType = (appType: any, allParams: any) => {
 
     // 根据单据类型显示不同的经理选项（项目经理和开发经理）
@@ -362,8 +334,50 @@ const JenkinsCheck: React.FC<any> = () => {
 
   };
 
+  /* endregion */
 
-  /* region 翻页以及页面跳转功能 */
+  /* region 查询以及 翻页以及页面跳转功能 */
+
+  const [Pages, setPages] = useState({
+    totalCounts: 0,  // 总条数
+    countsOfPage: 20,  // 每页显示多少条
+    totalPages: 0,  // 一共多少页
+    currentPage: 0, // 当前是第几页
+    jumpToPage: 0  // 跳转到第几页
+  });
+  // 计算分页信息
+  const showPageInfo = (pageInfo: any) => {
+    let totalCount = 0;
+    let countsOfPages = 1;
+    let totalPage = 1;
+    let currentPages = 1;
+    if (data) {
+      totalCount = Number(pageInfo.itemCount);
+      countsOfPages = Number(pageInfo.pageSize);
+      totalPage = Number(pageInfo.itemCount) === 0 ? 0 : Math.ceil(Number(pageInfo.itemCount) / Number(pageInfo.pageSize));
+      currentPages = Number(pageInfo.pageCount);
+    }
+
+
+    setPages({
+      totalCounts: totalCount,
+      countsOfPage: countsOfPages,
+      totalPages: totalPage,
+      currentPage: currentPages,
+      jumpToPage: 1
+    });
+  };
+
+  // 表格查询按钮
+  const refreshGrid = async () => {
+    g_queryCondition.page = Pages.currentPage;
+    g_queryCondition.pageSize = Pages.countsOfPage;
+    const newData = await queryDevelopViews(g_queryCondition);
+    gridApi.current?.setRowData(newData.datas);
+    showPageInfo(newData.pageInfo);
+
+  };
+
 
   // 每页显示多少条数据
   const showItemChange = async (pageCount: any) => {
@@ -479,26 +493,8 @@ const JenkinsCheck: React.FC<any> = () => {
     getApplicant();
     getStatus();
     getManagers("Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu");
+    showPageInfo(data?.pageInfo);
 
-    let totalCount = 0;
-    let countsOfPages = 1;
-    let totalPage = 1;
-    let currentPages = 1;
-    if (data) {
-      totalCount = Number(data?.pageInfo.itemCount);
-      countsOfPages = Number(data?.pageInfo.pageSize);
-      totalPage = Number(data?.pageInfo.itemCount) === 0 ? 0 : Math.ceil(Number(data?.pageInfo.itemCount) / Number(data?.pageInfo.pageSize));
-      currentPages = Number(data?.pageInfo.pageCount);
-    }
-
-
-    setPages({
-      totalCounts: totalCount,
-      countsOfPage: countsOfPages,
-      totalPages: totalPage,
-      currentPage: currentPages,
-      jumpToPage: 1
-    });
   }, [loading])
 
   return (

@@ -269,124 +269,130 @@ const getChangeApplyColumns = () => {
 const getDevHotfixOnlineColumns = () => {
   const columns: any = [
     {
-      headerName: '序号',
+      headerName: 'ID',
       field: 'ID',
-      minWidth: 70,
+      minWidth: 65,
       pinned: 'left',
     },
     {
       headerName: '审批编号',
-      field: 'taskName',
-      minWidth: 150,
+      field: 'sp_no',
+      minWidth: 130,
       pinned: 'left',
     },
     {
       headerName: '产品/迭代名称',
-      field: 'starttime',
+      field: 'product_name',
       minWidth: 110,
       pinned: 'left',
     },
     {
       headerName: '申请人',
-      field: 'endtime',
-      minWidth: 110,
+      field: 'applicant',
+      minWidth: 90,
       pinned: 'left',
     },
     {
       headerName: '开发经理',
-      field: 'excUser',
+      field: 'leader',
       minWidth: 90,
       pinned: 'left',
     },
     {
       headerName: '是否紧急修复',
-      field: 'ID',
+      field: 'emergency_repair',
       minWidth: 100,
       pinned: 'left',
     },
     {
       headerName: '期望上线时间',
-      field: 'taskName',
+      field: 'online_time',
       minWidth: 150,
       pinned: 'left',
     },
     {
       headerName: 'hotfix所属端',
-      field: 'starttime',
+      field: 'hotfix_server',
       minWidth: 110,
       pinned: 'left',
     },
     {
       headerName: '当前审批状态',
-      field: 'endtime',
+      field: 'sp_status',
       minWidth: 110,
       cellRenderer: approveStatus,
       pinned: 'left',
     },
     {
       headerName: 'hotfix类型',
-      field: 'excUser',
-      minWidth: 90,
+      field: 'hotfix_type',
+      minWidth: 110,
     },
     {
       headerName: 'hotfix编号',
-      field: 'ID',
-      minWidth: 100,
+      field: 'hotfix_num',
+      minWidth: 110,
     },
     {
       headerName: 'hotfix内容详情',
-      field: 'taskName',
+      field: 'hotfix_content',
       minWidth: 150,
     },
     {
       headerName: 'hotfix标记',
-      field: 'starttime',
-      minWidth: 110,
+      field: 'hotfix_tag',
+      minWidth: 100,
     },
     {
       headerName: '测试建议及安排',
-      field: 'endtime',
+      field: 'test_advice',
       minWidth: 110,
     },
     {
       headerName: '部署环境说明',
-      field: 'excUser',
-      minWidth: 90,
+      field: 'dep_env',
+      minWidth: 110,
     },
     {
       headerName: 'hotfix清单',
-      field: 'ID',
-      minWidth: 100,
+      field: 'hotfix_form',
+      minWidth: 110,
 
     },
     {
       headerName: '备注',
-      field: 'taskName',
+      field: 'comment_content',
       minWidth: 150,
 
     },
     {
       headerName: '提交时间',
-      field: 'excUser',
-      minWidth: 90,
+      field: 'apply_time',
+      minWidth: 150,
     },
     {
       headerName: '指定审批人',
-      field: 'starttime',
+      field: 'spec_approval',
       minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
       cellRenderer: approvePerson
     },
     {
       headerName: '测试经理审批',
-      field: 'endtime',
+      field: 'test_leader',
       minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
       cellRenderer: approvePerson
 
     },
     {
       headerName: '测试审批',
-      field: 'excUser',
+      field: 'test_approval',
       minWidth: 90,
+      cellRenderer: approveForTester
+
     }
   ];
 
@@ -769,7 +775,36 @@ const getGridColums = (approveType: any) => {
 
 // 开发hotfix上线申请
 const getDevHotfixOnlineDatas = (oraDatas: any, start_id: number) => {
+  const datas: any = [];
+  oraDatas.forEach((ele: any, index: number) => {
 
+    datas.push({
+      ID: start_id + index,
+      sp_no: ele.sp_no,
+      product_name: ele.product_name,
+      applicant: ele.applicant,
+      leader: ele.leader,
+      emergency_repair: ele.emergency_repair,
+      online_time: ele.online_time,
+      hotfix_server: ele.hotfix_server,
+      sp_status: ele.sp_status,
+      hotfix_type: ele.hotfix_type,
+      hotfix_num: ele.hotfix_num,
+      hotfix_content: ele.hotfix_content,
+      hotfix_tag: ele.hotfix_tag,
+      test_advice: ele.test_advice,
+      dep_env: ele.dep_env,
+      hotfix_form: ele.hotfix_form,
+      comment_content: ele.comment_content,
+      spec_approval: ele.spec_approval,
+      test_leader: ele.test_leader,
+      test_approval: ele.test_approval,
+      apply_time: ele.apply_time
+
+    });
+  });
+
+  return datas;
 
 };
 

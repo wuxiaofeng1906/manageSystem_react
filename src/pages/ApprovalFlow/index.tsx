@@ -48,7 +48,6 @@ const queryDevelopViews = async (condition: any) => {
     page_size: condition.pageSize  // 每页多少条
   };
 
-  debugger;
   await axios.get('/api/verify/apply/apply_data', {params: paramData})
     .then(function (res) {
 
@@ -90,16 +89,15 @@ const queryDevelopViews = async (condition: any) => {
 const JenkinsCheck: React.FC<any> = () => {
 
   /* region  表格相关事件 */
+  const [approveType, setApproveType] = useState("Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu")
+  const columns: any = getGridColums(approveType);
 
   const gridApi = useRef<GridApi>();
-
   const {data, loading} = useRequest(() => queryDevelopViews(g_queryCondition));
-
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
-
   if (gridApi.current) {
     if (loading) gridApi.current.showLoadingOverlay();
     else gridApi.current.hideOverlay();
@@ -117,8 +115,6 @@ const JenkinsCheck: React.FC<any> = () => {
     params.api.sizeColumnsToFit();
   };
 
-
-  const columns: any = getGridColums("emergency申请");
 
   /* endregion */
 
@@ -309,18 +305,12 @@ const JenkinsCheck: React.FC<any> = () => {
   }
 
   // 切换审批类型
-  const [approveType, setApproveType] = useState("emergency申请")
+
   const [showCondition, setShowCondition] = useState({
     devManager: "inline-block",
     prjManager: "none"
   });
-  const changeAppType = (appType: any, allParams: any) => {
-
-
-    const new_columns: any = getGridColums(allParams.children);
-    gridApi.current?.setColumnDefs(new_columns);
-    gridApi.current?.setRowData([]);
-
+  const changeAppType = (appType: any) => {
 
     // 根据单据类型显示不同的经理选项（项目经理和开发经理）
     getManagers(appType);
@@ -339,7 +329,9 @@ const JenkinsCheck: React.FC<any> = () => {
       });
     }
 
-
+    // const new_columns: any = getGridColums(allParams.children);
+    // gridApi.current?.setColumnDefs(new_columns);
+    // gridApi.current?.setRowData([]);
 
   };
 

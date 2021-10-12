@@ -683,21 +683,22 @@ const getEmergencyApplyColumns = () => {
 
 
 const getGridColums = (approveType: any) => {
+
   switch (approveType) {
-    case "开发hotfix上线申请":
+    case "Bs5Jhq7KtNGsJd4f9Zd2VedigHaBc634AEXhF6Vot":  // 开发hotfix上线申请
       return getDevHotfixOnlineColumns();
       break;
-    case "产品hotfix修复申请":
+    case "3TkaYnRhUKbC4ipUWXabjYJ6MSNNWPy6NcdYPxUx":  // 产品hotfix修复申请
       return getProductHotfixRepaireApplyColumns();
       break;
-    case "UED-hotfix修复申请":
+    case "3TmAULSSURUQT3AbRexQt7HAbEq2x9B8ZxffP7PM": // UED-hotfix修复申请
       return getUEDHotfixApplyColumns();
       break;
-    case "emergency申请":
+    case "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu": // emergency申请
       return getEmergencyApplyColumns();
       break;
 
-    case "变更申请":
+    case "Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt":  // 变更申请
       return getChangeApplyColumns();
       break;
 
@@ -769,6 +770,7 @@ const getStartItemId = (page: number, pageSize: number) => {
   return startId;
 
 };
+
 
 const alaysisDatas = (paramData: any, oraDatas: any) => {
 

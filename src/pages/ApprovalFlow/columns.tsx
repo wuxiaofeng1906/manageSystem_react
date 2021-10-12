@@ -44,33 +44,37 @@ const approvePerson = (params: any) => {
 
   let returnDiv = "";
   const appData = params.value;
-  appData.forEach((ele: any) => {
 
-    if (ele.sp_status === 2) {  // 2 为审批通过
-      returnDiv = returnDiv === "" ?
-        `<div>
+  if (appData) {
+
+    appData.forEach((ele: any) => {
+
+      if (ele.sp_status === 2) {  // 2 为审批通过
+        returnDiv = returnDiv === "" ?
+          `<div>
            <span style="display: inline-block; width: 45px">${ele.user_name}</span>
            <label style="margin-left:10px;font-weight: bolder; color: #32D529">√</label>
         </div>`
-        :
-        `${returnDiv}
+          :
+          `${returnDiv}
         <div style="margin-top: -20px">
            <span style="display: inline-block; width: 45px">${ele.user_name}</span>
            <label style="margin-left:10px;font-weight: bolder; color: #32D529">√</label>
         </div>`
-    } else {
-      returnDiv = returnDiv === "" ?
-        `<div>
+      } else {
+        returnDiv = returnDiv === "" ?
+          `<div>
            <span style="display: inline-block; ">${ele.user_name}</span>
         </div>`
-        :
-        `${returnDiv}
+          :
+          `${returnDiv}
         <div style="margin-top: -20px">
            <span style="display: inline-block; ">${ele.user_name}</span>
         </div>`
-    }
+      }
 
-  });
+    });
+  }
 
   return `<div> ${returnDiv} </div>`;
 };

@@ -172,7 +172,7 @@ export default [
                     icon: 'table',
                     path: '/kpi/performance/developer/coverage/byStorehouse',
                     component: './kpi/performance/developer/coverage/byStorehouse',
-                  },{
+                  }, {
                     name: '按分支',
                     icon: 'table',
                     path: '/kpi/performance/developer/coverage/byBranch',
@@ -361,7 +361,7 @@ export default [
             name: '前端 Dashboard',
             icon: 'table',
             path: 'front_dashboard',
-            hideInMenu: true,
+            // hideInMenu: true,
             component: './kpi/analysis/front_dashboard',
           },
           {
@@ -373,6 +373,38 @@ export default [
         ],
       },
     ],
+  },
+  {
+    name: '检查工具',
+    icon: 'table',
+    path: '/jenkins',
+    routes: [
+      {
+        name: '上线前检查',
+        path: 'checkBeforeOnline',
+        access: 'onlineCheck',
+        component: './jenkins/checkBeforeOnline',
+      },
+      {
+        name: 'sonar扫描',
+        path: 'sonar',
+        access: 'sonarCheck',
+        component: './jenkins/sonar',
+      }
+    ],
+  }, {
+    name: '企业微信审批流',
+    icon: 'table',
+    path: '/ApprovalFlow',
+    access: 'sysAdmin',
+    component: './ApprovalFlow',
+    // routes: [
+    //   {
+    //     name: '开发hotfix上线申请',
+    //     path: 'devHotfixOnline',
+    //     component: './ApprovalFlow/devHotfixOnline',
+    //   }
+    // ],
   },
   {
     name: '系统管理',

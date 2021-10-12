@@ -7,26 +7,37 @@
  */
 export default {
   dev: {
+
+    '/api/verify/': {
+      target: 'http://10.0.144.53:5000/',
+      changeOrigin: true,
+      pathRewrite: {'^': ''},
+    },
     '/api/': {
-      // target: 'https://preview.pro.ant.design',
-      // target: 'http://localhost:5000',
       target: 'http://10.0.144.53:8300/',
       changeOrigin: true,
-      pathRewrite: { '^': '' },
+      pathRewrite: {'^': ''},
     },
   },
   test: {
+    '/api/verify/': {
+      target: 'http://192.168.1.146:5000/',
+      changeOrigin: true,
+      pathRewrite: {'^': ''},
+    },
     '/api/': {
       target: 'http://10.0.144.53:8300/',
       changeOrigin: true,
-      pathRewrite: { '^': '' },
+      pathRewrite: {'^': ''},
     },
+
   },
   pre: {
     '/api/': {
       target: 'http://dms.q7link.com:8300/',
       changeOrigin: true,
-      pathRewrite: { '^': '' },
+      pathRewrite: {'^': ''},
     },
   },
+
 };

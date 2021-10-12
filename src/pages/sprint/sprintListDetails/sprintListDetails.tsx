@@ -169,6 +169,12 @@ const getColums = (prjNames: any) => {
       cellRenderer: timestampChanges,
     },
     {
+      headerName: '是否涉及页面调整',
+      field: 'pageAdjust',
+      cellRenderer: numberRenderToYesNo,
+      // tooltipField: "hotUpdate"
+    },
+    {
       headerName: '是否可热更',
       field: 'hotUpdate',
       cellRenderer: numberRenderToYesNo,
@@ -498,6 +504,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             assignedTo
             finishedBy
             closedBy
+            pageAdjust
             hotUpdate
             dataUpdate
             interUpdate
@@ -948,6 +955,7 @@ const SprintList: React.FC<any> = () => {
       adminAddAssignTo: '',
       adminAddSolvedBy: '',
       adminAddClosedBy: '',
+      adminAddPageadjust: '',
       adminAddHotUpdate: '',
       adminAddDataUpgrade: '',
       adminAddInteUpgrade: '',
@@ -1002,6 +1010,7 @@ const SprintList: React.FC<any> = () => {
       adminAddAssignTo: datas.assignedTo,
       adminAddSolvedBy: datas.finishedBy,
       adminAddClosedBy: datas.closedBy,
+      adminAddPageadjust: datas.pageAdjust,
       adminAddHotUpdate: datas.hotUpdate,
       adminAddDataUpgrade: datas.dataUpdate,
       adminAddInteUpgrade: datas.interUpdate,
@@ -1201,6 +1210,7 @@ const SprintList: React.FC<any> = () => {
       project: prjId,
       stage: Number(oradata.adminCurStage).toString() === "NaN" ? stageChangeToNumber(oradata.adminCurStage) : Number(oradata.adminCurStage),
       category: oradata.adminChandaoType,
+      pageAdjust: oradata.adminAddPageadjust === "" ? null : oradata.adminAddPageadjust,
       hotUpdate: oradata.adminAddHotUpdate === "" ? null : oradata.adminAddHotUpdate,
       dataUpdate: oradata.adminAddDataUpgrade === "" ? null : oradata.adminAddDataUpgrade,
       interUpdate: oradata.adminAddInteUpgrade === "" ? null : oradata.adminAddInteUpgrade,
@@ -1239,7 +1249,6 @@ const SprintList: React.FC<any> = () => {
       datas["tester"] = testers;
       datas["uedName"] = oradata.adminAddForUED;
       datas["feedback"] = oradata.adminAddFeedbacker;
-
 
       addCommitDetails(datas);
     } else {
@@ -1296,6 +1305,7 @@ const SprintList: React.FC<any> = () => {
       managerDataUpgrade: datas.dataUpdate,
       managerProTested: datas.proposedTest,
       managerEnvironment: pubEnv,
+      managerPageAdjust: datas.pageAdjust,
       managerHotUpdate: datas.hotUpdate,
       managerInteUpgrade: datas.interUpdate,
       managerPreData: datas.presetData,
@@ -1344,6 +1354,7 @@ const SprintList: React.FC<any> = () => {
       category: zentaoTypeRenderToNumber(oradata.managerChandaoType),
       // ztNo: oradata.managerCHandaoID,
       // 以上为必填项
+      pageAdjust: oradata.managerPageAdjust === "" ? null : oradata.managerPageAdjust,
       hotUpdate: oradata.managerHotUpdate === "" ? null : oradata.managerHotUpdate,
       dataUpdate: oradata.managerDataUpgrade === "" ? null : oradata.managerDataUpgrade,
       interUpdate: oradata.managerInteUpgrade === "" ? null : oradata.managerInteUpgrade,
@@ -1541,7 +1552,7 @@ const SprintList: React.FC<any> = () => {
     if (initialState?.currentUser) {
       currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
     }
-    // currentUserGroup = 'testGroup';
+    // currentUserGroup = 'devGroup';
     if (currentUserGroup !== undefined) {
       switch (currentUserGroup.toString()) {
         case 'superGroup':
@@ -2174,8 +2185,8 @@ const SprintList: React.FC<any> = () => {
   const [isFieldModalVisible, setFieldModalVisible] = useState(false);
   const [selectedFiled, setSelectedFiled] = useState(['']);
   const nessField = ['选择', '类型', '编号'];
-  const unNessField = ['阶段', '测试', '标题内容','创建时间', '解决时间', '严重等级', '截止日期', '模块', '状态', '已提测', '发布环境',
-    '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', '是否可热更', '是否有数据升级',
+  const unNessField = ['阶段', '测试', '标题内容', '创建时间', '解决时间', '严重等级', '截止日期', '模块', '状态', '已提测', '发布环境',
+    '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', "是否涉及页面调整", '是否可热更', '是否有数据升级',
     '是否有接口升级', '是否有预置数据', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人'];
 
 
@@ -2261,7 +2272,6 @@ const SprintList: React.FC<any> = () => {
         breadcrumb={{routes}}
 
       />
-
 
       {/* 明细操作按钮   */}
       <Row style={{background: 'white', marginTop: "20px"}}>
@@ -2353,7 +2363,6 @@ const SprintList: React.FC<any> = () => {
 
       </Row>
 
-
       {/* ag-grid 表格定义 */}
       <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
         <AgGridReact
@@ -2378,10 +2387,9 @@ const SprintList: React.FC<any> = () => {
           groupDefaultExpanded={9} // 展开分组
           onGridReady={onGridReady}
           onRowDoubleClicked={rowClicked}
-          // excelStyles={[]}
           getRowStyle={setRowColor}
-
-
+          onGridSizeChanged={onGridReady}
+          onColumnEverythingChanged={onGridReady}
         />
 
       </div>
@@ -2606,7 +2614,23 @@ const SprintList: React.FC<any> = () => {
               </div>
             </Col>
           </Row>
+
           <Row gutter={16}>
+            <Col className="gutter-row">
+              <div style={leftStyle}>
+                <Form.Item name="adminAddPageadjust" label="是否涉及页面调整：">
+                  <Select placeholder="请选择" style={{width: '150px'}}>
+                    {[
+                      <Option key={''} value={''}> </Option>,
+                      <Option key={'1'} value={'1'}>是</Option>,
+                      <Option key={'0'} value={'0'}>否</Option>,
+                    ]}
+                  </Select>
+                </Form.Item>
+              </div>
+            </Col>
+
+
             <Col className="gutter-row">
               <div style={{marginLeft: '35px'}}>
                 <Form.Item name="adminAddProposedTest" label="已提测：">
@@ -2622,10 +2646,28 @@ const SprintList: React.FC<any> = () => {
                 </Form.Item>
               </div>
             </Col>
+
+            <Col className="gutter-row">
+              <div style={leftStyle}>
+                <Form.Item name="adminAddBaseLine" label="是否基线：">
+                  <Select placeholder="请选择" style={{width: '210px'}}>
+                    {[
+                      <Option key={''} value={''}> </Option>,
+                      <Option key={'1'} value={'1'}>是</Option>,
+                      <Option key={'0'} value={'0'}>否</Option>,
+                    ]}
+                  </Select>
+                </Form.Item>
+              </div>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddSuggestion" label="验证范围建议:">
-                  <Input style={{width: '490px'}}/>
+                  <Input style={{width: '800px'}}/>
                 </Form.Item>
               </div>
             </Col>
@@ -2724,23 +2766,11 @@ const SprintList: React.FC<any> = () => {
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddRemark" label="备注:">
-                  <Input style={{width: '600px'}}/>
+                  <Input style={{width: '850px'}}/>
                 </Form.Item>
               </div>
             </Col>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddBaseLine" label="是否基线：">
-                  <Select placeholder="请选择" style={{width: '148px'}}>
-                    {[
-                      <Option key={''} value={''}> </Option>,
-                      <Option key={'1'} value={'1'}>是</Option>,
-                      <Option key={'0'} value={'0'}>否</Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
-            </Col>
+
           </Row>
           {/* 以下为不用显示出来但是需要传递的数据 */}
           <Row gutter={16} style={{marginTop: "-50px"}}>
@@ -2898,9 +2928,26 @@ const SprintList: React.FC<any> = () => {
             </Col>
 
             <Col className="gutter-row">
+              <div style={leftStyle}>
+                <Form.Item name="managerPageAdjust" label="是否涉及页面调整：">
+                  <Select placeholder="请选择" style={{width: '170px'}}>
+                    {[
+                      <Option key={''} value={''}> </Option>,
+                      <Option key={'1'} value={'1'}>是</Option>,
+                      <Option key={'0'} value={'0'}>否</Option>,
+                    ]}
+                  </Select>
+                </Form.Item>
+              </div>
+            </Col>
+
+          </Row>
+
+          <Row gutter={16}>
+            <Col className="gutter-row">
               <div style={{marginLeft: '65px'}}>
                 <Form.Item name="managerProTested" label="已提测：">
-                  <Select placeholder="请选择" style={{width: '200px'}}>
+                  <Select placeholder="请选择" style={{width: 180}}>
                     {[
                       <Option key={''} value={''}> </Option>,
                       <Option key={'0'} value={'0'}>否</Option>,
@@ -2912,14 +2959,13 @@ const SprintList: React.FC<any> = () => {
                 </Form.Item>
               </div>
             </Col>
-
           </Row>
 
           <Row gutter={16}>
             <Col className="gutter-row">
               <div style={{marginLeft: '50px'}}>
                 <Form.Item name="managerEnvironment" label="发布环境:">
-                  <Select placeholder="请选择" style={{width: '515px'}} mode="multiple"
+                  <Select placeholder="请选择" style={{width: 515}} mode="multiple"
                           optionFilterProp="children">
                     {[
                       <Option key={'集群1'} value={'集群1'}>集群1</Option>,
@@ -2944,7 +2990,7 @@ const SprintList: React.FC<any> = () => {
             </Col>
           </Row>
 
-          <Form.Item style={{marginTop: '50px'}}>
+          <Form.Item>
             <Button type="primary" style={{marginLeft: '300px'}} onClick={commitManagerModify}>
               确定
             </Button>
@@ -3513,6 +3559,9 @@ const SprintList: React.FC<any> = () => {
                 </Col>
                 <Col span={4}>
                   <Checkbox value="相关bug">相关bug</Checkbox>
+                </Col>
+                <Col span={4}>
+                  <Checkbox value="是否涉及页面调整">是否涉及页面调整</Checkbox>
                 </Col>
                 <Col span={4}>
                   <Checkbox value="是否可热更">是否可热更</Checkbox>

@@ -30,13 +30,27 @@ const ragCellClassRules = {
   }
 
 };
+
+// 单元格表头样式设置
+const columnColor = (params: any) => {
+
+  const columnName = params.colDef.children;
+  const date = columnName[0].field.toString();
+  const weekday = dayjs(date.substring(0, 8)).day();
+  // 如果是周六或者周天的话，title要显示成灰色的 ；也可以设置背景色
+  if (weekday === 0 || weekday === 6) {
+    return "grayColor"
+  }
+  return "blackColor"
+
+};
 // 定义列名
 const getSourceColums = (starttime: any, endTime: any) => {
 
   // 定义基础字段
   const Fields: any = [
     {
-      headerName: "",
+      headerName: '',
       children: [
         {
           headerName: '创建日期',
@@ -87,7 +101,6 @@ const getSourceColums = (starttime: any, endTime: any) => {
           pinned: 'left',
 
           rowSpan: (params: any) => {
-            debugger;
 
             if (params.data.createAt === "合计" && params.data.status === '激活') {
               return 5;
@@ -129,10 +142,11 @@ const getSourceColums = (starttime: any, endTime: any) => {
     const current = dayjs(starttime).add(index, 'day');
     Fields.push({
       headerName: current.format("MM月DD日"),
+      headerClass: columnColor,
       children: [{
         headerName: `变化`,
         field: `${current.format("YYYYMMDD")}变化`,
-        minWidth: 70
+        minWidth: 70,
       }, {
         headerName: `余量`,
         field: `${current.format("YYYYMMDD")}余量`,
@@ -359,6 +373,7 @@ const alaysisData = (sorceData: any) => {
 // 公共查询方法
 const queryFrontData = async (client: GqlClient<object>, params: any) => {
 
+
   let conditionStr = `start:"${params.start}", end:"${params.end}"`;
 
   if (params.projects.length > 0) {
@@ -458,12 +473,14 @@ const FrontTableList: React.FC<any> = () => {
     end: dayjs().format("YYYY-MM-DD"),
   };
 
-  const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryFrontData(gqlClient, {
+  const [choicedCondition, setQueryConditionForSource] = useState({
     projects: [],
     start: g_currentMonth_range.start,
-    end: g_currentMonth_range.end
-  }));
+    end: g_currentMonth_range.end,
+  });
+
+  const gqlClient = useGqlClient();
+  const {data, loading} = useRequest(() => queryFrontData(gqlClient, choicedCondition));
   const gridApiForFront = useRef<GridApi>();
   const onSourceGridReady = (params: GridReadyEvent) => {
     gridApiForFront.current = params.api;
@@ -482,11 +499,6 @@ const FrontTableList: React.FC<any> = () => {
     gridApiForFront.current?.sizeColumnsToFit();
   };
 
-  const [choicedCondition, setQueryConditionForSource] = useState({
-    projects: [],
-    start: g_currentMonth_range.start,
-    end: g_currentMonth_range.end,
-  });
 
   //  点击默认显示按钮触发事件
   const showSourceDefaultData = async () => {
@@ -497,13 +509,13 @@ const FrontTableList: React.FC<any> = () => {
 
     });
 
-    // 获取动态列名
-    const cloumnName = getSourceColums(g_currentMonth_range.start, g_currentMonth_range.end);
-    // 重新设置列名前清空列，并且设置列名后调用sizeColumnsToFit适应表格
-    gridApiForFront.current?.setColumnDefs([]);
-    gridApiForFront.current?.setColumnDefs(cloumnName);
-    gridApiForFront.current?.sizeColumnsToFit();
-
+    // // 获取动态列名
+    // const cloumnName = getSourceColums(g_currentMonth_range.start, g_currentMonth_range.end);
+    // // 重新设置列名前清空列，并且设置列名后调用sizeColumnsToFit适应表格
+    // gridApiForFront.current?.setColumnDefs([]);
+    // gridApiForFront.current?.setColumnDefs(cloumnName);
+    // gridApiForFront.current?.sizeColumnsToFit();
+    //
     const datas: any = await queryFrontData(gqlClient, {
       projects: [],
       start: g_currentMonth_range.start,
@@ -526,20 +538,21 @@ const FrontTableList: React.FC<any> = () => {
 
     });
 
-    const range = {
+
+    //
+    // const cloumnName = getSourceColums(dateString[0], dateString[1]);
+    //
+    // // 重新设置列名前清空列，并且设置列名后调用sizeColumnsToFit适应表格
+    // gridApiForFront.current?.setColumnDefs([]);
+    // gridApiForFront.current?.setColumnDefs(cloumnName);
+    // gridApiForFront.current?.sizeColumnsToFit();
+    //
+
+    const datas: any = await queryFrontData(gqlClient, {
       projects: choicedCondition.projects,
       start: dateString[0],
       end: dateString[1],
-    };
-
-    const cloumnName = getSourceColums(dateString[0], dateString[1]);
-
-    // 重新设置列名前清空列，并且设置列名后调用sizeColumnsToFit适应表格
-    gridApiForFront.current?.setColumnDefs([]);
-    gridApiForFront.current?.setColumnDefs(cloumnName);
-    gridApiForFront.current?.sizeColumnsToFit();
-
-    const datas: any = await queryFrontData(gqlClient, range);
+    });
     gridApiForFront.current?.setRowData([]);
     gridApiForFront.current?.setPinnedTopRowData([])  // 重新赋值之前最好也进行清空
     gridApiForFront.current?.setRowData(datas.details);
@@ -549,21 +562,18 @@ const FrontTableList: React.FC<any> = () => {
   };
 
   // 项目名称选择事件
-  const prjNameChanged = async (value: any, params: any) => {
-    console.log(params);
-
-    const range = {
-      projects: value,
-      start: choicedCondition.start,
-      end: choicedCondition.end
-    };
-
+  const prjNameChanged = async (value: any) => {
 
     setQueryConditionForSource({
       ...choicedCondition,
       projects: value
     });
-    const datas: any = await queryFrontData(gqlClient, range);
+
+    const datas: any = await queryFrontData(gqlClient, {
+      projects: value,
+      start: choicedCondition.start,
+      end: choicedCondition.end
+    });
     gridApiForFront.current?.setRowData([]);
     gridApiForFront.current?.setPinnedTopRowData([])  // 重新赋值之前最好也进行清空
     gridApiForFront.current?.setRowData(datas.details);
@@ -630,10 +640,10 @@ const FrontTableList: React.FC<any> = () => {
 
         </Form.Item>
 
-        {/* 数据表格 */}
+        {/* 数据表格   */}
         <div className="ag-theme-alpine" style={{height: sourceGridHeight, width: '100%', marginTop: -18}}>
           <AgGridReact
-            columnDefs={getSourceColums(g_currentMonth_range.start, g_currentMonth_range.end)} // 定义列
+            columnDefs={getSourceColums(choicedCondition.start, choicedCondition.end)} // 定义列
             rowData={data?.details} // 数据绑定
             pinnedTopRowData={data?.totals}
             defaultColDef={{

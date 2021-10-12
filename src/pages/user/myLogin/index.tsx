@@ -8,8 +8,6 @@ import styles from './index.less';
 import axios from "axios";
 import {useRequest} from "ahooks";
 
-const {TextArea} = Input;
-
 
 /**
  * 此方法会跳转到 redirect 参数所在的位置
@@ -1472,7 +1470,7 @@ const Login: React.FC<{}> = () => {
 
           {/* <TextArea rows={4} onChange={codeChanges}/> */}
 
-          {/* 手动登录 */}
+          {/* 手动登录
 
           <ProForm submitter={{
             searchConfig: {
@@ -1493,7 +1491,7 @@ const Login: React.FC<{}> = () => {
             handleSubmit();
           }}>
           </ProForm>
-
+*/}
 
         </div>
       </div>

@@ -471,11 +471,19 @@ const JenkinsCheck: React.FC<any> = () => {
         currentPage: Pages.currentPage - 1
       });
 
+      const newData = await queryDevelopViews(Pages.currentPage - 1, Pages.countsOfPage);
+      gridApi.current?.setRowData(newData.datas);
+    } else {
 
+      message.error({
+        content: '当前页已是第一页！',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
     }
 
-    const newData = await queryDevelopViews(Pages.currentPage - 1, Pages.countsOfPage);
-    gridApi.current?.setRowData(newData.datas);
 
   };
 
@@ -492,38 +500,54 @@ const JenkinsCheck: React.FC<any> = () => {
 
       const newData = await queryDevelopViews(Pages.currentPage + 1, Pages.countsOfPage);
       gridApi.current?.setRowData(newData.datas);
+    } else {
+      message.error({
+        content: '当前页已是最后一页！',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
     }
 
   };
 
   // 跳转到第几页
 
-  const jumpChange = (params: any) => {
-
-    const inputData = params.nativeEvent.data;
-    if (Number(inputData)) {
-
-      if (Number(inputData) > Pages.totalPages) {
-        setPages({
-          ...Pages,
-          jumpToPage: Number(inputData)
-
-        });
-      } else {
-        setPages({
-          ...Pages,
-          jumpToPage: Number(inputData),
-          currentPage: Number(inputData)
-        });
-      }
-
-    }
-  };
+  // const jumpChange = (params: any) => {
+  //
+  //   const inputData = params.nativeEvent.data;
+  //   if (Number(inputData)) {
+  //
+  //     if (Number(inputData) > Pages.totalPages) {
+  //       setPages({
+  //         ...Pages,
+  //         jumpToPage: Number(inputData)
+  //
+  //       });
+  //     } else {
+  //       setPages({
+  //         ...Pages,
+  //         jumpToPage: Number(inputData),
+  //         currentPage: Number(inputData)
+  //       });
+  //     }
+  //
+  //   }
+  // };
 
   const goToPage = async (params: any) => {
 
     const pageCounts = Number(params.currentTarget.defaultValue);
-    if (pageCounts > Pages.totalPages) {
+    if (pageCounts.toString() === "NaN") {
+      message.error({
+        content: '请输入有效跳转页数！',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    } else if (pageCounts > Pages.totalPages) {
 
       // 提示已超过最大跳转页数
       message.error({
@@ -871,7 +895,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
         {/* 跳转到第几页 */}
         <label style={{marginLeft: 20, fontWeight: "bold"}}> 跳转到第 </label>
-        <Input style={{textAlign: "center", width: 50, marginLeft: 2}} value={Pages.jumpToPage} onChange={jumpChange}
+        <Input style={{textAlign: "center", width: 50, marginLeft: 2}} defaultValue={1}
                onBlur={goToPage}/>
         <label style={{marginLeft: 2, fontWeight: "bold"}}> 页 </label>
 

@@ -15,20 +15,20 @@ import {getGridColums, alaysisDatas} from "./columns";
 const {Option} = Select;
 const {RangePicker} = DatePicker;
 
-const g_queryCondition =
-  {
-    approvalType: "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu", // emergency id
-    applicant: "",
-    manager: "",
-    status: "",
-    start: "",
-    end: "",
-    page: 1,
-    pageSize: 20
-  };
+const g_queryCondition = {
+  approvalType: "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu", // emergency id
+  applicant: "",
+  manager: "",
+  status: "",
+  start: "",
+  end: "",
+  page: 1,
+  pageSize: 20
+};
 
 // 查询数据
 const queryDevelopViews = async (condition: any) => {
+
 
   let datas: any = [];
   const pageInfo = {
@@ -202,7 +202,6 @@ const JenkinsCheck: React.FC<any> = () => {
 
   };
   const getselectedApplicant = (values: any, params: any) => {
-
     g_queryCondition.applicant = params.key;
   };
 
@@ -310,7 +309,7 @@ const JenkinsCheck: React.FC<any> = () => {
     devManager: "inline-block",
     prjManager: "none"
   });
-  const changeAppType = (appType: any) => {
+  const changeAppType = async (appType: any) => {
 
     // 根据单据类型显示不同的经理选项（项目经理和开发经理）
     getManagers(appType);
@@ -328,10 +327,18 @@ const JenkinsCheck: React.FC<any> = () => {
         prjManager: "none"
       });
     }
-
-    // const new_columns: any = getGridColums(allParams.children);
-    // gridApi.current?.setColumnDefs(new_columns);
-    // gridApi.current?.setRowData([]);
+    gridApi.current?.setRowData([]);
+    const newData = await queryDevelopViews({
+      approvalType: appType, // emergency id
+      applicant: "",
+      manager: "",
+      status: "",
+      start: "",
+      end: "",
+      page: 1,
+      pageSize: 20
+    });
+    gridApi.current?.setRowData(newData.datas);
 
   };
 

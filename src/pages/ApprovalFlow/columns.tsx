@@ -45,7 +45,6 @@ const approvePerson = (params: any) => {
   let returnDiv = "";
   const appData = params.value;
 
-  debugger;
   if (appData) {
 
     appData.forEach((ele: any) => {
@@ -179,45 +178,45 @@ const getChangeApplyColumns = () => {
       headerName: '产品负责人审批',
       field: 'excUser',
       minWidth: 90,
-      cellRenderer: approvePerson
+      // cellRenderer: approvePerson
     },
     {
       headerName: '架构审批（Anyone）',
       field: 'architecture_approval',
       minWidth: 110,
-      cellRenderer: approvePerson
+      // cellRenderer: approvePerson
     },
     {
       headerName: '项目负责人审批',
       field: 'excUser',
       minWidth: 90,
-      cellRenderer: approvePerson
+      // cellRenderer: approvePerson
     },
     {
       headerName: 'QA审批（Anyone）',
       field: 'ID',
       minWidth: 100,
-      cellRenderer: approvePerson
+      // cellRenderer: approvePerson
 
     },
     {
       headerName: 'CCB审批（Everyone）',
       field: 'ccb_approval',
       minWidth: 150,
-      cellRenderer: approvePerson
+      // cellRenderer: approvePerson
 
     },
     {
       headerName: '总设确认',
       field: 'total_confirm',
       minWidth: 110,
-      cellRenderer: approvePerson
+      // cellRenderer: approvePerson
     },
     {
       headerName: 'QA确认（Anyone）',
       field: 'qa_confirm',
       minWidth: 110,
-      cellRenderer: approvePerson
+      // cellRenderer: approvePerson
 
     },
     {
@@ -314,11 +313,11 @@ const getDevHotfixOnlineColumns = () => {
     {
       headerName: '期望上线时间',
       field: 'online_time',
-      minWidth: 150,
+      minWidth: 110,
       pinned: 'left',
     },
     {
-      headerName: 'hotfix所属端',
+      headerName: '所属端',
       field: 'hotfix_server',
       minWidth: 110,
       pinned: 'left',
@@ -341,7 +340,7 @@ const getDevHotfixOnlineColumns = () => {
       minWidth: 110,
     },
     {
-      headerName: 'hotfix内容详情',
+      headerName: '内容详情',
       field: 'hotfix_content',
       minWidth: 150,
     },
@@ -375,7 +374,7 @@ const getDevHotfixOnlineColumns = () => {
     {
       headerName: '提交时间',
       field: 'apply_time',
-      minWidth: 150,
+      minWidth: 170,
     },
     {
       headerName: '指定审批人',
@@ -383,7 +382,7 @@ const getDevHotfixOnlineColumns = () => {
       minWidth: 110,
       wrapText: true,
       autoHeight: true,
-      cellRenderer: approvePerson
+      // cellRenderer: approvePerson
     },
     {
       headerName: '测试经理审批',
@@ -391,7 +390,7 @@ const getDevHotfixOnlineColumns = () => {
       minWidth: 110,
       wrapText: true,
       autoHeight: true,
-      cellRenderer: approvePerson
+      // cellRenderer: approvePerson
 
     },
     {
@@ -425,8 +424,41 @@ const getProductHotfixRepaireApplyColumns = () => {
     {
       headerName: '禅道编号',
       field: 'chandao_num',
-      minWidth: 110,
+      minWidth: 90,
       pinned: 'left',
+      cellRenderer: (params: any) => {
+        const zentao_id = params.value.toString();
+
+        let zentaoArray = [];
+
+        if (zentao_id.includes("、")) {
+          zentaoArray = zentao_id.split("、");
+        } else {
+          zentaoArray.push(zentao_id);
+        }
+
+        let returnStr = "";
+        zentaoArray.forEach((ele: any) => {
+          let zentaoType = "";
+          if (params.data.hotfix_type === "需求") {
+            zentaoType = "story";
+          }
+
+          if (params.data.hotfix_type === "bug") {
+            zentaoType = "bug";
+          }
+
+          if (params.data.hotfix_type === "task") {
+            zentaoType = "task";
+          }
+
+          returnStr = returnStr === "" ? `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/${zentaoType}-view-${ele}.html'>${ele}</a>`
+            : `${returnStr},<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/${zentaoType}-view-${ele}.html'>${ele}</a>`;
+
+        });
+
+        return returnStr;
+      },
     },
     {
       headerName: '申请人',
@@ -478,19 +510,19 @@ const getProductHotfixRepaireApplyColumns = () => {
     {
       headerName: '提交时间',
       field: 'apply_time',
-      minWidth: 90,
+      minWidth: 170,
     },
     {
       headerName: '指定审批人',
       field: 'spec_approval',
       minWidth: 150,
-      cellRenderer: approvePerson
+      // cellRenderer: approvePerson
     },
     {
       headerName: '测试经理审批（Anyone）',
       field: 'test_leader',
       minWidth: 110,
-      cellRenderer: approvePerson
+      // cellRenderer: approvePerson
     }
 
   ];
@@ -511,19 +543,35 @@ const getUEDHotfixApplyColumns = () => {
     {
       headerName: '审批编号',
       field: 'sp_no',
-      minWidth: 150,
+      minWidth: 130,
       pinned: 'left',
     },
     {
       headerName: '禅道编号',
       field: 'chandao_num',
-      minWidth: 110,
+      minWidth: 90,
       pinned: 'left',
+      cellRenderer: (params: any) => {
+
+
+        if (params.data.hotfix_type === "需求") {
+          return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/story-view-${params.value}.html'>${params.value}</a>`;
+        }
+        if (params.data.hotfix_type === "bug") {
+          return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/bug-view-${params.value}.html'>${params.value}</a>`;
+        }
+
+        if (params.data.hotfix_type === "task") {
+          return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/task-view-${params.value}.html'>${params.value}</a>`;
+        }
+        return params.value;
+
+      },
     },
     {
       headerName: '申请人',
       field: 'applicant',
-      minWidth: 110,
+      minWidth: 90,
       pinned: 'left',
     },
     {
@@ -541,7 +589,7 @@ const getUEDHotfixApplyColumns = () => {
     {
       headerName: '期望修复时间',
       field: 'repair_time',
-      minWidth: 150,
+      minWidth: 120,
       pinned: 'left',
     },
     {
@@ -563,7 +611,7 @@ const getUEDHotfixApplyColumns = () => {
       minWidth: 90,
     },
     {
-      headerName: 'hotfix修复内容',
+      headerName: '修复内容',
       field: 'hotfix_content',
       minWidth: 100,
     },
@@ -580,25 +628,25 @@ const getUEDHotfixApplyColumns = () => {
     {
       headerName: '提交时间',
       field: 'apply_time',
-      minWidth: 90,
+      minWidth: 170,
     },
     {
       headerName: '产研负责人审批',
       field: 'product_leader',
       minWidth: 110,
-      cellRenderer: approvePerson
+      // cellRenderer: approvePerson
     },
     {
       headerName: '指定审批人',
       field: 'spec_approval',
       minWidth: 90,
-      cellRenderer: approvePerson
+      // cellRenderer: approvePerson
     },
     {
       headerName: '测试经理审批（Anyone）',
       field: 'test_leader',
       minWidth: 100,
-      cellRenderer: approvePerson
+      // cellRenderer: approvePerson
 
     }
   ];
@@ -726,7 +774,7 @@ const getEmergencyApplyColumns = () => {
       minWidth: 110,
       wrapText: true,
       autoHeight: true,
-      cellRenderer: approvePerson
+      // cellRenderer: approvePerson
     },
     {
       headerName: '测试经理审批（Anyone）',
@@ -734,7 +782,7 @@ const getEmergencyApplyColumns = () => {
       minWidth: 110,
       wrapText: true,
       autoHeight: true,
-      cellRenderer: approvePerson
+      // cellRenderer: approvePerson
     },
     {
       headerName: '测试审批（Anyone）',

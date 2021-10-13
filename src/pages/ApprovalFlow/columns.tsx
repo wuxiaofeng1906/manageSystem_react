@@ -45,6 +45,7 @@ const approvePerson = (params: any) => {
   let returnDiv = "";
   const appData = params.value;
 
+  debugger;
   if (appData) {
 
     appData.forEach((ele: any) => {
@@ -107,76 +108,82 @@ const getChangeApplyColumns = () => {
     },
     {
       headerName: '审批编号',
-      field: 'taskName',
+      field: 'sp_no',
       minWidth: 150,
       pinned: 'left',
     },
     {
       headerName: '项目名称',
-      field: 'starttime',
+      field: 'project_name',
       minWidth: 110,
       pinned: 'left',
     },
     {
       headerName: '项目经理',
-      field: 'endtime',
+      field: 'leader',
       minWidth: 110,
       pinned: 'left',
     },
     {
       headerName: '变更申请人',
-      field: 'excUser',
+      field: 'change_applicant',
       minWidth: 90,
       pinned: 'left',
     },
     {
       headerName: '变更来源',
-      field: 'ID',
+      field: 'change_source',
       minWidth: 100,
       pinned: 'left',
     },
     {
-      headerName: '变更类别',
-      field: 'taskName',
+      headerName: '变更类型',
+      field: 'change_type',
       minWidth: 150,
       pinned: 'left',
     },
     {
       headerName: '变更对象',
-      field: 'starttime',
+      field: 'change_obj',
       minWidth: 110,
       pinned: 'left',
     },
     {
       headerName: '当前审批状态',
-      field: 'endtime',
+      field: 'sp_status',
       minWidth: 110,
       cellRenderer: approveStatus,
       pinned: 'left',
     },
     {
       headerName: '变更所处阶段',
-      field: 'excUser',
+      field: 'change_phase',
       minWidth: 90,
     },
     {
       headerName: '变更原因',
-      field: '100',
+      field: 'change_why',
       minWidth: 70,
     },
     {
       headerName: '变更内容',
-      field: 'taskName',
+      field: 'change_content',
       minWidth: 150,
     },
     {
       headerName: '变更影响',
-      field: 'starttime',
+      field: 'change_impact',
       minWidth: 110,
     },
     {
+      headerName: '产品负责人审批',
+      field: 'excUser',
+      minWidth: 90,
+      cellRenderer: approvePerson
+    },
+    {
       headerName: '架构审批（Anyone）',
-      field: 'endtime',
+      field: 'architecture_approval',
       minWidth: 110,
       cellRenderer: approvePerson
     },
@@ -195,68 +202,68 @@ const getChangeApplyColumns = () => {
     },
     {
       headerName: 'CCB审批（Everyone）',
-      field: 'taskName',
+      field: 'ccb_approval',
       minWidth: 150,
       cellRenderer: approvePerson
 
     },
     {
       headerName: '总设确认',
-      field: 'starttime',
+      field: 'total_confirm',
       minWidth: 110,
       cellRenderer: approvePerson
     },
     {
       headerName: 'QA确认（Anyone）',
-      field: 'endtime',
+      field: 'qa_confirm',
       minWidth: 110,
       cellRenderer: approvePerson
 
     },
     {
       headerName: '变更涉及文档',
-      field: 'excUser',
+      field: 'change_doc',
       minWidth: 90,
       cellRenderer: linkRender
     },
     {
       headerName: '是否涉及交互修改',
-      field: 'ID',
+      field: 'change_modify',
       minWidth: 100,
     },
     {
       headerName: '原计划截止日期',
-      field: 'taskName',
+      field: 'original_deadline',
       minWidth: 150,
     },
     {
       headerName: '调整后计划截止日期',
-      field: 'starttime',
+      field: 'adjust_plan_original_deadline',
       minWidth: 110,
       // cellRenderer: cellRendererForId
     },
     {
       headerName: '变更天数',
-      field: 'endtime',
+      field: 'change_days',
       minWidth: 110,
     },
     {
       headerName: '是否变更里程碑计划',
-      field: 'excUser',
+      field: 'change_milestone_plan',
       minWidth: 90,
     },
     {
       headerName: '变更工时影响（H）',
-      field: 'endtime',
+      field: 'change_hours',
       minWidth: 110,
     },
     {
       headerName: '备注',
-      field: 'excUser',
+      field: 'comment_content',
       minWidth: 90,
     }, {
       headerName: '提交时间',
-      field: 'excUser',
+      field: 'apply_time',
       minWidth: 90,
     },
   ];
@@ -411,77 +418,77 @@ const getProductHotfixRepaireApplyColumns = () => {
     },
     {
       headerName: '审批编号',
-      field: 'taskName',
+      field: 'sp_no',
       minWidth: 150,
       pinned: 'left',
     },
     {
       headerName: '禅道编号',
-      field: 'starttime',
+      field: 'chandao_num',
       minWidth: 110,
       pinned: 'left',
     },
     {
       headerName: '申请人',
-      field: 'endtime',
+      field: 'applicant',
       minWidth: 110,
       pinned: 'left',
     },
     {
       headerName: '开发经理',
-      field: 'excUser',
+      field: 'leader',
       minWidth: 90,
       pinned: 'left',
     },
     {
       headerName: '紧急程度',
-      field: 'ID',
+      field: 'emergency_degree',
       minWidth: 100,
       pinned: 'left',
     },
     {
       headerName: '期望修复时间',
-      field: 'taskName',
+      field: 'repair_time',
       minWidth: 150,
       pinned: 'left',
     },
     {
       headerName: 'hotfix类型',
-      field: 'starttime',
+      field: 'hotfix_type',
       minWidth: 110,
       pinned: 'left',
     },
     {
       headerName: '当前审批状态',
-      field: 'endtime',
+      field: 'sp_status',
       minWidth: 110,
       cellRenderer: approveStatus,
       pinned: 'left',
     },
     {
       headerName: '修改说明/测试建议',
-      field: 'excUser',
+      field: 'test_advice',
       minWidth: 90,
     },
     {
       headerName: '备注',
-      field: '100',
+      field: 'comment_content',
       minWidth: 70,
     },
     {
       headerName: '提交时间',
-      field: 'excUser',
+      field: 'apply_time',
       minWidth: 90,
     },
     {
       headerName: '指定审批人',
-      field: 'taskName',
+      field: 'spec_approval',
       minWidth: 150,
       cellRenderer: approvePerson
     },
     {
       headerName: '测试经理审批（Anyone）',
-      field: 'starttime',
+      field: 'test_leader',
       minWidth: 110,
       cellRenderer: approvePerson
     }
@@ -503,93 +510,93 @@ const getUEDHotfixApplyColumns = () => {
     },
     {
       headerName: '审批编号',
-      field: 'taskName',
+      field: 'sp_no',
       minWidth: 150,
       pinned: 'left',
     },
     {
       headerName: '禅道编号',
-      field: 'starttime',
+      field: 'chandao_num',
       minWidth: 110,
       pinned: 'left',
     },
     {
       headerName: '申请人',
-      field: 'endtime',
+      field: 'applicant',
       minWidth: 110,
       pinned: 'left',
     },
     {
       headerName: '开发经理',
-      field: 'excUser',
+      field: 'leader',
       minWidth: 90,
       pinned: 'left',
     },
     {
       headerName: '紧急程度',
-      field: 'ID',
+      field: 'emergency_degree',
       minWidth: 100,
       pinned: 'left',
     },
     {
       headerName: '期望修复时间',
-      field: 'taskName',
+      field: 'repair_time',
       minWidth: 150,
       pinned: 'left',
     },
     {
       headerName: 'hotfix类型',
-      field: 'starttime',
+      field: 'hotfix_type',
       minWidth: 110,
       pinned: 'left',
     },
     {
       headerName: '当前审批状态',
-      field: 'endtime',
+      field: 'sp_status',
       minWidth: 110,
       cellRenderer: approveStatus,
       pinned: 'left',
     },
     {
       headerName: '是否需要测试验证',
-      field: 'excUser',
+      field: 'validation',
       minWidth: 90,
     },
     {
       headerName: 'hotfix修复内容',
-      field: 'ID',
+      field: 'hotfix_content',
       minWidth: 100,
     },
     {
       headerName: '修改说明/测试建议',
-      field: 'taskName',
+      field: 'test_advice',
       minWidth: 150,
     },
     {
       headerName: '备注',
-      field: 'starttime',
+      field: 'comment_content',
       minWidth: 110,
     },
     {
       headerName: '提交时间',
-      field: 'excUser',
+      field: 'apply_time',
       minWidth: 90,
     },
     {
-      headerName: '产妍负责人审批',
-      field: 'endtime',
+      headerName: '产研负责人审批',
+      field: 'product_leader',
       minWidth: 110,
       cellRenderer: approvePerson
     },
     {
       headerName: '指定审批人',
-      field: 'excUser',
+      field: 'spec_approval',
       minWidth: 90,
       cellRenderer: approvePerson
     },
     {
       headerName: '测试经理审批（Anyone）',
-      field: 'ID',
+      field: 'test_leader',
       minWidth: 100,
       cellRenderer: approvePerson
 
@@ -711,7 +718,7 @@ const getEmergencyApplyColumns = () => {
       minWidth: 110,
       wrapText: true,
       autoHeight: true,
-      cellRenderer: approvePerson
+      // cellRenderer: approvePerson
     },
     {
       headerName: 'CCB审批（Everyone）',
@@ -808,12 +815,61 @@ const getDevHotfixOnlineDatas = (oraDatas: any, start_id: number) => {
 
 };
 
+// 产品hotfix修复申请
 const getProductHotfixRepaireApplyDatas = (oraDatas: any, start_id: number) => {
+  const datas: any = [];
+  oraDatas.forEach((ele: any, index: number) => {
 
+    datas.push({
+      ID: start_id + index,
+      sp_no: ele.sp_no,
+      chandao_num: ele.chandao_num,
+      applicant: ele.applicant,
+      leader: ele.leader,
+      emergency_degree: ele.emergency_degree,
+      repair_time: ele.repair_time,
+      hotfix_type: ele.hotfix_type,
+      sp_status: ele.sp_status,
+      test_advice: ele.test_advice,
+      comment_content: ele.comment_content,
+      spec_approval: ele.spec_approval,
+      test_leader: ele.test_leader,
+      apply_time: ele.apply_time
+
+    });
+  });
+
+  return datas;
 };
 
+// UED-hotfix修复申请
 const getUEDHotfixApplyDatas = (oraDatas: any, start_id: number) => {
+  const datas: any = [];
+  oraDatas.forEach((ele: any, index: number) => {
 
+    datas.push({
+      ID: start_id + index,
+      sp_no: ele.sp_no,
+      chandao_num: ele.chandao_num,
+      applicant: ele.applicant,
+      leader: ele.leader,
+      emergency_degree: ele.emergency_degree,
+      repair_time: ele.repair_time,
+      hotfix_type: ele.hotfix_type,
+      sp_status: ele.sp_status,
+      validation: ele.validation,
+      hotfix_content: ele.hotfix_content,
+      test_advice: ele.test_advice,
+      comment_content: ele.comment_content,
+      product_leader: ele.product_leader,
+      spec_approval: ele.spec_approval,
+      test_leader: ele.test_leader,
+      apply_time: ele.apply_time
+
+    });
+  });
+
+  return datas;
 };
 
 const getEmergencyApplyDatas = (oraDatas: any, start_id: number) => {
@@ -849,7 +905,46 @@ const getEmergencyApplyDatas = (oraDatas: any, start_id: number) => {
   return datas;
 };
 
+// 变更申请
 const getChangeApplyDatas = (oraDatas: any, start_id: number) => {
+
+  const datas: any = [];
+  oraDatas.forEach((ele: any, index: number) => {
+
+    datas.push({
+      ID: start_id + index,
+      sp_no: ele.sp_no,
+      project_name: ele.project_name,
+      leader: ele.leader,
+      change_applicant: ele.change_applicant,
+      change_source: ele.change_source,
+      change_type: ele.change_type,
+      change_obj: ele.change_obj,
+      sp_status: ele.sp_status,
+      change_phase: ele.change_phase,
+      change_why: ele.change_why,
+      change_content: ele.change_content,
+      change_impact: ele.change_impact,
+      product_owner: ele.product_owner,
+      architecture_approval: ele.architecture_approval,
+      // QA 审批 和 项目负责人审批
+      ccb_approval: ele.ccb_approval,
+      total_confirm: ele.total_confirm,
+      qa_confirm: ele.qa_confirm,
+      change_doc: ele.change_doc,
+      change_modify: ele.change_modify,
+      original_deadline: ele.original_deadline,
+      adjust_plan_original_deadline: ele.adjust_plan_original_deadline,
+      change_days: ele.change_days,
+      change_milestone_plan: ele.change_milestone_plan,
+      change_hours: ele.change_hours,
+      comment_content: ele.comment_content,
+      apply_time: ele.apply_time
+
+    });
+  });
+
+  return datas;
 
 };
 

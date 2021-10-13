@@ -54,14 +54,20 @@ const queryDevelopViews = async (pages: Number, pageSize: Number) => {
 
       if (res.data.code === 200) {
 
-        pageInfo.itemCount = res.data.data.count;
-        pageInfo.pageCount = res.data.data.page;
-        pageInfo.pageSize = res.data.data.page_size;
+        pageInfo.itemCount = res.data.data.count; // 总条数
+        pageInfo.pageCount = res.data.data.page; // 当前页
+        pageInfo.pageSize = res.data.data.page_size; // 每页多少条
+
+        let startId = res.data.data.count;
+        if (pages > 1) {
+          startId = res.data.data.count - ((res.data.data.page - 1) * res.data.data.page_size);
+        }
 
         const serverDatas = res.data.data.data;
-        serverDatas.forEach((ele: any) => {
+        serverDatas.forEach((ele: any, index: any) => {
 
           datas.push({
+            NO: startId - index,
             ID: ele.number,
             taskName: ele.task_name,
             starttime: ele.start_time,
@@ -355,6 +361,37 @@ const JenkinsCheck: React.FC<any> = () => {
     });
   };
 
+  const [Pages, setPages] = useState({
+    totalCounts: 0,  // 总条数
+    countsOfPage: 20,  // 每页显示多少条
+    totalPages: 0,  // 一共多少页
+    currentPage: 0, // 当前是第几页
+    jumpToPage: 0  // 跳转到第几页
+  });
+
+  // 计算分页信息
+  const showPageInfo = (pageInfo: any) => {
+    let totalCount = 0;
+    let countsOfPages = 1;
+    let totalPage = 1;
+    let currentPages = 1;
+    if (data) {
+      totalCount = Number(pageInfo.itemCount);
+      countsOfPages = Number(pageInfo.pageSize);
+      totalPage = Number(pageInfo.itemCount) === 0 ? 0 : Math.ceil(Number(pageInfo.itemCount) / Number(pageInfo.pageSize));
+      currentPages = Number(pageInfo.pageCount);
+    }
+
+
+    setPages({
+      totalCounts: totalCount,
+      countsOfPage: countsOfPages,
+      totalPages: totalPage,
+      currentPage: currentPages,
+      jumpToPage: 1
+    });
+  };
+
   // 确定执行任务
   const commitCarryTask = () => {
     const modalData = formForCarryTask.getFieldsValue()
@@ -442,9 +479,11 @@ const JenkinsCheck: React.FC<any> = () => {
     axios.post('/api/preOnline/job/build', datas).then(async function (res) {
 
       if (res.data.code === 200) {
+
         const newData = await queryDevelopViews(1, 20);
 
         gridApi.current?.setRowData(newData.datas);
+        showPageInfo(newData.pageInfo);
         setCheckModalVisible(false);
         message.info({
           content: "执行完毕！",
@@ -456,7 +495,7 @@ const JenkinsCheck: React.FC<any> = () => {
         setLoadSate(false);
       } else {
         message.error({
-          content: `${res.data.message}${res.data.zt.message.end[0]}`,
+          content: `执行失败：${res.data.msg}`,
           duration: 1,
           style: {
             marginTop: '50vh',
@@ -464,7 +503,8 @@ const JenkinsCheck: React.FC<any> = () => {
         });
         setLoadSate(false);
       }
-    }).catch(function (error) {
+    }).catch(function (error: any) {
+
       if (error.toString().includes("403")) {
         message.error({
           content: `您无权限执行！`,
@@ -488,19 +528,14 @@ const JenkinsCheck: React.FC<any> = () => {
 
   };
 
-  const [Pages, setPages] = useState({
-    totalCounts: 0,  // 总条数
-    countsOfPage: 20,  // 每页显示多少条
-    totalPages: 0,  // 一共多少页
-    currentPage: 0, // 当前是第几页
-    jumpToPage: 0  // 跳转到第几页
-  });
+
   // 刷新表格
   const refreshGrid = async () => {
 
     const newData = await queryDevelopViews(Pages.currentPage, Pages.countsOfPage);
 
     gridApi.current?.setRowData(newData.datas);
+    showPageInfo(newData.pageInfo);
 
   };
 
@@ -723,8 +758,8 @@ const JenkinsCheck: React.FC<any> = () => {
   const colums = () => {
     const component: any = [
       {
-        headerName: 'ID',
-        field: 'ID',
+        headerName: 'NO.',
+        field: 'NO',
         maxWidth: 70,
       },
       {
@@ -853,25 +888,27 @@ const JenkinsCheck: React.FC<any> = () => {
 
   useEffect(() => {
 
-    let totalCount = 0;
-    let countsOfPages = 1;
-    let totalPage = 1;
-    let currentPages = 1;
-    if (data) {
-      totalCount = Number(data?.pageInfo.itemCount);
-      countsOfPages = Number(data?.pageInfo.pageSize);
-      totalPage = Number(data?.pageInfo.itemCount) === 0 ? 0 : Math.ceil(Number(data?.pageInfo.itemCount) / Number(data?.pageInfo.pageSize));
-      currentPages = Number(data?.pageInfo.pageCount);
-    }
+    showPageInfo(data?.pageInfo);
 
-
-    setPages({
-      totalCounts: totalCount,
-      countsOfPage: countsOfPages,
-      totalPages: totalPage,
-      currentPage: currentPages,
-      jumpToPage: 1
-    });
+    // let totalCount = 0;
+    // let countsOfPages = 1;
+    // let totalPage = 1;
+    // let currentPages = 1;
+    // if (data) {
+    //   totalCount = Number(data?.pageInfo.itemCount);
+    //   countsOfPages = Number(data?.pageInfo.pageSize);
+    //   totalPage = Number(data?.pageInfo.itemCount) === 0 ? 0 : Math.ceil(Number(data?.pageInfo.itemCount) / Number(data?.pageInfo.pageSize));
+    //   currentPages = Number(data?.pageInfo.pageCount);
+    // }
+    //
+    //
+    // setPages({
+    //   totalCounts: totalCount,
+    //   countsOfPage: countsOfPages,
+    //   totalPages: totalPage,
+    //   currentPage: currentPages,
+    //   jumpToPage: 1
+    // });
   }, [loading])
 
   return (

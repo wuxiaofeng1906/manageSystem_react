@@ -867,11 +867,11 @@ const JenkinsCheck: React.FC<any> = () => {
 
           const paramData = JSON.stringify(params.data);
           return `
-             <a href="${params.data.url}" target="_blank" >
-               <img src="../taskUrl.png" width="20" height="20" alt="任务URL" title="任务URL" />
-             </a>
              <a href="${params.data.taskLog}" target="_blank" >
                <img src="../logs.png" width="20" height="20" alt="任务日志" title="任务日志" />
+             </a>
+             <a href="${params.data.url}" target="_blank" >
+               <img src="../taskUrl.png" width="20" height="20" alt="任务URL" title="任务URL" />
              </a>
             <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='showParams(${paramData})'>
               <img src="../params.png" width="20" height="20" alt="执行参数" title="执行参数" />

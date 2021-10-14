@@ -353,7 +353,7 @@ const JenkinsCheck: React.FC<any> = () => {
       verson_imageevn: "nx-hotfix",
 
       // 检查上线分支是否包含对比分支的提交
-      branch_check: false,
+      branch_check: true,
       branch_mainBranch: ["stage", "master"],
       branch_teachnicalSide: ["front", "backend"],
       branch_targetBranch: undefined,
@@ -392,29 +392,51 @@ const JenkinsCheck: React.FC<any> = () => {
     });
   };
 
+  const [currentTimerId, setCurrentTimerId] = useState("");
+
   const setIntervalForUpdateStatus = () => {
 
-    const myTimer = setInterval(async () => {
-      console.log("上线前检查定时任务", dayjs().format("YYYY-MM-DD HH:mm:ss"));
-      const newData = await queryDevelopViews(1, 20); // 一次只运行几条
-      const {datas} = newData;
-      gridApi.current?.setRowData(datas);
+    // 判断有没有定时器id,有的话就代表有定时器，就不再创建了，如果没有，则创建
+    if (currentTimerId === "") {
+      let executeCount = 0;
 
-      let endRunningFlag = false;
-      for (let index = 0; index < datas.length; index += 1) {
-        if (datas[index].excStatus === null) { // 没有状态时,直接跳出循环，继续等待下一次循环
-          break;
-        } else {
-          endRunningFlag = true;
+      const myTimer = setInterval(async () => {
+        executeCount += 1;
+        console.log("上线前检查-定时任务", `执行次数${executeCount};执行时间：${dayjs().format("YYYY-MM-DD HH:mm:ss")}`);
+
+        const newData = await queryDevelopViews(1, 20); // 一次只运行几条
+        const {datas} = newData;
+        gridApi.current?.setRowData(datas);
+
+        // 是否还在运行
+        let isRunning = false;
+        for (let index = 0; index < datas.length; index += 1) {
+          if (datas[index].excStatus === null) { // 没有状态时,直接跳出循环，继续等待下一次循环
+            isRunning = true;
+            break;
+          }
         }
-      }
 
-      // 如果所有运行结束，那么则清除定时任务
-      if (endRunningFlag) {
-        clearInterval(myTimer);
-      }
+        // 如果所有运行结束，那么则清除定时任务
+        if (isRunning === false) {
+          setCurrentTimerId("");
+          // console.log("datas", datas);
+          console.log("上线前检查-定时任务正常结束");
+          clearInterval(myTimer);
 
-    }, 10000); // 10S刷新一次
+        }
+
+        // 超过次数就直接清除掉
+        if (executeCount >= 12) {
+          setCurrentTimerId("");
+          console.log("上线前检查-超过固定执行次数从而清除定时任务！");
+          clearInterval(myTimer);
+        }
+
+      }, 10000); // 10S刷新一次
+      // console.log("myTimer", myTimer);
+      setCurrentTimerId(myTimer.toString());
+    }
 
   };
 

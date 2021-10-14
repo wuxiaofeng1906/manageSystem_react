@@ -125,7 +125,7 @@ const getChangeApplyColumns = () => {
     },
     {
       headerName: '变更申请人',
-      field: 'change_applicant',
+      field: 'applicant',
       minWidth: 90,
       pinned: 'left',
     },
@@ -178,45 +178,45 @@ const getChangeApplyColumns = () => {
       headerName: '产品负责人审批',
       field: 'excUser',
       minWidth: 90,
-      // cellRenderer: approvePerson
+      cellRenderer: approvePerson
     },
     {
       headerName: '架构审批（Anyone）',
       field: 'architecture_approval',
       minWidth: 110,
-      // cellRenderer: approvePerson
+      cellRenderer: approvePerson
     },
     {
       headerName: '项目负责人审批',
-      field: 'excUser',
+      field: 'project_head_approval',
       minWidth: 90,
-      // cellRenderer: approvePerson
+      cellRenderer: approvePerson
     },
     {
       headerName: 'QA审批（Anyone）',
-      field: 'ID',
+      field: 'qa_approval',
       minWidth: 100,
-      // cellRenderer: approvePerson
+      cellRenderer: approvePerson
 
     },
     {
       headerName: 'CCB审批（Everyone）',
       field: 'ccb_approval',
       minWidth: 150,
-      // cellRenderer: approvePerson
+      cellRenderer: approvePerson
 
     },
     {
       headerName: '总设确认',
       field: 'total_confirm',
       minWidth: 110,
-      // cellRenderer: approvePerson
+      cellRenderer: approvePerson
     },
     {
       headerName: 'QA确认（Anyone）',
       field: 'qa_confirm',
       minWidth: 110,
-      // cellRenderer: approvePerson
+      cellRenderer: approvePerson
 
     },
     {
@@ -239,7 +239,6 @@ const getChangeApplyColumns = () => {
       headerName: '调整后计划截止日期',
       field: 'adjust_plan_original_deadline',
       minWidth: 110,
-      // cellRenderer: cellRendererForId
     },
     {
       headerName: '变更天数',
@@ -382,7 +381,7 @@ const getDevHotfixOnlineColumns = () => {
       minWidth: 110,
       wrapText: true,
       autoHeight: true,
-      // cellRenderer: approvePerson
+      cellRenderer: approvePerson
     },
     {
       headerName: '测试经理审批',
@@ -390,7 +389,7 @@ const getDevHotfixOnlineColumns = () => {
       minWidth: 110,
       wrapText: true,
       autoHeight: true,
-      // cellRenderer: approvePerson
+      cellRenderer: approvePerson
 
     },
     {
@@ -516,13 +515,13 @@ const getProductHotfixRepaireApplyColumns = () => {
       headerName: '指定审批人',
       field: 'spec_approval',
       minWidth: 150,
-      // cellRenderer: approvePerson
+      cellRenderer: approvePerson
     },
     {
       headerName: '测试经理审批（Anyone）',
       field: 'test_leader',
       minWidth: 110,
-      // cellRenderer: approvePerson
+      cellRenderer: approvePerson
     }
 
   ];
@@ -634,19 +633,19 @@ const getUEDHotfixApplyColumns = () => {
       headerName: '产研负责人审批',
       field: 'product_leader',
       minWidth: 110,
-      // cellRenderer: approvePerson
+      cellRenderer: approvePerson
     },
     {
       headerName: '指定审批人',
       field: 'spec_approval',
       minWidth: 90,
-      // cellRenderer: approvePerson
+      cellRenderer: approvePerson
     },
     {
       headerName: '测试经理审批（Anyone）',
       field: 'test_leader',
       minWidth: 100,
-      // cellRenderer: approvePerson
+      cellRenderer: approvePerson
 
     }
   ];
@@ -766,7 +765,7 @@ const getEmergencyApplyColumns = () => {
       minWidth: 110,
       wrapText: true,
       autoHeight: true,
-      // cellRenderer: approvePerson
+      cellRenderer: approvePerson
     },
     {
       headerName: 'CCB审批（Everyone）',
@@ -774,7 +773,7 @@ const getEmergencyApplyColumns = () => {
       minWidth: 110,
       wrapText: true,
       autoHeight: true,
-      // cellRenderer: approvePerson
+      cellRenderer: approvePerson
     },
     {
       headerName: '测试经理审批（Anyone）',
@@ -782,7 +781,7 @@ const getEmergencyApplyColumns = () => {
       minWidth: 110,
       wrapText: true,
       autoHeight: true,
-      // cellRenderer: approvePerson
+      cellRenderer: approvePerson
     },
     {
       headerName: '测试审批（Anyone）',
@@ -964,7 +963,7 @@ const getChangeApplyDatas = (oraDatas: any, start_id: number) => {
       sp_no: ele.sp_no,
       project_name: ele.project_name,
       leader: ele.leader,
-      change_applicant: ele.change_applicant,
+      applicant: ele.applicant,
       change_source: ele.change_source,
       change_type: ele.change_type,
       change_obj: ele.change_obj,
@@ -975,7 +974,8 @@ const getChangeApplyDatas = (oraDatas: any, start_id: number) => {
       change_impact: ele.change_impact,
       product_owner: ele.product_owner,
       architecture_approval: ele.architecture_approval,
-      // QA 审批 和 项目负责人审批
+      project_head_approval: ele.project_head_approval,
+      qa_approval: ele.qa_approval,
       ccb_approval: ele.ccb_approval,
       total_confirm: ele.total_confirm,
       qa_confirm: ele.qa_confirm,

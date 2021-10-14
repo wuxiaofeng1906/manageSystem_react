@@ -27,7 +27,7 @@ import axios from 'axios';
 
 
 import dayjs from "dayjs";
-import moment from 'moment';
+import moment, {now} from 'moment';
 
 const {Option} = Select;
 
@@ -392,6 +392,32 @@ const JenkinsCheck: React.FC<any> = () => {
     });
   };
 
+  const setIntervalForUpdateStatus = () => {
+
+    const myTimer = setInterval(async () => {
+      console.log("上线前检查定时任务", dayjs().format("YYYY-MM-DD HH:mm:ss"));
+      const newData = await queryDevelopViews(1, 20); // 一次只运行几条
+      const {datas} = newData;
+      gridApi.current?.setRowData(datas);
+
+      let endRunningFlag = false;
+      for (let index = 0; index < datas.length; index += 1) {
+        if (datas[index].excStatus === null) { // 没有状态时,直接跳出循环，继续等待下一次循环
+          break;
+        } else {
+          endRunningFlag = true;
+        }
+      }
+
+      // 如果所有运行结束，那么则清除定时任务
+      if (endRunningFlag) {
+        clearInterval(myTimer);
+      }
+
+    }, 10000); // 10S刷新一次
+
+  };
+
   // 确定执行任务
   const commitCarryTask = () => {
     const modalData = formForCarryTask.getFieldsValue()
@@ -493,6 +519,9 @@ const JenkinsCheck: React.FC<any> = () => {
           },
         });
         setLoadSate(false);
+
+        // 启动定时任务
+        setIntervalForUpdateStatus();
       } else {
         message.error({
           content: `执行失败：${res.data.msg}`,

@@ -176,7 +176,7 @@ const getChangeApplyColumns = () => {
     },
     {
       headerName: '产品负责人审批',
-      field: 'excUser',
+      field: 'product_owner',
       minWidth: 110,
       wrapText: true,
       autoHeight: true,

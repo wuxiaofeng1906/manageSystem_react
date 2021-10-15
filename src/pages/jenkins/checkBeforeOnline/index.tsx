@@ -427,11 +427,11 @@ const JenkinsCheck: React.FC<any> = () => {
         }
 
         // 超过次数就直接清除掉
-        if (executeCount >= 12) {
-          setCurrentTimerId("");
-          console.log("上线前检查-超过固定执行次数从而清除定时任务！");
-          clearInterval(myTimer);
-        }
+        // if (executeCount >= 12) {
+        //   setCurrentTimerId("");
+        //   console.log("上线前检查-超过固定执行次数从而清除定时任务！");
+        //   clearInterval(myTimer);
+        // }
 
       }, 10000); // 10S刷新一次
       // console.log("myTimer", myTimer);

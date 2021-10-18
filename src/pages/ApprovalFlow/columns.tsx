@@ -275,28 +275,13 @@ const getChangeApplyColumns = () => {
         }
         // 如果不是字符串，就为对象，则需要拼接返回值。
 
-        debugger;
-
-        let sum = 0;
-
-        if (Number(value["前端"]).toString() !== "NaN") {
-          sum += Number(value["前端"]);
-        }
-
-        if (Number(value["后端"]).toString() !== "NaN") {
-          sum += Number(value["后端"]);
-        }
-        if (Number(value["测试"]).toString() !== "NaN") {
-          sum += Number(value["测试"]);
-        }
-
         let returnDiv = "";
         if (value) {
           returnDiv = `
         <div>前端：${value["前端"]}</div>
         <div style="margin-top:-15px">后端：${value["后端"]}</div>
         <div style="margin-top:-15px">测试：${value["测试"]}</div>
-        <div style="margin-top:-15px">合集：${sum}</div>`;
+        <div style="margin-top:-15px">合集：${value["合计"]}</div>`;
         }
 
         return `<div> ${returnDiv} </div>`;
@@ -309,7 +294,9 @@ const getChangeApplyColumns = () => {
     }, {
       headerName: '提交时间',
       field: 'apply_time',
-      minWidth: 170,
+      minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
     },
   ];
 
@@ -341,7 +328,7 @@ const getDevHotfixOnlineColumns = () => {
     {
       headerName: '申请人',
       field: 'applicant',
-      minWidth: 90,
+      minWidth: 80,
       pinned: 'left',
     },
     {
@@ -365,7 +352,7 @@ const getDevHotfixOnlineColumns = () => {
     {
       headerName: '所属端',
       field: 'hotfix_server',
-      minWidth: 110,
+      minWidth: 75,
       pinned: 'left',
     },
     {
@@ -378,12 +365,12 @@ const getDevHotfixOnlineColumns = () => {
     {
       headerName: '类型',
       field: 'hotfix_type',
-      minWidth: 110,
+      minWidth: 75,
     },
     {
       headerName: '编号',
       field: 'hotfix_num',
-      minWidth: 110,
+      minWidth: 75,
       cellRenderer: (params: any) => {
 
         const zentao_id = params.value.toString();
@@ -487,7 +474,9 @@ const getDevHotfixOnlineColumns = () => {
     {
       headerName: '提交时间',
       field: 'apply_time',
-      minWidth: 170,
+      minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
     },
     {
       headerName: '指定审批人',
@@ -600,7 +589,7 @@ const getProductHotfixRepaireApplyColumns = () => {
     {
       headerName: '类型',
       field: 'hotfix_type',
-      minWidth: 90,
+      minWidth: 70,
       pinned: 'left',
     },
     {
@@ -623,7 +612,9 @@ const getProductHotfixRepaireApplyColumns = () => {
     {
       headerName: '提交时间',
       field: 'apply_time',
-      minWidth: 170,
+      minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
     },
     {
       headerName: '指定审批人',
@@ -686,7 +677,7 @@ const getUEDHotfixApplyColumns = () => {
     {
       headerName: '申请人',
       field: 'applicant',
-      minWidth: 90,
+      minWidth: 75,
       pinned: 'left',
     },
     {
@@ -743,7 +734,9 @@ const getUEDHotfixApplyColumns = () => {
     {
       headerName: '提交时间',
       field: 'apply_time',
-      minWidth: 170,
+      minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
     },
     {
       headerName: '产研负责人审批',
@@ -891,17 +884,17 @@ const getEmergencyApplyColumns = () => {
     {
       headerName: '修复内容',
       field: 'emergency_content',
-      minWidth: 130,
+      minWidth: 200,
     },
     {
       headerName: '紧急原因及影响',
       field: 'emergency_degree',
-      minWidth: 150,
+      minWidth: 200,
     },
     {
       headerName: '修改说明/测试建议',
       field: 'test_advice',
-      minWidth: 150,
+      minWidth: 200,
     },
     {
       headerName: '发布环境',
@@ -916,7 +909,9 @@ const getEmergencyApplyColumns = () => {
     {
       headerName: '提交时间',
       field: 'apply_time',
-      minWidth: 170,
+      minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
     },
     {
       headerName: '指定审批人',

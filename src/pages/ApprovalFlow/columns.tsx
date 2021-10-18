@@ -45,6 +45,14 @@ const approvePerson = (params: any) => {
   let returnDiv = "";
   const appData = params.value;
 
+
+  debugger;
+
+
+  if (typeof (appData) === "string") {
+    return appData;
+  }
+
   if (appData) {
 
     appData.forEach((ele: any) => {
@@ -372,6 +380,9 @@ const getDevHotfixOnlineColumns = () => {
       field: 'hotfix_num',
       minWidth: 75,
       cellRenderer: (params: any) => {
+        if (params.value === undefined) {
+          return "";
+        }
 
         const zentao_id = params.value.toString();
 
@@ -529,6 +540,9 @@ const getProductHotfixRepaireApplyColumns = () => {
       minWidth: 90,
       pinned: 'left',
       cellRenderer: (params: any) => {
+        if (params.value === undefined) {
+          return "";
+        }
         const zentao_id = params.value.toString();
 
         let zentaoArray = [];
@@ -660,6 +674,9 @@ const getUEDHotfixApplyColumns = () => {
       minWidth: 90,
       pinned: 'left',
       cellRenderer: (params: any) => {
+        if (params.value === undefined) {
+          return "";
+        }
         if (params.data.hotfix_type === "需求") {
           return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/story-view-${params.value}.html'>${params.value}</a>`;
         }
@@ -956,6 +973,10 @@ const getGridColums = (approveType: any) => {
     case "Bs5Jhq7KtNGsJd4f9Zd2VedigHaBc634AEXhF6Vot":  // 开发hotfix上线申请
       return getDevHotfixOnlineColumns();
       break;
+    case "Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt":  // 变更申请
+      return getChangeApplyColumns();
+      break;
+
     case "3TkaYnRhUKbC4ipUWXabjYJ6MSNNWPy6NcdYPxUx":  // 产品hotfix修复申请
       return getProductHotfixRepaireApplyColumns();
       break;
@@ -964,10 +985,6 @@ const getGridColums = (approveType: any) => {
       break;
     case "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu": // emergency申请
       return getEmergencyApplyColumns();
-      break;
-
-    case "Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt":  // 变更申请
-      return getChangeApplyColumns();
       break;
 
     default:

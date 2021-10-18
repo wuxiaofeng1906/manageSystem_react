@@ -7,28 +7,16 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {Button, message, Select, Input, DatePicker} from 'antd';
-import {SearchOutlined} from '@ant-design/icons';
 import {getHeight} from '@/publicMethods/pageSet';
 import axios from 'axios';
 import {getGridColums, alaysisDatas} from "./columns";
 
+
 const {Option} = Select;
 const {RangePicker} = DatePicker;
 
-const g_queryCondition = {
-  approvalType: "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu", // emergency id
-  applicant: "",
-  manager: "",
-  status: "",
-  start: "",
-  end: "",
-  page: 1,
-  pageSize: 20
-};
-
 // 查询数据
 const queryDevelopViews = async (condition: any) => {
-
 
   let datas: any = [];
   const pageInfo = {
@@ -88,12 +76,22 @@ const queryDevelopViews = async (condition: any) => {
 // 组件初始化
 const JenkinsCheck: React.FC<any> = () => {
 
+  const [condition, setCondition] = useState({
+    approvalType: "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu", // emergency id
+    applicant: "",
+    manager: "",
+    status: "",
+    start: "",
+    end: "",
+    page: 1,
+    pageSize: 20
+  });
+
   /* region  表格相关事件 */
-  const [approveType, setApproveType] = useState("Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu")
-  const columns: any = getGridColums(approveType);
+
 
   const gridApi = useRef<GridApi>();
-  const {data, loading} = useRequest(() => queryDevelopViews(g_queryCondition));
+  const {data, loading} = useRequest(() => queryDevelopViews(condition));
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -115,6 +113,188 @@ const JenkinsCheck: React.FC<any> = () => {
     params.api.sizeColumnsToFit();
   };
 
+
+  /* endregion */
+
+
+  /* region 查询以及 翻页以及页面跳转功能 */
+
+  const [Pages, setPages] = useState({
+    totalCounts: 0,  // 总条数
+    countsOfPage: 20,  // 每页显示多少条
+    totalPages: 0,  // 一共多少页
+    currentPage: 0, // 当前是第几页
+    jumpToPage: 0  // 跳转到第几页
+  });
+
+  // 计算分页信息
+  const showPageInfo = (pageInfo: any) => {
+    let totalCount = 0;
+    let countsOfPages = 1;
+    let totalPage = 1;
+    let currentPages = 1;
+    if (data) {
+      totalCount = Number(pageInfo.itemCount);
+      countsOfPages = Number(pageInfo.pageSize);
+      totalPage = Number(pageInfo.itemCount) === 0 ? 0 : Math.ceil(Number(pageInfo.itemCount) / Number(pageInfo.pageSize));
+      currentPages = Number(pageInfo.pageCount);
+    }
+
+
+    setPages({
+      totalCounts: totalCount,
+      countsOfPage: countsOfPages,
+      totalPages: totalPage,
+      currentPage: currentPages,
+      jumpToPage: 1
+    });
+  };
+
+  // 表格查询按钮
+  const refreshGrid = async (new_condition: any) => {
+
+    const n_columns: any = getGridColums(new_condition.approvalType);
+    gridApi.current?.setColumnDefs(n_columns);
+    gridApi.current?.setRowData([]);
+
+    const newData = await queryDevelopViews(new_condition);
+    gridApi.current?.setRowData(newData.datas);
+    showPageInfo(newData.pageInfo);
+
+  };
+
+
+  // 每页显示多少条数据
+  const showItemChange = async (pageCount: any) => {
+
+    setPages({
+      ...Pages,
+      countsOfPage: Number(pageCount),
+      totalPages: Math.ceil(Pages.totalCounts / Number(pageCount)),
+    });
+
+    const queryCondition = {
+      approvalType: condition.approvalType, // emergency id
+      applicant: condition.applicant,
+      manager: condition.manager,
+      status: condition.status,
+      start: condition.start,
+      end: condition.end,
+      page: Pages.currentPage, // 第几页
+      pageSize: pageCount // 每页多少条
+    };
+
+    refreshGrid(queryCondition);
+
+
+  };
+
+  // 上一页
+  const showPreviousPage = async () => {
+
+    // 上一页不能为负数或0
+    if (Pages.currentPage > 1) {
+      setPages({
+        ...Pages,
+        currentPage: Pages.currentPage - 1
+      });
+
+      const queryCondition = {
+        approvalType: condition.approvalType, // emergency id
+        applicant: condition.applicant,
+        manager: condition.manager,
+        status: condition.status,
+        start: condition.start,
+        end: condition.end,
+        page: Number(Pages.currentPage - 1), // 第几页
+        pageSize: Pages.countsOfPage // 每页多少条
+      };
+
+      refreshGrid(queryCondition);
+    } else {
+      message.error({
+        content: '当前已是第一页！',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+
+  };
+
+  // 下一页
+  const showNextPage = async () => {
+    const nextPage = Pages.currentPage + 1;
+
+    // 下一页的页面不能超过总页面之和
+    if (nextPage <= Pages.totalPages) {
+      setPages({
+        ...Pages,
+        currentPage: Pages.currentPage + 1
+      });
+
+      const queryCondition = {
+        approvalType: condition.approvalType, // emergency id
+        applicant: condition.applicant,
+        manager: condition.manager,
+        status: condition.status,
+        start: condition.start,
+        end: condition.end,
+        page: Number(Pages.currentPage + 1), // 第几页
+        pageSize: Pages.countsOfPage // 每页多少条
+      };
+
+      refreshGrid(queryCondition);
+    } else {
+      message.error({
+        content: '当前已是最后一页！',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+
+  };
+
+  // 跳转到第几页
+
+
+  const goToPage = async (params: any) => {
+
+    const pageCounts = Number(params.currentTarget.defaultValue);
+    if (pageCounts > Pages.totalPages) {
+
+      // 提示已超过最大跳转页数
+      message.error({
+        content: '已超过最大跳转页数!',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+    } else {
+
+
+      const queryCondition = {
+        approvalType: condition.approvalType, // emergency id
+        applicant: condition.applicant,
+        manager: condition.manager,
+        status: condition.status,
+        start: condition.start,
+        end: condition.end,
+        page: pageCounts, // 第几页
+        pageSize: Pages.countsOfPage // 每页多少条
+      };
+
+      refreshGrid(queryCondition);
+
+    }
+
+
+  };
 
   /* endregion */
 
@@ -202,7 +382,24 @@ const JenkinsCheck: React.FC<any> = () => {
 
   };
   const getselectedApplicant = (values: any, params: any) => {
-    g_queryCondition.applicant = params.key;
+    setCondition({
+      ...condition,
+      applicant: params.key
+    });
+
+    const queryCondition = {
+      approvalType: condition.approvalType, // emergency id
+      applicant: params.key,
+      manager: condition.manager,
+      status: condition.status,
+      start: condition.start,
+      end: condition.end,
+      page: condition.page,
+      pageSize: condition.pageSize
+    };
+
+    refreshGrid(queryCondition);
+
   };
 
   // 状态
@@ -246,8 +443,25 @@ const JenkinsCheck: React.FC<any> = () => {
 
   };
   const getSelectedStatus = (values: any, params: any) => {
+    setCondition({
+      ...condition,
+      status: params.key
+    });
 
-    g_queryCondition.status = params.key;
+    const queryCondition = {
+      approvalType: condition.approvalType, // emergency id
+      applicant: condition.applicant,
+      manager: condition.manager,
+      status: params.key,
+      start: condition.start,
+      end: condition.end,
+      page: condition.page,
+      pageSize: condition.pageSize
+    };
+
+    refreshGrid(queryCondition);
+
+
   };
 
   // 经理（开发经理 or 项目经理）
@@ -291,19 +505,70 @@ const JenkinsCheck: React.FC<any> = () => {
 
   };
   const getDevManager = (values: any, params: any) => {
-    g_queryCondition.manager = params.key;
+    setCondition({
+      ...condition,
+      manager: params.key
+    });
+
+    const queryCondition = {
+      approvalType: condition.approvalType, // emergency id
+      applicant: condition.applicant,
+      manager: params.key,
+      status: condition.status,
+      start: condition.start,
+      end: condition.end,
+      page: condition.page,
+      pageSize: condition.pageSize
+    };
+
+    refreshGrid(queryCondition);
+
   };
   const getprojectManager = (values: any, params: any) => {
-    g_queryCondition.manager = params.key;
+
+    setCondition({
+      ...condition,
+      manager: params.key
+    });
+
+    const queryCondition = {
+      approvalType: condition.approvalType, // emergency id
+      applicant: condition.applicant,
+      manager: params.key,
+      status: condition.status,
+      start: condition.start,
+      end: condition.end,
+      page: condition.page,
+      pageSize: condition.pageSize
+    };
+
+    refreshGrid(queryCondition);
   };
 
   // 已选择的时间
   const getSelectedDateRange = (values: any, params: any) => {
-    g_queryCondition.start = `${params[0].toString()} 00:00:00`;
-    g_queryCondition.end = `${params[1].toString()} 23:59:59`;
+
+    setCondition({
+      ...condition,
+      start: `${params[0].toString()} 00:00:00`,
+      end: `${params[1].toString()} 23:59:59`
+    });
+
+    const queryCondition = {
+      approvalType: condition.approvalType, // emergency id
+      applicant: condition.applicant,
+      manager: condition.manager,
+      status: condition.status,
+      start: `${params[0].toString()} 00:00:00`,
+      end: `${params[1].toString()} 23:59:59`,
+      page: condition.page,
+      pageSize: condition.pageSize
+    };
+
+    refreshGrid(queryCondition);
   }
 
-  // 切换审批类型
+  // 切换单据类型
 
   const [showCondition, setShowCondition] = useState({
     devManager: "inline-block",
@@ -313,8 +578,11 @@ const JenkinsCheck: React.FC<any> = () => {
 
     // 根据单据类型显示不同的经理选项（项目经理和开发经理）
     getManagers(appType);
-    setApproveType(appType);
-    g_queryCondition.approvalType = appType;
+    setCondition({
+      ...condition,
+      approvalType: appType
+
+    });
 
     if (appType === "Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt") {
       setShowCondition({
@@ -327,171 +595,20 @@ const JenkinsCheck: React.FC<any> = () => {
         prjManager: "none"
       });
     }
-    gridApi.current?.setRowData([]);
-    const newData = await queryDevelopViews({
+
+
+    const queryCondition = {
       approvalType: appType, // emergency id
-      applicant: "",
-      manager: "",
-      status: "",
-      start: "",
-      end: "",
-      page: 1,
-      pageSize: 20
-    });
-    gridApi.current?.setRowData(newData.datas);
+      applicant: condition.applicant,
+      manager: condition.manager,
+      status: condition.status,
+      start: condition.start,
+      end: condition.end,
+      page: condition.page,
+      pageSize: condition.pageSize
+    };
 
-  };
-
-  /* endregion */
-
-  /* region 查询以及 翻页以及页面跳转功能 */
-
-  const [Pages, setPages] = useState({
-    totalCounts: 0,  // 总条数
-    countsOfPage: 20,  // 每页显示多少条
-    totalPages: 0,  // 一共多少页
-    currentPage: 0, // 当前是第几页
-    jumpToPage: 0  // 跳转到第几页
-  });
-  // 计算分页信息
-  const showPageInfo = (pageInfo: any) => {
-    let totalCount = 0;
-    let countsOfPages = 1;
-    let totalPage = 1;
-    let currentPages = 1;
-    if (data) {
-      totalCount = Number(pageInfo.itemCount);
-      countsOfPages = Number(pageInfo.pageSize);
-      totalPage = Number(pageInfo.itemCount) === 0 ? 0 : Math.ceil(Number(pageInfo.itemCount) / Number(pageInfo.pageSize));
-      currentPages = Number(pageInfo.pageCount);
-    }
-
-
-    setPages({
-      totalCounts: totalCount,
-      countsOfPage: countsOfPages,
-      totalPages: totalPage,
-      currentPage: currentPages,
-      jumpToPage: 1
-    });
-  };
-
-  // 表格查询按钮
-  const refreshGrid = async () => {
-    g_queryCondition.page = Pages.currentPage;
-    g_queryCondition.pageSize = Pages.countsOfPage;
-    const newData = await queryDevelopViews(g_queryCondition);
-    gridApi.current?.setRowData(newData.datas);
-    showPageInfo(newData.pageInfo);
-
-  };
-
-
-  // 每页显示多少条数据
-  const showItemChange = async (pageCount: any) => {
-
-    setPages({
-      ...Pages,
-      countsOfPage: Number(pageCount),
-      totalPages: Math.ceil(Pages.totalCounts / Number(pageCount)),
-    });
-
-    g_queryCondition.page = Pages.currentPage;
-    g_queryCondition.pageSize = pageCount;
-    const newData = await queryDevelopViews(g_queryCondition);
-    gridApi.current?.setRowData(newData.datas);
-
-  };
-
-  // 上一页
-  const showPreviousPage = async () => {
-
-    // 上一页不能为负数或0
-    if (Pages.currentPage > 1) {
-      setPages({
-        ...Pages,
-        currentPage: Pages.currentPage - 1
-      });
-    }
-
-
-    g_queryCondition.page = Pages.currentPage - 1;
-    g_queryCondition.pageSize = Pages.countsOfPage;
-
-    const newData = await queryDevelopViews(g_queryCondition);
-    gridApi.current?.setRowData(newData.datas);
-
-  };
-
-  // 下一页
-  const showNextPage = async () => {
-    const nextPage = Pages.currentPage + 1;
-
-    // 下一页的页面不能超过总页面之和
-    if (nextPage <= Pages.totalPages) {
-      setPages({
-        ...Pages,
-        currentPage: Pages.currentPage + 1
-      });
-
-      g_queryCondition.page = Pages.currentPage + 1;
-      g_queryCondition.pageSize = Pages.countsOfPage;
-
-      const newData = await queryDevelopViews(g_queryCondition);
-      gridApi.current?.setRowData(newData.datas);
-    }
-
-  };
-
-  // 跳转到第几页
-
-  const jumpChange = (params: any) => {
-
-    const inputData = params.nativeEvent.data;
-    if (Number(inputData)) {
-
-      if (Number(inputData) > Pages.totalPages) {
-        setPages({
-          ...Pages,
-          jumpToPage: Number(inputData)
-
-        });
-      } else {
-        setPages({
-          ...Pages,
-          jumpToPage: Number(inputData),
-          currentPage: Number(inputData)
-        });
-      }
-
-    }
-  };
-
-  const goToPage = async (params: any) => {
-
-    const pageCounts = Number(params.currentTarget.defaultValue);
-    if (pageCounts > Pages.totalPages) {
-
-      // 提示已超过最大跳转页数
-      message.error({
-        content: '已超过最大跳转页数!',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
-    } else {
-
-      g_queryCondition.page = Number(params.currentTarget.defaultValue);
-      g_queryCondition.pageSize = Pages.countsOfPage;
-
-      const newData = await queryDevelopViews(g_queryCondition);
-      gridApi.current?.setRowData(newData.datas);
-
-    }
-
-
+    refreshGrid(queryCondition);
   };
 
   /* endregion */
@@ -500,10 +617,14 @@ const JenkinsCheck: React.FC<any> = () => {
     getApprovalType();
     getApplicant();
     getStatus();
-    getManagers("Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu");
-    showPageInfo(data?.pageInfo);
+    getManagers(condition.approvalType);
 
-  }, [loading])
+    showPageInfo(data?.pageInfo);
+    gridApi.current?.setColumnDefs(getGridColums(condition.approvalType));
+    gridApi.current?.setRowData(data?.datas);
+
+  }, [loading]);
+
 
   return (
     <PageContainer style={{marginLeft: -30, marginRight: -30}}>
@@ -512,7 +633,7 @@ const JenkinsCheck: React.FC<any> = () => {
       <div style={{height: 35, marginTop: -15, overflow: "hidden"}}>
 
         <label> 类型： </label>
-        <Select style={{width: '10%'}} onChange={changeAppType} value={approveType}>
+        <Select style={{width: '10%'}} onChange={changeAppType} value={condition.approvalType}>
           {approvalType}
           {/* <Option value="开发hotfix上线申请">开发hotfix上线申请</Option>
           <Option value="产品hotfix修复申请">产品hotfix修复申请</Option>
@@ -564,16 +685,13 @@ const JenkinsCheck: React.FC<any> = () => {
         <label style={{marginLeft: 10}}> 时间： </label>
         <RangePicker onChange={getSelectedDateRange}/>
 
-        <Button icon={<SearchOutlined/>} style={{marginLeft: 10, borderRadius: 5}} onClick={refreshGrid}>查询</Button>
-
-
       </div>
 
       {/* ag-grid 表格定义 */}
       <div className="ag-theme-alpine" style={{marginTop: 3, height: gridHeight, width: '100%'}}>
         <AgGridReact
-          columnDefs={columns} // 定义列
-          rowData={data?.datas} // 数据绑定
+          // columnDefs={getGridColums(condition.approvalType)} // 定义列
+          // rowData={data?.datas} // 数据绑定
           defaultColDef={{
             resizable: true,
             sortable: true,
@@ -625,7 +743,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
         {/* 跳转到第几页 */}
         <label style={{marginLeft: 20, fontWeight: "bold"}}> 跳转到第 </label>
-        <Input style={{textAlign: "center", width: 50, marginLeft: 2}} value={Pages.jumpToPage} onChange={jumpChange}
+        <Input style={{textAlign: "center", width: 50, marginLeft: 2}} defaultValue={1}
                onBlur={goToPage}/>
         <label style={{marginLeft: 2, fontWeight: "bold"}}> 页 </label>
 

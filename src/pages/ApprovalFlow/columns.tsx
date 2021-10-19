@@ -179,61 +179,69 @@ const getChangeApplyColumns = () => {
       minWidth: 120,
     },
     {
-      headerName: '产品负责人审批',
+      headerName: '当前审批人',
       field: 'product_owner',
       minWidth: 110,
       wrapText: true,
       autoHeight: true,
       cellRenderer: approvePerson
     },
-    {
-      headerName: '架构审批（Anyone）',
-      field: 'architecture_approval',
-      minWidth: 110,
-      cellRenderer: approvePerson
-    },
-    {
-      headerName: '项目负责人审批',
-      field: 'project_head_approval',
-      minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
-      cellRenderer: approvePerson
-    },
-    {
-      headerName: 'QA审批（Anyone）',
-      field: 'qa_approval',
-      minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
-      cellRenderer: approvePerson
-
-    },
-    {
-      headerName: 'CCB审批（Everyone）',
-      field: 'ccb_approval',
-      minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
-      cellRenderer: approvePerson
-    },
-    {
-      headerName: '总设确认',
-      field: 'total_confirm',
-      minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
-      cellRenderer: approvePerson
-    },
-    {
-      headerName: 'QA确认（Anyone）',
-      field: 'qa_confirm',
-      minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
-      cellRenderer: approvePerson
-
-    },
+    // {
+    //   headerName: '产品负责人审批',
+    //   field: 'product_owner',
+    //   minWidth: 110,
+    //   wrapText: true,
+    //   autoHeight: true,
+    //   cellRenderer: approvePerson
+    // },
+    // {
+    //   headerName: '架构审批（Anyone）',
+    //   field: 'architecture_approval',
+    //   minWidth: 110,
+    //   cellRenderer: approvePerson
+    // },
+    // {
+    //   headerName: '项目负责人审批',
+    //   field: 'project_head_approval',
+    //   minWidth: 110,
+    //   wrapText: true,
+    //   autoHeight: true,
+    //   cellRenderer: approvePerson
+    // },
+    // {
+    //   headerName: 'QA审批（Anyone）',
+    //   field: 'qa_approval',
+    //   minWidth: 110,
+    //   wrapText: true,
+    //   autoHeight: true,
+    //   cellRenderer: approvePerson
+    //
+    // },
+    // {
+    //   headerName: 'CCB审批（Everyone）',
+    //   field: 'ccb_approval',
+    //   minWidth: 110,
+    //   wrapText: true,
+    //   autoHeight: true,
+    //   cellRenderer: approvePerson
+    // },
+    // {
+    //   headerName: '总设确认',
+    //   field: 'total_confirm',
+    //   minWidth: 110,
+    //   wrapText: true,
+    //   autoHeight: true,
+    //   cellRenderer: approvePerson
+    // },
+    // {
+    //   headerName: 'QA确认（Anyone）',
+    //   field: 'qa_confirm',
+    //   minWidth: 110,
+    //   wrapText: true,
+    //   autoHeight: true,
+    //   cellRenderer: approvePerson
+    //
+    // },
     {
       headerName: '变更涉及文档',
       field: 'change_doc',

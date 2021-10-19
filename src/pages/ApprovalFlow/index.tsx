@@ -10,6 +10,7 @@ import {Button, message, Select, Input, DatePicker, Modal, InputNumber, Form} fr
 import {getHeight} from '@/publicMethods/pageSet';
 import axios from 'axios';
 import {getGridColums, alaysisDatas} from "./columns";
+import {getFlowDIv} from "./flow";
 
 
 const {Option} = Select;
@@ -613,7 +614,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   /* endregion */
 
-// region 弹出层事件（修改事件）
+  // region 弹出层修改事件
   const [formForModify] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const modalCancel = () => {
@@ -689,6 +690,42 @@ const JenkinsCheck: React.FC<any> = () => {
 
   };
 
+
+  // endregion
+
+  // region 弹出层显示审批流程事件
+
+  const [flowDiv, setFlowDiv] = useState(<div></div>);
+  const [isDetailsVisible, setDetailsVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const detailModalCancle = () => {
+    setDetailsVisible(false);
+  };
+  const onChangeCellClicked = (params: any) => {
+    if (condition.approvalType !== "Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt") { // 如果是变更申请
+      return;
+    }
+
+    if (params.column.colId === "sp_no") {
+      const datas = params.data;
+
+      let changeObject = "";
+      // 如果变更对象是需求变更，那么还要判断是否涉及交互修改
+      if (datas.change_obj === "需求变更" && datas.change_modify === "否") {
+
+        changeObject = "需求变更-不涉及交互修改";
+      } else if (datas.change_obj === "需求变更" && datas.change_modify === "是") {
+        changeObject = "需求变更-涉及交互修改";
+      } else {
+        // 其他变更类型不用判断是否涉及交互修改
+        changeObject = datas.change_obj;
+      }
+      setModalTitle(changeObject);
+      setDetailsVisible(true);
+      const returnDiv = getFlowDIv(changeObject, datas);
+      setFlowDiv(returnDiv);
+    }
+  };
 
   // endregion
   useEffect(() => {
@@ -780,6 +817,7 @@ const JenkinsCheck: React.FC<any> = () => {
           onGridSizeChanged={onChangeGridReady}
           onColumnEverythingChanged={onChangeGridReady}
           onRowDoubleClicked={onRowDoubleClick}
+          onCellClicked={onChangeCellClicked}
 
         >
         </AgGridReact>
@@ -829,7 +867,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
       </div>
 
-
+      {/* 设置变更工时 */}
       <Modal
         title={'设置'}
         visible={isModalVisible}
@@ -859,8 +897,8 @@ const JenkinsCheck: React.FC<any> = () => {
       >
         <Form form={formForModify}>
 
-          <Form.Item label="审批编号" name="appNo" >
-            <Input disabled={true} style={{marginLeft: 25, width: 200,color:"black"}}/>
+          <Form.Item label="审批编号" name="appNo">
+            <Input disabled={true} style={{marginLeft: 25, width: 200, color: "black"}}/>
           </Form.Item>
 
           <Form.Item label="前端影响[h]" name="frontTime">
@@ -879,6 +917,17 @@ const JenkinsCheck: React.FC<any> = () => {
         </Form>
       </Modal>
 
+      {/* 显示变更流程 */}
+      <Modal
+        title={modalTitle}
+        visible={isDetailsVisible}
+        onCancel={detailModalCancle}
+        centered={true}
+        width={350}>
+        <Form form={formForModify}>
+          {flowDiv}
+        </Form>
+      </Modal>
 
     </PageContainer>
   );

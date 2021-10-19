@@ -45,10 +45,6 @@ const approvePerson = (params: any) => {
   let returnDiv = "";
   const appData = params.value;
 
-
-  debugger;
-
-
   if (typeof (appData) === "string") {
     return appData;
   }
@@ -289,7 +285,7 @@ const getChangeApplyColumns = () => {
         <div>前端：${value["前端"]}</div>
         <div style="margin-top:-15px">后端：${value["后端"]}</div>
         <div style="margin-top:-15px">测试：${value["测试"]}</div>
-        <div style="margin-top:-15px">合集：${value["合计"]}</div>`;
+        <div style="margin-top:-15px">合计：${value["合计"]}</div>`;
         }
 
         return `<div> ${returnDiv} </div>`;

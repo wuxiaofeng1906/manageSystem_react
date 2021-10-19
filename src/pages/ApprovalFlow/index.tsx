@@ -6,7 +6,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {Button, message, Select, Input, DatePicker} from 'antd';
+import {Button, message, Select, Input, DatePicker, Modal, InputNumber, Form} from 'antd';
 import {getHeight} from '@/publicMethods/pageSet';
 import axios from 'axios';
 import {getGridColums, alaysisDatas} from "./columns";
@@ -613,6 +613,35 @@ const JenkinsCheck: React.FC<any> = () => {
 
   /* endregion */
 
+// region 弹出层事件（修改事件）
+  const [formForModify] = Form.useForm();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const modalCancel = () => {
+    setIsModalVisible(false);
+  };
+  const onRowDoubleClick = (params: any) => {
+    if (condition.approvalType !== "Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt") { // 如果是变更申请
+      return;
+    }
+    debugger;
+    const datas = params.data;
+    setIsModalVisible(true);
+    formForModify.setFieldsValue({
+      appNo: datas.sp_no,
+      frontTime: 0,
+      backendTime: 0,
+      testTime: 0
+    });
+  };
+
+  const carryModify = () => {
+
+
+
+  };
+
+
+  // endregion
   useEffect(() => {
     getApprovalType();
     getApplicant();
@@ -701,6 +730,8 @@ const JenkinsCheck: React.FC<any> = () => {
           onGridReady={onGridReady}
           onGridSizeChanged={onChangeGridReady}
           onColumnEverythingChanged={onChangeGridReady}
+          onRowDoubleClicked={onRowDoubleClick}
+
         >
         </AgGridReact>
       </div>
@@ -748,6 +779,57 @@ const JenkinsCheck: React.FC<any> = () => {
         <label style={{marginLeft: 2, fontWeight: "bold"}}> 页 </label>
 
       </div>
+
+
+      <Modal
+        title={'设置'}
+        visible={isModalVisible}
+        onCancel={modalCancel}
+        centered={true}
+        width={350}
+        bodyStyle={{height: 250}}
+        footer={
+          [
+            <Button
+              style={{borderRadius: 5, marginTop: -100}}
+              onClick={modalCancel}>取消
+            </Button>,
+            <Button type="primary"
+                    style={{
+                      marginLeft: 10,
+                      color: '#46A0FC',
+                      backgroundColor: "#ECF5FF",
+                      borderRadius: 5,
+                    }}
+
+                    onClick={carryModify}>保存
+            </Button>
+          ]
+        }
+
+      >
+        <Form form={formForModify}>
+
+          <Form.Item label="审批编号" name="appNo">
+            <Input disabled={true} style={{marginLeft: 25, width: 200}}/>
+          </Form.Item>
+
+          <Form.Item label="前端影响[h]" name="frontTime">
+            <InputNumber step={0.5} style={{marginLeft: 10, width: 200}}/>
+          </Form.Item>
+
+          <Form.Item label="后端影响[h]" name="backendTime">
+            <InputNumber step={0.5} style={{marginLeft: 10, width: 200}}/>
+          </Form.Item>
+
+          <Form.Item label="测试影响[h]" name="testTime">
+            <InputNumber step={0.5} style={{marginLeft: 10, width: 200}}/>
+          </Form.Item>
+
+
+        </Form>
+      </Modal>
+
 
     </PageContainer>
   );

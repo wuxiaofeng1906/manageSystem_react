@@ -623,19 +623,68 @@ const JenkinsCheck: React.FC<any> = () => {
     if (condition.approvalType !== "Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt") { // 如果是变更申请
       return;
     }
-    debugger;
+
     const datas = params.data;
     setIsModalVisible(true);
     formForModify.setFieldsValue({
       appNo: datas.sp_no,
-      frontTime: 0,
-      backendTime: 0,
-      testTime: 0
+      frontTime: (datas.change_hours)["前端"] === undefined ? 0 : (datas.change_hours)["前端"],
+      backendTime: (datas.change_hours)["后端"] === undefined ? 0 : (datas.change_hours)["后端"],
+      testTime: (datas.change_hours)["测试"] === undefined ? 0 : (datas.change_hours)["测试"]
     });
   };
 
-  const carryModify = () => {
+  const carryModify = async () => {
+    const formData = formForModify.getFieldsValue();
 
+    const frontData = formData.frontTime;
+    const backend = formData.backendTime;
+    const test = formData.testTime;
+    const sum = Number(frontData) + Number(backend) + Number(test);
+    const datas = {
+      "sp_no": formData.appNo,
+      "front": frontData.toString(),
+      "server": backend.toString(),
+      "test": test.toString(),
+      "sum": sum.toString()
+    };
+
+    await axios.put('/api/verify/apply/apply_data', datas)
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+          message.info({
+            content: `变更工时影响时间修改成功！`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+
+
+          refreshGrid(condition);
+          setIsModalVisible(false);
+        } else {
+          message.error({
+            content: `错误：${res.data.msg}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+
+      }).catch(function (error) {
+
+        message.error({
+          content: `异常信息:${error.toString()}`,
+          duration: 1, // 1S 后自动关闭
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      });
 
 
   };
@@ -810,8 +859,8 @@ const JenkinsCheck: React.FC<any> = () => {
       >
         <Form form={formForModify}>
 
-          <Form.Item label="审批编号" name="appNo">
-            <Input disabled={true} style={{marginLeft: 25, width: 200}}/>
+          <Form.Item label="审批编号" name="appNo" >
+            <Input disabled={true} style={{marginLeft: 25, width: 200,color:"black"}}/>
           </Form.Item>
 
           <Form.Item label="前端影响[h]" name="frontTime">

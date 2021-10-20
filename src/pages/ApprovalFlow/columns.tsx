@@ -107,14 +107,41 @@ const linkRender = (params: any) => {
 
 // 当前审批人
 const alaCurrentapproval = (params: any) => {
-  // 先判断当前审批状态，如果审批通过，就显示：已审批完成  字样
-  if (params.data?.sp_status === 2) {
-    return "审批完成";
+  const status_sp = params.data?.sp_status;
+  // 只有在审批中（值为1）的，才显示流程人，其他状态直接显示即可
+  if (status_sp !== 1) {
+
+    let returnValue = "";
+    switch (status_sp.toString()) {
+
+
+      case "2":
+        returnValue = "审批通过";
+        break;
+
+      case "3":
+        returnValue = "已驳回";
+        break;
+      case "4":
+        returnValue = "已撤销";
+        break;
+
+      case "6":
+        returnValue = "通过后撤销";
+        break;
+
+      case "7":
+        returnValue = "已删除";
+        break;
+
+      default:
+        break;
+    }
+
+
+    return returnValue;
   }
 
-  if (params.data?.sp_status === 4) {
-    return "已撤销";
-  }
 
   const appData = params.value;
   if (JSON.stringify(appData) === "{}") {

@@ -720,7 +720,7 @@ const JenkinsCheck: React.FC<any> = () => {
         // 其他变更类型不用判断是否涉及交互修改
         changeObject = datas.change_obj;
       }
-      setModalTitle(changeObject);
+      setModalTitle(datas.change_obj);
       setDetailsVisible(true);
       const returnDiv = getFlowDIv(changeObject, datas);
       setFlowDiv(returnDiv);
@@ -919,12 +919,12 @@ const JenkinsCheck: React.FC<any> = () => {
 
       {/* 显示变更流程 */}
       <Modal
-        title={<div style={{fontSize:15, height: 5, color: "red",marginLeft:-10, marginTop: -10}}>{modalTitle}</div>}
+        title={<div style={{fontSize: 15, height: 5, marginLeft: -10, marginTop: -10}}>{modalTitle}</div>}
         closeIcon={<div style={{marginTop: -10}}>X</div>}
         visible={isDetailsVisible}
         onCancel={detailModalCancle}
         centered={true}
-        width={460}
+        width={480}
         footer={null}
 
       >

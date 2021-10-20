@@ -279,7 +279,8 @@ const getChangeApplyColumns = () => {
       minWidth: 110,
       wrapText: true,
       autoHeight: true,
-      cellRenderer: alaCurrentapproval
+      cellRenderer: alaCurrentapproval,
+      pinned: 'right',
     },
     // {
     //   headerName: '产品负责人审批',

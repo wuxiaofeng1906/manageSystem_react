@@ -78,7 +78,7 @@ const queryDevelopViews = async (condition: any) => {
 const JenkinsCheck: React.FC<any> = () => {
 
   const [condition, setCondition] = useState({
-    approvalType: "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu", // emergency id
+    approvalType: "Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt", // emergency id
     applicant: "",
     manager: "",
     status: "",
@@ -923,7 +923,9 @@ const JenkinsCheck: React.FC<any> = () => {
         visible={isDetailsVisible}
         onCancel={detailModalCancle}
         centered={true}
-        width={350}>
+        width={470}
+        footer={null}
+      >
         <Form form={formForModify}>
           {flowDiv}
         </Form>

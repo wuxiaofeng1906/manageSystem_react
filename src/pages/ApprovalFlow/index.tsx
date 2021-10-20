@@ -919,12 +919,14 @@ const JenkinsCheck: React.FC<any> = () => {
 
       {/* 显示变更流程 */}
       <Modal
-        title={modalTitle}
+        title={<div style={{fontSize:15, height: 5, color: "red",marginLeft:-10, marginTop: -10}}>{modalTitle}</div>}
+        closeIcon={<div style={{marginTop: -10}}>X</div>}
         visible={isDetailsVisible}
         onCancel={detailModalCancle}
         centered={true}
-        width={470}
+        width={460}
         footer={null}
+
       >
         <Form form={formForModify}>
           {flowDiv}

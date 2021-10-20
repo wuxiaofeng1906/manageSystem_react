@@ -1,21 +1,21 @@
 /* region 基础控件 */
 
 const applayTitle = (applicant: string, approveNo: string,) => {
-  return <div>
-    <div>申请人： {applicant} </div>
-    <div>审批编号： {approveNo} </div>
-    <div style={{marginTop: 15}}>审批流程：</div>
+  return <div style={{marginTop: -17}}>
+    <div><label style={{color: "gray"}}>申请人： </label> {applicant} </div>
+    <div><label style={{color: "gray"}}>审批编号： </label> {approveNo} </div>
+    <div style={{color: "gray"}}>审批流程：</div>
   </div>;
 };
 
 const approveCommonMethod = (title: string, content: any) => {
 
-  let titleDiv = <div style={{marginTop:15}}>{title}</div>;
   if (content === undefined) {
-    return titleDiv;
+    return <div></div>;
   }
 
   let contentDiv;
+  let titleDiv = <div style={{marginTop: 8}}>{title}</div>;
 
   // 只有一个人，则不显示会签或者或签
   if (content.length === 1) {
@@ -24,15 +24,15 @@ const approveCommonMethod = (title: string, content: any) => {
         <label style={{
           display: "inline-block",
           textAlign: "center",
-          width: 90
+          width: 100
         }}>{content[0].user_name}</label>
-        <label style={{marginLeft: 150}}>已同意&nbsp;&nbsp;{content[0].sp_time}</label>
+        <label style={{marginLeft: 130}}>已同意&nbsp;&nbsp;{content[0].sp_time}</label>
       </div>;
     } else {
       contentDiv = <div><label style={{
         display: "inline-block",
         textAlign: "center",
-        width: 90
+        width: 100
       }}> {content[0].user_name}</label></div>;
     }
 
@@ -44,12 +44,12 @@ const approveCommonMethod = (title: string, content: any) => {
 
   // 多人的话，状态都是一样的。。所以判断第一个即可 1：或签  2：会签
   if (content[0].approverattr === 1) {
-    titleDiv = <div style={{marginTop:15}}>
+    titleDiv = <div style={{marginTop: 8}}>
       <label>{title}.</label>
-      <label style={{color: "#46A0FC",marginTop:15}}>或签</label>
+      <label style={{color: "#46A0FC"}}>或签</label>
     </div>;
   } else if (content[0].approverattr === 2) {
-    titleDiv = <div style={{marginTop:15}}>
+    titleDiv = <div style={{marginTop: 8}}>
       <label>{title}.</label>
       <label style={{color: "#46A0FC"}}>会签</label>
     </div>;
@@ -61,17 +61,16 @@ const approveCommonMethod = (title: string, content: any) => {
           <label style={{
             display: "inline-block",
             textAlign: "center",
-
-            width: 90
+            width: 100
           }}>{items.user_name}</label>
-          <label style={{marginLeft: 150}}>已同意&nbsp;&nbsp;{items.sp_time}</label>
+          <label style={{marginLeft: 130}}>已同意&nbsp;&nbsp;{items.sp_time}</label>
         </div>;
       }
 
       return <div><label style={{
         display: "inline-block",
         textAlign: "center",
-        width: 90
+        width: 100
       }}>{items.user_name}</label></div>;
     }
   );

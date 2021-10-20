@@ -2,12 +2,14 @@
 
 // 产品总监审批
 const productDirectorApprove = (content: any) => {
+  return <div>111111111</div>
 
 };
 
 // 架构评估审批
 const archEvaluateApprove = (content: any) => {
 
+  return <div>222222</div>
 };
 
 // 项目负责人审批
@@ -19,18 +21,65 @@ const prjPrincipalApprove = (content: any) => {
 const sqaSpecificateCheck = (content: any) => {
 
 };
+
+// CCB审批
+const ccbApprove = (content: any) => {
+
+};
+
+// 研发总经理审批
+const devManagerApprove = (content: any) => {
+
+};
+
+// SQA通知需求变更
+const sqaNotifyStoryUpdate = (content: any) => {
+
+};
+
+// UED评估审批
+const uedEvaluateApprove = (content: any) => {
+
+};
 /* endregion   */
 
 
 /* region 不同变更类型组装不同的控件 */
+
 // 需求变更
 const storyChange = (datas: any, isModify: boolean) => {
 
+  const prdDirApprove = productDirectorApprove(datas); // 产品总监审批
+  const archEvalApprove = archEvaluateApprove(datas); // 架构评估审批
+  const prjPrinciApprove = prjPrincipalApprove(datas);  // 项目负责人审批
+  const sqaSpecCheck = sqaSpecificateCheck(datas);// SQA规范检查
+  const ccbApp = ccbApprove(datas);// CCB审批
+  const devManApprove = devManagerApprove(datas);// 研发总经理审批
+  const sqaNotStUpdate = sqaNotifyStoryUpdate(datas);// SQA通知需求变更
+  const uedEvalApprove = uedEvaluateApprove(datas);// UED评估审批  涉及交互修改才用得到
+
   if (isModify) {
-    return <div> 涉及到交互修改</div>
+    return <div>
+      {prdDirApprove}
+      {archEvalApprove}
+      {uedEvalApprove}
+      {prjPrinciApprove}
+      {sqaSpecCheck}
+      {ccbApp}
+      {devManApprove}
+      {sqaNotStUpdate}
+    </div>;
   }
 
-  return <div> 没有涉及到交互修改！</div>
+  return <div>
+    {prdDirApprove}
+    {archEvalApprove}
+    {prjPrinciApprove}
+    {sqaSpecCheck}
+    {ccbApp}
+    {devManApprove}
+    {sqaNotStUpdate}
+  </div>;
 
 };
 

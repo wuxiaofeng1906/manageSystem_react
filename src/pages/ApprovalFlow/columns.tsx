@@ -83,6 +83,7 @@ const approvePerson = (params: any) => {
   return `<div> ${returnDiv} </div>`;
 };
 
+
 const approveForTester = (params: any) => {
 
   let returnValue = "";
@@ -100,6 +101,100 @@ const linkRender = (params: any) => {
   return `<a href="${params.value}" target="_blank" style="text-decoration: underline">${params.value}</a>`;
 };
 
+// 当前审批人
+const alaCurrentapproval = (params: any) => {
+  // 先判断当前审批状态，如果审批通过，就显示：已审批完成  字样
+  if (params.data?.sp_status === 2) {
+    return "已审批完成";
+  }
+
+  const appData = params.value;
+  if (JSON.stringify(appData) === "{}") {
+    return "";
+  }
+  let returnDiv = "";
+  if (appData) {
+    //   如果user里面只有一个人，则不显示会签或者或签，直接显示人和审批状态即可
+    const userInfoArray = appData.user;
+    if (userInfoArray.length === 1) {
+      const userInfo = userInfoArray[0];
+      if (userInfo.sp_status === 2) {  // 2 为审批通过
+        return `<div>
+           <span style="display: inline-block; width: 45px">${userInfo.user_name}</span>
+           <label style="margin-left:10px;font-weight: bolder; color: #32D529">√</label>
+        </div>`;
+
+      }
+      return `<div>
+           <span style="display: inline-block; ">${userInfo.user_name}</span>
+        </div>`;
+    }
+
+    //  如果user里面有多个人 ，则 approverattr字段表示：1:或签  2：会签
+    if (appData.approverattr === 1) {
+      returnDiv = `<div style="font-weight: bold">多人或签:</div>`;
+    } else {
+      returnDiv = `<div style="font-weight: bold">多人会签:</div>`;
+    }
+
+    userInfoArray.forEach((ele: any) => {
+
+      if (ele.sp_status === 2) {  // 2 为审批通过
+        returnDiv = `${returnDiv}
+      <div style="margin-top: -20px">
+         <span style="display: inline-block; width: 45px">${ele.user_name}</span>
+         <label style="margin-left:10px;font-weight: bolder; color: #32D529">√</label>
+      </div>`
+      } else {
+        returnDiv = `${returnDiv}
+      <div style="margin-top: -20px">
+         <span style="display: inline-block; ">${ele.user_name}</span>
+      </div>`
+      }
+
+    });
+
+
+    // Object.keys(appData).forEach(key => {
+    //
+    //
+    //   const dataArray = appData[key];
+    // dataArray.forEach((ele: any) => {
+    //
+    //   if (ele.sp_status === 2) {  // 2 为审批通过
+    //     returnDiv = returnDiv === "" ?
+    //       `<div>
+    //      <span style="display: inline-block; width: 45px">${ele.user_name}</span>
+    //      <label style="margin-left:10px;font-weight: bolder; color: #32D529">√</label>
+    //   </div>`
+    //       :
+    //       `${returnDiv}
+    //   <div style="margin-top: -20px">
+    //      <span style="display: inline-block; width: 45px">${ele.user_name}</span>
+    //      <label style="margin-left:10px;font-weight: bolder; color: #32D529">√</label>
+    //   </div>`
+    //   } else {
+    //     returnDiv = returnDiv === "" ?
+    //       `<div>
+    //      <span style="display: inline-block; ">${ele.user_name}</span>
+    //   </div>`
+    //       :
+    //       `${returnDiv}
+    //   <div style="margin-top: -20px">
+    //      <span style="display: inline-block; ">${ele.user_name}</span>
+    //   </div>`
+    //   }
+    //
+    // });
+
+    // });
+
+
+  }
+
+  return `<div> ${returnDiv} </div>`;
+
+};
 // 变更申请
 const getChangeApplyColumns = () => {
   const columns: any = [
@@ -180,11 +275,11 @@ const getChangeApplyColumns = () => {
     },
     {
       headerName: '当前审批人',
-      field: 'product_owner',
+      field: 'current_person',
       minWidth: 110,
       wrapText: true,
       autoHeight: true,
-      cellRenderer: approvePerson
+      cellRenderer: alaCurrentapproval
     },
     // {
     //   headerName: '产品负责人审批',
@@ -1147,13 +1242,16 @@ const getChangeApplyDatas = (oraDatas: any, start_id: number) => {
       change_why: ele.change_why,
       change_content: ele.change_content,
       change_impact: ele.change_impact,
-      product_owner: ele.product_owner,
-      architecture_approval: ele.architecture_approval,
-      project_head_approval: ele.project_head_approval,
-      qa_approval: ele.qa_approval,
-      ccb_approval: ele.ccb_approval,
-      total_confirm: ele.total_confirm,
-      qa_confirm: ele.qa_confirm,
+      current_person: ele.current_person,
+      record_data: ele.record_data,
+      record_title: ele.record_title,
+      // product_owner: ele.product_owner,
+      // architecture_approval: ele.architecture_approval,
+      // project_head_approval: ele.project_head_approval,
+      // qa_approval: ele.qa_approval,
+      // ccb_approval: ele.ccb_approval,
+      // total_confirm: ele.total_confirm,
+      // qa_confirm: ele.qa_confirm,
       change_doc: ele.change_doc,
       change_modify: ele.change_modify,
       original_deadline: ele.original_deadline,

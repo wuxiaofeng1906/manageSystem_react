@@ -706,7 +706,7 @@ const JenkinsCheck: React.FC<any> = () => {
       return;
     }
 
-    if (params.column.colId === "sp_no") {
+    if (params.column.colId === "current_person") {
       const datas = params.data;
 
       let changeObject = "";

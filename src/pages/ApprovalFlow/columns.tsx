@@ -85,9 +85,13 @@ const approvePerson = (params: any) => {
 
 
 const approveForTester = (params: any) => {
+  debugger;
 
   let returnValue = "";
   const appData = params.value;
+  if (appData === undefined) {
+    return "";
+  }
   if (appData[0].sp_status === 2) {
     returnValue = appData[0].user_name;
   } else {
@@ -105,7 +109,11 @@ const linkRender = (params: any) => {
 const alaCurrentapproval = (params: any) => {
   // 先判断当前审批状态，如果审批通过，就显示：已审批完成  字样
   if (params.data?.sp_status === 2) {
-    return "已审批完成";
+    return "审批完成";
+  }
+
+  if (params.data?.sp_status === 4) {
+    return "已撤销";
   }
 
   const appData = params.value;
@@ -1191,7 +1199,7 @@ const getUEDHotfixApplyDatas = (oraDatas: any, start_id: number) => {
 };
 
 const getEmergencyApplyDatas = (oraDatas: any, start_id: number) => {
-
+  debugger;
   const datas: any = [];
   oraDatas.forEach((ele: any, index: number) => {
 
@@ -1220,6 +1228,7 @@ const getEmergencyApplyDatas = (oraDatas: any, start_id: number) => {
     });
   });
 
+  debugger;
   return datas;
 };
 

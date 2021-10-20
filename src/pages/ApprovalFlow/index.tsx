@@ -78,7 +78,7 @@ const queryDevelopViews = async (condition: any) => {
 const JenkinsCheck: React.FC<any> = () => {
 
   const [condition, setCondition] = useState({
-    approvalType: "Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt", // emergency id
+    approvalType: "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu", // emergency id
     applicant: "",
     manager: "",
     status: "",

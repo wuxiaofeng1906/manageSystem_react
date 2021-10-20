@@ -3,7 +3,7 @@
 // 公用title属性
 const applayTitle = (applicant: string, approveNo: string,) => {
   return <div style={{marginTop: -17}}>
-    <div><label style={{color: "gray"}}>申请人： </label> {applicant} </div>
+    <div><label style={{color: "gray"}}>申请人： </label>&nbsp;&nbsp; {applicant} </div>
     <div><label style={{color: "gray"}}>审批编号： </label> {approveNo} </div>
     <div style={{color: "gray"}}>审批流程：</div>
   </div>;

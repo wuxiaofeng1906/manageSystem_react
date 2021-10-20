@@ -708,21 +708,9 @@ const JenkinsCheck: React.FC<any> = () => {
 
     if (params.column.colId === "current_person") {
       const datas = params.data;
-
-      let changeObject = "";
-      // 如果变更对象是需求变更，那么还要判断是否涉及交互修改
-      if (datas.change_obj === "需求变更" && datas.change_modify === "否") {
-
-        changeObject = "需求变更-不涉及交互修改";
-      } else if (datas.change_obj === "需求变更" && datas.change_modify === "是") {
-        changeObject = "需求变更-涉及交互修改";
-      } else {
-        // 其他变更类型不用判断是否涉及交互修改
-        changeObject = datas.change_obj;
-      }
       setModalTitle(datas.change_obj);
       setDetailsVisible(true);
-      const returnDiv = getFlowDIv(changeObject, datas);
+      const returnDiv = getFlowDIv(datas);
       setFlowDiv(returnDiv);
     }
   };

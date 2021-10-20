@@ -240,27 +240,14 @@ const storyChange = (datas: any, isModify: boolean) => {
   const flowData = datas.record_data;
 
   const applyTitles = applayTitle(applicant, ApproveNo); // 界面统一的title
-  // const prdDirApprove = productDirectorApprove(flowData.product_dire); // 产品总监审批
   const prdDirApprove = approveCommonMethod("产品总监审批", flowData.product_dire);
-  // const archEvalApprove = archEvaluateApprove(flowData.architecture_apply); // 架构评估审批
   const archEvalApprove = approveCommonMethod("架构评估审批", flowData.architecture_apply);
-  // const prjPrinciApprove = prjPrincipalApprove(datas);  // 项目负责人评估
   const prjPrinciApprove = approveCommonMethod("项目负责人评估", flowData.pro_apply);
-  // const sqaSpecCheck = sqaSpecificateCheck(datas);// SQA规范检查
   const sqaSpecCheck = approveCommonMethod("SQA规范检查", flowData.sqa_check);
-
-  // const ccbApp = ccbApprove(datas);// CCB审批
   const ccbApp = approveCommonMethod("CCB审批", flowData.ccb_apply);
-
-  // const devManApprove = devManagerApprove(datas);// 研发总经理审批
   const devManApprove = approveCommonMethod("研发总经理审批", flowData.manager_apply);
-
-  // const sqaNotStUpdate = sqaNotifyStoryUpdate(datas);// SQA通知需求变更
   const sqaNotStUpdate = approveCommonMethod("SQA通知需求变更", flowData.sqa_notice);
-
-  // const uedEvalApprove = uedEvaluateApprove(datas);// UED评估审批  涉及交互修改才用得到
-
-  const uedEvalApprove = approveCommonMethod("UED经理审批", flowData.ued_apply);
+  const uedEvalApprove = approveCommonMethod("UED评估审批", flowData.ued_apply);
 
 
   if (isModify) {
@@ -292,8 +279,27 @@ const storyChange = (datas: any, isModify: boolean) => {
 
 // 交互变更
 const interactiveChange = (datas: any) => {
-
-  return <div></div>
+  const flowData = datas.record_data;
+  const {applicant} = datas;
+  const ApproveNo = datas.sp_no;
+  const applyTitles = applayTitle(applicant, ApproveNo); // 界面统一的title
+  const uedEvalApprove = approveCommonMethod("UED经理审批", flowData.ued_apply);
+  const prdDirApprove = approveCommonMethod("产品总监审批", flowData.product_dire);
+  const prjPrinciApprove = approveCommonMethod("项目负责人评估", flowData.pro_apply);
+  const sqaSpecCheck = approveCommonMethod("SQA规范检查", flowData.sqa_check);
+  const ccbApp = approveCommonMethod("CCB审批", flowData.ccb_apply);
+  const devManApprove = approveCommonMethod("研发总经理审批", flowData.manager_apply);
+  const sqaNotStUpdate = approveCommonMethod("SQA通知需求变更", flowData.sqa_notice);
+  return <div>
+    {applyTitles}
+    {uedEvalApprove}
+    {prdDirApprove}
+    {prjPrinciApprove}
+    {sqaSpecCheck}
+    {ccbApp}
+    {devManApprove}
+    {sqaNotStUpdate}
+  </div>;
 };
 
 // 方案设计变更
@@ -326,7 +332,6 @@ const testPlanChange = (datas: any) => {
 const getFlowDIv = (type: string, datas: any) => {
   let flowDivResult: JSX.Element = <div></div>;
 
-  debugger;
   switch (type) {
     case"需求变更-不涉及交互修改":
       flowDivResult = storyChange(datas, false);

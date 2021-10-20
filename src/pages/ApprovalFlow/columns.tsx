@@ -288,7 +288,6 @@ const getChangeApplyColumns = () => {
       wrapText: true,
       autoHeight: true,
       cellRenderer: alaCurrentapproval,
-      pinned: 'right',
     },
     // {
     //   headerName: '产品负责人审批',
@@ -1199,7 +1198,7 @@ const getUEDHotfixApplyDatas = (oraDatas: any, start_id: number) => {
 };
 
 const getEmergencyApplyDatas = (oraDatas: any, start_id: number) => {
-  debugger;
+
   const datas: any = [];
   oraDatas.forEach((ele: any, index: number) => {
 
@@ -1228,7 +1227,6 @@ const getEmergencyApplyDatas = (oraDatas: any, start_id: number) => {
     });
   });
 
-  debugger;
   return datas;
 };
 

@@ -898,37 +898,45 @@ const getUEDHotfixApplyColumns = () => {
       minWidth: 110,
     },
     {
+      headerName: '当前审批人',
+      field: 'current_person',
+      minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
+      cellRenderer: alaCurrentapproval,
+    },
+    {
       headerName: '提交时间',
       field: 'apply_time',
       minWidth: 110,
       wrapText: true,
       autoHeight: true,
     },
-    {
-      headerName: '产研负责人审批',
-      field: 'product_leader',
-      minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
-      cellRenderer: approvePerson
-    },
-    {
-      headerName: '指定审批人',
-      field: 'spec_approval',
-      minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
-      cellRenderer: approvePerson
-    },
-    {
-      headerName: '测试经理审批（Anyone）',
-      field: 'test_leader',
-      minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
-      cellRenderer: approvePerson
-
-    }
+    // {
+    //   headerName: '产研负责人审批',
+    //   field: 'product_leader',
+    //   minWidth: 110,
+    //   wrapText: true,
+    //   autoHeight: true,
+    //   cellRenderer: approvePerson
+    // },
+    // {
+    //   headerName: '指定审批人',
+    //   field: 'spec_approval',
+    //   minWidth: 110,
+    //   wrapText: true,
+    //   autoHeight: true,
+    //   cellRenderer: approvePerson
+    // },
+    // {
+    //   headerName: '测试经理审批（Anyone）',
+    //   field: 'test_leader',
+    //   minWidth: 110,
+    //   wrapText: true,
+    //   autoHeight: true,
+    //   cellRenderer: approvePerson
+    //
+    // }
   ];
 
   return columns;
@@ -1244,9 +1252,12 @@ const getUEDHotfixApplyDatas = (oraDatas: any, start_id: number) => {
       hotfix_content: ele.hotfix_content,
       test_advice: ele.test_advice,
       comment_content: ele.comment_content,
-      product_leader: ele.product_leader,
-      spec_approval: ele.spec_approval,
-      test_leader: ele.test_leader,
+      current_person: ele.current_person,
+      record_data: ele.record_data,
+      record_title: ele.record_title,
+      // product_leader: ele.product_leader,
+      // spec_approval: ele.spec_approval,
+      // test_leader: ele.test_leader,
       apply_time: ele.apply_time
 
     });

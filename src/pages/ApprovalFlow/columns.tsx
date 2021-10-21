@@ -614,7 +614,14 @@ const getDevHotfixOnlineColumns = () => {
       headerName: '备注',
       field: 'comment_content',
       minWidth: 150,
-
+    },
+    {
+      headerName: '当前审批人',
+      field: 'current_person',
+      minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
+      cellRenderer: alaCurrentapproval,
     },
     {
       headerName: '提交时间',
@@ -623,30 +630,30 @@ const getDevHotfixOnlineColumns = () => {
       wrapText: true,
       autoHeight: true,
     },
-    {
-      headerName: '指定审批人',
-      field: 'spec_approval',
-      minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
-      cellRenderer: approvePerson
-    },
-    {
-      headerName: '测试经理审批',
-      field: 'test_leader',
-      minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
-      cellRenderer: approvePerson
-
-    },
-    {
-      headerName: '测试审批',
-      field: 'test_approval',
-      minWidth: 90,
-      cellRenderer: approveForTester
-
-    }
+    // {
+    //   headerName: '指定审批人',
+    //   field: 'spec_approval',
+    //   minWidth: 110,
+    //   wrapText: true,
+    //   autoHeight: true,
+    //   cellRenderer: approvePerson
+    // },
+    // {
+    //   headerName: '测试经理审批',
+    //   field: 'test_leader',
+    //   minWidth: 110,
+    //   wrapText: true,
+    //   autoHeight: true,
+    //   cellRenderer: approvePerson
+    //
+    // },
+    // {
+    //   headerName: '测试审批',
+    //   field: 'test_approval',
+    //   minWidth: 90,
+    //   cellRenderer: approveForTester
+    //
+    // }
   ];
 
   return columns;
@@ -1165,9 +1172,12 @@ const getDevHotfixOnlineDatas = (oraDatas: any, start_id: number) => {
       dep_env: ele.dep_env,
       hotfix_form: ele.hotfix_form,
       comment_content: ele.comment_content,
-      spec_approval: ele.spec_approval,
-      test_leader: ele.test_leader,
-      test_approval: ele.test_approval,
+      current_person: ele.current_person,
+      record_title: ele.record_title,
+      record_data: ele.record_data,
+      // spec_approval: ele.spec_approval,
+      // test_leader: ele.test_leader,
+      // test_approval: ele.test_approval,
       apply_time: ele.apply_time
 
     });

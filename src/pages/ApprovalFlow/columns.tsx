@@ -289,6 +289,14 @@ const getChangeApplyColumns = () => {
       pinned: 'left',
     },
     {
+      headerName: '当前审批人',
+      field: 'current_person',
+      minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
+      cellRenderer: alaCurrentapproval,
+    },
+    {
       headerName: '变更所处阶段',
       field: 'change_phase',
       minWidth: 100,
@@ -307,14 +315,6 @@ const getChangeApplyColumns = () => {
       headerName: '变更影响',
       field: 'change_impact',
       minWidth: 120,
-    },
-    {
-      headerName: '当前审批人',
-      field: 'current_person',
-      minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
-      cellRenderer: alaCurrentapproval,
     },
     // {
     //   headerName: '产品负责人审批',
@@ -505,6 +505,14 @@ const getDevHotfixOnlineColumns = () => {
       pinned: 'left',
     },
     {
+      headerName: '当前审批人',
+      field: 'current_person',
+      minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
+      cellRenderer: alaCurrentapproval,
+    },
+    {
       headerName: '类型',
       field: 'hotfix_type',
       minWidth: 75,
@@ -614,14 +622,6 @@ const getDevHotfixOnlineColumns = () => {
       headerName: '备注',
       field: 'comment_content',
       minWidth: 150,
-    },
-    {
-      headerName: '当前审批人',
-      field: 'current_person',
-      minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
-      cellRenderer: alaCurrentapproval,
     },
     {
       headerName: '提交时间',
@@ -755,6 +755,14 @@ const getProductHotfixRepaireApplyColumns = () => {
       pinned: 'left',
     },
     {
+      headerName: '当前审批人',
+      field: 'current_person',
+      minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
+      cellRenderer: alaCurrentapproval,
+    },
+    {
       headerName: '修改说明/测试建议',
       field: 'test_advice',
       minWidth: 120,
@@ -763,14 +771,6 @@ const getProductHotfixRepaireApplyColumns = () => {
       headerName: '备注',
       field: 'comment_content',
       minWidth: 120,
-    },
-    {
-      headerName: '当前审批人',
-      field: 'current_person',
-      minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
-      cellRenderer: alaCurrentapproval,
     },
     {
       headerName: '提交时间',
@@ -878,6 +878,14 @@ const getUEDHotfixApplyColumns = () => {
       pinned: 'left',
     },
     {
+      headerName: '当前审批人',
+      field: 'current_person',
+      minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
+      cellRenderer: alaCurrentapproval,
+    },
+    {
       headerName: '是否需要测试验证',
       field: 'validation',
       minWidth: 90,
@@ -896,14 +904,6 @@ const getUEDHotfixApplyColumns = () => {
       headerName: '备注',
       field: 'comment_content',
       minWidth: 110,
-    },
-    {
-      headerName: '当前审批人',
-      field: 'current_person',
-      minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
-      cellRenderer: alaCurrentapproval,
     },
     {
       headerName: '提交时间',
@@ -1014,6 +1014,14 @@ const getEmergencyApplyColumns = () => {
       pinned: 'left',
     },
     {
+      headerName: '当前审批人',
+      field: 'current_person',
+      minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
+      cellRenderer: alaCurrentapproval,
+    },
+    {
       headerName: '申请标记',
       field: 'apply_tag',
       minWidth: 190,
@@ -1080,14 +1088,7 @@ const getEmergencyApplyColumns = () => {
       field: 'comment_content',
       minWidth: 90,
     },
-    {
-      headerName: '当前审批人',
-      field: 'current_person',
-      minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
-      cellRenderer: alaCurrentapproval,
-    },
+
     {
       headerName: '提交时间',
       field: 'apply_time',

@@ -107,14 +107,13 @@ const linkRender = (params: any) => {
 
 // 当前审批人
 const alaCurrentapproval = (params: any) => {
+
   const status_sp = params.data?.sp_status;
   // 只有在审批中（值为1）的，才显示流程人，其他状态直接显示即可
   if (status_sp !== 1) {
 
     let returnValue = "";
     switch (status_sp.toString()) {
-
-
       case "2":
         returnValue = "审批通过";
         break;
@@ -142,10 +141,14 @@ const alaCurrentapproval = (params: any) => {
     return returnValue;
   }
 
-
   const appData = params.value;
   if (JSON.stringify(appData) === "{}") {
     return "";
+  }
+  // 如果当前审批人为测试审批，那么就显示为：测试待审批
+
+  if (appData.phase === "test_approval") {
+    return "测试待审批";
   }
   let returnDiv = "";
   if (appData) {

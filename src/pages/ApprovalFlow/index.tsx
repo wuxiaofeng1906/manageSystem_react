@@ -78,6 +78,7 @@ const queryDevelopViews = async (condition: any) => {
 const JenkinsCheck: React.FC<any> = () => {
 
   const [condition, setCondition] = useState({
+    approvalTypeName: "emergency申请",
     approvalType: "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu", // emergency id
     applicant: "",
     manager: "",
@@ -575,12 +576,15 @@ const JenkinsCheck: React.FC<any> = () => {
     devManager: "inline-block",
     prjManager: "none"
   });
-  const changeAppType = async (appType: any) => {
+  const changeAppType = async (appType: any, appTypeObject: any) => {
+    debugger
 
+    console.log(appTypeObject.children)
     // 根据单据类型显示不同的经理选项（项目经理和开发经理）
     getManagers(appType);
     setCondition({
       ...condition,
+      approvalTypeName: appTypeObject.children,
       approvalType: appType
 
     });
@@ -702,13 +706,15 @@ const JenkinsCheck: React.FC<any> = () => {
     setDetailsVisible(false);
   };
   const onChangeCellClicked = (params: any) => {
-    if (condition.approvalType !== "Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt") { // 如果是变更申请
-      return;
-    }
+
 
     if (params.column.colId === "current_person") {
       const datas = params.data;
-      setModalTitle(datas.change_obj);
+      if (condition.approvalType === "Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt") { // 如果是变更申请
+        setModalTitle(datas.change_obj);
+      } else {
+        setModalTitle(condition.approvalTypeName);
+      }
       setDetailsVisible(true);
       const returnDiv = getFlowDIv(datas);
       setFlowDiv(returnDiv);

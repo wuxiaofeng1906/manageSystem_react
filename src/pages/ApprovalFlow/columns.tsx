@@ -765,28 +765,36 @@ const getProductHotfixRepaireApplyColumns = () => {
       minWidth: 120,
     },
     {
+      headerName: '当前审批人',
+      field: 'current_person',
+      minWidth: 110,
+      wrapText: true,
+      autoHeight: true,
+      cellRenderer: alaCurrentapproval,
+    },
+    {
       headerName: '提交时间',
       field: 'apply_time',
       minWidth: 110,
       wrapText: true,
       autoHeight: true,
     },
-    {
-      headerName: '指定审批人',
-      field: 'spec_approval',
-      minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
-      cellRenderer: approvePerson
-    },
-    {
-      headerName: '测试经理审批（Anyone）',
-      field: 'test_leader',
-      minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
-      cellRenderer: approvePerson
-    }
+    // {
+    //   headerName: '指定审批人',
+    //   field: 'spec_approval',
+    //   minWidth: 110,
+    //   wrapText: true,
+    //   autoHeight: true,
+    //   cellRenderer: approvePerson
+    // },
+    // {
+    //   headerName: '测试经理审批（Anyone）',
+    //   field: 'test_leader',
+    //   minWidth: 110,
+    //   wrapText: true,
+    //   autoHeight: true,
+    //   cellRenderer: approvePerson
+    // }
 
   ];
 
@@ -1204,8 +1212,11 @@ const getProductHotfixRepaireApplyDatas = (oraDatas: any, start_id: number) => {
       sp_status: ele.sp_status,
       test_advice: ele.test_advice,
       comment_content: ele.comment_content,
-      spec_approval: ele.spec_approval,
-      test_leader: ele.test_leader,
+      current_person: ele.current_person,
+      record_title: ele.record_title,
+      record_data: ele.record_data,
+      // spec_approval: ele.spec_approval,
+      // test_leader: ele.test_leader,
       apply_time: ele.apply_time
 
     });

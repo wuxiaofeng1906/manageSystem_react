@@ -563,6 +563,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   // 待审批人
   const getselectedPendingApproval = (values: any, params: any) => {
+    debugger;
 
     setCondition({
       ...condition,
@@ -589,11 +590,12 @@ const JenkinsCheck: React.FC<any> = () => {
   // 获取审批编号
   const getSpNo = (params: any) => {
     const values = params.currentTarget?.defaultValue;
-    debugger;
+
     setCondition({
       ...condition,
-      spPerson: params.toString()
+      spNo: values.toString()
     });
+
 
     const queryCondition = {
       approvalType: condition.approvalType, // emergency id

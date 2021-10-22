@@ -18,6 +18,7 @@ const {RangePicker} = DatePicker;
 
 // 查询数据
 const queryDevelopViews = async (condition: any) => {
+  debugger;
 
   let datas: any = [];
   const pageInfo = {
@@ -186,8 +187,8 @@ const JenkinsCheck: React.FC<any> = () => {
       status: condition.status,
       start: condition.start,
       end: condition.end,
-      spNo:condition.spNo,
-      spPerson:condition.spPerson,
+      spNo: condition.spNo,
+      spPerson: condition.spPerson,
       page: Pages.currentPage, // 第几页
       pageSize: pageCount // 每页多少条
     };
@@ -214,8 +215,8 @@ const JenkinsCheck: React.FC<any> = () => {
         status: condition.status,
         start: condition.start,
         end: condition.end,
-        spNo:condition.spNo,
-        spPerson:condition.spPerson,
+        spNo: condition.spNo,
+        spPerson: condition.spPerson,
         page: Number(Pages.currentPage - 1), // 第几页
         pageSize: Pages.countsOfPage // 每页多少条
       };
@@ -251,8 +252,8 @@ const JenkinsCheck: React.FC<any> = () => {
         status: condition.status,
         start: condition.start,
         end: condition.end,
-        spNo:condition.spNo,
-        spPerson:condition.spPerson,
+        spNo: condition.spNo,
+        spPerson: condition.spPerson,
         page: Number(Pages.currentPage + 1), // 第几页
         pageSize: Pages.countsOfPage // 每页多少条
       };
@@ -297,8 +298,8 @@ const JenkinsCheck: React.FC<any> = () => {
         status: condition.status,
         start: condition.start,
         end: condition.end,
-        spNo:condition.spNo,
-        spPerson:condition.spPerson,
+        spNo: condition.spNo,
+        spPerson: condition.spPerson,
         page: pageCounts, // 第几页
         pageSize: Pages.countsOfPage // 每页多少条
       };
@@ -561,11 +562,11 @@ const JenkinsCheck: React.FC<any> = () => {
   };
 
   // 待审批人
-  const getselectedPendingApproval = (params: any) => {
+  const getselectedPendingApproval = (values: any, params: any) => {
 
     setCondition({
       ...condition,
-      spPerson: params.toString()
+      spPerson: params.key.toString()
     });
 
     const queryCondition = {
@@ -575,7 +576,7 @@ const JenkinsCheck: React.FC<any> = () => {
       status: condition.status,
       start: condition.start,
       end: condition.end,
-      spPerson: params.toString(),
+      spPerson: params.key.toString(),
       spNo: condition.spNo,
       page: condition.page,
       pageSize: condition.pageSize

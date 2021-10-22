@@ -51,16 +51,18 @@ const approveCommonMethod = (title: string, content: any, isTestStage: boolean, 
 
   if (isTestStage === true) { // 单独处理当前审批没能通过，并且字段有测试的问题
 
+
+
+    titleDiv = <div style={{marginTop: 8}}>
+      <label>测试审批.</label>
+      <label style={{color: "#46A0FC"}}>或签</label>
+    </div>;
+
     contentDiv = <div><label style={{
       display: "inline-block",
       textAlign: "center",
-      width: 100
+      width: 140
     }}>测试待审批</label></div>;
-
-    titleDiv = <div style={{marginTop: 8}}>
-      <label>测试待审批.</label>
-      <label style={{color: "#46A0FC"}}>或签</label>
-    </div>;
 
     return <div>
       {titleDiv}

@@ -409,6 +409,8 @@ const JenkinsCheck: React.FC<any> = () => {
       status: condition.status,
       start: condition.start,
       end: condition.end,
+      spPerson: condition.spPerson,
+      spNo: condition.spNo,
       page: condition.page,
       pageSize: condition.pageSize
     };
@@ -470,6 +472,8 @@ const JenkinsCheck: React.FC<any> = () => {
       status: params.key,
       start: condition.start,
       end: condition.end,
+      spPerson: condition.spPerson,
+      spNo: condition.spNo,
       page: condition.page,
       pageSize: condition.pageSize
     };
@@ -533,6 +537,8 @@ const JenkinsCheck: React.FC<any> = () => {
       status: condition.status,
       start: condition.start,
       end: condition.end,
+      spPerson: condition.spPerson,
+      spNo: condition.spNo,
       page: condition.page,
       pageSize: condition.pageSize
     };
@@ -554,6 +560,8 @@ const JenkinsCheck: React.FC<any> = () => {
       status: condition.status,
       start: condition.start,
       end: condition.end,
+      spPerson: condition.spPerson,
+      spNo: condition.spNo,
       page: condition.page,
       pageSize: condition.pageSize
     };
@@ -629,6 +637,8 @@ const JenkinsCheck: React.FC<any> = () => {
       status: condition.status,
       start: `${params[0].toString()} 00:00:00`,
       end: `${params[1].toString()} 23:59:59`,
+      spPerson: condition.spPerson,
+      spNo: condition.spNo,
       page: condition.page,
       pageSize: condition.pageSize
     };
@@ -643,7 +653,7 @@ const JenkinsCheck: React.FC<any> = () => {
     prjManager: "none"
   });
   const changeAppType = async (appType: any, appTypeObject: any) => {
-    debugger
+
 
     console.log(appTypeObject.children)
     // 根据单据类型显示不同的经理选项（项目经理和开发经理）
@@ -675,6 +685,8 @@ const JenkinsCheck: React.FC<any> = () => {
       status: condition.status,
       start: condition.start,
       end: condition.end,
+      spPerson: condition.spPerson,
+      spNo: condition.spNo,
       page: condition.page,
       pageSize: condition.pageSize
     };

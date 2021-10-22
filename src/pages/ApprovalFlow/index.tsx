@@ -805,6 +805,7 @@ const JenkinsCheck: React.FC<any> = () => {
             resizable: true,
             sortable: true,
             suppressMenu: true,
+            autoHeight: true,
           }}
 
           onGridReady={onGridReady}

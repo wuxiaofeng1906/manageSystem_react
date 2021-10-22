@@ -40,65 +40,64 @@ const approveStatus = (params: any) => {
 };
 
 // 架构审批 、项目负责人审批、QA审批、CCB审批、总设确认、QA确认
-const approvePerson = (params: any) => {
-
-  let returnDiv = "";
-  const appData = params.value;
-
-  if (typeof (appData) === "string") {
-    return appData;
-  }
-
-  if (appData) {
-
-    appData.forEach((ele: any) => {
-
-      if (ele.sp_status === 2) {  // 2 为审批通过
-        returnDiv = returnDiv === "" ?
-          `<div>
-           <span style="display: inline-block; width: 45px">${ele.user_name}</span>
-           <label style="margin-left:10px;font-weight: bolder; color: #32D529">√</label>
-        </div>`
-          :
-          `${returnDiv}
-        <div style="margin-top: -20px">
-           <span style="display: inline-block; width: 45px">${ele.user_name}</span>
-           <label style="margin-left:10px;font-weight: bolder; color: #32D529">√</label>
-        </div>`
-      } else {
-        returnDiv = returnDiv === "" ?
-          `<div>
-           <span style="display: inline-block; ">${ele.user_name}</span>
-        </div>`
-          :
-          `${returnDiv}
-        <div style="margin-top: -20px">
-           <span style="display: inline-block; ">${ele.user_name}</span>
-        </div>`
-      }
-
-    });
-  }
-
-  return `<div> ${returnDiv} </div>`;
-};
-
-
-const approveForTester = (params: any) => {
-  debugger;
-
-  let returnValue = "";
-  const appData = params.value;
-  if (appData === undefined) {
-    return "";
-  }
-  if (appData[0].sp_status === 2) {
-    returnValue = appData[0].user_name;
-  } else {
-    returnValue = "待审批";
-  }
-  return returnValue;
-};
+// const approvePerson = (params: any) => {
+//
+//   let returnDiv = "";
+//   const appData = params.value;
+//
+//   if (typeof (appData) === "string") {
+//     return appData;
+//   }
+//
+//   if (appData) {
+//
+//     appData.forEach((ele: any) => {
+//
+//       if (ele.sp_status === 2) {  // 2 为审批通过
+//         returnDiv = returnDiv === "" ?
+//           `<div>
+//            <span style="display: inline-block; width: 45px">${ele.user_name}</span>
+//            <label style="margin-left:10px;font-weight: bolder; color: #32D529">√</label>
+//         </div>`
+//           :
+//           `${returnDiv}
+//         <div style="margin-top: -20px">
+//            <span style="display: inline-block; width: 45px">${ele.user_name}</span>
+//            <label style="margin-left:10px;font-weight: bolder; color: #32D529">√</label>
+//         </div>`
+//       } else {
+//         returnDiv = returnDiv === "" ?
+//           `<div>
+//            <span style="display: inline-block; ">${ele.user_name}</span>
+//         </div>`
+//           :
+//           `${returnDiv}
+//         <div style="margin-top: -20px">
+//            <span style="display: inline-block; ">${ele.user_name}</span>
+//         </div>`
+//       }
+//
+//     });
+//   }
+//
+//   return `<div> ${returnDiv} </div>`;
+// };
+//
+//
+// const approveForTester = (params: any) => {
+//
+//   let returnValue = "";
+//   const appData = params.value;
+//   if (appData === undefined) {
+//     return "";
+//   }
+//   if (appData[0].sp_status === 2) {
+//     returnValue = appData[0].user_name;
+//   } else {
+//     returnValue = "待审批";
+//   }
+//   return returnValue;
+// };
 
 // 渲染成链接，直接点击进入
 const linkRender = (params: any) => {
@@ -295,7 +294,7 @@ const getChangeApplyColumns = () => {
       headerName: '当前审批人',
       field: 'current_person',
       minWidth: 110,
-      wrapText: true,
+      // wrapText: true,
       autoHeight: true,
       cellRenderer: alaCurrentapproval,
     },
@@ -511,8 +510,8 @@ const getDevHotfixOnlineColumns = () => {
       headerName: '当前审批人',
       field: 'current_person',
       minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
+      // wrapText: true,
+      // autoHeight: true,
       cellRenderer: alaCurrentapproval,
     },
     {
@@ -1020,8 +1019,8 @@ const getEmergencyApplyColumns = () => {
       headerName: '当前审批人',
       field: 'current_person',
       minWidth: 110,
-      wrapText: true,
-      autoHeight: true,
+      // wrapText: true,
+      // autoHeight: true,
       cellRenderer: alaCurrentapproval,
     },
     {

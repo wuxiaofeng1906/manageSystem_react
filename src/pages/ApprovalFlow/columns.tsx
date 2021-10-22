@@ -252,6 +252,7 @@ const getChangeApplyColumns = () => {
       field: 'project_name',
       minWidth: 110,
       pinned: 'left',
+      tooltipField: "project_name"
     },
     {
       headerName: '项目经理',
@@ -307,16 +308,19 @@ const getChangeApplyColumns = () => {
       headerName: '变更原因',
       field: 'change_why',
       minWidth: 120,
+      tooltipField: "change_why"
     },
     {
       headerName: '变更内容',
       field: 'change_content',
       minWidth: 120,
+      tooltipField: "change_content"
     },
     {
       headerName: '变更影响',
       field: 'change_impact',
       minWidth: 120,
+      tooltipField: "change_impact"
     },
     // {
     //   headerName: '产品负责人审批',
@@ -378,6 +382,7 @@ const getChangeApplyColumns = () => {
       headerName: '变更涉及文档',
       field: 'change_doc',
       minWidth: 110,
+      tooltipField: "change_doc",
       cellRenderer: linkRender
     },
     {
@@ -435,6 +440,7 @@ const getChangeApplyColumns = () => {
       headerName: '备注',
       field: 'comment_content',
       minWidth: 110,
+      tooltipField: "comment_content",
     }, {
       headerName: '提交时间',
       field: 'apply_time',
@@ -565,6 +571,7 @@ const getDevHotfixOnlineColumns = () => {
       headerName: '内容详情',
       field: 'hotfix_content',
       minWidth: 150,
+      tooltipField: "hotfix_content"
     },
     {
       headerName: 'hotfix标记',
@@ -608,22 +615,25 @@ const getDevHotfixOnlineColumns = () => {
       headerName: '测试建议及安排',
       field: 'test_advice',
       minWidth: 110,
+      tooltipField: "test_advice"
     },
     {
       headerName: '部署环境说明',
       field: 'dep_env',
       minWidth: 110,
+      tooltipField: "dep_env"
     },
     {
       headerName: 'hotfix清单',
       field: 'hotfix_form',
       minWidth: 110,
-
+      tooltipField: "hotfix清单"
     },
     {
       headerName: '备注',
       field: 'comment_content',
       minWidth: 150,
+      tooltipField: "comment_content"
     },
     {
       headerName: '提交时间',
@@ -768,11 +778,13 @@ const getProductHotfixRepaireApplyColumns = () => {
       headerName: '修改说明/测试建议',
       field: 'test_advice',
       minWidth: 120,
+      tooltipField: "test_advice",
     },
     {
       headerName: '备注',
       field: 'comment_content',
       minWidth: 120,
+      tooltipField: "comment_content",
     },
     {
       headerName: '提交时间',
@@ -896,16 +908,19 @@ const getUEDHotfixApplyColumns = () => {
       headerName: '修复内容',
       field: 'hotfix_content',
       minWidth: 100,
+      tooltipField: "hotfix_content",
     },
     {
       headerName: '修改说明/测试建议',
       field: 'test_advice',
       minWidth: 150,
+      tooltipField: "test_advice",
     },
     {
       headerName: '备注',
       field: 'comment_content',
       minWidth: 110,
+      tooltipField: "comment_content",
     },
     {
       headerName: '提交时间',
@@ -1069,28 +1084,32 @@ const getEmergencyApplyColumns = () => {
       headerName: '修复内容',
       field: 'emergency_content',
       minWidth: 200,
+      tooltipField: 'emergency_content'
     },
     {
       headerName: '紧急原因及影响',
       field: 'emergency_degree',
       minWidth: 200,
+      tooltipField: 'emergency_degree'
     },
     {
       headerName: '修改说明/测试建议',
       field: 'test_advice',
       minWidth: 200,
+      tooltipField: 'test_advice'
     },
     {
       headerName: '发布环境',
       field: 'release_env',
       minWidth: 110,
+      tooltipField: 'release_env'
     },
     {
       headerName: '备注',
       field: 'comment_content',
       minWidth: 90,
+      tooltipField: 'comment_content'
     },
-
     {
       headerName: '提交时间',
       field: 'apply_time',

@@ -33,6 +33,8 @@ const queryDevelopViews = async (condition: any) => {
     user_id: condition.applicant, // 申请人
     start_time: condition.start, // 开始时间
     end_time: condition.end,// 结束时间
+    sp_no: condition.spNo,
+    sp_person: condition.spPerson,
     page: condition.page, // 第几页
     page_size: condition.pageSize  // 每页多少条
   };
@@ -85,6 +87,8 @@ const JenkinsCheck: React.FC<any> = () => {
     status: "",
     start: "",
     end: "",
+    spNo: "",
+    spPerson: "",
     page: 1,
     pageSize: 20
   });
@@ -182,6 +186,8 @@ const JenkinsCheck: React.FC<any> = () => {
       status: condition.status,
       start: condition.start,
       end: condition.end,
+      spNo:condition.spNo,
+      spPerson:condition.spPerson,
       page: Pages.currentPage, // 第几页
       pageSize: pageCount // 每页多少条
     };
@@ -208,6 +214,8 @@ const JenkinsCheck: React.FC<any> = () => {
         status: condition.status,
         start: condition.start,
         end: condition.end,
+        spNo:condition.spNo,
+        spPerson:condition.spPerson,
         page: Number(Pages.currentPage - 1), // 第几页
         pageSize: Pages.countsOfPage // 每页多少条
       };
@@ -243,6 +251,8 @@ const JenkinsCheck: React.FC<any> = () => {
         status: condition.status,
         start: condition.start,
         end: condition.end,
+        spNo:condition.spNo,
+        spPerson:condition.spPerson,
         page: Number(Pages.currentPage + 1), // 第几页
         pageSize: Pages.countsOfPage // 每页多少条
       };
@@ -287,6 +297,8 @@ const JenkinsCheck: React.FC<any> = () => {
         status: condition.status,
         start: condition.start,
         end: condition.end,
+        spNo:condition.spNo,
+        spPerson:condition.spPerson,
         page: pageCounts, // 第几页
         pageSize: Pages.countsOfPage // 每页多少条
       };
@@ -466,6 +478,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   };
 
+
   // 经理（开发经理 or 项目经理）
   const [managers, setManagers] = useState([]);
   const getManagers = (appType: string) => {
@@ -547,6 +560,56 @@ const JenkinsCheck: React.FC<any> = () => {
     refreshGrid(queryCondition);
   };
 
+  // 待审批人
+  const getselectedPendingApproval = (params: any) => {
+
+    setCondition({
+      ...condition,
+      spPerson: params.toString()
+    });
+
+    const queryCondition = {
+      approvalType: condition.approvalType, // emergency id
+      applicant: condition.applicant,
+      manager: condition.manager,
+      status: condition.status,
+      start: condition.start,
+      end: condition.end,
+      spPerson: params.toString(),
+      spNo: condition.spNo,
+      page: condition.page,
+      pageSize: condition.pageSize
+    };
+
+    refreshGrid(queryCondition);
+
+  };
+
+  // 获取审批编号
+  const getSpNo = (params: any) => {
+    const values = params.currentTarget?.defaultValue;
+    debugger;
+    setCondition({
+      ...condition,
+      spPerson: params.toString()
+    });
+
+    const queryCondition = {
+      approvalType: condition.approvalType, // emergency id
+      applicant: condition.applicant,
+      manager: condition.manager,
+      status: condition.status,
+      start: condition.start,
+      end: condition.end,
+      spPerson: condition.spPerson,
+      spNo: values.toString(),
+      page: condition.page,
+      pageSize: condition.pageSize
+    };
+
+    refreshGrid(queryCondition);
+
+  };
   // 已选择的时间
   const getSelectedDateRange = (values: any, params: any) => {
 
@@ -742,57 +805,44 @@ const JenkinsCheck: React.FC<any> = () => {
       <div style={{height: 35, marginTop: -15, overflow: "hidden"}}>
 
         <label> 类型： </label>
-        <Select style={{width: '10%'}} onChange={changeAppType} value={condition.approvalType}>
+        <Select style={{minWidth: 140, width: '10%'}} onChange={changeAppType} value={condition.approvalType}>
           {approvalType}
-          {/* <Option value="开发hotfix上线申请">开发hotfix上线申请</Option>
-          <Option value="产品hotfix修复申请">产品hotfix修复申请</Option>
-          <Option value="UED-hotfix修复申请">UED-hotfix修复申请</Option>
-          <Option value="emergency申请">emergency申请</Option>
-          <Option value="变更申请">变更申请</Option> */}
         </Select>
 
         <label style={{marginLeft: 10}}> 申请人： </label>
-        <Select style={{width: '10%'}} showSearch onChange={getselectedApplicant}>
+        <Select style={{minWidth: 90, width: '10%'}} showSearch onChange={getselectedApplicant}>
           {applicant}
-          {/* <Option value="开发hotfix上线申请">1</Option>
-          <Option value="产品hotfix修复申请">2</Option>
-          <Option value="UED-hotfix修复申请">3-hotfix修复申请</Option>
-          <Option value="emergency申请">4</Option>
-          <Option value="变更申请">5</Option> */}
         </Select>
 
         <label style={{marginLeft: 10, display: showCondition.devManager}}> 开发经理： </label>
-        <Select style={{width: '10%', display: showCondition.devManager}} showSearch onChange={getDevManager}>
+        <Select style={{minWidth: 90, width: '10%', display: showCondition.devManager}} showSearch
+                onChange={getDevManager}>
           {managers}
-          {/* <Option value="开发hotfix上线申请">1</Option>
-          <Option value="产品hotfix修复申请">2</Option>
-          <Option value="UED-hotfix修复申请">UED-3</Option>
-          <Option value="emergency申请">4</Option>
-          <Option value="变更申请">5</Option> */}
         </Select>
 
         <label style={{marginLeft: 10, display: showCondition.prjManager}}> 项目经理： </label>
-        <Select style={{width: '10%', display: showCondition.prjManager}} showSearch onChange={getprojectManager}>
+        <Select style={{minWidth: 90, width: '10%', display: showCondition.prjManager}} showSearch
+                onChange={getprojectManager}>
           {managers}
-          {/*  <Option value="开发hotfix上线申请">1</Option>
-          <Option value="产品hotfix修复申请">2</Option>
-          <Option value="UED-hotfix修复申请">UED-3</Option>
-          <Option value="emergency申请">4</Option>
-          <Option value="变更申请">5</Option> */}
         </Select>
+
+        <label style={{marginLeft: 10}}> 待审批人： </label>
+        <Select style={{minWidth: 90, width: '10%'}} showSearch onChange={getselectedPendingApproval}>
+          {applicant}
+        </Select>
+
 
         <label style={{marginLeft: 10}}> 状态： </label>
         <Select style={{width: '10%'}} onChange={getSelectedStatus}>
           {status}
-          {/* <Option value="开发hotfix上线申请">全部</Option>
-          <Option value="产品hotfix修复申请">审批中</Option>
-          <Option value="UED-hotfix修复申请">已驳回</Option>
-          <Option value="emergency申请">审批通过</Option> */}
-
         </Select>
 
-        <label style={{marginLeft: 10}}> 时间： </label>
-        <RangePicker onChange={getSelectedDateRange}/>
+        {/* <label style={{marginLeft: 10}}> 时间： </label> */}
+        {/* <RangePicker onChange={getSelectedDateRange}/> */}
+
+
+        <label style={{marginLeft: 10}}> 审批编号： </label>
+        <Input style={{width: '10%'}} onBlur={getSpNo}/>
 
       </div>
 

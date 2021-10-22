@@ -40,7 +40,7 @@ const applayTitle = (applicant: string, approveNo: string,) => {
 };
 
 // 审批流内容详情
-const approveCommonMethod = (title: string, content: any, isTestStage: boolean, currentStatus: any) => {
+const approveCommonMethod = (title: string, content: any, isTestStage: boolean, en_name: any) => {
 
   if (content === undefined) {
     return <div></div>;
@@ -70,7 +70,7 @@ const approveCommonMethod = (title: string, content: any, isTestStage: boolean, 
 
 
   // 只有一个人，则不显示会签或者或签 （测试待审批除外）
-  if (content.length === 1 && currentStatus !== 2) {
+  if (content.length === 1 && en_name !== "test_approval") {
 
     const status = getStatus(content[0].sp_status);
     if (status !== "审批中") {
@@ -175,10 +175,10 @@ const getFlowDIv = (datas: any) => {
   flowDataTitle.forEach((ele: any) => {
     // 如果当前阶段为测试审批 并且循环到测试审批这个阶段
     if (ele.en_name === "test_approval" && datas.sp_status !== 2) {
-      const divResult = approveCommonMethod(ele.cn_name, flowData[ele.en_name], true, datas.sp_status);
+      const divResult = approveCommonMethod(ele.cn_name, flowData[ele.en_name], true, ele.en_name);
       divArray.push(divResult);
     } else {
-      const divResult = approveCommonMethod(ele.cn_name, flowData[ele.en_name], false, datas.sp_status);
+      const divResult = approveCommonMethod(ele.cn_name, flowData[ele.en_name], false, ele.en_name);
       divArray.push(divResult);
     }
 

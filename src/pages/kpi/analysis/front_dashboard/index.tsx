@@ -89,7 +89,7 @@ const alayThroughputData = (source: any, startTime: string, endTime: string) => 
 const alayRequestDatas = (oldData: any, reqDatas: any, avgRequestDura: any, bugResponseDuraCount: any,
                           appendFinishCount: any, appendStoryCount: any, initFinishCount: any, initStotryCount: any) => {
 
-    // 连接 对外请求--请求数
+    // 连接 对外请求--对外请求未响应数
     const reqResult: any = [];
     oldData.forEach((o_dts: any) => {
       let flag = 0;
@@ -113,7 +113,7 @@ const alayRequestDatas = (oldData: any, reqDatas: any, avgRequestDura: any, bugR
     });
 
     // return reqResult;
-    // 连接 对外请求--请求平均停留时长
+    // 连接 对外请求--请求平均等待时长
     const waitDurResult: any = [];
     reqResult.forEach((o_dts: any) => {
       let flag = 0;
@@ -421,8 +421,8 @@ const FrontTableList: React.FC<any> = () => {
     '初始需求完成数',
     '追加需求数',
     '追加需求完成数',
-    '请求数',
-    '请求平均停留时长（H）',
+    '对外请求未响应数',
+    '请求平均等待时长（H）',
     '交付需求数',
     '完成任务数',
     '修复Bug数',
@@ -728,14 +728,14 @@ const FrontTableList: React.FC<any> = () => {
         headerName: '对外请求',
         children: [
           {
-            headerName: '请求数',
+            headerName: '对外请求未响应数',
             field: 'reCount',
-            minWidth: 85,
+            minWidth: 140,
             // aggFunc: 'sum',
             valueFormatter: cellFormat,
           },
           {
-            headerName: '请求平均停留时长（H）',
+            headerName: '请求平均等待时长（H）',
             field: 'waitDura',
             minWidth: 180,
             valueFormatter: timeCellFormat,
@@ -1027,10 +1027,10 @@ const FrontTableList: React.FC<any> = () => {
                     <Checkbox value="追加需求完成数">追加需求完成数</Checkbox>
                   </Col>
                   <Col span={4}>
-                    <Checkbox value="请求数">请求数</Checkbox>
+                    <Checkbox value="对外请求未响应数">对外请求未响应数</Checkbox>
                   </Col>
                   <Col span={4}>
-                    <Checkbox value="请求平均停留时长（H）">请求平均停留时长</Checkbox>
+                    <Checkbox value="请求平均等待时长（H）">请求平均等待时长</Checkbox>
                   </Col>
                   <Col span={4}>
                     <Checkbox value="交付需求数">交付需求数</Checkbox>

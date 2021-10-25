@@ -597,6 +597,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   // 获取审批编号
   const getSpNo = (params: any) => {
+    debugger;
     const values = params.currentTarget?.defaultValue;
 
     setCondition({
@@ -604,21 +605,23 @@ const JenkinsCheck: React.FC<any> = () => {
       spNo: values.toString()
     });
 
+    if (values) {
+      const queryCondition = {
+        approvalType: condition.approvalType, // emergency id
+        applicant: condition.applicant,
+        manager: condition.manager,
+        status: condition.status,
+        start: condition.start,
+        end: condition.end,
+        spPerson: condition.spPerson,
+        spNo: values.toString(),
+        page: condition.page,
+        pageSize: condition.pageSize
+      };
 
-    const queryCondition = {
-      approvalType: condition.approvalType, // emergency id
-      applicant: condition.applicant,
-      manager: condition.manager,
-      status: condition.status,
-      start: condition.start,
-      end: condition.end,
-      spPerson: condition.spPerson,
-      spNo: values.toString(),
-      page: condition.page,
-      pageSize: condition.pageSize
-    };
+      refreshGrid(queryCondition);
+    }
 
-    refreshGrid(queryCondition);
 
   };
   // 已选择的时间

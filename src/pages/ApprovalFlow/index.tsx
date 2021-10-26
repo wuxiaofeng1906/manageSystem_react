@@ -18,7 +18,6 @@ const {RangePicker} = DatePicker;
 
 // 查询数据
 const queryDevelopViews = async (condition: any) => {
-  debugger;
 
   let datas: any = [];
   const pageInfo = {
@@ -82,7 +81,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
   const [condition, setCondition] = useState({
     approvalTypeName: "emergency申请",
-    approvalType: "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu", // emergency id
+    approvalType: "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu", // emergency id  变更申请：Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt emergency：Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu
     applicant: "",
     manager: "",
     status: "",
@@ -571,7 +570,6 @@ const JenkinsCheck: React.FC<any> = () => {
 
   // 待审批人
   const getselectedPendingApproval = (values: any, params: any) => {
-    debugger;
 
     setCondition({
       ...condition,

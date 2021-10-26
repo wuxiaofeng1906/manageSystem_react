@@ -101,7 +101,41 @@ const approveStatus = (params: any) => {
 
 // 渲染成链接，直接点击进入
 const linkRender = (params: any) => {
-  return `<a href="${params.value}" target="_blank" style="text-decoration: underline">${params.value}</a>`;
+
+  if (!params.value) {
+    return "";
+  }
+
+  const value = params.value.toString();
+
+  // 判断是否包含中文，如果不包含，则就为url链接
+  if (escape(value).indexOf("%u") < 0) {
+    return `<a href="${params.value}" target="_blank" style="text-decoration: underline">${params.value}</a>`;
+  }
+
+  // 如果不包含 http 或者https
+  if (value.indexOf("http") === -1 && value.indexOf("http") === -1) {
+    return value;
+  }
+
+  const reg = /(https?|http|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g;
+  const urlArray = value.match(reg);
+  let urlStr = value;
+
+  urlArray.forEach((urls: any) => {
+    const baseUrl = ` <a href="${urls}" target="_blank"  style="text-decoration: underline">${urls}</a>`;
+
+    // 判断原字符串中有无这个地址的链接，如果没有，则进行全局匹配来替换，如果有了这个链接，则之前的全局匹配就已经替换完成，无需继续处理替换功能。比如单据：202107270009
+    if (urlStr.indexOf(baseUrl) === -1) {
+      // 将url字符串替换成超链接
+      // urlStr = urlStr.replace(urls, baseUrl);
+      // 全局匹配  ，就可以解决
+      urlStr = urlStr.replace(new RegExp(urls, 'g'), baseUrl)
+
+    }
+  });
+
+  return urlStr;
 };
 
 // 当前审批人
@@ -381,7 +415,7 @@ const getChangeApplyColumns = () => {
     {
       headerName: '变更涉及文档',
       field: 'change_doc',
-      minWidth: 110,
+      minWidth: 120,
       tooltipField: "change_doc",
       cellRenderer: linkRender
     },

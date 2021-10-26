@@ -597,15 +597,15 @@ const JenkinsCheck: React.FC<any> = () => {
 
   // 获取审批编号
   const getSpNo = (params: any) => {
-    debugger;
-    const values = params.currentTarget?.defaultValue;
+
+    const values = (params.currentTarget?.defaultValue).trim().toString();
 
     setCondition({
       ...condition,
-      spNo: values.toString()
+      spNo: values
     });
 
-    if (values) {
+    if (condition.spNo !== values) {
       const queryCondition = {
         approvalType: condition.approvalType, // emergency id
         applicant: condition.applicant,
@@ -614,7 +614,7 @@ const JenkinsCheck: React.FC<any> = () => {
         start: condition.start,
         end: condition.end,
         spPerson: condition.spPerson,
-        spNo: values.toString(),
+        spNo: values,
         page: condition.page,
         pageSize: condition.pageSize
       };

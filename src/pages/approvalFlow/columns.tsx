@@ -286,7 +286,13 @@ const getChangeApplyColumns = () => {
       field: 'project_name',
       minWidth: 110,
       pinned: 'left',
-      tooltipField: "project_name"
+      tooltipField: "project_name",
+      cellRenderer: (params: any) => {
+        const rowData = params.data;
+
+        return params.value;
+
+      }
     },
     {
       headerName: '项目经理',

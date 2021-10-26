@@ -709,9 +709,11 @@ const JenkinsCheck: React.FC<any> = () => {
     }
 
     const datas = params.data;
+    debugger;
     setIsModalVisible(true);
     formForModify.setFieldsValue({
       appNo: datas.sp_no,
+      prjName: datas.project_name,
       frontTime: (datas.change_hours)["前端"] === undefined ? 0 : (datas.change_hours)["前端"],
       backendTime: (datas.change_hours)["后端"] === undefined ? 0 : (datas.change_hours)["后端"],
       testTime: (datas.change_hours)["测试"] === undefined ? 0 : (datas.change_hours)["测试"]
@@ -721,9 +723,10 @@ const JenkinsCheck: React.FC<any> = () => {
   const carryModify = async () => {
     const formData = formForModify.getFieldsValue();
 
-    const frontData = formData.frontTime;
-    const backend = formData.backendTime;
-    const test = formData.testTime;
+    debugger;
+    const frontData = formData.frontTime === null ? "0" : formData.frontTime;
+    const backend = formData.backendTime === null ? "0" : formData.backendTime;
+    const test = formData.testTime === null ? "0" : formData.testTime;
     const sum = Number(frontData) + Number(backend) + Number(test);
     const datas = {
       "sp_no": formData.appNo,
@@ -936,7 +939,7 @@ const JenkinsCheck: React.FC<any> = () => {
         onCancel={modalCancel}
         centered={true}
         width={350}
-        bodyStyle={{height: 250}}
+        bodyStyle={{height: 215}}
         footer={
           [
             <Button
@@ -959,19 +962,23 @@ const JenkinsCheck: React.FC<any> = () => {
       >
         <Form form={formForModify}>
 
-          <Form.Item label="审批编号" name="appNo">
+          <Form.Item label="审批编号" name="appNo" style={{marginTop: -15}}>
             <Input disabled={true} style={{marginLeft: 25, width: 200, color: "black"}}/>
           </Form.Item>
 
-          <Form.Item label="前端影响[h]" name="frontTime">
+          <Form.Item label="项目名称" name="prjName" style={{marginTop: -15}}>
+            <Input style={{marginLeft: 25, width: 200, color: "black"}}/>
+          </Form.Item>
+
+          <Form.Item label="前端影响[h]" name="frontTime" style={{marginTop: -15}}>
             <InputNumber step={0.5} style={{marginLeft: 10, width: 200}}/>
           </Form.Item>
 
-          <Form.Item label="后端影响[h]" name="backendTime">
+          <Form.Item label="后端影响[h]" name="backendTime" style={{marginTop: -15}}>
             <InputNumber step={0.5} style={{marginLeft: 10, width: 200}}/>
           </Form.Item>
 
-          <Form.Item label="测试影响[h]" name="testTime">
+          <Form.Item label="测试影响[h]" name="testTime" style={{marginTop: -15}}>
             <InputNumber step={0.5} style={{marginLeft: 10, width: 200}}/>
           </Form.Item>
 

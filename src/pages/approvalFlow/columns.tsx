@@ -1371,6 +1371,7 @@ const getChangeApplyDatas = (oraDatas: any, start_id: number) => {
   oraDatas.forEach((ele: any, index: number) => {
 
     datas.push({
+      id:index,
       ID: start_id + index,
       sp_no: ele.sp_no,
       project_name: ele.project_name,

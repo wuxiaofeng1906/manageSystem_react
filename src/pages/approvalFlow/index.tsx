@@ -16,6 +16,8 @@ import {getFlowDIv} from "./flow";
 const {Option} = Select;
 const {RangePicker} = DatePicker;
 
+let indexNode = "-1";
+
 // 查询数据
 const queryDevelopViews = async (condition: any) => {
 
@@ -156,6 +158,7 @@ const JenkinsCheck: React.FC<any> = () => {
     });
   };
 
+
   // 表格查询按钮
   const refreshGrid = async (new_condition: any) => {
 
@@ -166,9 +169,25 @@ const JenkinsCheck: React.FC<any> = () => {
     const newData = await queryDevelopViews(new_condition);
     gridApi.current?.setRowData(newData.datas);
     showPageInfo(newData.pageInfo);
-
   };
 
+
+  const refreshCellData = async (value: any) => {
+
+
+    debugger;
+
+    const rowNode = gridApi.current?.getRowNode(indexNode);
+
+    rowNode?.setDataValue('change_hours', {
+      "前端": value.front,
+      "后端": value.server,
+      "测试": value.test,
+      "合计": value.sum
+    });
+
+
+  };
 
   // 每页显示多少条数据
   const showItemChange = async (pageCount: any) => {
@@ -271,8 +290,6 @@ const JenkinsCheck: React.FC<any> = () => {
   };
 
   // 跳转到第几页
-
-
   const goToPage = async (params: any) => {
 
     const pageCounts = Number(params.currentTarget.defaultValue);
@@ -709,7 +726,7 @@ const JenkinsCheck: React.FC<any> = () => {
     }
 
     const datas = params.data;
-    debugger;
+    indexNode = datas.id;
     setIsModalVisible(true);
     formForModify.setFieldsValue({
       appNo: datas.sp_no,
@@ -723,7 +740,6 @@ const JenkinsCheck: React.FC<any> = () => {
   const carryModify = async () => {
     const formData = formForModify.getFieldsValue();
 
-    debugger;
     const frontData = formData.frontTime === null ? "0" : formData.frontTime;
     const backend = formData.backendTime === null ? "0" : formData.backendTime;
     const test = formData.testTime === null ? "0" : formData.testTime;
@@ -748,8 +764,7 @@ const JenkinsCheck: React.FC<any> = () => {
             },
           });
 
-
-          refreshGrid(condition);
+          refreshCellData(datas);
           setIsModalVisible(false);
         } else {
           message.error({

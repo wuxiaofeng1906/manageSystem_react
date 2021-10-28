@@ -188,15 +188,68 @@ const ToolIntegrate: React.FC<any> = () => {
 
   };
 
+
+  function IsURL(str_url: string) {
+    const strRegex = '(http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\w\\-\\@?^=%&amp;/~\\+#])?';
+    const re = new RegExp(strRegex);
+
+    if (re.test(str_url)) {
+      return (true);
+    }
+    return (false);
+
+  }
+
   // 保存设置
   const saveAppInfo = () => {
 
     const formData = formForAppInfo.getFieldsValue();
+
+    // 应用名称不能为空
+    if (!formData.appName) {
+      message.error({
+        content: "应用名称不能为空！",
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+
+    // 验证url是否符合正常rul规则
+    const url = formData.appUrl;
+    const strRegex = '(http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\w\\-\\@?^=%&amp;/~\\+#])?';
+    const re = new RegExp(strRegex);
+    if (!re.test(url)) {
+      message.error({
+        content: "应用地址不符合规则！",
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+
+
+    if (!formData.appDesc) {
+      message.error({
+        content: "应用描述不能为空！",
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+
     const datas = {
       "app_name": formData.appName,
       "app_url": formData.appUrl,
       "app_description": formData.appDesc
     };
+
 
     axios.post('/api/verify/app_tools/app_list', datas)
       .then(function (res) {
@@ -312,16 +365,16 @@ const ToolIntegrate: React.FC<any> = () => {
       >
         <Form form={formForAppInfo} style={{marginTop: -8}} autoComplete={"off"}>
 
-          <Form.Item label="应用名称：" name="appName">
-            <Input style={{marginLeft: 5, width: 390}}/>
+          <Form.Item label="应用名称：" name="appName" required={true}>
+            <Input style={{marginLeft: 5, width: 380}}/>
           </Form.Item>
 
-          <Form.Item label="应用地址" name="appUrl">
-            <Input style={{marginLeft: 5, width: 390}}/>
+          <Form.Item label="应用地址" name="appUrl" required={true}>
+            <Input style={{marginLeft: 5, width: 380}}/>
           </Form.Item>
 
-          <Form.Item label="应用描述" name="appDesc">
-            <TextArea rows={3} style={{marginLeft: 5, width: 390}}/>
+          <Form.Item label="应用描述" name="appDesc" required={true}>
+            <TextArea rows={3} style={{marginLeft: 5, width: 380}}/>
           </Form.Item>
 
         </Form>

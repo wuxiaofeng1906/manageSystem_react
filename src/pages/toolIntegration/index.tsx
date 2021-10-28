@@ -8,14 +8,12 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {getHeight} from '@/publicMethods/pageSet';
 import "./style.css";
-import {history} from 'umi';
+
 import CustomCellRenderer from './customCellRenderer';
 
-
-import dayjs from "dayjs";
 import {Button} from "antd";
-import {judgeAuthority} from "@/publicMethods/authorityJudge";
-import {FolderAddTwoTone} from "@ant-design/icons";
+
+import {DeleteTwoTone, EditTwoTone, FolderAddTwoTone} from "@ant-design/icons";
 
 
 // 查询数据
@@ -42,6 +40,13 @@ const ToolIntegrate: React.FC<any> = () => {
     const component = new Array();
     component.push(
       {
+        headerName: '',
+        checkboxSelection: true,
+        headerCheckboxSelection: true,
+        maxWidth: 50,
+        pinned: 'left',
+      },
+      {
         headerName: '序号',
         maxWidth: 90,
         filter: false,
@@ -52,33 +57,17 @@ const ToolIntegrate: React.FC<any> = () => {
       {
         headerName: '应用名称',
         field: 'appName',
-        minWidth: 124,
+        minWidth: 130,
       },
       {
         headerName: '应用描述',
         field: 'appDesc',
-        minWidth: 124,
+        minWidth: 130,
       },
       {
-        headerName: '操作',
-        minWidth: 130,
-        cellClass: "custom-athlete-cell",
+        headerName: '排序',
+        minWidth: 80,
         cellRenderer: "myCustomCell",
-        // cellRenderer: (params: any) => {
-        //
-        //   const paramData = JSON.stringify(params.data);
-        //   return `
-        //     <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='showParams(${paramData})'>
-        //       <img src="../edit.png" width="20" height="20" alt="执行参数" title="执行参数" />
-        //     </Button>
-        //   <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='showParams(${paramData})'>
-        //       <img src="../delete.png" width="20" height="20" alt="执行参数" title="执行参数" />
-        //     </Button>
-        //     <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='showParams(${paramData})'>
-        //       <img src="../move.png" width="20" height="20" alt="执行参数" title="执行参数" />
-        //     </Button>`;
-        //
-        // }
       }
     );
 
@@ -112,25 +101,45 @@ const ToolIntegrate: React.FC<any> = () => {
   };
   /* endregion */
 
+  // region 新增、修改、删除、排序
   // 新增工具信息
   const addToolInfo = () => {
 
   };
 
 
-  const dragOver = (params: any) => {
-    debugger;
+  // 修改工具信息
+  const modifyToolInfo = () => {
+
+  };
+
+
+  // 删除工具信息
+  const deleteToolInfo = () => {
+
+  };
+
+  // 排序拖动
+  const dragOver = () => {
+
     gridApi.current?.forEachNode(function (node, index) {
-      debugger;
+
+      console.log(node, index);
+
 
     });
 
   }
+
+  // endregion
+
   return (
     <PageContainer>
       {/* 查询条件 */}
       <div style={{width: '100%', backgroundColor: "white", marginTop: -15}}>
         <Button type="text" icon={<FolderAddTwoTone/>} size={'large'} onClick={addToolInfo}>新增</Button>
+        <Button type="text" icon={<EditTwoTone/>} size={'large'} onClick={modifyToolInfo}>修改</Button>
+        <Button type="text" icon={<DeleteTwoTone/>} size={'large'} onClick={deleteToolInfo}>删除</Button>
       </div>
 
       {/* ag-grid 表格定义 */}

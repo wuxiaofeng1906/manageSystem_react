@@ -289,6 +289,9 @@ const getChangeApplyColumns = () => {
       tooltipField: "project_name",
       cellRenderer: (params: any) => {
         const rowData = params.data;
+        if (!rowData.project_name_meets) {
+          return `<span style="color: #cbcc00"> ${params.value}</span>`;
+        }
 
         return params.value;
 
@@ -1371,10 +1374,11 @@ const getChangeApplyDatas = (oraDatas: any, start_id: number) => {
   oraDatas.forEach((ele: any, index: number) => {
 
     datas.push({
-      id:index,
+      id: index,
       ID: start_id + index,
       sp_no: ele.sp_no,
       project_name: ele.project_name,
+      project_name_meets: ele.project_name_meets,
       leader: ele.leader,
       applicant: ele.applicant,
       change_source: ele.change_source,

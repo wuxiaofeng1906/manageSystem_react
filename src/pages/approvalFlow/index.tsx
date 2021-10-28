@@ -174,9 +174,6 @@ const JenkinsCheck: React.FC<any> = () => {
 
   const refreshCellData = async (value: any) => {
 
-
-    debugger;
-
     const rowNode = gridApi.current?.getRowNode(indexNode);
 
     rowNode?.setDataValue('change_hours', {
@@ -740,6 +737,7 @@ const JenkinsCheck: React.FC<any> = () => {
   const carryModify = async () => {
     const formData = formForModify.getFieldsValue();
 
+    debugger;
     const frontData = formData.frontTime === null ? "0" : formData.frontTime;
     const backend = formData.backendTime === null ? "0" : formData.backendTime;
     const test = formData.testTime === null ? "0" : formData.testTime;
@@ -752,7 +750,8 @@ const JenkinsCheck: React.FC<any> = () => {
       "sum": sum.toString()
     };
 
-    await axios.put('/api/verify/apply/apply_data', datas)
+    const url = `/api/verify/apply/apply_data?project_name=${formData.prjName}`;
+    await axios.put(url, datas)
       .then(function (res) {
 
         if (res.data.code === 200) {

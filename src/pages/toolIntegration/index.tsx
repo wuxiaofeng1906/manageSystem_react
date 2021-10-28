@@ -80,7 +80,7 @@ const ToolIntegrate: React.FC<any> = () => {
       {
         headerName: '',
         checkboxSelection: true,
-        headerCheckboxSelection: true,
+        // headerCheckboxSelection: true,  // 禁用全选按钮
         maxWidth: 50,
         pinned: 'left',
       },
@@ -401,10 +401,10 @@ const ToolIntegrate: React.FC<any> = () => {
           rowData={data?.data} // 数据绑定
           defaultColDef={{
             resizable: true,
-            sortable: true,
+            // sortable: true,
             filter: true,
             flex: 1,
-            minWidth: 100,
+            suppressMenu: true,
           }}
           rowDragManaged={true}
           animateRows={true}

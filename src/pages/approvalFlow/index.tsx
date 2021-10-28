@@ -737,7 +737,6 @@ const JenkinsCheck: React.FC<any> = () => {
   const carryModify = async () => {
     const formData = formForModify.getFieldsValue();
 
-    debugger;
     const frontData = formData.frontTime === null ? "0" : formData.frontTime;
     const backend = formData.backendTime === null ? "0" : formData.backendTime;
     const test = formData.testTime === null ? "0" : formData.testTime;

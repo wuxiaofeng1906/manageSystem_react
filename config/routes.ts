@@ -413,7 +413,7 @@ export default [
     icon: 'table',
     path: '/toolIntegration',
     access: 'sysAdmin',
-    hideInMenu: true,
+    // hideInMenu: true,
     component: './toolIntegration',
   },
   {

@@ -11,12 +11,13 @@ import "./style.css";
 
 import CustomCellRenderer from './customCellRenderer';
 
-import {Button, message} from "antd";
+import {Button, Form, Input, message, Modal} from "antd";
 
 import {DeleteTwoTone, EditTwoTone, FolderAddTwoTone} from "@ant-design/icons";
 import axios from "axios";
 import {history} from "@@/core/history";
 
+const {TextArea} = Input;
 
 // 查询数据
 const queryDevelopViews = async () => {
@@ -61,16 +62,6 @@ const queryDevelopViews = async () => {
 // 组件初始化
 const ToolIntegrate: React.FC<any> = () => {
 
-  const testData = [{
-    appName: "研发管理平台",
-    appDesc: "测试数据------测试数据"
-  }, {
-    appName: "禅道",
-    appDesc: "测试数据------测试数据"
-  }, {
-    appName: "gitlab",
-    appDesc: "测试数据------测试数据"
-  }];
 
   // 跳转到当前网站的链接
   (window as any).gotoCurrentPage = (params: any) => {
@@ -108,7 +99,6 @@ const ToolIntegrate: React.FC<any> = () => {
             if (goToHref.indexOf(myHref) > -1) {
               const newUrl = goToHref.replace(myHref, "").trim();
 
-              debugger;
               // > -1就代表是同一个地址。。就不另起网页调转了
               return `<a  style="text-decoration: underline" onclick='gotoCurrentPage(${JSON.stringify(newUrl)})'>${params.value}</a>`;
             }
@@ -158,19 +148,96 @@ const ToolIntegrate: React.FC<any> = () => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
+
+  const refreshGrid = async () => {
+    const datas = await queryDevelopViews();
+
+    gridApi.current?.setRowData(datas?.data);
+  }
   /* endregion */
 
   // region 新增、修改、删除、排序
-  // 新增工具信息
-  const addToolInfo = () => {
+  const [formForAppInfo] = Form.useForm();
+  const [title, setTitle] = useState("新增");
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
+  // region 新增和修改工具信息
+
+  const addToolInfo = () => {
+    setIsModalVisible(true);
+    formForAppInfo.setFieldsValue({
+      appName: null,
+      appUrl: null,
+      appDesc: null
+    });
+  };
+  // 取消
+  const modalCancel = () => {
+    setIsModalVisible(false);
   };
 
 
   // 修改工具信息
   const modifyToolInfo = () => {
+    setTitle("修改");
+    formForAppInfo.setFieldsValue({
+      appName: null,
+      appUrl: null,
+      appDesc: null
+    });
 
   };
+
+  // 保存设置
+  const saveAppInfo = () => {
+
+    const formData = formForAppInfo.getFieldsValue();
+    const datas = {
+      "app_name": formData.appName,
+      "app_url": formData.appUrl,
+      "app_description": formData.appDesc
+    };
+
+    axios.post('/api/verify/app_tools/app_list', datas)
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+          setIsModalVisible(false);
+          refreshGrid();
+          message.info({
+            content: `保存成功！`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+
+        } else {
+          message.error({
+            content: `保存失败：${res.data.msg}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+      }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+
+  };
+
+
+  // endregion
 
 
   // 删除工具信息
@@ -178,14 +245,14 @@ const ToolIntegrate: React.FC<any> = () => {
 
   };
 
+  // endregion
+
   // 排序拖动
   const dragOver = () => {
 
     gridApi.current?.forEachNode(function (node, index) {
 
       console.log(node, index);
-
-
     });
 
   }
@@ -225,6 +292,40 @@ const ToolIntegrate: React.FC<any> = () => {
         </AgGridReact>
       </div>
 
+
+      <Modal
+        title={title}
+        visible={isModalVisible}
+        onCancel={modalCancel}
+        centered={true}
+        width={520}
+        bodyStyle={{height: 220}}
+        footer={
+          [
+            <Button style={{borderRadius: 5, marginTop: -100}} onClick={modalCancel}>取消</Button>,
+            <Button type="primary"
+                    style={{marginLeft: 10, color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}
+                    onClick={saveAppInfo}>保存
+            </Button>
+          ]
+        }
+      >
+        <Form form={formForAppInfo} style={{marginTop: -8}} autoComplete={"off"}>
+
+          <Form.Item label="应用名称：" name="appName">
+            <Input style={{marginLeft: 5, width: 390}}/>
+          </Form.Item>
+
+          <Form.Item label="应用地址" name="appUrl">
+            <Input style={{marginLeft: 5, width: 390}}/>
+          </Form.Item>
+
+          <Form.Item label="应用描述" name="appDesc">
+            <TextArea rows={3} style={{marginLeft: 5, width: 390}}/>
+          </Form.Item>
+
+        </Form>
+      </Modal>
 
     </PageContainer>
   );

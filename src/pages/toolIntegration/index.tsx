@@ -19,6 +19,11 @@ import {history} from "@@/core/history";
 
 const {TextArea} = Input;
 
+const seletedDataNum = {
+  "id": 0,
+  "sort_num": 0
+}
+
 // 查询数据
 const queryDevelopViews = async () => {
 
@@ -176,28 +181,124 @@ const ToolIntegrate: React.FC<any> = () => {
     setIsModalVisible(false);
   };
 
+  // 执行新增操作
+  const carryAddOperate = (datas: any) => {
+    axios.post('/api/verify/app_tools/app_list', datas)
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+          setIsModalVisible(false);
+          refreshGrid();
+          message.info({
+            content: `保存成功！`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+
+        } else {
+          message.error({
+            content: `保存失败：${res.data.msg}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+      }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+  };
+
 
   // 修改工具信息
   const modifyToolInfo = () => {
+    const selectedData = gridApi.current?.getSelectedNodes();
+    if (selectedData && selectedData.length <= 0) {
+      message.error({
+        content: "请选中一条数据！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+
+    if (selectedData && selectedData.length > 1) {
+      message.error({
+        content: "一次只能修改一条数据！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+    let s_row = null;
+    if (selectedData) {
+      s_row = selectedData[0].data;
+    }
+
+    seletedDataNum.id = s_row.id;
+    seletedDataNum.sort_num = s_row.sort_num;
+
     setTitle("修改");
+    setIsModalVisible(true);
     formForAppInfo.setFieldsValue({
-      appName: null,
-      appUrl: null,
-      appDesc: null
+      appName: s_row.app_name,
+      appUrl: s_row.app_url,
+      appDesc: s_row.app_description
     });
 
   };
 
+  // 执行修改操作
+  const carryModifyOperate = (datas: any) => {
+    axios.put("/api/verify/app_tools/app_list", [datas])
+      .then(function (res) {
 
-  function IsURL(str_url: string) {
-    const strRegex = '(http|ftp|https):\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\w\\-\\@?^=%&amp;/~\\+#])?';
-    const re = new RegExp(strRegex);
+        if (res.data.code === 200) {
+          setIsModalVisible(false);
+          refreshGrid();
+          message.info({
+            content: `保存成功！`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
 
-    if (re.test(str_url)) {
-      return (true);
-    }
-    return (false);
+        } else {
+          message.error({
+            content: `保存失败：${res.data.msg}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
 
+
+      }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
   }
 
   // 保存设置
@@ -250,42 +351,13 @@ const ToolIntegrate: React.FC<any> = () => {
       "app_description": formData.appDesc
     };
 
-
-    axios.post('/api/verify/app_tools/app_list', datas)
-      .then(function (res) {
-
-        if (res.data.code === 200) {
-          setIsModalVisible(false);
-          refreshGrid();
-          message.info({
-            content: `保存成功！`,
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-
-        } else {
-          message.error({
-            content: `保存失败：${res.data.msg}`,
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-
-      }).catch(function (error) {
-
-      message.error({
-        content: `异常信息:${error.toString()}`,
-        duration: 1, // 1S 后自动关闭
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    });
-
+    if (title === "新增") {
+      carryAddOperate(datas);
+    } else {
+      datas["id"] = seletedDataNum.id;
+      datas["sort_num"] = seletedDataNum.sort_num;
+      carryModifyOperate(datas);
+    }
 
   };
 

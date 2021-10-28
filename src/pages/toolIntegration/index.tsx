@@ -11,14 +11,51 @@ import "./style.css";
 
 import CustomCellRenderer from './customCellRenderer';
 
-import {Button} from "antd";
+import {Button, message} from "antd";
 
 import {DeleteTwoTone, EditTwoTone, FolderAddTwoTone} from "@ant-design/icons";
+import axios from "axios";
+import {history} from "@@/core/history";
 
 
 // 查询数据
 const queryDevelopViews = async () => {
-  return [];
+
+  let result: any = [];
+  const paramData = {
+    page: 1,
+    page_size: 100
+  };
+
+
+  await axios.get('/api/verify/app_tools/app_list', {params: paramData})
+    .then(function (res) {
+
+      if (res.data.code === 200) {
+        result = res.data.data;
+      } else {
+        message.error({
+          content: `错误：${res.data.msg}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
+
+
+    }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+  return result;
 };
 
 // 组件初始化
@@ -34,6 +71,11 @@ const ToolIntegrate: React.FC<any> = () => {
     appName: "gitlab",
     appDesc: "测试数据------测试数据"
   }];
+
+  // 跳转到当前网站的链接
+  (window as any).gotoCurrentPage = (params: any) => {
+    history.push(params);
+  };
 
   // 定义列名
   const colums = () => {
@@ -56,12 +98,29 @@ const ToolIntegrate: React.FC<any> = () => {
       },
       {
         headerName: '应用名称',
-        field: 'appName',
+        field: 'app_name',
         minWidth: 130,
+        cellRenderer: (params: any) => {
+          if (params.value) {
+            const myHref = window.location.origin;
+            const goToHref = params.data.app_url;
+
+            if (goToHref.indexOf(myHref) > -1) {
+              const newUrl = goToHref.replace(myHref, "").trim();
+
+              debugger;
+              // > -1就代表是同一个地址。。就不另起网页调转了
+              return `<a  style="text-decoration: underline" onclick='gotoCurrentPage(${JSON.stringify(newUrl)})'>${params.value}</a>`;
+            }
+
+            return `<a href="${goToHref}" target="_blank" style="text-decoration: underline" >${params.value}</a>`
+          }
+          return params.value;
+        },
       },
       {
         headerName: '应用描述',
-        field: 'appDesc',
+        field: 'app_description',
         minWidth: 130,
       },
       {
@@ -147,7 +206,7 @@ const ToolIntegrate: React.FC<any> = () => {
       <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
         <AgGridReact
           columnDefs={colums()} // 定义列
-          rowData={testData} // 数据绑定
+          rowData={data?.data} // 数据绑定
           defaultColDef={{
             resizable: true,
             sortable: true,

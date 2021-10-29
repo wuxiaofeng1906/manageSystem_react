@@ -219,13 +219,12 @@ const ToolIntegrate: React.FC<any> = () => {
     });
   };
 
-
   // 修改工具信息
   const modifyToolInfo = () => {
     const selectedData = gridApi.current?.getSelectedNodes();
     if (selectedData && selectedData.length <= 0) {
       message.error({
-        content: "请选中一条数据！",
+        content: "请选中需要修改的数据！",
         duration: 1,
         style: {
           marginTop: '50vh',
@@ -361,18 +360,95 @@ const ToolIntegrate: React.FC<any> = () => {
 
   };
 
-
   // endregion
 
+  // region 删除工具信息
 
-  // 删除工具信息
+  const [isdelModalVisible, setDelModalVisible] = useState(false);
+  // 点击删除按钮
   const deleteToolInfo = () => {
 
-  };
+    const selectedData = gridApi.current?.getSelectedNodes();
+    if (selectedData && selectedData.length <= 0) {
+      message.error({
+        content: "请选中需要删除的数据！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
 
+    setDelModalVisible(true);
+  };
+  // 取消删除
+  const delCancel = () => {
+    setDelModalVisible(false);
+  };
+  // 确认删除操作
+  const delAppInfo = () => {
+    const selectedData = gridApi.current?.getSelectedNodes();
+    let s_row = null;
+    if (selectedData) {
+      s_row = selectedData[0].data;
+    }
+
+    axios.delete('/api/verify/app_tools/app_list', {params: {_id: Number(s_row.id)}})
+      .then(function (res) {
+        if (res.data.code === 200) {
+          setDelModalVisible(false);
+          refreshGrid();
+          message.info({
+            content: "记录删除成功！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else if (Number(res.data.code) === 403) {
+          message.error({
+            content: "您无权删除信息！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+          message.error({
+            content: `${res.data.message}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+      })
+      .catch(function (error) {
+        if (error.toString().includes("403")) {
+          message.error({
+            content: "您无权删除信息！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+          message.error({
+            content: error.toString(),
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+      });
+
+  };
   // endregion
 
-  // 排序拖动
+  // region 排序拖动
   const dragOver = () => {
 
     gridApi.current?.forEachNode(function (node, index) {
@@ -381,6 +457,7 @@ const ToolIntegrate: React.FC<any> = () => {
     });
 
   }
+  // endregion
 
   // endregion
 
@@ -417,7 +494,6 @@ const ToolIntegrate: React.FC<any> = () => {
         </AgGridReact>
       </div>
 
-
       <Modal
         title={title}
         visible={isModalVisible}
@@ -449,6 +525,35 @@ const ToolIntegrate: React.FC<any> = () => {
             <TextArea rows={3} style={{marginLeft: 5, width: 380}}/>
           </Form.Item>
 
+        </Form>
+      </Modal>
+
+      {/* 删除 */}
+      <Modal
+        title={'删除'}
+        visible={isdelModalVisible}
+        onCancel={delCancel}
+        centered={true}
+        footer={null}
+        width={400}
+      >
+        <Form>
+          <Form.Item>
+            <label style={{marginLeft: '90px'}}>您确定删除选中的应用信息吗？</label>
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" style={{marginLeft: '100px'}} onClick={delAppInfo}>
+              确定
+            </Button>
+            <Button type="primary" style={{marginLeft: '20px'}} onClick={delCancel}>
+              取消
+            </Button>
+          </Form.Item>
+
+          <Form.Item name="groupId" style={{display: "none", width: "32px", marginTop: "-55px", marginLeft: "270px"}}>
+            <Input/>
+          </Form.Item>
         </Form>
       </Modal>
 

@@ -16,7 +16,7 @@ import {getFlowDIv} from "./flow";
 const {Option} = Select;
 const {RangePicker} = DatePicker;
 
-let indexNode = "-1";
+let clickedRow: any;
 
 // 查询数据
 const queryDevelopViews = async (condition: any) => {
@@ -80,6 +80,8 @@ const queryDevelopViews = async (condition: any) => {
 
 // 组件初始化
 const JenkinsCheck: React.FC<any> = () => {
+  const sys_accessToken = localStorage.getItem("accessId");
+  axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
 
   const [condition, setCondition] = useState({
     approvalTypeName: "emergency申请",
@@ -172,16 +174,19 @@ const JenkinsCheck: React.FC<any> = () => {
   };
 
 
-  const refreshCellData = async (value: any) => {
+  const refreshCellData = async (projectInfo: any, value: any) => {
 
-    const rowNode = gridApi.current?.getRowNode(indexNode);
-
-    rowNode?.setDataValue('change_hours', {
+    clickedRow.project_name = projectInfo.prjName;
+    clickedRow.project_name_meets = projectInfo.flag;
+    clickedRow.change_hours = {
       "前端": value.front,
       "后端": value.server,
       "测试": value.test,
       "合计": value.sum
-    });
+    };
+
+    const rowNode = gridApi.current?.getRowNode(clickedRow.id);
+    rowNode?.setData(clickedRow);
 
 
   };
@@ -723,7 +728,7 @@ const JenkinsCheck: React.FC<any> = () => {
     }
 
     const datas = params.data;
-    indexNode = datas.id;
+    clickedRow = datas;
     setIsModalVisible(true);
     formForModify.setFieldsValue({
       appNo: datas.sp_no,
@@ -737,23 +742,28 @@ const JenkinsCheck: React.FC<any> = () => {
   const carryModify = async () => {
     const formData = formForModify.getFieldsValue();
 
+    const project = formData.prjName;
     const frontData = formData.frontTime === null ? "0" : formData.frontTime;
     const backend = formData.backendTime === null ? "0" : formData.backendTime;
     const test = formData.testTime === null ? "0" : formData.testTime;
     const sum = Number(frontData) + Number(backend) + Number(test);
     const datas = {
       "sp_no": formData.appNo,
+      "project_name": project,
       "front": frontData.toString(),
       "server": backend.toString(),
       "test": test.toString(),
       "sum": sum.toString()
     };
 
-    const url = `/api/verify/apply/apply_data?project_name=${formData.prjName}`;
-    await axios.put(url, datas)
+
+    debugger;
+    // await axios.put("/api/verify/apply/apply_data", datas)
+    await axios.put("/api/wechat/flow", datas)
       .then(function (res) {
 
         if (res.data.code === 200) {
+
           message.info({
             content: `变更工时影响时间修改成功！`,
             duration: 1, // 1S 后自动关闭
@@ -762,12 +772,17 @@ const JenkinsCheck: React.FC<any> = () => {
             },
           });
 
-          refreshCellData(datas);
+          const projectInfo = {
+            prjName: project,
+            flag: res.data.data.project_name_meets
+          };
+
+          refreshCellData(projectInfo, datas);
           setIsModalVisible(false);
         } else {
           message.error({
             content: `错误：${res.data.msg}`,
-            duration: 1, // 1S 后自动关闭
+            duration: 1,
             style: {
               marginTop: '50vh',
             },
@@ -779,7 +794,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
         message.error({
           content: `异常信息:${error.toString()}`,
-          duration: 1, // 1S 后自动关闭
+          duration: 1,
           style: {
             marginTop: '50vh',
           },
@@ -817,6 +832,7 @@ const JenkinsCheck: React.FC<any> = () => {
   };
 
   // endregion
+
   useEffect(() => {
     getApprovalType();
     getApplicant();

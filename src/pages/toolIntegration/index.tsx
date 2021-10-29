@@ -263,7 +263,7 @@ const ToolIntegrate: React.FC<any> = () => {
 
   // 执行修改操作
   const carryModifyOperate = (datas: any) => {
-    axios.put("/api/verify/app_tools/app_list", [datas])
+    axios.put("/api/verify/app_tools/app_list", datas)
       .then(function (res) {
 
         if (res.data.code === 200) {
@@ -355,7 +355,7 @@ const ToolIntegrate: React.FC<any> = () => {
     } else {
       datas["id"] = seletedDataNum.id;
       datas["sort_num"] = seletedDataNum.sort_num;
-      carryModifyOperate(datas);
+      carryModifyOperate([datas]);
     }
 
   };
@@ -451,10 +451,21 @@ const ToolIntegrate: React.FC<any> = () => {
   // region 排序拖动
   const dragOver = () => {
 
+    const orderArray: any = [];
     gridApi.current?.forEachNode(function (node, index) {
+      const currentDt = node.data;
 
-      console.log(node, index);
+      orderArray.push({
+        "app_name": currentDt.app_name,
+        "app_url": currentDt.app_url,
+        "app_description": currentDt.app_description,
+        "id": currentDt.id,
+        "sort_num": index + 1
+      })
+
     });
+
+    carryModifyOperate(orderArray);
 
   }
   // endregion

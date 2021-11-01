@@ -1037,7 +1037,9 @@ const getEmergencyApplyColumns = () => {
         if (params.data.emergency_type === "bug") {
           return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/bug-view-${params.value}.html'>${params.value}</a>`;
         }
-
+        if (params.data.emergency_type === "task") {
+          return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/task-view-${params.value}.html'>${params.value}</a>`;
+        }
         return params.value;
 
       },

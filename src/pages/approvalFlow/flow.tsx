@@ -42,7 +42,7 @@ const applayTitle = (applicant: string, approveNo: string,) => {
 // 审批流内容详情
 const approveCommonMethod = (title: string, content: any, isTestStage: boolean, en_name: any) => {
 
-  if (content === undefined) {
+  if (content === undefined || content.length === 0) {
     return <div></div>;
   }
 
@@ -50,7 +50,6 @@ const approveCommonMethod = (title: string, content: any, isTestStage: boolean, 
   let titleDiv = <div style={{marginTop: 8}}>{title}</div>;
 
   if (isTestStage === true) { // 单独处理当前审批没能通过，并且字段有测试的问题
-
 
 
     titleDiv = <div style={{marginTop: 8}}>
@@ -105,7 +104,6 @@ const approveCommonMethod = (title: string, content: any, isTestStage: boolean, 
       {contentDiv}
     </div>
   }
-
 
   // 多人的话（测试为审批通过），状态都是一样的。。所以判断第一个即可 1：或签  2：会签
   if (content[0].approverattr === 1) {

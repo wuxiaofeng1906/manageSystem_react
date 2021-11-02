@@ -5,6 +5,8 @@
  * For details, please see
  * https://pro.ant.design/docs/deploy
  */
+
+// 测试服务器地址
 export default {
   dev: {
 
@@ -19,6 +21,8 @@ export default {
       pathRewrite: {'^': ''},
     },
   },
+
+  // 本地测试地址
   test: {
     '/api/verify/': {
       target: 'http://192.168.1.146:5000/',
@@ -32,6 +36,8 @@ export default {
     },
 
   },
+
+  // 正式环境地址
   pre: {
     '/api/verify/': {
       target: 'http://10.0.144.51:5000/',

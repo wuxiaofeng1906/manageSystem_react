@@ -396,16 +396,9 @@ export default [
     name: '企业微信审批流',
     icon: 'table',
     path: '/approvalFlow',
-    access: 'sysAdmin',
+    // access: 'sysAdmin',
     // hideInMenu: true,
     component: './approvalFlow',
-    // routes: [
-    //   {
-    //     name: '开发hotfix上线申请',
-    //     path: 'devHotfixOnline',
-    //     component: './approvalFlow/devHotfixOnline',
-    //   }
-    // ],
   },
   {
     name: '工具集成',

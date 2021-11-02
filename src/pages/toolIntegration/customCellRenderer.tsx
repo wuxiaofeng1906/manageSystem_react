@@ -9,7 +9,10 @@ const CustomCellRenderer = (props: any) => {
   useEffect(() => {
     debugger;
     console.log("props",props);
-    props.registerRowDragger(myRef.current, 0);
+    if(props.registerRowDragger){
+      props.registerRowDragger(myRef.current, 0);
+    }
+
   },[myRef]);
 
   return (

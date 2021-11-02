@@ -16,6 +16,7 @@ import {Button, Form, Input, message, Modal} from "antd";
 import {DeleteTwoTone, EditTwoTone, FolderAddTwoTone} from "@ant-design/icons";
 import axios from "axios";
 import {history} from "@@/core/history";
+import {judgeAuthority} from "@/publicMethods/authorityJudge";
 
 const {TextArea} = Input;
 
@@ -66,7 +67,8 @@ const queryDevelopViews = async () => {
 
 // 组件初始化
 const ToolIntegrate: React.FC<any> = () => {
-
+  const sys_accessToken = localStorage.getItem("accessId");
+  axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
 
   // 跳转到当前网站的链接
   (window as any).gotoCurrentPage = (params: any) => {
@@ -75,15 +77,13 @@ const ToolIntegrate: React.FC<any> = () => {
 
   // 定义列名
   const colums = () => {
-    const component = new Array();
-    component.push(
-      {
-        headerName: '',
-        checkboxSelection: true,
-        // headerCheckboxSelection: true,  // 禁用全选按钮
-        maxWidth: 50,
-        pinned: 'left',
-      },
+    const component: any = [{
+      headerName: '',
+      checkboxSelection: true,
+      // headerCheckboxSelection: true,  // 禁用全选按钮
+      maxWidth: 50,
+      pinned: 'left',
+    },
       {
         headerName: '序号',
         maxWidth: 90,
@@ -117,13 +117,18 @@ const ToolIntegrate: React.FC<any> = () => {
         headerName: '应用描述',
         field: 'app_description',
         minWidth: 130,
-      },
-      {
-        headerName: '排序',
-        minWidth: 80,
-        cellRenderer: "myCustomCell",
-      }
-    );
+      }];
+
+    // 需要判断有无移动权限，有的话就添加到数组里面去，没有的话则不添加
+    if (true) {
+      component.push(
+        {
+          headerName: '排序',
+          minWidth: 80,
+          cellRenderer: "myCustomCell"
+        }
+      );
+    }
 
     return component;
   };
@@ -476,9 +481,12 @@ const ToolIntegrate: React.FC<any> = () => {
     <PageContainer>
       {/* 查询条件 */}
       <div style={{width: '100%', backgroundColor: "white", marginTop: -15}}>
-        <Button type="text" icon={<FolderAddTwoTone/>} size={'large'} onClick={addToolInfo}>新增</Button>
-        <Button type="text" icon={<EditTwoTone/>} size={'large'} onClick={modifyToolInfo}>修改</Button>
-        <Button type="text" icon={<DeleteTwoTone/>} size={'large'} onClick={deleteToolInfo}>删除</Button>
+        <Button type="text" icon={<FolderAddTwoTone/>} size={'large'} onClick={addToolInfo}
+                style={{display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}>新增</Button>
+        <Button type="text" icon={<EditTwoTone/>} size={'large'} onClick={modifyToolInfo}
+                style={{display: "inline"}}>修改</Button>
+        <Button type="text" icon={<DeleteTwoTone/>} size={'large'} onClick={deleteToolInfo}
+                style={{display: "inline"}}>删除</Button>
       </div>
 
       {/* ag-grid 表格定义 */}

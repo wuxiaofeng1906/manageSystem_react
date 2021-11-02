@@ -7,6 +7,8 @@ const CustomCellRenderer = (props: any) => {
   const myRef = useRef(null);
 
   useEffect(() => {
+    debugger;
+    console.log("props",props);
     props.registerRowDragger(myRef.current, 0);
   });
 

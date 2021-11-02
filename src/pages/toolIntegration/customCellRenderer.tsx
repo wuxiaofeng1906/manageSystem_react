@@ -10,7 +10,7 @@ const CustomCellRenderer = (props: any) => {
     debugger;
     console.log("props",props);
     props.registerRowDragger(myRef.current, 0);
-  });
+  },[myRef]);
 
   return (
     <div>

@@ -16,6 +16,7 @@ import {
 } from '@/publicMethods/timeMethods';
 import {Button, Drawer} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
+import {getHeight} from '@/publicMethods/pageSet';
 
 
 // 获取近四周的时间范围
@@ -284,6 +285,13 @@ const AdviserFeedTableList: React.FC<any> = () => {
     params.api.sizeColumnsToFit();
   };
 
+  // 表格的屏幕大小自适应
+  const [gridHeight, setGridHeight] = useState(getHeight() / 2);
+  window.onresize = function () {
+    // console.log("新高度：", getHeight());
+    setGridHeight(getHeight() / 2);
+    gridApi.current?.sizeColumnsToFit();
+  };
 
   /* endregion */
 
@@ -362,7 +370,7 @@ const AdviserFeedTableList: React.FC<any> = () => {
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>
 
-      <div className="ag-theme-alpine" style={{height: 350, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
         <AgGridReact
           columnDefs={columsForQuarters()} // 定义列
           rowData={data} // 数据绑定
@@ -382,10 +390,11 @@ const AdviserFeedTableList: React.FC<any> = () => {
           rowHeight={32}
           headerHeight={35}
           onGridReady={onGridReady}
+          onGridSizeChanged={onGridReady}
         >
         </AgGridReact>
       </div>
-      <div className="ag-theme-alpine" style={{height: 350, width: '100%', marginTop: '20px'}}>
+      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%', marginTop: '20px'}}>
         <AgGridReact
           columnDefs={columsForQuarters()} // 定义列
           rowData={bugData.data} // 数据绑定
@@ -405,6 +414,7 @@ const AdviserFeedTableList: React.FC<any> = () => {
           rowHeight={32}
           headerHeight={35}
           onGridReady={onBugGridReady}
+          onGridSizeChanged={onBugGridReady}
         >
         </AgGridReact>
       </div>

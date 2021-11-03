@@ -404,7 +404,7 @@ export default [
     name: '工具集成',
     icon: 'table',
     path: '/toolIntegration',
-    access: 'sysAdmin',
+    // access: 'sysAdmin',
     // hideInMenu: true,
     component: './toolIntegration',
   },

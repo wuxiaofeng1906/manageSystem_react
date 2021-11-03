@@ -16,7 +16,7 @@ import {Button, Form, Input, message, Modal} from "antd";
 import {DeleteTwoTone, EditTwoTone, FolderAddTwoTone} from "@ant-design/icons";
 import axios from "axios";
 import {history} from "@@/core/history";
-import {judgeAuthority} from "@/publicMethods/authorityJudge";
+import {judgeAuthorityByName} from "@/publicMethods/authorityJudge";
 
 const {TextArea} = Input;
 
@@ -120,7 +120,7 @@ const ToolIntegrate: React.FC<any> = () => {
       }];
 
     // 需要判断有无移动权限，有的话就添加到数组里面去，没有的话则不添加
-    if (true) {
+    if (judgeAuthorityByName("modifyQuickLink")) {
       component.push(
         {
           headerName: '排序',
@@ -188,7 +188,8 @@ const ToolIntegrate: React.FC<any> = () => {
 
   // 执行新增操作
   const carryAddOperate = (datas: any) => {
-    axios.post('/api/verify/app_tools/app_list', datas)
+    // axios.post('/api/verify/app_tools/app_list', datas)
+    axios.post('/api/quicklink', datas)
       .then(function (res) {
 
         if (res.data.code === 200) {
@@ -268,7 +269,8 @@ const ToolIntegrate: React.FC<any> = () => {
 
   // 执行修改操作
   const carryModifyOperate = (datas: any) => {
-    axios.put("/api/verify/app_tools/app_list", datas)
+    // axios.put("/api/verify/app_tools/app_list", datas)
+    axios.put("/api/quicklink", datas)
       .then(function (res) {
 
         if (res.data.code === 200) {
@@ -399,7 +401,7 @@ const ToolIntegrate: React.FC<any> = () => {
       s_row = selectedData[0].data;
     }
 
-    axios.delete('/api/verify/app_tools/app_list', {params: {_id: Number(s_row.id)}})
+    axios.delete('/api/quicklink', {params: {_id: Number(s_row.id)}})
       .then(function (res) {
         if (res.data.code === 200) {
           setDelModalVisible(false);
@@ -482,11 +484,11 @@ const ToolIntegrate: React.FC<any> = () => {
       {/* 查询条件 */}
       <div style={{width: '100%', backgroundColor: "white", marginTop: -15}}>
         <Button type="text" icon={<FolderAddTwoTone/>} size={'large'} onClick={addToolInfo}
-                style={{display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}>新增</Button>
+                style={{display: judgeAuthorityByName("addQuickLink") === true ? "inline" : "none"}}>新增</Button>
         <Button type="text" icon={<EditTwoTone/>} size={'large'} onClick={modifyToolInfo}
-                style={{display: "inline"}}>修改</Button>
+                style={{display: judgeAuthorityByName("modifyQuickLink") === true ? "inline" : "none"}}>修改</Button>
         <Button type="text" icon={<DeleteTwoTone/>} size={'large'} onClick={deleteToolInfo}
-                style={{display: "inline"}}>删除</Button>
+                style={{display: judgeAuthorityByName("deleteQuickLink") === true ? "inline" : "none"}}>删除</Button>
       </div>
 
       {/* ag-grid 表格定义 */}

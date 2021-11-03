@@ -71,9 +71,12 @@ const alayAllAuthority = (params: any) => {
     // 先找寻parent（parent就是模块）
     const moduleArray = Array();
     params.forEach((ele: any) => {
-      if (moduleArray.indexOf(ele.parent.id) === -1) {
-        moduleArray.push(ele.parent.id);
+      if (ele.parent) {
+        if (moduleArray.indexOf(ele.parent.id) === -1) {
+          moduleArray.push(ele.parent.id);
+        }
       }
+
     });
 
     for (let index = 0; index < moduleArray.length; index += 1) {
@@ -81,7 +84,8 @@ const alayAllAuthority = (params: any) => {
       const myModule: any = Array();
       const myMethod: any = [];
       params.forEach((me: any) => {
-        if (moduleArray[index] === me.parent.id) {
+
+        if (moduleArray[index] === me.parent?.id) {
           if (myModule.indexOf(me.parent.description) === -1) {
             myModule.push(me.parent.description);
             allModule.push(me.parent.description);
@@ -199,6 +203,7 @@ const AuthorityDetails: React.FC<any> = () => {
   const gqlClient = useGqlClient();
   // 查询所有权限
   const {data} = useRequest(() => queryAllAuthorityViews(gqlClient));
+
   // 将数据解析成表格可用的格式
   const alaieddata = alayAllAuthority(data);
   const oraData = data === undefined ? [] : alaieddata.datas; // 拿去表格需要的数据

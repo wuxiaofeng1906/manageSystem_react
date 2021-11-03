@@ -1023,6 +1023,7 @@ const JenkinsCheck: React.FC<any> = () => {
         onCancel={detailModalCancle}
         centered={true}
         width={480}
+        bodyStyle={{maxHeight: 550, overflowY: "scroll"}}
         footer={null}
 
       >

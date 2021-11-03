@@ -138,6 +138,42 @@ const linkRender = (params: any) => {
   return urlStr;
 };
 
+// 备注的渲染
+const remakRender = (params: any) => {
+
+  const remarks = params.value;
+  if (remarks.length === 0) {
+    return "";
+  }
+
+  let returnDiv = "";
+  remarks.forEach((ele: any) => {
+    const currentDiv = `<div>
+    <div>===${ele.comment_user_name}    ${ele.comment_time}===</div>
+      <div>${ele.comment_content}</div>
+    </div>`;
+
+    returnDiv = returnDiv === "" ? currentDiv : `${returnDiv}${currentDiv}`
+  });
+
+  return returnDiv;
+};
+
+const toolTipRender = (params: any) => {
+  const remarks = params.value;
+  if (remarks.length === 0) {
+    return "";
+  }
+
+  let returnDiv = "";
+  remarks.forEach((ele: any) => {
+    const currentDiv = `${ele.comment_user_name}${ele.comment_time}:${ele.comment_content}`;
+
+    returnDiv = returnDiv === "" ? currentDiv : `${returnDiv};\n  ${currentDiv}`
+  });
+
+  return returnDiv;
+};
 // 当前审批人
 const alaCurrentapproval = (params: any) => {
 
@@ -479,12 +515,13 @@ const getChangeApplyColumns = () => {
         return `<div> ${returnDiv} </div>`;
       }
     },
+    // {
+    //   headerName: '备注',
+    //   field: 'comment_content',
+    //   minWidth: 110,
+    //   tooltipField: "comment_content",
+    // },
     {
-      headerName: '备注',
-      field: 'comment_content',
-      minWidth: 110,
-      tooltipField: "comment_content",
-    }, {
       headerName: '提交时间',
       field: 'apply_time',
       minWidth: 110,
@@ -672,12 +709,12 @@ const getDevHotfixOnlineColumns = () => {
       minWidth: 110,
       tooltipField: "hotfix清单"
     },
-    {
-      headerName: '备注',
-      field: 'comment_content',
-      minWidth: 150,
-      tooltipField: "comment_content"
-    },
+    // {
+    //   headerName: '备注',
+    //   field: 'comment_content',
+    //   minWidth: 150,
+    //   tooltipField: "comment_content"
+    // },
     {
       headerName: '提交时间',
       field: 'apply_time',
@@ -823,12 +860,12 @@ const getProductHotfixRepaireApplyColumns = () => {
       minWidth: 120,
       tooltipField: "test_advice",
     },
-    {
-      headerName: '备注',
-      field: 'comment_content',
-      minWidth: 120,
-      tooltipField: "comment_content",
-    },
+    // {
+    //   headerName: '备注',
+    //   field: 'comment_content',
+    //   minWidth: 120,
+    //   tooltipField: "comment_content",
+    // },
     {
       headerName: '提交时间',
       field: 'apply_time',
@@ -959,12 +996,13 @@ const getUEDHotfixApplyColumns = () => {
       minWidth: 150,
       tooltipField: "test_advice",
     },
-    {
-      headerName: '备注',
-      field: 'comment_content',
-      minWidth: 110,
-      tooltipField: "comment_content",
-    },
+    // {
+    //   headerName: '备注',
+    //   field: 'comment_content',
+    //   minWidth: 110,
+    //   // tooltipValueGetter: toolTipRender,
+    //   cellRenderer: remakRender
+    // },
     {
       headerName: '提交时间',
       field: 'apply_time',
@@ -1149,12 +1187,12 @@ const getEmergencyApplyColumns = () => {
       minWidth: 110,
       tooltipField: 'release_env'
     },
-    {
-      headerName: '备注',
-      field: 'comment_content',
-      minWidth: 90,
-      tooltipField: 'comment_content'
-    },
+    // {
+    //   headerName: '备注',
+    //   field: 'comment_content',
+    //   minWidth: 90,
+    //   tooltipField: 'comment_content'
+    // },
     {
       headerName: '提交时间',
       field: 'apply_time',

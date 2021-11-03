@@ -1,3 +1,4 @@
+import {Divider } from 'antd';
 /* region 基础控件 */
 
 const getStatus = (status_id: any) => {
@@ -170,10 +171,33 @@ const approveCommonMethod = (title: string, content: any, isTestStage: boolean, 
 
 };
 
+const getRemarkDiv = (params: any) => {
+  if (params.length === 0) {
+    return "";
+  }
+  const returnDiv: any = [];
+  params.forEach((ele: any) => {
+    const currentDiv = <div style={{marginTop:10,marginLeft:15}}>
+      <div style={{fontWeight: "bold"}}>{ele.comment_user_name} {ele.comment_time}</div>
+      <div style={{textIndent: "2em"}}>{ele.comment_content}</div>
+    </div>;
+
+    returnDiv.push(currentDiv)
+  });
+
+  return <div style={{marginTop: 20, width: 450, marginLeft: -15, border: "solid 1px Gainsboro"}}>
+    {/*<div style={{fontSize: 15, marginLeft: 10,marginTop:-12,backgroundColor:"red"}}> 备注</div>*/}
+    <Divider>备注</Divider>
+    {returnDiv}
+  </div>;
+
+}
+
 /* endregion   */
 
 // 获取不同类型的div
 const getFlowDIv = (datas: any) => {
+
   // 获取审批流的共用属性
   const applyTitles = applayTitle(datas.applicant, datas.sp_no);
 
@@ -194,12 +218,12 @@ const getFlowDIv = (datas: any) => {
 
   });
 
-
+  const remarkDiv = getRemarkDiv(datas.comment_content);
   // div 里面是可以用数组的。。。
   return <div>
     {applyTitles}
     {divArray}
-
+    {remarkDiv}
   </div>;
 };
 

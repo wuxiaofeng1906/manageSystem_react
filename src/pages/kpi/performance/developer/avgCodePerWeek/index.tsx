@@ -19,7 +19,13 @@ import {colorRender, moduleChange} from '@/publicMethods/cellRenderer';
 import {customRound, getHeight} from '@/publicMethods/pageSet';
 
 import {Button, Drawer} from "antd";
-import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone,AppstoreTwoTone} from "@ant-design/icons";
+import {
+  ScheduleTwoTone,
+  CalendarTwoTone,
+  ProfileTwoTone,
+  QuestionCircleTwoTone,
+  AppstoreTwoTone
+} from "@ant-design/icons";
 
 
 // 获取近四周的时间范围
@@ -455,8 +461,10 @@ const WeekCodeTableList: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
-        <Button type="text" style={{color: 'black'}} icon={<AppstoreTwoTone />} size={'large'}
-                onClick={statisticsByYear}>按年统计</Button>
+
+        {/* <Button type="text" style={{color: 'black'}} icon={<AppstoreTwoTone />} size={'large'}
+              onClick={statisticsByYear}>按年统计</Button> */}
+
         <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>

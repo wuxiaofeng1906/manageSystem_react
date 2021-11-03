@@ -74,10 +74,16 @@ const approveCommonMethod = (title: string, content: any, isTestStage: boolean, 
   if (content.length === 1 && en_name !== "test_approval") {
 
     const status = getStatus(content[0].sp_status);
-    if (status !== "审批中") {
+    if (status !== "审批中") {// 即审批完成、已撤销等
+
       contentDiv = <div>
-        <label style={{display: "inline-block", textAlign: "center", width: 100}}>{content[0].user_name}</label>
-        <label style={{marginLeft: 130}}>{status}&nbsp;&nbsp;{content[0].sp_time}</label>
+        <div>
+          <label style={{display: "inline-block", textAlign: "center", width: 100}}>{content[0].user_name}</label>
+          <label style={{marginLeft: 130}}>{status}&nbsp;&nbsp;{content[0].sp_time}</label>
+        </div>
+        <div style={{color: "gray"}}>
+          <label>{content[0].speech}</label>
+        </div>
       </div>;
     } else {
       contentDiv =
@@ -85,19 +91,6 @@ const approveCommonMethod = (title: string, content: any, isTestStage: boolean, 
           <label style={{display: "inline-block", textAlign: "center", width: 100}}> {content[0].user_name}</label>
         </div>;
     }
-
-    // if (content[0].sp_status === 2) {
-    //   contentDiv = <div>
-    //     <label style={{display: "inline-block", textAlign: "center", width: 100}}>{content[0].user_name}</label>
-    //     <label style={{marginLeft: 130}}>已同意&nbsp;&nbsp;{content[0].sp_time}</label>
-    //   </div>;
-    // } else {
-    //   contentDiv = <div><label style={{
-    //     display: "inline-block",
-    //     textAlign: "center",
-    //     width: 100
-    //   }}> {content[0].user_name}</label></div>;
-    // }
 
     return <div>
       {titleDiv}
@@ -122,34 +115,51 @@ const approveCommonMethod = (title: string, content: any, isTestStage: boolean, 
 
       const status = getStatus(items.sp_status);
       if (status !== "审批中") {
+
+        // 判断有无备注，有的话就放在下面
+        // if (items.speech !== "") {
+        //   return <div>
+        //     <div>
+        //       <label style={{display: "inline-block", textAlign: "center", width: 100}}>{items.user_name}</label>
+        //       <label style={{marginLeft: 130}}>{status}&nbsp;&nbsp;{items.sp_time}</label>
+        //     </div>
+        //     <div style={{color: "gray"}}>
+        //       <label>"{items.speech}"</label>
+        //     </div>
+        //   </div>;
+        // }
+
         return <div>
-          <label style={{display: "inline-block", textAlign: "center", width: 100}}>{items.user_name}</label>
-          <label style={{marginLeft: 130}}>{status}&nbsp;&nbsp;{items.sp_time}</label>
+          <div>
+            <label style={{display: "inline-block", textAlign: "center", width: 100}}>{items.user_name}</label>
+            <label style={{marginLeft: 130}}>{status}&nbsp;&nbsp;{items.sp_time}</label>
+          </div>
+          <div style={{color: "gray"}}>
+            <label>{items.speech}</label>
+          </div>
         </div>;
+
+        // return <div>
+        //   <label style={{display: "inline-block", textAlign: "center", width: 100}}>{items.user_name}</label>
+        //   <label style={{marginLeft: 130}}>{status}&nbsp;&nbsp;{items.sp_time}</label>
+        // </div>;
       }
 
-      return <div><label style={{
-        display: "inline-block",
-        textAlign: "center",
-        width: 100
-      }}>{items.user_name}</label></div>;
-
-      //   if (items.sp_status === 2) {
-      //     return <div>
-      //       <label style={{
-      //         display: "inline-block",
-      //         textAlign: "center",
-      //         width: 100
-      //       }}>{items.user_name}</label>
-      //       <label style={{marginLeft: 130}}>已同意&nbsp;&nbsp;{items.sp_time}</label>
-      //     </div>;
-      //   }
+      // 判断有无备注，有的话就放在下面
+      // if (items.speech !== "") {
+      //   return <div>
+      //     <div><label style={{display: "inline-block", textAlign: "center", width: 100}}>{items.user_name}</label></div>
+      //     <div style={{color: "gray"}}><label>"{items.speech}"</label></div>
+      //   </div>;
+      // }
       //
-      //   return <div><label style={{
-      //     display: "inline-block",
-      //     textAlign: "center",
-      //     width: 100
-      //   }}>{items.user_name}</label></div>;
+      // return <div><label style={{display: "inline-block", textAlign: "center", width: 100}}>{items.user_name}</label>
+      // </div>;
+      return <div>
+        <div><label style={{display: "inline-block", textAlign: "center", width: 100}}>{items.user_name}</label></div>
+        <div style={{color: "gray"}}><label>{items.speech}</label></div>
+      </div>;
+
     }
   );
 

@@ -209,6 +209,12 @@ function getCurrentQuarterTime() {
   return {start: `${currentYear}-${from}`, end: `${currentYear}-${to}`};
 }
 
+// 获取年的开始和结束时间
+function getYearsTime() {
+  return [{title: "", start: "", end: ""}];
+
+};
+
 
 const getParamsByType = (params: any, isCurMonth: boolean = false) => {
   let typeFlag = 0;
@@ -308,6 +314,7 @@ export {
   formatMomentTime,
   getParamsByType,
   getCurrentQuarterTime,
+  getYearsTime,
   getWeekStartAndEndTime,
   getWeekStartAndEndTimeByEndtime,
 

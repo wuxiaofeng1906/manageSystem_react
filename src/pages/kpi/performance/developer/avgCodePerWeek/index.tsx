@@ -12,19 +12,21 @@ import {
   getMonthWeek,
   getTwelveMonthTime,
   getFourQuarterTime,
+  getYearsTime,
   getParamsByType
 } from '@/publicMethods/timeMethods';
 import {colorRender, moduleChange} from '@/publicMethods/cellRenderer';
 import {customRound, getHeight} from '@/publicMethods/pageSet';
 
 import {Button, Drawer} from "antd";
-import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
+import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone,AppstoreTwoTone} from "@ant-design/icons";
 
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(8);
 const monthRanges = getTwelveMonthTime();
 const quarterTime = getFourQuarterTime();
+
 const groupValues: any[] = [];
 const moduleValues: any[] = [];
 
@@ -119,6 +121,21 @@ const columsForQuarters = () => {
     component.push({
       headerName: quarterTime[index].title,
       field: quarterTime[index].start,
+      aggFunc: codeNumberRender,
+      cellRenderer: colorRender
+    });
+
+  }
+  return compColums.concat(component);
+};
+
+const columsForYears = () => {
+  const yearsTime = getYearsTime();
+  const component = new Array();
+  for (let index = 0; index < yearsTime.length; index += 1) {
+    component.push({
+      headerName: yearsTime[index].title,
+      field: yearsTime[index].start,
       aggFunc: codeNumberRender,
       cellRenderer: colorRender
     });
@@ -340,7 +357,7 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
         }
       }
   `);
-debugger;
+  debugger;
   const datas = converseFormatForAgGrid(data?.avgCodeDept);
   return converseArrayToOne(datas);
 };
@@ -406,6 +423,15 @@ const WeekCodeTableList: React.FC<any> = () => {
     gridApi.current?.setRowData(datas);
   };
 
+  // 按年统计
+  const statisticsByYear = async () => {
+    gridApi.current?.setColumnDefs([]);
+    const quartersColums = columsForYears();
+    gridApi.current?.setColumnDefs(quartersColums);
+    const datas: any = await queryBugResolutionCount(gqlClient, 'year');
+    gridApi.current?.setRowData(datas);
+  };
+
   /* region 提示规则显示 */
   const [messageVisible, setVisible] = useState(false);
   const showRules = () => {
@@ -429,6 +455,8 @@ const WeekCodeTableList: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
+        <Button type="text" style={{color: 'black'}} icon={<AppstoreTwoTone />} size={'large'}
+                onClick={statisticsByYear}>按年统计</Button>
         <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>

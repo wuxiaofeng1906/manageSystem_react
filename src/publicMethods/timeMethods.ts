@@ -214,7 +214,7 @@ function getYearsTime() {
   // 获取当前年份
   const curYear = dayjs().year();
 
-  for (let index = 2019; index <= curYear; index += 1) {
+  for (let index = curYear; index >= 2019; index -= 1) {
     ranges.push({
       title: `${index}年`,
       start: `${index}-01-01`,

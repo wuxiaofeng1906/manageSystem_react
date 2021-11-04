@@ -218,7 +218,7 @@ function getYearsTime() {
     ranges.push({
       title: `${index}年`,
       start: `${index}-01-01`,
-      end: `${index}-12-31 23:59:59`
+      end: `${index}-12-31`
     });
   }
   return ranges;

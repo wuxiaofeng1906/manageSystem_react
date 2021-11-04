@@ -311,6 +311,7 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
   if (condition.typeFlag === 0) {
     return [];
   }
+
   const {data} = await client.query(`
       {
           bugThousDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, thous:ALL) {
@@ -420,8 +421,8 @@ const BugRateTableList: React.FC<any> = () => {
   // 按年统计
   const statisticsByYear = async () => {
     gridApi.current?.setColumnDefs([]);
-    const quartersColums = columsForYears();
-    gridApi.current?.setColumnDefs(quartersColums);
+    const yearsColums = columsForYears();
+    gridApi.current?.setColumnDefs(yearsColums);
     const datas: any = await queryBugResolutionCount(gqlClient, 'year');
     gridApi.current?.setRowData(datas);
   };

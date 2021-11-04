@@ -210,8 +210,18 @@ function getCurrentQuarterTime() {
 
 // 获取年的开始和结束时间
 function getYearsTime() {
-  return [{title: "", start: "", end: ""}];
+  const ranges = new Array();
+  // 获取当前年份
+  const curYear = dayjs().year();
 
+  for (let index = 2019; index <= curYear; index += 1) {
+    ranges.push({
+      title: `${index}年`,
+      start: `${index}-01-01`,
+      end: `${index}-12-31 23:59:59`
+    });
+  }
+  return ranges;
 };
 
 
@@ -244,6 +254,14 @@ const getParamsByType = (params: any, isCurMonth: boolean = false) => {
     }
     ends = `[${timeRange.join(",")}]`;
     typeFlag = 3;
+  } else if (params === 'year') {
+    const timeRange = new Array();
+    const quarterTime = getYearsTime();
+    for (let index = 0; index < quarterTime.length; index += 1) {
+      timeRange.push(`"${quarterTime[index].end}"`);
+    }
+    ends = `[${timeRange.join(",")}]`;
+    typeFlag = 4;
   }
 
   return {typeFlag, ends};

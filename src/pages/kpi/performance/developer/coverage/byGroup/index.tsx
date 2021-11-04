@@ -7,11 +7,17 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
-import {getWeeksRange, getMonthWeek, getTwelveMonthTime, getFourQuarterTime} from '@/publicMethods/timeMethods';
+import {
+  getWeeksRange,
+  getMonthWeek,
+  getTwelveMonthTime,
+  getFourQuarterTime,
+  getYearsTime
+} from '@/publicMethods/timeMethods';
 import {Button, Drawer} from "antd";
-import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
+import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone,AppstoreTwoTone} from "@ant-design/icons";
 import {customRound, getHeight} from "@/publicMethods/pageSet";
-import {moduleChange} from "@/publicMethods/cellRenderer";
+import {colorRender, moduleChange} from "@/publicMethods/cellRenderer";
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(4);
@@ -177,6 +183,31 @@ const columsForMonths = () => {
 
 const columsForQuarters = () => {
 
+  const component = new Array();
+  for (let index = 0; index < quarterTime.length; index += 1) {
+    const endtime = quarterTime[index].end;
+    component.push({
+      headerName: quarterTime[index].title,
+      children: [
+        {
+          headerName: '结构覆盖率',
+          field: `instCove${endtime.toString()}`,
+          aggFunc: instCoveRender,
+          cellRenderer: coverageCellRenderer,
+        },
+        {
+          headerName: '分支覆盖率',
+          field: `branCove${endtime.toString()}`,
+          aggFunc: branCoveRender,
+          cellRenderer: coverageCellRenderer,
+        },
+      ],
+    });
+  }
+  return compColums.concat(component);
+};
+
+const columsForYears = () => {
   const component = new Array();
   for (let index = 0; index < quarterTime.length; index += 1) {
     const endtime = quarterTime[index].end;
@@ -536,6 +567,15 @@ const CodeReviewTableList: React.FC<any> = () => {
     gridApi.current?.setRowData(datas);
   };
 
+  // 按年统计
+  const statisticsByYear = async () => {
+    gridApi.current?.setColumnDefs([]);
+    const quartersColums = columsForYears();
+    gridApi.current?.setColumnDefs(quartersColums);
+    const datas: any = await queryFrontCoverage(gqlClient, 'year');
+    gridApi.current?.setRowData(datas);
+  };
+
   /* endregion */
 
 
@@ -560,6 +600,9 @@ const CodeReviewTableList: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
+        <Button type="text" style={{color: 'black'}} icon={<AppstoreTwoTone/>} size={'large'}
+                onClick={statisticsByYear}>按年统计</Button>
+
         <label style={{fontWeight: "bold"}}>(统计单位：%)</label>
         <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
                 size={'large'} onClick={showRules}>计算规则</Button>

@@ -18,7 +18,7 @@ const judgeAuthority = (method: string) => {
 
 
 const judgeAuthorityByName = (method: string) => {
-  debugger;
+
   let authFlag = false;
   const myAuth: any = localStorage.getItem("authority");
   const sys_authority: any = JSON.parse(myAuth);

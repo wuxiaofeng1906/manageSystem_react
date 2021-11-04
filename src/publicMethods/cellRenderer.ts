@@ -411,7 +411,7 @@ const numberRenderToZentaoType = (params: any,) => {
 
 
 const numberRenderToZentaoTypeFilter = (params: any, test: any) => {
-  debugger;
+
   if (!params.value || params.value === '(Select All)') {
     return params.value;
   }

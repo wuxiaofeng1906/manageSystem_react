@@ -318,8 +318,6 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
     params.end.toString(),
   );
 
-
-  debugger;
   const requestDatas = alayRequestDatas(throughputDatas,
     data?.notResponse,
     data?.avgRequestDura,

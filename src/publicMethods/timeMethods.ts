@@ -15,7 +15,6 @@ function getWeeksRange(weekCounts: number) {
     // const tttt = dayjs().startOf('week').format('YYYY-MM-DD');
     // const ttttss = dayjs().endOf('week').format('YYYY-MM-DD');
 
-    // debugger;
     const from = dayjs().subtract(1, 'd').startOf('w').subtract(idx, 'w');
     const to = from.endOf('w');
 

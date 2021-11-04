@@ -192,7 +192,7 @@ const BranchTableList: React.FC<any> = () => {
   };
 
   const projectChanged = (values: any) => {
-    debugger;
+
     console.log(values);
     setCondition({
       ...conditon,

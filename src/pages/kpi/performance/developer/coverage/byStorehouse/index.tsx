@@ -16,7 +16,6 @@ const {Option} = Select;
 
 
 const queryBranchViews = async (client: GqlClient<object>, queryCondition: any) => {
-  debugger;
 
   let project = "";  // 拼接gql 需要的数组
   if (queryCondition.frontLib) {

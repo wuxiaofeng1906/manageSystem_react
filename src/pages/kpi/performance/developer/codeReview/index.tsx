@@ -154,7 +154,7 @@ const columsForQuarters = () => {
 
 // 转化为ag-grid能被显示的格式
 // const converseFormatForAgGrid = (oraDatas: any) => {
-//   debugger;
+
 //   groupValues.length = 0;
 //   moduleValues.length = 0;
 //   const arrays: any[] = [];

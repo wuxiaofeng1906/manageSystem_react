@@ -363,7 +363,7 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
         }
       }
   `);
-  debugger;
+
   const datas = converseFormatForAgGrid(data?.avgCodeDept);
   return converseArrayToOne(datas);
 };

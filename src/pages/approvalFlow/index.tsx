@@ -756,8 +756,6 @@ const JenkinsCheck: React.FC<any> = () => {
       "sum": sum.toString()
     };
 
-
-    debugger;
     // await axios.put("/api/verify/apply/apply_data", datas)
     await axios.put("/api/wechat/flow", datas)
       .then(function (res) {

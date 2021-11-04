@@ -462,8 +462,8 @@ const WeekCodeTableList: React.FC<any> = () => {
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
 
-        {/* <Button type="text" style={{color: 'black'}} icon={<AppstoreTwoTone />} size={'large'}
-              onClick={statisticsByYear}>按年统计</Button> */}
+        <Button type="text" style={{color: 'black'}} icon={<AppstoreTwoTone/>} size={'large'}
+                onClick={statisticsByYear}>按年统计</Button>
 
         <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
                 size={'large'} onClick={showRules}>计算规则</Button>

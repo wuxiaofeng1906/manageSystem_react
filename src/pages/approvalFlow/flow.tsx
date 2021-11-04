@@ -1,4 +1,4 @@
-import {Divider } from 'antd';
+import {Card} from 'antd';
 /* region 基础控件 */
 
 const getStatus = (status_id: any) => {
@@ -177,7 +177,7 @@ const getRemarkDiv = (params: any) => {
   }
   const returnDiv: any = [];
   params.forEach((ele: any) => {
-    const currentDiv = <div style={{marginTop:10,marginLeft:15}}>
+    const currentDiv = <div style={{marginTop: 7, marginLeft: 15}}>
       <div style={{fontWeight: "bold"}}>{ele.comment_user_name} {ele.comment_time}</div>
       <div style={{textIndent: "2em"}}>{ele.comment_content}</div>
     </div>;
@@ -185,11 +185,9 @@ const getRemarkDiv = (params: any) => {
     returnDiv.push(currentDiv)
   });
 
-  return <div style={{marginTop: 20, width: 450, marginLeft: -15, border: "solid 1px Gainsboro"}}>
-    {/*<div style={{fontSize: 15, marginLeft: 10,marginTop:-12,backgroundColor:"red"}}> 备注</div>*/}
-    <Divider>备注</Divider>
+  return <Card size="small" title="备注" style={{marginTop: 15}}>
     {returnDiv}
-  </div>;
+  </Card>;
 
 }
 

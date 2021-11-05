@@ -268,8 +268,8 @@ export default [
               {
                 name: 'bug回归率',
                 icon: 'table',
-                path: 'bugBugReturnRate',
-                component: './kpi/performance/testers/bugBugReturnRate',
+                path: 'bugReturnRate',
+                component: './kpi/performance/testers/bugReturnRate',
               },
               {
                 name: '自动化覆盖率',

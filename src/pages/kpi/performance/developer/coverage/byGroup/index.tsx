@@ -15,7 +15,13 @@ import {
   getYearsTime
 } from '@/publicMethods/timeMethods';
 import {Button, Drawer} from "antd";
-import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone,AppstoreTwoTone} from "@ant-design/icons";
+import {
+  ScheduleTwoTone,
+  CalendarTwoTone,
+  ProfileTwoTone,
+  QuestionCircleTwoTone,
+  AppstoreTwoTone
+} from "@ant-design/icons";
 import {customRound, getHeight} from "@/publicMethods/pageSet";
 import {colorRender, moduleChange} from "@/publicMethods/cellRenderer";
 
@@ -33,6 +39,7 @@ const branModuleValues: any[] = [];
 
 // 合并结构列渲染
 function instCoveRender(values: any) {
+
   const rowName = values.rowNode.key;
   if (rowName === "前端" || rowName === "后端") {
     for (let i = 0; i < instModuleValues.length; i += 1) {
@@ -208,11 +215,12 @@ const columsForQuarters = () => {
 };
 
 const columsForYears = () => {
+  const yearsTime = getYearsTime();
   const component = new Array();
-  for (let index = 0; index < quarterTime.length; index += 1) {
-    const endtime = quarterTime[index].end;
+  for (let index = 0; index < yearsTime.length; index += 1) {
+    const endtime = yearsTime[index].end;
     component.push({
-      headerName: quarterTime[index].title,
+      headerName: yearsTime[index].title,
       children: [
         {
           headerName: '结构覆盖率',
@@ -238,6 +246,8 @@ const columsForYears = () => {
 function addGroupAndDept(oraDatas: any) {
   instModuleValues.length = 0;
   branModuleValues.length = 0;
+  InstGroupValues.length = 0;
+  branGroupValues.length = 0;
   const objectDataArray: string | any[] = [];
   for (let index = 0; index < oraDatas.length; index += 1) {
     if (oraDatas[index] !== null) {
@@ -445,13 +455,24 @@ const queryFrontCoverage = async (client: GqlClient<object>, params: string) => 
     }
     ends = `[${timeRange.join(",")}]`;
     typeFlag = 3;
+  } else if (params === 'year') {
+    const timeRange = new Array();
+    const yearsTime = getYearsTime();
+    for (let index = 0; index < yearsTime.length; index += 1) {
+      timeRange.push(`"${yearsTime[index].end}"`);
+    }
+    ends = `[${timeRange.join(",")}]`;
+    typeFlag = 4;
   } else {
     return [];
   }
 
+  //  fileCoverageDept(kind:"${typeFlag}",ends:${ends}){
+  //   fileCoverageDept(kind: "4", ends: ["2021-12-31","2020-12-31","2019-12-31"]){
+  //    fileCoverageDept(kind:"4",ends:["2021-12-31"]){
   const {data} = await client.query(`
        {
-         fileCoverageDept(kind:"${typeFlag}",ends:${ends}){
+        fileCoverageDept(kind:"${typeFlag}",ends:${ends}){
             total{
               dept
               deptName
@@ -502,6 +523,8 @@ const queryFrontCoverage = async (client: GqlClient<object>, params: string) => 
 
       }
     `);
+
+  debugger;
   const objectValues = addGroupAndDept(data?.fileCoverageDept);
   return dealData(objectValues);
 };

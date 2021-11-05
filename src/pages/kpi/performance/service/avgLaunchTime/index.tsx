@@ -12,13 +12,20 @@ import {
   getMonthWeek,
   getTwelveMonthTime,
   getFourQuarterTime,
-  getParamsByType
+  getParamsByType, getYearsTime
 } from '@/publicMethods/timeMethods';
 import {getHeight} from '@/publicMethods/pageSet';
 import './styles.css';
 
 import {Button, Drawer} from "antd";
-import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
+import {
+  ScheduleTwoTone,
+  CalendarTwoTone,
+  ProfileTwoTone,
+  QuestionCircleTwoTone,
+  AppstoreTwoTone
+} from "@ant-design/icons";
+import {colorRender} from "@/publicMethods/cellRenderer";
 
 
 // 获取近四周的时间范围
@@ -138,6 +145,21 @@ const columsForQuarters = () => {
       aggFunc: codeNumberRender,
       cellRenderer: rowrender,
 
+    });
+
+  }
+  return compColums.concat(component);
+};
+
+const columsForYears = () => {
+  const yearsTime = getYearsTime();
+  const component = new Array();
+  for (let index = 0; index < yearsTime.length; index += 1) {
+    component.push({
+      headerName: yearsTime[index].title,
+      field: yearsTime[index].start,
+      aggFunc: codeNumberRender,
+      cellRenderer: rowrender
     });
 
   }
@@ -419,6 +441,22 @@ const LaunchTimeTableList: React.FC<any> = () => {
     gridApi.current?.setRowData(datas);
   };
 
+  // 按年统计
+  const statisticsByYear = async () => {
+
+    gridApi.current?.setColumnDefs([]);
+    const yearColums = columsForYears();
+    gridApi.current?.setColumnDefs(yearColums);
+    const datas: any = await queryLanchTime(gqlClient, 'year');
+    gridApi.current?.setRowData(datas);
+
+    // gridApi.current?.setColumnDefs([]);
+    // const yearColums = columsForYears();
+    // gridApi.current?.setColumnDefs(yearColums);
+    // const datas: any = await queryLanchTime(gqlClient, 'year');
+    // gridApi.current?.setRowData(datas);
+  };
+
   /* region 提示规则显示 */
   const [messageVisible, setVisible] = useState(false);
   const showRules = () => {
@@ -442,6 +480,10 @@ const LaunchTimeTableList: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
+
+        <Button type="text" style={{color: 'black'}} icon={<AppstoreTwoTone/>} size={'large'}
+                onClick={statisticsByYear}>按年统计</Button>
+
         <label style={{fontWeight: "bold"}}>(统计单位：天)</label>
         <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
                 size={'large'} onClick={showRules}>计算规则</Button>

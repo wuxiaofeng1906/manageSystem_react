@@ -12,10 +12,16 @@ import {
   getMonthWeek,
   getTwelveMonthTime,
   getFourQuarterTime,
-  getParamsByType
+  getParamsByType, getYearsTime
 } from '@/publicMethods/timeMethods';
 import {Button, Drawer} from "antd";
-import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
+import {
+  ScheduleTwoTone,
+  CalendarTwoTone,
+  ProfileTwoTone,
+  QuestionCircleTwoTone,
+  AppstoreTwoTone
+} from "@ant-design/icons";
 import {getHeight} from '@/publicMethods/pageSet';
 
 
@@ -119,6 +125,20 @@ const columsForQuarters = () => {
   return compColums.concat(component);
 };
 
+const columsForYears = () => {
+  const yearsTime = getYearsTime();
+  const component = new Array();
+  for (let index = 0; index < yearsTime.length; index += 1) {
+    component.push({
+      headerName: yearsTime[index].title,
+      field: yearsTime[index].start,
+      aggFunc: codeNumberRender,
+      cellRenderer: colorRender
+    });
+
+  }
+  return compColums.concat(component);
+};
 /* endregion */
 
 /* region 数据处理 */
@@ -216,7 +236,7 @@ const converseArrayToOne = (data: any) => {
   return resultData;
 };
 
-const queryBugResolutionCount = async (client: GqlClient<object>, params: string, type: string) => {
+const queryFeedBackTime = async (client: GqlClient<object>, params: string, type: string) => {
   const condition = getParamsByType(params);
   if (condition.typeFlag === 0) {
     return [];
@@ -263,10 +283,10 @@ const AdviserFeedTableList: React.FC<any> = () => {
   /* region ag-grid */
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
-    queryBugResolutionCount(gqlClient, 'quarter', 'story'),
+    queryFeedBackTime(gqlClient, 'quarter', 'story'),
   );
   const bugData = useRequest(() =>
-    queryBugResolutionCount(gqlClient, 'quarter', 'bug'),
+    queryFeedBackTime(gqlClient, 'quarter', 'bug'),
   );
 
   const gridApi = useRef<GridApi>();
@@ -301,12 +321,12 @@ const AdviserFeedTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const weekColums = columsForWeeks();
     gridApi.current?.setColumnDefs(weekColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'week', 'story');
+    const datas: any = await queryFeedBackTime(gqlClient, 'week', 'story');
     gridApi.current?.setRowData(datas);
 
     gridApiForBug.current?.setColumnDefs([]);
     gridApiForBug.current?.setColumnDefs(weekColums);
-    const bugDt: any = await queryBugResolutionCount(gqlClient, 'week', 'bug');
+    const bugDt: any = await queryFeedBackTime(gqlClient, 'week', 'bug');
     gridApiForBug.current?.setRowData(bugDt);
 
   };
@@ -317,12 +337,12 @@ const AdviserFeedTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const monthColums = columsForMonths();
     gridApi.current?.setColumnDefs(monthColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'month', 'story');
+    const datas: any = await queryFeedBackTime(gqlClient, 'month', 'story');
     gridApi.current?.setRowData(datas);
 
     gridApiForBug.current?.setColumnDefs([]);
     gridApiForBug.current?.setColumnDefs(monthColums);
-    const bugDt: any = await queryBugResolutionCount(gqlClient, 'month', 'bug');
+    const bugDt: any = await queryFeedBackTime(gqlClient, 'month', 'bug');
     gridApiForBug.current?.setRowData(bugDt);
 
   };
@@ -334,15 +354,31 @@ const AdviserFeedTableList: React.FC<any> = () => {
     const quartersColums = columsForQuarters();
     gridApi.current?.setColumnDefs([]);
     gridApi.current?.setColumnDefs(quartersColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'quarter', 'story');
+    const datas: any = await queryFeedBackTime(gqlClient, 'quarter', 'story');
     gridApi.current?.setRowData(datas);
 
     gridApiForBug.current?.setColumnDefs([]);
     gridApiForBug.current?.setColumnDefs(quartersColums);
-    const bugDt: any = await queryBugResolutionCount(gqlClient, 'quarter', 'bug');
+    const bugDt: any = await queryFeedBackTime(gqlClient, 'quarter', 'bug');
     gridApiForBug.current?.setRowData(bugDt);
   };
 
+  // 按年统计
+  const statisticsByYear = async () => {
+
+
+    const yearColums = columsForYears();
+    gridApi.current?.setColumnDefs([]);
+    gridApi.current?.setColumnDefs(yearColums);
+    const datas: any = await queryFeedBackTime(gqlClient, 'year', 'story');
+    gridApi.current?.setRowData(datas);
+
+    gridApiForBug.current?.setColumnDefs([]);
+    gridApiForBug.current?.setColumnDefs(yearColums);
+    const bugDt: any = await queryFeedBackTime(gqlClient, 'year', 'bug');
+    gridApiForBug.current?.setRowData(bugDt);
+
+  };
   /* region 提示规则显示 */
   const [messageVisible, setVisible] = useState(false);
   const showRules = () => {
@@ -364,6 +400,9 @@ const AdviserFeedTableList: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
+
+        <Button type="text" style={{color: 'black'}} icon={<AppstoreTwoTone/>} size={'large'}
+                onClick={statisticsByYear}>按年统计</Button>
         <label style={{fontWeight: "bold"}}>(统计单位：天)</label>
 
         <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}

@@ -12,11 +12,17 @@ import {
   getMonthWeek,
   getTwelveMonthTime,
   getFourQuarterTime,
-  getParamsByType
+  getParamsByType, getYearsTime
 } from '@/publicMethods/timeMethods';
 import {colorRender} from '@/publicMethods/cellRenderer';
 import {Button, Drawer} from "antd";
-import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
+import {
+  ScheduleTwoTone,
+  CalendarTwoTone,
+  ProfileTwoTone,
+  QuestionCircleTwoTone,
+  AppstoreTwoTone
+} from "@ant-design/icons";
 import {getHeight} from "@/publicMethods/pageSet";
 
 
@@ -101,6 +107,21 @@ const columsForQuarters = () => {
     component.push({
       headerName: quarterTime[index].title,
       field: quarterTime[index].start,
+      aggFunc: codeNumberRender,
+      cellRenderer: colorRender
+    });
+
+  }
+  return compColums.concat(component);
+};
+
+const columsForYears = () => {
+  const yearsTime = getYearsTime();
+  const component = new Array();
+  for (let index = 0; index < yearsTime.length; index += 1) {
+    component.push({
+      headerName: yearsTime[index].title,
+      field: yearsTime[index].start,
       aggFunc: codeNumberRender,
       cellRenderer: colorRender
     });
@@ -226,7 +247,7 @@ const converseArrayToOne = (data: any) => {
   return resultData;
 };
 
-const queryBugResolutionCount = async (client: GqlClient<object>, params: string) => {
+const queryBugReturnTime = async (client: GqlClient<object>, params: string) => {
   const condition = getParamsByType(params);
   if (condition.typeFlag === 0) {
     return [];
@@ -274,7 +295,7 @@ const BugReturnTableList: React.FC<any> = () => {
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
-    queryBugResolutionCount(gqlClient, 'quarter'),
+    queryBugReturnTime(gqlClient, 'quarter'),
   );
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -300,7 +321,7 @@ const BugReturnTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const weekColums = columsForWeeks();
     gridApi.current?.setColumnDefs(weekColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'week');
+    const datas: any = await queryBugReturnTime(gqlClient, 'week');
     gridApi.current?.setRowData(datas);
 
   };
@@ -311,7 +332,7 @@ const BugReturnTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const monthColums = columsForMonths();
     gridApi.current?.setColumnDefs(monthColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'month');
+    const datas: any = await queryBugReturnTime(gqlClient, 'month');
     gridApi.current?.setRowData(datas);
 
   };
@@ -322,10 +343,18 @@ const BugReturnTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const quartersColums = columsForQuarters();
     gridApi.current?.setColumnDefs(quartersColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'quarter');
+    const datas: any = await queryBugReturnTime(gqlClient, 'quarter');
     gridApi.current?.setRowData(datas);
   };
 
+  // 按年统计
+  const statisticsByYear = async () => {
+    gridApi.current?.setColumnDefs([]);
+    const yearColums = columsForYears();
+    gridApi.current?.setColumnDefs(yearColums);
+    const datas: any = await queryBugReturnTime(gqlClient, 'year');
+    gridApi.current?.setRowData(datas);
+  };
   /* region 提示规则显示 */
   const [messageVisible, setVisible] = useState(false);
   const showRules = () => {
@@ -347,6 +376,8 @@ const BugReturnTableList: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
+        <Button type="text" style={{color: 'black'}} icon={<AppstoreTwoTone/>} size={'large'}
+                onClick={statisticsByYear}>按年统计</Button>
         <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>

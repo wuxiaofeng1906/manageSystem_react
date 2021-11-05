@@ -23,7 +23,7 @@ import {
   AppstoreTwoTone
 } from "@ant-design/icons";
 import {customRound, getHeight} from "@/publicMethods/pageSet";
-import {colorRender, moduleChange} from "@/publicMethods/cellRenderer";
+import {moduleChange} from "@/publicMethods/cellRenderer";
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(4);
@@ -524,7 +524,6 @@ const queryFrontCoverage = async (client: GqlClient<object>, params: string) => 
       }
     `);
 
-  debugger;
   const objectValues = addGroupAndDept(data?.fileCoverageDept);
   return dealData(objectValues);
 };

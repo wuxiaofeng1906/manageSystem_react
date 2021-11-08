@@ -1,6 +1,7 @@
 // src/access.ts
 export default function access(initialState: { currentUser?: API.CurrentUser | undefined }) {
   const {currentUser} = initialState || {};
+
   return {
     sysAdmin: currentUser && currentUser.access === 'superGroup',
     spAdmin: currentUser && (currentUser.access === 'superGroup' || currentUser.access === 'projectListMG'),
@@ -11,5 +12,6 @@ export default function access(initialState: { currentUser?: API.CurrentUser | u
     // sonar扫描：超级管理员、开发经理/总监、开发人员组
     sonarCheck: currentUser && (currentUser.access === 'superGroup' || currentUser.access === 'devManageGroup' ||
       currentUser.access === 'devGroup'),
+    frontManager: currentUser && (currentUser.access === 'superGroup' || currentUser.access === 'frontManager')
   };
 }

@@ -14,9 +14,11 @@ import {
   getFourQuarterTime,
   getParamsByType
 } from '@/publicMethods/timeMethods';
-import {Button, Drawer} from "antd";
+import {Button, Drawer, message} from "antd";
 import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
 import {getHeight} from "@/publicMethods/pageSet";
+import axios from "axios";
+import {alaysisDatas} from "@/pages/approvalFlow/columns";
 
 
 // 获取近四周的时间范围
@@ -178,74 +180,42 @@ const converseFormatForAgGrid = (oraDatas: any) => {
   return arrays;
 };
 
-const converseArrayToOne = (data: any) => {
-  const resultData = new Array();
-  for (let index = 0; index < data.length; index += 1) {
-    let repeatFlag = false;
-    // 判断原有数组是否包含有名字
-    for (let m = 0; m < resultData.length; m += 1) {
-      if (resultData[m].username === data[index].username) {
-        repeatFlag = true;
-        break;
+
+const queryStoryChangeRate = async (timeFlag: string) => {
+  debugger;
+
+  let datas: any = [];
+  const paramData = {interval: timeFlag, person_or_project: "person"}
+  await axios.get('/api/verify/apply/change_rate', {params: paramData})
+    .then(function (res) {
+
+      if (res.data.code === 200) {
+
+        datas = converseFormatForAgGrid(res.data.data);
+
+      } else {
+        message.error({
+          content: `错误：${res.data.msg}`,
+          duration: 1, // 1S 后自动关闭
+          style: {
+            marginTop: '50vh',
+          },
+        });
       }
-    }
 
-    if (repeatFlag === false) {
-      const tempData = {};
-      for (let index2 = 0; index2 < data.length; index2 += 1) {
-        tempData["username"] = data[index].username;
 
-        if (data[index].username === data[index2].username) {
-          const key = Object.keys(data[index2]);  // 获取所有的Key值
-          key.forEach(function (item) {
-            tempData[item] = data[index2][item];
-          });
-        }
-      }
-      resultData.push(tempData);
-    }
-  }
+    }).catch(function (error) {
 
-  return resultData;
-};
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
 
-const queryBugResolutionCount = async (client: GqlClient<object>, params: string) => {
-  const condition = getParamsByType(params, true);
-  if (condition.typeFlag === 0) {
-    return [];
-  }
-  const {data} = await client.query(`
-      {
-        proChangeApply(kind: "${condition.typeFlag}", ends: ${condition.ends}){
-          total {
-            dept
-            deptName
-            kpi
-          }
-          range {
-            start
-            end
-          }
-          datas {
-            dept
-            deptName
-            kpi
-            parent {
-              dept
-              deptName
-            }
-            users {
-              userId
-              userName
-              kpi
-            }
-          }
-        }
-      }
-  `);
-
-  const datas = converseFormatForAgGrid(data?.proChangeApply);
-  return converseArrayToOne(datas);
+  return datas;
 };
 
 /* endregion */
@@ -255,7 +225,7 @@ const NeedsChangeRate: React.FC<any> = () => {
   /* region ag-grid */
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
-    queryBugResolutionCount(gqlClient, 'quarter'),
+    queryStoryChangeRate('quarter'),
   );
 
 
@@ -284,7 +254,7 @@ const NeedsChangeRate: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const weekColums = columsForWeeks();
     gridApi.current?.setColumnDefs(weekColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'week');
+    const datas: any = await queryStoryChangeRate('week');
     gridApi.current?.setRowData(datas);
 
   };
@@ -295,7 +265,7 @@ const NeedsChangeRate: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const monthColums = columsForMonths();
     gridApi.current?.setColumnDefs(monthColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'month');
+    const datas: any = await queryStoryChangeRate('month');
     gridApi.current?.setRowData(datas);
 
 
@@ -308,7 +278,7 @@ const NeedsChangeRate: React.FC<any> = () => {
     const quartersColums = columsForQuarters();
 
     gridApi.current?.setColumnDefs(quartersColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'quarter');
+    const datas: any = await queryStoryChangeRate('quarter');
     gridApi.current?.setRowData(datas);
 
   };

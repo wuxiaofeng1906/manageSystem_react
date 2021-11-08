@@ -890,7 +890,7 @@ const Login: React.FC<{}> = () => {
       group: 'superGroup',
       authority: testAuth,
       avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
-      access: 'frontManager'
+      access: 'superGroup'
     };
     localStorage.setItem("userLogins", JSON.stringify(userInfos));
 
@@ -952,7 +952,7 @@ const Login: React.FC<{}> = () => {
           }}>
           </ProForm>
 
-      */}
+ */}
 
         </div>
       </div>

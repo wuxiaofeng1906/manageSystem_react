@@ -349,12 +349,13 @@ export default [
         name: '数据分析',
         icon: 'table',
         path: '/kpi/analysis',
-        access: 'sysAdmin',
+        access: 'frontManager',
         routes: [
           {
             name: '代码贡献',
             icon: 'table',
             path: 'code',
+            access: 'sysAdmin',
             component: './kpi/analysis/code',
           },
           {
@@ -362,12 +363,14 @@ export default [
             icon: 'table',
             path: 'front_dashboard',
             component: './kpi/analysis/front_dashboard',
+            access: 'frontManager',
           },
           {
             name: 'Bug解决速能',
             icon: 'table',
             path: 'bugResolutionSpeed',
             component: './kpi/analysis/bugResolutionSpeed',
+            access: 'sysAdmin',
           },
         ],
       },

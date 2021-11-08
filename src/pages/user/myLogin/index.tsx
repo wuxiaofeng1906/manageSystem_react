@@ -888,9 +888,9 @@ const Login: React.FC<{}> = () => {
       name: 'testUser',
       userid: 'test',
       group: 'superGroup',
-      authority: '',
+      authority: testAuth,
       avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
-      access: 'superGroup'
+      access: 'frontManager'
     };
     localStorage.setItem("userLogins", JSON.stringify(userInfos));
 
@@ -952,7 +952,7 @@ const Login: React.FC<{}> = () => {
           }}>
           </ProForm>
 
-*/}
+      */}
 
         </div>
       </div>

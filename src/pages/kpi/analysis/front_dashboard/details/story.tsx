@@ -177,10 +177,10 @@ const StoryDetails: React.FC<any> = () => {
             filter: true,
             flex: 1,
             minWidth: 100,
+            cellStyle: {"line-height": "28px"},
           }}
-          autoGroupColumnDef={{
-            minWidth: 100,
-          }}
+          rowHeight={28}
+          headerHeight={30}
           onGridReady={onGridReady}
         />
 

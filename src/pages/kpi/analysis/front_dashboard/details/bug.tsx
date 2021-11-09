@@ -172,10 +172,10 @@ const BugDetails: React.FC<any> = () => {
             flex: 1,
             minWidth: 100,
             suppressMenu: true,
+            cellStyle: {"line-height": "28px"},
           }}
-          autoGroupColumnDef={{
-            minWidth: 100,
-          }}
+          rowHeight={28}
+          headerHeight={30}
           onGridReady={onGridReady}
         />
 

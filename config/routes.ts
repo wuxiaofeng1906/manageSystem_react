@@ -364,6 +364,24 @@ export default [
             path: 'front_dashboard',
             component: './kpi/analysis/front_dashboard',
             access: 'frontManager',
+          }, {
+            name: 'bug',
+            icon: 'table',
+            path: 'bug',
+            component: './kpi/analysis/front_dashboard/details/bug',
+            hideInMenu: true,
+          }, {
+            name: 'story',
+            icon: 'table',
+            path: 'story',
+            component: './kpi/analysis/front_dashboard/details/story',
+            hideInMenu: true,
+          }, {
+            name: 'task',
+            icon: 'table',
+            path: 'task',
+            component: './kpi/analysis/front_dashboard/details/task',
+            hideInMenu: true,
           },
           {
             name: 'Bug解决速能',

@@ -6,13 +6,12 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient} from '@/hooks';
 import {
   getWeeksRange,
   getMonthWeek,
   getTwelveMonthTime,
   getFourQuarterTime,
-  getParamsByType, getYearsTime
+  getYearsTime
 } from '@/publicMethods/timeMethods';
 import {Button, Drawer, message} from "antd";
 import {
@@ -24,7 +23,6 @@ import {
 } from "@ant-design/icons";
 import {getHeight} from "@/publicMethods/pageSet";
 import axios from "axios";
-import {alaysisDatas} from "@/pages/approvalFlow/columns";
 
 
 // 获取近四周的时间范围
@@ -32,7 +30,6 @@ const weekRanges = getWeeksRange(8);
 const monthRanges = getTwelveMonthTime();
 const quarterTime = getFourQuarterTime(true);
 const groupValues: any[] = [];
-const moduleValues: any[] = [];
 
 /* region 动态定义列 */
 const compColums = [
@@ -52,6 +49,7 @@ const compColums = [
   }];
 
 function codeNumberRender(values: any) {
+
   const rowName = values.rowNode.key;
   for (let i = 0; i < groupValues.length; i += 1) {
     const datas = groupValues[i];
@@ -166,6 +164,10 @@ const converseFormatForAgGrid = (oraDatas: any) => {
           time: starttime,
           group: "研发中心",
           values: ele.change_rate
+        }, {
+          time: starttime,
+          group: "产品管理部",
+          values: ele.change_rate
         });
       });
     } else {
@@ -173,7 +175,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         devCenter: "研发中心",
         group: "产品管理部",
         "username": username
-      }
+      };
 
       deptData.forEach((ele: any) => {
         const starttime = (ele.time_interval)[0];
@@ -191,7 +193,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
 const queryStoryChangeRate = async (timeFlag: string) => {
 
   let datas: any = [];
-  const paramData = {interval: timeFlag, person_or_project: "person"}
+  const paramData = {interval: timeFlag, person_or_project: "person"};
   await axios.get('/api/verify/apply/change_rate', {params: paramData})
     .then(function (res) {
 
@@ -229,11 +231,9 @@ const queryStoryChangeRate = async (timeFlag: string) => {
 const NeedsChangeRate: React.FC<any> = () => {
 
   /* region ag-grid */
-  const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
     queryStoryChangeRate('quarter'),
   );
-
 
   const gridApi = useRef<GridApi>();
   const onGridReady = (params: GridReadyEvent) => {

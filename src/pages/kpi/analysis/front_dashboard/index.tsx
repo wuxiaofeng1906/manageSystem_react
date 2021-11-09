@@ -15,6 +15,7 @@ import {useRequest} from 'ahooks';
 import dayjs from 'dayjs';
 import * as echarts from 'echarts';
 import './styles.css';
+import {history} from "@@/core/history";
 
 
 const {RangePicker} = DatePicker;
@@ -34,6 +35,7 @@ const cellFormat = (params: any) => {
     return Number(params.value);
   }
   return 0;
+
 };
 
 const timeCellFormat = (params: any) => {
@@ -650,6 +652,34 @@ const FrontTableList: React.FC<any> = () => {
     }
   };
 
+  (window as any).gotoPages = (title: string, paramData: any) => {
+    let type = "";
+    switch (title) {
+      case "Bug响应数":
+      case "对外请求未响应数":
+      case "修复Bug数":
+        type = 'bug';
+        break;
+
+      case "初始需求数":
+      case "初始需求完成数":
+      case "追加需求数":
+      case "追加需求完成数":
+      case "交付需求数":
+        type = 'story';
+        break;
+
+      case "完成任务数":
+      case "进行中任务数":
+        type = 'task';
+        break;
+      default:
+        break;
+    }
+    history.push(`/kpi/analysis/${type}?title=${title}&users=[${paramData.userId},${paramData.userName}]&time=[${paramData.start},${paramData.end}]`);
+  };
+
+
   const getSourceColums = () => {
     // 获取缓存的字段
     const fields = localStorage.getItem('data_front_dashboard');
@@ -694,6 +724,12 @@ const FrontTableList: React.FC<any> = () => {
             headerName: 'Bug响应数',
             field: 'solveCount',
             minWidth: 88,
+            cellRenderer: (params: any) => {
+              if (params.value === undefined) {
+                return "";
+              }
+              return `<a  style="text-decoration: underline" onclick='gotoPages("Bug响应数",${JSON.stringify(params.data)})'>${params.value}</a>`;
+            }
           },
         ],
       },
@@ -704,21 +740,45 @@ const FrontTableList: React.FC<any> = () => {
             headerName: '初始需求数',
             field: 'initCount',
             minWidth: 105,
+            cellRenderer: (params: any) => {
+              if (params.value === undefined) {
+                return "";
+              }
+              return `<a  style="text-decoration: underline" onclick='gotoPages("初始需求数",${JSON.stringify(params.data)})'>${params.value}</a>`;
+            }
           },
           {
             headerName: '初始需求完成数',
             field: 'initFinishCount',
             minWidth: 130,
+            cellRenderer: (params: any) => {
+              if (params.value === undefined) {
+                return "";
+              }
+              return `<a  style="text-decoration: underline" onclick='gotoPages("初始需求完成数",${JSON.stringify(params.data)})'>${params.value}</a>`;
+            }
           },
           {
             headerName: '追加需求数',
             field: 'appStoryCount',
             minWidth: 105,
+            cellRenderer: (params: any) => {
+              if (params.value === undefined) {
+                return "";
+              }
+              return `<a  style="text-decoration: underline" onclick='gotoPages("追加需求数",${JSON.stringify(params.data)})'>${params.value}</a>`;
+            }
           },
           {
             headerName: '追加需求完成数',
             field: 'appdFinishCount',
             minWidth: 130,
+            cellRenderer: (params: any) => {
+              if (params.value === undefined) {
+                return "";
+              }
+              return `<a  style="text-decoration: underline" onclick='gotoPages("追加需求完成数",${JSON.stringify(params.data)})'>${params.value}</a>`;
+            }
           },
         ],
       },
@@ -729,8 +789,12 @@ const FrontTableList: React.FC<any> = () => {
             headerName: '对外请求未响应数',
             field: 'reCount',
             minWidth: 140,
-            // aggFunc: 'sum',
-            valueFormatter: cellFormat,
+            cellRenderer: (params: any) => {
+              if (params.value === undefined) {
+                return "";
+              }
+              return `<a  style="text-decoration: underline" onclick='gotoPages("对外请求未响应数",${JSON.stringify(params.data)})'>${params.value}</a>`;
+            }
           },
           {
             headerName: '请求平均等待时长（H）',
@@ -748,25 +812,62 @@ const FrontTableList: React.FC<any> = () => {
             headerName: '交付需求数',
             field: 'finiStory',
             minWidth: 105,
-            valueFormatter: cellFormat,
+
+            cellRenderer: (params: any) => {
+              let values = params.value;
+              if (values === undefined) {
+                return "";
+              }
+              if (values === null) {
+                values = 0;
+              }
+              return `<a  style="text-decoration: underline" onclick='gotoPages("交付需求数",${JSON.stringify(params.data)})'>${values}</a>`;
+            }
           },
           {
             headerName: '完成任务数',
             field: 'finiTask',
             minWidth: 105,
-            valueFormatter: cellFormat,
+            cellRenderer: (params: any) => {
+              let values = params.value;
+              if (values === undefined) {
+                return "";
+              }
+              if (values === null) {
+                values = 0;
+              }
+              return `<a  style="text-decoration: underline" onclick='gotoPages("完成任务数",${JSON.stringify(params.data)})'>${values}</a>`;
+            }
           },
           {
             headerName: '修复Bug数',
             field: 'resolvedBug',
             minWidth: 105,
-            valueFormatter: cellFormat,
+            cellRenderer: (params: any) => {
+              let values = params.value;
+              if (values === undefined) {
+                return "";
+              }
+              if (values === null) {
+                values = 0;
+              }
+              return `<a  style="text-decoration: underline" onclick='gotoPages("修复Bug数",${JSON.stringify(params.data)})'>${values}</a>`;
+            }
           },
           {
             headerName: '进行中任务数',
             field: 'doingTask',
             minWidth: 115,
-            valueFormatter: cellFormat,
+            cellRenderer: (params: any) => {
+              let values = params.value;
+              if (values === undefined) {
+                return "";
+              }
+              if (values === null) {
+                values = 0;
+              }
+              return `<a  style="text-decoration: underline" onclick='gotoPages("进行中任务数",${JSON.stringify(params.data)})'>${values}</a>`;
+            }
           },
           {
             headerName: '代码提交次数',
@@ -791,7 +892,7 @@ const FrontTableList: React.FC<any> = () => {
             minWidth: 105,
             cellRenderer: (params: any) => {
               if (params.data) {
-                return `<span style="color: blue"> 查看</span>`;
+                return `<a>查看</a>`;
               }
               return '';
             },

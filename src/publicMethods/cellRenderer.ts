@@ -921,6 +921,12 @@ const projectStageRender = (params: any) => {
   return values;
 };
 
+const TimestampRender = (params: any) => {
+  if (params.value) {
+    return dayjs(Number(params.value)).format("YYYY-MM-DD HH:mm:ss");
+  }
+  return params.value;
+};
 export {
   numberRenderToYesNo,
   numberRenderTopass,
@@ -951,6 +957,7 @@ export {
   groupRender,
   areaRender,
   attendanceRender,
-  projectStageRender
+  projectStageRender,
+  TimestampRender
 };
 

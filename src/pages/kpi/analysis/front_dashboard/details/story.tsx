@@ -9,10 +9,10 @@ import {GqlClient, useGqlClient} from '@/hooks';
 import {PageHeader} from 'antd';
 import {history} from 'umi';
 import {
-  numberRenderToCurrentStage,
+
   numberRenderToZentaoSeverity,
   numberRenderToZentaoStatus,
-  linkToZentaoPage
+  TimestampRender
 } from '@/publicMethods/cellRenderer';
 
 import {getHeight} from '@/publicMethods/pageSet';
@@ -31,140 +31,111 @@ const colums = () => {
       },
     },
     {
-      headerName: '当前阶段',
-      field: 'stage',
-      cellRenderer: numberRenderToCurrentStage,
-    },
-    {
-      headerName: '对应测试',
-      field: 'tester',
-    },
-    {
-      headerName: '禅道类型',
-      field: 'category',
-    },
-    {
       headerName: '禅道编号',
       field: 'ztNo',
-      cellRenderer: linkToZentaoPage,
+      maxWidth: 110,
+      cellRenderer: (params: any) => {
+        return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/story-view-${params.value}.html'>${params.value}</a>`;
+      },
     },
     {
       headerName: '标题内容',
       field: 'title',
+      width: 250,
     },
     {
       headerName: '严重程度',
       field: 'severity',
       cellRenderer: numberRenderToZentaoSeverity,
-      hide: true
+      maxWidth: 110,
     },
     {
       headerName: '优先级',
-      field: 'priority',
-    },
-    {
-      headerName: '所属模块',
-      field: 'moduleName',
+      field: 'pri',
+      maxWidth: 100,
     },
     {
       headerName: '禅道状态',
-      field: 'ztStatus',
+      field: 'status',
       cellRenderer: numberRenderToZentaoStatus,
+      maxWidth: 110,
     },
-    // {
-    //   headerName: '相关task数',
-    //   field: 'relatedTasks',
-    // },
-    // {
-    //   headerName: '相关bug数',
-    //   field: 'relatedBugs',
-    // },
     {
       headerName: '指派给',
       field: 'assignedTo',
+      maxWidth: 110,
     },
-    // {
-    //   headerName: '由谁完成',
-    //   field: 'finishedBy',
-    // },
-    // {
-    //   headerName: '由谁关闭',
-    //   field: 'closedBy',
-    // },
-    // {
-    //   headerName: '计划提测时间',
-    //   field: 'expectTest',
-    // }
+    {
+      headerName: "创建时间",
+      field: 'openedAt',
+      cellRenderer: TimestampRender,
+      maxWidth: 200,
+    },
   );
 
   return component;
 };
 
-
-const addNewAttributes = (source: any) => {
-  const result = [];
-  console.log("原始数据");
-  const {data} = source[0];
-  for (let index = 0; index < data.length; index += 1) {
-    const details = data[index];
-    details["category"] = "需求";
-    result.push(details);
-  }
-  return result;
-};
-
-// 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
+
+  let type = 0;
+  if (params.title === "初始需求数") {
+    type = 3;
+  } else if (params.title === "初始需求完成数") {
+    type = 4;
+  } else if (params.title === "追加需求数") {
+    type = 5;
+  } else if (params.title === "追加需求完成数") {
+    type = 6;
+  } else if (params.title === "交付需求数") {
+    type = 8;
+  }
+
   const {data} = await client.query(`
       {
-       dashSingleItem(project:${params.prjId},kindName:"${params.prjKind}",itemName:"${params.itemName}") {
-        name
-        data{
-           id
-          stage
-          tester
+        dashFrontLinkTo(kind:${type},userId:"${params.userId}",start:"${params.start}",end:"${params.end}"){
           ztNo
           title
           severity
-          priority
-          moduleName
-          ztStatus
-          relatedTasks
-          relatedBugs
+          pri
+          status
+          openedAt
           assignedTo
-          finishedBy
-          closedBy
-          expectTest
         }
-      }
       }
   `);
 
-  return addNewAttributes(data?.dashSingleItem);
+  return data?.dashFrontLinkTo;
 };
 
 
 // 组件初始化
 const StoryDetails: React.FC<any> = () => {
   /* 获取网页的项目id */
-  const projectInfo = {
-    prjId: "",
-    prjNames: "测试",
-    prjKind: "story",
-    itemName: ""
+  const userData = {
+    title: "",
+    userName: "",
+    userId: "",
+    start: "",
+    end: ""
   };
 
-  // const location = history.location.query;
-  // if (location !== undefined && location.projectid !== null) {
-  //   projectInfo.prjId = location.projectid.toString();
-  //   projectInfo.prjNames = location.project === null ? '' : location.project.toString();
-  //   projectInfo.itemName = location.item === null ? '' : location.item.toString();
-  //
-  // }
+  const location = history.location.query;
+  if (location !== undefined) {
+
+    userData.title = location?.title === null ? "" : location?.title.toString();
+    const nameArray = location.users === null ? ["", ""] : (location.users).toString().split(',');
+    userData.userId = nameArray[0].toString().replace("[", "").trim();
+    userData.userName = nameArray[1].toString().replace("]", "").trim();
+
+    const timeArray = location.time === null ? ["", ""] : (location.time).toString().split(',');
+    userData.start = timeArray[0].toString().replace("[", "").trim();
+    userData.end = timeArray[1].toString().replace("]", "").trim();
+  }
 
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, projectInfo));
+  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, userData));
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -190,7 +161,7 @@ const StoryDetails: React.FC<any> = () => {
 
       <PageHeader
         ghost={false}
-        title={projectInfo.prjNames}
+        title={`${userData.userName}-${userData.title}`}
         style={{height: "100px"}}
         breadcrumb={{routes}}
       />

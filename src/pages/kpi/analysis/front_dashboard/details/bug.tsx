@@ -9,14 +9,12 @@ import {GqlClient, useGqlClient} from '@/hooks';
 import {PageHeader} from 'antd';
 import {history} from 'umi';
 import {
-  numberRenderToCurrentStage,
   numberRenderToZentaoSeverity,
   numberRenderToZentaoStatus,
-  linkToZentaoPage
+  TimestampRender
 } from '@/publicMethods/cellRenderer';
 
 import {getHeight} from '@/publicMethods/pageSet';
-
 
 // 定义列名
 const colums = () => {
@@ -31,159 +29,107 @@ const colums = () => {
       },
     },
     {
-      headerName: '当前阶段',
-      field: 'stage',
-      cellRenderer: numberRenderToCurrentStage,
-    },
-    {
-      headerName: '对应测试',
-      field: 'tester',
-    },
-    {
-      headerName: '禅道类型',
-      field: 'category',
-
-    },
-    {
       headerName: '禅道编号',
       field: 'ztNo',
-      cellRenderer: linkToZentaoPage,
+      maxWidth: 110,
+      cellRenderer: (params: any) => {
+        return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/bug-view-${params.value}.html'>${params.value}</a>`;
+      },
     },
     {
       headerName: '标题内容',
       field: 'title',
+      width: 250,
     },
     {
       headerName: '严重程度',
       field: 'severity',
       cellRenderer: numberRenderToZentaoSeverity,
+      maxWidth: 110,
     },
     {
       headerName: '优先级',
-      field: 'priority',
-    },
-    {
-      headerName: '所属模块',
-      field: 'moduleName',
+      field: 'pri',
+      maxWidth: 100,
     },
     {
       headerName: '禅道状态',
-      field: 'ztStatus',
+      field: 'status',
       cellRenderer: numberRenderToZentaoStatus,
+      maxWidth: 110,
     },
-    // {
-    //   headerName: '相关需求数',
-    //   field: 'relatedStories',
-    // },
-    // {
-    //   headerName: '相关任务数',
-    //   field: 'relatedTasks',
-    // },
     {
       headerName: '指派给',
       field: 'assignedTo',
+      maxWidth: 110,
     },
     {
-      headerName: '由谁解决',
-      field: 'resolvedBy',
+      headerName: "创建时间",
+      field: 'openedAt',
+      cellRenderer: TimestampRender,
+      maxWidth: 200,
     },
-    // {
-    //   headerName: '由谁关闭',
-    //   field: 'closedBy',
-    // },
-    // {
-    //   headerName: '激活时长',
-    //   field: 'activeDuration',
-    // },
-    // {
-    //   headerName: '解决时长',
-    //   field: 'solveDuration',
-    // },
-    // {
-    //   headerName: '回验时长',
-    //   field: 'verifyDuration',
-    // },
-    // {
-    //   headerName: '关闭时长',
-    //   field: 'closedDuration',
-    // }
   );
 
   return component;
 };
 
-const addNewAttributes = (source: any) => {
 
-  const result = [];
-
-  const {data} = source[0];
-  if (data !== null) {
-    for (let index = 0; index < data.length; index += 1) {
-      const details = data[index];
-      details["category"] = "bug";
-      result.push(details);
-    }
-  }
-
-  return result;
-};
-
-// 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
+  let type = 0;
+  if (params.title === "Bug响应数") {
+    type = 2;
+  } else if (params.title === "对外请求未响应数") {
+    type = 7;
+  } else if (params.title === "修复Bug数") {
+    type = 10;
+  }
 
   const {data} = await client.query(`
       {
-       dashSingleItem(project:${params.prjId},kindName:"${params.kind}",itemName:"${params.itemName}") {
-        name
-        data{
-           id
-          stage
-          tester
+        dashFrontLinkTo(kind:${type},userId:"${params.userId}",start:"${params.start}",end:"${params.end}"){
           ztNo
           title
           severity
-          priority
-          moduleName
-          ztStatus
-          relatedStories
-          relatedTasks
-          relatedBugs
+          pri
+          status
+          openedAt
           assignedTo
-          resolvedBy
-          closedBy
-          activeDuration
-          solveDuration
-          verifyDuration
-          closedDuration
         }
-      }
       }
   `);
 
-  return addNewAttributes(data?.dashSingleItem);
+  return data?.dashFrontLinkTo;
 };
 
 
 // 组件初始化
 const BugDetails: React.FC<any> = () => {
   /* 获取网页的项目id */
-  const projectInfo = {
-    prjId: "",
-    prjNames: "测试",
-    prjKind: "bug",
-    itemName: ""
+  const userData = {
+    title: "",
+    userName: "",
+    userId: "",
+    start: "",
+    end: ""
   };
 
-  // const location = history.location.query;
-  // if (location !== undefined && location.projectid !== null) {
-  //   projectInfo.prjId = location.projectid.toString();
-  //   projectInfo.prjNames = location.project === null ? '' : location.project.toString();
-  //   projectInfo.itemName = location.item === null ? '' : location.item.toString();
-  // }
+  const location = history.location.query;
+  if (location !== undefined) {
+
+    userData.title = location?.title === null ? "" : location?.title.toString();
+    const nameArray = location.users === null ? ["", ""] : (location.users).toString().split(',');
+    userData.userId = nameArray[0].toString().replace("[", "").trim();
+    userData.userName = nameArray[1].toString().replace("]", "").trim();
+
+    const timeArray = location.time === null ? ["", ""] : (location.time).toString().split(',');
+    userData.start = timeArray[0].toString().replace("[", "").trim();
+    userData.end = timeArray[1].toString().replace("]", "").trim();
+  }
 
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, projectInfo));
+  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, userData));
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -209,7 +155,7 @@ const BugDetails: React.FC<any> = () => {
 
       <PageHeader
         ghost={false}
-        title={projectInfo.prjNames}
+        title={`${userData.userName}-${userData.title}`}
         style={{height: "100px"}}
         breadcrumb={{routes}}
       />
@@ -225,6 +171,7 @@ const BugDetails: React.FC<any> = () => {
             filter: true,
             flex: 1,
             minWidth: 100,
+            suppressMenu: true,
           }}
           autoGroupColumnDef={{
             minWidth: 100,

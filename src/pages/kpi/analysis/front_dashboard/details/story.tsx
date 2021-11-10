@@ -43,12 +43,12 @@ const colums = () => {
       field: 'title',
       width: 250,
     },
-    {
-      headerName: '严重程度',
-      field: 'severity',
-      cellRenderer: numberRenderToZentaoSeverity,
-      maxWidth: 110,
-    },
+    // {
+    //   headerName: '严重程度',
+    //   field: 'severity',
+    //   cellRenderer: numberRenderToZentaoSeverity,
+    //   maxWidth: 110,
+    // },
     {
       headerName: '优先级',
       field: 'pri',

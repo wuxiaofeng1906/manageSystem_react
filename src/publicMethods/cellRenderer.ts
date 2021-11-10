@@ -527,7 +527,7 @@ const numberRenderToZentaoSeverity = (params: any) => {
   //  P2 = 3,
   //  P3 = 4,
   let severity = "";
-  switch (params.value) {
+  switch (params.value.toString()) {
     case "1":
       severity = "P0";
       break;

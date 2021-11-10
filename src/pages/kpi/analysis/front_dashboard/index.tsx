@@ -91,6 +91,7 @@ const alayThroughputData = (source: any, startTime: string, endTime: string) => 
 const alayRequestDatas = (oldData: any, reqDatas: any, avgRequestDura: any, bugResponseDuraCount: any,
                           appendFinishCount: any, appendStoryCount: any, initFinishCount: any, initStotryCount: any) => {
 
+    debugger;
     // 连接 对外请求--对外请求未响应数
     const reqResult: any = [];
     oldData.forEach((o_dts: any) => {
@@ -249,7 +250,7 @@ const alayRequestDatas = (oldData: any, reqDatas: any, avgRequestDura: any, bugR
 const queryFrontData = async (client: GqlClient<object>, params: any) => {
   const condition = `start:"${params.start}",end:"${params.end}"`;
 
-  // 吞吐量:dashFront,对外请求未响应数:notResponse
+  // 吞吐量:dashFront,对外请求未响应数:notResponse,初始需求完成数：initFinishCount
   const {data} = await client.query(`{
           dashFront(${condition}){
             userId
@@ -681,6 +682,20 @@ const FrontTableList: React.FC<any> = () => {
 
 
   const getSourceColums = () => {
+
+
+    // BUG_RESPONSE_DURATION = 1, // bug响应时长
+    //   BUG_RESPONSE_COUNT, // bug响应数
+    //   INIT_STORY_COUNT, // 初始需求数
+    //   INIT_STORY_COMPLETE, // 初始需求完成数
+    //   APPEND_STORY_COUNT, // 追加需求数
+    //   APPEND_STORY_COMPLETE, // 追加需求完成数
+    //   EXTERNAL_REQU_NOT_RESP_COUNT, // 对外请求未响应数
+    //   FINISHED_STORY_COUNT, // 交付需求数
+    //   FINISHED_TASK_COUNT, // 交付任务数
+    //   REPAIRED_BUG_COUNT, //修复bug数
+    //   DOING_TASK_COUNT, //进行中任务数
+
     // 获取缓存的字段
     const fields = localStorage.getItem('data_front_dashboard');
 
@@ -718,13 +733,13 @@ const FrontTableList: React.FC<any> = () => {
             headerName: 'Bug响应时长(H)',
             field: 'solveDur',
             minWidth: 133,
-            type:'rightAligned',
+            type: 'rightAligned',
             valueFormatter: timeCellFormat,
           },
           {
             headerName: 'Bug响应数',
             field: 'solveCount',
-            type:'rightAligned',
+            type: 'rightAligned',
             minWidth: 88,
             cellRenderer: (params: any) => {
               if (params.value === undefined) {
@@ -741,7 +756,7 @@ const FrontTableList: React.FC<any> = () => {
           {
             headerName: '初始需求数',
             field: 'initCount',
-            type:'rightAligned',
+            type: 'rightAligned',
             minWidth: 105,
             cellRenderer: (params: any) => {
               if (params.value === undefined) {
@@ -753,7 +768,7 @@ const FrontTableList: React.FC<any> = () => {
           {
             headerName: '初始需求完成数',
             field: 'initFinishCount',
-            type:'rightAligned',
+            type: 'rightAligned',
             minWidth: 130,
             cellRenderer: (params: any) => {
               if (params.value === undefined) {
@@ -765,7 +780,7 @@ const FrontTableList: React.FC<any> = () => {
           {
             headerName: '追加需求数',
             field: 'appStoryCount',
-            type:'rightAligned',
+            type: 'rightAligned',
             minWidth: 105,
             cellRenderer: (params: any) => {
               if (params.value === undefined) {
@@ -777,7 +792,7 @@ const FrontTableList: React.FC<any> = () => {
           {
             headerName: '追加需求完成数',
             field: 'appdFinishCount',
-            type:'rightAligned',
+            type: 'rightAligned',
             minWidth: 130,
             cellRenderer: (params: any) => {
               if (params.value === undefined) {
@@ -795,7 +810,7 @@ const FrontTableList: React.FC<any> = () => {
             headerName: '对外请求未响应数',
             field: 'reCount',
             minWidth: 140,
-            type:'rightAligned',
+            type: 'rightAligned',
             cellRenderer: (params: any) => {
               if (params.value === undefined) {
                 return "";
@@ -806,7 +821,7 @@ const FrontTableList: React.FC<any> = () => {
           {
             headerName: '请求平均等待时长（H）',
             field: 'waitDura',
-            type:'rightAligned',
+            type: 'rightAligned',
             minWidth: 180,
             valueFormatter: timeCellFormat,
           },
@@ -820,7 +835,7 @@ const FrontTableList: React.FC<any> = () => {
             headerName: '交付需求数',
             field: 'finiStory',
             minWidth: 105,
-            type:'rightAligned',
+            type: 'rightAligned',
             cellRenderer: (params: any) => {
               let values = params.value;
               if (values === undefined) {
@@ -836,7 +851,7 @@ const FrontTableList: React.FC<any> = () => {
             headerName: '完成任务数',
             field: 'finiTask',
             minWidth: 105,
-            type:'rightAligned',
+            type: 'rightAligned',
             cellRenderer: (params: any) => {
               let values = params.value;
               if (values === undefined) {
@@ -852,7 +867,7 @@ const FrontTableList: React.FC<any> = () => {
             headerName: '修复Bug数',
             field: 'resolvedBug',
             minWidth: 105,
-            type:'rightAligned',
+            type: 'rightAligned',
             cellRenderer: (params: any) => {
               let values = params.value;
               if (values === undefined) {
@@ -868,7 +883,7 @@ const FrontTableList: React.FC<any> = () => {
             headerName: '进行中任务数',
             field: 'doingTask',
             minWidth: 115,
-            type:'rightAligned',
+            type: 'rightAligned',
             cellRenderer: (params: any) => {
               let values = params.value;
               if (values === undefined) {
@@ -884,14 +899,14 @@ const FrontTableList: React.FC<any> = () => {
             headerName: '代码提交次数',
             field: 'codeCommit',
             minWidth: 115,
-            type:'rightAligned',
+            type: 'rightAligned',
             valueFormatter: cellFormat,
           },
           {
             headerName: '代码新增行数',
             field: 'newLine',
             minWidth: 115,
-            type:'rightAligned',
+            type: 'rightAligned',
             valueFormatter: cellFormat,
           },
         ],

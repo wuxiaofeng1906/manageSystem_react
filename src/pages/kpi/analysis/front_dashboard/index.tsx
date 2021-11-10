@@ -718,11 +718,13 @@ const FrontTableList: React.FC<any> = () => {
             headerName: 'Bug响应时长(H)',
             field: 'solveDur',
             minWidth: 133,
+            type:'rightAligned',
             valueFormatter: timeCellFormat,
           },
           {
             headerName: 'Bug响应数',
             field: 'solveCount',
+            type:'rightAligned',
             minWidth: 88,
             cellRenderer: (params: any) => {
               if (params.value === undefined) {
@@ -739,6 +741,7 @@ const FrontTableList: React.FC<any> = () => {
           {
             headerName: '初始需求数',
             field: 'initCount',
+            type:'rightAligned',
             minWidth: 105,
             cellRenderer: (params: any) => {
               if (params.value === undefined) {
@@ -750,6 +753,7 @@ const FrontTableList: React.FC<any> = () => {
           {
             headerName: '初始需求完成数',
             field: 'initFinishCount',
+            type:'rightAligned',
             minWidth: 130,
             cellRenderer: (params: any) => {
               if (params.value === undefined) {
@@ -761,6 +765,7 @@ const FrontTableList: React.FC<any> = () => {
           {
             headerName: '追加需求数',
             field: 'appStoryCount',
+            type:'rightAligned',
             minWidth: 105,
             cellRenderer: (params: any) => {
               if (params.value === undefined) {
@@ -772,6 +777,7 @@ const FrontTableList: React.FC<any> = () => {
           {
             headerName: '追加需求完成数',
             field: 'appdFinishCount',
+            type:'rightAligned',
             minWidth: 130,
             cellRenderer: (params: any) => {
               if (params.value === undefined) {
@@ -789,6 +795,7 @@ const FrontTableList: React.FC<any> = () => {
             headerName: '对外请求未响应数',
             field: 'reCount',
             minWidth: 140,
+            type:'rightAligned',
             cellRenderer: (params: any) => {
               if (params.value === undefined) {
                 return "";
@@ -799,6 +806,7 @@ const FrontTableList: React.FC<any> = () => {
           {
             headerName: '请求平均等待时长（H）',
             field: 'waitDura',
+            type:'rightAligned',
             minWidth: 180,
             valueFormatter: timeCellFormat,
           },
@@ -812,7 +820,7 @@ const FrontTableList: React.FC<any> = () => {
             headerName: '交付需求数',
             field: 'finiStory',
             minWidth: 105,
-
+            type:'rightAligned',
             cellRenderer: (params: any) => {
               let values = params.value;
               if (values === undefined) {
@@ -828,6 +836,7 @@ const FrontTableList: React.FC<any> = () => {
             headerName: '完成任务数',
             field: 'finiTask',
             minWidth: 105,
+            type:'rightAligned',
             cellRenderer: (params: any) => {
               let values = params.value;
               if (values === undefined) {
@@ -843,6 +852,7 @@ const FrontTableList: React.FC<any> = () => {
             headerName: '修复Bug数',
             field: 'resolvedBug',
             minWidth: 105,
+            type:'rightAligned',
             cellRenderer: (params: any) => {
               let values = params.value;
               if (values === undefined) {
@@ -858,6 +868,7 @@ const FrontTableList: React.FC<any> = () => {
             headerName: '进行中任务数',
             field: 'doingTask',
             minWidth: 115,
+            type:'rightAligned',
             cellRenderer: (params: any) => {
               let values = params.value;
               if (values === undefined) {
@@ -873,12 +884,14 @@ const FrontTableList: React.FC<any> = () => {
             headerName: '代码提交次数',
             field: 'codeCommit',
             minWidth: 115,
+            type:'rightAligned',
             valueFormatter: cellFormat,
           },
           {
             headerName: '代码新增行数',
             field: 'newLine',
             minWidth: 115,
+            type:'rightAligned',
             valueFormatter: cellFormat,
           },
         ],

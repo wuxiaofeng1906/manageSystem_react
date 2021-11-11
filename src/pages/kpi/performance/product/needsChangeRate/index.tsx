@@ -204,7 +204,7 @@ const queryStoryChangeRate = async (timeFlag: string) => {
       } else {
         message.error({
           content: `错误：${res.data.msg}`,
-          duration: 1, // 1S 后自动关闭
+          duration: 1,
           style: {
             marginTop: '50vh',
           },
@@ -216,7 +216,7 @@ const queryStoryChangeRate = async (timeFlag: string) => {
 
       message.error({
         content: `异常信息:${error.toString()}`,
-        duration: 1, // 1S 后自动关闭
+        duration: 1,
         style: {
           marginTop: '50vh',
         },
@@ -330,8 +330,8 @@ const NeedsChangeRate: React.FC<any> = () => {
 
       <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
         <AgGridReact
-          columnDefs={columsForQuarters()} // 定义列
-          rowData={data} // 数据绑定
+          columnDefs={columsForQuarters()}
+          rowData={data}
           defaultColDef={{
             resizable: true,
             sortable: true,
@@ -343,8 +343,8 @@ const NeedsChangeRate: React.FC<any> = () => {
             minWidth: 250,
             sort: 'asc'
           }}
-          groupDefaultExpanded={9} // 展开分组
-          suppressAggFuncInHeader={true}   // 不显示标题聚合函数的标识
+          groupDefaultExpanded={9}
+          suppressAggFuncInHeader={true}
           rowHeight={32}
           headerHeight={35}
           onGridReady={onGridReady}
@@ -355,7 +355,6 @@ const NeedsChangeRate: React.FC<any> = () => {
       <div>
         <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
                 placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
-
 
           <p><strong>1.统计周期</strong></p>
           <p style={cssIndent}>按周统计：企业微信变更申请提交日期为周一00:00:00--周日23:59:59；</p>

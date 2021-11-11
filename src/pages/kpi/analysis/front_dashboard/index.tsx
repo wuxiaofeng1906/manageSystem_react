@@ -91,7 +91,6 @@ const alayThroughputData = (source: any, startTime: string, endTime: string) => 
 const alayRequestDatas = (oldData: any, reqDatas: any, avgRequestDura: any, bugResponseDuraCount: any,
                           appendFinishCount: any, appendStoryCount: any, initFinishCount: any, initStotryCount: any) => {
 
-    debugger;
     // 连接 对外请求--对外请求未响应数
     const reqResult: any = [];
     oldData.forEach((o_dts: any) => {
@@ -223,11 +222,15 @@ const alayRequestDatas = (oldData: any, reqDatas: any, avgRequestDura: any, bugR
 
     // 追加需求完成数
     const appendFinishCountResult: any = [];
+    let appendFinishCounts = appendFinishCount;
+    if (!appendFinishCount) {
+      appendFinishCounts = [];
+    }
     appendStoryCountResult.forEach((o_dts: any) => {
       let flag = 0;
       const o_details = o_dts;
-      for (let index = 0; index < appendFinishCount.length; index += 1) {
-        const dts = appendFinishCount[index];
+      for (let index = 0; index < appendFinishCounts.length; index += 1) {
+        const dts = appendFinishCounts[index];
         if (o_details.userId === dts.userId) {
           o_details['appdFinishCount'] = dts.count;
           appendFinishCountResult.push(o_details);

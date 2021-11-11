@@ -316,7 +316,7 @@ const converseArrayToOne = (data: any) => {
   return resultData;
 };
 
-const queryBugResolutionCount = async (client: GqlClient<object>, params: string) => {
+const queryCodesCount = async (client: GqlClient<object>, params: string) => {
 
   const condition = getParamsByType(params);
   if (condition.typeFlag === 0) {
@@ -376,7 +376,7 @@ const WeekCodeTableList: React.FC<any> = () => {
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
-    queryBugResolutionCount(gqlClient, 'quarter'),
+    queryCodesCount(gqlClient, 'quarter'),
   );
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -403,7 +403,7 @@ const WeekCodeTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const weekColums = columsForWeeks();
     gridApi.current?.setColumnDefs(weekColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'week');
+    const datas: any = await queryCodesCount(gqlClient, 'week');
     gridApi.current?.setRowData(datas);
 
   };
@@ -414,7 +414,7 @@ const WeekCodeTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const monthColums = columsForMonths();
     gridApi.current?.setColumnDefs(monthColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'month');
+    const datas: any = await queryCodesCount(gqlClient, 'month');
     gridApi.current?.setRowData(datas);
 
   };
@@ -425,16 +425,16 @@ const WeekCodeTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const quartersColums = columsForQuarters();
     gridApi.current?.setColumnDefs(quartersColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'quarter');
+    const datas: any = await queryCodesCount(gqlClient, 'quarter');
     gridApi.current?.setRowData(datas);
   };
 
   // 按年统计
   const statisticsByYear = async () => {
     gridApi.current?.setColumnDefs([]);
-    const quartersColums = columsForYears();
-    gridApi.current?.setColumnDefs(quartersColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'year');
+    const yearColums = columsForYears();
+    gridApi.current?.setColumnDefs(yearColums);
+    const datas: any = await queryCodesCount(gqlClient, 'year');
     gridApi.current?.setRowData(datas);
   };
 

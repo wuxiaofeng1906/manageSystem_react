@@ -6,17 +6,23 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient} from '@/hooks';
 import {
   getWeeksRange,
   getMonthWeek,
   getTwelveMonthTime,
   getFourQuarterTime,
-  getParamsByType
+  getYearsTime
 } from '@/publicMethods/timeMethods';
-import {Button, Drawer} from "antd";
-import {ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone} from "@ant-design/icons";
+import {Button, Drawer, message} from "antd";
+import {
+  ScheduleTwoTone,
+  CalendarTwoTone,
+  ProfileTwoTone,
+  QuestionCircleTwoTone,
+  AppstoreTwoTone
+} from "@ant-design/icons";
 import {getHeight} from "@/publicMethods/pageSet";
+import axios from "axios";
 
 
 // 获取近四周的时间范围
@@ -24,7 +30,6 @@ const weekRanges = getWeeksRange(8);
 const monthRanges = getTwelveMonthTime();
 const quarterTime = getFourQuarterTime(true);
 const groupValues: any[] = [];
-const moduleValues: any[] = [];
 
 /* region 动态定义列 */
 const compColums = [
@@ -44,6 +49,7 @@ const compColums = [
   }];
 
 function codeNumberRender(values: any) {
+
   const rowName = values.rowNode.key;
   for (let i = 0; i < groupValues.length; i += 1) {
     const datas = groupValues[i];
@@ -112,6 +118,22 @@ const columsForQuarters = () => {
     });
 
   }
+
+  return compColums.concat(component);
+};
+
+const columsForYears = () => {
+  const yearsTime = getYearsTime();
+  const component = new Array();
+  for (let index = 0; index < yearsTime.length; index += 1) {
+    component.push({
+      headerName: yearsTime[index].title,
+      field: yearsTime[index].start,
+      aggFunc: codeNumberRender,
+      cellRenderer: colorRender
+    });
+
+  }
   return compColums.concat(component);
 };
 
@@ -124,7 +146,6 @@ const columsForQuarters = () => {
 const converseFormatForAgGrid = (oraDatas: any) => {
 
   groupValues.length = 0;
-  moduleValues.length = 0;
 
   const arrays: any[] = [];
   if (oraDatas === null) {
@@ -132,120 +153,77 @@ const converseFormatForAgGrid = (oraDatas: any) => {
   }
 
   for (let index = 0; index < oraDatas.length; index += 1) {
+    const dt_data = oraDatas[index];
+    const deptData = dt_data.change_rate;
+    const username = dt_data.user;
+    if (username === "dept") {
 
-    const starttime = oraDatas[index].range.start;
-
-    groupValues.push({
-      time: starttime,
-      group: "研发中心",
-      // values: oraDatas[index].total.kpi
-      values: oraDatas[index].datas[0].kpi   // 对研发中心的值进行特殊处理等于部门的值
-
-    });
-
-    const data = oraDatas[index].datas;
-    for (let i = 0; i < data.length; i += 1) {
-
-      groupValues.push({
+      deptData.forEach((ele: any) => {
+        const starttime = (ele.time_interval)[0];
+        groupValues.push({
           time: starttime,
-          group: data[i].deptName,
-          values: data[i].kpi
-        }
-        // , {
-        //   time: starttime,
-        //   group: data[i].parent === null ? "" : data[i].parent.deptName,
-        //   values: data[i].parent === null ? "" : data[i].parent.kpi
-        // }
-      );
+          group: "研发中心",
+          values: ele.change_rate
+        }, {
+          time: starttime,
+          group: "产品管理部",
+          values: ele.change_rate
+        });
+      });
+    } else {
+      const dataObject = {
+        devCenter: "研发中心",
+        group: "产品管理部",
+        "username": username
+      };
 
-      const usersData = data[i].users;
-      if (usersData !== null) {
-        for (let m = 0; m < usersData.length; m += 1) {
-          const username = usersData[m].userName;
-          if (username !== "薛峰") {
-            arrays.push({
-              devCenter: "研发中心",
-              group: data[i].deptName,
-              "username": username,
-              [starttime]: usersData[m].kpi
-            });
-          }
-        }
-      }
+      deptData.forEach((ele: any) => {
+        const starttime = (ele.time_interval)[0];
+        dataObject[starttime] = ele.change_rate;
+      });
+
+      arrays.push(dataObject);
     }
   }
 
   return arrays;
 };
 
-const converseArrayToOne = (data: any) => {
-  const resultData = new Array();
-  for (let index = 0; index < data.length; index += 1) {
-    let repeatFlag = false;
-    // 判断原有数组是否包含有名字
-    for (let m = 0; m < resultData.length; m += 1) {
-      if (resultData[m].username === data[index].username) {
-        repeatFlag = true;
-        break;
+
+const queryStoryChangeRate = async (timeFlag: string) => {
+
+  let datas: any = [];
+  const paramData = {interval: timeFlag, person_or_project: "person"};
+  await axios.get('/api/verify/apply/change_rate', {params: paramData})
+    .then(function (res) {
+
+      if (res.data.code === 200) {
+
+        datas = converseFormatForAgGrid(res.data.data);
+
+      } else {
+        message.error({
+          content: `错误：${res.data.msg}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
       }
-    }
 
-    if (repeatFlag === false) {
-      const tempData = {};
-      for (let index2 = 0; index2 < data.length; index2 += 1) {
-        tempData["username"] = data[index].username;
 
-        if (data[index].username === data[index2].username) {
-          const key = Object.keys(data[index2]);  // 获取所有的Key值
-          key.forEach(function (item) {
-            tempData[item] = data[index2][item];
-          });
-        }
-      }
-      resultData.push(tempData);
-    }
-  }
+    }).catch(function (error) {
 
-  return resultData;
-};
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
 
-const queryBugResolutionCount = async (client: GqlClient<object>, params: string) => {
-  const condition = getParamsByType(params, true);
-  if (condition.typeFlag === 0) {
-    return [];
-  }
-  const {data} = await client.query(`
-      {
-        proChangeApply(kind: "${condition.typeFlag}", ends: ${condition.ends}){
-          total {
-            dept
-            deptName
-            kpi
-          }
-          range {
-            start
-            end
-          }
-          datas {
-            dept
-            deptName
-            kpi
-            parent {
-              dept
-              deptName
-            }
-            users {
-              userId
-              userName
-              kpi
-            }
-          }
-        }
-      }
-  `);
-
-  const datas = converseFormatForAgGrid(data?.proChangeApply);
-  return converseArrayToOne(datas);
+  return datas;
 };
 
 /* endregion */
@@ -253,11 +231,9 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
 const NeedsChangeRate: React.FC<any> = () => {
 
   /* region ag-grid */
-  const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
-    queryBugResolutionCount(gqlClient, 'quarter'),
+    queryStoryChangeRate('quarter'),
   );
-
 
   const gridApi = useRef<GridApi>();
   const onGridReady = (params: GridReadyEvent) => {
@@ -284,7 +260,7 @@ const NeedsChangeRate: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const weekColums = columsForWeeks();
     gridApi.current?.setColumnDefs(weekColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'week');
+    const datas: any = await queryStoryChangeRate('week');
     gridApi.current?.setRowData(datas);
 
   };
@@ -295,7 +271,7 @@ const NeedsChangeRate: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const monthColums = columsForMonths();
     gridApi.current?.setColumnDefs(monthColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'month');
+    const datas: any = await queryStoryChangeRate('month');
     gridApi.current?.setRowData(datas);
 
 
@@ -308,9 +284,18 @@ const NeedsChangeRate: React.FC<any> = () => {
     const quartersColums = columsForQuarters();
 
     gridApi.current?.setColumnDefs(quartersColums);
-    const datas: any = await queryBugResolutionCount(gqlClient, 'quarter');
+    const datas: any = await queryStoryChangeRate('quarter');
     gridApi.current?.setRowData(datas);
 
+  };
+
+  // 按年统计
+  const statisticsByYear = async () => {
+    gridApi.current?.setColumnDefs([]);
+    const quartersColums = columsForYears();
+    gridApi.current?.setColumnDefs(quartersColums);
+    const datas: any = await queryStoryChangeRate('year');
+    gridApi.current?.setRowData(datas);
   };
 
   /* region 提示规则显示 */
@@ -334,6 +319,9 @@ const NeedsChangeRate: React.FC<any> = () => {
                 onClick={statisticsByMonths}>按月统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
                 onClick={statisticsByQuarters}>按季统计</Button>
+
+        <Button type="text" style={{color: 'black'}} icon={<AppstoreTwoTone/>} size={'large'}
+                onClick={statisticsByYear}>按年统计</Button>
         <label style={{fontWeight: "bold"}}>(统计单位：%)</label>
 
         <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
@@ -342,8 +330,8 @@ const NeedsChangeRate: React.FC<any> = () => {
 
       <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
         <AgGridReact
-          columnDefs={columsForQuarters()} // 定义列
-          rowData={data} // 数据绑定
+          columnDefs={columsForQuarters()}
+          rowData={data}
           defaultColDef={{
             resizable: true,
             sortable: true,
@@ -355,8 +343,8 @@ const NeedsChangeRate: React.FC<any> = () => {
             minWidth: 250,
             sort: 'asc'
           }}
-          groupDefaultExpanded={9} // 展开分组
-          suppressAggFuncInHeader={true}   // 不显示标题聚合函数的标识
+          groupDefaultExpanded={9}
+          suppressAggFuncInHeader={true}
           rowHeight={32}
           headerHeight={35}
           onGridReady={onGridReady}
@@ -367,7 +355,6 @@ const NeedsChangeRate: React.FC<any> = () => {
       <div>
         <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
                 placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
-
 
           <p><strong>1.统计周期</strong></p>
           <p style={cssIndent}>按周统计：企业微信变更申请提交日期为周一00:00:00--周日23:59:59；</p>

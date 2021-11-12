@@ -8,7 +8,7 @@ import type {GridApi, GridReadyEvent} from 'ag-grid-community';
 import type {GqlClient} from '@/hooks';
 import {useGqlClient} from '@/hooks';
 import {Button, Checkbox, Col, DatePicker, Form, message, Modal, Row} from 'antd';
-import {LogoutOutlined, SettingOutlined} from '@ant-design/icons';
+import {LogoutOutlined, QuestionCircleTwoTone, SettingOutlined} from '@ant-design/icons';
 import {getHeight} from '@/publicMethods/pageSet';
 import moment from 'moment';
 import {useRequest} from 'ahooks';
@@ -997,6 +997,7 @@ const FrontTableList: React.FC<any> = () => {
 
   /* endregion */
 
+
   return (
     <PageContainer>
       <div>
@@ -1026,9 +1027,7 @@ const FrontTableList: React.FC<any> = () => {
               style={{width: '30%', marginTop: 7}}
               onChange={onSourceTimeSelected}
               value={[
-                choicedConditionForSource.start === ''
-                  ? null
-                  : moment(choicedConditionForSource.start),
+                choicedConditionForSource.start === '' ? null : moment(choicedConditionForSource.start),
                 choicedConditionForSource.end === '' ? null : moment(choicedConditionForSource.end),
               ]}
             />
@@ -1044,15 +1043,15 @@ const FrontTableList: React.FC<any> = () => {
             </Button>
             <label style={{marginLeft: '-10px', color: 'black'}}> 默认1个月</label>
 
-            <Button
-              type="text"
-              icon={<SettingOutlined/>}
-              size={'large'}
-              onClick={showFieldsModal}
-              style={{float: 'right', marginTop: 5}}
-            >
-              {' '}
+            <Button type="text" style={{marginTop: 4, color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
+                    size={'large'}>
+              <a href={"http://zentao.77hub.com/zentao/story-view-4574.html"} target={"_blank"}> 计算规则</a>
             </Button>
+
+            <Button type="text" icon={<SettingOutlined/>} size={'large'} onClick={showFieldsModal}
+                    style={{float: 'right', marginTop: 5}}>
+            </Button>
+
           </Form.Item>
         </div>
 

@@ -663,6 +663,7 @@ const FrontTableList: React.FC<any> = () => {
       case "Bug响应数":
       case "对外请求未响应数":
       case "修复Bug数":
+      case "请求平均等待时长":
         type = 'bug';
         break;
 
@@ -838,7 +839,18 @@ const FrontTableList: React.FC<any> = () => {
             field: 'waitDura',
             type: 'rightAligned',
             minWidth: 180,
-            valueFormatter: timeCellFormat,
+            // valueFormatter: timeCellFormat,
+            cellRenderer: (params: any) => {
+              if (params.value === undefined) {
+                return "";
+              }
+              if (params.value === null || params.value === 0) {
+                return `<a  style="text-decoration: underline" onclick='gotoPages("请求平均等待时长",${JSON.stringify(params.data)})'>0</a>`;
+              }
+
+              const duration = (Number(params.value) / 3600).toFixed(2);
+              return `<a  style="text-decoration: underline" onclick='gotoPages("请求平均等待时长",${JSON.stringify(params.data)})'>${duration}</a>`;
+            }
           },
         ],
       },

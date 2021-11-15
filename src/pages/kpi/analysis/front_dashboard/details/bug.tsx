@@ -65,7 +65,7 @@ const colums = (title: string) => {
     }
   );
 
-  if (title === "Bug响应时长") {
+  if (title === "Bug响应时长" || title === "请求平均等待时长") {
     component.push({
       headerName: "响应时长",
       field: 'duration',
@@ -91,20 +91,30 @@ const colums = (title: string) => {
 
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
 
-  let type = 0;
-  if (params.title === "Bug响应时长") {
-    type = 1;
-  } else if (params.title === "Bug响应数") {
-    type = 2;
-  } else if (params.title === "对外请求未响应数") {
-    type = 7;
-  } else if (params.title === "修复Bug数") {
-    type = 10;
+  const flag = {
+    "Bug响应时长": 1,
+    "Bug响应数": 2,
+    "对外请求未响应数": 7,
+    "修复Bug数": 10,
+    "请求平均等待时长": "12"
   }
+
+  // let type = 0;
+  // if (params.title === "Bug响应时长") {
+  //   type = 1;
+  // } else if (params.title === "Bug响应数") {
+  //   type = 2;
+  // } else if (params.title === "对外请求未响应数") {
+  //   type = 7;
+  // } else if (params.title === "修复Bug数") {
+  //   type = 10;
+  // } else if (params.title === "请求平均等待时长") {
+  //   type = 12;
+  // }
 
   const {data} = await client.query(`
       {
-        dashFrontLinkTo(kind:${type},userId:"${params.userId}",start:"${params.start}",end:"${params.end}"){
+        dashFrontLinkTo(kind:${flag[params.title]},userId:"${params.userId}",start:"${params.start}",end:"${params.end}"){
           ztNo
           title
           severity
@@ -147,6 +157,7 @@ const BugDetails: React.FC<any> = () => {
 
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
+
   const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, userData));
 
   const onGridReady = (params: GridReadyEvent) => {

@@ -67,9 +67,9 @@ const colums = (title: string) => {
 
   if (title === "Bug响应时长" || title === "请求平均等待时长") {
     component.push({
-      headerName: "响应时长（H）",
+      headerName: "响应时长",
       field: 'duration',
-      minWidth: 120,
+      maxWidth: 120,
       cellRenderer: (params: any) => {
         const duration = (Number(params.value) / 3600).toFixed(2);
         return duration;
@@ -99,18 +99,6 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
     "请求平均等待时长": 12
   }
 
-  // let type = 0;
-  // if (params.title === "Bug响应时长") {
-  //   type = 1;
-  // } else if (params.title === "Bug响应数") {
-  //   type = 2;
-  // } else if (params.title === "对外请求未响应数") {
-  //   type = 7;
-  // } else if (params.title === "修复Bug数") {
-  //   type = 10;
-  // } else if (params.title === "请求平均等待时长") {
-  //   type = 12;
-  // }
 
   const {data} = await client.query(`
       {
@@ -127,25 +115,12 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
       }
   `);
 
-
   return data?.dashFrontLinkTo;
 };
 
-const getTotalTime = (datas: any) => {
 
-  let totalTime = 0;
-  if (datas) {
-    datas.forEach((ele: any) => {
-      totalTime += Number(ele.duration);
-    });
-
-    return totalTime / 3600 / datas.length;
-  }
-
-  return totalTime;
-};
 // 组件初始化
-const BugDetails: React.FC<any> = () => {
+const CodeDetails: React.FC<any> = () => {
   /* 获取网页的项目id */
   const userData = {
     title: "",
@@ -172,8 +147,6 @@ const BugDetails: React.FC<any> = () => {
   const gqlClient = useGqlClient();
 
   const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, userData));
-  const totalTime = getTotalTime(data);
-
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -199,7 +172,7 @@ const BugDetails: React.FC<any> = () => {
 
       <PageHeader
         ghost={false}
-        title={`${userData.userName}-${userData.title}-${totalTime}`}
+        title={`${userData.userName}-${userData.title}`}
         style={{height: "100px"}}
         breadcrumb={{routes}}
       />
@@ -229,4 +202,4 @@ const BugDetails: React.FC<any> = () => {
   );
 };
 
-export default BugDetails;
+export default CodeDetails;

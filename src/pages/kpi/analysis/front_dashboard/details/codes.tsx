@@ -31,7 +31,9 @@ const colums = () => {
       field: 'commit',
       minWidth: 300,
       cellRenderer: (params: any) => {
-        return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://gitlab.q7link.com/front/front-theory/commit/${params.value}.html'>${params.value}</a>`;
+
+        const {project} = params.data;
+        return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://gitlab.q7link.com/${project}/commit/${params.value}.html'>${params.value}</a>`;
       },
     },
     {

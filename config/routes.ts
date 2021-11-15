@@ -384,6 +384,13 @@ export default [
             hideInMenu: true,
           },
           {
+            name: 'codes',
+            icon: 'table',
+            path: 'codes',
+            component: './kpi/analysis/front_dashboard/details/codes',
+            hideInMenu: true,
+          },
+          {
             name: 'Bug解决速能',
             icon: 'table',
             path: 'bugResolutionSpeed',

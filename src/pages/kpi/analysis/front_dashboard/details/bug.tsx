@@ -17,7 +17,7 @@ import {
 import {getHeight} from '@/publicMethods/pageSet';
 
 // 定义列名
-const colums = () => {
+const colums = (title: string) => {
   const component = new Array();
   component.push(
     {
@@ -62,22 +62,39 @@ const colums = () => {
       headerName: '指派给',
       field: 'assignedTo',
       maxWidth: 110,
-    },
-    {
-      headerName: "创建时间",
-      field: 'openedAt',
-      cellRenderer: TimestampRender,
-      maxWidth: 200,
-    },
+    }
   );
+
+  if (title === "Bug响应时长") {
+    component.push({
+      headerName: "响应时长",
+      field: 'duration',
+      maxWidth: 120,
+      cellRenderer: (params: any) => {
+        const duration = (Number(params.value) / 3600).toFixed(2);
+        return duration;
+
+      }
+    });
+  }
+
+  component.push({
+    headerName: "创建时间",
+    field: 'openedAt',
+    cellRenderer: TimestampRender,
+    maxWidth: 200,
+  })
 
   return component;
 };
 
 
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
+
   let type = 0;
-  if (params.title === "Bug响应数") {
+  if (params.title === "Bug响应时长") {
+    type = 1;
+  } else if (params.title === "Bug响应数") {
     type = 2;
   } else if (params.title === "对外请求未响应数") {
     type = 7;
@@ -95,6 +112,7 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
           status
           openedAt
           assignedTo
+          duration
         }
       }
   `);
@@ -163,7 +181,7 @@ const BugDetails: React.FC<any> = () => {
       {/* ag-grid 表格定义 */}
       <div className="ag-theme-alpine" style={{height: getHeight(), width: '100%'}}>
         <AgGridReact
-          columnDefs={colums()} // 定义列
+          columnDefs={colums(userData.title)} // 定义列
           rowData={data} // 数据绑定
           defaultColDef={{
             resizable: true,

@@ -659,6 +659,7 @@ const FrontTableList: React.FC<any> = () => {
   (window as any).gotoPages = (title: string, paramData: any) => {
     let type = "";
     switch (title) {
+      case "Bug响应时长":
       case "Bug响应数":
       case "对外请求未响应数":
       case "修复Bug数":
@@ -737,7 +738,18 @@ const FrontTableList: React.FC<any> = () => {
             field: 'solveDur',
             minWidth: 133,
             type: 'rightAligned',
-            valueFormatter: timeCellFormat,
+            // valueFormatter: timeCellFormat,
+            cellRenderer: (params: any) => {
+              if (params.value === undefined) {
+                return "";
+              }
+              if (params.value === null || params.value === 0) {
+                return `<a  style="text-decoration: underline" onclick='gotoPages("Bug响应时长",${JSON.stringify(params.data)})'>0</a>`;
+              }
+
+              const duration = (Number(params.value) / 3600).toFixed(2);
+              return `<a  style="text-decoration: underline" onclick='gotoPages("Bug响应时长",${JSON.stringify(params.data)})'>${duration}</a>`;
+            }
           },
           {
             headerName: 'Bug响应数',

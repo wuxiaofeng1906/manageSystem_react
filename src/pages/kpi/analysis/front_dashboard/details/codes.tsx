@@ -9,81 +9,59 @@ import {GqlClient, useGqlClient} from '@/hooks';
 import {PageHeader} from 'antd';
 import {history} from 'umi';
 import {
-  numberRenderToZentaoSeverity,
-  numberRenderToZentaoStatus,
   TimestampRender
 } from '@/publicMethods/cellRenderer';
 
 import {getHeight} from '@/publicMethods/pageSet';
 
 // 定义列名
-const colums = (title: string) => {
+const colums = () => {
   const component = new Array();
   component.push(
     {
       headerName: '序号',
-      maxWidth: 80,
+      maxWidth: 90,
       filter: false,
       cellRenderer: (params: any) => {
         return Number(params.node.id) + 1;
       },
     },
     {
-      headerName: '禅道编号',
-      field: 'ztNo',
-      maxWidth: 110,
+      headerName: '提交ID',
+      field: 'commit',
+      minWidth: 350,
       cellRenderer: (params: any) => {
-        return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/bug-view-${params.value}.html'>${params.value}</a>`;
+
+        const {project} = params.data;
+        return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://gitlab.q7link.com/${project}/commit/${params.value}.html'>${params.value}</a>`;
       },
     },
     {
-      headerName: '标题内容',
-      field: 'title',
-      width: 250,
+      headerName: '提交人',
+      field: 'author',
+      minWidth: 120,
     },
     {
-      headerName: '严重程度',
-      field: 'severity',
-      cellRenderer: numberRenderToZentaoSeverity,
-      maxWidth: 110,
+      headerName: '描述',
+      field: 'desc',
+      minWidth: 300,
     },
     {
-      headerName: '优先级',
-      field: 'pri',
-      maxWidth: 100,
-    },
-    {
-      headerName: '禅道状态',
-      field: 'status',
-      cellRenderer: numberRenderToZentaoStatus,
-      maxWidth: 110,
-    },
-    {
-      headerName: '指派给',
-      field: 'assignedTo',
-      maxWidth: 110,
+      headerName: '新增行',
+      field: 'newlines',
+      minWidth: 80,
+    }, {
+      headerName: "项目名",
+      field: 'project',
+      minWidth: 150,
+    }, {
+      headerName: "提交时间",
+      field: 'authorAt',
+      cellRenderer: TimestampRender,
+      minWidth: 170,
     }
   );
 
-  if (title === "Bug响应时长" || title === "请求平均等待时长") {
-    component.push({
-      headerName: "响应时长（H）",
-      field: 'duration',
-      minWidth: 120,
-      cellRenderer: (params: any) => {
-        const duration = (Number(params.value) / 3600).toFixed(2);
-        return duration;
-
-      }
-    });
-  }
-
-  component.push({
-    headerName: "创建时间",
-    field: 'openedAt',
-    cellRenderer: TimestampRender,
-    maxWidth: 200,
-  })
 
   return component;
 };
@@ -91,62 +69,26 @@ const colums = (title: string) => {
 
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
 
-  const flag = {
-    "Bug响应时长": 1,
-    "Bug响应数": 2,
-    "对外请求未响应数": 7,
-    "修复Bug数": 10,
-    "请求平均等待时长": 12
-  }
-
-  // let type = 0;
-  // if (params.title === "Bug响应时长") {
-  //   type = 1;
-  // } else if (params.title === "Bug响应数") {
-  //   type = 2;
-  // } else if (params.title === "对外请求未响应数") {
-  //   type = 7;
-  // } else if (params.title === "修复Bug数") {
-  //   type = 10;
-  // } else if (params.title === "请求平均等待时长") {
-  //   type = 12;
-  // }
-
   const {data} = await client.query(`
       {
-        dashFrontLinkTo(kind:${flag[params.title]},userId:"${params.userId}",start:"${params.start}",end:"${params.end}"){
-          ztNo
-          title
-          severity
-          pri
-          status
-          openedAt
-          assignedTo
-          duration
+        dashFrontCodeLinkTo(kind:13,userId:"${params.userId}",start:"${params.start}",end:"${params.end}",differ:-8){
+         commit
+        author
+        authorAt
+        project
+        newlines
+        desc
         }
       }
   `);
 
-
-  return data?.dashFrontLinkTo;
+  return data?.dashFrontCodeLinkTo;
 };
 
-// const getTotalTime = (datas: any) => {
-//
-//   let totalTime = 0;
-//   if (datas) {
-//     datas.forEach((ele: any) => {
-//       totalTime += Number(ele.duration);
-//     });
-//
-//     return totalTime / 3600 / datas.length;
-//   }
-//
-//   return totalTime;
-// };
 
 // 组件初始化
-const BugDetails: React.FC<any> = () => {
+const CodeDetails: React.FC<any> = () => {
+
   /* 获取网页的项目id */
   const userData = {
     title: "",
@@ -173,8 +115,6 @@ const BugDetails: React.FC<any> = () => {
   const gqlClient = useGqlClient();
 
   const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, userData));
-  // const totalTime = getTotalTime(data);
-
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -200,7 +140,6 @@ const BugDetails: React.FC<any> = () => {
 
       <PageHeader
         ghost={false}
-        // title={`${userData.userName}-${userData.title}-${totalTime}`}
         title={`${userData.userName}-${userData.title}`}
         style={{height: "100px"}}
         breadcrumb={{routes}}
@@ -209,7 +148,7 @@ const BugDetails: React.FC<any> = () => {
       {/* ag-grid 表格定义 */}
       <div className="ag-theme-alpine" style={{height: getHeight(), width: '100%'}}>
         <AgGridReact
-          columnDefs={colums(userData.title)} // 定义列
+          columnDefs={colums()} // 定义列
           rowData={data} // 数据绑定
           defaultColDef={{
             resizable: true,
@@ -231,4 +170,4 @@ const BugDetails: React.FC<any> = () => {
   );
 };
 
-export default BugDetails;
+export default CodeDetails;

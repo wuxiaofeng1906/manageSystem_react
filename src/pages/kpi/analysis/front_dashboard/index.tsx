@@ -17,39 +17,7 @@ import * as echarts from 'echarts';
 import './styles.css';
 import {history} from "@@/core/history";
 
-
 const {RangePicker} = DatePicker;
-
-// 格式化单元格内容
-const cellFormat = (params: any) => {
-
-  if (params.value === undefined) {
-    return "";
-  }
-  if (Number(params.value)) {
-    const numbers = params.value.toString();
-    if (numbers.indexOf('.') > -1) {
-      // 判断有无小数点
-      return Number(params.value).toFixed(2);
-    }
-    return Number(params.value);
-  }
-  return 0;
-
-};
-
-const timeCellFormat = (params: any) => {
-
-  if (params.value === undefined) {
-    return "";
-  }
-
-  if (params.value === 0) {
-    return 0;
-  }
-  const duration = (Number(params.value) / 3600).toFixed(2)
-  return duration;
-};
 
 // 定义列名
 const alayThroughputData = (source: any, startTime: string, endTime: string) => {
@@ -255,7 +223,7 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
 
   // 吞吐量:dashFront,对外请求未响应数:notResponse,初始需求完成数：initFinishCount
   const {data} = await client.query(`{
-          dashFront(${condition}){
+          dashFront(start:"${params.start}",end:"${params.end}",differ:-8){
             userId
             userName
             deptsName
@@ -659,9 +627,11 @@ const FrontTableList: React.FC<any> = () => {
   (window as any).gotoPages = (title: string, paramData: any) => {
     let type = "";
     switch (title) {
+      case "Bug响应时长":
       case "Bug响应数":
       case "对外请求未响应数":
       case "修复Bug数":
+      case "请求平均等待时长":
         type = 'bug';
         break;
 
@@ -676,6 +646,11 @@ const FrontTableList: React.FC<any> = () => {
       case "完成任务数":
       case "进行中任务数":
         type = 'task';
+        break;
+
+      case "代码提交次数":
+      case "代码新增行数":
+        type = 'codes';
         break;
       default:
         break;
@@ -737,7 +712,18 @@ const FrontTableList: React.FC<any> = () => {
             field: 'solveDur',
             minWidth: 133,
             type: 'rightAligned',
-            valueFormatter: timeCellFormat,
+            // valueFormatter: timeCellFormat,
+            cellRenderer: (params: any) => {
+              if (params.value === undefined) {
+                return "";
+              }
+              if (params.value === null || params.value === 0) {
+                return `<a  style="text-decoration: underline" onclick='gotoPages("Bug响应时长",${JSON.stringify(params.data)})'>0</a>`;
+              }
+
+              const duration = (Number(params.value) / 3600).toFixed(2);
+              return `<a  style="text-decoration: underline" onclick='gotoPages("Bug响应时长",${JSON.stringify(params.data)})'>${duration}</a>`;
+            }
           },
           {
             headerName: 'Bug响应数',
@@ -826,7 +812,18 @@ const FrontTableList: React.FC<any> = () => {
             field: 'waitDura',
             type: 'rightAligned',
             minWidth: 180,
-            valueFormatter: timeCellFormat,
+            // valueFormatter: timeCellFormat,
+            cellRenderer: (params: any) => {
+              if (params.value === undefined) {
+                return "";
+              }
+              if (params.value === null || params.value === 0) {
+                return `<a  style="text-decoration: underline" onclick='gotoPages("请求平均等待时长",${JSON.stringify(params.data)})'>0</a>`;
+              }
+
+              const duration = (Number(params.value) / 3600).toFixed(2);
+              return `<a  style="text-decoration: underline" onclick='gotoPages("请求平均等待时长",${JSON.stringify(params.data)})'>${duration}</a>`;
+            }
           },
         ],
       },
@@ -903,14 +900,50 @@ const FrontTableList: React.FC<any> = () => {
             field: 'codeCommit',
             minWidth: 115,
             type: 'rightAligned',
-            valueFormatter: cellFormat,
+            // valueFormatter: cellFormat,
+            cellRenderer: (params: any) => {
+
+              if (params.value === undefined) {
+                return "";
+              }
+
+              let values = "0";
+              if (Number(params.value)) {
+                const numbers = params.value.toString();
+                if (numbers.indexOf('.') > -1) {
+                  // 判断有无小数点
+                  values = Number(params.value).toFixed(2);
+                }
+                values = params.value;
+              }
+
+              return `<a  style="text-decoration: underline" onclick='gotoPages("代码提交次数",${JSON.stringify(params.data)})'>${values}</a>`;
+            }
           },
           {
             headerName: '代码新增行数',
             field: 'newLine',
             minWidth: 115,
             type: 'rightAligned',
-            valueFormatter: cellFormat,
+            // valueFormatter: cellFormat,
+            cellRenderer: (params: any) => {
+
+              if (params.value === undefined) {
+                return "";
+              }
+
+              let values = "0";
+              if (Number(params.value)) {
+                const numbers = params.value.toString();
+                if (numbers.indexOf('.') > -1) {
+                  // 判断有无小数点
+                  values = Number(params.value).toFixed(2);
+                }
+                values = params.value;
+              }
+
+              return `<a  style="text-decoration: underline" onclick='gotoPages("代码新增行数",${JSON.stringify(params.data)})'>${values}</a>`;
+            }
           },
         ],
       },

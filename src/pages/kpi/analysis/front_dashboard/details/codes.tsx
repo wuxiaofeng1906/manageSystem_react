@@ -29,7 +29,7 @@ const colums = () => {
     {
       headerName: '提交ID',
       field: 'commit',
-      minWidth: 300,
+      minWidth: 350,
       cellRenderer: (params: any) => {
 
         const {project} = params.data;
@@ -39,7 +39,7 @@ const colums = () => {
     {
       headerName: '提交人',
       field: 'author',
-      minWidth: 90,
+      minWidth: 120,
     },
     {
       headerName: '描述',
@@ -49,7 +49,7 @@ const colums = () => {
     {
       headerName: '新增行',
       field: 'newlines',
-      minWidth: 90,
+      minWidth: 80,
     }, {
       headerName: "项目名",
       field: 'project',
@@ -58,7 +58,7 @@ const colums = () => {
       headerName: "提交时间",
       field: 'authorAt',
       cellRenderer: TimestampRender,
-      minWidth: 200,
+      minWidth: 170,
     }
   );
 

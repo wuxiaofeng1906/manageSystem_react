@@ -131,19 +131,20 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
   return data?.dashFrontLinkTo;
 };
 
-const getTotalTime = (datas: any) => {
+// const getTotalTime = (datas: any) => {
+//
+//   let totalTime = 0;
+//   if (datas) {
+//     datas.forEach((ele: any) => {
+//       totalTime += Number(ele.duration);
+//     });
+//
+//     return totalTime / 3600 / datas.length;
+//   }
+//
+//   return totalTime;
+// };
 
-  let totalTime = 0;
-  if (datas) {
-    datas.forEach((ele: any) => {
-      totalTime += Number(ele.duration);
-    });
-
-    return totalTime / 3600 / datas.length;
-  }
-
-  return totalTime;
-};
 // 组件初始化
 const BugDetails: React.FC<any> = () => {
   /* 获取网页的项目id */
@@ -172,7 +173,7 @@ const BugDetails: React.FC<any> = () => {
   const gqlClient = useGqlClient();
 
   const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, userData));
-  const totalTime = getTotalTime(data);
+  // const totalTime = getTotalTime(data);
 
 
   const onGridReady = (params: GridReadyEvent) => {
@@ -199,7 +200,8 @@ const BugDetails: React.FC<any> = () => {
 
       <PageHeader
         ghost={false}
-        title={`${userData.userName}-${userData.title}-${totalTime}`}
+        // title={`${userData.userName}-${userData.title}-${totalTime}`}
+        title={`${userData.userName}-${userData.title}`}
         style={{height: "100px"}}
         breadcrumb={{routes}}
       />

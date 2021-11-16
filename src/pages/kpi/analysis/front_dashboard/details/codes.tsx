@@ -71,7 +71,7 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
 
   const {data} = await client.query(`
       {
-        dashFrontCodeLinkTo(kind:13,userId:"${params.userId}",start:"${params.start}",end:"${params.end}"){
+        dashFrontCodeLinkTo(kind:13,userId:"${params.userId}",start:"${params.start}",end:"${params.end}",differ:-8){
          commit
         author
         authorAt

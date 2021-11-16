@@ -223,7 +223,7 @@ const queryFrontData = async (client: GqlClient<object>, params: any) => {
 
   // 吞吐量:dashFront,对外请求未响应数:notResponse,初始需求完成数：initFinishCount
   const {data} = await client.query(`{
-          dashFront(${condition}){
+          dashFront(start:"${params.start}",end:"${params.end}",differ:-8){
             userId
             userName
             deptsName

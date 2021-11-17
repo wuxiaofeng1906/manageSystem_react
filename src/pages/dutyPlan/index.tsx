@@ -127,7 +127,83 @@ const DutyPlan: React.FC<any> = () => {
 
   /* endregion */
 
-  const prjStyle = {width: 362, marginLeft: 27};
+  const testDiv = <div>
+
+    <div>
+      <Form.Item name="prjName" label="① 项目名称" style={{marginTop: -2}}>
+        <Select style={{width: 362, marginLeft: 27}}>
+          <Option value="刘黎明">刘黎明</Option>
+        </Select>
+      </Form.Item>
+      <Form.Item name="prjType" label="项目类型" style={{marginTop: -20, marginLeft: 17}}>
+        <Select style={{width: 362, marginLeft: 27}}>
+          <Option value="刘黎明">刘黎明</Option>
+        </Select>
+      </Form.Item>
+      <Form.Item name="branch" label="对应分支" style={{marginTop: -20, marginLeft: 17}}>
+        <Select style={{width: 362, marginLeft: 27}}>
+          <Option value="刘黎明">刘黎明</Option>
+        </Select>
+      </Form.Item>
+      <Form.Item name="testEnv" label="对应测试环境" style={{marginTop: -20, marginLeft: 17}}>
+        <Select>
+          <Option value="刘黎明">刘黎明</Option>
+        </Select>
+      </Form.Item>
+      <Form.Item name="upgradeEnv" label="对应升级环境" style={{marginTop: -20, marginLeft: 17}}>
+        <Select>
+          <Option value="刘黎明">刘黎明</Option>
+        </Select>
+      </Form.Item>
+      <Form.Item name="prjManager" label="项目负责人" style={{marginTop: -20, marginLeft: 17}}>
+        <Select style={{width: 361, marginLeft: 14}}>
+          <Option value="刘黎明">刘黎明</Option>
+        </Select>
+      </Form.Item>
+      <Form.Item name="planGrayTime" label="计划灰度时间" style={{marginTop: -20, marginLeft: 17}}>
+        <RangePicker style={{width: '100%'}}/>
+      </Form.Item>
+      <Form.Item name="planOnlineTime" label="计划上线时间" style={{marginTop: -20, marginLeft: 17}}>
+        <RangePicker style={{width: '100%'}}/>
+      </Form.Item>
+    </div>
+    <div style={{marginTop: -25}}>
+      <table>
+        <tr>
+          <td>
+            <Button type="text" onClick={addProject}>
+              <img src="../add_black.png" width="20" height="20" alt="删除项目" title="删除项目"/>
+            </Button>
+          </td>
+          <td>
+            <Divider style={{width: 380}}></Divider>
+          </td>
+          <td>
+            <Button type="text" onClick={delProject}>
+              <img src="../sub_black.png" width="20" height="20" alt="删除项目" title="删除项目"/>
+            </Button>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+  </div>;
+
+
+  const [projectDiv, setProjectDiv] = useState(testDiv);
+
+
+  const addProject = () => {
+    setProjectDiv(<div></div>);
+
+  };
+
+
+  const delProject = () => {
+
+  };
+
+
   return (
     <PageContainer>
       {/* 时间查询条件 */}
@@ -579,78 +655,7 @@ const DutyPlan: React.FC<any> = () => {
           {/* 项目明细Card */}
           <Card size="small" title="项目" style={{marginTop: 10}}>
 
-            <Form.Item name="prjName" label="① 项目名称" style={{marginTop: -2}}>
-              <Select style={prjStyle}>
-                <Option value="刘黎明">刘黎明</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item name="prjType" label="项目类型" style={{marginTop: -20, marginLeft: 17}}>
-              <Select style={prjStyle}>
-                <Option value="刘黎明">刘黎明</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item name="branch" label="对应分支" style={{marginTop: -20, marginLeft: 17}}>
-              <Select style={prjStyle}>
-                <Option value="刘黎明">刘黎明</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item name="testEnv" label="对应测试环境" style={{marginTop: -20, marginLeft: 17}}>
-              <Select>
-                <Option value="刘黎明">刘黎明</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item name="upgradeEnv" label="对应升级环境" style={{marginTop: -20, marginLeft: 17}}>
-              <Select>
-                <Option value="刘黎明">刘黎明</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item name="prjManager" label="项目负责人" style={{marginTop: -20, marginLeft: 17}}>
-              <Select style={{width: 361, marginLeft: 14}}>
-                <Option value="刘黎明">刘黎明</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item name="planGrayTime" label="计划灰度时间" style={{marginTop: -20, marginLeft: 17}}>
-              <RangePicker style={{width: '100%'}}/>
-            </Form.Item>
-            <Form.Item name="planOnlineTime" label="计划上线时间" style={{marginTop: -20, marginLeft: 17}}>
-              <RangePicker style={{width: '100%'}}/>
-            </Form.Item>
-
-            <div style={{marginTop: -25}}>
-              <table>
-                <tr>
-                  <td>
-                    <Button type="text">
-                      <img src="../add_black.png" width="20" height="20" alt="删除项目" title="删除项目"/>
-                    </Button>
-                  </td>
-                  <td>
-                    <Divider style={{width: 370}}></Divider>
-                  </td>
-                  <td>
-                    <Button type="text">
-                      <img src="../sub_black.png" width="20" height="20" alt="删除项目" title="删除项目"/>
-                    </Button>
-                  </td>
-                </tr>
-              </table>
-
-
-              {/*<Divider orientation="right">*/}
-              {/*  <Button type="text">*/}
-              {/*    <img src="../sub_black.png" width="20" height="20" alt="删除项目" title="删除项目"/>*/}
-              {/*  </Button>*/}
-              {/*</Divider>*/}
-
-
-              {/*<Divider orientation="left" style={{marginTop: -49}}>*/}
-              {/*  <Button type="text">*/}
-              {/*    <img src="../add_black.png" width="20" height="20" alt="新增项目" title="新增项目"/>*/}
-              {/*  </Button>*/}
-              {/*</Divider>*/}
-
-
-            </div>
+            {projectDiv}
             {/* 备注显示 */}
             <div>
               <label style={{color: "orange"}}> 备注： </label>

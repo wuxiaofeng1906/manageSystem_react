@@ -4,8 +4,7 @@ import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
-import {Button, DatePicker, Checkbox, Card, message, Row, Col, Table} from "antd";
-import {DeleteTwoTone, EditTwoTone, FolderAddTwoTone} from "@ant-design/icons";
+import {Button, DatePicker, Checkbox, Card, message, Table} from "antd";
 import axios from "axios";
 import moment from "moment";
 
@@ -53,7 +52,10 @@ const queryDevelopViews = async () => {
 
 const DutyPlan: React.FC<any> = () => {
 
-  const {data, loading} = useRequest(() => queryDevelopViews());
+  const {data} = useRequest(() => queryDevelopViews());
+  console.log(data)
+
+  // const div
 
   const [choicedCondition, setChoicedCondition] = useState({start: "", end: ""})
   const onTimeSelected = () => {
@@ -63,18 +65,15 @@ const DutyPlan: React.FC<any> = () => {
   const sendMessage = () => {
 
   };
-
-
   const columns: any = [
 
     {
-      title: 'Cash Assets',
-
+      title: '所属端',
       dataIndex: 'money',
       align: 'center'
     },
     {
-      title: 'Address',
+      title: '姓名',
       dataIndex: 'address',
       align: 'center'
     },
@@ -98,7 +97,20 @@ const DutyPlan: React.FC<any> = () => {
     },
   ];
 
+  // checkbox
+  const onPlanChanged = (params: any) => {
 
+    const selectedId = params.target.id;
+    const isChecked = params.target.checked;
+    console.log(selectedId, isChecked);
+    message.info(selectedId);
+  };
+
+  const doubleClickRow = (params: any) => {
+    const gridValue = params.target.parentElement.parentElement.innerText;
+    console.log(gridValue);
+    message.info(gridValue);
+  };
   return (
     <PageContainer>
       {/* 时间查询条件 */}
@@ -125,7 +137,7 @@ const DutyPlan: React.FC<any> = () => {
               <Card size="small"
                     title="2021/01/01~2021/01/07"
                     headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
+                    extra={<Checkbox id={"2021/01/01~2021/01/07"} onChange={onPlanChanged}></Checkbox>}>
                 <Table
                   style={{marginTop: -10}}
                   size="small"
@@ -134,6 +146,9 @@ const DutyPlan: React.FC<any> = () => {
                   bordered
                   showHeader={false}
                   pagination={false}
+                  onRow={() => {
+                    return {onDoubleClick: doubleClickRow};
+                  }}
                 />
               </Card>
             </td>
@@ -141,7 +156,7 @@ const DutyPlan: React.FC<any> = () => {
               <Card size="small"
                     title="2021/01/01~2021/01/07"
                     headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
+                    extra={<Checkbox id={"2021/01/01~2021/01/07"} onChange={onPlanChanged}></Checkbox>}>
                 <Table
                   style={{marginTop: -10}}
                   size="small"

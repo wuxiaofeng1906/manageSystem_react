@@ -97,6 +97,8 @@ const DutyPlan: React.FC<any> = () => {
       address: '徐睿',
     },
   ];
+
+
   return (
     <PageContainer>
       {/* 时间查询条件 */}
@@ -116,297 +118,342 @@ const DutyPlan: React.FC<any> = () => {
 
       </div>
 
-      <div style={{marginTop: 5}}>
-        <Row gutter={16} style={{marginTop: 5}}>
-          <Col className="gutter-row" span={5} style={{minWidth: 230}}>
-            <Card size="small"
-                  title="2021/01/01~2021/01/07"
-                  headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                  extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
-          <Col className="gutter-row" span={5} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
-          <Col className="gutter-row" span={5} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
-          <Col className="gutter-row" span={5} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
-          <Col className="gutter-row" span={4} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
+      <div style={{marginTop: 5, overflow: "scroll"}}>
+        <table style={{width: "100%"}}>
+          <tr>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+          </tr>
 
-        </Row>
-        <Row gutter={16} style={{marginTop: 5}}>
-          <Col className="gutter-row" span={5} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" headStyle={{textAlign: "center"}}
-                  extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
-          <Col className="gutter-row" span={5} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" headStyle={{textAlign: "center"}}
-                  extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
-          <Col className="gutter-row" span={5} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" headStyle={{textAlign: "center"}}
-                  extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
-          <Col className="gutter-row" span={5} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" headStyle={{textAlign: "center"}}
-                  extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
-          <Col className="gutter-row" span={4} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" headStyle={{textAlign: "center"}}
-                  extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
+          <tr>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+          </tr>
 
-        </Row>
-        <Row gutter={16} style={{marginTop: 5}}>
-          <Col className="gutter-row" span={5} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" headStyle={{textAlign: "center"}}
-                  extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
-          <Col className="gutter-row" span={5} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" headStyle={{textAlign: "center"}}
-                  extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
-          <Col className="gutter-row" span={5} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" headStyle={{textAlign: "center"}}
-                  extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
-          <Col className="gutter-row" span={5} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" headStyle={{textAlign: "center"}}
-                  extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
-          <Col className="gutter-row" span={4} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" headStyle={{textAlign: "center"}}
-                  extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
+          <tr>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+          </tr>
 
-        </Row>
-        <Row gutter={16} style={{marginTop: 5}}>
-          <Col className="gutter-row" span={5} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" headStyle={{textAlign: "center"}}
-                  extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
-          <Col className="gutter-row" span={5} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" headStyle={{textAlign: "center"}}
-                  extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
-          <Col className="gutter-row" span={5} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" headStyle={{textAlign: "center"}}
-                  extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
-          <Col className="gutter-row" span={5} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" headStyle={{textAlign: "center"}}
-                  extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
-          <Col className="gutter-row" span={4} style={{minWidth: 220}}>
-            <Card size="small" title="2021/01/01~2021/01/07" headStyle={{textAlign: "center"}}
-                  extra={<Checkbox></Checkbox>}>
-              <Table
-                style={{marginTop: -10}}
-                size="small"
-                columns={columns}
-                dataSource={datawww}
-                bordered
-                showHeader={false}
-                pagination={false}
-              />
-            </Card>
-          </Col>
+          <tr>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+            <td>
+              <Card size="small"
+                    title="2021/01/01~2021/01/07"
+                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
+                    extra={<Checkbox></Checkbox>}>
+                <Table
+                  style={{marginTop: -10}}
+                  size="small"
+                  columns={columns}
+                  dataSource={datawww}
+                  bordered
+                  showHeader={false}
+                  pagination={false}
+                />
+              </Card>
+            </td>
+          </tr>
+        </table>
 
-        </Row>
+
       </div>
     </PageContainer>
   );

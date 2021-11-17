@@ -435,6 +435,12 @@ export default [
     // access: 'sysAdmin',
     // hideInMenu: true,
     component: './toolIntegration',
+  }, {
+    name: '值班计划',
+    icon: 'table',
+    path: '/dutyPlan',
+    access: 'sysAdmin',
+    component: './dutyPlan',
   },
   {
     name: '系统管理',

@@ -4,26 +4,9 @@ import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
-import {
-  Button,
-  DatePicker,
-  Checkbox,
-  Card,
-  message,
-  Table,
-  Modal,
-  Form,
-  Select,
-  Row,
-  Col,
-  Divider,
-  Space,
-  Input
-} from "antd";
-import {MinusOutlined, PlusOutlined} from '@ant-design/icons';
+import {Button, DatePicker, Checkbox, Card, message, Table, Modal, Form, Select, Row, Col, Divider} from "antd";
 import axios from "axios";
 import moment from "moment";
-import {log} from "echarts/types/src/util/log";
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
@@ -62,6 +45,73 @@ const queryDevelopViews = async () => {
   return result;
 };
 
+const TestDiv: React.FC<any> = (props) => {
+  debugger;
+  //
+  const {addProject, delProject} = props
+  //
+  return <div>
+
+    <div>
+      <Form.Item name="prjName" label="① 项目名称" style={{marginTop: -2}}>
+        <Select style={{width: 362, marginLeft: 27}}>
+          <Option value="刘黎明">刘黎明</Option>
+        </Select>
+      </Form.Item>
+      <Form.Item name="prjType" label="项目类型" style={{marginTop: -20, marginLeft: 17}}>
+        <Select style={{width: 362, marginLeft: 27}}>
+          <Option value="刘黎明">刘黎明</Option>
+        </Select>
+      </Form.Item>
+      <Form.Item name="branch" label="对应分支" style={{marginTop: -20, marginLeft: 17}}>
+        <Select style={{width: 362, marginLeft: 27}}>
+          <Option value="刘黎明">刘黎明</Option>
+        </Select>
+      </Form.Item>
+      <Form.Item name="testEnv" label="对应测试环境" style={{marginTop: -20, marginLeft: 17}}>
+        <Select>
+          <Option value="刘黎明">刘黎明</Option>
+        </Select>
+      </Form.Item>
+      <Form.Item name="upgradeEnv" label="对应升级环境" style={{marginTop: -20, marginLeft: 17}}>
+        <Select>
+          <Option value="刘黎明">刘黎明</Option>
+        </Select>
+      </Form.Item>
+      <Form.Item name="prjManager" label="项目负责人" style={{marginTop: -20, marginLeft: 17}}>
+        <Select style={{width: 361, marginLeft: 14}}>
+          <Option value="刘黎明">刘黎明</Option>
+        </Select>
+      </Form.Item>
+      <Form.Item name="planGrayTime" label="计划灰度时间" style={{marginTop: -20, marginLeft: 17}}>
+        <RangePicker style={{width: '100%'}}/>
+      </Form.Item>
+      <Form.Item name="planOnlineTime" label="计划上线时间" style={{marginTop: -20, marginLeft: 17}}>
+        <RangePicker style={{width: '100%'}}/>
+      </Form.Item>
+    </div>
+    <div style={{marginTop: -25}}>
+      <table>
+        <tr>
+          <td>
+            <Button type="text" onClick={addProject}>
+              <img src="../add_black.png" width="20" height="20" alt="新增项目" title="新增项目"/>
+            </Button>
+          </td>
+          <td>
+            <Divider style={{width: 380}}></Divider>
+          </td>
+          <td>
+            <Button type="text" onClick={delProject}>
+              <img src="../sub_black.png" width="20" height="20" alt="删除项目" title="删除项目"/>
+            </Button>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+  </div>;
+}
 
 const DutyPlan: React.FC<any> = () => {
 
@@ -129,7 +179,7 @@ const DutyPlan: React.FC<any> = () => {
   /* region 弹出层事件 */
   const [formForPlanModify] = Form.useForm();
   const [isPlanVisble, setIsPlanVisble] = useState(false);
-
+  console.log(isPlanVisble);
   // 表格双击事件
   const doubleClickRow = (params: any) => {
     const gridValue = params.target.parentElement.parentElement.innerText;
@@ -142,159 +192,26 @@ const DutyPlan: React.FC<any> = () => {
   const planModalCancel = () => {
     setIsPlanVisble(false);
   };
+  // 弹出层保存
+  const carrySave = () => {
 
-  const [projects, setProjects] = useState([
-    {
-      prjName: '哈哈哈哈',
-      prjType: '嘻嘻嘻',
-      branch: "",
-      testEnv: "",
-      upgradeEnv: "",
-      prjManager: "",
-      planGrayTime: "",
-      planOnlineTime: ""
-
-    },
-  ]);
-
-  // 新增项目
-  const add = () => {
-    formForPlanModify.setFieldsValue({"projects": [...projects, {name: '', mobile: ''}]})
-    return setProjects([...projects, {
-      prjName: '',
-      prjType: '',
-      branch: "",
-      testEnv: "",
-      upgradeEnv: "",
-      prjManager: "",
-      planGrayTime: "",
-      planOnlineTime: ""
-    }])
   };
-
-  // 删除项目
-  const del = (index: any) => {
-    formForPlanModify.setFieldsValue({"projects": [...projects.slice(0, index), ...projects.slice(index + 1)]})
-    return setProjects([...projects.slice(0, index), ...projects.slice(index + 1)])
-  };
-
-  // 当值被改变
-  const onChange = (index: any, name: any, event: any) => {
-    const tempArray = [...projects];
-
-    if (name === 'prjName')
-      tempArray[index] = {...tempArray[index], prjName: event}
-    // else
-    //   tempArray[index] = {...tempArray[index], prjType: event.target.value}
-    return setProjects(tempArray)
-  };
-
-  // 动态生成项目组件
-  const projectItems = projects.map((item: any, index: any) => {
-    // 获取项目序号
-    const numChar = {
-      1: "①",
-      2: "②",
-      3: "③",
-      4: "④",
-      5: "⑤",
-      6: "⑥",
-      7: "⑦",
-      8: "⑧",
-      9: "⑨",
-      10: "⑩"
-    };
-    const order = `${numChar[index + 1]}项目名称`;
-
-    return <div>
-      <div>
-
-        <Form.Item label={order} name={['projects', index, 'prjName']} style={{marginLeft: -5}}>
-          <Select style={{width: '93%', marginLeft: 27}} onChange={(event: any) => onChange(index, 'prjName', event)}>
-            <Option value="liming.liu">刘黎明</Option>
-          </Select>
-        </Form.Item>
-
-        <Form.Item label="项目类型" name={['projects', index, 'prjType']} style={{marginTop: -20, marginLeft: 13}}>
-          <Select style={{width: '93%', marginLeft: 27}}>
-            <Option value="刘黎明">刘黎明</Option>
-          </Select>
-        </Form.Item>
-
-        <Form.Item label="对应分支" name={['projects', index, 'branch']} style={{marginTop: -20, marginLeft: 13}}>
-          <Select style={{width: "93%", marginLeft: 27}}>
-            <Option value="刘黎明">刘黎明</Option>
-          </Select>
-        </Form.Item>
-
-        <Form.Item label="对应测试环境" name={['projects', index, 'testEnv']} style={{marginTop: -20, marginLeft: 13}}>
-          <Select style={{width: "100%"}}>
-            <Option value="刘黎明">刘黎明</Option>
-          </Select>
-        </Form.Item>
-
-        <Form.Item label="对应升级环境" name={['projects', index, 'upgradeEnv']} style={{marginTop: -20, marginLeft: 13}}>
-          <Select style={{width: "100%"}}>
-            <Option value="刘黎明">刘黎明</Option>
-          </Select>
-        </Form.Item>
-
-        <Form.Item label="项目负责人" name={['projects', index, 'prjManager']} style={{marginTop: -20, marginLeft: 13}}>
-          <Select style={{width: "96%", marginLeft: 14}}>
-            <Option value="刘黎明">刘黎明</Option>
-          </Select>
-        </Form.Item>
-
-        <Form.Item label="计划灰度时间" name={['projects', index, 'planGrayTime']} style={{marginTop: -20, marginLeft: 13}}>
-          <RangePicker style={{width: '100%'}}/>
-        </Form.Item>
-
-        <Form.Item label="计划上线时间" name={['projects', index, 'planOnlineTime']} style={{marginTop: -20, marginLeft: 13}}>
-          <RangePicker style={{width: '100%'}}/>
-        </Form.Item>
-
-        {/* 增加和删除操作 */}
-        <Form.Item style={{marginLeft: 17, marginTop: -30, marginBottom: -10}}>
-          <table>
-            <tr>
-              <td>
-                <Button style={{border: "none", color: "#D0D0D0", marginLeft: -15}} onClick={() => add()}
-                        icon={<PlusOutlined/>}/>
-                {/*
-                <Button type="text" onClick={() => add()}>
-                <img src="../add_black.png" width="20" height="20" alt="新增项目" title="新增项目"/>
-                </Button> */}
-              </td>
-              <td>
-                <Divider style={{width: "410px"}}></Divider>
-              </td>
-              <td>
-                <Button style={{border: "none", color: "#D0D0D0"}} onClick={() => del(index)} icon={<MinusOutlined/>}/>
-                {/* <Button type="text" block onClick={() => del(index)}>
-                <img src="../sub_black.png" width="20" height="20" alt="删除项目" title="删除项目"/>
-               </Button> */}
-              </td>
-            </tr>
-          </table>
-        </Form.Item>
-
-
-      </div>
-
-    </div>
-  });
-
-  // 提交事件
-  const submitForm = () => {
-    const tt = formForPlanModify.getFieldsValue();
-
-    formForPlanModify.validateFields()
-      .then((values: any) => {
-        console.log("33333333333333333333333333333333333333", values, tt);
-      });
-  }
 
   /* endregion */
+
+
+  const addProject = () => {
+    setProjectDiv(<div>werwerwerweewer</div>);
+
+  }
+
+
+  const delProject = () => {
+
+  };
+
+  const [projectDiv, setProjectDiv] = useState(<TestDiv addProject={addProject} delProject={delProject}/>);
+
 
   return (
     <PageContainer>
@@ -657,21 +574,30 @@ const DutyPlan: React.FC<any> = () => {
 
       </div>
 
-      {/* 弹出层界面 */}
       <Modal
         title={'值班计划'}
-        visible={isPlanVisble}
+        visible={true}
         onCancel={planModalCancel}
         centered={true}
         width={550}
-        footer={null}
-        maskClosable={false}
-      >
-
-        <Form name="user_form" form={formForPlanModify} layout={'horizontal'} onFinish={submitForm}
-              initialValues={{projects}}>
-
-          <Form.Item label="值班时间" name="dutyTime" required={true}>
+        footer={
+          [
+            <Button
+              style={{borderRadius: 5, marginTop: -100}}
+              onClick={planModalCancel}>取消
+            </Button>,
+            <Button type="primary"
+                    style={{
+                      marginLeft: 10,
+                      color: '#46A0FC',
+                      backgroundColor: "#ECF5FF",
+                      borderRadius: 5,
+                    }}
+                    onClick={carrySave}>保存
+            </Button>
+          ]}>
+        <Form form={formForPlanModify} style={{marginTop: -15}}>
+          <Form.Item label="值班时间" name="planTime" required={true}>
             <RangePicker
               className={'times'}
               style={{width: '100%'}}
@@ -737,11 +663,8 @@ const DutyPlan: React.FC<any> = () => {
 
           {/* 项目明细Card */}
           <Card size="small" title="项目" style={{marginTop: 10}}>
-            <Form.Item>
-              {projectItems}
-            </Form.Item>
-
-            {/* 备注显示  */}
+            {projectDiv}
+            {/* 备注显示 */}
             <div>
               <label style={{color: "orange"}}> 备注： </label>
               <label> 需要当天紧急修复的请走emergency申请 <br/>
@@ -750,19 +673,6 @@ const DutyPlan: React.FC<any> = () => {
             </div>
 
           </Card>
-
-          {/* 取消和保存按钮 */}
-          <Form.Item style={{marginTop: 10, marginBottom: -10}}>
-            <Button
-              style={{float: "right", borderRadius: 5, marginLeft: 20}}
-              onClick={planModalCancel}>取消
-            </Button>
-            <Button type="primary"
-                    style={{float: "right", color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}
-                    htmlType='submit'>保存
-            </Button>
-
-          </Form.Item>
         </Form>
       </Modal>
 

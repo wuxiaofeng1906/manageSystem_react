@@ -48,18 +48,18 @@ export async function getInitialState(): Promise<{
       // const currentUser = await queryCurrent();
       // return currentUser;
 
-      // 读取缓存信息
-      const myAuth: any = localStorage.getItem("userLogins");
-      return JSON.parse(myAuth);
+      // // 读取缓存信息
+      // const myAuth: any = localStorage.getItem("userLogins");
+      // return JSON.parse(myAuth);
 
-      //  return {
-      //   access: "sys_admin",
-      //   authority: "",
-      //   avatar: "https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png",
-      //   group: "superGroup",
-      //   name: "444",
-      //   userid: "test"
-      // };
+       return {
+        access: "sys_admin",
+        authority: "",
+        avatar: "https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png",
+        group: "superGroup",
+        name: "444",
+        userid: "test"
+      };
 
     } catch (error) {
       // history.push('/user/login');

@@ -1,3 +1,11 @@
+/*
+ * @Description: 
+ * @Author: jieTan
+ * @Date: 2021-11-19 16:33:15
+ * @LastEditTime: 2021-11-19 18:08:35
+ * @LastEditors: jieTan
+ * @LastModify: 
+ */
 // https://umijs.org/config/
 import { defineConfig } from 'umi';
 import defaultSettings from './defaultSettings';
@@ -12,10 +20,11 @@ export default defineConfig({
   dva: {
     hmr: true,
   },
+  mfsu: {}, // 启用MFSU，加快启动速度 => 存在兼容问题
   layout: {
     name: 'Ant Design Pro',
     locale: true,
-    siderWidth: 265,   // 原始：208
+    siderWidth: 265, // 原始：208
     ...defaultSettings,
   },
   locale: {

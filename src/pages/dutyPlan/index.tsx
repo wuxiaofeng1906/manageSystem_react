@@ -21,12 +21,14 @@ import {
 import {MinusOutlined, PlusOutlined} from '@ant-design/icons';
 import axios from "axios";
 import moment from "moment";
+import dayjs from "dayjs";
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
 
 // 解析数据
 const parseData = (params: any) => {
+  debugger;
   const returnValue: any = [];
   if (params) {
     params.forEach((project: any) => {
@@ -199,7 +201,7 @@ const parseData = (params: any) => {
 const queryDevelopViews = async (params: any) => {
 
   let result: any = [];
-  await axios.get('/api/verify/duty/plan_data', {params: {start: params.start, end: params.end}})
+  await axios.get('/api/verify/duty/plan_data', {params: {start_time: params.start, end_time: params.end}})
     .then(function (res) {
 
       if (res.data.code === 200) {
@@ -238,19 +240,12 @@ const DutyPlan: React.FC<any> = () => {
   const {data} = useRequest(() => queryDevelopViews(choicedCondition));
   /* endregion */
 
-  /* region 时间查询 */
-  const
-    onTimeSelected = (params: any, dateString: any) => {
-
-      setChoicedCondition({start: dateString[0], end: dateString[1]});
-
-    };
-  /* endregion */
 
   /* region 消息推送事件 */
 
   // checkbox 选中事件
   const onPlanChanged = (params: any) => {
+
     const selectedId = params.target.id;
     const isChecked = params.target.checked;
     console.log(selectedId, isChecked);
@@ -449,14 +444,13 @@ const DutyPlan: React.FC<any> = () => {
     const cardDiv: any = [];
     const tdArray: any = [];
     oraData.forEach((ele_data: any, index: number) => {
-      const titleStr = `${ele_data[0].duty_start_time}~${ele_data[0].duty_end_time}`;
 
       tdArray.push(
         <td>
           <Card size="small"
-                title={titleStr}
+                title={`${ele_data[0].duty_start_time}~${ele_data[0].duty_end_time}`}
                 headStyle={{textAlign: "center"}}
-                extra={<Checkbox id={titleStr} onChange={onPlanChanged}></Checkbox>}>
+                extra={<Checkbox id={`${ele_data[0].person_num}`} onChange={onPlanChanged}></Checkbox>}>
             <Table
               style={{marginTop: -10}}
               size="small"
@@ -476,7 +470,7 @@ const DutyPlan: React.FC<any> = () => {
           </Card>
         </td>);
 
-      if ((index + 1) % 5 === 0 || data.length - 1 === index) {
+      if ((index + 1) % 5 === 0 || oraData.length - 1 === index) {
         const test = tdArray.map((current: any) => {
           return current;
         });
@@ -487,6 +481,20 @@ const DutyPlan: React.FC<any> = () => {
 
     return cardDiv;
   }
+  /* region 时间查询 */
+  const onTimeSelected = async (params: any, dateString: any) => {
+
+    setChoicedCondition({start: dateString[0], end: dateString[1]});
+    const queryData = await queryDevelopViews({
+      start: dayjs(dateString[0]).format("YYYY/MM/DD"),
+      end: dayjs(dateString[1]).format("YYYY/MM/DD")
+    });
+    debugger;
+    const newCardDiv = makeCardsDiv(queryData);
+
+    setDutyCart(newCardDiv);
+  };
+  /* endregion */
 
   useEffect(() => {
     let cardDiv: any = [];

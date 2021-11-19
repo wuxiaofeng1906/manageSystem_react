@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -16,27 +16,175 @@ import {
   Select,
   Row,
   Col,
-  Divider,
-  Space,
-  Input
+  Divider
 } from "antd";
 import {MinusOutlined, PlusOutlined} from '@ant-design/icons';
 import axios from "axios";
 import moment from "moment";
-import {log} from "echarts/types/src/util/log";
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
 
+const parseData = (params: any) => {
+  console.log(params);
+  // {
+  //   title: '所属端',
+  //     dataIndex: 'module',
+  //   align: 'center'
+  // },
+  // {
+  //   title: '姓名',
+  //     dataIndex: 'name',
+  //   align: 'center'
+  // },
+//    //   {
+//   //
+//   //     module: '前端',
+//   //     name: '刘黎明',
+//   //     id: "1"
+//   //   },
 
-const queryDevelopViews = async () => {
+
+  return [
+    [{
+      module: '前端',
+      name: '刘黎明',
+      id: "1",
+      start: "2021-01-01",
+      end: "2021-01-07"
+    }, {
+      module: '后端',
+      name: '胡靖华/罗林',
+      id: "2",
+      start: "2021-01-01",
+      end: "2021-01-07"
+    }, {
+      module: '测试',
+      name: '徐睿',
+      id: "3",
+      start: "2021-01-01",
+      end: "2021-01-07"
+    }], [{
+      module: '前端',
+      name: '欧兴阳/王濯',
+      id: "1",
+      start: "2021-01-08",
+      end: "2021-01-014"
+    }, {
+      module: '后端',
+      name: '何宇',
+      id: "2",
+      start: "2021-01-08",
+      end: "2021-01-014"
+    }, {
+      module: '测试',
+      name: '罗天刚',
+      id: "3",
+      start: "2021-01-08",
+      end: "2021-01-014"
+    }], [{
+      module: '前端',
+      name: '陈凯',
+      id: "1",
+      start: "2021-01-15",
+      end: "2021-01-22"
+    }, {
+      module: '后端',
+      name: '刘云鹏',
+      id: "2",
+      start: "2021-01-15",
+      end: "2021-01-22"
+    }, {
+      module: '测试',
+      name: '王鹄',
+      id: "3",
+      start: "2021-01-15",
+      end: "2021-01-22"
+    }], [{
+      module: '前端',
+      name: '陈凯',
+      id: "1",
+      start: "2021-01-15",
+      end: "2021-01-22"
+    }, {
+      module: '后端',
+      name: '刘云鹏',
+      id: "2",
+      start: "2021-01-15",
+      end: "2021-01-22"
+    }, {
+      module: '测试',
+      name: '王鹄',
+      id: "3",
+      start: "2021-01-15",
+      end: "2021-01-22"
+    }], [{
+      module: '前端',
+      name: '陈凯',
+      id: "1",
+      start: "2021-01-15",
+      end: "2021-01-22"
+    }, {
+      module: '后端',
+      name: '刘云鹏',
+      id: "2",
+      start: "2021-01-15",
+      end: "2021-01-22"
+    }, {
+      module: '测试',
+      name: '王鹄',
+      id: "3",
+      start: "2021-01-15",
+      end: "2021-01-22"
+    }], [{
+      module: '前端',
+      name: '陈凯',
+      id: "1",
+      start: "2021-01-23",
+      end: "2021-01-29"
+    }, {
+      module: '后端',
+      name: '刘云鹏',
+      id: "2",
+      start: "2021-01-23",
+      end: "2021-01-29"
+    }, {
+      module: '测试',
+      name: '王鹄',
+      id: "3",
+      start: "2021-01-23",
+      end: "2021-01-29"
+    }], [{
+      module: '前端',
+      name: '陈凯',
+      id: "1",
+      start: "2021-01-30",
+      end: "2021-02-05"
+    }, {
+      module: '后端',
+      name: '刘云鹏',
+      id: "2",
+      start: "2021-01-30",
+      end: "2021-02-05"
+    }, {
+      module: '测试',
+      name: '王鹄',
+      id: "3",
+      start: "2021-01-30",
+      end: "2021-02-05"
+    }]
+  ];
+
+}
+const queryDevelopViews = async (params: any) => {
 
   let result: any = [];
-  await axios.get('/api/verify/app_tools/app_list', {params: ""})
+  await axios.get('/api/verify/duty/plan_data', {params: {start: params.start, end: params.end}})
     .then(function (res) {
 
       if (res.data.code === 200) {
-        result = res.data.data;
+
+        result = parseData(res.data.data);
       } else {
         message.error({
           content: `错误：${res.data.msg}`,
@@ -68,54 +216,37 @@ const DutyPlan: React.FC<any> = () => {
   /* region 数据查询 */
 
   const [choicedCondition, setChoicedCondition] = useState({start: "", end: ""});
-  const {data} = useRequest(() => queryDevelopViews());
-  console.log(data);
-
+  const {data} = useRequest(() => queryDevelopViews(choicedCondition));
   const columns: any = [
-
     {
       title: '所属端',
-      dataIndex: 'money',
+      dataIndex: 'module',
       align: 'center'
     },
     {
       title: '姓名',
-      dataIndex: 'address',
+      dataIndex: 'name',
       align: 'center'
     },
   ];
-  const datawww = [
-    {
 
-      money: '前端',
-      address: '刘黎明',
-    },
-    {
-
-      money: '后端',
-      address: '胡靖华/罗林',
-    },
-    {
-
-      money: '测试',
-      address: '徐睿',
-    },
-  ];
 
   /* endregion */
 
   /* region 时间查询 */
-  const onTimeSelected = (params: any, dateString: any) => {
+  const
+    onTimeSelected = (params: any, dateString: any) => {
 
-    setChoicedCondition({start: dateString[0], end: dateString[1]});
+      setChoicedCondition({start: dateString[0], end: dateString[1]});
 
-  };
+    };
   /* endregion */
 
   /* region 消息推送事件 */
 
   // checkbox 选中事件
   const onPlanChanged = (params: any) => {
+    debugger;
     const selectedId = params.target.id;
     const isChecked = params.target.checked;
     console.log(selectedId, isChecked);
@@ -129,20 +260,6 @@ const DutyPlan: React.FC<any> = () => {
   /* region 弹出层事件 */
   const [formForPlanModify] = Form.useForm();
   const [isPlanVisble, setIsPlanVisble] = useState(false);
-
-  // 表格双击事件
-  const doubleClickRow = (params: any) => {
-    const gridValue = params.target.parentElement.parentElement.innerText;
-    console.log(gridValue);
-    // message.info(gridValue);
-    setIsPlanVisble(true);
-  };
-
-  // 弹出层取消
-  const planModalCancel = () => {
-    setIsPlanVisble(false);
-  };
-
   const [projects, setProjects] = useState([
     {
       prjName: '哈哈哈哈',
@@ -156,6 +273,20 @@ const DutyPlan: React.FC<any> = () => {
 
     },
   ]);
+
+  // 表格双击事件
+  const doubleClickRow = (tableData: any) => {
+    debugger;
+    console.log(tableData);
+
+    // setIsPlanVisble(true);
+
+  };
+
+  // 弹出层取消
+  const planModalCancel = () => {
+    setIsPlanVisble(false);
+  };
 
   // 新增项目
   const add = () => {
@@ -296,6 +427,61 @@ const DutyPlan: React.FC<any> = () => {
 
   /* endregion */
 
+
+  const [dutyCard, setDutyCart] = useState(<div></div>);
+  const makeCardsDiv = (oraData: any) => {
+    const cardDiv: any = [];
+    const tdArray: any = [];
+    oraData.forEach((ele_data: any, index: number) => {
+      const titleStr = `${ele_data[0].start}~${ele_data[0].end}`;
+
+      tdArray.push(
+        <td>
+          <Card size="small"
+                title={titleStr}
+                headStyle={{textAlign: "center"}}
+                extra={<Checkbox id={titleStr} onChange={onPlanChanged}></Checkbox>}>
+            <Table
+              style={{marginTop: -10}}
+              size="small"
+              columns={columns}
+              dataSource={ele_data}
+              bordered
+              showHeader={false}
+              pagination={false}
+              onRow={() => {
+                return {
+                  onDoubleClick: () => {
+                    doubleClickRow(ele_data);
+                  },
+                };
+              }}
+            />
+          </Card>
+        </td>);
+
+      if ((index + 1) % 5 === 0 || data.length - 1 === index) {
+        const test = tdArray.map((current: any) => {
+          return current;
+        });
+        cardDiv.push(<tr>{test} </tr>);
+        tdArray.length = 0;
+      }
+    });
+
+    return cardDiv;
+  }
+
+  useEffect(() => {
+    let cardDiv: any = [];
+    if (data) {
+      cardDiv = makeCardsDiv(data);
+
+    }
+    setDutyCart(cardDiv);
+
+  }, [data]);
+
   return (
     <PageContainer>
       {/* 时间查询条件 */}
@@ -318,343 +504,350 @@ const DutyPlan: React.FC<any> = () => {
 
       <div style={{marginTop: 5, overflow: "scroll"}}>
         <table style={{width: "100%"}}>
-          <tr>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox id={"2021/01/01~2021/01/07"} onChange={onPlanChanged}></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                  onRow={() => {
-                    return {onDoubleClick: doubleClickRow};
-                  }}
-                />
-              </Card>
-            </td>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox id={"2021/01/01~2021/01/07"} onChange={onPlanChanged}></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-          </tr>
 
-          <tr>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-          </tr>
+          {dutyCard}
+          {/*/!* */}
+          {/*// <tr>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox id={"2021/01/01~2021/01/07"} onChange={onPlanChanged}></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//         onRow={(record: any) => {*/}
+          {/*//           return {*/}
+          {/*//             onDoubleClick: () => {*/}
+          {/*//               doubleClickRow(record);*/}
+          {/*//             },*/}
+          {/*//           };*/}
+          {/*//         }}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox id={"2021/01/01~2021/01/07"} onChange={onPlanChanged}></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*// </tr>*/}
+          {/*//*/}
+          {/*// <tr>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*// </tr>*/}
+          {/*//*/}
+          {/*// <tr>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*// </tr>*/}
+          {/*//*/}
+          {/*// <tr>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*//   <td>*/}
+          {/*//     <Card size="small"*/}
+          {/*//           title="2021/01/01~2021/01/07"*/}
+          {/*//           headStyle={{textAlign: "center"}}  //   /!*  backgroundColor: "#F0F2F5" *!/*/}
+          {/*//           extra={<Checkbox></Checkbox>}>*/}
+          {/*//       <Table*/}
+          {/*//         style={{marginTop: -10}}*/}
+          {/*//         size="small"*/}
+          {/*//         columns={columns}*/}
+          {/*//         dataSource={data}*/}
+          {/*//         bordered*/}
+          {/*//         showHeader={false}*/}
+          {/*//         pagination={false}*/}
+          {/*//       />*/}
+          {/*//     </Card>*/}
+          {/*//   </td>*/}
+          {/*// </tr>*/}
 
-          <tr>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-          </tr>
 
-          <tr>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-            <td>
-              <Card size="small"
-                    title="2021/01/01~2021/01/07"
-                    headStyle={{textAlign: "center"}}  //   {/*  backgroundColor: "#F0F2F5" */}
-                    extra={<Checkbox></Checkbox>}>
-                <Table
-                  style={{marginTop: -10}}
-                  size="small"
-                  columns={columns}
-                  dataSource={datawww}
-                  bordered
-                  showHeader={false}
-                  pagination={false}
-                />
-              </Card>
-            </td>
-          </tr>
         </table>
-
-
       </div>
 
       {/* 弹出层界面 */}

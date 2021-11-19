@@ -28,7 +28,7 @@ const {Option} = Select;
 
 // 解析数据
 const parseData = (params: any) => {
-  debugger;
+
   const returnValue: any = [];
   if (params) {
     params.forEach((project: any) => {
@@ -66,137 +66,6 @@ const parseData = (params: any) => {
   }
 
   return returnValue;
-
-  // return [
-  //   [{
-  //     module: '前端',
-  //     name: '刘黎明',
-  //     id: "1",
-  //     start: "2021-01-01",
-  //     end: "2021-01-07"
-  //   }, {
-  //     module: '后端',
-  //     name: '胡靖华/罗林',
-  //     id: "2",
-  //     start: "2021-01-01",
-  //     end: "2021-01-07"
-  //   }, {
-  //     module: '测试',
-  //     name: '徐睿',
-  //     id: "3",
-  //     start: "2021-01-01",
-  //     end: "2021-01-07"
-  //   }], [{
-  //     module: '前端',
-  //     name: '欧兴阳/王濯',
-  //     id: "1",
-  //     start: "2021-01-08",
-  //     end: "2021-01-014"
-  //   }, {
-  //     module: '后端',
-  //     name: '何宇',
-  //     id: "2",
-  //     start: "2021-01-08",
-  //     end: "2021-01-014"
-  //   }, {
-  //     module: '测试',
-  //     name: '罗天刚',
-  //     id: "3",
-  //     start: "2021-01-08",
-  //     end: "2021-01-014"
-  //   }], [{
-  //     module: '前端',
-  //     name: '陈凯',
-  //     id: "1",
-  //     start: "2021-01-15",
-  //     end: "2021-01-22"
-  //   }, {
-  //     module: '后端',
-  //     name: '刘云鹏',
-  //     id: "2",
-  //     start: "2021-01-15",
-  //     end: "2021-01-22"
-  //   }, {
-  //     module: '测试',
-  //     name: '王鹄',
-  //     id: "3",
-  //     start: "2021-01-15",
-  //     end: "2021-01-22"
-  //   }], [{
-  //     module: '前端',
-  //     name: '陈凯',
-  //     id: "1",
-  //     start: "2021-01-15",
-  //     end: "2021-01-22"
-  //   }, {
-  //     module: '后端',
-  //     name: '刘云鹏',
-  //     id: "2",
-  //     start: "2021-01-15",
-  //     end: "2021-01-22"
-  //   }, {
-  //     module: '测试',
-  //     name: '王鹄',
-  //     id: "3",
-  //     start: "2021-01-15",
-  //     end: "2021-01-22"
-  //   }], [{
-  //     module: '前端',
-  //     name: '陈凯',
-  //     id: "1",
-  //     start: "2021-01-15",
-  //     end: "2021-01-22"
-  //   }, {
-  //     module: '后端',
-  //     name: '刘云鹏',
-  //     id: "2",
-  //     start: "2021-01-15",
-  //     end: "2021-01-22"
-  //   }, {
-  //     module: '测试',
-  //     name: '王鹄',
-  //     id: "3",
-  //     start: "2021-01-15",
-  //     end: "2021-01-22"
-  //   }], [{
-  //     module: '前端',
-  //     name: '陈凯',
-  //     id: "1",
-  //     start: "2021-01-23",
-  //     end: "2021-01-29"
-  //   }, {
-  //     module: '后端',
-  //     name: '刘云鹏',
-  //     id: "2",
-  //     start: "2021-01-23",
-  //     end: "2021-01-29"
-  //   }, {
-  //     module: '测试',
-  //     name: '王鹄',
-  //     id: "3",
-  //     start: "2021-01-23",
-  //     end: "2021-01-29"
-  //   }], [{
-  //     module: '前端',
-  //     name: '陈凯',
-  //     id: "1",
-  //     start: "2021-01-30",
-  //     end: "2021-02-05"
-  //   }, {
-  //     module: '后端',
-  //     name: '刘云鹏',
-  //     id: "2",
-  //     start: "2021-01-30",
-  //     end: "2021-02-05"
-  //   }, {
-  //     module: '测试',
-  //     name: '王鹄',
-  //     id: "3",
-  //     start: "2021-01-30",
-  //     end: "2021-02-05"
-  //   }]
-  // ];
-
 }
 const queryDevelopViews = async (params: any) => {
 
@@ -231,27 +100,99 @@ const queryDevelopViews = async (params: any) => {
   return result;
 };
 
-
+// 已选中的事件
+let selectedProject: any = [];
 const DutyPlan: React.FC<any> = () => {
-
-  /* region 数据查询 */
-
-  const [choicedCondition, setChoicedCondition] = useState({start: "", end: ""});
-  const {data} = useRequest(() => queryDevelopViews(choicedCondition));
-  /* endregion */
-
 
   /* region 消息推送事件 */
 
   // checkbox 选中事件
+
   const onPlanChanged = (params: any) => {
 
     const selectedId = params.target.id;
     const isChecked = params.target.checked;
-    console.log(selectedId, isChecked);
-    message.info(selectedId);
+    if (isChecked) {
+      debugger;
+      if (selectedProject.length >= 1) {// 表示之前已选有数据，一次性只能推送一条数据
+        message.error({
+          content: `一次只能推送一条数据！`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
+      selectedProject.push(selectedId);
+    } else {
+      // 如果取消掉则设置为空
+      selectedProject.forEach(function (item: any, index: any, arr: any) {
+        if (item === selectedId) {
+          arr.splice(index, 1);
+        }
+      });
+
+    }
+
   };
+
+  // 发送消息
   const sendMessage = () => {
+    if (selectedProject.length === 0) {
+      //   提醒选中一条
+      message.error({
+        content: `请选中你要推送的数据！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
+
+    if (selectedProject.length > 1) {
+      message.error({
+        content: `一次只能推送一条数据！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+    axios.get('/api/verify/duty/msg_push', {params: {person_num: selectedProject[0]}})
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+          message.info({
+            content: `消息推送成功！`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+          message.error({
+            content: `错误：${res.data.msg}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+
+      }).catch(function (error) {
+
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
 
   };
   /*  endregion */
@@ -427,6 +368,9 @@ const DutyPlan: React.FC<any> = () => {
   /* endregion */
 
   /* region 数据查询以及展示 */
+
+  const [choicedCondition, setChoicedCondition] = useState({start: "", end: ""});
+  const {data} = useRequest(() => queryDevelopViews(choicedCondition));
 
   const [dutyCard, setDutyCart] = useState(<div></div>);
   const makeCardsDiv = (oraData: any) => {

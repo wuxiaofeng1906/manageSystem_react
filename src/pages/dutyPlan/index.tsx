@@ -25,155 +25,175 @@ import moment from "moment";
 const {RangePicker} = DatePicker;
 const {Option} = Select;
 
+// 解析数据
 const parseData = (params: any) => {
-  console.log(params);
-  // {
-  //   title: '所属端',
-  //     dataIndex: 'module',
-  //   align: 'center'
-  // },
-  // {
-  //   title: '姓名',
-  //     dataIndex: 'name',
-  //   align: 'center'
-  // },
-//    //   {
-//   //
-//   //     module: '前端',
-//   //     name: '刘黎明',
-//   //     id: "1"
-//   //   },
+  const returnValue: any = [];
+  if (params) {
+    params.forEach((project: any) => {
+      const projectItemArray: any = [];
+      let username = "";
+      project.forEach((ele: any) => {
 
+        const projectItem = {
+          person_id: ele.person_id,
+          person_num: ele.person_num,
+          user_tech: ele.user_tech,
+          user_id: ele.user_id,
+          user_name: "",
+          duty_start_time: ele.duty_start_time,
+          duty_end_time: ele.duty_end_time,
+          duty_order: ele.duty_order
+        };
 
-  return [
-    [{
-      module: '前端',
-      name: '刘黎明',
-      id: "1",
-      start: "2021-01-01",
-      end: "2021-01-07"
-    }, {
-      module: '后端',
-      name: '胡靖华/罗林',
-      id: "2",
-      start: "2021-01-01",
-      end: "2021-01-07"
-    }, {
-      module: '测试',
-      name: '徐睿',
-      id: "3",
-      start: "2021-01-01",
-      end: "2021-01-07"
-    }], [{
-      module: '前端',
-      name: '欧兴阳/王濯',
-      id: "1",
-      start: "2021-01-08",
-      end: "2021-01-014"
-    }, {
-      module: '后端',
-      name: '何宇',
-      id: "2",
-      start: "2021-01-08",
-      end: "2021-01-014"
-    }, {
-      module: '测试',
-      name: '罗天刚',
-      id: "3",
-      start: "2021-01-08",
-      end: "2021-01-014"
-    }], [{
-      module: '前端',
-      name: '陈凯',
-      id: "1",
-      start: "2021-01-15",
-      end: "2021-01-22"
-    }, {
-      module: '后端',
-      name: '刘云鹏',
-      id: "2",
-      start: "2021-01-15",
-      end: "2021-01-22"
-    }, {
-      module: '测试',
-      name: '王鹄',
-      id: "3",
-      start: "2021-01-15",
-      end: "2021-01-22"
-    }], [{
-      module: '前端',
-      name: '陈凯',
-      id: "1",
-      start: "2021-01-15",
-      end: "2021-01-22"
-    }, {
-      module: '后端',
-      name: '刘云鹏',
-      id: "2",
-      start: "2021-01-15",
-      end: "2021-01-22"
-    }, {
-      module: '测试',
-      name: '王鹄',
-      id: "3",
-      start: "2021-01-15",
-      end: "2021-01-22"
-    }], [{
-      module: '前端',
-      name: '陈凯',
-      id: "1",
-      start: "2021-01-15",
-      end: "2021-01-22"
-    }, {
-      module: '后端',
-      name: '刘云鹏',
-      id: "2",
-      start: "2021-01-15",
-      end: "2021-01-22"
-    }, {
-      module: '测试',
-      name: '王鹄',
-      id: "3",
-      start: "2021-01-15",
-      end: "2021-01-22"
-    }], [{
-      module: '前端',
-      name: '陈凯',
-      id: "1",
-      start: "2021-01-23",
-      end: "2021-01-29"
-    }, {
-      module: '后端',
-      name: '刘云鹏',
-      id: "2",
-      start: "2021-01-23",
-      end: "2021-01-29"
-    }, {
-      module: '测试',
-      name: '王鹄',
-      id: "3",
-      start: "2021-01-23",
-      end: "2021-01-29"
-    }], [{
-      module: '前端',
-      name: '陈凯',
-      id: "1",
-      start: "2021-01-30",
-      end: "2021-02-05"
-    }, {
-      module: '后端',
-      name: '刘云鹏',
-      id: "2",
-      start: "2021-01-30",
-      end: "2021-02-05"
-    }, {
-      module: '测试',
-      name: '王鹄',
-      id: "3",
-      start: "2021-01-30",
-      end: "2021-02-05"
-    }]
-  ];
+        if (ele.duty_order === "1") {
+          username = ele.user_name === null ? "" : ele.user_name;
+        } else {
+
+          if (ele.user_name === null) {
+            projectItem.user_name = username;
+          } else {
+            projectItem.user_name = `${username}/${ele.user_name}`;
+          }
+          username = "";
+          projectItemArray.push(projectItem);
+        }
+      });
+      returnValue.push(projectItemArray);
+    });
+
+  }
+
+  return returnValue;
+
+  // return [
+  //   [{
+  //     module: '前端',
+  //     name: '刘黎明',
+  //     id: "1",
+  //     start: "2021-01-01",
+  //     end: "2021-01-07"
+  //   }, {
+  //     module: '后端',
+  //     name: '胡靖华/罗林',
+  //     id: "2",
+  //     start: "2021-01-01",
+  //     end: "2021-01-07"
+  //   }, {
+  //     module: '测试',
+  //     name: '徐睿',
+  //     id: "3",
+  //     start: "2021-01-01",
+  //     end: "2021-01-07"
+  //   }], [{
+  //     module: '前端',
+  //     name: '欧兴阳/王濯',
+  //     id: "1",
+  //     start: "2021-01-08",
+  //     end: "2021-01-014"
+  //   }, {
+  //     module: '后端',
+  //     name: '何宇',
+  //     id: "2",
+  //     start: "2021-01-08",
+  //     end: "2021-01-014"
+  //   }, {
+  //     module: '测试',
+  //     name: '罗天刚',
+  //     id: "3",
+  //     start: "2021-01-08",
+  //     end: "2021-01-014"
+  //   }], [{
+  //     module: '前端',
+  //     name: '陈凯',
+  //     id: "1",
+  //     start: "2021-01-15",
+  //     end: "2021-01-22"
+  //   }, {
+  //     module: '后端',
+  //     name: '刘云鹏',
+  //     id: "2",
+  //     start: "2021-01-15",
+  //     end: "2021-01-22"
+  //   }, {
+  //     module: '测试',
+  //     name: '王鹄',
+  //     id: "3",
+  //     start: "2021-01-15",
+  //     end: "2021-01-22"
+  //   }], [{
+  //     module: '前端',
+  //     name: '陈凯',
+  //     id: "1",
+  //     start: "2021-01-15",
+  //     end: "2021-01-22"
+  //   }, {
+  //     module: '后端',
+  //     name: '刘云鹏',
+  //     id: "2",
+  //     start: "2021-01-15",
+  //     end: "2021-01-22"
+  //   }, {
+  //     module: '测试',
+  //     name: '王鹄',
+  //     id: "3",
+  //     start: "2021-01-15",
+  //     end: "2021-01-22"
+  //   }], [{
+  //     module: '前端',
+  //     name: '陈凯',
+  //     id: "1",
+  //     start: "2021-01-15",
+  //     end: "2021-01-22"
+  //   }, {
+  //     module: '后端',
+  //     name: '刘云鹏',
+  //     id: "2",
+  //     start: "2021-01-15",
+  //     end: "2021-01-22"
+  //   }, {
+  //     module: '测试',
+  //     name: '王鹄',
+  //     id: "3",
+  //     start: "2021-01-15",
+  //     end: "2021-01-22"
+  //   }], [{
+  //     module: '前端',
+  //     name: '陈凯',
+  //     id: "1",
+  //     start: "2021-01-23",
+  //     end: "2021-01-29"
+  //   }, {
+  //     module: '后端',
+  //     name: '刘云鹏',
+  //     id: "2",
+  //     start: "2021-01-23",
+  //     end: "2021-01-29"
+  //   }, {
+  //     module: '测试',
+  //     name: '王鹄',
+  //     id: "3",
+  //     start: "2021-01-23",
+  //     end: "2021-01-29"
+  //   }], [{
+  //     module: '前端',
+  //     name: '陈凯',
+  //     id: "1",
+  //     start: "2021-01-30",
+  //     end: "2021-02-05"
+  //   }, {
+  //     module: '后端',
+  //     name: '刘云鹏',
+  //     id: "2",
+  //     start: "2021-01-30",
+  //     end: "2021-02-05"
+  //   }, {
+  //     module: '测试',
+  //     name: '王鹄',
+  //     id: "3",
+  //     start: "2021-01-30",
+  //     end: "2021-02-05"
+  //   }]
+  // ];
 
 }
 const queryDevelopViews = async (params: any) => {
@@ -183,8 +203,7 @@ const queryDevelopViews = async (params: any) => {
     .then(function (res) {
 
       if (res.data.code === 200) {
-
-        result = parseData(res.data.data);
+        result = parseData(res.data.data.data);
       } else {
         message.error({
           content: `错误：${res.data.msg}`,
@@ -217,20 +236,6 @@ const DutyPlan: React.FC<any> = () => {
 
   const [choicedCondition, setChoicedCondition] = useState({start: "", end: ""});
   const {data} = useRequest(() => queryDevelopViews(choicedCondition));
-  const columns: any = [
-    {
-      title: '所属端',
-      dataIndex: 'module',
-      align: 'center'
-    },
-    {
-      title: '姓名',
-      dataIndex: 'name',
-      align: 'center'
-    },
-  ];
-
-
   /* endregion */
 
   /* region 时间查询 */
@@ -246,7 +251,6 @@ const DutyPlan: React.FC<any> = () => {
 
   // checkbox 选中事件
   const onPlanChanged = (params: any) => {
-    debugger;
     const selectedId = params.target.id;
     const isChecked = params.target.checked;
     console.log(selectedId, isChecked);
@@ -276,7 +280,7 @@ const DutyPlan: React.FC<any> = () => {
 
   // 表格双击事件
   const doubleClickRow = (tableData: any) => {
-    debugger;
+
     console.log(tableData);
 
     // setIsPlanVisble(true);
@@ -430,10 +434,22 @@ const DutyPlan: React.FC<any> = () => {
 
   const [dutyCard, setDutyCart] = useState(<div></div>);
   const makeCardsDiv = (oraData: any) => {
+    const columns: any = [
+      {
+        title: '所属端',
+        dataIndex: 'user_tech',
+        align: 'center'
+      },
+      {
+        title: '姓名',
+        dataIndex: 'user_name',
+        align: 'center'
+      },
+    ];
     const cardDiv: any = [];
     const tdArray: any = [];
     oraData.forEach((ele_data: any, index: number) => {
-      const titleStr = `${ele_data[0].start}~${ele_data[0].end}`;
+      const titleStr = `${ele_data[0].duty_start_time}~${ele_data[0].duty_end_time}`;
 
       tdArray.push(
         <td>
@@ -476,7 +492,6 @@ const DutyPlan: React.FC<any> = () => {
     let cardDiv: any = [];
     if (data) {
       cardDiv = makeCardsDiv(data);
-
     }
     setDutyCart(cardDiv);
 

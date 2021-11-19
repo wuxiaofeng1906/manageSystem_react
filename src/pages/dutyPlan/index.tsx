@@ -99,21 +99,20 @@ const queryDevelopViews = async (params: any) => {
 
   return result;
 };
-
 // 已选中的事件
-let selectedProject: any = [];
+const selectedProject: any = [];
+
 const DutyPlan: React.FC<any> = () => {
 
   /* region 消息推送事件 */
 
   // checkbox 选中事件
-
   const onPlanChanged = (params: any) => {
 
     const selectedId = params.target.id;
     const isChecked = params.target.checked;
     if (isChecked) {
-      debugger;
+
       if (selectedProject.length >= 1) {// 表示之前已选有数据，一次性只能推送一条数据
         message.error({
           content: `一次只能推送一条数据！`,
@@ -131,9 +130,7 @@ const DutyPlan: React.FC<any> = () => {
           arr.splice(index, 1);
         }
       });
-
     }
-
   };
 
   // 发送消息

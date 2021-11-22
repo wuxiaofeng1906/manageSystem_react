@@ -107,6 +107,38 @@ const queryDevelopViews = async (params: any) => {
 
   return result;
 };
+const getPlanDetails = async (paln_num: string) => {
+  let userInfo: any = [];
+
+  await axios.get('/api/verify/duty/plan_data_detail', {params: {person_num: paln_num}})
+    .then(function (res) {
+
+      if (res.data.code === 200) {
+        userInfo = res.data.data;
+
+      } else {
+        message.error({
+          content: `错误：${res.data.msg}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
+
+    }).catch(function (error) {
+      message.error({
+        content: `异常信息:${error.toString()}`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    });
+
+  return userInfo;
+
+};
 
 // 已选中的事件
 const selectedProject: any = [];
@@ -217,8 +249,7 @@ const DutyPlan: React.FC<any> = () => {
       planGrayTime: "",
       planOnlineTime: ""
 
-    },
-  ]);
+    }]);
   const [allUsers, setAllUsers] = useState({
     front: [],
     backend: [],
@@ -373,9 +404,101 @@ const DutyPlan: React.FC<any> = () => {
   };
   /* endregion */
 
+  const showExitData = (hisData: any) => {
+    // 值班人详细信息显示
+    const userData = hisData.user;
+    if (userData) {
+      formForPlanModify.setFieldsValue({
+        ...formForPlanModify,
+        dutyTime: [moment(userData[0].duty_start_time), moment(userData[0].duty_end_time)],
+      });
+
+      userData.forEach((users: any) => {
+        if (users.user_tech === "前端") {
+          if (users.duty_order === "1") {
+            formForPlanModify.setFieldsValue({
+              ...formForPlanModify,
+              firstFront: users.user_name
+            });
+          } else {
+            formForPlanModify.setFieldsValue({
+              ...formForPlanModify,
+              secondFront: users.user_name
+            });
+          }
+
+        } else if (users.user_tech === "后端") {
+
+          if (users.duty_order === "1") {
+            formForPlanModify.setFieldsValue({
+              ...formForPlanModify,
+              firstBackend: users.user_name
+            });
+          } else {
+            formForPlanModify.setFieldsValue({
+              ...formForPlanModify,
+              secondBackend: users.user_name
+            });
+          }
+        } else if (users.duty_order === "1") {
+          formForPlanModify.setFieldsValue({
+            ...formForPlanModify,
+            firstTester: users.user_name
+          });
+        } else {
+          formForPlanModify.setFieldsValue({
+            ...formForPlanModify,
+            secondTester: users.user_name
+          });
+        }
+
+      });
+    }
+
+    debugger;
+    // 项目详细信息显示
+    const projectData = hisData.project;
+    if (projectData.length === 0) {
+      setProjects([{
+        prjName: "",
+        prjType: "",
+        branch: "",
+        testEnv: "",
+        upgradeEnv: "",
+        prjManager: "",
+        planGrayTime: "",
+        planOnlineTime: ""
+      }]);
+      return;
+    }
+
+    const detailsInfo: any = [];
+    projectData.forEach((dts: any) => {
+
+      detailsInfo.push({
+        prjName: dts.project_name,
+        prjType: dts.project_type,
+        branch: dts.project_branch,
+        testEnv: dts.project_test_environment,
+        upgradeEnv: dts.project_upgrade_environment,
+        prjManager: dts.project_head,
+        planGrayTime: moment(dts.project_plan_gray_time),
+        planOnlineTime: moment(dts.project_plan_online_time)
+      });
+    });
+    setProjects(detailsInfo);
+  };
   // 表格双击事件
   const doubleClickRow = async (tableData: any) => {
+
+    /* region 显示已有数据  */
+    const hisData = await getPlanDetails(tableData[0].person_num);
+    showExitData(hisData);
+    /* endregion  */
+
+    /* region 下拉框中选项加载  */
     setIsPlanVisble(true);
+
     // 生成值班人下拉框
     const frontUserInfo = await loadUserSelect("1");
     const backendUserInfo = await loadUserSelect("2");
@@ -400,27 +523,14 @@ const DutyPlan: React.FC<any> = () => {
       upgradeEnv: environment,
       manager: principal
     });
-
-
-    const infoDetails = [{
-      prjName: '',
-      prjType: '',
-      branch: "",
-      testEnv: "",
-      upgradeEnv: "",
-      prjManager: "",
-      planGrayTime: "",
-      planOnlineTime: ""
-
-    },];
-    setProjects(infoDetails);
-
+    /* endregion  */
   };
 
   // 弹出层取消
   const planModalCancel = () => {
     setIsPlanVisble(false);
   };
+
 
   // 新增项目
   const add = () => {
@@ -513,11 +623,11 @@ const DutyPlan: React.FC<any> = () => {
         </Form.Item>
 
         <Form.Item label="计划灰度时间" name={['projects', index, 'planGrayTime']} style={{marginTop: -20, marginLeft: 13}}>
-          <RangePicker style={{width: '100%'}}/>
+          <DatePicker style={{width: '100%'}}/>
         </Form.Item>
 
         <Form.Item label="计划上线时间" name={['projects', index, 'planOnlineTime']} style={{marginTop: -20, marginLeft: 13}}>
-          <RangePicker style={{width: '100%'}}/>
+          <DatePicker style={{width: '100%'}}/>
         </Form.Item>
 
         {/* 增加和删除操作 */}
@@ -680,6 +790,8 @@ const DutyPlan: React.FC<any> = () => {
         width={550}
         footer={null}
         maskClosable={false}
+        // onCancel={modalClosed}
+        // destroyOnClose = {true}
       >
 
         <Form name="user_form" form={formForPlanModify} layout={'horizontal'} onFinish={submitForm}
@@ -688,7 +800,8 @@ const DutyPlan: React.FC<any> = () => {
           <Form.Item label="值班时间" name="dutyTime" required={true}>
             <RangePicker
               className={'times'}
-              style={{width: '100%'}}
+              style={{width: '100%', color: "black"}}
+              disabled
             />
           </Form.Item>
 

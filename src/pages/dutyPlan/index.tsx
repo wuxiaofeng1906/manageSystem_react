@@ -22,6 +22,14 @@ import {MinusOutlined, PlusOutlined} from '@ant-design/icons';
 import axios from "axios";
 import moment from "moment";
 import dayjs from "dayjs";
+import {
+  getAllUsers,
+  getAllProject,
+  getProjectType,
+  getBranchName,
+  getEnvironment,
+  getPrincipal
+} from '@/publicMethods/verifyAxios';
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
@@ -99,6 +107,7 @@ const queryDevelopViews = async (params: any) => {
 
   return result;
 };
+
 // 已选中的事件
 const selectedProject: any = [];
 
@@ -199,8 +208,8 @@ const DutyPlan: React.FC<any> = () => {
   const [isPlanVisble, setIsPlanVisble] = useState(false);
   const [projects, setProjects] = useState([
     {
-      prjName: '哈哈哈哈',
-      prjType: '嘻嘻嘻',
+      prjName: '',
+      prjType: '',
       branch: "",
       testEnv: "",
       upgradeEnv: "",
@@ -210,13 +219,201 @@ const DutyPlan: React.FC<any> = () => {
 
     },
   ]);
+  const [allUsers, setAllUsers] = useState({
+    front: [],
+    backend: [],
+    tester: []
+  });
+  const [projectInfo, setProjectInfo] = useState({
+    prjName: [],
+    prjType: [],
+    branch: [],
+    testEnv: [],
+    upgradeEnv: [],
+    manager: []
+  });
+
+  /* region 下拉框获取 */
+  const loadUserSelect = async (teach: string) => {
+
+    const teachData: any = [<Option key={""} value={"免"}>免</Option>];
+
+    const userInfo = await getAllUsers(teach);
+    if (userInfo.message !== "") {
+      message.error({
+        content: userInfo.message,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    } else if (userInfo.data) {
+      const {data} = userInfo;
+      data.forEach((user: any) => {
+        teachData.push(<Option key={user.user_id} value={user.user_name}>{user.user_name}</Option>);
+      });
+    }
+    return teachData;
+  };
+  const loadPrjNameSelect = async () => {
+    const prjNames = await getAllProject();
+    const prjData: any = [];
+
+    if (prjNames.message !== "") {
+      message.error({
+        content: prjNames.message,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    } else if (prjNames.data) {
+      const datas = prjNames.data;
+      datas.forEach((project: any) => {
+        prjData.push(
+          <Option key={project.project_id} value={project.project_name}>{project.project_name}</Option>);
+      });
+    }
+
+    return prjData;
+
+  };
+  const loadPrjTypeSelect = async () => {
+    const prjNames = await getProjectType();
+    const prjData: any = [];
+
+    if (prjNames.message !== "") {
+      message.error({
+        content: prjNames.message,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    } else if (prjNames.data) {
+      const datas = prjNames.data;
+      datas.forEach((project: any) => {
+        prjData.push(
+          <Option key={project.project_type} value={project.project_type_name}>{project.project_type_name}</Option>);
+      });
+    }
+
+    return prjData;
+
+  };
+  const loadBanchSelect = async () => {
+
+    const branchInfo = await getBranchName();
+    const branchData: any = [];
+
+    if (branchInfo.message !== "") {
+      message.error({
+        content: branchInfo.message,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    } else if (branchInfo.data) {
+      const datas = branchInfo.data;
+      datas.forEach((branch: any) => {
+        branchData.push(
+          <Option key={branch.branch_id} value={branch.branch_name}>{branch.branch_name}</Option>);
+      });
+    }
+
+    return branchData;
+
+  };
+  const loadEnvironmentSelect = async () => {
+    const envData = await getEnvironment();
+    const environmentData: any = [];
+
+    if (envData.message !== "") {
+      message.error({
+        content: envData.message,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    } else if (envData.data) {
+      const datas = envData.data;
+      datas.forEach((env: any) => {
+        environmentData.push(
+          <Option key={env.env_id} value={env.image_env}>{env.image_env}</Option>);
+      });
+    }
+
+    return environmentData;
+
+  };
+  const loadPrincipalSelect = async () => {
+    const principalData = await getPrincipal();
+    const prinData: any = [];
+
+    if (principalData.message !== "") {
+      message.error({
+        content: principalData.message,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    } else if (principalData.data) {
+      const datas = principalData.data;
+      datas.forEach((users: any) => {
+        prinData.push(
+          <Option key={users.user_id} value={users.user_name}>{users.user_name}</Option>);
+      });
+    }
+
+    return prinData;
+
+  };
+  /* endregion */
 
   // 表格双击事件
-  const doubleClickRow = (tableData: any) => {
+  const doubleClickRow = async (tableData: any) => {
+    setIsPlanVisble(true);
+    // 生成值班人下拉框
+    const frontUserInfo = await loadUserSelect("1");
+    const backendUserInfo = await loadUserSelect("2");
+    const testerUserInfo = await loadUserSelect("3");
+    setAllUsers({
+      front: frontUserInfo,
+      backend: backendUserInfo,
+      tester: testerUserInfo
+    });
 
-    console.log(tableData);
+    // 生成项目名称、项目类型、对应分支、对应测试环境、对应升级环境、项目负责人的下拉框
+    const projectName = await loadPrjNameSelect();
+    const projectType = await loadPrjTypeSelect();
+    const branchs = await loadBanchSelect();
+    const environment = await loadEnvironmentSelect();
+    const principal = await loadPrincipalSelect();
+    setProjectInfo({
+      prjName: projectName,
+      prjType: projectType,
+      branch: branchs,
+      testEnv: environment,
+      upgradeEnv: environment,
+      manager: principal
+    });
 
-    // setIsPlanVisble(true);
+
+    const infoDetails = [{
+      prjName: '',
+      prjType: '',
+      branch: "",
+      testEnv: "",
+      upgradeEnv: "",
+      prjManager: "",
+      planGrayTime: "",
+      planOnlineTime: ""
+
+    },];
+    setProjects(infoDetails);
 
   };
 
@@ -229,6 +426,7 @@ const DutyPlan: React.FC<any> = () => {
   const add = () => {
     formForPlanModify.setFieldsValue({"projects": [...projects, {name: '', mobile: ''}]})
     return setProjects([...projects, {
+
       prjName: '',
       prjType: '',
       branch: "",
@@ -272,44 +470,45 @@ const DutyPlan: React.FC<any> = () => {
       9: "⑨",
       10: "⑩"
     };
-    const order = `${numChar[index + 1]}项目名称`;
+    const order = `${numChar[index + 1]} 项目名称`;
 
     return <div>
       <div>
 
         <Form.Item label={order} name={['projects', index, 'prjName']} style={{marginLeft: -5}}>
-          <Select style={{width: '93%', marginLeft: 27}} onChange={(event: any) => onChange(index, 'prjName', event)}>
-            <Option value="liming.liu">刘黎明</Option>
+          <Select style={{width: '93%', marginLeft: 27}} showSearch
+                  onChange={(event: any) => onChange(index, 'prjName', event)}>
+            {projectInfo.prjName}
           </Select>
         </Form.Item>
 
         <Form.Item label="项目类型" name={['projects', index, 'prjType']} style={{marginTop: -20, marginLeft: 13}}>
-          <Select style={{width: '93%', marginLeft: 27}}>
-            <Option value="刘黎明">刘黎明</Option>
+          <Select style={{width: '93%', marginLeft: 27}} showSearch>
+            {projectInfo.prjType}
           </Select>
         </Form.Item>
 
         <Form.Item label="对应分支" name={['projects', index, 'branch']} style={{marginTop: -20, marginLeft: 13}}>
-          <Select style={{width: "93%", marginLeft: 27}}>
-            <Option value="刘黎明">刘黎明</Option>
+          <Select style={{width: "93%", marginLeft: 27}} showSearch>
+            {projectInfo.branch}
           </Select>
         </Form.Item>
 
         <Form.Item label="对应测试环境" name={['projects', index, 'testEnv']} style={{marginTop: -20, marginLeft: 13}}>
-          <Select style={{width: "100%"}}>
-            <Option value="刘黎明">刘黎明</Option>
+          <Select style={{width: "100%"}} showSearch>
+            {projectInfo.testEnv}
           </Select>
         </Form.Item>
 
         <Form.Item label="对应升级环境" name={['projects', index, 'upgradeEnv']} style={{marginTop: -20, marginLeft: 13}}>
-          <Select style={{width: "100%"}}>
-            <Option value="刘黎明">刘黎明</Option>
+          <Select style={{width: "100%"}} showSearch>
+            {projectInfo.upgradeEnv}
           </Select>
         </Form.Item>
 
         <Form.Item label="项目负责人" name={['projects', index, 'prjManager']} style={{marginTop: -20, marginLeft: 13}}>
-          <Select style={{width: "96%", marginLeft: 14}}>
-            <Option value="刘黎明">刘黎明</Option>
+          <Select style={{width: "96%", marginLeft: 14}} showSearch>
+            {projectInfo.manager}
           </Select>
         </Form.Item>
 
@@ -498,16 +697,15 @@ const DutyPlan: React.FC<any> = () => {
             <Row gutter={40} style={{marginTop: -10}}>
               <Col span={10}>
                 <Form.Item name="firstFront" label="前端" style={{marginTop: 7}}>
-                  <Select style={{width: '130px'}}>
-                    <Option value="刘黎明">刘黎明</Option>
+                  <Select style={{width: '130px'}} showSearch>
+                    {allUsers.front}
                   </Select>
                 </Form.Item>
               </Col>
               <Col span={14}>
                 <Form.Item name="secondFront" label="前端第二值班人" style={{marginTop: 7}}>
-                  <Select style={{width: '130px'}}>
-                    <Option value="刘黎明">刘黎明</Option>
-
+                  <Select style={{width: '130px'}} showSearch>
+                    {allUsers.front}
                   </Select>
                 </Form.Item>
               </Col>
@@ -516,16 +714,16 @@ const DutyPlan: React.FC<any> = () => {
             <Row gutter={40} style={{marginTop: -25}}>
               <Col span={10}>
                 <Form.Item name="firstBackend" label="后端" style={{marginTop: 7}}>
-                  <Select style={{width: '130px'}}>
-                    <Option value="刘黎明">刘黎明</Option>
+                  <Select style={{width: '130px'}} showSearch>
+                    {allUsers.backend}
                   </Select>
                 </Form.Item>
               </Col>
 
               <Col span={14}>
                 <Form.Item name="secondBackend" label="后端第二值班人" style={{marginTop: 7}}>
-                  <Select style={{width: '130px'}}>
-                    <Option value="刘黎明">刘黎明</Option>
+                  <Select style={{width: '130px'}} showSearch>
+                    {allUsers.backend}
                   </Select>
                 </Form.Item>
               </Col>
@@ -535,15 +733,15 @@ const DutyPlan: React.FC<any> = () => {
             <Row gutter={40} style={{marginTop: -25}}>
               <Col span={10}>
                 <Form.Item name="firstTester" label="测试" style={{marginTop: 7}}>
-                  <Select style={{width: '130px'}}>
-                    <Option value="刘黎明">刘黎明</Option>
+                  <Select style={{width: '130px'}} showSearch>
+                    {allUsers.tester}
                   </Select>
                 </Form.Item>
               </Col>
               <Col span={14}>
                 <Form.Item name="secondTester" label="测试第二值班人" style={{marginTop: 7}}>
-                  <Select style={{width: '130px'}}>
-                    <Option value="刘黎明">刘黎明</Option>
+                  <Select style={{width: '130px'}} showSearch>
+                    {allUsers.tester}
                   </Select>
                 </Form.Item>
               </Col>

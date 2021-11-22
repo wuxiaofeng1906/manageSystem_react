@@ -2,17 +2,16 @@
  * @Description: 过程质量
  * @Author: jieTan
  * @Date: 2021-11-19 17:37:56
- * @LastEditTime: 2021-11-19 18:15:28
+ * @LastEditTime: 2021-11-22 11:28:12
  * @LastEditors: jieTan
  * @LastModify: 
  */
 
-import { Select } from "antd"
 import { PageContainer } from "@ant-design/pro-layout"
 import ProCard from '@ant-design/pro-card';
+import Selector from "./Selector";
+import TableList from "./TableList";
 // import { AgGridColumn, AgGridReact } from "ag-grid-react";
-
-const { Option } = Select;
 
 export default () => {
     /* 变量定义 */
@@ -22,12 +21,9 @@ export default () => {
     /* DOM绘制 */
     return (
         <PageContainer>
-            <ProCard direction="column" gutter={[0, 2]}>
-                <Select defaultValue="lucy" style={{ width: 200 }} onChange={() => { }}>
-                    <Option value="jack">Jack</Option>
-                    <Option value="lucy">Lucy</Option>
-                    <Option value="Yiminghe">yiminghe</Option>
-                </Select>
+            <ProCard direction="column" ghost gutter={[0, 2]}>
+                <ProCard bordered><Selector /></ProCard>
+                <ProCard bordered><TableList /></ProCard>
             </ProCard>
         </PageContainer>
     )

@@ -153,6 +153,7 @@ const oldDutyTask = {
   secondTesterId: "",
 };
 const DutyPlan: React.FC<any> = () => {
+  const [choicedCondition, setChoicedCondition] = useState({start: "", end: ""});
 
   /* region 消息推送事件 */
 
@@ -228,8 +229,6 @@ const DutyPlan: React.FC<any> = () => {
             },
           });
         }
-
-
       }).catch(function (error) {
 
       message.error({
@@ -584,6 +583,8 @@ const DutyPlan: React.FC<any> = () => {
   // 删除项目
   const del = (index: any) => {
 
+    debugger;
+
     formForPlanModify.setFieldsValue({"projects": [...projects.slice(0, index), ...projects.slice(index + 1)]})
     return setProjects([...projects.slice(0, index), ...projects.slice(index + 1)])
   };
@@ -702,6 +703,72 @@ const DutyPlan: React.FC<any> = () => {
   /* endregion */
 
   /* region 保存数据 */
+
+  const [dutyCard, setDutyCart] = useState(<div></div>);
+
+  const makeCardsDiv = (oraData: any) => {
+    const columns: any = [
+      {
+        title: '所属端',
+        dataIndex: 'user_tech',
+        align: 'center'
+      },
+      {
+        title: '姓名',
+        dataIndex: 'user_name',
+        align: 'center'
+      },
+    ];
+    const cardDiv: any = [];
+    const tdArray: any = [];
+    oraData.forEach((ele_data: any, index: number) => {
+
+      tdArray.push(
+        <td>
+          <Card size="small"
+                title={`${ele_data[0].duty_start_time}~${ele_data[0].duty_end_time}`}
+                headStyle={{textAlign: "center"}}
+                extra={<Checkbox id={`${ele_data[0].person_num}`} onChange={onPlanChanged}></Checkbox>}>
+            <Table
+              style={{marginTop: -10}}
+              size="small"
+              columns={columns}
+              dataSource={ele_data}
+              bordered
+              showHeader={false}
+              pagination={false}
+              onRow={() => {
+                return {
+                  onDoubleClick: () => {
+                    doubleClickRow(ele_data);
+                  },
+                };
+              }}
+            />
+          </Card>
+        </td>);
+
+      if ((index + 1) % 5 === 0 || oraData.length - 1 === index) {
+        const test = tdArray.map((current: any) => {
+          return current;
+        });
+        cardDiv.push(<tr>{test} </tr>);
+        tdArray.length = 0;
+      }
+    });
+
+    return cardDiv;
+  };
+  const refreshData = async (startTime: string, endTime: string) => {
+    const queryData = await queryDevelopViews({
+      start: startTime,
+      end: endTime
+    });
+
+    const newCardDiv = makeCardsDiv(queryData);
+    setDutyCart(newCardDiv);
+  };
+
   const alasysDutyPerson = (data: any) => {
 
     const person_data_array = [];
@@ -814,13 +881,12 @@ const DutyPlan: React.FC<any> = () => {
   };
   // 提交事件
   const submitForm = async () => {
+    debugger;
 
     const formData = formForPlanModify.getFieldsValue();
 
     // 解析值班人数据
     const person_data = alasysDutyPerson(formData);
-
-    console.log("person_data", person_data);
 
     // 解析项目数据
     const project_data = alasysDutyProject(formData.projects);
@@ -838,6 +904,9 @@ const DutyPlan: React.FC<any> = () => {
           });
 
           setIsPlanVisble(false);
+
+          //
+          refreshData(choicedCondition.start, choicedCondition.end);
 
         } else {
           message.error({
@@ -867,74 +936,12 @@ const DutyPlan: React.FC<any> = () => {
 
   /* region 数据查询以及展示 */
 
-  const [choicedCondition, setChoicedCondition] = useState({start: "", end: ""});
   const {data} = useRequest(() => queryDevelopViews(choicedCondition));
-
-  const [dutyCard, setDutyCart] = useState(<div></div>);
-  const makeCardsDiv = (oraData: any) => {
-    const columns: any = [
-      {
-        title: '所属端',
-        dataIndex: 'user_tech',
-        align: 'center'
-      },
-      {
-        title: '姓名',
-        dataIndex: 'user_name',
-        align: 'center'
-      },
-    ];
-    const cardDiv: any = [];
-    const tdArray: any = [];
-    oraData.forEach((ele_data: any, index: number) => {
-
-      tdArray.push(
-        <td>
-          <Card size="small"
-                title={`${ele_data[0].duty_start_time}~${ele_data[0].duty_end_time}`}
-                headStyle={{textAlign: "center"}}
-                extra={<Checkbox id={`${ele_data[0].person_num}`} onChange={onPlanChanged}></Checkbox>}>
-            <Table
-              style={{marginTop: -10}}
-              size="small"
-              columns={columns}
-              dataSource={ele_data}
-              bordered
-              showHeader={false}
-              pagination={false}
-              onRow={() => {
-                return {
-                  onDoubleClick: () => {
-                    doubleClickRow(ele_data);
-                  },
-                };
-              }}
-            />
-          </Card>
-        </td>);
-
-      if ((index + 1) % 5 === 0 || oraData.length - 1 === index) {
-        const test = tdArray.map((current: any) => {
-          return current;
-        });
-        cardDiv.push(<tr>{test} </tr>);
-        tdArray.length = 0;
-      }
-    });
-
-    return cardDiv;
-  };
   // 时间选择
   const onTimeSelected = async (params: any, dateString: any) => {
 
     setChoicedCondition({start: dateString[0], end: dateString[1]});
-    const queryData = await queryDevelopViews({
-      start: dayjs(dateString[0]).format("YYYY/MM/DD"),
-      end: dayjs(dateString[1]).format("YYYY/MM/DD")
-    });
-
-    const newCardDiv = makeCardsDiv(queryData);
-    setDutyCart(newCardDiv);
+    await refreshData(dayjs(dateString[0]).format("YYYY/MM/DD"), dayjs(dateString[1]).format("YYYY/MM/DD"));
   };
   /* endregion */
 

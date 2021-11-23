@@ -16,7 +16,8 @@ import {
   Select,
   Row,
   Col,
-  Divider
+  Divider,
+  Input
 } from "antd";
 import {MinusOutlined, PlusOutlined} from '@ant-design/icons';
 import axios from "axios";
@@ -142,7 +143,15 @@ const getPlanDetails = async (paln_num: string) => {
 
 // 已选中的事件
 const selectedProject: any = [];
-
+const oldDutyTask = {
+  personNum: "",
+  firstFrontId: "",
+  secondFrontId: "",
+  firstBackendId: "",
+  secondBackendId: "",
+  firstTesterId: "",
+  secondTesterId: "",
+};
 const DutyPlan: React.FC<any> = () => {
 
   /* region 消息推送事件 */
@@ -235,7 +244,7 @@ const DutyPlan: React.FC<any> = () => {
   };
   /*  endregion */
 
-  /* region 弹出层事件 */
+  /* region 弹出层相关 */
   const [formForPlanModify] = Form.useForm();
   const [isPlanVisble, setIsPlanVisble] = useState(false);
   const [projects, setProjects] = useState([
@@ -247,7 +256,8 @@ const DutyPlan: React.FC<any> = () => {
       upgradeEnv: "",
       prjManager: "",
       planGrayTime: "",
-      planOnlineTime: ""
+      planOnlineTime: "",
+      proId: ""
 
     }]);
   const [allUsers, setAllUsers] = useState({
@@ -281,7 +291,8 @@ const DutyPlan: React.FC<any> = () => {
     } else if (userInfo.data) {
       const {data} = userInfo;
       data.forEach((user: any) => {
-        teachData.push(<Option key={user.user_id} value={user.user_name}>{user.user_name}</Option>);
+        teachData.push(
+          <Option key={user.user_id} value={`${user.user_id}&${user.user_name}`}>{user.user_name}</Option>);
       });
     }
     return teachData;
@@ -302,7 +313,8 @@ const DutyPlan: React.FC<any> = () => {
       const datas = prjNames.data;
       datas.forEach((project: any) => {
         prjData.push(
-          <Option key={project.project_id} value={project.project_name}>{project.project_name}</Option>);
+          <Option key={project.project_id}
+                  value={`${project.project_id}&${project.project_name}`}>{project.project_name}</Option>);
       });
     }
 
@@ -325,7 +337,7 @@ const DutyPlan: React.FC<any> = () => {
       const datas = prjNames.data;
       datas.forEach((project: any) => {
         prjData.push(
-          <Option key={project.project_type} value={project.project_type_name}>{project.project_type_name}</Option>);
+          <Option key={project.project_type} value={project.project_type}>{project.project_type_name}</Option>);
       });
     }
 
@@ -404,51 +416,65 @@ const DutyPlan: React.FC<any> = () => {
   };
   /* endregion */
 
+  /* region 弹出项目框相关事件 */
   const showExitData = (hisData: any) => {
     // 值班人详细信息显示
     const userData = hisData.user;
     if (userData) {
+      // 用于保存修改时需要用到的字段
+      oldDutyTask.personNum = userData[0].person_num;
       formForPlanModify.setFieldsValue({
         ...formForPlanModify,
         dutyTime: [moment(userData[0].duty_start_time), moment(userData[0].duty_end_time)],
       });
 
       userData.forEach((users: any) => {
+        let usersAccount = null;
+        if (users.user_id) {
+          usersAccount = `${users.user_id}&${users.user_name}`;
+        }
         if (users.user_tech === "前端") {
           if (users.duty_order === "1") {
+            oldDutyTask.firstFrontId = users.person_id;
+
             formForPlanModify.setFieldsValue({
               ...formForPlanModify,
-              firstFront: users.user_name
+              firstFront: usersAccount
             });
           } else {
+            oldDutyTask.secondFrontId = users.person_id;
             formForPlanModify.setFieldsValue({
               ...formForPlanModify,
-              secondFront: users.user_name
+              secondFront: usersAccount
             });
           }
 
         } else if (users.user_tech === "后端") {
 
           if (users.duty_order === "1") {
+            oldDutyTask.firstBackendId = users.person_id;
             formForPlanModify.setFieldsValue({
               ...formForPlanModify,
-              firstBackend: users.user_name
+              firstBackend: usersAccount
             });
           } else {
+            oldDutyTask.secondBackendId = users.person_id;
             formForPlanModify.setFieldsValue({
               ...formForPlanModify,
-              secondBackend: users.user_name
+              secondBackend: usersAccount
             });
           }
         } else if (users.duty_order === "1") {
+          oldDutyTask.firstTesterId = users.person_id;
           formForPlanModify.setFieldsValue({
             ...formForPlanModify,
-            firstTester: users.user_name
+            firstTester: usersAccount
           });
         } else {
+          oldDutyTask.secondTesterId = users.person_id;
           formForPlanModify.setFieldsValue({
             ...formForPlanModify,
-            secondTester: users.user_name
+            secondTester: usersAccount
           });
         }
 
@@ -466,7 +492,8 @@ const DutyPlan: React.FC<any> = () => {
         upgradeEnv: "",
         prjManager: "",
         planGrayTime: "",
-        planOnlineTime: ""
+        planOnlineTime: "",
+        proId: "",
       }];
       formForPlanModify.setFieldsValue({"projects": emptyValue});
       setProjects(emptyValue);
@@ -477,14 +504,15 @@ const DutyPlan: React.FC<any> = () => {
     projectData.forEach((dts: any) => {
 
       detailsInfo.push({
-        prjName: dts.project_name,
+        prjName: `${dts.project_id}&${dts.project_name}`,
         prjType: dts.project_type,
         branch: dts.project_branch,
         testEnv: dts.project_test_environment,
         upgradeEnv: dts.project_upgrade_environment,
         prjManager: dts.project_head,
         planGrayTime: moment(dts.project_plan_gray_time),
-        planOnlineTime: moment(dts.project_plan_online_time)
+        planOnlineTime: moment(dts.project_plan_online_time),
+        proId: dts.pro_id,
       });
     });
     formForPlanModify.setFieldsValue({"projects": detailsInfo});
@@ -543,7 +571,8 @@ const DutyPlan: React.FC<any> = () => {
       upgradeEnv: "",
       prjManager: "",
       planGrayTime: "",
-      planOnlineTime: ""
+      planOnlineTime: "",
+      proId: "",
     }];
 
     formForPlanModify.setFieldsValue({
@@ -554,6 +583,7 @@ const DutyPlan: React.FC<any> = () => {
 
   // 删除项目
   const del = (index: any) => {
+
     formForPlanModify.setFieldsValue({"projects": [...projects.slice(0, index), ...projects.slice(index + 1)]})
     return setProjects([...projects.slice(0, index), ...projects.slice(index + 1)])
   };
@@ -634,6 +664,10 @@ const DutyPlan: React.FC<any> = () => {
           <DatePicker style={{width: '100%'}}/>
         </Form.Item>
 
+        <Form.Item label="修改需要" name={['projects', index, 'proId']} style={{display: "none"}}>
+          <Input style={{width: 40}}/>
+        </Form.Item>
+
         {/* 增加和删除操作 */}
         <Form.Item style={{marginLeft: 17, marginTop: -30, marginBottom: -10}}>
           <table>
@@ -665,15 +699,169 @@ const DutyPlan: React.FC<any> = () => {
     </div>
   });
 
-  // 提交事件
-  const submitForm = () => {
-    const tt = formForPlanModify.getFieldsValue();
+  /* endregion */
 
-    formForPlanModify.validateFields()
-      .then((values: any) => {
-        console.log("33333333333333333333333333333333333333", values, tt);
+  /* region 保存数据 */
+  const alasysDutyPerson = (data: any) => {
+
+    const person_data_array = [];
+    const startTime = moment((data.dutyTime)[0]).format("YYYY/MM/DD");
+    const endTime = moment((data.dutyTime)[1]).format("YYYY/MM/DD");
+
+    // 前端第一值班人
+    person_data_array.push({
+      "peron_num": oldDutyTask.personNum,  // 值班编号id 例如：202111190002
+      "duty_start_time": startTime,
+      "duty_end_time": endTime,
+      "person_id": oldDutyTask.firstFrontId,  // 序号 id
+      "user_id": (data.firstFront).split("&")[0],    // 用户id
+      "user_name": (data.firstFront).split("&")[1],  // 用户名
+      "user_tech": "1",  // 前端还是后端
+      "duty_order": "1", // 第几值班人
+    });
+
+    // 前端第二值班人
+    person_data_array.push({
+      "peron_num": oldDutyTask.personNum,
+      "duty_start_time": startTime,
+      "duty_end_time": endTime,
+      "person_id": oldDutyTask.secondFrontId,
+      "user_id": (data.secondFront).split("&")[0],
+      "user_name": (data.secondFront).split("&")[1],
+      "user_tech": "1",
+      "duty_order": "2",
+    });
+
+    // 后端第一值班人
+    person_data_array.push({
+      "peron_num": oldDutyTask.personNum,
+      "duty_start_time": startTime,
+      "duty_end_time": endTime,
+      "person_id": oldDutyTask.firstBackendId,
+      "user_id": (data.firstBackend).split("&")[0],
+      "user_name": (data.firstBackend).split("&")[1],
+      "user_tech": "2",
+      "duty_order": "1",
+    });
+
+    // 后端第二值班人
+    person_data_array.push({
+      "peron_num": oldDutyTask.personNum,
+      "duty_start_time": startTime,
+      "duty_end_time": endTime,
+      "person_id": oldDutyTask.secondBackendId,
+      "user_id": (data.secondBackend).split("&")[0],
+      "user_name": (data.secondBackend).split("&")[1],
+      "user_tech": "2",
+      "duty_order": "2",
+    });
+
+    // 测试第一值班人
+    person_data_array.push({
+      "peron_num": oldDutyTask.personNum,
+      "duty_start_time": startTime,
+      "duty_end_time": endTime,
+      "person_id": oldDutyTask.firstTesterId,
+      "user_id": (data.firstTester).split("&")[0],
+      "user_name": (data.firstTester).split("&")[1],
+      "user_tech": "3",
+      "duty_order": "1",
+    });
+
+    // 测试第二值班人
+    person_data_array.push({
+      "peron_num": oldDutyTask.personNum,
+      "duty_start_time": startTime,
+      "duty_end_time": endTime,
+      "person_id": oldDutyTask.secondTesterId,
+      "user_id": (data.secondTester).split("&")[0],
+      "user_name": (data.secondTester).split("&")[1],
+      "user_tech": "3",
+      "duty_order": "2",
+    });
+
+    return person_data_array;
+  };
+
+  const alasysDutyProject = (data: any) => {
+
+    const project_data: any = [];
+    if (data) {
+      data.forEach((dts: any, index: number) => {
+        const items = {
+          // "pro_id": dts.proId,  // project id  新增的时候不需要这个id（为空的时候则不需要）
+          "person_num": oldDutyTask.personNum, // 值班计划编号
+          "project_id": ((dts.prjName).split("&"))[0],// 项目id
+          "project_name": ((dts.prjName).split("&"))[1], // 项目名称
+          "project_type": dts.prjType,  // 项目类型
+          "project_branch": dts.branch, // 对应分支
+          "project_test_environment": dts.testEnv, // 对应测试环境
+          "project_upgrade_environment": dts.upgradeEnv, // 对应升级环境
+          "project_head": dts.prjManager,  // 项目负责人
+          "project_plan_gray_time": moment(dts.planGrayTime).format("YYYY/MM/DD"),  // 计划灰度时间
+          "project_plan_online_time": moment(dts.planOnlineTime).format("YYYY/MM/DD"), // 计划上线时间
+          "project_index": (index + 1).toString(),// 界面展示序号
+          "is_delete": 0 // 是否删除
+        };
+        if (dts.proId) {
+          items["pro_id"] = dts.proId;
+        }
+        project_data.push(items);
+      });
+    }
+
+    return project_data;
+  };
+  // 提交事件
+  const submitForm = async () => {
+
+    const formData = formForPlanModify.getFieldsValue();
+
+    // 解析值班人数据
+    const person_data = alasysDutyPerson(formData);
+
+    console.log("person_data", person_data);
+
+    // 解析项目数据
+    const project_data = alasysDutyProject(formData.projects);
+    await axios.put("/api/verify/duty/plan_data", {"person": person_data, "project": project_data})
+      .then(function (res) {
+
+        if (res.data.code === 200) {
+
+          message.info({
+            content: `值班计划修改成功！`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+
+          setIsPlanVisble(false);
+
+        } else {
+          message.error({
+            content: `错误：${res.data.msg}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+
+
+      }).catch(function (error) {
+        message.error({
+          content: `异常信息:${error.toString()}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
       });
   }
+
+  /* endregion */
 
   /* endregion */
 
@@ -808,7 +996,6 @@ const DutyPlan: React.FC<any> = () => {
               disabled
             />
           </Form.Item>
-
           {/* 值班人员Card */}
           <Card size="small" title="值班人员" style={{marginTop: -15}} bodyStyle={{height: 130}}>
             <Row gutter={40} style={{marginTop: -10}}>

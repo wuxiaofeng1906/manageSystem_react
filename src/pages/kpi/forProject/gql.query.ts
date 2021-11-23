@@ -2,7 +2,7 @@
  * @Description: gqlc查询
  * @Author: jieTan
  * @Date: 2021-11-23 10:01:28
- * @LastEditTime: 2021-11-23 14:29:42
+ * @LastEditTime: 2021-11-23 16:04:45
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -47,9 +47,7 @@ const funcWithParams = (args: GQL_PARAMS): string => {
 export const queryGQL = async (client: GqlClient<object>, mygql: Function, params: GQL_PARAMS) => {
   //
   const [GQL, funcName] = mygql(params, funcWithParams);
-  console.log(funcName);
-  
   const { data } = await client.query(GQL);
-  // if (!(data instanceof Object)) return;
+  if (!(data instanceof Object)) return;
   return data[funcName];
 };

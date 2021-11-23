@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: jieTan
  * @Date: 2021-11-19 16:33:15
- * @LastEditTime: 2021-11-22 15:51:09
+ * @LastEditTime: 2021-11-23 14:32:33
  * @LastEditors: jieTan
  * @LastModify: 
  */
@@ -20,7 +20,7 @@ export default defineConfig({
   dva: {
     hmr: true,
   },
-  mfsu: {}, // 启用MFSU，加快启动速度 => 存在兼容问题
+  // mfsu: {}, // 启用MFSU，加快启动速度 => 存在兼容问题
   layout: {
     name: 'Ant Design Pro',
     locale: true,

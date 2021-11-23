@@ -2,43 +2,20 @@
  * @Description: 数据列表
  * @Author: jieTan
  * @Date: 2021-11-22 10:55:42
- * @LastEditTime: 2021-11-22 18:22:14
+ * @LastEditTime: 2021-11-23 14:30:40
  * @LastEditors: jieTan
  * @LastModify:
  */
 
-// import { useRequest } from '@/.umi/plugin-request/request';
-import { GqlClient, useGqlClient } from '@/hooks';
+import { useGqlClient } from '@/hooks';
 import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import { useRequest } from 'ahooks';
+import { GQL_PARAMS, queryGQL } from '../../gql.query';
 //
 import './index.css';
+import mygql from './mygql';
 
-const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
 
-  const { data } = await client.query(`
-  {
-    projectKpi(start:"2021-11-20",projIds:[445,674,675,676]){
-      project{
-        id
-        name
-      }
-      bugNumber
-      reopenRatio
-      bugResolveDura
-      codes
-      thouslineRatio
-      unitCover
-      effectiveBugRatio
-      bugFlybackDura
-      caseNumber
-      autoCoverRatio
-    }
-  }
-  `);
-
-  return data?.projectKpi;
-};
 
 export default () => {
   /*  */
@@ -49,8 +26,9 @@ export default () => {
   // 
 
   const gqlClient = useGqlClient();
+  const params: GQL_PARAMS = { func: "projectKpi", params: { start: "2021-11-20", projIds: [445, 674, 675, 676] } }
 
-  const { data, loading } = useRequest(() => queryDevelopViews(gqlClient, {}));
+  const { data, loading } = useRequest(async () => await queryGQL(gqlClient, mygql, params))
 
   console.log(loading);
 

@@ -455,11 +455,10 @@ const DutyPlan: React.FC<any> = () => {
       });
     }
 
-    debugger;
     // 项目详细信息显示
     const projectData = hisData.project;
     if (projectData.length === 0) {
-      setProjects([{
+      const emptyValue = [{
         prjName: "",
         prjType: "",
         branch: "",
@@ -468,7 +467,9 @@ const DutyPlan: React.FC<any> = () => {
         prjManager: "",
         planGrayTime: "",
         planOnlineTime: ""
-      }]);
+      }];
+      formForPlanModify.setFieldsValue({"projects": emptyValue});
+      setProjects(emptyValue);
       return;
     }
 
@@ -486,6 +487,7 @@ const DutyPlan: React.FC<any> = () => {
         planOnlineTime: moment(dts.project_plan_online_time)
       });
     });
+    formForPlanModify.setFieldsValue({"projects": detailsInfo});
     setProjects(detailsInfo);
   };
   // 表格双击事件
@@ -531,21 +533,23 @@ const DutyPlan: React.FC<any> = () => {
     setIsPlanVisble(false);
   };
 
-
   // 新增项目
   const add = () => {
-    formForPlanModify.setFieldsValue({"projects": [...projects, {name: '', mobile: ''}]})
-    return setProjects([...projects, {
-
-      prjName: '',
-      prjType: '',
+    const addValue = [...projects, {
+      prjName: "",
+      prjType: "",
       branch: "",
       testEnv: "",
       upgradeEnv: "",
       prjManager: "",
       planGrayTime: "",
       planOnlineTime: ""
-    }])
+    }];
+
+    formForPlanModify.setFieldsValue({
+      "projects": addValue
+    });
+    return setProjects(addValue);
   };
 
   // 删除项目
@@ -746,6 +750,7 @@ const DutyPlan: React.FC<any> = () => {
   };
   /* endregion */
 
+  /* region useEffect 使用 */
   useEffect(() => {
     let cardDiv: any = [];
     if (data) {
@@ -755,6 +760,7 @@ const DutyPlan: React.FC<any> = () => {
 
   }, [data]);
 
+  /* endregion */
   return (
     <PageContainer>
       {/* 时间查询条件 */}
@@ -790,8 +796,6 @@ const DutyPlan: React.FC<any> = () => {
         width={550}
         footer={null}
         maskClosable={false}
-        // onCancel={modalClosed}
-        // destroyOnClose = {true}
       >
 
         <Form name="user_form" form={formForPlanModify} layout={'horizontal'} onFinish={submitForm}

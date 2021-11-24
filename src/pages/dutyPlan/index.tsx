@@ -622,6 +622,21 @@ const DutyPlan: React.FC<any> = () => {
     return setProjects([...projects.slice(0, index), ...projects.slice(index + 1)])
   };
 
+  const onPrjTypeChanged = (index: any, name: any, event: any) => {
+
+    const dutyInfo = formForPlanModify.getFieldsValue();
+    const firstBackend = (dutyInfo.firstBackend).split("&")[1];
+    const dutyProject = dutyInfo.projects;
+    const tempArray = [...dutyProject];
+    if (name === 'prjType' && event === "2") {  // 如果是班车项目,则自动获取上面的后端负责人填入项目负责人选择框
+      tempArray[index] = {...tempArray[index], prjManager: firstBackend};
+    }
+
+    formForPlanModify.setFieldsValue({
+      "projects": tempArray
+    });
+
+  };
   // 动态生成项目组件
   const projectItems = projects.map((item: any, index: any) => {
     // 获取项目序号
@@ -649,7 +664,8 @@ const DutyPlan: React.FC<any> = () => {
         </Form.Item>
 
         <Form.Item label="项目类型" name={['projects', index, 'prjType']} style={{marginTop: -20, marginLeft: 13}}>
-          <Select style={{width: '93%', marginLeft: 27}} showSearch>
+          <Select style={{width: '93%', marginLeft: 27}} showSearch
+                  onChange={(event) => onPrjTypeChanged(index, 'prjType', event)}>
             {projectInfo.prjType}
           </Select>
         </Form.Item>

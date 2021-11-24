@@ -143,6 +143,7 @@ const getPlanDetails = async (paln_num: string) => {
 
 // 已选中的事件
 const selectedProject: any = [];
+// 保存被修改项的相关ID，用于修改时
 const oldDutyTask = {
   personNum: "",
   firstFrontId: "",
@@ -152,14 +153,45 @@ const oldDutyTask = {
   firstTesterId: "",
   secondTesterId: "",
 };
+// 保存需要被删除的数据
 const deletedData: any = [];
 
 const DutyPlan: React.FC<any> = () => {
+
   const [choicedCondition, setChoicedCondition] = useState({start: "", end: ""});
+  const [isPlanVisble, setIsPlanVisble] = useState(false);
+  const [projects, setProjects] = useState([
+    {
+      prjName: '',
+      prjType: '',
+      branch: "",
+      testEnv: "",
+      upgradeEnv: "",
+      prjManager: "",
+      planGrayTime: "",
+      planOnlineTime: "",
+      proId: ""
+
+    }]);
+  const [allUsers, setAllUsers] = useState({
+    front: [],
+    backend: [],
+    tester: []
+  });
+  const [projectInfo, setProjectInfo] = useState({
+    prjName: [],
+    prjType: [],
+    branch: [],
+    testEnv: [],
+    upgradeEnv: [],
+    manager: []
+  });
+  const [dutyCard, setDutyCart] = useState(<div></div>);
+
 
   /* region 消息推送事件 */
 
-  // checkbox 选中事件
+  // 勾选需要推送的值班计划
   const onPlanChanged = (params: any) => {
 
     const selectedId = params.target.id;
@@ -245,41 +277,12 @@ const DutyPlan: React.FC<any> = () => {
   };
   /*  endregion */
 
-  /* region 弹出层相关 */
-  const [formForPlanModify] = Form.useForm();
-  const [isPlanVisble, setIsPlanVisble] = useState(false);
-  const [projects, setProjects] = useState([
-    {
-      prjName: '',
-      prjType: '',
-      branch: "",
-      testEnv: "",
-      upgradeEnv: "",
-      prjManager: "",
-      planGrayTime: "",
-      planOnlineTime: "",
-      proId: ""
-
-    }]);
-  const [allUsers, setAllUsers] = useState({
-    front: [],
-    backend: [],
-    tester: []
-  });
-  const [projectInfo, setProjectInfo] = useState({
-    prjName: [],
-    prjType: [],
-    branch: [],
-    testEnv: [],
-    upgradeEnv: [],
-    manager: []
-  });
-
   /* region 下拉框获取 */
+
+  // 值班人员选择框
   const loadUserSelect = async (teach: string) => {
 
-    const teachData: any = [<Option key={""} value={"免"}>免</Option>];
-
+    const teachData: any = [<Option key={""} value={`""&免`}>免</Option>];
     const userInfo = await getAllUsers(teach);
     if (userInfo.message !== "") {
       message.error({
@@ -298,6 +301,8 @@ const DutyPlan: React.FC<any> = () => {
     }
     return teachData;
   };
+
+  // 项目名称选择框
   const loadPrjNameSelect = async () => {
     const prjNames = await getAllProject();
     const prjData: any = [];
@@ -322,6 +327,8 @@ const DutyPlan: React.FC<any> = () => {
     return prjData;
 
   };
+
+  // 项目类型选择框
   const loadPrjTypeSelect = async () => {
     const prjNames = await getProjectType();
     const prjData: any = [];
@@ -345,6 +352,8 @@ const DutyPlan: React.FC<any> = () => {
     return prjData;
 
   };
+
+  // 分支选择框
   const loadBanchSelect = async () => {
 
     const branchInfo = await getBranchName();
@@ -369,6 +378,8 @@ const DutyPlan: React.FC<any> = () => {
     return branchData;
 
   };
+
+  // 发布环境选择框
   const loadEnvironmentSelect = async () => {
     const envData = await getEnvironment();
     const environmentData: any = [];
@@ -392,6 +403,8 @@ const DutyPlan: React.FC<any> = () => {
     return environmentData;
 
   };
+
+  // 负责人选择框
   const loadPrincipalSelect = async () => {
     const principalData = await getPrincipal();
     const prinData: any = [];
@@ -418,6 +431,8 @@ const DutyPlan: React.FC<any> = () => {
   /* endregion */
 
   /* region 弹出项目框相关事件 */
+
+  const [formForPlanModify] = Form.useForm();
   const showExitData = (hisData: any) => {
     // 值班人详细信息显示
     const userData = hisData.user;
@@ -563,7 +578,7 @@ const DutyPlan: React.FC<any> = () => {
   };
 
   // 新增项目
-  const add = () => {
+  const addProject = () => {
     const addValue = [...projects, {
       prjName: "",
       prjType: "",
@@ -582,9 +597,8 @@ const DutyPlan: React.FC<any> = () => {
     return setProjects(addValue);
   };
 
-
   // 删除项目
-  const del = (index: any) => {
+  const delProject = (index: any) => {
     const delData = projects[index];
     deletedData.push(
       {
@@ -608,17 +622,6 @@ const DutyPlan: React.FC<any> = () => {
     return setProjects([...projects.slice(0, index), ...projects.slice(index + 1)])
   };
 
-  // 当值被改变
-  const onChange = (index: any, name: any, event: any) => {
-    const tempArray = [...projects];
-
-    if (name === 'prjName')
-      tempArray[index] = {...tempArray[index], prjName: event}
-    // else
-    //   tempArray[index] = {...tempArray[index], prjType: event.target.value}
-    return setProjects(tempArray)
-  };
-
   // 动态生成项目组件
   const projectItems = projects.map((item: any, index: any) => {
     // 获取项目序号
@@ -640,8 +643,7 @@ const DutyPlan: React.FC<any> = () => {
       <div>
 
         <Form.Item label={order} name={['projects', index, 'prjName']} style={{marginLeft: -5}}>
-          <Select style={{width: '93%', marginLeft: 27}} showSearch
-                  onChange={(event: any) => onChange(index, 'prjName', event)}>
+          <Select style={{width: '93%', marginLeft: 27}} showSearch>
             {projectInfo.prjName}
           </Select>
         </Form.Item>
@@ -693,21 +695,14 @@ const DutyPlan: React.FC<any> = () => {
           <table>
             <tr>
               <td>
-                <Button style={{border: "none", color: "#D0D0D0", marginLeft: -15}} onClick={() => add()}
+                <Button style={{border: "none", color: "#D0D0D0", marginLeft: -15}} onClick={() => addProject()}
                         icon={<PlusOutlined/>}/>
-                {/*
-                <Button type="text" onClick={() => add()}>
-                <img src="../add_black.png" width="20" height="20" alt="新增项目" title="新增项目"/>
-                </Button> */}
               </td>
               <td>
                 <Divider style={{width: "410px"}}></Divider>
               </td>
               <td>
-                <Button style={{border: "none", color: "#D0D0D0"}} onClick={() => del(index)} icon={<MinusOutlined/>}/>
-                {/* <Button type="text" block onClick={() => del(index)}>
-                <img src="../sub_black.png" width="20" height="20" alt="删除项目" title="删除项目"/>
-               </Button> */}
+                <Button style={{border: "none", color: "#D0D0D0"}} onClick={() => delProject(index)} icon={<MinusOutlined/>}/>
               </td>
             </tr>
           </table>
@@ -721,10 +716,7 @@ const DutyPlan: React.FC<any> = () => {
 
   /* endregion */
 
-  /* region 保存数据 */
-
-  const [dutyCard, setDutyCart] = useState(<div></div>);
-
+  /* region 保存数据，并刷新界面 */
   const makeCardsDiv = (oraData: any) => {
     const columns: any = [
       {
@@ -787,6 +779,8 @@ const DutyPlan: React.FC<any> = () => {
     const newCardDiv = makeCardsDiv(queryData);
     setDutyCart(newCardDiv);
   };
+
+  // 解析需要保存的值班人员
   const alasysDutyPerson = (data: any) => {
 
     const person_data_array = [];
@@ -867,6 +861,8 @@ const DutyPlan: React.FC<any> = () => {
 
     return person_data_array;
   };
+
+  // 解析需要保存的值班项目
   const alasysDutyProject = (data: any) => {
 
     const project_data: any = [];
@@ -899,8 +895,6 @@ const DutyPlan: React.FC<any> = () => {
   };
   // 提交事件
   const submitForm = async () => {
-    debugger;
-
     const formData = formForPlanModify.getFieldsValue();
 
     // 解析值班人数据
@@ -950,9 +944,7 @@ const DutyPlan: React.FC<any> = () => {
 
   /* endregion */
 
-  /* endregion */
-
-  /* region 数据查询以及展示 */
+  /* region 时间数据查询以及展示 */
 
   const {data} = useRequest(() => queryDevelopViews(choicedCondition));
   // 时间选择
@@ -974,6 +966,7 @@ const DutyPlan: React.FC<any> = () => {
   }, [data]);
 
   /* endregion */
+
   return (
     <PageContainer>
       {/* 时间查询条件 */}

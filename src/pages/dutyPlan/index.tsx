@@ -622,6 +622,7 @@ const DutyPlan: React.FC<any> = () => {
     return setProjects([...projects.slice(0, index), ...projects.slice(index + 1)])
   };
 
+  // selected 框选择事件
   const onPrjTypeChanged = (index: any, name: any, event: any) => {
 
     const dutyInfo = formForPlanModify.getFieldsValue();

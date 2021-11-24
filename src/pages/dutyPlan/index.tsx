@@ -702,7 +702,8 @@ const DutyPlan: React.FC<any> = () => {
                 <Divider style={{width: "410px"}}></Divider>
               </td>
               <td>
-                <Button style={{border: "none", color: "#D0D0D0"}} onClick={() => delProject(index)} icon={<MinusOutlined/>}/>
+                <Button style={{border: "none", color: "#D0D0D0"}} onClick={() => delProject(index)}
+                        icon={<MinusOutlined/>}/>
               </td>
             </tr>
           </table>
@@ -733,13 +734,20 @@ const DutyPlan: React.FC<any> = () => {
     const cardDiv: any = [];
     const tdArray: any = [];
     oraData.forEach((ele_data: any, index: number) => {
+      const startTime = ele_data[0].duty_start_time;
+      const endTime = ele_data[0].duty_end_time;
+      let border_color = {};
+      if (dayjs().isAfter(dayjs(startTime)) && dayjs().isBefore(dayjs(endTime))) {
+        border_color = {border: "1px solid #BC7A37"};
+      }
 
       tdArray.push(
         <td>
           <Card size="small"
-                title={`${ele_data[0].duty_start_time}~${ele_data[0].duty_end_time}`}
+                title={`${startTime}~${endTime}`}
                 headStyle={{textAlign: "center"}}
-                extra={<Checkbox id={`${ele_data[0].person_num}`} onChange={onPlanChanged}></Checkbox>}>
+                extra={<Checkbox id={`${ele_data[0].person_num}`} onChange={onPlanChanged}></Checkbox>}
+                style={border_color}>
             <Table
               style={{marginTop: -10}}
               size="small"

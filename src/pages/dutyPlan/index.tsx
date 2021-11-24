@@ -152,6 +152,8 @@ const oldDutyTask = {
   firstTesterId: "",
   secondTesterId: "",
 };
+const deletedData: any = [];
+
 const DutyPlan: React.FC<any> = () => {
   const [choicedCondition, setChoicedCondition] = useState({start: "", end: ""});
 
@@ -580,10 +582,27 @@ const DutyPlan: React.FC<any> = () => {
     return setProjects(addValue);
   };
 
+
   // 删除项目
   const del = (index: any) => {
-
-    debugger;
+    const delData = projects[index];
+    deletedData.push(
+      {
+        "pro_id": delData.proId,  // project id  新增的时候不需要这个id（为空的时候则不需要）
+        "person_num": oldDutyTask.personNum, // 值班计划编号
+        "project_id": ((delData.prjName).split("&"))[0],// 项目id
+        "project_name": ((delData.prjName).split("&"))[1], // 项目名称
+        "project_type": delData.prjType,  // 项目类型
+        "project_branch": delData.branch, // 对应分支
+        "project_test_environment": delData.testEnv, // 对应测试环境
+        "project_upgrade_environment": delData.upgradeEnv, // 对应升级环境
+        "project_head": delData.prjManager,  // 项目负责人
+        "project_plan_gray_time": moment(delData.planGrayTime).format("YYYY/MM/DD"),  // 计划灰度时间
+        "project_plan_online_time": moment(delData.planOnlineTime).format("YYYY/MM/DD"), // 计划上线时间
+        "project_index": (index + 1).toString(),// 界面展示序号
+        "is_delete": 1 // 是否删除
+      }
+    );
 
     formForPlanModify.setFieldsValue({"projects": [...projects.slice(0, index), ...projects.slice(index + 1)]})
     return setProjects([...projects.slice(0, index), ...projects.slice(index + 1)])
@@ -768,7 +787,6 @@ const DutyPlan: React.FC<any> = () => {
     const newCardDiv = makeCardsDiv(queryData);
     setDutyCart(newCardDiv);
   };
-
   const alasysDutyPerson = (data: any) => {
 
     const person_data_array = [];
@@ -849,7 +867,6 @@ const DutyPlan: React.FC<any> = () => {
 
     return person_data_array;
   };
-
   const alasysDutyProject = (data: any) => {
 
     const project_data: any = [];
@@ -877,7 +894,8 @@ const DutyPlan: React.FC<any> = () => {
       });
     }
 
-    return project_data;
+    const allProject = project_data.concat(deletedData); // 将修改、新增和删除的数组连在一起进行保存
+    return allProject;
   };
   // 提交事件
   const submitForm = async () => {

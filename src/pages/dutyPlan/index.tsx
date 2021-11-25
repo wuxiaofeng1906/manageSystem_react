@@ -1,144 +1,20 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
-import 'ag-grid-enterprise';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {
-  Button,
-  DatePicker,
-  Checkbox,
-  Card,
-  message,
-  Table,
-  Modal,
-  Form,
-  Select,
-  Row,
-  Col,
-  Divider,
-  Input
+  Button, DatePicker, Checkbox, Card, message, Table,
+  Modal, Form, Select, Row, Col, Divider, Input
 } from "antd";
 import {MinusOutlined, PlusOutlined} from '@ant-design/icons';
-import axios from "axios";
 import moment from "moment";
 import dayjs from "dayjs";
 import {
-  getAllUsers,
-  getAllProject,
-  getProjectType,
-  getBranchName,
-  getEnvironment
+  getAllUsers, getAllProject, getProjectType, getBranchName, getEnvironment
 } from '@/publicMethods/verifyAxios';
+import {queryDutyCardInfo, getPlanDetails, sendMessageToApi, submitModifyData} from './axiosApi';
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
-
-// 解析数据
-const parseData = (params: any) => {
-
-  const returnValue: any = [];
-  if (params) {
-    params.forEach((project: any) => {
-      const projectItemArray: any = [];
-      let username = "";
-      project.forEach((ele: any) => {
-
-        const projectItem = {
-          person_id: ele.person_id,
-          person_num: ele.person_num,
-          user_tech: ele.user_tech,
-          user_id: ele.user_id,
-          user_name: "",
-          duty_start_time: ele.duty_start_time,
-          duty_end_time: ele.duty_end_time,
-          duty_order: ele.duty_order
-        };
-
-        if (ele.duty_order === "1") {
-          username = ele.user_name === null ? "" : ele.user_name;
-        } else {
-
-          if (ele.user_name === null) {
-            projectItem.user_name = username;
-          } else {
-            projectItem.user_name = `${username}/${ele.user_name}`;
-          }
-          username = "";
-          projectItemArray.push(projectItem);
-        }
-      });
-      returnValue.push(projectItemArray);
-    });
-
-  }
-
-  return returnValue;
-}
-const queryDevelopViews = async (params: any) => {
-
-  let result: any = [];
-  await axios.get('/api/verify/duty/plan_data', {params: {start_time: params.start, end_time: params.end}})
-    .then(function (res) {
-
-      if (res.data.code === 200) {
-        result = parseData(res.data.data.data);
-      } else {
-        message.error({
-          content: `错误：${res.data.msg}`,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      }
-
-
-    }).catch(function (error) {
-
-      message.error({
-        content: `异常信息:${error.toString()}`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    });
-
-  return result;
-};
-const getPlanDetails = async (paln_num: string) => {
-  let userInfo: any = [];
-
-  await axios.get('/api/verify/duty/plan_data_detail', {params: {person_num: paln_num}})
-    .then(function (res) {
-
-      if (res.data.code === 200) {
-        userInfo = res.data.data;
-
-      } else {
-        message.error({
-          content: `错误：${res.data.msg}`,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      }
-
-    }).catch(function (error) {
-      message.error({
-        content: `异常信息:${error.toString()}`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    });
-
-  return userInfo;
-
-};
 
 // 已选中的事件
 const selectedProject: any = [];
@@ -155,10 +31,146 @@ const oldDutyTask = {
 // 保存需要被删除的数据
 const deletedData: any = [];
 
+/* region 下拉框获取 */
+
+// 值班人员选择框
+const loadUserSelect = async (teach: string) => {
+
+  const teachData: any = [<Option key={""} value={`""&免`}>免</Option>];
+  const userInfo = await getAllUsers(teach);
+  if (userInfo.message !== "") {
+    message.error({
+      content: userInfo.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (userInfo.data) {
+    const {data} = userInfo;
+    data.forEach((user: any) => {
+      teachData.push(
+        <Option key={user.user_id} value={`${user.user_id}&${user.user_name}`}>{user.user_name}</Option>);
+    });
+  }
+  return teachData;
+};
+
+// 项目名称选择框
+const loadPrjNameSelect = async () => {
+  const prjNames = await getAllProject();
+  const prjData: any = [];
+
+  if (prjNames.message !== "") {
+    message.error({
+      content: prjNames.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (prjNames.data) {
+    const datas = prjNames.data;
+    datas.forEach((project: any) => {
+      prjData.push(
+        <Option key={project.project_id}
+                value={`${project.project_id}&${project.project_name}`}>{project.project_name}</Option>);
+    });
+  }
+
+  return prjData;
+
+};
+
+// 项目类型选择框
+const loadPrjTypeSelect = async () => {
+  const prjNames = await getProjectType();
+  const prjData: any = [];
+
+  if (prjNames.message !== "") {
+    message.error({
+      content: prjNames.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (prjNames.data) {
+    const datas = prjNames.data;
+    datas.forEach((project: any) => {
+      prjData.push(
+        <Option key={project.project_type} value={project.project_type}>{project.project_type_name}</Option>);
+    });
+  }
+
+  return prjData;
+
+};
+
+// 分支选择框
+const loadBanchSelect = async () => {
+
+  const branchInfo = await getBranchName();
+  const branchData: any = [];
+
+  if (branchInfo.message !== "") {
+    message.error({
+      content: branchInfo.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (branchInfo.data) {
+    const datas = branchInfo.data;
+    datas.forEach((branch: any) => {
+      branchData.push(
+        <Option key={branch.branch_id} value={branch.branch_name}>{branch.branch_name}</Option>);
+    });
+  }
+
+  return branchData;
+
+};
+
+// 发布环境选择框
+const loadEnvironmentSelect = async () => {
+  const envData = await getEnvironment();
+  const environmentData: any = [];
+
+  if (envData.message !== "") {
+    message.error({
+      content: envData.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (envData.data) {
+    const datas = envData.data;
+    datas.forEach((env: any) => {
+      environmentData.push(
+        <Option key={env.env_id} value={env.image_env}>{env.image_env}</Option>);
+    });
+  }
+
+  return environmentData;
+
+};
+
+/* endregion */
+
 const DutyPlan: React.FC<any> = () => {
 
+  /* region useState定义 */
+
+  // 查询条件
   const [choicedCondition, setChoicedCondition] = useState({start: "", end: ""});
+  // 值班人员动态Card
+  const [dutyCard, setDutyCart] = useState(<div></div>);
+  // 弹出层是否可见
   const [isPlanVisble, setIsPlanVisble] = useState(false);
+  // 动态生成的弹出层表单
   const [projects, setProjects] = useState([
     {
       prjName: '',
@@ -172,11 +184,13 @@ const DutyPlan: React.FC<any> = () => {
       proId: "",
       managerId: ""
     }]);
+  // 值班人下拉框
   const [allUsers, setAllUsers] = useState({
     front: [],
     backend: [],
     tester: []
   });
+  // 动态表单的下拉框
   const [projectInfo, setProjectInfo] = useState({
     prjName: [],
     prjType: [],
@@ -184,8 +198,8 @@ const DutyPlan: React.FC<any> = () => {
     testEnv: [],
     upgradeEnv: [],
   });
-  const [dutyCard, setDutyCart] = useState(<div></div>);
 
+  /* endregion */
 
   /* region 消息推送事件 */
 
@@ -196,15 +210,15 @@ const DutyPlan: React.FC<any> = () => {
     const isChecked = params.target.checked;
     if (isChecked) {
 
-      if (selectedProject.length >= 1) {// 表示之前已选有数据，一次性只能推送一条数据
-        message.error({
-          content: `一次只能推送一条数据！`,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      }
+      // if (selectedProject.length >= 1) {// 表示之前已选有数据，一次性只能推送一条数据
+      //   message.error({
+      //     content: `一次只能推送一条数据！`,
+      //     duration: 1,
+      //     style: {
+      //       marginTop: '50vh',
+      //     },
+      //   });
+      // }
       selectedProject.push(selectedId);
     } else {
       // 如果取消掉则设置为空
@@ -217,7 +231,7 @@ const DutyPlan: React.FC<any> = () => {
   };
 
   // 发送消息
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (selectedProject.length === 0) {
       //   提醒选中一条
       message.error({
@@ -241,168 +255,27 @@ const DutyPlan: React.FC<any> = () => {
       });
       return;
     }
-    axios.get('/api/verify/duty/msg_push', {params: {person_num: selectedProject[0]}})
-      .then(function (res) {
 
-        if (res.data.code === 200) {
-          message.info({
-            content: `消息推送成功！`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `错误：${res.data.msg}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-      }).catch(function (error) {
-
+    const sendResult = await sendMessageToApi(selectedProject[0]);
+    if (sendResult) {
       message.error({
-        content: `异常信息:${error.toString()}`,
+        content: sendResult,
         duration: 1,
         style: {
           marginTop: '50vh',
         },
       });
-    });
-
+    } else {
+      message.info({
+        content: `消息推送成功！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
   };
   /*  endregion */
-
-  /* region 下拉框获取 */
-
-  // 值班人员选择框
-  const loadUserSelect = async (teach: string) => {
-
-    const teachData: any = [<Option key={""} value={`""&免`}>免</Option>];
-    const userInfo = await getAllUsers(teach);
-    if (userInfo.message !== "") {
-      message.error({
-        content: userInfo.message,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    } else if (userInfo.data) {
-      const {data} = userInfo;
-      data.forEach((user: any) => {
-        teachData.push(
-          <Option key={user.user_id} value={`${user.user_id}&${user.user_name}`}>{user.user_name}</Option>);
-      });
-    }
-    return teachData;
-  };
-
-  // 项目名称选择框
-  const loadPrjNameSelect = async () => {
-    const prjNames = await getAllProject();
-    const prjData: any = [];
-
-    if (prjNames.message !== "") {
-      message.error({
-        content: prjNames.message,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    } else if (prjNames.data) {
-      const datas = prjNames.data;
-      datas.forEach((project: any) => {
-        prjData.push(
-          <Option key={project.project_id}
-                  value={`${project.project_id}&${project.project_name}`}>{project.project_name}</Option>);
-      });
-    }
-
-    return prjData;
-
-  };
-
-  // 项目类型选择框
-  const loadPrjTypeSelect = async () => {
-    const prjNames = await getProjectType();
-    const prjData: any = [];
-
-    if (prjNames.message !== "") {
-      message.error({
-        content: prjNames.message,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    } else if (prjNames.data) {
-      const datas = prjNames.data;
-      datas.forEach((project: any) => {
-        prjData.push(
-          <Option key={project.project_type} value={project.project_type}>{project.project_type_name}</Option>);
-      });
-    }
-
-    return prjData;
-
-  };
-
-  // 分支选择框
-  const loadBanchSelect = async () => {
-
-    const branchInfo = await getBranchName();
-    const branchData: any = [];
-
-    if (branchInfo.message !== "") {
-      message.error({
-        content: branchInfo.message,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    } else if (branchInfo.data) {
-      const datas = branchInfo.data;
-      datas.forEach((branch: any) => {
-        branchData.push(
-          <Option key={branch.branch_id} value={branch.branch_name}>{branch.branch_name}</Option>);
-      });
-    }
-
-    return branchData;
-
-  };
-
-  // 发布环境选择框
-  const loadEnvironmentSelect = async () => {
-    const envData = await getEnvironment();
-    const environmentData: any = [];
-
-    if (envData.message !== "") {
-      message.error({
-        content: envData.message,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    } else if (envData.data) {
-      const datas = envData.data;
-      datas.forEach((env: any) => {
-        environmentData.push(
-          <Option key={env.env_id} value={env.image_env}>{env.image_env}</Option>);
-      });
-    }
-
-    return environmentData;
-
-  };
-
-  /* endregion */
 
   /* region 弹出项目框相关事件 */
 
@@ -512,14 +385,22 @@ const DutyPlan: React.FC<any> = () => {
   };
   // 表格双击事件
   const doubleClickRow = async (tableData: any) => {
-
     /* region 显示已有数据  */
     const hisData = await getPlanDetails(tableData[0].person_num);
-    showExitData(hisData);
+    if (hisData.message) {
+      message.error({
+        content: hisData.message,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+    showExitData(hisData.datas);
     /* endregion  */
-
-    /* region 下拉框中选项加载  */
     setIsPlanVisble(true);
+    /* region 下拉框中选项加载  */
 
     // 生成值班人下拉框
     const frontUserInfo = await loadUserSelect("1");
@@ -545,6 +426,7 @@ const DutyPlan: React.FC<any> = () => {
       upgradeEnv: environment
     });
     /* endregion  */
+
   };
 
   // 弹出层取消
@@ -631,7 +513,7 @@ const DutyPlan: React.FC<any> = () => {
     return returnUser;
   };
 
-  // selected 框选择事件
+  // selected 选择事件
   const onPrjTypeChanged = async (index: any, name: any, event: any) => {
 
     const dutyInfo = formForPlanModify.getFieldsValue();
@@ -809,13 +691,27 @@ const DutyPlan: React.FC<any> = () => {
 
     return cardDiv;
   };
+
+  // 界面刷新
   const refreshData = async (startTime: string, endTime: string) => {
-    const queryData = await queryDevelopViews({
+
+    const queryData = await queryDutyCardInfo({
       start: startTime,
       end: endTime
     });
 
-    const newCardDiv = makeCardsDiv(queryData);
+    if (queryData.message) {
+      message.error({
+        content: queryData.message,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+
+    const newCardDiv = makeCardsDiv(queryData.datas);
     setDutyCart(newCardDiv);
   };
 
@@ -943,54 +839,51 @@ const DutyPlan: React.FC<any> = () => {
     // 解析项目数据
     const project_data = alasysDutyProject(formData.projects);
 
-    await axios.put("/api/verify/duty/plan_data", {"person": person_data, "project": project_data})
-      .then(function (res) {
-
-        if (res.data.code === 200) {
-
-          message.info({
-            content: `值班计划修改成功！`,
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-
-          setIsPlanVisble(false);
-
-          //
-          refreshData(choicedCondition.start, choicedCondition.end);
-
-        } else {
-          message.error({
-            content: `错误：${res.data.msg}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-
-
-      }).catch(function (error) {
-        message.error({
-          content: `异常信息:${error.toString()}`,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
+    const saveResult = await submitModifyData(person_data, project_data);
+    if (saveResult) {
+      message.error({
+        content: saveResult,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
       });
-  }
+    } else {
+      message.info({
+        content: `值班计划修改成功！`,
+        duration: 1, // 1S 后自动关闭
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      setIsPlanVisble(false);
+      refreshData(choicedCondition.start, choicedCondition.end);
+    }
+  };
 
   /* endregion */
 
   /* region 时间数据查询以及展示 */
+  let cardDatas: any = [];
+  const {data} = useRequest(() => queryDutyCardInfo(choicedCondition));
 
-  const {data} = useRequest(() => queryDevelopViews(choicedCondition));
+  if (data) {
+    if (data.message) {
+      message.error({
+        content: data.message,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    } else {
+      cardDatas = data.datas;
+    }
+  }
+
   // 时间选择
   const onTimeSelected = async (params: any, dateString: any) => {
-
     setChoicedCondition({start: dateString[0], end: dateString[1]});
     await refreshData(dayjs(dateString[0]).format("YYYY/MM/DD"), dayjs(dateString[1]).format("YYYY/MM/DD"));
   };
@@ -999,8 +892,8 @@ const DutyPlan: React.FC<any> = () => {
   /* region useEffect 使用 */
   useEffect(() => {
     let cardDiv: any = [];
-    if (data) {
-      cardDiv = makeCardsDiv(data);
+    if (cardDatas) {
+      cardDiv = makeCardsDiv(cardDatas);
     }
     setDutyCart(cardDiv);
 

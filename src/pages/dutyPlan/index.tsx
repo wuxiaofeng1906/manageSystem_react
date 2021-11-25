@@ -718,10 +718,21 @@ const DutyPlan: React.FC<any> = () => {
   // 解析需要保存的值班人员
   const alasysDutyPerson = (data: any) => {
 
-    const person_data_array = [];
+    const person_data_array: any = [];
     const startTime = moment((data.dutyTime)[0]).format("YYYY/MM/DD");
     const endTime = moment((data.dutyTime)[1]).format("YYYY/MM/DD");
 
+    if (!data.firstFront || !data.secondFront) {
+      message.error({
+        content: "前端值班人不能为空！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return person_data_array;
+    }
     // 前端第一值班人
     person_data_array.push({
       "peron_num": oldDutyTask.personNum,  // 值班编号id 例如：202111190002
@@ -745,6 +756,18 @@ const DutyPlan: React.FC<any> = () => {
       "user_tech": "1",
       "duty_order": "2",
     });
+
+    if (!data.firstBackend || !data.secondBackend) {
+      message.error({
+        content: "后端值班人不能为空！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return person_data_array;
+    }
 
     // 后端第一值班人
     person_data_array.push({
@@ -770,6 +793,17 @@ const DutyPlan: React.FC<any> = () => {
       "duty_order": "2",
     });
 
+    if (!data.firstTester || !data.secondTester) {
+      message.error({
+        content: "测试值班人不能为空！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return person_data_array;
+    }
     // 测试第一值班人
     person_data_array.push({
       "peron_num": oldDutyTask.personNum,
@@ -838,28 +872,31 @@ const DutyPlan: React.FC<any> = () => {
 
     // 解析项目数据
     const project_data = alasysDutyProject(formData.projects);
+    if (person_data.length > 0) {
+      const saveResult = await submitModifyData(person_data, project_data);
+      if (saveResult) {
+        message.error({
+          content: saveResult,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      } else {
+        message.info({
+          content: `值班计划修改成功！`,
+          duration: 1, // 1S 后自动关闭
+          style: {
+            marginTop: '50vh',
+          },
+        });
 
-    const saveResult = await submitModifyData(person_data, project_data);
-    if (saveResult) {
-      message.error({
-        content: saveResult,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    } else {
-      message.info({
-        content: `值班计划修改成功！`,
-        duration: 1, // 1S 后自动关闭
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
-      setIsPlanVisble(false);
-      refreshData(choicedCondition.start, choicedCondition.end);
+        setIsPlanVisble(false);
+        refreshData(choicedCondition.start, choicedCondition.end);
+      }
     }
+
+
   };
 
   /* endregion */

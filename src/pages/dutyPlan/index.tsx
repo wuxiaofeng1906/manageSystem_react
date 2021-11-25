@@ -690,9 +690,10 @@ const DutyPlan: React.FC<any> = () => {
         </Form.Item>
 
         <Form.Item label="项目负责人" name={['projects', index, 'prjManager']} style={{marginTop: -20, marginLeft: 13}}>
-          <Select style={{width: "96%", marginLeft: 14}} showSearch>
-            {projectInfo.manager}
-          </Select>
+          <Input style={{width: "96%", marginLeft: 14, color: "black"}} disabled/>
+          {/*<Select style={{width: "96%", marginLeft: 14}} showSearch>*/}
+          {/*  {projectInfo.manager}*/}
+          {/*</Select>*/}
         </Form.Item>
 
         <Form.Item label="计划灰度时间" name={['projects', index, 'planGrayTime']} style={{marginTop: -20, marginLeft: 13}}>
@@ -1033,11 +1034,7 @@ const DutyPlan: React.FC<any> = () => {
               initialValues={{projects}}>
 
           <Form.Item label="值班时间" name="dutyTime" required={true}>
-            <RangePicker
-              className={'times'}
-              style={{width: '100%', color: "black"}}
-              disabled
-            />
+            <RangePicker style={{width: '100%', color: "red"}} disabled/>
           </Form.Item>
           {/* 值班人员Card */}
           <Card size="small" title="值班人员" style={{marginTop: -15}} bodyStyle={{height: 130}}>

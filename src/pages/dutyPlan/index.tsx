@@ -184,7 +184,6 @@ const DutyPlan: React.FC<any> = () => {
     branch: [],
     testEnv: [],
     upgradeEnv: [],
-    manager: []
   });
   const [dutyCard, setDutyCart] = useState(<div></div>);
 
@@ -404,30 +403,6 @@ const DutyPlan: React.FC<any> = () => {
 
   };
 
-  // 负责人选择框
-  const loadPrincipalSelect = async () => {
-    const principalData = await getPrincipal();
-    const prinData: any = [];
-
-    if (principalData.message !== "") {
-      message.error({
-        content: principalData.message,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    } else if (principalData.data) {
-      const datas = principalData.data;
-      datas.forEach((users: any) => {
-        prinData.push(
-          <Option key={users.user_id} value={users.user_name}>{users.user_name}</Option>);
-      });
-    }
-
-    return prinData;
-
-  };
   /* endregion */
 
   /* region 弹出项目框相关事件 */
@@ -560,14 +535,13 @@ const DutyPlan: React.FC<any> = () => {
     const projectType = await loadPrjTypeSelect();
     const branchs = await loadBanchSelect();
     const environment = await loadEnvironmentSelect();
-    const principal = await loadPrincipalSelect();
+
     setProjectInfo({
       prjName: projectName,
       prjType: projectType,
       branch: branchs,
       testEnv: environment,
-      upgradeEnv: environment,
-      manager: principal
+      upgradeEnv: environment
     });
     /* endregion  */
   };
@@ -622,8 +596,41 @@ const DutyPlan: React.FC<any> = () => {
     return setProjects([...projects.slice(0, index), ...projects.slice(index + 1)])
   };
 
+  // 根据项目获取负责人
+  const getProjectManager = async (project: any) => {
+    let returnUser: any = {};
+
+    const proInfo: any = {
+      proId: (project.split('&'))[0],
+      proName: (project.split('&'))[1],
+    }
+
+    const projectsInfo = await getAllProject();
+
+    if (projectsInfo.message !== "") {
+      message.error({
+        content: projectsInfo.message,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    } else if (projectsInfo.data) {
+      const datas = projectsInfo.data;
+      for (let index = 0; index < datas.length; index += 1) {
+        const ele: any = datas[index];
+        if ((ele.project_id).toString() === proInfo.proId && ele.project_name === proInfo.proName) {
+          returnUser = ele.user;
+          break;
+        }
+      }
+    }
+    return returnUser;
+  };
+
+
   // selected 框选择事件
-  const onPrjTypeChanged = (index: any, name: any, event: any) => {
+  const onPrjTypeChanged = async (index: any, name: any, event: any) => {
 
     const dutyInfo = formForPlanModify.getFieldsValue();
     const firstBackend = (dutyInfo.firstBackend).split("&")[1];
@@ -631,6 +638,11 @@ const DutyPlan: React.FC<any> = () => {
     const tempArray = [...dutyProject];
     if (name === 'prjType' && event === "2") {  // 如果是班车项目,则自动获取上面的后端负责人填入项目负责人选择框
       tempArray[index] = {...tempArray[index], prjManager: firstBackend};
+    } else {
+      debugger;
+      const project = dutyProject[index].prjName;
+      const principal = await getProjectManager(project);
+      tempArray[index] = {...tempArray[index], prjManager: principal.user_name};
     }
 
     formForPlanModify.setFieldsValue({
@@ -691,9 +703,6 @@ const DutyPlan: React.FC<any> = () => {
 
         <Form.Item label="项目负责人" name={['projects', index, 'prjManager']} style={{marginTop: -20, marginLeft: 13}}>
           <Input style={{width: "96%", marginLeft: 14, color: "black"}} disabled/>
-          {/*<Select style={{width: "96%", marginLeft: 14}} showSearch>*/}
-          {/*  {projectInfo.manager}*/}
-          {/*</Select>*/}
         </Form.Item>
 
         <Form.Item label="计划灰度时间" name={['projects', index, 'planGrayTime']} style={{marginTop: -20, marginLeft: 13}}>
@@ -928,6 +937,8 @@ const DutyPlan: React.FC<any> = () => {
 
     // 解析项目数据
     const project_data = alasysDutyProject(formData.projects);
+
+    debugger;
     await axios.put("/api/verify/duty/plan_data", {"person": person_data, "project": project_data})
       .then(function (res) {
 

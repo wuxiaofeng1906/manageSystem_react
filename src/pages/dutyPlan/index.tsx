@@ -28,8 +28,7 @@ import {
   getAllProject,
   getProjectType,
   getBranchName,
-  getEnvironment,
-  getPrincipal
+  getEnvironment
 } from '@/publicMethods/verifyAxios';
 
 const {RangePicker} = DatePicker;
@@ -170,8 +169,8 @@ const DutyPlan: React.FC<any> = () => {
       prjManager: "",
       planGrayTime: "",
       planOnlineTime: "",
-      proId: ""
-
+      proId: "",
+      managerId: ""
     }]);
   const [allUsers, setAllUsers] = useState({
     front: [],
@@ -482,6 +481,7 @@ const DutyPlan: React.FC<any> = () => {
         testEnv: "",
         upgradeEnv: "",
         prjManager: "",
+        managerId: "",
         planGrayTime: "",
         planOnlineTime: "",
         proId: "",
@@ -501,6 +501,7 @@ const DutyPlan: React.FC<any> = () => {
         testEnv: dts.project_test_environment,
         upgradeEnv: dts.project_upgrade_environment,
         prjManager: dts.project_head,
+        managerId: dts.project_head_id,
         planGrayTime: moment(dts.project_plan_gray_time),
         planOnlineTime: moment(dts.project_plan_online_time),
         proId: dts.pro_id,
@@ -563,6 +564,7 @@ const DutyPlan: React.FC<any> = () => {
       planGrayTime: "",
       planOnlineTime: "",
       proId: "",
+      managerId: ""
     }];
 
     formForPlanModify.setFieldsValue({
@@ -585,6 +587,7 @@ const DutyPlan: React.FC<any> = () => {
         "project_test_environment": delData.testEnv, // 对应测试环境
         "project_upgrade_environment": delData.upgradeEnv, // 对应升级环境
         "project_head": delData.prjManager,  // 项目负责人
+        "project_head_id": delData.managerId,  // 项目负责人
         "project_plan_gray_time": moment(delData.planGrayTime).format("YYYY/MM/DD"),  // 计划灰度时间
         "project_plan_online_time": moment(delData.planOnlineTime).format("YYYY/MM/DD"), // 计划上线时间
         "project_index": (index + 1).toString(),// 界面展示序号
@@ -592,7 +595,7 @@ const DutyPlan: React.FC<any> = () => {
       }
     );
 
-    formForPlanModify.setFieldsValue({"projects": [...projects.slice(0, index), ...projects.slice(index + 1)]})
+    formForPlanModify.setFieldsValue({"projects": [...projects.slice(0, index), ...projects.slice(index + 1)]});
     return setProjects([...projects.slice(0, index), ...projects.slice(index + 1)])
   };
 
@@ -628,21 +631,19 @@ const DutyPlan: React.FC<any> = () => {
     return returnUser;
   };
 
-
   // selected 框选择事件
   const onPrjTypeChanged = async (index: any, name: any, event: any) => {
 
     const dutyInfo = formForPlanModify.getFieldsValue();
-    const firstBackend = (dutyInfo.firstBackend).split("&")[1];
+    const firstBackend = (dutyInfo.firstBackend).split("&");
     const dutyProject = dutyInfo.projects;
     const tempArray = [...dutyProject];
     if (name === 'prjType' && event === "2") {  // 如果是班车项目,则自动获取上面的后端负责人填入项目负责人选择框
-      tempArray[index] = {...tempArray[index], prjManager: firstBackend};
+      tempArray[index] = {...tempArray[index], managerId: firstBackend[0], prjManager: firstBackend[1]};
     } else {
-      debugger;
       const project = dutyProject[index].prjName;
       const principal = await getProjectManager(project);
-      tempArray[index] = {...tempArray[index], prjManager: principal.user_name};
+      tempArray[index] = {...tempArray[index], managerId: principal.user_id, prjManager: principal.user_name};
     }
 
     formForPlanModify.setFieldsValue({
@@ -714,6 +715,9 @@ const DutyPlan: React.FC<any> = () => {
         </Form.Item>
 
         <Form.Item label="修改需要" name={['projects', index, 'proId']} style={{display: "none"}}>
+          <Input style={{width: 40}}/>
+        </Form.Item>
+        <Form.Item label="修改需要" name={['projects', index, 'managerId']} style={{display: "none"}}>
           <Input style={{width: 40}}/>
         </Form.Item>
 
@@ -913,6 +917,7 @@ const DutyPlan: React.FC<any> = () => {
           "project_test_environment": dts.testEnv, // 对应测试环境
           "project_upgrade_environment": dts.upgradeEnv, // 对应升级环境
           "project_head": dts.prjManager,  // 项目负责人
+          "project_head_id": dts.managerId,
           "project_plan_gray_time": moment(dts.planGrayTime).format("YYYY/MM/DD"),  // 计划灰度时间
           "project_plan_online_time": moment(dts.planOnlineTime).format("YYYY/MM/DD"), // 计划上线时间
           "project_index": (index + 1).toString(),// 界面展示序号
@@ -938,7 +943,6 @@ const DutyPlan: React.FC<any> = () => {
     // 解析项目数据
     const project_data = alasysDutyProject(formData.projects);
 
-    debugger;
     await axios.put("/api/verify/duty/plan_data", {"person": person_data, "project": project_data})
       .then(function (res) {
 

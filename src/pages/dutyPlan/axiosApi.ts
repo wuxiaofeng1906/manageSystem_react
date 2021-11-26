@@ -108,6 +108,8 @@ const submitModifyData = async (person_data: any, project_data: any) => {
   let errorMessage = "";
 
   await axios.put("/api/verify/duty/plan_data", {"person": person_data, "project": project_data})
+
+    // await axios.put("/api/duty/plan_data", {"person": person_data, "project": project_data})
     .then(function (res) {
       if (res.data.code !== 200) {
         errorMessage = `错误：${res.data.msg}`;

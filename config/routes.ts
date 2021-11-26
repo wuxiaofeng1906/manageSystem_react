@@ -439,7 +439,7 @@ export default [
     name: '值班计划',
     icon: 'table',
     path: '/dutyPlan',
-    access: 'sysAdmin',
+    // access: 'sysAdmin',
     component: './dutyPlan',
   },
   {

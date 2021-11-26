@@ -731,7 +731,7 @@ const DutyPlan: React.FC<any> = () => {
         },
       });
 
-      return person_data_array;
+      return [];
     }
     // 前端第一值班人
     person_data_array.push({
@@ -766,7 +766,7 @@ const DutyPlan: React.FC<any> = () => {
         },
       });
 
-      return person_data_array;
+      return [];
     }
 
     // 后端第一值班人
@@ -802,7 +802,7 @@ const DutyPlan: React.FC<any> = () => {
         },
       });
 
-      return person_data_array;
+      return [];
     }
     // 测试第一值班人
     person_data_array.push({

@@ -1032,8 +1032,16 @@ const DutyPlan: React.FC<any> = () => {
 
   // 时间选择
   const onTimeSelected = async (params: any, dateString: any) => {
-    setChoicedCondition({start: dateString[0], end: dateString[1]});
-    await refreshData(dayjs(dateString[0]).format("YYYY/MM/DD"), dayjs(dateString[1]).format("YYYY/MM/DD"));
+
+    let startTime = dateString[0];
+    let endTime = dateString[1];
+    setChoicedCondition({start: startTime, end: endTime});
+    if (dateString[0] !== "" && dateString[1] !== "") {
+      startTime = dayjs(dateString[0]).format("YYYY/MM/DD");
+      endTime = dayjs(dateString[1]).format("YYYY/MM/DD");
+    }
+
+    await refreshData(startTime, endTime);
   };
   /* endregion */
 

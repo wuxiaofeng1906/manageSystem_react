@@ -25,7 +25,7 @@ const parseData = (params: any) => {
           username = ele.user_name === null ? "" : ele.user_name;
         } else {
 
-          if (ele.user_name === null) {
+          if (ele.user_name === null || ele.user_name === "") {
             projectItem.user_name = username;
           } else {
             projectItem.user_name = `${username}/${ele.user_name}`;

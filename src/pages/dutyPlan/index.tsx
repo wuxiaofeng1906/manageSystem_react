@@ -12,6 +12,7 @@ import {
   getAllUsers, getAllProject, getProjectType, getBranchName, getEnvironment
 } from '@/publicMethods/verifyAxios';
 import {queryDutyCardInfo, getPlanDetails, sendMessageToApi, submitModifyData} from './axiosApi';
+import {judgeAuthorityByName} from "@/publicMethods/authorityJudge";
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
@@ -672,7 +673,11 @@ const DutyPlan: React.FC<any> = () => {
               onRow={() => {
                 return {
                   onDoubleClick: () => {
-                    doubleClickRow(ele_data);
+
+                    if (judgeAuthorityByName("modifyDutyPlanData") === true) {
+                      doubleClickRow(ele_data);
+                    }
+
                   },
                 };
               }}
@@ -1071,7 +1076,12 @@ const DutyPlan: React.FC<any> = () => {
             choicedCondition.end === "" ? null : moment(choicedCondition.end)]}
         />
 
-        <Button type="text" onClick={sendMessage} style={{marginLeft: 10, padding: 10}}>
+        <Button type="text" onClick={sendMessage}
+                style={{
+                  marginLeft: 10,
+                  padding: 10,
+                  display: judgeAuthorityByName("addDutyMsgPush") === true ? "inline" : "none"
+                }}>
           <img src="../pushMessage.png" width="25" height="25" alt="一键推送" title="一键推送"/> &nbsp;一键推送
         </Button>
 

@@ -836,12 +836,121 @@ const DutyPlan: React.FC<any> = () => {
 
     const project_data: any = [];
     if (data) {
-      data.forEach((dts: any, index: number) => {
+      for (let index = 0; index < data.length; index += 1) {
+        const dts = data[index];
+
+        const proInfo = (dts.prjName).split("&");
+
+        /* region 判断所填项是否为空 */
+        // 判断项目名是否为空
+        if (!proInfo[1]) {
+          message.error({
+            content: "项目名不能为空！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          project_data.length = 0;
+          break;
+        }
+        // 判断项目类型是否为空
+        if (!dts.prjType) {
+          message.error({
+            content: "项目类型不能为空！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          project_data.length = 0;
+          break;
+        }
+
+        // 判断对应分支是否为空
+        if (!dts.branch) {
+          message.error({
+            content: "对应分支不能为空！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          project_data.length = 0;
+          break;
+        }
+
+        // 判断对应测试环境是否为空
+        if (!dts.testEnv) {
+          message.error({
+            content: "对应测试环境不能为空！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          project_data.length = 0;
+          break;
+        }
+
+        // 判断对应升级环境是否为空
+        if (!dts.upgradeEnv) {
+          message.error({
+            content: "对应升级环境不能为空！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          project_data.length = 0;
+          break;
+        }
+
+        // 判断项目负责人是否为空
+        if (!dts.prjManager) {
+          message.error({
+            content: "项目负责人不能为空！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          project_data.length = 0;
+          break;
+        }
+
+        // 判断计划灰度时间是否为空
+        if (!dts.planGrayTime) {
+          message.error({
+            content: "计划灰度时间不能为空！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          project_data.length = 0;
+          break;
+        }
+
+        // 判断计划上线时间是否为空
+        if (!dts.planOnlineTime) {
+          message.error({
+            content: "计划上线时间不能为空！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          project_data.length = 0;
+          break;
+        }
+
+        /* endregion */
+
         const items = {
-          // "pro_id": dts.proId,  // project id  新增的时候不需要这个id（为空的时候则不需要）
           "person_num": oldDutyTask.personNum, // 值班计划编号
-          "project_id": ((dts.prjName).split("&"))[0],// 项目id
-          "project_name": ((dts.prjName).split("&"))[1], // 项目名称
+          "project_id": proInfo[0],// 项目id
+          "project_name": proInfo[1], // 项目名称
           "project_type": dts.prjType,  // 项目类型
           "project_branch": dts.branch, // 对应分支
           "project_test_environment": dts.testEnv, // 对应测试环境
@@ -854,10 +963,12 @@ const DutyPlan: React.FC<any> = () => {
           "is_delete": 0 // 是否删除
         };
         if (dts.proId) {
-          items["pro_id"] = dts.proId;
+          items["pro_id"] = dts.proId;   // project id  新增的时候不需要这个id（为空的时候则不需要）
         }
+
         project_data.push(items);
-      });
+
+      }
     }
 
     const allProject = project_data.concat(deletedData); // 将修改、新增和删除的数组连在一起进行保存
@@ -872,7 +983,7 @@ const DutyPlan: React.FC<any> = () => {
 
     // 解析项目数据
     const project_data = alasysDutyProject(formData.projects);
-    if (person_data.length > 0) {
+    if (person_data.length > 0 && project_data.length > 0) {
       const saveResult = await submitModifyData(person_data, project_data);
       if (saveResult) {
         message.error({

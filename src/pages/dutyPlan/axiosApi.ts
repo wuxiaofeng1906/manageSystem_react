@@ -1,4 +1,8 @@
 import axios from "axios";
+import {getCurrentProxy} from "../../../config/ip";
+
+const sys_accessToken = localStorage.getItem("accessId");
+axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
 
 // 解析数据
 const parseData = (params: any) => {
@@ -90,8 +94,12 @@ const getPlanDetails = async (paln_num: string) => {
 
 // 勾选值班计划发送消息
 const sendMessageToApi = async (projectId: string) => {
+
   let errorMessage = "";
-  await axios.get('/api/verify/duty/msg_push', {params: {person_num: projectId}})
+  const hostIp = getCurrentProxy();
+  const data = {targetUrl: `${hostIp}api/verify/duty/msg_push?person_num=${projectId}`};
+  // await axios.get('/api/verify/duty/msg_push', {params: {person_num: projectId}})
+  await axios.post('/api/duty/msg_push', data)
     .then(function (res) {
       if (res.data.code !== 200) {
         errorMessage = `错误：${res.data.msg}`;
@@ -106,10 +114,10 @@ const sendMessageToApi = async (projectId: string) => {
 // 提交修改的数据
 const submitModifyData = async (person_data: any, project_data: any) => {
   let errorMessage = "";
-
-  await axios.put("/api/verify/duty/plan_data", {"person": person_data, "project": project_data})
-
-    // await axios.put("/api/duty/plan_data", {"person": person_data, "project": project_data})
+  const hostIp = getCurrentProxy();
+  const url = `${hostIp}api/verify/duty/plan_data`;
+  // await axios.put("/api/verify/duty/plan_data", {"person": person_data, "project": project_data})
+  await axios.put("/api/duty/plan_data", {"targetUrl": url, "person": person_data, "project": project_data})
     .then(function (res) {
       if (res.data.code !== 200) {
         errorMessage = `错误：${res.data.msg}`;

@@ -2,7 +2,7 @@
  * @Description: 通用常量
  * @Author: jieTan
  * @Date: 2021-11-23 15:51:13
- * @LastEditTime: 2021-11-23 17:01:26
+ * @LastEditTime: 2021-11-26 16:11:00
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -15,7 +15,7 @@ export const PERCENTAGE = {
   zh: '百分之',
 };
 // 默认列宽
-export const NUMBER_W = 64;
+export const COLUMN_W = 64; 
 // 相对于“秒”的时间 => H
 export const HOUR = {
   value: 3600,

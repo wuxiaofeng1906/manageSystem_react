@@ -1,13 +1,13 @@
-import { GQL_PARAMS } from '../../gql.query';
-
 /*
  * @Description: 查询的gql
  * @Author: jieTan
  * @Date: 2021-11-23 10:14:10
- * @LastEditTime: 2021-11-26 17:22:42
+ * @LastEditTime: 2021-11-29 16:56:36
  * @LastEditors: jieTan
  * @LastModify:
  */
+
+import { GQL_PARAMS } from '../../gql.query';
 
 export default (args: GQL_PARAMS, funcWithParams: Function): [string, string] => {
   //
@@ -32,6 +32,7 @@ export default (args: GQL_PARAMS, funcWithParams: Function): [string, string] =>
         reopenRatio
         bugFlybackDura
       }
+    }
   }
   `;
 

@@ -647,6 +647,9 @@ const DutyPlan: React.FC<any> = () => {
     ];
     const cardDiv: any = [];
     const tdArray: any = [];
+    if (!oraData) {
+      return [];
+    }
     oraData.forEach((ele_data: any, index: number) => {
       const startTime = ele_data[0].duty_start_time;
       const endTime = ele_data[0].duty_end_time;

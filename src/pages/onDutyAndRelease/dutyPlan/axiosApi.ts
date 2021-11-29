@@ -1,5 +1,5 @@
 import axios from "axios";
-import {getCurrentProxy} from "../../../config/ip";
+import {getCurrentProxy} from "../../../../config/ip";
 
 const sys_accessToken = localStorage.getItem("accessId");
 axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;

@@ -2,7 +2,7 @@
  * @Description: 数据列表
  * @Author: jieTan
  * @Date: 2021-11-22 10:55:42
- * @LastEditTime: 2021-11-29 17:03:58
+ * @LastEditTime: 2021-11-29 17:40:14
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -17,6 +17,7 @@ import BugReOpenColumn from './renders/BugReOpenColumn';
 import BugFlybackDuraColumn from './renders/BugFlybackDuraColumn';
 import { GQL_PARAMS, queryGQL } from '../../gql.query';
 import mygql from './mygql';
+import { GRAPHQL_QUERY } from '@/namespaces';
 
 // /*  */
 // const queryGQL = async (client: GqlClient<object>, params: any) => {
@@ -53,9 +54,9 @@ export default () => {
   /*  */
 
   /*  */
-  const gqlClient = useGqlClient();
-  const params: GQL_PARAMS = { func: 'projectKpi' };
-  const { data } = useRequest(() => queryGQL(gqlClient, mygql, params));
+  const gqlClient = useGqlClient(); // 必须提前初始化该对象
+  const params: GQL_PARAMS = { func: GRAPHQL_QUERY['PROJECT_KPI'] };
+  const { data } = { data: [] }; //useRequest(() => queryGQL(gqlClient, mygql, params));
 
   /*  */
   return (

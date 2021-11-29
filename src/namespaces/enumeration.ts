@@ -2,7 +2,7 @@
  * @Description: 通用枚举型
  * @Author: jieTan
  * @Date: 2021-11-23 10:42:47
- * @LastEditTime: 2021-11-26 16:26:47
+ * @LastEditTime: 2021-11-29 17:11:14
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -22,4 +22,10 @@ export enum JS_PROTOTYPE_TYPE {
 export enum TABLE_GROUP_SHOW {
   open = 'open',
   closed = 'closed',
+}
+
+/* gql查询方法 */
+export enum GRAPHQL_QUERY {
+  PROJECT_KPI = 'projectKpi', // 项目度量指标
+  ORGANIZATION = 'organization', // 企业微信组织架构
 }

@@ -2,61 +2,39 @@
  * @Description:
  * @Author: jieTan
  * @Date: 2021-11-30 16:00:58
- * @LastEditTime: 2021-11-30 17:39:55
+ * @LastEditTime: 2021-11-30 18:42:52
  * @LastEditors: jieTan
  * @LastModify:
  */
 
-export const toTree = (data: any[], idName?: string, parentIdName?: string) => {
-  const id = idName || 'id';
-  const parentId = parentIdName || 'parentId';
-  // 将数据存储为 以 id 为 KEY 的 map 索引数据列
-  const map = {};
-  data.forEach(function (item) {
-    map[item[id]] = item;
-  });
-  const menu: any[] = [];
-  data.forEach(function (item) {
-    // 在map中找到当前项的父级菜单
-    const parent = map[item[parentId]];
-    if (parent) {
-      // 如果父级菜单存在，则将当前项存入父级的children
-      // 如果父级的children不存在，初始化为空数组[]后再存入
-      (parent.children || (parent.children = [])).push(item);
-    } else {
-      // 如果父级菜单不存在，则做为顶级菜单存入
-      menu.push(item);
-    }
-  });
-  return menu;
+const extraConverter = <T>(item: T, extraMaps?: [string, string][]) => {
+  //
+  if (extraMaps) extraMaps.map(([source, target]) => (item[target] = item[source]));
+  //
+  return item;
 };
 
-export const toTree2 = (data: any[], idName?: string, parentIdName?: string) => {
-  const id = idName || 'id';
-  const parentId = parentIdName || 'parentId';
-  // 将数据存储为 以 id 为 KEY 的 map 索引数据列
+export const toTree = (
+  datas: any[],
+  idKey: string = 'id',
+  parentKey: string = 'parentId',
+  extraMap?: [string, string][],
+) => {
+  //
+  if (datas === undefined) return;
+  // 将数据存储为 以id为KEY的map索引数据列
   const map = {};
-  data.forEach(function (item) {
-    item['title'] = item['name'];
-    item['value'] = item['id'];
-    map[item[id]] = item;
-  });
-  var menu = [];
-  data.forEach(function (item) {
-    // 在map中找到当前项的父级菜单
-    const parent = map[item[parentId]];
-    if (parent) {
-      // 如果父级菜单存在，则将当前项存入父级的children
-      // 如果父级的children不存在，初始化为空数组[]后再存入
-      item['title'] = item['name'];
-      item['value'] = item['id'];
-      (parent.children || (parent.children = [])).push(item);
-    } else {
-      // 如果父级菜单不存在，则做为顶级菜单存入
-      item['title'] = item['name'];
-      item['value'] = item['id'];
-      menu.push(item);
-    }
-  });
-  return menu;
+  datas.map((da) => (map[da[idKey]] = extraConverter<any>(da, extraMap)));
+  //
+  const treeData: any[] = [];
+  for (const da of datas) {
+    const parent = map[da[parentKey]];
+    // 如果父级菜单存在，则将当前项存入父级的children
+    // 如果父级的children不存在，初始化为空数组[]后再存入
+    if (parent) (parent.children || (parent.children = [])).push(extraConverter<any>(da, extraMap));
+    // 如果父级菜单不存在，则做为顶级菜单存入
+    else treeData.push(extraConverter<any>(da, extraMap));
+  }
+  //
+  return treeData;
 };

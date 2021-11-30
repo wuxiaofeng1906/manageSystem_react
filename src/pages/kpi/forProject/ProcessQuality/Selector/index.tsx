@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2021-11-30 17:47:56
+ * @LastEditTime: 2021-11-30 18:42:09
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -16,7 +16,7 @@ import { GQL_PARAMS, queryGQL } from '../../gql.query';
 import organizationGql from './gqls/organization.gql';
 import { useEffect, useState } from 'react';
 import { useModel } from 'umi';
-import { toTree2 } from './utils/tree';
+import { toTree } from './utils/tree';
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -45,6 +45,7 @@ const childrenElems = (datas: any[], valueKey: string, textkey: string, target?:
   //
   return children;
 };
+
 /**
  * @description - 获取所有项目信息
  * @author JieTan
@@ -63,24 +64,26 @@ const projOptsElems = (datas: any[], val: any, setVal: Function): void => {
 export default () => {
   /* 数据区 */
   const defaultParams: any = {
-    mode: 'multiple',
     showArrow: true,
-    className: selectFilter,
     allowClear: 'allowClear',
     placeholder: '默认选择全部',
   }; // <Select>默认的一些配置
   const [projElems, setProjElems] = useState(null); // 保存项目信息
   const [treeData, setTreeData] = useState([]);
   const { gqlData } = useModel('processQuality'); // 获取“过程质量”查询的结果数据
-  // 
+  //
   const gqlClient = useGqlClient(); // 必须提前初始化该对象
   const params: GQL_PARAMS = { func: GRAPHQL_QUERY['ORGANIZATION'] };
   const { data } = useRequest(() => queryGQL(gqlClient, organizationGql, params));
 
   /*  */
   useEffect(() => {
-    const ret = data?.organization ? toTree2(data?.organization, 'id', 'parent') : [];
-    setTreeData(ret);
+    const converItems: [string, string][] = [
+      ['name', 'title'],
+      ['id', 'value'],
+    ];
+    const ret = toTree(data?.organization, 'id', 'parent', converItems)?.shift()?.children?.shift();
+    setTreeData(ret ? [ret as never] : []);
   }, [data]);
 
   /* 绘制区 */
@@ -89,6 +92,8 @@ export default () => {
       <Form.Item label="项目名称">
         <Select
           {...defaultParams}
+          mode="multiple"
+          className={selectFilter}
           onChange={() => {}}
           onClick={() => projOptsElems(gqlData, projElems, setProjElems)}
           children={projElems}
@@ -96,10 +101,10 @@ export default () => {
       </Form.Item>
       <Form.Item label="所属部门/组">
         <TreeSelect
-          style={{ width: 300 }}
+          {...defaultParams}
+          style={{ width: 320 }}
           dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
           treeData={treeData}
-          placeholder="Please select"
           treeDefaultExpandAll
         />
       </Form.Item>

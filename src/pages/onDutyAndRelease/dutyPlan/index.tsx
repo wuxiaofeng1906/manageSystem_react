@@ -516,23 +516,34 @@ const DutyPlan: React.FC<any> = () => {
 
   // selected 选择事件
   const onPrjTypeChanged = async (index: any, name: any, event: any) => {
+    try {
+      const dutyInfo = formForPlanModify.getFieldsValue();
+      const dutyProject = dutyInfo.projects;
+      const tempArray = [...dutyProject];
+      if (name === 'prjType' && event === "2") {  // 如果是班车项目,则自动获取上面的后端负责人填入项目负责人选择框
+        let firstBackend = "";
+        if (dutyInfo.firstBackend) {
+          firstBackend = (dutyInfo.firstBackend).split("&");
+        }
+        tempArray[index] = {...tempArray[index], managerId: firstBackend[0], prjManager: firstBackend[1]};
+      } else {
+        const project = dutyProject[index].prjName;
+        const principal = await getProjectManager(project);
+        tempArray[index] = {...tempArray[index], managerId: principal.user_id, prjManager: principal.user_name};
+      }
 
-    const dutyInfo = formForPlanModify.getFieldsValue();
-    const firstBackend = (dutyInfo.firstBackend).split("&");
-    const dutyProject = dutyInfo.projects;
-    const tempArray = [...dutyProject];
-    if (name === 'prjType' && event === "2") {  // 如果是班车项目,则自动获取上面的后端负责人填入项目负责人选择框
-      tempArray[index] = {...tempArray[index], managerId: firstBackend[0], prjManager: firstBackend[1]};
-    } else {
-      const project = dutyProject[index].prjName;
-      const principal = await getProjectManager(project);
-      tempArray[index] = {...tempArray[index], managerId: principal.user_id, prjManager: principal.user_name};
+      formForPlanModify.setFieldsValue({
+        "projects": tempArray
+      });
+    } catch (e) {
+      message.error({
+        content: `异常抛出：${e}`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
     }
-
-    formForPlanModify.setFieldsValue({
-      "projects": tempArray
-    });
-
   };
   // 动态生成项目组件
   const projectItems = projects.map((item: any, index: any) => {

@@ -15,18 +15,24 @@ const {Option} = Select;
 const currentDate = dayjs().format("YYYYMMDD");
 const Content: React.FC<any> = (props) => {
   const [formForDutyNameModify] = Form.useForm();
+  const saveProjects = (params: any) => {
+    debugger;
+
+    const datas = formForDutyNameModify.getFieldsValue();
+  };
 
   return (
     <div>
 
-      {/* 值班名单 */}
+      {/* 预发布项目 */}
       <fieldset className={"fieldStyle"}>
         <legend className={"legendStyle"}>Step1 预发布项目 <label style={{color: "red"}}> 被锁定:XXX正在编辑,请稍等</label></legend>
 
-        <div>
+        <div style={{marginBottom: -20, marginTop: -5}}>
           <div style={{float: "right"}}>
             <Button type="primary"
-                    style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, marginLeft: 10}}>保存 </Button>
+                    style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, marginLeft: 10}}
+                    onClick={saveProjects}>保存 </Button>
           </div>
 
           <div>
@@ -49,7 +55,8 @@ const Content: React.FC<any> = (props) => {
         <div>
           <div style={{float: "right"}}>
             <Button type="primary"
-                    style={{height: "200px", color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5,}}
+                    style={{height: "200px", color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}
+
             >点 <br></br>击 <br></br>保 <br></br>存 </Button>
           </div>
         </div>

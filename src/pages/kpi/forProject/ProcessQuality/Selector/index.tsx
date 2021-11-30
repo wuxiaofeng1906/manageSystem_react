@@ -2,73 +2,106 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2021-11-29 18:32:35
+ * @LastEditTime: 2021-11-30 17:44:37
  * @LastEditors: jieTan
  * @LastModify:
  */
-import { Select, Form, DatePicker, Divider } from 'antd';
+import { Select, Form, DatePicker, Divider, TreeSelect } from 'antd';
 import { selectFilter } from './index.css';
 import moment from 'moment';
-import { useRequest } from 'ahooks';
+import { useMount, useRequest } from 'ahooks';
 import { useGqlClient } from '@/hooks';
 import { GRAPHQL_QUERY } from '@/namespaces';
 import { GQL_PARAMS, queryGQL } from '../../gql.query';
 import organizationGql from './gqls/organization.gql';
-import { WxDepartment } from './interface';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useModel } from 'umi';
+import { toTree2 } from './utils/tree';
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
-/*  */
-const childrenElems = (datas: WxDepartment[], val: any, setVal: Function) => {
-  if (datas === undefined || val !== null) return;
+/**
+ * @description - 构建<Select>的<Option>元素
+ * @author JieTan
+ * @date 2021/11/30 11:11:15
+ * @param {any[]} datas - 待解析的源数据
+ * @param {string} valueKey - <Option>的value值
+ * @param {string} textkey - <Option>的text值
+ * @param {*} [target] - 从datas的target元素中取之
+ * @returns {*}  {any[]} - 返回构建的<Option>数组元素
+ */
+const childrenElems = (datas: any[], valueKey: string, textkey: string, target?: any): any[] => {
   //
   const children: any[] = [];
-  datas.map((da, i) =>
+  datas.map((da, i) => {
+    const item = target ? da[target] : da;
     children.push(
-      <Option key={i} value={`${da.id}`}>
-        {da.name}
+      <Option key={i} value={`${item[valueKey]}`}>
+        {item[textkey]}
       </Option>,
-    ),
-  );
+    );
+  });
   //
-  setVal(children);
+  return children;
+};
+/**
+ * @description - 获取所有项目信息
+ * @author JieTan
+ * @date 2021/11/30 11:11:14
+ * @param {any[]} datas - 待解析的源数据
+ * @param {*} val - 存储proj数据的state值
+ * @param {Function} setVal - 修改相应state值的函数
+ * @returns {*} {void}
+ */
+const projOptsElems = (datas: any[], val: any, setVal: Function): void => {
+  if (datas === undefined || val !== null) return;
+  setVal(childrenElems(datas, 'id', 'name', 'project'));
 };
 
 /*  */
-export default (props: any) => {
-  /*  */
+export default () => {
+  /* 数据区 */
   const defaultParams: any = {
     mode: 'multiple',
-    defaultValue: 'all',
+    showArrow: true,
     className: selectFilter,
     allowClear: 'allowClear',
-  };
-  const [projElems, setProjElems] = useState(null);
-
-  /*  */
+    placeholder: '默认选择全部',
+  }; // <Select>默认的一些配置
+  const [projElems, setProjElems] = useState(null); // 保存项目信息
+  const [treeData, setTreeData] = useState([]);
+  const { gqlData } = useModel('processQuality'); // 获取“过程质量”查询的结果数据
+  // 
   const gqlClient = useGqlClient(); // 必须提前初始化该对象
   const params: GQL_PARAMS = { func: GRAPHQL_QUERY['ORGANIZATION'] };
   const { data } = useRequest(() => queryGQL(gqlClient, organizationGql, params));
 
   /*  */
+  useEffect(() => {
+    const ret = data?.organization ? toTree2(data?.organization, 'id', 'parent') : [];
+    setTreeData(ret);
+  }, [data]);
+
+  /* 绘制区 */
   return (
     <Form layout="inline">
       <Form.Item label="项目名称">
-        <Select {...defaultParams} onChange={() => {}}>
-          <Option value="all">全部</Option>
-        </Select>
-      </Form.Item>
-      <Form.Item label="所属部门/组">
         <Select
           {...defaultParams}
           onChange={() => {}}
-          onClick={() => childrenElems(data?.organization, projElems, setProjElems)}
-        >
-          <Option value="all">全部</Option>
-          {projElems}
-        </Select>
+          onClick={() => projOptsElems(gqlData, projElems, setProjElems)}
+          children={projElems}
+        />
+      </Form.Item>
+      <Form.Item label="所属部门/组">
+        <TreeSelect
+          style={{ width: 300 }}
+          dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+          treeData={treeData}
+          placeholder="Please select"
+          treeDefaultExpandAll
+        />
       </Form.Item>
       <Form.Item>
         <Divider type="vertical" />

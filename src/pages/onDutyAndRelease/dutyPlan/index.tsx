@@ -537,7 +537,7 @@ const DutyPlan: React.FC<any> = () => {
       });
     } catch (e) {
       message.error({
-        content: `异常抛出：${e}`,
+        content: `抛出异常：${e}`,
         duration: 1,
         style: {
           marginTop: '50vh',

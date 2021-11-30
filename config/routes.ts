@@ -449,6 +449,7 @@ export default [
         path: 'preRelease',
         access: 'sysAdmin',
         component: './onDutyAndRelease/preRelease',
+        hideInMenu: true
       }
     ],
   },

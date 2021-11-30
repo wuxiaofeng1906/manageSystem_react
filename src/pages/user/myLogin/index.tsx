@@ -885,7 +885,6 @@ const Login: React.FC<{}> = () => {
 
       testAuth = JSON.parse(testAuth);
       // endregion
-      debugger;
       localStorage.setItem("authority", JSON.stringify(testAuth));
 
       // console.log("登陆后的token", localStorage.getItem("accessId"));

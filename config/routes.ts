@@ -432,9 +432,26 @@ export default [
     name: '工具集成',
     icon: 'table',
     path: '/toolIntegration',
-    // access: 'sysAdmin',
-    // hideInMenu: true,
     component: './toolIntegration',
+  }, {
+    name: '值班与发布',
+    icon: 'table',
+    path: '/onDutyAndRelease',
+    routes: [
+      {
+        name: '值班计划',
+        icon: 'table',
+        path: 'dutyPlan',
+        component: './onDutyAndRelease/dutyPlan',
+      }, {
+        name: '预发布',
+        icon: 'table',
+        path: 'preRelease',
+        access: 'sysAdmin',
+        component: './onDutyAndRelease/preRelease',
+        hideInMenu: true
+      }
+    ],
   },
   {
     name: '系统管理',

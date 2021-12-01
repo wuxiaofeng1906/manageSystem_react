@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2021-12-01 10:38:07
+ * @LastEditTime: 2021-12-01 17:52:28
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -10,7 +10,7 @@ import { Select, Form, DatePicker, Divider, TreeSelect } from 'antd';
 import { selectFilter, treeSelectActive } from './index.css';
 import moment from 'moment';
 import { useRequest } from 'ahooks';
-import { useGqlClient } from '@/hooks';
+import { GqlClient, useGqlClient } from '@/hooks';
 import { GRAPHQL_QUERY } from '@/namespaces';
 import { GQL_PARAMS, queryGQL } from '../../gql.query';
 import organizationGql from './gqls/organization.gql';
@@ -60,6 +60,15 @@ const projOptsElems = (datas: any[], val: any, setVal: Function): void => {
   setVal(childrenElems(datas, 'id', 'name', 'project'));
 };
 
+/**
+ * @description -
+ * @author JieTan
+ * @date 2021/12/01 17:12:33
+ * @param {*} data
+ * @param {any[]} val
+ * @param {Function} setVal
+ * @returns {*}  {void}
+ */
 const deptTreeNodes = (data: any, val: any[], setVal: Function): void => {
   if (val.length !== 0) return;
   const ret = toTree(data?.organization, 'id', 'parent', [
@@ -69,6 +78,17 @@ const deptTreeNodes = (data: any, val: any[], setVal: Function): void => {
     ?.shift()
     ?.children?.shift();
   setVal(ret ? [ret as never] : []);
+};
+
+const treeOnSelect = async (value: string, node: any, setVal: Function, gqlClient:GqlClient<object>) => {
+  //
+  const params: GQL_PARAMS = {
+    func: GRAPHQL_QUERY['ORGANIZATION'],
+    params: { dept: parseInt(value) },
+  };
+  const rets = await queryGQL(gqlClient, organizationGql, params);
+  //
+  setVal(rets);
 };
 
 /*  */
@@ -82,7 +102,7 @@ export default () => {
   const [projElems, setProjElems] = useState(null); // 保存项目信息
   const [treeData, setTreeData] = useState([]);
   const [treeActive, setTreeActive] = useState('');
-  const { gqlData } = useModel('processQuality'); // 获取“过程质量”查询的结果数据
+  const { gqlData, setGqlData } = useModel('processQuality'); // 获取“过程质量”查询的结果数据
   //
   const gqlClient = useGqlClient(); // 必须提前初始化该对象
   const params: GQL_PARAMS = { func: GRAPHQL_QUERY['ORGANIZATION'] };
@@ -110,6 +130,10 @@ export default () => {
           treeDefaultExpandAll
           onClick={() => deptTreeNodes(data, treeData, setTreeData)}
           onDropdownVisibleChange={() => setTreeActive(treeActive ? '' : treeSelectActive)}
+          onSelect={async (value: string, node: any) => {
+            console.log(1);
+            await treeOnSelect(value, node, setGqlData, gqlClient);
+          }}
         />
       </Form.Item>
       <Form.Item>

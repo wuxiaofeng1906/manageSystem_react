@@ -2,7 +2,7 @@
  * @Description: 项目基本信息字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:44:08
- * @LastEditTime: 2021-12-01 16:54:44
+ * @LastEditTime: 2021-12-01 17:18:18
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -26,6 +26,11 @@ export const TableMajorCols: ColGroupDef = {
     {
       headerName: '项目名称',
       field: 'project',
+      getQuickFilterText: ({ value }) => {
+        console.log(1);
+
+        return value.id;
+      },
       cellRenderer: 'idWithName',
       cellRendererParams: { liknTo: true },
     },
@@ -45,7 +50,6 @@ export const TableMajorCols: ColGroupDef = {
           },
         ],
       },
-      getQuickFilterText: ({ value }) => value.id,
       columnGroupShow: SHOW['closed'],
       cellRenderer: 'idWithName',
       ...doubleNumberW,
@@ -54,6 +58,7 @@ export const TableMajorCols: ColGroupDef = {
       headerName: '所属部门',
       columnGroupShow: SHOW['closed'],
       field: 'dept',
+      // getQuickFilterText: ({ value }) => value.id,
       cellRenderer: 'idWithName',
     },
   ],

@@ -2,7 +2,7 @@
  * @Description: 数据列表
  * @Author: jieTan
  * @Date: 2021-11-22 10:55:42
- * @LastEditTime: 2021-12-01 16:36:12
+ * @LastEditTime: 2021-12-01 17:27:57
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -56,7 +56,7 @@ import { Button } from 'antd';
 /*  */
 export default () => {
   /*  */
-  // const { setGqlData } = useModel('processQuality');
+  const { gqlData, setGqlData } = useModel('processQuality');
 
   // /*  */
   // const gqlClient = useGqlClient(); // 必须提前初始化该对象
@@ -69,16 +69,15 @@ export default () => {
 
   //
   const [gridApi, setGridApi] = useState(null);
-  const [gridColumnApi, setGridColumnApi] = useState(null);
-  const [rowData, setRowData] = useState(null);
 
-  const onGridReady = (params: any) => {
+  const onGridReady = async (params: any) => {
     setGridApi(params.api);
-    setGridColumnApi(params.columnApi);
+    //
+    setGqlData(mockData);
   };
 
   const theClick = () => {
-    gridApi.setQuickFilter('LuoSongTang');
+    (gridApi as any).setQuickFilter('4');
     console.log(1);
   };
 
@@ -93,7 +92,7 @@ export default () => {
           bugFlybackDura: BugFlybackDuraColumn,
         }}
         columnDefs={[TableMajorCols, ProcessQualityCols]}
-        rowData={mockData}
+        rowData={gqlData}
         onGridReady={onGridReady}
       />
     </div>

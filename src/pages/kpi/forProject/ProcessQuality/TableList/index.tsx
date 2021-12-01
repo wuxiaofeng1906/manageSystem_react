@@ -2,7 +2,7 @@
  * @Description: 数据列表
  * @Author: jieTan
  * @Date: 2021-11-22 10:55:42
- * @LastEditTime: 2021-11-30 16:29:09
+ * @LastEditTime: 2021-12-01 16:36:12
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -10,7 +10,7 @@
 import './index.css';
 import { AgGridReact } from 'ag-grid-react';
 import { useGqlClient } from '@/hooks';
-import { useMount, useRequest } from 'ahooks';
+import { useRequest } from 'ahooks';
 import { ProcessQualityCols, TableMajorCols } from './definitions/columns';
 import IdWithNameColumn from './renders/IdWithNameColumn';
 import BugReOpenColumn from './renders/BugReOpenColumn';
@@ -19,6 +19,9 @@ import { GQL_PARAMS, queryGQL } from '../../gql.query';
 import mygql from './mygql';
 import { GRAPHQL_QUERY } from '@/namespaces';
 import { useModel } from 'umi';
+import { mockData } from './mock';
+import { useState } from 'react';
+import { Button } from 'antd';
 
 // /*  */
 // const queryGQL = async (client: GqlClient<object>, params: any) => {
@@ -53,9 +56,9 @@ import { useModel } from 'umi';
 /*  */
 export default () => {
   /*  */
-  const { setGqlData } = useModel('processQuality');
+  // const { setGqlData } = useModel('processQuality');
 
-  /*  */
+  // /*  */
   // const gqlClient = useGqlClient(); // 必须提前初始化该对象
   // const params: GQL_PARAMS = { func: GRAPHQL_QUERY['PROJECT_KPI'] };
   // const { data } = useRequest(async () => {
@@ -64,9 +67,25 @@ export default () => {
   //   return rets;
   // });
 
+  //
+  const [gridApi, setGridApi] = useState(null);
+  const [gridColumnApi, setGridColumnApi] = useState(null);
+  const [rowData, setRowData] = useState(null);
+
+  const onGridReady = (params: any) => {
+    setGridApi(params.api);
+    setGridColumnApi(params.columnApi);
+  };
+
+  const theClick = () => {
+    gridApi.setQuickFilter('LuoSongTang');
+    console.log(1);
+  };
+
   /*  */
   return (
     <div className="ag-theme-material" style={{ height: 960 }}>
+      <Button onClick={theClick}>demo</Button>
       <AgGridReact
         frameworkComponents={{
           idWithName: IdWithNameColumn,
@@ -74,7 +93,8 @@ export default () => {
           bugFlybackDura: BugFlybackDuraColumn,
         }}
         columnDefs={[TableMajorCols, ProcessQualityCols]}
-        rowData={[]}
+        rowData={mockData}
+        onGridReady={onGridReady}
       />
     </div>
   );

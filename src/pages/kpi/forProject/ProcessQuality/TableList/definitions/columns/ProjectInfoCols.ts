@@ -2,7 +2,7 @@
  * @Description: 项目基本信息字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:44:08
- * @LastEditTime: 2021-11-29 16:00:14
+ * @LastEditTime: 2021-12-01 16:54:44
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -32,6 +32,20 @@ export const TableMajorCols: ColGroupDef = {
     {
       headerName: '负责人',
       field: 'user',
+      filter: true,
+      filterParams: {
+        filterOptions: [
+          {
+            displayKey: 'equalNoNulls',
+            displayName: 'equals without Nulls',
+            predicate: ([filterValue]: any[], cellValue: any) => {
+              if (cellValue == null) return false;
+              return cellValue['name'] === filterValue;
+            },
+          },
+        ],
+      },
+      getQuickFilterText: ({ value }) => value.id,
       columnGroupShow: SHOW['closed'],
       cellRenderer: 'idWithName',
       ...doubleNumberW,

@@ -2,7 +2,7 @@
  * @Description: 定义路由 => JieTan
  * @Author: jieTan
  * @Date: 2021-11-19 16:36:02
- * @LastEditTime: 2021-11-19 17:44:38
+ * @LastEditTime: 2021-12-01 10:03:09
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -22,12 +22,12 @@ type RouteType = {
 
 export const ProjectKpiRoute: RouteType = {
   name: '项目度量',
-  path: './kpi/project',
+  path: './project',
   //   component: '',
   routes: [
     {
       name: '过程质量',
-      path: './kpi/project/quality',
+      path: './quality',
       component: './kpi/forProject/ProcessQuality',
     },
   ],

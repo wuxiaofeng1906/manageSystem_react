@@ -2,19 +2,19 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2021-11-30 18:42:09
+ * @LastEditTime: 2021-12-01 10:38:07
  * @LastEditors: jieTan
  * @LastModify:
  */
 import { Select, Form, DatePicker, Divider, TreeSelect } from 'antd';
-import { selectFilter } from './index.css';
+import { selectFilter, treeSelectActive } from './index.css';
 import moment from 'moment';
 import { useRequest } from 'ahooks';
 import { useGqlClient } from '@/hooks';
 import { GRAPHQL_QUERY } from '@/namespaces';
 import { GQL_PARAMS, queryGQL } from '../../gql.query';
 import organizationGql from './gqls/organization.gql';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useModel } from 'umi';
 import { toTree } from './utils/tree';
 
@@ -60,6 +60,17 @@ const projOptsElems = (datas: any[], val: any, setVal: Function): void => {
   setVal(childrenElems(datas, 'id', 'name', 'project'));
 };
 
+const deptTreeNodes = (data: any, val: any[], setVal: Function): void => {
+  if (val.length !== 0) return;
+  const ret = toTree(data?.organization, 'id', 'parent', [
+    ['name', 'title'],
+    ['id', 'value'],
+  ])
+    ?.shift()
+    ?.children?.shift();
+  setVal(ret ? [ret as never] : []);
+};
+
 /*  */
 export default () => {
   /* 数据区 */
@@ -70,21 +81,12 @@ export default () => {
   }; // <Select>默认的一些配置
   const [projElems, setProjElems] = useState(null); // 保存项目信息
   const [treeData, setTreeData] = useState([]);
+  const [treeActive, setTreeActive] = useState('');
   const { gqlData } = useModel('processQuality'); // 获取“过程质量”查询的结果数据
   //
   const gqlClient = useGqlClient(); // 必须提前初始化该对象
   const params: GQL_PARAMS = { func: GRAPHQL_QUERY['ORGANIZATION'] };
   const { data } = useRequest(() => queryGQL(gqlClient, organizationGql, params));
-
-  /*  */
-  useEffect(() => {
-    const converItems: [string, string][] = [
-      ['name', 'title'],
-      ['id', 'value'],
-    ];
-    const ret = toTree(data?.organization, 'id', 'parent', converItems)?.shift()?.children?.shift();
-    setTreeData(ret ? [ret as never] : []);
-  }, [data]);
 
   /* 绘制区 */
   return (
@@ -102,10 +104,12 @@ export default () => {
       <Form.Item label="所属部门/组">
         <TreeSelect
           {...defaultParams}
-          style={{ width: 320 }}
+          className={`${selectFilter} ${treeActive}`}
           dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
           treeData={treeData}
           treeDefaultExpandAll
+          onClick={() => deptTreeNodes(data, treeData, setTreeData)}
+          onDropdownVisibleChange={() => setTreeActive(treeActive ? '' : treeSelectActive)}
         />
       </Form.Item>
       <Form.Item>

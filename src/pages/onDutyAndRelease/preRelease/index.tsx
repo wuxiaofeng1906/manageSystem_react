@@ -1,25 +1,134 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import './style.css';
 
-import {Button, Form, Modal, Select, Tabs} from 'antd';
+import {Button, Form, Input, message, Modal, Select, Tabs} from 'antd';
 
 import dayjs from "dayjs";
+import {AgGridReact} from "ag-grid-react";
+import {GridApi, GridReadyEvent} from "ag-grid-community";
+import {getAllProject} from "@/publicMethods/verifyAxios";
+import {useRequest} from "ahooks";
+import {savePrePulishProjects} from "./axiosApi";
 
 const {TabPane} = Tabs;
 const {Option} = Select;
 
 const currentDate = dayjs().format("YYYYMMDD");
-const Content: React.FC<any> = (props) => {
-  const [formForDutyNameModify] = Form.useForm();
-  const saveProjects = (params: any) => {
-    debugger;
 
+const loadPrjNameSelect = async () => {
+  const prjNames = await getAllProject();
+  const prjData: any = [];
+
+  if (prjNames.message !== "") {
+    message.error({
+      content: prjNames.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (prjNames.data) {
+    const datas = prjNames.data;
+    datas.forEach((project: any) => {
+      prjData.push(
+        <Option key={project.project_id} value={`${project.project_id}`}>{project.project_name}</Option>);
+    });
+  }
+
+  return prjData;
+
+};
+
+const Content: React.FC<any> = (props) => {
+  const gridApi = useRef<GridApi>();
+
+  debugger;
+  const formForDutyNameModify = props.form;
+
+  /* region  预发布项目 */
+  const projectsArray = useRequest(() => loadPrjNameSelect()).data;
+
+  // 保存预发布项目
+  const saveProjects = () => {
     const datas = formForDutyNameModify.getFieldsValue();
+    savePrePulishProjects(datas);
   };
+
+  /* endregion */
+
+  /* region 升级服务 */
+  const table1Column = [{
+    headerName: '上线环境',
+    field: '',
+  }, {
+    headerName: '发布项',
+    field: '',
+  }, {
+    headerName: '应用',
+    field: '',
+  }, {
+    headerName: '是否支持热更新',
+    field: '',
+  }, {
+    headerName: '是否涉及接口与数据库升级',
+    field: '',
+  }, {
+    headerName: '分支和环境',
+    field: '',
+  }, {
+    headerName: '说明',
+    field: '',
+  }, {
+    headerName: '备注',
+    field: '',
+  }, {
+    headerName: '操作',
+  }];
+
+  const table2Column = [{
+    headerName: '上线环境',
+    field: '',
+  }, {
+    headerName: '升级接口',
+    field: '',
+  }, {
+    headerName: '接口服务',
+    field: '',
+  }, {
+    headerName: '是否支持热更新',
+    field: '',
+  }, {
+    headerName: '接口Method',
+    field: '',
+  }, {
+    headerName: '接口URL',
+    field: '',
+  }, {
+    headerName: '涉及租户',
+    field: '',
+  }, {
+    headerName: '备注',
+    field: '',
+  }, {
+    headerName: '操作',
+  }];
+
+  const onGridReady = (params: GridReadyEvent) => {
+    gridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  const onChangeGridReady = (params: GridReadyEvent) => {
+    gridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+
+  /* endregion */
 
   return (
     <div>
@@ -37,9 +146,9 @@ const Content: React.FC<any> = (props) => {
 
           <div>
             <Form form={formForDutyNameModify}>
-              <Form.Item label="项目名称:" name="projectName">
-                <Select showSearch>
-                  <Option key={""} value={`""&免`}>免</Option>
+              <Form.Item label="项目名称:" name="projectsName">
+                <Select showSearch mode="multiple">
+                  {projectsArray}
                 </Select>
               </Form.Item>
             </Form>
@@ -53,13 +162,89 @@ const Content: React.FC<any> = (props) => {
         <legend className={"legendStyle"}>Step2 升级服务</legend>
 
         <div>
+          {/* 保存按钮 */}
           <div style={{float: "right"}}>
             <Button type="primary"
-                    style={{height: "200px", color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5}}
-
+                    style={{
+                      height: "200px",
+                      color: '#46A0FC',
+                      backgroundColor: "#ECF5FF",
+                      borderRadius: 5,
+                      marginTop: 34,
+                      marginLeft: 10
+                    }}
             >点 <br></br>击 <br></br>保 <br></br>存 </Button>
           </div>
+
+          {/* 条件查询   */}
+          <div style={{height: 35, marginTop: -15, overflow: "hidden"}}>
+
+            <label> 测试环境： </label>
+            <Select size={"small"} style={{minWidth: 140, width: '10%'}}>
+
+            </Select>
+
+            <label style={{marginLeft: 10}}> 一键部署ID： </label>
+            <Select size={"small"} style={{minWidth: 90, width: '10%'}} showSearch>
+
+            </Select>
+
+            <Button size={"small"} style={{marginLeft: 10, borderRadius: 5}}>查询</Button>
+
+          </div>
+
+          {/* ag-grid 表格 */}
+          <div>
+
+            <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+              <AgGridReact
+
+                columnDefs={table1Column} // 定义列
+                rowData={[]} // 数据绑定
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  suppressMenu: true,
+                }}
+                headerHeight={25}
+                rowHeight={25}
+                onGridReady={onGridReady}
+                onGridSizeChanged={onChangeGridReady}
+                onColumnEverythingChanged={onChangeGridReady}
+              >
+              </AgGridReact>
+            </div>
+
+            <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+
+              <AgGridReact
+                columnDefs={table2Column} // 定义列
+                rowData={[]} // 数据绑定
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  suppressMenu: true,
+                }}
+                headerHeight={25}
+                rowHeight={25}
+                onGridReady={onGridReady}
+                onGridSizeChanged={onChangeGridReady}
+                onColumnEverythingChanged={onChangeGridReady}
+              >
+              </AgGridReact>
+
+            </div>
+
+          </div>
+
+          {/*  提示标签 */}
+          <div>
+            这里显示操作的提示信息
+          </div>
+
         </div>
+
+
       </fieldset>
 
       {/* 升级分支 */}
@@ -93,11 +278,22 @@ const Content: React.FC<any> = (props) => {
 };
 
 const LogList: React.FC<any> = () => {
+  const [formForDutyNameModify] = Form.useForm();
 
 
   /* region 动态增删tab */
 
-  const initialPanes = [{title: `${currentDate}灰度预发布1`, content: <Content/>, key: '1', closable: false}];
+  const initialPanes = [{
+    title: `${currentDate}灰度预发布1`,
+    content: <Content form={formForDutyNameModify}/>,
+    key: '1',
+    closable: false
+  }, {
+    title: `${currentDate}灰度预发布2`,
+    content: <Content form={formForDutyNameModify}/>,
+    key: '2',
+    closable: false
+  }];
   const [tabContent, setTabContent] = useState({
       activeKey: initialPanes[0].key,
       panes: initialPanes
@@ -109,7 +305,12 @@ const LogList: React.FC<any> = () => {
     const {panes} = tabContent;
     const tabCount = panes.length;
     const activeKey = `index_${tabCount + 1}`;
-    panes.push({title: `${currentDate}灰度预发布${tabCount + 1}`, content: <Content/>, key: activeKey, closable: true});
+    panes.push({
+      title: `${currentDate}灰度预发布${tabCount + 1}`,
+      content: <Content form={formForDutyNameModify}/>,
+      key: activeKey,
+      closable: true
+    });
     setTabContent({panes, activeKey});
   };
 
@@ -153,11 +354,23 @@ const LogList: React.FC<any> = () => {
       ...tabContent,
       activeKey: activeKeys
     });
+
+    // 在切换时显示第二个界面的数据
+    formForDutyNameModify.setFieldsValue({
+      projectsName: "测试666"
+    });
   };
 
   /* endregion */
 
-  // 返回渲染的组件
+
+  useEffect(() => {
+
+    // 先显示第一个界面的数据
+    formForDutyNameModify.setFieldsValue({
+      projectsName: "测试"
+    },);
+  }, []);
   return (
     <PageContainer style={{marginTop: -30}}>
       <Tabs

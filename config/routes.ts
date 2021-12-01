@@ -404,19 +404,24 @@ export default [
   {
     name: '检查工具',
     icon: 'table',
-    path: '/jenkins',
+    path: '/checkTools',
     routes: [
+      {
+        name: '工具入口',
+        path: 'toolIntegration',
+        component: './checkTools/toolIntegration',
+      },
       {
         name: '上线前检查',
         path: 'checkBeforeOnline',
         access: 'onlineCheck',
-        component: './jenkins/checkBeforeOnline',
+        component: './checkTools/checkBeforeOnline',
       },
       {
         name: 'sonar扫描',
         path: 'sonar',
         access: 'sonarCheck',
-        component: './jenkins/sonar',
+        component: './checkTools/sonar',
       }
     ],
   },
@@ -429,11 +434,6 @@ export default [
     component: './approvalFlow',
   },
   {
-    name: '工具集成',
-    icon: 'table',
-    path: '/toolIntegration',
-    component: './toolIntegration',
-  }, {
     name: '值班与发布',
     icon: 'table',
     path: '/onDutyAndRelease',
@@ -449,7 +449,7 @@ export default [
         path: 'preRelease',
         access: 'sysAdmin',
         component: './onDutyAndRelease/preRelease',
-        hideInMenu: true
+        // hideInMenu: true
       }
     ],
   },

@@ -1056,7 +1056,9 @@ const DutyPlan: React.FC<any> = () => {
     // 值班人员名单必须有数据
     if (person_data.length > 0) {
       // 判断项目是否为空
-      if (project_data.allEmpty && (project_data.allProject).length === 0) {
+      if (deletedData.length > 0 && (project_data.allProject).length === 0) {
+        await requestAPpiToSaveData(deletedData, []);
+      } else if (project_data.allEmpty && (project_data.allProject).length === 0) {
         await requestAPpiToSaveData(person_data, []);
       } else if ((project_data.allProject).length > 0) {
         const allProjects = project_data.allProject.concat(deletedData)

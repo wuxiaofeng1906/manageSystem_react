@@ -44,12 +44,10 @@ const loadPrjNameSelect = async () => {
 };
 
 const Content: React.FC<any> = (props) => {
-  const gridApi = useRef<GridApi>();
-
-  debugger;
-  const formForDutyNameModify = props.form;
 
   /* region  预发布项目 */
+  const formForDutyNameModify = props.form;
+
   const projectsArray = useRequest(() => loadPrjNameSelect()).data;
 
   // 保存预发布项目
@@ -61,72 +59,138 @@ const Content: React.FC<any> = (props) => {
   /* endregion */
 
   /* region 升级服务 */
-  const table1Column = [{
-    headerName: '上线环境',
-    field: '',
-  }, {
-    headerName: '发布项',
-    field: '',
-  }, {
-    headerName: '应用',
-    field: '',
-  }, {
-    headerName: '是否支持热更新',
-    field: '',
-  }, {
-    headerName: '是否涉及接口与数据库升级',
-    field: '',
-  }, {
-    headerName: '分支和环境',
-    field: '',
-  }, {
-    headerName: '说明',
-    field: '',
-  }, {
-    headerName: '备注',
-    field: '',
-  }, {
-    headerName: '操作',
-  }];
 
-  const table2Column = [{
-    headerName: '上线环境',
-    field: '',
-  }, {
-    headerName: '升级接口',
-    field: '',
-  }, {
-    headerName: '接口服务',
-    field: '',
-  }, {
-    headerName: '是否支持热更新',
-    field: '',
-  }, {
-    headerName: '接口Method',
-    field: '',
-  }, {
-    headerName: '接口URL',
-    field: '',
-  }, {
-    headerName: '涉及租户',
-    field: '',
-  }, {
-    headerName: '备注',
-    field: '',
-  }, {
-    headerName: '操作',
-  }];
+  /* region 第一个表格 */
+  const firstGridApi = (props.grid)[0];
+  const table1Column = [
+    {
+      headerName: '上线环境',
+      field: 'onlineDev'
+    },
+    {
+      headerName: '发布项',
+      field: 'pulishItem',
+    },
+    {
+      headerName: '应用',
+      field: 'app',
+    },
+    {
+      headerName: '是否支持热更新',
+      field: 'hotUpdate',
+    },
+    {
+      headerName: '是否涉及接口与数据库升级',
+      field: 'upgrade',
+    },
+    {
+      headerName: '分支和环境',
+      field: 'branchAndDev',
+    },
+    {
+      headerName: '说明',
+      field: 'desc',
+    },
+    {
+      headerName: '备注',
+      field: 'remark',
+    },
+    {
+      headerName: '操作',
+    }];
 
-  const onGridReady = (params: GridReadyEvent) => {
-    gridApi.current = params.api;
+  const onFirstGridReady = (params: GridReadyEvent) => {
+    firstGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
 
-  const onChangeGridReady = (params: GridReadyEvent) => {
-    gridApi.current = params.api;
+  const onChangeFirstGridReady = (params: GridReadyEvent) => {
+    firstGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
 
+  /* endregion  */
+
+  /* region 第二个表格 */
+  const secondGridApi = (props.grid)[1];
+  const table2Column = [
+    {
+      headerName: '上线环境',
+      field: 'onlineDev',
+    },
+    {
+      headerName: '升级接口',
+      field: 'upgradeInte',
+    },
+    {
+      headerName: '接口服务',
+      field: 'intService',
+    },
+    {
+      headerName: '是否支持热更新',
+      field: 'hotUpdate',
+    },
+    {
+      headerName: '接口Method',
+      field: 'intMethod',
+    },
+    {
+      headerName: '接口URL',
+      field: 'intURL',
+    },
+    {
+      headerName: '涉及租户',
+      field: 'tenant',
+    },
+    {
+      headerName: '备注',
+      field: 'remark',
+    },
+    {
+      headerName: '操作',
+    }];
+
+  const onSecondGridReady = (params: GridReadyEvent) => {
+    secondGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  const onChangeSecondGridReady = (params: GridReadyEvent) => {
+    secondGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  /* endregion   */
+
+  /* region 查询按钮点击事件 */
+
+  const queryUpgradeService = () => {
+    const firstData = [{
+      onlineDev: "集群3",
+      pulishItem: "前端",
+      app: "web",
+      hotUpdate: "是",
+      upgrade: "否",
+      branchAndDev: "emergency_nx-hotfix",
+      desc: "",
+      remark: ""
+    }];
+
+    const secondData = [{
+      onlineDev: "集群3",
+      upgradeInte: "前端接口",
+      intService: "basebi",
+      hotUpdate: "是",
+      intMethod: "get",
+      intURL: "/basebi/Evaluate/......",
+      tenant: "全量用户",
+      remark: ""
+    }];
+
+    firstGridApi.current?.setRowData(firstData);
+    secondGridApi.current?.setRowData(secondData);
+  };
+  /* endregion */
 
   /* endregion */
 
@@ -189,7 +253,7 @@ const Content: React.FC<any> = (props) => {
 
             </Select>
 
-            <Button size={"small"} style={{marginLeft: 10, borderRadius: 5}}>查询</Button>
+            <Button size={"small"} style={{marginLeft: 10, borderRadius: 5}} onClick={queryUpgradeService}>查询</Button>
 
           </div>
 
@@ -200,17 +264,18 @@ const Content: React.FC<any> = (props) => {
               <AgGridReact
 
                 columnDefs={table1Column} // 定义列
-                rowData={[]} // 数据绑定
+                // rowData={[]} // 数据绑定
                 defaultColDef={{
                   resizable: true,
                   sortable: true,
                   suppressMenu: true,
+                  cellStyle: {"line-height": "25px"},
                 }}
                 headerHeight={25}
                 rowHeight={25}
-                onGridReady={onGridReady}
-                onGridSizeChanged={onChangeGridReady}
-                onColumnEverythingChanged={onChangeGridReady}
+                onGridReady={onFirstGridReady}
+                onGridSizeChanged={onChangeFirstGridReady}
+                onColumnEverythingChanged={onChangeFirstGridReady}
               >
               </AgGridReact>
             </div>
@@ -219,17 +284,18 @@ const Content: React.FC<any> = (props) => {
 
               <AgGridReact
                 columnDefs={table2Column} // 定义列
-                rowData={[]} // 数据绑定
+                // rowData={[]} // 数据绑定
                 defaultColDef={{
                   resizable: true,
                   sortable: true,
                   suppressMenu: true,
+                  cellStyle: {"line-height": "25px"},
                 }}
                 headerHeight={25}
                 rowHeight={25}
-                onGridReady={onGridReady}
-                onGridSizeChanged={onChangeGridReady}
-                onColumnEverythingChanged={onChangeGridReady}
+                onGridReady={onSecondGridReady}
+                onGridSizeChanged={onChangeSecondGridReady}
+                onColumnEverythingChanged={onChangeSecondGridReady}
               >
               </AgGridReact>
 
@@ -278,6 +344,8 @@ const Content: React.FC<any> = (props) => {
 };
 
 const LogList: React.FC<any> = () => {
+  const firstGridApi = useRef<GridApi>();
+  const secondGridApi = useRef<GridApi>();
   const [formForDutyNameModify] = Form.useForm();
 
 
@@ -285,12 +353,12 @@ const LogList: React.FC<any> = () => {
 
   const initialPanes = [{
     title: `${currentDate}灰度预发布1`,
-    content: <Content form={formForDutyNameModify}/>,
+    content: <Content form={formForDutyNameModify} grid={[firstGridApi, secondGridApi]}/>,
     key: '1',
     closable: false
   }, {
     title: `${currentDate}灰度预发布2`,
-    content: <Content form={formForDutyNameModify}/>,
+    content: <Content form={formForDutyNameModify} grid={[firstGridApi, secondGridApi]}/>,
     key: '2',
     closable: false
   }];
@@ -307,7 +375,7 @@ const LogList: React.FC<any> = () => {
     const activeKey = `index_${tabCount + 1}`;
     panes.push({
       title: `${currentDate}灰度预发布${tabCount + 1}`,
-      content: <Content form={formForDutyNameModify}/>,
+      content: <Content form={formForDutyNameModify} grid={[firstGridApi, secondGridApi]}/>,
       key: activeKey,
       closable: true
     });
@@ -350,6 +418,7 @@ const LogList: React.FC<any> = () => {
 
   // 切换tab页面
   const onChange = (activeKeys: any) => {
+
     setTabContent({
       ...tabContent,
       activeKey: activeKeys
@@ -359,18 +428,65 @@ const LogList: React.FC<any> = () => {
     formForDutyNameModify.setFieldsValue({
       projectsName: "测试666"
     });
+
+
+    firstGridApi.current?.setRowData([{
+      onlineDev: "集群2",
+      pulishItem: "前端",
+      app: "web",
+      hotUpdate: "是",
+      upgrade: "否",
+      branchAndDev: "emergency_nx-hotfix",
+      desc: "",
+      remark: ""
+    }]);
+    secondGridApi.current?.setRowData([{
+      onlineDev: "集群2",
+      upgradeInte: "前端接口",
+      intService: "basebi",
+      hotUpdate: "是",
+      intMethod: "get",
+      intURL: "/basebi/Evaluate/......",
+      tenant: "全量用户",
+      remark: ""
+    }]);
+
   };
 
   /* endregion */
 
 
+  const {data} = useRequest(() => loadPrjNameSelect());
+
+
   useEffect(() => {
 
+    firstGridApi.current?.setRowData([{
+      onlineDev: "集群1",
+      pulishItem: "前端",
+      app: "web",
+      hotUpdate: "是",
+      upgrade: "否",
+      branchAndDev: "emergency_nx-hotfix",
+      desc: "",
+      remark: ""
+    }]);
+    secondGridApi.current?.setRowData([{
+      onlineDev: "集群1",
+      upgradeInte: "前端接口",
+      intService: "basebi",
+      hotUpdate: "是",
+      intMethod: "get",
+      intURL: "/basebi/Evaluate/......",
+      tenant: "全量用户",
+      remark: ""
+    }]);
     // 先显示第一个界面的数据
     formForDutyNameModify.setFieldsValue({
       projectsName: "测试"
-    },);
-  }, []);
+    });
+
+  }, [data]);
   return (
     <PageContainer style={{marginTop: -30}}>
       <Tabs

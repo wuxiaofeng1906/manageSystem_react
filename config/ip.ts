@@ -1,5 +1,4 @@
 const getCurrentProxy = () => {
-  debugger;
 
   const url = window.location.host;
 

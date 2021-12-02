@@ -8,12 +8,7 @@
  */
 
 import { GqlClient } from '@/hooks';
-import { JS_PROTOTYPE_TYPE } from '@/namespaces';
-
-export interface GQL_PARAMS {
-  func: string;
-  params?: object;
-}
+import { GQL_PARAMS, JS_PROTOTYPE_TYPE } from '@/namespaces';
 
 const funcWithParams = (args: GQL_PARAMS): string => {
   //

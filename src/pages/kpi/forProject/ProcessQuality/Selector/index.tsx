@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2021-12-01 17:52:28
+ * @LastEditTime: 2021-12-02 13:45:01
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -11,12 +11,11 @@ import { selectFilter, treeSelectActive } from './index.css';
 import moment from 'moment';
 import { useRequest } from 'ahooks';
 import { GqlClient, useGqlClient } from '@/hooks';
-import { GRAPHQL_QUERY } from '@/namespaces';
-import { GQL_PARAMS, queryGQL } from '../../gql.query';
-import organizationGql from './gqls/organization.gql';
+import { GQL_PARAMS, GRAPHQL_QUERY } from '@/namespaces';
 import { useState } from 'react';
 import { useModel } from 'umi';
 import { toTree } from './utils/tree';
+import { projectKpiGql, organizationGql, queryGQL } from '@/pages/gqls';
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -80,18 +79,18 @@ const deptTreeNodes = (data: any, val: any[], setVal: Function): void => {
   setVal(ret ? [ret as never] : []);
 };
 
-const treeOnSelect = async (value: string, node: any, setVal: Function, gqlClient:GqlClient<object>) => {
+const treeOnSelect = async (value: string, setVal: Function, gqlClient: GqlClient<object>) => {
   //
   const params: GQL_PARAMS = {
-    func: GRAPHQL_QUERY['ORGANIZATION'],
-    params: { dept: parseInt(value) },
+    func: GRAPHQL_QUERY['PROJECT_KPI'],
+    params: { deptId: parseInt(value) },
   };
-  const rets = await queryGQL(gqlClient, organizationGql, params);
   //
+  const rets = (await queryGQL(gqlClient, projectKpiGql, params)) ?? [];
   setVal(rets);
 };
 
-/*  */
+/* ************************************************************************************************************** */
 export default () => {
   /* 数据区 */
   const defaultParams: any = {
@@ -130,10 +129,7 @@ export default () => {
           treeDefaultExpandAll
           onClick={() => deptTreeNodes(data, treeData, setTreeData)}
           onDropdownVisibleChange={() => setTreeActive(treeActive ? '' : treeSelectActive)}
-          onSelect={async (value: string, node: any) => {
-            console.log(1);
-            await treeOnSelect(value, node, setGqlData, gqlClient);
-          }}
+          onSelect={(value: string) => treeOnSelect(value, setGqlData, gqlClient)}
         />
       </Form.Item>
       <Form.Item>

@@ -2,7 +2,7 @@
  * @Description: 通用接口、类型
  * @Author: jieTan
  * @Date: 2021-11-29 15:07:54
- * @LastEditTime: 2021-11-29 15:07:54
+ * @LastEditTime: 2021-12-02 11:43:24
  * @LastEditors: jieTan
  * @LastModify: 
  */
@@ -16,4 +16,10 @@ export interface ProjectQualityResult {
   bugResolveDura?: number;
   effectiveBugRatio?: number;
   bugFlybackDura?: number;
+}
+
+/* graphql */
+export interface GQL_PARAMS {
+  func: string;
+  params?: object;
 }

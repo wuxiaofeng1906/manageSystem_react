@@ -2,7 +2,7 @@
  * @Description: 数据列表
  * @Author: jieTan
  * @Date: 2021-11-22 10:55:42
- * @LastEditTime: 2021-12-01 17:27:57
+ * @LastEditTime: 2021-12-02 13:53:52
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -15,13 +15,12 @@ import { ProcessQualityCols, TableMajorCols } from './definitions/columns';
 import IdWithNameColumn from './renders/IdWithNameColumn';
 import BugReOpenColumn from './renders/BugReOpenColumn';
 import BugFlybackDuraColumn from './renders/BugFlybackDuraColumn';
-import { GQL_PARAMS, queryGQL } from '../../gql.query';
-import mygql from './mygql';
-import { GRAPHQL_QUERY } from '@/namespaces';
+import { GQL_PARAMS, GRAPHQL_QUERY } from '@/namespaces';
 import { useModel } from 'umi';
 import { mockData } from './mock';
 import { useState } from 'react';
 import { Button } from 'antd';
+import { queryGQL, projectKpiGql } from '@/pages/gqls';
 
 // /*  */
 // const queryGQL = async (client: GqlClient<object>, params: any) => {
@@ -62,7 +61,7 @@ export default () => {
   // const gqlClient = useGqlClient(); // 必须提前初始化该对象
   // const params: GQL_PARAMS = { func: GRAPHQL_QUERY['PROJECT_KPI'] };
   // const { data } = useRequest(async () => {
-  //   const rets = await queryGQL(gqlClient, mygql, params);
+  //   const rets = await queryGQL(gqlClient, projectKpiGql, params);
   //   setGqlData(rets);
   //   return rets;
   // });
@@ -73,7 +72,7 @@ export default () => {
   const onGridReady = async (params: any) => {
     setGridApi(params.api);
     //
-    setGqlData(mockData);
+    setGqlData(mockData as never[]);
   };
 
   const theClick = () => {

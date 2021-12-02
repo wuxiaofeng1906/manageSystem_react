@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2021-12-02 13:45:01
+ * @LastEditTime: 2021-12-02 16:17:18
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -11,7 +11,7 @@ import { selectFilter, treeSelectActive } from './index.css';
 import moment from 'moment';
 import { useRequest } from 'ahooks';
 import { GqlClient, useGqlClient } from '@/hooks';
-import { GQL_PARAMS, GRAPHQL_QUERY } from '@/namespaces';
+import { EXTRA_FILTER_TYPE, GQL_PARAMS, GRAPHQL_QUERY } from '@/namespaces';
 import { useState } from 'react';
 import { useModel } from 'umi';
 import { toTree } from './utils/tree';
@@ -79,6 +79,14 @@ const deptTreeNodes = (data: any, val: any[], setVal: Function): void => {
   setVal(ret ? [ret as never] : []);
 };
 
+/**
+ * @description - 选中tree节点后，重新设置项目指标数据
+ * @author JieTan
+ * @date 2021/12/02 13:12:16
+ * @param {string} value - 部门ID值
+ * @param {Function} setVal - 修改Table数据的函数
+ * @param {GqlClient<object>} gqlClient - gql查询实例
+ */
 const treeOnSelect = async (value: string, setVal: Function, gqlClient: GqlClient<object>) => {
   //
   const params: GQL_PARAMS = {
@@ -90,6 +98,12 @@ const treeOnSelect = async (value: string, setVal: Function, gqlClient: GqlClien
   setVal(rets);
 };
 
+const projOnSelect = (vals: any[], projType: EXTRA_FILTER_TYPE, gridApi: any) => {
+  // const pType: EXTRA_FILTER_TYPE = { field: 'project', values: vals };
+  Object.assign(projType, { field: 'project', values: vals })
+  gridApi.onFilterChanged();
+};
+
 /* ************************************************************************************************************** */
 export default () => {
   /* 数据区 */
@@ -99,9 +113,9 @@ export default () => {
     placeholder: '默认选择全部',
   }; // <Select>默认的一些配置
   const [projElems, setProjElems] = useState(null); // 保存项目信息
-  const [treeData, setTreeData] = useState([]);
-  const [treeActive, setTreeActive] = useState('');
-  const { gqlData, setGqlData } = useModel('processQuality'); // 获取“过程质量”查询的结果数据
+  const [treeData, setTreeData] = useState([]); // 部门树形结构的数据
+  const [treeActive, setTreeActive] = useState(''); // 部门<Select>选中时的样式
+  const { gqlData, setGqlData, gridApi, projType } = useModel('processQuality'); // 获取“过程质量”查询的结果数据
   //
   const gqlClient = useGqlClient(); // 必须提前初始化该对象
   const params: GQL_PARAMS = { func: GRAPHQL_QUERY['ORGANIZATION'] };
@@ -115,7 +129,10 @@ export default () => {
           {...defaultParams}
           mode="multiple"
           className={selectFilter}
-          onChange={() => {}}
+          onChange={(value: any[], option) => {
+            // gridApi.onFilterChanged();
+            projOnSelect(value, projType, gridApi);
+          }}
           onClick={() => projOptsElems(gqlData, projElems, setProjElems)}
           children={projElems}
         />

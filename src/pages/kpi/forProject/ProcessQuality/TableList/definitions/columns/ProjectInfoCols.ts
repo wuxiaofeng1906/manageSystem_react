@@ -2,7 +2,7 @@
  * @Description: 项目基本信息字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:44:08
- * @LastEditTime: 2021-12-01 17:18:18
+ * @LastEditTime: 2021-12-02 17:44:25
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -20,16 +20,24 @@ export const TableMajorCols: ColGroupDef = {
     {
       headerName: '序',
       field: 'order',
-      valueGetter: (props: any) => (props.node?.rowIndex as number) + 1,
+      valueGetter: (props: any) => props.node.rowIndex + 1,
       ...numberW,
     },
     {
       headerName: '项目名称',
       field: 'project',
-      getQuickFilterText: ({ value }) => {
-        console.log(1);
-
-        return value.id;
+      filter: true,
+      filterParams: {
+        filterOptions: [
+          {
+            displayKey: 'equalNoNulls',
+            displayName: 'equals without Nulls',
+            predicate: ([filterValue]: any[], cellValue: any) => {
+              if (cellValue == null) return false;
+              return cellValue['name'] === filterValue;
+            },
+          },
+        ],
       },
       cellRenderer: 'idWithName',
       cellRendererParams: { liknTo: true },
@@ -58,6 +66,7 @@ export const TableMajorCols: ColGroupDef = {
       headerName: '所属部门',
       columnGroupShow: SHOW['closed'],
       field: 'dept',
+      filter:"agSetColumnFilter",
       // getQuickFilterText: ({ value }) => value.id,
       cellRenderer: 'idWithName',
     },

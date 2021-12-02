@@ -744,32 +744,111 @@ const DutyPlan: React.FC<any> = () => {
     setDutyCart(newCardDiv);
   };
 
+  // 两个为一组。只要一组数据完整，就可以保存
+  const checkInputData = (data: any) => {
+
+    const {firstFront, secondFront, firstBackend, secondBackend, firstTester, secondTester} = data;
+    // 判断所有为空
+    if (!firstFront && !secondFront && !firstBackend && !secondBackend && !firstTester && !secondTester) {
+      message.error({
+        content: "值班人员不能为空！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return false;
+    }
+
+    // 判断前端是否为空
+    if (!firstFront && secondFront) {
+      message.error({
+        content: "前端第一值班人不能为空！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return false;
+    }
+    if (firstFront && !secondFront) {
+      message.error({
+        content: "前端第二值班人不能为空！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return false;
+    }
+
+    // 判断后端是否为空
+    if (!firstBackend && secondBackend) {
+      message.error({
+        content: "后端第一值班人不能为空！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return false;
+    }
+    if (firstBackend && !secondBackend) {
+      message.error({
+        content: "后端第二值班人不能为空！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return false;
+    }
+
+    // 判断测试是否为空
+    if (!firstTester && secondTester) {
+      message.error({
+        content: "测试第一值班人不能为空！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return false;
+    }
+    if (firstTester && !secondTester) {
+      message.error({
+        content: "测试第二值班人不能为空！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return false;
+    }
+
+    return true;
+  };
   // 解析需要保存的值班人员
   const alasysDutyPerson = (data: any) => {
 
     const person_data_array: any = [];
     const startTime = moment((data.dutyTime)[0]).format("YYYY/MM/DD");
     const endTime = moment((data.dutyTime)[1]).format("YYYY/MM/DD");
-
-    if (!data.firstFront || !data.secondFront) {
-      message.error({
-        content: "前端值班人不能为空！",
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
+    const checkResult = checkInputData(data);
+    if (!checkResult) {
       return [];
     }
+
+    const {firstFront, secondFront, firstBackend, secondBackend, firstTester, secondTester} = data;
+
     // 前端第一值班人
     person_data_array.push({
       "peron_num": oldDutyTask.personNum,  // 值班编号id 例如：202111190002
       "duty_start_time": startTime,
       "duty_end_time": endTime,
       "person_id": oldDutyTask.firstFrontId,  // 序号 id
-      "user_id": (data.firstFront).split("&")[0],    // 用户id
-      "user_name": (data.firstFront).split("&")[1],  // 用户名
+      "user_id": firstFront === null ? "" : firstFront.split("&")[0],    // 用户id
+      "user_name": firstFront === null ? "" : firstFront.split("&")[1],  // 用户名
       "user_tech": "1",  // 前端还是后端
       "duty_order": "1", // 第几值班人
     });
@@ -780,23 +859,11 @@ const DutyPlan: React.FC<any> = () => {
       "duty_start_time": startTime,
       "duty_end_time": endTime,
       "person_id": oldDutyTask.secondFrontId,
-      "user_id": (data.secondFront).split("&")[0],
-      "user_name": (data.secondFront).split("&")[1],
+      "user_id": secondFront === null ? "" : secondFront.split("&")[0],
+      "user_name": secondFront === null ? "" : secondFront.split("&")[1],
       "user_tech": "1",
       "duty_order": "2",
     });
-
-    if (!data.firstBackend || !data.secondBackend) {
-      message.error({
-        content: "后端值班人不能为空！",
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
-      return [];
-    }
 
     // 后端第一值班人
     person_data_array.push({
@@ -804,8 +871,8 @@ const DutyPlan: React.FC<any> = () => {
       "duty_start_time": startTime,
       "duty_end_time": endTime,
       "person_id": oldDutyTask.firstBackendId,
-      "user_id": (data.firstBackend).split("&")[0],
-      "user_name": (data.firstBackend).split("&")[1],
+      "user_id": firstBackend === null ? "" : firstBackend.split("&")[0],
+      "user_name": firstBackend === null ? "" : firstBackend.split("&")[1],
       "user_tech": "2",
       "duty_order": "1",
     });
@@ -816,31 +883,20 @@ const DutyPlan: React.FC<any> = () => {
       "duty_start_time": startTime,
       "duty_end_time": endTime,
       "person_id": oldDutyTask.secondBackendId,
-      "user_id": (data.secondBackend).split("&")[0],
-      "user_name": (data.secondBackend).split("&")[1],
+      "user_id": secondBackend === null ? "" : secondBackend.split("&")[0],
+      "user_name": secondBackend === null ? "" : secondBackend.split("&")[1],
       "user_tech": "2",
       "duty_order": "2",
     });
 
-    if (!data.firstTester || !data.secondTester) {
-      message.error({
-        content: "测试值班人不能为空！",
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
-      return [];
-    }
     // 测试第一值班人
     person_data_array.push({
       "peron_num": oldDutyTask.personNum,
       "duty_start_time": startTime,
       "duty_end_time": endTime,
       "person_id": oldDutyTask.firstTesterId,
-      "user_id": (data.firstTester).split("&")[0],
-      "user_name": (data.firstTester).split("&")[1],
+      "user_id": firstTester === null ? "" : firstTester.split("&")[0],
+      "user_name": firstTester === null ? "" : firstTester.split("&")[1],
       "user_tech": "3",
       "duty_order": "1",
     });
@@ -851,8 +907,8 @@ const DutyPlan: React.FC<any> = () => {
       "duty_start_time": startTime,
       "duty_end_time": endTime,
       "person_id": oldDutyTask.secondTesterId,
-      "user_id": (data.secondTester).split("&")[0],
-      "user_name": (data.secondTester).split("&")[1],
+      "user_id": secondTester === null ? "" : secondTester.split("&")[0],
+      "user_name": secondTester === null ? "" : secondTester.split("&")[1],
       "user_tech": "3",
       "duty_order": "2",
     });

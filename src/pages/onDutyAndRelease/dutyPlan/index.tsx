@@ -662,12 +662,14 @@ const DutyPlan: React.FC<any> = () => {
       {
         title: '所属端',
         dataIndex: 'user_tech',
-        align: 'center'
+        align: 'center',
+        width: 90
       },
       {
         title: '姓名',
         dataIndex: 'user_name',
-        align: 'center'
+        align: 'center',
+        width: 160
       },
     ];
     const cardDiv: any = [];
@@ -680,7 +682,7 @@ const DutyPlan: React.FC<any> = () => {
       const endTime = ele_data[0].duty_end_time;
       let border_color = {};
       if (dayjs().isAfter(dayjs(startTime)) && dayjs().isBefore(dayjs(endTime))) {
-        border_color = {border: "1px solid #BC7A37"};
+        border_color = {border: "2px solid #46A0FC"};
       }
 
       tdArray.push(

@@ -2,7 +2,7 @@
  * @Description: 项目基本信息字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:44:08
- * @LastEditTime: 2021-12-02 17:44:25
+ * @LastEditTime: 2021-12-02 17:58:53
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -30,7 +30,7 @@ export const TableMajorCols: ColGroupDef = {
       filterParams: {
         filterOptions: [
           {
-            displayKey: 'equalNoNulls',
+            displayKey: 'set',
             displayName: 'equals without Nulls',
             predicate: ([filterValue]: any[], cellValue: any) => {
               if (cellValue == null) return false;
@@ -66,8 +66,7 @@ export const TableMajorCols: ColGroupDef = {
       headerName: '所属部门',
       columnGroupShow: SHOW['closed'],
       field: 'dept',
-      filter:"agSetColumnFilter",
-      // getQuickFilterText: ({ value }) => value.id,
+      filter: true,
       cellRenderer: 'idWithName',
     },
   ],

@@ -46,6 +46,7 @@
     "not ie <= 10"
   ],
   "dependencies": {
+    "@ag-grid-enterprise/set-filter": "^26.2.0",
     "@ant-design/icons": "^4.0.0",
     "@ant-design/pro-card": "^1.18.2",
     "@ant-design/pro-descriptions": "^1.0.19",

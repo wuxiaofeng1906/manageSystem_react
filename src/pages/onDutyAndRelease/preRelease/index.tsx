@@ -311,47 +311,77 @@ const PreRelease: React.FC<any> = () => {
   /* endregion */
 
   /*  region 上线分支 */
+  const rendererUnitTest = (params: any) => {
+    debugger;
+    const values = params.value;
 
-  const firstOnlineBranchColumn = [
+    let resultDiv = ``;
+
+    resultDiv = `
+    <div style="margin-top: -10px">
+        <div style="text-align: right" >
+            <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
+              <img src="../setting.png" width="15" height="15" alt="执行参数" title="执行参数">
+            </Button>
+        </div>
+
+        <div style=" margin-top: -20px;font-size: 10px">
+            <div>前端： <label style="color: red"> 否</label> &nbsp; &nbsp;09：58：12~09：59：12</div>
+            <div style="margin-top: -20px"> 后端： <label style="color: forestgreen"> 是</label> &nbsp;&nbsp; 09：58：12~09：59：12</div>
+        </div>
+
+    </div>
+    `;
+    return resultDiv;
+  };
+
+  const firstOnlineBranchColumn: any = [
     {
       headerName: '序号',
-      field: 'hotUpdate',
+      field: 'No',
+      maxWidth: 80,
+      cellRenderer: (params: any) => {
+        return Number(params.node.id) + 1;
+      },
     },
     {
       headerName: '分支名称',
-      field: 'intMethod',
+      field: 'branchName',
+      maxWidth: 115,
     },
     {
       headerName: '技术侧',
-      field: 'intURL',
+      field: 'module',
+      maxWidth: 100,
     },
     {
       headerName: '单元测试运行是否通过',
-      field: 'intURL',
+      field: 'passUnitTest',
+      cellRenderer: rendererUnitTest,
     },
     {
       headerName: '上线前版本检查是否通过',
-      field: 'intURL',
+      field: 'passVersionCheck',
     },
     {
       headerName: '上线前数据库环境检查是否通过',
-      field: 'intURL',
+      field: 'passDBCheck',
     },
     {
       headerName: '上线前自动化检查是否通过',
-      field: 'intURL',
+      field: 'passAutoCheckbf',
     },
     {
       headerName: '升级后自动化检查是否通过',
-      field: 'intURL',
+      field: 'passAutoCheckaf',
     },
     {
       headerName: '封板状态',
-      field: 'intURL',
+      field: 'sealStatus',
     },
     {
       headerName: '操作',
-      field: 'intURL',
+
     }];
   const firstOnlineBranchGridApi = useRef<GridApi>();
   const onfirstOnlineBranchGridReady = (params: GridReadyEvent) => {
@@ -634,6 +664,17 @@ const PreRelease: React.FC<any> = () => {
       tenant: "全量用户",
       remark: ""
     }]);
+
+    firstOnlineBranchGridApi.current?.setRowData([{
+      branchName: "release",
+      module: "前后端",
+      passUnitTest: {"前端": "是", "后端": "否"},
+      passVersionCheck: {"前端": "是", "后端": "否"},
+      passDBCheck: "否",
+      passAutoCheckbf: "未开始",
+      passAutoCheckaf: "未开始",
+      sealStatus: {"前端": "已封版", "后端": "未封板"},
+    }])
     // 先显示第一个界面的数据
     formForDutyNameModify.setFieldsValue({
       projectsName: "测试"
@@ -931,7 +972,7 @@ const PreRelease: React.FC<any> = () => {
 
             {/* ag-grid 表格 */}
             <div>
-              <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+              <div className="ag-theme-alpine" style={{height: 150, width: '100%'}}>
                 <AgGridReact
 
                   columnDefs={firstOnlineBranchColumn} // 定义列
@@ -940,10 +981,10 @@ const PreRelease: React.FC<any> = () => {
                     resizable: true,
                     sortable: true,
                     suppressMenu: true,
-                    cellStyle: {"line-height": "25px"},
+                    autoHeight: true,
+                    // cellStyle: {"line-height": "25px"},
                   }}
                   headerHeight={25}
-                  rowHeight={25}
                   onGridReady={onfirstOnlineBranchGridReady}
                   onGridSizeChanged={onChangefirstOnlineBranchGridReady}
                   onColumnEverythingChanged={onChangefirstOnlineBranchGridReady}

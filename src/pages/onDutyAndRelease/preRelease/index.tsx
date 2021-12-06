@@ -43,26 +43,14 @@ const loadPrjNameSelect = async () => {
 
 };
 
-const Content: React.FC<any> = (props) => {
 
-  /* region  预发布项目 */
-  const formForDutyNameModify = props.form;
+const PreRelease: React.FC<any> = () => {
 
-  const projectsArray = useRequest(() => loadPrjNameSelect()).data;
+  /* region 表格相关定义和事件 */
 
-  // 保存预发布项目
-  const saveProjects = () => {
-    const datas = formForDutyNameModify.getFieldsValue();
-    savePrePulishProjects(datas);
-  };
-
-  /* endregion */
-
-  /* region 升级服务 */
-
-  /* region 第一个表格 */
-  const firstGridApi = (props.grid)[0];
-  const table1Column = [
+  /* region 升级服务 一 */
+  const firstUpSerGridApi = useRef<GridApi>();
+  const firstUpSerColumn = [
     {
       headerName: '上线环境',
       field: 'onlineDev'
@@ -88,6 +76,14 @@ const Content: React.FC<any> = (props) => {
       field: 'branchAndDev',
     },
     {
+      headerName: '编辑人',
+      field: 'editor',
+    },
+    {
+      headerName: '编辑时间',
+      field: 'editeTime',
+    },
+    {
       headerName: '说明',
       field: 'desc',
     },
@@ -100,20 +96,19 @@ const Content: React.FC<any> = (props) => {
     }];
 
   const onFirstGridReady = (params: GridReadyEvent) => {
-    firstGridApi.current = params.api;
+    firstUpSerGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
 
   const onChangeFirstGridReady = (params: GridReadyEvent) => {
-    firstGridApi.current = params.api;
+    firstUpSerGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
 
   /* endregion  */
 
-  /* region 第二个表格 */
-  const secondGridApi = (props.grid)[1];
-  const table2Column = [
+  /* region 升级服务 二  */
+  const secondUpSerColumn = [
     {
       headerName: '上线环境',
       field: 'onlineDev',
@@ -139,6 +134,14 @@ const Content: React.FC<any> = (props) => {
       field: 'intURL',
     },
     {
+      headerName: '编辑人',
+      field: 'editor',
+    },
+    {
+      headerName: '编辑时间',
+      field: 'editeTime',
+    },
+    {
       headerName: '涉及租户',
       field: 'tenant',
     },
@@ -149,18 +152,295 @@ const Content: React.FC<any> = (props) => {
     {
       headerName: '操作',
     }];
-
+  const secondUpSerGridApi = useRef<GridApi>();
   const onSecondGridReady = (params: GridReadyEvent) => {
-    secondGridApi.current = params.api;
+    secondUpSerGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
 
   const onChangeSecondGridReady = (params: GridReadyEvent) => {
-    secondGridApi.current = params.api;
+    secondUpSerGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
 
   /* endregion   */
+
+  /* region 升级服务 三  */
+  const thirdUpSerColumn = [
+    {
+      headerName: '前端值班',
+      field: 'onlineDev',
+    },
+    {
+      headerName: '服务确认完成',
+      field: 'upgradeInte',
+    },
+    {
+      headerName: '确认时间',
+      field: 'intService',
+    },
+    {
+      headerName: '后端值班',
+      field: 'hotUpdate',
+    },
+    {
+      headerName: '服务确认完成',
+      field: 'intMethod',
+    },
+    {
+      headerName: '确认时间',
+      field: 'intURL',
+    },
+    {
+      headerName: '流程确认',
+      field: 'editor',
+    },
+    {
+      headerName: '服务确认完成',
+      field: 'editeTime',
+    },
+    {
+      headerName: '确认时间',
+      field: 'tenant',
+    },
+    {
+      headerName: '测试值班',
+      field: '服务确认完成',
+    },
+    {
+      headerName: '确认时间',
+    }];
+  const thirdUpSerGridApi = useRef<GridApi>();
+  const onthirdGridReady = (params: GridReadyEvent) => {
+    thirdUpSerGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  const onChangeThirdGridReady = (params: GridReadyEvent) => {
+    thirdUpSerGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  /* endregion   */
+
+  /*  region 数据修复 Review 一 */
+
+  const firstDataReviewColumn = [
+    {
+      headerName: '序号',
+      field: 'onlineDev',
+    },
+    {
+      headerName: '把数据修复内容',
+      field: 'upgradeInte',
+    },
+    {
+      headerName: '涉及租户',
+      field: 'intService',
+    },
+    {
+      headerName: '类型',
+      field: 'hotUpdate',
+    },
+    {
+      headerName: '修复提交人',
+      field: 'intMethod',
+    },
+    {
+      headerName: '分支',
+      field: 'intURL',
+    },
+    {
+      headerName: '编辑人',
+      field: 'editor',
+    },
+    {
+      headerName: '编辑时间',
+      field: 'editeTime',
+    },
+    {
+      headerName: '评审结果',
+      field: 'tenant',
+    },
+    {
+      headerName: '是否可重复执行',
+      field: '服务确认完成',
+    },
+    {
+      headerName: '确认时间',
+    }];
+  const firstDataReviewGridApi = useRef<GridApi>();
+  const onfirstDataReviewGridReady = (params: GridReadyEvent) => {
+    firstDataReviewGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  const onChangefirstDataReviewGridReady = (params: GridReadyEvent) => {
+    firstDataReviewGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  /* endregion */
+
+  /*  region 数据修复 Review 二 */
+
+  const secondDataReviewColumn = [
+    {
+      headerName: '后端值班',
+      field: 'hotUpdate',
+    },
+    {
+      headerName: '服务确认完成',
+      field: 'intMethod',
+    },
+    {
+      headerName: '确认时间',
+      field: 'intURL',
+    }];
+  const secondDataReviewGridApi = useRef<GridApi>();
+  const onsecondDataReviewGridReady = (params: GridReadyEvent) => {
+    secondDataReviewGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  const onChangesecondDataReviewGridReady = (params: GridReadyEvent) => {
+    secondDataReviewGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  /* endregion */
+
+  /*  region 上线分支 */
+
+  const firstOnlineBranchColumn = [
+    {
+      headerName: '序号',
+      field: 'hotUpdate',
+    },
+    {
+      headerName: '分支名称',
+      field: 'intMethod',
+    },
+    {
+      headerName: '技术侧',
+      field: 'intURL',
+    },
+    {
+      headerName: '单元测试运行是否通过',
+      field: 'intURL',
+    },
+    {
+      headerName: '上线前版本检查是否通过',
+      field: 'intURL',
+    },
+    {
+      headerName: '上线前数据库环境检查是否通过',
+      field: 'intURL',
+    },
+    {
+      headerName: '上线前自动化检查是否通过',
+      field: 'intURL',
+    },
+    {
+      headerName: '升级后自动化检查是否通过',
+      field: 'intURL',
+    },
+    {
+      headerName: '封板状态',
+      field: 'intURL',
+    },
+    {
+      headerName: '操作',
+      field: 'intURL',
+    }];
+  const firstOnlineBranchGridApi = useRef<GridApi>();
+  const onfirstOnlineBranchGridReady = (params: GridReadyEvent) => {
+    firstOnlineBranchGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  const onChangefirstOnlineBranchGridReady = (params: GridReadyEvent) => {
+    firstOnlineBranchGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  /* endregion */
+
+  /*  region 对应工单 */
+
+  const firstListColumn = [
+    {
+      headerName: '序号',
+      field: 'hotUpdate',
+    },
+    {
+      headerName: '工单类型',
+      field: 'intMethod',
+    },
+    {
+      headerName: '工单编号',
+      field: 'intURL',
+    },
+    {
+      headerName: '审批名称',
+      field: 'intURL',
+    },
+    {
+      headerName: '审批说明',
+      field: 'intURL',
+    },
+    {
+      headerName: '申请人',
+      field: 'intURL',
+    },
+    {
+      headerName: '创建时间',
+      field: 'intURL',
+    },
+    {
+      headerName: '更新时间',
+      field: 'intURL',
+    },
+    {
+      headerName: '工单状态',
+      field: 'intURL',
+    },
+    {
+      headerName: '上步已审批人',
+      field: 'intURL',
+    }, {
+      headerName: '当前待审批人',
+      field: 'intURL',
+    }];
+  const firstListGridApi = useRef<GridApi>();
+  const onfirstListGridReady = (params: GridReadyEvent) => {
+    firstListGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  const onChangefirstListGridReady = (params: GridReadyEvent) => {
+    firstListGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  /* endregion */
+
+  /* endregion */
+
+
+  /* region  预发布项目 */
+  const [formForDutyNameModify] = Form.useForm();
+
+  const projectsArray = useRequest(() => loadPrjNameSelect()).data;
+
+  // 保存预发布项目
+  const saveProjects = () => {
+    const datas = formForDutyNameModify.getFieldsValue();
+    savePrePulishProjects(datas);
+  };
+
+  /* endregion */
+
 
   /* region 查询按钮点击事件 */
 
@@ -187,186 +467,31 @@ const Content: React.FC<any> = (props) => {
       remark: ""
     }];
 
-    firstGridApi.current?.setRowData(firstData);
-    secondGridApi.current?.setRowData(secondData);
+    firstUpSerGridApi.current?.setRowData(firstData);
+    secondUpSerGridApi.current?.setRowData(secondData);
   };
-  /* endregion */
 
   /* endregion */
-
-  return (
-    <div>
-
-      {/* 预发布项目 */}
-      <fieldset className={"fieldStyle"}>
-        <legend className={"legendStyle"}>Step1 预发布项目 <label style={{color: "red"}}> 被锁定:XXX正在编辑,请稍等</label></legend>
-
-        <div style={{marginBottom: -20, marginTop: -5}}>
-          <div style={{float: "right"}}>
-            <Button type="primary"
-                    style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, marginLeft: 10}}
-                    onClick={saveProjects}>保存 </Button>
-          </div>
-
-          <div>
-            <Form form={formForDutyNameModify}>
-              <Form.Item label="项目名称:" name="projectsName">
-                <Select showSearch mode="multiple">
-                  {projectsArray}
-                </Select>
-              </Form.Item>
-            </Form>
-          </div>
-        </div>
-
-      </fieldset>
-
-      {/* 升级服务 */}
-      <fieldset className={"fieldStyle"}>
-        <legend className={"legendStyle"}>Step2 升级服务</legend>
-
-        <div>
-          {/* 保存按钮 */}
-          <div style={{float: "right"}}>
-            <Button type="primary"
-                    style={{
-                      height: "200px",
-                      color: '#46A0FC',
-                      backgroundColor: "#ECF5FF",
-                      borderRadius: 5,
-                      marginTop: 34,
-                      marginLeft: 10
-                    }}
-            >点 <br></br>击 <br></br>保 <br></br>存 </Button>
-          </div>
-
-          {/* 条件查询   */}
-          <div style={{height: 35, marginTop: -15, overflow: "hidden"}}>
-
-            <label> 测试环境： </label>
-            <Select size={"small"} style={{minWidth: 140, width: '10%'}}>
-
-            </Select>
-
-            <label style={{marginLeft: 10}}> 一键部署ID： </label>
-            <Select size={"small"} style={{minWidth: 90, width: '10%'}} showSearch>
-
-            </Select>
-
-            <Button size={"small"} style={{marginLeft: 10, borderRadius: 5}} onClick={queryUpgradeService}>查询</Button>
-
-          </div>
-
-          {/* ag-grid 表格 */}
-          <div>
-
-            <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
-              <AgGridReact
-
-                columnDefs={table1Column} // 定义列
-                // rowData={[]} // 数据绑定
-                defaultColDef={{
-                  resizable: true,
-                  sortable: true,
-                  suppressMenu: true,
-                  cellStyle: {"line-height": "25px"},
-                }}
-                headerHeight={25}
-                rowHeight={25}
-                onGridReady={onFirstGridReady}
-                onGridSizeChanged={onChangeFirstGridReady}
-                onColumnEverythingChanged={onChangeFirstGridReady}
-              >
-              </AgGridReact>
-            </div>
-
-            <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
-
-              <AgGridReact
-                columnDefs={table2Column} // 定义列
-                // rowData={[]} // 数据绑定
-                defaultColDef={{
-                  resizable: true,
-                  sortable: true,
-                  suppressMenu: true,
-                  cellStyle: {"line-height": "25px"},
-                }}
-                headerHeight={25}
-                rowHeight={25}
-                onGridReady={onSecondGridReady}
-                onGridSizeChanged={onChangeSecondGridReady}
-                onColumnEverythingChanged={onChangeSecondGridReady}
-              >
-              </AgGridReact>
-
-            </div>
-
-          </div>
-
-          {/*  提示标签 */}
-          <div>
-            这里显示操作的提示信息
-          </div>
-
-        </div>
-
-
-      </fieldset>
-
-      {/* 升级分支 */}
-      <fieldset className={"fieldStyle"}>
-        <legend className={"legendStyle"}>Step3 升级分支</legend>
-
-        <div>
-          <div style={{float: "right"}}>
-            <Button type="primary"
-                    style={{height: "200px", color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5,}}
-            >点 <br></br>击 <br></br>保 <br></br>存 </Button>
-          </div>
-        </div>
-      </fieldset>
-
-      {/* 对应工单 */}
-      <fieldset className={"fieldStyle"}>
-        <legend className={"legendStyle"}>Step4 对应工单</legend>
-        <div>
-          <div style={{float: "right"}}>
-            <Button type="primary"
-                    style={{height: "200px", color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5,}}
-            >点 <br></br>击 <br></br>保 <br></br>存 </Button>
-          </div>
-        </div>
-
-      </fieldset>
-    </div>
-  );
-
-};
-
-const LogList: React.FC<any> = () => {
-  const firstGridApi = useRef<GridApi>();
-  const secondGridApi = useRef<GridApi>();
-  const [formForDutyNameModify] = Form.useForm();
-
 
   /* region 动态增删tab */
 
-  const initialPanes = [{
-    title: `${currentDate}灰度预发布1`,
-    content: <Content form={formForDutyNameModify} grid={[firstGridApi, secondGridApi]}/>,
-    key: '1',
-    closable: false
-  }, {
-    title: `${currentDate}灰度预发布2`,
-    content: <Content form={formForDutyNameModify} grid={[firstGridApi, secondGridApi]}/>,
-    key: '2',
-    closable: false
-  }];
+  const initialPanes = [
+    {
+      title: `${currentDate}灰度预发布1`,
+      content: "",
+      key: '1',
+      closable: false
+    },
+    {
+      title: `${currentDate}灰度预发布2`,
+      content: "",
+      key: '2',
+      closable: false
+    }];
   const [tabContent, setTabContent] = useState({
-      activeKey: initialPanes[0].key,
-      panes: initialPanes
-    }
-  );
+    activeKey: initialPanes[0].key,
+    panes: initialPanes
+  });
 
   // 新增tab
   const add = () => {
@@ -375,11 +500,31 @@ const LogList: React.FC<any> = () => {
     const activeKey = `index_${tabCount + 1}`;
     panes.push({
       title: `${currentDate}灰度预发布${tabCount + 1}`,
-      content: <Content form={formForDutyNameModify} grid={[firstGridApi, secondGridApi]}/>,
+      content: "",
       key: activeKey,
       closable: true
     });
     setTabContent({panes, activeKey});
+    firstUpSerGridApi.current?.setRowData([{
+      onlineDev: "集群2",
+      pulishItem: "前端",
+      app: "web",
+      hotUpdate: "是",
+      upgrade: "否",
+      branchAndDev: "emergency_nx-hotfix",
+      desc: "",
+      remark: ""
+    }]);
+    secondUpSerGridApi.current?.setRowData([{
+      onlineDev: "集群2",
+      upgradeInte: "前端接口",
+      intService: "basebi",
+      hotUpdate: "是",
+      intMethod: "get",
+      intURL: "/basebi/Evaluate/......",
+      tenant: "全量用户",
+      remark: ""
+    }]);
   };
 
   // 删除tab
@@ -430,8 +575,8 @@ const LogList: React.FC<any> = () => {
     });
 
 
-    firstGridApi.current?.setRowData([{
-      onlineDev: "集群2",
+    firstUpSerGridApi.current?.setRowData([{
+      onlineDev: "集群4444",
       pulishItem: "前端",
       app: "web",
       hotUpdate: "是",
@@ -440,8 +585,8 @@ const LogList: React.FC<any> = () => {
       desc: "",
       remark: ""
     }]);
-    secondGridApi.current?.setRowData([{
-      onlineDev: "集群2",
+    secondUpSerGridApi.current?.setRowData([{
+      onlineDev: "集群44444",
       upgradeInte: "前端接口",
       intService: "basebi",
       hotUpdate: "是",
@@ -458,10 +603,8 @@ const LogList: React.FC<any> = () => {
 
   const {data} = useRequest(() => loadPrjNameSelect());
 
-
-  useEffect(() => {
-
-    firstGridApi.current?.setRowData([{
+  const showProject = () => {
+    firstUpSerGridApi.current?.setRowData([{
       onlineDev: "集群1",
       pulishItem: "前端",
       app: "web",
@@ -471,7 +614,17 @@ const LogList: React.FC<any> = () => {
       desc: "",
       remark: ""
     }]);
-    secondGridApi.current?.setRowData([{
+    secondUpSerGridApi.current?.setRowData([{
+      onlineDev: "集群1",
+      upgradeInte: "前端接口",
+      intService: "basebi",
+      hotUpdate: "是",
+      intMethod: "get",
+      intURL: "/basebi/Evaluate/......",
+      tenant: "全量用户",
+      remark: ""
+    }]);
+    thirdUpSerGridApi.current?.setRowData([{
       onlineDev: "集群1",
       upgradeInte: "前端接口",
       intService: "basebi",
@@ -485,27 +638,357 @@ const LogList: React.FC<any> = () => {
     formForDutyNameModify.setFieldsValue({
       projectsName: "测试"
     });
+  };
+
+
+  useEffect(() => {
+    showProject();
 
   }, [data]);
   return (
     <PageContainer style={{marginTop: -30}}>
-      <Tabs
-        type="editable-card"
-        activeKey={tabContent.activeKey}
-        onChange={onChange}
-        onEdit={(targetKey, action) => {
-          onEdits(targetKey, action)
-        }}
-        style={{backgroundColor: "white", marginTop: -20}}
-      >
-        {tabContent.panes.map(pane => (
-          <TabPane tab={pane.title} key={pane.key} closable={pane.closable}>
-            {pane.content}
-          </TabPane>
-        ))}
-      </Tabs>
+
+      {/* Tabs 标签 */}
+      <div>
+        <Tabs
+          type="editable-card"
+          activeKey={tabContent.activeKey}
+          onChange={onChange}
+          onEdit={(targetKey, action) => {
+            onEdits(targetKey, action)
+          }}
+          style={{marginTop: -20}}
+        >
+          {tabContent.panes.map(pane => (
+            <TabPane tab={pane.title} key={pane.key} closable={pane.closable}> </TabPane>
+          ))}
+        </Tabs>
+      </div>
+
+      {/* 其他控件 */}
+      <div style={{marginTop: -15, backgroundColor: "white"}}>
+
+        {/* 预发布项目 */}
+        <fieldset className={"fieldStyle"}>
+          <legend className={"legendStyle"}>Step1 预发布项目 <label style={{color: "red"}}> 被锁定:XXX正在编辑,请稍等</label></legend>
+
+          <div style={{marginBottom: -20, marginTop: -5}}>
+            <div style={{float: "right"}}>
+              <Button type="primary"
+                      style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, marginLeft: 10}}
+                      onClick={saveProjects}>保存 </Button>
+            </div>
+
+            <div>
+              <Form form={formForDutyNameModify}>
+                <Form.Item label="项目名称:" name="projectsName">
+                  <Select showSearch mode="multiple">
+                    {projectsArray}
+                  </Select>
+                </Form.Item>
+              </Form>
+            </div>
+          </div>
+
+        </fieldset>
+
+        {/* 升级服务 */}
+        <fieldset className={"fieldStyle"}>
+          <legend className={"legendStyle"}>Step2 升级服务</legend>
+
+          <div>
+
+            <div>
+              {/* 保存按钮 */}
+              <div style={{float: "right"}}>
+                <Button type="primary"
+                        style={{
+                          height: "200px",
+                          color: '#46A0FC',
+                          backgroundColor: "#ECF5FF",
+                          borderRadius: 5,
+                          marginTop: 34,
+                          marginLeft: 10
+                        }}
+                >点 <br></br>击 <br></br>保 <br></br>存 </Button>
+              </div>
+
+              {/* 条件查询   */}
+              <div style={{height: 35, marginTop: -15, overflow: "hidden"}}>
+
+                <label> 测试环境： </label>
+                <Select size={"small"} style={{minWidth: 140, width: '10%'}}>
+
+                </Select>
+
+                <label style={{marginLeft: 10}}> 一键部署ID： </label>
+                <Select size={"small"} style={{minWidth: 90, width: '10%'}} showSearch>
+
+                </Select>
+
+                <Button size={"small"} style={{marginLeft: 10, borderRadius: 5}}
+                        onClick={queryUpgradeService}>查询</Button>
+
+              </div>
+
+              {/* ag-grid 表格 */}
+              <div>
+
+                <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+                  <AgGridReact
+
+                    columnDefs={firstUpSerColumn} // 定义列
+                    // rowData={[]} // 数据绑定
+                    defaultColDef={{
+                      resizable: true,
+                      sortable: true,
+                      suppressMenu: true,
+                      cellStyle: {"line-height": "25px"},
+                    }}
+                    headerHeight={25}
+                    rowHeight={25}
+                    onGridReady={onFirstGridReady}
+                    onGridSizeChanged={onChangeFirstGridReady}
+                    onColumnEverythingChanged={onChangeFirstGridReady}
+                  >
+                  </AgGridReact>
+                </div>
+
+                <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+
+                  <AgGridReact
+                    columnDefs={secondUpSerColumn} // 定义列
+                    // rowData={[]} // 数据绑定
+                    defaultColDef={{
+                      resizable: true,
+                      sortable: true,
+                      suppressMenu: true,
+                      cellStyle: {"line-height": "25px"},
+                    }}
+                    headerHeight={25}
+                    rowHeight={25}
+                    onGridReady={onSecondGridReady}
+                    onGridSizeChanged={onChangeSecondGridReady}
+                    onColumnEverythingChanged={onChangeSecondGridReady}
+                  >
+                  </AgGridReact>
+
+                </div>
+
+              </div>
+            </div>
+
+
+            <div>
+              <div style={{fontWeight: "bold"}}> 服务确认完成</div>
+              <div style={{float: "right"}}>
+                <Button type="primary"
+                        style={{
+                          height: "100px",
+                          color: '#46A0FC',
+                          backgroundColor: "#ECF5FF",
+                          borderRadius: 5,
+                          marginTop: 0,
+                          marginLeft: 10
+                        }}
+                >点 <br></br>击 <br></br>确 <br></br>认 </Button>
+              </div>
+              <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+
+                <AgGridReact
+                  columnDefs={thirdUpSerColumn} // 定义列
+                  // rowData={[]} // 数据绑定
+                  defaultColDef={{
+                    resizable: true,
+                    sortable: true,
+                    suppressMenu: true,
+                    cellStyle: {"line-height": "25px"},
+                  }}
+                  headerHeight={25}
+                  rowHeight={25}
+                  onGridReady={onthirdGridReady}
+                  onGridSizeChanged={onChangeThirdGridReady}
+                  onColumnEverythingChanged={onChangeThirdGridReady}
+                >
+                </AgGridReact>
+
+              </div>
+            </div>
+
+
+            {/*  提示标签 */}
+            <div>
+              这里显示操作的提示信息
+            </div>
+
+          </div>
+
+
+        </fieldset>
+
+        {/* 数据修复Review */}
+        <fieldset className={"fieldStyle"}>
+          <legend className={"legendStyle"}>Step3 数据修复Review</legend>
+
+          <div>
+
+            <div>
+              {/* 保存按钮 */}
+              <div style={{float: "right"}}>
+                <Button type="primary"
+                        style={{
+                          height: "100px",
+                          color: '#46A0FC',
+                          backgroundColor: "#ECF5FF",
+                          borderRadius: 5,
+
+                          marginLeft: 10
+                        }}
+                >点 <br></br>击 <br></br>保 <br></br>存 </Button>
+              </div>
+
+              {/* ag-grid 表格 */}
+              <div>
+                <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+                  <AgGridReact
+
+                    columnDefs={firstDataReviewColumn} // 定义列
+                    // rowData={[]} // 数据绑定
+                    defaultColDef={{
+                      resizable: true,
+                      sortable: true,
+                      suppressMenu: true,
+                      cellStyle: {"line-height": "25px"},
+                    }}
+                    headerHeight={25}
+                    rowHeight={25}
+                    onGridReady={onfirstDataReviewGridReady}
+                    onGridSizeChanged={onChangefirstDataReviewGridReady}
+                    onColumnEverythingChanged={onChangefirstDataReviewGridReady}
+                  >
+                  </AgGridReact>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div style={{fontWeight: "bold"}}> Review确认完成</div>
+              <div style={{float: "right"}}>
+                <Button type="primary"
+                        style={{
+                          height: "100px",
+                          color: '#46A0FC',
+                          backgroundColor: "#ECF5FF",
+                          borderRadius: 5,
+                          marginTop: 0,
+                          marginLeft: 10
+                        }}
+                >点 <br></br>击 <br></br>确 <br></br>认 </Button>
+              </div>
+              <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+
+                <AgGridReact
+                  columnDefs={secondDataReviewColumn} // 定义列
+                  // rowData={[]} // 数据绑定
+                  defaultColDef={{
+                    resizable: true,
+                    sortable: true,
+                    suppressMenu: true,
+                    cellStyle: {"line-height": "25px"},
+                  }}
+                  headerHeight={25}
+                  rowHeight={25}
+                  onGridReady={onsecondDataReviewGridReady}
+                  onGridSizeChanged={onChangesecondDataReviewGridReady}
+                  onColumnEverythingChanged={onChangesecondDataReviewGridReady}
+                >
+                </AgGridReact>
+
+              </div>
+            </div>
+
+          </div>
+        </fieldset>
+
+        {/* 上线分支 */}
+        <fieldset className={"fieldStyle"}>
+          <legend className={"legendStyle"}>Step4 上线分支</legend>
+
+          <div>
+            {/* 保存按钮 */}
+            <div style={{float: "right"}}>
+              <Button type="primary"
+                      style={{
+                        height: "100px",
+                        color: '#46A0FC',
+                        backgroundColor: "#ECF5FF",
+                        borderRadius: 5,
+
+                        marginLeft: 10
+                      }}
+              >点 <br></br>击 <br></br>保 <br></br>存 </Button>
+            </div>
+
+            {/* ag-grid 表格 */}
+            <div>
+              <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+                <AgGridReact
+
+                  columnDefs={firstOnlineBranchColumn} // 定义列
+                  // rowData={[]} // 数据绑定
+                  defaultColDef={{
+                    resizable: true,
+                    sortable: true,
+                    suppressMenu: true,
+                    cellStyle: {"line-height": "25px"},
+                  }}
+                  headerHeight={25}
+                  rowHeight={25}
+                  onGridReady={onfirstOnlineBranchGridReady}
+                  onGridSizeChanged={onChangefirstOnlineBranchGridReady}
+                  onColumnEverythingChanged={onChangefirstOnlineBranchGridReady}
+                >
+                </AgGridReact>
+              </div>
+            </div>
+          </div>
+
+        </fieldset>
+
+        {/* 对应工单 */}
+        <fieldset className={"fieldStyle"}>
+          <legend className={"legendStyle"}>Step5 对应工单</legend>
+          <div>
+            <div>
+              {/* ag-grid 表格 */}
+              <div>
+                <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+                  <AgGridReact
+
+                    columnDefs={firstListColumn} // 定义列
+                    // rowData={[]} // 数据绑定
+                    defaultColDef={{
+                      resizable: true,
+                      sortable: true,
+                      suppressMenu: true,
+                      cellStyle: {"line-height": "25px"},
+                    }}
+                    headerHeight={25}
+                    rowHeight={25}
+                    onGridReady={onfirstListGridReady}
+                    onGridSizeChanged={onChangefirstListGridReady}
+                    onColumnEverythingChanged={onChangefirstListGridReady}
+                  >
+                  </AgGridReact>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </fieldset>
+      </div>
     </PageContainer>
   );
 };
 
-export default LogList;
+export default PreRelease;

@@ -166,6 +166,17 @@ const PreRelease: React.FC<any> = () => {
   /* endregion   */
 
   /* region 升级服务 三  */
+
+  const ChangRowColor = (params: any) => {
+    if (params.data?.onlineDev === "集群1") {
+
+      // 上下设置颜色
+      return {'background-color': '#FFF6F6'};
+
+    }
+    return {'background-color': 'transparent'};
+  };
+
   const thirdUpSerColumn = [
     {
       headerName: '前端值班',
@@ -173,7 +184,12 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '服务确认完成',
+      // checkboxSelection: true,
+      minWidth: 110,
       field: 'upgradeInte',
+      // cellRenderer: () => {
+      //   return ` <input style="color: red;margin-top: -10px;" type="checkbox" value="" />`;
+      // }
     },
     {
       headerName: '确认时间',
@@ -209,6 +225,7 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '确认时间',
+      field: 'confirmTime',
     }];
   const thirdUpSerGridApi = useRef<GridApi>();
   const onthirdGridReady = (params: GridReadyEvent) => {
@@ -311,10 +328,12 @@ const PreRelease: React.FC<any> = () => {
   /* endregion */
 
   /*  region 上线分支 */
-  const rendererUnitTest = (params: any) => {
-    debugger;
-    const values = params.value;
 
+  // 渲染单元测试运行是否通过字段
+  const rendererUnitTest = (params: any) => {
+
+    const values = params.value;
+    console.log(values);
     let resultDiv = ``;
 
     resultDiv = `
@@ -326,14 +345,44 @@ const PreRelease: React.FC<any> = () => {
         </div>
 
         <div style=" margin-top: -20px;font-size: 10px">
-            <div>前端： <label style="color: red"> 否</label> &nbsp; &nbsp;09：58：12~09：59：12</div>
-            <div style="margin-top: -20px"> 后端： <label style="color: forestgreen"> 是</label> &nbsp;&nbsp; 09：58：12~09：59：12</div>
+            <div>前端： <label style="color: red"> 否</label> &nbsp;09:58:12~09:59:12</div>
+            <div style="margin-top: -20px"> 后端： <label style="color: forestgreen"> 是</label> &nbsp;09:58:12~09:59:12</div>
         </div>
 
     </div>
     `;
     return resultDiv;
   };
+
+  // 渲染上线前版本检查是否通过
+  const beforeOnlineVersionCheck = () => {
+    let resultDiv = ``;
+
+    resultDiv = `
+    <div style="margin-top: -10px">
+        <div style="text-align: right" >
+            <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
+              <img src="../setting.png" width="15" height="15" alt="执行参数" title="执行参数">
+            </Button>
+            <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
+              <img src="../excute.png" width="14" height="14" alt="执行参数" title="执行参数">
+            </Button>
+            <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
+              <img src="../url.png" width="14" height="14" alt="执行参数" title="执行参数">
+            </Button>
+        </div>
+
+        <div style=" margin-top: -20px;font-size: 10px">
+            <div>前端： <label style="color: red"> 否</label> &nbsp;09:58:12~09:59:12</div>
+            <div style="margin-top: -20px"> 后端： <label style="color: forestgreen"> 是</label> &nbsp;09:58:12~09:59:12</div>
+        </div>
+
+    </div>
+    `;
+    return resultDiv;
+
+  };
+
 
   const firstOnlineBranchColumn: any = [
     {
@@ -358,10 +407,13 @@ const PreRelease: React.FC<any> = () => {
       headerName: '单元测试运行是否通过',
       field: 'passUnitTest',
       cellRenderer: rendererUnitTest,
+      minWidth: 190,
     },
     {
       headerName: '上线前版本检查是否通过',
       field: 'passVersionCheck',
+      cellRenderer: beforeOnlineVersionCheck,
+      minWidth: 190,
     },
     {
       headerName: '上线前数据库环境检查是否通过',
@@ -656,7 +708,16 @@ const PreRelease: React.FC<any> = () => {
     }]);
     thirdUpSerGridApi.current?.setRowData([{
       onlineDev: "集群1",
-      upgradeInte: "前端接口",
+
+      intService: "basebi",
+      hotUpdate: "是",
+      intMethod: "get",
+      intURL: "/basebi/Evaluate/......",
+      tenant: "全量用户",
+      remark: ""
+    }, {
+      onlineDev: "集群9",
+
       intService: "basebi",
       hotUpdate: "是",
       intMethod: "get",
@@ -711,7 +772,7 @@ const PreRelease: React.FC<any> = () => {
 
         {/* 预发布项目 */}
         <fieldset className={"fieldStyle"}>
-          <legend className={"legendStyle"}>Step1 预发布项目 <label style={{color: "red"}}> 被锁定:XXX正在编辑,请稍等</label></legend>
+          <legend className={"legendStyle"}>Step1 预发布项目</legend>
 
           <div style={{marginBottom: -20, marginTop: -5}}>
             <div style={{float: "right"}}>
@@ -740,21 +801,7 @@ const PreRelease: React.FC<any> = () => {
           <div>
 
             <div>
-              {/* 保存按钮 */}
-              <div style={{float: "right"}}>
-                <Button type="primary"
-                        style={{
-                          height: "200px",
-                          color: '#46A0FC',
-                          backgroundColor: "#ECF5FF",
-                          borderRadius: 5,
-                          marginTop: 34,
-                          marginLeft: 10
-                        }}
-                >点 <br></br>击 <br></br>保 <br></br>存 </Button>
-              </div>
 
-              {/* 条件查询   */}
               <div style={{height: 35, marginTop: -15, overflow: "hidden"}}>
 
                 <label> 测试环境： </label>
@@ -767,12 +814,19 @@ const PreRelease: React.FC<any> = () => {
 
                 </Select>
 
-                <Button size={"small"} style={{marginLeft: 10, borderRadius: 5}}
-                        onClick={queryUpgradeService}>查询</Button>
+                <Button
+                  size={"small"}
+                  type="primary"
+                  style={{
+                    color: '#46A0FC',
+                    backgroundColor: "#ECF5FF",
+                    borderRadius: 5,
+                    marginLeft: 10
+                  }}>查询 </Button>
+
 
               </div>
 
-              {/* ag-grid 表格 */}
               <div>
 
                 <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
@@ -806,6 +860,7 @@ const PreRelease: React.FC<any> = () => {
                       suppressMenu: true,
                       cellStyle: {"line-height": "25px"},
                     }}
+                    getRowStyle={ChangRowColor}
                     headerHeight={25}
                     rowHeight={25}
                     onGridReady={onSecondGridReady}
@@ -819,21 +874,9 @@ const PreRelease: React.FC<any> = () => {
               </div>
             </div>
 
-
             <div>
               <div style={{fontWeight: "bold"}}> 服务确认完成</div>
-              <div style={{float: "right"}}>
-                <Button type="primary"
-                        style={{
-                          height: "100px",
-                          color: '#46A0FC',
-                          backgroundColor: "#ECF5FF",
-                          borderRadius: 5,
-                          marginTop: 0,
-                          marginLeft: 10
-                        }}
-                >点 <br></br>击 <br></br>确 <br></br>认 </Button>
-              </div>
+
               <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
 
                 <AgGridReact
@@ -874,20 +917,6 @@ const PreRelease: React.FC<any> = () => {
           <div>
 
             <div>
-              {/* 保存按钮 */}
-              <div style={{float: "right"}}>
-                <Button type="primary"
-                        style={{
-                          height: "100px",
-                          color: '#46A0FC',
-                          backgroundColor: "#ECF5FF",
-                          borderRadius: 5,
-
-                          marginLeft: 10
-                        }}
-                >点 <br></br>击 <br></br>保 <br></br>存 </Button>
-              </div>
-
               {/* ag-grid 表格 */}
               <div>
                 <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
@@ -914,18 +943,7 @@ const PreRelease: React.FC<any> = () => {
 
             <div>
               <div style={{fontWeight: "bold"}}> Review确认完成</div>
-              <div style={{float: "right"}}>
-                <Button type="primary"
-                        style={{
-                          height: "100px",
-                          color: '#46A0FC',
-                          backgroundColor: "#ECF5FF",
-                          borderRadius: 5,
-                          marginTop: 0,
-                          marginLeft: 10
-                        }}
-                >点 <br></br>击 <br></br>确 <br></br>认 </Button>
-              </div>
+
               <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
 
                 <AgGridReact
@@ -956,20 +974,6 @@ const PreRelease: React.FC<any> = () => {
           <legend className={"legendStyle"}>Step4 上线分支</legend>
 
           <div>
-            {/* 保存按钮 */}
-            <div style={{float: "right"}}>
-              <Button type="primary"
-                      style={{
-                        height: "100px",
-                        color: '#46A0FC',
-                        backgroundColor: "#ECF5FF",
-                        borderRadius: 5,
-
-                        marginLeft: 10
-                      }}
-              >点 <br></br>击 <br></br>保 <br></br>存 </Button>
-            </div>
-
             {/* ag-grid 表格 */}
             <div>
               <div className="ag-theme-alpine" style={{height: 150, width: '100%'}}>
@@ -982,7 +986,6 @@ const PreRelease: React.FC<any> = () => {
                     sortable: true,
                     suppressMenu: true,
                     autoHeight: true,
-                    // cellStyle: {"line-height": "25px"},
                   }}
                   headerHeight={25}
                   onGridReady={onfirstOnlineBranchGridReady}

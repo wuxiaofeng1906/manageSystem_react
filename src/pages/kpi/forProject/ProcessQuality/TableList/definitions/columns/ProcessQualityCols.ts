@@ -7,14 +7,10 @@
  * @LastModify:
  */
 
-import { PERCENTAGE, HOUR, TABLE_GROUP_SHOW as SHOW, COLUMN_W } from '@/namespaces';
+import { PERCENTAGE, HOUR, TABLE_GROUP_SHOW as SHOW } from '@/namespaces';
 import { ColGroupDef } from 'ag-grid-community';
 import { ProjectQualityResult } from '@/namespaces/interface';
-
-/*  */
-// export const numberW = { width: COLUMN_W, minWidth: COLUMN_W };
-export const ratioW = { width: COLUMN_W * 2, minWidth: COLUMN_W * 2 };
-export const doubleNumberW = ratioW;
+import { doubleNumberW, ratioW } from './baseParams';
 
 /*  */
 //

@@ -9,13 +9,13 @@
 
 import './index.css';
 import { AgGridReact } from 'ag-grid-react';
-import IdWithNameColumn from './renders/IdWithNameColumn';
 import BugReOpenColumn from './renders/BugReOpenColumn';
 import BugFlybackDuraColumn from './renders/BugFlybackDuraColumn';
 import { useModel } from 'umi';
 import { mockData } from './mock';
 import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
 import { TableMajorCols, ProcessQualityCols } from './definitions/columns';
+import LinkToCloumn from './renders/LinkToCloumn';
 
 
 
@@ -36,7 +36,7 @@ export default () => {
       <AgGridReact
         modules={[SetFilterModule]}
         frameworkComponents={{
-          idWithName: IdWithNameColumn,
+          linkTo: LinkToCloumn,
           reopenRatio: BugReOpenColumn,
           bugFlybackDura: BugFlybackDuraColumn,
         }}

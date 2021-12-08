@@ -2,14 +2,14 @@
  * @Description: 项目基本信息字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:44:08
- * @LastEditTime: 2021-12-08 11:35:27
+ * @LastEditTime: 2021-12-08 15:41:57
  * @LastEditors: jieTan
  * @LastModify:
  */
 
-import { TABLE_GROUP_SHOW as SHOW } from '@/namespaces';
+import { DEFAULT_PLACEHOLDER, PROJ_STATUS, TABLE_GROUP_SHOW as SHOW } from '@/namespaces';
 import { ColGroupDef } from 'ag-grid-community';
-import { doubleNumberW, numberW } from './baseParams';
+import { doubleNumberW, numberW, stringW } from './baseParams';
 
 /* 主要字段 */
 export const TableMajorCols: ColGroupDef = {
@@ -31,17 +31,43 @@ export const TableMajorCols: ColGroupDef = {
     },
     {
       headerName: '负责人',
-      field: 'user',
+      field: 'user.name',
       filter: true,
-      valueGetter: (params) => params.data.user.name,
       columnGroupShow: SHOW['closed'],
       ...doubleNumberW,
     },
     {
       headerName: '所属部门',
       columnGroupShow: SHOW['closed'],
-      field: 'dept',
-      valueGetter: (params) => params.data.dept.name,
+      field: 'dept.name',
+    },
+    {
+      headerName: '项目状态',
+      columnGroupShow: SHOW['closed'],
+      field: 'project.status',
+      filter: true,
+      valueGetter: (params) => PROJ_STATUS[params.data.project.status]?.zh,
+      cellRenderer: 'projStatus',
+      ...stringW,
+    },
+    {
+      headerName: '项目分支',
+      columnGroupShow: SHOW['closed'],
+      filter: true,
+      valueGetter: () => DEFAULT_PLACEHOLDER,
+      ...stringW,
+    },
+    {
+      headerName: '开始日期',
+      field: 'project.start',
+      columnGroupShow: SHOW['closed'],
+      ...stringW,
+    },
+    {
+      headerName: '结束日期',
+      field: 'project.end',
+      columnGroupShow: SHOW['closed'],
+      ...stringW,
     },
   ],
 };

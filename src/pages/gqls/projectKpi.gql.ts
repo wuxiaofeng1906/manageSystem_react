@@ -2,7 +2,7 @@
  * @Description: 项目度量指标
  * @Author: jieTan
  * @Date: 2021-12-02 11:41:52
- * @LastEditTime: 2021-12-02 11:41:53
+ * @LastEditTime: 2021-12-08 11:46:26
  * @LastEditors: jieTan
  * @LastModify: 
  */
@@ -20,6 +20,7 @@ export default (args: GQL_PARAMS, funcWithParams: Function): [string, string] =>
         name
         start
         end
+        status
       }
       user{
         id

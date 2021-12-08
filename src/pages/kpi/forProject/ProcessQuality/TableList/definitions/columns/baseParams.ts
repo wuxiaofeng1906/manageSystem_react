@@ -12,3 +12,4 @@ import { COLUMN_W } from "@/namespaces";
 export const ratioW = { width: COLUMN_W * 2, minWidth: COLUMN_W * 2 };
 export const numberW = { width: COLUMN_W, minWidth: COLUMN_W };
 export const doubleNumberW = ratioW;
+export const stringW = doubleNumberW;

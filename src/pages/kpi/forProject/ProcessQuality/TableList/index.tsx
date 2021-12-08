@@ -16,8 +16,7 @@ import { mockData } from './mock';
 import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
 import { TableMajorCols, ProcessQualityCols } from './definitions/columns';
 import LinkToCloumn from './renders/LinkToCloumn';
-
-
+import ProjStatusColumn from './renders/ProjStatusColumn';
 
 /*  */
 export default () => {
@@ -39,6 +38,7 @@ export default () => {
           linkTo: LinkToCloumn,
           reopenRatio: BugReOpenColumn,
           bugFlybackDura: BugFlybackDuraColumn,
+          projStatus: ProjStatusColumn,
         }}
         columnDefs={[TableMajorCols, ProcessQualityCols]}
         rowData={gqlData}

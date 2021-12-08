@@ -312,6 +312,7 @@ export default [
               },
             ],
           },
+          ProjectKpiRoute,
           {
             name: '服务',
             icon: 'table',
@@ -404,7 +405,6 @@ export default [
           },
         ],
       },
-      ProjectKpiRoute,
     ],
   },
   {

@@ -4,9 +4,7 @@ import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import './style.css';
-
-import {Button, Form, Input, message, Modal, Select, Tabs} from 'antd';
-
+import {Button, Form, Input, message, Modal, Select, Tabs, Row, Col, DatePicker} from 'antd';
 import dayjs from "dayjs";
 import {AgGridReact} from "ag-grid-react";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
@@ -47,6 +45,23 @@ const loadPrjNameSelect = async () => {
 const PreRelease: React.FC<any> = () => {
 
   /* region 表格相关定义和事件 */
+  const operateRenderer = (params: any) => {
+    const paramData = JSON.stringify(params.data);
+    return `
+        <div style="margin-top: -5px">
+            <Button  style="border: none; background-color: transparent; " onclick='showParams(${paramData})'>
+              <img src="../add_1.png" width="15" height="15" alt="新增" title="新增">
+            </Button>
+             <Button  style="border: none; background-color: transparent;  margin-left: -10px; " onclick='showParams(${paramData})'>
+              <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
+            </Button>
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='showParams(${paramData})'>
+              <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
+            </Button>
+        </div>
+           `;
+
+  };
 
   /* region 升级服务 一 */
   const firstUpSerGridApi = useRef<GridApi>();
@@ -93,6 +108,7 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '操作',
+      cellRenderer: operateRenderer
     }];
 
   const onFirstGridReady = (params: GridReadyEvent) => {
@@ -151,6 +167,7 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '操作',
+      cellRenderer: operateRenderer
     }];
   const secondUpSerGridApi = useRef<GridApi>();
   const onSecondGridReady = (params: GridReadyEvent) => {
@@ -284,7 +301,8 @@ const PreRelease: React.FC<any> = () => {
       field: '服务确认完成',
     },
     {
-      headerName: '确认时间',
+      headerName: '操作',
+      cellRenderer: operateRenderer
     }];
   const firstDataReviewGridApi = useRef<GridApi>();
   const onfirstDataReviewGridReady = (params: GridReadyEvent) => {
@@ -338,13 +356,7 @@ const PreRelease: React.FC<any> = () => {
 
     resultDiv = `
     <div style="margin-top: -10px">
-        <div style="text-align: right" >
-            <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
-              <img src="../setting.png" width="15" height="15" alt="执行参数" title="执行参数">
-            </Button>
-        </div>
-
-        <div style=" margin-top: -20px;font-size: 10px">
+        <div style=" margin-top: 20px;font-size: 10px">
             <div>前端： <label style="color: red"> 否</label> &nbsp;09:58:12~09:59:12</div>
             <div style="margin-top: -20px"> 后端： <label style="color: forestgreen"> 是</label> &nbsp;09:58:12~09:59:12</div>
         </div>
@@ -361,9 +373,7 @@ const PreRelease: React.FC<any> = () => {
     resultDiv = `
     <div style="margin-top: -10px">
         <div style="text-align: right" >
-            <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
-              <img src="../setting.png" width="15" height="15" alt="执行参数" title="执行参数">
-            </Button>
+
             <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
               <img src="../excute.png" width="14" height="14" alt="执行参数" title="执行参数">
             </Button>
@@ -433,7 +443,7 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '操作',
-
+      cellRenderer: operateRenderer
     }];
   const firstOnlineBranchGridApi = useRef<GridApi>();
   const onfirstOnlineBranchGridReady = (params: GridReadyEvent) => {
@@ -509,7 +519,6 @@ const PreRelease: React.FC<any> = () => {
 
   /* endregion */
 
-
   /* region  预发布项目 */
   const [formForDutyNameModify] = Form.useForm();
 
@@ -523,39 +532,7 @@ const PreRelease: React.FC<any> = () => {
 
   /* endregion */
 
-
-  /* region 查询按钮点击事件 */
-
-  const queryUpgradeService = () => {
-    const firstData = [{
-      onlineDev: "集群3",
-      pulishItem: "前端",
-      app: "web",
-      hotUpdate: "是",
-      upgrade: "否",
-      branchAndDev: "emergency_nx-hotfix",
-      desc: "",
-      remark: ""
-    }];
-
-    const secondData = [{
-      onlineDev: "集群3",
-      upgradeInte: "前端接口",
-      intService: "basebi",
-      hotUpdate: "是",
-      intMethod: "get",
-      intURL: "/basebi/Evaluate/......",
-      tenant: "全量用户",
-      remark: ""
-    }];
-
-    firstUpSerGridApi.current?.setRowData(firstData);
-    secondUpSerGridApi.current?.setRowData(secondData);
-  };
-
-  /* endregion */
-
-  /* region 动态增删tab */
+  /* region Tabs 标签页事件 */
 
   const initialPanes = [
     {
@@ -682,7 +659,6 @@ const PreRelease: React.FC<any> = () => {
 
   /* endregion */
 
-
   const {data} = useRequest(() => loadPrjNameSelect());
 
   const showProject = () => {
@@ -715,15 +691,6 @@ const PreRelease: React.FC<any> = () => {
       intURL: "/basebi/Evaluate/......",
       tenant: "全量用户",
       remark: ""
-    }, {
-      onlineDev: "集群9",
-
-      intService: "basebi",
-      hotUpdate: "是",
-      intMethod: "get",
-      intURL: "/basebi/Evaluate/......",
-      tenant: "全量用户",
-      remark: ""
     }]);
 
     firstOnlineBranchGridApi.current?.setRowData([{
@@ -747,10 +714,11 @@ const PreRelease: React.FC<any> = () => {
     showProject();
 
   }, [data]);
+
   return (
     <PageContainer style={{marginTop: -30}}>
 
-      {/* Tabs 标签 */}
+      {/* Tabs 标签,固定在上面 */}
       <div>
         <Tabs
           type="editable-card"
@@ -768,71 +736,221 @@ const PreRelease: React.FC<any> = () => {
       </div>
 
       {/* 其他控件 */}
-      <div style={{marginTop: -15, backgroundColor: "white"}}>
+      <div style={{marginTop: -10, backgroundColor: "white"}}>
+        {/* 用于占位 */}
+        <div style={{height: 5}}></div>
+
+        {/* 检查总览 */}
+        <div style={{marginLeft: 5}}>
+
+          <label style={{fontWeight: "bold"}}>检查总览：</label>
+          <label>
+            <button style={{height: 13, width: 13, border: "none", backgroundColor: "#2BF541"}}></button>
+            &nbsp;预发布项目已填写完成
+          </label>
+
+          <label style={{marginLeft: 15}}>
+            <button style={{height: 13, width: 13, border: "none", backgroundColor: "#2BF541"}}></button>
+            &nbsp;升级服务已确认完成
+          </label>
+
+          <label style={{marginLeft: 15}}>
+            <button style={{height: 13, width: 13, border: "none", backgroundColor: "#2BF541"}}></button>
+            &nbsp;数据Review确认完成
+          </label>
+
+          <label style={{marginLeft: 15}}>
+            <button style={{height: 13, width: 13, border: "none", backgroundColor: "Gainsboro"}}></button>
+            &nbsp;上线前检查已完成
+          </label>
+
+          <label style={{marginLeft: 15}}>
+            <label style={{fontWeight: "bold"}}>发布状态总览：</label>
+            未完成
+          </label>
+
+          <label style={{marginLeft: 15}}>
+            <label style={{fontWeight: "bold"}}>发布结果：</label>
+            <Select size={"small"} style={{width: 100}}>
+              <Option value="">空</Option>
+              <Option value="lucy">Lucy</Option>
+            </Select>
+          </label>
+
+        </div>
 
         {/* 预发布项目 */}
-        <fieldset className={"fieldStyle"}>
-          <legend className={"legendStyle"}>Step1 预发布项目</legend>
+        <div>
+          <fieldset className={"fieldStyle"}>
+            <legend className={"legendStyle"}>Step1 预发布项目</legend>
 
-          <div style={{marginBottom: -20, marginTop: -5}}>
-            <div style={{float: "right"}}>
-              <Button type="primary"
-                      style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, marginLeft: 10}}
-                      onClick={saveProjects}>保存 </Button>
+            <div style={{marginBottom: -20, marginTop: -5}}>
+
+
+              <div style={{float: "right"}}>
+                <Button type="primary"
+                        style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, marginLeft: 10}}
+                        onClick={saveProjects}>点击保存 </Button>
+              </div>
+
+              <div>
+                <Form form={formForDutyNameModify}>
+                  <Row>
+                    <Col span={9}>
+
+                      {/* 项目名称 */}
+                      <Form.Item label="项目名称:" name="projectsName">
+                        <Select showSearch mode="multiple">
+                          {projectsArray}
+                        </Select>
+                      </Form.Item>
+                    </Col>
+
+                    <Col span={5}>
+
+                      {/* 发布类型 */}
+                      <Form.Item label="发布类型:" name="pulishType" style={{marginLeft: 5}}>
+                        <Select>
+
+                        </Select>
+                      </Form.Item>
+                    </Col>
+
+                    <Col span={5}>
+
+                      {/* 发布方式 */}
+                      <Form.Item label="发布方式:" name="pulishMethod" style={{marginLeft: 5}}>
+                        <Select>
+
+                        </Select>
+                      </Form.Item>
+                    </Col>
+
+                    <Col span={5}>
+                      {/* 发布时间 */}
+                      <Form.Item label="发布时间:" name="pulishTime" style={{marginLeft: 5}}>
+                        <DatePicker style={{width: "100%"}}/>
+                      </Form.Item>
+                    </Col>
+
+                  </Row>
+
+                </Form>
+              </div>
             </div>
 
-            <div>
-              <Form form={formForDutyNameModify}>
-                <Form.Item label="项目名称:" name="projectsName">
-                  <Select showSearch mode="multiple">
-                    {projectsArray}
-                  </Select>
-                </Form.Item>
-              </Form>
+            {/* 编辑人信息 */}
+            <div style={{marginTop: 5}}>
+              <label> 编辑人：罗天刚</label>
+              <label style={{marginLeft: 20}}> 编辑时间：2021-12-08 16：10：40</label>
             </div>
-          </div>
 
-        </fieldset>
+          </fieldset>
+        </div>
 
         {/* 升级服务 */}
-        <fieldset className={"fieldStyle"}>
-          <legend className={"legendStyle"}>Step2 升级服务</legend>
-
-          <div>
+        <div>
+          <fieldset className={"fieldStyle"}>
+            <legend className={"legendStyle"}>Step2 升级服务</legend>
 
             <div>
 
-              <div style={{height: 35, marginTop: -15, overflow: "hidden"}}>
+              <div>
 
-                <label> 测试环境： </label>
-                <Select size={"small"} style={{minWidth: 140, width: '10%'}}>
+                <div style={{height: 35, marginTop: -15, overflow: "hidden"}}>
+                  <Row>
+                    <Col span={9}>
 
-                </Select>
+                      {/* 测试环境 */}
+                      <Form.Item label="测试环境:" name="projectsName">
+                        <Select showSearch mode="multiple" size={"small"} style={{width: '100%'}}>
 
-                <label style={{marginLeft: 10}}> 一键部署ID： </label>
-                <Select size={"small"} style={{minWidth: 90, width: '10%'}} showSearch>
+                        </Select>
+                      </Form.Item>
+                    </Col>
 
-                </Select>
+                    <Col span={8}>
 
-                <Button
-                  size={"small"}
-                  type="primary"
-                  style={{
-                    color: '#46A0FC',
-                    backgroundColor: "#ECF5FF",
-                    borderRadius: 5,
-                    marginLeft: 10
-                  }}>查询 </Button>
+                      {/* 一键部署ID */}
+                      <Form.Item label="一键部署ID:" name="pulishType" style={{marginLeft: 10}}>
+                        <Select mode="multiple" size={"small"} style={{width: '100%'}} showSearch>
 
+                        </Select>
+                      </Form.Item>
+                    </Col>
+
+                    <Col span={7}>
+
+                      <Button size={"small"} type="primary"
+                              style={{
+                                color: '#46A0FC',
+                                backgroundColor: "#ECF5FF",
+                                borderRadius: 5,
+                                marginLeft: 10,
+                                marginTop: 3
+                              }}>点击查询</Button>
+                    </Col>
+
+                  </Row>
+
+
+                </div>
+
+                <div>
+
+                  <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+                    <AgGridReact
+
+                      columnDefs={firstUpSerColumn} // 定义列
+                      // rowData={[]} // 数据绑定
+                      defaultColDef={{
+                        resizable: true,
+                        sortable: true,
+                        suppressMenu: true,
+                        cellStyle: {"line-height": "25px"},
+                      }}
+                      headerHeight={25}
+                      rowHeight={25}
+                      onGridReady={onFirstGridReady}
+                      onGridSizeChanged={onChangeFirstGridReady}
+                      onColumnEverythingChanged={onChangeFirstGridReady}
+                    >
+                    </AgGridReact>
+                  </div>
+
+                  <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+
+                    <AgGridReact
+                      columnDefs={secondUpSerColumn} // 定义列
+                      // rowData={[]} // 数据绑定
+                      defaultColDef={{
+                        resizable: true,
+                        sortable: true,
+                        suppressMenu: true,
+                        cellStyle: {"line-height": "25px"},
+                      }}
+                      getRowStyle={ChangRowColor}
+                      headerHeight={25}
+                      rowHeight={25}
+                      onGridReady={onSecondGridReady}
+                      onGridSizeChanged={onChangeSecondGridReady}
+                      onColumnEverythingChanged={onChangeSecondGridReady}
+                    >
+                    </AgGridReact>
+
+                  </div>
+
+                </div>
 
               </div>
 
               <div>
+                <div style={{fontWeight: "bold"}}> 服务确认完成</div>
 
                 <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
-                  <AgGridReact
 
-                    columnDefs={firstUpSerColumn} // 定义列
+                  <AgGridReact
+                    columnDefs={thirdUpSerColumn} // 定义列
                     // rowData={[]} // 数据绑定
                     defaultColDef={{
                       resizable: true,
@@ -842,87 +960,71 @@ const PreRelease: React.FC<any> = () => {
                     }}
                     headerHeight={25}
                     rowHeight={25}
-                    onGridReady={onFirstGridReady}
-                    onGridSizeChanged={onChangeFirstGridReady}
-                    onColumnEverythingChanged={onChangeFirstGridReady}
-                  >
-                  </AgGridReact>
-                </div>
-
-                <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
-
-                  <AgGridReact
-                    columnDefs={secondUpSerColumn} // 定义列
-                    // rowData={[]} // 数据绑定
-                    defaultColDef={{
-                      resizable: true,
-                      sortable: true,
-                      suppressMenu: true,
-                      cellStyle: {"line-height": "25px"},
-                    }}
-                    getRowStyle={ChangRowColor}
-                    headerHeight={25}
-                    rowHeight={25}
-                    onGridReady={onSecondGridReady}
-                    onGridSizeChanged={onChangeSecondGridReady}
-                    onColumnEverythingChanged={onChangeSecondGridReady}
+                    onGridReady={onthirdGridReady}
+                    onGridSizeChanged={onChangeThirdGridReady}
+                    onColumnEverythingChanged={onChangeThirdGridReady}
                   >
                   </AgGridReact>
 
                 </div>
-
               </div>
-            </div>
 
-            <div>
-              <div style={{fontWeight: "bold"}}> 服务确认完成</div>
-
-              <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
-
-                <AgGridReact
-                  columnDefs={thirdUpSerColumn} // 定义列
-                  // rowData={[]} // 数据绑定
-                  defaultColDef={{
-                    resizable: true,
-                    sortable: true,
-                    suppressMenu: true,
-                    cellStyle: {"line-height": "25px"},
-                  }}
-                  headerHeight={25}
-                  rowHeight={25}
-                  onGridReady={onthirdGridReady}
-                  onGridSizeChanged={onChangeThirdGridReady}
-                  onColumnEverythingChanged={onChangeThirdGridReady}
-                >
-                </AgGridReact>
-
+              {/*  提示标签 */}
+              <div style={{fontSize: "smaller", marginTop: 10}}>
+                1、先选择【构建环境】，在选择【一键部署ID】，点击查询按钮，自动获取并展示发布的应用集合；
+                <br/>
+                2、发布项为前端、后端、流程时，分支和环境提供上线分支/测试环境，说明填写更新服务；
+                <br/>
+                3、发布项为前端镜像、后端镜像、流程镜像时，分支和环境提供镜像版本号，说明填写提供镜像/版本名称；
+                <br/>
+                4、发布项为接口时，分支和环境处提供具体接口，说明填写method：接口升级，租户升级说明。
               </div>
+
             </div>
 
 
-            {/*  提示标签 */}
-            <div>
-              这里显示操作的提示信息
-            </div>
-
-          </div>
-
-
-        </fieldset>
+          </fieldset>
+        </div>
 
         {/* 数据修复Review */}
-        <fieldset className={"fieldStyle"}>
-          <legend className={"legendStyle"}>Step3 数据修复Review</legend>
-
-          <div>
+        <div>
+          <fieldset className={"fieldStyle"}>
+            <legend className={"legendStyle"}>Step3 数据修复Review</legend>
 
             <div>
-              {/* ag-grid 表格 */}
-              <div>
-                <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
-                  <AgGridReact
 
-                    columnDefs={firstDataReviewColumn} // 定义列
+              <div>
+                {/* ag-grid 表格 */}
+                <div>
+                  <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+                    <AgGridReact
+
+                      columnDefs={firstDataReviewColumn} // 定义列
+                      // rowData={[]} // 数据绑定
+                      defaultColDef={{
+                        resizable: true,
+                        sortable: true,
+                        suppressMenu: true,
+                        cellStyle: {"line-height": "25px"},
+                      }}
+                      headerHeight={25}
+                      rowHeight={25}
+                      onGridReady={onfirstDataReviewGridReady}
+                      onGridSizeChanged={onChangefirstDataReviewGridReady}
+                      onColumnEverythingChanged={onChangefirstDataReviewGridReady}
+                    >
+                    </AgGridReact>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div style={{fontWeight: "bold"}}> Review确认完成</div>
+
+                <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+
+                  <AgGridReact
+                    columnDefs={secondDataReviewColumn} // 定义列
                     // rowData={[]} // 数据绑定
                     defaultColDef={{
                       resizable: true,
@@ -932,104 +1034,94 @@ const PreRelease: React.FC<any> = () => {
                     }}
                     headerHeight={25}
                     rowHeight={25}
-                    onGridReady={onfirstDataReviewGridReady}
-                    onGridSizeChanged={onChangefirstDataReviewGridReady}
-                    onColumnEverythingChanged={onChangefirstDataReviewGridReady}
+                    onGridReady={onsecondDataReviewGridReady}
+                    onGridSizeChanged={onChangesecondDataReviewGridReady}
+                    onColumnEverythingChanged={onChangesecondDataReviewGridReady}
                   >
                   </AgGridReact>
+
                 </div>
               </div>
+
             </div>
-
-            <div>
-              <div style={{fontWeight: "bold"}}> Review确认完成</div>
-
-              <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
-
-                <AgGridReact
-                  columnDefs={secondDataReviewColumn} // 定义列
-                  // rowData={[]} // 数据绑定
-                  defaultColDef={{
-                    resizable: true,
-                    sortable: true,
-                    suppressMenu: true,
-                    cellStyle: {"line-height": "25px"},
-                  }}
-                  headerHeight={25}
-                  rowHeight={25}
-                  onGridReady={onsecondDataReviewGridReady}
-                  onGridSizeChanged={onChangesecondDataReviewGridReady}
-                  onColumnEverythingChanged={onChangesecondDataReviewGridReady}
-                >
-                </AgGridReact>
-
-              </div>
-            </div>
-
-          </div>
-        </fieldset>
+          </fieldset>
+        </div>
 
         {/* 上线分支 */}
-        <fieldset className={"fieldStyle"}>
-          <legend className={"legendStyle"}>Step4 上线分支</legend>
+        <div>
+          <fieldset className={"fieldStyle"}>
+            <legend className={"legendStyle"}>Step4 上线分支</legend>
 
-          <div>
-            {/* ag-grid 表格 */}
-            <div>
-              <div className="ag-theme-alpine" style={{height: 150, width: '100%'}}>
-                <AgGridReact
-
-                  columnDefs={firstOnlineBranchColumn} // 定义列
-                  // rowData={[]} // 数据绑定
-                  defaultColDef={{
-                    resizable: true,
-                    sortable: true,
-                    suppressMenu: true,
-                    autoHeight: true,
-                  }}
-                  headerHeight={25}
-                  onGridReady={onfirstOnlineBranchGridReady}
-                  onGridSizeChanged={onChangefirstOnlineBranchGridReady}
-                  onColumnEverythingChanged={onChangefirstOnlineBranchGridReady}
-                >
-                </AgGridReact>
-              </div>
-            </div>
-          </div>
-
-        </fieldset>
-
-        {/* 对应工单 */}
-        <fieldset className={"fieldStyle"}>
-          <legend className={"legendStyle"}>Step5 对应工单</legend>
-          <div>
             <div>
               {/* ag-grid 表格 */}
               <div>
-                <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+                <div className="ag-theme-alpine" style={{height: 150, width: '100%'}}>
                   <AgGridReact
 
-                    columnDefs={firstListColumn} // 定义列
+                    columnDefs={firstOnlineBranchColumn} // 定义列
                     // rowData={[]} // 数据绑定
                     defaultColDef={{
                       resizable: true,
                       sortable: true,
                       suppressMenu: true,
-                      cellStyle: {"line-height": "25px"},
+                      autoHeight: true,
                     }}
                     headerHeight={25}
-                    rowHeight={25}
-                    onGridReady={onfirstListGridReady}
-                    onGridSizeChanged={onChangefirstListGridReady}
-                    onColumnEverythingChanged={onChangefirstListGridReady}
+                    onGridReady={onfirstOnlineBranchGridReady}
+                    onGridSizeChanged={onChangefirstOnlineBranchGridReady}
+                    onColumnEverythingChanged={onChangefirstOnlineBranchGridReady}
                   >
                   </AgGridReact>
                 </div>
               </div>
+              <div style={{fontSize: "smaller", marginTop: 10}}>
+                1、版本检查、环境一致性检查、自动化检查，默认开启自动检查，每个小时检查1次，可关闭自动检查，在需要的时间节点，点击手动触发按钮，进行按需检查；
+                <br/>
+                2、检查状态分为：是、否、检查中、未开始、忽略等5种状态；
+                <br/>
+                3、点击检查日志链接，可以进入检查的详情页面。
+              </div>
             </div>
-          </div>
 
-        </fieldset>
+          </fieldset>
+        </div>
+
+        {/* 对应工单 */}
+        <div>
+          <fieldset className={"fieldStyle"}>
+            <legend className={"legendStyle"}>Step5 对应工单</legend>
+            <div>
+              <div>
+                {/* ag-grid 表格 */}
+                <div>
+                  <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+                    <AgGridReact
+
+                      columnDefs={firstListColumn} // 定义列
+                      // rowData={[]} // 数据绑定
+                      defaultColDef={{
+                        resizable: true,
+                        sortable: true,
+                        suppressMenu: true,
+                        cellStyle: {"line-height": "25px"},
+                      }}
+                      headerHeight={25}
+                      rowHeight={25}
+                      onGridReady={onfirstListGridReady}
+                      onGridSizeChanged={onChangefirstListGridReady}
+                      onColumnEverythingChanged={onChangefirstListGridReady}
+                    >
+                    </AgGridReact>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style={{fontSize: "smaller", marginTop: 10}}>
+              注：根据预发布批次号每隔2分钟定时从运维平台同步一次相关工单信息
+            </div>
+          </fieldset>
+        </div>
+
       </div>
     </PageContainer>
   );

@@ -378,10 +378,10 @@ const PreRelease: React.FC<any> = () => {
         <div style="text-align: right" >
 
             <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
-              <img src="../excute.png" width="14" height="14" alt="执行参数" title="执行参数">
+              <img src="../执行.png" width="14" height="14" alt="执行参数" title="执行参数">
             </Button>
             <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
-              <img src="../url.png" width="14" height="14" alt="执行参数" title="执行参数">
+              <img src="../taskUrl.png" width="14" height="14" alt="执行参数" title="执行参数">
             </Button>
         </div>
 
@@ -401,7 +401,7 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '序号',
       field: 'No',
-      maxWidth: 80,
+      maxWidth: 90,
       cellRenderer: (params: any) => {
         return Number(params.node.id) + 1;
       },

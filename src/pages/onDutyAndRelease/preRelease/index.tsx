@@ -45,6 +45,8 @@ const loadPrjNameSelect = async () => {
 const PreRelease: React.FC<any> = () => {
 
   /* region 表格相关定义和事件 */
+
+  // 操作按钮渲染
   const operateRenderer = (params: any) => {
     const paramData = JSON.stringify(params.data);
     return `
@@ -76,7 +78,7 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '应用',
-      field: 'app',
+      field: 'application',
     },
     {
       headerName: '是否支持热更新',
@@ -84,7 +86,7 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '是否涉及接口与数据库升级',
-      field: 'upgrade',
+      field: 'upGrade',
     },
     {
       headerName: '分支和环境',
@@ -159,7 +161,7 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '涉及租户',
-      field: 'tenant',
+      field: 'relateRenter',
     },
     {
       headerName: '备注',
@@ -197,52 +199,53 @@ const PreRelease: React.FC<any> = () => {
   const thirdUpSerColumn = [
     {
       headerName: '前端值班',
-      field: 'onlineDev',
+      field: 'frontDuty',
     },
     {
       headerName: '服务确认完成',
-      // checkboxSelection: true,
+      field: 'frontConfirm',
       minWidth: 110,
-      field: 'upgradeInte',
-      // cellRenderer: () => {
-      //   return ` <input style="color: red;margin-top: -10px;" type="checkbox" value="" />`;
-      // }
+
     },
     {
       headerName: '确认时间',
-      field: 'intService',
+      field: 'frontConfirmTime',
     },
     {
       headerName: '后端值班',
-      field: 'hotUpdate',
+      field: 'backendDuty',
     },
     {
       headerName: '服务确认完成',
-      field: 'intMethod',
+      field: 'backendConfirm',
     },
     {
       headerName: '确认时间',
-      field: 'intURL',
+      field: 'backendConfirmTime',
     },
     {
       headerName: '流程确认',
-      field: 'editor',
+      field: 'flowConfirm',
     },
     {
       headerName: '服务确认完成',
-      field: 'editeTime',
+      field: 'flowConfirmOk',
     },
     {
       headerName: '确认时间',
-      field: 'tenant',
+      field: 'flowConfirmTime',
     },
     {
       headerName: '测试值班',
-      field: '服务确认完成',
+      field: 'testDutt',
+    },
+    {
+      headerName: '服务确认完成',
+      field: 'testConfirm',
     },
     {
       headerName: '确认时间',
-      field: 'confirmTime',
+      field: 'testConfirmTime',
     }];
   const thirdUpSerGridApi = useRef<GridApi>();
   const onthirdGridReady = (params: GridReadyEvent) => {
@@ -262,27 +265,27 @@ const PreRelease: React.FC<any> = () => {
   const firstDataReviewColumn = [
     {
       headerName: '序号',
-      field: 'onlineDev',
+      field: 'No',
     },
     {
       headerName: '把数据修复内容',
-      field: 'upgradeInte',
+      field: 'repaireContent',
     },
     {
       headerName: '涉及租户',
-      field: 'intService',
+      field: 'relateRenter',
     },
     {
       headerName: '类型',
-      field: 'hotUpdate',
+      field: 'Type',
     },
     {
       headerName: '修复提交人',
-      field: 'intMethod',
+      field: 'repaireCommiter',
     },
     {
       headerName: '分支',
-      field: 'intURL',
+      field: 'branch',
     },
     {
       headerName: '编辑人',
@@ -294,11 +297,11 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '评审结果',
-      field: 'tenant',
+      field: 'ReviewResult',
     },
     {
       headerName: '是否可重复执行',
-      field: '服务确认完成',
+      field: 'repeatExcute',
     },
     {
       headerName: '操作',
@@ -322,15 +325,15 @@ const PreRelease: React.FC<any> = () => {
   const secondDataReviewColumn = [
     {
       headerName: '后端值班',
-      field: 'hotUpdate',
+      field: 'backendDuty',
     },
     {
       headerName: '服务确认完成',
-      field: 'intMethod',
+      field: 'backendComfirm',
     },
     {
       headerName: '确认时间',
-      field: 'intURL',
+      field: 'backendComfirmTime',
     }];
   const secondDataReviewGridApi = useRef<GridApi>();
   const onsecondDataReviewGridReady = (params: GridReadyEvent) => {

@@ -2,7 +2,7 @@
  * @Description: 项目过程质量的字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:47:07
- * @LastEditTime: 2021-11-29 16:29:21
+ * @LastEditTime: 2021-12-08 17:05:06
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -29,48 +29,45 @@ const customSort = (targetKey: string) => ({
 });
 
 /* 项目过程质量 */
-export const ProcessQualityCols: ColGroupDef = {
-  headerName: '过程质量',
-  children: [
-    {
-      headerName: `ReOpen率(${PERCENTAGE['unit']})`,
-      field: 'projectQuality',
-      cellRenderer: 'reopenRatio',
-      cellRendererParams: { delta: PERCENTAGE['value'] },
-      ...ratioW,
-      ...customSort('reopenRatio'),
-    },
-    {
-      headerName: '千行Bug率',
-      field: '',
-      columnGroupShow: SHOW['open'],
-      ...ratioW,
-    },
-    {
-      headerName: '单元覆盖率',
-      field: 'unitCover',
-      columnGroupShow: SHOW['open'],
-      ...ratioW,
-    },
-    {
-      headerName: `回归时长(${HOUR['unit']})`,
-      field: 'projectQuality',
-      columnGroupShow: SHOW['open'],
-      cellRenderer: 'bugFlybackDura',
-      cellRendererParams: { delta: HOUR['value'] },
-      ...doubleNumberW,
-      ...customSort('bugFlybackDura'),
-    },
-    {
-      headerName: '用例覆盖率',
-      field: '',
-      columnGroupShow: SHOW['open'],
-      ...ratioW,
-    },
-    {
-      headerName: '加权遗留DI',
-      columnGroupShow: SHOW['open'],
-      field: '',
-    },
-  ],
-};
+export const ProcessQualityCols = [
+  {
+    headerName: `ReOpen率(${PERCENTAGE['unit']})`,
+    field: 'projectQuality',
+    cellRenderer: 'reopenRatio',
+    cellRendererParams: { delta: PERCENTAGE['value'] },
+    ...ratioW,
+    ...customSort('reopenRatio'),
+  },
+  {
+    headerName: '千行Bug率',
+    field: '',
+    columnGroupShow: SHOW['open'],
+    ...ratioW,
+  },
+  {
+    headerName: '单元覆盖率',
+    field: 'unitCover',
+    columnGroupShow: SHOW['open'],
+    ...ratioW,
+  },
+  {
+    headerName: `回归时长(${HOUR['unit']})`,
+    field: 'projectQuality',
+    columnGroupShow: SHOW['open'],
+    cellRenderer: 'bugFlybackDura',
+    cellRendererParams: { delta: HOUR['value'] },
+    ...doubleNumberW,
+    ...customSort('bugFlybackDura'),
+  },
+  {
+    headerName: '用例覆盖率',
+    field: '',
+    columnGroupShow: SHOW['open'],
+    ...ratioW,
+  },
+  {
+    headerName: '加权遗留DI',
+    columnGroupShow: SHOW['open'],
+    field: '',
+  },
+];

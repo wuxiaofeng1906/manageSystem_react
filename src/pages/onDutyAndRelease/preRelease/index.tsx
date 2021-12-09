@@ -45,19 +45,32 @@ const loadPrjNameSelect = async () => {
 const PreRelease: React.FC<any> = () => {
 
   /* region 表格相关定义和事件 */
+  // 新增行
+  (window as any).addRows = (params: any) => {
 
+  };
+
+  // 修改行
+  (window as any).modifyRows = (params: any) => {
+
+  };
+
+  // 删除行
+  (window as any).deleteRows = (params: any) => {
+
+  };
   // 操作按钮渲染
   const operateRenderer = (params: any) => {
     const paramData = JSON.stringify(params.data);
     return `
         <div style="margin-top: -5px">
-            <Button  style="border: none; background-color: transparent; " onclick='showParams(${paramData})'>
+            <Button  style="border: none; background-color: transparent; " onclick='addRows(${paramData})'>
               <img src="../add_1.png" width="15" height="15" alt="新增" title="新增">
             </Button>
-             <Button  style="border: none; background-color: transparent;  margin-left: -10px; " onclick='showParams(${paramData})'>
+             <Button  style="border: none; background-color: transparent;  margin-left: -10px; " onclick='modifyRows(${paramData})'>
               <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
             </Button>
-            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='showParams(${paramData})'>
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteRows(${paramData})'>
               <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
             </Button>
         </div>
@@ -65,7 +78,7 @@ const PreRelease: React.FC<any> = () => {
 
   };
 
-  // 改变行的颜色
+  // 改变行的颜色（正在编辑的行颜色）
   const ChangRowColor = (params: any) => {
     if (params.data?.onlineDev === "集群1") {
 
@@ -822,9 +835,7 @@ const PreRelease: React.FC<any> = () => {
 
   /* region  预发布项目 */
   const [formForDutyNameModify] = Form.useForm();
-
   const projectsArray = useRequest(() => loadPrjNameSelect()).data;
-
   // 保存预发布项目
   const savePreRelaseProjects = async () => {
 
@@ -870,6 +881,7 @@ const PreRelease: React.FC<any> = () => {
     }
   };
   /* endregion */
+
   /* region Tabs 标签页事件 */
 
   const initialPanes = [
@@ -973,8 +985,6 @@ const PreRelease: React.FC<any> = () => {
 
   /* endregion */
 
-  const {data} = useRequest(() => loadPrjNameSelect());
-
   const showProject = () => {
 
     // 升级服务 一
@@ -1076,11 +1086,10 @@ const PreRelease: React.FC<any> = () => {
     });
   };
 
-
   useEffect(() => {
     showProject();
 
-  }, [data]);
+  }, [projectsArray]);
 
   return (
     <PageContainer style={{marginTop: -30}}>

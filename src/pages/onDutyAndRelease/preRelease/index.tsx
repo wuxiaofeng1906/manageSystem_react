@@ -65,6 +65,17 @@ const PreRelease: React.FC<any> = () => {
 
   };
 
+  // 改变行的颜色
+  const ChangRowColor = (params: any) => {
+    if (params.data?.onlineDev === "集群1") {
+
+      // 上下设置颜色
+      return {'background-color': '#FFF6F6'};
+
+    }
+    return {'background-color': 'transparent'};
+  };
+
   /* region 升级服务 一 */
   const firstUpSerGridApi = useRef<GridApi>();
   const firstUpSerColumn = [
@@ -75,10 +86,12 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '发布项',
       field: 'pulishItem',
+      minWidth: 75
     },
     {
       headerName: '应用',
       field: 'application',
+      minWidth: 65
     },
     {
       headerName: '是否支持热更新',
@@ -95,6 +108,7 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '编辑人',
       field: 'editor',
+      minWidth: 75
     },
     {
       headerName: '编辑时间',
@@ -154,6 +168,7 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '编辑人',
       field: 'editor',
+      minWidth: 75
     },
     {
       headerName: '编辑时间',
@@ -185,16 +200,6 @@ const PreRelease: React.FC<any> = () => {
   /* endregion   */
 
   /* region 升级服务 三  */
-
-  const ChangRowColor = (params: any) => {
-    if (params.data?.onlineDev === "集群1") {
-
-      // 上下设置颜色
-      return {'background-color': '#FFF6F6'};
-
-    }
-    return {'background-color': 'transparent'};
-  };
 
   const thirdUpSerColumn = [
     {
@@ -262,10 +267,12 @@ const PreRelease: React.FC<any> = () => {
 
   /*  region 数据修复 Review 一 */
 
-  const firstDataReviewColumn = [
+  const firstDataReviewColumn: any = [
     {
       headerName: '序号',
       field: 'No',
+      minWidth: 65,
+      maxWidth: 70,
       cellRenderer: (params: any) => {
         return Number(params.node.id) + 1;
       },
@@ -281,6 +288,7 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '类型',
       field: 'type',
+      minWidth: 65
     },
     {
       headerName: '修复提交人',
@@ -293,6 +301,7 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '编辑人',
       field: 'editor',
+      minWidth: 75
     },
     {
       headerName: '编辑时间',
@@ -399,12 +408,12 @@ const PreRelease: React.FC<any> = () => {
 
   };
 
-
   const firstOnlineBranchColumn: any = [
     {
       headerName: '序号',
       field: 'No',
       minWidth: 65,
+      maxWidth: 70,
       cellRenderer: (params: any) => {
         return Number(params.node.id) + 1;
       },
@@ -466,10 +475,12 @@ const PreRelease: React.FC<any> = () => {
 
   /*  region 对应工单 */
 
-  const firstListColumn = [
+  const firstListColumn: any = [
     {
       headerName: '序号',
       field: 'No',
+      minWidth: 65,
+      maxWidth: 70,
       cellRenderer: (params: any) => {
         return Number(params.node.id) + 1;
       },
@@ -905,98 +916,97 @@ const PreRelease: React.FC<any> = () => {
         <div>
           <fieldset className={"fieldStyle"}>
             <legend className={"legendStyle"}>Step2 升级服务</legend>
-
             <div>
+              {/* 条件查询 */}
+              <div style={{height: 35, marginTop: -15, overflow: "hidden"}}>
+                <Row>
+                  <Col span={9}>
 
+                    {/* 测试环境 */}
+                    <Form.Item label="测试环境:" name="projectsName">
+                      <Select showSearch mode="multiple" size={"small"} style={{width: '100%'}}>
+
+                      </Select>
+                    </Form.Item>
+                  </Col>
+
+                  <Col span={8}>
+
+                    {/* 一键部署ID */}
+                    <Form.Item label="一键部署ID:" name="pulishType" style={{marginLeft: 10}}>
+                      <Select mode="multiple" size={"small"} style={{width: '100%'}} showSearch>
+
+                      </Select>
+                    </Form.Item>
+                  </Col>
+
+                  <Col span={7}>
+
+                    <Button size={"small"} type="primary"
+                            style={{
+                              color: '#46A0FC',
+                              backgroundColor: "#ECF5FF",
+                              borderRadius: 5,
+                              marginLeft: 10,
+                              marginTop: 3
+                            }}>点击查询</Button>
+                  </Col>
+
+                </Row>
+              </div>
+              {/* 两个表格 */}
               <div>
 
-                <div style={{height: 35, marginTop: -15, overflow: "hidden"}}>
-                  <Row>
-                    <Col span={9}>
+                {/* 表格一 */}
+                <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+                  <AgGridReact
 
-                      {/* 测试环境 */}
-                      <Form.Item label="测试环境:" name="projectsName">
-                        <Select showSearch mode="multiple" size={"small"} style={{width: '100%'}}>
-
-                        </Select>
-                      </Form.Item>
-                    </Col>
-
-                    <Col span={8}>
-
-                      {/* 一键部署ID */}
-                      <Form.Item label="一键部署ID:" name="pulishType" style={{marginLeft: 10}}>
-                        <Select mode="multiple" size={"small"} style={{width: '100%'}} showSearch>
-
-                        </Select>
-                      </Form.Item>
-                    </Col>
-
-                    <Col span={7}>
-
-                      <Button size={"small"} type="primary"
-                              style={{
-                                color: '#46A0FC',
-                                backgroundColor: "#ECF5FF",
-                                borderRadius: 5,
-                                marginLeft: 10,
-                                marginTop: 3
-                              }}>点击查询</Button>
-                    </Col>
-
-                  </Row>
-
-
+                    columnDefs={firstUpSerColumn} // 定义列
+                    // rowData={[]} // 数据绑定
+                    defaultColDef={{
+                      resizable: true,
+                      sortable: true,
+                      suppressMenu: true,
+                      minWidth: 90,
+                      cellStyle: {"line-height": "25px"},
+                    }}
+                    getRowStyle={ChangRowColor}
+                    headerHeight={25}
+                    rowHeight={25}
+                    onGridReady={onFirstGridReady}
+                    onGridSizeChanged={onChangeFirstGridReady}
+                    onColumnEverythingChanged={onChangeFirstGridReady}
+                  >
+                  </AgGridReact>
                 </div>
 
-                <div>
+                {/* 表格二 */}
+                <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
 
-                  <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
-                    <AgGridReact
-
-                      columnDefs={firstUpSerColumn} // 定义列
-                      // rowData={[]} // 数据绑定
-                      defaultColDef={{
-                        resizable: true,
-                        sortable: true,
-                        suppressMenu: true,
-                        cellStyle: {"line-height": "25px"},
-                      }}
-                      headerHeight={25}
-                      rowHeight={25}
-                      onGridReady={onFirstGridReady}
-                      onGridSizeChanged={onChangeFirstGridReady}
-                      onColumnEverythingChanged={onChangeFirstGridReady}
-                    >
-                    </AgGridReact>
-                  </div>
-
-                  <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
-
-                    <AgGridReact
-                      columnDefs={secondUpSerColumn} // 定义列
-                      // rowData={[]} // 数据绑定
-                      defaultColDef={{
-                        resizable: true,
-                        sortable: true,
-                        suppressMenu: true,
-                        cellStyle: {"line-height": "25px"},
-                      }}
-                      getRowStyle={ChangRowColor}
-                      headerHeight={25}
-                      rowHeight={25}
-                      onGridReady={onSecondGridReady}
-                      onGridSizeChanged={onChangeSecondGridReady}
-                      onColumnEverythingChanged={onChangeSecondGridReady}
-                    >
-                    </AgGridReact>
-
-                  </div>
+                  <AgGridReact
+                    columnDefs={secondUpSerColumn} // 定义列
+                    // rowData={[]} // 数据绑定
+                    defaultColDef={{
+                      resizable: true,
+                      sortable: true,
+                      suppressMenu: true,
+                      cellStyle: {"line-height": "25px"},
+                      minWidth: 90
+                    }}
+                    headerHeight={25}
+                    rowHeight={25}
+                    getRowStyle={ChangRowColor}
+                    onGridReady={onSecondGridReady}
+                    onGridSizeChanged={onChangeSecondGridReady}
+                    onColumnEverythingChanged={onChangeSecondGridReady}
+                  >
+                  </AgGridReact>
 
                 </div>
 
               </div>
 
+              {/* 服务确认完成 */}
               <div>
                 <div style={{fontWeight: "bold"}}> 服务确认完成</div>
 
@@ -1004,12 +1014,12 @@ const PreRelease: React.FC<any> = () => {
 
                   <AgGridReact
                     columnDefs={thirdUpSerColumn} // 定义列
-                    // rowData={[]} // 数据绑定
                     defaultColDef={{
                       resizable: true,
                       sortable: true,
                       suppressMenu: true,
                       cellStyle: {"line-height": "25px"},
+                      minWidth: 90
                     }}
                     headerHeight={25}
                     rowHeight={25}
@@ -1034,8 +1044,6 @@ const PreRelease: React.FC<any> = () => {
               </div>
 
             </div>
-
-
           </fieldset>
         </div>
 
@@ -1045,32 +1053,32 @@ const PreRelease: React.FC<any> = () => {
             <legend className={"legendStyle"}>Step3 数据修复Review</legend>
 
             <div>
-
+              {/* 表格 一 */}
               <div>
-                {/* ag-grid 表格 */}
-                <div>
-                  <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
-                    <AgGridReact
+                <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+                  <AgGridReact
 
-                      columnDefs={firstDataReviewColumn} // 定义列
-                      // rowData={[]} // 数据绑定
-                      defaultColDef={{
-                        resizable: true,
-                        sortable: true,
-                        suppressMenu: true,
-                        cellStyle: {"line-height": "25px"},
-                      }}
-                      headerHeight={25}
-                      rowHeight={25}
-                      onGridReady={onfirstDataReviewGridReady}
-                      onGridSizeChanged={onChangefirstDataReviewGridReady}
-                      onColumnEverythingChanged={onChangefirstDataReviewGridReady}
-                    >
-                    </AgGridReact>
-                  </div>
+                    columnDefs={firstDataReviewColumn} // 定义列
+                    // rowData={[]} // 数据绑定
+                    defaultColDef={{
+                      resizable: true,
+                      sortable: true,
+                      suppressMenu: true,
+                      cellStyle: {"line-height": "25px"},
+                      minWidth: 90
+                    }}
+                    headerHeight={25}
+                    rowHeight={25}
+                    getRowStyle={ChangRowColor}
+                    onGridReady={onfirstDataReviewGridReady}
+                    onGridSizeChanged={onChangefirstDataReviewGridReady}
+                    onColumnEverythingChanged={onChangefirstDataReviewGridReady}
+                  >
+                  </AgGridReact>
                 </div>
               </div>
 
+              {/* 表格 二 */}
               <div>
                 <div style={{fontWeight: "bold"}}> Review确认完成</div>
 
@@ -1118,8 +1126,10 @@ const PreRelease: React.FC<any> = () => {
                       sortable: true,
                       suppressMenu: true,
                       autoHeight: true,
+                      minWidth: 90
                     }}
                     headerHeight={25}
+                    getRowStyle={ChangRowColor}
                     onGridReady={onfirstOnlineBranchGridReady}
                     onGridSizeChanged={onChangefirstOnlineBranchGridReady}
                     onColumnEverythingChanged={onChangefirstOnlineBranchGridReady}
@@ -1157,6 +1167,7 @@ const PreRelease: React.FC<any> = () => {
                         sortable: true,
                         suppressMenu: true,
                         cellStyle: {"line-height": "25px"},
+                        minWidth: 90
                       }}
                       headerHeight={25}
                       rowHeight={25}

@@ -200,12 +200,12 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '前端值班',
       field: 'frontDuty',
+      minWidth: 90,
     },
     {
       headerName: '服务确认完成',
       field: 'frontConfirm',
       minWidth: 110,
-
     },
     {
       headerName: '确认时间',
@@ -237,7 +237,7 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '测试值班',
-      field: 'testDutt',
+      field: 'testDuty',
     },
     {
       headerName: '服务确认完成',
@@ -266,6 +266,9 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '序号',
       field: 'No',
+      cellRenderer: (params: any) => {
+        return Number(params.node.id) + 1;
+      },
     },
     {
       headerName: '把数据修复内容',
@@ -277,7 +280,7 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '类型',
-      field: 'Type',
+      field: 'type',
     },
     {
       headerName: '修复提交人',
@@ -297,7 +300,7 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '评审结果',
-      field: 'ReviewResult',
+      field: 'reviewResult',
     },
     {
       headerName: '是否可重复执行',
@@ -401,7 +404,7 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '序号',
       field: 'No',
-      maxWidth: 90,
+      minWidth: 65,
       cellRenderer: (params: any) => {
         return Number(params.node.id) + 1;
       },
@@ -466,46 +469,49 @@ const PreRelease: React.FC<any> = () => {
   const firstListColumn = [
     {
       headerName: '序号',
-      field: 'hotUpdate',
+      field: 'No',
+      cellRenderer: (params: any) => {
+        return Number(params.node.id) + 1;
+      },
     },
     {
       headerName: '工单类型',
-      field: 'intMethod',
+      field: 'listType',
     },
     {
       headerName: '工单编号',
-      field: 'intURL',
+      field: 'listNo',
     },
     {
       headerName: '审批名称',
-      field: 'intURL',
+      field: 'approveName',
     },
     {
       headerName: '审批说明',
-      field: 'intURL',
+      field: 'approveDesc',
     },
     {
       headerName: '申请人',
-      field: 'intURL',
+      field: 'applier',
     },
     {
       headerName: '创建时间',
-      field: 'intURL',
+      field: 'createTime',
     },
     {
       headerName: '更新时间',
-      field: 'intURL',
+      field: 'updateTime',
     },
     {
       headerName: '工单状态',
-      field: 'intURL',
+      field: 'listStatus',
     },
     {
       headerName: '上步已审批人',
-      field: 'intURL',
+      field: 'lastApprover',
     }, {
       headerName: '当前待审批人',
-      field: 'intURL',
+      field: 'currentApprover',
     }];
   const firstListGridApi = useRef<GridApi>();
   const onfirstListGridReady = (params: GridReadyEvent) => {
@@ -665,16 +671,21 @@ const PreRelease: React.FC<any> = () => {
   const {data} = useRequest(() => loadPrjNameSelect());
 
   const showProject = () => {
+
+    // 升级服务 一
     firstUpSerGridApi.current?.setRowData([{
       onlineDev: "集群1",
       pulishItem: "前端",
-      app: "web",
+      application: "web",
       hotUpdate: "是",
-      upgrade: "否",
+      upGrade: "否",
       branchAndDev: "emergency_nx-hotfix",
-      desc: "",
-      remark: ""
+      editor: "吴晓风",
+      editeTime: "2021-12-09 13:10:10",
+      desc: "测试数据",
+      remark: "测试数据"
     }]);
+    // 升级服务 二
     secondUpSerGridApi.current?.setRowData([{
       onlineDev: "集群1",
       upgradeInte: "前端接口",
@@ -682,20 +693,45 @@ const PreRelease: React.FC<any> = () => {
       hotUpdate: "是",
       intMethod: "get",
       intURL: "/basebi/Evaluate/......",
-      tenant: "全量用户",
-      remark: ""
+      editor: "吴晓风",
+      editeTime: "2021-12-09 12:12:12",
+      relateRenter: "全量用户",
+      remark: "测试数据"
     }]);
+    // 升级服务 三
     thirdUpSerGridApi.current?.setRowData([{
-      onlineDev: "集群1",
-
-      intService: "basebi",
-      hotUpdate: "是",
-      intMethod: "get",
-      intURL: "/basebi/Evaluate/......",
-      tenant: "全量用户",
-      remark: ""
+      frontDuty: "欧兴杨",
+      frontConfirm: "是",
+      frontConfirmTime: "2021-12-08 10:10:10",
+      backendDuty: "刘云鹏",
+      backendConfirm: "是",
+      backendConfirmTime: "2021-12-08 10:10:17",
+      flowConfirm: "杨期成",
+      flowConfirmOk: "否",
+      flowConfirmTime: "",
+      testDuty: "徐超",
+      testConfirm: "否",
+      testConfirmTime: ""
     }]);
-
+    // 数据修复Review 一
+    firstDataReviewGridApi.current?.setRowData([{
+      repaireContent: "测试数据一条",
+      relateRenter: "all",
+      type: "after",
+      repaireCommiter: "任毅",
+      branch: "hotfix",
+      editor: "欧治成",
+      editeTime: "2021-12-09 12:12:12",
+      reviewResult: "通过",
+      repeatExcute: "是",
+    }]);
+    // 数据修复Review 二
+    secondDataReviewGridApi.current?.setRowData([{
+      backendDuty: "刘云鹏",
+      backendComfirm: "是",
+      backendComfirmTime: "2021-12-09 14:12:12",
+    }]);
+    // 上线分支
     firstOnlineBranchGridApi.current?.setRowData([{
       branchName: "release",
       module: "前后端",
@@ -705,7 +741,21 @@ const PreRelease: React.FC<any> = () => {
       passAutoCheckbf: "未开始",
       passAutoCheckaf: "未开始",
       sealStatus: {"前端": "已封版", "后端": "未封板"},
-    }])
+    }]);
+    // 对应工单
+    firstListGridApi.current?.setRowData([{
+      listType: "蓝绿发布",
+      listNo: "3124",
+      approveName: "emergency20211126发布",
+      approveDesc: "emergency20211126发布",
+      applier: "徐超",
+      createTime: "2021-11-25 07:50:11",
+      updateTime: "2021-11-25 07:50:11",
+      listStatus: "验证通过后审批",
+      lastApprover: "黄义森",
+      currentApprover: "徐超"
+    }]);
+
     // 先显示第一个界面的数据
     formForDutyNameModify.setFieldsValue({
       projectsName: "测试"

@@ -76,6 +76,18 @@ const PreRelease: React.FC<any> = () => {
     return {'background-color': 'transparent'};
   };
 
+  // 下拉框相关字段的颜色渲染
+  const selectColorRenderer = (params: any) => {
+
+    let Color = "orange";
+    const values = params.value;
+    if (values === "是") {
+      Color = "#2BF541"
+    }
+
+    return `<span style="color: ${Color}"> ${values}</span>`
+  };
+
   /* region 升级服务 一 */
   const firstUpSerGridApi = useRef<GridApi>();
   const firstUpSerColumn = [
@@ -211,6 +223,10 @@ const PreRelease: React.FC<any> = () => {
       headerName: '服务确认完成',
       field: 'frontConfirm',
       minWidth: 110,
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {values: ["是", "否"]},
+      cellRenderer: selectColorRenderer
     },
     {
       headerName: '确认时间',
@@ -223,6 +239,10 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '服务确认完成',
       field: 'backendConfirm',
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {values: ["是", "否"]},
+      cellRenderer: selectColorRenderer
     },
     {
       headerName: '确认时间',
@@ -235,6 +255,10 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '服务确认完成',
       field: 'flowConfirmOk',
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {values: ["是", "否"]},
+      cellRenderer: selectColorRenderer
     },
     {
       headerName: '确认时间',
@@ -247,6 +271,10 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '服务确认完成',
       field: 'testConfirm',
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {values: ["是", "否"]},
+      cellRenderer: selectColorRenderer
     },
     {
       headerName: '确认时间',
@@ -261,6 +289,32 @@ const PreRelease: React.FC<any> = () => {
   const onChangeThirdGridReady = (params: GridReadyEvent) => {
     thirdUpSerGridApi.current = params.api;
     params.api.sizeColumnsToFit();
+  };
+
+  // 下拉框选择是否确认事件
+  const saveUperConfirmInfo = (params: any) => {
+    switch (params.column.colId) {
+      case "frontConfirm":  // 前端
+        break;
+      case "backendConfirm": // 后端
+        break;
+      case "flowConfirmOk":  // 流程
+        break;
+      case "testConfirm": // 测试
+        break;
+      default:
+        break;
+    }
+    //  如果前后两个值不同，则需要更新
+    if (params.newValue !== params.oldValue) {
+      //   选择从否变是的话，需要更新确认时间；如果之前就是是，就不用更新数据 了。
+      if (params.newValue === "是") {
+        console.log(params);
+
+      }
+    }
+
+
   };
 
   /* endregion   */
@@ -342,6 +396,10 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '服务确认完成',
       field: 'backendComfirm',
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {values: ["是", "否"]},
+      cellRenderer: selectColorRenderer
     },
     {
       headerName: '确认时间',
@@ -357,7 +415,18 @@ const PreRelease: React.FC<any> = () => {
     secondDataReviewGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
+  // 下拉框选择是否确认事件
+  const saveDataRepaireConfirmInfo = (params: any) => {
 
+    //  如果前后两个值不同，则需要更新
+    if (params.newValue !== params.oldValue) {
+      //   选择从否变是的话，需要更新确认时间；如果之前就是是，就不用更新数据 了。
+      if (params.newValue === "是") {
+        console.log(params);
+
+      }
+    }
+  };
   /* endregion */
 
   /*  region 上线分支 */
@@ -366,26 +435,66 @@ const PreRelease: React.FC<any> = () => {
   const rendererUnitTest = (params: any) => {
 
     const values = params.value;
-    console.log(values);
-    let resultDiv = ``;
+    const frontValue = (values["前端"])[0];
+    const frontTime = (values["前端"])[1];
+    const backendValue = (values["后端"])[0];
+    const backendTime = (values["后端"])[1];
+    // 前端的颜色
+    let frontColor = "#8B4513";
+    if (frontValue === "是") {
+      frontColor = "#2BF541";
+    } else if (frontValue === "忽略") {
+      frontColor = "blue";
+    }
 
-    resultDiv = `
-    <div style="margin-top: -10px">
-        <div style=" margin-top: 20px;font-size: 10px">
-            <div>前端： <label style="color: red"> 否</label> &nbsp;09:58:12~09:59:12</div>
-            <div style="margin-top: -20px"> 后端： <label style="color: forestgreen"> 是</label> &nbsp;09:58:12~09:59:12</div>
+    // 后端的颜色
+    let bacnkendColor = "#8B4513";
+    if (backendValue === "是") {
+      bacnkendColor = "#2BF541";
+    } else if (backendValue === "忽略") {
+      bacnkendColor = "blue";
+    }
+
+    if (params.data?.module === "仅前端") {
+
+      return `
+        <div style="margin-top: -10px">
+            <div style=" margin-top: 20px;font-size: 10px">
+                <div>前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
+            </div>
+
         </div>
-
-    </div>
     `;
-    return resultDiv;
+
+    }
+    if (params.data?.module === "仅后端") {
+      return `
+        <div style="margin-top: -10px">
+            <div style=" margin-top: 20px;font-size: 10px">
+                <div> 后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>
+                &nbsp;${backendTime}</div>
+            </div>
+        </div>
+    `;
+    }
+    return `
+        <div style="margin-top: -10px">
+            <div style=" margin-top: 20px;font-size: 10px">
+                <div>前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
+                <div style="margin-top: -20px"> 后端：
+                <label style="color: ${bacnkendColor}"> ${backendValue}</label>
+                &nbsp;${backendTime}</div>
+            </div>
+
+        </div>
+    `;
+
   };
 
   // 渲染上线前版本检查是否通过
-  const beforeOnlineVersionCheck = () => {
-    let resultDiv = ``;
+  const beforeOnlineVersionCheck = (params: any) => {
 
-    resultDiv = `
+    const commonDiv = `
     <div style="margin-top: -10px">
         <div style="text-align: right" >
 
@@ -396,16 +505,184 @@ const PreRelease: React.FC<any> = () => {
               <img src="../taskUrl.png" width="14" height="14" alt="执行参数" title="执行参数">
             </Button>
         </div>
-
-        <div style=" margin-top: -20px;font-size: 10px">
-            <div>前端： <label style="color: red"> 否</label> &nbsp;09:58:12~09:59:12</div>
-            <div style="margin-top: -20px"> 后端： <label style="color: forestgreen"> 是</label> &nbsp;09:58:12~09:59:12</div>
-        </div>
-
     </div>
     `;
-    return resultDiv;
 
+
+    const values = params.value;
+    const frontValue = (values["前端"])[0];
+    const frontTime = (values["前端"])[1];
+    const backendValue = (values["后端"])[0];
+    const backendTime = (values["后端"])[1];
+    // 前端的颜色
+    let frontColor = "#8B4513";
+    if (frontValue === "是") {
+      frontColor = "#2BF541";
+    } else if (frontValue === "检查中") {
+      frontColor = "#46A0FC";
+    }
+
+    // 后端的颜色
+    let bacnkendColor = "#8B4513";
+    if (backendValue === "是") {
+      bacnkendColor = "#2BF541";
+    } else if (backendValue === "检查中") {
+      bacnkendColor = "#46A0FC";
+    }
+
+    if (params.data?.module === "仅前端") {
+
+      return `
+        ${commonDiv}
+        <div style="margin-top: -20px">
+            <div style="font-size: 10px">
+                <div>前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
+            </div>
+
+        </div>
+    `;
+
+    }
+    if (params.data?.module === "仅后端") {
+      return `
+        ${commonDiv}
+        <div style="margin-top: -20px">
+            <div style="font-size: 10px">
+                <div> 后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>
+                &nbsp;${backendTime}</div>
+            </div>
+        </div>
+    `;
+    }
+    return `
+          ${commonDiv}
+        <div style="margin-top: -20px">
+            <div style="font-size: 10px">
+                <div>前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
+                <div style="margin-top: -20px"> 后端：
+                <label style="color: ${bacnkendColor}"> ${backendValue}</label>
+                &nbsp;${backendTime}</div>
+            </div>
+
+        </div>
+    `;
+
+  };
+
+  // 上线前环境检查
+  const beforeOnlineEnvCheck = (params: any) => {
+
+    const value = (params.value)[0];
+    const time = (params.value)[1];
+
+    // 前端的颜色
+    let Color = "#8B4513";
+    if (value === "是") {
+      Color = "#2BF541";
+    }
+
+    return `
+        <div style="margin-top: -10px">
+            <div style="text-align: right" >
+              <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
+                <img src="../执行.png" width="14" height="14" alt="执行参数" title="执行参数">
+              </Button>
+              <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
+                <img src="../taskUrl.png" width="14" height="14" alt="执行参数" title="执行参数">
+              </Button>
+            </div>
+            <div style=" margin-top: -20px;font-size: 10px">
+                <div><label style="color: ${Color}"> ${value}</label> &nbsp;${time}</div>
+            </div>
+
+        </div>
+    `;
+
+  };
+
+  // 上线前数据库检查
+  const beforeOnlineAutoCheck = (params: any) => {
+
+    const value = (params.value)[0];
+    const time = (params.value)[1];
+
+    // 前端的颜色
+    let Color = "black";
+    if (value === "检查中") {
+      Color = "#46A0FC";
+    }
+
+    return `
+        <div style="margin-top: -10px">
+            <div style="text-align: right" >
+              <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
+                <img src="../执行.png" width="14" height="14" alt="执行参数" title="执行参数">
+              </Button>
+              <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
+                <img src="../taskUrl.png" width="14" height="14" alt="执行参数" title="执行参数">
+              </Button>
+            </div>
+            <div style=" margin-top: -20px;font-size: 10px">
+                <div><label style="color: ${Color}"> ${value}</label> &nbsp;${time}</div>
+            </div>
+
+        </div>
+    `;
+
+  };
+
+  // 封板状态
+  const sealStatusRenderer = (params: any) => {
+    const values = params.value;
+    const frontValue = (values["前端"])[0];
+    const frontTime = (values["前端"])[1];
+    const backendValue = (values["后端"])[0];
+    const backendTime = (values["后端"])[1];
+    // 前端的颜色
+    let frontColor = "orange";
+    if (frontValue === "已封版") {
+      frontColor = "#2BF541";
+    }
+
+    // 后端的颜色
+    let bacnkendColor = "orange";
+    if (backendValue === "已封版") {
+      bacnkendColor = "#2BF541";
+    }
+
+    if (params.data?.module === "仅前端") {
+
+      return `
+        <div style="margin-top: -10px">
+            <div style=" margin-top: 20px;font-size: 10px">
+                <div>前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
+            </div>
+
+        </div>
+    `;
+
+    }
+    if (params.data?.module === "仅后端") {
+      return `
+        <div style="margin-top: -10px">
+            <div style=" margin-top: 20px;font-size: 10px">
+                <div> 后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>
+                &nbsp;${backendTime}</div>
+            </div>
+        </div>
+    `;
+    }
+    return `
+        <div style="margin-top: -10px">
+            <div style=" margin-top: 20px;font-size: 10px">
+                <div>前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
+                <div style="margin-top: -20px"> 后端：
+                <label style="color: ${bacnkendColor}"> ${backendValue}</label>
+                &nbsp;${backendTime}</div>
+            </div>
+
+        </div>
+    `;
   };
 
   const firstOnlineBranchColumn: any = [
@@ -441,20 +718,24 @@ const PreRelease: React.FC<any> = () => {
       minWidth: 190,
     },
     {
-      headerName: '上线前数据库环境检查是否通过',
-      field: 'passDBCheck',
+      headerName: '上线前环境检查是否通过',
+      field: 'passEnvCheck',
+      cellRenderer: beforeOnlineEnvCheck,
     },
     {
       headerName: '上线前自动化检查是否通过',
       field: 'passAutoCheckbf',
+      cellRenderer: beforeOnlineAutoCheck,
     },
     {
       headerName: '升级后自动化检查是否通过',
       field: 'passAutoCheckaf',
+      cellRenderer: beforeOnlineAutoCheck,
     },
     {
       headerName: '封板状态',
       field: 'sealStatus',
+      cellRenderer: sealStatusRenderer
     },
     {
       headerName: '操作',
@@ -746,12 +1027,21 @@ const PreRelease: React.FC<any> = () => {
     firstOnlineBranchGridApi.current?.setRowData([{
       branchName: "release",
       module: "前后端",
-      passUnitTest: {"前端": "是", "后端": "否"},
-      passVersionCheck: {"前端": "是", "后端": "否"},
-      passDBCheck: "否",
-      passAutoCheckbf: "未开始",
-      passAutoCheckaf: "未开始",
-      sealStatus: {"前端": "已封版", "后端": "未封板"},
+      passUnitTest: {"前端": ["是", "2021-01-01 12:11:22"], "后端": ["否", "2021-01-01 12:11:22"]},
+      passVersionCheck: {"前端": ["是", "2021-01-01 12:11:22"], "后端": ["否", "2021-01-01 12:11:22"]},
+      passEnvCheck: ["否", "2021-01-01 12:11:22"],
+      passAutoCheckbf: ["未开始", ""],
+      passAutoCheckaf: ["未开始", ""],
+      sealStatus: {"前端": ["已封版", "2021-01-01 12:11:22"], "后端": ["未封版", ""]},
+    }, {
+      branchName: "release-report",
+      module: "仅后端",
+      passUnitTest: {"前端": ["是", "2021-01-01 12:11:22"], "后端": ["忽略", ""]},
+      passVersionCheck: {"前端": ["是", "2021-01-01 12:11:22"], "后端": ["检查中", "2021-01-01 12:11:22"]},
+      passEnvCheck: ["是", "2021-01-01 12:11:22"],
+      passAutoCheckbf: ["检查中", "12:12:12~18:19:33"],
+      passAutoCheckaf: ["未开始", ""],
+      sealStatus: {"前端": ["未封版", ""], "后端": ["已封版", "2021-01-01 12:11:22"]},
     }]);
     // 对应工单
     firstListGridApi.current?.setRowData([{
@@ -1026,6 +1316,7 @@ const PreRelease: React.FC<any> = () => {
                     onGridReady={onthirdGridReady}
                     onGridSizeChanged={onChangeThirdGridReady}
                     onColumnEverythingChanged={onChangeThirdGridReady}
+                    onCellEditingStopped={saveUperConfirmInfo}
                   >
                   </AgGridReact>
 
@@ -1098,6 +1389,7 @@ const PreRelease: React.FC<any> = () => {
                     onGridReady={onsecondDataReviewGridReady}
                     onGridSizeChanged={onChangesecondDataReviewGridReady}
                     onColumnEverythingChanged={onChangesecondDataReviewGridReady}
+                    onCellEditingStopped={saveDataRepaireConfirmInfo}
                   >
                   </AgGridReact>
 
@@ -1116,7 +1408,7 @@ const PreRelease: React.FC<any> = () => {
             <div>
               {/* ag-grid 表格 */}
               <div>
-                <div className="ag-theme-alpine" style={{height: 150, width: '100%'}}>
+                <div className="ag-theme-alpine" style={{height: 200, width: '100%'}}>
                   <AgGridReact
 
                     columnDefs={firstOnlineBranchColumn} // 定义列

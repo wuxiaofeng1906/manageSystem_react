@@ -10,7 +10,7 @@ import {AgGridReact} from "ag-grid-react";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {getAllProject} from "@/publicMethods/verifyAxios";
 import {useRequest} from "ahooks";
-import {savePrePulishProjects} from "./axiosApi";
+import {savePreProjects, inquireService} from "./logic";
 
 const {TabPane} = Tabs;
 const {Option} = Select;
@@ -826,13 +826,50 @@ const PreRelease: React.FC<any> = () => {
   const projectsArray = useRequest(() => loadPrjNameSelect()).data;
 
   // 保存预发布项目
-  const saveProjects = () => {
+  const savePreRelaseProjects = async () => {
+
     const datas = formForDutyNameModify.getFieldsValue();
-    savePrePulishProjects(datas);
+    const result = await savePreProjects(datas);
+    if (result === "") {
+      message.info({
+        content: result,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+    } else {
+      message.error({
+        content: result,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
   };
 
   /* endregion */
 
+  /* region 查询 */
+  const [formUpgradeService] = Form.useForm();
+  const inquireServiceClick = async () => {
+    const data = formUpgradeService.getFieldsValue();
+    const result = await inquireService(data);
+    if (result.message !== "") {
+      message.error({
+        content: result.message,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    } else {
+      // 有数据之后进行表格的赋值操作
+    }
+  };
+  /* endregion */
   /* region Tabs 标签页事件 */
 
   const initialPanes = [
@@ -840,12 +877,6 @@ const PreRelease: React.FC<any> = () => {
       title: `${currentDate}灰度预发布1`,
       content: "",
       key: '1',
-      closable: false
-    },
-    {
-      title: `${currentDate}灰度预发布2`,
-      content: "",
-      key: '2',
       closable: false
     }];
   const [tabContent, setTabContent] = useState({
@@ -865,26 +896,8 @@ const PreRelease: React.FC<any> = () => {
       closable: true
     });
     setTabContent({panes, activeKey});
-    firstUpSerGridApi.current?.setRowData([{
-      onlineDev: "集群2",
-      pulishItem: "前端",
-      app: "web",
-      hotUpdate: "是",
-      upgrade: "否",
-      branchAndDev: "emergency_nx-hotfix",
-      desc: "",
-      remark: ""
-    }]);
-    secondUpSerGridApi.current?.setRowData([{
-      onlineDev: "集群2",
-      upgradeInte: "前端接口",
-      intService: "basebi",
-      hotUpdate: "是",
-      intMethod: "get",
-      intURL: "/basebi/Evaluate/......",
-      tenant: "全量用户",
-      remark: ""
-    }]);
+    firstUpSerGridApi.current?.setRowData([]);
+    secondUpSerGridApi.current?.setRowData([]);
   };
 
   // 删除tab
@@ -931,7 +944,7 @@ const PreRelease: React.FC<any> = () => {
 
     // 在切换时显示第二个界面的数据
     formForDutyNameModify.setFieldsValue({
-      projectsName: "测试666"
+      projectsName: "测试切换"
     });
 
 
@@ -1144,7 +1157,7 @@ const PreRelease: React.FC<any> = () => {
               <div style={{float: "right"}}>
                 <Button type="primary"
                         style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, marginLeft: 10}}
-                        onClick={saveProjects}>点击保存 </Button>
+                        onClick={savePreRelaseProjects}>点击保存 </Button>
               </div>
 
               <div>
@@ -1209,40 +1222,45 @@ const PreRelease: React.FC<any> = () => {
             <div>
               {/* 条件查询 */}
               <div style={{height: 35, marginTop: -15, overflow: "hidden"}}>
-                <Row>
-                  <Col span={9}>
+                <Form form={formUpgradeService}>
+                  <Row>
+                    <Col span={9}>
 
-                    {/* 测试环境 */}
-                    <Form.Item label="测试环境:" name="projectsName">
-                      <Select showSearch mode="multiple" size={"small"} style={{width: '100%'}}>
+                      {/* 测试环境 */}
+                      <Form.Item label="测试环境:" name="testEnv">
+                        <Select showSearch mode="multiple" size={"small"} style={{width: '100%'}}>
 
-                      </Select>
-                    </Form.Item>
-                  </Col>
+                        </Select>
+                      </Form.Item>
+                    </Col>
 
-                  <Col span={8}>
+                    <Col span={8}>
 
-                    {/* 一键部署ID */}
-                    <Form.Item label="一键部署ID:" name="pulishType" style={{marginLeft: 10}}>
-                      <Select mode="multiple" size={"small"} style={{width: '100%'}} showSearch>
+                      {/* 一键部署ID */}
+                      <Form.Item label="一键部署ID:" name="deployID" style={{marginLeft: 10}}>
+                        <Select mode="multiple" size={"small"} style={{width: '100%'}} showSearch>
 
-                      </Select>
-                    </Form.Item>
-                  </Col>
+                        </Select>
+                      </Form.Item>
+                    </Col>
 
-                  <Col span={7}>
+                    <Col span={7}>
 
-                    <Button size={"small"} type="primary"
-                            style={{
-                              color: '#46A0FC',
-                              backgroundColor: "#ECF5FF",
-                              borderRadius: 5,
-                              marginLeft: 10,
-                              marginTop: 3
-                            }}>点击查询</Button>
-                  </Col>
+                      <Button size={"small"} type="primary"
+                              style={{
+                                color: '#46A0FC',
+                                backgroundColor: "#ECF5FF",
+                                borderRadius: 5,
+                                marginLeft: 10,
+                                marginTop: 3
+                              }}
+                              onClick={inquireServiceClick}
+                      >点击查询</Button>
+                    </Col>
 
-                </Row>
+                  </Row>
+                </Form>
+
               </div>
               {/* 两个表格 */}
               <div>

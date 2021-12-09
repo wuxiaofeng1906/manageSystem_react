@@ -2,7 +2,7 @@
  * @Description: 项目基本信息字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:44:08
- * @LastEditTime: 2021-12-08 15:41:57
+ * @LastEditTime: 2021-12-08 19:51:04
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -22,7 +22,7 @@ export const TableMajorCols = [
     headerName: '项目名称',
     field: 'project',
     filter: true,
-    valueGetter: (params) => params.data.project.name,
+    valueGetter: (params: any) => params.data.project.name,
     cellRenderer: 'linkTo',
     // cellRendererParams: { liknTo: true },
   },
@@ -43,7 +43,7 @@ export const TableMajorCols = [
     columnGroupShow: SHOW['closed'],
     field: 'project.status',
     filter: true,
-    valueGetter: (params) => PROJ_STATUS[params.data.project.status]?.zh,
+    valueGetter: (params: any) => PROJ_STATUS[params.data.project.status]?.zh,
     cellRenderer: 'projStatus',
     ...stringW,
   },

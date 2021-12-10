@@ -530,11 +530,12 @@ const DutyPlan: React.FC<any> = () => {
 
   // selected 选择事件
   const onPrjTypeChanged = async (index: any, name: any, event: any) => {
+    debugger;
     try {
       const dutyInfo = formForPlanModify.getFieldsValue();
       const dutyProject = dutyInfo.projects;
       const tempArray = [...dutyProject];
-      if (name === 'prjType' && event === "2") {  // 如果是班车项目,则自动获取上面的后端负责人填入项目负责人选择框
+      if (name === 'prjType' && (event === "2" || event === "3")) {  // 如果是班车项目,则自动获取上面的后端负责人填入项目负责人选择框
         let firstBackend = "";
         if (dutyInfo.firstBackend) {
           firstBackend = (dutyInfo.firstBackend).split("&");

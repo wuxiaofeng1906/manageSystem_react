@@ -47,17 +47,21 @@ const PreRelease: React.FC<any> = () => {
   /* region 表格相关定义和事件 */
   // 新增行
   (window as any).addRows = (params: any) => {
+    console.log(params);
+    alert("新增");
 
   };
 
   // 修改行
   (window as any).modifyRows = (params: any) => {
-
+    console.log(params);
+    alert("修改");
   };
 
   // 删除行
   (window as any).deleteRows = (params: any) => {
-
+    console.log(params);
+    alert("删除");
   };
   // 操作按钮渲染
   const operateRenderer = (params: any) => {

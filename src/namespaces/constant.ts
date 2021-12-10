@@ -2,7 +2,7 @@
  * @Description: 通用常量
  * @Author: jieTan
  * @Date: 2021-11-23 15:51:13
- * @LastEditTime: 2021-12-08 14:43:48
+ * @LastEditTime: 2021-12-10 09:16:07
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -35,6 +35,11 @@ export const PROJ_STATUS = {
   doing: { en: 'doing', zh: '进行中' },
   suspended: { en: 'suspended', zh: '已挂起' },
   closed: { en: 'closed', zh: '已关闭' },
+};
+
+/* 项目度量指标 */
+export const PROJ_METRIC = {
+  processQuality: { en: 'processQuality', zh: '过程质量' },
 };
 
 /*  */

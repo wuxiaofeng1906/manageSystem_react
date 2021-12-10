@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2021-12-02 16:17:18
+ * @LastEditTime: 2021-12-10 10:10:27
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -100,7 +100,7 @@ const treeOnSelect = async (value: string, setVal: Function, gqlClient: GqlClien
 
 const projOnSelect = (vals: any[], projType: EXTRA_FILTER_TYPE, gridApi: any) => {
   // const pType: EXTRA_FILTER_TYPE = { field: 'project', values: vals };
-  Object.assign(projType, { field: 'project', values: vals })
+  Object.assign(projType, { field: 'project', values: vals });
   gridApi.onFilterChanged();
 };
 
@@ -124,19 +124,6 @@ export default () => {
   /* 绘制区 */
   return (
     <Form layout="inline">
-      <Form.Item label="项目名称">
-        <Select
-          {...defaultParams}
-          mode="multiple"
-          className={selectFilter}
-          onChange={(value: any[], option) => {
-            // gridApi.onFilterChanged();
-            projOnSelect(value, projType, gridApi);
-          }}
-          onClick={() => projOptsElems(gqlData, projElems, setProjElems)}
-          children={projElems}
-        />
-      </Form.Item>
       <Form.Item label="所属部门/组">
         <TreeSelect
           {...defaultParams}
@@ -147,6 +134,16 @@ export default () => {
           onClick={() => deptTreeNodes(data, treeData, setTreeData)}
           onDropdownVisibleChange={() => setTreeActive(treeActive ? '' : treeSelectActive)}
           onSelect={(value: string) => treeOnSelect(value, setGqlData, gqlClient)}
+        />
+      </Form.Item>
+      <Form.Item label="特性项目">
+        <Select
+          {...defaultParams}
+          mode="multiple"
+          className={selectFilter}
+          onChange={(value: any[]) => projOnSelect(value, projType, gridApi)}
+          onClick={() => projOptsElems(gqlData, projElems, setProjElems)}
+          children={projElems}
         />
       </Form.Item>
       <Form.Item>

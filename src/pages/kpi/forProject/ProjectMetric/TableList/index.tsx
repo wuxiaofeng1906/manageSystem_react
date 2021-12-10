@@ -2,66 +2,42 @@
  * @Description: 数据列表
  * @Author: jieTan
  * @Date: 2021-11-22 10:55:42
- * @LastEditTime: 2021-12-10 16:25:12
+ * @LastEditTime: 2021-12-10 10:05:57
  * @LastEditors: jieTan
  * @LastModify:
  */
 
 import './index.css';
 import { AgGridReact } from 'ag-grid-react';
-import { useGqlClient } from '@/hooks';
 import { useModel } from 'umi';
 import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
-import { TableMajorCols, ProcessQualityCols } from './definitions/columns';
+import { TableMajorCols } from './definitions/columns';
 import LinkToCloumn from './renders/LinkToCloumn';
 import ProjStatusColumn from './renders/ProjStatusColumn';
 import BugReOpenColumn from './renders/BugReOpenColumn';
 import BugFlybackDuraColumn from './renders/BugFlybackDuraColumn';
-import { GQL_PARAMS } from '@/namespaces';
-import { projectKpiGql, queryGQL } from '@/pages/gqls';
 import KpiCheckBox from './KpiCheckBox';
 
 /*  */
 export default () => {
   /*  */
-  const gqlClient = useGqlClient();
-  const { gqlData, setGqlData, setGridApi, pqCols, setPqCols } = useModel('projectMetric');
-
-  const onGridReady = async (ag: any) => {
-    setGridApi(ag.api);
-    //
-    const _params: GQL_PARAMS = { func: 'projectKpi' };
-    const ret = await queryGQL(gqlClient, projectKpiGql, _params);
-    setGqlData(ret);
-  };
-  /*  */
-  const pqOnClock = async () => {
-    //
-    if (pqCols.length === 0) {
-      const _params: GQL_PARAMS = { func: 'projectKpi', params: { kpis: ['processQuality'] } };
-      const ret = await queryGQL(gqlClient, projectKpiGql, _params);
-      setGqlData(ret);
-      setPqCols(ProcessQualityCols as never[]);
-    } else setPqCols([]);
-  };
+  const { gqlData, dynamicCols } = useModel('projectMetric');
 
   /*  */
   return (
     <>
-      <button onClick={pqOnClock}>xxx指标</button>
       <KpiCheckBox />
       <div className="ag-theme-material" style={{ height: 800 }}>
         <AgGridReact
-          modules={[SetFilterModule]}
+          modules={[SetFilterModule as any]}
           frameworkComponents={{
             linkTo: LinkToCloumn,
             reopenRatio: BugReOpenColumn,
             bugFlybackDura: BugFlybackDuraColumn,
             projStatus: ProjStatusColumn,
           }}
-          columnDefs={[...TableMajorCols, ...pqCols]}
+          columnDefs={[...TableMajorCols, ...dynamicCols]}
           rowData={gqlData}
-          onGridReady={onGridReady}
         />
       </div>
     </>

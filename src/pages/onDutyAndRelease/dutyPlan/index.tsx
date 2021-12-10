@@ -458,7 +458,7 @@ const DutyPlan: React.FC<any> = () => {
 
   // 删除项目
   const delProject = (index: any) => {
-    debugger;
+
     if (projects.length === 1) {
       message.error({
         content: "删除失败:至少需要保留一个项目!",
@@ -530,7 +530,6 @@ const DutyPlan: React.FC<any> = () => {
 
   // selected 选择事件
   const onPrjTypeChanged = async (index: any, name: any, event: any) => {
-    debugger;
     try {
       const dutyInfo = formForPlanModify.getFieldsValue();
       const dutyProject = dutyInfo.projects;

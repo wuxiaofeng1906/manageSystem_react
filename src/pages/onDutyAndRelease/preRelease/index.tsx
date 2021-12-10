@@ -549,7 +549,7 @@ const PreRelease: React.FC<any> = () => {
         ${commonDiv}
         <div style="margin-top: -20px">
             <div style="font-size: 10px">
-                <div>前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
+                <div>前端： <button style="color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${frontValue}</button> &nbsp;${frontTime}</div>
             </div>
 
         </div>
@@ -561,7 +561,7 @@ const PreRelease: React.FC<any> = () => {
         ${commonDiv}
         <div style="margin-top: -20px">
             <div style="font-size: 10px">
-                <div> 后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>
+                <div> 后端：<button style="color: ${bacnkendColor};width: 40px;border: none;background-color: transparent"> ${backendValue}</button>
                 &nbsp;${backendTime}</div>
             </div>
         </div>
@@ -571,9 +571,9 @@ const PreRelease: React.FC<any> = () => {
           ${commonDiv}
         <div style="margin-top: -20px">
             <div style="font-size: 10px">
-                <div>前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
+                <div>前端： <button style="color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${frontValue}</button> &nbsp;${frontTime}</div>
                 <div style="margin-top: -20px"> 后端：
-                <label style="color: ${bacnkendColor}"> ${backendValue}</label>
+                <button style=" color: ${bacnkendColor};width: 40px;border: none;background-color: transparent"> ${backendValue}</button>
                 &nbsp;${backendTime}</div>
             </div>
 
@@ -635,7 +635,7 @@ const PreRelease: React.FC<any> = () => {
                 <img src="../taskUrl.png" width="14" height="14" alt="执行参数" title="执行参数">
               </Button>
             </div>
-            <div style=" margin-top: -20px;font-size: 10px">
+            <div style=" margin-top: -20px;font-size: 10px;width: 200px">
                 <div><label style="color: ${Color}"> ${value}</label> &nbsp;${time}</div>
             </div>
 
@@ -831,6 +831,13 @@ const PreRelease: React.FC<any> = () => {
 
   /* endregion */
 
+  /* endregion */
+
+  /* region 发布结果 */
+  const pulishResulttChanged = (params: any) => {
+    console.log(params);
+
+  };
   /* endregion */
 
   /* region  预发布项目 */
@@ -1147,7 +1154,7 @@ const PreRelease: React.FC<any> = () => {
 
           <label style={{marginLeft: 15}}>
             <label style={{fontWeight: "bold"}}>发布结果：</label>
-            <Select size={"small"} style={{width: 100}}>
+            <Select size={"small"} style={{width: 100}} onChange={pulishResulttChanged}>
               <Option value="">空</Option>
               <Option value="lucy">Lucy</Option>
             </Select>

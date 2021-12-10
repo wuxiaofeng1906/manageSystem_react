@@ -2,13 +2,12 @@
  * @Description: 数据列表
  * @Author: jieTan
  * @Date: 2021-11-22 10:55:42
- * @LastEditTime: 2021-12-09 11:44:01
+ * @LastEditTime: 2021-12-10 16:25:12
  * @LastEditors: jieTan
  * @LastModify:
  */
 
 import './index.css';
-import { useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { useGqlClient } from '@/hooks';
 import { useModel } from 'umi';
@@ -20,13 +19,13 @@ import BugReOpenColumn from './renders/BugReOpenColumn';
 import BugFlybackDuraColumn from './renders/BugFlybackDuraColumn';
 import { GQL_PARAMS } from '@/namespaces';
 import { projectKpiGql, queryGQL } from '@/pages/gqls';
+import KpiCheckBox from './KpiCheckBox';
 
 /*  */
 export default () => {
   /*  */
   const gqlClient = useGqlClient();
-  const { gqlData, setGqlData, setGridApi } = useModel('processQuality');
-  const [pqCols, setPqCols] = useState([]);
+  const { gqlData, setGqlData, setGridApi, pqCols, setPqCols } = useModel('projectMetric');
 
   const onGridReady = async (ag: any) => {
     setGridApi(ag.api);
@@ -50,6 +49,7 @@ export default () => {
   return (
     <>
       <button onClick={pqOnClock}>xxx指标</button>
+      <KpiCheckBox />
       <div className="ag-theme-material" style={{ height: 800 }}>
         <AgGridReact
           modules={[SetFilterModule]}

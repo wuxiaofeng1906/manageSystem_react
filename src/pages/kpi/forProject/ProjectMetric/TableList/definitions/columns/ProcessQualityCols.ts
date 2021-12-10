@@ -2,13 +2,13 @@
  * @Description: 项目过程质量的字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:47:07
- * @LastEditTime: 2021-12-08 17:05:06
+ * @LastEditTime: 2021-12-10 16:28:12
  * @LastEditors: jieTan
  * @LastModify:
  */
 
 import { PERCENTAGE, HOUR, TABLE_GROUP_SHOW as SHOW } from '@/namespaces';
-import { ColGroupDef } from 'ag-grid-community';
+import { ColDef } from 'ag-grid-community';
 import { ProjectQualityResult } from '@/namespaces/interface';
 import { doubleNumberW, ratioW } from './baseParams';
 
@@ -29,7 +29,7 @@ const customSort = (targetKey: string) => ({
 });
 
 /* 项目过程质量 */
-export const ProcessQualityCols = [
+export const ProcessQualityCols: ColDef[] = [
   {
     headerName: `ReOpen率(${PERCENTAGE['unit']})`,
     field: 'projectQuality',

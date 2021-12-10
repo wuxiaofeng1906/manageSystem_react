@@ -2,7 +2,7 @@
  * @Description: 定义路由 => JieTan
  * @Author: jieTan
  * @Date: 2021-11-19 16:36:02
- * @LastEditTime: 2021-12-08 16:15:14
+ * @LastEditTime: 2021-12-10 16:41:58
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -23,5 +23,5 @@ type RouteType = {
 export const ProjectKpiRoute: RouteType = {
   name: '项目',
   path: './project',
-  component: './kpi/forProject/ProcessQuality',
+  component: './kpi/forProject/ProjectMetric',
 };

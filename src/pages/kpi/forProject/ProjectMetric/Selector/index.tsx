@@ -115,7 +115,7 @@ export default () => {
   const [projElems, setProjElems] = useState(null); // 保存项目信息
   const [treeData, setTreeData] = useState([]); // 部门树形结构的数据
   const [treeActive, setTreeActive] = useState(''); // 部门<Select>选中时的样式
-  const { gqlData, setGqlData, gridApi, projType } = useModel('processQuality'); // 获取“过程质量”查询的结果数据
+  const { gqlData, setGqlData, gridApi, projType } = useModel('projectMetric'); // 获取“过程质量”查询的结果数据
   //
   const gqlClient = useGqlClient(); // 必须提前初始化该对象
   const params: GQL_PARAMS = { func: GRAPHQL_QUERY['ORGANIZATION'] };

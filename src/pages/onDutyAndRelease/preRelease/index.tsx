@@ -11,7 +11,6 @@ import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {getAllProject} from "@/publicMethods/verifyAxios";
 import {useRequest} from "ahooks";
 import {savePreProjects, inquireService} from "./logic";
-import {json} from "express";
 
 const {TabPane} = Tabs;
 const {Option} = Select;
@@ -44,6 +43,55 @@ const loadPrjNameSelect = async () => {
 
 
 const PreRelease: React.FC<any> = () => {
+
+  // 新增和修改的共同modal显示
+  const [pulishItemModal, setpulishItemModal] = useState({
+    shown: false,
+    title: "新增",
+    type: -1
+  });
+
+  const pulishItemModalCancle = () => {
+    setpulishItemModal({
+      shown: false,
+      title: "新增",
+      type: -1
+    });
+  };
+
+  /* region 新增行 */
+
+  // 新增行
+  (window as any).addRows = (params: any) => {
+    //  显示数据
+    console.log(params);
+    setpulishItemModal({
+      shown: true,
+      title: "新增",
+      type: -1
+    });
+
+  };
+
+  /* endregion  */
+
+  /* region 修改行 */
+
+  // 修改行
+  (window as any).modifyRows = (params: any) => {
+    //  显示数据
+    console.log(params);
+    setpulishItemModal({
+      shown: true,
+      title: "修改",
+      type: -1
+    });
+  };
+
+
+  /* endregion  */
+
+  /* region 删除功能 */
   const [delModal, setDelModal] = useState({
     shown: false,
     type: -1,
@@ -62,21 +110,7 @@ const PreRelease: React.FC<any> = () => {
 
   };
 
-  /* region 表格相关定义和事件 */
-  // 新增行
-  (window as any).addRows = (params: any) => {
-    console.log(params);
-    alert("新增");
-
-  };
-
-  // 修改行
-  (window as any).modifyRows = (params: any) => {
-    console.log(params);
-    alert("修改");
-  };
-
-  // 删除行
+  // 删除事件
   (window as any).deleteRows = (item: any, params: any) => {
     setDelModal({
       type: item,
@@ -85,6 +119,11 @@ const PreRelease: React.FC<any> = () => {
     });
 
   };
+
+  /* endregion */
+
+  /* region 表格相关定义和事件 */
+
   // 操作按钮渲染
   const operateRenderer = (type: number, params: any) => {
     const typeStr = JSON.stringify(type);
@@ -92,10 +131,10 @@ const PreRelease: React.FC<any> = () => {
 
     return `
         <div style="margin-top: -5px">
-            <Button  style="border: none; background-color: transparent; " onclick='addRows(${paramData})'>
+            <Button  style="border: none; background-color: transparent; " onclick='addRows(${typeStr},${paramData})'>
               <img src="../add_1.png" width="15" height="15" alt="新增" title="新增">
             </Button>
-             <Button  style="border: none; background-color: transparent;  margin-left: -10px; " onclick='modifyRows(${paramData})'>
+             <Button  style="border: none; background-color: transparent;  margin-left: -10px; " onclick='modifyRows(${typeStr},${paramData})'>
               <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
             </Button>
             <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteRows(${typeStr},${paramData})'>
@@ -1550,7 +1589,7 @@ const PreRelease: React.FC<any> = () => {
 
       </div>
 
-      {/* 各类弹窗 */}
+      {/* ------------------------各类弹窗--------------------------- */}
 
 
       {/* 删除确认 */}
@@ -1579,6 +1618,60 @@ const PreRelease: React.FC<any> = () => {
           <Form.Item name="groupId" style={{display: "none", width: "32px", marginTop: "-55px", marginLeft: "270px"}}>
             <Input/>
           </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* 发布项 */}
+      <Modal
+        title={pulishItemModal.title}
+        visible={pulishItemModal.shown}
+        onCancel={pulishItemModalCancle}
+        centered={true}
+        footer={null}
+        width={400}
+      >
+        <Form>
+          <Form.Item name="onlineEnv" label="上线环境">
+            <Select showSearch style={{}}>
+            </Select>
+          </Form.Item>
+          <Form.Item name="onlineEnv" label="上线环境">
+            <Select showSearch style={{}}>
+            </Select>
+          </Form.Item>
+          <Form.Item name="onlineEnv" label="上线环境">
+            <Select showSearch style={{}}>
+            </Select>
+          </Form.Item>
+          <Form.Item name="onlineEnv" label="上线环境">
+            <Select showSearch style={{}}>
+            </Select>
+          </Form.Item>
+          <Form.Item name="onlineEnv" label="上线环境">
+            <Select showSearch style={{}}>
+            </Select>
+          </Form.Item>
+          <Form.Item name="onlineEnv" label="上线环境">
+            <Select showSearch style={{}}>
+            </Select>
+          </Form.Item>
+          <Form.Item name="onlineEnv" label="上线环境">
+            <Select showSearch style={{}}>
+            </Select>
+          </Form.Item>
+          <Form.Item name="onlineEnv" label="上线环境">
+            <Select showSearch style={{}}>
+            </Select>
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" style={{marginLeft: '100px'}} onClick={delDetailsInfo}>
+              确定
+            </Button>
+            <Button type="primary" style={{marginLeft: '20px'}} onClick={delCancel}>
+              取消
+            </Button>
+          </Form.Item>
+
         </Form>
       </Modal>
 

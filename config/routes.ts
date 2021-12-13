@@ -450,6 +450,13 @@ export default [
         access: 'sysAdmin',
         component: './onDutyAndRelease/preRelease',
         // hideInMenu: true
+      }, {
+        name: '发布历史',
+        icon: 'table',
+        path: 'releaseHistory',
+        access: 'sysAdmin',
+        component: './onDutyAndRelease/releaseHistory',
+        // hideInMenu: true
       }
     ],
   },

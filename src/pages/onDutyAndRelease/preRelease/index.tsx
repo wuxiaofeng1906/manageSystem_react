@@ -11,6 +11,7 @@ import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {getAllProject} from "@/publicMethods/verifyAxios";
 import {useRequest} from "ahooks";
 import {savePreProjects, inquireService} from "./logic";
+import {json} from "express";
 
 const {TabPane} = Tabs;
 const {Option} = Select;
@@ -43,6 +44,23 @@ const loadPrjNameSelect = async () => {
 
 
 const PreRelease: React.FC<any> = () => {
+  const [delModal, setDelModal] = useState({
+    shown: false,
+    type: -1,
+    datas: {}
+  });
+  // 取消删除
+  const delCancel = () => {
+    setDelModal({
+      shown: false,
+      type: -1,
+      datas: {}
+    });
+  };
+
+  const delDetailsInfo = () => {
+
+  };
 
   /* region 表格相关定义和事件 */
   // 新增行
@@ -59,13 +77,19 @@ const PreRelease: React.FC<any> = () => {
   };
 
   // 删除行
-  (window as any).deleteRows = (params: any) => {
-    console.log(params);
-    alert("删除");
+  (window as any).deleteRows = (item: any, params: any) => {
+    setDelModal({
+      type: item,
+      shown: true,
+      datas: params
+    });
+
   };
   // 操作按钮渲染
-  const operateRenderer = (params: any) => {
+  const operateRenderer = (type: number, params: any) => {
+    const typeStr = JSON.stringify(type);
     const paramData = JSON.stringify(params.data);
+
     return `
         <div style="margin-top: -5px">
             <Button  style="border: none; background-color: transparent; " onclick='addRows(${paramData})'>
@@ -74,7 +98,7 @@ const PreRelease: React.FC<any> = () => {
              <Button  style="border: none; background-color: transparent;  margin-left: -10px; " onclick='modifyRows(${paramData})'>
               <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
             </Button>
-            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteRows(${paramData})'>
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteRows(${typeStr},${paramData})'>
               <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
             </Button>
         </div>
@@ -107,7 +131,7 @@ const PreRelease: React.FC<any> = () => {
 
   /* region 升级服务 一 */
   const firstUpSerGridApi = useRef<GridApi>();
-  const firstUpSerColumn = [
+  const firstUpSerColumn: any = [
     {
       headerName: '上线环境',
       field: 'onlineDev'
@@ -153,7 +177,9 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '操作',
-      cellRenderer: operateRenderer
+      cellRenderer: (params: any) => {
+        return operateRenderer(1, params)
+      }
     }];
 
   const onFirstGridReady = (params: GridReadyEvent) => {
@@ -169,7 +195,7 @@ const PreRelease: React.FC<any> = () => {
   /* endregion  */
 
   /* region 升级服务 二  */
-  const secondUpSerColumn = [
+  const secondUpSerColumn: any = [
     {
       headerName: '上线环境',
       field: 'onlineDev',
@@ -213,7 +239,9 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '操作',
-      cellRenderer: operateRenderer
+      cellRenderer: (params: any) => {
+        return operateRenderer(2, params)
+      }
     }];
   const secondUpSerGridApi = useRef<GridApi>();
   const onSecondGridReady = (params: GridReadyEvent) => {
@@ -388,7 +416,9 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '操作',
-      cellRenderer: operateRenderer
+      cellRenderer: (params: any) => {
+        return operateRenderer(3, params)
+      }
     }];
   const firstDataReviewGridApi = useRef<GridApi>();
   const onfirstDataReviewGridReady = (params: GridReadyEvent) => {
@@ -756,7 +786,9 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '操作',
-      cellRenderer: operateRenderer
+      cellRenderer: (params: any) => {
+        return operateRenderer(4, params)
+      }
     }];
   const firstOnlineBranchGridApi = useRef<GridApi>();
   const onfirstOnlineBranchGridReady = (params: GridReadyEvent) => {
@@ -1093,7 +1125,7 @@ const PreRelease: React.FC<any> = () => {
 
     // 先显示第一个界面的数据
     formForDutyNameModify.setFieldsValue({
-      projectsName: "测试"
+      // projectsName: ""
     });
   };
 
@@ -1517,6 +1549,39 @@ const PreRelease: React.FC<any> = () => {
         </div>
 
       </div>
+
+      {/* 各类弹窗 */}
+
+
+      {/* 删除确认 */}
+      <Modal
+        title={'删除'}
+        visible={delModal.shown}
+        onCancel={delCancel}
+        centered={true}
+        footer={null}
+        width={400}
+      >
+        <Form>
+          <Form.Item>
+            <label style={{marginLeft: '90px'}}>确定删除该数据吗？</label>
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" style={{marginLeft: '100px'}} onClick={delDetailsInfo}>
+              确定
+            </Button>
+            <Button type="primary" style={{marginLeft: '20px'}} onClick={delCancel}>
+              取消
+            </Button>
+          </Form.Item>
+
+          <Form.Item name="groupId" style={{display: "none", width: "32px", marginTop: "-55px", marginLeft: "270px"}}>
+            <Input/>
+          </Form.Item>
+        </Form>
+      </Modal>
+
     </PageContainer>
   );
 };

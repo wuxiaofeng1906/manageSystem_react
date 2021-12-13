@@ -10,3 +10,4 @@
 /*  */
 export * from './ProjectInfoCols';
 export * from './ProcessQualityCols';
+export * from './ProcessDeviationCols';

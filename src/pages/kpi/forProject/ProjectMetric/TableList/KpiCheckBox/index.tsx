@@ -2,7 +2,7 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2021-12-10 10:03:24
+ * @LastEditTime: 2021-12-13 09:39:44
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -10,13 +10,13 @@ import { Checkbox, Divider } from 'antd';
 import { useState, useEffect } from 'react';
 import { useModel } from 'umi';
 import { GQL_PARAMS, PROJ_METRIC as PM } from '@/namespaces';
-import { ProcessQualityCols } from '../definitions/columns';
+import { ProcessDeviationCols, ProcessQualityCols } from '../definitions/columns';
 import { projectKpiGql, queryGQL } from '@/pages/gqls';
 import { useGqlClient } from '@/hooks';
 
 const CheckboxGroup = Checkbox.Group;
 
-const plainOptions = [PM['processQuality'].zh, '示例1', '示例2'];
+const plainOptions = [PM.processQuality.zh, PM.progressDeviation.zh, '示例2'];
 
 export default () => {
   /*  */
@@ -51,9 +51,13 @@ export default () => {
     const kpiItems = [];
     for (const kp of checkedList) {
       switch (kp) {
-        case PM['processQuality'].zh:
+        case PM.processQuality.zh:
           loadColumns.push(...ProcessQualityCols);
-          kpiItems.push(PM['processQuality'].en);
+          kpiItems.push(PM.processQuality.en);
+          break;
+        case PM.progressDeviation.zh:
+          loadColumns.push(...ProcessDeviationCols);
+          kpiItems.push(PM.progressDeviation.en);
           break;
 
         default:
@@ -73,7 +77,7 @@ export default () => {
   //
   useEffect(() => {
     // 选中指标变化事时，更改数据源
-    loadOnDemand(); 
+    loadOnDemand();
   }, [checkedList]);
 
   /*  */

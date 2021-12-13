@@ -2,7 +2,7 @@
  * @Description: 通用常量
  * @Author: jieTan
  * @Date: 2021-11-23 15:51:13
- * @LastEditTime: 2021-12-10 09:16:07
+ * @LastEditTime: 2021-12-13 10:00:32
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -39,6 +39,7 @@ export const PROJ_STATUS = {
 
 /* 项目度量指标 */
 export const PROJ_METRIC = {
+  progressDeviation: { en: 'progressDeviation', zh: '进度偏差率' },
   processQuality: { en: 'processQuality', zh: '过程质量' },
 };
 
@@ -47,3 +48,5 @@ export const PROJ_METRIC = {
 export const DEFAULT_DENOMINATOR = 1;
 // 默认占位符
 export const DEFAULT_PLACEHOLDER = '-';
+// float默认保留的小数位
+export const DEFAULT_DECIMAL_PLACES = 2;

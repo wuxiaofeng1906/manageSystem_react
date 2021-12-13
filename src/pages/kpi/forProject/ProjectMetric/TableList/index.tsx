@@ -2,7 +2,7 @@
  * @Description: 数据列表
  * @Author: jieTan
  * @Date: 2021-11-22 10:55:42
- * @LastEditTime: 2021-12-10 10:05:57
+ * @LastEditTime: 2021-12-13 10:10:02
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -17,6 +17,7 @@ import ProjStatusColumn from './renders/ProjStatusColumn';
 import BugReOpenColumn from './renders/BugReOpenColumn';
 import BugFlybackDuraColumn from './renders/BugFlybackDuraColumn';
 import KpiCheckBox from './KpiCheckBox';
+import NumberToFixedColumn from './renders/NumberToFixedColumn';
 
 /*  */
 export default () => {
@@ -35,6 +36,7 @@ export default () => {
             reopenRatio: BugReOpenColumn,
             bugFlybackDura: BugFlybackDuraColumn,
             projStatus: ProjStatusColumn,
+            numToFixed: NumberToFixedColumn,
           }}
           columnDefs={[...TableMajorCols, ...dynamicCols]}
           rowData={gqlData}

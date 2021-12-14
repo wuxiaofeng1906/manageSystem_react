@@ -43,33 +43,30 @@ const loadPrjNameSelect = async () => {
 
 
 const PreRelease: React.FC<any> = () => {
+  const [pulishItemForm] = Form.useForm();
 
   // 新增和修改的共同modal显示
-  const [pulishItemModal, setpulishItemModal] = useState({
+  const [dataItemModal, setDataItemModal] = useState({
     shown: false,
-    title: "新增",
-    type: -1
+    title: "新增"
   });
-
-  const pulishItemModalCancle = () => {
-    setpulishItemModal({
-      shown: false,
-      title: "新增",
-      type: -1
-    });
-  };
 
   /* region 新增行 */
 
   // 新增行
-  (window as any).addRows = (params: any) => {
-    //  显示数据
-    console.log(params);
-    setpulishItemModal({
-      shown: true,
-      title: "新增",
-      type: -1
-    });
+  (window as any).addRows = (types: any) => {
+
+    switch (types) {
+      case 1:
+        pulishItemForm.resetFields();
+        setDataItemModal({
+          shown: true,
+          title: "新增"
+        });
+        break;
+      default:
+        break;
+    }
 
   };
 
@@ -78,14 +75,30 @@ const PreRelease: React.FC<any> = () => {
   /* region 修改行 */
 
   // 修改行
-  (window as any).modifyRows = (params: any) => {
+  (window as any).modifyRows = (types: any, params: any) => {
     //  显示数据
-    console.log(params);
-    setpulishItemModal({
-      shown: true,
-      title: "修改",
-      type: -1
-    });
+    switch (types) {
+      case 1:
+        pulishItemForm.setFieldsValue({
+          onlineEnv: params.onlineDev,
+          pulishItem: params.pulishItem,
+          application: params.application,
+          hotUpdate: params.hotUpdate,
+          interAndDbUpgrade: params.upGrade,
+          branchAndEnv: params.branchAndDev,
+          description: params.desc,
+          remark: params.remark
+        });
+        setDataItemModal({
+          shown: true,
+          title: "修改"
+        });
+        break;
+      default:
+        break;
+    }
+
+
   };
 
 
@@ -231,6 +244,18 @@ const PreRelease: React.FC<any> = () => {
     params.api.sizeColumnsToFit();
   };
 
+  // 保存发布项结果
+  const savePulishResult = () => {
+
+  };
+
+  // 取消发布项弹出窗
+  const pulishItemModalCancle = () => {
+    setDataItemModal({
+      ...dataItemModal,
+      shown: false
+    });
+  };
   /* endregion  */
 
   /* region 升级服务 二  */
@@ -1600,19 +1625,24 @@ const PreRelease: React.FC<any> = () => {
         centered={true}
         footer={null}
         width={400}
+        bodyStyle={{height: 130}}
       >
         <Form>
           <Form.Item>
-            <label style={{marginLeft: '90px'}}>确定删除该数据吗？</label>
+            <label style={{marginLeft: '100px'}}>确定删除本条数据吗？</label>
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" style={{marginLeft: '100px'}} onClick={delDetailsInfo}>
-              确定
+            <Button type="primary"
+                    style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, marginLeft: 100}}
+                    onClick={delDetailsInfo}>确定
             </Button>
-            <Button type="primary" style={{marginLeft: '20px'}} onClick={delCancel}>
-              取消
+
+            <Button
+              style={{borderRadius: 5, marginLeft: 20}} onClick={delCancel}>取消
             </Button>
+
+
           </Form.Item>
 
           <Form.Item name="groupId" style={{display: "none", width: "32px", marginTop: "-55px", marginLeft: "270px"}}>
@@ -1623,53 +1653,52 @@ const PreRelease: React.FC<any> = () => {
 
       {/* 发布项 */}
       <Modal
-        title={pulishItemModal.title}
-        visible={pulishItemModal.shown}
+        title={dataItemModal.title}
+        visible={dataItemModal.shown}
         onCancel={pulishItemModalCancle}
         centered={true}
         footer={null}
         width={400}
+        bodyStyle={{height: 410}}
       >
-        <Form>
-          <Form.Item name="onlineEnv" label="上线环境">
+        <Form form={pulishItemForm}>
+          <Form.Item name="onlineEnv" label="上线环境:" style={{marginTop: -15}}>
+            <Select showSearch>
+            </Select>
+          </Form.Item>
+          <Form.Item name="pulishItem" label="发布项：" style={{marginTop: -15}}>
             <Select showSearch style={{}}>
             </Select>
           </Form.Item>
-          <Form.Item name="onlineEnv" label="上线环境">
+          <Form.Item name="application" label="应用：" style={{marginTop: -15}}>
             <Select showSearch style={{}}>
             </Select>
           </Form.Item>
-          <Form.Item name="onlineEnv" label="上线环境">
+          <Form.Item name="hotUpdate" label="是否支持热更新：" style={{marginTop: -15}}>
             <Select showSearch style={{}}>
             </Select>
           </Form.Item>
-          <Form.Item name="onlineEnv" label="上线环境">
+          <Form.Item name="interAndDbUpgrade" label="接口与数据库升级：" style={{marginTop: -15}}>
             <Select showSearch style={{}}>
             </Select>
           </Form.Item>
-          <Form.Item name="onlineEnv" label="上线环境">
-            <Select showSearch style={{}}>
-            </Select>
+          <Form.Item name="branchAndEnv" label="分支和环境：" style={{marginTop: -15}}>
+            <Input/>
           </Form.Item>
-          <Form.Item name="onlineEnv" label="上线环境">
-            <Select showSearch style={{}}>
-            </Select>
+          <Form.Item name="description" label="说明：" style={{marginTop: -15}}>
+            <Input/>
           </Form.Item>
-          <Form.Item name="onlineEnv" label="上线环境">
-            <Select showSearch style={{}}>
-            </Select>
-          </Form.Item>
-          <Form.Item name="onlineEnv" label="上线环境">
-            <Select showSearch style={{}}>
-            </Select>
+          <Form.Item name="remark" label="备注：" style={{marginTop: -15}}>
+            <Input/>
           </Form.Item>
           <Form.Item>
-            <Button type="primary" style={{marginLeft: '100px'}} onClick={delDetailsInfo}>
-              确定
+            <Button
+              style={{borderRadius: 5, marginLeft: 20, float: "right"}} onClick={pulishItemModalCancle}>取消
             </Button>
-            <Button type="primary" style={{marginLeft: '20px'}} onClick={delCancel}>
-              取消
-            </Button>
+            <Button type="primary"
+                    style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, float: "right"}}
+                    onClick={savePulishResult}>确定 </Button>
+
           </Form.Item>
 
         </Form>

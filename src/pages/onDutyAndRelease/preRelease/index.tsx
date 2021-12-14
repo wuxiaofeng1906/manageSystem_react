@@ -63,6 +63,11 @@ const PreRelease: React.FC<any> = () => {
     shown: false,
     title: "新增"
   });
+
+  const [autoLogModal, setAutoLogModal] = useState(false);
+  const autoCancle = () => {
+    setAutoLogModal(false);
+  };
   /* region 新增行 */
 
   // 新增行
@@ -793,6 +798,9 @@ const PreRelease: React.FC<any> = () => {
 
   };
 
+  (window as any).urlClick = (params: any) => {
+    setAutoLogModal(true);
+  };
   // 上线前数据库检查
   const beforeOnlineAutoCheck = (params: any) => {
 
@@ -809,10 +817,10 @@ const PreRelease: React.FC<any> = () => {
         <div style="margin-top: -10px">
             <div style="text-align: right" >
               <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
-                <img src="../执行.png" width="14" height="14" alt="执行参数" title="执行参数">
+                <img src="../执行.png" width="14" height="14" alt="执行" title="执行">
               </Button>
-              <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
-                <img src="../taskUrl.png" width="14" height="14" alt="执行参数" title="执行参数">
+              <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='urlClick("")'>
+                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
               </Button>
             </div>
             <div style=" margin-top: -20px;font-size: 10px;width: 200px">
@@ -1883,6 +1891,37 @@ const PreRelease: React.FC<any> = () => {
                     onClick={saveDataReviewResult}>确定 </Button>
 
           </Form.Item>
+
+        </Form>
+      </Modal>
+
+      {/* 自动化日志的弹窗确认 */}
+      <Modal
+        title={'自动化日志窗'}
+        visible={autoLogModal}
+        onCancel={autoCancle}
+        centered={true}
+        footer={null}
+        width={400}
+        bodyStyle={{height: 145}}
+      >
+        <Form>
+          <Form.Item name="UiLog" label="UI日志:" style={{marginTop: -15}}>
+            <a href={"https://shimo.im/docs/66u6eGAMj6UVljrn"}
+               target={"_black"}>https://shimo.im/docs/66u6eGAMj6UVljrn</a>
+          </Form.Item>
+
+          <Form.Item name="interfaceLog" label="接口日志:" style={{marginTop: -15}}>
+            <a href={"https://shimo.im/docs/66u6eGAMj6UVljrn"}
+               target={"_black"}>https://shimo.im/docs/66u6eGAMj6UVljrn</a>
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              style={{float: "right"}} onClick={autoCancle}>关闭
+            </Button>
+          </Form.Item>
+
 
         </Form>
       </Modal>

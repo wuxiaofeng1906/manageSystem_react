@@ -44,13 +44,25 @@ const loadPrjNameSelect = async () => {
 
 const PreRelease: React.FC<any> = () => {
   const [pulishItemForm] = Form.useForm();
+  const [upgradeIntForm] = Form.useForm();
+  const [dataReviewForm] = Form.useForm();
 
-  // 新增和修改的共同modal显示
-  const [dataItemModal, setDataItemModal] = useState({
+  // 发布项新增和修改的共同modal显示
+  const [pulishItemModal, setPulishItemModal] = useState({
     shown: false,
     title: "新增"
   });
 
+  // 发布项新增和修改的共同modal显示
+  const [upgradeIntModal, setUpgradeIntModal] = useState({
+    shown: false,
+    title: "新增"
+  });
+  // 发布项新增和修改的共同modal显示
+  const [dataReviewtModal, setDataReviewModal] = useState({
+    shown: false,
+    title: "新增"
+  });
   /* region 新增行 */
 
   // 新增行
@@ -59,7 +71,23 @@ const PreRelease: React.FC<any> = () => {
     switch (types) {
       case 1:
         pulishItemForm.resetFields();
-        setDataItemModal({
+        setPulishItemModal({
+          shown: true,
+          title: "新增"
+        });
+        break;
+
+      case 2:
+        upgradeIntForm.resetFields();
+        setUpgradeIntModal({
+          shown: true,
+          title: "新增"
+        });
+        break;
+
+      case 3:
+        dataReviewForm.resetFields();
+        setDataReviewModal({
           shown: true,
           title: "新增"
         });
@@ -89,7 +117,39 @@ const PreRelease: React.FC<any> = () => {
           description: params.desc,
           remark: params.remark
         });
-        setDataItemModal({
+        setPulishItemModal({
+          shown: true,
+          title: "修改"
+        });
+        break;
+      case 2:
+        upgradeIntForm.setFieldsValue({
+          onlineEnv: params.onlineDev,
+          upInterface: params.upgradeInte,
+          interService: params.intService,
+          hotUpdate: params.hotUpdate,
+          method: params.intMethod,
+          URL: params.intURL,
+          renter: params.relateRenter,
+          remark: params.remark
+        });
+        setUpgradeIntModal({
+          shown: true,
+          title: "修改"
+        });
+        break;
+      case 3:
+
+        dataReviewForm.setFieldsValue({
+          repaireContent: params.repaireContent,
+          relatedRenter: params.relateRenter,
+          types: params.type,
+          repaireCommiter: params.repaireCommiter,
+          branch: params.branch,
+          EvalResult: params.reviewResult,
+          repeatExecute: params.repeatExcute
+        });
+        setDataReviewModal({
           shown: true,
           title: "修改"
         });
@@ -251,8 +311,8 @@ const PreRelease: React.FC<any> = () => {
 
   // 取消发布项弹出窗
   const pulishItemModalCancle = () => {
-    setDataItemModal({
-      ...dataItemModal,
+    setPulishItemModal({
+      ...pulishItemModal,
       shown: false
     });
   };
@@ -318,6 +378,18 @@ const PreRelease: React.FC<any> = () => {
     params.api.sizeColumnsToFit();
   };
 
+  // 保存数据
+  const saveUpgradeInterResult = () => {
+
+  };
+  // 取消事件
+  const upgradeIntModalCancle = () => {
+    setUpgradeIntModal({
+      ...upgradeIntModal,
+      shown: false,
+
+    });
+  };
   /* endregion   */
 
   /* region 升级服务 三  */
@@ -441,7 +513,7 @@ const PreRelease: React.FC<any> = () => {
       },
     },
     {
-      headerName: '把数据修复内容',
+      headerName: '数据修复内容',
       field: 'repaireContent',
     },
     {
@@ -495,6 +567,16 @@ const PreRelease: React.FC<any> = () => {
     params.api.sizeColumnsToFit();
   };
 
+  const dataReviewModalCancle = () => {
+    setDataReviewModal({
+      shown: false,
+      title: "新增"
+    });
+
+  };
+  const saveDataReviewResult = () => {
+
+  };
   /* endregion */
 
   /*  region 数据修复 Review 二 */
@@ -1564,7 +1646,7 @@ const PreRelease: React.FC<any> = () => {
                 </div>
               </div>
               <div style={{fontSize: "smaller", marginTop: 10}}>
-                1、版本检查、环境一致性检查、自动化检查，默认开启自动检查，每个小时检查1次，可关闭自动检查，在需要的时间节点，点击手动触发按钮，进行按需检查；
+                1、版本检查、环境一致性检查、自动化检查，在需要的时间节点，点击手动触发按钮，进行按需检查；
                 <br/>
                 2、检查状态分为：是、否、检查中、未开始、忽略等5种状态；
                 <br/>
@@ -1653,8 +1735,8 @@ const PreRelease: React.FC<any> = () => {
 
       {/* 发布项 */}
       <Modal
-        title={dataItemModal.title}
-        visible={dataItemModal.shown}
+        title={pulishItemModal.title}
+        visible={pulishItemModal.shown}
         onCancel={pulishItemModalCancle}
         centered={true}
         footer={null}
@@ -1704,6 +1786,106 @@ const PreRelease: React.FC<any> = () => {
         </Form>
       </Modal>
 
+      {/* 接口服务 */}
+      <Modal
+        title={upgradeIntModal.title}
+        visible={upgradeIntModal.shown}
+        onCancel={upgradeIntModalCancle}
+        centered={true}
+        footer={null}
+        width={400}
+        bodyStyle={{height: 410}}
+      >
+        <Form form={upgradeIntForm}>
+          <Form.Item name="onlineEnv" label="上线环境:" style={{marginTop: -15}}>
+            <Select showSearch>
+            </Select>
+          </Form.Item>
+          <Form.Item name="upInterface" label="升级接口：" style={{marginTop: -15}}>
+            <Select showSearch style={{}}>
+            </Select>
+          </Form.Item>
+          <Form.Item name="interService" label="接口服务：" style={{marginTop: -15}}>
+            <Select showSearch style={{}}>
+            </Select>
+          </Form.Item>
+          <Form.Item name="hotUpdate" label="是否支持热更新：" style={{marginTop: -15}}>
+            <Select showSearch style={{}}>
+            </Select>
+          </Form.Item>
+          <Form.Item name="method" label="接口Method：" style={{marginTop: -15}}>
+            <Select showSearch style={{}}>
+            </Select>
+          </Form.Item>
+          <Form.Item name="URL" label="接口URL：" style={{marginTop: -15}}>
+            <Input/>
+          </Form.Item>
+          <Form.Item name="renter" label="涉及租户：" style={{marginTop: -15}}>
+            <Input/>
+          </Form.Item>
+          <Form.Item name="remark" label="备注：" style={{marginTop: -15}}>
+            <Input/>
+          </Form.Item>
+          <Form.Item>
+            <Button
+              style={{borderRadius: 5, marginLeft: 20, float: "right"}} onClick={upgradeIntModalCancle}>取消
+            </Button>
+            <Button type="primary"
+                    style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, float: "right"}}
+                    onClick={saveUpgradeInterResult}>确定 </Button>
+
+          </Form.Item>
+
+        </Form>
+      </Modal>
+
+      {/* 数据修复review */}
+      <Modal
+        title={dataReviewtModal.title}
+        visible={dataReviewtModal.shown}
+        onCancel={dataReviewModalCancle}
+        centered={true}
+        footer={null}
+        width={400}
+        bodyStyle={{height: 370}}
+      >
+        <Form form={dataReviewForm}>
+          <Form.Item name="repaireContent" label="数据修复内容:" style={{marginTop: -15}}>
+            <Input/>
+          </Form.Item>
+          <Form.Item name="relatedRenter" label="涉及租户：" style={{marginTop: -15}}>
+            <Input/>
+          </Form.Item>
+          <Form.Item name="types" label="类型：" style={{marginTop: -15}}>
+            <Select showSearch style={{}}>
+            </Select>
+          </Form.Item>
+          <Form.Item name="repaireCommiter" label="修复提交人：" style={{marginTop: -15}}>
+            <Select showSearch style={{}}>
+            </Select>
+          </Form.Item>
+          <Form.Item name="branch" label="分支：" style={{marginTop: -15}}>
+            <Input/>
+          </Form.Item>
+          <Form.Item name="EvalResult" label="评审结果：" style={{marginTop: -15}}>
+            <Input/>
+          </Form.Item>
+          <Form.Item name="repeatExecute" label="是否可重复执行：" style={{marginTop: -15}}>
+            <Input/>
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              style={{borderRadius: 5, marginLeft: 20, float: "right"}} onClick={dataReviewModalCancle}>取消
+            </Button>
+            <Button type="primary"
+                    style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, float: "right"}}
+                    onClick={saveDataReviewResult}>确定 </Button>
+
+          </Form.Item>
+
+        </Form>
+      </Modal>
     </PageContainer>
   );
 };

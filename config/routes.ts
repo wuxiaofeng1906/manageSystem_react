@@ -444,7 +444,7 @@ export default [
         path: 'dutyPlan',
         component: './onDutyAndRelease/dutyPlan',
       }, {
-        name: '预发布',
+        name: '发布过程',
         icon: 'table',
         path: 'preRelease',
         access: 'sysAdmin',

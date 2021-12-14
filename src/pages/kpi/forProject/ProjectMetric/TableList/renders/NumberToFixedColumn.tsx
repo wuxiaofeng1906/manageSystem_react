@@ -2,7 +2,7 @@
  * @Description: float保留小数位
  * @Author: jieTan
  * @Date: 2021-12-13 09:49:07
- * @LastEditTime: 2021-12-13 10:29:27
+ * @LastEditTime: 2021-12-14 03:38:38
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -20,20 +20,21 @@ export default (props: { value: any; others?: { decimal?: number; html?: boolean
   if (Object.prototype.toString.call(value) != JS_PROTOTYPE_TYPE['Number'])
     return value ? value : DEFAULT_PLACEHOLDER;
 
+  const decimalPlaces = others?.decimal ?? DEFAULT_DECIMAL_PLACES;
   // 判断是否需要绘制html
-  if (!others?.html) return value?.toFixed(DEFAULT_DECIMAL_PLACES);
+  if (!others?.html) return parseFloat(value?.toFixed(decimalPlaces));
 
   // 绘制颜色
   if (value < 0)
     return (
       <span style={{ color: 'red' }}>
-        {value.toFixed(DEFAULT_DECIMAL_PLACES) + PERCENTAGE.unit}
+        {parseFloat(value.toFixed(decimalPlaces)) + PERCENTAGE.unit}
       </span>
     );
   if (value > 0)
     return (
       <span style={{ color: 'green' }}>
-        {'+' + value.toFixed(DEFAULT_DECIMAL_PLACES) + PERCENTAGE.unit}
+        {'+' + parseFloat(value.toFixed(decimalPlaces)) + PERCENTAGE.unit}
       </span>
     );
   return value;

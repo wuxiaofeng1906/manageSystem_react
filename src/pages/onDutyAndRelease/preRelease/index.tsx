@@ -4,7 +4,22 @@ import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import './style.css';
-import {Button, Form, Input, message, Modal, Select, Tabs, Row, Col, DatePicker} from 'antd';
+import {
+  Button,
+  Form,
+  Input,
+  message,
+  Modal,
+  Select,
+  Tabs,
+  Row,
+  Col,
+  DatePicker,
+  Checkbox,
+  Divider,
+  Card,
+  Switch
+} from 'antd';
 import dayjs from "dayjs";
 import {AgGridReact} from "ag-grid-react";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
@@ -46,6 +61,7 @@ const PreRelease: React.FC<any> = () => {
   const [pulishItemForm] = Form.useForm();
   const [upgradeIntForm] = Form.useForm();
   const [dataReviewForm] = Form.useForm();
+  const [formForOnlineBranch] = Form.useForm();
 
   // 发布项新增和修改的共同modal显示
   const [pulishItemModal, setPulishItemModal] = useState({
@@ -64,10 +80,18 @@ const PreRelease: React.FC<any> = () => {
     title: "新增"
   });
 
+  // 自动化测试日志弹窗
   const [autoLogModal, setAutoLogModal] = useState(false);
   const autoCancle = () => {
     setAutoLogModal(false);
   };
+
+  // 上线分支设置
+  const [onlineBranchModal, setOnlineBranchModal] = useState({
+    shown: false,
+    title: "新增"
+  });
+
   /* region 新增行 */
 
   // 新增行
@@ -93,6 +117,13 @@ const PreRelease: React.FC<any> = () => {
       case 3:
         dataReviewForm.resetFields();
         setDataReviewModal({
+          shown: true,
+          title: "新增"
+        });
+        break;
+      case 4:
+        // dataReviewForm.resetFields();
+        setOnlineBranchModal({
           shown: true,
           title: "新增"
         });
@@ -155,6 +186,13 @@ const PreRelease: React.FC<any> = () => {
           repeatExecute: params.repeatExcute
         });
         setDataReviewModal({
+          shown: true,
+          title: "修改"
+        });
+        break;
+
+      case 4:
+        setOnlineBranchModal({
           shown: true,
           title: "修改"
         });
@@ -798,7 +836,9 @@ const PreRelease: React.FC<any> = () => {
 
   };
 
+  // 自动化URL跳转
   (window as any).urlClick = (params: any) => {
+    console.log(params);
     setAutoLogModal(true);
   };
   // 上线前数据库检查
@@ -955,6 +995,14 @@ const PreRelease: React.FC<any> = () => {
     params.api.sizeColumnsToFit();
   };
 
+  // 取消
+  const onlineBranchCancle = () => {
+
+  };
+  // 保存
+  const saveOnlineBranchResult = () => {
+
+  };
   /* endregion */
 
   /*  region 对应工单 */
@@ -1925,8 +1973,110 @@ const PreRelease: React.FC<any> = () => {
 
         </Form>
       </Modal>
+
+      {/* 上线分支设置 */}
+      <Modal
+        title={`上线分支设置-${onlineBranchModal.title}`}
+        visible={true}
+        onCancel={onlineBranchCancle}
+        centered={true}
+        footer={null}
+        width={500}>
+
+        <Form form={formForOnlineBranch}>
+
+          <div>
+            <Row>
+              <Col span={12}>
+
+                {/* 分支名称 */}
+                <Form.Item label="分支名称:" name="branchName" required={true}>
+                  <Select style={{width: '100%'}} showSearch>
+                  </Select>
+                </Form.Item>
+                {/* 忽略前端单元测试检查 */}
+                <Form.Item name="ignoreFrontCheck" style={{marginLeft: 0, marginTop: -20}}>
+                  <Checkbox>忽略前端单元测试检查</Checkbox>
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+
+                {/* 技术侧 */}
+                <Form.Item label="技术侧:" name="module" style={{marginLeft: 10}} required={true}>
+                  <Select style={{width: '100%'}} showSearch>
+                  </Select>
+                </Form.Item>
+                {/* 忽略后端单元测试检查 */}
+                <Form.Item name="ignoreBackendCheck" style={{marginLeft: 0, marginTop: -20}}>
+                  <Checkbox>忽略后端单元测试检查</Checkbox>
+                </Form.Item>
+              </Col>
+            </Row>
+
+          </div>
+
+          <div style={{marginTop: -35}}>
+            <Divider plain>① 版本检查设置</Divider>
+          </div>
+
+          <div>
+            <Card size="small" title="版本检查" style={{width: "100%", marginTop: -10, height: 150}}>
+              <Form.Item name="verson_check" label="是否开启：" valuePropName="checked" style={{marginTop: -10}}>
+                <Switch checkedChildren="是" unCheckedChildren="否" style={{}}/>
+              </Form.Item>
+              <Form.Item name="server" label="服务" style={{marginTop: -22}}>
+                <Select placeholder="请选择相应的服务！" style={{marginLeft: 28, width: 355}}>
+
+                </Select>
+              </Form.Item>
+              <Form.Item name="imageevn" label="镜像环境" style={{marginTop: -20}}>
+                <Select placeholder="请选择对应的环境！" style={{}} showSearch>
+
+                </Select>
+              </Form.Item>
+            </Card>
+          </div>
+
+          <div>
+            <Card size="small" title="检查上线分支是否包含对比分支的提交" style={{width: "100%", height: 200}}>
+              <Form.Item name="branchcheck" label="是否开启：" valuePropName="checked" style={{marginTop: -10}}>
+                <Switch checkedChildren="是" unCheckedChildren="否" style={{}}/>
+              </Form.Item>
+
+              <Form.Item label="被对比的主分支" name="branch_mainBranch" style={{marginTop: -25}}>
+                <Checkbox.Group>
+                  <Checkbox value={"stage"}>stage</Checkbox>
+                  <Checkbox value={"master"}>master</Checkbox>
+                </Checkbox.Group>
+              </Form.Item>
+
+              <Form.Item label="技术侧" name="branch_teachnicalSide" style={{marginTop: -25}}>
+                <Checkbox.Group>
+                  <Checkbox value={"front"}>前端</Checkbox>
+                  <Checkbox value={"backend"}>后端</Checkbox>
+                </Checkbox.Group>
+              </Form.Item>
+
+              <Form.Item label="对比起始时间" name="branch_mainSince" style={{marginTop: -20}}>
+                <DatePicker style={{marginLeft: 25, width: 300}}/>
+              </Form.Item>
+            </Card>
+          </div>
+
+          <Form.Item>
+            <Button
+              style={{borderRadius: 5, marginLeft: 20, float: "right"}} onClick={onlineBranchCancle}>清空
+            </Button>
+            <Button type="primary"
+                    style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, float: "right"}}
+                    onClick={saveOnlineBranchResult}>保存 </Button>
+
+          </Form.Item>
+        </Form>
+      </Modal>
     </PageContainer>
   );
 };
+
 
 export default PreRelease;

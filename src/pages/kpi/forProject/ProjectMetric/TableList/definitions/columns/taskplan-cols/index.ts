@@ -2,18 +2,18 @@
  * @Description: 任务的计划类型的字段: 进度偏差率 + 阶段工作量
  * @Author: jieTan
  * @Date: 2021-12-14 03:16:01
- * @LastEditTime: 2021-12-14 03:23:13
+ * @LastEditTime: 2021-12-14 03:30:39
  * @LastEditors: jieTan
  * @LastModify:
  */
 import { ColDef } from 'ag-grid-community';
 import { ratioW } from '../baseParams';
 
-export default (moduleName: string, html?: boolean) => {
+export default (moduleName: string, others?: { decimal?: number; html?: boolean }) => {
   /*  */
   const defaultParmas = {
     cellRenderer: 'numToFixed',
-    cellRendererParams: { others: { html } },
+    cellRendererParams: { others },
     ...ratioW,
   };
 

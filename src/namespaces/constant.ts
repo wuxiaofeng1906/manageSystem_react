@@ -2,7 +2,7 @@
  * @Description: 通用常量
  * @Author: jieTan
  * @Date: 2021-11-23 15:51:13
- * @LastEditTime: 2021-12-13 10:00:32
+ * @LastEditTime: 2021-12-14 03:10:33
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -39,8 +39,9 @@ export const PROJ_STATUS = {
 
 /* 项目度量指标 */
 export const PROJ_METRIC = {
-  progressDeviation: { en: 'progressDeviation', zh: '进度偏差率' },
   processQuality: { en: 'processQuality', zh: '过程质量' },
+  progressDeviation: { en: 'progressDeviation', zh: '进度偏差率' },
+  stageWorkload: { en: 'stageWorkload', zh: '阶段工作量' },
 };
 
 /*  */

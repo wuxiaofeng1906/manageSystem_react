@@ -18,7 +18,8 @@ import {
   Checkbox,
   Divider,
   Card,
-  Switch
+  Switch,
+  Progress
 } from 'antd';
 import dayjs from "dayjs";
 import {AgGridReact} from "ag-grid-react";
@@ -1402,44 +1403,52 @@ const PreRelease: React.FC<any> = () => {
         {/* 用于占位 */}
         <div style={{height: 5}}></div>
 
-        {/* 检查总览 */}
-        <div style={{marginLeft: 5}}>
+        <div>
+          <div>
+            <Row>
+              <label style={{marginLeft: 5, fontWeight: "bold"}}>检查进度：</label>
+              <Progress strokeColor={"#2BF541"} style={{width: 800}} percent={70}/>
+            </Row>
 
-          <label style={{fontWeight: "bold"}}>检查总览：</label>
-          <label>
-            <button style={{height: 13, width: 13, border: "none", backgroundColor: "#2BF541"}}></button>
-            &nbsp;预发布项目已填写完成
-          </label>
+          </div>
 
-          <label style={{marginLeft: 15}}>
-            <button style={{height: 13, width: 13, border: "none", backgroundColor: "#2BF541"}}></button>
-            &nbsp;升级服务已确认完成
-          </label>
+          {/* 检查总览 */}
+          <div style={{marginTop: 10, marginLeft: 5}}>
 
-          <label style={{marginLeft: 15}}>
-            <button style={{height: 13, width: 13, border: "none", backgroundColor: "#2BF541"}}></button>
-            &nbsp;数据Review确认完成
-          </label>
+            <label style={{fontWeight: "bold"}}>检查总览：</label>
+            <label>
+              <button style={{height: 13, width: 13, border: "none", backgroundColor: "#2BF541"}}></button>
+              &nbsp;预发布项目已填写完成
+            </label>
 
-          <label style={{marginLeft: 15}}>
-            <button style={{height: 13, width: 13, border: "none", backgroundColor: "Gainsboro"}}></button>
-            &nbsp;上线前检查已完成
-          </label>
+            <label style={{marginLeft: 10}}>
+              <button style={{height: 13, width: 13, border: "none", backgroundColor: "#2BF541"}}></button>
+              &nbsp;升级服务已确认完成
+            </label>
 
-          <label style={{marginLeft: 15}}>
-            <label style={{fontWeight: "bold"}}>发布状态总览：</label>
-            未完成
-          </label>
+            <label style={{marginLeft: 10}}>
+              <button style={{height: 13, width: 13, border: "none", backgroundColor: "#2BF541"}}></button>
+              &nbsp;数据Review确认完成
+            </label>
 
-          <label style={{marginLeft: 15}}>
-            <label style={{fontWeight: "bold"}}>发布结果：</label>
-            <Select size={"small"} style={{width: 100}} onChange={pulishResulttChanged}>
-              <Option value="">空</Option>
-              <Option value="lucy">Lucy</Option>
-            </Select>
-          </label>
+            <label style={{marginLeft: 10}}>
+              <button style={{height: 13, width: 13, border: "none", backgroundColor: "Gainsboro"}}></button>
+              &nbsp;上线前检查已完成
+            </label>
+
+            <label style={{marginLeft: 10}}>
+              <label style={{fontWeight: "bold"}}>发布结果：</label>
+              <Select size={"small"} style={{width: 100}} onChange={pulishResulttChanged}>
+                <Option value="">空</Option>
+                <Option value="lucy">Lucy</Option>
+              </Select>
+            </label>
+
+          </div>
+
 
         </div>
+
 
         {/* 预发布项目 */}
         <div>

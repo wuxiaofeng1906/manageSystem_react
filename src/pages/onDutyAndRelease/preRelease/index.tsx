@@ -997,11 +997,20 @@ const PreRelease: React.FC<any> = () => {
 
   // 取消
   const onlineBranchCancle = () => {
-
+    setOnlineBranchModal({
+      shown: false,
+      title: "新增"
+    });
   };
   // 保存
   const saveOnlineBranchResult = () => {
 
+  };
+
+  // 清空表中数据
+  const onlineBranchClear = () => {
+
+    formForOnlineBranch.resetFields();
   };
   /* endregion */
 
@@ -1974,17 +1983,20 @@ const PreRelease: React.FC<any> = () => {
         </Form>
       </Modal>
 
+
       {/* 上线分支设置 */}
       <Modal
         title={`上线分支设置-${onlineBranchModal.title}`}
-        visible={true}
+        visible={onlineBranchModal.shown}
         onCancel={onlineBranchCancle}
         centered={true}
         footer={null}
-        width={500}>
-
+        width={600}
+        bodyStyle={{height: 810}}
+      >
         <Form form={formForOnlineBranch}>
 
+          {/* 总设置 */}
           <div>
             <Row>
               <Col span={12}>
@@ -2015,63 +2027,161 @@ const PreRelease: React.FC<any> = () => {
 
           </div>
 
+          {/* ① 版本检查设置 */}
           <div style={{marginTop: -35}}>
             <Divider plain>① 版本检查设置</Divider>
+
+            <div>
+              <Card size="small" title="版本检查" style={{width: "100%", marginTop: -10, height: 150}}>
+                <Form.Item name="verson_check" label="是否开启：" valuePropName="checked" style={{marginTop: -10}}>
+                  <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 40}}/>
+                </Form.Item>
+                <Form.Item name="server" label="服务" style={{marginTop: -22}}>
+                  <Select mode="multiple" placeholder="请选择相应的服务！" style={{marginLeft: 68, width: 415}}>
+
+                  </Select>
+                </Form.Item>
+                <Form.Item name="imageevn" label="镜像环境" style={{marginTop: -20}}>
+                  <Select placeholder="请选择对应的环境！" style={{marginLeft: 40, width: 415}} showSearch>
+                  </Select>
+                </Form.Item>
+              </Card>
+            </div>
+
+            <div>
+              <Card size="small" title="检查上线分支是否包含对比分支的提交" style={{width: "100%", height: 200}}>
+                <Form.Item name="branchcheck" label="是否开启：" valuePropName="checked" style={{marginTop: -10}}>
+                  <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 40}}/>
+                </Form.Item>
+
+                <Form.Item label="被对比的主分支" name="branch_mainBranch" style={{marginTop: -25}}>
+                  <Checkbox.Group>
+                    <Checkbox value={"stage"}>stage</Checkbox>
+                    <Checkbox value={"master"}>master</Checkbox>
+                  </Checkbox.Group>
+                </Form.Item>
+
+                <Form.Item label="技术侧" name="branch_teachnicalSide" style={{marginTop: -25}}>
+                  <Checkbox.Group style={{marginLeft: 56}}>
+                    <Checkbox value={"front"}>前端</Checkbox>
+                    <Checkbox value={"backend"}>后端</Checkbox>
+                  </Checkbox.Group>
+                </Form.Item>
+
+                <Form.Item label="对比起始时间" name="branch_mainSince" style={{marginTop: -20}}>
+                  <DatePicker style={{marginLeft: 13, width: 415}}/>
+                </Form.Item>
+                <div style={{color: "gray", marginTop: -25, marginLeft: 110}}>默认时间代表查询近一周的数据</div>
+              </Card>
+            </div>
           </div>
 
-          <div>
-            <Card size="small" title="版本检查" style={{width: "100%", marginTop: -10, height: 150}}>
-              <Form.Item name="verson_check" label="是否开启：" valuePropName="checked" style={{marginTop: -10}}>
-                <Switch checkedChildren="是" unCheckedChildren="否" style={{}}/>
-              </Form.Item>
-              <Form.Item name="server" label="服务" style={{marginTop: -22}}>
-                <Select placeholder="请选择相应的服务！" style={{marginLeft: 28, width: 355}}>
+          {/* ② 环境一致性检查 */}
+          <div style={{marginTop: -10}}>
+            <Divider plain>② 环境一致性检查</Divider>
+            <div>
+              <Row>
+                <Col span={9}>
+                  {/* 忽略检查 */}
+                  <Form.Item label="是否忽略检查" name="ignoreCheck" style={{marginTop: -10}}>
+                    <Checkbox>忽略检查</Checkbox>
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
 
-                </Select>
-              </Form.Item>
-              <Form.Item name="imageevn" label="镜像环境" style={{marginTop: -20}}>
-                <Select placeholder="请选择对应的环境！" style={{}} showSearch>
+                  {/* 检查环境 */}
+                  <Form.Item label="检查环境:" name="checkEnv" style={{marginTop: -10}}>
+                    <Select style={{width: '100%'}} showSearch>
+                    </Select>
+                  </Form.Item>
 
-                </Select>
-              </Form.Item>
-            </Card>
+                </Col>
+              </Row>
+            </div>
           </div>
 
-          <div>
-            <Card size="small" title="检查上线分支是否包含对比分支的提交" style={{width: "100%", height: 200}}>
-              <Form.Item name="branchcheck" label="是否开启：" valuePropName="checked" style={{marginTop: -10}}>
-                <Switch checkedChildren="是" unCheckedChildren="否" style={{}}/>
-              </Form.Item>
+          {/* ③ 上线前自动化检查设置 */}
+          <div style={{marginTop: -30}}>
+            <Divider plain>③ 上线前自动化检查设置</Divider>
+            <Row style={{marginTop: -10}}>
+              <Col>
+                {/* 忽略检查 */}
+                <Form.Item label="是否忽略检查" name="autoBeforeIgnoreCheck" style={{marginTop: -10}}>
+                  <Checkbox>忽略检查</Checkbox>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row style={{marginTop: -10}}>
+              <Col span={8}>
+                {/* 检查类型 */}
+                <Form.Item label="检查类型:" name="beforeCheckType" style={{marginTop: -10}}>
+                  <Select mode="multiple" style={{width: '100%'}} showSearch>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                {/* 测试环境 */}
+                <Form.Item label="测试环境:" name="beforeTestEnv" style={{marginTop: -10, marginLeft: 10}}>
+                  <Select style={{width: '100%'}} showSearch>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                {/* 浏览器 */}
+                <Form.Item label="浏览器:" name="beforeBrowser" style={{marginTop: -10, marginLeft: 10}}>
+                  <Select style={{width: '100%'}} showSearch>
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+          </div>
 
-              <Form.Item label="被对比的主分支" name="branch_mainBranch" style={{marginTop: -25}}>
-                <Checkbox.Group>
-                  <Checkbox value={"stage"}>stage</Checkbox>
-                  <Checkbox value={"master"}>master</Checkbox>
-                </Checkbox.Group>
-              </Form.Item>
-
-              <Form.Item label="技术侧" name="branch_teachnicalSide" style={{marginTop: -25}}>
-                <Checkbox.Group>
-                  <Checkbox value={"front"}>前端</Checkbox>
-                  <Checkbox value={"backend"}>后端</Checkbox>
-                </Checkbox.Group>
-              </Form.Item>
-
-              <Form.Item label="对比起始时间" name="branch_mainSince" style={{marginTop: -20}}>
-                <DatePicker style={{marginLeft: 25, width: 300}}/>
-              </Form.Item>
-            </Card>
+          {/* ④ 上线后自动化检查设置 */}
+          <div style={{marginTop: -30}}>
+            <Divider plain>④ 上线后自动化检查设置</Divider>
+            <Row style={{marginTop: -10}}>
+              <Col>
+                {/* 忽略检查 */}
+                <Form.Item label="是否忽略检查" name="autoAfterIgnoreCheck" style={{marginTop: -10}}>
+                  <Checkbox>忽略检查</Checkbox>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row style={{marginTop: -10}}>
+              <Col span={8}>
+                {/* 检查类型 */}
+                <Form.Item label="检查类型:" name="afterCheckType" style={{marginTop: -10}}>
+                  <Select mode="multiple" style={{width: '100%'}} showSearch>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                {/* 测试环境 */}
+                <Form.Item label="测试环境:" name="afterTestEnv" style={{marginTop: -10, marginLeft: 10}}>
+                  <Select style={{width: '100%'}} showSearch>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                {/* 浏览器 */}
+                <Form.Item label="浏览器:" name="afterBrowser" style={{marginTop: -10, marginLeft: 10}}>
+                  <Select style={{width: '100%'}} showSearch>
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
           </div>
 
           <Form.Item>
             <Button
-              style={{borderRadius: 5, marginLeft: 20, float: "right"}} onClick={onlineBranchCancle}>清空
+              style={{borderRadius: 5, marginLeft: 20, float: "right"}} onClick={onlineBranchClear}>清空
             </Button>
             <Button type="primary"
                     style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, float: "right"}}
                     onClick={saveOnlineBranchResult}>保存 </Button>
 
           </Form.Item>
+
         </Form>
       </Modal>
     </PageContainer>

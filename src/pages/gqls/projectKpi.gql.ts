@@ -2,7 +2,7 @@
  * @Description: 项目度量指标
  * @Author: jieTan
  * @Date: 2021-12-02 11:41:52
- * @LastEditTime: 2021-12-14 03:08:14
+ * @LastEditTime: 2021-12-15 03:32:58
  * @LastEditors: jieTan
  * @LastModify: 
  */
@@ -49,6 +49,10 @@ export default (args: GQL_PARAMS, funcWithParams: Function): [string, string] =>
         testplan
         releaseplan
         projectplan
+      }
+      scaleProductivity{
+        actualValue
+        actualRatio
       }
     }
   }

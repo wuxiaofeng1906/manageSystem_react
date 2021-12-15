@@ -2,7 +2,7 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2021-12-14 03:10:56
+ * @LastEditTime: 2021-12-15 03:35:36
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -13,14 +13,19 @@ import { GQL_PARAMS, PROJ_METRIC as PM } from '@/namespaces';
 import {
   ProcessDeviationCols,
   ProcessQualityCols,
+  ScaleProductivityCols,
   StageWorkloadCols,
 } from '../definitions/columns';
 import { projectKpiGql, queryGQL } from '@/pages/gqls';
 import { useGqlClient } from '@/hooks';
 
 const CheckboxGroup = Checkbox.Group;
-
-const plainOptions = [PM.processQuality.zh, PM.progressDeviation.zh, PM.stageWorkload.zh];
+// checkbox框的文本值
+const plainOptions = (() => {
+  const rets: string[] = [];
+  Object.values(PM)?.map((item) => rets.push(item.zh));
+  return rets;
+})();
 
 export default () => {
   /*  */
@@ -69,6 +74,11 @@ export default () => {
         case PM.stageWorkload.zh:
           loadColumns.push(...StageWorkloadCols);
           kpiItems.push(PM.stageWorkload.en);
+          break;
+        // 生产率&规模
+        case PM.scaleProductivity.zh:
+          loadColumns.push(...ScaleProductivityCols);
+          kpiItems.push(PM.scaleProductivity.en);
           break;
 
         default:

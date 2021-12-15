@@ -2,14 +2,15 @@
  * @Description: cloumn => 通用的属性配置
  * @Author: jieTan
  * @Date: 2021-12-08 11:27:56
- * @LastEditTime: 2021-12-08 11:30:23
+ * @LastEditTime: 2021-12-15 03:43:38
  * @LastEditors: jieTan
- * @LastModify: 
+ * @LastModify:
  */
 
-import { COLUMN_W } from "@/namespaces";
+import { COLUMN_W } from '@/namespaces';
 
 export const ratioW = { width: COLUMN_W * 2, minWidth: COLUMN_W * 2 };
 export const numberW = { width: COLUMN_W, minWidth: COLUMN_W };
+export const extraW = { width: COLUMN_W * 1.5, minWidth: COLUMN_W };
 export const doubleNumberW = ratioW;
 export const stringW = doubleNumberW;

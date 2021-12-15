@@ -29,7 +29,7 @@ import {savePreProjects, inquireService} from "./logic";
 
 const {TabPane} = Tabs;
 const {Option} = Select;
-
+const {TextArea} = Input;
 const currentDate = dayjs().format("YYYYMMDD");
 
 const loadPrjNameSelect = async () => {
@@ -1811,15 +1811,19 @@ const PreRelease: React.FC<any> = () => {
           </Form.Item>
 
           <Form.Item>
+            <Button
+              style={{borderRadius: 5, marginLeft: 20, float: "right"}} onClick={delTabsCancel}>取消
+            </Button>
             <Button type="primary"
-                    style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, marginLeft: 100}}
+                    style={{
+                      color: '#46A0FC',
+                      backgroundColor: "#ECF5FF",
+                      borderRadius: 5,
+                      marginLeft: 100,
+                      float: "right"
+                    }}
                     onClick={delTabsInfo}>确定
             </Button>
-
-            <Button
-              style={{borderRadius: 5, marginLeft: 20}} onClick={delTabsCancel}>取消
-            </Button>
-
 
           </Form.Item>
 
@@ -1845,15 +1849,20 @@ const PreRelease: React.FC<any> = () => {
           </Form.Item>
 
           <Form.Item>
+            <Button
+              style={{borderRadius: 5, marginLeft: 20, float: "right"}} onClick={delCancel}>取消
+            </Button>
+
             <Button type="primary"
-                    style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, marginLeft: 100}}
+                    style={{
+                      color: '#46A0FC',
+                      backgroundColor: "#ECF5FF",
+                      borderRadius: 5,
+                      marginLeft: 100,
+                      float: "right"
+                    }}
                     onClick={delDetailsInfo}>确定
             </Button>
-
-            <Button
-              style={{borderRadius: 5, marginLeft: 20}} onClick={delCancel}>取消
-            </Button>
-
 
           </Form.Item>
 
@@ -1870,38 +1879,53 @@ const PreRelease: React.FC<any> = () => {
         onCancel={pulishItemModalCancle}
         centered={true}
         footer={null}
-        width={400}
-        bodyStyle={{height: 410}}
+        width={600}
       >
         <Form form={pulishItemForm}>
-          <Form.Item name="onlineEnv" label="上线环境:" style={{marginTop: -15}}>
-            <Select showSearch>
-            </Select>
-          </Form.Item>
-          <Form.Item name="pulishItem" label="发布项：" style={{marginTop: -15}}>
+          <Row>
+            <Col span={12}>
+              <Form.Item name="onlineEnv" label="上线环境:" style={{marginTop: -15}}>
+                <Select showSearch>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="pulishItem" label="发布项：" style={{marginTop: -15, marginLeft: 10}}>
+                <Select showSearch style={{marginLeft: 27, width: 183}}>
+                </Select>
+              </Form.Item>
+            </Col>
+
+          </Row>
+          <Row>
+            <Col span={12}>
+              <Form.Item name="application" label="应用：" style={{marginTop: -15}}>
+                <Select showSearch style={{marginLeft: 28, width: 206}}>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="branchAndEnv" label="分支和环境：" style={{marginTop: -15, marginLeft: 10}}>
+                <Input autoComplete="off"/>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item name="interAndDbUpgrade" label="是否涉及接口与数据库升级：" style={{marginTop: -15}}>
             <Select showSearch style={{}}>
             </Select>
           </Form.Item>
-          <Form.Item name="application" label="应用：" style={{marginTop: -15}}>
-            <Select showSearch style={{}}>
-            </Select>
-          </Form.Item>
+
           <Form.Item name="hotUpdate" label="是否支持热更新：" style={{marginTop: -15}}>
             <Select showSearch style={{}}>
             </Select>
           </Form.Item>
-          <Form.Item name="interAndDbUpgrade" label="接口与数据库升级：" style={{marginTop: -15}}>
-            <Select showSearch style={{}}>
-            </Select>
-          </Form.Item>
-          <Form.Item name="branchAndEnv" label="分支和环境：" style={{marginTop: -15}}>
-            <Input/>
-          </Form.Item>
+
           <Form.Item name="description" label="说明：" style={{marginTop: -15}}>
-            <Input/>
+            <TextArea/>
           </Form.Item>
           <Form.Item name="remark" label="备注：" style={{marginTop: -15}}>
-            <Input/>
+            <TextArea/>
           </Form.Item>
           <Form.Item>
             <Button
@@ -1923,38 +1947,64 @@ const PreRelease: React.FC<any> = () => {
         onCancel={upgradeIntModalCancle}
         centered={true}
         footer={null}
-        width={400}
-        bodyStyle={{height: 410}}
+        width={600}
+
       >
         <Form form={upgradeIntForm}>
-          <Form.Item name="onlineEnv" label="上线环境:" style={{marginTop: -15}}>
-            <Select showSearch>
-            </Select>
-          </Form.Item>
-          <Form.Item name="upInterface" label="升级接口：" style={{marginTop: -15}}>
-            <Select showSearch style={{}}>
-            </Select>
-          </Form.Item>
-          <Form.Item name="interService" label="接口服务：" style={{marginTop: -15}}>
-            <Select showSearch style={{}}>
-            </Select>
-          </Form.Item>
+
+          <Row>
+            <Col span={12}>
+              <Form.Item name="onlineEnv" label="上线环境:" style={{marginTop: -15}}>
+                <Select showSearch style={{marginLeft: 20, width: 185}}>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="upInterface" label="升级接口：" style={{marginLeft: 10, marginTop: -15}}>
+                <Select showSearch style={{}}>
+                </Select>
+              </Form.Item>
+            </Col>
+
+          </Row>
+
+          <Row>
+            <Col span={12}>
+              <Form.Item name="interService" label="接口服务：" style={{marginTop: -15}}>
+                <Select showSearch style={{marginLeft: 21, width: 185}}>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="renter" label="涉及租户：" style={{marginLeft: 10, marginTop: -15}}>
+                <Input/>
+              </Form.Item>
+            </Col>
+
+          </Row>
+
+          <Row>
+            <Col span={12}>
+              <Form.Item name="method" label="接口Method：" style={{marginTop: -15}}>
+                <Select showSearch style={{}}>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="URL" label="接口URL：" style={{marginLeft: 10, marginTop: -15}}>
+                <Input/>
+              </Form.Item>
+            </Col>
+
+          </Row>
+
           <Form.Item name="hotUpdate" label="是否支持热更新：" style={{marginTop: -15}}>
             <Select showSearch style={{}}>
             </Select>
           </Form.Item>
-          <Form.Item name="method" label="接口Method：" style={{marginTop: -15}}>
-            <Select showSearch style={{}}>
-            </Select>
-          </Form.Item>
-          <Form.Item name="URL" label="接口URL：" style={{marginTop: -15}}>
-            <Input/>
-          </Form.Item>
-          <Form.Item name="renter" label="涉及租户：" style={{marginTop: -15}}>
-            <Input/>
-          </Form.Item>
+
           <Form.Item name="remark" label="备注：" style={{marginTop: -15}}>
-            <Input/>
+            <TextArea/>
           </Form.Item>
           <Form.Item>
             <Button
@@ -1976,33 +2026,56 @@ const PreRelease: React.FC<any> = () => {
         onCancel={dataReviewModalCancle}
         centered={true}
         footer={null}
-        width={400}
-        bodyStyle={{height: 370}}
+        width={600}
       >
         <Form form={dataReviewForm}>
+
           <Form.Item name="repaireContent" label="数据修复内容:" style={{marginTop: -15}}>
-            <Input/>
+            <TextArea/>
           </Form.Item>
-          <Form.Item name="relatedRenter" label="涉及租户：" style={{marginTop: -15}}>
-            <Input/>
-          </Form.Item>
-          <Form.Item name="types" label="类型：" style={{marginTop: -15}}>
-            <Select showSearch style={{}}>
-            </Select>
-          </Form.Item>
-          <Form.Item name="repaireCommiter" label="修复提交人：" style={{marginTop: -15}}>
-            <Select showSearch style={{}}>
-            </Select>
-          </Form.Item>
-          <Form.Item name="branch" label="分支：" style={{marginTop: -15}}>
-            <Input/>
-          </Form.Item>
-          <Form.Item name="EvalResult" label="评审结果：" style={{marginTop: -15}}>
-            <Input/>
-          </Form.Item>
-          <Form.Item name="repeatExecute" label="是否可重复执行：" style={{marginTop: -15}}>
-            <Input/>
-          </Form.Item>
+          <Row>
+            <Col span={12}>
+              <Form.Item name="relatedRenter" label="涉及租户：" style={{marginTop: -15}}>
+                <Input style={{marginLeft: 14, width: 191}}/>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="types" label="类型：" style={{marginLeft: 10, marginTop: -15}}>
+                <Select showSearch style={{}}>
+                </Select>
+              </Form.Item>
+            </Col>
+
+          </Row>
+          <Row>
+            <Col span={12}>
+              <Form.Item name="repaireCommiter" label="修复提交人：" style={{marginTop: -15}}>
+                <Select showSearch style={{}}>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="branch" label="分支：" style={{marginLeft: 10, marginTop: -15}}>
+                <Input/>
+              </Form.Item>
+            </Col>
+
+          </Row>
+
+          <Row>
+            <Col span={12}>
+              <Form.Item name="EvalResult" label="评审结果：" style={{marginTop: -15}}>
+                <Select showSearch style={{width: 191, marginLeft: 14}}>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="repeatExecute" label="是否可重复执行：" style={{marginLeft: 10, marginTop: -15}}>
+                <Select showSearch style={{}}>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
 
           <Form.Item>
             <Button

@@ -1137,6 +1137,10 @@ const PreRelease: React.FC<any> = () => {
   /* endregion */
 
   /* region Tabs 标签页事件 */
+  const [showTabs, setShowTabs] = useState({
+    shown: false,
+    targetKey: ""
+  });
 
   const initialPanes = [
     {
@@ -1167,7 +1171,27 @@ const PreRelease: React.FC<any> = () => {
   };
 
   // 删除tab
-  const remove = (targetKey: any) => {
+  const remove = (targetKeys: any) => {
+
+    setShowTabs({
+      shown: true,
+      targetKey: targetKeys
+    });
+  };
+
+  const delTabsCancel = () => {
+    setShowTabs({
+      ...showTabs,
+      shown: false
+    });
+  };
+
+  const delTabsInfo = () => {
+    const {targetKey} = showTabs;
+    setShowTabs({
+      ...showTabs,
+      shown: false
+    });
     const {panes, activeKey} = tabContent;
     let newActiveKey = activeKey;
     let lastIndex = 0;
@@ -1189,16 +1213,16 @@ const PreRelease: React.FC<any> = () => {
       activeKey: newActiveKey,
     });
   };
-
   // 新增、修改或删除tab页
   const onEdits = (targetKey: any, action: any) => {
     if (action === 'remove') {
+      // 需要判断是否确定删除
+
       remove(targetKey)
     } else if (action === 'add') {
       add();
     }
   };
-
 
   // 切换tab页面
   const onChange = (activeKeys: any) => {
@@ -1237,6 +1261,13 @@ const PreRelease: React.FC<any> = () => {
 
   };
 
+  // 修改tab
+  const tabsChangeName = (params: any) => {
+
+    const currentName = params.target.innerText;
+    console.log(currentName);
+
+  };
   /* endregion */
 
   const showProject = () => {
@@ -1358,6 +1389,7 @@ const PreRelease: React.FC<any> = () => {
             onEdits(targetKey, action)
           }}
           style={{marginTop: -20}}
+          onDoubleClick={tabsChangeName}
         >
           {tabContent.panes.map(pane => (
             <TabPane tab={pane.title} key={pane.key} closable={pane.closable}> </TabPane>
@@ -1763,8 +1795,41 @@ const PreRelease: React.FC<any> = () => {
 
       {/* ------------------------各类弹窗--------------------------- */}
 
+      {/* Tabs删除确认 */}
+      <Modal
+        title={'删除'}
+        visible={showTabs.shown}
+        onCancel={delTabsCancel}
+        centered={true}
+        footer={null}
+        width={400}
+        bodyStyle={{height: 140}}
+      >
+        <Form>
+          <Form.Item>
+            <label style={{marginLeft: 25}}>是否需要删除该批次发布过程，删除后下次发布需重新填写相关信息?</label>
+          </Form.Item>
 
-      {/* 删除确认 */}
+          <Form.Item>
+            <Button type="primary"
+                    style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, marginLeft: 100}}
+                    onClick={delTabsInfo}>确定
+            </Button>
+
+            <Button
+              style={{borderRadius: 5, marginLeft: 20}} onClick={delTabsCancel}>取消
+            </Button>
+
+
+          </Form.Item>
+
+          <Form.Item name="groupId" style={{display: "none", width: "32px", marginTop: "-55px", marginLeft: "270px"}}>
+            <Input/>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* 表格明细删除确认 */}
       <Modal
         title={'删除'}
         visible={delModal.shown}

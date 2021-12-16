@@ -7,8 +7,9 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useGqlClient} from '@/hooks';
-import {getProcessColumns} from './columns';
+import {getProcessColumns, getStoryStabilityColumns} from './columns';
 import {queryDatas} from './dataOperate';
+import {setProcessCellStyle, setStoryStabilityCellStyle} from './gridStyles';
 import './styles.css';
 
 const WeekCodeTableList: React.FC<any> = () => {
@@ -20,7 +21,7 @@ const WeekCodeTableList: React.FC<any> = () => {
   /* region  进度指标 */
   const processGridApi = useRef<GridApi>();
 
-  const onGridReady = (params: GridReadyEvent) => {
+  const onProcessGridReady = (params: GridReadyEvent) => {
     processGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
@@ -29,10 +30,6 @@ const WeekCodeTableList: React.FC<any> = () => {
     else processGridApi.current.hideOverlay();
   }
 
-  window.onresize = function () {
-    processGridApi.current?.sizeColumnsToFit();
-  };
-
   const processCellEdited = (params: any) => {
 
     console.log(params);
@@ -40,43 +37,34 @@ const WeekCodeTableList: React.FC<any> = () => {
   };
   /* endregion */
 
-  const setCellStyle = (params: any) => {
-    if (params.column?.colId === "memo") {
-      // let wordsAlign = "left";
-      // if (params.value) {
-      //   wordsAlign = "center"
-      // }
+  /* region  需求稳定性 */
+  const storyStabilityGridApi = useRef<GridApi>();
 
-      return {
-        "line-height": "25px",
-        "border-left": "1px solid lightgrey",
-        // "text-align": wordsAlign,
-        "background-color": 'white'
-      }
-    }
+  const onStoryStabilityGridReady = (params: GridReadyEvent) => {
+    storyStabilityGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+  if (storyStabilityGridApi.current) {
+    if (loading) storyStabilityGridApi.current.showLoadingOverlay();
+    else storyStabilityGridApi.current.hideOverlay();
+  }
 
-    // if (params.data?.milestone === "项目计划") {
-    //   if (params.column?.colId !== "days" && params.column?.colId !== "ratio") {
-    //     return {
-    //       "line-height": "25px",
-    //       "border-left": "1px solid lightgrey",
-    //       "text-align": "center",
-    //       "background-color": 'white'
-    //     }
-    //   }
-    //
-    // }
-    return {
-      "line-height": "32px",
-      "border-left": "1px solid lightgrey",
-      // "text-align": "center",
-      "background-color": '#F8F8F8'
-    }
+  const storyStabilityCellEdited = (params: any) => {
+
+    console.log(params);
+
+  };
+  /* endregion */
+
+  window.onresize = function () {
+    processGridApi.current?.sizeColumnsToFit();
+    storyStabilityGridApi.current?.sizeColumnsToFit();
   };
 
   return (
     <PageContainer style={{height: "100%"}}>
-      <div style={{height: "600px", backgroundColor: "white"}}>
+      <div>
+        {/* 1.进度 */}
         <div className="ag-theme-alpine" style={{height: 250, width: '100%'}}>
           <AgGridReact
             columnDefs={getProcessColumns()} // 定义列
@@ -86,14 +74,47 @@ const WeekCodeTableList: React.FC<any> = () => {
               sortable: true,
               filter: true,
               suppressMenu: true,
-              cellStyle: setCellStyle,
+              cellStyle: setProcessCellStyle,
+              // headerComponentParams: () => {
+              //
+              //   return {
+              //     template:
+              //       `
+              //       <div ref="eLabel" class="ag-header-cell-label" role="presentation"  style="margin-left:50%">
+              //           <span  ref="eSortNone" class="ag-header-icon ag-sort-none-icon" ></span>
+              //             <span ref="eText" class="ag-header-cell-text" role="columnheader"></span>
+              //           <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>
+              //       </div>
+              //   </div>`
+              //   }
+              // }
             }}
             rowHeight={32}
             headerHeight={35}
             suppressRowTransform={true}
-            onGridReady={onGridReady}
+            onGridReady={onProcessGridReady}
             onCellEditingStopped={processCellEdited}
+          >
+          </AgGridReact>
+        </div>
 
+        {/* 2. 需求稳定性 */}
+        <div className="ag-theme-alpine" style={{height: 190, width: '100%'}}>
+          <AgGridReact
+            columnDefs={getStoryStabilityColumns()} // 定义列
+            rowData={data?.storyStability} // 数据绑定
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true,
+              suppressMenu: true,
+              cellStyle: setStoryStabilityCellStyle,
+            }}
+            rowHeight={32}
+            headerHeight={35}
+            suppressRowTransform={true}
+            onGridReady={onStoryStabilityGridReady}
+            onCellEditingStopped={storyStabilityCellEdited}
           >
           </AgGridReact>
         </div>
@@ -101,8 +122,7 @@ const WeekCodeTableList: React.FC<any> = () => {
 
 
     </PageContainer>
-  )
-    ;
+  );
 };
 
 

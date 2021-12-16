@@ -1,5 +1,6 @@
 import {GqlClient} from "@/hooks";
 
+// 1.进度数据解析
 const alaysisProcessData = (sourceData: any) => {
   if (!sourceData) {
     return [];
@@ -29,6 +30,35 @@ const alaysisProcessData = (sourceData: any) => {
   return result;
 };
 
+// 2.需求稳定性
+const alaysisStoryStability = () => {
+  return [{
+    title: "2.需求稳定性",
+    stage: "开发阶段",
+    planTime: "",
+    updateTime: "",
+    updateRate: ""
+  }, {
+    title: "",
+    stage: "测试阶段",
+    planTime: "",
+    updateTime: "",
+    updateRate: ""
+  }, {
+    title: "",
+    stage: "发布阶段",
+    planTime: "",
+    updateTime: "",
+    updateRate: ""
+  }, {
+    title: "",
+    stage: "项目周期",
+    planTime: "",
+    updateTime: "",
+    updateRate: ""
+  }]
+
+};
 const queryDatas = async (client: GqlClient<object>, projectId: string) => {
 
   const {data} = await client.query(`
@@ -48,7 +78,8 @@ const queryDatas = async (client: GqlClient<object>, projectId: string) => {
   `);
 
   const datas = {
-    process: alaysisProcessData(data?.projectDeviation)
+    process: alaysisProcessData(data?.projectDeviation),
+    storyStability: alaysisStoryStability()
   };
   return datas;
 };

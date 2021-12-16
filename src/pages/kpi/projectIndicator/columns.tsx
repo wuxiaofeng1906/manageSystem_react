@@ -1,3 +1,4 @@
+/* region 1.进度 */
 const editRenderer = (param: any) => {
   if (param.data?.milestone === "项目计划") {
     return true;
@@ -60,14 +61,14 @@ const getProcessColumns = () => {
     {
       headerName: '偏差天数',
       field: 'days',
-      type: 'numericColumn',
+      // type: 'numericColumn',
       minWidth: 90
     },
     {
       headerName: '偏差率',
       field: 'ratio',
-      type: 'numericColumn',
-      minWidth: 80,
+      // type: 'numericColumn',
+      minWidth: 90,
       valueFormatter: (params: any) => {
         if (params.value === null) {
           return "";
@@ -86,6 +87,7 @@ const getProcessColumns = () => {
       cellRenderer: (params: any) => {
         if (!params.value) {
           return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
+
         }
         return params.value;
       }
@@ -95,4 +97,76 @@ const getProcessColumns = () => {
   return processColums;
 };
 
-export {getProcessColumns};
+/* endregion  */
+
+/* region 2.需求稳定性 */
+
+const getStoryStabilityColumns = () => {
+
+  const storyStabilityColums: any = [
+    {
+      headerName: '',
+      field: 'title',
+      minWidth: 90,
+      cellRenderer: (params: any) => {
+        return `<div style="font-weight: bold;margin-top: 50px">${params.value}</div>`
+
+      },
+      cellClassRules: {
+        'cell-span': "value !== undefined"
+      },
+      rowSpan: (params: any) => {
+
+        if (params.data.title === '2.需求稳定性') {
+          return 4;
+        }
+        return 1;
+      }
+    },
+    {
+      headerName: '阶段',
+      field: 'stage',
+      maxWidth: 110,
+      minWidth: 80
+    },
+    {
+      headerName: '预计工时',
+      field: 'planTime',
+      minWidth: 115,
+      editable: true,
+      cellRenderer: (params: any) => {
+        if (!params.value) {
+          return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
+
+        }
+        return params.value;
+      }
+    },
+    {
+      headerName: '变更工时',
+      field: 'updateTime',
+      minWidth: 115,
+      editable: true,
+      cellRenderer: (params: any) => {
+        if (!params.value) {
+          return `<div style="color: red; font-style: italic ;text-align: center">手工录入</div>`;
+
+        }
+        return params.value;
+      }
+
+    },
+    {
+      headerName: '变更率',
+      field: 'updateRate',
+      minWidth: 115
+      // editable: editRenderer
+    }
+  ];
+
+  return storyStabilityColums;
+};
+
+/* endregion  */
+
+export {getProcessColumns, getStoryStabilityColumns};

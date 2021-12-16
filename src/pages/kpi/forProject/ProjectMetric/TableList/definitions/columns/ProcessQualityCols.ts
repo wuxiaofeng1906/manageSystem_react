@@ -2,13 +2,13 @@
  * @Description: 项目过程质量的字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:47:07
- * @LastEditTime: 2021-12-10 16:28:12
+ * @LastEditTime: 2021-12-15 05:44:24
  * @LastEditors: jieTan
  * @LastModify:
  */
 
-import { PERCENTAGE, HOUR, TABLE_GROUP_SHOW as SHOW } from '@/namespaces';
-import { ColDef } from 'ag-grid-community';
+import { PERCENTAGE, HOUR, TABLE_GROUP_SHOW as SHOW, PROJ_METRIC } from '@/namespaces';
+import { ColDef, ColGroupDef } from 'ag-grid-community';
 import { ProjectQualityResult } from '@/namespaces/interface';
 import { doubleNumberW, ratioW } from './baseParams';
 
@@ -41,19 +41,19 @@ export const ProcessQualityCols: ColDef[] = [
   {
     headerName: '千行Bug率',
     field: '',
-    columnGroupShow: SHOW['open'],
+    columnGroupShow: SHOW['closed'],
     ...ratioW,
   },
   {
     headerName: '单元覆盖率',
     field: 'unitCover',
-    columnGroupShow: SHOW['open'],
+    columnGroupShow: SHOW['closed'],
     ...ratioW,
   },
   {
     headerName: `回归时长(${HOUR['unit']})`,
     field: 'projectQuality',
-    columnGroupShow: SHOW['open'],
+    columnGroupShow: SHOW['closed'],
     cellRenderer: 'bugFlybackDura',
     cellRendererParams: { delta: HOUR['value'] },
     ...doubleNumberW,
@@ -62,12 +62,17 @@ export const ProcessQualityCols: ColDef[] = [
   {
     headerName: '用例覆盖率',
     field: '',
-    columnGroupShow: SHOW['open'],
+    columnGroupShow: SHOW['closed'],
     ...ratioW,
   },
   {
     headerName: '加权遗留DI',
-    columnGroupShow: SHOW['open'],
+    columnGroupShow: SHOW['closed'],
     field: '',
   },
 ];
+// 
+export const ProcessQualityGroup: ColGroupDef = {
+  headerName: PROJ_METRIC.processQuality.zh,
+  children: ProcessQualityCols,
+};

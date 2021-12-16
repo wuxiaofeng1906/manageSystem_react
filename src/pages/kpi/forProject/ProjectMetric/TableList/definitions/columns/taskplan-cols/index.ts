@@ -8,6 +8,7 @@
  */
 import { ColDef } from 'ag-grid-community';
 import { ratioW } from '../baseParams';
+import { TABLE_GROUP_SHOW as SHOW } from '@/namespaces';
 
 export default (moduleName: string, others?: { decimal?: number; html?: boolean }) => {
   /*  */
@@ -27,21 +28,25 @@ export default (moduleName: string, others?: { decimal?: number; html?: boolean 
     {
       headerName: '概设&计划',
       field: `${moduleName}.designplan`,
+      columnGroupShow: SHOW['closed'],
       ...defaultParmas,
     },
     {
       headerName: '开发',
       field: `${moduleName}.devplan`,
+      columnGroupShow: SHOW['closed'],
       ...defaultParmas,
     },
     {
       headerName: '测试',
       field: `${moduleName}.testplan`,
+      columnGroupShow: SHOW['closed'],
       ...defaultParmas,
     },
     {
       headerName: '发布',
       field: `${moduleName}.releaseplan`,
+      columnGroupShow: SHOW['closed'],
       ...defaultParmas,
     },
   ];

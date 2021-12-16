@@ -2,7 +2,7 @@
  * @Description: 数据列表
  * @Author: jieTan
  * @Date: 2021-11-22 10:55:42
- * @LastEditTime: 2021-12-13 10:10:02
+ * @LastEditTime: 2021-12-15 06:02:04
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -11,7 +11,7 @@ import './index.css';
 import { AgGridReact } from 'ag-grid-react';
 import { useModel } from 'umi';
 import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
-import { TableMajorCols } from './definitions/columns';
+import { TableMajorGroup } from './definitions/columns';
 import LinkToCloumn from './renders/LinkToCloumn';
 import ProjStatusColumn from './renders/ProjStatusColumn';
 import BugReOpenColumn from './renders/BugReOpenColumn';
@@ -38,7 +38,8 @@ export default () => {
             projStatus: ProjStatusColumn,
             numToFixed: NumberToFixedColumn,
           }}
-          columnDefs={[...TableMajorCols, ...dynamicCols]}
+          defaultColDef={{ resizable: true }}
+          columnDefs={[TableMajorGroup, ...dynamicCols]}
           rowData={gqlData}
         />
       </div>

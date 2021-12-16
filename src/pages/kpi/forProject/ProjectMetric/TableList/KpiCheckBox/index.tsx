@@ -2,7 +2,7 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2021-12-15 03:35:36
+ * @LastEditTime: 2021-12-15 06:13:06
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -11,10 +11,10 @@ import { useState, useEffect } from 'react';
 import { useModel } from 'umi';
 import { GQL_PARAMS, PROJ_METRIC as PM } from '@/namespaces';
 import {
-  ProcessDeviationCols,
-  ProcessQualityCols,
-  ScaleProductivityCols,
-  StageWorkloadCols,
+  ProcessDeviationGroup,
+  ProcessQualityGroup,
+  ScaleProductivityGroup,
+  StageWorkloadGroup,
 } from '../definitions/columns';
 import { projectKpiGql, queryGQL } from '@/pages/gqls';
 import { useGqlClient } from '@/hooks';
@@ -62,22 +62,22 @@ export default () => {
       switch (kp) {
         // 过程质量
         case PM.processQuality.zh:
-          loadColumns.push(...ProcessQualityCols);
+          loadColumns.push(ProcessQualityGroup);
           kpiItems.push(PM.processQuality.en);
           break;
         // 进度偏差率
         case PM.progressDeviation.zh:
-          loadColumns.push(...ProcessDeviationCols);
+          loadColumns.push(ProcessDeviationGroup);
           kpiItems.push(PM.progressDeviation.en);
           break;
         // 阶段工作量
         case PM.stageWorkload.zh:
-          loadColumns.push(...StageWorkloadCols);
+          loadColumns.push(StageWorkloadGroup);
           kpiItems.push(PM.stageWorkload.en);
           break;
         // 生产率&规模
         case PM.scaleProductivity.zh:
-          loadColumns.push(...ScaleProductivityCols);
+          loadColumns.push(ScaleProductivityGroup);
           kpiItems.push(PM.scaleProductivity.en);
           break;
 
@@ -108,7 +108,12 @@ export default () => {
         全选
       </Checkbox>
       <Divider type="vertical" />
-      <CheckboxGroup options={plainOptions} value={checkedList} onChange={onChange} />
+      <CheckboxGroup
+        style={{ marginLeft: 8 }}
+        options={plainOptions}
+        value={checkedList}
+        onChange={onChange}
+      />
     </>
   );
 };

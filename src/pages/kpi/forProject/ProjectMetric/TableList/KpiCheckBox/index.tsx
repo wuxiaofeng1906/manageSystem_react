@@ -13,6 +13,7 @@ import { GQL_PARAMS, PROJ_METRIC as PM } from '@/namespaces';
 import {
   ProcessDeviationGroup,
   ProcessQualityGroup,
+  ReviewDefectGroup,
   ScaleProductivityGroup,
   StageWorkloadGroup,
 } from '../definitions/columns';
@@ -79,6 +80,11 @@ export default () => {
         case PM.scaleProductivity.zh:
           loadColumns.push(ScaleProductivityGroup);
           kpiItems.push(PM.scaleProductivity.en);
+          break;
+        // 评审和缺陷
+        case PM.reviewDefect.zh:
+          loadColumns.push(ReviewDefectGroup);
+          kpiItems.push(PM.reviewDefect.en);
           break;
 
         default:

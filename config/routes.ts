@@ -329,6 +329,11 @@ export default [
               },
             ],
           },
+          {
+            name: '项目指标',
+            path: 'projectIndicator',
+            component: './kpi/projectIndicator',
+          },
         ],
       },
       {

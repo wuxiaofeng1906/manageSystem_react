@@ -14,7 +14,7 @@ export default (moduleName: string, others?: { decimal?: number; html?: boolean 
   /*  */
   const defaultParmas = {
     cellRenderer: 'numToFixed',
-    cellRendererParams: { others },
+    cellRendererParams: { ...others },
     ...ratioW,
   };
 

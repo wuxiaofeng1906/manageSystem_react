@@ -7,9 +7,14 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useGqlClient} from '@/hooks';
-import {getProcessColumns, getStoryStabilityColumns, getStageWorkloadColumns} from './columns';
+import {getProcessColumns, getStoryStabilityColumns, getStageWorkloadColumns, getProductRateColumns} from './columns';
 import {queryDatas} from './dataOperate';
-import {setProcessCellStyle, setStoryStabilityCellStyle, setStageWorkloadCellStyle} from './gridStyles';
+import {
+  setProcessCellStyle,
+  setStoryStabilityCellStyle,
+  setStageWorkloadCellStyle,
+  setProductRateCellStyle
+} from './gridStyles';
 import './styles.css';
 
 const WeekCodeTableList: React.FC<any> = () => {
@@ -75,10 +80,30 @@ const WeekCodeTableList: React.FC<any> = () => {
   };
   /* endregion */
 
+  /* region  生产率 */
+  const productRateGridApi = useRef<GridApi>();
+
+  const onProductRateGridReady = (params: GridReadyEvent) => {
+    productRateGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+  if (productRateGridApi.current) {
+    if (loading) productRateGridApi.current.showLoadingOverlay();
+    else productRateGridApi.current.hideOverlay();
+  }
+
+  const productRateCellEdited = (params: any) => {
+
+    console.log(params);
+
+  };
+  /* endregion */
+
   window.onresize = function () {
     processGridApi.current?.sizeColumnsToFit();
     storyStabilityGridApi.current?.sizeColumnsToFit();
     stageWorkloadGridApi.current?.sizeColumnsToFit();
+    productRateGridApi.current?.sizeColumnsToFit();
   };
 
   return (
@@ -159,6 +184,28 @@ const WeekCodeTableList: React.FC<any> = () => {
           >
           </AgGridReact>
         </div>
+
+        {/* 4.生产率 */}
+        <div className="ag-theme-alpine" style={{height: 150, width: '100%'}}>
+          <AgGridReact
+            columnDefs={getProductRateColumns()} // 定义列
+            rowData={data?.productRate} // 数据绑定
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true,
+              suppressMenu: true,
+              cellStyle: setProductRateCellStyle,
+            }}
+            rowHeight={32}
+            headerHeight={35}
+            suppressRowTransform={true}
+            onGridReady={onProductRateGridReady}
+            onCellEditingStopped={productRateCellEdited}
+          >
+          </AgGridReact>
+        </div>
+
       </div>
 
 

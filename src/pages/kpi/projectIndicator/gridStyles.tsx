@@ -74,6 +74,27 @@ const setStageWorkloadCellStyle = (params: any) => {
     "background-color": 'white'
   }
 
+};
+
+// 4.生产率
+const setProductRateCellStyle = (params: any) => {
+  debugger;
+  if (params.column?.colId === "title" || params.column?.colId === "stage" || params.data?.stage === "生产率(功能点/人天）") {
+
+    // 不可修改
+    return {
+      "line-height": "32px",
+      "border-left": "1px solid lightgrey",
+      "background-color": '#F8F8F8'
+    }
+  }
+
+  return {
+    "line-height": "25px",
+    "border-left": "1px solid lightgrey",
+    "background-color": 'white'
+  }
 
 };
-export {setProcessCellStyle, setStoryStabilityCellStyle, setStageWorkloadCellStyle}
+
+export {setProcessCellStyle, setStoryStabilityCellStyle, setStageWorkloadCellStyle, setProductRateCellStyle}

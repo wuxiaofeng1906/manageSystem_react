@@ -1,10 +1,5 @@
 /* region 1.进度 */
-const editRenderer = (param: any) => {
-  if (param.data?.milestone === "项目计划") {
-    return true;
-  }
-  return false;
-};
+
 const getProcessColumns = () => {
 
   const processColums: any = [
@@ -238,4 +233,72 @@ const getStageWorkloadColumns = () => {
 
 /* endregion  */
 
-export {getProcessColumns, getStoryStabilityColumns, getStageWorkloadColumns};
+/* region 4.生产率 */
+// 渲染手工录入
+const projectRateManualInput = (params: any) => {
+
+  if (params.data?.stage === "功能点" && (params.value === null || params.value === "")) {
+    return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
+
+  }
+  return params.value;
+};
+
+const projectRateEditRenderer = (param: any) => {
+  if (param.data?.stage === "功能点") {
+    return true;
+  }
+  return false;
+};
+
+const getProductRateColumns = () => {
+
+  const StageWorkloadColums: any = [
+    {
+      headerName: '',
+      field: 'title',
+      minWidth: 90,
+      cellRenderer: (params: any) => {
+        return `<div style="font-weight: bold;margin-top: 15px">${params.value}</div>`
+
+      },
+      cellClassRules: {
+        'cell-span': "value !== undefined"
+      },
+      rowSpan: (params: any) => {
+
+        if (params.data.title === '4.生产率') {
+          return 2;
+        }
+        return 1;
+      }
+    },
+    {
+      headerName: '阶段',
+      field: 'stage',
+
+      minWidth: 80
+    },
+    {
+      headerName: '计划值',
+      field: 'planValue',
+      minWidth: 115,
+      editable: projectRateEditRenderer,
+      cellRenderer: projectRateManualInput
+    },
+    {
+      headerName: '实际值',
+      field: 'actualValue',
+      minWidth: 115,
+      editable: projectRateEditRenderer,
+      cellRenderer: projectRateManualInput
+
+    }
+  ];
+
+  return StageWorkloadColums;
+};
+
+/* endregion  */
+
+export {getProcessColumns, getStoryStabilityColumns, getStageWorkloadColumns, getProductRateColumns};

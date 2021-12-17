@@ -147,6 +147,26 @@ const alaysisProductRate = (sourceData: any) => {
 
 }
 
+const alaysisReviewDefect = (sourceData: any) => {
+  if (!sourceData) {
+    return [];
+  }
+
+  const result: any = [];
+  sourceData.forEach((ele: any, index: number) => {
+    const newObject = ele;
+    if (index === 0) {
+      newObject.title = "5.评审和缺陷";
+    } else {
+      newObject.title = "";
+    }
+
+    result.push(newObject);
+  });
+
+  return result;
+
+};
 
 const queryDatas = async (client: GqlClient<object>, projectId: string) => {
 
@@ -154,30 +174,41 @@ const queryDatas = async (client: GqlClient<object>, projectId: string) => {
       {
 
           projectDeviation(pId:${Number(projectId)}){
-          planStart
-          planEnd
-          actualStart
-          actualEnd
-          type
-          days
-          ratio
-          memo
+            planStart
+            planEnd
+            actualStart
+            actualEnd
+            type
+            days
+            ratio
+            memo
           }
 
-          productWithWorkload(pId:729){
-          planValue
-          actualValue
-          planRatio
-          actualRatio
-          stageWorkload{
-            manpower
-            planHours
-            actualHours
-            type
-            planWorkload
-            actualWorkload
+          productWithWorkload(pId:${Number(projectId)}){
+            planValue
+            actualValue
+            planRatio
+            actualRatio
+            stageWorkload{
+              manpower
+              planHours
+              actualHours
+              type
+              planWorkload
+              actualWorkload
+              }
           }
-        }
+
+          reviewDefect(pId:${Number(projectId)}){
+            kind
+            cut
+            foundDN
+            weightDN
+            funcPoint
+            defectDensity
+            defectHour
+            defectRatio
+          }
       }
   `);
 
@@ -186,6 +217,7 @@ const queryDatas = async (client: GqlClient<object>, projectId: string) => {
     storyStability: alaysisStoryStability(), // 2.需求稳定性
     stageWorkload: alaysisStageWorkload(data?.productWithWorkload), // 3.阶段工作量
     productRate: alaysisProductRate(data?.productWithWorkload), // 4.生产率
+    reviewDefect: alaysisReviewDefect(data?.reviewDefect)
   };
   return datas;
 };

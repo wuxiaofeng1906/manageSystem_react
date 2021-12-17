@@ -7,13 +7,20 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useGqlClient} from '@/hooks';
-import {getProcessColumns, getStoryStabilityColumns, getStageWorkloadColumns, getProductRateColumns} from './columns';
+import {
+  getProcessColumns,
+  getStoryStabilityColumns,
+  getStageWorkloadColumns,
+  getProductRateColumns,
+  getReviewDefectColumns
+} from './columns';
 import {queryDatas} from './dataOperate';
 import {
   setProcessCellStyle,
   setStoryStabilityCellStyle,
   setStageWorkloadCellStyle,
-  setProductRateCellStyle
+  setProductRateCellStyle,
+  setReviewDefectCellStyle
 } from './gridStyles';
 import './styles.css';
 
@@ -99,11 +106,31 @@ const WeekCodeTableList: React.FC<any> = () => {
   };
   /* endregion */
 
+  /* region  评审和缺陷 */
+  const reviewDefectGridApi = useRef<GridApi>();
+
+  const onReviewDefectGridReady = (params: GridReadyEvent) => {
+    reviewDefectGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+  if (reviewDefectGridApi.current) {
+    if (loading) reviewDefectGridApi.current.showLoadingOverlay();
+    else reviewDefectGridApi.current.hideOverlay();
+  }
+
+  const reviewDefectCellEdited = (params: any) => {
+
+    console.log(params);
+
+  };
+  /* endregion */
+
   window.onresize = function () {
     processGridApi.current?.sizeColumnsToFit();
     storyStabilityGridApi.current?.sizeColumnsToFit();
     stageWorkloadGridApi.current?.sizeColumnsToFit();
     productRateGridApi.current?.sizeColumnsToFit();
+    reviewDefectGridApi.current?.sizeColumnsToFit();
   };
 
   return (
@@ -186,7 +213,7 @@ const WeekCodeTableList: React.FC<any> = () => {
         </div>
 
         {/* 4.生产率 */}
-        <div className="ag-theme-alpine" style={{height: 150, width: '100%'}}>
+        <div className="ag-theme-alpine" style={{height: 130, width: '100%'}}>
           <AgGridReact
             columnDefs={getProductRateColumns()} // 定义列
             rowData={data?.productRate} // 数据绑定
@@ -202,6 +229,27 @@ const WeekCodeTableList: React.FC<any> = () => {
             suppressRowTransform={true}
             onGridReady={onProductRateGridReady}
             onCellEditingStopped={productRateCellEdited}
+          >
+          </AgGridReact>
+        </div>
+
+        {/* 5.评审和缺陷 */}
+        <div className="ag-theme-alpine" style={{height: 420, width: '100%'}}>
+          <AgGridReact
+            columnDefs={getReviewDefectColumns()} // 定义列
+            rowData={data?.reviewDefect} // 数据绑定
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true,
+              suppressMenu: true,
+              cellStyle: setReviewDefectCellStyle,
+            }}
+            rowHeight={32}
+            headerHeight={35}
+            suppressRowTransform={true}
+            onGridReady={onReviewDefectGridReady}
+            onCellEditingStopped={reviewDefectCellEdited}
           >
           </AgGridReact>
         </div>

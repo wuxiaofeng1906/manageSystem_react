@@ -241,7 +241,7 @@ const projectRateManualInput = (params: any) => {
     return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
 
   }
-  return params.value;
+  return Number(params.value).toFixed(2);
 };
 
 const projectRateEditRenderer = (param: any) => {
@@ -301,4 +301,90 @@ const getProductRateColumns = () => {
 
 /* endregion  */
 
-export {getProcessColumns, getStoryStabilityColumns, getStageWorkloadColumns, getProductRateColumns};
+/* region 5.评审和缺陷 */
+
+const getReviewDefectColumns = () => {
+
+  const reviewDefectColums: any = [
+    {
+      headerName: '',
+      field: 'title',
+      minWidth: 90,
+      cellRenderer: (params: any) => {
+        return `<div style="font-weight: bold;margin-top: 190px">${params.value}</div>`
+
+      },
+      cellClassRules: {
+        'cell-span': "value !== undefined"
+      },
+      rowSpan: (params: any) => {
+
+        if (params.data.title === '5.评审和缺陷') {
+          return 12;
+        }
+        return 1;
+      }
+    },
+    {
+      headerName: '',
+      field: 'kind',
+      maxWidth: 110,
+      minWidth: 80
+    },
+    {
+      headerName: '是否裁剪',
+      field: 'cut',
+      minWidth: 115,
+      // editable: true,
+      // cellRenderer: manualInput
+    },
+    {
+      headerName: '发现缺陷数',
+      field: 'foundDN',
+      minWidth: 115,
+      // editable: true,
+      // cellRenderer: manualInput
+    },
+    {
+      headerName: '加权有效缺陷数',
+      field: 'weightDN',
+      minWidth: 115
+
+    },
+    {
+      headerName: '功能点',
+      field: 'funcPoint',
+      minWidth: 115
+
+    },
+    {
+      headerName: '缺陷密度',
+      field: 'defectDensity',
+      minWidth: 115
+
+    },
+    {
+      headerName: '评审用时',
+      field: 'defectHour',
+      minWidth: 115
+
+    },
+    {
+      headerName: '评审效率',
+      field: 'defectRatio',
+      minWidth: 115
+
+    }
+  ];
+
+  return reviewDefectColums;
+};
+
+/* endregion  */
+export {
+  getProcessColumns,
+  getStoryStabilityColumns,
+  getStageWorkloadColumns,
+  getProductRateColumns,
+  getReviewDefectColumns
+};

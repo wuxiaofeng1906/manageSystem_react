@@ -78,7 +78,7 @@ const setStageWorkloadCellStyle = (params: any) => {
 
 // 4.生产率
 const setProductRateCellStyle = (params: any) => {
-  debugger;
+
   if (params.column?.colId === "title" || params.column?.colId === "stage" || params.data?.stage === "生产率(功能点/人天）") {
 
     // 不可修改
@@ -97,4 +97,32 @@ const setProductRateCellStyle = (params: any) => {
 
 };
 
-export {setProcessCellStyle, setStoryStabilityCellStyle, setStageWorkloadCellStyle, setProductRateCellStyle}
+
+// 5.评审与缺陷
+const setReviewDefectCellStyle = (params: any) => {
+
+  if (params.column?.colId === "title" || params.column?.colId === "stage" || params.data?.stage === "生产率(功能点/人天）") {
+
+    // 不可修改
+    return {
+      "line-height": "32px",
+      "border-left": "1px solid lightgrey",
+      "background-color": '#F8F8F8'
+    }
+  }
+
+  return {
+    "line-height": "25px",
+    "border-left": "1px solid lightgrey",
+    "background-color": 'white'
+  }
+
+};
+
+export {
+  setProcessCellStyle,
+  setStoryStabilityCellStyle,
+  setStageWorkloadCellStyle,
+  setProductRateCellStyle,
+  setReviewDefectCellStyle
+}

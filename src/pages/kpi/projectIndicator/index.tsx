@@ -7,9 +7,9 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useGqlClient} from '@/hooks';
-import {getProcessColumns, getStoryStabilityColumns} from './columns';
+import {getProcessColumns, getStoryStabilityColumns, getStageWorkloadColumns} from './columns';
 import {queryDatas} from './dataOperate';
-import {setProcessCellStyle, setStoryStabilityCellStyle} from './gridStyles';
+import {setProcessCellStyle, setStoryStabilityCellStyle, setStageWorkloadCellStyle} from './gridStyles';
 import './styles.css';
 
 const WeekCodeTableList: React.FC<any> = () => {
@@ -56,9 +56,29 @@ const WeekCodeTableList: React.FC<any> = () => {
   };
   /* endregion */
 
+  /* region  阶段工作量 */
+  const stageWorkloadGridApi = useRef<GridApi>();
+
+  const onStageWorkloadGridReady = (params: GridReadyEvent) => {
+    stageWorkloadGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+  if (stageWorkloadGridApi.current) {
+    if (loading) stageWorkloadGridApi.current.showLoadingOverlay();
+    else stageWorkloadGridApi.current.hideOverlay();
+  }
+
+  const stageWorkloadCellEdited = (params: any) => {
+
+    console.log(params);
+
+  };
+  /* endregion */
+
   window.onresize = function () {
     processGridApi.current?.sizeColumnsToFit();
     storyStabilityGridApi.current?.sizeColumnsToFit();
+    stageWorkloadGridApi.current?.sizeColumnsToFit();
   };
 
   return (
@@ -115,6 +135,27 @@ const WeekCodeTableList: React.FC<any> = () => {
             suppressRowTransform={true}
             onGridReady={onStoryStabilityGridReady}
             onCellEditingStopped={storyStabilityCellEdited}
+          >
+          </AgGridReact>
+        </div>
+
+        {/* 3.阶段工作量（单位：人天） */}
+        <div className="ag-theme-alpine" style={{height: 250, width: '100%'}}>
+          <AgGridReact
+            columnDefs={getStageWorkloadColumns()} // 定义列
+            rowData={data?.stageWorkload} // 数据绑定
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true,
+              suppressMenu: true,
+              cellStyle: setStageWorkloadCellStyle,
+            }}
+            rowHeight={32}
+            headerHeight={35}
+            suppressRowTransform={true}
+            onGridReady={onStageWorkloadGridReady}
+            onCellEditingStopped={stageWorkloadCellEdited}
           >
           </AgGridReact>
         </div>

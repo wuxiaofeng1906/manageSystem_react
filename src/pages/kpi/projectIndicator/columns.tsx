@@ -99,6 +99,16 @@ const getProcessColumns = () => {
 
 /* endregion  */
 
+// 渲染手工录入
+const manualInput = (params: any) => {
+
+  if (params.value === null || params.value === "") {
+    return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
+
+  }
+  return params.value;
+};
+
 /* region 2.需求稳定性 */
 
 const getStoryStabilityColumns = () => {
@@ -134,26 +144,14 @@ const getStoryStabilityColumns = () => {
       field: 'planTime',
       minWidth: 115,
       editable: true,
-      cellRenderer: (params: any) => {
-        if (!params.value) {
-          return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
-
-        }
-        return params.value;
-      }
+      cellRenderer: manualInput
     },
     {
       headerName: '变更工时',
       field: 'updateTime',
       minWidth: 115,
       editable: true,
-      cellRenderer: (params: any) => {
-        if (!params.value) {
-          return `<div style="color: red; font-style: italic ;text-align: center">手工录入</div>`;
-
-        }
-        return params.value;
-      }
+      cellRenderer: manualInput
 
     },
     {
@@ -169,4 +167,75 @@ const getStoryStabilityColumns = () => {
 
 /* endregion  */
 
-export {getProcessColumns, getStoryStabilityColumns};
+/* region 3.阶段工作量（单位：人天） */
+
+const getStageWorkloadColumns = () => {
+
+  const StageWorkloadColums: any = [
+    {
+      headerName: '',
+      field: 'title',
+      minWidth: 90,
+      cellRenderer: (params: any) => {
+        return `<div style="font-weight: bold;margin-top: 75px">${params.value}</div>`
+
+      },
+      cellClassRules: {
+        'cell-span': "value !== undefined"
+      },
+      rowSpan: (params: any) => {
+
+        if (params.data.title === '3.阶段工作量（单位：人天）') {
+          return 6;
+        }
+        return 1;
+      }
+    },
+    {
+      headerName: '阶段',
+      field: 'stage',
+      maxWidth: 110,
+      minWidth: 80
+    },
+    {
+      headerName: '投入人数',
+      field: 'manpower',
+      minWidth: 115,
+      editable: true,
+      cellRenderer: manualInput
+    },
+    {
+      headerName: '预计工时',
+      field: 'planHours',
+      minWidth: 115,
+      editable: true,
+      cellRenderer: manualInput
+
+    },
+    {
+      headerName: '实际工时',
+      field: 'actualHours',
+      minWidth: 115,
+      editable: true,
+      cellRenderer: manualInput
+    },
+    {
+      headerName: '计划工作量',
+      field: 'planWorkload',
+      minWidth: 115
+
+    },
+    {
+      headerName: '实际工作量',
+      field: 'actualWorkload',
+      minWidth: 115
+
+    }
+  ];
+
+  return StageWorkloadColums;
+};
+
+/* endregion  */
+
+export {getProcessColumns, getStoryStabilityColumns, getStageWorkloadColumns};

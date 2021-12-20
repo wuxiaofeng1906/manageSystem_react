@@ -2,76 +2,75 @@
  * @Description: 项目过程质量的字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:47:07
- * @LastEditTime: 2021-12-15 05:44:24
+ * @LastEditTime: 2021-12-20 07:01:34
  * @LastEditors: jieTan
  * @LastModify:
  */
 
 import { PERCENTAGE, HOUR, TABLE_GROUP_SHOW as SHOW, PROJ_METRIC } from '@/namespaces';
 import { ColDef, ColGroupDef } from 'ag-grid-community';
-import { ProjectQualityResult } from '@/namespaces/interface';
-import { doubleNumberW, ratioW } from './baseParams';
+import { ratioW } from './baseParams';
 
 /*  */
-//
-const sortByTarget = (valueA: ProjectQualityResult, valueB: ProjectQualityResult, key: string) => {
-  //
-  if (valueA[key] === null) return 1;
-  //
-  if (valueB[key] === null) return -1;
-  //
-  return valueA[key] - valueB[key];
+const moduleName = 'projectQuality';
+const defaultParmas = {
+  cellRenderer: 'numToFixed',
+  cellRendererParams: { decimal: 4 },
+  ...ratioW,
 };
-//
-const customSort = (targetKey: string) => ({
-  sortable: true,
-  comparator: (valueA: any, valueB: any) => sortByTarget(valueA, valueB, targetKey),
-});
+const duraParams = {
+  cellRenderer: 'duration',
+  cellRendererParams: { delta: HOUR['value'] },
+  ...ratioW,
+};
 
 /* 项目过程质量 */
 export const ProcessQualityCols: ColDef[] = [
   {
     headerName: `ReOpen率(${PERCENTAGE['unit']})`,
-    field: 'projectQuality',
-    cellRenderer: 'reopenRatio',
-    cellRendererParams: { delta: PERCENTAGE['value'] },
-    ...ratioW,
-    ...customSort('reopenRatio'),
-  },
-  {
-    headerName: '千行Bug率',
-    field: '',
-    columnGroupShow: SHOW['closed'],
+    field: `${moduleName}.reopenRatio`,
+    cellRenderer: 'numToFixed',
+    cellRendererParams: { multiple: PERCENTAGE.value },
     ...ratioW,
   },
   {
-    headerName: '单元覆盖率',
-    field: 'unitCover',
+    headerName: `解决时长(${HOUR['unit']})`,
+    field: `${moduleName}.bugResolveDura`,
     columnGroupShow: SHOW['closed'],
-    ...ratioW,
+    ...duraParams,
   },
   {
     headerName: `回归时长(${HOUR['unit']})`,
-    field: 'projectQuality',
+    field: `${moduleName}.bugFlybackDura`,
     columnGroupShow: SHOW['closed'],
-    cellRenderer: 'bugFlybackDura',
-    cellRendererParams: { delta: HOUR['value'] },
-    ...doubleNumberW,
-    ...customSort('bugFlybackDura'),
+    ...duraParams,
   },
   {
-    headerName: '用例覆盖率',
-    field: '',
+    headerName: '加权遗留缺陷',
+    field: `${moduleName}.weightedLegacyDefect`,
     columnGroupShow: SHOW['closed'],
-    ...ratioW,
+    ...defaultParmas,
   },
   {
     headerName: '加权遗留DI',
+    field: `${moduleName}.weightedLegacyDI`,
     columnGroupShow: SHOW['closed'],
-    field: '',
+    ...defaultParmas,
+  },
+  {
+    headerName: '前端覆盖率',
+    field: `${moduleName}.frontUnitCover`,
+    columnGroupShow: SHOW['closed'],
+    ...defaultParmas,
+  },
+  {
+    headerName: '后端覆盖率',
+    field: `${moduleName}.backUnitCover`,
+    columnGroupShow: SHOW['closed'],
+    ...defaultParmas,
   },
 ];
-// 
+//
 export const ProcessQualityGroup: ColGroupDef = {
   headerName: PROJ_METRIC.processQuality.zh,
   children: ProcessQualityCols,

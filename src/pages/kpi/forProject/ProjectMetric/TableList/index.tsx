@@ -2,7 +2,7 @@
  * @Description: 数据列表
  * @Author: jieTan
  * @Date: 2021-11-22 10:55:42
- * @LastEditTime: 2021-12-15 06:02:04
+ * @LastEditTime: 2021-12-20 06:36:44
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -14,10 +14,9 @@ import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
 import { TableMajorGroup } from './definitions/columns';
 import LinkToCloumn from './renders/LinkToCloumn';
 import ProjStatusColumn from './renders/ProjStatusColumn';
-import BugReOpenColumn from './renders/BugReOpenColumn';
-import BugFlybackDuraColumn from './renders/BugFlybackDuraColumn';
 import KpiCheckBox from './KpiCheckBox';
 import NumberToFixedColumn from './renders/NumberToFixedColumn';
+import DurationColumn from './renders/DurationColumn';
 
 /*  */
 export default () => {
@@ -33,9 +32,8 @@ export default () => {
           modules={[SetFilterModule as any]}
           frameworkComponents={{
             linkTo: LinkToCloumn,
-            reopenRatio: BugReOpenColumn,
-            bugFlybackDura: BugFlybackDuraColumn,
             projStatus: ProjStatusColumn,
+            duration:DurationColumn,
             numToFixed: NumberToFixedColumn,
           }}
           defaultColDef={{ resizable: true }}

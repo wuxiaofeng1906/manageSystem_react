@@ -2,7 +2,7 @@
  * @Description: 项目度量指标
  * @Author: jieTan
  * @Date: 2021-12-02 11:41:52
- * @LastEditTime: 2021-12-16 12:28:17
+ * @LastEditTime: 2021-12-20 06:21:32
  * @LastEditors: jieTan
  * @LastModify: 
  */
@@ -33,6 +33,9 @@ export default (args: GQL_PARAMS, funcWithParams: Function): [string, string] =>
       projectQuality{
         reopenRatio
         bugFlybackDura
+        bugResolveDura
+        weightedLegacyDefect
+        weightedLegacyDI
       }
       progressDeviation{
         storyplan

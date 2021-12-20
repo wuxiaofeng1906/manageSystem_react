@@ -152,18 +152,90 @@ const alaysisReviewDefect = (sourceData: any) => {
     return [];
   }
 
-  const result: any = [];
-  sourceData.forEach((ele: any, index: number) => {
-    const newObject = ele;
-    if (index === 0) {
-      newObject.title = "5.评审和缺陷";
-    } else {
-      newObject.title = "";
+  const result: any = [
+    {
+      title: "5.评审和缺陷",
+      kind: "需求预审",
+    },
+    {
+      kind: "需求评审",
+    },
+    {
+      kind: "UE评审",
+    },
+    {
+      kind: "概设评审",
+    },
+    {
+      kind: "详设评审",
+    },
+    {
+      kind: "用例评审",
+    },
+    {
+      kind: "CodeReview",
+    },
+    {
+      kind: "提测演示",
+    },
+    {
+      kind: "集成测试",
+    },
+    {
+      kind: "系统测试",
+    },
+    {
+      kind: "发布测试",
     }
 
-    result.push(newObject);
+  ];
+  sourceData.forEach((ele: any) => {
+    const newObject = ele;
+    switch (newObject.kind) {
+      case "需求预审":
+        newObject.title = "5.评审和缺陷";
+        result[0] = newObject
+        break;
+      case "需求评审":
+        result[1] = newObject
+        break;
+      case "UE评审":
+        result[2] = newObject
+        break;
+      case "概设评审":
+        result[3] = newObject
+        break;
+      case "详设评审":
+        result[4] = newObject
+        break;
+      case "用例评审":
+        result[5] = newObject
+        break;
+      case "CodeReview":
+        result[6] = newObject
+        break;
+      case "提测演示":
+        result[7] = newObject
+        break;
+      case "集成测试":
+        result[8] = newObject
+        break;
+      case "系统测试":
+        result[9] = newObject
+        break;
+      case "发布测试":
+        result[10] = newObject
+        break;
+      default:
+        break;
+    }
+
+
   });
 
+  result.push({
+    kind: "合计",
+  })
   return result;
 
 };

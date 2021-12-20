@@ -101,7 +101,8 @@ const setProductRateCellStyle = (params: any) => {
 // 5.评审与缺陷
 const setReviewDefectCellStyle = (params: any) => {
 
-  if (params.column?.colId === "title" || params.column?.colId === "stage" || params.data?.stage === "生产率(功能点/人天）") {
+  if (params.column?.colId === "title" || params.column?.colId === "foundDN" || params.column?.colId === "weightDN"
+    || params.column?.colId === "funcPoint" || params.column?.colId === "defectDensity" || params.column?.colId === "defectRatio") {
 
     // 不可修改
     return {
@@ -111,6 +112,26 @@ const setReviewDefectCellStyle = (params: any) => {
     }
   }
 
+  if (params.column?.colId === "defectHour" && (params.data?.kind === "提测演示" || params.data?.kind === "集成测试"
+    || params.data?.kind === "系统测试" || params.data?.kind === "发布测试")) {
+    // 不可修改
+    return {
+      "line-height": "32px",
+      "border-left": "1px solid lightgrey",
+      "background-color": '#F8F8F8'
+    }
+  }
+
+  if (params.data?.kind === "合计") {
+    // 不可修改
+    return {
+      "line-height": "32px",
+      "border-left": "1px solid lightgrey",
+      "background-color": '#F8F8F8'
+    }
+  }
+
+  // 可修改颜色渲染
   return {
     "line-height": "25px",
     "border-left": "1px solid lightgrey",

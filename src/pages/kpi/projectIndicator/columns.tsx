@@ -1,4 +1,25 @@
+// 渲染手工录入
+const manualInput_red = (params: any) => {
+
+  if (params.value === null || params.value === "") {
+    return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
+
+  }
+  return params.value;
+};
+
+
+const manualInput_black = (params: any) => {
+
+  if (params.value === null || params.value === "") {
+    return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
+
+  }
+  return params.value;
+};
+
 /* region 1.进度 */
+
 
 const getProcessColumns = () => {
 
@@ -79,13 +100,7 @@ const getProcessColumns = () => {
       field: 'memo',
       editable: true,
       minWidth: 300,
-      cellRenderer: (params: any) => {
-        if (!params.value) {
-          return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
-
-        }
-        return params.value;
-      }
+      cellRenderer: manualInput_black
     }
   ];
 
@@ -94,15 +109,6 @@ const getProcessColumns = () => {
 
 /* endregion  */
 
-// 渲染手工录入
-const manualInput = (params: any) => {
-
-  if (params.value === null || params.value === "") {
-    return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
-
-  }
-  return params.value;
-};
 
 /* region 2.需求稳定性 */
 
@@ -139,14 +145,14 @@ const getStoryStabilityColumns = () => {
       field: 'planTime',
       minWidth: 115,
       editable: true,
-      cellRenderer: manualInput
+      cellRenderer: manualInput_red
     },
     {
       headerName: '变更工时',
       field: 'updateTime',
       minWidth: 115,
       editable: true,
-      cellRenderer: manualInput
+      cellRenderer: manualInput_red
 
     },
     {
@@ -197,14 +203,14 @@ const getStageWorkloadColumns = () => {
       field: 'manpower',
       minWidth: 115,
       editable: true,
-      cellRenderer: manualInput
+      cellRenderer: manualInput_red
     },
     {
       headerName: '预计工时',
       field: 'planHours',
       minWidth: 115,
       editable: true,
-      cellRenderer: manualInput
+      cellRenderer: manualInput_red
 
     },
     {
@@ -212,7 +218,7 @@ const getStageWorkloadColumns = () => {
       field: 'actualHours',
       minWidth: 115,
       editable: true,
-      cellRenderer: manualInput
+      cellRenderer: manualInput_red
     },
     {
       headerName: '计划工作量',
@@ -303,6 +309,21 @@ const getProductRateColumns = () => {
 
 /* region 5.评审和缺陷 */
 
+const noDataRenderer = (params: any) => {
+
+  if (params.data?.kind === "提测演示" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
+    return "-";
+  }
+  return params.value;
+};
+
+const defectHourEditRenderer = (params: any) => {
+  if (params.data?.kind === "提测演示" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
+    return false;
+  }
+  return true;
+};
+
 const getReviewDefectColumns = () => {
 
   const reviewDefectColums: any = [
@@ -335,15 +356,16 @@ const getReviewDefectColumns = () => {
       headerName: '是否裁剪',
       field: 'cut',
       minWidth: 115,
-      // editable: true,
-      // cellRenderer: manualInput
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {values: ["是", "否"]},
+      cellRenderer: manualInput_black
     },
     {
       headerName: '发现缺陷数',
       field: 'foundDN',
       minWidth: 115,
-      // editable: true,
-      // cellRenderer: manualInput
+
     },
     {
       headerName: '加权有效缺陷数',
@@ -366,14 +388,16 @@ const getReviewDefectColumns = () => {
     {
       headerName: '评审用时',
       field: 'defectHour',
-      minWidth: 115
+      minWidth: 115,
+      cellRenderer: noDataRenderer,
+      editable: defectHourEditRenderer,
 
     },
     {
       headerName: '评审效率',
       field: 'defectRatio',
-      minWidth: 115
-
+      minWidth: 115,
+      cellRenderer: noDataRenderer
     }
   ];
 
@@ -381,6 +405,7 @@ const getReviewDefectColumns = () => {
 };
 
 /* endregion  */
+
 export {
   getProcessColumns,
   getStoryStabilityColumns,

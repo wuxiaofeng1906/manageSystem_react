@@ -1,4 +1,5 @@
 // 1.进度
+
 const setProcessCellStyle = (params: any) => {
   if (params.column?.colId === "memo") {
     // let wordsAlign = "left";
@@ -97,7 +98,6 @@ const setProductRateCellStyle = (params: any) => {
 
 };
 
-
 // 5.评审与缺陷
 const setReviewDefectCellStyle = (params: any) => {
 
@@ -140,10 +140,32 @@ const setReviewDefectCellStyle = (params: any) => {
 
 };
 
+// 6.6 过程质量补充数据和7.服务
+const setProcessQualityCellStyle = (params: any) => {
+
+  if (params.column?.colId === "title" || params.column?.colId === "stage" || params.data?.stage === "生产率(功能点/人天）") {
+
+    // 不可修改
+    return {
+      "line-height": "32px",
+      "border-left": "1px solid lightgrey",
+      "background-color": '#F8F8F8'
+    }
+  }
+
+  return {
+    "line-height": "25px",
+    "border-left": "1px solid lightgrey",
+    "background-color": 'white'
+  }
+
+};
+
 export {
   setProcessCellStyle,
   setStoryStabilityCellStyle,
   setStageWorkloadCellStyle,
   setProductRateCellStyle,
-  setReviewDefectCellStyle
+  setReviewDefectCellStyle,
+  setProcessQualityCellStyle
 }

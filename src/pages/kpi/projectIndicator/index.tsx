@@ -12,7 +12,8 @@ import {
   getStoryStabilityColumns,
   getStageWorkloadColumns,
   getProductRateColumns,
-  getReviewDefectColumns
+  getReviewDefectColumns,
+  getProcessQualityColumns
 } from './columns';
 import {queryDatas} from './dataOperate';
 import {
@@ -20,9 +21,11 @@ import {
   setStoryStabilityCellStyle,
   setStageWorkloadCellStyle,
   setProductRateCellStyle,
-  setReviewDefectCellStyle
+  setReviewDefectCellStyle,
+  setProcessQualityCellStyle
 } from './gridStyles';
 import './styles.css';
+import {Button} from "antd";
 
 const WeekCodeTableList: React.FC<any> = () => {
   const gqlClient = useGqlClient();
@@ -125,17 +128,64 @@ const WeekCodeTableList: React.FC<any> = () => {
   };
   /* endregion */
 
+  /* region  6 过程质量补充数据和7.服务 */
+  const processQualityGridApi = useRef<GridApi>();
+
+  const onPocessQualityGridReady = (params: GridReadyEvent) => {
+    processQualityGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+  if (processQualityGridApi.current) {
+    if (loading) processQualityGridApi.current.showLoadingOverlay();
+    else processQualityGridApi.current.hideOverlay();
+  }
+
+  const pocessQualityCellEdited = (params: any) => {
+
+    console.log(params);
+
+  };
+  /* endregion */
+
   window.onresize = function () {
     processGridApi.current?.sizeColumnsToFit();
     storyStabilityGridApi.current?.sizeColumnsToFit();
     stageWorkloadGridApi.current?.sizeColumnsToFit();
     productRateGridApi.current?.sizeColumnsToFit();
     reviewDefectGridApi.current?.sizeColumnsToFit();
+    processQualityGridApi.current?.sizeColumnsToFit();
+  };
+
+  // 导出数据
+  const exportAllExcell = () => {
+    const spreadsheets: any = [];
+
+    spreadsheets.push(
+      processGridApi.current?.getSheetDataForExcel({sheetName: '进度'}),
+      storyStabilityGridApi.current?.getSheetDataForExcel({sheetName: '需求稳定性'}),
+      stageWorkloadGridApi.current?.getSheetDataForExcel({sheetName: '阶段工作量'}),
+      productRateGridApi.current?.getSheetDataForExcel({sheetName: '生产率'}),
+      reviewDefectGridApi.current?.getSheetDataForExcel({sheetName: '评审和缺陷'}),
+      processQualityGridApi.current?.getSheetDataForExcel({sheetName: '过程质量补充数据和服务'}),
+    );
+
+    processGridApi.current?.exportMultipleSheetsAsExcel({
+      data: spreadsheets,
+      fileName: '项目指标.xlsx'
+    });
   };
 
   return (
     <PageContainer style={{height: "100%"}}>
+      <div style={{marginTop: -20, height: 35}}>
+        <Button
+          style={{float: "right", borderRadius: 5}}
+          onClick={exportAllExcell}>导出Excel
+        </Button>
+      </div>
+
       <div>
+
         {/* 1.进度 */}
         <div className="ag-theme-alpine" style={{height: 250, width: '100%'}}>
           <AgGridReact
@@ -254,6 +304,26 @@ const WeekCodeTableList: React.FC<any> = () => {
           </AgGridReact>
         </div>
 
+        {/* 6 过程质量补充数据和7.服务 */}
+        <div className="ag-theme-alpine" style={{height: 300, width: '100%'}}>
+          <AgGridReact
+            columnDefs={getProcessQualityColumns()} // 定义列
+            rowData={data?.processQuality} // 数据绑定
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true,
+              suppressMenu: true,
+              cellStyle: setProcessQualityCellStyle,
+            }}
+            rowHeight={32}
+            headerHeight={35}
+            suppressRowTransform={true}
+            onGridReady={onPocessQualityGridReady}
+            onCellEditingStopped={pocessQualityCellEdited}
+          >
+          </AgGridReact>
+        </div>
       </div>
 
 

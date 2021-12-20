@@ -289,7 +289,8 @@ const queryDatas = async (client: GqlClient<object>, projectId: string) => {
     storyStability: alaysisStoryStability(), // 2.需求稳定性
     stageWorkload: alaysisStageWorkload(data?.productWithWorkload), // 3.阶段工作量
     productRate: alaysisProductRate(data?.productWithWorkload), // 4.生产率
-    reviewDefect: alaysisReviewDefect(data?.reviewDefect)
+    reviewDefect: alaysisReviewDefect(data?.reviewDefect),
+    processQuality: []
   };
   return datas;
 };

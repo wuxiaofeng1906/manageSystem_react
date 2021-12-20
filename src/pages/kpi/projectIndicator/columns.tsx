@@ -1,7 +1,7 @@
 // 渲染手工录入
 const manualInput_red = (params: any) => {
 
-  if (params.value === null || params.value === "") {
+  if (params.value === null || params.value === "" || params.value === undefined) {
     return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
 
   }
@@ -11,7 +11,7 @@ const manualInput_red = (params: any) => {
 
 const manualInput_black = (params: any) => {
 
-  if (params.value === null || params.value === "") {
+  if (!params.value) {
     return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
 
   }
@@ -406,10 +406,73 @@ const getReviewDefectColumns = () => {
 
 /* endregion  */
 
+/* region 6 过程质量补充数据和7.服务 */
+
+const getProcessQualityColumns = () => {
+
+  const processQualityColums: any = [
+    {
+      headerName: '',
+      field: 'title',
+      minWidth: 90,
+      cellRenderer: (params: any) => {
+        return `<div style="font-weight: bold;margin-top: 75px">${params.value}</div>`
+
+      },
+      cellClassRules: {
+        'cell-span': "value !== undefined"
+      },
+      rowSpan: (params: any) => {
+
+        if (params.data.title === '3.阶段工作量（单位：人天）') {
+          return 6;
+        }
+        return 1;
+      }
+    },
+    {
+      headerName: '',
+      field: 'stage',
+      maxWidth: 110,
+      minWidth: 80
+    },
+    {
+      headerName: '是否裁剪',
+      field: 'manpower',
+      minWidth: 115,
+      editable: true,
+      cellRenderer: manualInput_red
+    },
+    {
+      headerName: '',
+      field: 'planHours',
+      minWidth: 115,
+    },
+    {
+      headerName: '基线值',
+      field: 'actualHours',
+      minWidth: 115,
+      // editable: true,
+      // cellRenderer: manualInput_red
+    },
+    {
+      headerName: '实际值',
+      field: 'planWorkload',
+      minWidth: 115
+
+    }
+  ];
+
+  return processQualityColums;
+};
+
+/* endregion  */
+
 export {
   getProcessColumns,
   getStoryStabilityColumns,
   getStageWorkloadColumns,
   getProductRateColumns,
-  getReviewDefectColumns
+  getReviewDefectColumns,
+  getProcessQualityColumns
 };

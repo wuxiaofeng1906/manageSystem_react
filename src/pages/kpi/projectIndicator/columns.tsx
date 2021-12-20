@@ -20,14 +20,14 @@ const manualInput_black = (params: any) => {
 
 /* region 1.进度 */
 
-
 const getProcessColumns = () => {
 
   const processColums: any = [
     {
       headerName: '',
       field: 'title',
-      minWidth: 90,
+      minWidth: 120,
+      maxWidth: 120,
       cellRenderer: (params: any) => {
         return `<div style="font-weight: bold;margin-top: 70px">${params.value}</div>`
 
@@ -46,45 +46,50 @@ const getProcessColumns = () => {
     {
       headerName: '里程碑',
       field: 'milestone',
-      maxWidth: 110,
-      minWidth: 80
+      maxWidth: 175,
+      minWidth: 175
     },
     {
       headerName: '计划开始时间',
       field: 'planStart',
-      minWidth: 115
+      minWidth: 115,
+      maxWidth: 115
       // editable: editRenderer
     },
     {
       headerName: '实际开始时间',
       field: 'actualStart',
-      minWidth: 115
+      minWidth: 115,
+      maxWidth: 115
       // editable: editRenderer
 
     },
     {
       headerName: '计划完成时间',
       field: 'planEnd',
-      minWidth: 115
+      minWidth: 115,
+      maxWidth: 115
       // editable: editRenderer
     },
     {
       headerName: '实际完成时间',
       field: 'actualEnd',
-      minWidth: 115
+      minWidth: 115,
+      maxWidth: 115
       // editable: editRenderer
     },
     {
       headerName: '偏差天数',
       field: 'days',
-      // type: 'numericColumn',
-      minWidth: 90
+      minWidth: 110,
+      maxWidth: 110
     },
     {
       headerName: '偏差率',
       field: 'ratio',
       // type: 'numericColumn',
       minWidth: 90,
+      maxWidth: 90,
       valueFormatter: (params: any) => {
         if (params.value === null) {
           return "";
@@ -100,6 +105,7 @@ const getProcessColumns = () => {
       field: 'memo',
       editable: true,
       minWidth: 300,
+      maxWidth: 300,
       cellRenderer: manualInput_black
     }
   ];
@@ -109,7 +115,6 @@ const getProcessColumns = () => {
 
 /* endregion  */
 
-
 /* region 2.需求稳定性 */
 
 const getStoryStabilityColumns = () => {
@@ -118,7 +123,8 @@ const getStoryStabilityColumns = () => {
     {
       headerName: '',
       field: 'title',
-      minWidth: 90,
+      minWidth: 120,
+      maxWidth: 120,
       cellRenderer: (params: any) => {
         return `<div style="font-weight: bold;margin-top: 50px">${params.value}</div>`
 
@@ -137,13 +143,14 @@ const getStoryStabilityColumns = () => {
     {
       headerName: '阶段',
       field: 'stage',
-      maxWidth: 110,
-      minWidth: 80
+      maxWidth: 175,
+      minWidth: 175
     },
     {
       headerName: '预计工时',
       field: 'planTime',
       minWidth: 115,
+      maxWidth: 115,
       editable: true,
       cellRenderer: manualInput_red
     },
@@ -151,6 +158,7 @@ const getStoryStabilityColumns = () => {
       headerName: '变更工时',
       field: 'updateTime',
       minWidth: 115,
+      maxWidth: 115,
       editable: true,
       cellRenderer: manualInput_red
 
@@ -158,7 +166,8 @@ const getStoryStabilityColumns = () => {
     {
       headerName: '变更率',
       field: 'updateRate',
-      minWidth: 115
+      minWidth: 115,
+      maxWidth: 115,
       // editable: editRenderer
     }
   ];
@@ -176,9 +185,12 @@ const getStageWorkloadColumns = () => {
     {
       headerName: '',
       field: 'title',
-      minWidth: 90,
-      cellRenderer: (params: any) => {
-        return `<div style="font-weight: bold;margin-top: 75px">${params.value}</div>`
+      minWidth: 120,
+      maxWidth: 120,
+      cellRenderer: () => {
+        return `<div style="font-weight: bold;margin-top: 65px">
+<div>3.阶段工作量<br/>（单位：人天）</div>
+</div>`
 
       },
       cellClassRules: {
@@ -195,13 +207,14 @@ const getStageWorkloadColumns = () => {
     {
       headerName: '阶段',
       field: 'stage',
-      maxWidth: 110,
-      minWidth: 80
+      maxWidth: 175,
+      minWidth: 175
     },
     {
       headerName: '投入人数',
       field: 'manpower',
       minWidth: 115,
+      maxWidth: 115,
       editable: true,
       cellRenderer: manualInput_red
     },
@@ -209,6 +222,7 @@ const getStageWorkloadColumns = () => {
       headerName: '预计工时',
       field: 'planHours',
       minWidth: 115,
+      maxWidth: 115,
       editable: true,
       cellRenderer: manualInput_red
 
@@ -217,20 +231,21 @@ const getStageWorkloadColumns = () => {
       headerName: '实际工时',
       field: 'actualHours',
       minWidth: 115,
+      maxWidth: 115,
       editable: true,
       cellRenderer: manualInput_red
     },
     {
       headerName: '计划工作量',
       field: 'planWorkload',
-      minWidth: 115
-
+      minWidth: 115,
+      maxWidth: 115,
     },
     {
       headerName: '实际工作量',
       field: 'actualWorkload',
-      minWidth: 115
-
+      minWidth: 110,
+      maxWidth: 110,
     }
   ];
 
@@ -263,7 +278,8 @@ const getProductRateColumns = () => {
     {
       headerName: '',
       field: 'title',
-      minWidth: 90,
+      minWidth: 120,
+      maxWidth: 120,
       cellRenderer: (params: any) => {
         return `<div style="font-weight: bold;margin-top: 15px">${params.value}</div>`
 
@@ -282,13 +298,14 @@ const getProductRateColumns = () => {
     {
       headerName: '阶段',
       field: 'stage',
-
-      minWidth: 80
+      maxWidth: 175,
+      minWidth: 175
     },
     {
       headerName: '计划值',
       field: 'planValue',
       minWidth: 115,
+      maxWidth: 115,
       editable: projectRateEditRenderer,
       cellRenderer: projectRateManualInput
     },
@@ -296,6 +313,7 @@ const getProductRateColumns = () => {
       headerName: '实际值',
       field: 'actualValue',
       minWidth: 115,
+      maxWidth: 115,
       editable: projectRateEditRenderer,
       cellRenderer: projectRateManualInput
 
@@ -330,7 +348,8 @@ const getReviewDefectColumns = () => {
     {
       headerName: '',
       field: 'title',
-      minWidth: 90,
+      minWidth: 120,
+      maxWidth: 120,
       cellRenderer: (params: any) => {
         return `<div style="font-weight: bold;margin-top: 190px">${params.value}</div>`
 
@@ -349,13 +368,14 @@ const getReviewDefectColumns = () => {
     {
       headerName: '',
       field: 'kind',
-      maxWidth: 110,
-      minWidth: 80
+      maxWidth: 175,
+      minWidth: 175
     },
     {
       headerName: '是否裁剪',
       field: 'cut',
       minWidth: 115,
+      maxWidth: 115,
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {values: ["是", "否"]},
@@ -365,30 +385,32 @@ const getReviewDefectColumns = () => {
       headerName: '发现缺陷数',
       field: 'foundDN',
       minWidth: 115,
-
+      maxWidth: 115,
     },
     {
       headerName: '加权有效缺陷数',
       field: 'weightDN',
-      minWidth: 115
-
+      minWidth: 115,
+      maxWidth: 115,
     },
     {
       headerName: '功能点',
       field: 'funcPoint',
-      minWidth: 115
-
+      minWidth: 115,
+      maxWidth: 115,
     },
     {
       headerName: '缺陷密度',
       field: 'defectDensity',
-      minWidth: 115
+      minWidth: 115,
+      maxWidth: 110
 
     },
     {
       headerName: '评审用时',
       field: 'defectHour',
-      minWidth: 115,
+      minWidth: 90,
+      maxWidth: 90,
       cellRenderer: noDataRenderer,
       editable: defectHourEditRenderer,
 
@@ -396,7 +418,8 @@ const getReviewDefectColumns = () => {
     {
       headerName: '评审效率',
       field: 'defectRatio',
-      minWidth: 115,
+      minWidth: 90,
+      maxWidth: 90,
       cellRenderer: noDataRenderer
     }
   ];
@@ -414,7 +437,8 @@ const getProcessQualityColumns = () => {
     {
       headerName: '',
       field: 'title',
-      minWidth: 90,
+      minWidth: 120,
+      maxWidth: 120,
       cellRenderer: (params: any) => {
         return `<div style="font-weight: bold;margin-top: 75px">${params.value}</div>`
 

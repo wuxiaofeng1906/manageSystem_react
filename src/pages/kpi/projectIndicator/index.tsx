@@ -180,7 +180,7 @@ const WeekCodeTableList: React.FC<any> = () => {
       <div style={{marginTop: -20, height: 35}}>
         <Button
           style={{float: "right", borderRadius: 5}}
-          onClick={exportAllExcell}>导出Excel
+          onClick={exportAllExcell}>导出所有表格
         </Button>
       </div>
 

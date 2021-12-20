@@ -101,7 +101,7 @@ const setProductRateCellStyle = (params: any) => {
 // 5.评审与缺陷
 const setReviewDefectCellStyle = (params: any) => {
 
-  if (params.column?.colId === "title" || params.column?.colId === "kind"|| params.column?.colId === "foundDN" || params.column?.colId === "weightDN"
+  if (params.column?.colId === "title" || params.column?.colId === "kind" || params.column?.colId === "foundDN" || params.column?.colId === "weightDN"
     || params.column?.colId === "funcPoint" || params.column?.colId === "defectDensity" || params.column?.colId === "defectRatio") {
 
     // 不可修改

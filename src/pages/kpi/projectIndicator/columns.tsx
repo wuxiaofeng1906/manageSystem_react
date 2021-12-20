@@ -376,10 +376,25 @@ const getReviewDefectColumns = () => {
       field: 'cut',
       minWidth: 115,
       maxWidth: 115,
-      editable: true,
+      editable: (params: any) => {
+        if (params.data?.kind === "合计") {
+          return false;
+        }
+        return true;
+      },
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {values: ["是", "否"]},
-      cellRenderer: manualInput_black
+      cellRenderer: (params: any) => {
+
+        if (params.data?.kind === "合计") {
+          return "-";
+        }
+        if (!params.value) {
+          return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
+        }
+        return params.value;
+      }
+
     },
     {
       headerName: '发现缺陷数',

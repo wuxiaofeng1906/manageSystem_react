@@ -147,6 +147,7 @@ const alaysisProductRate = (sourceData: any) => {
 
 }
 
+// 评审和缺陷
 const alaysisReviewDefect = (sourceData: any) => {
   if (!sourceData) {
     return [];
@@ -240,6 +241,21 @@ const alaysisReviewDefect = (sourceData: any) => {
 
 };
 
+// 过程质量补充数据和服务
+const alaysisProcessQuality = (sourceData: any) => {
+
+  if (!sourceData) {
+    return [];
+  }
+
+  const result = [{
+    title:"6 过程质量补充数据",
+    module:"开发",
+  }];
+
+  return result;
+};
+
 const queryDatas = async (client: GqlClient<object>, projectId: string) => {
 
   const {data} = await client.query(`
@@ -281,6 +297,37 @@ const queryDatas = async (client: GqlClient<object>, projectId: string) => {
             defectHour
             defectRatio
           }
+
+          processQuality(pId:${Number(projectId)}){
+            reopenRatio {
+              actualValue
+              baseline
+            }
+            bugFlybackDura {
+              actualValue
+              baseline
+            }
+            bugResolvedDura {
+              actualValue
+              baseline
+            }
+            weightedLegacyDefect {
+              actualValue
+              baseline
+            }
+            weightedLegacyDI {
+              actualValue
+              baseline
+            }
+            frontUnitCover {
+              actualValue
+              baseline
+            }
+            backUnitCover {
+              actualValue
+              baseline
+            }
+          }
       }
   `);
 
@@ -290,7 +337,7 @@ const queryDatas = async (client: GqlClient<object>, projectId: string) => {
     stageWorkload: alaysisStageWorkload(data?.productWithWorkload), // 3.阶段工作量
     productRate: alaysisProductRate(data?.productWithWorkload), // 4.生产率
     reviewDefect: alaysisReviewDefect(data?.reviewDefect),
-    processQuality: []
+    processQuality: alaysisProcessQuality(data?.processQuality)
   };
   return datas;
 };

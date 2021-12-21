@@ -140,50 +140,46 @@ export default () => {
 
   /* 绘制区 */
   return (
-    <>
-      <Form layout="inline">
-        <Form.Item label="所属部门/组">
-          <TreeSelect
-            {...defaultParams}
-            className={`${selectFilter} ${treeActive}`}
-            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-            treeData={treeData}
-            treeDefaultExpandAll
-            onClick={() => deptTreeNodes(data, treeData, setTreeData)}
-            onDropdownVisibleChange={() => setTreeActive(treeActive ? '' : treeSelectActive)}
-            // onSelect={(value: string) => treeOnSelect(value, setGqlData, gqlClient)}
-            onSelect={(value: string) => {
-              deptId = value;
-              _onSelect();
-            }}
-          />
-        </Form.Item>
-        <Form.Item label="特性项目">
-          <Select
-            {...defaultParams}
-            mode="multiple"
-            className={selectFilter}
-            onChange={(values: never[]) => setProjIds(values)}
-            onBlur={() => _onSelect()}
-            onClick={() => projOptsElems(gqlData, projElems, setProjElems)}
-            children={projElems}
-          />
-        </Form.Item>
-        <Form.Item>
-          <Divider type="vertical" />
-        </Form.Item>
-        <Form.Item>
-          <RangePicker
-            ranges={{
-              Today: [moment(), moment()],
-              'This Month': [moment().startOf('month'), moment().endOf('month')],
-            }}
-            onChange={() => {}}
-          />
-        </Form.Item>
-      </Form>
-      <br />
-      <KpiCheckBox />
-    </>
+    <Form layout="inline">
+      <Form.Item label="所属部门/组">
+        <TreeSelect
+          {...defaultParams}
+          className={`${selectFilter} ${treeActive}`}
+          dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+          treeData={treeData}
+          treeDefaultExpandAll
+          onClick={() => deptTreeNodes(data, treeData, setTreeData)}
+          onDropdownVisibleChange={() => setTreeActive(treeActive ? '' : treeSelectActive)}
+          // onSelect={(value: string) => treeOnSelect(value, setGqlData, gqlClient)}
+          onSelect={(value: string) => {
+            deptId = value;
+            _onSelect();
+          }}
+        />
+      </Form.Item>
+      <Form.Item label="特性项目">
+        <Select
+          {...defaultParams}
+          mode="multiple"
+          className={selectFilter}
+          onChange={(values: never[]) => setProjIds(values)}
+          onBlur={() => _onSelect()}
+          onClick={() => projOptsElems(gqlData, projElems, setProjElems)}
+          children={projElems}
+        />
+      </Form.Item>
+      <Form.Item>
+        <Divider type="vertical" />
+      </Form.Item>
+      <Form.Item>
+        <RangePicker
+          ranges={{
+            Today: [moment(), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+          }}
+          onChange={() => {}}
+        />
+      </Form.Item>
+    </Form>
   );
 };

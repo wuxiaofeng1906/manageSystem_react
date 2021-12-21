@@ -312,7 +312,7 @@ export default [
               },
             ],
           },
-          ProjectKpiRoute,
+          ...ProjectKpiRoute,
           {
             name: '服务',
             icon: 'table',

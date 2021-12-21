@@ -2,7 +2,7 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2021-12-15 06:13:06
+ * @LastEditTime: 2021-12-21 09:43:53
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -16,7 +16,7 @@ import {
   ReviewDefectGroup,
   ScaleProductivityGroup,
   StageWorkloadGroup,
-} from '../definitions/columns';
+} from '../TableList/definitions/columns';
 import { projectKpiGql, queryGQL } from '@/pages/gqls';
 import { useGqlClient } from '@/hooks';
 

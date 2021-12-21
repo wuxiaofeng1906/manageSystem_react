@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2021-12-10 10:10:27
+ * @LastEditTime: 2021-12-21 08:09:25
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -11,7 +11,7 @@ import { selectFilter, treeSelectActive } from './index.css';
 import moment from 'moment';
 import { useRequest } from 'ahooks';
 import { GqlClient, useGqlClient } from '@/hooks';
-import { EXTRA_FILTER_TYPE, GQL_PARAMS, GRAPHQL_QUERY } from '@/namespaces';
+import { GQL_PARAMS, GRAPHQL_QUERY } from '@/namespaces';
 import { useState } from 'react';
 import { useModel } from 'umi';
 import { toTree } from './utils/tree';
@@ -83,25 +83,19 @@ const deptTreeNodes = (data: any, val: any[], setVal: Function): void => {
  * @description - 选中tree节点后，重新设置项目指标数据
  * @author JieTan
  * @date 2021/12/02 13:12:16
- * @param {string} value - 部门ID值
+ * @param {Object} gqlParams - gql的查询参数
  * @param {Function} setVal - 修改Table数据的函数
  * @param {GqlClient<object>} gqlClient - gql查询实例
  */
-const treeOnSelect = async (value: string, setVal: Function, gqlClient: GqlClient<object>) => {
+const onSelect = async (gqlParams: object, setVal: Function, gqlClient: GqlClient<object>) => {
   //
   const params: GQL_PARAMS = {
     func: GRAPHQL_QUERY['PROJECT_KPI'],
-    params: { deptId: parseInt(value) },
+    params: gqlParams,
   };
   //
   const rets = (await queryGQL(gqlClient, projectKpiGql, params)) ?? [];
   setVal(rets);
-};
-
-const projOnSelect = (vals: any[], projType: EXTRA_FILTER_TYPE, gridApi: any) => {
-  // const pType: EXTRA_FILTER_TYPE = { field: 'project', values: vals };
-  Object.assign(projType, { field: 'project', values: vals });
-  gridApi.onFilterChanged();
 };
 
 /* ************************************************************************************************************** */
@@ -115,11 +109,33 @@ export default () => {
   const [projElems, setProjElems] = useState(null); // 保存项目信息
   const [treeData, setTreeData] = useState([]); // 部门树形结构的数据
   const [treeActive, setTreeActive] = useState(''); // 部门<Select>选中时的样式
-  const { gqlData, setGqlData, gridApi, projType } = useModel('projectMetric'); // 获取“过程质量”查询的结果数据
+  const { gqlData, setGqlData } = useModel('projectMetric'); // 获取“过程质量”查询的结果数据
+  const [projIds, setProjIds] = useState([]);
+  //
+  let deptId: string;
   //
   const gqlClient = useGqlClient(); // 必须提前初始化该对象
   const params: GQL_PARAMS = { func: GRAPHQL_QUERY['ORGANIZATION'] };
   const { data } = useRequest(() => queryGQL(gqlClient, organizationGql, params));
+
+  /* 方法区 */
+  const _onSelect = async () => {
+    // 参数构建
+    const gqlParams = {};
+    //
+    if (deptId) Object.assign(gqlParams, { deptId: parseInt(deptId) });
+    if (projIds.length !== 0)
+      Object.assign(gqlParams, { projIds: projIds.map((x) => parseInt(x)) });
+    //
+    const params: GQL_PARAMS = {
+      func: GRAPHQL_QUERY['PROJECT_KPI'],
+      params: gqlParams,
+    };
+
+    // 数据查询
+    const rets = (await queryGQL(gqlClient, projectKpiGql, params)) ?? [];
+    setGqlData(rets);
+  };
 
   /* 绘制区 */
   return (
@@ -133,7 +149,11 @@ export default () => {
           treeDefaultExpandAll
           onClick={() => deptTreeNodes(data, treeData, setTreeData)}
           onDropdownVisibleChange={() => setTreeActive(treeActive ? '' : treeSelectActive)}
-          onSelect={(value: string) => treeOnSelect(value, setGqlData, gqlClient)}
+          // onSelect={(value: string) => treeOnSelect(value, setGqlData, gqlClient)}
+          onSelect={(value: string) => {
+            deptId = value;
+            _onSelect();
+          }}
         />
       </Form.Item>
       <Form.Item label="特性项目">
@@ -141,7 +161,8 @@ export default () => {
           {...defaultParams}
           mode="multiple"
           className={selectFilter}
-          onChange={(value: any[]) => projOnSelect(value, projType, gridApi)}
+          onChange={(values: never[]) => setProjIds(values)}
+          onBlur={() => _onSelect()}
           onClick={() => projOptsElems(gqlData, projElems, setProjElems)}
           children={projElems}
         />

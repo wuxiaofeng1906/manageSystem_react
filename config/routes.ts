@@ -332,6 +332,11 @@ export default [
               },
             ],
           },
+          {
+            name: '项目指标',
+            path: 'projectIndicator',
+            component: './kpi/projectIndicator',
+          },
         ],
       },
       {
@@ -410,20 +415,25 @@ export default [
   {
     name: '检查工具',
     icon: 'table',
-    path: '/jenkins',
+    path: '/checkTools',
     routes: [
+      {
+        name: '工具入口',
+        path: 'toolIntegration',
+        component: './checkTools/toolIntegration',
+      },
       {
         name: '上线前检查',
         path: 'checkBeforeOnline',
         access: 'onlineCheck',
-        component: './jenkins/checkBeforeOnline',
+        component: './checkTools/checkBeforeOnline',
       },
       {
         name: 'sonar扫描',
         path: 'sonar',
         access: 'sonarCheck',
-        component: './jenkins/sonar',
-      },
+        component: './checkTools/sonar',
+      }
     ],
   },
   {
@@ -435,19 +445,31 @@ export default [
     component: './approvalFlow',
   },
   {
-    name: '工具集成',
+    name: '值班与发布',
     icon: 'table',
-    path: '/toolIntegration',
-    // access: 'sysAdmin',
-    // hideInMenu: true,
-    component: './toolIntegration',
-  },
-  {
-    name: '值班计划',
-    icon: 'table',
-    path: '/dutyPlan',
-    access: 'sysAdmin',
-    component: './dutyPlan',
+    path: '/onDutyAndRelease',
+    routes: [
+      {
+        name: '值班计划',
+        icon: 'table',
+        path: 'dutyPlan',
+        component: './onDutyAndRelease/dutyPlan',
+      }, {
+        name: '发布过程',
+        icon: 'table',
+        path: 'preRelease',
+        access: 'sysAdmin',
+        component: './onDutyAndRelease/preRelease',
+        // hideInMenu: true
+      }, {
+        name: '发布历史',
+        icon: 'table',
+        path: 'releaseHistory',
+        access: 'sysAdmin',
+        component: './onDutyAndRelease/releaseHistory',
+        // hideInMenu: true
+      }
+    ],
   },
   {
     name: '系统管理',

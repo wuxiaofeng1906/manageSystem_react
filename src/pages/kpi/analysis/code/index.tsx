@@ -235,7 +235,7 @@ const getSourceColums = () => {
       headerName: '项目阶段',
       field: 'stage',
       minWidth: 110,
-      editable: true,
+
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {values: prjStageRender()},
       filterParams: {

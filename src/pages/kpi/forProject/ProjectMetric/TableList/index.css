@@ -1,0 +1,25 @@
+/*  */
+@import '~ag-grid-community/dist/styles/ag-grid.css';
+@import '~ag-grid-community/dist/styles/ag-theme-alpine.css';
+
+/* TableList */
+::-webkit-scrollbar-track {
+  background-color: #f1f1f5;
+  border: 2px solid white;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+  background-color: #dfe6e9;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #e7eaeb;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #d3d5d6;
+  border-radius: 8px;
+}

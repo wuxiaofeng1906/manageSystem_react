@@ -1,5 +1,6 @@
 ﻿// @ts-ignore
-import {MenuDataItem} from '@@/plugin-layout/runtime';
+import { MenuDataItem } from '@@/plugin-layout/runtime';
+import { ProjectKpiRoute } from './routes-tj';
 
 export default [
   {
@@ -9,16 +10,16 @@ export default [
       {
         path: '/user',
         routes: [
-          {
-            name: 'myLogin',
-            path: '/user/myLogin',
-            component: './user/myLogin',
-          },
           // {
-          //   name: 'login',
-          //   path: '/user/login',
-          //   component: './user/login',
+          //   name: 'myLogin',
+          //   path: '/user/myLogin',
+          //   component: './user/myLogin',
           // },
+          {
+            name: 'login',
+            path: '/user/login',
+            component: './user/login',
+          },
         ],
       },
     ],
@@ -130,7 +131,7 @@ export default [
   },
   {
     name: '研发过程数据',
-    access: 'devCenter',  // 仅研发中心人员可见，客服不可见
+    access: 'devCenter', // 仅研发中心人员可见，客服不可见
     icon: 'table',
     path: '/kpi',
     routes: [
@@ -172,7 +173,8 @@ export default [
                     icon: 'table',
                     path: '/kpi/performance/developer/coverage/byStorehouse',
                     component: './kpi/performance/developer/coverage/byStorehouse',
-                  }, {
+                  },
+                  {
                     name: '按分支',
                     icon: 'table',
                     path: '/kpi/performance/developer/coverage/byBranch',
@@ -310,6 +312,7 @@ export default [
               },
             ],
           },
+          ...ProjectKpiRoute,
           {
             name: '服务',
             icon: 'table',
@@ -369,19 +372,22 @@ export default [
             path: 'front_dashboard',
             component: './kpi/analysis/front_dashboard',
             access: 'frontManager',
-          }, {
+          },
+          {
             name: 'bug',
             icon: 'table',
             path: 'bug',
             component: './kpi/analysis/front_dashboard/details/bug',
             hideInMenu: true,
-          }, {
+          },
+          {
             name: 'story',
             icon: 'table',
             path: 'story',
             component: './kpi/analysis/front_dashboard/details/story',
             hideInMenu: true,
-          }, {
+          },
+          {
             name: 'task',
             icon: 'table',
             path: 'task',

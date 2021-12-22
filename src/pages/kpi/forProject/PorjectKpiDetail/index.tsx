@@ -25,7 +25,7 @@ import {
   setProcessQualityCellStyle
 } from './gridStyles';
 import './styles.css';
-import {Button} from "antd";
+import {Button, message} from "antd";
 import {
   getProcessHeaderStyle,
   getStoryStabilityHeaderStyle,
@@ -33,14 +33,16 @@ import {
   getProductRateHeaderStyle,
   getReviewDefectHeaderStyle,
   getProcessQualityHeaderStyle
-} from "./columsTitleRenderer"
+} from "./columsTitleRenderer";
+
+
+import {updateGridContent} from "./axiosRequest";
 
 const WeekCodeTableList: React.FC<any> = (props: any) => {
+  const projectId = props.location.query.id;
 
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() =>
-    queryDatas(gqlClient, props.location.query.id),
-  );
+  const {data, loading} = useRequest(() => queryDatas(gqlClient, projectId),);
 
   /* region  进度指标 */
   const processGridApi = useRef<GridApi>();
@@ -54,9 +56,44 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     else processGridApi.current.hideOverlay();
   }
 
-  const processCellEdited = (params: any) => {
+  const processCellEdited = async (params: any) => {
 
-    console.log(params);
+    const type = params.data?.milestone;
+    const correspondingField = {
+      "需求": "storyplan",
+      "概设&计划": "designplan",
+      "开发": "devplan",
+      "测试": "testplan",
+      "发布": "releaseplan",
+      "项目计划": "projectplan",
+    };
+    const newValues = {
+      "category": "progressDeviation",
+      "column": "memo",
+      "newValue": params.newValue,
+      "projects": [projectId],
+      "types": [correspondingField[type]]
+    };
+
+    const result = await updateGridContent(newValues);
+
+    if (!result) {
+      message.info({
+        content: "修改成功！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    } else {
+      message.error({
+        content: result,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
 
   };
   /* endregion */
@@ -268,7 +305,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         </div>
 
         {/* 4.生产率 */}
-        <div className="ag-theme-alpine" style={{height: 130, width: '100%'}}>
+        <div className="ag-theme-alpine" style={{height: 140, width: '100%'}}>
           <AgGridReact
             columnDefs={getProductRateColumns()} // 定义列
             rowData={data?.productRate} // 数据绑定

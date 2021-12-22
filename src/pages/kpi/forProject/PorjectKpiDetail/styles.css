@@ -5,5 +5,11 @@
   border-bottom: 1px solid lightgrey !important;
 }
 
+.cell-span2 {
+
+  background-color: white;
+  border-right: 1px solid lightgrey !important;
+  border-bottom: 1px solid lightgrey !important;
+}
 
 

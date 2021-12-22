@@ -143,7 +143,7 @@ const setReviewDefectCellStyle = (params: any) => {
 // 6.6 过程质量补充数据和7.服务
 const setProcessQualityCellStyle = (params: any) => {
 
-  if (params.column?.colId === "title" || params.column?.colId === "stage" || params.data?.stage === "生产率(功能点/人天）") {
+  if (params.column?.colId === "title" || params.column?.colId === "module" || params.column?.colId === "baseline" || params.column?.colId === "kind") {
 
     // 不可修改
     return {
@@ -153,6 +153,14 @@ const setProcessQualityCellStyle = (params: any) => {
     }
   }
 
+  if (params.column?.colId === "realValue" && params.data?.module !== "及时交付") {
+    // 不可修改
+    return {
+      "line-height": "32px",
+      "border-left": "1px solid lightgrey",
+      "background-color": '#F8F8F8'
+    }
+  }
   return {
     "line-height": "25px",
     "border-left": "1px solid lightgrey",

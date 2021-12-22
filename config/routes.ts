@@ -1,6 +1,6 @@
 ﻿// @ts-ignore
-import { MenuDataItem } from '@@/plugin-layout/runtime';
-import { ProjectKpiRoute } from './routes-tj';
+import {MenuDataItem} from '@@/plugin-layout/runtime';
+import {ProjectKpiRoute} from './routes-tj';
 
 export default [
   {
@@ -10,15 +10,10 @@ export default [
       {
         path: '/user',
         routes: [
-          // {
-          //   name: 'myLogin',
-          //   path: '/user/myLogin',
-          //   component: './user/myLogin',
-          // },
           {
-            name: 'login',
-            path: '/user/login',
-            component: './user/login',
+            name: 'myLogin',
+            path: '/user/myLogin',
+            component: './user/myLogin',
           },
         ],
       },
@@ -331,12 +326,7 @@ export default [
                 component: './kpi/performance/service/avgEstablishTime',
               },
             ],
-          },
-          {
-            name: '项目指标',
-            path: 'projectIndicator',
-            component: './kpi/projectIndicator',
-          },
+          }
         ],
       },
       {

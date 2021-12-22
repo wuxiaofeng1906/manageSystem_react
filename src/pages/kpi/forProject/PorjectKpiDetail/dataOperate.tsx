@@ -249,8 +249,61 @@ const alaysisProcessQuality = (sourceData: any) => {
   }
 
   const result = [{
-    title:"6 过程质量补充数据",
-    module:"开发",
+    title: "6 过程质量补充数据",
+    module: "开发",
+    cut: sourceData.reopenRatio?.cut,
+    kind: "Reopen率",
+    baseline: "-",
+    realValue: sourceData.reopenRatio?.actualValue
+  }, {
+    title: "",
+    module: "",
+    cut: sourceData.frontUnitCover?.cut,
+    kind: "前端单元测试覆盖率",
+    baseline: "-",
+    realValue: sourceData.frontUnitCover?.actualValue
+  }, {
+    title: "",
+    module: "",
+    cut: sourceData.backUnitCover?.cut,
+    kind: "后端单元测试覆盖率",
+    baseline: "-",
+    realValue: sourceData.backUnitCover?.actualValue
+  }, {
+    title: "",
+    module: "",
+    cut: sourceData.bugResolvedDura?.cut,
+    kind: "Bug解决时长",
+    baseline: "-",
+    realValue: sourceData.bugResolvedDura?.actualValue
+  }, {
+    title: "",
+    module: "测试",
+    cut: sourceData.bugFlybackDura?.cut,
+    kind: "Bug回归时长",
+    baseline: "-",
+    realValue: sourceData.bugFlybackDura?.actualValue
+  }, {
+    title: "",
+    module: "",
+    cut: sourceData.weightedLegacyDefect?.cut,
+    kind: "加权遗留缺陷",
+    baseline: "-",
+    realValue: sourceData.weightedLegacyDefect?.actualValue,
+  }, {
+    title: "",
+    module: "",
+    cut: sourceData.weightedLegacyDI?.cut,
+    kind: "加权遗留缺陷密度",
+    baseline: "-",
+    realValue: sourceData.weightedLegacyDI?.actualValue,
+  }, {
+    title: "7.服务",
+    module: "及时交付",
+    cut: "",
+    kind: " 一次发布成功率",
+    baseline: "-",
+    realValue: ""
   }];
 
   return result;
@@ -302,30 +355,37 @@ const queryDatas = async (client: GqlClient<object>, projectId: string) => {
             reopenRatio {
               actualValue
               baseline
+              cut
             }
             bugFlybackDura {
               actualValue
               baseline
+              cut
             }
             bugResolvedDura {
               actualValue
               baseline
+              cut
             }
             weightedLegacyDefect {
               actualValue
               baseline
+              cut
             }
             weightedLegacyDI {
               actualValue
               baseline
+              cut
             }
             frontUnitCover {
               actualValue
               baseline
+              cut
             }
             backUnitCover {
               actualValue
               baseline
+              cut
             }
           }
       }
@@ -336,8 +396,8 @@ const queryDatas = async (client: GqlClient<object>, projectId: string) => {
     storyStability: alaysisStoryStability(), // 2.需求稳定性
     stageWorkload: alaysisStageWorkload(data?.productWithWorkload), // 3.阶段工作量
     productRate: alaysisProductRate(data?.productWithWorkload), // 4.生产率
-    reviewDefect: alaysisReviewDefect(data?.reviewDefect),
-    processQuality: alaysisProcessQuality(data?.processQuality)
+    reviewDefect: alaysisReviewDefect(data?.reviewDefect),  // 5.评审和缺陷
+    processQuality: alaysisProcessQuality(data?.processQuality) // 6 过程质量补充数据和服务
   };
   return datas;
 };

@@ -455,7 +455,11 @@ const getProcessQualityColumns = () => {
       minWidth: 120,
       maxWidth: 120,
       cellRenderer: (params: any) => {
-        return `<div style="font-weight: bold;margin-top: 75px">${params.value}</div>`
+        if (params.value === '6 过程质量补充数据') {
+          return `<div style="font-weight: bold;margin-top: 90px">6.过程质量补<br/>充数据</div>`
+
+        }
+        return `<div style="font-weight: bold;">${params.value}</div>`
 
       },
       cellClassRules: {
@@ -463,42 +467,82 @@ const getProcessQualityColumns = () => {
       },
       rowSpan: (params: any) => {
 
-        if (params.data.title === '3.阶段工作量（单位：人天）') {
-          return 6;
+        if (params.data.title === '6 过程质量补充数据') {
+          return 7;
         }
         return 1;
       }
     },
     {
       headerName: '',
-      field: 'stage',
-      maxWidth: 110,
-      minWidth: 80
+      field: 'module',
+      maxWidth: 175,
+      minWidth: 175,
+      cellRenderer: (params: any) => {
+        if (params.value === '开发') {
+          return `<div style="margin-top: 50px">${params.value}</div>`
+
+        }
+        if (params.value === '测试') {
+          return `<div style="margin-top: 35px">${params.value}</div>`
+
+        }
+        return `<div>${params.value}</div>`
+
+      },
+      cellClassRules: {
+        'cell-span2': "value !== undefined"
+      },
+      rowSpan: (params: any) => {
+        if (params.data?.module === "开发") {
+          return 4;
+        }
+        if (params.data?.module === "测试") {
+          return 3;
+        }
+        return 1;
+      }
     },
     {
       headerName: '是否裁剪',
-      field: 'manpower',
+      field: 'cut',
       minWidth: 115,
+      maxWidth: 115,
       editable: true,
-      cellRenderer: manualInput_red
+      cellRenderer: manualInput_red,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: {values: ["是", "否"]},
     },
     {
       headerName: '',
-      field: 'planHours',
-      minWidth: 115,
+      field: 'kind',
+      minWidth: 170,
+      maxWidth: 170,
     },
     {
       headerName: '基线值',
-      field: 'actualHours',
-      minWidth: 115,
-      // editable: true,
-      // cellRenderer: manualInput_red
+      field: 'baseline',
+      minWidth: 75,
+      maxWidth: 75,
     },
     {
       headerName: '实际值',
-      field: 'planWorkload',
-      minWidth: 115
+      field: 'realValue',
+      minWidth: 115,
+      maxWidth: 100,
+      cellRenderer: (params: any) => {
+        if (params.data?.module === "及时交付" && (params.value === null || params.value === "" || params.value === undefined)) {
+          return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
+        }
+        return params.value;
+      },
+      editable: (params: any) => {
+        if (params.data?.module === "及时交付") {
+          return true;
+        }
+        return false;
 
+      },
     }
   ];
 

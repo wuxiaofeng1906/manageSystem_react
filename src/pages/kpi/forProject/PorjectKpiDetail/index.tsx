@@ -26,10 +26,17 @@ import {
 } from './gridStyles';
 import './styles.css';
 import {Button} from "antd";
+import {
+  getProcessHeaderStyle,
+  getStoryStabilityHeaderStyle,
+  getStageWorkloadHeaderStyle,
+  getProductRateHeaderStyle,
+  getReviewDefectHeaderStyle,
+  getProcessQualityHeaderStyle
+} from "./columsTitleRenderer"
 
 const WeekCodeTableList: React.FC<any> = (props: any) => {
 
-  debugger;
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
     queryDatas(gqlClient, props.location.query.id),
@@ -177,15 +184,15 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     });
   };
 
+  const COMMON_LENGTH = 130;
   return (
-    <PageContainer style={{height: "100%"}}>
-      <div style={{marginTop: -20, height: 35}}>
+    <PageContainer style={{height: "100%", marginTop: -30}}>
+      <div style={{marginTop: -55, height: 35}}>
         <Button
           style={{float: "right", borderRadius: 5}}
           onClick={exportAllExcell}>导出所有表格
         </Button>
       </div>
-
       <div>
 
         {/* 1.进度 */}
@@ -199,19 +206,9 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
               filter: true,
               suppressMenu: true,
               cellStyle: setProcessCellStyle,
-              // headerComponentParams: () => {
-              //
-              //   return {
-              //     template:
-              //       `
-              //       <div ref="eLabel" class="ag-header-cell-label" role="presentation"  style="margin-left:50%">
-              //           <span  ref="eSortNone" class="ag-header-icon ag-sort-none-icon" ></span>
-              //             <span ref="eText" class="ag-header-cell-text" role="columnheader"></span>
-              //           <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>
-              //       </div>
-              //   </div>`
-              //   }
-              // }
+              minWidth: COMMON_LENGTH,
+              maxWidth: COMMON_LENGTH,
+              headerComponentParams: getProcessHeaderStyle
             }}
             rowHeight={32}
             headerHeight={35}
@@ -233,6 +230,9 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
               filter: true,
               suppressMenu: true,
               cellStyle: setStoryStabilityCellStyle,
+              minWidth: COMMON_LENGTH,
+              maxWidth: COMMON_LENGTH,
+              headerComponentParams: getStoryStabilityHeaderStyle
             }}
             rowHeight={32}
             headerHeight={35}
@@ -254,6 +254,9 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
               filter: true,
               suppressMenu: true,
               cellStyle: setStageWorkloadCellStyle,
+              minWidth: COMMON_LENGTH,
+              maxWidth: COMMON_LENGTH,
+              headerComponentParams: getStageWorkloadHeaderStyle
             }}
             rowHeight={32}
             headerHeight={35}
@@ -275,8 +278,16 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
               filter: true,
               suppressMenu: true,
               cellStyle: setProductRateCellStyle,
+              minWidth: COMMON_LENGTH,
+              maxWidth: COMMON_LENGTH,
+              headerComponentParams: getProductRateHeaderStyle
             }}
-            rowHeight={32}
+            getRowHeight={(params: any) => {
+              if (params.data?.stage === "生产率(功能点/人天）") {
+                return 50;
+              }
+              return 32;
+            }}
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onProductRateGridReady}
@@ -296,6 +307,9 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
               filter: true,
               suppressMenu: true,
               cellStyle: setReviewDefectCellStyle,
+              minWidth: COMMON_LENGTH,
+              maxWidth: COMMON_LENGTH,
+              headerComponentParams: getReviewDefectHeaderStyle
             }}
             rowHeight={32}
             headerHeight={35}
@@ -317,6 +331,9 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
               filter: true,
               suppressMenu: true,
               cellStyle: setProcessQualityCellStyle,
+              minWidth: COMMON_LENGTH,
+              maxWidth: COMMON_LENGTH,
+              headerComponentParams: getProcessQualityHeaderStyle
             }}
             rowHeight={32}
             headerHeight={35}

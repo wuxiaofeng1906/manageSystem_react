@@ -2,7 +2,7 @@
  * @Description: 数据列表
  * @Author: jieTan
  * @Date: 2021-11-22 10:55:42
- * @LastEditTime: 2021-12-22 02:59:21
+ * @LastEditTime: 2021-12-22 10:33:45
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -24,7 +24,7 @@ export default () => {
 
   /*  */
   return (
-    <div style={{ height: 'calc(100% - 210px)' }}>
+    <div style={{ height: 'calc(100% - 146px)' }}>
       <div style={{ height: '100%' }} className="ag-theme-alpine">
         <div style={{ width: '100%', height: '100%' }}>
           <AgGridReact

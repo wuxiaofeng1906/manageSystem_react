@@ -2,21 +2,20 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2021-12-21 08:37:11
+ * @LastEditTime: 2021-12-22 10:31:14
  * @LastEditors: jieTan
  * @LastModify:
  */
 import { Select, Form, DatePicker, Divider, TreeSelect } from 'antd';
-import { selectFilter, treeSelectActive } from './index.css';
+import { selectFilter, treeSelectActive, mySelector } from './index.css';
 import moment from 'moment';
 import { useRequest } from 'ahooks';
-import { GqlClient, useGqlClient } from '@/hooks';
+import { useGqlClient } from '@/hooks';
 import { GQL_PARAMS, GRAPHQL_QUERY } from '@/namespaces';
 import React, { useState } from 'react';
 import { useModel } from 'umi';
 import { toTree } from './utils/tree';
 import { projectKpiGql, organizationGql, queryGQL } from '@/pages/gqls';
-import KpiCheckBox from '../TableList/KpiCheckBox';
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -80,25 +79,6 @@ const deptTreeNodes = (data: any, val: any[], setVal: Function): void => {
   setVal(ret ? [ret as never] : []);
 };
 
-/**
- * @description - 选中tree节点后，重新设置项目指标数据
- * @author JieTan
- * @date 2021/12/02 13:12:16
- * @param {Object} gqlParams - gql的查询参数
- * @param {Function} setVal - 修改Table数据的函数
- * @param {GqlClient<object>} gqlClient - gql查询实例
- */
-const onSelect = async (gqlParams: object, setVal: Function, gqlClient: GqlClient<object>) => {
-  //
-  const params: GQL_PARAMS = {
-    func: GRAPHQL_QUERY['PROJECT_KPI'],
-    params: gqlParams,
-  };
-  //
-  const rets = (await queryGQL(gqlClient, projectKpiGql, params)) ?? [];
-  setVal(rets);
-};
-
 /* ************************************************************************************************************** */
 export default () => {
   /* 数据区 */
@@ -140,46 +120,47 @@ export default () => {
 
   /* 绘制区 */
   return (
-    <Form layout="inline">
-      <Form.Item label="所属部门/组">
-        <TreeSelect
-          {...defaultParams}
-          className={`${selectFilter} ${treeActive}`}
-          dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-          treeData={treeData}
-          treeDefaultExpandAll
-          onClick={() => deptTreeNodes(data, treeData, setTreeData)}
-          onDropdownVisibleChange={() => setTreeActive(treeActive ? '' : treeSelectActive)}
-          // onSelect={(value: string) => treeOnSelect(value, setGqlData, gqlClient)}
-          onSelect={(value: string) => {
-            deptId = value;
-            _onSelect();
-          }}
-        />
-      </Form.Item>
-      <Form.Item label="特性项目">
-        <Select
-          {...defaultParams}
-          mode="multiple"
-          className={selectFilter}
-          onChange={(values: never[]) => setProjIds(values)}
-          onBlur={() => _onSelect()}
-          onClick={() => projOptsElems(gqlData, projElems, setProjElems)}
-          children={projElems}
-        />
-      </Form.Item>
-      <Form.Item>
-        <Divider type="vertical" />
-      </Form.Item>
-      <Form.Item>
-        <RangePicker
-          ranges={{
-            Today: [moment(), moment()],
-            'This Month': [moment().startOf('month'), moment().endOf('month')],
-          }}
-          onChange={() => {}}
-        />
-      </Form.Item>
-    </Form>
+    <div className={mySelector}>
+      <Form layout="inline">
+        <Form.Item label="所属部门/组">
+          <TreeSelect
+            {...defaultParams}
+            className={`${selectFilter} ${treeActive}`}
+            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+            treeData={treeData}
+            treeDefaultExpandAll
+            onClick={() => deptTreeNodes(data, treeData, setTreeData)}
+            onDropdownVisibleChange={() => setTreeActive(treeActive ? '' : treeSelectActive)}
+            onSelect={(value: string) => {
+              deptId = value;
+              _onSelect();
+            }}
+          />
+        </Form.Item>
+        <Form.Item label="特性项目">
+          <Select
+            {...defaultParams}
+            mode="multiple"
+            className={selectFilter}
+            onChange={(values: never[]) => setProjIds(values)}
+            onBlur={() => _onSelect()}
+            onClick={() => projOptsElems(gqlData, projElems, setProjElems)}
+            children={projElems}
+          />
+        </Form.Item>
+        <Form.Item>
+          <Divider type="vertical" />
+        </Form.Item>
+        <Form.Item>
+          <RangePicker
+            ranges={{
+              Today: [moment(), moment()],
+              'This Month': [moment().startOf('month'), moment().endOf('month')],
+            }}
+            onChange={() => {}}
+          />
+        </Form.Item>
+      </Form>
+    </div>
   );
 };

@@ -2,7 +2,7 @@
  * @Description: 项目的可编辑字段
  * @Author: jieTan
  * @Date: 2021-12-22 06:39:40
- * @LastEditTime: 2021-12-22 07:31:12
+ * @LastEditTime: 2021-12-22 07:49:35
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -19,7 +19,7 @@ class ProjectKpiEditables {
   branch = (key: string, params: ValueSetterParams) => {
     //
     const datas: ProjectKpiInput = {
-      project: params.data.project.id,
+      projects: [params.data.project.id],
       category: PROJ_METRIC.project.en,
       column: key,
       newValue: params.newValue,

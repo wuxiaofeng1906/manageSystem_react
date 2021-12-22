@@ -2,7 +2,7 @@
  * @Description: 通用接口、类型
  * @Author: jieTan
  * @Date: 2021-11-29 15:07:54
- * @LastEditTime: 2021-12-22 06:34:02
+ * @LastEditTime: 2021-12-22 09:01:24
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -24,8 +24,8 @@ export interface EXTRA_FILTER_TYPE {
 export interface ProjectKpiInput {
   category: string;
   column: string;
-  newValue: string;
-  project: number;
+  newValue: any;
+  projects: number[];
   modifier?: string;
 } // 项目指标cell修改 - 需要传递的参数
 

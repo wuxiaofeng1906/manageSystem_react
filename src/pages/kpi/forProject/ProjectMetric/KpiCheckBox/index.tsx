@@ -2,7 +2,7 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2021-12-22 07:17:29
+ * @LastEditTime: 2021-12-22 10:22:11
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -109,7 +109,7 @@ export default () => {
 
   /*  */
   return (
-    <>
+    <div style={{ marginLeft: 10 }}>
       <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>
         全选
       </Checkbox>
@@ -120,6 +120,6 @@ export default () => {
         value={checkedList}
         onChange={onChange}
       />
-    </>
+    </div>
   );
 };

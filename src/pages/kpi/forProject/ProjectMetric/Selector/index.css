@@ -2,5 +2,13 @@
   width: 200px !important;
 }
 .treeSelectActive {
-  width: 320px !important;
+  width: 256px !important;
+}
+
+/*  */
+.mySelector {
+  padding: 12px 20px;
+  background-color: white;
+  border-radius: 2px;
+  margin-bottom: 6px;
 }

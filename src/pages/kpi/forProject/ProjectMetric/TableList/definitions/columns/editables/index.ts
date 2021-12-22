@@ -2,7 +2,7 @@
  * @Description: 项目的可编辑字段
  * @Author: jieTan
  * @Date: 2021-12-22 06:39:40
- * @LastEditTime: 2021-12-22 07:19:05
+ * @LastEditTime: 2021-12-22 07:31:12
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -16,7 +16,7 @@ class ProjectKpiEditables {
   constructor(private readonly pkUrl: string) {}
 
   /* 项目分支 */
-  private branch = (key: string, params: ValueSetterParams) => {
+  branch = (key: string, params: ValueSetterParams) => {
     //
     const datas: ProjectKpiInput = {
       project: params.data.project.id,
@@ -43,5 +43,5 @@ class ProjectKpiEditables {
   };
 }
 
-const pkEditInst = new ProjectKpiEditables(PK_PATH);
-export default pkEditInst;
+const pkEditValueSetter = new ProjectKpiEditables(PK_PATH).valueSetter;
+export default pkEditValueSetter;

@@ -2,7 +2,7 @@
  * @Description: 项目基本信息字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:44:08
- * @LastEditTime: 2021-12-22 07:22:10
+ * @LastEditTime: 2021-12-22 07:33:04
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -10,7 +10,7 @@
 import { DEFAULT_PLACEHOLDER, PROJ_STATUS, TABLE_GROUP_SHOW as SHOW } from '@/namespaces';
 import { ColDef, ColGroupDef } from 'ag-grid-community';
 import { doubleNumberF, numberF, stringF } from './baseParams';
-import pkEditInst from './editables';
+import pkEditValueSetter from './editables';
 
 /*  */
 
@@ -58,7 +58,7 @@ export const TableMajorCols: ColDef[] = [
     filter: true,
     editable: true,
     valueFormatter: (params) => params.value ?? DEFAULT_PLACEHOLDER,
-    valueSetter: (params) => pkEditInst.valueSetter('branch', params),
+    valueSetter: (params) => pkEditValueSetter('branch', params),
     ...stringF,
   },
   {

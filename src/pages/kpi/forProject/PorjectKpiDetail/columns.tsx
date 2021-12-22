@@ -18,7 +18,7 @@ const manualInput_black = (params: any) => {
     return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
 
   }
-  return params.value;
+  return `<div style="text-align: left">${params.value}</div>`;
 };
 
 /* region 1.进度 */
@@ -225,11 +225,15 @@ const getStageWorkloadColumns = () => {
 // 渲染手工录入
 const projectRateManualInput = (params: any) => {
 
-  if (params.data?.stage === "功能点" && (params.value === null || params.value === "")) {
-    return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
+  if (params.data?.stage === "功能点") {
+    if (params.value === null || params.value === "") {
+      return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
+
+    }
+    return Number(params.value).toFixed(2);
 
   }
-  return Number(params.value).toFixed(2);
+  return `<div style="margin-top: 10px">${Number(params.value).toFixed(2)}</div>`;
 };
 
 const projectRateEditRenderer = (param: any) => {
@@ -248,7 +252,7 @@ const getProductRateColumns = () => {
       minWidth: TYPE_LENGTH,
       maxWidth: TYPE_LENGTH,
       cellRenderer: (params: any) => {
-        return `<div style="font-weight: bold;margin-top: 15px">${params.value}</div>`
+        return `<div style="font-weight: bold;margin-top: 25px">${params.value}</div>`
 
       },
       cellClassRules: {
@@ -270,8 +274,8 @@ const getProductRateColumns = () => {
       cellRenderer: (params: any) => {
         if (params.value === "生产率(功能点/人天）") {
           return `<div>
-                    <div> 生产率  </div>
-                    <div style="margin-top: -14px"> (功能点/人天）</div>
+                    <div>生产率</div>
+                    <div style="margin-top: -5px"> (功能点/人天）</div>
                 </div>`;
         }
         return params.value;

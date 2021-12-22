@@ -2,7 +2,7 @@
  * @Description: 数据列表
  * @Author: jieTan
  * @Date: 2021-11-22 10:55:42
- * @LastEditTime: 2021-12-21 09:04:57
+ * @LastEditTime: 2021-12-22 02:59:21
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -29,7 +29,6 @@ export default () => {
         <div style={{ width: '100%', height: '100%' }}>
           <AgGridReact
             rowHeight={40}
-            // domLayout="autoHeight"
             modules={[SetFilterModule as any]}
             frameworkComponents={{
               linkTo: LinkToCloumn,
@@ -38,6 +37,7 @@ export default () => {
               numToFixed: NumberToFixedColumn,
             }}
             defaultColDef={{ resizable: true }}
+            // stopEditingWhenCellsLoseFocus={true}
             columnDefs={[TableMajorGroup, ...dynamicCols]}
             rowData={gqlData}
           />

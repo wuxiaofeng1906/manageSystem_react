@@ -2,7 +2,7 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2021-12-21 09:43:53
+ * @LastEditTime: 2021-12-22 07:17:29
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -24,7 +24,7 @@ const CheckboxGroup = Checkbox.Group;
 // checkbox框的文本值
 const plainOptions = (() => {
   const rets: string[] = [];
-  Object.values(PM)?.map((item) => rets.push(item.zh));
+  Object.values(PM)?.map((item) => (item['show'] === undefined ? rets.push(item.zh) : ''));
   return rets;
 })();
 

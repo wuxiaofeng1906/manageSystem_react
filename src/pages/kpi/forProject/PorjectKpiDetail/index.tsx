@@ -14,8 +14,8 @@ import {
   getProductRateColumns,
   getReviewDefectColumns,
   getProcessQualityColumns
-} from './columns';
-import {queryDatas} from './dataOperate';
+} from './supplementFile/columns';
+import {queryDatas} from './supplementFile/dataOperate';
 import {
   setProcessCellStyle,
   setStoryStabilityCellStyle,
@@ -23,8 +23,8 @@ import {
   setProductRateCellStyle,
   setReviewDefectCellStyle,
   setProcessQualityCellStyle
-} from './gridStyles';
-import './styles.css';
+} from './supplementFile/gridStyles';
+import './supplementFile/styles.css';
 import {Button, message} from "antd";
 import {
   getProcessHeaderStyle,
@@ -33,10 +33,10 @@ import {
   getProductRateHeaderStyle,
   getReviewDefectHeaderStyle,
   getProcessQualityHeaderStyle
-} from "./columsTitleRenderer";
+} from "./supplementFile/columsTitleRenderer";
 
-import {updateGridContent} from "./axiosRequest";
-import {CustomTooltip} from "./customTooltip"
+import {updateGridContent} from "./supplementFile/axiosRequest";
+import {CustomTooltip} from "./supplementFile/customTooltip"
 
 const WeekCodeTableList: React.FC<any> = (props: any) => {
   const projectId = props.location.query.id;

@@ -58,43 +58,45 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
 
   const processCellEdited = async (params: any) => {
 
-    const type = params.data?.milestone;
-    const correspondingField = {
-      "需求": "storyplan",
-      "概设&计划": "designplan",
-      "开发": "devplan",
-      "测试": "testplan",
-      "发布": "releaseplan",
-      "项目计划": "projectplan",
-    };
-    const newValues = {
-      "category": "progressDeviation",
-      "column": "memo",
-      "newValue": params.newValue,
-      "projects": [projectId],
-      "types": [correspondingField[type]]
-    };
+    // 有数据变化时再进行修改请求
+    if (params.newValue !== params.oldValue) {
+      const type = params.data?.milestone;
+      const correspondingField = {
+        "需求": "storyplan",
+        "概设&计划": "designplan",
+        "开发": "devplan",
+        "测试": "testplan",
+        "发布": "releaseplan",
+        "项目计划": "projectplan",
+      };
+      const newValues = {
+        "category": "progressDeviation",
+        "column": "memo",
+        "newValue": params.newValue,
+        "projects": [projectId],
+        "types": [correspondingField[type]]
+      };
 
-    const result = await updateGridContent(newValues);
+      const result = await updateGridContent(newValues);
 
-    if (!result) {
-      message.info({
-        content: "修改成功！",
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    } else {
-      message.error({
-        content: result,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      if (!result) {
+        message.info({
+          content: "修改成功！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      } else {
+        message.error({
+          content: result,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
     }
-
   };
   /* endregion */
 
@@ -129,9 +131,48 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     else stageWorkloadGridApi.current.hideOverlay();
   }
 
-  const stageWorkloadCellEdited = (params: any) => {
+  const stageWorkloadCellEdited = async (params: any) => {
 
-    console.log(params);
+    // 有数据变化时再进行修改请求
+    if (params.newValue !== params.oldValue) {
+      const type = params.data?.stage;
+      const correspondingField = {
+        "需求": "storyplan",
+        "概设&计划": "designplan",
+        "开发": "devplan",
+        "测试": "testplan",
+        "发布": "releaseplan",
+        "总计": "",
+      };
+
+      const newValues = {
+        "category": "stageWorkload",
+        "column": params.column?.colId,
+        "newValue": params.newValue,
+        "projects": [projectId],
+        "types": [correspondingField[type]]
+      };
+
+      const result = await updateGridContent(newValues);
+
+      if (!result) {
+        message.info({
+          content: "修改成功！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      } else {
+        message.error({
+          content: result,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
+    }
 
   };
   /* endregion */
@@ -148,9 +189,36 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     else productRateGridApi.current.hideOverlay();
   }
 
-  const productRateCellEdited = (params: any) => {
+  const productRateCellEdited = async (params: any) => {
 
-    console.log(params);
+    if (params.newValue !== params.oldValue) {
+      const newValues = {
+        "category": "scaleProductivity",
+        "column": params.column?.colId,
+        "newValue": params.newValue,
+        "projects": [projectId],
+      };
+
+      const result = await updateGridContent(newValues);
+
+      if (!result) {
+        message.info({
+          content: "修改成功！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      } else {
+        message.error({
+          content: result,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
+    }
 
   };
   /* endregion */

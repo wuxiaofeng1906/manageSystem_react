@@ -303,14 +303,6 @@ const getProductRateColumns = () => {
 
 /* region 5.评审和缺陷 */
 
-const noDataRenderer = (params: any) => {
-
-  if (params.data?.kind === "提测演示" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
-    // return `<div style="text-align: center">-</div>`;
-    return "-";
-  }
-  return params.value;
-};
 
 const defectHourEditRenderer = (params: any) => {
   if (params.data?.kind === "提测演示" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
@@ -386,18 +378,35 @@ const getReviewDefectColumns = () => {
     {
       headerName: '缺陷密度',
       field: 'defectDensity',
+      valueFormatter: (params: any) => {
+        if (params.value) {
+          return Number(params.value).toFixed(4);
+        }
+        return params.value;
+      }
     },
     {
       headerName: '评审用时',
       field: 'defectHour',
-      cellRenderer: noDataRenderer,
+      cellRenderer: (params: any) => {
+        if (params.data?.kind === "提测演示" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
+          // return `<div style="text-align: center">-</div>`;
+          return "-";
+        }
+        return params.value;
+      },
       editable: defectHourEditRenderer,
 
     },
     {
       headerName: '评审效率',
       field: 'defectRatio',
-      cellRenderer: noDataRenderer
+      cellRenderer: (params: any) => {
+        if (params.data?.kind === "提测演示" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
+          return "-";
+        }
+        return Number(params.value).toFixed(2);
+      }
     }
   ];
 

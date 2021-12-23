@@ -358,10 +358,14 @@ const getReviewDefectColumns = () => {
         if (params.data?.kind === "合计") {
           return "-";
         }
-        if (!params.value) {
+        if (params.value === null || params.value === undefined) {
           return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
         }
-        return params.value;
+
+        if (params.value === true || params.value === "是") {
+          return "是";
+        }
+        return "否";
       }
 
     },
@@ -382,14 +386,14 @@ const getReviewDefectColumns = () => {
       field: 'defectDensity',
       valueFormatter: (params: any) => {
         if (params.value) {
-          return Number(params.value).toFixed(4);
+          return Number(params.value).toFixed(2);
         }
         return params.value;
       }
     },
     {
       headerName: '评审用时',
-      field: 'defectHour',
+      field: 'reviewHour',
       cellRenderer: (params: any) => {
         if (params.data?.kind === "提测演示" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
           // return `<div style="text-align: center">-</div>`;
@@ -402,7 +406,7 @@ const getReviewDefectColumns = () => {
     },
     {
       headerName: '评审效率',
-      field: 'defectRatio',
+      field: 'reviewRatio',
       cellRenderer: (params: any) => {
         if (params.data?.kind === "提测演示" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
           return "-";
@@ -480,9 +484,22 @@ const getProcessQualityColumns = () => {
       headerName: '是否裁剪',
       field: 'cut',
       editable: true,
-      cellRenderer: manualInput_red,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {values: ["是", "否"]},
+      cellRenderer: (params: any) => {
+
+        if (params.data?.kind === "合计") {
+          return "-";
+        }
+        if (params.value === null || params.value === undefined) {
+          return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
+        }
+
+        if (params.value === true || params.value === "是") {
+          return "是";
+        }
+        return "否";
+      }
     },
     {
       headerName: '',

@@ -54,13 +54,13 @@ const setProductRateCellStyle = (params: any) => {
 const setReviewDefectCellStyle = (params: any) => {
 
   if (params.column?.colId === "title" || params.column?.colId === "kind" || params.column?.colId === "foundDN" || params.column?.colId === "weightDN"
-    || params.column?.colId === "funcPoint" || params.column?.colId === "defectDensity" || params.column?.colId === "defectRatio") {
+    || params.column?.colId === "funcPoint" || params.column?.colId === "defectDensity" || params.column?.colId === "reviewRatio") {
 
     // 不可修改
     return grayCellStyle;
   }
 
-  if (params.column?.colId === "defectHour" && (params.data?.kind === "提测演示" || params.data?.kind === "集成测试"
+  if (params.column?.colId === "reviewHour" && (params.data?.kind === "提测演示" || params.data?.kind === "集成测试"
     || params.data?.kind === "系统测试" || params.data?.kind === "发布测试")) {
     // 不可修改
     return grayCellStyle;

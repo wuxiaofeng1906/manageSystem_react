@@ -300,7 +300,7 @@ const alaysisProcessQuality = (sourceData: any) => {
   }, {
     title: "7.服务",
     module: "及时交付",
-    cut: "",
+    cut: null,
     kind: " 一次发布成功率",
     baseline: "-",
     realValue: ""
@@ -311,6 +311,7 @@ const alaysisProcessQuality = (sourceData: any) => {
 
 const queryDatas = async (client: GqlClient<object>, projectId: string) => {
 
+  debugger;
   const {data} = await client.query(`
       {
 
@@ -338,6 +339,7 @@ const queryDatas = async (client: GqlClient<object>, projectId: string) => {
               planWorkload
               actualWorkload
               }
+              totalSW
           }
 
           reviewDefect(pId:${Number(projectId)}){
@@ -347,8 +349,8 @@ const queryDatas = async (client: GqlClient<object>, projectId: string) => {
             weightDN
             funcPoint
             defectDensity
-            defectHour
-            defectRatio
+            reviewHour
+            reviewRatio
           }
 
           processQuality(pId:${Number(projectId)}){
@@ -390,6 +392,7 @@ const queryDatas = async (client: GqlClient<object>, projectId: string) => {
           }
       }
   `);
+
 
   const datas = {
     process: alaysisProcessData(data?.projectDeviation),  // 1.速度

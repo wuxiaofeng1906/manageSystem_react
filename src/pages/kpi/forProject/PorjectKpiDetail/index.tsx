@@ -235,9 +235,54 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     else reviewDefectGridApi.current.hideOverlay();
   }
 
-  const reviewDefectCellEdited = (params: any) => {
+  const reviewDefectCellEdited = async (params: any) => {
+    const type = params.data?.kind;
 
-    console.log(params);
+    enum typeObject {
+      "需求预审" = 1, "需求评审", "UE评审", "概设评审", "详设评审",
+      "用例评审", "CodeReview", "提测演示", "集成测试", "系统测试",
+      "发布测试"
+    }
+
+    if (params.newValue !== params.oldValue) {
+
+      const newValues = {
+        "category": "reviewDefect",
+        "column": "",
+        "newValue": 0,
+        "projects": [projectId],
+        "types": [typeObject[type]]
+      };
+
+      if (params.column?.colId === "reviewHour") {
+        newValues.column = "extra";
+        newValues.newValue = params.newValue;
+      } else {
+        newValues.column = "cut";
+        newValues.newValue = params.newValue === "否" ? 0 : 1;
+      }
+
+
+      const result = await updateGridContent(newValues);
+
+      if (!result) {
+        message.info({
+          content: "修改成功！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      } else {
+        message.error({
+          content: result,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
+    }
 
   };
   /* endregion */
@@ -254,9 +299,46 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     else processQualityGridApi.current.hideOverlay();
   }
 
-  const pocessQualityCellEdited = (params: any) => {
+  const pocessQualityCellEdited = async (params: any) => {
 
-    console.log(params);
+    debugger;
+    const type = params.data?.kind;
+
+    enum typeObject {
+      "Bug解决时长" = 1, "Reopen率", "Bug回归时长", "加权遗留缺陷", "加权遗留缺陷密度",
+      "后端单元测试覆盖率", "前端单元测试覆盖率"
+    }
+
+    if (params.newValue !== params.oldValue) {
+
+      const newValues = {
+        "category": "processQuality",
+        "column": "cut",
+        "newValue": params.newValue === "否" ? 0 : 1,
+        "projects": [projectId],
+        "types": [typeObject[type]]
+      };
+
+      const result = await updateGridContent(newValues);
+
+      if (!result) {
+        message.info({
+          content: "修改成功！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      } else {
+        message.error({
+          content: result,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
+    }
 
   };
   /* endregion */

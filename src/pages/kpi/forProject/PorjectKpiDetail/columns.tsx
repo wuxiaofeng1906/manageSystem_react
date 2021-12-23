@@ -90,7 +90,9 @@ const getProcessColumns = () => {
       minWidth: 260,
       maxWidth: 260,
       cellRenderer: manualInput_black,
-      tooltipField: 'memo',
+      tooltipField: "memo",
+      tooltipComponent: "customTooltip",
+
     }
   ];
 

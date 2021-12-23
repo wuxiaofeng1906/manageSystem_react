@@ -35,8 +35,8 @@ import {
   getProcessQualityHeaderStyle
 } from "./columsTitleRenderer";
 
-
 import {updateGridContent} from "./axiosRequest";
+import {CustomTooltip} from "./customTooltip"
 
 const WeekCodeTableList: React.FC<any> = (props: any) => {
   const projectId = props.location.query.id;
@@ -290,6 +290,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
   };
 
   const COMMON_LENGTH = 130;
+
   return (
     <PageContainer style={{height: "100%", marginTop: -30}}>
       <div style={{marginTop: -55, height: 35}}>
@@ -313,8 +314,10 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
               cellStyle: setProcessCellStyle,
               minWidth: COMMON_LENGTH,
               maxWidth: COMMON_LENGTH,
-              headerComponentParams: getProcessHeaderStyle
+              headerComponentParams: getProcessHeaderStyle,
             }}
+            components={{customTooltip: CustomTooltip}}
+            tooltipShowDelay={100}  // 鼠标放上去多久显示提示信息
             rowHeight={32}
             headerHeight={35}
             suppressRowTransform={true}

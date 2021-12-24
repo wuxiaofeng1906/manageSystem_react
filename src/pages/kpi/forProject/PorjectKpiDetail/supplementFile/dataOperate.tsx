@@ -29,6 +29,25 @@ const alaysisProcessData = (sourceData: any) => {
 
   return result;
 };
+const queryProcessData = async (client: GqlClient<object>, projectId: string) => {
+  const {data} = await client.query(`
+      {
+
+          projectDeviation(pId:${Number(projectId)}){
+            planStart
+            planEnd
+            actualStart
+            actualEnd
+            type
+            days
+            ratio
+            memo
+          }
+      }
+  `);
+
+  return alaysisProcessData(data?.projectDeviation);
+}
 
 // 2.需求稳定性
 const alaysisStoryStability = () => {
@@ -59,6 +78,16 @@ const alaysisStoryStability = () => {
   }]
 
 };
+const queryStoryStability = async (client: GqlClient<object>, projectId: string) => {
+  // const {data} = await client.query(`
+  //     {
+  //
+  //
+  //     }
+  // `);
+
+  return alaysisStoryStability();
+}
 
 // 3.阶段工作量
 const alaysisStageWorkload = (sourceData: any) => {
@@ -81,14 +110,6 @@ const alaysisStageWorkload = (sourceData: any) => {
     projectplan: "项目计划"
   };
 
-  const total = {
-    total_manpower: 0,
-    total_planHours: 0,
-    total_actualHours: 0,
-    releaseplan_manpower: 0, // 发布投入人数
-  }
-
-
   const result: any = [];
   stageWorkloadData.forEach((ele: any, index: number) => {
     const newObject = ele;
@@ -103,31 +124,26 @@ const alaysisStageWorkload = (sourceData: any) => {
 
       result.push(newObject);
 
-      //   计算总计数据
-      total.total_manpower = Number(newObject.manpower) + total.total_manpower;
-      total.total_planHours = Number(newObject.planHours) + total.total_planHours;
-      total.total_actualHours = Number(newObject.actualHours) + total.total_actualHours;
-      if (chineseName === "发布") {
-        total.total_manpower = newObject.manpower;
-      }
     }
   });
 
-  // 需要新增总计
+  if (sourceData.totalSW) {
+    const total = sourceData.totalSW;
+    // 需要新增总计
+    result.push({
+      title: "",
+      stage: "合计",
+      manpower: total[0],
+      planHours: total[1],
+      actualHours: total[2],
+      planWorkload: total[3],
+      actualWorkload: total[4]
+    });
+  }
 
-  result.push({
-    title: "",
-    stage: "总计",
-    manpower: "",
-    planHours: total.total_planHours,
-    actualHours: total.total_actualHours,
-    planWorkload: total.total_manpower * (total.total_planHours / 8),  // 投入人数*（预计工时（汇总①-⑤）/8）
-    actualWorkload: total.total_manpower * (total.total_actualHours / 8)  // 发布投入人数*（实际工时（汇总①-⑤）/8）
-  });
 
   return result
 };
-
 // 4.生产率
 const alaysisProductRate = (sourceData: any) => {
 
@@ -147,10 +163,45 @@ const alaysisProductRate = (sourceData: any) => {
 
 }
 
-// 评审和缺陷
+const queryStageWorkload = async (client: GqlClient<object>, projectId: string) => {
+  const {data} = await client.query(`
+      {
+
+          productWithWorkload(pId:${Number(projectId)}){
+            planValue
+            actualValue
+            planRatio
+            actualRatio
+            stageWorkload{
+              manpower
+              planHours
+              actualHours
+              type
+              planWorkload
+              actualWorkload
+              }
+              totalSW
+          }
+      }
+  `);
+
+  return {
+    stageWorkload: alaysisStageWorkload(data?.productWithWorkload),
+    productRate: alaysisProductRate(data?.productWithWorkload)
+  };
+}
+
+
+// 5评审和缺陷
 const alaysisReviewDefect = (sourceData: any) => {
   if (!sourceData) {
     return [];
+  }
+
+  const total = {
+    foundDN: 0,
+    weightDN: 0,
+    funcPoint: 0
   }
 
   const result: any = [
@@ -231,17 +282,44 @@ const alaysisReviewDefect = (sourceData: any) => {
         break;
     }
 
-
+    // 合计的计算
+    total.foundDN += newObject.foundDN;
+    total.weightDN += newObject.weightDN;
+    total.funcPoint = newObject.funcPoint;
   });
 
   result.push({
     kind: "合计",
+    foundDN: total.foundDN,  // ①-⑪求和
+    weightDN: total.weightDN,  // ①-⑪求和
+    funcPoint: total.funcPoint,  // 跟上面的功能点值一样
+    defectDensity: total.weightDN / total.funcPoint // 总计的加权有效缺陷数/总计的功能点。
   })
   return result;
 
 };
+const queryReviewDefect = async (client: GqlClient<object>, projectId: string) => {
+  const {data} = await client.query(`
+      {
 
-// 过程质量补充数据和服务
+          reviewDefect(pId:${Number(projectId)}){
+            kind
+            cut
+            foundDN
+            weightDN
+            funcPoint
+            defectDensity
+            reviewHour
+            reviewRatio
+          }
+      }
+  `);
+
+  return alaysisReviewDefect(data?.reviewDefect);
+}
+
+
+// 6 7 过程质量补充数据和服务
 const alaysisProcessQuality = (sourceData: any) => {
 
   if (!sourceData) {
@@ -308,50 +386,9 @@ const alaysisProcessQuality = (sourceData: any) => {
 
   return result;
 };
-
-const queryDatas = async (client: GqlClient<object>, projectId: string) => {
-
-  debugger;
+const queryProcessQuality = async (client: GqlClient<object>, projectId: string) => {
   const {data} = await client.query(`
       {
-
-          projectDeviation(pId:${Number(projectId)}){
-            planStart
-            planEnd
-            actualStart
-            actualEnd
-            type
-            days
-            ratio
-            memo
-          }
-
-          productWithWorkload(pId:${Number(projectId)}){
-            planValue
-            actualValue
-            planRatio
-            actualRatio
-            stageWorkload{
-              manpower
-              planHours
-              actualHours
-              type
-              planWorkload
-              actualWorkload
-              }
-              totalSW
-          }
-
-          reviewDefect(pId:${Number(projectId)}){
-            kind
-            cut
-            foundDN
-            weightDN
-            funcPoint
-            defectDensity
-            reviewHour
-            reviewRatio
-          }
 
           processQuality(pId:${Number(projectId)}){
             reopenRatio {
@@ -392,18 +429,24 @@ const queryDatas = async (client: GqlClient<object>, projectId: string) => {
           }
       }
   `);
+  return alaysisProcessQuality(data?.processQuality);
+}
 
+
+
+// 数据查询
+const queryDatas = async (client: GqlClient<object>, projectId: string) => {
 
   const datas = {
-    process: alaysisProcessData(data?.projectDeviation),  // 1.速度
-    storyStability: alaysisStoryStability(), // 2.需求稳定性
-    stageWorkload: alaysisStageWorkload(data?.productWithWorkload), // 3.阶段工作量
-    productRate: alaysisProductRate(data?.productWithWorkload), // 4.生产率
-    reviewDefect: alaysisReviewDefect(data?.reviewDefect),  // 5.评审和缺陷
-    processQuality: alaysisProcessQuality(data?.processQuality) // 6 过程质量补充数据和服务
+    process: await queryProcessData(client, projectId),  // 1.速度
+    storyStability: await queryStoryStability(client, projectId), // 2.需求稳定性
+    stageWorkload: (await queryStageWorkload(client, projectId)).stageWorkload, // 3.阶段工作量
+    productRate: (await queryStageWorkload(client, projectId)).productRate, // 4.生产率
+    reviewDefect: await queryReviewDefect(client, projectId),  // 5.评审和缺陷
+    processQuality: await queryProcessQuality(client, projectId) // 6 过程质量补充数据和服务
   };
   return datas;
 };
 
 
-export {queryDatas};
+export {queryDatas,queryReviewDefect};

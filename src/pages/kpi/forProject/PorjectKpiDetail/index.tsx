@@ -15,7 +15,7 @@ import {
   getReviewDefectColumns,
   getProcessQualityColumns
 } from './supplementFile/columns';
-import {queryDatas} from './supplementFile/dataOperate';
+import {queryDatas, queryReviewDefect} from './supplementFile/dataOperate';
 import {
   setProcessCellStyle,
   setStoryStabilityCellStyle,
@@ -177,52 +177,6 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
   };
   /* endregion */
 
-  /* region  生产率 */
-  const productRateGridApi = useRef<GridApi>();
-
-  const onProductRateGridReady = (params: GridReadyEvent) => {
-    productRateGridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-  if (productRateGridApi.current) {
-    if (loading) productRateGridApi.current.showLoadingOverlay();
-    else productRateGridApi.current.hideOverlay();
-  }
-
-  const productRateCellEdited = async (params: any) => {
-
-    if (params.newValue !== params.oldValue) {
-      const newValues = {
-        "category": "scaleProductivity",
-        "column": params.column?.colId,
-        "newValue": params.newValue,
-        "projects": [projectId],
-      };
-
-      const result = await updateGridContent(newValues);
-
-      if (!result) {
-        message.info({
-          content: "修改成功！",
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      } else {
-        message.error({
-          content: result,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      }
-    }
-
-  };
-  /* endregion */
-
   /* region  评审和缺陷 */
   const reviewDefectGridApi = useRef<GridApi>();
 
@@ -287,6 +241,59 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
   };
   /* endregion */
 
+  /* region  生产率 */
+  const productRateGridApi = useRef<GridApi>();
+
+  const onProductRateGridReady = (params: GridReadyEvent) => {
+    productRateGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+  if (productRateGridApi.current) {
+    if (loading) productRateGridApi.current.showLoadingOverlay();
+    else productRateGridApi.current.hideOverlay();
+  }
+
+  const productRateCellEdited = async (params: any) => {
+
+    if (params.newValue !== params.oldValue) {
+      const newValues = {
+        "category": "scaleProductivity",
+        "column": params.column?.colId,
+        "newValue": params.newValue,
+        "projects": [projectId],
+      };
+
+      const result = await updateGridContent(newValues);
+
+      if (!result) {
+        message.info({
+          content: "修改成功！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+
+
+        // 需要更新评审和缺陷的表格
+
+        const newDatas = await queryReviewDefect(gqlClient, projectId);
+
+        reviewDefectGridApi.current?.setRowData(newDatas);
+      } else {
+        message.error({
+          content: result,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
+    }
+
+  };
+  /* endregion */
+
   /* region  6 过程质量补充数据和7.服务 */
   const processQualityGridApi = useRef<GridApi>();
 
@@ -301,7 +308,6 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
 
   const pocessQualityCellEdited = async (params: any) => {
 
-    debugger;
     const type = params.data?.kind;
 
     enum typeObject {

@@ -440,7 +440,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         </div>
 
         {/* 3.阶段工作量（单位：人天） */}
-        <div className="ag-theme-alpine" style={{height: 280, width: '100%'}}>
+        <div className="ag-theme-alpine" style={{height: 250, width: '100%'}}>
           <AgGridReact
             columnDefs={getStageWorkloadColumns()} // 定义列
             rowData={data?.stageWorkload} // 数据绑定

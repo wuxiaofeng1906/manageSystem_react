@@ -134,11 +134,14 @@ const alaysisStageWorkload = (sourceData: any) => {
     result.push({
       title: "",
       stage: "合计",
-      manpower: total[0],
+      manpower: Math.abs(total[0]),
+      manpowerFlag: Number(total[0]) > 0 ? "false" : "true",
       planHours: total[1],
+      planHoursFlag: Number(total[1]) > 0 ? "false" : "true",
       actualHours: total[2],
+      actualHoursFlag: Number(total[2]) > 0 ? "false" : "true",
       planWorkload: total[3],
-      actualWorkload: total[4]
+      actualWorkload: total[4],
     });
   }
 
@@ -449,4 +452,4 @@ const queryDatas = async (client: GqlClient<object>, projectId: string) => {
 };
 
 
-export {queryDatas, queryReviewDefect,queryStageWorkload};
+export {queryDatas, queryReviewDefect, queryStageWorkload};

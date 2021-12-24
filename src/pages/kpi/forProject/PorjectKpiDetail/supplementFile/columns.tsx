@@ -157,6 +157,27 @@ const getStoryStabilityColumns = () => {
 /* endregion  */
 
 /* region 3.阶段工作量（单位：人天） */
+// 渲染手工录入
+const manualInput = (params: any) => {
+
+  if (params.value === null || params.value === "" || params.value === undefined) {
+    return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
+
+  }
+
+  // 判断合计中，是否有对人工进行修改
+  if (params.data?.stage === "合计") {
+
+    if ((params.column?.colId === "manpower" && params.data?.manpowerFlag === "true") ||
+      (params.column?.colId === "planHours" && params.data?.planHoursFlag === "true") ||
+      (params.column?.colId === "actualHours" && params.data?.actualHoursFlag === "true")) {
+      return `<div style="font-weight: bold;font-style: italic ;text-align: center">${params.value}</div>`;
+
+    }
+  }
+  return params.value;
+};
+
 
 const getStageWorkloadColumns = () => {
 
@@ -193,20 +214,20 @@ const getStageWorkloadColumns = () => {
       headerName: '投入人数',
       field: 'manpower',
       editable: true,
-      cellRenderer: manualInput_red
+      cellRenderer: manualInput
     },
     {
       headerName: '预计工时',
       field: 'planHours',
       editable: true,
-      cellRenderer: manualInput_red
+      cellRenderer: manualInput
 
     },
     {
       headerName: '实际工时',
       field: 'actualHours',
       editable: true,
-      cellRenderer: manualInput_red
+      cellRenderer: manualInput
     },
     {
       headerName: '计划工作量',

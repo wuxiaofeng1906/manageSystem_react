@@ -112,18 +112,19 @@ const alaysisStageWorkload = (sourceData: any) => {
 
   const result: any = [];
   stageWorkloadData.forEach((ele: any, index: number) => {
-    const newObject = ele;
-    const chineseName = typeName[ele["type"]];
-    if (chineseName !== "项目计划") {  // 这个数据是没有项目计划的
-      newObject.stage = chineseName;
-      if (index === 0) {
-        newObject.title = "3.阶段工作量（单位：人天）";
-      } else {
-        newObject.title = "";
+    const types = ele["type"];
+    if (types) {
+      const newObject = ele;
+      const chineseName = typeName[types];
+      if (chineseName !== "项目计划") {  // 这个数据是没有项目计划的
+        newObject.stage = chineseName;
+        if (index === 0) {
+          newObject.title = "3.阶段工作量（单位：人天）";
+        } else {
+          newObject.title = "";
+        }
+        result.push(newObject);
       }
-
-      result.push(newObject);
-
     }
   });
 
@@ -433,7 +434,6 @@ const queryProcessQuality = async (client: GqlClient<object>, projectId: string)
 }
 
 
-
 // 数据查询
 const queryDatas = async (client: GqlClient<object>, projectId: string) => {
 
@@ -449,4 +449,4 @@ const queryDatas = async (client: GqlClient<object>, projectId: string) => {
 };
 
 
-export {queryDatas,queryReviewDefect};
+export {queryDatas, queryReviewDefect,queryStageWorkload};

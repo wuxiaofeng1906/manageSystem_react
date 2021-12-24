@@ -15,7 +15,7 @@ import {
   getReviewDefectColumns,
   getProcessQualityColumns
 } from './supplementFile/columns';
-import {queryDatas, queryReviewDefect} from './supplementFile/dataOperate';
+import {queryDatas, queryReviewDefect, queryStageWorkload} from './supplementFile/dataOperate';
 import {
   setProcessCellStyle,
   setStoryStabilityCellStyle,
@@ -142,7 +142,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         "开发": "devplan",
         "测试": "testplan",
         "发布": "releaseplan",
-        "总计": "",
+        "合计": "",
       };
 
       const newValues = {
@@ -163,6 +163,10 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             marginTop: '50vh',
           },
         });
+
+        //   需要更新以下合计的数据
+        const datas = await queryStageWorkload(gqlClient, projectId);
+        stageWorkloadGridApi.current?.setRowData(datas.stageWorkload);
       } else {
         message.error({
           content: result,
@@ -311,8 +315,8 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     const type = params.data?.kind;
 
     enum typeObject {
-      "Bug解决时长" = 1, "Reopen率", "Bug回归时长", "加权遗留缺陷", "加权遗留缺陷密度",
-      "后端单元测试覆盖率", "前端单元测试覆盖率"
+      "Bug解决时长" = 1, "Reopen率", "后端单元测试覆盖率", "Bug回归时长", "加权遗留缺陷", "加权遗留缺陷密度",
+      "前端单元测试覆盖率"
     }
 
     if (params.newValue !== params.oldValue) {

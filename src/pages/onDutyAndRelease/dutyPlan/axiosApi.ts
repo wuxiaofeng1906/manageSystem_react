@@ -11,32 +11,86 @@ const parseData = (params: any) => {
   if (params) {
     params.forEach((project: any) => {
       const projectItemArray: any = [];
-      let username = "";
-      project.forEach((ele: any) => {
+      const projectItem_Front = {
+        person_num: "",
+        user_tech: "",
+        user_name: "",
+        duty_start_time: "",
+        duty_end_time: "",
+        duty_order: ""
+      };
+      const projectItem_Backend = {
+        person_num: "",
+        user_tech: "",
+        user_name: "",
+        duty_start_time: "",
+        duty_end_time: "",
+        duty_order: ""
+      };
+      const projectItem_Test = {
+        person_num: "",
+        user_tech: "",
+        user_name: "",
+        duty_start_time: "",
+        duty_end_time: "",
+        duty_order: ""
+      };
 
-        const projectItem = {
-          person_id: ele.person_id,
-          person_num: ele.person_num,
-          user_tech: ele.user_tech,
-          user_id: ele.user_id,
-          user_name: "",
-          duty_start_time: ele.duty_start_time,
-          duty_end_time: ele.duty_end_time,
-          duty_order: ele.duty_order
-        };
+      project.forEach((ele: any, index: number) => {
+        const username = ele.user_name === null ? "" : ele.user_name;
 
-        if (ele.duty_order === "1") {
-          username = ele.user_name === null ? "" : ele.user_name;
-        } else {
+        if (ele.user_tech === "前端") {
+          projectItem_Front.person_num = ele.person_num;
+          projectItem_Front.user_tech = ele.user_tech;
+          projectItem_Front.duty_start_time = ele.duty_start_time;
+          projectItem_Front.duty_end_time = ele.duty_end_time;
+          projectItem_Front.duty_order = ele.duty_order;
+          if (ele.duty_order === "1") {
+            projectItem_Front.user_name = projectItem_Front.user_name === "" ? username : `${username}/${projectItem_Front.user_name}`;
 
-          if (ele.user_name === null || ele.user_name === "") {
-            projectItem.user_name = username;
           } else {
-            projectItem.user_name = `${username}/${ele.user_name}`;
+            projectItem_Front.user_name = projectItem_Front.user_name === "" ? username : `${projectItem_Front.user_name}/${username}`;
           }
-          username = "";
-          projectItemArray.push(projectItem);
         }
+
+
+        if (ele.user_tech === "后端") {
+          projectItem_Backend.person_num = ele.person_num;
+          projectItem_Backend.user_tech = ele.user_tech;
+          projectItem_Backend.duty_start_time = ele.duty_start_time;
+          projectItem_Backend.duty_end_time = ele.duty_end_time;
+          projectItem_Backend.duty_order = ele.duty_order;
+          if (ele.duty_order === "1") {
+            projectItem_Backend.user_name = projectItem_Backend.user_name === "" ? username : `${username}/${projectItem_Backend.user_name}`;
+
+          } else {
+            projectItem_Backend.user_name = projectItem_Backend.user_name === "" ? username : `${projectItem_Backend.user_name}/${username}`;
+          }
+        }
+
+
+        if (ele.user_tech === "测试") {
+          projectItem_Test.person_num = ele.person_num;
+          projectItem_Test.user_tech = ele.user_tech;
+          projectItem_Test.duty_start_time = ele.duty_start_time;
+          projectItem_Test.duty_end_time = ele.duty_end_time;
+          projectItem_Test.duty_order = ele.duty_order;
+          if (ele.duty_order === "1") {
+            projectItem_Test.user_name = projectItem_Test.user_name === "" ? username : `${username}/${projectItem_Test.user_name}`;
+
+          } else {
+            projectItem_Test.user_name = projectItem_Test.user_name === "" ? username : `${projectItem_Test.user_name}/${username}`;
+          }
+
+        }
+
+        if (index === project.length - 1) {
+          projectItemArray.push(projectItem_Front);
+          projectItemArray.push(projectItem_Backend);
+          projectItemArray.push(projectItem_Test);
+
+        }
+
       });
       returnValue.push(projectItemArray);
     });
@@ -55,6 +109,7 @@ const queryDutyCardInfo = async (params: any) => {
   await axios.get('/api/verify/duty/plan_data', {params: {start_time: params.start, end_time: params.end}})
     .then(function (res) {
       if (res.data.code === 200) {
+
         result.datas = parseData(res.data.data.data);
       } else {
         result.message = `错误：${res.data.msg}`;

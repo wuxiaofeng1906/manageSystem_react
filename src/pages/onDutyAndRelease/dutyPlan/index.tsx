@@ -437,18 +437,35 @@ const DutyPlan: React.FC<any> = () => {
 
   // 新增项目
   const addProject = () => {
-    const addValue = [...projects, {
-      prjName: "",
-      prjType: "",
-      branch: "",
-      testEnv: "",
-      upgradeEnv: "",
-      prjManager: "",
-      planGrayTime: "",
-      planOnlineTime: "",
-      proId: "",
-      managerId: ""
-    }];
+
+    // const addValue = [...projects, {
+    //   prjName: "",
+    //   prjType: "",
+    //   branch: "",
+    //   testEnv: "",
+    //   upgradeEnv: "",
+    //   prjManager: "",
+    //   planGrayTime: "",
+    //   planOnlineTime: "",
+    //   proId: "",
+    //   managerId: ""
+    // }];
+    const exitDatas = formForPlanModify.getFieldsValue();
+    const addValue = exitDatas.projects;
+    addValue.push(
+      {
+        prjName: "",
+        prjType: "",
+        branch: "",
+        testEnv: "",
+        upgradeEnv: "",
+        prjManager: "",
+        planGrayTime: "",
+        planOnlineTime: "",
+        proId: "",
+        managerId: ""
+      }
+    );
 
     formForPlanModify.setFieldsValue({
       "projects": addValue

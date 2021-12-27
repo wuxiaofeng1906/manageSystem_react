@@ -1,4 +1,4 @@
-import {savePrePulishProjects} from "@/pages/onDutyAndRelease/preRelease/axiosApi";
+import {savePrePulishProjects, queryServiceByID} from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
 
 // 保存预发布项目
 const savePreProjects = async (source: any) => {
@@ -27,24 +27,15 @@ const savePreProjects = async (source: any) => {
 // 点击查询
 const inquireService = async (sorce: any) => {
 
-  const result = {
-    message: "",
-    datas: []
-  };
 
-  if (!sorce.testEnv) {
-    return {
-      message: "测试环境不能为空！",
-      datas: []
-    }
-  }
-
-  if (!sorce.deployID) {
+  if (sorce.length === 0) {
     return {
       message: "一键部署ID不能为空！",
       datas: []
     }
   }
+
+  const result = await queryServiceByID(sorce);
   return result;
 
 };

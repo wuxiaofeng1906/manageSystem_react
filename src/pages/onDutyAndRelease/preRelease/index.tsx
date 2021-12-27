@@ -3,59 +3,26 @@ import {PageContainer} from '@ant-design/pro-layout';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import './style.css';
+import './supplementFile/style.css';
 import {
-  Button,
-  Form,
-  Input,
-  message,
-  Modal,
-  Select,
-  Tabs,
-  Row,
-  Col,
-  DatePicker,
-  Checkbox,
-  Divider,
-  Card,
-  Switch,
-  Progress
+  Button, Form, Input, message, Modal, Select, Tabs,
+  Row, Col, DatePicker, Checkbox, Divider, Card, Switch, Progress
 } from 'antd';
 import dayjs from "dayjs";
 import {AgGridReact} from "ag-grid-react";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
-import {getAllProject} from "@/publicMethods/verifyAxios";
+import {
+  loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect,
+  loadReleaseIDSelect
+} from "./supplementFile/controler";
 import {useRequest} from "ahooks";
-import {savePreProjects, inquireService} from "./logic";
+import {savePreProjects, inquireService} from "./supplementFile/logic";
+import {alalysisInitData} from "./supplementFile/dataAnalyze";
 
 const {TabPane} = Tabs;
 const {Option} = Select;
 const {TextArea} = Input;
 const currentDate = dayjs().format("YYYYMMDD");
-
-const loadPrjNameSelect = async () => {
-  const prjNames = await getAllProject();
-  const prjData: any = [];
-
-  if (prjNames.message !== "") {
-    message.error({
-      content: prjNames.message,
-      duration: 1,
-      style: {
-        marginTop: '50vh',
-      },
-    });
-  } else if (prjNames.data) {
-    const datas = prjNames.data;
-    datas.forEach((project: any) => {
-      prjData.push(
-        <Option key={project.project_id} value={`${project.project_id}`}>{project.project_name}</Option>);
-    });
-  }
-
-  return prjData;
-
-};
 
 
 const PreRelease: React.FC<any> = () => {
@@ -92,6 +59,8 @@ const PreRelease: React.FC<any> = () => {
     shown: false,
     title: "新增"
   });
+
+  const initData = useRequest(() => alalysisInitData()).data;
 
   /* region 新增行 */
 
@@ -1089,12 +1058,15 @@ const PreRelease: React.FC<any> = () => {
   /* endregion */
 
   /* region  预发布项目 */
-  const [formForDutyNameModify] = Form.useForm();
+  const [formForPreReleaseProject] = Form.useForm();
   const projectsArray = useRequest(() => loadPrjNameSelect()).data;
+  const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
+  const releaseWayArray = useRequest(() => loadReleaseWaySelect()).data;
+
   // 保存预发布项目
   const savePreRelaseProjects = async () => {
 
-    const datas = formForDutyNameModify.getFieldsValue();
+    const datas = formForPreReleaseProject.getFieldsValue();
     const result = await savePreProjects(datas);
     if (result === "") {
       message.info({
@@ -1118,11 +1090,33 @@ const PreRelease: React.FC<any> = () => {
 
   /* endregion */
 
-  /* region 查询 */
+  /* region 升级服务 */
+  const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
+
+  const [releaseIDs, setReleaseIDs] = useState([]);
   const [formUpgradeService] = Form.useForm();
+
+  const onReleaseIdChanges = (selectedId: any, params: any) => {
+    if (params) {
+      const queryCondition: any = [];
+      params.forEach((ele: any) => {
+
+        queryCondition.push({
+          "deployment_id": ele.key,
+          "automation_test": ele.automation_test,
+          "service": (ele.service).split(",")
+        });
+
+      });
+
+      setReleaseIDs(queryCondition);
+
+    }
+  }
+
   const inquireServiceClick = async () => {
-    const data = formUpgradeService.getFieldsValue();
-    const result = await inquireService(data);
+
+    const result = await inquireService(releaseIDs);
     if (result.message !== "") {
       message.error({
         content: result.message,
@@ -1132,9 +1126,12 @@ const PreRelease: React.FC<any> = () => {
         },
       });
     } else {
+
+      debugger;
       // 有数据之后进行表格的赋值操作
     }
   };
+
   /* endregion */
 
   /* region Tabs 标签页事件 */
@@ -1234,7 +1231,7 @@ const PreRelease: React.FC<any> = () => {
     });
 
     // 在切换时显示第二个界面的数据
-    formForDutyNameModify.setFieldsValue({
+    formForPreReleaseProject.setFieldsValue({
       projectsName: "测试切换"
     });
 
@@ -1271,7 +1268,11 @@ const PreRelease: React.FC<any> = () => {
   };
   /* endregion */
 
-  const showProject = () => {
+  const showProject = (source: any) => {
+    if (!source) {
+      return;
+    }
+    debugger;
 
     // 升级服务 一
     firstUpSerGridApi.current?.setRowData([{
@@ -1333,25 +1334,26 @@ const PreRelease: React.FC<any> = () => {
       backendComfirmTime: "2021-12-09 14:12:12",
     }]);
     // 上线分支
-    firstOnlineBranchGridApi.current?.setRowData([{
-      branchName: "release",
-      module: "前后端",
-      passUnitTest: {"前端": ["是", "2021-01-01 12:11:22"], "后端": ["否", "2021-01-01 12:11:22"]},
-      passVersionCheck: {"前端": ["是", "2021-01-01 12:11:22"], "后端": ["否", "2021-01-01 12:11:22"]},
-      passEnvCheck: ["否", "2021-01-01 12:11:22"],
-      passAutoCheckbf: ["未开始", ""],
-      passAutoCheckaf: ["未开始", ""],
-      sealStatus: {"前端": ["已封版", "2021-01-01 12:11:22"], "后端": ["未封版", ""]},
-    }, {
-      branchName: "release-report",
-      module: "仅后端",
-      passUnitTest: {"前端": ["是", "2021-01-01 12:11:22"], "后端": ["忽略", ""]},
-      passVersionCheck: {"前端": ["是", "2021-01-01 12:11:22"], "后端": ["检查中", "2021-01-01 12:11:22"]},
-      passEnvCheck: ["是", "2021-01-01 12:11:22"],
-      passAutoCheckbf: ["检查中", "12:12:12~18:19:33"],
-      passAutoCheckaf: ["未开始", ""],
-      sealStatus: {"前端": ["未封版", ""], "后端": ["已封版", "2021-01-01 12:11:22"]},
-    }]);
+    firstOnlineBranchGridApi.current?.setRowData([
+      {
+        branchName: "release",
+        module: "前后端",
+        passUnitTest: {"前端": ["是", "2021-01-01 12:11:22"], "后端": ["否", "2021-01-01 12:11:22"]},
+        passVersionCheck: {"前端": ["是", "2021-01-01 12:11:22"], "后端": ["否", "2021-01-01 12:11:22"]},
+        passEnvCheck: ["否", "2021-01-01 12:11:22"],
+        passAutoCheckbf: ["未开始", ""],
+        passAutoCheckaf: ["未开始", ""],
+        sealStatus: {"前端": ["已封版", "2021-01-01 12:11:22"], "后端": ["未封版", ""]},
+      }, {
+        branchName: "release-report",
+        module: "仅后端",
+        passUnitTest: {"前端": ["是", "2021-01-01 12:11:22"], "后端": ["忽略", ""]},
+        passVersionCheck: {"前端": ["是", "2021-01-01 12:11:22"], "后端": ["检查中", "2021-01-01 12:11:22"]},
+        passEnvCheck: ["是", "2021-01-01 12:11:22"],
+        passAutoCheckbf: ["检查中", "12:12:12~18:19:33"],
+        passAutoCheckaf: ["未开始", ""],
+        sealStatus: {"前端": ["未封版", ""], "后端": ["已封版", "2021-01-01 12:11:22"]},
+      }]);
     // 对应工单
     firstListGridApi.current?.setRowData([{
       listType: "蓝绿发布",
@@ -1366,16 +1368,23 @@ const PreRelease: React.FC<any> = () => {
       currentApprover: "徐超"
     }]);
 
+    const preReleaseProject = source?.preProject;
     // 先显示第一个界面的数据
-    formForDutyNameModify.setFieldsValue({
-      // projectsName: ""
+    formForPreReleaseProject.setFieldsValue({
+      projectsName: preReleaseProject.projectId,
+      pulishType: preReleaseProject.release_type,
+      pulishMethod: preReleaseProject.release_way,
+      pulishTime: dayjs(preReleaseProject.plan_release_time),
+      editor: preReleaseProject.edit_user_name,
+      editTime: preReleaseProject.edit_time,
+
     });
   };
 
   useEffect(() => {
-    showProject();
+    showProject(initData);
 
-  }, [projectsArray]);
+  }, [initData]);
 
   return (
     <PageContainer style={{marginTop: -30}}>
@@ -1403,6 +1412,7 @@ const PreRelease: React.FC<any> = () => {
         {/* 用于占位 */}
         <div style={{height: 5}}></div>
 
+        {/* 检查进度 */}
         <div>
           <div>
             <Row>
@@ -1449,14 +1459,12 @@ const PreRelease: React.FC<any> = () => {
 
         </div>
 
-
         {/* 预发布项目 */}
         <div>
           <fieldset className={"fieldStyle"}>
             <legend className={"legendStyle"}>Step1 预发布项目</legend>
 
             <div style={{marginBottom: -20, marginTop: -5}}>
-
 
               <div style={{float: "right"}}>
                 <Button type="primary"
@@ -1465,9 +1473,9 @@ const PreRelease: React.FC<any> = () => {
               </div>
 
               <div>
-                <Form form={formForDutyNameModify}>
+                <Form form={formForPreReleaseProject}>
                   <Row>
-                    <Col span={9}>
+                    <Col span={8}>
 
                       {/* 项目名称 */}
                       <Form.Item label="项目名称:" name="projectsName">
@@ -1482,7 +1490,7 @@ const PreRelease: React.FC<any> = () => {
                       {/* 发布类型 */}
                       <Form.Item label="发布类型:" name="pulishType" style={{marginLeft: 5}}>
                         <Select>
-
+                          {releaseTypeArray}
                         </Select>
                       </Form.Item>
                     </Col>
@@ -1492,29 +1500,41 @@ const PreRelease: React.FC<any> = () => {
                       {/* 发布方式 */}
                       <Form.Item label="发布方式:" name="pulishMethod" style={{marginLeft: 5}}>
                         <Select>
-
+                          {releaseWayArray}
                         </Select>
                       </Form.Item>
                     </Col>
 
-                    <Col span={5}>
+                    <Col span={6}>
                       {/* 发布时间 */}
                       <Form.Item label="发布时间:" name="pulishTime" style={{marginLeft: 5}}>
-                        <DatePicker style={{width: "100%"}}/>
+                        <DatePicker showTime style={{width: "100%"}}/>
                       </Form.Item>
                     </Col>
 
+                  </Row>
+
+                  <Row style={{marginTop:-20}}>
+                    <Col span={3}>    {/* 编辑人信息 */}
+                      {/* 编辑人 */}
+                      <Form.Item label="编辑人:" name="editor">
+                        <Input style={{border: "none", backgroundColor: "white", color: "black", marginLeft: -5}}
+                               disabled/>
+                      </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                      {/* 编辑时间 */}
+                      <Form.Item label="编辑时间:" name="editTime" style={{marginLeft: 5}}>
+                        <Input style={{border: "none", backgroundColor: "white", color: "black", marginLeft: -5}}
+                               disabled/>
+                      </Form.Item>
+                    </Col>
                   </Row>
 
                 </Form>
               </div>
             </div>
 
-            {/* 编辑人信息 */}
-            <div style={{marginTop: 5}}>
-              <label> 编辑人：罗天刚</label>
-              <label style={{marginLeft: 20}}> 编辑时间：2021-12-08 16：10：40</label>
-            </div>
 
           </fieldset>
         </div>
@@ -1528,27 +1548,18 @@ const PreRelease: React.FC<any> = () => {
               <div style={{height: 35, marginTop: -15, overflow: "hidden"}}>
                 <Form form={formUpgradeService}>
                   <Row>
-                    <Col span={9}>
-
-                      {/* 测试环境 */}
-                      <Form.Item label="测试环境:" name="testEnv">
-                        <Select showSearch mode="multiple" size={"small"} style={{width: '100%'}}>
-
-                        </Select>
-                      </Form.Item>
-                    </Col>
-
-                    <Col span={8}>
+                    <Col span={12}>
 
                       {/* 一键部署ID */}
                       <Form.Item label="一键部署ID:" name="deployID" style={{marginLeft: 10}}>
-                        <Select mode="multiple" size={"small"} style={{width: '100%'}} showSearch>
-
+                        <Select mode="multiple" size={"small"} style={{width: '100%'}} showSearch
+                                onChange={onReleaseIdChanges}>
+                          {releaseIDArray}
                         </Select>
                       </Form.Item>
                     </Col>
 
-                    <Col span={7}>
+                    <Col span={12}>
 
                       <Button size={"small"} type="primary"
                               style={{

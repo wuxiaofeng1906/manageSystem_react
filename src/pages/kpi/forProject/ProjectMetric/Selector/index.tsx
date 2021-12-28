@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2021-12-28 10:15:45
+ * @LastEditTime: 2021-12-28 12:37:41
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -20,8 +20,8 @@ import { deptTreeNodes, projOptsElems } from './extra';
 const { RangePicker } = DatePicker;
 
 /*  */
-let deptId: string | undefined;
 let dateStr: [string, string] | undefined; // 存放时间range信息
+const defaultSeclectItems = { deptIds: [], projIds: [], dates: null };
 /* ************************************************************************************************************** */
 export default () => {
   /* 数据区 */
@@ -34,11 +34,8 @@ export default () => {
   const [treeData, setTreeData] = useState([]); // 部门树形结构的数据
   const [treeActive, setTreeActive] = useState(''); // 部门<Select>选中时的样式
   const { gqlData, setGqlData } = useModel('projectMetric'); // 获取“过程质量”查询的结果数据
-  const [deptIds, setDeptIds] = useState([]);
-  const [projIds, setProjIds] = useState([]);
-  const [dates, setDates] = useState(null);
   //
-  const [selectItems, setSelectItems] = useState({});
+  const [selectItems, setSelectItems] = useState(defaultSeclectItems); // 存放多个筛选的值
 
   //
   const gqlClient = useGqlClient(); // 必须提前初始化该对象
@@ -50,10 +47,11 @@ export default () => {
     // 参数构建
     const gqlParams = {};
     //
-    if (deptId) Object.assign(gqlParams, { deptId: parseInt(deptId) });
+    if (selectItems.deptIds.length !== 0)
+      Object.assign(gqlParams, { deptIds: selectItems.deptIds });
     //
-    if (projIds.length !== 0)
-      Object.assign(gqlParams, { projIds: projIds.map((x) => parseInt(x)) });
+    if (selectItems.projIds.length !== 0)
+      Object.assign(gqlParams, { projIds: selectItems.projIds.map((x) => parseInt(x)) });
     //
     if (dateStr) Object.assign(gqlParams, { dates: { start: dateStr[0], end: dateStr[1] } });
 
@@ -69,10 +67,9 @@ export default () => {
   };
 
   /*  */
-  //
   useEffect(() => {
     _onSelect();
-  }, [deptIds, projIds, dates]);
+  }, [selectItems]);
 
   /* 绘制区 */
   return (
@@ -83,16 +80,20 @@ export default () => {
             <Form.Item label="所属部门/组">
               <TreeSelect
                 {...defaultParams}
+                multiple
                 className={`${selectFilter} ${treeActive}`}
                 dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                 treeData={treeData}
                 treeDefaultExpandAll
                 onClick={() => deptTreeNodes(data, treeData, setTreeData)}
                 onDropdownVisibleChange={() => setTreeActive(treeActive ? '' : treeSelectActive)}
-                onSelect={(value: string) => {
-                  deptId = value;
-                  _onSelect();
-                }}
+                onChange={(values: string) =>
+                  setSelectItems((prev) => Object.assign({ ...prev }, { deptIds: values }))
+                }
+                onClear={() =>
+                  setSelectItems((prev) => Object.assign({ ...prev }, { deptIds: [] }))
+                }
+                value={selectItems.deptIds}
               />
             </Form.Item>
             <Form.Item label="特性项目">
@@ -100,10 +101,14 @@ export default () => {
                 {...defaultParams}
                 mode="multiple"
                 className={selectFilter}
-                onChange={(values: never[]) => setProjIds(values)}
+                onChange={(values: never[]) =>
+                  setSelectItems((prev) => Object.assign({ ...prev }, { projIds: values }))
+                }
                 onClick={() => projOptsElems(gqlData, projElems, setProjElems)}
-                onClear={() => setProjIds([])}
-                value={projIds}
+                onClear={() =>
+                  setSelectItems((prev) => Object.assign({ ...prev }, { projIds: [] }))
+                }
+                value={selectItems.projIds}
                 children={projElems}
               />
             </Form.Item>
@@ -114,9 +119,9 @@ export default () => {
               <RangePicker
                 onChange={(dates: any, dateString) => {
                   dateStr = dates ? dateString : undefined;
-                  setDates(dates);
+                  setSelectItems((prev) => Object.assign({ ...prev }, { dates: dates }));
                 }}
-                value={dates}
+                value={selectItems.dates}
               />
             </Form.Item>
           </Form>
@@ -125,11 +130,8 @@ export default () => {
           <Tooltip title="刷新" color="cyan">
             <ReloadOutlined
               onClick={() => {
-                setDeptIds([]);
-                setProjIds([]);
-                setDates(null);
+                setSelectItems(() => defaultSeclectItems);
                 dateStr = undefined;
-                _onSelect();
               }}
             />
           </Tooltip>

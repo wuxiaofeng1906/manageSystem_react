@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2021-12-22 10:31:14
+ * @LastEditTime: 2021-12-28 08:53:48
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -94,6 +94,7 @@ export default () => {
   const [projIds, setProjIds] = useState([]);
   //
   let deptId: string;
+  let dateStr: [string, string] | undefined;
   //
   const gqlClient = useGqlClient(); // 必须提前初始化该对象
   const params: GQL_PARAMS = { func: GRAPHQL_QUERY['ORGANIZATION'] };
@@ -105,8 +106,12 @@ export default () => {
     const gqlParams = {};
     //
     if (deptId) Object.assign(gqlParams, { deptId: parseInt(deptId) });
+    //
     if (projIds.length !== 0)
       Object.assign(gqlParams, { projIds: projIds.map((x) => parseInt(x)) });
+    //
+    if (dateStr) Object.assign(gqlParams, { dates: { start: dateStr[0], end: dateStr[1] } });
+
     //
     const params: GQL_PARAMS = {
       func: GRAPHQL_QUERY['PROJECT_KPI'],
@@ -153,11 +158,10 @@ export default () => {
         </Form.Item>
         <Form.Item>
           <RangePicker
-            ranges={{
-              Today: [moment(), moment()],
-              'This Month': [moment().startOf('month'), moment().endOf('month')],
+            onChange={(dates, dateString) => {
+              dateStr = dates ? dateString : undefined;
+              _onSelect();
             }}
-            onChange={() => {}}
           />
         </Form.Item>
       </Form>

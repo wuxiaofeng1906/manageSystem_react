@@ -8,10 +8,16 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import {
-  getWeeksRange, getMonthWeek, getTwelveMonthTime, getFourQuarterTime,
-  getYearsTime, getParamsByType
+  getWeeksRange,
+  getMonthWeek,
+  getTwelveMonthTime,
+  getFourQuarterTime,
+  getYearsTime,
+  getParamsByType
 } from '@/publicMethods/timeMethods';
+import {colorRender, moduleChange} from '@/publicMethods/cellRenderer';
 import {customRound, getHeight} from '@/publicMethods/pageSet';
+
 import {Button, Drawer} from "antd";
 import {
   ScheduleTwoTone,
@@ -20,6 +26,7 @@ import {
   QuestionCircleTwoTone,
   AppstoreTwoTone
 } from "@ant-design/icons";
+import {json} from "express";
 
 
 // 获取近四周的时间范围
@@ -27,52 +34,17 @@ const weekRanges = getWeeksRange(8);
 const monthRanges = getTwelveMonthTime();
 const quarterTime = getFourQuarterTime();
 
+const groupValues: any[] = [];
+const moduleValues: any[] = [];
+
 /* region 动态定义列 */
-const dataRender = (params: any) => {
+const compColums = [
+  // {
+  //   headerName: '姓名',
+  //   field: 'username',
+  // }
+];
 
-  let result = "0";
-  if (params.value) {
-    result = customRound(params.value, 2);
-  }
-
-  const node = params.data;
-  if (node.isDept === true) {
-    return `<span style="font-weight: bold"> ${result}</span>`;
-  }
-
-  return `<span> ${result}</span>`
-
-}
-
-const columsForWeeks = () => {
-  const component = new Array();
-  for (let index = weekRanges.length - 1; index >= 0; index -= 1) {
-    const starttime = weekRanges[index].from;
-    const weekName = getMonthWeek(starttime);
-    component.push({
-      headerName: weekName,
-      field: starttime.toString(),
-      cellRenderer: dataRender,
-      minWidth: 100
-    });
-
-  }
-  return component;
-};
-
-const columsForMonths = () => {
-  const component = new Array();
-  for (let index = 0; index < monthRanges.length; index += 1) {
-    component.push({
-      headerName: monthRanges[index].title,
-      field: monthRanges[index].start,
-      cellRenderer: dataRender,
-      minWidth: 110
-    });
-
-  }
-  return component;
-};
 
 const columsForQuarters = () => {
   const component = new Array();
@@ -80,33 +52,22 @@ const columsForQuarters = () => {
     component.push({
       headerName: quarterTime[index].title,
       field: quarterTime[index].start,
-      cellRenderer: dataRender
+
     });
 
   }
-  return component;
+
+  return compColums.concat(component);
 };
 
-const columsForYears = () => {
-  const yearsTime = getYearsTime();
-  const component = new Array();
-  for (let index = 0; index < yearsTime.length; index += 1) {
-    component.push({
-      headerName: yearsTime[index].title,
-      field: yearsTime[index].start,
-      cellRenderer: dataRender
-    });
-
-  }
-  return component;
-};
 
 /* endregion */
 
 /* region 数据处理 */
 
-const converseArrayToOne = (data: any) => {
 
+const converseArrayToOne = (data: any) => {
+  debugger;
   const resultData = new Array();
   for (let index = 0; index < data.length; index += 1) {
     let repeatFlag = false;
@@ -164,16 +125,13 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     // 新增研发中心数据
     resultArray.push({
       Group: ['研发中心'],
-      [starttime]: elements.total.kpi,
-      isDept: true
+      [starttime]: elements.total.kpi
     }, {
       Group: ['研发中心', '前端'],
-      [starttime]: elements.side.front,
-      isDept: true
+      [starttime]: elements.side.front
     }, {
       Group: ['研发中心', '后端'],
-      [starttime]: elements.side.backend,
-      isDept: true
+      [starttime]: elements.side.backend
     });
 
     const departDatas = elements.datas;
@@ -189,8 +147,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       // 新增部门
       resultArray.push({
         Group: groups,
-        [starttime]: depts.kpi,
-        isDept: true
+        [starttime]: depts.kpi
       });
 
       // 新增部门的前端
@@ -198,8 +155,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       frontGroup.push("前端")
       resultArray.push({
         Group: frontGroup,
-        [starttime]: depts.side.front,
-        isDept: true
+        [starttime]: depts.side.front
       });
 
       // 新增部门的后端
@@ -207,8 +163,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       backendGroup.push("后端")
       resultArray.push({
         Group: backendGroup,
-        [starttime]: depts.side.backend,
-        isDept: true
+        [starttime]: depts.side.backend
       });
 
 
@@ -229,8 +184,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
           usersGroup.push(user.userName);
           resultArray.push({
             Group: usersGroup,
-            [starttime]: user.kpi,
-            isDept: false
+            [starttime]: user.kpi
           });
         });
       }
@@ -309,6 +263,8 @@ const WeekCodeTableList: React.FC<any> = () => {
   const {data, loading} = useRequest(() =>
     queryCodesCount(gqlClient, 'quarter'),
   );
+
+
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -331,22 +287,22 @@ const WeekCodeTableList: React.FC<any> = () => {
   // 按周统计
   const statisticsByWeeks = async () => {
     /* 八周 */
-    gridApi.current?.setColumnDefs([]);
-    const weekColums = columsForWeeks();
-    gridApi.current?.setColumnDefs(weekColums);
-    const datas: any = await queryCodesCount(gqlClient, 'week');
-    gridApi.current?.setRowData(datas);
+    // gridApi.current?.setColumnDefs([]);
+    //  const weekColums = columsForWeeks();
+    // gridApi.current?.setColumnDefs(weekColums);
+    // const datas: any = await queryCodesCount(gqlClient, 'week');
+    // gridApi.current?.setRowData(datas);
 
   };
 
   // 按月统计
   const statisticsByMonths = async () => {
     /* 12月 */
-    gridApi.current?.setColumnDefs([]);
-    const monthColums = columsForMonths();
-    gridApi.current?.setColumnDefs(monthColums);
-    const datas: any = await queryCodesCount(gqlClient, 'month');
-    gridApi.current?.setRowData(datas);
+    // gridApi.current?.setColumnDefs([]);
+    // const monthColums = columsForMonths();
+    // gridApi.current?.setColumnDefs(monthColums);
+    // const datas: any = await queryCodesCount(gqlClient, 'month');
+    // gridApi.current?.setRowData(datas);
 
   };
 
@@ -362,11 +318,11 @@ const WeekCodeTableList: React.FC<any> = () => {
 
   // 按年统计
   const statisticsByYear = async () => {
-    gridApi.current?.setColumnDefs([]);
-    const yearColums = columsForYears();
-    gridApi.current?.setColumnDefs(yearColums);
-    const datas: any = await queryCodesCount(gqlClient, 'year');
-    gridApi.current?.setRowData(datas);
+    // gridApi.current?.setColumnDefs([]);
+    //  const yearColums = columsForYears();
+    // gridApi.current?.setColumnDefs(yearColums);
+    // const datas: any = await queryCodesCount(gqlClient, 'year');
+    // gridApi.current?.setRowData(datas);
   };
 
   /* region 提示规则显示 */
@@ -380,7 +336,6 @@ const WeekCodeTableList: React.FC<any> = () => {
 
   const cssIndent = {textIndent: '2em'};
   /* endregion */
-
 
   return (
     <PageContainer>
@@ -409,14 +364,12 @@ const WeekCodeTableList: React.FC<any> = () => {
             sortable: true,
             filter: true,
             flex: 1,
-            suppressMenu: true
+            cellStyle: {"margin-top": "-5px"}
           }}
           autoGroupColumnDef={{
-            minWidth: 260,
-            headerName: '部门-人员',
+            minWidth: 250,
+            headerName: 'group',
             cellRendererParams: {suppressCount: true},
-            pinned: 'left',
-            suppressMenu: false
           }}
 
 

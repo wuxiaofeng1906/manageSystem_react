@@ -73,7 +73,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         "category": "progressDeviation",
         "column": "memo",
         "newValue": params.newValue,
-        "projects": [projectId],
+        "project": projectId,
         "types": [correspondingField[type]]
       };
 
@@ -149,7 +149,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         "category": "stageWorkload",
         "column": params.column?.colId,
         "newValue": params.newValue,
-        "projects": [projectId],
+        "project": projectId,
         "types": [correspondingField[type]]
       };
 
@@ -208,7 +208,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         "category": "reviewDefect",
         "column": "",
         "newValue": 0,
-        "projects": [projectId],
+        "project": projectId,
         "types": [typeObject[type]]
       };
 
@@ -264,7 +264,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         "category": "scaleProductivity",
         "column": params.column?.colId,
         "newValue": params.newValue,
-        "projects": [projectId],
+        "project": projectId,
       };
 
       const result = await updateGridContent(newValues);
@@ -325,7 +325,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         "category": "processQuality",
         "column": "cut",
         "newValue": params.newValue === "否" ? 0 : 1,
-        "projects": [projectId],
+        "project": projectId,
         "types": [typeObject[type]]
       };
 

@@ -193,25 +193,32 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         isDept: true
       });
 
-      // 新增部门的前端
-      const frontGroup: any = JSON.parse(JSON.stringify(groups)); // 如果对原数组groups进行直接赋值，再对frontGroup进行修改，groups也会被修改（数组所指向的是内存地址，直接赋值会使它们指向同一地址）
-      frontGroup.push("前端")
-      resultArray.push({
-        Group: frontGroup,
-        [starttime]: depts.side.front,
-        isDept: true
-      });
 
-      // 新增部门的后端
-      const backendGroup: any = JSON.parse(JSON.stringify(groups));
-      backendGroup.push("后端")
-      resultArray.push({
-        Group: backendGroup,
-        [starttime]: depts.side.backend,
-        isDept: true
-      });
+      // 需要判断部门有没有前后端：
 
+      // 没有前端：应用架构部==>如果不是应用架构部，就添加前端数据
+      if (depts.deptName !== "应用架构部") {
+        // 新增部门的前端
+        const frontGroup: any = JSON.parse(JSON.stringify(groups)); // 如果对原数组groups进行直接赋值，再对frontGroup进行修改，groups也会被修改（数组所指向的是内存地址，直接赋值会使它们指向同一地址）
+        frontGroup.push("前端")
+        resultArray.push({
+          Group: frontGroup,
+          [starttime]: depts.side.front,
+          isDept: true
+        });
+      }
 
+      // 没有后端：前端应用平台，基础技术=》如果不是前端应用平台和基础技术就添加后端数据
+      if (depts.deptName !== "前端应用平台" && depts.deptName !== "基础技术") {
+        // 新增部门的后端
+        const backendGroup: any = JSON.parse(JSON.stringify(groups));
+        backendGroup.push("后端")
+        resultArray.push({
+          Group: backendGroup,
+          [starttime]: depts.side.backend,
+          isDept: true
+        });
+      }
       /* endregion 部门数据 */
 
       /* region 人员数据 */
@@ -412,13 +419,12 @@ const WeekCodeTableList: React.FC<any> = () => {
             suppressMenu: true
           }}
           autoGroupColumnDef={{
-            minWidth: 260,
+            minWidth: 280,
             headerName: '部门-人员',
             cellRendererParams: {suppressCount: true},
             pinned: 'left',
             suppressMenu: false
           }}
-
 
           rowHeight={32}
           headerHeight={35}

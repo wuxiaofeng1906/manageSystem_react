@@ -12,12 +12,15 @@ import dayjs from "dayjs";
 import {AgGridReact} from "ag-grid-react";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {
-  loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect,
-  loadReleaseIDSelect
+  loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadReleaseIDSelect
 } from "./supplementFile/controler";
 import {useRequest} from "ahooks";
 import {savePreProjects, inquireService} from "./supplementFile/logic";
 import {alalysisInitData} from "./supplementFile/dataAnalyze";
+import {
+  getReleaseItem, getIfOrNot, getDatabseAndApiUpgrade, getApiMethod, getUpgradeApi, getOnlineDev,
+  getRepaireType, getPassOrNot, getTechSide
+} from "./supplementFile/converse";
 
 const {TabPane} = Tabs;
 const {Option} = Select;
@@ -244,9 +247,8 @@ const PreRelease: React.FC<any> = () => {
 
   // 下拉框相关字段的颜色渲染
   const selectColorRenderer = (params: any) => {
-
     let Color = "orange";
-    const values = params.value;
+    const values = getIfOrNot(params.value);
     if (values === "是") {
       Color = "#2BF541"
     }
@@ -259,46 +261,63 @@ const PreRelease: React.FC<any> = () => {
   const firstUpSerColumn: any = [
     {
       headerName: '上线环境',
-      field: 'onlineDev'
+      field: 'online_environment',
+      cellRenderer: (params: any) => {
+        return `<span>${getOnlineDev(params.value)}</span>`
+      }
+
     },
     {
       headerName: '发布项',
-      field: 'pulishItem',
-      minWidth: 75
+      field: 'release_item',
+      minWidth: 95,
+      cellRenderer: (params: any) => {
+        const item = getReleaseItem(params.value);
+        return `<span>${item}</span>`
+      }
     },
     {
       headerName: '应用',
-      field: 'application',
+      field: 'app',
       minWidth: 65
     },
     {
       headerName: '是否支持热更新',
-      field: 'hotUpdate',
+      field: 'hot_update',
+      minWidth: 130,
+      cellRenderer: (params: any) => {
+        return `<span>${getIfOrNot(params.value)}</span>`
+      }
     },
     {
       headerName: '是否涉及接口与数据库升级',
-      field: 'upGrade',
+      field: 'is_upgrade_api_database',
+      minWidth: 196,
+      cellRenderer: (params: any) => {
+        return `<span>${getDatabseAndApiUpgrade(params.value)}</span>`
+      }
     },
     {
       headerName: '分支和环境',
-      field: 'branchAndDev',
+      field: 'branch_environment',
+      minWidth: 105,
     },
     {
       headerName: '编辑人',
-      field: 'editor',
+      field: 'edit_user_name',
       minWidth: 75
     },
     {
       headerName: '编辑时间',
-      field: 'editeTime',
+      field: 'edit_time',
     },
     {
       headerName: '说明',
-      field: 'desc',
+      field: 'instructions',
     },
     {
       headerName: '备注',
-      field: 'remark',
+      field: 'remarks',
     },
     {
       headerName: '操作',
@@ -335,44 +354,58 @@ const PreRelease: React.FC<any> = () => {
   const secondUpSerColumn: any = [
     {
       headerName: '上线环境',
-      field: 'onlineDev',
+      field: 'online_environment',
+      cellRenderer: (params: any) => {
+        return `<span>${getOnlineDev(params.value)}</span>`
+      }
     },
     {
       headerName: '升级接口',
-      field: 'upgradeInte',
+      field: 'update_api',
+      cellRenderer: (params: any) => {
+        return `<span>${getUpgradeApi(params.value)}</span>`
+      }
+
     },
     {
       headerName: '接口服务',
-      field: 'intService',
+      field: 'api_name',
     },
     {
       headerName: '是否支持热更新',
-      field: 'hotUpdate',
+      field: 'hot_update',
+      cellRenderer: (params: any) => {
+        return `<span>${getIfOrNot(params.value)}</span>`
+      }
     },
     {
       headerName: '接口Method',
-      field: 'intMethod',
+      field: 'api_method',
+      cellRenderer: (params: any) => {
+        return `<span>${getApiMethod(params.value)}</span>`
+      }
+
     },
     {
       headerName: '接口URL',
-      field: 'intURL',
+      field: 'api_url',
     },
     {
       headerName: '编辑人',
-      field: 'editor',
+      field: 'edit_user_name',
       minWidth: 75
     },
     {
       headerName: '编辑时间',
-      field: 'editeTime',
+      field: 'edit_time',
     },
     {
       headerName: '涉及租户',
-      field: 'relateRenter',
+      field: 'related_tenant',
     },
     {
       headerName: '备注',
-      field: 'remark',
+      field: 'remarks',
     },
     {
       headerName: '操作',
@@ -410,13 +443,13 @@ const PreRelease: React.FC<any> = () => {
   const thirdUpSerColumn = [
     {
       headerName: '前端值班',
-      field: 'frontDuty',
+      field: 'front_user_name',
       minWidth: 90,
     },
     {
       headerName: '服务确认完成',
-      field: 'frontConfirm',
-      minWidth: 110,
+      field: 'front_confirm_status',
+      minWidth: 115,
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {values: ["是", "否"]},
@@ -424,15 +457,16 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '确认时间',
-      field: 'frontConfirmTime',
+      field: 'front_confirm_time',
     },
     {
       headerName: '后端值班',
-      field: 'backendDuty',
+      field: 'back_end_user_name',
     },
     {
       headerName: '服务确认完成',
-      field: 'backendConfirm',
+      field: 'back_end_confirm_status',
+      minWidth: 115,
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {values: ["是", "否"]},
@@ -440,15 +474,16 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '确认时间',
-      field: 'backendConfirmTime',
+      field: 'back_end_confirm_time',
     },
     {
       headerName: '流程确认',
-      field: 'flowConfirm',
+      field: 'process_user_name',
     },
     {
       headerName: '服务确认完成',
-      field: 'flowConfirmOk',
+      field: 'process_confirm_status',
+      minWidth: 115,
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {values: ["是", "否"]},
@@ -456,15 +491,16 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '确认时间',
-      field: 'flowConfirmTime',
+      field: 'process_confirm_time',
     },
     {
       headerName: '测试值班',
-      field: 'testDuty',
+      field: 'test_user_name',
     },
     {
       headerName: '服务确认完成',
-      field: 'testConfirm',
+      field: 'test_confirm_status',
+      minWidth: 115,
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {values: ["是", "否"]},
@@ -472,7 +508,7 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '确认时间',
-      field: 'testConfirmTime',
+      field: 'test_confirm_time',
     }];
   const thirdUpSerGridApi = useRef<GridApi>();
   const onthirdGridReady = (params: GridReadyEvent) => {
@@ -527,20 +563,26 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '数据修复内容',
-      field: 'repaireContent',
+      field: 'repair_data_content',
+      minWidth: 120
     },
     {
       headerName: '涉及租户',
-      field: 'relateRenter',
+      field: 'related_tenant',
     },
     {
       headerName: '类型',
       field: 'type',
-      minWidth: 65
+      minWidth: 80,
+      cellRenderer: (params: any) => {
+        return `<span>${getRepaireType(params.value)}</span>`
+      }
+
     },
     {
       headerName: '修复提交人',
-      field: 'repaireCommiter',
+      field: 'commit_user_name',
+      minWidth: 105
     },
     {
       headerName: '分支',
@@ -548,20 +590,28 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '编辑人',
-      field: 'editor',
+      field: 'edit_user_name',
       minWidth: 75
     },
     {
       headerName: '编辑时间',
-      field: 'editeTime',
+      field: 'edit_time',
     },
     {
       headerName: '评审结果',
-      field: 'reviewResult',
+      field: 'review_result',
+      cellRenderer: (params: any) => {
+        return `<span>${getPassOrNot(params.value)}</span>`
+      }
+
     },
     {
       headerName: '是否可重复执行',
-      field: 'repeatExcute',
+      field: 'is_repeat',
+      minWidth: 130,
+      cellRenderer: (params: any) => {
+        return `<span>${getIfOrNot(params.value)}</span>`
+      }
     },
     {
       headerName: '操作',
@@ -597,11 +647,11 @@ const PreRelease: React.FC<any> = () => {
   const secondDataReviewColumn = [
     {
       headerName: '后端值班',
-      field: 'backendDuty',
+      field: 'confirm_user_name',
     },
     {
       headerName: '服务确认完成',
-      field: 'backendComfirm',
+      field: 'confirm_status',
       editable: true,
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {values: ["是", "否"]},
@@ -609,7 +659,7 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '确认时间',
-      field: 'backendComfirmTime',
+      field: 'confirm_time',
     }];
   const secondDataReviewGridApi = useRef<GridApi>();
   const onsecondDataReviewGridReady = (params: GridReadyEvent) => {
@@ -641,27 +691,70 @@ const PreRelease: React.FC<any> = () => {
   const rendererUnitTest = (params: any) => {
 
     const values = params.value;
-    const frontValue = (values["前端"])[0];
-    const frontTime = (values["前端"])[1];
-    const backendValue = (values["后端"])[0];
-    const backendTime = (values["后端"])[1];
+    if (!values) {
+      return "";
+    }
+
+    let frontValue = "";
+    let frontTime = "";
+    let backendValue = "";
+    let backendTime = "";
+
+    // 循环解析前后端的数据
+    values.forEach((ele: any) => {
+
+      // 解析是否成功
+      let passFlag = "";
+      if (ele.ignore_check === "1") {
+        passFlag = "是";
+      } else if (ele.test_case_status === "success") {
+        passFlag = "是";
+      } else if (ele.test_case_status === "error") {
+        passFlag = "否";
+      } else if (ele.test_case_status === "skip") {
+        passFlag = "忽略";
+      } else if (ele.test_case_status === "running") {
+        passFlag = "运行中";
+      }
+
+      // 解析时间
+      const start = ele.test_case_start_time === "" ? "" : dayjs(ele.test_case_start_time).format("HH:mm:ss");
+      const end = ele.test_case_end_time === "" ? "" : dayjs(ele.test_case_end_time).format("HH:mm:ss");
+      let timeRange = "";
+      if (start) {
+        timeRange = `${start}~${end}`;
+      }
+      if (ele.test_case_technical_side === "1") { // 前端
+        frontValue = passFlag;
+        frontTime = timeRange;
+      } else {  // 后端
+        backendValue = passFlag;
+        backendTime = timeRange;
+      }
+
+    });
+
     // 前端的颜色
-    let frontColor = "#8B4513";
+    let frontColor = "black";
     if (frontValue === "是") {
       frontColor = "#2BF541";
+    } else if (frontValue === "否") {
+      frontColor = "#8B4513";
     } else if (frontValue === "忽略") {
       frontColor = "blue";
     }
 
     // 后端的颜色
-    let bacnkendColor = "#8B4513";
+    let bacnkendColor = "black";
     if (backendValue === "是") {
       bacnkendColor = "#2BF541";
+    } else if (backendValue === "否") {
+      bacnkendColor = "#8B4513";
     } else if (backendValue === "忽略") {
       bacnkendColor = "blue";
     }
 
-    if (params.data?.module === "仅前端") {
+    if (params.data?.technical_side === "1") {  // 前端
 
       return `
         <div style="margin-top: -10px">
@@ -673,7 +766,7 @@ const PreRelease: React.FC<any> = () => {
     `;
 
     }
-    if (params.data?.module === "仅后端") {
+    if (params.data?.technical_side === "2") {   // 后端
       return `
         <div style="margin-top: -10px">
             <div style=" margin-top: 20px;font-size: 10px">
@@ -699,6 +792,7 @@ const PreRelease: React.FC<any> = () => {
 
   // 渲染上线前版本检查是否通过
   const beforeOnlineVersionCheck = (params: any) => {
+    debugger;
 
     const commonDiv = `
     <div style="margin-top: -10px">
@@ -736,30 +830,7 @@ const PreRelease: React.FC<any> = () => {
       bacnkendColor = "#46A0FC";
     }
 
-    if (params.data?.module === "仅前端") {
 
-      return `
-        ${commonDiv}
-        <div style="margin-top: -20px">
-            <div style="font-size: 10px">
-                <div>前端： <button style="color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${frontValue}</button> &nbsp;${frontTime}</div>
-            </div>
-
-        </div>
-    `;
-
-    }
-    if (params.data?.module === "仅后端") {
-      return `
-        ${commonDiv}
-        <div style="margin-top: -20px">
-            <div style="font-size: 10px">
-                <div> 后端：<button style="color: ${bacnkendColor};width: 40px;border: none;background-color: transparent"> ${backendValue}</button>
-                &nbsp;${backendTime}</div>
-            </div>
-        </div>
-    `;
-    }
     return `
           ${commonDiv}
         <div style="margin-top: -20px">
@@ -908,45 +979,47 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '分支名称',
-      field: 'branchName',
+      field: 'branch_name',
       maxWidth: 115,
     },
     {
       headerName: '技术侧',
-      field: 'module',
-      maxWidth: 100,
+      field: 'technical_side',
+      cellRenderer: (params: any) => {
+        return `<span>${getTechSide(params.value)}</span>`
+      }
     },
     {
       headerName: '单元测试运行是否通过',
-      field: 'passUnitTest',
+      field: 'test_unit',
       cellRenderer: rendererUnitTest,
       minWidth: 190,
     },
     {
       headerName: '上线前版本检查是否通过',
-      field: 'passVersionCheck',
+      field: 'version_check',
       cellRenderer: beforeOnlineVersionCheck,
       minWidth: 190,
     },
     {
       headerName: '上线前环境检查是否通过',
-      field: 'passEnvCheck',
-      cellRenderer: beforeOnlineEnvCheck,
+      field: 'env_check',
+      // cellRenderer: beforeOnlineEnvCheck,
     },
     {
       headerName: '上线前自动化检查是否通过',
-      field: 'passAutoCheckbf',
-      cellRenderer: beforeOnlineAutoCheck,
+      field: 'automation_check',
+      // cellRenderer: beforeOnlineAutoCheck,
     },
     {
       headerName: '升级后自动化检查是否通过',
-      field: 'passAutoCheckaf',
-      cellRenderer: beforeOnlineAutoCheck,
+      field: 'automation_check',
+      // cellRenderer: beforeOnlineAutoCheck,
     },
     {
       headerName: '封板状态',
-      field: 'sealStatus',
-      cellRenderer: sealStatusRenderer
+      field: 'branch_sealing_check',
+      // cellRenderer: sealStatusRenderer
     },
     {
       headerName: '操作',
@@ -998,42 +1071,44 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '工单类型',
-      field: 'listType',
+      field: 'repair_order_type',
     },
     {
       headerName: '工单编号',
-      field: 'listNo',
+      field: 'repair_order_num',
     },
     {
       headerName: '审批名称',
-      field: 'approveName',
+      field: 'approval_name',
     },
     {
       headerName: '审批说明',
-      field: 'approveDesc',
+      field: 'approval_instructions',
     },
     {
       headerName: '申请人',
-      field: 'applier',
+      field: 'applicant_name',
     },
     {
       headerName: '创建时间',
-      field: 'createTime',
+      field: 'apply_create_time',
     },
     {
       headerName: '更新时间',
-      field: 'updateTime',
+      field: 'apply_update_time',
     },
     {
       headerName: '工单状态',
-      field: 'listStatus',
+      field: 'repair_order_status',
     },
     {
       headerName: '上步已审批人',
-      field: 'lastApprover',
+      field: 'before_approval_name',
+      minWidth: 120
     }, {
       headerName: '当前待审批人',
-      field: 'currentApprover',
+      field: 'current_approval_name',
+      minWidth: 120
     }];
   const firstListGridApi = useRef<GridApi>();
   const onfirstListGridReady = (params: GridReadyEvent) => {
@@ -1127,7 +1202,7 @@ const PreRelease: React.FC<any> = () => {
       });
     } else {
 
-      debugger;
+
       // 有数据之后进行表格的赋值操作
     }
   };
@@ -1268,108 +1343,13 @@ const PreRelease: React.FC<any> = () => {
   };
   /* endregion */
 
-  const showProject = (source: any) => {
+  const showPagesContent = (source: any) => {
     if (!source) {
       return;
     }
-    debugger;
 
-    // 升级服务 一
-    firstUpSerGridApi.current?.setRowData([{
-      onlineDev: "集群1",
-      pulishItem: "前端",
-      application: "web",
-      hotUpdate: "是",
-      upGrade: "否",
-      branchAndDev: "emergency_nx-hotfix",
-      editor: "吴晓风",
-      editeTime: "2021-12-09 13:10:10",
-      desc: "测试数据",
-      remark: "测试数据"
-    }]);
-    // 升级服务 二
-    secondUpSerGridApi.current?.setRowData([{
-      onlineDev: "集群1",
-      upgradeInte: "前端接口",
-      intService: "basebi",
-      hotUpdate: "是",
-      intMethod: "get",
-      intURL: "/basebi/Evaluate/......",
-      editor: "吴晓风",
-      editeTime: "2021-12-09 12:12:12",
-      relateRenter: "全量用户",
-      remark: "测试数据"
-    }]);
-    // 升级服务 三
-    thirdUpSerGridApi.current?.setRowData([{
-      frontDuty: "欧兴杨",
-      frontConfirm: "是",
-      frontConfirmTime: "2021-12-08 10:10:10",
-      backendDuty: "刘云鹏",
-      backendConfirm: "是",
-      backendConfirmTime: "2021-12-08 10:10:17",
-      flowConfirm: "杨期成",
-      flowConfirmOk: "否",
-      flowConfirmTime: "",
-      testDuty: "徐超",
-      testConfirm: "否",
-      testConfirmTime: ""
-    }]);
-    // 数据修复Review 一
-    firstDataReviewGridApi.current?.setRowData([{
-      repaireContent: "测试数据一条",
-      relateRenter: "all",
-      type: "after",
-      repaireCommiter: "任毅",
-      branch: "hotfix",
-      editor: "欧治成",
-      editeTime: "2021-12-09 12:12:12",
-      reviewResult: "通过",
-      repeatExcute: "是",
-    }]);
-    // 数据修复Review 二
-    secondDataReviewGridApi.current?.setRowData([{
-      backendDuty: "刘云鹏",
-      backendComfirm: "是",
-      backendComfirmTime: "2021-12-09 14:12:12",
-    }]);
-    // 上线分支
-    firstOnlineBranchGridApi.current?.setRowData([
-      {
-        branchName: "release",
-        module: "前后端",
-        passUnitTest: {"前端": ["是", "2021-01-01 12:11:22"], "后端": ["否", "2021-01-01 12:11:22"]},
-        passVersionCheck: {"前端": ["是", "2021-01-01 12:11:22"], "后端": ["否", "2021-01-01 12:11:22"]},
-        passEnvCheck: ["否", "2021-01-01 12:11:22"],
-        passAutoCheckbf: ["未开始", ""],
-        passAutoCheckaf: ["未开始", ""],
-        sealStatus: {"前端": ["已封版", "2021-01-01 12:11:22"], "后端": ["未封版", ""]},
-      }, {
-        branchName: "release-report",
-        module: "仅后端",
-        passUnitTest: {"前端": ["是", "2021-01-01 12:11:22"], "后端": ["忽略", ""]},
-        passVersionCheck: {"前端": ["是", "2021-01-01 12:11:22"], "后端": ["检查中", "2021-01-01 12:11:22"]},
-        passEnvCheck: ["是", "2021-01-01 12:11:22"],
-        passAutoCheckbf: ["检查中", "12:12:12~18:19:33"],
-        passAutoCheckaf: ["未开始", ""],
-        sealStatus: {"前端": ["未封版", ""], "后端": ["已封版", "2021-01-01 12:11:22"]},
-      }]);
-    // 对应工单
-    firstListGridApi.current?.setRowData([{
-      listType: "蓝绿发布",
-      listNo: "3124",
-      approveName: "emergency20211126发布",
-      approveDesc: "emergency20211126发布",
-      applier: "徐超",
-      createTime: "2021-11-25 07:50:11",
-      updateTime: "2021-11-25 07:50:11",
-      listStatus: "验证通过后审批",
-      lastApprover: "黄义森",
-      currentApprover: "徐超"
-    }]);
-
+    // 预发布项目
     const preReleaseProject = source?.preProject;
-    // 先显示第一个界面的数据
     formForPreReleaseProject.setFieldsValue({
       projectsName: preReleaseProject.projectId,
       pulishType: preReleaseProject.release_type,
@@ -1379,10 +1359,27 @@ const PreRelease: React.FC<any> = () => {
       editTime: preReleaseProject.edit_time,
 
     });
+
+    // 升级服务 一
+    firstUpSerGridApi.current?.setRowData(source?.upService_releaseItem);
+
+    // 升级服务 二
+    secondUpSerGridApi.current?.setRowData(source?.upService_interface);
+    // 升级服务 三
+    thirdUpSerGridApi.current?.setRowData(source?.upService_confirm);
+    // 数据修复Review 一
+    firstDataReviewGridApi.current?.setRowData(source?.reviewData_repaire);
+    // 数据修复Review 二
+    secondDataReviewGridApi.current?.setRowData(source?.reviewData_confirm);
+    // 上线分支
+    firstOnlineBranchGridApi.current?.setRowData(source?.onlineBranch);
+    // 对应工单
+    firstListGridApi.current?.setRowData(source?.correspondOrder);
+
   };
 
   useEffect(() => {
-    showProject(initData);
+    showPagesContent(initData);
 
   }, [initData]);
 
@@ -1514,7 +1511,7 @@ const PreRelease: React.FC<any> = () => {
 
                   </Row>
 
-                  <Row style={{marginTop:-20}}>
+                  <Row style={{marginTop: -20}}>
                     <Col span={3}>    {/* 编辑人信息 */}
                       {/* 编辑人 */}
                       <Form.Item label="编辑人:" name="editor">

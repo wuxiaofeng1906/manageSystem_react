@@ -2,13 +2,13 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2021-12-28 12:37:41
+ * @LastEditTime: 2021-12-29 09:43:25
  * @LastEditors: jieTan
  * @LastModify:
  */
-import { Select, Form, DatePicker, Divider, TreeSelect, Row, Col, Tooltip } from 'antd';
-import { selectFilter, treeSelectActive, mySelector } from './index.css';
-import { useRequest } from 'ahooks';
+import { Form, DatePicker, Divider, TreeSelect, Row, Col, Tooltip } from 'antd';
+import { selectFilter, mySelector } from './index.css';
+import { useMount } from 'ahooks';
 import { useGqlClient } from '@/hooks';
 import { GQL_PARAMS, GRAPHQL_QUERY } from '@/namespaces';
 import React, { useEffect, useState } from 'react';
@@ -21,26 +21,36 @@ const { RangePicker } = DatePicker;
 
 /*  */
 let dateStr: [string, string] | undefined; // 存放时间range信息
-const defaultSeclectItems = { deptIds: [], projIds: [], dates: null };
+let doChange = false;
+const defaultSeclectItems = { deptIds: [], projIds: [], dates: null, doQuery: false };
 /* ************************************************************************************************************** */
 export default () => {
   /* 数据区 */
+  const gqlClient = useGqlClient(); // 必须提前初始化该对象
+  const [projElems, setProjElems] = useState(null); // 保存项目信息
+  const [treeData, setTreeData] = useState([]); // 部门树形结构的数据
+  const { gqlData, setGqlData } = useModel('projectMetric'); // 获取“过程质量”查询的结果数据
+  const [selectItems, setSelectItems] = useState(defaultSeclectItems); // 存放多个筛选的值
+  //
   const defaultParams: any = {
+    className: selectFilter,
     showArrow: true,
     allowClear: 'allowClear',
     placeholder: '默认选择全部',
+    multiple: 'multiple',
+    dropdownStyle: { maxHeight: 400, overflow: 'auto' },
+    treeDefaultExpandAll: 'treeDefaultExpandAll',
+    treeCheckable: true,
+    maxTagCount: 'responsive',
+    onDropdownVisibleChange: (open: boolean) => {
+      //
+      !open && doChange
+        ? setSelectItems((prev) => Object.assign({ ...prev }, { doQuery: true }))
+        : null;
+    },
+    filterTreeNode: (inputValue: string, treeNode: { title: string }) =>
+      treeNode?.title.includes(inputValue) ? true : false,
   }; // <Select>默认的一些配置
-  const [projElems, setProjElems] = useState(null); // 保存项目信息
-  const [treeData, setTreeData] = useState([]); // 部门树形结构的数据
-  const [treeActive, setTreeActive] = useState(''); // 部门<Select>选中时的样式
-  const { gqlData, setGqlData } = useModel('projectMetric'); // 获取“过程质量”查询的结果数据
-  //
-  const [selectItems, setSelectItems] = useState(defaultSeclectItems); // 存放多个筛选的值
-
-  //
-  const gqlClient = useGqlClient(); // 必须提前初始化该对象
-  const params: GQL_PARAMS = { func: GRAPHQL_QUERY['ORGANIZATION'] };
-  const { data } = useRequest(() => queryGQL(gqlClient, organizationGql, params));
 
   /* 方法区 */
   const _onSelect = async () => {
@@ -68,8 +78,23 @@ export default () => {
 
   /*  */
   useEffect(() => {
-    _onSelect();
+    if (selectItems.doQuery && doChange) {
+      setSelectItems((prev) => Object.assign({ ...prev }, { doQuery: false }));
+      _onSelect();
+      doChange = false;
+    }
   }, [selectItems]);
+  //
+  useEffect(() => {
+    gqlData !== undefined ? projOptsElems(gqlData, setProjElems, selectItems.projIds) : null;
+  }, [gqlData]);
+  // 界面挂载后，立马查询部门组织架构
+  useMount(async () => {
+    const rets = await queryGQL(gqlClient, organizationGql, {
+      func: GRAPHQL_QUERY['ORGANIZATION'],
+    });
+    rets ? deptTreeNodes(rets, treeData, setTreeData) : null;
+  });
 
   /* 绘制区 */
   return (
@@ -77,49 +102,65 @@ export default () => {
       <Row align="middle">
         <Col span={20}>
           <Form layout="inline">
-            <Form.Item label="所属部门/组">
+            <Form.Item label="所属部门/组" key="depts">
               <TreeSelect
                 {...defaultParams}
-                multiple
-                className={`${selectFilter} ${treeActive}`}
-                dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                 treeData={treeData}
-                treeDefaultExpandAll
-                onClick={() => deptTreeNodes(data, treeData, setTreeData)}
-                onDropdownVisibleChange={() => setTreeActive(treeActive ? '' : treeSelectActive)}
-                onChange={(values: string) =>
-                  setSelectItems((prev) => Object.assign({ ...prev }, { deptIds: values }))
-                }
-                onClear={() =>
-                  setSelectItems((prev) => Object.assign({ ...prev }, { deptIds: [] }))
-                }
+                onChange={(values: string) => {
+                  doChange = true;
+                  setSelectItems((prev) =>
+                    Object.assign(
+                      { ...prev },
+                      {
+                        deptIds: values,
+                        doQuery: prev.deptIds.length > values.length ? true : false, // 添加时不查询，移除时查询
+                      },
+                    ),
+                  );
+                }}
+                onClear={() => {
+                  setSelectItems((prev) =>
+                    Object.assign({ ...prev }, { deptIds: [], doQuery: true }),
+                  );
+                }}
                 value={selectItems.deptIds}
               />
             </Form.Item>
-            <Form.Item label="特性项目">
-              <Select
+            <Form.Item label="特性项目" key="projects">
+              <TreeSelect
                 {...defaultParams}
-                mode="multiple"
-                className={selectFilter}
-                onChange={(values: never[]) =>
-                  setSelectItems((prev) => Object.assign({ ...prev }, { projIds: values }))
-                }
-                onClick={() => projOptsElems(gqlData, projElems, setProjElems)}
-                onClear={() =>
-                  setSelectItems((prev) => Object.assign({ ...prev }, { projIds: [] }))
-                }
+                treeData={projElems}
+                onChange={(values: string) => {
+                  doChange = true;
+                  setSelectItems((prev) =>
+                    Object.assign(
+                      { ...prev },
+                      {
+                        projIds: values,
+                        doQuery: prev.projIds.length > values.length ? true : false, // 添加时不查询，移除时查询
+                      },
+                    ),
+                  );
+                }}
+                onClear={() => {
+                  setSelectItems((prev) =>
+                    Object.assign({ ...prev }, { projIds: [], doQuery: true }),
+                  );
+                }}
                 value={selectItems.projIds}
-                children={projElems}
               />
             </Form.Item>
-            <Form.Item>
+            <Form.Item key="vertical1">
               <Divider type="vertical" />
             </Form.Item>
-            <Form.Item>
+            <Form.Item key="dates">
               <RangePicker
                 onChange={(dates: any, dateString) => {
                   dateStr = dates ? dateString : undefined;
-                  setSelectItems((prev) => Object.assign({ ...prev }, { dates: dates }));
+                  doChange = true;
+                  setSelectItems((prev) =>
+                    Object.assign({ ...prev }, { dates: dates, doQuery: true }),
+                  );
                 }}
                 value={selectItems.dates}
               />
@@ -130,7 +171,9 @@ export default () => {
           <Tooltip title="刷新" color="cyan">
             <ReloadOutlined
               onClick={() => {
-                setSelectItems(() => defaultSeclectItems);
+                doChange = true;
+                setProjElems(null);
+                setSelectItems(Object.assign(defaultSeclectItems, { doQuery: true }));
                 dateStr = undefined;
               }}
             />

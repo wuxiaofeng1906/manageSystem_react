@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2021-12-29 09:43:25
+ * @LastEditTime: 2021-12-29 10:02:20
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -15,7 +15,7 @@ import React, { useEffect, useState } from 'react';
 import { useModel } from 'umi';
 import { projectKpiGql, organizationGql, queryGQL } from '@/pages/gqls';
 import { ColumnHeightOutlined, ReloadOutlined } from '@ant-design/icons';
-import { deptTreeNodes, projOptsElems } from './extra';
+import { deptTreeNodes, onTreeMultiChange, projOptsElems } from './extra';
 
 const { RangePicker } = DatePicker;
 
@@ -106,18 +106,9 @@ export default () => {
               <TreeSelect
                 {...defaultParams}
                 treeData={treeData}
-                onChange={(values: string) => {
-                  doChange = true;
-                  setSelectItems((prev) =>
-                    Object.assign(
-                      { ...prev },
-                      {
-                        deptIds: values,
-                        doQuery: prev.deptIds.length > values.length ? true : false, // 添加时不查询，移除时查询
-                      },
-                    ),
-                  );
-                }}
+                onChange={(values: string) =>
+                  (doChange = onTreeMultiChange(values, setSelectItems, 'deptIds'))
+                }
                 onClear={() => {
                   setSelectItems((prev) =>
                     Object.assign({ ...prev }, { deptIds: [], doQuery: true }),
@@ -130,18 +121,9 @@ export default () => {
               <TreeSelect
                 {...defaultParams}
                 treeData={projElems}
-                onChange={(values: string) => {
-                  doChange = true;
-                  setSelectItems((prev) =>
-                    Object.assign(
-                      { ...prev },
-                      {
-                        projIds: values,
-                        doQuery: prev.projIds.length > values.length ? true : false, // 添加时不查询，移除时查询
-                      },
-                    ),
-                  );
-                }}
+                onChange={(values: string) =>
+                  (doChange = onTreeMultiChange(values, setSelectItems, 'projIds'))
+                }
                 onClear={() => {
                   setSelectItems((prev) =>
                     Object.assign({ ...prev }, { projIds: [], doQuery: true }),

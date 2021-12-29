@@ -2,7 +2,7 @@
  * @Description:
  * @Author: jieTan
  * @Date: 2021-12-28 10:07:16
- * @LastEditTime: 2021-12-29 09:42:34
+ * @LastEditTime: 2021-12-29 10:00:52
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -13,16 +13,16 @@ import { toTree } from '../utils/tree';
  * @author JieTan
  * @date 2021/11/30 11:11:14
  * @param {{ project: { id: string; name: string } }[]} datas - 待解析的源数据
- * @param {Function} setVal - 修改相应state值的函数
+ * @param {Function} setState - 修改相应state值的函数
  * @param {any[]} selectDepts - 当前被选中的项目ID列表
  * @returns {*} {*}
  */
 export const projOptsElems = (
   datas: { project: { id: string; name: string } }[],
-  setVal: Function,
+  setState: Function,
   selectDepts: any[], // 当前被选中的项目ID列表
 ): any => {
-  setVal((prev: any[]) => {
+  setState((prev: any[]) => {
     // 规避先选择项目，后选择部门导致的tag失效的问题
     if (datas.length === 0 && selectDepts.length !== 0 && prev)
       return prev.map((d) => ({
@@ -58,4 +58,28 @@ export const deptTreeNodes = (data: any, val: any[], setVal: Function): void => 
     ?.shift()
     ?.children?.shift();
   setVal(ret ? [ret as never] : []);
+};
+
+/**
+ * @description - 多选时：<TreeSelect>的onChange事件的处理
+ * @author JieTan
+ * @date 2021/12/29 09:12:39
+ * @param {string} values - 多选的值列表
+ * @param {Function} setState - 更新查询参数
+ * @param {string} item - 查询类别：[部门|项目]
+ * @returns {*} {boolean}
+ */
+export const onTreeMultiChange = (values: string, setState: Function, item: string): boolean => {
+  //
+  setState((prev: any) =>
+    Object.assign(
+      { ...prev },
+      {
+        [item]: values,
+        doQuery: prev[item].length > values.length ? true : false, // 添加时不查询，移除时查询
+      },
+    ),
+  );
+  //
+  return true;
 };

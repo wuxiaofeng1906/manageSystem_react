@@ -792,7 +792,6 @@ const PreRelease: React.FC<any> = () => {
 
   // 渲染上线前版本检查是否通过
   const beforeOnlineVersionCheck = (params: any) => {
-    debugger;
 
     const commonDiv = `
     <div style="margin-top: -10px">
@@ -808,37 +807,56 @@ const PreRelease: React.FC<any> = () => {
     </div>
     `;
 
+    if (!params.value) {
+      return "";
+    }
+    const values: any = (params.value)[0];// 本数组只会有一条数据
+    // 解析所属端
+    let side = "";
+    if (values.technical_side === "front") {
+      side = "前端";
+    } else if (values.technical_side === "backend") {
+      side = "后端";
+    } else if (values.technical_side === "front,backend") {
+      side = "前后端";
+    }
 
-    const values = params.value;
-    const frontValue = (values["前端"])[0];
-    const frontTime = (values["前端"])[1];
-    const backendValue = (values["后端"])[0];
-    const backendTime = (values["后端"])[1];
-    // 前端的颜色
-    let frontColor = "#8B4513";
-    if (frontValue === "是") {
+
+    // 解析时间
+    const start = values.check_start_time === "-" ? "" : dayjs(values.check_start_time).format("HH:mm:ss");
+    const end = values.check_end_time === "-" ? "" : dayjs(values.check_end_time).format("HH:mm:ss");
+    let timeRange = "";
+    if (start) {
+      timeRange = `${start}~${end}`;
+    }
+
+    // 解析结果
+    let result = "";
+    let frontColor = "black";
+
+    if (values.check_result === "9") {  // 9是未结束，然后就获取检查状态
+
+      if (values.check_status === "1") {
+        result = "未开始";
+      } else if (values.check_status === "2") {
+        result = "检查中";
+      } else if (values.check_status === "3") {
+        result = "已结束";
+      }
+      frontColor = "#8B4513";
+    } else if (values.check_result === "1") {
+      result = "是";
       frontColor = "#2BF541";
-    } else if (frontValue === "检查中") {
+    } else if (values.check_result === "2") {
+      result = "否";
       frontColor = "#46A0FC";
     }
 
-    // 后端的颜色
-    let bacnkendColor = "#8B4513";
-    if (backendValue === "是") {
-      bacnkendColor = "#2BF541";
-    } else if (backendValue === "检查中") {
-      bacnkendColor = "#46A0FC";
-    }
-
-
     return `
-          ${commonDiv}
+        ${commonDiv}
         <div style="margin-top: -20px">
             <div style="font-size: 10px">
-                <div>前端： <button style="color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${frontValue}</button> &nbsp;${frontTime}</div>
-                <div style="margin-top: -20px"> 后端：
-                <button style=" color: ${bacnkendColor};width: 40px;border: none;background-color: transparent"> ${backendValue}</button>
-                &nbsp;${backendTime}</div>
+                <div>${side}： <button style="color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button> &nbsp;${timeRange}</div>
             </div>
 
         </div>
@@ -883,16 +901,40 @@ const PreRelease: React.FC<any> = () => {
     setAutoLogModal(true);
   };
   // 上线前数据库检查
-  const beforeOnlineAutoCheck = (params: any) => {
-
-    const value = (params.value)[0];
-    const time = (params.value)[1];
-
-    // 前端的颜色
-    let Color = "black";
-    if (value === "检查中") {
-      Color = "#46A0FC";
+  const beforeOnlineAutoCheck = (params: any, type: string) => {
+    const values = params.value;
+    if (!values) {
+      return "";
     }
+
+    let value = "";
+    let Color = "black";
+    let timeRange = "";
+
+    values.forEach((ele: any) => {
+      if (ele.check_time === type) {  // 如果是1 ，则代表是上线前检查,如果是2 ，则代表是上线后检查
+
+        // 解析结果和颜色
+        if (ele.check_status === "1") {
+          value = "未开始";
+        } else if (ele.check_status === "2") {
+          value = "检查中";
+          Color = "#46A0FC";
+        } else if (ele.check_status === "3") {
+          value = "已结束";
+          Color = "#2BF541";
+        }
+
+        // 解析时间
+        const start = ele.check_start_time === "" ? "" : dayjs(ele.check_start_time).format("HH:mm:ss");
+        const end = ele.check_end_time === "" ? "" : dayjs(ele.check_end_time).format("HH:mm:ss");
+        if (start) {
+          timeRange = `${start}~${end}`;
+        }
+
+      }
+
+    });
 
     return `
         <div style="margin-top: -10px">
@@ -905,7 +947,7 @@ const PreRelease: React.FC<any> = () => {
               </Button>
             </div>
             <div style=" margin-top: -20px;font-size: 10px;width: 200px">
-                <div><label style="color: ${Color}"> ${value}</label> &nbsp;${time}</div>
+                <div><label style="color: ${Color}"> ${value}</label> &nbsp;${timeRange}</div>
             </div>
 
         </div>
@@ -1004,17 +1046,24 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '上线前环境检查是否通过',
       field: 'env_check',
+      minWidth: 190,
       // cellRenderer: beforeOnlineEnvCheck,
     },
     {
       headerName: '上线前自动化检查是否通过',
       field: 'automation_check',
-      // cellRenderer: beforeOnlineAutoCheck,
+      minWidth: 200,
+      cellRenderer: (param: any) => {
+        return beforeOnlineAutoCheck(param, "1")
+      },
     },
     {
       headerName: '升级后自动化检查是否通过',
       field: 'automation_check',
-      // cellRenderer: beforeOnlineAutoCheck,
+      minWidth: 200,
+      cellRenderer: (param: any) => {
+        return beforeOnlineAutoCheck(param, "2")
+      },
     },
     {
       headerName: '封板状态',

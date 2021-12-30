@@ -10,12 +10,14 @@ const analysisPreReleaseProject = (datas: any) => {
     projectIdArray.push(ele.project_id);
   })
   const returnArray = {
+    pro_id: project.pro_id,
     projectId: projectIdArray,
     release_type: project.release_type,
     release_way: project.release_way,
     plan_release_time: project.plan_release_time,
     edit_user_name: project.edit_user_name,
     edit_time: project.edit_time,
+    ready_release_num: project.ready_release_num
   };
 
   return returnArray;
@@ -70,7 +72,7 @@ const analysisOnlineBranch = (datas: any) => {
 
 
 /* region 对应工单数据解析 */
-const analysiCorrespondOrder= (datas: any) => {
+const analysiCorrespondOrder = (datas: any) => {
 
   return datas;
 };
@@ -96,7 +98,7 @@ const alalysisInitData = async () => {
     onlineBranch: analysisOnlineBranch(datas[0].release_branch),
 
     // 对应工单
-    correspondOrder:analysiCorrespondOrder(datas[0].repair_order)
+    correspondOrder: analysiCorrespondOrder(datas[0].repair_order)
 
   };
 

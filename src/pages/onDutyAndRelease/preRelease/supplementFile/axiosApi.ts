@@ -70,37 +70,42 @@ const queryReleaseWay = async () => {
 };
 
 // 保存预发布项目
-const savePrePulishProjects = async (params: any) => {
-  console.log(params, usersInfo);
+const savePrePulishProjects = async (params: any, listNo: string) => {
   const prjIdArray = params.projectsName;
   let projectId = "";
-
   prjIdArray.forEach((project: string) => {
     projectId = projectId === "" ? project : `${projectId},${project}`;
   });
 
   const data = {
+    "pro_id": params.proid === "" ? "" : Number(params.proid),
     "user_name": usersInfo.name,
     "user_id": usersInfo.userid,
     "project_id_set": projectId,
     "release_type": params.pulishType,
     "release_way": params.pulishMethod,
     "plan_release_time": dayjs(params.pulishTime).format("YYYY-MM-DD HH:mm:ss"),
-    "ready_release_num": "string"
+    "ready_release_num": listNo
   };
   // const hostIp = getCurrentProxy();
   // const url = `${hostIp}api/verify/duty/plan_data`;
-  let errorMessage = "";
-  await axios.put("/api/verify/release/release_project", data)
+  const result = {
+    datas: [],
+    errorMessage: ""
+  };
+  await axios.post("/api/verify/release/release_project", data)
     .then(function (res) {
-      if (res.data.code !== 200) {
-        errorMessage = `错误：${res.data.msg}`;
+
+      if (res.data.code === 200) {
+        result.datas = res.data.data;
+      } else {
+        result.errorMessage = `错误：${res.data.msg}`;
       }
     }).catch(function (error) {
-      errorMessage = `异常信息:${error.toString()}`;
+      result.errorMessage = `异常信息:${error.toString()}`;
     });
 
-  return errorMessage;
+  return result;
 };
 
 /* endregion */

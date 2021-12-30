@@ -1,27 +1,36 @@
 import {savePrePulishProjects, queryServiceByID} from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
 
 // 保存预发布项目
-const savePreProjects = async (source: any) => {
+const savePreProjects = async (source: any, listNo: string) => {
+  debugger;
 
+  let result = {
+    datas: [],
+    errorMessage: ""
+  };
   // 需要判断输入框不为空
-  if (!source.projectsName) {
-    return "项目名称不能为空！";
+  if (!source.projectsName || (source.projectsName).length ===0) {
+    result.errorMessage = "项目名称不能为空！"
+    return result;
   }
 
   if (!source.pulishType) {
-    return "发布类型不能为空！";
+    result.errorMessage = "发布类型不能为空！"
+    return result;
   }
 
   if (!source.pulishMethod) {
-    return "发布方式不能为空！";
+    result.errorMessage = "发布方式不能为空！"
+    return result;
   }
 
   if (!source.pulishTime) {
-    return "发布时间不能为空！";
+    result.errorMessage = "发布时间不能为空！"
+    return result;
   }
 
-  const resultMessage = await savePrePulishProjects(source);
-  return resultMessage;
+  result = await savePrePulishProjects(source, listNo);
+  return result;
 };
 
 // 点击查询

@@ -26,7 +26,7 @@ const {TabPane} = Tabs;
 const {Option} = Select;
 const {TextArea} = Input;
 const currentDate = dayjs().format("YYYYMMDD");
-
+let currentListNo = "";
 
 const PreRelease: React.FC<any> = () => {
   const [pulishItemForm] = Form.useForm();
@@ -35,21 +35,12 @@ const PreRelease: React.FC<any> = () => {
   const [formForOnlineBranch] = Form.useForm();
 
   // 发布项新增和修改的共同modal显示
-  const [pulishItemModal, setPulishItemModal] = useState({
-    shown: false,
-    title: "新增"
-  });
+  const [pulishItemModal, setPulishItemModal] = useState({shown: false, title: "新增"});
 
   // 发布项新增和修改的共同modal显示
-  const [upgradeIntModal, setUpgradeIntModal] = useState({
-    shown: false,
-    title: "新增"
-  });
+  const [upgradeIntModal, setUpgradeIntModal] = useState({shown: false, title: "新增"});
   // 发布项新增和修改的共同modal显示
-  const [dataReviewtModal, setDataReviewModal] = useState({
-    shown: false,
-    title: "新增"
-  });
+  const [dataReviewtModal, setDataReviewModal] = useState({shown: false, title: "新增"});
 
   // 自动化测试日志弹窗
   const [autoLogModal, setAutoLogModal] = useState(false);
@@ -58,10 +49,7 @@ const PreRelease: React.FC<any> = () => {
   };
 
   // 上线分支设置
-  const [onlineBranchModal, setOnlineBranchModal] = useState({
-    shown: false,
-    title: "新增"
-  });
+  const [onlineBranchModal, setOnlineBranchModal] = useState({shown: false, title: "新增"});
 
   const initData = useRequest(() => alalysisInitData()).data;
 
@@ -616,7 +604,8 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '操作',
       cellRenderer: (params: any) => {
-        return operateRenderer(3, params)
+
+        return operateRenderer(3, params);
       }
     }];
   const firstDataReviewGridApi = useRef<GridApi>();
@@ -1191,10 +1180,11 @@ const PreRelease: React.FC<any> = () => {
   const savePreRelaseProjects = async () => {
 
     const datas = formForPreReleaseProject.getFieldsValue();
-    const result = await savePreProjects(datas);
-    if (result === "") {
+    const result = await savePreProjects(datas, currentListNo);
+
+    if (result.errorMessage === "") {
       message.info({
-        content: result,
+        content: "保存成功！",
         duration: 1,
         style: {
           marginTop: '50vh',
@@ -1203,7 +1193,7 @@ const PreRelease: React.FC<any> = () => {
 
     } else {
       message.error({
-        content: result,
+        content: result.errorMessage,
         duration: 1,
         style: {
           marginTop: '50vh',
@@ -1393,12 +1383,15 @@ const PreRelease: React.FC<any> = () => {
   /* endregion */
 
   const showPagesContent = (source: any) => {
+    console.log(source);
     if (!source) {
       return;
     }
 
     // 预发布项目
     const preReleaseProject = source?.preProject;
+
+    currentListNo = preReleaseProject.ready_release_num;
     formForPreReleaseProject.setFieldsValue({
       projectsName: preReleaseProject.projectId,
       pulishType: preReleaseProject.release_type,
@@ -1406,7 +1399,7 @@ const PreRelease: React.FC<any> = () => {
       pulishTime: dayjs(preReleaseProject.plan_release_time),
       editor: preReleaseProject.edit_user_name,
       editTime: preReleaseProject.edit_time,
-
+      proid: preReleaseProject.pro_id
     });
 
     // 升级服务 一
@@ -1575,6 +1568,13 @@ const PreRelease: React.FC<any> = () => {
                                disabled/>
                       </Form.Item>
                     </Col>
+                    <Col span={1}>
+                      {/* 隐藏的pro_id，对数据的操作需要 */}
+                      <Form.Item name="proid">
+                        <Input style={{display: "none"}}
+                        />
+                      </Form.Item>
+                    </Col>
                   </Row>
 
                 </Form>
@@ -1725,7 +1725,7 @@ const PreRelease: React.FC<any> = () => {
             <div>
               {/* 表格 一 */}
               <div>
-                <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+                <div className="ag-theme-alpine" style={{height: 700, width: '100%'}}>
                   <AgGridReact
 
                     columnDefs={firstDataReviewColumn} // 定义列

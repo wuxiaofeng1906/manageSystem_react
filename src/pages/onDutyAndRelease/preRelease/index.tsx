@@ -27,6 +27,7 @@ const {Option} = Select;
 const {TextArea} = Input;
 const currentDate = dayjs().format("YYYYMMDD");
 let currentListNo = "";
+let releaseIdArray: any;
 
 const PreRelease: React.FC<any> = () => {
   const [pulishItemForm] = Form.useForm();
@@ -856,13 +857,34 @@ const PreRelease: React.FC<any> = () => {
   // 上线前环境检查
   const beforeOnlineEnvCheck = (params: any) => {
 
-    const value = (params.value)[0];
-    const time = (params.value)[1];
+    if ((params.value).length === 0) {
+      return "";
+    }
+    const values = (params.value)[0]; // 也只会有一条数据
 
-    // 前端的颜色
-    let Color = "#8B4513";
-    if (value === "是") {
-      Color = "#2BF541";
+    // 显示结果和颜色
+    let result = "";
+    let Color = "black";
+    if (values.ignore_check === "1") {// 忽略
+      result = "忽略";
+      Color = "blue";
+
+    } else if (values.ignore_check === "2") {  // 不忽略
+      if (values.check_result === "success") {
+        result = "是";
+        Color = "#2BF541";
+      } else {
+        result = "否";
+        Color = "#8B4513";
+      }
+    }
+
+    // 解析时间
+    const start = values.check_start_time === "-" ? "" : dayjs(values.check_start_time).format("HH:mm:ss");
+    const end = values.check_end_time === "-" ? "" : dayjs(values.check_end_time).format("HH:mm:ss");
+    let timeRange = "";
+    if (start) {
+      timeRange = `${start}~${end}`;
     }
 
     return `
@@ -876,7 +898,7 @@ const PreRelease: React.FC<any> = () => {
               </Button>
             </div>
             <div style=" margin-top: -20px;font-size: 10px">
-                <div><label style="color: ${Color}"> ${value}</label> &nbsp;${time}</div>
+                <div><label style="color: ${Color}"> ${result}</label> &nbsp;${timeRange}</div>
             </div>
 
         </div>
@@ -1036,7 +1058,7 @@ const PreRelease: React.FC<any> = () => {
       headerName: '上线前环境检查是否通过',
       field: 'env_check',
       minWidth: 190,
-      // cellRenderer: beforeOnlineEnvCheck,
+      cellRenderer: beforeOnlineEnvCheck,
     },
     {
       headerName: '上线前自动化检查是否通过',
@@ -1183,12 +1205,22 @@ const PreRelease: React.FC<any> = () => {
     const result = await savePreProjects(datas, currentListNo);
 
     if (result.errorMessage === "") {
+
       message.info({
         content: "保存成功！",
         duration: 1,
         style: {
           marginTop: '50vh',
         },
+      });
+
+      const modifyTime: any = result.datas;
+      debugger;
+      formForPreReleaseProject.setFieldsValue({
+
+        editor: modifyTime.editor,
+        editTime: modifyTime.editTime,
+
       });
 
     } else {
@@ -1207,7 +1239,6 @@ const PreRelease: React.FC<any> = () => {
   /* region 升级服务 */
   const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
 
-  const [releaseIDs, setReleaseIDs] = useState([]);
   const [formUpgradeService] = Form.useForm();
 
   const onReleaseIdChanges = (selectedId: any, params: any) => {
@@ -1223,14 +1254,14 @@ const PreRelease: React.FC<any> = () => {
 
       });
 
-      setReleaseIDs(queryCondition);
+      releaseIdArray = queryCondition;
 
     }
   }
 
   const inquireServiceClick = async () => {
 
-    const result = await inquireService(releaseIDs);
+    const result = await inquireService(releaseIdArray);
     if (result.message !== "") {
       message.error({
         content: result.message,
@@ -1243,6 +1274,9 @@ const PreRelease: React.FC<any> = () => {
 
 
       // 有数据之后进行表格的赋值操作
+
+      firstUpSerGridApi.current?.setRowData(result.data);
+
     }
   };
 
@@ -1383,7 +1417,7 @@ const PreRelease: React.FC<any> = () => {
   /* endregion */
 
   const showPagesContent = (source: any) => {
-    console.log(source);
+
     if (!source) {
       return;
     }
@@ -1725,7 +1759,7 @@ const PreRelease: React.FC<any> = () => {
             <div>
               {/* 表格 一 */}
               <div>
-                <div className="ag-theme-alpine" style={{height: 700, width: '100%'}}>
+                <div className="ag-theme-alpine" style={{height: 300, width: '100%'}}>
                   <AgGridReact
 
                     columnDefs={firstDataReviewColumn} // 定义列

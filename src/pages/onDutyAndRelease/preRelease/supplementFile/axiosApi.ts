@@ -2,7 +2,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 
 const sys_accessToken = localStorage.getItem("accessId");
-axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
+axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
 
 const userLogins: any = localStorage.getItem("userLogins");
 const usersInfo = JSON.parse(userLogins);
@@ -89,15 +89,19 @@ const savePrePulishProjects = async (params: any, listNo: string) => {
   };
   // const hostIp = getCurrentProxy();
   // const url = `${hostIp}api/verify/duty/plan_data`;
-  const result = {
-    datas: [],
+  const result: any = {
+    datas: {},
     errorMessage: ""
   };
   await axios.post("/api/verify/release/release_project", data)
     .then(function (res) {
 
       if (res.data.code === 200) {
-        result.datas = res.data.data;
+        const timeData = res.data.data;
+        result.datas = {
+          editor: usersInfo.name,
+          editTime: timeData.edit_time
+        };
       } else {
         result.errorMessage = `错误：${res.data.msg}`;
       }
@@ -132,7 +136,36 @@ const queryReleaseId = async () => {
 
   return result;
 };
-// 根据一键部署ID查询
+
+const getGridDataSource = (oldData: any) => {
+
+  if (!oldData) {
+    return [];
+  }
+
+  const resultArray: any = [];
+  oldData.forEach((ele: any) => {
+
+    const filedObject = {
+      id: ele.id,
+      automation_test: ele.automation_test,
+      branch_environment: `${ele.branch}_${ele.env}`,
+      app: "",
+
+    };
+
+    (ele.service).forEach((service: any) => {  // 有几个应用就要生成几条数据
+      filedObject.app = service;
+      resultArray.push(filedObject);
+    });
+
+
+  });
+
+  return resultArray;
+};
+
+// 一键部署ID之升级接口数据获取
 const queryServiceByID = async (params: string) => {
 
   const result: any = {
@@ -140,13 +173,10 @@ const queryServiceByID = async (params: string) => {
     data: []
   };
 
-  // const hostIp = getCurrentProxy();
-  // const data = {targetUrl: `${hostIp}api/verify/duty/msg_push?person_num=${projectId}`};
-  // await axios.get('/api/verify/duty/msg_push', {params: {person_num: projectId}})
   await axios.post('/api/verify/release/env_branch', params)
     .then(function (res) {
       if (res.data.code === 200) {
-        result.data = res.data.data;
+        result.data = getGridDataSource(res.data.data);
 
       } else {
         result.message = `错误：${res.data.msg}`;
@@ -156,56 +186,10 @@ const queryServiceByID = async (params: string) => {
     });
 
   return result;
+
 };
 
 /* endregion */
-//
-// // 值班计划详情查询
-// const getPlanDetails = async (paln_num: string) => {
-//
-//   const userInfo: any = {
-//     message: "",
-//     datas: []
-//   };
-//
-//
-//   // await axios.get('/api/verify/duty/plan_data_detail', {params: {person_num: paln_num}})
-//   //   .then(function (res) {
-//   //
-//   //     if (res.data.code === 200) {
-//   //       userInfo.datas = res.data.data;
-//   //     } else {
-//   //       userInfo.message = `错误：${res.data.msg}`;
-//   //     }
-//   //
-//   //   }).catch(function (error) {
-//   //     userInfo.message = `异常信息:${error.toString()}`;
-//   //   });
-//
-//   return userInfo;
-//
-// };
-//
-// // 勾选值班计划发送消息
-
-//
-// // 提交修改的数据
-// const submitModifyData = async (person_data: any, project_data: any) => {
-//   let errorMessage = "";
-//   // const hostIp = getCurrentProxy();
-//   // const url = `${hostIp}api/verify/duty/plan_data`;
-//   // // await axios.put("/api/verify/duty/plan_data", {"person": person_data, "project": project_data})
-//   // await axios.put("/api/duty/plan_data", {"targetUrl": url, "person": person_data, "project": project_data})
-//   //   .then(function (res) {
-//   //     if (res.data.code !== 200) {
-//   //       errorMessage = `错误：${res.data.msg}`;
-//   //     }
-//   //   }).catch(function (error) {
-//   //     errorMessage = `异常信息:${error.toString()}`;
-//   //   });
-//
-//   return errorMessage;
-// };
 
 
 export {

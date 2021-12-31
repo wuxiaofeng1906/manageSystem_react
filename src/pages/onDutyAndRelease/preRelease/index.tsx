@@ -75,7 +75,7 @@ const PreRelease: React.FC<any> = () => {
         title: "新增"
       });
     } else {
-      debugger;
+
       pulishItemForm.setFieldsValue({
         onlineEnv: params.online_environment,
         pulishItem: params.release_item,
@@ -369,6 +369,7 @@ const PreRelease: React.FC<any> = () => {
 
   // 保存发布项结果
   const savePulishResult = async () => {
+
     const formData = pulishItemForm.getFieldsValue();
     const datas = {
       "app_id": formData.appId,
@@ -2103,12 +2104,12 @@ const PreRelease: React.FC<any> = () => {
 
           {/* 隐藏字段，进行修改需要的字段 */}
           <Row style={{marginTop: -60}}>
-            <Col span={12}>
+            <Col span={3}>
               <Form.Item name="appId">
                 <Input style={{width: 50, display: "none"}}/>
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={3}>
               <Form.Item name="automationTest">
                 <Input style={{width: 50, display: "none"}}/>
               </Form.Item>

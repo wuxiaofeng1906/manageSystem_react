@@ -1,4 +1,8 @@
-import {savePrePulishProjects, queryServiceByID} from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
+import {
+  savePrePulishProjects,
+  queryServiceByID,
+  saveUpgradeItem
+} from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
 
 // 保存预发布项目
 const savePreProjects = async (source: any, listNo: string) => {
@@ -50,7 +54,9 @@ const inquireService = async (sorce: any) => {
 
 // 发布项的修改
 const upgradePulishItem = async (datas: any) => {
-// 需要验证必填项
+ // 需要验证必填项
+
+  return await saveUpgradeItem(datas);
 
 };
 export {savePreProjects, inquireService, upgradePulishItem};

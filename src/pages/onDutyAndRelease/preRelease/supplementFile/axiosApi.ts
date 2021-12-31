@@ -259,12 +259,43 @@ const getIsApiAndDatabaseUpgrade = async () => {
 
 };
 
+const saveUpgradeItem = async (params: any) => {
+
+  const result: any = {
+    datas: {},
+    errorMessage: ""
+  };
+  debugger;
+  await axios.post("/api/verify/release/upgrade_service", params)
+    .then(function (res) {
+      debugger;
+      if (res.data.code === 200) {
+
+        const timeData = res.data.data;
+        if (timeData) {
+          result.datas = {
+            editor: usersInfo.name,
+            editTime: timeData.edit_time
+          };
+        }
+
+      } else {
+        result.errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      result.errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+
+};
+
 /* endregion */
 
 
 export {
   savePrePulishProjects, queryReleaseType, queryReleaseWay, queryReleaseId, queryServiceByID,
-  getInitPageData, getOnlineDev, getPulishItem, getIsApiAndDatabaseUpgrade
+  getInitPageData, getOnlineDev, getPulishItem, getIsApiAndDatabaseUpgrade, saveUpgradeItem
 };
 
 

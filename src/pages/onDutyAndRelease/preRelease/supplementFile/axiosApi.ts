@@ -98,10 +98,13 @@ const savePrePulishProjects = async (params: any, listNo: string) => {
 
       if (res.data.code === 200) {
         const timeData = res.data.data;
-        result.datas = {
-          editor: usersInfo.name,
-          editTime: timeData.edit_time
-        };
+        if (timeData) {
+          result.datas = {
+            editor: usersInfo.name,
+            editTime: timeData.edit_time
+          };
+        }
+
       } else {
         result.errorMessage = `错误：${res.data.msg}`;
       }

@@ -9,6 +9,8 @@ import {
   Row, Col, DatePicker, Checkbox, Divider, Card, Switch, Progress
 } from 'antd';
 import dayjs from "dayjs";
+import moment from "moment";
+
 import {AgGridReact} from "ag-grid-react";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {
@@ -327,6 +329,8 @@ const PreRelease: React.FC<any> = () => {
 
   // 保存发布项结果
   const savePulishResult = () => {
+    const formData = pulishItemForm.getFieldsValue();
+
 
   };
 
@@ -1215,7 +1219,7 @@ const PreRelease: React.FC<any> = () => {
       });
 
       const modifyTime: any = result.datas;
-      debugger;
+
       formForPreReleaseProject.setFieldsValue({
 
         editor: modifyTime.editor,
@@ -1271,12 +1275,10 @@ const PreRelease: React.FC<any> = () => {
         },
       });
     } else {
-
-
       // 有数据之后进行表格的赋值操作
-
       firstUpSerGridApi.current?.setRowData(result.data);
-
+      secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
+      thirdUpSerGridApi.current?.setRowData([{}]); // 需要给服务确认设置一行空值
     }
   };
 
@@ -1426,11 +1428,12 @@ const PreRelease: React.FC<any> = () => {
     const preReleaseProject = source?.preProject;
 
     currentListNo = preReleaseProject.ready_release_num;
+
     formForPreReleaseProject.setFieldsValue({
       projectsName: preReleaseProject.projectId,
       pulishType: preReleaseProject.release_type,
       pulishMethod: preReleaseProject.release_way,
-      pulishTime: dayjs(preReleaseProject.plan_release_time),
+      pulishTime: moment(preReleaseProject.plan_release_time),
       editor: preReleaseProject.edit_user_name,
       editTime: preReleaseProject.edit_time,
       proid: preReleaseProject.pro_id
@@ -1581,7 +1584,7 @@ const PreRelease: React.FC<any> = () => {
                     <Col span={6}>
                       {/* 发布时间 */}
                       <Form.Item label="发布时间:" name="pulishTime" style={{marginLeft: 5}}>
-                        <DatePicker showTime style={{width: "100%"}}/>
+                        <DatePicker showTime format="YYYY-MM-DD HH:mm" style={{width: "100%"}}/>
                       </Form.Item>
                     </Col>
 

@@ -1,6 +1,11 @@
 .selectFilter {
-  width: 200px !important;
+  width: 280px !important;
 }
-.treeSelectActive {
-  width: 320px !important;
+
+/*  */
+.mySelector {
+  padding: 8px 20px;
+  background-color: white;
+  border-radius: 2px;
+  margin-bottom: 6px;
 }

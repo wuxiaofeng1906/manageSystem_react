@@ -2,7 +2,7 @@
  * @Description: gqlc查询
  * @Author: jieTan
  * @Date: 2021-11-23 10:01:28
- * @LastEditTime: 2021-11-23 16:04:45
+ * @LastEditTime: 2021-12-28 08:49:52
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -27,6 +27,11 @@ const funcWithParams = (args: GQL_PARAMS): string => {
         break;
       case JS_PROTOTYPE_TYPE['String']:
         kvs.push(`${k}:"${v}"`);
+        break;
+      case JS_PROTOTYPE_TYPE['Object']:
+        // FIXME: 要适配number的情况，可以写一个递归来调用自身的判断
+        const _kvs = Object.entries(v)?.map((_vs) => `${_vs[0]}:"${_vs[1]}"`);
+        kvs.push(`${k}:{${_kvs.join()}}`);
         break;
 
       default:

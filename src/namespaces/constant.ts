@@ -2,7 +2,7 @@
  * @Description: 通用常量
  * @Author: jieTan
  * @Date: 2021-11-23 15:51:13
- * @LastEditTime: 2021-12-16 12:04:06
+ * @LastEditTime: 2021-12-22 07:02:05
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -40,12 +40,15 @@ export const PROJ_STATUS = {
 /* 项目度量指标 */
 // scaleProductivity # 生产率 + 规模
 export const PROJ_METRIC = {
+  project: { en: 'project', zh: '项目信息', show: false },
   processQuality: { en: 'processQuality', zh: '过程质量' },
   progressDeviation: { en: 'progressDeviation', zh: '进度偏差率' },
   stageWorkload: { en: 'stageWorkload', zh: '阶段工作量' },
   scaleProductivity: { en: 'scaleProductivity', zh: '生产率&规模' },
   reviewDefect: { en: 'reviewDefect', zh: '评审和缺陷' },
 };
+// 项目度量指标 - 修改接口路径
+export const PK_PATH = '/api/project/kpi';
 
 /*  */
 // 分母默认值

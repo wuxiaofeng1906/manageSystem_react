@@ -2,7 +2,7 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2021-12-21 09:43:53
+ * @LastEditTime: 2021-12-22 10:22:11
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -24,7 +24,7 @@ const CheckboxGroup = Checkbox.Group;
 // checkbox框的文本值
 const plainOptions = (() => {
   const rets: string[] = [];
-  Object.values(PM)?.map((item) => rets.push(item.zh));
+  Object.values(PM)?.map((item) => (item['show'] === undefined ? rets.push(item.zh) : ''));
   return rets;
 })();
 
@@ -109,7 +109,7 @@ export default () => {
 
   /*  */
   return (
-    <>
+    <div style={{ marginLeft: 10 }}>
       <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>
         全选
       </Checkbox>
@@ -120,6 +120,6 @@ export default () => {
         value={checkedList}
         onChange={onChange}
       />
-    </>
+    </div>
   );
 };

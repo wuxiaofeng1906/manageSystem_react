@@ -2,7 +2,7 @@
  * @Description: 项目基本信息字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:44:08
- * @LastEditTime: 2021-12-21 10:00:50
+ * @LastEditTime: 2021-12-23 02:53:22
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -10,13 +10,29 @@
 import { DEFAULT_PLACEHOLDER, PROJ_STATUS, TABLE_GROUP_SHOW as SHOW } from '@/namespaces';
 import { ColDef, ColGroupDef } from 'ag-grid-community';
 import { doubleNumberF, numberF, stringF } from './baseParams';
+import pkEditValueSetter from './editables';
+
+/* 计算整数位数 */
+const getFillDigit = (value: number) => {
+  let digit = 1;
+  let ret = value / 10;
+  while (Math.floor(ret) > 0) {
+    ret /= 10;
+    digit++;
+  }
+  //
+  return digit;
+};
+let gDigit: number;
 
 /* 主要字段 */
 export const TableMajorCols: ColDef[] = [
   {
     headerName: '序',
-    field: 'order',
-    valueGetter: (props: any) => props.node.rowIndex + 1,
+    valueFormatter: (params: any) => {
+      if (gDigit === undefined) gDigit = getFillDigit(params.node.parent.allChildrenCount);
+      return `${params.node.rowIndex + 1}`.padStart(gDigit, '0');
+    },
     ...numberF,
   },
   {
@@ -51,8 +67,11 @@ export const TableMajorCols: ColDef[] = [
   {
     headerName: '项目分支',
     columnGroupShow: SHOW['closed'],
+    field: 'project.branch',
     filter: true,
-    valueGetter: () => DEFAULT_PLACEHOLDER,
+    editable: true,
+    valueFormatter: (params) => (params.value ? params.value : DEFAULT_PLACEHOLDER),
+    valueSetter: (params) => pkEditValueSetter('branch', params),
     ...stringF,
   },
   {

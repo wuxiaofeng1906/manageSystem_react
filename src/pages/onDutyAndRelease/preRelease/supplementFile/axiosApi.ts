@@ -140,6 +140,7 @@ const queryReleaseId = async () => {
   return result;
 };
 
+// 解析数据
 const getGridDataSource = (oldData: any) => {
 
   if (!oldData) {
@@ -192,12 +193,78 @@ const queryServiceByID = async (params: string) => {
 
 };
 
+// 获取上线环境
+const getOnlineDev = async () => {
+
+  const result: any = {
+    message: "",
+    data: []
+  };
+  await axios.get('/api/verify/release/online_environment', {})
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+
+};
+
+// 获取发布项
+const getPulishItem = async () => {
+
+  const result: any = {
+    message: "",
+    data: []
+  };
+  await axios.get('/api/verify/release/release_item', {})
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+
+};
+
+// 获取是否涉及接口和数据库升级
+const getIsApiAndDatabaseUpgrade = async () => {
+
+  const result: any = {
+    message: "",
+    data: []
+  };
+  await axios.get('/api/verify/release/api_database_upgrade', {})
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+
+};
+
 /* endregion */
 
 
 export {
   savePrePulishProjects, queryReleaseType, queryReleaseWay, queryReleaseId, queryServiceByID,
-  getInitPageData
+  getInitPageData, getOnlineDev, getPulishItem, getIsApiAndDatabaseUpgrade
 };
 
 

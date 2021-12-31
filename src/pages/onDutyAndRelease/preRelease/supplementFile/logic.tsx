@@ -2,14 +2,13 @@ import {savePrePulishProjects, queryServiceByID} from "@/pages/onDutyAndRelease/
 
 // 保存预发布项目
 const savePreProjects = async (source: any, listNo: string) => {
-  debugger;
 
   let result = {
     datas: [],
     errorMessage: ""
   };
   // 需要判断输入框不为空
-  if (!source.projectsName || (source.projectsName).length ===0) {
+  if (!source.projectsName || (source.projectsName).length === 0) {
     result.errorMessage = "项目名称不能为空！"
     return result;
   }
@@ -48,4 +47,10 @@ const inquireService = async (sorce: any) => {
   return result;
 
 };
-export {savePreProjects, inquireService};
+
+// 发布项的修改
+const upgradePulishItem = async (datas: any) => {
+// 需要验证必填项
+
+};
+export {savePreProjects, inquireService, upgradePulishItem};

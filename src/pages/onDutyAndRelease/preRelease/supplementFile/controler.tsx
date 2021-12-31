@@ -1,8 +1,12 @@
 import {message, Select} from "antd";
 import {getAllProject} from "@/publicMethods/verifyAxios";
-import {queryReleaseType, queryReleaseWay, queryReleaseId} from "./axiosApi";
+import {
+  queryReleaseType, queryReleaseWay, queryReleaseId, getOnlineDev, getPulishItem,
+  getIsApiAndDatabaseUpgrade
+} from "./axiosApi";
 
 const {Option} = Select;
+
 
 /* region 预发布项目 */
 // 项目名称下拉框
@@ -116,5 +120,92 @@ const loadReleaseIDSelect = async () => {
 
 };
 
+// 上线环境
+const loadOnlineEnvSelect = async () => {
+  const envs = await getOnlineDev();
+  const envData: any = [];
+
+  if (envs.message !== "") {
+    message.error({
+      content: envs.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (envs.data) {
+    const datas = envs.data;
+    datas.forEach((ele: any) => {
+      envData.push(
+        <Option key={ele.online_environment_id}
+                value={`${ele.online_environment_id}`}>{ele.online_environment_name}</Option>);
+
+    });
+  }
+
+  return envData;
+
+};
+
+// 发布项
+const loadPulishItemSelect = async () => {
+  const source = await getPulishItem();
+  const resultArray: any = [];
+
+  if (source.message !== "") {
+    message.error({
+      content: source.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (source.data) {
+    const datas = source.data;
+    datas.forEach((ele: any) => {
+      resultArray.push(
+        <Option key={ele.release_item_id}
+                value={`${ele.release_item_id}`}>{ele.release_item_name}</Option>);
+
+    });
+  }
+
+  return resultArray;
+
+};
+
+const loadIsApiAndDbUpgradeSelect = async () => {
+
+  const source = await getIsApiAndDatabaseUpgrade();
+  const resultArray: any = [];
+
+  if (source.message !== "") {
+    message.error({
+      content: source.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (source.data) {
+    const datas = source.data;
+    datas.forEach((ele: any) => {
+      resultArray.push(
+        <Option key={ele.upgrade_id}
+                value={`${ele.upgrade_id}`}>{ele.upgrade_item}</Option>);
+
+    });
+  }
+
+  return resultArray;
+
+
+};
+
 /* endregion */
-export {loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadReleaseIDSelect};
+
+export {
+  loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadReleaseIDSelect, loadOnlineEnvSelect,
+  loadPulishItemSelect, loadIsApiAndDbUpgradeSelect
+
+};

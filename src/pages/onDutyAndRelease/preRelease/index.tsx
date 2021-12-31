@@ -14,10 +14,11 @@ import moment from "moment";
 import {AgGridReact} from "ag-grid-react";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {
-  loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadReleaseIDSelect
+  loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadReleaseIDSelect, loadOnlineEnvSelect,
+  loadPulishItemSelect, loadIsApiAndDbUpgradeSelect
 } from "./supplementFile/controler";
 import {useRequest} from "ahooks";
-import {savePreProjects, inquireService} from "./supplementFile/logic";
+import {savePreProjects, inquireService, upgradePulishItem} from "./supplementFile/logic";
 import {alalysisInitData} from "./supplementFile/dataAnalyze";
 import {
   getReleaseItem, getIfOrNot, getDatabseAndApiUpgrade, getApiMethod, getUpgradeApi, getOnlineDev,
@@ -30,6 +31,8 @@ const {TextArea} = Input;
 const currentDate = dayjs().format("YYYYMMDD");
 let currentListNo = "";
 let releaseIdArray: any;
+const userLogins: any = localStorage.getItem("userLogins");
+const usersInfo = JSON.parse(userLogins);
 
 const PreRelease: React.FC<any> = () => {
   const [pulishItemForm] = Form.useForm();
@@ -57,17 +60,55 @@ const PreRelease: React.FC<any> = () => {
   const initData = useRequest(() => alalysisInitData()).data;
 
   /* region 新增行 */
+  const [pulishItemFormSelected, setPulishItemFormSelected] = useState({
+    onlineEnv: [],
+    pulishItem: [],
+    isApiDbUpgrade: []
+  });
+
+  const showPulishItemForm = async (type: any, params: any) => {
+
+    if (type === "add") {
+      pulishItemForm.resetFields();
+      setPulishItemModal({
+        shown: true,
+        title: "新增"
+      });
+    } else {
+      debugger;
+      pulishItemForm.setFieldsValue({
+        onlineEnv: params.online_environment,
+        pulishItem: params.release_item,
+        application: params.app,
+        hotUpdate: params.hot_update,
+        interAndDbUpgrade: params.is_upgrade_api_database,
+        branchAndEnv: params.branch_environment,
+        description: params.instructions,
+        remark: params.remarks,
+        appId: params.app_id,
+        automationTest: params.deployment_id
+
+      });
+      setPulishItemModal({
+        shown: true,
+        title: "修改"
+      });
+    }
+
+    setPulishItemFormSelected({
+      onlineEnv: await loadOnlineEnvSelect(),
+      pulishItem: await loadPulishItemSelect(),
+      isApiDbUpgrade: await loadIsApiAndDbUpgradeSelect()
+    });
+
+  };
 
   // 新增行
   (window as any).addRows = (types: any) => {
 
     switch (types) {
       case 1:
-        pulishItemForm.resetFields();
-        setPulishItemModal({
-          shown: true,
-          title: "新增"
-        });
+        showPulishItemForm("add", {});
         break;
 
       case 2:
@@ -107,20 +148,7 @@ const PreRelease: React.FC<any> = () => {
     //  显示数据
     switch (types) {
       case 1:
-        pulishItemForm.setFieldsValue({
-          onlineEnv: params.onlineDev,
-          pulishItem: params.pulishItem,
-          application: params.application,
-          hotUpdate: params.hotUpdate,
-          interAndDbUpgrade: params.upGrade,
-          branchAndEnv: params.branchAndDev,
-          description: params.desc,
-          remark: params.remark
-        });
-        setPulishItemModal({
-          shown: true,
-          title: "修改"
-        });
+        showPulishItemForm("modify", params);
         break;
       case 2:
         upgradeIntForm.setFieldsValue({
@@ -208,6 +236,18 @@ const PreRelease: React.FC<any> = () => {
   const operateRenderer = (type: number, params: any) => {
     const typeStr = JSON.stringify(type);
     const paramData = JSON.stringify(params.data);
+    if (type === 1) {  // 发布项没有新增功能
+      return `
+        <div style="margin-top: -5px">
+             <Button  style="border: none; background-color: transparent;  margin-left: -10px; " onclick='modifyRows(${typeStr},${paramData})'>
+              <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
+            </Button>
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteRows(${typeStr},${paramData})'>
+              <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
+            </Button>
+        </div>
+           `;
+    }
 
     return `
         <div style="margin-top: -5px">
@@ -328,9 +368,26 @@ const PreRelease: React.FC<any> = () => {
   };
 
   // 保存发布项结果
-  const savePulishResult = () => {
+  const savePulishResult = async () => {
     const formData = pulishItemForm.getFieldsValue();
+    const datas = {
+      "app_id": formData.appId,
+      "automation_test": formData.automationTest,
+      "ready_release_num": currentListNo,
+      "user_name": usersInfo.name,
+      "user_id": usersInfo.userid,
+      "online_environment": formData.onlineEnv,
+      "release_item": formData.pulishItem,
+      "app": formData.application,
+      "is_upgrade_api_database": formData.interAndDbUpgrade,
+      "hot_update": formData.hotUpdate,
+      "branch_environment": formData.branchAndEnv,
+      "instructions": formData.description,
+      "remarks": formData.remark,
 
+    };
+
+    const result = await upgradePulishItem(datas);
 
   };
 
@@ -1989,12 +2046,14 @@ const PreRelease: React.FC<any> = () => {
             <Col span={12}>
               <Form.Item name="onlineEnv" label="上线环境:" style={{marginTop: -15}}>
                 <Select showSearch>
+                  {pulishItemFormSelected.onlineEnv}
                 </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item name="pulishItem" label="发布项：" style={{marginTop: -15, marginLeft: 10}}>
                 <Select showSearch style={{marginLeft: 27, width: 183}}>
+                  {pulishItemFormSelected.pulishItem}
                 </Select>
               </Form.Item>
             </Col>
@@ -2003,24 +2062,26 @@ const PreRelease: React.FC<any> = () => {
           <Row>
             <Col span={12}>
               <Form.Item name="application" label="应用：" style={{marginTop: -15}}>
-                <Select showSearch style={{marginLeft: 28, width: 206}}>
-                </Select>
+                <Input autoComplete="off" style={{marginLeft: 28, width: 206, color: "black"}} disabled/>
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item name="branchAndEnv" label="分支和环境：" style={{marginTop: -15, marginLeft: 10}}>
-                <Input autoComplete="off"/>
+                <Input autoComplete="off" disabled style={{color: "black"}}/>
               </Form.Item>
             </Col>
           </Row>
 
           <Form.Item name="interAndDbUpgrade" label="是否涉及接口与数据库升级：" style={{marginTop: -15}}>
-            <Select showSearch style={{}}>
+            <Select>
+              {pulishItemFormSelected.isApiDbUpgrade}
             </Select>
           </Form.Item>
 
           <Form.Item name="hotUpdate" label="是否支持热更新：" style={{marginTop: -15}}>
-            <Select showSearch style={{}}>
+            <Select>
+              <Option key={"1"} value={"1"}>{"是"}</Option>
+              <Option key={"2"} value={"2"}>{"否"}</Option>
             </Select>
           </Form.Item>
 
@@ -2039,6 +2100,21 @@ const PreRelease: React.FC<any> = () => {
                     onClick={savePulishResult}>确定 </Button>
 
           </Form.Item>
+
+          {/* 隐藏字段，进行修改需要的字段 */}
+          <Row style={{marginTop: -60}}>
+            <Col span={12}>
+              <Form.Item name="appId">
+                <Input style={{width: 50, display: "none"}}/>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="automationTest">
+                <Input style={{width: 50, display: "none"}}/>
+              </Form.Item>
+            </Col>
+          </Row>
+
 
         </Form>
       </Modal>

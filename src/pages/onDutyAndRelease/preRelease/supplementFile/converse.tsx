@@ -133,40 +133,48 @@ const getUpgradeApi = (idStr: string) => {
 
 // 上线环境
 const getOnlineDev = (idStr: string) => {
-  let name = "";
-  switch (idStr) {
-    case "1":
-      name = "global";
-      break;
-    case "2":
-      name = "集群1";
-      break;
-    case "3":
-      name = "集群2";
-      break;
-    case "4":
-      name = "集群3";
-      break;
-    case "5":
-      name = "集群4";
-      break;
-    case "6":
-      name = "集群5";
-      break;
-    case "7":
-      name = "集群6";
-      break;
 
-    case "9":
-      name = "";
-      break;
+  const devArray = idStr.split(",");
+  let returnValue = "";
+  devArray.forEach((ele: string) => {
+    let name = "";
+    switch (ele) {
+      case "1":
+        name = "global";
+        break;
+      case "2":
+        name = "集群1";
+        break;
+      case "3":
+        name = "集群2";
+        break;
+      case "4":
+        name = "集群3";
+        break;
+      case "5":
+        name = "集群4";
+        break;
+      case "6":
+        name = "集群5";
+        break;
+      case "7":
+        name = "集群6";
+        break;
 
-    default:
-      break;
+      case "9":
+        name = "";
+        break;
 
-  }
+      default:
+        break;
 
-  return name;
+    }
+
+    returnValue = returnValue === "" ? name : `${returnValue},${name}`;
+  });
+
+
+  return returnValue;
 };
 
 // 修复类型

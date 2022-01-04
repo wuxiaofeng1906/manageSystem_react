@@ -262,31 +262,18 @@ const getIsApiAndDatabaseUpgrade = async () => {
 // 修改发布项
 const saveUpgradeItem = async (params: any) => {
 
-  const result: any = {
-    datas: {},
-    errorMessage: ""
-  };
-  debugger;
+  let errorMessage = "";
   await axios.post("/api/verify/release/upgrade_service", params)
     .then(function (res) {
-      if (res.data.code === 200) {
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
 
-        const timeData = res.data.data;
-        if (timeData) {
-          result.datas = {
-            editor: usersInfo.name,
-            editTime: timeData.edit_time
-          };
-        }
-
-      } else {
-        result.errorMessage = `错误：${res.data.msg}`;
       }
     }).catch(function (error) {
-      result.errorMessage = `异常信息:${error.toString()}`;
+      errorMessage = `异常信息:${error.toString()}`;
     });
 
-  return result;
+  return errorMessage;
 
 };
 

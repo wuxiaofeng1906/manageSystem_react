@@ -24,7 +24,6 @@ import {
   getReleaseItem, getIfOrNot, getDatabseAndApiUpgrade, getApiMethod, getUpgradeApi, getOnlineDev,
   getRepaireType, getPassOrNot, getTechSide
 } from "./supplementFile/converse";
-import {delUpgradeItem} from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
 
 const {TabPane} = Tabs;
 const {Option} = Select;
@@ -78,7 +77,7 @@ const PreRelease: React.FC<any> = () => {
     } else {
 
       pulishItemForm.setFieldsValue({
-        onlineEnv: params.online_environment,
+        onlineEnv: (params.online_environment).split(","),
         pulishItem: params.release_item,
         application: params.app,
         hotUpdate: params.hot_update,
@@ -87,7 +86,8 @@ const PreRelease: React.FC<any> = () => {
         description: params.instructions,
         remark: params.remarks,
         appId: params.app_id,
-        automationTest: params.deployment_id
+        automationTest: params.automation_check,
+        deploymentId: params.deployment_id,
 
       });
       setPulishItemModal({
@@ -218,19 +218,13 @@ const PreRelease: React.FC<any> = () => {
   };
 
   // 显示删除后的数据
-  const showdeletedNewData = (app_id: number) => {
+  const showdeletedNewData = async () => {
 
     const {type} = delModal;
     if (type === 1) { // 是发布项删除
-      const newArray: any = [];
-      firstUpSerGridApi.current?.forEachNode((node: any) => {
-        const rowdata = node.data;
-        if (rowdata.app_id !== app_id) {
-          newArray.push(rowdata);
-        }
-      });
+      const newData: any = await alalysisInitData("pulishItem");
+      firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
 
-      firstUpSerGridApi.current?.setRowData(newArray);
     } else if (type === 2) { // 是升级接口删除
 
     } else if (type === 3) { // 是数据修复review
@@ -252,7 +246,7 @@ const PreRelease: React.FC<any> = () => {
         },
       });
 
-      showdeletedNewData(delData?.app_id);
+      showdeletedNewData();
     } else {
       message.error({
         content: `${result}`,
@@ -345,6 +339,7 @@ const PreRelease: React.FC<any> = () => {
       headerName: '上线环境',
       field: 'online_environment',
       cellRenderer: (params: any) => {
+
         return `<span>${getOnlineDev(params.value)}</span>`
       }
 
@@ -422,13 +417,19 @@ const PreRelease: React.FC<any> = () => {
   const savePulishResult = async () => {
 
     const formData = pulishItemForm.getFieldsValue();
+    let onlineEnvStr = "";
+    formData.onlineEnv.forEach((ele: any) => {
+      onlineEnvStr = onlineEnvStr === "" ? ele : `${onlineEnvStr},${ele}`;
+    });
+
     const datas = {
       "app_id": formData.appId,
       "automation_test": formData.automationTest,
+      "deployment_id": formData.deploymentId,
       "ready_release_num": currentListNo,
       "user_name": usersInfo.name,
       "user_id": usersInfo.userid,
-      "online_environment": formData.onlineEnv,
+      "online_environment": onlineEnvStr,
       "release_item": formData.pulishItem,
       "app": formData.application,
       "is_upgrade_api_database": formData.interAndDbUpgrade,
@@ -440,6 +441,32 @@ const PreRelease: React.FC<any> = () => {
     };
 
     const result = await upgradePulishItem(datas);
+    if (result === "") {
+      message.info({
+        content: "修改成功！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      setPulishItemModal({
+        ...pulishItemModal,
+        shown: false
+      });
+
+      const newData: any = await alalysisInitData("pulishItem");
+      firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
+
+    } else {
+      message.error({
+        content: `${result}`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
 
   };
 
@@ -2158,13 +2185,18 @@ const PreRelease: React.FC<any> = () => {
 
           {/* 隐藏字段，进行修改需要的字段 */}
           <Row style={{marginTop: -60}}>
-            <Col span={3}>
+            <Col span={2}>
               <Form.Item name="appId">
                 <Input style={{width: 50, display: "none"}}/>
               </Form.Item>
             </Col>
-            <Col span={3}>
+            <Col span={2}>
               <Form.Item name="automationTest">
+                <Input style={{width: 50, display: "none"}}/>
+              </Form.Item>
+            </Col>
+            <Col span={2}>
+              <Form.Item name="deploymentId">
                 <Input style={{width: 50, display: "none"}}/>
               </Form.Item>
             </Col>

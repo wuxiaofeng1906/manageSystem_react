@@ -79,10 +79,14 @@ const analysiCorrespondOrder = (datas: any) => {
 
 /* endregion */
 
-const alalysisInitData = async () => {
+const alalysisInitData = async (queryData = "all") => {
 
   const result = await getInitPageData();
   const datas = result.data;
+
+  if (queryData === "pulishItem") {
+    return {upService_releaseItem: analysisReleaseItem(datas[0].update_app),} // 升级服务-发布项;
+  }
   return {
     // 预发布项目
     preProject: analysisPreReleaseProject(datas[0].project),

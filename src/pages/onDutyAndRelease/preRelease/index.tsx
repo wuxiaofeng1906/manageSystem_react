@@ -24,7 +24,7 @@ import {
   inquireService,
   upgradePulishItem,
   delUpgradeItems,
-  addPulishApi, confirmUpgradeService, dataRepaireReview
+  addPulishApi, confirmUpgradeService, dataRepaireReview, confirmDataRepairService
 } from "./supplementFile/logic";
 import {alalysisInitData} from "./supplementFile/dataAnalyze";
 import {
@@ -1030,15 +1030,38 @@ const PreRelease: React.FC<any> = () => {
     params.api.sizeColumnsToFit();
   };
   // 下拉框选择是否确认事件
-  const saveDataRepaireConfirmInfo = (params: any) => {
+  const saveDataRepaireConfirmInfo = async (params: any) => {
 
     //  如果前后两个值不同，则需要更新
     if (params.newValue !== params.oldValue) {
-      //   选择从否变是的话，需要更新确认时间；如果之前就是是，就不用更新数据 了。
-      if (params.newValue === "是") {
-        console.log(params);
 
+      const data = {
+        "user_name": usersInfo.name,
+        "user_id": usersInfo.userid,
+        "confirm_id": params.data?.confirm_id,
+        "ready_release_num": currentListNo,
+        "confirm_result": params.newValue
+      };
+
+      const result = await confirmDataRepairService(data);
+      if (result === "") {
+        message.info({
+          content: "保存成功！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      } else {
+        message.error({
+          content: `${result}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
       }
+
     }
   };
   /* endregion */

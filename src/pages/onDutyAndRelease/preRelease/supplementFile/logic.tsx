@@ -5,7 +5,8 @@ import {
   delUpgradeItem,
   savePulishApi,
   delPulishApi,
-  upgradeServiceConfirm, addDataRepaire, modifyDataRepaire, delDataReviewApi
+  upgradeServiceConfirm, addDataRepaire, modifyDataRepaire, delDataReviewApi,
+  dataRepairConfirm
 } from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
 
 const userLogins: any = localStorage.getItem("userLogins");
@@ -128,7 +129,14 @@ const dataRepaireReview = async (kind: string, currentListNo: string, datas: any
 
 };
 
+// 数据修复服务确认
+const confirmDataRepairService = async (datas: any) => {
+
+  return await dataRepairConfirm(datas);
+
+};
+
 export {
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems, addPulishApi, confirmUpgradeService,
-  dataRepaireReview
+  dataRepaireReview,confirmDataRepairService
 };

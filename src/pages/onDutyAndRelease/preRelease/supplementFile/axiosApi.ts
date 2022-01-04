@@ -502,12 +502,29 @@ const delDataReviewApi = async (id: number) => {
 
 }
 
+// 数据修复服务确认
+const dataRepairConfirm = async (datas: any) => {
+
+  let errorMessage = "";
+  await axios.post("/api/verify/release/review_confirm_always", datas)
+    .then(function (res) {
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+};
+
 /* endregion */
 export {
   savePrePulishProjects, queryReleaseType, queryReleaseWay, queryReleaseId, queryServiceByID,
   getInitPageData, getOnlineDev, getPulishItem, getIsApiAndDatabaseUpgrade, saveUpgradeItem,
   delUpgradeItem, getUpgradeApi, getApiService, getApiMethod, savePulishApi, delPulishApi,
-  upgradeServiceConfirm, getRepaireCategory, addDataRepaire, modifyDataRepaire, delDataReviewApi
+  upgradeServiceConfirm, getRepaireCategory, addDataRepaire, modifyDataRepaire, delDataReviewApi,
+  dataRepairConfirm
 };
 
 

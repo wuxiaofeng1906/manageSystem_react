@@ -2,7 +2,7 @@ import {message, Select} from "antd";
 import {getAllProject} from "@/publicMethods/verifyAxios";
 import {
   queryReleaseType, queryReleaseWay, queryReleaseId, getOnlineDev, getPulishItem,
-  getIsApiAndDatabaseUpgrade
+  getIsApiAndDatabaseUpgrade, getUpgradeApi, getApiService, getApiMethod
 } from "./axiosApi";
 
 const {Option} = Select;
@@ -174,6 +174,7 @@ const loadPulishItemSelect = async () => {
 
 };
 
+// 是否接口和数据库升级
 const loadIsApiAndDbUpgradeSelect = async () => {
 
   const source = await getIsApiAndDatabaseUpgrade();
@@ -204,8 +205,88 @@ const loadIsApiAndDbUpgradeSelect = async () => {
 
 /* endregion */
 
+/* region 升级接口 */
+
+// 升级接口
+const loadUpgradeApiSelect = async () => {
+  const source = await getUpgradeApi();
+  const resultArray: any = [];
+
+  if (source.message !== "") {
+    message.error({
+      content: source.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (source.data) {
+    const datas = source.data;
+    datas.forEach((ele: any) => {
+      resultArray.push(
+        <Option key={ele.type_id}
+                value={`${ele.type_id}`}>{ele.type_name}</Option>);
+
+    });
+  }
+
+  return resultArray;
+};
+
+// 接口服务
+const loadApiServiceSelect = async () => {
+  const source = await getApiService();
+  const resultArray: any = [];
+
+  if (source.message !== "") {
+    message.error({
+      content: source.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (source.data) {
+    const datas = source.data;
+    datas.forEach((ele: any) => {
+      resultArray.push(
+        <Option key={ele} value={`${ele}`}>{ele}</Option>);
+
+    });
+  }
+
+  return resultArray;
+};
+
+// 接口method
+const loadApiMethodSelect = async () => {
+  const source = await getApiMethod();
+  const resultArray: any = [];
+
+  if (source.message !== "") {
+    message.error({
+      content: source.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (source.data) {
+    const datas = source.data;
+    datas.forEach((ele: any) => {
+      resultArray.push(
+        <Option key={ele.method_id} value={`${ele.method_id}`}>{ele.method_name}</Option>);
+
+    });
+  }
+
+  return resultArray;
+};
+
+/* endregion */
+
 export {
   loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadReleaseIDSelect, loadOnlineEnvSelect,
-  loadPulishItemSelect, loadIsApiAndDbUpgradeSelect
+  loadPulishItemSelect, loadIsApiAndDbUpgradeSelect, loadUpgradeApiSelect, loadApiServiceSelect, loadApiMethodSelect
 
 };

@@ -85,7 +85,10 @@ const alalysisInitData = async (queryData = "all") => {
   const datas = result.data;
 
   if (queryData === "pulishItem") {
-    return {upService_releaseItem: analysisReleaseItem(datas[0].update_app),} // 升级服务-发布项;
+    return {upService_releaseItem: analysisReleaseItem(datas[0].update_app),}; // 升级服务-发布项;
+  }
+  if (queryData === "pulishApi") {
+    return {upService_interface: analysisUpInterface(datas[0].update_api)};
   }
   return {
     // 预发布项目

@@ -2,7 +2,10 @@ import {
   savePrePulishProjects,
   queryServiceByID,
   saveUpgradeItem,
-  delUpgradeItem
+  delUpgradeItem,
+  savePulishApi,
+  delPulishApi,
+  upgradeServiceConfirm
 } from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
 
 // 保存预发布项目
@@ -56,18 +59,18 @@ const inquireService = async (sorce: any) => {
 // 发布项的修改
 const upgradePulishItem = async (datas: any) => {
   // 需要验证必填项
-
   return await saveUpgradeItem(datas);
-
 };
 
 // 删除数据
-const delUpgradeItems = async (type: number, id: number) => {
+const delUpgradeItems = async (type: number, source: any) => {
+
   let delMessage = "";
   if (type === 1) { // 是发布项删除
-    delMessage = await delUpgradeItem(id);
+    delMessage = await delUpgradeItem(source.app_id);
 
   } else if (type === 2) { // 是升级接口删除
+    delMessage = await delPulishApi(source.api_id);
 
   } else if (type === 3) { // 是数据修复review
 
@@ -78,4 +81,19 @@ const delUpgradeItems = async (type: number, id: number) => {
   return delMessage;
 
 };
-export {savePreProjects, inquireService, upgradePulishItem, delUpgradeItems};
+
+// 发布接口保存
+const addPulishApi = async (datas: any) => {
+
+  return await savePulishApi(datas);
+
+};
+
+// 升级服务服务确认
+const confirmUpgradeService = async (datas: any) => {
+
+  return await upgradeServiceConfirm(datas);
+
+};
+
+export {savePreProjects, inquireService, upgradePulishItem, delUpgradeItems, addPulishApi,confirmUpgradeService};

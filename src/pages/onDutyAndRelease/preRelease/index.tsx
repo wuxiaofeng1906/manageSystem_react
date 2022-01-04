@@ -15,10 +15,16 @@ import {AgGridReact} from "ag-grid-react";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {
   loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadReleaseIDSelect, loadOnlineEnvSelect,
-  loadPulishItemSelect, loadIsApiAndDbUpgradeSelect
+  loadPulishItemSelect, loadIsApiAndDbUpgradeSelect, loadUpgradeApiSelect, loadApiServiceSelect, loadApiMethodSelect
 } from "./supplementFile/controler";
 import {useRequest} from "ahooks";
-import {savePreProjects, inquireService, upgradePulishItem, delUpgradeItems} from "./supplementFile/logic";
+import {
+  savePreProjects,
+  inquireService,
+  upgradePulishItem,
+  delUpgradeItems,
+  addPulishApi, confirmUpgradeService
+} from "./supplementFile/logic";
 import {alalysisInitData} from "./supplementFile/dataAnalyze";
 import {
   getReleaseItem, getIfOrNot, getDatabseAndApiUpgrade, getApiMethod, getUpgradeApi, getOnlineDev,
@@ -60,12 +66,15 @@ const PreRelease: React.FC<any> = () => {
   const initData = useRequest(() => alalysisInitData()).data;
 
   /* region 新增行 */
+
+  // 发布项弹出窗口中的select框加载
   const [pulishItemFormSelected, setPulishItemFormSelected] = useState({
     onlineEnv: [],
     pulishItem: [],
     isApiDbUpgrade: []
   });
 
+  // 发布项弹出窗口进行修改和新增
   const showPulishItemForm = async (type: any, params: any) => {
 
     if (type === "add") {
@@ -104,6 +113,51 @@ const PreRelease: React.FC<any> = () => {
 
   };
 
+  // 发布项弹出窗口中的select框加载
+  const [upgradeApiFormSelected, setUpgradeApiFormSelected] = useState({
+    onlineEnv: [],
+    upgradeApi: [],
+    apiService: [],
+    apiMethod: []
+  });
+  // 发布项弹出窗口进行修改和新增
+  const showUpgradeApiForm = async (type: any, params: any) => {
+
+    if (type === "add") {
+      upgradeIntForm.resetFields();
+      setUpgradeIntModal({
+        shown: true,
+        title: "新增"
+      });
+    } else {
+      upgradeIntForm.setFieldsValue({
+        onlineEnv: (params.online_environment).split(","),
+        upInterface: params.update_api,
+        interService: params.api_name,
+        hotUpdate: params.hot_update,
+        method: params.api_method,
+        URL: params.api_url,
+        renter: params.related_tenant,
+        remark: params.remarks,
+        appId: params.api_id
+      });
+      setUpgradeIntModal({
+        shown: true,
+        title: "修改"
+      });
+
+    }
+
+    setUpgradeApiFormSelected({
+      onlineEnv: await loadOnlineEnvSelect(),
+      upgradeApi: await loadUpgradeApiSelect(),
+      apiService: await loadApiServiceSelect(),
+      apiMethod: await loadApiMethodSelect()
+    });
+
+  };
+
+
   // 新增行
   (window as any).addRows = (types: any) => {
 
@@ -113,11 +167,8 @@ const PreRelease: React.FC<any> = () => {
         break;
 
       case 2:
-        upgradeIntForm.resetFields();
-        setUpgradeIntModal({
-          shown: true,
-          title: "新增"
-        });
+        showUpgradeApiForm("add", {});
+
         break;
 
       case 3:
@@ -152,20 +203,7 @@ const PreRelease: React.FC<any> = () => {
         showPulishItemForm("modify", params);
         break;
       case 2:
-        upgradeIntForm.setFieldsValue({
-          onlineEnv: params.onlineDev,
-          upInterface: params.upgradeInte,
-          interService: params.intService,
-          hotUpdate: params.hotUpdate,
-          method: params.intMethod,
-          URL: params.intURL,
-          renter: params.relateRenter,
-          remark: params.remark
-        });
-        setUpgradeIntModal({
-          shown: true,
-          title: "修改"
-        });
+        showUpgradeApiForm("modify", params);
         break;
       case 3:
 
@@ -202,6 +240,7 @@ const PreRelease: React.FC<any> = () => {
 
   /* region 删除功能 */
   const firstUpSerGridApi = useRef<GridApi>();
+  const secondUpSerGridApi = useRef<GridApi>();
 
   const [delModal, setDelModal] = useState({
     shown: false,
@@ -226,6 +265,8 @@ const PreRelease: React.FC<any> = () => {
       firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
 
     } else if (type === 2) { // 是升级接口删除
+      const newData: any = await alalysisInitData("pulishApi");
+      secondUpSerGridApi.current?.setRowData(newData.upService_interface);
 
     } else if (type === 3) { // 是数据修复review
 
@@ -233,10 +274,11 @@ const PreRelease: React.FC<any> = () => {
 
     }
   }
+
+  // 数据删除
   const delDetailsInfo = async () => {
 
-    const delData: any = delModal.datas;
-    const result: string = await delUpgradeItems(delModal.type, delData?.app_id);
+    const result: string = await delUpgradeItems(delModal.type, delModal.datas);
     if (result === "") {
       message.info({
         content: "删除成功！",
@@ -542,7 +584,7 @@ const PreRelease: React.FC<any> = () => {
         return operateRenderer(2, params)
       }
     }];
-  const secondUpSerGridApi = useRef<GridApi>();
+
   const onSecondGridReady = (params: GridReadyEvent) => {
     secondUpSerGridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -554,7 +596,58 @@ const PreRelease: React.FC<any> = () => {
   };
 
   // 保存数据
-  const saveUpgradeInterResult = () => {
+  const saveUpgradeInterResult = async () => {
+    const formData = upgradeIntForm.getFieldsValue();
+    let onlineEnvStr = "";
+    formData.onlineEnv.forEach((ele: any) => {
+      onlineEnvStr = onlineEnvStr === "" ? ele : `${onlineEnvStr},${ele}`;
+    });
+
+    const datas = {
+      "user_name": usersInfo.name,
+      "user_id": usersInfo.userid,
+      "online_environment": onlineEnvStr,
+      "update_api": formData.upInterface,
+      "api_service": formData.interService,
+      "api_url": formData.URL,
+      "api_method": formData.method,
+      "hot_update": formData.hotUpdate,
+      "related_tenant": formData.renter,
+      "remarks": formData.remark,
+      "ready_release_num": currentListNo
+    };
+
+    if (upgradeIntModal.title === "修改") {
+      datas["api_id"] = formData.appId;
+    }
+    const result = await addPulishApi(datas);
+    if (result === "") {
+      message.info({
+        content: "保存成功！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      setUpgradeIntModal({
+        ...upgradeIntModal,
+        shown: false,
+
+      });
+
+      const newData: any = await alalysisInitData("pulishApi");
+      secondUpSerGridApi.current?.setRowData(newData.upService_interface);
+
+    } else {
+      message.error({
+        content: `${result}`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
 
   };
   // 取消事件
@@ -569,6 +662,17 @@ const PreRelease: React.FC<any> = () => {
 
   /* region 升级服务 三  */
 
+
+  const confirmMappings = {
+    "1": "是",
+    "2": "否",
+
+  };
+
+  const confirmRender = () => {
+    return Object.keys(confirmMappings);
+  }
+
   const thirdUpSerColumn = [
     {
       headerName: '前端值班',
@@ -581,8 +685,18 @@ const PreRelease: React.FC<any> = () => {
       minWidth: 115,
       editable: true,
       cellEditor: "agSelectCellEditor",
-      cellEditorParams: {values: ["是", "否"]},
-      cellRenderer: selectColorRenderer
+      cellEditorParams: {values: confirmRender()},
+      filterParams: {
+        valueFormatter: (params: any) => {
+          return confirmMappings[params.value];
+        },
+      },
+      valueFormatter: (params: any) => {
+        return confirmMappings[params.value];
+      },
+      cellRenderer: selectColorRenderer,
+
+
     },
     {
       headerName: '确认时间',
@@ -598,7 +712,15 @@ const PreRelease: React.FC<any> = () => {
       minWidth: 115,
       editable: true,
       cellEditor: "agSelectCellEditor",
-      cellEditorParams: {values: ["是", "否"]},
+      cellEditorParams: {values: confirmRender()},
+      filterParams: {
+        valueFormatter: (params: any) => {
+          return confirmMappings[params.value];
+        },
+      },
+      valueFormatter: (params: any) => {
+        return confirmMappings[params.value];
+      },
       cellRenderer: selectColorRenderer
     },
     {
@@ -615,7 +737,15 @@ const PreRelease: React.FC<any> = () => {
       minWidth: 115,
       editable: true,
       cellEditor: "agSelectCellEditor",
-      cellEditorParams: {values: ["是", "否"]},
+      cellEditorParams: {values: confirmRender()},
+      filterParams: {
+        valueFormatter: (params: any) => {
+          return confirmMappings[params.value];
+        },
+      },
+      valueFormatter: (params: any) => {
+        return confirmMappings[params.value];
+      },
       cellRenderer: selectColorRenderer
     },
     {
@@ -632,7 +762,15 @@ const PreRelease: React.FC<any> = () => {
       minWidth: 115,
       editable: true,
       cellEditor: "agSelectCellEditor",
-      cellEditorParams: {values: ["是", "否"]},
+      cellEditorParams: {values: confirmRender()},
+      filterParams: {
+        valueFormatter: (params: any) => {
+          return confirmMappings[params.value];
+        },
+      },
+      valueFormatter: (params: any) => {
+        return confirmMappings[params.value];
+      },
       cellRenderer: selectColorRenderer
     },
     {
@@ -651,28 +789,54 @@ const PreRelease: React.FC<any> = () => {
   };
 
   // 下拉框选择是否确认事件
-  const saveUperConfirmInfo = (params: any) => {
+  const saveUperConfirmInfo = async (params: any) => {
+
+    const datas = {
+      "user_name": usersInfo.name,
+      "user_id": usersInfo.userid,
+      "person_type": "",
+      "ready_release_num": currentListNo,
+      "confirm_status": ""
+    };
     switch (params.column.colId) {
-      case "frontConfirm":  // 前端
+      case "front_confirm_status":  // 前端
+        datas.person_type = "front";
         break;
-      case "backendConfirm": // 后端
+      case "back_end_confirm_status": // 后端
+        datas.person_type = "back";
         break;
-      case "flowConfirmOk":  // 流程
+      case "process_confirm_status":  // 流程
+        datas.person_type = "process";
         break;
-      case "testConfirm": // 测试
+      case "test_confirm_status": // 测试
+        datas.person_type = "test";
         break;
       default:
         break;
     }
     //  如果前后两个值不同，则需要更新
     if (params.newValue !== params.oldValue) {
-      //   选择从否变是的话，需要更新确认时间；如果之前就是是，就不用更新数据 了。
-      if (params.newValue === "是") {
-        console.log(params);
-
-      }
+      datas.confirm_status = params.newValue;
     }
 
+    const result = await confirmUpgradeService(datas);
+    if (result === "") {
+      message.info({
+        content: "保存成功！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    } else {
+      message.error({
+        content: `${result}`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
 
   };
 
@@ -784,7 +948,15 @@ const PreRelease: React.FC<any> = () => {
       field: 'confirm_status',
       editable: true,
       cellEditor: "agSelectCellEditor",
-      cellEditorParams: {values: ["是", "否"]},
+      cellEditorParams: {values: confirmRender()},
+      filterParams: {
+        valueFormatter: (params: any) => {
+          return confirmMappings[params.value];
+        },
+      },
+      valueFormatter: (params: any) => {
+        return confirmMappings[params.value];
+      },
       cellRenderer: selectColorRenderer
     },
     {
@@ -2221,13 +2393,15 @@ const PreRelease: React.FC<any> = () => {
           <Row>
             <Col span={12}>
               <Form.Item name="onlineEnv" label="上线环境:" style={{marginTop: -15}}>
-                <Select showSearch style={{marginLeft: 20, width: 185}}>
+                <Select showSearch mode="multiple" style={{marginLeft: 20, width: 185}}>
+                  {upgradeApiFormSelected.onlineEnv}
                 </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item name="upInterface" label="升级接口：" style={{marginLeft: 10, marginTop: -15}}>
                 <Select showSearch style={{}}>
+                  {upgradeApiFormSelected.upgradeApi}
                 </Select>
               </Form.Item>
             </Col>
@@ -2238,6 +2412,7 @@ const PreRelease: React.FC<any> = () => {
             <Col span={12}>
               <Form.Item name="interService" label="接口服务：" style={{marginTop: -15}}>
                 <Select showSearch style={{marginLeft: 21, width: 185}}>
+                  {upgradeApiFormSelected.apiService}
                 </Select>
               </Form.Item>
             </Col>
@@ -2253,6 +2428,7 @@ const PreRelease: React.FC<any> = () => {
             <Col span={12}>
               <Form.Item name="method" label="接口Method：" style={{marginTop: -15}}>
                 <Select showSearch style={{}}>
+                  {upgradeApiFormSelected.apiMethod}
                 </Select>
               </Form.Item>
             </Col>
@@ -2265,13 +2441,16 @@ const PreRelease: React.FC<any> = () => {
           </Row>
 
           <Form.Item name="hotUpdate" label="是否支持热更新：" style={{marginTop: -15}}>
-            <Select showSearch style={{}}>
+            <Select>
+              <Option key={"1"} value={"1"}>{"是"}</Option>
+              <Option key={"2"} value={"2"}>{"否"}</Option>
             </Select>
           </Form.Item>
 
           <Form.Item name="remark" label="备注：" style={{marginTop: -15}}>
             <TextArea/>
           </Form.Item>
+
           <Form.Item>
             <Button
               style={{borderRadius: 5, marginLeft: 20, float: "right"}} onClick={upgradeIntModalCancle}>取消
@@ -2281,6 +2460,15 @@ const PreRelease: React.FC<any> = () => {
                     onClick={saveUpgradeInterResult}>确定 </Button>
 
           </Form.Item>
+          {/* 隐藏字段，进行修改需要的字段 */}
+          <Row style={{marginTop: -60}}>
+            <Col span={2}>
+              <Form.Item name="appId">
+                <Input style={{width: 50, display: "none"}}/>
+              </Form.Item>
+            </Col>
+
+          </Row>
 
         </Form>
       </Modal>

@@ -259,6 +259,7 @@ const getIsApiAndDatabaseUpgrade = async () => {
 
 };
 
+// 修改发布项
 const saveUpgradeItem = async (params: any) => {
 
   const result: any = {
@@ -268,7 +269,6 @@ const saveUpgradeItem = async (params: any) => {
   debugger;
   await axios.post("/api/verify/release/upgrade_service", params)
     .then(function (res) {
-      debugger;
       if (res.data.code === 200) {
 
         const timeData = res.data.data;
@@ -290,12 +290,34 @@ const saveUpgradeItem = async (params: any) => {
 
 };
 
+// 删除发布项数据
+const delUpgradeItem = async (id: number) => {
+  let errorMessage = "";
+
+  const datas = {
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "app_id": id
+  };
+  await axios.delete("/api/verify/release/upgrade_service", {data: datas})
+    .then(function (res) {
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+}
 /* endregion */
 
 
 export {
   savePrePulishProjects, queryReleaseType, queryReleaseWay, queryReleaseId, queryServiceByID,
-  getInitPageData, getOnlineDev, getPulishItem, getIsApiAndDatabaseUpgrade, saveUpgradeItem
+  getInitPageData, getOnlineDev, getPulishItem, getIsApiAndDatabaseUpgrade, saveUpgradeItem,
+  delUpgradeItem
 };
 
 

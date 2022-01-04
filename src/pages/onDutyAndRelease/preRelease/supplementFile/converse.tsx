@@ -142,29 +142,25 @@ const getOnlineDev = (idStr: string) => {
       name = "集群1";
       break;
     case "3":
-      name = "集群345";
-      break;
-    case "4":
-      name = "集群2345";
-      break;
-    case "5":
-      name = "集群12345";
-      break;
-    case "6":
       name = "集群2";
       break;
-    case "7":
+    case "4":
       name = "集群3";
       break;
-    case "8":
+    case "5":
       name = "集群4";
       break;
+    case "6":
+      name = "集群5";
+      break;
+    case "7":
+      name = "集群6";
+      break;
+
     case "9":
       name = "";
       break;
-    case "10":
-      name = "集群5";
-      break;
+
     default:
       break;
 

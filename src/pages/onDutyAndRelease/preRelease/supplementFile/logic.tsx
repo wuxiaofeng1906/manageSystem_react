@@ -1,7 +1,8 @@
 import {
   savePrePulishProjects,
   queryServiceByID,
-  saveUpgradeItem
+  saveUpgradeItem,
+  delUpgradeItem
 } from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
 
 // 保存预发布项目
@@ -54,9 +55,27 @@ const inquireService = async (sorce: any) => {
 
 // 发布项的修改
 const upgradePulishItem = async (datas: any) => {
- // 需要验证必填项
+  // 需要验证必填项
 
   return await saveUpgradeItem(datas);
 
 };
-export {savePreProjects, inquireService, upgradePulishItem};
+
+// 删除数据
+const delUpgradeItems = async (type: number, id: number) => {
+  let delMessage = "";
+  if (type === 1) { // 是发布项删除
+    delMessage = await delUpgradeItem(id);
+
+  } else if (type === 2) { // 是升级接口删除
+
+  } else if (type === 3) { // 是数据修复review
+
+  } else if (type === 4) { // 是上线分支删除
+
+  }
+
+  return delMessage;
+
+};
+export {savePreProjects, inquireService, upgradePulishItem, delUpgradeItems};

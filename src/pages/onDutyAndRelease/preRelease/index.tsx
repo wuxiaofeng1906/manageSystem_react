@@ -18,12 +18,13 @@ import {
   loadPulishItemSelect, loadIsApiAndDbUpgradeSelect
 } from "./supplementFile/controler";
 import {useRequest} from "ahooks";
-import {savePreProjects, inquireService, upgradePulishItem} from "./supplementFile/logic";
+import {savePreProjects, inquireService, upgradePulishItem, delUpgradeItems} from "./supplementFile/logic";
 import {alalysisInitData} from "./supplementFile/dataAnalyze";
 import {
   getReleaseItem, getIfOrNot, getDatabseAndApiUpgrade, getApiMethod, getUpgradeApi, getOnlineDev,
   getRepaireType, getPassOrNot, getTechSide
 } from "./supplementFile/converse";
+import {delUpgradeItem} from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
 
 const {TabPane} = Tabs;
 const {Option} = Select;
@@ -200,6 +201,8 @@ const PreRelease: React.FC<any> = () => {
   /* endregion  */
 
   /* region 删除功能 */
+  const firstUpSerGridApi = useRef<GridApi>();
+
   const [delModal, setDelModal] = useState({
     shown: false,
     type: -1,
@@ -214,8 +217,57 @@ const PreRelease: React.FC<any> = () => {
     });
   };
 
-  const delDetailsInfo = () => {
+  // 显示删除后的数据
+  const showdeletedNewData = (app_id: number) => {
 
+    const {type} = delModal;
+    if (type === 1) { // 是发布项删除
+      const newArray: any = [];
+      firstUpSerGridApi.current?.forEachNode((node: any) => {
+        const rowdata = node.data;
+        if (rowdata.app_id !== app_id) {
+          newArray.push(rowdata);
+        }
+      });
+
+      firstUpSerGridApi.current?.setRowData(newArray);
+    } else if (type === 2) { // 是升级接口删除
+
+    } else if (type === 3) { // 是数据修复review
+
+    } else if (type === 4) { // 是上线分支删除
+
+    }
+  }
+  const delDetailsInfo = async () => {
+
+    const delData: any = delModal.datas;
+    const result: string = await delUpgradeItems(delModal.type, delData?.app_id);
+    if (result === "") {
+      message.info({
+        content: "删除成功！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      showdeletedNewData(delData?.app_id);
+    } else {
+      message.error({
+        content: `${result}`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+
+    setDelModal({
+      shown: false,
+      type: -1,
+      datas: {}
+    });
   };
 
   // 删除事件
@@ -287,8 +339,7 @@ const PreRelease: React.FC<any> = () => {
     return `<span style="color: ${Color}"> ${values}</span>`
   };
 
-  /* region 升级服务 一 */
-  const firstUpSerGridApi = useRef<GridApi>();
+  /* region 升级服务 一  发布项 */
   const firstUpSerColumn: any = [
     {
       headerName: '上线环境',
@@ -1323,21 +1374,24 @@ const PreRelease: React.FC<any> = () => {
 
   const inquireServiceClick = async () => {
 
-    const result = await inquireService(releaseIdArray);
-    if (result.message !== "") {
-      message.error({
-        content: result.message,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    } else {
-      // 有数据之后进行表格的赋值操作
-      firstUpSerGridApi.current?.setRowData(result.data);
-      secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
-      thirdUpSerGridApi.current?.setRowData([{}]); // 需要给服务确认设置一行空值
+    if (releaseIdArray) {
+      const result = await inquireService(releaseIdArray);
+      if (result.message !== "") {
+        message.error({
+          content: result.message,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      } else {
+        // 有数据之后进行表格的赋值操作
+        firstUpSerGridApi.current?.setRowData(result.data);
+        secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
+        thirdUpSerGridApi.current?.setRowData([{}]); // 需要给服务确认设置一行空值
+      }
     }
+
   };
 
   /* endregion */
@@ -2046,7 +2100,7 @@ const PreRelease: React.FC<any> = () => {
           <Row>
             <Col span={12}>
               <Form.Item name="onlineEnv" label="上线环境:" style={{marginTop: -15}}>
-                <Select showSearch>
+                <Select showSearch mode="multiple">
                   {pulishItemFormSelected.onlineEnv}
                 </Select>
               </Form.Item>

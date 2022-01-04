@@ -408,7 +408,7 @@ const delPulishApi = async (id: number) => {
 
 // 服务确认
 const upgradeServiceConfirm = async (datas: any) => {
-  debugger;
+
   let errorMessage = "";
   await axios.post("/api/verify/release/upgrade_confirm", datas)
     .then(function (res) {
@@ -421,11 +421,93 @@ const upgradeServiceConfirm = async (datas: any) => {
 
   return errorMessage;
 };
+
+/* region 数据修复 */
+
+// 修复类别
+const getRepaireCategory = async () => {
+
+  const result: any = {
+    message: "",
+    data: []
+  };
+  await axios.get('/api/verify/release/repair_type', {})
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+
+};
+
+// 新增数据修复数据
+const addDataRepaire = async (datas: any) => {
+
+  let errorMessage = "";
+  await axios.post("/api/verify/release/review_confirm", datas)
+    .then(function (res) {
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+};
+
+// 修改数据修复数据
+const modifyDataRepaire = async (datas: any) => {
+
+  let errorMessage = "";
+  await axios.put("/api/verify/release/review_confirm", datas)
+    .then(function (res) {
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+};
+
+// review 删除数据接口
+const delDataReviewApi = async (id: number) => {
+  let errorMessage = "";
+
+  const datas = {
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "review_id": id
+  };
+  await axios.delete("/api/verify/release/review_confirm", {data: datas})
+    .then(function (res) {
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+}
+
+/* endregion */
 export {
   savePrePulishProjects, queryReleaseType, queryReleaseWay, queryReleaseId, queryServiceByID,
   getInitPageData, getOnlineDev, getPulishItem, getIsApiAndDatabaseUpgrade, saveUpgradeItem,
   delUpgradeItem, getUpgradeApi, getApiService, getApiMethod, savePulishApi, delPulishApi,
-  upgradeServiceConfirm
+  upgradeServiceConfirm, getRepaireCategory, addDataRepaire, modifyDataRepaire, delDataReviewApi
 };
 
 

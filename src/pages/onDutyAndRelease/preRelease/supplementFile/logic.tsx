@@ -5,8 +5,11 @@ import {
   delUpgradeItem,
   savePulishApi,
   delPulishApi,
-  upgradeServiceConfirm
+  upgradeServiceConfirm, addDataRepaire, modifyDataRepaire, delDataReviewApi
 } from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
+
+const userLogins: any = localStorage.getItem("userLogins");
+const usersInfo = JSON.parse(userLogins);
 
 // 保存预发布项目
 const savePreProjects = async (source: any, listNo: string) => {
@@ -73,6 +76,7 @@ const delUpgradeItems = async (type: number, source: any) => {
     delMessage = await delPulishApi(source.api_id);
 
   } else if (type === 3) { // 是数据修复review
+    delMessage = await delDataReviewApi(source.review_id)
 
   } else if (type === 4) { // 是上线分支删除
 
@@ -96,4 +100,35 @@ const confirmUpgradeService = async (datas: any) => {
 
 };
 
-export {savePreProjects, inquireService, upgradePulishItem, delUpgradeItems, addPulishApi,confirmUpgradeService};
+// 数据修复的新增和修改
+const dataRepaireReview = async (kind: string, currentListNo: string, datas: any) => {
+
+  const data = {
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "review_result": datas.EvalResult,
+    "is_repeat": datas.repeatExecute,
+    "repair_data_content": datas.repaireContent,
+    "related_tenant": datas.relatedRenter,
+    "type": datas.types,
+    "commit_user_id": (datas.repaireCommiter).split("&")[0],
+    "commit_user_name": (datas.repaireCommiter).split("&")[1],
+    "branch": datas.branch,
+    "ready_release_num": currentListNo,
+  }
+
+  if (kind === "新增") {
+    return await addDataRepaire(data);
+  }
+
+  // 以下是修改
+  data["review_id"] = datas.reviewId;
+  return await modifyDataRepaire(data);
+
+
+};
+
+export {
+  savePreProjects, inquireService, upgradePulishItem, delUpgradeItems, addPulishApi, confirmUpgradeService,
+  dataRepaireReview
+};

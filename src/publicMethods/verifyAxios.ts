@@ -134,4 +134,26 @@ const getPrincipal = async () => {
 
   return principalInfo;
 };
-export {getAllUsers, getAllProject, getProjectType, getBranchName, getEnvironment, getPrincipal};
+
+// 获取所有人员
+const getAllDeptUsers = async () => {
+  const principalInfo = {
+    message: "",
+    data: []
+  };
+  await axios.get('/api/verify/apply/applicant', {params: {}})
+    .then(function (res) {
+
+      if (res.data.code === 200) {
+        principalInfo.data = res.data.data;
+      } else {
+        principalInfo.message = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      principalInfo.message = `异常信息:${error.toString()}`;
+    });
+
+  return principalInfo;
+};
+
+export {getAllUsers, getAllProject, getProjectType, getBranchName, getEnvironment, getPrincipal, getAllDeptUsers};

@@ -90,6 +90,10 @@ const alalysisInitData = async (queryData = "all") => {
   if (queryData === "pulishApi") {
     return {upService_interface: analysisUpInterface(datas[0].update_api)};
   }
+
+  if (queryData === "dataReview") {
+    return {reviewData_repaire: analysisReviewData(datas[0].review_data)}
+  }
   return {
     // 预发布项目
     preProject: analysisPreReleaseProject(datas[0].project),

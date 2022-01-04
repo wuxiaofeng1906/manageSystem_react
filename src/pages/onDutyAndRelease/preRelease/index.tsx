@@ -15,7 +15,8 @@ import {AgGridReact} from "ag-grid-react";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {
   loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadReleaseIDSelect, loadOnlineEnvSelect,
-  loadPulishItemSelect, loadIsApiAndDbUpgradeSelect, loadUpgradeApiSelect, loadApiServiceSelect, loadApiMethodSelect
+  loadPulishItemSelect, loadIsApiAndDbUpgradeSelect, loadUpgradeApiSelect, loadApiServiceSelect, loadApiMethodSelect,
+  loadCategorySelect, loadCommiterSelect
 } from "./supplementFile/controler";
 import {useRequest} from "ahooks";
 import {
@@ -23,7 +24,7 @@ import {
   inquireService,
   upgradePulishItem,
   delUpgradeItems,
-  addPulishApi, confirmUpgradeService
+  addPulishApi, confirmUpgradeService, dataRepaireReview
 } from "./supplementFile/logic";
 import {alalysisInitData} from "./supplementFile/dataAnalyze";
 import {
@@ -73,7 +74,6 @@ const PreRelease: React.FC<any> = () => {
     pulishItem: [],
     isApiDbUpgrade: []
   });
-
   // 发布项弹出窗口进行修改和新增
   const showPulishItemForm = async (type: any, params: any) => {
 
@@ -139,7 +139,7 @@ const PreRelease: React.FC<any> = () => {
         URL: params.api_url,
         renter: params.related_tenant,
         remark: params.remarks,
-        appId: params.api_id
+        apiId: params.api_id
       });
       setUpgradeIntModal({
         shown: true,
@@ -157,7 +157,47 @@ const PreRelease: React.FC<any> = () => {
 
   };
 
+  // 数据修复review 弹窗selected框
+  const [dataReviewFormSelected, setDataReviewFormSelected] = useState({
+    category: [],
+    repairCommiter: [],
+  });
 
+  // 数据修复review弹出窗口进行修改和新增
+  const showDataReviewForm = async (type: any, params: any) => {
+
+    if (type === "add") {
+      dataReviewForm.resetFields();
+      setDataReviewModal({
+        shown: true,
+        title: "新增"
+      });
+    } else {
+      debugger;
+      dataReviewForm.setFieldsValue({
+        repaireContent: params.repair_data_content,
+        relatedRenter: params.related_tenant,
+        types: params.type,
+        repaireCommiter: `${params.commit_user_id}&${params.commit_user_name}`,
+        branch: params.branch,
+        EvalResult: params.review_result,
+        repeatExecute: params.is_repeat,
+        reviewId: params.review_id
+      });
+      setDataReviewModal({
+        shown: true,
+        title: "修改"
+      });
+
+    }
+
+    setDataReviewFormSelected({
+      category: await loadCategorySelect(),
+      repairCommiter: await loadCommiterSelect(),
+
+    });
+
+  };
   // 新增行
   (window as any).addRows = (types: any) => {
 
@@ -172,11 +212,7 @@ const PreRelease: React.FC<any> = () => {
         break;
 
       case 3:
-        dataReviewForm.resetFields();
-        setDataReviewModal({
-          shown: true,
-          title: "新增"
-        });
+        showDataReviewForm("add", {});
         break;
       case 4:
         // dataReviewForm.resetFields();
@@ -206,20 +242,7 @@ const PreRelease: React.FC<any> = () => {
         showUpgradeApiForm("modify", params);
         break;
       case 3:
-
-        dataReviewForm.setFieldsValue({
-          repaireContent: params.repaireContent,
-          relatedRenter: params.relateRenter,
-          types: params.type,
-          repaireCommiter: params.repaireCommiter,
-          branch: params.branch,
-          EvalResult: params.reviewResult,
-          repeatExecute: params.repeatExcute
-        });
-        setDataReviewModal({
-          shown: true,
-          title: "修改"
-        });
+        showDataReviewForm("modify", params);
         break;
 
       case 4:
@@ -241,6 +264,7 @@ const PreRelease: React.FC<any> = () => {
   /* region 删除功能 */
   const firstUpSerGridApi = useRef<GridApi>();
   const secondUpSerGridApi = useRef<GridApi>();
+  const firstDataReviewGridApi = useRef<GridApi>();
 
   const [delModal, setDelModal] = useState({
     shown: false,
@@ -268,7 +292,10 @@ const PreRelease: React.FC<any> = () => {
       const newData: any = await alalysisInitData("pulishApi");
       secondUpSerGridApi.current?.setRowData(newData.upService_interface);
 
-    } else if (type === 3) { // 是数据修复review
+    } else if (type === 3) { // 是数据修复review、
+      const newData: any = await alalysisInitData("dataReview");
+      firstDataReviewGridApi.current?.setRowData(newData.reviewData_repaire);
+
 
     } else if (type === 4) { // 是上线分支删除
 
@@ -618,7 +645,7 @@ const PreRelease: React.FC<any> = () => {
     };
 
     if (upgradeIntModal.title === "修改") {
-      datas["api_id"] = formData.appId;
+      datas["api_id"] = formData.apiId;
     }
     const result = await addPulishApi(datas);
     if (result === "") {
@@ -913,7 +940,6 @@ const PreRelease: React.FC<any> = () => {
         return operateRenderer(3, params);
       }
     }];
-  const firstDataReviewGridApi = useRef<GridApi>();
   const onfirstDataReviewGridReady = (params: GridReadyEvent) => {
     firstDataReviewGridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -931,8 +957,38 @@ const PreRelease: React.FC<any> = () => {
     });
 
   };
-  const saveDataReviewResult = () => {
 
+  // 保存数据修复review
+  const saveDataReviewResult = async () => {
+    const formData = dataReviewForm.getFieldsValue();
+    const result = await dataRepaireReview(dataReviewtModal.title, currentListNo, formData);
+    if (result === "") {
+      message.info({
+        content: "保存成功！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      setDataReviewModal({
+        shown: false,
+        title: "新增"
+      });
+
+      //   刷新
+      const newData: any = await alalysisInitData("dataReview");
+      firstDataReviewGridApi.current?.setRowData(newData.reviewData_repaire);
+
+    } else {
+      message.error({
+        content: `${result}`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
   };
   /* endregion */
 
@@ -2463,7 +2519,7 @@ const PreRelease: React.FC<any> = () => {
           {/* 隐藏字段，进行修改需要的字段 */}
           <Row style={{marginTop: -60}}>
             <Col span={2}>
-              <Form.Item name="appId">
+              <Form.Item name="apiId">
                 <Input style={{width: 50, display: "none"}}/>
               </Form.Item>
             </Col>
@@ -2495,7 +2551,8 @@ const PreRelease: React.FC<any> = () => {
             </Col>
             <Col span={12}>
               <Form.Item name="types" label="类型：" style={{marginLeft: 10, marginTop: -15}}>
-                <Select showSearch style={{}}>
+                <Select showSearch>
+                  {dataReviewFormSelected.category}
                 </Select>
               </Form.Item>
             </Col>
@@ -2504,7 +2561,8 @@ const PreRelease: React.FC<any> = () => {
           <Row>
             <Col span={12}>
               <Form.Item name="repaireCommiter" label="修复提交人：" style={{marginTop: -15}}>
-                <Select showSearch style={{}}>
+                <Select showSearch>
+                  {dataReviewFormSelected.repairCommiter}
                 </Select>
               </Form.Item>
             </Col>
@@ -2519,13 +2577,17 @@ const PreRelease: React.FC<any> = () => {
           <Row>
             <Col span={12}>
               <Form.Item name="EvalResult" label="评审结果：" style={{marginTop: -15}}>
-                <Select showSearch style={{width: 191, marginLeft: 14}}>
+                <Select style={{width: 191, marginLeft: 14}}>
+                  <Option key={"1"} value={"1"}>{"通过"}</Option>
+                  <Option key={"2"} value={"2"}>{"不通过"}</Option>
                 </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item name="repeatExecute" label="是否可重复执行：" style={{marginLeft: 10, marginTop: -15}}>
-                <Select showSearch style={{}}>
+                <Select>
+                  <Option key={"1"} value={"1"}>{"是"}</Option>
+                  <Option key={"2"} value={"2"}>{"否"}</Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -2540,6 +2602,15 @@ const PreRelease: React.FC<any> = () => {
                     onClick={saveDataReviewResult}>确定 </Button>
 
           </Form.Item>
+          {/* 隐藏字段，进行修改需要的字段 */}
+          <Row style={{marginTop: -60}}>
+            <Col span={2}>
+              <Form.Item name="reviewId">
+                <Input style={{width: 50, display: "none"}}/>
+              </Form.Item>
+            </Col>
+
+          </Row>
 
         </Form>
       </Modal>

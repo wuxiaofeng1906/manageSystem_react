@@ -1,8 +1,8 @@
 import {message, Select} from "antd";
-import {getAllProject} from "@/publicMethods/verifyAxios";
+import {getAllProject, getAllDeptUsers} from "@/publicMethods/verifyAxios";
 import {
   queryReleaseType, queryReleaseWay, queryReleaseId, getOnlineDev, getPulishItem,
-  getIsApiAndDatabaseUpgrade, getUpgradeApi, getApiService, getApiMethod
+  getIsApiAndDatabaseUpgrade, getUpgradeApi, getApiService, getApiMethod, getRepaireCategory
 } from "./axiosApi";
 
 const {Option} = Select;
@@ -285,8 +285,64 @@ const loadApiMethodSelect = async () => {
 
 /* endregion */
 
+
+/* region 数据修复 */
+
+// 修复类型select
+const loadCategorySelect = async () => {
+  const source = await getRepaireCategory();
+  const resultArray: any = [];
+
+  if (source.message !== "") {
+    message.error({
+      content: source.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (source.data) {
+    const datas = source.data;
+    datas.forEach((ele: any) => {
+      resultArray.push(
+        <Option key={ele.repair_id} value={`${ele.repair_id}`}>{ele.repair_name}</Option>);
+
+    });
+  }
+
+  return resultArray;
+
+}
+
+// 修复类型select
+const loadCommiterSelect = async () => {
+  const source = await getAllDeptUsers();
+  const resultArray: any = [];
+
+  if (source.message !== "") {
+    message.error({
+      content: source.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (source.data) {
+    const datas = source.data;
+    datas.forEach((ele: any) => {
+      resultArray.push(
+        <Option key={ele.user_id} value={`${ele.user_id}&${ele.user_name}`}>{ele.user_name}</Option>);
+
+    });
+  }
+
+  return resultArray;
+
+}
+/* endregion */
 export {
   loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadReleaseIDSelect, loadOnlineEnvSelect,
-  loadPulishItemSelect, loadIsApiAndDbUpgradeSelect, loadUpgradeApiSelect, loadApiServiceSelect, loadApiMethodSelect
+  loadPulishItemSelect, loadIsApiAndDbUpgradeSelect, loadUpgradeApiSelect, loadApiServiceSelect, loadApiMethodSelect,
+  loadCategorySelect, loadCommiterSelect
 
 };

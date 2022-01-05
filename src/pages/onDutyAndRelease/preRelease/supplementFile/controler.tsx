@@ -3,7 +3,7 @@ import {getAllProject, getAllDeptUsers, getBranchName, getServices, getImgEnv} f
 import {
   queryReleaseType, queryReleaseWay, queryReleaseId, getOnlineDev, getPulishItem,
   getIsApiAndDatabaseUpgrade, getUpgradeApi, getApiService, getApiMethod, getRepaireCategory,
-  getTechSide
+  getTechSide, getCheckType,getBrowserType
 } from "./axiosApi";
 
 const {Option} = Select;
@@ -447,10 +447,64 @@ const loadImgEnvSelect = async () => {
 
 };
 
+// 镜像环境下拉框
+const loadCheckTypeSelect = async () => {
+
+  const source = await getCheckType();
+  const resultArray: any = [];
+
+  if (source.message !== "") {
+    message.error({
+      content: source.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (source.data) {
+    const datas = source.data;
+    datas.forEach((ele: any) => {
+      resultArray.push(
+        <Option key={ele.check_type_id} value={`${ele.check_type_id}`}>{ele.check_type_name}</Option>);
+
+    });
+  }
+
+  return resultArray;
+
+};
+
+
+// 镜像环境下拉框
+const loadBrowserTypeSelect = async () => {
+
+  const source = await getBrowserType();
+  const resultArray: any = [];
+
+  if (source.message !== "") {
+    message.error({
+      content: source.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (source.data) {
+    const datas = source.data;
+    datas.forEach((ele: any) => {
+      resultArray.push(
+        <Option key={ele.browser_id} value={`${ele.browser_id}`}>{ele.browse_name}</Option>);
+
+    });
+  }
+
+  return resultArray;
+
+};
 /* endregion */
 export {
   loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadReleaseIDSelect, loadOnlineEnvSelect,
   loadPulishItemSelect, loadIsApiAndDbUpgradeSelect, loadUpgradeApiSelect, loadApiServiceSelect, loadApiMethodSelect,
   loadCategorySelect, loadCommiterSelect, loadTechSideSelect, loadBranchNameSelect, loadServiceSelect, loadImgEnvSelect,
-
+  loadCheckTypeSelect,loadBrowserTypeSelect
 };

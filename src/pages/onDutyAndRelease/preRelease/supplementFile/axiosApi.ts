@@ -542,6 +542,45 @@ const getTechSide = async () => {
   return result;
 };
 
+// 获取检查类型
+const getCheckType = async () => {
+  const result: any = {
+    message: "",
+    data: []
+  };
+  await axios.get('/api/verify/release/check_type', {})
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+};
+
+// 获取浏览器类型
+const getBrowserType = async () => {
+  const result: any = {
+    message: "",
+    data: []
+  };
+  await axios.get('/api/verify/release/browser', {})
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+};
 /* endregion */
 
 export {
@@ -549,7 +588,7 @@ export {
   getInitPageData, getOnlineDev, getPulishItem, getIsApiAndDatabaseUpgrade, saveUpgradeItem,
   delUpgradeItem, getUpgradeApi, getApiService, getApiMethod, savePulishApi, delPulishApi,
   upgradeServiceConfirm, getRepaireCategory, addDataRepaire, modifyDataRepaire, delDataReviewApi,
-  dataRepairConfirm, getTechSide
+  dataRepairConfirm, getTechSide,getCheckType,getBrowserType
 };
 
 

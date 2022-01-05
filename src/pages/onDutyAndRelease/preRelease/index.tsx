@@ -16,7 +16,8 @@ import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {
   loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadReleaseIDSelect, loadOnlineEnvSelect,
   loadPulishItemSelect, loadIsApiAndDbUpgradeSelect, loadUpgradeApiSelect, loadApiServiceSelect, loadApiMethodSelect,
-  loadCategorySelect, loadCommiterSelect, loadTechSideSelect, loadBranchNameSelect, loadServiceSelect, loadImgEnvSelect
+  loadCategorySelect, loadCommiterSelect, loadTechSideSelect, loadBranchNameSelect, loadServiceSelect, loadImgEnvSelect,
+  loadCheckTypeSelect, loadBrowserTypeSelect
 } from "./supplementFile/controler";
 import {useRequest} from "ahooks";
 import {
@@ -119,8 +120,6 @@ const PreRelease: React.FC<any> = () => {
     upgradeApi: [],
     apiService: [],
     apiMethod: [],
-    ckeckType:[],
-    browser:[]
   });
   // 发布项弹出窗口进行修改和新增
   const showUpgradeApiForm = async (type: any, params: any) => {
@@ -200,13 +199,14 @@ const PreRelease: React.FC<any> = () => {
 
   };
 
-
   // 上线分支 弹窗selected框
   const [onlineBranchFormSelected, setOnlineBranchFormSelected] = useState({
     branchName: [],
     techSide: [],
     server: [],
-    imgEnv: []
+    imgEnv: [],
+    checkType: [],
+    browser: []
   });
 
   // 上线分支弹出窗口进行修改和新增
@@ -241,7 +241,10 @@ const PreRelease: React.FC<any> = () => {
       branchName: await loadBranchNameSelect(),
       techSide: await loadTechSideSelect(),
       server: await loadServiceSelect(),
-      imgEnv: await loadImgEnvSelect()
+      imgEnv: await loadImgEnvSelect(),
+      checkType: await loadCheckTypeSelect(),
+      browser: await loadBrowserTypeSelect()
+
     });
 
   };
@@ -2875,6 +2878,7 @@ const PreRelease: React.FC<any> = () => {
                 {/* 检查类型 */}
                 <Form.Item label="检查类型:" name="beforeCheckType" style={{marginTop: -10}}>
                   <Select mode="multiple" style={{width: '100%'}} showSearch>
+                    {onlineBranchFormSelected.checkType}
                   </Select>
                 </Form.Item>
               </Col>
@@ -2890,6 +2894,7 @@ const PreRelease: React.FC<any> = () => {
                 {/* 浏览器 */}
                 <Form.Item label="浏览器:" name="beforeBrowser" style={{marginTop: -10, marginLeft: 10}}>
                   <Select style={{width: '100%'}} showSearch>
+                    {onlineBranchFormSelected.browser}
                   </Select>
                 </Form.Item>
               </Col>
@@ -2912,6 +2917,7 @@ const PreRelease: React.FC<any> = () => {
                 {/* 检查类型 */}
                 <Form.Item label="检查类型:" name="afterCheckType" style={{marginTop: -10}}>
                   <Select mode="multiple" style={{width: '100%'}} showSearch>
+                    {onlineBranchFormSelected.checkType}
                   </Select>
                 </Form.Item>
               </Col>
@@ -2927,6 +2933,7 @@ const PreRelease: React.FC<any> = () => {
                 {/* 浏览器 */}
                 <Form.Item label="浏览器:" name="afterBrowser" style={{marginTop: -10, marginLeft: 10}}>
                   <Select style={{width: '100%'}} showSearch>
+                    {onlineBranchFormSelected.browser}
                   </Select>
                 </Form.Item>
               </Col>

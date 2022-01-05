@@ -1,8 +1,9 @@
 import {message, Select} from "antd";
-import {getAllProject, getAllDeptUsers} from "@/publicMethods/verifyAxios";
+import {getAllProject, getAllDeptUsers, getBranchName, getServices, getImgEnv} from "@/publicMethods/verifyAxios";
 import {
   queryReleaseType, queryReleaseWay, queryReleaseId, getOnlineDev, getPulishItem,
-  getIsApiAndDatabaseUpgrade, getUpgradeApi, getApiService, getApiMethod, getRepaireCategory
+  getIsApiAndDatabaseUpgrade, getUpgradeApi, getApiService, getApiMethod, getRepaireCategory,
+  getTechSide
 } from "./axiosApi";
 
 const {Option} = Select;
@@ -285,7 +286,6 @@ const loadApiMethodSelect = async () => {
 
 /* endregion */
 
-
 /* region 数据修复 */
 
 // 修复类型select
@@ -340,9 +340,117 @@ const loadCommiterSelect = async () => {
 
 }
 /* endregion */
+
+/* region 上线分支 */
+
+// 技术侧下拉框
+const loadTechSideSelect = async () => {
+  const source = await getTechSide();
+  const resultArray: any = [];
+
+  if (source.message !== "") {
+    message.error({
+      content: source.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (source.data) {
+    const datas = source.data;
+    datas.forEach((ele: any) => {
+      resultArray.push(
+        <Option key={ele.technical_side_id} value={`${ele.technical_side_id}`}>{ele.technical_side}</Option>);
+
+    });
+  }
+
+  return resultArray;
+};
+
+// 分支名称下拉框
+const loadBranchNameSelect = async () => {
+  const source = await getBranchName();
+  const resultArray: any = [];
+
+  if (source.message !== "") {
+    message.error({
+      content: source.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (source.data) {
+    const datas = source.data;
+    datas.forEach((ele: any) => {
+      resultArray.push(
+        <Option key={ele.branch_id} value={`${ele.branch_id}`}>{ele.branch_name}</Option>);
+
+    });
+  }
+
+  return resultArray;
+};
+
+// 服务下拉框
+const loadServiceSelect = async () => {
+
+  const source = await getServices();
+  const resultArray: any = [];
+
+  if (source.message !== "") {
+    message.error({
+      content: source.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (source.data) {
+    const datas = source.data;
+    datas.forEach((ele: any) => {
+      resultArray.push(
+        <Option key={ele.server_id} value={`${ele.server_id}`}>{ele.server}</Option>);
+
+    });
+  }
+
+  return resultArray;
+
+};
+
+// 镜像环境下拉框
+const loadImgEnvSelect = async () => {
+
+  const source = await getImgEnv();
+  const resultArray: any = [];
+
+  if (source.message !== "") {
+    message.error({
+      content: source.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (source.data) {
+    const datas = source.data;
+    datas.forEach((ele: any) => {
+      resultArray.push(
+        <Option key={ele.env_id} value={`${ele.env_id}`}>{ele.image_env}</Option>);
+
+    });
+  }
+
+  return resultArray;
+
+};
+
+/* endregion */
 export {
   loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadReleaseIDSelect, loadOnlineEnvSelect,
   loadPulishItemSelect, loadIsApiAndDbUpgradeSelect, loadUpgradeApiSelect, loadApiServiceSelect, loadApiMethodSelect,
-  loadCategorySelect, loadCommiterSelect
+  loadCategorySelect, loadCommiterSelect, loadTechSideSelect, loadBranchNameSelect, loadServiceSelect, loadImgEnvSelect,
 
 };

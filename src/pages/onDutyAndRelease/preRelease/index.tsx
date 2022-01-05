@@ -16,7 +16,7 @@ import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {
   loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadReleaseIDSelect, loadOnlineEnvSelect,
   loadPulishItemSelect, loadIsApiAndDbUpgradeSelect, loadUpgradeApiSelect, loadApiServiceSelect, loadApiMethodSelect,
-  loadCategorySelect, loadCommiterSelect
+  loadCategorySelect, loadCommiterSelect, loadTechSideSelect, loadBranchNameSelect, loadServiceSelect, loadImgEnvSelect
 } from "./supplementFile/controler";
 import {useRequest} from "ahooks";
 import {
@@ -118,7 +118,9 @@ const PreRelease: React.FC<any> = () => {
     onlineEnv: [],
     upgradeApi: [],
     apiService: [],
-    apiMethod: []
+    apiMethod: [],
+    ckeckType:[],
+    browser:[]
   });
   // 发布项弹出窗口进行修改和新增
   const showUpgradeApiForm = async (type: any, params: any) => {
@@ -198,8 +200,17 @@ const PreRelease: React.FC<any> = () => {
 
   };
 
-  // 数据修复review弹出窗口进行修改和新增
-  const showOnlineBranchReviewForm = async (type: any, params: any) => {
+
+  // 上线分支 弹窗selected框
+  const [onlineBranchFormSelected, setOnlineBranchFormSelected] = useState({
+    branchName: [],
+    techSide: [],
+    server: [],
+    imgEnv: []
+  });
+
+  // 上线分支弹出窗口进行修改和新增
+  const showOnlineBranchForm = async (type: any, params: any) => {
 
     if (type === "add") {
       formForOnlineBranch.resetFields();
@@ -226,10 +237,11 @@ const PreRelease: React.FC<any> = () => {
 
     }
 
-    setDataReviewFormSelected({
-      category: await loadCategorySelect(),
-      repairCommiter: await loadCommiterSelect(),
-
+    setOnlineBranchFormSelected({
+      branchName: await loadBranchNameSelect(),
+      techSide: await loadTechSideSelect(),
+      server: await loadServiceSelect(),
+      imgEnv: await loadImgEnvSelect()
     });
 
   };
@@ -250,7 +262,7 @@ const PreRelease: React.FC<any> = () => {
         showDataReviewForm("add", {});
         break;
       case 4:
-        showOnlineBranchReviewForm("add", {});
+        showOnlineBranchForm("add", {});
         break;
       default:
         break;
@@ -498,7 +510,7 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '操作',
-      pinned:"right",
+      pinned: "right",
       minWidth: 115,
       maxWidth: 115,
       cellRenderer: (params: any) => {
@@ -641,7 +653,7 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '操作',
-      pinned:"right",
+      pinned: "right",
       minWidth: 100,
       maxWidth: 100,
       cellRenderer: (params: any) => {
@@ -972,7 +984,7 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '操作',
-      pinned:"right",
+      pinned: "right",
       minWidth: 100,
       maxWidth: 100,
       cellRenderer: (params: any) => {
@@ -1528,7 +1540,7 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '操作',
-      pinned:"right",
+      pinned: "right",
       minWidth: 100,
       maxWidth: 100,
       cellRenderer: (params: any) => {
@@ -2747,6 +2759,7 @@ const PreRelease: React.FC<any> = () => {
                 {/* 分支名称 */}
                 <Form.Item label="分支名称:" name="branchName" required={true}>
                   <Select style={{width: '100%'}} showSearch>
+                    {onlineBranchFormSelected.branchName}
                   </Select>
                 </Form.Item>
                 {/* 忽略前端单元测试检查 */}
@@ -2759,6 +2772,7 @@ const PreRelease: React.FC<any> = () => {
                 {/* 技术侧 */}
                 <Form.Item label="技术侧:" name="module" style={{marginLeft: 10}} required={true}>
                   <Select style={{width: '100%'}} showSearch>
+                    {onlineBranchFormSelected.techSide}
                   </Select>
                 </Form.Item>
                 {/* 忽略后端单元测试检查 */}
@@ -2781,11 +2795,12 @@ const PreRelease: React.FC<any> = () => {
                 </Form.Item>
                 <Form.Item name="server" label="服务" style={{marginTop: -22}}>
                   <Select mode="multiple" placeholder="请选择相应的服务！" style={{marginLeft: 68, width: 415}}>
-
+                    {onlineBranchFormSelected.server}
                   </Select>
                 </Form.Item>
                 <Form.Item name="imageevn" label="镜像环境" style={{marginTop: -20}}>
                   <Select placeholder="请选择对应的环境！" style={{marginLeft: 40, width: 415}} showSearch>
+                    {onlineBranchFormSelected.imgEnv}
                   </Select>
                 </Form.Item>
               </Card>
@@ -2835,6 +2850,7 @@ const PreRelease: React.FC<any> = () => {
                   {/* 检查环境 */}
                   <Form.Item label="检查环境:" name="checkEnv" style={{marginTop: -10}}>
                     <Select style={{width: '100%'}} showSearch>
+                      {onlineBranchFormSelected.imgEnv}
                     </Select>
                   </Form.Item>
 
@@ -2866,6 +2882,7 @@ const PreRelease: React.FC<any> = () => {
                 {/* 测试环境 */}
                 <Form.Item label="测试环境:" name="beforeTestEnv" style={{marginTop: -10, marginLeft: 10}}>
                   <Select style={{width: '100%'}} showSearch>
+                    {onlineBranchFormSelected.imgEnv}
                   </Select>
                 </Form.Item>
               </Col>
@@ -2902,6 +2919,7 @@ const PreRelease: React.FC<any> = () => {
                 {/* 测试环境 */}
                 <Form.Item label="测试环境:" name="afterTestEnv" style={{marginTop: -10, marginLeft: 10}}>
                   <Select style={{width: '100%'}} showSearch>
+                    {onlineBranchFormSelected.imgEnv}
                   </Select>
                 </Form.Item>
               </Col>

@@ -498,6 +498,9 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '操作',
+      pinned:"right",
+      minWidth: 115,
+      maxWidth: 115,
       cellRenderer: (params: any) => {
         return operateRenderer(1, params)
       }
@@ -638,6 +641,9 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '操作',
+      pinned:"right",
+      minWidth: 100,
+      maxWidth: 100,
       cellRenderer: (params: any) => {
         return operateRenderer(2, params)
       }
@@ -966,6 +972,9 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '操作',
+      pinned:"right",
+      minWidth: 100,
+      maxWidth: 100,
       cellRenderer: (params: any) => {
 
         return operateRenderer(3, params);
@@ -1519,6 +1528,9 @@ const PreRelease: React.FC<any> = () => {
     },
     {
       headerName: '操作',
+      pinned:"right",
+      minWidth: 100,
+      maxWidth: 100,
       cellRenderer: (params: any) => {
         return operateRenderer(4, params)
       }

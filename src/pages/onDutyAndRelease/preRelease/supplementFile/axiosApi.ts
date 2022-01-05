@@ -403,8 +403,7 @@ const delPulishApi = async (id: number) => {
 
   return errorMessage;
 
-}
-/* endregion */
+};
 
 // 服务确认
 const upgradeServiceConfirm = async (datas: any) => {
@@ -421,6 +420,7 @@ const upgradeServiceConfirm = async (datas: any) => {
 
   return errorMessage;
 };
+/* endregion */
 
 /* region 数据修复 */
 
@@ -519,12 +519,35 @@ const dataRepairConfirm = async (datas: any) => {
 };
 
 /* endregion */
+
+/* region 上线分支 */
+const getTechSide = async () => {
+  const result: any = {
+    message: "",
+    data: []
+  };
+  await axios.get('/api/verify/release/technical_side', {})
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+};
+
+/* endregion */
+
 export {
   savePrePulishProjects, queryReleaseType, queryReleaseWay, queryReleaseId, queryServiceByID,
   getInitPageData, getOnlineDev, getPulishItem, getIsApiAndDatabaseUpgrade, saveUpgradeItem,
   delUpgradeItem, getUpgradeApi, getApiService, getApiMethod, savePulishApi, delPulishApi,
   upgradeServiceConfirm, getRepaireCategory, addDataRepaire, modifyDataRepaire, delDataReviewApi,
-  dataRepairConfirm
+  dataRepairConfirm, getTechSide
 };
 
 

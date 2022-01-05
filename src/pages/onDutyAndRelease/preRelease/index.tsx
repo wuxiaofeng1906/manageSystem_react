@@ -162,7 +162,6 @@ const PreRelease: React.FC<any> = () => {
     category: [],
     repairCommiter: [],
   });
-
   // 数据修复review弹出窗口进行修改和新增
   const showDataReviewForm = async (type: any, params: any) => {
 
@@ -173,7 +172,7 @@ const PreRelease: React.FC<any> = () => {
         title: "新增"
       });
     } else {
-      debugger;
+
       dataReviewForm.setFieldsValue({
         repaireContent: params.repair_data_content,
         relatedRenter: params.related_tenant,
@@ -188,6 +187,42 @@ const PreRelease: React.FC<any> = () => {
         shown: true,
         title: "修改"
       });
+
+    }
+
+    setDataReviewFormSelected({
+      category: await loadCategorySelect(),
+      repairCommiter: await loadCommiterSelect(),
+
+    });
+
+  };
+
+  // 数据修复review弹出窗口进行修改和新增
+  const showOnlineBranchReviewForm = async (type: any, params: any) => {
+
+    if (type === "add") {
+      formForOnlineBranch.resetFields();
+      setOnlineBranchModal({
+        shown: true,
+        title: "新增"
+      });
+    } else {
+
+      // dataReviewForm.setFieldsValue({
+      //   repaireContent: params.repair_data_content,
+      //   relatedRenter: params.related_tenant,
+      //   types: params.type,
+      //   repaireCommiter: `${params.commit_user_id}&${params.commit_user_name}`,
+      //   branch: params.branch,
+      //   EvalResult: params.review_result,
+      //   repeatExecute: params.is_repeat,
+      //   reviewId: params.review_id
+      // });
+      // setDataReviewModal({
+      //   shown: true,
+      //   title: "修改"
+      // });
 
     }
 
@@ -215,11 +250,7 @@ const PreRelease: React.FC<any> = () => {
         showDataReviewForm("add", {});
         break;
       case 4:
-        // dataReviewForm.resetFields();
-        setOnlineBranchModal({
-          shown: true,
-          title: "新增"
-        });
+        showOnlineBranchReviewForm("add", {});
         break;
       default:
         break;
@@ -350,7 +381,7 @@ const PreRelease: React.FC<any> = () => {
   // 操作按钮渲染
   const operateRenderer = (type: number, params: any) => {
     const typeStr = JSON.stringify(type);
-    const paramData = JSON.stringify(params.data);
+    const paramData = JSON.stringify(params.data).replace(/'/g, "’");
     if (type === 1) {  // 发布项没有新增功能
       return `
         <div style="margin-top: -5px">
@@ -1359,56 +1390,69 @@ const PreRelease: React.FC<any> = () => {
 
   // 封板状态
   const sealStatusRenderer = (params: any) => {
+    if (!params.value) {
+      return [];
+    }
+
     const values = params.value;
-    const frontValue = (values["前端"])[0];
-    const frontTime = (values["前端"])[1];
-    const backendValue = (values["后端"])[0];
-    const backendTime = (values["后端"])[1];
-    // 前端的颜色
-    let frontColor = "orange";
-    if (frontValue === "已封版") {
-      frontColor = "#2BF541";
-    }
+    // 代表只有前端或者只有后端
+    if (values.length === 1) {
+      const arrayData = values[0];
+      let side = "";
+      if (arrayData.technical_side === "1") { // 是前端
+        side = "前端：";
+      } else if (arrayData.technical_side === "2") { // 是后端
+        side = "后端："
+      }
+      ;
 
-    // 后端的颜色
-    let bacnkendColor = "orange";
-    if (backendValue === "已封版") {
-      bacnkendColor = "#2BF541";
-    }
-
-    if (params.data?.module === "仅前端") {
+      const status = arrayData.sealing_version === "1" ? "已封板" : "未封板";
+      const sideColor = arrayData.sealing_version === "1" ? "#2BF541" : "orange";
+      const time = arrayData.sealing_version_time === "" ? "" : dayjs(arrayData.sealing_version_time).format("HH:mm:ss");
 
       return `
         <div style="margin-top: -10px">
             <div style=" margin-top: 20px;font-size: 10px">
-                <div>前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
+                <div>${side} <label style="color: ${sideColor}"> ${status}</label> &nbsp;${time}</div>
             </div>
 
         </div>
     `;
-
     }
-    if (params.data?.module === "仅后端") {
+
+    // 证明有前后端
+    if (values.length === 2) {
+      let frontValue = "";
+      let frontTime = "";
+      let frontColor = "orange";
+
+      let backendValue = "";
+      let backendTime = "";
+      let bacnkendColor = "orange";
+      values.forEach((ele: any) => {
+        if (ele.technical_side === "1") {  // 前端
+          frontValue = ele.sealing_version === "1" ? "已封板" : "未封板";
+          frontTime = ele.sealing_version_time === "" ? "" : dayjs(ele.sealing_version_time).format("HH:mm:ss");
+          frontColor = ele.sealing_version === "1" ? "#2BF541" : "orange";
+        } else if (ele.technical_side === "2") {  // 后端
+          backendValue = ele.sealing_version === "1" ? "已封板" : "未封板";
+          backendTime = ele.sealing_version_time === "" ? "" : dayjs(ele.sealing_version_time).format("HH:mm:ss");
+          bacnkendColor = ele.sealing_version === "1" ? "#2BF541" : "orange";
+        }
+      });
+
       return `
         <div style="margin-top: -10px">
             <div style=" margin-top: 20px;font-size: 10px">
-                <div> 后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>
-                &nbsp;${backendTime}</div>
-            </div>
-        </div>
-    `;
-    }
-    return `
-        <div style="margin-top: -10px">
-            <div style=" margin-top: 20px;font-size: 10px">
-                <div>前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
-                <div style="margin-top: -20px"> 后端：
-                <label style="color: ${bacnkendColor}"> ${backendValue}</label>
-                &nbsp;${backendTime}</div>
+                <div>前端：<label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
+                <div style="margin-top: -20px">
+                后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>${backendTime}</div>
             </div>
 
         </div>
     `;
+    }
+    return values;
   };
 
   const firstOnlineBranchColumn: any = [
@@ -1470,7 +1514,8 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '封板状态',
       field: 'branch_sealing_check',
-      // cellRenderer: sealStatusRenderer
+      minWidth: 160,
+      cellRenderer: sealStatusRenderer
     },
     {
       headerName: '操作',

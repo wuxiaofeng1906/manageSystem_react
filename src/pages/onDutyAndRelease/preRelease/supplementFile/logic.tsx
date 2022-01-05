@@ -1,7 +1,8 @@
 import {
   savePrePulishProjects, queryServiceByID, saveUpgradeItem, delUpgradeItem,
   savePulishApi, delPulishApi, upgradeServiceConfirm, addDataRepaire, modifyDataRepaire,
-  delDataReviewApi, dataRepairConfirm, getNewCheckNum, saveOnlineBranch,saveVersonCheck
+  delDataReviewApi, dataRepairConfirm, getNewCheckNum, saveOnlineBranch, saveVersonCheck,
+  saveEnvironmentCheck
 } from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
 
 const userLogins: any = localStorage.getItem("userLogins");
@@ -147,7 +148,8 @@ const saveOnlineBranchData = async (type: string, currentListNo: string, newOnli
 
   return {
     // onlineBranch: await saveOnlineBranch(type, currentListNo, newOnlineBranchNum, sourceData),
-    versonCheck:await saveVersonCheck(type, currentListNo, newOnlineBranchNum, sourceData),
+    // versonCheck:await saveVersonCheck(type, currentListNo, newOnlineBranchNum, sourceData),
+    enviromentCheck: await saveEnvironmentCheck(type, currentListNo, newOnlineBranchNum, sourceData),
   }
 };
 export {

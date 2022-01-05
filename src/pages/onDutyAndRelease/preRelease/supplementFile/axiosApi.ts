@@ -691,6 +691,35 @@ const saveVersonCheck = async (type: string, currentListNo: string, newOnlineBra
   return errorMessage;
 
 };
+
+// 环境一致性检查
+const saveEnvironmentCheck = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any) => {
+  debugger;
+  const data = {
+    "check_num": newOnlineBranchNum,
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "ignore_check": (sourceData.ignoreCheck).length === 1 ? "1" : "2",
+    "check_env": sourceData.checkEnv
+  }
+  if (type === "修改") {
+    data["check_id"] = "";
+  }
+
+  let errorMessage = "";
+  await axios.post("/api/verify/release/check_env", data)
+    .then(function (res) {
+
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+};
 /* endregion */
 
 export {
@@ -699,7 +728,7 @@ export {
   delUpgradeItem, getUpgradeApi, getApiService, getApiMethod, savePulishApi, delPulishApi,
   upgradeServiceConfirm, getRepaireCategory, addDataRepaire, modifyDataRepaire, delDataReviewApi,
   dataRepairConfirm, getTechSide, getCheckType, getBrowserType, getNewCheckNum, saveOnlineBranch,
-  saveVersonCheck
+  saveVersonCheck, saveEnvironmentCheck
 };
 
 

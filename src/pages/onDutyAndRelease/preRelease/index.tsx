@@ -2855,7 +2855,9 @@ const PreRelease: React.FC<any> = () => {
                 <Col span={9}>
                   {/* 忽略检查 */}
                   <Form.Item label="是否忽略检查" name="ignoreCheck" style={{marginTop: -10}}>
-                    <Checkbox>忽略检查</Checkbox>
+                    <Checkbox.Group>
+                      <Checkbox value={"ignoreCheck"}>忽略检查</Checkbox>
+                    </Checkbox.Group>
                   </Form.Item>
                 </Col>
                 <Col span={8}>

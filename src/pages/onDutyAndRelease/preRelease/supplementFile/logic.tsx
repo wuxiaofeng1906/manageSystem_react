@@ -1,12 +1,7 @@
 import {
-  savePrePulishProjects,
-  queryServiceByID,
-  saveUpgradeItem,
-  delUpgradeItem,
-  savePulishApi,
-  delPulishApi,
-  upgradeServiceConfirm, addDataRepaire, modifyDataRepaire, delDataReviewApi,
-  dataRepairConfirm
+  savePrePulishProjects, queryServiceByID, saveUpgradeItem, delUpgradeItem,
+  savePulishApi, delPulishApi, upgradeServiceConfirm, addDataRepaire, modifyDataRepaire,
+  delDataReviewApi, dataRepairConfirm, getNewCheckNum, saveOnlineBranch,saveVersonCheck
 } from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
 
 const userLogins: any = localStorage.getItem("userLogins");
@@ -136,7 +131,26 @@ const confirmDataRepairService = async (datas: any) => {
 
 };
 
+// 获取上线分支新增时所需的checkNum
+const getCheckNumForOnlineBranch = async () => {
+
+  return await getNewCheckNum();
+};
+
+// 保存上线分支的设置
+const saveOnlineBranchData = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any) => {
+  //   保存分了4个接口，
+  //  1.上线分支设置
+  //  2.版本检查设置
+  //  3.环境一致性检查
+  //  4.(上线前后)自动化检查设置
+
+  return {
+    // onlineBranch: await saveOnlineBranch(type, currentListNo, newOnlineBranchNum, sourceData),
+    versonCheck:await saveVersonCheck(type, currentListNo, newOnlineBranchNum, sourceData),
+  }
+};
 export {
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems, addPulishApi, confirmUpgradeService,
-  dataRepaireReview,confirmDataRepairService
+  dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch, saveOnlineBranchData
 };

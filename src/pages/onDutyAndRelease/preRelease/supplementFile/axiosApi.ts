@@ -523,6 +523,27 @@ const dataRepairConfirm = async (datas: any) => {
 /* region 上线分支 */
 
 // 获取技术侧
+const getNewCheckNum = async () => {
+  const result: any = {
+    message: "",
+    data: []
+  };
+  await axios.get('/api/verify/release/check_num', {})
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+};
+
+
+// 获取技术侧
 const getTechSide = async () => {
   const result: any = {
     message: "",
@@ -581,6 +602,95 @@ const getBrowserType = async () => {
 
   return result;
 };
+
+// 线上分支设置保存
+const saveOnlineBranch = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any) => {
+  const data = {
+    "check_num": newOnlineBranchNum,
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "ready_release_num": currentListNo,
+    "branch_name": sourceData.branchName,
+    "technical_side": sourceData.module,
+    "ignore_check_test_unit_backend": (sourceData.ignoreFrontCheck).length === 1 ? "1" : "2",
+    "ignore_check_test_unit_front": (sourceData.ignoreBackendCheck).length === 1 ? "1" : "2",
+  };
+
+  if (type === "修改") {
+    data["branch_check_id"] = "";
+  }
+
+  let errorMessage = "";
+  await axios.post("/api/verify/release/release_branch", data)
+    .then(function (res) {
+
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+};
+
+// 线上版本检查
+const saveVersonCheck = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any) => {
+  // 服务
+  const {server} = sourceData;
+  let serverStr = "";
+  server.forEach((ele: string) => {
+    serverStr = serverStr === "" ? ele : `${serverStr},${ele}`;
+  });
+
+  // 被对比的主分支
+  const main_branch = sourceData.branch_mainBranch;
+  let mainBranch = "";
+  main_branch.forEach((ele: string) => {
+    mainBranch = mainBranch === "" ? ele : `${mainBranch},${ele}`;
+  });
+
+  // 技术侧
+  const technical_side = sourceData.branch_teachnicalSide;
+  let techSide = "";
+  technical_side.forEach((ele: string) => {
+    techSide = techSide === "" ? ele : `${techSide},${ele}`;
+  });
+
+  const data = {
+    "check_num": newOnlineBranchNum,
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "backend_version_check_flag": sourceData.verson_check, // 是否开启版本检查
+    "server": serverStr, // 服务
+    "image_branch": sourceData.branchName, // 传分支名称
+    "image_env": sourceData.imageevn, // 镜像环境
+    "inclusion_check_flag": sourceData.branchcheck, // 是否开启分支检查
+    "main_branch": mainBranch, // 主分支
+    "technical_side": techSide, // 技术侧
+    "target_branch": sourceData.branchName, // 传分支名称
+    "main_since": dayjs(sourceData.branch_mainSince).format("YYYY-MM-DD"), // 时间
+  };
+
+  if (type === "修改") {
+    data["version_check_id"] = "";
+  }
+
+  let errorMessage = "";
+  await axios.post("/api/verify/release/release_check_version", data)
+    .then(function (res) {
+
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+};
 /* endregion */
 
 export {
@@ -588,7 +698,8 @@ export {
   getInitPageData, getOnlineDev, getPulishItem, getIsApiAndDatabaseUpgrade, saveUpgradeItem,
   delUpgradeItem, getUpgradeApi, getApiService, getApiMethod, savePulishApi, delPulishApi,
   upgradeServiceConfirm, getRepaireCategory, addDataRepaire, modifyDataRepaire, delDataReviewApi,
-  dataRepairConfirm, getTechSide,getCheckType,getBrowserType
+  dataRepairConfirm, getTechSide, getCheckType, getBrowserType, getNewCheckNum, saveOnlineBranch,
+  saveVersonCheck
 };
 
 

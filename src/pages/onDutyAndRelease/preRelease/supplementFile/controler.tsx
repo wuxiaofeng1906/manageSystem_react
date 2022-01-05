@@ -385,7 +385,7 @@ const loadBranchNameSelect = async () => {
     const datas = source.data;
     datas.forEach((ele: any) => {
       resultArray.push(
-        <Option key={ele.branch_id} value={`${ele.branch_id}`}>{ele.branch_name}</Option>);
+        <Option key={ele.branch_id} value={`${ele.branch_name}`}>{ele.branch_name}</Option>);
 
     });
   }
@@ -438,7 +438,7 @@ const loadImgEnvSelect = async () => {
     const datas = source.data;
     datas.forEach((ele: any) => {
       resultArray.push(
-        <Option key={ele.env_id} value={`${ele.env_id}`}>{ele.image_env}</Option>);
+        <Option key={ele.env_id} value={`${ele.image_env}`}>{ele.image_env}</Option>);
 
     });
   }

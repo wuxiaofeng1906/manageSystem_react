@@ -21,11 +21,9 @@ import {
 } from "./supplementFile/controler";
 import {useRequest} from "ahooks";
 import {
-  savePreProjects,
-  inquireService,
-  upgradePulishItem,
-  delUpgradeItems,
-  addPulishApi, confirmUpgradeService, dataRepaireReview, confirmDataRepairService
+  savePreProjects, inquireService, upgradePulishItem, delUpgradeItems,
+  addPulishApi, confirmUpgradeService, dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch,
+  saveOnlineBranchData
 } from "./supplementFile/logic";
 import {alalysisInitData} from "./supplementFile/dataAnalyze";
 import {
@@ -38,6 +36,7 @@ const {Option} = Select;
 const {TextArea} = Input;
 const currentDate = dayjs().format("YYYYMMDD");
 let currentListNo = "";
+let newOnlineBranchNum = "";
 let releaseIdArray: any;
 const userLogins: any = localStorage.getItem("userLogins");
 const usersInfo = JSON.parse(userLogins);
@@ -218,6 +217,11 @@ const PreRelease: React.FC<any> = () => {
         shown: true,
         title: "新增"
       });
+
+      const result = await getCheckNumForOnlineBranch();
+
+      newOnlineBranchNum = result.data?.check_num;
+
     } else {
 
       // dataReviewForm.setFieldsValue({
@@ -1243,9 +1247,10 @@ const PreRelease: React.FC<any> = () => {
     </div>
     `;
 
-    if (!params.value) {
+    if (!params.value || (params.value).length === 0) {
       return "";
     }
+
     const values: any = (params.value)[0];// 本数组只会有一条数据
     // 解析所属端
     let side = "";
@@ -1569,8 +1574,9 @@ const PreRelease: React.FC<any> = () => {
     });
   };
   // 保存
-  const saveOnlineBranchResult = () => {
-
+  const saveOnlineBranchResult = async () => {
+    const formData = formForOnlineBranch.getFieldsValue();
+    const result = await saveOnlineBranchData(onlineBranchModal.title, currentListNo, newOnlineBranchNum, formData);
   };
 
   // 清空表中数据
@@ -2767,7 +2773,9 @@ const PreRelease: React.FC<any> = () => {
                 </Form.Item>
                 {/* 忽略前端单元测试检查 */}
                 <Form.Item name="ignoreFrontCheck" style={{marginLeft: 0, marginTop: -20}}>
-                  <Checkbox>忽略前端单元测试检查</Checkbox>
+                  <Checkbox.Group>
+                    <Checkbox value={"ignoreFrontCheck"}>忽略前端单元测试检查</Checkbox>
+                  </Checkbox.Group>
                 </Form.Item>
               </Col>
               <Col span={12}>
@@ -2780,7 +2788,9 @@ const PreRelease: React.FC<any> = () => {
                 </Form.Item>
                 {/* 忽略后端单元测试检查 */}
                 <Form.Item name="ignoreBackendCheck" style={{marginLeft: 0, marginTop: -20}}>
-                  <Checkbox>忽略后端单元测试检查</Checkbox>
+                  <Checkbox.Group>
+                    <Checkbox value={"ignoreBackendCheck"}>忽略后端单元测试检查</Checkbox>
+                  </Checkbox.Group>
                 </Form.Item>
               </Col>
             </Row>
@@ -2824,8 +2834,8 @@ const PreRelease: React.FC<any> = () => {
 
                 <Form.Item label="技术侧" name="branch_teachnicalSide" style={{marginTop: -25}}>
                   <Checkbox.Group style={{marginLeft: 56}}>
-                    <Checkbox value={"front"}>前端</Checkbox>
-                    <Checkbox value={"backend"}>后端</Checkbox>
+                    <Checkbox value={"1"}>前端</Checkbox>
+                    <Checkbox value={"2"}>后端</Checkbox>
                   </Checkbox.Group>
                 </Form.Item>
 

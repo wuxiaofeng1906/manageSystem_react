@@ -2,11 +2,14 @@
 const findParent = (departDatas: any, depts: any, result: any) => {
   const idx = depts.deptName;
   departDatas.forEach((item: any) => {
-    if (idx === item['deptName']) {
-      const pidName = item['parent'].deptName;
-      result.unshift(pidName);
-      findParent(departDatas, item['parent'], result);
+    if (item['deptName'] && idx) {
+      if (idx === item['deptName']) {
+        const pidName = item['parent'].deptName;
+        result.unshift(pidName);
+        findParent(departDatas, item['parent'], result);
+      }
     }
+
   });
 
 }
@@ -46,7 +49,6 @@ const converseArrayToOne = (data: any) => {
 
 // 转化为ag-grid能被显示的格式
 const converseFormatForAgGrid = (oraDatas: any) => {
-
   if (!oraDatas) {
     return [];
   }

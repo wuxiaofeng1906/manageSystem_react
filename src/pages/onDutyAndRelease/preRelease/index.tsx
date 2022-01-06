@@ -85,8 +85,9 @@ const PreRelease: React.FC<any> = () => {
       });
     } else {
 
+      debugger;
       pulishItemForm.setFieldsValue({
-        onlineEnv: (params.online_environment).split(","),
+        onlineEnv: params.online_environment === undefined ? undefined : (params.online_environment).split(","),
         pulishItem: params.release_item,
         application: params.app,
         hotUpdate: params.hot_update,
@@ -131,7 +132,7 @@ const PreRelease: React.FC<any> = () => {
       });
     } else {
       upgradeIntForm.setFieldsValue({
-        onlineEnv: (params.online_environment).split(","),
+        onlineEnv: params.online_environment === undefined ? undefined : (params.online_environment).split(","),
         upInterface: params.update_api,
         interService: params.api_name,
         hotUpdate: params.hot_update,
@@ -1855,138 +1856,28 @@ const PreRelease: React.FC<any> = () => {
   /* endregion */
 
   /* region Tabs 标签页事件 */
-  const [showTabs, setShowTabs] = useState({
-    shown: false,
-    targetKey: ""
-  });
 
-  const initialPanes = [
-    {
-      title: `${currentDate}灰度预发布1`,
-      content: "",
-      key: '1',
-      closable: false
-    }];
-  const [tabContent, setTabContent] = useState({
-    activeKey: initialPanes[0].key,
-    panes: initialPanes
-  });
+  const showNoneDataPage = () => {
+    // 预发布项目
+    formForPreReleaseProject.resetFields();
 
-  // 新增tab
-  const add = () => {
-    const {panes} = tabContent;
-    const tabCount = panes.length;
-    const activeKey = `index_${tabCount + 1}`;
-    panes.push({
-      title: `${currentDate}灰度预发布${tabCount + 1}`,
-      content: "",
-      key: activeKey,
-      closable: true
-    });
-    setTabContent({panes, activeKey});
+    // 升级服务 一
     firstUpSerGridApi.current?.setRowData([]);
+
+    // 升级服务 二
     secondUpSerGridApi.current?.setRowData([]);
-  };
-
-  // 删除tab
-  const remove = (targetKeys: any) => {
-
-    setShowTabs({
-      shown: true,
-      targetKey: targetKeys
-    });
-  };
-
-  const delTabsCancel = () => {
-    setShowTabs({
-      ...showTabs,
-      shown: false
-    });
-  };
-
-  const delTabsInfo = () => {
-    const {targetKey} = showTabs;
-    setShowTabs({
-      ...showTabs,
-      shown: false
-    });
-    const {panes, activeKey} = tabContent;
-    let newActiveKey = activeKey;
-    let lastIndex = 0;
-    panes.forEach((pane, i) => {
-      if (pane.key === targetKey) {
-        lastIndex = i - 1;
-      }
-    });
-    const newPanes = panes.filter(pane => pane.key !== targetKey);
-    if (newPanes.length && newActiveKey === targetKey) {
-      if (lastIndex >= 0) {
-        newActiveKey = newPanes[lastIndex].key;
-      } else {
-        newActiveKey = newPanes[0].key;
-      }
-    }
-    setTabContent({
-      panes: newPanes,
-      activeKey: newActiveKey,
-    });
-  };
-  // 新增、修改或删除tab页
-  const onEdits = (targetKey: any, action: any) => {
-    if (action === 'remove') {
-      // 需要判断是否确定删除
-
-      remove(targetKey)
-    } else if (action === 'add') {
-      add();
-    }
-  };
-
-  // 切换tab页面
-  const onChange = (activeKeys: any) => {
-
-    setTabContent({
-      ...tabContent,
-      activeKey: activeKeys
-    });
-
-    // 在切换时显示第二个界面的数据
-    formForPreReleaseProject.setFieldsValue({
-      projectsName: "测试切换"
-    });
-
-
-    firstUpSerGridApi.current?.setRowData([{
-      onlineDev: "集群4444",
-      pulishItem: "前端",
-      app: "web",
-      hotUpdate: "是",
-      upgrade: "否",
-      branchAndDev: "emergency_nx-hotfix",
-      desc: "",
-      remark: ""
-    }]);
-    secondUpSerGridApi.current?.setRowData([{
-      onlineDev: "集群44444",
-      upgradeInte: "前端接口",
-      intService: "basebi",
-      hotUpdate: "是",
-      intMethod: "get",
-      intURL: "/basebi/Evaluate/......",
-      tenant: "全量用户",
-      remark: ""
-    }]);
+    // 升级服务 三
+    thirdUpSerGridApi.current?.setRowData([]);
+    // 数据修复Review 一
+    firstDataReviewGridApi.current?.setRowData([]);
+    // 数据修复Review 二
+    secondDataReviewGridApi.current?.setRowData([]);
+    // 上线分支
+    firstOnlineBranchGridApi.current?.setRowData([]);
+    // 对应工单
+    firstListGridApi.current?.setRowData([]);
 
   };
-
-  // 修改tab
-  const tabsChangeName = (params: any) => {
-
-    const currentName = params.target.innerText;
-    console.log(currentName);
-
-  };
-  /* endregion */
 
   const showPagesContent = (source: any) => {
 
@@ -2026,6 +1917,129 @@ const PreRelease: React.FC<any> = () => {
     firstListGridApi.current?.setRowData(source?.correspondOrder);
 
   };
+  const [showTabs, setShowTabs] = useState({
+    shown: false,
+    targetKey: ""
+  });
+
+  const initialPanes = [
+    {
+      title: `${currentDate}灰度预发布1`,
+      content: "",
+      key: '1',
+      // closable: false
+    }];
+  const [tabContent, setTabContent] = useState({
+    activeKey: initialPanes[0].key,
+    panes: initialPanes
+  });
+
+  // 新增tab
+  const add = () => {
+    const {panes} = tabContent;
+    const tabCount = panes.length;
+    const activeKey = `index_${tabCount + 1}`;
+    panes.push({
+      title: `${currentDate}灰度预发布${tabCount + 1}`,
+      content: "",
+      key: activeKey,
+      // closable: true
+    });
+    setTabContent({panes, activeKey});
+
+    showNoneDataPage();
+  };
+
+  // 删除tab
+  const remove = (targetKeys: any) => {
+
+    setShowTabs({
+      shown: true,
+      targetKey: targetKeys
+    });
+  };
+
+  const delTabsCancel = () => {
+    setShowTabs({
+      ...showTabs,
+      shown: false
+    });
+  };
+
+  const delTabsInfo = () => {
+
+    const {targetKey} = showTabs;
+    setShowTabs({
+      ...showTabs,
+      shown: false
+    });
+    const {panes, activeKey} = tabContent;
+
+    if (panes.length === 1) {
+      message.error({
+        content: "删除失败：页面需要至少保留一个预发布页面!",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
+    let newActiveKey = activeKey;
+    let lastIndex = 0;
+    panes.forEach((pane, i) => {
+      if (pane.key === targetKey) {
+        lastIndex = i - 1;
+      }
+    });
+    const newPanes = panes.filter(pane => pane.key !== targetKey);
+    if (newPanes.length && newActiveKey === targetKey) {
+      if (lastIndex >= 0) {
+        newActiveKey = newPanes[lastIndex].key;
+      } else {
+        newActiveKey = newPanes[0].key;
+      }
+    }
+    setTabContent({
+      panes: newPanes,
+      activeKey: newActiveKey,
+    });
+  };
+  // 新增、修改或删除tab页
+  const onEdits = (targetKey: any, action: any) => {
+    if (action === 'remove') {
+      // 需要判断是否确定删除
+
+      remove(targetKey)
+    } else if (action === 'add') {
+      add();
+    }
+  };
+
+  // 切换tab页面
+  const onChange = (activeKeys: any) => {
+
+    setTabContent({
+      ...tabContent,
+      activeKey: activeKeys
+    });
+
+    // 根据标签页获取数据,然后再赋予值
+    showPagesContent({});
+
+
+  };
+
+  // 修改tab
+  const tabsChangeName = (params: any) => {
+
+    const currentName = params.target.innerText;
+    console.log(currentName);
+
+  };
+  /* endregion */
+
 
   useEffect(() => {
     showPagesContent(initData);

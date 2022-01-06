@@ -3,7 +3,7 @@ import {getAllProject, getAllDeptUsers, getBranchName, getServices, getImgEnv} f
 import {
   queryReleaseType, queryReleaseWay, queryReleaseId, getOnlineDev, getPulishItem,
   getIsApiAndDatabaseUpgrade, getUpgradeApi, getApiService, getApiMethod, getRepaireCategory,
-  getTechSide, getCheckType,getBrowserType
+  getTechSide, getCheckType, getBrowserType
 } from "./axiosApi";
 
 const {Option} = Select;
@@ -52,15 +52,18 @@ const loadReleaseTypeSelect = async () => {
   } else if (releaseTypes.data) {
     const datas = releaseTypes.data;
     datas.forEach((types: any) => {
-      typesData.push(
-        <Option key={types.release_type_id} value={`${types.release_type_id}`}>{types.release_type_name}</Option>);
+      if (types.release_type_id !== "9") {
+        typesData.push(
+          <Option key={types.release_type_id} value={`${types.release_type_id}`}>{types.release_type_name}</Option>);
+      }
+
     });
   }
 
   return typesData;
 };
 
-// 发布类型下拉框
+// 发布方式下拉框
 const loadReleaseWaySelect = async () => {
 
   const releaseWays = await queryReleaseWay();
@@ -77,8 +80,10 @@ const loadReleaseWaySelect = async () => {
   } else if (releaseWays.data) {
     const datas = releaseWays.data;
     datas.forEach((ways: any) => {
-      wayData.push(
-        <Option key={ways.release_way_id} value={`${ways.release_way_id}`}>{ways.release_way_name}</Option>);
+      if (ways.release_way_id !== "9") {
+        wayData.push(
+          <Option key={ways.release_way_id} value={`${ways.release_way_id}`}>{ways.release_way_name}</Option>);
+      }
     });
   }
 
@@ -137,10 +142,11 @@ const loadOnlineEnvSelect = async () => {
   } else if (envs.data) {
     const datas = envs.data;
     datas.forEach((ele: any) => {
-      envData.push(
-        <Option key={ele.online_environment_id}
-                value={`${ele.online_environment_id}`}>{ele.online_environment_name}</Option>);
-
+      if (ele.online_environment_id !== "9") {
+        envData.push(
+          <Option key={ele.online_environment_id}
+                  value={`${ele.online_environment_id}`}>{ele.online_environment_name}</Option>);
+      }
     });
   }
 
@@ -192,9 +198,12 @@ const loadIsApiAndDbUpgradeSelect = async () => {
   } else if (source.data) {
     const datas = source.data;
     datas.forEach((ele: any) => {
-      resultArray.push(
-        <Option key={ele.upgrade_id}
-                value={`${ele.upgrade_id}`}>{ele.upgrade_item}</Option>);
+      if (ele.upgrade_id !== "9") {
+        resultArray.push(
+          <Option key={ele.upgrade_id}
+                  value={`${ele.upgrade_id}`}>{ele.upgrade_item}</Option>);
+      }
+
 
     });
   }
@@ -224,10 +233,11 @@ const loadUpgradeApiSelect = async () => {
   } else if (source.data) {
     const datas = source.data;
     datas.forEach((ele: any) => {
-      resultArray.push(
-        <Option key={ele.type_id}
-                value={`${ele.type_id}`}>{ele.type_name}</Option>);
-
+      if (ele.type_id !== "9") {
+        resultArray.push(
+          <Option key={ele.type_id}
+                  value={`${ele.type_id}`}>{ele.type_name}</Option>);
+      }
     });
   }
 
@@ -275,9 +285,10 @@ const loadApiMethodSelect = async () => {
   } else if (source.data) {
     const datas = source.data;
     datas.forEach((ele: any) => {
-      resultArray.push(
-        <Option key={ele.method_id} value={`${ele.method_id}`}>{ele.method_name}</Option>);
-
+      if (ele.method_id !== "9") {
+        resultArray.push(
+          <Option key={ele.method_id} value={`${ele.method_id}`}>{ele.method_name}</Option>);
+      }
     });
   }
 
@@ -304,9 +315,10 @@ const loadCategorySelect = async () => {
   } else if (source.data) {
     const datas = source.data;
     datas.forEach((ele: any) => {
-      resultArray.push(
-        <Option key={ele.repair_id} value={`${ele.repair_id}`}>{ele.repair_name}</Option>);
-
+      if (ele.repair_id !== "9") {
+        resultArray.push(
+          <Option key={ele.repair_id} value={`${ele.repair_id}`}>{ele.repair_name}</Option>);
+      }
     });
   }
 
@@ -359,9 +371,10 @@ const loadTechSideSelect = async () => {
   } else if (source.data) {
     const datas = source.data;
     datas.forEach((ele: any) => {
-      resultArray.push(
-        <Option key={ele.technical_side_id} value={`${ele.technical_side_id}`}>{ele.technical_side}</Option>);
-
+      if (ele.technical_side_id !== "9") {
+        resultArray.push(
+          <Option key={ele.technical_side_id} value={`${ele.technical_side_id}`}>{ele.technical_side}</Option>);
+      }
     });
   }
 
@@ -447,7 +460,7 @@ const loadImgEnvSelect = async () => {
 
 };
 
-// 镜像环境下拉框
+// 检查类型下拉框
 const loadCheckTypeSelect = async () => {
 
   const source = await getCheckType();
@@ -464,8 +477,11 @@ const loadCheckTypeSelect = async () => {
   } else if (source.data) {
     const datas = source.data;
     datas.forEach((ele: any) => {
-      resultArray.push(
-        <Option key={ele.check_type_id} value={`${ele.check_type_id}`}>{ele.check_type_name}</Option>);
+      if (ele.check_type_id !== "9") {
+        resultArray.push(
+          <Option key={ele.check_type_id} value={`${ele.check_type_id}`}>{ele.check_type_name}</Option>);
+      }
+
 
     });
   }
@@ -475,7 +491,7 @@ const loadCheckTypeSelect = async () => {
 };
 
 
-// 镜像环境下拉框
+// 浏览器下拉框
 const loadBrowserTypeSelect = async () => {
 
   const source = await getBrowserType();
@@ -492,9 +508,10 @@ const loadBrowserTypeSelect = async () => {
   } else if (source.data) {
     const datas = source.data;
     datas.forEach((ele: any) => {
-      resultArray.push(
-        <Option key={ele.browser_id} value={`${ele.browser_id}`}>{ele.browse_name}</Option>);
-
+      if (ele.browser_id !== "9") {
+        resultArray.push(
+          <Option key={ele.browser_id} value={`${ele.browser_id}`}>{ele.browse_name}</Option>);
+      }
     });
   }
 
@@ -506,5 +523,5 @@ export {
   loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadReleaseIDSelect, loadOnlineEnvSelect,
   loadPulishItemSelect, loadIsApiAndDbUpgradeSelect, loadUpgradeApiSelect, loadApiServiceSelect, loadApiMethodSelect,
   loadCategorySelect, loadCommiterSelect, loadTechSideSelect, loadBranchNameSelect, loadServiceSelect, loadImgEnvSelect,
-  loadCheckTypeSelect,loadBrowserTypeSelect
+  loadCheckTypeSelect, loadBrowserTypeSelect
 };

@@ -134,6 +134,9 @@ const getUpgradeApi = (idStr: string) => {
 // 上线环境
 const getOnlineDev = (idStr: string) => {
 
+  if (!idStr) {
+    return "";
+  }
   const devArray = idStr.split(",");
   let returnValue = "";
   devArray.forEach((ele: string) => {

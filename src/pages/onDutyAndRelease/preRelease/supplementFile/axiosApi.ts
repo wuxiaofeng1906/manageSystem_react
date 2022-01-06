@@ -605,6 +605,16 @@ const getBrowserType = async () => {
 
 // 线上分支设置保存
 const saveOnlineBranch = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any) => {
+
+  let frontCheck = "2";
+  if (sourceData.ignoreFrontCheck) {
+    frontCheck = (sourceData.ignoreFrontCheck).length === 1 ? "1" : "2";
+  }
+
+  let backendCheck = "2";
+  if (sourceData.ignoreBackendCheck) {
+    backendCheck = (sourceData.ignoreBackendCheck).length === 1 ? "1" : "2";
+  }
   const data = {
     "check_num": newOnlineBranchNum,
     "user_name": usersInfo.name,
@@ -612,8 +622,8 @@ const saveOnlineBranch = async (type: string, currentListNo: string, newOnlineBr
     "ready_release_num": currentListNo,
     "branch_name": sourceData.branchName,
     "technical_side": sourceData.module,
-    "ignore_check_test_unit_backend": (sourceData.ignoreFrontCheck).length === 1 ? "1" : "2",
-    "ignore_check_test_unit_front": (sourceData.ignoreBackendCheck).length === 1 ? "1" : "2",
+    "ignore_check_test_unit_backend": frontCheck,
+    "ignore_check_test_unit_front": backendCheck,
   };
 
   if (type === "修改") {
@@ -727,7 +737,6 @@ const saveEnvironmentCheck = async (type: string, currentListNo: string, newOnli
 
 // (上线前后)自动化检查
 const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any) => {
-  debugger;
 
   const data = [];
 

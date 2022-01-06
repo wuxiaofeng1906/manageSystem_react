@@ -6,7 +6,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import './supplementFile/style.css';
 import {
   Button, Form, Input, message, Modal, Select, Tabs,
-  Row, Col, DatePicker, Checkbox, Divider, Card, Switch, Progress
+  Row, Col, DatePicker, Checkbox, Divider, Card, Switch, Progress, Spin
 } from 'antd';
 import dayjs from "dayjs";
 import moment from "moment";
@@ -62,7 +62,7 @@ const PreRelease: React.FC<any> = () => {
   };
 
   // 上线分支设置
-  const [onlineBranchModal, setOnlineBranchModal] = useState({shown: false, title: "新增"});
+  const [onlineBranchModal, setOnlineBranchModal] = useState({shown: false, title: "新增", loading: false});
 
   const initData = useRequest(() => alalysisInitData()).data;
 
@@ -215,7 +215,8 @@ const PreRelease: React.FC<any> = () => {
       formForOnlineBranch.resetFields();
       setOnlineBranchModal({
         shown: true,
-        title: "新增"
+        title: "新增",
+        loading: false
       });
 
       const result = await getCheckNumForOnlineBranch();
@@ -298,7 +299,8 @@ const PreRelease: React.FC<any> = () => {
       case 4:
         setOnlineBranchModal({
           shown: true,
-          title: "修改"
+          title: "修改",
+          loading: false
         });
         break;
       default:
@@ -1570,13 +1572,54 @@ const PreRelease: React.FC<any> = () => {
   const onlineBranchCancle = () => {
     setOnlineBranchModal({
       shown: false,
-      title: "新增"
+      title: "新增",
+      loading: false
     });
   };
   // 保存
   const saveOnlineBranchResult = async () => {
+    setOnlineBranchModal({
+      ...onlineBranchModal,
+      loading: true
+    });
+
     const formData = formForOnlineBranch.getFieldsValue();
     const result = await saveOnlineBranchData(onlineBranchModal.title, currentListNo, newOnlineBranchNum, formData);
+
+    if (result === "") {
+
+      message.info({
+        content: "保存成功！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      setOnlineBranchModal({
+        shown: false,
+        title: "新增",
+        loading: false
+      });
+
+      const newData: any = await alalysisInitData("onlineBranch");
+      firstOnlineBranchGridApi.current?.setRowData(newData.onlineBranch);
+
+    } else {
+      message.error({
+        content: result,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      setOnlineBranchModal({
+        ...onlineBranchModal,
+        loading: false
+      });
+
+    }
+
   };
 
   // 清空表中数据
@@ -2747,17 +2790,18 @@ const PreRelease: React.FC<any> = () => {
         </Form>
       </Modal>
 
-
       {/* 上线分支设置 */}
       <Modal
         title={`上线分支设置-${onlineBranchModal.title}`}
         visible={onlineBranchModal.shown}
         onCancel={onlineBranchCancle}
+        maskClosable={false}
         centered={true}
         footer={null}
         width={600}
         bodyStyle={{height: 810}}
       >
+
         <Form form={formForOnlineBranch}>
 
           {/* 总设置 */}
@@ -2956,18 +3000,25 @@ const PreRelease: React.FC<any> = () => {
             </Row>
           </div>
 
-          <Form.Item>
-            <Button
-              style={{borderRadius: 5, marginLeft: 20, float: "right"}} onClick={onlineBranchClear}>清空
-            </Button>
-            <Button type="primary"
-                    style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, float: "right"}}
-                    onClick={saveOnlineBranchResult}>保存 </Button>
+          <Spin spinning={onlineBranchModal.loading} tip="保存中...">
+            <Form.Item>
+              <Button
+                style={{borderRadius: 5, marginLeft: 20, float: "right"}} onClick={onlineBranchClear}>清空
+              </Button>
 
-          </Form.Item>
+              <Button type="primary"
+                      style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, float: "right"}}
+                      onClick={saveOnlineBranchResult}>保存 </Button>
+
+
+            </Form.Item>
+          </Spin>
 
         </Form>
+
       </Modal>
+
+
     </PageContainer>
   );
 };

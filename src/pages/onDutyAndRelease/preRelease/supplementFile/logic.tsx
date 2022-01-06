@@ -146,12 +146,26 @@ const saveOnlineBranchData = async (type: string, currentListNo: string, newOnli
   //  3.环境一致性检查
   //  4.(上线前后)自动化检查设置
 
-  return {
-    // onlineBranch: await saveOnlineBranch(type, currentListNo, newOnlineBranchNum, sourceData),
-    // versonCheck:await saveVersonCheck(type, currentListNo, newOnlineBranchNum, sourceData),
-    // enviromentCheck: await saveEnvironmentCheck(type, currentListNo, newOnlineBranchNum, sourceData),
-    onlineAutoCheck: await saveOnlineAutoCheck(type, currentListNo, newOnlineBranchNum, sourceData),
+  let returnMessage = "";
+  const onlineBranch = await saveOnlineBranch(type, currentListNo, newOnlineBranchNum, sourceData);
+  if (onlineBranch !== "") {
+    returnMessage = `上线分支保存失败：${onlineBranch}`;
   }
+  const versonCheck = await saveVersonCheck(type, currentListNo, newOnlineBranchNum, sourceData);
+  if (versonCheck !== "") {
+    returnMessage = returnMessage === "" ? `版本检查设置保存失败：${versonCheck}` : `${returnMessage}；\n版本检查设置保存失败：${versonCheck}`;
+  }
+
+  const enviromentCheck = await saveEnvironmentCheck(type, currentListNo, newOnlineBranchNum, sourceData);
+  if (enviromentCheck !== "") {
+    returnMessage = returnMessage === "" ? `环境一致性检查保存失败：${enviromentCheck}` : `${returnMessage}；\n环境一致性检查保存失败：${enviromentCheck}`;
+  }
+  const onlineAutoCheck = await saveOnlineAutoCheck(type, currentListNo, newOnlineBranchNum, sourceData);
+  if (onlineAutoCheck !== "") {
+    returnMessage = returnMessage === "" ? `自动化检查保存失败：${onlineAutoCheck}` : `${returnMessage}；\n自动化检查保存失败：${onlineAutoCheck}`;
+  }
+
+  return returnMessage;
 };
 export {
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems, addPulishApi, confirmUpgradeService,

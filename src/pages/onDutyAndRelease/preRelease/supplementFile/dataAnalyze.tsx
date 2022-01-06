@@ -94,6 +94,11 @@ const alalysisInitData = async (queryData = "all") => {
   if (queryData === "dataReview") {
     return {reviewData_repaire: analysisReviewData(datas[0].review_data)}
   }
+
+  if (queryData === "onlineBranch") {
+    return {onlineBranch: analysisOnlineBranch(datas[0].release_branch)}
+  }
+
   return {
     // 预发布项目
     preProject: analysisPreReleaseProject(datas[0].project),

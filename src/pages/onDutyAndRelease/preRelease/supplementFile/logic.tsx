@@ -2,7 +2,7 @@ import {
   savePrePulishProjects, queryServiceByID, saveUpgradeItem, delUpgradeItem,
   savePulishApi, delPulishApi, upgradeServiceConfirm, addDataRepaire, modifyDataRepaire,
   delDataReviewApi, dataRepairConfirm, getNewCheckNum, saveOnlineBranch, saveVersonCheck,
-  saveEnvironmentCheck, saveOnlineAutoCheck
+  saveEnvironmentCheck, saveOnlineAutoCheck, getDetaisByCHeckNum
 } from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
 
 const userLogins: any = localStorage.getItem("userLogins");
@@ -146,6 +146,7 @@ const saveOnlineBranchData = async (type: string, currentListNo: string, newOnli
   //  3.环境一致性检查
   //  4.(上线前后)自动化检查设置
 
+  debugger;
   let returnMessage = "";
   const onlineBranch = await saveOnlineBranch(type, currentListNo, newOnlineBranchNum, sourceData);
   if (onlineBranch !== "") {
@@ -167,7 +168,143 @@ const saveOnlineBranchData = async (type: string, currentListNo: string, newOnli
 
   return returnMessage;
 };
+
+// 上线分支修改-表头数据解析
+const alayOnlineCheckHead = (source_data: any) => {
+  let f_ignore = "2";
+  let b_ignore = "2";
+  const testUnit = source_data.test_unit;
+
+  // 判断是否忽略前后端检查
+  if (testUnit) {
+    testUnit.forEach((ele: any) => {
+      if (ele.test_case_technical_side === "1") { // 前端
+        f_ignore = ele.ignore_check;
+      } else if (ele.test_case_technical_side === "2") { // 后端
+        b_ignore = ele.ignore_check;
+      }
+
+    });
+  }
+  const checkHeadData = {
+    branchCheckId: source_data.branch_check_id,
+    checkNum: source_data.check_num,
+    branchName: source_data.branch_name,
+    module: source_data.technical_side,
+    ignoreBackendCheck: f_ignore,
+    ignoreFrontCheck: b_ignore,
+
+  };
+
+  return checkHeadData;
+};
+
+// 分支和版本检查
+const alayVersonCheck = (source_data: any) => {
+  if (!source_data.version_check || (source_data.version_check).length === 0) {
+    return {};
+  }
+  const checkData = (source_data.version_check)[0];
+
+  const versonCheckData = {
+    versionCheckId: checkData.version_check_id,
+    checkNum: checkData.check_num,
+    verson_check: checkData.backend_version_check_flag,
+    server: (checkData.server).split(","),
+    imageevn: checkData.image_env,
+  };
+
+  const branchCheck = {
+    versionCheckId: checkData.version_check_id,
+    checkNum: checkData.check_num,
+    branchcheck: checkData.inclusion_check_flag,
+    branch_mainBranch: (checkData.main_branch).split(","),
+    branch_teachnicalSide: (checkData.technical_side).split(","),
+    branch_mainSince: checkData.main_since,
+  };
+
+
+  return {versonCheckData, branchCheck}
+};
+
+// 环境一致性检查
+const alayEnvironmentCheck = (source_data: any) => {
+  if (!source_data.env_check || (source_data.env_check).length === 0) {
+    return {};
+  }
+
+  const envData = (source_data.env_check)[0];
+
+  return {
+    checkNum: envData.check_num,
+    checkId: envData.check_id,
+    ignoreCheck: envData.ignore_check,
+    checkEnv: envData.check_env,
+  };
+};
+
+// 自动化检查
+const autoCheck = (source_data: any) => {
+  if (!source_data.automation_check || (source_data.automation_check).length === 0) {
+    return {};
+  }
+
+  const beforeOnline = {
+    automationId: "",
+    checkNum: "",
+    autoBeforeIgnoreCheck: "",
+    beforeCheckType: "",
+    beforeTestEnv: "",
+    beforeBrowser: "",
+  };
+  const afterOnliinie = {
+    automationId: "",
+    checkNum: "",
+    autoAfterIgnoreCheck: "",
+    afterCheckType: "",
+    afterTestEnv: "",
+    afterBrowser: "",
+  };
+  (source_data.automation_check).forEach((ele: any) => {
+    if (ele.check_time === "1") { // 上线前
+      beforeOnline.automationId = ele.automation_id;
+      beforeOnline.checkNum = ele.check_num;
+      beforeOnline.autoBeforeIgnoreCheck = ele.ignore_check;
+      beforeOnline.beforeCheckType = ele.check_type;
+      beforeOnline.beforeTestEnv = ele.test_env;
+      beforeOnline.beforeBrowser = ele.browser;
+    } else if (ele.check_time === "2") { // 上线后
+      afterOnliinie.automationId = ele.automation_id;
+      afterOnliinie.checkNum = ele.check_num;
+      afterOnliinie.autoAfterIgnoreCheck = ele.ignore_check;
+      afterOnliinie.afterCheckType = ele.check_type;
+      afterOnliinie.afterTestEnv = ele.test_env;
+      afterOnliinie.afterBrowser = ele.browser;
+
+    }
+
+  });
+
+  return {beforeOnline, afterOnliinie};
+
+};
+// 获取上线分支修改时的原始数据
+const getModifiedData = async (checkNum: string) => {
+
+  const source = await getDetaisByCHeckNum(checkNum);
+  const source_data = source.data
+
+  return {
+    checkHead: alayOnlineCheckHead(source_data),
+    versonCheck: alayVersonCheck(source_data).versonCheckData,
+    branchCheck: alayVersonCheck(source_data).branchCheck,
+    envCheck: alayEnvironmentCheck(source_data),
+    beforeOnlineCheck: autoCheck(source_data).beforeOnline,
+    afterOnlineCheck: autoCheck(source_data).afterOnliinie
+
+  }
+}
 export {
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems, addPulishApi, confirmUpgradeService,
-  dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch, saveOnlineBranchData
+  dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch, saveOnlineBranchData, getModifiedData
 };

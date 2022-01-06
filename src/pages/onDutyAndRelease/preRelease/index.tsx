@@ -23,7 +23,7 @@ import {useRequest} from "ahooks";
 import {
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems,
   addPulishApi, confirmUpgradeService, dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch,
-  saveOnlineBranchData
+  saveOnlineBranchData, getModifiedData
 } from "./supplementFile/logic";
 import {alalysisInitData} from "./supplementFile/dataAnalyze";
 import {
@@ -218,23 +218,56 @@ const PreRelease: React.FC<any> = () => {
         title: "新增",
         loading: false
       });
-
       const result = await getCheckNumForOnlineBranch();
-
       newOnlineBranchNum = result.data?.check_num;
-
     } else {
 
-      // dataReviewForm.setFieldsValue({
-      //   repaireContent: params.repair_data_content,
-      //   relatedRenter: params.related_tenant,
-      //   types: params.type,
-      //   repaireCommiter: `${params.commit_user_id}&${params.commit_user_name}`,
-      //   branch: params.branch,
-      //   EvalResult: params.review_result,
-      //   repeatExecute: params.is_repeat,
-      //   reviewId: params.review_id
-      // });
+      newOnlineBranchNum = params.check_num;
+      const oraData = await getModifiedData(newOnlineBranchNum);
+
+      formForOnlineBranch.setFieldsValue({
+        // 表头设置
+        branchName: oraData.checkHead.branchName,
+        ignoreFrontCheck: oraData.checkHead.ignoreFrontCheck,
+        module: oraData.checkHead.module,
+        ignoreBackendCheck: oraData.checkHead.ignoreBackendCheck,
+
+        // 版本检查设置
+        verson_check: oraData.versonCheck?.verson_check,
+        server: oraData.versonCheck?.server,
+        imageevn: oraData.versonCheck?.imageevn,
+
+        // 对比分支
+        branchcheck: oraData.branchCheck?.branchcheck,
+        branch_mainBranch: oraData.branchCheck?.branch_mainBranch,
+        branch_teachnicalSide: oraData.branchCheck?.branch_teachnicalSide,
+        branch_mainSince: moment(oraData.branchCheck?.branch_mainSince),
+
+        // 环境一致性检查
+        ignoreCheck: oraData.envCheck.ignoreCheck,
+        checkEnv: oraData.envCheck.checkEnv,
+
+        // 上线前自动化检查
+        autoBeforeIgnoreCheck: oraData.beforeOnlineCheck?.autoBeforeIgnoreCheck,
+        beforeCheckType: oraData.beforeOnlineCheck?.beforeCheckType,
+        beforeTestEnv: oraData.beforeOnlineCheck?.beforeTestEnv,
+        beforeBrowser: oraData.beforeOnlineCheck?.beforeBrowser,
+
+        //  上线后自动化检查
+        autoAfterIgnoreCheck: oraData.afterOnlineCheck?.autoAfterIgnoreCheck,
+        afterCheckType: oraData.afterOnlineCheck?.afterCheckType,
+        afterTestEnv: oraData.afterOnlineCheck?.afterTestEnv,
+        afterBrowser: oraData.afterOnlineCheck?.afterBrowser,
+
+
+        //   隐藏字段，修改时需要使用
+        branchCheckId: oraData.checkHead?.branchCheckId,
+        versionCheckId: oraData.versonCheck?.versionCheckId,
+        envCheckId: oraData.envCheck?.checkId,
+        beforeAutomationId: oraData.beforeOnlineCheck?.automationId,
+        afterAutomationId: oraData.afterOnlineCheck?.automationId
+      });
+
       setOnlineBranchModal({
         shown: true,
         title: "修改",
@@ -1523,7 +1556,7 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '分支名称',
       field: 'branch_name',
-      maxWidth: 115,
+      minWidth: 100,
     },
     {
       headerName: '技术侧',
@@ -2844,7 +2877,7 @@ const PreRelease: React.FC<any> = () => {
                 {/* 忽略前端单元测试检查 */}
                 <Form.Item name="ignoreFrontCheck" style={{marginLeft: 0, marginTop: -20}}>
                   <Checkbox.Group>
-                    <Checkbox value={"ignoreFrontCheck"}>忽略前端单元测试检查</Checkbox>
+                    <Checkbox value={"1"}>忽略前端单元测试检查</Checkbox>
                   </Checkbox.Group>
                 </Form.Item>
               </Col>
@@ -2859,7 +2892,7 @@ const PreRelease: React.FC<any> = () => {
                 {/* 忽略后端单元测试检查 */}
                 <Form.Item name="ignoreBackendCheck" style={{marginLeft: 0, marginTop: -20}}>
                   <Checkbox.Group>
-                    <Checkbox value={"ignoreBackendCheck"}>忽略后端单元测试检查</Checkbox>
+                    <Checkbox value={"1"}>忽略后端单元测试检查</Checkbox>
                   </Checkbox.Group>
                 </Form.Item>
               </Col>
@@ -2926,7 +2959,7 @@ const PreRelease: React.FC<any> = () => {
                   {/* 忽略检查 */}
                   <Form.Item label="是否忽略检查" name="ignoreCheck" style={{marginTop: -10}}>
                     <Checkbox.Group>
-                      <Checkbox value={"ignoreCheck"}>忽略检查</Checkbox>
+                      <Checkbox value={"1"}>忽略检查</Checkbox>
                     </Checkbox.Group>
                   </Form.Item>
                 </Col>
@@ -2952,7 +2985,7 @@ const PreRelease: React.FC<any> = () => {
                 {/* 忽略检查 */}
                 <Form.Item label="是否忽略检查" name="autoBeforeIgnoreCheck" style={{marginTop: -10}}>
                   <Checkbox.Group>
-                    <Checkbox value={"autoBeforeIgnoreCheck"}>忽略检查</Checkbox>
+                    <Checkbox value={"1"}>忽略检查</Checkbox>
                   </Checkbox.Group>
                 </Form.Item>
               </Col>
@@ -2993,7 +3026,7 @@ const PreRelease: React.FC<any> = () => {
                 {/* 忽略检查 */}
                 <Form.Item label="是否忽略检查" name="autoAfterIgnoreCheck" style={{marginTop: -10}}>
                   <Checkbox.Group>
-                    <Checkbox value={"autoAfterIgnoreCheck"}>忽略检查</Checkbox>
+                    <Checkbox value={"1"}>忽略检查</Checkbox>
                   </Checkbox.Group>
                 </Form.Item>
               </Col>
@@ -3035,10 +3068,37 @@ const PreRelease: React.FC<any> = () => {
               <Button type="primary"
                       style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, float: "right"}}
                       onClick={saveOnlineBranchResult}>保存 </Button>
-
-
             </Form.Item>
           </Spin>
+
+          {/* 隐藏字段，进行修改需要的字段 */}
+          <Row style={{marginTop: -60}}>
+            <Col span={2}>
+              <Form.Item name="branchCheckId">
+                <Input style={{width: 50, display: "none"}}/>
+              </Form.Item>
+            </Col>
+            <Col span={2}>
+              <Form.Item name="versionCheckId">
+                <Input style={{width: 50, display: "none"}}/>
+              </Form.Item>
+            </Col>
+            <Col span={2}>
+              <Form.Item name="envCheckId">
+                <Input style={{width: 50, display: "none"}}/>
+              </Form.Item>
+            </Col>
+            <Col span={2}>
+              <Form.Item name="beforeAutomationId">
+                <Input style={{width: 50, display: "none"}}/>
+              </Form.Item>
+            </Col>
+            <Col span={2}>
+              <Form.Item name="afterAutomationId">
+                <Input style={{width: 50, display: "none"}}/>
+              </Form.Item>
+            </Col>
+          </Row>
 
         </Form>
 

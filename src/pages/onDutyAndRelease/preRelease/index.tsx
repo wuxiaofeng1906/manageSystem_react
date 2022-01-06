@@ -235,10 +235,11 @@ const PreRelease: React.FC<any> = () => {
       //   repeatExecute: params.is_repeat,
       //   reviewId: params.review_id
       // });
-      // setDataReviewModal({
-      //   shown: true,
-      //   title: "修改"
-      // });
+      setOnlineBranchModal({
+        shown: true,
+        title: "修改",
+        loading: false
+      });
 
     }
 
@@ -297,11 +298,7 @@ const PreRelease: React.FC<any> = () => {
         break;
 
       case 4:
-        setOnlineBranchModal({
-          shown: true,
-          title: "修改",
-          loading: false
-        });
+        showOnlineBranchForm("modify", params)
         break;
       default:
         break;
@@ -401,6 +398,7 @@ const PreRelease: React.FC<any> = () => {
 
   // 操作按钮渲染
   const operateRenderer = (type: number, params: any) => {
+
     const typeStr = JSON.stringify(type);
     const paramData = JSON.stringify(params.data).replace(/'/g, "’");
     if (type === 1) {  // 发布项没有新增功能
@@ -1160,8 +1158,15 @@ const PreRelease: React.FC<any> = () => {
       }
 
       // 解析时间
-      const start = ele.test_case_start_time === "" ? "" : dayjs(ele.test_case_start_time).format("HH:mm:ss");
-      const end = ele.test_case_end_time === "" ? "" : dayjs(ele.test_case_end_time).format("HH:mm:ss");
+      let start = "";
+      if (ele.test_case_start_time) {
+        start = dayjs(ele.test_case_start_time).format("HH:mm:ss");
+      }
+
+      let end = "";
+      if (ele.test_case_end_time) {
+        end = dayjs(ele.test_case_end_time).format("HH:mm:ss");
+      }
       let timeRange = "";
       if (start) {
         timeRange = `${start}~${end}`;
@@ -1235,19 +1240,6 @@ const PreRelease: React.FC<any> = () => {
   // 渲染上线前版本检查是否通过
   const beforeOnlineVersionCheck = (params: any) => {
 
-    const commonDiv = `
-    <div style="margin-top: -10px">
-        <div style="text-align: right" >
-
-            <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
-              <img src="../执行.png" width="14" height="14" alt="执行参数" title="执行参数">
-            </Button>
-            <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
-              <img src="../taskUrl.png" width="14" height="14" alt="执行参数" title="执行参数">
-            </Button>
-        </div>
-    </div>
-    `;
 
     if (!params.value || (params.value).length === 0) {
       return "";
@@ -1264,10 +1256,17 @@ const PreRelease: React.FC<any> = () => {
       side = "前后端";
     }
 
-
     // 解析时间
-    const start = values.check_start_time === "-" ? "" : dayjs(values.check_start_time).format("HH:mm:ss");
-    const end = values.check_end_time === "-" ? "" : dayjs(values.check_end_time).format("HH:mm:ss");
+    let start = "";
+    if (values.check_start_time) {
+      start = dayjs(values.check_start_time).format("HH:mm:ss");
+    }
+
+    let end = "";
+    if (values.check_end_time) {
+      end = dayjs(values.check_end_time).format("HH:mm:ss");
+    }
+
     let timeRange = "";
     if (start) {
       timeRange = `${start}~${end}`;
@@ -1296,13 +1295,24 @@ const PreRelease: React.FC<any> = () => {
     }
 
     return `
-        ${commonDiv}
-        <div style="margin-top: -20px">
-            <div style="font-size: 10px">
-                <div>${side}： <button style="color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button> &nbsp;${timeRange}</div>
-            </div>
+         <div>
+          <div style="margin-top: -10px;text-align: right">
 
-        </div>
+            <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
+              <img src="../执行.png" width="14" height="14" alt="执行参数" title="执行参数">
+            </Button>
+            <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
+              <img src="../taskUrl.png" width="14" height="14" alt="执行参数" title="执行参数">
+            </Button>
+
+          </div>
+          <div style="margin-top: -20px;width: 200px">
+              <div style="font-size: 10px">
+                  <div>${side}： <button style="color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button> &nbsp;${timeRange}</div>
+              </div>
+
+          </div>
+      </div>
     `;
 
   };
@@ -1333,8 +1343,16 @@ const PreRelease: React.FC<any> = () => {
     }
 
     // 解析时间
-    const start = values.check_start_time === "-" ? "" : dayjs(values.check_start_time).format("HH:mm:ss");
-    const end = values.check_end_time === "-" ? "" : dayjs(values.check_end_time).format("HH:mm:ss");
+    let start = "";
+    if (values.check_start_time) {
+      start = dayjs(values.check_start_time).format("HH:mm:ss");
+    }
+
+    let end = "";
+    if (values.check_end_time) {
+      end = dayjs(values.check_end_time).format("HH:mm:ss");
+    }
+
     let timeRange = "";
     if (start) {
       timeRange = `${start}~${end}`;
@@ -1350,7 +1368,7 @@ const PreRelease: React.FC<any> = () => {
                 <img src="../taskUrl.png" width="14" height="14" alt="执行参数" title="执行参数">
               </Button>
             </div>
-            <div style=" margin-top: -20px;font-size: 10px">
+            <div style=" margin-top: -20px;font-size: 10px;width: 200px">
                 <div><label style="color: ${Color}"> ${result}</label> &nbsp;${timeRange}</div>
             </div>
 
@@ -1390,8 +1408,15 @@ const PreRelease: React.FC<any> = () => {
         }
 
         // 解析时间
-        const start = ele.check_start_time === "" ? "" : dayjs(ele.check_start_time).format("HH:mm:ss");
-        const end = ele.check_end_time === "" ? "" : dayjs(ele.check_end_time).format("HH:mm:ss");
+        let start = "";
+        if (ele.check_start_time) {
+          start = dayjs(ele.check_start_time).format("HH:mm:ss");
+        }
+
+        let end = "";
+        if (ele.check_end_time) {
+          end = dayjs(ele.check_end_time).format("HH:mm:ss");
+        }
         if (start) {
           timeRange = `${start}~${end}`;
         }
@@ -1422,7 +1447,7 @@ const PreRelease: React.FC<any> = () => {
   // 封板状态
   const sealStatusRenderer = (params: any) => {
     if (!params.value) {
-      return [];
+      return `<div></div>`;
     }
 
     const values = params.value;
@@ -1433,9 +1458,8 @@ const PreRelease: React.FC<any> = () => {
       if (arrayData.technical_side === "1") { // 是前端
         side = "前端：";
       } else if (arrayData.technical_side === "2") { // 是后端
-        side = "后端："
+        side = "后端：";
       }
-      ;
 
       const status = arrayData.sealing_version === "1" ? "已封板" : "未封板";
       const sideColor = arrayData.sealing_version === "1" ? "#2BF541" : "orange";
@@ -1483,7 +1507,7 @@ const PreRelease: React.FC<any> = () => {
         </div>
     `;
     }
-    return values;
+    return `<div></div>`;
   };
 
   const firstOnlineBranchColumn: any = [
@@ -1551,10 +1575,11 @@ const PreRelease: React.FC<any> = () => {
     {
       headerName: '操作',
       pinned: "right",
+      field: 'branch_sealing_check',
       minWidth: 100,
       maxWidth: 100,
       cellRenderer: (params: any) => {
-        return operateRenderer(4, params)
+        return operateRenderer(4, params);
       }
     }];
   const firstOnlineBranchGridApi = useRef<GridApi>();
@@ -1600,6 +1625,7 @@ const PreRelease: React.FC<any> = () => {
         title: "新增",
         loading: false
       });
+
 
       const newData: any = await alalysisInitData("onlineBranch");
       firstOnlineBranchGridApi.current?.setRowData(newData.onlineBranch);
@@ -2878,8 +2904,8 @@ const PreRelease: React.FC<any> = () => {
 
                 <Form.Item label="技术侧" name="branch_teachnicalSide" style={{marginTop: -25}}>
                   <Checkbox.Group style={{marginLeft: 56}}>
-                    <Checkbox value={"1"}>前端</Checkbox>
-                    <Checkbox value={"2"}>后端</Checkbox>
+                    <Checkbox value={"front"}>前端</Checkbox>
+                    <Checkbox value={"backend"}>后端</Checkbox>
                   </Checkbox.Group>
                 </Form.Item>
 

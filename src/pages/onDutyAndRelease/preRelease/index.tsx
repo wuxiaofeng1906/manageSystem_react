@@ -2881,7 +2881,9 @@ const PreRelease: React.FC<any> = () => {
               <Col>
                 {/* 忽略检查 */}
                 <Form.Item label="是否忽略检查" name="autoBeforeIgnoreCheck" style={{marginTop: -10}}>
-                  <Checkbox>忽略检查</Checkbox>
+                  <Checkbox.Group>
+                    <Checkbox value={"autoBeforeIgnoreCheck"}>忽略检查</Checkbox>
+                  </Checkbox.Group>
                 </Form.Item>
               </Col>
             </Row>
@@ -2920,7 +2922,9 @@ const PreRelease: React.FC<any> = () => {
               <Col>
                 {/* 忽略检查 */}
                 <Form.Item label="是否忽略检查" name="autoAfterIgnoreCheck" style={{marginTop: -10}}>
-                  <Checkbox>忽略检查</Checkbox>
+                  <Checkbox.Group>
+                    <Checkbox value={"autoAfterIgnoreCheck"}>忽略检查</Checkbox>
+                  </Checkbox.Group>
                 </Form.Item>
               </Col>
             </Row>

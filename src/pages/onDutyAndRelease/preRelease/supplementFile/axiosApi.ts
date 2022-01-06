@@ -694,12 +694,16 @@ const saveVersonCheck = async (type: string, currentListNo: string, newOnlineBra
 
 // 环境一致性检查
 const saveEnvironmentCheck = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any) => {
-  debugger;
+
+  let ignore_check = "2";
+  if (sourceData.ignoreCheck) {
+    ignore_check = (sourceData.ignoreCheck).length === 1 ? "1" : "2";
+  }
   const data = {
     "check_num": newOnlineBranchNum,
     "user_name": usersInfo.name,
     "user_id": usersInfo.userid,
-    "ignore_check": (sourceData.ignoreCheck).length === 1 ? "1" : "2",
+    "ignore_check": ignore_check,
     "check_env": sourceData.checkEnv
   }
   if (type === "修改") {
@@ -720,6 +724,78 @@ const saveEnvironmentCheck = async (type: string, currentListNo: string, newOnli
   return errorMessage;
 
 };
+
+// (上线前后)自动化检查
+const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any) => {
+  debugger;
+
+  const data = [];
+
+  // 上线前检查
+  let before_ignore_check = "2";
+  if (sourceData.autoBeforeIgnoreCheck) {
+    before_ignore_check = (sourceData.autoBeforeIgnoreCheck).length === 1 ? "1" : "2";
+  }
+
+  let before_check_type = "";
+  (sourceData.beforeCheckType).forEach((ele: string) => {
+    before_check_type = before_check_type === "" ? ele : `${before_check_type},${ele}`;
+  });
+  data.push({
+    "check_num": newOnlineBranchNum,
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "check_time": "1",    // 1 上线前检查， 2 上线后检查
+    "ignore_check": before_ignore_check,
+    "check_type": before_check_type,
+    "test_env": sourceData.beforeTestEnv,
+    "browser": sourceData.beforeBrowser,
+    // "automation_id": 0,
+  });
+
+
+  // 上线后检查
+  let after_ignore_check = "2";
+  if (sourceData.autoAfterIgnoreCheck) {
+    after_ignore_check = (sourceData.autoAfterIgnoreCheck).length === 1 ? "1" : "2";
+  }
+  let after_check_type = "";
+  (sourceData.afterCheckType).forEach((ele: string) => {
+    after_check_type = after_check_type === "" ? ele : `${after_check_type},${ele}`;
+  });
+
+  data.push({
+    "check_num": newOnlineBranchNum,
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "check_time": "2",    // 1 上线前检查， 2 上线后检查
+    "ignore_check": after_ignore_check,
+    "check_type": after_check_type,
+    "test_env": sourceData.afterTestEnv,
+    "browser": sourceData.afterBrowser,
+    // "automation_id": 0,
+
+  });
+
+  if (type === "修改") {
+    data[0]["automation_id"] = "";
+    data[1]["automation_id"] = "";
+  }
+
+  let errorMessage = "";
+  await axios.post("/api/verify/release/automation_check", data)
+    .then(function (res) {
+
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+};
 /* endregion */
 
 export {
@@ -728,7 +804,7 @@ export {
   delUpgradeItem, getUpgradeApi, getApiService, getApiMethod, savePulishApi, delPulishApi,
   upgradeServiceConfirm, getRepaireCategory, addDataRepaire, modifyDataRepaire, delDataReviewApi,
   dataRepairConfirm, getTechSide, getCheckType, getBrowserType, getNewCheckNum, saveOnlineBranch,
-  saveVersonCheck, saveEnvironmentCheck
+  saveVersonCheck, saveEnvironmentCheck, saveOnlineAutoCheck
 };
 
 

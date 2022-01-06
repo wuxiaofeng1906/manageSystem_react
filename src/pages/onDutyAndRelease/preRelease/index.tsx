@@ -2857,7 +2857,7 @@ const PreRelease: React.FC<any> = () => {
         maskClosable={false}
         centered={true}
         footer={null}
-        width={700}
+        width={652}
         // bodyStyle={{height: 810}}
       >
 
@@ -2991,7 +2991,7 @@ const PreRelease: React.FC<any> = () => {
               </Col>
             </Row>
             <Row style={{marginTop: -10}}>
-              <Col span={7}>
+              <Col span={8}>
                 {/* 检查类型 */}
                 <Form.Item label="检查类型:" name="beforeCheckType" style={{marginTop: -10}}>
                   <Select mode="multiple" style={{width: '100%'}} showSearch>
@@ -2999,7 +2999,7 @@ const PreRelease: React.FC<any> = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={11}>
+              <Col span={9}>
                 {/* 测试环境 */}
                 <Form.Item label="测试环境:" name="beforeTestEnv" style={{marginTop: -10, marginLeft: 10}}>
                   <Select style={{width: '100%'}} showSearch>
@@ -3007,7 +3007,7 @@ const PreRelease: React.FC<any> = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={7}>
                 {/* 浏览器 */}
                 <Form.Item label="浏览器:" name="beforeBrowser" style={{marginTop: -10, marginLeft: 10}}>
                   <Select style={{width: '100%'}} showSearch>
@@ -3032,7 +3032,7 @@ const PreRelease: React.FC<any> = () => {
               </Col>
             </Row>
             <Row style={{marginTop: -10}}>
-              <Col span={7}>
+              <Col span={8}>
                 {/* 检查类型 */}
                 <Form.Item label="检查类型:" name="afterCheckType" style={{marginTop: -10}}>
                   <Select mode="multiple" style={{width: '100%'}} showSearch>
@@ -3040,7 +3040,7 @@ const PreRelease: React.FC<any> = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={11}>
+              <Col span={9}>
                 {/* 测试环境 */}
                 <Form.Item label="测试环境:" name="afterTestEnv" style={{marginTop: -10, marginLeft: 10}}>
                   <Select style={{width: '100%'}} showSearch>
@@ -3048,7 +3048,7 @@ const PreRelease: React.FC<any> = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={7}>
                 {/* 浏览器 */}
                 <Form.Item label="浏览器:" name="afterBrowser" style={{marginTop: -10, marginLeft: 10}}>
                   <Select style={{width: '100%'}} showSearch>

@@ -30,6 +30,7 @@ import {
   getReleaseItem, getIfOrNot, getDatabseAndApiUpgrade, getApiMethod, getUpgradeApi, getOnlineDev,
   getRepaireType, getPassOrNot, getTechSide
 } from "./supplementFile/converse";
+import {getGridHeight} from "./supplementFile/gridSet";
 
 const {TabPane} = Tabs;
 const {Option} = Select;
@@ -46,6 +47,17 @@ const PreRelease: React.FC<any> = () => {
   const [upgradeIntForm] = Form.useForm();
   const [dataReviewForm] = Form.useForm();
   const [formForOnlineBranch] = Form.useForm();
+
+  const [gridHeight, setGridHeight] = useState({
+    pulishItemGrid: 100,
+    upgradeApiGrid: 100,
+    upConfirm: 100,
+    dataRepaireReviewGrid: 100,
+    onlineBranchGrid: 100,
+    reviewConfirm: 100,
+    orderList: 100
+  });
+
 
   // 发布项新增和修改的共同modal显示
   const [pulishItemModal, setPulishItemModal] = useState({shown: false, title: "新增"});
@@ -1916,6 +1928,17 @@ const PreRelease: React.FC<any> = () => {
     // 对应工单
     firstListGridApi.current?.setRowData(source?.correspondOrder);
 
+    setGridHeight({
+      pulishItemGrid: getGridHeight((source?.upService_releaseItem).length),
+      upgradeApiGrid: getGridHeight((source?.upService_interface).length),
+      upConfirm: getGridHeight((source?.upService_confirm).length),
+      dataRepaireReviewGrid: getGridHeight((source?.reviewData_repaire).length),
+      reviewConfirm: getGridHeight((source?.reviewData_confirm).length),
+      onlineBranchGrid: getGridHeight((source?.onlineBranch).length),
+      orderList: getGridHeight((source?.correspondOrder).length),
+
+    });
+
   };
   const [showTabs, setShowTabs] = useState({
     shown: false,
@@ -2248,7 +2271,7 @@ const PreRelease: React.FC<any> = () => {
               <div>
 
                 {/* 表格一 */}
-                <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+                <div className="ag-theme-alpine" style={{height: gridHeight.pulishItemGrid, width: '100%'}}>
                   <AgGridReact
 
                     columnDefs={firstUpSerColumn} // 定义列
@@ -2271,7 +2294,7 @@ const PreRelease: React.FC<any> = () => {
                 </div>
 
                 {/* 表格二 */}
-                <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+                <div className="ag-theme-alpine" style={{height: gridHeight.upgradeApiGrid, width: '100%'}}>
 
                   <AgGridReact
                     columnDefs={secondUpSerColumn} // 定义列
@@ -2300,7 +2323,7 @@ const PreRelease: React.FC<any> = () => {
               <div>
                 <div style={{fontWeight: "bold"}}> 服务确认完成</div>
 
-                <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+                <div className="ag-theme-alpine" style={{height: gridHeight.upConfirm, width: '100%'}}>
 
                   <AgGridReact
                     columnDefs={thirdUpSerColumn} // 定义列
@@ -2346,7 +2369,7 @@ const PreRelease: React.FC<any> = () => {
             <div>
               {/* 表格 一 */}
               <div>
-                <div className="ag-theme-alpine" style={{height: 300, width: '100%'}}>
+                <div className="ag-theme-alpine" style={{height: gridHeight.dataRepaireReviewGrid, width: '100%'}}>
                   <AgGridReact
 
                     columnDefs={firstDataReviewColumn} // 定义列
@@ -2373,7 +2396,7 @@ const PreRelease: React.FC<any> = () => {
               <div>
                 <div style={{fontWeight: "bold"}}> Review确认完成</div>
 
-                <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+                <div className="ag-theme-alpine" style={{height: gridHeight.reviewConfirm, width: '100%'}}>
 
                   <AgGridReact
                     columnDefs={secondDataReviewColumn} // 定义列
@@ -2408,7 +2431,7 @@ const PreRelease: React.FC<any> = () => {
             <div>
               {/* ag-grid 表格 */}
               <div>
-                <div className="ag-theme-alpine" style={{height: 200, width: '100%'}}>
+                <div className="ag-theme-alpine" style={{height: gridHeight.onlineBranchGrid, width: '100%'}}>
                   <AgGridReact
 
                     columnDefs={firstOnlineBranchColumn} // 定义列
@@ -2449,7 +2472,7 @@ const PreRelease: React.FC<any> = () => {
               <div>
                 {/* ag-grid 表格 */}
                 <div>
-                  <div className="ag-theme-alpine" style={{height: 100, width: '100%'}}>
+                  <div className="ag-theme-alpine" style={{height: gridHeight.orderList, width: '100%'}}>
                     <AgGridReact
 
                       columnDefs={firstListColumn} // 定义列

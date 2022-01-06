@@ -1179,7 +1179,7 @@ const PreRelease: React.FC<any> = () => {
       // 解析是否成功
       let passFlag = "";
       if (ele.ignore_check === "1") {
-        passFlag = "是";
+        passFlag = "忽略";
       } else if (ele.test_case_status === "success") {
         passFlag = "是";
       } else if (ele.test_case_status === "error") {
@@ -2849,7 +2849,7 @@ const PreRelease: React.FC<any> = () => {
         </Form>
       </Modal>
 
-      {/* 上线分支设置 */}
+      {/* 上线分支设置  */}
       <Modal
         title={`上线分支设置-${onlineBranchModal.title}`}
         visible={onlineBranchModal.shown}
@@ -2857,8 +2857,8 @@ const PreRelease: React.FC<any> = () => {
         maskClosable={false}
         centered={true}
         footer={null}
-        width={600}
-        bodyStyle={{height: 810}}
+        width={700}
+        // bodyStyle={{height: 810}}
       >
 
         <Form form={formForOnlineBranch}>
@@ -2866,7 +2866,7 @@ const PreRelease: React.FC<any> = () => {
           {/* 总设置 */}
           <div>
             <Row>
-              <Col span={12}>
+              <Col span={16}>
 
                 {/* 分支名称 */}
                 <Form.Item label="分支名称:" name="branchName" required={true}>
@@ -2881,7 +2881,7 @@ const PreRelease: React.FC<any> = () => {
                   </Checkbox.Group>
                 </Form.Item>
               </Col>
-              <Col span={12}>
+              <Col span={8}>
 
                 {/* 技术侧 */}
                 <Form.Item label="技术侧:" name="module" style={{marginLeft: 10}} required={true}>
@@ -2991,7 +2991,7 @@ const PreRelease: React.FC<any> = () => {
               </Col>
             </Row>
             <Row style={{marginTop: -10}}>
-              <Col span={8}>
+              <Col span={7}>
                 {/* 检查类型 */}
                 <Form.Item label="检查类型:" name="beforeCheckType" style={{marginTop: -10}}>
                   <Select mode="multiple" style={{width: '100%'}} showSearch>
@@ -2999,7 +2999,7 @@ const PreRelease: React.FC<any> = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={8}>
+              <Col span={11}>
                 {/* 测试环境 */}
                 <Form.Item label="测试环境:" name="beforeTestEnv" style={{marginTop: -10, marginLeft: 10}}>
                   <Select style={{width: '100%'}} showSearch>
@@ -3007,7 +3007,7 @@ const PreRelease: React.FC<any> = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={8}>
+              <Col span={6}>
                 {/* 浏览器 */}
                 <Form.Item label="浏览器:" name="beforeBrowser" style={{marginTop: -10, marginLeft: 10}}>
                   <Select style={{width: '100%'}} showSearch>
@@ -3032,7 +3032,7 @@ const PreRelease: React.FC<any> = () => {
               </Col>
             </Row>
             <Row style={{marginTop: -10}}>
-              <Col span={8}>
+              <Col span={7}>
                 {/* 检查类型 */}
                 <Form.Item label="检查类型:" name="afterCheckType" style={{marginTop: -10}}>
                   <Select mode="multiple" style={{width: '100%'}} showSearch>
@@ -3040,7 +3040,7 @@ const PreRelease: React.FC<any> = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={8}>
+              <Col span={11}>
                 {/* 测试环境 */}
                 <Form.Item label="测试环境:" name="afterTestEnv" style={{marginTop: -10, marginLeft: 10}}>
                   <Select style={{width: '100%'}} showSearch>
@@ -3048,7 +3048,7 @@ const PreRelease: React.FC<any> = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={8}>
+              <Col span={6}>
                 {/* 浏览器 */}
                 <Form.Item label="浏览器:" name="afterBrowser" style={{marginTop: -10, marginLeft: 10}}>
                   <Select style={{width: '100%'}} showSearch>

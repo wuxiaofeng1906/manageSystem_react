@@ -267,18 +267,23 @@ const autoCheck = (source_data: any) => {
     afterBrowser: "",
   };
   (source_data.automation_check).forEach((ele: any) => {
+
+    let checkType = [];
+    if (ele.check_type) {
+      checkType = (ele.check_type).split(",");
+    }
     if (ele.check_time === "1") { // 上线前
       beforeOnline.automationId = ele.automation_id;
       beforeOnline.checkNum = ele.check_num;
       beforeOnline.autoBeforeIgnoreCheck = ele.ignore_check;
-      beforeOnline.beforeCheckType = ele.check_type;
+      beforeOnline.beforeCheckType = checkType;
       beforeOnline.beforeTestEnv = ele.test_env;
       beforeOnline.beforeBrowser = ele.browser;
     } else if (ele.check_time === "2") { // 上线后
       afterOnliinie.automationId = ele.automation_id;
       afterOnliinie.checkNum = ele.check_num;
       afterOnliinie.autoAfterIgnoreCheck = ele.ignore_check;
-      afterOnliinie.afterCheckType = ele.check_type;
+      afterOnliinie.afterCheckType = checkType;
       afterOnliinie.afterTestEnv = ele.test_env;
       afterOnliinie.afterBrowser = ele.browser;
 

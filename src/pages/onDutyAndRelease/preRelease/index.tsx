@@ -68,9 +68,20 @@ const PreRelease: React.FC<any> = () => {
   const [dataReviewtModal, setDataReviewModal] = useState({shown: false, title: "新增"});
 
   // 自动化测试日志弹窗
-  const [autoLogModal, setAutoLogModal] = useState(false);
+  const [autoLogModal, setAutoLogModal] = useState({
+    show: false,
+    url: {
+      ui: "",
+      api: ""
+    }
+  });
   const autoCancle = () => {
-    setAutoLogModal(false);
+    setAutoLogModal(
+      {
+        ...autoLogModal,
+        show: false
+      }
+    );
   };
 
   // 上线分支设置
@@ -234,6 +245,7 @@ const PreRelease: React.FC<any> = () => {
       newOnlineBranchNum = result.data?.check_num;
     } else {
 
+      debugger;
       newOnlineBranchNum = params.check_num;
       const oraData = await getModifiedData(newOnlineBranchNum);
 
@@ -359,6 +371,7 @@ const PreRelease: React.FC<any> = () => {
   const firstUpSerGridApi = useRef<GridApi>();
   const secondUpSerGridApi = useRef<GridApi>();
   const firstDataReviewGridApi = useRef<GridApi>();
+  const firstOnlineBranchGridApi = useRef<GridApi>();
 
   const [delModal, setDelModal] = useState({
     shown: false,
@@ -392,6 +405,9 @@ const PreRelease: React.FC<any> = () => {
 
 
     } else if (type === 4) { // 是上线分支删除
+
+      const newData: any = await alalysisInitData("onlineBranch");
+      firstOnlineBranchGridApi.current?.setRowData(newData.onlineBranch);
 
     }
   }
@@ -1371,11 +1387,12 @@ const PreRelease: React.FC<any> = () => {
 
             <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
             onclick='excuteDataCheck("versionCheck",${checkNum})'>
-              <img src="../执行.png" width="14" height="14" alt="执行参数" title="执行参数">
+              <img src="../执行.png" width="14" height="14" alt="执行" title="执行">
             </Button>
-            <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
-              <img src="../taskUrl.png" width="14" height="14" alt="执行参数" title="执行参数">
-            </Button>
+
+              <a href="${values.check_url}" target="_blank" >
+               <img src="../taskUrl.png" width="14" height="14" alt="执行" title="执行">
+             </a>
 
           </div>
           <div style="margin-top: -20px;width: 200px">
@@ -1431,15 +1448,17 @@ const PreRelease: React.FC<any> = () => {
     }
 
     const checkNum = JSON.stringify(params.data?.check_num);
+
     return `
         <div style="margin-top: -10px">
             <div style="text-align: right" >
               <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='excuteDataCheck("envCheck",${checkNum})'>
                 <img src="../执行.png" width="14" height="14" alt="执行参数" title="执行参数">
               </Button>
-              <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
-                <img src="../taskUrl.png" width="14" height="14" alt="执行参数" title="执行参数">
-              </Button>
+
+              <a href="${values.check_url}" target="_blank" >
+               <img src="../taskUrl.png" width="14" height="14" alt="执行" title="执行">
+             </a>
             </div>
             <div style=" margin-top: -20px;font-size: 10px;width: 200px">
                 <div><label style="color: ${Color}"> ${result}</label> &nbsp;${timeRange}</div>
@@ -1453,7 +1472,15 @@ const PreRelease: React.FC<any> = () => {
   // 自动化URL跳转
   (window as any).urlClick = (params: any) => {
     console.log(params);
-    setAutoLogModal(true);
+    setAutoLogModal(
+      {
+        show: true,
+        url: {
+          ui: "",
+          api: ""
+        }
+      }
+    );
   };
   // 上线前自动化检查
   const beforeOnlineAutoCheck = (params: any, type: string) => {
@@ -1661,7 +1688,7 @@ const PreRelease: React.FC<any> = () => {
         return operateRenderer(4, params);
       }
     }];
-  const firstOnlineBranchGridApi = useRef<GridApi>();
+
   const onfirstOnlineBranchGridReady = (params: GridReadyEvent) => {
     firstOnlineBranchGridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -1967,7 +1994,7 @@ const PreRelease: React.FC<any> = () => {
       upConfirm: getGridHeight((source?.upService_confirm).length),
       dataRepaireReviewGrid: getGridHeight((source?.reviewData_repaire).length),
       reviewConfirm: getGridHeight((source?.reviewData_confirm).length),
-      onlineBranchGrid: getGridHeight((source?.onlineBranch).length),
+      onlineBranchGrid: getGridHeight((source?.onlineBranch).length, true),
       orderList: getGridHeight((source?.correspondOrder).length),
 
     });
@@ -2891,7 +2918,7 @@ const PreRelease: React.FC<any> = () => {
       {/* 自动化日志的弹窗确认 */}
       <Modal
         title={'自动化日志窗'}
-        visible={autoLogModal}
+        visible={autoLogModal.show}
         onCancel={autoCancle}
         centered={true}
         footer={null}
@@ -2900,13 +2927,13 @@ const PreRelease: React.FC<any> = () => {
       >
         <Form>
           <Form.Item name="UiLog" label="UI日志:" style={{marginTop: -15}}>
-            <a href={"https://shimo.im/docs/66u6eGAMj6UVljrn"}
-               target={"_black"}>https://shimo.im/docs/66u6eGAMj6UVljrn</a>
+            <a href={`${autoLogModal.url.ui}`}
+               target={"_black"}>{autoLogModal.url.ui}</a>
           </Form.Item>
 
           <Form.Item name="interfaceLog" label="接口日志:" style={{marginTop: -15}}>
-            <a href={"https://shimo.im/docs/66u6eGAMj6UVljrn"}
-               target={"_black"}>https://shimo.im/docs/66u6eGAMj6UVljrn</a>
+            <a href={`${autoLogModal.url.api}`}
+               target={"_black"}>`${autoLogModal.url.api}`</a>
           </Form.Item>
 
           <Form.Item>

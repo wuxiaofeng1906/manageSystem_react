@@ -245,7 +245,6 @@ const PreRelease: React.FC<any> = () => {
       newOnlineBranchNum = result.data?.check_num;
     } else {
 
-      debugger;
       newOnlineBranchNum = params.check_num;
       const oraData = await getModifiedData(newOnlineBranchNum);
 
@@ -742,29 +741,7 @@ const PreRelease: React.FC<any> = () => {
   // 保存数据
   const saveUpgradeInterResult = async () => {
     const formData = upgradeIntForm.getFieldsValue();
-    let onlineEnvStr = "";
-    formData.onlineEnv.forEach((ele: any) => {
-      onlineEnvStr = onlineEnvStr === "" ? ele : `${onlineEnvStr},${ele}`;
-    });
-
-    const datas = {
-      "user_name": usersInfo.name,
-      "user_id": usersInfo.userid,
-      "online_environment": onlineEnvStr,
-      "update_api": formData.upInterface,
-      "api_service": formData.interService,
-      "api_url": formData.URL,
-      "api_method": formData.method,
-      "hot_update": formData.hotUpdate,
-      "related_tenant": formData.renter,
-      "remarks": formData.remark,
-      "ready_release_num": currentListNo
-    };
-
-    if (upgradeIntModal.title === "修改") {
-      datas["api_id"] = formData.apiId;
-    }
-    const result = await addPulishApi(datas);
+    const result = await addPulishApi(formData, currentListNo, upgradeIntModal.title);
     if (result === "") {
       message.info({
         content: "保存成功！",
@@ -1470,14 +1447,45 @@ const PreRelease: React.FC<any> = () => {
   };
 
   // 自动化URL跳转
-  (window as any).urlClick = (params: any) => {
-    console.log(params);
+  (window as any).urlClick = (checkType: string, logUrl: string) => {
+
+    let ui_url = "";
+    let api_url = "";
+    if (checkType && logUrl) {
+      const typeArray = checkType.split(",");
+      const logArray = logUrl.split(",");
+
+      if (typeArray.length === 1 && logArray.length === 1) { // 仅有一个检查和一个日志
+        if (typeArray[0] === "1") { // 是UI，2是接口
+          ui_url = logArray[0].toString();
+
+        } else if (typeArray[0] === "2") {
+          api_url = logArray[0].toString();
+        }
+      } else if (typeArray.length === 2 && logArray.length === 2) {
+        if (typeArray[0] === "1") { // 是UI，2是接口
+          ui_url = logArray[0].toString();
+
+        } else if (typeArray[0] === "2") {
+          api_url = logArray[0].toString();
+        }
+
+        if (typeArray[1] === "1") { // 是UI，2是接口
+          ui_url = logArray[1].toString();
+
+        } else if (typeArray[1] === "2") {
+          api_url = logArray[1].toString();
+        }
+
+      }
+    }
+
     setAutoLogModal(
       {
         show: true,
         url: {
-          ui: "",
-          api: ""
+          ui: ui_url,
+          api: api_url
         }
       }
     );
@@ -1492,10 +1500,13 @@ const PreRelease: React.FC<any> = () => {
     let value = "";
     let Color = "black";
     let timeRange = "";
+    let checkType = "";
+    let logUrl = "";
 
     values.forEach((ele: any) => {
       if (ele.check_time === type) {  // 如果是1 ，则代表是上线前检查,如果是2 ，则代表是上线后检查
-
+        checkType = ele.check_type;
+        logUrl = ele.check_log_url;
         // 解析结果和颜色
         if (ele.check_status === "1") {
           value = "未开始";
@@ -1530,6 +1541,7 @@ const PreRelease: React.FC<any> = () => {
       title = "beforeOnlineCheck";
     }
 
+
     return `
         <div style="margin-top: -10px">
             <div style="text-align: right" >
@@ -1537,7 +1549,7 @@ const PreRelease: React.FC<any> = () => {
               onclick='excuteDataCheck(${JSON.stringify(title)},${JSON.stringify(params.data?.check_num)})'>
                 <img src="../执行.png" width="14" height="14" alt="执行" title="执行">
               </Button>
-              <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='urlClick("")'>
+              <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='urlClick(${JSON.stringify(checkType)},${JSON.stringify(logUrl)})'>
                 <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
               </Button>
             </div>
@@ -1905,24 +1917,29 @@ const PreRelease: React.FC<any> = () => {
 
   const inquireServiceClick = async () => {
 
-    if (releaseIdArray) {
-      const result = await inquireService(releaseIdArray);
-      if (result.message !== "") {
-        message.error({
-          content: result.message,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      } else {
-        // 有数据之后进行表格的赋值操作
-        firstUpSerGridApi.current?.setRowData(result.data);
-        secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
-        thirdUpSerGridApi.current?.setRowData([{}]); // 需要给服务确认设置一行空值
-      }
-    }
+    const result = await inquireService(releaseIdArray);
+    if (result.message !== "") {
+      message.error({
+        content: result.message,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    } else {
+      // 有数据之后进行表格的赋值操作
+      firstUpSerGridApi.current?.setRowData(result.data);
+      secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
+      thirdUpSerGridApi.current?.setRowData([{}]); // 需要给服务确认设置一行空值
 
+      setGridHeight({
+        ...gridHeight,
+        pulishItemGrid: getGridHeight((result.data).length),
+        upgradeApiGrid: getGridHeight(1),
+
+
+      });
+    }
   };
 
   /* endregion */
@@ -2927,13 +2944,13 @@ const PreRelease: React.FC<any> = () => {
       >
         <Form>
           <Form.Item name="UiLog" label="UI日志:" style={{marginTop: -15}}>
-            <a href={`${autoLogModal.url.ui}`}
+            <a href={`{autoLogModal.url.ui}`}
                target={"_black"}>{autoLogModal.url.ui}</a>
           </Form.Item>
 
           <Form.Item name="interfaceLog" label="接口日志:" style={{marginTop: -15}}>
             <a href={`${autoLogModal.url.api}`}
-               target={"_black"}>`${autoLogModal.url.api}`</a>
+               target={"_black"}>{autoLogModal.url.api}</a>
           </Form.Item>
 
           <Form.Item>

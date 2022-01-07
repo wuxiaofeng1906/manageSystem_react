@@ -44,6 +44,12 @@ const savePreProjects = async (source: any, listNo: string) => {
 // 点击查询
 const inquireService = async (sorce: any) => {
 
+  if (!sorce) {
+    return {
+      message: "一键部署ID不能为空！",
+      datas: []
+    }
+  }
 
   if (sorce.length === 0) {
     return {
@@ -85,7 +91,44 @@ const delUpgradeItems = async (type: number, source: any) => {
 };
 
 // 发布接口保存
-const addPulishApi = async (datas: any) => {
+const addPulishApi = async (formData: any, currentListNo: string, type: string) => {
+  if (!formData.onlineEnv) {
+    return "上线环境不能为空";
+  }
+
+  //   URL: undefined
+  // apiId: undefined
+  // hotUpdate: undefined
+  // interService: undefined
+  // method: undefined
+  // onlineEnv: undefined
+  // remark: undefined
+  // renter: undefined
+  // upInterface: undefined
+
+  debugger;
+  let onlineEnvStr = "";
+  formData.onlineEnv.forEach((ele: any) => {
+    onlineEnvStr = onlineEnvStr === "" ? ele : `${onlineEnvStr},${ele}`;
+  });
+
+  const datas = {
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "online_environment": onlineEnvStr,
+    "update_api": formData.upInterface,
+    "api_service": formData.interService,
+    "api_url": formData.URL,
+    "api_method": formData.method,
+    "hot_update": formData.hotUpdate,
+    "related_tenant": formData.renter,
+    "remarks": formData.remark,
+    "ready_release_num": currentListNo
+  };
+
+  if (type === "修改") {
+    datas["api_id"] = formData.apiId;
+  }
 
   return await savePulishApi(datas);
 

@@ -2,7 +2,7 @@
  * @Description: 通用常量
  * @Author: jieTan
  * @Date: 2021-11-23 15:51:13
- * @LastEditTime: 2022-01-06 07:37:07
+ * @LastEditTime: 2022-01-07 02:05:18
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -47,6 +47,7 @@ export const PROJ_METRIC = {
   scaleProductivity: { en: 'scaleProductivity', zh: '生产率&规模' },
   reviewDefect: { en: 'reviewDefect', zh: '评审和缺陷' },
   processQuality: { en: 'processQuality', zh: '过程质量' },
+  serviceAbout: { en: 'serviceAbout', zh: '服务' },
 };
 // 项目度量指标 - 修改接口路径
 export const PK_PATH = '/api/project/kpi';

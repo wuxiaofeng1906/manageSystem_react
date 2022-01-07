@@ -2,7 +2,7 @@
  * @Description: 需求稳定性的字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:47:07
- * @LastEditTime: 2022-01-06 07:43:00
+ * @LastEditTime: 2022-01-07 02:10:27
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -12,7 +12,7 @@ import { ColDef, ColGroupDef } from 'ag-grid-community';
 import { ratioW } from './baseParams';
 
 /*  */
-const moduleName = 'storyStable';
+const moduleName = PROJ_METRIC.storyStable.en;
 const defaultParmas = {
   cellRenderer: 'numToFixed',
   cellRendererParams: { decimal: 4 },

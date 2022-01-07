@@ -2,7 +2,7 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2022-01-06 07:27:10
+ * @LastEditTime: 2022-01-07 02:14:55
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -15,6 +15,7 @@ import {
   ProcessQualityGroup,
   ReviewDefectGroup,
   ScaleProductivityGroup,
+  ServiceAboutGroup,
   StageWorkloadGroup,
   StoryStableGroup,
 } from '../TableList/definitions/columns';
@@ -91,6 +92,11 @@ export default () => {
         case PM.storyStable.zh:
           loadColumns.push(StoryStableGroup);
           kpiItems.push(PM.storyStable.en);
+          break;
+        // 服务
+        case PM.serviceAbout.zh:
+          loadColumns.push(ServiceAboutGroup);
+          kpiItems.push(PM.serviceAbout.en);
           break;
 
         default:

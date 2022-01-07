@@ -2844,21 +2844,21 @@ const PreRelease: React.FC<any> = () => {
         onCancel={dataReviewModalCancle}
         centered={true}
         footer={null}
-        width={600}
+        width={630}
       >
         <Form form={dataReviewForm}>
 
-          <Form.Item name="repaireContent" label="数据修复内容:" style={{marginTop: -15}}>
+          <Form.Item name="repaireContent" label="数据修复内容:" required style={{marginTop: -15}}>
             <TextArea/>
           </Form.Item>
           <Row>
             <Col span={12}>
-              <Form.Item name="relatedRenter" label="涉及租户：" style={{marginTop: -15}}>
+              <Form.Item name="relatedRenter" label="涉及租户：" required style={{marginTop: -15}}>
                 <Input style={{marginLeft: 14, width: 191}}/>
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="types" label="类型：" style={{marginLeft: 10, marginTop: -15}}>
+              <Form.Item name="types" label="类型：" required style={{marginLeft: 10, marginTop: -15}}>
                 <Select showSearch>
                   {dataReviewFormSelected.category}
                 </Select>
@@ -2868,14 +2868,14 @@ const PreRelease: React.FC<any> = () => {
           </Row>
           <Row>
             <Col span={12}>
-              <Form.Item name="repaireCommiter" label="修复提交人：" style={{marginTop: -15}}>
+              <Form.Item name="repaireCommiter" label="修复提交人：" required style={{marginTop: -15}}>
                 <Select showSearch>
                   {dataReviewFormSelected.repairCommiter}
                 </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="branch" label="分支：" style={{marginLeft: 10, marginTop: -15}}>
+              <Form.Item name="branch" label="分支：" required style={{marginLeft: 10, marginTop: -15}}>
                 <Input/>
               </Form.Item>
             </Col>
@@ -2884,7 +2884,7 @@ const PreRelease: React.FC<any> = () => {
 
           <Row>
             <Col span={12}>
-              <Form.Item name="EvalResult" label="评审结果：" style={{marginTop: -15}}>
+              <Form.Item name="EvalResult" label="评审结果：" required style={{marginTop: -15}}>
                 <Select style={{width: 191, marginLeft: 14}}>
                   <Option key={"1"} value={"1"}>{"通过"}</Option>
                   <Option key={"2"} value={"2"}>{"不通过"}</Option>
@@ -2892,7 +2892,7 @@ const PreRelease: React.FC<any> = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="repeatExecute" label="是否可重复执行：" style={{marginLeft: 10, marginTop: -15}}>
+              <Form.Item name="repeatExecute" label="是否可重复执行：" required style={{marginLeft: 10, marginTop: -15}}>
                 <Select>
                   <Option key={"1"} value={"1"}>{"是"}</Option>
                   <Option key={"2"} value={"2"}>{"否"}</Option>

@@ -2,12 +2,12 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2021-12-29 10:02:20
+ * @LastEditTime: 2022-01-07 07:40:20
  * @LastEditors: jieTan
  * @LastModify:
  */
 import { Form, DatePicker, Divider, TreeSelect, Row, Col, Tooltip } from 'antd';
-import { selectFilter, mySelector } from './index.css';
+import { selectFilter, mySelector, treeSelectActive } from './index.css';
 import { useMount } from 'ahooks';
 import { useGqlClient } from '@/hooks';
 import { GQL_PARAMS, GRAPHQL_QUERY } from '@/namespaces';
@@ -27,13 +27,14 @@ const defaultSeclectItems = { deptIds: [], projIds: [], dates: null, doQuery: fa
 export default () => {
   /* 数据区 */
   const gqlClient = useGqlClient(); // 必须提前初始化该对象
+  const [treeActive1, setTreeActive1] = useState(''); // 部门<Select>选中时的样式
+  const [treeActive2, setTreeActive2] = useState(''); // 部门<Select>选中时的样式
   const [projElems, setProjElems] = useState(null); // 保存项目信息
   const [treeData, setTreeData] = useState([]); // 部门树形结构的数据
   const { gqlData, setGqlData } = useModel('projectMetric'); // 获取“过程质量”查询的结果数据
   const [selectItems, setSelectItems] = useState(defaultSeclectItems); // 存放多个筛选的值
   //
   const defaultParams: any = {
-    className: selectFilter,
     showArrow: true,
     allowClear: 'allowClear',
     placeholder: '默认选择全部',
@@ -100,12 +101,14 @@ export default () => {
   return (
     <div className={mySelector}>
       <Row align="middle">
-        <Col span={20}>
-          <Form layout="inline">
+        <Col lg={24} xl={22}>
+          <Form layout='inline'>
             <Form.Item label="所属部门/组" key="depts">
               <TreeSelect
                 {...defaultParams}
                 treeData={treeData}
+                className={`${selectFilter} ${treeActive1}`}
+                onDropdownVisibleChange={() => setTreeActive1(treeActive1 ? '' : treeSelectActive)}
                 onChange={(values: string) =>
                   (doChange = onTreeMultiChange(values, setSelectItems, 'deptIds'))
                 }
@@ -121,6 +124,8 @@ export default () => {
               <TreeSelect
                 {...defaultParams}
                 treeData={projElems}
+                className={`${selectFilter} ${treeActive2}`}
+                onDropdownVisibleChange={() => setTreeActive2(treeActive2 ? '' : treeSelectActive)}
                 onChange={(values: string) =>
                   (doChange = onTreeMultiChange(values, setSelectItems, 'projIds'))
                 }
@@ -132,11 +137,9 @@ export default () => {
                 value={selectItems.projIds}
               />
             </Form.Item>
-            <Form.Item key="vertical1">
-              <Divider type="vertical" />
-            </Form.Item>
-            <Form.Item key="dates">
+            <Form.Item label="时间范围" key="dates">
               <RangePicker
+                style={{ width: 230 }}
                 onChange={(dates: any, dateString) => {
                   dateStr = dates ? dateString : undefined;
                   doChange = true;
@@ -149,7 +152,7 @@ export default () => {
             </Form.Item>
           </Form>
         </Col>
-        <Col span={4} style={{ textAlign: 'right' }}>
+        <Col lg={24} xl={2} style={{ textAlign: 'right' }}>
           <Tooltip title="刷新" color="cyan">
             <ReloadOutlined
               onClick={() => {

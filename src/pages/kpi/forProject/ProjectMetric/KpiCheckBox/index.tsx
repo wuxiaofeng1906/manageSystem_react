@@ -2,7 +2,7 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2021-12-22 10:22:11
+ * @LastEditTime: 2022-01-06 07:27:10
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -16,6 +16,7 @@ import {
   ReviewDefectGroup,
   ScaleProductivityGroup,
   StageWorkloadGroup,
+  StoryStableGroup,
 } from '../TableList/definitions/columns';
 import { projectKpiGql, queryGQL } from '@/pages/gqls';
 import { useGqlClient } from '@/hooks';
@@ -85,6 +86,11 @@ export default () => {
         case PM.reviewDefect.zh:
           loadColumns.push(ReviewDefectGroup);
           kpiItems.push(PM.reviewDefect.en);
+          break;
+        // 需求稳定性
+        case PM.storyStable.zh:
+          loadColumns.push(StoryStableGroup);
+          kpiItems.push(PM.storyStable.en);
           break;
 
         default:

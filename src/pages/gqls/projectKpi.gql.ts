@@ -2,13 +2,12 @@
  * @Description: 项目度量指标
  * @Author: jieTan
  * @Date: 2021-12-02 11:41:52
- * @LastEditTime: 2022-01-05 01:52:44
+ * @LastEditTime: 2022-01-07 02:01:43
  * @LastEditors: jieTan
- * @LastModify: 
+ * @LastModify:
  */
 
-import { GQL_PARAMS } from "@/namespaces";
-
+import { GQL_PARAMS } from '@/namespaces';
 
 export default (args: GQL_PARAMS, funcWithParams: Function): [string, string] => {
   //
@@ -72,6 +71,15 @@ export default (args: GQL_PARAMS, funcWithParams: Function): [string, string] =>
         uePreview
         uiPreview
         uiReview
+      }
+      storyStable{
+        devplan
+        testplan
+        releaseplan
+        processcycle
+      }
+      serviceAbout{
+        releaseSucc
       }
     }
   }

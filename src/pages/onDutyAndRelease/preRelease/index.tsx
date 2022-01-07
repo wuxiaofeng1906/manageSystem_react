@@ -108,8 +108,13 @@ const PreRelease: React.FC<any> = () => {
       });
     } else {
 
+      let onlineEnvArray;
+      if (params.online_environment) {
+        onlineEnvArray = (params.online_environment).split(",");
+      }
+
       pulishItemForm.setFieldsValue({
-        onlineEnv: params.online_environment === undefined ? undefined : (params.online_environment).split(","),
+        onlineEnv: onlineEnvArray,
         pulishItem: params.release_item,
         application: params.app,
         hotUpdate: params.hot_update,
@@ -145,7 +150,6 @@ const PreRelease: React.FC<any> = () => {
   });
   // 发布项弹出窗口进行修改和新增
   const showUpgradeApiForm = async (type: any, params: any) => {
-
     if (type === "add") {
       upgradeIntForm.resetFields();
       setUpgradeIntModal({
@@ -153,6 +157,7 @@ const PreRelease: React.FC<any> = () => {
         title: "新增"
       });
     } else {
+
       upgradeIntForm.setFieldsValue({
         onlineEnv: params.online_environment === undefined ? undefined : (params.online_environment).split(","),
         upInterface: params.update_api,
@@ -397,6 +402,10 @@ const PreRelease: React.FC<any> = () => {
     } else if (type === 2) { // 是升级接口删除
       const newData: any = await alalysisInitData("pulishApi");
       secondUpSerGridApi.current?.setRowData(newData.upService_interface);
+      setGridHeight({
+        ...gridHeight,
+        upgradeApiGrid: getGridHeight((newData?.upService_interface).length),
+      });
 
     } else if (type === 3) { // 是数据修复review、
       const newData: any = await alalysisInitData("dataReview");
@@ -599,30 +608,7 @@ const PreRelease: React.FC<any> = () => {
   const savePulishResult = async () => {
 
     const formData = pulishItemForm.getFieldsValue();
-    let onlineEnvStr = "";
-    formData.onlineEnv.forEach((ele: any) => {
-      onlineEnvStr = onlineEnvStr === "" ? ele : `${onlineEnvStr},${ele}`;
-    });
-
-    const datas = {
-      "app_id": formData.appId,
-      "automation_test": formData.automationTest,
-      "deployment_id": formData.deploymentId,
-      "ready_release_num": currentListNo,
-      "user_name": usersInfo.name,
-      "user_id": usersInfo.userid,
-      "online_environment": onlineEnvStr,
-      "release_item": formData.pulishItem,
-      "app": formData.application,
-      "is_upgrade_api_database": formData.interAndDbUpgrade,
-      "hot_update": formData.hotUpdate,
-      "branch_environment": formData.branchAndEnv,
-      "instructions": formData.description,
-      "remarks": formData.remark,
-
-    };
-
-    const result = await upgradePulishItem(datas);
+    const result = await upgradePulishItem(formData, currentListNo);
     if (result === "") {
       message.info({
         content: "修改成功！",
@@ -759,6 +745,11 @@ const PreRelease: React.FC<any> = () => {
 
       const newData: any = await alalysisInitData("pulishApi");
       secondUpSerGridApi.current?.setRowData(newData.upService_interface);
+
+      setGridHeight({
+        ...gridHeight,
+        upgradeApiGrid: getGridHeight((newData?.upService_interface).length),
+      });
 
     } else {
       message.error({
@@ -2318,7 +2309,7 @@ const PreRelease: React.FC<any> = () => {
                     <Col span={12}>
 
                       {/* 一键部署ID */}
-                      <Form.Item label="一键部署ID:" name="deployID" style={{marginLeft: 10}}>
+                      <Form.Item label="一键部署ID:" name="deployID" required style={{marginLeft: 10}}>
                         <Select mode="multiple" size={"small"} style={{width: '100%'}} showSearch
                                 onChange={onReleaseIdChanges}>
                           {releaseIDArray}
@@ -2666,19 +2657,19 @@ const PreRelease: React.FC<any> = () => {
         onCancel={pulishItemModalCancle}
         centered={true}
         footer={null}
-        width={600}
+        width={630}
       >
         <Form form={pulishItemForm}>
           <Row>
             <Col span={12}>
-              <Form.Item name="onlineEnv" label="上线环境:" style={{marginTop: -15}}>
+              <Form.Item name="onlineEnv" label="上线环境:" required style={{marginTop: -15}}>
                 <Select showSearch mode="multiple">
                   {pulishItemFormSelected.onlineEnv}
                 </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="pulishItem" label="发布项：" style={{marginTop: -15, marginLeft: 10}}>
+              <Form.Item name="pulishItem" label="发布项：" required style={{marginTop: -15, marginLeft: 10}}>
                 <Select showSearch style={{marginLeft: 27, width: 183}}>
                   {pulishItemFormSelected.pulishItem}
                 </Select>
@@ -2688,24 +2679,24 @@ const PreRelease: React.FC<any> = () => {
           </Row>
           <Row>
             <Col span={12}>
-              <Form.Item name="application" label="应用：" style={{marginTop: -15}}>
+              <Form.Item name="application" label="应用：" required style={{marginTop: -15}}>
                 <Input autoComplete="off" style={{marginLeft: 28, width: 206, color: "black"}} disabled/>
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="branchAndEnv" label="分支和环境：" style={{marginTop: -15, marginLeft: 10}}>
+              <Form.Item name="branchAndEnv" label="分支和环境：" required style={{marginTop: -15, marginLeft: 10}}>
                 <Input autoComplete="off" disabled style={{color: "black"}}/>
               </Form.Item>
             </Col>
           </Row>
 
-          <Form.Item name="interAndDbUpgrade" label="是否涉及接口与数据库升级：" style={{marginTop: -15}}>
+          <Form.Item name="interAndDbUpgrade" label="是否涉及接口与数据库升级：" required style={{marginTop: -15}}>
             <Select>
               {pulishItemFormSelected.isApiDbUpgrade}
             </Select>
           </Form.Item>
 
-          <Form.Item name="hotUpdate" label="是否支持热更新：" style={{marginTop: -15}}>
+          <Form.Item name="hotUpdate" label="是否支持热更新：" required style={{marginTop: -15}}>
             <Select>
               <Option key={"1"} value={"1"}>{"是"}</Option>
               <Option key={"2"} value={"2"}>{"否"}</Option>
@@ -2758,21 +2749,21 @@ const PreRelease: React.FC<any> = () => {
         onCancel={upgradeIntModalCancle}
         centered={true}
         footer={null}
-        width={600}
+        width={630}
 
       >
         <Form form={upgradeIntForm}>
 
           <Row>
             <Col span={12}>
-              <Form.Item name="onlineEnv" label="上线环境:" style={{marginTop: -15}}>
+              <Form.Item name="onlineEnv" label="上线环境:" required style={{marginTop: -15}}>
                 <Select showSearch mode="multiple" style={{marginLeft: 20, width: 185}}>
                   {upgradeApiFormSelected.onlineEnv}
                 </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="upInterface" label="升级接口：" style={{marginLeft: 10, marginTop: -15}}>
+              <Form.Item name="upInterface" label="升级接口：" required style={{marginLeft: 10, marginTop: -15}}>
                 <Select showSearch style={{}}>
                   {upgradeApiFormSelected.upgradeApi}
                 </Select>
@@ -2783,14 +2774,14 @@ const PreRelease: React.FC<any> = () => {
 
           <Row>
             <Col span={12}>
-              <Form.Item name="interService" label="接口服务：" style={{marginTop: -15}}>
+              <Form.Item name="interService" label="接口服务：" required style={{marginTop: -15}}>
                 <Select showSearch style={{marginLeft: 21, width: 185}}>
                   {upgradeApiFormSelected.apiService}
                 </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="renter" label="涉及租户：" style={{marginLeft: 10, marginTop: -15}}>
+              <Form.Item name="renter" label="涉及租户：" required style={{marginLeft: 10, marginTop: -15}}>
                 <Input/>
               </Form.Item>
             </Col>
@@ -2799,21 +2790,21 @@ const PreRelease: React.FC<any> = () => {
 
           <Row>
             <Col span={12}>
-              <Form.Item name="method" label="接口Method：" style={{marginTop: -15}}>
+              <Form.Item name="method" label="接口Method：" required style={{marginTop: -15}}>
                 <Select showSearch style={{}}>
                   {upgradeApiFormSelected.apiMethod}
                 </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="URL" label="接口URL：" style={{marginLeft: 10, marginTop: -15}}>
+              <Form.Item name="URL" label="接口URL：" required style={{marginLeft: 10, marginTop: -15}}>
                 <Input/>
               </Form.Item>
             </Col>
 
           </Row>
 
-          <Form.Item name="hotUpdate" label="是否支持热更新：" style={{marginTop: -15}}>
+          <Form.Item name="hotUpdate" label="是否支持热更新：" required style={{marginTop: -15}}>
             <Select>
               <Option key={"1"} value={"1"}>{"是"}</Option>
               <Option key={"2"} value={"2"}>{"否"}</Option>

@@ -64,7 +64,51 @@ const inquireService = async (sorce: any) => {
 };
 
 // 发布项的修改
-const upgradePulishItem = async (datas: any) => {
+const upgradePulishItem = async (formData: any, currentListNo: string) => {
+
+  if (!formData.onlineEnv) {
+    return "上线环境不能为空！"
+  }
+  if (!formData.pulishItem) {
+    return "发布项不能为空！"
+  }
+  if (!formData.application) {
+    return "应用不能为空！"
+  }
+  if (!formData.branchAndEnv) {
+    return "分支和环境不能为空！"
+  }
+  if (!formData.interAndDbUpgrade) {
+    return "是否涉及接口和数据库升级不能为空！"
+  }
+
+  if (!formData.hotUpdate) {
+    return "是否支持热更新不能为空！"
+  }
+
+  let onlineEnvStr = "";
+  formData.onlineEnv.forEach((ele: any) => {
+    onlineEnvStr = onlineEnvStr === "" ? ele : `${onlineEnvStr},${ele}`;
+  });
+
+  const datas = {
+    "app_id": formData.appId,
+    "automation_test": formData.automationTest,
+    "deployment_id": formData.deploymentId,
+    "ready_release_num": currentListNo,
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "online_environment": onlineEnvStr,
+    "release_item": formData.pulishItem,
+    "app": formData.application,
+    "is_upgrade_api_database": formData.interAndDbUpgrade,
+    "hot_update": formData.hotUpdate,
+    "branch_environment": formData.branchAndEnv,
+    "instructions": formData.description,
+    "remarks": formData.remark,
+
+  };
+
   // 需要验证必填项
   return await saveUpgradeItem(datas);
 };
@@ -92,21 +136,34 @@ const delUpgradeItems = async (type: number, source: any) => {
 
 // 发布接口保存
 const addPulishApi = async (formData: any, currentListNo: string, type: string) => {
+
   if (!formData.onlineEnv) {
     return "上线环境不能为空";
   }
 
-  //   URL: undefined
-  // apiId: undefined
-  // hotUpdate: undefined
-  // interService: undefined
-  // method: undefined
-  // onlineEnv: undefined
-  // remark: undefined
-  // renter: undefined
-  // upInterface: undefined
+  if (!formData.upInterface) {
+    return "升级接口不能为空";
+  }
+  if (!formData.interService) {
+    return "接口服务不能为空";
+  }
 
-  debugger;
+  if (!formData.renter) {
+    return "涉及租户不能为空";
+  }
+
+  if (!formData.method) {
+    return "接口Method不能为空";
+  }
+
+  if (!formData.URL) {
+    return "接口URL不能为空";
+  }
+
+  if (!formData.hotUpdate) {
+    return "是否热更新不能为空";
+  }
+
   let onlineEnvStr = "";
   formData.onlineEnv.forEach((ele: any) => {
     onlineEnvStr = onlineEnvStr === "" ? ele : `${onlineEnvStr},${ele}`;
@@ -143,6 +200,32 @@ const confirmUpgradeService = async (datas: any) => {
 
 // 数据修复的新增和修改
 const dataRepaireReview = async (kind: string, currentListNo: string, datas: any) => {
+
+  if (!datas.repaireContent) {
+    return "数据修复内容不能为空！";
+  }
+
+  if (!datas.relatedRenter) {
+    return "涉及租户不能为空！";
+  }
+
+  if (!datas.types) {
+    return "类型不能为空！";
+  }
+  if (!datas.repaireCommiter) {
+    return "修复提交人不能为空！";
+  }
+  if (!datas.branch) {
+    return "分支不能为空！";
+  }
+
+  if (!datas.EvalResult) {
+    return "评审结果不能为空！";
+  }
+
+  if (!datas.repeatExecute) {
+    return "是否可重复执行不能为空！";
+  }
 
   const data = {
     "user_name": usersInfo.name,
@@ -190,7 +273,6 @@ const saveOnlineBranchData = async (type: string, currentListNo: string, newOnli
   //  3.环境一致性检查
   //  4.(上线前后)自动化检查设置
 
-  debugger;
   let returnMessage = "";
   const onlineBranch = await saveOnlineBranch(type, currentListNo, newOnlineBranchNum, sourceData);
   if (onlineBranch !== "") {

@@ -2,7 +2,8 @@ import {
   savePrePulishProjects, queryServiceByID, saveUpgradeItem, delUpgradeItem,
   savePulishApi, delPulishApi, upgradeServiceConfirm, addDataRepaire, modifyDataRepaire,
   delDataReviewApi, dataRepairConfirm, getNewCheckNum, saveOnlineBranch, saveVersonCheck,
-  saveEnvironmentCheck, saveOnlineAutoCheck, getDetaisByCHeckNum, delDataOnlineBranchApi
+  saveEnvironmentCheck, saveOnlineAutoCheck, getDetaisByCHeckNum, delDataOnlineBranchApi,
+  excuteVersionCheck, excuteEnvCheck, excuteAutoCheck
 } from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
 
 const userLogins: any = localStorage.getItem("userLogins");
@@ -64,7 +65,6 @@ const upgradePulishItem = async (datas: any) => {
 
 // 删除数据
 const delUpgradeItems = async (type: number, source: any) => {
-  debugger;
 
   let delMessage = "";
   if (type === 1) { // 是发布项删除
@@ -289,6 +289,7 @@ const autoCheck = (source_data: any) => {
   return {beforeOnline, afterOnliinie};
 
 };
+
 // 获取上线分支修改时的原始数据
 const getModifiedData = async (checkNum: string) => {
 
@@ -304,8 +305,35 @@ const getModifiedData = async (checkNum: string) => {
     afterOnlineCheck: autoCheck(source_data).afterOnliinie
 
   }
-}
+};
+
+// 执行上线分支的各类检查
+const executeOnlineCheck = async (type: string, checkNum: string) => {
+  switch (type) {
+    case "versionCheck":
+      return await excuteVersionCheck(checkNum);
+      break;
+
+    case "envCheck":
+      return await excuteEnvCheck(checkNum);
+      break;
+
+    case "beforeOnlineCheck":
+      return await excuteAutoCheck(checkNum, "1");
+      break;
+
+    case "afterOnlineCheck":
+      return await excuteAutoCheck(checkNum, "2");
+      break;
+
+    default:
+      return "error";
+      break;
+  }
+
+};
 export {
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems, addPulishApi, confirmUpgradeService,
-  dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch, saveOnlineBranchData, getModifiedData
+  dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch, saveOnlineBranchData, getModifiedData,
+  executeOnlineCheck
 };

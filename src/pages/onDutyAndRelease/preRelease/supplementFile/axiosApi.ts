@@ -854,7 +854,75 @@ const delDataOnlineBranchApi = async (id: number) => {
 
   return errorMessage;
 
-}
+};
+
+// 执行版本检查
+const excuteVersionCheck = async (checkNum: string) => {
+
+  const data = {
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "check_num": checkNum
+  };
+  let errorMessage = "";
+  await axios.post("/api/verify/release/version_check", data)
+    .then(function (res) {
+
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+};
+
+// 执行环境检查
+const excuteEnvCheck = async (checkNum: string) => {
+  const data = {
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "check_num": checkNum
+  };
+  let errorMessage = "";
+  await axios.post("/api/verify/release/env_check", data)
+    .then(function (res) {
+
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+};
+
+// 执行自动化检查
+const excuteAutoCheck = async (checkNum: string, checkTime: string) => {
+  const data = {
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "check_num": checkNum,
+    "check_time": checkTime
+  };
+  let errorMessage = "";
+  await axios.post("/api/verify/release/automation_check_perform", data)
+    .then(function (res) {
+
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+};
 /* endregion */
 
 export {
@@ -863,7 +931,8 @@ export {
   delUpgradeItem, getUpgradeApi, getApiService, getApiMethod, savePulishApi, delPulishApi,
   upgradeServiceConfirm, getRepaireCategory, addDataRepaire, modifyDataRepaire, delDataReviewApi,
   dataRepairConfirm, getTechSide, getCheckType, getBrowserType, getNewCheckNum, saveOnlineBranch,
-  saveVersonCheck, saveEnvironmentCheck, saveOnlineAutoCheck, getDetaisByCHeckNum, delDataOnlineBranchApi
+  saveVersonCheck, saveEnvironmentCheck, saveOnlineAutoCheck, getDetaisByCHeckNum, delDataOnlineBranchApi,
+  excuteVersionCheck, excuteEnvCheck, excuteAutoCheck
 };
 
 

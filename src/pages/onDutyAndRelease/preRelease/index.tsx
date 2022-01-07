@@ -23,7 +23,7 @@ import {useRequest} from "ahooks";
 import {
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems,
   addPulishApi, confirmUpgradeService, dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch,
-  saveOnlineBranchData, getModifiedData
+  saveOnlineBranchData, getModifiedData, executeOnlineCheck
 } from "./supplementFile/logic";
 import {alalysisInitData} from "./supplementFile/dataAnalyze";
 import {
@@ -1282,6 +1282,31 @@ const PreRelease: React.FC<any> = () => {
 
   };
 
+  // 执行上线前检查：上线前版本检查、环境检查，自动化检查
+  (window as any).excuteDataCheck = async (type: string, checkNum: string) => {
+
+
+    const result = await executeOnlineCheck(type, checkNum);
+    if (result === "") {
+      message.info({
+        content: "执行成功！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    } else {
+      message.error({
+        content: `${result}`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+
+  };
+
   // 渲染上线前版本检查是否通过
   const beforeOnlineVersionCheck = (params: any) => {
 
@@ -1339,11 +1364,13 @@ const PreRelease: React.FC<any> = () => {
       frontColor = "#46A0FC";
     }
 
+    const checkNum = JSON.stringify(params.data?.check_num);
     return `
          <div>
           <div style="margin-top: -10px;text-align: right">
 
-            <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
+            <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
+            onclick='excuteDataCheck("versionCheck",${checkNum})'>
               <img src="../执行.png" width="14" height="14" alt="执行参数" title="执行参数">
             </Button>
             <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
@@ -1403,10 +1430,11 @@ const PreRelease: React.FC<any> = () => {
       timeRange = `${start}~${end}`;
     }
 
+    const checkNum = JSON.stringify(params.data?.check_num);
     return `
         <div style="margin-top: -10px">
             <div style="text-align: right" >
-              <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
+              <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='excuteDataCheck("envCheck",${checkNum})'>
                 <img src="../执行.png" width="14" height="14" alt="执行参数" title="执行参数">
               </Button>
               <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
@@ -1427,7 +1455,7 @@ const PreRelease: React.FC<any> = () => {
     console.log(params);
     setAutoLogModal(true);
   };
-  // 上线前数据库检查
+  // 上线前自动化检查
   const beforeOnlineAutoCheck = (params: any, type: string) => {
     const values = params.value;
     if (!values) {
@@ -1465,15 +1493,21 @@ const PreRelease: React.FC<any> = () => {
         if (start) {
           timeRange = `${start}~${end}`;
         }
-
       }
 
     });
 
+    // 判断是上下前检查还是上线后检查
+    let title = "afterOnlineCheck";
+    if (type === "1") {
+      title = "beforeOnlineCheck";
+    }
+
     return `
         <div style="margin-top: -10px">
             <div style="text-align: right" >
-              <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick=''>
+              <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
+              onclick='excuteDataCheck(${JSON.stringify(title)},${JSON.stringify(params.data?.check_num)})'>
                 <img src="../执行.png" width="14" height="14" alt="执行" title="执行">
               </Button>
               <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='urlClick("")'>

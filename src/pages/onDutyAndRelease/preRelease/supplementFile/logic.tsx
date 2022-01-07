@@ -2,7 +2,7 @@ import {
   savePrePulishProjects, queryServiceByID, saveUpgradeItem, delUpgradeItem,
   savePulishApi, delPulishApi, upgradeServiceConfirm, addDataRepaire, modifyDataRepaire,
   delDataReviewApi, dataRepairConfirm, getNewCheckNum, saveOnlineBranch, saveVersonCheck,
-  saveEnvironmentCheck, saveOnlineAutoCheck, getDetaisByCHeckNum
+  saveEnvironmentCheck, saveOnlineAutoCheck, getDetaisByCHeckNum, delDataOnlineBranchApi
 } from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
 
 const userLogins: any = localStorage.getItem("userLogins");
@@ -64,6 +64,7 @@ const upgradePulishItem = async (datas: any) => {
 
 // 删除数据
 const delUpgradeItems = async (type: number, source: any) => {
+  debugger;
 
   let delMessage = "";
   if (type === 1) { // 是发布项删除
@@ -73,10 +74,10 @@ const delUpgradeItems = async (type: number, source: any) => {
     delMessage = await delPulishApi(source.api_id);
 
   } else if (type === 3) { // 是数据修复review
-    delMessage = await delDataReviewApi(source.review_id)
+    delMessage = await delDataReviewApi(source.review_id);
 
   } else if (type === 4) { // 是上线分支删除
-
+    delMessage = await delDataOnlineBranchApi(source.check_num);
   }
 
   return delMessage;

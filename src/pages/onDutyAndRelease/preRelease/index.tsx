@@ -97,7 +97,6 @@ const PreRelease: React.FC<any> = () => {
       });
     } else {
 
-      debugger;
       pulishItemForm.setFieldsValue({
         onlineEnv: params.online_environment === undefined ? undefined : (params.online_environment).split(","),
         pulishItem: params.release_item,

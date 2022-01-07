@@ -832,6 +832,29 @@ const getDetaisByCHeckNum = async (checkNum: string) => {
 
 
 };
+
+// 删除上线分支
+const delDataOnlineBranchApi = async (id: number) => {
+
+  let errorMessage = "";
+
+  const datas = {
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "check_num": id
+  };
+  await axios.delete("/api/verify/release/release_branch", {data: datas})
+    .then(function (res) {
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+}
 /* endregion */
 
 export {
@@ -840,7 +863,7 @@ export {
   delUpgradeItem, getUpgradeApi, getApiService, getApiMethod, savePulishApi, delPulishApi,
   upgradeServiceConfirm, getRepaireCategory, addDataRepaire, modifyDataRepaire, delDataReviewApi,
   dataRepairConfirm, getTechSide, getCheckType, getBrowserType, getNewCheckNum, saveOnlineBranch,
-  saveVersonCheck, saveEnvironmentCheck, saveOnlineAutoCheck, getDetaisByCHeckNum
+  saveVersonCheck, saveEnvironmentCheck, saveOnlineAutoCheck, getDetaisByCHeckNum, delDataOnlineBranchApi
 };
 
 

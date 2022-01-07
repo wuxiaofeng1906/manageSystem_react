@@ -5,6 +5,7 @@ import {
   saveEnvironmentCheck, saveOnlineAutoCheck, getDetaisByCHeckNum, delDataOnlineBranchApi,
   excuteVersionCheck, excuteEnvCheck, excuteAutoCheck
 } from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
+import dayjs from "dayjs";
 
 const userLogins: any = localStorage.getItem("userLogins");
 const usersInfo = JSON.parse(userLogins);
@@ -265,14 +266,66 @@ const getCheckNumForOnlineBranch = async () => {
   return await getNewCheckNum();
 };
 
+// 上线分支头部验证
+const checkOnlineHeadData = (sourceData: any) => {
+  // "branch_name": sourceData.branchName,
+  //   "technical_side": sourceData.module,
+  if (!sourceData.branchName) {
+    return "分支名称不能为空！";
+  }
+
+  if (!sourceData.module) {
+    return "技术侧不能为空！";
+  }
+
+  return "";
+};
+// 上线分支版本检查验证
+const checkOnlineVersionData = (sourceData: any) => {
+
+
+  //   "backend_version_check_flag": sourceData.verson_check, // 是否开启版本检查
+  //   "server": serverStr, // 服务
+  //   "image_env": sourceData.imageevn, // 镜像环境
+  //   "inclusion_check_flag": sourceData.branchcheck, // 是否开启分支检查
+  //   "main_branch": mainBranch, // 主分支
+  //   "technical_side": techSide, // 技术侧
+  //   "main_since": dayjs(sourceData.branch_mainSince).format("YYYY-MM-DD"), // 时间
+
+  // if (!sourceData.branchName) {
+  //   return "分支名称不能为空！";
+  // }
+  //
+  // if (!sourceData.module) {
+  //   return "技术侧不能为空！";
+  // }
+
+  return "";
+};
 // 保存上线分支的设置
 const saveOnlineBranchData = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any) => {
   //   保存分了4个接口，
-  //  1.上线分支设置
+  //  1.上线分支头部设置
   //  2.版本检查设置
   //  3.环境一致性检查
   //  4.(上线前后)自动化检查设置
 
+  debugger;
+
+  // 上线分支头部验证分支名称和技术侧
+  const checkMsg_onlineHead = checkOnlineHeadData(sourceData);
+  if (checkMsg_onlineHead) { // 如果校验信息不为空，代表校验失败
+    return checkMsg_onlineHead;
+  }
+
+
+  // 版本检查设置
+  const checkMsg_versonCheck = checkOnlineVersionData(sourceData);
+  if (checkMsg_onlineHead) {
+    return checkMsg_onlineHead;
+  }
+
+  return "";
   let returnMessage = "";
   const onlineBranch = await saveOnlineBranch(type, currentListNo, newOnlineBranchNum, sourceData);
   if (onlineBranch !== "") {
@@ -292,7 +345,7 @@ const saveOnlineBranchData = async (type: string, currentListNo: string, newOnli
     returnMessage = returnMessage === "" ? `自动化检查保存失败：${onlineAutoCheck}` : `${returnMessage}；\n自动化检查保存失败：${onlineAutoCheck}`;
   }
 
-  return returnMessage;
+  // return returnMessage;
 };
 
 // 上线分支修改-表头数据解析

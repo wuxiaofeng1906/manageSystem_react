@@ -2963,7 +2963,7 @@ const PreRelease: React.FC<any> = () => {
         centered={true}
         footer={null}
         width={652}
-        // bodyStyle={{height: 810}}
+
       >
 
         <Form form={formForOnlineBranch}>

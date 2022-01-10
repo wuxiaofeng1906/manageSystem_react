@@ -1739,6 +1739,11 @@ const PreRelease: React.FC<any> = () => {
       const newData: any = await alalysisInitData("onlineBranch");
       firstOnlineBranchGridApi.current?.setRowData(newData.onlineBranch);
 
+      setGridHeight({
+        ...gridHeight,
+        onlineBranchGrid: getGridHeight((newData?.onlineBranch).length, true),
+      });
+
     } else {
       message.error({
         content: result,

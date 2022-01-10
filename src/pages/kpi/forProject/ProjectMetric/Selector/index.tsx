@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-01-07 07:40:20
+ * @LastEditTime: 2022-01-07 09:33:29
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -31,7 +31,7 @@ export default () => {
   const [treeActive2, setTreeActive2] = useState(''); // 部门<Select>选中时的样式
   const [projElems, setProjElems] = useState(null); // 保存项目信息
   const [treeData, setTreeData] = useState([]); // 部门树形结构的数据
-  const { gqlData, setGqlData } = useModel('projectMetric'); // 获取“过程质量”查询的结果数据
+  const { gqlData, setGqlData, setLoading } = useModel('projectMetric'); // 获取“过程质量”查询的结果数据
   const [selectItems, setSelectItems] = useState(defaultSeclectItems); // 存放多个筛选的值
   //
   const defaultParams: any = {
@@ -43,12 +43,6 @@ export default () => {
     treeDefaultExpandAll: 'treeDefaultExpandAll',
     treeCheckable: true,
     maxTagCount: 'responsive',
-    onDropdownVisibleChange: (open: boolean) => {
-      //
-      !open && doChange
-        ? setSelectItems((prev) => Object.assign({ ...prev }, { doQuery: true }))
-        : null;
-    },
     filterTreeNode: (inputValue: string, treeNode: { title: string }) =>
       treeNode?.title.includes(inputValue) ? true : false,
   }; // <Select>默认的一些配置
@@ -80,6 +74,7 @@ export default () => {
   /*  */
   useEffect(() => {
     if (selectItems.doQuery && doChange) {
+      setLoading(true);
       setSelectItems((prev) => Object.assign({ ...prev }, { doQuery: false }));
       _onSelect();
       doChange = false;
@@ -102,13 +97,18 @@ export default () => {
     <div className={mySelector}>
       <Row align="middle">
         <Col lg={24} xl={22}>
-          <Form layout='inline'>
+          <Form layout="inline">
             <Form.Item label="所属部门/组" key="depts">
               <TreeSelect
                 {...defaultParams}
                 treeData={treeData}
                 className={`${selectFilter} ${treeActive1}`}
-                onDropdownVisibleChange={() => setTreeActive1(treeActive1 ? '' : treeSelectActive)}
+                onDropdownVisibleChange={(open: boolean) => {
+                  setTreeActive1(treeActive1 ? '' : treeSelectActive);
+                  !open && doChange
+                    ? setSelectItems((prev) => Object.assign({ ...prev }, { doQuery: true }))
+                    : null;
+                }}
                 onChange={(values: string) =>
                   (doChange = onTreeMultiChange(values, setSelectItems, 'deptIds'))
                 }
@@ -125,7 +125,12 @@ export default () => {
                 {...defaultParams}
                 treeData={projElems}
                 className={`${selectFilter} ${treeActive2}`}
-                onDropdownVisibleChange={() => setTreeActive2(treeActive2 ? '' : treeSelectActive)}
+                onDropdownVisibleChange={(open: boolean) => {
+                  setTreeActive2(treeActive2 ? '' : treeSelectActive);
+                  !open && doChange
+                    ? setSelectItems((prev) => Object.assign({ ...prev }, { doQuery: true }))
+                    : null;
+                }}
                 onChange={(values: string) =>
                   (doChange = onTreeMultiChange(values, setSelectItems, 'projIds'))
                 }

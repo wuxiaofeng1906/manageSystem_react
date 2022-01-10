@@ -2,7 +2,7 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2022-01-07 02:14:55
+ * @LastEditTime: 2022-01-07 09:35:14
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -36,7 +36,7 @@ export default () => {
   const [checkedList, setCheckedList] = useState([]);
   const [indeterminate, setIndeterminate] = useState(false);
   const [checkAll, setCheckAll] = useState(false);
-  const { setGqlData, setDynamicCols } = useModel('projectMetric');
+  const { setGqlData, setDynamicCols, setLoading } = useModel('projectMetric');
 
   /*  */
   const onChange = (list: any) => {
@@ -116,6 +116,7 @@ export default () => {
   //
   useEffect(() => {
     // 选中指标变化事时，更改数据源
+    setLoading(true);
     loadOnDemand();
   }, [checkedList]);
 

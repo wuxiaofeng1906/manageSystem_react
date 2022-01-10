@@ -38,7 +38,7 @@ export default () => {
           <AgGridReact
             className="myGrid"
             rowHeight={tableRowHeight}
-            headerHeight={tableRowHeight + 6}
+            headerHeight={tableRowHeight + 2}
             modules={[SetFilterModule as any]}
             frameworkComponents={{
               linkTo: LinkToCloumn,

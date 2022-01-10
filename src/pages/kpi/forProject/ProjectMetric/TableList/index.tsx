@@ -2,7 +2,7 @@
  * @Description: 数据列表
  * @Author: jieTan
  * @Date: 2021-11-22 10:55:42
- * @LastEditTime: 2022-01-10 02:15:14
+ * @LastEditTime: 2022-01-10 07:05:44
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -22,8 +22,8 @@ import { useEffect } from 'react';
 /*  */
 export default () => {
   /*  */
-  const { gqlData, dynamicCols, loading, setLoading } = useModel('projectMetric');
-  const tableRowHeight = 32; // grid的行高
+  const { gqlData, dynamicCols, loading, setLoading, gridHeight, setGridApi } =
+    useModel('projectMetric');
   const innerHeight = window.innerHeight - 248; // grid的固定高度
 
   useEffect(() => {
@@ -37,8 +37,7 @@ export default () => {
         <div style={{ width: '100%', height: '100%' }}>
           <AgGridReact
             className="myGrid"
-            rowHeight={tableRowHeight}
-            headerHeight={tableRowHeight + 2}
+            headerHeight={gridHeight.row + 2}
             modules={[SetFilterModule as any]}
             frameworkComponents={{
               linkTo: LinkToCloumn,
@@ -50,6 +49,9 @@ export default () => {
             // stopEditingWhenCellsLoseFocus={true}
             columnDefs={[TableMajorGroup, ...dynamicCols]}
             rowData={gqlData}
+            onGridReady={(params: any) => setGridApi(params.api)}
+            getRowHeight={() => gridHeight.row}
+            animateRows={true}
           />
         </div>
       </div>

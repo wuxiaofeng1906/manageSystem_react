@@ -2,11 +2,22 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-01-07 09:33:29
+ * @LastEditTime: 2022-01-10 07:18:28
  * @LastEditors: jieTan
  * @LastModify:
  */
-import { Form, DatePicker, Divider, TreeSelect, Row, Col, Tooltip } from 'antd';
+import {
+  Form,
+  DatePicker,
+  Divider,
+  TreeSelect,
+  Row,
+  Col,
+  Tooltip,
+  Dropdown,
+  Menu,
+  Radio,
+} from 'antd';
 import { selectFilter, mySelector, treeSelectActive } from './index.css';
 import { useMount } from 'ahooks';
 import { useGqlClient } from '@/hooks';
@@ -20,6 +31,8 @@ import { deptTreeNodes, onTreeMultiChange, projOptsElems } from './extra';
 const { RangePicker } = DatePicker;
 
 /*  */
+
+/*  */
 let dateStr: [string, string] | undefined; // 存放时间range信息
 let doChange = false;
 const defaultSeclectItems = { deptIds: [], projIds: [], dates: null, doQuery: false };
@@ -31,8 +44,9 @@ export default () => {
   const [treeActive2, setTreeActive2] = useState(''); // 部门<Select>选中时的样式
   const [projElems, setProjElems] = useState(null); // 保存项目信息
   const [treeData, setTreeData] = useState([]); // 部门树形结构的数据
-  const { gqlData, setGqlData, setLoading } = useModel('projectMetric'); // 获取“过程质量”查询的结果数据
+  const { gqlData, setGqlData, setLoading, gridApi, gridHeight } = useModel('projectMetric'); // 获取“过程质量”查询的结果数据
   const [selectItems, setSelectItems] = useState(defaultSeclectItems); // 存放多个筛选的值
+  const [ratioVal, setRatioVal] = useState(gridHeight.row);
   //
   const defaultParams: any = {
     showArrow: true,
@@ -46,6 +60,22 @@ export default () => {
     filterTreeNode: (inputValue: string, treeNode: { title: string }) =>
       treeNode?.title.includes(inputValue) ? true : false,
   }; // <Select>默认的一些配置
+  const menu = (
+    <Menu>
+      <Radio.Group
+        onChange={(e) => {
+          setRatioVal(e.target.value);
+          gridHeight.row = e.target.value;
+          (gridApi as any)?.resetRowHeights();
+        }}
+        value={ratioVal}
+      >
+        <Menu.Item children={<Radio value={36}>宽松</Radio>} />
+        <Menu.Item children={<Radio value={32}>适中</Radio>} />
+        <Menu.Item children={<Radio value={28}>紧凑</Radio>} />
+      </Radio.Group>
+    </Menu>
+  );
 
   /* 方法区 */
   const _onSelect = async () => {
@@ -158,6 +188,10 @@ export default () => {
           </Form>
         </Col>
         <Col lg={24} xl={2} style={{ textAlign: 'right' }}>
+          <Dropdown overlay={menu} placement="bottomCenter" arrow>
+            <ColumnHeightOutlined />
+          </Dropdown>
+          <Divider type="vertical" />
           <Tooltip title="刷新" color="cyan">
             <ReloadOutlined
               onClick={() => {
@@ -168,8 +202,6 @@ export default () => {
               }}
             />
           </Tooltip>
-          <Divider type="vertical" />
-          <ColumnHeightOutlined />
         </Col>
       </Row>
     </div>

@@ -2,7 +2,7 @@
  * @Description: 过程质量 => Model数据
  * @Author: jieTan
  * @Date: 2021-11-30 09:57:14
- * @LastEditTime: 2022-01-07 09:18:40
+ * @LastEditTime: 2022-01-10 07:17:20
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -18,6 +18,8 @@ export default () => {
   const [gqlData, setGqlData] = useState([]);
   const [dynamicCols, setDynamicCols] = useState([]);
   const [loading, setLoading] = useState(false);
+  /*  */
+  const gridHeight = { row: 32 }; // 设置grid的行高
 
   return {
     gqlData,
@@ -29,5 +31,6 @@ export default () => {
     setGridApi,
     loading,
     setLoading,
+    gridHeight,
   };
 };

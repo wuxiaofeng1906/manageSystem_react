@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-01-10 08:09:45
+ * @LastEditTime: 2022-01-10 09:57:56
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -18,7 +18,7 @@ import {
   Menu,
   Radio,
 } from 'antd';
-import { selectFilter, mySelector, treeSelectActive } from './index.css';
+import { mySelector } from './index.css';
 import { useMount } from 'ahooks';
 import { useGqlClient } from '@/hooks';
 import { GQL_PARAMS, GRAPHQL_QUERY } from '@/namespaces';
@@ -38,8 +38,6 @@ const defaultSeclectItems = { deptIds: [], projIds: [], dates: null, doQuery: fa
 export default () => {
   /* 数据区 */
   const gqlClient = useGqlClient(); // 必须提前初始化该对象
-  const [treeActive1, setTreeActive1] = useState(''); // 部门<Select>选中时的样式
-  const [treeActive2, setTreeActive2] = useState(''); // 部门<Select>选中时的样式
   const [projElems, setProjElems] = useState(null); // 保存项目信息
   const [treeData, setTreeData] = useState([]); // 部门树形结构的数据
   const { gqlData, setGqlData, setLoading, gridApi, gridHeight, pkGqlParmas, setPkGqlParmas } =
@@ -75,6 +73,11 @@ export default () => {
       </Radio.Group>
     </Menu>
   );
+  // xs={24} sm={24} md={22} lg={22} xl={22}
+  const selectFlexs = { xs: 24, sm: 24, md: 22 };
+  const extraFlexs = { xs: selectFlexs.xs, sm: selectFlexs.sm, md: 24 - selectFlexs.md };
+  // 
+  const itemFlexs = { xs: 24, sm: 24, md: 6 };
 
   /* 方法区 */
   const _onSelect = async () => {
@@ -112,7 +115,7 @@ export default () => {
       _onSelect();
       doChange = false;
     }
-  }, [selectItems]);
+  }, [selectItems]); // 查询参数更跟时触发
   //
   useEffect(() => {
     gqlData !== undefined ? projOptsElems(gqlData, setProjElems, selectItems.projIds) : null;
@@ -129,68 +132,73 @@ export default () => {
   return (
     <div className={mySelector}>
       <Row align="middle">
-        <Col lg={24} xl={22}>
+        <Col {...selectFlexs}>
           <Form layout="inline">
-            <Form.Item label="所属部门/组" key="depts">
-              <TreeSelect
-                {...defaultParams}
-                treeData={treeData}
-                className={`${selectFilter} ${treeActive1}`}
-                onDropdownVisibleChange={(open: boolean) => {
-                  setTreeActive1(treeActive1 ? '' : treeSelectActive);
-                  !open && doChange
-                    ? setSelectItems((prev) => Object.assign({ ...prev }, { doQuery: true }))
-                    : null;
-                }}
-                onChange={(values: string) =>
-                  (doChange = onTreeMultiChange(values, setSelectItems, 'deptIds'))
-                }
-                onClear={() => {
-                  setSelectItems((prev) =>
-                    Object.assign({ ...prev }, { deptIds: [], doQuery: true }),
-                  );
-                }}
-                value={selectItems.deptIds}
-              />
-            </Form.Item>
-            <Form.Item label="特性项目" key="projects">
-              <TreeSelect
-                {...defaultParams}
-                treeData={projElems}
-                className={`${selectFilter} ${treeActive2}`}
-                onDropdownVisibleChange={(open: boolean) => {
-                  setTreeActive2(treeActive2 ? '' : treeSelectActive);
-                  !open && doChange
-                    ? setSelectItems((prev) => Object.assign({ ...prev }, { doQuery: true }))
-                    : null;
-                }}
-                onChange={(values: string) =>
-                  (doChange = onTreeMultiChange(values, setSelectItems, 'projIds'))
-                }
-                onClear={() => {
-                  setSelectItems((prev) =>
-                    Object.assign({ ...prev }, { projIds: [], doQuery: true }),
-                  );
-                }}
-                value={selectItems.projIds}
-              />
-            </Form.Item>
-            <Form.Item label="时间范围" key="dates">
-              <RangePicker
-                style={{ width: 230 }}
-                onChange={(dates: any, dateString) => {
-                  dateStr = dates ? dateString : undefined;
-                  doChange = true;
-                  setSelectItems((prev) =>
-                    Object.assign({ ...prev }, { dates: dates, doQuery: true }),
-                  );
-                }}
-                value={selectItems.dates}
-              />
-            </Form.Item>
+            <Col {...itemFlexs}>
+              <Form.Item label="部门/组" key="depts">
+                <TreeSelect
+                  {...defaultParams}
+                  treeData={treeData}
+                  onDropdownVisibleChange={(open: boolean) => {
+                    !open && doChange
+                      ? setSelectItems((prev) => Object.assign({ ...prev }, { doQuery: true }))
+                      : null;
+                  }}
+                  onChange={(values: string) =>
+                    (doChange = onTreeMultiChange(values, setSelectItems, 'deptIds'))
+                  }
+                  onClear={() => {
+                    setSelectItems((prev) =>
+                      Object.assign({ ...prev }, { deptIds: [], doQuery: true }),
+                    );
+                  }}
+                  value={selectItems.deptIds}
+                />
+              </Form.Item>
+            </Col>
+            <Col {...itemFlexs}>
+              <Form.Item label="特性项目" key="projects">
+                <TreeSelect
+                  dropdownClassName="myDropdown"
+                  {...defaultParams}
+                  treeData={projElems}
+                  onDropdownVisibleChange={(open: boolean) => {
+                    !open && doChange
+                      ? setSelectItems((prev) => Object.assign({ ...prev }, { doQuery: true }))
+                      : null;
+                  }}
+                  onChange={(values: string) =>
+                    (doChange = onTreeMultiChange(values, setSelectItems, 'projIds'))
+                  }
+                  onClear={() => {
+                    setSelectItems((prev) =>
+                      Object.assign({ ...prev }, { projIds: [], doQuery: true }),
+                    );
+                  }}
+                  value={selectItems.projIds}
+                />
+              </Form.Item>
+            </Col>
+            <Col {...itemFlexs}>
+              <Form.Item label="时间范围" key="dates">
+                <RangePicker
+                  onChange={(dates: any, dateString) => {
+                    dateStr = dates ? dateString : undefined;
+                    doChange = true;
+                    setSelectItems((prev) =>
+                      Object.assign({ ...prev }, { dates: dates, doQuery: true }),
+                    );
+                  }}
+                  value={selectItems.dates}
+                />
+              </Form.Item>
+            </Col>
           </Form>
         </Col>
-        <Col lg={24} xl={2} style={{ textAlign: 'right' }}>
+        <Col xs={24} sm={0} md={0}>
+          <br />
+        </Col>
+        <Col {...extraFlexs} style={{ textAlign: 'right' }}>
           <Dropdown overlay={menu} placement="bottomCenter" arrow>
             <ColumnHeightOutlined />
           </Dropdown>

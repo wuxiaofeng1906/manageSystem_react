@@ -71,6 +71,7 @@ const inquireService = async (sorce: any) => {
 // 发布项的修改
 const upgradePulishItem = async (formData: any, currentListNo: string) => {
 
+  debugger;
   if (!formData.onlineEnv) {
     return "上线环境不能为空！"
   }
@@ -98,7 +99,7 @@ const upgradePulishItem = async (formData: any, currentListNo: string) => {
 
   const datas = {
     "app_id": formData.appId,
-    "automation_test": formData.automationTest,
+    "automation_check": formData.automationTest,
     "deployment_id": formData.deploymentId,
     "ready_release_num": currentListNo,
     "user_name": usersInfo.name,

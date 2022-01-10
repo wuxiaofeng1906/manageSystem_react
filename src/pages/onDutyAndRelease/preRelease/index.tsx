@@ -36,7 +36,6 @@ import {getGridHeight} from "./supplementFile/gridSet";
 const {TabPane} = Tabs;
 const {Option} = Select;
 const {TextArea} = Input;
-const currentDate = dayjs().format("YYYYMMDD");
 let currentListNo = "";
 let newOnlineBranchNum = "";
 let releaseIdArray: any;
@@ -58,7 +57,6 @@ const PreRelease: React.FC<any> = () => {
     reviewConfirm: 100,
     orderList: 100
   });
-
 
   // 发布项新增和修改的共同modal显示
   const [pulishItemModal, setPulishItemModal] = useState({shown: false, title: "新增"});
@@ -375,6 +373,7 @@ const PreRelease: React.FC<any> = () => {
   /* region 删除功能 */
   const firstUpSerGridApi = useRef<GridApi>();
   const secondUpSerGridApi = useRef<GridApi>();
+  const thirdUpSerGridApi = useRef<GridApi>();
   const firstDataReviewGridApi = useRef<GridApi>();
   const firstOnlineBranchGridApi = useRef<GridApi>();
 
@@ -397,11 +396,11 @@ const PreRelease: React.FC<any> = () => {
 
     const {type} = delModal;
     if (type === 1) { // 是发布项删除
-      const newData: any = await alalysisInitData("pulishItem");
+      const newData: any = await alalysisInitData("pulishItem", currentListNo);
       firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
 
     } else if (type === 2) { // 是升级接口删除
-      const newData: any = await alalysisInitData("pulishApi");
+      const newData: any = await alalysisInitData("pulishApi", currentListNo);
       secondUpSerGridApi.current?.setRowData(newData.upService_interface);
       setGridHeight({
         ...gridHeight,
@@ -409,13 +408,13 @@ const PreRelease: React.FC<any> = () => {
       });
 
     } else if (type === 3) { // 是数据修复review、
-      const newData: any = await alalysisInitData("dataReview");
+      const newData: any = await alalysisInitData("dataReview", currentListNo);
       firstDataReviewGridApi.current?.setRowData(newData.reviewData_repaire);
 
 
     } else if (type === 4) { // 是上线分支删除
 
-      const newData: any = await alalysisInitData("onlineBranch");
+      const newData: any = await alalysisInitData("onlineBranch", currentListNo);
       firstOnlineBranchGridApi.current?.setRowData(newData.onlineBranch);
 
     }
@@ -624,8 +623,20 @@ const PreRelease: React.FC<any> = () => {
         shown: false
       });
 
-      const newData: any = await alalysisInitData("pulishItem");
+      const newData: any = await alalysisInitData("pulishItem", currentListNo);
       firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
+
+
+      //   发布项结果保存成功之后，需要刷新发布项中的服务确认完成
+
+      const newData_confirm: any = await alalysisInitData("pulishConfirm", currentListNo);
+      thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认设置一行空值
+
+      setGridHeight({
+        ...gridHeight,
+        pulishItemGrid: getGridHeight((newData.upService_releaseItem).length),
+        upConfirm: getGridHeight((newData_confirm.upService_confirm).length)
+      });
 
     } else {
       message.error({
@@ -744,7 +755,7 @@ const PreRelease: React.FC<any> = () => {
 
       });
 
-      const newData: any = await alalysisInitData("pulishApi");
+      const newData: any = await alalysisInitData("pulishApi", currentListNo);
       secondUpSerGridApi.current?.setRowData(newData.upService_interface);
 
       setGridHeight({
@@ -890,7 +901,7 @@ const PreRelease: React.FC<any> = () => {
       headerName: '确认时间',
       field: 'test_confirm_time',
     }];
-  const thirdUpSerGridApi = useRef<GridApi>();
+
   const onthirdGridReady = (params: GridReadyEvent) => {
     thirdUpSerGridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -1066,7 +1077,7 @@ const PreRelease: React.FC<any> = () => {
       });
 
       //   刷新
-      const newData: any = await alalysisInitData("dataReview");
+      const newData: any = await alalysisInitData("dataReview", currentListNo);
       firstDataReviewGridApi.current?.setRowData(newData.reviewData_repaire);
 
     } else {
@@ -1378,7 +1389,7 @@ const PreRelease: React.FC<any> = () => {
   // 上线前环境检查
   const beforeOnlineEnvCheck = (params: any) => {
 
-    if ((params.value).length === 0) {
+    if (!params.value || (params.value).length === 0) {
       return "";
     }
     const values = (params.value)[0]; // 也只会有一条数据
@@ -1737,7 +1748,7 @@ const PreRelease: React.FC<any> = () => {
       });
 
 
-      const newData: any = await alalysisInitData("onlineBranch");
+      const newData: any = await alalysisInitData("onlineBranch", currentListNo);
       firstOnlineBranchGridApi.current?.setRowData(newData.onlineBranch);
 
       setGridHeight({
@@ -1901,7 +1912,7 @@ const PreRelease: React.FC<any> = () => {
 
         queryCondition.push({
           "deployment_id": ele.key,
-          "automation_test": ele.automation_test,
+          "automation_check": ele.automation_test,
           "service": (ele.service).split(",")
         });
 
@@ -1924,6 +1935,7 @@ const PreRelease: React.FC<any> = () => {
         },
       });
     } else {
+
       // 有数据之后进行表格的赋值操作
       firstUpSerGridApi.current?.setRowData(result.data);
       secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
@@ -1944,6 +1956,7 @@ const PreRelease: React.FC<any> = () => {
   /* region Tabs 标签页事件 */
 
   const showNoneDataPage = () => {
+    formUpgradeService.resetFields();
     // 预发布项目
     formForPreReleaseProject.resetFields();
 
@@ -1959,9 +1972,19 @@ const PreRelease: React.FC<any> = () => {
     // 数据修复Review 二
     secondDataReviewGridApi.current?.setRowData([]);
     // 上线分支
-    firstOnlineBranchGridApi.current?.setRowData([]);
+    firstOnlineBranchGridApi.current?.setRowData([{}]);
     // 对应工单
     firstListGridApi.current?.setRowData([]);
+
+    setGridHeight({
+      pulishItemGrid: 100,
+      upgradeApiGrid: 100,
+      upConfirm: 100,
+      dataRepaireReviewGrid: 100,
+      onlineBranchGrid: 100,
+      reviewConfirm: 100,
+      orderList: 100
+    });
 
   };
 

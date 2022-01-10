@@ -87,6 +87,9 @@ const analysisReviewConfirm = (datas: any) => {
 
 /* region 上线分支数据解析 */
 const analysisOnlineBranch = (datas: any) => {
+  if (datas.length === 0) {
+    return [{}];
+  }
 
   return datas;
 };
@@ -113,6 +116,10 @@ const alalysisInitData = async (queryData: string = "", queryReleaseNum: string 
   }
   if (queryData === "pulishApi") {
     return {upService_interface: analysisUpInterface(datas[0].update_api)};
+  }
+
+  if (queryData === "pulishConfirm") {
+    return {upService_confirm: analysisServiceConfirm(datas[0].update_confirm)}; // 升级服务-服务确认;
   }
 
   if (queryData === "dataReview") {

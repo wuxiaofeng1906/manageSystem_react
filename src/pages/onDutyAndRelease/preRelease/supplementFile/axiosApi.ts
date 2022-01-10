@@ -177,7 +177,8 @@ const getGridDataSource = (oldData: any) => {
 
     const filedObject = {
       id: ele.id,
-      automation_test: ele.automation_test,
+      deployment_id: ele.id,
+      automation_check: ele.automation_check,
       branch_environment: `${ele.branch}_${ele.env}`,
       app: "",
 
@@ -202,9 +203,11 @@ const queryServiceByID = async (params: string) => {
     data: []
   };
 
+  debugger;
   await axios.post('/api/verify/release/env_branch', params)
     .then(function (res) {
       if (res.data.code === 200) {
+        debugger;
         result.data = getGridDataSource(res.data.data);
 
       } else {
@@ -287,6 +290,7 @@ const getIsApiAndDatabaseUpgrade = async () => {
 // 修改发布项
 const saveUpgradeItem = async (params: any) => {
 
+  debugger;
   let errorMessage = "";
   await axios.post("/api/verify/release/upgrade_service", params)
     .then(function (res) {

@@ -2,7 +2,7 @@
  * @Description: 数据列表
  * @Author: jieTan
  * @Date: 2021-11-22 10:55:42
- * @LastEditTime: 2021-12-23 02:00:30
+ * @LastEditTime: 2022-01-10 07:05:44
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -16,22 +16,28 @@ import LinkToCloumn from './renders/LinkToCloumn';
 import ProjStatusColumn from './renders/ProjStatusColumn';
 import NumberToFixedColumn from './renders/NumberToFixedColumn';
 import DurationColumn from './renders/DurationColumn';
+import { Spin } from 'antd';
+import { useEffect } from 'react';
 
 /*  */
 export default () => {
   /*  */
-  const { gqlData, dynamicCols } = useModel('projectMetric');
-  const tableRowHeight = 33;
+  const { gqlData, dynamicCols, loading, setLoading, gridHeight, setGridApi } =
+    useModel('projectMetric');
+  const innerHeight = window.innerHeight - 248; // grid的固定高度
+
+  useEffect(() => {
+    setLoading(false);
+  }, [gqlData]);
 
   /*  */
   return (
-    <div style={{ height: 'calc(100% - 142px)' }}>
-      <div style={{ height: '100%' }} className="ag-theme-alpine">
+    <Spin tip="数据加载中..." spinning={loading} style={{ height: innerHeight }}>
+      <div style={{ height: innerHeight }} className="ag-theme-alpine">
         <div style={{ width: '100%', height: '100%' }}>
           <AgGridReact
             className="myGrid"
-            rowHeight={tableRowHeight}
-            headerHeight={tableRowHeight}
+            headerHeight={gridHeight.row + 2}
             modules={[SetFilterModule as any]}
             frameworkComponents={{
               linkTo: LinkToCloumn,
@@ -43,9 +49,13 @@ export default () => {
             // stopEditingWhenCellsLoseFocus={true}
             columnDefs={[TableMajorGroup, ...dynamicCols]}
             rowData={gqlData}
+            onGridReady={(params: any) => setGridApi(params.api)}
+            getRowHeight={() => gridHeight.row}
+            animateRows={true}
           />
         </div>
       </div>
-    </div>
+    </Spin>
+    // {/* <Button onClick={() => setLoading((prev: boolean) => !prev)}>123</Button> */}
   );
 };

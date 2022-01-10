@@ -1,0 +1,31 @@
+.cell-span {
+  text-align: center;
+  background-color: white;
+  border-right: 1px solid lightgrey !important;
+  border-bottom: 1px solid lightgrey !important;
+}
+
+.cell-span2 {
+  background-color: white;
+  border-right: 1px solid lightgrey !important;
+  border-bottom: 1px solid lightgrey !important;
+}
+
+
+/* region 单元格提示信息 */
+
+.custom-tooltip {
+  position: absolute;
+  width: 530px;
+  padding: 5px;
+  background-color: #F8F8F8;
+  border: 1px solid #A9A9A9;
+  transition: opacity 1s;
+  pointer-events: none;
+}
+
+.custom-tooltip.ag-tooltip-hiding {
+  opacity: 0;
+}
+
+/* endregion 提示信息 */

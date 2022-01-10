@@ -787,7 +787,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
         }
 
-
+        debugger;
         // 设置显示的值。
         formForCarryTask.setFieldsValue({
           // 版本检查

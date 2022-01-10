@@ -1,14 +1,18 @@
 import {
+  getNewPageNum,
   savePrePulishProjects, queryServiceByID, saveUpgradeItem, delUpgradeItem,
   savePulishApi, delPulishApi, upgradeServiceConfirm, addDataRepaire, modifyDataRepaire,
   delDataReviewApi, dataRepairConfirm, getNewCheckNum, saveOnlineBranch, saveVersonCheck,
   saveEnvironmentCheck, saveOnlineAutoCheck, getDetaisByCHeckNum, delDataOnlineBranchApi,
   excuteVersionCheck, excuteEnvCheck, excuteAutoCheck
 } from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
-import dayjs from "dayjs";
 
 const userLogins: any = localStorage.getItem("userLogins");
 const usersInfo = JSON.parse(userLogins);
+
+const getNewNum = async () => {
+  return await getNewPageNum();
+}
 
 // 保存预发布项目
 const savePreProjects = async (source: any, listNo: string) => {
@@ -587,6 +591,7 @@ const executeOnlineCheck = async (type: string, checkNum: string) => {
 
 };
 export {
+  getNewNum,
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems, addPulishApi, confirmUpgradeService,
   dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch, saveOnlineBranchData, getModifiedData,
   executeOnlineCheck

@@ -1,5 +1,28 @@
 import {getInitPageData} from "./axiosApi";
 
+// 解析有多少个tab
+const analysisTabsPageInfo = (datas: any) => {
+  const tabsPageArray: any = [];
+  if (datas) {
+    datas.forEach((ele: any) => {
+      const {project} = ele;
+      if (project.length > 0) {
+        const releaseNum = project[0].ready_release_num;
+
+        // const timeString = releaseNum.substring(0, 8);
+        const panes: any = {
+          title: `${releaseNum}灰度预发布`,
+          content: "",
+          key: releaseNum,
+        };
+        tabsPageArray.push(panes);
+      }
+    });
+  }
+
+  return tabsPageArray;
+};
+
 // 预发布项目数据解析
 const analysisPreReleaseProject = (datas: any) => {
 
@@ -79,9 +102,10 @@ const analysiCorrespondOrder = (datas: any) => {
 
 /* endregion */
 
-const alalysisInitData = async (queryData = "all") => {
+const alalysisInitData = async (queryData: string = "", queryReleaseNum: string = "") => {
+  debugger;
 
-  const result = await getInitPageData();
+  const result = await getInitPageData(queryReleaseNum);
   const datas = result.data;
 
   if (queryData === "pulishItem") {
@@ -100,6 +124,7 @@ const alalysisInitData = async (queryData = "all") => {
   }
 
   return {
+    tabPageInfo: analysisTabsPageInfo(datas),
     // 预发布项目
     preProject: analysisPreReleaseProject(datas[0].project),
     // 升级服务

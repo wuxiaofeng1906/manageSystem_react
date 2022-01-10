@@ -1,5 +1,5 @@
 const getGridHeight = (gridRowCount: number, moreHigh: boolean = false) => {
-  let height = gridRowCount * 25 + 50;
+  let height = gridRowCount * 25 + 60;
   if (moreHigh) {
     height += 50;
   }

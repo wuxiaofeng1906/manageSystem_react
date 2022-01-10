@@ -21,6 +21,7 @@ import {
 } from "./supplementFile/controler";
 import {useRequest} from "ahooks";
 import {
+  getNewNum,
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems,
   addPulishApi, confirmUpgradeService, dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch,
   saveOnlineBranchData, getModifiedData, executeOnlineCheck
@@ -2018,30 +2019,35 @@ const PreRelease: React.FC<any> = () => {
     targetKey: ""
   });
 
-  const initialPanes = [
-    {
-      title: `${currentDate}灰度预发布1`,
-      content: "",
-      key: '1',
-      // closable: false
-    }];
+  // const initialPanes = [
+  //   {
+  //     title: `${currentDate}灰度预发布1`,
+  //     content: "",
+  //     key: '1',
+  //     // closable: false
+  //   }];
+  // const [tabContent, setTabContent] = useState({
+  //   activeKey: initialPanes[0].key,
+  //   panes: initialPanes
+  // });
+
   const [tabContent, setTabContent] = useState({
-    activeKey: initialPanes[0].key,
-    panes: initialPanes
+    activeKey: "",
+    panes: []
   });
 
   // 新增tab
-  const add = () => {
-    const {panes} = tabContent;
-    const tabCount = panes.length;
-    const activeKey = `index_${tabCount + 1}`;
+  const add = async () => {
+    // 获取新的pageNum
+    const newNum = await getNewNum();
+    currentListNo = newNum.data?.ready_release_num;
+    const {panes}: any = tabContent;
     panes.push({
-      title: `${currentDate}灰度预发布${tabCount + 1}`,
+      title: `${currentListNo}灰度预发布`,
       content: "",
-      key: activeKey,
-      // closable: true
+      key: currentListNo
     });
-    setTabContent({panes, activeKey});
+    setTabContent({panes, activeKey: currentListNo});
 
     showNoneDataPage();
   };
@@ -2069,8 +2075,9 @@ const PreRelease: React.FC<any> = () => {
       ...showTabs,
       shown: false
     });
-    const {panes, activeKey} = tabContent;
 
+    const {panes}: any = tabContent;
+    const {activeKey}: any = tabContent;
     if (panes.length === 1) {
       message.error({
         content: "删除失败：页面需要至少保留一个预发布页面!",
@@ -2084,12 +2091,12 @@ const PreRelease: React.FC<any> = () => {
     }
     let newActiveKey = activeKey;
     let lastIndex = 0;
-    panes.forEach((pane, i) => {
+    panes.forEach((pane: any, i: number) => {
       if (pane.key === targetKey) {
         lastIndex = i - 1;
       }
     });
-    const newPanes = panes.filter(pane => pane.key !== targetKey);
+    const newPanes = panes.filter((pane: any) => pane.key !== targetKey);
     if (newPanes.length && newActiveKey === targetKey) {
       if (lastIndex >= 0) {
         newActiveKey = newPanes[lastIndex].key;
@@ -2114,7 +2121,7 @@ const PreRelease: React.FC<any> = () => {
   };
 
   // 切换tab页面
-  const onChange = (activeKeys: any) => {
+  const onChange = async (activeKeys: any) => {
 
     setTabContent({
       ...tabContent,
@@ -2122,9 +2129,8 @@ const PreRelease: React.FC<any> = () => {
     });
 
     // 根据标签页获取数据,然后再赋予值
-    showPagesContent({});
-
-
+    const newTabData = await alalysisInitData("", activeKeys);
+    showPagesContent(newTabData);
   };
 
   // 修改tab
@@ -2136,9 +2142,16 @@ const PreRelease: React.FC<any> = () => {
   };
   /* endregion */
 
-
   useEffect(() => {
     showPagesContent(initData);
+    const tabsInfo = initData?.tabPageInfo;
+
+    if (tabsInfo) {
+      setTabContent({
+        activeKey: tabsInfo[0].key,
+        panes: tabsInfo
+      });
+    }
 
   }, [initData]);
 

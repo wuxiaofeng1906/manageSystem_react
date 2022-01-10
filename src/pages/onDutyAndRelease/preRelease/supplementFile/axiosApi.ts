@@ -7,12 +7,37 @@ axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
 const userLogins: any = localStorage.getItem("userLogins");
 const usersInfo = JSON.parse(userLogins);
 
-const getInitPageData = async () => {
+// 获取预发布编号
+const getNewPageNum = async () => {
+
   const result: any = {
     message: "",
     data: []
   };
-  await axios.get('/api/verify/release/release_detail', {})
+  await axios.get('/api/verify/release/release_num', {})
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+
+};
+
+// 根据id获取数据
+const getInitPageData = async (queryReleaseNum: string) => {
+
+  const result: any = {
+    message: "",
+    data: []
+  };
+
+  await axios.get('/api/verify/release/release_detail', {params: {"ready_release_num": queryReleaseNum}})
     .then(function (res) {
       if (res.data.code === 200) {
         result.data = res.data.data;
@@ -946,6 +971,7 @@ const excuteAutoCheck = async (checkNum: string, checkTime: string) => {
 /* endregion */
 
 export {
+  getNewPageNum,
   savePrePulishProjects, queryReleaseType, queryReleaseWay, queryReleaseId, queryServiceByID,
   getInitPageData, getOnlineDev, getPulishItem, getIsApiAndDatabaseUpgrade, saveUpgradeItem,
   delUpgradeItem, getUpgradeApi, getApiService, getApiMethod, savePulishApi, delPulishApi,

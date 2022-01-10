@@ -2,7 +2,7 @@
  * @Description: 项目过程质量的字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:47:07
- * @LastEditTime: 2021-12-16 12:44:05
+ * @LastEditTime: 2022-01-05 02:08:33
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -24,11 +24,32 @@ export const ReviewDefectCols: ColDef[] = [
   {
     headerName: `需求（预设+评审）`,
     field: `${moduleName}.storyPreReview`,
-    ...defaultParmas,
+    cellRenderer: 'numToFixed',
+    cellRendererParams: { decimal: 4 },
+    width: 156,
+    minWidth: 150,
   },
   {
     headerName: 'UE评审',
     field: `${moduleName}.ueReview`,
+    columnGroupShow: SHOW['closed'],
+    ...defaultParmas,
+  },
+  {
+    headerName: 'UE预审',
+    field: `${moduleName}.uePreview`,
+    columnGroupShow: SHOW['closed'],
+    ...defaultParmas,
+  },
+  {
+    headerName: 'UI预审',
+    field: `${moduleName}.uiPreview`,
+    columnGroupShow: SHOW['closed'],
+    ...defaultParmas,
+  },
+  {
+    headerName: 'UI评审',
+    field: `${moduleName}.uiReview`,
     columnGroupShow: SHOW['closed'],
     ...defaultParmas,
   },

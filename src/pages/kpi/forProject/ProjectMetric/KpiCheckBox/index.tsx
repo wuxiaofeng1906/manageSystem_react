@@ -2,7 +2,7 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2021-12-22 10:22:11
+ * @LastEditTime: 2022-01-10 07:59:45
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -15,7 +15,9 @@ import {
   ProcessQualityGroup,
   ReviewDefectGroup,
   ScaleProductivityGroup,
+  ServiceAboutGroup,
   StageWorkloadGroup,
+  StoryStableGroup,
 } from '../TableList/definitions/columns';
 import { projectKpiGql, queryGQL } from '@/pages/gqls';
 import { useGqlClient } from '@/hooks';
@@ -34,7 +36,8 @@ export default () => {
   const [checkedList, setCheckedList] = useState([]);
   const [indeterminate, setIndeterminate] = useState(false);
   const [checkAll, setCheckAll] = useState(false);
-  const { setGqlData, setDynamicCols } = useModel('projectMetric');
+  const { setGqlData, setDynamicCols, setLoading, setPkGqlParmas, pkGqlParmas } =
+    useModel('projectMetric');
 
   /*  */
   const onChange = (list: any) => {
@@ -58,7 +61,7 @@ export default () => {
   const loadOnDemand = async () => {
     // 获取当前选中的指标项 => FIMXE：抽离出去
     const loadColumns = [];
-    const kpiItems = [];
+    const kpiItems: string[] = [];
     for (const kp of checkedList) {
       switch (kp) {
         // 过程质量
@@ -86,6 +89,16 @@ export default () => {
           loadColumns.push(ReviewDefectGroup);
           kpiItems.push(PM.reviewDefect.en);
           break;
+        // 需求稳定性
+        case PM.storyStable.zh:
+          loadColumns.push(StoryStableGroup);
+          kpiItems.push(PM.storyStable.en);
+          break;
+        // 服务
+        case PM.serviceAbout.zh:
+          loadColumns.push(ServiceAboutGroup);
+          kpiItems.push(PM.serviceAbout.en);
+          break;
 
         default:
           break;
@@ -93,7 +106,9 @@ export default () => {
     }
 
     // gql查询数据
-    const _params: GQL_PARAMS = { func: 'projectKpi', params: { kpis: kpiItems } };
+    const newParams = Object.assign(pkGqlParmas, { kpis: kpiItems });
+    setPkGqlParmas(newParams);
+    const _params: GQL_PARAMS = { func: 'projectKpi', params: newParams };
     const ret = await queryGQL(gqlClient, projectKpiGql, _params);
 
     // 更改当前gird的数据源
@@ -104,6 +119,7 @@ export default () => {
   //
   useEffect(() => {
     // 选中指标变化事时，更改数据源
+    setLoading(true);
     loadOnDemand();
   }, [checkedList]);
 

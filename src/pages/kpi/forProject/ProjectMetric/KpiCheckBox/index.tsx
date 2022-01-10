@@ -2,7 +2,7 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2022-01-07 09:35:14
+ * @LastEditTime: 2022-01-10 07:59:45
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -36,7 +36,8 @@ export default () => {
   const [checkedList, setCheckedList] = useState([]);
   const [indeterminate, setIndeterminate] = useState(false);
   const [checkAll, setCheckAll] = useState(false);
-  const { setGqlData, setDynamicCols, setLoading } = useModel('projectMetric');
+  const { setGqlData, setDynamicCols, setLoading, setPkGqlParmas, pkGqlParmas } =
+    useModel('projectMetric');
 
   /*  */
   const onChange = (list: any) => {
@@ -60,7 +61,7 @@ export default () => {
   const loadOnDemand = async () => {
     // 获取当前选中的指标项 => FIMXE：抽离出去
     const loadColumns = [];
-    const kpiItems = [];
+    const kpiItems: string[] = [];
     for (const kp of checkedList) {
       switch (kp) {
         // 过程质量
@@ -105,7 +106,9 @@ export default () => {
     }
 
     // gql查询数据
-    const _params: GQL_PARAMS = { func: 'projectKpi', params: { kpis: kpiItems } };
+    const newParams = Object.assign(pkGqlParmas, { kpis: kpiItems });
+    setPkGqlParmas(newParams);
+    const _params: GQL_PARAMS = { func: 'projectKpi', params: newParams };
     const ret = await queryGQL(gqlClient, projectKpiGql, _params);
 
     // 更改当前gird的数据源

@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-01-10 07:18:28
+ * @LastEditTime: 2022-01-10 08:09:45
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -31,8 +31,6 @@ import { deptTreeNodes, onTreeMultiChange, projOptsElems } from './extra';
 const { RangePicker } = DatePicker;
 
 /*  */
-
-/*  */
 let dateStr: [string, string] | undefined; // 存放时间range信息
 let doChange = false;
 const defaultSeclectItems = { deptIds: [], projIds: [], dates: null, doQuery: false };
@@ -44,7 +42,8 @@ export default () => {
   const [treeActive2, setTreeActive2] = useState(''); // 部门<Select>选中时的样式
   const [projElems, setProjElems] = useState(null); // 保存项目信息
   const [treeData, setTreeData] = useState([]); // 部门树形结构的数据
-  const { gqlData, setGqlData, setLoading, gridApi, gridHeight } = useModel('projectMetric'); // 获取“过程质量”查询的结果数据
+  const { gqlData, setGqlData, setLoading, gridApi, gridHeight, pkGqlParmas, setPkGqlParmas } =
+    useModel('projectMetric'); // 获取“过程质量”查询的结果数据
   const [selectItems, setSelectItems] = useState(defaultSeclectItems); // 存放多个筛选的值
   const [ratioVal, setRatioVal] = useState(gridHeight.row);
   //
@@ -80,17 +79,21 @@ export default () => {
   /* 方法区 */
   const _onSelect = async () => {
     // 参数构建
-    const gqlParams = {};
+    const gqlParams = pkGqlParmas;
     //
     if (selectItems.deptIds.length !== 0)
       Object.assign(gqlParams, { deptIds: selectItems.deptIds });
+    else if (gqlParams['deptIds'] !== undefined) delete gqlParams['deptIds']; // 参数不存在时，移除key
     //
     if (selectItems.projIds.length !== 0)
       Object.assign(gqlParams, { projIds: selectItems.projIds.map((x) => parseInt(x)) });
+    else if (gqlParams['projIds'] !== undefined) delete gqlParams['projIds'];
     //
     if (dateStr) Object.assign(gqlParams, { dates: { start: dateStr[0], end: dateStr[1] } });
+    else if (gqlParams['dates'] !== undefined) delete gqlParams['dates'];
 
     //
+    setPkGqlParmas(gqlParams);
     const params: GQL_PARAMS = {
       func: GRAPHQL_QUERY['PROJECT_KPI'],
       params: gqlParams,
@@ -197,7 +200,7 @@ export default () => {
               onClick={() => {
                 doChange = true;
                 setProjElems(null);
-                setSelectItems(Object.assign(defaultSeclectItems, { doQuery: true }));
+                setSelectItems(Object.assign({ ...defaultSeclectItems }, { doQuery: true }));
                 dateStr = undefined;
               }}
             />

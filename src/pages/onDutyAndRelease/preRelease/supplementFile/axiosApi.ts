@@ -647,41 +647,51 @@ const saveOnlineBranch = async (type: string, currentListNo: string, newOnlineBr
 
 // 线上版本检查
 const saveVersonCheck = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any) => {
-  // 服务
-  const {server} = sourceData;
-  let serverStr = "";
-  server.forEach((ele: string) => {
-    serverStr = serverStr === "" ? ele : `${serverStr},${ele}`;
-  });
-
-  // 被对比的主分支
-  const main_branch = sourceData.branch_mainBranch;
-  let mainBranch = "";
-  main_branch.forEach((ele: string) => {
-    mainBranch = mainBranch === "" ? ele : `${mainBranch},${ele}`;
-  });
-
-  // 技术侧
-  const technical_side = sourceData.branch_teachnicalSide;
-  let techSide = "";
-  technical_side.forEach((ele: string) => {
-    techSide = techSide === "" ? ele : `${techSide},${ele}`;
-  });
 
   const data = {
     "check_num": newOnlineBranchNum,
     "user_name": usersInfo.name,
     "user_id": usersInfo.userid,
-    "backend_version_check_flag": sourceData.verson_check, // 是否开启版本检查
-    "server": serverStr, // 服务
-    "image_branch": sourceData.branchName, // 传分支名称
-    "image_env": sourceData.imageevn, // 镜像环境
-    "inclusion_check_flag": sourceData.branchcheck, // 是否开启分支检查
-    "main_branch": mainBranch, // 主分支
-    "technical_side": techSide, // 技术侧
-    "target_branch": sourceData.branchName, // 传分支名称
-    "main_since": dayjs(sourceData.branch_mainSince).format("YYYY-MM-DD"), // 时间
+    "backend_version_check_flag": false, // 是否开启版本检查
+    "inclusion_check_flag": false, // 是否开启分支检查
   };
+
+  // 判断是否开启版本检查，如果没开启，则不传相关字段
+  if (sourceData?.verson_check) { // true 已开启
+    // 服务
+    const {server} = sourceData;
+    let serverStr = "";
+    server.forEach((ele: string) => {
+      serverStr = serverStr === "" ? ele : `${serverStr},${ele}`;
+    });
+    data.backend_version_check_flag = true;
+    data["server"] = serverStr;
+    data["image_branch"] = sourceData.branchName;// 传分支名称
+    data["image_env"] = sourceData.imageevn; // 镜像环境
+  }
+
+
+  if (sourceData?.branchcheck) {
+    // 被对比的主分支
+    const main_branch = sourceData.branch_mainBranch;
+    let mainBranch = "";
+    main_branch.forEach((ele: string) => {
+      mainBranch = mainBranch === "" ? ele : `${mainBranch},${ele}`;
+    });
+
+    // 技术侧
+    const technical_side = sourceData.branch_teachnicalSide;
+    let techSide = "";
+    technical_side.forEach((ele: string) => {
+      techSide = techSide === "" ? ele : `${techSide},${ele}`;
+    });
+
+    data["main_branch"] = mainBranch; // 主分支
+    data["technical_side"] = techSide; // 技术侧
+    data["target_branch"] = sourceData.branchName; // 传分支名称
+    data["main_since"] = dayjs(sourceData.branch_mainSince).format("YYYY-MM-DD"); // 时间
+
+  }
 
   if (type === "修改") {
     data["version_check_id"] = sourceData.versionCheckId;
@@ -709,13 +719,18 @@ const saveEnvironmentCheck = async (type: string, currentListNo: string, newOnli
   if (sourceData.ignoreCheck) {
     ignore_check = (sourceData.ignoreCheck).length === 1 ? "1" : "2";
   }
+
   const data = {
     "check_num": newOnlineBranchNum,
     "user_name": usersInfo.name,
     "user_id": usersInfo.userid,
     "ignore_check": ignore_check,
-    "check_env": sourceData.checkEnv
   }
+
+  if (ignore_check === "2") { // 如果没有忽略检查
+    data["check_env"] = sourceData.checkEnv;
+  }
+
   if (type === "修改") {
     data["check_id"] = sourceData.envCheckId;
   }
@@ -746,22 +761,23 @@ const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlin
     before_ignore_check = (sourceData.autoBeforeIgnoreCheck).length === 1 ? "1" : "2";
   }
 
-  let before_check_type = "";
-  (sourceData.beforeCheckType).forEach((ele: string) => {
-    before_check_type = before_check_type === "" ? ele : `${before_check_type},${ele}`;
-  });
-
   const beforeData = {
     "check_num": newOnlineBranchNum,
     "user_name": usersInfo.name,
     "user_id": usersInfo.userid,
     "check_time": "1",    // 1 上线前检查， 2 上线后检查
     "ignore_check": before_ignore_check,
-    "check_type": before_check_type,
-    "test_env": sourceData.beforeTestEnv,
-    "browser": sourceData.beforeBrowser,
-
   };
+
+  if (before_ignore_check === "2") {
+    let before_check_type = "";
+    (sourceData.beforeCheckType).forEach((ele: string) => {
+      before_check_type = before_check_type === "" ? ele : `${before_check_type},${ele}`;
+    });
+    beforeData["check_type"] = before_check_type;
+    beforeData["test_env"] = sourceData.beforeTestEnv;
+    beforeData["browser"] = sourceData.beforeBrowser;
+  }
   if (type === "修改") {
     beforeData["automation_id"] = sourceData.beforeAutomationId;
   }
@@ -774,10 +790,6 @@ const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlin
   if (sourceData.autoAfterIgnoreCheck) {
     after_ignore_check = (sourceData.autoAfterIgnoreCheck).length === 1 ? "1" : "2";
   }
-  let after_check_type = "";
-  (sourceData.afterCheckType).forEach((ele: string) => {
-    after_check_type = after_check_type === "" ? ele : `${after_check_type},${ele}`;
-  });
 
   const afterData = {
     "check_num": newOnlineBranchNum,
@@ -785,10 +797,18 @@ const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlin
     "user_id": usersInfo.userid,
     "check_time": "2",    // 1 上线前检查， 2 上线后检查
     "ignore_check": after_ignore_check,
-    "check_type": after_check_type,
-    "test_env": sourceData.afterTestEnv,
-    "browser": sourceData.afterBrowser,
   };
+
+  if (after_ignore_check === "2") {
+    let after_check_type = "";
+    (sourceData.afterCheckType).forEach((ele: string) => {
+      after_check_type = after_check_type === "" ? ele : `${after_check_type},${ele}`;
+    });
+    data["check_type"] = after_check_type;
+    data["test_env"] = sourceData.afterTestEnv;
+    data["browser"] = sourceData.afterBrowser;
+  }
+
   if (type === "修改") {
     afterData["automation_id"] = sourceData.afterAutomationId;
   }

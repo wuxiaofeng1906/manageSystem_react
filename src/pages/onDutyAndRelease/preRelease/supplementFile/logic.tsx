@@ -283,22 +283,80 @@ const checkOnlineHeadData = (sourceData: any) => {
 // 上线分支版本检查验证
 const checkOnlineVersionData = (sourceData: any) => {
 
+  if (sourceData.verson_check) {  // 如果开启了版本检查，就要判断服务和镜像环境是否填写值
+    if (!sourceData.server || (sourceData.server).length === 0) {
+      return "版本检查-服务不能为空！";
+    }
 
-  //   "backend_version_check_flag": sourceData.verson_check, // 是否开启版本检查
-  //   "server": serverStr, // 服务
-  //   "image_env": sourceData.imageevn, // 镜像环境
-  //   "inclusion_check_flag": sourceData.branchcheck, // 是否开启分支检查
-  //   "main_branch": mainBranch, // 主分支
-  //   "technical_side": techSide, // 技术侧
-  //   "main_since": dayjs(sourceData.branch_mainSince).format("YYYY-MM-DD"), // 时间
+    if (!sourceData.imageevn) {
+      return "版本检查-镜像环境不能为空！";
+    }
+  }
 
-  // if (!sourceData.branchName) {
-  //   return "分支名称不能为空！";
-  // }
-  //
-  // if (!sourceData.module) {
-  //   return "技术侧不能为空！";
-  // }
+
+  if (sourceData.branchcheck) {  // 如果开启了分支对比检查，就要判断被对比的主分支和技术侧以及起始时间是否填写值
+    if (!sourceData.branch_mainBranch || (sourceData.branch_mainBranch).length === 0) {
+      return "分支检查-被对比的主分支不能为空！";
+    }
+
+    if (!sourceData.branch_teachnicalSide || (sourceData.branch_teachnicalSide).length === 0) {
+      return "分支检查-技术侧不能为空！";
+    }
+
+    if (!sourceData.branch_mainSince) {
+      return "版本检查-对比起始时间不能为空！";
+    }
+
+  }
+
+  return "";
+};
+
+// 上线环境检查验证
+const checkOnlineEnvData = (sourceData: any) => {
+//   只有没有勾选忽略检查，后面参数才必填
+  if (sourceData.ignoreCheck === undefined || (sourceData.ignoreCheck).length === 0) {
+
+    if (!sourceData.checkEnv) {
+      return "环境一致性检查中检察环境不能为空！";
+    }
+  }
+
+  return "";
+};
+
+const checkOnlineAutoData = (sourceData: any) => {
+
+  //   只有没有勾选忽略检查，后面参数才必填
+  if (sourceData.autoBeforeIgnoreCheck === undefined || (sourceData.autoBeforeIgnoreCheck).length === 0) {
+
+    if (sourceData.beforeCheckType === undefined || (sourceData.beforeCheckType).length === 0) {
+      return "上线前自动化检查中检查类型不能为空！";
+    }
+
+    if (!sourceData.beforeTestEnv) {
+      return "上线前自动化检查中测试环境不能为空！";
+    }
+
+    if (!sourceData.beforeBrowser) {
+      return "上线前自动化检查中浏览器不能为空！";
+    }
+  }
+
+  if (sourceData.autoAfterIgnoreCheck === undefined || (sourceData.autoAfterIgnoreCheck).length === 0) {
+
+    if (sourceData.afterCheckType === undefined || (sourceData.afterCheckType).length === 0) {
+      return "上线后自动化检查中检查类型不能为空！";
+    }
+
+    if (!sourceData.afterTestEnv) {
+      return "上线后自动化检查中测试环境不能为空！";
+    }
+
+    if (!sourceData.afterBrowser) {
+      return "上线后自动化检查中浏览器不能为空！";
+    }
+  }
 
   return "";
 };
@@ -318,15 +376,28 @@ const saveOnlineBranchData = async (type: string, currentListNo: string, newOnli
     return checkMsg_onlineHead;
   }
 
-
   // 版本检查设置
   const checkMsg_versonCheck = checkOnlineVersionData(sourceData);
-  if (checkMsg_onlineHead) {
-    return checkMsg_onlineHead;
+  if (checkMsg_versonCheck) {
+    return checkMsg_versonCheck;
   }
 
-  return "";
+
+  // 环境一致性检查设置
+  const checkMsg_envCheck = checkOnlineEnvData(sourceData);
+  if (checkMsg_envCheck) {
+    return checkMsg_envCheck;
+  }
+
+  // 自动化检查参数
+  const checkMsg_autoCheck = checkOnlineAutoData(sourceData);
+  if (checkMsg_autoCheck) {
+    return checkMsg_autoCheck;
+  }
+
+
   let returnMessage = "";
+
   const onlineBranch = await saveOnlineBranch(type, currentListNo, newOnlineBranchNum, sourceData);
   if (onlineBranch !== "") {
     returnMessage = `上线分支保存失败：${onlineBranch}`;
@@ -345,7 +416,7 @@ const saveOnlineBranchData = async (type: string, currentListNo: string, newOnli
     returnMessage = returnMessage === "" ? `自动化检查保存失败：${onlineAutoCheck}` : `${returnMessage}；\n自动化检查保存失败：${onlineAutoCheck}`;
   }
 
-  // return returnMessage;
+  return returnMessage;
 };
 
 // 上线分支修改-表头数据解析

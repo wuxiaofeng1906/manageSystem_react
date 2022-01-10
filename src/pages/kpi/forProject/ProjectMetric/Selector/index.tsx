@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-01-10 09:57:56
+ * @LastEditTime: 2022-01-10 10:28:33
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -77,7 +77,7 @@ export default () => {
   const selectFlexs = { xs: 24, sm: 24, md: 22 };
   const extraFlexs = { xs: selectFlexs.xs, sm: selectFlexs.sm, md: 24 - selectFlexs.md };
   // 
-  const itemFlexs = { xs: 24, sm: 24, md: 6 };
+  const itemFlexs = { xs: 24, sm: 24, md: 7 };
 
   /* 方法区 */
   const _onSelect = async () => {
@@ -179,7 +179,7 @@ export default () => {
                 />
               </Form.Item>
             </Col>
-            <Col {...itemFlexs}>
+            <Col {...itemFlexs} md={8}>
               <Form.Item label="时间范围" key="dates">
                 <RangePicker
                   onChange={(dates: any, dateString) => {

@@ -171,7 +171,7 @@ const PreRelease: React.FC<any> = () => {
     if (params.data?.onlineDev === "集群1") {
 
       // 上下设置颜色
-      return {'background-color': '#FFF6F6'};
+      return {'background-color': '#fff6f6'};
 
     }
     return {'background-color': 'transparent'};

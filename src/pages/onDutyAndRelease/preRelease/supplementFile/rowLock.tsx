@@ -9,6 +9,7 @@ const usersInfo = JSON.parse(userLogins);
 
 
 const getLockStatus = async (lockedId: string) => {
+
   const datas = {
     "user_name": usersInfo.name,
     "user_id": usersInfo.userid,
@@ -20,13 +21,15 @@ const getLockStatus = async (lockedId: string) => {
     data: {}
   };
 
-  await axios.post("/api/verify/release/release_project", {params: datas})
+  await axios.post("/api/verify/release/lock", datas)
     .then(function (res) {
 
       if (res.data.code === 200) {
-
-
         result.data = res.data.data;
+        const personInfo = res.data.data;
+        if (personInfo.user_name) {
+          result.errMessage = `【${personInfo.user_name}】正在编辑，请稍后！`;
+        }
 
       } else {
         result.errMessage = `错误：${res.data.msg}`;
@@ -47,7 +50,7 @@ const deleteLockStatus = async (lockedId: string) => {
     "param": lockedId
   };
 
-  await axios.delete("/api/verify/release/release_branch", {data: datas})
+  await axios.delete("/api/verify/release/lock", {data: datas})
     .then(function (res) {
       if (res.data.code !== 200) {
         errorMessage = `错误：${res.data.msg}`;

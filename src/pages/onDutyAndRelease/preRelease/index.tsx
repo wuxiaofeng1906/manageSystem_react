@@ -32,6 +32,7 @@ import {
   getRepaireType, getPassOrNot, getTechSide
 } from "./supplementFile/converse";
 import {getGridHeight} from "./supplementFile/gridSet";
+import {getLockStatus, deleteLockStatus} from "./supplementFile/rowLock";
 
 const {TabPane} = Tabs;
 const {Option} = Select;
@@ -1993,7 +1994,7 @@ const PreRelease: React.FC<any> = () => {
     if (!source) {
       return;
     }
-
+    formUpgradeService.resetFields();
     // 预发布项目
     const preReleaseProject = source?.preProject;
 

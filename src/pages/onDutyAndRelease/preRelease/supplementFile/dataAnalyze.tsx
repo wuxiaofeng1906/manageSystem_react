@@ -125,6 +125,10 @@ const alalysisInitData = async (queryData: string = "", queryReleaseNum: string 
     return {reviewData_repaire: analysisReviewData(datas[0].review_data)}
   }
 
+  if (queryData === "dataReviewConfirm") {
+    return {reviewData_confirm: analysisReviewConfirm(datas[0].review_confirm)}
+  }
+
   if (queryData === "onlineBranch") {
     return {onlineBranch: analysisOnlineBranch(datas[0].release_branch)}
   }

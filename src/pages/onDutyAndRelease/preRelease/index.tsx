@@ -1056,6 +1056,11 @@ const PreRelease: React.FC<any> = () => {
             marginTop: '50vh',
           },
         });
+
+        //   刷新表格
+        const newData_confirm: any = await alalysisInitData("pulishConfirm", currentListNo);
+        thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认设置一行空值
+
       } else {
         message.error({
           content: `${result}`,
@@ -1265,6 +1270,11 @@ const PreRelease: React.FC<any> = () => {
               marginTop: '50vh',
             },
           });
+
+          //   刷新表格
+          const newData_confirm: any = await alalysisInitData("dataReviewConfirm", currentListNo);
+          secondDataReviewGridApi.current?.setRowData(newData_confirm.reviewData_confirm);
+
         } else {
           message.error({
             content: `${result}`,

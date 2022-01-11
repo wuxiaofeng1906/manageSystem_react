@@ -24,7 +24,7 @@ import {
   getNewNum, deleteReleaseItem, getPageCHeckProcess,
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems,
   addPulishApi, confirmUpgradeService, dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch,
-  saveOnlineBranchData, getModifiedData, executeOnlineCheck
+  saveOnlineBranchData, getModifiedData, executeOnlineCheck, saveProcessResult
 } from "./supplementFile/logic";
 import {alalysisInitData} from "./supplementFile/dataAnalyze";
 import {
@@ -33,6 +33,7 @@ import {
 } from "./supplementFile/converse";
 import {getGridHeight} from "./supplementFile/gridSet";
 import {getLockStatus, deleteLockStatus, getAllLockedData} from "./supplementFile/rowLock";
+import {getNewPageNum} from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
 
 const {TabPane} = Tabs;
 const {Option} = Select;
@@ -91,8 +92,8 @@ const PreRelease: React.FC<any> = () => {
     // 上线分支设置
     const [onlineBranchModal, setOnlineBranchModal] = useState({shown: false, title: "新增", loading: false});
 
-    const initData = useRequest(() => alalysisInitData()).data;
-
+    const {data, loading} = useRequest(() => alalysisInitData());
+    const initData = data;
     /* region 新增行 */
 
     // 发布项弹出窗口中的select框加载
@@ -576,6 +577,7 @@ const PreRelease: React.FC<any> = () => {
         results.onliineCheck = "#2BF541";
         successCount += 1;
       }
+
       results.releaseResult = datas.release_result;
       results.processPercent = (successCount / 4) * 100;
 
@@ -1302,7 +1304,7 @@ const PreRelease: React.FC<any> = () => {
       //  如果前后两个值不同，则需要更新
       if (params.newValue !== params.oldValue) {
 
-        const data = {
+        const datas = {
           "user_name": usersInfo.name,
           "user_id": usersInfo.userid,
           "confirm_id": params.data?.confirm_id,
@@ -1310,7 +1312,7 @@ const PreRelease: React.FC<any> = () => {
           "confirm_result": params.newValue
         };
 
-        const result = await confirmDataRepairService(data);
+        const result = await confirmDataRepairService(datas);
         if (result === "") {
           message.info({
             content: "保存成功！",
@@ -2029,8 +2031,32 @@ const PreRelease: React.FC<any> = () => {
     /* endregion */
 
     /* region 发布结果 */
-    const pulishResulttChanged = (params: any) => {
-      console.log(params);
+    const pulishResulttChanged = async (params: any) => {
+
+      const result = await saveProcessResult(currentListNo, params);
+      if (result === "") {
+
+        message.info({
+          content: "保存成功！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+
+        setProcessStatus({
+          ...processStatus,
+          releaseResult: params
+        })
+      } else {
+        message.error({
+          content: result,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
 
     };
     /* endregion */
@@ -2160,20 +2186,20 @@ const PreRelease: React.FC<any> = () => {
       firstListGridApi.current?.setRowData([]);
 
       setGridHeight({
-        pulishItemGrid: 100,
-        upgradeApiGrid: 100,
-        upConfirm: 100,
-        dataRepaireReviewGrid: 100,
-        onlineBranchGrid: 100,
-        reviewConfirm: 100,
-        orderList: 100
+        pulishItemGrid: 120,
+        upgradeApiGrid: 120,
+        upConfirm: 120,
+        dataRepaireReviewGrid: 120,
+        onlineBranchGrid: 120,
+        reviewConfirm: 120,
+        orderList: 120
       });
 
     };
 
     const showPagesContent = async (source: any) => {
 
-      if (!source) {
+      if (!source || JSON.stringify(source) === "{}") {
         return;
       }
 
@@ -2418,18 +2444,38 @@ const PreRelease: React.FC<any> = () => {
         setSaveButtonDisable(false);
       }
     };
-
-
-    useEffect(() => {
-      showPagesContent(initData);
-      const tabsInfo = initData?.tabPageInfo;
+    // 初始化显示tab
+    const showTabsPage = async () => {
+      debugger;
+      const source = await alalysisInitData();
+      const tabsInfo = source?.tabPageInfo;
 
       if (tabsInfo) {
         setTabContent({
           activeKey: tabsInfo[0].key,
           panes: tabsInfo
         });
+      } else {
+        const newNum = await getNewPageNum();
+        const releaseNum = newNum.data?.ready_release_num;
+        currentListNo = releaseNum;
+        const panesArray: any = [{
+          title: `${releaseNum}灰度预发布`,
+          content: "",
+          key: releaseNum,
+        }];
+
+        setTabContent({
+          activeKey: releaseNum,
+          panes: panesArray
+        });
       }
+    };
+
+    useEffect(() => {
+      console.log("233333", initData)
+      showPagesContent(initData);
+      showTabsPage();
 
     }, [initData]);
 

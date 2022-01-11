@@ -100,7 +100,25 @@ const getCheckProcess = async (releaseNum: string) => {
   return result;
 };
 
+const updateReleaseProcess = async (data: any) => {
+
+  let errorMessage = "";
+  await axios.post("/api/verify/release/progress", data)
+    .then(function (res) {
+
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+};
 /* endregion */
+
 /* region 预发布项目 */
 // 发布类型
 const queryReleaseType = async () => {
@@ -1023,7 +1041,7 @@ const excuteAutoCheck = async (checkNum: string, checkTime: string) => {
 /* endregion */
 
 export {
-  getNewPageNum, delTabsInfo, getCheckProcess,
+  getNewPageNum, delTabsInfo, getCheckProcess, updateReleaseProcess,
   savePrePulishProjects, queryReleaseType, queryReleaseWay, queryReleaseId, queryServiceByID,
   getInitPageData, getOnlineDev, getPulishItem, getIsApiAndDatabaseUpgrade, saveUpgradeItem,
   delUpgradeItem, getUpgradeApi, getApiService, getApiMethod, savePulishApi, delPulishApi,

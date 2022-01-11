@@ -1,9 +1,24 @@
-import {getInitPageData} from "./axiosApi";
+import {getInitPageData, getNewPageNum} from "./axiosApi";
 
 // 解析有多少个tab
-const analysisTabsPageInfo = (datas: any) => {
+const analysisTabsPageInfo = async (datas: any) => {
+
   const tabsPageArray: any = [];
   if (datas) {
+
+    // if (datas.length === 0) {
+    //   // 新建一个
+    //   // const newNum = await getNewPageNum();
+    //   // const releaseNum = newNum.data?.ready_release_num;
+    //   // const panes: any = {
+    //   //   title: `${releaseNum}灰度预发布`,
+    //   //   content: "",
+    //   //   key: releaseNum,
+    //   // };
+    //   // tabsPageArray.push(panes);
+    //
+    //   return
+    // } else {
     datas.forEach((ele: any) => {
       const {project} = ele;
       if (project.length > 0) {
@@ -18,6 +33,8 @@ const analysisTabsPageInfo = (datas: any) => {
         tabsPageArray.push(panes);
       }
     });
+    // }
+
   }
 
   return tabsPageArray;
@@ -108,6 +125,10 @@ const analysiCorrespondOrder = (datas: any) => {
 const alalysisInitData = async (queryData: string = "", queryReleaseNum: string = "") => {
 
   const result = await getInitPageData(queryReleaseNum);
+
+  if ((result.data).length === 0) {
+    return {};
+  }
   const datas = result.data;
 
   if (queryData === "pulishItem") {
@@ -133,8 +154,9 @@ const alalysisInitData = async (queryData: string = "", queryReleaseNum: string 
     return {onlineBranch: analysisOnlineBranch(datas[0].release_branch)}
   }
 
+
   return {
-    tabPageInfo: analysisTabsPageInfo(datas),
+    tabPageInfo: await analysisTabsPageInfo(datas),
     // 预发布项目
     preProject: analysisPreReleaseProject(datas[0].project),
     // 升级服务

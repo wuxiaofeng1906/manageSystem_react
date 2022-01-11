@@ -1,5 +1,5 @@
 import {
-  getNewPageNum, getCheckProcess,
+  getNewPageNum, getCheckProcess, updateReleaseProcess,
   savePrePulishProjects, queryServiceByID, saveUpgradeItem, delUpgradeItem,
   savePulishApi, delPulishApi, upgradeServiceConfirm, addDataRepaire, modifyDataRepaire,
   delDataReviewApi, dataRepairConfirm, getNewCheckNum, saveOnlineBranch, saveVersonCheck,
@@ -46,6 +46,7 @@ const savePreProjects = async (source: any, listNo: string) => {
   return result;
 };
 
+
 // 点击查询
 const inquireService = async (sorce: any) => {
 
@@ -76,7 +77,20 @@ const deleteReleaseItem = async (releaseNum: string) => {
 // 获取进度
 const getPageCHeckProcess = async (releaseNum: string) => {
   return await getCheckProcess(releaseNum);
-}
+};
+
+// 保存发布结果
+const saveProcessResult = async (releaseNum: string, result: string) => {
+
+  const data = {
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "ready_release_num": releaseNum,
+    "release_result": result
+  };
+  return await updateReleaseProcess(data);
+
+};
 // 发布项的修改
 const upgradePulishItem = async (formData: any, currentListNo: string) => {
 
@@ -598,7 +612,7 @@ const executeOnlineCheck = async (type: string, checkNum: string) => {
 
 };
 export {
-  getNewNum, deleteReleaseItem,getPageCHeckProcess,
+  getNewNum, deleteReleaseItem, getPageCHeckProcess,saveProcessResult,
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems, addPulishApi, confirmUpgradeService,
   dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch, saveOnlineBranchData, getModifiedData,
   executeOnlineCheck

@@ -78,6 +78,29 @@ const delTabsInfo = async (releaseNum: string) => {
 
 /* endregion */
 
+/* region 检查进度 */
+
+const getCheckProcess = async (releaseNum: string) => {
+
+  const result: any = {
+    message: "",
+    data: []
+  };
+  await axios.get('/api/verify/release/progress', {params: {ready_release_num: releaseNum}})
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+};
+
+/* endregion */
 /* region 预发布项目 */
 // 发布类型
 const queryReleaseType = async () => {
@@ -1000,7 +1023,7 @@ const excuteAutoCheck = async (checkNum: string, checkTime: string) => {
 /* endregion */
 
 export {
-  getNewPageNum, delTabsInfo,
+  getNewPageNum, delTabsInfo, getCheckProcess,
   savePrePulishProjects, queryReleaseType, queryReleaseWay, queryReleaseId, queryServiceByID,
   getInitPageData, getOnlineDev, getPulishItem, getIsApiAndDatabaseUpgrade, saveUpgradeItem,
   delUpgradeItem, getUpgradeApi, getApiService, getApiMethod, savePulishApi, delPulishApi,

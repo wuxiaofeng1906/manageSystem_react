@@ -21,7 +21,7 @@ import {
 } from "./supplementFile/controler";
 import {useRequest} from "ahooks";
 import {
-  getNewNum, deleteReleaseItem,
+  getNewNum, deleteReleaseItem, getPageCHeckProcess,
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems,
   addPulishApi, confirmUpgradeService, dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch,
   saveOnlineBranchData, getModifiedData, executeOnlineCheck
@@ -535,6 +535,54 @@ const PreRelease: React.FC<any> = () => {
     /* endregion */
 
     /* region 表格相关定义和事件 */
+    const [processStatus, setProcessStatus] = useState({
+      releaseProject: "Gainsboro",  // #2BF541
+      upgradeService: "Gainsboro",
+      dataReview: "Gainsboro",
+      onliineCheck: "Gainsboro",
+      releaseResult: "9",
+      processPercent: 0
+    });
+
+    // 获取当前页面的状态
+    const getProcessStatus = async () => {
+      const process = await getPageCHeckProcess(currentListNo);
+
+      const datas = process.data;
+      const results = {
+        releaseProject: "Gainsboro",  // #2BF541
+        upgradeService: "Gainsboro",
+        dataReview: "Gainsboro",
+        onliineCheck: "Gainsboro",
+        releaseResult: "9",
+        processPercent: 0
+      };
+      let successCount = 0;
+      if (datas.project_edit === "1") {
+        results.releaseProject = "#2BF541";
+        successCount += 1;
+      }
+
+      if (datas.update_service === "1") {
+        results.upgradeService = "#2BF541";
+        successCount += 1;
+      }
+      if (datas.review_confirm === "1") {
+        results.dataReview = "#2BF541";
+        successCount += 1;
+      }
+
+      if (datas.release_check === "1") {
+        results.onliineCheck = "#2BF541";
+        successCount += 1;
+      }
+      results.releaseResult = datas.release_result;
+      results.processPercent = (successCount / 4) * 100;
+
+      setProcessStatus(results);
+
+    };
+
 
     /* region 升级服务 一  发布项 */
 // 操作按钮渲染
@@ -1061,6 +1109,7 @@ const PreRelease: React.FC<any> = () => {
         const newData_confirm: any = await alalysisInitData("pulishConfirm", currentListNo);
         thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认设置一行空值
 
+        await getProcessStatus();
       } else {
         message.error({
           content: `${result}`,
@@ -1274,7 +1323,8 @@ const PreRelease: React.FC<any> = () => {
           //   刷新表格
           const newData_confirm: any = await alalysisInitData("dataReviewConfirm", currentListNo);
           secondDataReviewGridApi.current?.setRowData(newData_confirm.reviewData_confirm);
-
+          // 进度
+          await getProcessStatus();
         } else {
           message.error({
             content: `${result}`,
@@ -2016,6 +2066,8 @@ const PreRelease: React.FC<any> = () => {
 
         });
 
+        // 保存成功后需要刷新状态
+        await getProcessStatus();
       } else {
         message.error({
           content: result.errorMessage,
@@ -2132,6 +2184,8 @@ const PreRelease: React.FC<any> = () => {
       const lockedData = await getAllLockedData(currentListNo);
       allLockedArray = lockedData.data;
 
+      await getProcessStatus();
+
       formUpgradeService.resetFields();
       formForPreReleaseProject.setFieldsValue({
         projectsName: preReleaseProject.projectId,
@@ -2227,8 +2281,7 @@ const PreRelease: React.FC<any> = () => {
 
     // 删除tab
     const delTabsInfo = async () => {
-      debugger;
-      // deleteReleaseItem
+
       const {targetKey} = showTabs;
       setShowTabs({
         ...showTabs,
@@ -2366,6 +2419,7 @@ const PreRelease: React.FC<any> = () => {
       }
     };
 
+
     useEffect(() => {
       showPagesContent(initData);
       const tabsInfo = initData?.tabPageInfo;
@@ -2410,7 +2464,7 @@ const PreRelease: React.FC<any> = () => {
             <div>
               <Row>
                 <label style={{marginLeft: 5, fontWeight: "bold"}}>检查进度：</label>
-                <Progress strokeColor={"#2BF541"} style={{width: 800}} percent={70}/>
+                <Progress strokeColor={"#2BF541"} style={{width: 800}} percent={processStatus.processPercent}/>
               </Row>
 
             </div>
@@ -2420,30 +2474,36 @@ const PreRelease: React.FC<any> = () => {
 
               <label style={{fontWeight: "bold"}}>检查总览：</label>
               <label>
-                <button style={{height: 13, width: 13, border: "none", backgroundColor: "#2BF541"}}></button>
+                <button
+                  style={{height: 13, width: 13, border: "none", backgroundColor: processStatus.releaseProject}}></button>
                 &nbsp;预发布项目已填写完成
               </label>
 
               <label style={{marginLeft: 10}}>
-                <button style={{height: 13, width: 13, border: "none", backgroundColor: "#2BF541"}}></button>
+                <button
+                  style={{height: 13, width: 13, border: "none", backgroundColor: processStatus.upgradeService}}></button>
                 &nbsp;升级服务已确认完成
               </label>
 
               <label style={{marginLeft: 10}}>
-                <button style={{height: 13, width: 13, border: "none", backgroundColor: "#2BF541"}}></button>
+                <button
+                  style={{height: 13, width: 13, border: "none", backgroundColor: processStatus.dataReview}}></button>
                 &nbsp;数据Review确认完成
               </label>
 
               <label style={{marginLeft: 10}}>
-                <button style={{height: 13, width: 13, border: "none", backgroundColor: "Gainsboro"}}></button>
+                <button
+                  style={{height: 13, width: 13, border: "none", backgroundColor: processStatus.onliineCheck}}></button>
                 &nbsp;上线前检查已完成
               </label>
 
               <label style={{marginLeft: 10}}>
                 <label style={{fontWeight: "bold"}}>发布结果：</label>
-                <Select size={"small"} style={{width: 100}} onChange={pulishResulttChanged}>
-                  <Option value="">空</Option>
-                  <Option value="lucy">Lucy</Option>
+                <Select size={"small"} style={{width: 100}} onChange={pulishResulttChanged}
+                        value={processStatus.releaseResult}>
+                  <Option key={"1"} value={"1"}>发布成功</Option>
+                  <Option key={"2"} value={"2"}>发布失败</Option>
+                  <Option key={"9"} value={"9"}> </Option>
                 </Select>
               </label>
 

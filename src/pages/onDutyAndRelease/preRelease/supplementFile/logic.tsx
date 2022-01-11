@@ -465,7 +465,7 @@ const alayVersonCheck = (source_data: any) => {
     versionCheckId: checkData.version_check_id,
     checkNum: checkData.check_num,
     verson_check: checkData.backend_version_check_flag,
-    server: (checkData.server).split(","),
+    server: checkData.server === null ? undefined : (checkData.server).split(","),
     imageevn: checkData.image_env,
   };
 
@@ -473,8 +473,8 @@ const alayVersonCheck = (source_data: any) => {
     versionCheckId: checkData.version_check_id,
     checkNum: checkData.check_num,
     branchcheck: checkData.inclusion_check_flag,
-    branch_mainBranch: (checkData.main_branch).split(","),
-    branch_teachnicalSide: (checkData.technical_side).split(","),
+    branch_mainBranch: checkData.main_branch === null ? undefined : (checkData.main_branch).split(","),
+    branch_teachnicalSide: checkData.technical_side === null ? undefined : (checkData.technical_side).split(","),
     branch_mainSince: checkData.main_since,
   };
 

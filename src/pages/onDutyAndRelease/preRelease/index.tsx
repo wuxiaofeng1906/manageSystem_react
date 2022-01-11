@@ -32,17 +32,20 @@ import {
   getRepaireType, getPassOrNot, getTechSide
 } from "./supplementFile/converse";
 import {getGridHeight} from "./supplementFile/gridSet";
-import {getLockStatus, deleteLockStatus} from "./supplementFile/rowLock";
+import {getLockStatus, deleteLockStatus, getAllLockedData} from "./supplementFile/rowLock";
 
 const {TabPane} = Tabs;
 const {Option} = Select;
 const {TextArea} = Input;
-let currentListNo = "";
+
+const userLogins: any = localStorage.getItem("userLogins");
+const usersInfo = JSON.parse(userLogins);
+let currentListNo = "";  // 当前页面编号
 let newOnlineBranchNum = "";
 let lockedInfo = "";// 被锁了的id
 let releaseIdArray: any;
-const userLogins: any = localStorage.getItem("userLogins");
-const usersInfo = JSON.parse(userLogins);
+let allLockedArray: any = [];
+
 
 const PreRelease: React.FC<any> = () => {
     const [pulishItemForm] = Form.useForm();
@@ -137,7 +140,7 @@ const PreRelease: React.FC<any> = () => {
             title: "修改"
           });
         } else {
-          lockedInfo = `step2-app-${appid}`;
+          lockedInfo = `${currentListNo}-step2-app-${appid}`;
           const lockInfo = await getLockStatus(lockedInfo);
 
           if (lockInfo.errMessage) {
@@ -197,7 +200,7 @@ const PreRelease: React.FC<any> = () => {
         });
 
 
-        lockedInfo = `step2-api-${apiid}`;
+        lockedInfo = `${currentListNo}-step2-api-${apiid}`;
         const lockInfo = await getLockStatus(lockedInfo);
 
         if (lockInfo.errMessage) {
@@ -253,7 +256,7 @@ const PreRelease: React.FC<any> = () => {
           reviewId: reviewid
         });
 
-        lockedInfo = `step3-review-${reviewid}`;
+        lockedInfo = `${currentListNo}-step3-review-${reviewid}`;
         const lockInfo = await getLockStatus(lockedInfo);
 
         if (lockInfo.errMessage) {
@@ -351,7 +354,7 @@ const PreRelease: React.FC<any> = () => {
         });
 
 
-        lockedInfo = `step4-onlineBranch-${oraData.checkHead?.branchCheckId}`;
+        lockedInfo = `${currentListNo}-step4-onlineBranch-${oraData.checkHead?.branchCheckId}`;
         const lockInfo = await getLockStatus(lockedInfo);
 
         if (lockInfo.errMessage) {
@@ -569,15 +572,24 @@ const PreRelease: React.FC<any> = () => {
     };
 
 // 改变行的颜色（正在编辑的行颜色）
-    const ChangRowColor = (params: any) => {
+    const releaseAppChangRowColor = (type: string, idFlag: number) => {
 
-      if (params.data?.app_id === 1) {
+      const lockInfoArray = allLockedArray;
+      let returnValue = {'background-color': 'transparent'};
+      if (lockInfoArray && lockInfoArray.length > 0) {
+        for (let index = 0; index < lockInfoArray.length; index += 1) {
 
-        // 上下设置颜色
-        return {'background-color': '#FFF6F6'};
+          const paramsArray = (lockInfoArray[index].param).split("-");
+          if (type === `${paramsArray[1]}-${paramsArray[2]}`) { // 判断是不是属于当前渲染表格的数据
+            if (idFlag.toString() === paramsArray[3]) { // 判断有没有对应id
+              returnValue = {'background-color': '#FFF6F6'};
+              break;
 
+            }
+          }
+        }
       }
-      return {'background-color': 'transparent'};
+      return returnValue;
     };
 
 // 下拉框相关字段的颜色渲染
@@ -1969,7 +1981,7 @@ const PreRelease: React.FC<any> = () => {
     const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
     const releaseWayArray = useRequest(() => loadReleaseWaySelect()).data;
 
-// 保存预发布项目
+    // 保存预发布项目
     const savePreRelaseProjects = async () => {
 
       const datas = formForPreReleaseProject.getFieldsValue();
@@ -2003,6 +2015,8 @@ const PreRelease: React.FC<any> = () => {
           },
         });
       }
+
+      deleteLockStatus(lockedInfo);
     };
 
     /* endregion */
@@ -2095,17 +2109,20 @@ const PreRelease: React.FC<any> = () => {
 
     };
 
-    const showPagesContent = (source: any) => {
+    const showPagesContent = async (source: any) => {
 
       if (!source) {
         return;
       }
-      formUpgradeService.resetFields();
+
       // 预发布项目
       const preReleaseProject = source?.preProject;
 
       currentListNo = preReleaseProject.ready_release_num;
+      const lockedData = await getAllLockedData(currentListNo);
+      allLockedArray = lockedData.data;
 
+      formUpgradeService.resetFields();
       formForPreReleaseProject.setFieldsValue({
         projectsName: preReleaseProject.projectId,
         pulishType: preReleaseProject.release_type,
@@ -2284,6 +2301,39 @@ const PreRelease: React.FC<any> = () => {
       deleteLockStatus(lockedInfo);
     };
 
+    // 页面报错时释放锁
+    window.addEventListener('error', () => {
+      deleteLockStatus(lockedInfo);
+
+    }, true)
+
+    const [saveButtonDisable, setSaveButtonDisable] = useState(false);
+    // 编辑框聚焦时检查是否可以编辑
+    const releaseItemFocus = async () => {
+
+      const formData = formForPreReleaseProject.getFieldsValue();
+      const proId = formData.proid;
+      lockedInfo = `${currentListNo}-step1-project-${proId}`
+      const lockInfo = await getLockStatus(lockedInfo);
+      if (lockInfo.errMessage) {
+        const userInfo: any = lockInfo.data;
+        if (userInfo.user_id !== usersInfo.userid) {
+          message.error({
+            content: `${lockInfo.errMessage}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          setSaveButtonDisable(true);
+        } else {
+          setSaveButtonDisable(false);
+        }
+      } else {
+        setSaveButtonDisable(false);
+      }
+    };
+
     useEffect(() => {
       showPagesContent(initData);
       const tabsInfo = initData?.tabPageInfo;
@@ -2378,7 +2428,7 @@ const PreRelease: React.FC<any> = () => {
               <div style={{marginBottom: -20, marginTop: -5}}>
 
                 <div style={{float: "right"}}>
-                  <Button type="primary"
+                  <Button type="primary" disabled={saveButtonDisable}
                           style={{color: '#46A0FC', backgroundColor: "#ECF5FF", borderRadius: 5, marginLeft: 10}}
                           onClick={savePreRelaseProjects}>点击保存 </Button>
                 </div>
@@ -2390,7 +2440,7 @@ const PreRelease: React.FC<any> = () => {
 
                         {/* 项目名称 */}
                         <Form.Item label="项目名称:" name="projectsName">
-                          <Select showSearch mode="multiple">
+                          <Select showSearch mode="multiple" onFocus={releaseItemFocus}>
                             {projectsArray}
                           </Select>
                         </Form.Item>
@@ -2400,7 +2450,7 @@ const PreRelease: React.FC<any> = () => {
 
                         {/* 发布类型 */}
                         <Form.Item label="发布类型:" name="pulishType" style={{marginLeft: 5}}>
-                          <Select>
+                          <Select onFocus={releaseItemFocus}>
                             {releaseTypeArray}
                           </Select>
                         </Form.Item>
@@ -2410,7 +2460,7 @@ const PreRelease: React.FC<any> = () => {
 
                         {/* 发布方式 */}
                         <Form.Item label="发布方式:" name="pulishMethod" style={{marginLeft: 5}}>
-                          <Select>
+                          <Select onFocus={releaseItemFocus}>
                             {releaseWayArray}
                           </Select>
                         </Form.Item>
@@ -2419,7 +2469,8 @@ const PreRelease: React.FC<any> = () => {
                       <Col span={6}>
                         {/* 发布时间 */}
                         <Form.Item label="发布时间:" name="pulishTime" style={{marginLeft: 5}}>
-                          <DatePicker showTime format="YYYY-MM-DD HH:mm" style={{width: "100%"}}/>
+                          <DatePicker showTime format="YYYY-MM-DD HH:mm" style={{width: "100%"}}
+                                      onFocus={releaseItemFocus}/>
                         </Form.Item>
                       </Col>
 
@@ -2511,7 +2562,9 @@ const PreRelease: React.FC<any> = () => {
                         minWidth: 90,
                         cellStyle: {"line-height": "25px"},
                       }}
-                      getRowStyle={ChangRowColor}
+                      getRowStyle={(params: any) => {
+                        return releaseAppChangRowColor("step2-app", params.data?.app_id);
+                      }}
                       headerHeight={25}
                       rowHeight={25}
                       onGridReady={onFirstGridReady}
@@ -2536,7 +2589,9 @@ const PreRelease: React.FC<any> = () => {
                       }}
                       headerHeight={25}
                       rowHeight={25}
-                      getRowStyle={ChangRowColor}
+                      getRowStyle={(params: any) => {
+                        return releaseAppChangRowColor("step2-api", params.data?.api_id);
+                      }}
                       onGridReady={onSecondGridReady}
                       onGridSizeChanged={onChangeSecondGridReady}
                       onColumnEverythingChanged={onChangeSecondGridReady}
@@ -2611,7 +2666,9 @@ const PreRelease: React.FC<any> = () => {
                       }}
                       headerHeight={25}
                       rowHeight={25}
-                      getRowStyle={ChangRowColor}
+                      getRowStyle={(params: any) => {
+                        return releaseAppChangRowColor("step3-review", params.data?.review_id);
+                      }}
                       onGridReady={onfirstDataReviewGridReady}
                       onGridSizeChanged={onChangefirstDataReviewGridReady}
                       onColumnEverythingChanged={onChangefirstDataReviewGridReady}
@@ -2672,7 +2729,9 @@ const PreRelease: React.FC<any> = () => {
                         minWidth: 90
                       }}
                       headerHeight={25}
-                      getRowStyle={ChangRowColor}
+                      getRowStyle={(params: any) => {
+                        return releaseAppChangRowColor("step4-onlineBranch", params.data?.branch_check_id);
+                      }}
                       onGridReady={onfirstOnlineBranchGridReady}
                       onGridSizeChanged={onChangefirstOnlineBranchGridReady}
                       onColumnEverythingChanged={onChangefirstOnlineBranchGridReady}

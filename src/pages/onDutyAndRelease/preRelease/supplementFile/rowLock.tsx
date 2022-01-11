@@ -1,5 +1,4 @@
 import axios from "axios";
-import dayjs from "dayjs";
 
 const sys_accessToken = localStorage.getItem("accessId");
 axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
@@ -7,7 +6,27 @@ axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
 const userLogins: any = localStorage.getItem("userLogins");
 const usersInfo = JSON.parse(userLogins);
 
+// 获取所有加锁的数据
+const getAllLockedData = async (releaseNum: string) => {
+  const result: any = {
+    message: "",
+    data: []
+  };
+  await axios.get('/api/verify/release/lock', {params: {ready_release_num: releaseNum}})
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
 
+  return result;
+};
+
+// 获取是否加锁
 const getLockStatus = async (lockedId: string) => {
 
   const datas = {
@@ -41,6 +60,7 @@ const getLockStatus = async (lockedId: string) => {
   return result;
 };
 
+// 删除锁
 const deleteLockStatus = async (lockedId: string) => {
   let errorMessage = "";
 
@@ -63,4 +83,4 @@ const deleteLockStatus = async (lockedId: string) => {
 
 };
 
-export {getLockStatus, deleteLockStatus}
+export {getLockStatus, deleteLockStatus, getAllLockedData}

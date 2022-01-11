@@ -7,6 +7,7 @@ axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
 const userLogins: any = localStorage.getItem("userLogins");
 const usersInfo = JSON.parse(userLogins);
 
+/* region 发布tab相关 */
 // 获取预发布编号
 const getNewPageNum = async () => {
 
@@ -50,6 +51,32 @@ const getInitPageData = async (queryReleaseNum: string) => {
 
   return result;
 }
+
+// 删除预发布tab
+const delTabsInfo = async (releaseNum: string) => {
+
+  let errorMessage = "";
+
+  const datas = {
+
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "ready_release_num": releaseNum
+  };
+  await axios.delete("/api/verify/release/release_detail", {data: datas})
+    .then(function (res) {
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+};
+
+/* endregion */
 
 /* region 预发布项目 */
 // 发布类型
@@ -973,7 +1000,7 @@ const excuteAutoCheck = async (checkNum: string, checkTime: string) => {
 /* endregion */
 
 export {
-  getNewPageNum,
+  getNewPageNum, delTabsInfo,
   savePrePulishProjects, queryReleaseType, queryReleaseWay, queryReleaseId, queryServiceByID,
   getInitPageData, getOnlineDev, getPulishItem, getIsApiAndDatabaseUpgrade, saveUpgradeItem,
   delUpgradeItem, getUpgradeApi, getApiService, getApiMethod, savePulishApi, delPulishApi,

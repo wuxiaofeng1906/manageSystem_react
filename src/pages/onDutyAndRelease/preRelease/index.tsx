@@ -21,7 +21,7 @@ import {
 } from "./supplementFile/controler";
 import {useRequest} from "ahooks";
 import {
-  getNewNum,
+  getNewNum, deleteReleaseItem,
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems,
   addPulishApi, confirmUpgradeService, dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch,
   saveOnlineBranchData, getModifiedData, executeOnlineCheck
@@ -2215,8 +2215,10 @@ const PreRelease: React.FC<any> = () => {
       });
     };
 
-    const delTabsInfo = () => {
-
+    // 删除tab
+    const delTabsInfo = async () => {
+      debugger;
+      // deleteReleaseItem
       const {targetKey} = showTabs;
       setShowTabs({
         ...showTabs,
@@ -2251,16 +2253,36 @@ const PreRelease: React.FC<any> = () => {
           newActiveKey = newPanes[0].key;
         }
       }
-      setTabContent({
-        panes: newPanes,
-        activeKey: newActiveKey,
-      });
+
+      const deleteInfo = await deleteReleaseItem(targetKey);
+
+      if (deleteInfo === "") {
+        message.info({
+          content: "删除成功！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          }
+        });
+        setTabContent({
+          panes: newPanes,
+          activeKey: newActiveKey,
+        });
+
+      } else {
+        message.error({
+          content: deleteInfo,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          }
+        });
+      }
+
     };
 // 新增、修改或删除tab页
     const onEdits = (targetKey: any, action: any) => {
       if (action === 'remove') {
-        // 需要判断是否确定删除
-
         remove(targetKey)
       } else if (action === 'add') {
         add();

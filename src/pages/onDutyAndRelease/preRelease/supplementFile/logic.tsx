@@ -4,7 +4,7 @@ import {
   savePulishApi, delPulishApi, upgradeServiceConfirm, addDataRepaire, modifyDataRepaire,
   delDataReviewApi, dataRepairConfirm, getNewCheckNum, saveOnlineBranch, saveVersonCheck,
   saveEnvironmentCheck, saveOnlineAutoCheck, getDetaisByCHeckNum, delDataOnlineBranchApi,
-  excuteVersionCheck, excuteEnvCheck, excuteAutoCheck
+  excuteVersionCheck, excuteEnvCheck, excuteAutoCheck, delTabsInfo
 } from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
 
 const userLogins: any = localStorage.getItem("userLogins");
@@ -68,10 +68,13 @@ const inquireService = async (sorce: any) => {
 
 };
 
+const deleteReleaseItem = async (releaseNum: string) => {
+  return await delTabsInfo(releaseNum);
+};
+
 // 发布项的修改
 const upgradePulishItem = async (formData: any, currentListNo: string) => {
 
-  debugger;
   if (!formData.onlineEnv) {
     return "上线环境不能为空！"
   }
@@ -373,8 +376,6 @@ const saveOnlineBranchData = async (type: string, currentListNo: string, newOnli
   //  3.环境一致性检查
   //  4.(上线前后)自动化检查设置
 
-  debugger;
-
   // 上线分支头部验证分支名称和技术侧
   const checkMsg_onlineHead = checkOnlineHeadData(sourceData);
   if (checkMsg_onlineHead) { // 如果校验信息不为空，代表校验失败
@@ -592,7 +593,7 @@ const executeOnlineCheck = async (type: string, checkNum: string) => {
 
 };
 export {
-  getNewNum,
+  getNewNum, deleteReleaseItem,
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems, addPulishApi, confirmUpgradeService,
   dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch, saveOnlineBranchData, getModifiedData,
   executeOnlineCheck

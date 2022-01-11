@@ -2263,7 +2263,7 @@ const PreRelease: React.FC<any> = () => {
       showPagesContent(newTabData);
     };
 
-// 修改tab
+    // 修改tab
     const tabsChangeName = (params: any) => {
 
       const currentName = params.target.innerText;
@@ -2280,7 +2280,9 @@ const PreRelease: React.FC<any> = () => {
     };
 
     // 窗口关闭释放锁
-
+    window.onunload = () => {
+      deleteLockStatus(lockedInfo);
+    };
 
     useEffect(() => {
       showPagesContent(initData);

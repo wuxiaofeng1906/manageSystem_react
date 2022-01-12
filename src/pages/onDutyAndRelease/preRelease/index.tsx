@@ -311,6 +311,36 @@ const PreRelease: React.FC<any> = () => {
         newOnlineBranchNum = params.check_num;
         const oraData = await getModifiedData(newOnlineBranchNum);
 
+        // 服务
+        let servers = oraData.versonCheck?.server;
+        if (servers) {
+          if (servers.length === 1 && servers.includes("")) {
+            servers = undefined;
+          }
+        }
+
+        // 时间
+        let mainSince;
+        if (oraData.branchCheck?.branch_mainSince) {
+          mainSince = moment(oraData.branchCheck?.branch_mainSince);
+        }
+
+        // 上线前的检查类型
+        let beforeType = oraData.beforeOnlineCheck?.beforeCheckType;
+        if (oraData.beforeOnlineCheck?.beforeCheckType) {
+          if ((oraData.beforeOnlineCheck?.beforeCheckType).length === 1 && (oraData.beforeOnlineCheck?.beforeCheckType).includes("9")) {
+            beforeType = undefined;
+          }
+        }
+
+        // 上线后的检查类型
+        let afterType = oraData.afterOnlineCheck?.afterCheckType;
+        if (oraData.afterOnlineCheck?.afterCheckType) {
+          if ((oraData.afterOnlineCheck?.afterCheckType).length === 1 && (oraData.afterOnlineCheck?.afterCheckType).includes("9")) {
+            afterType = undefined;
+          }
+        }
+
         formForOnlineBranch.setFieldsValue({
           // 表头设置
           branchName: oraData.checkHead.branchName,
@@ -320,14 +350,14 @@ const PreRelease: React.FC<any> = () => {
 
           // 版本检查设置
           verson_check: oraData.versonCheck?.verson_check,
-          server: oraData.versonCheck?.server,
+          server: servers,
           imageevn: oraData.versonCheck?.imageevn,
 
           // 对比分支
           branchcheck: oraData.branchCheck?.branchcheck,
           branch_mainBranch: oraData.branchCheck?.branch_mainBranch,
           branch_teachnicalSide: oraData.branchCheck?.branch_teachnicalSide,
-          branch_mainSince: moment(oraData.branchCheck?.branch_mainSince),
+          branch_mainSince: mainSince,
 
           // 环境一致性检查
           ignoreCheck: oraData.envCheck.ignoreCheck,
@@ -335,13 +365,13 @@ const PreRelease: React.FC<any> = () => {
 
           // 上线前自动化检查
           autoBeforeIgnoreCheck: oraData.beforeOnlineCheck?.autoBeforeIgnoreCheck,
-          beforeCheckType: oraData.beforeOnlineCheck?.beforeCheckType,
+          beforeCheckType: beforeType,
           beforeTestEnv: oraData.beforeOnlineCheck?.beforeTestEnv,
           beforeBrowser: oraData.beforeOnlineCheck?.beforeBrowser,
 
           //  上线后自动化检查
           autoAfterIgnoreCheck: oraData.afterOnlineCheck?.autoAfterIgnoreCheck,
-          afterCheckType: oraData.afterOnlineCheck?.afterCheckType,
+          afterCheckType: afterType,
           afterTestEnv: oraData.afterOnlineCheck?.afterTestEnv,
           afterBrowser: oraData.afterOnlineCheck?.afterBrowser,
 
@@ -353,7 +383,6 @@ const PreRelease: React.FC<any> = () => {
           beforeAutomationId: oraData.beforeOnlineCheck?.automationId,
           afterAutomationId: oraData.afterOnlineCheck?.automationId
         });
-
 
         lockedInfo = `${currentListNo}-step4-onlineBranch-${oraData.checkHead?.branchCheckId}`;
         const lockInfo = await getLockStatus(lockedInfo);
@@ -626,6 +655,9 @@ const PreRelease: React.FC<any> = () => {
 
       const lockInfoArray = allLockedArray;
       let returnValue = {'background-color': 'transparent'};
+      if (!idFlag) {
+        return returnValue;
+      }
       if (lockInfoArray && lockInfoArray.length > 0) {
         for (let index = 0; index < lockInfoArray.length; index += 1) {
 

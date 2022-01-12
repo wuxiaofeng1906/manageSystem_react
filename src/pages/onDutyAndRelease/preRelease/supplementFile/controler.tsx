@@ -481,8 +481,6 @@ const loadCheckTypeSelect = async () => {
         resultArray.push(
           <Option key={ele.check_type_id} value={`${ele.check_type_id}`}>{ele.check_type_name}</Option>);
       }
-
-
     });
   }
 

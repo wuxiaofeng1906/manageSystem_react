@@ -612,7 +612,7 @@ const executeOnlineCheck = async (type: string, checkNum: string) => {
 
 };
 export {
-  getNewNum, deleteReleaseItem, getPageCHeckProcess,saveProcessResult,
+  getNewNum, deleteReleaseItem, getPageCHeckProcess, saveProcessResult,
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems, addPulishApi, confirmUpgradeService,
   dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch, saveOnlineBranchData, getModifiedData,
   executeOnlineCheck

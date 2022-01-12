@@ -1403,6 +1403,8 @@ const PreRelease: React.FC<any> = () => {
           passFlag = "忽略";
         } else if (ele.test_case_status === "running") {
           passFlag = "运行中";
+        } else {
+          passFlag = "未知";
         }
 
         // 解析时间
@@ -1513,7 +1515,6 @@ const PreRelease: React.FC<any> = () => {
 // 渲染上线前版本检查是否通过
     const beforeOnlineVersionCheck = (params: any) => {
 
-
       if (!params.value || (params.value).length === 0) {
         return "";
       }
@@ -1522,11 +1523,11 @@ const PreRelease: React.FC<any> = () => {
       // 解析所属端
       let side = "";
       if (values.technical_side === "front") {
-        side = "前端";
+        side = "前端：";
       } else if (values.technical_side === "backend") {
-        side = "后端";
+        side = "后端：";
       } else if (values.technical_side === "front,backend") {
-        side = "前后端";
+        side = "前后端：";
       }
 
       // 解析时间
@@ -1568,6 +1569,18 @@ const PreRelease: React.FC<any> = () => {
       }
 
       const checkNum = JSON.stringify(params.data?.check_num);
+
+      if (side === "") {
+        return `
+         <div>
+          <div style="width: 200px">
+              <div style="font-size: 10px">
+                  <div>${side} <button style="color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button> &nbsp;${timeRange}</div>
+              </div>
+          </div>
+      </div>
+    `;
+      }
       return `
          <div>
           <div style="margin-top: -10px;text-align: right">
@@ -1584,7 +1597,7 @@ const PreRelease: React.FC<any> = () => {
           </div>
           <div style="margin-top: -20px;width: 200px">
               <div style="font-size: 10px">
-                  <div>${side}： <button style="color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button> &nbsp;${timeRange}</div>
+                  <div>${side} <button style="color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button> &nbsp;${timeRange}</div>
               </div>
 
           </div>

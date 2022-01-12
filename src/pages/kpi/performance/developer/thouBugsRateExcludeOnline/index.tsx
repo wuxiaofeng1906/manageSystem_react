@@ -31,6 +31,7 @@ const weekRanges = getWeeksRange(8);
 const monthRanges = getTwelveMonthTime();
 const quarterTime = getFourQuarterTime();
 
+/* region 列的定义和渲染 */
 const dataRender = (params: any) => {
   const node = params.data;
 
@@ -108,6 +109,7 @@ const columsForYears = () => {
   return component;
 };
 
+/* endregion */
 
 /* region 数据处理 */
 
@@ -191,7 +193,7 @@ const BugRateTableList: React.FC<any> = () => {
 
   /* endregion */
 
-
+  /* region 按钮事件 */
   // 按周统计
   const statisticsByWeeks = async () => {
     /* 八周 */
@@ -232,6 +234,8 @@ const BugRateTableList: React.FC<any> = () => {
     const datas: any = await queryBugResolutionCount(gqlClient, 'year');
     gridApi.current?.setRowData(datas);
   };
+
+  /* endregion */
 
   /* region 提示规则显示 */
   const [messageVisible, setVisible] = useState(false);

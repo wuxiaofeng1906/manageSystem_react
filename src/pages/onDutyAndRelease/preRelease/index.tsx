@@ -92,8 +92,8 @@ const PreRelease: React.FC<any> = () => {
     // 上线分支设置
     const [onlineBranchModal, setOnlineBranchModal] = useState({shown: false, title: "新增", loading: false});
 
-    const {data, loading} = useRequest(() => alalysisInitData());
-    const initData = data;
+    const initData = useRequest(() => alalysisInitData()).data;
+
     /* region 新增行 */
 
     // 发布项弹出窗口中的select框加载
@@ -2033,6 +2033,24 @@ const PreRelease: React.FC<any> = () => {
     /* region 发布结果 */
     const pulishResulttChanged = async (params: any) => {
 
+      // 需要验证前面的检查是否全部成功。
+      // releaseProject: "Gainsboro",  // #2BF541
+      //   upgradeService: "Gainsboro",
+      //   dataReview: "Gainsboro",
+      //   onliineCheck: "Gainsboro",
+      if (processStatus.releaseProject === "Gainsboro" || processStatus.upgradeService === "Gainsboro" ||
+        processStatus.dataReview === "Gainsboro" || processStatus.onliineCheck === "Gainsboro") {
+
+        message.error({
+          content: "检查未全部完成，不能保存发布结果！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+
+        return;
+      }
       const result = await saveProcessResult(currentListNo, params);
       if (result === "") {
 
@@ -2446,7 +2464,7 @@ const PreRelease: React.FC<any> = () => {
     };
     // 初始化显示tab
     const showTabsPage = async () => {
-      debugger;
+
       const source = await alalysisInitData();
       const tabsInfo = source?.tabPageInfo;
 
@@ -2455,7 +2473,7 @@ const PreRelease: React.FC<any> = () => {
           activeKey: tabsInfo[0].key,
           panes: tabsInfo
         });
-      } else {
+      } else if (initData === undefined) {
         const newNum = await getNewPageNum();
         const releaseNum = newNum.data?.ready_release_num;
         currentListNo = releaseNum;
@@ -2473,7 +2491,6 @@ const PreRelease: React.FC<any> = () => {
     };
 
     useEffect(() => {
-      console.log("233333", initData)
       showPagesContent(initData);
       showTabsPage();
 

@@ -1,3 +1,4 @@
+const managers = ['宋永强', '郑江', '万星', '吴生祥', '刘黎明', '蒲姣', '欧治成', '刘云鹏', '任航', '胡敬华', '何羽'];
 // 查找父部门
 const findParent = (departDatas: any, depts: any, result: any) => {
   const idx = depts.deptName;
@@ -96,7 +97,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       // 需要判断部门有没有前后端：
 
       // 没有前端：应用架构部==>如果不是应用架构部，就添加前端数据
-      if (depts.deptName !== "应用架构部") {
+      if (depts.deptName !== "应用架构部" && depts.deptName !== "供应链后端") {
         // 新增部门的前端
         const frontGroup: any = JSON.parse(JSON.stringify(groups)); // 如果对原数组groups进行直接赋值，再对frontGroup进行修改，groups也会被修改（数组所指向的是内存地址，直接赋值会使它们指向同一地址）
         frontGroup.push("前端")
@@ -108,7 +109,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
       }
 
       // 没有后端：前端应用平台，基础技术=》如果不是前端应用平台和基础技术就添加后端数据
-      if (depts.deptName !== "前端应用平台" && depts.deptName !== "基础技术") {
+      if (depts.deptName !== "前端应用平台" && depts.deptName !== "基础技术" && depts.deptName !== "供应链前端") {
         // 新增部门的后端
         const backendGroup: any = JSON.parse(JSON.stringify(groups));
         backendGroup.push("后端")
@@ -127,11 +128,14 @@ const converseFormatForAgGrid = (oraDatas: any) => {
         usersArray.forEach((user: any) => {
 
           const usersGroup = JSON.parse(JSON.stringify(groups));
-          if (user.tech === "1") {
-            usersGroup.push("前端");
-          } else if (user.tech === "2") {
-            usersGroup.push("后端");
+          if (!managers.includes(user.userName)) { // 对管理人员的部门不加前后端，直接显示在部门下面即可。
+            if (user.tech === "1") {
+              usersGroup.push("前端");
+            } else if (user.tech === "2") {
+              usersGroup.push("后端");
+            }
           }
+
           usersGroup.push(user.userName);
           resultArray.push({
             Group: usersGroup,
@@ -203,7 +207,7 @@ const converseCoverageFormatForAgGrid = (oraDatas: any) => {
       // 需要判断部门有没有前后端：
 
       // 没有前端：应用架构部==>如果不是应用架构部，就添加前端数据
-      if (depts.deptName !== "应用架构部") {
+      if (depts.deptName !== "应用架构部" && depts.deptName !== "供应链后端") {
         // 新增部门的前端
         const frontGroup: any = JSON.parse(JSON.stringify(groups)); // 如果对原数组groups进行直接赋值，再对frontGroup进行修改，groups也会被修改（数组所指向的是内存地址，直接赋值会使它们指向同一地址）
         frontGroup.push("前端")
@@ -216,7 +220,7 @@ const converseCoverageFormatForAgGrid = (oraDatas: any) => {
       }
 
       // 没有后端：前端应用平台，基础技术=》如果不是前端应用平台和基础技术就添加后端数据
-      if (depts.deptName !== "前端应用平台" && depts.deptName !== "基础技术") {
+      if (depts.deptName !== "前端应用平台" && depts.deptName !== "基础技术" && depts.deptName !== "供应链前端") {
         // 新增部门的后端
         const backendGroup: any = JSON.parse(JSON.stringify(groups));
         backendGroup.push("后端")
@@ -236,10 +240,12 @@ const converseCoverageFormatForAgGrid = (oraDatas: any) => {
         usersArray.forEach((user: any) => {
 
           const usersGroup = JSON.parse(JSON.stringify(groups));
-          if (user.tech === "1") {
-            usersGroup.push("前端");
-          } else if (user.tech === "2") {
-            usersGroup.push("后端");
+          if (!managers.includes(user.userName)) { // 对管理人员的部门不加前后端，直接显示在部门下面即可。
+            if (user.tech === "1") {
+              usersGroup.push("前端");
+            } else if (user.tech === "2") {
+              usersGroup.push("后端");
+            }
           }
           usersGroup.push(user.userName);
           resultArray.push({

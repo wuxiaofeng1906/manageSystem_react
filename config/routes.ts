@@ -57,7 +57,7 @@ export default [
   //   component: './dashboard/developer',
   // },
   {
-    name: 'sprint 工作台',
+    name: '班车工作台',
     icon: 'table',
     path: '/sprint',
     routes: [

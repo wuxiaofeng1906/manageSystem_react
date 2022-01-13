@@ -5,8 +5,11 @@ const findParent = (departDatas: any, depts: any, result: any) => {
     if (item['deptName'] && idx) {
       if (idx === item['deptName']) {
         const pidName = item['parent'].deptName;
-        result.unshift(pidName);
-        findParent(departDatas, item['parent'], result);
+        if(pidName !== "北京企企科技有限公司"){  // 不显示北京企企科技有限公司
+          result.unshift(pidName);
+          findParent(departDatas, item['parent'], result);
+        }
+
       }
     }
 
@@ -49,6 +52,7 @@ const converseArrayToOne = (data: any) => {
 // 转化为ag-grid能被显示的格式
 const converseFormatForAgGrid = (oraDatas: any) => {
 
+  debugger;
   if (!oraDatas) {
     return [];
   }

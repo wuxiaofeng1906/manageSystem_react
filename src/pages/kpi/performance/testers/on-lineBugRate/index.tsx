@@ -64,7 +64,8 @@ const columsForWeeks = () => {
     component.push({
       headerName: weekName,
       field: starttime.toString(),
-      cellRenderer: dataRender
+      cellRenderer: dataRender,
+      minWidth: 100
     });
 
   }
@@ -77,7 +78,8 @@ const columsForMonths = () => {
     component.push({
       headerName: monthRanges[index].title,
       field: monthRanges[index].start,
-      cellRenderer: dataRender
+      cellRenderer: dataRender,
+      minWidth: 110
     });
 
   }
@@ -104,7 +106,7 @@ const columsForYears = () => {
     component.push({
       headerName: yearsTime[index].title,
       field: yearsTime[index].start,
-      cellRenderer: colorRender
+      cellRenderer: dataRender
     });
 
   }

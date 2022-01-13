@@ -674,6 +674,7 @@ const PreRelease: React.FC<any> = () => {
       return returnValue;
     };
 
+
 // 下拉框相关字段的颜色渲染
     const selectColorRenderer = (params: any) => {
       let Color = "orange";
@@ -681,8 +682,8 @@ const PreRelease: React.FC<any> = () => {
       if (values === "是") {
         Color = "#2BF541"
       }
-
       return `<span style="color: ${Color}"> ${values}</span>`
+
     };
 
 
@@ -1376,7 +1377,7 @@ const PreRelease: React.FC<any> = () => {
     /*  region 上线分支 */
 
 
-// 渲染单元测试运行是否通过字段
+    // 渲染单元测试运行是否通过字段
     const rendererUnitTest = (params: any) => {
 
       const values = params.value;
@@ -1488,10 +1489,11 @@ const PreRelease: React.FC<any> = () => {
 
     };
 
+    const [executeStatus, setExecuteStatus] = useState(false);
 // 执行上线前检查：上线前版本检查、环境检查，自动化检查
     (window as any).excuteDataCheck = async (type: string, checkNum: string) => {
 
-
+      setExecuteStatus(true);
       const result = await executeOnlineCheck(type, checkNum);
       if (result === "") {
         message.info({
@@ -1510,7 +1512,7 @@ const PreRelease: React.FC<any> = () => {
           },
         });
       }
-
+      setExecuteStatus(false);
     };
 
 // 渲染上线前版本检查是否通过
@@ -2917,28 +2919,33 @@ const PreRelease: React.FC<any> = () => {
               <div>
                 {/* ag-grid 表格 */}
                 <div>
-                  <div className="ag-theme-alpine" style={{height: gridHeight.onlineBranchGrid, width: '100%'}}>
-                    <AgGridReact
+                  <Spin spinning={executeStatus} tip="执行中...">
 
-                      columnDefs={firstOnlineBranchColumn} // 定义列
-                      // rowData={[]} // 数据绑定
-                      defaultColDef={{
-                        resizable: true,
-                        sortable: true,
-                        suppressMenu: true,
-                        autoHeight: true,
-                        minWidth: 90
-                      }}
-                      headerHeight={25}
-                      getRowStyle={(params: any) => {
-                        return releaseAppChangRowColor("step4-onlineBranch", params.data?.branch_check_id);
-                      }}
-                      onGridReady={onfirstOnlineBranchGridReady}
-                      onGridSizeChanged={onChangefirstOnlineBranchGridReady}
-                      onColumnEverythingChanged={onChangefirstOnlineBranchGridReady}
-                    >
-                    </AgGridReact>
-                  </div>
+                    <div className="ag-theme-alpine" style={{height: gridHeight.onlineBranchGrid, width: '100%'}}>
+                      <AgGridReact
+
+                        columnDefs={firstOnlineBranchColumn} // 定义列
+                        // rowData={[]} // 数据绑定
+                        defaultColDef={{
+                          resizable: true,
+                          sortable: true,
+                          suppressMenu: true,
+                          autoHeight: true,
+                          minWidth: 90
+                        }}
+                        headerHeight={25}
+                        getRowStyle={(params: any) => {
+                          return releaseAppChangRowColor("step4-onlineBranch", params.data?.branch_check_id);
+                        }}
+                        onGridReady={onfirstOnlineBranchGridReady}
+                        onGridSizeChanged={onChangefirstOnlineBranchGridReady}
+                        onColumnEverythingChanged={onChangefirstOnlineBranchGridReady}
+                      >
+                      </AgGridReact>
+                    </div>
+
+                  </Spin>
+
                 </div>
                 <div style={{fontSize: "smaller", marginTop: 10}}>
                   1、版本检查、环境一致性检查、自动化检查，在需要的时间节点，点击手动触发按钮，进行按需检查；

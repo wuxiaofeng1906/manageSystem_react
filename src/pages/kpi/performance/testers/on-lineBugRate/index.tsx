@@ -267,7 +267,7 @@ const TestBugRateTableList: React.FC<any> = () => {
             suppressMenu: true
           }}
           autoGroupColumnDef={{
-            minWidth: 280,
+            minWidth: 240,
             headerName: '部门-人员',
             cellRendererParams: {suppressCount: true},
             pinned: 'left',

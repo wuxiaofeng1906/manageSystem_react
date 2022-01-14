@@ -67,7 +67,8 @@ const converseFormatForAgGrid = (oraDatas: any) => {
     if (elements.code) {  // 如果有代码量这项则新增代码量这一行
       resultArray.push({
         Group: ['代码量'],
-        [starttime]: elements.code
+        [starttime]: elements.code,
+        isDept: false
       });
     }
 

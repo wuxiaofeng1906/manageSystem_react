@@ -227,7 +227,7 @@ const SprintList: React.FC<any> = () => {
         field: 'ztId',
         minWidth: 80,
         cellRenderer: (params: any) => {
-          return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/project-task-${params.value}.html'>去禅道</a>`;
+          return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/execution-task-${params.value}.html'>去禅道</a>`;
         },
       }, {
         headerName: '来源',

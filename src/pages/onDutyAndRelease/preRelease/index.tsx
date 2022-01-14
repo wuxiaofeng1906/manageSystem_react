@@ -34,6 +34,7 @@ import {
 import {getGridHeight} from "./supplementFile/gridSet";
 import {getLockStatus, deleteLockStatus, getAllLockedData} from "./supplementFile/rowLock";
 import {getNewPageNum} from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
+// import SelectChoice from './renders/SelectChoice';
 
 const {TabPane} = Tabs;
 const {Option} = Select;
@@ -46,7 +47,6 @@ let newOnlineBranchNum = "";
 let lockedInfo = "";// 被锁了的id
 let releaseIdArray: any;
 let allLockedArray: any = [];
-
 
 const PreRelease: React.FC<any> = () => {
     const [pulishItemForm] = Form.useForm();
@@ -674,19 +674,6 @@ const PreRelease: React.FC<any> = () => {
       return returnValue;
     };
 
-
-// 下拉框相关字段的颜色渲染
-    const selectColorRenderer = (params: any) => {
-      let Color = "orange";
-      const values = getIfOrNot(params.value);
-      if (values === "是") {
-        Color = "#2BF541"
-      }
-      return `<span style="color: ${Color}"> ${values}</span>`
-
-    };
-
-
     const firstUpSerColumn: any = [
       {
         headerName: '上线环境',
@@ -973,17 +960,6 @@ const PreRelease: React.FC<any> = () => {
 
     /* region 升级服务 三  */
 
-
-    const confirmMappings = {
-      "1": "是",
-      "2": "否",
-
-    };
-
-    const confirmRender = () => {
-      return Object.keys(confirmMappings);
-    }
-
     const thirdUpSerColumn = [
       {
         headerName: '前端值班',
@@ -994,20 +970,18 @@ const PreRelease: React.FC<any> = () => {
         headerName: '服务确认完成',
         field: 'front_confirm_status',
         minWidth: 115,
-        editable: true,
-        cellEditor: "agSelectCellEditor",
-        cellEditorParams: {values: confirmRender()},
-        filterParams: {
-          valueFormatter: (params: any) => {
-            return confirmMappings[params.value];
-          },
-        },
-        valueFormatter: (params: any) => {
-          return confirmMappings[params.value];
-        },
-        cellRenderer: selectColorRenderer,
-
-
+        // editable: true,
+        // cellEditor: "agSelectCellEditor",
+        // cellEditorParams: {values: confirmRender()},
+        // filterParams: {
+        //   valueFormatter: (params: any) => {
+        //     return confirmMappings[params.value];
+        //   },
+        // },
+        // valueFormatter: (params: any) => {
+        //   return confirmMappings[params.value];
+        // },
+        cellRenderer: "confirmSelectChoice",
       },
       {
         headerName: '确认时间',
@@ -1021,18 +995,20 @@ const PreRelease: React.FC<any> = () => {
         headerName: '服务确认完成',
         field: 'back_end_confirm_status',
         minWidth: 115,
-        editable: true,
-        cellEditor: "agSelectCellEditor",
-        cellEditorParams: {values: confirmRender()},
-        filterParams: {
-          valueFormatter: (params: any) => {
-            return confirmMappings[params.value];
-          },
-        },
-        valueFormatter: (params: any) => {
-          return confirmMappings[params.value];
-        },
-        cellRenderer: selectColorRenderer
+        // editable: true,
+        // cellEditor: "agSelectCellEditor",
+        // cellEditorParams: {values: confirmRender()},
+        // filterParams: {
+        //   valueFormatter: (params: any) => {
+        //     return confirmMappings[params.value];
+        //   },
+        // },
+        // valueFormatter: (params: any) => {
+        //   return confirmMappings[params.value];
+        // },
+        // cellRenderer: selectColorRenderer
+        cellRenderer: "confirmSelectChoice",
+
       },
       {
         headerName: '确认时间',
@@ -1046,18 +1022,20 @@ const PreRelease: React.FC<any> = () => {
         headerName: '服务确认完成',
         field: 'process_confirm_status',
         minWidth: 115,
-        editable: true,
-        cellEditor: "agSelectCellEditor",
-        cellEditorParams: {values: confirmRender()},
-        filterParams: {
-          valueFormatter: (params: any) => {
-            return confirmMappings[params.value];
-          },
-        },
-        valueFormatter: (params: any) => {
-          return confirmMappings[params.value];
-        },
-        cellRenderer: selectColorRenderer
+        // editable: true,
+        // cellEditor: "agSelectCellEditor",
+        // cellEditorParams: {values: confirmRender()},
+        // filterParams: {
+        //   valueFormatter: (params: any) => {
+        //     return confirmMappings[params.value];
+        //   },
+        // },
+        // valueFormatter: (params: any) => {
+        //   return confirmMappings[params.value];
+        // },
+        // cellRenderer: selectColorRenderer
+        cellRenderer: "confirmSelectChoice",
+
       },
       {
         headerName: '确认时间',
@@ -1071,18 +1049,20 @@ const PreRelease: React.FC<any> = () => {
         headerName: '服务确认完成',
         field: 'test_confirm_status',
         minWidth: 115,
-        editable: true,
-        cellEditor: "agSelectCellEditor",
-        cellEditorParams: {values: confirmRender()},
-        filterParams: {
-          valueFormatter: (params: any) => {
-            return confirmMappings[params.value];
-          },
-        },
-        valueFormatter: (params: any) => {
-          return confirmMappings[params.value];
-        },
-        cellRenderer: selectColorRenderer
+        // editable: true,
+        // cellEditor: "agSelectCellEditor",
+        // cellEditorParams: {values: confirmRender()},
+        // filterParams: {
+        //   valueFormatter: (params: any) => {
+        //     return confirmMappings[params.value];
+        //   },
+        // },
+        // valueFormatter: (params: any) => {
+        //   return confirmMappings[params.value];
+        // },
+        // cellRenderer: selectColorRenderer
+        cellRenderer: "confirmSelectChoice",
+
       },
       {
         headerName: '确认时间',
@@ -1100,7 +1080,7 @@ const PreRelease: React.FC<any> = () => {
     };
 
 // 下拉框选择是否确认事件
-    const saveUperConfirmInfo = async (params: any) => {
+    const saveUperConfirmInfo = async (newValue: string, props: any) => {
 
       const datas = {
         "user_name": usersInfo.name,
@@ -1109,7 +1089,8 @@ const PreRelease: React.FC<any> = () => {
         "ready_release_num": currentListNo,
         "confirm_status": ""
       };
-      switch (params.column.colId) {
+
+      switch (props.column.colId) {
         case "front_confirm_status":  // 前端
           datas.person_type = "front";
           break;
@@ -1125,11 +1106,8 @@ const PreRelease: React.FC<any> = () => {
         default:
           break;
       }
-      //  如果前后两个值不同，则需要更新
-      if (params.newValue !== params.oldValue) {
-        datas.confirm_status = params.newValue;
-      }
 
+      datas.confirm_status = newValue;
       const result = await confirmUpgradeService(datas);
       if (result === "") {
         message.info({
@@ -1304,18 +1282,18 @@ const PreRelease: React.FC<any> = () => {
       {
         headerName: '服务确认完成',
         field: 'confirm_status',
-        editable: true,
-        cellEditor: "agSelectCellEditor",
-        cellEditorParams: {values: confirmRender()},
-        filterParams: {
-          valueFormatter: (params: any) => {
-            return confirmMappings[params.value];
-          },
-        },
-        valueFormatter: (params: any) => {
-          return confirmMappings[params.value];
-        },
-        cellRenderer: selectColorRenderer
+        // editable: true,
+        // cellEditor: "agSelectCellEditor",
+        // cellEditorParams: {values: confirmRender()},
+        // filterParams: {
+        //   valueFormatter: (params: any) => {
+        //     return confirmMappings[params.value];
+        //   },
+        // },
+        // valueFormatter: (params: any) => {
+        //   return confirmMappings[params.value];
+        // },
+        cellRenderer: 'selectChoice'
       },
       {
         headerName: '确认时间',
@@ -1332,17 +1310,17 @@ const PreRelease: React.FC<any> = () => {
       params.api.sizeColumnsToFit();
     };
 // 下拉框选择是否确认事件
-    const saveDataRepaireConfirmInfo = async (params: any) => {
+    const saveDataRepaireConfirmInfo = async (newValue: string, oldData: any) => {
 
       //  如果前后两个值不同，则需要更新
-      if (params.newValue !== params.oldValue) {
+      if (newValue !== oldData.confirm_status) {
 
         const datas = {
           "user_name": usersInfo.name,
           "user_id": usersInfo.userid,
-          "confirm_id": params.data?.confirm_id,
+          "confirm_id": oldData.confirm_id,
           "ready_release_num": currentListNo,
-          "confirm_result": params.newValue
+          "confirm_result": newValue
         };
 
         const result = await confirmDataRepairService(datas);
@@ -2825,7 +2803,30 @@ const PreRelease: React.FC<any> = () => {
                       onGridReady={onthirdGridReady}
                       onGridSizeChanged={onChangeThirdGridReady}
                       onColumnEverythingChanged={onChangeThirdGridReady}
-                      onCellEditingStopped={saveUperConfirmInfo}
+                      frameworkComponents={{
+                        confirmSelectChoice: (props: any) => {
+                          const currentValue = props.value;
+                          let Color = "black";
+                          if (currentValue === "1") {
+                            Color = "#2BF541"
+                          } else if (currentValue === "2") {
+                            Color = "orange";
+                          }
+
+                          return <Select size={"small"} defaultValue={currentValue} bordered={false}
+                                         style={{width: '100%', color: Color}}
+                                         onChange={
+                                           (newValue: any) => {
+                                             saveUperConfirmInfo(newValue, props);
+                                           }
+                                         }>
+
+                            <Option key={"1"} value={"1"}>是</Option>
+                            <Option key={"2"} value={"2"}>否</Option>
+
+                          </Select>;
+                        },
+                      }}
                     >
                     </AgGridReact>
 
@@ -2895,12 +2896,36 @@ const PreRelease: React.FC<any> = () => {
                         suppressMenu: true,
                         cellStyle: {"line-height": "25px"},
                       }}
+                      frameworkComponents={{
+                        selectChoice: (props: any) => {
+                          const currentValue = props.value;
+                          let Color = "black";
+                          if (currentValue === "1") {
+                            Color = "#2BF541"
+                          } else if (currentValue === "2") {
+                            Color = "orange";
+                          }
+
+                          return <Select size={"small"} defaultValue={currentValue} bordered={false}
+                                         style={{width: '100%', color: Color}}
+                                         onChange={
+                                           (newValue: any) => {
+                                             saveDataRepaireConfirmInfo(newValue, props.data);
+                                           }
+                                         }>
+
+                            <Option key={"1"} value={"1"}>是</Option>
+                            <Option key={"2"} value={"2"}>否</Option>
+
+                          </Select>;
+                        },
+                      }}
                       headerHeight={25}
                       rowHeight={25}
                       onGridReady={onsecondDataReviewGridReady}
                       onGridSizeChanged={onChangesecondDataReviewGridReady}
                       onColumnEverythingChanged={onChangesecondDataReviewGridReady}
-                      onCellEditingStopped={saveDataRepaireConfirmInfo}
+                      // onCellEditingStopped={saveDataRepaireConfirmInfo}
                     >
                     </AgGridReact>
 

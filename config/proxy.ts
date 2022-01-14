@@ -45,7 +45,8 @@ export default {
       pathRewrite: {'^': ''},
     },
     '/api/': {
-      target: 'http://dms.q7link.com:8300/',
+      // target: 'http://dms.q7link.com:8300/',
+      target: 'http://rd.q7link.com:8300/',
       changeOrigin: true,
       pathRewrite: {'^': ''},
     },

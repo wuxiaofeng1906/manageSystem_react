@@ -39,7 +39,7 @@ const dataRender = (params: any) => {
     return `<span> ${result}</span>`;
   }
 
-  if (node.isDept === true) {
+  if (node && node.isDept === true) {
     return `<span style="font-weight: bold"> ${0}</span>`;
   }
 

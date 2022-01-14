@@ -39,7 +39,7 @@ function colorRender(params: any) {
     return ` <span> ${100} </span> `;
   }
 
-  if (node.isDept === true) {
+  if (node && node.isDept === true) {
     return ` <span style="font-weight: bold"> ${customRound((Number(params.value) * 100), 2)} </span> `;
   }
 

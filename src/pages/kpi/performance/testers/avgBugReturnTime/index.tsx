@@ -31,7 +31,7 @@ function colorRender(params: any) {
 
   if (params.value) {
     const result = Number(params.value).toFixed(2);
-    if (node.isDept === true) {
+    if (node && node.isDept === true) {
       return `<span style="font-weight: bold"> ${result}</span>`;
     }
 

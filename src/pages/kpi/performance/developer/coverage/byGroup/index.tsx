@@ -33,14 +33,14 @@ function coverageCellRenderer(params: any) {
 
   if (params.value) {
     const result = customRound((Number(params.value) * 100), 2);
-    if (node.isDept === true) {
+    if (node && node.isDept === true) {
       return `<span style="font-weight: bold"> ${result}</span>`;
     }
 
     return `<span> ${result}</span>`;
   }
 
-  if (node.isDept === true) {
+  if (node && node.isDept === true) {
     return `<span style="font-weight: bold"> ${0}</span>`;
   }
 

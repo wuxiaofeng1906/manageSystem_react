@@ -1,4 +1,4 @@
-import {getInitPageData, getNewPageNum} from "./axiosApi";
+import {getInitPageData} from "./axiosApi";
 
 // 解析有多少个tab
 const analysisTabsPageInfo = async (datas: any) => {

@@ -860,7 +860,7 @@ const saveEnvironmentCheck = async (type: string, currentListNo: string, newOnli
 
 // (上线前后)自动化检查
 const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any) => {
-  debugger;
+
   const data = [];
 
   // 上线前检查: 打勾是1，没打勾是2

@@ -34,6 +34,7 @@ import {
 import {getGridHeight} from "./supplementFile/gridSet";
 import {getLockStatus, deleteLockStatus, getAllLockedData} from "./supplementFile/rowLock";
 import {getNewPageNum} from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
+import {history} from "@@/core/history";
 // import SelectChoice from './renders/SelectChoice';
 
 const {TabPane} = Tabs;
@@ -49,6 +50,8 @@ let releaseIdArray: any;
 let allLockedArray: any = [];
 
 const PreRelease: React.FC<any> = () => {
+
+    // 获取链接后面的参数
     const [pulishItemForm] = Form.useForm();
     const [upgradeIntForm] = Form.useForm();
     const [dataReviewForm] = Form.useForm();
@@ -92,7 +95,13 @@ const PreRelease: React.FC<any> = () => {
     // 上线分支设置
     const [onlineBranchModal, setOnlineBranchModal] = useState({shown: false, title: "新增", loading: false});
 
-    const initData = useRequest(() => alalysisInitData()).data;
+    const location = history.location.query;
+    let releasedNumStr = "";
+    if (JSON.stringify(location) !== '{}' && location) {
+
+      releasedNumStr = location?.releasedNum === null ? "" : (location?.releasedNum).toString();
+    }
+    const initData = useRequest(() => alalysisInitData("", releasedNumStr)).data;
 
     /* region 新增行 */
 
@@ -2209,6 +2218,14 @@ const PreRelease: React.FC<any> = () => {
     /* region Tabs 标签页事件 */
 
     const showNoneDataPage = () => {
+      setProcessStatus({
+        releaseProject: "Gainsboro",  // #2BF541
+        upgradeService: "Gainsboro",
+        dataReview: "Gainsboro",
+        onliineCheck: "Gainsboro",
+        releaseResult: "9",
+        processPercent: 0
+      });
       formUpgradeService.resetFields();
       // 预发布项目
       formForPreReleaseProject.resetFields();
@@ -2299,18 +2316,6 @@ const PreRelease: React.FC<any> = () => {
       shown: false,
       targetKey: ""
     });
-
-// const initialPanes = [
-//   {
-//     title: `${currentDate}灰度预发布1`,
-//     content: "",
-//     key: '1',
-//     // closable: false
-//   }];
-// const [tabContent, setTabContent] = useState({
-//   activeKey: initialPanes[0].key,
-//   panes: initialPanes
-// });
 
     const [tabContent, setTabContent] = useState({
       activeKey: "",
@@ -2444,7 +2449,7 @@ const PreRelease: React.FC<any> = () => {
     };
     /* endregion */
 
-
+    /* region 释放锁 */
     // 刷新释放正锁住的锁
     window.onbeforeunload = () => {
 
@@ -2461,6 +2466,8 @@ const PreRelease: React.FC<any> = () => {
       deleteLockStatus(lockedInfo);
 
     }, true)
+
+    /* endregion */
 
     const [saveButtonDisable, setSaveButtonDisable] = useState(false);
     // 编辑框聚焦时检查是否可以编辑
@@ -2490,28 +2497,40 @@ const PreRelease: React.FC<any> = () => {
     };
     // 初始化显示tab
     const showTabsPage = async () => {
+      if (releasedNumStr === "") {
+        const source = await alalysisInitData();
+        const tabsInfo = source?.tabPageInfo;
 
-      const source = await alalysisInitData();
-      const tabsInfo = source?.tabPageInfo;
+        if (tabsInfo) {
+          setTabContent({
+            activeKey: tabsInfo[0].key,
+            panes: tabsInfo
+          });
+        } else if (initData === undefined) {
+          const newNum = await getNewPageNum();
+          const releaseNum = newNum.data?.ready_release_num;
+          currentListNo = releaseNum;
+          const panesArray: any = [{
+            title: `${releaseNum}灰度预发布`,
+            content: "",
+            key: releaseNum,
+          }];
 
-      if (tabsInfo) {
-        setTabContent({
-          activeKey: tabsInfo[0].key,
-          panes: tabsInfo
-        });
-      } else if (initData === undefined) {
-        const newNum = await getNewPageNum();
-        const releaseNum = newNum.data?.ready_release_num;
-        currentListNo = releaseNum;
-        const panesArray: any = [{
-          title: `${releaseNum}灰度预发布`,
+          setTabContent({
+            activeKey: releaseNum,
+            panes: panesArray
+          });
+        }
+
+      } else {
+        const newPage: any = [{
+          title: `${releasedNumStr}灰度预发布`,
           content: "",
-          key: releaseNum,
+          key: releasedNumStr,
         }];
-
         setTabContent({
-          activeKey: releaseNum,
-          panes: panesArray
+          activeKey: releasedNumStr,
+          panes: newPage
         });
       }
     };
@@ -2519,7 +2538,6 @@ const PreRelease: React.FC<any> = () => {
     useEffect(() => {
       showPagesContent(initData);
       showTabsPage();
-
     }, [initData]);
 
     return (

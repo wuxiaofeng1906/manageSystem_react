@@ -28,7 +28,12 @@ const ReleaseHistory: React.FC<any> = () => {
 
   const grayscaleData = useRequest(() => getGrayscaleListData()).data;
   (window as any).releaseProcess = (releasedNum: string) => {
-    history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}`);
+    if (releasedNum === "") {
+      history.push(`/onDutyAndRelease/preRelease`);
+    } else {
+      history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}`);
+    }
+
   };
 
   const grayscaleBacklogList = () => {

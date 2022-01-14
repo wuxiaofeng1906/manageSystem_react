@@ -34,7 +34,7 @@ const dataRender = (params: any) => {
     if ((node.Group)[0] === "代码量") {
       result = params.value;
     }
-    if (node.isDept === true) {
+    if (node &&node.isDept === true) {
       return `<span style="font-weight: bold"> ${result}</span>`;
     }
 

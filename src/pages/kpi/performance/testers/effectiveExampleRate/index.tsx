@@ -32,7 +32,7 @@ function colorRender(params: any) {
 
   if (params.value) {
     const result = (Number(params.value)).toFixed(2);
-    if (node.isDept === true) {
+    if (node && node.isDept === true) {
       return `<span style="font-weight: bold"> ${result}</span>`;
     }
 
@@ -55,7 +55,7 @@ const columsForWeeks = () => {
       headerName: weekName,
       field: starttime.toString(),
       cellRenderer: colorRender,
-      minWidth:100
+      minWidth: 100
     });
 
   }
@@ -69,7 +69,7 @@ const columsForMonths = () => {
       headerName: monthRanges[index].title,
       field: monthRanges[index].start,
       cellRenderer: colorRender,
-      minWidth:110
+      minWidth: 110
     });
 
   }

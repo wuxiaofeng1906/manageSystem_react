@@ -2824,7 +2824,7 @@ const PreRelease: React.FC<any> = () => {
                       onColumnEverythingChanged={onChangeThirdGridReady}
                       frameworkComponents={{
                         confirmSelectChoice: (props: any) => {
-                          const currentValue = props.value;
+                          const currentValue = props.value === '9' ? '2' : '1';
                           let Color = "black";
                           if (currentValue === "1") {
                             Color = "#2BF541"
@@ -2917,7 +2917,7 @@ const PreRelease: React.FC<any> = () => {
                       }}
                       frameworkComponents={{
                         selectChoice: (props: any) => {
-                          const currentValue = props.value;
+                          const currentValue = props.value === '9' ? '2' : '1';
                           let Color = "black";
                           if (currentValue === "1") {
                             Color = "#2BF541"

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useRef} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -7,9 +7,8 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useRequest} from "ahooks";
 import {getGrayscaleListData} from './apiPage';
-import axios from "axios";
-import moment from "moment";
-import {message} from "antd";
+
+import {history} from "@@/core/history";
 
 
 /* endregion */
@@ -27,10 +26,9 @@ const ReleaseHistory: React.FC<any> = () => {
     grayscaleGridApi.current?.sizeColumnsToFit();
   });
 
-
   const grayscaleData = useRequest(() => getGrayscaleListData()).data;
-  (window as any).releaseProcess = (params: any) => {
-    console.log(params);
+  (window as any).releaseProcess = (releasedNum: string) => {
+    history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}`);
   };
 
   const grayscaleBacklogList = () => {
@@ -63,16 +61,14 @@ const ReleaseHistory: React.FC<any> = () => {
     }, {
       headerName: '操作',
       cellRenderer: (params: any) => {
-        const paramData = JSON.stringify(params.data);
-        debugger;
+        const readyReleaseNum = params.data?.ready_release_num;
         return `
         <div style="margin-top: -5px">
-             <a href="${params.data.taskLog}" target="_blank" >
+             <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='releaseProcess(${JSON.stringify(readyReleaseNum)})'>
                 <img src="../logs.png" width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情" />
-             </a>
-
-            <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='releaseProcess(${paramData})'>
-              <img src="../params.png" width="20" height="20" alt="点击构建正式发布" title="点击构建正式发布" />
+            </Button>
+            <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='releaseProcess("")'>
+              <img src="../processAdd.png" width="20" height="20" alt="点击构建正式发布" title="点击构建正式发布" />
             </Button>
         </div>
             `;

@@ -33,7 +33,7 @@ import {
 } from "./supplementFile/converse";
 import {getGridHeight} from "./supplementFile/gridSet";
 import {getLockStatus, deleteLockStatus, getAllLockedData} from "./supplementFile/rowLock";
-import {getNewPageNum} from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
+import {getNewPageNum, queryReleaseId} from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
 import {history} from "@@/core/history";
 
 const {TabPane} = Tabs;
@@ -45,7 +45,7 @@ const usersInfo = JSON.parse(userLogins);
 let currentListNo = "";  // 当前页面编号
 let newOnlineBranchNum = "";
 let lockedInfo = "";// 被锁了的id
-let releaseIdArray: any;
+let releaseIdArray: any = [];
 let allLockedArray: any = [];
 
 const PreRelease: React.FC<any> = () => {
@@ -1560,7 +1560,7 @@ const PreRelease: React.FC<any> = () => {
 
       // 解析时间
       let start = "";
-      if (values.check_start_time) {
+      if (values.check_start_time && values.check_start_time !== "-") {
         start = dayjs(values.check_start_time).format("HH:mm:ss");
       }
 
@@ -2247,7 +2247,7 @@ const PreRelease: React.FC<any> = () => {
 
         });
 
-        releaseIdArray = queryCondition;
+        releaseIdArray = releaseIdArray.concat(queryCondition);
 
       }
     }
@@ -2325,6 +2325,37 @@ const PreRelease: React.FC<any> = () => {
 
     };
 
+    const setReleasedIdForm = async (releasedData: any) => {
+
+      const idArray: any = [];
+
+      const idStrArray: any = [];
+
+      // 查询id
+      const IDs = (await queryReleaseId()).data;
+      releasedData.forEach((ele: any) => {
+        if (!idArray.includes(ele.deployment_id)) {
+          idArray.push(ele.deployment_id);
+
+          for (let i = 0; i < IDs.length; i += 1) {
+
+            if (ele.deployment_id === (IDs[i].id).toString()) {
+              idStrArray.push({
+                "deployment_id": ele.deployment_id,
+                "automation_check": IDs[i].automation_test,
+                "service": IDs[i].service
+              });
+              break;
+            }
+          }
+        }
+      });
+
+      releaseIdArray = idStrArray;
+      formUpgradeService.setFieldsValue({
+        deployID: idArray
+      });
+    };
     const showPagesContent = async (source: any) => {
 
       if (!source || JSON.stringify(source) === "{}") {
@@ -2340,9 +2371,6 @@ const PreRelease: React.FC<any> = () => {
 
       await getProcessStatus();
 
-      // formUpgradeService.setFieldsValue({
-      //   // deployID: "90"
-      // });
       formForPreReleaseProject.setFieldsValue({
         projectsName: preReleaseProject.projectId,
         pulishType: preReleaseProject.release_type,
@@ -2353,7 +2381,9 @@ const PreRelease: React.FC<any> = () => {
         proid: preReleaseProject.pro_id
       });
 
+
       // 升级服务 一
+      setReleasedIdForm(source?.upService_releaseItem)
       firstUpSerGridApi.current?.setRowData(source?.upService_releaseItem);
 
       // 升级服务 二

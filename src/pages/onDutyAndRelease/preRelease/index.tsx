@@ -533,6 +533,40 @@ const PreRelease: React.FC<any> = () => {
 // 数据删除
     const delDetailsInfo = async () => {
 
+      const {type} = delModal;
+      const oraData: any = delModal.datas;
+      let currentDelData = "";
+      // 被锁定的数据不能删除
+      switch (type) {
+        case 1:
+          currentDelData = `${currentListNo}-step2-app-${oraData?.app_id}`;
+          break;
+        case 2:
+          currentDelData = `${currentListNo}-step2-api-${oraData?.api_id}`;
+          break;
+        case 3:
+          currentDelData = `${currentListNo}-step3-review-${oraData?.review_id}`;
+          break;
+        case 4:
+          currentDelData = `${currentListNo}-step4-onlineBranch-${oraData?.branch_check_id}`;
+          break;
+        default:
+          break;
+      }
+
+      const lockInfo = await getLockStatus(currentDelData);
+
+      if (lockInfo.errMessage) {
+        message.error({
+          content: `删除失败：${lockInfo.errMessage}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+
+        return;
+      }
       const result: string = await delUpgradeItems(delModal.type, delModal.datas);
       if (result === "") {
         message.info({

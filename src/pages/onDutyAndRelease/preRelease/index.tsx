@@ -308,6 +308,10 @@ const PreRelease: React.FC<any> = () => {
 
       if (type === "add") {
         formForOnlineBranch.resetFields();
+        formForOnlineBranch.setFieldsValue({
+          verson_check: "1",
+          branchcheck: "1"
+        });
         setOnlineBranchModal({
           shown: true,
           title: "新增",

@@ -49,6 +49,7 @@ let releaseIdArray: any;
 let allLockedArray: any = [];
 
 const PreRelease: React.FC<any> = () => {
+    const interValRef: any = useRef();
 
     // 获取链接后面的参数
     const [pulishItemForm] = Form.useForm();
@@ -1357,7 +1358,7 @@ const PreRelease: React.FC<any> = () => {
     };
 // 下拉框选择是否确认事件
     const saveDataRepaireConfirmInfo = async (newValue: string, oldData: any) => {
-      debugger;
+
       //  如果前后两个值不同，则需要更新
       if (newValue !== oldData.confirm_status) {
 
@@ -1973,8 +1974,33 @@ const PreRelease: React.FC<any> = () => {
         deleteLockStatus(lockedInfo);
       }
     };
+
+    const runTimeTask = async () => {
+      let count = 0;
+      const id = setInterval(async () => {
+        count += 1;
+        console.log(`刷新数据${count},定时任务id${id}`);
+        // 刷新
+        const new_Data: any = await alalysisInitData("dataReview", currentListNo);
+        firstDataReviewGridApi.current?.setRowData(new_Data.reviewData_repaire);
+        //   刷新表格
+        const newData_confirm_data: any = await alalysisInitData("dataReviewConfirm", currentListNo);
+        secondDataReviewGridApi.current?.setRowData(newData_confirm_data.reviewData_confirm);
+        if ((new_Data.reviewData_repaire).length > 0 && (newData_confirm_data.reviewData_confirm).length > 0) {
+          clearInterval(interValRef.current);
+        }
+
+        if (count === 10) { // 5分钟后没数据就自动停止
+          clearInterval(interValRef.current);
+        }
+
+      }, 30 * 1000);
+
+      interValRef.current = id;
+    };
     // 保存
     const saveOnlineBranchResult = async () => {
+
       setOnlineBranchModal({
         ...onlineBranchModal,
         loading: true
@@ -2009,6 +2035,10 @@ const PreRelease: React.FC<any> = () => {
         if (onlineBranchModal.title === "修改") {
           deleteLockStatus(lockedInfo);
         }
+
+        //   定时刷新数据review的数据
+        await runTimeTask();
+
       } else {
         message.error({
           content: result,

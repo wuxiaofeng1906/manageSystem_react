@@ -35,7 +35,6 @@ import {getGridHeight} from "./supplementFile/gridSet";
 import {getLockStatus, deleteLockStatus, getAllLockedData} from "./supplementFile/rowLock";
 import {getNewPageNum} from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
 import {history} from "@@/core/history";
-// import SelectChoice from './renders/SelectChoice';
 
 const {TabPane} = Tabs;
 const {Option} = Select;
@@ -2311,7 +2310,9 @@ const PreRelease: React.FC<any> = () => {
 
       await getProcessStatus();
 
-      formUpgradeService.resetFields();
+      formUpgradeService.setFieldsValue({
+        deployID:"90"
+      });
       formForPreReleaseProject.setFieldsValue({
         projectsName: preReleaseProject.projectId,
         pulishType: preReleaseProject.release_type,
@@ -3397,6 +3398,7 @@ const PreRelease: React.FC<any> = () => {
                   <Select style={{width: 191, marginLeft: 14}}>
                     <Option key={"1"} value={"1"}>{"通过"}</Option>
                     <Option key={"2"} value={"2"}>{"不通过"}</Option>
+                    <Option key={"9"} value={"9"}>{""}</Option>
                   </Select>
                 </Form.Item>
               </Col>
@@ -3405,6 +3407,7 @@ const PreRelease: React.FC<any> = () => {
                   <Select>
                     <Option key={"1"} value={"1"}>{"是"}</Option>
                     <Option key={"2"} value={"2"}>{"否"}</Option>
+                    <Option key={"9"} value={"9"}>{""}</Option>
                   </Select>
                 </Form.Item>
               </Col>

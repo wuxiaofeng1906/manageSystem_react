@@ -1357,7 +1357,7 @@ const PreRelease: React.FC<any> = () => {
     };
 // 下拉框选择是否确认事件
     const saveDataRepaireConfirmInfo = async (newValue: string, oldData: any) => {
-
+      debugger;
       //  如果前后两个值不同，则需要更新
       if (newValue !== oldData.confirm_status) {
 
@@ -2310,9 +2310,9 @@ const PreRelease: React.FC<any> = () => {
 
       await getProcessStatus();
 
-      formUpgradeService.setFieldsValue({
-        deployID:"90"
-      });
+      // formUpgradeService.setFieldsValue({
+      //   // deployID: "90"
+      // });
       formForPreReleaseProject.setFieldsValue({
         projectsName: preReleaseProject.projectId,
         pulishType: preReleaseProject.release_type,
@@ -2863,7 +2863,7 @@ const PreRelease: React.FC<any> = () => {
                       onColumnEverythingChanged={onChangeThirdGridReady}
                       frameworkComponents={{
                         confirmSelectChoice: (props: any) => {
-                          const currentValue = props.value === '9' ? '2' : '1';
+                          const currentValue = props.value === '9' ? "" : props.value;
                           let Color = "black";
                           if (currentValue === "1") {
                             Color = "#2BF541"
@@ -2881,6 +2881,7 @@ const PreRelease: React.FC<any> = () => {
 
                             <Option key={"1"} value={"1"}>是</Option>
                             <Option key={"2"} value={"2"}>否</Option>
+                            <Option key={"9"} value={"9"}> </Option>
 
                           </Select>;
                         },
@@ -2956,7 +2957,8 @@ const PreRelease: React.FC<any> = () => {
                       }}
                       frameworkComponents={{
                         selectChoice: (props: any) => {
-                          const currentValue = props.value === '9' ? '2' : '1';
+
+                          const currentValue = props.value === "9" ? "" : props.value;
                           let Color = "black";
                           if (currentValue === "1") {
                             Color = "#2BF541"
@@ -2974,7 +2976,7 @@ const PreRelease: React.FC<any> = () => {
 
                             <Option key={"1"} value={"1"}>是</Option>
                             <Option key={"2"} value={"2"}>否</Option>
-
+                            <Option key={"9"} value={"9"}> </Option>
                           </Select>;
                         },
                       }}

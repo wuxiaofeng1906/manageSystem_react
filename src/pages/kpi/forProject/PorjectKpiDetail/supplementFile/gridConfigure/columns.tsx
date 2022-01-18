@@ -450,7 +450,7 @@ const getReviewDefectColumns = () => {
 
 /* endregion  */
 
-/* region 6 过程质量补充数据和7.服务 */
+/* region 6 过程质量补充数据 */
 
 const getProcessQualityColumns = () => {
 
@@ -531,7 +531,7 @@ const getProcessQualityColumns = () => {
       }
     },
     {
-      headerName: '',
+      headerName: '度量值',
       field: 'kind',
       minWidth: 170,
       maxWidth: 170,
@@ -568,11 +568,86 @@ const getProcessQualityColumns = () => {
 
 /* endregion  */
 
+/* region 7.服务 */
+
+const getServiceColumns = () => {
+
+  const processQualityColums: any = [
+    {
+      headerName: '',
+      field: 'title',
+      minWidth: TYPE_LENGTH,
+      maxWidth: TYPE_LENGTH,
+      cellRenderer: (params: any) => {
+        return `<div style="font-weight: bold;margin-top: 8px">${params.value}</div>`
+      },
+    },
+    {
+      headerName: '',
+      field: 'module',
+      maxWidth: STAGE_LENGTH,
+      minWidth: STAGE_LENGTH,
+      cellRenderer: (params: any) => {
+        return `<div style="margin-top: 8px">${params.value} </div>`;
+      }
+    },
+    {
+      headerName: '度量值',
+      field: 'item',
+      cellRenderer: (params: any) => {
+        if (params.value === "一次发布成功率") {
+          return `<div>
+                    <div>一次发布</div>
+                    <div style="margin-top: -5px">成功率</div>
+                </div>`;
+        }
+
+        return params.value;
+      },
+    },
+    {
+      headerName: '成功发布数',
+      field: 'succN',
+      minWidth: 170,
+      maxWidth: 170,
+      editable: true,
+      cellRenderer: (params: any) => {
+        return `<div style="margin-top: 8px">${params.value} </div>`;
+      }
+    },
+    {
+      headerName: '发布次数',
+      field: 'totalN',
+      minWidth: 95,
+      maxWidth: 95,
+      editable: true,
+      cellRenderer: (params: any) => {
+        return `<div style="margin-top: 8px">${params.value} </div>`;
+      }
+    },
+    {
+      headerName: '一次成功发布率',
+      field: 'ratio',
+      minWidth: 130,
+      maxWidth: 130,
+      cellRenderer: (params: any) => {
+        const values = (params.value).toFixed(2);
+        return `<div style="margin-top: 8px">${values}%</div>`;
+      }
+    }
+  ];
+
+  return processQualityColums;
+};
+
+/* endregion  */
+
 export {
   getProcessColumns,
   getStoryStabilityColumns,
   getStageWorkloadColumns,
   getProductRateColumns,
   getReviewDefectColumns,
-  getProcessQualityColumns
+  getProcessQualityColumns,
+  getServiceColumns
 };

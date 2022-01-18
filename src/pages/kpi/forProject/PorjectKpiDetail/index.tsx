@@ -9,7 +9,8 @@ import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useGqlClient} from '@/hooks';
 import {
   getProcessColumns, getStoryStabilityColumns, getStageWorkloadColumns,
-  getProductRateColumns, getReviewDefectColumns, getProcessQualityColumns
+  getProductRateColumns, getReviewDefectColumns, getProcessQualityColumns,
+  getServiceColumns
 } from './supplementFile/gridConfigure/columns';
 import {
   processCellEdited, storyStabilityCellEdited, stageWorkloadCellEdited,
@@ -17,19 +18,21 @@ import {
 } from './supplementFile/gridConfigure/gridEdit';
 import {
   queryProcessData, queryStoryStability, queryStageWorkload,
-  queryProductRateload, queryReviewDefect, queryProcessQuality
+  queryProductRateload, queryReviewDefect, queryProcessQuality,
+  queryServices
 } from './supplementFile/data/dataOperate';
 import {
   setProcessCellStyle, setStoryStabilityCellStyle, setStageWorkloadCellStyle,
-  setProductRateCellStyle, setReviewDefectCellStyle, setProcessQualityCellStyle
+  setProductRateCellStyle, setReviewDefectCellStyle, setProcessQualityCellStyle,
+  setServiceCellStyle
 } from './supplementFile/style/gridStyles';
 import './supplementFile/style/styles.css';
 import {Button} from "antd";
 import {
   getProcessHeaderStyle, getStoryStabilityHeaderStyle, getStageWorkloadHeaderStyle,
-  getProductRateHeaderStyle, getReviewDefectHeaderStyle, getProcessQualityHeaderStyle
+  getProductRateHeaderStyle, getReviewDefectHeaderStyle, getProcessQualityHeaderStyle,
+  getServiceHeaderStyle
 } from "./supplementFile/style/columsTitleRenderer";
-import {updateGridContent} from "./supplementFile/data/axiosRequest";
 import {CustomTooltip} from "./supplementFile/style/customTooltip"
 
 const WeekCodeTableList: React.FC<any> = (props: any) => {
@@ -113,7 +116,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
   }
   /* endregion */
 
-  /* region  6 过程质量补充数据和7.服务 */
+  /* region  6 过程质量补充数据 */
   const processQuality = useRequest(() => queryProcessQuality(gqlClient, projectId));
   const processQualityGridApi = useRef<GridApi>();
   const onPocessQualityGridReady = (params: GridReadyEvent) => {
@@ -126,6 +129,19 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
   }
   /* endregion */
 
+  /* region  7  服务 */
+  const serviceData = useRequest(() => queryServices(gqlClient, projectId));
+  const serviceGridApi = useRef<GridApi>();
+  const onServiceGridReady = (params: GridReadyEvent) => {
+    serviceGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+  if (serviceGridApi.current) {
+    if (serviceData.loading) serviceGridApi.current.showLoadingOverlay();
+    else serviceGridApi.current.hideOverlay();
+  }
+  /* endregion */
+
   window.onresize = function () {
     processGridApi.current?.sizeColumnsToFit();
     storyStabilityGridApi.current?.sizeColumnsToFit();
@@ -133,6 +149,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     productRateGridApi.current?.sizeColumnsToFit();
     reviewDefectGridApi.current?.sizeColumnsToFit();
     processQualityGridApi.current?.sizeColumnsToFit();
+    serviceGridApi.current?.sizeColumnsToFit();
   };
 
   // 导出数据
@@ -146,6 +163,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
       productRateGridApi.current?.getSheetDataForExcel({sheetName: '生产率'}),
       reviewDefectGridApi.current?.getSheetDataForExcel({sheetName: '评审和缺陷'}),
       processQualityGridApi.current?.getSheetDataForExcel({sheetName: '过程质量补充数据和服务'}),
+      serviceGridApi.current?.getSheetDataForExcel({sheetName: '服务'}),
     );
 
     processGridApi.current?.exportMultipleSheetsAsExcel({
@@ -319,7 +337,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         </div>
 
         {/* 6 过程质量补充数据 */}
-        <div className="ag-theme-alpine" style={{height: 300, width: '100%'}}>
+        <div className="ag-theme-alpine" style={{height: 263, width: '100%'}}>
           <AgGridReact
             columnDefs={getProcessQualityColumns()} // 定义列
             rowData={processQuality?.data} // 数据绑定
@@ -339,6 +357,38 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             onGridReady={onPocessQualityGridReady}
             onCellEditingStopped={(params: any) => {
               return pocessQualityCellEdited(params, projectId);
+            }}
+          >
+          </AgGridReact>
+        </div>
+
+        {/* 7 服务 */}
+        <div className="ag-theme-alpine" style={{height: 80, width: '100%'}}>
+          <AgGridReact
+            columnDefs={getServiceColumns()} // 定义列
+            rowData={serviceData?.data} // 数据绑定
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true,
+              suppressMenu: true,
+              cellStyle: setServiceCellStyle,
+              minWidth: COMMON_LENGTH,
+              maxWidth: COMMON_LENGTH,
+              headerComponentParams: getServiceHeaderStyle
+            }}
+            getRowHeight={(params: any) => {
+              if (params.data?.item === "一次发布成功率") {
+                return 50;
+              }
+              return 32;
+            }}
+            // rowHeight={32}
+            headerHeight={35}
+            suppressRowTransform={true}
+            onGridReady={onServiceGridReady}
+            onCellEditingStopped={(params: any) => {
+              // return pocessQualityCellEdited(params, projectId);
             }}
           >
           </AgGridReact>

@@ -467,11 +467,43 @@ const queryProcessQuality = async (client: GqlClient<object>, projectId: string)
   return alaysisProcessQuality(data?.processQuality);
 };
 
+// 6 过程质量补充数据
+const alaysisService = (sourceData: any) => {
+
+  if (!sourceData) {
+    return [];
+  }
+  const datas = sourceData[0];
+  const result = [{
+    title: "7.服务",
+    module: "及时交付",
+    item: "一次发布成功率",
+    succN: datas.succN,
+    totalN: datas.totalN,
+    ratio: datas.ratio
+  }];
+
+  return result;
+};
+const queryServices = async (client: GqlClient<object>, projectId: string) => {
+  const {data} = await client.query(`
+      {
+          serviceAbout(pId:${Number(projectId)}){
+            kind
+            succN
+            totalN
+            ratio
+          }
+      }
+  `);
+  return alaysisService(data?.serviceAbout);
+};
 export {
   queryProcessData,
   queryStoryStability,
   queryStageWorkload,
   queryReviewDefect,
   queryProductRateload,
-  queryProcessQuality
+  queryProcessQuality,
+  queryServices
 };

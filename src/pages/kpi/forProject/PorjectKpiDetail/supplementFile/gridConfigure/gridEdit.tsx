@@ -48,10 +48,31 @@ const processCellEdited = async (params: any, projectId: string) => {
 // 需求稳定性编辑
 const storyStabilityCellEdited = async (params: any, projectId: string) => {
 
+  if (!params.newValue || (params.newValue).trim() === "") {
+    message.error({
+      content: "请输入正确的数字！",
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+    return true;
+  }
+
+  if ((Number(params.newValue)).toString() === "NaN") {
+    message.error({
+      content: "请输入正确的数字！",
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+    return true;
+  }
+
   // 有数据变化时再进行修改请求
   if ((params.newValue).toString() !== (params.oldValue).toString()) {
     const type = params.data?.stage;
-
     const typeValue = {"项目周期": 0, "开发": 3, "测试": 4, "发布": 5};
 
     let columID = "";
@@ -60,6 +81,8 @@ const storyStabilityCellEdited = async (params: any, projectId: string) => {
     } else if (params.column.colId === "stableHours") { // 变更工时
       columID = "extra"
     }
+
+
     const newValues = {
       "category": "storyStable",
       "column": columID,
@@ -97,6 +120,28 @@ const storyStabilityCellEdited = async (params: any, projectId: string) => {
 
 // 阶段工作量
 const stageWorkloadCellEdited = async (params: any, projectId: string) => {
+  if (!params.newValue || (params.newValue).trim() === "") {
+    message.error({
+      content: "请输入正确的数字！",
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+    return true;
+  }
+
+  if ((Number(params.newValue)).toString() === "NaN") {
+    message.error({
+      content: "请输入正确的数字！",
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+    return true;
+  }
+
 
   // 有数据变化时再进行修改请求
   if (params.newValue !== params.oldValue) {
@@ -148,6 +193,27 @@ const stageWorkloadCellEdited = async (params: any, projectId: string) => {
 
 // 生产率
 const productRateCellEdited = async (params: any, projectId: string) => {
+  if (!params.newValue || (params.newValue).trim() === "") {
+    message.error({
+      content: "请输入正确的数字！",
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+    return true;
+  }
+
+  if ((Number(params.newValue)).toString() === "NaN") {
+    message.error({
+      content: "请输入正确的数字！",
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+    return true;
+  }
 
   if (params.newValue !== params.oldValue) {
     const newValues = {
@@ -186,6 +252,8 @@ const productRateCellEdited = async (params: any, projectId: string) => {
 
 // 评审和缺陷
 const reviewDefectCellEdited = async (params: any, projectId: string) => {
+
+
   const type = params.data?.kind;
 
   enum typeObject {
@@ -280,6 +348,28 @@ const pocessQualityCellEdited = async (params: any, projectId: string) => {
 
 // 服务
 const serviceCellEdited = async (params: any, projectId: string) => {
+  if (!params.newValue || (params.newValue).trim() === "") {
+    message.error({
+      content: "请输入正确的数字！",
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+    return true;
+  }
+
+  if ((Number(params.newValue)).toString() === "NaN") {
+    message.error({
+      content: "请输入正确的数字！",
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+    return true;
+  }
+
 
   let columns = "";
   if (params.column?.colId === "succN") { // 成功发布数据

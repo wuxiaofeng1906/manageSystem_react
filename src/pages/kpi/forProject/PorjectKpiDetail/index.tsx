@@ -38,7 +38,6 @@ import {CustomTooltip} from "./supplementFile/style/customTooltip"
 
 const WeekCodeTableList: React.FC<any> = (props: any) => {
   const projectId = props.location.query.id;
-
   const gqlClient = useGqlClient();
 
   /* region  进度指标 */
@@ -401,6 +400,5 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     </PageContainer>
   );
 };
-
 
 export default WeekCodeTableList;

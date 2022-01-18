@@ -179,27 +179,30 @@ const alaysisStageWorkload = (sourceData: any) => {
         newData.actualWorkload = datas.actualWorkload;
         break;
       }
-
     }
     result.push(newData);
   });
 
-
+  const totalData = {
+    title: "",
+    stage: "合计",
+    manpower: "",
+    planHours: "",
+    actualHours: "",
+    planWorkload: "",
+    actualWorkload: "",
+  };
   if (sourceData.totalSW) {
     const total = sourceData.totalSW;
-    // 需要新增总计
-    result.push({
-      title: "",
-      stage: "合计",
-      manpower: total[0],
-      planHours: total[1],
-      actualHours: total[2],
-      planWorkload: total[3],
-      actualWorkload: total[4],
-    });
+    totalData.manpower = total[0].toString();
+    totalData.planHours = total[1].toString();
+    totalData.actualHours = total[2].toString();
+    totalData.planWorkload = total[3].toString();
+    totalData.actualWorkload = total[4].toString();
   }
 
-
+  // 需要新增总计
+  result.push(totalData);
   return result
 };
 const queryStageWorkload = async (client: GqlClient<object>, projectId: string) => {
@@ -396,7 +399,7 @@ const queryReviewDefect = async (client: GqlClient<object>, projectId: string) =
   return alaysisReviewDefect(data?.reviewDefect);
 };
 
-// 6 7 过程质量补充数据和服务
+// 6 过程质量补充数据
 const alaysisProcessQuality = (sourceData: any) => {
 
   if (!sourceData) {

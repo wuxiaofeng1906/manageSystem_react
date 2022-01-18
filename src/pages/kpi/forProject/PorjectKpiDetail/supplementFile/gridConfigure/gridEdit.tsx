@@ -80,16 +80,16 @@ const storyStabilityCellEdited = async (params: any, projectId: string) => {
       });
 
       return true;
-    } else {
-      message.error({
-        content: result,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-      return false;
     }
+    message.error({
+      content: result,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+    return false;
+
   }
 
   return false;
@@ -130,17 +130,17 @@ const stageWorkloadCellEdited = async (params: any, projectId: string) => {
       });
       return true;
 
-    } else {
-      message.error({
-        content: result,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
-      return false;
     }
+    message.error({
+      content: result,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+
+    return false;
+
   }
 
   return false;
@@ -168,23 +168,20 @@ const productRateCellEdited = async (params: any, projectId: string) => {
         },
       });
 
-
-      // 需要更新评审和缺陷的表格
-      //
-      // const newDatas = await queryReviewDefect(gqlClient, projectId);
-      //
-      // reviewDefectGridApi.current?.setRowData(newDatas);
-    } else {
-      message.error({
-        content: result,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      return true;
     }
+    message.error({
+      content: result,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+    return false;
+
   }
 
+  return false;
 };
 
 // 评审和缺陷

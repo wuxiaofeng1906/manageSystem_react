@@ -280,8 +280,13 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onProductRateGridReady}
-            onCellEditingStopped={(params: any) => {
-              return productRateCellEdited(params, projectId);
+            onCellEditingStopped={async (params: any) => {
+              const returnValue = await productRateCellEdited(params, projectId);
+              if (returnValue) {
+                // 需要更新本表格和（评审和缺陷）的表格
+                productRateGridApi.current?.setRowData(await queryProductRateload(gqlClient, projectId));
+                reviewDefectGridApi.current?.setRowData(await queryReviewDefect(gqlClient, projectId));
+              }
             }}
           >
           </AgGridReact>

@@ -5,27 +5,45 @@ const alaysisProcessData = (sourceData: any) => {
   if (!sourceData) {
     return [];
   }
-  const typeName = {
-    storyplan: "需求",
-    designplan: "概设&计划",
-    devplan: "开发",
-    testplan: "测试",
-    releaseplan: "发布",
-    projectplan: "项目计划"
-  };
+
+  const typeName = [
+    {type: "storyplan", name: "需求"},
+    {type: "designplan", name: "概设&计划"},
+    {type: "devplan", name: "开发"},
+    {type: "testplan", name: "测试"},
+    {type: "releaseplan", name: "发布"},
+    {type: "projectplan", name: "项目计划"}
+  ];
+
   const result: any = [];
 
-  sourceData.forEach((ele: any, index: number) => {
-    const newObject = ele;
-    const chineseName = typeName[ele["type"]];
-    newObject.milestone = chineseName;
-    if (index === 0) {
-      newObject.title = "1.进度";
-    } else {
-      newObject.title = "";
+  typeName.forEach((Types: any) => {
+    for (let index = 0; index < sourceData.length; index += 1) {
+      const datas = sourceData[index];
+      if (Types.type === datas.type) {
+        const newData = {
+          title: "",
+          milestone: Types.name,
+          planStart: datas.planStart,
+          planEnd: datas.planEnd,
+          actualStart: datas.actualStart,
+          actualEnd: datas.actualEnd,
+          days: datas.days,
+          ratio: datas.ratio,
+          memo: datas.memo,
+        };
+
+        if (index === 0) {
+          newData.title = "1.进度";
+        }
+
+        result.push(newData);
+        break;
+      }
     }
-    result.push(newObject);
+
   });
+
 
   return result;
 };
@@ -195,7 +213,6 @@ const queryStageWorkload = async (client: GqlClient<object>, projectId: string) 
   };
 }
 
-
 // 5评审和缺陷
 const alaysisReviewDefect = (sourceData: any) => {
   if (!sourceData) {
@@ -322,7 +339,6 @@ const queryReviewDefect = async (client: GqlClient<object>, projectId: string) =
   return alaysisReviewDefect(data?.reviewDefect);
 }
 
-
 // 6 7 过程质量补充数据和服务
 const alaysisProcessQuality = (sourceData: any) => {
 
@@ -435,7 +451,6 @@ const queryProcessQuality = async (client: GqlClient<object>, projectId: string)
   `);
   return alaysisProcessQuality(data?.processQuality);
 }
-
 
 // 数据查询
 const queryDatas = async (client: GqlClient<object>, projectId: string) => {

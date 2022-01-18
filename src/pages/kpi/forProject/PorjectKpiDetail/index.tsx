@@ -8,35 +8,30 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useGqlClient} from '@/hooks';
 import {
-  getProcessColumns,
-  getStoryStabilityColumns,
-  getStageWorkloadColumns,
-  getProductRateColumns,
-  getReviewDefectColumns,
-  getProcessQualityColumns
-} from './supplementFile/columns';
-import {queryDatas, queryReviewDefect, queryStageWorkload} from './supplementFile/dataOperate';
+  getProcessColumns, getStoryStabilityColumns, getStageWorkloadColumns,
+  getProductRateColumns, getReviewDefectColumns, getProcessQualityColumns
+} from './supplementFile/gridConfigure/columns';
 import {
-  setProcessCellStyle,
-  setStoryStabilityCellStyle,
-  setStageWorkloadCellStyle,
-  setProductRateCellStyle,
-  setReviewDefectCellStyle,
-  setProcessQualityCellStyle
-} from './supplementFile/gridStyles';
-import './supplementFile/styles.css';
+  processCellEdited,
+  storyStabilityCellEdited,
+  stageWorkloadCellEdited,
+  reviewDefectCellEdited,
+  productRateCellEdited,
+  pocessQualityCellEdited
+} from './supplementFile/gridConfigure/gridEdit';
+import {queryDatas, queryReviewDefect, queryStageWorkload} from './supplementFile/data/dataOperate';
+import {
+  setProcessCellStyle, setStoryStabilityCellStyle, setStageWorkloadCellStyle,
+  setProductRateCellStyle, setReviewDefectCellStyle, setProcessQualityCellStyle
+} from './supplementFile/style/gridStyles';
+import './supplementFile/style/styles.css';
 import {Button, message} from "antd";
 import {
-  getProcessHeaderStyle,
-  getStoryStabilityHeaderStyle,
-  getStageWorkloadHeaderStyle,
-  getProductRateHeaderStyle,
-  getReviewDefectHeaderStyle,
-  getProcessQualityHeaderStyle
-} from "./supplementFile/columsTitleRenderer";
-
-import {updateGridContent} from "./supplementFile/axiosRequest";
-import {CustomTooltip} from "./supplementFile/customTooltip"
+  getProcessHeaderStyle, getStoryStabilityHeaderStyle, getStageWorkloadHeaderStyle,
+  getProductRateHeaderStyle, getReviewDefectHeaderStyle, getProcessQualityHeaderStyle
+} from "./supplementFile/style/columsTitleRenderer";
+import {updateGridContent} from "./supplementFile/data/axiosRequest";
+import {CustomTooltip} from "./supplementFile/style/customTooltip"
 
 const WeekCodeTableList: React.FC<any> = (props: any) => {
   const projectId = props.location.query.id;
@@ -55,49 +50,6 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     if (loading) processGridApi.current.showLoadingOverlay();
     else processGridApi.current.hideOverlay();
   }
-
-  const processCellEdited = async (params: any) => {
-
-    // 有数据变化时再进行修改请求
-    if (params.newValue !== params.oldValue) {
-      const type = params.data?.milestone;
-      const correspondingField = {
-        "需求": "storyplan",
-        "概设&计划": "designplan",
-        "开发": "devplan",
-        "测试": "testplan",
-        "发布": "releaseplan",
-        "项目计划": "projectplan",
-      };
-      const newValues = {
-        "category": "progressDeviation",
-        "column": "memo",
-        "newValue": params.newValue,
-        "project": projectId,
-        "types": [correspondingField[type]]
-      };
-
-      const result = await updateGridContent(newValues);
-
-      if (!result) {
-        message.info({
-          content: "修改成功！",
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      } else {
-        message.error({
-          content: result,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      }
-    }
-  };
   /* endregion */
 
   /* region  需求稳定性 */
@@ -112,11 +64,6 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     else storyStabilityGridApi.current.hideOverlay();
   }
 
-  const storyStabilityCellEdited = (params: any) => {
-
-    console.log(params);
-
-  };
   /* endregion */
 
   /* region  阶段工作量 */
@@ -131,54 +78,6 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     else stageWorkloadGridApi.current.hideOverlay();
   }
 
-  const stageWorkloadCellEdited = async (params: any) => {
-
-    // 有数据变化时再进行修改请求
-    if (params.newValue !== params.oldValue) {
-      const type = params.data?.stage;
-      const correspondingField = {
-        "需求": "storyplan",
-        "概设&计划": "designplan",
-        "开发": "devplan",
-        "测试": "testplan",
-        "发布": "releaseplan",
-        "合计": "",
-      };
-
-      const newValues = {
-        "category": "stageWorkload",
-        "column": params.column?.colId,
-        "newValue": params.newValue,
-        "project": projectId,
-        "types": [correspondingField[type]]
-      };
-
-      const result = await updateGridContent(newValues);
-
-      if (!result) {
-        message.info({
-          content: "修改成功！",
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-
-        //   需要更新以下合计的数据
-        const datas = await queryStageWorkload(gqlClient, projectId);
-        stageWorkloadGridApi.current?.setRowData(datas.stageWorkload);
-      } else {
-        message.error({
-          content: result,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      }
-    }
-
-  };
   /* endregion */
 
   /* region  评审和缺陷 */
@@ -193,56 +92,6 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     else reviewDefectGridApi.current.hideOverlay();
   }
 
-  const reviewDefectCellEdited = async (params: any) => {
-    const type = params.data?.kind;
-
-    enum typeObject {
-      "需求预审" = 1, "需求评审", "UE评审", "概设评审", "详设评审",
-      "用例评审", "CodeReview", "提测演示", "集成测试", "系统测试",
-      "发布测试"
-    }
-
-    if (params.newValue !== params.oldValue) {
-
-      const newValues = {
-        "category": "reviewDefect",
-        "column": "",
-        "newValue": 0,
-        "project": projectId,
-        "types": [typeObject[type]]
-      };
-
-      if (params.column?.colId === "reviewHour") {
-        newValues.column = "extra";
-        newValues.newValue = params.newValue;
-      } else {
-        newValues.column = "cut";
-        newValues.newValue = params.newValue === "否" ? 0 : 1;
-      }
-
-
-      const result = await updateGridContent(newValues);
-
-      if (!result) {
-        message.info({
-          content: "修改成功！",
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      } else {
-        message.error({
-          content: result,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      }
-    }
-
-  };
   /* endregion */
 
   /* region  生产率 */
@@ -256,46 +105,6 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     if (loading) productRateGridApi.current.showLoadingOverlay();
     else productRateGridApi.current.hideOverlay();
   }
-
-  const productRateCellEdited = async (params: any) => {
-
-    if (params.newValue !== params.oldValue) {
-      const newValues = {
-        "category": "scaleProductivity",
-        "column": params.column?.colId,
-        "newValue": params.newValue,
-        "project": projectId,
-      };
-
-      const result = await updateGridContent(newValues);
-
-      if (!result) {
-        message.info({
-          content: "修改成功！",
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-
-
-        // 需要更新评审和缺陷的表格
-
-        const newDatas = await queryReviewDefect(gqlClient, projectId);
-
-        reviewDefectGridApi.current?.setRowData(newDatas);
-      } else {
-        message.error({
-          content: result,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      }
-    }
-
-  };
   /* endregion */
 
   /* region  6 过程质量补充数据和7.服务 */
@@ -309,48 +118,6 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     if (loading) processQualityGridApi.current.showLoadingOverlay();
     else processQualityGridApi.current.hideOverlay();
   }
-
-  const pocessQualityCellEdited = async (params: any) => {
-
-    const type = params.data?.kind;
-
-    enum typeObject {
-      "Bug解决时长" = 1, "Reopen率", "后端单元测试覆盖率", "Bug回归时长", "加权遗留缺陷", "加权遗留缺陷密度",
-      "前端单元测试覆盖率"
-    }
-
-    if (params.newValue !== params.oldValue) {
-
-      const newValues = {
-        "category": "processQuality",
-        "column": "cut",
-        "newValue": params.newValue === "否" ? 0 : 1,
-        "project": projectId,
-        "types": [typeObject[type]]
-      };
-
-      const result = await updateGridContent(newValues);
-
-      if (!result) {
-        message.info({
-          content: "修改成功！",
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      } else {
-        message.error({
-          content: result,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      }
-    }
-
-  };
   /* endregion */
 
   window.onresize = function () {
@@ -414,7 +181,9 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onProcessGridReady}
-            onCellEditingStopped={processCellEdited}
+            onCellEditingStopped={(params: any) => {
+              return processCellEdited(params, projectId);
+            }}
           >
           </AgGridReact>
         </div>
@@ -438,7 +207,9 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onStoryStabilityGridReady}
-            onCellEditingStopped={storyStabilityCellEdited}
+            onCellEditingStopped={(params: any) => {
+              return storyStabilityCellEdited(params, projectId);
+            }}
           >
           </AgGridReact>
         </div>
@@ -462,7 +233,9 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onStageWorkloadGridReady}
-            onCellEditingStopped={stageWorkloadCellEdited}
+            onCellEditingStopped={(params: any) => {
+              return stageWorkloadCellEdited(params, projectId);
+            }}
           >
           </AgGridReact>
         </div>
@@ -491,7 +264,9 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onProductRateGridReady}
-            onCellEditingStopped={productRateCellEdited}
+            onCellEditingStopped={(params: any) => {
+              return productRateCellEdited(params, projectId);
+            }}
           >
           </AgGridReact>
         </div>
@@ -515,12 +290,14 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onReviewDefectGridReady}
-            onCellEditingStopped={reviewDefectCellEdited}
+            onCellEditingStopped={(params: any) => {
+              return reviewDefectCellEdited(params, projectId);
+            }}
           >
           </AgGridReact>
         </div>
 
-        {/* 6 过程质量补充数据和7.服务 */}
+        {/* 6 过程质量补充数据 */}
         <div className="ag-theme-alpine" style={{height: 300, width: '100%'}}>
           <AgGridReact
             columnDefs={getProcessQualityColumns()} // 定义列
@@ -539,7 +316,9 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onPocessQualityGridReady}
-            onCellEditingStopped={pocessQualityCellEdited}
+            onCellEditingStopped={(params: any) => {
+              return pocessQualityCellEdited(params, projectId);
+            }}
           >
           </AgGridReact>
         </div>

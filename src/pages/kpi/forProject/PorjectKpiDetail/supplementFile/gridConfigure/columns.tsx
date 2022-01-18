@@ -579,7 +579,7 @@ const getServiceColumns = () => {
       minWidth: TYPE_LENGTH,
       maxWidth: TYPE_LENGTH,
       cellRenderer: (params: any) => {
-        return `<div style="font-weight: bold;margin-top: 8px">${params.value}</div>`
+        return `<div style="font-weight: bold;margin-top: 12px">${params.value}</div>`
       },
     },
     {
@@ -588,7 +588,7 @@ const getServiceColumns = () => {
       maxWidth: STAGE_LENGTH,
       minWidth: STAGE_LENGTH,
       cellRenderer: (params: any) => {
-        return `<div style="margin-top: 8px">${params.value} </div>`;
+        return `<div style="margin-top: 12px">${params.value} </div>`;
       }
     },
     {
@@ -612,7 +612,7 @@ const getServiceColumns = () => {
       maxWidth: 170,
       editable: true,
       cellRenderer: (params: any) => {
-        return `<div style="margin-top: 8px">${params.value} </div>`;
+        return `<div style="margin-top: 12px">${params.value} </div>`;
       }
     },
     {
@@ -622,7 +622,7 @@ const getServiceColumns = () => {
       maxWidth: 95,
       editable: true,
       cellRenderer: (params: any) => {
-        return `<div style="margin-top: 8px">${params.value} </div>`;
+        return `<div style="margin-top: 12px">${params.value} </div>`;
       }
     },
     {
@@ -632,7 +632,7 @@ const getServiceColumns = () => {
       maxWidth: 130,
       cellRenderer: (params: any) => {
         const values = (params.value).toFixed(2);
-        return `<div style="margin-top: 8px">${values}%</div>`;
+        return `<div style="margin-top: 12px">${values}%</div>`;
       }
     }
   ];

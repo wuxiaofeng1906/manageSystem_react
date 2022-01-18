@@ -278,7 +278,53 @@ const pocessQualityCellEdited = async (params: any, projectId: string) => {
 
 };
 
+// 服务
+const serviceCellEdited = async (params: any, projectId: string) => {
+
+  let columns = "";
+  if (params.column?.colId === "succN") { // 成功发布数据
+    columns = "kpi";
+  } else if (params.column?.colId === "totalN") {
+    columns = "extra";
+  }
+
+  if (params.newValue !== params.oldValue) {
+
+    const newValues = {
+      "category": "serviceAbout",
+      "column": columns,
+      "newValue": Number(params.newValue),
+      "project": projectId,
+      "types": [1]  // 1 - 一次发布成功率 -> 目前仅支持1的取值
+    };
+
+    const result = await updateGridContent(newValues);
+
+    if (!result) {
+      message.info({
+        content: "修改成功！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return true;
+    }
+    message.error({
+      content: result,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+    return false;
+
+  }
+
+  return false;
+};
 export {
   processCellEdited, storyStabilityCellEdited, stageWorkloadCellEdited, reviewDefectCellEdited,
-  productRateCellEdited, pocessQualityCellEdited
+  productRateCellEdited, pocessQualityCellEdited, serviceCellEdited
 }

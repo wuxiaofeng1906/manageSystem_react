@@ -14,7 +14,8 @@ import {
 } from './supplementFile/gridConfigure/columns';
 import {
   processCellEdited, storyStabilityCellEdited, stageWorkloadCellEdited,
-  reviewDefectCellEdited, productRateCellEdited, pocessQualityCellEdited
+  reviewDefectCellEdited, productRateCellEdited, pocessQualityCellEdited,
+  serviceCellEdited
 } from './supplementFile/gridConfigure/gridEdit';
 import {
   queryProcessData, queryStoryStability, queryStageWorkload,
@@ -337,7 +338,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         </div>
 
         {/* 6 过程质量补充数据 */}
-        <div className="ag-theme-alpine" style={{height: 263, width: '100%'}}>
+        <div className="ag-theme-alpine" style={{height: 283, width: '100%'}}>
           <AgGridReact
             columnDefs={getProcessQualityColumns()} // 定义列
             rowData={processQuality?.data} // 数据绑定
@@ -363,7 +364,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         </div>
 
         {/* 7 服务 */}
-        <div className="ag-theme-alpine" style={{height: 80, width: '100%'}}>
+        <div className="ag-theme-alpine" style={{height: 90, width: '100%'}}>
           <AgGridReact
             columnDefs={getServiceColumns()} // 定义列
             rowData={serviceData?.data} // 数据绑定
@@ -383,12 +384,14 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
               }
               return 32;
             }}
-            // rowHeight={32}
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onServiceGridReady}
-            onCellEditingStopped={(params: any) => {
-              // return pocessQualityCellEdited(params, projectId);
+            onCellEditingStopped={async (params: any) => {
+              const resultValue = await serviceCellEdited(params, projectId);
+              if (resultValue) {
+                serviceGridApi.current?.setRowData(await queryServices(gqlClient, projectId))
+              }
             }}
           >
           </AgGridReact>

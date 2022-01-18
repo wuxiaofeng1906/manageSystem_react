@@ -1754,12 +1754,14 @@ const PreRelease: React.FC<any> = () => {
       let checkType = "";
       let logUrl = "";
 
+
       values.forEach((ele: any) => {
         if (ele.check_time === type) {  // 如果是1 ，则代表是上线前检查,如果是2 ，则代表是上线后检查
-          checkType = ele.check_type;
-          logUrl = ele.check_log_url;
-          // 解析结果和颜色
-          if (ele.check_status === "1") {
+          // // 解析结果和颜色：需要判断是否忽略，是的话显示忽略，否的话继续显示状态
+          if (ele.ignore_check === "1") {
+            value = "忽略";
+            Color = "blue";
+          } else if (ele.check_status === "1") {
             value = "未开始";
           } else if (ele.check_status === "2") {
             value = "检查中";
@@ -1769,6 +1771,8 @@ const PreRelease: React.FC<any> = () => {
             Color = "#2BF541";
           }
 
+          checkType = ele.check_type;
+          logUrl = ele.check_log_url;
           // 解析时间
           let start = "";
           if (ele.check_start_time) {

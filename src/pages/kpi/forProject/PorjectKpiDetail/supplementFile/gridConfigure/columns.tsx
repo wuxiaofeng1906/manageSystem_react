@@ -134,20 +134,29 @@ const getStoryStabilityColumns = () => {
     },
     {
       headerName: '预计工时',
-      field: 'planTime',
+      field: 'planHours',
       editable: true,
       cellRenderer: manualInput_red
     },
     {
       headerName: '变更工时',
-      field: 'updateTime',
+      field: 'stableHours',
       editable: true,
       cellRenderer: manualInput_red
 
     },
     {
       headerName: '变更率',
-      field: 'updateRate',
+      field: 'ratio',
+      valueFormatter: (params: any) => {
+        if (params.value === null) {
+          return "";
+        }
+        if (params.value === 0) {
+          return 0;
+        }
+        return `${Number(params.value).toFixed(4)}`
+      }
     }
   ];
 

@@ -24,7 +24,7 @@ const setProcessCellStyle = (params: any) => {
 
 // 2.需求稳定性
 const setStoryStabilityCellStyle = (params: any) => {
-  if (params.column?.colId === "updateRate" || params.column?.colId === "title" || params.column?.colId === "stage") {
+  if (params.column?.colId === "ratio" || params.column?.colId === "title" || params.column?.colId === "stage") {
     return grayCellStyle;
   }
   return whiteCellStyle;

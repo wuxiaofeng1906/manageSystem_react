@@ -46,10 +46,53 @@ const processCellEdited = async (params: any, projectId: string) => {
 };
 
 // 需求稳定性编辑
-const storyStabilityCellEdited = (params: any, projectId: string) => {
+const storyStabilityCellEdited = async (params: any, projectId: string) => {
 
-  console.log(params, projectId);
+  // 有数据变化时再进行修改请求
+  if ((params.newValue).toString() !== (params.oldValue).toString()) {
+    const type = params.data?.stage;
 
+    const typeValue = {"项目周期": 0, "开发": 3, "测试": 4, "发布": 5};
+
+    let columID = "";
+    if (params.column.colId === "planHours") { // 预计工时
+      columID = "kpi"
+    } else if (params.column.colId === "stableHours") { // 变更工时
+      columID = "extra"
+    }
+    const newValues = {
+      "category": "storyStable",
+      "column": columID,
+      "newValue": Number(params.newValue),
+      "project": projectId,
+      "types": [typeValue[type]]
+    };
+
+    const result = await updateGridContent(newValues);
+
+    if (!result) {
+      message.info({
+        content: "修改成功！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return true;
+    } else {
+      message.error({
+        content: result,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return false;
+    }
+  }
+
+  return false;
 };
 
 // 阶段工作量

@@ -12,20 +12,19 @@ import {
   getProductRateColumns, getReviewDefectColumns, getProcessQualityColumns
 } from './supplementFile/gridConfigure/columns';
 import {
-  processCellEdited,
-  storyStabilityCellEdited,
-  stageWorkloadCellEdited,
-  reviewDefectCellEdited,
-  productRateCellEdited,
-  pocessQualityCellEdited
+  processCellEdited, storyStabilityCellEdited, stageWorkloadCellEdited,
+  reviewDefectCellEdited, productRateCellEdited, pocessQualityCellEdited
 } from './supplementFile/gridConfigure/gridEdit';
-import {queryDatas, queryReviewDefect, queryStageWorkload} from './supplementFile/data/dataOperate';
+import {
+  queryProcessData, queryStoryStability, queryStageWorkload,
+  queryProductRateload, queryReviewDefect, queryProcessQuality
+} from './supplementFile/data/dataOperate';
 import {
   setProcessCellStyle, setStoryStabilityCellStyle, setStageWorkloadCellStyle,
   setProductRateCellStyle, setReviewDefectCellStyle, setProcessQualityCellStyle
 } from './supplementFile/style/gridStyles';
 import './supplementFile/style/styles.css';
-import {Button, message} from "antd";
+import {Button} from "antd";
 import {
   getProcessHeaderStyle, getStoryStabilityHeaderStyle, getStageWorkloadHeaderStyle,
   getProductRateHeaderStyle, getReviewDefectHeaderStyle, getProcessQualityHeaderStyle
@@ -37,9 +36,9 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
   const projectId = props.location.query.id;
 
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryDatas(gqlClient, projectId),);
 
   /* region  进度指标 */
+  const processData = useRequest(() => queryProcessData(gqlClient, projectId));
   const processGridApi = useRef<GridApi>();
 
   const onProcessGridReady = (params: GridReadyEvent) => {
@@ -47,12 +46,14 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     params.api.sizeColumnsToFit();
   };
   if (processGridApi.current) {
-    if (loading) processGridApi.current.showLoadingOverlay();
+    if (processData.loading) processGridApi.current.showLoadingOverlay();
     else processGridApi.current.hideOverlay();
   }
   /* endregion */
 
   /* region  需求稳定性 */
+  const storyStableData = useRequest(() => queryStoryStability(gqlClient, projectId));
+
   const storyStabilityGridApi = useRef<GridApi>();
 
   const onStoryStabilityGridReady = (params: GridReadyEvent) => {
@@ -60,13 +61,14 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     params.api.sizeColumnsToFit();
   };
   if (storyStabilityGridApi.current) {
-    if (loading) storyStabilityGridApi.current.showLoadingOverlay();
+    if (storyStableData.loading) storyStabilityGridApi.current.showLoadingOverlay();
     else storyStabilityGridApi.current.hideOverlay();
   }
 
   /* endregion */
 
   /* region  阶段工作量 */
+  const stageWorkCount = useRequest(() => queryStageWorkload(gqlClient, projectId));
   const stageWorkloadGridApi = useRef<GridApi>();
 
   const onStageWorkloadGridReady = (params: GridReadyEvent) => {
@@ -74,13 +76,15 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     params.api.sizeColumnsToFit();
   };
   if (stageWorkloadGridApi.current) {
-    if (loading) stageWorkloadGridApi.current.showLoadingOverlay();
+    if (stageWorkCount.loading) stageWorkloadGridApi.current.showLoadingOverlay();
     else stageWorkloadGridApi.current.hideOverlay();
   }
 
   /* endregion */
 
   /* region  评审和缺陷 */
+  const reviewDefect = useRequest(() => queryReviewDefect(gqlClient, projectId));
+
   const reviewDefectGridApi = useRef<GridApi>();
 
   const onReviewDefectGridReady = (params: GridReadyEvent) => {
@@ -88,13 +92,15 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     params.api.sizeColumnsToFit();
   };
   if (reviewDefectGridApi.current) {
-    if (loading) reviewDefectGridApi.current.showLoadingOverlay();
+    if (reviewDefect.loading) reviewDefectGridApi.current.showLoadingOverlay();
     else reviewDefectGridApi.current.hideOverlay();
   }
 
   /* endregion */
 
   /* region  生产率 */
+  const productRate = useRequest(() => queryProductRateload(gqlClient, projectId));
+
   const productRateGridApi = useRef<GridApi>();
 
   const onProductRateGridReady = (params: GridReadyEvent) => {
@@ -102,20 +108,20 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     params.api.sizeColumnsToFit();
   };
   if (productRateGridApi.current) {
-    if (loading) productRateGridApi.current.showLoadingOverlay();
+    if (productRate.loading) productRateGridApi.current.showLoadingOverlay();
     else productRateGridApi.current.hideOverlay();
   }
   /* endregion */
 
   /* region  6 过程质量补充数据和7.服务 */
+  const processQuality = useRequest(() => queryProcessQuality(gqlClient, projectId));
   const processQualityGridApi = useRef<GridApi>();
-
   const onPocessQualityGridReady = (params: GridReadyEvent) => {
     processQualityGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
   if (processQualityGridApi.current) {
-    if (loading) processQualityGridApi.current.showLoadingOverlay();
+    if (processQuality.loading) processQualityGridApi.current.showLoadingOverlay();
     else processQualityGridApi.current.hideOverlay();
   }
   /* endregion */
@@ -164,7 +170,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         <div className="ag-theme-alpine" style={{height: 250, width: '100%'}}>
           <AgGridReact
             columnDefs={getProcessColumns()} // 定义列
-            rowData={data?.process} // 数据绑定
+            rowData={processData?.data} // 数据绑定
             defaultColDef={{
               resizable: true,
               sortable: true,
@@ -192,7 +198,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         <div className="ag-theme-alpine" style={{height: 190, width: '100%'}}>
           <AgGridReact
             columnDefs={getStoryStabilityColumns()} // 定义列
-            rowData={data?.storyStability} // 数据绑定
+            rowData={storyStableData?.data} // 数据绑定
             defaultColDef={{
               resizable: true,
               sortable: true,
@@ -207,8 +213,13 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onStoryStabilityGridReady}
-            onCellEditingStopped={(params: any) => {
-              return storyStabilityCellEdited(params, projectId);
+            onCellEditingStopped={async (params: any) => {
+              const result = await storyStabilityCellEdited(params, projectId);
+              if (result) {
+                //  刷新表格
+                const gridData = await queryStoryStability(gqlClient, projectId);
+                storyStabilityGridApi.current?.setRowData(gridData);
+              }
             }}
           >
           </AgGridReact>
@@ -218,7 +229,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         <div className="ag-theme-alpine" style={{height: 250, width: '100%'}}>
           <AgGridReact
             columnDefs={getStageWorkloadColumns()} // 定义列
-            rowData={data?.stageWorkload} // 数据绑定
+            rowData={stageWorkCount?.data} // 数据绑定
             defaultColDef={{
               resizable: true,
               sortable: true,
@@ -244,7 +255,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         <div className="ag-theme-alpine" style={{height: 140, width: '100%'}}>
           <AgGridReact
             columnDefs={getProductRateColumns()} // 定义列
-            rowData={data?.productRate} // 数据绑定
+            rowData={productRate?.data} // 数据绑定
             defaultColDef={{
               resizable: true,
               sortable: true,
@@ -275,7 +286,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         <div className="ag-theme-alpine" style={{height: 440, width: '100%'}}>
           <AgGridReact
             columnDefs={getReviewDefectColumns()} // 定义列
-            rowData={data?.reviewDefect} // 数据绑定
+            rowData={reviewDefect?.data} // 数据绑定
             defaultColDef={{
               resizable: true,
               sortable: true,
@@ -301,7 +312,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         <div className="ag-theme-alpine" style={{height: 300, width: '100%'}}>
           <AgGridReact
             columnDefs={getProcessQualityColumns()} // 定义列
-            rowData={data?.processQuality} // 数据绑定
+            rowData={processQuality?.data} // 数据绑定
             defaultColDef={{
               resizable: true,
               sortable: true,
@@ -323,7 +334,6 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
           </AgGridReact>
         </div>
       </div>
-
 
     </PageContainer>
   );

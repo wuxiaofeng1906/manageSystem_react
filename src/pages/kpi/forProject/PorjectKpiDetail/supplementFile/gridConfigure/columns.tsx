@@ -175,15 +175,15 @@ const manualInput = (params: any) => {
   }
 
   // 判断合计中，是否有对人工进行修改
-  if (params.data?.stage === "合计") {
-
-    if ((params.column?.colId === "manpower" && params.data?.manpowerFlag === "true") ||
-      (params.column?.colId === "planHours" && params.data?.planHoursFlag === "true") ||
-      (params.column?.colId === "actualHours" && params.data?.actualHoursFlag === "true")) {
-      return `<div style="font-weight: bold;font-style: italic ;text-align: center">${params.value}</div>`;
-
-    }
-  }
+  // if (params.data?.stage === "合计") {
+  //
+  //   if ((params.column?.colId === "manpower" && params.data?.manpowerFlag === "true") ||
+  //     (params.column?.colId === "planHours" && params.data?.planHoursFlag === "true") ||
+  //     (params.column?.colId === "actualHours" && params.data?.actualHoursFlag === "true")) {
+  //     return `<div style="font-weight: bold;font-style: italic ;text-align: center">${params.value}</div>`;
+  //
+  //   }
+  // }
   return params.value;
 };
 
@@ -220,7 +220,7 @@ const getStageWorkloadColumns = () => {
       minWidth: STAGE_LENGTH
     },
     {
-      headerName: '投入人数',
+      headerName: '投入人力',
       field: 'manpower',
       editable: true,
       cellRenderer: manualInput

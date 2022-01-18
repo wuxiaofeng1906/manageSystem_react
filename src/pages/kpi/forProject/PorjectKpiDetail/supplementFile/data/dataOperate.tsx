@@ -136,7 +136,7 @@ const queryStoryStability = async (client: GqlClient<object>, projectId: string)
 // 3.阶段工作量
 const alaysisStageWorkload = (sourceData: any) => {
 
-  if (!sourceData?.stageWorkload) {
+  if (!sourceData || !sourceData?.stageWorkload) {
     return [];
   }
 
@@ -145,32 +145,45 @@ const alaysisStageWorkload = (sourceData: any) => {
     return [];
   }
 
-  const typeName = {
-    storyplan: "需求",
-    designplan: "概设&计划",
-    devplan: "开发",
-    testplan: "测试",
-    releaseplan: "发布",
-    projectplan: "项目计划"
-  };
+  const typeName = [
+    {type: "storyplan", name: "需求"},
+    {type: "designplan", name: "概设&计划"},
+    {type: "devplan", name: "开发"},
+    {type: "testplan", name: "测试"},
+    {type: "releaseplan", name: "发布"},
+  ];
 
   const result: any = [];
-  stageWorkloadData.forEach((ele: any, index: number) => {
-    const types = ele["type"];
-    if (types) {
-      const newObject = ele;
-      const chineseName = typeName[types];
-      if (chineseName !== "项目计划") {  // 这个数据是没有项目计划的
-        newObject.stage = chineseName;
-        if (index === 0) {
-          newObject.title = "3.阶段工作量（单位：人天）";
-        } else {
-          newObject.title = "";
-        }
-        result.push(newObject);
-      }
+  typeName.forEach((Types: any, i: number) => {
+    const newData = {
+      title: "",
+      stage: Types.name,
+      manpower: "",
+      planHours: "",
+      actualHours: "",
+      planWorkload: "",
+      actualWorkload: ""
+    };
+
+    if (i === 0) {
+      newData.title = "3.阶段工作量（单位：人天）";
     }
+
+    for (let index = 0; index < stageWorkloadData.length; index += 1) {
+      const datas = stageWorkloadData[index];
+      if (Types.type === datas.type) {
+        newData.manpower = datas.manpower;
+        newData.planHours = datas.planHours;
+        newData.actualHours = datas.actualHours;
+        newData.planWorkload = datas.planWorkload;
+        newData.actualWorkload = datas.actualWorkload;
+        break;
+      }
+
+    }
+    result.push(newData);
   });
+
 
   if (sourceData.totalSW) {
     const total = sourceData.totalSW;
@@ -178,12 +191,9 @@ const alaysisStageWorkload = (sourceData: any) => {
     result.push({
       title: "",
       stage: "合计",
-      manpower: Math.abs(total[0]),
-      manpowerFlag: Number(total[0]) > 0 ? "false" : "true",
+      manpower: total[0],
       planHours: total[1],
-      planHoursFlag: Number(total[1]) > 0 ? "false" : "true",
       actualHours: total[2],
-      actualHoursFlag: Number(total[2]) > 0 ? "false" : "true",
       planWorkload: total[3],
       actualWorkload: total[4],
     });
@@ -498,21 +508,6 @@ const queryProcessQuality = async (client: GqlClient<object>, projectId: string)
   `);
   return alaysisProcessQuality(data?.processQuality);
 };
-
-// // 数据查询
-// const queryDatas = async (client: GqlClient<object>, projectId: string) => {
-//
-//   const datas = {
-//     // process: await queryProcessData(client, projectId),  // 1.速度
-//     // storyStability: await queryStoryStability(client, projectId), // 2.需求稳定性
-//     // stageWorkload: (await queryStageWorkload(client, projectId)).stageWorkload, // 3.阶段工作量
-//     // productRate: (await queryStageWorkload(client, projectId)).productRate, // 4.生产率
-//     // reviewDefect: await queryReviewDefect(client, projectId),  // 5.评审和缺陷
-//     // processQuality: await queryProcessQuality(client, projectId) // 6 过程质量补充数据和服务
-//   };
-//   return datas;
-// };
-
 
 export {
   queryProcessData,

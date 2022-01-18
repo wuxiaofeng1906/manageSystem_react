@@ -128,10 +128,8 @@ const stageWorkloadCellEdited = async (params: any, projectId: string) => {
           marginTop: '50vh',
         },
       });
+      return true;
 
-      // //   需要更新以下合计的数据
-      // const datas = await queryStageWorkload(gqlClient, projectId);
-      // stageWorkloadGridApi.current?.setRowData(datas.stageWorkload);
     } else {
       message.error({
         content: result,
@@ -140,9 +138,12 @@ const stageWorkloadCellEdited = async (params: any, projectId: string) => {
           marginTop: '50vh',
         },
       });
+
+      return false;
     }
   }
 
+  return false;
 };
 
 // 生产率

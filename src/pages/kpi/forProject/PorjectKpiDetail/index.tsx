@@ -244,8 +244,13 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onStageWorkloadGridReady}
-            onCellEditingStopped={(params: any) => {
-              return stageWorkloadCellEdited(params, projectId);
+            onCellEditingStopped={async (params: any) => {
+              const returnValue = await stageWorkloadCellEdited(params, projectId);
+              if (returnValue) {
+                //  需要更新以下合计的数据
+                const datas = await queryStageWorkload(gqlClient, projectId);
+                stageWorkloadGridApi.current?.setRowData(datas);
+              }
             }}
           >
           </AgGridReact>

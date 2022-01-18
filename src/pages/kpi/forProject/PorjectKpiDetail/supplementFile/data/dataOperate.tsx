@@ -275,99 +275,61 @@ const queryProductRateload = async (client: GqlClient<object>, projectId: string
 
 // 5评审和缺陷
 const alaysisReviewDefect = (sourceData: any) => {
+
   if (!sourceData) {
     return [];
   }
+
+  const typeName = ["需求预审", "需求评审", "UE预审", "UE评审", "UI预审", "UI评审", "概设评审", "详设评审", "用例评审", "CodeReview",
+    "提测演示", "开发联调", "系统测试", "发布测试"];
+
+  const result: any = [];
 
   const total = {
     foundDN: 0,
     weightDN: 0,
     funcPoint: 0
-  }
+  };
 
-  const result: any = [
-    {
-      title: "5.评审和缺陷",
-      kind: "需求预审",
-    },
-    {
-      kind: "需求评审",
-    },
-    {
-      kind: "UE评审",
-    },
-    {
-      kind: "概设评审",
-    },
-    {
-      kind: "详设评审",
-    },
-    {
-      kind: "用例评审",
-    },
-    {
-      kind: "CodeReview",
-    },
-    {
-      kind: "提测演示",
-    },
-    {
-      kind: "集成测试",
-    },
-    {
-      kind: "系统测试",
-    },
-    {
-      kind: "发布测试",
+  typeName.forEach((Types: any, i: number) => {
+    const newData = {
+      title: "",
+      kind: Types,
+      cut: "",
+      foundDN: "",
+      weightDN: "",
+      funcPoint: "",
+      defectDensity: "",
+      reviewHour: "",
+      reviewRatio: ""
+    };
+
+    if (i === 0) {
+      newData.title = "5.评审和缺陷";
     }
+    for (let index = 0; index < sourceData.length; index += 1) {
+      const datas = sourceData[index];
+      if (Types === datas.kind) {
+        newData.cut = datas.cut;
+        newData.foundDN = datas.foundDN;
+        newData.weightDN = datas.weightDN;
+        newData.funcPoint = datas.funcPoint;
+        newData.defectDensity = datas.defectDensity;
+        newData.reviewHour = datas.reviewHour;
+        newData.reviewRatio = datas.reviewRatio;
 
-  ];
-  sourceData.forEach((ele: any) => {
-    const newObject = ele;
-    switch (newObject.kind) {
-      case "需求预审":
-        newObject.title = "5.评审和缺陷";
-        result[0] = newObject
+        // 合计的计算
+        total.foundDN += datas.foundDN;
+        total.weightDN += datas.weightDN;
+        total.funcPoint = datas.funcPoint;
+
         break;
-      case "需求评审":
-        result[1] = newObject
-        break;
-      case "UE评审":
-        result[2] = newObject
-        break;
-      case "概设评审":
-        result[3] = newObject
-        break;
-      case "详设评审":
-        result[4] = newObject
-        break;
-      case "用例评审":
-        result[5] = newObject
-        break;
-      case "CodeReview":
-        result[6] = newObject
-        break;
-      case "提测演示":
-        result[7] = newObject
-        break;
-      case "集成测试":
-        result[8] = newObject
-        break;
-      case "系统测试":
-        result[9] = newObject
-        break;
-      case "发布测试":
-        result[10] = newObject
-        break;
-      default:
-        break;
+      }
+
     }
-
-    // 合计的计算
-    total.foundDN += newObject.foundDN;
-    total.weightDN += newObject.weightDN;
-    total.funcPoint = newObject.funcPoint;
+    result.push(newData);
   });
+
 
   result.push({
     kind: "合计",

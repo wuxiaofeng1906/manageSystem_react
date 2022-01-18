@@ -335,9 +335,8 @@ const getProductRateColumns = () => {
 
 /* region 5.评审和缺陷 */
 
-
 const defectHourEditRenderer = (params: any) => {
-  if (params.data?.kind === "提测演示" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
+  if (params.data?.kind === "提测演示" || params.data?.kind === "开发联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
     return false;
   }
   return true;
@@ -361,7 +360,7 @@ const getReviewDefectColumns = () => {
       rowSpan: (params: any) => {
 
         if (params.data.title === '5.评审和缺陷') {
-          return 12;
+          return 15;
         }
         return 1;
       }
@@ -388,7 +387,7 @@ const getReviewDefectColumns = () => {
         if (params.data?.kind === "合计") {
           return "-";
         }
-        if (params.value === null || params.value === undefined) {
+        if (params.value === null || params.value === undefined || params.value === "") {
           return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
         }
 
@@ -425,7 +424,7 @@ const getReviewDefectColumns = () => {
       headerName: '评审用时',
       field: 'reviewHour',
       cellRenderer: (params: any) => {
-        if (params.data?.kind === "提测演示" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
+        if (params.data?.kind === "提测演示" || params.data?.kind === "开发联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
           // return `<div style="text-align: center">-</div>`;
           return "-";
         }
@@ -438,7 +437,7 @@ const getReviewDefectColumns = () => {
       headerName: '评审效率',
       field: 'reviewRatio',
       cellRenderer: (params: any) => {
-        if (params.data?.kind === "提测演示" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
+        if (params.data?.kind === "提测演示" || params.data?.kind === "开发联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
           return "-";
         }
         return Number(params.value).toFixed(2);
@@ -521,7 +520,7 @@ const getProcessQualityColumns = () => {
         if (params.data?.kind === "合计") {
           return "-";
         }
-        if (params.value === null || params.value === undefined) {
+        if (params.value === null || params.value === undefined || params.value === "") {
           return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
         }
 

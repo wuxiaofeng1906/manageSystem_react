@@ -417,13 +417,6 @@ const alaysisProcessQuality = (sourceData: any) => {
     kind: "加权遗留缺陷密度",
     baseline: "-",
     realValue: sourceData.weightedLegacyDI?.actualValue,
-  }, {
-    title: "7.服务",
-    module: "及时交付",
-    cut: null,
-    kind: " 一次发布成功率",
-    baseline: "-",
-    realValue: ""
   }];
 
   return result;

@@ -2,7 +2,7 @@
  * @Description: 数据列表
  * @Author: jieTan
  * @Date: 2021-11-22 10:55:42
- * @LastEditTime: 2022-01-10 07:05:44
+ * @LastEditTime: 2022-01-18 06:47:26
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -18,6 +18,7 @@ import NumberToFixedColumn from './renders/NumberToFixedColumn';
 import DurationColumn from './renders/DurationColumn';
 import { Spin } from 'antd';
 import { useEffect } from 'react';
+import ManualEntryColumn from './renders/ManualEntryColumn';
 
 /*  */
 export default () => {
@@ -44,6 +45,7 @@ export default () => {
               projStatus: ProjStatusColumn,
               duration: DurationColumn,
               numToFixed: NumberToFixedColumn,
+              manualEntry: ManualEntryColumn,
             }}
             defaultColDef={{ resizable: true }}
             // stopEditingWhenCellsLoseFocus={true}

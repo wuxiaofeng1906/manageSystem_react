@@ -2,7 +2,7 @@
  * @Description: 通用常量
  * @Author: jieTan
  * @Date: 2021-11-23 15:51:13
- * @LastEditTime: 2022-01-07 07:27:22
+ * @LastEditTime: 2022-01-18 06:57:11
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -21,6 +21,13 @@ export const HOUR = {
   value: 3600,
   unit: 'H',
   zh: '小时',
+};
+// 手动录入单元的默认属性
+export const MANUAL_CELL = {
+  text: '手工录入', //提示文本
+  numberColor: '#ff0000', // 数字文本颜色
+  color: '#bfbfbf', // 默认文本颜色
+  fontStyle: 'italic', //斜体
 };
 // 相对于“秒”的时间 => D
 export const DAY = {

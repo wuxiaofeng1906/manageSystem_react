@@ -2,7 +2,7 @@
  * @Description: 项目基本信息字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:44:08
- * @LastEditTime: 2021-12-23 02:53:22
+ * @LastEditTime: 2022-01-18 07:05:22
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -70,7 +70,7 @@ export const TableMajorCols: ColDef[] = [
     field: 'project.branch',
     filter: true,
     editable: true,
-    valueFormatter: (params) => (params.value ? params.value : DEFAULT_PLACEHOLDER),
+    cellRenderer: 'manualEntry',
     valueSetter: (params) => pkEditValueSetter('branch', params),
     ...stringF,
   },

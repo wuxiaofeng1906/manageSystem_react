@@ -274,7 +274,8 @@ const queryProductRateload = async (client: GqlClient<object>, projectId: string
 };
 
 // 5评审和缺陷
-const alaysisReviewDefect = (sourceData: any) => {
+const alaysisReviewDefect = (sourceData: any, totalData: any) => {
+  debugger;
 
   if (!sourceData) {
     return [];
@@ -284,12 +285,6 @@ const alaysisReviewDefect = (sourceData: any) => {
     "提测演示", "开发联调", "系统测试", "发布测试"];
 
   const result: any = [];
-
-  const total = {
-    foundDN: 0,
-    weightDN: 0,
-    funcPoint: 0
-  };
 
   typeName.forEach((Types: any, i: number) => {
     const newData = {
@@ -317,12 +312,6 @@ const alaysisReviewDefect = (sourceData: any) => {
         newData.defectDensity = datas.defectDensity;
         newData.reviewHour = datas.reviewHour;
         newData.reviewRatio = datas.reviewRatio;
-
-        // 合计的计算
-        total.foundDN += datas.foundDN;
-        total.weightDN += datas.weightDN;
-        total.funcPoint = datas.funcPoint;
-
         break;
       }
 
@@ -330,16 +319,25 @@ const alaysisReviewDefect = (sourceData: any) => {
     result.push(newData);
   });
 
+  if (!totalData || totalData.length === 0) {
+    result.push({
+      kind: "合计",
+      foundDN: "",
+      weightDN: "",
+      funcPoint: "",
+      defectDensity: ""
+    });
+  } else {
+    result.push({
+      kind: "合计",
+      foundDN: totalData[0],
+      weightDN: totalData[1].toFixed(2),
+      funcPoint: totalData[2],
+      defectDensity: totalData[3].toFixed(2)
+    });
+  }
 
-  result.push({
-    kind: "合计",
-    foundDN: total.foundDN,  // ①-⑪求和
-    weightDN: total.weightDN,  // ①-⑪求和
-    funcPoint: total.funcPoint,  // 跟上面的功能点值一样
-    defectDensity: total.weightDN / total.funcPoint // 总计的加权有效缺陷数/总计的功能点。
-  })
   return result;
-
 };
 const queryReviewDefect = async (client: GqlClient<object>, projectId: string) => {
   const {data} = await client.query(`
@@ -355,10 +353,11 @@ const queryReviewDefect = async (client: GqlClient<object>, projectId: string) =
             reviewHour
             reviewRatio
           }
+          reviewDefectTotal(pId:${Number(projectId)})
       }
   `);
 
-  return alaysisReviewDefect(data?.reviewDefect);
+  return alaysisReviewDefect(data?.reviewDefect, data?.reviewDefectTotal);
 };
 
 // 6 过程质量补充数据

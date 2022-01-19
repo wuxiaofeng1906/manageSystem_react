@@ -467,12 +467,20 @@ const queryProcessQuality = async (client: GqlClient<object>, projectId: string)
   return alaysisProcessQuality(data?.processQuality);
 };
 
-// 6 过程质量补充数据
+// 7 服务
 const alaysisService = (sourceData: any) => {
 
-  if (!sourceData) {
-    return [];
+  if (!sourceData || sourceData.length === 0) {
+    return [{
+      title: "7.服务",
+      module: "及时交付",
+      item: "一次发布成功率",
+      succN: "",
+      totalN: "",
+      ratio: ""
+    }];
   }
+
   const datas = sourceData[0];
   const result = [{
     title: "7.服务",

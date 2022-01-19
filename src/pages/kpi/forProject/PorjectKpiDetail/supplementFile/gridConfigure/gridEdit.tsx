@@ -253,16 +253,40 @@ const productRateCellEdited = async (params: any, projectId: string) => {
 // 评审和缺陷
 const reviewDefectCellEdited = async (params: any, projectId: string) => {
 
+  if (params.column?.colId !== "cut") {
+    if (!params.newValue || (params.newValue).trim() === "") {
+      message.error({
+        content: "请输入正确的数字！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return true;
+    }
 
-  const type = params.data?.kind;
+    if ((Number(params.newValue)).toString() === "NaN") {
+      message.error({
+        content: "请输入正确的数字！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return true;
+    }
+  }
 
-  enum typeObject {
-    "需求预审" = 1, "需求评审", "UE评审", "概设评审", "详设评审",
-    "用例评审", "CodeReview", "提测演示", "开发联调", "系统测试",
-    "发布测试", "UE预审", "UI预审", "UI评审"
-  };
 
   if (params.newValue !== params.oldValue) {
+
+    const type = params.data?.kind;
+
+    enum typeObject {
+      "需求预审" = 1, "需求评审", "UE评审", "概设评审", "详设评审",
+      "用例评审", "CodeReview", "提测演示", "开发联调", "系统测试",
+      "发布测试", "UE预审", "UI预审", "UI评审"
+    };
 
     const newValues = {
       "category": "reviewDefect",
@@ -290,17 +314,22 @@ const reviewDefectCellEdited = async (params: any, projectId: string) => {
           marginTop: '50vh',
         },
       });
-    } else {
-      message.error({
-        content: result,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+
+      return true
     }
+    message.error({
+      content: result,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+
+    return false
+
   }
 
+  return false;
 };
 
 // 过程质量

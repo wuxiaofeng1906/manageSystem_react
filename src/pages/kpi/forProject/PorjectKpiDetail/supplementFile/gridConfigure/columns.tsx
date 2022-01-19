@@ -631,8 +631,12 @@ const getServiceColumns = () => {
       minWidth: 130,
       maxWidth: 130,
       cellRenderer: (params: any) => {
-        const values = (params.value).toFixed(2);
-        return `<div style="margin-top: 12px">${values}%</div>`;
+
+        if (params.value) {
+          const values = (params.value).toFixed(2);
+          return `<div style="margin-top: 12px">${values}%</div>`;
+        }
+        return params.value;
       }
     }
   ];

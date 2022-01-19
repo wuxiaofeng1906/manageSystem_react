@@ -329,8 +329,11 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onReviewDefectGridReady}
-            onCellEditingStopped={(params: any) => {
-              return reviewDefectCellEdited(params, projectId);
+            onCellEditingStopped={async (params: any) => {
+              const returnValue = await reviewDefectCellEdited(params, projectId);
+              if (returnValue) {
+                reviewDefectGridApi.current?.setRowData(await queryReviewDefect(gqlClient, projectId))
+              }
             }}
           >
           </AgGridReact>

@@ -197,8 +197,8 @@ const alaysisStageWorkload = (sourceData: any) => {
     totalData.manpower = total[0].toString();
     totalData.planHours = total[1].toString();
     totalData.actualHours = total[2].toString();
-    totalData.planWorkload = total[3].toString();
-    totalData.actualWorkload = total[4].toString();
+    totalData.planWorkload = total[3] === null ? "" : total[3].toString();
+    totalData.actualWorkload = total[4] === null ? "" : total[4].toString();
   }
 
   // 需要新增总计
@@ -275,7 +275,6 @@ const queryProductRateload = async (client: GqlClient<object>, projectId: string
 
 // 5评审和缺陷
 const alaysisReviewDefect = (sourceData: any, totalData: any) => {
-  debugger;
 
   if (!sourceData) {
     return [];

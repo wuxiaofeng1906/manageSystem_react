@@ -241,10 +241,23 @@ const getStageWorkloadColumns = () => {
     {
       headerName: '计划工作量',
       field: 'planWorkload',
+      valueFormatter: (params: any) => {
+        if (params.value) {
+          return Number(params.value).toFixed(2);
+        }
+        return params.value;
+      }
+
     },
     {
       headerName: '实际工作量',
       field: 'actualWorkload',
+      valueFormatter: (params: any) => {
+        if (params.value) {
+          return Number(params.value).toFixed(2);
+        }
+        return params.value;
+      }
     }
   ];
 

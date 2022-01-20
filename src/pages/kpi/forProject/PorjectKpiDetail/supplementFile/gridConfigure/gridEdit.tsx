@@ -48,7 +48,7 @@ const processCellEdited = async (params: any, projectId: string) => {
 // 需求稳定性编辑
 const storyStabilityCellEdited = async (params: any, projectId: string) => {
 
-  if (!params.newValue || (params.newValue).trim() === "") {
+  if (!params.newValue || (params.newValue).toString().trim() === "") {
     message.error({
       content: "请输入正确的数字！",
       duration: 1,
@@ -120,7 +120,8 @@ const storyStabilityCellEdited = async (params: any, projectId: string) => {
 
 // 阶段工作量
 const stageWorkloadCellEdited = async (params: any, projectId: string) => {
-  if (!params.newValue || (params.newValue).trim() === "") {
+
+  if (!params.newValue || (params.newValue).toString().trim() === "") {
     message.error({
       content: "请输入正确的数字！",
       duration: 1,
@@ -193,7 +194,7 @@ const stageWorkloadCellEdited = async (params: any, projectId: string) => {
 
 // 生产率
 const productRateCellEdited = async (params: any, projectId: string) => {
-  if (!params.newValue || (params.newValue).trim() === "") {
+  if (!params.newValue || (params.newValue).toString().trim() === "") {
     message.error({
       content: "请输入正确的数字！",
       duration: 1,
@@ -254,7 +255,7 @@ const productRateCellEdited = async (params: any, projectId: string) => {
 const reviewDefectCellEdited = async (params: any, projectId: string) => {
 
   if (params.column?.colId !== "cut") {
-    if (!params.newValue || (params.newValue).trim() === "") {
+    if (!params.newValue || (params.newValue).toString().trim() === "") {
       message.error({
         content: "请输入正确的数字！",
         duration: 1,
@@ -377,7 +378,7 @@ const pocessQualityCellEdited = async (params: any, projectId: string) => {
 
 // 服务
 const serviceCellEdited = async (params: any, projectId: string) => {
-  if (!params.newValue || (params.newValue).trim() === "") {
+  if (!params.newValue || (params.newValue).toString().trim() === "") {
     message.error({
       content: "请输入正确的数字！",
       duration: 1,

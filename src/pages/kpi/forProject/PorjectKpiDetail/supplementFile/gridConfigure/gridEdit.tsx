@@ -71,7 +71,7 @@ const storyStabilityCellEdited = async (params: any, projectId: string) => {
   }
 
   // 有数据变化时再进行修改请求
-  if ((params.newValue).toString() !== (params.oldValue).toString()) {
+  if (!params.oldValue || (params.newValue).toString() !== (params.oldValue).toString()) {
     const type = params.data?.stage;
     const typeValue = {"项目周期": 0, "开发": 3, "测试": 4, "发布": 5};
 

@@ -425,9 +425,14 @@ const getReviewDefectColumns = () => {
       field: 'reviewHour',
       cellRenderer: (params: any) => {
         if (params.data?.kind === "提测演示" || params.data?.kind === "开发联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
-          // return `<div style="text-align: center">-</div>`;
           return "-";
         }
+
+        if (params.value === null || params.value === "" || params.value === undefined) {
+          return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
+
+        }
+
         return params.value;
       },
       editable: defectHourEditRenderer,
@@ -612,6 +617,11 @@ const getServiceColumns = () => {
       maxWidth: 170,
       editable: true,
       cellRenderer: (params: any) => {
+
+        if (params.value === null || params.value === "" || params.value === undefined) {
+          return `<div style="color: red;font-style: italic ;text-align: center;margin-top: 12px">手工录入</div>`;
+
+        }
         return `<div style="margin-top: 12px">${params.value} </div>`;
       }
     },
@@ -622,6 +632,10 @@ const getServiceColumns = () => {
       maxWidth: 95,
       editable: true,
       cellRenderer: (params: any) => {
+        if (params.value === null || params.value === "" || params.value === undefined) {
+          return `<div style="color: red;font-style: italic ;text-align: center;margin-top: 12px">手工录入</div>`;
+
+        }
         return `<div style="margin-top: 12px">${params.value} </div>`;
       }
     },

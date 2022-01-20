@@ -725,8 +725,8 @@ const saveOnlineBranch = async (type: string, currentListNo: string, newOnlineBr
     "ready_release_num": currentListNo,
     "branch_name": sourceData.branchName,
     "technical_side": sourceData.module,
-    "ignore_check_test_unit_backend": frontCheck,
-    "ignore_check_test_unit_front": backendCheck,
+    "ignore_check_test_unit_front": frontCheck,
+    "ignore_check_test_unit_backend": backendCheck,
   };
 
   if (type === "修改") {

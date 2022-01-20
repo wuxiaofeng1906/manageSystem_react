@@ -1601,7 +1601,7 @@ const PreRelease: React.FC<any> = () => {
       if (side === "") {
         return `
          <div>
-          <div style="width: 200px">
+          <div style="width: 210px">
               <div style="font-size: 10px">
                   <div>${side}
                     <button style="margin-left: -20px;color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
@@ -1622,13 +1622,13 @@ const PreRelease: React.FC<any> = () => {
             </Button>
 
               <a href="${values.check_url}" target="_blank" >
-               <img src="../taskUrl.png" width="14" height="14" alt="执行" title="执行">
+               <img src="../taskUrl.png" width="14" height="14" alt="日志查看" title="日志查看">
              </a>
 
           </div>
-          <div style="margin-top: -20px;width: 200px">
+          <div style="margin-top: -20px;width: 210px">
               <div style="font-size: 10px">
-                  <div>${side} <button style="margin-left: -20px; color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
+                  <div>${side} <button style="margin-left: -10px; color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
                   <lable style="margin-left: -10px">${timeRange}</lable>
                   </div>
               </div>
@@ -1984,29 +1984,29 @@ const PreRelease: React.FC<any> = () => {
       }
     };
 
-    const runTimeTask = async () => {
-      let count = 0;
-      const id = setInterval(async () => {
-        count += 1;
-        console.log(`刷新数据${count},定时任务id${id}`);
-        // 刷新
-        const new_Data: any = await alalysisInitData("dataReview", currentListNo);
-        firstDataReviewGridApi.current?.setRowData(new_Data.reviewData_repaire);
-        //   刷新表格
-        const newData_confirm_data: any = await alalysisInitData("dataReviewConfirm", currentListNo);
-        secondDataReviewGridApi.current?.setRowData(newData_confirm_data.reviewData_confirm);
-        if ((new_Data.reviewData_repaire).length > 0 && (newData_confirm_data.reviewData_confirm).length > 0) {
-          clearInterval(interValRef.current);
-        }
-
-        if (count === 10) { // 5分钟后没数据就自动停止
-          clearInterval(interValRef.current);
-        }
-
-      }, 30 * 1000);
-
-      interValRef.current = id;
-    };
+    // const runTimeTask = async () => {
+    //   let count = 0;
+    //   const id = setInterval(async () => {
+    //     count += 1;
+    //     console.log(`刷新数据${count},定时任务id${id}`);
+    //     // 刷新
+    //     const new_Data: any = await alalysisInitData("dataReview", currentListNo);
+    //     firstDataReviewGridApi.current?.setRowData(new_Data.reviewData_repaire);
+    //     //   刷新表格
+    //     const newData_confirm_data: any = await alalysisInitData("dataReviewConfirm", currentListNo);
+    //     secondDataReviewGridApi.current?.setRowData(newData_confirm_data.reviewData_confirm);
+    //     if ((new_Data.reviewData_repaire).length > 0 && (newData_confirm_data.reviewData_confirm).length > 0) {
+    //       clearInterval(interValRef.current);
+    //     }
+    //
+    //     if (count === 10) { // 5分钟后没数据就自动停止
+    //       clearInterval(interValRef.current);
+    //     }
+    //
+    //   }, 30 * 1000);
+    //
+    //   interValRef.current = id;
+    // };
     // 保存
     const saveOnlineBranchResult = async () => {
 
@@ -2044,9 +2044,6 @@ const PreRelease: React.FC<any> = () => {
         if (onlineBranchModal.title === "修改") {
           deleteLockStatus(lockedInfo);
         }
-
-        //   定时刷新数据review的数据
-        await runTimeTask();
 
       } else {
         message.error({
@@ -2643,9 +2640,29 @@ const PreRelease: React.FC<any> = () => {
       }
     };
 
+    // 刷新页面定时任务
+    const timeTaskForPageRefresh = async () => {
+      if (!interValRef.current) {
+        let count = 0;
+
+        const id = setInterval(async () => {
+          count += 1;
+          console.log(`刷新数据${count},定时任务id${id}`);
+          // 刷新
+          const datas = await alalysisInitData("", releasedNumStr);
+
+          showPagesContent(datas);
+        }, 30 * 1000);
+
+        interValRef.current = id;
+      }
+    };
+
     useEffect(() => {
       showPagesContent(initData);
       showTabsPage();
+      //   定时刷新数据review的数据
+      timeTaskForPageRefresh();
     }, [initData]);
 
     return (

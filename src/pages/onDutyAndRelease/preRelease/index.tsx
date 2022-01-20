@@ -505,6 +505,39 @@ const PreRelease: React.FC<any> = () => {
       });
     };
 
+    const [formUpgradeService] = Form.useForm();
+    const setReleasedIdForm = async (releasedData: any) => {
+
+      const idArray: any = [];
+
+      const idStrArray: any = [];
+
+      // 查询id
+      const IDs = (await queryReleaseId()).data;
+      releasedData.forEach((ele: any) => {
+        if (!idArray.includes(ele.deployment_id)) {
+          idArray.push(ele.deployment_id);
+
+          for (let i = 0; i < IDs.length; i += 1) {
+
+            if (ele.deployment_id === (IDs[i].id).toString()) {
+              idStrArray.push({
+                "deployment_id": ele.deployment_id,
+                "automation_check": IDs[i].automation_test,
+                "service": IDs[i].service
+              });
+              break;
+            }
+          }
+        }
+      });
+
+      releaseIdArray = idStrArray;
+      formUpgradeService.setFieldsValue({
+        deployID: idArray
+      });
+    };
+
 // 显示删除后的数据
     const showdeletedNewData = async () => {
 
@@ -512,6 +545,8 @@ const PreRelease: React.FC<any> = () => {
       if (type === 1) { // 是发布项删除
         const newData: any = await alalysisInitData("pulishItem", currentListNo);
         firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
+        // 也要刷新一键部署ID
+        setReleasedIdForm(newData?.upService_releaseItem)
 
       } else if (type === 2) { // 是升级接口删除
         const newData: any = await alalysisInitData("pulishApi", currentListNo);
@@ -803,6 +838,7 @@ const PreRelease: React.FC<any> = () => {
       params.api.sizeColumnsToFit();
     };
 
+
 // 保存发布项结果
     const savePulishResult = async () => {
 
@@ -823,9 +859,10 @@ const PreRelease: React.FC<any> = () => {
         });
 
         const newData: any = await alalysisInitData("pulishItem", currentListNo);
+
         firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
-
-
+        // 也要刷新一键部署ID
+        setReleasedIdForm(newData?.upService_releaseItem)
         //   发布项结果保存成功之后，需要刷新发布项中的服务确认完成
         const newData_confirm: any = await alalysisInitData("pulishConfirm", currentListNo);
         thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认设置一行空值
@@ -2238,10 +2275,10 @@ const PreRelease: React.FC<any> = () => {
     /* region 升级服务 */
     const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
 
-    const [formUpgradeService] = Form.useForm();
 
     const onReleaseIdChanges = (selectedId: any, params: any) => {
-      if (params) {
+
+      if (params && params.length > 0) {
         const queryCondition: any = [];
         params.forEach((ele: any) => {
 
@@ -2253,7 +2290,10 @@ const PreRelease: React.FC<any> = () => {
 
         });
 
-        releaseIdArray = releaseIdArray.concat(queryCondition);
+        // releaseIdArray = releaseIdArray.concat(queryCondition);
+        releaseIdArray = queryCondition;
+      } else {
+        releaseIdArray = [];
 
       }
     }
@@ -2271,16 +2311,28 @@ const PreRelease: React.FC<any> = () => {
         });
       } else {
 
-        // 有数据之后进行表格的赋值操作
-        firstUpSerGridApi.current?.setRowData(result.data);
-        secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
-        thirdUpSerGridApi.current?.setRowData([{}]); // 需要给服务确认设置一行空值
+        // 有数据之后进行表格的赋值操作(需要把之前表格的数据一并追加进来)
+        // 获取之前的数据
+
+        const newData: any = await alalysisInitData("pulishItem", currentListNo);
+        let gridData = result.data;
+        if (newData.upService_releaseItem) {
+          gridData = (newData.upService_releaseItem).concat(gridData);
+        }
+
+        firstUpSerGridApi.current?.setRowData(gridData);
+
+        // 需要判断升级接口内容是否有值，如果没有的话，则需要新增一个空行
+        const apidata: any = await alalysisInitData("pulishApi", currentListNo);
+        if (!apidata.upService_interface || (apidata.upService_interface) <= 0) {
+          secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
+        }
+        // thirdUpSerGridApi.current?.setRowData([{}]); // 需要给服务确认设置一行空值
 
         setGridHeight({
           ...gridHeight,
-          pulishItemGrid: getGridHeight((result.data).length),
+          pulishItemGrid: getGridHeight(gridData.length),
           upgradeApiGrid: getGridHeight(1),
-
 
         });
       }
@@ -2331,37 +2383,7 @@ const PreRelease: React.FC<any> = () => {
 
     };
 
-    const setReleasedIdForm = async (releasedData: any) => {
 
-      const idArray: any = [];
-
-      const idStrArray: any = [];
-
-      // 查询id
-      const IDs = (await queryReleaseId()).data;
-      releasedData.forEach((ele: any) => {
-        if (!idArray.includes(ele.deployment_id)) {
-          idArray.push(ele.deployment_id);
-
-          for (let i = 0; i < IDs.length; i += 1) {
-
-            if (ele.deployment_id === (IDs[i].id).toString()) {
-              idStrArray.push({
-                "deployment_id": ele.deployment_id,
-                "automation_check": IDs[i].automation_test,
-                "service": IDs[i].service
-              });
-              break;
-            }
-          }
-        }
-      });
-
-      releaseIdArray = idStrArray;
-      formUpgradeService.setFieldsValue({
-        deployID: idArray
-      });
-    };
     const showPagesContent = async (source: any) => {
 
       if (!source || JSON.stringify(source) === "{}") {
@@ -2662,7 +2684,7 @@ const PreRelease: React.FC<any> = () => {
       showPagesContent(initData);
       showTabsPage();
       //   定时刷新数据review的数据
-      timeTaskForPageRefresh();
+      // timeTaskForPageRefresh();
     }, [initData]);
 
     return (

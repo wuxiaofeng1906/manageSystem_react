@@ -270,7 +270,7 @@ const queryServiceByID = async (params: string) => {
     message: "",
     data: []
   };
-
+debugger;
   await axios.post('/api/verify/release/env_branch', params)
     .then(function (res) {
       if (res.data.code === 200) {

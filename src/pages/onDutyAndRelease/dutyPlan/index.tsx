@@ -191,7 +191,8 @@ const DutyPlan: React.FC<any> = () => {
   const [allUsers, setAllUsers] = useState({
     front: [],
     backend: [],
-    tester: []
+    tester: [],
+    flow: []
   });
   // 动态表单的下拉框
   const [projectInfo, setProjectInfo] = useState({
@@ -345,6 +346,7 @@ const DutyPlan: React.FC<any> = () => {
             });
           }
         } else if (users.user_tech === "流程") {
+
           if (users.duty_order === "1") {
             oldDutyTask.firstFlowId = users.person_id;
             formForPlanModify.setFieldsValue({
@@ -427,7 +429,8 @@ const DutyPlan: React.FC<any> = () => {
     setAllUsers({
       front: frontUserInfo,
       backend: backendUserInfo,
-      tester: testerUserInfo
+      tester: testerUserInfo,
+      flow: backendUserInfo
     });
 
     // 生成项目名称、项目类型、对应分支、对应测试环境、对应升级环境、项目负责人的下拉框
@@ -692,6 +695,7 @@ const DutyPlan: React.FC<any> = () => {
 
   /* region 保存数据，并刷新界面 */
   const makeCardsDiv = (oraData: any) => {
+    debugger;
 
     const columns: any = [
       {
@@ -1239,6 +1243,7 @@ const DutyPlan: React.FC<any> = () => {
         },
       });
     } else {
+      debugger;
       cardDatas = data.datas;
     }
   }
@@ -1377,7 +1382,7 @@ const DutyPlan: React.FC<any> = () => {
               <Col span={10}>
                 <Form.Item name="firstFlow" label="流程" style={{marginTop: 7}}>
                   <Select style={{width: '130px'}} showSearch>
-                    {allUsers.backend}
+                    {allUsers.flow}
                   </Select>
                 </Form.Item>
               </Col>
@@ -1385,7 +1390,7 @@ const DutyPlan: React.FC<any> = () => {
               <Col span={14}>
                 <Form.Item name="secondFlow" label="流程第二值班人" style={{marginTop: 7}}>
                   <Select style={{width: '130px'}} showSearch>
-                    {allUsers.backend}
+                    {allUsers.flow}
                   </Select>
                 </Form.Item>
               </Col>

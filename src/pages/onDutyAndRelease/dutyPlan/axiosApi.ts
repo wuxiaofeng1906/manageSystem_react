@@ -36,6 +36,15 @@ const parseData = (params: any) => {
         duty_order: ""
       };
 
+      const projectItem_Flow = {
+        person_num: "",
+        user_tech: "流程",
+        user_name: "",
+        duty_start_time: "",
+        duty_end_time: "",
+        duty_order: ""
+      };
+
       project.forEach((ele: any, index: number) => {
         const username = ele.user_name === null ? "" : ele.user_name;
 
@@ -53,7 +62,6 @@ const parseData = (params: any) => {
           }
         }
 
-
         if (ele.user_tech === "后端") {
           projectItem_Backend.person_num = ele.person_num;
           projectItem_Backend.user_tech = ele.user_tech;
@@ -67,7 +75,6 @@ const parseData = (params: any) => {
             projectItem_Backend.user_name = projectItem_Backend.user_name === "" ? username : `${projectItem_Backend.user_name}/${username}`;
           }
         }
-
 
         if (ele.user_tech === "测试") {
           projectItem_Test.person_num = ele.person_num;
@@ -84,10 +91,27 @@ const parseData = (params: any) => {
 
         }
 
+        if (ele.user_tech === "流程") {
+          projectItem_Flow.person_num = ele.person_num;
+          projectItem_Flow.user_tech = ele.user_tech;
+          projectItem_Flow.duty_start_time = ele.duty_start_time;
+          projectItem_Flow.duty_end_time = ele.duty_end_time;
+          projectItem_Flow.duty_order = ele.duty_order;
+          if (ele.duty_order === "1") {
+            projectItem_Flow.user_name = projectItem_Flow.user_name === "" ? username : `${username}/${projectItem_Flow.user_name}`;
+
+          } else {
+            projectItem_Flow.user_name = projectItem_Flow.user_name === "" ? username : `${projectItem_Flow.user_name}/${username}`;
+          }
+
+        }
+
+
         if (index === project.length - 1) {
           projectItemArray.push(projectItem_Front);
           projectItemArray.push(projectItem_Backend);
           projectItemArray.push(projectItem_Test);
+          projectItemArray.push(projectItem_Flow);
 
         }
 

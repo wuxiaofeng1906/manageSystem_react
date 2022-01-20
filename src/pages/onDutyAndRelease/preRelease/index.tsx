@@ -1603,7 +1603,10 @@ const PreRelease: React.FC<any> = () => {
          <div>
           <div style="width: 200px">
               <div style="font-size: 10px">
-                  <div>${side} <button style="color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button> &nbsp;${timeRange}</div>
+                  <div>${side}
+                    <button style="margin-left: -20px;color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
+                    <lable style="margin-left: -10px">${timeRange}</lable>
+                  </div>
               </div>
           </div>
       </div>
@@ -1625,7 +1628,9 @@ const PreRelease: React.FC<any> = () => {
           </div>
           <div style="margin-top: -20px;width: 200px">
               <div style="font-size: 10px">
-                  <div>${side} <button style="color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button> &nbsp;${timeRange}</div>
+                  <div>${side} <button style="margin-left: -20px; color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
+                  <lable style="margin-left: -10px">${timeRange}</lable>
+                  </div>
               </div>
 
           </div>
@@ -1681,7 +1686,7 @@ const PreRelease: React.FC<any> = () => {
         <div style="margin-top: -10px">
             <div style="text-align: right" >
               <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='excuteDataCheck("envCheck",${checkNum})'>
-                <img src="../执行.png" width="14" height="14" alt="执行参数" title="执行参数">
+                <img src="../执行.png" width="14" height="14" alt="执行" title="执行">
               </Button>
 
               <a href="${values.check_url}" target="_blank" >

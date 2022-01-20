@@ -297,7 +297,10 @@ const DutyPlan: React.FC<any> = () => {
 
       userData.forEach((users: any) => {
         let usersAccount = null;
-        if (users.user_id) {
+
+        if (users.user_name === "免") {
+          usersAccount = `""&免`;
+        } else if (users.user_id) {
           usersAccount = `${users.user_id}&${users.user_name}`;
         }
         if (users.user_tech === "前端") {
@@ -332,6 +335,7 @@ const DutyPlan: React.FC<any> = () => {
             });
           }
         } else if (users.user_tech === "测试") {
+
           if (users.duty_order === "1") {
             oldDutyTask.firstTesterId = users.person_id;
             formForPlanModify.setFieldsValue({

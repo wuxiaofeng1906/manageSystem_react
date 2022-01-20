@@ -168,6 +168,7 @@ const sendMessageToApi = async (projectId: string) => {
 
 // 提交修改的数据
 const submitModifyData = async (person_data: any, project_data: any) => {
+  debugger;
   let errorMessage = "";
   const hostIp = getCurrentProxy();
   const url = `${hostIp}api/verify/duty/plan_data`;

@@ -28,6 +28,8 @@ const oldDutyTask = {
   secondBackendId: "",
   firstTesterId: "",
   secondTesterId: "",
+  firstFlowId: "",
+  secondFlowId: ""
 };
 // 保存需要被删除的数据
 const deletedData: any = [];
@@ -328,20 +330,35 @@ const DutyPlan: React.FC<any> = () => {
               secondBackend: usersAccount
             });
           }
-        } else if (users.duty_order === "1") {
-          oldDutyTask.firstTesterId = users.person_id;
-          formForPlanModify.setFieldsValue({
-            ...formForPlanModify,
-            firstTester: usersAccount
-          });
-        } else {
-          oldDutyTask.secondTesterId = users.person_id;
-          formForPlanModify.setFieldsValue({
-            ...formForPlanModify,
-            secondTester: usersAccount
-          });
+        } else if (users.user_tech === "测试") {
+          if (users.duty_order === "1") {
+            oldDutyTask.firstTesterId = users.person_id;
+            formForPlanModify.setFieldsValue({
+              ...formForPlanModify,
+              firstTester: usersAccount
+            });
+          } else {
+            oldDutyTask.secondTesterId = users.person_id;
+            formForPlanModify.setFieldsValue({
+              ...formForPlanModify,
+              secondTester: usersAccount
+            });
+          }
+        } else if (users.user_tech === "流程") {
+          if (users.duty_order === "1") {
+            oldDutyTask.firstFlowId = users.person_id;
+            formForPlanModify.setFieldsValue({
+              ...formForPlanModify,
+              firstFlow: usersAccount
+            });
+          } else {
+            oldDutyTask.secondFlowId = users.person_id;
+            formForPlanModify.setFieldsValue({
+              ...formForPlanModify,
+              secondFlow: usersAccount
+            });
+          }
         }
-
       });
     }
 
@@ -675,6 +692,7 @@ const DutyPlan: React.FC<any> = () => {
 
   /* region 保存数据，并刷新界面 */
   const makeCardsDiv = (oraData: any) => {
+
     const columns: any = [
       {
         title: '所属端',
@@ -770,9 +788,12 @@ const DutyPlan: React.FC<any> = () => {
   // 两个为一组。只要一组数据完整，就可以保存
   const checkInputData = (data: any) => {
 
-    const {firstFront, secondFront, firstBackend, secondBackend, firstTester, secondTester} = data;
+    const {
+      firstFront, secondFront, firstBackend, secondBackend, firstTester, secondTester, firstFlow,
+      secondFlow
+    } = data;
     // 判断所有为空
-    if (!firstFront && !secondFront && !firstBackend && !secondBackend && !firstTester && !secondTester) {
+    if (!firstFront && !secondFront && !firstBackend && !secondBackend && !firstTester && !secondTester && !firstFlow && !secondFlow) {
       message.error({
         content: "值班人员不能为空！",
         duration: 1,
@@ -849,6 +870,28 @@ const DutyPlan: React.FC<any> = () => {
       return false;
     }
 
+    // 判断流程是否为空
+    if (!firstFlow && secondFlow) {
+      message.error({
+        content: "流程第一值班人不能为空！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return false;
+    }
+    if (firstFlow && !secondFlow) {
+      message.error({
+        content: "流程第二值班人不能为空！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return false;
+    }
+
     return true;
   };
   // 解析需要保存的值班人员
@@ -862,7 +905,16 @@ const DutyPlan: React.FC<any> = () => {
       return [];
     }
 
-    const {firstFront, secondFront, firstBackend, secondBackend, firstTester, secondTester} = data;
+    const {
+      firstFront,
+      secondFront,
+      firstBackend,
+      secondBackend,
+      firstTester,
+      secondTester,
+      firstFlow,
+      secondFlow
+    } = data;
 
     // 前端第一值班人
     person_data_array.push({
@@ -936,6 +988,29 @@ const DutyPlan: React.FC<any> = () => {
       "duty_order": "2",
     });
 
+    // 流程第一值班人
+    person_data_array.push({
+      "peron_num": oldDutyTask.personNum,
+      "duty_start_time": startTime,
+      "duty_end_time": endTime,
+      "person_id": oldDutyTask.firstFlowId,
+      "user_id": firstFlow === null ? "" : firstFlow.split("&")[0],
+      "user_name": firstFlow === null ? "" : firstFlow.split("&")[1],
+      "user_tech": "6",
+      "duty_order": "1",
+    });
+
+    // 流程第二值班人
+    person_data_array.push({
+      "peron_num": oldDutyTask.personNum,
+      "duty_start_time": startTime,
+      "duty_end_time": endTime,
+      "person_id": oldDutyTask.secondFlowId,
+      "user_id": secondFlow === null ? "" : secondFlow.split("&")[0],
+      "user_name": secondFlow === null ? "" : secondFlow.split("&")[1],
+      "user_tech": "6",
+      "duty_order": "2",
+    });
     return person_data_array;
   };
 
@@ -1101,6 +1176,7 @@ const DutyPlan: React.FC<any> = () => {
   };
 
   const requestAPpiToSaveData = async (person_data: any, allProject: any) => {
+    debugger;
     const saveResult = await submitModifyData(person_data, allProject);
     if (saveResult) {
       message.error({
@@ -1231,7 +1307,7 @@ const DutyPlan: React.FC<any> = () => {
         visible={isPlanVisble}
         onCancel={planModalCancel}
         centered={true}
-        width={550}
+        width={560}
         footer={null}
         maskClosable={false}
       >
@@ -1243,7 +1319,7 @@ const DutyPlan: React.FC<any> = () => {
             <RangePicker style={{width: '100%', color: "red"}} disabled/>
           </Form.Item>
           {/* 值班人员Card */}
-          <Card size="small" title="值班人员" style={{marginTop: -15}} bodyStyle={{height: 130}}>
+          <Card size="small" title="值班人员" style={{marginTop: -15}} bodyStyle={{height: 160}}>
             <Row gutter={40} style={{marginTop: -10}}>
               <Col span={10}>
                 <Form.Item name="firstFront" label="前端" style={{marginTop: 7}}>
@@ -1296,6 +1372,26 @@ const DutyPlan: React.FC<any> = () => {
                 </Form.Item>
               </Col>
             </Row>
+
+            <Row gutter={40} style={{marginTop: -25}}>
+              <Col span={10}>
+                <Form.Item name="firstFlow" label="流程" style={{marginTop: 7}}>
+                  <Select style={{width: '130px'}} showSearch>
+                    {allUsers.backend}
+                  </Select>
+                </Form.Item>
+              </Col>
+
+              <Col span={14}>
+                <Form.Item name="secondFlow" label="流程第二值班人" style={{marginTop: 7}}>
+                  <Select style={{width: '130px'}} showSearch>
+                    {allUsers.backend}
+                  </Select>
+                </Form.Item>
+              </Col>
+
+            </Row>
+
           </Card>
 
           {/* 项目明细Card */}

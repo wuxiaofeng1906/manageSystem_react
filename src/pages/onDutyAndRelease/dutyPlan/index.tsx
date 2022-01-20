@@ -695,7 +695,6 @@ const DutyPlan: React.FC<any> = () => {
 
   /* region 保存数据，并刷新界面 */
   const makeCardsDiv = (oraData: any) => {
-    debugger;
 
     const columns: any = [
       {
@@ -1180,7 +1179,6 @@ const DutyPlan: React.FC<any> = () => {
   };
 
   const requestAPpiToSaveData = async (person_data: any, allProject: any) => {
-    debugger;
     const saveResult = await submitModifyData(person_data, allProject);
     if (saveResult) {
       message.error({
@@ -1243,7 +1241,6 @@ const DutyPlan: React.FC<any> = () => {
         },
       });
     } else {
-      debugger;
       cardDatas = data.datas;
     }
   }

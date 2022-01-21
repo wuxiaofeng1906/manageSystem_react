@@ -479,8 +479,8 @@ const PreRelease: React.FC<any> = () => {
 
   };
   // 修改行
-  (window as any).modifyRows =async (types: any, params: any) => {
-    const flag =await vertifyModifyFlag(types, currentListNo);
+  (window as any).modifyRows = async (types: any, params: any) => {
+    const flag = await vertifyModifyFlag(types, currentListNo);
     if (!flag) {
       message.error({
         content: `服务确认已完成，不能进行修改！`,
@@ -615,8 +615,8 @@ const PreRelease: React.FC<any> = () => {
   };
 
   // 删除事件
-  (window as any).deleteRows =async (item: any, params: any) => {
-    const flag =await vertifyModifyFlag(item, currentListNo);
+  (window as any).deleteRows = async (item: any, params: any) => {
+    const flag = await vertifyModifyFlag(item, currentListNo);
     if (!flag) {
       message.error({
         content: `服务确认已完成，不能进行删除！`,
@@ -1250,19 +1250,20 @@ const PreRelease: React.FC<any> = () => {
 
   }
 
+  // 一键部署ID查询
   const inquireServiceClick = async () => {
 
-   if(!await vertifyModifyFlag(6,currentListNo)){
-     message.error({
-       content: `服务确认已完成，不能进行查询！`,
-       duration: 1,
-       style: {
-         marginTop: '50vh',
-       },
-     });
+    if (!await vertifyModifyFlag(6, currentListNo)) {
+      message.error({
+        content: `服务确认已完成，不能进行查询！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
 
-     return;
-   }
+      return;
+    }
 
     const result = await inquireService(releaseIdArray);
     if (result.message !== "") {
@@ -1274,15 +1275,31 @@ const PreRelease: React.FC<any> = () => {
         },
       });
     } else {
-
+      const queryGridData = result.data;
       // 有数据之后进行表格的赋值操作(需要把之前表格的数据一并追加进来)   获取之前的数据
-      const newData: any = await alalysisInitData("pulishItem", currentListNo);
-      let gridData = result.data;
-      if (newData.upService_releaseItem) {
-        gridData = (newData.upService_releaseItem).concat(gridData);
+      const newData: any = (await alalysisInitData("pulishItem", currentListNo)).upService_releaseItem;
+      const allGrid: any = [];
+      if (newData) {
+        queryGridData.forEach((news: any, i: number) => {
+          let includeFlag = false;
+          for (let index = 0; index < newData.length; index += 1) {
+
+            const old = newData[index];
+            if (i === 0) { // 只增加一次源数据
+              allGrid.push(old);
+            }
+            if (old.app === news.app) {
+              includeFlag = true;
+              break;
+            }
+          }
+          if (!includeFlag) {
+            allGrid.push(news);
+          }
+        });
       }
 
-      firstUpSerGridApi.current?.setRowData(gridData);
+      firstUpSerGridApi.current?.setRowData(allGrid);
       // 需要判断升级接口内容是否有值，如果没有的话，则需要新增一个空行
       const apidata: any = await alalysisInitData("pulishApi", currentListNo);
       if (!apidata.upService_interface || (apidata.upService_interface) <= 0) {
@@ -1291,7 +1308,7 @@ const PreRelease: React.FC<any> = () => {
 
       setGridHeight({
         ...gridHeight,
-        pulishItemGrid: getGridHeight(gridData.length),
+        pulishItemGrid: getGridHeight(allGrid.length),
         upgradeApiGrid: getGridHeight(1),
       });
     }

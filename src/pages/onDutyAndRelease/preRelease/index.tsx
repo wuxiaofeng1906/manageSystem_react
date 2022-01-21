@@ -1661,6 +1661,7 @@ const PreRelease: React.FC<any> = () => {
   // 刷新页面定时任务
   const timeTaskForPageRefresh = async () => {
     if (!interValRef.current) {
+      console.log("interValRef.current", interValRef.current);
       let count = 0;
 
       const id = setInterval(async () => {

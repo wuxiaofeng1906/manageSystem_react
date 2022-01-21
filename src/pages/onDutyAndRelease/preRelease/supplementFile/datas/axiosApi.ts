@@ -80,7 +80,6 @@ const delTabsInfo = async (releaseNum: string) => {
 
 // 修改tab的名字
 const updateTabsName = async (currentListNo: string, newName: string) => {
-  debugger;
 
   const data = {
     "ready_release_num": currentListNo,
@@ -295,21 +294,17 @@ const getGridDataSource = (oldData: any) => {
   const resultArray: any = [];
   oldData.forEach((ele: any) => {
 
-    const filedObject = {
-      id: ele.id,
-      deployment_id: ele.id,
-      automation_check: ele.automation_check,
-      branch_environment: `${ele.branch}_${ele.env}`,
-      app: "",
-
-    };
-
     (ele.service).forEach((service: any) => {  // 有几个应用就要生成几条数据
-      filedObject.app = service;
-      resultArray.push(filedObject);
+
+      resultArray.push({
+        id: ele.id,
+        deployment_id: ele.id,
+        automation_check: ele.automation_check,
+        branch_environment: `${ele.branch}_${ele.env}`,
+        app: service,
+
+      });
     });
-
-
   });
 
   return resultArray;
@@ -322,7 +317,7 @@ const queryServiceByID = async (params: string) => {
     message: "",
     data: []
   };
-  debugger;
+
   await axios.post('/api/verify/release/env_branch', params)
     .then(function (res) {
       if (res.data.code === 200) {

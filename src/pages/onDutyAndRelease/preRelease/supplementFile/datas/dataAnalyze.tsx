@@ -29,7 +29,7 @@ const analysisPreReleaseProject = (datas: any) => {
   const projectArray = project.project;
   const projectIdArray: any = [];
   projectArray.forEach((ele: any) => {
-    projectIdArray.push(ele.project_id);
+    projectIdArray.push(`${ele.project_name}&${ele.project_id}`);
   })
   const returnArray = {
     pro_id: project.pro_id,

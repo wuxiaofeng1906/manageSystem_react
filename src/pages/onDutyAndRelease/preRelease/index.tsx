@@ -1299,6 +1299,7 @@ const PreRelease: React.FC<any> = () => {
     const lockedData = await getAllLockedData(currentListNo);
     allLockedArray = lockedData.data;
     await getProcessStatus();
+
     formForPreReleaseProject.setFieldsValue({
       projectsName: preReleaseProject.projectId,
       pulishType: preReleaseProject.release_type,

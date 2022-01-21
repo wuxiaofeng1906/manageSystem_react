@@ -213,10 +213,12 @@ const queryReleaseWay = async () => {
 
 // 保存预发布项目
 const savePrePulishProjects = async (params: any, listNo: string) => {
+
   const prjIdArray = params.projectsName;
   let projectId = "";
   prjIdArray.forEach((project: string) => {
-    projectId = projectId === "" ? project : `${projectId},${project}`;
+    const proID = project.split('&')[1];
+    projectId = projectId === "" ? proID : `${projectId},${proID}`;
   });
 
   const data = {

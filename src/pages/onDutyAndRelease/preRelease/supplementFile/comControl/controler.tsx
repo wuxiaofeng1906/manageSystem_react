@@ -27,7 +27,7 @@ const loadPrjNameSelect = async () => {
     const datas = prjNames.data;
     datas.forEach((project: any) => {
       prjData.push(
-        <Option key={project.project_id} value={`${project.project_id}`}>{project.project_name}</Option>);
+        <Option key={project.project_id} value={`${project.project_name}&${project.project_id}`}>{project.project_name}</Option>);
     });
   }
 

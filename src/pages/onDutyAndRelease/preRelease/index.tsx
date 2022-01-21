@@ -1300,7 +1300,7 @@ const PreRelease: React.FC<any> = () => {
 
     // 预发布项目
     const preReleaseProject = source?.preProject;
-    currentListNo = preReleaseProject.ready_release_num;
+    currentListNo = (source?.tabPageInfo) [0].key;
     const lockedData = await getAllLockedData(currentListNo);
     allLockedArray = lockedData.data;
     await getProcessStatus();
@@ -1453,7 +1453,7 @@ const PreRelease: React.FC<any> = () => {
       activeKey: activeKeys
     });
 
-    currentListNo = activeKeys;
+
     // 根据标签页获取数据,然后再赋予值
     const newTabData = await alalysisInitData("", activeKeys);
     showPagesContent(newTabData);
@@ -1518,7 +1518,7 @@ const PreRelease: React.FC<any> = () => {
 
   // 保存tab名
   const saveModifyName = async () => {
-    debugger;
+
     const formData = tabNameSetForm.getFieldsValue();
     const result = await modifyTanName(currentListNo, formData.newTabName);
     if (result === "") {
@@ -1623,7 +1623,7 @@ const PreRelease: React.FC<any> = () => {
     showPagesContent(initData);
     showTabsPage();
     //   定时刷新数据review的数据
-    // timeTaskForPageRefresh();
+    timeTaskForPageRefresh();
   }, [initData]);
 
   return (

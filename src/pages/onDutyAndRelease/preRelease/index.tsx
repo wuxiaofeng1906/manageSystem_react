@@ -1,4 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
+import {useRequest} from "ahooks";
 import {PageContainer} from '@ant-design/pro-layout';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -17,7 +18,6 @@ import {
   loadCategorySelect, loadCommiterSelect, loadTechSideSelect, loadBranchNameSelect, loadServiceSelect, loadImgEnvSelect,
   loadCheckTypeSelect, loadBrowserTypeSelect
 } from "./supplementFile/comControl/controler";
-import {useRequest} from "ahooks";
 import {
   getNewNum, deleteReleaseItem, getPageCHeckProcess,
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems,
@@ -25,11 +25,10 @@ import {
   saveOnlineBranchData, getModifiedData, executeOnlineCheck, saveProcessResult
 } from "./supplementFile/datas/logic";
 import {alalysisInitData} from "./supplementFile/datas/dataAnalyze";
-
 import {
   getGridHeight, getReleasedItemColumns, getReleasedApiColumns,
   getReleaseServiceComfirmColumns, getReviewColumns, getReviewConfirmColums,
-  getOnlineBranchColumns
+  getOnlineBranchColumns, getWorkOrderColumns, releaseAppChangRowColor
 } from "./supplementFile/grid/gridSet";
 import {getLockStatus, deleteLockStatus, getAllLockedData, getLockedId} from "./supplementFile/lock/rowLock";
 import {getNewPageNum} from "@/pages/onDutyAndRelease/preRelease/supplementFile/datas/axiosApi";
@@ -50,7 +49,7 @@ let releaseIdArray: any = []; // 已发布的一键部署ID
 let allLockedArray: any = [];  // 被锁的数据
 
 const PreRelease: React.FC<any> = () => {
-    const interValRef: any = useRef();
+    const interValRef: any = useRef(); // 定时任务数据id保存
 
     /* region Form 和state定义 */
     const [pulishItemForm] = Form.useForm(); // 发布项
@@ -113,7 +112,6 @@ const PreRelease: React.FC<any> = () => {
       type: -1,
       datas: {}
     });
-
     const [executeStatus, setExecuteStatus] = useState(false); // 上线分支点击执行后的进度展示
     const [showTabs, setShowTabs] = useState({  // 页面tabPage当前展示页面
       shown: false, targetKey: ""
@@ -130,6 +128,7 @@ const PreRelease: React.FC<any> = () => {
     const thirdUpSerGridApi = useRef<GridApi>();
     const firstDataReviewGridApi = useRef<GridApi>();
     const firstOnlineBranchGridApi = useRef<GridApi>();
+    const firstListGridApi = useRef<GridApi>();
     /* endregion */
 
     /* region 当前页面数据的获取 */
@@ -223,7 +222,6 @@ const PreRelease: React.FC<any> = () => {
           title: "新增"
         });
       } else {
-
         const apiid = params.api_id;
         upgradeIntForm.setFieldsValue({
           onlineEnv: params.online_environment === undefined ? undefined : (params.online_environment).split(","),
@@ -236,8 +234,6 @@ const PreRelease: React.FC<any> = () => {
           remark: params.remarks,
           apiId: apiid
         });
-
-
         lockedInfo = `${currentListNo}-step2-api-${apiid}`;
         const lockInfo = await getLockStatus(lockedInfo);
 
@@ -276,7 +272,6 @@ const PreRelease: React.FC<any> = () => {
           title: "新增"
         });
       } else {
-
         const reviewid = params.review_id;
         dataReviewForm.setFieldsValue({
           repaireContent: params.repair_data_content,
@@ -333,7 +328,6 @@ const PreRelease: React.FC<any> = () => {
         const result = await getCheckNumForOnlineBranch();
         newOnlineBranchNum = result.data?.check_num;
       } else {
-
         newOnlineBranchNum = params.check_num;
         const oraData = await getModifiedData(newOnlineBranchNum);
 
@@ -452,7 +446,6 @@ const PreRelease: React.FC<any> = () => {
 
         case 2:
           showUpgradeApiForm("add", {});
-
           break;
 
         case 3:
@@ -479,15 +472,12 @@ const PreRelease: React.FC<any> = () => {
         case 3:
           showDataReviewForm("modify", params);
           break;
-
         case 4:
           showOnlineBranchForm("modify", params)
           break;
         default:
           break;
       }
-
-
     };
     /* endregion  */
 
@@ -614,29 +604,6 @@ const PreRelease: React.FC<any> = () => {
     /* region 表格相关定义和事件 */
 
     /* region 升级服务 一  发布项 */
-    // 改变行的颜色（正在编辑的行颜色）
-    const releaseAppChangRowColor = (type: string, idFlag: number) => {
-
-      const lockInfoArray = allLockedArray;
-      let returnValue = {'background-color': 'transparent'};
-      if (!idFlag) {
-        return returnValue;
-      }
-      if (lockInfoArray && lockInfoArray.length > 0) {
-        for (let index = 0; index < lockInfoArray.length; index += 1) {
-
-          const paramsArray = (lockInfoArray[index].param).split("-");
-          if (type === `${paramsArray[1]}-${paramsArray[2]}`) { // 判断是不是属于当前渲染表格的数据
-            if (idFlag.toString() === paramsArray[3]) { // 判断有没有对应id
-              returnValue = {'background-color': '#FFF6F6'};
-              break;
-
-            }
-          }
-        }
-      }
-      return returnValue;
-    };
     const onFirstGridReady = (params: GridReadyEvent) => {
       firstUpSerGridApi.current = params.api;
       params.api.sizeColumnsToFit();
@@ -645,7 +612,6 @@ const PreRelease: React.FC<any> = () => {
       firstUpSerGridApi.current = params.api;
       params.api.sizeColumnsToFit();
     };
-
     // 保存发布项结果
     const savePulishResult = async () => {
 
@@ -666,26 +632,22 @@ const PreRelease: React.FC<any> = () => {
         });
 
         const newData: any = await alalysisInitData("pulishItem", currentListNo);
-
         firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
         // 也要刷新一键部署ID
         setReleasedIdForm(newData?.upService_releaseItem)
         //   发布项结果保存成功之后，需要刷新发布项中的服务确认完成
         const newData_confirm: any = await alalysisInitData("pulishConfirm", currentListNo);
         thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认设置一行空值
-
         setGridHeight({
           ...gridHeight,
           pulishItemGrid: getGridHeight((newData.upService_releaseItem).length),
           upConfirm: getGridHeight((newData_confirm.upService_confirm).length)
         });
 
-
-        //   修改后需要解开锁
+        // 保存后需要解解锁
         if (formData.appId) {
           deleteLockStatus(lockedInfo);
         }
-
 
       } else {
         message.error({
@@ -766,7 +728,6 @@ const PreRelease: React.FC<any> = () => {
           },
         });
       }
-
     };
 // 取消事件
     const upgradeIntModalCancle = () => {
@@ -855,7 +816,6 @@ const PreRelease: React.FC<any> = () => {
     /* endregion   */
 
     /*  region 数据修复 Review 一 */
-
     const onfirstDataReviewGridReady = (params: GridReadyEvent) => {
       firstDataReviewGridApi.current = params.api;
       params.api.sizeColumnsToFit();
@@ -1053,7 +1013,7 @@ const PreRelease: React.FC<any> = () => {
       params.api.sizeColumnsToFit();
     };
 
-// 取消
+    // 取消
     const onlineBranchCancle = () => {
       setOnlineBranchModal({
         shown: false,
@@ -1065,7 +1025,6 @@ const PreRelease: React.FC<any> = () => {
         deleteLockStatus(lockedInfo);
       }
     };
-
 
     // 保存
     const saveOnlineBranchResult = async () => {
@@ -1079,7 +1038,6 @@ const PreRelease: React.FC<any> = () => {
       const result = await saveOnlineBranchData(onlineBranchModal.title, currentListNo, newOnlineBranchNum, formData);
 
       if (result === "") {
-
         message.info({
           content: "保存成功！",
           duration: 1,
@@ -1118,77 +1076,16 @@ const PreRelease: React.FC<any> = () => {
           ...onlineBranchModal,
           loading: false
         });
-
       }
-
     };
 
-    // 清空表中数据
-    const onlineBranchClear = () => {
-
-      formForOnlineBranch.resetFields();
-    };
     /* endregion */
 
     /*  region 对应工单 */
-
-    const firstListColumn: any = [
-      {
-        headerName: '序号',
-        field: 'No',
-        minWidth: 65,
-        maxWidth: 70,
-        cellRenderer: (params: any) => {
-          return Number(params.node.id) + 1;
-        },
-      },
-      {
-        headerName: '工单类型',
-        field: 'repair_order_type',
-      },
-      {
-        headerName: '工单编号',
-        field: 'repair_order_num',
-      },
-      {
-        headerName: '审批名称',
-        field: 'approval_name',
-      },
-      {
-        headerName: '审批说明',
-        field: 'approval_instructions',
-      },
-      {
-        headerName: '申请人',
-        field: 'applicant_name',
-      },
-      {
-        headerName: '创建时间',
-        field: 'apply_create_time',
-      },
-      {
-        headerName: '更新时间',
-        field: 'apply_update_time',
-      },
-      {
-        headerName: '工单状态',
-        field: 'repair_order_status',
-      },
-      {
-        headerName: '上步已审批人',
-        field: 'before_approval_name',
-        minWidth: 120
-      }, {
-        headerName: '当前待审批人',
-        field: 'current_approval_name',
-        minWidth: 120
-      }];
-    const firstListGridApi = useRef<GridApi>();
     const onfirstListGridReady = (params: GridReadyEvent) => {
       firstListGridApi.current = params.api;
       params.api.sizeColumnsToFit();
     };
-
     const onChangefirstListGridReady = (params: GridReadyEvent) => {
       firstListGridApi.current = params.api;
       params.api.sizeColumnsToFit();
@@ -1218,7 +1115,6 @@ const PreRelease: React.FC<any> = () => {
       }
       const result = await saveProcessResult(currentListNo, params);
       if (result === "") {
-
         message.info({
           content: "保存成功！",
           duration: 1,
@@ -1240,7 +1136,6 @@ const PreRelease: React.FC<any> = () => {
           },
         });
       }
-
     };
     /* endregion */
 
@@ -1265,16 +1160,11 @@ const PreRelease: React.FC<any> = () => {
             marginTop: '50vh',
           },
         });
-
         const modifyTime: any = result.datas;
-
         formForPreReleaseProject.setFieldsValue({
-
           editor: modifyTime.editor,
           editTime: modifyTime.editTime,
-
         });
-
         // 保存成功后需要刷新状态
         await getProcessStatus();
       } else {
@@ -1286,7 +1176,6 @@ const PreRelease: React.FC<any> = () => {
           },
         });
       }
-
       deleteLockStatus(lockedInfo);
     };
 
@@ -1295,11 +1184,9 @@ const PreRelease: React.FC<any> = () => {
     /* region 升级服务 */
     const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
     const onReleaseIdChanges = (selectedId: any, params: any) => {
-
       if (params && params.length > 0) {
         const queryCondition: any = [];
         params.forEach((ele: any) => {
-
           queryCondition.push({
             "deployment_id": ele.key,
             "automation_check": ele.automation_test,
@@ -1307,17 +1194,13 @@ const PreRelease: React.FC<any> = () => {
           });
 
         });
-
-        // releaseIdArray = releaseIdArray.concat(queryCondition);
         releaseIdArray = queryCondition;
       } else {
         releaseIdArray = [];
-
       }
     }
 
     const inquireServiceClick = async () => {
-
       const result = await inquireService(releaseIdArray);
       if (result.message !== "") {
         message.error({
@@ -1330,7 +1213,6 @@ const PreRelease: React.FC<any> = () => {
       } else {
 
         // 有数据之后进行表格的赋值操作(需要把之前表格的数据一并追加进来)   获取之前的数据
-
         const newData: any = await alalysisInitData("pulishItem", currentListNo);
         let gridData = result.data;
         if (newData.upService_releaseItem) {
@@ -1338,7 +1220,6 @@ const PreRelease: React.FC<any> = () => {
         }
 
         firstUpSerGridApi.current?.setRowData(gridData);
-
         // 需要判断升级接口内容是否有值，如果没有的话，则需要新增一个空行
         const apidata: any = await alalysisInitData("pulishApi", currentListNo);
         if (!apidata.upService_interface || (apidata.upService_interface) <= 0) {
@@ -1349,7 +1230,6 @@ const PreRelease: React.FC<any> = () => {
           ...gridHeight,
           pulishItemGrid: getGridHeight(gridData.length),
           upgradeApiGrid: getGridHeight(1),
-
         });
       }
     };
@@ -1398,8 +1278,6 @@ const PreRelease: React.FC<any> = () => {
       });
 
     };
-
-
     const showPagesContent = async (source: any) => {
 
       if (!source || JSON.stringify(source) === "{}") {
@@ -1408,13 +1286,10 @@ const PreRelease: React.FC<any> = () => {
 
       // 预发布项目
       const preReleaseProject = source?.preProject;
-
       currentListNo = preReleaseProject.ready_release_num;
       const lockedData = await getAllLockedData(currentListNo);
       allLockedArray = lockedData.data;
-
       await getProcessStatus();
-
       formForPreReleaseProject.setFieldsValue({
         projectsName: preReleaseProject.projectId,
         pulishType: preReleaseProject.release_type,
@@ -1425,11 +1300,9 @@ const PreRelease: React.FC<any> = () => {
         proid: preReleaseProject.pro_id
       });
 
-
       // 升级服务 一
       setReleasedIdForm(source?.upService_releaseItem)
       firstUpSerGridApi.current?.setRowData(source?.upService_releaseItem);
-
       // 升级服务 二
       secondUpSerGridApi.current?.setRowData(source?.upService_interface);
       // 升级服务 三
@@ -1442,7 +1315,6 @@ const PreRelease: React.FC<any> = () => {
       firstOnlineBranchGridApi.current?.setRowData(source?.onlineBranch);
       // 对应工单
       firstListGridApi.current?.setRowData(source?.correspondOrder);
-
       setGridHeight({
         pulishItemGrid: getGridHeight((source?.upService_releaseItem).length),
         upgradeApiGrid: getGridHeight((source?.upService_interface).length),
@@ -1456,8 +1328,7 @@ const PreRelease: React.FC<any> = () => {
 
     };
 
-
-// 新增tab
+    // 新增tab
     const add = async () => {
       // 获取新的pageNum
       const newNum = await getNewNum();
@@ -1469,13 +1340,10 @@ const PreRelease: React.FC<any> = () => {
         key: currentListNo
       });
       setTabContent({panes, activeKey: currentListNo});
-
       showNoneDataPage();
     };
-
-// 删除tab
+    // 删除tab
     const remove = (targetKeys: any) => {
-
       setShowTabs({
         shown: true,
         targetKey: targetKeys
@@ -1553,7 +1421,7 @@ const PreRelease: React.FC<any> = () => {
       }
 
     };
-// 新增、修改或删除tab页
+    // 新增、修改或删除tab页
     const onEdits = (targetKey: any, action: any) => {
       if (action === 'remove') {
         remove(targetKey)
@@ -1562,7 +1430,7 @@ const PreRelease: React.FC<any> = () => {
       }
     };
 
-// 切换tab页面
+    // 切换tab页面
     const onChange = async (activeKeys: any) => {
 
       setTabContent({
@@ -1926,7 +1794,7 @@ const PreRelease: React.FC<any> = () => {
                         cellStyle: {"line-height": "25px"},
                       }}
                       getRowStyle={(params: any) => {
-                        return releaseAppChangRowColor("step2-app", params.data?.app_id);
+                        return releaseAppChangRowColor(allLockedArray, "step2-app", params.data?.app_id);
                       }}
                       headerHeight={25}
                       rowHeight={25}
@@ -1953,7 +1821,7 @@ const PreRelease: React.FC<any> = () => {
                       headerHeight={25}
                       rowHeight={25}
                       getRowStyle={(params: any) => {
-                        return releaseAppChangRowColor("step2-api", params.data?.api_id);
+                        return releaseAppChangRowColor(allLockedArray, "step2-api", params.data?.api_id);
                       }}
                       onGridReady={onSecondGridReady}
                       onGridSizeChanged={onChangeSecondGridReady}
@@ -2055,7 +1923,7 @@ const PreRelease: React.FC<any> = () => {
                       headerHeight={25}
                       rowHeight={25}
                       getRowStyle={(params: any) => {
-                        return releaseAppChangRowColor("step3-review", params.data?.review_id);
+                        return releaseAppChangRowColor(allLockedArray, "step3-review", params.data?.review_id);
                       }}
                       onGridReady={onfirstDataReviewGridReady}
                       onGridSizeChanged={onChangefirstDataReviewGridReady}
@@ -2144,7 +2012,7 @@ const PreRelease: React.FC<any> = () => {
                         }}
                         headerHeight={25}
                         getRowStyle={(params: any) => {
-                          return releaseAppChangRowColor("step4-onlineBranch", params.data?.branch_check_id);
+                          return releaseAppChangRowColor(allLockedArray, "step4-onlineBranch", params.data?.branch_check_id);
                         }}
                         onGridReady={onfirstOnlineBranchGridReady}
                         onGridSizeChanged={onChangefirstOnlineBranchGridReady}
@@ -2179,7 +2047,7 @@ const PreRelease: React.FC<any> = () => {
                     <div className="ag-theme-alpine" style={{height: gridHeight.orderList, width: '100%'}}>
                       <AgGridReact
 
-                        columnDefs={firstListColumn} // 定义列
+                        columnDefs={getWorkOrderColumns()} // 定义列
                         // rowData={[]} // 数据绑定
                         defaultColDef={{
                           resizable: true,
@@ -2805,7 +2673,9 @@ const PreRelease: React.FC<any> = () => {
             <Spin spinning={onlineBranchModal.loading} tip="保存中...">
               <Form.Item>
                 <Button
-                  style={{borderRadius: 5, marginLeft: 20, float: "right"}} onClick={onlineBranchClear}>清空
+                  style={{borderRadius: 5, marginLeft: 20, float: "right"}} onClick={() => {
+                  formForOnlineBranch.resetFields();
+                }}>清空
                 </Button>
 
                 <Button type="primary"

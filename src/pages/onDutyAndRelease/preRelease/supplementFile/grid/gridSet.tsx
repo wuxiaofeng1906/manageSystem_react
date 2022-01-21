@@ -21,6 +21,30 @@ const getGridHeight = (gridRowCount: number, moreHigh: boolean = false) => {
   return height;
 };
 
+// 渲染表格行的颜色(正在修改的行)
+const releaseAppChangRowColor = (allLockedArray: any, type: string, idFlag: number) => {
+
+  const lockInfoArray = allLockedArray;
+  let returnValue = {'background-color': 'transparent'};
+  if (!idFlag) {
+    return returnValue;
+  }
+  if (lockInfoArray && lockInfoArray.length > 0) {
+    for (let index = 0; index < lockInfoArray.length; index += 1) {
+
+      const paramsArray = (lockInfoArray[index].param).split("-");
+      if (type === `${paramsArray[1]}-${paramsArray[2]}`) { // 判断是不是属于当前渲染表格的数据
+        if (idFlag.toString() === paramsArray[3]) { // 判断有没有对应id
+          returnValue = {'background-color': '#FFF6F6'};
+          break;
+
+        }
+      }
+    }
+  }
+  return returnValue;
+};
+
 // 操作按钮
 const operateRenderer = (type: number, params: any) => {
 
@@ -909,7 +933,64 @@ const getOnlineBranchColumns = () => {
   return firstOnlineBranchColumn;
 
 }
+
+//
+const getWorkOrderColumns = ()=>{
+
+  const firstListColumn: any = [
+    {
+      headerName: '序号',
+      field: 'No',
+      minWidth: 65,
+      maxWidth: 70,
+      cellRenderer: (params: any) => {
+        return Number(params.node.id) + 1;
+      },
+    },
+    {
+      headerName: '工单类型',
+      field: 'repair_order_type',
+    },
+    {
+      headerName: '工单编号',
+      field: 'repair_order_num',
+    },
+    {
+      headerName: '审批名称',
+      field: 'approval_name',
+    },
+    {
+      headerName: '审批说明',
+      field: 'approval_instructions',
+    },
+    {
+      headerName: '申请人',
+      field: 'applicant_name',
+    },
+    {
+      headerName: '创建时间',
+      field: 'apply_create_time',
+    },
+    {
+      headerName: '更新时间',
+      field: 'apply_update_time',
+    },
+    {
+      headerName: '工单状态',
+      field: 'repair_order_status',
+    },
+    {
+      headerName: '上步已审批人',
+      field: 'before_approval_name',
+      minWidth: 120
+    }, {
+      headerName: '当前待审批人',
+      field: 'current_approval_name',
+      minWidth: 120
+    }];
+  return firstListColumn;
+}
 export {
-  getGridHeight, getReleasedItemColumns, getReleasedApiColumns, getReleaseServiceComfirmColumns,
-  getReviewColumns, getReviewConfirmColums, getOnlineBranchColumns
+  getGridHeight,releaseAppChangRowColor, getReleasedItemColumns, getReleasedApiColumns, getReleaseServiceComfirmColumns,
+  getReviewColumns, getReviewConfirmColums, getOnlineBranchColumns,getWorkOrderColumns
 }

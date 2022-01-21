@@ -1,5 +1,5 @@
 import {
-  getNewPageNum, getCheckProcess, updateReleaseProcess,
+  getNewPageNum, getCheckProcess, updateReleaseProcess, updateTabsName,
   savePrePulishProjects, queryServiceByID, saveUpgradeItem, delUpgradeItem,
   savePulishApi, delPulishApi, upgradeServiceConfirm, addDataRepaire, modifyDataRepaire,
   delDataReviewApi, dataRepairConfirm, getNewCheckNum, saveOnlineBranch, saveVersonCheck,
@@ -10,6 +10,9 @@ import {
 const userLogins: any = localStorage.getItem("userLogins");
 const usersInfo = JSON.parse(userLogins);
 
+const modifyTanName = async (currentListNo: string, newName: string) => {
+  return await updateTabsName(currentListNo, newName);
+};
 const getNewNum = async () => {
   return await getNewPageNum();
 }
@@ -612,7 +615,7 @@ const executeOnlineCheck = async (type: string, checkNum: string) => {
 
 };
 export {
-  getNewNum, deleteReleaseItem, getPageCHeckProcess, saveProcessResult,
+  getNewNum, deleteReleaseItem, getPageCHeckProcess, saveProcessResult,modifyTanName,
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems, addPulishApi, confirmUpgradeService,
   dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch, saveOnlineBranchData, getModifiedData,
   executeOnlineCheck

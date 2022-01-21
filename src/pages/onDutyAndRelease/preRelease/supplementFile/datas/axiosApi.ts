@@ -7,6 +7,7 @@ axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
 const userLogins: any = localStorage.getItem("userLogins");
 const usersInfo = JSON.parse(userLogins);
 
+
 /* region 发布tab相关 */
 // 获取预发布编号
 const getNewPageNum = async () => {
@@ -40,6 +41,7 @@ const getInitPageData = async (queryReleaseNum: string) => {
 
   await axios.get('/api/verify/release/release_detail', {params: {"ready_release_num": queryReleaseNum}})
     .then(function (res) {
+
       if (res.data.code === 200) {
         result.data = res.data.data;
       } else {
@@ -76,6 +78,28 @@ const delTabsInfo = async (releaseNum: string) => {
 
 };
 
+// 修改tab的名字
+const updateTabsName = async (currentListNo: string, newName: string) => {
+
+  const data = {
+    "ready_release_num": currentListNo,
+    "ready_release_name": newName
+  };
+  let errorMessage = "";
+  await axios.post("/api/verify/release/release_name", data)
+    .then(function (res) {
+
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+};
 /* endregion */
 
 /* region 检查进度 */
@@ -270,7 +294,7 @@ const queryServiceByID = async (params: string) => {
     message: "",
     data: []
   };
-debugger;
+  debugger;
   await axios.post('/api/verify/release/env_branch', params)
     .then(function (res) {
       if (res.data.code === 200) {
@@ -1062,7 +1086,7 @@ const excuteAutoCheck = async (checkNum: string, checkTime: string) => {
 /* endregion */
 
 export {
-  getNewPageNum, delTabsInfo, getCheckProcess, updateReleaseProcess,
+  getNewPageNum, delTabsInfo, getCheckProcess, updateReleaseProcess, updateTabsName,
   savePrePulishProjects, queryReleaseType, queryReleaseWay, queryReleaseId, queryServiceByID,
   getInitPageData, getOnlineDev, getPulishItem, getIsApiAndDatabaseUpgrade, saveUpgradeItem,
   delUpgradeItem, getUpgradeApi, getApiService, getApiMethod, savePulishApi, delPulishApi,

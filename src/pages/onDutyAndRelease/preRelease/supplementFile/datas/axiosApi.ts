@@ -80,6 +80,7 @@ const delTabsInfo = async (releaseNum: string) => {
 
 // 修改tab的名字
 const updateTabsName = async (currentListNo: string, newName: string) => {
+  debugger;
 
   const data = {
     "ready_release_num": currentListNo,

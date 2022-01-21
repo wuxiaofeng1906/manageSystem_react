@@ -1453,6 +1453,7 @@ const PreRelease: React.FC<any> = () => {
       activeKey: activeKeys
     });
 
+    currentListNo = activeKeys;
     // 根据标签页获取数据,然后再赋予值
     const newTabData = await alalysisInitData("", activeKeys);
     showPagesContent(newTabData);
@@ -1517,6 +1518,7 @@ const PreRelease: React.FC<any> = () => {
 
   // 保存tab名
   const saveModifyName = async () => {
+    debugger;
     const formData = tabNameSetForm.getFieldsValue();
     const result = await modifyTanName(currentListNo, formData.newTabName);
     if (result === "") {

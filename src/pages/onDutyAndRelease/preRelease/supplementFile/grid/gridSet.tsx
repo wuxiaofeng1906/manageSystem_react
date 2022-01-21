@@ -556,7 +556,6 @@ const rendererUnitTest = (params: any) => {
 
 // 渲染上线前版本检查是否通过
 const beforeOnlineVersionCheck = (params: any) => {
-  debugger;
 
   if (!params.value || (params.value).length === 0) {
     return "";

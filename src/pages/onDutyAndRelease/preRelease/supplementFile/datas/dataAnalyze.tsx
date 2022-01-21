@@ -17,6 +17,7 @@ const analysisTabsPageInfo = async (datas: any) => {
 
     });
   }
+
   return tabsPageArray;
 };
 

@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-01-10 10:28:33
+ * @LastEditTime: 2022-01-21 09:22:30
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -21,19 +21,25 @@ import {
 import { mySelector } from './index.css';
 import { useMount } from 'ahooks';
 import { useGqlClient } from '@/hooks';
-import { GQL_PARAMS, GRAPHQL_QUERY } from '@/namespaces';
+import { GQL_PARAMS, GRAPHQL_QUERY, PK_SEARCH_INTERVAL } from '@/namespaces';
 import React, { useEffect, useState } from 'react';
 import { useModel } from 'umi';
 import { projectKpiGql, organizationGql, queryGQL } from '@/pages/gqls';
 import { ColumnHeightOutlined, ReloadOutlined } from '@ant-design/icons';
 import { deptTreeNodes, onTreeMultiChange, projOptsElems } from './extra';
+import { Moment } from 'moment';
+import moment from 'moment';
 
 const { RangePicker } = DatePicker;
 
 /*  */
 let dateStr: [string, string] | undefined; // 存放时间range信息
 let doChange = false;
-const defaultSeclectItems = { deptIds: [], projIds: [], dates: null, doQuery: false };
+const defaultDateRange: [Moment, any] = [
+  moment().subtract(PK_SEARCH_INTERVAL.value, PK_SEARCH_INTERVAL.unit as any),
+  null,
+]; // date组件默认显示
+const defaultSeclectItems = { deptIds: [], projIds: [], dates: defaultDateRange, doQuery: false };
 /* ************************************************************************************************************** */
 export default () => {
   /* 数据区 */
@@ -76,7 +82,7 @@ export default () => {
   // xs={24} sm={24} md={22} lg={22} xl={22}
   const selectFlexs = { xs: 24, sm: 24, md: 22 };
   const extraFlexs = { xs: selectFlexs.xs, sm: selectFlexs.sm, md: 24 - selectFlexs.md };
-  // 
+  //
   const itemFlexs = { xs: 24, sm: 24, md: 7 };
 
   /* 方法区 */

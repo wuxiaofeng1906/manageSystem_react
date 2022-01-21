@@ -2,7 +2,7 @@
  * @Description: 通用常量
  * @Author: jieTan
  * @Date: 2021-11-23 15:51:13
- * @LastEditTime: 2022-01-18 06:57:11
+ * @LastEditTime: 2022-01-21 08:49:06
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -58,6 +58,11 @@ export const PROJ_METRIC = {
 };
 // 项目度量指标 - 修改接口路径
 export const PK_PATH = '/api/project/kpi';
+// 默认项目查询的时间范围
+export const PK_SEARCH_INTERVAL = {
+  unit: 'months',
+  value: 3,
+};
 
 /*  */
 // 分母默认值
@@ -66,3 +71,8 @@ export const DEFAULT_DENOMINATOR = 1;
 export const DEFAULT_PLACEHOLDER = '-';
 // float默认保留的小数位
 export const DEFAULT_DECIMAL_PLACES = 2;
+// Moment日期格式化
+export const MOMENT_FORMAT = {
+  date: 'YYYY-MM-DD',
+  time: 'HH:mm:ss',
+};

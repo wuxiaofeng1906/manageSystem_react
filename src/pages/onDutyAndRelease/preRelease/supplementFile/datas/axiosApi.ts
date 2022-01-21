@@ -144,6 +144,31 @@ const updateReleaseProcess = async (data: any) => {
 /* endregion */
 
 /* region 预发布项目 */
+// 删除接口
+const deleteReleasedId = async (ready_release_num: string, deployment_id: string) => {
+
+  let errorMessage = "";
+
+  const datas = {
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "deployment_id": deployment_id,
+    "ready_release_num": ready_release_num
+  };
+
+  await axios.delete("/api/verify/release/upgrade_service_deployment", {data: datas})
+    .then(function (res) {
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+};
+
 // 发布类型
 const queryReleaseType = async () => {
 
@@ -1086,7 +1111,7 @@ const excuteAutoCheck = async (checkNum: string, checkTime: string) => {
 /* endregion */
 
 export {
-  getNewPageNum, delTabsInfo, getCheckProcess, updateReleaseProcess, updateTabsName,
+  getNewPageNum, delTabsInfo, getCheckProcess, updateReleaseProcess, updateTabsName, deleteReleasedId,
   savePrePulishProjects, queryReleaseType, queryReleaseWay, queryReleaseId, queryServiceByID,
   getInitPageData, getOnlineDev, getPulishItem, getIsApiAndDatabaseUpgrade, saveUpgradeItem,
   delUpgradeItem, getUpgradeApi, getApiService, getApiMethod, savePulishApi, delPulishApi,

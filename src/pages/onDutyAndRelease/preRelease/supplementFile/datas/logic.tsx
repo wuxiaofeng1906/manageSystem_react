@@ -1,5 +1,5 @@
 import {
-  getNewPageNum, getCheckProcess, updateReleaseProcess, updateTabsName,
+  getNewPageNum, getCheckProcess, updateReleaseProcess, updateTabsName, deleteReleasedId,
   savePrePulishProjects, queryServiceByID, saveUpgradeItem, delUpgradeItem,
   savePulishApi, delPulishApi, upgradeServiceConfirm, addDataRepaire, modifyDataRepaire,
   delDataReviewApi, dataRepairConfirm, getNewCheckNum, saveOnlineBranch, saveVersonCheck,
@@ -82,6 +82,10 @@ const getPageCHeckProcess = async (releaseNum: string) => {
   return await getCheckProcess(releaseNum);
 };
 
+// 删除一键发布ID
+const deleteReleasedID = (deployment_id: string, ready_release_num: string) => {
+ return  deleteReleasedId(deployment_id, ready_release_num);
+};
 // 保存发布结果
 const saveProcessResult = async (releaseNum: string, result: string) => {
 
@@ -615,7 +619,7 @@ const executeOnlineCheck = async (type: string, checkNum: string) => {
 
 };
 export {
-  getNewNum, deleteReleaseItem, getPageCHeckProcess, saveProcessResult,modifyTanName,
+  getNewNum, deleteReleaseItem, getPageCHeckProcess, saveProcessResult, modifyTanName,deleteReleasedID,
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems, addPulishApi, confirmUpgradeService,
   dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch, saveOnlineBranchData, getModifiedData,
   executeOnlineCheck

@@ -353,6 +353,12 @@ const getReviewColumns = () => {
       },
     },
     {
+      headerName: '提交ID',
+      field: 'commit_id',
+      minWidth: 100,
+      maxWidth: 100
+    },
+    {
       headerName: '数据修复内容',
       field: 'repair_data_content',
       minWidth: 120
@@ -550,6 +556,7 @@ const rendererUnitTest = (params: any) => {
 
 // 渲染上线前版本检查是否通过
 const beforeOnlineVersionCheck = (params: any) => {
+  debugger;
 
   if (!params.value || (params.value).length === 0) {
     return "";
@@ -562,7 +569,7 @@ const beforeOnlineVersionCheck = (params: any) => {
     side = "前端：";
   } else if (values.technical_side === "backend") {
     side = "后端：";
-  } else if (values.technical_side === "front,backend") {
+  } else if (values.technical_side === "front,backend" || values.technical_side === "backend,front") {
     side = "前后端：";
   }
 
@@ -935,7 +942,7 @@ const getOnlineBranchColumns = () => {
 }
 
 //
-const getWorkOrderColumns = ()=>{
+const getWorkOrderColumns = () => {
 
   const firstListColumn: any = [
     {
@@ -991,6 +998,13 @@ const getWorkOrderColumns = ()=>{
   return firstListColumn;
 }
 export {
-  getGridHeight,releaseAppChangRowColor, getReleasedItemColumns, getReleasedApiColumns, getReleaseServiceComfirmColumns,
-  getReviewColumns, getReviewConfirmColums, getOnlineBranchColumns,getWorkOrderColumns
+  getGridHeight,
+  releaseAppChangRowColor,
+  getReleasedItemColumns,
+  getReleasedApiColumns,
+  getReleaseServiceComfirmColumns,
+  getReviewColumns,
+  getReviewConfirmColums,
+  getOnlineBranchColumns,
+  getWorkOrderColumns
 }

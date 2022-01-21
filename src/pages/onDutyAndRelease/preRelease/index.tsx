@@ -19,7 +19,7 @@ import {
   loadCheckTypeSelect, loadBrowserTypeSelect
 } from "./supplementFile/comControl/controler";
 import {
-  getNewNum, deleteReleaseItem, getPageCHeckProcess, modifyTanName,
+  getNewNum, deleteReleaseItem, getPageCHeckProcess, modifyTanName, deleteReleasedID,
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems,
   addPulishApi, confirmUpgradeService, dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch,
   saveOnlineBranchData, getModifiedData, executeOnlineCheck, saveProcessResult
@@ -33,7 +33,7 @@ import {
 import {getLockStatus, deleteLockStatus, getAllLockedData, getLockedId} from "./supplementFile/lock/rowLock";
 import {getNewPageNum} from "@/pages/onDutyAndRelease/preRelease/supplementFile/datas/axiosApi";
 import {history} from "@@/core/history";
-import {showReleasedId} from './upgradeService/dataDeal';
+import {showReleasedId, alaReleasedChanged} from './upgradeService/dataDeal';
 import {showProgressData} from './progress/alaProgress';
 
 const {TabPane} = Tabs;
@@ -496,6 +496,7 @@ const PreRelease: React.FC<any> = () => {
 
   // 显示一键部署ID
   const setReleasedIdForm = async (releasedData: any) => {
+    debugger;
     const ids = await showReleasedId(releasedData);
     releaseIdArray = ids.idStrArray;
     formUpgradeService.setFieldsValue({
@@ -1185,24 +1186,30 @@ const PreRelease: React.FC<any> = () => {
 
   /* region 升级服务 */
   const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
-  const onReleaseIdChanges = (selectedId: any, params: any) => {
-    if (params && params.length > 0) {
-      const queryCondition: any = [];
-      params.forEach((ele: any) => {
-        queryCondition.push({
-          "deployment_id": ele.key,
-          "automation_check": ele.automation_test,
-          "service": (ele.service).split(",")
-        });
+  const onReleaseIdChanges = async (selectedId: any, params: any) => {
 
-      });
-      releaseIdArray = queryCondition;
-    } else {
-      releaseIdArray = [];
+    const allaResult = alaReleasedChanged(releaseIdArray, params);
+    releaseIdArray = allaResult.queryArray;
+    if (allaResult.deletedData) { // 如果有需要被删除的数据就删除，并且更新列表
+      const result = await deleteReleasedID(currentListNo, allaResult.deletedData);
+      if (result !== "") {
+        message.error({
+          content: result,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      } else {
+        const newData: any = await alalysisInitData("pulishItem", currentListNo);
+        firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
+      }
     }
+
   }
 
   const inquireServiceClick = async () => {
+
     const result = await inquireService(releaseIdArray);
     if (result.message !== "") {
       message.error({

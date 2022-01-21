@@ -7,16 +7,14 @@ const analysisTabsPageInfo = async (datas: any) => {
   if (datas) {
 
     datas.forEach((ele: any) => {
-      const {project} = ele;
-      if (project.length > 0) {
+      const {ready_release} = ele;
+      const panes: any = {
+        title: ready_release.ready_release_name,
+        content: "",
+        key: ready_release.ready_release_num,
+      };
+      tabsPageArray.push(panes);
 
-        const panes: any = {
-          title: project[0].ready_release_name,
-          content: "",
-          key: project[0].ready_release_num,
-        };
-        tabsPageArray.push(panes);
-      }
     });
   }
   return tabsPageArray;
@@ -24,25 +22,30 @@ const analysisTabsPageInfo = async (datas: any) => {
 
 // 预发布项目数据解析
 const analysisPreReleaseProject = (datas: any) => {
+  if (datas && datas.length > 0) {
 
-  const project = datas[0];
-  const projectArray = project.project;
-  const projectIdArray: any = [];
-  projectArray.forEach((ele: any) => {
-    projectIdArray.push(`${ele.project_name}&${ele.project_id}`);
-  })
-  const returnArray = {
-    pro_id: project.pro_id,
-    projectId: projectIdArray,
-    release_type: project.release_type,
-    release_way: project.release_way,
-    plan_release_time: project.plan_release_time,
-    edit_user_name: project.edit_user_name,
-    edit_time: project.edit_time,
-    ready_release_num: project.ready_release_num
-  };
+    const project = datas[0];
+    const projectArray = project.project;
+    const projectIdArray: any = [];
+    projectArray.forEach((ele: any) => {
+      projectIdArray.push(`${ele.project_name}&${ele.project_id}`);
+    })
+    const returnArray = {
+      pro_id: project.pro_id,
+      projectId: projectIdArray,
+      release_type: project.release_type,
+      release_way: project.release_way,
+      plan_release_time: project.plan_release_time,
+      edit_user_name: project.edit_user_name,
+      edit_time: project.edit_time,
+      ready_release_num: project.ready_release_num
+    };
 
-  return returnArray;
+    return returnArray;
+  }
+
+  return {};
+
 };
 
 /*  region 升级服务数据解析 */

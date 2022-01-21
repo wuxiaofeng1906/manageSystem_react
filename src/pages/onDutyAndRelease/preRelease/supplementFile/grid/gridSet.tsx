@@ -598,16 +598,17 @@ const beforeOnlineVersionCheck = (params: any) => {
       result = "未开始";
     } else if (values.check_status === "2") {
       result = "检查中";
+      frontColor = "#46A0FC";
     } else if (values.check_status === "3") {
       result = "已结束";
     }
-    frontColor = "#8B4513";
+
   } else if (values.check_result === "1") {
     result = "是";
     frontColor = "#2BF541";
   } else if (values.check_result === "2") {
     result = "否";
-    frontColor = "#46A0FC";
+    frontColor = "#8B4513";
   }
 
   const checkNum = JSON.stringify(params.data?.check_num);

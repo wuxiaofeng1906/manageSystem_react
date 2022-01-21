@@ -6,37 +6,19 @@ const analysisTabsPageInfo = async (datas: any) => {
   const tabsPageArray: any = [];
   if (datas) {
 
-    // if (datas.length === 0) {
-    //   // 新建一个
-    //   // const newNum = await getNewPageNum();
-    //   // const releaseNum = newNum.data?.ready_release_num;
-    //   // const panes: any = {
-    //   //   title: `${releaseNum}灰度预发布`,
-    //   //   content: "",
-    //   //   key: releaseNum,
-    //   // };
-    //   // tabsPageArray.push(panes);
-    //
-    //   return
-    // } else {
     datas.forEach((ele: any) => {
       const {project} = ele;
       if (project.length > 0) {
-        const releaseNum = project[0].ready_release_num;
 
-        // const timeString = releaseNum.substring(0, 8);
         const panes: any = {
-          title: `${releaseNum}灰度预发布`,
+          title: project[0].ready_release_name,
           content: "",
-          key: releaseNum,
+          key: project[0].ready_release_num,
         };
         tabsPageArray.push(panes);
       }
     });
-    // }
-
   }
-
   return tabsPageArray;
 };
 

@@ -496,7 +496,7 @@ const PreRelease: React.FC<any> = () => {
 
   // 显示一键部署ID
   const setReleasedIdForm = async (releasedData: any) => {
-    debugger;
+
     const ids = await showReleasedId(releasedData);
     releaseIdArray = ids.idStrArray;
     formUpgradeService.setFieldsValue({
@@ -1469,6 +1469,46 @@ const PreRelease: React.FC<any> = () => {
     setTabNameModal(false);
   };
 
+  // 初始化显示tab
+  const showTabsPage = async () => {
+    if (releasedNumStr === "") {
+      const source = await alalysisInitData();
+      const tabsInfo = source?.tabPageInfo;
+
+      if (tabsInfo) {
+        setTabContent({
+          activeKey: tabsInfo[0].key,
+          panes: tabsInfo
+        });
+      } else if (initData === undefined) {
+        const newNum = await getNewPageNum();
+        const releaseNum = newNum.data?.ready_release_num;
+        currentListNo = releaseNum;
+        const panesArray: any = [{
+          title: `${releaseNum}灰度预发布`,
+          content: "",
+          key: releaseNum,
+        }];
+
+        setTabContent({
+          activeKey: releaseNum,
+          panes: panesArray
+        });
+      }
+
+    } else {
+      const newPage: any = [{
+        title: `${releasedNumStr}灰度预发布`,
+        content: "",
+        key: releasedNumStr,
+      }];
+      setTabContent({
+        activeKey: releasedNumStr,
+        panes: newPage
+      });
+    }
+  };
+
   // 保存tab名
   const saveModifyName = async () => {
     const formData = tabNameSetForm.getFieldsValue();
@@ -1482,6 +1522,8 @@ const PreRelease: React.FC<any> = () => {
         },
       });
       setTabNameModal(false);
+      //   重置tab名
+      showTabsPage();
     } else {
       message.error({
         content: result,
@@ -1538,45 +1580,6 @@ const PreRelease: React.FC<any> = () => {
       }
     } else {
       setSaveButtonDisable(false);
-    }
-  };
-  // 初始化显示tab
-  const showTabsPage = async () => {
-    if (releasedNumStr === "") {
-      const source = await alalysisInitData();
-      const tabsInfo = source?.tabPageInfo;
-
-      if (tabsInfo) {
-        setTabContent({
-          activeKey: tabsInfo[0].key,
-          panes: tabsInfo
-        });
-      } else if (initData === undefined) {
-        const newNum = await getNewPageNum();
-        const releaseNum = newNum.data?.ready_release_num;
-        currentListNo = releaseNum;
-        const panesArray: any = [{
-          title: `${releaseNum}灰度预发布`,
-          content: "",
-          key: releaseNum,
-        }];
-
-        setTabContent({
-          activeKey: releaseNum,
-          panes: panesArray
-        });
-      }
-
-    } else {
-      const newPage: any = [{
-        title: `${releasedNumStr}灰度预发布`,
-        content: "",
-        key: releasedNumStr,
-      }];
-      setTabContent({
-        activeKey: releasedNumStr,
-        panes: newPage
-      });
     }
   };
 

@@ -283,7 +283,7 @@ const getReleaseServiceComfirmColumns = () => {
       field: 'back_end_confirm_time',
     },
     {
-      headerName: '流程确认',
+      headerName: '流程值班',
       field: 'process_user_name',
     },
     {

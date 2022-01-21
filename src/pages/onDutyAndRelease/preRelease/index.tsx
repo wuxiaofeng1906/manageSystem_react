@@ -1623,7 +1623,7 @@ const PreRelease: React.FC<any> = () => {
     showPagesContent(initData);
     showTabsPage();
     //   定时刷新数据review的数据
-    timeTaskForPageRefresh();
+    // timeTaskForPageRefresh();
   }, [initData]);
 
   return (

@@ -35,6 +35,7 @@ import {getNewPageNum} from "@/pages/onDutyAndRelease/preRelease/supplementFile/
 import {history} from "@@/core/history";
 import {showReleasedId, alaReleasedChanged} from './upgradeService/dataDeal';
 import {showProgressData} from './progress/alaProgress';
+import dayjs from "dayjs";
 
 const {TabPane} = Tabs;
 const {Option} = Select;
@@ -320,7 +321,10 @@ const PreRelease: React.FC<any> = () => {
       formForOnlineBranch.resetFields();
       formForOnlineBranch.setFieldsValue({
         verson_check: "1",
-        branchcheck: "1"
+        branchcheck: "1",
+        branch_mainBranch: ["stage", "master"],
+        branch_teachnicalSide: ["front", "backend"],
+        branch_mainSince: moment(dayjs().subtract(6, 'day').format("YYYY-MM-DD")),
       });
       setOnlineBranchModal({
         shown: true,

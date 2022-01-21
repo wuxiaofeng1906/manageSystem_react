@@ -6,6 +6,7 @@ import {
   saveEnvironmentCheck, saveOnlineAutoCheck, getDetaisByCHeckNum, delDataOnlineBranchApi,
   excuteVersionCheck, excuteEnvCheck, excuteAutoCheck, delTabsInfo
 } from "@/pages/onDutyAndRelease/preRelease/supplementFile/datas/axiosApi";
+import {alalysisInitData} from "./dataAnalyze";
 
 const userLogins: any = localStorage.getItem("userLogins");
 const usersInfo = JSON.parse(userLogins);
@@ -84,7 +85,7 @@ const getPageCHeckProcess = async (releaseNum: string) => {
 
 // 删除一键发布ID
 const deleteReleasedID = (deployment_id: string, ready_release_num: string) => {
- return  deleteReleasedId(deployment_id, ready_release_num);
+  return deleteReleasedId(deployment_id, ready_release_num);
 };
 // 保存发布结果
 const saveProcessResult = async (releaseNum: string, result: string) => {
@@ -618,9 +619,34 @@ const executeOnlineCheck = async (type: string, checkNum: string) => {
   }
 
 };
+
+
+// 验证是否可以进行表格的新增、修改和删除
+const vertifyModifyFlag = async (types: number, currentListNo: string) => {
+
+  let returnFlag = true;
+
+  if (types === 1 || types === 2 || types === 6) { // 6是一键部署ID的查询
+    // 验证上线分支是否确认完成
+    const datas = (await alalysisInitData("pulishConfirm", currentListNo)).upService_confirm;
+    const confirmData = datas[0];
+    if (confirmData.test_confirm_status === "1") {
+      returnFlag = false;
+    }
+  } else if (types === 3) {
+    // 需要验证review服务中的测试是否确认
+    const datas = (await alalysisInitData("dataReviewConfirm", currentListNo)).reviewData_confirm;
+    const confirmData = datas[0];
+    if (confirmData.confirm_status === "1") {
+      returnFlag = false;
+    }
+  }
+
+  return returnFlag;
+};
 export {
-  getNewNum, deleteReleaseItem, getPageCHeckProcess, saveProcessResult, modifyTanName,deleteReleasedID,
+  getNewNum, deleteReleaseItem, getPageCHeckProcess, saveProcessResult, modifyTanName, deleteReleasedID,
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems, addPulishApi, confirmUpgradeService,
   dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch, saveOnlineBranchData, getModifiedData,
-  executeOnlineCheck
+  executeOnlineCheck, vertifyModifyFlag
 };

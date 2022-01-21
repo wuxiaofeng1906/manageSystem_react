@@ -19,7 +19,7 @@ import {
   loadCheckTypeSelect, loadBrowserTypeSelect
 } from "./supplementFile/comControl/controler";
 import {
-  getNewNum, deleteReleaseItem, getPageCHeckProcess, modifyTanName, deleteReleasedID,
+  getNewNum, deleteReleaseItem, getPageCHeckProcess, modifyTanName, deleteReleasedID, vertifyModifyFlag,
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems,
   addPulishApi, confirmUpgradeService, dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch,
   saveOnlineBranchData, getModifiedData, executeOnlineCheck, saveProcessResult
@@ -150,6 +150,7 @@ const PreRelease: React.FC<any> = () => {
 
   // 发布项弹出窗口进行修改和新增
   const showPulishItemForm = async (type: any, params: any) => {
+    // 验证是否已经确认服务，如果已经确认了，就不能新增和修改了
 
     if (type === "add") {
       pulishItemForm.resetFields();
@@ -443,7 +444,19 @@ const PreRelease: React.FC<any> = () => {
   };
 
   // 新增行
-  (window as any).addRows = (types: any) => {
+  (window as any).addRows = async (types: any) => {
+    const flag = await vertifyModifyFlag(types, currentListNo);
+    if (!flag) {
+      message.error({
+        content: `服务确认已完成，不能进行新增！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
 
     switch (types) {
       case 1:
@@ -466,7 +479,19 @@ const PreRelease: React.FC<any> = () => {
 
   };
   // 修改行
-  (window as any).modifyRows = (types: any, params: any) => {
+  (window as any).modifyRows =async (types: any, params: any) => {
+    const flag =await vertifyModifyFlag(types, currentListNo);
+    if (!flag) {
+      message.error({
+        content: `服务确认已完成，不能进行修改！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
     //  显示数据
     switch (types) {
       case 1:
@@ -590,7 +615,20 @@ const PreRelease: React.FC<any> = () => {
   };
 
   // 删除事件
-  (window as any).deleteRows = (item: any, params: any) => {
+  (window as any).deleteRows =async (item: any, params: any) => {
+    const flag =await vertifyModifyFlag(item, currentListNo);
+    if (!flag) {
+      message.error({
+        content: `服务确认已完成，不能进行删除！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
+
     setDelModal({
       type: item,
       shown: true,
@@ -1213,6 +1251,18 @@ const PreRelease: React.FC<any> = () => {
   }
 
   const inquireServiceClick = async () => {
+
+   if(!await vertifyModifyFlag(6,currentListNo)){
+     message.error({
+       content: `服务确认已完成，不能进行查询！`,
+       duration: 1,
+       style: {
+         marginTop: '50vh',
+       },
+     });
+
+     return;
+   }
 
     const result = await inquireService(releaseIdArray);
     if (result.message !== "") {

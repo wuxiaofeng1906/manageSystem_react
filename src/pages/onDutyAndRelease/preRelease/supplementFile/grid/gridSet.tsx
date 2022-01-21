@@ -53,7 +53,7 @@ const operateRenderer = (type: number, params: any) => {
   if (type === 1) {  // 发布项没有新增功能
     return `
         <div style="margin-top: -5px">
-             <Button  style="border: none; background-color: transparent;  margin-left: -10px; " onclick='modifyRows(${typeStr},${paramData})'>
+             <Button  style="border: none; background-color: transparent;  margin-left: -10px; "  onclick='modifyRows(${typeStr},${paramData})'>
               <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
             </Button>
             <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteRows(${typeStr},${paramData})'>
@@ -939,9 +939,9 @@ const getOnlineBranchColumns = () => {
     }];
   return firstOnlineBranchColumn;
 
-}
+};
 
-//
+// 工单信息
 const getWorkOrderColumns = () => {
 
   const firstListColumn: any = [
@@ -996,7 +996,7 @@ const getWorkOrderColumns = () => {
       minWidth: 120
     }];
   return firstListColumn;
-}
+};
 export {
   getGridHeight,
   releaseAppChangRowColor,

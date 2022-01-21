@@ -57,7 +57,7 @@ const qywxScript = () => {
 };
 
 const Login: React.FC<{}> = () => {
-  debugger;
+
   const [submitting] = useState(false);
   const [showTitle, setTitleShown] = useState(false);
 
@@ -887,9 +887,10 @@ const Login: React.FC<{}> = () => {
 
       testAuth = JSON.parse(testAuth);
       // endregion
-      localStorage.setItem("authority", JSON.stringify(testAuth));
 
-      // console.log("登陆后的token", localStorage.getItem("accessId"));
+      localStorage.setItem("authority", JSON.stringify(testAuth));
+      const tokens = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IuWQtOaZk-WHpCIsInN1YiI6Ild1WGlhb0ZlbmciLCJpYXQiOjE2MjM4MzA2Nzd9.G3EjtMWppClX_E2NN0dFPXgX6OsGSrIXy4ReT_Rs5zI";
+      localStorage.setItem("accessId", tokens);
 
       const userInfos = {
         name: 'testUser',

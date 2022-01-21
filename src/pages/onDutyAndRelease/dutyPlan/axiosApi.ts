@@ -4,6 +4,7 @@ import {getCurrentProxy} from "../../../../config/ip";
 const sys_accessToken = localStorage.getItem("accessId");
 axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
 
+console.log(`Bearer ${sys_accessToken}`);
 // 解析数据
 const parseData = (params: any) => {
 

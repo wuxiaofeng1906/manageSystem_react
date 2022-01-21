@@ -8,7 +8,9 @@ import {
   Button, Form, Input, message, Modal, Select, Tabs,
   Row, Col, DatePicker, Checkbox, Divider, Card, Switch, Progress, Spin
 } from 'antd';
+import dayjs from "dayjs";
 import moment from "moment";
+
 import {AgGridReact} from "ag-grid-react";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {
@@ -16,26 +18,23 @@ import {
   loadPulishItemSelect, loadIsApiAndDbUpgradeSelect, loadUpgradeApiSelect, loadApiServiceSelect, loadApiMethodSelect,
   loadCategorySelect, loadCommiterSelect, loadTechSideSelect, loadBranchNameSelect, loadServiceSelect, loadImgEnvSelect,
   loadCheckTypeSelect, loadBrowserTypeSelect
-} from "./supplementFile/comControl/controler";
+} from "./supplementFile/controler";
 import {useRequest} from "ahooks";
 import {
   getNewNum, deleteReleaseItem, getPageCHeckProcess,
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems,
   addPulishApi, confirmUpgradeService, dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch,
   saveOnlineBranchData, getModifiedData, executeOnlineCheck, saveProcessResult
-} from "./supplementFile/datas/logic";
-import {alalysisInitData} from "./supplementFile/datas/dataAnalyze";
-
+} from "./supplementFile/logic";
+import {alalysisInitData} from "./supplementFile/dataAnalyze";
 import {
-  getGridHeight, getReleasedItemColumns, getReleasedApiColumns,
-  getReleaseServiceComfirmColumns, getReviewColumns, getReviewConfirmColums,
-  getOnlineBranchColumns
-} from "./supplementFile/grid/gridSet";
-import {getLockStatus, deleteLockStatus, getAllLockedData, getLockedId} from "./supplementFile/lock/rowLock";
-import {getNewPageNum} from "@/pages/onDutyAndRelease/preRelease/supplementFile/datas/axiosApi";
+  getReleaseItem, getIfOrNot, getDatabseAndApiUpgrade, getApiMethod, getUpgradeApi, getOnlineDev,
+  getRepaireType, getPassOrNot, getTechSide
+} from "./supplementFile/converse";
+import {getGridHeight} from "./supplementFile/gridSet";
+import {getLockStatus, deleteLockStatus, getAllLockedData} from "./supplementFile/rowLock";
+import {getNewPageNum, queryReleaseId} from "@/pages/onDutyAndRelease/preRelease/supplementFile/datas/axiosApi";
 import {history} from "@@/core/history";
-import {showReleasedId} from './upgradeService/dataDeal';
-import {showProgressData} from './progress/alaProgress';
 
 const {TabPane} = Tabs;
 const {Option} = Select;
@@ -46,19 +45,17 @@ const usersInfo = JSON.parse(userLogins);
 let currentListNo = "";  // 当前页面编号
 let newOnlineBranchNum = "";
 let lockedInfo = "";// 被锁了的id
-let releaseIdArray: any = []; // 已发布的一键部署ID
-let allLockedArray: any = [];  // 被锁的数据
+let releaseIdArray: any = [];
+let allLockedArray: any = [];
 
 const PreRelease: React.FC<any> = () => {
     const interValRef: any = useRef();
 
-    /* region Form 和state定义 */
-    const [pulishItemForm] = Form.useForm(); // 发布项
-    const [upgradeIntForm] = Form.useForm(); // 发布接口
-    const [dataReviewForm] = Form.useForm(); // 数据修复review
-    const [formForOnlineBranch] = Form.useForm(); // 上线分支设置
-    const [formUpgradeService] = Form.useForm(); // 升级服务
-    const [formForPreReleaseProject] = Form.useForm(); // 预发布 head
+    // 获取链接后面的参数
+    const [pulishItemForm] = Form.useForm();
+    const [upgradeIntForm] = Form.useForm();
+    const [dataReviewForm] = Form.useForm();
+    const [formForOnlineBranch] = Form.useForm();
 
     const [gridHeight, setGridHeight] = useState({
       pulishItemGrid: 100,
@@ -69,83 +66,51 @@ const PreRelease: React.FC<any> = () => {
       reviewConfirm: 100,
       orderList: 100
     });
-    const [processStatus, setProcessStatus] = useState({ // 进度条相关数据和颜色
-      releaseProject: "Gainsboro",  // #2BF541
-      upgradeService: "Gainsboro",
-      dataReview: "Gainsboro",
-      onliineCheck: "Gainsboro",
-      releaseResult: "9",
-      processPercent: 0
-    });
-    const [pulishItemModal, setPulishItemModal] = useState({shown: false, title: "新增"});    // 发布项 新增和修改的共同modal显示
-    const [upgradeIntModal, setUpgradeIntModal] = useState({shown: false, title: "新增"});    // 发布项新增和修改的共同modal显示
-    const [dataReviewtModal, setDataReviewModal] = useState({shown: false, title: "新增"});    // 发布项新增和修改的共同modal显示
-    const [onlineBranchModal, setOnlineBranchModal] = useState({shown: false, title: "新增", loading: false}); // 上线分支设置
-    const [autoLogModal, setAutoLogModal] = useState({    // 自动化测试日志弹窗
+
+    // 发布项新增和修改的共同modal显示
+    const [pulishItemModal, setPulishItemModal] = useState({shown: false, title: "新增"});
+
+    // 发布项新增和修改的共同modal显示
+    const [upgradeIntModal, setUpgradeIntModal] = useState({shown: false, title: "新增"});
+    // 发布项新增和修改的共同modal显示
+    const [dataReviewtModal, setDataReviewModal] = useState({shown: false, title: "新增"});
+
+    // 自动化测试日志弹窗
+    const [autoLogModal, setAutoLogModal] = useState({
       show: false,
-      url: {ui: "", api: ""}
+      url: {
+        ui: "",
+        api: ""
+      }
     });
-    const [pulishItemFormSelected, setPulishItemFormSelected] = useState({  // 发布项弹出窗口中的select框加载
+    const autoCancle = () => {
+      setAutoLogModal(
+        {
+          ...autoLogModal,
+          show: false
+        }
+      );
+    };
+
+    // 上线分支设置
+    const [onlineBranchModal, setOnlineBranchModal] = useState({shown: false, title: "新增", loading: false});
+
+    const location = history.location.query;
+    let releasedNumStr = "";
+    if (JSON.stringify(location) !== '{}' && location) {
+
+      releasedNumStr = location?.releasedNum === null ? "" : (location?.releasedNum).toString();
+    }
+    const initData = useRequest(() => alalysisInitData("", releasedNumStr)).data;
+
+    /* region 新增行 */
+
+    // 发布项弹出窗口中的select框加载
+    const [pulishItemFormSelected, setPulishItemFormSelected] = useState({
       onlineEnv: [],
       pulishItem: [],
       isApiDbUpgrade: []
     });
-    const [upgradeApiFormSelected, setUpgradeApiFormSelected] = useState({  // 发布接口弹出窗口中的select框加载
-      onlineEnv: [],
-      upgradeApi: [],
-      apiService: [],
-      apiMethod: [],
-    });
-    const [dataReviewFormSelected, setDataReviewFormSelected] = useState({     // 数据修复review 弹窗selected框
-      category: [],
-      repairCommiter: [],
-    });
-    const [onlineBranchFormSelected, setOnlineBranchFormSelected] = useState({     // 上线分支 弹窗selected框
-      branchName: [],
-      techSide: [],
-      server: [],
-      imgEnv: [],
-      checkType: [],
-      browser: []
-    });
-    const [delModal, setDelModal] = useState({   // 列表数据删除弹窗
-      shown: false,
-      type: -1,
-      datas: {}
-    });
-
-    const [executeStatus, setExecuteStatus] = useState(false); // 上线分支点击执行后的进度展示
-    const [showTabs, setShowTabs] = useState({  // 页面tabPage当前展示页面
-      shown: false, targetKey: ""
-    });
-    const [tabContent, setTabContent] = useState({ // 页面tabPage展示
-      activeKey: "", panes: []
-    });
-    const [saveButtonDisable, setSaveButtonDisable] = useState(false); // 保存按钮是否可用
-    /* endregion */
-
-    /* region 表格的定义 */
-    const firstUpSerGridApi = useRef<GridApi>();
-    const secondUpSerGridApi = useRef<GridApi>();
-    const thirdUpSerGridApi = useRef<GridApi>();
-    const firstDataReviewGridApi = useRef<GridApi>();
-    const firstOnlineBranchGridApi = useRef<GridApi>();
-    /* endregion */
-
-    /* region 当前页面数据的获取 */
-    // 获取当前链接是否有携带预发布编号（就是区分是否从历史记录跳转过来的），
-    const location = history.location.query;
-    let releasedNumStr = "";
-    if (JSON.stringify(location) !== '{}' && location) {
-      releasedNumStr = location?.releasedNum === null ? "" : (location?.releasedNum).toString();
-    }
-    // 查询数据
-    const initData = useRequest(() => alalysisInitData("", releasedNumStr)).data;
-
-    /* endregion */
-
-    /* region 新增和修改表格行弹窗 */
-
     // 发布项弹出窗口进行修改和新增
     const showPulishItemForm = async (type: any, params: any) => {
 
@@ -214,7 +179,14 @@ const PreRelease: React.FC<any> = () => {
 
     };
 
-    // 发布接口弹出窗口进行修改和新增
+    // 发布项弹出窗口中的select框加载
+    const [upgradeApiFormSelected, setUpgradeApiFormSelected] = useState({
+      onlineEnv: [],
+      upgradeApi: [],
+      apiService: [],
+      apiMethod: [],
+    });
+    // 发布项弹出窗口进行修改和新增
     const showUpgradeApiForm = async (type: any, params: any) => {
       if (type === "add") {
         upgradeIntForm.resetFields();
@@ -266,6 +238,11 @@ const PreRelease: React.FC<any> = () => {
 
     };
 
+    // 数据修复review 弹窗selected框
+    const [dataReviewFormSelected, setDataReviewFormSelected] = useState({
+      category: [],
+      repairCommiter: [],
+    });
     // 数据修复review弹出窗口进行修改和新增
     const showDataReviewForm = async (type: any, params: any) => {
 
@@ -315,6 +292,16 @@ const PreRelease: React.FC<any> = () => {
       });
 
     };
+
+    // 上线分支 弹窗selected框
+    const [onlineBranchFormSelected, setOnlineBranchFormSelected] = useState({
+      branchName: [],
+      techSide: [],
+      server: [],
+      imgEnv: [],
+      checkType: [],
+      browser: []
+    });
 
     // 上线分支弹出窗口进行修改和新增
     const showOnlineBranchForm = async (type: any, params: any) => {
@@ -441,7 +428,6 @@ const PreRelease: React.FC<any> = () => {
       });
 
     };
-
     // 新增行
     (window as any).addRows = (types: any) => {
 
@@ -466,6 +452,11 @@ const PreRelease: React.FC<any> = () => {
       }
 
     };
+
+    /* endregion  */
+
+    /* region 修改行 */
+
     // 修改行
     (window as any).modifyRows = (types: any, params: any) => {
       //  显示数据
@@ -489,11 +480,23 @@ const PreRelease: React.FC<any> = () => {
 
 
     };
+
+
     /* endregion  */
 
     /* region 删除功能 */
+    const firstUpSerGridApi = useRef<GridApi>();
+    const secondUpSerGridApi = useRef<GridApi>();
+    const thirdUpSerGridApi = useRef<GridApi>();
+    const firstDataReviewGridApi = useRef<GridApi>();
+    const firstOnlineBranchGridApi = useRef<GridApi>();
 
-    // 取消删除
+    const [delModal, setDelModal] = useState({
+      shown: false,
+      type: -1,
+      datas: {}
+    });
+// 取消删除
     const delCancel = () => {
       setDelModal({
         shown: false,
@@ -502,55 +505,95 @@ const PreRelease: React.FC<any> = () => {
       });
     };
 
-    // 显示一键部署ID
+    const [formUpgradeService] = Form.useForm();
     const setReleasedIdForm = async (releasedData: any) => {
-      const ids = await showReleasedId(releasedData);
-      releaseIdArray = ids.idStrArray;
+
+      const idArray: any = [];
+
+      const idStrArray: any = [];
+
+      // 查询id
+      const IDs = (await queryReleaseId()).data;
+      releasedData.forEach((ele: any) => {
+        if (!idArray.includes(ele.deployment_id)) {
+          idArray.push(ele.deployment_id);
+
+          for (let i = 0; i < IDs.length; i += 1) {
+
+            if (ele.deployment_id === (IDs[i].id).toString()) {
+              idStrArray.push({
+                "deployment_id": ele.deployment_id,
+                "automation_check": IDs[i].automation_test,
+                "service": IDs[i].service
+              });
+              break;
+            }
+          }
+        }
+      });
+
+      releaseIdArray = idStrArray;
       formUpgradeService.setFieldsValue({
-        deployID: ids.idArray
+        deployID: idArray
       });
     };
 
-    // 显示删除后的数据
+// 显示删除后的数据
     const showdeletedNewData = async () => {
 
       const {type} = delModal;
+      if (type === 1) { // 是发布项删除
+        const newData: any = await alalysisInitData("pulishItem", currentListNo);
+        firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
+        // 也要刷新一键部署ID
+        setReleasedIdForm(newData?.upService_releaseItem)
+
+      } else if (type === 2) { // 是升级接口删除
+        const newData: any = await alalysisInitData("pulishApi", currentListNo);
+        secondUpSerGridApi.current?.setRowData(newData.upService_interface);
+        setGridHeight({
+          ...gridHeight,
+          upgradeApiGrid: getGridHeight((newData?.upService_interface).length),
+        });
+
+      } else if (type === 3) { // 是数据修复review、
+        const newData: any = await alalysisInitData("dataReview", currentListNo);
+        firstDataReviewGridApi.current?.setRowData(newData.reviewData_repaire);
+
+
+      } else if (type === 4) { // 是上线分支删除
+
+        const newData: any = await alalysisInitData("onlineBranch", currentListNo);
+        firstOnlineBranchGridApi.current?.setRowData(newData.onlineBranch);
+
+      }
+    }
+
+// 数据删除
+    const delDetailsInfo = async () => {
+
+      const {type} = delModal;
+      const oraData: any = delModal.datas;
+      let currentDelData = "";
+      // 被锁定的数据不能删除
       switch (type) {
-        case 1: {
-          const newDatas = await alalysisInitData("pulishItem", currentListNo);
-          firstUpSerGridApi.current?.setRowData(newDatas.upService_releaseItem);
-          setReleasedIdForm(newDatas?.upService_releaseItem);       // 也要刷新一键部署ID
-        }
+        case 1:
+          currentDelData = `${currentListNo}-step2-app-${oraData?.app_id}`;
           break;
-        case 2: {
-          const newData: any = await alalysisInitData("pulishApi", currentListNo);
-          secondUpSerGridApi.current?.setRowData(newData.upService_interface);
-          setGridHeight({
-            ...gridHeight,
-            upgradeApiGrid: getGridHeight((newData?.upService_interface).length),
-          });
-        }
+        case 2:
+          currentDelData = `${currentListNo}-step2-api-${oraData?.api_id}`;
           break;
-        case 3: {
-          const newData: any = await alalysisInitData("dataReview", currentListNo);
-          firstDataReviewGridApi.current?.setRowData(newData.reviewData_repaire);
-        }
+        case 3:
+          currentDelData = `${currentListNo}-step3-review-${oraData?.review_id}`;
           break;
-        case 4: {
-          const newData: any = await alalysisInitData("onlineBranch", currentListNo);
-          firstOnlineBranchGridApi.current?.setRowData(newData.onlineBranch);
-        }
+        case 4:
+          currentDelData = `${currentListNo}-step4-onlineBranch-${oraData?.branch_check_id}`;
           break;
         default:
           break;
       }
 
-    }
-
-    // 数据删除
-    const delDetailsInfo = async () => {
-
-      const lockInfo = await getLockStatus(getLockedId(delModal.type, currentListNo, delModal.datas));
+      const lockInfo = await getLockStatus(currentDelData);
 
       if (lockInfo.errMessage) {
         message.error({
@@ -563,7 +606,6 @@ const PreRelease: React.FC<any> = () => {
 
         return;
       }
-      // 删除数据
       const result: string = await delUpgradeItems(delModal.type, delModal.datas);
       if (result === "") {
         message.info({
@@ -592,29 +634,105 @@ const PreRelease: React.FC<any> = () => {
       });
     };
 
-    // 删除事件
+// 删除事件
     (window as any).deleteRows = (item: any, params: any) => {
       setDelModal({
         type: item,
         shown: true,
         datas: params
       });
+
     };
 
-    /* endregion */
-
-    /* region 进度条相关 */
-    // 获取当前页面的进度数据
-    const getProcessStatus = async () => {
-      const process = await getPageCHeckProcess(currentListNo);
-      setProcessStatus(showProgressData(process.data));
-    };
     /* endregion */
 
     /* region 表格相关定义和事件 */
+    const [processStatus, setProcessStatus] = useState({
+      releaseProject: "Gainsboro",  // #2BF541
+      upgradeService: "Gainsboro",
+      dataReview: "Gainsboro",
+      onliineCheck: "Gainsboro",
+      releaseResult: "9",
+      processPercent: 0
+    });
+
+    // 获取当前页面的状态
+    const getProcessStatus = async () => {
+      const process = await getPageCHeckProcess(currentListNo);
+
+      const datas = process.data;
+      const results = {
+        releaseProject: "Gainsboro",  // #2BF541
+        upgradeService: "Gainsboro",
+        dataReview: "Gainsboro",
+        onliineCheck: "Gainsboro",
+        releaseResult: "9",
+        processPercent: 0
+      };
+      let successCount = 0;
+      if (datas.project_edit === "1") {
+        results.releaseProject = "#2BF541";
+        successCount += 1;
+      }
+
+      if (datas.update_service === "1") {
+        results.upgradeService = "#2BF541";
+        successCount += 1;
+      }
+      if (datas.review_confirm === "1") {
+        results.dataReview = "#2BF541";
+        successCount += 1;
+      }
+
+      if (datas.release_check === "1") {
+        results.onliineCheck = "#2BF541";
+        successCount += 1;
+      }
+
+      results.releaseResult = datas.release_result;
+      results.processPercent = (successCount / 4) * 100;
+
+      setProcessStatus(results);
+
+    };
+
 
     /* region 升级服务 一  发布项 */
-    // 改变行的颜色（正在编辑的行颜色）
+// 操作按钮渲染
+    const operateRenderer = (type: number, params: any) => {
+
+      const typeStr = JSON.stringify(type);
+      const paramData = JSON.stringify(params.data).replace(/'/g, "’");
+      if (type === 1) {  // 发布项没有新增功能
+        return `
+        <div style="margin-top: -5px">
+             <Button  style="border: none; background-color: transparent;  margin-left: -10px; " onclick='modifyRows(${typeStr},${paramData})'>
+              <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
+            </Button>
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteRows(${typeStr},${paramData})'>
+              <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
+            </Button>
+        </div>
+           `;
+      }
+
+      return `
+        <div style="margin-top: -5px">
+            <Button  style="border: none; background-color: transparent; " onclick='addRows(${typeStr},${paramData})'>
+              <img src="../add_1.png" width="15" height="15" alt="新增" title="新增">
+            </Button>
+             <Button  style="border: none; background-color: transparent;  margin-left: -10px; " onclick='modifyRows(${typeStr},${paramData})'>
+              <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
+            </Button>
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteRows(${typeStr},${paramData})'>
+              <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
+            </Button>
+        </div>
+           `;
+
+    };
+
+// 改变行的颜色（正在编辑的行颜色）
     const releaseAppChangRowColor = (type: string, idFlag: number) => {
 
       const lockInfoArray = allLockedArray;
@@ -637,16 +755,91 @@ const PreRelease: React.FC<any> = () => {
       }
       return returnValue;
     };
+
+    const firstUpSerColumn: any = [
+      {
+        headerName: '上线环境',
+        field: 'online_environment',
+        cellRenderer: (params: any) => {
+
+          return `<span>${getOnlineDev(params.value)}</span>`
+        }
+
+      },
+      {
+        headerName: '发布项',
+        field: 'release_item',
+        minWidth: 95,
+        cellRenderer: (params: any) => {
+          const item = getReleaseItem(params.value);
+          return `<span>${item}</span>`
+        }
+      },
+      {
+        headerName: '应用',
+        field: 'app',
+        minWidth: 65
+      },
+      {
+        headerName: '是否支持热更新',
+        field: 'hot_update',
+        minWidth: 130,
+        cellRenderer: (params: any) => {
+          return `<span>${getIfOrNot(params.value)}</span>`
+        }
+      },
+      {
+        headerName: '是否涉及接口与数据库升级',
+        field: 'is_upgrade_api_database',
+        minWidth: 196,
+        cellRenderer: (params: any) => {
+          return `<span>${getDatabseAndApiUpgrade(params.value)}</span>`
+        }
+      },
+      {
+        headerName: '分支和环境',
+        field: 'branch_environment',
+        minWidth: 105,
+      },
+      {
+        headerName: '编辑人',
+        field: 'edit_user_name',
+        minWidth: 75
+      },
+      {
+        headerName: '编辑时间',
+        field: 'edit_time',
+      },
+      {
+        headerName: '说明',
+        field: 'instructions',
+      },
+      {
+        headerName: '备注',
+        field: 'remarks',
+      },
+      {
+        headerName: '操作',
+        pinned: "right",
+        minWidth: 115,
+        maxWidth: 115,
+        cellRenderer: (params: any) => {
+          return operateRenderer(1, params)
+        }
+      }];
+
     const onFirstGridReady = (params: GridReadyEvent) => {
       firstUpSerGridApi.current = params.api;
       params.api.sizeColumnsToFit();
     };
+
     const onChangeFirstGridReady = (params: GridReadyEvent) => {
       firstUpSerGridApi.current = params.api;
       params.api.sizeColumnsToFit();
     };
 
-    // 保存发布项结果
+
+// 保存发布项结果
     const savePulishResult = async () => {
 
       const formData = pulishItemForm.getFieldsValue();
@@ -699,7 +892,7 @@ const PreRelease: React.FC<any> = () => {
 
     };
 
-    // 取消发布项弹出窗
+// 取消发布项弹出窗
     const pulishItemModalCancle = () => {
       setPulishItemModal({
         ...pulishItemModal,
@@ -714,6 +907,71 @@ const PreRelease: React.FC<any> = () => {
     /* endregion  */
 
     /* region 升级服务 二  */
+    const secondUpSerColumn: any = [
+      {
+        headerName: '上线环境',
+        field: 'online_environment',
+        cellRenderer: (params: any) => {
+          return `<span>${getOnlineDev(params.value)}</span>`
+        }
+      },
+      {
+        headerName: '升级接口',
+        field: 'update_api',
+        cellRenderer: (params: any) => {
+          return `<span>${getUpgradeApi(params.value)}</span>`
+        }
+
+      },
+      {
+        headerName: '接口服务',
+        field: 'api_name',
+      },
+      {
+        headerName: '是否支持热更新',
+        field: 'hot_update',
+        cellRenderer: (params: any) => {
+          return `<span>${getIfOrNot(params.value)}</span>`
+        }
+      },
+      {
+        headerName: '接口Method',
+        field: 'api_method',
+        cellRenderer: (params: any) => {
+          return `<span>${getApiMethod(params.value)}</span>`
+        }
+
+      },
+      {
+        headerName: '接口URL',
+        field: 'api_url',
+      },
+      {
+        headerName: '编辑人',
+        field: 'edit_user_name',
+        minWidth: 75
+      },
+      {
+        headerName: '编辑时间',
+        field: 'edit_time',
+      },
+      {
+        headerName: '涉及租户',
+        field: 'related_tenant',
+      },
+      {
+        headerName: '备注',
+        field: 'remarks',
+      },
+      {
+        headerName: '操作',
+        pinned: "right",
+        minWidth: 100,
+        maxWidth: 100,
+        cellRenderer: (params: any) => {
+          return operateRenderer(2, params)
+        }
+      }];
 
     const onSecondGridReady = (params: GridReadyEvent) => {
       secondUpSerGridApi.current = params.api;
@@ -725,7 +983,7 @@ const PreRelease: React.FC<any> = () => {
       params.api.sizeColumnsToFit();
     };
 
-    // 保存数据
+// 保存数据
     const saveUpgradeInterResult = async () => {
       const formData = upgradeIntForm.getFieldsValue();
       const result = await addPulishApi(formData, currentListNo, upgradeIntModal.title);
@@ -786,6 +1044,115 @@ const PreRelease: React.FC<any> = () => {
 
     /* region 升级服务 三  */
 
+    const thirdUpSerColumn = [
+      {
+        headerName: '前端值班',
+        field: 'front_user_name',
+        minWidth: 90,
+      },
+      {
+        headerName: '服务确认完成',
+        field: 'front_confirm_status',
+        minWidth: 115,
+        // editable: true,
+        // cellEditor: "agSelectCellEditor",
+        // cellEditorParams: {values: confirmRender()},
+        // filterParams: {
+        //   valueFormatter: (params: any) => {
+        //     return confirmMappings[params.value];
+        //   },
+        // },
+        // valueFormatter: (params: any) => {
+        //   return confirmMappings[params.value];
+        // },
+        cellRenderer: "confirmSelectChoice",
+      },
+      {
+        headerName: '确认时间',
+        field: 'front_confirm_time',
+      },
+      {
+        headerName: '后端值班',
+        field: 'back_end_user_name',
+      },
+      {
+        headerName: '服务确认完成',
+        field: 'back_end_confirm_status',
+        minWidth: 115,
+        // editable: true,
+        // cellEditor: "agSelectCellEditor",
+        // cellEditorParams: {values: confirmRender()},
+        // filterParams: {
+        //   valueFormatter: (params: any) => {
+        //     return confirmMappings[params.value];
+        //   },
+        // },
+        // valueFormatter: (params: any) => {
+        //   return confirmMappings[params.value];
+        // },
+        // cellRenderer: selectColorRenderer
+        cellRenderer: "confirmSelectChoice",
+
+      },
+      {
+        headerName: '确认时间',
+        field: 'back_end_confirm_time',
+      },
+      {
+        headerName: '流程确认',
+        field: 'process_user_name',
+      },
+      {
+        headerName: '服务确认完成',
+        field: 'process_confirm_status',
+        minWidth: 115,
+        // editable: true,
+        // cellEditor: "agSelectCellEditor",
+        // cellEditorParams: {values: confirmRender()},
+        // filterParams: {
+        //   valueFormatter: (params: any) => {
+        //     return confirmMappings[params.value];
+        //   },
+        // },
+        // valueFormatter: (params: any) => {
+        //   return confirmMappings[params.value];
+        // },
+        // cellRenderer: selectColorRenderer
+        cellRenderer: "confirmSelectChoice",
+
+      },
+      {
+        headerName: '确认时间',
+        field: 'process_confirm_time',
+      },
+      {
+        headerName: '测试值班',
+        field: 'test_user_name',
+      },
+      {
+        headerName: '服务确认完成',
+        field: 'test_confirm_status',
+        minWidth: 115,
+        // editable: true,
+        // cellEditor: "agSelectCellEditor",
+        // cellEditorParams: {values: confirmRender()},
+        // filterParams: {
+        //   valueFormatter: (params: any) => {
+        //     return confirmMappings[params.value];
+        //   },
+        // },
+        // valueFormatter: (params: any) => {
+        //   return confirmMappings[params.value];
+        // },
+        // cellRenderer: selectColorRenderer
+        cellRenderer: "confirmSelectChoice",
+
+      },
+      {
+        headerName: '确认时间',
+        field: 'test_confirm_time',
+      }];
+
     const onthirdGridReady = (params: GridReadyEvent) => {
       thirdUpSerGridApi.current = params.api;
       params.api.sizeColumnsToFit();
@@ -796,7 +1163,7 @@ const PreRelease: React.FC<any> = () => {
       params.api.sizeColumnsToFit();
     };
 
-    // 下拉框选择是否确认事件
+// 下拉框选择是否确认事件
     const saveUperConfirmInfo = async (newValue: string, props: any) => {
 
       const datas = {
@@ -856,6 +1223,78 @@ const PreRelease: React.FC<any> = () => {
 
     /*  region 数据修复 Review 一 */
 
+    const firstDataReviewColumn: any = [
+      {
+        headerName: '序号',
+        field: 'No',
+        minWidth: 65,
+        maxWidth: 70,
+        cellRenderer: (params: any) => {
+          return Number(params.node.id) + 1;
+        },
+      },
+      {
+        headerName: '数据修复内容',
+        field: 'repair_data_content',
+        minWidth: 120
+      },
+      {
+        headerName: '涉及租户',
+        field: 'related_tenant',
+      },
+      {
+        headerName: '类型',
+        field: 'type',
+        minWidth: 80,
+        cellRenderer: (params: any) => {
+          return `<span>${getRepaireType(params.value)}</span>`
+        }
+
+      },
+      {
+        headerName: '修复提交人',
+        field: 'commit_user_name',
+        minWidth: 105
+      },
+      {
+        headerName: '分支',
+        field: 'branch',
+      },
+      {
+        headerName: '编辑人',
+        field: 'edit_user_name',
+        minWidth: 75
+      },
+      {
+        headerName: '编辑时间',
+        field: 'edit_time',
+      },
+      {
+        headerName: '评审结果',
+        field: 'review_result',
+        cellRenderer: (params: any) => {
+          return `<span>${getPassOrNot(params.value)}</span>`
+        }
+
+      },
+      {
+        headerName: '是否可重复执行',
+        field: 'is_repeat',
+        minWidth: 130,
+        cellRenderer: (params: any) => {
+          return `<span>${getIfOrNot(params.value)}</span>`
+        }
+      },
+      {
+        headerName: '操作',
+        pinned: "right",
+        minWidth: 100,
+        maxWidth: 100,
+        cellRenderer: (params: any) => {
+
+          return operateRenderer(3, params);
+        }
+      }];
     const onfirstDataReviewGridReady = (params: GridReadyEvent) => {
       firstDataReviewGridApi.current = params.api;
       params.api.sizeColumnsToFit();
@@ -878,7 +1317,7 @@ const PreRelease: React.FC<any> = () => {
       }
     };
 
-    // 保存数据修复review
+// 保存数据修复review
     const saveDataReviewResult = async () => {
       const formData = dataReviewForm.getFieldsValue();
       const result = await dataRepaireReview(dataReviewtModal.title, currentListNo, formData);
@@ -918,6 +1357,32 @@ const PreRelease: React.FC<any> = () => {
     /* endregion */
 
     /*  region 数据修复 Review 二 */
+
+    const secondDataReviewColumn = [
+      {
+        headerName: '后端值班',
+        field: 'confirm_user_name',
+      },
+      {
+        headerName: '服务确认完成',
+        field: 'confirm_status',
+        // editable: true,
+        // cellEditor: "agSelectCellEditor",
+        // cellEditorParams: {values: confirmRender()},
+        // filterParams: {
+        //   valueFormatter: (params: any) => {
+        //     return confirmMappings[params.value];
+        //   },
+        // },
+        // valueFormatter: (params: any) => {
+        //   return confirmMappings[params.value];
+        // },
+        cellRenderer: 'selectChoice'
+      },
+      {
+        headerName: '确认时间',
+        field: 'confirm_time',
+      }];
     const secondDataReviewGridApi = useRef<GridApi>();
     const onsecondDataReviewGridReady = (params: GridReadyEvent) => {
       secondDataReviewGridApi.current = params.api;
@@ -928,7 +1393,7 @@ const PreRelease: React.FC<any> = () => {
       secondDataReviewGridApi.current = params.api;
       params.api.sizeColumnsToFit();
     };
-    // 下拉框选择是否确认事件
+// 下拉框选择是否确认事件
     const saveDataRepaireConfirmInfo = async (newValue: string, oldData: any) => {
 
       //  如果前后两个值不同，则需要更新
@@ -973,7 +1438,121 @@ const PreRelease: React.FC<any> = () => {
 
     /*  region 上线分支 */
 
-    // 执行上线前检查：上线前版本检查、环境检查，自动化检查
+
+    // 渲染单元测试运行是否通过字段
+    const rendererUnitTest = (params: any) => {
+
+      const values = params.value;
+      if (!values) {
+        return "";
+      }
+
+      let frontValue = "";
+      let frontTime = "";
+      let backendValue = "";
+      let backendTime = "";
+
+      // 循环解析前后端的数据
+      values.forEach((ele: any) => {
+
+        // 解析是否成功
+        let passFlag = "";
+        if (ele.ignore_check === "1") {
+          passFlag = "忽略";
+        } else if (ele.test_case_status === "success") {
+          passFlag = "是";
+        } else if (ele.test_case_status === "error") {
+          passFlag = "否";
+        } else if (ele.test_case_status === "skip") {
+          passFlag = "忽略";
+        } else if (ele.test_case_status === "running") {
+          passFlag = "运行中";
+        } else {
+          passFlag = "未知";
+        }
+
+        // 解析时间
+        let start = "";
+        if (ele.test_case_start_time) {
+          start = dayjs(ele.test_case_start_time).format("HH:mm:ss");
+        }
+
+        let end = "";
+        if (ele.test_case_end_time) {
+          end = dayjs(ele.test_case_end_time).format("HH:mm:ss");
+        }
+        let timeRange = "";
+        if (start) {
+          timeRange = `${start}~${end}`;
+        }
+        if (ele.test_case_technical_side === "1") { // 前端
+          frontValue = passFlag;
+          frontTime = timeRange;
+        } else {  // 后端
+          backendValue = passFlag;
+          backendTime = timeRange;
+        }
+
+      });
+
+      // 前端的颜色
+      let frontColor = "black";
+      if (frontValue === "是") {
+        frontColor = "#2BF541";
+      } else if (frontValue === "否") {
+        frontColor = "#8B4513";
+      } else if (frontValue === "忽略") {
+        frontColor = "blue";
+      }
+
+      // 后端的颜色
+      let bacnkendColor = "black";
+      if (backendValue === "是") {
+        bacnkendColor = "#2BF541";
+      } else if (backendValue === "否") {
+        bacnkendColor = "#8B4513";
+      } else if (backendValue === "忽略") {
+        bacnkendColor = "blue";
+      }
+
+      if (params.data?.technical_side === "1") {  // 前端
+
+        return `
+        <div style="margin-top: -10px">
+            <div style=" margin-top: 20px;font-size: 10px">
+                <div>前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
+            </div>
+
+        </div>
+    `;
+
+      }
+      if (params.data?.technical_side === "2") {   // 后端
+        return `
+        <div style="margin-top: -10px">
+            <div style=" margin-top: 20px;font-size: 10px">
+                <div> 后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>
+                &nbsp;${backendTime}</div>
+            </div>
+        </div>
+    `;
+      }
+      return `
+        <div style="margin-top: -10px">
+            <div style=" margin-top: 20px;font-size: 10px">
+                <div>前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
+                <div style="margin-top: -20px"> 后端：
+                <label style="color: ${bacnkendColor}"> ${backendValue}</label>
+                &nbsp;${backendTime}</div>
+            </div>
+
+        </div>
+    `;
+
+    };
+
+    const [executeStatus, setExecuteStatus] = useState(false);
+// 执行上线前检查：上线前版本检查、环境检查，自动化检查
     (window as any).excuteDataCheck = async (type: string, checkNum: string) => {
 
       setExecuteStatus(true);
@@ -998,7 +1577,169 @@ const PreRelease: React.FC<any> = () => {
       setExecuteStatus(false);
     };
 
-    // 自动化URL跳转
+// 渲染上线前版本检查是否通过
+    const beforeOnlineVersionCheck = (params: any) => {
+
+      if (!params.value || (params.value).length === 0) {
+        return "";
+      }
+
+      const values: any = (params.value)[0];// 本数组只会有一条数据
+      // 解析所属端
+      let side = "";
+      if (values.technical_side === "front") {
+        side = "前端：";
+      } else if (values.technical_side === "backend") {
+        side = "后端：";
+      } else if (values.technical_side === "front,backend") {
+        side = "前后端：";
+      }
+
+      // 解析时间
+      let start = "";
+      if (values.check_start_time && values.check_start_time !== "-") {
+        start = dayjs(values.check_start_time).format("HH:mm:ss");
+      }
+
+      let end = "";
+      if (values.check_end_time) {
+        end = dayjs(values.check_end_time).format("HH:mm:ss");
+      }
+
+      let timeRange = "";
+      if (start) {
+        timeRange = `${start}~${end}`;
+      }
+
+      // 解析结果
+      let result = "";
+      let frontColor = "black";
+
+      if (values.check_result === "9") {  // 9是未结束，然后就获取检查状态
+
+        if (values.check_status === "1") {
+          result = "未开始";
+        } else if (values.check_status === "2") {
+          result = "检查中";
+        } else if (values.check_status === "3") {
+          result = "已结束";
+        }
+        frontColor = "#8B4513";
+      } else if (values.check_result === "1") {
+        result = "是";
+        frontColor = "#2BF541";
+      } else if (values.check_result === "2") {
+        result = "否";
+        frontColor = "#46A0FC";
+      }
+
+      const checkNum = JSON.stringify(params.data?.check_num);
+
+      if (side === "") {
+        return `
+         <div>
+          <div style="width: 210px">
+              <div style="font-size: 10px">
+                  <div>${side}
+                    <button style="margin-left: -20px;color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
+                    <lable style="margin-left: -10px">${timeRange}</lable>
+                  </div>
+              </div>
+          </div>
+      </div>
+    `;
+      }
+      return `
+         <div>
+          <div style="margin-top: -10px;text-align: right">
+
+            <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
+            onclick='excuteDataCheck("versionCheck",${checkNum})'>
+              <img src="../执行.png" width="14" height="14" alt="执行" title="执行">
+            </Button>
+
+              <a href="${values.check_url}" target="_blank" >
+               <img src="../taskUrl.png" width="14" height="14" alt="日志查看" title="日志查看">
+             </a>
+
+          </div>
+          <div style="margin-top: -20px;width: 210px">
+              <div style="font-size: 10px">
+                  <div>${side} <button style="margin-left: -10px; color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
+                  <lable style="margin-left: -10px">${timeRange}</lable>
+                  </div>
+              </div>
+
+          </div>
+      </div>
+    `;
+
+    };
+
+// 上线前环境检查
+    const beforeOnlineEnvCheck = (params: any) => {
+
+      if (!params.value || (params.value).length === 0) {
+        return "";
+      }
+      const values = (params.value)[0]; // 也只会有一条数据
+
+      // 显示结果和颜色
+      let result = "";
+      let Color = "black";
+      if (values.ignore_check === "1") {// 忽略
+        result = "忽略";
+        Color = "blue";
+
+      } else if (values.ignore_check === "2") {  // 不忽略
+        if (values.check_result === "success") {
+          result = "是";
+          Color = "#2BF541";
+        } else {
+          result = "否";
+          Color = "#8B4513";
+        }
+      }
+
+      // 解析时间
+      let start = "";
+      if (values.check_start_time) {
+        start = dayjs(values.check_start_time).format("HH:mm:ss");
+      }
+
+      let end = "";
+      if (values.check_end_time) {
+        end = dayjs(values.check_end_time).format("HH:mm:ss");
+      }
+
+      let timeRange = "";
+      if (start) {
+        timeRange = `${start}~${end}`;
+      }
+
+      const checkNum = JSON.stringify(params.data?.check_num);
+
+      return `
+        <div style="margin-top: -10px">
+            <div style="text-align: right" >
+              <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='excuteDataCheck("envCheck",${checkNum})'>
+                <img src="../执行.png" width="14" height="14" alt="执行" title="执行">
+              </Button>
+
+              <a href="${values.check_url}" target="_blank" >
+               <img src="../taskUrl.png" width="14" height="14" alt="执行" title="执行">
+             </a>
+            </div>
+            <div style=" margin-top: -20px;font-size: 10px;width: 200px">
+                <div><label style="color: ${Color}"> ${result}</label> &nbsp;${timeRange}</div>
+            </div>
+
+        </div>
+    `;
+
+    };
+
+// 自动化URL跳转
     (window as any).urlClick = (checkType: string, logUrl: string) => {
 
       let ui_url = "";
@@ -1042,6 +1783,220 @@ const PreRelease: React.FC<any> = () => {
         }
       );
     };
+// 上线前自动化检查
+    const beforeOnlineAutoCheck = (params: any, type: string) => {
+      const values = params.value;
+      if (!values) {
+        return "";
+      }
+
+      let value = "";
+      let Color = "black";
+      let timeRange = "";
+      let checkType = "";
+      let logUrl = "";
+
+
+      values.forEach((ele: any) => {
+        if (ele.check_time === type) {  // 如果是1 ，则代表是上线前检查,如果是2 ，则代表是上线后检查
+          // // 解析结果和颜色：需要判断是否忽略，是的话显示忽略，否的话继续显示状态
+          if (ele.ignore_check === "1") {
+            value = "忽略";
+            Color = "blue";
+          } else if (ele.check_status === "1") {
+            value = "未开始";
+          } else if (ele.check_status === "2") {
+            value = "检查中";
+            Color = "#46A0FC";
+          } else if (ele.check_status === "3") {
+            value = "已结束";
+            Color = "#2BF541";
+          }
+
+          checkType = ele.check_type;
+          logUrl = ele.check_log_url;
+          // 解析时间
+          let start = "";
+          if (ele.check_start_time) {
+            start = dayjs(ele.check_start_time).format("HH:mm:ss");
+          }
+
+          let end = "";
+          if (ele.check_end_time) {
+            end = dayjs(ele.check_end_time).format("HH:mm:ss");
+          }
+          if (start) {
+            timeRange = `${start}~${end}`;
+          }
+        }
+
+      });
+
+      // 判断是上下前检查还是上线后检查
+      let title = "afterOnlineCheck";
+      if (type === "1") {
+        title = "beforeOnlineCheck";
+      }
+
+
+      return `
+        <div style="margin-top: -10px">
+            <div style="text-align: right" >
+              <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
+              onclick='excuteDataCheck(${JSON.stringify(title)},${JSON.stringify(params.data?.check_num)})'>
+                <img src="../执行.png" width="14" height="14" alt="执行" title="执行">
+              </Button>
+              <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='urlClick(${JSON.stringify(checkType)},${JSON.stringify(logUrl)})'>
+                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+              </Button>
+            </div>
+            <div style=" margin-top: -20px;font-size: 10px;width: 200px">
+                <div><label style="color: ${Color}"> ${value}</label> &nbsp;${timeRange}</div>
+            </div>
+
+        </div>
+    `;
+
+    };
+
+    // 封板状态
+    const sealStatusRenderer = (params: any) => {
+      if (!params.value) {
+        return `<div></div>`;
+      }
+
+      const values = params.value;
+      // 代表只有前端或者只有后端
+      if (values.length === 1) {
+        const arrayData = values[0];
+        let side = "";
+        if (arrayData.technical_side === "1") { // 是前端
+          side = "前端：";
+        } else if (arrayData.technical_side === "2") { // 是后端
+          side = "后端：";
+        }
+
+        const status = arrayData.sealing_version === "1" ? "已封板" : "未封板";
+        const sideColor = arrayData.sealing_version === "1" ? "#2BF541" : "orange";
+        const time = arrayData.sealing_version_time === "" ? "" : dayjs(arrayData.sealing_version_time).format("HH:mm:ss");
+
+        return `
+        <div style="margin-top: -10px">
+            <div style=" margin-top: 20px;font-size: 10px">
+                <div>${side} <label style="color: ${sideColor}"> ${status}</label> &nbsp;${time}</div>
+            </div>
+
+        </div>
+    `;
+      }
+
+      // 证明有前后端
+      if (values.length === 2) {
+        let frontValue = "";
+        let frontTime = "";
+        let frontColor = "orange";
+
+        let backendValue = "";
+        let backendTime = "";
+        let bacnkendColor = "orange";
+        values.forEach((ele: any) => {
+          if (ele.technical_side === "1") {  // 前端
+            frontValue = ele.sealing_version === "1" ? "已封板" : "未封板";
+            frontTime = ele.sealing_version_time === "" ? "" : dayjs(ele.sealing_version_time).format("HH:mm:ss");
+            frontColor = ele.sealing_version === "1" ? "#2BF541" : "orange";
+          } else if (ele.technical_side === "2") {  // 后端
+            backendValue = ele.sealing_version === "1" ? "已封板" : "未封板";
+            backendTime = ele.sealing_version_time === "" ? "" : dayjs(ele.sealing_version_time).format("HH:mm:ss");
+            bacnkendColor = ele.sealing_version === "1" ? "#2BF541" : "orange";
+          }
+        });
+
+        return `
+        <div style="margin-top: -10px">
+            <div style=" margin-top: 20px;font-size: 10px">
+                <div>前端：<label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
+                <div style="margin-top: -20px">
+                后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>${backendTime}</div>
+            </div>
+
+        </div>
+    `;
+      }
+      return `<div></div>`;
+    };
+
+    const firstOnlineBranchColumn: any = [
+      {
+        headerName: '序号',
+        field: 'No',
+        minWidth: 65,
+        maxWidth: 70,
+        cellRenderer: (params: any) => {
+          return Number(params.node.id) + 1;
+        },
+      },
+      {
+        headerName: '分支名称',
+        field: 'branch_name',
+        minWidth: 100,
+      },
+      {
+        headerName: '技术侧',
+        field: 'technical_side',
+        cellRenderer: (params: any) => {
+          return `<span>${getTechSide(params.value)}</span>`
+        }
+      },
+      {
+        headerName: '单元测试运行是否通过',
+        field: 'test_unit',
+        cellRenderer: rendererUnitTest,
+        minWidth: 190,
+      },
+      {
+        headerName: '上线前版本检查是否通过',
+        field: 'version_check',
+        cellRenderer: beforeOnlineVersionCheck,
+        minWidth: 190,
+      },
+      {
+        headerName: '上线前环境检查是否通过',
+        field: 'env_check',
+        minWidth: 190,
+        cellRenderer: beforeOnlineEnvCheck,
+      },
+      {
+        headerName: '上线前自动化检查是否通过',
+        field: 'automation_check',
+        minWidth: 200,
+        cellRenderer: (param: any) => {
+          return beforeOnlineAutoCheck(param, "1")
+        },
+      },
+      {
+        headerName: '升级后自动化检查是否通过',
+        field: 'automation_check',
+        minWidth: 200,
+        cellRenderer: (param: any) => {
+          return beforeOnlineAutoCheck(param, "2")
+        },
+      },
+      {
+        headerName: '封板状态',
+        field: 'branch_sealing_check',
+        minWidth: 160,
+        cellRenderer: sealStatusRenderer
+      },
+      {
+        headerName: '操作',
+        pinned: "right",
+        field: 'branch_sealing_check',
+        minWidth: 100,
+        maxWidth: 100,
+        cellRenderer: (params: any) => {
+          return operateRenderer(4, params);
+        }
+      }];
 
     const onfirstOnlineBranchGridReady = (params: GridReadyEvent) => {
       firstOnlineBranchGridApi.current = params.api;
@@ -1066,7 +2021,29 @@ const PreRelease: React.FC<any> = () => {
       }
     };
 
-
+    // const runTimeTask = async () => {
+    //   let count = 0;
+    //   const id = setInterval(async () => {
+    //     count += 1;
+    //     console.log(`刷新数据${count},定时任务id${id}`);
+    //     // 刷新
+    //     const new_Data: any = await alalysisInitData("dataReview", currentListNo);
+    //     firstDataReviewGridApi.current?.setRowData(new_Data.reviewData_repaire);
+    //     //   刷新表格
+    //     const newData_confirm_data: any = await alalysisInitData("dataReviewConfirm", currentListNo);
+    //     secondDataReviewGridApi.current?.setRowData(newData_confirm_data.reviewData_confirm);
+    //     if ((new_Data.reviewData_repaire).length > 0 && (newData_confirm_data.reviewData_confirm).length > 0) {
+    //       clearInterval(interValRef.current);
+    //     }
+    //
+    //     if (count === 10) { // 5分钟后没数据就自动停止
+    //       clearInterval(interValRef.current);
+    //     }
+    //
+    //   }, 30 * 1000);
+    //
+    //   interValRef.current = id;
+    // };
     // 保存
     const saveOnlineBranchResult = async () => {
 
@@ -1202,7 +2179,10 @@ const PreRelease: React.FC<any> = () => {
     const pulishResulttChanged = async (params: any) => {
 
       // 需要验证前面的检查是否全部成功。
-
+      // releaseProject: "Gainsboro",  // #2BF541
+      //   upgradeService: "Gainsboro",
+      //   dataReview: "Gainsboro",
+      //   onliineCheck: "Gainsboro",
       if (processStatus.releaseProject === "Gainsboro" || processStatus.upgradeService === "Gainsboro" ||
         processStatus.dataReview === "Gainsboro" || processStatus.onliineCheck === "Gainsboro") {
 
@@ -1245,7 +2225,7 @@ const PreRelease: React.FC<any> = () => {
     /* endregion */
 
     /* region  预发布项目 */
-
+    const [formForPreReleaseProject] = Form.useForm();
     const projectsArray = useRequest(() => loadPrjNameSelect()).data;
     const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
     const releaseWayArray = useRequest(() => loadReleaseWaySelect()).data;
@@ -1294,6 +2274,8 @@ const PreRelease: React.FC<any> = () => {
 
     /* region 升级服务 */
     const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
+
+
     const onReleaseIdChanges = (selectedId: any, params: any) => {
 
       if (params && params.length > 0) {
@@ -1329,7 +2311,8 @@ const PreRelease: React.FC<any> = () => {
         });
       } else {
 
-        // 有数据之后进行表格的赋值操作(需要把之前表格的数据一并追加进来)   获取之前的数据
+        // 有数据之后进行表格的赋值操作(需要把之前表格的数据一并追加进来)
+        // 获取之前的数据
 
         const newData: any = await alalysisInitData("pulishItem", currentListNo);
         let gridData = result.data;
@@ -1344,6 +2327,7 @@ const PreRelease: React.FC<any> = () => {
         if (!apidata.upService_interface || (apidata.upService_interface) <= 0) {
           secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
         }
+        // thirdUpSerGridApi.current?.setRowData([{}]); // 需要给服务确认设置一行空值
 
         setGridHeight({
           ...gridHeight,
@@ -1455,7 +2439,15 @@ const PreRelease: React.FC<any> = () => {
       });
 
     };
+    const [showTabs, setShowTabs] = useState({
+      shown: false,
+      targetKey: ""
+    });
 
+    const [tabContent, setTabContent] = useState({
+      activeKey: "",
+      panes: []
+    });
 
 // 新增tab
     const add = async () => {
@@ -1600,10 +2592,11 @@ const PreRelease: React.FC<any> = () => {
     window.addEventListener('error', () => {
       deleteLockStatus(lockedInfo);
 
-    }, true);
+    }, true)
 
     /* endregion */
 
+    const [saveButtonDisable, setSaveButtonDisable] = useState(false);
     // 编辑框聚焦时检查是否可以编辑
     const releaseItemFocus = async () => {
 
@@ -1685,16 +2678,6 @@ const PreRelease: React.FC<any> = () => {
 
         interValRef.current = id;
       }
-    };
-
-    // 自动化日志显示弹窗取消
-    const autoCancle = () => {
-      setAutoLogModal(
-        {
-          ...autoLogModal,
-          show: false
-        }
-      );
     };
 
     useEffect(() => {
@@ -1916,7 +2899,7 @@ const PreRelease: React.FC<any> = () => {
                   <div className="ag-theme-alpine" style={{height: gridHeight.pulishItemGrid, width: '100%'}}>
                     <AgGridReact
 
-                      columnDefs={getReleasedItemColumns()} // 定义列
+                      columnDefs={firstUpSerColumn} // 定义列
                       // rowData={[]} // 数据绑定
                       defaultColDef={{
                         resizable: true,
@@ -1941,7 +2924,7 @@ const PreRelease: React.FC<any> = () => {
                   <div className="ag-theme-alpine" style={{height: gridHeight.upgradeApiGrid, width: '100%'}}>
 
                     <AgGridReact
-                      columnDefs={getReleasedApiColumns()} // 定义列
+                      columnDefs={secondUpSerColumn} // 定义列
                       // rowData={[]} // 数据绑定
                       defaultColDef={{
                         resizable: true,
@@ -1973,7 +2956,7 @@ const PreRelease: React.FC<any> = () => {
                   <div className="ag-theme-alpine" style={{height: gridHeight.upConfirm, width: '100%'}}>
 
                     <AgGridReact
-                      columnDefs={getReleaseServiceComfirmColumns()} // 定义列
+                      columnDefs={thirdUpSerColumn} // 定义列
                       defaultColDef={{
                         resizable: true,
                         sortable: true,
@@ -2043,7 +3026,7 @@ const PreRelease: React.FC<any> = () => {
                   <div className="ag-theme-alpine" style={{height: gridHeight.dataRepaireReviewGrid, width: '100%'}}>
                     <AgGridReact
 
-                      columnDefs={getReviewColumns()} // 定义列
+                      columnDefs={firstDataReviewColumn} // 定义列
                       // rowData={[]} // 数据绑定
                       defaultColDef={{
                         resizable: true,
@@ -2068,10 +3051,11 @@ const PreRelease: React.FC<any> = () => {
                 {/* 表格 二 */}
                 <div>
                   <div style={{fontWeight: "bold"}}> Review确认完成</div>
+
                   <div className="ag-theme-alpine" style={{height: gridHeight.reviewConfirm, width: '100%'}}>
 
                     <AgGridReact
-                      columnDefs={getReviewConfirmColums()} // 定义列
+                      columnDefs={secondDataReviewColumn} // 定义列
                       // rowData={[]} // 数据绑定
                       defaultColDef={{
                         resizable: true,
@@ -2133,7 +3117,7 @@ const PreRelease: React.FC<any> = () => {
                     <div className="ag-theme-alpine" style={{height: gridHeight.onlineBranchGrid, width: '100%'}}>
                       <AgGridReact
 
-                        columnDefs={getOnlineBranchColumns()} // 定义列
+                        columnDefs={firstOnlineBranchColumn} // 定义列
                         // rowData={[]} // 数据绑定
                         defaultColDef={{
                           resizable: true,

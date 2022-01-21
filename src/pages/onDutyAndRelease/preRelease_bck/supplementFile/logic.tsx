@@ -5,7 +5,7 @@ import {
   delDataReviewApi, dataRepairConfirm, getNewCheckNum, saveOnlineBranch, saveVersonCheck,
   saveEnvironmentCheck, saveOnlineAutoCheck, getDetaisByCHeckNum, delDataOnlineBranchApi,
   excuteVersionCheck, excuteEnvCheck, excuteAutoCheck, delTabsInfo
-} from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
+} from "@/pages/onDutyAndRelease/preRelease/supplementFile/datas/axiosApi";
 
 const userLogins: any = localStorage.getItem("userLogins");
 const usersInfo = JSON.parse(userLogins);

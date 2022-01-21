@@ -1600,7 +1600,7 @@ const PreRelease: React.FC<any> = () => {
         count += 1;
         console.log(`刷新数据${count},定时任务id${id}`);
         // 刷新
-        const datas = await alalysisInitData("", releasedNumStr);
+        const datas = await alalysisInitData("", currentListNo);
 
         showPagesContent(datas);
       }, 30 * 1000);

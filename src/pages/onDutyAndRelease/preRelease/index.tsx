@@ -1192,6 +1192,7 @@ const PreRelease: React.FC<any> = () => {
 
   // 保存预发布项目
   const savePreRelaseProjects = async () => {
+    debugger;
 
     const datas = formForPreReleaseProject.getFieldsValue();
     const result = await savePreProjects(datas, currentListNo);
@@ -1360,7 +1361,7 @@ const PreRelease: React.FC<any> = () => {
   };
 
   const showPagesContent = async (source: any) => {
-
+    debugger;
     if (!source || JSON.stringify(source) === "{}") {
       return;
     }

@@ -221,8 +221,14 @@ const savePrePulishProjects = async (params: any, listNo: string) => {
     projectId = projectId === "" ? proID : `${projectId},${proID}`;
   });
 
+  let proID: any;
+  if (params.proid) {
+    proID = Number(params.proid);
+  }else{
+    proID = "";
+  }
   const data = {
-    "pro_id": params.proid === "" ? "" : Number(params.proid),
+    "pro_id": proID,
     "user_name": usersInfo.name,
     "user_id": usersInfo.userid,
     "project_id_set": projectId,
@@ -231,6 +237,8 @@ const savePrePulishProjects = async (params: any, listNo: string) => {
     "plan_release_time": dayjs(params.pulishTime).format("YYYY-MM-DD HH:mm:ss"),
     "ready_release_num": listNo
   };
+
+  debugger;
   // const hostIp = getCurrentProxy();
   // const url = `${hostIp}api/verify/duty/plan_data`;
   const result: any = {

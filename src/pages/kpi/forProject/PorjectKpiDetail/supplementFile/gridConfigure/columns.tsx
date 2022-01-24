@@ -573,17 +573,10 @@ const getProcessQualityColumns = () => {
       minWidth: 130,
       maxWidth: 130,
       cellRenderer: (params: any) => {
-        if (params.data?.module === "及时交付" && (params.value === null || params.value === "" || params.value === undefined)) {
-          return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
+        if (params.value) {
+          return Number(params.value).toFixed(2);
         }
         return params.value;
-      },
-      editable: (params: any) => {
-        if (params.data?.module === "及时交付") {
-          return true;
-        }
-        return false;
-
       },
     }
   ];
@@ -668,7 +661,7 @@ const getServiceColumns = () => {
 
         if (params.value) {
           const values = (params.value).toFixed(2);
-          return `<div style="margin-top: 12px">${Number(values) * 100}%</div>`;
+          return `<div style="margin-top: 12px">${(Number(values) * 100).toFixed(2)}%</div>`;
         }
         return params.value;
       }

@@ -61,7 +61,9 @@ const analysisReleaseItem = (datas: any) => {
 // ----升级接口
 
 const analysisUpInterface = (datas: any) => {
-
+  if (datas.length === 0) {
+    return [{}];
+  }
   return datas;
 
 };

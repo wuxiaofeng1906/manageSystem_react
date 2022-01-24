@@ -2,7 +2,7 @@
  * @Description: 通用常量
  * @Author: jieTan
  * @Date: 2021-11-23 15:51:13
- * @LastEditTime: 2022-01-07 07:27:22
+ * @LastEditTime: 2022-01-24 10:02:14
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -21,6 +21,13 @@ export const HOUR = {
   value: 3600,
   unit: 'H',
   zh: '小时',
+};
+// 手动录入单元的默认属性
+export const MANUAL_CELL = {
+  text: '手工录入', //提示文本
+  numberColor: '#ff0000', // 数字文本颜色
+  color: '#bfbfbf', // 默认文本颜色
+  fontStyle: 'italic', //斜体
 };
 // 相对于“秒”的时间 => D
 export const DAY = {
@@ -51,6 +58,13 @@ export const PROJ_METRIC = {
 };
 // 项目度量指标 - 修改接口路径
 export const PK_PATH = '/api/project/kpi';
+// 默认项目查询的时间范围
+export const PK_SEARCH_INTERVAL = {
+  unit: 'months',
+  value: 3,
+};
+// 默认要显示的属性部门id列表
+export const  PK_TREE_DEPTS = [130, 66, 82, 114, 81]
 
 /*  */
 // 分母默认值
@@ -59,3 +73,8 @@ export const DEFAULT_DENOMINATOR = 1;
 export const DEFAULT_PLACEHOLDER = '-';
 // float默认保留的小数位
 export const DEFAULT_DECIMAL_PLACES = 2;
+// Moment日期格式化
+export const MOMENT_FORMAT = {
+  date: 'YYYY-MM-DD',
+  time: 'HH:mm:ss',
+};

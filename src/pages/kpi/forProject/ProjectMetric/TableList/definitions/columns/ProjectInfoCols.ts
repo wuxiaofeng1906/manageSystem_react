@@ -2,12 +2,12 @@
  * @Description: 项目基本信息字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:44:08
- * @LastEditTime: 2021-12-23 02:53:22
+ * @LastEditTime: 2022-01-21 09:43:54
  * @LastEditors: jieTan
  * @LastModify:
  */
 
-import { DEFAULT_PLACEHOLDER, PROJ_STATUS, TABLE_GROUP_SHOW as SHOW } from '@/namespaces';
+import { PROJ_STATUS, TABLE_GROUP_SHOW as SHOW } from '@/namespaces';
 import { ColDef, ColGroupDef } from 'ag-grid-community';
 import { doubleNumberF, numberF, stringF } from './baseParams';
 import pkEditValueSetter from './editables';
@@ -46,14 +46,17 @@ export const TableMajorCols: ColDef[] = [
   {
     headerName: '负责人',
     field: 'user.name',
+    sortable: true,
     filter: true,
     columnGroupShow: SHOW['closed'],
     ...doubleNumberF,
   },
   {
     headerName: '所属部门',
-    columnGroupShow: SHOW['closed'],
     field: 'dept.name',
+    sortable: true,
+    filter: true,
+    columnGroupShow: SHOW['closed'],
   },
   {
     headerName: '项目状态',
@@ -70,19 +73,22 @@ export const TableMajorCols: ColDef[] = [
     field: 'project.branch',
     filter: true,
     editable: true,
-    valueFormatter: (params) => (params.value ? params.value : DEFAULT_PLACEHOLDER),
+    cellRenderer: 'manualEntry',
     valueSetter: (params) => pkEditValueSetter('branch', params),
     ...stringF,
   },
   {
     headerName: '开始日期',
     field: 'project.start',
+    sort: 'desc',
+    sortable: true,
     columnGroupShow: SHOW['closed'],
     ...stringF,
   },
   {
     headerName: '结束日期',
     field: 'project.end',
+    sortable: true,
     columnGroupShow: SHOW['closed'],
     ...stringF,
   },

@@ -2,10 +2,11 @@
  * @Description:
  * @Author: jieTan
  * @Date: 2021-12-28 10:07:16
- * @LastEditTime: 2021-12-29 10:00:52
+ * @LastEditTime: 2022-01-24 10:00:13
  * @LastEditors: jieTan
  * @LastModify:
  */
+import { PK_TREE_DEPTS } from '@/namespaces';
 import { toTree } from '../utils/tree';
 
 /**
@@ -57,7 +58,11 @@ export const deptTreeNodes = (data: any, val: any[], setVal: Function): void => 
   ])
     ?.shift()
     ?.children?.shift();
-  setVal(ret ? [ret as never] : []);
+
+  // 数据过滤
+  ret.children = ret.children?.filter((d: { id: number }) => PK_TREE_DEPTS.includes(d.id));
+  //
+  setVal(ret.children ?? []);
 };
 
 /**

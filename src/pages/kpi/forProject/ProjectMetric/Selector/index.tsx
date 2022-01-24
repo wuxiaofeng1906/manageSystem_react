@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-01-21 09:22:30
+ * @LastEditTime: 2022-01-24 09:55:23
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -57,7 +57,6 @@ export default () => {
     placeholder: '默认选择全部',
     multiple: 'multiple',
     dropdownStyle: { maxHeight: 400, overflow: 'auto' },
-    treeDefaultExpandAll: 'treeDefaultExpandAll',
     treeCheckable: true,
     maxTagCount: 'responsive',
     filterTreeNode: (inputValue: string, treeNode: { title: string }) =>

@@ -2,7 +2,7 @@
  * @Description: 通用常量
  * @Author: jieTan
  * @Date: 2021-11-23 15:51:13
- * @LastEditTime: 2022-01-21 08:49:06
+ * @LastEditTime: 2022-01-24 10:02:14
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -63,6 +63,8 @@ export const PK_SEARCH_INTERVAL = {
   unit: 'months',
   value: 3,
 };
+// 默认要显示的属性部门id列表
+export const  PK_TREE_DEPTS = [130, 66, 82, 114, 81]
 
 /*  */
 // 分母默认值

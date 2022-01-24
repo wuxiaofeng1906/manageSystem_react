@@ -1360,7 +1360,6 @@ const PreRelease: React.FC<any> = () => {
   };
 
   const showPagesContent = async (source: any) => {
-    debugger;
     if (!source || JSON.stringify(source) === "{}") {
       return;
     }

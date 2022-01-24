@@ -358,8 +358,11 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onPocessQualityGridReady}
-            onCellEditingStopped={(params: any) => {
-              return pocessQualityCellEdited(params, projectId);
+            onCellEditingStopped={async (params: any) => {
+              const returnValue = await pocessQualityCellEdited(params, projectId);
+              if (returnValue) {
+                processQualityGridApi.current?.setRowData(await queryProcessQuality(gqlClient, projectId))
+              }
             }}
           >
           </AgGridReact>

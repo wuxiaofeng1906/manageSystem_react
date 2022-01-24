@@ -363,17 +363,19 @@ const pocessQualityCellEdited = async (params: any, projectId: string) => {
           marginTop: '50vh',
         },
       });
-    } else {
-      message.error({
-        content: result,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      return true;
     }
+    message.error({
+      content: result,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+
   }
 
+  return false;
 };
 
 // 服务

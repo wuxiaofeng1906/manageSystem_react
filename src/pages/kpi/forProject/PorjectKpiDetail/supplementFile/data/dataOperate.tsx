@@ -145,7 +145,7 @@ const alaysisStageWorkload = (sourceData: any) => {
     return [];
   }
 
-   const typeName = [
+  const typeName = [
     {type: "storyplan", name: "需求"},
     {type: "designplan", name: "概设&计划"},
     {type: "devplan", name: "开发"},
@@ -305,12 +305,14 @@ const alaysisReviewDefect = (sourceData: any, totalData: any) => {
       const datas = sourceData[index];
       if (Types === datas.kind) {
         newData.cut = datas.cut;
-        newData.foundDN = datas.foundDN;
-        newData.weightDN = datas.weightDN;
-        newData.funcPoint = datas.funcPoint;
-        newData.defectDensity = datas.defectDensity;
-        newData.reviewHour = datas.reviewHour;
-        newData.reviewRatio = datas.reviewRatio;
+        if (!datas.cut) {  // 如果要裁剪，则不显示相应数据
+          newData.foundDN = datas.foundDN;
+          newData.weightDN = datas.weightDN;
+          newData.funcPoint = datas.funcPoint;
+          newData.defectDensity = datas.defectDensity;
+          newData.reviewHour = datas.reviewHour;
+          newData.reviewRatio = datas.reviewRatio;
+        }
         break;
       }
 

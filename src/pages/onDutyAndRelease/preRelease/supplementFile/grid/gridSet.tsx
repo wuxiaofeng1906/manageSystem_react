@@ -387,6 +387,14 @@ const getReviewColumns = () => {
       field: 'branch',
     },
     {
+      headerName: '是否可重复执行',
+      field: 'is_repeat',
+      minWidth: 130,
+      cellRenderer: (params: any) => {
+        return `<span>${getIfOrNot(params.value)}</span>`
+      }
+    },
+    {
       headerName: '编辑人',
       field: 'edit_user_name',
       minWidth: 75
@@ -404,20 +412,11 @@ const getReviewColumns = () => {
 
     },
     {
-      headerName: '是否可重复执行',
-      field: 'is_repeat',
-      minWidth: 130,
-      cellRenderer: (params: any) => {
-        return `<span>${getIfOrNot(params.value)}</span>`
-      }
-    },
-    {
       headerName: '操作',
       pinned: "right",
       minWidth: 100,
       maxWidth: 100,
       cellRenderer: (params: any) => {
-
         return operateRenderer(3, params);
       }
     }];

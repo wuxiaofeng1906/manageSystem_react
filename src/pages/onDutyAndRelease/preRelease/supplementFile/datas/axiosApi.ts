@@ -82,6 +82,8 @@ const delTabsInfo = async (releaseNum: string) => {
 const updateTabsName = async (currentListNo: string, newName: string) => {
 
   const data = {
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
     "ready_release_num": currentListNo,
     "ready_release_name": newName
   };

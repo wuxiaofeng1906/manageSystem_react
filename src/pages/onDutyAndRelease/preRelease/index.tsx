@@ -1037,15 +1037,26 @@ const PreRelease: React.FC<any> = () => {
       }
     }
 
-    setAutoLogModal(
-      {
-        show: true,
-        url: {
-          ui: ui_url,
-          api: api_url
+    if (ui_url || api_url) {
+      setAutoLogModal(
+        {
+          show: true,
+          url: {
+            ui: ui_url,
+            api: api_url
+          }
         }
-      }
-    );
+      );
+    } else {
+      message.error({
+        content: "无检查日志，请执行后在查看！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+
   };
 
   const onfirstOnlineBranchGridReady = (params: GridReadyEvent) => {

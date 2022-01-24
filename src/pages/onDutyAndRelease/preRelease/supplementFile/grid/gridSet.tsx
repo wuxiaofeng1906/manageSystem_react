@@ -3,6 +3,10 @@ import {
   getPassOrNot, getReleaseItem, getRepaireType, getTechSide, getUpgradeApi
 } from "@/pages/onDutyAndRelease/preRelease/supplementFile/comControl/converse";
 import dayjs from "dayjs";
+import {message} from "antd";
+import {history} from "@@/core/history";
+import {routerRedux} from 'dva/router';
+
 
 // 获取表格高度
 const getGridHeight = (gridRowCount: number, moreHigh: boolean = false) => {
@@ -554,6 +558,21 @@ const rendererUnitTest = (params: any) => {
 
 };
 
+(window as any).goCommenLog = (logUrl: string) => {
+
+  if (logUrl && logUrl !== "null") {
+    return true;
+  }
+  message.error({
+    content: "无检查日志，请执行后在查看！",
+    duration: 1,
+    style: {
+      marginTop: '50vh',
+    },
+  });
+  return false;
+};
+
 // 渲染上线前版本检查是否通过
 const beforeOnlineVersionCheck = (params: any) => {
 
@@ -613,6 +632,11 @@ const beforeOnlineVersionCheck = (params: any) => {
 
   const checkNum = JSON.stringify(params.data?.check_num);
 
+
+  // let targetUrl = values.check_url;
+  // if(values.check_url){
+  //   targetUrl = ""
+  // }
   if (side === "") {
     return `
          <div>
@@ -636,8 +660,8 @@ const beforeOnlineVersionCheck = (params: any) => {
               <img src="../执行.png" width="14" height="14" alt="执行" title="执行">
             </Button>
 
-              <a href="${values.check_url}" target="_blank" >
-               <img src="../taskUrl.png" width="14" height="14" alt="日志查看" title="日志查看">
+              <a href="${values.check_url}" target="_blank"  onclick="return goCommenLog('${values.check_url}')" >
+               <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
              </a>
 
           </div>
@@ -704,8 +728,8 @@ const beforeOnlineEnvCheck = (params: any) => {
                 <img src="../执行.png" width="14" height="14" alt="执行" title="执行">
               </Button>
 
-              <a href="${values.check_url}" target="_blank" >
-               <img src="../taskUrl.png" width="14" height="14" alt="执行" title="执行">
+              <a href="${values.check_url}" target="_blank"  onclick="return goCommenLog('${values.check_url}')" >
+               <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
              </a>
             </div>
             <div style=" margin-top: -20px;font-size: 10px;width: 200px">

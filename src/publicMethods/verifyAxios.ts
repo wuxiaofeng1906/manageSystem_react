@@ -134,4 +134,73 @@ const getPrincipal = async () => {
 
   return principalInfo;
 };
-export {getAllUsers, getAllProject, getProjectType, getBranchName, getEnvironment, getPrincipal};
+
+// 获取所有人员
+const getAllDeptUsers = async () => {
+  const principalInfo = {
+    message: "",
+    data: []
+  };
+  await axios.get('/api/verify/apply/applicant', {params: {}})
+    .then(function (res) {
+
+      if (res.data.code === 200) {
+        principalInfo.data = res.data.data;
+      } else {
+        principalInfo.message = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      principalInfo.message = `异常信息:${error.toString()}`;
+    });
+
+  return principalInfo;
+};
+
+// 获取服务
+const getServices = async () => {
+  const result = {
+    message: "",
+    data: []
+  };
+  await axios.get('/api/verify/project/server', {params: {}})
+    .then(function (res) {
+      if (res.data.code === 200) {
+
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+
+    }).catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+
+    });
+  return result;
+};
+
+// 获取镜像环境
+const getImgEnv = async () => {
+  const result = {
+    message: "",
+    data: []
+  };
+  await axios.get('/api/verify/project/image_env', {params: {}})
+    .then(function (res) {
+      if (res.data.code === 200) {
+
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+
+    }).catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+
+    });
+  return result;
+}
+
+export {
+  getAllUsers, getAllProject, getProjectType, getBranchName, getEnvironment, getPrincipal, getAllDeptUsers,
+  getServices, getImgEnv
+};

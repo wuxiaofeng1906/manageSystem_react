@@ -2,14 +2,14 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2022-01-10 07:59:45
+ * @LastEditTime: 2022-01-24 02:25:03
  * @LastEditors: jieTan
  * @LastModify:
  */
 import { Checkbox, Divider } from 'antd';
 import { useState, useEffect } from 'react';
 import { useModel } from 'umi';
-import { GQL_PARAMS, PROJ_METRIC as PM } from '@/namespaces';
+import { GQL_PARAMS, PROJ_METRIC as PM, PK_SEARCH_INTERVAL, MOMENT_FORMAT } from '@/namespaces';
 import {
   ProcessDeviationGroup,
   ProcessQualityGroup,
@@ -21,6 +21,7 @@ import {
 } from '../TableList/definitions/columns';
 import { projectKpiGql, queryGQL } from '@/pages/gqls';
 import { useGqlClient } from '@/hooks';
+import moment from 'moment';
 
 const CheckboxGroup = Checkbox.Group;
 // checkbox框的文本值
@@ -106,7 +107,15 @@ export default () => {
     }
 
     // gql查询数据
-    const newParams = Object.assign(pkGqlParmas, { kpis: kpiItems });
+    const newParams = {
+      ...pkGqlParmas,
+      kpis: kpiItems,
+      dates: {
+        start: moment()
+          .subtract(PK_SEARCH_INTERVAL.value, PK_SEARCH_INTERVAL.unit as any)
+          .format(MOMENT_FORMAT.date),
+      }, // 构建默认查询参数 - 带查询时间
+    };
     setPkGqlParmas(newParams);
     const _params: GQL_PARAMS = { func: 'projectKpi', params: newParams };
     const ret = await queryGQL(gqlClient, projectKpiGql, _params);
@@ -126,8 +135,8 @@ export default () => {
   /*  */
   return (
     <div style={{ marginLeft: 10 }}>
-      <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>
-        全选
+      <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll} disabled>
+        全选(暂不可用)
       </Checkbox>
       <Divider type="vertical" />
       <CheckboxGroup

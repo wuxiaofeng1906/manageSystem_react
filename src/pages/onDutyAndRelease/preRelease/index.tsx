@@ -1598,9 +1598,15 @@ const PreRelease: React.FC<any> = () => {
       });
       setTabNameModal(false);
       //   重置tab名
+      const source = await alalysisInitData();
+      const tabsInfo = source?.tabPageInfo;
 
-      console.log(tabContent);
-      showTabsPage();
+      if (tabsInfo) {
+        setTabContent({
+          activeKey: tabContent.activeKey,
+          panes: tabsInfo
+        });
+      }
     } else {
       message.error({
         content: result,

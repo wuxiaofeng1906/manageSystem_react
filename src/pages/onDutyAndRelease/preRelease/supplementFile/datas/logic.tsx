@@ -52,7 +52,7 @@ const savePreProjects = async (source: any, listNo: string) => {
 
 
 // 点击查询
-const inquireService = async (sorce: any) => {
+const inquireService = async (sorce: any, currentListNo: string) => {
 
   if (!sorce) {
     return {
@@ -68,7 +68,16 @@ const inquireService = async (sorce: any) => {
     }
   }
 
-  const result = await queryServiceByID(sorce);
+  const paramsData: any = [];
+  if (sorce.length > 0) {
+    sorce.forEach((ele: any) => {
+      const newEle = ele;
+      newEle.ready_release_num = currentListNo;
+      paramsData.push(newEle);
+    });
+  }
+
+  const result = await queryServiceByID(paramsData);
   return result;
 
 };

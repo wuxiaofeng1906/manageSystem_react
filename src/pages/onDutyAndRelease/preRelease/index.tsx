@@ -1265,7 +1265,7 @@ const PreRelease: React.FC<any> = () => {
       return;
     }
 
-    const result = await inquireService(releaseIdArray);
+    const result = await inquireService(releaseIdArray, currentListNo);
     if (result.message !== "") {
       message.error({
         content: result.message,
@@ -1275,31 +1275,31 @@ const PreRelease: React.FC<any> = () => {
         },
       });
     } else {
-      const queryGridData = result.data;
+
       // 有数据之后进行表格的赋值操作(需要把之前表格的数据一并追加进来)   获取之前的数据
       const newData: any = (await alalysisInitData("pulishItem", currentListNo)).upService_releaseItem;
-      const allGrid: any = [];
-      if (newData) {
-        queryGridData.forEach((news: any, i: number) => {
-          let includeFlag = false;
-          for (let index = 0; index < newData.length; index += 1) {
+      // const allGrid: any = [];
+      // if (newData) {
+      //   queryGridData.forEach((news: any, i: number) => {
+      //     let includeFlag = false;
+      //     for (let index = 0; index < newData.length; index += 1) {
+      //
+      //       const old = newData[index];
+      //       if (i === 0) { // 只增加一次源数据
+      //         allGrid.push(old);
+      //       }
+      //       if (old.app === news.app) {
+      //         includeFlag = true;
+      //         break;
+      //       }
+      //     }
+      //     if (!includeFlag) {
+      //       allGrid.push(news);
+      //     }
+      //   });
+      // }
 
-            const old = newData[index];
-            if (i === 0) { // 只增加一次源数据
-              allGrid.push(old);
-            }
-            if (old.app === news.app) {
-              includeFlag = true;
-              break;
-            }
-          }
-          if (!includeFlag) {
-            allGrid.push(news);
-          }
-        });
-      }
-
-      firstUpSerGridApi.current?.setRowData(allGrid);
+      firstUpSerGridApi.current?.setRowData(newData);
       // 需要判断升级接口内容是否有值，如果没有的话，则需要新增一个空行
       const apidata: any = await alalysisInitData("pulishApi", currentListNo);
       if (!apidata.upService_interface || (apidata.upService_interface) <= 0) {
@@ -1308,7 +1308,7 @@ const PreRelease: React.FC<any> = () => {
 
       setGridHeight({
         ...gridHeight,
-        pulishItemGrid: getGridHeight(allGrid.length),
+        pulishItemGrid: getGridHeight(newData.length),
         upgradeApiGrid: getGridHeight(1),
       });
     }
@@ -1598,6 +1598,8 @@ const PreRelease: React.FC<any> = () => {
       });
       setTabNameModal(false);
       //   重置tab名
+
+      console.log(tabContent);
       showTabsPage();
     } else {
       message.error({

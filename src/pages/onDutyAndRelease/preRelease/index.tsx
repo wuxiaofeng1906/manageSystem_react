@@ -1361,6 +1361,7 @@ const PreRelease: React.FC<any> = () => {
 
   const showPagesContent = async (source: any) => {
     if (!source || JSON.stringify(source) === "{}") {
+      showNoneDataPage();
       return;
     }
 

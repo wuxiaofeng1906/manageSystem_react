@@ -136,7 +136,14 @@ const getStoryStabilityColumns = () => {
       headerName: '预计工时',
       field: 'planHours',
       editable: true,
-      cellRenderer: manualInput_red
+      cellRenderer: (params: any) => {
+        if (params.value === null || params.value === "" || params.value === undefined) {
+          return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
+
+        }
+        return Number(params.value).toFixed(2);
+
+      }
     },
     {
       headerName: '变更工时',
@@ -661,7 +668,7 @@ const getServiceColumns = () => {
 
         if (params.value) {
           const values = (params.value).toFixed(2);
-          return `<div style="margin-top: 12px">${values}%</div>`;
+          return `<div style="margin-top: 12px">${Number(values) * 100}%</div>`;
         }
         return params.value;
       }

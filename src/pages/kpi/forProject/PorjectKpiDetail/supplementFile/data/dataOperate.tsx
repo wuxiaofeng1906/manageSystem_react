@@ -145,7 +145,7 @@ const alaysisStageWorkload = (sourceData: any) => {
     return [];
   }
 
-  const typeName = [
+   const typeName = [
     {type: "storyplan", name: "需求"},
     {type: "designplan", name: "概设&计划"},
     {type: "devplan", name: "开发"},
@@ -194,9 +194,9 @@ const alaysisStageWorkload = (sourceData: any) => {
   };
   if (sourceData.totalSW) {
     const total = sourceData.totalSW;
-    totalData.manpower = total[0].toString();
-    totalData.planHours = total[1].toString();
-    totalData.actualHours = total[2].toString();
+    totalData.manpower = total[0] === null ? "" : total[0].toString();
+    totalData.planHours = total[1] === null ? "" : total[1].toString();
+    totalData.actualHours = total[2] === null ? "" : total[2].toString();
     totalData.planWorkload = total[3] === null ? "" : total[3].toString();
     totalData.actualWorkload = total[4] === null ? "" : total[4].toString();
   }

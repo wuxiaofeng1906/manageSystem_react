@@ -4,9 +4,6 @@ import {
 } from "@/pages/onDutyAndRelease/preRelease/supplementFile/comControl/converse";
 import dayjs from "dayjs";
 import {message} from "antd";
-import {history} from "@@/core/history";
-import {routerRedux} from 'dva/router';
-
 
 // 获取表格高度
 const getGridHeight = (gridRowCount: number, moreHigh: boolean = false) => {

@@ -1,11 +1,11 @@
 import {
-  getNewPageNum,
+  getNewPageNum, getCheckProcess, updateReleaseProcess,
   savePrePulishProjects, queryServiceByID, saveUpgradeItem, delUpgradeItem,
   savePulishApi, delPulishApi, upgradeServiceConfirm, addDataRepaire, modifyDataRepaire,
   delDataReviewApi, dataRepairConfirm, getNewCheckNum, saveOnlineBranch, saveVersonCheck,
   saveEnvironmentCheck, saveOnlineAutoCheck, getDetaisByCHeckNum, delDataOnlineBranchApi,
-  excuteVersionCheck, excuteEnvCheck, excuteAutoCheck
-} from "@/pages/onDutyAndRelease/preRelease/supplementFile/axiosApi";
+  excuteVersionCheck, excuteEnvCheck, excuteAutoCheck, delTabsInfo
+} from "@/pages/onDutyAndRelease/preRelease/supplementFile/datas/axiosApi";
 
 const userLogins: any = localStorage.getItem("userLogins");
 const usersInfo = JSON.parse(userLogins);
@@ -46,6 +46,7 @@ const savePreProjects = async (source: any, listNo: string) => {
   return result;
 };
 
+
 // 点击查询
 const inquireService = async (sorce: any) => {
 
@@ -68,10 +69,31 @@ const inquireService = async (sorce: any) => {
 
 };
 
+// 删除tab
+const deleteReleaseItem = async (releaseNum: string) => {
+  return await delTabsInfo(releaseNum);
+};
+
+// 获取进度
+const getPageCHeckProcess = async (releaseNum: string) => {
+  return await getCheckProcess(releaseNum);
+};
+
+// 保存发布结果
+const saveProcessResult = async (releaseNum: string, result: string) => {
+
+  const data = {
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "ready_release_num": releaseNum,
+    "release_result": result
+  };
+  return await updateReleaseProcess(data);
+
+};
 // 发布项的修改
 const upgradePulishItem = async (formData: any, currentListNo: string) => {
 
-  debugger;
   if (!formData.onlineEnv) {
     return "上线环境不能为空！"
   }
@@ -373,8 +395,6 @@ const saveOnlineBranchData = async (type: string, currentListNo: string, newOnli
   //  3.环境一致性检查
   //  4.(上线前后)自动化检查设置
 
-  debugger;
-
   // 上线分支头部验证分支名称和技术侧
   const checkMsg_onlineHead = checkOnlineHeadData(sourceData);
   if (checkMsg_onlineHead) { // 如果校验信息不为空，代表校验失败
@@ -465,7 +485,7 @@ const alayVersonCheck = (source_data: any) => {
     versionCheckId: checkData.version_check_id,
     checkNum: checkData.check_num,
     verson_check: checkData.backend_version_check_flag,
-    server: (checkData.server).split(","),
+    server: checkData.server === null ? undefined : (checkData.server).split(","),
     imageevn: checkData.image_env,
   };
 
@@ -473,8 +493,8 @@ const alayVersonCheck = (source_data: any) => {
     versionCheckId: checkData.version_check_id,
     checkNum: checkData.check_num,
     branchcheck: checkData.inclusion_check_flag,
-    branch_mainBranch: (checkData.main_branch).split(","),
-    branch_teachnicalSide: (checkData.technical_side).split(","),
+    branch_mainBranch: checkData.main_branch === null ? undefined : (checkData.main_branch).split(","),
+    branch_teachnicalSide: checkData.technical_side === null ? undefined : (checkData.technical_side).split(","),
     branch_mainSince: checkData.main_since,
   };
 
@@ -592,7 +612,7 @@ const executeOnlineCheck = async (type: string, checkNum: string) => {
 
 };
 export {
-  getNewNum,
+  getNewNum, deleteReleaseItem, getPageCHeckProcess, saveProcessResult,
   savePreProjects, inquireService, upgradePulishItem, delUpgradeItems, addPulishApi, confirmUpgradeService,
   dataRepaireReview, confirmDataRepairService, getCheckNumForOnlineBranch, saveOnlineBranchData, getModifiedData,
   executeOnlineCheck

@@ -18,13 +18,14 @@ import {
 } from "@ant-design/icons";
 import {converseFormatForAgGrid} from "../devMethod/deptDataAnalyze";
 
-
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(8);
 const monthRanges = getTwelveMonthTime();
 const quarterTime = getFourQuarterTime();
 
-/* region 动态定义列 */
+/* region 列的获取 */
+
+// 数据渲染
 const dataRender = (params: any) => {
 
   let result = "0";
@@ -33,7 +34,7 @@ const dataRender = (params: any) => {
   }
 
   const node = params.data;
-  if (node.isDept === true) {
+  if (node && node.isDept === true) {
     return `<span style="font-weight: bold"> ${result}</span>`;
   }
 
@@ -100,7 +101,7 @@ const columsForYears = () => {
 
 /* endregion */
 
-/* region 数据处理 */
+/* region 数据获取和解析 */
 
 const queryCodesCount = async (client: GqlClient<object>, params: string) => {
 
@@ -186,6 +187,7 @@ const WeekCodeTableList: React.FC<any> = () => {
 
   /* endregion */
 
+  /* region 按钮事件 */
   // 按周统计
   const statisticsByWeeks = async () => {
     /* 八周 */
@@ -226,6 +228,8 @@ const WeekCodeTableList: React.FC<any> = () => {
     const datas: any = await queryCodesCount(gqlClient, 'year');
     gridApi.current?.setRowData(datas);
   };
+
+  /* endregion */
 
   /* region 提示规则显示 */
   const [messageVisible, setVisible] = useState(false);

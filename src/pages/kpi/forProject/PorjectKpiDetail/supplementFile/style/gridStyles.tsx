@@ -24,7 +24,7 @@ const setProcessCellStyle = (params: any) => {
 
 // 2.需求稳定性
 const setStoryStabilityCellStyle = (params: any) => {
-  if (params.column?.colId === "updateRate" || params.column?.colId === "title" || params.column?.colId === "stage") {
+  if (params.column?.colId === "ratio" || params.column?.colId === "title" || params.column?.colId === "stage") {
     return grayCellStyle;
   }
   return whiteCellStyle;
@@ -60,7 +60,7 @@ const setReviewDefectCellStyle = (params: any) => {
     return grayCellStyle;
   }
 
-  if (params.column?.colId === "reviewHour" && (params.data?.kind === "提测演示" || params.data?.kind === "集成测试"
+  if (params.column?.colId === "reviewHour" && (params.data?.kind === "提测演示" || params.data?.kind === "开发联调" || params.data?.kind === "集成测试"
     || params.data?.kind === "系统测试" || params.data?.kind === "发布测试")) {
     // 不可修改
     return grayCellStyle;
@@ -76,7 +76,7 @@ const setReviewDefectCellStyle = (params: any) => {
 
 };
 
-// 6.6 过程质量补充数据和7.服务
+// 6.过程质量补充数据和7.服务
 const setProcessQualityCellStyle = (params: any) => {
 
   if (params.column?.colId === "title" || params.column?.colId === "module" || params.column?.colId === "baseline" || params.column?.colId === "kind") {
@@ -93,11 +93,25 @@ const setProcessQualityCellStyle = (params: any) => {
 
 };
 
+// 7.服务
+const setServiceCellStyle = (params: any) => {
+
+  if (params.column?.colId === "title" || params.column?.colId === "module" || params.column?.colId === "item" || params.column?.colId === "ratio") {
+
+    // 不可修改
+    return grayCellStyle;
+  }
+
+  return whiteCellStyle;
+
+};
+
 export {
   setProcessCellStyle,
   setStoryStabilityCellStyle,
   setStageWorkloadCellStyle,
   setProductRateCellStyle,
   setReviewDefectCellStyle,
-  setProcessQualityCellStyle
+  setProcessQualityCellStyle,
+  setServiceCellStyle
 }

@@ -12,7 +12,7 @@ import {AgGridReact} from "ag-grid-react";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {getAllProject} from "@/publicMethods/verifyAxios";
 import {useRequest} from "ahooks";
-import {savePrePulishProjects} from "./supplementFile/datas/axiosApi";
+import {savePrePulishProjects} from "./supplementFile/axiosApi";
 
 const {TabPane} = Tabs;
 const {Option} = Select;

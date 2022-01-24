@@ -14,7 +14,6 @@ import {
   getFourQuarterTime,
   getParamsByType, getYearsTime
 } from '@/publicMethods/timeMethods';
-import {colorRender} from '@/publicMethods/cellRenderer';
 import {Button, Drawer} from "antd";
 import {
   ScheduleTwoTone,
@@ -23,53 +22,40 @@ import {
   QuestionCircleTwoTone,
   AppstoreTwoTone
 } from "@ant-design/icons";
-import {getHeight} from "@/publicMethods/pageSet";
+import {customRound, getHeight} from "@/publicMethods/pageSet";
+import {converseFormatForAgGrid} from "../testMethod/deptDataAnalyze";
 
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(8);
 const monthRanges = getTwelveMonthTime();
 const quarterTime = getFourQuarterTime();
-const groupValues: any[] = [];
-const moduleValues: any[] = [];
 
-/* region 动态定义列 */
-const compColums = [
-  {
-    headerName: '研发中心',
-    field: 'devCenter',
-    rowGroup: true,
-    hide: true,
-  }, {
-    headerName: '所属部门',
-    field: 'dept',
-    rowGroup: true,
-    hide: true,
-  }, {
-    headerName: '组名',
-    field: 'group',
-    rowGroup: true,
-    hide: true,
-  }, {
-    headerName: '姓名',
-    field: 'username',
-  }];
+/* region 列的定义和渲染 */
+// 数据渲染
+const dataRender = (params: any) => {
+  const node = params.data;
 
-function codeNumberRender(values: any) {
-  const rowName = values.rowNode.key;
-  for (let i = 0; i < groupValues.length; i += 1) {
-    const datas = groupValues[i];
-    if (values.colDef.field === datas.time && rowName === datas.group) {
-      if (datas.values === "" || datas.values === null || datas.values === undefined || Number(datas.values) === 0) {
-        return ` <span style="color: Silver  ">  ${0} </span> `;
-      }
-      return ` <span style="font-weight: bold">  ${Number(datas.values).toFixed(4)} </span> `;
+  if (params.value) {
+    let result = customRound(params.value, 4);
+    if ((node.Group)[0] === "代码量") {
+      result = params.value;
     }
+
+    if (node &&node.isDept === true) {
+      return `<span style="font-weight: bold"> ${result}</span>`;
+    }
+
+    return `<span> ${result}</span>`;
   }
 
-  return ` <span style="color: Silver  ">  ${0} </span> `;
-}
+  if (node && node.isDept === true) {
+    return `<span style="font-weight: bold"> ${0}</span>`;
+  }
 
+  return `<span style="color: silver"> ${0}</span>`;
+
+}
 
 const columsForWeeks = () => {
   const component = new Array();
@@ -79,12 +65,12 @@ const columsForWeeks = () => {
     component.push({
       headerName: weekName,
       field: starttime.toString(),
-      aggFunc: codeNumberRender,
-      cellRenderer: colorRender
+      cellRenderer: dataRender,
+      minWidth: 100
     });
 
   }
-  return compColums.concat(component);
+  return component;
 };
 
 const columsForMonths = () => {
@@ -93,12 +79,12 @@ const columsForMonths = () => {
     component.push({
       headerName: monthRanges[index].title,
       field: monthRanges[index].start,
-      aggFunc: codeNumberRender,
-      cellRenderer: colorRender
+      cellRenderer: dataRender,
+      minWidth: 110
     });
 
   }
-  return compColums.concat(component);
+  return component;
 };
 
 const columsForQuarters = () => {
@@ -107,12 +93,11 @@ const columsForQuarters = () => {
     component.push({
       headerName: quarterTime[index].title,
       field: quarterTime[index].start,
-      aggFunc: codeNumberRender,
-      cellRenderer: colorRender
+      cellRenderer: dataRender
     });
 
   }
-  return compColums.concat(component);
+  return component;
 };
 
 const columsForYears = () => {
@@ -122,160 +107,55 @@ const columsForYears = () => {
     component.push({
       headerName: yearsTime[index].title,
       field: yearsTime[index].start,
-      aggFunc: codeNumberRender,
-      cellRenderer: colorRender
+      cellRenderer: dataRender
     });
 
   }
-  return compColums.concat(component);
+  return component;
 };
 /* endregion */
 
-/* region 数据处理 */
-
-
-// 转化为ag-grid能被显示的格式
-const converseFormatForAgGrid = (oraDatas: any) => {
-
-  groupValues.length = 0;
-  moduleValues.length = 0;
-
-  const arrays: any[] = [];
-  if (oraDatas === null) {
-    return arrays;
-  }
-
-  for (let index = 0; index < oraDatas.length; index += 1) {
-
-    const starttime = oraDatas[index].range.start;
-    arrays.push({
-      "username": "代码量",
-      [starttime]: oraDatas[index].code
-    });
-
-    groupValues.push({
-      time: starttime,
-      group: "研发中心",
-      values: oraDatas[index].total.kpi
-    });
-
-    const data = oraDatas[index].datas;
-    for (let i = 0; i < data.length; i += 1) {
-
-      groupValues.push({
-          time: starttime,
-          group: data[i].deptName,
-          values: data[i].kpi
-        }
-        // , {
-        //   time: starttime,
-        //   group: data[i].parent === null ? "" : data[i].parent.deptName,
-        //   values: data[i].parent === null ? "" : data[i].parent.kpi
-        // }
-      );
-
-
-      const usersData = data[i].users;
-      if (usersData !== null) {
-        for (let m = 0; m < usersData.length; m += 1) {
-          const username = usersData[m].userName;
-
-          // 特殊处理宋老师和王润燕的部门和组
-          if (username === "陈诺") {
-            arrays.push({
-              devCenter: "研发中心",
-              dept: "测试部",
-              "username": username,
-              [starttime]: usersData[m].kpi
-            });
-          } else {
-            arrays.push({
-              devCenter: "研发中心",
-              dept: data[i].parent.deptName,
-              group: data[i].deptName,
-              "username": username,
-              [starttime]: Number(usersData[m].kpi).toFixed(4)
-            });
-          }
-
-        }
-      }
-    }
-  }
-
-  return arrays;
-};
-
-const converseArrayToOne = (data: any) => {
-  const resultData = new Array();
-  for (let index = 0; index < data.length; index += 1) {
-    let repeatFlag = false;
-    // 判断原有数组是否包含有名字
-    for (let m = 0; m < resultData.length; m += 1) {
-      if (resultData[m].username === data[index].username) {
-        repeatFlag = true;
-        break;
-      }
-    }
-
-    if (repeatFlag === false) {
-      const tempData = {};
-      for (let index2 = 0; index2 < data.length; index2 += 1) {
-        tempData["username"] = data[index].username;
-
-        if (data[index].username === data[index2].username) {
-          const key = Object.keys(data[index2]);  // 获取所有的Key值
-          key.forEach(function (item) {
-            tempData[item] = data[index2][item];
-          });
-        }
-      }
-      resultData.push(tempData);
-    }
-  }
-
-  return resultData;
-};
+/* region 数据获取和解析 */
 
 const queryOnlineBugRate = async (client: GqlClient<object>, params: string) => {
   const condition = getParamsByType(params);
   if (condition.typeFlag === 0) {
     return [];
   }
+
   const {data} = await client.query(`
       {
-           bugThousTestDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, thous: TEST) {
-              total {
+         bugThousTestDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, thous: TEST) {
+            total {
+              dept
+              deptName
+              kpi
+            }
+            code
+            range {
+              start
+              end
+            }
+            datas {
+              dept
+              deptName
+              kpi
+              parent {
                 dept
                 deptName
-                kpi
               }
-              code
-              range {
-                start
-                end
-              }
-              datas {
-                dept
-                deptName
+              users {
+                userId
+                userName
                 kpi
-                parent {
-                  dept
-                  deptName
-                }
-                users {
-                  userId
-                  userName
-                  kpi
-                }
               }
             }
+          }
 
       }
   `);
-
   const datas = converseFormatForAgGrid(data?.bugThousTestDept);
-  return converseArrayToOne(datas);
+  return datas;
 };
 
 /* endregion */
@@ -306,6 +186,7 @@ const TestBugRateTableList: React.FC<any> = () => {
   };
   /* endregion */
 
+  /* region 按钮事件 */
   // 按周统计
   const statisticsByWeeks = async () => {
     /* 八周 */
@@ -346,6 +227,8 @@ const TestBugRateTableList: React.FC<any> = () => {
     gridApi.current?.setRowData(datas);
   };
 
+  /* endregion */
+
   /* region 提示规则显示 */
   const [messageVisible, setVisible] = useState(false);
   const showRules = () => {
@@ -382,17 +265,25 @@ const TestBugRateTableList: React.FC<any> = () => {
             sortable: true,
             filter: true,
             flex: 1,
-            cellStyle: {"margin-top": "-5px"}
+            suppressMenu: true
           }}
           autoGroupColumnDef={{
-            minWidth: 250,
-            sort: 'asc'
+            minWidth: 240,
+            headerName: '部门-人员',
+            cellRendererParams: {suppressCount: true},
+            pinned: 'left',
+            suppressMenu: false
           }}
-          groupDefaultExpanded={9} // 展开分组
-          suppressAggFuncInHeader={true}   // 不显示标题聚合函数的标识
+
           rowHeight={32}
           headerHeight={35}
           onGridReady={onGridReady}
+          treeData={true}
+          animateRows={true}
+          groupDefaultExpanded={-1}
+          getDataPath={(source: any) => {
+            return source.Group;
+          }}
         >
         </AgGridReact>
       </div>

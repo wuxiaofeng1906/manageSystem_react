@@ -24,24 +24,28 @@ const weekRanges = getWeeksRange(8);
 const monthRanges = getTwelveMonthTime();
 const quarterTime = getFourQuarterTime();
 
+/* region 列的定义和渲染 */
 
-/* region 动态定义列 */
+// 数据渲染
 const dataRender = (params: any) => {
+  const node = params.data;
 
   if (params.value) {
     const result = customRound(params.value, 2);
-    const node = params.data;
-    if (node.isDept === true) {
-
+    if (node && node.isDept === true) {
       return `<span style="font-weight: bold"> ${result}</span>`;
     }
-    return `<span> ${result}</span>`;
 
+    return `<span> ${result}</span>`;
   }
+
+  if (node && node.isDept === true) {
+    return `<span style="font-weight: bold"> ${0}</span>`;
+  }
+
   return `<span style="color: silver"> ${0}</span>`;
 
 }
-
 
 const columsForWeeks = () => {
   const component = new Array();
@@ -99,11 +103,10 @@ const columsForYears = () => {
   }
   return component;
 };
+
 /* endregion */
 
-/* region 数据处理 */
-
-
+/* region 数据获取和解析 */
 const queryBugResolutionCount = async (client: GqlClient<object>, params: string) => {
   const condition = getParamsByType(params);
   if (condition.typeFlag === 0) {
@@ -154,7 +157,6 @@ const queryBugResolutionCount = async (client: GqlClient<object>, params: string
   const datas = converseFormatForAgGrid(data?.bugThousDept);
   return datas;
 };
-
 /* endregion */
 
 const BugRateTableList: React.FC<any> = () => {
@@ -184,6 +186,7 @@ const BugRateTableList: React.FC<any> = () => {
 
   /* endregion */
 
+  /* region 按钮事件 */
   // 按周统计
   const statisticsByWeeks = async () => {
     /* 八周 */
@@ -224,6 +227,8 @@ const BugRateTableList: React.FC<any> = () => {
     const datas: any = await queryBugResolutionCount(gqlClient, 'year');
     gridApi.current?.setRowData(datas);
   };
+
+  /* endregion */
 
   /* region 提示规则显示 */
   const [messageVisible, setVisible] = useState(false);

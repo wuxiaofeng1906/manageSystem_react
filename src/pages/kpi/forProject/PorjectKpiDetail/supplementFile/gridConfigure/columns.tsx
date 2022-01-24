@@ -134,20 +134,36 @@ const getStoryStabilityColumns = () => {
     },
     {
       headerName: '预计工时',
-      field: 'planTime',
+      field: 'planHours',
       editable: true,
-      cellRenderer: manualInput_red
+      cellRenderer: (params: any) => {
+        if (params.value === null || params.value === "" || params.value === undefined) {
+          return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
+
+        }
+        return Number(params.value).toFixed(2);
+
+      }
     },
     {
       headerName: '变更工时',
-      field: 'updateTime',
+      field: 'stableHours',
       editable: true,
       cellRenderer: manualInput_red
 
     },
     {
       headerName: '变更率',
-      field: 'updateRate',
+      field: 'ratio',
+      valueFormatter: (params: any) => {
+        if (params.value === null) {
+          return "";
+        }
+        if (params.value === 0) {
+          return 0;
+        }
+        return `${Number(params.value).toFixed(4)}`
+      }
     }
   ];
 
@@ -166,15 +182,15 @@ const manualInput = (params: any) => {
   }
 
   // 判断合计中，是否有对人工进行修改
-  if (params.data?.stage === "合计") {
-
-    if ((params.column?.colId === "manpower" && params.data?.manpowerFlag === "true") ||
-      (params.column?.colId === "planHours" && params.data?.planHoursFlag === "true") ||
-      (params.column?.colId === "actualHours" && params.data?.actualHoursFlag === "true")) {
-      return `<div style="font-weight: bold;font-style: italic ;text-align: center">${params.value}</div>`;
-
-    }
-  }
+  // if (params.data?.stage === "合计") {
+  //
+  //   if ((params.column?.colId === "manpower" && params.data?.manpowerFlag === "true") ||
+  //     (params.column?.colId === "planHours" && params.data?.planHoursFlag === "true") ||
+  //     (params.column?.colId === "actualHours" && params.data?.actualHoursFlag === "true")) {
+  //     return `<div style="font-weight: bold;font-style: italic ;text-align: center">${params.value}</div>`;
+  //
+  //   }
+  // }
   return params.value;
 };
 
@@ -211,7 +227,7 @@ const getStageWorkloadColumns = () => {
       minWidth: STAGE_LENGTH
     },
     {
-      headerName: '投入人数',
+      headerName: '投入人力',
       field: 'manpower',
       editable: true,
       cellRenderer: manualInput
@@ -232,10 +248,23 @@ const getStageWorkloadColumns = () => {
     {
       headerName: '计划工作量',
       field: 'planWorkload',
+      valueFormatter: (params: any) => {
+        if (params.value) {
+          return Number(params.value).toFixed(2);
+        }
+        return params.value;
+      }
+
     },
     {
       headerName: '实际工作量',
       field: 'actualWorkload',
+      valueFormatter: (params: any) => {
+        if (params.value) {
+          return Number(params.value).toFixed(2);
+        }
+        return params.value;
+      }
     }
   ];
 
@@ -326,9 +355,8 @@ const getProductRateColumns = () => {
 
 /* region 5.评审和缺陷 */
 
-
 const defectHourEditRenderer = (params: any) => {
-  if (params.data?.kind === "提测演示" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
+  if (params.data?.kind === "提测演示" || params.data?.kind === "开发联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
     return false;
   }
   return true;
@@ -352,7 +380,7 @@ const getReviewDefectColumns = () => {
       rowSpan: (params: any) => {
 
         if (params.data.title === '5.评审和缺陷') {
-          return 12;
+          return 15;
         }
         return 1;
       }
@@ -379,7 +407,7 @@ const getReviewDefectColumns = () => {
         if (params.data?.kind === "合计") {
           return "-";
         }
-        if (params.value === null || params.value === undefined) {
+        if (params.value === null || params.value === undefined || params.value === "") {
           return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
         }
 
@@ -416,10 +444,15 @@ const getReviewDefectColumns = () => {
       headerName: '评审用时',
       field: 'reviewHour',
       cellRenderer: (params: any) => {
-        if (params.data?.kind === "提测演示" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
-          // return `<div style="text-align: center">-</div>`;
+        if (params.data?.kind === "提测演示" || params.data?.kind === "开发联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
           return "-";
         }
+
+        if (params.value === null || params.value === "" || params.value === undefined) {
+          return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
+
+        }
+
         return params.value;
       },
       editable: defectHourEditRenderer,
@@ -429,7 +462,7 @@ const getReviewDefectColumns = () => {
       headerName: '评审效率',
       field: 'reviewRatio',
       cellRenderer: (params: any) => {
-        if (params.data?.kind === "提测演示" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
+        if (params.data?.kind === "提测演示" || params.data?.kind === "开发联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
           return "-";
         }
         return Number(params.value).toFixed(2);
@@ -442,7 +475,7 @@ const getReviewDefectColumns = () => {
 
 /* endregion  */
 
-/* region 6 过程质量补充数据和7.服务 */
+/* region 6 过程质量补充数据 */
 
 const getProcessQualityColumns = () => {
 
@@ -512,7 +545,7 @@ const getProcessQualityColumns = () => {
         if (params.data?.kind === "合计") {
           return "-";
         }
-        if (params.value === null || params.value === undefined) {
+        if (params.value === null || params.value === undefined || params.value === "") {
           return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
         }
 
@@ -523,7 +556,7 @@ const getProcessQualityColumns = () => {
       }
     },
     {
-      headerName: '',
+      headerName: '度量值',
       field: 'kind',
       minWidth: 170,
       maxWidth: 170,
@@ -540,18 +573,98 @@ const getProcessQualityColumns = () => {
       minWidth: 130,
       maxWidth: 130,
       cellRenderer: (params: any) => {
-        if (params.data?.module === "及时交付" && (params.value === null || params.value === "" || params.value === undefined)) {
-          return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
+        if (params.value) {
+          return Number(params.value).toFixed(2);
         }
         return params.value;
       },
-      editable: (params: any) => {
-        if (params.data?.module === "及时交付") {
-          return true;
-        }
-        return false;
+    }
+  ];
 
+  return processQualityColums;
+};
+
+/* endregion  */
+
+/* region 7.服务 */
+
+const getServiceColumns = () => {
+
+  const processQualityColums: any = [
+    {
+      headerName: '',
+      field: 'title',
+      minWidth: TYPE_LENGTH,
+      maxWidth: TYPE_LENGTH,
+      cellRenderer: (params: any) => {
+        return `<div style="font-weight: bold;margin-top: 12px">${params.value}</div>`
       },
+    },
+    {
+      headerName: '',
+      field: 'module',
+      maxWidth: STAGE_LENGTH,
+      minWidth: STAGE_LENGTH,
+      cellRenderer: (params: any) => {
+        return `<div style="margin-top: 12px">${params.value} </div>`;
+      }
+    },
+    {
+      headerName: '度量值',
+      field: 'item',
+      cellRenderer: (params: any) => {
+        if (params.value === "一次发布成功率") {
+          return `<div>
+                    <div>一次发布</div>
+                    <div style="margin-top: -5px">成功率</div>
+                </div>`;
+        }
+
+        return params.value;
+      },
+    },
+    {
+      headerName: '成功发布数',
+      field: 'succN',
+      minWidth: 170,
+      maxWidth: 170,
+      editable: true,
+      cellRenderer: (params: any) => {
+
+        if (params.value === null || params.value === "" || params.value === undefined) {
+          return `<div style="color: red;font-style: italic ;text-align: center;margin-top: 12px">手工录入</div>`;
+
+        }
+        return `<div style="margin-top: 12px">${params.value} </div>`;
+      }
+    },
+    {
+      headerName: '发布次数',
+      field: 'totalN',
+      minWidth: 95,
+      maxWidth: 95,
+      editable: true,
+      cellRenderer: (params: any) => {
+        if (params.value === null || params.value === "" || params.value === undefined) {
+          return `<div style="color: red;font-style: italic ;text-align: center;margin-top: 12px">手工录入</div>`;
+
+        }
+        return `<div style="margin-top: 12px">${params.value} </div>`;
+      }
+    },
+    {
+      headerName: '一次成功发布率',
+      field: 'ratio',
+      minWidth: 130,
+      maxWidth: 130,
+      cellRenderer: (params: any) => {
+
+        if (params.value) {
+          const values = (params.value).toFixed(2);
+          return `<div style="margin-top: 12px">${(Number(values) * 100).toFixed(2)}%</div>`;
+        }
+        return params.value;
+      }
     }
   ];
 
@@ -566,5 +679,6 @@ export {
   getStageWorkloadColumns,
   getProductRateColumns,
   getReviewDefectColumns,
-  getProcessQualityColumns
+  getProcessQualityColumns,
+  getServiceColumns
 };

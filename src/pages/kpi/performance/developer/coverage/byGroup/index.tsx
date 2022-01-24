@@ -8,133 +8,51 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import {
-  getWeeksRange,
-  getMonthWeek,
-  getTwelveMonthTime,
-  getFourQuarterTime,
-  getYearsTime
+  getWeeksRange, getMonthWeek, getTwelveMonthTime, getFourQuarterTime, getYearsTime
 } from '@/publicMethods/timeMethods';
 import {Button, Drawer} from "antd";
 import {
-  ScheduleTwoTone,
-  CalendarTwoTone,
-  ProfileTwoTone,
-  QuestionCircleTwoTone,
-  AppstoreTwoTone
+  ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone, AppstoreTwoTone
 } from "@ant-design/icons";
 import {customRound, getHeight} from "@/publicMethods/pageSet";
-import {moduleChange} from "@/publicMethods/cellRenderer";
+
+import {converseCoverageFormatForAgGrid} from "../../devMethod/deptDataAnalyze";
+
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(4);
 const monthRanges = getTwelveMonthTime(6);
 const quarterTime = getFourQuarterTime();
-const InstGroupValues: any[] = [];
-const branGroupValues: any[] = [];
-const instModuleValues: any[] = [];
-const branModuleValues: any[] = [];
-
 
 /* region 表格渲染 */
 
-// 合并结构列渲染
-function instCoveRender(values: any) {
-
-  const rowName = values.rowNode.key;
-  if (rowName === "前端" || rowName === "后端") {
-    for (let i = 0; i < instModuleValues.length; i += 1) {
-      const moduleInfo = instModuleValues[i];
-      if (values.colDef.field === moduleInfo.time && rowName === moduleInfo.module && values.rowNode.parent.key === moduleInfo.parent) {
-        if (moduleInfo.values === "" || moduleInfo.values === null || moduleInfo.values === undefined || Number(moduleInfo.values) === 0) {
-          return ` <span style="color: Silver  ">  ${0} </span> `;
-        }
-        return ` <span style="font-weight: bold">  ${customRound(Number(moduleInfo.values), 2)} </span> `;
-      }
-    }
-  }
-
-  for (let i = 0; i < InstGroupValues.length; i += 1) {
-    const datas = InstGroupValues[i];
-    if (values.colDef.field === datas.time && values.rowNode.key === datas.group) {
-      if (Number(datas.values) === 0) {
-        return ` <span style="color: Silver ">  0</span> `;
-      }
-      return ` <span style="font-weight: bold">  ${datas.values} </span> `;
-    }
-  }
-  return "";
-}
-
-// 合并分支列渲染
-function branCoveRender(values: any) {
-
-  const rowName = values.rowNode.key;
-  if (rowName === "前端" || rowName === "后端") {
-    for (let i = 0; i < branModuleValues.length; i += 1) {
-      const moduleInfo = branModuleValues[i];
-      if (values.colDef.field === moduleInfo.time && rowName === moduleInfo.module && values.rowNode.parent.key === moduleInfo.parent) {
-        if (moduleInfo.values === "" || moduleInfo.values === null || moduleInfo.values === undefined || Number(moduleInfo.values) === 0) {
-          return ` <span style="color: Silver  ">  ${0} </span> `;
-        }
-        return ` <span style="font-weight: bold">  ${customRound(Number(moduleInfo.values), 2)} </span> `;
-      }
-    }
-  }
-
-  for (let i = 0; i < branGroupValues.length; i += 1) {
-    const datas = branGroupValues[i];
-    if (values.colDef.field === datas.time && values.rowNode.key === datas.group) {
-      if (Number(datas.values) === 0) {
-        return ` <span style="color: Silver ">  0</span> `;
-      }
-      return ` <span style="font-weight: bold">  ${datas.values} </span> `;
-    }
-
-  }
-  return '';
-}
 
 // 表格代码渲染
 function coverageCellRenderer(params: any) {
-  // 判断是否包含属性
-  if (params.hasOwnProperty("value")) {
-    if (params.value === "0.00") {
-      return ` <span style="color: Silver  ">  ${0} </span> `;   // Silver
+  const node = params.data;
+
+  if (params.value) {
+    const result = customRound((Number(params.value) * 100), 2);
+    if (node && node.isDept === true) {
+      return `<span style="font-weight: bold"> ${result}</span>`;
     }
-    return params.value;
+
+    return `<span> ${result}</span>`;
   }
-  return ` <span style="color: Silver  ">  ${0} </span> `;
+
+  if (node && node.isDept === true) {
+    return `<span style="font-weight: bold"> ${0}</span>`;
+  }
+
+  return `<span style="color: silver"> ${0}</span>`;
+
+
 }
 
 /* endregion */
 
 /* region 动态定义列 */
-const compColums = [
-  {
-    headerName: '研发中心',
-    field: 'devCenter',
-    rowGroup: true,
-    hide: true,
-  }, {
-    headerName: '所属部门',
-    field: 'dept',
-    rowGroup: true,
-    hide: true,
-  }, {
-    headerName: '组名',
-    field: 'group',
-    rowGroup: true,
-    hide: true,
-  }, {
-    headerName: '所属端',
-    field: 'module',
-    rowGroup: true,
-    hide: true,
 
-  }, {
-    headerName: '姓名',
-    field: 'username',
-  }];
 
 const columsForWeeks = () => {
   const component = new Array();
@@ -148,19 +66,17 @@ const columsForWeeks = () => {
         {
           headerName: '结构覆盖率',
           field: `instCove${endtime.toString()}`,
-          aggFunc: instCoveRender,
           cellRenderer: coverageCellRenderer,
         },
         {
           headerName: '分支覆盖率',
           field: `branCove${endtime.toString()}`,
-          aggFunc: branCoveRender,
           cellRenderer: coverageCellRenderer,
         },
       ],
     });
   }
-  return compColums.concat(component);
+  return component;
 };
 
 const columsForMonths = () => {
@@ -173,19 +89,17 @@ const columsForMonths = () => {
         {
           headerName: '结构覆盖率',
           field: `instCove${endtime.toString()}`,
-          aggFunc: instCoveRender,
           cellRenderer: coverageCellRenderer,
         },
         {
           headerName: '分支覆盖率',
           field: `branCove${endtime.toString()}`,
-          aggFunc: branCoveRender,
           cellRenderer: coverageCellRenderer,
         },
       ],
     });
   }
-  return compColums.concat(component);
+  return component;
 };
 
 const columsForQuarters = () => {
@@ -199,19 +113,17 @@ const columsForQuarters = () => {
         {
           headerName: '结构覆盖率',
           field: `instCove${endtime.toString()}`,
-          aggFunc: instCoveRender,
           cellRenderer: coverageCellRenderer,
         },
         {
           headerName: '分支覆盖率',
           field: `branCove${endtime.toString()}`,
-          aggFunc: branCoveRender,
           cellRenderer: coverageCellRenderer,
         },
       ],
     });
   }
-  return compColums.concat(component);
+  return component;
 };
 
 const columsForYears = () => {
@@ -225,211 +137,22 @@ const columsForYears = () => {
         {
           headerName: '结构覆盖率',
           field: `instCove${endtime.toString()}`,
-          aggFunc: instCoveRender,
           cellRenderer: coverageCellRenderer,
         },
         {
           headerName: '分支覆盖率',
           field: `branCove${endtime.toString()}`,
-          aggFunc: branCoveRender,
           cellRenderer: coverageCellRenderer,
         },
       ],
     });
   }
-  return compColums.concat(component);
+  return component;
 };
 
 /* endregion */
 
 /* region 数据处理 */
-function addGroupAndDept(oraDatas: any) {
-  instModuleValues.length = 0;
-  branModuleValues.length = 0;
-  InstGroupValues.length = 0;
-  branGroupValues.length = 0;
-  const objectDataArray: string | any[] = [];
-  for (let index = 0; index < oraDatas.length; index += 1) {
-    if (oraDatas[index] !== null) {
-      const orderTime = oraDatas[index].range.end;
-      // 研发中心数据
-      objectDataArray.push({
-        devCenter: "研发中心",
-        "username": "前端",
-        [`instCove${orderTime}`]: customRound(Number(oraDatas[index].side.front.instCove * 100), 2),
-        [`branCove${orderTime}`]: customRound(Number(oraDatas[index].side.front.branCove * 100), 2)
-      });
-
-      objectDataArray.push({
-        devCenter: "研发中心",
-        "username": "后端",
-        [`instCove${orderTime}`]: customRound(Number(oraDatas[index].side.backend.instCove * 100), 2),
-        [`branCove${orderTime}`]: customRound(Number(oraDatas[index].side.backend.branCove * 100), 2)
-      });
-      InstGroupValues.push({
-        time: `instCove${orderTime}`,
-        group: "研发中心",
-        values: customRound(Number(oraDatas[index].total.instCove * 100), 2),
-
-      });
-
-      branGroupValues.push({
-        time: `branCove${orderTime}`,
-        group: "研发中心",
-        values: customRound(Number(oraDatas[index].total.branCove * 100), 2),
-
-      });
-
-
-      const weekDatas = oraDatas[index].datas;
-      if (weekDatas !== null) {
-        for (let i = 0; i < weekDatas.length; i += 1) {
-          const userInfo = weekDatas[i].users;
-          let deptInfo = "";
-          if (weekDatas[i].parent !== null) {
-            deptInfo = weekDatas[i].parent.deptName;
-          }
-          let groupInfo = weekDatas[i].deptName;
-
-
-          if (groupInfo === "前端平台研发部") {
-            deptInfo = "前端平台研发部";
-            groupInfo = "前端平台研发";
-            InstGroupValues.push({
-              time: `instCove${orderTime}`,
-              group: "前端平台研发部",
-              values: customRound(Number(weekDatas[i].instCove * 100), 2),
-            });
-
-            branGroupValues.push({
-              time: `branCove${orderTime}`,
-              group: "前端平台研发部",
-              values: customRound(Number(weekDatas[i].branCove * 100), 2),
-            });
-          }
-
-          // 特殊处理产品研发部的数据
-          if (deptInfo === "产品研发部") {
-            InstGroupValues.push({
-              time: `instCove${orderTime}`,
-              group: "产品研发部",
-              values: customRound(Number(weekDatas[i].parent.instCove * 100), 2),
-
-            });
-
-            branGroupValues.push({
-              time: `branCove${orderTime}`,
-              group: "产品研发部",
-              values: customRound(Number(weekDatas[i].parent.branCove * 100), 2),
-
-            });
-          }
-
-          // 添加所有部门和组的信息
-          InstGroupValues.push({
-            time: `instCove${orderTime}`,
-            group: groupInfo,
-            values: customRound(Number(weekDatas[i].instCove * 100), 2),
-
-          });
-
-          branGroupValues.push({
-            time: `branCove${orderTime}`,
-            group: groupInfo,
-            values: customRound(Number(weekDatas[i].branCove * 100), 2),
-          });
-
-          instModuleValues.push({
-            time: `instCove${orderTime}`,
-            module: "前端",
-            parent: weekDatas[i].deptName,
-            values: weekDatas[i].side === null ? "" : customRound(Number(weekDatas[i].side.front.instCove) * 100, 2),
-          }, {
-            time: `instCove${orderTime}`,
-            module: "后端",
-            parent: weekDatas[i].deptName,
-            values: weekDatas[i].side === null ? "" : customRound(Number(weekDatas[i].side.backend.instCove) * 100, 2),
-          });
-
-          branModuleValues.push({
-            time: `branCove${orderTime}`,
-            module: "前端",
-            parent: weekDatas[i].deptName,
-            values: weekDatas[i].side === null ? "" : customRound(Number(weekDatas[i].side.front.branCove) * 100, 2),
-          }, {
-            time: `branCove${orderTime}`,
-            module: "后端",
-            parent: weekDatas[i].deptName,
-            values: weekDatas[i].side === null ? "" : customRound(Number(weekDatas[i].side.backend.branCove) * 100, 2),
-          });
-
-          // 此循环用于处理个人的覆盖率
-          for (let index2 = 0; index2 < userInfo.length; index2 += 1) {
-            if (userInfo[index2].userName !== "王润燕" && userInfo[index2].userName !== "宋永强") {
-              if (weekDatas[i].parent === null || weekDatas[i].parent.deptName === "北京研发中心" || weekDatas[i].parent.deptName === "成都研发中心") {  // 如果是（北京或成都）研发中心，去掉部门的显示
-                if (weekDatas[i].parent.deptName !== "研发中心") {
-                  objectDataArray.push({
-                      devCenter: "研发中心",
-                      group: weekDatas[i].deptName,
-                      module: moduleChange(userInfo[index2].tech),
-                      "username": userInfo[index2].userName,
-                      [`instCove${orderTime}`]: customRound(Number(userInfo[index2].instCove * 100), 2),
-                      [`branCove${orderTime}`]: customRound(Number(userInfo[index2].branCove * 100), 2)
-                    }
-                  );
-                }
-
-              } else if (groupInfo !== "北京研发中心" && deptInfo !== "研发中心") {
-                objectDataArray.push({
-                  devCenter: "研发中心",
-                  group: groupInfo,
-                  module: moduleChange(userInfo[index2].tech),
-                  dept: deptInfo,
-                  username: userInfo[index2].userName,
-                  [`instCove${orderTime}`]: customRound(Number(userInfo[index2].instCove * 100), 2),
-                  [`branCove${orderTime}`]: customRound(Number(userInfo[index2].branCove * 100), 2)
-                });
-              }
-
-            }
-          }
-        }
-      }
-    }
-  }
-
-  return objectDataArray;
-};
-
-function dealData(tempDataArray: any) {
-  const resultDataArray: string | any[] = [];
-
-  // 首先需要获取所有已有的人名。
-  let userNames = new Array();
-  for (let i = 0; i < tempDataArray.length; i += 1) {
-    userNames.push(tempDataArray[i].username);
-  }
-  userNames = Array.from(new Set(userNames));
-
-  // 将相同人名的属性放到一起
-  for (let userIndex = 0; userIndex < userNames.length; userIndex += 1) {
-    // 声明一个对象
-    const objectStr = {};
-    for (let i = 0; i < tempDataArray.length; i += 1) {
-      // 当姓名相等，则把属性放到一起
-      if (userNames[userIndex] === tempDataArray[i].username) {
-        // 遍历属性
-        Object.keys(tempDataArray[i]).forEach((key) => {
-          objectStr[key] = tempDataArray[i][key];
-        });
-      }
-    }
-    // 再把最终的对象放到数组中
-    resultDataArray.push(objectStr);
-  }
-  console.log('resultDataArray', resultDataArray);
-  return resultDataArray;
-}
 
 const queryFrontCoverage = async (client: GqlClient<object>, params: string) => {
   let ends = "";
@@ -524,8 +247,8 @@ const queryFrontCoverage = async (client: GqlClient<object>, params: string) => 
       }
     `);
 
-  const objectValues = addGroupAndDept(data?.fileCoverageDept);
-  return dealData(objectValues);
+  const objectValues = converseCoverageFormatForAgGrid(data?.fileCoverageDept);
+  return objectValues;
 };
 
 /* endregion */
@@ -600,7 +323,6 @@ const CodeReviewTableList: React.FC<any> = () => {
 
   /* endregion */
 
-
   /* region 提示规则显示 */
   const [messageVisible, setVisible] = useState(false);
   const showRules = () => {
@@ -640,16 +362,25 @@ const CodeReviewTableList: React.FC<any> = () => {
             sortable: true,
             filter: true,
             flex: 1,
-            cellStyle: {"margin-top": "-5px"}
+            suppressMenu: true
           }}
           autoGroupColumnDef={{
-            minWidth: 250,
+            minWidth: 280,
+            headerName: '部门-人员',
+            cellRendererParams: {suppressCount: true},
+            pinned: 'left',
+            suppressMenu: false
           }}
-          groupDefaultExpanded={9} // 展开分组
-          suppressAggFuncInHeader={true}   // 不显示标题聚合函数的标识
+
           rowHeight={32}
           headerHeight={35}
           onGridReady={onGridReady}
+          treeData={true}
+          animateRows={true}
+          groupDefaultExpanded={-1}
+          getDataPath={(source: any) => {
+            return source.Group;
+          }}
         >
         </AgGridReact>
       </div>

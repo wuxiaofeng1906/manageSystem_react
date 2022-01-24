@@ -37,7 +37,8 @@ const wxLogin = () => {
       "id": "container",
       "appid": "wwcba5faed367cdeee",
       "agentid": 1000021,
-      "redirect_uri": encodeURIComponent('http://dms.q7link.com:8000/user/myLogin'),
+      // "redirect_uri": encodeURIComponent('http://dms.q7link.com:8000/user/myLogin'),
+      "redirect_uri": encodeURIComponent('http://rd.q7link.com:8000/user/myLogin'),
       "state": "wwcba5faed367cdeee",
       "href": "",
     });
@@ -56,7 +57,7 @@ const qywxScript = () => {
 };
 
 const Login: React.FC<{}> = () => {
-  
+
   const [submitting] = useState(false);
   const [showTitle, setTitleShown] = useState(false);
 
@@ -886,9 +887,10 @@ const Login: React.FC<{}> = () => {
 
       testAuth = JSON.parse(testAuth);
       // endregion
-      localStorage.setItem("authority", JSON.stringify(testAuth));
 
-      // console.log("登陆后的token", localStorage.getItem("accessId"));
+      localStorage.setItem("authority", JSON.stringify(testAuth));
+      const tokens = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IuWQtOaZk-WHpCIsInN1YiI6Ild1WGlhb0ZlbmciLCJpYXQiOjE2MjM4MzA2Nzd9.G3EjtMWppClX_E2NN0dFPXgX6OsGSrIXy4ReT_Rs5zI";
+      localStorage.setItem("accessId", tokens);
 
       const userInfos = {
         name: 'testUser',
@@ -937,7 +939,7 @@ const Login: React.FC<{}> = () => {
 
           {/* <TextArea rows={4} onChange={codeChanges}/> */}
 
-          {/* 手动登录 */}
+          {/* 手动登录
 
           <ProForm submitter={{
             searchConfig: {
@@ -957,7 +959,7 @@ const Login: React.FC<{}> = () => {
           }} onFinish={async () => {
             handleSubmit();
           }}>
-          </ProForm>
+          </ProForm>  */}
         </div>
       </div>
 

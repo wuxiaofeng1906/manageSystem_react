@@ -4,7 +4,7 @@ import {
   queryReleaseType, queryReleaseWay, queryReleaseId, getOnlineDev, getPulishItem,
   getIsApiAndDatabaseUpgrade, getUpgradeApi, getApiService, getApiMethod, getRepaireCategory,
   getTechSide, getCheckType, getBrowserType
-} from "./axiosApi";
+} from "../datas/axiosApi";
 
 const {Option} = Select;
 
@@ -27,7 +27,7 @@ const loadPrjNameSelect = async () => {
     const datas = prjNames.data;
     datas.forEach((project: any) => {
       prjData.push(
-        <Option key={project.project_id} value={`${project.project_id}`}>{project.project_name}</Option>);
+        <Option key={project.project_id} value={`${project.project_name}&${project.project_id}`}>{project.project_name}</Option>);
     });
   }
 
@@ -481,8 +481,6 @@ const loadCheckTypeSelect = async () => {
         resultArray.push(
           <Option key={ele.check_type_id} value={`${ele.check_type_id}`}>{ele.check_type_name}</Option>);
       }
-
-
     });
   }
 

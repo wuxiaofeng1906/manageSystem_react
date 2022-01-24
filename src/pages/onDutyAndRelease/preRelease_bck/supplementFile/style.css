@@ -1,0 +1,79 @@
+/* style项中样式是有顺序的,否则会有警告信息 */
+.legendStyle {
+  width: auto;
+  padding: .5em .5em .5em .5em;     /* 上右下左 */
+  font-weight: bold;
+  font-size: small;
+  border: 0;
+}
+
+.fieldStyle {
+  margin: 0 2px;
+  padding: .35em .625em .75em;
+  border: 1px solid silver;
+}
+
+
+
+
+/* input[type="checkbox"] {*/
+/*   position: relative;*/
+/*   width: 15px;*/
+/*   height: 15px;*/
+/*   font-size: 14px;*/
+/*   cursor: pointer;*/
+/* }*/
+
+/*input[type="checkbox"]::after {*/
+/*  position: absolute;*/
+/*  top: 0;*/
+/*  display: inline-block;*/
+/*  width: 15px;*/
+/*  height: 15px;*/
+/*  padding-left: 0;*/
+/*  color: #000;*/
+/*  text-align: center;*/
+/*  border-radius: 3px;*/
+/*  visibility: visible;*/
+/*  content: ' ';*/
+/*}*/
+
+/*input[type="checkbox"]:checked::after {*/
+/*  color: greenyellow;*/
+/*  font-weight: bold;*/
+/*  font-size: 12px;*/
+/*  background-color: white;*/
+/*  content: "✓";*/
+/*  border-color: greenyellow;*/
+/*  margin-bottom: 5px;*/
+
+/*}*/
+
+/*input[type=checkbox] {*/
+/*  margin-right: 5px;*/
+/*  cursor: pointer;*/
+/*  font-size: 14px;*/
+/*  width: 15px;*/
+/*  height: 12px;*/
+/*  position: relative;*/
+/*}*/
+
+/*input[type=checkbox]:after {*/
+/*  position: absolute;*/
+/*  width: 10px;*/
+/*  height: 15px;*/
+/*  top: 0;*/
+/*  content: " ";*/
+/*  background-color: #ff0000;*/
+/*  color: #fff;*/
+/*  display: inline-block;*/
+/*  visibility: visible;*/
+/*  padding: 0px 3px;*/
+/*  border-radius: 3px;*/
+/*}*/
+
+/*input[type=checkbox]:checked:after {*/
+/*  content: "✓";*/
+/*  font-size: 12px;*/
+/*}*/
+

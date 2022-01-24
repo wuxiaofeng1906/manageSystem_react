@@ -1,22 +1,20 @@
 import {getInitPageData} from "./axiosApi";
 
 // 解析有多少个tab
-const analysisTabsPageInfo = (datas: any) => {
+const analysisTabsPageInfo = async (datas: any) => {
+
   const tabsPageArray: any = [];
   if (datas) {
-    datas.forEach((ele: any) => {
-      const {project} = ele;
-      if (project.length > 0) {
-        const releaseNum = project[0].ready_release_num;
 
-        // const timeString = releaseNum.substring(0, 8);
-        const panes: any = {
-          title: `${releaseNum}灰度预发布`,
-          content: "",
-          key: releaseNum,
-        };
-        tabsPageArray.push(panes);
-      }
+    datas.forEach((ele: any) => {
+      const {ready_release} = ele;
+      const panes: any = {
+        title: ready_release.ready_release_name,
+        content: "",
+        key: ready_release.ready_release_num,
+      };
+      tabsPageArray.push(panes);
+
     });
   }
 
@@ -25,25 +23,30 @@ const analysisTabsPageInfo = (datas: any) => {
 
 // 预发布项目数据解析
 const analysisPreReleaseProject = (datas: any) => {
+  if (datas && datas.length > 0) {
 
-  const project = datas[0];
-  const projectArray = project.project;
-  const projectIdArray: any = [];
-  projectArray.forEach((ele: any) => {
-    projectIdArray.push(ele.project_id);
-  })
-  const returnArray = {
-    pro_id: project.pro_id,
-    projectId: projectIdArray,
-    release_type: project.release_type,
-    release_way: project.release_way,
-    plan_release_time: project.plan_release_time,
-    edit_user_name: project.edit_user_name,
-    edit_time: project.edit_time,
-    ready_release_num: project.ready_release_num
-  };
+    const project = datas[0];
+    const projectArray = project.project;
+    const projectIdArray: any = [];
+    projectArray.forEach((ele: any) => {
+      projectIdArray.push(`${ele.project_name}&${ele.project_id}`);
+    })
+    const returnArray = {
+      pro_id: project.pro_id,
+      projectId: projectIdArray,
+      release_type: project.release_type,
+      release_way: project.release_way,
+      plan_release_time: project.plan_release_time,
+      edit_user_name: project.edit_user_name,
+      edit_time: project.edit_time,
+      ready_release_num: project.ready_release_num
+    };
 
-  return returnArray;
+    return returnArray;
+  }
+
+  return {};
+
 };
 
 /*  region 升级服务数据解析 */
@@ -58,7 +61,9 @@ const analysisReleaseItem = (datas: any) => {
 // ----升级接口
 
 const analysisUpInterface = (datas: any) => {
-
+  if (datas.length === 0) {
+    return [{}];
+  }
   return datas;
 
 };
@@ -106,9 +111,12 @@ const analysiCorrespondOrder = (datas: any) => {
 /* endregion */
 
 const alalysisInitData = async (queryData: string = "", queryReleaseNum: string = "") => {
-  debugger;
 
   const result = await getInitPageData(queryReleaseNum);
+
+  if ((result.data).length === 0) {
+    return {};
+  }
   const datas = result.data;
 
   if (queryData === "pulishItem") {
@@ -126,12 +134,17 @@ const alalysisInitData = async (queryData: string = "", queryReleaseNum: string 
     return {reviewData_repaire: analysisReviewData(datas[0].review_data)}
   }
 
+  if (queryData === "dataReviewConfirm") {
+    return {reviewData_confirm: analysisReviewConfirm(datas[0].review_confirm)}
+  }
+
   if (queryData === "onlineBranch") {
     return {onlineBranch: analysisOnlineBranch(datas[0].release_branch)}
   }
 
+
   return {
-    tabPageInfo: analysisTabsPageInfo(datas),
+    tabPageInfo: await analysisTabsPageInfo(datas),
     // 预发布项目
     preProject: analysisPreReleaseProject(datas[0].project),
     // 升级服务

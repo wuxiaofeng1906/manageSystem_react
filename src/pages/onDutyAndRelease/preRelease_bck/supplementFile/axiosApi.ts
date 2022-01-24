@@ -7,6 +7,7 @@ axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
 const userLogins: any = localStorage.getItem("userLogins");
 const usersInfo = JSON.parse(userLogins);
 
+/* region 发布tab相关 */
 // 获取预发布编号
 const getNewPageNum = async () => {
 
@@ -50,6 +51,73 @@ const getInitPageData = async (queryReleaseNum: string) => {
 
   return result;
 }
+
+// 删除预发布tab
+const delTabsInfo = async (releaseNum: string) => {
+
+  let errorMessage = "";
+
+  const datas = {
+
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "ready_release_num": releaseNum
+  };
+  await axios.delete("/api/verify/release/release_detail", {data: datas})
+    .then(function (res) {
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+};
+
+/* endregion */
+
+/* region 检查进度 */
+
+const getCheckProcess = async (releaseNum: string) => {
+
+  const result: any = {
+    message: "",
+    data: []
+  };
+  await axios.get('/api/verify/release/progress', {params: {ready_release_num: releaseNum}})
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+};
+
+const updateReleaseProcess = async (data: any) => {
+
+  let errorMessage = "";
+  await axios.post("/api/verify/release/progress", data)
+    .then(function (res) {
+
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+};
+/* endregion */
 
 /* region 预发布项目 */
 // 发布类型
@@ -202,12 +270,11 @@ const queryServiceByID = async (params: string) => {
     message: "",
     data: []
   };
-
-  debugger;
+debugger;
   await axios.post('/api/verify/release/env_branch', params)
     .then(function (res) {
       if (res.data.code === 200) {
-        debugger;
+
         result.data = getGridDataSource(res.data.data);
 
       } else {
@@ -290,7 +357,6 @@ const getIsApiAndDatabaseUpgrade = async () => {
 // 修改发布项
 const saveUpgradeItem = async (params: any) => {
 
-  debugger;
   let errorMessage = "";
   await axios.post("/api/verify/release/upgrade_service", params)
     .then(function (res) {
@@ -637,12 +703,20 @@ const saveOnlineBranch = async (type: string, currentListNo: string, newOnlineBr
 
   let frontCheck = "2";
   if (sourceData.ignoreFrontCheck) {
-    frontCheck = (sourceData.ignoreFrontCheck).length === 1 ? "1" : "2";
+    if (Array.isArray(sourceData.ignoreFrontCheck)) {
+      frontCheck = (sourceData.ignoreFrontCheck).length === 1 ? "1" : "2";
+    } else {
+      frontCheck = sourceData.ignoreFrontCheck; // 这个表示没被修改过，直接带过来的数据
+    }
   }
 
   let backendCheck = "2";
   if (sourceData.ignoreBackendCheck) {
-    backendCheck = (sourceData.ignoreBackendCheck).length === 1 ? "1" : "2";
+    if (Array.isArray(sourceData.ignoreBackendCheck)) {
+      backendCheck = (sourceData.ignoreBackendCheck).length === 1 ? "1" : "2";
+    } else {
+      backendCheck = sourceData.ignoreBackendCheck;
+    }
   }
   const data = {
     "check_num": newOnlineBranchNum,
@@ -651,8 +725,8 @@ const saveOnlineBranch = async (type: string, currentListNo: string, newOnlineBr
     "ready_release_num": currentListNo,
     "branch_name": sourceData.branchName,
     "technical_side": sourceData.module,
-    "ignore_check_test_unit_backend": frontCheck,
-    "ignore_check_test_unit_front": backendCheck,
+    "ignore_check_test_unit_front": frontCheck,
+    "ignore_check_test_unit_backend": backendCheck,
   };
 
   if (type === "修改") {
@@ -714,7 +788,7 @@ const saveVersonCheck = async (type: string, currentListNo: string, newOnlineBra
     technical_side.forEach((ele: string) => {
       techSide = techSide === "" ? ele : `${techSide},${ele}`;
     });
-
+    data.inclusion_check_flag = true;
     data["main_branch"] = mainBranch; // 主分支
     data["technical_side"] = techSide; // 技术侧
     data["target_branch"] = sourceData.branchName; // 传分支名称
@@ -746,7 +820,12 @@ const saveEnvironmentCheck = async (type: string, currentListNo: string, newOnli
 
   let ignore_check = "2";
   if (sourceData.ignoreCheck) {
-    ignore_check = (sourceData.ignoreCheck).length === 1 ? "1" : "2";
+    if (Array.isArray(sourceData.ignoreCheck)) {
+      ignore_check = (sourceData.ignoreCheck).length === 1 ? "1" : "2";
+
+    } else {
+      ignore_check = sourceData.ignoreCheck;
+    }
   }
 
   const data = {
@@ -784,10 +863,14 @@ const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlin
 
   const data = [];
 
-  // 上线前检查
+  // 上线前检查: 打勾是1，没打勾是2
   let before_ignore_check = "2";
   if (sourceData.autoBeforeIgnoreCheck) {
-    before_ignore_check = (sourceData.autoBeforeIgnoreCheck).length === 1 ? "1" : "2";
+    if (Array.isArray(sourceData.autoBeforeIgnoreCheck)) {
+      before_ignore_check = (sourceData.autoBeforeIgnoreCheck).length === 1 ? "1" : "2";
+    } else {
+      before_ignore_check = sourceData.autoBeforeIgnoreCheck;
+    }
   }
 
   const beforeData = {
@@ -817,7 +900,11 @@ const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlin
   // 上线后检查
   let after_ignore_check = "2";
   if (sourceData.autoAfterIgnoreCheck) {
-    after_ignore_check = (sourceData.autoAfterIgnoreCheck).length === 1 ? "1" : "2";
+    if (Array.isArray(sourceData.autoAfterIgnoreCheck)) {
+      after_ignore_check = (sourceData.autoAfterIgnoreCheck).length === 1 ? "1" : "2";
+    } else {
+      after_ignore_check = sourceData.autoAfterIgnoreCheck;
+    }
   }
 
   const afterData = {
@@ -833,9 +920,9 @@ const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlin
     (sourceData.afterCheckType).forEach((ele: string) => {
       after_check_type = after_check_type === "" ? ele : `${after_check_type},${ele}`;
     });
-    data["check_type"] = after_check_type;
-    data["test_env"] = sourceData.afterTestEnv;
-    data["browser"] = sourceData.afterBrowser;
+    afterData["check_type"] = after_check_type;
+    afterData["test_env"] = sourceData.afterTestEnv;
+    afterData["browser"] = sourceData.afterBrowser;
   }
 
   if (type === "修改") {
@@ -975,7 +1062,7 @@ const excuteAutoCheck = async (checkNum: string, checkTime: string) => {
 /* endregion */
 
 export {
-  getNewPageNum,
+  getNewPageNum, delTabsInfo, getCheckProcess, updateReleaseProcess,
   savePrePulishProjects, queryReleaseType, queryReleaseWay, queryReleaseId, queryServiceByID,
   getInitPageData, getOnlineDev, getPulishItem, getIsApiAndDatabaseUpgrade, saveUpgradeItem,
   delUpgradeItem, getUpgradeApi, getApiService, getApiMethod, savePulishApi, delPulishApi,

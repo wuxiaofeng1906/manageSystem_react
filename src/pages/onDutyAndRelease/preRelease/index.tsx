@@ -979,7 +979,18 @@ const PreRelease: React.FC<any> = () => {
   /*  region 上线分支 */
 
   // 执行上线前检查：上线前版本检查、环境检查，自动化检查
-  (window as any).excuteDataCheck = async (type: string, checkNum: string) => {
+  (window as any).excuteDataCheck = async (type: string, checkNum: string, values: string) => {
+
+    if (values === "忽略") {
+      message.error({
+        content: "当前状态为忽略，不能进行任务执行！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
 
     setExecuteStatus(true);
     const result = await executeOnlineCheck(type, checkNum);
@@ -1682,14 +1693,11 @@ const PreRelease: React.FC<any> = () => {
     if (!interValRef.current) {
       console.log("interValRef.current", interValRef.current);
       let count = 0;
-
       const id = setInterval(async () => {
         count += 1;
         console.log(`刷新次数${count},定时任务id${id}`);
         // 刷新
-        debugger;
         const datas = await alalysisInitData("", currentListNo);
-
         showPagesContent(datas);
       }, 30 * 1000);
 

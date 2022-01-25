@@ -638,8 +638,8 @@ const beforeOnlineVersionCheck = (params: any) => {
          <div>
           <div style="width: 210px">
               <div style="font-size: 10px">
-                  <div>${side}
-                    <button style="margin-left: -20px;color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
+                  <div>
+                    <button style="color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
                     <lable style="margin-left: -10px">${timeRange}</lable>
                   </div>
               </div>
@@ -652,7 +652,7 @@ const beforeOnlineVersionCheck = (params: any) => {
           <div style="margin-top: -10px;text-align: right">
 
             <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
-            onclick='excuteDataCheck("versionCheck",${checkNum})'>
+            onclick='excuteDataCheck("versionCheck",${checkNum},${JSON.stringify(result)})'>
               <img src="../执行.png" width="14" height="14" alt="执行" title="执行">
             </Button>
 
@@ -720,7 +720,8 @@ const beforeOnlineEnvCheck = (params: any) => {
   return `
         <div style="margin-top: -10px">
             <div style="text-align: right" >
-              <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='excuteDataCheck("envCheck",${checkNum})'>
+              <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
+              onclick='excuteDataCheck("envCheck",${checkNum},${JSON.stringify(result)})'>
                 <img src="../执行.png" width="14" height="14" alt="执行" title="执行">
               </Button>
 
@@ -796,7 +797,7 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
         <div style="margin-top: -10px">
             <div style="text-align: right" >
               <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
-              onclick='excuteDataCheck(${JSON.stringify(title)},${JSON.stringify(params.data?.check_num)})'>
+              onclick='excuteDataCheck(${JSON.stringify(title)},${JSON.stringify(params.data?.check_num)},${JSON.stringify(value)})'>
                 <img src="../执行.png" width="14" height="14" alt="执行" title="执行">
               </Button>
               <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='urlClick(${JSON.stringify(checkType)},${JSON.stringify(logUrl)})'>

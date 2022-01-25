@@ -62,12 +62,15 @@ const getProcessColumns = () => {
     {
       headerName: '偏差天数',
       field: 'days',
-
     },
     {
       headerName: '偏差率',
       field: 'ratio',
       valueFormatter: (params: any) => {
+
+        if (params.value === 0 || params.value === "0") {
+          return 0;
+        }
         if (!params.value) {
           return "";
         }
@@ -140,13 +143,11 @@ const getStoryStabilityColumns = () => {
       field: 'stableHours',
       editable: true,
       cellRenderer: (params: any) => {
-        if (params.value === null || params.value === "" || params.value === undefined) {
+        if (!params.value) {
           return "";
         }
         return params.value;
-
       }
-
     },
     {
       headerName: '变更率',
@@ -430,19 +431,45 @@ const getReviewDefectColumns = () => {
     {
       headerName: '发现缺陷数',
       field: 'foundDN',
+      valueFormatter: (params: any) => {
+        if (!params.value) {
+          return "";
+        }
+        return params.value;
+      }
     },
     {
       headerName: '加权有效缺陷数',
       field: 'weightDN',
+      valueFormatter: (params: any) => {
+
+        // 只要发现缺陷数为0或者空，这个值也需要为空
+        if (!params.data?.foundDN) {
+          return "";
+        }
+        return params.value;
+      }
     },
     {
       headerName: '功能点',
       field: 'funcPoint',
+      valueFormatter: (params: any) => {
+
+        // 只要发现缺陷数为0或者空，这个值也需要为空
+        if (!params.data?.foundDN) {
+          return "";
+        }
+        return params.value;
+      }
     },
     {
       headerName: '缺陷密度',
       field: 'defectDensity',
       valueFormatter: (params: any) => {
+        // 只要发现缺陷数为0或者空，这个值也需要为空
+        if (!params.data?.foundDN) {
+          return "";
+        }
         if (params.value) {
           return Number(params.value).toFixed(2);
         }
@@ -457,15 +484,18 @@ const getReviewDefectColumns = () => {
           return "-";
         }
 
+        // 只要发现缺陷数为0或者空，这个值也需要为空
+        if (!params.data?.foundDN) {
+          return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
+        }
+
         if (params.value === null || params.value === "" || params.value === undefined) {
           return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
-
         }
 
         return params.value;
       },
       editable: defectHourEditRenderer,
-
     },
     {
       headerName: '评审效率',

@@ -255,6 +255,18 @@ const productRateCellEdited = async (params: any, projectId: string) => {
 const reviewDefectCellEdited = async (params: any, projectId: string) => {
 
   if (params.column?.colId !== "cut") {
+    // 需要判断当发现缺陷数为0或者为空时，评审用时不能被修改
+
+    if(!params.data?.foundDN){
+      message.error({
+        content: "发现缺陷数无值，不能修改评审用时！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return true;
+    }
     if (!params.newValue || (params.newValue).toString().trim() === "") {
       message.error({
         content: "请输入正确的数字！",

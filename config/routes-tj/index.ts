@@ -26,7 +26,7 @@ export const ProjectKpiRoute: RouteType[] = [
     name: '项目',
     path: './project/overview',
     component: './kpi/forProject/ProjectMetric',
-    // hideInMenu: true,
+    hideInMenu: true,
   },
   {
     name: "项目指标",

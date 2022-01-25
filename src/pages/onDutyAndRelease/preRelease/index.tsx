@@ -2542,7 +2542,7 @@ const PreRelease: React.FC<any> = () => {
                 <Select style={{width: 191, marginLeft: 14}}>
                   <Option key={"1"} value={"1"}>{"通过"}</Option>
                   <Option key={"2"} value={"2"}>{"不通过"}</Option>
-                  <Option key={"9"} value={""}>{""}</Option>
+                  <Option key={"9"} value={"9"}> {}</Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -2551,7 +2551,7 @@ const PreRelease: React.FC<any> = () => {
                 <Select>
                   <Option key={"1"} value={"1"}>{"是"}</Option>
                   <Option key={"2"} value={"2"}>{"否"}</Option>
-                  <Option key={"9"} value={""}>{""}</Option>
+                  <Option key={"9"} value={"9"}> {}</Option>
                 </Select>
               </Form.Item>
             </Col>

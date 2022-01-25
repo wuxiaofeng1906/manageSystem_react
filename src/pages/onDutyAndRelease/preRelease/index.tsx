@@ -1647,16 +1647,30 @@ const PreRelease: React.FC<any> = () => {
   window.onbeforeunload = () => {
 
     deleteLockStatus(lockedInfo);
+
+    if (interValRef.current) {
+      clearInterval(interValRef.current);
+    }
   };
+
 
   // 窗口关闭释放锁
   window.onunload = () => {
+
     deleteLockStatus(lockedInfo);
+
+    if (interValRef.current) {
+      clearInterval(interValRef.current);
+    }
   };
 
   // 页面报错时释放锁
   window.addEventListener('error', () => {
     deleteLockStatus(lockedInfo);
+
+    if (interValRef.current) {
+      clearInterval(interValRef.current);
+    }
 
   }, true);
 
@@ -1688,23 +1702,6 @@ const PreRelease: React.FC<any> = () => {
     }
   };
 
-  // 刷新页面定时任务
-  const timeTaskForPageRefresh = async () => {
-    if (!interValRef.current) {
-      console.log("interValRef.current", interValRef.current);
-      let count = 0;
-      const id = setInterval(async () => {
-        count += 1;
-        console.log(`刷新次数${count},定时任务id${id}`);
-        // 刷新
-        const datas = await alalysisInitData("", currentListNo);
-        showPagesContent(datas);
-      }, 30 * 1000);
-
-      interValRef.current = id;
-    }
-  };
-
   // 自动化日志显示弹窗取消
   const autoCancle = () => {
     setAutoLogModal(
@@ -1715,13 +1712,33 @@ const PreRelease: React.FC<any> = () => {
     );
   };
 
+
   useEffect(() => {
     showPagesContent(initData);
     showTabsPage();
-    //   定时刷新数据review的数据
-    timeTaskForPageRefresh();
+
   }, [initData]);
 
+
+  useEffect(() => {
+
+    if (!interValRef.current) {
+      console.log("interValRef.current", interValRef.current);
+      let count = 0;
+      const id = setInterval(async () => {
+        count += 1;
+        console.log(`刷新次数${count},定时任务id${id}`);
+        // 刷新
+        const datas = await alalysisInitData("", currentListNo);
+        showPagesContent(datas);
+
+      }, 30 * 1000);
+
+      interValRef.current = id;
+    }
+
+    return () => clearInterval(interValRef.current);
+  }, [])
   return (
     <PageContainer style={{marginTop: -30}}>
 

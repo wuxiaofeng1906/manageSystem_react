@@ -36,6 +36,10 @@ import {history} from "@@/core/history";
 import {showReleasedId, alaReleasedChanged} from './upgradeService/dataDeal';
 import {showProgressData} from './progress/alaProgress';
 import dayjs from "dayjs";
+import {
+  getDutyPersonPermission,
+  getSystemPersonPermission
+} from "@/pages/onDutyAndRelease/preRelease/permission/permission";
 
 const {TabPane} = Tabs;
 const {Option} = Select;
@@ -150,8 +154,9 @@ const PreRelease: React.FC<any> = () => {
 
   // 发布项弹出窗口进行修改和新增
   const showPulishItemForm = async (type: any, params: any) => {
-    // 验证是否已经确认服务，如果已经确认了，就不能新增和修改了
 
+
+    // 验证是否已经确认服务，如果已经确认了，就不能新增和修改了
     if (type === "add") {
       pulishItemForm.resetFields();
       setPulishItemModal({
@@ -159,7 +164,6 @@ const PreRelease: React.FC<any> = () => {
         title: "新增"
       });
     } else {
-
       let onlineEnvArray;
       if (params.online_environment) {
         onlineEnvArray = (params.online_environment).split(",");
@@ -219,6 +223,13 @@ const PreRelease: React.FC<any> = () => {
 
   // 发布接口弹出窗口进行修改和新增
   const showUpgradeApiForm = async (type: any, params: any) => {
+    const authData = {
+      "operate": "修改发布项",
+      "method": "post",
+      "path": "/api/verify/release/release_project"
+    };
+    const dutyPermission = await getDutyPersonPermission(authData);
+    const systemPermission = await getSystemPersonPermission(authData);
     if (type === "add") {
       upgradeIntForm.resetFields();
       setUpgradeIntModal({

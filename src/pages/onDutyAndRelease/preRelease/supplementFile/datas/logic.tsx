@@ -7,19 +7,58 @@ import {
   excuteVersionCheck, excuteEnvCheck, excuteAutoCheck, delTabsInfo
 } from "@/pages/onDutyAndRelease/preRelease/supplementFile/datas/axiosApi";
 import {alalysisInitData} from "./dataAnalyze";
+import {getDutyPersonPermission, getSystemPersonPermission} from "../../permission/permission";
 
 const userLogins: any = localStorage.getItem("userLogins");
 const usersInfo = JSON.parse(userLogins);
 
+// 修改tab名
 const modifyTanName = async (currentListNo: string, newName: string) => {
-  return await updateTabsName(currentListNo, newName);
+
+  // 验证权限(值班测试和超级管理员)
+  const authData = {
+    "operate": "修改发布名称",
+    "method": "post",
+    "path": "/api/verify/release/release_name"
+  };
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+  if (dutyPermission.flag || systemPermission.flag) {
+    return await updateTabsName(currentListNo, newName);
+  }
+  if (dutyPermission.errorMessage) {
+    return dutyPermission.errorMessage;
+  }
+  return systemPermission.errorMessage;
 };
+
+// 删除tab
+const deleteReleaseItem = async (releaseNum: string) => {
+  // 验证权限(值班测试和超级管理员)
+  const authData = {
+    "operate": "删除发布名称",
+    "method": "delete",
+    "path": "/api/verify/release/release_detail"
+  };
+
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+  if (dutyPermission.flag || systemPermission.flag) {
+    return await delTabsInfo(releaseNum);
+  }
+  if (dutyPermission.errorMessage) {
+    return dutyPermission.errorMessage;
+  }
+  return systemPermission.errorMessage;
+};
+
+// 获取新的tab编号
 const getNewNum = async () => {
   return await getNewPageNum();
 }
 
 // 保存预发布项目
-const savePreProjects = async (source: any, listNo: string) => {
+const savePreProjects = async (source: any, releaseNum: string) => {
 
   let result = {
     datas: [],
@@ -27,26 +66,44 @@ const savePreProjects = async (source: any, listNo: string) => {
   };
   // 需要判断输入框不为空
   if (!source.projectsName || (source.projectsName).length === 0) {
-    result.errorMessage = "项目名称不能为空！"
+    result.errorMessage = "项目名称不能为空！";
     return result;
   }
 
   if (!source.pulishType) {
-    result.errorMessage = "发布类型不能为空！"
+    result.errorMessage = "发布类型不能为空！";
     return result;
   }
 
   if (!source.pulishMethod) {
-    result.errorMessage = "发布方式不能为空！"
+    result.errorMessage = "发布方式不能为空！";
     return result;
   }
 
   if (!source.pulishTime) {
-    result.errorMessage = "发布时间不能为空！"
+    result.errorMessage = "发布时间不能为空！";
     return result;
   }
 
-  result = await savePrePulishProjects(source, listNo);
+  // 验证权限(值班测试和超级管理员)
+  const authData = {
+    "operate": "保存预发布项目",
+    "method": "post",
+    "path": "/api/verify/release/release_project"
+  };
+
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+  if (dutyPermission.flag || systemPermission.flag) {
+    result = await savePrePulishProjects(source, releaseNum);
+    return result;
+  }
+  if (dutyPermission.errorMessage) {
+    result.errorMessage = dutyPermission.errorMessage;
+    return result;
+
+  }
+  result.errorMessage = systemPermission.errorMessage;
   return result;
 };
 
@@ -82,11 +139,6 @@ const inquireService = async (sorce: any, currentListNo: string) => {
 
 };
 
-// 删除tab
-const deleteReleaseItem = async (releaseNum: string) => {
-  return await delTabsInfo(releaseNum);
-};
-
 // 获取进度
 const getPageCHeckProcess = async (releaseNum: string) => {
   return await getCheckProcess(releaseNum);
@@ -99,13 +151,27 @@ const deleteReleasedID = (deployment_id: string, ready_release_num: string) => {
 // 保存发布结果
 const saveProcessResult = async (releaseNum: string, result: string) => {
 
-  const data = {
-    "user_name": usersInfo.name,
-    "user_id": usersInfo.userid,
-    "ready_release_num": releaseNum,
-    "release_result": result
+  // 验证权限(值班测试和超级管理员)
+  const authData = {
+    "operate": "修改发布结果",
+    "method": "post",
+    "path": "/api/verify/release/progress"
   };
-  return await updateReleaseProcess(data);
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+  if (dutyPermission.flag || systemPermission.flag) {
+    const data = {
+      "user_name": usersInfo.name,
+      "user_id": usersInfo.userid,
+      "ready_release_num": releaseNum,
+      "release_result": result
+    };
+    return await updateReleaseProcess(data);
+  }
+  if (dutyPermission.errorMessage) {
+    return dutyPermission.errorMessage;
+  }
+  return systemPermission.errorMessage;
 
 };
 // 发布项的修改
@@ -151,11 +217,26 @@ const upgradePulishItem = async (formData: any, currentListNo: string) => {
     "branch_environment": formData.branchAndEnv,
     "instructions": formData.description,
     "remarks": formData.remark,
-
   };
 
-  // 需要验证必填项
-  return await saveUpgradeItem(datas);
+  // 该周前端值班人、后端值班人、测试值班人、流程：杨期成、超级管理员
+  const authData = {
+    "operate": "修改发布项",
+    "method": "post",
+    "path": "/api/verify/release/upgrade_service"
+  };
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+  if (dutyPermission.flag || systemPermission.flag) {
+    // 需要验证必填项
+    return await saveUpgradeItem(datas);
+  }
+  if (dutyPermission.errorMessage) {
+    return dutyPermission.errorMessage;
+  }
+  return systemPermission.errorMessage;
+
+
 };
 
 // 删除数据
@@ -232,14 +313,43 @@ const addPulishApi = async (formData: any, currentListNo: string, type: string) 
     datas["api_id"] = formData.apiId;
   }
 
-  return await savePulishApi(datas);
+  // 该周前端值班人、后端值班人、测试值班人、流程：杨期成、超级管理员
+  const authData = {
+    "operate": `${type}发布接口`,
+    "method": "post",
+    "path": "/api/verify/release/upgrade_api"
+  };
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+  if (dutyPermission.flag || systemPermission.flag) {
+    return await savePulishApi(datas);
+  }
+  if (dutyPermission.errorMessage) {
+    return dutyPermission.errorMessage;
+  }
+  return systemPermission.errorMessage;
 
 };
 
 // 升级服务服务确认
 const confirmUpgradeService = async (datas: any) => {
 
-  return await upgradeServiceConfirm(datas);
+  const authData = {
+    "operate": `进行服务确认`,
+    "method": "post",
+    "path": "/api/verify/release/upgrade_confirm"
+  };
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+  if (dutyPermission.flag || systemPermission.flag) {
+
+    return await upgradeServiceConfirm(datas);
+  }
+  if (dutyPermission.errorMessage) {
+    return dutyPermission.errorMessage;
+  }
+  return systemPermission.errorMessage;
+
 
 };
 
@@ -286,13 +396,31 @@ const dataRepaireReview = async (kind: string, currentListNo: string, datas: any
     "ready_release_num": currentListNo,
   }
 
-  if (kind === "新增") {
-    return await addDataRepaire(data);
-  }
 
-  // 以下是修改
-  data["review_id"] = datas.reviewId;
-  return await modifyDataRepaire(data);
+  // 开发经理、超级管理员
+  const authData = {
+    "operate": `${kind}修复内容`,
+    "method": "post",
+    "path": "/api/verify/release/review_confirm"
+  };
+  if (kind === "修改") {
+    authData.method = "put";
+  }
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+  if (dutyPermission.flag || systemPermission.flag) {
+    if (kind === "新增") {
+      return await addDataRepaire(data);
+    }
+
+    // 以下是修改
+    data["review_id"] = datas.reviewId;
+    return await modifyDataRepaire(data);
+  }
+  if (dutyPermission.errorMessage) {
+    return dutyPermission.errorMessage;
+  }
+  return systemPermission.errorMessage;
 
 
 };
@@ -300,7 +428,21 @@ const dataRepaireReview = async (kind: string, currentListNo: string, datas: any
 // 数据修复服务确认
 const confirmDataRepairService = async (datas: any) => {
 
-  return await dataRepairConfirm(datas);
+  const authData = {
+    "operate": `进行review服务确认`,
+    "method": "post",
+    "path": "/api/verify/release/review_confirm_always"
+  };
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+  if (dutyPermission.flag || systemPermission.flag) {
+
+    return await dataRepairConfirm(datas);
+  }
+  if (dutyPermission.errorMessage) {
+    return dutyPermission.errorMessage;
+  }
+  return systemPermission.errorMessage;
 
 };
 
@@ -311,7 +453,7 @@ const getCheckNumForOnlineBranch = async () => {
 };
 
 // 上线分支头部验证
-const checkOnlineHeadData = (sourceData: any) => {
+const checkOnlineHeadData = async (sourceData: any) => {
   // "branch_name": sourceData.branchName,
   //   "technical_side": sourceData.module,
   if (!sourceData.branchName) {
@@ -322,10 +464,23 @@ const checkOnlineHeadData = (sourceData: any) => {
     return "技术侧不能为空！";
   }
 
-  return "";
+  const authData = {
+    "operate": `保存上线分支`,
+    "method": "post",
+    "path": "/api/verify/release/release_branch"
+  };
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+  if (dutyPermission.flag || systemPermission.flag) {
+    return ""
+  }
+  if (dutyPermission.errorMessage) {
+    return dutyPermission.errorMessage;
+  }
+  return systemPermission.errorMessage;
 };
 // 上线分支版本检查验证
-const checkOnlineVersionData = (sourceData: any) => {
+const checkOnlineVersionData = async (sourceData: any) => {
 
   if (sourceData.verson_check) {  // 如果开启了版本检查，就要判断服务和镜像环境是否填写值
     if (!sourceData.server || (sourceData.server).length === 0) {
@@ -353,11 +508,25 @@ const checkOnlineVersionData = (sourceData: any) => {
 
   }
 
-  return "";
+
+  const authData = {
+    "operate": `保存上线分支-版本检查设置`,
+    "method": "post",
+    "path": "/api/verify/release/release_check_version"
+  };
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+  if (dutyPermission.flag || systemPermission.flag) {
+    return ""
+  }
+  if (dutyPermission.errorMessage) {
+    return dutyPermission.errorMessage;
+  }
+  return systemPermission.errorMessage;
 };
 
 // 上线环境检查验证
-const checkOnlineEnvData = (sourceData: any) => {
+const checkOnlineEnvData = async (sourceData: any) => {
 //   只有没有勾选忽略检查，后面参数才必填
   if (sourceData.ignoreCheck === undefined || (sourceData.ignoreCheck).length === 0) {
 
@@ -366,10 +535,23 @@ const checkOnlineEnvData = (sourceData: any) => {
     }
   }
 
-  return "";
+  const authData = {
+    "operate": `保存上线分支-环境一致性检查设置`,
+    "method": "post",
+    "path": "/api/verify/release/check_env"
+  };
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+  if (dutyPermission.flag || systemPermission.flag) {
+    return ""
+  }
+  if (dutyPermission.errorMessage) {
+    return dutyPermission.errorMessage;
+  }
+  return systemPermission.errorMessage;
 };
 
-const checkOnlineAutoData = (sourceData: any) => {
+const checkOnlineAutoData = async (sourceData: any) => {
 
   //   只有没有勾选忽略检查，后面参数才必填
   if (sourceData.autoBeforeIgnoreCheck === undefined || (sourceData.autoBeforeIgnoreCheck).length === 0) {
@@ -402,7 +584,21 @@ const checkOnlineAutoData = (sourceData: any) => {
     }
   }
 
-  return "";
+  const authData = {
+    "operate": `保存上线分支-自动化检查`,
+    "method": "post",
+    "path": "/api/verify/release/automation_check"
+  };
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+
+  if (dutyPermission.flag || systemPermission.flag) {
+    return ""
+  }
+  if (dutyPermission.errorMessage) {
+    return dutyPermission.errorMessage;
+  }
+  return systemPermission.errorMessage;
 };
 // 保存上线分支的设置
 const saveOnlineBranchData = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any) => {
@@ -413,30 +609,29 @@ const saveOnlineBranchData = async (type: string, currentListNo: string, newOnli
   //  4.(上线前后)自动化检查设置
 
   // 上线分支头部验证分支名称和技术侧
-  const checkMsg_onlineHead = checkOnlineHeadData(sourceData);
+  const checkMsg_onlineHead = await checkOnlineHeadData(sourceData);
   if (checkMsg_onlineHead) { // 如果校验信息不为空，代表校验失败
     return checkMsg_onlineHead;
   }
 
   // 版本检查设置
-  const checkMsg_versonCheck = checkOnlineVersionData(sourceData);
+  const checkMsg_versonCheck = await checkOnlineVersionData(sourceData);
   if (checkMsg_versonCheck) {
     return checkMsg_versonCheck;
   }
 
 
   // 环境一致性检查设置
-  const checkMsg_envCheck = checkOnlineEnvData(sourceData);
+  const checkMsg_envCheck = await checkOnlineEnvData(sourceData);
   if (checkMsg_envCheck) {
     return checkMsg_envCheck;
   }
 
   // 自动化检查参数
-  const checkMsg_autoCheck = checkOnlineAutoData(sourceData);
+  const checkMsg_autoCheck = await checkOnlineAutoData(sourceData);
   if (checkMsg_autoCheck) {
     return checkMsg_autoCheck;
   }
-
 
   let returnMessage = "";
 

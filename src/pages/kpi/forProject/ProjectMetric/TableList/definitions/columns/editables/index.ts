@@ -2,7 +2,7 @@
  * @Description: 项目的可编辑字段
  * @Author: jieTan
  * @Date: 2021-12-22 06:39:40
- * @LastEditTime: 2021-12-22 07:49:35
+ * @LastEditTime: 2022-01-25 02:23:48
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -25,7 +25,9 @@ class ProjectKpiEditables {
       newValue: params.newValue,
     };
     //
-    axios.put(this.pkUrl, datas);
+    axios.put(this.pkUrl, datas, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('accessId')}` },
+    });
     //
     params.data.project.branch = params.newValue;
   };

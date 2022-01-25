@@ -448,14 +448,14 @@ export default [
         name: '发布过程',
         icon: 'table',
         path: 'preRelease',
-        access: 'sysAdmin',
+        // access: 'sysAdmin',
         component: './onDutyAndRelease/preRelease',
         // hideInMenu: true
       }, {
         name: '发布历史',
         icon: 'table',
         path: 'releaseHistory',
-        access: 'sysAdmin',
+        // access: 'sysAdmin',
         component: './onDutyAndRelease/releaseHistory',
         // hideInMenu: true
       }

@@ -1531,7 +1531,7 @@ const PreRelease: React.FC<any> = () => {
       activeKey: activeKeys
     });
 
-
+    currentListNo = activeKeys; // 定时任务更新有用到
     // 根据标签页获取数据,然后再赋予值
     const newTabData = await alalysisInitData("", activeKeys);
     showPagesContent(newTabData);
@@ -1685,8 +1685,9 @@ const PreRelease: React.FC<any> = () => {
 
       const id = setInterval(async () => {
         count += 1;
-        console.log(`刷新数据${count},定时任务id${id}`);
+        console.log(`刷新次数${count},定时任务id${id}`);
         // 刷新
+        debugger;
         const datas = await alalysisInitData("", currentListNo);
 
         showPagesContent(datas);
@@ -1710,7 +1711,7 @@ const PreRelease: React.FC<any> = () => {
     showPagesContent(initData);
     showTabsPage();
     //   定时刷新数据review的数据
-    // timeTaskForPageRefresh();
+    timeTaskForPageRefresh();
   }, [initData]);
 
   return (
@@ -2533,7 +2534,7 @@ const PreRelease: React.FC<any> = () => {
                 <Select style={{width: 191, marginLeft: 14}}>
                   <Option key={"1"} value={"1"}>{"通过"}</Option>
                   <Option key={"2"} value={"2"}>{"不通过"}</Option>
-                  <Option key={"9"} value={"9"}>{""}</Option>
+                  <Option key={"9"} value={""}>{""}</Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -2542,7 +2543,7 @@ const PreRelease: React.FC<any> = () => {
                 <Select>
                   <Option key={"1"} value={"1"}>{"是"}</Option>
                   <Option key={"2"} value={"2"}>{"否"}</Option>
-                  <Option key={"9"} value={"9"}>{""}</Option>
+                  <Option key={"9"} value={""}>{""}</Option>
                 </Select>
               </Form.Item>
             </Col>

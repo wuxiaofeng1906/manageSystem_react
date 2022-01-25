@@ -485,6 +485,7 @@ const dataRepaireReview = async (kind: string, currentListNo: string, datas: any
   };
   if (kind === "修改") {
     authData.method = "put";
+
   }
   const dutyPermission = await getDutyPersonPermission(authData);
   const systemPermission = await getSystemPersonPermission(authData);
@@ -495,6 +496,8 @@ const dataRepaireReview = async (kind: string, currentListNo: string, datas: any
 
     // 以下是修改
     data["review_id"] = datas.reviewId;
+    data["commit_id"] = datas.commitID;
+
     return await modifyDataRepaire(data);
   }
   if (dutyPermission.errorMessage) {

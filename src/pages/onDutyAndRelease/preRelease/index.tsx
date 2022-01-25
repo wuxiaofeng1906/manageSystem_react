@@ -276,6 +276,7 @@ const PreRelease: React.FC<any> = () => {
         title: "新增"
       });
     } else {
+
       const reviewid = params.review_id;
       dataReviewForm.setFieldsValue({
         repaireContent: params.repair_data_content,
@@ -285,7 +286,8 @@ const PreRelease: React.FC<any> = () => {
         branch: params.branch,
         EvalResult: params.review_result,
         repeatExecute: params.is_repeat,
-        reviewId: reviewid
+        reviewId: reviewid,
+        commitID: params.commit_id
       });
 
       lockedInfo = `${currentListNo}-step3-review-${reviewid}`;
@@ -2590,8 +2592,13 @@ const PreRelease: React.FC<any> = () => {
               <Form.Item name="reviewId">
                 <Input style={{width: 50, display: "none"}}/>
               </Form.Item>
-            </Col>
 
+            </Col>
+            <Col span={2}>
+              <Form.Item name="commitID">
+                <Input style={{width: 50, display: "none"}}/>
+              </Form.Item>
+            </Col>
           </Row>
 
         </Form>

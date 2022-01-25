@@ -134,9 +134,29 @@ const inquireService = async (sorce: any, currentListNo: string) => {
     });
   }
 
-  const result = await queryServiceByID(paramsData);
-  return result;
+  // 验证权限
+  const authData = {
+    "operate": "查询一键部署ID",
+    "method": "post",
+    "path": "/api/verify/release/env_branch"
+  };
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+  if (dutyPermission.flag || systemPermission.flag) {
+    const result = await queryServiceByID(paramsData);
+    return result;
+  }
+  if (dutyPermission.errorMessage) {
+    return {
+      message: dutyPermission.errorMessage,
+      datas: []
+    }
+  }
 
+  return {
+    message: systemPermission.errorMessage,
+    datas: []
+  }
 };
 
 // 获取进度
@@ -145,8 +165,24 @@ const getPageCHeckProcess = async (releaseNum: string) => {
 };
 
 // 删除一键发布ID
-const deleteReleasedID = (deployment_id: string, ready_release_num: string) => {
-  return deleteReleasedId(deployment_id, ready_release_num);
+const deleteReleasedID = async (deployment_id: string, ready_release_num: string) => {
+  // 验证权限(值班测试和超级管理员)
+  const authData = {
+    "operate": "删除一键部署ID",
+    "method": "delete",
+    "path": "/api/verify/release/upgrade_service_deployment"
+  };
+
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+  if (dutyPermission.flag || systemPermission.flag) {
+    return deleteReleasedId(deployment_id, ready_release_num);
+  }
+  if (dutyPermission.errorMessage) {
+    return dutyPermission.errorMessage;
+  }
+  return systemPermission.errorMessage;
+
 };
 // 保存发布结果
 const saveProcessResult = async (releaseNum: string, result: string) => {
@@ -239,9 +275,53 @@ const upgradePulishItem = async (formData: any, currentListNo: string) => {
 
 };
 
+//
+const getDelUpgradeItemsAuthority = async (type: number) => {
+  const authData = {
+    "operate": "删除",
+    "method": "delete",
+    "path": ""
+  };
+  switch (type) {
+    case 1:
+      authData.path = "/api/verify/release/upgrade_service";
+      break;
+    case 2:
+      authData.path = "/api/verify/release/upgrade_api";
+      break;
+    case 3:
+      authData.path = "/api/verify/release/review_confirm";
+      break;
+    case 4:
+      authData.path = "/api/verify/release/release_branch";
+      break;
+
+    default:
+      break;
+  }
+
+
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+  if (dutyPermission.flag || systemPermission.flag) {
+    return "";
+  }
+  if (dutyPermission.errorMessage) {
+    return dutyPermission.errorMessage;
+  }
+  return systemPermission.errorMessage;
+
+};
+
 // 删除数据
 const delUpgradeItems = async (type: number, source: any) => {
 
+
+  const authFlag = await getDelUpgradeItemsAuthority(type);
+
+  if (authFlag) {
+    return authFlag;
+  }
   let delMessage = "";
   if (type === 1) { // 是发布项删除
     delMessage = await delUpgradeItem(source.app_id);

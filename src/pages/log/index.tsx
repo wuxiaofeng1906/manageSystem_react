@@ -137,11 +137,14 @@ const LogList: React.FC<any> = () => {
             }
           }`);
 
-    for (let index = 0; index < project.length; index += 1) {
-      projects.push(
-        <Option value={project[index].id}> {project[index].name}</Option>,
-      );
+    if(project){
+      for (let index = 0; index < project.length; index += 1) {
+        projects.push(
+          <Option value={project[index].id}> {project[index].name}</Option>,
+        );
+      }
     }
+
     return projects;
 
   };

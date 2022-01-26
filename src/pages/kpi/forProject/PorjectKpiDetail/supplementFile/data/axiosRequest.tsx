@@ -13,7 +13,11 @@ const updateGridContent = async (datas: object) => {
         errorMessage = `错误：${res.data.msg}`;
       }
     }).catch(function (error) {
-      errorMessage = `异常信息:${error.toString()}`;
+      if(error.toString().includes("403")){
+        errorMessage = `您无修改权限！`;
+      }else{
+        errorMessage = `异常信息:${error.toString()}`;
+      }
     });
 
   return errorMessage;

@@ -205,8 +205,9 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onProcessGridReady}
-            onCellEditingStopped={(params: any) => {
-              return processCellEdited(params, projectId);
+            onCellEditingStopped={async (params: any) => {
+              await processCellEdited(params, projectId);
+              processGridApi.current?.setRowData(await queryProcessData(gqlClient, projectId));
             }}
           >
           </AgGridReact>
@@ -232,12 +233,8 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             suppressRowTransform={true}
             onGridReady={onStoryStabilityGridReady}
             onCellEditingStopped={async (params: any) => {
-              const result = await storyStabilityCellEdited(params, projectId);
-              if (result) {
-                //  刷新表格
-                const gridData = await queryStoryStability(gqlClient, projectId);
-                storyStabilityGridApi.current?.setRowData(gridData);
-              }
+              await storyStabilityCellEdited(params, projectId);
+              storyStabilityGridApi.current?.setRowData(await queryStoryStability(gqlClient, projectId));
             }}
           >
           </AgGridReact>
@@ -263,12 +260,8 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             suppressRowTransform={true}
             onGridReady={onStageWorkloadGridReady}
             onCellEditingStopped={async (params: any) => {
-              const returnValue = await stageWorkloadCellEdited(params, projectId);
-              if (returnValue) {
-                //  需要更新以下合计的数据
-                const datas = await queryStageWorkload(gqlClient, projectId);
-                stageWorkloadGridApi.current?.setRowData(datas);
-              }
+              await stageWorkloadCellEdited(params, projectId);
+              stageWorkloadGridApi.current?.setRowData(await queryStageWorkload(gqlClient, projectId));
             }}
           >
           </AgGridReact>
@@ -299,12 +292,10 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             suppressRowTransform={true}
             onGridReady={onProductRateGridReady}
             onCellEditingStopped={async (params: any) => {
-              const returnValue = await productRateCellEdited(params, projectId);
-              if (returnValue) {
-                // 需要更新本表格和（评审和缺陷）的表格
-                productRateGridApi.current?.setRowData(await queryProductRateload(gqlClient, projectId));
-                reviewDefectGridApi.current?.setRowData(await queryReviewDefect(gqlClient, projectId));
-              }
+              await productRateCellEdited(params, projectId);
+              // 需要更新本表格和（评审和缺陷）的表格
+              productRateGridApi.current?.setRowData(await queryProductRateload(gqlClient, projectId));
+              reviewDefectGridApi.current?.setRowData(await queryReviewDefect(gqlClient, projectId));
             }}
           >
           </AgGridReact>
@@ -330,10 +321,8 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             suppressRowTransform={true}
             onGridReady={onReviewDefectGridReady}
             onCellEditingStopped={async (params: any) => {
-              const returnValue = await reviewDefectCellEdited(params, projectId);
-              if (returnValue) {
-                reviewDefectGridApi.current?.setRowData(await queryReviewDefect(gqlClient, projectId))
-              }
+              await reviewDefectCellEdited(params, projectId);
+              reviewDefectGridApi.current?.setRowData(await queryReviewDefect(gqlClient, projectId))
             }}
           >
           </AgGridReact>
@@ -359,10 +348,8 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             suppressRowTransform={true}
             onGridReady={onPocessQualityGridReady}
             onCellEditingStopped={async (params: any) => {
-              const returnValue = await pocessQualityCellEdited(params, projectId);
-              if (returnValue) {
-                processQualityGridApi.current?.setRowData(await queryProcessQuality(gqlClient, projectId))
-              }
+              await pocessQualityCellEdited(params, projectId);
+              processQualityGridApi.current?.setRowData(await queryProcessQuality(gqlClient, projectId))
             }}
           >
           </AgGridReact>
@@ -393,10 +380,8 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             suppressRowTransform={true}
             onGridReady={onServiceGridReady}
             onCellEditingStopped={async (params: any) => {
-              const resultValue = await serviceCellEdited(params, projectId);
-              if (resultValue) {
-                serviceGridApi.current?.setRowData(await queryServices(gqlClient, projectId))
-              }
+              await serviceCellEdited(params, projectId);
+              serviceGridApi.current?.setRowData(await queryServices(gqlClient, projectId))
             }}
           >
           </AgGridReact>

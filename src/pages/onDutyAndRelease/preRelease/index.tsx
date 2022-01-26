@@ -1283,6 +1283,7 @@ const PreRelease: React.FC<any> = () => {
   // 一键部署ID查询
   const inquireServiceClick = async () => {
 
+
     if (!await vertifyModifyFlag(6, currentListNo)) {
       message.error({
         content: `服务确认已完成，不能进行查询！`,
@@ -1295,6 +1296,17 @@ const PreRelease: React.FC<any> = () => {
       return;
     }
 
+    const queryCondition = formUpgradeService.getFieldsValue().deployID;
+    if (!queryCondition || queryCondition.length === 0) {
+      message.error({
+        content: "一键部署ID不能为空！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
     const result = await inquireService(releaseIdArray, currentListNo);
     if (result.message !== "") {
       message.error({
@@ -1336,7 +1348,7 @@ const PreRelease: React.FC<any> = () => {
         secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
       }
 
-      if(newData){
+      if (newData) {
         setGridHeight({
           ...gridHeight,
           pulishItemGrid: getGridHeight(newData.length),

@@ -111,6 +111,7 @@ const savePreProjects = async (source: any, releaseNum: string) => {
 // 点击查询
 const inquireService = async (sorce: any, currentListNo: string) => {
 
+
   if (!sorce) {
     return {
       message: "一键部署ID不能为空！",
@@ -118,16 +119,24 @@ const inquireService = async (sorce: any, currentListNo: string) => {
     }
   }
 
-  if (sorce.length === 0) {
+  if ((sorce.oraID).length > 0 && (sorce.queryId).length <= 0) {
+    return {
+      message: "ID已不存在运维平台！",
+      datas: []
+    }
+  }
+
+  if (!sorce.queryId) {
     return {
       message: "一键部署ID不能为空！",
       datas: []
     }
   }
 
+
   const paramsData: any = [];
-  if (sorce.length > 0) {
-    sorce.forEach((ele: any) => {
+  if ((sorce.queryId).length > 0) {
+    (sorce.queryId).forEach((ele: any) => {
       const newEle = ele;
       newEle.ready_release_num = currentListNo;
       paramsData.push(newEle);
@@ -140,6 +149,7 @@ const inquireService = async (sorce: any, currentListNo: string) => {
     "method": "post",
     "path": "/api/verify/release/env_branch"
   };
+
   const dutyPermission = await getDutyPersonPermission(authData);
   const systemPermission = await getSystemPersonPermission(authData);
   if (dutyPermission.flag || systemPermission.flag) {

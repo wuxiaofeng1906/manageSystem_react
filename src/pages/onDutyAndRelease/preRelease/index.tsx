@@ -46,7 +46,10 @@ const usersInfo = JSON.parse(userLogins);
 let currentListNo = "";  // 当前页面编号
 let newOnlineBranchNum = "";
 let lockedInfo = "";// 被锁了的id
-let releaseIdArray: any = []; // 已发布的一键部署ID
+const releaseIdArray: any = {
+  oraID: [],
+  queryId: []
+}; // 已发布的一键部署ID，用于保存查询条件，其中包含service等属性
 let allLockedArray: any = [];  // 被锁的数据
 
 const PreRelease: React.FC<any> = () => {
@@ -529,9 +532,10 @@ const PreRelease: React.FC<any> = () => {
   const setReleasedIdForm = async (releasedData: any) => {
 
     const ids = await showReleasedId(releasedData);
-    releaseIdArray = ids.idStrArray;
+    releaseIdArray.queryId = ids.queryIdArray;
+    releaseIdArray.oraID = ids.showIdArray;
     formUpgradeService.setFieldsValue({
-      deployID: ids.idArray
+      deployID: ids.showIdArray
     });
   };
 
@@ -1251,11 +1255,12 @@ const PreRelease: React.FC<any> = () => {
   /* endregion */
 
   /* region 升级服务 */
+
   const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
   const onReleaseIdChanges = async (selectedId: any, params: any) => {
 
-    const allaResult = alaReleasedChanged(releaseIdArray, params);
-    releaseIdArray = allaResult.queryArray;
+    const allaResult = alaReleasedChanged(releaseIdArray, params, selectedId);
+    releaseIdArray.queryId = allaResult.queryArray;
     if (allaResult.deletedData) { // 如果有需要被删除的数据就删除，并且更新列表
       const result = await deleteReleasedID(currentListNo, allaResult.deletedData);
       if (result !== "") {

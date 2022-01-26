@@ -1002,7 +1002,7 @@ const PreRelease: React.FC<any> = () => {
     const result = await executeOnlineCheck(type, checkNum);
     if (result === "") {
       message.info({
-        content: "执行成功！",
+        content: "任务开始执行！",
         duration: 1,
         style: {
           marginTop: '50vh',

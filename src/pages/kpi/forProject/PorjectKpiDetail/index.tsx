@@ -28,13 +28,16 @@ import {
   setServiceCellStyle
 } from './supplementFile/style/gridStyles';
 import './supplementFile/style/styles.css';
-import {Button} from "antd";
+import {Button, Select} from "antd";
 import {
   getProcessHeaderStyle, getStoryStabilityHeaderStyle, getStageWorkloadHeaderStyle,
   getProductRateHeaderStyle, getReviewDefectHeaderStyle, getProcessQualityHeaderStyle,
   getServiceHeaderStyle
 } from "./supplementFile/style/columsTitleRenderer";
-import {CustomTooltip} from "./supplementFile/style/customTooltip"
+import {CustomTooltip} from "./supplementFile/style/customTooltip";
+import {ExportOutlined} from '@ant-design/icons';
+
+const {Option} = Select;
 
 const WeekCodeTableList: React.FC<any> = (props: any) => {
   const projectId = props.location.query.id;
@@ -174,15 +177,18 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
 
   const COMMON_LENGTH = 130;
 
+
   return (
     <PageContainer style={{height: "100%", marginTop: -30}}>
       <div style={{marginTop: -55, height: 35}}>
-        <Button
-          style={{float: "right", borderRadius: 5}}
-          onClick={exportAllExcell}>导出所有表格
-        </Button>
+
+        {/*<Select defaultValue="lucy" style={{width: 120}} size={"small"}>*/}
+        {/*  <Option value="jack">Jack</Option>*/}
+        {/*</Select>*/}
+        <Button type="text" icon={<ExportOutlined/>} onClick={exportAllExcell} size={'large'}
+                style={{float: "right"}}>导出</Button>
       </div>
-      <div>
+      <div style={{marginTop: 5}}>
 
         {/* 1.进度 */}
         <div className="ag-theme-alpine" style={{height: 250, width: '100%'}}>
@@ -389,7 +395,8 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
       </div>
 
     </PageContainer>
-  );
+  )
+    ;
 };
 
 export default WeekCodeTableList;

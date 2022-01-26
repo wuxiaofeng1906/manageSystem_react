@@ -1336,11 +1336,13 @@ const PreRelease: React.FC<any> = () => {
         secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
       }
 
-      setGridHeight({
-        ...gridHeight,
-        pulishItemGrid: getGridHeight(newData.length),
-        upgradeApiGrid: getGridHeight(1),
-      });
+      if(newData){
+        setGridHeight({
+          ...gridHeight,
+          pulishItemGrid: getGridHeight(newData.length),
+          upgradeApiGrid: getGridHeight(1),
+        });
+      }
     }
   };
 

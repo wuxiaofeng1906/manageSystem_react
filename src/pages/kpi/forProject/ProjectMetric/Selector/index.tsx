@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-01-24 09:55:23
+ * @LastEditTime: 2022-01-26 10:48:48
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -21,7 +21,7 @@ import {
 import { mySelector } from './index.css';
 import { useMount } from 'ahooks';
 import { useGqlClient } from '@/hooks';
-import { GQL_PARAMS, GRAPHQL_QUERY, PK_SEARCH_INTERVAL } from '@/namespaces';
+import { GQL_PARAMS, GRAPHQL_QUERY, MOMENT_FORMAT, PK_SEARCH_INTERVAL } from '@/namespaces';
 import React, { useEffect, useState } from 'react';
 import { useModel } from 'umi';
 import { projectKpiGql, organizationGql, queryGQL } from '@/pages/gqls';
@@ -32,13 +32,15 @@ import moment from 'moment';
 
 const { RangePicker } = DatePicker;
 
-/*  */
-let dateStr: [string, string] | undefined; // 存放时间range信息
-let doChange = false;
+/* 默认的时间 */
 const defaultDateRange: [Moment, any] = [
   moment().subtract(PK_SEARCH_INTERVAL.value, PK_SEARCH_INTERVAL.unit as any),
   null,
 ]; // date组件默认显示
+const defaultDateStr: [string, any] = [defaultDateRange[0].format(MOMENT_FORMAT.date), null];
+// 
+let dateStr: [string, any] = defaultDateStr; // 存放时间range信息
+let doChange = false;
 const defaultSeclectItems = { deptIds: [], projIds: [], dates: defaultDateRange, doQuery: false };
 /* ************************************************************************************************************** */
 export default () => {
@@ -97,8 +99,13 @@ export default () => {
       Object.assign(gqlParams, { projIds: selectItems.projIds.map((x) => parseInt(x)) });
     else if (gqlParams['projIds'] !== undefined) delete gqlParams['projIds'];
     //
-    if (dateStr) Object.assign(gqlParams, { dates: { start: dateStr[0], end: dateStr[1] } });
-    else if (gqlParams['dates'] !== undefined) delete gqlParams['dates'];
+    if (dateStr) {
+      const whereOpts = {};
+      if (dateStr[0]) whereOpts['start'] = dateStr[0];
+      if (dateStr[1]) whereOpts['end'] = dateStr[1];
+      //
+      Object.assign(gqlParams, { dates: whereOpts });
+    } else if (gqlParams['dates'] !== undefined) delete gqlParams['dates'];
 
     //
     setPkGqlParmas(gqlParams);
@@ -214,7 +221,7 @@ export default () => {
                 doChange = true;
                 setProjElems(null);
                 setSelectItems(Object.assign({ ...defaultSeclectItems }, { doQuery: true }));
-                dateStr = undefined;
+                dateStr = defaultDateStr;
               }}
             />
           </Tooltip>

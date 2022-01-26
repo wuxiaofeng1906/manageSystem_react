@@ -2,7 +2,7 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2022-01-24 02:25:03
+ * @LastEditTime: 2022-01-26 10:25:49
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -135,8 +135,8 @@ export default () => {
   /*  */
   return (
     <div style={{ marginLeft: 10 }}>
-      <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll} disabled>
-        全选(暂不可用)
+      <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>
+        全选
       </Checkbox>
       <Divider type="vertical" />
       <CheckboxGroup

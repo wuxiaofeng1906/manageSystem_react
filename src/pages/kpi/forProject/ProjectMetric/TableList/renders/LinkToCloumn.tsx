@@ -6,9 +6,10 @@
  * @LastEditors: jieTan
  * @LastModify:
  */
-import { Link } from 'umi';
+import {Link} from 'umi';
 
 export default (props: { value: any; route?: string; data?: any }) => {
-  const href = props.route ? `${props.route}?id=${props.data.project.id}` : '#';
+  debugger;
+  const href = props.route ? `${props.route}?id=${props.data.project.id}&name=${props.data.project.name}` : '#';
   return <Link to={href}>{props?.value}</Link>;
 };

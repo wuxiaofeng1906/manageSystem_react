@@ -28,7 +28,7 @@ import {
   setServiceCellStyle
 } from './supplementFile/style/gridStyles';
 import './supplementFile/style/styles.css';
-import {Button, Select} from "antd";
+import {Button, PageHeader, Select} from "antd";
 import {
   getProcessHeaderStyle, getStoryStabilityHeaderStyle, getStageWorkloadHeaderStyle,
   getProductRateHeaderStyle, getReviewDefectHeaderStyle, getProcessQualityHeaderStyle,
@@ -41,6 +41,7 @@ const {Option} = Select;
 
 const WeekCodeTableList: React.FC<any> = (props: any) => {
   const projectId = props.location.query.id;
+
   const gqlClient = useGqlClient();
 
   /* region  进度指标 */
@@ -177,10 +178,27 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
 
   const COMMON_LENGTH = 130;
 
-
+  const routes = [
+    {
+      path: '',
+      breadcrumbName: '研发过程数据',
+    }, {
+      path: '',
+      breadcrumbName: '度量指标',
+    }, {
+      path: '',
+      breadcrumbName: '项目指标',
+    }];
   return (
-    <PageContainer style={{height: "100%", marginTop: -30}}>
-      <div style={{marginTop: -55, height: 35}}>
+    <div style={{width: "100%", height: "100%", marginTop: "-20px"}}>
+      <PageHeader
+        ghost={false}
+        title={props.location.query.name}
+        style={{height: "85px"}}
+        breadcrumb={{routes}}
+      />
+
+      <div style={{marginTop: -35, height: 35}}>
 
         {/*<Select defaultValue="lucy" style={{width: 120}} size={"small"}>*/}
         {/*  <Option value="jack">Jack</Option>*/}
@@ -394,7 +412,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         </div>
       </div>
 
-    </PageContainer>
+    </div>
   )
     ;
 };

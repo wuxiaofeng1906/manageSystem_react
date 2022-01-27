@@ -315,7 +315,7 @@ const getGridDataSource = (oldData: any) => {
 
   return resultArray;
 };
-　
+
 // 一键部署ID之升级接口数据获取
 const queryServiceByID = async (params: string) => {
 
@@ -886,11 +886,12 @@ const saveEnvironmentCheck = async (type: string, currentListNo: string, newOnli
     "user_name": usersInfo.name,
     "user_id": usersInfo.userid,
     "ignore_check": ignore_check,
+    "check_env": sourceData.checkEnv
   }
 
-  if (ignore_check === "2") { // 如果没有忽略检查
-    data["check_env"] = sourceData.checkEnv;
-  }
+  // if (ignore_check === "2") { // 如果没有忽略检查
+  //   data["check_env"] = sourceData.checkEnv;
+  // }
 
   if (type === "修改") {
     data["check_id"] = sourceData.envCheckId;
@@ -926,23 +927,32 @@ const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlin
     }
   }
 
+  let before_check_type = "";
+  (sourceData.beforeCheckType).forEach((ele: string) => {
+    before_check_type = before_check_type === "" ? ele : `${before_check_type},${ele}`;
+  });
+
   const beforeData = {
     "check_num": newOnlineBranchNum,
     "user_name": usersInfo.name,
     "user_id": usersInfo.userid,
     "check_time": "1",    // 1 上线前检查， 2 上线后检查
     "ignore_check": before_ignore_check,
+    "check_type": before_check_type,
+    "test_env": sourceData.beforeTestEnv,
+    "browser": sourceData.beforeBrowser
   };
 
-  if (before_ignore_check === "2") {
-    let before_check_type = "";
-    (sourceData.beforeCheckType).forEach((ele: string) => {
-      before_check_type = before_check_type === "" ? ele : `${before_check_type},${ele}`;
-    });
-    beforeData["check_type"] = before_check_type;
-    beforeData["test_env"] = sourceData.beforeTestEnv;
-    beforeData["browser"] = sourceData.beforeBrowser;
-  }
+
+  // if (before_ignore_check === "2") {
+  //   let before_check_type = "";
+  //   (sourceData.beforeCheckType).forEach((ele: string) => {
+  //     before_check_type = before_check_type === "" ? ele : `${before_check_type},${ele}`;
+  //   });
+  //   beforeData["check_type"] = before_check_type;
+  //   beforeData["test_env"] = sourceData.beforeTestEnv;
+  //   beforeData["browser"] = sourceData.beforeBrowser;
+  // }
   if (type === "修改") {
     beforeData["automation_id"] = sourceData.beforeAutomationId;
   }
@@ -960,23 +970,31 @@ const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlin
     }
   }
 
+  let after_check_type = "";
+  (sourceData.afterCheckType).forEach((ele: string) => {
+    after_check_type = after_check_type === "" ? ele : `${after_check_type},${ele}`;
+  });
   const afterData = {
     "check_num": newOnlineBranchNum,
     "user_name": usersInfo.name,
     "user_id": usersInfo.userid,
     "check_time": "2",    // 1 上线前检查， 2 上线后检查
     "ignore_check": after_ignore_check,
+    "check_type": after_check_type,
+    "test_env": sourceData.afterTestEnv,
+    "browser": sourceData.afterBrowser
   };
 
-  if (after_ignore_check === "2") {
-    let after_check_type = "";
-    (sourceData.afterCheckType).forEach((ele: string) => {
-      after_check_type = after_check_type === "" ? ele : `${after_check_type},${ele}`;
-    });
-    afterData["check_type"] = after_check_type;
-    afterData["test_env"] = sourceData.afterTestEnv;
-    afterData["browser"] = sourceData.afterBrowser;
-  }
+
+  // if (after_ignore_check === "2") {
+  //   let after_check_type = "";
+  //   (sourceData.afterCheckType).forEach((ele: string) => {
+  //     after_check_type = after_check_type === "" ? ele : `${after_check_type},${ele}`;
+  //   });
+  //   afterData["check_type"] = after_check_type;
+  //   afterData["test_env"] = sourceData.afterTestEnv;
+  //   afterData["browser"] = sourceData.afterBrowser;
+  // }
 
   if (type === "修改") {
     afterData["automation_id"] = sourceData.afterAutomationId;

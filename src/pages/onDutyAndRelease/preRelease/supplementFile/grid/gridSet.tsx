@@ -878,6 +878,46 @@ const sealStatusRenderer = (params: any) => {
   return `<div></div>`;
 };
 
+// 封板状态
+const branchGitTime = (params: any) => {
+
+  const datas = params.data;
+
+  // 证明有前后端
+  if (datas.branch_front_create_time && datas.branch_create_time) {
+
+    return `
+        <div style="margin-top: -10px">
+            <div style=" margin-top: 20px;font-size: 10px">
+                <div>前端：<label> ${datas.branch_front_create_time}</label></div>
+                <div style="margin-top: -20px">
+                后端：<label  > ${datas.branch_create_time}</label></div>
+            </div>
+        </div>
+    `;
+  }
+
+  if (datas.branch_front_create_time || datas.branch_create_time) { // 如果只有前端或者只有后端
+    let values = datas.branch_create_time;
+    let side = "后端:";
+    if (datas.branch_front_create_time) {
+      side = "前端:";
+      values = datas.branch_front_create_time;
+    }
+
+    return `
+        <div style="margin-top: -10px">
+            <div style=" margin-top: 20px;font-size: 10px">
+                <div>${side} <label> ${values}</label> </div>
+            </div>
+
+        </div>
+    `;
+  }
+  return `<div></div>`;
+};
+
+
 // 上线分支
 const getOnlineBranchColumns = () => {
   const firstOnlineBranchColumn: any = [
@@ -944,8 +984,9 @@ const getOnlineBranchColumns = () => {
     },
     {
       headerName: '程序分支拉取时间',
-      field: 'branch_create_time',
+      // field: 'branch_create_time',
       minWidth: 160,
+      cellRenderer: branchGitTime
     },
     {
       headerName: '操作',

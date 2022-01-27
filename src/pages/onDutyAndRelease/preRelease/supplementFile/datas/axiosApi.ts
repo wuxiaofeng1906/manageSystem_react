@@ -928,9 +928,12 @@ const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlin
   }
 
   let before_check_type = "";
-  (sourceData.beforeCheckType).forEach((ele: string) => {
-    before_check_type = before_check_type === "" ? ele : `${before_check_type},${ele}`;
-  });
+  if(sourceData.beforeCheckType && (sourceData.beforeCheckType).length){
+    (sourceData.beforeCheckType).forEach((ele: string) => {
+      before_check_type = before_check_type === "" ? ele : `${before_check_type},${ele}`;
+    });
+  }
+
 
   const beforeData = {
     "check_num": newOnlineBranchNum,
@@ -971,9 +974,13 @@ const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlin
   }
 
   let after_check_type = "";
-  (sourceData.afterCheckType).forEach((ele: string) => {
-    after_check_type = after_check_type === "" ? ele : `${after_check_type},${ele}`;
-  });
+  debugger;
+  if (sourceData.afterCheckType && (sourceData.afterCheckType).length > 0) {
+    (sourceData.afterCheckType).forEach((ele: string) => {
+      after_check_type = after_check_type === "" ? ele : `${after_check_type},${ele}`;
+    });
+  }
+
   const afterData = {
     "check_num": newOnlineBranchNum,
     "user_name": usersInfo.name,

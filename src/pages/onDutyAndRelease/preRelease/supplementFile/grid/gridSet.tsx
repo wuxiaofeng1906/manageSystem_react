@@ -644,7 +644,7 @@ const beforeOnlineVersionCheck = (params: any) => {
 
             <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
             onclick='excuteDataCheck("versionCheck",${checkNum},${JSON.stringify(result)})'>
-              <img src="../执行.png" width="14" height="14" alt="执行" title="执行">
+              <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
             </Button>
 
               <a href="${values.check_url}" target="_blank"  onclick="return goCommenLog('${values.check_url}')" >
@@ -718,7 +718,7 @@ const beforeOnlineEnvCheck = (params: any) => {
             <div style="text-align: right" >
               <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
               onclick='excuteDataCheck("envCheck",${checkNum},${JSON.stringify(result)})'>
-                <img src="../执行.png" width="14" height="14" alt="执行" title="执行">
+                <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
               </Button>
 
               <a href="${values.check_url}" target="_blank"  onclick="return goCommenLog('${values.check_url}')" >
@@ -797,7 +797,7 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
             <div style="text-align: right" >
               <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
               onclick='excuteDataCheck(${JSON.stringify(title)},${JSON.stringify(params.data?.check_num)},${JSON.stringify(value)})'>
-                <img src="../执行.png" width="14" height="14" alt="执行" title="执行">
+                <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
               </Button>
               <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='urlClick(${JSON.stringify(checkType)},${JSON.stringify(logUrl)})'>
                 <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">

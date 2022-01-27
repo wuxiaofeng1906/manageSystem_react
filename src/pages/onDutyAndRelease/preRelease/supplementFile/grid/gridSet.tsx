@@ -642,7 +642,7 @@ const beforeOnlineVersionCheck = (params: any) => {
          <div>
           <div style="margin-top: -10px;text-align: right">
 
-            <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
+            <Button  style="padding-bottom: 5px; margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
             onclick='excuteDataCheck("versionCheck",${checkNum},${JSON.stringify(result)})'>
               <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
             </Button>

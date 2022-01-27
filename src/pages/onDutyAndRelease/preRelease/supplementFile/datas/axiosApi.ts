@@ -915,6 +915,7 @@ const saveEnvironmentCheck = async (type: string, currentListNo: string, newOnli
 // (上线前后)自动化检查
 const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any) => {
 
+  debugger;
   const data = [];
 
   // 上线前检查: 打勾是1，没打勾是2
@@ -928,10 +929,12 @@ const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlin
   }
 
   let before_check_type = "";
-  if(sourceData.beforeCheckType && (sourceData.beforeCheckType).length){
+  if (sourceData.beforeCheckType && (sourceData.beforeCheckType).length) {
     (sourceData.beforeCheckType).forEach((ele: string) => {
       before_check_type = before_check_type === "" ? ele : `${before_check_type},${ele}`;
     });
+  } else {
+    before_check_type = "9";
   }
 
 
@@ -974,11 +977,13 @@ const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlin
   }
 
   let after_check_type = "";
-  debugger;
+
   if (sourceData.afterCheckType && (sourceData.afterCheckType).length > 0) {
     (sourceData.afterCheckType).forEach((ele: string) => {
       after_check_type = after_check_type === "" ? ele : `${after_check_type},${ele}`;
     });
+  } else {
+    after_check_type = "9";
   }
 
   const afterData = {

@@ -151,6 +151,7 @@ const queryBugReturnRate = async (client: GqlClient<object>, params: string) => 
       }
   `);
 
+  debugger;
   const datas = converseFormatForAgGrid(data?.bugFlybackRateDept);
   return datas;
 };

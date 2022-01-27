@@ -1008,6 +1008,11 @@ const PreRelease: React.FC<any> = () => {
           marginTop: '50vh',
         },
       });
+
+      // 刷新界面
+      const newData: any = await alalysisInitData("onlineBranch", currentListNo);
+      firstOnlineBranchGridApi.current?.setRowData(newData.onlineBranch);
+
     } else {
       message.error({
         content: `${result}`,

@@ -469,7 +469,7 @@ const rendererUnitTest = (params: any) => {
     } else if (ele.test_case_status === "skip") {
       passFlag = "忽略";
     } else if (ele.test_case_status === "running") {
-      passFlag = "运行中";
+      passFlag = "执行中";
     } else {
       passFlag = "未知";
     }
@@ -587,15 +587,34 @@ const beforeOnlineVersionCheck = (params: any) => {
     side = "前后端：";
   }
 
+  // 解析结果
+  let result = "";
+  let frontColor = "black";
+
   // 解析时间
   let start = "";
-  if (values.check_start_time && values.check_start_time !== "-") {
-    start = dayjs(values.check_start_time).format("HH:mm:ss");
-  }
-
   let end = "";
-  if (values.check_end_time) {
-    end = dayjs(values.check_end_time).format("HH:mm:ss");
+
+  if (values.check_status === "1") {
+    result = "未开始";
+  } else if (values.check_status === "2") {
+    result = "执行中";
+    frontColor = "#46A0FC";
+  } else if (values.check_status === "3") {//  result = "已结束";
+
+    if (values.check_start_time && values.check_start_time !== "-") {
+      start = dayjs(values.check_start_time).format("HH:mm:ss");
+    }
+    if (values.check_end_time) {
+      end = dayjs(values.check_end_time).format("HH:mm:ss");
+    }
+    if (values.check_result === "1") {
+      result = "是";
+      frontColor = "#2BF541";
+    } else if (values.check_result === "2") {
+      result = "否";
+      frontColor = "#8B4513";
+    }
   }
 
   let timeRange = "";
@@ -603,36 +622,8 @@ const beforeOnlineVersionCheck = (params: any) => {
     timeRange = `${start}~${end}`;
   }
 
-  // 解析结果
-  let result = "";
-  let frontColor = "black";
-
-  if (values.check_result === "9") {  // 9是未结束，然后就获取检查状态
-
-    if (values.check_status === "1") {
-      result = "未开始";
-    } else if (values.check_status === "2") {
-      result = "检查中";
-      frontColor = "#46A0FC";
-    } else if (values.check_status === "3") {
-      result = "已结束";
-    }
-
-  } else if (values.check_result === "1") {
-    result = "是";
-    frontColor = "#2BF541";
-  } else if (values.check_result === "2") {
-    result = "否";
-    frontColor = "#8B4513";
-  }
-
   const checkNum = JSON.stringify(params.data?.check_num);
 
-
-  // let targetUrl = values.check_url;
-  // if(values.check_url){
-  //   targetUrl = ""
-  // }
   if (side === "") {
     return `
          <div>
@@ -690,12 +681,17 @@ const beforeOnlineEnvCheck = (params: any) => {
     Color = "blue";
 
   } else if (values.ignore_check === "2") {  // 不忽略
-    if (values.check_result === "success") {
+    if (values.check_result === null) {
+      result = "未开始";
+    } else if (values.check_result === "success") {
       result = "是";
       Color = "#2BF541";
-    } else {
+    } else if (values.check_result === "failed") {
       result = "否";
       Color = "#8B4513";
+    } else if (values.check_result === "running") {
+      result = "执行中";
+      Color = "#46A0FC";
     }
   }
 
@@ -749,8 +745,10 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
   let timeRange = "";
   let checkType = "";
   let logUrl = "";
+  // 解析时间
+  let start = "";
 
-
+  let end = "";
   values.forEach((ele: any) => {
     if (ele.check_time === type) {  // 如果是1 ，则代表是上线前检查,如果是2 ，则代表是上线后检查
       // // 解析结果和颜色：需要判断是否忽略，是的话显示忽略，否的话继续显示状态
@@ -760,28 +758,30 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
       } else if (ele.check_status === "1") {
         value = "未开始";
       } else if (ele.check_status === "2") {
-        value = "检查中";
+        value = "执行中";
         Color = "#46A0FC";
-      } else if (ele.check_status === "3") {
-        value = "已结束";
-        Color = "#2BF541";
-      }
-
-      checkType = ele.check_type;
-      logUrl = ele.check_log_url;
-      // 解析时间
-      let start = "";
-      if (ele.check_start_time) {
-        start = dayjs(ele.check_start_time).format("HH:mm:ss");
-      }
-
-      let end = "";
-      if (ele.check_end_time) {
-        end = dayjs(ele.check_end_time).format("HH:mm:ss");
+      } else if (ele.check_status === "3") {  // 检查完毕，已结束
+        if (ele.check_start_time) {
+          start = dayjs(ele.check_start_time).format("HH:mm:ss");
+        }
+        if (ele.check_end_time) {
+          end = dayjs(ele.check_end_time).format("HH:mm:ss");
+        }
+        if (values.check_result === "success") {
+          value = "是";
+          Color = "#2BF541";
+        } else if (values.check_result === "failed") {
+          value = "否";
+          Color = "#8B4513";
+        }
       }
       if (start) {
         timeRange = `${start}~${end}`;
       }
+      checkType = ele.check_type;
+      logUrl = ele.check_log_url;
+
+
     }
 
   });
@@ -791,7 +791,6 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
   if (type === "1") {
     title = "beforeOnlineCheck";
   }
-
 
   return `
         <div style="margin-top: -10px">

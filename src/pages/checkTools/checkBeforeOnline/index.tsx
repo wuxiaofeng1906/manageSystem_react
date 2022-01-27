@@ -1134,7 +1134,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
             <Form.Item name="verson_imagebranch" label="ImageBranch" style={{marginTop: -20, width: 468}}>
               <Select placeholder="请选择待检查分支！" showSearch>
-                {imageBranch}
+                {targetBranch}
               </Select>
             </Form.Item>
 

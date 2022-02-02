@@ -1,13 +1,28 @@
-import {message, Select} from "antd";
-import {getAllProject, getAllDeptUsers, getBranchName, getServices, getImgEnv} from "@/publicMethods/verifyAxios";
+import { message, Select } from 'antd';
 import {
-  queryReleaseType, queryReleaseWay, queryReleaseId, getOnlineDev, getPulishItem,
-  getIsApiAndDatabaseUpgrade, getUpgradeApi, getApiService, getApiMethod, getRepaireCategory,
-  getTechSide, getCheckType, getBrowserType
-} from "../datas/axiosApi";
+  getAllProject,
+  getAllDeptUsers,
+  getBranchName,
+  getServices,
+  getImgEnv,
+} from '@/publicMethods/verifyAxios';
+import {
+  queryReleaseType,
+  queryReleaseWay,
+  queryReleaseId,
+  getOnlineDev,
+  getPulishItem,
+  getIsApiAndDatabaseUpgrade,
+  getUpgradeApi,
+  getApiService,
+  getApiMethod,
+  getRepaireCategory,
+  getTechSide,
+  getCheckType,
+  getBrowserType,
+} from '../datas/axiosApi';
 
-const {Option} = Select;
-
+const { Option } = Select;
 
 /* region 预发布项目 */
 // 项目名称下拉框
@@ -15,7 +30,7 @@ const loadPrjNameSelect = async () => {
   const prjNames = await getAllProject();
   const prjData: any = [];
 
-  if (prjNames.message !== "") {
+  if (prjNames.message !== '') {
     message.error({
       content: prjNames.message,
       duration: 1,
@@ -27,21 +42,22 @@ const loadPrjNameSelect = async () => {
     const datas = prjNames.data;
     datas.forEach((project: any) => {
       prjData.push(
-        <Option key={project.project_id} value={`${project.project_name}&${project.project_id}`}>{project.project_name}</Option>);
+        <Option key={project.project_id} value={`${project.project_name}&${project.project_id}`}>
+          {project.project_name}
+        </Option>,
+      );
     });
   }
 
   return prjData;
-
 };
 
 // 发布类型下拉框
 const loadReleaseTypeSelect = async () => {
-
   const releaseTypes = await queryReleaseType();
   const typesData: any = [];
 
-  if (releaseTypes.message !== "") {
+  if (releaseTypes.message !== '') {
     message.error({
       content: releaseTypes.message,
       duration: 1,
@@ -52,11 +68,13 @@ const loadReleaseTypeSelect = async () => {
   } else if (releaseTypes.data) {
     const datas = releaseTypes.data;
     datas.forEach((types: any) => {
-      if (types.release_type_id !== "9") {
+      if (types.release_type_id !== '9') {
         typesData.push(
-          <Option key={types.release_type_id} value={`${types.release_type_id}`}>{types.release_type_name}</Option>);
+          <Option key={types.release_type_id} value={`${types.release_type_id}`}>
+            {types.release_type_name}
+          </Option>,
+        );
       }
-
     });
   }
 
@@ -65,11 +83,10 @@ const loadReleaseTypeSelect = async () => {
 
 // 发布方式下拉框
 const loadReleaseWaySelect = async () => {
-
   const releaseWays = await queryReleaseWay();
   const wayData: any = [];
 
-  if (releaseWays.message !== "") {
+  if (releaseWays.message !== '') {
     message.error({
       content: releaseWays.message,
       duration: 1,
@@ -80,16 +97,18 @@ const loadReleaseWaySelect = async () => {
   } else if (releaseWays.data) {
     const datas = releaseWays.data;
     datas.forEach((ways: any) => {
-      if (ways.release_way_id !== "9") {
+      if (ways.release_way_id !== '9') {
         wayData.push(
-          <Option key={ways.release_way_id} value={`${ways.release_way_id}`}>{ways.release_way_name}</Option>);
+          <Option key={ways.release_way_id} value={`${ways.release_way_id}`}>
+            {ways.release_way_name}
+          </Option>,
+        );
       }
     });
   }
 
   return wayData;
 };
-
 
 /* endregion */
 
@@ -100,7 +119,7 @@ const loadReleaseIDSelect = async () => {
   const IDs = await queryReleaseId();
   const idData: any = [];
 
-  if (IDs.message !== "") {
+  if (IDs.message !== '') {
     message.error({
       content: IDs.message,
       duration: 1,
@@ -112,18 +131,24 @@ const loadReleaseIDSelect = async () => {
     const datas = IDs.data;
     datas.forEach((ids: any) => {
       const serviceArray = ids.service;
-      let serviceStr = "";
+      let serviceStr = '';
       serviceArray.forEach((service: any) => {
-        serviceStr = serviceStr === "" ? service : `${serviceStr},${service}`;
+        serviceStr = serviceStr === '' ? service : `${serviceStr},${service}`;
       });
       idData.push(
-        <Option key={ids.id} value={`${ids.id}`} automation_test={`${ids.automation_test}`}
-                service={`${serviceStr}`}>{ids.id}</Option>);
+        <Option
+          key={ids.id}
+          value={`${ids.id}`}
+          automation_test={`${ids.automation_test}`}
+          service={`${serviceStr}`}
+        >
+          {ids.id}
+        </Option>,
+      );
     });
   }
 
   return idData;
-
 };
 
 // 上线环境
@@ -131,7 +156,7 @@ const loadOnlineEnvSelect = async () => {
   const envs = await getOnlineDev();
   const envData: any = [];
 
-  if (envs.message !== "") {
+  if (envs.message !== '') {
     message.error({
       content: envs.message,
       duration: 1,
@@ -142,16 +167,17 @@ const loadOnlineEnvSelect = async () => {
   } else if (envs.data) {
     const datas = envs.data;
     datas.forEach((ele: any) => {
-      if (ele.online_environment_id !== "9") {
+      if (ele.online_environment_id !== '9') {
         envData.push(
-          <Option key={ele.online_environment_id}
-                  value={`${ele.online_environment_id}`}>{ele.online_environment_name}</Option>);
+          <Option key={ele.online_environment_id} value={`${ele.online_environment_id}`}>
+            {ele.online_environment_name}
+          </Option>,
+        );
       }
     });
   }
 
   return envData;
-
 };
 
 // 发布项
@@ -159,7 +185,7 @@ const loadPulishItemSelect = async () => {
   const source = await getPulishItem();
   const resultArray: any = [];
 
-  if (source.message !== "") {
+  if (source.message !== '') {
     message.error({
       content: source.message,
       duration: 1,
@@ -171,23 +197,22 @@ const loadPulishItemSelect = async () => {
     const datas = source.data;
     datas.forEach((ele: any) => {
       resultArray.push(
-        <Option key={ele.release_item_id}
-                value={`${ele.release_item_id}`}>{ele.release_item_name}</Option>);
-
+        <Option key={ele.release_item_id} value={`${ele.release_item_id}`}>
+          {ele.release_item_name}
+        </Option>,
+      );
     });
   }
 
   return resultArray;
-
 };
 
 // 是否接口和数据库升级
 const loadIsApiAndDbUpgradeSelect = async () => {
-
   const source = await getIsApiAndDatabaseUpgrade();
   const resultArray: any = [];
 
-  if (source.message !== "") {
+  if (source.message !== '') {
     message.error({
       content: source.message,
       duration: 1,
@@ -198,19 +223,17 @@ const loadIsApiAndDbUpgradeSelect = async () => {
   } else if (source.data) {
     const datas = source.data;
     datas.forEach((ele: any) => {
-      if (ele.upgrade_id !== "9") {
+      if (ele.upgrade_id !== '9') {
         resultArray.push(
-          <Option key={ele.upgrade_id}
-                  value={`${ele.upgrade_id}`}>{ele.upgrade_item}</Option>);
+          <Option key={ele.upgrade_id} value={`${ele.upgrade_id}`}>
+            {ele.upgrade_item}
+          </Option>,
+        );
       }
-
-
     });
   }
 
   return resultArray;
-
-
 };
 
 /* endregion */
@@ -222,7 +245,7 @@ const loadUpgradeApiSelect = async () => {
   const source = await getUpgradeApi();
   const resultArray: any = [];
 
-  if (source.message !== "") {
+  if (source.message !== '') {
     message.error({
       content: source.message,
       duration: 1,
@@ -233,10 +256,12 @@ const loadUpgradeApiSelect = async () => {
   } else if (source.data) {
     const datas = source.data;
     datas.forEach((ele: any) => {
-      if (ele.type_id !== "9") {
+      if (ele.type_id !== '9') {
         resultArray.push(
-          <Option key={ele.type_id}
-                  value={`${ele.type_id}`}>{ele.type_name}</Option>);
+          <Option key={ele.type_id} value={`${ele.type_id}`}>
+            {ele.type_name}
+          </Option>,
+        );
       }
     });
   }
@@ -249,7 +274,7 @@ const loadApiServiceSelect = async () => {
   const source = await getApiService();
   const resultArray: any = [];
 
-  if (source.message !== "") {
+  if (source.message !== '') {
     message.error({
       content: source.message,
       duration: 1,
@@ -261,8 +286,10 @@ const loadApiServiceSelect = async () => {
     const datas = source.data;
     datas.forEach((ele: any) => {
       resultArray.push(
-        <Option key={ele} value={`${ele}`}>{ele}</Option>);
-
+        <Option key={ele} value={`${ele}`}>
+          {ele}
+        </Option>,
+      );
     });
   }
 
@@ -274,7 +301,7 @@ const loadApiMethodSelect = async () => {
   const source = await getApiMethod();
   const resultArray: any = [];
 
-  if (source.message !== "") {
+  if (source.message !== '') {
     message.error({
       content: source.message,
       duration: 1,
@@ -285,9 +312,12 @@ const loadApiMethodSelect = async () => {
   } else if (source.data) {
     const datas = source.data;
     datas.forEach((ele: any) => {
-      if (ele.method_id !== "9") {
+      if (ele.method_id !== '9') {
         resultArray.push(
-          <Option key={ele.method_id} value={`${ele.method_id}`}>{ele.method_name}</Option>);
+          <Option key={ele.method_id} value={`${ele.method_id}`}>
+            {ele.method_name}
+          </Option>,
+        );
       }
     });
   }
@@ -304,7 +334,7 @@ const loadCategorySelect = async () => {
   const source = await getRepaireCategory();
   const resultArray: any = [];
 
-  if (source.message !== "") {
+  if (source.message !== '') {
     message.error({
       content: source.message,
       duration: 1,
@@ -315,23 +345,25 @@ const loadCategorySelect = async () => {
   } else if (source.data) {
     const datas = source.data;
     datas.forEach((ele: any) => {
-      if (ele.repair_id !== "9") {
+      if (ele.repair_id !== '9') {
         resultArray.push(
-          <Option key={ele.repair_id} value={`${ele.repair_id}`}>{ele.repair_name}</Option>);
+          <Option key={ele.repair_id} value={`${ele.repair_id}`}>
+            {ele.repair_name}
+          </Option>,
+        );
       }
     });
   }
 
   return resultArray;
-
-}
+};
 
 // 修复类型select
 const loadCommiterSelect = async () => {
   const source = await getAllDeptUsers();
   const resultArray: any = [];
 
-  if (source.message !== "") {
+  if (source.message !== '') {
     message.error({
       content: source.message,
       duration: 1,
@@ -343,14 +375,15 @@ const loadCommiterSelect = async () => {
     const datas = source.data;
     datas.forEach((ele: any) => {
       resultArray.push(
-        <Option key={ele.user_id} value={`${ele.user_id}&${ele.user_name}`}>{ele.user_name}</Option>);
-
+        <Option key={ele.user_id} value={`${ele.user_id}&${ele.user_name}`}>
+          {ele.user_name}
+        </Option>,
+      );
     });
   }
 
   return resultArray;
-
-}
+};
 /* endregion */
 
 /* region 上线分支 */
@@ -360,7 +393,7 @@ const loadTechSideSelect = async () => {
   const source = await getTechSide();
   const resultArray: any = [];
 
-  if (source.message !== "") {
+  if (source.message !== '') {
     message.error({
       content: source.message,
       duration: 1,
@@ -371,9 +404,12 @@ const loadTechSideSelect = async () => {
   } else if (source.data) {
     const datas = source.data;
     datas.forEach((ele: any) => {
-      if (ele.technical_side_id !== "9") {
+      if (ele.technical_side_id !== '9') {
         resultArray.push(
-          <Option key={ele.technical_side_id} value={`${ele.technical_side_id}`}>{ele.technical_side}</Option>);
+          <Option key={ele.technical_side_id} value={`${ele.technical_side_id}`}>
+            {ele.technical_side}
+          </Option>,
+        );
       }
     });
   }
@@ -386,7 +422,7 @@ const loadBranchNameSelect = async () => {
   const source = await getBranchName();
   const resultArray: any = [];
 
-  if (source.message !== "") {
+  if (source.message !== '') {
     message.error({
       content: source.message,
       duration: 1,
@@ -398,8 +434,10 @@ const loadBranchNameSelect = async () => {
     const datas = source.data;
     datas.forEach((ele: any) => {
       resultArray.push(
-        <Option key={ele.branch_id} value={`${ele.branch_name}`}>{ele.branch_name}</Option>);
-
+        <Option key={ele.branch_id} value={`${ele.branch_name}`}>
+          {ele.branch_name}
+        </Option>,
+      );
     });
   }
 
@@ -408,11 +446,10 @@ const loadBranchNameSelect = async () => {
 
 // 服务下拉框
 const loadServiceSelect = async () => {
-
   const source = await getServices();
   const resultArray: any = [];
 
-  if (source.message !== "") {
+  if (source.message !== '') {
     message.error({
       content: source.message,
       duration: 1,
@@ -424,22 +461,22 @@ const loadServiceSelect = async () => {
     const datas = source.data;
     datas.forEach((ele: any) => {
       resultArray.push(
-        <Option key={ele.server_id} value={`${ele.server_id}`}>{ele.server}</Option>);
-
+        <Option key={ele.server_id} value={`${ele.server_id}`}>
+          {ele.server}
+        </Option>,
+      );
     });
   }
 
   return resultArray;
-
 };
 
 // 镜像环境下拉框
 const loadImgEnvSelect = async () => {
-
   const source = await getImgEnv();
   const resultArray: any = [];
 
-  if (source.message !== "") {
+  if (source.message !== '') {
     message.error({
       content: source.message,
       duration: 1,
@@ -451,22 +488,22 @@ const loadImgEnvSelect = async () => {
     const datas = source.data;
     datas.forEach((ele: any) => {
       resultArray.push(
-        <Option key={ele.env_id} value={`${ele.image_env}`}>{ele.image_env}</Option>);
-
+        <Option key={ele.env_id} value={`${ele.image_env}`}>
+          {ele.image_env}
+        </Option>,
+      );
     });
   }
 
   return resultArray;
-
 };
 
 // 检查类型下拉框
 const loadCheckTypeSelect = async () => {
-
   const source = await getCheckType();
   const resultArray: any = [];
 
-  if (source.message !== "") {
+  if (source.message !== '') {
     message.error({
       content: source.message,
       duration: 1,
@@ -477,25 +514,25 @@ const loadCheckTypeSelect = async () => {
   } else if (source.data) {
     const datas = source.data;
     datas.forEach((ele: any) => {
-      if (ele.check_type_id !== "9") {
+      if (ele.check_type_id !== '9') {
         resultArray.push(
-          <Option key={ele.check_type_id} value={`${ele.check_type_id}`}>{ele.check_type_name}</Option>);
+          <Option key={ele.check_type_id} value={`${ele.check_type_id}`}>
+            {ele.check_type_name}
+          </Option>,
+        );
       }
     });
   }
 
   return resultArray;
-
 };
-
 
 // 浏览器下拉框
 const loadBrowserTypeSelect = async () => {
-
   const source = await getBrowserType();
   const resultArray: any = [];
 
-  if (source.message !== "") {
+  if (source.message !== '') {
     message.error({
       content: source.message,
       duration: 1,
@@ -506,20 +543,36 @@ const loadBrowserTypeSelect = async () => {
   } else if (source.data) {
     const datas = source.data;
     datas.forEach((ele: any) => {
-      if (ele.browser_id !== "9") {
+      if (ele.browser_id !== '9') {
         resultArray.push(
-          <Option key={ele.browser_id} value={`${ele.browser_id}`}>{ele.browse_name}</Option>);
+          <Option key={ele.browser_id} value={`${ele.browser_id}`}>
+            {ele.browse_name}
+          </Option>,
+        );
       }
     });
   }
 
   return resultArray;
-
 };
 /* endregion */
 export {
-  loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadReleaseIDSelect, loadOnlineEnvSelect,
-  loadPulishItemSelect, loadIsApiAndDbUpgradeSelect, loadUpgradeApiSelect, loadApiServiceSelect, loadApiMethodSelect,
-  loadCategorySelect, loadCommiterSelect, loadTechSideSelect, loadBranchNameSelect, loadServiceSelect, loadImgEnvSelect,
-  loadCheckTypeSelect, loadBrowserTypeSelect
+  loadPrjNameSelect,
+  loadReleaseTypeSelect,
+  loadReleaseWaySelect,
+  loadReleaseIDSelect,
+  loadOnlineEnvSelect,
+  loadPulishItemSelect,
+  loadIsApiAndDbUpgradeSelect,
+  loadUpgradeApiSelect,
+  loadApiServiceSelect,
+  loadApiMethodSelect,
+  loadCategorySelect,
+  loadCommiterSelect,
+  loadTechSideSelect,
+  loadBranchNameSelect,
+  loadServiceSelect,
+  loadImgEnvSelect,
+  loadCheckTypeSelect,
+  loadBrowserTypeSelect,
 };

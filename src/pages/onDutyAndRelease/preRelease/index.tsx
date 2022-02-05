@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import Tab from './components/Tab';
 import { alalysisInitData } from './datas/dataAnalyze';
@@ -10,7 +10,13 @@ const PreRelease: React.FC<any> = () => {
 
   //Tab标签数据显示
   const { setTabsData } = useModel('releaseProcess');
-  setTabsData(initData?.tabPageInfo);
+
+  useEffect(() => {
+    if (initData) {
+      const { tabPageInfo } = initData;
+      setTabsData(tabPageInfo?.activeKey, tabPageInfo.panes);
+    }
+  }, [initData]);
 
   return (
     <PageContainer>

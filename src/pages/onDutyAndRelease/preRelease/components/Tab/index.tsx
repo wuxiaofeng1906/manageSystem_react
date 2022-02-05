@@ -9,22 +9,14 @@ const Tab: React.FC<any> = () => {
   //Tab标签数据显示
   const { tabsData, setTabsData } = useModel('releaseProcess');
   const [showTabs, setShowTabs] = useState({
-    // 页面tabPage当前展示页面
     shown: false,
     targetKey: '',
   });
 
-  // const [tabContent, setTabContent] = useState({ // 页面tabPage展示
-  //   activeKey: "", panes: []
-  // });
-
   /* region tab 自身事件 */
   // Tabs页面切换
   const onTabsChange = async (activeKeys: any) => {
-    setTabsData({
-      ...tabsData,
-      activeKey: activeKeys,
-    });
+    setTabsData(activeKeys, tabsData.panes);
   };
 
   // 新增tab
@@ -38,7 +30,7 @@ const Tab: React.FC<any> = () => {
       content: '',
       key: newTabs,
     });
-    setTabsData({ panes, activeKey: newTabs });
+    setTabsData(newTabs, panes);
     // showNoneDataPage();
   };
 
@@ -117,10 +109,7 @@ const Tab: React.FC<any> = () => {
           marginTop: '50vh',
         },
       });
-      setTabsData({
-        panes: newPanes,
-        activeKey: newActiveKey,
-      });
+      setTabsData(newActiveKey, newPanes);
     } else {
       message.error({
         content: deleteInfo,

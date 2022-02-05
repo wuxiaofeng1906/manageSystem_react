@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import { Button, Form, Input, message, Modal, Tabs } from 'antd';
 import { useModel } from '@@/plugin-model/useModel';
-import { getNewPageNumber, deleteReleaseItem } from './axiosRequest';
+import { getNewPageNumber, deleteReleaseItem, modifyTabsName } from './axiosRequest';
+import { alalysisInitData } from '../../datas/dataAnalyze';
 
 const { TabPane } = Tabs;
 
 const Tab: React.FC<any> = () => {
-  //Tab标签数据显示
   const { tabsData, setTabsData } = useModel('releaseProcess');
-  const [showTabs, setShowTabs] = useState({
-    shown: false,
-    targetKey: '',
-  });
 
   /* region tab 自身事件 */
+  const [showTabs, setShowTabs] = useState({ shown: false, targetKey: '' });
+
   // Tabs页面切换
   const onTabsChange = async (activeKeys: any) => {
     setTabsData(activeKeys, tabsData.panes);
@@ -123,6 +121,56 @@ const Tab: React.FC<any> = () => {
 
   /* endregion */
 
+  /* region  修改tab */
+  const [tabNameSetForm] = Form.useForm(); // tab 名修改
+  const [tabNameModal, setTabNameModal] = useState(false);
+  // 修改tab的名字
+  const tabsChangeName = (params: any) => {
+    const currentName = params.target.innerText;
+    setTabNameModal(true);
+    tabNameSetForm.setFieldsValue({
+      oldTabName: currentName,
+      newTabName: '',
+    });
+  };
+
+  // 取消修改
+  const cancleNameSet = () => {
+    setTabNameModal(false);
+  };
+
+  // 保存tab名
+  const saveModifyName = async () => {
+    const formData = tabNameSetForm.getFieldsValue();
+    // 被修改的一定是当前activekey中的数据
+    const result = await modifyTabsName(tabsData.activeKey, formData.newTabName);
+    if (result === '') {
+      message.info({
+        content: '修改成功',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      setTabNameModal(false);
+      //   重置tab名
+      const { tabPageInfo } = await alalysisInitData('tabPageInfo', '');
+      if (tabPageInfo) {
+        setTabsData(tabsData.activeKey, tabPageInfo.panes);
+      }
+    } else {
+      message.error({
+        content: result,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+  };
+
+  /* endregion */
+
   return (
     <div>
       {/* Tabs 标签,固定在上面 */}
@@ -135,7 +183,7 @@ const Tab: React.FC<any> = () => {
             onEdits(targetKey, action);
           }}
           style={{ marginTop: -20 }}
-          // onDoubleClick={tabsChangeName}
+          onDoubleClick={tabsChangeName}
         >
           {tabsData?.panes?.map((pane: any) => (
             <TabPane tab={pane.title} key={pane.key} closable={pane.closable}>
@@ -189,6 +237,41 @@ const Tab: React.FC<any> = () => {
             style={{ display: 'none', width: '32px', marginTop: '-55px', marginLeft: '270px' }}
           >
             <Input />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title={'发布过程名修改'}
+        visible={tabNameModal}
+        onCancel={cancleNameSet}
+        centered={true}
+        footer={null}
+        width={400}
+        bodyStyle={{ height: 145 }}
+      >
+        <Form form={tabNameSetForm} autoComplete="off">
+          <Form.Item name="oldTabName" label="原发布名:" style={{ marginTop: -15 }}>
+            <Input disabled style={{ color: 'black' }} />
+          </Form.Item>
+
+          <Form.Item name="newTabName" label="新发布名:" style={{ marginTop: -15 }}>
+            <Input />
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="primary"
+              style={{
+                color: '#46A0FC',
+                backgroundColor: '#ECF5FF',
+                borderRadius: 5,
+                float: 'right',
+              }}
+              onClick={saveModifyName}
+            >
+              保存{' '}
+            </Button>
           </Form.Item>
         </Form>
       </Modal>

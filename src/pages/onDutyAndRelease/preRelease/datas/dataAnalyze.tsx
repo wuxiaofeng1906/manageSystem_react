@@ -134,6 +134,10 @@ const alalysisInitData = async (queryData: string = '', queryReleaseNum: string 
     return { onlineBranch: analysisOnlineBranch(datas[0].release_branch) };
   }
 
+  if (queryData === 'tabPageInfo') {
+    return { tabPageInfo: await analysisTabsPageInfo(datas) };
+  }
+
   return {
     tabPageInfo: await analysisTabsPageInfo(datas),
     // 预发布项目

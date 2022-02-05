@@ -70,4 +70,46 @@ const deleteReleaseItem = async (releaseNum: string) => {
   // return systemPermission.errorMessage;
 };
 
-export { getNewPageNumber, deleteReleaseItem };
+// 修改tab的名字
+const updateTabsName = async (currentListNo: string, newName: string) => {
+  const data = {
+    user_name: usersInfo.name,
+    user_id: usersInfo.userid,
+    ready_release_num: currentListNo,
+    ready_release_name: newName,
+  };
+  let errorMessage = '';
+  await axios
+    .post('/api/verify/release/release_name', data)
+    .then(function (res) {
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    })
+    .catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+};
+
+// 修改tab名
+const modifyTabsName = async (currentListNo: string, newName: string) => {
+  // 验证权限(值班测试和超级管理员)
+  // const authData = {
+  //   operate: '修改发布名称',
+  //   method: 'post',
+  //   path: '/api/verify/release/release_name',
+  // };
+  // const dutyPermission = await getDutyPersonPermission(authData);
+  // const systemPermission = await getSystemPersonPermission(authData);
+  // if (dutyPermission.flag || systemPermission.flag) {
+  return await updateTabsName(currentListNo, newName);
+  // }
+  // if (dutyPermission.errorMessage) {
+  //   return dutyPermission.errorMessage;
+  // }
+  // return systemPermission.errorMessage;
+};
+
+export { getNewPageNumber, deleteReleaseItem, modifyTabsName };

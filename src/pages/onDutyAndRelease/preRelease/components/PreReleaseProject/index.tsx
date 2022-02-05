@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Col, DatePicker, Form, Input, message, Row, Select } from 'antd';
-import { useModel } from '@@/plugin-model/useModel';
-import { useRequest } from 'ahooks';
+import React, {useEffect, useState} from 'react';
+import {Button, Col, DatePicker, Form, Input, message, Row, Select} from 'antd';
+import {useModel} from '@@/plugin-model/useModel';
+import {useRequest} from 'ahooks';
 import {
   loadPrjNameSelect,
   loadReleaseTypeSelect,
@@ -9,17 +9,17 @@ import {
 } from '../../comControl/controler';
 import '../../style/style.css';
 import moment from 'moment';
-import { getLockStatus, deleteLockStatus } from '../../lock/rowLock';
-import { savePreProjects } from './axiosRequest';
-import { showProgressData } from '@/pages/onDutyAndRelease/preRelease_bck/progress/alaProgress';
-import { getCheckProcess } from '@/pages/onDutyAndRelease/preRelease/components/CheckProgress/axiosRequest';
+import {getLockStatus, deleteLockStatus} from '../../lock/rowLock';
+import {savePreProjects} from './axiosRequest';
+import {showProgressData} from '../../components/CheckProgress/processAnalysis';
+import {getCheckProcess} from '../../components/CheckProgress/axiosRequest';
 
 const userLogins: any = localStorage.getItem('userLogins');
 const usersInfo = JSON.parse(userLogins);
 
 const PreReleaseProject: React.FC<any> = () => {
   // 获取当前页面的进度数据
-  const { tabsData, preReleaseData, modifyProcessStatus, lockedItem, modifyLockedItem } =
+  const {tabsData, preReleaseData, modifyProcessStatus, lockedItem, modifyLockedItem} =
     useModel('releaseProcess');
   const [saveButtonDisable, setSaveButtonDisable] = useState(false); // 保存按钮是否可用
   const [formForPreReleaseProject] = Form.useForm(); // 预发布
@@ -111,8 +111,8 @@ const PreReleaseProject: React.FC<any> = () => {
         <fieldset className={'fieldStyle'}>
           <legend className={'legendStyle'}>Step1 预发布项目</legend>
 
-          <div style={{ marginBottom: -20, marginTop: -5 }}>
-            <div style={{ float: 'right' }}>
+          <div style={{marginBottom: -20, marginTop: -5}}>
+            <div style={{float: 'right'}}>
               <Button
                 type="primary"
                 disabled={saveButtonDisable}
@@ -142,32 +142,32 @@ const PreReleaseProject: React.FC<any> = () => {
 
                   <Col span={5}>
                     {/* 发布类型 */}
-                    <Form.Item label="发布类型:" name="pulishType" style={{ marginLeft: 5 }}>
+                    <Form.Item label="发布类型:" name="pulishType" style={{marginLeft: 5}}>
                       <Select onFocus={releaseItemFocus}>{releaseTypeArray}</Select>
                     </Form.Item>
                   </Col>
 
                   <Col span={5}>
                     {/* 发布方式 */}
-                    <Form.Item label="发布方式:" name="pulishMethod" style={{ marginLeft: 5 }}>
+                    <Form.Item label="发布方式:" name="pulishMethod" style={{marginLeft: 5}}>
                       <Select onFocus={releaseItemFocus}>{releaseWayArray}</Select>
                     </Form.Item>
                   </Col>
 
                   <Col span={6}>
                     {/* 发布时间 */}
-                    <Form.Item label="发布时间:" name="pulishTime" style={{ marginLeft: 5 }}>
+                    <Form.Item label="发布时间:" name="pulishTime" style={{marginLeft: 5}}>
                       <DatePicker
                         showTime
                         format="YYYY-MM-DD HH:mm"
-                        style={{ width: '100%' }}
+                        style={{width: '100%'}}
                         onFocus={releaseItemFocus}
                       />
                     </Form.Item>
                   </Col>
                 </Row>
 
-                <Row style={{ marginTop: -20 }}>
+                <Row style={{marginTop: -20}}>
                   <Col span={3}>
                     {/* 编辑人信息 */}
                     {/* 编辑人 */}
@@ -185,7 +185,7 @@ const PreReleaseProject: React.FC<any> = () => {
                   </Col>
                   <Col span={6}>
                     {/* 编辑时间 */}
-                    <Form.Item label="编辑时间:" name="editTime" style={{ marginLeft: 5 }}>
+                    <Form.Item label="编辑时间:" name="editTime" style={{marginLeft: 5}}>
                       <Input
                         style={{
                           border: 'none',
@@ -200,7 +200,7 @@ const PreReleaseProject: React.FC<any> = () => {
                   <Col span={1}>
                     {/* 隐藏的pro_id，对数据的操作需要 */}
                     <Form.Item name="proid">
-                      <Input style={{ display: 'none' }} />
+                      <Input style={{display: 'none'}}/>
                     </Form.Item>
                   </Col>
                 </Row>

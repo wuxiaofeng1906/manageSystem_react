@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import {useCallback, useState} from 'react';
 
 export default () => {
   /* region 其他全局变量 */
@@ -8,14 +8,15 @@ export default () => {
   const modifyLockedItem = useCallback((lockedString: string) => {
     setLockedItem(lockedString);
   }, []);
+
   /* endregion */
 
   /* region tab 数据 */
-  const [tabsData, setTabData] = useState({ activeKey: '', panes: [] });
+  const [tabsData, setTabData] = useState({activeKey: '', panes: []});
 
   // 设置Tab的数据
   const setTabsData = useCallback((activeKey: string, panes: any) => {
-    setTabData({ activeKey, panes });
+    setTabData({activeKey, panes});
   }, []);
 
   /* endregion */
@@ -53,14 +54,34 @@ export default () => {
     setPreReleaseData(data);
   }, []);
   /* endregion */
+
+  /* region 发布项数据 */
+  const [releaseItem, setRelesaeItem] = useState({gridHight: "100px", gridData: []});
+  const modifyRelesaeItem = useCallback((height: string, data: any) => {
+    setRelesaeItem({gridHight: height, gridData: data});
+  }, []);
+  /* endregion  */
+
+  /* region 发布接口数据 */
+  const [upgradeApi, setUpgradeApi] = useState({gridHight: "100px", gridData: []});
+  const modifyUpgradeApi = useCallback((height: string, data: any) => {
+    setUpgradeApi({gridHight: height, gridData: data});
+  }, []);
+  /* endregion  */
+
+  /* region 升级服务确认 */
+  const [upgradeConfirm, setUpgradeConfirm] = useState({gridHight: "100px", gridData: []});
+  const modifyUpgradeConfirm = useCallback((height: string, data: any) => {
+    setUpgradeConfirm({gridHight: height, gridData: data});
+  }, []);
+  /* endregion  */
   return {
-    lockedItem,
-    modifyLockedItem, //被锁的id
-    tabsData,
-    setTabsData, // tabs
-    processStatus,
-    modifyProcessStatus, // 进度条
-    preReleaseData,
-    modifyPreReleaseData, // 预发布数据
+    lockedItem, modifyLockedItem, //被锁的id
+    tabsData, setTabsData, // tabs
+    processStatus, modifyProcessStatus, // 进度条
+    preReleaseData, modifyPreReleaseData, // 预发布数据
+    releaseItem, modifyRelesaeItem,// 发布项
+    upgradeApi, modifyUpgradeApi, // 发布接口
+    upgradeConfirm, modifyUpgradeConfirm // 升级服务确认
   };
 };

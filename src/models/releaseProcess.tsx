@@ -3,6 +3,11 @@ import { useCallback, useState } from 'react';
 export default () => {
   /* region 其他全局变量 */
 
+  // 全局的被锁id
+  const [lockedItem, setLockedItem] = useState('');
+  const modifyLockedItem = useCallback((lockedString: string) => {
+    setLockedItem(lockedString);
+  }, []);
   /* endregion */
 
   /* region tab 数据 */
@@ -31,12 +36,31 @@ export default () => {
     setProcessStatus(processData);
   }, []);
   /* endregion  */
+
+  /* region 预发布项目数据 */
+  const [preReleaseData, setPreReleaseData] = useState({
+    projectId: '',
+    release_type: '',
+    release_way: '',
+    plan_release_time: '',
+    edit_user_name: '',
+    edit_time: '',
+    pro_id: '',
+  });
+
+  // 设置Tab的数据
+  const modifyPreReleaseData = useCallback((data: any) => {
+    setPreReleaseData(data);
+  }, []);
+  /* endregion */
   return {
-    // tabs
+    lockedItem,
+    modifyLockedItem, //被锁的id
     tabsData,
-    setTabsData,
-    // 进度条
+    setTabsData, // tabs
     processStatus,
-    modifyProcessStatus,
+    modifyProcessStatus, // 进度条
+    preReleaseData,
+    modifyPreReleaseData, // 预发布数据
   };
 };

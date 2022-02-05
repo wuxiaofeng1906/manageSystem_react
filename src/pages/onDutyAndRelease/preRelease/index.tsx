@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import Tab from './components/Tab';
 import CheckProgress from './components/CheckProgress';
+import PreReleaseProject from './components/PreReleaseProject';
 import { alalysisInitData } from './datas/dataAnalyze';
 import { useRequest } from 'ahooks';
 import { useModel } from '@@/plugin-model/useModel';
@@ -12,7 +13,7 @@ const PreRelease: React.FC<any> = () => {
   const initData: any = useRequest(() => alalysisInitData('', '')).data;
 
   //Tab标签数据显示
-  const { setTabsData, modifyProcessStatus } = useModel('releaseProcess');
+  const { setTabsData, modifyProcessStatus, modifyPreReleaseData } = useModel('releaseProcess');
 
   const showPageInitData = async () => {
     if (initData) {
@@ -25,6 +26,11 @@ const PreRelease: React.FC<any> = () => {
       if (processData) {
         modifyProcessStatus(showProgressData(processData.data));
       }
+      debugger;
+      //
+      const preReleaseProject = initData?.preProject;
+
+      modifyPreReleaseData(preReleaseProject);
     }
   };
 
@@ -36,6 +42,7 @@ const PreRelease: React.FC<any> = () => {
     <PageContainer style={{ backgroundColor: 'white' }}>
       <Tab />
       <CheckProgress />
+      <PreReleaseProject />
     </PageContainer>
   );
 };

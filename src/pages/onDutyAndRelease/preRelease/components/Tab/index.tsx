@@ -174,7 +174,7 @@ const Tab: React.FC<any> = () => {
   return (
     <div>
       {/* Tabs 标签,固定在上面 */}
-      <div>
+      <div style={{ marginTop: -40 }}>
         <Tabs
           type="editable-card"
           activeKey={tabsData === undefined ? '' : tabsData.activeKey}

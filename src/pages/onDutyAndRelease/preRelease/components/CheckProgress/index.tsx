@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { message, Progress, Row, Select } from 'antd';
 import { useModel } from '@@/plugin-model/useModel';
 import { saveProcessResult } from './axiosRequest';
@@ -8,8 +8,7 @@ const { Option } = Select;
 const CheckProgress: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const { tabsData, processStatus } = useModel('releaseProcess');
-
-  // 发布结果修改
+   // 发布结果修改
   const pulishResulttChanged = async (params: any) => {
     // 需要验证前面的检查是否全部成功。
 
@@ -53,7 +52,9 @@ const CheckProgress: React.FC<any> = () => {
       });
     }
   };
-
+  // useEffect(()=>{
+  //   console.log("2222", tabsData);
+  // },[tabsData])
   return (
     <div>
       {/* 检查进度 */}

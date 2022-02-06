@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {Button, Col, Form, message, Row, Select} from 'antd';
+import {Button, Col, Form, Input, message, Modal, Row, Select} from 'antd';
 import {useModel} from '@@/plugin-model/useModel';
 import {AgGridReact} from "ag-grid-react";
 import 'ag-grid-enterprise';
@@ -16,13 +16,29 @@ import {confirmUpgradeService} from "./serviceConfirm";
 import {alalysisInitData} from "../../datas/dataAnalyze";
 import {getCheckProcess} from '../../components/CheckProgress/axiosRequest';
 import {showProgressData} from '../../components/CheckProgress/processAnalysis';
+import {vertifyModifyFlag} from '../../operate';
+import {inquireService} from './axiosRequest';
+import {deleteLockStatus, getLockStatus} from "../../lock/rowLock";
+import {
+  loadApiMethodSelect,
+  loadApiServiceSelect,
+  loadIsApiAndDbUpgradeSelect,
+  loadOnlineEnvSelect,
+  loadPulishItemSelect, loadUpgradeApiSelect
+} from "../../comControl/controler";
+import {upgradePulishItem, addPulishApi} from "./axiosRequest";
+import {getGridHeight} from "@/pages/onDutyAndRelease/preRelease/components/gridHeight";
 
+const {TextArea} = Input;
 const {Option} = Select;
 const userLogins: any = localStorage.getItem('userLogins');
 const usersInfo = JSON.parse(userLogins);
 
 const UpgradeService: React.FC<any> = () => {
-  const {tabsData, modifyProcessStatus, releaseItem, upgradeApi, upgradeConfirm} = useModel('releaseProcess');
+  const {
+    tabsData, modifyProcessStatus, releaseItem, upgradeApi, upgradeConfirm, lockedItem, modifyLockedItem,
+    setRelesaeItem, setUpgradeApi
+  } = useModel('releaseProcess');
   const [formUpgradeService] = Form.useForm(); // 升级服务
   const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
 
@@ -67,6 +83,7 @@ const UpgradeService: React.FC<any> = () => {
 
   /* endregion   */
 
+  /* region 一键部署ID相关事件 */
   // ID changed
   const onReleaseIdChanges = async (selectedId: any, params: any) => {
     // const allaResult = alaReleasedChanged(releaseIdArray, params, selectedId);
@@ -91,68 +108,352 @@ const UpgradeService: React.FC<any> = () => {
 
   // 一键部署ID查询
   const inquireServiceClick = async () => {
-    // if (!(await vertifyModifyFlag(6, currentListNo))) {
-    //   message.error({
-    //     content: `服务确认已完成，不能进行查询！`,
-    //     duration: 1,
-    //     style: {
-    //       marginTop: '50vh',
-    //     },
-    //   });
-    //
-    //   return;
-    // }
-    //
-    // const queryCondition = formUpgradeService.getFieldsValue().deployID;
-    // if (!queryCondition || queryCondition.length === 0) {
-    //   message.error({
-    //     content: '一键部署ID不能为空！',
-    //     duration: 1,
-    //     style: {
-    //       marginTop: '50vh',
-    //     },
-    //   });
-    //   return;
-    // }
-    // const result = await inquireService(releaseIdArray, currentListNo);
-    // if (result.message !== '') {
-    //   message.error({
-    //     content: result.message,
-    //     duration: 1,
-    //     style: {
-    //       marginTop: '50vh',
-    //     },
-    //   });
-    // } else {
-    //   // 有数据之后进行表格的赋值操作(需要把之前表格的数据一并追加进来)   获取之前的数据
-    //   const newData: any = (await alalysisInitData('pulishItem', currentListNo))
-    //     .upService_releaseItem;
-    //
-    //
-    //   firstUpSerGridApi.current?.setRowData(newData);
-    //   // 需要判断升级接口内容是否有值，如果没有的话，则需要新增一个空行
-    //   const apidata: any = await alalysisInitData('pulishApi', currentListNo);
-    //   if (!apidata.upService_interface || apidata.upService_interface <= 0) {
-    //     secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
-    //   }
-    //
-    //   if (newData) {
-    //     setGridHeight({
-    //       ...gridHeight,
-    //       pulishItemGrid: getGridHeight(newData.length),
-    //       upgradeApiGrid: getGridHeight(1),
-    //     });
-    //   }
-    // }
+    if (!(await vertifyModifyFlag(6, tabsData.activeKey))) {
+      message.error({
+        content: `服务确认已完成，不能进行查询！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
+
+    const queryCondition = formUpgradeService.getFieldsValue().deployID;
+    if (!queryCondition || queryCondition.length === 0) {
+      message.error({
+        content: '一键部署ID不能为空！',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+
+    // releaseIdArray 需要注意
+    const result = await inquireService("releaseIdArray", tabsData.activeKey);
+    if (result.message !== '') {
+      message.error({
+        content: result.message,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    } else {
+      // 有数据之后进行表格的赋值操作(需要把之前表格的数据一并追加进来)   获取之前的数据
+      const newData: any = (await alalysisInitData('pulishItem', tabsData.activeKey))
+        .upService_releaseItem;
+      firstUpSerGridApi.current?.setRowData(newData);
+      // 需要判断升级接口内容是否有值，如果没有的话，则需要新增一个空行
+      const apidata: any = await alalysisInitData('pulishApi', tabsData.activeKey);
+      if (!apidata.upService_interface || apidata.upService_interface <= 0) {
+        secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
+      }
+
+      // if (newData) {
+      //   setGridHeight({
+      //     ...gridHeight,
+      //     pulishItemGrid: getGridHeight(newData.length),
+      //     upgradeApiGrid: getGridHeight(1),
+      //   });
+      // }
+    }
+  };
+  /* endregion */
+
+  /* region 行的新增和修改 */
+
+  /* region 发布项新增和修改 */
+  const [pulishItemForm] = Form.useForm(); // 发布项
+  const [pulishItemModal, setPulishItemModal] = useState({shown: false, title: '新增'}); // 发布项 新增和修改的共同modal显示
+  const [pulishItemFormSelected, setPulishItemFormSelected] = useState({
+    // 发布项弹出窗口中的select框加载
+    onlineEnv: [],
+    pulishItem: [],
+    isApiDbUpgrade: [],
+  });
+
+  (window as any).showPulishItemForm = async (type: any, params: any) => {
+    // 验证是否已经确认服务，如果已经确认了，就不能新增和修改了
+    const flag = await vertifyModifyFlag(1, tabsData.activeKey);
+    if (!flag) {
+      message.error({
+        content: `服务确认已完成，不能进行修改！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
+    if (type === 'add') {
+      pulishItemForm.resetFields();
+      setPulishItemModal({
+        shown: true,
+        title: '新增',
+      });
+    } else {
+      let onlineEnvArray;
+      if (params.online_environment) {
+        onlineEnvArray = params.online_environment.split(',');
+      }
+
+      const appid = params.app_id;
+      pulishItemForm.setFieldsValue({
+        onlineEnv: onlineEnvArray,
+        pulishItem: params.release_item,
+        application: params.app,
+        hotUpdate: params.hot_update,
+        interAndDbUpgrade: params.is_upgrade_api_database,
+        branchAndEnv: params.branch_environment,
+        description: params.instructions,
+        remark: params.remarks,
+        appId: appid,
+        automationTest: params.automation_check,
+        deploymentId: params.deployment_id,
+      });
+
+      // 如果appid是空的，则表示是新查询出来的数据
+      if (!appid) {
+        setPulishItemModal({
+          shown: true,
+          title: '修改',
+        });
+      } else {
+        modifyLockedItem(`${tabsData.activeKey}-step2-app-${appid}`);
+        const lockInfo = await getLockStatus(`${tabsData.activeKey}-step2-app-${appid}`);
+
+        if (lockInfo.errMessage) {
+          message.error({
+            content: `${lockInfo.errMessage}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+          setPulishItemModal({
+            shown: true,
+            title: '修改',
+          });
+        }
+      }
+    }
+
+    setPulishItemFormSelected({
+      onlineEnv: await loadOnlineEnvSelect(),
+      pulishItem: await loadPulishItemSelect(),
+      isApiDbUpgrade: await loadIsApiAndDbUpgradeSelect(),
+    });
   };
 
+  // 取消发布项弹出窗
+  const pulishItemModalCancle = () => {
+    setPulishItemModal({
+      ...pulishItemModal,
+      shown: false,
+    });
+    const formData = pulishItemForm.getFieldsValue();
+    if (formData.appId) {
+      deleteLockStatus(lockedItem);
+    }
+  }
+
+  // 保存发布项结果
+  const savePulishResult = async () => {
+    const formData = pulishItemForm.getFieldsValue();
+    const result = await upgradePulishItem(formData, tabsData.activeKey);
+    if (result === '') {
+      message.info({
+        content: '修改成功！',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      setPulishItemModal({
+        ...pulishItemModal,
+        shown: false,
+      });
+
+      const newData: any = await alalysisInitData('pulishItem', tabsData.activeKey);
+      // firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
+      setRelesaeItem({
+        gridHight: getGridHeight((newData.upService_releaseItem).length).toString(),
+        gridData: newData.upService_releaseItem
+      });
+
+
+      // 也要刷新一键部署ID
+      // setReleasedIdForm(newData?.upService_releaseItem);
+      //   发布项结果保存成功之后，需要刷新发布项中的服务确认完成
+      const newData_confirm: any = await alalysisInitData('pulishConfirm', tabsData.activeKey);
+      thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认设置一行空值
+
+      // setGridHeight({
+      //   ...gridHeight,
+      //   pulishItemGrid: getGridHeight(newData.upService_releaseItem.length),
+      //   upConfirm: getGridHeight(newData_confirm.upService_confirm.length),
+      // });
+
+      // 保存后需要解解锁
+      if (formData.appId) {
+        deleteLockStatus(lockedItem);
+      }
+    } else {
+      message.error({
+        content: `${result}`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+  };
+  /* endregion */
+
+  /* region 发布接口新增和修改 */
+  const [upgradeIntForm] = Form.useForm(); // 发布接口
+  const [upgradeIntModal, setUpgradeIntModal] = useState({shown: false, title: '新增'}); // 发布项新增和修改的共同modal显示
+  const [upgradeApiFormSelected, setUpgradeApiFormSelected] = useState({
+    // 发布接口弹出窗口中的select框加载
+    onlineEnv: [],
+    upgradeApi: [],
+    apiService: [],
+    apiMethod: [],
+  });
+
+  // 发布接口弹出窗口进行修改和新增
+  (window as any).showUpgradeApiForm = async (type: any, params: any) => {
+    const flag = await vertifyModifyFlag(2, tabsData.activeKey);
+    if (!flag) {
+      message.error({
+        content: `服务确认已完成，不能进行修改！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
+    if (type === 'add') {
+      upgradeIntForm.resetFields();
+      setUpgradeIntModal({
+        shown: true,
+        title: '新增',
+      });
+    } else {
+      const apiid = params.api_id;
+      upgradeIntForm.setFieldsValue({
+        onlineEnv:
+          params.online_environment === undefined
+            ? undefined
+            : params.online_environment.split(','),
+        upInterface: params.update_api,
+        interService: params.api_name,
+        hotUpdate: params.hot_update,
+        method: params.api_method,
+        URL: params.api_url,
+        renter: params.related_tenant,
+        remark: params.remarks,
+        apiId: apiid,
+      });
+      modifyLockedItem(`${tabsData.activeKey}-step2-api-${apiid}`);
+      const lockInfo = await getLockStatus(`${tabsData.activeKey}-step2-api-${apiid}`);
+
+      if (lockInfo.errMessage) {
+        message.error({
+          content: `${lockInfo.errMessage}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      } else {
+        setUpgradeIntModal({
+          shown: true,
+          title: '修改',
+        });
+      }
+    }
+
+    setUpgradeApiFormSelected({
+      onlineEnv: await loadOnlineEnvSelect(),
+      upgradeApi: await loadUpgradeApiSelect(),
+      apiService: await loadApiServiceSelect(),
+      apiMethod: await loadApiMethodSelect(),
+    });
+  };
+  // 取消事件
+  const upgradeIntModalCancle = () => {
+    setUpgradeIntModal({
+      ...upgradeIntModal,
+      shown: false,
+    });
+
+    if (upgradeIntModal.title === '修改') {
+      //   释放锁
+      deleteLockStatus(lockedItem);
+    }
+  };
+
+  // 保存数据
+  const saveUpgradeInterResult = async () => {
+    const formData = upgradeIntForm.getFieldsValue();
+    const result = await addPulishApi(formData, tabsData.activeKey, upgradeIntModal.title);
+    if (result === '') {
+      message.info({
+        content: '保存成功！',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      setUpgradeIntModal({
+        ...upgradeIntModal,
+        shown: false,
+      });
+
+      const newData: any = await alalysisInitData('pulishApi', tabsData.activeKey);
+      setUpgradeApi({
+        gridHight: getGridHeight((newData.upService_interface).length).toString(),
+        gridData: newData.upService_interface
+      });
+
+
+      if (upgradeIntModal.title === '修改') {
+        //   释放锁
+        deleteLockStatus(lockedItem);
+      }
+    } else {
+      message.error({
+        content: `${result}`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+  };
+
+  /* endregion */
+
+  /* region 服务确认 */
   // 下拉框选择是否确认事件
   const saveUperConfirmInfo = async (newValue: string, props: any) => {
+
     const datas = {
       user_name: usersInfo.name,
       user_id: usersInfo.userid,
       person_type: '',
-      ready_release_num: tabsData.activeKey,
+      ready_release_num: props.data?.ready_release_num,
       confirm_status: '',
     };
 
@@ -204,6 +505,9 @@ const UpgradeService: React.FC<any> = () => {
       });
     }
   };
+  /* endregion */
+
+  /* endregion */
 
   return (
     <div>
@@ -389,6 +693,244 @@ const UpgradeService: React.FC<any> = () => {
           </div>
         </fieldset>
       </div>
+      {/* 发布项 */}
+      <Modal
+        title={pulishItemModal.title}
+        visible={pulishItemModal.shown}
+        onCancel={pulishItemModalCancle}
+        centered={true}
+        footer={null}
+        width={630}
+      >
+        <Form form={pulishItemForm}>
+          <Row>
+            <Col span={12}>
+              <Form.Item name="onlineEnv" label="上线环境:" required style={{marginTop: -15}}>
+                <Select showSearch mode="multiple">
+                  {pulishItemFormSelected.onlineEnv}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="pulishItem"
+                label="发布项："
+                required
+                style={{marginTop: -15, marginLeft: 10}}
+              >
+                <Select showSearch style={{marginLeft: 27, width: 183}}>
+                  {pulishItemFormSelected.pulishItem}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={12}>
+              <Form.Item name="application" label="应用：" required style={{marginTop: -15}}>
+                <Input
+                  autoComplete="off"
+                  style={{marginLeft: 28, width: 206, color: 'black'}}
+                  disabled
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="branchAndEnv"
+                label="分支和环境："
+                required
+                style={{marginTop: -15, marginLeft: 10}}
+              >
+                <Input autoComplete="off" disabled style={{color: 'black'}}/>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item
+            name="interAndDbUpgrade"
+            label="是否涉及接口与数据库升级："
+            required
+            style={{marginTop: -15}}
+          >
+            <Select>{pulishItemFormSelected.isApiDbUpgrade}</Select>
+          </Form.Item>
+
+          <Form.Item name="hotUpdate" label="是否支持热更新：" required style={{marginTop: -15}}>
+            <Select>
+              <Option key={'1'} value={'1'}>
+                {'是'}
+              </Option>
+              <Option key={'2'} value={'2'}>
+                {'否'}
+              </Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item name="description" label="说明：" style={{marginTop: -15}}>
+            <TextArea/>
+          </Form.Item>
+          <Form.Item name="remark" label="备注：" style={{marginTop: -15}}>
+            <TextArea/>
+          </Form.Item>
+          <Form.Item>
+            <Button
+              style={{borderRadius: 5, marginLeft: 20, float: 'right'}}
+              onClick={pulishItemModalCancle}
+            >
+              取消
+            </Button>
+            <Button
+              type="primary"
+              style={{
+                color: '#46A0FC',
+                backgroundColor: '#ECF5FF',
+                borderRadius: 5,
+                float: 'right',
+              }}
+              onClick={savePulishResult}
+            >
+              确定{' '}
+            </Button>
+          </Form.Item>
+
+          {/* 隐藏字段，进行修改需要的字段 */}
+          <Row style={{marginTop: -60}}>
+            <Col span={2}>
+              <Form.Item name="appId">
+                <Input style={{width: 50, display: 'none'}}/>
+              </Form.Item>
+            </Col>
+            <Col span={2}>
+              <Form.Item name="automationTest">
+                <Input style={{width: 50, display: 'none'}}/>
+              </Form.Item>
+            </Col>
+            <Col span={2}>
+              <Form.Item name="deploymentId">
+                <Input style={{width: 50, display: 'none'}}/>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Modal>
+
+      {/* 接口服务 */}
+      <Modal
+        title={upgradeIntModal.title}
+        visible={upgradeIntModal.shown}
+        onCancel={upgradeIntModalCancle}
+        centered={true}
+        footer={null}
+        width={630}
+      >
+        <Form form={upgradeIntForm}>
+          <Row>
+            <Col span={12}>
+              <Form.Item name="onlineEnv" label="上线环境:" required style={{marginTop: -15}}>
+                <Select showSearch mode="multiple" style={{marginLeft: 20, width: 185}}>
+                  {upgradeApiFormSelected.onlineEnv}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="upInterface"
+                label="升级接口："
+                required
+                style={{marginLeft: 10, marginTop: -15}}
+              >
+                <Select showSearch style={{}}>
+                  {upgradeApiFormSelected.upgradeApi}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col span={12}>
+              <Form.Item name="interService" label="接口服务：" required style={{marginTop: -15}}>
+                <Select showSearch style={{marginLeft: 21, width: 185}}>
+                  {upgradeApiFormSelected.apiService}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="renter"
+                label="涉及租户："
+                required
+                style={{marginLeft: 10, marginTop: -15}}
+              >
+                <Input/>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col span={12}>
+              <Form.Item name="method" label="接口Method：" required style={{marginTop: -15}}>
+                <Select showSearch style={{}}>
+                  {upgradeApiFormSelected.apiMethod}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="URL"
+                label="接口URL："
+                required
+                style={{marginLeft: 10, marginTop: -15}}
+              >
+                <Input/>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item name="hotUpdate" label="是否支持热更新：" required style={{marginTop: -15}}>
+            <Select>
+              <Option key={'1'} value={'1'}>
+                {'是'}
+              </Option>
+              <Option key={'2'} value={'2'}>
+                {'否'}
+              </Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item name="remark" label="备注：" style={{marginTop: -15}}>
+            <TextArea/>
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              style={{borderRadius: 5, marginLeft: 20, float: 'right'}}
+              onClick={upgradeIntModalCancle}
+            >
+              取消
+            </Button>
+            <Button
+              type="primary"
+              style={{
+                color: '#46A0FC',
+                backgroundColor: '#ECF5FF',
+                borderRadius: 5,
+                float: 'right',
+              }}
+              onClick={saveUpgradeInterResult}
+            >
+              确定{' '}
+            </Button>
+          </Form.Item>
+          {/* 隐藏字段，进行修改需要的字段 */}
+          <Row style={{marginTop: -60}}>
+            <Col span={2}>
+              <Form.Item name="apiId">
+                <Input style={{width: 50, display: 'none'}}/>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Modal>
     </div>
   );
 };

@@ -4,7 +4,7 @@ import {
 // 渲染表格行的颜色(正在修改的行)
 const releaseAppChangRowColor = (allLockedArray: any, type: string, idFlag: number) => {
   const lockInfoArray = allLockedArray;
-  let returnValue = { 'background-color': 'transparent' };
+  let returnValue = {'background-color': 'transparent'};
   if (!idFlag) {
     return returnValue;
   }
@@ -15,7 +15,7 @@ const releaseAppChangRowColor = (allLockedArray: any, type: string, idFlag: numb
         // 判断是不是属于当前渲染表格的数据
         if (idFlag.toString() === paramsArray[3]) {
           // 判断有没有对应id
-          returnValue = { 'background-color': '#FFF6F6' };
+          returnValue = {'background-color': '#FFF6F6'};
           break;
         }
       }
@@ -25,37 +25,7 @@ const releaseAppChangRowColor = (allLockedArray: any, type: string, idFlag: numb
 };
 
 // 操作按钮
-const operateRenderer = (type: number, params: any) => {
-  const typeStr = JSON.stringify(type);
-  const paramData = JSON.stringify(params.data).replace(/'/g, '’');
-  if (type === 1) {
-    // 发布项没有新增功能
-    return `
-        <div style="margin-top: -5px">
-             <Button  style="border: none; background-color: transparent;  margin-left: -10px; "  onclick='modifyRows(${typeStr},${paramData})'>
-              <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
-            </Button>
-            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteRows(${typeStr},${paramData})'>
-              <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
-            </Button>
-        </div>
-           `;
-  }
 
-  return `
-        <div style="margin-top: -5px">
-            <Button  style="border: none; background-color: transparent; " onclick='addRows(${typeStr},${paramData})'>
-              <img src="../add_1.png" width="15" height="15" alt="新增" title="新增">
-            </Button>
-             <Button  style="border: none; background-color: transparent;  margin-left: -10px; " onclick='modifyRows(${typeStr},${paramData})'>
-              <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
-            </Button>
-            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteRows(${typeStr},${paramData})'>
-              <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
-            </Button>
-        </div>
-           `;
-};
 
 // 发布项表格定义
 const getReleasedItemColumns = () => {
@@ -125,7 +95,19 @@ const getReleasedItemColumns = () => {
       minWidth: 115,
       maxWidth: 115,
       cellRenderer: (params: any) => {
-        return operateRenderer(1, params);
+        const paramData = JSON.stringify(params.data).replace(/'/g, '’');
+        // 发布项没有新增功能
+        return `
+        <div style="margin-top: -5px">
+             <Button  style="border: none; background-color: transparent;  margin-left: -10px; "  onclick='showPulishItemForm("modify",${paramData})'>
+              <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
+            </Button>
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteRows(${1},${paramData})'>
+              <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
+            </Button>
+        </div>
+           `;
+
       },
     },
   ];
@@ -194,7 +176,20 @@ const getReleasedApiColumns = () => {
       minWidth: 100,
       maxWidth: 100,
       cellRenderer: (params: any) => {
-        return operateRenderer(2, params);
+        const paramData = JSON.stringify(params.data).replace(/'/g, '’');
+        return `
+        <div style="margin-top: -5px">
+            <Button  style="border: none; background-color: transparent; " onclick='showUpgradeApiForm("add",${paramData})'>
+              <img src="../add_1.png" width="15" height="15" alt="新增" title="新增">
+            </Button>
+             <Button  style="border: none; background-color: transparent;  margin-left: -10px; " onclick='showUpgradeApiForm("modify",${paramData})'>
+              <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
+            </Button>
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteRows("",${paramData})'>
+              <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
+            </Button>
+        </div>
+           `;
       },
     },
   ];
@@ -313,4 +308,4 @@ const getReleaseServiceComfirmColumns = () => {
 };
 
 
-export {getReleasedItemColumns, getReleasedApiColumns, getReleaseServiceComfirmColumns,releaseAppChangRowColor}
+export {getReleasedItemColumns, getReleasedApiColumns, getReleaseServiceComfirmColumns, releaseAppChangRowColor}

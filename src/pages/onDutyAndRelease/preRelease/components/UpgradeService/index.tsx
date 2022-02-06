@@ -448,12 +448,13 @@ const UpgradeService: React.FC<any> = () => {
   /* region 服务确认 */
   // 下拉框选择是否确认事件
   const saveUperConfirmInfo = async (newValue: string, props: any) => {
+    const currentReleaseNum = props.data?.ready_release_num;
 
     const datas = {
       user_name: usersInfo.name,
       user_id: usersInfo.userid,
       person_type: '',
-      ready_release_num: props.data?.ready_release_num,
+      ready_release_num: currentReleaseNum,
       confirm_status: '',
     };
 
@@ -484,13 +485,12 @@ const UpgradeService: React.FC<any> = () => {
           marginTop: '50vh',
         },
       });
-
       //   刷新表格
-      const newData_confirm: any = await alalysisInitData('pulishConfirm', tabsData.activeKey);
-      thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认设置一行空值
+      const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
+      thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
 
-      // 保存成功后需要刷新状态
-      const processData: any = await getCheckProcess(tabsData?.activeKey);
+      // 刷新状态进度条
+      const processData: any = await getCheckProcess(currentReleaseNum);
       if (processData) {
         modifyProcessStatus(showProgressData(processData.data));
       }

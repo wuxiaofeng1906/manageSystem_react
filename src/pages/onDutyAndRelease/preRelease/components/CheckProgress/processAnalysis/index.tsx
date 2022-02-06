@@ -31,6 +31,7 @@ const showProgressData = (datas: any) => {
   results.releaseResult = datas.release_result;
   results.processPercent = (successCount / 4) * 100;
 
+  debugger;
   return results;
 };
 

@@ -11,6 +11,7 @@ import {getCheckProcess} from './components/CheckProgress/axiosRequest';
 import {showProgressData} from './components/CheckProgress/processAnalysis';
 import {deleteLockStatus} from "@/pages/onDutyAndRelease/preRelease_bck/supplementFile/lock/rowLock";
 import {getGridHeight} from './components/gridHeight';
+import {showReleasedId} from "./components/UpgradeService/idDeal/dataDeal";
 
 const PreRelease: React.FC<any> = () => {
   const initData: any = useRequest(() => alalysisInitData('', '')).data;
@@ -18,8 +19,9 @@ const PreRelease: React.FC<any> = () => {
   //Tab标签数据显示
   const {
     setTabsData, modifyProcessStatus, modifyPreReleaseData, lockedItem,
-    setRelesaeItem, setUpgradeApi, setUpgradeConfirm
+    setRelesaeItem, setUpgradeApi, setUpgradeConfirm, modifyReleasedID
   } = useModel('releaseProcess');
+
 
   const showPageInitData = async () => {
     if (initData) {
@@ -35,9 +37,14 @@ const PreRelease: React.FC<any> = () => {
       // 预发布项目
       const preReleaseProject = initData?.preProject;
       modifyPreReleaseData(preReleaseProject);
+
+
       //  发布项
       const releaseItem = initData?.upService_releaseItem;
       setRelesaeItem({gridHight: getGridHeight(releaseItem.length).toString(), gridData: releaseItem});
+      // 一键部署ID展示
+      const ids = await showReleasedId(releaseItem);
+      modifyReleasedID(ids.showIdArray, ids.queryIdArray);
       //  发布接口
       const releaseApi = initData?.upService_interface;
       setUpgradeApi({gridHight: getGridHeight(releaseApi.length).toString(), gridData: releaseApi});

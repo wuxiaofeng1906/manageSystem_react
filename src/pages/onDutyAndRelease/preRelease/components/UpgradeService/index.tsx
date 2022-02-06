@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Button, Col, Form, Input, message, Modal, Row, Select} from 'antd';
 import {useModel} from '@@/plugin-model/useModel';
 import {AgGridReact} from "ag-grid-react";
@@ -9,7 +9,7 @@ import '../../style/style.css';
 import {useRequest} from "ahooks";
 import {loadReleaseIDSelect} from "../../comControl/controler";
 import {
-  getReleasedItemColumns, getReleasedApiColumns, getReleaseServiceComfirmColumns, releaseAppChangRowColor
+  getReleasedItemColumns, getReleasedApiColumns, getReleaseServiceComfirmColumns
 } from './grid/columns'
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {confirmUpgradeService} from "./serviceConfirm";
@@ -20,14 +20,12 @@ import {vertifyModifyFlag} from '../../operate';
 import {inquireService} from './axiosRequest';
 import {deleteLockStatus, getLockStatus} from "../../lock/rowLock";
 import {
-  loadApiMethodSelect,
-  loadApiServiceSelect,
-  loadIsApiAndDbUpgradeSelect,
-  loadOnlineEnvSelect,
+  loadApiMethodSelect, loadApiServiceSelect, loadIsApiAndDbUpgradeSelect, loadOnlineEnvSelect,
   loadPulishItemSelect, loadUpgradeApiSelect
 } from "../../comControl/controler";
-import {upgradePulishItem, addPulishApi} from "./axiosRequest";
-import {getGridHeight} from "@/pages/onDutyAndRelease/preRelease/components/gridHeight";
+import {upgradePulishItem, addPulishApi, deleteReleasedID} from "./axiosRequest";
+import {getGridHeight} from "../../components/gridHeight";
+import {alaReleasedChanged, showReleasedId} from "./idDeal/dataDeal";
 
 const {TextArea} = Input;
 const {Option} = Select;
@@ -37,7 +35,7 @@ const usersInfo = JSON.parse(userLogins);
 const UpgradeService: React.FC<any> = () => {
   const {
     tabsData, modifyProcessStatus, releaseItem, upgradeApi, upgradeConfirm, lockedItem, modifyLockedItem,
-    setRelesaeItem, setUpgradeApi
+    setRelesaeItem, setUpgradeApi, releasedID, modifyReleasedID
   } = useModel('releaseProcess');
   const [formUpgradeService] = Form.useForm(); // 升级服务
   const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
@@ -86,24 +84,32 @@ const UpgradeService: React.FC<any> = () => {
   /* region 一键部署ID相关事件 */
   // ID changed
   const onReleaseIdChanges = async (selectedId: any, params: any) => {
-    // const allaResult = alaReleasedChanged(releaseIdArray, params, selectedId);
-    // releaseIdArray.queryId = allaResult.queryArray;
-    // if (allaResult.deletedData) {
-    //   // 如果有需要被删除的数据就删除，并且更新列表
-    //   const result = await deleteReleasedID(currentListNo, allaResult.deletedData);
-    //   if (result !== '') {
-    //     message.error({
-    //       content: result,
-    //       duration: 1,
-    //       style: {
-    //         marginTop: '50vh',
-    //       },
-    //     });
-    //   } else {
-    //     const newData: any = await alalysisInitData('pulishItem', currentListNo);
-    //     firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
-    //   }
-    // }
+
+    const allaResult = alaReleasedChanged(releasedID, params, selectedId);
+    // modifyReleasedID(releasedID.oraID, allaResult.queryArray);
+    modifyReleasedID(selectedId, allaResult.queryArray);
+
+    if (allaResult.deletedData) {
+      // 如果有需要被删除的数据就删除，并且更新列表
+      const result = await deleteReleasedID(tabsData.activeKey, allaResult.deletedData);
+      if (result !== '') {
+        message.error({
+          content: result,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      } else {
+        const newData: any = await alalysisInitData('pulishItem', tabsData.activeKey);
+        // firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
+        setRelesaeItem({
+          gridHight: getGridHeight((newData.upService_releaseItem).length).toString(),
+          gridData: newData.upService_releaseItem
+        });
+
+      }
+    }
   };
 
   // 一键部署ID查询
@@ -133,7 +139,7 @@ const UpgradeService: React.FC<any> = () => {
     }
 
     // releaseIdArray 需要注意
-    const result = await inquireService("releaseIdArray", tabsData.activeKey);
+    const result = await inquireService(releasedID, tabsData.activeKey);
     if (result.message !== '') {
       message.error({
         content: result.message,
@@ -143,23 +149,20 @@ const UpgradeService: React.FC<any> = () => {
         },
       });
     } else {
-      // 有数据之后进行表格的赋值操作(需要把之前表格的数据一并追加进来)   获取之前的数据
-      const newData: any = (await alalysisInitData('pulishItem', tabsData.activeKey))
-        .upService_releaseItem;
-      firstUpSerGridApi.current?.setRowData(newData);
+
+      const newData: any = (await alalysisInitData('pulishItem', tabsData.activeKey)).upService_releaseItem;
+      // firstUpSerGridApi.current?.setRowData(newData);
+      setRelesaeItem({gridHight: getGridHeight(newData.length).toString(), gridData: newData});
+
+
       // 需要判断升级接口内容是否有值，如果没有的话，则需要新增一个空行
       const apidata: any = await alalysisInitData('pulishApi', tabsData.activeKey);
       if (!apidata.upService_interface || apidata.upService_interface <= 0) {
-        secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
+        // secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
+        setUpgradeApi({gridHight: getGridHeight(1).toString(), gridData: [{}]});
       }
 
-      // if (newData) {
-      //   setGridHeight({
-      //     ...gridHeight,
-      //     pulishItemGrid: getGridHeight(newData.length),
-      //     upgradeApiGrid: getGridHeight(1),
-      //   });
-      // }
+
     }
   };
   /* endregion */
@@ -509,6 +512,12 @@ const UpgradeService: React.FC<any> = () => {
 
   /* endregion */
 
+
+  useEffect(() => {
+    formUpgradeService.setFieldsValue({
+      deployID: releasedID.oraID,
+    });
+  }, [releasedID])
   return (
     <div>
       {/* 升级服务 */}

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getDutyPersonPermission, getSystemPersonPermission } from '../../../authority/permission';
+import {getDutyPersonPermission, getSystemPersonPermission} from '../../../authority/permission';
 
 const sys_accessToken = localStorage.getItem('accessId');
 axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
@@ -277,4 +277,71 @@ const addPulishApi = async (formData: any, currentListNo: string, type: string) 
   return systemPermission.errorMessage;
 };
 
-export {  inquireService,upgradePulishItem,addPulishApi };
+// 一键部署Id
+const queryReleaseId = async () => {
+  const result: any = {
+    message: '',
+    data: [],
+  };
+  await axios
+    .get('/api/verify/release/deployment_id', {})
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    })
+    .catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+};
+
+// 删除接口
+const deleteReleasedId = async (ready_release_num: string, deployment_id: string) => {
+  let errorMessage = '';
+
+  const datas = {
+    user_name: usersInfo.name,
+    user_id: usersInfo.userid,
+    deployment_id: deployment_id,
+    ready_release_num: ready_release_num,
+  };
+
+  await axios
+    .delete('/api/verify/release/upgrade_service_deployment', {data: datas})
+    .then(function (res) {
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    })
+    .catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+};
+
+// 删除一键发布ID
+const deleteReleasedID = async (deployment_id: string, ready_release_num: string) => {
+  // 验证权限(值班测试和超级管理员)
+  const authData = {
+    operate: '删除一键部署ID',
+    method: 'delete',
+    path: '/api/verify/release/upgrade_service_deployment',
+  };
+
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+  if (dutyPermission.flag || systemPermission.flag) {
+    return deleteReleasedId(deployment_id, ready_release_num);
+  }
+  if (dutyPermission.errorMessage) {
+    return dutyPermission.errorMessage;
+  }
+  return systemPermission.errorMessage;
+};
+
+export {inquireService, upgradePulishItem, addPulishApi, queryReleaseId, deleteReleasedID};

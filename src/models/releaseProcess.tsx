@@ -9,6 +9,15 @@ export default () => {
     setLockedItem(lockedString);
   }, []);
 
+  // 全局的一键部署ID数据,已发布的一键部署ID，用于保存查询条件，其中包含service等属性
+  const [releasedID, setReleasedID] = useState({
+    oraID: [],
+    queryId: [],
+  });
+  const modifyReleasedID = useCallback((oraID: any, queryId: any) => {
+    setReleasedID({oraID, queryId});
+  }, []);
+
   /* endregion */
 
   /* region tab 数据 */
@@ -68,6 +77,7 @@ export default () => {
 
   return {
     lockedItem, modifyLockedItem, //被锁的id
+    releasedID,modifyReleasedID,
     tabsData, setTabsData, // tabs
     processStatus, modifyProcessStatus, // 进度条
     preReleaseData, modifyPreReleaseData, // 预发布数据

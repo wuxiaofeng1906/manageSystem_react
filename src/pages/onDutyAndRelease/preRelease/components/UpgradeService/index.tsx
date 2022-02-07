@@ -151,12 +151,12 @@ const UpgradeService: React.FC<any> = () => {
     } else {
 
       const newData: any = (await alalysisInitData('pulishItem', tabsData.activeKey)).upService_releaseItem;
-      // firstUpSerGridApi.current?.setRowData(newData);
       setRelesaeItem({gridHight: getGridHeight(newData.length).toString(), gridData: newData});
 
 
       // 需要判断升级接口内容是否有值，如果没有的话，则需要新增一个空行
       const apidata: any = await alalysisInitData('pulishApi', tabsData.activeKey);
+      debugger;
       if (!apidata.upService_interface || apidata.upService_interface <= 0) {
         // secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
         setUpgradeApi({gridHight: getGridHeight(1).toString(), gridData: [{}]});

@@ -19,13 +19,16 @@ import {
 } from "../../comControl/controler";
 import {alalysisInitData} from "../../datas/dataAnalyze";
 import {getGridHeight} from "../gridHeight";
+import {releaseAppChangRowColor} from '../../operate';
 
 let newOnlineBranchNum = '';
 
 const OnlineBranch: React.FC<any> = () => {
   const [formForOnlineBranch] = Form.useForm(); // 上线分支设置
   const firstOnlineBranchGridApi = useRef<GridApi>();
-  const {tabsData, lockedItem, modifyLockedItem, onlineBranch, setOnlineBranch} = useModel('releaseProcess');
+  const {
+    tabsData, lockedItem, modifyLockedItem, onlineBranch, setOnlineBranch, allLockedArray
+  } = useModel('releaseProcess');
   const [executeStatus, setExecuteStatus] = useState(false); // 上线分支点击执行后的进度展示
   const [onlineBranchModal, setOnlineBranchModal] = useState({
     shown: false,
@@ -314,13 +317,13 @@ const OnlineBranch: React.FC<any> = () => {
                       minWidth: 90,
                     }}
                     headerHeight={25}
-                    // getRowStyle={(params: any) => {
-                    //   return releaseAppChangRowColor(
-                    //     allLockedArray,
-                    //     'step4-onlineBranch',
-                    //     params.data?.branch_check_id,
-                    //   );
-                    // }}
+                    getRowStyle={(params: any) => {
+                      return releaseAppChangRowColor(
+                        allLockedArray,
+                        'step4-onlineBranch',
+                        params.data?.branch_check_id,
+                      );
+                    }}
                     onGridReady={onfirstOnlineBranchGridReady}
                     onGridSizeChanged={onChangefirstOnlineBranchGridReady}
                     onColumnEverythingChanged={onChangefirstOnlineBranchGridReady}

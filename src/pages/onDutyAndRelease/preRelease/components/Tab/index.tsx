@@ -7,6 +7,7 @@ import {getCheckProcess} from "@/pages/onDutyAndRelease/preRelease/components/Ch
 import {showProgressData} from "@/pages/onDutyAndRelease/preRelease/components/CheckProgress/processAnalysis";
 import {getGridHeight} from "@/pages/onDutyAndRelease/preRelease/components/gridHeight";
 import {showReleasedId} from "@/pages/onDutyAndRelease/preRelease/components/UpgradeService/idDeal/dataDeal";
+import {getAllLockedData} from "@/pages/onDutyAndRelease/preRelease/lock/rowLock";
 
 const {TabPane} = Tabs;
 
@@ -14,7 +15,8 @@ const Tab: React.FC<any> = () => {
   const {
     tabsData, setTabsData, modifyProcessStatus, modifyPreReleaseData,
     setRelesaeItem, setUpgradeApi, setUpgradeConfirm, modifyReleasedID,
-    setDataReview, setDataReviewConfirm, setOnlineBranch, setCorrespOrder
+    setDataReview, setDataReviewConfirm, setOnlineBranch, setCorrespOrder,
+    modifyAllLockedArray
   } = useModel('releaseProcess');
 
   /* region tab 自身事件 */
@@ -27,6 +29,11 @@ const Tab: React.FC<any> = () => {
       if (processData) {
         modifyProcessStatus(showProgressData(processData.data));
       }
+
+      // 当前界面被锁住的ID
+      const lockedData = await getAllLockedData(tabPageInfo?.activeKey);
+      modifyAllLockedArray(lockedData.data);
+
       // 预发布项目
       const preReleaseProject = initData?.preProject;
       modifyPreReleaseData(preReleaseProject);

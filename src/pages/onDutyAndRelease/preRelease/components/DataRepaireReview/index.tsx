@@ -11,6 +11,7 @@ import {showProgressData} from '../../components/CheckProgress/processAnalysis';
 import {deleteLockStatus, getLockStatus} from "../../lock/rowLock";
 import {loadCategorySelect, loadCommiterSelect} from "../../comControl/controler";
 import {getGridHeight} from "@/pages/onDutyAndRelease/preRelease/components/gridHeight";
+import {releaseAppChangRowColor} from '../../operate';
 
 const {TextArea} = Input;
 const {Option} = Select;
@@ -19,7 +20,7 @@ const usersInfo = JSON.parse(userLogins);
 const DataRepaireReview: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const {
-    tabsData, modifyProcessStatus, dataReview,
+    tabsData, modifyProcessStatus, dataReview,allLockedArray,
     setDataReview, dataReviewConfirm, lockedItem, modifyLockedItem
   } = useModel('releaseProcess');
 
@@ -228,13 +229,13 @@ const DataRepaireReview: React.FC<any> = () => {
                   }}
                   headerHeight={25}
                   rowHeight={25}
-                  // getRowStyle={(params: any) => {
-                  //   return releaseAppChangRowColor(
-                  //     allLockedArray,
-                  //     'step3-review',
-                  //     params.data?.review_id,
-                  //   );
-                  // }}
+                  getRowStyle={(params: any) => {
+                    return releaseAppChangRowColor(
+                      allLockedArray,
+                      'step3-review',
+                      params.data?.review_id,
+                    );
+                  }}
                   onGridReady={onfirstDataReviewGridReady}
                   onGridSizeChanged={onChangefirstDataReviewGridReady}
                   onColumnEverythingChanged={onChangefirstDataReviewGridReady}

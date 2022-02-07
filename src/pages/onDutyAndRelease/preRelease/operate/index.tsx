@@ -29,4 +29,28 @@ const vertifyModifyFlag = async (types: number, currentListNo: string) => {
   return returnFlag;
 };
 
-export {vertifyModifyFlag};
+// 渲染表格行的颜色(正在修改的行)
+const releaseAppChangRowColor = (allLockedArray: any, type: string, idFlag: number) => {
+  const lockInfoArray = allLockedArray;
+  let returnValue = { 'background-color': 'transparent' };
+  if (!idFlag) {
+    return returnValue;
+  }
+  if (lockInfoArray && lockInfoArray.length > 0) {
+    for (let index = 0; index < lockInfoArray.length; index += 1) {
+      const paramsArray = lockInfoArray[index].param.split('-');
+      if (type === `${paramsArray[1]}-${paramsArray[2]}`) {
+        // 判断是不是属于当前渲染表格的数据
+        if (idFlag.toString() === paramsArray[3]) {
+          // 判断有没有对应id
+          returnValue = { 'background-color': '#FFF6F6' };
+          break;
+        }
+      }
+    }
+  }
+  return returnValue;
+};
+
+
+export {vertifyModifyFlag,releaseAppChangRowColor};

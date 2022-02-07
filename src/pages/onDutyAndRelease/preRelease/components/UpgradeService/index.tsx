@@ -16,7 +16,7 @@ import {confirmUpgradeService} from "./serviceConfirm";
 import {alalysisInitData} from "../../datas/dataAnalyze";
 import {getCheckProcess} from '../../components/CheckProgress/axiosRequest';
 import {showProgressData} from '../../components/CheckProgress/processAnalysis';
-import {vertifyModifyFlag} from '../../operate';
+import {vertifyModifyFlag,releaseAppChangRowColor} from '../../operate';
 import {inquireService} from './axiosRequest';
 import {deleteLockStatus, getLockStatus} from "../../lock/rowLock";
 import {
@@ -35,7 +35,7 @@ const usersInfo = JSON.parse(userLogins);
 const UpgradeService: React.FC<any> = () => {
   const {
     tabsData, modifyProcessStatus, releaseItem, upgradeApi, upgradeConfirm, lockedItem, modifyLockedItem,
-    setRelesaeItem, setUpgradeApi, releasedID, modifyReleasedID
+    setRelesaeItem, setUpgradeApi, releasedID, modifyReleasedID,allLockedArray, modifyAllLockedArray
   } = useModel('releaseProcess');
   const [formUpgradeService] = Form.useForm(); // 升级服务
   const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
@@ -576,13 +576,13 @@ const UpgradeService: React.FC<any> = () => {
                     minWidth: 90,
                     cellStyle: {'line-height': '25px'},
                   }}
-                  // getRowStyle={(params: any) => {
-                  //   return releaseAppChangRowColor(
-                  //     allLockedArray,
-                  //     'step2-app',
-                  //     params.data?.app_id,
-                  //   );
-                  // }}
+                  getRowStyle={(params: any) => {
+                    return releaseAppChangRowColor(
+                      allLockedArray,
+                      'step2-app',
+                      params.data?.app_id,
+                    );
+                  }}
                   headerHeight={25}
                   rowHeight={25}
                   onGridReady={onFirstGridReady}
@@ -610,13 +610,13 @@ const UpgradeService: React.FC<any> = () => {
                   }}
                   headerHeight={25}
                   rowHeight={25}
-                  // getRowStyle={(params: any) => {
-                  //   return releaseAppChangRowColor(
-                  //     allLockedArray,
-                  //     'step2-api',
-                  //     params.data?.api_id,
-                  //   );
-                  // }}
+                  getRowStyle={(params: any) => {
+                    return releaseAppChangRowColor(
+                      allLockedArray,
+                      'step2-api',
+                      params.data?.api_id,
+                    );
+                  }}
                   onGridReady={onSecondGridReady}
                   onGridSizeChanged={onChangeSecondGridReady}
                   onColumnEverythingChanged={onChangeSecondGridReady}

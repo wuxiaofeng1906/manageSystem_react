@@ -3,10 +3,16 @@ import {useCallback, useState} from 'react';
 export default () => {
   /* region 其他全局变量 */
 
-  // 全局的被锁id
+  // 当前被锁id（正在编辑的）
   const [lockedItem, setLockedItem] = useState('');
   const modifyLockedItem = useCallback((lockedString: string) => {
     setLockedItem(lockedString);
+  }, []);
+
+  // 界面所有被锁的ID
+  const [allLockedArray, setAllLockedArray] = useState([]);
+  const modifyAllLockedArray = useCallback((lockedArray: any) => {
+    setAllLockedArray(lockedArray);
   }, []);
 
   // 全局的一键部署ID数据,已发布的一键部署ID，用于保存查询条件，其中包含service等属性
@@ -98,8 +104,9 @@ export default () => {
   /* endregion  */
 
   return {
-    lockedItem, modifyLockedItem, //被锁的id
-    releasedID, modifyReleasedID,
+    lockedItem, modifyLockedItem, //当前被锁的id
+    allLockedArray, modifyAllLockedArray, // 所有被锁的ID
+    releasedID, modifyReleasedID, // 已选中的一键部署ID
     tabsData, setTabsData, // tabs
     processStatus, modifyProcessStatus, // 进度条
     preReleaseData, modifyPreReleaseData, // 预发布数据

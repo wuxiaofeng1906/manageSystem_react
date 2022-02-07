@@ -12,9 +12,10 @@ import {useRequest} from 'ahooks';
 import {useModel} from '@@/plugin-model/useModel';
 import {getCheckProcess} from './components/CheckProgress/axiosRequest';
 import {showProgressData} from './components/CheckProgress/processAnalysis';
-import {deleteLockStatus} from "./lock/rowLock";
+import {deleteLockStatus, getAllLockedData} from "./lock/rowLock";
 import {getGridHeight} from './components/gridHeight';
 import {showReleasedId} from "./components/UpgradeService/idDeal/dataDeal";
+
 
 const PreRelease: React.FC<any> = () => {
   const initData: any = useRequest(() => alalysisInitData('', '')).data;
@@ -23,7 +24,8 @@ const PreRelease: React.FC<any> = () => {
   const {
     setTabsData, modifyProcessStatus, modifyPreReleaseData, lockedItem,
     setRelesaeItem, setUpgradeApi, setUpgradeConfirm, modifyReleasedID,
-    setDataReview, setDataReviewConfirm, setOnlineBranch, setCorrespOrder
+    setDataReview, setDataReviewConfirm, setOnlineBranch, setCorrespOrder,
+    modifyAllLockedArray
   } = useModel('releaseProcess');
 
 
@@ -38,10 +40,12 @@ const PreRelease: React.FC<any> = () => {
       if (processData) {
         modifyProcessStatus(showProgressData(processData.data));
       }
+      // 当前界面被锁住的ID
+      const lockedData = await getAllLockedData(tabPageInfo?.activeKey);
+      modifyAllLockedArray(lockedData.data);
       // 预发布项目
       const preReleaseProject = initData?.preProject;
       modifyPreReleaseData(preReleaseProject);
-
 
       //  发布项
       const releaseItem = initData?.upService_releaseItem;

@@ -5,12 +5,14 @@ import CheckProgress from './components/CheckProgress';
 import PreReleaseProject from './components/PreReleaseProject';
 import UpgradeService from "./components/UpgradeService";
 import DataRepaireReview from "./components/DataRepaireReview";
+import OnlineBranch from "./components/OnlineBranch";
+import CorrespondingWorkOrder from "./components/CorrespondingWorkOrder";
 import {alalysisInitData} from './datas/dataAnalyze';
 import {useRequest} from 'ahooks';
 import {useModel} from '@@/plugin-model/useModel';
 import {getCheckProcess} from './components/CheckProgress/axiosRequest';
 import {showProgressData} from './components/CheckProgress/processAnalysis';
-import {deleteLockStatus} from "@/pages/onDutyAndRelease/preRelease_bck/supplementFile/lock/rowLock";
+import {deleteLockStatus} from "./lock/rowLock";
 import {getGridHeight} from './components/gridHeight';
 import {showReleasedId} from "./components/UpgradeService/idDeal/dataDeal";
 
@@ -21,7 +23,7 @@ const PreRelease: React.FC<any> = () => {
   const {
     setTabsData, modifyProcessStatus, modifyPreReleaseData, lockedItem,
     setRelesaeItem, setUpgradeApi, setUpgradeConfirm, modifyReleasedID,
-    setDataReview, setDataReviewConfirm
+    setDataReview, setDataReviewConfirm, setCorrespOrder
   } = useModel('releaseProcess');
 
 
@@ -63,6 +65,14 @@ const PreRelease: React.FC<any> = () => {
         gridData: dataRepaireConfirm
       });
 
+
+      //   对应工单
+      const correspondOrderData = initData?.correspondOrder;
+
+      setCorrespOrder({
+        gridHight: getGridHeight(correspondOrderData.length).toString(),
+        gridData: correspondOrderData
+      });
     }
   };
 
@@ -98,6 +108,8 @@ const PreRelease: React.FC<any> = () => {
       <PreReleaseProject/>
       <UpgradeService/>
       <DataRepaireReview/>
+      <OnlineBranch/>
+      <CorrespondingWorkOrder/>
     </PageContainer>
   );
 };

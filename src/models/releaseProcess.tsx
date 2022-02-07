@@ -84,6 +84,13 @@ export default () => {
 
   /* endregion  */
 
+
+  /* region step 5  对应工单 */
+
+  // 对应工单
+  const [correspOrder, setCorrespOrder] = useState({gridHight: "100px", gridData: []});
+  /* endregion  */
+
   return {
     lockedItem, modifyLockedItem, //被锁的id
     releasedID, modifyReleasedID,
@@ -94,6 +101,8 @@ export default () => {
     upgradeApi, setUpgradeApi, // 发布接口
     upgradeConfirm, setUpgradeConfirm,// 升级服务确认
     dataReview, setDataReview, // review 数据
-    dataReviewConfirm, setDataReviewConfirm // review 确认
+    dataReviewConfirm, setDataReviewConfirm, // review 确认
+
+    correspOrder, setCorrespOrder // 对应工单
   };
 };

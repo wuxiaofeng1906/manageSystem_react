@@ -25,7 +25,7 @@ import {
 } from "../../comControl/controler";
 import {upgradePulishItem, addPulishApi, deleteReleasedID} from "./axiosRequest";
 import {getGridHeight} from "../../components/gridHeight";
-import {alaReleasedChanged, showReleasedId} from "./idDeal/dataDeal";
+import {alaReleasedChanged} from "./idDeal/dataDeal";
 
 const {TextArea} = Input;
 const {Option} = Select;
@@ -161,8 +161,6 @@ const UpgradeService: React.FC<any> = () => {
         // secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
         setUpgradeApi({gridHight: getGridHeight(1).toString(), gridData: [{}]});
       }
-
-
     }
   };
   /* endregion */

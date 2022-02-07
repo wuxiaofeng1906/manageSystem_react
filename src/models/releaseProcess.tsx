@@ -75,14 +75,25 @@ export default () => {
 
   /* endregion  */
 
+  /* region step 3 数据修复review */
+
+  // review数据
+  const [dataReview, setDataReview] = useState({gridHight: "100px", gridData: []});
+  // review数据确认
+  const [dataReviewConfirm, setDataReviewConfirm] = useState({gridHight: "100px", gridData: []});
+
+  /* endregion  */
+
   return {
     lockedItem, modifyLockedItem, //被锁的id
-    releasedID,modifyReleasedID,
+    releasedID, modifyReleasedID,
     tabsData, setTabsData, // tabs
     processStatus, modifyProcessStatus, // 进度条
     preReleaseData, modifyPreReleaseData, // 预发布数据
     releaseItem, setRelesaeItem,// 发布项
     upgradeApi, setUpgradeApi, // 发布接口
-    upgradeConfirm, setUpgradeConfirm // 升级服务确认
+    upgradeConfirm, setUpgradeConfirm,// 升级服务确认
+    dataReview, setDataReview, // review 数据
+    dataReviewConfirm, setDataReviewConfirm // review 确认
   };
 };

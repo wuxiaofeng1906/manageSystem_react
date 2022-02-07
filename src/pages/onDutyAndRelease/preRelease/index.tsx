@@ -4,6 +4,7 @@ import Tab from './components/Tab';
 import CheckProgress from './components/CheckProgress';
 import PreReleaseProject from './components/PreReleaseProject';
 import UpgradeService from "./components/UpgradeService";
+import DataRepaireReview from "./components/DataRepaireReview";
 import {alalysisInitData} from './datas/dataAnalyze';
 import {useRequest} from 'ahooks';
 import {useModel} from '@@/plugin-model/useModel';
@@ -19,7 +20,8 @@ const PreRelease: React.FC<any> = () => {
   //Tab标签数据显示
   const {
     setTabsData, modifyProcessStatus, modifyPreReleaseData, lockedItem,
-    setRelesaeItem, setUpgradeApi, setUpgradeConfirm, modifyReleasedID
+    setRelesaeItem, setUpgradeApi, setUpgradeConfirm, modifyReleasedID,
+    setDataReview, setDataReviewConfirm
   } = useModel('releaseProcess');
 
 
@@ -51,6 +53,16 @@ const PreRelease: React.FC<any> = () => {
       //  发布服务确认
       const releaseConfirm = initData?.upService_confirm;
       setUpgradeConfirm({gridHight: getGridHeight(releaseConfirm.length).toString(), gridData: releaseConfirm});
+      // 数据修复
+      const dataRepaire = initData?.reviewData_repaire;
+      setDataReview({gridHight: getGridHeight(dataRepaire.length).toString(), gridData: dataRepaire});
+      //数据修复确认
+      const dataRepaireConfirm = initData?.reviewData_confirm;
+      setDataReviewConfirm({
+        gridHight: getGridHeight(dataRepaireConfirm.length).toString(),
+        gridData: dataRepaireConfirm
+      });
+
     }
   };
 
@@ -85,6 +97,7 @@ const PreRelease: React.FC<any> = () => {
       <CheckProgress/>
       <PreReleaseProject/>
       <UpgradeService/>
+      <DataRepaireReview/>
     </PageContainer>
   );
 };

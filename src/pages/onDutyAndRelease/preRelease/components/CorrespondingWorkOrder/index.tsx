@@ -2,7 +2,7 @@ import React, {useRef} from 'react';
 import {useModel} from '@@/plugin-model/useModel';
 import {AgGridReact} from "ag-grid-react";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
-import {getWorkOrderColumns} from "../OnlineBranch/grid/columns";
+import {getWorkOrderColumns} from "./grid/columns";
 
 const CorrespondingWorkOrder: React.FC<any> = () => {
   // 获取当前页面的进度数据
@@ -30,7 +30,7 @@ const CorrespondingWorkOrder: React.FC<any> = () => {
               <div>
                 <div
                   className="ag-theme-alpine"
-                  style={{height: correspOrder.gridHight, width: '100%'}}
+                  style={{height: correspOrder.gridHight, width: '100%',marginTop:-12}}
                 >
                   <AgGridReact
                     columnDefs={getWorkOrderColumns()} // 定义列

@@ -84,6 +84,12 @@ export default () => {
 
   /* endregion  */
 
+  /* region step 4  上线分支 */
+
+  // 对应工单
+  const [onlineBranch, setOnlineBranch] = useState({gridHight: "100px", gridData: []});
+  /* endregion  */
+
 
   /* region step 5  对应工单 */
 
@@ -102,7 +108,7 @@ export default () => {
     upgradeConfirm, setUpgradeConfirm,// 升级服务确认
     dataReview, setDataReview, // review 数据
     dataReviewConfirm, setDataReviewConfirm, // review 确认
-
+    onlineBranch, setOnlineBranch, // 上线分支
     correspOrder, setCorrespOrder // 对应工单
   };
 };

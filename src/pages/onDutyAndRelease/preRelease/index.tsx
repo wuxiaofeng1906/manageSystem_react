@@ -23,7 +23,7 @@ const PreRelease: React.FC<any> = () => {
   const {
     setTabsData, modifyProcessStatus, modifyPreReleaseData, lockedItem,
     setRelesaeItem, setUpgradeApi, setUpgradeConfirm, modifyReleasedID,
-    setDataReview, setDataReviewConfirm, setCorrespOrder
+    setDataReview, setDataReviewConfirm, setOnlineBranch, setCorrespOrder
   } = useModel('releaseProcess');
 
 
@@ -65,10 +65,15 @@ const PreRelease: React.FC<any> = () => {
         gridData: dataRepaireConfirm
       });
 
+      // 上线分支
+      const onlineBranchDatas = initData?.onlineBranch;
+      setOnlineBranch({
+        gridHight: getGridHeight(onlineBranchDatas.length, true).toString(),
+        gridData: onlineBranchDatas
+      });
 
       //   对应工单
       const correspondOrderData = initData?.correspondOrder;
-
       setCorrespOrder({
         gridHight: getGridHeight(correspondOrderData.length).toString(),
         gridData: correspondOrderData

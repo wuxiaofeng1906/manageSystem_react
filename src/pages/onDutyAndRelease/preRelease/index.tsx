@@ -17,7 +17,6 @@ import {deleteLockStatus, getAllLockedData} from "./lock/rowLock";
 import {getGridHeight} from './components/gridHeight';
 import {showReleasedId} from "./components/UpgradeService/idDeal/dataDeal";
 
-
 const PreRelease: React.FC<any> = () => {
   const initData: any = useRequest(() => alalysisInitData('', '')).data;
 

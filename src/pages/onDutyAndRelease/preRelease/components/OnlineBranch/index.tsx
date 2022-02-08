@@ -313,10 +313,15 @@ const OnlineBranch: React.FC<any> = () => {
                       resizable: true,
                       sortable: true,
                       suppressMenu: true,
-                      autoHeight: true,
+                      // autoHeight: true,
                       minWidth: 90,
+                      cellStyle: () => ({   // 单元格垂直居中显示
+                        display: "flex",
+                        alignItems: "center"
+                      })
                     }}
                     headerHeight={25}
+                    rowHeight={50}
                     getRowStyle={(params: any) => {
                       return releaseAppChangRowColor(
                         allLockedArray,

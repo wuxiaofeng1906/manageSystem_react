@@ -209,9 +209,7 @@ const beforeOnlineVersionCheck = (params: any) => {
               <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
             </Button>
 
-              <a href="${values.check_url}" target="_blank"  onclick="return visitCommenLog('${
-    values.check_url
-  }')" >
+              <a href="${values.check_url}" target="_blank"  onclick="return visitCommenLog('${values.check_url}')" >
                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
              </a>
 
@@ -507,6 +505,7 @@ const getOnlineBranchColumns = () => {
       headerName: '分支名称',
       field: 'branch_name',
       minWidth: 100,
+
     },
     {
       headerName: '技术侧',
@@ -514,6 +513,7 @@ const getOnlineBranchColumns = () => {
       cellRenderer: (params: any) => {
         return `<span>${getTechSide(params.value)}</span>`;
       },
+
     },
     {
       headerName: '单元测试运行是否通过',
@@ -525,7 +525,8 @@ const getOnlineBranchColumns = () => {
       headerName: '上线前版本检查是否通过',
       field: 'version_check',
       cellRenderer: beforeOnlineVersionCheck,
-      minWidth: 190,
+      minWidth: 200,
+
     },
     {
       headerName: '上线前环境检查是否通过',

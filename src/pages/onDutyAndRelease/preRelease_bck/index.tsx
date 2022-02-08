@@ -2329,7 +2329,9 @@ const PreRelease: React.FC<any> = () => {
                       onGridReady={onfirstOnlineBranchGridReady}
                       onGridSizeChanged={onChangefirstOnlineBranchGridReady}
                       onColumnEverythingChanged={onChangefirstOnlineBranchGridReady}
-                    ></AgGridReact>
+                    >
+
+                    </AgGridReact>
                   </div>
                 </Spin>
               </div>

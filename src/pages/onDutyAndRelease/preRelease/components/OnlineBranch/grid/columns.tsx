@@ -511,7 +511,7 @@ const getOnlineBranchColumns = () => {
       headerName: '技术侧',
       field: 'technical_side',
       cellRenderer: (params: any) => {
-        return `<span>${getTechSide(params.value)}</span>`;
+        return `<span style="font-size: smaller">${getTechSide(params.value)}</span>`;
       },
 
     },

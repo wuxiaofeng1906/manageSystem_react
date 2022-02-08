@@ -83,7 +83,6 @@ const Tab: React.FC<any> = () => {
     showPageData(newTabData);
   };
 
-
   const showNoneDataPage = async () => {
     modifyProcessStatus({
       // 进度条相关数据和颜色

@@ -83,7 +83,7 @@ const getReviewColumns = () => {
              <Button  style="border: none; background-color: transparent;  margin-left: -10px; " onclick='showDataRepaireForm("modify",${paramData})'>
               <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
             </Button>
-            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteRows("",${paramData})'>
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteGridRows(3,${paramData})'>
               <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
             </Button>
         </div>

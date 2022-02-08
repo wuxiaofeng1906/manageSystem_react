@@ -7,6 +7,7 @@ import UpgradeService from "./components/UpgradeService";
 import DataRepaireReview from "./components/DataRepaireReview";
 import OnlineBranch from "./components/OnlineBranch";
 import CorrespondingWorkOrder from "./components/CorrespondingWorkOrder";
+import DeleteRow from "./components/DeleteRow";
 import {alalysisInitData} from './datas/dataAnalyze';
 import {useRequest} from 'ahooks';
 import {useModel} from '@@/plugin-model/useModel';
@@ -119,6 +120,7 @@ const PreRelease: React.FC<any> = () => {
       <DataRepaireReview/>
       <OnlineBranch/>
       <CorrespondingWorkOrder/>
+      <DeleteRow/>
     </PageContainer>
   );
 };

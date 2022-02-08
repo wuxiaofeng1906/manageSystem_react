@@ -102,7 +102,7 @@ const getReleasedItemColumns = () => {
              <Button  style="border: none; background-color: transparent;  margin-left: -10px; "  onclick='showPulishItemForm("modify",${paramData})'>
               <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
             </Button>
-            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteRows(${1},${paramData})'>
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteGridRows(1,${paramData})'>
               <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
             </Button>
         </div>
@@ -185,7 +185,7 @@ const getReleasedApiColumns = () => {
              <Button  style="border: none; background-color: transparent;  margin-left: -10px; " onclick='showUpgradeApiForm("modify",${paramData})'>
               <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
             </Button>
-            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteRows("",${paramData})'>
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteGridRows(2,${paramData})'>
               <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
             </Button>
         </div>

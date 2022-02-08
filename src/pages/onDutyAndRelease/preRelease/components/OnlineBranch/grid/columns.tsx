@@ -397,7 +397,7 @@ const sealStatusRenderer = (params: any) => {
       side = '后端：';
     }
 
-    const status = arrayData.sealing_version === '1' ? '已封板' : '未封板';
+    const status = arrayData.sealing_version === '1' ? '已封版' : '未封版';
     const sideColor = arrayData.sealing_version === '1' ? '#2BF541' : 'orange';
     const time =
       arrayData.sealing_version_time === ''
@@ -426,13 +426,13 @@ const sealStatusRenderer = (params: any) => {
     values.forEach((ele: any) => {
       if (ele.technical_side === '1') {
         // 前端
-        frontValue = ele.sealing_version === '1' ? '已封板' : '未封板';
+        frontValue = ele.sealing_version === '1' ? '已封版' : '未封版';
         frontTime =
           ele.sealing_version_time === '' ? '' : dayjs(ele.sealing_version_time).format('HH:mm:ss');
         frontColor = ele.sealing_version === '1' ? '#2BF541' : 'orange';
       } else if (ele.technical_side === '2') {
         // 后端
-        backendValue = ele.sealing_version === '1' ? '已封板' : '未封板';
+        backendValue = ele.sealing_version === '1' ? '已封版' : '未封版';
         backendTime =
           ele.sealing_version_time === '' ? '' : dayjs(ele.sealing_version_time).format('HH:mm:ss');
         bacnkendColor = ele.sealing_version === '1' ? '#2BF541' : 'orange';
@@ -578,7 +578,7 @@ const getOnlineBranchColumns = () => {
              <Button  style="border: none; background-color: transparent;  margin-left: -10px; " onclick='showOnlineBranchForm("modify",${paramData})'>
               <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
             </Button>
-            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteRows(4,,${paramData})'>
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteGridRows(4,${paramData})'>
               <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
             </Button>
         </div>

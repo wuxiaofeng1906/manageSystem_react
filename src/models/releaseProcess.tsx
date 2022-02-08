@@ -70,36 +70,37 @@ export default () => {
   }, []);
   /* endregion */
 
-  /* region step 2 升级服务 */
+  /* region 表格行数据的删除 */
+  const [delModal, setDelModal] = useState({
+    // 列表数据删除弹窗
+    shown: false,
+    type: -1,
+    datas: {},
+  });
 
+  /* endregion */
+
+  /* region step 2 升级服务 */
   // 发布项数据
   const [releaseItem, setRelesaeItem] = useState({gridHight: "100px", gridData: []});
   // 发布接口数据
   const [upgradeApi, setUpgradeApi] = useState({gridHight: "100px", gridData: []});
   // 升级服务确认
   const [upgradeConfirm, setUpgradeConfirm] = useState({gridHight: "100px", gridData: []});
-
   /* endregion  */
 
   /* region step 3 数据修复review */
-
   // review数据
   const [dataReview, setDataReview] = useState({gridHight: "100px", gridData: []});
   // review数据确认
   const [dataReviewConfirm, setDataReviewConfirm] = useState({gridHight: "100px", gridData: []});
-
   /* endregion  */
 
   /* region step 4  上线分支 */
-
-  // 对应工单
   const [onlineBranch, setOnlineBranch] = useState({gridHight: "100px", gridData: []});
   /* endregion  */
 
-
   /* region step 5  对应工单 */
-
-  // 对应工单
   const [correspOrder, setCorrespOrder] = useState({gridHight: "100px", gridData: []});
   /* endregion  */
 
@@ -109,6 +110,7 @@ export default () => {
     releasedID, modifyReleasedID, // 已选中的一键部署ID
     tabsData, setTabsData, // tabs
     processStatus, modifyProcessStatus, // 进度条
+    delModal, setDelModal, // 行数据的删除
     preReleaseData, modifyPreReleaseData, // 预发布数据
     releaseItem, setRelesaeItem,// 发布项
     upgradeApi, setUpgradeApi, // 发布接口

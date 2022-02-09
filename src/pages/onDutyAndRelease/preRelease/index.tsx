@@ -19,11 +19,11 @@ import {showReleasedId} from "./components/UpgradeService/idDeal/dataDeal";
 import {getNewPageNumber} from './components/Tab/axiosRequest';
 
 const PreRelease: React.FC<any> = () => {
-  const initPageData: any = useRequest(() => alalysisInitData('', '')).data;
+  const {data, loading} = useRequest(() => alalysisInitData('', ''));
 
-  //Tab标签数据显示
+  // Tab标签数据显示
   const {
-    tabsData, setTabsData, modifyProcessStatus, modifyPreReleaseData, lockedItem,
+    tabsData, setTabsData, modifyProcessStatus, modifyPreReleaseData, lockedItem, allLockedArray,
     setRelesaeItem, setUpgradeApi, setUpgradeConfirm, modifyReleasedID,
     setDataReview, setDataReviewConfirm, setOnlineBranch, setCorrespOrder,
     modifyAllLockedArray
@@ -75,7 +75,7 @@ const PreRelease: React.FC<any> = () => {
     setUpgradeConfirm({gridHight: "100px", gridData: []});
     // 数据修复
     setDataReview({gridHight: "100px", gridData: []});
-    //数据修复确认
+    // 数据修复确认
     setDataReviewConfirm({gridHight: "100px", gridData: []});
 
     // 上线分支
@@ -85,15 +85,22 @@ const PreRelease: React.FC<any> = () => {
     setCorrespOrder({gridHight: "100px", gridData: []});
   };
 
-  const showPageInitData = async (initData: any) => {
+  const showPageInitData = async (initData: any, initShow: boolean) => {
     if (!initData || JSON.stringify(initData) === '{}') {
       showNoneDataPage();
       return;
     }
 
+
     // Tab数据
     const {tabPageInfo} = initData;
-    setTabsData(tabPageInfo?.activeKey, tabPageInfo.panes);
+    if (initShow) {
+      setTabsData(tabPageInfo?.activeKey, tabPageInfo.panes);
+
+    } else {
+      setTabsData(tabPageInfo?.activeKey, tabsData.panes);
+
+    }
     // 进度条数据
     const processData: any = await getCheckProcess(tabPageInfo?.activeKey);
     if (processData) {
@@ -121,7 +128,7 @@ const PreRelease: React.FC<any> = () => {
     // 数据修复
     const dataRepaire = initData?.reviewData_repaire;
     setDataReview({gridHight: getGridHeight(dataRepaire.length).toString(), gridData: dataRepaire});
-    //数据修复确认
+    // 数据修复确认
     const dataRepaireConfirm = initData?.reviewData_confirm;
     setDataReviewConfirm({
       gridHight: getGridHeight(dataRepaireConfirm.length).toString(),
@@ -143,23 +150,29 @@ const PreRelease: React.FC<any> = () => {
     });
 
   };
-
+  // showPageInitData(data, true);
   useEffect(() => {
-    showPageInitData(initPageData);
-  }, [initPageData]);
-
-  const interValRef: any = useRef(); // 定时任务数据id保存
+    showPageInitData(data, true);
+  }, [data, loading]);
+  //
+  // const interValRef: any = useRef(); // 定时任务数据id保存
+  // console.log("tabsData", tabsData);
   // 定时任务
   // useEffect(() => {
   //   if (!interValRef.current) {
   //     console.log('interValRef.current', interValRef.current);
   //     let count = 0;
   //     const id = setInterval(async () => {
+  //       // console.log("lockedItem", lockedItem);
   //       count += 1;
   //       console.log(`刷新次数${count},定时任务id${id}`);
+  //       // if (lockedItem === "") {  // 只有在没被锁定的时候才动态加载
   //       // 刷新
+  //       console.log("tabsData.activeKey", tabsData.activeKey);
   //       const datas = await alalysisInitData('', tabsData.activeKey);
-  //       showPageInitData(datas);
+  //       showPageInitData(datas, false);
+  //       // }
+  //
   //     }, 30 * 1000);
   //
   //     interValRef.current = id;

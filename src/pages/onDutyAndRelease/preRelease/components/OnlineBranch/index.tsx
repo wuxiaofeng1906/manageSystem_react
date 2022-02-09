@@ -102,10 +102,12 @@ const OnlineBranch: React.FC<any> = () => {
       });
 
       const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
-      setOnlineBranch({
-        gridHight: getGridHeight((newData.onlineBranch).length, true).toString(),
-        gridData: newData.onlineBranch
-      });
+      if (newData.onlineBranch) {
+        setOnlineBranch({
+          gridHight: getGridHeight((newData.onlineBranch).length, true).toString(),
+          gridData: newData.onlineBranch
+        });
+      }
 
       if (onlineBranchModal.title === '修改') {
         deleteLockStatus(lockedItem);
@@ -774,32 +776,32 @@ const OnlineBranch: React.FC<any> = () => {
         <Form>
           <div style={{display: logModal.autoUrl.style}}>
             <Form.Item name="UiLog" label="UI日志:" style={{marginTop: -15}}>
-              <a href={`${logModal.autoUrl.ui}`} target={'_black'} style={{textDecoration:"underline"}}>
+              <a href={`${logModal.autoUrl.ui}`} target={'_black'} style={{textDecoration: "underline"}}>
                 {logModal.autoUrl.ui}
               </a>
             </Form.Item>
 
             <Form.Item name="interfaceLog" label="接口日志:" style={{marginTop: -15}}>
-              <a href={`${logModal.autoUrl.api}`} target={'_black'} style={{textDecoration:"underline"}}>
+              <a href={`${logModal.autoUrl.api}`} target={'_black'} style={{textDecoration: "underline"}}>
                 {logModal.autoUrl.api}
               </a>
             </Form.Item>
           </div>
           <div style={{display: logModal.versionUrl.style}}>
             <Form.Item name="appLog" label="app日志:" style={{marginTop: -15}}>
-              <a href={`${logModal.versionUrl.app}`} target={'_black'} style={{textDecoration:"underline"}}>
+              <a href={`${logModal.versionUrl.app}`} target={'_black'} style={{textDecoration: "underline"}}>
                 {logModal.versionUrl.app}
               </a>
             </Form.Item>
             <Form.Item name="globalLog" label="global日志:" style={{marginTop: -1}}>
-              <a href={`${logModal.versionUrl.global}`} target={'_black'} style={{textDecoration:"underline"}}>
+              <a href={`${logModal.versionUrl.global}`} target={'_black'} style={{textDecoration: "underline"}}>
                 {logModal.versionUrl.global}
               </a>
             </Form.Item>
           </div>
 
 
-           {/* <Form.Item>
+          {/* <Form.Item>
             <Button style={{float: 'right'}} onClick={autoCancle}>
               关闭
             </Button>

@@ -67,12 +67,14 @@ const PreReleaseProject: React.FC<any> = () => {
 
   // 编辑框聚焦时检查是否可以编辑
   const releaseItemFocus = async () => {
+
     const formData = formForPreReleaseProject.getFieldsValue();
     const proId = formData.proid;
 
+    modifyLockedItem(`${tabsData.activeKey}-step1-project-${proId}`); // 如果是被锁了保存当前被锁的id
     const lockInfo = await getLockStatus(`${tabsData.activeKey}-step1-project-${proId}`);
+    console.log(lockInfo,`${tabsData.activeKey}-step1-project-${proId}`);
     if (lockInfo.errMessage) {
-      modifyLockedItem(`${tabsData.activeKey}-step1-project-${proId}`); // 如果是被锁了保存当前被锁的id
       const userInfo: any = lockInfo.data;
       if (userInfo.user_id !== usersInfo.userid) {
         message.error({

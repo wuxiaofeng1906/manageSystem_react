@@ -105,7 +105,7 @@ export default () => {
   /* endregion  */
 
   return {
-    lockedItem, modifyLockedItem, //当前被锁的id
+    lockedItem, modifyLockedItem, // 当前被锁的id
     allLockedArray, modifyAllLockedArray, // 所有被锁的ID
     releasedID, modifyReleasedID, // 已选中的一键部署ID
     tabsData, setTabsData, // tabs

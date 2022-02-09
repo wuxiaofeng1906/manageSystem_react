@@ -25,6 +25,8 @@ const Tab: React.FC<any> = () => {
     if (initData) {
       // Tab数据    // 进度条数据
       const {tabPageInfo} = initData;
+      setTabsData(tabPageInfo?.activeKey, tabsData.panes);
+      // setTabsData(activeKeys, tabsData.panes);
       const processData: any = await getCheckProcess(tabPageInfo?.activeKey);
       if (processData) {
         modifyProcessStatus(showProgressData(processData.data));
@@ -53,7 +55,7 @@ const Tab: React.FC<any> = () => {
       // 数据修复
       const dataRepaire = initData?.reviewData_repaire;
       setDataReview({gridHight: getGridHeight(dataRepaire.length).toString(), gridData: dataRepaire});
-      //数据修复确认
+      // 数据修复确认
       const dataRepaireConfirm = initData?.reviewData_confirm;
       setDataReviewConfirm({
         gridHight: getGridHeight(dataRepaireConfirm.length).toString(),
@@ -78,7 +80,7 @@ const Tab: React.FC<any> = () => {
 
   // Tabs页面切换
   const onTabsChange = async (activeKeys: any) => {
-    setTabsData(activeKeys, tabsData.panes);
+
     const newTabData = await alalysisInitData('', activeKeys);
     showPageData(newTabData);
   };

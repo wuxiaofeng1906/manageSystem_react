@@ -67,7 +67,7 @@ const columsForQuarters = () => {
 
 
 const converseArrayToOne = (data: any) => {
-  debugger;
+
   const resultData = new Array();
   for (let index = 0; index < data.length; index += 1) {
     let repeatFlag = false;

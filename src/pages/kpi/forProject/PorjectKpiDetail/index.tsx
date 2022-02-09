@@ -28,7 +28,7 @@ import {
   setServiceCellStyle
 } from './supplementFile/style/gridStyles';
 import './supplementFile/style/styles.css';
-import {Button, PageHeader, Select} from "antd";
+import {Button, PageHeader, Select, Breadcrumb} from "antd";
 import {
   getProcessHeaderStyle, getStoryStabilityHeaderStyle, getStageWorkloadHeaderStyle,
   getProductRateHeaderStyle, getReviewDefectHeaderStyle, getProcessQualityHeaderStyle,
@@ -36,6 +36,7 @@ import {
 } from "./supplementFile/style/columsTitleRenderer";
 import {CustomTooltip} from "./supplementFile/style/customTooltip";
 import {ExportOutlined} from '@ant-design/icons';
+import {Link} from 'react-router-dom';
 
 const {Option} = Select;
 
@@ -178,24 +179,24 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
 
   const COMMON_LENGTH = 130;
 
-  const routes = [
-    {
-      path: '',
-      breadcrumbName: '研发过程数据',
-    }, {
-      path: '',
-      breadcrumbName: '度量指标',
-    }, {
-      path: '',
-      breadcrumbName: '项目指标',
-    }];
+
+  const breadcrumbItems = [
+    <Breadcrumb.Item key="研发过程数据">研发过程数据</Breadcrumb.Item>,
+    <Breadcrumb.Item key="研发过程数据">度量指标</Breadcrumb.Item>,
+    <Breadcrumb.Item key="项目">
+      <Link to="/kpi/performance/project/overview">项目</Link>
+    </Breadcrumb.Item>,
+    <Breadcrumb.Item key="项目指标">项目指标</Breadcrumb.Item>];
+
   return (
     <div style={{width: "100%", height: "100%", marginTop: "-20px"}}>
       <PageHeader
         ghost={false}
         title={props.location.query.name}
         style={{height: "85px"}}
-        breadcrumb={{routes}}
+        breadcrumbRender={() => {
+          return <Breadcrumb>{breadcrumbItems}</Breadcrumb>;
+        }}
       />
 
       <div style={{marginTop: -35, height: 35}}>

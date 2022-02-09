@@ -38,7 +38,7 @@ const getInitPageData = async (queryReleaseNum: string) => {
   };
 
   await axios
-    .get('/api/verify/release/release_detail', { params: { ready_release_num: queryReleaseNum } })
+    .get('/api/verify/release/release_detail', {params: {ready_release_num: queryReleaseNum}})
     .then(function (res) {
       if (res.data.code === 200) {
         result.data = res.data.data;
@@ -63,7 +63,7 @@ const delTabsInfo = async (releaseNum: string) => {
     ready_release_num: releaseNum,
   };
   await axios
-    .delete('/api/verify/release/release_detail', { data: datas })
+    .delete('/api/verify/release/release_detail', {data: datas})
     .then(function (res) {
       if (res.data.code !== 200) {
         errorMessage = `错误：${res.data.msg}`;
@@ -108,7 +108,7 @@ const getCheckProcess = async (releaseNum: string) => {
     data: [],
   };
   await axios
-    .get('/api/verify/release/progress', { params: { ready_release_num: releaseNum } })
+    .get('/api/verify/release/progress', {params: {ready_release_num: releaseNum}})
     .then(function (res) {
       if (res.data.code === 200) {
         result.data = res.data.data;
@@ -153,7 +153,7 @@ const deleteReleasedId = async (ready_release_num: string, deployment_id: string
   };
 
   await axios
-    .delete('/api/verify/release/upgrade_service_deployment', { data: datas })
+    .delete('/api/verify/release/upgrade_service_deployment', {data: datas})
     .then(function (res) {
       if (res.data.code !== 200) {
         errorMessage = `错误：${res.data.msg}`;
@@ -427,7 +427,7 @@ const delUpgradeItem = async (id: number) => {
     app_id: id,
   };
   await axios
-    .delete('/api/verify/release/upgrade_service', { data: datas })
+    .delete('/api/verify/release/upgrade_service', {data: datas})
     .then(function (res) {
       if (res.data.code !== 200) {
         errorMessage = `错误：${res.data.msg}`;
@@ -536,7 +536,7 @@ const delPulishApi = async (id: number) => {
     api_id: id,
   };
   await axios
-    .delete('/api/verify/release/upgrade_api', { data: datas })
+    .delete('/api/verify/release/upgrade_api', {data: datas})
     .then(function (res) {
       if (res.data.code !== 200) {
         errorMessage = `错误：${res.data.msg}`;
@@ -635,7 +635,7 @@ const delDataReviewApi = async (id: number) => {
     review_id: id,
   };
   await axios
-    .delete('/api/verify/release/review_confirm', { data: datas })
+    .delete('/api/verify/release/review_confirm', {data: datas})
     .then(function (res) {
       if (res.data.code !== 200) {
         errorMessage = `错误：${res.data.msg}`;
@@ -830,7 +830,7 @@ const saveVersonCheck = async (
   if (sourceData?.verson_check) {
     // true 已开启
     // 服务
-    const { server } = sourceData;
+    const {server} = sourceData;
     let serverStr = '';
     server.forEach((ele: string) => {
       serverStr = serverStr === '' ? ele : `${serverStr},${ele}`;
@@ -935,7 +935,6 @@ const saveOnlineAutoCheck = async (
   newOnlineBranchNum: string,
   sourceData: any,
 ) => {
-  debugger;
   const data = [];
 
   // 上线前检查: 打勾是1，没打勾是2
@@ -1051,7 +1050,7 @@ const getDetaisByCHeckNum = async (checkNum: string) => {
     data: [],
   };
   await axios
-    .get('/api/verify/release/release_branch', { params: { check_num: checkNum } })
+    .get('/api/verify/release/release_branch', {params: {check_num: checkNum}})
     .then(function (res) {
       if (res.data.code === 200) {
         result.data = res.data.data;
@@ -1076,7 +1075,7 @@ const delDataOnlineBranchApi = async (id: number) => {
     check_num: id,
   };
   await axios
-    .delete('/api/verify/release/release_branch', { data: datas })
+    .delete('/api/verify/release/release_branch', {data: datas})
     .then(function (res) {
       if (res.data.code !== 200) {
         errorMessage = `错误：${res.data.msg}`;

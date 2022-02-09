@@ -82,7 +82,7 @@ const rendererUnitTest = (params: any) => {
     // 前端
 
     return `
-        <div style="margin-top: -10px">
+        <div style="margin-top: -20px">
             <div style=" margin-top: 20px;font-size: 10px">
                 <div>前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
             </div>
@@ -93,7 +93,7 @@ const rendererUnitTest = (params: any) => {
   if (params.data?.technical_side === '2') {
     // 后端
     return `
-        <div style="margin-top: -10px">
+        <div style="margin-top: -20px">
             <div style=" margin-top: 20px;font-size: 10px">
                 <div> 后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>
                 &nbsp;${backendTime}</div>
@@ -102,7 +102,7 @@ const rendererUnitTest = (params: any) => {
     `;
   }
   return `
-        <div style="margin-top: -10px">
+        <div style="margin-top: -20px">
             <div style=" margin-top: 20px;font-size: 10px">
                 <div>前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
                 <div style="margin-top: -20px"> 后端：
@@ -130,6 +130,7 @@ const rendererUnitTest = (params: any) => {
 
 // 渲染上线前版本检查是否通过
 const beforeOnlineVersionCheck = (params: any) => {
+
   if (!params.value || params.value.length === 0) {
     return '';
   }
@@ -192,8 +193,8 @@ const beforeOnlineVersionCheck = (params: any) => {
           <div style="width: 210px">
               <div style="font-size: 10px">
                   <div>
-                    <button style="color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
-                    <lable style="margin-left: -10px">${timeRange}</lable>
+                    <button style="text-align: left; color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
+                    <lable style="margin-left: -20px">${timeRange}</lable>
                   </div>
               </div>
           </div>
@@ -202,22 +203,21 @@ const beforeOnlineVersionCheck = (params: any) => {
   }
   return `
          <div>
-          <div style="margin-top: -10px;text-align: right">
+          <div style="margin-top: -10px;margin-left: 120px">
 
             <Button  style="padding-bottom: 5px; margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
-            onclick='excuteDataCheck("versionCheck",${checkNum},${JSON.stringify(result)})'>
+            onclick='excuteCheckData("versionCheck",${checkNum},${JSON.stringify(result)})'>
               <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
             </Button>
-
-              <a href="${values.check_url}" target="_blank"  onclick="return visitCommenLog('${values.check_url}')" >
-               <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
-             </a>
-
+            <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC"
+              onclick='versionCheckLogUrlClick(${JSON.stringify(values.check_url)})'>
+                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+             </Button>
           </div>
           <div style="margin-top: -20px;width: 210px">
               <div style="font-size: 10px">
-                  <div>${side} <button style="margin-left: -10px; color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
-                  <lable style="margin-left: -10px">${timeRange}</lable>
+                  <div>${side} <button style="text-align: left;margin-left: -10px; color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
+                  <lable style="margin-left: -20px">${timeRange}</lable>
                   </div>
               </div>
 
@@ -276,15 +276,13 @@ const beforeOnlineEnvCheck = (params: any) => {
 
   return `
         <div style="margin-top: -10px">
-            <div style="text-align: right" >
+            <div style="margin-left: 120px" >
               <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
-              onclick='excuteDataCheck("envCheck",${checkNum},${JSON.stringify(result)})'>
+              onclick='excuteCheckData("envCheck",${checkNum},${JSON.stringify(result)})'>
                 <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
               </Button>
 
-              <a href="${values.check_url}" target="_blank"  onclick="return visitCommenLog('${
-    values.check_url
-  }')" >
+              <a href="${values.check_url}" target="_blank"  onclick="return visitCommenLog('${values.check_url}')" >
                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
              </a>
             </div>
@@ -297,6 +295,7 @@ const beforeOnlineEnvCheck = (params: any) => {
 };
 // 上线前自动化检查
 const beforeOnlineAutoCheck = (params: any, type: string) => {
+
   const values = params.value;
   if (!values) {
     return '';
@@ -331,11 +330,11 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
         if (ele.check_end_time) {
           end = dayjs(ele.check_end_time).format('HH:mm:ss');
         }
-        if (values.check_result === 'success') {
-          value = '是';
+        if (ele.check_result === '1') {
+          value = '成功';
           Color = '#2BF541';
-        } else if (values.check_result === 'failed') {
-          value = '否';
+        } else if (ele.check_result === '2') {
+          value = '失败';
           Color = '#8B4513';
         }
       }
@@ -355,16 +354,13 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
 
   return `
         <div style="margin-top: -10px">
-            <div style="text-align: right" >
+            <div style="margin-left: 120px" >
               <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
-              onclick='excuteDataCheck(${JSON.stringify(title)},${JSON.stringify(
-    params.data?.check_num,
-  )},${JSON.stringify(value)})'>
+              onclick='excuteCheckData(${JSON.stringify(title)},${JSON.stringify(params.data?.check_num,)},${JSON.stringify(value)})'>
                 <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
               </Button>
-              <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='urlClick(${JSON.stringify(
-    checkType,
-  )},${JSON.stringify(logUrl)})'>
+              <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC"
+              onclick='autoLogUrlClick(${JSON.stringify(checkType,)},${JSON.stringify(logUrl)})'>
                 <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
               </Button>
             </div>
@@ -398,12 +394,10 @@ const sealStatusRenderer = (params: any) => {
     const status = arrayData.sealing_version === '1' ? '已封版' : '未封版';
     const sideColor = arrayData.sealing_version === '1' ? '#2BF541' : 'orange';
     const time =
-      arrayData.sealing_version_time === ''
-        ? ''
-        : dayjs(arrayData.sealing_version_time).format('HH:mm:ss');
+      arrayData.sealing_version_time === '' ? '' : dayjs(arrayData.sealing_version_time).format('HH:mm:ss');
 
     return `
-        <div style="margin-top: -10px">
+        <div style="margin-top: -20px">
             <div style=" margin-top: 20px;font-size: 10px">
                 <div>${side} <label style="color: ${sideColor}"> ${status}</label> &nbsp;${time}</div>
             </div>
@@ -438,7 +432,7 @@ const sealStatusRenderer = (params: any) => {
     });
 
     return `
-        <div style="margin-top: -10px">
+        <div style="margin-top: -20px">
             <div style=" margin-top: 20px;font-size: 10px">
                 <div>前端：<label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
                 <div style="margin-top: -20px">
@@ -455,10 +449,10 @@ const sealStatusRenderer = (params: any) => {
 const branchGitTime = (params: any) => {
   const datas = params.data;
 
-  // 证明有前后端
+  // 有前后端
   if (datas.branch_front_create_time && datas.branch_create_time) {
     return `
-        <div style="margin-top: -10px">
+        <div style="margin-top: -20px">
             <div style=" margin-top: 20px;font-size: 10px">
                 <div>前端：<label> ${datas.branch_front_create_time}</label></div>
                 <div style="margin-top: -20px">
@@ -478,7 +472,7 @@ const branchGitTime = (params: any) => {
     }
 
     return `
-        <div style="margin-top: -10px">
+        <div style="margin-top: -20px">
             <div style=" margin-top: 20px;font-size: 10px">
                 <div>${side} <label> ${values}</label> </div>
             </div>
@@ -504,7 +498,7 @@ const getOnlineBranchColumns = () => {
     {
       headerName: '分支名称',
       field: 'branch_name',
-      minWidth: 100,
+      minWidth: 90,
 
     },
     {
@@ -519,13 +513,13 @@ const getOnlineBranchColumns = () => {
       headerName: '单元测试运行是否通过',
       field: 'test_unit',
       cellRenderer: rendererUnitTest,
-      minWidth: 190,
+      minWidth: 170,
     },
     {
       headerName: '上线前版本检查是否通过',
       field: 'version_check',
       cellRenderer: beforeOnlineVersionCheck,
-      minWidth: 200,
+      minWidth: 190,
 
     },
     {

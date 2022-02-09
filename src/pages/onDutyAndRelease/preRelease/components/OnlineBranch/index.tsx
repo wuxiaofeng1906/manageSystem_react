@@ -44,6 +44,11 @@ const OnlineBranch: React.FC<any> = () => {
     checkType: [],
     browser: [],
   });
+  const [logModal, setLogModal] = useState({
+    show: false,
+    autoUrl: {style: "none", ui: '', api: ''},
+    versionUrl: {style: "none", app: '', global: ''},
+  });
   const onfirstOnlineBranchGridReady = (params: GridReadyEvent) => {
     firstOnlineBranchGridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -252,7 +257,7 @@ const OnlineBranch: React.FC<any> = () => {
   };
 
   // 执行上线前检查：上线前版本检查、环境检查，自动化检查
-  (window as any).excuteDataCheck = async (type: string, checkNum: string, values: string) => {
+  (window as any).excuteCheckData = async (type: string, checkNum: string, values: string) => {
     if (values === '忽略') {
       message.error({
         content: '当前状态为忽略，不能进行任务执行！',
@@ -289,11 +294,104 @@ const OnlineBranch: React.FC<any> = () => {
     }
     setExecuteStatus(false);
   };
+  // 版本检查URL跳转
+  (window as any).versionCheckLogUrlClick = (logUrl: any) => {
+    let app_url = '';
+    let global_url = '';
+    if (logUrl && logUrl.length > 0) {
+      logUrl.forEach((ele: any) => {
+        if (ele.server === "apps") {
+          app_url = ele.check_url;
+        } else if (ele.server === "global") {
+          global_url = ele.check_url;
+        }
+      });
+    }
+
+    if (app_url || global_url) {
+      setLogModal({
+        autoUrl: {style: "none", ui: '', api: ''},
+        versionUrl: {style: "inline", app: app_url, global: global_url},
+        show: true,
+      });
+    } else {
+      message.error({
+        content: '无检查日志，请执行后在查看！',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+  };
+
+  // 自动化URL跳转
+  (window as any).autoLogUrlClick = (checkType: string, logUrl: string) => {
+
+    let ui_url = '';
+    let api_url = '';
+    if (checkType && logUrl) {
+      const typeArray = checkType.split(',');
+      const logArray = logUrl.split(',');
+
+      if (typeArray.length === 1 && logArray.length === 1) {
+        // 仅有一个检查和一个日志
+        if (typeArray[0] === '1') {
+          // 是UI，2是接口
+          ui_url = logArray[0].toString();
+        } else if (typeArray[0] === '2') {
+          api_url = logArray[0].toString();
+        }
+      } else if (typeArray.length === 2 && logArray.length === 2) {
+        if (typeArray[0] === '1') {
+          // 是UI，2是接口
+          ui_url = logArray[0].toString();
+        } else if (typeArray[0] === '2') {
+          api_url = logArray[0].toString();
+        }
+
+        if (typeArray[1] === '1') {
+          // 是UI，2是接口
+          ui_url = logArray[1].toString();
+        } else if (typeArray[1] === '2') {
+          api_url = logArray[1].toString();
+        }
+      }
+    }
+
+
+    if (ui_url || api_url) {
+      setLogModal({
+        autoUrl: {style: "inline", ui: ui_url, api: api_url},
+        versionUrl: {style: "none", app: '', global: ''},
+        show: true,
+      });
+
+    } else {
+      message.error({
+        content: '无检查日志，请执行后在查看！',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+  };
+
+
+  // 自动化日志显示弹窗取消
+  const autoCancle = () => {
+    setLogModal({
+      show: false,
+      autoUrl: {style: "none", ui: '', api: ''},
+      versionUrl: {style: "none", app: '', global: ''},
+    });
+  };
 
   return (
     <div>
 
-      {/*上线分支 */}
+      {/* 上线分支 */}
       <div>
         <fieldset className={'fieldStyle'}>
           <legend className={'legendStyle'}>Step4 上线分支</legend>
@@ -314,7 +412,7 @@ const OnlineBranch: React.FC<any> = () => {
                       sortable: true,
                       suppressMenu: true,
                       // autoHeight: true,
-                      minWidth: 90,
+                      minWidth: 75,
                       cellStyle: () => ({   // 单元格垂直居中显示
                         display: "flex",
                         alignItems: "center"
@@ -660,6 +758,52 @@ const OnlineBranch: React.FC<any> = () => {
               </Form.Item>
             </Col>
           </Row>
+        </Form>
+      </Modal>
+
+      {/* 自动化日志的弹窗确认 */}
+      <Modal
+        title={'日志'}
+        visible={logModal.show}
+        onCancel={autoCancle}
+        centered={true}
+        footer={null}
+        width={500}
+        // bodyStyle={{height: 145}}
+      >
+        <Form>
+          <div style={{display: logModal.autoUrl.style}}>
+            <Form.Item name="UiLog" label="UI日志:" style={{marginTop: -15}}>
+              <a href={`${logModal.autoUrl.ui}`} target={'_black'}>
+                {logModal.autoUrl.ui}
+              </a>
+            </Form.Item>
+
+            <Form.Item name="interfaceLog" label="接口日志:" style={{marginTop: -15}}>
+              <a href={`${logModal.autoUrl.api}`} target={'_black'}>
+                {logModal.autoUrl.api}
+              </a>
+            </Form.Item>
+          </div>
+          <div style={{display: logModal.versionUrl.style}}>
+            <Form.Item name="appLog" label="app日志:" style={{marginTop: -15}}>
+              <a href={`${logModal.versionUrl.app}`} target={'_black'}>
+                {logModal.versionUrl.app}
+              </a>
+            </Form.Item>
+            <Form.Item name="globalLog" label="global日志:" style={{marginTop: -1}}>
+              <a href={`${logModal.versionUrl.global}`} target={'_black'}>
+                {logModal.versionUrl.global}
+              </a>
+            </Form.Item>
+          </div>
+
+
+           {/* <Form.Item>
+            <Button style={{float: 'right'}} onClick={autoCancle}>
+              关闭
+            </Button>
+          </Form.Item> */}
         </Form>
       </Modal>
 

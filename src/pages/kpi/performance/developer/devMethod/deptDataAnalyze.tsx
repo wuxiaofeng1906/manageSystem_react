@@ -189,7 +189,6 @@ const converseCoverageFormatForAgGrid = (oraDatas: any) => {
 
     // 部门数据
     departDatas.forEach((depts: any) => {
-      debugger;
 
       /* region 部门数据 */
 

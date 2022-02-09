@@ -52,7 +52,6 @@ const converseArrayToOne = (data: any) => {
 // 转化为ag-grid能被显示的格式
 const converseFormatForAgGrid = (oraDatas: any) => {
 
-  debugger;
   if (!oraDatas) {
     return [];
   }

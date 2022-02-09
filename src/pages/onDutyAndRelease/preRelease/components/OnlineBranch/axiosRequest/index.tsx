@@ -519,7 +519,7 @@ const saveOnlineAutoCheck = async (
   newOnlineBranchNum: string,
   sourceData: any,
 ) => {
-  debugger;
+
   const data = [];
 
   // 上线前检查: 打勾是1，没打勾是2

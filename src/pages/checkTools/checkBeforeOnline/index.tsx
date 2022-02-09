@@ -27,7 +27,7 @@ import axios from 'axios';
 
 
 import dayjs from "dayjs";
-import moment, {now} from 'moment';
+import moment from 'moment';
 
 const {Option} = Select;
 
@@ -782,12 +782,9 @@ const JenkinsCheck: React.FC<any> = () => {
               default:
                 break;
             }
-
           });
-
         }
 
-        debugger;
         // 设置显示的值。
         formForCarryTask.setFieldsValue({
           // 版本检查
@@ -803,8 +800,6 @@ const JenkinsCheck: React.FC<any> = () => {
           branch_targetBranch: branchTargetBranch === "" ? undefined : branchTargetBranch.split(','),
           branch_mainSince: branchMainSince === "" ? undefined : moment(branchMainSince)
         });
-
-
       } else {
         message.error({
           content: `错误：${res.data.msg}`,

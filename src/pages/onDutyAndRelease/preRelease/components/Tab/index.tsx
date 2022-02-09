@@ -42,7 +42,11 @@ const Tab: React.FC<any> = () => {
 
       //  发布项
       const releaseItem = initData?.upService_releaseItem;
-      setRelesaeItem({gridHight: getGridHeight(releaseItem.length).toString(), gridData: releaseItem});
+      if(releaseItem){
+        setRelesaeItem({gridHight: getGridHeight(releaseItem.length).toString(), gridData: releaseItem});
+      }else{
+        setRelesaeItem({gridHight: "100px", gridData: releaseItem});
+      }
       // 一键部署ID展示
       const ids = await showReleasedId(releaseItem);
       modifyReleasedID(ids.showIdArray, ids.queryIdArray);

@@ -7,23 +7,24 @@ const showReleasedId = async (releasedData: any) => {
 
   // 查询id
   const IDs = (await queryReleaseId()).data;
-  releasedData.forEach((ele: any) => {
-    if (!showIdArray.includes(ele.deployment_id)) {
-      showIdArray.push(ele.deployment_id);
+  if (releasedData && releasedData.length > 0) {
+    releasedData.forEach((ele: any) => {
+      if (!showIdArray.includes(ele.deployment_id)) {
+        showIdArray.push(ele.deployment_id);
 
-      for (let i = 0; i < IDs.length; i += 1) {
-        if (ele.deployment_id === IDs[i].id.toString()) {
-          queryIdArray.push({
-            deployment_id: ele.deployment_id,
-            automation_check: IDs[i].automation_test,
-            service: IDs[i].service,
-          });
-          break;
+        for (let i = 0; i < IDs.length; i += 1) {
+          if (ele.deployment_id === IDs[i].id.toString()) {
+            queryIdArray.push({
+              deployment_id: ele.deployment_id,
+              automation_check: IDs[i].automation_test,
+              service: IDs[i].service,
+            });
+            break;
+          }
         }
       }
-    }
-  });
-
+    });
+  }
   return {showIdArray, queryIdArray};
 };
 

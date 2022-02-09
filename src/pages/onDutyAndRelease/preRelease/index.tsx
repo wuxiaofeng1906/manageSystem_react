@@ -150,23 +150,23 @@ const PreRelease: React.FC<any> = () => {
 
   const interValRef: any = useRef(); // 定时任务数据id保存
   // 定时任务
-  useEffect(() => {
-    if (!interValRef.current) {
-      console.log('interValRef.current', interValRef.current);
-      let count = 0;
-      const id = setInterval(async () => {
-        count += 1;
-        console.log(`刷新次数${count},定时任务id${id}`);
-        // 刷新
-        const datas = await alalysisInitData('', tabsData.activeKey);
-        showPageInitData(datas);
-      }, 30 * 1000);
-
-      interValRef.current = id;
-    }
-
-    return () => clearInterval(interValRef.current);
-  }, []);
+  // useEffect(() => {
+  //   if (!interValRef.current) {
+  //     console.log('interValRef.current', interValRef.current);
+  //     let count = 0;
+  //     const id = setInterval(async () => {
+  //       count += 1;
+  //       console.log(`刷新次数${count},定时任务id${id}`);
+  //       // 刷新
+  //       const datas = await alalysisInitData('', tabsData.activeKey);
+  //       showPageInitData(datas);
+  //     }, 30 * 1000);
+  //
+  //     interValRef.current = id;
+  //   }
+  //
+  //   return () => clearInterval(interValRef.current);
+  // }, []);
 
   /* region 释放锁 */
   // 刷新释放正锁住的锁

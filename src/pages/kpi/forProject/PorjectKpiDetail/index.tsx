@@ -354,7 +354,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         </div>
 
         {/* 6 过程质量补充数据 */}
-        <div className="ag-theme-alpine" style={{height: 283, width: '100%'}}>
+        <div className="ag-theme-alpine" style={{height: 370, width: '100%'}}>
           <AgGridReact
             columnDefs={getProcessQualityColumns()} // 定义列
             rowData={processQuality?.data} // 数据绑定
@@ -368,8 +368,15 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
               maxWidth: COMMON_LENGTH,
               headerComponentParams: getProcessQualityHeaderStyle
             }}
-            rowHeight={32}
+            getRowHeight={(params: any) => {
+              debugger;
+              if (params.data?.cut === "一次提测通过率" || params.data?.realValue === "一次提测通过率") {
+                return 50;
+              }
+              return 32;
+            }}
             headerHeight={35}
+            rowHeight={32}
             suppressRowTransform={true}
             onGridReady={onPocessQualityGridReady}
             onCellEditingStopped={async (params: any) => {

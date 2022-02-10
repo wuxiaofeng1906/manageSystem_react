@@ -417,6 +417,20 @@ const alaysisProcessQuality = (sourceData: any) => {
     kind: "加权遗留缺陷密度",
     baseline: "-",
     realValue: sourceData.weightedLegacyDI?.actualValue,
+  }, {
+    title: "",
+    module: "质量",
+    cut: "度量值",
+    kind: "提测通过次数",
+    baseline: "提测次数",
+    realValue: "一次提测通过率",
+  }, {
+    title: "",
+    module: "",
+    cut: "一次提测通过率",
+    kind: sourceData.carryTestPass?.succN,
+    baseline: sourceData.carryTestPass?.totalN,
+    realValue: sourceData.carryTestPass?.ratio,
   }];
 
   return result;
@@ -460,6 +474,11 @@ const queryProcessQuality = async (client: GqlClient<object>, projectId: string)
               actualValue
               baseline
               cut
+            }
+             carryTestPass{
+              succN
+              totalN
+              ratio
             }
           }
       }

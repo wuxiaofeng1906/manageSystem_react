@@ -79,6 +79,15 @@ const setReviewDefectCellStyle = (params: any) => {
 // 6.过程质量补充数据和7.服务
 const setProcessQualityCellStyle = (params: any) => {
 
+  if (params.data?.module === "质量") {
+     return grayCellStyle;
+  }
+  if (params.data?.cut === "一次提测通过率") {
+    if (params.column?.colId === "cut" || params.column?.colId === "realValue") {
+      return grayCellStyle;
+    }
+    return whiteCellStyle;
+  }
   if (params.column?.colId === "title" || params.column?.colId === "module" || params.column?.colId === "baseline" || params.column?.colId === "kind") {
 
     // 不可修改
@@ -95,7 +104,6 @@ const setProcessQualityCellStyle = (params: any) => {
 
 // 7.服务
 const setServiceCellStyle = (params: any) => {
-
   if (params.column?.colId === "title" || params.column?.colId === "module" || params.column?.colId === "item" || params.column?.colId === "ratio") {
 
     // 不可修改

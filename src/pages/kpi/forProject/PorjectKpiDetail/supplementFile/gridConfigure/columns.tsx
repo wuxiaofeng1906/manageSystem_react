@@ -530,7 +530,7 @@ const getProcessQualityColumns = () => {
       maxWidth: TYPE_LENGTH,
       cellRenderer: (params: any) => {
         if (params.value === '6 过程质量补充数据') {
-          return `<div style="font-weight: bold;margin-top: 90px">6.过程质量补<br/>充数据</div>`
+          return `<div style="font-weight: bold;margin-top: 120px">6.过程质量补<br/>充数据</div>`
 
         }
         return `<div style="font-weight: bold;">${params.value}</div>`
@@ -542,7 +542,7 @@ const getProcessQualityColumns = () => {
       rowSpan: (params: any) => {
 
         if (params.data.title === '6 过程质量补充数据') {
-          return 7;
+          return 10.1;
         }
         return 1;
       }
@@ -561,6 +561,10 @@ const getProcessQualityColumns = () => {
           return `<div style="margin-top: 35px">${params.value}</div>`
 
         }
+        if (params.value === '质量') {
+          return `<div style="margin-top: 35px">${params.value}</div>`
+
+        }
         return `<div>${params.value}</div>`
 
       },
@@ -574,28 +578,44 @@ const getProcessQualityColumns = () => {
         if (params.data?.module === "测试") {
           return 3;
         }
+        if (params.data?.module === "质量") {
+          return 3.1;
+        }
         return 1;
       }
     },
     {
       headerName: '是否裁剪',
       field: 'cut',
-      editable: true,
+      editable: (params: any) => {
+        if (params.data?.cut === "度量值" || params.data?.cut === "一次提测通过率") {
+          return false;
+        }
+        return true;
+      },
       cellEditor: "agSelectCellEditor",
       cellEditorParams: {values: ["是", "否"]},
       cellRenderer: (params: any) => {
 
-        if (params.data?.kind === "合计") {
-          return "-";
-        }
-        if (params.value === null || params.value === undefined || params.value === "") {
+        if (params.value === null || params.value === undefined || params.value === "" || params.value === "否") {
           return "否";
         }
 
         if (params.value === true || params.value === "是") {
           return "是";
         }
-        return "否";
+        if (params.value === "度量值") {
+          return `<div style="margin-top: 10px">度量值</div>`;
+        }
+
+        if (params.value === "一次提测通过率") {
+          return `<div>
+                    <div>一次提测</div>
+                    <div style="margin-top: -5px">通过率</div>
+                </div>`;
+        }
+
+        return params.value;
       }
     },
     {
@@ -603,12 +623,36 @@ const getProcessQualityColumns = () => {
       field: 'kind',
       minWidth: 170,
       maxWidth: 170,
+      editable: (params: any) => {
+        if (params.data?.cut === "一次提测通过率") {
+          return true;
+        }
+        return false;
+      },
+      cellRenderer: (params: any) => {
+        if (params.data?.cut === "度量值" || params.data?.cut === "一次提测通过率") {
+          return `<div style="margin-top: 10px">${params.value}</div>`;
+        }
+        return params.value;
+      }
     },
     {
       headerName: '基线值',
       field: 'baseline',
       minWidth: 95,
       maxWidth: 95,
+      editable: (params: any) => {
+        if (params.data?.cut === "一次提测通过率") {
+          return true;
+        }
+        return false;
+      },
+      cellRenderer: (params: any) => {
+        if (params.data?.cut === "度量值" || params.data?.cut === "一次提测通过率") {
+          return `<div style="margin-top: 10px">${params.value}</div>`;
+        }
+        return params.value;
+      }
     },
     {
       headerName: '实际值',
@@ -616,7 +660,6 @@ const getProcessQualityColumns = () => {
       minWidth: 130,
       maxWidth: 130,
       cellRenderer: (params: any) => {
-
         if (params.data?.cut === true) {
           return "";
         }
@@ -628,9 +671,22 @@ const getProcessQualityColumns = () => {
           }
           return params.value;
         }
+
+
+        if (params.value === "一次提测通过率") {
+          return `<div>
+                    <div>一次提测</div>
+                    <div style="margin-top: -5px">通过率</div>
+                </div>`;
+        }
+
         if (params.value) {
+          if (params.data?.cut === "一次提测通过率") {
+            return `<div style="margin-top: 10px">${(Number(params.value) * 100).toFixed(2)}%</div>`;
+          }
           return Number(params.value).toFixed(2);
         }
+
         return params.value;
       },
     }

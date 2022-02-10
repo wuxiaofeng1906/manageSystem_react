@@ -634,6 +634,10 @@ const getProcessQualityColumns = () => {
           return `<div style="margin-top: 10px;font-weight: bold">${params.value}</div>`;
         }
         if (params.data?.cut === "一次提测通过率") {
+          if (params.value === null || params.value === "" || params.value === undefined) {
+            return `<div style="color: red;font-style: italic ;text-align: center;margin-top: 12px">手工录入</div>`;
+
+          }
           return `<div style="margin-top: 10px">${params.value}</div>`;
         }
         return params.value;
@@ -651,10 +655,13 @@ const getProcessQualityColumns = () => {
         return false;
       },
       cellRenderer: (params: any) => {
-        if (params.data?.cut === "度量值" ) {
+        if (params.data?.cut === "度量值") {
           return `<div style="margin-top: 10px;font-weight: bold">${params.value}</div>`;
         }
         if (params.data?.cut === "一次提测通过率") {
+          if (params.value === null || params.value === "" || params.value === undefined) {
+            return `<div style="color: red;font-style: italic ;text-align: center;margin-top: 12px">手工录入</div>`;
+          }
           return `<div style="margin-top: 10px">${params.value}</div>`;
         }
         return params.value;
@@ -678,7 +685,6 @@ const getProcessQualityColumns = () => {
           return params.value;
         }
 
-
         if (params.value === "一次提测通过率") {
           return `<div style="font-weight: bold">
                     <div>一次提测</div>
@@ -692,7 +698,6 @@ const getProcessQualityColumns = () => {
           }
           return Number(params.value).toFixed(2);
         }
-
         return params.value;
       },
     }

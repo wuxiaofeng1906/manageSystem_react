@@ -428,9 +428,9 @@ const alaysisProcessQuality = (sourceData: any) => {
     title: "",
     module: "",
     cut: "一次提测通过率",
-    kind: sourceData.carryTestPass?.succN,
-    baseline: sourceData.carryTestPass?.totalN,
-    realValue: sourceData.carryTestPass?.ratio,
+    kind: sourceData.carryTestPass?.succN === undefined ? "" : sourceData.carryTestPass?.succN,
+    baseline: sourceData.carryTestPass?.totalN === undefined ? "" : sourceData.carryTestPass?.totalN,
+    realValue: sourceData.carryTestPass?.ratio === undefined ? "" : sourceData.carryTestPass?.ratio,
   }];
 
   return result;

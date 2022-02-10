@@ -345,47 +345,63 @@ const reviewDefectCellEdited = async (params: any, projectId: string) => {
   return false;
 };
 
+const updateTestPassValue = (params: any) => {
+  const items: any = [8];
+  const values = Number(params.newValue);
+  let columns = "";
+
+  // 里面要区分column，
+  // 录入提测通过次数的时候：
+  //   没有提测次数值的时候，提测通过次数直接录入成功，不需要任何提示。
+  //   已有提测次数且提测通过次数>提测次数，弹出提示语：提测通过次数不能大于提测次数。
+  // 录入提测次数时：
+  //   如果提测通过次数>提测次数，弹出提示语：提测次数不能小于提测通过次数。
+  if (params.column?.colId === "kind") {   // kind 代表度量值列-提测通过次数
+    columns = "kpi";
+    const testCount = params.data?.baseline;
+    if (testCount && values > Number(testCount)) {
+      message.error({
+        content: "提测通过次数不能大于提测次数！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return true;
+    }
+  } else if (params.column?.colId === "baseline") { // 基线值-提测次数
+    columns = "extra";
+    const testSuccCount = params.data?.kind;
+    if (Number(testSuccCount) > values) {
+      message.error({
+        content: "提测次数不能小于提测通过次数！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return true;
+    }
+  }
+  return {item: items, column: columns, value: values};
+};
 // 过程质量
 const pocessQualityCellEdited = async (params: any, projectId: string) => {
 
-  const items = [];
+  let items = [];
   let columns = "";
   let values: any;
+
   if (params.data?.cut === "一次提测通过率") {     // 修改一次通过率
-    values = Number(params.newValue);
-    items.push(8);
-    // 里面要区分column，
-    // 录入提测通过次数的时候：
-    //   没有提测次数值的时候，提测通过次数直接录入成功，不需要任何提示。
-    //   已有提测次数且提测通过次数>提测次数，弹出提示语：提测通过次数不能大于提测次数。
-    // 录入提测次数时：
-    //   如果提测通过次数>提测次数，弹出提示语：提测次数不能小于提测通过次数。
-    if (params.column?.colId === "kind") {   // kind 代表度量值列-提测通过次数
-      columns = "kpi";
-      const testCount = params.data?.baseline;
-      if (testCount && values > Number(testCount)) {
-        message.error({
-          content: "提测通过次数不能大于提测次数！",
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-        return true;
-      }
-    } else if (params.column?.colId === "baseline") { // 基线值-提测次数
-      columns = "extra";
-      const testSuccCount = params.data?.kind;
-      if (Number(testSuccCount) > values) {
-        message.error({
-          content: "提测次数不能小于提测通过次数！",
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-        return true;
-      }
+    const data = updateTestPassValue(params);
+    if (typeof data !== "boolean") {
+      items = data.item;
+    }
+    if (typeof data !== "boolean") {
+      columns = data?.column;
+    }
+    if (typeof data !== "boolean") {
+      values = data?.value;
     }
   } else {  // 修改是否裁剪
     enum typeObject {

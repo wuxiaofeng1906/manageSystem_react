@@ -17,6 +17,7 @@ import {deleteLockStatus, getAllLockedData} from "./lock/rowLock";
 import {getGridHeight} from './components/gridHeight';
 import {showReleasedId} from "./components/UpgradeService/idDeal/dataDeal";
 import {getNewPageNumber} from './components/Tab/axiosRequest';
+import {message} from "antd";
 
 const PreRelease: React.FC<any> = () => {
   const {data, loading} = useRequest(() => alalysisInitData('', ''));
@@ -86,12 +87,14 @@ const PreRelease: React.FC<any> = () => {
   };
 
   const showPageInitData = async (initData: any, initShow: boolean) => {
-    if (!initData || JSON.stringify(initData) === '{}') {
+
+    if (!initData) {
+      return;
+    }
+    if (JSON.stringify(initData) === '{}') {  // 数据是空对象时，才是正常返回的空数据
       showNoneDataPage();
       return;
     }
-
-
     // Tab数据
     const {tabPageInfo} = initData;
     if (initShow) {

@@ -605,7 +605,7 @@ const getProcessQualityColumns = () => {
           return "是";
         }
         if (params.value === "度量值") {
-          return `<div style="margin-top: 10px">度量值</div>`;
+          return `<div style="margin-top: 10px;font-weight: bold">度量值</div>`;
         }
 
         if (params.value === "一次提测通过率") {
@@ -630,7 +630,10 @@ const getProcessQualityColumns = () => {
         return false;
       },
       cellRenderer: (params: any) => {
-        if (params.data?.cut === "度量值" || params.data?.cut === "一次提测通过率") {
+        if (params.data?.cut === "度量值") {
+          return `<div style="margin-top: 10px;font-weight: bold">${params.value}</div>`;
+        }
+        if (params.data?.cut === "一次提测通过率") {
           return `<div style="margin-top: 10px">${params.value}</div>`;
         }
         return params.value;
@@ -648,7 +651,10 @@ const getProcessQualityColumns = () => {
         return false;
       },
       cellRenderer: (params: any) => {
-        if (params.data?.cut === "度量值" || params.data?.cut === "一次提测通过率") {
+        if (params.data?.cut === "度量值" ) {
+          return `<div style="margin-top: 10px;font-weight: bold">${params.value}</div>`;
+        }
+        if (params.data?.cut === "一次提测通过率") {
           return `<div style="margin-top: 10px">${params.value}</div>`;
         }
         return params.value;
@@ -674,7 +680,7 @@ const getProcessQualityColumns = () => {
 
 
         if (params.value === "一次提测通过率") {
-          return `<div>
+          return `<div style="font-weight: bold">
                     <div>一次提测</div>
                     <div style="margin-top: -5px">通过率</div>
                 </div>`;

@@ -1,8 +1,8 @@
 /*
- * @Description: 项目过程质量的字段
+ * @Description: 评审和缺陷的字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:47:07
- * @LastEditTime: 2022-01-27 06:07:37
+ * @LastEditTime: 2022-02-10 07:31:31
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -81,6 +81,12 @@ export const ReviewDefectCols: ColDef[] = [
     headerName: '发布测试',
     columnGroupShow: SHOW['closed'],
     field: `${moduleName}.releaseTest`,
+    ...defaultParmas,
+  },
+  {
+    headerName: '合计',
+    columnGroupShow: SHOW['closed'],
+    field: `${moduleName}.total`,
     ...defaultParmas,
   },
 ];

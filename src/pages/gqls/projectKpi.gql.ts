@@ -2,7 +2,7 @@
  * @Description: 项目度量指标
  * @Author: jieTan
  * @Date: 2021-12-02 11:41:52
- * @LastEditTime: 2022-02-10 03:38:17
+ * @LastEditTime: 2022-02-10 07:25:41
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -69,6 +69,7 @@ export default (args: GQL_PARAMS, funcWithParams: Function): [string, string] =>
         integrationTest
         systemTest
         releaseTest
+        total
       }
       storyStable{
         devplan

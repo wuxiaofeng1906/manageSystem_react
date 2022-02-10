@@ -1,28 +1,16 @@
-import { message, Select } from 'antd';
+import {message, Select} from 'antd';
 import {
-  getAllProject,
-  getAllDeptUsers,
-  getBranchName,
-  getServices,
-  getImgEnv,
+  getAllProject, getAllDeptUsers, getBranchName,
+  getServices, getImgEnv, getTestEnv
 } from '@/publicMethods/verifyAxios';
 import {
-  queryReleaseType,
-  queryReleaseWay,
-  queryReleaseId,
-  getOnlineDev,
-  getPulishItem,
-  getIsApiAndDatabaseUpgrade,
-  getUpgradeApi,
-  getApiService,
-  getApiMethod,
-  getRepaireCategory,
-  getTechSide,
-  getCheckType,
-  getBrowserType,
+  queryReleaseType, queryReleaseWay, queryReleaseId, getOnlineDev,
+  getPulishItem, getIsApiAndDatabaseUpgrade, getUpgradeApi,
+  getApiService, getApiMethod, getRepaireCategory, getTechSide,
+  getCheckType, getBrowserType,
 } from './axiosRequest';
 
-const { Option } = Select;
+const {Option} = Select;
 
 /* region 预发布项目 */
 // 项目名称下拉框
@@ -498,8 +486,36 @@ const loadImgEnvSelect = async () => {
   return resultArray;
 };
 
+// 测试环境
+const loadTestEnvSelect = async () => {
+  const source = await getTestEnv();
+  const resultArray: any = [];
+
+  if (source.message !== '') {
+    message.error({
+      content: source.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (source.data) {
+    const datas = source.data;
+    datas.forEach((ele: any) => {
+      resultArray.push(
+        <Option key={ele} value={`${ele}`}>
+          {ele}
+        </Option>,
+      );
+    });
+  }
+
+  return resultArray;
+};
+
 // 检查类型下拉框
-const loadCheckTypeSelect = async () => {
+const loadCheckTypeSelect = async (type: string) => {
+  // 检查类型，上线后自动化检查类型只显示UI选项，其余不显示。
   const source = await getCheckType();
   const resultArray: any = [];
 
@@ -515,11 +531,22 @@ const loadCheckTypeSelect = async () => {
     const datas = source.data;
     datas.forEach((ele: any) => {
       if (ele.check_type_id !== '9') {
-        resultArray.push(
-          <Option key={ele.check_type_id} value={`${ele.check_type_id}`}>
-            {ele.check_type_name}
-          </Option>,
-        );
+        if (type === "after") {
+          if (ele.check_type_name === "UI") {
+            resultArray.push(
+              <Option key={ele.check_type_id} value={`${ele.check_type_id}`}>
+                {ele.check_type_name}
+              </Option>,
+            );
+          }
+        } else {
+          resultArray.push(
+            <Option key={ele.check_type_id} value={`${ele.check_type_id}`}>
+              {ele.check_type_name}
+            </Option>,
+          );
+        }
+
       }
     });
   }
@@ -574,6 +601,7 @@ export {
   loadBranchNameSelect,
   loadServiceSelect,
   loadImgEnvSelect,
+  loadTestEnvSelect,
   loadCheckTypeSelect,
   loadBrowserTypeSelect,
 };

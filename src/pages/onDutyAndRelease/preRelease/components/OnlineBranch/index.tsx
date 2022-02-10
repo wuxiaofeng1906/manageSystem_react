@@ -14,7 +14,7 @@ import {
 import moment from "moment";
 import dayjs from "dayjs";
 import {
-  loadBranchNameSelect, loadBrowserTypeSelect, loadCheckTypeSelect, loadImgEnvSelect, loadServiceSelect,
+  loadBranchNameSelect, loadBrowserTypeSelect, loadCheckTypeSelect, loadTestEnvSelect, loadServiceSelect,
   loadTechSideSelect
 } from "../../comControl/controler";
 import {alalysisInitData} from "../../datas/dataAnalyze";
@@ -41,7 +41,8 @@ const OnlineBranch: React.FC<any> = () => {
     techSide: [],
     server: [],
     imgEnv: [],
-    checkType: [],
+    before_checkType: [],
+    after_checkType: [],
     browser: [],
   });
   const [logModal, setLogModal] = useState({
@@ -252,8 +253,9 @@ const OnlineBranch: React.FC<any> = () => {
       branchName: await loadBranchNameSelect(),
       techSide: await loadTechSideSelect(),
       server: await loadServiceSelect(),
-      imgEnv: await loadImgEnvSelect(),
-      checkType: await loadCheckTypeSelect(),
+      imgEnv: await loadTestEnvSelect(),
+      before_checkType: await loadCheckTypeSelect("before"),
+      after_checkType: await loadCheckTypeSelect("after"),
       browser: await loadBrowserTypeSelect(),
     });
   };
@@ -622,7 +624,7 @@ const OnlineBranch: React.FC<any> = () => {
                 {/* 检查类型 */}
                 <Form.Item label="检查类型:" name="beforeCheckType" style={{marginTop: -10}}>
                   <Select mode="multiple" style={{width: '100%'}} showSearch>
-                    {onlineBranchFormSelected.checkType}
+                    {onlineBranchFormSelected.before_checkType}
                   </Select>
                 </Form.Item>
               </Col>
@@ -675,7 +677,7 @@ const OnlineBranch: React.FC<any> = () => {
                 {/* 检查类型 */}
                 <Form.Item label="检查类型:" name="afterCheckType" style={{marginTop: -10}}>
                   <Select mode="multiple" style={{width: '100%'}} showSearch>
-                    {onlineBranchFormSelected.checkType}
+                    {onlineBranchFormSelected.after_checkType}
                   </Select>
                 </Form.Item>
               </Col>

@@ -5,7 +5,7 @@ import {getNewPageNumber, deleteReleaseItem, modifyTabsName} from './axiosReques
 import {alalysisInitData} from '../../datas/dataAnalyze';
 import {getCheckProcess} from "@/pages/onDutyAndRelease/preRelease/components/CheckProgress/axiosRequest";
 import {showProgressData} from "@/pages/onDutyAndRelease/preRelease/components/CheckProgress/processAnalysis";
-import {getGridHeight} from "@/pages/onDutyAndRelease/preRelease/components/gridHeight";
+import {getGridRowsHeight} from "@/pages/onDutyAndRelease/preRelease/components/gridHeight";
 import {showReleasedId} from "@/pages/onDutyAndRelease/preRelease/components/UpgradeService/idDeal/dataDeal";
 import {getAllLockedData} from "@/pages/onDutyAndRelease/preRelease/lock/rowLock";
 
@@ -21,74 +21,6 @@ const Tab: React.FC<any> = () => {
 
   /* region tab 自身事件 */
   const [showTabs, setShowTabs] = useState({shown: false, targetKey: ''});
-  const showPageData = async (initData: any) => {
-    if (initData) {
-      // Tab数据    // 进度条数据
-      const {tabPageInfo} = initData;
-      setTabsData(tabPageInfo?.activeKey, tabsData.panes);
-      // setTabsData(activeKeys, tabsData.panes);
-      const processData: any = await getCheckProcess(tabPageInfo?.activeKey);
-      if (processData) {
-        modifyProcessStatus(showProgressData(processData.data));
-      }
-
-      // 当前界面被锁住的ID
-      const lockedData = await getAllLockedData(tabPageInfo?.activeKey);
-      modifyAllLockedArray(lockedData.data);
-
-      // 预发布项目
-      const preReleaseProject = initData?.preProject;
-      modifyPreReleaseData(preReleaseProject);
-
-      //  发布项
-      const releaseItem = initData?.upService_releaseItem;
-      if(releaseItem){
-        setRelesaeItem({gridHight: getGridHeight(releaseItem.length).toString(), gridData: releaseItem});
-      }else{
-        setRelesaeItem({gridHight: "100px", gridData: releaseItem});
-      }
-      // 一键部署ID展示
-      const ids = await showReleasedId(releaseItem);
-      modifyReleasedID(ids.showIdArray, ids.queryIdArray);
-      //  发布接口
-      const releaseApi = initData?.upService_interface;
-      setUpgradeApi({gridHight: getGridHeight(releaseApi.length).toString(), gridData: releaseApi});
-      //  发布服务确认
-      const releaseConfirm = initData?.upService_confirm;
-      setUpgradeConfirm({gridHight: getGridHeight(releaseConfirm.length).toString(), gridData: releaseConfirm});
-      // 数据修复
-      const dataRepaire = initData?.reviewData_repaire;
-      setDataReview({gridHight: getGridHeight(dataRepaire.length).toString(), gridData: dataRepaire});
-      // 数据修复确认
-      const dataRepaireConfirm = initData?.reviewData_confirm;
-      setDataReviewConfirm({
-        gridHight: getGridHeight(dataRepaireConfirm.length).toString(),
-        gridData: dataRepaireConfirm
-      });
-
-      // 上线分支
-      const onlineBranchDatas = initData?.onlineBranch;
-      setOnlineBranch({
-        gridHight: getGridHeight(onlineBranchDatas.length, true).toString(),
-        gridData: onlineBranchDatas
-      });
-
-      //   对应工单
-      const correspondOrderData = initData?.correspondOrder;
-      setCorrespOrder({
-        gridHight: getGridHeight(correspondOrderData.length).toString(),
-        gridData: correspondOrderData
-      });
-    }
-  };
-
-  // Tabs页面切换
-  const onTabsChange = async (activeKeys: any) => {
-
-    const newTabData = await alalysisInitData('', activeKeys);
-    showPageData(newTabData);
-  };
-
   const showNoneDataPage = async () => {
     modifyProcessStatus({
       // 进度条相关数据和颜色
@@ -121,7 +53,7 @@ const Tab: React.FC<any> = () => {
     setUpgradeConfirm({gridHight: "100px", gridData: []});
     // 数据修复
     setDataReview({gridHight: "100px", gridData: []});
-    //数据修复确认
+    // 数据修复确认
     setDataReviewConfirm({gridHight: "100px", gridData: []});
 
     // 上线分支
@@ -130,6 +62,78 @@ const Tab: React.FC<any> = () => {
     //   对应工单
     setCorrespOrder({gridHight: "100px", gridData: []});
   };
+
+  const showPageData = async (initData: any, activeKeys: string) => {
+
+    if (!initData || JSON.stringify(initData) === '{}') {
+      setTabsData(activeKeys, tabsData.panes);
+      showNoneDataPage();
+    } else {
+      // Tab数据
+      const {tabPageInfo} = initData;
+      setTabsData(activeKeys, tabsData.panes);
+      // setTabsData(activeKeys, tabsData.panes);
+      // 进度条数据
+      const processData: any = await getCheckProcess(tabPageInfo?.activeKey);
+      if (processData) {
+        modifyProcessStatus(showProgressData(processData.data));
+      }
+
+      // 当前界面被锁住的ID
+      const lockedData = await getAllLockedData(tabPageInfo?.activeKey);
+      modifyAllLockedArray(lockedData.data);
+
+      // 预发布项目
+      const preReleaseProject = initData?.preProject;
+      modifyPreReleaseData(preReleaseProject);
+
+      //  发布项
+      const releaseItem = initData?.upService_releaseItem;
+      setRelesaeItem({gridHight: getGridRowsHeight(releaseItem), gridData: releaseItem});
+
+      // 一键部署ID展示
+      const ids = await showReleasedId(releaseItem);
+      modifyReleasedID(ids.showIdArray, ids.queryIdArray);
+      //  发布接口
+      const releaseApi = initData?.upService_interface;
+      setUpgradeApi({gridHight: getGridRowsHeight(releaseApi), gridData: releaseApi});
+      //  发布服务确认
+      const releaseConfirm = initData?.upService_confirm;
+      setUpgradeConfirm({gridHight: getGridRowsHeight(releaseConfirm), gridData: releaseConfirm});
+      // 数据修复
+      const dataRepaire = initData?.reviewData_repaire;
+      setDataReview({gridHight: getGridRowsHeight(dataRepaire), gridData: dataRepaire});
+      // 数据修复确认
+      const dataRepaireConfirm = initData?.reviewData_confirm;
+      setDataReviewConfirm({
+        gridHight: getGridRowsHeight(dataRepaireConfirm),
+        gridData: dataRepaireConfirm
+      });
+
+      // 上线分支
+      const onlineBranchDatas = initData?.onlineBranch;
+      setOnlineBranch({
+        gridHight: getGridRowsHeight(onlineBranchDatas, true),
+        gridData: onlineBranchDatas
+      });
+
+      //   对应工单
+      const correspondOrderData = initData?.correspondOrder;
+      setCorrespOrder({
+        gridHight: getGridRowsHeight(correspondOrderData),
+        gridData: correspondOrderData
+      });
+    }
+  };
+
+  // Tabs页面切换
+  const onTabsChange = async (activeKeys: any) => {
+
+    const newTabData = await alalysisInitData('', activeKeys);
+    showPageData(newTabData, activeKeys);
+  };
+
+
   // 新增tab
   const addTabs = async () => {
     // 获取新的pageNum

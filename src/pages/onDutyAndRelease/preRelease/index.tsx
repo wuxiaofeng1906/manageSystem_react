@@ -14,22 +14,28 @@ import {useModel} from '@@/plugin-model/useModel';
 import {getCheckProcess} from './components/CheckProgress/axiosRequest';
 import {showProgressData} from './components/CheckProgress/processAnalysis';
 import {deleteLockStatus, getAllLockedData} from "./lock/rowLock";
-import {getGridHeight} from './components/gridHeight';
+import {getGridRowsHeight} from './components/gridHeight';
 import {showReleasedId} from "./components/UpgradeService/idDeal/dataDeal";
 import {getNewPageNumber} from './components/Tab/axiosRequest';
-import {message} from "antd";
 
+let currentKey: any;
+let currentPanes: any;
 const PreRelease: React.FC<any> = () => {
   const {data, loading} = useRequest(() => alalysisInitData('', ''));
 
   // Tab标签数据显示
   const {
-    tabsData, setTabsData, modifyProcessStatus, modifyPreReleaseData, lockedItem, allLockedArray,
+    tabsData, setTabsData, modifyProcessStatus, modifyPreReleaseData, lockedItem,
     setRelesaeItem, setUpgradeApi, setUpgradeConfirm, modifyReleasedID,
     setDataReview, setDataReviewConfirm, setOnlineBranch, setCorrespOrder,
     modifyAllLockedArray
   } = useModel('releaseProcess');
 
+  // 用于定时任务显示数据，定是个hi任务useEffect中渲染了一次。不能实时更新
+  currentKey = tabsData.activeKey;
+  currentPanes = tabsData.panes;
+
+  // 显示无数据界面
   const showNoneDataPage = async () => {
 
     // tab 页面
@@ -86,11 +92,13 @@ const PreRelease: React.FC<any> = () => {
     setCorrespOrder({gridHight: "100px", gridData: []});
   };
 
+  // 显示有数据界面
   const showPageInitData = async (initData: any, initShow: boolean) => {
 
-    if (!initData) {
+    if (!initData || (JSON.stringify(initData) === '{}' && currentKey !== "")) {  // 没有数据，但是有activekey，也不再创建tab数据
       return;
     }
+
     if (JSON.stringify(initData) === '{}') {  // 数据是空对象时，才是正常返回的空数据
       showNoneDataPage();
       return;
@@ -101,8 +109,9 @@ const PreRelease: React.FC<any> = () => {
       setTabsData(tabPageInfo?.activeKey, tabPageInfo.panes);
 
     } else {
-      setTabsData(tabPageInfo?.activeKey, tabsData.panes);
-
+      // const source = await alalysisInitData("tabPageInfo");
+      // const tabsInfomation = source?.tabPageInfo;
+      setTabsData(tabPageInfo?.activeKey, currentPanes);
     }
     // 进度条数据
     const processData: any = await getCheckProcess(tabPageInfo?.activeKey);
@@ -118,71 +127,66 @@ const PreRelease: React.FC<any> = () => {
 
     //  发布项
     const releaseItem = initData?.upService_releaseItem;
-    setRelesaeItem({gridHight: getGridHeight(releaseItem.length).toString(), gridData: releaseItem});
+    setRelesaeItem({gridHight: getGridRowsHeight(releaseItem), gridData: releaseItem});
     // 一键部署ID展示
     const ids = await showReleasedId(releaseItem);
     modifyReleasedID(ids.showIdArray, ids.queryIdArray);
     //  发布接口
     const releaseApi = initData?.upService_interface;
-    setUpgradeApi({gridHight: getGridHeight(releaseApi.length).toString(), gridData: releaseApi});
+    setUpgradeApi({gridHight: getGridRowsHeight(releaseApi), gridData: releaseApi});
     //  发布服务确认
     const releaseConfirm = initData?.upService_confirm;
-    setUpgradeConfirm({gridHight: getGridHeight(releaseConfirm.length).toString(), gridData: releaseConfirm});
+    setUpgradeConfirm({gridHight: getGridRowsHeight(releaseConfirm), gridData: releaseConfirm});
     // 数据修复
     const dataRepaire = initData?.reviewData_repaire;
-    setDataReview({gridHight: getGridHeight(dataRepaire.length).toString(), gridData: dataRepaire});
+    setDataReview({gridHight: getGridRowsHeight(dataRepaire), gridData: dataRepaire});
     // 数据修复确认
     const dataRepaireConfirm = initData?.reviewData_confirm;
     setDataReviewConfirm({
-      gridHight: getGridHeight(dataRepaireConfirm.length).toString(),
+      gridHight: getGridRowsHeight(dataRepaireConfirm),
       gridData: dataRepaireConfirm
     });
 
     // 上线分支
     const onlineBranchDatas = initData?.onlineBranch;
     setOnlineBranch({
-      gridHight: getGridHeight(onlineBranchDatas.length, true).toString(),
+      gridHight: getGridRowsHeight(onlineBranchDatas, true),
       gridData: onlineBranchDatas
     });
 
     //   对应工单
     const correspondOrderData = initData?.correspondOrder;
     setCorrespOrder({
-      gridHight: getGridHeight(correspondOrderData.length).toString(),
+      gridHight: getGridRowsHeight(correspondOrderData),
       gridData: correspondOrderData
     });
 
   };
+
   // showPageInitData(data, true);
   useEffect(() => {
     showPageInitData(data, true);
   }, [data, loading]);
-  //
-  // const interValRef: any = useRef(); // 定时任务数据id保存
-  // console.log("tabsData", tabsData);
+
+  const interValRef: any = useRef(); // 定时任务数据id保存
   // 定时任务
-  // useEffect(() => {
-  //   if (!interValRef.current) {
-  //     console.log('interValRef.current', interValRef.current);
-  //     let count = 0;
-  //     const id = setInterval(async () => {
-  //       // console.log("lockedItem", lockedItem);
-  //       count += 1;
-  //       console.log(`刷新次数${count},定时任务id${id}`);
-  //       // if (lockedItem === "") {  // 只有在没被锁定的时候才动态加载
-  //       // 刷新
-  //       console.log("tabsData.activeKey", tabsData.activeKey);
-  //       const datas = await alalysisInitData('', tabsData.activeKey);
-  //       showPageInitData(datas, false);
-  //       // }
-  //
-  //     }, 30 * 1000);
-  //
-  //     interValRef.current = id;
-  //   }
-  //
-  //   return () => clearInterval(interValRef.current);
-  // }, []);
+  useEffect(() => {
+    if (!interValRef.current) {
+      let count = 0;
+      const id = setInterval(async () => {
+        count += 1;
+        console.log(`刷新次数=${count},定时任务id=${id},currentKey=${currentKey}`);
+        // 刷新
+        if (lockedItem === "") {
+          const datas = await alalysisInitData('', currentKey);
+          showPageInitData(datas, false);
+        }
+      }, 30 * 1000);
+
+      interValRef.current = id;
+    }
+    return () => clearInterval(interValRef.current);
+  }, []);
 
   /* region 释放锁 */
   // 刷新释放正锁住的锁

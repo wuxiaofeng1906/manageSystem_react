@@ -16,7 +16,7 @@ import {confirmUpgradeService} from "./serviceConfirm";
 import {alalysisInitData} from "../../datas/dataAnalyze";
 import {getCheckProcess} from '../../components/CheckProgress/axiosRequest';
 import {showProgressData} from '../../components/CheckProgress/processAnalysis';
-import {vertifyModifyFlag,releaseAppChangRowColor} from '../../operate';
+import {vertifyModifyFlag, releaseAppChangRowColor} from '../../operate';
 import {inquireService} from './axiosRequest';
 import {deleteLockStatus, getLockStatus} from "../../lock/rowLock";
 import {
@@ -24,7 +24,7 @@ import {
   loadPulishItemSelect, loadUpgradeApiSelect
 } from "../../comControl/controler";
 import {upgradePulishItem, addPulishApi, deleteReleasedID} from "./axiosRequest";
-import {getGridHeight} from "../../components/gridHeight";
+import {getGridRowsHeight} from "../../components/gridHeight";
 import {alaReleasedChanged} from "./idDeal/dataDeal";
 
 const {TextArea} = Input;
@@ -35,7 +35,7 @@ const usersInfo = JSON.parse(userLogins);
 const UpgradeService: React.FC<any> = () => {
   const {
     tabsData, modifyProcessStatus, releaseItem, upgradeApi, upgradeConfirm, lockedItem, modifyLockedItem,
-    setRelesaeItem, setUpgradeApi, releasedID, modifyReleasedID,allLockedArray, modifyAllLockedArray
+    setRelesaeItem, setUpgradeApi, releasedID, modifyReleasedID, allLockedArray
   } = useModel('releaseProcess');
   const [formUpgradeService] = Form.useForm(); // 升级服务
   const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
@@ -104,7 +104,7 @@ const UpgradeService: React.FC<any> = () => {
         const newData: any = await alalysisInitData('pulishItem', tabsData.activeKey);
         // firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
         setRelesaeItem({
-          gridHight: getGridHeight((newData.upService_releaseItem).length).toString(),
+          gridHight: getGridRowsHeight((newData.upService_releaseItem)),
           gridData: newData.upService_releaseItem
         });
 
@@ -151,7 +151,7 @@ const UpgradeService: React.FC<any> = () => {
     } else {
 
       const newData: any = (await alalysisInitData('pulishItem', tabsData.activeKey)).upService_releaseItem;
-      setRelesaeItem({gridHight: getGridHeight(newData.length).toString(), gridData: newData});
+      setRelesaeItem({gridHight: getGridRowsHeight(newData), gridData: newData});
 
 
       // 需要判断升级接口内容是否有值，如果没有的话，则需要新增一个空行
@@ -159,7 +159,7 @@ const UpgradeService: React.FC<any> = () => {
 
       if (!apidata.upService_interface || apidata.upService_interface <= 0) {
         // secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
-        setUpgradeApi({gridHight: getGridHeight(1).toString(), gridData: [{}]});
+        setUpgradeApi({gridHight: getGridRowsHeight([]).toString(), gridData: [{}]});
       }
     }
   };
@@ -285,7 +285,7 @@ const UpgradeService: React.FC<any> = () => {
       const newData: any = await alalysisInitData('pulishItem', tabsData.activeKey);
       // firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
       setRelesaeItem({
-        gridHight: getGridHeight((newData.upService_releaseItem).length).toString(),
+        gridHight: getGridRowsHeight((newData.upService_releaseItem)),
         gridData: newData.upService_releaseItem
       });
 
@@ -424,10 +424,9 @@ const UpgradeService: React.FC<any> = () => {
 
       const newData: any = await alalysisInitData('pulishApi', tabsData.activeKey);
       setUpgradeApi({
-        gridHight: getGridHeight((newData.upService_interface).length).toString(),
+        gridHight: getGridRowsHeight((newData.upService_interface)),
         gridData: newData.upService_interface
       });
-
 
       if (upgradeIntModal.title === '修改') {
         //   释放锁

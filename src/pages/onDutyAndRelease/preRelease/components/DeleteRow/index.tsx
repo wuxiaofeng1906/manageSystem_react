@@ -5,7 +5,7 @@ import {getLockedId, getLockStatus} from "../../lock/rowLock";
 import {delUpgradeItems} from "./axiosRequest";
 import {vertifyModifyFlag} from '../../operate';
 import {alalysisInitData} from "../../datas/dataAnalyze";
-import {getGridHeight} from "../../components/gridHeight";
+import {getGridRowsHeight} from "../../components/gridHeight";
 import {showReleasedId} from "@/pages/onDutyAndRelease/preRelease/components/UpgradeService/idDeal/dataDeal";
 
 const DeleteRow: React.FC<any> = () => {
@@ -45,7 +45,7 @@ const DeleteRow: React.FC<any> = () => {
       case 1: {
         const newDatas = await alalysisInitData('pulishItem', currentListNo);
         setRelesaeItem({
-          gridHight: getGridHeight((newDatas.upService_releaseItem).length),
+          gridHight: getGridRowsHeight((newDatas.upService_releaseItem)),
           gridData: newDatas.upService_releaseItem
         });
         // firstUpSerGridApi.current?.setRowData(newDatas.upService_releaseItem);
@@ -58,7 +58,7 @@ const DeleteRow: React.FC<any> = () => {
       case 2: {
         const newDatas: any = await alalysisInitData('pulishApi', currentListNo);
         setUpgradeApi({
-          gridHight: getGridHeight((newDatas.upService_interface).length),
+          gridHight: getGridRowsHeight((newDatas.upService_interface)),
           gridData: newDatas.upService_interface
         });
       }
@@ -66,7 +66,7 @@ const DeleteRow: React.FC<any> = () => {
       case 3: {
         const newDatas: any = await alalysisInitData('dataReview', currentListNo);
         setDataReview({
-          gridHight: getGridHeight((newDatas.reviewData_repaire).length),
+          gridHight: getGridRowsHeight((newDatas.reviewData_repaire)),
           gridData: newDatas.reviewData_repaire
         });
       }
@@ -74,7 +74,7 @@ const DeleteRow: React.FC<any> = () => {
       case 4: {
         const newDatas: any = await alalysisInitData('onlineBranch', currentListNo);
         setOnlineBranch({
-          gridHight: getGridHeight((newDatas.onlineBranch).length, true),
+          gridHight: getGridRowsHeight((newDatas.onlineBranch), true),
           gridData: newDatas.onlineBranch
         });
       }

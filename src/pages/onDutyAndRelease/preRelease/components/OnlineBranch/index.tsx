@@ -18,7 +18,7 @@ import {
   loadTechSideSelect
 } from "../../comControl/controler";
 import {alalysisInitData} from "../../datas/dataAnalyze";
-import {getGridHeight} from "../gridHeight";
+import {getGridRowsHeight} from "../gridHeight";
 import {releaseAppChangRowColor} from '../../operate';
 
 let newOnlineBranchNum = '';
@@ -105,7 +105,7 @@ const OnlineBranch: React.FC<any> = () => {
       const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
       if (newData.onlineBranch) {
         setOnlineBranch({
-          gridHight: getGridHeight((newData.onlineBranch).length, true).toString(),
+          gridHight: getGridRowsHeight((newData.onlineBranch), true),
           gridData: newData.onlineBranch
         });
       }

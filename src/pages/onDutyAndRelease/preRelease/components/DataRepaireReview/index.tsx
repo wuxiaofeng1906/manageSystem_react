@@ -10,7 +10,7 @@ import {getCheckProcess} from '../../components/CheckProgress/axiosRequest';
 import {showProgressData} from '../../components/CheckProgress/processAnalysis';
 import {deleteLockStatus, getLockStatus} from "../../lock/rowLock";
 import {loadCategorySelect, loadCommiterSelect} from "../../comControl/controler";
-import {getGridHeight} from "@/pages/onDutyAndRelease/preRelease/components/gridHeight";
+import {getGridRowsHeight} from "@/pages/onDutyAndRelease/preRelease/components/gridHeight";
 import {releaseAppChangRowColor} from '../../operate';
 
 const {TextArea} = Input;
@@ -122,7 +122,7 @@ const DataRepaireReview: React.FC<any> = () => {
       // 刷新
       const newData: any = await alalysisInitData('dataReview', tabsData.activeKey);
       setDataReview({
-        gridHight: getGridHeight((newData?.reviewData_repaire).length).toString(),
+        gridHight: getGridRowsHeight((newData?.reviewData_repaire)),
         gridData: newData?.reviewData_repaire
       });
 

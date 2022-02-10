@@ -785,7 +785,7 @@ const getServiceColumns = () => {
           const values = (params.value).toFixed(2);
           return `<div style="margin-top: 12px">${(Number(values) * 100).toFixed(2)}%</div>`;
         }
-        return `<div style="margin-top: 12px">${params.value}</div>`;
+        return "";
       }
     }
   ];

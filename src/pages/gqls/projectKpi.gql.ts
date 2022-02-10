@@ -2,7 +2,7 @@
  * @Description: 项目度量指标
  * @Author: jieTan
  * @Date: 2021-12-02 11:41:52
- * @LastEditTime: 2022-01-27 06:07:45
+ * @LastEditTime: 2022-02-10 01:52:38
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -36,6 +36,7 @@ export default (args: GQL_PARAMS, funcWithParams: Function): [string, string] =>
         bugResolvedDura
         weightedLegacyDefect
         weightedLegacyDI
+        carryTestPass
       }
       progressDeviation{
         storyplan

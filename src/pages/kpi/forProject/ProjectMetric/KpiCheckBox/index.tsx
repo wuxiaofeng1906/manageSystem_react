@@ -2,7 +2,7 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2022-01-26 10:25:49
+ * @LastEditTime: 2022-02-11 10:20:04
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -107,8 +107,7 @@ export default () => {
     }
 
     // gql查询数据
-    const newParams = {
-      ...pkGqlParmas,
+    const tmpParams = {
       kpis: kpiItems,
       dates: {
         start: moment()
@@ -116,6 +115,8 @@ export default () => {
           .format(MOMENT_FORMAT.date),
       }, // 构建默认查询参数 - 带查询时间
     };
+    //
+    const newParams: any = pkGqlParmas ? { ...(pkGqlParmas as any), kpis: kpiItems } : tmpParams;
     setPkGqlParmas(newParams);
     const _params: GQL_PARAMS = { func: 'projectKpi', params: newParams };
     const ret = await queryGQL(gqlClient, projectKpiGql, _params);

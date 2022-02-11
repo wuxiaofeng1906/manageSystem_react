@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-01-26 10:48:48
+ * @LastEditTime: 2022-02-11 10:39:02
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -38,8 +38,8 @@ const defaultDateRange: [Moment, any] = [
   null,
 ]; // date组件默认显示
 const defaultDateStr: [string, any] = [defaultDateRange[0].format(MOMENT_FORMAT.date), null];
-// 
-let dateStr: [string, any] = defaultDateStr; // 存放时间range信息
+//
+let dateStr: [string, any] | undefined = defaultDateStr; // 存放时间range信息
 let doChange = false;
 const defaultSeclectItems = { deptIds: [], projIds: [], dates: defaultDateRange, doQuery: false };
 /* ************************************************************************************************************** */
@@ -61,6 +61,7 @@ export default () => {
     dropdownStyle: { maxHeight: 400, overflow: 'auto' },
     treeCheckable: true,
     maxTagCount: 'responsive',
+    showCheckedStrategy: 'SHOW_ALL',
     filterTreeNode: (inputValue: string, treeNode: { title: string }) =>
       treeNode?.title.includes(inputValue) ? true : false,
   }; // <Select>默认的一些配置
@@ -89,7 +90,7 @@ export default () => {
   /* 方法区 */
   const _onSelect = async () => {
     // 参数构建
-    const gqlParams = pkGqlParmas;
+    const gqlParams = pkGqlParmas ?? {};
     //
     if (selectItems.deptIds.length !== 0)
       Object.assign(gqlParams, { deptIds: selectItems.deptIds });
@@ -108,7 +109,7 @@ export default () => {
     } else if (gqlParams['dates'] !== undefined) delete gqlParams['dates'];
 
     //
-    setPkGqlParmas(gqlParams);
+    setPkGqlParmas(gqlParams as any);
     const params: GQL_PARAMS = {
       func: GRAPHQL_QUERY['PROJECT_KPI'],
       params: gqlParams,

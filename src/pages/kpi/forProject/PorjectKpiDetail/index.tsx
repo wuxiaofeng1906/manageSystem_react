@@ -1,5 +1,4 @@
-import React, {useRef} from 'react';
-import {PageContainer} from '@ant-design/pro-layout';
+import React, {useRef, useState} from 'react';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -28,22 +27,22 @@ import {
   setServiceCellStyle
 } from './supplementFile/style/gridStyles';
 import './supplementFile/style/styles.css';
-import {Button, PageHeader, Select, Breadcrumb} from "antd";
+import {Button, PageHeader, Spin, Breadcrumb, message} from "antd";
 import {
   getProcessHeaderStyle, getStoryStabilityHeaderStyle, getStageWorkloadHeaderStyle,
   getProductRateHeaderStyle, getReviewDefectHeaderStyle, getProcessQualityHeaderStyle,
   getServiceHeaderStyle
 } from "./supplementFile/style/columsTitleRenderer";
 import {CustomTooltip} from "./supplementFile/style/customTooltip";
-import {ExportOutlined} from '@ant-design/icons';
+import {ExportOutlined, ReloadOutlined} from '@ant-design/icons';
 import {Link} from 'react-router-dom';
+import {refreshProject} from './supplementFile/data/axiosRequest';
 
-const {Option} = Select;
 
 const WeekCodeTableList: React.FC<any> = (props: any) => {
   const projectId = props.location.query.id;
-
   const gqlClient = useGqlClient();
+  const [loadState, setLoadState] = useState(false);
 
   /* region  进度指标 */
   const processData = useRequest(() => queryProcessData(gqlClient, projectId));
@@ -147,6 +146,35 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
   }
   /* endregion */
 
+  /* region 一键刷新 */
+  const resetGridData = async () => {
+    processGridApi.current?.setRowData(await queryProcessData(gqlClient, projectId));
+    storyStabilityGridApi.current?.setRowData(await queryStoryStability(gqlClient, projectId));
+    stageWorkloadGridApi.current?.setRowData(await queryStageWorkload(gqlClient, projectId));
+    productRateGridApi.current?.setRowData(await queryProductRateload(gqlClient, projectId));
+    reviewDefectGridApi.current?.setRowData(await queryReviewDefect(gqlClient, projectId));
+    processQualityGridApi.current?.setRowData(await queryProcessQuality(gqlClient, projectId))
+    serviceGridApi.current?.setRowData(await queryServices(gqlClient, projectId))
+  };
+  // 刷新表格
+  const refreshGrid = async () => {
+    setLoadState(true);
+    const result = await refreshProject(projectId);
+    if (result.flag) {
+      await resetGridData();
+    } else {
+      message.error({
+        content: result.errorMessage,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+    setLoadState(false);
+  };
+  /* endregion */
+
   window.onresize = function () {
     processGridApi.current?.sizeColumnsToFit();
     storyStabilityGridApi.current?.sizeColumnsToFit();
@@ -176,10 +204,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
       fileName: '项目指标.xlsx'
     });
   };
-
-  const COMMON_LENGTH = 130;
-
-
+  // 页面顶部导航栏
   const breadcrumbItems = [
     <Breadcrumb.Item key="研发过程数据">研发过程数据</Breadcrumb.Item>,
     <Breadcrumb.Item key="研发过程数据">度量指标</Breadcrumb.Item>,
@@ -187,6 +212,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
       <Link to="/kpi/performance/project/overview">项目</Link>
     </Breadcrumb.Item>,
     <Breadcrumb.Item key="项目指标">项目指标</Breadcrumb.Item>];
+  const COMMON_LENGTH = 130;
 
   return (
     <div style={{width: "100%", height: "100%", marginTop: "-20px"}}>
@@ -198,227 +224,227 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
           return <Breadcrumb>{breadcrumbItems}</Breadcrumb>;
         }}
       />
+      <Spin size="large" tip="数据加载中..." spinning={loadState}>
+        <div>
+          <div style={{marginTop: -35, height: 35}}>
+            <Button type="text" icon={<ExportOutlined/>} onClick={exportAllExcell} size={'large'}
+                    style={{float: "right"}}>导出</Button>
+            <Button type="text" icon={<ReloadOutlined/>} onClick={refreshGrid} size={'large'}
+                    style={{float: "right"}}>刷新</Button>
+          </div>
+          <div style={{marginTop: 5}}>
 
-      <div style={{marginTop: -35, height: 35}}>
+            {/* 1.进度 */}
+            <div className="ag-theme-alpine" style={{height: 250, width: '100%'}}>
+              <AgGridReact
+                columnDefs={getProcessColumns()} // 定义列
+                rowData={processData?.data} // 数据绑定
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true,
+                  suppressMenu: true,
+                  cellStyle: setProcessCellStyle,
+                  minWidth: COMMON_LENGTH,
+                  maxWidth: COMMON_LENGTH,
+                  headerComponentParams: getProcessHeaderStyle,
+                }}
+                components={{customTooltip: CustomTooltip}}
+                tooltipShowDelay={100}  // 鼠标放上去多久显示提示信息
+                rowHeight={32}
+                headerHeight={35}
+                suppressRowTransform={true}
+                onGridReady={onProcessGridReady}
+                onCellEditingStopped={async (params: any) => {
+                  await processCellEdited(params, projectId);
+                  processGridApi.current?.setRowData(await queryProcessData(gqlClient, projectId));
+                }}
+              >
+              </AgGridReact>
+            </div>
 
-        {/*<Select defaultValue="lucy" style={{width: 120}} size={"small"}>*/}
-        {/*  <Option value="jack">Jack</Option>*/}
-        {/*</Select>*/}
-        <Button type="text" icon={<ExportOutlined/>} onClick={exportAllExcell} size={'large'}
-                style={{float: "right"}}>导出</Button>
-      </div>
-      <div style={{marginTop: 5}}>
+            {/* 2. 需求稳定性 */}
+            <div className="ag-theme-alpine" style={{height: 190, width: '100%'}}>
+              <AgGridReact
+                columnDefs={getStoryStabilityColumns()} // 定义列
+                rowData={storyStableData?.data} // 数据绑定
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true,
+                  suppressMenu: true,
+                  cellStyle: setStoryStabilityCellStyle,
+                  minWidth: COMMON_LENGTH,
+                  maxWidth: COMMON_LENGTH,
+                  headerComponentParams: getStoryStabilityHeaderStyle
+                }}
+                rowHeight={32}
+                headerHeight={35}
+                suppressRowTransform={true}
+                onGridReady={onStoryStabilityGridReady}
+                onCellEditingStopped={async (params: any) => {
+                  await storyStabilityCellEdited(params, projectId);
+                  storyStabilityGridApi.current?.setRowData(await queryStoryStability(gqlClient, projectId));
+                }}
+              >
+              </AgGridReact>
+            </div>
 
-        {/* 1.进度 */}
-        <div className="ag-theme-alpine" style={{height: 250, width: '100%'}}>
-          <AgGridReact
-            columnDefs={getProcessColumns()} // 定义列
-            rowData={processData?.data} // 数据绑定
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true,
-              suppressMenu: true,
-              cellStyle: setProcessCellStyle,
-              minWidth: COMMON_LENGTH,
-              maxWidth: COMMON_LENGTH,
-              headerComponentParams: getProcessHeaderStyle,
-            }}
-            components={{customTooltip: CustomTooltip}}
-            tooltipShowDelay={100}  // 鼠标放上去多久显示提示信息
-            rowHeight={32}
-            headerHeight={35}
-            suppressRowTransform={true}
-            onGridReady={onProcessGridReady}
-            onCellEditingStopped={async (params: any) => {
-              await processCellEdited(params, projectId);
-              processGridApi.current?.setRowData(await queryProcessData(gqlClient, projectId));
-            }}
-          >
-          </AgGridReact>
+            {/* 3.阶段工作量（单位：人天） */}
+            <div className="ag-theme-alpine" style={{height: 250, width: '100%'}}>
+              <AgGridReact
+                columnDefs={getStageWorkloadColumns()} // 定义列
+                rowData={stageWorkCount?.data} // 数据绑定
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true,
+                  suppressMenu: true,
+                  cellStyle: setStageWorkloadCellStyle,
+                  minWidth: COMMON_LENGTH,
+                  maxWidth: COMMON_LENGTH,
+                  headerComponentParams: getStageWorkloadHeaderStyle
+                }}
+                rowHeight={32}
+                headerHeight={35}
+                suppressRowTransform={true}
+                onGridReady={onStageWorkloadGridReady}
+                onCellEditingStopped={async (params: any) => {
+                  await stageWorkloadCellEdited(params, projectId);
+                  stageWorkloadGridApi.current?.setRowData(await queryStageWorkload(gqlClient, projectId));
+                }}
+              >
+              </AgGridReact>
+            </div>
+
+            {/* 4.生产率 */}
+            <div className="ag-theme-alpine" style={{height: 140, width: '100%'}}>
+              <AgGridReact
+                columnDefs={getProductRateColumns()} // 定义列
+                rowData={productRate?.data} // 数据绑定
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true,
+                  suppressMenu: true,
+                  cellStyle: setProductRateCellStyle,
+                  minWidth: COMMON_LENGTH,
+                  maxWidth: COMMON_LENGTH,
+                  headerComponentParams: getProductRateHeaderStyle
+                }}
+                getRowHeight={(params: any) => {
+                  if (params.data?.stage === "生产率(功能点/人天）") {
+                    return 50;
+                  }
+                  return 32;
+                }}
+                headerHeight={35}
+                suppressRowTransform={true}
+                onGridReady={onProductRateGridReady}
+                onCellEditingStopped={async (params: any) => {
+                  await productRateCellEdited(params, projectId);
+                  // 需要更新本表格和（评审和缺陷）的表格
+                  productRateGridApi.current?.setRowData(await queryProductRateload(gqlClient, projectId));
+                  reviewDefectGridApi.current?.setRowData(await queryReviewDefect(gqlClient, projectId));
+                }}
+              >
+              </AgGridReact>
+            </div>
+
+            {/* 5.评审和缺陷 */}
+            <div className="ag-theme-alpine" style={{height: 540, width: '100%'}}>
+              <AgGridReact
+                columnDefs={getReviewDefectColumns()} // 定义列
+                rowData={reviewDefect?.data} // 数据绑定
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true,
+                  suppressMenu: true,
+                  cellStyle: setReviewDefectCellStyle,
+                  minWidth: COMMON_LENGTH,
+                  maxWidth: COMMON_LENGTH,
+                  headerComponentParams: getReviewDefectHeaderStyle
+                }}
+                rowHeight={32}
+                headerHeight={35}
+                suppressRowTransform={true}
+                onGridReady={onReviewDefectGridReady}
+                onCellEditingStopped={async (params: any) => {
+                  await reviewDefectCellEdited(params, projectId);
+                  reviewDefectGridApi.current?.setRowData(await queryReviewDefect(gqlClient, projectId))
+                }}
+              >
+              </AgGridReact>
+            </div>
+
+            {/* 6 过程质量补充数据 */}
+            <div className="ag-theme-alpine" style={{height: 380, width: '100%'}}>
+              <AgGridReact
+                columnDefs={getProcessQualityColumns()} // 定义列
+                rowData={processQuality?.data} // 数据绑定
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true,
+                  suppressMenu: true,
+                  cellStyle: setProcessQualityCellStyle,
+                  minWidth: COMMON_LENGTH,
+                  maxWidth: COMMON_LENGTH,
+                  headerComponentParams: getProcessQualityHeaderStyle
+                }}
+                getRowHeight={(params: any) => {
+                  if (params.data?.cut === "一次提测通过率" || params.data?.realValue === "一次提测通过率") {
+                    return 50;
+                  }
+                  return 32;
+                }}
+                headerHeight={35}
+                rowHeight={32}
+                suppressRowTransform={true}
+                onGridReady={onPocessQualityGridReady}
+                onCellEditingStopped={async (params: any) => {
+                  await pocessQualityCellEdited(params, projectId);
+                  processQualityGridApi.current?.setRowData(await queryProcessQuality(gqlClient, projectId))
+                }}
+              >
+              </AgGridReact>
+            </div>
+
+            {/* 7 服务 */}
+            <div className="ag-theme-alpine" style={{height: 90, width: '100%'}}>
+              <AgGridReact
+                columnDefs={getServiceColumns()} // 定义列
+                rowData={serviceData?.data} // 数据绑定
+                defaultColDef={{
+                  resizable: true,
+                  sortable: true,
+                  filter: true,
+                  suppressMenu: true,
+                  cellStyle: setServiceCellStyle,
+                  minWidth: COMMON_LENGTH,
+                  maxWidth: COMMON_LENGTH,
+                  headerComponentParams: getServiceHeaderStyle
+                }}
+                getRowHeight={(params: any) => {
+                  if (params.data?.item === "一次发布成功率") {
+                    return 50;
+                  }
+                  return 32;
+                }}
+                headerHeight={35}
+                suppressRowTransform={true}
+                onGridReady={onServiceGridReady}
+                onCellEditingStopped={async (params: any) => {
+                  await serviceCellEdited(params, projectId);
+                  serviceGridApi.current?.setRowData(await queryServices(gqlClient, projectId))
+                }}
+              >
+              </AgGridReact>
+            </div>
+          </div>
         </div>
-
-        {/* 2. 需求稳定性 */}
-        <div className="ag-theme-alpine" style={{height: 190, width: '100%'}}>
-          <AgGridReact
-            columnDefs={getStoryStabilityColumns()} // 定义列
-            rowData={storyStableData?.data} // 数据绑定
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true,
-              suppressMenu: true,
-              cellStyle: setStoryStabilityCellStyle,
-              minWidth: COMMON_LENGTH,
-              maxWidth: COMMON_LENGTH,
-              headerComponentParams: getStoryStabilityHeaderStyle
-            }}
-            rowHeight={32}
-            headerHeight={35}
-            suppressRowTransform={true}
-            onGridReady={onStoryStabilityGridReady}
-            onCellEditingStopped={async (params: any) => {
-              await storyStabilityCellEdited(params, projectId);
-              storyStabilityGridApi.current?.setRowData(await queryStoryStability(gqlClient, projectId));
-            }}
-          >
-          </AgGridReact>
-        </div>
-
-        {/* 3.阶段工作量（单位：人天） */}
-        <div className="ag-theme-alpine" style={{height: 250, width: '100%'}}>
-          <AgGridReact
-            columnDefs={getStageWorkloadColumns()} // 定义列
-            rowData={stageWorkCount?.data} // 数据绑定
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true,
-              suppressMenu: true,
-              cellStyle: setStageWorkloadCellStyle,
-              minWidth: COMMON_LENGTH,
-              maxWidth: COMMON_LENGTH,
-              headerComponentParams: getStageWorkloadHeaderStyle
-            }}
-            rowHeight={32}
-            headerHeight={35}
-            suppressRowTransform={true}
-            onGridReady={onStageWorkloadGridReady}
-            onCellEditingStopped={async (params: any) => {
-              await stageWorkloadCellEdited(params, projectId);
-              stageWorkloadGridApi.current?.setRowData(await queryStageWorkload(gqlClient, projectId));
-            }}
-          >
-          </AgGridReact>
-        </div>
-
-        {/* 4.生产率 */}
-        <div className="ag-theme-alpine" style={{height: 140, width: '100%'}}>
-          <AgGridReact
-            columnDefs={getProductRateColumns()} // 定义列
-            rowData={productRate?.data} // 数据绑定
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true,
-              suppressMenu: true,
-              cellStyle: setProductRateCellStyle,
-              minWidth: COMMON_LENGTH,
-              maxWidth: COMMON_LENGTH,
-              headerComponentParams: getProductRateHeaderStyle
-            }}
-            getRowHeight={(params: any) => {
-              if (params.data?.stage === "生产率(功能点/人天）") {
-                return 50;
-              }
-              return 32;
-            }}
-            headerHeight={35}
-            suppressRowTransform={true}
-            onGridReady={onProductRateGridReady}
-            onCellEditingStopped={async (params: any) => {
-              await productRateCellEdited(params, projectId);
-              // 需要更新本表格和（评审和缺陷）的表格
-              productRateGridApi.current?.setRowData(await queryProductRateload(gqlClient, projectId));
-              reviewDefectGridApi.current?.setRowData(await queryReviewDefect(gqlClient, projectId));
-            }}
-          >
-          </AgGridReact>
-        </div>
-
-        {/* 5.评审和缺陷 */}
-        <div className="ag-theme-alpine" style={{height: 540, width: '100%'}}>
-          <AgGridReact
-            columnDefs={getReviewDefectColumns()} // 定义列
-            rowData={reviewDefect?.data} // 数据绑定
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true,
-              suppressMenu: true,
-              cellStyle: setReviewDefectCellStyle,
-              minWidth: COMMON_LENGTH,
-              maxWidth: COMMON_LENGTH,
-              headerComponentParams: getReviewDefectHeaderStyle
-            }}
-            rowHeight={32}
-            headerHeight={35}
-            suppressRowTransform={true}
-            onGridReady={onReviewDefectGridReady}
-            onCellEditingStopped={async (params: any) => {
-              await reviewDefectCellEdited(params, projectId);
-              reviewDefectGridApi.current?.setRowData(await queryReviewDefect(gqlClient, projectId))
-            }}
-          >
-          </AgGridReact>
-        </div>
-
-        {/* 6 过程质量补充数据 */}
-        <div className="ag-theme-alpine" style={{height: 380, width: '100%'}}>
-          <AgGridReact
-            columnDefs={getProcessQualityColumns()} // 定义列
-            rowData={processQuality?.data} // 数据绑定
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true,
-              suppressMenu: true,
-              cellStyle: setProcessQualityCellStyle,
-              minWidth: COMMON_LENGTH,
-              maxWidth: COMMON_LENGTH,
-              headerComponentParams: getProcessQualityHeaderStyle
-            }}
-            getRowHeight={(params: any) => {
-              if (params.data?.cut === "一次提测通过率" || params.data?.realValue === "一次提测通过率") {
-                return 50;
-              }
-              return 32;
-            }}
-            headerHeight={35}
-            rowHeight={32}
-            suppressRowTransform={true}
-            onGridReady={onPocessQualityGridReady}
-            onCellEditingStopped={async (params: any) => {
-              await pocessQualityCellEdited(params, projectId);
-              processQualityGridApi.current?.setRowData(await queryProcessQuality(gqlClient, projectId))
-            }}
-          >
-          </AgGridReact>
-        </div>
-
-        {/* 7 服务 */}
-        <div className="ag-theme-alpine" style={{height: 90, width: '100%'}}>
-          <AgGridReact
-            columnDefs={getServiceColumns()} // 定义列
-            rowData={serviceData?.data} // 数据绑定
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true,
-              suppressMenu: true,
-              cellStyle: setServiceCellStyle,
-              minWidth: COMMON_LENGTH,
-              maxWidth: COMMON_LENGTH,
-              headerComponentParams: getServiceHeaderStyle
-            }}
-            getRowHeight={(params: any) => {
-              if (params.data?.item === "一次发布成功率") {
-                return 50;
-              }
-              return 32;
-            }}
-            headerHeight={35}
-            suppressRowTransform={true}
-            onGridReady={onServiceGridReady}
-            onCellEditingStopped={async (params: any) => {
-              await serviceCellEdited(params, projectId);
-              serviceGridApi.current?.setRowData(await queryServices(gqlClient, projectId))
-            }}
-          >
-          </AgGridReact>
-        </div>
-      </div>
-
+      </Spin>
     </div>
   )
     ;

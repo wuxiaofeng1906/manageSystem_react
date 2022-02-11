@@ -564,7 +564,16 @@ const getOnlineBranchColumns = () => {
       maxWidth: 100,
       cellRenderer: (params: any) => {
         const paramData = JSON.stringify(params.data).replace(/'/g, '’');
-
+        debugger;
+        if (paramData === '{}') { // 当上线分支没数据时，只显示新增按钮，其余按钮不显示
+          return `
+        <div style="margin-top: -5px">
+            <Button  style="border: none; background-color: transparent; " onclick='showOnlineBranchForm("add",${paramData})'>
+              <img src="../add_1.png" width="15" height="15" alt="新增" title="新增">
+            </Button>
+        </div>
+           `;
+        }
         return `
         <div style="margin-top: -5px">
             <Button  style="border: none; background-color: transparent; " onclick='showOnlineBranchForm("add",${paramData})'>

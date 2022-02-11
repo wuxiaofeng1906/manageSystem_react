@@ -62,19 +62,39 @@ const getProcessColumns = () => {
     {
       headerName: '偏差天数',
       field: 'days',
+      cellRenderer: (params: any) => {
+        //   >0 显示绿色，< 0 显示红色，0是黑色
+        const values = params.value;
+        if (values === 0) {
+          return 0;
+        }
+        if (!values) {
+          return "";
+        }
+        if (Number(values) > 0) {
+          return `<span style="color: green">+${values}</span>`;
+        }
+        return `<span style="color: red">${values}</span>`;
+      }
     },
     {
       headerName: '偏差率',
       field: 'ratio',
-      valueFormatter: (params: any) => {
-
-        if (params.value === 0 || params.value === "0") {
+      cellRenderer: (params: any) => {
+        let values = params.value;
+        if (values === 0 || values === "0") {
           return 0;
         }
-        if (!params.value) {
+        if (!values) {
           return "";
         }
-        return `${Number(params.value).toFixed(2)}%`
+
+        values = Number(params.value).toFixed(2);
+        if (Number(values) > 0) {
+          return `<span style="color: green">+${values}%</span>`;
+        }
+        return `<span style="color: red">${values}%</span>`;
+
       }
     },
     {

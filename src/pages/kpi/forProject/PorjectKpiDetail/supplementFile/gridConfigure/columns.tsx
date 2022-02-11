@@ -530,7 +530,7 @@ const getProcessQualityColumns = () => {
       maxWidth: TYPE_LENGTH,
       cellRenderer: (params: any) => {
         if (params.value === '6 过程质量补充数据') {
-          return `<div style="font-weight: bold;margin-top: 120px">6.过程质量补<br/>充数据</div>`
+          return `<div style="font-weight: bold;margin-top: 140px">6.过程质量补<br/>充数据</div>`
 
         }
         return `<div style="font-weight: bold;">${params.value}</div>`
@@ -686,10 +686,7 @@ const getProcessQualityColumns = () => {
         }
 
         if (params.value === "一次提测通过率") {
-          return `<div style="font-weight: bold">
-                    <div>一次提测</div>
-                    <div style="margin-top: -5px">通过率</div>
-                </div>`;
+          return `<div style="margin-top: 10px; font-weight: bold"> 一次提测通过率</div>`;
         }
 
         if (params.value) {

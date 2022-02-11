@@ -564,7 +564,6 @@ const getOnlineBranchColumns = () => {
       maxWidth: 100,
       cellRenderer: (params: any) => {
         const paramData = JSON.stringify(params.data).replace(/'/g, '’');
-        debugger;
         if (paramData === '{}') { // 当上线分支没数据时，只显示新增按钮，其余按钮不显示
           return `
         <div style="margin-top: -5px">

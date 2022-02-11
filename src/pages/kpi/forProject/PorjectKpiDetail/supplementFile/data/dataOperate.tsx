@@ -199,7 +199,7 @@ const alaysisStageWorkload = (sourceData: any) => {
 
   // 需要新增总计
   result.push(totalData);
-  debugger;
+
   return result
 };
 const queryStageWorkload = async (client: GqlClient<object>, projectId: string) => {
@@ -326,12 +326,21 @@ const alaysisReviewDefect = (sourceData: any, totalData: any) => {
       defectDensity: ""
     });
   } else {
+    let WD = "";
+    if (totalData[1]) {
+      WD = (totalData[1].toFixed(2)).toString();
+    }
+
+    let DD = "";
+    if (totalData[3]) {
+      DD = (totalData[3].toFixed(2)).toString()
+    }
     result.push({
       kind: "合计",
       foundDN: totalData[0],
-      weightDN: totalData[1].toFixed(2),
+      weightDN: WD,
       funcPoint: totalData[2],
-      defectDensity: totalData[3].toFixed(2)
+      defectDensity: DD
     });
   }
 

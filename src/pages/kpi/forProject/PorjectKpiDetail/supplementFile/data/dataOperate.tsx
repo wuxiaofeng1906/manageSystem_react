@@ -136,13 +136,9 @@ const queryStoryStability = async (client: GqlClient<object>, projectId: string)
 // 3.阶段工作量
 const alaysisStageWorkload = (sourceData: any) => {
 
-  if (!sourceData || !sourceData?.stageWorkload) {
-    return [];
-  }
-
-  const stageWorkloadData = sourceData?.stageWorkload;
+  let stageWorkloadData = sourceData?.stageWorkload;
   if (!stageWorkloadData) {
-    return [];
+    stageWorkloadData = [];
   }
 
   const typeName = [
@@ -203,6 +199,7 @@ const alaysisStageWorkload = (sourceData: any) => {
 
   // 需要新增总计
   result.push(totalData);
+  debugger;
   return result
 };
 const queryStageWorkload = async (client: GqlClient<object>, projectId: string) => {

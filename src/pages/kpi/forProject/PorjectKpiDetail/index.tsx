@@ -312,6 +312,8 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                 onCellEditingStopped={async (params: any) => {
                   await stageWorkloadCellEdited(params, projectId);
                   stageWorkloadGridApi.current?.setRowData(await queryStageWorkload(gqlClient, projectId));
+                  // 在阶段工作量-合计的计划工作量和实际工作量产生新的值的时候，生产率可以同步进行刷新。
+                  productRateGridApi.current?.setRowData(await queryProductRateload(gqlClient, projectId));
                 }}
               >
               </AgGridReact>

@@ -1,8 +1,8 @@
 /*
- * @Description: 项目过程质量的字段
+ * @Description: 评审和缺陷的字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:47:07
- * @LastEditTime: 2022-01-05 02:08:33
+ * @LastEditTime: 2022-02-10 07:31:31
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -30,26 +30,8 @@ export const ReviewDefectCols: ColDef[] = [
     minWidth: 150,
   },
   {
-    headerName: 'UE评审',
+    headerName: 'UED评审',
     field: `${moduleName}.ueReview`,
-    columnGroupShow: SHOW['closed'],
-    ...defaultParmas,
-  },
-  {
-    headerName: 'UE预审',
-    field: `${moduleName}.uePreview`,
-    columnGroupShow: SHOW['closed'],
-    ...defaultParmas,
-  },
-  {
-    headerName: 'UI预审',
-    field: `${moduleName}.uiPreview`,
-    columnGroupShow: SHOW['closed'],
-    ...defaultParmas,
-  },
-  {
-    headerName: 'UI评审',
-    field: `${moduleName}.uiReview`,
     columnGroupShow: SHOW['closed'],
     ...defaultParmas,
   },
@@ -99,6 +81,12 @@ export const ReviewDefectCols: ColDef[] = [
     headerName: '发布测试',
     columnGroupShow: SHOW['closed'],
     field: `${moduleName}.releaseTest`,
+    ...defaultParmas,
+  },
+  {
+    headerName: '合计',
+    columnGroupShow: SHOW['closed'],
+    field: `${moduleName}.total`,
     ...defaultParmas,
   },
 ];

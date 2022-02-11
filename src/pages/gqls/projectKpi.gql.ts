@@ -2,7 +2,7 @@
  * @Description: 项目度量指标
  * @Author: jieTan
  * @Date: 2021-12-02 11:41:52
- * @LastEditTime: 2022-01-07 02:01:43
+ * @LastEditTime: 2022-02-10 07:25:41
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -36,6 +36,7 @@ export default (args: GQL_PARAMS, funcWithParams: Function): [string, string] =>
         bugResolvedDura
         weightedLegacyDefect
         weightedLegacyDI
+        carryTestPass
       }
       progressDeviation{
         storyplan
@@ -51,7 +52,7 @@ export default (args: GQL_PARAMS, funcWithParams: Function): [string, string] =>
         devplan
         testplan
         releaseplan
-        projectplan
+        total
       }
       scaleProductivity{
         actualValue
@@ -68,9 +69,7 @@ export default (args: GQL_PARAMS, funcWithParams: Function): [string, string] =>
         integrationTest
         systemTest
         releaseTest
-        uePreview
-        uiPreview
-        uiReview
+        total
       }
       storyStable{
         devplan

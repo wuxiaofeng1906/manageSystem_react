@@ -2,7 +2,7 @@
  * @Description: 项目过程质量的字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:47:07
- * @LastEditTime: 2021-12-20 07:01:34
+ * @LastEditTime: 2022-02-10 02:07:43
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -23,24 +23,54 @@ const duraParams = {
   cellRendererParams: { delta: HOUR['value'] },
   ...ratioW,
 };
+const ratioParmas = {
+  cellRenderer: 'numToFixed',
+  cellRendererParams: { multiple: PERCENTAGE.value },
+  ...ratioW,
+};
 
 /* 项目过程质量 */
 export const ProcessQualityCols: ColDef[] = [
   {
-    headerName: `ReOpen率(${PERCENTAGE['unit']})`,
+    // headerName: `ReOpen率(${PERCENTAGE['unit']})`,
+    headerName: `ReOpen率`,
+    headerTooltip: `ReOpen率(${PERCENTAGE['unit']})`,
     field: `${moduleName}.reopenRatio`,
     cellRenderer: 'numToFixed',
     cellRendererParams: { multiple: PERCENTAGE.value },
     ...ratioW,
   },
   {
-    headerName: `解决时长(${HOUR['unit']})`,
+    headerName: '前端覆盖率',
+    headerTooltip: `前端覆盖率(${PERCENTAGE['unit']})`,
+    field: `${moduleName}.frontUnitCover`,
+    columnGroupShow: SHOW['closed'],
+    ...defaultParmas,
+  },
+  {
+    headerName: '后端覆盖率',
+    headerTooltip: `后端覆盖率(${PERCENTAGE['unit']})`,
+    field: `${moduleName}.backUnitCover`,
+    columnGroupShow: SHOW['closed'],
+    ...defaultParmas,
+  },
+  {
+    headerName: `解决时长`,
+    headerTooltip: `Bug解决时长(${HOUR['unit']})`,
     field: `${moduleName}.bugResolveDura`,
     columnGroupShow: SHOW['closed'],
     ...duraParams,
   },
   {
-    headerName: `回归时长(${HOUR['unit']})`,
+    headerName: `一次提测通过率`,
+    headerTooltip: `一次提测通过率(${PERCENTAGE['unit']})`,
+    field: `${moduleName}.carryTestPass`,
+    columnGroupShow: SHOW['closed'],
+    ...ratioParmas,
+  },
+  {
+    headerName: `回归时长`,
+    headerTooltip: `Bug回归时长(${HOUR['unit']})`,
     field: `${moduleName}.bugFlybackDura`,
     columnGroupShow: SHOW['closed'],
     ...duraParams,
@@ -53,19 +83,8 @@ export const ProcessQualityCols: ColDef[] = [
   },
   {
     headerName: '加权遗留DI',
+    headerTooltip: '加权遗留缺陷密度',
     field: `${moduleName}.weightedLegacyDI`,
-    columnGroupShow: SHOW['closed'],
-    ...defaultParmas,
-  },
-  {
-    headerName: '前端覆盖率',
-    field: `${moduleName}.frontUnitCover`,
-    columnGroupShow: SHOW['closed'],
-    ...defaultParmas,
-  },
-  {
-    headerName: '后端覆盖率',
-    field: `${moduleName}.backUnitCover`,
     columnGroupShow: SHOW['closed'],
     ...defaultParmas,
   },

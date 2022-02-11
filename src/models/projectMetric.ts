@@ -18,7 +18,7 @@ export default () => {
   const [gqlData, setGqlData] = useState([]);
   const [dynamicCols, setDynamicCols] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [pkGqlParmas, setPkGqlParmas] = useState({});
+  const [pkGqlParmas, setPkGqlParmas] = useState(null);
 
   /*  */
   const gridHeight = { row: 32 }; // 设置grid的行高

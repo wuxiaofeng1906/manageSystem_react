@@ -47,27 +47,19 @@ const processCellEdited = async (params: any, projectId: string) => {
 
 // 需求稳定性编辑
 const storyStabilityCellEdited = async (params: any, projectId: string) => {
+  // 说明可以不为数字
+  if (params.column.colId !== "memo") {
 
-  if (!params.newValue || (params.newValue).toString().trim() === "") {
-    message.error({
-      content: "请输入正确的数字！",
-      duration: 1,
-      style: {
-        marginTop: '50vh',
-      },
-    });
-    return true;
-  }
-
-  if ((Number(params.newValue)).toString() === "NaN") {
-    message.error({
-      content: "请输入正确的数字！",
-      duration: 1,
-      style: {
-        marginTop: '50vh',
-      },
-    });
-    return true;
+    if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
+      message.error({
+        content: "请输入正确的数字！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return true;
+    }
   }
 
   // 有数据变化时再进行修改请求
@@ -121,29 +113,20 @@ const storyStabilityCellEdited = async (params: any, projectId: string) => {
 // 阶段工作量
 const stageWorkloadCellEdited = async (params: any, projectId: string) => {
 
-  if (!params.newValue || (params.newValue).toString().trim() === "") {
-    message.error({
-      content: "请输入正确的数字！",
-      duration: 1,
-      style: {
-        marginTop: '50vh',
-      },
-    });
-    return true;
+  // 说明可以不为数字
+  if (params.column.colId !== "memo") {
+
+    if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
+      message.error({
+        content: "请输入正确的数字！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return true;
+    }
   }
-
-  if ((Number(params.newValue)).toString() === "NaN") {
-    message.error({
-      content: "请输入正确的数字！",
-      duration: 1,
-      style: {
-        marginTop: '50vh',
-      },
-    });
-    return true;
-  }
-
-
   // 有数据变化时再进行修改请求
   if (params.newValue !== params.oldValue) {
     const type = params.data?.stage;
@@ -194,26 +177,19 @@ const stageWorkloadCellEdited = async (params: any, projectId: string) => {
 
 // 生产率
 const productRateCellEdited = async (params: any, projectId: string) => {
-  if (!params.newValue || (params.newValue).toString().trim() === "") {
-    message.error({
-      content: "请输入正确的数字！",
-      duration: 1,
-      style: {
-        marginTop: '50vh',
-      },
-    });
-    return true;
-  }
+  // 说明可以不为数字
+  if (params.column.colId !== "memo") {
 
-  if ((Number(params.newValue)).toString() === "NaN") {
-    message.error({
-      content: "请输入正确的数字！",
-      duration: 1,
-      style: {
-        marginTop: '50vh',
-      },
-    });
-    return true;
+    if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
+      message.error({
+        content: "请输入正确的数字！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return true;
+    }
   }
 
   if (params.newValue !== params.oldValue) {
@@ -254,9 +230,8 @@ const productRateCellEdited = async (params: any, projectId: string) => {
 // 评审和缺陷
 const reviewDefectCellEdited = async (params: any, projectId: string) => {
 
-  if (params.column?.colId !== "cut") {
+  if (params.column?.colId !== "cut" && params.column.colId !== "memo") {
     // 需要判断当发现缺陷数为0或者为空时，评审用时不能被修改
-
     if (!params.data?.foundDN) {
       message.error({
         content: "发现缺陷数无值，不能修改评审用时！",
@@ -267,7 +242,8 @@ const reviewDefectCellEdited = async (params: any, projectId: string) => {
       });
       return true;
     }
-    if (!params.newValue || (params.newValue).toString().trim() === "") {
+    // 说明可以不为数字
+    if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
       message.error({
         content: "请输入正确的数字！",
         duration: 1,
@@ -278,16 +254,6 @@ const reviewDefectCellEdited = async (params: any, projectId: string) => {
       return true;
     }
 
-    if ((Number(params.newValue)).toString() === "NaN") {
-      message.error({
-        content: "请输入正确的数字！",
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-      return true;
-    }
   }
 
 
@@ -451,26 +417,19 @@ const pocessQualityCellEdited = async (params: any, projectId: string) => {
 // 服务
 const serviceCellEdited = async (params: any, projectId: string) => {
 
-  if (!params.newValue || (params.newValue).toString().trim() === "") {
-    message.error({
-      content: "请输入正确的数字！",
-      duration: 1,
-      style: {
-        marginTop: '50vh',
-      },
-    });
-    return true;
-  }
+  // 说明可以不为数字
+  if (params.column.colId !== "memo") {
 
-  if ((Number(params.newValue)).toString() === "NaN") {
-    message.error({
-      content: "请输入正确的数字！",
-      duration: 1,
-      style: {
-        marginTop: '50vh',
-      },
-    });
-    return true;
+    if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
+      message.error({
+        content: "请输入正确的数字！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return true;
+    }
   }
   /*
   录入成功发布次数的时候：

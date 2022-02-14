@@ -42,16 +42,22 @@ const setStageWorkloadCellStyle = (params: any) => {
 // 4.生产率
 const setProductRateCellStyle = (params: any) => {
 
-  if (params.column?.colId === "title" || params.column?.colId === "stage" || params.data?.stage === "生产率(功能点/人天）") {
-
+  if (params.column?.colId === "title" || params.column?.colId === "stage") {
     return grayCellStyle;
   }
 
+
+  if (params.data?.stage === "生产率(功能点/人天）" && (params.column?.colId === "planValue" || params.column?.colId === "actualValue")) {
+    return grayCellStyle;
+  }
   return whiteCellStyle;
 };
 
 // 5.评审与缺陷
 const setReviewDefectCellStyle = (params: any) => {
+  if (params.column?.colId === "memo") {
+    return whiteCellStyle;
+  }
 
   if (params.column?.colId === "title" || params.column?.colId === "kind" || params.column?.colId === "foundDN" || params.column?.colId === "weightDN"
     || params.column?.colId === "funcPoint" || params.column?.colId === "defectDensity" || params.column?.colId === "reviewRatio") {
@@ -80,7 +86,7 @@ const setReviewDefectCellStyle = (params: any) => {
 const setProcessQualityCellStyle = (params: any) => {
 
   if (params.data?.module === "质量") {
-     return grayCellStyle;
+    return grayCellStyle;
   }
   if (params.data?.cut === "一次提测通过率") {
     if (params.column?.colId === "cut" || params.column?.colId === "realValue") {

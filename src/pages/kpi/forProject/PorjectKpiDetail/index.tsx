@@ -397,7 +397,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                   headerComponentParams: setGridHeaderShowCenter
                 }}
                 getRowHeight={(params: any) => {
-                  if (params.data?.cut === "一次提测通过率" || params.data?.realValue === "一次提测通过率") {
+                  if (params.data?.cut === "一次提测通过率") {
                     return 50;
                   }
                   return 32;

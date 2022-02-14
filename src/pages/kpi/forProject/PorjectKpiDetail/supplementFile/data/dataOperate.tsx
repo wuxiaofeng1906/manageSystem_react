@@ -430,6 +430,7 @@ const alaysisProcessQuality = (sourceData: any) => {
     kind: "提测通过次数",
     baseline: "提测次数",
     realValue: "一次提测通过率",
+    memo:"说明"
   }, {
     title: "",
     module: "",

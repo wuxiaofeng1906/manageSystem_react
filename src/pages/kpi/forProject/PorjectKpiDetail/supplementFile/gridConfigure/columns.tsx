@@ -399,8 +399,20 @@ const getProductRateColumns = () => {
       editable: true,
       minWidth: 260,
       maxWidth: 260,
-      cellRenderer: manualInput_black,
-      // tooltipField: "memo",
+      cellRenderer: (params: any) => {
+        if (params.value) {
+          if (params.data?.stage === "生产率(功能点/人天）") {
+            return `<div style="margin-top: 10px; text-align: left">${params.value}</div>`;
+          }
+          return `<div style="text-align: left">${params.value}</div>`;
+        }
+        if (params.data?.stage === "生产率(功能点/人天）") {
+          return `<div style=" margin-top:10px;font-style: italic ;text-align: center">手工录入</div>`;
+        }
+        return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
+
+      },
+      tooltipField: "memo",
       // tooltipComponent: "customTooltip",
     }
   ];
@@ -661,7 +673,7 @@ const getProcessQualityColumns = () => {
           return "是";
         }
         if (params.value === "度量值") {
-          return `<div style="margin-top: 10px;font-weight: bold">度量值</div>`;
+          return `<div style="font-weight: bold">度量值</div>`;
         }
 
         if (params.value === "一次提测通过率") {
@@ -687,7 +699,7 @@ const getProcessQualityColumns = () => {
       },
       cellRenderer: (params: any) => {
         if (params.data?.cut === "度量值") {
-          return `<div style="margin-top: 10px;font-weight: bold">${params.value}</div>`;
+          return `<div style="font-weight: bold">${params.value}</div>`;
         }
         if (params.data?.cut === "一次提测通过率") {
           if (params.value === null || params.value === "" || params.value === undefined) {
@@ -712,7 +724,7 @@ const getProcessQualityColumns = () => {
       },
       cellRenderer: (params: any) => {
         if (params.data?.cut === "度量值") {
-          return `<div style="margin-top: 10px;font-weight: bold">${params.value}</div>`;
+          return `<div style="font-weight: bold">${params.value}</div>`;
         }
         if (params.data?.cut === "一次提测通过率") {
           if (params.value === null || params.value === "" || params.value === undefined) {
@@ -742,7 +754,7 @@ const getProcessQualityColumns = () => {
         }
 
         if (params.value === "一次提测通过率") {
-          return `<div style="margin-top: 10px; font-weight: bold"> 一次提测通过率</div>`;
+          return `<div style=" font-weight: bold"> 一次提测通过率</div>`;
         }
 
         if (params.value) {
@@ -756,10 +768,32 @@ const getProcessQualityColumns = () => {
     }, {
       headerName: '说明',
       field: 'memo',
-      editable: true,
+      editable: (params: any) => {
+        if (params.data?.memo === "说明") {
+          return false;
+        }
+        return true;
+      },
       minWidth: 260,
       maxWidth: 260,
-      cellRenderer: manualInput_black,
+      cellRenderer: (params: any) => {
+        if (params.value === "说明") {
+          return `<div style="font-weight: bold"> 说明</div>`;
+        }
+
+        if (params.value) {
+          if (params.data?.cut === "一次提测通过率") {
+            return `<div style="text-align: left;margin-top: 10px">${params.value}</div>`;
+          }
+          return `<div style="text-align: left">${params.value}</div>`;
+        }
+        if (params.data?.cut === "一次提测通过率") {
+
+          return `<div style=" margin-top:10px;font-style: italic ;text-align: center">手工录入</div>`;
+        }
+        return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
+
+      },
       // tooltipField: "memo",
       // tooltipComponent: "customTooltip",
     }
@@ -774,95 +808,102 @@ const getProcessQualityColumns = () => {
 
 const getServiceColumns = () => {
 
-  const processQualityColums: any = [
-    {
-      headerName: '',
-      field: 'title',
-      minWidth: TYPE_LENGTH,
-      maxWidth: TYPE_LENGTH,
-      cellRenderer: (params: any) => {
-        return `<div style="font-weight: bold;margin-top: 12px">${params.value}</div>`
+    const processQualityColums: any = [
+      {
+        headerName: '',
+        field: 'title',
+        minWidth: TYPE_LENGTH,
+        maxWidth: TYPE_LENGTH,
+        cellRenderer: (params: any) => {
+          return `<div style="font-weight: bold;margin-top: 12px">${params.value}</div>`
+        },
       },
-    },
-    {
-      headerName: '',
-      field: 'module',
-      maxWidth: STAGE_LENGTH,
-      minWidth: STAGE_LENGTH,
-      cellRenderer: (params: any) => {
-        return `<div style="margin-top: 12px">${params.value} </div>`;
-      }
-    },
-    {
-      headerName: '度量值',
-      field: 'item',
-      cellRenderer: (params: any) => {
-        if (params.value === "一次发布成功率") {
-          return `<div>
+      {
+        headerName: '',
+        field: 'module',
+        maxWidth: STAGE_LENGTH,
+        minWidth: STAGE_LENGTH,
+        cellRenderer: (params: any) => {
+          return `<div style="margin-top: 12px">${params.value} </div>`;
+        }
+      },
+      {
+        headerName: '度量值',
+        field: 'item',
+        cellRenderer: (params: any) => {
+          if (params.value === "一次发布成功率") {
+            return `<div>
                     <div>一次发布</div>
                     <div style="margin-top: -5px">成功率</div>
                 </div>`;
-        }
+          }
 
-        return params.value;
+          return params.value;
+        },
       },
-    },
-    {
-      headerName: '成功发布数',
-      field: 'succN',
-      minWidth: 170,
-      maxWidth: 170,
-      editable: true,
-      cellRenderer: (params: any) => {
+      {
+        headerName: '成功发布数',
+        field: 'succN',
+        minWidth: 170,
+        maxWidth: 170,
+        editable: true,
+        cellRenderer: (params: any) => {
 
-        if (params.value === null || params.value === "" || params.value === undefined) {
-          return `<div style="color: red;font-style: italic ;text-align: center;margin-top: 12px">手工录入</div>`;
+          if (params.value === null || params.value === "" || params.value === undefined) {
+            return `<div style="color: red;font-style: italic ;text-align: center;margin-top: 12px">手工录入</div>`;
 
+          }
+          return `<div style="margin-top: 12px">${params.value} </div>`;
         }
-        return `<div style="margin-top: 12px">${params.value} </div>`;
-      }
-    },
-    {
-      headerName: '发布次数',
-      field: 'totalN',
-      minWidth: 95,
-      maxWidth: 95,
-      editable: true,
-      cellRenderer: (params: any) => {
-        if (params.value === null || params.value === "" || params.value === undefined) {
-          return `<div style="color: red;font-style: italic ;text-align: center;margin-top: 12px">手工录入</div>`;
+      },
+      {
+        headerName: '发布次数',
+        field: 'totalN',
+        minWidth: 95,
+        maxWidth: 95,
+        editable: true,
+        cellRenderer: (params: any) => {
+          if (params.value === null || params.value === "" || params.value === undefined) {
+            return `<div style="color: red;font-style: italic ;text-align: center;margin-top: 12px">手工录入</div>`;
 
+          }
+          return `<div style="margin-top: 12px">${params.value} </div>`;
         }
-        return `<div style="margin-top: 12px">${params.value} </div>`;
-      }
-    },
-    {
-      headerName: '一次成功发布率',
-      field: 'ratio',
-      minWidth: 130,
-      maxWidth: 130,
-      cellRenderer: (params: any) => {
+      },
+      {
+        headerName: '一次成功发布率',
+        field: 'ratio',
+        minWidth: 130,
+        maxWidth: 130,
+        cellRenderer: (params: any) => {
 
-        if (params.value) {
-          const values = (params.value).toFixed(2);
-          return `<div style="margin-top: 12px">${(Number(values) * 100).toFixed(2)}%</div>`;
+          if (params.value) {
+            const values = (params.value).toFixed(2);
+            return `<div style="margin-top: 12px">${(Number(values) * 100).toFixed(2)}%</div>`;
+          }
+          return "";
         }
-        return "";
-      }
-    }, {
-      headerName: '说明',
-      field: 'memo',
-      editable: true,
-      minWidth: 260,
-      maxWidth: 260,
-      cellRenderer: manualInput_black,
-      // tooltipField: "memo",
-      // tooltipComponent: "customTooltip",
-    }
-  ];
+      }, {
+        headerName: '说明',
+        field: 'memo',
+        editable: true,
+        minWidth: 260,
+        maxWidth: 260,
+        cellRenderer: (params: any) => {
+          if (!params.value) {
+            return `<div style="margin-top: 12px;font-style: italic ;text-align: center">手工录入</div>`;
 
-  return processQualityColums;
-};
+          }
+          return `<div style="margin-top: 12px;text-align: left">${params.value}</div>`;
+          // tooltipField: "memo",
+          // tooltipComponent: "customTooltip",
+        }
+      }
+    ];
+
+    return processQualityColums;
+  }
+;
 
 /* endregion  */
 

@@ -72,9 +72,9 @@ const getProcessColumns = () => {
           return "";
         }
         if (Number(values) > 0) {
-          return `<span style="color: green">+${values}</span>`;
+          return `<span style="color: red">+${values}</span>`;
         }
-        return `<span style="color: red">${values}</span>`;
+        return `<span style="color: green">${values}</span>`;
       }
     },
     {
@@ -91,9 +91,9 @@ const getProcessColumns = () => {
 
         values = Number(params.value).toFixed(2);
         if (Number(values) > 0) {
-          return `<span style="color: green">+${values}%</span>`;
+          return `<span style="color: red">+${values}%</span>`;
         }
-        return `<span style="color: red">${values}%</span>`;
+        return `<span style="color: green">${values}%</span>`;
 
       }
     },

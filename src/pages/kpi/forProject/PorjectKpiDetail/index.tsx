@@ -34,9 +34,10 @@ import {
   getServiceHeaderStyle
 } from "./supplementFile/style/columsTitleRenderer";
 import {CustomTooltip} from "./supplementFile/style/customTooltip";
-import {ExportOutlined, ReloadOutlined} from '@ant-design/icons';
+import {ExportOutlined, QuestionCircleTwoTone, ReloadOutlined} from '@ant-design/icons';
 import {Link} from 'react-router-dom';
 import {refreshProject} from './supplementFile/data/axiosRequest';
+import {history} from 'umi';
 
 
 const WeekCodeTableList: React.FC<any> = (props: any) => {
@@ -227,6 +228,12 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
       <Spin size="large" tip="数据加载中..." spinning={loadState}>
         <div>
           <div style={{marginTop: -35, height: 35}}>
+
+            <Button type="text" style={{color: '#1890FF', float: 'right'}}
+                    icon={<QuestionCircleTwoTone/>} size={'large'}>
+              <a href={"https://shimo.im/docs/gO3oxWKg6yFwL0qD"} target={"_blank"} style={{marginLeft:5}}>计算规则</a>
+            </Button>
+
             <Button type="text" icon={<ExportOutlined/>} onClick={exportAllExcell} size={'large'}
                     style={{float: "right"}}>导出</Button>
             <Button type="text" icon={<ReloadOutlined/>} onClick={refreshGrid} size={'large'}

@@ -178,6 +178,15 @@ const getStoryStabilityColumns = () => {
         }
         return `${Number(params.value).toFixed(4)}`
       }
+    }, {
+      headerName: '说明',
+      field: 'memo',
+      editable: true,
+      minWidth: 260,
+      maxWidth: 260,
+      cellRenderer: manualInput_black,
+      // tooltipField: "memo",
+      // tooltipComponent: "customTooltip",
     }
   ];
 
@@ -291,6 +300,15 @@ const getStageWorkloadColumns = () => {
         }
         return params.value;
       }
+    }, {
+      headerName: '说明',
+      field: 'memo',
+      editable: true,
+      minWidth: 260,
+      maxWidth: 260,
+      cellRenderer: manualInput_black,
+      // tooltipField: "memo",
+      // tooltipComponent: "customTooltip",
     }
   ];
 
@@ -375,6 +393,15 @@ const getProductRateColumns = () => {
       editable: projectRateEditRenderer,
       cellRenderer: projectRateManualInput
 
+    }, {
+      headerName: '说明',
+      field: 'memo',
+      editable: true,
+      minWidth: 260,
+      maxWidth: 260,
+      cellRenderer: manualInput_black,
+      // tooltipField: "memo",
+      // tooltipComponent: "customTooltip",
     }
   ];
 
@@ -530,6 +557,15 @@ const getReviewDefectColumns = () => {
         }
         return "";
       }
+    }, {
+      headerName: '说明',
+      field: 'memo',
+      editable: true,
+      minWidth: 260,
+      maxWidth: 260,
+      cellRenderer: manualInput_black,
+      // tooltipField: "memo",
+      // tooltipComponent: "customTooltip",
     }
   ];
 
@@ -717,6 +753,15 @@ const getProcessQualityColumns = () => {
         }
         return params.value;
       },
+    }, {
+      headerName: '说明',
+      field: 'memo',
+      editable: true,
+      minWidth: 260,
+      maxWidth: 260,
+      cellRenderer: manualInput_black,
+      // tooltipField: "memo",
+      // tooltipComponent: "customTooltip",
     }
   ];
 
@@ -804,6 +849,15 @@ const getServiceColumns = () => {
         }
         return "";
       }
+    }, {
+      headerName: '说明',
+      field: 'memo',
+      editable: true,
+      minWidth: 260,
+      maxWidth: 260,
+      cellRenderer: manualInput_black,
+      // tooltipField: "memo",
+      // tooltipComponent: "customTooltip",
     }
   ];
 

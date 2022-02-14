@@ -28,24 +28,18 @@ import {
 } from './supplementFile/style/gridStyles';
 import './supplementFile/style/styles.css';
 import {Button, PageHeader, Spin, Breadcrumb, message} from "antd";
-import {
-  getProcessHeaderStyle, getStoryStabilityHeaderStyle, getStageWorkloadHeaderStyle,
-  getProductRateHeaderStyle, getReviewDefectHeaderStyle, getProcessQualityHeaderStyle,
-  getServiceHeaderStyle
-} from "./supplementFile/style/columsTitleRenderer";
+import {setGridHeaderShowCenter} from "./supplementFile/style/columsTitleRenderer";
 import {CustomTooltip} from "./supplementFile/style/customTooltip";
 import {ExportOutlined, QuestionCircleTwoTone, ReloadOutlined} from '@ant-design/icons';
 import {Link} from 'react-router-dom';
 import {refreshProject} from './supplementFile/data/axiosRequest';
-import {history} from 'umi';
-
 
 const WeekCodeTableList: React.FC<any> = (props: any) => {
   const projectId = props.location.query.id;
   const gqlClient = useGqlClient();
   const [loadState, setLoadState] = useState(false);
 
-  /* region  进度指标 */
+  /* region  1.进度指标 */
   const processData = useRequest(() => queryProcessData(gqlClient, projectId));
   const processGridApi = useRef<GridApi>();
 
@@ -59,7 +53,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
   }
   /* endregion */
 
-  /* region  需求稳定性 */
+  /* region  2.需求稳定性 */
   const storyStableData = useRequest(() => queryStoryStability(gqlClient, projectId));
 
   const storyStabilityGridApi = useRef<GridApi>();
@@ -75,7 +69,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
 
   /* endregion */
 
-  /* region  阶段工作量 */
+  /* region  3.阶段工作量 */
   const stageWorkCount = useRequest(() => queryStageWorkload(gqlClient, projectId));
   const stageWorkloadGridApi = useRef<GridApi>();
 
@@ -90,7 +84,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
 
   /* endregion */
 
-  /* region  评审和缺陷 */
+  /* region  5.评审和缺陷 */
   const reviewDefect = useRequest(() => queryReviewDefect(gqlClient, projectId));
 
   const reviewDefectGridApi = useRef<GridApi>();
@@ -106,7 +100,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
 
   /* endregion */
 
-  /* region  生产率 */
+  /* region  4.生产率 */
   const productRate = useRequest(() => queryProductRateload(gqlClient, projectId));
 
   const productRateGridApi = useRef<GridApi>();
@@ -231,7 +225,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
 
             <Button type="text" style={{color: '#1890FF', float: 'right'}}
                     icon={<QuestionCircleTwoTone/>} size={'large'}>
-              <a href={"https://shimo.im/docs/gO3oxWKg6yFwL0qD"} target={"_blank"} style={{marginLeft:5}}>计算规则</a>
+              <a href={"https://shimo.im/docs/gO3oxWKg6yFwL0qD"} target={"_blank"} style={{marginLeft: 5}}>计算规则</a>
             </Button>
 
             <Button type="text" icon={<ExportOutlined/>} onClick={exportAllExcell} size={'large'}
@@ -254,7 +248,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                   cellStyle: setProcessCellStyle,
                   minWidth: COMMON_LENGTH,
                   maxWidth: COMMON_LENGTH,
-                  headerComponentParams: getProcessHeaderStyle,
+                  headerComponentParams: setGridHeaderShowCenter,
                 }}
                 components={{customTooltip: CustomTooltip}}
                 tooltipShowDelay={100}  // 鼠标放上去多久显示提示信息
@@ -283,7 +277,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                   cellStyle: setStoryStabilityCellStyle,
                   minWidth: COMMON_LENGTH,
                   maxWidth: COMMON_LENGTH,
-                  headerComponentParams: getStoryStabilityHeaderStyle
+                  headerComponentParams: setGridHeaderShowCenter
                 }}
                 rowHeight={32}
                 headerHeight={35}
@@ -310,7 +304,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                   cellStyle: setStageWorkloadCellStyle,
                   minWidth: COMMON_LENGTH,
                   maxWidth: COMMON_LENGTH,
-                  headerComponentParams: getStageWorkloadHeaderStyle
+                  headerComponentParams: setGridHeaderShowCenter
                 }}
                 rowHeight={32}
                 headerHeight={35}
@@ -339,7 +333,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                   cellStyle: setProductRateCellStyle,
                   minWidth: COMMON_LENGTH,
                   maxWidth: COMMON_LENGTH,
-                  headerComponentParams: getProductRateHeaderStyle
+                  headerComponentParams: setGridHeaderShowCenter
                 }}
                 getRowHeight={(params: any) => {
                   if (params.data?.stage === "生产率(功能点/人天）") {
@@ -373,7 +367,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                   cellStyle: setReviewDefectCellStyle,
                   minWidth: COMMON_LENGTH,
                   maxWidth: COMMON_LENGTH,
-                  headerComponentParams: getReviewDefectHeaderStyle
+                  headerComponentParams: setGridHeaderShowCenter
                 }}
                 rowHeight={32}
                 headerHeight={35}
@@ -400,7 +394,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                   cellStyle: setProcessQualityCellStyle,
                   minWidth: COMMON_LENGTH,
                   maxWidth: COMMON_LENGTH,
-                  headerComponentParams: getProcessQualityHeaderStyle
+                  headerComponentParams: setGridHeaderShowCenter
                 }}
                 getRowHeight={(params: any) => {
                   if (params.data?.cut === "一次提测通过率" || params.data?.realValue === "一次提测通过率") {
@@ -433,7 +427,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                   cellStyle: setServiceCellStyle,
                   minWidth: COMMON_LENGTH,
                   maxWidth: COMMON_LENGTH,
-                  headerComponentParams: getServiceHeaderStyle
+                  headerComponentParams: setGridHeaderShowCenter
                 }}
                 getRowHeight={(params: any) => {
                   if (params.data?.item === "一次发布成功率") {

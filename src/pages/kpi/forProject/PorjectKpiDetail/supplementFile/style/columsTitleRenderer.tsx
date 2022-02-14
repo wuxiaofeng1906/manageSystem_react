@@ -81,7 +81,7 @@ const getStageWorkloadHeaderStyle = (params: any) => {
       break;
   }
 
-  const returnDiv = `<div ref="eLabel" class="ag-header-cell-label" role="presentation"  style="margin-left:${marginLeftValue}">
+  const returnDiv = `<div ref="eLabel" class="ag-header-cell-label" role="presentation" style="margin-left:${marginLeftValue}">
                         <span  ref="eSortNone" class="ag-header-icon ag-sort-none-icon" ></span>
                           <span ref="eText" class="ag-header-cell-text" role="columnheader"></span>
                         <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>
@@ -179,7 +179,7 @@ const getProcessQualityHeaderStyle = (params: any) => {
 
 //   7.服务
 const getServiceHeaderStyle = (params: any) => {
-  
+
   let marginLeftValue = "0px";
 
   switch (params.column?.colId) {
@@ -203,6 +203,18 @@ const getServiceHeaderStyle = (params: any) => {
   return {template: returnDiv}
 
 };
+
+
+const setGridHeaderShowCenter = () => {
+  const returnDiv = `<div ref="eLabel" class="ag-header-cell-label" role="presentation"  style="justify-content: center;">
+                        <span  ref="eSortNone" class="ag-header-icon ag-sort-none-icon" ></span>
+                          <span ref="eText" class="ag-header-cell-text" role="columnheader"></span>
+                        <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>
+                    </div>`;
+  return {template: returnDiv}
+
+
+}
 export {
   getProcessHeaderStyle,
   getStoryStabilityHeaderStyle,
@@ -210,5 +222,6 @@ export {
   getProductRateHeaderStyle,
   getReviewDefectHeaderStyle,
   getProcessQualityHeaderStyle,
-  getServiceHeaderStyle
+  getServiceHeaderStyle,
+  setGridHeaderShowCenter
 };

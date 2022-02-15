@@ -694,9 +694,6 @@ const UpgradeService: React.FC<any> = () => {
                           <Option key={'2'} value={'2'}>
                             否
                           </Option>
-                          <Option key={'9'} value={'9'}>
-                            {' '}
-                          </Option>
                         </Select>
                       );
                     },

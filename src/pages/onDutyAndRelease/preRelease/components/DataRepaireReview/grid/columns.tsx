@@ -75,7 +75,7 @@ const getReviewColumns = () => {
       maxWidth: 100,
       cellRenderer: (params: any) => {
         const paramData = JSON.stringify(params.data).replace(/'/g, '’');
-        debugger;
+
         if (paramData === "{}") {
           return `
             <Button  style="border: none; background-color: transparent; " onclick='showDataRepaireForm("add",${paramData})'>

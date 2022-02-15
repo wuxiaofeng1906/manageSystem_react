@@ -106,7 +106,7 @@ const getAutoCheckMessage = (source: any) => {
     if (ele.automation_check === "2") { // 表示未勾选自动化用例参数
       if (!noCheckArray.includes(ele.deployment_id)) {
         noCheckArray.push(ele.deployment_id);
-        noCheckString = noCheckString === "" ? `【${ele.deployment_id}】` : `${noCheckString},【${ele.deployment_id}】`;
+        noCheckString = noCheckString === "" ? `【${ele.deployment_id}】` : `${noCheckString}【${ele.deployment_id}】`;
       }
     }
 

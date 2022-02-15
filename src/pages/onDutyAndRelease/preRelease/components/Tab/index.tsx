@@ -67,7 +67,7 @@ const Tab: React.FC<any> = () => {
 
   // 显示表格数据
   const showAllDatas = async (initData: any) => {
-    debugger;
+
     // Tab数据
     const {tabPageInfo} = initData;
     // 进度条数据

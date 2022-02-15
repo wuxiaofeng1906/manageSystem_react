@@ -91,4 +91,31 @@ const alaReleasedChanged = (oldData: any, newIDArray: any, selectedId: any) => {
 
   return {queryArray, deletedData};
 };
-export {showReleasedId, alaReleasedChanged};
+
+// 检查是否勾选自动化测试
+const getAutoCheckMessage = (source: any) => {
+
+  if (!source) {
+    return "";
+  }
+
+  const noCheckArray: any = [];
+  let noCheckString = "";
+  source.forEach((ele: any) => {
+
+    if (ele.automation_check === "2") { // 表示未勾选自动化用例参数
+      if (!noCheckArray.includes(ele.deployment_id)) {
+        noCheckArray.push(ele.deployment_id);
+        noCheckString = noCheckString === "" ? `【${ele.deployment_id}】` : `${noCheckString},【${ele.deployment_id}】`;
+      }
+    }
+
+  });
+
+  if (noCheckArray.length === 0) {
+    return "";
+  }
+  return `提示：构建镜像${noCheckString}未勾选自动化用例参数`;
+
+};
+export {showReleasedId, alaReleasedChanged, getAutoCheckMessage};

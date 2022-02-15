@@ -25,7 +25,7 @@ import {
 } from "../../comControl/controler";
 import {upgradePulishItem, addPulishApi, deleteReleasedID} from "./axiosRequest";
 import {getGridRowsHeight} from "../../components/gridHeight";
-import {alaReleasedChanged} from "./idDeal/dataDeal";
+import {alaReleasedChanged, getAutoCheckMessage} from "./idDeal/dataDeal";
 
 const {TextArea} = Input;
 const {Option} = Select;
@@ -103,6 +103,9 @@ const UpgradeService: React.FC<any> = () => {
       } else {
         const newData: any = await alalysisInitData('pulishItem', tabsData.activeKey);
         // firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
+        formUpgradeService.setFieldsValue({
+          hitMessage: getAutoCheckMessage(newData.upService_releaseItem),
+        });
         setRelesaeItem({
           gridHight: getGridRowsHeight((newData.upService_releaseItem)),
           gridData: newData.upService_releaseItem
@@ -151,9 +154,10 @@ const UpgradeService: React.FC<any> = () => {
     } else {
 
       const newData: any = (await alalysisInitData('pulishItem', tabsData.activeKey)).upService_releaseItem;
+      formUpgradeService.setFieldsValue({
+        hitMessage: getAutoCheckMessage(newData),
+      });
       setRelesaeItem({gridHight: getGridRowsHeight(newData), gridData: newData});
-
-
       // 需要判断升级接口内容是否有值，如果没有的话，则需要新增一个空行
       const apidata: any = await alalysisInitData('pulishApi', tabsData.activeKey);
 
@@ -513,6 +517,7 @@ const UpgradeService: React.FC<any> = () => {
   useEffect(() => {
     formUpgradeService.setFieldsValue({
       deployID: releasedID.oraID,
+      hitMessage: getAutoCheckMessage(releaseItem.gridData)  // 31357
     });
   }, [releasedID])
   return (
@@ -554,6 +559,19 @@ const UpgradeService: React.FC<any> = () => {
                     >
                       点击查询
                     </Button>
+                    <Form.Item
+                      label="" name="hitMessage"
+                      style={{marginTop: -28}}>
+                      <Input
+                        style={{
+                          border: 'none',
+                          backgroundColor: 'white',
+                          color: 'red',
+                          marginLeft: 85,
+                        }}
+                        disabled
+                      />
+                    </Form.Item>
                   </Col>
                 </Row>
               </Form>

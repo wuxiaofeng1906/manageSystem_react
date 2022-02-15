@@ -7,29 +7,6 @@ axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
 const userLogins: any = localStorage.getItem('userLogins');
 const usersInfo = JSON.parse(userLogins);
 
-// 解析数据
-const getGridDataSource = (oldData: any) => {
-  if (!oldData) {
-    return [];
-  }
-
-  const resultArray: any = [];
-  oldData.forEach((ele: any) => {
-    ele.service.forEach((service: any) => {
-      // 有几个应用就要生成几条数据
-
-      resultArray.push({
-        id: ele.id,
-        deployment_id: ele.id,
-        automation_check: ele.automation_check,
-        branch_environment: `${ele.branch}_${ele.env}`,
-        app: service,
-      });
-    });
-  });
-
-  return resultArray;
-};
 
 // 一键部署ID之升级接口数据获取
 const queryServiceByID = async (params: string) => {
@@ -42,7 +19,7 @@ const queryServiceByID = async (params: string) => {
     .post('/api/verify/release/env_branch', params)
     .then(function (res) {
       if (res.data.code === 200) {
-        result.data = getGridDataSource(res.data.data);
+        result.data = []; // 无用代码，没有删除
       } else {
         result.message = `错误：${res.data.msg}`;
       }

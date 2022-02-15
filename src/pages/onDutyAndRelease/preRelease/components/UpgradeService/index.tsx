@@ -561,13 +561,12 @@ const UpgradeService: React.FC<any> = () => {
                     </Button>
                     <Form.Item
                       label="" name="hitMessage"
-                      style={{marginTop: -28}}>
+                      style={{marginLeft: 85, marginTop: -28}}>
                       <Input
                         style={{
                           border: 'none',
                           backgroundColor: 'white',
                           color: 'red',
-                          marginLeft: 85,
                         }}
                         disabled
                       />

@@ -260,9 +260,16 @@ const DataRepaireReview: React.FC<any> = () => {
                     suppressMenu: true,
                     cellStyle: {'line-height': '25px'},
                   }}
+                  // getRowStyle={(params: any) => {
+                  //   debugger;
+                  //   if (params.data?.confirm_status === "9") {
+                  //     return {"backgroundColor": "#F8F8F8"};
+                  //   }
+                  //   return {};
+                  // }}
                   frameworkComponents={{
                     selectChoice: (props: any) => {
-                      let disableValue = false;
+
                       let Color = 'black';
                       const currentValue = props.value;
                       if (currentValue === '1') {
@@ -270,7 +277,7 @@ const DataRepaireReview: React.FC<any> = () => {
                       } else if (currentValue === '2') {
                         Color = 'orange';
                       } else if (currentValue === "9") {
-                        disableValue = true;
+                        return (<label></label>);
                       }
 
                       return (
@@ -282,7 +289,6 @@ const DataRepaireReview: React.FC<any> = () => {
                           onChange={(newValue: any) => {
                             saveDataRepaireConfirmInfo(newValue, props.data);
                           }}
-                          disabled={disableValue}
                         >
                           <Option key={'1'} value={'1'}>
                             是
@@ -290,9 +296,7 @@ const DataRepaireReview: React.FC<any> = () => {
                           <Option key={'2'} value={'2'}>
                             否
                           </Option>
-                          <Option key={'9'} value={'9'}>
-                            {' '}
-                          </Option>
+
                         </Select>
                       );
                     },

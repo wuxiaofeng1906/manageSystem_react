@@ -78,6 +78,9 @@ const analysisServiceConfirm = (datas: any) => {
 /* region 数据修复解析 */
 
 const analysisReviewData = (datas: any) => {
+  if (datas.length === 0) {
+    return [{}];
+  }
   return datas;
 };
 const analysisReviewConfirm = (datas: any) => {

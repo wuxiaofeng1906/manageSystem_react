@@ -54,7 +54,7 @@ const Tab: React.FC<any> = () => {
     //  发布服务确认
     setUpgradeConfirm({gridHight: "100px", gridData: []});
     // 数据修复
-    setDataReview({gridHight: "100px", gridData: []});
+    setDataReview({gridHight: "100px", gridData: [{}]});
     // 数据修复确认
     setDataReviewConfirm({gridHight: "100px", gridData: []});
 
@@ -67,6 +67,7 @@ const Tab: React.FC<any> = () => {
 
   // 显示表格数据
   const showAllDatas = async (initData: any) => {
+    debugger;
     // Tab数据
     const {tabPageInfo} = initData;
     // 进度条数据

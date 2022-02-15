@@ -20,7 +20,7 @@ const usersInfo = JSON.parse(userLogins);
 const DataRepaireReview: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const {
-    tabsData, modifyProcessStatus, dataReview,allLockedArray,
+    tabsData, modifyProcessStatus, dataReview, allLockedArray,
     setDataReview, dataReviewConfirm, lockedItem, modifyLockedItem
   } = useModel('releaseProcess');
 
@@ -262,12 +262,15 @@ const DataRepaireReview: React.FC<any> = () => {
                   }}
                   frameworkComponents={{
                     selectChoice: (props: any) => {
-                      const currentValue = props.value === '9' ? '' : props.value;
+                      let disableValue = false;
                       let Color = 'black';
+                      const currentValue = props.value;
                       if (currentValue === '1') {
                         Color = '#2BF541';
                       } else if (currentValue === '2') {
                         Color = 'orange';
+                      } else if (currentValue === "9") {
+                        disableValue = true;
                       }
 
                       return (
@@ -279,6 +282,7 @@ const DataRepaireReview: React.FC<any> = () => {
                           onChange={(newValue: any) => {
                             saveDataRepaireConfirmInfo(newValue, props.data);
                           }}
+                          disabled={disableValue}
                         >
                           <Option key={'1'} value={'1'}>
                             是

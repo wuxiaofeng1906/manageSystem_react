@@ -667,12 +667,15 @@ const UpgradeService: React.FC<any> = () => {
                   onColumnEverythingChanged={onChangeThirdGridReady}
                   frameworkComponents={{
                     confirmSelectChoice: (props: any) => {
-                      const currentValue = props.value === '9' ? '' : props.value;
+                      let disableValue = false;
                       let Color = 'black';
+                      const currentValue = props.value;
                       if (currentValue === '1') {
                         Color = '#2BF541';
                       } else if (currentValue === '2') {
                         Color = 'orange';
+                      } else if (currentValue === '9') {
+                        disableValue = true;
                       }
 
                       return (
@@ -684,6 +687,7 @@ const UpgradeService: React.FC<any> = () => {
                           onChange={(newValue: any) => {
                             saveUperConfirmInfo(newValue, props);
                           }}
+                          disabled={disableValue}
                         >
                           <Option key={'1'} value={'1'}>
                             是

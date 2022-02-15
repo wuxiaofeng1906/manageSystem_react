@@ -81,7 +81,7 @@ const PreRelease: React.FC<any> = () => {
     //  发布服务确认
     setUpgradeConfirm({gridHight: "100px", gridData: []});
     // 数据修复
-    setDataReview({gridHight: "100px", gridData: []});
+    setDataReview({gridHight: "100px", gridData: [{}]});
     // 数据修复确认
     setDataReviewConfirm({gridHight: "100px", gridData: []});
 
@@ -139,6 +139,11 @@ const PreRelease: React.FC<any> = () => {
     setUpgradeConfirm({gridHight: getGridRowsHeight(releaseConfirm), gridData: releaseConfirm});
     // 数据修复
     const dataRepaire = initData?.reviewData_repaire;
+    // if (!dataRepaire || dataRepaire.length === 0) {
+    //   dataRepaire = [{}];
+    // }
+    // const dataRepaire = (initData?.reviewData_repaire).length === 0 ? [{}] : initData?.reviewData_repaire;
+
     setDataReview({gridHight: getGridRowsHeight(dataRepaire), gridData: dataRepaire});
     // 数据修复确认
     const dataRepaireConfirm = initData?.reviewData_confirm;

@@ -287,7 +287,7 @@ const dealExpleAndCodereview = (sourceData: any) => {
       description: "说明"
     }, {
       title: "",
-      kind: "",
+      kind: "用例评审2",
       cut: "",
       foundDN: "",
       weightDN: "",
@@ -310,7 +310,7 @@ const dealExpleAndCodereview = (sourceData: any) => {
       description: "说明"
     }, {
       title: "",
-      kind: "",
+      kind: "codereview",
       cut: "",
       foundDN: "",
       weightDN: "",
@@ -336,21 +336,20 @@ const dealExpleAndCodereview = (sourceData: any) => {
           dtExample[1].reviewRatio = ele.reviewRatio;
           dtExample[1].description = ele.description;
         } else if (ele.kind === "CodeReview" && !ele.cut) {
-          dtExample[2].title = "codereview";
-          dtExample[2].kind = ele.cut;
-          dtExample[2].cut = ele.cut;
-          dtExample[2].foundDN = ele.foundDN;
-          dtExample[2].weightDN = ele.weightDN;
-          dtExample[2].funcPoint = ele.funcPoint;
-          dtExample[2].defectDensity = ele.defectDensity;
-          dtExample[2].reviewHour = ele.reviewHour;
-          dtExample[2].reviewRatio = ele.reviewRatio;
-          dtExample[2].description = ele.description;
+          dtCodereview[1].title = "";
+          dtCodereview[1].kind = "codereview";
+          dtCodereview[1].cut = ele.cut;
+          dtCodereview[1].foundDN = ele.foundDN;
+          dtCodereview[1].weightDN = ele.weightDN;
+          dtCodereview[1].funcPoint = ele.funcPoint;
+          dtCodereview[1].defectDensity = ele.defectDensity;
+          dtCodereview[1].reviewHour = ele.reviewHour;
+          dtCodereview[1].reviewRatio = ele.reviewRatio;
+          dtCodereview[1].description = ele.description;
         }
       }
     }
     result = dtExample.concat(dtCodereview);
-
   });
   return result;
 };

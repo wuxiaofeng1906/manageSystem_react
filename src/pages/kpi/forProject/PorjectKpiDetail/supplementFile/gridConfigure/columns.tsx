@@ -424,12 +424,6 @@ const getProductRateColumns = () => {
 
 /* region 5.评审和缺陷 */
 
-const defectHourEditRenderer = (params: any) => {
-  if (params.data?.kind === "提测演示" || params.data?.kind === "开发自测\\联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
-    return false;
-  }
-  return true;
-};
 
 const getReviewDefectColumns = () => {
 
@@ -449,7 +443,7 @@ const getReviewDefectColumns = () => {
       rowSpan: (params: any) => {
 
         if (params.data.title === '5.评审和缺陷') {
-          return 15;
+          return 16;
         }
         return 1;
       }
@@ -458,13 +452,29 @@ const getReviewDefectColumns = () => {
       headerName: '',
       field: 'kind',
       maxWidth: STAGE_LENGTH,
-      minWidth: STAGE_LENGTH
+      minWidth: STAGE_LENGTH,
+      cellClassRules: {
+        'cell-span': "value !== undefined"
+      },
+      rowSpan: (params: any) => {
+        if (params.data.kind === '用例评审' || params.data.kind === 'CodeReview') {
+          return 2;
+        }
+        return 1;
+      },
+      cellRenderer: (params: any) => {
+        if (params.value === "用例评审" || params.value === "CodeReview") {
+
+          return `<div style="margin-top: 18px">${params.value}</div>`
+        }
+        return params.value;
+      }
     },
     {
       headerName: '是否裁剪',
       field: 'cut',
       editable: (params: any) => {
-        if (params.data?.kind === "合计") {
+        if (params.data?.kind === "合计" || params.data?.cut === "是否裁剪") {
           return false;
         }
         return true;
@@ -476,21 +486,33 @@ const getReviewDefectColumns = () => {
         if (params.data?.kind === "合计") {
           return "-";
         }
-        if (params.value === null || params.value === undefined || params.value === "") {
+        if (params.value === null || params.value === undefined || params.value === "" || params.value === false || params.value === "否") {
           return "否";  // 默认值
         }
 
         if (params.value === true || params.value === "是") {
           return "是";
         }
-        return "否";
+        if (params.value === "是否裁剪") {
+          return `<span style="font-weight: bold">${params.value}</span>`;
+        }
+        return params.value;
       }
 
     },
     {
       headerName: '发现缺陷数',
       field: 'foundDN',
-      valueFormatter: (params: any) => {
+      // valueFormatter: (params: any) => {
+      //   if (!params.value) {
+      //     return "";
+      //   }
+      //   return params.value;
+      // },
+      cellRenderer: (params: any) => {
+        if (params.value === "发现问题数" || params.value === "发现缺陷数") {
+          return `<span style="font-weight: bold">${params.value}</span>`
+        }
         if (!params.value) {
           return "";
         }
@@ -500,20 +522,48 @@ const getReviewDefectColumns = () => {
     {
       headerName: '加权有效缺陷数',
       field: 'weightDN',
-      valueFormatter: (params: any) => {
-
+      // valueFormatter: (params: any) => {
+      //
+      //   // 只要发现缺陷数为0或者空，这个值也需要为空
+      //   if (!params.data?.foundDN) {
+      //     return "";
+      //   }
+      //   return params.value;
+      // },
+      cellRenderer: (params: any) => {
+        if (params.value === "加权有效问题数" || params.value === "加权有效缺陷数") {
+          return `<span style="font-weight: bold">${params.value}</span>`
+        }
         // 只要发现缺陷数为0或者空，这个值也需要为空
         if (!params.data?.foundDN) {
           return "";
         }
         return params.value;
+
       }
     },
     {
       headerName: '功能点',
       field: 'funcPoint',
-      valueFormatter: (params: any) => {
+      editable: (params: any) => {
 
+        if (params.data?.kind === "codereview") {
+          return true;
+        }
+        return false;
+      },
+      // valueFormatter: (params: any) => {
+      //
+      //   // 只要发现缺陷数为0或者空，这个值也需要为空
+      //   if (!params.data?.foundDN) {
+      //     return "";
+      //   }
+      //   return params.value;
+      // }
+      cellRenderer: (params: any) => {
+        if (params.value === "功能点" || params.value === "代码量") {
+          return `<span style="font-weight: bold">${params.value}</span>`
+        }
         // 只要发现缺陷数为0或者空，这个值也需要为空
         if (!params.data?.foundDN) {
           return "";
@@ -524,7 +574,20 @@ const getReviewDefectColumns = () => {
     {
       headerName: '缺陷密度',
       field: 'defectDensity',
-      valueFormatter: (params: any) => {
+      // valueFormatter: (params: any) => {
+      //   // 只要发现缺陷数为0或者空，这个值也需要为空
+      //   if (!params.data?.foundDN) {
+      //     return "";
+      //   }
+      //   if (params.value) {
+      //     return Number(params.value).toFixed(2);
+      //   }
+      //   return params.value;
+      // },
+      cellRenderer: (params: any) => {
+        if (params.value === "加权有效问题密度" || params.value === "加权有效缺陷密度") {
+          return `<span style="font-weight: bold">${params.value}</span>`
+        }
         // 只要发现缺陷数为0或者空，这个值也需要为空
         if (!params.data?.foundDN) {
           return "";
@@ -539,6 +602,10 @@ const getReviewDefectColumns = () => {
       headerName: '评审用时',
       field: 'reviewHour',
       cellRenderer: (params: any) => {
+        debugger;
+        if (params.value === "评审用时") {
+          return `<span style="font-weight: bold">${params.value}</span>`
+        }
         if (params.data?.kind === "提测演示" || params.data?.kind === "开发自测\\联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
           return "-";
         }
@@ -554,12 +621,24 @@ const getReviewDefectColumns = () => {
 
         return params.value;
       },
-      editable: defectHourEditRenderer,
+      editable: (params: any) => {
+        if (params.data?.kind === "提测演示" || params.data?.kind === "开发自测\\联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
+          return false;
+        }
+
+        if (params.data?.cut === "是否裁剪") {
+          return false;
+        }
+        return true;
+      },
     },
     {
       headerName: '评审效率',
       field: 'reviewRatio',
       cellRenderer: (params: any) => {
+        if (params.value === "评审效率") {
+          return `<span style="font-weight: bold">${params.value}</span>`
+        }
         if (params.data?.kind === "提测演示" || params.data?.kind === "开发自测\\联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
           return "-";
         }
@@ -575,7 +654,16 @@ const getReviewDefectColumns = () => {
       editable: true,
       minWidth: 260,
       maxWidth: 260,
-      cellRenderer: manualInput_black,
+      cellRenderer: (params: any) => {
+        if (params.value === "说明") {
+          return `<span style="font-weight: bold">${params.value}</span>`
+        }
+        if (!params.value) {
+          return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
+
+        }
+        return `<div style="text-align: left">${params.value}</div>`;
+      },
       // tooltipField: "memo",
       // tooltipComponent: "customTooltip",
     }

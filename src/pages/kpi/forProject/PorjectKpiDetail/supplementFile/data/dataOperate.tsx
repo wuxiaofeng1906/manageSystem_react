@@ -270,6 +270,70 @@ const queryProductRateload = async (client: GqlClient<object>, projectId: string
   return alaysisProductRate(data?.productWithWorkload);
 };
 
+const dealExpleAndCodereview = (sourceData: any) => {
+  const result: any = [];
+  //   单独处理用例评审 和 CodeReview数据
+  sourceData.forEach((ele: any) => {
+    const types = ele.kind;
+    if (types === "用例评审") {
+      result.push({
+        title: "",
+        kind: types,
+        cut: "是否裁剪",
+        foundDN: "发现问题数",
+        weightDN: "加权有效问题数",
+        funcPoint: "功能点",
+        defectDensity: "加权有效问题密度",
+        reviewHour: "评审用时",
+        reviewRatio: "评审效率"
+      });
+
+      if (!ele.cut) {  // 如果要裁剪，则不显示相应数据
+        result.push({
+          title: "",
+          kind: "",
+          cut: ele.cut,
+          foundDN: ele.foundDN,
+          weightDN: ele.weightDN,
+          funcPoint: ele.funcPoint,
+          defectDensity: ele.defectDensity,
+          reviewHour: ele.reviewHour,
+          reviewRatio: ele.reviewRatio
+        });
+      }
+
+    } else if (types === "CodeReview") {
+      result.push({
+        title: "",
+        kind: types,
+        cut: "是否裁剪",
+        foundDN: "发现缺陷数",
+        weightDN: "加权有效缺陷数",
+        funcPoint: "代码量",
+        defectDensity: "加权有效缺陷密度",
+        reviewHour: "评审用时",
+        reviewRatio: "评审效率"
+      });
+
+      if (!ele.cut) {  // 如果要裁剪，则不显示相应数据
+        result.push({
+          title: "",
+          kind: "codereview",
+          cut: ele.cut,
+          foundDN: ele.foundDN,
+          weightDN: ele.weightDN,
+          funcPoint: ele.funcPoint,
+          defectDensity: ele.defectDensity,
+          reviewHour: ele.reviewHour,
+          reviewRatio: ele.reviewRatio
+        });
+      }
+    }
+  });
+  debugger;
+  return result;
+
+};
 // 5评审和缺陷
 const alaysisReviewDefect = (sourceData: any, totalData: any) => {
 
@@ -277,11 +341,8 @@ const alaysisReviewDefect = (sourceData: any, totalData: any) => {
     return [];
   }
 
-  const typeName = ["需求预审", "需求评审", "UE预审", "UE评审", "UI预审", "UI评审", "概设评审", "详设评审", "用例评审", "CodeReview",
-    "提测演示", "开发自测\\联调", "系统测试", "发布测试"];
-
+  const typeName = ["需求预审", "需求评审", "UE预审", "UE评审", "UI预审", "UI评审", "概设评审", "详设评审", "提测演示", "开发自测\\联调", "系统测试", "发布测试"];
   const result: any = [];
-
   typeName.forEach((Types: any, i: number) => {
     const newData = {
       title: "",
@@ -315,36 +376,41 @@ const alaysisReviewDefect = (sourceData: any, totalData: any) => {
 
     }
     result.push(newData);
+
   });
 
-  if (!totalData || totalData.length === 0) {
-    result.push({
-      kind: "合计",
-      foundDN: "",
-      weightDN: "",
-      funcPoint: "",
-      defectDensity: ""
-    });
-  } else {
-    let WD = "";
-    if (totalData[1]) {
-      WD = (totalData[1].toFixed(2)).toString();
-    }
 
-    let DD = "";
-    if (totalData[3]) {
-      DD = (totalData[3].toFixed(2)).toString()
-    }
-    result.push({
-      kind: "合计",
-      foundDN: totalData[0],
-      weightDN: WD,
-      funcPoint: totalData[2],
-      defectDensity: DD
-    });
-  }
+  console.log("totalData", totalData);
+  // 暂时不显示合计数据，但是代码保留
+  // if (!totalData || totalData.length === 0) {
+  //   result.push({
+  //     kind: "合计",
+  //     foundDN: "",
+  //     weightDN: "",
+  //     funcPoint: "",
+  //     defectDensity: ""
+  //   });
+  // } else {
+  //   let WD = "";
+  //   if (totalData[1]) {
+  //     WD = (totalData[1].toFixed(2)).toString();
+  //   }
+  //
+  //   let DD = "";
+  //   if (totalData[3]) {
+  //     DD = (totalData[3].toFixed(2)).toString()
+  //   }
+  //   result.push({
+  //     kind: "合计",
+  //     foundDN: totalData[0],
+  //     weightDN: WD,
+  //     funcPoint: totalData[2],
+  //     defectDensity: DD
+  //   });
+  // }
 
-  return result;
+  // 拼接数据分析和codereview数据
+  return result.concat(dealExpleAndCodereview(sourceData));
 };
 const queryReviewDefect = async (client: GqlClient<object>, projectId: string) => {
   const {data} = await client.query(`
@@ -430,7 +496,7 @@ const alaysisProcessQuality = (sourceData: any) => {
     kind: "提测通过次数",
     baseline: "提测次数",
     realValue: "一次提测通过率",
-    memo:"说明"
+    memo: "说明"
   }, {
     title: "",
     module: "",

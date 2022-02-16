@@ -355,7 +355,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
             </div>
 
             {/* 5.评审和缺陷 */}
-            <div className="ag-theme-alpine" style={{height: 540, width: '100%'}}>
+            <div className="ag-theme-alpine" style={{height: 570, width: '100%'}}>
               <AgGridReact
                 columnDefs={getReviewDefectColumns()} // 定义列
                 rowData={reviewDefect?.data} // 数据绑定

@@ -264,40 +264,54 @@ const reviewDefectCellEdited = async (params: any, projectId: string) => {
       });
       return true;
     }
-
   }
 
-
   if (params.newValue !== params.oldValue) {
-
     const type = params.data?.kind;
+    let modifyData: any;
+    if (type === "codereview" && params.column?.colId === "funcPoint") { // 修改的是代码量
+      modifyData = {
+        "category": "scaleProductivity",
+        "column": "codes",
+        "newValue": params.newValue,
+        "project": projectId,
+      }
+    } else {
+      enum typeObject {
+        "需求预审" = 1, "需求评审", "UE评审", "概设评审", "详设评审",
+        "用例评审2", "codereview", "提测演示", "开发自测\\联调", "系统测试",
+        "发布测试", "UE预审", "UI预审", "UI评审"
+      };
 
-    enum typeObject {
-      "需求预审" = 1, "需求评审", "UE评审", "概设评审", "详设评审",
-      "用例评审2", "codereview", "提测演示", "开发自测\\联调", "系统测试",
-      "发布测试", "UE预审", "UI预审", "UI评审"
-    };
-
-    const newValues = {
-      "category": "reviewDefect",
-      "column": "",
-      "newValue": 0,
-      "project": projectId,
-      "types": [typeObject[type]]
-    };
-
-    if (params.column?.colId === "reviewHour") {
-      newValues.column = "extra";
-      newValues.newValue = params.newValue;
-    } else if (params.column?.colId === "description") {
-      newValues.column = "description";
-      newValues.newValue = params.newValue;
-    } else if (params.column?.colId === "cut") {
-      newValues.column = "cut";
-      newValues.newValue = params.newValue === "否" ? 0 : 1;
+      if (params.column?.colId === "reviewHour") {
+        modifyData = {
+          "category": "reviewDefect",
+          "column": "extra",
+          "newValue": params.newValue,
+          "project": projectId,
+          "types": [typeObject[type]]
+        }
+      } else if (params.column?.colId === "description") {
+        modifyData = {
+          "category": "reviewDefect",
+          "column": "description",
+          "newValue": params.newValue,
+          "project": projectId,
+          "types": [typeObject[type]]
+        }
+      } else if (params.column?.colId === "cut") {
+        modifyData = {
+          "category": "reviewDefect",
+          "column": "cut",
+          "newValue": params.newValue === "否" ? 0 : 1,
+          "project": projectId,
+          "types": [typeObject[type]]
+        }
+      }
     }
 
-    const result = await updateGridContent(newValues);
+
+    const result = await updateGridContent(modifyData);
 
     if (!result) {
       message.info({
@@ -319,7 +333,6 @@ const reviewDefectCellEdited = async (params: any, projectId: string) => {
     });
 
     return false
-
   }
 
   return false;

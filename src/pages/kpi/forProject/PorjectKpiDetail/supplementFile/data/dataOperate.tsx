@@ -357,8 +357,9 @@ const dealExpleAndCodereview = (sourceData: any) => {
 // 5评审和缺陷
 const alaysisReviewDefect = (sourceData: any, totalData: any) => {
 
-  if (!sourceData) {
-    return [];
+  let dts: any = []
+  if (sourceData) {
+    dts = sourceData;
   }
 
   const typeName = ["需求预审", "需求评审", "UE预审", "UE评审", "UI预审", "UI评审", "概设评审", "详设评审", "提测演示", "开发自测\\联调", "系统测试", "发布测试"];
@@ -380,8 +381,8 @@ const alaysisReviewDefect = (sourceData: any, totalData: any) => {
     if (i === 0) {
       newData.title = "5.评审和缺陷";
     }
-    for (let index = 0; index < sourceData.length; index += 1) {
-      const datas = sourceData[index];
+    for (let index = 0; index < dts.length; index += 1) {
+      const datas = dts[index];
       if (Types === datas.kind) {
         newData.cut = datas.cut;
         if (!datas.cut) {  // 如果要裁剪，则不显示相应数据
@@ -432,7 +433,7 @@ const alaysisReviewDefect = (sourceData: any, totalData: any) => {
   // }
 
   // 拼接数据分析和codereview数据
-  return result.concat(dealExpleAndCodereview(sourceData));
+  return result.concat(dealExpleAndCodereview(dts));
 };
 const queryReviewDefect = async (client: GqlClient<object>, projectId: string) => {
   const {data} = await client.query(`

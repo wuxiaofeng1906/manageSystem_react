@@ -263,7 +263,7 @@ const reviewDefectCellEdited = async (params: any, projectId: string) => {
 
     enum typeObject {
       "需求预审" = 1, "需求评审", "UE评审", "概设评审", "详设评审",
-      "用例评审", "CodeReview", "提测演示", "开发联调", "系统测试",
+      "用例评审", "CodeReview", "提测演示", "开发自测\\联调", "系统测试",
       "发布测试", "UE预审", "UI预审", "UI评审"
     };
 

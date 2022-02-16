@@ -1,5 +1,5 @@
 const TYPE_LENGTH = 120;
-const STAGE_LENGTH = 115;
+const STAGE_LENGTH = 130;
 
 // 渲染手工录入
 
@@ -425,7 +425,7 @@ const getProductRateColumns = () => {
 /* region 5.评审和缺陷 */
 
 const defectHourEditRenderer = (params: any) => {
-  if (params.data?.kind === "提测演示" || params.data?.kind === "开发联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
+  if (params.data?.kind === "提测演示" || params.data?.kind === "开发自测\\联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
     return false;
   }
   return true;
@@ -539,7 +539,7 @@ const getReviewDefectColumns = () => {
       headerName: '评审用时',
       field: 'reviewHour',
       cellRenderer: (params: any) => {
-        if (params.data?.kind === "提测演示" || params.data?.kind === "开发联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
+        if (params.data?.kind === "提测演示" || params.data?.kind === "开发自测\\联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
           return "-";
         }
 
@@ -560,7 +560,7 @@ const getReviewDefectColumns = () => {
       headerName: '评审效率',
       field: 'reviewRatio',
       cellRenderer: (params: any) => {
-        if (params.data?.kind === "提测演示" || params.data?.kind === "开发联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
+        if (params.data?.kind === "提测演示" || params.data?.kind === "开发自测\\联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
           return "-";
         }
 
@@ -610,7 +610,7 @@ const getProcessQualityColumns = () => {
       rowSpan: (params: any) => {
 
         if (params.data.title === '6 过程质量补充数据') {
-          return 10.1;
+          return 9.6;
         }
         return 1;
       }
@@ -647,7 +647,7 @@ const getProcessQualityColumns = () => {
           return 3;
         }
         if (params.data?.module === "质量") {
-          return 3.1;
+          return 2.6;
         }
         return 1;
       }

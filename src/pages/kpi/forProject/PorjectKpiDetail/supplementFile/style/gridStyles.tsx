@@ -66,7 +66,7 @@ const setReviewDefectCellStyle = (params: any) => {
     return grayCellStyle;
   }
 
-  if (params.column?.colId === "reviewHour" && (params.data?.kind === "提测演示" || params.data?.kind === "开发联调" || params.data?.kind === "集成测试"
+  if (params.column?.colId === "reviewHour" && (params.data?.kind === "提测演示" || params.data?.kind === "开发自测\\联调" || params.data?.kind === "集成测试"
     || params.data?.kind === "系统测试" || params.data?.kind === "发布测试")) {
     // 不可修改
     return grayCellStyle;

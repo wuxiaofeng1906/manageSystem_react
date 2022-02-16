@@ -540,7 +540,9 @@ const getReviewDefectColumns = () => {
         }
         return params.value;
 
-      }
+      },
+      minWidth: 140,
+      maxWidth: 140
     },
     {
       headerName: '功能点',
@@ -574,6 +576,8 @@ const getReviewDefectColumns = () => {
     {
       headerName: '缺陷密度',
       field: 'defectDensity',
+      minWidth: 150,
+      maxWidth: 150,
       // valueFormatter: (params: any) => {
       //   // 只要发现缺陷数为0或者空，这个值也需要为空
       //   if (!params.data?.foundDN) {

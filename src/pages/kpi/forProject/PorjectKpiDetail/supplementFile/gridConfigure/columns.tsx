@@ -610,7 +610,7 @@ const getReviewDefectColumns = () => {
         if (params.value === "评审用时") {
           return `<span style="font-weight: bold">${params.value}</span>`
         }
-        if (params.data?.kind === "提测演示" || params.data?.kind === "开发自测\\联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
+        if (params.data?.kind === "提测演示" || params.data?.kind === "开发自测/联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
           return "-";
         }
 
@@ -626,7 +626,7 @@ const getReviewDefectColumns = () => {
         return params.value;
       },
       editable: (params: any) => {
-        if (params.data?.kind === "提测演示" || params.data?.kind === "开发自测\\联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
+        if (params.data?.kind === "提测演示" || params.data?.kind === "开发自测/联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
           return false;
         }
 
@@ -643,7 +643,7 @@ const getReviewDefectColumns = () => {
         if (params.value === "评审效率") {
           return `<span style="font-weight: bold">${params.value}</span>`
         }
-        if (params.data?.kind === "提测演示" || params.data?.kind === "开发自测\\联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
+        if (params.data?.kind === "提测演示" || params.data?.kind === "开发自测/联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
           return "-";
         }
 

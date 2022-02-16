@@ -366,7 +366,7 @@ const alaysisReviewDefect = (sourceData: any, totalData: any) => {
     dts = sourceData;
   }
 
-  const typeName = ["需求预审", "需求评审", "UE预审", "UE评审", "UI预审", "UI评审", "概设评审", "详设评审", "提测演示", "开发自测\\联调", "系统测试", "发布测试"];
+  const typeName = ["需求预审", "需求评审", "UE预审", "UE评审", "UI预审", "UI评审", "概设评审", "详设评审", "提测演示", "开发自测/联调", "系统测试", "发布测试"];
   const result: any = [];
   typeName.forEach((Types: any, i: number) => {
     const newData = {

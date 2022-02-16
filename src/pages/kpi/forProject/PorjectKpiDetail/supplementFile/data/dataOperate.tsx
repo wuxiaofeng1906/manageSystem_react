@@ -271,87 +271,92 @@ const queryProductRateload = async (client: GqlClient<object>, projectId: string
 };
 
 const dealExpleAndCodereview = (sourceData: any) => {
-  let result: any = [];
+
+  const dtExample = [{
+    title: "",
+    kind: "用例评审",
+    cut: "是否裁剪",
+    foundDN: "发现问题数",
+    weightDN: "加权有效问题数",
+    funcPoint: "功能点",
+    defectDensity: "加权有效问题密度",
+    reviewHour: "评审用时",
+    reviewRatio: "评审效率",
+    description: "说明"
+  }, {
+    title: "",
+    kind: "用例评审2",
+    cut: "",
+    foundDN: "",
+    weightDN: "",
+    funcPoint: "",
+    defectDensity: "",
+    reviewHour: "",
+    reviewRatio: "",
+    description: ""
+  }];
+  const dtCodereview = [{
+    title: "",
+    kind: "CodeReview",
+    cut: "是否裁剪",
+    foundDN: "发现缺陷数",
+    weightDN: "加权有效缺陷数",
+    funcPoint: "代码量",
+    defectDensity: "加权有效缺陷密度",
+    reviewHour: "评审用时",
+    reviewRatio: "评审效率",
+    description: "说明"
+  }, {
+    title: "",
+    kind: "codereview",
+    cut: "",
+    foundDN: "",
+    weightDN: "",
+    funcPoint: "",
+    defectDensity: "",
+    reviewHour: "",
+    reviewRatio: "",
+    description: ""
+  }];
   //   单独处理用例评审 和 CodeReview数据
   ["用例评审", "CodeReview"].forEach((item: any) => {
-    const dtExample = [{
-      title: "",
-      kind: "用例评审",
-      cut: "是否裁剪",
-      foundDN: "发现问题数",
-      weightDN: "加权有效问题数",
-      funcPoint: "功能点",
-      defectDensity: "加权有效问题密度",
-      reviewHour: "评审用时",
-      reviewRatio: "评审效率",
-      description: "说明"
-    }, {
-      title: "",
-      kind: "用例评审2",
-      cut: "",
-      foundDN: "",
-      weightDN: "",
-      funcPoint: "",
-      defectDensity: "",
-      reviewHour: "",
-      reviewRatio: "",
-      description: ""
-    }];
-    const dtCodereview = [{
-      title: "",
-      kind: "CodeReview",
-      cut: "是否裁剪",
-      foundDN: "发现缺陷数",
-      weightDN: "加权有效缺陷数",
-      funcPoint: "代码量",
-      defectDensity: "加权有效缺陷密度",
-      reviewHour: "评审用时",
-      reviewRatio: "评审效率",
-      description: "说明"
-    }, {
-      title: "",
-      kind: "codereview",
-      cut: "",
-      foundDN: "",
-      weightDN: "",
-      funcPoint: "",
-      defectDensity: "",
-      reviewHour: "",
-      reviewRatio: "",
-      description: ""
-    }];
-
     for (let index = 0; index < sourceData.length; index += 1) {
       const ele = sourceData[index];
       if (item === ele.kind) {
-        if (ele.kind === "用例评审" && !ele.cut) {
+        if (ele.kind === "用例评审") {
+          if (!ele.cut) {
+            dtExample[1].foundDN = ele.foundDN;
+            dtExample[1].weightDN = ele.weightDN;
+            dtExample[1].funcPoint = ele.funcPoint;
+            dtExample[1].defectDensity = ele.defectDensity;
+            dtExample[1].reviewHour = ele.reviewHour;
+            dtExample[1].reviewRatio = ele.reviewRatio;
+            dtExample[1].description = ele.description;
+          }
           dtExample[1].title = "";
           dtExample[1].kind = "用例评审2";
           dtExample[1].cut = ele.cut;
-          dtExample[1].foundDN = ele.foundDN;
-          dtExample[1].weightDN = ele.weightDN;
-          dtExample[1].funcPoint = ele.funcPoint;
-          dtExample[1].defectDensity = ele.defectDensity;
-          dtExample[1].reviewHour = ele.reviewHour;
-          dtExample[1].reviewRatio = ele.reviewRatio;
-          dtExample[1].description = ele.description;
-        } else if (ele.kind === "CodeReview" && !ele.cut) {
+
+        } else if (ele.kind === "CodeReview") {
+          if (!ele.cut) {
+            dtCodereview[1].foundDN = ele.foundDN;
+            dtCodereview[1].weightDN = ele.weightDN;
+            dtCodereview[1].funcPoint = ele.funcPoint;
+            dtCodereview[1].defectDensity = ele.defectDensity;
+            dtCodereview[1].reviewHour = ele.reviewHour;
+            dtCodereview[1].reviewRatio = ele.reviewRatio;
+            dtCodereview[1].description = ele.description;
+          }
           dtCodereview[1].title = "";
           dtCodereview[1].kind = "codereview";
           dtCodereview[1].cut = ele.cut;
-          dtCodereview[1].foundDN = ele.foundDN;
-          dtCodereview[1].weightDN = ele.weightDN;
-          dtCodereview[1].funcPoint = ele.funcPoint;
-          dtCodereview[1].defectDensity = ele.defectDensity;
-          dtCodereview[1].reviewHour = ele.reviewHour;
-          dtCodereview[1].reviewRatio = ele.reviewRatio;
-          dtCodereview[1].description = ele.description;
+
         }
       }
     }
-    result = dtExample.concat(dtCodereview);
   });
-  return result;
+
+  return dtExample.concat(dtCodereview);
 };
 // 5评审和缺陷
 const alaysisReviewDefect = (sourceData: any, totalData: any) => {

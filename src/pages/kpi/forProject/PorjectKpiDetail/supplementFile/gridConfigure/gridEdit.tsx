@@ -300,6 +300,7 @@ const reviewDefectCellEdited = async (params: any, projectId: string) => {
           "types": [typeObject[type]]
         }
       } else if (params.column?.colId === "cut") {
+        debugger;
         modifyData = {
           "category": "reviewDefect",
           "column": "cut",
@@ -309,7 +310,6 @@ const reviewDefectCellEdited = async (params: any, projectId: string) => {
         }
       }
     }
-
 
     const result = await updateGridContent(modifyData);
 

@@ -241,7 +241,7 @@ const productRateCellEdited = async (params: any, projectId: string) => {
 // 评审和缺陷
 const reviewDefectCellEdited = async (params: any, projectId: string) => {
 
-  if (params.column?.colId !== "cut" && params.column.colId !== "description") {
+  if (params.column?.colId ==="reviewHour") {
     // 需要判断当发现缺陷数为0或者为空时，评审用时不能被修改
     if (!params.data?.foundDN) {
       message.error({

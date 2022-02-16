@@ -271,72 +271,88 @@ const queryProductRateload = async (client: GqlClient<object>, projectId: string
 };
 
 const dealExpleAndCodereview = (sourceData: any) => {
-  const result: any = [];
+  let result: any = [];
   //   单独处理用例评审 和 CodeReview数据
-  sourceData.forEach((ele: any) => {
-    const types = ele.kind;
-    if (types === "用例评审") {
-      result.push({
-        title: "",
-        kind: types,
-        cut: "是否裁剪",
-        foundDN: "发现问题数",
-        weightDN: "加权有效问题数",
-        funcPoint: "功能点",
-        defectDensity: "加权有效问题密度",
-        reviewHour: "评审用时",
-        reviewRatio: "评审效率",
-        description: "说明"
-      });
+  ["用例评审", "CodeReview"].forEach((item: any) => {
+    const dtExample = [{
+      title: "",
+      kind: "用例评审",
+      cut: "是否裁剪",
+      foundDN: "发现问题数",
+      weightDN: "加权有效问题数",
+      funcPoint: "功能点",
+      defectDensity: "加权有效问题密度",
+      reviewHour: "评审用时",
+      reviewRatio: "评审效率",
+      description: "说明"
+    }, {
+      title: "",
+      kind: "",
+      cut: "",
+      foundDN: "",
+      weightDN: "",
+      funcPoint: "",
+      defectDensity: "",
+      reviewHour: "",
+      reviewRatio: "",
+      description: ""
+    }];
+    const dtCodereview = [{
+      title: "",
+      kind: "CodeReview",
+      cut: "是否裁剪",
+      foundDN: "发现缺陷数",
+      weightDN: "加权有效缺陷数",
+      funcPoint: "代码量",
+      defectDensity: "加权有效缺陷密度",
+      reviewHour: "评审用时",
+      reviewRatio: "评审效率",
+      description: "说明"
+    }, {
+      title: "",
+      kind: "",
+      cut: "",
+      foundDN: "",
+      weightDN: "",
+      funcPoint: "",
+      defectDensity: "",
+      reviewHour: "",
+      reviewRatio: "",
+      description: ""
+    }];
 
-      if (!ele.cut) {  // 如果要裁剪，则不显示相应数据
-        result.push({
-          title: "",
-          kind: "用例评审2",
-          cut: ele.cut,
-          foundDN: ele.foundDN,
-          weightDN: ele.weightDN,
-          funcPoint: ele.funcPoint,
-          defectDensity: ele.defectDensity,
-          reviewHour: ele.reviewHour,
-          reviewRatio: ele.reviewRatio,
-          description: ele.description
-        });
-      }
-
-    } else if (types === "CodeReview") {
-      result.push({
-        title: "",
-        kind: types,
-        cut: "是否裁剪",
-        foundDN: "发现缺陷数",
-        weightDN: "加权有效缺陷数",
-        funcPoint: "代码量",
-        defectDensity: "加权有效缺陷密度",
-        reviewHour: "评审用时",
-        reviewRatio: "评审效率",
-        description: "说明"
-      });
-
-      if (!ele.cut) {  // 如果要裁剪，则不显示相应数据
-        result.push({
-          title: "",
-          kind: "codereview",
-          cut: ele.cut,
-          foundDN: ele.foundDN,
-          weightDN: ele.weightDN,
-          funcPoint: ele.funcPoint,
-          defectDensity: ele.defectDensity,
-          reviewHour: ele.reviewHour,
-          reviewRatio: ele.reviewRatio,
-          description: ele.description
-        });
+    for (let index = 0; index < sourceData.length; index += 1) {
+      const ele = sourceData[index];
+      if (item === ele.kind) {
+        if (ele.kind === "用例评审" && !ele.cut) {
+          dtExample[1].title = "";
+          dtExample[1].kind = "用例评审2";
+          dtExample[1].cut = ele.cut;
+          dtExample[1].foundDN = ele.foundDN;
+          dtExample[1].weightDN = ele.weightDN;
+          dtExample[1].funcPoint = ele.funcPoint;
+          dtExample[1].defectDensity = ele.defectDensity;
+          dtExample[1].reviewHour = ele.reviewHour;
+          dtExample[1].reviewRatio = ele.reviewRatio;
+          dtExample[1].description = ele.description;
+        } else if (ele.kind === "CodeReview" && !ele.cut) {
+          dtExample[2].title = "codereview";
+          dtExample[2].kind = ele.cut;
+          dtExample[2].cut = ele.cut;
+          dtExample[2].foundDN = ele.foundDN;
+          dtExample[2].weightDN = ele.weightDN;
+          dtExample[2].funcPoint = ele.funcPoint;
+          dtExample[2].defectDensity = ele.defectDensity;
+          dtExample[2].reviewHour = ele.reviewHour;
+          dtExample[2].reviewRatio = ele.reviewRatio;
+          dtExample[2].description = ele.description;
+        }
       }
     }
+    result = dtExample.concat(dtCodereview);
+
   });
-
   return result;
-
 };
 // 5评审和缺陷
 const alaysisReviewDefect = (sourceData: any, totalData: any) => {
@@ -444,7 +460,83 @@ const queryReviewDefect = async (client: GqlClient<object>, projectId: string) =
 const alaysisProcessQuality = (sourceData: any) => {
 
   if (!sourceData) {
-    return [];
+    return [{
+      title: "6 过程质量补充数据",
+      module: "开发",
+      cut: "",
+      kind: "Reopen率",
+      baseline: "-",
+      realValue: "",
+      description: ""
+    }, {
+      title: "",
+      module: "",
+      cut: "",
+      kind: "前端单元测试覆盖率",
+      baseline: "-",
+      realValue: "",
+      description: ""
+
+    }, {
+      title: "",
+      module: "",
+      cut: "",
+      kind: "后端单元测试覆盖率",
+      baseline: "-",
+      realValue: "",
+      description: ""
+
+    }, {
+      title: "",
+      module: "",
+      cut: "",
+      kind: "Bug解决时长",
+      baseline: "-",
+      realValue: "",
+      description: ""
+    }, {
+      title: "",
+      module: "测试",
+      cut: "",
+      kind: "Bug回归时长",
+      baseline: "-",
+      realValue: "",
+      description: ""
+
+    }, {
+      title: "",
+      module: "",
+      cut: "",
+      kind: "加权遗留缺陷",
+      baseline: "-",
+      realValue: "",
+      description: ""
+
+    }, {
+      title: "",
+      module: "",
+      cut: "",
+      kind: "加权遗留缺陷密度",
+      baseline: "-",
+      realValue: "",
+      description: ""
+    }, {
+      title: "",
+      module: "质量",
+      cut: "度量值",
+      kind: "提测通过次数",
+      baseline: "提测次数",
+      realValue: "一次提测通过率",
+      description: "说明"
+    }, {
+      title: "",
+      module: "",
+      cut: "一次提测通过率",
+      kind: "",
+      baseline: "",
+      realValue: "",
+      description: ""
+    }];
   }
 
   const result = [{

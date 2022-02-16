@@ -279,6 +279,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                   maxWidth: COMMON_LENGTH,
                   headerComponentParams: setGridHeaderShowCenter
                 }}
+                components={{customTooltip: CustomTooltip}}
                 rowHeight={32}
                 headerHeight={35}
                 suppressRowTransform={true}
@@ -306,6 +307,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                   maxWidth: COMMON_LENGTH,
                   headerComponentParams: setGridHeaderShowCenter
                 }}
+                components={{customTooltip: CustomTooltip}}
                 rowHeight={32}
                 headerHeight={35}
                 suppressRowTransform={true}
@@ -341,6 +343,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                   }
                   return 32;
                 }}
+                components={{customTooltip: CustomTooltip}}
                 headerHeight={35}
                 suppressRowTransform={true}
                 onGridReady={onProductRateGridReady}
@@ -369,6 +372,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                   maxWidth: COMMON_LENGTH,
                   headerComponentParams: setGridHeaderShowCenter
                 }}
+                components={{customTooltip: CustomTooltip}}
                 rowHeight={32}
                 headerHeight={35}
                 suppressRowTransform={true}
@@ -396,6 +400,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                   maxWidth: COMMON_LENGTH,
                   headerComponentParams: setGridHeaderShowCenter
                 }}
+                components={{customTooltip: CustomTooltip}}
                 getRowHeight={(params: any) => {
                   if (params.data?.cut === "一次提测通过率") {
                     return 50;
@@ -429,6 +434,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                   maxWidth: COMMON_LENGTH,
                   headerComponentParams: setGridHeaderShowCenter
                 }}
+                components={{customTooltip: CustomTooltip}}
                 getRowHeight={(params: any) => {
                   if (params.data?.item === "一次发布成功率") {
                     return 50;

@@ -99,12 +99,12 @@ const getProcessColumns = () => {
     },
     {
       headerName: '偏差原因说明',
-      field: 'memo',
+      field: 'description',
       editable: true,
       minWidth: 260,
       maxWidth: 260,
       cellRenderer: manualInput_black,
-      tooltipField: "memo",
+      tooltipField: "description",
       tooltipComponent: "customTooltip",
 
     }
@@ -180,13 +180,13 @@ const getStoryStabilityColumns = () => {
       }
     }, {
       headerName: '说明',
-      field: 'memo',
+      field: 'description',
       editable: true,
       minWidth: 260,
       maxWidth: 260,
       cellRenderer: manualInput_black,
-      // tooltipField: "memo",
-      // tooltipComponent: "customTooltip",
+      tooltipField: "description",
+      tooltipComponent: "customTooltip",
     }
   ];
 
@@ -302,13 +302,13 @@ const getStageWorkloadColumns = () => {
       }
     }, {
       headerName: '说明',
-      field: 'memo',
+      field: 'description',
       editable: true,
       minWidth: 260,
       maxWidth: 260,
       cellRenderer: manualInput_black,
-      // tooltipField: "memo",
-      // tooltipComponent: "customTooltip",
+      tooltipField: "description",
+      tooltipComponent: "customTooltip",
     }
   ];
 
@@ -395,7 +395,7 @@ const getProductRateColumns = () => {
 
     }, {
       headerName: '说明',
-      field: 'memo',
+      field: 'description',
       editable: true,
       minWidth: 260,
       maxWidth: 260,
@@ -412,8 +412,8 @@ const getProductRateColumns = () => {
         return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
 
       },
-      tooltipField: "memo",
-      // tooltipComponent: "customTooltip",
+      tooltipField: "description",
+      tooltipComponent: "customTooltip",
     }
   ];
 
@@ -602,7 +602,7 @@ const getReviewDefectColumns = () => {
       headerName: '评审用时',
       field: 'reviewHour',
       cellRenderer: (params: any) => {
-        debugger;
+
         if (params.value === "评审用时") {
           return `<span style="font-weight: bold">${params.value}</span>`
         }
@@ -650,7 +650,7 @@ const getReviewDefectColumns = () => {
       }
     }, {
       headerName: '说明',
-      field: 'memo',
+      field: 'description',
       editable: true,
       minWidth: 260,
       maxWidth: 260,
@@ -664,8 +664,8 @@ const getReviewDefectColumns = () => {
         }
         return `<div style="text-align: left">${params.value}</div>`;
       },
-      // tooltipField: "memo",
-      // tooltipComponent: "customTooltip",
+      tooltipField: "description",
+      tooltipComponent: "customTooltip",
     }
   ];
 
@@ -855,9 +855,9 @@ const getProcessQualityColumns = () => {
       },
     }, {
       headerName: '说明',
-      field: 'memo',
+      field: 'description',
       editable: (params: any) => {
-        if (params.data?.memo === "说明") {
+        if (params.data?.description === "说明") {
           return false;
         }
         return true;
@@ -882,8 +882,8 @@ const getProcessQualityColumns = () => {
         return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
 
       },
-      // tooltipField: "memo",
-      // tooltipComponent: "customTooltip",
+      tooltipField: "description",
+      tooltipComponent: "customTooltip",
     }
   ];
 
@@ -973,7 +973,7 @@ const getServiceColumns = () => {
         }
       }, {
         headerName: '说明',
-        field: 'memo',
+        field: 'description',
         editable: true,
         minWidth: 260,
         maxWidth: 260,
@@ -983,9 +983,10 @@ const getServiceColumns = () => {
 
           }
           return `<div style="margin-top: 12px;text-align: left">${params.value}</div>`;
-          // tooltipField: "memo",
-          // tooltipComponent: "customTooltip",
-        }
+
+        },
+        tooltipField: "description",
+        tooltipComponent: "customTooltip",
       }
     ];
 

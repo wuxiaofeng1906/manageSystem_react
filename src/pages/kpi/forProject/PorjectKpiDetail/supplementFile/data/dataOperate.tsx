@@ -2,8 +2,9 @@ import {GqlClient} from "@/hooks";
 
 // 1.进度数据解析
 const alaysisProcessData = (sourceData: any) => {
-  if (!sourceData) {
-    return [];
+  let ora_datas: any = [];
+  if (sourceData) {
+    ora_datas = sourceData;
   }
 
   const typeName = [
@@ -25,15 +26,15 @@ const alaysisProcessData = (sourceData: any) => {
       actualEnd: "",
       days: "",
       ratio: "",
-      memo: "",
+      description: "",
     };
 
     if (i === 0) {
       newData.title = "1.进度";
     }
 
-    for (let index = 0; index < sourceData.length; index += 1) {
-      const datas = sourceData[index];
+    for (let index = 0; index < ora_datas.length; index += 1) {
+      const datas = ora_datas[index];
       if (Types.type === datas.type) {
         newData.planStart = datas.planStart;
         newData.planEnd = datas.planEnd;
@@ -41,11 +42,10 @@ const alaysisProcessData = (sourceData: any) => {
         newData.actualEnd = datas.actualEnd;
         newData.days = datas.days;
         newData.ratio = datas.ratio;
-        newData.memo = datas.memo;
+        newData.description = datas.description;
 
         break;
       }
-
     }
     result.push(newData);
 
@@ -65,7 +65,7 @@ const queryProcessData = async (client: GqlClient<object>, projectId: string) =>
             type
             days
             ratio
-            memo
+            description
           }
       }
   `);
@@ -95,6 +95,7 @@ const alaysisStoryStability = (sourceData: any) => {
       planHours: "",
       stableHours: "",
       ratio: "",
+      description: ""
     };
 
     if (i === 0) {
@@ -107,6 +108,7 @@ const alaysisStoryStability = (sourceData: any) => {
         newData.planHours = datas.planHours;
         newData.stableHours = datas.stableHours;
         newData.ratio = datas.ratio;
+        newData.description = datas.description;
         break;
       }
 
@@ -125,6 +127,7 @@ const queryStoryStability = async (client: GqlClient<object>, projectId: string)
           planHours
           stableHours
           ratio
+          description
         }
 
       }
@@ -158,7 +161,8 @@ const alaysisStageWorkload = (sourceData: any) => {
       planHours: "",
       actualHours: "",
       planWorkload: "",
-      actualWorkload: ""
+      actualWorkload: "",
+      description: ""
     };
 
     if (i === 0) {
@@ -173,6 +177,7 @@ const alaysisStageWorkload = (sourceData: any) => {
         newData.actualHours = datas.actualHours;
         newData.planWorkload = datas.planWorkload;
         newData.actualWorkload = datas.actualWorkload;
+        newData.description = datas.description
         break;
       }
     }
@@ -187,7 +192,9 @@ const alaysisStageWorkload = (sourceData: any) => {
     actualHours: "",
     planWorkload: "",
     actualWorkload: "",
+    description: ""
   };
+
   if (sourceData.totalSW) {
     const total = sourceData.totalSW;
     totalData.manpower = total[0] === null ? "" : total[0].toString();
@@ -195,6 +202,7 @@ const alaysisStageWorkload = (sourceData: any) => {
     totalData.actualHours = total[2] === null ? "" : total[2].toString();
     totalData.planWorkload = total[3] === null ? "" : total[3].toString();
     totalData.actualWorkload = total[4] === null ? "" : total[4].toString();
+    totalData.description = sourceData.description;
   }
 
   // 需要新增总计
@@ -207,10 +215,6 @@ const queryStageWorkload = async (client: GqlClient<object>, projectId: string) 
       {
 
           productWithWorkload(pId:${Number(projectId)}){
-            planValue
-            actualValue
-            planRatio
-            actualRatio
             stageWorkload{
               manpower
               planHours
@@ -218,7 +222,9 @@ const queryStageWorkload = async (client: GqlClient<object>, projectId: string) 
               type
               planWorkload
               actualWorkload
+              description
               }
+              description
               totalSW
           }
       }
@@ -235,12 +241,14 @@ const alaysisProductRate = (sourceData: any) => {
       title: "4.生产率",
       stage: "功能点",
       planValue: sourceData.planValue,
-      actualValue: sourceData.actualValue
+      actualValue: sourceData.actualValue,
+      description: sourceData.fpDescription
     }, {
       title: "",
       stage: "生产率(功能点/人天）",
       planValue: sourceData.planRatio,
-      actualValue: sourceData.actualRatio
+      actualValue: sourceData.actualRatio,
+      description: sourceData.raDescription
     }
   ];
 
@@ -248,21 +256,13 @@ const alaysisProductRate = (sourceData: any) => {
 const queryProductRateload = async (client: GqlClient<object>, projectId: string) => {
   const {data} = await client.query(`
       {
-
           productWithWorkload(pId:${Number(projectId)}){
             planValue
             actualValue
             planRatio
             actualRatio
-            stageWorkload{
-              manpower
-              planHours
-              actualHours
-              type
-              planWorkload
-              actualWorkload
-              }
-              totalSW
+            fpDescription
+            raDescription
           }
       }
   `);
@@ -285,20 +285,22 @@ const dealExpleAndCodereview = (sourceData: any) => {
         funcPoint: "功能点",
         defectDensity: "加权有效问题密度",
         reviewHour: "评审用时",
-        reviewRatio: "评审效率"
+        reviewRatio: "评审效率",
+        description: "说明"
       });
 
       if (!ele.cut) {  // 如果要裁剪，则不显示相应数据
         result.push({
           title: "",
-          kind: "",
+          kind: "用例评审2",
           cut: ele.cut,
           foundDN: ele.foundDN,
           weightDN: ele.weightDN,
           funcPoint: ele.funcPoint,
           defectDensity: ele.defectDensity,
           reviewHour: ele.reviewHour,
-          reviewRatio: ele.reviewRatio
+          reviewRatio: ele.reviewRatio,
+          description: ele.description
         });
       }
 
@@ -312,7 +314,8 @@ const dealExpleAndCodereview = (sourceData: any) => {
         funcPoint: "代码量",
         defectDensity: "加权有效缺陷密度",
         reviewHour: "评审用时",
-        reviewRatio: "评审效率"
+        reviewRatio: "评审效率",
+        description: "说明"
       });
 
       if (!ele.cut) {  // 如果要裁剪，则不显示相应数据
@@ -325,12 +328,13 @@ const dealExpleAndCodereview = (sourceData: any) => {
           funcPoint: ele.funcPoint,
           defectDensity: ele.defectDensity,
           reviewHour: ele.reviewHour,
-          reviewRatio: ele.reviewRatio
+          reviewRatio: ele.reviewRatio,
+          description: ele.description
         });
       }
     }
   });
-  debugger;
+
   return result;
 
 };
@@ -353,7 +357,8 @@ const alaysisReviewDefect = (sourceData: any, totalData: any) => {
       funcPoint: "",
       defectDensity: "",
       reviewHour: "",
-      reviewRatio: ""
+      reviewRatio: "",
+      description: ""
     };
 
     if (i === 0) {
@@ -370,6 +375,7 @@ const alaysisReviewDefect = (sourceData: any, totalData: any) => {
           newData.defectDensity = datas.defectDensity;
           newData.reviewHour = datas.reviewHour;
           newData.reviewRatio = datas.reviewRatio;
+          newData.description = datas.description;
         }
         break;
       }
@@ -425,6 +431,7 @@ const queryReviewDefect = async (client: GqlClient<object>, projectId: string) =
             defectDensity
             reviewHour
             reviewRatio
+            description
           }
           reviewDefectTotal(pId:${Number(projectId)})
       }
@@ -446,35 +453,43 @@ const alaysisProcessQuality = (sourceData: any) => {
     cut: sourceData.reopenRatio?.cut,
     kind: "Reopen率",
     baseline: "-",
-    realValue: sourceData.reopenRatio?.actualValue
+    realValue: sourceData.reopenRatio?.actualValue,
+    description: sourceData.reopenRatio?.description
   }, {
     title: "",
     module: "",
     cut: sourceData.frontUnitCover?.cut,
     kind: "前端单元测试覆盖率",
     baseline: "-",
-    realValue: sourceData.frontUnitCover?.actualValue
+    realValue: sourceData.frontUnitCover?.actualValue,
+    description: sourceData.frontUnitCover?.description
+
   }, {
     title: "",
     module: "",
     cut: sourceData.backUnitCover?.cut,
     kind: "后端单元测试覆盖率",
     baseline: "-",
-    realValue: sourceData.backUnitCover?.actualValue
+    realValue: sourceData.backUnitCover?.actualValue,
+    description: sourceData.backUnitCover?.description
+
   }, {
     title: "",
     module: "",
     cut: sourceData.bugResolvedDura?.cut,
     kind: "Bug解决时长",
     baseline: "-",
-    realValue: sourceData.bugResolvedDura?.actualValue
+    realValue: sourceData.bugResolvedDura?.actualValue,
+    description: sourceData.bugResolvedDura?.description
   }, {
     title: "",
     module: "测试",
     cut: sourceData.bugFlybackDura?.cut,
     kind: "Bug回归时长",
     baseline: "-",
-    realValue: sourceData.bugFlybackDura?.actualValue
+    realValue: sourceData.bugFlybackDura?.actualValue,
+    description: sourceData.bugFlybackDura?.description
+
   }, {
     title: "",
     module: "",
@@ -482,6 +497,8 @@ const alaysisProcessQuality = (sourceData: any) => {
     kind: "加权遗留缺陷",
     baseline: "-",
     realValue: sourceData.weightedLegacyDefect?.actualValue,
+    description: sourceData.weightedLegacyDefect?.description
+
   }, {
     title: "",
     module: "",
@@ -489,6 +506,7 @@ const alaysisProcessQuality = (sourceData: any) => {
     kind: "加权遗留缺陷密度",
     baseline: "-",
     realValue: sourceData.weightedLegacyDI?.actualValue,
+    description: sourceData.weightedLegacyDI?.description
   }, {
     title: "",
     module: "质量",
@@ -496,7 +514,7 @@ const alaysisProcessQuality = (sourceData: any) => {
     kind: "提测通过次数",
     baseline: "提测次数",
     realValue: "一次提测通过率",
-    memo: "说明"
+    description: "说明"
   }, {
     title: "",
     module: "",
@@ -504,6 +522,7 @@ const alaysisProcessQuality = (sourceData: any) => {
     kind: sourceData.carryTestPass?.succN === undefined ? "" : sourceData.carryTestPass?.succN,
     baseline: sourceData.carryTestPass?.totalN === undefined ? "" : sourceData.carryTestPass?.totalN,
     realValue: sourceData.carryTestPass?.ratio === undefined ? "" : sourceData.carryTestPass?.ratio,
+    description: sourceData.carryTestPass?.description
   }];
 
   return result;
@@ -517,41 +536,49 @@ const queryProcessQuality = async (client: GqlClient<object>, projectId: string)
               actualValue
               baseline
               cut
+              description
             }
             bugFlybackDura {
               actualValue
               baseline
               cut
+              description
             }
             bugResolvedDura {
               actualValue
               baseline
               cut
+              description
             }
             weightedLegacyDefect {
               actualValue
               baseline
               cut
+              description
             }
             weightedLegacyDI {
               actualValue
               baseline
               cut
+              description
             }
             frontUnitCover {
               actualValue
               baseline
               cut
+              description
             }
             backUnitCover {
               actualValue
               baseline
               cut
+              description
             }
              carryTestPass{
               succN
               totalN
               ratio
+              description
             }
           }
       }
@@ -569,7 +596,8 @@ const alaysisService = (sourceData: any) => {
       item: "一次发布成功率",
       succN: "",
       totalN: "",
-      ratio: ""
+      ratio: "",
+      description: ""
     }];
   }
 
@@ -580,7 +608,8 @@ const alaysisService = (sourceData: any) => {
     item: "一次发布成功率",
     succN: datas.succN,
     totalN: datas.totalN,
-    ratio: datas.ratio
+    ratio: datas.ratio,
+    description: datas.description
   }];
 
   return result;
@@ -593,6 +622,7 @@ const queryServices = async (client: GqlClient<object>, projectId: string) => {
             succN
             totalN
             ratio
+            description
           }
       }
   `);

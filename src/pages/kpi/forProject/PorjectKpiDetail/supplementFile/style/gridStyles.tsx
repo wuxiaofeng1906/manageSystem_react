@@ -16,7 +16,7 @@ const whiteCellStyle = {
 
 // 1.进度
 const setProcessCellStyle = (params: any) => {
-  if (params.column?.colId === "memo") {
+  if (params.column?.colId === "description") {
     return whiteCellStyle;
   }
   return grayCellStyle;

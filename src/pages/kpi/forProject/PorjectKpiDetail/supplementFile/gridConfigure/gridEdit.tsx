@@ -3,7 +3,6 @@ import {message} from "antd";
 
 // 进度指标编辑
 const processCellEdited = async (params: any, projectId: string) => {
-
   // 有数据变化时再进行修改请求
   if (params.newValue !== params.oldValue) {
     const type = params.data?.milestone;
@@ -17,7 +16,7 @@ const processCellEdited = async (params: any, projectId: string) => {
     };
     const newValues = {
       "category": "progressDeviation",
-      "column": "memo",
+      "column": "description",
       "newValue": params.newValue,
       "project": projectId,
       "types": [correspondingField[type]]
@@ -48,7 +47,7 @@ const processCellEdited = async (params: any, projectId: string) => {
 // 需求稳定性编辑
 const storyStabilityCellEdited = async (params: any, projectId: string) => {
   // 说明可以不为数字
-  if (params.column.colId !== "memo") {
+  if (params.column.colId !== "description") {
 
     if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
       message.error({
@@ -67,18 +66,20 @@ const storyStabilityCellEdited = async (params: any, projectId: string) => {
     const type = params.data?.stage;
     const typeValue = {"项目周期": 0, "开发": 3, "测试": 4, "发布": 5};
 
-    let columID = "";
+    let modifyValue = params.newValue;
+    let columID = params.column.colId;
     if (params.column.colId === "planHours") { // 预计工时
       columID = "kpi"
+      modifyValue = Number(params.newValue);
     } else if (params.column.colId === "stableHours") { // 变更工时
-      columID = "extra"
+      columID = "extra";
+      modifyValue = Number(params.newValue);
     }
-
 
     const newValues = {
       "category": "storyStable",
       "column": columID,
-      "newValue": Number(params.newValue),
+      "newValue": modifyValue,
       "project": projectId,
       "types": [typeValue[type]]
     };
@@ -114,7 +115,7 @@ const storyStabilityCellEdited = async (params: any, projectId: string) => {
 const stageWorkloadCellEdited = async (params: any, projectId: string) => {
 
   // 说明可以不为数字
-  if (params.column.colId !== "memo") {
+  if (params.column.colId !== "description") {
 
     if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
       message.error({
@@ -127,6 +128,7 @@ const stageWorkloadCellEdited = async (params: any, projectId: string) => {
       return true;
     }
   }
+
   // 有数据变化时再进行修改请求
   if (params.newValue !== params.oldValue) {
     const type = params.data?.stage;
@@ -178,7 +180,7 @@ const stageWorkloadCellEdited = async (params: any, projectId: string) => {
 // 生产率
 const productRateCellEdited = async (params: any, projectId: string) => {
   // 说明可以不为数字
-  if (params.column.colId !== "memo") {
+  if (params.column.colId !== "description") {
 
     if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
       message.error({
@@ -192,10 +194,19 @@ const productRateCellEdited = async (params: any, projectId: string) => {
     }
   }
 
+  let columns = params.column?.colId;
+
+  if (columns === "description") {
+    if (params.data?.stage === "功能点") {
+      columns = "fpDescription";
+    } else if (params.data?.stage === "生产率(功能点/人天）") {
+      columns = "raDescription";
+    }
+  }
   if (params.newValue !== params.oldValue) {
     const newValues = {
       "category": "scaleProductivity",
-      "column": params.column?.colId,
+      "column": columns,
       "newValue": params.newValue,
       "project": projectId,
     };
@@ -230,7 +241,7 @@ const productRateCellEdited = async (params: any, projectId: string) => {
 // 评审和缺陷
 const reviewDefectCellEdited = async (params: any, projectId: string) => {
 
-  if (params.column?.colId !== "cut" && params.column.colId !== "memo") {
+  if (params.column?.colId !== "cut" && params.column.colId !== "description") {
     // 需要判断当发现缺陷数为0或者为空时，评审用时不能被修改
     if (!params.data?.foundDN) {
       message.error({
@@ -263,7 +274,7 @@ const reviewDefectCellEdited = async (params: any, projectId: string) => {
 
     enum typeObject {
       "需求预审" = 1, "需求评审", "UE评审", "概设评审", "详设评审",
-      "用例评审", "CodeReview", "提测演示", "开发自测\\联调", "系统测试",
+      "用例评审2", "codereview", "提测演示", "开发自测\\联调", "系统测试",
       "发布测试", "UE预审", "UI预审", "UI评审"
     };
 
@@ -278,7 +289,10 @@ const reviewDefectCellEdited = async (params: any, projectId: string) => {
     if (params.column?.colId === "reviewHour") {
       newValues.column = "extra";
       newValues.newValue = params.newValue;
-    } else {
+    } else if (params.column?.colId === "description") {
+      newValues.column = "description";
+      newValues.newValue = params.newValue;
+    } else if (params.column?.colId === "cut") {
       newValues.column = "cut";
       newValues.newValue = params.newValue === "否" ? 0 : 1;
     }
@@ -313,7 +327,7 @@ const reviewDefectCellEdited = async (params: any, projectId: string) => {
 
 const updateTestPassValue = (params: any) => {
   const items: any = [8];
-  const values = Number(params.newValue);
+  let values = params.newValue;
   let columns = "";
 
   // 里面要区分column，
@@ -324,6 +338,7 @@ const updateTestPassValue = (params: any) => {
   //   如果提测通过次数>提测次数，弹出提示语：提测次数不能小于提测通过次数。
   if (params.column?.colId === "kind") {   // kind 代表度量值列-提测通过次数
     columns = "kpi";
+    values = Number(params.newValue)
     const testCount = params.data?.baseline;
     if (testCount && values > Number(testCount)) {
       message.error({
@@ -337,6 +352,7 @@ const updateTestPassValue = (params: any) => {
     }
   } else if (params.column?.colId === "baseline") { // 基线值-提测次数
     columns = "extra";
+    values = Number(params.newValue)
     const testSuccCount = params.data?.kind;
     if (Number(testSuccCount) > values) {
       message.error({
@@ -348,6 +364,8 @@ const updateTestPassValue = (params: any) => {
       });
       return true;
     }
+  } else if (params.column?.colId === "description") { // 说明
+    columns = "description";
   }
   return {item: items, column: columns, value: values};
 };
@@ -376,8 +394,12 @@ const pocessQualityCellEdited = async (params: any, projectId: string) => {
     }
 
     items.push(typeObject[params.data?.kind]);
-    columns = "cut";
-    values = params.newValue === "否" ? 0 : 1;
+    columns = params.column?.colId;
+    if (columns === "cut") {
+      values = params.newValue === "否" ? 0 : 1;
+    } else {
+      values = params.newValue;
+    }
   }
 
   if (params.newValue !== params.oldValue) {
@@ -418,7 +440,7 @@ const pocessQualityCellEdited = async (params: any, projectId: string) => {
 const serviceCellEdited = async (params: any, projectId: string) => {
 
   // 说明可以不为数字
-  if (params.column.colId !== "memo") {
+  if (params.column.colId !== "description") {
 
     if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
       message.error({
@@ -439,7 +461,9 @@ const serviceCellEdited = async (params: any, projectId: string) => {
     如果成功发布次数>发布次数，弹出提示语：发布次数不能小于成功发布次数。  */
 
   let columns = "";
+  let values = params.newValue;
   if (params.column?.colId === "succN") { // 成功发布列
+    values = Number(params.newValue);
     columns = "kpi";
     const totalNum = params.data?.totalN; // 表格中的发布总数
     if (totalNum) { // 如果总发布次数有值，需要判断
@@ -456,6 +480,7 @@ const serviceCellEdited = async (params: any, projectId: string) => {
       }
     }
   } else if (params.column?.colId === "totalN") {
+    values = Number(params.newValue);
     columns = "extra";
     const succNum = params.data?.succN; // 成功发布的数据
     if (Number(succNum) > Number(params.newValue)) {
@@ -468,14 +493,18 @@ const serviceCellEdited = async (params: any, projectId: string) => {
       });
       return true;
     }
+  } else if (params.column?.colId === "description") {
+    values = params.newValue;
+    columns = "description";
   }
 
+  debugger;
   if (params.newValue !== params.oldValue) {
 
     const newValues = {
       "category": "serviceAbout",
       "column": columns,
-      "newValue": Number(params.newValue),
+      "newValue": values,
       "project": projectId,
       "types": [1]  // 1 - 一次发布成功率 -> 目前仅支持1的取值
     };

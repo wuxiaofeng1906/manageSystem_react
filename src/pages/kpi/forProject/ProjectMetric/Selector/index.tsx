@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-02-11 10:39:02
+ * @LastEditTime: 2022-02-17 09:54:40
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -17,6 +17,7 @@ import {
   Dropdown,
   Menu,
   Radio,
+  Space,
 } from 'antd';
 import { mySelector } from './index.css';
 import { useMount } from 'ahooks';
@@ -26,11 +27,9 @@ import React, { useEffect, useState } from 'react';
 import { useModel } from 'umi';
 import { projectKpiGql, organizationGql, queryGQL } from '@/pages/gqls';
 import { ColumnHeightOutlined, ReloadOutlined } from '@ant-design/icons';
-import { deptTreeNodes, onTreeMultiChange, projOptsElems } from './extra';
+import { deptTreeNodes, onDateChange, onTreeMultiChange, projOptsElems } from './extra';
 import { Moment } from 'moment';
 import moment from 'moment';
-
-const { RangePicker } = DatePicker;
 
 /* 默认的时间 */
 const defaultDateRange: [Moment, any] = [
@@ -194,16 +193,24 @@ export default () => {
             </Col>
             <Col {...itemFlexs} md={8}>
               <Form.Item label="时间范围" key="dates">
-                <RangePicker
-                  onChange={(dates: any, dateString) => {
-                    dateStr = dates ? dateString : undefined;
-                    doChange = true;
-                    setSelectItems((prev) =>
-                      Object.assign({ ...prev }, { dates: dates, doQuery: true }),
-                    );
-                  }}
-                  value={selectItems.dates}
-                />
+                <Space direction="horizontal">
+                  <DatePicker
+                    placeholder="开始日期"
+                    onChange={(date: any, dateString: string) => {
+                      doChange = true;
+                      onDateChange(dateStr as any, 0, date, dateString, setSelectItems);
+                    }}
+                    value={selectItems.dates[0]}
+                  />
+                  <DatePicker
+                    placeholder="结束日期"
+                    onChange={(date: any, dateString: string) => {
+                      doChange = true;
+                      onDateChange(dateStr as any, 1, date, dateString, setSelectItems);
+                    }}
+                    value={selectItems.dates[1]}
+                  />
+                </Space>
               </Form.Item>
             </Col>
           </Form>
@@ -221,8 +228,8 @@ export default () => {
               onClick={() => {
                 doChange = true;
                 setProjElems(null);
-                setSelectItems(Object.assign({ ...defaultSeclectItems }, { doQuery: true }));
-                dateStr = defaultDateStr;
+                setSelectItems((prev) => Object.assign({ ...prev }, { doQuery: true }));
+                // dateStr = defaultDateStr;
               }}
             />
           </Tooltip>

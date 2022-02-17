@@ -2,7 +2,7 @@
  * @Description:
  * @Author: jieTan
  * @Date: 2021-12-28 10:07:16
- * @LastEditTime: 2022-01-24 10:00:13
+ * @LastEditTime: 2022-02-17 09:51:32
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -25,7 +25,7 @@ export const projOptsElems = (
 ): any => {
   setState((prev: any[]) => {
     // 规避先选择项目，后选择部门导致的tag失效的问题
-    if (datas.length === 0 && selectDepts.length !== 0 && prev)
+    if (datas.length === 0 && selectDepts && selectDepts.length !== 0 && prev)
       return prev.map((d) => ({
         title: d.title,
         value: d.value,
@@ -87,4 +87,29 @@ export const onTreeMultiChange = (values: string, setState: Function, item: stri
   );
   //
   return true;
+};
+
+export /**
+ * @description - 日期选择时，相关参数的更改
+ * @author JieTan
+ * @date 2022/02/17 09:02:09
+ * @param {[string, any]} dateStr - 可被同步修改的日期值：[开始日期，结束日期]
+ * @param {number} idx - 对应日期的下标
+ * @param {*} date - 当前组件选中的时间：moment格式
+ * @param {string} dateString - 当前组件选中的时间：string格式
+ * @param {Function} setSelectItems - 异步修改的页面整体参数
+ */
+const onDateChange = (
+  dateStr: [string, any],
+  idx: number,
+  date: any,
+  dateString: string,
+  setSelectItems: Function,
+) => {
+  dateStr[idx] = dateString;
+  setSelectItems((prev: any) => {
+    const _dates = prev.dates;
+    _dates[idx] = date;
+    return Object.assign({ ...prev }, { dates: _dates, doQuery: true });
+  });
 };

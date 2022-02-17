@@ -162,10 +162,17 @@ const getReviewDefectTable = (data: any) => {
   if (data && data.length > 0) {
     data.forEach((ele: any) => {
       let stage = "";
-      if (stage !== "用例评审2" && stage !== "codereview") {
+      if (ele.kind !== "用例评审2" && ele.kind !== "codereview") {
         stage = ele.kind;
       }
-      const currentRow: any = [ele.title, stage, ele.cut, ele.foundDN, ele.weightDN, ele.funcPoint,
+
+      // 是否裁剪转为中文
+      let cutFlag = ele.cut;
+      if (cutFlag !== "是否裁剪") {
+        cutFlag = ele.cut === true ? "是" : "否";
+      }
+
+      const currentRow: any = [ele.title, stage, cutFlag, ele.foundDN, ele.weightDN, ele.funcPoint,
         ele.defectDensity, ele.reviewHour, ele.reviewRatio, ele.description];
       rowData.push(currentRow);
     });
@@ -201,7 +208,14 @@ const getProcessQualityTable = (data: any) => {
   const rowData: any = [];
   if (data && data.length > 0) {
     data.forEach((ele: any) => {
-      const currentRow: any = [ele.title, ele.module, ele.cut, ele.kind, ele.baseline, ele.realValue,
+
+      // 是否裁剪转为中文
+      let cutFlag = ele.cut;
+      if (cutFlag !== "度量值" && cutFlag !== "一次提测通过率") {
+        cutFlag = ele.cut === true ? "是" : "否";
+      }
+
+      const currentRow: any = [ele.title, ele.module, cutFlag, ele.kind, ele.baseline, ele.realValue,
         ele.description];
       rowData.push(currentRow);
     });

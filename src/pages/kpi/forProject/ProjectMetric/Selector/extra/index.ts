@@ -2,7 +2,7 @@
  * @Description:
  * @Author: jieTan
  * @Date: 2021-12-28 10:07:16
- * @LastEditTime: 2022-02-17 09:51:32
+ * @LastEditTime: 2022-02-17 10:27:08
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -25,7 +25,7 @@ export const projOptsElems = (
 ): any => {
   setState((prev: any[]) => {
     // 规避先选择项目，后选择部门导致的tag失效的问题
-    if (datas.length === 0 && selectDepts && selectDepts.length !== 0 && prev)
+    if (datas?.length === 0 && selectDepts?.length !== 0 && prev)
       return prev.map((d) => ({
         title: d.title,
         value: d.value,
@@ -33,7 +33,7 @@ export const projOptsElems = (
       }));
 
     //
-    return datas.map((d) => ({
+    return datas?.map((d) => ({
       title: d.project.name,
       value: d.project.id,
       key: d.project.id,

@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-02-17 09:54:40
+ * @LastEditTime: 2022-02-17 10:16:38
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -130,7 +130,7 @@ export default () => {
   }, [selectItems]); // 查询参数更跟时触发
   //
   useEffect(() => {
-    gqlData !== undefined ? projOptsElems(gqlData, setProjElems, selectItems.projIds) : null;
+    gqlData ? projOptsElems(gqlData, setProjElems, selectItems.projIds) : null;
   }, [gqlData]);
   // 界面挂载后，立马查询部门组织架构
   useMount(async () => {

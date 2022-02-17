@@ -161,7 +161,11 @@ const getReviewDefectTable = (data: any) => {
   const rowData: any = [];
   if (data && data.length > 0) {
     data.forEach((ele: any) => {
-      const currentRow: any = [ele.title, ele.kind, ele.cut, ele.foundDN, ele.weightDN, ele.funcPoint,
+      let stage = "";
+      if (stage !== "用例评审2" && stage !== "codereview") {
+        stage = ele.kind;
+      }
+      const currentRow: any = [ele.title, stage, ele.cut, ele.foundDN, ele.weightDN, ele.funcPoint,
         ele.defectDensity, ele.reviewHour, ele.reviewRatio, ele.description];
       rowData.push(currentRow);
     });

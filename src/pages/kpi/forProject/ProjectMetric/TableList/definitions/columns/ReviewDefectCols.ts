@@ -2,7 +2,7 @@
  * @Description: 评审和缺陷的字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:47:07
- * @LastEditTime: 2022-02-10 07:31:31
+ * @LastEditTime: 2022-02-17 01:54:28
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -66,7 +66,7 @@ export const ReviewDefectCols: ColDef[] = [
     ...defaultParmas,
   },
   {
-    headerName: '集成测试',
+    headerName: '开发自测/联调',
     columnGroupShow: SHOW['closed'],
     field: `${moduleName}.integrationTest`,
     ...defaultParmas,

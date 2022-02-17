@@ -2,7 +2,7 @@
  * @Description: 通用常量
  * @Author: jieTan
  * @Date: 2021-11-23 15:51:13
- * @LastEditTime: 2022-01-24 10:02:14
+ * @LastEditTime: 2022-02-17 01:53:28
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -52,7 +52,7 @@ export const PROJ_METRIC = {
   storyStable: { en: 'storyStable', zh: '需求稳定性' },
   stageWorkload: { en: 'stageWorkload', zh: '阶段工作量' },
   scaleProductivity: { en: 'scaleProductivity', zh: '生产率&规模' },
-  reviewDefect: { en: 'reviewDefect', zh: '评审和缺陷' },
+  reviewDefect: { en: 'reviewDefect', zh: '评审缺陷问题密度' },
   processQuality: { en: 'processQuality', zh: '过程质量' },
   serviceAbout: { en: 'serviceAbout', zh: '服务' },
 };

@@ -10,14 +10,12 @@ const CheckProgress: React.FC<any> = () => {
   const { tabsData, processStatus } = useModel('releaseProcess');
    // 发布结果修改
   const pulishResulttChanged = async (params: any) => {
-    // 需要验证前面的检查是否全部成功。
+    // 需要验证前面的检查是否全部成功(前三个成功即可)。
 
     if (
       processStatus.releaseProject === 'Gainsboro' ||
       processStatus.upgradeService === 'Gainsboro' ||
-      processStatus.dataReview === 'Gainsboro' ||
-      processStatus.onliineCheck === 'Gainsboro'
-    ) {
+      processStatus.dataReview === 'Gainsboro' ) {
       message.error({
         content: '检查未全部完成，不能保存发布结果！',
         duration: 1,

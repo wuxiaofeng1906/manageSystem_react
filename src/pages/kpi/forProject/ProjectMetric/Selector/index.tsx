@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-02-17 10:16:38
+ * @LastEditTime: 2022-02-17 11:02:33
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -200,6 +200,7 @@ export default () => {
                       doChange = true;
                       onDateChange(dateStr as any, 0, date, dateString, setSelectItems);
                     }}
+                    disabledDate={(current) => current && current >= selectItems.dates[1]}
                     value={selectItems.dates[0]}
                   />
                   <DatePicker
@@ -208,6 +209,7 @@ export default () => {
                       doChange = true;
                       onDateChange(dateStr as any, 1, date, dateString, setSelectItems);
                     }}
+                    disabledDate={(current) => current && current < selectItems.dates[0]}
                     value={selectItems.dates[1]}
                   />
                 </Space>

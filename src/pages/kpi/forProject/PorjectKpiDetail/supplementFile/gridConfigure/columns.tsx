@@ -387,13 +387,14 @@ const getProductRateColumns = () => {
       editable: projectRateEditRenderer,
       cellRenderer: projectRateManualInput
     },
+    // {
+    //   headerName: '实际值',
+    //   field: 'actualValue',
+    //   editable: projectRateEditRenderer,
+    //   cellRenderer: projectRateManualInput
+    //
+    // },
     {
-      headerName: '实际值',
-      field: 'actualValue',
-      editable: projectRateEditRenderer,
-      cellRenderer: projectRateManualInput
-
-    }, {
       headerName: '说明',
       field: 'description',
       editable: true,

@@ -117,14 +117,14 @@ const getProductRateTable = (data: any) => {
     {name: "title"},
     {name: "阶段"},
     {name: "计划值"},
-    {name: "实际值"},
+    // {name: "实际值"},  暂时隐藏实际值的显示
     {name: "说明"}
   ];
 
   const rowData: any = [];
   if (data && data.length > 0) {
     data.forEach((ele: any) => {
-      const currentRow: any = [ele.title, ele.stage, ele.planValue, ele.actualValue, ele.description];
+      const currentRow: any = [ele.title, ele.stage, ele.planValue, ele.description]; // ele.actualValue,
       rowData.push(currentRow);
     });
   }

@@ -33,6 +33,7 @@ import {CustomTooltip} from "./supplementFile/style/customTooltip";
 import {ExportOutlined, QuestionCircleTwoTone, ReloadOutlined} from '@ant-design/icons';
 import {Link} from 'react-router-dom';
 import {refreshProject} from './supplementFile/data/axiosRequest';
+import {exportToExcel} from './export'
 
 const WeekCodeTableList: React.FC<any> = (props: any) => {
   const projectId = props.location.query.id;
@@ -181,23 +182,34 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
   };
 
   // 导出数据
-  const exportAllExcell = () => {
-    const spreadsheets: any = [];
+  const exportAllExcell =async () => {
+    const exportSourceData = {
+      processData: await queryProcessData(gqlClient, projectId),
+      storyStabilityData: await queryStoryStability(gqlClient, projectId),
+      stageWorkData: await queryStageWorkload(gqlClient, projectId),
+      productRateData: await queryProductRateload(gqlClient, projectId),
+      reviewDefectData: await queryReviewDefect(gqlClient, projectId),
+      processQualityData: await queryProcessQuality(gqlClient, projectId),
+      serviceData: await queryServices(gqlClient, projectId),
+    }
+    exportToExcel(exportSourceData);
 
-    spreadsheets.push(
-      processGridApi.current?.getSheetDataForExcel({sheetName: '进度'}),
-      storyStabilityGridApi.current?.getSheetDataForExcel({sheetName: '需求稳定性'}),
-      stageWorkloadGridApi.current?.getSheetDataForExcel({sheetName: '阶段工作量'}),
-      productRateGridApi.current?.getSheetDataForExcel({sheetName: '生产率'}),
-      reviewDefectGridApi.current?.getSheetDataForExcel({sheetName: '评审和缺陷'}),
-      processQualityGridApi.current?.getSheetDataForExcel({sheetName: '过程质量补充数据和服务'}),
-      serviceGridApi.current?.getSheetDataForExcel({sheetName: '服务'}),
-    );
-
-    processGridApi.current?.exportMultipleSheetsAsExcel({
-      data: spreadsheets,
-      fileName: '项目指标.xlsx'
-    });
+    // const spreadsheets: any = [];
+    //
+    // spreadsheets.push(
+    //   processGridApi.current?.getSheetDataForExcel({sheetName: '进度'}),
+    //   storyStabilityGridApi.current?.getSheetDataForExcel({sheetName: '需求稳定性'}),
+    //   stageWorkloadGridApi.current?.getSheetDataForExcel({sheetName: '阶段工作量'}),
+    //   productRateGridApi.current?.getSheetDataForExcel({sheetName: '生产率'}),
+    //   reviewDefectGridApi.current?.getSheetDataForExcel({sheetName: '评审和缺陷'}),
+    //   processQualityGridApi.current?.getSheetDataForExcel({sheetName: '过程质量补充数据和服务'}),
+    //   serviceGridApi.current?.getSheetDataForExcel({sheetName: '服务'}),
+    // );
+    //
+    // processGridApi.current?.exportMultipleSheetsAsExcel({
+    //   data: spreadsheets,
+    //   fileName: '项目指标.xlsx'
+    // });
   };
   // 页面顶部导航栏
   const breadcrumbItems = [

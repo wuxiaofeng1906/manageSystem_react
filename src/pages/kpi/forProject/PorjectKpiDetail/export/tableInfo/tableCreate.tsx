@@ -16,8 +16,15 @@ const getProcessTable = (data: any) => {
   const rowData: any = [];
   if (data && data.length > 0) {
     data.forEach((ele: any) => {
-      const currentRow: any = [ele.title, ele.milestone, new Date(ele.planStart), new Date(ele.actualStart),
-        new Date(ele.planEnd), new Date(ele.actualEnd), ele.days, ele.ratio, ele.description];
+      const currentRow: any = [
+        ele.title,
+        ele.milestone,
+        ele.planStart === "" ? "" : new Date(ele.planStart),
+        ele.actualStart === "" ? "" : new Date(ele.actualStart),
+        ele.planEnd === "" ? "" : new Date(ele.planEnd),
+        ele.actualEnd === "" ? "" : new Date(ele.actualEnd),
+        ele.days, ele.ratio,
+        ele.description];
 
       rowData.push(currentRow);
     });

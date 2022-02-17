@@ -1,21 +1,19 @@
-import React, {useEffect} from 'react';
-import { message, Progress, Row, Select } from 'antd';
-import { useModel } from '@@/plugin-model/useModel';
-import { saveProcessResult } from './axiosRequest';
+import React from 'react';
+import {message, Progress, Row, Select} from 'antd';
+import {useModel} from '@@/plugin-model/useModel';
+import {saveProcessResult} from './axiosRequest';
 
-const { Option } = Select;
+const {Option} = Select;
 
 const CheckProgress: React.FC<any> = () => {
   // 获取当前页面的进度数据
-  const { tabsData, processStatus } = useModel('releaseProcess');
-   // 发布结果修改
+  const {tabsData, processStatus, modifyProcessStatus} = useModel('releaseProcess');
+  // 发布结果修改
   const pulishResulttChanged = async (params: any) => {
     // 需要验证前面的检查是否全部成功(前三个成功即可)。
-
-    if (
-      processStatus.releaseProject === 'Gainsboro' ||
+    if (processStatus.releaseProject === 'Gainsboro' ||
       processStatus.upgradeService === 'Gainsboro' ||
-      processStatus.dataReview === 'Gainsboro' ) {
+      processStatus.dataReview === 'Gainsboro') {
       message.error({
         content: '检查未全部完成，不能保存发布结果！',
         duration: 1,
@@ -29,17 +27,16 @@ const CheckProgress: React.FC<any> = () => {
     const result = await saveProcessResult(tabsData.activeKey, params);
     if (result === '') {
       message.info({
-        content: '保存成功！',
+        content: '发布结果保存成功！',
         duration: 1,
         style: {
           marginTop: '50vh',
         },
       });
-
-      // modifyProcessStatus({
-      //   ...processStatus,
-      //   releaseResult: params,
-      // });
+      modifyProcessStatus({
+        ...processStatus,
+        releaseResult: params,
+      });
     } else {
       message.error({
         content: result,
@@ -56,21 +53,21 @@ const CheckProgress: React.FC<any> = () => {
   return (
     <div>
       {/* 检查进度 */}
-      <div style={{ marginTop: -10 }}>
+      <div style={{marginTop: -10}}>
         <div>
           <Row>
-            <label style={{ marginLeft: 5, fontWeight: 'bold' }}>检查进度：</label>
+            <label style={{marginLeft: 5, fontWeight: 'bold'}}>检查进度：</label>
             <Progress
               strokeColor={'#2BF541'}
-              style={{ width: 800 }}
+              style={{width: 800}}
               percent={processStatus.processPercent}
             />
           </Row>
         </div>
 
         {/* 检查总览 */}
-        <div style={{ marginTop: 5, marginLeft: 5 }}>
-          <label style={{ fontWeight: 'bold' }}>检查总览：</label>
+        <div style={{marginTop: 5, marginLeft: 5}}>
+          <label style={{fontWeight: 'bold'}}>检查总览：</label>
           <label>
             <button
               style={{
@@ -83,7 +80,7 @@ const CheckProgress: React.FC<any> = () => {
             &nbsp;预发布项目已填写完成
           </label>
 
-          <label style={{ marginLeft: 10 }}>
+          <label style={{marginLeft: 10}}>
             <button
               style={{
                 height: 13,
@@ -95,7 +92,7 @@ const CheckProgress: React.FC<any> = () => {
             &nbsp;升级服务已确认完成
           </label>
 
-          <label style={{ marginLeft: 10 }}>
+          <label style={{marginLeft: 10}}>
             <button
               style={{
                 height: 13,
@@ -107,7 +104,7 @@ const CheckProgress: React.FC<any> = () => {
             &nbsp;数据Review确认完成
           </label>
 
-          <label style={{ marginLeft: 10 }}>
+          <label style={{marginLeft: 10}}>
             <button
               style={{
                 height: 13,
@@ -119,11 +116,11 @@ const CheckProgress: React.FC<any> = () => {
             &nbsp;上线前检查已完成
           </label>
 
-          <label style={{ marginLeft: 10 }}>
-            <label style={{ fontWeight: 'bold' }}>发布结果：</label>
+          <label style={{marginLeft: 10}}>
+            <label style={{fontWeight: 'bold'}}>发布结果：</label>
             <Select
               size={'small'}
-              style={{ width: 100 }}
+              style={{width: 100}}
               onChange={pulishResulttChanged}
               value={processStatus.releaseResult}
             >

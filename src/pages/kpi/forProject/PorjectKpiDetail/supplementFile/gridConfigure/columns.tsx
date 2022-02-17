@@ -443,7 +443,7 @@ const getReviewDefectColumns = () => {
       },
       rowSpan: (params: any) => {
 
-        if (params.data.title === '5.评审和缺陷') {
+        if (params.data.title === '5.评审缺陷问题') {
           return 16;
         }
         return 1;

@@ -258,12 +258,14 @@ const UserDetails: React.FC<any> = () => {
 
   /* region 部门树选择事件 */
   const onSelect = async (selectedKeys: any) => {
-    // console.log('selected', selectedKeys, info);
-    const keys = selectedKeys[0];
-    const deptMember = await queryGroupAllUsers(gqlClient, keys);
-    setSelectDeptUser(deptMember.nameArray);
-    setIngroupUser(initSelectedUser);
-    setInGpSelAll(true);
+    if (selectedKeys && selectedKeys.length > 0) {
+      const keys = selectedKeys[0];
+      const deptMember = await queryGroupAllUsers(gqlClient, keys);
+      setSelectDeptUser(deptMember.nameArray);
+      setIngroupUser(initSelectedUser);
+      setInGpSelAll(true);
+    }
+
   };
 
   /* endregion */

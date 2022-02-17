@@ -6,8 +6,7 @@ const STAGE_LENGTH = 130;
 const manualInput_black = (params: any) => {
 
   if (!params.value) {
-    return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
-
+    return "";
   }
   return `<div style="text-align: left">${params.value}</div>`;
 };
@@ -664,7 +663,7 @@ const getReviewDefectColumns = () => {
           return `<span style="font-weight: bold">${params.value}</span>`
         }
         if (!params.value) {
-          return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
+          return "";
 
         }
         return `<div style="text-align: left">${params.value}</div>`;
@@ -880,12 +879,7 @@ const getProcessQualityColumns = () => {
           }
           return `<div style="text-align: left">${params.value}</div>`;
         }
-        if (params.data?.cut === "一次提测通过率") {
-
-          return `<div style=" margin-top:10px;font-style: italic ;text-align: center">手工录入</div>`;
-        }
-        return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
-
+        return "";
       },
       tooltipField: "description",
       tooltipComponent: "customTooltip",
@@ -984,8 +978,7 @@ const getServiceColumns = () => {
         maxWidth: 260,
         cellRenderer: (params: any) => {
           if (!params.value) {
-            return `<div style="margin-top: 12px;font-style: italic ;text-align: center">手工录入</div>`;
-
+            return "";
           }
           return `<div style="margin-top: 12px;text-align: left">${params.value}</div>`;
 

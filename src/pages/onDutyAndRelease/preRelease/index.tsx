@@ -17,11 +17,21 @@ import {deleteLockStatus, getAllLockedData} from "./lock/rowLock";
 import {getGridRowsHeight} from './components/gridHeight';
 import {showReleasedId} from "./components/UpgradeService/idDeal/dataDeal";
 import {getNewPageNumber} from './components/Tab/axiosRequest';
+import {history} from "@@/core/history";
 
 let currentKey: any;
 let currentPanes: any;
 const PreRelease: React.FC<any> = () => {
-  const {data, loading} = useRequest(() => alalysisInitData('', ''));
+  // 获取当前链接是否有携带预发布编号（就是区分是否从历史记录跳转过来的），
+  const location = history.location.query;
+  let releasedNumStr = '';
+  if (JSON.stringify(location) !== '{}' && location) {
+    releasedNumStr = location?.releasedNum === null ? '' : (location?.releasedNum).toString();
+  }
+  // 查询数据
+  // const initData = useRequest(() => alalysisInitData('', releasedNumStr)).data;
+
+  const {data, loading} = useRequest(() => alalysisInitData('', releasedNumStr));
 
   // Tab标签数据显示
   const {

@@ -127,7 +127,7 @@ const loadReleaseIDSelect = async () => {
         <Option
           key={ids.id}
           value={`${ids.id}`}
-          automation_test={`${ids.automation_test}`}
+          automation_test={ids.automation_test}
           service={`${serviceStr}`}
         >
           {ids.id}

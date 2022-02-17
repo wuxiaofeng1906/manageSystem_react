@@ -46,7 +46,15 @@ const ReleaseHistory: React.FC<any> = () => {
     }, {
       headerName: '灰度发布批次号',
       field: 'ready_release_num',
-      maxWidth: 135
+      maxWidth: 145
+    }, {
+      headerName: '灰度发布名称',
+      field: 'ready_release_name',
+      minWidth: 145
+    }, {
+      headerName: '工单编号',
+      field: 'order',
+      minWidth: 100,
     }, {
       headerName: '项目名称',
       field: 'project_name'
@@ -55,7 +63,7 @@ const ReleaseHistory: React.FC<any> = () => {
       field: 'online_environment'
     }, {
       headerName: '发布镜像ID',
-      field: 'deployment_id'
+      field: 'deployment_id',
     }, {
       headerName: '发布分支',
       field: 'branch'

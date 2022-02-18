@@ -16,6 +16,15 @@ const getProcessTable = (data: any) => {
   const rowData: any = [];
   if (data && data.length > 0) {
     data.forEach((ele: any) => {
+
+      // 需要对偏差率进行小数点保留和百分号展示
+      let ratioValue = "";
+      if (ele.ratio === "0" || ele.ratio === 0) {
+        ratioValue = "0";
+      } else if (ele.ratio) {
+        ratioValue = `${Number(ele.ratio).toFixed(2)}%`;
+      }
+
       const currentRow: any = [
         ele.title,
         ele.milestone,
@@ -23,7 +32,8 @@ const getProcessTable = (data: any) => {
         ele.actualStart === "" ? "" : new Date(ele.actualStart),
         ele.planEnd === "" ? "" : new Date(ele.planEnd),
         ele.actualEnd === "" ? "" : new Date(ele.actualEnd),
-        ele.days, ele.ratio,
+        ele.days,
+        ratioValue,
         ele.description];
 
       rowData.push(currentRow);
@@ -62,7 +72,32 @@ const getStoryStabilityTable = (data: any) => {
   const rowData: any = [];
   if (data && data.length > 0) {
     data.forEach((ele: any) => {
-      const currentRow: any = [ele.title, ele.stage, ele.planHours, ele.stableHours, ele.ratio, ele.description];
+      // 对预计工时保留两位小数
+      let planHours = "";
+      if (ele.planHours === "0" || ele.planHours === 0) {
+        planHours = "0.00";
+      } else if (ele.planHours) {
+        planHours = `${Number(ele.planHours).toFixed(2)}`;
+      }
+
+      // 变更工时为0时显示为空
+      let stableHours = "";
+      if (ele.stableHours) {
+        stableHours = ele.stableHours;
+      }
+      // 对变更率保留四位小数
+      let ratio = "";
+      if (ele.ratio) {
+        ratio = `${Number(ele.ratio).toFixed(4)}`;
+      }
+
+      const currentRow: any = [
+        ele.title,
+        ele.stage,
+        planHours,
+        stableHours,
+        ratio,
+        ele.description];
       rowData.push(currentRow);
     });
   }

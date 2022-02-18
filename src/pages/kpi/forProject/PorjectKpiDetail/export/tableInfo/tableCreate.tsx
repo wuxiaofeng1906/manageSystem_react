@@ -133,8 +133,26 @@ const getStageWorkloadTable = (data: any) => {
   const rowData: any = [];
   if (data && data.length > 0) {
     data.forEach((ele: any) => {
-      const currentRow: any = [ele.title, ele.stage, ele.manpower, ele.planHours, ele.actualHours, ele.planWorkload,
-        ele.actualWorkload, ele.description];
+      // 计划工作量保留两位小数
+      let planWorkload = "";
+      if (ele.planWorkload) {
+        planWorkload = `${Number(ele.planWorkload).toFixed(2)}`
+      }
+      // 实际工作量保留两位小数
+      let actualWorkload = "";
+      if (ele.actualWorkload) {
+        actualWorkload = `${Number(ele.actualWorkload).toFixed(2)}`
+      }
+
+      const currentRow: any = [
+        ele.title,
+        ele.stage,
+        ele.manpower,
+        ele.planHours,
+        ele.actualHours,
+        planWorkload,
+        actualWorkload,
+        ele.description];
       rowData.push(currentRow);
     });
   }
@@ -166,7 +184,12 @@ const getProductRateTable = (data: any) => {
   const rowData: any = [];
   if (data && data.length > 0) {
     data.forEach((ele: any) => {
-      const currentRow: any = [ele.title, ele.stage, ele.planValue, ele.description]; // ele.actualValue,
+      // 计划值需要保留两位小数
+      let planValue = "";
+      if (ele.planValue) {
+        planValue = `${Number(ele.planValue).toFixed(2)}`
+      }
+      const currentRow: any = [ele.title, ele.stage, planValue, ele.description]; // ele.actualValue,
       rowData.push(currentRow);
     });
   }
@@ -257,7 +280,22 @@ const getProcessQualityTable = (data: any) => {
         cutFlag = ele.cut === true ? "是" : "否";
       }
 
-      const currentRow: any = [ele.title, ele.module, cutFlag, ele.kind, ele.baseline, ele.realValue,
+      // 实际值的转化（bug解决时长和回归时长需要/3600,并且保留两位小数；一次提测通过率需要保留两位小数和百分比）
+      let realValue = "";
+      if (ele.realValue) {
+        if (ele.kind === "Bug解决时长" || ele.kind === "Bug回归时长") {
+          // 需要除以3600 转为小时
+          realValue = (Number(ele.realValue) / 3600).toFixed(2);
+        } else if (ele.cut === "一次提测通过率") {
+          realValue = `${(Number(ele.realValue) * 100).toFixed(2)}%`;
+        } else if (ele.realValue === "一次提测通过率") {
+          realValue = "一次提测通过率";
+        } else {
+          realValue = Number(ele.realValue).toFixed(2);
+        }
+      }
+
+      const currentRow: any = [ele.title, ele.module, cutFlag, ele.kind, ele.baseline, realValue,
         ele.description];
       rowData.push(currentRow);
     });
@@ -293,8 +331,13 @@ const getServiceTable = (data: any) => {
   const rowData: any = [];
   if (data && data.length > 0) {
     data.forEach((ele: any) => {
-      const currentRow: any = [ele.title, ele.module, ele.item, ele.succN, ele.totalN, ele.ratio,
-        ele.description];
+      // 一次成功发布率需要*100并且显示百分号
+      let ratio = "";
+      if (ele.ratio) {
+        ratio = `${(Number(ele.ratio) * 100).toFixed(2)}%`;
+      }
+      const currentRow: any = [ele.title, ele.module, ele.item, ele.succN,
+        ele.totalN, ratio, ele.description];
       rowData.push(currentRow);
     });
   }

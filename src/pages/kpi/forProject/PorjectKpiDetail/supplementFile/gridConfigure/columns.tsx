@@ -406,10 +406,8 @@ const getProductRateColumns = () => {
           }
           return `<div style="text-align: left">${params.value}</div>`;
         }
-        if (params.data?.stage === "生产率(功能点/人天）") {
-          return `<div style=" margin-top:10px;font-style: italic ;text-align: center">手工录入</div>`;
-        }
-        return `<div style="font-style: italic ;text-align: center">手工录入</div>`;
+
+        return "";
 
       },
       tooltipField: "description",
@@ -570,7 +568,11 @@ const getReviewDefectColumns = () => {
         if (!params.data?.foundDN) {
           return "";
         }
-        return params.value;
+
+        if (params.data?.kind === "codereview") {
+          return params.value;
+        }
+        return Number(params.value).toFixed(2);
       }
     },
     {
@@ -965,8 +967,8 @@ const getServiceColumns = () => {
         cellRenderer: (params: any) => {
 
           if (params.value) {
-            const values = (params.value).toFixed(2);
-            return `<div style="margin-top: 12px">${(Number(values) * 100).toFixed(2)}%</div>`;
+
+            return `<div style="margin-top: 12px">${(Number(params.value) * 100).toFixed(2)}%</div>`;
           }
           return "";
         }

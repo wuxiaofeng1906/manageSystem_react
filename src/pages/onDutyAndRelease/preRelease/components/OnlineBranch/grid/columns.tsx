@@ -436,7 +436,7 @@ const sealStatusRenderer = (params: any) => {
             <div style=" margin-top: 20px;font-size: 10px">
                 <div>前端：<label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
                 <div style="margin-top: -20px">
-                后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>${backendTime}</div>
+                后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>&nbsp;${backendTime}</div>
             </div>
 
         </div>

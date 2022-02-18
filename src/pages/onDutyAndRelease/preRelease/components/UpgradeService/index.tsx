@@ -473,7 +473,27 @@ const UpgradeService: React.FC<any> = () => {
         datas.person_type = 'process';
         break;
       case 'test_confirm_status': // 测试
-        datas.person_type = 'test';
+      {
+        // 需要判断前后端和流程的数据是否确认，只有都确认了测试才能确认（如果不涉及某一段的，就跳过那一段）
+        const confirmData = props?.data;
+        if ((confirmData.front_confirm_status === "1" || confirmData.front_confirm_status === "9") &&
+          (confirmData.back_end_confirm_status === "1" || confirmData.back_end_confirm_status === "9") &&
+          (confirmData.process_confirm_status === "1" || confirmData.process_confirm_status === "9")) {
+          datas.person_type = 'test';
+        } else {
+          message.error({
+            content: '保存失败：请先完成开发确认！',
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          // (不管成功或者失败)刷新表格
+          const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
+          thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+          return;
+        }
+      }
         break;
       default:
         break;
@@ -489,10 +509,6 @@ const UpgradeService: React.FC<any> = () => {
           marginTop: '50vh',
         },
       });
-      //   刷新表格
-      const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
-      thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
-
       // 刷新状态进度条
       const processData: any = await getCheckProcess(currentReleaseNum);
       if (processData) {
@@ -508,6 +524,10 @@ const UpgradeService: React.FC<any> = () => {
         },
       });
     }
+
+    //   (不管成功或者失败)刷新表格
+    const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
+    thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
   };
   /* endregion */
 

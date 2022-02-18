@@ -150,11 +150,18 @@ const getStoryStabilityColumns = () => {
       field: 'planHours',
       editable: true,
       cellRenderer: (params: any) => {
+
         if (params.value === null || params.value === "" || params.value === undefined) {
           return "";
         }
-        return Number(params.value).toFixed(2);
-
+        const values = Number(params.value);
+        if (values.toFixed(0) === "-999999") {
+          return `<span style="color: orange">0</span>`;
+        }
+        if (values < 0) {
+          return `<span style="color: orange"> ${Math.abs(Number(values.toFixed(2)))}</span>`;
+        }
+        return values.toFixed(2);
       }
     },
     {
@@ -165,7 +172,14 @@ const getStoryStabilityColumns = () => {
         if (!params.value) {
           return "";
         }
-        return params.value;
+        const values = Number(params.value);
+        if (values.toFixed(0) === "-999999") {
+          return `<span style="color: orange">0</span>`;
+        }
+        if (values < 0) {
+          return `<span style="color: orange"> ${Math.abs(values)}</span>`;
+        }
+        return values;
       }
     },
     {
@@ -196,26 +210,6 @@ const getStoryStabilityColumns = () => {
 
 /* region 3.阶段工作量（单位：人天） */
 // 渲染手工录入
-const manualInput = (params: any) => {
-
-  if (params.value === null || params.value === "" || params.value === undefined) {
-    return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
-
-  }
-
-  // 判断合计中，是否有对人工进行修改
-  // if (params.data?.stage === "合计") {
-  //
-  //   if ((params.column?.colId === "manpower" && params.data?.manpowerFlag === "true") ||
-  //     (params.column?.colId === "planHours" && params.data?.planHoursFlag === "true") ||
-  //     (params.column?.colId === "actualHours" && params.data?.actualHoursFlag === "true")) {
-  //     return `<div style="font-weight: bold;font-style: italic ;text-align: center">${params.value}</div>`;
-  //
-  //   }
-  // }
-  return params.value;
-};
-
 
 const getStageWorkloadColumns = () => {
 
@@ -252,7 +246,15 @@ const getStageWorkloadColumns = () => {
       headerName: '投入人力',
       field: 'manpower',
       editable: true,
-      cellRenderer: manualInput
+      cellRenderer: (params: any) => {
+        if (params.value === null || params.value === "" || params.value === undefined) {
+          return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
+        }
+        if (params.value === -999999) {
+          return 0;
+        }
+        return Math.abs(params.value);
+      }
     },
     {
       headerName: '预计工时',
@@ -261,11 +263,17 @@ const getStageWorkloadColumns = () => {
       cellRenderer: (params: any) => {
         if (params.value === null || params.value === "" || params.value === undefined) {
           return "";
-
         }
-        return params.value;
-      }
 
+        const values = Number(params.value);
+        if (values.toFixed(0) === "-999999") {
+          return `<span style="color: orange">0</span>`;
+        }
+        if (values < 0) {
+          return `<span style="color: orange"> ${Math.abs(values)}</span>`;
+        }
+        return values;
+      }
     },
     {
       headerName: '实际工时',
@@ -274,9 +282,16 @@ const getStageWorkloadColumns = () => {
       cellRenderer: (params: any) => {
         if (params.value === null || params.value === "" || params.value === undefined) {
           return "";
-
         }
-        return params.value;
+        const values = Number(params.value);
+        if (values.toFixed(0) === "-999999") {
+          return `<span style="color: orange">0</span>`;
+        }
+        if (values < 0) {
+          return `<span style="color: orange"> ${Math.abs(values)}</span>`;
+        }
+        return values;
+
       }
     },
     {
@@ -625,7 +640,15 @@ const getReviewDefectColumns = () => {
           return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
         }
 
-        return params.value;
+        const values = Number(params.value);
+        if (values.toFixed(0) === "-999999") {
+          return `<span style="color: orange">0</span>`;
+        }
+        if (values < 0) {
+          return `<span style="color: orange"> ${Math.abs(values)}</span>`;
+        }
+        return values;
+
       },
       editable: (params: any) => {
         if (params.data?.kind === "提测演示" || params.data?.kind === "开发自测/联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {

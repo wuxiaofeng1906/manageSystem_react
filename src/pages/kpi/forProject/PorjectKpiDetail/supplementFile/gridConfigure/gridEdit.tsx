@@ -70,10 +70,10 @@ const storyStabilityCellEdited = async (params: any, projectId: string) => {
     let columID = params.column.colId;
     if (params.column.colId === "planHours") { // 预计工时
       columID = "kpi"
-      modifyValue = Number(params.newValue);
+      modifyValue = Number(params.newValue) === 0 ? 999999 : Number(params.newValue);
     } else if (params.column.colId === "stableHours") { // 变更工时
       columID = "extra";
-      modifyValue = Number(params.newValue);
+      modifyValue = Number(params.newValue) === 0 ? 999999 : Number(params.newValue);
     }
 
     const newValues = {
@@ -141,10 +141,15 @@ const stageWorkloadCellEdited = async (params: any, projectId: string) => {
       "合计": "",
     };
 
+    let inputValue = params.newValue;
+    // 如果不是描述，需要转为数字
+    if (params.column.colId !== "description") {
+      inputValue = Number(params.newValue) === 0 ? 999999 : Number(params.newValue);
+    }
     const newValues = {
       "category": "stageWorkload",
       "column": params.column?.colId,
-      "newValue": params.newValue,
+      "newValue": inputValue,
       "project": projectId,
       "types": [correspondingField[type]]
     };
@@ -241,7 +246,7 @@ const productRateCellEdited = async (params: any, projectId: string) => {
 // 评审和缺陷
 const reviewDefectCellEdited = async (params: any, projectId: string) => {
 
-  if (params.column?.colId ==="reviewHour") {
+  if (params.column?.colId === "reviewHour") {
     // 需要判断当发现缺陷数为0或者为空时，评审用时不能被修改
     if (!params.data?.foundDN) {
       message.error({
@@ -287,7 +292,7 @@ const reviewDefectCellEdited = async (params: any, projectId: string) => {
         modifyData = {
           "category": "reviewDefect",
           "column": "extra",
-          "newValue": params.newValue,
+          "newValue": params.newValue === "0" ? "999999" : params.newValue,
           "project": projectId,
           "types": [typeObject[type]]
         }

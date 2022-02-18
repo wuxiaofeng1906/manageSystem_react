@@ -74,16 +74,16 @@ const getStoryStabilityTable = (data: any) => {
     data.forEach((ele: any) => {
       // 对预计工时保留两位小数
       let planHours = "";
-      if (ele.planHours === "0" || ele.planHours === 0) {
-        planHours = "0.00";
+      if (ele.planHours === "0" || ele.planHours === 0 || ele.planHours === -999999) {
+        planHours = "0";
       } else if (ele.planHours) {
-        planHours = `${Number(ele.planHours).toFixed(2)}`;
+        planHours = `${Math.abs(Number(ele.planHours)).toFixed(2)}`;
       }
 
       // 变更工时为0时显示为空
       let stableHours = "";
       if (ele.stableHours) {
-        stableHours = ele.stableHours;
+        stableHours = ele.stableHours === -999999 ? "0" : Math.abs(Number(ele.stableHours)).toString();
       }
       // 对变更率保留四位小数
       let ratio = "";
@@ -147,9 +147,9 @@ const getStageWorkloadTable = (data: any) => {
       const currentRow: any = [
         ele.title,
         ele.stage,
-        ele.manpower,
-        ele.planHours,
-        ele.actualHours,
+        ele.manpower === -999999 ? 0 : Math.abs(ele.manpower),
+        ele.planHours === -999999 ? 0 : Math.abs(ele.planHours),
+        ele.actualHours === -999999 ? 0 : Math.abs(ele.actualHours),
         planWorkload,
         actualWorkload,
         ele.description];
@@ -268,8 +268,12 @@ const getReviewDefectTable = (data: any) => {
             defectDensity = Number(ele.defectDensity).toFixed(2);
           }
         }
-        if (ele.reviewHour) {
-          reviewHour = ele.reviewHour;
+        if (ele.reviewHour || ele.reviewHour === 0) {
+          if (ele.reviewHour === "评审用时") {
+            reviewHour = "评审用时";
+          } else {
+            reviewHour = ele.reviewHour === -999999 ? "0" : Math.abs(ele.reviewHour).toString();
+          }
         }
         if (ele.reviewRatio) {
           if (ele.reviewRatio === "评审效率") {
@@ -279,7 +283,6 @@ const getReviewDefectTable = (data: any) => {
           }
         }
       }
-
 
       const currentRow: any = [
         ele.title,

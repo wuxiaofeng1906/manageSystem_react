@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-02-17 11:02:33
+ * @LastEditTime: 2022-02-18 10:23:20
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -200,7 +200,10 @@ export default () => {
                       doChange = true;
                       onDateChange(dateStr as any, 0, date, dateString, setSelectItems);
                     }}
-                    disabledDate={(current) => current && current >= selectItems.dates[1]}
+                    disabledDate={(current) => {
+                      if (!selectItems.dates[1]) return false;
+                      return current && current >= selectItems.dates[1];
+                    }}
                     value={selectItems.dates[0]}
                   />
                   <DatePicker
@@ -209,7 +212,10 @@ export default () => {
                       doChange = true;
                       onDateChange(dateStr as any, 1, date, dateString, setSelectItems);
                     }}
-                    disabledDate={(current) => current && current < selectItems.dates[0]}
+                    disabledDate={(current) => {
+                      if (!selectItems.dates[0]) return false;
+                      return current && current < selectItems.dates[0];
+                    }}
                     value={selectItems.dates[1]}
                   />
                 </Space>
@@ -231,7 +237,6 @@ export default () => {
                 doChange = true;
                 setProjElems(null);
                 setSelectItems((prev) => Object.assign({ ...prev }, { doQuery: true }));
-                // dateStr = defaultDateStr;
               }}
             />
           </Tooltip>

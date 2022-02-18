@@ -236,9 +236,61 @@ const getReviewDefectTable = (data: any) => {
       if (cutFlag !== "是否裁剪") {
         cutFlag = ele.cut === true ? "是" : "否";
       }
+      // 发现缺陷数(发现缺陷数为0或者空，其他除了说明以外的值也需要为空)
 
-      const currentRow: any = [ele.title, stage, cutFlag, ele.foundDN, ele.weightDN, ele.funcPoint,
-        ele.defectDensity, ele.reviewHour, ele.reviewRatio, ele.description];
+      let foundDN = "";
+      // 加权有效缺陷数
+      let weightDN = "";
+      // 功能点
+      let funcPoint = "";
+      // 缺陷密度
+      let defectDensity = "";
+      // 评审用时
+      let reviewHour = "";
+      // 评审效率
+      let reviewRatio = "";
+      if (ele.foundDN) {
+        foundDN = ele.foundDN;
+        if (ele.weightDN) {
+          weightDN = ele.weightDN;
+        }
+        if (ele.funcPoint) {
+          if (ele.kind === "codereview" || ele.funcPoint === "功能点" || ele.funcPoint === "代码量") {
+            funcPoint = ele.funcPoint;
+          } else {
+            funcPoint = Number(ele.funcPoint).toFixed(2);
+          }
+        }
+        if (ele.defectDensity) {
+          if (ele.defectDensity === "加权有效问题密度" || ele.defectDensity === "加权有效缺陷密度") {
+            defectDensity = ele.defectDensity;
+          } else {
+            defectDensity = Number(ele.defectDensity).toFixed(2);
+          }
+        }
+        if (ele.reviewHour) {
+          reviewHour = ele.reviewHour;
+        }
+        if (ele.reviewRatio) {
+          if (ele.reviewRatio === "评审效率") {
+            reviewRatio = ele.reviewRatio;
+          } else {
+            reviewRatio = Number(ele.reviewRatio).toFixed(2);
+          }
+        }
+      }
+
+
+      const currentRow: any = [
+        ele.title,
+        stage,
+        cutFlag,
+        foundDN,
+        weightDN,
+        funcPoint,
+        defectDensity,
+        reviewHour,
+        reviewRatio, ele.description];
       rowData.push(currentRow);
     });
   }

@@ -8,8 +8,8 @@ axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
 const getDutyPersonPermission = async (authData: any) => {
   const data = {
     dutyOrder: '1',
-    startAt: dayjs().startOf('week').add(1, 'day').format('YYYY-MM-DD'),
-    endAt: dayjs().endOf('week').add(1, 'day').format('YYYY-MM-DD'),
+    startAt: dayjs().startOf('week').add(1, 'day').format('YYYY/MM/DD'),
+    endAt: dayjs().endOf('week').add(1, 'day').format('YYYY/MM/DD'),
     method: authData.method, // 请求类型
     path: authData.path, // 请求路径
   };

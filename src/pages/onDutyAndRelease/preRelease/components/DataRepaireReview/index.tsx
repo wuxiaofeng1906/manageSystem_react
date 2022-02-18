@@ -157,7 +157,6 @@ const DataRepaireReview: React.FC<any> = () => {
 
   // 下拉框选择是否确认事件
   const saveDataRepaireConfirmInfo = async (newValue: string, oldData: any) => {
-    debugger;
     const currentReleaseNum = oldData.ready_release_num;
     //  如果前后两个值不同，则需要更新
     if (newValue !== oldData.confirm_status) {

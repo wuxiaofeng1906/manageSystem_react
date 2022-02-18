@@ -157,46 +157,75 @@ const DataRepaireReview: React.FC<any> = () => {
 
   // 下拉框选择是否确认事件
   const saveDataRepaireConfirmInfo = async (newValue: string, oldData: any) => {
+    debugger;
     const currentReleaseNum = oldData.ready_release_num;
-
     //  如果前后两个值不同，则需要更新
     if (newValue !== oldData.confirm_status) {
-      const datas = {
-        user_name: usersInfo.name,
-        user_id: usersInfo.userid,
-        confirm_id: oldData.confirm_id,
-        ready_release_num: currentReleaseNum,
-        confirm_result: newValue,
-      };
-
-      const result = await confirmDataRepairService(datas);
-      if (result === '') {
-        message.info({
-          content: '保存成功！',
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-
-        //   刷新表格
-        const newData_confirm: any = await alalysisInitData('dataReviewConfirm', currentReleaseNum);
-        secondDataReviewGridApi.current?.setRowData(newData_confirm.reviewData_confirm);
-        // 进度
-        // 刷新状态进度条
-        const processData: any = await getCheckProcess(currentReleaseNum);
-        if (processData) {
-          modifyProcessStatus(showProgressData(processData.data));
+      // 需要确认修复内容中是否可重复执行全部有值的时候才可以选择。
+      let modifyFlag = true;
+      firstDataReviewGridApi.current?.forEachNode((node: any) => {
+        const dts = node.data;
+        if (dts.is_repeat) {
+          if (dts.is_repeat === "9") {
+            message.error({
+              content: '保存失败：数据修复review中是否可重复执行没有全部确认！',
+              duration: 1,
+              style: {
+                marginTop: '50vh',
+              },
+            });
+            modifyFlag = false;
+          }
+        } else {
+          message.error({
+            content: '保存失败：数据修复review中是否可重复执行没有全部确认！',
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          modifyFlag = false;
         }
-      } else {
-        message.error({
-          content: `${result}`,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
+      });
+
+      if (modifyFlag) {
+        const datas = {
+          user_name: usersInfo.name,
+          user_id: usersInfo.userid,
+          confirm_id: oldData.confirm_id,
+          ready_release_num: currentReleaseNum,
+          confirm_result: newValue,
+        };
+
+        const result = await confirmDataRepairService(datas);
+        if (result === '') {
+          message.info({
+            content: '保存成功！',
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+
+          // 刷新状态进度条
+          const processData: any = await getCheckProcess(currentReleaseNum);
+          if (processData) {
+            modifyProcessStatus(showProgressData(processData.data));
+          }
+        } else {
+          message.error({
+            content: `${result}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
       }
+      //   刷新表格
+      const newData_confirm: any = await alalysisInitData('dataReviewConfirm', currentReleaseNum);
+      secondDataReviewGridApi.current?.setRowData(newData_confirm.reviewData_confirm);
+
     }
   };
   /* endregion */

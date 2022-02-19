@@ -2,7 +2,7 @@
  * @Description: 通用常量
  * @Author: jieTan
  * @Date: 2021-11-23 15:51:13
- * @LastEditTime: 2022-02-17 01:53:28
+ * @LastEditTime: 2022-02-19 02:41:54
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -64,7 +64,10 @@ export const PK_SEARCH_INTERVAL = {
   value: 3,
 };
 // 默认要显示的属性部门id列表
-export const  PK_TREE_DEPTS = [130, 66, 82, 114, 81]
+export const PK_TREE_DEPTS = [130, 66, 82, 114, 81];
+// 禅道执行的设置页
+export const ztExectionUrl = (eId: number) =>
+  `http://zentao.77hub.com/zentao/execution-view-${eId}.html`;
 
 /*  */
 // 分母默认值

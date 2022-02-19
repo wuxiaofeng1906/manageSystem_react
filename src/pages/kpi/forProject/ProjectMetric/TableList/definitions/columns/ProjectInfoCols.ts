@@ -2,7 +2,7 @@
  * @Description: 项目基本信息字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:44:08
- * @LastEditTime: 2022-01-21 09:43:54
+ * @LastEditTime: 2022-02-19 03:18:46
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -33,6 +33,7 @@ export const TableMajorCols: ColDef[] = [
       if (gDigit === undefined) gDigit = getFillDigit(params.node.parent.allChildrenCount);
       return `${params.node.rowIndex + 1}`.padStart(gDigit, '0');
     },
+    cellRenderer: 'projLinkZt',
     ...numberF,
   },
   {

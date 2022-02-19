@@ -59,7 +59,23 @@ const storyStabilityCellEdited = async (params: any, projectId: string) => {
       });
       return true;
     }
+
+    // 修改变更工时和预计工时时： 判断，如果变更工时>预计工时，弹出异常提示：变更工时不能大于预计工时
+
+    const rowData = params.data;
+    if (Math.abs(rowData.stableHours) > Math.abs(rowData.planHours)) {
+      message.error({
+        content: "变更工时不能大于预计工时！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return true;
+    }
+
   }
+
 
   // 有数据变化时再进行修改请求
   if (!params.oldValue || (params.newValue).toString() !== (params.oldValue).toString()) {

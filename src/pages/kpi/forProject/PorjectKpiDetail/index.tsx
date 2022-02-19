@@ -39,6 +39,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
   const projectId = props.location.query.id;
   const gqlClient = useGqlClient();
   const [loadState, setLoadState] = useState(false);
+  const [browserHeight, setBrowserHeight] = useState(document.body.clientHeight - 140);
 
   /* region  1.进度指标 */
   const processData = useRequest(() => queryProcessData(gqlClient, projectId));
@@ -179,6 +180,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     reviewDefectGridApi.current?.sizeColumnsToFit();
     processQualityGridApi.current?.sizeColumnsToFit();
     serviceGridApi.current?.sizeColumnsToFit();
+    setBrowserHeight(document.body.clientHeight - 140);
   };
 
   // 导出数据
@@ -194,22 +196,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
     }
     exportToExcel(exportSourceData);
 
-    // const spreadsheets: any = [];
-    //
-    // spreadsheets.push(
-    //   processGridApi.current?.getSheetDataForExcel({sheetName: '进度'}),
-    //   storyStabilityGridApi.current?.getSheetDataForExcel({sheetName: '需求稳定性'}),
-    //   stageWorkloadGridApi.current?.getSheetDataForExcel({sheetName: '阶段工作量'}),
-    //   productRateGridApi.current?.getSheetDataForExcel({sheetName: '生产率'}),
-    //   reviewDefectGridApi.current?.getSheetDataForExcel({sheetName: '评审和缺陷'}),
-    //   processQualityGridApi.current?.getSheetDataForExcel({sheetName: '过程质量补充数据和服务'}),
-    //   serviceGridApi.current?.getSheetDataForExcel({sheetName: '服务'}),
-    // );
-    //
-    // processGridApi.current?.exportMultipleSheetsAsExcel({
-    //   data: spreadsheets,
-    //   fileName: '项目指标.xlsx'
-    // });
+
   };
   // 页面顶部导航栏
   const breadcrumbItems = [
@@ -233,19 +220,20 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
         }}
       />
       <Spin size="large" tip="数据加载中..." spinning={loadState}>
-        <div>
-          <div style={{marginTop: -35, height: 35}}>
+        <div style={{marginTop: -35, height: 35}}>
 
-            <Button type="text" style={{color: '#1890FF', float: 'right'}}
-                    icon={<QuestionCircleTwoTone/>} size={'large'}>
-              <a href={"https://shimo.im/docs/gO3oxWKg6yFwL0qD"} target={"_blank"} style={{marginLeft: 5}}>计算规则</a>
-            </Button>
+          <Button type="text" style={{color: '#1890FF', float: 'right'}}
+                  icon={<QuestionCircleTwoTone/>} size={'large'}>
+            <a href={"https://shimo.im/docs/gO3oxWKg6yFwL0qD"} target={"_blank"} style={{marginLeft: 5}}>计算规则</a>
+          </Button>
 
-            <Button type="text" icon={<ExportOutlined/>} onClick={exportAllExcell} size={'large'}
-                    style={{float: "right"}}>导出</Button>
-            <Button type="text" icon={<ReloadOutlined/>} onClick={refreshGrid} size={'large'}
-                    style={{float: "right"}}>刷新</Button>
-          </div>
+          <Button type="text" icon={<ExportOutlined/>} onClick={exportAllExcell} size={'large'}
+                  style={{float: "right"}}>导出</Button>
+          <Button type="text" icon={<ReloadOutlined/>} onClick={refreshGrid} size={'large'}
+                  style={{float: "right"}}>刷新</Button>
+        </div>
+        <div style={{width: "100%", height: browserHeight, overflowY: "scroll"}}>
+
           <div style={{marginTop: 5}}>
 
             {/* 1.进度 */}

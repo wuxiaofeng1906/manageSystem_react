@@ -182,7 +182,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
   };
 
   // 导出数据
-  const exportAllExcell =async () => {
+  const exportAllExcell = async () => {
     const exportSourceData = {
       processData: await queryProcessData(gqlClient, projectId),
       storyStabilityData: await queryStoryStability(gqlClient, projectId),
@@ -224,6 +224,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
   return (
     <div style={{width: "100%", height: "100%", marginTop: "-20px"}}>
       <PageHeader
+
         ghost={false}
         title={props.location.query.name}
         style={{height: "85px"}}

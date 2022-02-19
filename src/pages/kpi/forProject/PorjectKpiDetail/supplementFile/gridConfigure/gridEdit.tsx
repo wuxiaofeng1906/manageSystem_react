@@ -46,39 +46,50 @@ const processCellEdited = async (params: any, projectId: string) => {
 
 // 需求稳定性编辑
 const storyStabilityCellEdited = async (params: any, projectId: string) => {
-  // 说明可以不为数字
-  if (params.column.colId !== "description") {
-
-    if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
-      message.error({
-        content: "请输入正确的数字！",
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-      return true;
-    }
-
-    // 修改变更工时和预计工时时： 判断，如果变更工时>预计工时，弹出异常提示：变更工时不能大于预计工时
-
-    const rowData = params.data;
-    if (Math.abs(rowData.stableHours) > Math.abs(rowData.planHours)) {
-      message.error({
-        content: "变更工时不能大于预计工时！",
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-      return true;
-    }
-
+  if (params.newValue === undefined) {
+    return false;
   }
-
-
   // 有数据变化时再进行修改请求
   if (!params.oldValue || (params.newValue).toString() !== (params.oldValue).toString()) {
+    // 说明可以不为数字
+    if (params.column.colId !== "description") {
+      // ,输入数字的地方不能为文字，不能为负数
+      if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
+        message.error({
+          content: "请输入正确的数字！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return true;
+      }
+
+      if (Number(params.newValue) < 0) {
+        message.error({
+          content: "输入的数据不能为负数！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return true;
+      }
+
+      // 修改变更工时和预计工时时： 判断，如果变更工时>预计工时，弹出异常提示：变更工时不能大于预计工时
+      const rowData = params.data;
+      if (Math.abs(rowData.stableHours) > Math.abs(rowData.planHours)) {
+        message.error({
+          content: "变更工时不能大于预计工时！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return true;
+      }
+    }
+
     const type = params.data?.stage;
     const typeValue = {"项目周期": 0, "开发": 3, "测试": 4, "发布": 5};
 
@@ -133,23 +144,34 @@ const stageWorkloadCellEdited = async (params: any, projectId: string) => {
     return false;
   }
 
-  // 说明可以不为数字
-  if (params.column.colId !== "description") {
-
-    if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
-      message.error({
-        content: "请输入正确的数字！",
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-      return true;
-    }
-  }
-
   // 有数据变化时再进行修改请求
   if (params.newValue !== params.oldValue) {
+    // 说明可以不为数字
+    if (params.column.colId !== "description") {
+
+      if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
+        message.error({
+          content: "请输入正确的数字！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return true;
+      }
+
+      if (Number(params.newValue) < 0) {
+        message.error({
+          content: "输入的数据不能为负数！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return true;
+      }
+    }
+
     const type = params.data?.stage;
     const correspondingField = {
       "需求": "storyplan",
@@ -203,31 +225,46 @@ const stageWorkloadCellEdited = async (params: any, projectId: string) => {
 
 // 生产率
 const productRateCellEdited = async (params: any, projectId: string) => {
-  // 说明可以不为数字
-  if (params.column.colId !== "description") {
-
-    if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
-      message.error({
-        content: "请输入正确的数字！",
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-      return true;
-    }
+  if (params.newValue === undefined) {
+    return false;
   }
 
-  let columns = params.column?.colId;
-
-  if (columns === "description") {
-    if (params.data?.stage === "功能点") {
-      columns = "fpDescription";
-    } else if (params.data?.stage === "生产率(功能点/人天）") {
-      columns = "raDescription";
-    }
-  }
   if (params.newValue !== params.oldValue) {
+    // 说明可以不为数字
+    if (params.column.colId !== "description") {
+
+      if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
+        message.error({
+          content: "请输入正确的数字！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return true;
+      }
+
+      if (Number(params.newValue) < 0) {
+        message.error({
+          content: "输入的数据不能为负数！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return true;
+      }
+    }
+
+    let columns = params.column?.colId;
+    if (columns === "description") {
+      if (params.data?.stage === "功能点") {
+        columns = "fpDescription";
+      } else if (params.data?.stage === "生产率(功能点/人天）") {
+        columns = "raDescription";
+      }
+    }
+
     const newValues = {
       "category": "scaleProductivity",
       "column": columns,
@@ -268,32 +305,44 @@ const reviewDefectCellEdited = async (params: any, projectId: string) => {
   if (params.newValue === undefined) {
     return false;
   }
-  if (params.column?.colId === "reviewHour") {
-    // 需要判断当发现缺陷数为0或者为空时，评审用时不能被修改
-    if (!params.data?.foundDN) {
-      message.error({
-        content: "发现缺陷数无值，不能修改评审用时！",
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-      return true;
-    }
-    // 说明可以不为数字
-    if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
-      message.error({
-        content: "请输入正确的数字！",
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-      return true;
-    }
-  }
 
   if (params.newValue !== params.oldValue) {
+    if (params.column?.colId === "reviewHour") {
+      // 需要判断当发现缺陷数为0或者为空时，评审用时不能被修改
+      if (!params.data?.foundDN) {
+        message.error({
+          content: "发现缺陷数无值，不能修改评审用时！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return true;
+      }
+      // 必须为数字
+      if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
+        message.error({
+          content: "请输入正确的数字！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return true;
+      }
+      // 不能为负数
+      if (Number(params.newValue) < 0) {
+        message.error({
+          content: "输入的数据不能为负数！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return true;
+      }
+    }
+
     const type = params.data?.kind;
     let modifyData: any;
     if (type === "codereview" && params.column?.colId === "funcPoint") { // 修改的是代码量
@@ -409,7 +458,7 @@ const updateTestPassValue = (params: any) => {
   }
   return {item: items, column: columns, value: values};
 };
-// 过程质量
+// 6.过程质量
 const pocessQualityCellEdited = async (params: any, projectId: string) => {
 
   let items = [];
@@ -476,41 +525,20 @@ const pocessQualityCellEdited = async (params: any, projectId: string) => {
   return false;
 };
 
-// 服务
+// 7.服务
 const serviceCellEdited = async (params: any, projectId: string) => {
-
-  // 说明可以不为数字
-  if (params.column.colId !== "description") {
-
-    if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
-      message.error({
-        content: "请输入正确的数字！",
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-      return true;
-    }
+  if (params.newValue === undefined) {
+    return false;
   }
-  /*
-  录入成功发布次数的时候：
-    已有发布次数且成功发布次数>发布次数，弹出提示语：成功发布次数不能大于发布次数。
-    没有发布次数的值，发布成功次数直接录入成功，不需要任何提示。
-  录入发布次数时：
-    如果成功发布次数>发布次数，弹出提示语：发布次数不能小于成功发布次数。  */
 
-  let columns = "";
-  let values = params.newValue;
-  if (params.column?.colId === "succN") { // 成功发布列
-    values = Number(params.newValue);
-    columns = "kpi";
-    const totalNum = params.data?.totalN; // 表格中的发布总数
-    if (totalNum) { // 如果总发布次数有值，需要判断
-      const succNum = Number(params.newValue); // 成功的发布次数
-      if (succNum > Number(totalNum)) {
+  if (params.newValue !== params.oldValue) {
+
+    // 说明可以不为数字
+    if (params.column.colId !== "description") {
+
+      if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
         message.error({
-          content: "成功发布次数不能大于发布次数！",
+          content: "请输入正确的数字！",
           duration: 1,
           style: {
             marginTop: '50vh',
@@ -518,28 +546,63 @@ const serviceCellEdited = async (params: any, projectId: string) => {
         });
         return true;
       }
-    }
-  } else if (params.column?.colId === "totalN") {
-    values = Number(params.newValue);
-    columns = "extra";
-    const succNum = params.data?.succN; // 成功发布的数据
-    if (Number(succNum) > Number(params.newValue)) {
-      message.error({
-        content: "发布次数不能小于成功发布次数！",
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-      return true;
-    }
-  } else if (params.column?.colId === "description") {
-    values = params.newValue;
-    columns = "description";
-  }
+      // 不能为负数
+      if (Number(params.newValue) < 0) {
+        message.error({
+          content: "输入的数据不能为负数！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return true;
+      }
 
-  debugger;
-  if (params.newValue !== params.oldValue) {
+    }
+    /*
+    录入成功发布次数的时候：
+      已有发布次数且成功发布次数>发布次数，弹出提示语：成功发布次数不能大于发布次数。
+      没有发布次数的值，发布成功次数直接录入成功，不需要任何提示。
+    录入发布次数时：
+      如果成功发布次数>发布次数，弹出提示语：发布次数不能小于成功发布次数。  */
+
+    let columns = "";
+    let values = params.newValue;
+    if (params.column?.colId === "succN") { // 成功发布列
+      values = Number(params.newValue);
+      columns = "kpi";
+      const totalNum = params.data?.totalN; // 表格中的发布总数
+      if (totalNum) { // 如果总发布次数有值，需要判断
+        const succNum = Number(params.newValue); // 成功的发布次数
+        if (succNum > Number(totalNum)) {
+          message.error({
+            content: "成功发布次数不能大于发布次数！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          return true;
+        }
+      }
+    } else if (params.column?.colId === "totalN") {
+      values = Number(params.newValue);
+      columns = "extra";
+      const succNum = params.data?.succN; // 成功发布的数据
+      if (Number(succNum) > Number(params.newValue)) {
+        message.error({
+          content: "发布次数不能小于成功发布次数！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return true;
+      }
+    } else if (params.column?.colId === "description") {
+      values = params.newValue;
+      columns = "description";
+    }
 
     const newValues = {
       "category": "serviceAbout",

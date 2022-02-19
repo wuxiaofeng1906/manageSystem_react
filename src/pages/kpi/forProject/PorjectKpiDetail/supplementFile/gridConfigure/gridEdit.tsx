@@ -129,6 +129,9 @@ const storyStabilityCellEdited = async (params: any, projectId: string) => {
 
 // 阶段工作量
 const stageWorkloadCellEdited = async (params: any, projectId: string) => {
+  if (params.newValue === undefined) {
+    return false;
+  }
 
   // 说明可以不为数字
   if (params.column.colId !== "description") {
@@ -262,6 +265,9 @@ const productRateCellEdited = async (params: any, projectId: string) => {
 // 评审和缺陷
 const reviewDefectCellEdited = async (params: any, projectId: string) => {
 
+  if (params.newValue === undefined) {
+    return false;
+  }
   if (params.column?.colId === "reviewHour") {
     // 需要判断当发现缺陷数为0或者为空时，评审用时不能被修改
     if (!params.data?.foundDN) {

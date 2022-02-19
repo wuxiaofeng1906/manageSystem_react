@@ -2,7 +2,7 @@
  * @Description: 项目基本信息字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:44:08
- * @LastEditTime: 2022-02-19 03:18:46
+ * @LastEditTime: 2022-02-19 14:07:04
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -34,6 +34,7 @@ export const TableMajorCols: ColDef[] = [
       return `${params.node.rowIndex + 1}`.padStart(gDigit, '0');
     },
     cellRenderer: 'projLinkZt',
+    pinned: 'left',
     ...numberF,
   },
   {
@@ -43,6 +44,7 @@ export const TableMajorCols: ColDef[] = [
     valueGetter: (params: any) => params.data.project.name,
     cellRenderer: 'linkTo',
     cellRendererParams: { route: '/kpi/performance/project/detail' },
+    pinned: 'left',
   },
   {
     headerName: '负责人',

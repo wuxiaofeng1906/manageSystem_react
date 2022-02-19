@@ -2,7 +2,7 @@
  * @Description: 需求稳定性的字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:47:07
- * @LastEditTime: 2022-01-07 02:10:27
+ * @LastEditTime: 2022-02-19 14:09:39
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -24,7 +24,6 @@ export const StoryStableCols: ColDef[] = [
   {
     headerName: '开发',
     field: `${moduleName}.devplan`,
-    columnGroupShow: SHOW['closed'],
     ...defaultParmas,
   },
   {

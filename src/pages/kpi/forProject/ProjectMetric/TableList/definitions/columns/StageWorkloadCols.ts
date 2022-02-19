@@ -2,7 +2,7 @@
  * @Description:
  * @Author: jieTan
  * @Date: 2021-12-14 03:20:22
- * @LastEditTime: 2022-02-10 03:37:30
+ * @LastEditTime: 2022-02-19 11:44:43
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -12,7 +12,7 @@ import { ratioW } from './baseParams';
 import taskplanCols from './taskplan-cols';
 
 const moduleName = 'stageWorkload';
-const others = { decimal: 4 };
+const others = { decimal: 2 };
 
 /*  */
 export const StageWorkloadCols = taskplanCols(moduleName, others);

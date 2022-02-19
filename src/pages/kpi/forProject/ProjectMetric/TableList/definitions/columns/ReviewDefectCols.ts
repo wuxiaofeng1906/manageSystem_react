@@ -2,7 +2,7 @@
  * @Description: 评审和缺陷的字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:47:07
- * @LastEditTime: 2022-02-17 01:54:28
+ * @LastEditTime: 2022-02-19 10:48:25
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -22,7 +22,7 @@ const defaultParmas = {
 /* 项目过程质量 */
 export const ReviewDefectCols: ColDef[] = [
   {
-    headerName: `需求（预设+评审）`,
+    headerName: `需求（预审+评审）`,
     field: `${moduleName}.storyPreReview`,
     cellRenderer: 'numToFixed',
     cellRendererParams: { decimal: 4 },

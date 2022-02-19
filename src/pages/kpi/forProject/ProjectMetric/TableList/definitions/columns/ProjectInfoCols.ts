@@ -2,7 +2,7 @@
  * @Description: 项目基本信息字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:44:08
- * @LastEditTime: 2022-02-19 14:07:04
+ * @LastEditTime: 2022-02-19 15:29:20
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -52,6 +52,7 @@ export const TableMajorCols: ColDef[] = [
     sortable: true,
     filter: true,
     columnGroupShow: SHOW['closed'],
+    pinned: 'left',
     ...doubleNumberF,
   },
   {

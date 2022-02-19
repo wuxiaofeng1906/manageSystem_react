@@ -2,7 +2,7 @@
  * @Description: 服务的字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:47:07
- * @LastEditTime: 2022-01-07 06:29:13
+ * @LastEditTime: 2022-02-19 12:46:29
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -19,7 +19,7 @@ export const ServiceAboutCols: ColDef[] = [
     headerName: `一次发布成功率(${PERCENTAGE['unit']})`,
     field: `${moduleName}.releaseSucc`,
     cellRenderer: 'numToFixed',
-    cellRendererParams: { multiple: PERCENTAGE.value },
+    cellRendererParams: { multiple: PERCENTAGE.value, unit: PERCENTAGE.unit },
     width: 156,
     minWidth: 150,
   },

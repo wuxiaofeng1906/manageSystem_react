@@ -2,7 +2,7 @@
  * @Description:
  * @Author: jieTan
  * @Date: 2021-12-28 10:07:16
- * @LastEditTime: 2022-02-17 10:27:08
+ * @LastEditTime: 2022-02-19 10:42:50
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -74,17 +74,22 @@ export const deptTreeNodes = (data: any, val: any[], setVal: Function): void => 
  * @param {string} item - 查询类别：[部门|项目]
  * @returns {*} {boolean}
  */
-export const onTreeMultiChange = (values: string, setState: Function, item: string): boolean => {
+export const onTreeMultiChange = (
+  values: string,
+  setState: Function,
+  item: string,
+  isDept = true,
+): boolean => {
   //
-  setState((prev: any) =>
-    Object.assign(
-      { ...prev },
-      {
-        [item]: values,
-        doQuery: prev[item].length > values.length ? true : false, // 添加时不查询，移除时查询
-      },
-    ),
-  );
+  setState((prev: any) => {
+    const newP = {
+      [item]: values,
+      doQuery: prev[item].length > values.length ? true : false, // 添加时不查询，移除时查询
+    };
+    if (isDept) Object.assign(newP, { projIds: [] });
+    //
+    return Object.assign({ ...prev }, newP);
+  });
   //
   return true;
 };
@@ -110,6 +115,6 @@ const onDateChange = (
   setSelectItems((prev: any) => {
     const _dates = prev.dates;
     _dates[idx] = date;
-    return Object.assign({ ...prev }, { dates: _dates, doQuery: true });
+    return Object.assign({ ...prev }, { dates: _dates, doQuery: true, projIds: [] });
   });
 };

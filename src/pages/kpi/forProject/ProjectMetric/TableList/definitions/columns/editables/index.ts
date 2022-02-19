@@ -2,7 +2,7 @@
  * @Description: 项目的可编辑字段
  * @Author: jieTan
  * @Date: 2021-12-22 06:39:40
- * @LastEditTime: 2022-01-25 02:23:48
+ * @LastEditTime: 2022-02-19 09:07:03
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -17,6 +17,8 @@ class ProjectKpiEditables {
 
   /* 项目分支 */
   branch = (key: string, params: ValueSetterParams) => {
+    //
+    if (!params.newValue) return;
     //
     const datas: ProjectKpiInput = {
       projects: [params.data.project.id],

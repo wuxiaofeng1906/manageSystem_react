@@ -2,7 +2,7 @@
  * @Description: 评审和缺陷的字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:47:07
- * @LastEditTime: 2022-02-17 01:54:28
+ * @LastEditTime: 2022-02-19 12:29:17
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -15,17 +15,17 @@ import { ratioW } from './baseParams';
 const moduleName = 'reviewDefect';
 const defaultParmas = {
   cellRenderer: 'numToFixed',
-  cellRendererParams: { decimal: 4 },
+  cellRendererParams: { decimal: 2 },
   ...ratioW,
 };
 
 /* 项目过程质量 */
 export const ReviewDefectCols: ColDef[] = [
   {
-    headerName: `需求（预设+评审）`,
+    headerName: `需求（预审+评审）`,
     field: `${moduleName}.storyPreReview`,
     cellRenderer: 'numToFixed',
-    cellRendererParams: { decimal: 4 },
+    cellRendererParams: { decimal: 2 },
     width: 156,
     minWidth: 150,
   },

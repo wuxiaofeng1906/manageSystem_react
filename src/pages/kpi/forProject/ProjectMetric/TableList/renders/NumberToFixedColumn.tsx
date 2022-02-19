@@ -2,7 +2,7 @@
  * @Description: float保留小数位
  * @Author: jieTan
  * @Date: 2021-12-13 09:49:07
- * @LastEditTime: 2021-12-20 06:58:47
+ * @LastEditTime: 2022-02-19 12:48:26
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -30,16 +30,19 @@ export default (props: {
   const unit = props.unit ?? PERCENTAGE.unit;
   const value = props.value * multiple;
   // 判断是否需要绘制html
-  if (!props.html) return parseFloat(value?.toFixed(decimalPlaces));
+  if (!props.html)
+    return props.unit
+      ? parseFloat(value?.toFixed(decimalPlaces)) + props.unit
+      : parseFloat(value?.toFixed(decimalPlaces));
 
   // 绘制颜色
-  if (value < 0)
-    return <span style={{ color: 'red' }}>{parseFloat(value.toFixed(decimalPlaces)) + unit}</span>;
   if (value > 0)
     return (
-      <span style={{ color: 'green' }}>
-        {'+' + parseFloat(value.toFixed(decimalPlaces)) + unit}
-      </span>
+      <span style={{ color: 'red' }}>{'+' + parseFloat(value.toFixed(decimalPlaces)) + unit}</span>
+    );
+  if (value < 0)
+    return (
+      <span style={{ color: 'green' }}>{parseFloat(value.toFixed(decimalPlaces)) + unit}</span>
     );
   return value;
 };

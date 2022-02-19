@@ -2,7 +2,7 @@
  * @Description: 项目过程质量的字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:47:07
- * @LastEditTime: 2022-02-10 02:07:43
+ * @LastEditTime: 2022-02-19 12:50:17
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -25,7 +25,7 @@ const duraParams = {
 };
 const ratioParmas = {
   cellRenderer: 'numToFixed',
-  cellRendererParams: { multiple: PERCENTAGE.value },
+  cellRendererParams: { multiple: PERCENTAGE.value, unit:PERCENTAGE.unit },
   ...ratioW,
 };
 
@@ -36,23 +36,21 @@ export const ProcessQualityCols: ColDef[] = [
     headerName: `ReOpen率`,
     headerTooltip: `ReOpen率(${PERCENTAGE['unit']})`,
     field: `${moduleName}.reopenRatio`,
-    cellRenderer: 'numToFixed',
-    cellRendererParams: { multiple: PERCENTAGE.value },
-    ...ratioW,
+    ...ratioParmas,
   },
   {
     headerName: '前端覆盖率',
     headerTooltip: `前端覆盖率(${PERCENTAGE['unit']})`,
     field: `${moduleName}.frontUnitCover`,
     columnGroupShow: SHOW['closed'],
-    ...defaultParmas,
+    ...ratioParmas,
   },
   {
     headerName: '后端覆盖率',
     headerTooltip: `后端覆盖率(${PERCENTAGE['unit']})`,
     field: `${moduleName}.backUnitCover`,
     columnGroupShow: SHOW['closed'],
-    ...defaultParmas,
+    ...ratioParmas,
   },
   {
     headerName: `解决时长`,

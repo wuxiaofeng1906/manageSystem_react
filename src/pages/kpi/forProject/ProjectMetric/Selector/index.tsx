@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-02-19 03:15:52
+ * @LastEditTime: 2022-02-19 10:35:34
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -41,13 +41,14 @@ const defaultDateStr: [string, any] = [defaultDateRange[0].format(MOMENT_FORMAT.
 let dateStr: [string, any] | undefined = defaultDateStr; // 存放时间range信息
 let doChange = false;
 const defaultSeclectItems = { deptIds: [], projIds: [], dates: defaultDateRange, doQuery: false };
+let projChange = true; // 记录特性项目的列表是否应该发生变化
 /* ************************************************************************************************************** */
 export default () => {
   /* 数据区 */
   const gqlClient = useGqlClient(); // 必须提前初始化该对象
   const [projElems, setProjElems] = useState(null); // 保存项目信息
   const [treeData, setTreeData] = useState([]); // 部门树形结构的数据
-  const { setGqlData, setLoading, gridApi, gridHeight, pkGqlParmas, setPkGqlParmas } =
+  const { gqlData, setGqlData, setLoading, gridApi, gridHeight, pkGqlParmas, setPkGqlParmas } =
     useModel('projectMetric'); // 获取“过程质量”查询的结果数据
   const [selectItems, setSelectItems] = useState(defaultSeclectItems); // 存放多个筛选的值
   const [ratioVal, setRatioVal] = useState(gridHeight.row);
@@ -128,6 +129,10 @@ export default () => {
       doChange = false;
     }
   }, [selectItems]); // 查询参数更跟时触发
+  //
+  useEffect(() => {
+    gqlData && projChange ? projOptsElems(gqlData, setProjElems, selectItems.projIds) : null;
+  }, [gqlData]);
   // 界面挂载后
   useMount(async () => {
     // 查询部门组织架构
@@ -135,12 +140,6 @@ export default () => {
       func: GRAPHQL_QUERY['ORGANIZATION'],
     });
     rets ? deptTreeNodes(rets, treeData, setTreeData) : null;
-    // 查询所有的项目列表
-    const projs = await queryGQL(gqlClient, projectKpiGql, {
-      func: GRAPHQL_QUERY['PROJECT_KPI'],
-      params: { kpis: [] },
-    });
-    projs ? projOptsElems(projs, setProjElems, selectItems.projIds) : null;
   });
 
   /* 绘制区 */
@@ -156,15 +155,19 @@ export default () => {
                   treeData={treeData}
                   onDropdownVisibleChange={(open: boolean) => {
                     !open && doChange
-                      ? setSelectItems((prev) => Object.assign({ ...prev }, { doQuery: true }))
+                      ? setSelectItems((prev) =>
+                          Object.assign({ ...prev }, { doQuery: true, projIds: [] }),
+                        )
                       : null;
                   }}
-                  onChange={(values: string) =>
-                    (doChange = onTreeMultiChange(values, setSelectItems, 'deptIds'))
-                  }
+                  onChange={(values: string) => {
+                    projChange = true;
+                    doChange = onTreeMultiChange(values, setSelectItems, 'deptIds');
+                  }}
                   onClear={() => {
+                    projChange = true;
                     setSelectItems((prev) =>
-                      Object.assign({ ...prev }, { deptIds: [], doQuery: true }),
+                      Object.assign({ ...prev }, { deptIds: [], doQuery: true, projIds: [] }),
                     );
                   }}
                   value={selectItems.deptIds}
@@ -182,10 +185,12 @@ export default () => {
                       ? setSelectItems((prev) => Object.assign({ ...prev }, { doQuery: true }))
                       : null;
                   }}
-                  onChange={(values: string) =>
-                    (doChange = onTreeMultiChange(values, setSelectItems, 'projIds'))
-                  }
+                  onChange={(values: string) => {
+                    projChange = false;
+                    doChange = onTreeMultiChange(values, setSelectItems, 'projIds', false);
+                  }}
                   onClear={() => {
+                    projChange = false;
                     setSelectItems((prev) =>
                       Object.assign({ ...prev }, { projIds: [], doQuery: true }),
                     );
@@ -200,6 +205,7 @@ export default () => {
                   <DatePicker
                     placeholder="开始日期"
                     onChange={(date: any, dateString: string) => {
+                      projChange = true;
                       doChange = true;
                       onDateChange(dateStr as any, 0, date, dateString, setSelectItems);
                     }}
@@ -212,6 +218,7 @@ export default () => {
                   <DatePicker
                     placeholder="结束日期"
                     onChange={(date: any, dateString: string) => {
+                      projChange = true;
                       doChange = true;
                       onDateChange(dateStr as any, 1, date, dateString, setSelectItems);
                     }}

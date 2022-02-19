@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-02-17 11:02:33
+ * @LastEditTime: 2022-02-19 03:15:52
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -47,7 +47,7 @@ export default () => {
   const gqlClient = useGqlClient(); // 必须提前初始化该对象
   const [projElems, setProjElems] = useState(null); // 保存项目信息
   const [treeData, setTreeData] = useState([]); // 部门树形结构的数据
-  const { gqlData, setGqlData, setLoading, gridApi, gridHeight, pkGqlParmas, setPkGqlParmas } =
+  const { setGqlData, setLoading, gridApi, gridHeight, pkGqlParmas, setPkGqlParmas } =
     useModel('projectMetric'); // 获取“过程质量”查询的结果数据
   const [selectItems, setSelectItems] = useState(defaultSeclectItems); // 存放多个筛选的值
   const [ratioVal, setRatioVal] = useState(gridHeight.row);
@@ -128,16 +128,19 @@ export default () => {
       doChange = false;
     }
   }, [selectItems]); // 查询参数更跟时触发
-  //
-  useEffect(() => {
-    gqlData ? projOptsElems(gqlData, setProjElems, selectItems.projIds) : null;
-  }, [gqlData]);
-  // 界面挂载后，立马查询部门组织架构
+  // 界面挂载后
   useMount(async () => {
+    // 查询部门组织架构
     const rets = await queryGQL(gqlClient, organizationGql, {
       func: GRAPHQL_QUERY['ORGANIZATION'],
     });
     rets ? deptTreeNodes(rets, treeData, setTreeData) : null;
+    // 查询所有的项目列表
+    const projs = await queryGQL(gqlClient, projectKpiGql, {
+      func: GRAPHQL_QUERY['PROJECT_KPI'],
+      params: { kpis: [] },
+    });
+    projs ? projOptsElems(projs, setProjElems, selectItems.projIds) : null;
   });
 
   /* 绘制区 */
@@ -200,7 +203,10 @@ export default () => {
                       doChange = true;
                       onDateChange(dateStr as any, 0, date, dateString, setSelectItems);
                     }}
-                    disabledDate={(current) => current && current >= selectItems.dates[1]}
+                    disabledDate={(current) => {
+                      if (!selectItems.dates[1]) return false;
+                      return current && current >= selectItems.dates[1];
+                    }}
                     value={selectItems.dates[0]}
                   />
                   <DatePicker
@@ -209,7 +215,10 @@ export default () => {
                       doChange = true;
                       onDateChange(dateStr as any, 1, date, dateString, setSelectItems);
                     }}
-                    disabledDate={(current) => current && current < selectItems.dates[0]}
+                    disabledDate={(current) => {
+                      if (!selectItems.dates[0]) return false;
+                      return current && current < selectItems.dates[0];
+                    }}
                     value={selectItems.dates[1]}
                   />
                 </Space>
@@ -221,6 +230,7 @@ export default () => {
           <br />
         </Col>
         <Col {...extraFlexs} style={{ textAlign: 'right' }}>
+          <Divider type="vertical" />
           <Dropdown overlay={menu} placement="bottomCenter" arrow>
             <ColumnHeightOutlined />
           </Dropdown>
@@ -231,7 +241,6 @@ export default () => {
                 doChange = true;
                 setProjElems(null);
                 setSelectItems((prev) => Object.assign({ ...prev }, { doQuery: true }));
-                // dateStr = defaultDateStr;
               }}
             />
           </Tooltip>

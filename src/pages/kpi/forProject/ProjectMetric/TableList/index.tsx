@@ -19,6 +19,7 @@ import DurationColumn from './renders/DurationColumn';
 import { Spin } from 'antd';
 import { useEffect } from 'react';
 import ManualEntryColumn from './renders/ManualEntryColumn';
+import ProjLinkZtCloumn from './renders/special/ProjLinkZtCloumn';
 
 /*  */
 export default () => {
@@ -42,6 +43,7 @@ export default () => {
             modules={[SetFilterModule as any]}
             frameworkComponents={{
               linkTo: LinkToCloumn,
+              projLinkZt: ProjLinkZtCloumn,
               projStatus: ProjStatusColumn,
               duration: DurationColumn,
               numToFixed: NumberToFixedColumn,

@@ -254,7 +254,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                 rowData={processData?.data} // 数据绑定
                 defaultColDef={{
                   resizable: true,
-                  sortable: true,
+                  // sortable: true,
                   filter: true,
                   suppressMenu: true,
                   cellStyle: setProcessCellStyle,
@@ -283,7 +283,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                 rowData={storyStableData?.data} // 数据绑定
                 defaultColDef={{
                   resizable: true,
-                  sortable: true,
+                  // sortable: true,
                   filter: true,
                   suppressMenu: true,
                   cellStyle: setStoryStabilityCellStyle,
@@ -311,7 +311,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                 rowData={stageWorkCount?.data} // 数据绑定
                 defaultColDef={{
                   resizable: true,
-                  sortable: true,
+                  // sortable: true,
                   filter: true,
                   suppressMenu: true,
                   cellStyle: setStageWorkloadCellStyle,
@@ -341,7 +341,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                 rowData={productRate?.data} // 数据绑定
                 defaultColDef={{
                   resizable: true,
-                  sortable: true,
+                  // sortable: true,
                   filter: true,
                   suppressMenu: true,
                   cellStyle: setProductRateCellStyle,
@@ -376,7 +376,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                 rowData={reviewDefect?.data} // 数据绑定
                 defaultColDef={{
                   resizable: true,
-                  sortable: true,
+                  // sortable: true,
                   filter: true,
                   suppressMenu: true,
                   cellStyle: setReviewDefectCellStyle,
@@ -404,7 +404,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                 rowData={processQuality?.data} // 数据绑定
                 defaultColDef={{
                   resizable: true,
-                  sortable: true,
+                  // sortable: true,
                   filter: true,
                   suppressMenu: true,
                   cellStyle: setProcessQualityCellStyle,
@@ -438,7 +438,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
                 rowData={serviceData?.data} // 数据绑定
                 defaultColDef={{
                   resizable: true,
-                  sortable: true,
+                  // sortable: true,
                   filter: true,
                   suppressMenu: true,
                   cellStyle: setServiceCellStyle,

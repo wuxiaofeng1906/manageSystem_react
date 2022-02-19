@@ -389,6 +389,7 @@ const alaysisReviewDefect = (sourceData: any, totalData: any) => {
       const datas = dts[index];
       if (Types === datas.kind) {
         newData.cut = datas.cut;
+        newData.description = datas.description;
         if (!datas.cut) {  // 如果要裁剪，则不显示相应数据
           newData.foundDN = datas.foundDN;
           newData.weightDN = datas.weightDN;
@@ -396,7 +397,6 @@ const alaysisReviewDefect = (sourceData: any, totalData: any) => {
           newData.defectDensity = datas.defectDensity;
           newData.reviewHour = datas.reviewHour;
           newData.reviewRatio = datas.reviewRatio;
-          newData.description = datas.description;
         }
         break;
       }

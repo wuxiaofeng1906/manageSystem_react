@@ -630,7 +630,10 @@ const getReviewDefectColumns = () => {
         if (params.data?.kind === "提测演示" || params.data?.kind === "开发自测/联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
           return "-";
         }
-
+        // 如果是否裁剪为是，则不能编辑，则不显示手工录入
+        if (params.data?.cut === true) {
+          return "";
+        }
         // 只要发现缺陷数为0或者空，这个值也需要为空
         if (!params.data?.foundDN) {
           return `<div style="color: red;font-style: italic ;text-align: center">手工录入</div>`;
@@ -654,8 +657,8 @@ const getReviewDefectColumns = () => {
         if (params.data?.kind === "提测演示" || params.data?.kind === "开发自测/联调" || params.data?.kind === "集成测试" || params.data?.kind === "系统测试" || params.data?.kind === "发布测试" || params.data?.kind === "合计") {
           return false;
         }
-
-        if (params.data?.cut === "是否裁剪") {
+        // 如果是否裁剪值为是，则评审用时不可修改。
+        if (params.data?.cut === "是否裁剪" || params.data?.cut === true) {
           return false;
         }
         return true;

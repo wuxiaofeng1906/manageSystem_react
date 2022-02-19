@@ -55,14 +55,16 @@ const setProductRateCellStyle = (params: any) => {
 
 // 5.评审与缺陷
 const setReviewDefectCellStyle = (params: any) => {
-  if (params.column?.colId === "memo") {
-    return whiteCellStyle;
-  }
 
   if (params.column?.colId === "title" || params.column?.colId === "kind" || params.column?.colId === "foundDN" || params.column?.colId === "weightDN"
     || params.column?.colId === "defectDensity" || params.column?.colId === "reviewRatio") {
 
     // 不可修改
+    return grayCellStyle;
+  }
+
+  // 当是否裁剪为是，评审用时这个字段不能修改。置灰
+  if (params.column?.colId === "reviewHour" && params.data?.cut === true) {
     return grayCellStyle;
   }
 

@@ -1,6 +1,31 @@
 import {updateGridContent} from "@/pages/kpi/forProject/PorjectKpiDetail/supplementFile/data/axiosRequest";
 import {message} from "antd";
 
+// 校验数据
+const checkValueIsEffectiveNum = (Num: any) => {
+  // 输入数字的地方不能为文字，不能为负数
+  if (Num.toString().trim() !== "" && (Number(Num)).toString() === "NaN") {
+    message.error({
+      content: "请输入正确的数字！",
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+    return true;
+  }
+
+  if (Number(Num) < 0) {
+    message.error({
+      content: "输入的数据不能为负数！",
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+    return true;
+  }
+};
 // 进度指标编辑
 const processCellEdited = async (params: any, projectId: string) => {
   // 有数据变化时再进行修改请求
@@ -53,7 +78,9 @@ const storyStabilityCellEdited = async (params: any, projectId: string) => {
   if (!params.oldValue || (params.newValue).toString() !== (params.oldValue).toString()) {
     // 说明可以不为数字
     if (params.column.colId !== "description") {
-      // ,输入数字的地方不能为文字，不能为负数
+
+      // return checkValueIsEffectiveNum(params.newValue);
+      // 输入数字的地方不能为文字，不能为负数
       if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
         message.error({
           content: "请输入正确的数字！",
@@ -75,10 +102,14 @@ const storyStabilityCellEdited = async (params: any, projectId: string) => {
         });
         return true;
       }
-
       // 修改变更工时和预计工时时： 判断，如果变更工时>预计工时，弹出异常提示：变更工时不能大于预计工时
       const rowData = params.data;
-      if (Math.abs(rowData.stableHours) > Math.abs(rowData.planHours)) {
+
+      let stableHours = Math.abs(rowData.stableHours);
+      if (stableHours === 999999) {
+        stableHours = 0;
+      }
+      if (stableHours > Math.abs(rowData.planHours)) {
         message.error({
           content: "变更工时不能大于预计工时！",
           duration: 1,
@@ -419,6 +450,29 @@ const updateTestPassValue = (params: any) => {
   let values = params.newValue;
   let columns = "";
 
+  // 必须为数字
+  if ((params.newValue).toString().trim() !== "" && (Number(params.newValue)).toString() === "NaN") {
+    message.error({
+      content: "请输入正确的数字！",
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+    return true;
+  }
+  // 不能为负数
+  if (Number(params.newValue) < 0) {
+    message.error({
+      content: "输入的数据不能为负数！",
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+    return true;
+  }
+
   // 里面要区分column，
   // 录入提测通过次数的时候：
   //   没有提测次数值的时候，提测通过次数直接录入成功，不需要任何提示。
@@ -461,37 +515,41 @@ const updateTestPassValue = (params: any) => {
 // 6.过程质量
 const pocessQualityCellEdited = async (params: any, projectId: string) => {
 
-  let items = [];
-  let columns = "";
-  let values: any;
-
-  if (params.data?.cut === "一次提测通过率") {     // 修改一次通过率
-    const data = updateTestPassValue(params);
-    if (typeof data !== "boolean") {
-      items = data.item;
-    }
-    if (typeof data !== "boolean") {
-      columns = data?.column;
-    }
-    if (typeof data !== "boolean") {
-      values = data?.value;
-    }
-  } else {  // 修改是否裁剪
-    enum typeObject {
-      "Bug解决时长" = 1, "Reopen率", "后端单元测试覆盖率", "Bug回归时长", "加权遗留缺陷", "加权遗留缺陷密度",
-      "前端单元测试覆盖率"
-    }
-
-    items.push(typeObject[params.data?.kind]);
-    columns = params.column?.colId;
-    if (columns === "cut") {
-      values = params.newValue === "否" ? 0 : 1;
-    } else {
-      values = params.newValue;
-    }
+  if (params.newValue === undefined) {
+    return false;
   }
 
   if (params.newValue !== params.oldValue) {
+    let items = [];
+    let columns = "";
+    let values: any;
+
+    if (params.data?.cut === "一次提测通过率") {     // 修改一次通过率
+      const data = updateTestPassValue(params);
+      if (typeof data !== "boolean") {
+        items = data.item;
+      }
+      if (typeof data !== "boolean") {
+        columns = data?.column;
+      }
+      if (typeof data !== "boolean") {
+        values = data?.value;
+      }
+    } else {  // 修改是否裁剪
+      enum typeObject {
+        "Bug解决时长" = 1, "Reopen率", "后端单元测试覆盖率", "Bug回归时长", "加权遗留缺陷", "加权遗留缺陷密度",
+        "前端单元测试覆盖率"
+      }
+
+      items.push(typeObject[params.data?.kind]);
+      columns = params.column?.colId;
+      if (columns === "cut") {
+        values = params.newValue === "否" ? 0 : 1;
+      } else {
+        values = params.newValue;
+      }
+    }
+
     const newValues = {
       "category": "processQuality",
       "column": columns,

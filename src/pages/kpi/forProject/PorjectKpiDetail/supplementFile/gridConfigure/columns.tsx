@@ -4,7 +4,6 @@ const STAGE_LENGTH = 130;
 // 渲染手工录入
 
 const manualInput_black = (params: any) => {
-  debugger;
   if (!params.value) {
     return "";
   }

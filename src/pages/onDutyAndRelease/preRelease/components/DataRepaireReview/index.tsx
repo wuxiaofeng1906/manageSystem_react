@@ -164,18 +164,8 @@ const DataRepaireReview: React.FC<any> = () => {
       let modifyFlag = true;
       firstDataReviewGridApi.current?.forEachNode((node: any) => {
         const dts = node.data;
-        if (dts.is_repeat) {
-          if (dts.is_repeat === "9") {
-            message.error({
-              content: '保存失败：数据修复review中是否可重复执行没有全部确认！',
-              duration: 1,
-              style: {
-                marginTop: '50vh',
-              },
-            });
-            modifyFlag = false;
-          }
-        } else {
+        // 需要看本条数据是否有效，比如表格只有一条初始化的空数据时就无需验证
+        if (dts.is_repeat && dts.is_repeat === "9") {
           message.error({
             content: '保存失败：数据修复review中是否可重复执行没有全部确认！',
             duration: 1,

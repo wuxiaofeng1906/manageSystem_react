@@ -98,11 +98,9 @@ const PreReleaseProject: React.FC<any> = () => {
         modifyProcessStatus(showProgressData(processData.data));
       }
 
-      debugger;
-      // 保存成功后需要判断tab标签有没有被修改过，如果有，则跳过，如果没有，上面的标签名字需要与发布类型同步，
+       // 保存成功后需要判断tab标签有没有被修改过，如果有，则跳过，如果没有，上面的标签名字需要与发布类型同步，
       // 发布类型为正式发布，标签页需要改为xxxxxx正式预发布，如果是灰度发布，则改为xxxxx灰度预发布。
       autoModifyTabsName(datas.pulishType);
-
 
     } else {
       message.error({

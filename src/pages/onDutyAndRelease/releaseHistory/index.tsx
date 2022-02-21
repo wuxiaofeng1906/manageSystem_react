@@ -9,11 +9,18 @@ import {useRequest} from "ahooks";
 import {getGrayscaleListData} from './apiPage';
 
 import {history} from "@@/core/history";
-import {Button} from "antd";
+import {Button, Col, DatePicker, Form, Row, Select} from "antd";
+import {loadPrjNameSelect} from "@/pages/onDutyAndRelease/preRelease/comControl/controler";
+import dayjs from "dayjs";
+import moment from 'moment';
 
+const {RangePicker} = DatePicker;
 
-/* endregion */
-
+const queryCondition = {
+  start: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+  end: dayjs().subtract(7, 'day').format("YYYY-MM-DD HH:mm:ss"),
+  project: ""
+}
 const ReleaseHistory: React.FC<any> = () => {
 
   /* region 灰度积压列表 */
@@ -139,14 +146,24 @@ const ReleaseHistory: React.FC<any> = () => {
       field: 'plan_release_time'
     }, {
       headerName: '操作',
-      field: 'kind'
+      cellRenderer: (params: any) => {
+        const readyReleaseNum = params.data?.ready_release_num;
+        return `
+        <div style="margin-top: -5px">
+             <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='releaseProcessDetail(${JSON.stringify(readyReleaseNum)})'>
+                <img src="../logs.png" width="20" height="20" alt="正式发布过程详情" title="正式发布过程详情" />
+            </Button>
+        </div>
+            `;
+      }
     }];
   };
+  const projectsArray = useRequest(() => loadPrjNameSelect()).data;
 
   const releasedData = useRequest(() => getGrayscaleListData({
     release_type: "2",
-    release_start_time: "",
-    release_end_time: ""
+    release_start_time: queryCondition.start,
+    release_end_time: queryCondition.end
   })).data;
 
   const releasedGridApi = useRef<GridApi>();
@@ -160,6 +177,42 @@ const ReleaseHistory: React.FC<any> = () => {
     // else releasedGridApi.current.hideOverlay();
   }
 
+  // 获取数据
+  const getReleasedList = async () => {
+    const cond = {release_type: "2"};
+
+    if (queryCondition.start && queryCondition.end) {
+      cond["release_start_time"] = queryCondition.start;
+      cond["release_end_time"] = queryCondition.end;
+    }
+    if (queryCondition.project) {
+      cond["project_id"] = queryCondition.project;
+    }
+    const result = await getGrayscaleListData(cond);
+    releasedGridApi.current?.setRowData(result.data)
+  };
+
+  // 根据项目获取
+  const onProjectChanged = (params: any) => {
+    let prjStr = "";
+    if (params && params.length > 0) {
+      params.forEach((ele: any) => {
+        const prjNum = ele.split("&");
+        prjStr = prjStr === "" ? prjNum[1] : `${prjStr},${prjNum[1]}`;
+      });
+    }
+
+    queryCondition.project = prjStr;
+    getReleasedList();
+  };
+
+  // 根据时间获取
+  const onReleaseProject = (params: any, times: any) => {
+    queryCondition.start = times[0] === "" ? "" : dayjs(times[0]).format("YYYY-MM-DD HH:mm:ss");
+    queryCondition.end = times[1] === "" ? "" : dayjs(times[1]).format("YYYY-MM-DD HH:mm:ss");
+    getReleasedList();
+
+  }
   /* endregion */
 
   const gridHeight = (datas: any) => {
@@ -218,10 +271,33 @@ const ReleaseHistory: React.FC<any> = () => {
           border: "solid 1px #CCCCCC"
         }}>&nbsp;
           <label style={{fontWeight: "bold"}}>已正式发布列表</label>
+
+          <div style={{float: "right"}}>
+            <Row>
+              <Col span={12}>
+                <Form.Item label="项目名称:" name="projectsName" style={{width: 400}}>
+                  <Select size={"small"} showSearch mode="multiple" onChange={onProjectChanged}>
+                    {projectsArray}
+                  </Select>
+                </Form.Item>
+              </Col>
+
+              <Col span={12}>
+                {/* 发布类型 */}
+                <Form.Item label="发布时间:" name="pulishTime" style={{width: 430}}>
+                  <RangePicker size={"small"} defaultValue={[moment(queryCondition.start), moment(queryCondition.end)]}
+                               onChange={onReleaseProject}/>
+                </Form.Item>
+              </Col>
+
+            </Row>
+
+          </div>
         </div>
-
-
-        <div className="ag-theme-alpine" style={{height:  gridHeight(releasedData?.data), width: '100%'}}>
+        <div></div>
+        <button></button>
+        <div className="ag-theme-alpine"
+             style={{height: gridHeight(releasedData?.data), width: '100%'}}>
           <AgGridReact
             columnDefs={releasedList()} // 定义列
             rowData={releasedData?.data} // 数据绑定

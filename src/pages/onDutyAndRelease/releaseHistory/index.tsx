@@ -46,7 +46,8 @@ const ReleaseHistory: React.FC<any> = () => {
     }, {
       headerName: '灰度发布批次号',
       field: 'ready_release_num',
-      maxWidth: 145
+      minWidth: 125,
+      maxWidth: 150
     }, {
       headerName: '灰度发布名称',
       field: 'ready_release_name',
@@ -149,6 +150,14 @@ const ReleaseHistory: React.FC<any> = () => {
     <PageContainer>
       {/* 灰度积压列表 */}
       <div>
+        <div style={{
+          height: "35px", lineHeight: "35px", verticalAlign: "middle",
+          textAlign: "left", backgroundColor: "#F8F8F8", fontWeight: "bold", width: '100%',
+          border: "solid 1px #CCCCCC"
+        }}> &nbsp;   灰度积压列表
+
+
+        </div>
         <div style={{
           height: "35px", lineHeight: "35px", verticalAlign: "middle",
           textAlign: "left", backgroundColor: "#F8F8F8", fontWeight: "bold", width: '100%',

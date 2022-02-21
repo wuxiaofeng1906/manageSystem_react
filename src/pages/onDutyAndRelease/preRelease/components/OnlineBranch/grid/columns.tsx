@@ -385,7 +385,7 @@ const sealStatusRenderer = (params: any) => {
 
     let side = '';
     let status = "";
-    let sideColor = "";
+    let sideColor = "black";
     let time = "";
     const arrayData = values[0];
     values.forEach((ele: any) => {
@@ -398,8 +398,13 @@ const sealStatusRenderer = (params: any) => {
           // 是后端
           side = '后端：';
         }
-        status = arrayData.sealing_version === '1' ? '已封版' : '未封版';
-        sideColor = arrayData.sealing_version === '1' ? '#2BF541' : 'orange';
+        // status = arrayData.sealing_version === '1' ? '已封版' : '未封版';
+        status = arrayData.sealing_version;
+        if (status === "已封版") {
+          sideColor = '#2BF541';
+        } else if (status === "未封版") {
+          sideColor = 'orange';
+        }
         time = arrayData.sealing_version_time === '' ? '' : dayjs(arrayData.sealing_version_time).format('HH:mm:ss');
       }
     });
@@ -418,24 +423,37 @@ const sealStatusRenderer = (params: any) => {
   if (datas.technical_side === "3") {
     let frontValue = '';
     let frontTime = '';
-    let frontColor = 'orange';
+    let frontColor = 'black';
 
     let backendValue = '';
     let backendTime = '';
-    let bacnkendColor = 'orange';
+    let bacnkendColor = 'black';
     values.forEach((ele: any) => {
       if (ele.technical_side === '1') {
         // 前端
-        frontValue = ele.sealing_version === '1' ? '已封版' : '未封版';
-        frontTime =
-          ele.sealing_version_time === '' ? '' : dayjs(ele.sealing_version_time).format('HH:mm:ss');
-        frontColor = ele.sealing_version === '1' ? '#2BF541' : 'orange';
+        // frontValue = ele.sealing_version === '1' ? '已封版' : '未封版';
+        frontValue = ele.sealing_version;
+        frontTime = ele.sealing_version_time === '' ? '' : dayjs(ele.sealing_version_time).format('HH:mm:ss');
+        if (frontValue === "已封版") {
+          frontColor = '#2BF541';
+        } else if (frontValue === "未封版") {
+          frontColor = 'orange';
+        }
+
+        // frontColor = ele.sealing_version === '1' ? '#2BF541' : 'orange';
       } else if (ele.technical_side === '2') {
         // 后端
-        backendValue = ele.sealing_version === '1' ? '已封版' : '未封版';
+        // backendValue = ele.sealing_version === '1' ? '已封版' : '未封版';
+        backendValue = ele.sealing_version;
         backendTime =
           ele.sealing_version_time === '' ? '' : dayjs(ele.sealing_version_time).format('HH:mm:ss');
-        bacnkendColor = ele.sealing_version === '1' ? '#2BF541' : 'orange';
+        if (backendValue === "已封版") {
+          bacnkendColor = '#2BF541';
+        } else if (backendValue === "未封版") {
+          bacnkendColor = 'orange';
+        }
+
+        // bacnkendColor = ele.sealing_version === '1' ? '#2BF541' : 'orange';
       }
     });
 

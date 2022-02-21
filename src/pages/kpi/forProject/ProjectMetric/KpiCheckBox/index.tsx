@@ -2,14 +2,21 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2022-02-11 10:20:04
+ * @LastEditTime: 2022-02-21 09:30:19
  * @LastEditors: jieTan
  * @LastModify:
  */
 import { Checkbox, Divider } from 'antd';
 import { useState, useEffect } from 'react';
 import { useModel } from 'umi';
-import { GQL_PARAMS, PROJ_METRIC as PM, PK_SEARCH_INTERVAL, MOMENT_FORMAT } from '@/namespaces';
+import {
+  GQL_PARAMS,
+  PROJ_METRIC as PM,
+  PK_SEARCH_INTERVAL,
+  MOMENT_FORMAT,
+  PK_SHOW_DEFAULT_DATE,
+  PK_EXCLUDE_DEMO_NAME,
+} from '@/namespaces';
 import {
   ProcessDeviationGroup,
   ProcessQualityGroup,
@@ -22,6 +29,8 @@ import {
 import { projectKpiGql, queryGQL } from '@/pages/gqls';
 import { useGqlClient } from '@/hooks';
 import moment from 'moment';
+import { history as myHistory } from 'umi';
+import { useMount } from 'ahooks';
 
 const CheckboxGroup = Checkbox.Group;
 // checkbox框的文本值
@@ -39,6 +48,9 @@ export default () => {
   const [checkAll, setCheckAll] = useState(false);
   const { setGqlData, setDynamicCols, setLoading, setPkGqlParmas, pkGqlParmas } =
     useModel('projectMetric');
+
+  //
+  let hasMount = false;
 
   /*  */
   const onChange = (list: any) => {
@@ -107,18 +119,25 @@ export default () => {
     }
 
     // gql查询数据
-    const tmpParams = {
-      kpis: kpiItems,
-      dates: {
-        start: moment()
-          .subtract(PK_SEARCH_INTERVAL.value, PK_SEARCH_INTERVAL.unit as any)
-          .format(MOMENT_FORMAT.date),
-      }, // 构建默认查询参数 - 带查询时间
-    };
+    const tmpParams = { kpis: kpiItems };
+    // 判定是否需要默认的筛选时间
+    if (PK_SHOW_DEFAULT_DATE)
+      Object.assign(tmpParams, {
+        dates: {
+          start: moment()
+            .subtract(PK_SEARCH_INTERVAL.value, PK_SEARCH_INTERVAL.unit as any)
+            .format(MOMENT_FORMAT.date),
+        }, // 构建默认查询参数 - 带查询时间
+      });
     //
-    const newParams: any = pkGqlParmas ? { ...(pkGqlParmas as any), kpis: kpiItems } : tmpParams;
+    const newParams: any = hasMount ? { ...(pkGqlParmas as any), kpis: kpiItems } : tmpParams;
     setPkGqlParmas(newParams);
     const _params: GQL_PARAMS = { func: 'projectKpi', params: newParams };
+    // **************************************************
+    // 绑定预演数据
+    if (!(myHistory as any).location.query[PK_EXCLUDE_DEMO_NAME])
+      Object.assign(_params.params, { demo: true });
+    // **************************************************
     const ret = await queryGQL(gqlClient, projectKpiGql, _params);
 
     // 更改当前gird的数据源
@@ -132,6 +151,10 @@ export default () => {
     setLoading(true);
     loadOnDemand();
   }, [checkedList]);
+  //
+  useMount(() => {
+    hasMount = true;
+  });
 
   /*  */
   return (

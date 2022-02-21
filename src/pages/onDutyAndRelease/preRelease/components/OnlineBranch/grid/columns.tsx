@@ -379,23 +379,30 @@ const sealStatusRenderer = (params: any) => {
   }
 
   const values = params.value;
+  const datas = params.data;
   // 代表只有前端或者只有后端
-  if (values.length === 1) {
-    const arrayData = values[0];
+  if (datas.technical_side === "1" || datas.technical_side === "2") {
+
     let side = '';
-    if (arrayData.technical_side === '1') {
-      // 是前端
-      side = '前端：';
-    } else if (arrayData.technical_side === '2') {
-      // 是后端
-      side = '后端：';
-    }
+    let status = "";
+    let sideColor = "";
+    let time = "";
+    const arrayData = values[0];
+    values.forEach((ele: any) => {
 
-    const status = arrayData.sealing_version === '1' ? '已封版' : '未封版';
-    const sideColor = arrayData.sealing_version === '1' ? '#2BF541' : 'orange';
-    const time =
-      arrayData.sealing_version_time === '' ? '' : dayjs(arrayData.sealing_version_time).format('HH:mm:ss');
-
+      if (ele.technical_side === datas.technical_side) {
+        if (arrayData.technical_side === '1') {
+          // 是前端
+          side = '前端：';
+        } else if (arrayData.technical_side === '2') {
+          // 是后端
+          side = '后端：';
+        }
+        status = arrayData.sealing_version === '1' ? '已封版' : '未封版';
+        sideColor = arrayData.sealing_version === '1' ? '#2BF541' : 'orange';
+        time = arrayData.sealing_version_time === '' ? '' : dayjs(arrayData.sealing_version_time).format('HH:mm:ss');
+      }
+    });
     return `
         <div style="margin-top: -20px">
             <div style=" margin-top: 20px;font-size: 10px">
@@ -407,7 +414,8 @@ const sealStatusRenderer = (params: any) => {
   }
 
   // 证明有前后端
-  if (values.length === 2) {
+  // if (values.length === 2) {
+  if (datas.technical_side === "3") {
     let frontValue = '';
     let frontTime = '';
     let frontColor = 'orange';
@@ -445,12 +453,38 @@ const sealStatusRenderer = (params: any) => {
   return `<div></div>`;
 };
 
-// 封板状态
+// 程序分支拉取时间
 const branchGitTime = (params: any) => {
   const datas = params.data;
+  // if (datas.branch_front_create_time || datas.branch_create_time) {
+
+  // 只有前端
+  if (datas.technical_side === "1") {
+    return `
+        <div style="margin-top: -20px">
+            <div style=" margin-top: 20px;font-size: 10px">
+                <div>前端： <label> ${datas.branch_front_create_time}</label> </div>
+            </div>
+
+        </div>
+    `;
+  }
+  // 只有后端
+  if (datas.technical_side === "2") {
+    return `
+        <div style="margin-top: -20px">
+            <div style=" margin-top: 20px;font-size: 10px">
+                <div>后端： <label> ${datas.branch_create_time}</label> </div>
+            </div>
+
+        </div>
+    `;
+  }
 
   // 有前后端
-  if (datas.branch_front_create_time && datas.branch_create_time) {
+  // if (datas.branch_front_create_time && datas.branch_create_time) {
+  if (datas.technical_side === "3") {
+
     return `
         <div style="margin-top: -20px">
             <div style=" margin-top: 20px;font-size: 10px">
@@ -458,25 +492,6 @@ const branchGitTime = (params: any) => {
                 <div style="margin-top: -20px">
                 后端：<label  > ${datas.branch_create_time}</label></div>
             </div>
-        </div>
-    `;
-  }
-
-  if (datas.branch_front_create_time || datas.branch_create_time) {
-    // 如果只有前端或者只有后端
-    let values = datas.branch_create_time;
-    let side = '后端:';
-    if (datas.branch_front_create_time) {
-      side = '前端:';
-      values = datas.branch_front_create_time;
-    }
-
-    return `
-        <div style="margin-top: -20px">
-            <div style=" margin-top: 20px;font-size: 10px">
-                <div>${side} <label> ${values}</label> </div>
-            </div>
-
         </div>
     `;
   }

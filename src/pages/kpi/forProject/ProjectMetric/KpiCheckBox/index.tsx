@@ -2,7 +2,7 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2022-02-21 09:30:19
+ * @LastEditTime: 2022-02-21 10:16:03
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -30,7 +30,7 @@ import { projectKpiGql, queryGQL } from '@/pages/gqls';
 import { useGqlClient } from '@/hooks';
 import moment from 'moment';
 import { history as myHistory } from 'umi';
-import { useMount } from 'ahooks';
+import { useUnmount } from 'ahooks';
 
 const CheckboxGroup = Checkbox.Group;
 // checkbox框的文本值
@@ -48,9 +48,6 @@ export default () => {
   const [checkAll, setCheckAll] = useState(false);
   const { setGqlData, setDynamicCols, setLoading, setPkGqlParmas, pkGqlParmas } =
     useModel('projectMetric');
-
-  //
-  let hasMount = false;
 
   /*  */
   const onChange = (list: any) => {
@@ -130,7 +127,7 @@ export default () => {
         }, // 构建默认查询参数 - 带查询时间
       });
     //
-    const newParams: any = hasMount ? { ...(pkGqlParmas as any), kpis: kpiItems } : tmpParams;
+    const newParams: any = pkGqlParmas ? { ...(pkGqlParmas as any), kpis: kpiItems } : tmpParams;
     setPkGqlParmas(newParams);
     const _params: GQL_PARAMS = { func: 'projectKpi', params: newParams };
     // **************************************************
@@ -150,10 +147,12 @@ export default () => {
     // 选中指标变化事时，更改数据源
     setLoading(true);
     loadOnDemand();
+    //
   }, [checkedList]);
-  //
-  useMount(() => {
-    hasMount = true;
+
+  // 卸载前,清空查询参数
+  useUnmount(() => {
+    setPkGqlParmas(null);
   });
 
   /*  */

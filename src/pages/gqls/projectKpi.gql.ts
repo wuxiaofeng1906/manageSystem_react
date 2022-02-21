@@ -2,7 +2,7 @@
  * @Description: 项目度量指标
  * @Author: jieTan
  * @Date: 2021-12-02 11:41:52
- * @LastEditTime: 2022-02-10 07:25:41
+ * @LastEditTime: 2022-02-21 10:04:43
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -55,8 +55,8 @@ export default (args: GQL_PARAMS, funcWithParams: Function): [string, string] =>
         total
       }
       scaleProductivity{
-        actualValue
-        actualRatio
+        planValue
+        planRatio
       }
       reviewDefect {
         storyPreReview

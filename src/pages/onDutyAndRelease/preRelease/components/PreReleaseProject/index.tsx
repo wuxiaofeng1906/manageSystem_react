@@ -13,13 +13,15 @@ import {getLockStatus, deleteLockStatus} from '../../lock/rowLock';
 import {savePreProjects} from './axiosRequest';
 import {showProgressData} from '../../components/CheckProgress/processAnalysis';
 import {getCheckProcess} from '../../components/CheckProgress/axiosRequest';
+import {modifyTabsName} from "@/pages/onDutyAndRelease/preRelease/components/Tab/axiosRequest";
+import {alalysisInitData} from "@/pages/onDutyAndRelease/preRelease/datas/dataAnalyze";
 
 const userLogins: any = localStorage.getItem('userLogins');
 const usersInfo = JSON.parse(userLogins);
 
 const PreReleaseProject: React.FC<any> = () => {
   // 获取当前页面的进度数据
-  const {tabsData, preReleaseData, modifyProcessStatus, lockedItem, modifyLockedItem} =
+  const {tabsData, setTabsData, preReleaseData, modifyProcessStatus, lockedItem, modifyLockedItem} =
     useModel('releaseProcess');
   const [saveButtonDisable, setSaveButtonDisable] = useState(false); // 保存按钮是否可用
   const [formForPreReleaseProject] = Form.useForm(); // 预发布
@@ -28,6 +30,50 @@ const PreReleaseProject: React.FC<any> = () => {
   const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
   const releaseWayArray = useRequest(() => loadReleaseWaySelect()).data;
 
+  // 保存tab名
+  const saveModifyName = async (activeKey: string, newTabName: string) => {
+    // 被修改的一定是当前activekey中的数据
+    const result = await modifyTabsName(activeKey, newTabName);
+    if (result === '') {
+      //   重置tab名
+      const {tabPageInfo} = await alalysisInitData('tabPageInfo', '');
+      if (tabPageInfo) {
+        setTabsData(tabsData.activeKey, tabPageInfo.panes);
+      }
+    } else {
+      message.error({
+        content: result,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+  };
+
+  // 自动修改tab名
+  const autoModifyTabsName = (pulishType: any) => {
+
+    // 获取当前标签页的真实名字
+    const {activeKey} = tabsData;
+    let activeTitle = "";
+    if (tabsData.panes && (tabsData.panes).length > 0) {
+      (tabsData.panes).forEach((ele: any) => {
+        if (activeKey === ele.key) {
+          activeTitle = (ele.title).toString();
+        }
+
+      });
+    }
+
+    // 判断选择的是灰度发布还是正式发布
+    if (activeTitle === `${activeKey}正式预发布` && pulishType === "1") { // 灰度发布
+      saveModifyName(activeKey, `${activeKey}灰度预发布`);
+
+    } else if (activeTitle === `${activeKey}灰度预发布` && pulishType === "2") { // 正式发布
+      saveModifyName(activeKey, `${activeKey}正式预发布`);
+    }
+  };
   // 保存预发布项目
   const savePreRelaseProjects = async () => {
     const datas = formForPreReleaseProject.getFieldsValue();
@@ -51,6 +97,13 @@ const PreReleaseProject: React.FC<any> = () => {
       if (processData) {
         modifyProcessStatus(showProgressData(processData.data));
       }
+
+      debugger;
+      // 保存成功后需要判断tab标签有没有被修改过，如果有，则跳过，如果没有，上面的标签名字需要与发布类型同步，
+      // 发布类型为正式发布，标签页需要改为xxxxxx正式预发布，如果是灰度发布，则改为xxxxx灰度预发布。
+      autoModifyTabsName(datas.pulishType);
+
+
     } else {
       message.error({
         content: result.errorMessage,
@@ -73,7 +126,7 @@ const PreReleaseProject: React.FC<any> = () => {
 
     modifyLockedItem(`${tabsData.activeKey}-step1-project-${proId}`); // 如果是被锁了保存当前被锁的id
     const lockInfo = await getLockStatus(`${tabsData.activeKey}-step1-project-${proId}`);
-    console.log(lockInfo,`${tabsData.activeKey}-step1-project-${proId}`);
+    console.log(lockInfo, `${tabsData.activeKey}-step1-project-${proId}`);
     if (lockInfo.errMessage) {
       const userInfo: any = lockInfo.data;
       if (userInfo.user_id !== usersInfo.userid) {

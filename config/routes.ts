@@ -457,7 +457,7 @@ export default [
         path: 'releaseHistory',
         // access: 'sysAdmin',
         component: './onDutyAndRelease/releaseHistory',
-        // hideInMenu: true
+        hideInMenu: true
       }
     ],
   },

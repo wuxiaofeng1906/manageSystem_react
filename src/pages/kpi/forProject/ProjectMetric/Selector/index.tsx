@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-02-21 09:29:38
+ * @LastEditTime: 2022-02-21 10:21:10
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -49,13 +49,13 @@ const defaultDateStr: [string, any] = [defaultDateRange[0]?.format(MOMENT_FORMAT
 //
 let dateStr: [string, any] | undefined = defaultDateStr; // 存放时间range信息
 let doChange = false;
-// const defaultSeclectItems = { deptIds: [], projIds: [], dates: defaultDateRange, doQuery: false };
-let projChange = true; // 记录特性项目的列表是否应该发生变化
+
 /* ************************************************************************************************************** */
 export default () => {
   /* 数据区 */
   //
   const defaultSeclectItems = { deptIds: [], projIds: [], dates: defaultDateRange, doQuery: false };
+  let projChange = true; // 记录特性项目的列表是否应该发生变化
   //
   const gqlClient = useGqlClient(); // 必须提前初始化该对象
   const [projElems, setProjElems] = useState(null); // 保存项目信息

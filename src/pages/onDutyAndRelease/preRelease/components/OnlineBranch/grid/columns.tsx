@@ -460,10 +460,14 @@ const branchGitTime = (params: any) => {
 
   // 只有前端
   if (datas.technical_side === "1") {
+    let values = "";
+    if (datas.branch_front_create_time) {
+      values = datas.branch_front_create_time;
+    }
     return `
         <div style="margin-top: -20px">
             <div style=" margin-top: 20px;font-size: 10px">
-                <div>前端： <label> ${datas.branch_front_create_time}</label> </div>
+                <div>前端： <label> ${values}</label> </div>
             </div>
 
         </div>
@@ -471,10 +475,14 @@ const branchGitTime = (params: any) => {
   }
   // 只有后端
   if (datas.technical_side === "2") {
+    let values = "";
+    if (datas.branch_create_time) {
+      values = datas.branch_create_time;
+    }
     return `
         <div style="margin-top: -20px">
             <div style=" margin-top: 20px;font-size: 10px">
-                <div>后端： <label> ${datas.branch_create_time}</label> </div>
+                <div>后端： <label> ${values}</label> </div>
             </div>
 
         </div>
@@ -484,13 +492,22 @@ const branchGitTime = (params: any) => {
   // 有前后端
   // if (datas.branch_front_create_time && datas.branch_create_time) {
   if (datas.technical_side === "3") {
+    let front_value = "";
+    if (datas.branch_front_create_time) {
+      front_value = datas.branch_front_create_time;
+    }
+
+    let backend_value = "";
+    if (datas.branch_create_time) {
+      backend_value = datas.branch_create_time;
+    }
 
     return `
         <div style="margin-top: -20px">
             <div style=" margin-top: 20px;font-size: 10px">
-                <div>前端：<label> ${datas.branch_front_create_time}</label></div>
+                <div>前端：<label> ${front_value}</label></div>
                 <div style="margin-top: -20px">
-                后端：<label  > ${datas.branch_create_time}</label></div>
+                后端：<label  > ${backend_value}</label></div>
             </div>
         </div>
     `;

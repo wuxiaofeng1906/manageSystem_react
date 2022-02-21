@@ -2,7 +2,7 @@
  * @Description: 通用常量
  * @Author: jieTan
  * @Date: 2021-11-23 15:51:13
- * @LastEditTime: 2022-02-19 02:41:54
+ * @LastEditTime: 2022-02-21 09:26:02
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -68,6 +68,10 @@ export const PK_TREE_DEPTS = [130, 66, 82, 114, 81];
 // 禅道执行的设置页
 export const ztExectionUrl = (eId: number) =>
   `http://zentao.77hub.com/zentao/execution-view-${eId}.html`;
+// 筛选是否显示默认时间
+export const PK_SHOW_DEFAULT_DATE = false;
+// 预演路径名称
+export const PK_EXCLUDE_DEMO_NAME = 'notDemo';
 
 /*  */
 // 分母默认值

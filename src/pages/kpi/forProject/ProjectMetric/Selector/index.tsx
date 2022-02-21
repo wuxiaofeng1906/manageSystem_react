@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-02-19 10:35:34
+ * @LastEditTime: 2022-02-21 09:29:38
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -22,29 +22,41 @@ import {
 import { mySelector } from './index.css';
 import { useMount } from 'ahooks';
 import { useGqlClient } from '@/hooks';
-import { GQL_PARAMS, GRAPHQL_QUERY, MOMENT_FORMAT, PK_SEARCH_INTERVAL } from '@/namespaces';
+import {
+  GQL_PARAMS,
+  GRAPHQL_QUERY,
+  MOMENT_FORMAT,
+  PK_SEARCH_INTERVAL,
+  PK_EXCLUDE_DEMO_NAME,
+  PK_SHOW_DEFAULT_DATE,
+} from '@/namespaces';
 import React, { useEffect, useState } from 'react';
 import { useModel } from 'umi';
 import { projectKpiGql, organizationGql, queryGQL } from '@/pages/gqls';
 import { ColumnHeightOutlined, ReloadOutlined } from '@ant-design/icons';
 import { deptTreeNodes, onDateChange, onTreeMultiChange, projOptsElems } from './extra';
-import { Moment } from 'moment';
 import moment from 'moment';
+import { history as myHistory } from 'umi';
 
 /* 默认的时间 */
-const defaultDateRange: [Moment, any] = [
-  moment().subtract(PK_SEARCH_INTERVAL.value, PK_SEARCH_INTERVAL.unit as any),
+const defaultDateRange: [any, any] = [
+  PK_SHOW_DEFAULT_DATE
+    ? moment().subtract(PK_SEARCH_INTERVAL.value, PK_SEARCH_INTERVAL.unit as any)
+    : null,
   null,
 ]; // date组件默认显示
-const defaultDateStr: [string, any] = [defaultDateRange[0].format(MOMENT_FORMAT.date), null];
+const defaultDateStr: [string, any] = [defaultDateRange[0]?.format(MOMENT_FORMAT.date), null];
 //
 let dateStr: [string, any] | undefined = defaultDateStr; // 存放时间range信息
 let doChange = false;
-const defaultSeclectItems = { deptIds: [], projIds: [], dates: defaultDateRange, doQuery: false };
+// const defaultSeclectItems = { deptIds: [], projIds: [], dates: defaultDateRange, doQuery: false };
 let projChange = true; // 记录特性项目的列表是否应该发生变化
 /* ************************************************************************************************************** */
 export default () => {
   /* 数据区 */
+  //
+  const defaultSeclectItems = { deptIds: [], projIds: [], dates: defaultDateRange, doQuery: false };
+  //
   const gqlClient = useGqlClient(); // 必须提前初始化该对象
   const [projElems, setProjElems] = useState(null); // 保存项目信息
   const [treeData, setTreeData] = useState([]); // 部门树形结构的数据
@@ -116,6 +128,11 @@ export default () => {
     };
 
     // 数据查询
+    // **************************************************
+    // 绑定预演数据
+    if (!(myHistory as any).location.query[PK_EXCLUDE_DEMO_NAME])
+      Object.assign(params.params, { demo: true });
+    // **************************************************
     const rets = (await queryGQL(gqlClient, projectKpiGql, params)) ?? [];
     setGqlData(rets);
   };

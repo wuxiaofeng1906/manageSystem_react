@@ -1,12 +1,11 @@
 import axios from "axios";
 
-const getGrayscaleListData = async () => {
-
+const getGrayscaleListData = async (paramData: any) => {
   const result: any = {
     message: "",
     data: []
   };
-  await axios.get('/api/verify/release/release_list', {})
+  await axios.get('/api/verify/release/release_list', {params: paramData})
     .then(function (res) {
       if (res.data.code === 200) {
         result.data = res.data.data;

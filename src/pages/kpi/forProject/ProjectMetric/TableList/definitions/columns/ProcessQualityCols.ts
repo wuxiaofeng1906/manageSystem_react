@@ -2,7 +2,7 @@
  * @Description: 项目过程质量的字段
  * @Author: jieTan
  * @Date: 2021-11-29 15:47:07
- * @LastEditTime: 2022-02-19 12:50:17
+ * @LastEditTime: 2022-02-21 10:33:53
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -80,7 +80,7 @@ export const ProcessQualityCols: ColDef[] = [
     ...defaultParmas,
   },
   {
-    headerName: '加权遗留DI',
+    headerName: '加权遗留缺陷密度',
     headerTooltip: '加权遗留缺陷密度',
     field: `${moduleName}.weightedLegacyDI`,
     columnGroupShow: SHOW['closed'],

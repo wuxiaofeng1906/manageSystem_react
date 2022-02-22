@@ -605,7 +605,7 @@ const getReviewDefectColumns = () => {
       //   return params.value;
       // },
       cellRenderer: (params: any) => {
-        if (params.value === "加权有效问题密度" || params.value === "加权有效缺陷密度") {
+        if (params.value === "加权有效问题率" || params.value === "加权有效缺陷密度") {
           return `<span style="font-weight: bold">${params.value}</span>`
         }
         // 只要发现缺陷数为0或者空，这个值也需要为空

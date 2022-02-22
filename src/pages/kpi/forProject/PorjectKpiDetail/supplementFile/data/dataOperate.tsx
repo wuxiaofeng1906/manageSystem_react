@@ -279,7 +279,7 @@ const dealExpleAndCodereview = (sourceData: any) => {
     foundDN: "发现问题数",
     weightDN: "加权有效问题数",
     funcPoint: "功能点",
-    defectDensity: "加权有效问题密度",
+    defectDensity: "加权有效问题率",
     reviewHour: "评审用时",
     reviewRatio: "评审效率",
     description: "说明"

@@ -262,7 +262,7 @@ const getReviewDefectTable = (data: any) => {
           }
         }
         if (ele.defectDensity) {
-          if (ele.defectDensity === "加权有效问题密度" || ele.defectDensity === "加权有效缺陷密度") {
+          if (ele.defectDensity === "加权有效问题率" || ele.defectDensity === "加权有效缺陷密度") {
             defectDensity = ele.defectDensity;
           } else {
             defectDensity = Number(ele.defectDensity).toFixed(2);

@@ -455,9 +455,9 @@ export default [
         name: '发布历史',
         icon: 'table',
         path: 'releaseHistory',
-        // access: 'sysAdmin',
+        access: 'sysAdmin',
         component: './onDutyAndRelease/releaseHistory',
-        hideInMenu: true
+        // hideInMenu: true
       }
     ],
   },

@@ -13,6 +13,7 @@ const {TabPane} = Tabs;
 
 const Tab: React.FC<any> = () => {
   const {
+    operteStatus,
     tabsData, setTabsData, modifyProcessStatus, modifyPreReleaseData,
     setRelesaeItem, setUpgradeApi, setUpgradeConfirm, modifyReleasedID,
     setDataReview, setDataReviewConfirm, setOnlineBranch, setCorrespOrder,
@@ -152,6 +153,17 @@ const Tab: React.FC<any> = () => {
 
   // 删除tab
   const removeTabs = (targetKeys: any) => {
+    if (operteStatus) {
+      message.error({
+        content: '页面已发布完成，不能删除！',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
     setShowTabs({
       shown: true,
       targetKey: targetKeys,

@@ -21,7 +21,7 @@ const DataRepaireReview: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const {
     tabsData, modifyProcessStatus, dataReview, allLockedArray,
-    setDataReview, dataReviewConfirm, lockedItem, modifyLockedItem
+    setDataReview, dataReviewConfirm, lockedItem, modifyLockedItem,operteStatus
   } = useModel('releaseProcess');
 
   /* region 数据修复review */
@@ -44,6 +44,19 @@ const DataRepaireReview: React.FC<any> = () => {
 
   // 数据修复review弹出窗口进行修改和新增
   (window as any).showDataRepaireForm = async (type: any, params: any) => {
+    // 是否是已完成发布
+    if (operteStatus) {
+      message.error({
+        content: `发布已完成，不能进行新增和修改！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
+
     if (type === 'add') {
       dataReviewForm.resetFields();
       setDataReviewModal({
@@ -307,6 +320,7 @@ const DataRepaireReview: React.FC<any> = () => {
                           onChange={(newValue: any) => {
                             saveDataRepaireConfirmInfo(newValue, props.data);
                           }}
+                          disabled={operteStatus}
                         >
                           <Option key={'1'} value={'1'}>
                             是

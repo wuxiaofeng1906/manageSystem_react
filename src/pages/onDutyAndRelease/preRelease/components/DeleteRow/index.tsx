@@ -11,11 +11,31 @@ import {showReleasedId} from "@/pages/onDutyAndRelease/preRelease/components/Upg
 const DeleteRow: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const {
-    tabsData, delModal, setDelModal, modifyReleasedID, setRelesaeItem, setUpgradeApi, setDataReview, setOnlineBranch
+    tabsData,
+    delModal,
+    setDelModal,
+    modifyReleasedID,
+    setRelesaeItem,
+    setUpgradeApi,
+    setDataReview,
+    setOnlineBranch,
+    operteStatus
   } = useModel('releaseProcess');
 
   // 删除事件
   (window as any).deleteGridRows = async (item: any, params: any) => {
+    // 是否是已完成发布
+    if (operteStatus) {
+      message.error({
+        content: `发布已完成，不能进行删除！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
 
     const flag = await vertifyModifyFlag(item, tabsData.activeKey);
     if (!flag) {

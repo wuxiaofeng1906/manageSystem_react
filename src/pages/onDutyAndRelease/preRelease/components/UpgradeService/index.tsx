@@ -35,7 +35,7 @@ const usersInfo = JSON.parse(userLogins);
 const UpgradeService: React.FC<any> = () => {
   const {
     tabsData, modifyProcessStatus, releaseItem, upgradeApi, upgradeConfirm, lockedItem, modifyLockedItem,
-    setRelesaeItem, setUpgradeApi, releasedID, modifyReleasedID, allLockedArray
+    setRelesaeItem, setUpgradeApi, releasedID, modifyReleasedID, allLockedArray, operteStatus
   } = useModel('releaseProcess');
   const [formUpgradeService] = Form.useForm(); // 升级服务
   const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
@@ -182,6 +182,18 @@ const UpgradeService: React.FC<any> = () => {
   });
 
   (window as any).showPulishItemForm = async (type: any, params: any) => {
+    // 是否是已完成发布
+    if (operteStatus) {
+      message.error({
+        content: `发布已完成，不能进行修改！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
     // 验证是否已经确认服务，如果已经确认了，就不能新增和修改了
     const flag = await vertifyModifyFlag(1, tabsData.activeKey);
     if (!flag) {
@@ -335,6 +347,20 @@ const UpgradeService: React.FC<any> = () => {
 
   // 发布接口弹出窗口进行修改和新增
   (window as any).showUpgradeApiForm = async (type: any, params: any) => {
+
+    // 是否是已完成发布
+    if (operteStatus) {
+      message.error({
+        content: `发布已完成，不能进行新增和修改！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
+
     const flag = await vertifyModifyFlag(2, tabsData.activeKey);
     if (!flag) {
       message.error({
@@ -575,6 +601,7 @@ const UpgradeService: React.FC<any> = () => {
                         marginLeft: 10,
                         marginTop: 3,
                       }}
+                      disabled={operteStatus}
                       onClick={inquireServiceClick}
                     >
                       点击查询
@@ -707,6 +734,7 @@ const UpgradeService: React.FC<any> = () => {
                           onChange={(newValue: any) => {
                             saveUperConfirmInfo(newValue, props);
                           }}
+                          disabled={operteStatus}
                         >
                           <Option key={'1'} value={'1'}>
                             是

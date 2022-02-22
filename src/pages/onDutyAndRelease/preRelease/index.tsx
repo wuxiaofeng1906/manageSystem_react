@@ -22,26 +22,29 @@ import {history} from "@@/core/history";
 let currentKey: any;
 let currentPanes: any;
 const PreRelease: React.FC<any> = () => {
-  // 获取当前链接是否有携带预发布编号（就是区分是否从历史记录跳转过来的），
-  const location = history.location.query;
-  let releasedNumStr = '';
-  if (JSON.stringify(location) !== '{}' && location) {
-    releasedNumStr = location?.releasedNum === null ? '' : (location?.releasedNum).toString();
-
-  }
-  // 查询数据
-  // const initData = useRequest(() => alalysisInitData('', releasedNumStr)).data;
-
-  const {data, loading} = useRequest(() => alalysisInitData('', releasedNumStr));
-  console.log(11111);
-
   // Tab标签数据显示
   const {
+    modifyOperteStatus,
     tabsData, setTabsData, modifyProcessStatus, modifyPreReleaseData, lockedItem,
     setRelesaeItem, setUpgradeApi, setUpgradeConfirm, modifyReleasedID,
     setDataReview, setDataReviewConfirm, setOnlineBranch, setCorrespOrder,
     modifyAllLockedArray
   } = useModel('releaseProcess');
+
+  // 获取当前链接是否有携带预发布编号（就是区分是否从历史记录跳转过来的），
+  const location = history.location.query;
+  let releasedNumStr = '';
+  if (JSON.stringify(location) !== '{}' && location) {
+    releasedNumStr = location?.releasedNum === null ? '' : (location?.releasedNum).toString();
+    if (releasedNumStr) {
+      modifyOperteStatus(true);
+    }
+  }
+  // 查询数据
+  // const initData = useRequest(() => alalysisInitData('', releasedNumStr)).data;
+
+  const {data, loading} = useRequest(() => alalysisInitData('', releasedNumStr));
+
 
   // 用于定时任务显示数据，定是个hi任务useEffect中渲染了一次。不能实时更新
   currentKey = tabsData.activeKey;

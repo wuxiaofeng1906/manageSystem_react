@@ -24,6 +24,13 @@ export default () => {
     setReleasedID({oraID, queryId});
   }, []);
 
+
+  // 控件是否可用
+  const [operteStatus, setOperteStatus] = useState(false);
+  const modifyOperteStatus = useCallback((values: boolean) => {
+    setOperteStatus(values);
+  }, []);
+
   /* endregion */
 
   /* region tab 数据 */
@@ -105,6 +112,7 @@ export default () => {
   /* endregion  */
 
   return {
+    operteStatus, modifyOperteStatus, // 页面中按钮是否可用
     lockedItem, modifyLockedItem, // 当前被锁的id
     allLockedArray, modifyAllLockedArray, // 所有被锁的ID
     releasedID, modifyReleasedID, // 已选中的一键部署ID

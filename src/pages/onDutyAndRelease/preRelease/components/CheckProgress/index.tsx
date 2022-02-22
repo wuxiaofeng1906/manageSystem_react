@@ -7,7 +7,7 @@ const {Option} = Select;
 
 const CheckProgress: React.FC<any> = () => {
   // 获取当前页面的进度数据
-  const {tabsData, processStatus, modifyProcessStatus} = useModel('releaseProcess');
+  const {tabsData, processStatus, modifyProcessStatus, operteStatus} = useModel('releaseProcess');
   // 发布结果修改
   const pulishResulttChanged = async (params: any) => {
     // 需要验证前面的检查是否全部成功(前三个成功即可)。
@@ -123,6 +123,7 @@ const CheckProgress: React.FC<any> = () => {
               style={{width: 100}}
               onChange={pulishResulttChanged}
               value={processStatus.releaseResult}
+              disabled={operteStatus}
             >
               <Option key={'1'} value={'1'}>
                 发布成功

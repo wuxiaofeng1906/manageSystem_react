@@ -27,7 +27,7 @@ const OnlineBranch: React.FC<any> = () => {
   const [formForOnlineBranch] = Form.useForm(); // 上线分支设置
   const firstOnlineBranchGridApi = useRef<GridApi>();
   const {
-    tabsData, lockedItem, modifyLockedItem, onlineBranch, setOnlineBranch, allLockedArray
+    tabsData, lockedItem, modifyLockedItem, onlineBranch, setOnlineBranch, allLockedArray, operteStatus
   } = useModel('releaseProcess');
   const [executeStatus, setExecuteStatus] = useState(false); // 上线分支点击执行后的进度展示
   const [onlineBranchModal, setOnlineBranchModal] = useState({
@@ -131,6 +131,19 @@ const OnlineBranch: React.FC<any> = () => {
 
   // 上线分支弹出窗口进行修改和新增
   (window as any).showOnlineBranchForm = async (type: any, params: any) => {
+    // 是否是已完成发布
+    if (operteStatus) {
+      message.error({
+        content: `发布已完成，不能进行新增和修改！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
+
     if (type === 'add') {
       formForOnlineBranch.resetFields();
       formForOnlineBranch.setFieldsValue({

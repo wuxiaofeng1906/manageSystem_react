@@ -21,9 +21,8 @@ const usersInfo = JSON.parse(userLogins);
 
 const PreReleaseProject: React.FC<any> = () => {
   // 获取当前页面的进度数据
-  const {tabsData, setTabsData, preReleaseData, modifyProcessStatus, lockedItem, modifyLockedItem} =
+  const {tabsData, setTabsData, preReleaseData, modifyProcessStatus, lockedItem, modifyLockedItem, operteStatus} =
     useModel('releaseProcess');
-  const [saveButtonDisable, setSaveButtonDisable] = useState(false); // 保存按钮是否可用
   const [formForPreReleaseProject] = Form.useForm(); // 预发布
 
   const projectsArray = useRequest(() => loadPrjNameSelect()).data;
@@ -98,7 +97,7 @@ const PreReleaseProject: React.FC<any> = () => {
         modifyProcessStatus(showProgressData(processData.data));
       }
 
-       // 保存成功后需要判断tab标签有没有被修改过，如果有，则跳过，如果没有，上面的标签名字需要与发布类型同步，
+      // 保存成功后需要判断tab标签有没有被修改过，如果有，则跳过，如果没有，上面的标签名字需要与发布类型同步，
       // 发布类型为正式发布，标签页需要改为xxxxxx正式预发布，如果是灰度发布，则改为xxxxx灰度预发布。
       autoModifyTabsName(datas.pulishType);
 
@@ -135,12 +134,7 @@ const PreReleaseProject: React.FC<any> = () => {
             marginTop: '50vh',
           },
         });
-        setSaveButtonDisable(true);
-      } else {
-        setSaveButtonDisable(false);
       }
-    } else {
-      setSaveButtonDisable(false);
     }
   };
 
@@ -168,7 +162,7 @@ const PreReleaseProject: React.FC<any> = () => {
             <div style={{float: 'right'}}>
               <Button
                 type="primary"
-                disabled={saveButtonDisable}
+                disabled={operteStatus}
                 style={{
                   color: '#46A0FC',
                   backgroundColor: '#ECF5FF',

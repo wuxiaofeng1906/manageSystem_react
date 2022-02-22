@@ -19,7 +19,7 @@ const grayscaleBacklogList = () => {
     field: 'ready_release_num',
     minWidth: 125,
     maxWidth: 150,
-    sort: "asc"
+    // sort: "asc"
   }, {
     headerName: '灰度发布名称',
     field: 'ready_release_name',
@@ -75,7 +75,7 @@ const releasedList = () => {
     field: 'ready_release_num',
     minWidth: 125,
     maxWidth: 150,
-    sort: "asc"
+    // sort: "asc"
   }, {
     headerName: '发布名称',
     field: 'ready_release_name',

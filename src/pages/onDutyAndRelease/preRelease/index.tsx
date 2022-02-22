@@ -27,13 +27,14 @@ const PreRelease: React.FC<any> = () => {
   let releasedNumStr = '';
   if (JSON.stringify(location) !== '{}' && location) {
     releasedNumStr = location?.releasedNum === null ? '' : (location?.releasedNum).toString();
-    debugger;
+
   }
   // 查询数据
   // const initData = useRequest(() => alalysisInitData('', releasedNumStr)).data;
 
   const {data, loading} = useRequest(() => alalysisInitData('', releasedNumStr));
-  debugger;
+  console.log(11111);
+
   // Tab标签数据显示
   const {
     tabsData, setTabsData, modifyProcessStatus, modifyPreReleaseData, lockedItem,

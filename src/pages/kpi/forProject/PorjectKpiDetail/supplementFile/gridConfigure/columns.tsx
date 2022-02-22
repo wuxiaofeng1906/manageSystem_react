@@ -269,9 +269,9 @@ const getStageWorkloadColumns = () => {
           return `<span style="color: orange">0</span>`;
         }
         if (values < 0) {
-          return `<span style="color: orange"> ${Math.abs(values)}</span>`;
+          return `<span style="color: orange"> ${Math.abs(values).toFixed(2)}</span>`;
         }
-        return values;
+        return values.toFixed(2);
       }
     },
     {
@@ -287,9 +287,9 @@ const getStageWorkloadColumns = () => {
           return `<span style="color: orange">0</span>`;
         }
         if (values < 0) {
-          return `<span style="color: orange"> ${Math.abs(values)}</span>`;
+          return `<span style="color: orange"> ${Math.abs(values).toFixed(2)}</span>`;
         }
-        return values;
+        return values.toFixed(2);
 
       }
     },

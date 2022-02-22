@@ -194,7 +194,7 @@ const WeekCodeTableList: React.FC<any> = (props: any) => {
       processQualityData: await queryProcessQuality(gqlClient, projectId),
       serviceData: await queryServices(gqlClient, projectId),
     }
-    exportToExcel(exportSourceData);
+    exportToExcel(exportSourceData,props.location.query.name);
 
 
   };

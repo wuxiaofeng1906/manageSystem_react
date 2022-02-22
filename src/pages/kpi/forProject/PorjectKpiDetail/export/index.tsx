@@ -25,8 +25,8 @@ const setTableTitleColor = (rowNum: number, sheet: any) => {
 };
 
 // Excel数据导出
-const exportToExcel = (data: any) => {
-  const sheetName = "项目指标";
+const exportToExcel = (data: any, title: string) => {
+  const sheetName = `项目指标-${title}`;
   // 1.创建工作薄
   const workbook = new ExcelJs.Workbook();
 

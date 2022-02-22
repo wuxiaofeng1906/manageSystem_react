@@ -1,12 +1,14 @@
 /* region 各个指标的Table定义 */
 // 1.进度指标数据
+import dayjs from "dayjs";
+
 const getProcessTable = (data: any) => {
   const column = [
     {name: "title"},
     {name: "里程碑"},
     {name: "计划开始时间"},
-    {name: "实际开始时间"},
     {name: "计划完成时间"},
+    {name: "实际开始时间"},
     {name: "实际完成时间"},
     {name: "偏差天数"},
     {name: "偏差率"},
@@ -25,16 +27,34 @@ const getProcessTable = (data: any) => {
         ratioValue = `${Number(ele.ratio).toFixed(2)}%`;
       }
 
+      // 计划开始时间
+      let planStart = "";
+      if (ele.planStart && ele.planStart !== "0000-00-00") {
+        planStart = dayjs(ele.planStart).format("YYYY-MM-DD");
+      }
+
+      // 计划完成时间
+      let planEnd = "";
+      if (ele.planEnd && ele.planEnd !== "0000-00-00") {
+        planEnd = dayjs(ele.planEnd).format("YYYY-MM-DD");
+      }
+
+      // 实际开始时间
+      let actualStart = "";
+      if (ele.actualStart && ele.actualStart !== "0000-00-00") {
+        actualStart = dayjs(ele.actualStart).format("YYYY-MM-DD");
+      }
+
+      // 实际完成时间
+      let actualEnd = "";
+      if (ele.actualEnd && ele.actualEnd !== "0000-00-00") {
+        actualEnd = dayjs(ele.actualEnd).format("YYYY-MM-DD");
+      }
+
       const currentRow: any = [
-        ele.title,
-        ele.milestone,
-        ele.planStart === "" ? "" : new Date(ele.planStart),
-        ele.actualStart === "" ? "" : new Date(ele.actualStart),
-        ele.planEnd === "" ? "" : new Date(ele.planEnd),
-        ele.actualEnd === "" ? "" : new Date(ele.actualEnd),
-        ele.days,
-        ratioValue,
-        ele.description];
+        ele.title, ele.milestone, planStart, planEnd,
+        actualStart, actualEnd, ele.days,
+        ratioValue, ele.description];
 
       rowData.push(currentRow);
     });
@@ -144,14 +164,27 @@ const getStageWorkloadTable = (data: any) => {
         actualWorkload = `${Number(ele.actualWorkload).toFixed(2)}`
       }
 
+      // 投入人力
+      let manpower = "";
+      if (ele.manpower) {
+        manpower = ele.manpower === -999999 ? "0" : Math.abs(ele.manpower).toString();
+      }
+
+      // 预计工时
+      let planHours = "";
+      if (ele.planHours) {
+        planHours = ele.planHours === -999999 ? "0" : Math.abs(ele.planHours).toString();
+      }
+      // 实际工时
+      let actualHours = "";
+      if (ele.actualHours) {
+        actualHours = ele.actualHours === -999999 ? "0" : Math.abs(ele.actualHours).toString();
+      }
+
       const currentRow: any = [
-        ele.title,
-        ele.stage,
-        ele.manpower === -999999 ? 0 : Math.abs(ele.manpower),
-        ele.planHours === -999999 ? 0 : Math.abs(ele.planHours),
-        ele.actualHours === -999999 ? 0 : Math.abs(ele.actualHours),
-        planWorkload,
-        actualWorkload,
+        ele.title, ele.stage,
+        manpower, planHours, actualHours,
+        planWorkload, actualWorkload,
         ele.description];
       rowData.push(currentRow);
     });

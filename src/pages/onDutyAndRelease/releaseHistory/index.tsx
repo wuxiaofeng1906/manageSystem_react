@@ -102,6 +102,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 发布详情
   (window as any).releaseProcessDetail = (releasedNum: string) => {
+
     if (releasedNum === "") {
       history.push(`/onDutyAndRelease/preRelease`);
     } else {
@@ -186,7 +187,7 @@ const ReleaseHistory: React.FC<any> = () => {
         </div>
 
         <button></button>
-        <div className="ag-theme-alpine" style={{marginTop:-21, height: releasedGridHight, width: '100%'}}>
+        <div className="ag-theme-alpine" style={{marginTop: -21, height: releasedGridHight, width: '100%'}}>
           <AgGridReact
             columnDefs={releasedList()} // 定义列
             rowData={releasedData?.data} // 数据绑定

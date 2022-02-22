@@ -600,12 +600,12 @@ const getOnlineBranchColumns = () => {
       minWidth: 160,
       cellRenderer: sealStatusRenderer,
     },
-    {
-      headerName: '程序分支拉取时间',
-      // field: 'branch_create_time',
-      minWidth: 160,
-      cellRenderer: branchGitTime,
-    },
+    // {     // 暂时不显示
+    //   headerName: '程序分支拉取时间',
+    //   // field: 'branch_create_time',
+    //   minWidth: 160,
+    //   cellRenderer: branchGitTime,
+    // },
     {
       headerName: '操作',
       pinned: 'right',

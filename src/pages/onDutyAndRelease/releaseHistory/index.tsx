@@ -162,46 +162,49 @@ const ReleaseHistory: React.FC<any> = () => {
       <div style={{marginTop: 20}}>
         <div
           style={{
-            height: "35px",
-            lineHeight: "35px",
-            width: "100%",
-            backgroundColor: "#F8F8F8",
+            height: "35px", lineHeight: "35px",
+            width: "100%", backgroundColor: "#F8F8F8",
             border: "solid 1px #CCCCCC",
           }}
         >
           <label style={{fontWeight: "bold", float: "left"}}>已正式发布列表</label>
-          {/* 发布类型 */}
-          <Form.Item label="发布时间:" name="pulishTime" style={{float: "right",marginLeft:10}}>
-            <RangePicker size={"small"} defaultValue={[moment(queryCondition.start), moment(queryCondition.end)]}
-                         onChange={onReleaseProject}/>
-          </Form.Item>
-          <Form.Item label="项目名称:" name="projectsName"
-                     style={{float: "right", minWidth: 300}}>
-            <Select size={"small"} showSearch mode="multiple" onChange={onProjectChanged}>
+          <div style={{textAlign: "right"}}>
+
+
+            <label> 项目名称:</label>
+            <Select size={"small"} showSearch mode="multiple" onChange={onProjectChanged}
+                    style={{minWidth: 300, marginLeft: 5}}>
               {projectsArray}
             </Select>
-          </Form.Item>
-        </div>
-        <div style={{clear: "right"}}>
-          <div className="ag-theme-alpine" style={{height: releasedGridHight, width: '100%'}}>
-            <AgGridReact
-              columnDefs={releasedList()} // 定义列
-              rowData={releasedData?.data} // 数据绑定
-              defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true,
-                suppressMenu: true,
-                cellStyle: {'line-height': '30px'},
-              }}
-              rowHeight={30}
-              headerHeight={35}
-              suppressRowTransform={true}
-              onGridReady={onReleasedGridReady}
-            >
-            </AgGridReact>
+            <label style={{marginLeft: 10}}>发布时间: </label>
+            <RangePicker style={{marginLeft: 5}} size={"small"}
+                         defaultValue={[moment(queryCondition.start), moment(queryCondition.end)]}
+                         onChange={onReleaseProject}/>
           </div>
+
+
         </div>
+
+        <button></button>
+        <div className="ag-theme-alpine" style={{marginTop:-21, height: releasedGridHight, width: '100%'}}>
+          <AgGridReact
+            columnDefs={releasedList()} // 定义列
+            rowData={releasedData?.data} // 数据绑定
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true,
+              suppressMenu: true,
+              cellStyle: {'line-height': '30px'},
+            }}
+            rowHeight={30}
+            headerHeight={35}
+            suppressRowTransform={true}
+            onGridReady={onReleasedGridReady}
+          >
+          </AgGridReact>
+        </div>
+
 
       </div>
 

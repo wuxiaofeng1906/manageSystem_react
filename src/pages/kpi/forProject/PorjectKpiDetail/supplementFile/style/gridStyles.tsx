@@ -24,19 +24,33 @@ const setProcessCellStyle = (params: any) => {
 
 // 2.需求稳定性
 const setStoryStabilityCellStyle = (params: any) => {
-  if (params.column?.colId === "ratio" || params.column?.colId === "title" || params.column?.colId === "stage") {
-    return grayCellStyle;
+  // 暂时设置只有说明可以修改
+  if (params.column?.colId === "description") {
+    return whiteCellStyle;
   }
-  return whiteCellStyle;
+  return grayCellStyle;
+
+  // if (params.column?.colId === "ratio" || params.column?.colId === "title" || params.column?.colId === "stage") {
+  //   return grayCellStyle;
+  // }
+  // return whiteCellStyle;
 };
 
 // 3.阶段工作量（单位：人天）
 const setStageWorkloadCellStyle = (params: any) => {
-  if (params.column?.colId === "planWorkload" || params.column?.colId === "actualWorkload" || params.column?.colId === "title" || params.column?.colId === "stage") {
+  // 暂时设置揉入人力和说明可以修改
 
-    return grayCellStyle;
+  if (params.column?.colId === "description" || params.column?.colId === "manpower") {
+
+    return whiteCellStyle;
   }
-  return whiteCellStyle;
+  return grayCellStyle;
+
+  // if (params.column?.colId === "planWorkload" || params.column?.colId === "actualWorkload" || params.column?.colId === "title" || params.column?.colId === "stage") {
+  //
+  //   return grayCellStyle;
+  // }
+  // return whiteCellStyle;
 };
 
 // 4.生产率

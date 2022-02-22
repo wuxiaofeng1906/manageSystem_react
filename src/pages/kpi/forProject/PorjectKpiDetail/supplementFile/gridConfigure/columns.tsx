@@ -46,12 +46,12 @@ const getProcessColumns = () => {
       field: 'planStart',
     },
     {
-      headerName: '实际开始时间',
-      field: 'actualStart',
-    },
-    {
       headerName: '计划完成时间',
       field: 'planEnd',
+    },
+    {
+      headerName: '实际开始时间',
+      field: 'actualStart',
     },
     {
       headerName: '实际完成时间',
@@ -147,7 +147,7 @@ const getStoryStabilityColumns = () => {
     {
       headerName: '预计工时',
       field: 'planHours',
-      editable: true,
+      // editable: true,
       cellRenderer: (params: any) => {
 
         if (params.value === null || params.value === "" || params.value === undefined) {
@@ -166,7 +166,7 @@ const getStoryStabilityColumns = () => {
     {
       headerName: '变更工时',
       field: 'stableHours',
-      editable: true,
+      // editable: true,
       cellRenderer: (params: any) => {
         if (!params.value) {
           return "";
@@ -258,7 +258,7 @@ const getStageWorkloadColumns = () => {
     {
       headerName: '预计工时',
       field: 'planHours',
-      editable: true,
+      // editable: true,
       cellRenderer: (params: any) => {
         if (params.value === null || params.value === "" || params.value === undefined) {
           return "";
@@ -277,7 +277,7 @@ const getStageWorkloadColumns = () => {
     {
       headerName: '实际工时',
       field: 'actualHours',
-      editable: true,
+      // editable: true,
       cellRenderer: (params: any) => {
         if (params.value === null || params.value === "" || params.value === undefined) {
           return "";
@@ -575,11 +575,12 @@ const getReviewDefectColumns = () => {
       //   return params.value;
       // }
       cellRenderer: (params: any) => {
+
         if (params.value === "功能点" || params.value === "代码量") {
           return `<span style="font-weight: bold">${params.value}</span>`
         }
-        // 只要发现缺陷数为0或者空，这个值也需要为空
-        if (!params.data?.foundDN) {
+        // 只要发现缺陷数为0或者空，这个值也需要为空(代码量除外)
+        if (!params.data?.foundDN && params.data?.kind !== "codereview") {
           return "";
         }
 

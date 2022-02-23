@@ -49,7 +49,6 @@ const PreRelease: React.FC<any> = () => {
   const location = history.location.query;
   let releasedNumStr = '';
   if (JSON.stringify(location) !== '{}' && location) {
-    debugger;
     releasedNumStr = location?.releasedNum === null ? '' : (location?.releasedNum).toString();
     if (releasedNumStr) {
       modifyOperteStatus(true);

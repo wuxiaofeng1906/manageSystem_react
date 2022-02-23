@@ -1,32 +1,39 @@
-import React, {useRef, useState} from 'react';
-import {Button, Col, Form, Input, message, Modal, Row, Select} from 'antd';
-import {useModel} from '@@/plugin-model/useModel';
-import {confirmDataRepairService, dataRepaireReview} from './axiosRequest';
-import {AgGridReact} from "ag-grid-react";
-import {getReviewColumns, getReviewConfirmColums} from "./grid/columns";
-import {GridApi, GridReadyEvent} from "ag-grid-community";
-import {alalysisInitData} from "../../datas/dataAnalyze";
-import {getCheckProcess} from '../../components/CheckProgress/axiosRequest';
-import {showProgressData} from '../../components/CheckProgress/processAnalysis';
-import {deleteLockStatus, getLockStatus} from "../../lock/rowLock";
-import {loadCategorySelect, loadCommiterSelect} from "../../comControl/controler";
-import {getGridRowsHeight} from "@/pages/onDutyAndRelease/preRelease/components/gridHeight";
-import {releaseAppChangRowColor} from '../../operate';
+import React, { useRef, useState } from 'react';
+import { Button, Col, Form, Input, message, Modal, Row, Select } from 'antd';
+import { useModel } from '@@/plugin-model/useModel';
+import { confirmDataRepairService, dataRepaireReview } from './axiosRequest';
+import { AgGridReact } from 'ag-grid-react';
+import { getReviewColumns, getReviewConfirmColums } from './grid/columns';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { alalysisInitData } from '../../datas/dataAnalyze';
+import { getCheckProcess } from '../../components/CheckProgress/axiosRequest';
+import { showProgressData } from '../../components/CheckProgress/processAnalysis';
+import { deleteLockStatus, getLockStatus } from '../../lock/rowLock';
+import { loadCategorySelect, loadCommiterSelect } from '../../comControl/controler';
+import { getGridRowsHeight } from '@/pages/onDutyAndRelease/preRelease/components/gridHeight';
+import { releaseAppChangRowColor } from '../../operate';
 
-const {TextArea} = Input;
-const {Option} = Select;
+const { TextArea } = Input;
+const { Option } = Select;
 const userLogins: any = localStorage.getItem('userLogins');
 const usersInfo = JSON.parse(userLogins);
 const DataRepaireReview: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const {
-    tabsData, modifyProcessStatus, dataReview, allLockedArray,
-    setDataReview, dataReviewConfirm, lockedItem, modifyLockedItem,operteStatus
+    tabsData,
+    modifyProcessStatus,
+    dataReview,
+    allLockedArray,
+    setDataReview,
+    dataReviewConfirm,
+    lockedItem,
+    modifyLockedItem,
+    operteStatus,
   } = useModel('releaseProcess');
 
   /* region 数据修复review */
   const [dataReviewForm] = Form.useForm(); // 数据修复review
-  const [dataReviewtModal, setDataReviewModal] = useState({shown: false, title: '新增'}); // 发布项新增和修改的共同modal显示
+  const [dataReviewtModal, setDataReviewModal] = useState({ shown: false, title: '新增' }); // 发布项新增和修改的共同modal显示
   const [dataReviewFormSelected, setDataReviewFormSelected] = useState({
     // 数据修复review 弹窗selected框
     category: [],
@@ -135,8 +142,8 @@ const DataRepaireReview: React.FC<any> = () => {
       // 刷新
       const newData: any = await alalysisInitData('dataReview', tabsData.activeKey);
       setDataReview({
-        gridHight: getGridRowsHeight((newData?.reviewData_repaire)),
-        gridData: newData?.reviewData_repaire
+        gridHight: getGridRowsHeight(newData?.reviewData_repaire),
+        gridData: newData?.reviewData_repaire,
       });
 
       if (dataReviewtModal.title === '修改') {
@@ -170,6 +177,17 @@ const DataRepaireReview: React.FC<any> = () => {
 
   // 下拉框选择是否确认事件
   const saveDataRepaireConfirmInfo = async (newValue: string, oldData: any) => {
+    // 如果是已发布的数据，则不能再修改
+    if (operteStatus) {
+      message.error({
+        content: `发布已完成，不能修改确认结果！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
     const currentReleaseNum = oldData.ready_release_num;
     //  如果前后两个值不同，则需要更新
     if (newValue !== oldData.confirm_status) {
@@ -178,7 +196,7 @@ const DataRepaireReview: React.FC<any> = () => {
       firstDataReviewGridApi.current?.forEachNode((node: any) => {
         const dts = node.data;
         // 需要看本条数据是否有效，比如表格只有一条初始化的空数据时就无需验证
-        if (dts.is_repeat && dts.is_repeat === "9") {
+        if (dts.is_repeat && dts.is_repeat === '9') {
           message.error({
             content: '保存失败：数据修复review中是否可重复执行没有全部确认！',
             duration: 1,
@@ -227,15 +245,12 @@ const DataRepaireReview: React.FC<any> = () => {
       //   刷新表格
       const newData_confirm: any = await alalysisInitData('dataReviewConfirm', currentReleaseNum);
       secondDataReviewGridApi.current?.setRowData(newData_confirm.reviewData_confirm);
-
     }
   };
   /* endregion */
 
-
   return (
     <div>
-
       {/* 数据修复Review */}
       <div>
         <fieldset className={'fieldStyle'}>
@@ -246,7 +261,7 @@ const DataRepaireReview: React.FC<any> = () => {
             <div>
               <div
                 className="ag-theme-alpine"
-                style={{height: dataReview.gridHight, width: '100%', marginTop: -12}}
+                style={{ height: dataReview.gridHight, width: '100%', marginTop: -12 }}
               >
                 <AgGridReact
                   columnDefs={getReviewColumns()} // 定义列
@@ -255,7 +270,7 @@ const DataRepaireReview: React.FC<any> = () => {
                     resizable: true,
                     sortable: true,
                     suppressMenu: true,
-                    cellStyle: {'line-height': '25px'},
+                    cellStyle: { 'line-height': '25px' },
                     minWidth: 90,
                   }}
                   headerHeight={25}
@@ -270,17 +285,16 @@ const DataRepaireReview: React.FC<any> = () => {
                   onGridReady={onfirstDataReviewGridReady}
                   onGridSizeChanged={onChangefirstDataReviewGridReady}
                   onColumnEverythingChanged={onChangefirstDataReviewGridReady}
-                >
-                </AgGridReact>
+                ></AgGridReact>
               </div>
             </div>
 
             {/* 数据修复确认 */}
             <div>
-              <div style={{fontWeight: 'bold'}}> Review确认完成</div>
+              <div style={{ fontWeight: 'bold' }}> Review确认完成</div>
               <div
                 className="ag-theme-alpine"
-                style={{height: dataReviewConfirm.gridHight, width: '100%'}}
+                style={{ height: dataReviewConfirm.gridHight, width: '100%' }}
               >
                 <AgGridReact
                   columnDefs={getReviewConfirmColums()} // 定义列
@@ -289,7 +303,7 @@ const DataRepaireReview: React.FC<any> = () => {
                     resizable: true,
                     sortable: true,
                     suppressMenu: true,
-                    cellStyle: {'line-height': '25px'},
+                    cellStyle: { 'line-height': '25px' },
                   }}
                   // getRowStyle={(params: any) => {
                   //   debugger;
@@ -300,15 +314,14 @@ const DataRepaireReview: React.FC<any> = () => {
                   // }}
                   frameworkComponents={{
                     selectChoice: (props: any) => {
-
                       let Color = 'black';
                       const currentValue = props.value;
                       if (currentValue === '1') {
                         Color = '#2BF541';
                       } else if (currentValue === '2') {
                         Color = 'orange';
-                      } else if (currentValue === "9") {
-                        return (<label></label>);
+                      } else if (currentValue === '9') {
+                        return <label></label>;
                       }
 
                       return (
@@ -316,7 +329,7 @@ const DataRepaireReview: React.FC<any> = () => {
                           size={'small'}
                           defaultValue={currentValue}
                           bordered={false}
-                          style={{width: '100%', color: Color}}
+                          style={{ width: '100%', color: Color }}
                           onChange={(newValue: any) => {
                             saveDataRepaireConfirmInfo(newValue, props.data);
                           }}
@@ -328,7 +341,6 @@ const DataRepaireReview: React.FC<any> = () => {
                           <Option key={'2'} value={'2'}>
                             否
                           </Option>
-
                         </Select>
                       );
                     },
@@ -339,8 +351,7 @@ const DataRepaireReview: React.FC<any> = () => {
                   onGridSizeChanged={onChangesecondDataReviewGridReady}
                   onColumnEverythingChanged={onChangesecondDataReviewGridReady}
                   // onCellEditingStopped={saveDataRepaireConfirmInfo}
-                >
-                </AgGridReact>
+                ></AgGridReact>
               </div>
             </div>
           </div>
@@ -361,9 +372,9 @@ const DataRepaireReview: React.FC<any> = () => {
             name="repaireContent"
             label="数据修复内容:"
             required
-            style={{marginTop: -15}}
+            style={{ marginTop: -15 }}
           >
-            <TextArea/>
+            <TextArea />
           </Form.Item>
           <Row>
             <Col span={12}>
@@ -371,9 +382,9 @@ const DataRepaireReview: React.FC<any> = () => {
                 name="relatedRenter"
                 label="涉及租户："
                 required
-                style={{marginTop: -15}}
+                style={{ marginTop: -15 }}
               >
-                <Input style={{marginLeft: 14, width: 191}}/>
+                <Input style={{ marginLeft: 14, width: 191 }} />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -381,7 +392,7 @@ const DataRepaireReview: React.FC<any> = () => {
                 name="types"
                 label="类型："
                 required
-                style={{marginLeft: 10, marginTop: -15}}
+                style={{ marginLeft: 10, marginTop: -15 }}
               >
                 <Select showSearch>{dataReviewFormSelected.category}</Select>
               </Form.Item>
@@ -393,7 +404,7 @@ const DataRepaireReview: React.FC<any> = () => {
                 name="repaireCommiter"
                 label="修复提交人："
                 required
-                style={{marginTop: -15}}
+                style={{ marginTop: -15 }}
               >
                 <Select showSearch>{dataReviewFormSelected.repairCommiter}</Select>
               </Form.Item>
@@ -403,17 +414,17 @@ const DataRepaireReview: React.FC<any> = () => {
                 name="branch"
                 label="分支："
                 required
-                style={{marginLeft: 10, marginTop: -15}}
+                style={{ marginLeft: 10, marginTop: -15 }}
               >
-                <Input/>
+                <Input />
               </Form.Item>
             </Col>
           </Row>
 
           <Row>
             <Col span={12}>
-              <Form.Item name="EvalResult" label="评审结果：" required style={{marginTop: -15}}>
-                <Select style={{width: 191, marginLeft: 14}}>
+              <Form.Item name="EvalResult" label="评审结果：" required style={{ marginTop: -15 }}>
+                <Select style={{ width: 191, marginLeft: 14 }}>
                   <Option key={'1'} value={'1'}>
                     {'通过'}
                   </Option>
@@ -432,7 +443,7 @@ const DataRepaireReview: React.FC<any> = () => {
                 name="repeatExecute"
                 label="是否可重复执行："
                 required
-                style={{marginLeft: 10, marginTop: -15}}
+                style={{ marginLeft: 10, marginTop: -15 }}
               >
                 <Select>
                   <Option key={'1'} value={'1'}>
@@ -452,7 +463,7 @@ const DataRepaireReview: React.FC<any> = () => {
 
           <Form.Item>
             <Button
-              style={{borderRadius: 5, marginLeft: 20, float: 'right'}}
+              style={{ borderRadius: 5, marginLeft: 20, float: 'right' }}
               onClick={dataReviewModalCancle}
             >
               取消
@@ -471,21 +482,20 @@ const DataRepaireReview: React.FC<any> = () => {
             </Button>
           </Form.Item>
           {/* 隐藏字段，进行修改需要的字段 */}
-          <Row style={{marginTop: -60}}>
+          <Row style={{ marginTop: -60 }}>
             <Col span={2}>
               <Form.Item name="reviewId">
-                <Input style={{width: 50, display: 'none'}}/>
+                <Input style={{ width: 50, display: 'none' }} />
               </Form.Item>
             </Col>
             <Col span={2}>
               <Form.Item name="commitID">
-                <Input style={{width: 50, display: 'none'}}/>
+                <Input style={{ width: 50, display: 'none' }} />
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </Modal>
-
     </div>
   );
 };

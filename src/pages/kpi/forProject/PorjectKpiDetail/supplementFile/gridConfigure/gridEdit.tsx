@@ -1,5 +1,5 @@
-import {updateGridContent} from '@/pages/kpi/forProject/PorjectKpiDetail/supplementFile/data/axiosRequest';
-import {message} from 'antd';
+import { updateGridContent } from '@/pages/kpi/forProject/PorjectKpiDetail/supplementFile/data/axiosRequest';
+import { message } from 'antd';
 
 // 校验数据
 const checkValueIsEffectiveNum = (Num: any) => {
@@ -104,7 +104,7 @@ const storyStabilityCellEdited = async (params: any, projectId: string) => {
     }
 
     const type = params.data?.stage;
-    const typeValue = {项目周期: 0, 开发: 3, 测试: 4, 发布: 5};
+    const typeValue = { 项目周期: 0, 开发: 3, 测试: 4, 发布: 5 };
 
     let modifyValue = params.newValue;
     let columID = params.column.colId;
@@ -279,7 +279,6 @@ const reviewDefectCellEdited = async (params: any, projectId: string) => {
   }
 
   if (params.newValue !== params.oldValue) {
-
     // 是否修改的判断条件
     if (params.column?.colId === 'reviewHour') {
       // 需要判断当发现缺陷数为0或者为空时，评审用时不能被修改
@@ -306,33 +305,51 @@ const reviewDefectCellEdited = async (params: any, projectId: string) => {
       modifyData = {
         category: 'scaleProductivity',
         column: 'codes',
-        newValue: params.newValue === "" ? null : Number(params.newValue),
+        newValue: params.newValue === '' ? null : Number(params.newValue),
         project: projectId,
       };
     } else {
       enum typeObject {
-        '需求预审' = 1, '需求评审', 'UE评审',
-        '概设评审', '详设评审', '用例评审2', 'codereview',
-        '提测演示', '开发自测/联调', '系统测试', '发布测试',
-        'UE预审', 'UI预审', 'UI评审',
+        '需求预审' = 1,
+        '需求评审',
+        'UE评审',
+        '概设评审',
+        '详设评审',
+        '用例评审2',
+        'codereview',
+        '提测演示',
+        '开发自测/联调',
+        '系统测试',
+        '发布测试',
+        'UE预审',
+        'UI预审',
+        'UI评审',
       }
 
       // 修改评审用时
       if (params.column?.colId === 'reviewHour') {
-
+        debugger;
         let newData = null;
-        if (params.newValue !== "") {
-          newData = params.newValue === '0' ? 999999 : Number(params.newValue)
+        if (params.newValue !== '') {
+          newData = params.newValue === '0' ? 999999 : Number(params.newValue);
+        }
+
+        let oldValue = params.oldValue;
+        if (oldValue === null || oldValue === '' || oldValue === undefined) {
+          oldValue = null;
+        } else {
+          oldValue = Number(params.oldValue);
         }
         modifyData = {
           category: 'reviewDefect',
           column: 'extra',
-          oldValue: params.oldValue === "" ? null : Number(params.oldValue),
+          oldValue: oldValue,
           newValue: newData,
           project: projectId,
           types: [typeObject[type]],
         };
-      } else if (params.column?.colId === 'description') {  // 修改描述
+      } else if (params.column?.colId === 'description') {
+        // 修改描述
         modifyData = {
           category: 'reviewDefect',
           column: 'description',
@@ -340,7 +357,8 @@ const reviewDefectCellEdited = async (params: any, projectId: string) => {
           project: projectId,
           types: [typeObject[type]],
         };
-      } else if (params.column?.colId === 'cut') { // 修改是否裁剪
+      } else if (params.column?.colId === 'cut') {
+        // 修改是否裁剪
         modifyData = {
           category: 'reviewDefect',
           column: 'cut',
@@ -429,7 +447,7 @@ const updateTestPassValue = (params: any) => {
     // 说明
     columns = 'description';
   }
-  return {item: items, column: columns, value: values};
+  return { item: items, column: columns, value: values };
 };
 
 // 6.过程质量

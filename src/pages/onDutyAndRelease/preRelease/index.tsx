@@ -44,7 +44,7 @@ const PreRelease: React.FC<any> = () => {
   // 用于定时任务显示数据，定是个hi任务useEffect中渲染了一次。不能实时更新
   currentKey = tabsData.activeKey;
   currentPanes = tabsData.panes;
-  debugger;
+
   // 获取当前链接是否有携带预发布编号（就是区分是否从历史记录跳转过来的），
   const location = history.location.query;
   let releasedNumStr = '';
@@ -198,10 +198,10 @@ const PreRelease: React.FC<any> = () => {
   // 定时任务
   useEffect(() => {
     if (!interValRef.current) {
-      let count = 0;
+      // let count = 0;
       const id = setInterval(async () => {
-        count += 1;
-        console.log(`刷新次数=${count},定时任务id=${id},currentKey=${currentKey}`);
+        // count += 1;
+        // console.log(`刷新次数=${count},定时任务id=${id},currentKey=${currentKey}`);
         // 刷新
         if (lockedItem === '') {
           const datas = await alalysisInitData('', currentKey);

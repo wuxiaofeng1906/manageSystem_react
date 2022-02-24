@@ -10,7 +10,7 @@ import {showReleasedId} from "@/pages/onDutyAndRelease/preRelease/components/Upg
 import {getAllLockedData} from "@/pages/onDutyAndRelease/preRelease/lock/rowLock";
 
 const {TabPane} = Tabs;
-let tabType = "editable-card";// 可新增和删除的tab
+let tabType: any = "editable-card";// 可新增和删除的tab
 const Tab: React.FC<any> = () => {
   const {
     operteStatus,
@@ -309,7 +309,6 @@ const Tab: React.FC<any> = () => {
     } else {
       tabType = "editable-card";
     }
-
   }, [operteStatus]);
   return (
     <div>

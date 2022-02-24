@@ -310,7 +310,6 @@ const DataRepaireReview: React.FC<any> = () => {
                     cellStyle: {'line-height': '25px'},
                   }}
                   // getRowStyle={(params: any) => {
-                  //   debugger;
                   //   if (params.data?.confirm_status === "9") {
                   //     return {"backgroundColor": "#F8F8F8"};
                   //   }

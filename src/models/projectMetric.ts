@@ -2,7 +2,7 @@
  * @Description: 过程质量 => Model数据
  * @Author: jieTan
  * @Date: 2021-11-30 09:57:14
- * @LastEditTime: 2022-01-10 08:11:36
+ * @LastEditTime: 2022-02-24 03:46:52
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -19,6 +19,7 @@ export default () => {
   const [dynamicCols, setDynamicCols] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pkGqlParmas, setPkGqlParmas] = useState(null);
+  const [gridRef, setGridRef] = useState(() => {}); // 项目指标Table的ref使用
 
   /*  */
   const gridHeight = { row: 32 }; // 设置grid的行高
@@ -36,5 +37,7 @@ export default () => {
     gridHeight,
     pkGqlParmas,
     setPkGqlParmas,
+    gridRef,
+    setGridRef,
   };
 };

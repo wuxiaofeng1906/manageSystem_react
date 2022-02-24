@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Form, Input, message, Modal, Tabs} from 'antd';
 import {useModel} from '@@/plugin-model/useModel';
 import {getNewPageNumber, deleteReleaseItem, modifyTabsName} from './axiosRequest';
@@ -10,7 +10,7 @@ import {showReleasedId} from "@/pages/onDutyAndRelease/preRelease/components/Upg
 import {getAllLockedData} from "@/pages/onDutyAndRelease/preRelease/lock/rowLock";
 
 const {TabPane} = Tabs;
-
+let tabType = "editable-card";// 可新增和删除的tab
 const Tab: React.FC<any> = () => {
   const {
     operteStatus,
@@ -303,12 +303,20 @@ const Tab: React.FC<any> = () => {
 
   /* endregion */
 
+  useEffect(() => {
+    if (operteStatus) {
+      tabType = "card";
+    } else {
+      tabType = "editable-card";
+    }
+
+  }, [operteStatus]);
   return (
     <div>
       {/* Tabs 标签,固定在上面 */}
       <div style={{marginTop: -40}}>
         <Tabs
-          type="editable-card"
+          type={tabType}
           activeKey={tabsData === undefined ? '' : tabsData.activeKey}
           onChange={onTabsChange}
           onEdit={(targetKey, action) => {

@@ -2,7 +2,7 @@
  * @Description: 数据列表
  * @Author: jieTan
  * @Date: 2021-11-22 10:55:42
- * @LastEditTime: 2022-02-24 03:16:29
+ * @LastEditTime: 2022-02-24 06:22:59
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -65,6 +65,7 @@ export default () => {
             onGridReady={(params: any) => setGridApi(params.api)}
             getRowHeight={() => gridHeight.row}
             animateRows={true}
+            defaultExcelExportParams={{ fileName: '项目度量指标' }}
           />
         </div>
       </div>

@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-02-21 10:21:10
+ * @LastEditTime: 2022-02-24 03:07:20
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -30,10 +30,10 @@ import {
   PK_EXCLUDE_DEMO_NAME,
   PK_SHOW_DEFAULT_DATE,
 } from '@/namespaces';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useModel } from 'umi';
 import { projectKpiGql, organizationGql, queryGQL } from '@/pages/gqls';
-import { ColumnHeightOutlined, ReloadOutlined } from '@ant-design/icons';
+import { ColumnHeightOutlined, DownloadOutlined, ReloadOutlined } from '@ant-design/icons';
 import { deptTreeNodes, onDateChange, onTreeMultiChange, projOptsElems } from './extra';
 import moment from 'moment';
 import { history as myHistory } from 'umi';
@@ -60,8 +60,16 @@ export default () => {
   const gqlClient = useGqlClient(); // 必须提前初始化该对象
   const [projElems, setProjElems] = useState(null); // 保存项目信息
   const [treeData, setTreeData] = useState([]); // 部门树形结构的数据
-  const { gqlData, setGqlData, setLoading, gridApi, gridHeight, pkGqlParmas, setPkGqlParmas } =
-    useModel('projectMetric'); // 获取“过程质量”查询的结果数据
+  const {
+    gqlData,
+    setGqlData,
+    setLoading,
+    gridApi,
+    gridHeight,
+    pkGqlParmas,
+    setPkGqlParmas,
+    gridRef,
+  } = useModel('projectMetric'); // 获取“过程质量”查询的结果数据
   const [selectItems, setSelectItems] = useState(defaultSeclectItems); // 存放多个筛选的值
   const [ratioVal, setRatioVal] = useState(gridHeight.row);
   //
@@ -100,6 +108,7 @@ export default () => {
   const itemFlexs = { xs: 24, sm: 24, md: 7 };
 
   /* 方法区 */
+  // 选中后的查询函数
   const _onSelect = async () => {
     // 参数构建
     const gqlParams = pkGqlParmas ?? {};
@@ -136,6 +145,10 @@ export default () => {
     const rets = (await queryGQL(gqlClient, projectKpiGql, params)) ?? [];
     setGqlData(rets);
   };
+  //
+  const onGridExport = useCallback((_gridRef: any) => {
+    _gridRef.current.api.exportDataAsExcel();
+  }, []);
 
   /*  */
   useEffect(() => {
@@ -254,6 +267,9 @@ export default () => {
           <br />
         </Col>
         <Col {...extraFlexs} style={{ textAlign: 'right' }}>
+          <Tooltip title="导出表格" color="cyan">
+            <DownloadOutlined onClick={() => onGridExport(gridRef)} />
+          </Tooltip>
           <Divider type="vertical" />
           <Dropdown overlay={menu} placement="bottomCenter" arrow>
             <ColumnHeightOutlined />

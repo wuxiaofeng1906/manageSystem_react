@@ -2,13 +2,14 @@
  * @Description: 数据列表
  * @Author: jieTan
  * @Date: 2021-11-22 10:55:42
- * @LastEditTime: 2022-01-18 06:47:26
+ * @LastEditTime: 2022-02-24 03:16:29
  * @LastEditors: jieTan
  * @LastModify:
  */
 
 import './index.css';
 import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-enterprise';
 import { useModel } from 'umi';
 import { SetFilterModule } from '@ag-grid-enterprise/set-filter';
 import { TableMajorGroup } from './definitions/columns';
@@ -17,20 +18,27 @@ import ProjStatusColumn from './renders/ProjStatusColumn';
 import NumberToFixedColumn from './renders/NumberToFixedColumn';
 import DurationColumn from './renders/DurationColumn';
 import { Spin } from 'antd';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import ManualEntryColumn from './renders/ManualEntryColumn';
 import ProjLinkZtCloumn from './renders/special/ProjLinkZtCloumn';
+import { useMount } from 'ahooks';
 
 /*  */
 export default () => {
   /*  */
-  const { gqlData, dynamicCols, loading, setLoading, gridHeight, setGridApi } =
+  const { gqlData, dynamicCols, loading, setLoading, gridHeight, setGridApi, setGridRef } =
     useModel('projectMetric');
   const innerHeight = window.innerHeight - 248; // grid的固定高度
+
+  const _gridRef: any = useRef();
 
   useEffect(() => {
     setLoading(false);
   }, [gqlData]);
+
+  useMount(() => {
+    setGridRef(_gridRef);
+  });
 
   /*  */
   return (
@@ -38,6 +46,7 @@ export default () => {
       <div style={{ height: innerHeight }} className="ag-theme-alpine">
         <div style={{ width: '100%', height: '100%' }}>
           <AgGridReact
+            ref={_gridRef}
             className="myGrid"
             headerHeight={gridHeight.row + 2}
             modules={[SetFilterModule as any]}
@@ -50,7 +59,7 @@ export default () => {
               manualEntry: ManualEntryColumn,
             }}
             defaultColDef={{ resizable: true }}
-            // stopEditingWhenCellsLoseFocus={true}
+            stopEditingWhenCellsLoseFocus={true}
             columnDefs={[TableMajorGroup, ...dynamicCols]}
             rowData={gqlData}
             onGridReady={(params: any) => setGridApi(params.api)}
@@ -60,6 +69,5 @@ export default () => {
         </div>
       </div>
     </Spin>
-    // {/* <Button onClick={() => setLoading((prev: boolean) => !prev)}>123</Button> */}
   );
 };

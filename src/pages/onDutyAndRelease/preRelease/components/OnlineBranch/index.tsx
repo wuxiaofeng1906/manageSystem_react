@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, {useRef, useState} from 'react';
 import {
   Button,
   Card,
@@ -15,11 +15,11 @@ import {
   Spin,
   Switch,
 } from 'antd';
-import { useModel } from '@@/plugin-model/useModel';
-import { AgGridReact } from 'ag-grid-react';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import { deleteLockStatus, getLockStatus } from '../../lock/rowLock';
-import { getOnlineBranchColumns } from './grid/columns';
+import {useModel} from '@@/plugin-model/useModel';
+import {AgGridReact} from 'ag-grid-react';
+import {GridApi, GridReadyEvent} from 'ag-grid-community';
+import {deleteLockStatus, getLockStatus} from '../../lock/rowLock';
+import {getOnlineBranchColumns} from './grid/columns';
 import {
   getCheckNumForOnlineBranch,
   getModifiedData,
@@ -36,9 +36,9 @@ import {
   loadServiceSelect,
   loadTechSideSelect,
 } from '../../comControl/controler';
-import { alalysisInitData } from '../../datas/dataAnalyze';
-import { getGridRowsHeight } from '../gridHeight';
-import { releaseAppChangRowColor } from '../../operate';
+import {alalysisInitData} from '../../datas/dataAnalyze';
+import {getGridRowsHeight} from '../gridHeight';
+import {releaseAppChangRowColor} from '../../operate';
 
 let newOnlineBranchNum = '';
 
@@ -51,6 +51,7 @@ const OnlineBranch: React.FC<any> = () => {
     modifyLockedItem,
     onlineBranch,
     setOnlineBranch,
+    setDataReviewConfirm,
     allLockedArray,
     operteStatus,
   } = useModel('releaseProcess');
@@ -72,8 +73,8 @@ const OnlineBranch: React.FC<any> = () => {
   });
   const [logModal, setLogModal] = useState({
     show: false,
-    autoUrl: { style: 'none', ui: '', api: '' },
-    versionUrl: { style: 'none', app: '', global: '' },
+    autoUrl: {style: 'none', ui: '', api: ''},
+    versionUrl: {style: 'none', app: '', global: ''},
   });
   const onfirstOnlineBranchGridReady = (params: GridReadyEvent) => {
     firstOnlineBranchGridApi.current = params.api;
@@ -132,6 +133,15 @@ const OnlineBranch: React.FC<any> = () => {
         setOnlineBranch({
           gridHight: getGridRowsHeight(newData.onlineBranch, true),
           gridData: newData.onlineBranch,
+        });
+      }
+
+      // 刷新数据review确认框
+      const reviewData: any = await alalysisInitData('dataReviewConfirm', tabsData.activeKey);
+      if (reviewData.reviewData_confirm) {
+        setDataReviewConfirm({
+          gridHight: getGridRowsHeight(reviewData.reviewData_confirm),
+          gridData: reviewData.reviewData_confirm,
         });
       }
 
@@ -368,8 +378,8 @@ const OnlineBranch: React.FC<any> = () => {
 
     if (app_url || global_url) {
       setLogModal({
-        autoUrl: { style: 'none', ui: '', api: '' },
-        versionUrl: { style: 'inline', app: app_url, global: global_url },
+        autoUrl: {style: 'none', ui: '', api: ''},
+        versionUrl: {style: 'inline', app: app_url, global: global_url},
         show: true,
       });
     } else {
@@ -418,8 +428,8 @@ const OnlineBranch: React.FC<any> = () => {
 
     if (ui_url || api_url) {
       setLogModal({
-        autoUrl: { style: 'inline', ui: ui_url, api: api_url },
-        versionUrl: { style: 'none', app: '', global: '' },
+        autoUrl: {style: 'inline', ui: ui_url, api: api_url},
+        versionUrl: {style: 'none', app: '', global: ''},
         show: true,
       });
     } else {
@@ -437,8 +447,8 @@ const OnlineBranch: React.FC<any> = () => {
   const autoCancle = () => {
     setLogModal({
       show: false,
-      autoUrl: { style: 'none', ui: '', api: '' },
-      versionUrl: { style: 'none', app: '', global: '' },
+      autoUrl: {style: 'none', ui: '', api: ''},
+      versionUrl: {style: 'none', app: '', global: ''},
     });
   };
 
@@ -455,7 +465,7 @@ const OnlineBranch: React.FC<any> = () => {
               <Spin spinning={executeStatus} tip="执行中...">
                 <div
                   className="ag-theme-alpine"
-                  style={{ height: onlineBranch.gridHight, width: '100%', marginTop: -12 }}
+                  style={{height: onlineBranch.gridHight, width: '100%', marginTop: -12}}
                 >
                   <AgGridReact
                     columnDefs={getOnlineBranchColumns()} // 定义列
@@ -488,11 +498,11 @@ const OnlineBranch: React.FC<any> = () => {
                 </div>
               </Spin>
             </div>
-            <div style={{ fontSize: 'smaller', marginTop: 10 }}>
+            <div style={{fontSize: 'smaller', marginTop: 10}}>
               1、版本检查、环境一致性检查、自动化检查，在需要的时间节点，点击手动触发按钮，进行按需检查；
-              <br />
+              <br/>
               2、检查状态分为：是、否、检查中、未开始、忽略等5种状态；
-              <br />
+              <br/>
               3、点击检查日志链接，可以进入检查的详情页面。
             </div>
           </div>
@@ -516,12 +526,12 @@ const OnlineBranch: React.FC<any> = () => {
               <Col span={16}>
                 {/* 分支名称 */}
                 <Form.Item label="分支名称:" name="branchName" required={true}>
-                  <Select style={{ width: '100%' }} showSearch>
+                  <Select style={{width: '100%'}} showSearch>
                     {onlineBranchFormSelected.branchName}
                   </Select>
                 </Form.Item>
                 {/* 忽略前端单元测试检查 */}
-                <Form.Item name="ignoreFrontCheck" style={{ marginLeft: 0, marginTop: -20 }}>
+                <Form.Item name="ignoreFrontCheck" style={{marginLeft: 0, marginTop: -20}}>
                   <Checkbox.Group>
                     <Checkbox value={'1'}>忽略前端单元测试检查</Checkbox>
                   </Checkbox.Group>
@@ -529,13 +539,13 @@ const OnlineBranch: React.FC<any> = () => {
               </Col>
               <Col span={8}>
                 {/* 技术侧 */}
-                <Form.Item label="技术侧:" name="module" style={{ marginLeft: 10 }} required={true}>
-                  <Select style={{ width: '100%' }} showSearch>
+                <Form.Item label="技术侧:" name="module" style={{marginLeft: 10}} required={true}>
+                  <Select style={{width: '100%'}} showSearch>
                     {onlineBranchFormSelected.techSide}
                   </Select>
                 </Form.Item>
                 {/* 忽略后端单元测试检查 */}
-                <Form.Item name="ignoreBackendCheck" style={{ marginLeft: 0, marginTop: -20 }}>
+                <Form.Item name="ignoreBackendCheck" style={{marginLeft: 0, marginTop: -20}}>
                   <Checkbox.Group>
                     <Checkbox value={'1'}>忽略后端单元测试检查</Checkbox>
                   </Checkbox.Group>
@@ -545,36 +555,36 @@ const OnlineBranch: React.FC<any> = () => {
           </div>
 
           {/* ① 版本检查设置 */}
-          <div style={{ marginTop: -35 }}>
+          <div style={{marginTop: -35}}>
             <Divider plain>① 版本检查设置</Divider>
 
             <div>
               <Card
                 size="small"
                 title="版本检查"
-                style={{ width: '100%', marginTop: -10, height: 150 }}
+                style={{width: '100%', marginTop: -10, height: 150}}
               >
                 <Form.Item
                   name="verson_check"
                   label="是否开启："
                   valuePropName="checked"
-                  style={{ marginTop: -10 }}
+                  style={{marginTop: -10}}
                 >
-                  <Switch checkedChildren="是" unCheckedChildren="否" style={{ marginLeft: 40 }} />
+                  <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 40}}/>
                 </Form.Item>
-                <Form.Item name="server" label="服务" style={{ marginTop: -22 }}>
+                <Form.Item name="server" label="服务" style={{marginTop: -22}}>
                   <Select
                     mode="multiple"
                     placeholder="请选择相应的服务！"
-                    style={{ marginLeft: 68, width: 415 }}
+                    style={{marginLeft: 68, width: 415}}
                   >
                     {onlineBranchFormSelected.server}
                   </Select>
                 </Form.Item>
-                <Form.Item name="imageevn" label="镜像环境" style={{ marginTop: -20 }}>
+                <Form.Item name="imageevn" label="镜像环境" style={{marginTop: -20}}>
                   <Select
                     placeholder="请选择对应的环境！"
-                    style={{ marginLeft: 40, width: 415 }}
+                    style={{marginLeft: 40, width: 415}}
                     showSearch
                   >
                     {onlineBranchFormSelected.imgEnv}
@@ -587,21 +597,21 @@ const OnlineBranch: React.FC<any> = () => {
               <Card
                 size="small"
                 title="检查上线分支是否包含对比分支的提交"
-                style={{ width: '100%', height: 200 }}
+                style={{width: '100%', height: 200}}
               >
                 <Form.Item
                   name="branchcheck"
                   label="是否开启："
                   valuePropName="checked"
-                  style={{ marginTop: -10 }}
+                  style={{marginTop: -10}}
                 >
-                  <Switch checkedChildren="是" unCheckedChildren="否" style={{ marginLeft: 40 }} />
+                  <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 40}}/>
                 </Form.Item>
 
                 <Form.Item
                   label="被对比的主分支"
                   name="branch_mainBranch"
-                  style={{ marginTop: -25 }}
+                  style={{marginTop: -25}}
                 >
                   <Checkbox.Group>
                     <Checkbox value={'stage'}>stage</Checkbox>
@@ -609,17 +619,17 @@ const OnlineBranch: React.FC<any> = () => {
                   </Checkbox.Group>
                 </Form.Item>
 
-                <Form.Item label="技术侧" name="branch_teachnicalSide" style={{ marginTop: -25 }}>
-                  <Checkbox.Group style={{ marginLeft: 56 }}>
+                <Form.Item label="技术侧" name="branch_teachnicalSide" style={{marginTop: -25}}>
+                  <Checkbox.Group style={{marginLeft: 56}}>
                     <Checkbox value={'front'}>前端</Checkbox>
                     <Checkbox value={'backend'}>后端</Checkbox>
                   </Checkbox.Group>
                 </Form.Item>
 
-                <Form.Item label="对比起始时间" name="branch_mainSince" style={{ marginTop: -20 }}>
-                  <DatePicker style={{ marginLeft: 13, width: 415 }} />
+                <Form.Item label="对比起始时间" name="branch_mainSince" style={{marginTop: -20}}>
+                  <DatePicker style={{marginLeft: 13, width: 415}}/>
                 </Form.Item>
-                <div style={{ color: 'gray', marginTop: -25, marginLeft: 110 }}>
+                <div style={{color: 'gray', marginTop: -25, marginLeft: 110}}>
                   默认时间代表查询近一周的数据
                 </div>
               </Card>
@@ -627,13 +637,13 @@ const OnlineBranch: React.FC<any> = () => {
           </div>
 
           {/* ② 环境一致性检查 */}
-          <div style={{ marginTop: -10 }}>
+          <div style={{marginTop: -10}}>
             <Divider plain>② 环境一致性检查</Divider>
             <div>
               <Row>
                 <Col span={9}>
                   {/* 忽略检查 */}
-                  <Form.Item label="是否忽略检查" name="ignoreCheck" style={{ marginTop: -10 }}>
+                  <Form.Item label="是否忽略检查" name="ignoreCheck" style={{marginTop: -10}}>
                     <Checkbox.Group>
                       <Checkbox value={'1'}>忽略检查</Checkbox>
                     </Checkbox.Group>
@@ -641,8 +651,8 @@ const OnlineBranch: React.FC<any> = () => {
                 </Col>
                 <Col span={8}>
                   {/* 检查环境 */}
-                  <Form.Item label="检查环境:" name="checkEnv" style={{ marginTop: -10 }}>
-                    <Select style={{ width: '100%' }} showSearch>
+                  <Form.Item label="检查环境:" name="checkEnv" style={{marginTop: -10}}>
+                    <Select style={{width: '100%'}} showSearch>
                       {onlineBranchFormSelected.imgEnv}
                     </Select>
                   </Form.Item>
@@ -652,15 +662,15 @@ const OnlineBranch: React.FC<any> = () => {
           </div>
 
           {/* ③ 上线前自动化检查设置 */}
-          <div style={{ marginTop: -30 }}>
+          <div style={{marginTop: -30}}>
             <Divider plain>③ 上线前自动化检查设置</Divider>
-            <Row style={{ marginTop: -10 }}>
+            <Row style={{marginTop: -10}}>
               <Col>
                 {/* 忽略检查 */}
                 <Form.Item
                   label="是否忽略检查"
                   name="autoBeforeIgnoreCheck"
-                  style={{ marginTop: -10 }}
+                  style={{marginTop: -10}}
                 >
                   <Checkbox.Group>
                     <Checkbox value={'1'}>忽略检查</Checkbox>
@@ -668,11 +678,11 @@ const OnlineBranch: React.FC<any> = () => {
                 </Form.Item>
               </Col>
             </Row>
-            <Row style={{ marginTop: -10 }}>
+            <Row style={{marginTop: -10}}>
               <Col span={8}>
                 {/* 检查类型 */}
-                <Form.Item label="检查类型:" name="beforeCheckType" style={{ marginTop: -10 }}>
-                  <Select mode="multiple" style={{ width: '100%' }} showSearch>
+                <Form.Item label="检查类型:" name="beforeCheckType" style={{marginTop: -10}}>
+                  <Select mode="multiple" style={{width: '100%'}} showSearch>
                     {onlineBranchFormSelected.before_checkType}
                   </Select>
                 </Form.Item>
@@ -682,9 +692,9 @@ const OnlineBranch: React.FC<any> = () => {
                 <Form.Item
                   label="测试环境:"
                   name="beforeTestEnv"
-                  style={{ marginTop: -10, marginLeft: 10 }}
+                  style={{marginTop: -10, marginLeft: 10}}
                 >
-                  <Select style={{ width: '100%' }} showSearch>
+                  <Select style={{width: '100%'}} showSearch>
                     {onlineBranchFormSelected.imgEnv}
                   </Select>
                 </Form.Item>
@@ -694,9 +704,9 @@ const OnlineBranch: React.FC<any> = () => {
                 <Form.Item
                   label="浏览器:"
                   name="beforeBrowser"
-                  style={{ marginTop: -10, marginLeft: 10 }}
+                  style={{marginTop: -10, marginLeft: 10}}
                 >
-                  <Select style={{ width: '100%' }} showSearch>
+                  <Select style={{width: '100%'}} showSearch>
                     {onlineBranchFormSelected.browser}
                   </Select>
                 </Form.Item>
@@ -705,15 +715,15 @@ const OnlineBranch: React.FC<any> = () => {
           </div>
 
           {/* ④ 上线后自动化检查设置 */}
-          <div style={{ marginTop: -30 }}>
+          <div style={{marginTop: -30}}>
             <Divider plain>④ 上线后自动化检查设置</Divider>
-            <Row style={{ marginTop: -10 }}>
+            <Row style={{marginTop: -10}}>
               <Col>
                 {/* 忽略检查 */}
                 <Form.Item
                   label="是否忽略检查"
                   name="autoAfterIgnoreCheck"
-                  style={{ marginTop: -10 }}
+                  style={{marginTop: -10}}
                 >
                   <Checkbox.Group>
                     <Checkbox value={'1'}>忽略检查</Checkbox>
@@ -721,11 +731,11 @@ const OnlineBranch: React.FC<any> = () => {
                 </Form.Item>
               </Col>
             </Row>
-            <Row style={{ marginTop: -10 }}>
+            <Row style={{marginTop: -10}}>
               <Col span={8}>
                 {/* 检查类型 */}
-                <Form.Item label="检查类型:" name="afterCheckType" style={{ marginTop: -10 }}>
-                  <Select mode="multiple" style={{ width: '100%' }} showSearch>
+                <Form.Item label="检查类型:" name="afterCheckType" style={{marginTop: -10}}>
+                  <Select mode="multiple" style={{width: '100%'}} showSearch>
                     {onlineBranchFormSelected.after_checkType}
                   </Select>
                 </Form.Item>
@@ -735,9 +745,9 @@ const OnlineBranch: React.FC<any> = () => {
                 <Form.Item
                   label="测试环境:"
                   name="afterTestEnv"
-                  style={{ marginTop: -10, marginLeft: 10 }}
+                  style={{marginTop: -10, marginLeft: 10}}
                 >
-                  <Select style={{ width: '100%' }} showSearch>
+                  <Select style={{width: '100%'}} showSearch>
                     {onlineBranchFormSelected.imgEnv}
                   </Select>
                 </Form.Item>
@@ -747,9 +757,9 @@ const OnlineBranch: React.FC<any> = () => {
                 <Form.Item
                   label="浏览器:"
                   name="afterBrowser"
-                  style={{ marginTop: -10, marginLeft: 10 }}
+                  style={{marginTop: -10, marginLeft: 10}}
                 >
-                  <Select style={{ width: '100%' }} showSearch>
+                  <Select style={{width: '100%'}} showSearch>
                     {onlineBranchFormSelected.browser}
                   </Select>
                 </Form.Item>
@@ -760,7 +770,7 @@ const OnlineBranch: React.FC<any> = () => {
           <Spin spinning={onlineBranchModal.loading} tip="保存中...">
             <Form.Item>
               <Button
-                style={{ borderRadius: 5, marginLeft: 20, float: 'right' }}
+                style={{borderRadius: 5, marginLeft: 20, float: 'right'}}
                 onClick={() => {
                   formForOnlineBranch.resetFields();
                 }}
@@ -784,30 +794,30 @@ const OnlineBranch: React.FC<any> = () => {
           </Spin>
 
           {/* 隐藏字段，进行修改需要的字段 */}
-          <Row style={{ marginTop: -60 }}>
+          <Row style={{marginTop: -60}}>
             <Col span={2}>
               <Form.Item name="branchCheckId">
-                <Input style={{ width: 50, display: 'none' }} />
+                <Input style={{width: 50, display: 'none'}}/>
               </Form.Item>
             </Col>
             <Col span={2}>
               <Form.Item name="versionCheckId">
-                <Input style={{ width: 50, display: 'none' }} />
+                <Input style={{width: 50, display: 'none'}}/>
               </Form.Item>
             </Col>
             <Col span={2}>
               <Form.Item name="envCheckId">
-                <Input style={{ width: 50, display: 'none' }} />
+                <Input style={{width: 50, display: 'none'}}/>
               </Form.Item>
             </Col>
             <Col span={2}>
               <Form.Item name="beforeAutomationId">
-                <Input style={{ width: 50, display: 'none' }} />
+                <Input style={{width: 50, display: 'none'}}/>
               </Form.Item>
             </Col>
             <Col span={2}>
               <Form.Item name="afterAutomationId">
-                <Input style={{ width: 50, display: 'none' }} />
+                <Input style={{width: 50, display: 'none'}}/>
               </Form.Item>
             </Col>
           </Row>
@@ -825,42 +835,42 @@ const OnlineBranch: React.FC<any> = () => {
         // bodyStyle={{height: 145}}
       >
         <Form>
-          <div style={{ display: logModal.autoUrl.style }}>
-            <Form.Item name="UiLog" label="UI日志:" style={{ marginTop: -15 }}>
+          <div style={{display: logModal.autoUrl.style}}>
+            <Form.Item name="UiLog" label="UI日志:" style={{marginTop: -15}}>
               <a
                 href={`${logModal.autoUrl.ui}`}
                 target={'_black'}
-                style={{ textDecoration: 'underline' }}
+                style={{textDecoration: 'underline'}}
               >
                 {logModal.autoUrl.ui}
               </a>
             </Form.Item>
 
-            <Form.Item name="interfaceLog" label="接口日志:" style={{ marginTop: -15 }}>
+            <Form.Item name="interfaceLog" label="接口日志:" style={{marginTop: -15}}>
               <a
                 href={`${logModal.autoUrl.api}`}
                 target={'_black'}
-                style={{ textDecoration: 'underline' }}
+                style={{textDecoration: 'underline'}}
               >
                 {logModal.autoUrl.api}
               </a>
             </Form.Item>
           </div>
-          <div style={{ display: logModal.versionUrl.style }}>
-            <Form.Item name="appLog" label="app日志:" style={{ marginTop: -15 }}>
+          <div style={{display: logModal.versionUrl.style}}>
+            <Form.Item name="appLog" label="app日志:" style={{marginTop: -15}}>
               <a
                 href={`${logModal.versionUrl.app}`}
                 target={'_black'}
-                style={{ textDecoration: 'underline' }}
+                style={{textDecoration: 'underline'}}
               >
                 {logModal.versionUrl.app}
               </a>
             </Form.Item>
-            <Form.Item name="globalLog" label="global日志:" style={{ marginTop: -1 }}>
+            <Form.Item name="globalLog" label="global日志:" style={{marginTop: -1}}>
               <a
                 href={`${logModal.versionUrl.global}`}
                 target={'_black'}
-                style={{ textDecoration: 'underline' }}
+                style={{textDecoration: 'underline'}}
               >
                 {logModal.versionUrl.global}
               </a>

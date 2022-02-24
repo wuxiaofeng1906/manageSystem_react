@@ -117,12 +117,14 @@ const PreRelease: React.FC<any> = () => {
 
   // 显示有数据界面
   const showPageInitData = async (initData: any, initShow: boolean) => {
-    if (!initData || (JSON.stringify(initData) === '{}' && currentKey !== '')) {
-      // 没有数据，但是有activekey，也不再创建tab数据
-      return;
-    }
+    // if (!initData || (JSON.stringify(initData) === '{}' && currentKey !== '')) {
+    //   // 没有数据，但是有activekey，也不再创建tab数据
+    //   showNoneDataPage();
+    //   debugger;
+    //   return;
+    // }
 
-    if (JSON.stringify(initData) === '{}') {
+    if (!initData || JSON.stringify(initData) === '{}') {
       // 数据是空对象时，才是正常返回的空数据
       showNoneDataPage();
       return;

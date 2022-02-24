@@ -471,6 +471,11 @@ const UpgradeService: React.FC<any> = () => {
         gridData: newData.upService_interface,
       });
 
+      // (不管成功或者失败)刷新表格
+      const newData_confirm: any = await alalysisInitData('pulishConfirm', tabsData.activeKey);
+      thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+
+
       if (upgradeIntModal.title === '修改') {
         //   释放锁
         deleteLockStatus(lockedItem);

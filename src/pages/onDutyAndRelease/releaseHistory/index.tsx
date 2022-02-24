@@ -17,8 +17,8 @@ import {gridHeight, grayscaleBacklogList, releasedList} from './gridSet';
 const {RangePicker} = DatePicker;
 
 const queryCondition = {
-  start: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-  end: dayjs().subtract(7, 'day').format("YYYY-MM-DD HH:mm:ss"),
+  start: dayjs().subtract(7, 'day').format("YYYY-MM-DD HH:mm:ss"),
+  end: dayjs().format("YYYY-MM-DD HH:mm:ss"),
   project: ""
 }
 const ReleaseHistory: React.FC<any> = () => {

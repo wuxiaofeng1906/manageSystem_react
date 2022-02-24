@@ -62,16 +62,18 @@ const PreRelease: React.FC<any> = () => {
   // 显示无数据界面
   const showNoneDataPage = async () => {
     // tab 页面
-    const newNum = await getNewPageNumber();
-    const releaseNum = newNum.data?.ready_release_num;
-    const panesArray: any = [
-      {
-        title: `${releaseNum}灰度预发布`,
-        content: '',
-        key: releaseNum,
-      },
-    ];
-    setTabsData(releaseNum, panesArray);
+    if (currentKey === "") {  // 如果当前key未空，则获取
+      const newNum = await getNewPageNumber();
+      const releaseNum = newNum.data?.ready_release_num;
+      const panesArray: any = [
+        {
+          title: `${releaseNum}灰度预发布`,
+          content: '',
+          key: releaseNum,
+        },
+      ];
+      setTabsData(releaseNum, panesArray);
+    }
 
     // 进度条
     modifyProcessStatus({
@@ -117,12 +119,6 @@ const PreRelease: React.FC<any> = () => {
 
   // 显示有数据界面
   const showPageInitData = async (initData: any, initShow: boolean) => {
-    // if (!initData || (JSON.stringify(initData) === '{}' && currentKey !== '')) {
-    //   // 没有数据，但是有activekey，也不再创建tab数据
-    //   showNoneDataPage();
-    //   debugger;
-    //   return;
-    // }
 
     if (!initData || JSON.stringify(initData) === '{}') {
       // 数据是空对象时，才是正常返回的空数据

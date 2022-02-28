@@ -64,7 +64,7 @@ const getProcessTable = (data: any) => {
     name: "processTable", // 表格名称
     ref: "A1",
     style: {
-      theme: 'TableStyleMedium9',
+      theme: 'TableStyleMedium15',  // TableStyleMedium9
       showRowStripes: true,  // 用交替的背景色显示行
       // font: {name: 'Comic Sans MS', family: 4, size: 16, underline: 'double', bold: true,color:"#FF0000"}
 
@@ -126,7 +126,7 @@ const getStoryStabilityTable = (data: any) => {
     name: "storyStablityTable", // 表格名称
     ref: "A9",
     style: {
-      theme: 'TableStyleMedium9',
+      theme: 'TableStyleMedium15',
       showRowStripes: true,  // 用交替的背景色显示行
     },
     columns: column,
@@ -194,7 +194,7 @@ const getStageWorkloadTable = (data: any) => {
     name: "stageWorkloadTable",
     ref: "A15",
     style: {
-      theme: 'TableStyleMedium9',
+      theme: 'TableStyleMedium15',
       showRowStripes: true,
     },
     columns: column,
@@ -231,7 +231,7 @@ const getProductRateTable = (data: any) => {
     name: "productRateTable",
     ref: "A23",
     style: {
-      theme: 'TableStyleMedium9',
+      theme: 'TableStyleMedium15',
       showRowStripes: true,
     },
     columns: column,
@@ -335,7 +335,7 @@ const getReviewDefectTable = (data: any) => {
     name: "reviewDefectTable",
     ref: "A27",
     style: {
-      theme: 'TableStyleMedium9',
+      theme: 'TableStyleMedium15',
       showRowStripes: true,
     },
     columns: column,
@@ -393,7 +393,7 @@ const getProcessQualityTable = (data: any) => {
     name: "processQualityTable",
     ref: "A45",
     style: {
-      theme: 'TableStyleMedium9',
+      theme: 'TableStyleMedium15',
       showRowStripes: true,
     },
     columns: column,
@@ -434,7 +434,7 @@ const getServiceTable = (data: any) => {
     name: "serviceTable",
     ref: "A56",
     style: {
-      theme: 'TableStyleMedium9',
+      theme: 'TableStyleMedium15',
       showRowStripes: true,
     },
     columns: column,

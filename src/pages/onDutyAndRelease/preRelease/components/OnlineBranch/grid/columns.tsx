@@ -564,6 +564,14 @@ const getOnlineBranchColumns = () => {
       field: 'test_unit',
       cellRenderer: rendererUnitTest,
       minWidth: 170,
+    }, {
+      headerName: '禅道检查checklist',
+      field: '',
+      minWidth: 150,
+    }, {
+      headerName: '图标一致性检查',
+      field: '',
+      minWidth: 130,
     },
     {
       headerName: '上线前版本检查是否通过',

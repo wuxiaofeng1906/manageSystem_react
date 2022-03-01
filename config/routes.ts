@@ -460,6 +460,19 @@ export default [
         // hideInMenu: true
       }
     ],
+  }, {
+    name: "禅道管理",
+    icon: 'table',
+    path: '/zentao',
+    routes: [
+      {
+        name: '人员执行设置',
+        icon: 'table',
+        path: 'peopleExcuteSetting',
+        component: './zentao/peopleExcuteSetting',
+        hideInMenu: true
+      }
+    ]
   },
   {
     name: '系统管理',

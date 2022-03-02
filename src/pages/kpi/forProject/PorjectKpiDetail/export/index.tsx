@@ -1,8 +1,7 @@
 import ExcelJs from "exceljs";
 import {
   getProcessTable, getStoryStabilityTable, getStageWorkloadTable,
-  getProductRateTable, getReviewDefectTable, getProcessQualityTable, getServiceTable,
-  vertifyFileName
+  getProductRateTable, getReviewDefectTable, getProcessQualityTable, getServiceTable,vertifyFileName
 } from "./tableInfo/tableCreate"
 
 // exceljs的说明文档： https://github.com/exceljs/exceljs/blob/master/README_zh.md
@@ -27,13 +26,11 @@ const setTableTitleColor = (rowNum: number, sheet: any) => {
 
 // Excel数据导出
 const exportToExcel = (data: any, title: string) => {
-
   const sheetName = vertifyFileName(`项目指标-${title}`);
-
   // 1.创建工作薄
   const workbook = new ExcelJs.Workbook();
 
-  // 2.添加工作表(工作表名规则：不能有 \  /  ?  *  [  ]  这几种特殊字符，名称的开始和结尾不能有单引号)
+  // 2.添加工作表
   const sheet = workbook.addWorksheet(sheetName);
   // 默认行高（默认值为15）
   sheet.properties.defaultRowHeight = 18;

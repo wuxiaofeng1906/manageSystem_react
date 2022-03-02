@@ -444,6 +444,20 @@ const getServiceTable = (data: any) => {
   return tableInfo;
 };
 
+// 正则表达式验证table sheet名是否可用（不可用则进行处理）
+const vertifyFileName = (stName: string) => {
+  let sheetName = stName;
+  // 工作表名规则：不能包含有 \  /  ?  *  [  ]  这几种特殊字符，名称的开始和结尾不能有单引号
+  if (stName.startsWith("'") || stName.endsWith("'")) {
+    sheetName = stName.replaceAll("'", "")
+  }
+
+  // 正则表达式匹配 \  /  ?  *  [  ]
+  const reg = /\/|\?|\*|\[|\]|\\/g;
+  sheetName = sheetName.replaceAll(reg, "-");
+
+  return sheetName;
+};
 /* endregion */
 
 // 正则表达式验证table sheet名是否可用（不可用则进行处理）

@@ -544,7 +544,7 @@ const OnlineBranch: React.FC<any> = () => {
             </Row>
 
             <Row>
-              <Col span={8}>
+              <Col span={16}>
                 {/* 忽略前端单元测试检查 */}
                 <Form.Item name="ignoreFrontCheck" style={{marginLeft: 0, marginTop: -20}}>
                   <Checkbox.Group>
@@ -560,14 +560,14 @@ const OnlineBranch: React.FC<any> = () => {
                   </Checkbox.Group>
                 </Form.Item>
               </Col>
-              <Col span={8}>
-                {/* 忽略禅道checklist检查 */}
-                <Form.Item name="ignoreChecklistCheck" style={{marginLeft: 0, marginTop: -20}}>
-                  <Checkbox.Group>
-                    <Checkbox value={'1'}>忽略禅道checklist检查</Checkbox>
-                  </Checkbox.Group>
-                </Form.Item>
-              </Col>
+              {/*<Col span={8}>*/}
+              {/*  /!* 忽略禅道checklist检查 *!/*/}
+              {/*  <Form.Item name="ignoreChecklistCheck" style={{marginLeft: 0, marginTop: -20}}>*/}
+              {/*    <Checkbox.Group>*/}
+              {/*      <Checkbox value={'1'}>忽略禅道checklist检查</Checkbox>*/}
+              {/*    </Checkbox.Group>*/}
+              {/*  </Form.Item>*/}
+              {/*</Col>*/}
             </Row>
 
           </div>

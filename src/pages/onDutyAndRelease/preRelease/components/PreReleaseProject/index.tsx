@@ -18,6 +18,7 @@ import {alalysisInitData} from "@/pages/onDutyAndRelease/preRelease/datas/dataAn
 
 const userLogins: any = localStorage.getItem('userLogins');
 const usersInfo = JSON.parse(userLogins);
+const {Option} = Select;
 
 const PreReleaseProject: React.FC<any> = () => {
   // 获取当前页面的进度数据
@@ -157,11 +158,11 @@ const PreReleaseProject: React.FC<any> = () => {
       <div>
         <fieldset className={'fieldStyle'}>
           <legend className={'legendStyle'}>Step1 预发布项目
-          <label style={{color:"Gray"}}> (值班测试填写)</label>
+            <label style={{color: "Gray"}}> (值班测试填写)</label>
           </legend>
 
           <div style={{marginBottom: -20, marginTop: -5}}>
-            <div style={{float: 'right'}}>
+            <div style={{float: 'right', marginTop: 5}}>
               <Button
                 type="primary"
                 disabled={operteStatus}
@@ -170,6 +171,7 @@ const PreReleaseProject: React.FC<any> = () => {
                   backgroundColor: '#ECF5FF',
                   borderRadius: 5,
                   marginLeft: 10,
+                  height: 60
                 }}
                 onClick={savePreRelaseProjects}
               >
@@ -180,7 +182,7 @@ const PreReleaseProject: React.FC<any> = () => {
             <div>
               <Form form={formForPreReleaseProject}>
                 <Row>
-                  <Col span={8}>
+                  <Col span={11}>
                     {/* 项目名称 */}
                     <Form.Item label="项目名称:" name="projectsName">
                       <Select showSearch mode="multiple" onFocus={releaseItemFocus}>
@@ -189,23 +191,24 @@ const PreReleaseProject: React.FC<any> = () => {
                     </Form.Item>
                   </Col>
 
-                  <Col span={5}>
+                  <Col span={7}>
                     {/* 发布类型 */}
                     <Form.Item label="发布类型:" name="pulishType" style={{marginLeft: 5}}>
                       <Select onFocus={releaseItemFocus}>{releaseTypeArray}</Select>
                     </Form.Item>
                   </Col>
 
-                  <Col span={5}>
+                  <Col span={6}>
                     {/* 发布方式 */}
                     <Form.Item label="发布方式:" name="pulishMethod" style={{marginLeft: 5}}>
                       <Select onFocus={releaseItemFocus}>{releaseWayArray}</Select>
                     </Form.Item>
                   </Col>
-
-                  <Col span={6}>
+                </Row>
+                <Row style={{marginTop: -15}}>
+                  <Col span={11}>
                     {/* 发布时间 */}
-                    <Form.Item label="发布时间:" name="pulishTime" style={{marginLeft: 5}}>
+                    <Form.Item label="发布时间" name="pulishTime" style={{marginLeft: 5}}>
                       <DatePicker
                         showTime
                         format="YYYY-MM-DD HH:mm"
@@ -214,10 +217,35 @@ const PreReleaseProject: React.FC<any> = () => {
                       />
                     </Form.Item>
                   </Col>
-                </Row>
 
+                  <Col span={13}>
+                    {/* 是否忽略禅道checklist */}
+                    <Form.Item label="是否忽略禅道checklist:" name="ignoreZentaoList" style={{marginLeft: 5}}>
+                      <Select onFocus={releaseItemFocus}>
+                        <Option value="1">是</Option>
+                        <Option value="2">否</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+
+                </Row>
                 <Row style={{marginTop: -20}}>
-                  <Col span={3}>
+                  <Col span={12}>
+
+                    <Form.Item label="禅道checklist检查状态:" name="checkListStatus">
+                      <Input
+                        style={{
+                          border: 'none',
+                          backgroundColor: 'white',
+                          color: '#46A0FC',
+                          marginLeft: -5,
+                        }}
+                        disabled
+                      />
+                    </Form.Item>
+                  </Col>
+
+                  <Col span={5}>
                     {/* 编辑人信息 */}
                     {/* 编辑人 */}
                     <Form.Item label="编辑人:" name="editor">

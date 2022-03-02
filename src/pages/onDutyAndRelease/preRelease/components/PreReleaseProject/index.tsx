@@ -91,6 +91,7 @@ const PreReleaseProject: React.FC<any> = () => {
       formForPreReleaseProject.setFieldsValue({
         editor: modifyTime.editor,
         editTime: modifyTime.editTime,
+        checkListStatus: ""
       });
       // 保存成功后需要刷新状态
       const processData: any = await getCheckProcess(tabsData?.activeKey);
@@ -149,6 +150,8 @@ const PreReleaseProject: React.FC<any> = () => {
         editor: preReleaseData.edit_user_name,
         editTime: preReleaseData.edit_time,
         proid: preReleaseData.pro_id,
+        ignoreZentaoList: preReleaseData.ignoreZentaoList,
+        checkListStatus: preReleaseData.checkListStatus,
       });
     }
   }, [preReleaseData]);

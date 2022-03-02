@@ -69,6 +69,8 @@ export default () => {
     edit_user_name: '',
     edit_time: '',
     pro_id: '',
+    ignoreZentaoList: '',
+    checkListStatus: '',
   });
 
   // 设置Tab的数据

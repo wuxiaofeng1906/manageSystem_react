@@ -1,11 +1,11 @@
-import { getInitPageData } from './datasGet';
+import {getInitPageData} from './datasGet';
 
 // 解析Tabs
 const analysisTabsPageInfo = async (datas: any) => {
   const tabsPageArray: any = [];
   if (datas) {
     datas.forEach((ele: any) => {
-      const { ready_release } = ele;
+      const {ready_release} = ele;
       const panes: any = {
         title: ready_release.ready_release_name,
         content: '',
@@ -26,7 +26,8 @@ const analysisTabsPageInfo = async (datas: any) => {
 };
 
 // 预发布项目数据解析
-const analysisPreReleaseProject = (datas: any) => {
+const analysisPreReleaseProject = (datas: any, zentaoData: any) => {
+
   if (datas && datas.length > 0) {
     const project = datas[0];
     const projectArray = project.project;
@@ -43,6 +44,8 @@ const analysisPreReleaseProject = (datas: any) => {
       edit_user_name: project.edit_user_name,
       edit_time: project.edit_time,
       ready_release_num: project.ready_release_num,
+      ignoreZentaoList: zentaoData[0].ignore_check,
+      checkListStatus: zentaoData[0].task_status,
     };
 
     return returnArray;
@@ -115,36 +118,36 @@ const alalysisInitData = async (queryData: string = '', queryReleaseNum: string 
   const datas = result.data;
 
   if (queryData === 'pulishItem') {
-    return { upService_releaseItem: analysisReleaseItem(datas[0].update_app) }; // 升级服务-发布项;
+    return {upService_releaseItem: analysisReleaseItem(datas[0].update_app)}; // 升级服务-发布项;
   }
   if (queryData === 'pulishApi') {
-    return { upService_interface: analysisUpInterface(datas[0].update_api) };
+    return {upService_interface: analysisUpInterface(datas[0].update_api)};
   }
 
   if (queryData === 'pulishConfirm') {
-    return { upService_confirm: analysisServiceConfirm(datas[0].update_confirm) }; // 升级服务-服务确认;
+    return {upService_confirm: analysisServiceConfirm(datas[0].update_confirm)}; // 升级服务-服务确认;
   }
 
   if (queryData === 'dataReview') {
-    return { reviewData_repaire: analysisReviewData(datas[0].review_data) };
+    return {reviewData_repaire: analysisReviewData(datas[0].review_data)};
   }
 
   if (queryData === 'dataReviewConfirm') {
-    return { reviewData_confirm: analysisReviewConfirm(datas[0].review_confirm) };
+    return {reviewData_confirm: analysisReviewConfirm(datas[0].review_confirm)};
   }
 
   if (queryData === 'onlineBranch') {
-    return { onlineBranch: analysisOnlineBranch(datas[0].release_branch) };
+    return {onlineBranch: analysisOnlineBranch(datas[0].release_branch)};
   }
 
   if (queryData === 'tabPageInfo') {
-    return { tabPageInfo: await analysisTabsPageInfo(datas) };
+    return {tabPageInfo: await analysisTabsPageInfo(datas)};
   }
 
   return {
     tabPageInfo: await analysisTabsPageInfo(datas),
     // 预发布项目
-    preProject: analysisPreReleaseProject(datas[0].project),
+    preProject: analysisPreReleaseProject(datas[0].project, datas[0].zt_task_status),
     // 升级服务
     upService_releaseItem: analysisReleaseItem(datas[0].update_app), // 升级服务-发布项
     upService_interface: analysisUpInterface(datas[0].update_api), // 升级服务-升级接口
@@ -161,4 +164,4 @@ const alalysisInitData = async (queryData: string = '', queryReleaseNum: string 
   };
 };
 
-export { alalysisInitData };
+export {alalysisInitData};

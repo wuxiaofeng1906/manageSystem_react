@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getDutyPersonPermission, getSystemPersonPermission } from '../../../authority/permission';
+import {getDutyPersonPermission, getSystemPersonPermission} from '../../../authority/permission';
 import dayjs from 'dayjs';
 
 const sys_accessToken = localStorage.getItem('accessId');
@@ -25,6 +25,7 @@ const savePrePulishProjects = async (params: any, listNo: string) => {
     release_way: params.pulishMethod,
     plan_release_time: dayjs(params.pulishTime).format('YYYY-MM-DD HH:mm:ss'),
     ready_release_num: listNo,
+    ignore_check: params.ignoreZentaoList
   };
 
   if (params.proid) {
@@ -107,4 +108,4 @@ const savePreProjects = async (source: any, releaseNum: string) => {
   return result;
 };
 
-export { savePreProjects };
+export {savePreProjects};

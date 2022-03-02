@@ -95,6 +95,8 @@ const PreRelease: React.FC<any> = () => {
       edit_user_name: '',
       edit_time: '',
       pro_id: '',
+      ignoreZentaoList: "2",
+      checkListStatus: "",
     });
 
     //  发布项

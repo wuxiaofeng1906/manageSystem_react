@@ -113,7 +113,7 @@ const CheckProgress: React.FC<any> = () => {
                 backgroundColor: processStatus.onliineCheck,
               }}
             ></button>
-            &nbsp;上线前检查已完成
+            &nbsp;分支检查已完成
           </label>
 
           <label style={{marginLeft: 10}}>

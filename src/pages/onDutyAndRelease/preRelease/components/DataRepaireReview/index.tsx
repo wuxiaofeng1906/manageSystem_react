@@ -258,7 +258,9 @@ const DataRepaireReview: React.FC<any> = () => {
       {/* 数据修复Review */}
       <div>
         <fieldset className={'fieldStyle'}>
-          <legend className={'legendStyle'}>Step3 数据修复Review</legend>
+          <legend className={'legendStyle'}>Step3 数据修复Review
+            <label style={{color:"Gray"}}> (后端值班填写)</label>
+          </legend>
 
           <div>
             {/* 数据修复 */}

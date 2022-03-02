@@ -606,7 +606,11 @@ const UpgradeService: React.FC<any> = () => {
       {/* 升级服务 */}
       <div>
         <fieldset className={'fieldStyle'}>
-          <legend className={'legendStyle'}>Step2 升级服务</legend>
+          <legend className={'legendStyle'}>
+            Step2 升级服务
+            <label style={{color: "Gray"}}> (值班测试：填写一键部署ID和测试服务确认完成；前后端值班：填写应用服务和升级接口/对应服务确认完成)
+            </label>
+          </legend>
           <div>
             {/* 条件查询 */}
             <div style={{height: 35, marginTop: -15, overflow: 'hidden'}}>

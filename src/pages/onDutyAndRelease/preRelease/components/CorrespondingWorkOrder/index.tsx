@@ -23,7 +23,9 @@ const CorrespondingWorkOrder: React.FC<any> = () => {
       {/* 对应工单 */}
       <div>
         <fieldset className={'fieldStyle'}>
-          <legend className={'legendStyle'}>Step5 对应工单</legend>
+          <legend className={'legendStyle'}>Step5 对应工单
+            <label style={{color:"Gray"}}> (值班测试：在运维平台填写工单时，需要关联发布批次号)</label>
+          </legend>
           <div>
             <div>
               {/* ag-grid 表格 */}

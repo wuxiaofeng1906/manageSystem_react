@@ -156,7 +156,9 @@ const PreReleaseProject: React.FC<any> = () => {
     <div>
       <div>
         <fieldset className={'fieldStyle'}>
-          <legend className={'legendStyle'}>Step1 预发布项目</legend>
+          <legend className={'legendStyle'}>Step1 预发布项目
+          <label style={{color:"Gray"}}> (值班测试填写)</label>
+          </legend>
 
           <div style={{marginBottom: -20, marginTop: -5}}>
             <div style={{float: 'right'}}>

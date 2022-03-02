@@ -7,7 +7,7 @@ const {Option} = Select;
 
 const CheckProgress: React.FC<any> = () => {
   // 获取当前页面的进度数据
-  const {tabsData, processStatus, modifyProcessStatus, operteStatus} = useModel('releaseProcess');
+  const {tabsData, processStatus, modifyProcessStatus, modifyOperteStatus, operteStatus} = useModel('releaseProcess');
   // 发布结果修改
   const pulishResulttChanged = async (params: any) => {
     // 需要验证前面的检查是否全部成功(前三个成功即可)。
@@ -37,6 +37,8 @@ const CheckProgress: React.FC<any> = () => {
         ...processStatus,
         releaseResult: params,
       });
+
+      // modifyOperteStatus(true);
     } else {
       message.error({
         content: result,

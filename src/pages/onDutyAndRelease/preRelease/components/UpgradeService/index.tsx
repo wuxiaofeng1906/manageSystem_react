@@ -9,9 +9,7 @@ import '../../style/style.css';
 import {useRequest} from 'ahooks';
 import {loadReleaseIDSelect} from '../../comControl/controler';
 import {
-  getReleasedItemColumns,
-  getReleasedApiColumns,
-  getReleaseServiceComfirmColumns,
+  getReleasedItemColumns, getReleasedApiColumns, getReleaseServiceComfirmColumns,
 } from './grid/columns';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {confirmUpgradeService} from './serviceConfirm';
@@ -22,16 +20,13 @@ import {vertifyModifyFlag, releaseAppChangRowColor} from '../../operate';
 import {inquireService} from './axiosRequest';
 import {deleteLockStatus, getLockStatus} from '../../lock/rowLock';
 import {
-  loadApiMethodSelect,
-  loadApiServiceSelect,
-  loadIsApiAndDbUpgradeSelect,
-  loadOnlineEnvSelect,
-  loadPulishItemSelect,
-  loadUpgradeApiSelect,
+  loadApiMethodSelect, loadApiServiceSelect, loadIsApiAndDbUpgradeSelect,
+  loadOnlineEnvSelect, loadPulishItemSelect, loadUpgradeApiSelect,
 } from '../../comControl/controler';
 import {upgradePulishItem, addPulishApi, deleteReleasedID} from './axiosRequest';
 import {getGridRowsHeight} from '../../components/gridHeight';
 import {alaReleasedChanged, getAutoCheckMessage} from './idDeal/dataDeal';
+import {serverConfirmJudge} from './checkExcute';
 
 const {TextArea} = Input;
 const {Option} = Select;
@@ -40,19 +35,9 @@ const usersInfo = JSON.parse(userLogins);
 let currentOperateStatus = false;  // 需要将useState中的operteStatus值赋值过来，如果直接取operteStatus，下拉框那边获取不到罪行的operteStatus；
 const UpgradeService: React.FC<any> = () => {
   const {
-    tabsData,
-    modifyProcessStatus,
-    releaseItem,
-    upgradeApi,
-    upgradeConfirm,
-    lockedItem,
-    modifyLockedItem,
-    setRelesaeItem,
-    setUpgradeApi,
-    releasedID,
-    modifyReleasedID,
-    allLockedArray,
-    operteStatus,
+    tabsData, modifyProcessStatus, releaseItem, upgradeApi, upgradeConfirm,
+    lockedItem, modifyLockedItem, setRelesaeItem, setUpgradeApi, releasedID,
+    modifyReleasedID, allLockedArray, operteStatus,
   } = useModel('releaseProcess');
   const [formUpgradeService] = Form.useForm(); // 升级服务
   const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
@@ -475,7 +460,6 @@ const UpgradeService: React.FC<any> = () => {
       const newData_confirm: any = await alalysisInitData('pulishConfirm', tabsData.activeKey);
       thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
 
-
       if (upgradeIntModal.title === '修改') {
         //   释放锁
         deleteLockStatus(lockedItem);
@@ -494,26 +478,24 @@ const UpgradeService: React.FC<any> = () => {
   /* endregion */
 
   /* region 服务确认 */
+
   // 下拉框选择是否确认事件
   const saveUperConfirmInfo = async (newValue: string, props: any) => {
-    if (currentOperateStatus) {
-      message.error({
-        content: `发布已完成，不能修改确认结果！`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+    const currentReleaseNum = props.data?.ready_release_num;
+debugger;    // 验证是否可以修改确认值
+    if (!serverConfirmJudge(currentOperateStatus, props, formUpgradeService.getFieldValue("hitMessage"))) {
+      // (不管成功或者失败)刷新表格
+      const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
+      thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
       return;
     }
-    const currentReleaseNum = props.data?.ready_release_num;
 
     const datas = {
       user_name: usersInfo.name,
       user_id: usersInfo.userid,
       person_type: '',
       ready_release_num: currentReleaseNum,
-      confirm_status: '',
+      confirm_status: newValue,
     };
 
     switch (props.column.colId) {
@@ -527,38 +509,13 @@ const UpgradeService: React.FC<any> = () => {
         datas.person_type = 'process';
         break;
       case 'test_confirm_status': // 测试
-      {
-        // 需要判断前后端和流程的数据是否确认，只有都确认了测试才能确认（如果不涉及某一段的，就跳过那一段）
-        const confirmData = props?.data;
-        if (
-          (confirmData.front_confirm_status === '1' ||
-            confirmData.front_confirm_status === '9') &&
-          (confirmData.back_end_confirm_status === '1' ||
-            confirmData.back_end_confirm_status === '9') &&
-          (confirmData.process_confirm_status === '1' ||
-            confirmData.process_confirm_status === '9')
-        ) {
-          datas.person_type = 'test';
-        } else {
-          message.error({
-            content: '保存失败：请先完成开发确认！',
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-          // (不管成功或者失败)刷新表格
-          const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
-          thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
-          return;
-        }
-      }
+        datas.person_type = 'test';
+
         break;
       default:
         break;
     }
 
-    datas.confirm_status = newValue;
     const result = await confirmUpgradeService(datas);
     if (result === '') {
       message.info({

@@ -89,8 +89,8 @@ const PreRelease: React.FC<any> = () => {
     // 预发布项目
     modifyPreReleaseData({
       projectId: undefined,
-      release_type: '',
-      release_way: '',
+      release_type: '1',
+      release_way: '1',
       plan_release_time: undefined,
       edit_user_name: '',
       edit_time: '',

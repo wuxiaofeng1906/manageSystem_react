@@ -114,6 +114,32 @@ const rendererUnitTest = (params: any) => {
     `;
 };
 
+const iconCheckRender = (params: any) => {
+  const values = params.value;
+  if (!values) {
+    return "";
+  }
+
+  let result = values.check_status;
+  let Color = "black";
+
+  if (values.check_status === "done") {// done  doing（执行中） wait（未开始）
+    result = values.check_result;  // check_result:  暂无分支、是、否
+    if (result === "是") {
+      Color = '#2BF541';
+    } else if (result === "否") {
+      Color = '#8B4513';
+    }
+  } else if (values.check_status === "doing") {
+    result = "执行中";
+    Color = '#46A0FC';
+  } else if (values.check_status === "wait") {
+    result = "未开始";
+  }
+
+  return ` <div style="color:${Color};font-size: 10px">${result}</div>`;
+
+};
 (window as any).visitCommenLog = (logUrl: string) => {
   if (logUrl && logUrl !== 'null') {
     return true;
@@ -566,8 +592,9 @@ const getOnlineBranchColumns = () => {
       minWidth: 170,
     }, {
       headerName: '图标一致性检查',
-      field: '',
+      field: 'icon_check',
       minWidth: 130,
+      cellRenderer: iconCheckRender
     },
     {
       headerName: '上线前版本检查是否通过',

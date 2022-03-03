@@ -1,7 +1,7 @@
 import ExcelJs from "exceljs";
 import {
   getProcessTable, getStoryStabilityTable, getStageWorkloadTable,
-  getProductRateTable, getReviewDefectTable, getProcessQualityTable, getServiceTable,vertifyFileName
+  getProductRateTable, getReviewDefectTable, getProcessQualityTable, getServiceTable, vertifyFileName
 } from "./tableInfo/tableCreate"
 
 // exceljs的说明文档： https://github.com/exceljs/exceljs/blob/master/README_zh.md
@@ -26,7 +26,7 @@ const setTableTitleColor = (rowNum: number, sheet: any) => {
 
 // Excel数据导出
 const exportToExcel = (data: any, title: string) => {
-  const sheetName = vertifyFileName(`项目指标-${title}`);
+  const sheetName = vertifyFileName(title);
   // 1.创建工作薄
   const workbook = new ExcelJs.Workbook();
 
@@ -102,7 +102,7 @@ const exportToExcel = (data: any, title: string) => {
 
   // 表格的数据绘制完成，定义下载方法，将数据导出到Excel文件
   workbook.xlsx.writeBuffer().then((buffer) => {
-    writeFile(sheetName, buffer);
+    writeFile(`${sheetName}.xls`, buffer);
   });
 };
 

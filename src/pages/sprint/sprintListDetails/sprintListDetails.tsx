@@ -164,6 +164,47 @@ const getColums = (prjNames: any) => {
       suppressMenu: false,
     },
     {
+      headerName: '相关需求',
+      field: 'relatedStories',
+      minWidth: 80,
+      cellRenderer: relatedNumberAndIdRender,
+      onCellClicked: (params: any) => {
+        // BUG = 1,
+        // TASK = 2,
+        // STORY = 3,
+        if (Number(params.value) < 500 && Number(params.value) > 0) {
+          history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=3&count=${params.value}`);
+        }
+      },
+      // tooltipField: "relatedStories"
+    },
+    {
+      headerName: '相关任务',
+      field: 'relatedTasks',
+      minWidth: 80,
+      cellRenderer: relatedNumberAndIdRender,
+      onCellClicked: (params: any) => {
+        if (Number(params.value) < 500 && Number(params.value) > 0) {
+          history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=2&count=${params.value}`);
+        }
+      },
+      // tooltipField: "relatedTasks"
+
+    },
+    {
+      headerName: '相关bug',
+      field: 'relatedBugs',
+      minWidth: 80,
+      cellRenderer: relatedNumberRender,
+      onCellClicked: (params: any) => {
+        if (Number(params.value) > 0) {
+          history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=1&count=${params.value}`);
+        }
+      },
+      // tooltipField: "relatedBugs"
+
+    },
+    {
       headerName: '截止日期',
       field: 'deadline',
       cellRenderer: timestampChanges,
@@ -232,47 +273,6 @@ const getColums = (prjNames: any) => {
       minWidth: 150,
       cellRenderer: stageForLineThrough,
       tooltipField: "memo"
-
-    },
-    {
-      headerName: '相关需求',
-      field: 'relatedStories',
-      minWidth: 80,
-      cellRenderer: relatedNumberAndIdRender,
-      onCellClicked: (params: any) => {
-        // BUG = 1,
-        // TASK = 2,
-        // STORY = 3,
-        if (Number(params.value) < 500 && Number(params.value) > 0) {
-          history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=3&count=${params.value}`);
-        }
-      },
-      // tooltipField: "relatedStories"
-    },
-    {
-      headerName: '相关任务',
-      field: 'relatedTasks',
-      minWidth: 80,
-      cellRenderer: relatedNumberAndIdRender,
-      onCellClicked: (params: any) => {
-        if (Number(params.value) < 500 && Number(params.value) > 0) {
-          history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=2&count=${params.value}`);
-        }
-      },
-      // tooltipField: "relatedTasks"
-
-    },
-    {
-      headerName: '相关bug',
-      field: 'relatedBugs',
-      minWidth: 80,
-      cellRenderer: relatedNumberRender,
-      onCellClicked: (params: any) => {
-        if (Number(params.value) > 0) {
-          history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=1&count=${params.value}`);
-        }
-      },
-      // tooltipField: "relatedBugs"
 
     },
     {

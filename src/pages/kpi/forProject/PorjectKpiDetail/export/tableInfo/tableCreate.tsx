@@ -458,7 +458,7 @@ const vertifyFileName = (stName: string) => {
   const reg = /\/|\?|\*|\[|\]|\\/g;
   sheetName = sheetName.replaceAll(reg, "-");
 
-  return sheetName;
+  return `${sheetName}_项目度量表_V1.0`;
 };
 
 export {

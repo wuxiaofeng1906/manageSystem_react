@@ -424,14 +424,16 @@ const getReviewDefectColumns = () => {
       field: 'title',
       minWidth: TYPE_LENGTH,
       maxWidth: TYPE_LENGTH,
-      cellRenderer: (params: any) => {
-        return `<div style="font-weight: bold;margin-top: 190px">${params.value}</div>`;
+      cellRenderer: () => {
+        return `<div style="font-weight: bold;margin-top: 190px">
+                    <div>5.缺陷密度/<br/>问题率</div>
+              </div>`;
       },
       cellClassRules: {
         'cell-span': 'value !== undefined',
       },
       rowSpan: (params: any) => {
-        if (params.data.title === '5.评审缺陷问题') {
+        if (params.data.title === '5.缺陷密度/问题率') {
           return 16;
         }
         return 1;
@@ -468,7 +470,7 @@ const getReviewDefectColumns = () => {
         return true;
       },
       cellEditor: 'agSelectCellEditor',
-      cellEditorParams: { values: ['是', '否'] },
+      cellEditorParams: {values: ['是', '否']},
       cellRenderer: (params: any) => {
         if (params.data?.kind === '合计') {
           return '-';
@@ -773,7 +775,7 @@ const getProcessQualityColumns = () => {
         return true;
       },
       cellEditor: 'agSelectCellEditor',
-      cellEditorParams: { values: ['是', '否'] },
+      cellEditorParams: {values: ['是', '否']},
       cellRenderer: (params: any) => {
         if (
           params.value === null ||

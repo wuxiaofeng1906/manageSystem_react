@@ -383,7 +383,7 @@ const alaysisReviewDefect = (sourceData: any, totalData: any) => {
     };
 
     if (i === 0) {
-      newData.title = "5.评审缺陷问题";
+      newData.title = "5.缺陷密度/问题率";
     }
     for (let index = 0; index < dts.length; index += 1) {
       const datas = dts[index];

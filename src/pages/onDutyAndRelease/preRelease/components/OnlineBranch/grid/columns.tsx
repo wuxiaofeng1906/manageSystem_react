@@ -124,11 +124,13 @@ const iconCheckRender = (params: any) => {
   let Color = "black";
 
   if (values.check_status === "done") {// done  doing（执行中） wait（未开始）
-    result = values.check_result;  // check_result:  暂无分支、是、否
-    if (result === "是") {
+    // check_result:  暂无分支、是、否
+    if (values.check_result === "是") {
       Color = '#2BF541';
-    } else if (result === "否") {
+      result = "通过";
+    } else if (values.check_result === "否") {
       Color = '#8B4513';
+      result = "不通过";
     }
   } else if (values.check_status === "doing") {
     result = "执行中";

@@ -10,16 +10,16 @@ const getProcessTable = (data: any) => {
     {name: "计划完成时间"},
     {name: "实际开始时间"},
     {name: "实际完成时间"},
-    {name: "偏差天数"},
-    {name: "偏差率"},
-    {name: "偏差原因"},
+    {name: "延期天数"},
+    {name: "延期率"},
+    {name: "延期原因说明"},
   ];
 
   const rowData: any = [];
   if (data && data.length > 0) {
     data.forEach((ele: any) => {
 
-      // 需要对偏差率进行小数点保留和百分号展示
+      // 需要对延期率进行小数点保留和百分号展示
       let ratioValue = "";
       if (ele.ratio === "0" || ele.ratio === 0) {
         ratioValue = "0";

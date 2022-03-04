@@ -55,7 +55,7 @@ const getProcessColumns = () => {
       field: 'actualEnd',
     },
     {
-      headerName: '偏差天数',
+      headerName: '延期天数',
       field: 'days',
       cellRenderer: (params: any) => {
         //   >0 显示绿色，< 0 显示红色，0是黑色
@@ -73,7 +73,7 @@ const getProcessColumns = () => {
       },
     },
     {
-      headerName: '偏差率',
+      headerName: '延期率',
       field: 'ratio',
       cellRenderer: (params: any) => {
         let values = params.value;
@@ -92,7 +92,7 @@ const getProcessColumns = () => {
       },
     },
     {
-      headerName: '偏差原因说明',
+      headerName: '延期原因说明',
       field: 'description',
       editable: true,
       minWidth: 260,

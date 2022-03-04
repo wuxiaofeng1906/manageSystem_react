@@ -386,7 +386,7 @@ const UpgradeService: React.FC<any> = () => {
             : params.online_environment.split(','),
         upInterface: params.update_api,
         interService: params.api_name,
-        hotUpdate: params.hot_update,
+        // hotUpdate: params.hot_update,
         method: params.api_method,
         URL: params.api_url,
         renter: params.related_tenant,
@@ -957,16 +957,16 @@ debugger;    // 验证是否可以修改确认值
             </Col>
           </Row>
 
-          <Form.Item name="hotUpdate" label="是否支持热更新：" required style={{marginTop: -15}}>
-            <Select>
-              <Option key={'1'} value={'1'}>
-                {'是'}
-              </Option>
-              <Option key={'2'} value={'2'}>
-                {'否'}
-              </Option>
-            </Select>
-          </Form.Item>
+          {/*<Form.Item name="hotUpdate" label="是否支持热更新：" required style={{marginTop: -15}}>*/}
+          {/*  <Select>*/}
+          {/*    <Option key={'1'} value={'1'}>*/}
+          {/*      {'是'}*/}
+          {/*    </Option>*/}
+          {/*    <Option key={'2'} value={'2'}>*/}
+          {/*      {'否'}*/}
+          {/*    </Option>*/}
+          {/*  </Select>*/}
+          {/*</Form.Item>*/}
 
           <Form.Item name="remark" label="备注：" style={{marginTop: -15}}>
             <TextArea/>

@@ -135,13 +135,13 @@ const getReleasedApiColumns = () => {
       headerName: '接口服务',
       field: 'api_name',
     },
-    {
-      headerName: '是否支持热更新',
-      field: 'hot_update',
-      cellRenderer: (params: any) => {
-        return `<span>${getIfOrNot(params.value)}</span>`;
-      },
-    },
+    // {
+    //   headerName: '是否支持热更新',
+    //   field: 'hot_update',
+    //   cellRenderer: (params: any) => {
+    //     return `<span>${getIfOrNot(params.value)}</span>`;
+    //   },
+    // },
     {
       headerName: '接口Method',
       field: 'api_method',

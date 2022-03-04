@@ -210,9 +210,9 @@ const addPulishApi = async (formData: any, currentListNo: string, type: string) 
     return '接口URL不能为空';
   }
 
-  if (!formData.hotUpdate) {
-    return '是否热更新不能为空';
-  }
+  // if (!formData.hotUpdate) {
+  //   return '是否热更新不能为空';
+  // }
 
   let onlineEnvStr = '';
   formData.onlineEnv.forEach((ele: any) => {
@@ -227,7 +227,7 @@ const addPulishApi = async (formData: any, currentListNo: string, type: string) 
     api_service: formData.interService,
     api_url: formData.URL,
     api_method: formData.method,
-    hot_update: formData.hotUpdate,
+    hot_update: "2",
     related_tenant: formData.renter,
     remarks: formData.remark,
     ready_release_num: currentListNo,

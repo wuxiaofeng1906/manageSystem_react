@@ -66,7 +66,6 @@ const queryAuthGroupViews = async (client: GqlClient<object>) => {
     }
   `);
 
-
   return analAuthGroup(data?.roleGroup);
 };
 

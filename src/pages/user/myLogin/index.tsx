@@ -67,7 +67,7 @@ const Login: React.FC<{}> = () => {
   const fetchUserInfo = async (userInfos: any) => {
 
     // 测试时的token
-    // console.log("登录后的token", userInfos.access_token);
+    console.log("登录后的token", userInfos.access_token);
     localStorage.setItem("accessId", userInfos.access_token); // 正式环境应放开
     localStorage.setItem("authority", JSON.stringify(userInfos.authorities));
     // console.log("myauth", JSON.stringify(userInfos.authorities));

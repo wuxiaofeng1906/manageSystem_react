@@ -24,7 +24,7 @@ export class GqlClient<T> {
       query: gql(query),
       context: {
         headers: {"Authorization": `Bearer ${localStorage.getItem("accessId")}`},  // 添加headers请求头，用于权限控制
-        // headers: {"Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IuiwreadsCIsInN1YiI6IlRhbkppZSIsImlhdCI6MTYyMzgyOTk4NX0.GqXs9NTJ3ynUzT0w9hkxppaKqvBUa6PDG2TmrfGyN5k`},
+        // headers: {"Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IuiwreadsCIsInN1YiI6IlRhbkppZSIsImlhdCI6MTYyMzgyOTk4NX0.GqXs9NTJ3ynUzT0w9hkxppaKqvBUa6PDG2TmrfGyN5k`},  // 谭杰的token
       }
     });
   };

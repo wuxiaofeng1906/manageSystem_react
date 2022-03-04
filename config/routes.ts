@@ -464,13 +464,14 @@ export default [
     name: "禅道管理",
     icon: 'table',
     path: '/zentao',
+    hideInMenu: true,
     routes: [
       {
         name: '人员执行设置',
         icon: 'table',
         path: 'peopleExcuteSetting',
         component: './zentao/peopleExcuteSetting',
-        hideInMenu: true
+
       }
     ]
   },

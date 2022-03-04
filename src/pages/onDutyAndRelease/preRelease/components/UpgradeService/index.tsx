@@ -105,7 +105,7 @@ const UpgradeService: React.FC<any> = () => {
         const newData: any = await alalysisInitData('pulishItem', tabsData.activeKey);
         // firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
         formUpgradeService.setFieldsValue({
-          hitMessage: getAutoCheckMessage(newData.upService_releaseItem),
+          hitMessage: await getAutoCheckMessage(tabsData.activeKey),
         });
         setRelesaeItem({
           gridHight: getGridRowsHeight(newData.upService_releaseItem),
@@ -155,7 +155,7 @@ const UpgradeService: React.FC<any> = () => {
       const newData: any = (await alalysisInitData('pulishItem', tabsData.activeKey))
         .upService_releaseItem;
       formUpgradeService.setFieldsValue({
-        hitMessage: getAutoCheckMessage(newData),
+        hitMessage: await getAutoCheckMessage(tabsData.activeKey),
       });
       setRelesaeItem({gridHight: getGridRowsHeight(newData), gridData: newData});
       // 需要判断升级接口内容是否有值，如果没有的话，则需要新增一个空行
@@ -482,7 +482,7 @@ const UpgradeService: React.FC<any> = () => {
   // 下拉框选择是否确认事件
   const saveUperConfirmInfo = async (newValue: string, props: any) => {
     const currentReleaseNum = props.data?.ready_release_num;
-debugger;    // 验证是否可以修改确认值
+    // 验证是否可以修改确认值
     if (!serverConfirmJudge(currentOperateStatus, props, formUpgradeService.getFieldValue("hitMessage"))) {
       // (不管成功或者失败)刷新表格
       const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
@@ -548,11 +548,15 @@ debugger;    // 验证是否可以修改确认值
 
   /* endregion */
 
-  useEffect(() => {
+  const showArrays = async () => {
     formUpgradeService.setFieldsValue({
       deployID: releasedID.oraID,
-      hitMessage: getAutoCheckMessage(releaseItem.gridData), // 31357
+      hitMessage: await getAutoCheckMessage(tabsData.activeKey), // 31357
     });
+  };
+  useEffect(() => {
+
+    showArrays();
   }, [releasedID]);
 
   useEffect(() => {

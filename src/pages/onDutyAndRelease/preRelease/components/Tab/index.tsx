@@ -91,7 +91,7 @@ const Tab: React.FC<any> = () => {
     setRelesaeItem({gridHight: getGridRowsHeight(releaseItem), gridData: releaseItem});
 
     // 一键部署ID展示
-    const ids = await showReleasedId(releaseItem);
+    const ids = await showReleasedId(initData?.deployment_id);
     modifyReleasedID(ids.showIdArray, ids.queryIdArray);
     //  发布接口
     const releaseApi = initData?.upService_interface;

@@ -120,6 +120,9 @@ const alalysisInitData = async (queryData: string = '', queryReleaseNum: string 
   if (queryData === 'pulishItem') {
     return {upService_releaseItem: analysisReleaseItem(datas[0].update_app)}; // 升级服务-发布项;
   }
+  if (queryData === 'deployment_id') {
+    return {deployment_id: datas[0].deployment_id}; // 一键发布ID;
+  }
   if (queryData === 'pulishApi') {
     return {upService_interface: analysisUpInterface(datas[0].update_api)};
   }
@@ -149,6 +152,7 @@ const alalysisInitData = async (queryData: string = '', queryReleaseNum: string 
     // 预发布项目
     preProject: analysisPreReleaseProject(datas[0].project, datas[0].zt_task_status),
     // 升级服务
+    deployment_id: datas[0].deployment_id,
     upService_releaseItem: analysisReleaseItem(datas[0].update_app), // 升级服务-发布项
     upService_interface: analysisUpInterface(datas[0].update_api), // 升级服务-升级接口
     upService_confirm: analysisServiceConfirm(datas[0].update_confirm), // 升级服务-服务确认

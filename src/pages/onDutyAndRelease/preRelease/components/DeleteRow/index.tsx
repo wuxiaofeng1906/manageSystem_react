@@ -69,7 +69,8 @@ const DeleteRow: React.FC<any> = () => {
           gridData: newDatas.upService_releaseItem
         });
         // firstUpSerGridApi.current?.setRowData(newDatas.upService_releaseItem);
-        const ids = await showReleasedId(newDatas?.upService_releaseItem);
+        const deptIDs = await alalysisInitData('deployment_id', currentListNo);
+        const ids = await showReleasedId(deptIDs?.deployment_id);
         modifyReleasedID(ids.showIdArray, ids.queryIdArray);
 
         // modifyReleasedID(newDatas?.upService_releaseItem); // 也要刷新一键部署ID

@@ -1,14 +1,16 @@
 import {queryReleaseId} from '../axiosRequest';
+import {alalysisInitData} from '../../../datas/dataAnalyze';
 
 // 展示已部署ID
-const showReleasedId = async (releasedData: any) => {
-  const showIdArray: any = [];
-  const queryIdArray: any = [];
+const showReleasedId = async (deploymentIDs: any) => {
 
+  const showIdArray: any = [];
   // 查询id
   const IDs = (await queryReleaseId()).data;
-  if (releasedData && releasedData.length > 0) {
-    releasedData.forEach((ele: any) => {
+  const queryIdArray: any = [];
+
+  if (deploymentIDs && deploymentIDs.length > 0) {
+    deploymentIDs.forEach((ele: any) => {
       if (!showIdArray.includes(ele.deployment_id)) {
         showIdArray.push(ele.deployment_id);
 
@@ -25,6 +27,7 @@ const showReleasedId = async (releasedData: any) => {
       }
     });
   }
+
   return {showIdArray, queryIdArray};
 };
 
@@ -93,15 +96,19 @@ const alaReleasedChanged = (oldData: any, newIDArray: any, selectedId: any) => {
 };
 
 // 检查是否勾选自动化测试
-const getAutoCheckMessage = (source: any) => {
+const getAutoCheckMessage = async (activeKey: string) => {
 
-  if (!source) {
+  const source: any = await alalysisInitData("deployment_id", activeKey);
+
+  const deploymentIDs = source.deployment_id;
+
+  if (!deploymentIDs || deploymentIDs.length === 0) {
     return "";
   }
 
   const noCheckArray: any = [];
   let noCheckString = "";
-  source.forEach((ele: any) => {
+  deploymentIDs.forEach((ele: any) => {
 
     if (ele.automation_check === "2") { // 表示未勾选自动化用例参数
       if (!noCheckArray.includes(ele.deployment_id)) {

@@ -115,8 +115,9 @@ const rendererUnitTest = (params: any) => {
 };
 
 const iconCheckRender = (params: any) => {
+
   const values = params.value;
-  if (!values) {
+  if (!values || JSON.stringify(values) === "{}") {
     return "";
   }
 
@@ -139,9 +140,22 @@ const iconCheckRender = (params: any) => {
     result = "未开始";
   }
 
-  return ` <div style="color:${Color};font-size: 10px">${result}</div>`;
 
+  return `
+       <div>
+          <div style="margin-top: -10px;margin-left: 100px">
+            <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC"
+              onclick='showIconCheckLog(${JSON.stringify(values.check_log)})'>
+                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+             </Button>
+          </div>
+          <div style="margin-top: -20px;width: 210px">
+                <div style="color:${Color};font-size: 10px">${result}</div>
+          </div>
+       </div>`
 };
+
+
 (window as any).visitCommenLog = (logUrl: string) => {
   if (logUrl && logUrl !== 'null') {
     return true;

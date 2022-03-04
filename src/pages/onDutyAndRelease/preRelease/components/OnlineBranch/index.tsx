@@ -75,6 +75,7 @@ const OnlineBranch: React.FC<any> = () => {
     show: false,
     autoUrl: {style: 'none', ui: '', api: ''},
     versionUrl: {style: 'none', app: '', global: ''},
+    iconCheckUrl: {style: 'none', content: <div></div>}
   });
   const onfirstOnlineBranchGridReady = (params: GridReadyEvent) => {
     firstOnlineBranchGridApi.current = params.api;
@@ -362,6 +363,60 @@ const OnlineBranch: React.FC<any> = () => {
     }
     setExecuteStatus(false);
   };
+  // 图标一致性检查日志显示
+  (window as any).showIconCheckLog = (logUrl: any) => {
+    if (logUrl.length === 0) {
+      message.info({
+        content: `图标库所包含地址一致，无检查日志！`,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
+
+    const logContent: any = [];
+    logUrl.forEach((log: any) => {
+
+      logContent.push(
+        <div>
+          {/* 原始仓库 */}
+          <div style={{textIndent: "2em"}}>
+            <div>
+              <label>{log.warehouse.name}</label>
+              <label>【{log.warehouse.file}】 所包含图标库地址：</label>
+            </div>
+            <label style={{color: "orange"}}>{log.warehouse.tag_id}地址：{log.warehouse.src}</label>
+          </div>
+
+          {/* 被对比的仓库 */}
+          <div style={{textIndent: "2em"}}>
+            <div>
+              <label>{log.compar_warehouse.name}</label>
+              <label>【{log.compar_warehouse.file}】 所包含图标库地址：</label>
+            </div>
+            <label style={{color: "red"}}>{log.compar_warehouse.tag_id}地址：{log.compar_warehouse.src}</label>
+          </div>
+
+        </div>
+      );
+    });
+
+    logContent.push(<div style={{marginTop: 20}}>
+      <label> 检查结果：</label>
+      <label style={{color: "#A71429"}}> 图标库所包含地址不一致</label>
+    </div>)
+    setLogModal({
+      show: true,
+      iconCheckUrl: {style: 'inline', content: <div style={{marginTop: -15}}> {logContent}</div>},
+      autoUrl: {style: 'none', ui: '', api: ''},
+      versionUrl: {style: 'none', app: '', global: ''},
+    });
+
+  };
+
   // 版本检查URL跳转
   (window as any).versionCheckLogUrlClick = (logUrl: any) => {
     let app_url = '';
@@ -378,6 +433,7 @@ const OnlineBranch: React.FC<any> = () => {
 
     if (app_url || global_url) {
       setLogModal({
+        iconCheckUrl: {style: 'none', content: <div></div>},
         autoUrl: {style: 'none', ui: '', api: ''},
         versionUrl: {style: 'inline', app: app_url, global: global_url},
         show: true,
@@ -428,6 +484,7 @@ const OnlineBranch: React.FC<any> = () => {
 
     if (ui_url || api_url) {
       setLogModal({
+        iconCheckUrl: {style: 'none', content: <div></div>},
         autoUrl: {style: 'inline', ui: ui_url, api: api_url},
         versionUrl: {style: 'none', app: '', global: ''},
         show: true,
@@ -447,6 +504,7 @@ const OnlineBranch: React.FC<any> = () => {
   const autoCancle = () => {
     setLogModal({
       show: false,
+      iconCheckUrl: {style: 'none', content: <div></div>},
       autoUrl: {style: 'none', ui: '', api: ''},
       versionUrl: {style: 'none', app: '', global: ''},
     });
@@ -458,7 +516,7 @@ const OnlineBranch: React.FC<any> = () => {
       <div>
         <fieldset className={'fieldStyle'}>
           <legend className={'legendStyle'}>Step4 上线分支
-            <label style={{color:"Gray"}}> (值班测试填写)</label>
+            <label style={{color: "Gray"}}> (值班测试填写)</label>
           </legend>
 
           <div>
@@ -560,14 +618,6 @@ const OnlineBranch: React.FC<any> = () => {
                   </Checkbox.Group>
                 </Form.Item>
               </Col>
-              {/*<Col span={8}>*/}
-              {/*  /!* 忽略禅道checklist检查 *!/*/}
-              {/*  <Form.Item name="ignoreChecklistCheck" style={{marginLeft: 0, marginTop: -20}}>*/}
-              {/*    <Checkbox.Group>*/}
-              {/*      <Checkbox value={'1'}>忽略禅道checklist检查</Checkbox>*/}
-              {/*    </Checkbox.Group>*/}
-              {/*  </Form.Item>*/}
-              {/*</Col>*/}
             </Row>
 
           </div>
@@ -849,7 +899,7 @@ const OnlineBranch: React.FC<any> = () => {
         onCancel={autoCancle}
         centered={true}
         footer={null}
-        width={500}
+        width={550}
         // bodyStyle={{height: 145}}
       >
         <Form>
@@ -893,6 +943,10 @@ const OnlineBranch: React.FC<any> = () => {
                 {logModal.versionUrl.global}
               </a>
             </Form.Item>
+          </div>
+
+          <div style={{display: logModal.iconCheckUrl.style}}>
+            {logModal.iconCheckUrl.content}
           </div>
 
           {/* <Form.Item>

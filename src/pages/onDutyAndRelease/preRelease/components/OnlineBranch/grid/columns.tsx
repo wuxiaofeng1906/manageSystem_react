@@ -118,6 +118,9 @@ const iconCheckRender = (params: any) => {
 
   const values = params.value;
   if (!values || JSON.stringify(values) === "{}") {
+    if (params.data?.technical_side === "2") {
+      return `     <div style="color:blue;font-size: 10px">忽略</div>`;
+    }
     return "";
   }
 

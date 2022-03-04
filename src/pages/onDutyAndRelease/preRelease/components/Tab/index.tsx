@@ -275,6 +275,16 @@ const Tab: React.FC<any> = () => {
   // 保存tab名
   const saveModifyName = async () => {
     const formData = tabNameSetForm.getFieldsValue();
+    if((formData.newTabName).trim() === ""){
+      message.error({
+        content: "新发布名称不能为空！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
     // 被修改的一定是当前activekey中的数据
     const result = await modifyTabsName(tabsData.activeKey, formData.newTabName);
     if (result === '') {

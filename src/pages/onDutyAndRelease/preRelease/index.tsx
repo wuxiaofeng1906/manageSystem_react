@@ -58,7 +58,6 @@ const PreRelease: React.FC<any> = () => {
   }
   // 查询数据
   const {data, loading} = useRequest(() => alalysisInitData('', releasedNumStr));
-
   // 显示无数据界面
   const showNoneDataPage = async () => {
     // tab 页面

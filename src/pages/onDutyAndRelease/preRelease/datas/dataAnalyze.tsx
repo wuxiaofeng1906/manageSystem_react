@@ -35,6 +35,7 @@ const analysisPreReleaseProject = (datas: any, zentaoData: any) => {
     projectArray.forEach((ele: any) => {
       projectIdArray.push(`${ele.project_name}&${ele.project_id}`);
     });
+    debugger;
     const returnArray = {
       pro_id: project.pro_id,
       projectId: projectIdArray,
@@ -44,8 +45,8 @@ const analysisPreReleaseProject = (datas: any, zentaoData: any) => {
       edit_user_name: project.edit_user_name,
       edit_time: project.edit_time,
       ready_release_num: project.ready_release_num,
-      ignoreZentaoList: zentaoData[0].ignore_check,
-      checkListStatus: zentaoData[0].task_status,
+      ignoreZentaoList: zentaoData[0] === undefined ? "" : zentaoData[0].ignore_check,
+      checkListStatus: zentaoData[0] === undefined ? "" : zentaoData[0].task_status,
     };
 
     return returnArray;
@@ -147,6 +148,7 @@ const alalysisInitData = async (queryData: string = '', queryReleaseNum: string 
     return {tabPageInfo: await analysisTabsPageInfo(datas)};
   }
 
+  debugger;
   return {
     tabPageInfo: await analysisTabsPageInfo(datas),
     // 预发布项目

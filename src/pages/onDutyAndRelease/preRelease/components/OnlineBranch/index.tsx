@@ -365,13 +365,14 @@ const OnlineBranch: React.FC<any> = () => {
   };
   // 图标一致性检查日志显示
   (window as any).showIconCheckLog = (logUrl: any) => {
-    if (logUrl.length === 0) {
+
+    if (!logUrl || logUrl.length === 0) {
       message.info({
         content: `图标库所包含地址一致，无检查日志！`,
         duration: 1,
         style: {
           marginTop: '50vh',
-        },
+        }
       });
 
       return;

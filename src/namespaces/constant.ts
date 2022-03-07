@@ -2,7 +2,7 @@
  * @Description: 通用常量
  * @Author: jieTan
  * @Date: 2021-11-23 15:51:13
- * @LastEditTime: 2022-03-03 02:15:02
+ * @LastEditTime: 2022-03-07 05:49:44
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -48,7 +48,7 @@ export const PROJ_STATUS = {
 // scaleProductivity # 生产率 + 规模
 export const PROJ_METRIC = {
   project: { en: 'project', zh: '项目信息', show: false },
-  progressDeviation: { en: 'progressDeviation', zh: '进度偏差率' },
+  progressDeviation: { en: 'progressDeviation', zh: '进度延期率' },
   storyStable: { en: 'storyStable', zh: '需求稳定性' },
   stageWorkload: { en: 'stageWorkload', zh: '阶段工作量' },
   scaleProductivity: { en: 'scaleProductivity', zh: '生产率&规模' },

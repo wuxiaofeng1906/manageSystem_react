@@ -9,7 +9,7 @@ import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import moment from 'moment';
 import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col} from 'antd';
-import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone, LogoutOutlined} from '@ant-design/icons';
+import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone, LogoutOutlined, ReloadOutlined} from '@ant-design/icons';
 import {formatMomentTime} from '@/publicMethods/timeMethods';
 import {getHeight} from '@/publicMethods/pageSet';
 import axios from 'axios';
@@ -791,6 +791,9 @@ const SprintList: React.FC<any> = () => {
   };
   /* endregion */
 
+  const refreshGrid = () => {
+
+  }
   const rightStyle = {marginLeft: '30px'};
   const leftStyle = {marginLeft: '120px'};
   const widths = {width: '150px'};
@@ -902,6 +905,9 @@ const SprintList: React.FC<any> = () => {
                 style={{color: 'black', float: 'right', display: judgeAuthority("新增项目") === true ? "inline" : "none"}}
                 icon={<FolderAddTwoTone/>} size={'large'}
                 onClick={addProject}>新增</Button>
+
+        <Button type="text" icon={<ReloadOutlined/>} onClick={refreshGrid} size={'large'}
+                style={{display:"none",float: "right"}} >刷新</Button>
       </div>
 
       {/* ag-grid 表格定义 */}

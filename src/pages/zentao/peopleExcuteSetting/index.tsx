@@ -87,7 +87,22 @@ const PeopleExcuteSetting: React.FC<any> = () => {
 
             </Row>
             <Row style={{marginTop: -20}}>
-              <Col span={21}>
+              <Col span={11}>
+                <Form.Item label="分配执行类型筛选" name="distributeExcute" required={true}>
+                  <Select style={{width: '100%'}}>
+                    <Option value="开发">开发</Option>
+                    <Option value="测试">测试</Option>
+                  </Select>
+                </Form.Item>
+                <Form.Item label="排除执行类型筛选" name="excludeExcute" required={true} style={{marginTop: -20}}>
+                  <Select style={{width: '100%'}}>
+                    <Option value="jack">Jack</Option>
+                    <Option value="lucy">Lucy</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+
+              <Col span={10}>
                 <Form.Item label="分配执行" name="distributeExcute" required={true}>
                   <Select style={{width: '100%'}}>
                     <Option value="开发">开发</Option>
@@ -101,6 +116,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
                   </Select>
                 </Form.Item>
               </Col>
+
               <Col span={3}>
 
                 <Button

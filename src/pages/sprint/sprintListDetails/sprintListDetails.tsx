@@ -6,7 +6,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient, useQuery} from '@/hooks';
-import {PageHeader, Button, message, Form, Select, Modal, Input, Row, Col, DatePicker, Checkbox} from 'antd';
+import {PageHeader, Button, message, Form, Select, Modal, Input, Row, Col, DatePicker, Checkbox, Spin} from 'antd';
 import {formatMomentTime} from '@/publicMethods/timeMethods';
 import dayjs from "dayjs";
 import {
@@ -16,7 +16,7 @@ import {
   EditTwoTone,
   CloseSquareTwoTone,
   CheckSquareTwoTone,
-  SettingOutlined
+  SettingOutlined, ReloadOutlined
 } from '@ant-design/icons';
 import {history} from 'umi';
 import {
@@ -2238,6 +2238,48 @@ const SprintList: React.FC<any> = () => {
 
   /* endregion */
 
+  /* region 手动同步数据 */
+  const [refreshItem, setRefreshItem] = useState(false);
+  const refreshGrid = async () => {
+    setRefreshItem(true);
+    await axios
+      .post('/api/project/system/sync/sprint/pdetail', {"pid": Number(prjId)})
+      .then(function (res) {
+
+        if (res.data.ok === true) {
+          updateGrid();
+          message.info({
+            content: "项目详情同步成功！",
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+          message.error({
+            content: `错误：${res.data.message}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+      })
+      .catch(function (error) {
+        message.error({
+          content: `异常信息：${error.toString()}`,
+          duration: 1, // 1S 后自动关闭
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      });
+
+    setRefreshItem(false);
+
+  };
+
+  /* endregion */
   const leftStyle = {marginLeft: '20px'};
   const rightStyle = {marginLeft: '30px'};
   const widths = {width: '200px', color: 'black'};
@@ -2273,127 +2315,133 @@ const SprintList: React.FC<any> = () => {
 
       />
 
-      {/* 明细操作按钮   */}
-      <Row style={{background: 'white', marginTop: "20px"}}>
-
-        <Col span={23}>
-
-          <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap"}}>
-
-            <Button type="text"
-                    style={{
-                      marginLeft: "-10px",
-                      display: judgeAuthority("新增项目明细行") === true ? "inline" : "none"
-                    }}
-                    icon={<FolderAddTwoTone/>} size={'large'}
-                    onClick={addProject}>新增</Button>
-            <Button type="text"
-                    style={{
-                      marginLeft: "-10px",
-                      display: judgeAuthority("修改项目明细行") === true ? "inline" : "none"
-                    }}
-                    icon={<EditTwoTone/>} size={'large'}
-                    onClick={btnModifyProject}>修改</Button>
-            <Button type="text"
-                    style={{
-                      marginLeft: "-10px",
-                      display: judgeAuthority("删除项目明细行") === true ? "inline" : "none"
-                    }}
-                    icon={<DeleteTwoTone/>} size={'large'}
-                    onClick={deleteSprintDetails}>删除</Button>
-            <Button type="text"
-                    style={{
-                      marginLeft: "-10px",
-                      display: judgeAuthority("移动项目明细行") === true ? "inline" : "none"
-                    }}
-                    icon={<SnippetsTwoTone/>} size={'large'}
-                    onClick={moveProject}>移动</Button>
-
-            <label style={{marginTop: '10px', fontWeight: 'bold', marginLeft: "10px"}}>操作流程:</label>
-
-            <Button type="text"
-                    style={{display: judgeAuthority("打基线") === true ? "inline" : "none"}}
-                    icon={<CheckSquareTwoTone/>} size={'large'}
-                    onClick={flowForBaseLine}>基线</Button>
-
-            <Button type="text"
-                    style={{marginLeft: "-10px", display: judgeAuthority("撤销") === true ? "inline" : "none"}}
-                    icon={<CloseSquareTwoTone/>} size={'large'}
-                    onClick={flowForRevoke}>撤销</Button>
-
-            <Button type="text"
-                    style={{marginLeft: "-10px", display: judgeAuthority("取消") === true ? "inline" : "none"}}
-                    icon={<CloseSquareTwoTone/>} size={'large'}
-                    onClick={flowForCancle}>取消</Button>
-
-            <Button type="text"
-                    style={{marginLeft: "-10px", display: judgeAuthority("开发已revert") === true ? "inline" : "none"}}
-                    icon={<CheckSquareTwoTone/>} size={'large'}
-                    onClick={flowForDevRevert}>开发已revert</Button>
-
-            <Button type="text"
-                    style={{marginLeft: "-10px", display: judgeAuthority("测试已验revert") === true ? "inline" : "none"}}
-                    icon={<CheckSquareTwoTone/>} size={'large'}
-                    onClick={flowForTestRevert}>测试已验revert</Button>
-
-            <Button type="text"
-                    style={{marginLeft: "-10px", display: judgeAuthority("灰度已验证") === true ? "inline" : "none"}}
-                    icon={<CheckSquareTwoTone/>} size={'large'}
-                    onClick={flowForHuiduChecked}>灰度已验证</Button>
-
-            <Button type="text"
-                    style={{marginLeft: "-10px", display: judgeAuthority("线上已验证") === true ? "inline" : "none"}}
-                    icon={<CheckSquareTwoTone/>} size={'large'}
-                    onClick={flowForOnlineChecked}>线上已验证</Button>
-
-          </div>
-
-        </Col>
+      <Spin spinning={refreshItem} tip="项目详情同步中..." size={"large"}>
 
 
-        <Col span={1} style={{
-          textAlign: "right",
-          // display: "flex",
-          // flexDirection: "row-reverse",
-          // flexWrap: "wrap",
-        }}>
+        {/* 明细操作按钮   */}
+        <Row style={{background: 'white', marginTop: "20px"}}>
 
-          <Button type="text" icon={<SettingOutlined/>} size={'large'} onClick={showFieldsModal}> </Button>
-        </Col>
+          <Col span={22}>
 
-      </Row>
+            <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap"}}>
 
-      {/* ag-grid 表格定义 */}
-      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
-        <AgGridReact
-          columnDefs={getColums(prjNames)} // 定义列
-          rowData={data?.result} // 数据绑定
-          defaultColDef={{
-            resizable: true,
-            sortable: true,
-            filter: true,
-            flex: 1,
-            minWidth: 100,
-            suppressMenu: true,
-            cellStyle: {"line-height": "28px"},
-          }}
+              <Button type="text"
+                      style={{
+                        marginLeft: "-10px",
+                        display: judgeAuthority("新增项目明细行") === true ? "inline" : "none"
+                      }}
+                      icon={<FolderAddTwoTone/>} size={'large'}
+                      onClick={addProject}>新增</Button>
+              <Button type="text"
+                      style={{
+                        marginLeft: "-10px",
+                        display: judgeAuthority("修改项目明细行") === true ? "inline" : "none"
+                      }}
+                      icon={<EditTwoTone/>} size={'large'}
+                      onClick={btnModifyProject}>修改</Button>
+              <Button type="text"
+                      style={{
+                        marginLeft: "-10px",
+                        display: judgeAuthority("删除项目明细行") === true ? "inline" : "none"
+                      }}
+                      icon={<DeleteTwoTone/>} size={'large'}
+                      onClick={deleteSprintDetails}>删除</Button>
+              <Button type="text"
+                      style={{
+                        marginLeft: "-10px",
+                        display: judgeAuthority("移动项目明细行") === true ? "inline" : "none"
+                      }}
+                      icon={<SnippetsTwoTone/>} size={'large'}
+                      onClick={moveProject}>移动</Button>
 
-          autoGroupColumnDef={{
-            minWidth: 100,
-          }}
-          rowHeight={28}
-          headerHeight={30}
-          rowSelection={'multiple'} // 设置多行选中
-          groupDefaultExpanded={9} // 展开分组
-          onGridReady={onGridReady}
-          onRowDoubleClicked={rowClicked}
-          getRowStyle={setRowColor}
-          onGridSizeChanged={onGridReady}
-          onColumnEverythingChanged={onGridReady}
-        />
+              <label style={{marginTop: '10px', fontWeight: 'bold', marginLeft: "10px"}}>操作流程:</label>
 
-      </div>
+              <Button type="text"
+                      style={{display: judgeAuthority("打基线") === true ? "inline" : "none"}}
+                      icon={<CheckSquareTwoTone/>} size={'large'}
+                      onClick={flowForBaseLine}>基线</Button>
 
+              <Button type="text"
+                      style={{marginLeft: "-10px", display: judgeAuthority("撤销") === true ? "inline" : "none"}}
+                      icon={<CloseSquareTwoTone/>} size={'large'}
+                      onClick={flowForRevoke}>撤销</Button>
+
+              <Button type="text"
+                      style={{marginLeft: "-10px", display: judgeAuthority("取消") === true ? "inline" : "none"}}
+                      icon={<CloseSquareTwoTone/>} size={'large'}
+                      onClick={flowForCancle}>取消</Button>
+
+              <Button type="text"
+                      style={{marginLeft: "-10px", display: judgeAuthority("开发已revert") === true ? "inline" : "none"}}
+                      icon={<CheckSquareTwoTone/>} size={'large'}
+                      onClick={flowForDevRevert}>开发已revert</Button>
+
+              <Button type="text"
+                      style={{marginLeft: "-10px", display: judgeAuthority("测试已验revert") === true ? "inline" : "none"}}
+                      icon={<CheckSquareTwoTone/>} size={'large'}
+                      onClick={flowForTestRevert}>测试已验revert</Button>
+
+              <Button type="text"
+                      style={{marginLeft: "-10px", display: judgeAuthority("灰度已验证") === true ? "inline" : "none"}}
+                      icon={<CheckSquareTwoTone/>} size={'large'}
+                      onClick={flowForHuiduChecked}>灰度已验证</Button>
+
+              <Button type="text"
+                      style={{marginLeft: "-10px", display: judgeAuthority("线上已验证") === true ? "inline" : "none"}}
+                      icon={<CheckSquareTwoTone/>} size={'large'}
+                      onClick={flowForOnlineChecked}>线上已验证</Button>
+
+            </div>
+
+          </Col>
+          <Col span={1} style={{textAlign: "right",}}>
+            <div>
+              <Button type="text" icon={<ReloadOutlined/>} onClick={refreshGrid} size={'large'}
+                      style={{display: "inline", float: "right"}}>刷新</Button>
+            </div>
+
+          </Col>
+
+          <Col span={1} style={{textAlign: "right",}}>
+            <div>
+              <Button type="text" icon={<SettingOutlined/>} size={'large'} onClick={showFieldsModal}> </Button>
+            </div>
+          </Col>
+
+        </Row>
+
+        {/* ag-grid 表格定义 */}
+        <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
+          <AgGridReact
+            columnDefs={getColums(prjNames)} // 定义列
+            rowData={data?.result} // 数据绑定
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true,
+              flex: 1,
+              minWidth: 100,
+              suppressMenu: true,
+              cellStyle: {"line-height": "28px"},
+            }}
+
+            autoGroupColumnDef={{
+              minWidth: 100,
+            }}
+            rowHeight={28}
+            headerHeight={30}
+            rowSelection={'multiple'} // 设置多行选中
+            groupDefaultExpanded={9} // 展开分组
+            onGridReady={onGridReady}
+            onRowDoubleClicked={rowClicked}
+            getRowStyle={setRowColor}
+            onGridSizeChanged={onGridReady}
+            onColumnEverythingChanged={onGridReady}
+          />
+
+        </div>
+
+      </Spin>
       {/* admin新增和修改表单 */}
       <Modal
         title={modal.title}

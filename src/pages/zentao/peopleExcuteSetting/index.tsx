@@ -1,8 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {useRequest} from 'ahooks';
-
 import {Card, Button, message, Form, Select, Row, Col, InputNumber} from 'antd';
+import {getZentaoUserSelect, getPositionSelect, getExcuteTypeSelect, getExcutionSelect} from './component';
 
 const {Option} = Select;
 
@@ -11,6 +11,17 @@ const {Option} = Select;
 
 // 组件初始化
 const PeopleExcuteSetting: React.FC<any> = () => {
+  /* region 下拉列表 */
+  // 人员列表
+  const zentaoUserList = useRequest(() => getZentaoUserSelect()).data;
+  // 职位
+  const positionsList = useRequest(() => getPositionSelect()).data;
+
+  // 执行类型
+  const excuteTypeList = useRequest(() => getExcuteTypeSelect()).data;
+
+
+  /* endregion */
 
   const [formForExcuteSetting] = Form.useForm();
 
@@ -27,6 +38,14 @@ const PeopleExcuteSetting: React.FC<any> = () => {
     console.log(formData);
   };
 
+  const [excute, setExcute] = useState({
+    distributeExcute: null,// 分配
+    excludeExcute: null // 排除
+
+  })
+  const onExcuteTypeChanged = async () => {
+    await getExcutionSelect("");
+  };
   useEffect(() => {
     // formForExcuteSetting.setFieldsValue({
     //   // usersName: undefined,
@@ -46,18 +65,16 @@ const PeopleExcuteSetting: React.FC<any> = () => {
             <Row>
               <Col span={7}>
                 <Form.Item label="人员选择" name="usersName" required={true}>
-                  <Select mode="multiple" allowClear style={{width: '100%'}}
+                  <Select mode="multiple" showSearch style={{width: '100%'}}
                   >
-                    <Option value="jack">Jack</Option>
-                    <Option value="lucy">Lucy</Option>
+                    {zentaoUserList}
                   </Select>
                 </Form.Item>
               </Col>
               <Col span={4}>
                 <Form.Item label="职位" name="position" required={true}>
-                  <Select style={{width: '100%'}} defaultValue={"开发"}>
-                    <Option value="开发">开发</Option>
-                    <Option value="测试">测试</Option>
+                  <Select style={{width: '100%'}} showSearch defaultValue={"研发"}>
+                    {positionsList}
                   </Select>
                 </Form.Item>
               </Col>
@@ -89,30 +106,26 @@ const PeopleExcuteSetting: React.FC<any> = () => {
             <Row style={{marginTop: -20}}>
               <Col span={11}>
                 <Form.Item label="分配执行类型筛选" name="distributeExcute" required={true}>
-                  <Select style={{width: '100%'}}>
-                    <Option value="开发">开发</Option>
-                    <Option value="测试">测试</Option>
+                  <Select style={{width: '100%'}} showSearch>
+                    {excuteTypeList}
                   </Select>
                 </Form.Item>
                 <Form.Item label="排除执行类型筛选" name="excludeExcute" required={true} style={{marginTop: -20}}>
-                  <Select style={{width: '100%'}}>
-                    <Option value="jack">Jack</Option>
-                    <Option value="lucy">Lucy</Option>
+                  <Select style={{width: '100%'}} showSearch>
+                    {excuteTypeList}
                   </Select>
                 </Form.Item>
               </Col>
 
               <Col span={10}>
                 <Form.Item label="分配执行" name="distributeExcute" required={true}>
-                  <Select style={{width: '100%'}}>
-                    <Option value="开发">开发</Option>
-                    <Option value="测试">测试</Option>
+                  <Select style={{width: '100%'}} showSearch>
+                    {excute.distributeExcute}
                   </Select>
                 </Form.Item>
                 <Form.Item label="排除执行" name="excludeExcute" required={true} style={{marginTop: -20}}>
-                  <Select style={{width: '100%'}}>
-                    <Option value="jack">Jack</Option>
-                    <Option value="lucy">Lucy</Option>
+                  <Select style={{width: '100%'}} showSearch>
+                    {excute.excludeExcute}
                   </Select>
                 </Form.Item>
               </Col>

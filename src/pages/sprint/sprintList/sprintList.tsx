@@ -34,11 +34,12 @@ let orgPrjname = '';
 let delCounts = 0;
 
 // 查询数据
-const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
+const queryDevelopViews = async (client: GqlClient<object>, params: any, syncData: boolean) => {
+
   const range = `{start:"${params.dateRange.start}", end:"${params.dateRange.end}"}`;
   const {data} = await client.query(`
       {
-         project(name:"${params.projectName}",category:[${params.projectType}], range:${range},status:[${params.projectStatus}],order:ASC){
+         project(name:"${params.projectName}",category:[${params.projectType}], range:${range},status:[${params.projectStatus}],order:ASC,doSync:${syncData}){
           id
           name
           type
@@ -88,7 +89,6 @@ const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
   return data?.proExist;
 };
 
-
 const queryDeleteCount = async (client: GqlClient<object>, params: any) => {
   const {data} = await client.query(`
       {
@@ -104,7 +104,6 @@ const queryDeleteCount = async (client: GqlClient<object>, params: any) => {
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
-
 
   const sys_accessToken = localStorage.getItem("accessId");
   axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
@@ -258,7 +257,8 @@ const SprintList: React.FC<any> = () => {
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, defalutCondition));
+
+  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, defalutCondition, true));
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -283,7 +283,7 @@ const SprintList: React.FC<any> = () => {
   /* region 条件查询功能 */
 
   const updateGrid = async () => {
-    const datas: any = await queryDevelopViews(gqlClient, choicedCondition);
+    const datas: any = await queryDevelopViews(gqlClient, choicedCondition, false);
     gridApi.current?.setRowData(datas);
   };
 
@@ -347,7 +347,7 @@ const SprintList: React.FC<any> = () => {
       dateRange: {start: "", end: ""},
       projectStatus: ['wait', 'doing', 'suspended'],
     });
-    const datas: any = await queryDevelopViews(gqlClient, defalutCondition);
+    const datas: any = await queryDevelopViews(gqlClient, defalutCondition, false);
     gridApi.current?.setRowData(datas);
   };
 

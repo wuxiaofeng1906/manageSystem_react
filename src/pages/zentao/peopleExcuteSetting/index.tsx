@@ -4,7 +4,7 @@ import {useRequest} from 'ahooks';
 import {Card, Button, message, Form, Select, Row, Col, InputNumber} from 'antd';
 import {getZentaoUserSelect, getPositionSelect, getExcuteTypeSelect, getExcutionSelect} from './component';
 import {excuteDistributeOperate, saveDistributeOperate} from './excute';
-import {getDistributeDetails} from './axiosRequest';
+import {getDistributeDetails, getExcuteLogs} from './axiosRequest';
 
 // 组件初始化
 const PeopleExcuteSetting: React.FC<any> = () => {
@@ -27,6 +27,9 @@ const PeopleExcuteSetting: React.FC<any> = () => {
   const excuteAuthorityDistribute = () => {
     const formData = formForExcuteSetting.getFieldsValue();
     excuteDistributeOperate(formData);
+
+    // 获取执行日志
+    // await getExcuteLogs();
 
   };
 

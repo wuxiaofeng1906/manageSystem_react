@@ -465,6 +465,7 @@ export default [
     icon: 'table',
     path: '/zentao',
     // hideInMenu: true,
+    access: 'sysAdmin',
     routes: [
       {
         name: '人员执行设置',

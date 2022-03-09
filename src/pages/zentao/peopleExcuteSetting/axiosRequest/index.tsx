@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {message} from "antd";
 
 const sys_accessToken = localStorage.getItem('accessId');
 axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
@@ -118,13 +119,68 @@ const getDistributeDetails = async () => {
 
 
 // 执行分配
-const excuteDistribute = () => {
+const excuteDistribute = async (datas: any) => {
+  const result: any = {
+    message: '',
+    data: [],
+  };
+  await axios.post('/api/verify/zentao/distribution', datas)
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    })
+    .catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
 
+  return result;
 };
 
 // 保存分配
-const saveDistribute = () => {
+const saveDistribute = async (datas: any) => {
+  const result: any = {
+    message: '',
+    data: [],
+  };
+  await axios.post('/api/verify/zentao/distribution_detail', datas)
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    })
+    .catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
 
+  return result;
+
+};
+
+// 获取执行日志
+const getExcuteLogs = async (performId: number) => {
+  const result: any = {
+    message: '',
+    data: [],
+  };
+  await axios
+    .get('/api/verify/zentao/distribution_log', {params: {perform_id: performId}})
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    })
+    .catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
 };
 export {
   getZentaoUsers,
@@ -133,5 +189,6 @@ export {
   getExcution,
   excuteDistribute,
   saveDistribute,
-  getDistributeDetails
+  getDistributeDetails,
+  getExcuteLogs
 };

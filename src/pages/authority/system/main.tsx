@@ -432,6 +432,10 @@ const Authority: React.FC<any> = () => {
         {/* 新增分组按钮 */}
         <div style={{width: "100%", height: "40px", background: 'white'}}>
 
+
+          <Button type="text" icon={<ReloadOutlined/>} onClick={refreshDeptUsers} size={'large'}
+                  style={{float: "right"}}>刷新</Button>
+
           <Button type="text"
                   style={{
                     color: '#1890FF',
@@ -442,8 +446,6 @@ const Authority: React.FC<any> = () => {
                   size={'large'} onClick={addGroup}>新增分组</Button>
 
 
-          <Button type="text" icon={<ReloadOutlined/>} onClick={refreshDeptUsers} size={'large'}
-                  style={{float: "right"}}>刷新</Button>
 
         </div>
         {/* 表格控件 */}

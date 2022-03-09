@@ -8,7 +8,7 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import moment from 'moment';
-import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col} from 'antd';
+import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col, Spin} from 'antd';
 import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone, LogoutOutlined, ReloadOutlined} from '@ant-design/icons';
 import {formatMomentTime} from '@/publicMethods/timeMethods';
 import {getHeight} from '@/publicMethods/pageSet';
@@ -791,9 +791,46 @@ const SprintList: React.FC<any> = () => {
   };
   /* endregion */
 
-  const refreshGrid = () => {
+  /* region sprint 列表手动刷新 */
+  const [refreshProject, setRefreshProject] = useState(false);
+  const refreshGrid = async () => {
+    setRefreshProject(true);
 
+    await axios.post('/api/project/system/sync/sprint/project')
+      .then(function (res) {
+        if (res.data.ok === true) {
+          updateGrid();
+          message.info({
+            content: "项目同步成功！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else {
+          message.error({
+            content: `${res.data.message}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+      })
+      .catch(function (error) {
+        message.error({
+          content: `异常信息：${error.toString()}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      });
+
+    setRefreshProject(false);
   }
+
+  /* endregion */
   const rightStyle = {marginLeft: '30px'};
   const leftStyle = {marginLeft: '120px'};
   const widths = {width: '150px'};
@@ -806,136 +843,147 @@ const SprintList: React.FC<any> = () => {
   // 返回渲染的组件
   return (
     <PageContainer>
-      {/* 查询条件 */}
-      <div style={{width: '100%', overflow: 'auto', whiteSpace: 'nowrap'}}>
-        {/* <button onClick={testTiaozhaun}>跳转测试</button> */}
+      <Spin spinning={refreshProject} tip="项目同步中..." size={"large"}>
 
-        {/* <div><Link to="/sprint/sprintListDetails">跳转测试</Link></div> */}
-        <Form.Item name="prjName">
-          <label style={{marginLeft: '10px'}}>项目名称：</label>
-          <Input
-            placeholder="请输入"
-            style={{width: '18%'}}
-            allowClear={true}
-            onChange={projectChanged}
-            value={choicedCondition.projectName}
-          />
-          {/* <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjTypeHandleChange} */}
-          {/*        tokenSeparators={[',']}> {[ */}
-          {/*  <Option key={"emergency20201223"} value={"emergency20201223"}>emergency20201223 </Option> */}
-          {/* ]} */}
-          {/* </Select> */}
+        {/* 查询条件 */}
+        <div style={{width: '100%', overflow: 'auto', whiteSpace: 'nowrap'}}>
+          {/* <button onClick={testTiaozhaun}>跳转测试</button> */}
 
-          <label style={{marginLeft: '10px'}}>项目类型：</label>
-          <Select
-            placeholder="请选择"
-            mode="multiple"
-            style={{width: '18%'}}
-            value={choicedCondition.projectType}
-            onChange={prjTypeChanged}
-          >{[
-            <Option key={'sprint'} value={'sprint'}>
-              sprint{' '}
-            </Option>,
-            <Option key={'hotfix'} value={'hotfix'}>
-              hotfix{' '}
-            </Option>,
-            <Option key={'emergency'} value={'emergency'}>
-              emergency{' '}
-            </Option>,
-          ]}
-          </Select>
+          {/* <div><Link to="/sprint/sprintListDetails">跳转测试</Link></div> */}
+          <Form.Item name="prjName">
+            <label style={{marginLeft: '10px'}}>项目名称：</label>
+            <Input
+              placeholder="请输入"
+              style={{width: '18%'}}
+              allowClear={true}
+              onChange={projectChanged}
+              value={choicedCondition.projectName}
+            />
+            {/* <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjTypeHandleChange} */}
+            {/*        tokenSeparators={[',']}> {[ */}
+            {/*  <Option key={"emergency20201223"} value={"emergency20201223"}>emergency20201223 </Option> */}
+            {/* ]} */}
+            {/* </Select> */}
 
-          <label style={{marginLeft: '10px'}}>时间：</label>
-          <RangePicker
-            className={'times'}
-            style={{width: '18%'}}
-            // defaultValue={[moment(getRecentMonth().start), moment(getRecentMonth().end)]}
-            // defaultValue={[choicedDateTime.start, choicedDateTime.end]}
-            value={[choicedCondition.dateRange.start === "" ? null : moment(choicedCondition.dateRange.start),
-              choicedCondition.dateRange.end === "" ? null : moment(choicedCondition.dateRange.end)]}
-
-            onChange={onTimeSelected}
-          />
-
-          <label style={{marginLeft: '10px'}}>项目状态：</label>
-          <Select
-            placeholder="请选择"
-            mode="multiple"
-            style={{width: '20%'}}
-            onChange={prjStatusChanged}
-            value={choicedCondition.projectStatus}
-
-          >
-            {[
-              <Option key={'closed'} value={'closed'}>
-                已关闭
+            <label style={{marginLeft: '10px'}}>项目类型：</label>
+            <Select
+              placeholder="请选择"
+              mode="multiple"
+              style={{width: '18%'}}
+              value={choicedCondition.projectType}
+              onChange={prjTypeChanged}
+            >{[
+              <Option key={'sprint'} value={'sprint'}>
+                sprint{' '}
               </Option>,
-              <Option key={'doing'} value={'doing'}>
-                进行中
+              <Option key={'hotfix'} value={'hotfix'}>
+                hotfix{' '}
               </Option>,
-              <Option key={'suspended'} value={'suspended'}>
-                已挂起
-              </Option>,
-              <Option key={'wait'} value={'wait'}>
-                未开始
+              <Option key={'emergency'} value={'emergency'}>
+                emergency{' '}
               </Option>,
             ]}
-          </Select>
-        </Form.Item>
-      </div>
+            </Select>
 
-      {/* 新增、修改、删除按钮栏 */}
-      <div style={{background: 'white'}}>
-        {/* 使用一个图标就要导入一个图标 */}
-        <Button type="text" style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}
-                icon={<LogoutOutlined/>} size={'large'} onClick={showDefalultValue}>
-          默认：</Button>
-        <label style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}> 未关闭项目</label>
-        {/* <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}> 近1月未关闭的 </Button> */}
-        <Button type="text"
-                style={{color: 'black', float: 'right', display: judgeAuthority("删除项目") === true ? "inline" : "none"}}
-                icon={<DeleteTwoTone/>} size={'large'}
-                onClick={deleteSprintList}>删除</Button>
-        <Button type="text"
-                style={{color: 'black', float: 'right', display: judgeAuthority("修改项目名称") === true ? "inline" : "none"}}
-                icon={<EditTwoTone/>} size={'large'}
-                onClick={modifyProject}>修改</Button>
-        <Button type="text"
-                style={{color: 'black', float: 'right', display: judgeAuthority("新增项目") === true ? "inline" : "none"}}
-                icon={<FolderAddTwoTone/>} size={'large'}
-                onClick={addProject}>新增</Button>
+            <label style={{marginLeft: '10px'}}>时间：</label>
+            <RangePicker
+              className={'times'}
+              style={{width: '18%'}}
+              // defaultValue={[moment(getRecentMonth().start), moment(getRecentMonth().end)]}
+              // defaultValue={[choicedDateTime.start, choicedDateTime.end]}
+              value={[choicedCondition.dateRange.start === "" ? null : moment(choicedCondition.dateRange.start),
+                choicedCondition.dateRange.end === "" ? null : moment(choicedCondition.dateRange.end)]}
 
-        <Button type="text" icon={<ReloadOutlined/>} onClick={refreshGrid} size={'large'}
-                style={{display:"none",float: "right"}} >刷新</Button>
-      </div>
+              onChange={onTimeSelected}
+            />
 
-      {/* ag-grid 表格定义 */}
-      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
-        <AgGridReact
-          columnDefs={colums()} // 定义列
-          rowData={data} // 数据绑定
-          defaultColDef={{
-            resizable: true,
-            sortable: true,
-            // floatingFilter: true,
-            filter: true,
-            flex: 1,
-            minWidth: 100,
-            suppressMenu: true,
-          }}
-          autoGroupColumnDef={{
-            minWidth: 100,
-          }}
-          groupDefaultExpanded={9} // 展开分组
-          // suppressDragLeaveHidesColumns // 取消分组时，例如单击删除区域中某一列上的“ x” ，该列将不可见
-          // suppressMakeColumnVisibleAfterUnGroup // 如果用户在移动列时不小心将列移出了网格，但并不打算将其隐藏，那么这就很方便。
-          // rowGroupPanelShow="always"
-          onGridReady={onGridReady}
-          onRowDoubleClicked={rowClicked}
-        >
-        </AgGridReact>
-      </div>
+            <label style={{marginLeft: '10px'}}>项目状态：</label>
+            <Select
+              placeholder="请选择"
+              mode="multiple"
+              style={{width: '20%'}}
+              onChange={prjStatusChanged}
+              value={choicedCondition.projectStatus}
+
+            >
+              {[
+                <Option key={'closed'} value={'closed'}>
+                  已关闭
+                </Option>,
+                <Option key={'doing'} value={'doing'}>
+                  进行中
+                </Option>,
+                <Option key={'suspended'} value={'suspended'}>
+                  已挂起
+                </Option>,
+                <Option key={'wait'} value={'wait'}>
+                  未开始
+                </Option>,
+              ]}
+            </Select>
+          </Form.Item>
+        </div>
+
+
+        {/* 新增、修改、删除按钮栏 */}
+        <div style={{background: 'white'}}>
+          {/* 使用一个图标就要导入一个图标 */}
+          <Button type="text" style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}
+                  icon={<LogoutOutlined/>} size={'large'} onClick={showDefalultValue}>
+            默认：</Button>
+          <label style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}> 未关闭项目</label>
+          {/* <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}> 近1月未关闭的 </Button> */}
+          <Button type="text" icon={<ReloadOutlined/>} onClick={refreshGrid} size={'large'}
+                  style={{display: "inline", float: "right"}}>刷新</Button>
+
+          <Button type="text"
+                  style={{color: 'black', float: 'right', display: judgeAuthority("删除项目") === true ? "inline" : "none"}}
+                  icon={<DeleteTwoTone/>} size={'large'}
+                  onClick={deleteSprintList}>删除</Button>
+          <Button type="text"
+                  style={{
+                    color: 'black',
+                    float: 'right',
+                    display: judgeAuthority("修改项目名称") === true ? "inline" : "none"
+                  }}
+                  icon={<EditTwoTone/>} size={'large'}
+                  onClick={modifyProject}>修改</Button>
+          <Button type="text"
+                  style={{color: 'black', float: 'right', display: judgeAuthority("新增项目") === true ? "inline" : "none"}}
+                  icon={<FolderAddTwoTone/>} size={'large'}
+                  onClick={addProject}>新增</Button>
+
+
+        </div>
+
+        {/* ag-grid 表格定义 */}
+        <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
+          <AgGridReact
+            columnDefs={colums()} // 定义列
+            rowData={data} // 数据绑定
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              // floatingFilter: true,
+              filter: true,
+              flex: 1,
+              minWidth: 100,
+              suppressMenu: true,
+            }}
+            autoGroupColumnDef={{
+              minWidth: 100,
+            }}
+            groupDefaultExpanded={9} // 展开分组
+            // suppressDragLeaveHidesColumns // 取消分组时，例如单击删除区域中某一列上的“ x” ，该列将不可见
+            // suppressMakeColumnVisibleAfterUnGroup // 如果用户在移动列时不小心将列移出了网格，但并不打算将其隐藏，那么这就很方便。
+            // rowGroupPanelShow="always"
+            onGridReady={onGridReady}
+            onRowDoubleClicked={rowClicked}
+          >
+          </AgGridReact>
+        </div>
+
+      </Spin>
 
       {/* 弹出层定义 */}
       <Modal

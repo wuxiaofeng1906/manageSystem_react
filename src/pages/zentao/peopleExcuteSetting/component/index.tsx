@@ -59,7 +59,10 @@ const getPositionSelect = async () => {
 const getExcuteTypeSelect = async () => {
 
   const excuteType = await getExcuteType();
-  const typeData: any = [];
+  const typeData: any = [
+    <Option key={""} value={""}>空</Option>,
+    <Option key={"all"} value={"all"}> 全部 </Option>
+  ];
 
   if (excuteType.message !== '') {
     message.error({
@@ -84,7 +87,10 @@ const getExcuteTypeSelect = async () => {
 // 执行
 const getExcutionSelect = async (excuteType: string) => {
   const excution = await getExcution(excuteType);
-  const excuteData: any = [];
+  const excuteData: any = [
+    <Option key={""} value={""}>空</Option>,
+    <Option key={"all"} value={"all"}> 全部 </Option>
+  ];
 
   if (excution.message !== '') {
     message.error({

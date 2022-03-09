@@ -50,7 +50,6 @@ const getPositions = async () => {
   return result;
 };
 
-
 // 执行类型
 const getExcuteType = async () => {
   const result: any = {
@@ -73,8 +72,7 @@ const getExcuteType = async () => {
   return result;
 };
 
-
-// 执行
+// 获取执行选项
 const getExcution = async (excuteType: string) => {
   const result: any = {
     message: '',
@@ -96,4 +94,44 @@ const getExcution = async (excuteType: string) => {
   return result;
 };
 
-export {getZentaoUsers, getPositions, getExcuteType, getExcution};
+// 查询已经保存了的分配数据
+const getDistributeDetails = async () => {
+  const result: any = {
+    message: '',
+    data: [],
+  };
+  await axios
+    .get('/api/verify/zentao/distribution')
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    })
+    .catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+};
+
+
+// 执行分配
+const excuteDistribute = () => {
+
+};
+
+// 保存分配
+const saveDistribute = () => {
+
+};
+export {
+  getZentaoUsers,
+  getPositions,
+  getExcuteType,
+  getExcution,
+  excuteDistribute,
+  saveDistribute,
+  getDistributeDetails
+};

@@ -3,11 +3,8 @@ import {PageContainer} from '@ant-design/pro-layout';
 import {useRequest} from 'ahooks';
 import {Card, Button, message, Form, Select, Row, Col, InputNumber} from 'antd';
 import {getZentaoUserSelect, getPositionSelect, getExcuteTypeSelect, getExcutionSelect} from './component';
-
-const {Option} = Select;
-
-// 查询数据
-
+import {excuteDistributeOperate, saveDistributeOperate} from './excute';
+import {getDistributeDetails} from './axiosRequest';
 
 // 组件初始化
 const PeopleExcuteSetting: React.FC<any> = () => {
@@ -20,32 +17,38 @@ const PeopleExcuteSetting: React.FC<any> = () => {
   // 执行类型
   const excuteTypeList = useRequest(() => getExcuteTypeSelect()).data;
 
+  // 已经保存的分配详情
+  const distributeDetails = useRequest(() => getDistributeDetails()).data;
 
   /* endregion */
-
   const [formForExcuteSetting] = Form.useForm();
 
   // 执行权限分配
   const excuteAuthorityDistribute = () => {
     const formData = formForExcuteSetting.getFieldsValue();
-    console.log(formData);
+    excuteDistributeOperate(formData);
 
   };
 
   // 点击保存
   const saveExcute = () => {
     const formData = formForExcuteSetting.getFieldsValue();
-    console.log(formData);
+    saveDistributeOperate(formData);
+
   };
 
+  /* region 执行下拉框设置 */
   const [excute, setExcute] = useState({
     distributeExcute: [],// 分配
     excludeExcute: [] // 排除
-
   });
   const onExcuteTypeChanged = async (excuteType: string, changedData: any) => {
-    debugger;
-    const selectData = await getExcutionSelect(changedData);
+
+    let typeData = "";
+    if (changedData && changedData.length > 0) {
+      typeData = changedData.join();
+    }
+    const selectData = await getExcutionSelect(typeData);
     if (excuteType === "distribute") {
       setExcute({
         ...excute,
@@ -58,17 +61,27 @@ const PeopleExcuteSetting: React.FC<any> = () => {
       });
     }
   };
-  useEffect(() => {
-    // formForExcuteSetting.setFieldsValue({
-    //   // usersName: undefined,
-    //   position: "",
-    //   workDay: "",
-    //   workHours: "",
-    //   distributeExcute: "",
-    //   excludeExcute: ""
-    // });
 
-  })
+  /* endregion  */
+
+  useEffect(() => {
+
+    if (distributeDetails && distributeDetails.data && JSON.stringify(distributeDetails.data) !== "{}") {
+      // 有数据的显示
+    } else { // 无数据的东西
+      formForExcuteSetting.setFieldsValue({
+        // usersName: undefined,
+        position: "研发",
+        // workDay: "",
+        // workHours: "",
+        distributeExcuteType: "all",
+        distributeExcute: "全部",
+        excludeExcuteType: "",
+        excludeExcute: "空",
+
+      });
+    }
+  }, [distributeDetails])
   return (
     <PageContainer style={{marginTop: -30}}>
       <div style={{marginTop: -20}}>
@@ -85,7 +98,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
               </Col>
               <Col span={4}>
                 <Form.Item label="职位" name="position" required={true}>
-                  <Select style={{width: '100%'}} showSearch defaultValue={"研发"}>
+                  <Select style={{width: '100%'}} showSearch>
                     {positionsList}
                   </Select>
                 </Form.Item>
@@ -118,14 +131,14 @@ const PeopleExcuteSetting: React.FC<any> = () => {
             <Row style={{marginTop: -20}}>
               <Col span={11}>
                 <Form.Item label="分配执行类型筛选" name="distributeExcuteType" required={true}>
-                  <Select style={{width: '100%'}} showSearch onChange={async (changedData: any) => {
+                  <Select style={{width: '100%'}} mode="multiple" showSearch onChange={async (changedData: any) => {
                     await onExcuteTypeChanged("distribute", changedData);
                   }}>
                     {excuteTypeList}
                   </Select>
                 </Form.Item>
                 <Form.Item label="排除执行类型筛选" name="excludeExcuteType" required={true} style={{marginTop: -20}}>
-                  <Select style={{width: '100%'}} showSearch onChange={async (changedData: any) => {
+                  <Select style={{width: '100%'}} mode="multiple" showSearch onChange={async (changedData: any) => {
                     await onExcuteTypeChanged("exclude", changedData);
                   }}>
                     {excuteTypeList}
@@ -135,12 +148,12 @@ const PeopleExcuteSetting: React.FC<any> = () => {
 
               <Col span={10}>
                 <Form.Item label="分配执行" name="distributeExcute" required={true}>
-                  <Select style={{width: '100%'}} showSearch>
+                  <Select style={{width: '100%'}} mode="multiple" showSearch>
                     {excute.distributeExcute}
                   </Select>
                 </Form.Item>
                 <Form.Item label="排除执行" name="excludeExcute" required={true} style={{marginTop: -20}}>
-                  <Select style={{width: '100%'}} showSearch>
+                  <Select style={{width: '100%'}} mode="multiple" showSearch>
                     {excute.excludeExcute}
                   </Select>
                 </Form.Item>

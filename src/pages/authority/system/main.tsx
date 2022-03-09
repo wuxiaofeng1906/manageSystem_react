@@ -6,10 +6,10 @@ import {
   IdcardTwoTone,
   EditTwoTone,
   DeleteTwoTone,
-  FolderAddTwoTone
+  FolderAddTwoTone, ReloadOutlined
 } from '@ant-design/icons';
 
-import {Table, Space, Button, Tooltip, message, Modal, Form, Input} from 'antd';
+import {Table, Space, Button, Tooltip, message, Modal, Form, Input, Spin} from 'antd';
 import axios from "axios";
 import {history} from "@@/core/history";
 import {GqlClient, useGqlClient} from "@/hooks";
@@ -331,7 +331,44 @@ const Authority: React.FC<any> = () => {
 
   /* endregion */
 
+  /* region 刷新同步企业微信人员 */
+  const [refreshState, setRefreshState] = useState(false);
+  const refreshDeptUsers = async () => {
+    setRefreshState(true);
+    await axios.post('/api/project/system/sync/wechat/all')
+      .then(function (res) {
+        if (res.data.ok === true) {
+          message.info({
+            content: "人员数据刷新成功！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
 
+        } else {
+          message.error({
+            content: `错误：${res.data.message}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        }
+      })
+      .catch(function (error) {
+        message.error({
+          content: `异常信息:${error.toString()}`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      });
+    setRefreshState(false);
+  };
+
+  /* endregion */
   const columns = [
     {
       title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 编号</span>,
@@ -390,29 +427,36 @@ const Authority: React.FC<any> = () => {
   }, [data]);
   return (
     <PageContainer style={{height: getHeight(), backgroundColor: "#F2F2F2"}}>
-      {/* 新增分组按钮 */}
-      <div style={{width: "100%", height: "40px", background: 'white'}}>
-        <Button></Button>
-        <Button type="text"
-                style={{
-                  color: '#1890FF',
-                  float: 'right',
-                  display: judgeAuthority("增加权限组") === true ? "inline" : "none"
-                }}
-                icon={<FolderAddTwoTone/>}
-                size={'large'} onClick={addGroup}>新增分组</Button>
-      </div>
-      {/* 表格控件 */}
-      <div>
+      <Spin spinning={refreshState} tip="数据同步中..." size={"large"}>
 
-        <Table columns={columns}
-               dataSource={tableData}
-               pagination={false}  // 禁止分页
-               size="small"  // 紧凑型
-               bordered={true}
-        />
-      </div>
+        {/* 新增分组按钮 */}
+        <div style={{width: "100%", height: "40px", background: 'white'}}>
 
+          <Button type="text"
+                  style={{
+                    color: '#1890FF',
+                    float: 'right',
+                    display: judgeAuthority("增加权限组") === true ? "inline" : "none"
+                  }}
+                  icon={<FolderAddTwoTone/>}
+                  size={'large'} onClick={addGroup}>新增分组</Button>
+
+
+          <Button type="text" icon={<ReloadOutlined/>} onClick={refreshDeptUsers} size={'large'}
+                  style={{float: "right"}}>刷新</Button>
+
+        </div>
+        {/* 表格控件 */}
+        <div>
+
+          <Table columns={columns}
+                 dataSource={tableData}
+                 pagination={false}  // 禁止分页
+                 size="small"  // 紧凑型
+                 bordered={true}
+          />
+        </div>
+      </Spin>
       {/* 弹出层集合 */}
       <div>
 

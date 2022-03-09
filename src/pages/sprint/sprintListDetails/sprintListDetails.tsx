@@ -485,12 +485,12 @@ const changeBaseLinePosition = (data: any) => {
 };
 
 // 查询数据
-const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any) => {
+const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any, syncQuery: boolean = false) => {
 
   // baseline
   const {data} = await client.query(`
       {
-         proDetail(project:${prjID},category:"${prjType}",order:ASC){
+         proDetail(project:${prjID},category:"${prjType}",order:ASC,doSync:${syncQuery}){
             id
             stage
             tester
@@ -669,9 +669,10 @@ const SprintList: React.FC<any> = () => {
   /* endregion */
 
   /* region  表格相关事件 */
+  /* region  表格相关事件 */
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, prjId, prjType));
+  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, prjId, prjType, true));
 
 
   const onGridReady = (params: GridReadyEvent) => {
@@ -782,7 +783,7 @@ const SprintList: React.FC<any> = () => {
     const projectArray = [];
 
     const {data: {project = []} = {}} = useQuery(`{
-        project(range:{start:"", end:""},,order:DESC){
+        project(range:{start:"", end:""},order:DESC,doSync:true){
         id
         name
       }

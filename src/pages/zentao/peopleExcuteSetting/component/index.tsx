@@ -73,7 +73,7 @@ const getExcuteTypeSelect = async () => {
     const datas = excuteType.data;
     datas.forEach((types: any) => {
       typeData.push(
-        <Option key={types.execution_type} value={types.execution_type_name}>{types.execution_type_name}</Option>,
+        <Option key={types.execution_type} value={types.execution_type}>{types.execution_type_name}</Option>,
       );
     });
   }
@@ -96,9 +96,9 @@ const getExcutionSelect = async (excuteType: string) => {
     });
   } else if (excution.data) {
     const datas = excution.data;
-    datas.forEach((types: any) => {
+    datas.forEach((excute: any) => {
       excuteData.push(
-        <Option key={types.execution_type} value={types.execution_type_name}>{types.execution_type_name}</Option>,
+        <Option key={excute.execution_id} value={excute.execution_name}>{excute.execution_name}</Option>,
       );
     });
   }
@@ -106,4 +106,4 @@ const getExcutionSelect = async (excuteType: string) => {
   return excuteData;
 };
 
-export {getZentaoUserSelect, getPositionSelect, getExcuteTypeSelect,getExcutionSelect};
+export {getZentaoUserSelect, getPositionSelect, getExcuteTypeSelect, getExcutionSelect};

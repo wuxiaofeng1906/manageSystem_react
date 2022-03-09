@@ -39,12 +39,24 @@ const PeopleExcuteSetting: React.FC<any> = () => {
   };
 
   const [excute, setExcute] = useState({
-    distributeExcute: null,// 分配
-    excludeExcute: null // 排除
+    distributeExcute: [],// 分配
+    excludeExcute: [] // 排除
 
-  })
-  const onExcuteTypeChanged = async () => {
-    await getExcutionSelect("");
+  });
+  const onExcuteTypeChanged = async (excuteType: string, changedData: any) => {
+    debugger;
+    const selectData = await getExcutionSelect(changedData);
+    if (excuteType === "distribute") {
+      setExcute({
+        ...excute,
+        distributeExcute: selectData
+      });
+    } else {
+      setExcute({
+        ...excute,
+        excludeExcute: selectData
+      });
+    }
   };
   useEffect(() => {
     // formForExcuteSetting.setFieldsValue({
@@ -105,13 +117,17 @@ const PeopleExcuteSetting: React.FC<any> = () => {
             </Row>
             <Row style={{marginTop: -20}}>
               <Col span={11}>
-                <Form.Item label="分配执行类型筛选" name="distributeExcute" required={true}>
-                  <Select style={{width: '100%'}} showSearch>
+                <Form.Item label="分配执行类型筛选" name="distributeExcuteType" required={true}>
+                  <Select style={{width: '100%'}} showSearch onChange={async (changedData: any) => {
+                    await onExcuteTypeChanged("distribute", changedData);
+                  }}>
                     {excuteTypeList}
                   </Select>
                 </Form.Item>
-                <Form.Item label="排除执行类型筛选" name="excludeExcute" required={true} style={{marginTop: -20}}>
-                  <Select style={{width: '100%'}} showSearch>
+                <Form.Item label="排除执行类型筛选" name="excludeExcuteType" required={true} style={{marginTop: -20}}>
+                  <Select style={{width: '100%'}} showSearch onChange={async (changedData: any) => {
+                    await onExcuteTypeChanged("exclude", changedData);
+                  }}>
                     {excuteTypeList}
                   </Select>
                 </Form.Item>

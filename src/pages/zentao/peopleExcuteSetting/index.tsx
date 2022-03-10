@@ -315,7 +315,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
                       {disExcuteTypeList}
                     </Select>
                   </Form.Item>
-                  <Form.Item label="排除执行类型筛选" name="excludeExcuteType" required={true} style={{marginTop: -20}}>
+                  <Form.Item label="排除执行类型筛选" name="excludeExcuteType" style={{marginTop: -20, marginLeft: 12}}>
                     <Select style={{width: '100%'}} mode="multiple" showSearch onChange={async (changedData: any) => {
                       await onExcuteTypeChanged("exclude", changedData);
                     }}>
@@ -330,7 +330,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
                       {excute.distributeExcute}
                     </Select>
                   </Form.Item>
-                  <Form.Item label="排除执行" name="excludeExcute" required={true} style={{marginTop: -20}}>
+                  <Form.Item label="排除执行" name="excludeExcute" style={{marginTop: -20, marginLeft: 12}}>
                     <Select style={{width: '100%'}} mode="multiple" showSearch>
                       {excute.excludeExcute}
                     </Select>

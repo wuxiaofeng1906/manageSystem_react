@@ -246,7 +246,7 @@ const alaysisProductRate = (sourceData: any) => {
     }, {
       title: "",
       stage: "生产率(功能点/人天）",
-      planValue: sourceData.planRatio,
+      planValue: sourceData.currentRatio,
       actualValue: sourceData.actualRatio,
       description: sourceData.raDescription
     }
@@ -260,6 +260,7 @@ const queryProductRateload = async (client: GqlClient<object>, projectId: string
             planValue
             actualValue
             planRatio
+            currentRatio
             actualRatio
             fpDescription
             raDescription

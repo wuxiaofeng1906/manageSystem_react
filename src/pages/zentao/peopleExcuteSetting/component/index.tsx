@@ -93,7 +93,7 @@ const getExcuteTypeSelect = async (type: string) => {
 const getExcutionSelect = async (excuteType: string) => {
   const excution = await getExcution(excuteType);
   const excuteData: any = [
-    <Option key={"all"} value={"all&&全部"}> 全部 </Option>
+    <Option key={"all"} value={"all&全部"}> 全部 </Option>
   ];
 
   if (excution.message !== '') {

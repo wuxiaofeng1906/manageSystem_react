@@ -58,6 +58,15 @@ const saveDistributeOperate = async (formData: any, performID: number) => {
     toPerformType = toPerformType === "" ? id : `${toPerformType},${id}`;
   });
 
+  let outPerformType = "";
+  const excludeExcuteTypeID = formData.excludeExcuteType;
+  if (excludeExcuteTypeID && excludeExcuteTypeID.length > 0) {
+    excludeExcuteTypeID.forEach((ele: any) => {
+      const id = ele.split("&")[0];
+      outPerformType = outPerformType === "" ? id : `${outPerformType},${id}`;
+    });
+  }
+
   let outPerformID = "";
   const excludeExcuteID = formData.excludeExcute;
   if (excludeExcuteID && excludeExcuteID.length > 0) {
@@ -67,14 +76,7 @@ const saveDistributeOperate = async (formData: any, performID: number) => {
     });
   }
 
-  let outPerformType = "";
-  const excludeExcuteTypeID = formData.excludeExcuteType;
-  if (excludeExcuteTypeID && excludeExcuteTypeID.length > 0) {
-    excludeExcuteTypeID.forEach((ele: any) => {
-      const id = ele.split("&")[0];
-      outPerformType = outPerformType === "" ? id : `${outPerformType},${id}`;
-    });
-  }
+
 
   const datas = {
     "position": formData.position,

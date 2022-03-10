@@ -108,6 +108,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
       });
       return;
     }
+
     showLogs(logResult?.data);
     setExcuteState(false);
   };
@@ -119,6 +120,13 @@ const PeopleExcuteSetting: React.FC<any> = () => {
 
     if (saveResult.message === "") {
       performID = saveResult.performID;
+      message.info({
+        content: "保存成功！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
     } else {
       message.error({
         content: saveResult.message,
@@ -138,7 +146,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
 
   // 获取执行下拉框列表
   const getExcuteSelect = async (changedData: any) => {
-    let typeData = "";
+    let typeData = "all";
     if (changedData && changedData.length > 0) {
       const typeId: any = [];
       changedData.forEach((types: any) => {
@@ -147,6 +155,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
       typeData = typeId.join();
     }
     const selectData = await getExcutionSelect(typeData);
+
     return selectData;
   };
 
@@ -180,26 +189,41 @@ const PeopleExcuteSetting: React.FC<any> = () => {
       const disExcuteType = []; // 分配执行类型
       if ((disData.to_perform_type).length > 0) {
         const excuteType = disData.to_perform_type;
-        disExcuteType.push(`${excuteType[0].to_perform_type_id}&${excuteType[0].to_perform_type}`);
+        if (excuteType[0].to_perform_type_id === "all") {
+          disExcuteType.push(`${excuteType[0].to_perform_type_id}&全部`);
+        } else {
+          disExcuteType.push(`${excuteType[0].to_perform_type_id}&${excuteType[0].to_perform_type}`);
+        }
       }
       // 展示分配执行下拉框
       const disExcute = [];// 分配执行
       if ((disData.to_perform).length > 0) {
         const excuteID = disData.to_perform;
-        disExcute.push(`${excuteID[0].project_id}&${excuteID[0].project_name}`);
+        if (excuteID[0].project_id === "all") {
+          disExcute.push(`${excuteID[0].project_id}&全部`);
+        } else {
+          disExcute.push(`${excuteID[0].project_id}&${excuteID[0].project_name}`);
+        }
       }
 
       const exExcuteType = [];// 排除执行类型
       if ((disData.out_perform_type).length > 0) {
         const outType = disData.out_perform_type;
-        exExcuteType.push(`${outType[0].out_perform_type_id}&${outType[0].out_perform_type}`);
+        if (outType[0].out_perform_type_id === "''") {
+          exExcuteType.push(`${outType[0].out_perform_type_id}&空`);
+        } else {
+          exExcuteType.push(`${outType[0].out_perform_type_id}&${outType[0].out_perform_type}`);
+        }
       }
 
       const exExcute = [];// 排除执行
       if ((disData.out_perform).length > 0) {
         const outID = disData.out_perform;
         exExcute.push(`${outID[0].project_id}&${outID[0].project_name}`);
+      } else {
+        exExcute.push("all&全部");
       }
+
 
       // 展示排除执行下拉框
       setExcute({

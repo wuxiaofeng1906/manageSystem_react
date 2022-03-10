@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {useRequest} from 'ahooks';
-import {Card, Button, message, Form, Select, Row, Col, InputNumber} from 'antd';
+import {Card, Button, message, Form, Select, Row, Col, InputNumber, Spin} from 'antd';
 import {getZentaoUserSelect, getPositionSelect, getExcuteTypeSelect, getExcutionSelect} from './component';
 import {excuteDistributeOperate, saveDistributeOperate} from './excute';
 import {getDistributeDetails, getExcuteLogs} from './axiosRequest';
@@ -27,16 +27,45 @@ const PeopleExcuteSetting: React.FC<any> = () => {
   const distributeDetails = useRequest(() => getDistributeDetails()).data;
 
   /* endregion */
-  const [formForExcuteSetting] = Form.useForm();
 
+  const [formForExcuteSetting] = Form.useForm();
+  const [excuteState, setExcuteState] = useState(false);
+  const [logs, setLogs] = useState(<div></div>);
+  const [logHeight, setLogHeight] = useState((window.innerHeight) - 270);
+  window.onresize = function () {
+    setLogHeight((window.innerHeight) - 270);
+  };
+
+  // 日志显示
+  const showLogs = (logData: any) => {
+    if (!logData || logData.length === 0) {
+      return;
+    }
+    const logsArray: any = [];
+    logData.forEach((log: string, index: number) => {
+      const logInfo = log.split("->");
+      let fontColor = "black";
+      if (logInfo[1] === "失败") {
+        fontColor = "red";
+      }
+      logsArray.push(
+        <p>
+          <label id="title">{index + 1}. {logInfo[0]}{"->"}</label>
+          <label id="result" style={{color: fontColor}}>{logInfo[1]}</label>
+        </p>
+      );
+    });
+    setLogs(<div>{logsArray}</div>);
+  };
   // 执行权限分配
   const excuteAuthorityDistribute = async () => {
+    setExcuteState(true);
     const formData = formForExcuteSetting.getFieldsValue();
 
-    debugger;
     // 第一步，调用保存接口保存设置的数据。
     const saveResult = await saveDistributeOperate(formData, performID);
     if (saveResult.message !== "") {
+      setExcuteState(false);
       message.error({
         content: saveResult.message,
         duration: 1,
@@ -54,6 +83,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
     const excuteResult = await excuteDistributeOperate(formData, performID);
 
     if (excuteResult.message !== "") {
+      setExcuteState(false);
       message.error({
         content: excuteResult.message,
         duration: 1,
@@ -66,8 +96,20 @@ const PeopleExcuteSetting: React.FC<any> = () => {
     }
 
     // 第三步，根据执行接口返回的id再获取执行日志
-    const logResult = await getExcuteLogs(excuteResult.distributionNum);
-
+    const logResult = await getExcuteLogs(Number(excuteResult.distributionNum));
+    if (logResult.message !== "") {
+      setExcuteState(false);
+      message.error({
+        content: logResult.message,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+    showLogs(logResult?.data);
+    setExcuteState(false);
   };
 
   // 点击保存
@@ -94,6 +136,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
     excludeExcute: [] // 排除
   });
 
+  // 获取执行下拉框列表
   const getExcuteSelect = async (changedData: any) => {
     let typeData = "";
     if (changedData && changedData.length > 0) {
@@ -128,7 +171,9 @@ const PeopleExcuteSetting: React.FC<any> = () => {
 
   // 页面数据显示
   const showPagesData = async () => {
+
     if (distributeDetails && distributeDetails.data && JSON.stringify(distributeDetails.data) !== "{}") {
+
       const disData = distributeDetails.data;
       performID = disData.perform_id;
 
@@ -179,10 +224,10 @@ const PeopleExcuteSetting: React.FC<any> = () => {
         position: "研发",
         workDay: 720,
         workHours: 8,
-        distributeExcuteType: "all",
-        distributeExcute: "全部",
-        excludeExcuteType: "",
-        excludeExcute: "空",
+        distributeExcuteType: "all&全部",
+        distributeExcute: "all&全部",
+        excludeExcuteType: "''&空",
+        excludeExcute: "''&空",
       });
     }
   };
@@ -192,108 +237,105 @@ const PeopleExcuteSetting: React.FC<any> = () => {
   }, [distributeDetails])
   return (
     <PageContainer style={{marginTop: -30}}>
-      <div style={{marginTop: -20}}>
-        <div>
-          <Form form={formForExcuteSetting}>
-            <Row>
-              <Col span={7}>
-                <Form.Item label="人员选择" name="usersName" required={true}>
-                  <Select mode="multiple" showSearch style={{width: '100%'}}
-                  >
-                    {zentaoUserList}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col span={4}>
-                <Form.Item label="职位" name="position" required={true}>
-                  <Select style={{width: '100%'}} showSearch>
-                    {positionsList}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col span={5}>
-                <Form.Item label="可用工日[天]" name="workDay" required={true}>
-                  <InputNumber style={{width: '100%'}} min={1}/>
-                </Form.Item>
-              </Col>
-              <Col span={5}>
-                <Form.Item label="可用工时/天" name="workHours" required={true}>
-                  <InputNumber style={{width: '100%'}} min={1}/>
-                </Form.Item>
-              </Col>
-              <Col span={3}>
-                <Button
-                  type="primary"
-                  style={{
-                    color: '#46A0FC', backgroundColor: '#ECF5FF',
-                    borderRadius: 5, marginLeft: 10,
-                    marginTop: 3, minWidth: "110px", width: "100%"
-                  }}
-                  onClick={excuteAuthorityDistribute}>
+      <Spin spinning={excuteState} tip="执行中..." size={"large"}>
+        <div style={{marginTop: -20}}>
+          <div>
+            <Form form={formForExcuteSetting}>
+              <Row>
+                <Col span={7}>
+                  <Form.Item label="人员选择" name="usersName" required={true}>
+                    <Select mode="multiple" showSearch style={{width: '100%'}}
+                    >
+                      {zentaoUserList}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={4}>
+                  <Form.Item label="职位" name="position" required={true}>
+                    <Select style={{width: '100%'}} showSearch>
+                      {positionsList}
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={5}>
+                  <Form.Item label="可用工日[天]" name="workDay" required={true}>
+                    <InputNumber style={{width: '100%'}} min={1}/>
+                  </Form.Item>
+                </Col>
+                <Col span={5}>
+                  <Form.Item label="可用工时/天" name="workHours" required={true}>
+                    <InputNumber style={{width: '100%'}} min={1}/>
+                  </Form.Item>
+                </Col>
+                <Col span={3}>
+                  <Button
+                    type="primary"
+                    style={{
+                      color: '#46A0FC', backgroundColor: '#ECF5FF',
+                      borderRadius: 5, marginLeft: 10,
+                      marginTop: 3, minWidth: "110px", width: "100%"
+                    }}
+                    onClick={excuteAuthorityDistribute}>
 
-                  执行权限分配
-                </Button>
-              </Col>
+                    执行权限分配
+                  </Button>
+                </Col>
 
-            </Row>
-            <Row style={{marginTop: -20}}>
-              <Col span={11}>
-                <Form.Item label="分配执行类型筛选" name="distributeExcuteType" required={true}>
-                  <Select style={{width: '100%'}} mode="multiple" showSearch onChange={async (changedData: any) => {
-                    await onExcuteTypeChanged("distribute", changedData);
-                  }}>
-                    {disExcuteTypeList}
-                  </Select>
-                </Form.Item>
-                <Form.Item label="排除执行类型筛选" name="excludeExcuteType" required={true} style={{marginTop: -20}}>
-                  <Select style={{width: '100%'}} mode="multiple" showSearch onChange={async (changedData: any) => {
-                    await onExcuteTypeChanged("exclude", changedData);
-                  }}>
-                    {ExExcuteTypeList}
-                  </Select>
-                </Form.Item>
-              </Col>
+              </Row>
+              <Row style={{marginTop: -20}}>
+                <Col span={11}>
+                  <Form.Item label="分配执行类型筛选" name="distributeExcuteType" required={true}>
+                    <Select style={{width: '100%'}} mode="multiple" showSearch onChange={async (changedData: any) => {
+                      await onExcuteTypeChanged("distribute", changedData);
+                    }}>
+                      {disExcuteTypeList}
+                    </Select>
+                  </Form.Item>
+                  <Form.Item label="排除执行类型筛选" name="excludeExcuteType" required={true} style={{marginTop: -20}}>
+                    <Select style={{width: '100%'}} mode="multiple" showSearch onChange={async (changedData: any) => {
+                      await onExcuteTypeChanged("exclude", changedData);
+                    }}>
+                      {ExExcuteTypeList}
+                    </Select>
+                  </Form.Item>
+                </Col>
 
-              <Col span={10}>
-                <Form.Item label="分配执行" name="distributeExcute" required={true}>
-                  <Select style={{width: '100%'}} mode="multiple" showSearch>
-                    {excute.distributeExcute}
-                  </Select>
-                </Form.Item>
-                <Form.Item label="排除执行" name="excludeExcute" required={true} style={{marginTop: -20}}>
-                  <Select style={{width: '100%'}} mode="multiple" showSearch>
-                    {excute.excludeExcute}
-                  </Select>
-                </Form.Item>
-              </Col>
+                <Col span={10}>
+                  <Form.Item label="分配执行" name="distributeExcute" required={true}>
+                    <Select style={{width: '100%'}} mode="multiple" showSearch>
+                      {excute.distributeExcute}
+                    </Select>
+                  </Form.Item>
+                  <Form.Item label="排除执行" name="excludeExcute" required={true} style={{marginTop: -20}}>
+                    <Select style={{width: '100%'}} mode="multiple" showSearch>
+                      {excute.excludeExcute}
+                    </Select>
+                  </Form.Item>
+                </Col>
 
-              <Col span={3}>
+                <Col span={3}>
 
-                <Button
-                  type="primary"
-                  style={{
-                    color: '#46A0FC', backgroundColor: '#ECF5FF',
-                    borderRadius: 5, marginLeft: 10,
-                    marginTop: 10, height: 50, minWidth: "110px", width: "100%"
-                  }} onClick={saveExcute}>
-                  点击保存
-                </Button>
+                  <Button
+                    type="primary"
+                    style={{
+                      color: '#46A0FC', backgroundColor: '#ECF5FF',
+                      borderRadius: 5, marginLeft: 10,
+                      marginTop: 10, height: 50, minWidth: "110px", width: "100%"
+                    }} onClick={saveExcute}>
+                    点击保存
+                  </Button>
 
-              </Col>
-            </Row>
+                </Col>
+              </Row>
 
-          </Form>
+            </Form>
+          </div>
+          {/* 执行日志 */}
+          <Card size="small" title="执行日志" style={{width: '100%', height: logHeight, marginTop: -20}}>
+            {logs}
+          </Card>
         </div>
-        {/* 执行日志 */}
-        <Card size="small" title="执行日志" style={{width: '100%', marginTop: -20}}>
-          <p> content</p>
-          <p> content</p>
-          <p> content</p>
-          <p> content</p>
-          <p> content</p>
-        </Card>
-      </div>
-
+      </Spin>
 
     </PageContainer>
   );

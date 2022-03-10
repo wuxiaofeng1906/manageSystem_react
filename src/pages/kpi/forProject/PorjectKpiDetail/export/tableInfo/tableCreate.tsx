@@ -147,6 +147,7 @@ const getStageWorkloadTable = (data: any) => {
     {name: "实际工时"},
     {name: "计划工作量"},
     {name: "实际工作量"},
+    {name: "阶段生产率"},
     {name: "说明"}
   ];
 
@@ -156,12 +157,12 @@ const getStageWorkloadTable = (data: any) => {
       // 计划工作量保留两位小数
       let planWorkload = "";
       if (ele.planWorkload) {
-        planWorkload = `${Number(ele.planWorkload).toFixed(2)}`
+        planWorkload = `${Number(ele.planWorkload).toFixed(2)}`;
       }
       // 实际工作量保留两位小数
       let actualWorkload = "";
       if (ele.actualWorkload) {
-        actualWorkload = `${Number(ele.actualWorkload).toFixed(2)}`
+        actualWorkload = `${Number(ele.actualWorkload).toFixed(2)}`;
       }
 
       // 投入人力
@@ -181,10 +182,16 @@ const getStageWorkloadTable = (data: any) => {
         actualHours = ele.actualHours === -999999 ? "0" : Math.abs(ele.actualHours).toString();
       }
 
+      // 实际工时
+      let stageRatio = "";
+      if (ele.stageRatio) {
+        stageRatio = ele.stageRatio === -999999 ? "0" : `${Number(ele.stageRatio).toFixed(2)}`;
+      }
+
       const currentRow: any = [
         ele.title, ele.stage,
         manpower, planHours, actualHours,
-        planWorkload, actualWorkload,
+        planWorkload, actualWorkload,stageRatio,
         ele.description];
       rowData.push(currentRow);
     });

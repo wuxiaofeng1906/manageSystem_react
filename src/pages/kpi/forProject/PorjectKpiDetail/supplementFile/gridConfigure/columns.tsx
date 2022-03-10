@@ -300,6 +300,15 @@ const getStageWorkloadColumns = () => {
         }
         return params.value;
       },
+    }, {
+      headerName: '阶段生产率',
+      field: 'stageRatio',
+      valueFormatter: (params: any) => {
+        if (params.value) {
+          return Number(params.value).toFixed(2);
+        }
+        return params.value;
+      },
     },
     {
       headerName: '说明',

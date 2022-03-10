@@ -162,6 +162,7 @@ const alaysisStageWorkload = (sourceData: any) => {
       actualHours: "",
       planWorkload: "",
       actualWorkload: "",
+      stageRatio: "",
       description: ""
     };
 
@@ -177,6 +178,7 @@ const alaysisStageWorkload = (sourceData: any) => {
         newData.actualHours = datas.actualHours;
         newData.planWorkload = datas.planWorkload;
         newData.actualWorkload = datas.actualWorkload;
+        newData.stageRatio = datas.stageRatio;
         newData.description = datas.description
         break;
       }
@@ -192,6 +194,7 @@ const alaysisStageWorkload = (sourceData: any) => {
     actualHours: "",
     planWorkload: "",
     actualWorkload: "",
+    stageRatio: "",
     description: ""
   };
 
@@ -202,6 +205,7 @@ const alaysisStageWorkload = (sourceData: any) => {
     totalData.actualHours = total[2] === null ? "" : total[2].toString();
     totalData.planWorkload = total[3] === null ? "" : total[3].toString();
     totalData.actualWorkload = total[4] === null ? "" : total[4].toString();
+    totalData.stageRatio = total[5] === null ? "" : total[5].toString();
     totalData.description = sourceData.description;
   }
 
@@ -222,6 +226,7 @@ const queryStageWorkload = async (client: GqlClient<object>, projectId: string) 
               type
               planWorkload
               actualWorkload
+              stageRatio
               description
               }
               description

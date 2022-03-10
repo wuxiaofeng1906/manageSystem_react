@@ -164,11 +164,12 @@ const saveDistribute = async (datas: any) => {
 };
 
 // 获取执行日志
-const getExcuteLogs = async (distributionNum: number) => {
+const getExcuteLogs = async (distributionNum: string) => {
   const result: any = {
     message: '',
     data: [],
   };
+  debugger;
   await axios
     .get('/api/verify/zentao/distribution_log', {params: {perform_id: distributionNum}})
     .then(function (res) {

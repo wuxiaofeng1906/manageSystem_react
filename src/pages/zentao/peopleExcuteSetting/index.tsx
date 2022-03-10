@@ -96,7 +96,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
     }
 
     // 第三步，根据执行接口返回的id再获取执行日志
-    const logResult = await getExcuteLogs(Number(excuteResult.distributionNum));
+    const logResult = await getExcuteLogs((excuteResult.distributionNum).toString());
     if (logResult.message !== "") {
       setExcuteState(false);
       message.error({

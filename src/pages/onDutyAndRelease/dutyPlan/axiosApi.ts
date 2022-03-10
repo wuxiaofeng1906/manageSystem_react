@@ -7,6 +7,7 @@ axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
 console.log(`Bearer ${sys_accessToken}`);
 // 解析数据
 const parseData = (params: any) => {
+  debugger;
 
   const returnValue: any = [];
   if (params) {
@@ -40,6 +41,15 @@ const parseData = (params: any) => {
       const projectItem_Flow = {
         person_num: "",
         user_tech: "流程",
+        user_name: "",
+        duty_start_time: "",
+        duty_end_time: "",
+        duty_order: ""
+      };
+
+      const projectItem_SQA = {
+        person_num: "",
+        user_tech: "SQA",
         user_name: "",
         duty_start_time: "",
         duty_end_time: "",
@@ -107,13 +117,27 @@ const parseData = (params: any) => {
 
         }
 
+        if (ele.user_tech === "SQA") {
+          projectItem_SQA.person_num = ele.person_num;
+          projectItem_SQA.user_tech = ele.user_tech;
+          projectItem_SQA.duty_start_time = ele.duty_start_time;
+          projectItem_SQA.duty_end_time = ele.duty_end_time;
+          projectItem_SQA.duty_order = ele.duty_order;
+          if (ele.duty_order === "1") {
+            projectItem_SQA.user_name = projectItem_SQA.user_name === "" ? username : `${username}/${projectItem_SQA.user_name}`;
+
+          } else {
+            projectItem_SQA.user_name = projectItem_SQA.user_name === "" ? username : `${projectItem_SQA.user_name}/${username}`;
+          }
+        }
+
 
         if (index === project.length - 1) {
           projectItemArray.push(projectItem_Front);
           projectItemArray.push(projectItem_Backend);
           projectItemArray.push(projectItem_Test);
           projectItemArray.push(projectItem_Flow);
-
+          projectItemArray.push(projectItem_SQA);
         }
 
       });
@@ -153,7 +177,6 @@ const getPlanDetails = async (paln_num: string) => {
     message: "",
     datas: []
   };
-
 
   await axios.get('/api/verify/duty/plan_data_detail', {params: {person_num: paln_num}})
     .then(function (res) {

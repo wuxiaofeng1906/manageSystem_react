@@ -29,7 +29,9 @@ const oldDutyTask = {
   firstTesterId: "",
   secondTesterId: "",
   firstFlowId: "",
-  secondFlowId: ""
+  secondFlowId: "",
+  firstSQAId: "",
+  secondSQAId: "",
 };
 // 保存需要被删除的数据
 const deletedData: any = [];
@@ -41,6 +43,7 @@ const loadUserSelect = async (teach: string) => {
 
   const teachData: any = [<Option key={""} value={`""&免`}>免</Option>];
   const userInfo = await getAllUsers(teach);
+
   if (userInfo.message !== "") {
     message.error({
       content: userInfo.message,
@@ -192,7 +195,8 @@ const DutyPlan: React.FC<any> = () => {
     front: [],
     backend: [],
     tester: [],
-    flow: []
+    flow: [],
+    SQA: []
   });
   // 动态表单的下拉框
   const [projectInfo, setProjectInfo] = useState({
@@ -285,6 +289,7 @@ const DutyPlan: React.FC<any> = () => {
 
   const [formForPlanModify] = Form.useForm();
   const showExitData = (hisData: any) => {
+
     // 值班人详细信息显示
     const userData = hisData.user;
     if (userData) {
@@ -364,6 +369,21 @@ const DutyPlan: React.FC<any> = () => {
               secondFlow: usersAccount
             });
           }
+        } else if (users.user_tech === "SQA") {
+
+          if (users.duty_order === "1") {
+            oldDutyTask.firstSQAId = users.person_id;
+            formForPlanModify.setFieldsValue({
+              ...formForPlanModify,
+              firstSQA: usersAccount
+            });
+          } else {
+            oldDutyTask.secondSQAId = users.person_id;
+            formForPlanModify.setFieldsValue({
+              ...formForPlanModify,
+              secondSQA: usersAccount
+            });
+          }
         }
       });
     }
@@ -430,11 +450,14 @@ const DutyPlan: React.FC<any> = () => {
     const frontUserInfo = await loadUserSelect("1");
     const backendUserInfo = await loadUserSelect("2");
     const testerUserInfo = await loadUserSelect("3");
+    const sqaUserInfo = await loadUserSelect("7");
+
     setAllUsers({
       front: frontUserInfo,
       backend: backendUserInfo,
       tester: testerUserInfo,
-      flow: backendUserInfo
+      flow: backendUserInfo,
+      SQA: sqaUserInfo
     });
 
     // 生成项目名称、项目类型、对应分支、对应测试环境、对应升级环境、项目负责人的下拉框
@@ -797,10 +820,11 @@ const DutyPlan: React.FC<any> = () => {
 
     const {
       firstFront, secondFront, firstBackend, secondBackend, firstTester, secondTester, firstFlow,
-      secondFlow
+      secondFlow, firstSQA, secondSQA
     } = data;
     // 判断所有为空
-    if (!firstFront && !secondFront && !firstBackend && !secondBackend && !firstTester && !secondTester && !firstFlow && !secondFlow) {
+    if (!firstFront && !secondFront && !firstBackend && !secondBackend && !firstTester && !secondTester && !firstFlow && !secondFlow
+      && !firstSQA && !secondSQA) {
       message.error({
         content: "值班人员不能为空！",
         duration: 1,
@@ -899,6 +923,28 @@ const DutyPlan: React.FC<any> = () => {
       return false;
     }
 
+    // 判断SQA是否为空
+    if (!firstSQA && secondSQA) {
+      message.error({
+        content: "SQA第一值班人不能为空！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return false;
+    }
+    if (firstSQA && !secondSQA) {
+      message.error({
+        content: "SQA第二值班人不能为空！",
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return false;
+    }
+
     return true;
   };
   // 解析需要保存的值班人员
@@ -920,7 +966,9 @@ const DutyPlan: React.FC<any> = () => {
       firstTester,
       secondTester,
       firstFlow,
-      secondFlow
+      secondFlow,
+      firstSQA,
+      secondSQA
     } = data;
 
     // 前端第一值班人
@@ -1016,6 +1064,30 @@ const DutyPlan: React.FC<any> = () => {
       "user_id": secondFlow === null ? "" : secondFlow.split("&")[0],
       "user_name": secondFlow === null ? "" : secondFlow.split("&")[1],
       "user_tech": "6",
+      "duty_order": "2",
+    });
+
+    // SQA第一值班人
+    person_data_array.push({
+      "peron_num": oldDutyTask.personNum,
+      "duty_start_time": startTime,
+      "duty_end_time": endTime,
+      "person_id": oldDutyTask.firstSQAId,
+      "user_id": firstSQA === null ? "" : firstSQA.split("&")[0],
+      "user_name": firstSQA === null ? "" : firstSQA.split("&")[1],
+      "user_tech": "7",
+      "duty_order": "1",
+    });
+
+    // SQA第二值班人
+    person_data_array.push({
+      "peron_num": oldDutyTask.personNum,
+      "duty_start_time": startTime,
+      "duty_end_time": endTime,
+      "person_id": oldDutyTask.secondSQAId,
+      "user_id": secondSQA === null ? "" : secondSQA.split("&")[0],
+      "user_name": secondSQA === null ? "" : secondSQA.split("&")[1],
+      "user_tech": "7",
       "duty_order": "2",
     });
     return person_data_array;
@@ -1325,7 +1397,7 @@ const DutyPlan: React.FC<any> = () => {
             <RangePicker style={{width: '100%', color: "red"}} disabled/>
           </Form.Item>
           {/* 值班人员Card */}
-          <Card size="small" title="值班人员" style={{marginTop: -15}} bodyStyle={{height: 160}}>
+          <Card size="small" title="值班人员" style={{marginTop: -15}} bodyStyle={{height: 200}}>
             <Row gutter={40} style={{marginTop: -10}}>
               <Col span={10}>
                 <Form.Item name="firstFront" label="前端" style={{marginTop: 7}}>
@@ -1392,6 +1464,25 @@ const DutyPlan: React.FC<any> = () => {
                 <Form.Item name="secondFlow" label="流程第二值班人" style={{marginTop: 7}}>
                   <Select style={{width: '130px'}} showSearch>
                     {allUsers.flow}
+                  </Select>
+                </Form.Item>
+              </Col>
+
+            </Row>
+
+            <Row gutter={40} style={{marginTop: -25}}>
+              <Col span={10}>
+                <Form.Item name="firstSQA" label="SQA" style={{marginTop: 7}}>
+                  <Select style={{width: '130px'}} showSearch>
+                    {allUsers.SQA}
+                  </Select>
+                </Form.Item>
+              </Col>
+
+              <Col span={14}>
+                <Form.Item name="secondSQA" label="SQA第二值班人" style={{marginTop: 7}}>
+                  <Select style={{width: '130px'}} showSearch>
+                    {allUsers.SQA}
                   </Select>
                 </Form.Item>
               </Col>

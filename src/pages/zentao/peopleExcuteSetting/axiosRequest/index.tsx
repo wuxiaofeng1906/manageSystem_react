@@ -122,12 +122,13 @@ const getDistributeDetails = async () => {
 const excuteDistribute = async (datas: any) => {
   const result: any = {
     message: '',
-    data: [],
+    distributionNum: '',
   };
+
   await axios.post('/api/verify/zentao/distribution', datas)
     .then(function (res) {
       if (res.data.code === 200) {
-        result.data = res.data.data;
+        result.distributionNum = res.data.data?.distribution_num;
       } else {
         result.message = `错误：${res.data.msg}`;
       }
@@ -163,13 +164,13 @@ const saveDistribute = async (datas: any) => {
 };
 
 // 获取执行日志
-const getExcuteLogs = async (performId: number) => {
+const getExcuteLogs = async (distributionNum: number) => {
   const result: any = {
     message: '',
     data: [],
   };
   await axios
-    .get('/api/verify/zentao/distribution_log', {params: {perform_id: performId}})
+    .get('/api/verify/zentao/distribution_log', {params: {perform_id: distributionNum}})
     .then(function (res) {
       if (res.data.code === 200) {
         result.data = res.data.data;

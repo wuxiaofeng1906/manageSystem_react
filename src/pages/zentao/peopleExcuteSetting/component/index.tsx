@@ -56,14 +56,16 @@ const getPositionSelect = async () => {
 };
 
 // 执行类型
-const getExcuteTypeSelect = async () => {
+const getExcuteTypeSelect = async (type: string) => {
 
   const excuteType = await getExcuteType();
-  const typeData: any = [
-    <Option key={""} value={""}>空</Option>,
-    <Option key={"all"} value={"all"}> 全部 </Option>
-  ];
+  const typeData: any = [];
 
+  if (type === "distribute") {
+    typeData.push(<Option key={"all"} value={"all&全部"}> 全部 </Option>);
+  } else {
+    typeData.push(<Option key={""} value={`''&空`}>空</Option>);
+  }
   if (excuteType.message !== '') {
     message.error({
       content: excuteType.message,
@@ -91,8 +93,7 @@ const getExcuteTypeSelect = async () => {
 const getExcutionSelect = async (excuteType: string) => {
   const excution = await getExcution(excuteType);
   const excuteData: any = [
-    <Option key={""} value={""}>空</Option>,
-    <Option key={"all"} value={"all"}> 全部 </Option>
+    <Option key={"all"} value={"all&&全部"}> 全部 </Option>
   ];
 
   if (excution.message !== '') {

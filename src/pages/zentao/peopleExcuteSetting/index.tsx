@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {useRequest} from 'ahooks';
 import {Card, Button, message, Form, Select, Row, Col, InputNumber} from 'antd';
@@ -16,8 +16,12 @@ const PeopleExcuteSetting: React.FC<any> = () => {
   // 职位
   const positionsList = useRequest(() => getPositionSelect()).data;
 
-  // 执行类型
-  const excuteTypeList = useRequest(() => getExcuteTypeSelect()).data;
+  // 分配执行类型
+  const disExcuteTypeList = useRequest(() => getExcuteTypeSelect("distribute")).data;
+
+  // 排除执行类型
+  const ExExcuteTypeList = useRequest(() => getExcuteTypeSelect("exclude")).data;
+
 
   // 已经保存的分配详情
   const distributeDetails = useRequest(() => getDistributeDetails()).data;
@@ -29,6 +33,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
   const excuteAuthorityDistribute = async () => {
     const formData = formForExcuteSetting.getFieldsValue();
 
+    debugger;
     // 第一步，调用保存接口保存设置的数据。
     const saveResult = await saveDistributeOperate(formData, performID);
     if (saveResult.message !== "") {
@@ -42,14 +47,15 @@ const PeopleExcuteSetting: React.FC<any> = () => {
 
       return;
     }
-    performID = saveResult.performID;
 
+    performID = saveResult.performID;
 
     // 第二步，调用执行接口
     const excuteResult = await excuteDistributeOperate(formData, performID);
+
     if (excuteResult.message !== "") {
       message.error({
-        content: saveResult.message,
+        content: excuteResult.message,
         duration: 1,
         style: {
           marginTop: '50vh',
@@ -60,7 +66,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
     }
 
     // 第三步，根据执行接口返回的id再获取执行日志
-    const logResult = await getExcuteLogs(excuteResult.performID);
+    const logResult = await getExcuteLogs(excuteResult.distributionNum);
 
   };
 
@@ -87,8 +93,8 @@ const PeopleExcuteSetting: React.FC<any> = () => {
     distributeExcute: [],// 分配
     excludeExcute: [] // 排除
   });
-  const onExcuteTypeChanged = async (excuteType: string, changedData: any) => {
 
+  const getExcuteSelect = async (changedData: any) => {
     let typeData = "";
     if (changedData && changedData.length > 0) {
       const typeId: any = [];
@@ -98,6 +104,13 @@ const PeopleExcuteSetting: React.FC<any> = () => {
       typeData = typeId.join();
     }
     const selectData = await getExcutionSelect(typeData);
+    return selectData;
+  };
+
+  // 执行类型下拉框选项变化
+  const onExcuteTypeChanged = async (excuteType: string, changedData: any) => {
+
+    const selectData = await getExcuteSelect(changedData);
     if (excuteType === "distribute") {
       setExcute({
         ...excute,
@@ -113,16 +126,41 @@ const PeopleExcuteSetting: React.FC<any> = () => {
 
   /* endregion  */
 
-  useEffect(() => {
-    debugger;
+  // 页面数据显示
+  const showPagesData = async () => {
     if (distributeDetails && distributeDetails.data && JSON.stringify(distributeDetails.data) !== "{}") {
       const disData = distributeDetails.data;
       performID = disData.perform_id;
-      let disExcuteType = "";
+
+      const disExcuteType = []; // 分配执行类型
       if ((disData.to_perform_type).length > 0) {
         const excuteType = disData.to_perform_type;
-        disExcuteType = `${excuteType[0].to_perform_type_id}&${excuteType[0].to_perform_type}`
+        disExcuteType.push(`${excuteType[0].to_perform_type_id}&${excuteType[0].to_perform_type}`);
       }
+      // 展示分配执行下拉框
+      const disExcute = [];// 分配执行
+      if ((disData.to_perform).length > 0) {
+        const excuteID = disData.to_perform;
+        disExcute.push(`${excuteID[0].project_id}&${excuteID[0].project_name}`);
+      }
+
+      const exExcuteType = [];// 排除执行类型
+      if ((disData.out_perform_type).length > 0) {
+        const outType = disData.out_perform_type;
+        exExcuteType.push(`${outType[0].out_perform_type_id}&${outType[0].out_perform_type}`);
+      }
+
+      const exExcute = [];// 排除执行
+      if ((disData.out_perform).length > 0) {
+        const outID = disData.out_perform;
+        exExcute.push(`${outID[0].project_id}&${outID[0].project_name}`);
+      }
+
+      // 展示排除执行下拉框
+      setExcute({
+        distributeExcute: await getExcuteSelect(disExcuteType),// 分配
+        excludeExcute: await getExcuteSelect(exExcuteType)// 排除
+      });
 
       // 有数据的显示
       formForExcuteSetting.setFieldsValue({
@@ -130,9 +168,9 @@ const PeopleExcuteSetting: React.FC<any> = () => {
         workDay: disData.work_days,
         workHours: disData.work_hours,
         distributeExcuteType: disExcuteType,
-        distributeExcute: "全部",
-        excludeExcuteType: "",
-        excludeExcute: "空",
+        distributeExcute: disExcute,
+        excludeExcuteType: exExcuteType,
+        excludeExcute: exExcute,
       });
 
     } else { // 无数据的东西
@@ -147,6 +185,10 @@ const PeopleExcuteSetting: React.FC<any> = () => {
         excludeExcute: "空",
       });
     }
+  };
+
+  useEffect(() => {
+    showPagesData();
   }, [distributeDetails])
   return (
     <PageContainer style={{marginTop: -30}}>
@@ -200,14 +242,14 @@ const PeopleExcuteSetting: React.FC<any> = () => {
                   <Select style={{width: '100%'}} mode="multiple" showSearch onChange={async (changedData: any) => {
                     await onExcuteTypeChanged("distribute", changedData);
                   }}>
-                    {excuteTypeList}
+                    {disExcuteTypeList}
                   </Select>
                 </Form.Item>
                 <Form.Item label="排除执行类型筛选" name="excludeExcuteType" required={true} style={{marginTop: -20}}>
                   <Select style={{width: '100%'}} mode="multiple" showSearch onChange={async (changedData: any) => {
                     await onExcuteTypeChanged("exclude", changedData);
                   }}>
-                    {excuteTypeList}
+                    {ExExcuteTypeList}
                   </Select>
                 </Form.Item>
               </Col>

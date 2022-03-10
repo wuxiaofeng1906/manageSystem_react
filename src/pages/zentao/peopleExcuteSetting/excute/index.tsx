@@ -1,12 +1,26 @@
 import {excuteDistribute, saveDistribute} from '../axiosRequest';
-import {message} from "antd";
 
 // 执行分配
-const excuteDistributeOperate = async (formData: any,performID:number) => {
-  console.log(formData);
+const excuteDistributeOperate = async (formData: any, performID: any) => {
+
+  const {usersName} = formData;
+  if (!usersName || usersName.length === 0) {
+    return {
+      message: "分配人员不能为空！",
+      distributionNum: '',
+    };
+  }
+
+  const userList: any = [];
+  usersName.forEach((ele: any) => {
+    const userID = ele.split("&");
+    userList.push(userID[0]);
+
+  });
+
   const datas = {
-    "perform_id": 0,
-    "zt_user_id": "string"
+    "perform_id": Number(performID),
+    "zt_user_id": userList.join()
   };
 
   // 执行前需要先调用保存接口

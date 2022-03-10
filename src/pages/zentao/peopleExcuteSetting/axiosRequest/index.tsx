@@ -141,14 +141,15 @@ const excuteDistribute = async (datas: any) => {
 
 // 保存分配
 const saveDistribute = async (datas: any) => {
+
   const result: any = {
     message: '',
-    data: [],
+    performID: -1,
   };
   await axios.post('/api/verify/zentao/distribution_detail', datas)
     .then(function (res) {
       if (res.data.code === 200) {
-        result.data = res.data.data;
+        result.performID = res.data.data?.perform_id;
       } else {
         result.message = `错误：${res.data.msg}`;
       }

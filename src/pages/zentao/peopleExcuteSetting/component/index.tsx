@@ -21,7 +21,7 @@ const getZentaoUserSelect = async () => {
     const datas = zentaoUsers.data;
     datas.forEach((users: any) => {
       userData.push(
-        <Option key={users.account} value={users.realname}>{users.realname}</Option>,
+        <Option key={users.account} value={`${users.account}&${users.realname}`}>{users.realname}</Option>,
       );
     });
   }
@@ -76,7 +76,10 @@ const getExcuteTypeSelect = async () => {
     const datas = excuteType.data;
     datas.forEach((types: any) => {
       typeData.push(
-        <Option key={types.execution_type} value={types.execution_type}>{types.execution_type_name}</Option>,
+        <Option
+          key={types.execution_type}
+          value={`${types.execution_type}&${types.execution_type_name}`}>{types.execution_type_name}
+        </Option>,
       );
     });
   }
@@ -104,7 +107,10 @@ const getExcutionSelect = async (excuteType: string) => {
     const datas = excution.data;
     datas.forEach((excute: any) => {
       excuteData.push(
-        <Option key={excute.execution_id} value={excute.execution_name}>{excute.execution_name}</Option>,
+        <Option
+          key={excute.execution_id}
+          value={`${excute.execution_id}&${excute.execution_name}`}>{excute.execution_name}
+        </Option>,
       );
     });
   }

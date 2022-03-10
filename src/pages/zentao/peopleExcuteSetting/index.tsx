@@ -6,6 +6,8 @@ import {getZentaoUserSelect, getPositionSelect, getExcuteTypeSelect, getExcution
 import {excuteDistributeOperate, saveDistributeOperate} from './excute';
 import {getDistributeDetails, getExcuteLogs} from './axiosRequest';
 
+let performID = -1; // 用于记录全局的保存记录ID，在页面加载时和保存后赋值，保存和执行时需要使用
+
 // 组件初始化
 const PeopleExcuteSetting: React.FC<any> = () => {
   /* region 下拉列表 */
@@ -24,20 +26,60 @@ const PeopleExcuteSetting: React.FC<any> = () => {
   const [formForExcuteSetting] = Form.useForm();
 
   // 执行权限分配
-  const excuteAuthorityDistribute = () => {
+  const excuteAuthorityDistribute = async () => {
     const formData = formForExcuteSetting.getFieldsValue();
-    excuteDistributeOperate(formData);
 
-    // 获取执行日志
-    // await getExcuteLogs();
+    // 第一步，调用保存接口保存设置的数据。
+    const saveResult = await saveDistributeOperate(formData, performID);
+    if (saveResult.message !== "") {
+      message.error({
+        content: saveResult.message,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
+    performID = saveResult.performID;
+
+
+    // 第二步，调用执行接口
+    const excuteResult = await excuteDistributeOperate(formData, performID);
+    if (excuteResult.message !== "") {
+      message.error({
+        content: saveResult.message,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      return;
+    }
+
+    // 第三步，根据执行接口返回的id再获取执行日志
+    const logResult = await getExcuteLogs(excuteResult.performID);
 
   };
 
   // 点击保存
-  const saveExcute = () => {
+  const saveExcute = async () => {
     const formData = formForExcuteSetting.getFieldsValue();
-    saveDistributeOperate(formData);
+    const saveResult = await saveDistributeOperate(formData, performID);
 
+    if (saveResult.message === "") {
+      performID = saveResult.performID;
+    } else {
+      message.error({
+        content: saveResult.message,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
   };
 
   /* region 执行下拉框设置 */
@@ -49,7 +91,11 @@ const PeopleExcuteSetting: React.FC<any> = () => {
 
     let typeData = "";
     if (changedData && changedData.length > 0) {
-      typeData = changedData.join();
+      const typeId: any = [];
+      changedData.forEach((types: any) => {
+        typeId.push(types.split("&")[0]);
+      });
+      typeData = typeId.join();
     }
     const selectData = await getExcutionSelect(typeData);
     if (excuteType === "distribute") {
@@ -68,20 +114,37 @@ const PeopleExcuteSetting: React.FC<any> = () => {
   /* endregion  */
 
   useEffect(() => {
-
+    debugger;
     if (distributeDetails && distributeDetails.data && JSON.stringify(distributeDetails.data) !== "{}") {
+      const disData = distributeDetails.data;
+      performID = disData.perform_id;
+      let disExcuteType = "";
+      if ((disData.to_perform_type).length > 0) {
+        const excuteType = disData.to_perform_type;
+        disExcuteType = `${excuteType[0].to_perform_type_id}&${excuteType[0].to_perform_type}`
+      }
+
       // 有数据的显示
+      formForExcuteSetting.setFieldsValue({
+        position: disData.position,
+        workDay: disData.work_days,
+        workHours: disData.work_hours,
+        distributeExcuteType: disExcuteType,
+        distributeExcute: "全部",
+        excludeExcuteType: "",
+        excludeExcute: "空",
+      });
+
     } else { // 无数据的东西
       formForExcuteSetting.setFieldsValue({
         // usersName: undefined,
         position: "研发",
-        // workDay: "",
-        // workHours: "",
+        workDay: 720,
+        workHours: 8,
         distributeExcuteType: "all",
         distributeExcute: "全部",
         excludeExcuteType: "",
         excludeExcute: "空",
-
       });
     }
   }, [distributeDetails])
@@ -108,12 +171,12 @@ const PeopleExcuteSetting: React.FC<any> = () => {
               </Col>
               <Col span={5}>
                 <Form.Item label="可用工日[天]" name="workDay" required={true}>
-                  <InputNumber style={{width: '100%'}} min={1} defaultValue={720}/>
+                  <InputNumber style={{width: '100%'}} min={1}/>
                 </Form.Item>
               </Col>
               <Col span={5}>
                 <Form.Item label="可用工时/天" name="workHours" required={true}>
-                  <InputNumber style={{width: '100%'}} min={1} defaultValue={8}/>
+                  <InputNumber style={{width: '100%'}} min={1}/>
                 </Form.Item>
               </Col>
               <Col span={3}>

@@ -169,7 +169,7 @@ const getExcuteLogs = async (distributionNum: string) => {
     message: '',
     data: [],
   };
-  debugger;
+
   await axios
     .get('/api/verify/zentao/distribution_log', {params: {perform_id: distributionNum}})
     .then(function (res) {

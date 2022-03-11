@@ -56,6 +56,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
       );
     });
     setLogs(<div>{logsArray}</div>);
+    setExcuteState(false);
   };
   // 执行权限分配
   const excuteAuthorityDistribute = async () => {
@@ -120,8 +121,6 @@ const PeopleExcuteSetting: React.FC<any> = () => {
 
     }, 2000);
 
-
-    setExcuteState(false);
   };
 
   // 点击保存

@@ -7,8 +7,7 @@ axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
 console.log(`Bearer ${sys_accessToken}`);
 // 解析数据
 const parseData = (params: any) => {
-  debugger;
-
+ 
   const returnValue: any = [];
   if (params) {
     params.forEach((project: any) => {

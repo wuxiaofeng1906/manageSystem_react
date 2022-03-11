@@ -1,7 +1,7 @@
 import {message} from "antd";
 
 const serverConfirmJudge = (currentOperateStatus: any, props: any, autoHitMessage: any) => {
-  debugger;
+
   // 判断发布是否已完成，已完成不能修改
   if (currentOperateStatus) {
     message.error({

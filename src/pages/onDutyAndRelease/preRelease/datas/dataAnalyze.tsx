@@ -35,7 +35,7 @@ const analysisPreReleaseProject = (datas: any, zentaoData: any) => {
     projectArray.forEach((ele: any) => {
       projectIdArray.push(`${ele.project_name}&${ele.project_id}`);
     });
-    debugger;
+
     const returnArray = {
       pro_id: project.pro_id,
       projectId: projectIdArray,
@@ -148,7 +148,6 @@ const alalysisInitData = async (queryData: string = '', queryReleaseNum: string 
     return {tabPageInfo: await analysisTabsPageInfo(datas)};
   }
 
-  debugger;
   return {
     tabPageInfo: await analysisTabsPageInfo(datas),
     // 预发布项目

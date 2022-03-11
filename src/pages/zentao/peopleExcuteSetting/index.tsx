@@ -59,6 +59,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
   };
   // 执行权限分配
   const excuteAuthorityDistribute = async () => {
+    setLogs(<div></div>);
     setExcuteState(true);
     const formData = formForExcuteSetting.getFieldsValue();
 
@@ -96,20 +97,30 @@ const PeopleExcuteSetting: React.FC<any> = () => {
     }
 
     // 第三步，根据执行接口返回的id再获取执行日志
-    const logResult = await getExcuteLogs((excuteResult.distributionNum).toString());
-    if (logResult.message !== "") {
-      setExcuteState(false);
-      message.error({
-        content: logResult.message,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-      return;
-    }
 
-    showLogs(logResult?.data);
+
+    setTimeout(async () => {
+      const logResult = await getExcuteLogs((excuteResult.distributionNum).toString());
+
+      if (JSON.stringify(logResult) !== "{}") {
+        if (logResult.message !== "") {
+          setExcuteState(false);
+          message.error({
+            content: logResult.message,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          return;
+        }
+
+        showLogs(logResult?.data);
+      }
+
+    }, 1000);
+
+
     setExcuteState(false);
   };
 

@@ -505,6 +505,8 @@ const PeopleExcuteSetting: React.FC<any> = () => {
           }
         });
 
+      } else {
+        exExcuteType.push("''&空");
       }
 
       const exExcute = [];// 排除执行
@@ -601,13 +603,14 @@ const PeopleExcuteSetting: React.FC<any> = () => {
               <Row style={{marginTop: -20}}>
                 <Col span={11}>
                   <Form.Item label="分配执行类型筛选" name="distributeExcuteType" required={true}>
-                    <Select style={{width: '100%'}} mode="multiple" showSearch
+                    <Select style={{width: '100%'}} mode="multiple" showSearch maxTagCount={'responsive'}
                             onSelect={getDisExcuteType}>
                       {disExcuteTypeList}
                     </Select>
                   </Form.Item>
                   <Form.Item label="排除执行类型筛选" name="excludeExcuteType" style={{marginTop: -20, marginLeft: 12}}>
-                    <Select style={{width: '100%'}} mode="multiple" showSearch onSelect={getExcExcuteType}>
+                    <Select style={{width: '100%'}} mode="multiple" showSearch maxTagCount={'responsive'}
+                            onSelect={getExcExcuteType}>
                       {ExExcuteTypeList}
                     </Select>
                   </Form.Item>
@@ -615,12 +618,14 @@ const PeopleExcuteSetting: React.FC<any> = () => {
 
                 <Col span={10}>
                   <Form.Item label="分配执行" name="distributeExcute" required={true}>
-                    <Select style={{width: '100%'}} mode="multiple" showSearch onSelect={distributeExcuteSelected}>
+                    <Select style={{width: '100%'}} mode="multiple" showSearch maxTagCount={'responsive'}
+                            onSelect={distributeExcuteSelected}>
                       {excute.distributeExcute}
                     </Select>
                   </Form.Item>
                   <Form.Item label="排除执行" name="excludeExcute" style={{marginTop: -20, marginLeft: 12}}>
-                    <Select style={{width: '100%'}} mode="multiple" showSearch onSelect={excludeExcuteSelected}>
+                    <Select style={{width: '100%'}} mode="multiple" showSearch maxTagCount={'responsive'}
+                            onSelect={excludeExcuteSelected}>
                       {excute.excludeExcute}
                     </Select>
                   </Form.Item>
@@ -644,7 +649,8 @@ const PeopleExcuteSetting: React.FC<any> = () => {
             </Form>
           </div>
           {/* 执行日志 */}
-          <Card size="small" title="执行日志" style={{width: '100%', height: logHeight, marginTop: -20,overflow:"scroll"}}>
+          <Card size="small" title="执行日志"
+                style={{width: '100%', height: logHeight, marginTop: -20, overflow: "scroll"}}>
             {logs}
           </Card>
         </div>

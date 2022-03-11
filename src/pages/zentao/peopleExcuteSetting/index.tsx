@@ -193,48 +193,57 @@ const PeopleExcuteSetting: React.FC<any> = () => {
   const showPagesData = async () => {
 
     if (distributeDetails && distributeDetails.data && JSON.stringify(distributeDetails.data) !== "{}") {
-
+      debugger;
       const disData = distributeDetails.data;
       performID = disData.perform_id;
-
-      const disExcuteType = []; // 分配执行类型
+      // 分配执行类型
+      const disExcuteType: any = [];
       if ((disData.to_perform_type).length > 0) {
-        const excuteType = disData.to_perform_type;
-        if (excuteType[0].to_perform_type_id === "all") {
-          disExcuteType.push(`${excuteType[0].to_perform_type_id}&全部`);
-        } else {
-          disExcuteType.push(`${excuteType[0].to_perform_type_id}&${excuteType[0].to_perform_type}`);
-        }
+        const excuteType: any = disData.to_perform_type;
+        excuteType.forEach((types: any) => {
+          if (types.to_perform_type_id === "all") {
+            disExcuteType.push(`${types.to_perform_type_id}&全部`);
+          } else {
+            disExcuteType.push(`${types.to_perform_type_id}&${types.to_perform_type}`);
+          }
+        });
+
       }
       // 展示分配执行下拉框
-      const disExcute = [];// 分配执行
+      const disExcute: any = [];// 分配执行
       if ((disData.to_perform).length > 0) {
-        const excuteID = disData.to_perform;
-        if (excuteID[0].project_id === "all") {
-          disExcute.push(`${excuteID[0].project_id}&全部`);
-        } else {
-          disExcute.push(`${excuteID[0].project_id}&${excuteID[0].project_name}`);
-        }
+        const excuteID: any = disData.to_perform;
+        excuteID.forEach((id: any) => {
+          if (id.project_id === "all") {
+            disExcute.push(`${id.project_id}&全部`);
+          } else {
+            disExcute.push(`${id.project_id}&${id.project_name}`);
+          }
+        });
       }
 
-      const exExcuteType = [];// 排除执行类型
+      const exExcuteType: any = [];// 排除执行类型
       if ((disData.out_perform_type).length > 0) {
-        const outType = disData.out_perform_type;
-        if (outType[0].out_perform_type_id === "''") {
-          exExcuteType.push(`${outType[0].out_perform_type_id}&空`);
-        } else {
-          exExcuteType.push(`${outType[0].out_perform_type_id}&${outType[0].out_perform_type}`);
-        }
+        const outType: any = disData.out_perform_type;
+        outType.forEach((types: any) => {
+          if (types.out_perform_type_id === "''") {
+            exExcuteType.push(`${types.out_perform_type_id}&空`);
+          } else {
+            exExcuteType.push(`${types.out_perform_type_id}&${types.out_perform_type}`);
+          }
+        });
+
       }
 
       const exExcute = [];// 排除执行
       if ((disData.out_perform).length > 0) {
-        const outID = disData.out_perform;
-        exExcute.push(`${outID[0].project_id}&${outID[0].project_name}`);
+        const outID: any = disData.out_perform;
+        outID.forEach((id: any) => {
+          exExcute.push(`${id.project_id}&${id.project_name}`);
+        });
       } else {
         exExcute.push("all&全部");
       }
-
 
       // 展示排除执行下拉框
       setExcute({

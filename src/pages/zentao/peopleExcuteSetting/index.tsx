@@ -118,7 +118,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
         showLogs(logResult?.data);
       }
 
-    }, 1000);
+    }, 2000);
 
 
     setExcuteState(false);
@@ -157,6 +157,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
 
   // 获取执行下拉框列表
   const getExcuteSelect = async (changedData: any) => {
+
     let typeData = "all";
     if (changedData && changedData.length > 0) {
       const typeId: any = [];
@@ -170,20 +171,291 @@ const PeopleExcuteSetting: React.FC<any> = () => {
     return selectData;
   };
 
-  // 执行类型下拉框选项变化
-  const onExcuteTypeChanged = async (excuteType: string, changedData: any) => {
+  // 分配执行类型下拉框选项变化
+  const getDisExcuteType = async (changedData: any, currentValue: any) => {
 
-    const selectData = await getExcuteSelect(changedData);
-    if (excuteType === "distribute") {
-      setExcute({
-        ...excute,
-        distributeExcute: selectData
+    const disExcuteTypeData = formForExcuteSetting.getFieldValue("distributeExcuteType");
+
+    // 如果选中全部之后，其他项不能进行选择(disExcuteTypeData.length = 1,表示里面只有一个全部选项)
+    if (currentValue.key === "all" && disExcuteTypeData.length > 1) {
+      const noAllArray: any = [];
+      //   判断选择框内是否有其他除了全部以外的项目。
+      disExcuteTypeData.forEach((ele: any) => {
+        const ty_dt = ele.split("&");
+        if (ty_dt[0] !== "all") {
+          noAllArray.push(ele);
+        }
       });
+
+      if (noAllArray.length > 0) {
+        message.error({
+          content: " ”全部“选项和其他具体项目不能同时存在！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        formForExcuteSetting.setFieldsValue({
+          distributeExcuteType: noAllArray
+        });
+      } else {
+        const selectData = await getExcuteSelect(disExcuteTypeData);
+        setExcute({
+          ...excute,
+          distributeExcute: selectData
+        });
+      }
+
     } else {
-      setExcute({
-        ...excute,
-        excludeExcute: selectData
+      // 需要判断原有数据中有没有包含全部选项，如果有的话，则提醒不能添加其他项目
+      const noAllArray: any = [];
+      const allArray: any = [];
+      //   判断选择框内是否有其他除了全部以外的项目。
+      disExcuteTypeData.forEach((ele: any) => {
+        const ty_dt = ele.split("&");
+        if (ty_dt[0] === "all") {
+          allArray.push(ele);
+        } else {
+          noAllArray.push(ele);
+        }
       });
+
+      if (noAllArray.length > 0 && allArray.length > 0) {
+        message.error({
+          content: "”全部“选项和其他具体项目不能同时存在！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+
+        formForExcuteSetting.setFieldsValue({
+          distributeExcuteType: allArray
+        });
+
+      } else {
+        const selectData = await getExcuteSelect(disExcuteTypeData);
+        setExcute({
+          ...excute,
+          distributeExcute: selectData
+        });
+      }
+
+    }
+
+  };
+
+  // 分配执行下拉框选择
+  const distributeExcuteSelected = (changedData: any, currentValue: any) => {
+    const disExcuteData = formForExcuteSetting.getFieldValue("distributeExcute");
+
+    // 如果选中全部之后，其他项不能进行选择(disExcuteTypeData.length = 1,表示里面只有一个全部选项)
+    if (currentValue.key === "all" && disExcuteData.length > 1) {
+      const noAllArray: any = [];
+      //   判断选择框内是否有其他除了全部以外的项目。
+      disExcuteData.forEach((ele: any) => {
+        const ty_dt = ele.split("&");
+        if (ty_dt[0] !== "all") {
+          noAllArray.push(ele);
+        }
+      });
+
+      if (noAllArray.length > 0) {
+        message.error({
+          content: " ”全部“选项和其他具体项目不能同时存在！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        formForExcuteSetting.setFieldsValue({
+          distributeExcute: noAllArray
+        });
+      }
+
+    } else {
+      // 需要判断原有数据中有没有包含全部选项，如果有的话，则提醒不能添加其他项目
+      const noAllArray: any = [];
+      const allArray: any = [];
+      //   判断选择框内是否有其他除了全部以外的项目。
+      disExcuteData.forEach((ele: any) => {
+        const ty_dt = ele.split("&");
+        if (ty_dt[0] === "all") {
+          allArray.push(ele);
+        } else {
+          noAllArray.push(ele);
+        }
+      });
+
+      if (noAllArray.length > 0 && allArray.length > 0) {
+        message.error({
+          content: "”全部“选项和其他具体项目不能同时存在！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+
+        formForExcuteSetting.setFieldsValue({
+          distributeExcute: allArray
+        });
+
+      }
+    }
+  };
+
+  // const onDisExcuteTypeChanged = async (changedData: any, currentValue: any, test: any) => {
+  //   // 选择全部的时候不能选择其他，有其他的时候不能有全部选项
+  //   console.log("currentValue", currentValue, test);
+  //   debugger;
+  //   const selectData = await getExcuteSelect(changedData);
+  //   setExcute({
+  //     ...excute,
+  //     distributeExcute: selectData
+  //   });
+  //
+  // };
+
+  // 排除执行类型下拉框选项变化
+  // const onExcExcuteTypeChanged = async (changedData: any) => {
+  //   const selectData = await getExcuteSelect(changedData);
+  //   setExcute({
+  //     ...excute,
+  //     excludeExcute: selectData
+  //   });
+  //
+  // };
+
+  // 分配执行类型下拉框选项变化
+  const getExcExcuteType = async (changedData: any, currentValue: any) => {
+
+    const excExcuteTypeData = formForExcuteSetting.getFieldValue("excludeExcuteType");
+
+    // 如果选中全部之后，其他项不能进行选择(disExcuteTypeData.length = 1,表示里面只有一个全部选项)
+    if (currentValue.key === "" && excExcuteTypeData.length > 1) {
+      const noEmptyArray: any = [];
+      //   判断选择框内是否有其他除了全部以外的项目。
+      excExcuteTypeData.forEach((ele: any) => {
+        const ty_dt = ele.split("&");
+        if (ty_dt[0] !== "''") {
+          noEmptyArray.push(ele);
+        }
+      });
+
+      if (noEmptyArray.length > 0) {
+        message.error({
+          content: " ”全部“选项和其他具体项目不能同时存在！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        formForExcuteSetting.setFieldsValue({
+          excludeExcuteType: noEmptyArray
+        });
+      } else {
+        const selectData = await getExcuteSelect(excExcuteTypeData);
+        setExcute({
+          ...excute,
+          excludeExcute: selectData
+        });
+      }
+
+    } else {
+      // 需要判断原有数据中有没有包含全部选项，如果有的话，则提醒不能添加其他项目
+      const noAllArray: any = [];
+      const allArray: any = [];
+      //   判断选择框内是否有其他除了全部以外的项目。
+      excExcuteTypeData.forEach((ele: any) => {
+        const ty_dt = ele.split("&");
+        if (ty_dt[0] === "''") {
+          allArray.push(ele);
+        } else {
+          noAllArray.push(ele);
+        }
+      });
+
+      if (noAllArray.length > 0 && allArray.length > 0) {
+        message.error({
+          content: "”全部“选项和其他具体项目不能同时存在！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+
+        formForExcuteSetting.setFieldsValue({
+          excludeExcuteType: allArray
+        });
+
+      } else {
+        const selectData = await getExcuteSelect(excExcuteTypeData);
+        setExcute({
+          ...excute,
+          excludeExcute: selectData
+        });
+      }
+
+    }
+
+  };
+
+  // 排除执行下拉框选择
+  const excludeExcuteSelected = (changedData: any, currentValue: any) => {
+    const exExcuteData = formForExcuteSetting.getFieldValue("excludeExcute");
+
+    // 如果选中全部之后，其他项不能进行选择(disExcuteTypeData.length = 1,表示里面只有一个全部选项)
+    if (currentValue.key === "all" && exExcuteData.length > 1) {
+      const noAllArray: any = [];
+      //   判断选择框内是否有其他除了全部以外的项目。
+      exExcuteData.forEach((ele: any) => {
+        const ty_dt = ele.split("&");
+        if (ty_dt[0] !== "all") {
+          noAllArray.push(ele);
+        }
+      });
+
+      if (noAllArray.length > 0) {
+        message.error({
+          content: " ”全部“选项和其他具体项目不能同时存在！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        formForExcuteSetting.setFieldsValue({
+          excludeExcute: noAllArray
+        });
+      }
+
+    } else {
+      // 需要判断原有数据中有没有包含全部选项，如果有的话，则提醒不能添加其他项目
+      const noAllArray: any = [];
+      const allArray: any = [];
+      //   判断选择框内是否有其他除了全部以外的项目。
+      exExcuteData.forEach((ele: any) => {
+        const ty_dt = ele.split("&");
+        if (ty_dt[0] === "all") {
+          allArray.push(ele);
+        } else {
+          noAllArray.push(ele);
+        }
+      });
+
+      if (noAllArray.length > 0 && allArray.length > 0) {
+        message.error({
+          content: "”全部“选项和其他具体项目不能同时存在！",
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+
+        formForExcuteSetting.setFieldsValue({
+          excludeExcute: allArray
+        });
+
+      }
     }
   };
 
@@ -193,7 +465,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
   const showPagesData = async () => {
 
     if (distributeDetails && distributeDetails.data && JSON.stringify(distributeDetails.data) !== "{}") {
-      debugger;
+
       const disData = distributeDetails.data;
       performID = disData.perform_id;
       // 分配执行类型
@@ -329,16 +601,13 @@ const PeopleExcuteSetting: React.FC<any> = () => {
               <Row style={{marginTop: -20}}>
                 <Col span={11}>
                   <Form.Item label="分配执行类型筛选" name="distributeExcuteType" required={true}>
-                    <Select style={{width: '100%'}} mode="multiple" showSearch onChange={async (changedData: any) => {
-                      await onExcuteTypeChanged("distribute", changedData);
-                    }}>
+                    <Select style={{width: '100%'}} mode="multiple" showSearch
+                            onSelect={getDisExcuteType}>
                       {disExcuteTypeList}
                     </Select>
                   </Form.Item>
                   <Form.Item label="排除执行类型筛选" name="excludeExcuteType" style={{marginTop: -20, marginLeft: 12}}>
-                    <Select style={{width: '100%'}} mode="multiple" showSearch onChange={async (changedData: any) => {
-                      await onExcuteTypeChanged("exclude", changedData);
-                    }}>
+                    <Select style={{width: '100%'}} mode="multiple" showSearch onSelect={getExcExcuteType}>
                       {ExExcuteTypeList}
                     </Select>
                   </Form.Item>
@@ -346,12 +615,12 @@ const PeopleExcuteSetting: React.FC<any> = () => {
 
                 <Col span={10}>
                   <Form.Item label="分配执行" name="distributeExcute" required={true}>
-                    <Select style={{width: '100%'}} mode="multiple" showSearch>
+                    <Select style={{width: '100%'}} mode="multiple" showSearch onSelect={distributeExcuteSelected}>
                       {excute.distributeExcute}
                     </Select>
                   </Form.Item>
                   <Form.Item label="排除执行" name="excludeExcute" style={{marginTop: -20, marginLeft: 12}}>
-                    <Select style={{width: '100%'}} mode="multiple" showSearch>
+                    <Select style={{width: '100%'}} mode="multiple" showSearch onSelect={excludeExcuteSelected}>
                       {excute.excludeExcute}
                     </Select>
                   </Form.Item>
@@ -375,7 +644,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
             </Form>
           </div>
           {/* 执行日志 */}
-          <Card size="small" title="执行日志" style={{width: '100%', height: logHeight, marginTop: -20}}>
+          <Card size="small" title="执行日志" style={{width: '100%', height: logHeight, marginTop: -20,overflow:"scroll"}}>
             {logs}
           </Card>
         </div>

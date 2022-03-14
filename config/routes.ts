@@ -473,6 +473,12 @@ export default [
         path: 'peopleExcuteSetting',
         component: './zentao/peopleExcuteSetting',
 
+      },
+      {
+        name: '禅道管理',
+        icon: 'table',
+        path: 'zentaoManage',
+        component: './zentao/zentaoManage/templateList',
       }
     ]
   },

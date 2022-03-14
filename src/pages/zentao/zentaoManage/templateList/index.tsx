@@ -1,13 +1,12 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {useRequest} from 'ahooks';
-import {Card, Button, message, Form, Select, Row, Col, InputNumber, Spin} from 'antd';
-import {getTempColumns} from './gridMethod/columns';
+import {Button, message, Form, Modal} from 'antd';
+import {getTempColumns, getTestData} from './gridMethod/columns';
 import {getHeight} from "@/publicMethods/pageSet";
 import {DeleteTwoTone, FolderAddTwoTone, ProfileTwoTone, DownloadOutlined} from "@ant-design/icons";
 
@@ -30,19 +29,89 @@ const ZentaoTemplateList: React.FC<any> = () => {
 
   /* endregion 表格事件 */
 
-  /* region 增删改查 */
-  const add = () => {
+  /* region 增改 */
+
+  // 新增界面跳转
+  const addTempList = () => {
 
   };
-  const del = () => {
+
+  // 修改界面跳转
+  const modifyTempList = (params: any) => {
+    const {data} = params;
+    console.log(data);
 
   };
 
-  /* endregion 增删改查 */
+  /* endregion 增改 */
+
+  /* region 删除模板 */
+  const [isdelModalVisible, setIsDelModalVisible] = useState({
+    showFalg: false,
+    delData: ""
+  });
+  const delSelectedTemp = () => {
+    // 判断是否选中数据
+    const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+
+    if (selRows.length === 0) {
+      message.error({
+        content: '请选中需要删除的数据!',
+        duration: 1,
+        className: 'delNone',
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+
+    let selData = "";
+    // 需要根据真实数据传值（名字或者ID）
+    selRows.forEach((ele: any) => {
+      selData = ele;
+    });
+    setIsDelModalVisible({
+      showFalg: true,
+      delData: selData
+    });
+  };
+  const delFormCancle = () => {
+
+    setIsDelModalVisible({
+      showFalg: false,
+      delData: ""
+    });
+  };
+  const delTempList = () => {
+
+  };
+  /* endregion 删除模板 */
 
   /* region 生成任务 */
-  const generateTask = () => {
 
+  const generateTask = () => {
+    // 判断是否选中数据
+    const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
+
+    if (selRows.length === 0) {
+      message.error({
+        content: '请选中需要生成的模板数据!',
+        duration: 1,
+        className: 'delNone',
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+
+    let tempList = "";
+    selRows.forEach((ele: any) => {
+      tempList = ele;
+    });
+
+    console.log(tempList);
   };
 
 
@@ -50,7 +119,34 @@ const ZentaoTemplateList: React.FC<any> = () => {
 
   /* region 下载模板 */
   const downloadTemplate = () => {
+    // 判断是否选中数据
+    const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
 
+    if (selRows.length === 0) {
+      message.error({
+        content: '请选中需要下载的模板数据!',
+        duration: 1,
+        className: 'delNone',
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+    if (selRows.length > 1) {
+      message.error({
+        content: '一次只能下载一个模板！',
+        duration: 1,
+        className: 'delNone',
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+
+    const tempData = selRows[0];
+    console.log(tempData);
   };
 
   /* endregion 下载模板 */
@@ -60,9 +156,9 @@ const ZentaoTemplateList: React.FC<any> = () => {
       {/* 按钮栏 */}
       <div style={{background: 'white', marginTop: -20}}>
         <Button type="text" icon={<FolderAddTwoTone/>} size={'middle'}
-                onClick={add}>新增</Button>
+                onClick={addTempList}>新增</Button>
         <Button type="text" icon={<DeleteTwoTone/>} size={'middle'}
-                onClick={del}>删除</Button>
+                onClick={delSelectedTemp}>删除</Button>
         <Button type="text" style={{float: "right", color: "#46A0FC"}} icon={<DownloadOutlined/>} size={'middle'}
                 onClick={downloadTemplate}><label style={{color: "black"}}>下载模板</label></Button>
         <Button type="text" style={{float: "right"}} icon={<ProfileTwoTone/>} size={'middle'}
@@ -75,7 +171,7 @@ const ZentaoTemplateList: React.FC<any> = () => {
         <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
           <AgGridReact
             columnDefs={getTempColumns()} // 定义列
-            rowData={[]} // 数据绑定
+            rowData={getTestData()} // 数据绑定
             defaultColDef={{
               resizable: true,
               sortable: true,
@@ -87,11 +183,39 @@ const ZentaoTemplateList: React.FC<any> = () => {
             headerHeight={30}
             suppressRowTransform={true}
             onGridReady={onGridReady}
+            onRowDoubleClicked={modifyTempList}
+            rowSelection={'multiple'}
           >
           </AgGridReact>
         </div>
 
       </div>
+
+      <Modal
+        title={'删除模板'}
+        visible={isdelModalVisible.showFalg}
+        onCancel={delFormCancle}
+        centered={true}
+        footer={null}
+        width={400}
+      >
+        <Form>
+          <Form.Item>
+            <label>
+              确定删除选中的模板吗？
+            </label>
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" style={{marginLeft: '110px'}} onClick={delTempList}>
+              确定
+            </Button>
+            <Button type="primary" style={{marginLeft: '30px'}} onClick={delFormCancle}>
+              取消
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
 
     </PageContainer>
   );

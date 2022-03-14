@@ -4,7 +4,7 @@ import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {Button, Col, Form, Input, message, Row, Select} from "antd";
+import {Button, Col, Form, Input, message, Modal, Row, Select} from "antd";
 import Header from "./components/CusPageHeader";
 import {ImportOutlined} from "@ant-design/icons";
 import {getTempColumns, getTestData} from "./gridMethod/columns";
@@ -38,6 +38,41 @@ const EditTemplateList: React.FC<any> = () => {
 
   };
 
+  // 新增行
+  (window as any).addTemplateRow = async () => {
+
+
+  };
+
+  /* region 删除行 */
+  const [isdelModalVisible, setIsDelModalVisible] = useState({
+    showFalg: false,
+    delData: ""
+  });
+
+  (window as any).delTemplateRow = async (params: any) => {
+
+    setIsDelModalVisible({
+      showFalg: true,
+      delData: params
+    });
+  };
+
+  // 取消删除
+  const delFormCancle = () => {
+    setIsDelModalVisible({
+      showFalg: false,
+      delData: ""
+    });
+  };
+
+  // 确定删除慈航
+  const delTempRow = () => {
+
+  };
+
+  /* endregion  删除行 */
+
   // 取消模板编辑
   const cancleTempEdit = () => {
     history.push('/zentao/templateList');
@@ -65,6 +100,7 @@ const EditTemplateList: React.FC<any> = () => {
     // 保存成功之后返回列表，并刷新数据
     // history.push('/zentao/templateList');
   };
+
   return (
     <div style={{width: "100%", height: "100%", marginTop: "-20px"}}>
       <Header/>
@@ -143,6 +179,32 @@ const EditTemplateList: React.FC<any> = () => {
             onClick={cancleTempEdit}>取消
           </Button>
         </div>
+
+        <Modal
+          title={'删除行'}
+          visible={isdelModalVisible.showFalg}
+          onCancel={delFormCancle}
+          centered={true}
+          footer={null}
+          width={400}
+        >
+          <Form>
+            <Form.Item>
+              <label>
+                确定删除此行吗？
+              </label>
+            </Form.Item>
+
+            <Form.Item>
+              <Button type="primary" style={{marginLeft: '110px'}} onClick={delTempRow}>
+                确定
+              </Button>
+              <Button type="primary" style={{marginLeft: '30px'}} onClick={delFormCancle}>
+                取消
+              </Button>
+            </Form.Item>
+          </Form>
+        </Modal>
 
       </div>
     </div>

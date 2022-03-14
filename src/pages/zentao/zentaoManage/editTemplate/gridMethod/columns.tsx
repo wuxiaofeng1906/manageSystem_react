@@ -69,10 +69,10 @@ const getTempColumns = () => {
       const paramData = JSON.stringify(params.data).replace(/'/g, '’');
       return `
         <div style="margin-top: -3px">
-            <Button  style="border: none; background-color: transparent; " onclick='showUpgradeApiForm("add",${paramData})'>
+            <Button  style="border: none; background-color: transparent; " onclick='addTemplateRow()'>
               <img src="../add_black2.png" width="15" height="15" alt="新增" title="新增">
             </Button>
-            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteGridRows(2,${paramData})'>
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='delTemplateRow(${paramData})'>
               <img src="../delete_balck.png" width="15" height="15" alt="删除" title="删除">
             </Button>
         </div>

@@ -477,8 +477,14 @@ export default [
       {
         name: '禅道管理',
         icon: 'table',
-        path: 'zentaoManage',
+        path: 'templateList',
         component: './zentao/zentaoManage/templateList',
+      }, {
+        name: '禅道任务模板',
+        icon: 'table',
+        path: 'editTemplate',
+        component: './zentao/zentaoManage/editTemplate',
+        hideInMenu: true
       }
     ]
   },

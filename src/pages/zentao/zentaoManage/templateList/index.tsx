@@ -9,6 +9,7 @@ import {Button, message, Form, Modal} from 'antd';
 import {getTempColumns, getTestData} from './gridMethod/columns';
 import {getHeight} from "@/publicMethods/pageSet";
 import {DeleteTwoTone, FolderAddTwoTone, ProfileTwoTone, DownloadOutlined} from "@ant-design/icons";
+import {history} from "@@/core/history";
 
 
 // 组件初始化
@@ -33,13 +34,13 @@ const ZentaoTemplateList: React.FC<any> = () => {
 
   // 新增界面跳转
   const addTempList = () => {
-
+    history.push('/zentao/editTemplate');
   };
 
   // 修改界面跳转
   const modifyTempList = (params: any) => {
     const {data} = params;
-    console.log(data);
+    history.push(`/zentao/editTemplate?tempName=${data.tempName}`);
 
   };
 

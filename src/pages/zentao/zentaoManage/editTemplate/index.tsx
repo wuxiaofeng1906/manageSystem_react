@@ -4,13 +4,14 @@ import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {Button, Col, Form, Input, message, Row} from "antd";
+import {Button, Col, Form, Input, message, Row, Select} from "antd";
 import Header from "./components/CusPageHeader";
 import {ImportOutlined} from "@ant-design/icons";
-import {getTempColumns,getTestData} from "./gridMethod/columns";
+import {getTempColumns, getTestData} from "./gridMethod/columns";
 import {getHeight} from "@/publicMethods/pageSet";
 import {history} from "@@/core/history";
 
+const {Option} = Select;
 
 // 组件初始化
 const EditTemplateList: React.FC<any> = () => {
@@ -55,13 +56,14 @@ const EditTemplateList: React.FC<any> = () => {
       return;
     }
     const gridDatas = [];
+
     // 遍历列表中的数据
     gridApi.current?.forEachNode((node: any) => {
       gridDatas.push(node);
     });
 
     // 保存成功之后返回列表，并刷新数据
-    history.push('/zentao/templateList');
+    // history.push('/zentao/templateList');
   };
   return (
     <div style={{width: "100%", height: "100%", marginTop: "-20px"}}>
@@ -81,8 +83,6 @@ const EditTemplateList: React.FC<any> = () => {
                       onClick={importTemplate}>导入Excel任务</Button>
             </Col>
           </Row>
-
-
         </div>
 
         {/* 模板列表 */}
@@ -102,6 +102,28 @@ const EditTemplateList: React.FC<any> = () => {
               headerHeight={30}
               suppressRowTransform={true}
               onGridReady={onGridReady}
+              frameworkComponents={{
+                confirmSelectChoice: (props: any) => {
+                  const currentValue = props.value;
+                  return (
+                    <Select
+                      size={'small'}
+                      defaultValue={currentValue}
+                      bordered={false}
+                      style={{width: '100%'}}
+                      onChange={(newValue: any) => {
+                        console.log(newValue);
+                      }}>
+                      <Option key={'1'} value={'1'}>
+                        新增
+                      </Option>
+                      <Option key={'2'} value={'2'}>
+                        子任务
+                      </Option>
+                    </Select>
+                  );
+                },
+              }}
             >
             </AgGridReact>
           </div>

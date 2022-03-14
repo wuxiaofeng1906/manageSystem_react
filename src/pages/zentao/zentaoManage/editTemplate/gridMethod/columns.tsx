@@ -10,51 +10,75 @@ const getTempColumns = () => {
   }, {
     headerName: '增加类型',
     field: 'addType',
-    minWidth: 110,
+    minWidth: 120,
+    cellRenderer: "confirmSelectChoice"
   }, {
     headerName: '任务名称',
     field: 'taskName',
     minWidth: 100,
+    editable: true,
   }, {
     headerName: '所属模块',
     field: 'module',
     minWidth: 90,
+    editable: true,
   }, {
     headerName: '研发相关需求',
     field: 'devStory',
     minWidth: 90,
+    editable: true,
   }, {
     headerName: '指派给',
     field: 'assignedTo',
     minWidth: 90,
+    cellRenderer: "confirmSelectChoice"
   }, {
     headerName: '优先级',
     field: 'priority',
     minWidth: 90,
+    cellRenderer: "confirmSelectChoice"
   }, {
     headerName: '任务类型',
     field: 'taskType',
     minWidth: 110,
+    cellRenderer: "confirmSelectChoice"
   }, {
     headerName: '最初预计',
     field: 'initPlan',
     minWidth: 100,
+    editable: true,
   }, {
     headerName: '任务描述',
     field: 'taskDesc',
     minWidth: 90,
+    editable: true,
   }, {
     headerName: '所属端',
     field: 'side',
     minWidth: 90,
+    cellRenderer: "confirmSelectChoice"
   }, {
     headerName: '任务来源',
     field: 'taskSource',
     minWidth: 90,
+    cellRenderer: "confirmSelectChoice"
   }, {
     headerName: '操作',
-    field: 'operate',
     minWidth: 90,
+    cellRenderer: (params: any) => {
+      const paramData = JSON.stringify(params.data).replace(/'/g, '’');
+      return `
+        <div style="margin-top: -3px">
+            <Button  style="border: none; background-color: transparent; " onclick='showUpgradeApiForm("add",${paramData})'>
+              <img src="../add_1.png" width="15" height="15" alt="新增" title="新增">
+            </Button>
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteGridRows(2,${paramData})'>
+              <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
+            </Button>
+        </div>
+           `;
+
+    }
   }];
 
   return column;

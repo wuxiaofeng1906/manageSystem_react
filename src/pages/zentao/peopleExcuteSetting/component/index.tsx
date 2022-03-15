@@ -89,6 +89,58 @@ const getExcuteTypeSelect = async (type: string) => {
   return typeData;
 };
 
+// 执行类型(用于树形)
+
+const getExcuteTypeForTree = async (type: string) => {
+
+  const excuteType = await getExcuteType();
+  const childType: any = [];
+
+  if (excuteType.message !== '') {
+    message.error({
+      content: excuteType.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (excuteType.data) {
+    const datas = excuteType.data;
+    datas.forEach((types: any) => {
+      childType.push({
+        title: types.execution_type_name,
+        value: `${types.execution_type}&${types.execution_type_name}`,
+        key: types.execution_type,
+      })
+    });
+  }
+
+  let typeData: any = [
+    {
+      title: '全部',
+      value: 'all&全部',
+      key: 'all&全部',
+      children: childType
+    }];
+
+  if (type === "exclude") {
+    typeData = [{
+      title: "空",
+      value: `''&空`,
+      key: `''&空`,
+    }, {
+      title: '全部',
+      value: 'all&全部',
+      key: 'all&全部',
+      children: childType
+    }];
+
+  }
+
+
+  return typeData;
+};
+
 // 执行
 const getExcutionSelect = async (excuteType: string) => {
   const excution = await getExcution(excuteType);
@@ -119,4 +171,43 @@ const getExcutionSelect = async (excuteType: string) => {
   return excuteData;
 };
 
-export {getZentaoUserSelect, getPositionSelect, getExcuteTypeSelect, getExcutionSelect};
+// 获取执行的数据
+const getExcutionForTree = async (excuteType: string) => {
+
+  const excution = await getExcution(excuteType);
+  const childType: any = [];
+  if (excution.message !== '') {
+    message.error({
+      content: excution.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (excution.data) {
+    const datas = excution.data;
+    datas.forEach((excute: any) => {
+      childType.push({
+        title: excute.execution_name,
+        value: `${excute.execution_id}&${excute.execution_name}`,
+        key: `${excute.execution_id}&${excute.execution_name}`,
+      });
+    });
+  }
+
+  const excuteData: any = [
+    {
+      title: '全部',
+      value: 'all&全部',
+      key: 'all&全部',
+      children: childType
+    }
+  ];
+
+  return excuteData;
+};
+
+export {
+  getZentaoUserSelect, getPositionSelect, getExcuteTypeSelect, getExcutionSelect,
+  getExcuteTypeForTree, getExcutionForTree
+};

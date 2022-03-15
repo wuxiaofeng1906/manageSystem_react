@@ -57,6 +57,16 @@ const PeopleExcuteSetting: React.FC<any> = () => {
     setExcuteState(false);
   };
 
+  // 使用递归循环调用异步程序
+  const getLogData: any = async (distributionNum: string) => {
+
+    const logResult = await getExcuteLogs(distributionNum);
+    if (JSON.stringify(logResult) !== "{}" && (logResult?.data).length > 0) {
+      return logResult?.data;
+    }
+    return getLogData(distributionNum);
+  };
+
   // 执行权限分配
   const excuteAuthorityDistribute = async () => {
     setLogs(<div></div>);
@@ -95,26 +105,9 @@ const PeopleExcuteSetting: React.FC<any> = () => {
     }
 
     // 第三步，根据执行接口返回的id再获取执行日志，延时执行。因为有时候项目太多执行时间有延时。。
-    setTimeout(async () => {
-      const logResult = await getExcuteLogs((excuteResult.distributionNum).toString());
 
-      if (JSON.stringify(logResult) !== "{}") {
-        if (logResult.message !== "") {
-          setExcuteState(false);
-          message.error({
-            content: logResult.message,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-          return;
-        }
+    showLogs(await getLogData((excuteResult.distributionNum).toString()));
 
-        showLogs(logResult?.data);
-      }
-
-    }, 2000);
   };
 
   // 点击保存
@@ -260,7 +253,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
       }
     }
 
-     if(changeFlage){
+    if (changeFlage) {
       const selectData = await getExcuteSelect(excExcuteTypeData);
       setExcute({
         ...excute,

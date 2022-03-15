@@ -176,7 +176,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
   };
 
   // 分配执行下拉框选择
-  const distributeExcuteChange = (changedData: any, currentValue: any) => {
+  const distributeExcuteChange = () => {
     // const disExcuteData = formForExcuteSetting.getFieldValue("distributeExcute");
     //
     // // 如果选中全部之后，其他项不能进行选择(disExcuteTypeData.length = 1,表示里面只有一个全部选项)
@@ -235,19 +235,44 @@ const PeopleExcuteSetting: React.FC<any> = () => {
   };
 
   // 排除执行类型下拉框选项变化
-  const excExcuteTypeChanged = async (changedData: any, currentValue: any) => {
-
+  const excExcuteTypeChanged = async () => {
     const excExcuteTypeData = formForExcuteSetting.getFieldValue("excludeExcuteType");
-    debugger;
-    const selectData = await getExcuteSelect(excExcuteTypeData);
-    setExcute({
-      ...excute,
-      excludeExcute: selectData
-    });
+
+    let changeFlage = true;
+
+    if (excExcuteTypeData && excExcuteTypeData.length > 1) {
+
+      for (let index = 0; index < excExcuteTypeData.length; index += 1) {
+        if ((excExcuteTypeData[index].toString()).indexOf("空") > -1) {
+          message.error({
+            content: " ”空“选项和其他具体项目不能同时存在！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
+          });
+          changeFlage = false;
+          formForExcuteSetting.setFieldsValue({
+            excludeExcuteType: `''&空`
+          });
+          break;
+        }
+      }
+    }
+
+     if(changeFlage){
+      const selectData = await getExcuteSelect(excExcuteTypeData);
+      setExcute({
+        ...excute,
+        excludeExcute: selectData
+      });
+    }
+
+
   };
 
   // 排除执行下拉框选择
-  const excludeExcuteChanged = (changedData: any, currentValue: any) => {
+  const excludeExcuteChanged = () => {
     // const exExcuteData = formForExcuteSetting.getFieldValue("excludeExcute");
     //
     // // 如果选中全部之后，其他项不能进行选择(disExcuteTypeData.length = 1,表示里面只有一个全部选项)

@@ -124,7 +124,7 @@ const ZentaoTemplateList: React.FC<any> = () => {
     if (tempData.tempName === "上线前检查任务模板") {
       history.push('/zentao/btForCheckBeforeOnline');
     } else {
-      history.push('/zentao/btForCheckBeforeOnline');
+      history.push('/zentao/btForProjectTemplate');
     }
   };
 

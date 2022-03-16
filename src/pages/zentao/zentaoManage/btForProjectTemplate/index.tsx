@@ -4,7 +4,7 @@ import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import Header from "./components/CusPageHeader";
-import {getTaskColumns} from "./gridMethod/columns";
+import {getProjectColumns} from "./gridMethod/columns";
 import {Button, Col, Form, Row, Select, DatePicker, message, Spin} from "antd";
 import {getHeight} from "@/publicMethods/pageSet";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
@@ -13,7 +13,7 @@ import moment from "moment";
 
 const {Option} = Select;
 // 组件初始化
-const CheckBeforeOnline: React.FC<any> = () => {
+const ProjectTemplate: React.FC<any> = () => {
 
   /* region 表格事件 */
   const [gridHeight, setGridHeight] = useState(getHeight());
@@ -30,60 +30,50 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
   /* endregion 表格事件 */
 
-  /* region 联动选项 */
+  /* region  联动修改 */
 
+  // 项目执行修改后要修改任务名称
+  const excutionChanged = () => {
+
+  };
+
+// 项目负责人修改后，也要对应修改表格中所属端的指派人
+  const projectManagerChanged = (currentValue: any) => {
+    console.log("currentValue", currentValue);
+  };
+
+  // 计划开始时间选择后改变表格中的时间
   const planStartChanged = () => {
     //   时间改变后，下面的预计开始时间也要同步改变
+
   }
 
+  // 计划开始结束选择后改变表格中的时间
   const planEndChanged = () => {
     //   时间改变后，下面的预计截至时间也要同步改变
   }
 
-  // 指派人修改后，也要对应修改表格中所属端的指派人
-  const changeAssignedTo = (side: string, currentValue: any) => {
-    console.log("currentValue", currentValue);
-    switch (side) {
-      case "SQA":
-        break;
-      case "Front":
-        break;
-      case "Backend":
-        break;
-      case "Tester":
-        break;
-      default:
-        break;
-    }
+  /* endregion 联动修改 */
 
-  };
-
-  /* endregion 联动选项 */
-
-  const [formForZentaoTask] = Form.useForm(); // 上线分支设置
+  const [formForProject] = Form.useForm(); // 上线分支设置
   const [excuteState, setExcuteState] = useState(false);
-
+  // 任务生成按钮
+  const builtTask = () => {
+    setExcuteState(true);
+    // 需要校验空值
+    const formData = formForProject.getFieldsValue();
+    console.log(formData);
+    //   调用接口生成
+  };
   // 取消模板编辑
   const cancleTempEdit = () => {
     history.push('/zentao/templateList');
   };
 
-  // 生成任务
-  const builtTask = () => {
-    setExcuteState(true);
-    // 需要校验空值
-    const formData = formForZentaoTask.getFieldsValue();
-    console.log(formData);
-    //   调用接口生成
-  };
-
   useEffect(() => {
-    formForZentaoTask.setFieldsValue({
+    formForProject.setFieldsValue({
       belongExcution: "",
-      assingedToSQA: "",
-      assingedToFront: "",
-      assingedToBackend: "",
-      assingedToTester: "",
+      projectManager: "",
       planStart: moment(),
       planEnd: moment()
     });
@@ -96,57 +86,21 @@ const CheckBeforeOnline: React.FC<any> = () => {
       <Spin spinning={excuteState} tip="任务生成中，请稍后..." size={"large"}>
 
         <div>
-
           {/* 条件 */}
-          <div style={{background: 'white', height: 76}}>
-            <Form form={formForZentaoTask} autoComplete="off" style={{marginLeft: 5}}>
-
+          <div style={{background: 'white', height: 35}}>
+            <Form form={formForProject} autoComplete="off" style={{marginLeft: 5}}>
               <Row>
                 <Col span={6}>
-                  <Form.Item label="所属执行:" name="belongExcution" required={true} style={{marginLeft: 14}}>
-                    <Select defaultValue="lucy" style={{width: '100%'}} allowClear>
+                  <Form.Item label="所属执行:" name="belongExcution" required={true}>
+                    <Select defaultValue="lucy" style={{width: '100%'}} allowClear onChange={excutionChanged}>
                       <Option value="lucy">Lucy</Option>
                     </Select>
                   </Form.Item>
                 </Col>
                 <Col span={6}>
-                  <Form.Item label="SQA指派人:" name="assingedToSQA" required={true} style={{marginLeft: 19}}>
+                  <Form.Item label="项目负责人:" name="projectManager" required={true} style={{marginLeft: 5}}>
                     <Select defaultValue="lucy" style={{width: '100%'}} allowClear
-                            onChange={(params: any) => {
-                              changeAssignedTo("SQA", params);
-                            }}>
-                      <Option value="lucy">Lucy</Option>
-                    </Select>
-                  </Form.Item>
-                </Col>
-                <Col span={6}>
-                  <Form.Item label="前端指派人:" name="assingedToFront" required={true} style={{marginLeft: 19}}>
-                    <Select defaultValue="lucy" style={{width: '100%'}} allowClear
-                            onChange={(params: any) => {
-                              changeAssignedTo("Front", params);
-                            }}>
-                      <Option value="lucy">Lucy</Option>
-                    </Select>
-                  </Form.Item>
-                </Col>
-                <Col span={6}>
-                  <Form.Item label="后端指派人:" name="assingedToBackend" required={true} style={{marginLeft: 5}}>
-                    <Select defaultValue="lucy" style={{width: '100%'}} allowClear
-                            onChange={(params: any) => {
-                              changeAssignedTo("Backend", params);
-                            }}>
-                      <Option value="lucy">Lucy</Option>
-                    </Select>
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row style={{marginTop: -17}}>
-                <Col span={6}>
-                  <Form.Item label="测试指派人:" name="assingedToTester" required={true}>
-                    <Select defaultValue="lucy" style={{width: '100%'}} allowClear
-                            onChange={(params: any) => {
-                              changeAssignedTo("Tester", params);
-                            }}>
+                            onChange={projectManagerChanged}>
                       <Option value="lucy">Lucy</Option>
                     </Select>
                   </Form.Item>
@@ -167,9 +121,9 @@ const CheckBeforeOnline: React.FC<any> = () => {
           </div>
           {/* 表格 */}
           <div style={{marginTop: 5}}>
-            <div className="ag-theme-alpine" style={{height: gridHeight - 45, width: '100%'}}>
+            <div className="ag-theme-alpine" style={{height: gridHeight - 20, width: '100%'}}>
               <AgGridReact
-                columnDefs={getTaskColumns()} // 定义列
+                columnDefs={getProjectColumns()} // 定义列
                 rowData={[]} // 数据绑定
                 defaultColDef={{
                   resizable: true,
@@ -207,4 +161,4 @@ const CheckBeforeOnline: React.FC<any> = () => {
 };
 
 
-export default CheckBeforeOnline;
+export default ProjectTemplate;

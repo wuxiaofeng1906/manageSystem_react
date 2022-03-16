@@ -485,10 +485,16 @@ export default [
         component: './zentao/zentaoManage/editTemplate',
         hideInMenu: true
       }, {
-        name: '禅道任务生成',
+        name: '禅道任务生成（上线检查）',
         icon: 'table',
         path: 'btForCheckBeforeOnline',
         component: './zentao/zentaoManage/btForCheckBeforeOnline',
+        hideInMenu: true
+      }, {
+        name: '禅道任务生成（项目计划）',
+        icon: 'table',
+        path: 'btForProjectTemplate',
+        component: './zentao/zentaoManage/btForProjectTemplate',
         hideInMenu: true
       }
     ]

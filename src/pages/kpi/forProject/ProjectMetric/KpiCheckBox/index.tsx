@@ -2,7 +2,7 @@
  * @Description: 按需加载项目指标数据
  * @Author: jieTan
  * @Date: 2021-12-08 17:53:12
- * @LastEditTime: 2022-02-21 10:16:03
+ * @LastEditTime: 2022-03-16 03:15:35
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -15,7 +15,6 @@ import {
   PK_SEARCH_INTERVAL,
   MOMENT_FORMAT,
   PK_SHOW_DEFAULT_DATE,
-  PK_EXCLUDE_DEMO_NAME,
 } from '@/namespaces';
 import {
   ProcessDeviationGroup,
@@ -29,7 +28,6 @@ import {
 import { projectKpiGql, queryGQL } from '@/pages/gqls';
 import { useGqlClient } from '@/hooks';
 import moment from 'moment';
-import { history as myHistory } from 'umi';
 import { useUnmount } from 'ahooks';
 
 const CheckboxGroup = Checkbox.Group;
@@ -130,11 +128,11 @@ export default () => {
     const newParams: any = pkGqlParmas ? { ...(pkGqlParmas as any), kpis: kpiItems } : tmpParams;
     setPkGqlParmas(newParams);
     const _params: GQL_PARAMS = { func: 'projectKpi', params: newParams };
-    // **************************************************
-    // 绑定预演数据
-    if (!(myHistory as any).location.query[PK_EXCLUDE_DEMO_NAME])
-      Object.assign(_params.params, { demo: true });
-    // **************************************************
+    // // **************************************************
+    // // 绑定预演数据
+    // if (!(myHistory as any).location.query[PK_EXCLUDE_DEMO_NAME])
+    //   Object.assign(_params.params, { demo: true });
+    // // **************************************************
     const ret = await queryGQL(gqlClient, projectKpiGql, _params);
 
     // 更改当前gird的数据源

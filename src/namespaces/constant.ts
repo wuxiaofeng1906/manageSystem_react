@@ -2,7 +2,7 @@
  * @Description: 通用常量
  * @Author: jieTan
  * @Date: 2021-11-23 15:51:13
- * @LastEditTime: 2022-03-07 05:49:44
+ * @LastEditTime: 2022-03-16 03:13:42
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -69,7 +69,7 @@ export const PK_TREE_DEPTS = [130, 66, 82, 114, 81];
 export const ztExectionUrl = (eId: number) =>
   `http://zentao.77hub.com/zentao/execution-view-${eId}.html`;
 // 筛选是否显示默认时间
-export const PK_SHOW_DEFAULT_DATE = false;
+export const PK_SHOW_DEFAULT_DATE = true;
 // 预演路径名称
 export const PK_EXCLUDE_DEMO_NAME = 'notDemo';
 

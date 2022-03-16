@@ -2,7 +2,7 @@
  * @Description: 查询、筛选组件
  * @Author: jieTan
  * @Date: 2021-11-22 10:50:27
- * @LastEditTime: 2022-02-24 03:07:20
+ * @LastEditTime: 2022-03-16 03:12:58
  * @LastEditors: jieTan
  * @LastModify:
  */
@@ -27,7 +27,6 @@ import {
   GRAPHQL_QUERY,
   MOMENT_FORMAT,
   PK_SEARCH_INTERVAL,
-  PK_EXCLUDE_DEMO_NAME,
   PK_SHOW_DEFAULT_DATE,
 } from '@/namespaces';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -36,7 +35,6 @@ import { projectKpiGql, organizationGql, queryGQL } from '@/pages/gqls';
 import { ColumnHeightOutlined, DownloadOutlined, ReloadOutlined } from '@ant-design/icons';
 import { deptTreeNodes, onDateChange, onTreeMultiChange, projOptsElems } from './extra';
 import moment from 'moment';
-import { history as myHistory } from 'umi';
 
 /* 默认的时间 */
 const defaultDateRange: [any, any] = [
@@ -137,11 +135,11 @@ export default () => {
     };
 
     // 数据查询
-    // **************************************************
-    // 绑定预演数据
-    if (!(myHistory as any).location.query[PK_EXCLUDE_DEMO_NAME])
-      Object.assign(params.params, { demo: true });
-    // **************************************************
+    // // **************************************************
+    // // 绑定预演数据
+    // if (!(myHistory as any).location.query[PK_EXCLUDE_DEMO_NAME])
+    //   Object.assign(params.params, { demo: true });
+    // // **************************************************
     const rets = (await queryGQL(gqlClient, projectKpiGql, params)) ?? [];
     setGqlData(rets);
   };

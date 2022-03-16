@@ -84,10 +84,9 @@ const ProjectTemplate: React.FC<any> = () => {
     <div style={{width: "100%", height: "100%", marginTop: "-20px"}}>
       <Header/>
       <Spin spinning={excuteState} tip="任务生成中，请稍后..." size={"large"}>
-
-        <div>
+        <div style={{marginTop: 5}}>
           {/* 条件 */}
-          <div style={{background: 'white', height: 35}}>
+          <div style={{background: 'white', height: 40,paddingTop:4}}>
             <Form form={formForProject} autoComplete="off" style={{marginLeft: 5}}>
               <Row>
                 <Col span={6}>

@@ -185,7 +185,7 @@ const EditTemplateList: React.FC<any> = () => {
     <div style={{width: "100%", height: "100%", marginTop: "-20px"}}>
       <Header/>
       <div className={"content"} style={{marginTop: 5}}>
-        <div style={{background: 'white', height: 35}}>
+        <div style={{background: 'white', height: 36,paddingTop:2}}>
           <Form form={formForTemplate} autoComplete="off" style={{marginLeft: 5}}>
             <Row>
               <Col span={8}>

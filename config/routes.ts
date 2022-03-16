@@ -464,7 +464,7 @@ export default [
     name: "禅道管理",
     icon: 'table',
     path: '/zentao',
-    // hideInMenu: true,
+    hideInMenu: true,
     access: 'sysAdmin',
     routes: [
       {

@@ -4,12 +4,13 @@ import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {Button, Col, Form, Input, message, Modal, Row, Select} from "antd";
+import {Button, Col, Form, Input, message, Modal, Row, Select, Upload} from "antd";
 import Header from "./components/CusPageHeader";
 import {ImportOutlined} from "@ant-design/icons";
 import {getTempColumns, getTestData} from "./gridMethod/columns";
 import {getHeight} from "@/publicMethods/pageSet";
 import {history} from "@@/core/history";
+import {loadExcelData, getGridDataFromExcel} from './import';
 
 const {Option} = Select;
 
@@ -34,8 +35,32 @@ const EditTemplateList: React.FC<any> = () => {
   const [formForTemplate] = Form.useForm(); // 上线分支设置
 
   // 导入excel任务
-  const importTemplate = () => {
-
+  const importTemplate =   (file: any) => {
+    console.log(file);
+    //   获取数据
+    // const result =   loadExcelData(file);
+    // debugger;
+    // if (result.message) {
+    //   message.error({
+    //     content: `导入失败：${result.message}`,
+    //     duration: 1, // 1S 后自动关闭
+    //     style: {marginTop: '50vh'},
+    //   });
+    //   return;
+    // }
+    // // 将数据显示到表格中
+    // if ((result.data).length === 0) {
+    //   message.error({
+    //     content: `导入失败：表格中没有数据！`,
+    //     duration: 1, // 1S 后自动关闭
+    //     style: {marginTop: '50vh'},
+    //   });
+    //   return;
+    // }
+    //
+    // const gridData: any = getGridDataFromExcel(result.data)
+    //
+    // gridApi.current?.setRowData(gridData)
   };
 
   // 新增行
@@ -101,22 +126,73 @@ const EditTemplateList: React.FC<any> = () => {
     // history.push('/zentao/templateList');
   };
 
+  // 这是使用Input控件做导入
+  // {/*<input id="file" type="file" onChange={testLoad}/>*/}
+  // const testLoad = (file: any) => {
+  //   debugger;
+  //   // 获取上传的文件对象
+  //   const {files} = file.target;
+  //   // 通过FileReader对象读取文件
+  //   const fileReader = new FileReader();
+  //   fileReader.onload = event => {
+  //     try {
+  //       const excelData = event.target?.result;
+  //       // 以二进制流方式读取得到整份excel表格对象
+  //       const workbook = XLSX.read(excelData, {type: 'binary'});
+  //       // 存储获取到的数据
+  //       let resultData: any = [];
+  //       // 遍历每张工作表进行读取（这里默认只读取第一张表）
+  //       Object.keys(workbook.Sheets).forEach((sheet: string, index: number) => {
+  //         debugger;
+  //         if (index === 0) { // 只获取第一个sheet的数据
+  //           // 利用 sheet_to_json 方法将 excel 转成 json 数据
+  //           resultData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet]);
+  //         }
+  //       })
+  //
+  //       console.log(resultData);
+  //
+  //       // for (const sheet in workbook.Sheets) {
+  //       //   if (workbook.Sheets.hasOwnProperty(sheet)) {
+  //       //     debugger;
+  //       //     // 利用 sheet_to_json 方法将 excel 转成 json 数据
+  //       //     resultData = resultData.concat(XLSX.utils.sheet_to_json(workbook.Sheets[sheet]));
+  //       //     break; // 如果只取第一张表，就取消注释这行
+  //       //   }
+  //       // }
+  //
+  //     } catch (e) {
+  //       message.error(`错误：${e}`);
+  //     }
+  //   };
+  //   fileReader.readAsBinaryString(files[0]);   // 以二进制方式打开文件
+  // };
+
   return (
     <div style={{width: "100%", height: "100%", marginTop: "-20px"}}>
       <Header/>
       <div className={"content"} style={{marginTop: 5}}>
         <div style={{background: 'white', height: 35}}>
           <Row>
-            <Col span={12}>
+            <Col span={8}>
               <Form form={formForTemplate} autoComplete="off" style={{marginLeft: 5}}>
                 <Form.Item label="模板名称:" name="tempName" required={true}>
                   <Input/>
                 </Form.Item>
               </Form>
             </Col>
-            <Col span={12}>
-              <Button type="text" style={{color: "#46A0FC"}} icon={<ImportOutlined/>} size={'middle'}
-                      onClick={importTemplate}>导入Excel任务</Button>
+            <Col span={8}>
+              <Form form={formForTemplate} autoComplete="off" style={{marginLeft: 5}}>
+                <Form.Item label="模板类型:" name="tempType" required={true}>
+                  <Input/>
+                </Form.Item>
+              </Form>
+            </Col>
+            <Col span={8}>
+              <Upload beforeUpload={importTemplate}>
+                <Button type="text" style={{color: "#46A0FC"}} icon={<ImportOutlined/>} size={'middle'}
+                >导入Excel任务</Button>
+              </Upload>,
             </Col>
           </Row>
         </div>
@@ -163,7 +239,6 @@ const EditTemplateList: React.FC<any> = () => {
             >
             </AgGridReact>
           </div>
-
         </div>
 
         <div style={{marginTop: 10}}>

@@ -11,6 +11,7 @@ import {getTempColumns, getTestData} from "./gridMethod/columns";
 import {getHeight} from "@/publicMethods/pageSet";
 import {history} from "@@/core/history";
 import {loadExcelData, getGridDataFromExcel} from './import';
+import {log} from "echarts/types/src/util/log";
 
 const {Option} = Select;
 
@@ -35,32 +36,34 @@ const EditTemplateList: React.FC<any> = () => {
   const [formForTemplate] = Form.useForm(); // 上线分支设置
 
   // 导入excel任务
-  const importTemplate =   (file: any) => {
-    console.log(file);
-    //   获取数据
-    // const result =   loadExcelData(file);
-    // debugger;
-    // if (result.message) {
-    //   message.error({
-    //     content: `导入失败：${result.message}`,
-    //     duration: 1, // 1S 后自动关闭
-    //     style: {marginTop: '50vh'},
-    //   });
-    //   return;
-    // }
-    // // 将数据显示到表格中
-    // if ((result.data).length === 0) {
-    //   message.error({
-    //     content: `导入失败：表格中没有数据！`,
-    //     duration: 1, // 1S 后自动关闭
-    //     style: {marginTop: '50vh'},
-    //   });
-    //   return;
-    // }
-    //
-    // const gridData: any = getGridDataFromExcel(result.data)
-    //
-    // gridApi.current?.setRowData(gridData)
+  const importTemplate = (file: any) => {
+
+    //   获取数据()
+    loadExcelData(file).then((result: any) => {
+
+      if (result.message) {
+        message.error({
+          content: `导入失败：${result.message}`,
+          duration: 1,
+          style: {marginTop: '50vh'},
+        });
+        return;
+      }
+      // 将数据显示到表格中
+      if ((result.data).length === 0) {
+        message.error({
+          content: `导入失败：表格中没有数据！`,
+          duration: 1,
+          style: {marginTop: '50vh'},
+        });
+        return;
+      }
+
+      const gridData: any = getGridDataFromExcel(result.data)
+      gridApi.current?.setRowData(gridData);
+
+    });
+
   };
 
   // 新增行

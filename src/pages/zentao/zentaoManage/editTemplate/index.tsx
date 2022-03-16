@@ -11,7 +11,6 @@ import {getTempColumns, getTestData} from "./gridMethod/columns";
 import {getHeight} from "@/publicMethods/pageSet";
 import {history} from "@@/core/history";
 import {loadExcelData, getGridDataFromExcel} from './import';
-import {log} from "echarts/types/src/util/log";
 
 const {Option} = Select;
 
@@ -32,6 +31,16 @@ const EditTemplateList: React.FC<any> = () => {
   };
 
   /* endregion 表格事件 */
+
+  // 获取跳转过来的模板。。
+  let tempname = "";
+  const location = history.location.query;
+  if (JSON.stringify(location) !== '{}') {
+    if (location !== undefined && location.tempName !== null) {
+      tempname = location.tempName.toString();
+    }
+  }
+
 
   const [formForTemplate] = Form.useForm(); // 上线分支设置
 
@@ -171,6 +180,7 @@ const EditTemplateList: React.FC<any> = () => {
   //   fileReader.readAsBinaryString(files[0]);   // 以二进制方式打开文件
   // };
 
+
   return (
     <div style={{width: "100%", height: "100%", marginTop: "-20px"}}>
       <Header/>
@@ -205,7 +215,7 @@ const EditTemplateList: React.FC<any> = () => {
           <div className="ag-theme-alpine" style={{height: gridHeight - 20, width: '100%'}}>
             <AgGridReact
               columnDefs={getTempColumns()} // 定义列
-              rowData={getTestData()} // 数据绑定
+              rowData={tempname === "" ? [] : getTestData()} // 数据绑定
               defaultColDef={{
                 resizable: true,
                 sortable: true,

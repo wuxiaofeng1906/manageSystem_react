@@ -107,12 +107,25 @@ const ZentaoTemplateList: React.FC<any> = () => {
       return;
     }
 
-    let tempList = "";
-    selRows.forEach((ele: any) => {
-      tempList = ele;
-    });
+    if (selRows.length > 1) {
+      message.error({
+        content: '一次只能生成一个任务！',
+        duration: 1,
+        className: 'delNone',
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
 
-    console.log(tempList);
+    const tempData: any = selRows[0];
+    // 不同类型的模板进入不同的生成列表
+    if (tempData.tempName === "上线前检查任务模板") {
+      history.push('/zentao/btForCheckBeforeOnline');
+    } else {
+      history.push('/zentao/btForCheckBeforeOnline');
+    }
   };
 
 
@@ -134,20 +147,13 @@ const ZentaoTemplateList: React.FC<any> = () => {
       });
       return;
     }
-    if (selRows.length > 1) {
-      message.error({
-        content: '一次只能下载一个模板！',
-        duration: 1,
-        className: 'delNone',
-        style: {
-          marginTop: '50vh',
-        },
-      });
-      return;
-    }
 
-    const tempData = selRows[0];
-    console.log(tempData);
+    let tempList = "";
+    selRows.forEach((ele: any) => {
+      tempList = ele;
+    });
+
+    console.log(tempList);
   };
 
   /* endregion 下载模板 */

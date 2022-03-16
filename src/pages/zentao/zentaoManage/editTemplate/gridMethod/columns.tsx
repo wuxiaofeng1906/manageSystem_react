@@ -63,6 +63,11 @@ const getTempColumns = () => {
     minWidth: 90,
     cellRenderer: "confirmSelectChoice"
   }, {
+    headerName: '是否裁剪',
+    field: 'taskSource',
+    minWidth: 90,
+    cellRenderer: "confirmSelectChoice"
+  }, {
     headerName: '操作',
     minWidth: 90,
     cellRenderer: (params: any) => {

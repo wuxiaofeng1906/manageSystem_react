@@ -472,7 +472,6 @@ export default [
         icon: 'table',
         path: 'peopleExcuteSetting',
         component: './zentao/peopleExcuteSetting',
-
       },
       {
         name: '禅道管理',
@@ -484,6 +483,12 @@ export default [
         icon: 'table',
         path: 'editTemplate',
         component: './zentao/zentaoManage/editTemplate',
+        hideInMenu: true
+      }, {
+        name: '禅道任务生成',
+        icon: 'table',
+        path: 'btForCheckBeforeOnline',
+        component: './zentao/zentaoManage/btForCheckBeforeOnline',
         hideInMenu: true
       }
     ]

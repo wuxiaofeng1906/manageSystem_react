@@ -186,28 +186,27 @@ const EditTemplateList: React.FC<any> = () => {
       <Header/>
       <div className={"content"} style={{marginTop: 5}}>
         <div style={{background: 'white', height: 35}}>
-          <Row>
-            <Col span={8}>
-              <Form form={formForTemplate} autoComplete="off" style={{marginLeft: 5}}>
+          <Form form={formForTemplate} autoComplete="off" style={{marginLeft: 5}}>
+            <Row>
+              <Col span={8}>
                 <Form.Item label="模板名称:" name="tempName" required={true}>
                   <Input/>
                 </Form.Item>
-              </Form>
-            </Col>
-            <Col span={8}>
-              <Form form={formForTemplate} autoComplete="off" style={{marginLeft: 5}}>
+              </Col>
+              <Col span={8}>
                 <Form.Item label="模板类型:" name="tempType" required={true}>
                   <Input/>
                 </Form.Item>
-              </Form>
-            </Col>
-            <Col span={8}>
-              <Upload beforeUpload={importTemplate}>
-                <Button type="text" style={{color: "#46A0FC"}} icon={<ImportOutlined/>} size={'middle'}
-                >导入Excel任务</Button>
-              </Upload>,
-            </Col>
-          </Row>
+
+              </Col>
+              <Col span={8}>
+                <Upload beforeUpload={importTemplate}>
+                  <Button type="text" style={{color: "#46A0FC"}} icon={<ImportOutlined/>} size={'middle'}
+                  >导入Excel任务</Button>
+                </Upload>,
+              </Col>
+            </Row>
+          </Form>
         </div>
 
         {/* 模板列表 */}

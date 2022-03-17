@@ -6,10 +6,12 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {Button, message, Form, Modal} from 'antd';
-import {getTempColumns, getTestData} from './gridMethod/columns';
+import {getTempColumns} from './gridMethod/columns';
 import {getHeight} from "@/publicMethods/pageSet";
 import {DeleteTwoTone, FolderAddTwoTone, ProfileTwoTone, DownloadOutlined} from "@ant-design/icons";
 import {history} from "@@/core/history";
+import {getTemplateList, deleteTemplate} from './axiosRequest/requestDataParse';
+import {useRequest} from "ahooks";
 
 
 // 组件初始化
@@ -29,6 +31,11 @@ const ZentaoTemplateList: React.FC<any> = () => {
   };
 
   /* endregion 表格事件 */
+
+  /* region 获取详情数据 */
+  const templeList = useRequest(() => getTemplateList()).data;
+
+  /* endregion */
 
   /* region 增改 */
 
@@ -70,13 +77,15 @@ const ZentaoTemplateList: React.FC<any> = () => {
     let selData = "";
     // 需要根据真实数据传值（名字或者ID）
     selRows.forEach((ele: any) => {
-      selData = ele;
+      selData = selData === "" ? ele.temp_id : `${selData},${ele.temp_id}`;
     });
     setIsDelModalVisible({
       showFalg: true,
       delData: selData
     });
   };
+
+  // 取消删除
   const delFormCancle = () => {
 
     setIsDelModalVisible({
@@ -84,8 +93,29 @@ const ZentaoTemplateList: React.FC<any> = () => {
       delData: ""
     });
   };
-  const delTempList = () => {
 
+  // 确定删除
+  const delTempList = async () => {
+
+    const rtMsg = await deleteTemplate(isdelModalVisible.delData);
+    if (rtMsg) {
+      message.error({
+        content: `删除失败：${rtMsg}`,
+        duration: 1,
+        className: 'delNone',
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+
+    //   更新列表
+    gridApi.current?.setRowData(await getTemplateList());
+    setIsDelModalVisible({
+      showFalg: false,
+      delData: ""
+    });
   };
   /* endregion 删除模板 */
 
@@ -178,7 +208,7 @@ const ZentaoTemplateList: React.FC<any> = () => {
         <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
           <AgGridReact
             columnDefs={getTempColumns()} // 定义列
-            rowData={getTestData()} // 数据绑定
+            rowData={templeList} // 数据绑定
             defaultColDef={{
               resizable: true,
               sortable: true,

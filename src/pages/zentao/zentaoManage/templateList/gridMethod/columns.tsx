@@ -15,28 +15,28 @@ const getTempColumns = () => {
     },
   }, {
     headerName: '模板名称',
-    field: 'tempName',
+    field: 'temp_name',
     minWidth: 110,
     pinned: 'left',
   }, {
     headerName: '包含任务数',
-    field: 'taskCount',
+    field: 'count',
     minWidth: 100,
   }, {
     headerName: '创建人',
-    field: 'creater',
+    field: 'create_user_name',
     minWidth: 90,
   }, {
     headerName: '创建时间',
-    field: 'createTime',
+    field: 'create_time',
     minWidth: 170,
   }, {
     headerName: '编辑人',
-    field: 'editor',
+    field: 'update_user_name',
     minWidth: 90,
   }, {
     headerName: '编辑时间',
-    field: 'editTime',
+    field: 'update_time',
     minWidth: 170,
   }];
 
@@ -44,26 +44,5 @@ const getTempColumns = () => {
 
 };
 
-const getTestData = () => {
 
-  return [
-    {
-      tempName: "上线前检查任务模板",
-      taskCount: "25",
-      creater: "何江",
-      createTime: "2021/10/28 22:00:21",
-      editor: "谭杰",
-      editTime: "2021/10/28 22:10:21"
-    }, {
-      tempName: "项目计划模板",
-      taskCount: "8",
-      creater: "何江",
-      createTime: "2021/10/28 22:00:21",
-      editor: "",
-      editTime: ""
-    }
-  ];
-
-};
-
-export {getTempColumns, getTestData};
+export {getTempColumns};

@@ -25,7 +25,7 @@ export default {
   // 本地测试地址
   test: {
     '/api/verify/': {
-      target: 'http://192.168.1.146:5000/',
+      target: 'http://192.168.1.31:5001/',
       changeOrigin: true,
       pathRewrite: {'^': ''},
     },

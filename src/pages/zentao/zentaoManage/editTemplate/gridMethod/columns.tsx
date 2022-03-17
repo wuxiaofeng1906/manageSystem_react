@@ -9,12 +9,12 @@ const getTempColumns = () => {
     },
   }, {
     headerName: '增加类型',
-    field: 'addType',
+    field: 'add_type',
     minWidth: 120,
-    cellRenderer: "confirmSelectChoice"
+    cellRenderer: "addType"
   }, {
     headerName: '任务名称',
-    field: 'taskName',
+    field: 'task_name',
     minWidth: 100,
     editable: true,
   }, {
@@ -24,12 +24,12 @@ const getTempColumns = () => {
     editable: true,
   }, {
     headerName: '研发相关需求',
-    field: 'devStory',
+    field: 'subtask_dev_needs',
     minWidth: 90,
     editable: true,
   }, {
     headerName: '指派给',
-    field: 'assignedTo',
+    field: 'assigned_person',
     minWidth: 90,
     cellRenderer: "confirmSelectChoice"
   }, {
@@ -39,32 +39,32 @@ const getTempColumns = () => {
     cellRenderer: "confirmSelectChoice"
   }, {
     headerName: '任务类型',
-    field: 'taskType',
+    field: 'task_type',
     minWidth: 110,
     cellRenderer: "confirmSelectChoice"
   }, {
     headerName: '最初预计',
-    field: 'initPlan',
+    field: 'estimate',
     minWidth: 100,
     editable: true,
   }, {
     headerName: '任务描述',
-    field: 'taskDesc',
+    field: 'desc',
     minWidth: 90,
     editable: true,
   }, {
     headerName: '所属端',
-    field: 'side',
+    field: 'belongs',
     minWidth: 90,
     cellRenderer: "confirmSelectChoice"
   }, {
     headerName: '任务来源',
-    field: 'taskSource',
+    field: 'tasksource',
     minWidth: 90,
     cellRenderer: "confirmSelectChoice"
   }, {
     headerName: '是否裁剪',
-    field: 'taskSource',
+    field: 'is_tailoring',
     minWidth: 90,
     cellRenderer: "confirmSelectChoice"
   }, {

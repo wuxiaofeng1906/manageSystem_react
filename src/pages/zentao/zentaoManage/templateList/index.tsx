@@ -46,9 +46,9 @@ const ZentaoTemplateList: React.FC<any> = () => {
 
   // 修改界面跳转
   const modifyTempList = (params: any) => {
-    const {data} = params;
-    history.push(`/zentao/editTemplate?tempName=${data.tempName}`);
 
+    const {data} = params;
+    history.push(`/zentao/editTemplate?tempId=${data.temp_id}&tempName=${data.temp_name}&tempType=${data.temp_type}`);
   };
 
   /* endregion 增改 */

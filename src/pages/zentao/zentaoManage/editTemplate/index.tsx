@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -7,17 +7,37 @@ import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {Button, Col, Form, Input, message, Modal, Row, Select, Upload} from "antd";
 import Header from "./components/CusPageHeader";
 import {ImportOutlined} from "@ant-design/icons";
-import {getTempColumns, getTestData} from "./gridMethod/columns";
+import {getTempColumns} from "./gridMethod/columns";
 import {getHeight} from "@/publicMethods/pageSet";
 import {history} from "@@/core/history";
 import {loadExcelData, getGridDataFromExcel} from './import';
+import {getTemTypeSelect, getAddTypeSelect, getTemplateDetails} from './axiosRequest/requestDataParse';
+import {useRequest} from "ahooks";
+import dayjs from "dayjs";
 
-const {Option} = Select;
-
+let selectOptions = {
+  addType: "",
+}
 // 组件初始化
 const EditTemplateList: React.FC<any> = () => {
 
   /* region 表格事件 */
+  const [gridData, setGridData] = useState([]);
+  // 获取跳转过来的模板，并获取对应数据
+  const template = {id: "", name: "", type: ""}
+  const location = history.location.query;
+  if (location && JSON.stringify(location) !== '{}') {
+    if (location.tempName) {
+      template.name = location.tempName.toString();
+    }
+    if (location.tempId) {
+      template.id = location.tempId.toString();
+    }
+    if (location.tempType) {
+      template.type = location.tempType.toString();
+    }
+  }
+
   const [gridHeight, setGridHeight] = useState(getHeight());
   const gridApi = useRef<GridApi>();
   const onGridReady = (params: GridReadyEvent) => {
@@ -31,18 +51,13 @@ const EditTemplateList: React.FC<any> = () => {
   };
 
   /* endregion 表格事件 */
+  /* region 几个下拉框取值 */
+  const templeType = useRequest(() => getTemTypeSelect()).data;
 
-  // 获取跳转过来的模板。。
-  let tempname = "";
-  const location = history.location.query;
-  if (JSON.stringify(location) !== '{}') {
-    if (location !== undefined && location.tempName !== null) {
-      tempname = location.tempName.toString();
-    }
-  }
+  selectOptions.addType = useRequest(() => getAddTypeSelect()).data;
 
-
-  const [formForTemplate] = Form.useForm(); // 上线分支设置
+  /* endregion */
+  const [formForTemplate] = Form.useForm();
 
   // 导入excel任务
   const importTemplate = (file: any) => {
@@ -68,8 +83,8 @@ const EditTemplateList: React.FC<any> = () => {
         return;
       }
 
-      const gridData: any = getGridDataFromExcel(result.data)
-      gridApi.current?.setRowData(gridData);
+      const gridDatas: any = getGridDataFromExcel(result.data)
+      gridApi.current?.setRowData(gridDatas);
 
     });
 
@@ -180,12 +195,28 @@ const EditTemplateList: React.FC<any> = () => {
   //   fileReader.readAsBinaryString(files[0]);   // 以二进制方式打开文件
   // };
 
+  const showInitPages = async () => {
 
+    if (template.id) {
+      const dt = await getTemplateDetails(template.id);
+      setGridData(dt);
+
+      formForTemplate.setFieldsValue({
+        tempName: template.name,
+        tempType: template.type
+      });
+    }
+  };
+  useEffect(() => {
+
+    showInitPages();
+
+  }, [1]);
   return (
     <div style={{width: "100%", height: "100%", marginTop: "-20px"}}>
       <Header/>
       <div className={"content"} style={{marginTop: 5}}>
-        <div style={{background: 'white', height: 36,paddingTop:2}}>
+        <div style={{background: 'white', height: 36, paddingTop: 2}}>
           <Form form={formForTemplate} autoComplete="off" style={{marginLeft: 5}}>
             <Row>
               <Col span={8}>
@@ -194,8 +225,11 @@ const EditTemplateList: React.FC<any> = () => {
                 </Form.Item>
               </Col>
               <Col span={8}>
-                <Form.Item label="模板类型:" name="tempType" required={true}>
-                  <Input/>
+                <Form.Item label="模板类型:" name="tempType" required={true} style={{marginLeft: 5}}>
+                  <Select showSearch style={{width: "100%"}}>
+                    {templeType}
+                  </Select>
+
                 </Form.Item>
 
               </Col>
@@ -214,7 +248,7 @@ const EditTemplateList: React.FC<any> = () => {
           <div className="ag-theme-alpine" style={{height: gridHeight - 20, width: '100%'}}>
             <AgGridReact
               columnDefs={getTempColumns()} // 定义列
-              rowData={tempname === "" ? [] : getTestData()} // 数据绑定
+              rowData={gridData} // 数据绑定
               defaultColDef={{
                 resizable: true,
                 sortable: true,
@@ -227,23 +261,14 @@ const EditTemplateList: React.FC<any> = () => {
               suppressRowTransform={true}
               onGridReady={onGridReady}
               frameworkComponents={{
-                confirmSelectChoice: (props: any) => {
-                  const currentValue = props.value;
+                addType: (props: any) => {
+                  const {data} = props;
+                  const currentValue = `${data.add_type}&${data.add_type_name}`;
                   return (
                     <Select
-                      size={'small'}
-                      defaultValue={currentValue}
-                      bordered={false}
-                      style={{width: '100%'}}
-                      onChange={(newValue: any) => {
-                        console.log(newValue);
-                      }}>
-                      <Option key={'1'} value={'1'}>
-                        新增
-                      </Option>
-                      <Option key={'2'} value={'2'}>
-                        子任务
-                      </Option>
+                      size={'small'} defaultValue={currentValue}
+                      bordered={false} style={{width: '100%'}}>
+                      {selectOptions.addType}
                     </Select>
                   );
                 },

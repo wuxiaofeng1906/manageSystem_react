@@ -11,12 +11,23 @@ import {getTempColumns} from "./gridMethod/columns";
 import {getHeight} from "@/publicMethods/pageSet";
 import {history} from "@@/core/history";
 import {loadExcelData, getGridDataFromExcel} from './import';
-import {getTemTypeSelect, getAddTypeSelect, getTemplateDetails} from './axiosRequest/requestDataParse';
+import {
+  getTemTypeSelect, getAddTypeSelect, getAssignedToSelect, getPrioritySelect,
+  getTaskTypeSelect, getSideSelect, getTaskSourceSelect, getTemplateDetails
+} from './axiosRequest/requestDataParse';
 import {useRequest} from "ahooks";
-import dayjs from "dayjs";
+import {
+  addTypeRenderer, assignedToRenderer, priorityRenderer,
+  taskTypeRenderer, sideRenderer, taskSourceRenderer
+} from "./gridMethod/gridRenderer";
 
-let selectOptions = {
-  addType: "",
+const selectOptions = {
+  addType: [],
+  assignedTo: [],
+  priority: [],
+  taskType: [],
+  side: [],
+  taskSource: []
 }
 // 组件初始化
 const EditTemplateList: React.FC<any> = () => {
@@ -55,6 +66,12 @@ const EditTemplateList: React.FC<any> = () => {
   const templeType = useRequest(() => getTemTypeSelect()).data;
 
   selectOptions.addType = useRequest(() => getAddTypeSelect()).data;
+  selectOptions.assignedTo = useRequest(() => getAssignedToSelect()).data;
+  selectOptions.priority = useRequest(() => getPrioritySelect()).data;
+  selectOptions.taskType = useRequest(() => getTaskTypeSelect()).data;
+  selectOptions.side = useRequest(() => getSideSelect()).data;
+  selectOptions.taskSource = useRequest(() => getTaskSourceSelect()).data;
+
 
   /* endregion */
   const [formForTemplate] = Form.useForm();
@@ -261,16 +278,23 @@ const EditTemplateList: React.FC<any> = () => {
               suppressRowTransform={true}
               onGridReady={onGridReady}
               frameworkComponents={{
-                addType: (props: any) => {
-                  const {data} = props;
-                  const currentValue = `${data.add_type}&${data.add_type_name}`;
-                  return (
-                    <Select
-                      size={'small'} defaultValue={currentValue}
-                      bordered={false} style={{width: '100%'}}>
-                      {selectOptions.addType}
-                    </Select>
-                  );
+                addTypeRender: (props: any) => {
+                  return addTypeRenderer(props.data, selectOptions.addType);
+                },
+                assignedToRender: (props: any) => {
+                  return assignedToRenderer(props.data, selectOptions.assignedTo);
+                },
+                priorityRender: (props: any) => {
+                  return priorityRenderer(props.data, selectOptions.priority);
+                },
+                taskTypeRender: (props: any) => {
+                  return taskTypeRenderer(props.data, selectOptions.taskType);
+                },
+                belongsSideRender: (props: any) => {
+                  return sideRenderer(props.data, selectOptions.side);
+                },
+                taskSourceRender: (props: any) => {
+                   return taskSourceRenderer(props.data, selectOptions.taskSource);
                 },
               }}
             >

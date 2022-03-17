@@ -23,7 +23,7 @@ const requestTempType = async () => {
 };
 
 // 获取增加类型
-const requestAddType = async ()=>{
+const requestAddType = async () => {
   let data: any = [];
   await axios.get('/api/verify/zentao/add_type')
     .then(function (res) {
@@ -37,6 +37,94 @@ const requestAddType = async ()=>{
 
   return data;
 };
+
+// 获取指派人
+const requestAssignedTo = async () => {
+  let data: any = [];
+  await axios.get('/api/verify/zentao/users')
+    .then(function (res) {
+      if (res.data.code === 200) {
+        data = res.data.data;
+      }
+    })
+    .catch(function (error) {
+      console.log("指派人获取失败", error)
+    });
+
+  return data;
+};
+
+//  优先级
+const requestPriorityApi = async () => {
+  let data: any = [];
+  await axios.get('/api/verify/zentao/priority')
+    .then(function (res) {
+      if (res.data.code === 200) {
+        data = res.data.data;
+      }
+    })
+    .catch(function (error) {
+      console.log("指派人获取失败", error)
+    });
+
+  return data;
+};
+
+
+//  任务类型
+const requestTaskTypeApi = async () => {
+  let data: any = [];
+  await axios.get('/api/verify/zentao/task_type')
+    .then(function (res) {
+      if (res.data.code === 200) {
+        data = res.data.data;
+      }
+    })
+    .catch(function (error) {
+      console.log("指派人获取失败", error)
+    });
+
+  return data;
+};
+
+//  所属端
+const requestSideApi = async () => {
+  let data: any = [];
+  await axios.get('/api/verify/zentao/belongs')
+    .then(function (res) {
+      if (res.data.code === 200) {
+        data = res.data.data;
+      }
+    })
+    .catch(function (error) {
+      console.log("指派人获取失败", error)
+    });
+
+  return data;
+};
+
+//  任务来源
+const requestTaskSourceApi = async () => {
+  let data: any = [];
+  await axios.get('/api/verify/zentao/source')
+    .then(function (res) {
+      if (res.data.code === 200) {
+        data = res.data.data;
+      }
+    })
+    .catch(function (error) {
+      console.log("指派人获取失败", error)
+    });
+
+  return data;
+};
+
+
+
+
+
+
+
 // 获取模板详情列表
 const requestTemplateDetailsApi = async (tempID: string) => {
   let data: any = [];
@@ -73,6 +161,12 @@ const requestTemplateDetailsApi = async (tempID: string) => {
 export {
   requestTempType,
   requestAddType,
+  requestAssignedTo,
+  requestPriorityApi,
+  requestTaskTypeApi,
+  requestSideApi,
+  requestTaskSourceApi,
+
   requestTemplateDetailsApi,
 
 }

@@ -6,14 +6,14 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {Button, Col, Form, Input, message, Modal, Row, Select, Upload} from "antd";
 import Header from "./components/CusPageHeader";
-import {ImportOutlined} from "@ant-design/icons";
+import {DeleteTwoTone, ImportOutlined} from "@ant-design/icons";
 import {getTempColumns} from "./gridMethod/columns";
 import {getHeight} from "@/publicMethods/pageSet";
 import {history} from "@@/core/history";
 import {loadExcelData, getGridDataFromExcel} from './import';
 import {
   getTemTypeSelect, getAddTypeSelect, getAssignedToSelect, getPrioritySelect,
-  getTaskTypeSelect, getSideSelect, getTaskSourceSelect
+  getTaskTypeSelect, getSideSelect, getTaskSourceSelect, deleteTemplateList
 } from './axiosRequest/requestDataParse';
 import {getTemplateDetails} from './gridMethod/girdData';
 import {useRequest} from "ahooks";
@@ -63,6 +63,7 @@ const EditTemplateList: React.FC<any> = () => {
   };
 
   /* endregion 表格事件 */
+
   /* region 几个下拉框取值 */
   const templeType = useRequest(() => getTemTypeSelect()).data;
 
@@ -75,6 +76,7 @@ const EditTemplateList: React.FC<any> = () => {
 
 
   /* endregion */
+
   const [formForTemplate] = Form.useForm();
 
   // 导入excel任务
@@ -101,9 +103,10 @@ const EditTemplateList: React.FC<any> = () => {
         return;
       }
 
-      const gridDatas: any = getGridDataFromExcel(result.data)
-      gridApi.current?.setRowData(gridDatas);
-
+      const newDatas: any = getGridDataFromExcel(result.data);
+      // 导入需要追加之前的数据
+      const finalData: any = gridData.concat(newDatas);
+      setGridData(finalData);
     });
 
   };
@@ -117,14 +120,39 @@ const EditTemplateList: React.FC<any> = () => {
   /* region 删除行 */
   const [isdelModalVisible, setIsDelModalVisible] = useState({
     showFalg: false,
-    delData: ""
+    db_delData: "", // 需要从数据库删除的数据
+    cu_delData: []  // 本地的数据，还未保存到数据库中
   });
 
-  (window as any).delTemplateRow = async (params: any) => {
+  // 删除行
+  const delTemplateRow = (params: any) => {
+    // 获取选中的行
+    const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
 
+    if (selRows.length === 0) {
+      message.error({
+        content: '请选中需要删除的数据!',
+        duration: 1,
+        className: 'delNone',
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+
+    let selData = "";
+    // 获取需要删除的ID
+    selRows.forEach((ele: any) => {
+      // 首先要判断有没有subtask_id，有的话才是数据库中已经存储的，需要链接数据库删除，如果没有的，直接在表格中删除即可。
+      if (ele.subtask_id) {
+        selData = selData === "" ? ele.subtask_id : `${selData},${ele.subtask_id}`;
+      }
+    });
     setIsDelModalVisible({
       showFalg: true,
-      delData: params
+      db_delData: selData,
+      cu_delData: selRows
     });
   };
 
@@ -136,8 +164,38 @@ const EditTemplateList: React.FC<any> = () => {
     });
   };
 
-  // 确定删除慈航
-  const delTempRow = () => {
+  // 确定删除选中项
+  const delTempRow = async () => {
+    // 判断有无数据库删除项目，有的话则调用删除接口，没有直接删除表格本地数据即可
+    if (isdelModalVisible.db_delData) {
+      const rtMsg = await deleteTemplateList(isdelModalVisible.db_delData);
+      if (rtMsg) {
+        message.error({
+          content: `删除失败：${rtMsg}`,
+          duration: 1,
+          className: 'delNone',
+          style: {
+            marginTop: '50vh',
+          },
+        });
+        return;
+      }
+    }
+
+    gridApi.current?.updateRowData({remove: isdelModalVisible.cu_delData});
+    setIsDelModalVisible({
+      showFalg: false,
+      db_delData: "", // 需要从数据库删除的数据
+      cu_delData: []  // 本地的数据，还未保存到数据库中
+    });
+    message.info({
+      content: `删除成功！`,
+      duration: 1,
+      className: 'delNone',
+      style: {
+        marginTop: '50vh',
+      },
+    });
 
   };
 
@@ -170,48 +228,6 @@ const EditTemplateList: React.FC<any> = () => {
     // 保存成功之后返回列表，并刷新数据
     // history.push('/zentao/templateList');
   };
-
-  // 这是使用Input控件做导入
-  // {/*<input id="file" type="file" onChange={testLoad}/>*/}
-  // const testLoad = (file: any) => {
-  //   debugger;
-  //   // 获取上传的文件对象
-  //   const {files} = file.target;
-  //   // 通过FileReader对象读取文件
-  //   const fileReader = new FileReader();
-  //   fileReader.onload = event => {
-  //     try {
-  //       const excelData = event.target?.result;
-  //       // 以二进制流方式读取得到整份excel表格对象
-  //       const workbook = XLSX.read(excelData, {type: 'binary'});
-  //       // 存储获取到的数据
-  //       let resultData: any = [];
-  //       // 遍历每张工作表进行读取（这里默认只读取第一张表）
-  //       Object.keys(workbook.Sheets).forEach((sheet: string, index: number) => {
-  //         debugger;
-  //         if (index === 0) { // 只获取第一个sheet的数据
-  //           // 利用 sheet_to_json 方法将 excel 转成 json 数据
-  //           resultData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet]);
-  //         }
-  //       })
-  //
-  //       console.log(resultData);
-  //
-  //       // for (const sheet in workbook.Sheets) {
-  //       //   if (workbook.Sheets.hasOwnProperty(sheet)) {
-  //       //     debugger;
-  //       //     // 利用 sheet_to_json 方法将 excel 转成 json 数据
-  //       //     resultData = resultData.concat(XLSX.utils.sheet_to_json(workbook.Sheets[sheet]));
-  //       //     break; // 如果只取第一张表，就取消注释这行
-  //       //   }
-  //       // }
-  //
-  //     } catch (e) {
-  //       message.error(`错误：${e}`);
-  //     }
-  //   };
-  //   fileReader.readAsBinaryString(files[0]);   // 以二进制方式打开文件
-  // };
 
   const showInitPages = async () => {
 
@@ -251,14 +267,19 @@ const EditTemplateList: React.FC<any> = () => {
                 </Form.Item>
 
               </Col>
-              <Col span={8}>
+              <Col span={4}>
                 <Upload beforeUpload={importTemplate}>
                   <Button type="text" style={{color: "#46A0FC"}} icon={<ImportOutlined/>} size={'middle'}
                   >导入Excel任务</Button>
-                </Upload>,
+                </Upload>
+              </Col>
+              <Col span={4}>
+                <Button type="text" icon={<DeleteTwoTone/>} size={'middle'} style={{float: "right"}}
+                        onClick={delTemplateRow}>删除</Button>
               </Col>
             </Row>
           </Form>
+
         </div>
 
         {/* 模板列表 */}
@@ -277,6 +298,7 @@ const EditTemplateList: React.FC<any> = () => {
               rowHeight={28}
               headerHeight={30}
               suppressRowTransform={true}
+              rowSelection={'multiple'}
               onGridReady={onGridReady}
               frameworkComponents={{
                 addTypeRender: (props: any) => {
@@ -331,7 +353,7 @@ const EditTemplateList: React.FC<any> = () => {
           <Form>
             <Form.Item>
               <label>
-                确定删除此行吗？
+                确定删除选中的数据吗？
               </label>
             </Form.Item>
 

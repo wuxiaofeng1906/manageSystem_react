@@ -1,6 +1,6 @@
 import {
   requestTempType, requestAddType, requestAssignedTo, requestPriorityApi,
-  requestTaskTypeApi, requestSideApi, requestTaskSourceApi
+  requestTaskTypeApi, requestSideApi, requestTaskSourceApi,requestDelTempleListApi
 } from "./reauestApi";
 import {Select} from "antd";
 
@@ -130,15 +130,12 @@ const getTaskSourceSelect = async () => {
   return [];
 };
 
-
-
-
-// // 删除选中的模板
-// const deleteTemplate = async (tempId: string) => {
-//   const delData = await requestDelTempleApi(tempId);
-//   return delData;
-// };
+// 删除选中的模板
+const deleteTemplateList = async (subtaskId: string) => {
+  const delData = await requestDelTempleListApi(subtaskId);
+  return delData;
+};
 export {
   getTemTypeSelect, getAddTypeSelect, getAssignedToSelect, getPrioritySelect,
-  getTaskTypeSelect, getSideSelect, getTaskSourceSelect
+  getTaskTypeSelect, getSideSelect, getTaskSourceSelect,deleteTemplateList
 }

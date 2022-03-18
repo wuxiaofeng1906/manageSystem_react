@@ -119,6 +119,23 @@ const requestTaskSourceApi = async () => {
   return data;
 };
 
+// 删除模板数据
+const requestDelTempleListApi = async (tempId: string) => {
+
+  let returnMsg = "";
+  await axios.delete('/api/verify/zentao/temp_detail', {data: {subtask_id: tempId}})
+    .then(function (res) {
+      if (res.data.code !== 200) {
+        returnMsg = res.data.msg;
+      }
+    })
+    .catch(function (error) {
+      returnMsg = error;
+    });
+
+  return returnMsg;
+};
+
 
 export {
   requestTempType,
@@ -128,4 +145,5 @@ export {
   requestTaskTypeApi,
   requestSideApi,
   requestTaskSourceApi,
+  requestDelTempleListApi
 }

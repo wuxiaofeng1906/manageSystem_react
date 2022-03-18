@@ -7,7 +7,7 @@ import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {Button, Col, Form, Input, message, Modal, Row, Select, Upload} from "antd";
 import Header from "./components/CusPageHeader";
 import {DeleteTwoTone, ImportOutlined} from "@ant-design/icons";
-import {getTempColumns} from "./gridMethod/columns";
+import {getTempColumns, columnsAdd} from "./gridMethod/columns";
 import {getHeight} from "@/publicMethods/pageSet";
 import {history} from "@@/core/history";
 import {loadExcelData, getGridDataFromExcel} from './import';
@@ -77,14 +77,11 @@ const EditTemplateList: React.FC<any> = () => {
 
   /* endregion */
 
-  const [formForTemplate] = Form.useForm();
-
+  /* region 数据导入和新增 */
   // 导入excel任务
   const importTemplate = (file: any) => {
-
-    //   获取数据()
+    //   获取数据
     loadExcelData(file).then((result: any) => {
-
       if (result.message) {
         message.error({
           content: `导入失败：${result.message}`,
@@ -116,31 +113,11 @@ const EditTemplateList: React.FC<any> = () => {
 
   // 新增行
   (window as any).addTemplateRow = async (rowIndex: any, rowData: any) => {
-
-    const addRow: any = {add_type_name: "",};
-    // 判断当前点击是父任务还是子任务（增加类型是新增还是子任务），
-    if (rowData.add_type_name === "子任务") {
-      // 如果是子任务，则在本父任务后面添加一行子任务
-      addRow.add_type_name = "子任务";
-      gridApi.current?.updateRowData({add: [addRow], addIndex: Number(rowIndex) + 1});
-      return;
-    }
-
-    // 如果是父任务，则本地新增则添加到这个父任务所属所有子任务的后面一行。
-    addRow.add_type_name = "新增";
-    const oldData = gridData;
-    let addPosition = -1; // 新增行的位置
-    for (let index = Number(rowIndex); index < oldData.length; index += 1) {
-      //  查找下一个父任务的ID
-      const dts: any = oldData[index + 1];
-      if (!dts || dts.add_type_name === "新增") {  // !dts 表示只有一行新增，则直接在下面新增一行父任务即可
-        // 如果找到了下一个父任务，就在这个父任务的上面新增一行。
-        addPosition = index + 1;
-        break;
-      }
-    }
-    gridApi.current?.updateRowData({add: [addRow], addIndex: addPosition});
+    const addData = columnsAdd(rowIndex, rowData, gridData);
+    gridApi.current?.updateRowData({add: [addData.row], addIndex: addData.position});
   };
+
+  /* endregion 数据导入和新增 */
 
   /* region 删除行 */
   const [isdelModalVisible, setIsDelModalVisible] = useState({
@@ -149,11 +126,10 @@ const EditTemplateList: React.FC<any> = () => {
     cu_delData: []  // 本地的数据，还未保存到数据库中
   });
 
-  // 删除行
+  // 删除行弹窗
   const delTemplateRow = () => {
     // 获取选中的行
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
-
     if (selRows.length === 0) {
       message.error({
         content: '请选中需要删除的数据!',
@@ -165,7 +141,6 @@ const EditTemplateList: React.FC<any> = () => {
       });
       return;
     }
-
     let selData = "";
     // 获取需要删除的ID
     selRows.forEach((ele: any) => {
@@ -227,10 +202,7 @@ const EditTemplateList: React.FC<any> = () => {
 
   /* endregion  删除行 */
 
-  // 取消模板编辑
-  const cancleTempEdit = () => {
-    history.push('/zentao/templateList');
-  };
+  const [formForTemplate] = Form.useForm();
 
   // 保存编辑后的模板
   const saveTemplate = () => {
@@ -254,7 +226,12 @@ const EditTemplateList: React.FC<any> = () => {
     // 保存成功之后返回列表，并刷新数据
     // history.push('/zentao/templateList');
   };
+  // 取消模板编辑
+  const cancleTempEdit = () => {
+    history.push('/zentao/templateList');
+  };
 
+  // 初始化界面数据
   const showInitPages = async () => {
 
     if (template.id) {
@@ -268,9 +245,7 @@ const EditTemplateList: React.FC<any> = () => {
     }
   };
   useEffect(() => {
-
     showInitPages();
-
   }, [1]);
   return (
     <div style={{width: "100%", height: "100%", marginTop: "-20px"}}>

@@ -78,7 +78,7 @@ const getTempColumns = () => {
     pinned: 'right',
     maxWidth: 90,
     cellRenderer: (params: any) => {
-      debugger;
+
       const paramData = JSON.stringify(params.data).replace(/'/g, '’');
       return `
             <Button  style="border: none; background-color: transparent;margin-top: -3px " onclick='addTemplateRow(JSON.stringify(${params.rowIndex}),${paramData})'>
@@ -93,5 +93,33 @@ const getTempColumns = () => {
 
 };
 
+const columnsAdd = (rowIndex: any, rowData: any, gridOldData: any) => {
 
-export {getTempColumns};
+    const addRow: any = {add_type_name: "",};
+    // 判断当前点击是父任务还是子任务（增加类型是新增还是子任务），
+    if (rowData.add_type_name === "子任务") {
+      // 如果是子任务，则在本父任务后面添加一行子任务
+      addRow.add_type_name = "子任务";
+      // gridApi.current?.updateRowData({add: [addRow], addIndex: Number(rowIndex) + 1});
+      return {row: addRow, position: Number(rowIndex) + 1};
+    }
+
+    // 如果是父任务，则本地新增则添加到这个父任务所属所有子任务的后面一行。
+    addRow.add_type_name = "新增";
+    let addPosition = -1; // 新增行的位置
+    for (let index = Number(rowIndex); index < gridOldData.length; index += 1) {
+      //  查找下一个父任务的ID
+      const dts: any = gridOldData[index + 1];
+      if (!dts || dts.add_type_name === "新增") {  // !dts 表示只有一行新增，则直接在下面新增一行父任务即可
+        // 如果找到了下一个父任务，就在这个父任务的上面新增一行。
+        addPosition = index + 1;
+        break;
+      }
+    }
+
+    return {row: addRow, position: addPosition};
+    // gridApi.current?.updateRowData({add: [addRow], addIndex: addPosition});
+
+  }
+;
+export {getTempColumns,columnsAdd};

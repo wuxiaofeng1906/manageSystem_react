@@ -18,7 +18,7 @@ import {
 import {useRequest} from "ahooks";
 import {
   addTypeRenderer, assignedToRenderer, priorityRenderer,
-  taskTypeRenderer, sideRenderer, taskSourceRenderer
+  taskTypeRenderer, sideRenderer, taskSourceRenderer,cutRenderer
 } from "./gridMethod/gridRenderer";
 
 const selectOptions = {
@@ -295,6 +295,9 @@ const EditTemplateList: React.FC<any> = () => {
                 },
                 taskSourceRender: (props: any) => {
                    return taskSourceRenderer(props.data, selectOptions.taskSource);
+                },
+                cutRender: (props: any) => {
+                  return cutRenderer(props.value);
                 },
               }}
             >

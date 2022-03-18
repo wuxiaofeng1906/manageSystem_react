@@ -66,7 +66,7 @@ const getTempColumns = () => {
     headerName: '是否裁剪',
     field: 'is_tailoring',
     minWidth: 90,
-    cellRenderer: "confirmSelectChoice"
+    cellRenderer: "cutRender"
   }, {
     headerName: '操作',
     minWidth: 90,

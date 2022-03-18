@@ -1,7 +1,6 @@
 import {
   requestTempType, requestAddType, requestAssignedTo, requestPriorityApi,
-  requestTaskTypeApi, requestSideApi, requestTaskSourceApi,
-  requestTemplateDetailsApi
+  requestTaskTypeApi, requestSideApi, requestTaskSourceApi
 } from "./reauestApi";
 import {Select} from "antd";
 
@@ -30,7 +29,7 @@ const getAddTypeSelect = async () => {
     const selectValue: any = [];
     types.forEach((ele: any) => {
       selectValue.push(
-        <Option key={ele.task_type} value={`${ele.task_type}&${ele.task_type_name}`}> {ele.task_type_name} </Option>
+        <Option key={ele.task_type} value={ele.task_type_name}> {ele.task_type_name} </Option>
       );
     });
 
@@ -48,7 +47,7 @@ const getAssignedToSelect = async () => {
     const selectValue: any = [];
     types.forEach((ele: any) => {
       selectValue.push(
-        <Option key={ele.account} value={`${ele.account}&${ele.realname}`}> {ele.realname} </Option>
+        <Option key={ele.account} value={ele.realname}> {ele.realname} </Option>
       );
     });
 
@@ -84,7 +83,7 @@ const getTaskTypeSelect = async () => {
     const selectValue: any = [];
     types.forEach((ele: any) => {
       selectValue.push(
-        <Option key={ele.task_type} value={`${ele.task_type}&${ele.task_type_name}`}> {ele.task_type_name} </Option>
+        <Option key={ele.task_type} value={ele.task_type_name}> {ele.task_type_name} </Option>
       );
     });
 
@@ -102,7 +101,7 @@ const getSideSelect = async () => {
     const selectValue: any = [];
     types.forEach((ele: any) => {
       selectValue.push(
-        <Option key={ele.belongs} value={`${ele.belongs}&${ele.belongs_name}`}> {ele.belongs_name} </Option>
+        <Option key={ele.belongs} value={ele.belongs_name}> {ele.belongs_name} </Option>
       );
     });
 
@@ -120,8 +119,8 @@ const getTaskSourceSelect = async () => {
     const selectValue: any = [];
     types.forEach((ele: any) => {
       selectValue.push(
-        <Option key={ele.task_source}
-                value={`${ele.task_source}&${ele.task_source_name}`}> {ele.task_source_name} </Option>
+        <Option
+          key={ele.task_source} value={ele.task_source_name}> {ele.task_source_name} </Option>
       );
     });
 
@@ -132,12 +131,7 @@ const getTaskSourceSelect = async () => {
 };
 
 
-// 获取详情列表
-const getTemplateDetails = async (tempId: string) => {
-  const tempList = await requestTemplateDetailsApi(tempId);
-  return tempList;
 
-};
 
 // // 删除选中的模板
 // const deleteTemplate = async (tempId: string) => {
@@ -146,6 +140,5 @@ const getTemplateDetails = async (tempId: string) => {
 // };
 export {
   getTemTypeSelect, getAddTypeSelect, getAssignedToSelect, getPrioritySelect,
-  getTaskTypeSelect, getSideSelect, getTaskSourceSelect,
-  getTemplateDetails
+  getTaskTypeSelect, getSideSelect, getTaskSourceSelect
 }

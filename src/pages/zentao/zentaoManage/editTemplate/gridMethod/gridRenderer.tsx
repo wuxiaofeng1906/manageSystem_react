@@ -3,8 +3,7 @@ import {Select} from "antd";
 const {Option} = Select;
 
 // 增加类型
-const addTypeRenderer = (data: any, options: any) => {
-  const currentValue = `${data.add_type}&${data.add_type_name}`;
+const addTypeRenderer = (currentValue: any, options: any) => {
   return (
     <Select
       size={'small'} defaultValue={currentValue}
@@ -16,9 +15,8 @@ const addTypeRenderer = (data: any, options: any) => {
 };
 
 // 指派人
-const assignedToRenderer = (data: any, options: any) => {
+const assignedToRenderer = (currentValue: any, options: any) => {
 
-  const currentValue = `${data.assigned_person}&${data.assigned_person_name}`;
   return (
     <Select
       size={'small'} defaultValue={currentValue}
@@ -31,9 +29,8 @@ const assignedToRenderer = (data: any, options: any) => {
 
 
 // 优先级
-const priorityRenderer = (data: any, options: any) => {
+const priorityRenderer = (currentValue: any, options: any) => {
 
-  const currentValue = data.priority;
   return (
     <Select
       size={'small'} defaultValue={currentValue}
@@ -45,8 +42,7 @@ const priorityRenderer = (data: any, options: any) => {
 };
 
 // 任务类型
-const taskTypeRenderer = (data: any, options: any) => {
-  const currentValue = `${data.task_type}&${data.task_type_name}`;
+const taskTypeRenderer = (currentValue: any, options: any) => {
   return (
     <Select
       size={'small'} defaultValue={currentValue}
@@ -58,8 +54,7 @@ const taskTypeRenderer = (data: any, options: any) => {
 };
 
 // 所属端
-const sideRenderer = (data: any, options: any) => {
-  const currentValue = `${data.belongs}&${data.belongs_name}`;
+const sideRenderer = (currentValue: any, options: any) => {
   return (
     <Select
       size={'small'} defaultValue={currentValue}
@@ -71,8 +66,7 @@ const sideRenderer = (data: any, options: any) => {
 };
 
 // 任务来源
-const taskSourceRenderer = (data: any, options: any) => {
-  const currentValue = `${data.tasksource}&${data.tasksource_name}`;
+const taskSourceRenderer = (currentValue: any, options: any) => {
   return (
     <Select
       size={'small'} defaultValue={currentValue}
@@ -86,16 +80,16 @@ const taskSourceRenderer = (data: any, options: any) => {
 const cutRenderer = (value: any) => {
   let currentValue;
   if (value === "yes") {
-    currentValue = "yes&是";
+    currentValue = "是";
   } else {
-    currentValue = "no&否";
+    currentValue = "否";
   }
   return (
     <Select
       size={'small'} defaultValue={currentValue}
       bordered={false} style={{width: '100%'}}>
-      <Option key={"yes"} value={`yes&是`}> {"是"} </Option>
-      <Option key={"no"} value={`no&否`}> {"否"} </Option>
+      <Option key={"yes"} value={"是"}> {"是"} </Option>
+      <Option key={"no"} value={"否"}> {"否"} </Option>
     </Select>
   );
 };

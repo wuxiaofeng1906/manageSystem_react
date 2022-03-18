@@ -3,24 +3,6 @@ import axios from 'axios';
 const sys_accessToken = localStorage.getItem('accessId');
 axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
 
-// const userLogins: any = localStorage.getItem('userLogins');
-// const usersInfo = JSON.parse(userLogins);
-
-// 获取模板类型
-const requestTempType = async () => {
-  let data: any = [];
-  await axios.get('/api/verify/zentao/temp_type')
-    .then(function (res) {
-      if (res.data.code === 200) {
-        data = res.data.data;
-      }
-    })
-    .catch(function (error) {
-      console.log("模板类型获取失败", error)
-    });
-
-  return data;
-};
 
 // 获取增加类型
 const requestAddType = async () => {
@@ -69,7 +51,6 @@ const requestPriorityApi = async () => {
 
   return data;
 };
-
 
 //  任务类型
 const requestTaskTypeApi = async () => {
@@ -121,7 +102,6 @@ const requestTaskSourceApi = async () => {
 
 
 export {
-  requestTempType,
   requestAddType,
   requestAssignedTo,
   requestPriorityApi,

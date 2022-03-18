@@ -9,7 +9,7 @@ const getTempColumns = () => {
     },
   }, {
     headerName: '增加类型',
-    field: 'add_type',
+    field: 'add_type_name',
     minWidth: 120,
     cellRenderer: "addTypeRender"
   }, {
@@ -29,7 +29,7 @@ const getTempColumns = () => {
     editable: true,
   }, {
     headerName: '指派给',
-    field: 'assigned_person',
+    field: 'assigned_person_name',
     minWidth: 90,
     cellRenderer: "assignedToRender"
   }, {
@@ -39,7 +39,7 @@ const getTempColumns = () => {
     cellRenderer: "priorityRender"
   }, {
     headerName: '任务类型',
-    field: 'task_type',
+    field: 'task_type_name',
     minWidth: 110,
     cellRenderer: "taskTypeRender"
   }, {
@@ -54,12 +54,12 @@ const getTempColumns = () => {
     editable: true,
   }, {
     headerName: '所属端',
-    field: 'belongs',
+    field: 'belongs_name',
     minWidth: 90,
     cellRenderer: "belongsSideRender"
   }, {
     headerName: '任务来源',
-    field: 'tasksource',
+    field: 'tasksource_name',
     minWidth: 90,
     cellRenderer: "taskSourceRender"
   }, {

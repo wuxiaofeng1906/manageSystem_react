@@ -13,12 +13,13 @@ import {history} from "@@/core/history";
 import {loadExcelData, getGridDataFromExcel} from './import';
 import {
   getTemTypeSelect, getAddTypeSelect, getAssignedToSelect, getPrioritySelect,
-  getTaskTypeSelect, getSideSelect, getTaskSourceSelect, getTemplateDetails
+  getTaskTypeSelect, getSideSelect, getTaskSourceSelect
 } from './axiosRequest/requestDataParse';
+import {getTemplateDetails} from './gridMethod/girdData';
 import {useRequest} from "ahooks";
 import {
   addTypeRenderer, assignedToRenderer, priorityRenderer,
-  taskTypeRenderer, sideRenderer, taskSourceRenderer,cutRenderer
+  taskTypeRenderer, sideRenderer, taskSourceRenderer, cutRenderer
 } from "./gridMethod/gridRenderer";
 
 const selectOptions = {
@@ -279,22 +280,22 @@ const EditTemplateList: React.FC<any> = () => {
               onGridReady={onGridReady}
               frameworkComponents={{
                 addTypeRender: (props: any) => {
-                  return addTypeRenderer(props.data, selectOptions.addType);
+                  return addTypeRenderer(props.value, selectOptions.addType);
                 },
                 assignedToRender: (props: any) => {
-                  return assignedToRenderer(props.data, selectOptions.assignedTo);
+                  return assignedToRenderer(props.value, selectOptions.assignedTo);
                 },
                 priorityRender: (props: any) => {
-                  return priorityRenderer(props.data, selectOptions.priority);
+                  return priorityRenderer(props.value, selectOptions.priority);
                 },
                 taskTypeRender: (props: any) => {
-                  return taskTypeRenderer(props.data, selectOptions.taskType);
+                  return taskTypeRenderer(props.value, selectOptions.taskType);
                 },
                 belongsSideRender: (props: any) => {
-                  return sideRenderer(props.data, selectOptions.side);
+                  return sideRenderer(props.value, selectOptions.side);
                 },
                 taskSourceRender: (props: any) => {
-                   return taskSourceRenderer(props.data, selectOptions.taskSource);
+                  return taskSourceRenderer(props.value, selectOptions.taskSource);
                 },
                 cutRender: (props: any) => {
                   return cutRenderer(props.value);

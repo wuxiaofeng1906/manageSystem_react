@@ -13,7 +13,7 @@ import {history} from "@@/core/history";
 import {loadExcelData, getGridDataFromExcel} from './import';
 import {
   getTemTypeSelect, getAddTypeSelect, getAssignedToSelect, getPrioritySelect,
-  getTaskTypeSelect, getSideSelect, getTaskSourceSelect, deleteTemplateList
+  getTaskTypeSelect, getSideSelect, getTaskSourceSelect, deleteTemplateList, saveTempList
 } from './axiosRequest/requestDataParse';
 import {getTemplateDetails} from './gridMethod/girdData';
 import {useRequest} from "ahooks";
@@ -30,6 +30,7 @@ const selectOptions = {
   side: [],
   taskSource: []
 }
+let gridDataState: any;
 // 组件初始化
 const EditTemplateList: React.FC<any> = () => {
 
@@ -106,6 +107,7 @@ const EditTemplateList: React.FC<any> = () => {
       gridApi.current?.forEachNode((node: any) => {
         oraData.push(node.data);
       });
+      gridDataState = oraData.concat(newDatas);
       setGridData(oraData.concat(newDatas));
     });
 
@@ -203,12 +205,12 @@ const EditTemplateList: React.FC<any> = () => {
   /* endregion  删除行 */
 
   const [formForTemplate] = Form.useForm();
-
   // 保存编辑后的模板
-  const saveTemplate = () => {
+  const saveTemplate = async () => {
     // 需要校验模版名称不能为空
-    const tempName = formForTemplate.getFieldValue("tempName");
-    if (!tempName) {
+    const tempInfos = formForTemplate.getFieldsValue();
+
+    if (!tempInfos.tempName) {
       message.error({
         content: `模板名称不能为空！`,
         duration: 1, // 1S 后自动关闭
@@ -216,15 +218,40 @@ const EditTemplateList: React.FC<any> = () => {
       });
       return;
     }
-    const gridDatas = [];
+    if (!tempInfos.tempType) {
+      message.error({
+        content: `模板类型不能为空！`,
+        duration: 1, // 1S 后自动关闭
+        style: {marginTop: '50vh'},
+      });
+      return;
+    }
+    debugger;
+    const gridDatas: any = [];
 
     // 遍历列表中的数据
     gridApi.current?.forEachNode((node: any) => {
-      gridDatas.push(node);
+      gridDatas.push(node.data);
     });
-
-    // 保存成功之后返回列表，并刷新数据
-    // history.push('/zentao/templateList');
+    const tempInfo = {
+      id: template.id,
+      name: tempInfos.tempName,
+      type: (tempInfos.tempType).split("&")[0]
+    };
+    const messages = await saveTempList(gridDatas, tempInfo);
+    if (messages) {
+      message.error({
+        content: `错误：${messages}`,
+        duration: 1,
+        style: {marginTop: '50vh'},
+      });
+    } else {
+      message.info({
+        content: `数据保存成功！`,
+        duration: 1,
+        style: {marginTop: '50vh'},
+      });
+    }
   };
   // 取消模板编辑
   const cancleTempEdit = () => {
@@ -237,7 +264,7 @@ const EditTemplateList: React.FC<any> = () => {
     if (template.id) {
       const dt = await getTemplateDetails(template.id);
       setGridData(dt);
-
+      gridDataState = dt;
       formForTemplate.setFieldsValue({
         tempName: template.name,
         tempType: template.type
@@ -303,7 +330,21 @@ const EditTemplateList: React.FC<any> = () => {
               onGridReady={onGridReady}
               frameworkComponents={{
                 addTypeRender: (props: any) => {
-                  return addTypeRenderer(props.value, selectOptions.addType);
+                  return <Select
+                    size={'small'} defaultValue={props.value}
+                    bordered={false} style={{width: '100%'}}
+                    // onChange={(currentValue: any) => {
+                    //   debugger;
+                    //
+                    //   gridDataState[props.rowIndex].add_type_name = currentValue;
+                    //   gridApi.current?.refreshCells({force: true});
+                    // }}
+
+                  >
+                    {selectOptions.addType}
+                  </Select>
+
+                  // return addTypeRenderer(props.value, selectOptions.addType);
                 },
                 assignedToRender: (props: any) => {
                   return assignedToRenderer(props.value, selectOptions.assignedTo);

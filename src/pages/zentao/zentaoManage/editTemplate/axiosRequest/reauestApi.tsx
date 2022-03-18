@@ -136,6 +136,22 @@ const requestDelTempleListApi = async (tempId: string) => {
   return returnMsg;
 };
 
+// 保存
+const requestSaveTempleListApi = async (data: any) => {
+
+  let errorMessage = "";
+  await axios.post('/api/verify/zentao/temp_detail', data)
+    .then(function (res) {
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+
+};
 
 export {
   requestTempType,
@@ -145,5 +161,6 @@ export {
   requestTaskTypeApi,
   requestSideApi,
   requestTaskSourceApi,
-  requestDelTempleListApi
+  requestDelTempleListApi,
+  requestSaveTempleListApi
 }

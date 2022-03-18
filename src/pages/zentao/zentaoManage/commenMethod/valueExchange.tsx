@@ -73,4 +73,109 @@ const convertUsersToID = async () => {
 
 /* endregion  转换增加类型 */
 
-export {convertAddTypeToValue,convertUsersToValue}
+/* region  转换任务类型 */
+
+// ID转Value
+const convertTaskTypeToValue = async () => {
+
+  const sourceData = await requestTaskTypeApi();
+  if (!sourceData || sourceData.length === 0) {
+    return {};
+  }
+
+  const returnValue = {};
+  sourceData.forEach((types: any) => {
+    returnValue[types.task_type] = types.task_type_name;
+  });
+  return returnValue;
+};
+
+// value转ID
+const convertTaskTypeToID = async () => {
+  const sourceData = await requestTaskTypeApi();
+  if (!sourceData || sourceData.length === 0) {
+    return {};
+  }
+
+  const returnValue = {};
+  sourceData.forEach((types: any) => {
+    returnValue[types.task_type_name] = types.task_type;
+  });
+  return returnValue;
+
+};
+
+
+/* endregion  转换增加类型 */
+
+/* region  转换所属端 */
+
+// ID转Value
+const convertSideToValue = async () => {
+
+  const sourceData = await requestSideApi();
+  if (!sourceData || sourceData.length === 0) {
+    return {};
+  }
+
+  const returnValue = {};
+  sourceData.forEach((types: any) => {
+    returnValue[types.belongs] = types.belongs_name;
+  });
+  return returnValue;
+};
+
+// value转ID
+const convertSideToID = async () => {
+  const sourceData = await requestSideApi();
+  if (!sourceData || sourceData.length === 0) {
+    return {};
+  }
+
+  const returnValue = {};
+  sourceData.forEach((types: any) => {
+    returnValue[types.belongs_name] = types.belongs;
+  });
+  return returnValue;
+
+};
+
+
+/* endregion  转换增加类型 */
+
+/* region  转换所属端 */
+
+// ID转Value
+const convertTaskSourceToValue = async () => {
+
+  const sourceData = await requestTaskSourceApi();
+  if (!sourceData || sourceData.length === 0) {
+    return {};
+  }
+
+  const returnValue = {};
+  sourceData.forEach((types: any) => {
+    returnValue[types.task_source] = types.task_source_name;
+  });
+  return returnValue;
+};
+
+// value转ID
+const convertTaskSourceToID = async () => {
+  const sourceData = await requestTaskSourceApi();
+  if (!sourceData || sourceData.length === 0) {
+    return {};
+  }
+
+  const returnValue = {};
+  sourceData.forEach((types: any) => {
+    returnValue[types.task_source_name] = types.task_source;
+  });
+  return returnValue;
+
+};
+
+
+/* endregion  转换增加类型 */
+
+export {convertAddTypeToID, convertUsersToID, convertTaskTypeToID,convertSideToID,convertTaskSourceToID}

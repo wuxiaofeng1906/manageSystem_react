@@ -113,7 +113,7 @@ const EditTemplateList: React.FC<any> = () => {
 
   // 新增行
   (window as any).addTemplateRow = async (rowIndex: any, rowData: any) => {
-
+    debugger;
     const addRow: any = {add_type_name: "",};
     // 判断当前点击是父任务还是子任务（增加类型是新增还是子任务），
     if (rowData.add_type_name === "子任务") {
@@ -130,7 +130,7 @@ const EditTemplateList: React.FC<any> = () => {
     for (let index = Number(rowIndex); index < oldData.length; index += 1) {
       //  查找下一个父任务的ID
       const dts: any = oldData[index + 1];
-      if (dts.add_type_name === "新增") {
+      if (!dts || dts.add_type_name === "新增") {  // !dts 表示只有一行新增，则直接在下面新增一行父任务即可
         // 如果找到了下一个父任务，就在这个父任务的上面新增一行。
         addPosition = index + 1;
         break;

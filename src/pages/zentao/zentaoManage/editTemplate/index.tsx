@@ -104,16 +104,19 @@ const EditTemplateList: React.FC<any> = () => {
       }
 
       const newDatas: any = getGridDataFromExcel(result.data);
-      // 导入需要追加之前的数据
-      const finalData: any = gridData.concat(newDatas);
-      setGridData(finalData);
+      // 导入需要追加之前的数据，从表格遍历获取数据，不能直接用state中的gridData，因为在手动新增一行时不会更新state
+      const oraData: any = [];
+      gridApi.current?.forEachNode((node: any) => {
+        oraData.push(node.data);
+      });
+      setGridData(oraData.concat(newDatas));
     });
 
   };
 
   // 新增行
   (window as any).addTemplateRow = async (rowIndex: any, rowData: any) => {
-    debugger;
+
     const addRow: any = {add_type_name: "",};
     // 判断当前点击是父任务还是子任务（增加类型是新增还是子任务），
     if (rowData.add_type_name === "子任务") {
@@ -182,7 +185,8 @@ const EditTemplateList: React.FC<any> = () => {
   const delFormCancle = () => {
     setIsDelModalVisible({
       showFalg: false,
-      delData: ""
+      db_delData: "",
+      cu_delData: []
     });
   };
 

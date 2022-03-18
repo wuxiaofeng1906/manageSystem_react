@@ -7,7 +7,7 @@ const getTempColumns = () => {
     pinned: 'left',
   }, {
     headerName: '序号',
-    minWidth: 70,
+    minWidth: 50,
     maxWidth: 80,
     pinned: 'left',
     cellRenderer: (params: any) => {
@@ -75,11 +75,13 @@ const getTempColumns = () => {
     cellRenderer: "cutRender"
   }, {
     headerName: '操作',
-    minWidth: 90,
+    pinned: 'right',
+    maxWidth: 90,
     cellRenderer: (params: any) => {
+      debugger;
       const paramData = JSON.stringify(params.data).replace(/'/g, '’');
       return `
-            <Button  style="border: none; background-color: transparent;margin-top: -3px " onclick='addTemplateRow()'>
+            <Button  style="border: none; background-color: transparent;margin-top: -3px " onclick='addTemplateRow(JSON.stringify(${params.rowIndex}),${paramData})'>
               <img src="../add_black2.png" width="15" height="15" alt="新增" title="新增">
             </Button>
            `;
@@ -90,7 +92,6 @@ const getTempColumns = () => {
   return column;
 
 };
-
 
 
 export {getTempColumns};

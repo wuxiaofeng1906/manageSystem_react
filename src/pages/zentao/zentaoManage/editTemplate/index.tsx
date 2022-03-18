@@ -112,9 +112,31 @@ const EditTemplateList: React.FC<any> = () => {
   };
 
   // 新增行
-  (window as any).addTemplateRow = async () => {
+  (window as any).addTemplateRow = async (rowIndex: any, rowData: any) => {
 
+    const addRow: any = {add_type_name: "",};
+    // 判断当前点击是父任务还是子任务（增加类型是新增还是子任务），
+    if (rowData.add_type_name === "子任务") {
+      // 如果是子任务，则在本父任务后面添加一行子任务
+      addRow.add_type_name = "子任务";
+      gridApi.current?.updateRowData({add: [addRow], addIndex: Number(rowIndex) + 1});
+      return;
+    }
 
+    // 如果是父任务，则本地新增则添加到这个父任务所属所有子任务的后面一行。
+    addRow.add_type_name = "新增";
+    const oldData = gridData;
+    let addPosition = -1; // 新增行的位置
+    for (let index = Number(rowIndex); index < oldData.length; index += 1) {
+      //  查找下一个父任务的ID
+      const dts: any = oldData[index + 1];
+      if (dts.add_type_name === "新增") {
+        // 如果找到了下一个父任务，就在这个父任务的上面新增一行。
+        addPosition = index + 1;
+        break;
+      }
+    }
+    gridApi.current?.updateRowData({add: [addRow], addIndex: addPosition});
   };
 
   /* region 删除行 */
@@ -125,7 +147,7 @@ const EditTemplateList: React.FC<any> = () => {
   });
 
   // 删除行
-  const delTemplateRow = (params: any) => {
+  const delTemplateRow = () => {
     // 获取选中的行
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
 

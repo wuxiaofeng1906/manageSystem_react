@@ -26,7 +26,6 @@ import {getTemplateDetails} from './gridMethod/girdData';
 import {useRequest} from 'ahooks';
 
 const {Option} = Select;
-
 const selectOptions = {
   addType: [],
   assignedTo: [],
@@ -41,7 +40,7 @@ const EditTemplateList: React.FC<any> = () => {
   /* region 表格事件 */
   const [gridData, setGridData] = useState([]);
   // 获取跳转过来的模板，并获取对应数据
-  const template = {id: '', name: '', type: ''};
+  const template = {id: '', name: '', type: '', type_name: ''};
   const location = history.location.query;
   if (location && JSON.stringify(location) !== '{}') {
     if (location.tempName) {
@@ -51,7 +50,8 @@ const EditTemplateList: React.FC<any> = () => {
       template.id = location.tempId.toString();
     }
     if (location.tempType) {
-      template.type = location.tempType.toString();
+      template.type = ((location.tempType).toString()).split("|")[0].toString();
+      template.type_name = ((location.tempType).toString()).split("|")[1].toString();
     }
   }
 
@@ -68,18 +68,6 @@ const EditTemplateList: React.FC<any> = () => {
   };
 
   /* endregion 表格事件 */
-
-  /* region 几个下拉框取值 */
-  const templeType = useRequest(() => getTemTypeSelect()).data;
-
-  selectOptions.addType = useRequest(() => getAddTypeSelect()).data;
-  selectOptions.assignedTo = useRequest(() => getAssignedToSelect()).data;
-  selectOptions.priority = useRequest(() => getPrioritySelect()).data;
-  selectOptions.taskType = useRequest(() => getTaskTypeSelect()).data;
-  selectOptions.side = useRequest(() => getSideSelect()).data;
-  selectOptions.taskSource = useRequest(() => getTaskSourceSelect()).data;
-
-  /* endregion */
 
   /* region 数据导入和新增 */
   // 导入excel任务
@@ -210,6 +198,7 @@ const EditTemplateList: React.FC<any> = () => {
 
   /* endregion  删除行 */
 
+  /* region 模板保存 */
   const gridSelectChanged = (index: number, filed: string, value: any) => {
 
     gridDataState[index][filed] = value;
@@ -272,7 +261,17 @@ const EditTemplateList: React.FC<any> = () => {
     history.push('/zentao/templateList');
   };
 
-  // 初始化界面数据
+  /* endregion  模板保存 */
+
+  /* region 初始化界面数据 */
+  const templeType = useRequest(() => getTemTypeSelect()).data;
+  selectOptions.addType = useRequest(() => getAddTypeSelect()).data;
+  selectOptions.assignedTo = useRequest(() => getAssignedToSelect()).data;
+  selectOptions.priority = useRequest(() => getPrioritySelect()).data;
+  selectOptions.taskType = useRequest(() => getTaskTypeSelect()).data;
+  selectOptions.side = useRequest(() => getSideSelect()).data;
+  selectOptions.taskSource = useRequest(() => getTaskSourceSelect()).data;
+
   const showInitPages = async () => {
     if (template.id) {
       const dt = await getTemplateDetails(template.id);
@@ -280,7 +279,7 @@ const EditTemplateList: React.FC<any> = () => {
       gridDataState = dt;
       formForTemplate.setFieldsValue({
         tempName: template.name,
-        tempType: template.type,
+        tempType: `${template.type}&${template.type_name}`,
       });
     } else {
       //   如果为空，则要设置一行
@@ -291,6 +290,8 @@ const EditTemplateList: React.FC<any> = () => {
   useEffect(() => {
     showInitPages();
   }, [1]);
+  /* endregion 初始化界面数据 */
+
   return (
     <div style={{width: '100%', height: '100%', marginTop: '-20px'}}>
       <Header/>
@@ -383,6 +384,7 @@ const EditTemplateList: React.FC<any> = () => {
                       defaultValue={props.value}
                       bordered={false}
                       style={{width: '100%'}}
+                      showSearch
                       onChange={(currentValue: any) => {
                         gridSelectChanged(props.rowIndex, 'assigned_person_name', currentValue);
                       }}
@@ -412,6 +414,7 @@ const EditTemplateList: React.FC<any> = () => {
                       size={'small'}
                       defaultValue={props.value}
                       bordered={false}
+                      showSearch
                       style={{width: '100%'}}
                       onChange={(currentValue: any) => {
                         gridSelectChanged(props.rowIndex, 'task_type_name', currentValue);
@@ -446,6 +449,7 @@ const EditTemplateList: React.FC<any> = () => {
                       onChange={(currentValue: any) => {
                         gridSelectChanged(props.rowIndex, 'tasksource_name', currentValue);
                       }}
+                      showSearch
                     >
                       {selectOptions.taskSource}
                     </Select>

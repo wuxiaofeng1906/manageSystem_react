@@ -24,7 +24,7 @@ const getTemTypeSelect = async () => {
     const selectValue: any = [];
     types.forEach((ele: any) => {
       selectValue.push(
-        <Option key={ele.temp_type} value={`${ele.temp_type}`}> {ele.temp_type_name} </Option>)
+        <Option key={ele.temp_type} value={`${ele.temp_type}&${ele.temp_type_name}`}> {ele.temp_type_name} </Option>)
     });
     return selectValue;
   }

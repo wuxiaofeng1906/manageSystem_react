@@ -48,7 +48,7 @@ const ZentaoTemplateList: React.FC<any> = () => {
   const modifyTempList = (params: any) => {
 
     const {data} = params;
-    history.push(`/zentao/editTemplate?tempId=${data.temp_id}&tempName=${data.temp_name}&tempType=${data.temp_type}`);
+    history.push(`/zentao/editTemplate?tempId=${data.temp_id}&tempName=${data.temp_name}&tempType=${data.temp_type}|${data.temp_type_name}`);
   };
 
   /* endregion 增改 */

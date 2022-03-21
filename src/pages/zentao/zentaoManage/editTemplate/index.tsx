@@ -211,7 +211,7 @@ const EditTemplateList: React.FC<any> = () => {
   /* endregion  删除行 */
 
   const gridSelectChanged = (index: number, filed: string, value: any) => {
-    debugger;
+
     gridDataState[index][filed] = value;
     gridApi.current?.refreshCells({force: true});
     if (filed === "is_tailoring") {

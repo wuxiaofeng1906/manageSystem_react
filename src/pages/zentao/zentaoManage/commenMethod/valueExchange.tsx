@@ -2,6 +2,7 @@ import {
   requestAddType, requestAssignedTo, requestPriorityApi,
   requestTaskTypeApi, requestSideApi, requestTaskSourceApi
 } from './reauestApi';
+import {getPrincipal} from "@/publicMethods/verifyAxios";
 
 /* region  转换增加类型 */
 
@@ -176,6 +177,30 @@ const convertTaskSourceToID = async () => {
 };
 
 
+// value转ID
+const convertUserNameToID = async () => {
+
+
+  const sourceData = await getPrincipal();
+  if (!sourceData || (sourceData.data).length === 0) {
+    return {};
+  }
+
+  const returnValue = {};
+  (sourceData.data).forEach((types: any) => {
+    returnValue[types.user_name] = types.user_id;
+  });
+  return returnValue;
+
+};
+
 /* endregion  转换增加类型 */
 
-export {convertAddTypeToID, convertUsersToID, convertTaskTypeToID,convertSideToID,convertTaskSourceToID}
+export {
+  convertAddTypeToID,
+  convertUsersToID,
+  convertTaskTypeToID,
+  convertSideToID,
+  convertTaskSourceToID,
+  convertUserNameToID
+}

@@ -116,6 +116,23 @@ const requestExcutionApi = async () => {
   return data;
 };
 
+// 禅道生成任务
+const requestGenerateTaskApi = async (data: any) => {
+
+  let errorMessage = "";
+  await axios.post('/api/verify/zentao/task', data)
+    .then(function (res) {
+
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+};
+
 export {
   requestAddType,
   requestAssignedTo,
@@ -123,5 +140,6 @@ export {
   requestTaskTypeApi,
   requestSideApi,
   requestTaskSourceApi,
-  requestExcutionApi
+  requestExcutionApi,
+  requestGenerateTaskApi
 }

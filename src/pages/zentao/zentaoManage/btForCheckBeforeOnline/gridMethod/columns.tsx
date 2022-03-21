@@ -9,62 +9,69 @@ const getTaskColumns = () => {
     },
   }, {
     headerName: '增加类型',
-    field: 'addType',
+    field: 'add_type_name',
     minWidth: 120,
   }, {
     headerName: '任务名称',
-    field: 'taskName',
+    field: 'task_name',
     minWidth: 100,
-    editable: true,
+    cellRenderer: (params: any) => {
+      if (params.data.is_tailoring === "yes" || params.data.is_tailoring === "是") {
+        return `<span style="color: gray">${params.value}</span>`
+      }
+      return params.value;
+    }
   }, {
     headerName: '所属模块',
     field: 'module',
     minWidth: 90,
-    editable: true,
   }, {
     headerName: '研发相关需求',
-    field: 'devStory',
+    field: 'subtask_dev_needs',
     minWidth: 90,
-    editable: true,
   }, {
     headerName: '指派给',
-    field: 'assignedTo',
+    field: 'assigned_person_name',
     minWidth: 90,
   }, {
     headerName: '预计开始',
-    field: 'priority',
-    minWidth: 90,
+    field: 'plan_start',
+    minWidth: 110,
+    editable: true,
   }, {
     headerName: '预计截至',
-    field: 'taskType',
+    field: 'plan_end',
     minWidth: 110,
+    editable: true,
   }, {
     headerName: '优先级',
-    field: 'initPlan',
+    field: 'priority',
     minWidth: 100,
-    editable: true,
   }, {
     headerName: '任务类型',
-    field: 'taskDesc',
+    field: 'task_type_name',
     minWidth: 90,
-    editable: true,
   }, {
     headerName: '最初预计',
-    field: 'side',
+    field: 'estimate',
     minWidth: 90,
   }, {
     headerName: '任务描述',
-    field: 'taskSource',
+    field: 'desc',
     minWidth: 90,
   }, {
     headerName: '所属端',
+    field: "belongs_name",
     minWidth: 90,
   }, {
     headerName: '任务来源',
+    field: "tasksource_name",
     minWidth: 90,
   }, {
     headerName: '是否裁剪',
+    field: 'is_tailoring',
     minWidth: 90,
+    cellRenderer: "cutRender"
   }];
   return column;
 };

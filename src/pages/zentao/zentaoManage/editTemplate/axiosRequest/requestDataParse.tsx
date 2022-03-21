@@ -4,8 +4,10 @@ import {
   requestSaveTempleListApi
 } from "./reauestApi";
 
+import {getPrincipal} from "@/publicMethods/verifyAxios";
+
 import {
-  convertAddTypeToID, convertUsersToID, convertTaskTypeToID,
+  convertAddTypeToID, convertUserNameToID, convertTaskTypeToID,
   convertSideToID, convertTaskSourceToID
 } from "../../commenMethod/valueExchange";
 import {Select} from "antd";
@@ -50,13 +52,13 @@ const getAddTypeSelect = async () => {
 
 // 获取指派人
 const getAssignedToSelect = async () => {
-  const types = await requestAssignedTo();
+  const users = await getPrincipal();
 
-  if (types.length > 0) {
+  if ((users.data).length > 0) {
     const selectValue: any = [];
-    types.forEach((ele: any) => {
+    (users.data).forEach((ele: any) => {
       selectValue.push(
-        <Option key={ele.account} value={ele.realname}> {ele.realname} </Option>
+        <Option key={ele.user_id} value={ele.user_name}> {ele.user_name} </Option>
       );
     });
 
@@ -151,7 +153,7 @@ const deleteTemplateList = async (subtaskId: string) => {
 const analysisGridData = async (data: any, tempInfo: any) => {
 
   const addType = await convertAddTypeToID(); // 增加类型
-  const users = await convertUsersToID(); // 增加类型
+  const users = await convertUserNameToID(); // 增加类型
   const taskType = await convertTaskTypeToID(); // 增加类型
   const side = await convertSideToID(); // 增加类型
   const taskSource = await convertTaskSourceToID(); // 增加类型
@@ -203,6 +205,7 @@ const saveTempList = async (data: any, tempInfo: any) => {
   if (!data || data.length === 0) {
     return "保存的数据不能为空！"
   }
+
   const finValue = await analysisGridData(data, tempInfo)
   const saveResult = await requestSaveTempleListApi(finValue);
   return saveResult;

@@ -10,14 +10,23 @@ import {getHeight} from "@/publicMethods/pageSet";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {history} from "@@/core/history";
 import moment from "moment";
-import {loadUserSelect, loadExcutionSelect, getDutyPerson} from "./axiosRequest/requestDataParse";
+import {
+  loadUserSelect,
+  loadExcutionSelect,
+  getDutyPerson,
+  getTempDetails,
+  generateTask
+} from "./axiosRequest/requestDataParse";
 import {useRequest} from "ahooks";
 
+
 const {Option} = Select;
+
 // 组件初始化
 const CheckBeforeOnline: React.FC<any> = () => {
 
   /* region 表格事件 */
+  const [gridData, setGridData] = useState([]);
   const [gridHeight, setGridHeight] = useState(getHeight());
   const gridApi = useRef<GridApi>();
   const onGridReady = (params: GridReadyEvent) => {
@@ -32,39 +41,64 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
   /* endregion 表格事件 */
 
-  /* 下拉框 */
+  // 获取跳转过来的模板，并获取对应数据
+  const template = {id: '', name: '',type:''};
+  const location = history.location.query;
+  if (location && JSON.stringify(location) !== '{}') {
+    if (location.tempName) {
+      template.name = location.tempName.toString();
+    }
+    if (location.tempID) {
+      template.id = location.tempID.toString();
+    }
+    if (location.tempType) {
+      template.type = location.tempType.toString();
+    }
+  }
+
+  /* region 下拉框 */
   const frontUserInfo = useRequest(() => loadUserSelect("1")).data;
   const backendUserInfo = useRequest(() => loadUserSelect("2")).data;
   const testerUserInfo = useRequest(() => loadUserSelect("3")).data;
   const sqaUserInfo = useRequest(() => loadUserSelect("7")).data;
   const excutionInfo = useRequest(() => loadExcutionSelect()).data;
 
+  /* endregion  下拉框 */
+
   /* region 联动选项 */
 
-  const planStartChanged = () => {
+  const planStartChanged = (params: any, values: any) => {
     //   时间改变后，下面的预计开始时间也要同步改变
+    const atferValue: any = [];
+    gridData.forEach((ele: any) => {
+      atferValue.push({...ele, plan_start: values});
+    });
+    setGridData(atferValue);
   }
 
-  const planEndChanged = () => {
+  const planEndChanged = (params: any, values: any) => {
     //   时间改变后，下面的预计截至时间也要同步改变
+    const atferValue: any = [];
+    gridData.forEach((ele: any) => {
+      atferValue.push({...ele, plan_end: values});
+    });
+    setGridData(atferValue);
   }
 
   // 指派人修改后，也要对应修改表格中所属端的指派人
   const changeAssignedTo = (side: string, currentValue: any) => {
-    console.log("currentValue", currentValue);
-    switch (side) {
-      case "SQA":
-        break;
-      case "Front":
-        break;
-      case "Backend":
-        break;
-      case "Tester":
-        break;
-      default:
-        break;
-    }
 
+    const atferValue: any = [];
+    gridData.forEach((ele: any) => {
+      if (side === "Front" && ele.belongs_name === "前端"
+        || side === "Backend" && ele.belongs_name === "后端"
+        || side === "Tester" && ele.belongs_name === "测试") {
+        atferValue.push({...ele, assigned_person_name: currentValue});
+      } else {
+        atferValue.push(ele);
+      }
+    });
+    setGridData(atferValue);
   };
 
   /* endregion 联动选项 */
@@ -78,12 +112,37 @@ const CheckBeforeOnline: React.FC<any> = () => {
   };
 
   // 生成任务
-  const builtTask = () => {
+  const builtTask = async () => {
     setExcuteState(true);
     // 需要校验空值
     const formData = formForZentaoTask.getFieldsValue();
     console.log(formData);
     //   调用接口生成
+    const result = await generateTask(template,formData, gridData);
+    if(result){
+      message.error({
+        content: result,
+        duration: 1,
+        className: 'delNone',
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+    }else{
+      message.info({
+        content: "执行成功！",
+        duration: 1,
+        className: 'delNone',
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+
+    setExcuteState(false);
+
+
   };
 
   const showPageInfo = async () => {
@@ -98,6 +157,9 @@ const CheckBeforeOnline: React.FC<any> = () => {
       planStart: moment(),
       planEnd: moment()
     });
+
+    const tabInfo = await getTempDetails(template.id, dutyInfo);
+    setGridData(tabInfo);
   }
   useEffect(() => {
     showPageInfo();
@@ -182,7 +244,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
             <div className="ag-theme-alpine" style={{height: gridHeight - 45, width: '100%'}}>
               <AgGridReact
                 columnDefs={getTaskColumns()} // 定义列
-                rowData={[]} // 数据绑定
+                rowData={gridData} // 数据绑定
                 defaultColDef={{
                   resizable: true,
                   sortable: true,
@@ -194,6 +256,26 @@ const CheckBeforeOnline: React.FC<any> = () => {
                 headerHeight={30}
                 suppressRowTransform={true}
                 onGridReady={onGridReady}
+                frameworkComponents={{
+                  cutRender: (props: any) => {
+                    // return props.value;
+                    return (
+                      <Select
+                        size={'small'}
+                        defaultValue={props.value}
+                        bordered={false}
+                        style={{width: '100%'}}
+                        onChange={(selectedValue: any) => {
+                          // gridSelectChanged(props.rowIndex, 'is_tailoring', selectedValue);
+                        }}
+                      >
+                        <Option key={'yes'} value={'yes'}>{'是'}</Option>
+                        <Option key={'no'} value={'no'}>{'否'}</Option>
+                      </Select>
+                    );
+                    // return cutRenderer(props.value);
+                  },
+                }}
               >
               </AgGridReact>
             </div>

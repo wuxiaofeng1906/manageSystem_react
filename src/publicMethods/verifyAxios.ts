@@ -114,7 +114,7 @@ const getEnvironment = async () => {
   return envInfo;
 };
 
-// 获取负责人
+// 获取负责人(里面包含了企业微信所有人)
 const getPrincipal = async () => {
   const principalInfo = {
     message: "",
@@ -135,7 +135,7 @@ const getPrincipal = async () => {
   return principalInfo;
 };
 
-// 获取所有人员
+// 获取所有人员（里面包含了企业微信所有人）
 const getAllDeptUsers = async () => {
   const principalInfo = {
     message: "",

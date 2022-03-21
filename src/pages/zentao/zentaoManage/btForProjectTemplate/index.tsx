@@ -17,6 +17,7 @@ import {
   getAllUsersSelect,
   loadProjectManager
 } from "./axiosRequest/requestDataParse";
+import {generateTask} from "./axiosRequest/requestDataParse";
 
 const {Option} = Select;
 // 组件初始化
@@ -118,12 +119,36 @@ const ProjectTemplate: React.FC<any> = () => {
 
   const [excuteState, setExcuteState] = useState(false);
   // 任务生成按钮
-  const builtTask = () => {
+  const builtTask = async () => {
+    debugger;
     setExcuteState(true);
     // 需要校验空值
     const formData = formForProject.getFieldsValue();
     console.log(formData);
     //   调用接口生成
+    const result = await generateTask(template, formData, gridData);
+    if (result) {
+      message.error({
+        content: result,
+        duration: 1,
+        className: 'delNone',
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+    } else {
+      message.info({
+        content: "执行成功！",
+        duration: 1,
+        className: 'delNone',
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
+
+    setExcuteState(false);
   };
   // 取消模板编辑
   const cancleTempEdit = () => {

@@ -1,5 +1,5 @@
 import {requestExcutionApi, requestGenerateTaskApi} from "../../commenMethod/reauestApi"
-import {message, Select} from "antd";
+import {Select} from "antd";
 import {getPrincipal} from "@/publicMethods/verifyAxios";
 import React from "react";
 import dayjs from "dayjs";
@@ -12,7 +12,6 @@ const userLogins: any = localStorage.getItem('userLogins');
 const usersLoginInfo = JSON.parse(userLogins);
 
 // 人员选择框
-
 const getAllUsersSelect = async () => {
   const users = await getPrincipal();
 
@@ -71,6 +70,7 @@ const getTempDetails = async (tempId: string) => {
 
 // 任务生成
 const generateTask = async (tempInfo: any, fromData: any, gridData: any) => {
+
   // 所属执行不能为空
   if (!fromData.belongExcution) {
     return "所属执行不能为空！"
@@ -87,10 +87,7 @@ const generateTask = async (tempInfo: any, fromData: any, gridData: any) => {
     "start_time": dayjs(fromData.planStart).format("YYYY-MM-DD"),
     "end_time": dayjs(fromData.planEnd).format("YYYY-MM-DD"),
     "execution_id": (fromData.belongExcution).split("&")[0],
-    "sqa": usersInfo[fromData.assingedToSQA],
-    "test": usersInfo[fromData.assingedToTester],
-    "front": usersInfo[fromData.assingedToFront],
-    "backend": usersInfo[fromData.assingedToBackend]
+    "project_manager": usersInfo[fromData.projectManager],
   };
   const gridDataArray: any = [];
   gridData.forEach((ele: any) => {
@@ -111,7 +108,7 @@ const generateTask = async (tempInfo: any, fromData: any, gridData: any) => {
         "tasksource": ele.tasksource,
         "edit_user": usersLoginInfo.name,
         "temp_type": tempInfo.type,
-        "is_tailoring": "yes",
+        "is_tailoring": "no",
         "start_time": ele.plan_start,
         "end_time": ele.plan_end
       })

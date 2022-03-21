@@ -23,6 +23,12 @@ const getTempColumns = () => {
     field: 'task_name',
     minWidth: 100,
     editable: true,
+    cellRenderer: (params: any) => {
+      if (params.data.is_tailoring === "yes" || params.data.is_tailoring === "是") {
+        return `<span style="color: gray">${params.value}</span>`
+      }
+      return params.value;
+    }
   }, {
     headerName: '所属模块',
     field: 'module',
@@ -122,4 +128,4 @@ const columnsAdd = (rowIndex: any, rowData: any, gridOldData: any) => {
 
   }
 ;
-export {getTempColumns,columnsAdd};
+export {getTempColumns, columnsAdd};

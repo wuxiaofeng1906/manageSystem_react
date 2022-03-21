@@ -1,16 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { AgGridReact } from 'ag-grid-react';
+import React, {useEffect, useRef, useState} from 'react';
+import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import { Button, Col, Form, Input, message, Modal, Row, Select, Upload } from 'antd';
+import {GridApi, GridReadyEvent} from 'ag-grid-community';
+import {Button, Col, Form, Input, message, Modal, Row, Select, Upload} from 'antd';
 import Header from './components/CusPageHeader';
-import { DeleteTwoTone, ImportOutlined } from '@ant-design/icons';
-import { getTempColumns, columnsAdd } from './gridMethod/columns';
-import { getHeight } from '@/publicMethods/pageSet';
-import { history } from '@@/core/history';
-import { loadExcelData, getGridDataFromExcel } from './import';
+import {DeleteTwoTone, ImportOutlined} from '@ant-design/icons';
+import {getTempColumns, columnsAdd} from './gridMethod/columns';
+import {getHeight} from '@/publicMethods/pageSet';
+import {history} from '@@/core/history';
+import {loadExcelData, getGridDataFromExcel} from './import';
 import {
   getTemTypeSelect,
   getAddTypeSelect,
@@ -22,10 +22,10 @@ import {
   deleteTemplateList,
   saveTempList,
 } from './axiosRequest/requestDataParse';
-import { getTemplateDetails } from './gridMethod/girdData';
-import { useRequest } from 'ahooks';
+import {getTemplateDetails} from './gridMethod/girdData';
+import {useRequest} from 'ahooks';
 
-const { Option } = Select;
+const {Option} = Select;
 
 const selectOptions = {
   addType: [],
@@ -41,7 +41,7 @@ const EditTemplateList: React.FC<any> = () => {
   /* region 表格事件 */
   const [gridData, setGridData] = useState([]);
   // 获取跳转过来的模板，并获取对应数据
-  const template = { id: '', name: '', type: '' };
+  const template = {id: '', name: '', type: ''};
   const location = history.location.query;
   if (location && JSON.stringify(location) !== '{}') {
     if (location.tempName) {
@@ -90,7 +90,7 @@ const EditTemplateList: React.FC<any> = () => {
         message.error({
           content: `导入失败：${result.message}`,
           duration: 1,
-          style: { marginTop: '50vh' },
+          style: {marginTop: '50vh'},
         });
         return;
       }
@@ -99,7 +99,7 @@ const EditTemplateList: React.FC<any> = () => {
         message.error({
           content: `导入失败：表格中没有数据！`,
           duration: 1,
-          style: { marginTop: '50vh' },
+          style: {marginTop: '50vh'},
         });
         return;
       }
@@ -118,7 +118,7 @@ const EditTemplateList: React.FC<any> = () => {
   // 新增行
   (window as any).addTemplateRow = async (rowIndex: any, rowData: any) => {
     const addData = columnsAdd(rowIndex, rowData, gridData);
-    gridApi.current?.updateRowData({ add: [addData.row], addIndex: addData.position });
+    gridApi.current?.updateRowData({add: [addData.row], addIndex: addData.position});
     gridDataState.length = 0;
     gridApi.current?.forEachNode((node: any) => {
       gridDataState.push(node.data);
@@ -192,7 +192,7 @@ const EditTemplateList: React.FC<any> = () => {
       }
     }
 
-    gridApi.current?.updateRowData({ remove: isdelModalVisible.cu_delData });
+    gridApi.current?.updateRowData({remove: isdelModalVisible.cu_delData});
     setIsDelModalVisible({
       showFalg: false,
       db_delData: '', // 需要从数据库删除的数据
@@ -212,7 +212,11 @@ const EditTemplateList: React.FC<any> = () => {
 
   const gridSelectChanged = (index: number, filed: string, value: any) => {
     gridDataState[index][filed] = value;
-    gridApi.current?.refreshCells({ force: true });
+    gridApi.current?.refreshCells({force: true});
+    debugger;
+    if (filed === "is_tailoring") {
+      gridApi.current?.setRowData(gridDataState);
+    }
   };
   const [formForTemplate] = Form.useForm();
   // 保存编辑后的模板
@@ -224,7 +228,7 @@ const EditTemplateList: React.FC<any> = () => {
       message.error({
         content: `模板名称不能为空！`,
         duration: 1, // 1S 后自动关闭
-        style: { marginTop: '50vh' },
+        style: {marginTop: '50vh'},
       });
       return;
     }
@@ -232,7 +236,7 @@ const EditTemplateList: React.FC<any> = () => {
       message.error({
         content: `模板类型不能为空！`,
         duration: 1, // 1S 后自动关闭
-        style: { marginTop: '50vh' },
+        style: {marginTop: '50vh'},
       });
       return;
     }
@@ -253,13 +257,13 @@ const EditTemplateList: React.FC<any> = () => {
       message.error({
         content: `错误：${messages}`,
         duration: 1,
-        style: { marginTop: '50vh' },
+        style: {marginTop: '50vh'},
       });
     } else {
       message.info({
         content: `数据保存成功！`,
         duration: 1,
-        style: { marginTop: '50vh' },
+        style: {marginTop: '50vh'},
       });
     }
   };
@@ -284,15 +288,15 @@ const EditTemplateList: React.FC<any> = () => {
     showInitPages();
   }, [1]);
   return (
-    <div style={{ width: '100%', height: '100%', marginTop: '-20px' }}>
-      <Header />
-      <div className={'content'} style={{ marginTop: 5 }}>
-        <div style={{ background: 'white', height: 36, paddingTop: 2 }}>
-          <Form form={formForTemplate} autoComplete="off" style={{ marginLeft: 5 }}>
+    <div style={{width: '100%', height: '100%', marginTop: '-20px'}}>
+      <Header/>
+      <div className={'content'} style={{marginTop: 5}}>
+        <div style={{background: 'white', height: 36, paddingTop: 2}}>
+          <Form form={formForTemplate} autoComplete="off" style={{marginLeft: 5}}>
             <Row>
               <Col span={8}>
                 <Form.Item label="模板名称:" name="tempName" required={true}>
-                  <Input />
+                  <Input/>
                 </Form.Item>
               </Col>
               <Col span={8}>
@@ -300,9 +304,9 @@ const EditTemplateList: React.FC<any> = () => {
                   label="模板类型:"
                   name="tempType"
                   required={true}
-                  style={{ marginLeft: 5 }}
+                  style={{marginLeft: 5}}
                 >
-                  <Select showSearch style={{ width: '100%' }}>
+                  <Select showSearch style={{width: '100%'}}>
                     {templeType}
                   </Select>
                 </Form.Item>
@@ -311,8 +315,8 @@ const EditTemplateList: React.FC<any> = () => {
                 <Upload beforeUpload={importTemplate}>
                   <Button
                     type="text"
-                    style={{ color: '#46A0FC' }}
-                    icon={<ImportOutlined />}
+                    style={{color: '#46A0FC'}}
+                    icon={<ImportOutlined/>}
                     size={'middle'}
                   >
                     导入Excel任务
@@ -322,9 +326,9 @@ const EditTemplateList: React.FC<any> = () => {
               <Col span={4}>
                 <Button
                   type="text"
-                  icon={<DeleteTwoTone />}
+                  icon={<DeleteTwoTone/>}
                   size={'middle'}
-                  style={{ float: 'right' }}
+                  style={{float: 'right'}}
                   onClick={delTemplateRow}
                 >
                   删除
@@ -335,8 +339,8 @@ const EditTemplateList: React.FC<any> = () => {
         </div>
 
         {/* 模板列表 */}
-        <div style={{ marginTop: 5 }}>
-          <div className="ag-theme-alpine" style={{ height: gridHeight - 20, width: '100%' }}>
+        <div style={{marginTop: 5}}>
+          <div className="ag-theme-alpine" style={{height: gridHeight - 20, width: '100%'}}>
             <AgGridReact
               columnDefs={getTempColumns()} // 定义列
               rowData={gridData} // 数据绑定
@@ -345,7 +349,7 @@ const EditTemplateList: React.FC<any> = () => {
                 sortable: true,
                 filter: true,
                 suppressMenu: true,
-                cellStyle: { 'line-height': '28px' },
+                cellStyle: {'line-height': '28px'},
               }}
               rowHeight={28}
               headerHeight={30}
@@ -359,7 +363,7 @@ const EditTemplateList: React.FC<any> = () => {
                       size={'small'}
                       defaultValue={props.value}
                       bordered={false}
-                      style={{ width: '100%' }}
+                      style={{width: '100%'}}
                       onChange={(currentValue: any) => {
                         gridSelectChanged(props.rowIndex, 'add_type_name', currentValue);
                       }}
@@ -367,8 +371,6 @@ const EditTemplateList: React.FC<any> = () => {
                       {selectOptions.addType}
                     </Select>
                   );
-
-                  // return addTypeRenderer(props.value, selectOptions.addType);
                 },
                 assignedToRender: (props: any) => {
                   return (
@@ -376,7 +378,7 @@ const EditTemplateList: React.FC<any> = () => {
                       size={'small'}
                       defaultValue={props.value}
                       bordered={false}
-                      style={{ width: '100%' }}
+                      style={{width: '100%'}}
                       onChange={(currentValue: any) => {
                         gridSelectChanged(props.rowIndex, 'assigned_person_name', currentValue);
                       }}
@@ -384,7 +386,6 @@ const EditTemplateList: React.FC<any> = () => {
                       {selectOptions.assignedTo}
                     </Select>
                   );
-                  // return assignedToRenderer(props.value, selectOptions.assignedTo);
                 },
                 priorityRender: (props: any) => {
                   return (
@@ -392,7 +393,7 @@ const EditTemplateList: React.FC<any> = () => {
                       size={'small'}
                       defaultValue={props.value}
                       bordered={false}
-                      style={{ width: '100%' }}
+                      style={{width: '100%'}}
                       onChange={(currentValue: any) => {
                         gridSelectChanged(props.rowIndex, 'priority', currentValue);
                       }}
@@ -400,7 +401,6 @@ const EditTemplateList: React.FC<any> = () => {
                       {selectOptions.priority}
                     </Select>
                   );
-                  // return priorityRenderer(props.value, selectOptions.priority);
                 },
                 taskTypeRender: (props: any) => {
                   return (
@@ -408,7 +408,7 @@ const EditTemplateList: React.FC<any> = () => {
                       size={'small'}
                       defaultValue={props.value}
                       bordered={false}
-                      style={{ width: '100%' }}
+                      style={{width: '100%'}}
                       onChange={(currentValue: any) => {
                         gridSelectChanged(props.rowIndex, 'task_type_name', currentValue);
                       }}
@@ -416,7 +416,6 @@ const EditTemplateList: React.FC<any> = () => {
                       {selectOptions.taskType}
                     </Select>
                   );
-                  // return taskTypeRenderer(props.value, selectOptions.taskType);
                 },
                 belongsSideRender: (props: any) => {
                   return (
@@ -424,7 +423,7 @@ const EditTemplateList: React.FC<any> = () => {
                       size={'small'}
                       defaultValue={props.value}
                       bordered={false}
-                      style={{ width: '100%' }}
+                      style={{width: '100%'}}
                       onChange={(currentValue: any) => {
                         gridSelectChanged(props.rowIndex, 'belongs_name', currentValue);
                       }}
@@ -432,7 +431,6 @@ const EditTemplateList: React.FC<any> = () => {
                       {selectOptions.side}
                     </Select>
                   );
-                  // return sideRenderer(props.value, selectOptions.side);
                 },
                 taskSourceRender: (props: any) => {
                   return (
@@ -440,7 +438,7 @@ const EditTemplateList: React.FC<any> = () => {
                       size={'small'}
                       defaultValue={props.value}
                       bordered={false}
-                      style={{ width: '100%' }}
+                      style={{width: '100%'}}
                       onChange={(currentValue: any) => {
                         gridSelectChanged(props.rowIndex, 'tasksource_name', currentValue);
                       }}
@@ -448,33 +446,20 @@ const EditTemplateList: React.FC<any> = () => {
                       {selectOptions.taskSource}
                     </Select>
                   );
-                  // return taskSourceRenderer(props.value, selectOptions.taskSource);
                 },
                 cutRender: (props: any) => {
-                  let currentValue;
-                  if (props.value === 'yes') {
-                    currentValue = '是';
-                  } else {
-                    currentValue = '否';
-                  }
                   return (
                     <Select
                       size={'small'}
-                      defaultValue={currentValue}
+                      defaultValue={props.value}
                       bordered={false}
-                      style={{ width: '100%' }}
+                      style={{width: '100%'}}
                       onChange={(selectedValue: any) => {
                         gridSelectChanged(props.rowIndex, 'is_tailoring', selectedValue);
                       }}
                     >
-                      <Option key={'yes'} value={'是'}>
-                        {' '}
-                        {'是'}{' '}
-                      </Option>
-                      <Option key={'no'} value={'否'}>
-                        {' '}
-                        {'否'}{' '}
-                      </Option>
+                      <Option key={'yes'} value={'yes'}>{'是'}</Option>
+                      <Option key={'no'} value={'no'}>{'否'}</Option>
                     </Select>
                   );
                   // return cutRenderer(props.value);
@@ -485,21 +470,17 @@ const EditTemplateList: React.FC<any> = () => {
           </div>
         </div>
 
-        <div style={{ marginTop: 10 }}>
+        <div style={{marginTop: 10}}>
           <Button
             type="primary"
             style={{
-              float: 'right',
-              color: '#46A0FC',
-              backgroundColor: '#ECF5FF',
-              borderRadius: 5,
-              marginLeft: 20,
+              float: 'right', color: '#46A0FC', backgroundColor: '#ECF5FF', borderRadius: 5, marginLeft: 20,
             }}
             onClick={saveTemplate}
           >
             保存
           </Button>
-          <Button style={{ float: 'right', borderRadius: 5 }} onClick={cancleTempEdit}>
+          <Button style={{float: 'right', borderRadius: 5}} onClick={cancleTempEdit}>
             取消
           </Button>
         </div>
@@ -518,10 +499,10 @@ const EditTemplateList: React.FC<any> = () => {
             </Form.Item>
 
             <Form.Item>
-              <Button type="primary" style={{ marginLeft: '110px' }} onClick={delTempRow}>
+              <Button type="primary" style={{marginLeft: '110px'}} onClick={delTempRow}>
                 确定
               </Button>
-              <Button type="primary" style={{ marginLeft: '30px' }} onClick={delFormCancle}>
+              <Button type="primary" style={{marginLeft: '30px'}} onClick={delFormCancle}>
                 取消
               </Button>
             </Form.Item>

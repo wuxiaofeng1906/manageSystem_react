@@ -74,7 +74,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
       atferValue.push({...ele, plan_start: values});
     });
     setGridData(atferValue);
-  }
+  };
 
   const planEndChanged = (params: any, values: any) => {
     //   时间改变后，下面的预计截至时间也要同步改变
@@ -83,7 +83,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
       atferValue.push({...ele, plan_end: values});
     });
     setGridData(atferValue);
-  }
+  };
 
   // 指派人修改后，也要对应修改表格中所属端的指派人
   const changeAssignedTo = (side: string, currentValue: any) => {

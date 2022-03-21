@@ -110,7 +110,7 @@ const requestExcutionApi = async () => {
       }
     })
     .catch(function (error) {
-      console.log("指派人获取失败", error)
+      console.log("所属执行获取失败", error)
     });
 
   return data;

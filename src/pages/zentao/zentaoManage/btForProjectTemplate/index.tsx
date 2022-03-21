@@ -10,12 +10,20 @@ import {getHeight} from "@/publicMethods/pageSet";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {history} from "@@/core/history";
 import moment from "moment";
+import {useRequest} from "ahooks";
+import {
+  getTempDetails,
+  loadExcutionSelect,
+  getAllUsersSelect,
+  loadProjectManager
+} from "./axiosRequest/requestDataParse";
 
 const {Option} = Select;
 // 组件初始化
 const ProjectTemplate: React.FC<any> = () => {
 
   /* region 表格事件 */
+  const [gridData, setGridData] = useState([]);
   const [gridHeight, setGridHeight] = useState(getHeight());
   const gridApi = useRef<GridApi>();
   const onGridReady = (params: GridReadyEvent) => {
@@ -30,32 +38,84 @@ const ProjectTemplate: React.FC<any> = () => {
 
   /* endregion 表格事件 */
 
+  const [formForProject] = Form.useForm(); // 上线分支设置
+
+
+  // 获取跳转过来的模板，并获取对应数据
+  const template = {id: '', name: '', type: ''};
+  const location = history.location.query;
+  if (location && JSON.stringify(location) !== '{}') {
+    if (location.tempName) {
+      template.name = location.tempName.toString();
+    }
+    if (location.tempID) {
+      template.id = location.tempID.toString();
+    }
+    if (location.tempType) {
+      template.type = location.tempType.toString();
+    }
+  }
+
+  const excutionInfo = useRequest(() => loadExcutionSelect()).data;
+  const projectManager = useRequest(() => getAllUsersSelect()).data;
+
+
   /* region  联动修改 */
 
   // 项目执行修改后要修改任务名称
-  const excutionChanged = () => {
+  const excutionChanged = async (params: any) => {
+    //   获取项目负责人
+    const excuteInfo = params.split("&");
+    const prjManager = await loadProjectManager(Number(excuteInfo[0]));
+    formForProject.setFieldsValue({
+      projectManager: prjManager.realname
+    });
+
+    // 同样修改表格里面的值
+    const atferValue: any = [];
+    gridData.forEach((ele: any) => {
+      atferValue.push({
+        ...ele,
+        task_name: `${excuteInfo[1]}-${ele.task_name}`,
+        assigned_person_name: prjManager.realname,
+        module: `${excuteInfo[1]}里程碑`
+      });
+    });
+    setGridData(atferValue);
 
   };
 
 // 项目负责人修改后，也要对应修改表格中所属端的指派人
   const projectManagerChanged = (currentValue: any) => {
-    console.log("currentValue", currentValue);
+    const atferValue: any = [];
+    gridData.forEach((ele: any) => {
+      atferValue.push({...ele, assigned_person_name: currentValue});
+    });
+    setGridData(atferValue);
   };
 
-  // 计划开始时间选择后改变表格中的时间
-  const planStartChanged = () => {
+  // 预计开始
+  const planStartChanged = (params: any, values: any) => {
     //   时间改变后，下面的预计开始时间也要同步改变
+    const atferValue: any = [];
+    gridData.forEach((ele: any) => {
+      atferValue.push({...ele, plan_start: values});
+    });
+    setGridData(atferValue);
+  };
 
-  }
-
-  // 计划开始结束选择后改变表格中的时间
-  const planEndChanged = () => {
+  // 预计结束
+  const planEndChanged = (params: any, values: any) => {
     //   时间改变后，下面的预计截至时间也要同步改变
-  }
+    const atferValue: any = [];
+    gridData.forEach((ele: any) => {
+      atferValue.push({...ele, plan_end: values});
+    });
+    setGridData(atferValue);
+  };
 
   /* endregion 联动修改 */
 
-  const [formForProject] = Form.useForm(); // 上线分支设置
   const [excuteState, setExcuteState] = useState(false);
   // 任务生成按钮
   const builtTask = () => {
@@ -70,7 +130,9 @@ const ProjectTemplate: React.FC<any> = () => {
     history.push('/zentao/templateList');
   };
 
-  useEffect(() => {
+  // 初始化界面
+  const showPageInfo = async () => {
+
     formForProject.setFieldsValue({
       belongExcution: "",
       projectManager: "",
@@ -78,7 +140,13 @@ const ProjectTemplate: React.FC<any> = () => {
       planEnd: moment()
     });
 
-  });
+    const tabInfo = await getTempDetails(template.id);
+    setGridData(tabInfo);
+  }
+
+  useEffect(() => {
+    showPageInfo();
+  }, [excutionInfo]);
 
   return (
     <div style={{width: "100%", height: "100%", marginTop: "-20px"}}>
@@ -86,21 +154,21 @@ const ProjectTemplate: React.FC<any> = () => {
       <Spin spinning={excuteState} tip="任务生成中，请稍后..." size={"large"}>
         <div style={{marginTop: 5}}>
           {/* 条件 */}
-          <div style={{background: 'white', height: 40,paddingTop:4}}>
+          <div style={{background: 'white', height: 40, paddingTop: 4}}>
             <Form form={formForProject} autoComplete="off" style={{marginLeft: 5}}>
               <Row>
                 <Col span={6}>
                   <Form.Item label="所属执行:" name="belongExcution" required={true}>
-                    <Select defaultValue="lucy" style={{width: '100%'}} allowClear onChange={excutionChanged}>
-                      <Option value="lucy">Lucy</Option>
+                    <Select style={{width: '100%'}} allowClear onChange={excutionChanged}>
+                      {excutionInfo}
                     </Select>
                   </Form.Item>
                 </Col>
                 <Col span={6}>
                   <Form.Item label="项目负责人:" name="projectManager" required={true} style={{marginLeft: 5}}>
-                    <Select defaultValue="lucy" style={{width: '100%'}} allowClear
+                    <Select style={{width: '100%'}} allowClear
                             onChange={projectManagerChanged}>
-                      <Option value="lucy">Lucy</Option>
+                      {projectManager}
                     </Select>
                   </Form.Item>
                 </Col>
@@ -123,7 +191,7 @@ const ProjectTemplate: React.FC<any> = () => {
             <div className="ag-theme-alpine" style={{height: gridHeight - 20, width: '100%'}}>
               <AgGridReact
                 columnDefs={getProjectColumns()} // 定义列
-                rowData={[]} // 数据绑定
+                rowData={gridData} // 数据绑定
                 defaultColDef={{
                   resizable: true,
                   sortable: true,
@@ -135,6 +203,26 @@ const ProjectTemplate: React.FC<any> = () => {
                 headerHeight={30}
                 suppressRowTransform={true}
                 onGridReady={onGridReady}
+                frameworkComponents={{
+                  cutRender: (props: any) => {
+                    // return props.value;
+                    return (
+                      <Select
+                        size={'small'}
+                        defaultValue={props.value}
+                        bordered={false}
+                        style={{width: '100%'}}
+                        onChange={(selectedValue: any) => {
+                          // gridSelectChanged(props.rowIndex, 'is_tailoring', selectedValue);
+                        }}
+                      >
+                        <Option key={'yes'} value={'yes'}>{'是'}</Option>
+                        <Option key={'no'} value={'no'}>{'否'}</Option>
+                      </Select>
+                    );
+                    // return cutRenderer(props.value);
+                  },
+                }}
               >
               </AgGridReact>
             </div>

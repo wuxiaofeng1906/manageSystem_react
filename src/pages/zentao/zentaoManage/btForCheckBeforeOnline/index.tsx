@@ -11,14 +11,9 @@ import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {history} from "@@/core/history";
 import moment from "moment";
 import {
-  loadUserSelect,
-  loadExcutionSelect,
-  getDutyPerson,
-  getTempDetails,
-  generateTask
+  loadUserSelect, loadExcutionSelect, getDutyPerson, getTempDetails, generateTask
 } from "./axiosRequest/requestDataParse";
 import {useRequest} from "ahooks";
-
 
 const {Option} = Select;
 
@@ -41,8 +36,8 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
   /* endregion 表格事件 */
 
-  // 获取跳转过来的模板，并获取对应数据
-  const template = {id: '', name: '',type:''};
+  /* region 获取跳转过来的模板，并获取对应数据 */
+  const template = {id: '', name: '', type: ''};
   const location = history.location.query;
   if (location && JSON.stringify(location) !== '{}') {
     if (location.tempName) {
@@ -56,14 +51,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
     }
   }
 
-  /* region 下拉框 */
-  const frontUserInfo = useRequest(() => loadUserSelect("1")).data;
-  const backendUserInfo = useRequest(() => loadUserSelect("2")).data;
-  const testerUserInfo = useRequest(() => loadUserSelect("3")).data;
-  const sqaUserInfo = useRequest(() => loadUserSelect("7")).data;
-  const excutionInfo = useRequest(() => loadExcutionSelect()).data;
-
-  /* endregion  下拉框 */
+  /* endregion 获取跳转过来的模板，并获取对应数据 */
 
   /* region 联动选项 */
 
@@ -103,6 +91,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
   /* endregion 联动选项 */
 
+  /* region 任务生成 */
   const [formForZentaoTask] = Form.useForm(); // 上线分支设置
   const [excuteState, setExcuteState] = useState(false);
 
@@ -118,8 +107,8 @@ const CheckBeforeOnline: React.FC<any> = () => {
     const formData = formForZentaoTask.getFieldsValue();
     console.log(formData);
     //   调用接口生成
-    const result = await generateTask(template,formData, gridData);
-    if(result){
+    const result = await generateTask(template, formData, gridData);
+    if (result) {
       message.error({
         content: result,
         duration: 1,
@@ -129,7 +118,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
         },
       });
 
-    }else{
+    } else {
       message.info({
         content: "执行成功！",
         duration: 1,
@@ -145,8 +134,17 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
   };
 
-  const showPageInfo = async () => {
+  /* endregion 任务生成 */
 
+  /* region 界面初始化显示 */
+
+  const frontUserInfo = useRequest(() => loadUserSelect("1")).data;
+  const backendUserInfo = useRequest(() => loadUserSelect("2")).data;
+  const testerUserInfo = useRequest(() => loadUserSelect("3")).data;
+  const sqaUserInfo = useRequest(() => loadUserSelect("7")).data;
+  const excutionInfo = useRequest(() => loadExcutionSelect()).data;
+
+  const showPageInfo = async () => {
     const dutyInfo = await getDutyPerson();
     formForZentaoTask.setFieldsValue({
       belongExcution: "",
@@ -157,13 +155,14 @@ const CheckBeforeOnline: React.FC<any> = () => {
       planStart: moment(),
       planEnd: moment()
     });
-
     const tabInfo = await getTempDetails(template.id, dutyInfo);
     setGridData(tabInfo);
-  }
+  };
   useEffect(() => {
     showPageInfo();
   }, [excutionInfo]);
+
+  /* endregion  界面初始化显示 */
 
   return (
     <div style={{width: "100%", height: "100%", marginTop: "-20px"}}>

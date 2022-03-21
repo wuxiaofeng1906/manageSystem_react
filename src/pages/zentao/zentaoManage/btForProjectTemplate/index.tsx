@@ -12,10 +12,7 @@ import {history} from "@@/core/history";
 import moment from "moment";
 import {useRequest} from "ahooks";
 import {
-  getTempDetails,
-  loadExcutionSelect,
-  getAllUsersSelect,
-  loadProjectManager
+  getTempDetails, loadExcutionSelect, getAllUsersSelect, loadProjectManager
 } from "./axiosRequest/requestDataParse";
 import {generateTask} from "./axiosRequest/requestDataParse";
 
@@ -39,10 +36,7 @@ const ProjectTemplate: React.FC<any> = () => {
 
   /* endregion 表格事件 */
 
-  const [formForProject] = Form.useForm(); // 上线分支设置
-
-
-  // 获取跳转过来的模板，并获取对应数据
+  /* region 获取跳转过来的模板，并获取对应数据 */
   const template = {id: '', name: '', type: ''};
   const location = history.location.query;
   if (location && JSON.stringify(location) !== '{}') {
@@ -56,14 +50,12 @@ const ProjectTemplate: React.FC<any> = () => {
       template.type = location.tempType.toString();
     }
   }
-
-  const excutionInfo = useRequest(() => loadExcutionSelect()).data;
-  const projectManager = useRequest(() => getAllUsersSelect()).data;
-
+  /* endregion 获取跳转过来的模板，并获取对应数据 */
 
   /* region  联动修改 */
+  const [formForProject] = Form.useForm(); // 上线分支设置
 
-  // 项目执行修改后要修改任务名称
+  // 项目执行修改
   const excutionChanged = async (params: any) => {
     //   获取项目负责人
     const excuteInfo = params.split("&");
@@ -72,7 +64,7 @@ const ProjectTemplate: React.FC<any> = () => {
       projectManager: prjManager.realname
     });
 
-    // 同样修改表格里面的值
+    // 同样修改表格里面的值（任务名称、指派给、所属模块）
     const atferValue: any = [];
     gridData.forEach((ele: any) => {
       atferValue.push({
@@ -86,7 +78,7 @@ const ProjectTemplate: React.FC<any> = () => {
 
   };
 
-// 项目负责人修改后，也要对应修改表格中所属端的指派人
+  // 项目负责人修改后，也要对应修改表格中所属端的指派人
   const projectManagerChanged = (currentValue: any) => {
     const atferValue: any = [];
     gridData.forEach((ele: any) => {
@@ -117,15 +109,13 @@ const ProjectTemplate: React.FC<any> = () => {
 
   /* endregion 联动修改 */
 
+  /* region 任务生成 */
   const [excuteState, setExcuteState] = useState(false);
   // 任务生成按钮
   const builtTask = async () => {
-    debugger;
     setExcuteState(true);
-    // 需要校验空值
     const formData = formForProject.getFieldsValue();
-    console.log(formData);
-    //   调用接口生成
+    // 调用接口生成
     const result = await generateTask(template, formData, gridData);
     if (result) {
       message.error({
@@ -155,23 +145,27 @@ const ProjectTemplate: React.FC<any> = () => {
     history.push('/zentao/templateList');
   };
 
-  // 初始化界面
-  const showPageInfo = async () => {
+  /* endregion 任务生成 */
 
+  /* region  初始化界面 */
+  const excutionInfo = useRequest(() => loadExcutionSelect()).data;
+  const projectManager = useRequest(() => getAllUsersSelect()).data;
+
+  const showPageInfo = async () => {
     formForProject.setFieldsValue({
       belongExcution: "",
       projectManager: "",
       planStart: moment(),
       planEnd: moment()
     });
-
     const tabInfo = await getTempDetails(template.id);
     setGridData(tabInfo);
-  }
-
+  };
   useEffect(() => {
     showPageInfo();
   }, [excutionInfo]);
+
+  /* endregion  初始化界面 */
 
   return (
     <div style={{width: "100%", height: "100%", marginTop: "-20px"}}>

@@ -10,6 +10,8 @@ import {getHeight} from "@/publicMethods/pageSet";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {history} from "@@/core/history";
 import moment from "moment";
+import {loadUserSelect, loadExcutionSelect, getDutyPerson} from "./axiosRequest/requestDataParse";
+import {useRequest} from "ahooks";
 
 const {Option} = Select;
 // 组件初始化
@@ -29,6 +31,13 @@ const CheckBeforeOnline: React.FC<any> = () => {
   };
 
   /* endregion 表格事件 */
+
+  /* 下拉框 */
+  const frontUserInfo = useRequest(() => loadUserSelect("1")).data;
+  const backendUserInfo = useRequest(() => loadUserSelect("2")).data;
+  const testerUserInfo = useRequest(() => loadUserSelect("3")).data;
+  const sqaUserInfo = useRequest(() => loadUserSelect("7")).data;
+  const excutionInfo = useRequest(() => loadExcutionSelect()).data;
 
   /* region 联动选项 */
 
@@ -77,64 +86,68 @@ const CheckBeforeOnline: React.FC<any> = () => {
     //   调用接口生成
   };
 
-  useEffect(() => {
+  const showPageInfo = async () => {
+
+    const dutyInfo = await getDutyPerson();
     formForZentaoTask.setFieldsValue({
       belongExcution: "",
-      assingedToSQA: "",
-      assingedToFront: "",
-      assingedToBackend: "",
-      assingedToTester: "",
+      assingedToSQA: dutyInfo.sqa,
+      assingedToFront: dutyInfo.front,
+      assingedToBackend: dutyInfo.backend,
+      assingedToTester: dutyInfo.test,
       planStart: moment(),
       planEnd: moment()
     });
-
-  });
+  }
+  useEffect(() => {
+    showPageInfo();
+  }, [excutionInfo]);
 
   return (
     <div style={{width: "100%", height: "100%", marginTop: "-20px"}}>
       <Header/>
       <Spin spinning={excuteState} tip="任务生成中，请稍后..." size={"large"}>
-        <div style={{marginTop:5}}>
+        <div style={{marginTop: 5}}>
 
           {/* 条件 */}
-          <div style={{background: 'white', height: 80,paddingTop:4}}>
+          <div style={{background: 'white', height: 80, paddingTop: 4}}>
             <Form form={formForZentaoTask} autoComplete="off" style={{marginLeft: 5}}>
 
               <Row>
                 <Col span={6}>
                   <Form.Item label="所属执行:" name="belongExcution" required={true} style={{marginLeft: 14}}>
-                    <Select defaultValue="lucy" style={{width: '100%'}} allowClear>
-                      <Option value="lucy">Lucy</Option>
+                    <Select style={{width: '100%'}} allowClear>
+                      {excutionInfo}
                     </Select>
                   </Form.Item>
                 </Col>
                 <Col span={6}>
                   <Form.Item label="SQA指派人:" name="assingedToSQA" required={true} style={{marginLeft: 19}}>
-                    <Select defaultValue="lucy" style={{width: '100%'}} allowClear
+                    <Select style={{width: '100%'}} allowClear
                             onChange={(params: any) => {
                               changeAssignedTo("SQA", params);
                             }}>
-                      <Option value="lucy">Lucy</Option>
+                      {sqaUserInfo}
                     </Select>
                   </Form.Item>
                 </Col>
                 <Col span={6}>
                   <Form.Item label="前端指派人:" name="assingedToFront" required={true} style={{marginLeft: 19}}>
-                    <Select defaultValue="lucy" style={{width: '100%'}} allowClear
+                    <Select style={{width: '100%'}} allowClear
                             onChange={(params: any) => {
                               changeAssignedTo("Front", params);
                             }}>
-                      <Option value="lucy">Lucy</Option>
+                      {frontUserInfo}
                     </Select>
                   </Form.Item>
                 </Col>
                 <Col span={6}>
                   <Form.Item label="后端指派人:" name="assingedToBackend" required={true} style={{marginLeft: 5}}>
-                    <Select defaultValue="lucy" style={{width: '100%'}} allowClear
+                    <Select style={{width: '100%'}} allowClear
                             onChange={(params: any) => {
                               changeAssignedTo("Backend", params);
                             }}>
-                      <Option value="lucy">Lucy</Option>
+                      {backendUserInfo}
                     </Select>
                   </Form.Item>
                 </Col>
@@ -142,11 +155,11 @@ const CheckBeforeOnline: React.FC<any> = () => {
               <Row style={{marginTop: -17}}>
                 <Col span={6}>
                   <Form.Item label="测试指派人:" name="assingedToTester" required={true}>
-                    <Select defaultValue="lucy" style={{width: '100%'}} allowClear
+                    <Select style={{width: '100%'}} allowClear
                             onChange={(params: any) => {
                               changeAssignedTo("Tester", params);
                             }}>
-                      <Option value="lucy">Lucy</Option>
+                      {testerUserInfo}
                     </Select>
                   </Form.Item>
                 </Col>

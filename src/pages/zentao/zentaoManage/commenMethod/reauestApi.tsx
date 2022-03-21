@@ -100,6 +100,21 @@ const requestTaskSourceApi = async () => {
   return data;
 };
 
+//  所属执行
+const requestExcutionApi = async () => {
+  let data: any = [];
+  await axios.get('/api/verify/zentao/executions', {params: {execution_type: ""}})
+    .then(function (res) {
+      if (res.data.code === 200) {
+        data = res.data.data;
+      }
+    })
+    .catch(function (error) {
+      console.log("指派人获取失败", error)
+    });
+
+  return data;
+};
 
 export {
   requestAddType,
@@ -108,4 +123,5 @@ export {
   requestTaskTypeApi,
   requestSideApi,
   requestTaskSourceApi,
+  requestExcutionApi
 }

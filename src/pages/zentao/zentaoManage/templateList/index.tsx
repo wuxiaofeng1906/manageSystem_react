@@ -151,10 +151,13 @@ const ZentaoTemplateList: React.FC<any> = () => {
 
     const tempData: any = selRows[0];
     // 不同类型的模板进入不同的生成列表
-    if (tempData.tempName === "上线前检查任务模板") {
-      history.push('/zentao/btForCheckBeforeOnline');
+
+    if (tempData.temp_type === "sprint" || tempData.temp_type === "hotfix"
+      || tempData.temp_type === "auxiliaryReleaseCheck" || tempData.temp_type === "comprehensiveReleaseCheck") {
+
+      history.push(`/zentao/btForCheckBeforeOnline?tempID=${tempData.temp_id}&tempName=${tempData.temp_name}`);
     } else {
-      history.push('/zentao/btForProjectTemplate');
+      history.push(`/zentao/btForProjectTemplate?tempID=${tempData.temp_id}&tempName=${tempData.temp_name}`);
     }
   };
 

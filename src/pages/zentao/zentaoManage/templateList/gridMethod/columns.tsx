@@ -19,6 +19,11 @@ const getTempColumns = () => {
     minWidth: 110,
     pinned: 'left',
   }, {
+    headerName: '模板类型',
+    field: 'temp_type_name',
+    minWidth: 110,
+    pinned: 'left',
+  }, {
     headerName: '包含任务数',
     field: 'count',
     minWidth: 100,

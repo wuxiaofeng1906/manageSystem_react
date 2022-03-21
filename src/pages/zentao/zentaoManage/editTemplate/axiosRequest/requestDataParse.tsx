@@ -22,7 +22,7 @@ const getTemTypeSelect = async () => {
     const selectValue: any = [];
     types.forEach((ele: any) => {
       selectValue.push(
-        <Option key={ele.temp_type} value={`${ele.temp_type}&${ele.temp_type_name}`}> {ele.temp_type_name} </Option>)
+        <Option key={ele.temp_type} value={`${ele.temp_type}`}> {ele.temp_type_name} </Option>)
     });
     return selectValue;
   }
@@ -156,7 +156,7 @@ const analysisGridData = async (data: any, tempInfo: any) => {
   const side = await convertSideToID(); // 增加类型
   const taskSource = await convertTaskSourceToID(); // 增加类型
   const saveDt: any = [];
-  debugger;
+
   data.forEach((ele: any) => {
 
     // subtask_id、task_id、parent 这三个字段如果没有值，则不传字段到后端，其他字段为空的时候都传空字符串
@@ -174,11 +174,13 @@ const analysisGridData = async (data: any, tempInfo: any) => {
       "tasksource": ele.tasksource_name === undefined ? "" : taskSource[ele.tasksource_name],
       "is_tailoring": ele.is_tailoring === "是" ? "yes" : ele.is_tailoring === "yes" ? "yes" : "no",
       "edit_user": usersInfo.name,
-      "temp_id": tempInfo.id,
       "temp_name": tempInfo.name,
       "temp_type": tempInfo.type,
     };
 
+    if (tempInfo.id) {
+      detailsData["temp_id"] = tempInfo.id;
+    }
     if (ele.subtask_id) {
       detailsData["subtask_id"] = ele.subtask_id;
     }
@@ -202,8 +204,8 @@ const saveTempList = async (data: any, tempInfo: any) => {
     return "保存的数据不能为空！"
   }
   const finValue = await analysisGridData(data, tempInfo)
-  // const saveResult = await requestSaveTempleListApi(finValue);
-  return "";
+  const saveResult = await requestSaveTempleListApi(finValue);
+  return saveResult;
 };
 
 export {

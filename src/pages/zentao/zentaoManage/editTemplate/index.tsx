@@ -119,6 +119,11 @@ const EditTemplateList: React.FC<any> = () => {
   (window as any).addTemplateRow = async (rowIndex: any, rowData: any) => {
     const addData = columnsAdd(rowIndex, rowData, gridData);
     gridApi.current?.updateRowData({ add: [addData.row], addIndex: addData.position });
+    gridDataState.length = 0;
+    gridApi.current?.forEachNode((node: any) => {
+      gridDataState.push(node.data);
+    });
+
   };
 
   /* endregion 数据导入和新增 */
@@ -231,7 +236,7 @@ const EditTemplateList: React.FC<any> = () => {
       });
       return;
     }
-    debugger;
+
     const gridDatas: any = [];
 
     // 遍历列表中的数据
@@ -241,7 +246,7 @@ const EditTemplateList: React.FC<any> = () => {
     const tempInfo = {
       id: template.id,
       name: tempInfos.tempName,
-      type: tempInfos.tempType.split('&')[0],
+      type: tempInfos.tempType,
     };
     const messages = await saveTempList(gridDatas, tempInfo);
     if (messages) {
@@ -475,7 +480,8 @@ const EditTemplateList: React.FC<any> = () => {
                   // return cutRenderer(props.value);
                 },
               }}
-            ></AgGridReact>
+            >
+            </AgGridReact>
           </div>
         </div>
 

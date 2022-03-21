@@ -211,9 +211,9 @@ const EditTemplateList: React.FC<any> = () => {
   /* endregion  删除行 */
 
   const gridSelectChanged = (index: number, filed: string, value: any) => {
+    debugger;
     gridDataState[index][filed] = value;
     gridApi.current?.refreshCells({force: true});
-    debugger;
     if (filed === "is_tailoring") {
       gridApi.current?.setRowData(gridDataState);
     }
@@ -282,6 +282,10 @@ const EditTemplateList: React.FC<any> = () => {
         tempName: template.name,
         tempType: template.type,
       });
+    } else {
+      //   如果为空，则要设置一行
+      setGridData([{add_type_name: "新增"}]);
+      gridDataState = [{add_type_name: "新增"}];
     }
   };
   useEffect(() => {
@@ -464,6 +468,11 @@ const EditTemplateList: React.FC<any> = () => {
                   );
                   // return cutRenderer(props.value);
                 },
+              }}
+              onCellEditingStopped={(params: any) => {
+                gridDataState[params.rowIndex][params.colDef.field] = params.newValue;
+                gridApi.current?.refreshCells({force: true});
+
               }}
             >
             </AgGridReact>

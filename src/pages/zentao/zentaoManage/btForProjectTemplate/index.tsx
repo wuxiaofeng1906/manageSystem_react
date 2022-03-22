@@ -17,6 +17,9 @@ import {
 import {generateTask} from "./axiosRequest/requestDataParse";
 
 const {Option} = Select;
+// 表格中的下拉框和时间选择器在渲染时调用不到state中的gridData数据，只能定义一个全局变量用于表格中的控件值的变化。
+let gridDataForTableComponent: any = []; // gridDataForTableComponent 必须一直等于useState中的gridData值。意味着每一个setGridData后面都需要给gridDataForTableComponent赋一个最新的值
+
 // 组件初始化
 const ProjectTemplate: React.FC<any> = () => {
 
@@ -75,7 +78,7 @@ const ProjectTemplate: React.FC<any> = () => {
       });
     });
     setGridData(atferValue);
-
+    gridDataForTableComponent = atferValue;
   };
 
   // 项目负责人修改后，也要对应修改表格中所属端的指派人
@@ -85,6 +88,8 @@ const ProjectTemplate: React.FC<any> = () => {
       atferValue.push({...ele, assigned_person_name: currentValue});
     });
     setGridData(atferValue);
+    gridDataForTableComponent = atferValue;
+
   };
 
   // 预计开始
@@ -95,6 +100,8 @@ const ProjectTemplate: React.FC<any> = () => {
       atferValue.push({...ele, plan_start: values});
     });
     setGridData(atferValue);
+    gridDataForTableComponent = atferValue;
+
   };
 
   // 预计结束
@@ -105,9 +112,54 @@ const ProjectTemplate: React.FC<any> = () => {
       atferValue.push({...ele, plan_end: values});
     });
     setGridData(atferValue);
+    gridDataForTableComponent = atferValue;
   };
 
   /* endregion 联动修改 */
+
+  /* region 表格中的时间选择修改和下拉框值 */
+  const planTimeChanged = (props: any, timeValue: any) => {
+
+    const modifiedValue: any = [];
+    if (gridDataForTableComponent.length > 0) {
+      gridDataForTableComponent.forEach((rows: any, index: number) => {
+        if (index === props.rowIndex) { // 将被修改行的对应字段（预计时间）的值修改了。
+          modifiedValue.push({
+            ...rows,
+            [props.column.colId]: timeValue  // props.column.colId 可能为plan_start 和 plan_end 表示预计开始和预计截至
+          });
+        } else {
+          modifiedValue.push(rows);
+        }
+      });
+    }
+
+    setGridData(modifiedValue);
+    gridDataForTableComponent = modifiedValue;
+  };
+
+  // 是否裁剪下拉框h值的变化
+  const setGridCutValue = (rowIndex: number, selectedValue: any) => {
+    const modifiedValue: any = [];
+    if (gridDataForTableComponent.length > 0) {
+      gridDataForTableComponent.forEach((rows: any, index: number) => {
+        if (index === rowIndex) { // 将被修改行的对应字段（是否裁剪）的值修改了。
+          modifiedValue.push({
+            ...rows,
+            "is_tailoring": selectedValue
+          });
+        } else {
+          modifiedValue.push(rows);
+        }
+
+      });
+    }
+
+    setGridData(modifiedValue);
+    gridDataForTableComponent = modifiedValue;
+  };
+
+  /* endregion 表格中的时间选择修改和下拉框值 */
 
   /* region 任务生成 */
   const [excuteState, setExcuteState] = useState(false);
@@ -115,6 +167,7 @@ const ProjectTemplate: React.FC<any> = () => {
   const builtTask = async () => {
     setExcuteState(true);
     const formData = formForProject.getFieldsValue();
+    debugger;
     // 调用接口生成
     const result = await generateTask(template, formData, gridData);
     if (result) {
@@ -160,6 +213,8 @@ const ProjectTemplate: React.FC<any> = () => {
     });
     const tabInfo = await getTempDetails(template.id);
     setGridData(tabInfo);
+    gridDataForTableComponent = tabInfo;
+
   };
   useEffect(() => {
     showPageInfo();
@@ -223,6 +278,15 @@ const ProjectTemplate: React.FC<any> = () => {
                 suppressRowTransform={true}
                 onGridReady={onGridReady}
                 frameworkComponents={{
+                  timeRender: (props: any) => {
+                    return (<DatePicker
+                      allowClear={false} size={'small'}
+                      defaultValue={moment(props.value)} bordered={false}
+                      onChange={(params: any, value: any) => {
+                        planTimeChanged(props, value)
+                      }}
+                    />);
+                  },
                   cutRender: (props: any) => {
                     // return props.value;
                     return (
@@ -232,8 +296,7 @@ const ProjectTemplate: React.FC<any> = () => {
                         bordered={false}
                         style={{width: '100%'}}
                         onChange={(selectedValue: any) => {
-                          // gridSelectChanged(props.rowIndex, 'is_tailoring', selectedValue);
-                        }}
+                          setGridCutValue(props.rowIndex, selectedValue);                        }}
                       >
                         <Option key={'yes'} value={'yes'}>{'是'}</Option>
                         <Option key={'no'} value={'no'}>{'否'}</Option>

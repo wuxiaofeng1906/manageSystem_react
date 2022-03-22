@@ -1,7 +1,7 @@
 const getProjectColumns = () => {
   const column: any = [{
     headerName: '序号',
-    minWidth: 70,
+    minWidth: 60,
     maxWidth: 80,
     pinned: 'left',
     cellRenderer: (params: any) => {
@@ -10,7 +10,7 @@ const getProjectColumns = () => {
   }, {
     headerName: '增加类型',
     field: 'add_type_name',
-    minWidth: 120,
+    minWidth: 100,
   }, {
     headerName: '任务名称',
     field: 'task_name',
@@ -36,17 +36,17 @@ const getProjectColumns = () => {
   }, {
     headerName: '预计开始',
     field: 'plan_start',
-    minWidth: 110,
-    editable: true,
+    minWidth: 150,
+    cellRenderer: "timeRender"
   }, {
     headerName: '预计截至',
     field: 'plan_end',
     minWidth: 110,
-    editable: true,
+    cellRenderer: "timeRender"
   }, {
     headerName: '优先级',
     field: 'priority',
-    minWidth: 100,
+    minWidth: 80,
   }, {
     headerName: '任务类型',
     field: 'task_type_name',

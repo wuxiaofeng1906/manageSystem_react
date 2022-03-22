@@ -71,8 +71,7 @@ const getTaskColumns = () => {
     headerName: '是否裁剪',
     field: 'is_tailoring',
     minWidth: 90,
-    cellRenderer: "cutRender",
-    pinned: 'right',
+    cellRenderer: "cutRender"
   }];
   return column;
 };

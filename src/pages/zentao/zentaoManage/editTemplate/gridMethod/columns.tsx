@@ -1,3 +1,18 @@
+const headerRender = {
+  menuIcon: 'fa-bars',
+  template: `<div class="ag-cell-label-container" role="presentation">
+                    <span ref="eMenu" class="ag-header-icon ag-header-cell-menu-button"></span>
+                    <div ref="eLabel" class="ag-header-cell-label" role="presentation">
+                        <span ref="eSortOrder" class="ag-header-icon ag-sort-order" ></span>
+                        <span ref="eSortAsc" class="ag-header-icon ag-sort-ascending-icon" ></span>
+                        <span ref="eSortDesc" class="ag-header-icon ag-sort-descending-icon" ></span>
+                        <span ref="eSortNone" class="ag-header-icon ag-sort-none-icon" ></span>
+                        <span ref="eText" class="ag-header-cell-text" role="columnheader"></span>
+                        <label style="color: red;margin-left: 3px">*</label>
+                        <span ref="eFilter" class="ag-header-icon ag-filter-icon"></span>
+                    </div>
+                </div>`,
+};
 const getTempColumns = () => {
   const column: any = [{
     headerName: '',
@@ -17,9 +32,11 @@ const getTempColumns = () => {
     headerName: '增加类型',
     field: 'add_type_name',
     minWidth: 110,
-    cellRenderer: "addTypeRender"
+    cellRenderer: "addTypeRender",
+    headerComponentParams: headerRender,
   }, {
     headerName: '任务名称',
+    headerComponentParams: headerRender,
     field: 'task_name',
     minWidth: 100,
     editable: true,
@@ -47,15 +64,18 @@ const getTempColumns = () => {
   }, {
     headerName: '优先级',
     field: 'priority',
+    headerComponentParams: headerRender,
     minWidth: 90,
     cellRenderer: "priorityRender"
   }, {
     headerName: '任务类型',
+    headerComponentParams: headerRender,
     field: 'task_type_name',
     minWidth: 110,
     cellRenderer: "taskTypeRender"
   }, {
     headerName: '最初预计',
+    headerComponentParams: headerRender,
     field: 'estimate',
     minWidth: 90,
     editable: true,
@@ -67,15 +87,18 @@ const getTempColumns = () => {
   }, {
     headerName: '所属端',
     field: 'belongs_name',
+    headerComponentParams: headerRender,
     minWidth: 110,
     cellRenderer: "belongsSideRender"
   }, {
     headerName: '任务来源',
+    headerComponentParams: headerRender,
     field: 'tasksource_name',
     minWidth: 120,
     cellRenderer: "taskSourceRender"
   }, {
     headerName: '是否裁剪',
+    headerComponentParams: headerRender,
     field: 'is_tailoring',
     minWidth: 100,
     cellRenderer: "cutRender"

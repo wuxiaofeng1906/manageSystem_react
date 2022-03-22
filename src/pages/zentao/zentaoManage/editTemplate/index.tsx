@@ -296,7 +296,7 @@ const EditTemplateList: React.FC<any> = () => {
 
   return (
     <div style={{width: '100%', height: '100%', marginTop: '-20px'}}>
-      <Header/>
+      <Header templateInfo={template}/>
       <div className={'content'} style={{marginTop: 5}}>
         <div style={{background: 'white', height: 36, paddingTop: 2}}>
           <Form form={formForTemplate} autoComplete="off" style={{marginLeft: 5}}>

@@ -3,7 +3,7 @@ import {Breadcrumb, PageHeader} from "antd";
 import {Link} from "react-router-dom";
 
 const Header: React.FC<any> = (props: any) => {
-debugger;
+
   const breadcrumbItems = [
     <Breadcrumb.Item key="禅道管理">禅道管理</Breadcrumb.Item>,
     <Breadcrumb.Item key="禅道管理Details">

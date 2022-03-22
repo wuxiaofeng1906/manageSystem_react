@@ -34,7 +34,9 @@ const selectOptions = {
   side: [],
   taskSource: [],
 };
-let gridDataState: any;
+// 表格中的下拉框在渲染时调用不到state中的gridData数据，只能定义一个全局变量用于表格中的控件值的变化。
+let gridDataForTableComponent: any = []; // gridDataForTableComponent 必须一直等于useState中的gridData值。意味着每一个setGridData后面都需要给gridDataForTableComponent赋一个最新的值
+
 // 组件初始化
 const EditTemplateList: React.FC<any> = () => {
   /* region 表格事件 */
@@ -100,8 +102,9 @@ const EditTemplateList: React.FC<any> = () => {
       gridApi.current?.forEachNode((node: any) => {
         oraData.push(node.data);
       });
-      gridDataState = oraData.concat(newDatas);
+
       setGridData(oraData.concat(newDatas));
+      gridDataForTableComponent = oraData.concat(newDatas);
     });
   };
 
@@ -109,9 +112,9 @@ const EditTemplateList: React.FC<any> = () => {
   (window as any).addTemplateRow = async (rowIndex: any, rowData: any) => {
     const addData = columnsAdd(rowIndex, rowData, gridData);
     gridApi.current?.updateRowData({add: [addData.row], addIndex: addData.position});
-    gridDataState.length = 0;
+    gridDataForTableComponent.length = 0;
     gridApi.current?.forEachNode((node: any) => {
-      gridDataState.push(node.data);
+      gridDataForTableComponent.push(node.data);
     });
 
   };
@@ -183,6 +186,12 @@ const EditTemplateList: React.FC<any> = () => {
     }
 
     gridApi.current?.updateRowData({remove: isdelModalVisible.cu_delData});
+    // 这里还需要重置 gridDataForTableComponent
+    gridDataForTableComponent.length = 0; // 清除之前的数据
+    gridApi.current?.forEachNode((node: any) => {
+      gridDataForTableComponent.push(node.data);
+    });
+
     setIsDelModalVisible({
       showFalg: false,
       db_delData: '', // 需要从数据库删除的数据
@@ -201,15 +210,17 @@ const EditTemplateList: React.FC<any> = () => {
   /* endregion  删除行 */
 
   /* region 模板保存 */
-  const gridSelectChanged = (index: number, filed: string, value: any) => {
+  const [formForTemplate] = Form.useForm();
 
-    gridDataState[index][filed] = value;
+  // 表格中数据变化
+  const gridSelectChanged = (index: number, filed: string, value: any) => {
+    gridDataForTableComponent[index][filed] = value; // 修改对应的字段的值。
     gridApi.current?.refreshCells({force: true});
     if (filed === "is_tailoring") {
-      gridApi.current?.setRowData(gridDataState);
+      gridApi.current?.setRowData(gridDataForTableComponent);
     }
   };
-  const [formForTemplate] = Form.useForm();
+
   // 保存编辑后的模板
   const saveTemplate = async () => {
     // 需要校验模版名称不能为空
@@ -278,7 +289,7 @@ const EditTemplateList: React.FC<any> = () => {
     if (template.id) {
       const dt = await getTemplateDetails(template.id);
       setGridData(dt);
-      gridDataState = dt;
+      gridDataForTableComponent = dt;
       formForTemplate.setFieldsValue({
         tempName: template.name,
         tempType: `${template.type}&${template.type_name}`,
@@ -286,7 +297,7 @@ const EditTemplateList: React.FC<any> = () => {
     } else {
       //   如果为空，则要设置一行
       setGridData([{add_type_name: "新增"}]);
-      gridDataState = [{add_type_name: "新增"}];
+      gridDataForTableComponent = [{add_type_name: "新增"}];
     }
   };
   useEffect(() => {
@@ -352,11 +363,7 @@ const EditTemplateList: React.FC<any> = () => {
               columnDefs={getTempColumns()} // 定义列
               rowData={gridData} // 数据绑定
               defaultColDef={{
-                resizable: true,
-                sortable: true,
-                filter: true,
-                suppressMenu: true,
-                cellStyle: {'line-height': '28px'},
+                resizable: true, suppressMenu: true, cellStyle: {'line-height': '28px'}
               }}
               rowHeight={28}
               headerHeight={30}
@@ -367,10 +374,8 @@ const EditTemplateList: React.FC<any> = () => {
                 addTypeRender: (props: any) => {
                   return (
                     <Select
-                      size={'small'}
-                      defaultValue={props.value}
-                      bordered={false}
-                      style={{width: '100%'}}
+                      size={'small'} defaultValue={props.value}
+                      bordered={false} style={{width: '120%'}}
                       onChange={(currentValue: any) => {
                         gridSelectChanged(props.rowIndex, 'add_type_name', currentValue);
                       }}
@@ -382,11 +387,8 @@ const EditTemplateList: React.FC<any> = () => {
                 assignedToRender: (props: any) => {
                   return (
                     <Select
-                      size={'small'}
-                      defaultValue={props.value}
-                      bordered={false}
-                      style={{width: '100%'}}
-                      showSearch
+                      size={'small'} defaultValue={props.value}
+                      bordered={false} style={{width: '120%'}} showSearch
                       onChange={(currentValue: any) => {
                         gridSelectChanged(props.rowIndex, 'assigned_person_name', currentValue);
                       }}
@@ -398,10 +400,8 @@ const EditTemplateList: React.FC<any> = () => {
                 priorityRender: (props: any) => {
                   return (
                     <Select
-                      size={'small'}
-                      defaultValue={props.value}
-                      bordered={false}
-                      style={{width: '100%'}}
+                      size={'small'} defaultValue={props.value}
+                      bordered={false} style={{width: '120%'}}
                       onChange={(currentValue: any) => {
                         gridSelectChanged(props.rowIndex, 'priority', currentValue);
                       }}
@@ -413,11 +413,8 @@ const EditTemplateList: React.FC<any> = () => {
                 taskTypeRender: (props: any) => {
                   return (
                     <Select
-                      size={'small'}
-                      defaultValue={props.value}
-                      bordered={false}
-                      showSearch
-                      style={{width: '100%'}}
+                      size={'small'} defaultValue={props.value}
+                      bordered={false} showSearch style={{width: '120%'}}
                       onChange={(currentValue: any) => {
                         gridSelectChanged(props.rowIndex, 'task_type_name', currentValue);
                       }}
@@ -429,10 +426,8 @@ const EditTemplateList: React.FC<any> = () => {
                 belongsSideRender: (props: any) => {
                   return (
                     <Select
-                      size={'small'}
-                      defaultValue={props.value}
-                      bordered={false}
-                      style={{width: '100%'}}
+                      size={'small'} defaultValue={props.value}
+                      bordered={false} style={{width: '120%'}}
                       onChange={(currentValue: any) => {
                         gridSelectChanged(props.rowIndex, 'belongs_name', currentValue);
                       }}
@@ -444,10 +439,8 @@ const EditTemplateList: React.FC<any> = () => {
                 taskSourceRender: (props: any) => {
                   return (
                     <Select
-                      size={'small'}
-                      defaultValue={props.value}
-                      bordered={false}
-                      style={{width: '100%'}}
+                      size={'small'} defaultValue={props.value}
+                      bordered={false} style={{width: '120%'}}
                       onChange={(currentValue: any) => {
                         gridSelectChanged(props.rowIndex, 'tasksource_name', currentValue);
                       }}
@@ -460,10 +453,8 @@ const EditTemplateList: React.FC<any> = () => {
                 cutRender: (props: any) => {
                   return (
                     <Select
-                      size={'small'}
-                      defaultValue={props.value}
-                      bordered={false}
-                      style={{width: '100%'}}
+                      size={'small'} defaultValue={props.value}
+                      bordered={false} style={{width: '120%'}}
                       onChange={(selectedValue: any) => {
                         gridSelectChanged(props.rowIndex, 'is_tailoring', selectedValue);
                       }}
@@ -472,12 +463,12 @@ const EditTemplateList: React.FC<any> = () => {
                       <Option key={'no'} value={'no'}>{'否'}</Option>
                     </Select>
                   );
-                  // return cutRenderer(props.value);
                 },
               }}
               onCellEditingStopped={(params: any) => {
-                gridDataState[params.rowIndex][params.colDef.field] = params.newValue;
-                gridApi.current?.refreshCells({force: true});
+                gridSelectChanged(params.rowIndex, params.colDef.field, params.newValue);
+                // gridSelectChanged[params.rowIndex][params.colDef.field] = params.newValue;
+                // gridApi.current?.refreshCells({force: true});
 
               }}
             >

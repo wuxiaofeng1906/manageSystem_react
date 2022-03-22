@@ -16,7 +16,7 @@ const getTempColumns = () => {
   }, {
     headerName: '增加类型',
     field: 'add_type_name',
-    minWidth: 120,
+    minWidth: 110,
     cellRenderer: "addTypeRender"
   }, {
     headerName: '任务名称',
@@ -42,7 +42,7 @@ const getTempColumns = () => {
   }, {
     headerName: '指派给',
     field: 'assigned_person_name',
-    minWidth: 90,
+    minWidth: 110,
     cellRenderer: "assignedToRender"
   }, {
     headerName: '优先级',
@@ -57,7 +57,7 @@ const getTempColumns = () => {
   }, {
     headerName: '最初预计',
     field: 'estimate',
-    minWidth: 100,
+    minWidth: 90,
     editable: true,
   }, {
     headerName: '任务描述',
@@ -67,17 +67,17 @@ const getTempColumns = () => {
   }, {
     headerName: '所属端',
     field: 'belongs_name',
-    minWidth: 90,
+    minWidth: 110,
     cellRenderer: "belongsSideRender"
   }, {
     headerName: '任务来源',
     field: 'tasksource_name',
-    minWidth: 90,
+    minWidth: 120,
     cellRenderer: "taskSourceRender"
   }, {
     headerName: '是否裁剪',
     field: 'is_tailoring',
-    minWidth: 90,
+    minWidth: 100,
     cellRenderer: "cutRender"
   }, {
     headerName: '操作',

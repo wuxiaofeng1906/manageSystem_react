@@ -7,6 +7,7 @@ import {
 } from './component';
 import {excuteDistributeOperate, saveDistributeOperate} from './excute';
 import {getDistributeDetails, getExcuteLogs} from './axiosRequest';
+import dayjs from "dayjs";
 
 const {SHOW_PARENT} = TreeSelect;
 let performID = -1; // 用于记录全局的保存记录ID，在页面加载时和保存后赋值，保存和执行时需要使用
@@ -61,6 +62,7 @@ const PeopleExcuteSetting: React.FC<any> = () => {
   const getLogData: any = async (distributionNum: string) => {
 
     const logResult = await getExcuteLogs(distributionNum);
+    console.log(`执行结果获取：${dayjs().format("YYYY-MM-DD hh:mm:SSS")}`, logResult);
     if (JSON.stringify(logResult) !== "{}" && (logResult?.data).length > 0) {
       return logResult?.data;
     }

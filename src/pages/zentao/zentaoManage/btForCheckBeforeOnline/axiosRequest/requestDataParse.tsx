@@ -91,20 +91,24 @@ const getTempDetails = async (tempId: string, assignedTo: any) => {
   const tempList = await getTemplateDetails(tempId);
   const returnValue: any = [];
   if (tempList && tempList.length > 0) {
-
     tempList.forEach((ele: any) => {
       const newDts = ele;
       newDts["plan_start"] = dayjs().format("YYYY-MM-DD");
       newDts["plan_end"] = dayjs().format("YYYY-MM-DD");
-      // 判断指派给的是哪个端的，是哪个端的就去取哪个端的值班人员。
+      // 判断指派给的是哪个端的，是哪个端的就去取哪个端的值班人员。如果所取那个端的人员为空，则显示模板编辑时候的默认值。
       if (newDts.belongs_name === "前端") {
-        newDts["assigned_person_name"] = assignedTo.front;
+        if (assignedTo.front) { // 有值班人员才取值，没有的话还是使用原始值。
+          newDts["assigned_person_name"] = assignedTo.front;
+        }
       } else if (newDts.belongs_name === "后端") {
-        newDts["assigned_person_name"] = assignedTo.backend;
+        if (assignedTo.backend) {
+          newDts["assigned_person_name"] = assignedTo.backend;
+        }
       } else if (newDts.belongs_name === "测试") {
-        newDts["assigned_person_name"] = assignedTo.test;
+        if (assignedTo.test) {
+          newDts["assigned_person_name"] = assignedTo.test;
+        }
       }
-
       returnValue.push(newDts);
     });
   }

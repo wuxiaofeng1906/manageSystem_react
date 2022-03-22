@@ -12,6 +12,7 @@ import {DeleteTwoTone, FolderAddTwoTone, ProfileTwoTone, DownloadOutlined} from 
 import {history} from "@@/core/history";
 import {getTemplateList, deleteTemplate} from './axiosRequest/requestDataParse';
 import {useRequest} from "ahooks";
+import {downloadTemplateToExcel} from "./export";
 
 
 // 组件初始化
@@ -179,13 +180,7 @@ const ZentaoTemplateList: React.FC<any> = () => {
       });
       return;
     }
-
-    let tempList = "";
-    selRows.forEach((ele: any) => {
-      tempList = ele;
-    });
-
-    console.log(tempList);
+    downloadTemplateToExcel(selRows);
   };
 
   /* endregion 下载模板 */

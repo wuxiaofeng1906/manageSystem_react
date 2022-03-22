@@ -151,6 +151,7 @@ const deleteTemplateList = async (subtaskId: string) => {
 
 // 解析需要保存的数据
 const analysisGridData = async (data: any, tempInfo: any) => {
+  debugger;
 
   const addType = await convertAddTypeToID(); // 增加类型
   const users = await convertUserNameToID(); // 增加类型
@@ -177,7 +178,7 @@ const analysisGridData = async (data: any, tempInfo: any) => {
       "is_tailoring": ele.is_tailoring === "是" ? "yes" : ele.is_tailoring === "yes" ? "yes" : "no",
       "edit_user": usersInfo.name,
       "temp_name": tempInfo.name,
-      "temp_type": tempInfo.type,
+      "temp_type": (tempInfo.type).split("&")[0],
     };
 
     if (tempInfo.id) {

@@ -50,8 +50,10 @@ const EditTemplateList: React.FC<any> = () => {
       template.id = location.tempId.toString();
     }
     if (location.tempType) {
-      template.type = ((location.tempType).toString()).split("|")[0].toString();
-      template.type_name = ((location.tempType).toString()).split("|")[1].toString();
+      if (((location.tempType).toString()).split("|")[0]) {
+        template.type = ((location.tempType).toString()).split("|")[0].toString();
+        template.type_name = ((location.tempType).toString()).split("|")[1].toString();
+      }
     }
   }
 

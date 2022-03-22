@@ -10,7 +10,7 @@ import {
   convertAddTypeToID, convertUserNameToID, convertTaskTypeToID,
   convertSideToID, convertTaskSourceToID
 } from "../../commenMethod/valueExchange";
-import {Select} from "antd";
+import {message, Select} from "antd";
 
 const {Option} = Select;
 const userLogins: any = localStorage.getItem('userLogins');
@@ -151,7 +151,6 @@ const deleteTemplateList = async (subtaskId: string) => {
 
 // 解析需要保存的数据
 const analysisGridData = async (data: any, tempInfo: any) => {
-  debugger;
 
   const addType = await convertAddTypeToID(); // 增加类型
   const users = await convertUserNameToID(); // 增加类型
@@ -167,12 +166,12 @@ const analysisGridData = async (data: any, tempInfo: any) => {
       "add_type": ele.add_type_name === undefined ? "" : addType[ele.add_type_name],
       "task_type": ele.task_type_name === undefined ? "" : taskType[ele.task_type_name],
       "task_name": ele.task_name,
-      "module": ele.module,
-      "subtask_dev_needs": ele.subtask_dev_needs,
-      "assigned_person": ele.assigned_person_name === undefined ? "" : users[ele.assigned_person_name],
+      "module": ele.module === undefined ? "" : ele.module,
+      "subtask_dev_needs": ele.subtask_dev_needs === undefined ? "" : ele.subtask_dev_needs,
+      "assigned_person": ele.assigned_person_name === undefined ? "" : users[ele.assigned_person_name] === undefined ? "" : users[ele.assigned_person_name],
       "priority": ele.priority,
       "estimate": ele.estimate,
-      "desc": ele.desc,
+      "desc": ele.desc === undefined ? "" : ele.desc,
       "belongs": ele.belongs_name === undefined ? "" : side[ele.belongs_name],
       "tasksource": ele.tasksource_name === undefined ? "" : taskSource[ele.tasksource_name],
       "is_tailoring": ele.is_tailoring === "是" ? "yes" : ele.is_tailoring === "yes" ? "yes" : "no",
@@ -201,6 +200,66 @@ const analysisGridData = async (data: any, tempInfo: any) => {
 
 };
 
+// 验证保存的数据
+const vertifySaveData = (gridData: any, tempInfos: any) => {
+
+  if (!tempInfos.tempName) {
+    return "模板名称不能为空!";
+  }
+
+  if (!tempInfos.tempType) {
+    return "模板类型不能为空!";
+  }
+
+  let vertifyMsg = "";
+  // 表格中 增加类型、任务名称、优先级、任务类型、最初预计、所属端、任务来源
+  if (gridData && gridData.length > 0) {
+    for (let index = 0; index < gridData.length; index += 1) {
+      const dts = gridData[index];
+      if (!dts.add_type_name) {
+        vertifyMsg = `表格中第【${index + 1}】行的【增加类型】不能为空!`;
+        break;
+      }
+      if (!dts.task_name) {
+        vertifyMsg = `表格中第【${index + 1}】行的【任务名称】不能为空!`;
+        break;
+      }
+      if (!dts.priority) {
+        vertifyMsg = `表格中第【${index + 1}】行的【优先级】不能为空!`;
+        break;
+      }
+      if (!dts.task_type_name) {
+        vertifyMsg = `表格中第【${index + 1}】行的【任务类型】不能为空!`;
+        break;
+      }
+      if (!dts.estimate) {
+        vertifyMsg = `表格中第【${index + 1}】行的【最初预计】不能为空!`;
+        break;
+      }
+      if (dts.estimate) {
+        if (Number(dts.estimate).toString() === "NaN") {
+          vertifyMsg = `表格中第【${index + 1}】行的【最初预计】必须为数字！`;
+          break;
+        }
+      }
+      if (!dts.belongs_name) {
+        vertifyMsg = `表格中第【${index + 1}】行的【所属端】不能为空!`;
+        break;
+      }
+      if (!dts.tasksource_name) {
+        vertifyMsg = `表格中第【${index + 1}】行的【任务来源】不能为空!`;
+        break;
+      }
+      // if (!dts.is_tailoring) {
+      //   vertifyMsg = `表格中第【${index + 1}】行的【是否裁剪】不能为空!`;
+      //   break;
+      // }
+    }
+  }
+
+  return vertifyMsg;
+};
+
 // 保存模板编辑列表
 const saveTempList = async (data: any, tempInfo: any) => {
   if (!data || data.length === 0) {
@@ -212,7 +271,8 @@ const saveTempList = async (data: any, tempInfo: any) => {
   return saveResult;
 };
 
+
 export {
   getTemTypeSelect, getAddTypeSelect, getAssignedToSelect, getPrioritySelect,
-  getTaskTypeSelect, getSideSelect, getTaskSourceSelect, deleteTemplateList, saveTempList
+  getTaskTypeSelect, getSideSelect, getTaskSourceSelect, deleteTemplateList, vertifySaveData, saveTempList
 }

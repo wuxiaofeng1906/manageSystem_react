@@ -12,14 +12,9 @@ import {getHeight} from '@/publicMethods/pageSet';
 import {history} from '@@/core/history';
 import {loadExcelData, getGridDataFromExcel} from './import';
 import {
-  getTemTypeSelect,
-  getAddTypeSelect,
-  getAssignedToSelect,
-  getPrioritySelect,
-  getTaskTypeSelect,
-  getSideSelect,
-  getTaskSourceSelect,
-  deleteTemplateList,
+  getTemTypeSelect, getAddTypeSelect, getAssignedToSelect,
+  getPrioritySelect, getTaskTypeSelect, getSideSelect,
+  getTaskSourceSelect, deleteTemplateList, vertifySaveData,
   saveTempList,
 } from './axiosRequest/requestDataParse';
 import {getTemplateDetails} from './gridMethod/girdData';
@@ -214,41 +209,37 @@ const EditTemplateList: React.FC<any> = () => {
 
   // 表格中数据变化
   const gridSelectChanged = (index: number, filed: string, value: any) => {
-    gridDataForTableComponent[index][filed] = value; // 修改对应的字段的值。
-    gridApi.current?.refreshCells({force: true});
-    if (filed === "is_tailoring") {
-      gridApi.current?.setRowData(gridDataForTableComponent);
+    if (index && filed) {
+      gridDataForTableComponent[index][filed] = value; // 修改对应的字段的值。
+      // gridApi.current?.refreshCells({force: true});
+      if (filed === "is_tailoring") {
+        gridApi.current?.setRowData(gridDataForTableComponent);
+      }
     }
+
   };
 
   // 保存编辑后的模板
   const saveTemplate = async () => {
-    // 需要校验模版名称不能为空
-    const tempInfos = formForTemplate.getFieldsValue();
-
-    if (!tempInfos.tempName) {
-      message.error({
-        content: `模板名称不能为空！`,
-        duration: 1, // 1S 后自动关闭
-        style: {marginTop: '50vh'},
-      });
-      return;
-    }
-    if (!tempInfos.tempType) {
-      message.error({
-        content: `模板类型不能为空！`,
-        duration: 1, // 1S 后自动关闭
-        style: {marginTop: '50vh'},
-      });
-      return;
-    }
 
     const gridDatas: any = [];
-
     // 遍历列表中的数据
     gridApi.current?.forEachNode((node: any) => {
       gridDatas.push(node.data);
     });
+    // 需要校验模版名称不能为空
+    const tempInfos = formForTemplate.getFieldsValue();
+    // 验证数据
+    const vertifyMessage = vertifySaveData(gridDatas, tempInfos);
+    if (vertifyMessage) {
+      message.error({
+        content: `错误：${vertifyMessage}`,
+        duration: 1,
+        style: {marginTop: '50vh'},
+      });
+      return;
+    }
+
     const tempInfo = {
       id: template.id,
       name: tempInfos.tempName,
@@ -451,9 +442,13 @@ const EditTemplateList: React.FC<any> = () => {
                   );
                 },
                 cutRender: (props: any) => {
+                  let currentValue = props.value
+                  if (!currentValue) {
+                    currentValue = "否"
+                  }
                   return (
                     <Select
-                      size={'small'} defaultValue={props.value}
+                      size={'small'} defaultValue={currentValue}
                       bordered={false} style={{width: '120%'}}
                       onChange={(selectedValue: any) => {
                         gridSelectChanged(props.rowIndex, 'is_tailoring', selectedValue);
@@ -467,9 +462,6 @@ const EditTemplateList: React.FC<any> = () => {
               }}
               onCellEditingStopped={(params: any) => {
                 gridSelectChanged(params.rowIndex, params.colDef.field, params.newValue);
-                // gridSelectChanged[params.rowIndex][params.colDef.field] = params.newValue;
-                // gridApi.current?.refreshCells({force: true});
-
               }}
             >
             </AgGridReact>

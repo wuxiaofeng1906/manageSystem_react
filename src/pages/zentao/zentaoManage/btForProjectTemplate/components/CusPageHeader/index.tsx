@@ -2,7 +2,7 @@ import React from "react";
 import {Breadcrumb, PageHeader} from "antd";
 import {Link} from "react-router-dom";
 
-const Header: React.FC<any> = () => {
+const Header: React.FC<any> = (props: any) => {
 
   const breadcrumbItems = [
     <Breadcrumb.Item key="禅道管理">禅道管理</Breadcrumb.Item>,
@@ -14,7 +14,7 @@ const Header: React.FC<any> = () => {
   return (
     <PageHeader
       ghost={false}
-      title={"禅道任务生成"}
+      title={<div>项目计划任务生成<label style={{fontSize: "medium",fontFamily:"黑体"}}>-{props.tempName}</label></div>}
       style={{height: "85px"}}
       breadcrumbRender={() => {
         return <Breadcrumb>{breadcrumbItems}</Breadcrumb>;

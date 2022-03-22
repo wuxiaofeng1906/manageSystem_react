@@ -216,7 +216,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
   return (
     <div style={{width: "100%", height: "100%", marginTop: "-20px"}}>
-      <Header/>
+      <Header tempName={template.name}/>
       <Spin spinning={excuteState} tip="任务生成中，请稍后..." size={"large"}>
         <div style={{marginTop: 5}}>
 

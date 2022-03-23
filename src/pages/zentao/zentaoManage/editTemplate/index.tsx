@@ -15,7 +15,7 @@ import {
   getTemTypeSelect, getAddTypeSelect, getAssignedToSelect,
   getPrioritySelect, getTaskTypeSelect, getSideSelect,
   getTaskSourceSelect, deleteTemplateList, vertifySaveData,
-  saveTempList, vertifyTaskName,vertifyAddType
+  saveTempList, vertifyTaskName, vertifyAddType
 } from './axiosRequest/requestDataParse';
 import {getTemplateDetails} from './gridMethod/girdData';
 import {useRequest} from 'ahooks';
@@ -29,8 +29,6 @@ const selectOptions = {
   side: [],
   taskSource: [],
 };
-// 表格中的下拉框在渲染时调用不到state中的gridData数据，只能定义一个全局变量用于表格中的控件值的变化。
-let gridDataForTableComponent: any = []; // gridDataForTableComponent 必须一直等于useState中的gridData值。意味着每一个setGridData后面都需要给gridDataForTableComponent赋一个最新的值
 
 // 组件初始化
 const EditTemplateList: React.FC<any> = () => {
@@ -99,7 +97,6 @@ const EditTemplateList: React.FC<any> = () => {
       });
 
       setGridData(oraData.concat(newDatas));
-      gridDataForTableComponent = oraData.concat(newDatas);
     });
   };
 
@@ -107,11 +104,6 @@ const EditTemplateList: React.FC<any> = () => {
   (window as any).addTemplateRow = async (rowIndex: any, rowData: any) => {
     const addData = columnsAdd(rowIndex, rowData, gridData);
     gridApi.current?.updateRowData({add: [addData.row], addIndex: addData.position});
-    gridDataForTableComponent.length = 0;
-    gridApi.current?.forEachNode((node: any) => {
-      gridDataForTableComponent.push(node.data);
-    });
-
   };
 
   /* endregion 数据导入和新增 */
@@ -181,11 +173,6 @@ const EditTemplateList: React.FC<any> = () => {
     }
 
     gridApi.current?.updateRowData({remove: isdelModalVisible.cu_delData});
-    // 这里还需要重置 gridDataForTableComponent
-    gridDataForTableComponent.length = 0; // 清除之前的数据
-    gridApi.current?.forEachNode((node: any) => {
-      gridDataForTableComponent.push(node.data);
-    });
 
     setIsDelModalVisible({
       showFalg: false,
@@ -208,15 +195,14 @@ const EditTemplateList: React.FC<any> = () => {
   const [formForTemplate] = Form.useForm();
 
   // 表格中数据变化
-  const gridSelectChanged = (index: number, filed: string, value: any) => {
-    if (index && filed) {
-      gridDataForTableComponent[index][filed] = value; // 修改对应的字段的值。
-      // gridApi.current?.refreshCells({force: true});
-      if (filed === "is_tailoring") {
-        gridApi.current?.setRowData(gridDataForTableComponent);
-      }
-    }
+  const gridSelectChanged = (props: any, value: any) => {
 
+    // 重设某行的值
+    const rowNode = gridApi.current?.getRowNode(props.rowIndex);
+    rowNode?.setData({
+      ...props.data,
+      [props.column.colId]: value
+    });
   };
 
   // 表格停止编辑
@@ -233,16 +219,17 @@ const EditTemplateList: React.FC<any> = () => {
         });
 
         // 还原之前的数据
-        const rowNode = gridApi.current?.getRowNode(params.rowIndex);
-        rowNode?.setData({
-          ...params.data,
-          task_name:params.oldValue
-        });
+        gridSelectChanged(params, params.oldValue);
+        // const rowNode = gridApi.current?.getRowNode(params.rowIndex);
+        // rowNode?.setData({
+        //   ...params.data,
+        //   task_name: params.oldValue
+        // });
         return;
       }
     }
 
-    gridSelectChanged(params.rowIndex, params.colDef.field, params.newValue);
+    gridSelectChanged(params, params.newValue);
   }
 
   // 保存编辑后的模板
@@ -253,6 +240,9 @@ const EditTemplateList: React.FC<any> = () => {
     gridApi.current?.forEachNode((node: any) => {
       gridDatas.push(node.data);
     });
+
+
+    debugger;
     // 需要校验模版名称不能为空
     const tempInfos = formForTemplate.getFieldsValue();
     // 验证数据
@@ -306,7 +296,7 @@ const EditTemplateList: React.FC<any> = () => {
     if (template.id) {
       const dt = await getTemplateDetails(template.id);
       setGridData(dt);
-      gridDataForTableComponent = dt;
+
       formForTemplate.setFieldsValue({
         tempName: template.name,
         tempType: `${template.type}&${template.type_name}`,
@@ -314,7 +304,6 @@ const EditTemplateList: React.FC<any> = () => {
     } else {
       //   如果为空，则要设置一行
       setGridData([{add_type_name: "新增"}]);
-      gridDataForTableComponent = [{add_type_name: "新增"}];
     }
   };
   useEffect(() => {
@@ -409,7 +398,7 @@ const EditTemplateList: React.FC<any> = () => {
                         //   return;
                         // }
 
-                        gridSelectChanged(props.rowIndex, 'add_type_name', currentValue);
+                        gridSelectChanged(props, currentValue);
                       }}
                     >
                       {selectOptions.addType}
@@ -422,7 +411,7 @@ const EditTemplateList: React.FC<any> = () => {
                       size={'small'} defaultValue={props.value}
                       bordered={false} style={{width: '120%'}} showSearch
                       onChange={(currentValue: any) => {
-                        gridSelectChanged(props.rowIndex, 'assigned_person_name', currentValue);
+                        gridSelectChanged(props, currentValue);
                       }}
                     >
                       {selectOptions.assignedTo}
@@ -435,7 +424,7 @@ const EditTemplateList: React.FC<any> = () => {
                       size={'small'} defaultValue={props.value}
                       bordered={false} style={{width: '120%'}}
                       onChange={(currentValue: any) => {
-                        gridSelectChanged(props.rowIndex, 'priority', currentValue);
+                        gridSelectChanged(props, currentValue);
                       }}
                     >
                       {selectOptions.priority}
@@ -448,7 +437,7 @@ const EditTemplateList: React.FC<any> = () => {
                       size={'small'} defaultValue={props.value}
                       bordered={false} showSearch style={{width: '120%'}}
                       onChange={(currentValue: any) => {
-                        gridSelectChanged(props.rowIndex, 'task_type_name', currentValue);
+                        gridSelectChanged(props, currentValue);
                       }}
                     >
                       {selectOptions.taskType}
@@ -461,7 +450,7 @@ const EditTemplateList: React.FC<any> = () => {
                       size={'small'} defaultValue={props.value}
                       bordered={false} style={{width: '120%'}}
                       onChange={(currentValue: any) => {
-                        gridSelectChanged(props.rowIndex, 'belongs_name', currentValue);
+                        gridSelectChanged(props, currentValue);
                       }}
                     >
                       {selectOptions.side}
@@ -474,7 +463,7 @@ const EditTemplateList: React.FC<any> = () => {
                       size={'small'} defaultValue={props.value}
                       bordered={false} style={{width: '120%'}}
                       onChange={(currentValue: any) => {
-                        gridSelectChanged(props.rowIndex, 'tasksource_name', currentValue);
+                        gridSelectChanged(props, currentValue);
                       }}
                       showSearch
                     >
@@ -492,7 +481,7 @@ const EditTemplateList: React.FC<any> = () => {
                       size={'small'} defaultValue={currentValue}
                       bordered={false} style={{width: '120%'}}
                       onChange={(selectedValue: any) => {
-                        gridSelectChanged(props.rowIndex, 'is_tailoring', selectedValue);
+                        gridSelectChanged(props, selectedValue);
                       }}
                     >
                       <Option key={'yes'} value={'yes'}>{'是'}</Option>

@@ -231,6 +231,10 @@ const EditTemplateList: React.FC<any> = () => {
           duration: 1,
           style: {marginTop: '50vh'},
         });
+
+        // 还原之前的数据
+        const rowNode = gridApi.current?.getRowNode(params.rowIndex);
+        rowNode?.setData(params.data);
         return;
       }
     }

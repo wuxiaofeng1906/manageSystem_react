@@ -34,12 +34,14 @@ const getTempColumns = () => {
     minWidth: 110,
     cellRenderer: "addTypeRender",
     headerComponentParams: headerRender,
+    pinned: 'left',
   }, {
     headerName: '任务名称',
     headerComponentParams: headerRender,
     field: 'task_name',
     minWidth: 150,
     editable: true,
+    pinned: 'left',
     cellRenderer: (params: any) => {
       if (params.data.is_tailoring === "yes" || params.data.is_tailoring === "是") {
         return `<span style="color: gray">${params.value}</span>`

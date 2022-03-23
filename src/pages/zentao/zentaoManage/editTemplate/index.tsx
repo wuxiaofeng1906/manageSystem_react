@@ -15,7 +15,7 @@ import {
   getTemTypeSelect, getAddTypeSelect, getAssignedToSelect,
   getPrioritySelect, getTaskTypeSelect, getSideSelect,
   getTaskSourceSelect, deleteTemplateList, vertifySaveData,
-  saveTempList, vertifyTaskName, vertifyAddType
+  saveTempList, vertifyTaskName
 } from './axiosRequest/requestDataParse';
 import {getTemplateDetails} from './gridMethod/girdData';
 import {useRequest} from 'ahooks';
@@ -241,8 +241,6 @@ const EditTemplateList: React.FC<any> = () => {
       gridDatas.push(node.data);
     });
 
-
-    debugger;
     // 需要校验模版名称不能为空
     const tempInfos = formForTemplate.getFieldsValue();
     // 验证数据

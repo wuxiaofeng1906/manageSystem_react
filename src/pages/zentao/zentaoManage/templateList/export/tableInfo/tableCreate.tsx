@@ -4,7 +4,7 @@
 const getOnlineCheckTempTable = (data: any) => {
 
   const column = [
-    {name: "编号"}, {name: "所属执行"}, {name: "所属模块"}, {name: "相关研发需求"},
+    {name: "编号",width:100}, {name: "所属执行",width:600}, {name: "所属模块"}, {name: "相关研发需求"},
     {name: "任务名称"}, {name: "任务描述"}, {name: "任务类型"}, {name: "优先级"},
     {name: "预计开始"}, {name: "实际开始"}, {name: "截止日期"}, {name: "任务状态"},
     {name: "最初预计"}, {name: "总计消耗"}, {name: "预计剩余"}, {name: "抄送给"},

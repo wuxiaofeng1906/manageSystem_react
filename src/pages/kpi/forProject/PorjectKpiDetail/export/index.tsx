@@ -89,7 +89,7 @@ const exportToExcel = (data: any, title: string) => {
     const row: any = ele;
     row.font = {name: "微软雅黑"};
     row.alignment = {vertical: 'middle', horizontal: 'left'};
-    ele.commit();
+    row.commit();
   });
 
   // 设置标题行的颜色

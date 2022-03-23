@@ -234,7 +234,10 @@ const EditTemplateList: React.FC<any> = () => {
 
         // 还原之前的数据
         const rowNode = gridApi.current?.getRowNode(params.rowIndex);
-        rowNode?.setData(params.data);
+        rowNode?.setData({
+          ...params.data,
+          task_name:params.oldValue
+        });
         return;
       }
     }

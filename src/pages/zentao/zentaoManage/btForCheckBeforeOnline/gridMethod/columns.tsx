@@ -11,10 +11,12 @@ const getTaskColumns = () => {
     headerName: '增加类型',
     field: 'add_type_name',
     minWidth: 100,
+    pinned: 'left',
   }, {
     headerName: '任务名称',
     field: 'task_name',
     minWidth: 100,
+    pinned: 'left',
     cellRenderer: (params: any) => {
       if (params.data.is_tailoring === "yes" || params.data.is_tailoring === "是") {
         return `<span style="color: gray">${params.value}</span>`

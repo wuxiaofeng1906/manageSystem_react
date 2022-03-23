@@ -42,7 +42,7 @@ const loadExcutionSelect = async () => {
   if (excution && excution.length > 0) {
     excution.forEach((ele: any) => {
       excutionData.push(
-        <Option key={ele.execution_id} value={`${ele.execution_id}&${ele.execution_name}`}>{ele.execution_name}</Option>
+        <Option key={ele.sprint_type} value={`${ele.execution_id}&${ele.execution_name}`}>{ele.execution_name}</Option>
       );
     });
 
@@ -153,7 +153,7 @@ const generateTask = async (tempInfo: any, fromData: any, gridData: any) => {
   }
 
   const usersInfo = await convertUserNameToID();
-
+  debugger;
   const headData = {
     "temp_id": tempInfo.id,
     "start_time": dayjs(fromData.planStart).format("YYYY-MM-DD"),
@@ -175,7 +175,7 @@ const generateTask = async (tempInfo: any, fromData: any, gridData: any) => {
         "task_name": ele.task_name,
         "module": ele.module,
         "subtask_dev_needs": ele.subtask_dev_needs,
-        "assigned_person": ele.assigned_person,
+        "assigned_person": usersInfo[ele.assigned_person_name],
         "priority": ele.priority,
         "estimate": ele.estimate,
         "desc": ele.desc,

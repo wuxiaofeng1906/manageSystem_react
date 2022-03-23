@@ -103,7 +103,7 @@ const requestTaskSourceApi = async () => {
 //  所属执行
 const requestExcutionApi = async () => {
   let data: any = [];
-  await axios.get('/api/verify/zentao/executions', {params: {execution_type: ""}})
+  await axios.get('/api/verify/zentao/executions')
     .then(function (res) {
       if (res.data.code === 200) {
         data = res.data.data;

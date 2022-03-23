@@ -8,7 +8,7 @@ axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
 
 
 const getPrjManegerApi = async (excutId: number) => {
-
+  debugger;
   let data: any = {};
   await axios.get('/api/verify/zentao/head', {params: {execution_id: excutId}})
     .then(function (res) {

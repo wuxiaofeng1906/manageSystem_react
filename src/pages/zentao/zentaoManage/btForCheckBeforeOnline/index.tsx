@@ -14,9 +14,10 @@ import {
   loadUserSelect, loadExcutionSelect, getDutyPerson, getTempDetails, generateTask
 } from "./axiosRequest/requestDataParse";
 import {useRequest} from "ahooks";
+import {loadProjectManager} from "@/pages/zentao/zentaoManage/btForProjectTemplate/axiosRequest/requestDataParse";
 
 const {Option} = Select;
-
+let dutyInfo: any;
 // 组件初始化
 const CheckBeforeOnline: React.FC<any> = () => {
 
@@ -63,7 +64,36 @@ const CheckBeforeOnline: React.FC<any> = () => {
   /* endregion 获取跳转过来的模板，并获取对应数据 */
 
   /* region 联动选项 */
+  const [formForZentaoTask] = Form.useForm(); // 上线分支设置
 
+  // 项目执行修改
+  const excutionChanged = async (values: any, params: any,) => {
+    let assigned_to = "";
+    //   获取项目负责人，如果是特性项目就是执行里边设置的后端负责人；如果是班车就设置为值班计划里边当周的后端值班人
+    if (params.key === "sprint" || params.key === "hotfix") { // 班车项目
+      assigned_to = dutyInfo.backend;
+    } else {
+      // 特性项目
+      const excuteInfo = values.split("&");
+      assigned_to = (await loadProjectManager(Number(excuteInfo[0]))).user_name;
+    }
+
+    // 同样修改表格里面的值，增加类型为 新增（父任务）的指派人
+    const atferValue: any = [];
+    gridData.forEach((ele: any) => {
+      if (ele.add_type_name === "新增") {
+        atferValue.push({
+          ...ele,
+          assigned_person_name: assigned_to,
+        });
+      } else {
+        atferValue.push(ele);
+      }
+    });
+    setGridData(atferValue);
+  };
+
+  // 预计开始时间
   const planStartChanged = (params: any, values: any) => {
     //   时间改变后，下面的预计开始时间也要同步改变
     const atferValue: any = [];
@@ -73,6 +103,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
     setGridData(atferValue);
   };
 
+  // 预计结束时间
   const planEndChanged = (params: any, values: any) => {
     //   时间改变后，下面的预计截至时间也要同步改变
     const atferValue: any = [];
@@ -82,14 +113,15 @@ const CheckBeforeOnline: React.FC<any> = () => {
     setGridData(atferValue);
   };
 
-  // 指派人修改后，也要对应修改表格中所属端的指派人
+  // 指派人修改后，也要对应修改表格中所属端的指派人(只是修改子任务指派人)
   const changeAssignedTo = (side: string, currentValue: any) => {
 
     const atferValue: any = [];
     gridData.forEach((ele: any) => {
-      if (side === "Front" && ele.belongs_name === "前端"
-        || side === "Backend" && ele.belongs_name === "后端"
-        || side === "Tester" && ele.belongs_name === "测试") {
+      if (side === "Front" && (ele.task_name).startsWith(">【前端】")
+        || side === "Backend" && (ele.task_name).startsWith(">【后端】")
+        || side === "Tester" && (ele.task_name).startsWith(">【测试】")
+        || side === "SQA" && (ele.task_name).startsWith(">【sqa】")) {
         atferValue.push({...ele, assigned_person_name: currentValue});
       } else {
         atferValue.push(ele);
@@ -112,7 +144,6 @@ const CheckBeforeOnline: React.FC<any> = () => {
   /* endregion 表格中的时间选择修改和下拉框值 */
 
   /* region 任务生成 */
-  const [formForZentaoTask] = Form.useForm(); // 上线分支设置
   const [excuteState, setExcuteState] = useState(false);
 
   // 取消模板编辑
@@ -169,7 +200,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
   const excutionInfo = useRequest(() => loadExcutionSelect()).data;
 
   const showPageInfo = async () => {
-    const dutyInfo = await getDutyPerson();
+    dutyInfo = await getDutyPerson();
     formForZentaoTask.setFieldsValue({
       belongExcution: "",
       assingedToSQA: dutyInfo.sqa,
@@ -200,7 +231,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
               <Row>
                 <Col span={6}>
                   <Form.Item label="所属执行:" name="belongExcution" required={true} style={{marginLeft: 14}}>
-                    <Select style={{width: '100%'}} allowClear>
+                    <Select style={{width: '100%'}} allowClear showSearch onChange={excutionChanged}>
                       {excutionInfo}
                     </Select>
                   </Form.Item>

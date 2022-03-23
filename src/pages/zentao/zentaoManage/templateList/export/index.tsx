@@ -30,8 +30,9 @@ const exportToExcel = (data: any, title: string, tempType: string) => {
   // 默认列宽设置
   sheet.properties.defaultColWidth = 20;
 
- // 不同的类型有不同的表格
-  const tempTable: any = getTempTable(data,tempType);
+  // 不同的类型有不同的表格
+  const tempTable: any = getTempTable(data, tempType);
+
   sheet.addTable(tempTable);
 
   // 表格的数据绘制完成，定义下载方法，将数据导出到Excel文件

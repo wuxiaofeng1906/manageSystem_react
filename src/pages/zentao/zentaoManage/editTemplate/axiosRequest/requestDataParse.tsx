@@ -293,8 +293,31 @@ const vertifyTaskName = (type: string, values: string) => {
 
   return "子任务输入格式错误，正确格式为：>【所属端】 任务名称";
 };
+
+// 增加类型
+const vertifyAddType=(type: string, values: string)=>{
+  //   主任务（类型为新增）需要用【】包含起来。
+  if (type === "新增") { // 主任务
+    if (values.startsWith("【") && values.endsWith("】")) {
+      return "";
+    }
+    return "增加类型和任务名称格式不匹配";
+  }
+
+//  子任务，需要用 > 【前端】【后端】【测试】【sqa】 开头
+  if (!values.startsWith(">")) {
+    return "增加类型和任务名称格式不匹配";
+  }
+
+  if (values.includes("【前端】") || values.includes("【后端】") || values.includes("【测试】") || values.includes("【sqa】")) {
+    return ""
+  }
+
+  return "增加类型和任务名称格式不匹配";
+
+}
 export {
   getTemTypeSelect, getAddTypeSelect, getAssignedToSelect, getPrioritySelect,
   getTaskTypeSelect, getSideSelect, getTaskSourceSelect, deleteTemplateList, vertifySaveData, saveTempList,
-  vertifyTaskName
+  vertifyTaskName,vertifyAddType
 }

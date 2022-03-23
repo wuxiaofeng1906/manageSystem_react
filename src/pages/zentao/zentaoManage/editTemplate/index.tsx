@@ -15,7 +15,7 @@ import {
   getTemTypeSelect, getAddTypeSelect, getAssignedToSelect,
   getPrioritySelect, getTaskTypeSelect, getSideSelect,
   getTaskSourceSelect, deleteTemplateList, vertifySaveData,
-  saveTempList, vertifyTaskName
+  saveTempList, vertifyTaskName,vertifyAddType
 } from './axiosRequest/requestDataParse';
 import {getTemplateDetails} from './gridMethod/girdData';
 import {useRequest} from 'ahooks';
@@ -391,6 +391,21 @@ const EditTemplateList: React.FC<any> = () => {
                       size={'small'} defaultValue={props.value}
                       bordered={false} style={{width: '120%'}}
                       onChange={(currentValue: any) => {
+                        // 如果修改的是增加类型，需要判断任务名称是否符合
+                        // const vertifyMessage = vertifyAddType(currentValue, props.data?.task_name);
+                        // if (vertifyMessage) {
+                        //   message.error({
+                        //     content: `错误：${vertifyMessage}`,
+                        //     duration: 1,
+                        //     style: {marginTop: '50vh'},
+                        //   });
+                        //
+                        //   // 还原之前的数据
+                        //   const rowNode = gridApi.current?.getRowNode(props.rowIndex);
+                        //   rowNode?.setData(props.data);
+                        //   return;
+                        // }
+
                         gridSelectChanged(props.rowIndex, 'add_type_name', currentValue);
                       }}
                     >

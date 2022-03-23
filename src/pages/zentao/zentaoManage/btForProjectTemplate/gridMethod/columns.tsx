@@ -41,7 +41,7 @@ const getProjectColumns = () => {
   }, {
     headerName: '预计截至',
     field: 'plan_end',
-    minWidth: 110,
+    minWidth: 150,
     cellRenderer: "timeRender"
   }, {
     headerName: '优先级',

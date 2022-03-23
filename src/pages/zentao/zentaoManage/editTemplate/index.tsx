@@ -15,7 +15,7 @@ import {
   getTemTypeSelect, getAddTypeSelect, getAssignedToSelect,
   getPrioritySelect, getTaskTypeSelect, getSideSelect,
   getTaskSourceSelect, deleteTemplateList, vertifySaveData,
-  saveTempList,
+  saveTempList, vertifyTaskName
 } from './axiosRequest/requestDataParse';
 import {getTemplateDetails} from './gridMethod/girdData';
 import {useRequest} from 'ahooks';
@@ -218,6 +218,25 @@ const EditTemplateList: React.FC<any> = () => {
     }
 
   };
+
+  // 表格停止编辑
+  const cellEditingStopped = (params: any) => {
+    // 如果是任务名称，则需要判断输入格式。
+
+    if (params.column.colId === "task_name") {
+      const vertifyMessage = vertifyTaskName(params.data?.add_type_name, params.newValue);
+      if (vertifyMessage) {
+        message.error({
+          content: `错误：${vertifyMessage}`,
+          duration: 1,
+          style: {marginTop: '50vh'},
+        });
+        return;
+      }
+    }
+
+    gridSelectChanged(params.rowIndex, params.colDef.field, params.newValue);
+  }
 
   // 保存编辑后的模板
   const saveTemplate = async () => {
@@ -460,9 +479,7 @@ const EditTemplateList: React.FC<any> = () => {
                   );
                 },
               }}
-              onCellEditingStopped={(params: any) => {
-                gridSelectChanged(params.rowIndex, params.colDef.field, params.newValue);
-              }}
+              onCellEditingStopped={cellEditingStopped}
             >
             </AgGridReact>
           </div>

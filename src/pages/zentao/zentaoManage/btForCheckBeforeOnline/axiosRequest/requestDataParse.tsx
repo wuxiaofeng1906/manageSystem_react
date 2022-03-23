@@ -85,6 +85,33 @@ const getDutyPerson = async () => {
   return dutyPerson;
 };
 
+// 分配父任务的指派人
+const getParentTaskPerson = (newDts: any) => {
+
+  return newDts.assigned_person_name;
+}
+
+// 分配子任务的指派人
+const getChildTaskPerson = (newDts: any, assignedTo: any) => {
+  if ((newDts.task_name).toString().startsWith(">【前端】")) {
+    if (assignedTo.front) { // 有值班人员才取值，没有的话还是使用原始值。
+      return assignedTo.front;
+    }
+  } else if ((newDts.task_name).toString().startsWith(">【后端】")) {
+    if (assignedTo.backend) {
+      return assignedTo.backend;
+    }
+  } else if ((newDts.task_name).toString().startsWith(">【测试】")) {
+    if (assignedTo.test) {
+      return assignedTo.test;
+    }
+  } else if ((newDts.task_name).toString().startsWith(">【sqa】")) {
+    if (assignedTo.sqa) {
+      return assignedTo.sqa;
+    }
+  }
+  return newDts.assigned_person_name;
+}
 // 获取模板的详情
 const getTempDetails = async (tempId: string, assignedTo: any) => {
 
@@ -95,20 +122,17 @@ const getTempDetails = async (tempId: string, assignedTo: any) => {
       const newDts = ele;
       newDts["plan_start"] = dayjs().format("YYYY-MM-DD");
       newDts["plan_end"] = dayjs().format("YYYY-MM-DD");
-      // 判断指派给的是哪个端的，是哪个端的就去取哪个端的值班人员。如果所取那个端的人员为空，则显示模板编辑时候的默认值。
-      if (newDts.belongs_name === "前端") {
-        if (assignedTo.front) { // 有值班人员才取值，没有的话还是使用原始值。
-          newDts["assigned_person_name"] = assignedTo.front;
-        }
-      } else if (newDts.belongs_name === "后端") {
-        if (assignedTo.backend) {
-          newDts["assigned_person_name"] = assignedTo.backend;
-        }
-      } else if (newDts.belongs_name === "测试") {
-        if (assignedTo.test) {
-          newDts["assigned_person_name"] = assignedTo.test;
-        }
+
+      // 判断是不是主任务
+      let assigned_to = "";
+      if (newDts.add_type_name === "新增") {
+        // 是主任务就要获取相关项目负责人
+        assigned_to = getParentTaskPerson(newDts);
+      } else {
+        // 如果是子任务，则判断任务名称中是哪个端的，是哪个端的就去取哪个端的值班人员。如果所取那个端的人员为空，则显示模板编辑时候的默认值。
+        assigned_to = getChildTaskPerson(newDts, assignedTo);
       }
+      newDts["assigned_person_name"] = assigned_to;
       returnValue.push(newDts);
     });
   }

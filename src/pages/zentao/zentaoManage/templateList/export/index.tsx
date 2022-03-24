@@ -67,7 +67,7 @@ const exportToExcel = (data: any, title: string, tempType: string) => {
 
   // 表格的数据绘制完成，定义下载方法，将数据导出到Excel文件
   workbook.xlsx.writeBuffer().then((buffer) => {
-    writeFile(`${sheetName}.xls`, buffer);
+    writeFile(`${sheetName}.xlsx`, buffer);
   });
 };
 

@@ -42,7 +42,8 @@ const loadExcutionSelect = async () => {
   if (excution && excution.length > 0) {
     excution.forEach((ele: any) => {
       excutionData.push(
-        <Option key={ele.sprint_type} value={`${ele.execution_id}&${ele.execution_name}`}>{ele.execution_name}</Option>
+        <Option key={ele.execution_id} sprintType={ele.sprint_type}
+                value={`${ele.execution_id}&${ele.execution_name}`}>{ele.execution_name}</Option>
       );
     });
 
@@ -153,7 +154,7 @@ const generateTask = async (tempInfo: any, fromData: any, gridData: any) => {
   }
 
   const usersInfo = await convertUserNameToID();
-  debugger;
+
   const headData = {
     "temp_id": tempInfo.id,
     "start_time": dayjs(fromData.planStart).format("YYYY-MM-DD"),

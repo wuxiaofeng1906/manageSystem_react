@@ -89,6 +89,7 @@ const ProjectTemplate: React.FC<any> = () => {
 
   // 项目负责人修改后，也要对应修改表格中所属端的指派人
   const projectManagerChanged = (currentValue: any) => {
+    debugger;
     const atferValue: any = [];
     gridData.forEach((ele: any) => {
       atferValue.push({...ele, assigned_person_name: currentValue});
@@ -142,7 +143,6 @@ const ProjectTemplate: React.FC<any> = () => {
     gridApi.current?.forEachNode((node: any) => {
       gridDatas.push(node.data);
     });
-
     // 调用接口生成
     const result = await generateTask(template, formData, gridDatas);
     if (result) {
@@ -157,7 +157,7 @@ const ProjectTemplate: React.FC<any> = () => {
 
     } else {
       message.info({
-        content: "执行成功！",
+        content: "任务生成成功！",
         duration: 1,
         className: 'delNone',
         style: {
@@ -207,14 +207,14 @@ const ProjectTemplate: React.FC<any> = () => {
               <Row>
                 <Col span={6}>
                   <Form.Item label="所属执行:" name="belongExcution" required={true}>
-                    <Select style={{width: '100%'}} allowClear onChange={excutionChanged}>
+                    <Select style={{width: '100%'}} allowClear showSearch onChange={excutionChanged}>
                       {excutionInfo}
                     </Select>
                   </Form.Item>
                 </Col>
                 <Col span={6}>
                   <Form.Item label="项目负责人:" name="projectManager" required={true} style={{marginLeft: 5}}>
-                    <Select style={{width: '100%'}} allowClear
+                    <Select style={{width: '100%'}} allowClear showSearch
                             onChange={projectManagerChanged}>
                       {projectManager}
                     </Select>

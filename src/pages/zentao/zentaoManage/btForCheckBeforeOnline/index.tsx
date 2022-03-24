@@ -68,9 +68,10 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
   // 项目执行修改
   const excutionChanged = async (values: any, params: any,) => {
+
     let assigned_to = "";
     //   获取项目负责人，如果是特性项目就是执行里边设置的后端负责人；如果是班车就设置为值班计划里边当周的后端值班人
-    if (params.key === "sprint" || params.key === "hotfix") { // 班车项目
+    if (params.sprintType === "sprint" || params.sprintType === "hotfix") { // 班车项目
       assigned_to = dutyInfo.backend;
     } else {
       // 特性项目
@@ -176,7 +177,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
     } else {
       message.info({
-        content: "执行成功！",
+        content: "任务生成成功！",
         duration: 1,
         className: 'delNone',
         style: {

@@ -100,7 +100,7 @@ const generateTask = async (tempInfo: any, fromData: any, gridData: any) => {
         "task_name": ele.task_name,
         "module": ele.module,
         "subtask_dev_needs": ele.subtask_dev_needs,
-        "assigned_person": ele.assigned_person,
+        "assigned_person": usersInfo[ele.assigned_person_name] === undefined ? "" : usersInfo[ele.assigned_person_name],
         "priority": ele.priority,
         "estimate": ele.estimate,
         "desc": ele.desc,
@@ -117,7 +117,7 @@ const generateTask = async (tempInfo: any, fromData: any, gridData: any) => {
     }
 
   });
-
+  debugger;
   if (gridDataArray.length === 0) {
     return "列表中任务不能为空或者列表中的数据都被裁剪！"
   }

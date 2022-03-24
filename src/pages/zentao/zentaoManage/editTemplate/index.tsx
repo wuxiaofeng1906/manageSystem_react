@@ -103,7 +103,12 @@ const EditTemplateList: React.FC<any> = () => {
   // 新增行
   (window as any).addTemplateRow = async (rowIndex: any, rowData: any) => {
     const addData = columnsAdd(rowIndex, rowData, gridData);
-    gridApi.current?.updateRowData({add: [addData.row], addIndex: addData.position});
+    // gridApi.current?.updateRowData({add: [addData.row], addIndex: addData.position});
+
+    const testData: any = [...gridData];  // 克隆的时候改变地址,数组如果引用地址不变，是不触发重新渲染的，但是值是设置进去了
+    testData.splice(addData.position, 0, addData.row);
+    setGridData(testData)
+
   };
 
   /* endregion 数据导入和新增 */
@@ -210,23 +215,26 @@ const EditTemplateList: React.FC<any> = () => {
     // 如果是任务名称，则需要判断输入格式。
 
     if (params.column.colId === "task_name") {
-      const vertifyMessage = vertifyTaskName(params.data?.add_type_name, params.newValue);
-      if (vertifyMessage) {
-        message.error({
-          content: `错误：${vertifyMessage}`,
-          duration: 1,
-          style: {marginTop: '50vh'},
-        });
+      if (params.newValue) {
+        const vertifyMessage = vertifyTaskName(params.data?.add_type_name, params.newValue);
+        if (vertifyMessage) {
+          message.error({
+            content: `错误：${vertifyMessage}`,
+            duration: 1,
+            style: {marginTop: '50vh'},
+          });
 
-        // 还原之前的数据
-        gridSelectChanged(params, params.oldValue);
-        // const rowNode = gridApi.current?.getRowNode(params.rowIndex);
-        // rowNode?.setData({
-        //   ...params.data,
-        //   task_name: params.oldValue
-        // });
-        return;
+          // 还原之前的数据
+          gridSelectChanged(params, params.oldValue);
+          // const rowNode = gridApi.current?.getRowNode(params.rowIndex);
+          // rowNode?.setData({
+          //   ...params.data,
+          //   task_name: params.oldValue
+          // });
+          return;
+        }
       }
+
     }
 
     gridSelectChanged(params, params.newValue);

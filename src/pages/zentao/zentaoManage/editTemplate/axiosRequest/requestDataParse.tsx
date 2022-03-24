@@ -1,5 +1,5 @@
 import {
-  requestTempType, requestAddType, requestAssignedTo, requestPriorityApi,
+  requestTempType, requestAddType, requestPriorityApi,
   requestTaskTypeApi, requestSideApi, requestTaskSourceApi, requestDelTempleListApi,
   requestSaveTempleListApi
 } from "./reauestApi";
@@ -10,7 +10,7 @@ import {
   convertAddTypeToID, convertUserNameToID, convertTaskTypeToID,
   convertSideToID, convertTaskSourceToID
 } from "../../commenMethod/valueExchange";
-import {message, Select} from "antd";
+import {Select} from "antd";
 
 const {Option} = Select;
 const userLogins: any = localStorage.getItem('userLogins');
@@ -295,7 +295,7 @@ const vertifyTaskName = (type: string, values: string) => {
 };
 
 // 增加类型
-const vertifyAddType=(type: string, values: string)=>{
+const vertifyAddType = (type: string, values: string) => {
   //   主任务（类型为新增）需要用【】包含起来。
   if (type === "新增") { // 主任务
     if (values.startsWith("【") && values.endsWith("】")) {
@@ -319,5 +319,5 @@ const vertifyAddType=(type: string, values: string)=>{
 export {
   getTemTypeSelect, getAddTypeSelect, getAssignedToSelect, getPrioritySelect,
   getTaskTypeSelect, getSideSelect, getTaskSourceSelect, deleteTemplateList, vertifySaveData, saveTempList,
-  vertifyTaskName,vertifyAddType
+  vertifyTaskName, vertifyAddType
 }

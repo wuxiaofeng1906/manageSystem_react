@@ -102,10 +102,17 @@ const EditTemplateList: React.FC<any> = () => {
 
   // 新增行
   (window as any).addTemplateRow = async (rowIndex: any, rowData: any) => {
-    const addData = columnsAdd(rowIndex, rowData, gridData);
+    debugger;
+    const gridDatas: any = [];
+    // 遍历列表中的数据
+    gridApi.current?.forEachNode((node: any) => {
+      gridDatas.push(node.data);
+    });
+    // 获取表格中所有的数据，不能直接用gridData，因为在数据变化时没有更新到set gridData。
+    const addData = columnsAdd(rowIndex, rowData, gridDatas);
     // gridApi.current?.updateRowData({add: [addData.row], addIndex: addData.position});
 
-    const testData: any = [...gridData];  // 克隆的时候改变地址,数组如果引用地址不变，是不触发重新渲染的，但是值是设置进去了
+    const testData: any = [...gridDatas];  // 克隆的时候改变地址,数组如果引用地址不变，是不触发重新渲染的，但是值是设置进去了
     testData.splice(addData.position, 0, addData.row);
     setGridData(testData)
 

@@ -207,14 +207,14 @@ const ProjectTemplate: React.FC<any> = () => {
               <Row>
                 <Col span={6}>
                   <Form.Item label="所属执行:" name="belongExcution" required={true}>
-                    <Select style={{width: '100%'}} allowClear showSearch onChange={excutionChanged}>
+                    <Select style={{width: '100%'}} showSearch onChange={excutionChanged}>
                       {excutionInfo}
                     </Select>
                   </Form.Item>
                 </Col>
                 <Col span={6}>
                   <Form.Item label="项目负责人:" name="projectManager" required={true} style={{marginLeft: 5}}>
-                    <Select style={{width: '100%'}} allowClear showSearch
+                    <Select style={{width: '100%'}} showSearch
                             onChange={projectManagerChanged}>
                       {projectManager}
                     </Select>
@@ -222,12 +222,12 @@ const ProjectTemplate: React.FC<any> = () => {
                 </Col>
                 <Col span={6}>
                   <Form.Item label="预计开始日期:" name="planStart" required={true} style={{marginLeft: 5}}>
-                    <DatePicker style={{width: "100%"}} onChange={planStartChanged}/>
+                    <DatePicker style={{width: "100%"}} allowClear={false} onChange={planStartChanged}/>
                   </Form.Item>
                 </Col>
                 <Col span={6}>
                   <Form.Item label="预计结束日期:" name="planEnd" required={true} style={{marginLeft: 5}}>
-                    <DatePicker style={{width: "100%"}} onChange={planEndChanged}/>
+                    <DatePicker style={{width: "100%"}} allowClear={false} onChange={planEndChanged}/>
                   </Form.Item>
                 </Col>
 

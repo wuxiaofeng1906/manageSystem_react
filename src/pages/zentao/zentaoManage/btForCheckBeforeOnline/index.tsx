@@ -232,14 +232,14 @@ const CheckBeforeOnline: React.FC<any> = () => {
               <Row>
                 <Col span={6}>
                   <Form.Item label="所属执行:" name="belongExcution" required={true} style={{marginLeft: 14}}>
-                    <Select style={{width: '100%'}} allowClear showSearch onChange={excutionChanged}>
+                    <Select style={{width: '100%'}} showSearch onChange={excutionChanged}>
                       {excutionInfo}
                     </Select>
                   </Form.Item>
                 </Col>
                 <Col span={6}>
                   <Form.Item label="SQA指派人:" name="assingedToSQA" required={true} style={{marginLeft: 19}}>
-                    <Select style={{width: '100%'}} allowClear
+                    <Select style={{width: '100%'}}
                             onChange={(params: any) => {
                               changeAssignedTo("SQA", params);
                             }}>
@@ -249,7 +249,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
                 </Col>
                 <Col span={6}>
                   <Form.Item label="前端指派人:" name="assingedToFront" required={true} style={{marginLeft: 19}}>
-                    <Select style={{width: '100%'}} allowClear
+                    <Select style={{width: '100%'}}  showSearch
                             onChange={(params: any) => {
                               changeAssignedTo("Front", params);
                             }}>
@@ -259,7 +259,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
                 </Col>
                 <Col span={6}>
                   <Form.Item label="后端指派人:" name="assingedToBackend" required={true} style={{marginLeft: 5}}>
-                    <Select style={{width: '100%'}} allowClear
+                    <Select style={{width: '100%'}} showSearch
                             onChange={(params: any) => {
                               changeAssignedTo("Backend", params);
                             }}>
@@ -271,7 +271,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
               <Row style={{marginTop: -17}}>
                 <Col span={6}>
                   <Form.Item label="测试指派人:" name="assingedToTester" required={true}>
-                    <Select style={{width: '100%'}} allowClear
+                    <Select style={{width: '100%'}} showSearch
                             onChange={(params: any) => {
                               changeAssignedTo("Tester", params);
                             }}>
@@ -281,12 +281,12 @@ const CheckBeforeOnline: React.FC<any> = () => {
                 </Col>
                 <Col span={6}>
                   <Form.Item label="预计开始日期:" name="planStart" required={true} style={{marginLeft: 5}}>
-                    <DatePicker style={{width: "100%"}} onChange={planStartChanged}/>
+                    <DatePicker style={{width: "100%"}} onChange={planStartChanged} allowClear={false}/>
                   </Form.Item>
                 </Col>
                 <Col span={6}>
                   <Form.Item label="预计结束日期:" name="planEnd" required={true} style={{marginLeft: 5}}>
-                    <DatePicker style={{width: "100%"}} onChange={planEndChanged}/>
+                    <DatePicker style={{width: "100%"}} onChange={planEndChanged} allowClear={false}/>
                   </Form.Item>
                 </Col>
 

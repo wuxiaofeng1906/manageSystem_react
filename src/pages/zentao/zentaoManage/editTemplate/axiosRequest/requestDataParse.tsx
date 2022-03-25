@@ -153,10 +153,10 @@ const deleteTemplateList = async (subtaskId: string) => {
 const analysisGridData = async (data: any, tempInfo: any) => {
 
   const addType = await convertAddTypeToID(); // 增加类型
-  const users = await convertUserNameToID(); // 增加类型
-  const taskType = await convertTaskTypeToID(); // 增加类型
-  const side = await convertSideToID(); // 增加类型
-  const taskSource = await convertTaskSourceToID(); // 增加类型
+  // const users = await convertUserNameToID(); // 指派人
+  const taskType = await convertTaskTypeToID(); // 任务类型
+  const side = await convertSideToID(); // 所属端
+  const taskSource = await convertTaskSourceToID(); // 任务来源
   const saveDt: any = [];
 
   data.forEach((ele: any) => {
@@ -168,7 +168,8 @@ const analysisGridData = async (data: any, tempInfo: any) => {
       "task_name": ele.task_name,
       "module": ele.module === undefined ? "" : ele.module,
       "subtask_dev_needs": ele.subtask_dev_needs === undefined ? "" : ele.subtask_dev_needs,
-      "assigned_person": ele.assigned_person_name === undefined ? "" : users[ele.assigned_person_name] === undefined ? "" : users[ele.assigned_person_name],
+      // "assigned_person": ele.assigned_person_name === undefined ? "" : users[ele.assigned_person_name] === undefined ? "" : users[ele.assigned_person_name],
+      "assigned_person": "", // 指派人设置为空
       "priority": ele.priority,
       "estimate": ele.estimate,
       "desc": ele.desc === undefined ? "" : ele.desc,

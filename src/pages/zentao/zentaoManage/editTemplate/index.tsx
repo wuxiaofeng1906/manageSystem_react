@@ -93,7 +93,12 @@ const EditTemplateList: React.FC<any> = () => {
       // 导入需要追加之前的数据，从表格遍历获取数据，不能直接用state中的gridData，因为在手动新增一行时不会更新state
       const oraData: any = [];
       gridApi.current?.forEachNode((node: any) => {
-        oraData.push(node.data);
+        // 如果导入数据之前只有一条默认的新增数据，则不要那条数据。
+        const rowData = node.data;
+        const dataLength = Object.keys(rowData).length;
+        if (dataLength > 1) {
+          oraData.push(node.data);
+        }
       });
 
       setGridData(oraData.concat(newDatas));
@@ -102,7 +107,7 @@ const EditTemplateList: React.FC<any> = () => {
 
   // 新增行
   (window as any).addTemplateRow = async (rowIndex: any, rowData: any) => {
-    debugger;
+
     const gridDatas: any = [];
     // 遍历列表中的数据
     gridApi.current?.forEachNode((node: any) => {

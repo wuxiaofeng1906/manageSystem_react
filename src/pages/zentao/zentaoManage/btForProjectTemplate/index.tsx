@@ -164,6 +164,7 @@ const ProjectTemplate: React.FC<any> = () => {
           marginTop: '50vh',
         },
       });
+      history.push('/zentao/templateList');
     }
 
     setExcuteState(false);

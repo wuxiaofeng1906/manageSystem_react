@@ -2,8 +2,6 @@ import { Button, Result } from 'antd';
 import React from 'react';
 import { history } from 'umi';
 
-const test = 0;
-
 const NoFoundPage: React.FC<{}> = () => (
   <Result
     status="404"

@@ -58,67 +58,69 @@ const getTempColumns = () => {
     field: 'subtask_dev_needs',
     minWidth: 90,
     editable: true,
-  }, {
-    headerName: '指派给',
-    field: 'assigned_person_name',
-    minWidth: 110,
-    cellRenderer: "assignedToRender"
-  }, {
-    headerName: '优先级',
-    field: 'priority',
-    headerComponentParams: headerRender,
-    minWidth: 90,
-    cellRenderer: "priorityRender"
-  }, {
-    headerName: '任务类型',
-    headerComponentParams: headerRender,
-    field: 'task_type_name',
-    minWidth: 110,
-    cellRenderer: "taskTypeRender"
-  }, {
-    headerName: '最初预计',
-    headerComponentParams: headerRender,
-    field: 'estimate',
-    minWidth: 90,
-    editable: true,
-  }, {
-    headerName: '任务描述',
-    field: 'desc',
-    minWidth: 90,
-    editable: true,
-  }, {
-    headerName: '所属端',
-    field: 'belongs_name',
-    headerComponentParams: headerRender,
-    minWidth: 110,
-    cellRenderer: "belongsSideRender"
-  }, {
-    headerName: '任务来源',
-    headerComponentParams: headerRender,
-    field: 'tasksource_name',
-    minWidth: 120,
-    cellRenderer: "taskSourceRender"
-  }, {
-    headerName: '是否裁剪',
-    headerComponentParams: headerRender,
-    field: 'is_tailoring',
-    minWidth: 100,
-    cellRenderer: "cutRender"
-  }, {
-    headerName: '操作',
-    pinned: 'right',
-    maxWidth: 90,
-    cellRenderer: (params: any) => {
+  },
+    //   {  编辑界面的指派人暂时不需要
+    //   headerName: '指派给',
+    //   field: 'assigned_person_name',
+    //   minWidth: 110,
+    //   cellRenderer: "assignedToRender"
+    // },
+    {
+      headerName: '优先级',
+      field: 'priority',
+      headerComponentParams: headerRender,
+      minWidth: 90,
+      cellRenderer: "priorityRender"
+    }, {
+      headerName: '任务类型',
+      headerComponentParams: headerRender,
+      field: 'task_type_name',
+      minWidth: 110,
+      cellRenderer: "taskTypeRender"
+    }, {
+      headerName: '最初预计',
+      headerComponentParams: headerRender,
+      field: 'estimate',
+      minWidth: 90,
+      editable: true,
+    }, {
+      headerName: '任务描述',
+      field: 'desc',
+      minWidth: 90,
+      editable: true,
+    }, {
+      headerName: '所属端',
+      field: 'belongs_name',
+      headerComponentParams: headerRender,
+      minWidth: 110,
+      cellRenderer: "belongsSideRender"
+    }, {
+      headerName: '任务来源',
+      headerComponentParams: headerRender,
+      field: 'tasksource_name',
+      minWidth: 120,
+      cellRenderer: "taskSourceRender"
+    }, {
+      headerName: '是否裁剪',
+      headerComponentParams: headerRender,
+      field: 'is_tailoring',
+      minWidth: 100,
+      cellRenderer: "cutRender"
+    }, {
+      headerName: '操作',
+      pinned: 'right',
+      maxWidth: 90,
+      cellRenderer: (params: any) => {
 
-      const paramData = JSON.stringify(params.data).replace(/'/g, '’');
-      return `
+        const paramData = JSON.stringify(params.data).replace(/'/g, '’');
+        return `
             <Button  style="border: none; background-color: transparent;margin-top: -3px " onclick='addTemplateRow(JSON.stringify(${params.rowIndex}),${paramData})'>
               <img src="../add_black2.png" width="15" height="15" alt="新增" title="新增">
             </Button>
            `;
 
-    }
-  }];
+      }
+    }];
 
   return column;
 

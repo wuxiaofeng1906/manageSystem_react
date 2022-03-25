@@ -77,9 +77,10 @@ const ProjectTemplate: React.FC<any> = () => {
     // 同样修改表格里面的值（任务名称、指派给、所属模块）
     const atferValue: any = [];
     gridData.forEach((ele: any) => {
+      const new_name = `${(ele.task_name).slice(0, 1)}${excuteInfo[1]}-${(ele.task_name).slice(1)}`;
       atferValue.push({
         ...ele,
-        task_name: `${excuteInfo[1]}-${ele.task_name}`,
+        task_name: new_name,
         assigned_person_name: prjManager.realname,
         module: `${excuteInfo[1]}里程碑`
       });
@@ -89,7 +90,7 @@ const ProjectTemplate: React.FC<any> = () => {
 
   // 项目负责人修改后，也要对应修改表格中所属端的指派人
   const projectManagerChanged = (currentValue: any) => {
-    debugger;
+
     const atferValue: any = [];
     gridData.forEach((ele: any) => {
       atferValue.push({...ele, assigned_person_name: currentValue});

@@ -94,19 +94,19 @@ const getParentTaskPerson = (newDts: any) => {
 
 // 分配子任务的指派人
 const getChildTaskPerson = (newDts: any, assignedTo: any) => {
-  if ((newDts.task_name).toString().startsWith(">【前端】")) {
+  if ((newDts.task_name).toString().includes("前端】")) {
     if (assignedTo.front) { // 有值班人员才取值，没有的话还是使用原始值。
       return assignedTo.front;
     }
-  } else if ((newDts.task_name).toString().startsWith(">【后端】")) {
+  } else if ((newDts.task_name).toString().includes("后端】")) {
     if (assignedTo.backend) {
       return assignedTo.backend;
     }
-  } else if ((newDts.task_name).toString().startsWith(">【测试】")) {
+  } else if ((newDts.task_name).toString().includes("测试】")) {
     if (assignedTo.test) {
       return assignedTo.test;
     }
-  } else if ((newDts.task_name).toString().startsWith(">【sqa】")) {
+  } else if ((newDts.task_name).toString().includes("sqa】")) {
     if (assignedTo.sqa) {
       return assignedTo.sqa;
     }
@@ -117,19 +117,19 @@ const getChildTaskPerson = (newDts: any, assignedTo: any) => {
 // 分配子任务的指派人
 const getChildTaskPersonForPrj = (newDts: any, assignedTo: any) => {
 
-  if ((newDts.task_name).toString().startsWith(">【前端】")) {
+  if ((newDts.task_name).toString().includes("前端】")) {
     if (assignedTo.front && (assignedTo.front).user_name) { // 有值班人员才取值，没有的话还是使用原始值。
       return assignedTo.front.user_name;
     }
-  } else if ((newDts.task_name).toString().startsWith(">【后端】")) {
+  } else if ((newDts.task_name).toString().includes("后端】")) {
     if (assignedTo.backend && (assignedTo.backend).user_name) {
       return assignedTo.backend.user_name;
     }
-  } else if ((newDts.task_name).toString().startsWith(">【测试】")) {
+  } else if ((newDts.task_name).toString().includes("测试】")) {
     if (assignedTo.test && (assignedTo.test).user_name) {
       return assignedTo.test.user_name;
     }
-  } else if ((newDts.task_name).toString().startsWith(">【sqa】")) {
+  } else if ((newDts.task_name).toString().includes("sqa】")) {
     if (assignedTo.sqa && (assignedTo.sqa).user_name) {
       return assignedTo.sqa.user_name;
     }

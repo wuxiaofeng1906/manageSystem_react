@@ -83,21 +83,28 @@ const CheckBeforeOnline: React.FC<any> = () => {
     const atferValue: any = [];
     gridData.forEach((ele: any) => {
       let assignedTo = "";
+      let taskname = "";
+
       if (params.sprintType === "sprint" || params.sprintType === "hotfix") { // 班车项目
         if (ele.add_type_name === "新增") { //
-          assignedTo = dutyInfo.backend
+          assignedTo = dutyInfo.backend;
+          taskname = `${(ele.task_name).slice(0, 1)}${excuteInfo[1]}-${(ele.task_name).slice(1)}`;
         } else {
           assignedTo = getChildTaskPerson(ele, dutyInfo);
+          taskname = `${(ele.task_name).slice(0, 2)}${excuteInfo[1]}-${(ele.task_name).slice(2)}`;
         }
       } else if (ele.add_type_name === "新增") {
         assignedTo = (spProjectAssigned.pm).user_name;
+        taskname = `${(ele.task_name).slice(0, 1)}${excuteInfo[1]}-${(ele.task_name).slice(1)}`;
       } else {
         assignedTo = getChildTaskPersonForPrj(ele, spProjectAssigned);
+        taskname = `${(ele.task_name).slice(0, 2)}${excuteInfo[1]}-${(ele.task_name).slice(2)}`;
       }
 
       atferValue.push({
         ...ele,
         assigned_person_name: assignedTo,
+        task_name: taskname,
       });
 
     });
@@ -129,10 +136,10 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
     const atferValue: any = [];
     gridData.forEach((ele: any) => {
-      if (side === "Front" && (ele.task_name).startsWith(">【前端】")
-        || side === "Backend" && (ele.task_name).startsWith(">【后端】")
-        || side === "Tester" && (ele.task_name).startsWith(">【测试】")
-        || side === "SQA" && (ele.task_name).startsWith(">【sqa】")) {
+      if (side === "Front" && (ele.task_name).includes("前端】")
+        || side === "Backend" && (ele.task_name).includes("后端】")
+        || side === "Tester" && (ele.task_name).includes("测试】")
+        || side === "SQA" && (ele.task_name).includes("sqa】")) {
         atferValue.push({...ele, assigned_person_name: currentValue});
       } else {
         atferValue.push(ele);

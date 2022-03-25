@@ -73,11 +73,17 @@ const generateTask = async (tempInfo: any, fromData: any, gridData: any) => {
 
   // 所属执行不能为空
   if (!fromData.belongExcution) {
-    return "所属执行不能为空！"
+    return {
+      sucess: false,
+      message: "所属执行不能为空!",
+    }
   }
 
   if (!gridData || gridData.length === 0) {
-    return "列表中任务不能为空！"
+    return {
+      sucess: false,
+      message: "列表中任务不能为空!",
+    }
   }
 
   const usersInfo = await convertUserNameToID();
@@ -117,9 +123,12 @@ const generateTask = async (tempInfo: any, fromData: any, gridData: any) => {
     }
 
   });
-  debugger;
+
   if (gridDataArray.length === 0) {
-    return "列表中任务不能为空或者列表中的数据都被裁剪！"
+    return {
+      sucess: false,
+      message: "列表中任务不能为空或者列表中的数据都被裁剪!",
+    }
   }
   return await requestGenerateTaskApi({
     "person": headData,

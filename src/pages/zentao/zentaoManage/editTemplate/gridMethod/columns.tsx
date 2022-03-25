@@ -39,7 +39,7 @@ const getTempColumns = () => {
     headerName: '任务名称',
     headerComponentParams: headerRender,
     field: 'task_name',
-    minWidth: 150,
+    minWidth: 200,
     editable: true,
     pinned: 'left',
     cellRenderer: (params: any) => {

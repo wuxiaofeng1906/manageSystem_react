@@ -14,7 +14,7 @@ const getProjectColumns = () => {
   }, {
     headerName: '任务名称',
     field: 'task_name',
-    minWidth: 100,
+    minWidth: 200,
     cellRenderer: (params: any) => {
       if (params.data.is_tailoring === "yes" || params.data.is_tailoring === "是") {
         return `<span style="color: gray">${params.value}</span>`

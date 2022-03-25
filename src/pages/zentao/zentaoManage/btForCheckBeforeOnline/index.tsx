@@ -175,9 +175,9 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
     //   调用接口生成
     const result = await generateTask(template, formData, gridDatas);
-    if (result) {
+    if (!result.sucess) {
       message.error({
-        content: result,
+        content: result.message,
         duration: 1,
         className: 'delNone',
         style: {
@@ -187,7 +187,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
     } else {
       message.info({
-        content: "任务生成成功！",
+        content: result.message,
         duration: 1,
         className: 'delNone',
         style: {

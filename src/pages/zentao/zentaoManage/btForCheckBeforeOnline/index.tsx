@@ -11,7 +11,13 @@ import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {history} from "@@/core/history";
 import moment from "moment";
 import {
-  loadUserSelect, loadExcutionSelect, getDutyPerson, getTempDetails, generateTask
+  loadUserSelect,
+  loadExcutionSelect,
+  getDutyPerson,
+  getTempDetails,
+  generateTask,
+  getChildTaskPerson,
+  getChildTaskPersonForPrj
 } from "./axiosRequest/requestDataParse";
 import {useRequest} from "ahooks";
 import {loadProjectManager} from "@/pages/zentao/zentaoManage/btForProjectTemplate/axiosRequest/requestDataParse";
@@ -68,28 +74,32 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
   // 项目执行修改
   const excutionChanged = async (values: any, params: any,) => {
+    const excuteInfo = values.split("&");
+    const spProjectAssigned = (await loadProjectManager(Number(excuteInfo[0])));
 
-    let assigned_to = "";
-    //   获取项目负责人，如果是特性项目就是执行里边设置的后端负责人；如果是班车就设置为值班计划里边当周的后端值班人
-    if (params.sprintType === "sprint" || params.sprintType === "hotfix") { // 班车项目
-      assigned_to = dutyInfo.backend;
-    } else {
-      // 特性项目
-      const excuteInfo = values.split("&");
-      assigned_to = (await loadProjectManager(Number(excuteInfo[0]))).user_name;
-    }
-
-    // 同样修改表格里面的值，增加类型为 新增（父任务）的指派人
+    // 如果执行类型为班车项目（sprint或hotfix），则父任务取值班计划中的后端值班人，子任务取值班计划中所属端的值班人。
+    // 如果执行类型为特性项目，则父任务取值班项目负责人，子任务特性项目中对应的所属端的人员
+    // 同样修改表格里面的指派人，
     const atferValue: any = [];
     gridData.forEach((ele: any) => {
-      if (ele.add_type_name === "新增") {
-        atferValue.push({
-          ...ele,
-          assigned_person_name: assigned_to,
-        });
+      let assignedTo = "";
+      if (params.sprintType === "sprint" || params.sprintType === "hotfix") { // 班车项目
+        if (ele.add_type_name === "新增") { //
+          assignedTo = dutyInfo.backend
+        } else {
+          assignedTo = getChildTaskPerson(ele, dutyInfo);
+        }
+      } else if (ele.add_type_name === "新增") {
+        assignedTo = (spProjectAssigned.pm).user_name;
       } else {
-        atferValue.push(ele);
+        assignedTo = getChildTaskPersonForPrj(ele, spProjectAssigned);
       }
+
+      atferValue.push({
+        ...ele,
+        assigned_person_name: assignedTo,
+      });
+
     });
     setGridData(atferValue);
   };
@@ -251,7 +261,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
                 </Col>
                 <Col span={6}>
                   <Form.Item label="前端指派人:" name="assingedToFront" required={true} style={{marginLeft: 19}}>
-                    <Select style={{width: '100%'}}  showSearch
+                    <Select style={{width: '100%'}} showSearch
                             onChange={(params: any) => {
                               changeAssignedTo("Front", params);
                             }}>

@@ -113,6 +113,29 @@ const getChildTaskPerson = (newDts: any, assignedTo: any) => {
   }
   return newDts.assigned_person_name;
 }
+
+// 分配子任务的指派人
+const getChildTaskPersonForPrj = (newDts: any, assignedTo: any) => {
+
+  if ((newDts.task_name).toString().startsWith(">【前端】")) {
+    if (assignedTo.front && (assignedTo.front).user_name) { // 有值班人员才取值，没有的话还是使用原始值。
+      return assignedTo.front.user_name;
+    }
+  } else if ((newDts.task_name).toString().startsWith(">【后端】")) {
+    if (assignedTo.backend && (assignedTo.backend).user_name) {
+      return assignedTo.backend.user_name;
+    }
+  } else if ((newDts.task_name).toString().startsWith(">【测试】")) {
+    if (assignedTo.test && (assignedTo.test).user_name) {
+      return assignedTo.test.user_name;
+    }
+  } else if ((newDts.task_name).toString().startsWith(">【sqa】")) {
+    if (assignedTo.sqa && (assignedTo.sqa).user_name) {
+      return assignedTo.sqa.user_name;
+    }
+  }
+  return newDts.assigned_person_name;
+}
 // 获取模板的详情
 const getTempDetails = async (tempId: string, assignedTo: any) => {
 
@@ -125,15 +148,15 @@ const getTempDetails = async (tempId: string, assignedTo: any) => {
       newDts["plan_end"] = dayjs().format("YYYY-MM-DD");
 
       // 判断是不是主任务
-      let assigned_to = "";
-      if (newDts.add_type_name === "新增") {
-        // 是主任务就要获取相关项目负责人
-        assigned_to = getParentTaskPerson(newDts);
-      } else {
-        // 如果是子任务，则判断任务名称中是哪个端的，是哪个端的就去取哪个端的值班人员。如果所取那个端的人员为空，则显示模板编辑时候的默认值。
-        assigned_to = getChildTaskPerson(newDts, assignedTo);
-      }
-      newDts["assigned_person_name"] = assigned_to;
+      // let assigned_to = "";
+      // if (newDts.add_type_name === "新增") {
+      //   // 是主任务就要获取相关项目负责人
+      //   assigned_to = getParentTaskPerson(newDts);
+      // } else {
+      //   // 如果是子任务，则判断任务名称中是哪个端的，是哪个端的就去取哪个端的值班人员。如果所取那个端的人员为空，则显示模板编辑时候的默认值。
+      //   assigned_to = getChildTaskPerson(newDts, assignedTo);
+      // }
+      newDts["assigned_person_name"] = "";
       returnValue.push(newDts);
     });
   }
@@ -204,5 +227,5 @@ const generateTask = async (tempInfo: any, fromData: any, gridData: any) => {
 };
 
 export {
-  loadUserSelect, loadExcutionSelect, getDutyPerson, getTempDetails, generateTask
+  loadUserSelect, loadExcutionSelect, getDutyPerson, getTempDetails, generateTask, getChildTaskPerson,getChildTaskPersonForPrj
 }

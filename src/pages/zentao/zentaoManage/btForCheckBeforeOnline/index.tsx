@@ -76,6 +76,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
   const excutionChanged = async (values: any, params: any,) => {
     const excuteInfo = values.split("&");
     const spProjectAssigned = (await loadProjectManager(Number(excuteInfo[0])));
+    debugger;
 
     // 如果执行类型为班车项目（sprint或hotfix），则父任务取值班计划中的后端值班人，子任务取值班计划中所属端的值班人。
     // 如果执行类型为特性项目，则父任务取值班项目负责人，子任务特性项目中对应的所属端的人员

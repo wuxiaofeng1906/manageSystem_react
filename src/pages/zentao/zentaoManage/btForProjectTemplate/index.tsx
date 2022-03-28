@@ -69,19 +69,25 @@ const ProjectTemplate: React.FC<any> = () => {
   const excutionChanged = async (params: any) => {
     //   获取项目负责人
     const excuteInfo = params.split("&");
-    const prjManager = await loadProjectManager(Number(excuteInfo[0]));
+    const prjManager = (await loadProjectManager(Number(excuteInfo[0]))).pm;
+
     formForProject.setFieldsValue({
-      projectManager: prjManager.realname
+      projectManager: prjManager.user_name
     });
 
     // 同样修改表格里面的值（任务名称、指派给、所属模块）
     const atferValue: any = [];
     gridData.forEach((ele: any) => {
-      const new_name = `${(ele.task_name).slice(0, 1)}${excuteInfo[1]}-${(ele.task_name).slice(1)}`;
+      // 任务名称需要还原之前的名字再加上执行的名字
+      let taskName = ele.task_name;
+      if ((ele.task_name).includes("-")) { // 如果名称包含-，则需要清除掉这个-
+        taskName = `【${(ele.task_name).split("-")[1]}`;
+      }
+      const new_name = `${taskName.slice(0, 1)}${excuteInfo[1]}-${taskName.slice(1)}`;
       atferValue.push({
         ...ele,
         task_name: new_name,
-        assigned_person_name: prjManager.realname,
+        assigned_person_name: prjManager.user_name,
         module: `${excuteInfo[1]}里程碑`
       });
     });

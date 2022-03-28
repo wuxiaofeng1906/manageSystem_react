@@ -83,7 +83,6 @@ const CheckBeforeOnline: React.FC<any> = () => {
     const atferValue: any = [];
     gridData.forEach((ele: any) => {
       debugger;
-      let taskname = "";
       // 任务名称需要还原之前的名
       let taskName = ele.task_name;
       const nameHead = taskName.substring(taskName.indexOf("【") + 1, taskName.indexOf("】"));
@@ -93,6 +92,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
       }
 
       let assignedTo = "";
+      let taskname = "";
       if (params.sprintType === "sprint" || params.sprintType === "hotfix") { // 班车项目
         if (ele.add_type_name === "新增") { //
           assignedTo = dutyInfo.backend;

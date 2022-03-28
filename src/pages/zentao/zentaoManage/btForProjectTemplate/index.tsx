@@ -80,8 +80,10 @@ const ProjectTemplate: React.FC<any> = () => {
     gridData.forEach((ele: any) => {
       // 任务名称需要还原之前的名字再加上执行的名字
       let taskName = ele.task_name;
-      if ((ele.task_name).includes("-")) { // 如果名称包含-，则需要清除掉这个-
-        taskName = `【${(ele.task_name).split("-")[1]}`;
+      const nameHead = taskName.substring(taskName.indexOf("【") + 1, taskName.indexOf("】"));
+      if (nameHead.includes("-")) { // 如果名称包含-，则需要清除掉这个-
+        const head = nameHead.split("-")[0];
+        taskName = `${taskName.replace(`${head}-`, "")}`;
       }
       const new_name = `${taskName.slice(0, 1)}${excuteInfo[1]}-${taskName.slice(1)}`;
       atferValue.push({

@@ -134,7 +134,7 @@ const getChildTaskPersonForPrj = (newDts: any, assignedTo: any) => {
       return assignedTo.sqa.user_name;
     }
   }
-  return newDts.assigned_person_name;
+  return "";
 }
 // 获取模板的详情
 const getTempDetails = async (tempId: string, assignedTo: any) => {

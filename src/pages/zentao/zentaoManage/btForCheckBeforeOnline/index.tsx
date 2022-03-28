@@ -76,30 +76,37 @@ const CheckBeforeOnline: React.FC<any> = () => {
   const excutionChanged = async (values: any, params: any,) => {
     const excuteInfo = values.split("&");
     const spProjectAssigned = (await loadProjectManager(Number(excuteInfo[0])));
-    debugger;
 
     // 如果执行类型为班车项目（sprint或hotfix），则父任务取值班计划中的后端值班人，子任务取值班计划中所属端的值班人。
     // 如果执行类型为特性项目，则父任务取值班项目负责人，子任务特性项目中对应的所属端的人员
     // 同样修改表格里面的指派人，
     const atferValue: any = [];
     gridData.forEach((ele: any) => {
-      let assignedTo = "";
+      debugger;
       let taskname = "";
+      // 任务名称需要还原之前的名
+      let taskName = ele.task_name;
+      const nameHead = taskName.substring(taskName.indexOf("【") + 1, taskName.indexOf("】"));
+      if (nameHead.includes("-")) { // 如果名称包含-，则需要清除掉这个-
+        const head = nameHead.split("-")[0];
+        taskName = `${taskName.replace(`${head}-`, "")}`;
+      }
 
+      let assignedTo = "";
       if (params.sprintType === "sprint" || params.sprintType === "hotfix") { // 班车项目
         if (ele.add_type_name === "新增") { //
           assignedTo = dutyInfo.backend;
-          taskname = `${(ele.task_name).slice(0, 1)}${excuteInfo[1]}-${(ele.task_name).slice(1)}`;
+          taskname = `${taskName.slice(0, 1)}${excuteInfo[1]}-${taskName.slice(1)}`;
         } else {
           assignedTo = getChildTaskPerson(ele, dutyInfo);
-          taskname = `${(ele.task_name).slice(0, 2)}${excuteInfo[1]}-${(ele.task_name).slice(2)}`;
+          taskname = `${taskName.slice(0, 2)}${excuteInfo[1]}-${taskName.slice(2)}`;
         }
       } else if (ele.add_type_name === "新增") {
         assignedTo = (spProjectAssigned.pm).user_name;
-        taskname = `${(ele.task_name).slice(0, 1)}${excuteInfo[1]}-${(ele.task_name).slice(1)}`;
+        taskname = `${taskName.slice(0, 1)}${excuteInfo[1]}-${taskName.slice(1)}`;
       } else {
         assignedTo = getChildTaskPersonForPrj(ele, spProjectAssigned);
-        taskname = `${(ele.task_name).slice(0, 2)}${excuteInfo[1]}-${(ele.task_name).slice(2)}`;
+        taskname = `${taskName.slice(0, 2)}${excuteInfo[1]}-${taskName.slice(2)}`;
       }
 
       atferValue.push({

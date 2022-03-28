@@ -108,7 +108,7 @@ const getTempColumns = () => {
       cellRenderer: "cutRender"
     }, {
       headerName: '操作',
-      pinned: 'right',
+      // pinned: 'right',
       maxWidth: 90,
       cellRenderer: (params: any) => {
 

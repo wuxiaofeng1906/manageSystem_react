@@ -30,8 +30,8 @@ const selectOptions = {
   taskSource: [],
 };
 
-// 组件初始化
 const EditTemplateList: React.FC<any> = () => {
+
   /* region 表格事件 */
   const [gridData, setGridData] = useState([]);
   // 获取跳转过来的模板，并获取对应数据
@@ -210,10 +210,8 @@ const EditTemplateList: React.FC<any> = () => {
 
   /* region 模板保存 */
   const [formForTemplate] = Form.useForm();
-
   // 表格中数据变化
   const gridSelectChanged = (props: any, value: any) => {
-
     // 重设某行的值
     const rowNode = gridApi.current?.getRowNode(props.rowIndex);
     rowNode?.setData({
@@ -225,7 +223,6 @@ const EditTemplateList: React.FC<any> = () => {
   // 表格停止编辑
   const cellEditingStopped = (params: any) => {
     // 如果是任务名称，则需要判断输入格式。
-
     if (params.column.colId === "task_name") {
       if (params.newValue) {
         const vertifyMessage = vertifyTaskName(params.data?.add_type_name, params.newValue);
@@ -246,9 +243,7 @@ const EditTemplateList: React.FC<any> = () => {
           return;
         }
       }
-
     }
-
     gridSelectChanged(params, params.newValue);
   }
 
@@ -292,6 +287,12 @@ const EditTemplateList: React.FC<any> = () => {
         duration: 1,
         style: {marginTop: '50vh'},
       });
+
+      // 如果是新增，保存成功之后需要跳转回主界面。
+      if (!template.id) {
+        history.push('/zentao/templateList');
+      }
+
     }
   };
   // 取消模板编辑
@@ -311,18 +312,15 @@ const EditTemplateList: React.FC<any> = () => {
   selectOptions.taskSource = useRequest(() => getTaskSourceSelect()).data;
 
   const showInitPages = async () => {
+    let gridDt: any = [{add_type_name: "新增"}];
     if (template.id) {
-      const dt = await getTemplateDetails(template.id);
-      setGridData(dt);
-
       formForTemplate.setFieldsValue({
         tempName: template.name,
         tempType: `${template.type}&${template.type_name}`,
       });
-    } else {
-      //   如果为空，则要设置一行
-      setGridData([{add_type_name: "新增"}]);
+      gridDt = await getTemplateDetails(template.id);
     }
+    setGridData(gridDt);
   };
   useEffect(() => {
     showInitPages();
@@ -514,44 +512,33 @@ const EditTemplateList: React.FC<any> = () => {
           </div>
         </div>
 
+        {/* 模板保存和取消按钮 */}
         <div style={{marginTop: 10}}>
           <Button
             type="primary"
             style={{
               float: 'right', color: '#46A0FC', backgroundColor: '#ECF5FF', borderRadius: 5, marginLeft: 20,
             }}
-            onClick={saveTemplate}
-          >
-            保存
-          </Button>
-          <Button style={{float: 'right', borderRadius: 5}} onClick={cancleTempEdit}>
-            取消
-          </Button>
+            onClick={saveTemplate}>保存</Button>
+          <Button style={{float: 'right', borderRadius: 5}} onClick={cancleTempEdit}>取消</Button>
         </div>
 
+        {/* 删除弹窗 */}
         <Modal
-          title={'删除行'}
+          title={'删除确认'}
           visible={isdelModalVisible.showFalg}
           onCancel={delFormCancle}
           centered={true}
-          footer={null}
+          footer={[
+            <Button type="primary" style={{marginLeft: '110px'}} onClick={delTempRow}>
+              确定
+            </Button>,
+            <Button type="primary" style={{marginLeft: '30px'}} onClick={delFormCancle}>
+              取消
+            </Button>
+          ]}
           width={400}
-        >
-          <Form>
-            <Form.Item>
-              <label>确定删除选中的数据吗？</label>
-            </Form.Item>
-
-            <Form.Item>
-              <Button type="primary" style={{marginLeft: '110px'}} onClick={delTempRow}>
-                确定
-              </Button>
-              <Button type="primary" style={{marginLeft: '30px'}} onClick={delFormCancle}>
-                取消
-              </Button>
-            </Form.Item>
-          </Form>
-        </Modal>
+        >您确定要删除选中的数据吗？</Modal>
       </div>
     </div>
   );

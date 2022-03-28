@@ -5,7 +5,7 @@ import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {Button, message, Form, Modal} from 'antd';
+import {Button, message, Modal} from 'antd';
 import {getTempColumns} from './gridMethod/columns';
 import {getHeight} from "@/publicMethods/pageSet";
 import {DeleteTwoTone, FolderAddTwoTone, ProfileTwoTone, DownloadOutlined} from "@ant-design/icons";
@@ -14,8 +14,6 @@ import {getTemplateList, deleteTemplate} from './axiosRequest/requestDataParse';
 import {useRequest} from "ahooks";
 import {downloadTemplateToExcel} from "./export";
 
-
-// 组件初始化
 const ZentaoTemplateList: React.FC<any> = () => {
 
   /* region 表格事件 */
@@ -110,12 +108,19 @@ const ZentaoTemplateList: React.FC<any> = () => {
       });
       return;
     }
-
     //   更新列表
     gridApi.current?.setRowData(await getTemplateList());
     setIsDelModalVisible({
       showFalg: false,
       delData: ""
+    });
+    message.info({
+      content: `模板删除成功！`,
+      duration: 1,
+      className: 'delNone',
+      style: {
+        marginTop: '50vh',
+      },
     });
   };
   /* endregion 删除模板 */
@@ -199,7 +204,6 @@ const ZentaoTemplateList: React.FC<any> = () => {
                 onClick={generateTask}>生成任务</Button>
       </div>
 
-
       {/* 模板列表 */}
       <div>
         <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
@@ -226,29 +230,16 @@ const ZentaoTemplateList: React.FC<any> = () => {
       </div>
 
       <Modal
-        title={'删除模板'}
+        title={'删除确认'}
         visible={isdelModalVisible.showFalg}
         onCancel={delFormCancle}
         centered={true}
-        footer={null}
-        width={400}
-      >
-        <Form>
-          <Form.Item>
-            <label>
-              确定删除选中的模板吗？
-            </label>
-          </Form.Item>
-
-          <Form.Item>
-            <Button type="primary" style={{marginLeft: '110px'}} onClick={delTempList}>
-              确定
-            </Button>
-            <Button type="primary" style={{marginLeft: '30px'}} onClick={delFormCancle}>
-              取消
-            </Button>
-          </Form.Item>
-        </Form>
+        footer={[
+          <Button type="primary" style={{marginLeft: '110px'}} onClick={delTempList}>确定</Button>,
+          <Button type="primary" style={{marginLeft: '30px'}} onClick={delFormCancle}>取消</Button>
+        ]}
+        width={350}
+      > 您确定要删除选中的模板吗？
       </Modal>
 
     </PageContainer>

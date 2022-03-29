@@ -317,8 +317,41 @@ const vertifyAddType = (type: string, values: string) => {
   return "增加类型和任务名称格式不匹配";
 
 }
+
+// 寻找父任务的ID以及父任务总的值。
+const calParentTask = (tableData: any, currentRow: any) => {
+
+  // 找到当前子任务所属父任务
+  const currentIndex = currentRow.rowIndex;
+  let parentIndex = -1;
+  // 往上找寻父任务并且相加子任务的值
+  for (let index = currentIndex; index >= 0; index -= 1) {
+    const rows = tableData[index];
+    if (rows.add_type_name === "新增") {  // 确定父任务ID
+      parentIndex = index;
+      break;
+    }
+  }
+
+  let parentValue = 0;
+  // 相加所有子任务的值
+  for (let index = parentIndex + 1; index < tableData.length; index += 1) {
+    const rows = tableData[index];
+    //   寻找到下一个下一个父任务时，就跳出循环，停止值的相加。
+    if (rows.add_type_name === "新增") { //
+      break;
+    } else {
+      parentValue = Number(rows.estimate) + parentValue;
+    }
+  }
+
+
+  // 还要获取
+  return {parentIndex, parentValue}
+
+};
 export {
   getTemTypeSelect, getAddTypeSelect, getAssignedToSelect, getPrioritySelect,
   getTaskTypeSelect, getSideSelect, getTaskSourceSelect, deleteTemplateList, vertifySaveData, saveTempList,
-  vertifyTaskName, vertifyAddType
+  vertifyTaskName, vertifyAddType, calParentTask
 }

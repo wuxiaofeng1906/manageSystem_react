@@ -15,7 +15,7 @@ import {
   getTemTypeSelect, getAddTypeSelect, getAssignedToSelect,
   getPrioritySelect, getTaskTypeSelect, getSideSelect,
   getTaskSourceSelect, deleteTemplateList, vertifySaveData,
-  saveTempList, vertifyTaskName
+  saveTempList, vertifyTaskName, calParentTask
 } from './axiosRequest/requestDataParse';
 import {getTemplateDetails} from './gridMethod/girdData';
 import {useRequest} from 'ahooks';
@@ -244,7 +244,22 @@ const EditTemplateList: React.FC<any> = () => {
         }
       }
     }
+
     gridSelectChanged(params, params.newValue);
+
+    // 如果是修改的最初预计，则需要判断是不是子任务，当前子任务的父任务的最初预计时长需要计算为子子任务最初预计时间之和。
+    if (params.column.colId === "estimate" && params.data?.add_type_name === "子任务") {
+      const tabData: any = [];
+      gridApi.current?.forEachNode((node: any) => {
+        tabData.push(node.data);
+      });
+      const parentInfo = calParentTask(tabData, params);
+      const rowNode = gridApi.current?.getRowNode((parentInfo.parentIndex).toString());
+      rowNode?.setData({
+        ...tabData[parentInfo.parentIndex],
+        "estimate": parentInfo.parentValue
+      })
+    }
   }
 
   // 保存编辑后的模板

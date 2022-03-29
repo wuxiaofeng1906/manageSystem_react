@@ -194,7 +194,6 @@ const CheckBeforeOnline: React.FC<any> = () => {
       message.error({
         content: result.message,
         duration: 1.5,
-        className: 'delNone',
         style: {
           marginTop: '50vh',
         },
@@ -204,7 +203,6 @@ const CheckBeforeOnline: React.FC<any> = () => {
       message.info({
         content: result.message,
         duration: 1.5,
-        className: 'delNone',
         style: {
           marginTop: '50vh',
         },

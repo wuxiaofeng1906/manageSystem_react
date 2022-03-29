@@ -157,8 +157,7 @@ const ProjectTemplate: React.FC<any> = () => {
     if (!result.sucess) {
       message.error({
         content: result.message,
-        duration: 1,
-        className: 'delNone',
+        duration: 1.5,
         style: {
           marginTop: '50vh',
         },
@@ -167,8 +166,7 @@ const ProjectTemplate: React.FC<any> = () => {
     } else {
       message.info({
         content: result.message,
-        duration: 1,
-        className: 'delNone',
+        duration: 1.5,
         style: {
           marginTop: '50vh',
         },

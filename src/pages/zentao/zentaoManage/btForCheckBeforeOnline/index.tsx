@@ -82,7 +82,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
     // 同样修改表格里面的指派人，
     const atferValue: any = [];
     gridData.forEach((ele: any) => {
-      debugger;
+
       // 任务名称需要还原之前的名
       let taskName = ele.task_name;
       const nameHead = taskName.substring(taskName.indexOf("【") + 1, taskName.indexOf("】"));
@@ -193,7 +193,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
     if (!result.sucess) {
       message.error({
         content: result.message,
-        duration: 1,
+        duration: 1.5,
         className: 'delNone',
         style: {
           marginTop: '50vh',
@@ -203,7 +203,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
     } else {
       message.info({
         content: result.message,
-        duration: 1,
+        duration: 1.5,
         className: 'delNone',
         style: {
           marginTop: '50vh',

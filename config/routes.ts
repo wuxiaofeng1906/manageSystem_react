@@ -499,6 +499,34 @@ export default [
         hideInMenu: true
       }
     ]
+  }, {
+    name: "石墨管理",
+    icon: 'table',
+    path: '/shimo',
+    hideInMenu: false,
+    access: 'sysAdmin',
+    routes: [
+      {
+        name: '文档基线',
+        icon: 'table',
+        path: 'fileBaseline',
+        routes: [
+          {
+            name: '迭代列表',
+            icon: 'table',
+            path: 'iterateList',
+            component: './shimo/fileBaseline/iterateList',
+          },
+          {
+            name: '基线详情',
+            icon: 'table',
+            path: 'baselineDetails',
+            component: './shimo/fileBaseline/baselineDetails',
+            hideInMenu: true,
+          }
+        ]
+      }
+    ]
   },
   {
     name: '系统管理',

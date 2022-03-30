@@ -1,9 +1,21 @@
-
 import {
-  linkToZentaoPage, numberRenderToCurrentStage, numberRenderToCurrentStageForColor,
-  numberRenderTopass, numberRenderToSource, numberRenderToYesNo, numberRenderToZentaoStatusForRed, numberRenderToZentaoTypeFilter,
-  numRenderForSevAndpriForLine, numRenderToTypeForLineAndFromBug, proposedTestRender, relatedNumberAndIdRender,
-  relatedNumberRender, stageForLineThrough, testerRender, timeForLineThrough, timestampChanges
+  linkToZentaoPage,
+  numberRenderToCurrentStage,
+  numberRenderToCurrentStageForColor,
+  numberRenderTopass,
+  numberRenderToSource,
+  numberRenderToYesNo,
+  numberRenderToZentaoStatusForRed,
+  numberRenderToZentaoTypeFilter,
+  numRenderForSevAndpriForLine,
+  numRenderToTypeForLineAndFromBug,
+  proposedTestRender,
+  relatedNumberAndIdRender,
+  relatedNumberRender,
+  stageForLineThrough,
+  testerRender,
+  timeForLineThrough,
+  timestampChanges
 } from "@/publicMethods/cellRenderer";
 
 import {history} from "@@/core/history";
@@ -75,6 +87,11 @@ const getColums = (prjNames: any) => {
       minWidth: 235,
       cellRenderer: stageForLineThrough,
       tooltipField: "title"
+    },
+    {
+      headerName: '所属计划',
+      field: 'planName',
+      minWidth: 100,
     },
     {
       headerName: '严重等级',
@@ -320,4 +337,4 @@ const setRowColor = (params: any) => {
   return {'background-color': 'white'};
 };
 
-export {getColums,setRowColor};
+export {getColums, setRowColor};

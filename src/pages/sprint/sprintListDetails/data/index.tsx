@@ -145,6 +145,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             ztNo
             title
             severity
+            planName
             priority
             moduleName
             ztStatus

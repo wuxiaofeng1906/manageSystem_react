@@ -5,649 +5,41 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient, useQuery} from '@/hooks';
+import {useGqlClient} from '@/hooks';
 import {PageHeader, Button, message, Form, Select, Modal, Input, Row, Col, DatePicker, Checkbox, Spin} from 'antd';
 import {formatMomentTime} from '@/publicMethods/timeMethods';
 import dayjs from "dayjs";
 import {
-  FolderAddTwoTone,
-  SnippetsTwoTone,
-  DeleteTwoTone,
-  EditTwoTone,
-  CloseSquareTwoTone,
-  CheckSquareTwoTone,
-  SettingOutlined, ReloadOutlined
+  FolderAddTwoTone, SnippetsTwoTone, DeleteTwoTone, EditTwoTone,
+  CloseSquareTwoTone, CheckSquareTwoTone, SettingOutlined, ReloadOutlined
 } from '@ant-design/icons';
-import {history} from 'umi';
+import {getProjectInfo, alayManagerData} from "./common";
 import {
-  numberRenderToYesNo,
-  numberRenderTopass,
-  numberRenderToCurrentStage,
-  numberRenderToCurrentStageForColor,
-  stageChangeToNumber,
-  numberRenderToZentaoType,
-  zentaoTypeRenderToNumber,
-  numRenderToTypeForLineAndFromBug,
-  numberRenderToZentaoSeverity,
-  numberRenderToZentaoStatus,
-  numberRenderToSource,
-  linkToZentaoPage,
-  numberRenderToZentaoStatusForRed,
-  stageForLineThrough,
-  numRenderForSevAndpriForLine,
-  proposedTestRender,
-  relatedNumberRender,
-  relatedNumberAndIdRender,
-  testerRender,
-  timeForLineThrough,
-  timestampChanges,
-  numberRenderToZentaoTypeFilter
+  numberRenderToCurrentStage, stageChangeToNumber, numberRenderToZentaoType,
+  zentaoTypeRenderToNumber, numberRenderToZentaoSeverity, numberRenderToZentaoStatus,
 } from '@/publicMethods/cellRenderer';
 import {getUsersId} from '@/publicMethods/userMethod';
-
 import axios from 'axios';
 import moment from "moment";
 import {getHeight} from '@/publicMethods/pageSet';
 import {judgeAuthority} from "@/publicMethods/authorityJudge";
 import {useModel} from "@@/plugin-model/useModel";
+import {getColums, setRowColor} from "./grid";
+import {
+  queryDevelopViews, queryRepeats, getDeptMemner,
+  LoadCombobox, LoadTesterCombobox, GetSprintProject
+} from "./data";
 
 const {Option} = Select;
-
-// 定义列名
-const getColums = (prjNames: any) => {
-
-  // 获取缓存的字段
-  const fields = localStorage.getItem("sp_details_filed");
-  const oraFields: any = [
-    {
-      headerName: '选择',
-      pinned: 'left',
-      checkboxSelection: true,
-      headerCheckboxSelection: true,
-      maxWidth: 35,
-    },
-    // {
-    //   headerName: '序号',
-    //   maxWidth: 80,
-    //   filter: false,
-    //   pinned: 'left',
-    //   cellRenderer: (params: any) => {
-    //     return Number(params.node.id) + 1;
-    //   },
-    // },
-    {
-      headerName: '阶段',
-      field: 'stage',
-      pinned: 'left',
-      cellRenderer: numberRenderToCurrentStageForColor,
-      minWidth: 120,
-      suppressMenu: false,
-      // filter: "agSetColumnFilter",
-      filterParams: {cellRenderer: numberRenderToCurrentStage}
-    },
-    {
-      headerName: '测试',
-      field: 'tester',
-      pinned: 'left',
-      minWidth: 80,
-      cellRenderer: testerRender,
-      tooltipField: "tester",
-      suppressMenu: false
-    },
-    {
-      headerName: '类型',
-      field: 'category',
-      cellRenderer: numRenderToTypeForLineAndFromBug,
-      pinned: 'left',
-      minWidth: 95,
-      suppressMenu: false,
-      filterParams: {cellRenderer: numberRenderToZentaoTypeFilter}
-
-      // tooltipField: "category"
-
-    },
-    {
-      headerName: '编号',
-      field: 'ztNo',
-      cellRenderer: linkToZentaoPage,
-      pinned: 'left',
-      minWidth: 90,
-      // tooltipField: "ztNo"
-    },
-    {
-      headerName: '标题内容',
-      field: 'title',
-      pinned: 'left',
-      minWidth: 235,
-      cellRenderer: stageForLineThrough,
-      tooltipField: "title"
-    },
-    {
-      headerName: '严重等级',
-      field: 'severity',
-      cellRenderer: numRenderForSevAndpriForLine,
-      minWidth: 90,
-      // tooltipField: "severity"
-    },
-    // {
-    //   headerName: '优先级',
-    //   field: 'priority',
-    // },
-    {
-      headerName: '模块',
-      field: 'moduleName',
-      minWidth: 100,
-      cellRenderer: stageForLineThrough,
-      tooltipField: "moduleName"
-    },
-    {
-      headerName: '状态',
-      field: 'ztStatus',
-      cellRenderer: numberRenderToZentaoStatusForRed,
-      minWidth: 80,
-      // tooltipField: "ztStatus"
-    }, {
-      headerName: '指派给',
-      field: 'assignedTo',
-      minWidth: 80,
-      cellRenderer: stageForLineThrough,
-      tooltipField: "assignedTo",
-      suppressMenu: false,
-
-    },
-    {
-      headerName: '解决/完成人',
-      field: 'finishedBy',
-      minWidth: 80,
-      cellRenderer: stageForLineThrough,
-      tooltipField: "finishedBy",
-      suppressMenu: false,
-    },
-    {
-      headerName: '相关需求',
-      field: 'relatedStories',
-      minWidth: 80,
-      cellRenderer: relatedNumberAndIdRender,
-      onCellClicked: (params: any) => {
-        // BUG = 1,
-        // TASK = 2,
-        // STORY = 3,
-        if (Number(params.value) < 500 && Number(params.value) > 0) {
-          history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=3&count=${params.value}`);
-        }
-      },
-      // tooltipField: "relatedStories"
-    },
-    {
-      headerName: '相关任务',
-      field: 'relatedTasks',
-      minWidth: 80,
-      cellRenderer: relatedNumberAndIdRender,
-      onCellClicked: (params: any) => {
-        if (Number(params.value) < 500 && Number(params.value) > 0) {
-          history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=2&count=${params.value}`);
-        }
-      },
-      // tooltipField: "relatedTasks"
-
-    },
-    {
-      headerName: '相关bug',
-      field: 'relatedBugs',
-      minWidth: 80,
-      cellRenderer: relatedNumberRender,
-      onCellClicked: (params: any) => {
-        if (Number(params.value) > 0) {
-          history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=1&count=${params.value}`);
-        }
-      },
-      // tooltipField: "relatedBugs"
-
-    },
-    {
-      headerName: '截止日期',
-      field: 'deadline',
-      cellRenderer: timestampChanges,
-    },
-    {
-      headerName: '是否涉及页面调整',
-      field: 'pageAdjust',
-      cellRenderer: numberRenderToYesNo,
-      // tooltipField: "hotUpdate"
-    },
-    {
-      headerName: '是否可热更',
-      field: 'hotUpdate',
-      cellRenderer: numberRenderToYesNo,
-      // tooltipField: "hotUpdate"
-    },
-    {
-      headerName: '是否有数据升级',
-      field: 'dataUpdate',
-      cellRenderer: numberRenderToYesNo,
-      // tooltipField: "dataUpdate"
-    },
-    {
-      headerName: '是否有接口升级',
-      field: 'interUpdate',
-      cellRenderer: numberRenderToYesNo,
-      // tooltipField: "interUpdate"
-    },
-    {
-      headerName: '是否有预置数据修改',
-      field: 'presetData',
-      cellRenderer: numberRenderToYesNo,
-      // tooltipField: "presetData"
-    },
-    {
-      headerName: '是否需要测试验证',
-      field: 'testCheck',
-      cellRenderer: numberRenderToYesNo,
-      // tooltipField: "testCheck"
-    },
-    {
-      headerName: '已提测',
-      field: 'proposedTest',
-      cellRenderer: proposedTestRender,
-    },
-    {
-      headerName: '发布环境',
-      field: 'publishEnv',
-      minWidth: 80,
-      cellRenderer: stageForLineThrough,
-      tooltipField: "publishEnv"
-
-    },
-    {
-      headerName: '关闭人',
-      field: 'closedBy',
-      minWidth: 80,
-      cellRenderer: stageForLineThrough,
-      tooltipField: "closedBy",
-      suppressMenu: false,
-
-    },
-    {
-      headerName: '备注',
-      field: 'memo',
-      minWidth: 150,
-      cellRenderer: stageForLineThrough,
-      tooltipField: "memo"
-
-    },
-    {
-      headerName: '验证范围建议',
-      field: 'scopeLimit',
-      cellRenderer: stageForLineThrough,
-      // tooltipField: "scopeLimit"
-    },
-    {
-      headerName: 'UED',
-      field: 'uedName',
-      cellRenderer: stageForLineThrough,
-      suppressMenu: false,
-      // tooltipField: "uedName"
-    },
-    {
-      headerName: 'UED测试环境验证',
-      field: 'uedEnvCheck',
-      cellRenderer: numberRenderTopass,
-      // tooltipField: "uedEnvCheck"
-
-    },
-    {
-      headerName: 'UED线上验证',
-      field: 'uedOnlineCheck',
-      cellRenderer: numberRenderTopass,
-      // tooltipField: "uedOnlineCheck"
-    },
-    {
-      headerName: '来源',
-      field: 'source',
-      cellRenderer: numberRenderToSource,
-      // tooltipField: "source"
-    },
-    {
-      headerName: '反馈人',
-      field: 'feedback',
-      cellRenderer: stageForLineThrough,
-      suppressMenu: false,
-      // tooltipField: "feedback"
-    },
-    // {
-    //   headerName: '基线',
-    //   field: 'baseline',
-    //   suppressMenu: false,
-    // }
-  ];
-
-  if (prjNames === "多组织阻塞bug跟踪") {
-    oraFields.splice(11, 0, {
-      headerName: '创建时间',
-      field: 'openedAt',
-      minWidth: 150,
-      cellRenderer: timeForLineThrough,
-      suppressMenu: false
-    });
-
-    oraFields.splice(12, 0, {
-      headerName: '解决时间',
-      field: 'resolvedAt',
-      minWidth: 150,
-      cellRenderer: timeForLineThrough,
-      suppressMenu: false
-    });
-  }
-
-  if (fields === null) {
-    return oraFields;
-  }
-  const myFields = JSON.parse(fields);
-  const component = new Array();
-
-  oraFields.forEach((ele: any) => {
-    const newElement = ele;
-    if (myFields.includes(ele.headerName)) {
-      newElement.hide = false;
-    } else {
-      newElement.hide = true;
-    }
-    component.push(newElement);
-  });
-
-  return component;
-};
-
-const calTypeCount = (data: any) => {
-  let bug = 0;
-  let task = 0;
-  let story = 0;
-  let B_story = 0;
-
-  data.forEach((ele: any) => {
-    if (ele.category === "1") {
-      bug += 1;
-    } else if (ele.category === "2") {
-      task += 1;
-    } else if (ele.category === "3" && ele.fromBug) {
-      B_story += 1;
-    } else {
-      story += 1;
-    }
-
-  });
-  return {bug, task, story, B_story};
-};
-
-// 将是相关需求或者相关任务的编号显示刀所属需求或者所属任务对应列。
-const showBelongItem = (data: any) => {
-
-  const re_data: any = [];
-  for (let index = 0; index < data.length; index += 1) {
-
-    const details = data[index];
-    // 对标题中有转义字符进行替换。
-    if (details.title.includes('&quot;')) {
-      details.title = details.title.replace(/&quot;/g, '"');
-    }
-
-    if (details.belongStory) {
-      details.relatedStories = details.belongStory;
-    }
-
-    if (details.belongTask) {
-      details.relatedTasks = details.belongTask;
-    }
-    re_data.push(details);
-  }
-  return re_data;
-};
-
-const addPositionData = (inStoryAndTask: any, oraData: any) => {
-
-  inStoryAndTask.forEach((ele: any) => {
-
-    const be_story = ele.belongStory;
-    const be_task = ele.belongTask;
-
-    for (let index = 0; index < oraData.length; index += 1) {
-      const details = oraData[index];
-
-      // 如果只是 需求 有值，并且禅道类型和禅道编号能对应，则添加到原始data上一个位置，然后break，否则会造成死循环
-      if (be_story !== null && be_task === null) {
-        if (ele.belongStory === details.ztNo && details.category === "3") { // 如果对应的是需求
-          oraData.splice(index + 1, 0, ele);
-          break;
-        }
-      }
-
-      // 如果只是 任务 有值，并且禅道类型和禅道编号能对应，则添加到原始data上一个位置，然后break，否则会造成死循环
-      if (be_story === null && be_task !== null) {
-        if (ele.belongTask === details.ztNo && details.category === "2") { // 如果对应的是任务
-          oraData.splice(index + 1, 0, ele);
-          break;
-        }
-      }
-
-      // 如果 需求和任务 都有值，那么不需要判断禅道类型，只需要禅道编号能对应，则添加到原始data上一个位置，然后break，否则会造成死循环
-      if (be_story !== null && be_task !== null) {
-        if (ele.belongStory === details.ztNo) { // 如果对应的是需求
-          oraData.splice(index + 1, 0, ele);
-          break;
-        }
-      }
-
-    }
-  });
-
-  return oraData;
-};
-
-const changeRowPosition = (data: any) => {
-  const arrays: any = [];
-  const inStoryAndTask = [];
-
-  // 如果所属需求或者任务不为空，则添加到新的数组里面
-  for (let index = 0; index < data.length; index += 1) {
-    if (data[index].belongStory || data[index].belongTask) {
-      inStoryAndTask.push(data[index]);
-    }
-
-    // if (data[index].belongTask) {  // 如果所属任务不为空，则寻找相关任务bug
-    //   inStoryAndTask.push(data[index]);
-    // }
-
-    // 上面两种情况都不满足时,直接添加数据
-    if (!data[index].belongTask && !data[index].belongStory) {
-      arrays.push(data[index]);
-    }
-  }
-
-  return addPositionData(inStoryAndTask, arrays);
-};
-
-// 将未基线的数据放到最前面显示
-const changeBaseLinePosition = (data: any) => {
-
-  const baseLineArray: any = [];
-  const noBaseLineArray: any = [];
-  data.forEach((ele: any) => {
-    if (ele.baseline === '0') {
-      noBaseLineArray.push(ele);
-    } else {
-      baseLineArray.push(ele);
-    }
-
-  });
-
-  return noBaseLineArray.concat(baseLineArray);
-
-};
-
-// 查询数据
-const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any, syncQuery: boolean = false) => {
-
-  // baseline
-  const {data} = await client.query(`
-      {
-         proDetail(project:${prjID},category:"${prjType}",order:ASC,doSync:${syncQuery}){
-            id
-            stage
-            tester
-            category
-            ztNo
-            title
-            severity
-            priority
-            moduleName
-            ztStatus
-            assignedTo
-            finishedBy
-            closedBy
-            pageAdjust
-            hotUpdate
-            dataUpdate
-            interUpdate
-            presetData
-            testCheck
-            scopeLimit
-            proposedTest
-            publishEnv
-            uedName
-            uedEnvCheck
-            uedOnlineCheck
-            memo
-            source
-            feedback
-            expectTest
-            submitTest
-            activeDuration
-            solveDuration
-            verifyDuration
-            closedDuration
-            relatedBugs
-            relatedTasks
-            relatedStories
-            deadline
-            belongStory
-            belongTask
-            baseline
-            resolvedAt
-            fromBug
-            openedAt
-          }
-      }
-  `);
-
-  let oraData: any = data?.proDetail;
-  if (prjType === "") {
-    const changedRow = changeRowPosition(data?.proDetail); // 对数据进行想要的顺序排序(将需求相关的bug放到相关需求后面)
-    oraData = changeBaseLinePosition(changedRow); //  将基线值为0的数据统一起来，放到页面最前面
-
-  }
-
-  return {result: showBelongItem(oraData), resCount: calTypeCount(oraData)};
-};
-
-// 查询是否有重复数据
-const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
-  const {data} = await client.query(`
-      {
-        proExist(name:"${prjName}"){
-          ok
-          data{
-            id
-            name
-            type
-            startAt
-            testEnd
-            testFinish
-            expStage
-            expOnline
-            creator
-            status
-            createAt
-            ztId
-          }
-          code
-          message
-        }
-      }
-  `);
-
-  console.log('data', data);
-  return data?.proExist;
-};
-
-
-// 获取部门数据
-const getDeptMemner = async (client: GqlClient<object>, params: any) => {
-  let deptMember = "";
-
-  if (params === "all") {
-
-    deptMember = `
-          {
-            WxDeptUsers{
-               id
-              userName
-            }
-          }
-      `;
-  }
-  if (params === "UED") {
-
-    deptMember = `
-          {
-            WxDeptUsers(deptNames:["UED"]){
-               id
-              userName
-            }
-          }
-      `;
-  }
-
-  if (params === "测试") {
-
-    deptMember = `
-          {
-            WxDeptUsers(deptNames:["测试","业务"], techs:[TEST]){
-                id
-                userName
-              }
-          }
-      `;
-  }
-
-  const {data} = await client.query(deptMember);
-
-  return data?.WxDeptUsers;
-};
-
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
   const {initialState} = useModel('@@initialState');
-
   const sys_accessToken = localStorage.getItem("accessId");
   axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
+
   /* 获取网页的项目id */
-  let prjId: string = '';
-  let prjNames: string = '';
-  let prjType: string = '';
-  const location = history.location.query;
-  if (JSON.stringify(location) !== '{}') {
-    if (location !== undefined && location.projectid !== null) {
-
-      prjId = location.projectid.toString();
-      prjNames = location.project === null ? '' : location.project.toString();
-    }
-
-    if (location !== undefined && location.type !== undefined && location.type !== null) {
-      prjType = location.type.toString();
-    }
-  }
-
+  const {prjId, prjNames, prjType} = getProjectInfo();
 
   /* region 整个模块都需要用到的表单定义 */
   // admin 新增和修改from表单
@@ -665,15 +57,15 @@ const SprintList: React.FC<any> = () => {
   // 移动新增项目
   const [formForMoveAddAnaMod] = Form.useForm();
   const [pageTitle, setPageTitle] = useState("");
-  // const [isSelectType, setIsSelectType] = useState(false);
+
   /* endregion */
 
   /* region  表格相关事件 */
+
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, prjId, prjType, true));
-
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -689,7 +81,6 @@ const SprintList: React.FC<any> = () => {
   // 表格的屏幕大小自适应
   const [gridHeight, setGridHeight] = useState(getHeight());
   window.onresize = function () {
-    // console.log("新高度：", getHeight());
     setGridHeight(getHeight());
     gridApi.current?.sizeColumnsToFit();
   };
@@ -706,95 +97,6 @@ const SprintList: React.FC<any> = () => {
     const B_story = datas?.resCount.B_story === undefined ? 0 : datas?.resCount.B_story;
     setPageTitle(`共${bugs + tasks + storys + B_story}个，bug ${bugs} 个，task ${tasks} 个，story ${storys} 个，B-story ${B_story} 个`);
 
-  };
-
-  // 获取UED和所有人员，生成下拉框
-  const LoadCombobox = (params: any) => {
-    const deptMan = [];
-    let deptMember = "";
-
-    if (params === "all") {
-
-      deptMember = `
-          {
-            WxDeptUsers{
-               id
-              userName
-            }
-          }
-      `;
-    }
-    if (params === "UED") {
-
-      deptMember = `
-          {
-            WxDeptUsers(deptNames:["UED"]){
-               id
-              userName
-            }
-          }
-      `;
-    }
-
-    if (params === "测试") {
-
-      deptMember = `
-          {
-            WxDeptUsers(deptNames:["测试","业务"], techs:[TEST]){
-                id
-                userName
-              }
-          }
-      `;
-    }
-
-    const {data: {WxDeptUsers = []} = {}} = useQuery(deptMember);
-
-    for (let index = 0; index < WxDeptUsers.length; index += 1) {
-      deptMan.push(
-        <Option value={WxDeptUsers[index].id}> {WxDeptUsers[index].userName}</Option>,
-      );
-    }
-    return deptMan;
-
-  };
-
-  const LoadTesterCombobox = () => {
-    const deptMan = [<Option value="NA">NA</Option>];
-    const {data: {WxDeptUsers = []} = {}} = useQuery(`
-          {
-            WxDeptUsers(deptNames:["测试","业务"], techs:[TEST]){
-                id
-                userName
-              }
-          }
-      `);
-
-    for (let index = 0; index < WxDeptUsers.length; index += 1) {
-      deptMan.push(
-        <Option value={WxDeptUsers[index].id}> {WxDeptUsers[index].userName}</Option>,
-      );
-    }
-    return deptMan;
-
-  };
-
-  const GetSprintProject = () => {
-    const projectArray = [];
-
-    const {data: {project = []} = {}} = useQuery(`{
-        project(range:{start:"", end:""},order:DESC,doSync:true){
-        id
-        name
-      }
-    }`);
-
-    for (let index = 0; index < project.length; index += 1) {
-      projectArray.push(
-        <Option value={project[index].id.toString()}> {project[index].name}</Option>,
-      );
-    }
-    return projectArray;
   };
 
   /* endregion */
@@ -815,20 +117,17 @@ const SprintList: React.FC<any> = () => {
     if (chanDaoType === '') {
       message.error({
         content: `禅道类型不能为空！`,
-        className: 'ModNone',
-        duration: 1, // 1S 后自动关闭
+        duration: 1,
         style: {
           marginTop: '50vh',
         },
       });
       return;
     }
-
     if (ztno === '') {
       message.error({
         content: `禅道编号不能为空！`,
-        className: 'ModNone',
-        duration: 1, // 1S 后自动关闭
+        duration: 1,
         style: {
           marginTop: '50vh',
         },
@@ -842,76 +141,75 @@ const SprintList: React.FC<any> = () => {
         category: chanDaoType,
         ztNo: ztno,
       },
-    })
-      .then(function (res) {
-        if (res.data.ok === true) {
-          const queryDatas = res.data.ztRecord;
+    }).then(function (res) {
+      if (res.data.ok === true) {
+        const queryDatas = res.data.ztRecord;
 
-          formForAdminToAddAnaMod.setFieldsValue({
-            adminCurStage: numberRenderToCurrentStage({
-              value: queryDatas.stage === undefined ? '' : queryDatas.stage.toString(),
-            }),
-            adminAddChandaoTitle: queryDatas.title,
-            adminAddSeverity: numberRenderToZentaoSeverity({
-              value: queryDatas.severity === null ? '' : queryDatas.severity.toString(),
-            }),
-            adminAddPriority: queryDatas.priority,
-            adminAddModule: queryDatas.module,
-            adminAddChandaoStatus: numberRenderToZentaoStatus({value: queryDatas.ztStatus === null ? '' : queryDatas.ztStatus.toString()}),
-            adminAddAssignTo: queryDatas.assignedTo,
-            adminAddSolvedBy: queryDatas.finishedBy === undefined ? queryDatas.resolvedBy : queryDatas.finishedBy,
-            adminAddClosedBy: queryDatas.closedBy,
-            // adminAddFeedbacker: queryDatas.feedback,
-            createTime_hidden: dayjs(queryDatas.openedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.openedAt).format("YYYY-MM-DD HH:mm:ss"),
-            activeTime_hidden: dayjs(queryDatas.activedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.activedAt).format("YYYY-MM-DD HH:mm:ss"),
-            resolveTime_hidden: dayjs(queryDatas.resolvedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.resolvedAt).format("YYYY-MM-DD HH:mm:ss")
+        formForAdminToAddAnaMod.setFieldsValue({
+          adminCurStage: numberRenderToCurrentStage({
+            value: queryDatas.stage === undefined ? '' : queryDatas.stage.toString(),
+          }),
+          adminAddChandaoTitle: queryDatas.title,
+          adminAddSeverity: numberRenderToZentaoSeverity({
+            value: queryDatas.severity === null ? '' : queryDatas.severity.toString(),
+          }),
+          adminAddPriority: queryDatas.priority,
+          adminAddModule: queryDatas.module,
+          adminAddChandaoStatus: numberRenderToZentaoStatus({value: queryDatas.ztStatus === null ? '' : queryDatas.ztStatus.toString()}),
+          adminAddAssignTo: queryDatas.assignedTo,
+          adminAddSolvedBy: queryDatas.finishedBy === undefined ? queryDatas.resolvedBy : queryDatas.finishedBy,
+          adminAddClosedBy: queryDatas.closedBy,
+          // adminAddFeedbacker: queryDatas.feedback,
+          createTime_hidden: dayjs(queryDatas.openedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.openedAt).format("YYYY-MM-DD HH:mm:ss"),
+          activeTime_hidden: dayjs(queryDatas.activedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.activedAt).format("YYYY-MM-DD HH:mm:ss"),
+          resolveTime_hidden: dayjs(queryDatas.resolvedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.resolvedAt).format("YYYY-MM-DD HH:mm:ss")
+        });
+      } else {
+        if (Number(res.data.code) === 404) {
+          message.error({
+            content: `禅道不存在ID为${ztno}的${numberRenderToZentaoType({value: chanDaoType})}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else if (Number(res.data.code) === 409) {
+          message.error({
+            content: `【${prjNames}】已存在ID为${ztno}的${numberRenderToZentaoType({value: chanDaoType})}`,
+            duration: 1, // 1S 后自动关闭
+            style: {
+              marginTop: '50vh',
+            },
+          });
+        } else if (Number(res.data.code) === 403) {
+          message.error({
+            content: "您无权查询权限！",
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
           });
         } else {
-          if (Number(res.data.code) === 404) {
-            message.error({
-              content: `禅道不存在ID为${ztno}的${numberRenderToZentaoType({value: chanDaoType})}`,
-              duration: 1, // 1S 后自动关闭
-              style: {
-                marginTop: '50vh',
-              },
-            });
-          } else if (Number(res.data.code) === 409) {
-            message.error({
-              content: `【${prjNames}】已存在ID为${ztno}的${numberRenderToZentaoType({value: chanDaoType})}`,
-              duration: 1, // 1S 后自动关闭
-              style: {
-                marginTop: '50vh',
-              },
-            });
-          } else if (Number(res.data.code) === 403) {
-            message.error({
-              content: "您无权查询权限！",
-              duration: 1,
-              style: {
-                marginTop: '50vh',
-              },
-            });
-          } else {
-            message.error({
-              content: `${res.data.message}`,
-              duration: 1, // 1S 后自动关闭
-              style: {
-                marginTop: '50vh',
-              },
-            });
-          }
-          formForAdminToAddAnaMod.setFieldsValue({
-            adminAddChandaoTitle: '',
-            adminAddSeverity: '',
-            adminAddPriority: '',
-            adminAddModule: '',
-            adminAddChandaoStatus: '',
-            adminAddAssignTo: '',
-            adminAddSolvedBy: '',
-            adminAddClosedBy: '',
+          message.error({
+            content: `${res.data.message}`,
+            duration: 1,
+            style: {
+              marginTop: '50vh',
+            },
           });
         }
-      })
+        formForAdminToAddAnaMod.setFieldsValue({
+          adminAddChandaoTitle: '',
+          adminAddSeverity: '',
+          adminAddPriority: '',
+          adminAddModule: '',
+          adminAddChandaoStatus: '',
+          adminAddAssignTo: '',
+          adminAddSolvedBy: '',
+          adminAddClosedBy: '',
+        });
+      }
+    })
       .catch(function (error) {
         if (error.toString().includes("403")) {
           message.error({
@@ -936,13 +234,7 @@ const SprintList: React.FC<any> = () => {
 
   // 点击新增按钮赋值弹出窗
   const addProject = () => {
-    // let zenType = "";
-    // if (initialState?.currentUser && initialState.currentUser.group === 'testGroup') {
-    //   zenType = '1';
-    //   setIsSelectType(true);
-    // }
-
-
+    // formForAdminToAddAnaMod.resetFields();
     formForAdminToAddAnaMod.setFieldsValue({
       adminCurStage: '',
       adminAddTester: undefined,
@@ -968,7 +260,6 @@ const SprintList: React.FC<any> = () => {
       adminAddForUED: '',
       adminAddForUedVerify: '',
       adminAdminUedOnline: '',
-      // adminAddSource: "",
       adminAddFeedbacker: '',
       adminAddRemark: '',
       adminAddBaseLine: ''
@@ -981,12 +272,10 @@ const SprintList: React.FC<any> = () => {
 
   // 点击修改按钮赋值弹出窗
   const adminModify = async (datas: any) => {
-
     // 还要获取英文名
     const teters = datas.tester.split(';');
     const deptUsers = await getDeptMemner(gqlClient, "测试");
     const nameIdArray = getUsersId(deptUsers, teters);
-
 
     let publishEnv: any = [];
     if (datas.publishEnv !== null && datas.publishEnv !== "") {
@@ -1173,7 +462,6 @@ const SprintList: React.FC<any> = () => {
       message.error({
         content: `对应测试不能为空！`,
         duration: 1,
-        className: 'MNone',
         style: {
           marginTop: '50vh',
         },
@@ -1278,11 +566,8 @@ const SprintList: React.FC<any> = () => {
       if (curRow[0].feedback !== oradata.adminAddFeedbacker) {
         datas["feedback"] = oradata.adminAddFeedbacker;
       }
-
       modCommitDetails(datas);
-
     }
-
   };
 
   // 新增和修改 弹出层取消按钮事件
@@ -1324,12 +609,10 @@ const SprintList: React.FC<any> = () => {
 
   // 开发经理提交修改
   const commitManagerModify = () => {
-
     const oradata = formForManagerToMod.getFieldsValue();
     if (oradata.testerChandaoType === '' || oradata.testerCHandaoID === '') {
       message.error({
         content: `禅道类型和禅道编号不能为空！`,
-        className: 'MNone',
         duration: 1,
         style: {
           marginTop: '50vh',
@@ -1337,41 +620,7 @@ const SprintList: React.FC<any> = () => {
       });
       return;
     }
-    const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
-    const rowDatas = curRow[0];
-
-    // 用;拼接发布环境
-    let pubEnv = "";
-    if (oradata.managerEnvironment !== undefined) {
-      oradata.managerEnvironment.forEach((eles: any) => {
-        pubEnv = pubEnv === "" ? eles : `${pubEnv};${eles}`;
-      });
-    }
-
-
-    const datas = {
-      id: rowDatas.id,
-      project: prjId,
-      category: zentaoTypeRenderToNumber(oradata.managerChandaoType),
-      // ztNo: oradata.managerCHandaoID,
-      // 以上为必填项
-      pageAdjust: oradata.managerPageAdjust === "" ? null : oradata.managerPageAdjust,
-      hotUpdate: oradata.managerHotUpdate === "" ? null : oradata.managerHotUpdate,
-      dataUpdate: oradata.managerDataUpgrade === "" ? null : oradata.managerDataUpgrade,
-      interUpdate: oradata.managerInteUpgrade === "" ? null : oradata.managerInteUpgrade,
-      presetData: oradata.managerPreData === "" ? null : oradata.managerPreData,
-      testCheck: oradata.managertesterVerifi === "" ? null : oradata.managertesterVerifi,
-      scopeLimit: oradata.managerSuggestion,
-      proposedTest: oradata.managerProTested === "" ? null : oradata.managerProTested,
-      publishEnv: pubEnv,
-      // tester: rowDatas.tester,
-      // uedName: rowDatas.uedName,
-      // uedEnvCheck: rowDatas.uedEnvCheck,
-      // uedOnlineCheck: rowDatas.uedOnlineCheck,
-      // source: rowDatas.source,
-      // feedback: rowDatas.feedback,
-      // memo: rowDatas.memo,
-    };
+    const datas = alayManagerData(oradata, gridApi.current?.getSelectedRows(), prjId);
     modCommitDetails(datas);
   };
 
@@ -1380,24 +629,20 @@ const SprintList: React.FC<any> = () => {
   /* region 测试 权限操作 */
   // 测试 修改
   const testerModify = async (datas: any) => {
-
     // 获取英文名
     const teters = datas.tester.split(';');
     const deptUsers = await getDeptMemner(gqlClient, "测试");
     const nameIdArray = getUsersId(deptUsers, teters);
-
     formForTesterToMod.setFieldsValue({
       testerChandaoType: numberRenderToZentaoType({value: datas.category === null ? '' : datas.category.toString()}),
       testerCHandaoID: datas.ztNo,
       testerTitle: datas.title,
       testChandaoStatus: numberRenderToZentaoStatus({
-        value: datas.ztStatus === null ? '' : datas.ztStatus.toString(),
-      }),
+        value: datas.ztStatus === null ? '' : datas.ztStatus.toString(),}),
       testToTester: nameIdArray,
       testerProTested: datas.proposedTest,
       testerStage: numberRenderToCurrentStage({value: datas.stage}),
       testerRemark: datas.memo
-
     });
     setformForTesterToModVisible(true);
   };
@@ -1432,31 +677,14 @@ const SprintList: React.FC<any> = () => {
       return;
     }
     const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
-
     const datas = {
       id: curRow[0].id,
       project: prjId,
       category: zentaoTypeRenderToNumber(oradata.testerChandaoType),
-      // ztNo: oradata.testerCHandaoID,
       // 以上为必填字段
       proposedTest: oradata.testerProTested === "" ? null : oradata.testerProTested,
       // 测试不能修改当前阶段
-      // stage: Number(oradata.testerStage).toString() === "NaN" ? stageChangeToNumber(oradata.testerStage) : Number(oradata.testerStage),
       memo: oradata.testerRemark,
-
-      // hotUpdate: rowDatas.hotUpdate,
-      // dataUpdate: rowDatas.dataUpdate,
-      // interUpdate: rowDatas.interUpdate,
-      // presetData: rowDatas.presetData,
-      // testCheck: rowDatas.testCheck,
-      // scopeLimit: rowDatas.scopeLimit,
-      // publish: rowDatas.publishEnv,
-      // uedName: rowDatas.uedName,
-      // uedEnvCheck: rowDatas.uedEnvCheck,
-      // uedOnlineCheck: rowDatas.uedOnlineCheck,
-      // source: rowDatas.source,
-      // feedback: rowDatas.feedback,
-
     };
 
     if (formForTesterToMod.isFieldTouched('testToTester')) {
@@ -1501,7 +729,6 @@ const SprintList: React.FC<any> = () => {
       message.error({
         content: `禅道类型和禅道编号不能为空！`,
         duration: 1,
-        className: 'MNone',
         style: {
           marginTop: '50vh',
         },
@@ -1515,24 +742,10 @@ const SprintList: React.FC<any> = () => {
       id: rowDatas.id,
       project: prjId,
       category: zentaoTypeRenderToNumber(oradata.uedChandaoType),
-      // ztNo: oradata.uedCHandaoID,
       // 以上为必填字段
-
       uedEnvCheck: oradata.uedForUedVerify === "" ? null : oradata.uedForUedVerify,
       uedOnlineCheck: oradata.UedOnlineVerti === "" ? null : oradata.UedOnlineVerti,
       memo: oradata.uedRemark,
-
-      // source: rowDatas.uedSource,
-      // feedback: rowDatas.feedback,
-      // tester: rowDatas.tester,
-      // hotUpdate: rowDatas.hotUpdate,
-      // dataUpdate: rowDatas.dataUpdate,
-      // interUpdate: rowDatas.interUpdate,
-      // presetData: rowDatas.presetData,
-      // testCheck: rowDatas.testCheck,
-      // scopeLimit: rowDatas.scopeLimit,
-      // publish: rowDatas.publishEnv,
-
     };
 
     if (formForUEDToMod.isFieldTouched('uedForUED')) {
@@ -1588,20 +801,17 @@ const SprintList: React.FC<any> = () => {
       message.error({
         content: '请选中需要修改的数据!',
         duration: 1,
-        className: 'modifyNone',
         style: {
           marginTop: '50vh',
         },
       });
       return;
     }
-
     // 一次只能修改一条数据
     if (selRows.length > 1) {
       message.error({
         content: '一次只能修改一条数据!',
         duration: 1,
-        className: 'modifyMore',
         style: {
           marginTop: '50vh',
         },
@@ -1616,18 +826,10 @@ const SprintList: React.FC<any> = () => {
     authorityForMod(params.data);
   };
 
-  const setRowColor = (params: any) => {
-    if (params.data.baseline === '0') {  // 如果基线为0，则整行都渲染颜色
-      return {'background-color': '#FFF6F6'};
-    }
-    return {'background-color': 'white'};
-  };
-
   /* endregion */
 
   /* region 删除功能 */
 
-  // 删除sprint列表
   const [isdelModalVisible, setIsDelModalVisible] = useState(false);
   // 删除按钮点击
   const deleteSprintDetails = () => {
@@ -1637,24 +839,12 @@ const SprintList: React.FC<any> = () => {
       message.error({
         content: '请选中需要删除的数据!',
         duration: 1,
-        className: 'delNone',
         style: {
           marginTop: '50vh',
         },
       });
       return;
     }
-    // if (selRows.length > 1) {
-    //   message.error({
-    //     content: '一次只能删除一条数据!',
-    //     duration: 1,
-    //     className: 'delMore',
-    //     style: {
-    //       marginTop: '50vh',
-    //     },
-    //   });
-    //   return;
-    // }
     setIsDelModalVisible(true);
   };
 
@@ -1670,7 +860,6 @@ const SprintList: React.FC<any> = () => {
       } else if (rows.category === "3") {
         deleteIdArray.push(`STORY_${id}`);
       }
-
     });
 
     axios.delete('/api/sprint/project/child', {data: {data: deleteIdArray}})
@@ -1721,7 +910,6 @@ const SprintList: React.FC<any> = () => {
             },
           });
         }
-
       });
   };
 
@@ -1763,7 +951,6 @@ const SprintList: React.FC<any> = () => {
 
   // 发送请求
   const moveSprintList = () => {
-
     // 获取被选择明细项
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
     const idArray = [];
@@ -1828,9 +1015,7 @@ const SprintList: React.FC<any> = () => {
             },
           });
         }
-
       });
-
   };
 
   // 取消新增项目
@@ -1882,8 +1067,6 @@ const SprintList: React.FC<any> = () => {
         // prjStatus: data.data.status  // data 可能没有数据
       });
     }
-
-
   };
 
   // 发送请求新增项目
@@ -1978,18 +1161,14 @@ const SprintList: React.FC<any> = () => {
         }
 
       });
-
   };
 
   /* endregion */
 
   /* region 操作流程 */
 
-
-  // /////// 以下为流程操作
   const [isRevokeModalVisible, setIsRevokeModalVisible] = useState(false); // 撤销操作
   const [buttonMessage, setButtonHintMessage] = useState({hintMessage: ''});
-
   const [isFlowModalVisible, setIsFlowModalVisible] = useState(false); // 其他流程按钮
   const [flowHitmessage, setFlowHitmessage] = useState({hintMessage: ''});
 
@@ -1999,7 +1178,6 @@ const SprintList: React.FC<any> = () => {
     if (selRows.length > 0) {
       return true;
     }
-
     message.error({
       content: `请至少选中一条记录进行操作！`,
       duration: 1,
@@ -2032,7 +1210,6 @@ const SprintList: React.FC<any> = () => {
       setFlowHitmessage({hintMessage: '测试已验证revert'});
       setIsFlowModalVisible(true);
     }
-
   };
 
   // 流程-灰度已验
@@ -2053,10 +1230,8 @@ const SprintList: React.FC<any> = () => {
 
   const modFlowStage = (content: any, values: any) => {
     const selRows: any = gridApi.current?.getSelectedRows();
-
     const selIds = [];
     for (let index = 0; index < selRows.length; index += 1) {
-
       const rows = selRows[index];
       if (rows.category === "1") {
         selIds.push(`BUG_${rows.id}`);
@@ -2151,7 +1326,6 @@ const SprintList: React.FC<any> = () => {
     setIsFlowModalVisible(false);
   };
 
-
   // 以下为撤销和基线操作
   const flowForRevoke = () => {
     if (judgingSelectdRow()) {
@@ -2182,14 +1356,12 @@ const SprintList: React.FC<any> = () => {
   /* endregion */
 
   /* region 设置字段 */
-
   const [isFieldModalVisible, setFieldModalVisible] = useState(false);
   const [selectedFiled, setSelectedFiled] = useState(['']);
-  const nessField = ['选择', '类型', '编号'];
-  const unNessField = ['阶段', '测试', '标题内容', '创建时间', '解决时间', '严重等级', '截止日期', '模块', '状态', '已提测', '发布环境',
+  const nessField = ['选择', '类型', '编号']; // 必需的列
+  const unNessField = ['阶段', '测试', '标题内容', '创建时间', '解决时间','所属计划' ,'严重等级', '截止日期', '模块', '状态', '已提测', '发布环境',
     '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', "是否涉及页面调整", '是否可热更', '是否有数据升级',
     '是否有接口升级', '是否有预置数据', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人'];
-
 
   const onSetFieldsChange = (checkedValues: any) => {
     setSelectedFiled(checkedValues);
@@ -2212,7 +1384,6 @@ const SprintList: React.FC<any> = () => {
     } else {
       setSelectedFiled(nessField);
     }
-
   };
 
   // 保存按钮
@@ -2235,16 +1406,13 @@ const SprintList: React.FC<any> = () => {
   const fieldCancel = () => {
     setFieldModalVisible(false);
   };
-
-
   /* endregion */
 
   /* region 手动同步数据 */
   const [refreshItem, setRefreshItem] = useState(false);
   const refreshGrid = async () => {
     setRefreshItem(true);
-    await axios
-      .post('/api/project/system/sync/sprint/pdetail', {"pid": Number(prjId)})
+    await axios.post('/api/project/system/sync/sprint/pdetail', {"pid": Number(prjId)})
       .then(function (res) {
 
         if (res.data.ok === true) {
@@ -2281,25 +1449,19 @@ const SprintList: React.FC<any> = () => {
   };
 
   /* endregion */
+
   const leftStyle = {marginLeft: '20px'};
   const rightStyle = {marginLeft: '30px'};
   const widths = {width: '200px', color: 'black'};
   const routes = [
-    {
-      path: '',
-      breadcrumbName: 'sprint 工作台',
-    }, {
-      path: '',
-      breadcrumbName: '项目详情',
-    }];
+    {path: '', breadcrumbName: 'sprint 工作台'},
+    {path: '', breadcrumbName: '项目详情'}];
 
   useEffect(() => {
-
     const bugs = data?.resCount.bug === undefined ? 0 : data?.resCount.bug;
     const tasks = data?.resCount.task === undefined ? 0 : data?.resCount.task;
     const storys = data?.resCount.story === undefined ? 0 : data?.resCount.story;
     const B_story = data?.resCount.B_story === undefined ? 0 : data?.resCount.B_story;
-
     setPageTitle(`共 ${bugs + tasks + storys + B_story} 个，bug ${bugs} 个，task ${tasks} 个，story ${storys} 个，B-story ${B_story} 个`);
   }, [data]);
 
@@ -2318,14 +1480,10 @@ const SprintList: React.FC<any> = () => {
 
       <Spin spinning={refreshItem} tip="项目详情同步中..." size={"large"}>
 
-
         {/* 明细操作按钮   */}
         <Row style={{background: 'white', marginTop: "20px"}}>
-
           <Col span={22}>
-
             <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap"}}>
-
               <Button type="text"
                       style={{
                         marginLeft: "-10px",
@@ -2393,7 +1551,6 @@ const SprintList: React.FC<any> = () => {
                       onClick={flowForOnlineChecked}>线上已验证</Button>
 
             </div>
-
           </Col>
           <Col span={1} style={{textAlign: "right",}}>
             <div>
@@ -2451,7 +1608,6 @@ const SprintList: React.FC<any> = () => {
         centered={true}
         footer={null}
         width={1000}
-
       >
         {/* admin 权限组新增和修改的界面 */}
         <Form form={formForAdminToAddAnaMod}>
@@ -3572,6 +2728,9 @@ const SprintList: React.FC<any> = () => {
                 </Col>
                 <Col span={4}>
                   <Checkbox value="严重等级">严重等级</Checkbox>
+                </Col>
+                <Col span={4}>
+                  <Checkbox value="所属计划">所属计划</Checkbox>
                 </Col>
                 <Col span={4}>
                   <Checkbox value="截止日期">截止日期</Checkbox>

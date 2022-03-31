@@ -4,6 +4,10 @@ import {Button} from 'antd';
 
 const PageHeader: React.FC<any> = () => {
 
+  // 列表验证重复
+  const vertifyListRepeat=()=>{
+
+  };
 
   return (
     <PageContainer
@@ -12,7 +16,8 @@ const PageHeader: React.FC<any> = () => {
                 style={{
                   float: "right", color: '#46A0FC',
                   backgroundColor: "#ECF5FF", borderRadius: 5, marginLeft: 20
-                }}>点击生成
+                }}
+        onClick={vertifyListRepeat}>列表验重
         </Button>
       ]}
     />

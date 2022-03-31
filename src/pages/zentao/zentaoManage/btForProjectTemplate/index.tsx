@@ -44,6 +44,16 @@ const ProjectTemplate: React.FC<any> = () => {
     });
   }
 
+  // 获取表格中的数据
+  const getTablesData = () => {
+    const gridDatas: any = [];
+    // 遍历列表中的数据(不能用usestate中的值)
+    gridApi.current?.forEachNode((node: any) => {
+      gridDatas.push(node.data);
+    });
+
+    return gridDatas;
+  };
   /* endregion 表格事件 */
 
   /* region 获取跳转过来的模板，并获取对应数据 */
@@ -62,7 +72,7 @@ const ProjectTemplate: React.FC<any> = () => {
   }
   /* endregion 获取跳转过来的模板，并获取对应数据 */
 
-  /* region  联动修改 */
+  /* region  表格上面的联动修改 */
   const [formForProject] = Form.useForm(); // 上线分支设置
 
   // 项目执行修改
@@ -76,8 +86,9 @@ const ProjectTemplate: React.FC<any> = () => {
     });
 
     // 同样修改表格里面的值（任务名称、指派给、所属模块）
+    const tabData = getTablesData();
     const atferValue: any = [];
-    gridData.forEach((ele: any) => {
+    tabData.forEach((ele: any) => {
       // 任务名称需要还原之前的名字再加上执行的名字
       let taskName = ele.task_name;
       const nameHead = taskName.substring(taskName.indexOf("【") + 1, taskName.indexOf("】"));
@@ -98,9 +109,9 @@ const ProjectTemplate: React.FC<any> = () => {
 
   // 项目负责人修改后，也要对应修改表格中所属端的指派人
   const projectManagerChanged = (currentValue: any) => {
-
+    const tabData = getTablesData();
     const atferValue: any = [];
-    gridData.forEach((ele: any) => {
+    tabData.forEach((ele: any) => {
       atferValue.push({...ele, assigned_person_name: currentValue});
     });
     setGridData(atferValue);
@@ -109,8 +120,9 @@ const ProjectTemplate: React.FC<any> = () => {
   // 预计开始
   const planStartChanged = (params: any, values: any) => {
     //   时间改变后，下面的预计开始时间也要同步改变
+    const tabData = getTablesData();
     const atferValue: any = [];
-    gridData.forEach((ele: any) => {
+    tabData.forEach((ele: any) => {
       atferValue.push({...ele, plan_start: values});
     });
     setGridData(atferValue);
@@ -119,8 +131,9 @@ const ProjectTemplate: React.FC<any> = () => {
   // 预计结束
   const planEndChanged = (params: any, values: any) => {
     //   时间改变后，下面的预计截至时间也要同步改变
+    const tabData = getTablesData();
     const atferValue: any = [];
-    gridData.forEach((ele: any) => {
+    tabData.forEach((ele: any) => {
       atferValue.push({...ele, plan_end: values});
     });
     setGridData(atferValue);

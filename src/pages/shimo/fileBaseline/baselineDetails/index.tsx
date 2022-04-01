@@ -1,8 +1,17 @@
+import Header from "./components/Header";
+import Tab from "./components/Tabs";
+
 const BaseDetails: React.FC<any> = () => {
 
   return (
     <>
-      3333
+      {/* header */}
+      <Header/>
+      {/*  tab  */}
+      <Tab/>
+      {/*  查询条件  */}
+
+      {/* 列表 */}
     </>
   );
 };

@@ -1,7 +1,5 @@
 // 表格列的定义
 
-import {history} from "@@/core/history";
-
 const columns: any = [{
   headerName: '序号',
   minWidth: 70,

@@ -1,5 +1,7 @@
 // 表格列的定义
 
+import {history} from "@@/core/history";
+
 const columns: any = [{
   headerName: '序号',
   minWidth: 70,
@@ -16,6 +18,7 @@ const columns: any = [{
   headerName: '迭代名称',
   field: 'temp_type_name',
   minWidth: 110,
+  cellRenderer: "nameUrl"
 
 }, {
   headerName: '负责人',
@@ -69,7 +72,7 @@ const columns: any = [{
 // 表格测试数据
 const testData = [
   {
-    temp_type_name: "222"
+    temp_type_name: "迭代名称"
   }
 ]
 

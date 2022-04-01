@@ -11,6 +11,7 @@ import {ShimoOverviewContent} from "./gridComponents/ShimoOverviewContent";
 import {ShimoStoryContent} from "./gridComponents/ShimoStoryContent";
 import {Operate} from "./gridComponents/Operate";
 import {myUrls} from "./gridComponents/myUrls";
+import {NameUrl} from "./gridComponents/NameUrl";
 
 const GridList: React.FC<any> = () => {
 
@@ -42,6 +43,7 @@ const GridList: React.FC<any> = () => {
           }}
           frameworkComponents={{
             myUrl: myUrls,
+            nameUrl: NameUrl,
             shimoStoryContent: ShimoStoryContent,
             shimoOverviewContent: ShimoOverviewContent,
             operate: Operate

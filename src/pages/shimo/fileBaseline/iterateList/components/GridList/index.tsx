@@ -5,7 +5,9 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {getHeight} from "@/publicMethods/pageSet";
-import {getColumns} from "./grid/columns";
+import {columns, testData, setCellStyle} from "./columns";
+import "./style.css"
+import {ShimoStoryContent, ShimoOverviewContent} from "./gridComponents";
 
 const GridList: React.FC<any> = () => {
 
@@ -25,18 +27,23 @@ const GridList: React.FC<any> = () => {
   /* endregion 表格事件 */
 
   return (
-    <div>
+    <div className={"gridDiv"}>
       <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
         <AgGridReact
-          columnDefs={getColumns()} // 定义列
-          rowData={[]} // 数据绑定
+          columnDefs={columns} // 定义列
+          rowData={testData} // 数据绑定
           defaultColDef={{
             resizable: true,
             suppressMenu: true,
+            cellStyle: setCellStyle
           }}
           rowHeight={28}
           headerHeight={30}
           onGridReady={onGridReady}
+          frameworkComponents={{
+            shimoStoryContent: ShimoStoryContent,
+            shimoOverviewContent: ShimoOverviewContent
+          }}
         >
         </AgGridReact>
       </div>

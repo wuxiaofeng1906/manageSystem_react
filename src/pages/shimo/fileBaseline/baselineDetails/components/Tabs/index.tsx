@@ -13,12 +13,12 @@ const Tab: React.FC<any> = (props: any) => {
 
   return (
     <>
-      <Tabs onChange={tabChanged} type="card">
+      <Tabs onChange={tabChanged} type="card" >
         <TabPane tab="需求基线" key="需求基线">
-          Content of Tab Pane 1
+
         </TabPane>
         <TabPane tab="概设基线" key="概设基线">
-          Content of Tab Pane 2
+
         </TabPane>
       </Tabs>
     </>

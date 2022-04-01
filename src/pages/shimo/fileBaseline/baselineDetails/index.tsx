@@ -1,5 +1,6 @@
 import Header from "./components/Header";
 import Tab from "./components/Tabs";
+import QueryBar from "./components/QueryBar";
 
 const BaseDetails: React.FC<any> = () => {
 
@@ -10,7 +11,7 @@ const BaseDetails: React.FC<any> = () => {
       {/*  tab  */}
       <Tab/>
       {/*  查询条件  */}
-
+      <QueryBar/>
       {/* 列表 */}
     </>
   );

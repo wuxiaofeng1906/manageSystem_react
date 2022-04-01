@@ -2,7 +2,6 @@ import PageHeader from './components/PageHeader';
 import QueryBar from './components/QueryBar';
 import GridList from './components/GridList'
 
-
 const IterateList: React.FC<any> = () => {
 
   return (

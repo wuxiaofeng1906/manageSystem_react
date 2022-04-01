@@ -3,27 +3,24 @@ import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {GridApi, GridReadyEvent} from 'ag-grid-community';
+import {GridApi} from 'ag-grid-community';
 import {getHeight} from "@/publicMethods/pageSet";
 import {columns, testData, setCellStyle} from "./columns";
 import "./style.css"
-import {ShimoStoryContent, ShimoOverviewContent} from "./gridComponents";
+import {ShimoOverviewContent} from "./gridComponents/ShimoOverviewContent";
+import {ShimoStoryContent} from "./gridComponents/ShimoStoryContent";
+import {Operate} from "./gridComponents/Operate";
+import {myUrls} from "./gridComponents/myUrls";
 
 const GridList: React.FC<any> = () => {
 
   /* region 表格事件 */
-  const [gridHeight, setGridHeight] = useState(getHeight());
+  const [gridHeight, setGridHeight] = useState(getHeight() + 36);
   const gridApi = useRef<GridApi>();
-  const onGridReady = (params: GridReadyEvent) => {
-    gridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-
   window.onresize = function () {
-    setGridHeight(getHeight());
+    setGridHeight(getHeight() + 36);
     gridApi.current?.sizeColumnsToFit();
   };
-
   /* endregion 表格事件 */
 
   return (
@@ -39,10 +36,15 @@ const GridList: React.FC<any> = () => {
           }}
           rowHeight={28}
           headerHeight={30}
-          onGridReady={onGridReady}
+          onGridReady={(params: any) => {
+            gridApi.current = params.api;
+            params.api.sizeColumnsToFit();
+          }}
           frameworkComponents={{
+            myUrl: myUrls,
             shimoStoryContent: ShimoStoryContent,
-            shimoOverviewContent: ShimoOverviewContent
+            shimoOverviewContent: ShimoOverviewContent,
+            operate: Operate
           }}
         >
         </AgGridReact>

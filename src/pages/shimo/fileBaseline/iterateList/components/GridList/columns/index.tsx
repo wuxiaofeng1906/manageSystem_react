@@ -11,13 +11,7 @@ const columns: any = [{
 }, {
   headerName: '',
   field: 'zentao_url',
-  cellRenderer: (params: any) => {
-    return `
-        <a href="" target="_blank" >
-              <img src="/taskUrl.png" width="15" height="15" alt="日志" title="日志">
-         </a>
-           `;
-  }
+  cellRenderer: "myUrl"
 }, {
   headerName: '迭代名称',
   field: 'temp_type_name',
@@ -42,14 +36,7 @@ const columns: any = [{
 }, {
   headerName: '',
   field: 'shimo_url',
-  cellRenderer: (params: any) => {
-
-    return `
-        <a href=" " target="_blank" >
-            <img src="/taskUrl.png" width="15" height="15" alt="日志" title="日志">
-        </a>
-           `;
-  }
+  cellRenderer: "myUrl"
 }, {
   headerName: '石墨需求目录',
   field: 'shimo_url',
@@ -62,14 +49,7 @@ const columns: any = [{
 }, {
   headerName: '',
   field: 'shimo_url',
-  cellRenderer: (params: any) => {
-
-    return `
-        <a href=" " target="_blank" >
-            <img src="/taskUrl.png" width="15" height="15" alt="日志" title="日志">
-        </a>
-           `;
-  }
+  cellRenderer: "myUrl"
 }, {
   headerName: '石墨概设目录',
   field: 'shimo_url',
@@ -82,7 +62,8 @@ const columns: any = [{
 }, {
   headerName: '操作',
   minWidth: 90,
-  pinned: "right"
+  pinned: "right",
+  cellRenderer: "operate"
 }];
 
 // 表格测试数据

@@ -175,7 +175,7 @@ const analysisGridData = async (data: any, tempInfo: any) => {
       "belongs": ele.belongs_name === undefined ? "" : side[(ele.belongs_name).trim()],
       "tasksource": ele.tasksource_name === undefined ? "" : taskSource[(ele.tasksource_name).trim()],
       "is_tailoring": ele.is_tailoring === "是" ? "yes" : ele.is_tailoring === "yes" ? "yes" : "no",
-      "edit_user": usersInfo.name,
+      "edit_user": usersInfo.userid,
       "temp_name": tempInfo.name,
       "temp_type": (tempInfo.type).split("&")[0],
     };
@@ -267,7 +267,7 @@ const saveTempList = async (data: any, tempInfo: any) => {
   }
 
   const finValue = await analysisGridData(data, tempInfo);
-  debugger;
+
   const saveResult = await requestSaveTempleListApi(finValue);
   return saveResult;
 };

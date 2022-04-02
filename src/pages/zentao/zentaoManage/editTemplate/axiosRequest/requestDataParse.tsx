@@ -58,7 +58,7 @@ const getAssignedToSelect = async () => {
     const selectValue: any = [];
     (users.data).forEach((ele: any) => {
       selectValue.push(
-        <Option key={ele.user_id} value={ele.user_name}> {ele.user_name} </Option>
+        <Option key={ele.user_id} value={ele.user_name}>{ele.user_name}</Option>
       );
     });
 
@@ -107,7 +107,6 @@ const getTaskTypeSelect = async () => {
 // 获取所属端
 const getSideSelect = async () => {
   const types = await requestSideApi();
-
   if (types.length > 0) {
     const selectValue: any = [];
     types.forEach((ele: any) => {
@@ -163,8 +162,8 @@ const analysisGridData = async (data: any, tempInfo: any) => {
 
     // subtask_id、task_id、parent 这三个字段如果没有值，则不传字段到后端，其他字段为空的时候都传空字符串
     const detailsData = {
-      "add_type": ele.add_type_name === undefined ? "" : addType[ele.add_type_name],
-      "task_type": ele.task_type_name === undefined ? "" : taskType[ele.task_type_name],
+      "add_type": ele.add_type_name === undefined ? "" : addType[(ele.add_type_name).trim()],
+      "task_type": ele.task_type_name === undefined ? "" : taskType[(ele.task_type_name).trim()],
       "task_name": ele.task_name,
       "module": ele.module === undefined ? "" : ele.module,
       "subtask_dev_needs": ele.subtask_dev_needs === undefined ? "" : ele.subtask_dev_needs,
@@ -173,8 +172,8 @@ const analysisGridData = async (data: any, tempInfo: any) => {
       "priority": ele.priority,
       "estimate": ele.estimate,
       "desc": ele.desc === undefined ? "" : ele.desc,
-      "belongs": ele.belongs_name === undefined ? "" : side[ele.belongs_name],
-      "tasksource": ele.tasksource_name === undefined ? "" : taskSource[ele.tasksource_name],
+      "belongs": ele.belongs_name === undefined ? "" : side[(ele.belongs_name).trim()],
+      "tasksource": ele.tasksource_name === undefined ? "" : taskSource[(ele.tasksource_name).trim()],
       "is_tailoring": ele.is_tailoring === "是" ? "yes" : ele.is_tailoring === "yes" ? "yes" : "no",
       "edit_user": usersInfo.name,
       "temp_name": tempInfo.name,
@@ -267,7 +266,8 @@ const saveTempList = async (data: any, tempInfo: any) => {
     return "保存的数据不能为空！"
   }
 
-  const finValue = await analysisGridData(data, tempInfo)
+  const finValue = await analysisGridData(data, tempInfo);
+  debugger;
   const saveResult = await requestSaveTempleListApi(finValue);
   return saveResult;
 };

@@ -13,6 +13,7 @@ const BaseDetails: React.FC<any> = () => {
       {/*  查询条件  */}
       <QueryBar/>
       {/* 列表 */}
+
     </>
   );
 };

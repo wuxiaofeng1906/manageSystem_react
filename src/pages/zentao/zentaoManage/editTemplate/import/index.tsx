@@ -24,6 +24,7 @@ const loadExcelData = async (file: any) => {
         let resultData: any = [];
         // 遍历每张工作表进行读取
         Object.keys(workbook.Sheets).forEach((sheet: string, index: number) => {
+
           if (index === 0) { // 只获取第一个sheet的数据
             // 利用 sheet_to_json 方法将 excel 转成 json 数据
             resultData = XLSX.utils.sheet_to_json(workbook.Sheets[sheet]);

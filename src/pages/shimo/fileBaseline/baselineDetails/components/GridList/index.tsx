@@ -9,7 +9,6 @@ import {columns, testData, setCellStyle} from "./columns";
 import "./style.css"
 import {myUrls} from "./gridComponents/myUrls";
 
-
 const GridList: React.FC<any> = () => {
 
   /* region 表格事件 */

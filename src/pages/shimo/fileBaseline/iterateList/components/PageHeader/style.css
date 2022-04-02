@@ -1,8 +1,13 @@
 /* pageCOntainer样式 */
-.myContainers {
+/*.myContainers {*/
+/*  height: 80px;*/
+/*  margin-top: -35px;*/
+/*  background-color:cornflowerblue;*/
+/*}*/
+
+.myContainers > div > .ant-page-header {
   height: 80px;
   margin-top: -35px;
-  background-color:cornflowerblue;
 }
 
 /* 列表验重按钮样式 */

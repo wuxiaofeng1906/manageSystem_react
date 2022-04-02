@@ -214,6 +214,7 @@ export default () => {
                       : null;
                   }}
                   onChange={(values: string) => {
+                    debugger;
                     projChange = false;
                     doChange = onTreeMultiChange(values, setSelectItems, 'projIds', false);
                   }}

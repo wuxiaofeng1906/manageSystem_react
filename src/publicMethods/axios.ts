@@ -7,14 +7,17 @@ axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
 // axios中常见的get/delete请求，也称作query请求：
 // get 请求
 const axiosGet = async (url: string, queryData: any = {}) => {
+
+  let result: any = {};
   await axios.get(url, {params: queryData})
     .then((res: any) => {
-      return res;
+      result = res.data.data;
     })
     .catch((error: string) => {
       errorMessage(`异常信息:${error.toString()}`);
-      return {};
     });
+
+  return result
 };
 
 // delete 请求

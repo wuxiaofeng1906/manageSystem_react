@@ -16,10 +16,10 @@ import {NameUrl} from "./gridComponents/NameUrl";
 const GridList: React.FC<any> = () => {
 
   /* region 表格事件 */
-  const [gridHeight, setGridHeight] = useState(getHeight() + 36);
+  const [gridHeight, setGridHeight] = useState(getHeight() + 30);
   const gridApi = useRef<GridApi>();
   window.onresize = function () {
-    setGridHeight(getHeight() + 36);
+    setGridHeight(getHeight() + 30);
     gridApi.current?.sizeColumnsToFit();
   };
   /* endregion 表格事件 */

@@ -24,7 +24,7 @@ const QueryBar: React.FC<any> = () => {
       dept: "",
       iterName: "",
       SQA: "",
-      iterRange: [moment(dayjs().startOf("year").format("YYYYMMDD")), moment(dayjs().format("YYYYMMDD"))]
+      iterRange: [moment(dayjs().startOf("year").format("YYYYMMDD")), moment(dayjs().endOf("year").format("YYYYMMDD"))]
     });
   });
   return (

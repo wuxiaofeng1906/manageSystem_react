@@ -1,9 +1,8 @@
-/* pageCOntainer样式 */
-/*.myContainers {*/
-/*  height: 80px;*/
-/*  margin-top: -35px;*/
-/*  background-color:cornflowerblue;*/
-/*}*/
+/* pageCOntainer样式 不能省略*/
+.myContainers {
+  height: 80px;
+  margin-top: -35px;
+}
 
 /* pageCOntainer样式 */
 .myContainers > div > .ant-page-header {

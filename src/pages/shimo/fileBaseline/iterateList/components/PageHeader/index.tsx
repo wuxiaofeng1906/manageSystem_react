@@ -3,6 +3,7 @@ import {PageContainer} from "@ant-design/pro-layout";
 import {Button} from 'antd';
 import "./style.css";
 import {errorMessage, infoMessage, sucMessage} from "@/publicMethods/showMessages";
+import {CopyOutlined} from '@ant-design/icons';
 
 const PageHeader: React.FC<any> = () => {
 
@@ -14,9 +15,8 @@ const PageHeader: React.FC<any> = () => {
   return (
     <PageContainer className={"myContainers"}
                    extra={[
-                     <Button type="primary" className={"vertifyButton"}
-                             onClick={vertifyListRepeat}>列表验重
-                     </Button>
+                     <Button icon={<CopyOutlined/>} className={"vertifyButton"} size={"small"}
+                             onClick={vertifyListRepeat}>列表验重</Button>
                    ]}/>
   );
 }

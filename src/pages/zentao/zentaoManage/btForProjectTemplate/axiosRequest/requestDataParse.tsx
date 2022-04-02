@@ -112,7 +112,7 @@ const generateTask = async (tempInfo: any, fromData: any, gridData: any) => {
         "desc": ele.desc,
         "belongs": ele.belongs,
         "tasksource": ele.tasksource,
-        "edit_user": usersLoginInfo.name,
+        "edit_user": usersLoginInfo.userid,
         "temp_type": tempInfo.type,
         "is_tailoring": "no",
         "start_time": ele.plan_start,

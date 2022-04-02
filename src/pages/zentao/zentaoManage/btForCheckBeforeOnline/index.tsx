@@ -50,6 +50,18 @@ const CheckBeforeOnline: React.FC<any> = () => {
       [props.column.colId]: value
     });
   }
+
+  // 获取表格中的数据
+  const getTablesData = () => {
+    const gridDatas: any = [];
+    // 遍历列表中的数据(不能用usestate中的值)
+    gridApi.current?.forEachNode((node: any) => {
+      gridDatas.push(node.data);
+    });
+
+    return gridDatas;
+  };
+
   /* endregion 表格事件 */
 
   /* region 获取跳转过来的模板，并获取对应数据 */
@@ -77,11 +89,12 @@ const CheckBeforeOnline: React.FC<any> = () => {
     const excuteInfo = values.split("&");
     const spProjectAssigned = (await loadProjectManager(Number(excuteInfo[0])));
 
+    const tabData = getTablesData();
     // 如果执行类型为班车项目（sprint或hotfix），则父任务取值班计划中的后端值班人，子任务取值班计划中所属端的值班人。
     // 如果执行类型为特性项目，则父任务取值班项目负责人，子任务特性项目中对应的所属端的人员
     // 同样修改表格里面的指派人，
     const atferValue: any = [];
-    gridData.forEach((ele: any) => {
+    tabData.forEach((ele: any) => {
 
       // 任务名称需要还原之前的名
       let taskName = ele.task_name;
@@ -122,8 +135,9 @@ const CheckBeforeOnline: React.FC<any> = () => {
   // 预计开始时间
   const planStartChanged = (params: any, values: any) => {
     //   时间改变后，下面的预计开始时间也要同步改变
+    const tabData = getTablesData();
     const atferValue: any = [];
-    gridData.forEach((ele: any) => {
+    tabData.forEach((ele: any) => {
       atferValue.push({...ele, plan_start: values});
     });
     setGridData(atferValue);
@@ -131,9 +145,10 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
   // 预计结束时间
   const planEndChanged = (params: any, values: any) => {
+    const tabData = getTablesData();
     //   时间改变后，下面的预计截至时间也要同步改变
     const atferValue: any = [];
-    gridData.forEach((ele: any) => {
+    tabData.forEach((ele: any) => {
       atferValue.push({...ele, plan_end: values});
     });
     setGridData(atferValue);
@@ -141,9 +156,9 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
   // 指派人修改后，也要对应修改表格中所属端的指派人(只是修改子任务指派人)
   const changeAssignedTo = (side: string, currentValue: any) => {
-
+    const tabData = getTablesData();
     const atferValue: any = [];
-    gridData.forEach((ele: any) => {
+    tabData.forEach((ele: any) => {
       if (side === "Front" && (ele.task_name).includes("前端】")
         || side === "Backend" && (ele.task_name).includes("后端】")
         || side === "Tester" && (ele.task_name).includes("测试】")

@@ -1,13 +1,13 @@
 import React from "react";
 import {Form, Row, Col, TreeSelect, DatePicker} from 'antd';
-import "./style.css";
+import {queryCondition} from "./style.css";
 import {errorMessage, infoMessage, sucMessage} from "@/publicMethods/showMessages";
 
 const {RangePicker} = DatePicker;
 const QueryBar: React.FC<any> = () => {
 
   return (
-    <div className={"queryCondition"}>
+    <div className={queryCondition}>
       <Form>
         <Row gutter={5}>
           <Col span={6}>
@@ -32,7 +32,6 @@ const QueryBar: React.FC<any> = () => {
           </Col>
         </Row>
       </Form>
-
 
     </div>
 

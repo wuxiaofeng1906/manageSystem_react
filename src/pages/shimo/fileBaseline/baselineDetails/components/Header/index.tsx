@@ -1,7 +1,7 @@
 import React from "react";
 import {Breadcrumb, PageHeader} from "antd";
 import {Link} from "react-router-dom";
-import "./style.css";
+import {pageHeader} from "./style.css";
 
 const Header: React.FC<any> = (props: any) => {
 
@@ -16,7 +16,7 @@ const Header: React.FC<any> = (props: any) => {
   //  点击概设基线，title就显示  概设基线/迭代名称
   return (
     <PageHeader
-      className={"pageHeader"}
+      className={pageHeader}
       ghost={false}
       title={"需求基线/迭代名称"}
       breadcrumbRender={() => {

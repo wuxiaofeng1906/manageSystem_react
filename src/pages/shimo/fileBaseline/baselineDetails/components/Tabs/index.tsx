@@ -14,9 +14,11 @@ const Tab: React.FC<any> = (props: any) => {
   return (
     <>
       <Tabs className="myTabs" onChange={tabChanged} type="card" size={"small"}>
-        <TabPane tab="需求基线" key="需求基线">
+        <TabPane tab="需求基线" key="需求基线" style={{height:50}}>
+
         </TabPane>
         <TabPane tab="概设基线" key="概设基线">
+
         </TabPane>
       </Tabs>
     </>

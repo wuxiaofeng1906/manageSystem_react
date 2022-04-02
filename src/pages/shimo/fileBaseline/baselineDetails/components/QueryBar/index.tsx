@@ -12,10 +12,9 @@ const QueryBar: React.FC<any> = () => {
   return (
     <div className={"queryCondition"}>
       <Form>
-        <Row gutter={5}>
-
+        <Row gutter={5} className={"queryRow"}>
           <Col span={8}>
-            <Form.Item label="迭代名称" name={"iterName"}>
+            <Form.Item label="迭代名称" name={"iterName"} style={{marginLeft: 10}}>
               <TreeSelect className={"iterName"} placeholder="默认选择全部"/>
             </Form.Item>
           </Col>

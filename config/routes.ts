@@ -503,7 +503,7 @@ export default [
     name: "石墨管理",
     icon: 'table',
     path: '/shimo',
-    hideInMenu: true,
+    hideInMenu: false,
     access: 'sysAdmin',
     routes: [
       {

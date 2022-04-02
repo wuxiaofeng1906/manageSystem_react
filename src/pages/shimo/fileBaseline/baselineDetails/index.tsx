@@ -1,6 +1,7 @@
 import Header from "./components/Header";
 import Tab from "./components/Tabs";
 import QueryBar from "./components/QueryBar";
+import GridList from "./components/GridList";
 
 const BaseDetails: React.FC<any> = () => {
 
@@ -13,7 +14,7 @@ const BaseDetails: React.FC<any> = () => {
       {/*  查询条件  */}
       <QueryBar/>
       {/* 列表 */}
-
+      <GridList/>
     </>
   );
 };

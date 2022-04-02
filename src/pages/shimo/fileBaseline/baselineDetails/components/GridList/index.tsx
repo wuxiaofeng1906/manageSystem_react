@@ -7,16 +7,13 @@ import {GridApi} from 'ag-grid-community';
 import {getHeight} from "@/publicMethods/pageSet";
 import {columns, testData, setCellStyle} from "./columns";
 import "./style.css"
-import {ShimoOverviewContent} from "./gridComponents/ShimoOverviewContent";
-import {ShimoStoryContent} from "./gridComponents/ShimoStoryContent";
-import {Operate} from "./gridComponents/Operate";
 import {myUrls} from "./gridComponents/myUrls";
-import {NameUrl} from "./gridComponents/NameUrl";
+
 
 const GridList: React.FC<any> = () => {
 
   /* region 表格事件 */
-  const [gridHeight, setGridHeight] = useState(getHeight() + 36);
+  const [gridHeight, setGridHeight] = useState(getHeight());
   const gridApi = useRef<GridApi>();
   window.onresize = function () {
     setGridHeight(getHeight() + 36);
@@ -43,10 +40,6 @@ const GridList: React.FC<any> = () => {
           }}
           frameworkComponents={{
             myUrl: myUrls,
-            nameUrl: NameUrl,
-            shimoStoryContent: ShimoStoryContent,
-            shimoOverviewContent: ShimoOverviewContent,
-            operate: Operate
           }}
         >
         </AgGridReact>

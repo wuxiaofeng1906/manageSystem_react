@@ -1,10 +1,12 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Form, Row, Col, TreeSelect, DatePicker} from 'antd';
 import {queryCondition} from "./style.css";
 import {errorMessage, infoMessage, sucMessage} from "@/publicMethods/showMessages";
 import {useRequest} from "ahooks";
 import {getIterateName, getSQAName} from "./selector";
 import defaultTreeSelectParams from "../../defaultSetting";
+import dayjs from "dayjs";
+import moment from "moment";
 
 const {RangePicker} = DatePicker;
 const QueryBar: React.FC<any> = () => {
@@ -15,10 +17,19 @@ const QueryBar: React.FC<any> = () => {
   const iterChanged = (iterId: string) => {
     console.log(iterId);
   };
+  const [iterForm] = Form.useForm();
 
+  useEffect(() => {
+    iterForm.setFieldsValue({
+      dept: "",
+      iterName: "",
+      SQA: "",
+      iterRange: [moment(dayjs().startOf("year").format("YYYYMMDD")), moment(dayjs().format("YYYYMMDD"))]
+    });
+  });
   return (
     <div className={queryCondition}>
-      <Form>
+      <Form form={iterForm}>
         <Row gutter={5}>
           <Col span={6}>
             <Form.Item label="部门/组" name={"dept"}>
@@ -34,7 +45,8 @@ const QueryBar: React.FC<any> = () => {
           </Col>
           <Col span={6}>
             <Form.Item label="SQA" name={"SQA"}>
-              <TreeSelect className={"SQA"}  {...defaultTreeSelectParams} treeData={sqaList}
+              <TreeSelect className={"SQA"}
+                          {...defaultTreeSelectParams} treeData={sqaList}
                           onChange={iterChanged}/>
             </Form.Item>
           </Col>

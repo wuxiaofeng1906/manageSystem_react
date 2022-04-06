@@ -7,52 +7,76 @@ import {getIterateName, getSQAName} from "./selector";
 import defaultTreeSelectParams from "../../defaultSetting";
 import dayjs from "dayjs";
 import moment from "moment";
+import {useModel} from "@@/plugin-model/useModel";
 
 const {RangePicker} = DatePicker;
 const QueryBar: React.FC<any> = () => {
+  const {queryInfo, setQueryInfo} = useModel("iterateList.index");
+  const [iterForm] = Form.useForm();
+  iterForm.setFieldsValue(queryInfo);
+
 
   const iterateList: any = useRequest(() => getIterateName()).data;
   const sqaList: any = useRequest(() => getSQAName()).data;
 
-  const iterChanged = (iterId: string) => {
-    console.log(iterId);
-  };
-  const [iterForm] = Form.useForm();
+  /* region 条件changed */
+  // 部门改变
+  const iterDeptChanged = () => {
 
-  useEffect(() => {
-    iterForm.setFieldsValue({
-      dept: "",
-      iterName: "",
-      SQA: "",
-      iterRange: [moment(dayjs().startOf("year").format("YYYYMMDD")), moment(dayjs().endOf("year").format("YYYYMMDD"))]
+  }
+  // 迭代名称改变
+  const iterNameChanged = (iterIds: any) => {
+
+    setQueryInfo({
+      ...queryInfo,
+      iterName: iterIds
     });
-  });
+  };
+
+  // SQA改变
+  const iterSQAChanged = (sqaId: string) => {
+    setQueryInfo({
+      ...queryInfo,
+      SQA: sqaId
+    });
+  };
+
+  // 迭代周期改变
+  const iterRangeChanged = (timeRange: any) => {
+    setQueryInfo({
+      ...queryInfo,
+      iterRange: timeRange
+    });
+  };
+
+  /* endregion 条件changed */
+
   return (
     <div className={queryCondition}>
       <Form form={iterForm}>
         <Row gutter={5}>
           <Col span={6}>
             <Form.Item label="部门/组" name={"dept"}>
-              <TreeSelect className={"deptTree"} placeholder="默认选择全部"/>
+              <TreeSelect className={"deptTree"} placeholder="默认选择全部" onChange={iterDeptChanged}/>
             </Form.Item>
           </Col>
           <Col span={6}>
             <Form.Item label="迭代名称" name={"iterName"}>
               <TreeSelect className={"iterName"}
                           {...defaultTreeSelectParams} treeData={iterateList}
-                          onChange={iterChanged}/>
+                          onChange={iterNameChanged}/>
             </Form.Item>
           </Col>
           <Col span={6}>
             <Form.Item label="SQA" name={"SQA"}>
               <TreeSelect className={"SQA"}
                           {...defaultTreeSelectParams} treeData={sqaList}
-                          onChange={iterChanged}/>
+                          onChange={iterSQAChanged}/>
             </Form.Item>
           </Col>
           <Col span={6}>
             <Form.Item label="迭代周期" name={"iterRange"}>
-              <RangePicker className={"iterRange"} allowClear={false}/>
+              <RangePicker className={"iterRange"} allowClear={false} onChange={iterRangeChanged}/>
             </Form.Item>
           </Col>
         </Row>

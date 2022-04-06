@@ -4,8 +4,12 @@ import {Button} from 'antd';
 import {myContainers, vertifyButton} from "./style.css";
 import {errorMessage, infoMessage, sucMessage} from "@/publicMethods/showMessages";
 import {CopyOutlined} from '@ant-design/icons';
+import {useModel} from "@@/plugin-model/useModel";
 
 const PageHeader: React.FC<any> = () => {
+
+  const {listData} = useModel("iterateList.index");
+
 
   // 列表验证重复
   const vertifyListRepeat = () => {

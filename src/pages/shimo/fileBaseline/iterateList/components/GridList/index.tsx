@@ -5,13 +5,14 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {GridApi} from 'ag-grid-community';
 import {getHeight} from "@/publicMethods/pageSet";
-import {columns, testData, setCellStyle} from "./columns";
+import {columns, setCellStyle} from "./columns";
 import {gridDiv} from "./style.css";
 import {ShimoOverviewContent} from "./gridComponents/ShimoOverviewContent";
 import {ShimoStoryContent} from "./gridComponents/ShimoStoryContent";
 import {Operate} from "./gridComponents/Operate";
 import {myUrls} from "./gridComponents/myUrls";
 import {NameUrl} from "./gridComponents/NameUrl";
+import {useModel} from "@@/plugin-model/useModel";
 
 const GridList: React.FC<any> = () => {
 
@@ -24,12 +25,15 @@ const GridList: React.FC<any> = () => {
   };
   /* endregion 表格事件 */
 
+  const {listData} = useModel("iterateList.index");
+
+
   return (
     <div className={gridDiv}>
       <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
         <AgGridReact
           columnDefs={columns} // 定义列
-          rowData={testData} // 数据绑定
+          rowData={listData} // 数据绑定
           defaultColDef={{
             resizable: true,
             suppressMenu: true,

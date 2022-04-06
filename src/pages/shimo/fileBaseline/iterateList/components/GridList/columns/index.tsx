@@ -67,12 +67,7 @@ const columns: any = [{
   cellRenderer: "operate"
 }];
 
-// 表格测试数据
-const testData = [
-  {
-    temp_type_name: "迭代名称"
-  }
-]
+
 
 const setCellStyle = (params: any) => {
   const style = {"line-height": "28px"}
@@ -82,4 +77,4 @@ const setCellStyle = (params: any) => {
   return style;
 
 };
-export {columns, testData, setCellStyle}
+export {columns, setCellStyle}

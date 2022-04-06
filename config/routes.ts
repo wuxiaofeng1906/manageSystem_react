@@ -522,7 +522,7 @@ export default [
             icon: 'table',
             path: 'baselineDetails',
             component: './shimo/fileBaseline/baselineDetails',
-            hideInMenu: true,
+            // hideInMenu: true,
           }
         ]
       }

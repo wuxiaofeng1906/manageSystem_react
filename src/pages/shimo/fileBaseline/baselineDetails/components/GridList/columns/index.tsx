@@ -1,34 +1,124 @@
-// 表格列的定义
+const getBaseInfoColumns = () => {
 
-const columns: any = [{
-  headerName: '序号',
-  minWidth: 70,
-  maxWidth: 80,
-  pinned: 'left',
-  cellRenderer: (params: any) => {
-    return Number(params.node.id) + 1;
-  },
-}, {
-  headerName: '',
-  field: 'zentao_url',
-  cellRenderer: "myUrl"
-}, {
-  headerName: '变更禅道编号',
-  field: 'shimo_url',
-  minWidth: 120,
-  cellRenderer: "shimoOverviewContent"
-}, {
-  headerName: '备注说明',
-  field: 'shimo_url',
-  minWidth: 120,
-}];
+  const baseFile = [
+    {
+      headerName: '一级目录',
+      field: 'total',
+      pinned: 'left',
+      columnGroupShow: 'closed',
+    }, {
+      headerName: '一级目录',
+      field: '',
+      pinned: 'left',
+      columnGroupShow: 'open',
+    }, {
+      headerName: '二级文件',
+      field: '',
+      pinned: 'left',
+      columnGroupShow: 'open',
+    }, {
+      headerName: '三级文件',
+      field: '',
+      pinned: 'left',
+      columnGroupShow: 'open',
+    },
+  ];
+
+  const baseTime = [
+    {
+      headerName: '一次基线时间',
+      field: '',
+      columnGroupShow: 'closed',
+    },
+    {
+      headerName: '一次基线时间',
+      field: '',
+      columnGroupShow: 'open',
+    }, {
+      headerName: '二次基线时间',
+      field: '',
+      columnGroupShow: 'open',
+    }, {
+      headerName: '三次基线时间',
+      field: '',
+      columnGroupShow: 'open',
+    },
+  ];
+  return {baseFile, baseTime};
+};
+
+// 表格列的定义
+const getColumns = () => {
+  const {baseFile, baseTime} = getBaseInfoColumns();
+
+  const columns: any = [{
+    headerName: '序号',
+    minWidth: 70,
+    maxWidth: 75,
+    pinned: 'left',
+    cellRenderer: (params: any) => {
+      return Number(params.node.id) + 1;
+    },
+  }, {
+    headerName: '',
+    field: 'zentao_url',
+    cellRenderer: "myUrl",
+    pinned: 'left',
+    maxWidth: 50,
+  }, {
+    headerName: '文件',
+    children: baseFile
+  }, {
+    headerName: '文档类型',
+    field: '',
+    pinned: 'left',
+    minWidth: 90,
+    maxWidth: 100,
+  }, {
+    headerName: '作者',
+    field: '',
+    pinned: 'left',
+    minWidth: 80,
+    maxWidth: 100,
+  }, {
+    headerName: '基线人',
+    field: '',
+    pinned: 'left',
+    minWidth: 90,
+    maxWidth: 100,
+  }, {
+    headerName: '是否基线',
+    field: '',
+    pinned: 'left',
+    minWidth: 90,
+    maxWidth: 100,
+  }, {
+    headerName: '基线时间',
+    children: baseTime
+  }, {
+    headerName: '最新基线标识',
+    field: '',
+    minWidth: 90,
+    maxWidth: 100,
+  }, {
+    headerName: '变更禅道编号',
+    field: 'shimo_url',
+    minWidth: 120,
+  }, {
+    headerName: '备注说明',
+    field: 'shimo_url',
+    minWidth: 120,
+  }];
+
+  return columns;
+};
 
 // 表格测试数据
 const testData = [
   {
     temp_type_name: "迭代名称"
   }
-]
+];
 
 const setCellStyle = (params: any) => {
   const style = {"line-height": "28px"}
@@ -38,4 +128,4 @@ const setCellStyle = (params: any) => {
   return style;
 
 };
-export {columns, testData, setCellStyle}
+export {getColumns, testData, setCellStyle}

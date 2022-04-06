@@ -8,6 +8,8 @@ import {getHeight} from "@/publicMethods/pageSet";
 import {getColumns, testData, setCellStyle} from "./columns";
 import {gridDiv} from "./style.css"
 import {myUrls} from "./gridComponents/myUrls";
+import {BaseLineSelect} from "./gridComponents/BaseLineSelect";
+
 
 const GridList: React.FC<any> = () => {
 
@@ -39,7 +41,9 @@ const GridList: React.FC<any> = () => {
           }}
           frameworkComponents={{
             myUrl: myUrls,
+            baseLine: BaseLineSelect
           }}
+
         >
         </AgGridReact>
       </div>

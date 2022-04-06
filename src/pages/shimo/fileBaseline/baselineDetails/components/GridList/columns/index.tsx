@@ -47,6 +47,13 @@ const getBaseInfoColumns = () => {
   return {baseFile, baseTime};
 };
 
+const manualInput = (params: any) => {
+  if (!params.value) {
+    return `<div style="color: #A9A9A9">手工输入</div>`;
+  }
+  return `<div>${params.value}</div>`;
+};
+
 // 表格列的定义
 const getColumns = () => {
   const {baseFile, baseTime} = getBaseInfoColumns();
@@ -92,22 +99,26 @@ const getColumns = () => {
     pinned: 'left',
     minWidth: 90,
     maxWidth: 100,
+    cellRenderer: "baseLine"
   }, {
     headerName: '基线时间',
     children: baseTime
   }, {
     headerName: '最新基线标识',
     field: '',
-    minWidth: 90,
-    maxWidth: 100,
+    minWidth: 110,
   }, {
     headerName: '变更禅道编号',
     field: 'shimo_url',
     minWidth: 120,
+    cellRenderer: manualInput,
+    editable: true
   }, {
     headerName: '备注说明',
     field: 'shimo_url',
     minWidth: 120,
+    cellRenderer: manualInput,
+    editable: true
   }];
 
   return columns;

@@ -1,6 +1,6 @@
 import React from "react";
 import {Button} from 'antd';
-import {PlusOutlined, MinusOutlined, CopyOutlined} from '@ant-design/icons';
+import {MinusOutlined, CopyOutlined} from '@ant-design/icons';
 import "./style.css";
 import {useModel} from "@@/plugin-model/useModel";
 import {copyNewRows, deletedRows} from "./rowsOperate";
@@ -17,10 +17,13 @@ const Operate: React.FC<any> = (props: any) => {
   }
 
   // 删除行
-  const delRow = () => {
-    debugger;
+  const delRow = async () => {
 
-    deletedRows(Number(currentRow.shimo_id));
+    const deleteResult = await deletedRows(Number(currentRow.shimo_id));
+    if (deleteResult.code === 200) {
+      // 刷新表格
+      updateGrid();
+    }
   };
 
   // 复制行

@@ -10,7 +10,7 @@ const copyNewRows = async (shimoId: number) => {
 // 删除
 const deletedRows = async (shimoId: number) => {
 
-  return await axiosDelete("/api/verify/shimo/executions", {old_shimo_id: shimoId});
+  return await axiosDelete("/api/verify/shimo/executions", {data:{old_shimo_id: shimoId}});
 };
 
 

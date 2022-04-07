@@ -22,17 +22,18 @@ const axiosGet = async (url: string, queryData: any = {}) => {
 
 // delete 请求
 const axiosDelete = async (url: string, queryData: any = {}) => {
-  await axios.delete(url, {params: queryData})
+  // queryData 格式 ： {data: queryData}或者 {params: queryData}
+  debugger;
+  let result: any = {};
+  await axios.delete(url, queryData)
     .then((res: any) => {
-      return res;
+      result = res.data;
     })
     .catch((error: string) => {
       errorMessage(`异常信息:${error.toString()}`);
-      return {};
     });
+  return result;
 };
-
-
 
 
 // post

@@ -1,14 +1,17 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {GridApi} from 'ag-grid-community';
 import {getHeight} from "@/publicMethods/pageSet";
-import {getColumns, testData, setCellStyle} from "./columns";
+import {getColumns, setCellStyle} from "./columns";
 import {gridDiv} from "./style.css"
 import {myUrls} from "./gridComponents/myUrls";
 import {BaseLineSelect} from "./gridComponents/BaseLineSelect";
+import {useModel} from "@@/plugin-model/useModel";
+import {useRequest} from "ahooks";
+import {getIterDetailsData} from "./gridData";
 
 
 const GridList: React.FC<any> = () => {
@@ -22,12 +25,19 @@ const GridList: React.FC<any> = () => {
   };
   /* endregion 表格事件 */
 
+  const {detailsData, setDetailsData, queryDetailsInfo} = useModel("iterateList.index");
+  const detailsList: any = useRequest(() => getIterDetailsData("")).data;
+
+  useEffect(() => {
+    setDetailsData(detailsList);
+  }, [detailsList]);
+
   return (
     <div className={gridDiv}>
       <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
         <AgGridReact
           columnDefs={getColumns()} // 定义列
-          rowData={testData} // 数据绑定
+          rowData={detailsData} // 数据绑定
           defaultColDef={{
             resizable: true,
             suppressMenu: true,

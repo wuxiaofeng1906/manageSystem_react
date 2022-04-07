@@ -138,12 +138,7 @@ const getColumns = () => {
   return columns;
 };
 
-// 表格测试数据
-const testData = [
-  {
-    temp_type_name: "迭代名称"
-  }
-];
+
 
 const setCellStyle = (params: any) => {
   const style = {"line-height": "28px"}
@@ -153,4 +148,4 @@ const setCellStyle = (params: any) => {
   return style;
 
 };
-export {getColumns, testData, setCellStyle}
+export {getColumns, setCellStyle}

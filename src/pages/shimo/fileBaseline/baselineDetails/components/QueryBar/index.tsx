@@ -14,19 +14,22 @@ const QueryBar: React.FC<any> = () => {
   const iterateList: any = useRequest(() => getIterateName()).data;
   const [iterDetailsForm] = Form.useForm();
 
-
-
-  const BaseLine = () => {
+  // 基线按钮点击
+  const BaseLineClicked = () => {
 
   };
 
-  useEffect(()=>{
-    debugger;
+  // 迭代名称修改
+  const iterNameChanged = () => {
+
+  };
+
+  useEffect(() => {
     iterDetailsForm.setFieldsValue({
       iterName: queryDetailsInfo.iterName,
       SQA: queryDetailsInfo.SQA
     });
-  },[iterateList])
+  }, [iterateList])
 
   return (
     <div className={queryCondition}>
@@ -37,6 +40,7 @@ const QueryBar: React.FC<any> = () => {
               <TreeSelect className={"iterName"}
                           {...defaultTreeSelectParams}
                           treeData={iterateList}
+                          onChange={iterNameChanged}
               />
             </Form.Item>
 
@@ -49,7 +53,7 @@ const QueryBar: React.FC<any> = () => {
           <Col span={3}>
             <Form.Item>
               <Button type="text" icon={<CheckSquareTwoTone/>}
-                      onClick={BaseLine}>基线</Button>
+                      onClick={BaseLineClicked}>基线</Button>
             </Form.Item>
           </Col>
 

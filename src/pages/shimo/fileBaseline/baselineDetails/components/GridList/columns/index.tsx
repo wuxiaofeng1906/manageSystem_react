@@ -57,69 +57,83 @@ const manualInput = (params: any) => {
 // 表格列的定义
 const getColumns = () => {
   const {baseFile, baseTime} = getBaseInfoColumns();
-
-  const columns: any = [{
-    headerName: '序号',
-    minWidth: 70,
-    maxWidth: 75,
-    pinned: 'left',
-    cellRenderer: (params: any) => {
-      return Number(params.node.id) + 1;
+  const columns: any = [
+    {
+      headerName: '',
+      children: [{
+        headerName: '序号',
+        minWidth: 70,
+        maxWidth: 75,
+        pinned: 'left',
+        cellRenderer: (params: any) => {
+          return Number(params.node.id) + 1;
+        },
+      }, {
+        headerName: '',
+        field: 'zentao_url',
+        cellRenderer: "myUrl",
+        pinned: 'left',
+        maxWidth: 50,
+      }]
     },
-  }, {
-    headerName: '',
-    field: 'zentao_url',
-    cellRenderer: "myUrl",
-    pinned: 'left',
-    maxWidth: 50,
-  }, {
-    headerName: '文件',
-    children: baseFile
-  }, {
-    headerName: '文档类型',
-    field: '',
-    pinned: 'left',
-    minWidth: 90,
-    maxWidth: 100,
-  }, {
-    headerName: '作者',
-    field: '',
-    pinned: 'left',
-    minWidth: 80,
-    maxWidth: 100,
-  }, {
-    headerName: '基线人',
-    field: '',
-    pinned: 'left',
-    minWidth: 90,
-    maxWidth: 100,
-  }, {
-    headerName: '是否基线',
-    field: '',
-    pinned: 'left',
-    minWidth: 90,
-    maxWidth: 100,
-    cellRenderer: "baseLine"
-  }, {
-    headerName: '基线时间',
-    children: baseTime
-  }, {
-    headerName: '最新基线标识',
-    field: '',
-    minWidth: 110,
-  }, {
-    headerName: '变更禅道编号',
-    field: 'shimo_url',
-    minWidth: 120,
-    cellRenderer: manualInput,
-    editable: true
-  }, {
-    headerName: '备注说明',
-    field: 'shimo_url',
-    minWidth: 120,
-    cellRenderer: manualInput,
-    editable: true
-  }];
+    {
+      headerName: '文件路径',
+      children: baseFile
+    },
+    {
+      headerName: '',
+      children: [{
+        headerName: '文档类型',
+        field: '',
+        pinned: 'left',
+        minWidth: 90,
+        maxWidth: 100,
+      }, {
+        headerName: '作者',
+        field: '',
+        pinned: 'left',
+        minWidth: 80,
+        maxWidth: 100,
+      }, {
+        headerName: '基线人',
+        field: '',
+        pinned: 'left',
+        minWidth: 90,
+        maxWidth: 100,
+      }, {
+        headerName: '是否基线',
+        field: '',
+        pinned: 'left',
+        minWidth: 90,
+        maxWidth: 100,
+        cellRenderer: "baseLine"
+      }]
+    },
+    {
+      headerName: '基线时间',
+      children: baseTime
+    },
+    {
+      headerName: '',
+      children: [{
+        headerName: '最新基线标识',
+        field: '',
+        minWidth: 110,
+      }, {
+        headerName: '变更禅道编号',
+        field: 'shimo_url',
+        minWidth: 120,
+        cellRenderer: manualInput,
+        editable: true
+      }, {
+        headerName: '备注说明',
+        field: 'shimo_url',
+        minWidth: 120,
+        cellRenderer: manualInput,
+        editable: true
+      }]
+    }
+  ];
 
   return columns;
 };

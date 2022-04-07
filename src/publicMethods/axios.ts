@@ -23,7 +23,7 @@ const axiosGet = async (url: string, queryData: any = {}) => {
 // delete 请求
 const axiosDelete = async (url: string, queryData: any = {}) => {
   // queryData 格式 ： {data: queryData}或者 {params: queryData}
-  debugger;
+
   let result: any = {};
   await axios.delete(url, queryData)
     .then((res: any) => {
@@ -51,14 +51,15 @@ const axiosPost = async (url: string, bodyData: any = {}, queryData: any = {}) =
 
 // put
 const axiosPut = async (url: string, bodyData: any = {}, queryData: any = {}) => {
-  await axios.put(url, {data: bodyData}, {params: queryData})
-    .then((res: any) => {
-      return res;
+  let result: any = {};
 
+  await axios.put(url, bodyData, {params: queryData})
+    .then((res: any) => {
+      result = res.data;
     }).catch((error) => {
       errorMessage(`异常信息:${error.toString()}`);
-      return {};
     });
+  return result;
 };
 
 export {axiosGet, axiosDelete, axiosPost, axiosPut}

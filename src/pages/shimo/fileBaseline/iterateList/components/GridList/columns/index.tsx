@@ -42,7 +42,7 @@ const columns: any = [
   }, {
     headerName: '石墨需求目录',
     field: 'demand_directory',
-    minWidth: 120,
+    minWidth: 160,
     cellRenderer: "shimoStoryContent"
   }, {
     headerName: '需求基线状态',
@@ -55,7 +55,7 @@ const columns: any = [
   }, {
     headerName: '石墨概设目录',
     field: 'design_directory',
-    minWidth: 120,
+    minWidth: 160,
     cellRenderer: "shimoOverviewContent"
   }, {
     headerName: '概设基线状态',

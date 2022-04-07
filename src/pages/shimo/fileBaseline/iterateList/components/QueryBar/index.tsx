@@ -1,17 +1,16 @@
 import React, {useEffect} from "react";
 import {Form, Row, Col, TreeSelect, DatePicker} from 'antd';
 import {queryCondition} from "./style.css";
-import {errorMessage, infoMessage, sucMessage} from "@/publicMethods/showMessages";
 import {useRequest} from "ahooks";
-import {getDeptName,getIterateName, getSQAName} from "./selector";
+import {getDeptName, getIterateName, getSQAName} from "./selector";
 import defaultTreeSelectParams from "../../defaultSetting";
-import dayjs from "dayjs";
-import moment from "moment";
 import {useModel} from "@@/plugin-model/useModel";
+import {getIterListData} from "../GridList/gridData";
 
 const {RangePicker} = DatePicker;
 const QueryBar: React.FC<any> = () => {
-  const {queryInfo, setQueryInfo} = useModel("iterateList.index");
+
+  const {queryInfo, setQueryInfo, setListData} = useModel("iterateList.index");
   const [iterForm] = Form.useForm();
   iterForm.setFieldsValue(queryInfo);
 
@@ -20,10 +19,16 @@ const QueryBar: React.FC<any> = () => {
   const sqaList: any = useRequest(() => getSQAName()).data;
 
   /* region 条件changed */
-  // 部门改变
-  const iterDeptChanged = () => {
 
-  }
+  // 部门改变
+  const iterDeptChanged = (deptsId: any) => {
+
+    setQueryInfo({
+      ...queryInfo,
+      dept: deptsId
+    });
+  };
+
   // 迭代名称改变
   const iterNameChanged = (iterIds: any) => {
 
@@ -50,7 +55,17 @@ const QueryBar: React.FC<any> = () => {
   };
 
   /* endregion 条件changed */
+  const updateGrid = async () => {
+    // 条件选择完成后会进行调用，刷新数据界面
+    console.log(queryInfo);
+    const dts = await getIterListData(queryInfo);
 
+    setListData(dts);
+  }
+
+  useEffect(() => {
+    updateGrid();
+  }, [queryInfo]);
   return (
     <div className={queryCondition}>
       <Form form={iterForm}>

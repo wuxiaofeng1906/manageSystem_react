@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -13,6 +13,8 @@ import {Operate} from "./gridComponents/Operate";
 import {myUrls} from "./gridComponents/myUrls";
 import {NameUrl} from "./gridComponents/NameUrl";
 import {useModel} from "@@/plugin-model/useModel";
+import {getIterListData} from "./gridData";
+import {useRequest} from "ahooks";
 
 const GridList: React.FC<any> = () => {
 
@@ -25,8 +27,12 @@ const GridList: React.FC<any> = () => {
   };
   /* endregion 表格事件 */
 
-  const {listData} = useModel("iterateList.index");
+  const {setListData, listData, queryInfo} = useModel("iterateList.index");
+  const deptList: any = useRequest(() => getIterListData(queryInfo)).data;
 
+  useEffect(() => {
+    setListData(deptList);
+  }, [deptList]);
 
   return (
     <div className={gridDiv}>

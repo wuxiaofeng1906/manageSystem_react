@@ -3,7 +3,7 @@ import {Form, Row, Col, TreeSelect, DatePicker} from 'antd';
 import {queryCondition} from "./style.css";
 import {errorMessage, infoMessage, sucMessage} from "@/publicMethods/showMessages";
 import {useRequest} from "ahooks";
-import {getIterateName, getSQAName} from "./selector";
+import {getDeptName,getIterateName, getSQAName} from "./selector";
 import defaultTreeSelectParams from "../../defaultSetting";
 import dayjs from "dayjs";
 import moment from "moment";
@@ -15,7 +15,7 @@ const QueryBar: React.FC<any> = () => {
   const [iterForm] = Form.useForm();
   iterForm.setFieldsValue(queryInfo);
 
-
+  const deptList: any = useRequest(() => getDeptName()).data;
   const iterateList: any = useRequest(() => getIterateName()).data;
   const sqaList: any = useRequest(() => getSQAName()).data;
 
@@ -57,7 +57,9 @@ const QueryBar: React.FC<any> = () => {
         <Row gutter={5}>
           <Col span={6}>
             <Form.Item label="部门/组" name={"dept"}>
-              <TreeSelect className={"deptTree"} placeholder="默认选择全部" onChange={iterDeptChanged}/>
+              <TreeSelect className={"deptTree"}
+                          {...defaultTreeSelectParams} treeData={deptList}
+                          onChange={iterDeptChanged}/>
             </Form.Item>
           </Col>
           <Col span={6}>

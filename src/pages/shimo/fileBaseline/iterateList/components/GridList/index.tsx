@@ -7,7 +7,6 @@ import {GridApi} from 'ag-grid-community';
 import {getHeight} from "@/publicMethods/pageSet";
 import {columns, setCellStyle} from "./columns";
 import {gridDiv} from "./style.css";
-import {ShimoOverviewContent} from "./gridComponents/ShimoOverviewContent";
 import {ShimoStoryContent} from "./gridComponents/ShimoStoryContent";
 import {Operate} from "./gridComponents/Operate";
 import {myUrls} from "./gridComponents/myUrls";
@@ -54,8 +53,7 @@ const GridList: React.FC<any> = () => {
           frameworkComponents={{
             myUrl: myUrls,
             nameUrl: NameUrl,
-            shimoStoryContent: ShimoStoryContent,
-            shimoOverviewContent: ShimoOverviewContent,
+            shimoContent: ShimoStoryContent,
             operate: Operate
           }}
         >

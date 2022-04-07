@@ -1,4 +1,4 @@
-import {Select, TreeSelect} from 'antd';
+import {TreeSelect} from 'antd';
 import React, {useEffect, useState} from "react";
 import {modifyListContent} from "./rowChanged";
 import {useRequest} from "ahooks";
@@ -6,11 +6,10 @@ import {getTreeSelectData} from "./selector";
 import {getIterListData} from "@/pages/shimo/fileBaseline/iterateList/components/GridList/gridData";
 import {useModel} from "@@/plugin-model/useModel";
 
-const {TreeNode} = TreeSelect;
-
-
 const ShimoStoryContent: React.FC<any> = (props: any) => {
-  const {data} = props;
+
+
+  const {data, column} = props;
   const {setListData, queryInfo} = useModel("iterateList.index");
 
   const [tree, setTreeData] = useState({
@@ -36,7 +35,11 @@ const ShimoStoryContent: React.FC<any> = (props: any) => {
     const result: any = [];
     getParentName(enValue, result);
 
-    const modifyResult = await modifyListContent("story", {shimo: data.shimo_id, id: enValue, dir: result.join("/")});
+    const modifyResult = await modifyListContent(column.colId, {
+      shimo: data.shimo_id,
+      id: enValue,
+      dir: result.join("/")
+    });
     if (modifyResult.code === 200) {
       const dts = await getIterListData(queryInfo);
       setListData(dts);
@@ -58,8 +61,14 @@ const ShimoStoryContent: React.FC<any> = (props: any) => {
 
   useEffect(() => {
 
+    let currentValue = "";
+    if (column.colId === "demand_directory") {
+      currentValue = data.demand_directory;
+    } else {
+      currentValue = data.design_directory;
+    }
     setTreeData({
-      values: data.demand_directory,
+      values: currentValue,
       treeData: treeList
     });
   }, [treeList]);

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Form, Row, Col, TreeSelect, DatePicker, Button, Input} from 'antd';
 import {queryCondition, queryRow, iterName, SQA} from "./style.css";
 import {errorMessage, infoMessage, sucMessage} from "@/publicMethods/showMessages";
@@ -6,17 +6,31 @@ import {CheckSquareTwoTone} from "@ant-design/icons";
 import {useRequest} from "ahooks";
 import {getIterateName} from "@/pages/shimo/fileBaseline/iterateList/components/QueryBar/selector";
 import defaultTreeSelectParams from "@/pages/shimo/fileBaseline/iterateList/defaultSetting";
+import {useModel} from "@@/plugin-model/useModel";
 
 const QueryBar: React.FC<any> = () => {
+  const {queryDetailsInfo, setQueryDetailsInfo} = useModel("iterateList.index");
+
   const iterateList: any = useRequest(() => getIterateName()).data;
+  const [iterDetailsForm] = Form.useForm();
+
+
 
   const BaseLine = () => {
 
   };
 
+  useEffect(()=>{
+    debugger;
+    iterDetailsForm.setFieldsValue({
+      iterName: queryDetailsInfo.iterName,
+      SQA: queryDetailsInfo.SQA
+    });
+  },[iterateList])
+
   return (
     <div className={queryCondition}>
-      <Form>
+      <Form form={iterDetailsForm}>
         <Row gutter={5} className={queryRow}>
           <Col span={8}>
             <Form.Item label="迭代名称" name={"iterName"} style={{marginLeft: 10}}>

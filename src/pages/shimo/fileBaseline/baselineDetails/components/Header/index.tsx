@@ -5,11 +5,12 @@ import {pageHeader} from "./style.css";
 import {useModel} from "@@/plugin-model/useModel";
 
 const Header: React.FC<any> = (props: any) => {
-  const {tabsInfo} = useModel("iterateList.index");
+
+  const {tabsInfo, queryDetailsInfo} = useModel("iterateList.index");
   //  点击需求基线，title就显示  需求基线/迭代名称
   //  点击概设基线，title就显示  概设基线/迭代名称
-
-  const pageTitle = `${tabsInfo.activeKey}/迭代名称`;
+  console.log("tabsInfo",tabsInfo)
+  const pageTitle = `${tabsInfo.activeKey}/${queryDetailsInfo.iterName}`;
 
   const breadcrumbItems = [
     <Breadcrumb.Item key="石墨管理">石墨管理</Breadcrumb.Item>,

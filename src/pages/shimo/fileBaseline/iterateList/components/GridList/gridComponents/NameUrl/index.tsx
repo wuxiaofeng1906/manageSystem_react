@@ -5,7 +5,7 @@ const NameUrl: React.FC<any> = (props: any) => {
 
   return (
     <span>
-        <Link to={"/shimo/fileBaseline/baselineDetails"}>{props.value}</Link>
+        <Link to={`/shimo/fileBaseline/baselineDetails?shimo=${props.data?.shimo_id}`}>{props.value}</Link>
     </span>
 
   );

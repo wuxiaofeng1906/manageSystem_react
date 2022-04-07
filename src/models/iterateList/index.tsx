@@ -3,7 +3,7 @@ import moment from "moment";
 import dayjs from "dayjs";
 
 export default () => {
-
+// /////////迭代列表数据
   /* region tab 数据 */
   const [tabsInfo, setTabsInfo] = useState({activeKey: '需求基线'});
 
@@ -21,21 +21,28 @@ export default () => {
     SQA: "",
     iterRange: [moment(dayjs().startOf("year").format("YYYYMMDD")), moment(dayjs().endOf("year").format("YYYYMMDD"))]
   });
-
-  // 设置Tab的数据
-  // const setConditionInfo = useCallback((condition: any) => {
-  //   setQueryInfo(condition);
-  // }, []);
-
   /* endregion */
 
   /* region 迭代列表grid 数据 */
   const [listData, setListData] = useState([]);
   /* endregion */
 
+  // /////////迭代详情数据
+
+  /* region 查询条件 数据 */
+  const [queryDetailsInfo, setQueryDetailsInfo] = useState({
+
+    iterName: "",
+    SQA: "",
+  });
+  /* endregion */
+
+
   return {
     tabsInfo, setTabsData, // tabs
     queryInfo, setQueryInfo, // 查询条件
     listData, setListData, // 迭代列表数据
+
+    queryDetailsInfo, setQueryDetailsInfo,// 详情列表查询条件
   };
 };

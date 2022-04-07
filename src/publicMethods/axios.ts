@@ -17,7 +17,7 @@ const axiosGet = async (url: string, queryData: any = {}) => {
       errorMessage(`异常信息:${error.toString()}`);
     });
 
-  return result
+  return result;
 };
 
 // delete 请求
@@ -32,16 +32,20 @@ const axiosDelete = async (url: string, queryData: any = {}) => {
     });
 };
 
+
+
+
 // post
 const axiosPost = async (url: string, bodyData: any = {}, queryData: any = {}) => {
-  await axios.post(url, {data: bodyData}, {params: queryData})
-    .then((res: any) => {
-      return res;
+  let result: any = {};
 
+  await axios.post(url, bodyData, {params: queryData})
+    .then((res: any) => {
+      result = res.data;
     }).catch((error) => {
       errorMessage(`异常信息:${error.toString()}`);
-      return {};
     });
+  return result;
 };
 
 // put

@@ -55,8 +55,8 @@ const manualInput = (params: any) => {
 };
 
 // 表格列的定义
-const getColumns = () => {
-  const {baseFile, baseTime} = getBaseInfoColumns();
+const getColumns = (baseFile: any, baseTime: any) => {
+
   const columns: any = [
     {
       headerName: '',

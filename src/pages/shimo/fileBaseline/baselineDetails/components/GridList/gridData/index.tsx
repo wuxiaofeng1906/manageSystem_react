@@ -1,4 +1,5 @@
 import {axiosGet} from "@/publicMethods/axios";
+import {getColumns} from "../columns";
 
 const getParentPathByChild = (data: any, nodeName: any, indexArray: any, rt_all: any) => {
 
@@ -45,31 +46,75 @@ const getChildData = (oraData: any, childData: any, result: any, filedArrayLengt
   });
 
 };
-//
-const getGridDataAndColumns = (data: any) => {
+const contactResult = (oraData: any, firstName: string) => {
+  const result: any = [];
+  oraData.forEach((dts: any) => {
+    const newObject = {...dts};
+    newObject["1_file"] = firstName;
+    result.push(newObject);
+  });
 
-  // 文件和基线时间要用最大的列数
+  return result;
+};
+
+const getFileColumns = (filedArray: any) => {
+
+  const arraySort = filedArray.sort((a: number, b: number) => {
+    return b - a
+  });
+
+  const maxCount = arraySort[0];
+
+  const columns: any = [{
+    headerName: '1级目录',
+    field: 'total',
+    pinned: 'left',
+    columnGroupShow: 'closed',
+  }, {
+    headerName: '1级目录',
+    field: '1_file',
+    pinned: 'left',
+    columnGroupShow: 'open',
+  }];
+  for (let index = 2; index <= maxCount + 1; index += 1) {
+    columns.push({
+      headerName: `${index}级文件`,
+      field: `${index}_file`,
+      pinned: 'left',
+      columnGroupShow: 'open',
+    })
+  }
+
+  return columns;
+};
+
+
+
+// 获取迭代数据
+const getIterDetailsData = async (myGuid: any) => {
+  const details = await axiosGet("/api/verify/shimo/version_detail", {guid: myGuid});
+   // 文件和基线时间要用最大的列数
   // parent是一定有的(一级目录)。
-  const firstContent = {"1_file": data.parent?.name};
+  const firstContent = {"1_file": details.parent?.name};
   // 判断file_format 类型是不是为folder，是的话就有下级目录。其他类型就没有下级目录
-  if (data.parent?.file_format !== "folder") {
+  if (details.parent?.file_format !== "folder") {
     return [firstContent];
   }
 
   const result: any = [];
   const filedArrayLength: any = [];
-  if ((data.children) && (data.children).length > 0) {
-    getChildData(data.children, data.children, result, filedArrayLength);
+  if ((details.children) && (details.children).length > 0) {
+    getChildData(details.children, details.children, result, filedArrayLength);
   }
+  // 数据
+  const gridData= contactResult(result, details.parent?.name);
 
-  console.log("result", result, filedArrayLength);
-  return result;
-};
+  // 文件名
+  const fileColumns = getFileColumns(filedArrayLength);
 
-// 获取迭代数据
-const getIterDetailsData = async (myGuid: any) => {
-  const details = await axiosGet("/api/verify/shimo/version_detail", {guid: myGuid});
-  return getGridDataAndColumns(details);
+  const columnsData = getColumns(fileColumns,[]);
+
+  return {gridData, columnsData}
 
 };
 

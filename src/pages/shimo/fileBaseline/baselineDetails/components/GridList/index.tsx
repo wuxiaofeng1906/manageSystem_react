@@ -27,8 +27,8 @@ const GridList: React.FC<any> = (props: any) => {
 
   /* endregion 表格事件 */
 
-  const {detailsData, setDetailsData} = useModel("iterateList.index");
-  const detailsList: any = useRequest(() => getIterDetailsData(prjInfo.storyId)).data;
+  const {detailsData, setDetailsData, columns, setColumns} = useModel("iterateList.index");
+  const detailsInfo: any = useRequest(() => getIterDetailsData(prjInfo.storyId)).data;
 
   // 编辑表格
   const cellEditedStoped = (params: any) => {
@@ -36,14 +36,15 @@ const GridList: React.FC<any> = (props: any) => {
   };
 
   useEffect(() => {
-    setDetailsData(detailsList);
-  }, [detailsList]);
+    setColumns(detailsInfo?.columnsData);
+    setDetailsData(detailsInfo?.gridData);
+  }, [detailsInfo]);
 
   return (
     <div className={gridDiv}>
       <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
         <AgGridReact
-          columnDefs={getColumns()} // 定义列
+          columnDefs={columns} // 定义列
           rowData={detailsData} // 数据绑定
           defaultColDef={{
             resizable: true,

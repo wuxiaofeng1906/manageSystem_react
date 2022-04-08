@@ -13,9 +13,6 @@ const Tab: React.FC<any> = (props: any) => {
     setTabsData(activeKey);
   };
 
-  // useEffect(() => {
-  //   setTabsData("需求基线");
-  // });
   return (
     <>
       <Tabs className={myTabs} onChange={tabChanged} type="card" size={"small"}>

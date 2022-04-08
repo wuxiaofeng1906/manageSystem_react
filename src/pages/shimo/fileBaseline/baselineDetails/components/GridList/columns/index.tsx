@@ -60,21 +60,28 @@ const getColumns = () => {
   const columns: any = [
     {
       headerName: '',
-      children: [{
-        headerName: '序号',
-        minWidth: 70,
-        maxWidth: 75,
-        pinned: 'left',
-        cellRenderer: (params: any) => {
-          return Number(params.node.id) + 1;
-        },
-      }, {
-        headerName: '',
-        field: 'zentao_url',
-        cellRenderer: "myUrl",
-        pinned: 'left',
-        maxWidth: 50,
-      }]
+      children: [
+        {
+          headerName: '',
+          checkboxSelection: true,
+          headerCheckboxSelection: true,
+          maxWidth: 50,
+          pinned: 'left',
+        }, {
+          headerName: '序号',
+          minWidth: 70,
+          maxWidth: 75,
+          pinned: 'left',
+          cellRenderer: (params: any) => {
+            return Number(params.node.id) + 1;
+          },
+        }, {
+          headerName: '',
+          field: 'zentao_url',
+          cellRenderer: "myUrl",
+          pinned: 'left',
+          maxWidth: 50,
+        }]
     },
     {
       headerName: '文件路径',
@@ -137,7 +144,6 @@ const getColumns = () => {
 
   return columns;
 };
-
 
 
 const setCellStyle = (params: any) => {

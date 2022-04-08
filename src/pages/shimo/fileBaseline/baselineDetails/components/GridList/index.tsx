@@ -14,7 +14,8 @@ import {useRequest} from "ahooks";
 import {getIterDetailsData} from "./gridData";
 
 
-const GridList: React.FC<any> = () => {
+const GridList: React.FC<any> = (props: any) => {
+  const prjInfo = props.hrefParams;
 
   /* region 表格事件 */
   const [gridHeight, setGridHeight] = useState(getHeight());
@@ -23,10 +24,16 @@ const GridList: React.FC<any> = () => {
     setGridHeight(getHeight() + 36);
     gridApi.current?.sizeColumnsToFit();
   };
+
   /* endregion 表格事件 */
 
-  const {detailsData, setDetailsData, queryDetailsInfo} = useModel("iterateList.index");
-  const detailsList: any = useRequest(() => getIterDetailsData("")).data;
+  const {detailsData, setDetailsData} = useModel("iterateList.index");
+  const detailsList: any = useRequest(() => getIterDetailsData(prjInfo.storyId)).data;
+
+  // 编辑表格
+  const cellEditedStoped = (params: any) => {
+
+  };
 
   useEffect(() => {
     setDetailsData(detailsList);
@@ -53,7 +60,8 @@ const GridList: React.FC<any> = () => {
             myUrl: myUrls,
             baseLine: BaseLineSelect
           }}
-
+          rowSelection={'multiple'}
+          onCellEditingStopped={cellEditedStoped}
         >
         </AgGridReact>
       </div>

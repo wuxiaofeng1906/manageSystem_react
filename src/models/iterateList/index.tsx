@@ -30,13 +30,13 @@ export default () => {
   // /////////迭代详情数据
 
   /* region 查询条件 数据 */
-  const [listParams, setListParams] = useState({
-    iterId:-1,
-    iterName: "",
-    SQA: "",
-    designId: "",
-    storyId: ""
-  });
+  // const [listParams, setListParams] = useState({
+  //   iterId:-1,
+  //   iterName: "",
+  //   SQA: "",
+  //   designId: "",
+  //   storyId: ""
+  // });
   /* endregion */
 
   /* region 详情列表数据 */
@@ -48,7 +48,7 @@ export default () => {
     queryInfo, setQueryInfo, // 查询条件
     listData, setListData, // 迭代列表数据
 
-    listParams, setListParams,// 详情列表查询条件
+    // listParams, setListParams,// 详情列表查询条件
     detailsData, setDetailsData
   };
 };

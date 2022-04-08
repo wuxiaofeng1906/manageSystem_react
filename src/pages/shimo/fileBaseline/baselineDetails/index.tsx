@@ -2,36 +2,20 @@ import Header from "./components/Header";
 import Tab from "./components/Tabs";
 import QueryBar from "./components/QueryBar";
 import GridList from "./components/GridList";
-import {useModel} from "@@/plugin-model/useModel";
-import {useEffect} from "react";
 
 const BaseDetails: React.FC<any> = (props: any) => {
 
-  const {setListParams} = useModel("iterateList.index");
-
-  useEffect(() => {
-    const prjInfo = props.location.query;
-
-    setListParams({
-      iterId: Number(prjInfo.iterID),
-      iterName: prjInfo.iterName,
-      SQA: prjInfo.SQA === "null" ? "" : prjInfo.SQA,
-      designId: prjInfo.designId,
-      storyId: prjInfo.storyId
-    });
-
-  }, [1]);
 
   return (
     <>
       {/* header */}
-      <Header/>
+      <Header hrefParams={props.location.query}/>
       {/*  tab  */}
-      <Tab/>
+      <Tab hrefParams={props.location.query}/>
       {/*  查询条件  */}
-      <QueryBar/>
+      <QueryBar hrefParams={props.location.query}/>
       {/* 列表 */}
-      <GridList/>
+      <GridList hrefParams={props.location.query}/>
     </>
   );
 };

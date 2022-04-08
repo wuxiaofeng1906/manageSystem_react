@@ -3,14 +3,12 @@ import {Form, Row, Col, Select, Button, Input} from 'antd';
 import {queryCondition, queryRow, SQA} from "./style.css";
 import {CheckSquareTwoTone} from "@ant-design/icons";
 import {useRequest} from "ahooks";
-import {useModel} from "@@/plugin-model/useModel";
 import {getIterSelect} from "./selector";
 import {getSqaByIterName, setBaseLineFor} from "./dataAlaysis";
 
 let selected_sqa = -1; // 记录选中的sqaID
-const QueryBar: React.FC<any> = () => {
-  const {listParams} = useModel("iterateList.index");
-
+const QueryBar: React.FC<any> = (props: any) => {
+  const prjInfo = props.hrefParams;
   const iterateList: any = useRequest(() => getIterSelect()).data;
   const [iterDetailsForm] = Form.useForm();
 
@@ -37,8 +35,8 @@ const QueryBar: React.FC<any> = () => {
 
   useEffect(() => {
     iterDetailsForm.setFieldsValue({
-      iterName: listParams.iterId,
-      SQA: listParams.SQA
+      iterName: Number(prjInfo.iterID),
+      SQA: prjInfo.SQA === "null" ? "" : prjInfo.SQA
     });
   }, [iterateList])
 

@@ -4,7 +4,7 @@ import {Link} from "umi";
 const NameUrl: React.FC<any> = (props: any) => {
 
   const {data} = props;
-  debugger;
+
   // 参数需要 迭代名称，迭代ID、SQA、需求和概设的基线ID
   return (
     <span>

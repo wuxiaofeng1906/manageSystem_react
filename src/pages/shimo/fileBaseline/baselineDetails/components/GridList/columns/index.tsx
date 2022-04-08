@@ -8,17 +8,17 @@ const getBaseInfoColumns = () => {
       columnGroupShow: 'closed',
     }, {
       headerName: '一级目录',
-      field: '',
+      field: '1_file',
       pinned: 'left',
       columnGroupShow: 'open',
     }, {
       headerName: '二级文件',
-      field: '',
+      field: '2_file',
       pinned: 'left',
       columnGroupShow: 'open',
     }, {
       headerName: '三级文件',
-      field: '',
+      field: '3_file',
       pinned: 'left',
       columnGroupShow: 'open',
     },
@@ -91,13 +91,13 @@ const getColumns = () => {
       headerName: '',
       children: [{
         headerName: '文档类型',
-        field: '',
+        field: 'file_format',
         pinned: 'left',
         minWidth: 90,
         maxWidth: 100,
       }, {
         headerName: '作者',
-        field: '',
+        field: 'author',
         pinned: 'left',
         minWidth: 80,
         maxWidth: 100,

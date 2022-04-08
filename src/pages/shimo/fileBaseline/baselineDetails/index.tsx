@@ -7,22 +7,17 @@ import {useEffect} from "react";
 
 const BaseDetails: React.FC<any> = (props: any) => {
 
-  const {listData, setQueryDetailsInfo} = useModel("iterateList.index");
+  const {setListParams} = useModel("iterateList.index");
 
   useEffect(() => {
-    let infos: any = {};
-    const shimoId = props.location.query.shimo;
-    for (let index = 0; index < listData.length; index += 1) {
-      const dts: any = listData[index];
-      if (Number(shimoId) === dts.shimo_id) {
-        infos = dts;
-        break;
-      }
-    }
+    const prjInfo = props.location.query;
 
-    setQueryDetailsInfo({
-      iterName: infos.execution_name,
-      SQA: infos.execution_sqa_name,
+    setListParams({
+      iterId: Number(prjInfo.iterID),
+      iterName: prjInfo.iterName,
+      SQA: prjInfo.SQA === "null" ? "" : prjInfo.SQA,
+      designId: prjInfo.designId,
+      storyId: prjInfo.storyId
     });
 
   }, [1]);

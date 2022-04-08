@@ -1,15 +1,16 @@
 import React, {useEffect} from "react";
-import {Form, Row, Col, TreeSelect, DatePicker, Button, Input} from 'antd';
-import {queryCondition, queryRow, iterName, SQA} from "./style.css";
+import {Form, Row, Col, TreeSelect, Button, Input} from 'antd';
+import {queryCondition, queryRow, SQA} from "./style.css";
 import {errorMessage, infoMessage, sucMessage} from "@/publicMethods/showMessages";
 import {CheckSquareTwoTone} from "@ant-design/icons";
 import {useRequest} from "ahooks";
 import {getIterateName} from "@/pages/shimo/fileBaseline/iterateList/components/QueryBar/selector";
 import defaultTreeSelectParams from "@/pages/shimo/fileBaseline/iterateList/defaultSetting";
 import {useModel} from "@@/plugin-model/useModel";
+import {getSqaByIterName} from "./dataAlaysis";
 
 const QueryBar: React.FC<any> = () => {
-  const {queryDetailsInfo, setQueryDetailsInfo} = useModel("iterateList.index");
+  const {listParams} = useModel("iterateList.index");
 
   const iterateList: any = useRequest(() => getIterateName()).data;
   const [iterDetailsForm] = Form.useForm();
@@ -20,14 +21,15 @@ const QueryBar: React.FC<any> = () => {
   };
 
   // 迭代名称修改
-  const iterNameChanged = () => {
-
+  const iterNameChanged = async (param: any) => {
+    console.log("param", param);
+    await getSqaByIterName();
   };
 
   useEffect(() => {
     iterDetailsForm.setFieldsValue({
-      iterName: queryDetailsInfo.iterName,
-      SQA: queryDetailsInfo.SQA
+      iterName: listParams.iterId,
+      SQA: listParams.SQA
     });
   }, [iterateList])
 

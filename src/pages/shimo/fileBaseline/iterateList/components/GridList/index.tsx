@@ -27,8 +27,9 @@ const GridList: React.FC<any> = () => {
   };
   /* endregion 表格事件 */
 
-  const {setListData, listData, queryInfo, repeatId} = useModel("iterateList.index");
+  const {setListData, listData, queryInfo} = useModel("iterateList.index");
   const deptList: any = useRequest(() => getIterListData(queryInfo)).data;
+
 
   useEffect(() => {
     setListData(deptList);
@@ -43,9 +44,7 @@ const GridList: React.FC<any> = () => {
           defaultColDef={{
             resizable: true,
             suppressMenu: true,
-            cellStyle: (params: any) => {
-              return setCellStyle(params, repeatId);
-            }
+            cellStyle:setCellStyle
           }}
           rowHeight={28}
           headerHeight={30}
@@ -63,17 +62,6 @@ const GridList: React.FC<any> = () => {
             shimoContent: ShimoStoryContent,
             operate: Operate
           }}
-
-          // getRowStyle={(params: any) => {
-          //   debugger;
-          //   const repeatRow: any = [...repeatId];
-          //   const currentRow_shimoId: number = params.data?.shimo_id;
-          //   if (repeatRow.indexOf(currentRow_shimoId) > -1) {
-          //     return {background: '#FFF6F6'};
-          //   }
-          //   return {background: '#FFF6F6'};
-          //   // return {background: 'white'};
-          // }}
 
         >
         </AgGridReact>

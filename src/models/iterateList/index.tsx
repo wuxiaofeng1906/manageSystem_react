@@ -27,10 +27,6 @@ export default () => {
   const [listData, setListData] = useState([]);
   /* endregion */
 
-  /* region 重复的列 */
-  const [repeatId, setRepeatId] = useState([]);
-  /* endregion */
-
   // /////////迭代详情数据
 
   /* region 列 */
@@ -45,7 +41,6 @@ export default () => {
     tabsInfo, setTabsData, // tabs
     queryInfo, setQueryInfo, // 查询条件
     listData, setListData, // 迭代列表数据
-    repeatId, setRepeatId,
 
     // listParams, setListParams,// 详情列表查询条件
     columns, setColumns,

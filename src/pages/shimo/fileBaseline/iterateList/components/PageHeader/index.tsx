@@ -9,9 +9,10 @@ import {useModel} from "@@/plugin-model/useModel";
 
 const PageHeader: React.FC<any> = () => {
 
-  const {listData, setRepeatId} = useModel("iterateList.index");
+  const {listData, setListData} = useModel("iterateList.index");
   // 验证数据有无重复
   const isRepeat = (arr: any) => {
+    debugger;
     const repeatArray = [];
     const hash = {}
     for (const i in arr) {
@@ -27,15 +28,23 @@ const PageHeader: React.FC<any> = () => {
   // 列表验证重复
   const vertifyListRepeat = () => {
     const oraData = [...listData];
-
     const repeatData: any = isRepeat(oraData);
     if (repeatData.length === 0) {
       sucMessage("验证完毕：无重复数据！");
     }
 
-    //  利用石墨ID渲染行的颜色
-    setRepeatId(repeatData);
+    //  利用石墨ID渲染行的颜色,将需要渲染的行加入颜色字段
+    const new_array: any = [];
+    oraData.forEach((ele: any) => {
+      const new_row = {...ele};
+      const {shimo_id} = ele;
+      if (repeatData.indexOf(shimo_id) > -1) {
+        new_row["repeat"] = true;
+      }
+      new_array.push(new_row);
+    });
 
+    setListData(new_array);
   };
 
   return (

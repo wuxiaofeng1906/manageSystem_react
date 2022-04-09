@@ -479,7 +479,7 @@ export default [
         icon: 'table',
         path: 'templateList',
         component: './zentao/zentaoManage/templateList',
-        // hideInMenu: true
+        hideInMenu: true
       }, {
         name: '禅道任务模板',
         icon: 'table',

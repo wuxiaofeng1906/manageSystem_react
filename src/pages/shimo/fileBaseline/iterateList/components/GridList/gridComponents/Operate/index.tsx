@@ -1,5 +1,5 @@
 import React from "react";
-import {Button} from 'antd';
+import {Button, Popconfirm} from 'antd';
 import {MinusOutlined, CopyOutlined} from '@ant-design/icons';
 import "./style.css";
 import {useModel} from "@@/plugin-model/useModel";
@@ -38,7 +38,13 @@ const Operate: React.FC<any> = (props: any) => {
   return (
     <div>
       <Button type="text" className={"bt_operate"} icon={<CopyOutlined/>} onClick={copyRow}></Button>
-      <Button type="text" className={"bt_operate"} icon={<MinusOutlined/>} onClick={delRow}></Button>
+      <Popconfirm title="确定删除这条数据吗？"
+                  okText="是"
+                  cancelText="否"
+                  onConfirm={delRow}>
+        <Button type="text" className={"bt_operate"} icon={<MinusOutlined/>}></Button>
+      </Popconfirm>
+
     </div>);
 };
 

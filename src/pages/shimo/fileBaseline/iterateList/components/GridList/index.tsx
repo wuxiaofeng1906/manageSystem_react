@@ -14,6 +14,7 @@ import {NameUrl} from "./gridComponents/NameUrl";
 import {useModel} from "@@/plugin-model/useModel";
 import {getIterListData} from "./gridData";
 import {useRequest} from "ahooks";
+import "./style.css";
 
 const GridList: React.FC<any> = () => {
 
@@ -26,7 +27,7 @@ const GridList: React.FC<any> = () => {
   };
   /* endregion 表格事件 */
 
-  const {setListData, listData, queryInfo} = useModel("iterateList.index");
+  const {setListData, listData, queryInfo, repeatId} = useModel("iterateList.index");
   const deptList: any = useRequest(() => getIterListData(queryInfo)).data;
 
   useEffect(() => {
@@ -42,11 +43,17 @@ const GridList: React.FC<any> = () => {
           defaultColDef={{
             resizable: true,
             suppressMenu: true,
-            cellStyle: setCellStyle
+            cellStyle: (params: any) => {
+              return setCellStyle(params, repeatId);
+            }
           }}
           rowHeight={28}
           headerHeight={30}
           onGridReady={(params: any) => {
+            gridApi.current = params.api;
+            params.api.sizeColumnsToFit();
+          }}
+          onGridSizeChanged={(params: any) => {
             gridApi.current = params.api;
             params.api.sizeColumnsToFit();
           }}
@@ -56,6 +63,18 @@ const GridList: React.FC<any> = () => {
             shimoContent: ShimoStoryContent,
             operate: Operate
           }}
+
+          // getRowStyle={(params: any) => {
+          //   debugger;
+          //   const repeatRow: any = [...repeatId];
+          //   const currentRow_shimoId: number = params.data?.shimo_id;
+          //   if (repeatRow.indexOf(currentRow_shimoId) > -1) {
+          //     return {background: '#FFF6F6'};
+          //   }
+          //   return {background: '#FFF6F6'};
+          //   // return {background: 'white'};
+          // }}
+
         >
         </AgGridReact>
       </div>

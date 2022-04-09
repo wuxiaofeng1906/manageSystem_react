@@ -68,7 +68,9 @@ const columns: any = [
     cellRenderer: "operate"
   }];
 
-const setCellStyle = (params: any) => {
+const setCellStyle = (params: any, repeatIds: any) => {
+  debugger;
+  console.log("repeatIds",repeatIds)
   const style = {"line-height": "28px"}
   const whiteFile = ["demand_directory", "design_directory"];
   if (whiteFile.indexOf(params.column?.colId) < 0) {

@@ -12,15 +12,28 @@ const PageHeader: React.FC<any> = () => {
   const {listData, setListData} = useModel("iterateList.index");
   // 验证数据有无重复
   const isRepeat = (arr: any) => {
-    debugger;
+    const judgeArray: any = [];
+    // 单独拿出需要判断的字段
+    arr.forEach((ele: any) => {
+      judgeArray.push({
+        shimoId: ele.shimo_id,
+        datas: [ele.execution_id, ele.execution_head_name, ele.head_depart, ele.execution_status, ele.execution_sqa,
+          ele.demand_directory_guid, ele.demand_status, ele.design_directory_guid, ele.design_status]
+      });
+    });
+
     const repeatArray = [];
-    const hash = {}
-    for (const i in arr) {
-      if (hash[arr[i]]) {
-        repeatArray.push(arr[i].shimo_id);
+    for (let index1 = 0; index1 < judgeArray.length; index1 += 1) {
+      const firstData = judgeArray[index1];
+      for (let index2 = index1 + 1; index2 < judgeArray.length; index2 += 1) {
+        const secondData = judgeArray[index2];
+        if (JSON.stringify(firstData.datas) === JSON.stringify(secondData.datas)) {
+          repeatArray.push(firstData.shimoId);
+          repeatArray.push(secondData.shimoId)
+        }
       }
-      hash[arr[i]] = true
     }
+
     return repeatArray
   }
 

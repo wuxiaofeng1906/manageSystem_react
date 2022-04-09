@@ -472,6 +472,7 @@ export default [
         icon: 'table',
         path: 'peopleExcuteSetting',
         component: './zentao/peopleExcuteSetting',
+        hideInMenu: true
       },
       {
         name: '禅道管理',

@@ -15,7 +15,7 @@ import {getIterDetailsData} from "./gridData";
 
 
 const GridList: React.FC<any> = (props: any) => {
-  const prjInfo = props.hrefParams;
+  const {detailsData, setDetailsData, columns, setColumns} = useModel("iterateList.index");
 
   /* region 表格事件 */
   const [gridHeight, setGridHeight] = useState(getHeight());
@@ -26,8 +26,7 @@ const GridList: React.FC<any> = (props: any) => {
   };
 
   /* endregion 表格事件 */
-
-  const {detailsData, setDetailsData, columns, setColumns} = useModel("iterateList.index");
+  const prjInfo = props.hrefParams;
   const detailsInfo: any = useRequest(() => getIterDetailsData(prjInfo.storyId)).data;
 
   // 编辑表格
@@ -36,8 +35,8 @@ const GridList: React.FC<any> = (props: any) => {
   };
 
   useEffect(() => {
-    setColumns(detailsInfo?.columnsData);
-    setDetailsData(detailsInfo?.gridData);
+    setColumns(detailsInfo?.columnsData); // 设置列
+    setDetailsData(detailsInfo?.gridData); //设置数据
   }, [detailsInfo]);
 
   return (

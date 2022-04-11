@@ -102,7 +102,7 @@ const getIterDetailsData = async (myGuid: any) => {
   }
 
   const gridResult: any = []; // 记录数据
-  const filedArrayLength: any = []; //记录文件最大长度
+  const filedArrayLength: any = []; // 记录文件最大长度
   if ((details.children) && (details.children).length > 0) {
     getChildData(details.children, details.children, gridResult, filedArrayLength);
   }

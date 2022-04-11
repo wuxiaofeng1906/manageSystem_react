@@ -193,9 +193,10 @@ const UserDetails: React.FC<any> = () => {
   // 组外人员
   const GetOutGroupusers = (params: any) => {
 
-    if (params.users === undefined || params.users.length <= 1 || initSelectedUser === null) {
+    if (params.users === undefined || params.users.length < 1 || !initSelectedUser) {
       return <label></label>;
     }
+
     const arrays = params.users;
     if (initSelectedUser.length > 0) {
       // 要去除已选择的人员放到组内人员中去

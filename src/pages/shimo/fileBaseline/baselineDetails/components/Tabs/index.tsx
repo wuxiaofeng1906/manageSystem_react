@@ -2,15 +2,27 @@ import React, {useEffect} from "react";
 import {Tabs} from "antd";
 import {myTabs, myTabPane} from "./style.css";
 import {useModel} from "@@/plugin-model/useModel";
+import {getIterDetailsData} from "@/pages/shimo/fileBaseline/baselineDetails/components/GridList/gridData";
 
 const {TabPane} = Tabs;
 
 const Tab: React.FC<any> = (props: any) => {
   const {setTabsData} = useModel("iterateList.index");
+  const {setDetailsData, setColumns} = useModel("iterateList.index");
+
+
+  const prjInfo = props.hrefParams;
 
   // 切换Tabs
-  const tabChanged = (activeKey: string) => {
+  const tabChanged = async (activeKey: string) => {
     setTabsData(activeKey);
+    let queryType = prjInfo.storyId;
+    if (activeKey === "概设基线") {
+      queryType = prjInfo.designId
+    }
+    const result: any = await getIterDetailsData(queryType);
+    setColumns(result?.columnsData); // 设置列
+    setDetailsData(result?.gridData); // 设置数据
   };
 
   return (

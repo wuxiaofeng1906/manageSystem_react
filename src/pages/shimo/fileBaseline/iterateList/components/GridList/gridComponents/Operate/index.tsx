@@ -5,6 +5,7 @@ import "./style.css";
 import {useModel} from "@@/plugin-model/useModel";
 import {copyNewRows, deletedRows} from "./rowsOperate";
 import {getIterListData} from "@/pages/shimo/fileBaseline/iterateList/components/GridList/gridData";
+import { QuestionCircleOutlined } from '@ant-design/icons';
 
 const Operate: React.FC<any> = (props: any) => {
   const {setListData, queryInfo} = useModel("iterateList.index");
@@ -38,7 +39,9 @@ const Operate: React.FC<any> = (props: any) => {
   return (
     <div>
       <Button type="text" className={"bt_operate"} icon={<CopyOutlined/>} onClick={copyRow}></Button>
-      <Popconfirm title="确定删除这条数据吗？"
+      <Popconfirm
+        icon={<QuestionCircleOutlined/>}
+        title="确定删除这条数据吗？"
                   okText="是"
                   cancelText="否"
                   onConfirm={delRow}>

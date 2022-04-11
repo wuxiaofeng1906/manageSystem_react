@@ -12,6 +12,7 @@ import {BaseLineSelect} from "./gridComponents/BaseLineSelect";
 import {useModel} from "@@/plugin-model/useModel";
 import {useRequest} from "ahooks";
 import {getIterDetailsData} from "./gridData";
+import {modifyGridCells} from "./cellEdit";
 
 
 const GridList: React.FC<any> = (props: any) => {
@@ -30,13 +31,13 @@ const GridList: React.FC<any> = (props: any) => {
   const detailsInfo: any = useRequest(() => getIterDetailsData(prjInfo.storyId)).data;
 
   // 编辑表格
-  const cellEditedStoped = (params: any) => {
-
+  const cellEditedStoped = async (params: any) => {
+    await modifyGridCells({});
   };
 
   useEffect(() => {
     setColumns(detailsInfo?.columnsData); // 设置列
-    setDetailsData(detailsInfo?.gridData); //设置数据
+    setDetailsData(detailsInfo?.gridData); // 设置数据
   }, [detailsInfo]);
 
   return (

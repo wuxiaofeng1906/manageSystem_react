@@ -1,6 +1,6 @@
 import {axiosPut} from "@/publicMethods/axios";
 
-const modifyGridCells = async () => {
+const modifyGridCells = async (cellData: any) => {
   const data = {
     "version_id": 0,
     "remark": "string",

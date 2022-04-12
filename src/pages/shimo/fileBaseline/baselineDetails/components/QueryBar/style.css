@@ -12,3 +12,11 @@
   width: 100%;
   color: black;
 }
+
+.baseLineButton {
+  margin-left: 10px;
+  color: #46A0FC;
+  background-color: #ECF5FF;
+  border-radius: 5px;
+}
+

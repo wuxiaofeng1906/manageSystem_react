@@ -8,6 +8,7 @@ import {getHeight} from "@/publicMethods/pageSet";
 import {columns, setCellStyle} from "./columns";
 import {gridDiv} from "./style.css";
 import {ShimoStoryContent} from "./gridComponents/ShimoStoryContent";
+import {ShimoDesignContent} from "./gridComponents/ShimoDesignContent";
 import {Operate} from "./gridComponents/Operate";
 import {myUrls} from "./gridComponents/myUrls";
 import {NameUrl} from "./gridComponents/NameUrl";
@@ -43,7 +44,7 @@ const GridList: React.FC<any> = () => {
           defaultColDef={{
             resizable: true,
             suppressMenu: true,
-            cellStyle:setCellStyle
+            cellStyle: setCellStyle
           }}
           rowHeight={28}
           headerHeight={30}
@@ -58,7 +59,8 @@ const GridList: React.FC<any> = () => {
           frameworkComponents={{
             myUrl: myUrls,
             nameUrl: NameUrl,
-            shimoContent: ShimoStoryContent,
+            shimoStoryContent: ShimoStoryContent,
+            shimoDesignContent: ShimoDesignContent,
             operate: Operate
           }}
 

@@ -7,14 +7,15 @@ import {useModel} from "@@/plugin-model/useModel";
 import {useEffect} from "react";
 
 const IterateList: React.FC<any> = () => {
-  const {setInitTree} = useModel("iterateList.index");
+  const {setInitStoryTree, setInitDesignTree} = useModel("iterateList.index");
 
-
-  const treeList: any = useRequest(() => getTreeSelectData()).data;
+  const storyTreeList: any = useRequest(() => getTreeSelectData("", "", "demand")).data;
+  const designTreeList: any = useRequest(() => getTreeSelectData("", "", "design")).data;
 
   useEffect(() => {
-    setInitTree(treeList);
-  }, [treeList])
+    setInitStoryTree(storyTreeList);
+    setInitDesignTree(designTreeList);
+  }, [storyTreeList, designTreeList]);
   return (
     <>
       {/*  header  */}

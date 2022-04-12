@@ -1,8 +1,8 @@
-import {axiosGet, axiosDelete, axiosPost, axiosPut} from "@/publicMethods/axios";
+import {axiosGet} from "@/publicMethods/axios";
 
-const getTreeSelectData = async (myGuid: string = "", parentId: string ="") => {
+const getTreeSelectData = async (myGuid: string = "", parentId: string = "", fileType: string) => {
 
-  const datas = await axiosGet("/api/verify/shimo/shimo_file", {guid: myGuid});
+  const datas = await axiosGet("/api/verify/shimo/shimo_file", {guid: myGuid, file_type: fileType});
   const treeData: any = [];
   if (datas && datas.length > 0) {
     datas.forEach((ele: any) => {

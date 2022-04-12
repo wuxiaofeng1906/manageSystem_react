@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import {Form, Row, Col, Select, Button, Input} from 'antd';
-import {queryCondition, queryRow, SQA} from "./style.css";
-import {CheckSquareTwoTone} from "@ant-design/icons";
+import {queryCondition, queryRow, SQA, baseLineButton} from "./style.css";
+import {EditTwoTone} from "@ant-design/icons";
 import {useRequest} from "ahooks";
 import {getIterSelect, getIterSelectedValue} from "./selector";
 import {getSqaByIterName, setBaseLineFor} from "./dataAlaysis";
@@ -115,7 +115,7 @@ const QueryBar: React.FC<any> = (props: any) => {
           </Col>
           <Col span={3}>
             <Form.Item>
-              <Button type="text" icon={<CheckSquareTwoTone/>}
+              <Button icon={<EditTwoTone/>} className={baseLineButton}
                       onClick={BaseLineClicked}>基线</Button>
             </Form.Item>
           </Col>

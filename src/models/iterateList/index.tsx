@@ -27,7 +27,8 @@ export default () => {
   const [listData, setListData] = useState([]);
   /* endregion */
 
-  const [initTree, setInitTree] = useState([]);
+  const [initStoryTree, setInitStoryTree] = useState([]);
+  const [initDesignTree, setInitDesignTree] = useState([]);
 
 
   // /////////迭代详情数据
@@ -44,7 +45,8 @@ export default () => {
 
 
   return {
-    initTree, setInitTree,
+    initStoryTree, setInitStoryTree,
+    initDesignTree, setInitDesignTree,
     tabsInfo, setTabsData, // tabs
     queryInfo, setQueryInfo, // 查询条件
     listData, setListData, // 迭代列表数据

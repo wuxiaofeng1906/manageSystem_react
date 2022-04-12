@@ -1,14 +1,14 @@
 import {TreeSelect} from 'antd';
-import React, {useEffect, useState} from "react";
-import {modifyListContent} from "./rowChanged";
-import {getTreeSelectData} from "./selector";
-import {getIterListData} from "@/pages/shimo/fileBaseline/iterateList/components/GridList/gridData";
 import {useModel} from "@@/plugin-model/useModel";
+import React, {useEffect, useState} from "react";
+import {modifyListContent} from "../ShimoStoryContent/rowChanged" ;
+import {getTreeSelectData} from "../ShimoStoryContent/selector";
+import {getIterListData} from "@/pages/shimo/fileBaseline/iterateList/components/GridList/gridData";
 
-const ShimoStoryContent: React.FC<any> = (props: any) => {
+const ShimoDesignContent: React.FC<any> = (props: any) => {
 
   const {data, column} = props;
-  const {setListData, queryInfo, initStoryTree} = useModel("iterateList.index");
+  const {setListData, queryInfo, initDesignTree} = useModel("iterateList.index");
 
   const [tree, setTreeData] = useState({
     values: "",
@@ -26,9 +26,8 @@ const ShimoStoryContent: React.FC<any> = (props: any) => {
     });
   };
 
-
   // 目录修改
-  const storyContentChanged = async (enValue: any) => {
+  const designContentChanged = async (enValue: any) => {
 
     const result: any = [];
     getParentName(enValue, result);
@@ -46,7 +45,7 @@ const ShimoStoryContent: React.FC<any> = (props: any) => {
 
   // 动态加载子文件
   const loadChildTree = async (params: any) => {
-    const childs = await getTreeSelectData(params.value, params.id, "demand");
+    const childs = await getTreeSelectData(params.value, params.id, "design");
     const oraTree = [...tree.treeData];
     setTreeData({
       ...tree,
@@ -56,12 +55,11 @@ const ShimoStoryContent: React.FC<any> = (props: any) => {
 
 
   useEffect(() => {
-
     setTreeData({
-      values: data.demand_directory,
-      treeData: initStoryTree
+      values: data.design_directory,
+      treeData: initDesignTree
     });
-  }, [initStoryTree]);
+  }, [initDesignTree]);
 
 
   return (<div>
@@ -71,7 +69,7 @@ const ShimoStoryContent: React.FC<any> = (props: any) => {
       bordered={false}
       value={tree.values}
       placeholder="请选择"
-      onChange={storyContentChanged}
+      onChange={designContentChanged}
       loadData={loadChildTree}
       treeData={tree.treeData}
     />
@@ -79,4 +77,4 @@ const ShimoStoryContent: React.FC<any> = (props: any) => {
 };
 
 
-export {ShimoStoryContent};
+export {ShimoDesignContent};

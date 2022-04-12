@@ -1,7 +1,27 @@
 import {axiosGet} from "@/publicMethods/axios";
 import {getColumns} from "../columns";
 
-const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_allGrid: any) => {
+// 获取基线时间
+const getBaseLineVersion = (baseLineInfo: any) => {
+  if (!baseLineInfo) {
+    return {};
+  }
+
+  const versionInfo = {
+    is_save_version: baseLineInfo.is_save_version,
+    remark: baseLineInfo.remark,
+    zt_num: baseLineInfo.zt_num,
+  }
+
+  const baseInfo = baseLineInfo.save_version_data;
+  baseInfo.forEach((ele: any, index: number) => {
+    versionInfo[`${index + 1}_time`] = ele.save_time;
+  });
+  return {gridData: versionInfo, versionLength: baseInfo.length}
+};
+
+
+const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_allGrid: any, rt_basetimeArray: any) => {
 
   for (let i = 0, len = data.length; i < len; i += 1) {
     const current = data[i];
@@ -10,38 +30,52 @@ const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_al
       rt_allGrid[`${(rt_pathArray.length) + 1}_file`] = current.name;
       rt_allGrid["author"] = current.author;
       rt_allGrid["file_format"] = current.file_format;
+      //   获取version
+      const baseLineInfo = current.version;
+      rt_allGrid["is_save_version"] = baseLineInfo.is_save_version;
+      rt_allGrid["remark"] = baseLineInfo.remark;
+      rt_allGrid["zt_num"] = baseLineInfo.zt_num;
+      const baseInfo = baseLineInfo.save_version_data;
+      baseInfo.forEach((ele: any, index: number) => {
+        rt_allGrid[`${index + 1}_time`] = ele.save_time;
+      });
+
+      rt_basetimeArray.push(baseInfo.length);
     }
 
     if (data[i].name === nodeName) {
-      return {rt_pathArray, rt_allGrid};
+      return {rt_pathArray, rt_allGrid, rt_basetimeArray};
     }
     const {children} = data[i]
     if (children && children.length) {
       rt_allGrid[`${(rt_pathArray.length + 1)}_file`] = current.name;
-      const result: any = getParentPathByChild(children, nodeName, rt_pathArray, rt_allGrid)
+      const result: any = getParentPathByChild(children, nodeName, rt_pathArray, rt_allGrid, rt_basetimeArray)
       if (result) {
-        return {rt_pathArray, rt_allGrid};
+        return {rt_pathArray, rt_allGrid, rt_basetimeArray};
       }
     }
-    rt_pathArray.pop()
+    rt_pathArray.pop();
   }
 
   return false;
 };
 
 // 递归解析数据
-const getChildData = (oraData: any, childData: any, gridResult: any, filedArrayLength: any) => {
+const getChildData = (oraData: any, childData: any, gridResult: any, filedArrayLength: any, basetimeLength: any) => {
 
   childData.forEach((field: any) => {
     if (field.file_format === "folder") { // 是文件夹，表示还有下一层children，继续遍历。
-      getChildData(oraData, field.children, gridResult, filedArrayLength);
+      getChildData(oraData, field.children, gridResult, filedArrayLength, basetimeLength);
     } else {
       // 获取父节点路径
       const rt_pathArray: any = [];
+      const rt_basetimeArray: any = [];
       const rt_allGrid: any = {};
-      getParentPathByChild(oraData, field.name, rt_pathArray, rt_allGrid);
+      getParentPathByChild(oraData, field.name, rt_pathArray, rt_allGrid, rt_basetimeArray);
+
       gridResult.push(rt_allGrid);
       filedArrayLength.push(rt_pathArray.length);
+      basetimeLength.push(rt_basetimeArray);
     }
   });
 
@@ -67,8 +101,8 @@ const getFileColumns = (filedArray: any) => {
   const maxCount = arraySort[0];
 
   const columns: any = [{
-    headerName: '1级目录',
-    field: 'total',
+    headerName: `${maxCount + 1}级目录`,
+    field: `${maxCount + 1}_file`,
     pinned: 'left',
     columnGroupShow: 'closed',
   }, {
@@ -89,10 +123,42 @@ const getFileColumns = (filedArray: any) => {
   return columns;
 };
 
+const getBaseTimeColumns = (timeArray: any) => {
+  if (timeArray.length === 0) {
+    return [];
+  }
+
+  const baseArray: any = [];
+  timeArray.forEach((ele: any) => {
+    baseArray.push(ele[0]);
+  });
+  const arraySort = baseArray.sort((a: number, b: number) => {
+    return b - a
+  });
+
+  const maxCount = arraySort[0];
+
+  const columns: any = [{
+    headerName: `${maxCount}次基线时间`,
+    field: `${maxCount}_time`,
+    columnGroupShow: 'closed',
+  }];
+  for (let index = 1; index <= maxCount + 1; index += 1) {
+    columns.push({
+      headerName: `${index}次基线时间`,
+      field: `${index}_time`,
+      columnGroupShow: 'open',
+    })
+  }
+
+  return columns;
+};
+
 
 // 获取迭代数据
 const getIterDetailsData = async (myGuid: any) => {
   const details = await axiosGet("/api/verify/shimo/version_detail", {guid: myGuid});
+
   // 文件和基线时间要用最大的列数
   // parent是一定有的(一级目录)。
   const firstContent = {"1_file": details.parent?.name};
@@ -103,16 +169,21 @@ const getIterDetailsData = async (myGuid: any) => {
 
   const gridResult: any = []; // 记录数据
   const filedArrayLength: any = []; // 记录文件最大长度
+  const basetimeLength: any = []; // 记录文件最大长度
+
   if ((details.children) && (details.children).length > 0) {
-    getChildData(details.children, details.children, gridResult, filedArrayLength);
+    getChildData(details.children, details.children, gridResult, filedArrayLength, basetimeLength);
   }
+  debugger;
   // 数据
   const gridData = contactResult(gridResult, details.parent?.name);
 
   // 获取文件的列
   const fileColumns = getFileColumns(filedArrayLength);
+  // 获取基线时间的列
+  const basetimeColumns = getBaseTimeColumns(basetimeLength);
 
-  const columnsData = getColumns(fileColumns, []);
+  const columnsData = getColumns(fileColumns, basetimeColumns);
 
   return {gridData, columnsData}
 

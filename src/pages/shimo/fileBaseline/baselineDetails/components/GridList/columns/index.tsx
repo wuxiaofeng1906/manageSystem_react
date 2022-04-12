@@ -109,7 +109,7 @@ const getColumns = (baseFile: any, baseTime: any) => {
         maxWidth: 100,
       }, {
         headerName: '是否基线',
-        field: '',
+        field: 'is_save_version',
         pinned: 'left',
         minWidth: 90,
         maxWidth: 100,
@@ -128,13 +128,13 @@ const getColumns = (baseFile: any, baseTime: any) => {
         minWidth: 110,
       }, {
         headerName: '变更禅道编号',
-        field: 'shimo_url',
+        field: 'zt_num',
         minWidth: 120,
         cellRenderer: manualInput,
         editable: true
       }, {
         headerName: '备注说明',
-        field: 'shimo_url',
+        field: 'remark',
         minWidth: 120,
         cellRenderer: manualInput,
         editable: true

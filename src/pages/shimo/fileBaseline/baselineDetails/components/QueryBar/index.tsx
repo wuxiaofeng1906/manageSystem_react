@@ -36,7 +36,7 @@ const QueryBar: React.FC<any> = (props: any) => {
   // 基线按钮点击
   const BaseLineClicked = async () => {
     const iterInfo = iterDetailsForm.getFieldValue("iterName");
-    debugger;
+
     // @ts-ignore
     const sel_rows: any = gridApi.getSelectedRows();
 

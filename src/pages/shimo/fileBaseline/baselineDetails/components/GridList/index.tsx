@@ -17,14 +17,17 @@ import {sucMessage} from "@/publicMethods/showMessages";
 
 
 const GridList: React.FC<any> = (props: any) => {
-  const {detailsData, setDetailsData, columns, setColumns} = useModel("iterateList.index");
+  const {
+    detailsData, setDetailsData, columns,
+    setColumns, gridApi, setGridApi
+  } = useModel("iterateList.index");
 
   /* region 表格事件 */
   const [gridHeight, setGridHeight] = useState(getHeight());
-  const gridApi = useRef<GridApi>();
+  // const gridApi = useRef<GridApi>();
   window.onresize = function () {
     setGridHeight(getHeight() + 36);
-    gridApi.current?.sizeColumnsToFit();
+    gridApi?.sizeColumnsToFit();
   };
 
   /* endregion 表格事件 */
@@ -73,7 +76,8 @@ const GridList: React.FC<any> = (props: any) => {
           rowHeight={28}
           headerHeight={30}
           onGridReady={(params: any) => {
-            gridApi.current = params.api;
+            setGridApi(params.api)
+            // gridApi.current = params.api;
             params.api.sizeColumnsToFit();
           }}
           frameworkComponents={{
@@ -82,6 +86,16 @@ const GridList: React.FC<any> = (props: any) => {
           }}
           rowSelection={'multiple'}
           onCellEditingStopped={cellEditedStoped}
+          // onRowSelected={(params: any) => {
+          //   debugger;
+          //   console.log(params);
+          //   //   记录被选中的数据
+          //   if (params.node?.selected) {  // 被选中的数据
+          //     setForBaseLineData();
+          //   } else {
+          //     //  没被选中，需要去掉这个数据
+          //   }
+          // }}
         >
         </AgGridReact>
       </div>

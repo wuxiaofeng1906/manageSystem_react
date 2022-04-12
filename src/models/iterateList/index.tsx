@@ -29,6 +29,8 @@ export default () => {
 
   // /////////迭代详情数据
 
+  const [gridApi, setGridApi] = useState(null);
+
   /* region 列 */
   const [columns, setColumns] = useState([]);
   /* endregion */
@@ -37,13 +39,15 @@ export default () => {
   const [detailsData, setDetailsData] = useState([]);
   /* endregion */
 
+
+
   return {
     tabsInfo, setTabsData, // tabs
     queryInfo, setQueryInfo, // 查询条件
     listData, setListData, // 迭代列表数据
 
-    // listParams, setListParams,// 详情列表查询条件
     columns, setColumns,
-    detailsData, setDetailsData
+    detailsData, setDetailsData,
+    gridApi, setGridApi
   };
 };

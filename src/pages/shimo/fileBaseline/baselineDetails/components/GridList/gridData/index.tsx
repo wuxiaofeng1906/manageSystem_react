@@ -31,6 +31,8 @@ const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_al
       rt_allGrid["author"] = current.author;
       rt_allGrid["file_format"] = current.file_format;
       rt_allGrid["file_url"] = current.file_url;
+      rt_allGrid["file_type"] = current.file_type;
+      rt_allGrid["guid"] = current.guid;
       //   获取version
       const baseLineInfo = current.version;
       rt_allGrid["version_id"] = baseLineInfo.version_id;
@@ -39,7 +41,6 @@ const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_al
       rt_allGrid["zt_num"] = baseLineInfo.zt_num;
       const baseInfo = baseLineInfo.save_version_data;
       baseInfo.forEach((ele: any, index: number) => {
-        debugger;
         rt_allGrid[`${index + 1}_time`] = ele.save_time;
         // 基线人和基线标识都取最后一个
         if (index === baseInfo.length - 1) {
@@ -182,8 +183,7 @@ const getIterDetailsData = async (myGuid: any) => {
   if ((details.children) && (details.children).length > 0) {
     getChildData(details.children, details.children, gridResult, filedArrayLength, basetimeLength);
   }
-  debugger;
-  // 数据
+   // 数据
   const gridData = contactResult(gridResult, details.parent?.name);
 
   // 获取文件的列

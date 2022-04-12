@@ -5,16 +5,8 @@ const getSqaByIterName = async (excutId: number) => {
   return result.sqa;
 };
 
-const setBaseLineFor = (baseInfo: any) => {
-  const data: any = {
-    "guid": "string",
-    "user_id": "string",
-    "file_name": "string",
-    "file_type": "string",
-    "execution_name": "string"
-  };
-
+const setBaseLineFor = (data: any) => {
   return axiosPost("/api/verify/shimo/save_version", data);
 
 };
-export {getSqaByIterName,setBaseLineFor};
+export {getSqaByIterName, setBaseLineFor};

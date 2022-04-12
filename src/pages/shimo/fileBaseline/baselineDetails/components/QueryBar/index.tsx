@@ -5,21 +5,59 @@ import {CheckSquareTwoTone} from "@ant-design/icons";
 import {useRequest} from "ahooks";
 import {getIterSelect} from "./selector";
 import {getSqaByIterName, setBaseLineFor} from "./dataAlaysis";
+import {useModel} from "@@/plugin-model/useModel";
+import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 
 let selected_sqa = -1; // 记录选中的sqaID
 const QueryBar: React.FC<any> = (props: any) => {
+  const {gridApi} = useModel("iterateList.index");
   const prjInfo = props.hrefParams;
   const iterateList: any = useRequest(() => getIterSelect()).data;
   const [iterDetailsForm] = Form.useForm();
 
+  // 获取最后一个文件名称
+  const getFileName = (rows: any) => {
+    let fileKey: any = []; // 保存是文件列的数据
+    const keyArray = Object.keys(rows);
+    keyArray.forEach((key: string) => {
+      if (key.endsWith("_file")) {
+        fileKey.push(Number(key.split("_")[0]));
+      }
+    });
+    fileKey = fileKey.sort();
+
+    const lastFIleName = rows[`${fileKey.length}_file`]
+    return lastFIleName;
+
+  };
   // 基线按钮点击
   const BaseLineClicked = async () => {
     const iterInfo = iterDetailsForm.getFieldValue("iterName");
+    // @ts-ignore
+    const sel_rows: any = gridApi.getSelectedRows();
 
-    const result = await setBaseLineFor({
-      iterId: iterInfo,
-      sqaId: selected_sqa
+    if (sel_rows.length === 0) {
+      errorMessage("请选中需要基线的数据！");
+      return;
+    }
+
+    const data: any = [];
+    sel_rows.forEach((ele: any) => {
+      data.push({
+        "guid": ele.guid,
+        "file_name": getFileName(ele),
+        "file_type": ele.file_type,
+        "execution_name": iterInfo,
+        "user_id": selected_sqa,
+      });
     });
+
+    const result = await setBaseLineFor(data);
+    if (result.code === 200) {
+      sucMessage("基线成功！");
+    } else {
+      errorMessage(result.msg);
+    }
   };
 
   // 迭代名称修改
@@ -66,8 +104,6 @@ const QueryBar: React.FC<any> = (props: any) => {
           </Col>
         </Row>
       </Form>
-
-
     </div>
 
   );

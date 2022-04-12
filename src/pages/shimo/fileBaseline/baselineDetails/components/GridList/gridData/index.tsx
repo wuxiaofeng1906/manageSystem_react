@@ -185,7 +185,7 @@ const getIterDetailsData = async (myGuid: any) => {
   }
   // 数据
   const gridData = contactResult(gridResult, details.parent?.name);
-  debugger;
+
   // 获取文件的列
   const fileColumns = getFileColumns(filedArrayLength);
   // 获取基线时间的列

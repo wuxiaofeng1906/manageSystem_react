@@ -75,9 +75,8 @@ const GridList: React.FC<any> = (props: any) => {
           rowHeight={28}
           headerHeight={30}
           onGridReady={(params: any) => {
-            setGridApi(params.api)
-            // gridApi.current = params.api;
             params.api.sizeColumnsToFit();
+            setGridApi(params.api);
           }}
           frameworkComponents={{
             myUrl: myUrls,
@@ -85,16 +84,12 @@ const GridList: React.FC<any> = (props: any) => {
           }}
           rowSelection={'multiple'}
           onCellEditingStopped={cellEditedStoped}
-          // onRowSelected={(params: any) => {
-          //   debugger;
-          //   console.log(params);
-          //   //   记录被选中的数据
-          //   if (params.node?.selected) {  // 被选中的数据
-          //     setForBaseLineData();
-          //   } else {
-          //     //  没被选中，需要去掉这个数据
-          //   }
-          // }}
+          onColumnEverythingChanged={() => {
+            if (gridApi) {
+              // @ts-ignore
+              gridApi.sizeColumnsToFit();
+            }
+          }}
         >
         </AgGridReact>
       </div>

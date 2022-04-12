@@ -8,8 +8,11 @@ import {getSqaByIterName, setBaseLineFor} from "./dataAlaysis";
 import {useModel} from "@@/plugin-model/useModel";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 
-let selected_sqa = -1; // 记录选中的sqaID
+
 const QueryBar: React.FC<any> = (props: any) => {
+  const userLogins: any = localStorage.getItem('userLogins');
+  const usersInfo = JSON.parse(userLogins);
+
   const {gridApi} = useModel("iterateList.index");
   const prjInfo = props.hrefParams;
   const iterateList: any = useRequest(() => getIterSelect()).data;
@@ -33,6 +36,7 @@ const QueryBar: React.FC<any> = (props: any) => {
   // 基线按钮点击
   const BaseLineClicked = async () => {
     const iterInfo = iterDetailsForm.getFieldValue("iterName");
+    debugger;
     // @ts-ignore
     const sel_rows: any = gridApi.getSelectedRows();
 
@@ -48,15 +52,17 @@ const QueryBar: React.FC<any> = (props: any) => {
         "file_name": getFileName(ele),
         "file_type": ele.file_type,
         "execution_name": iterInfo,
-        "user_id": selected_sqa,
+        "user_id": usersInfo.userid,
       });
     });
 
     const result = await setBaseLineFor(data);
-    if (result.code === 200) {
-      sucMessage("基线成功！");
-    } else {
-      errorMessage(result.msg);
+    if (JSON.stringify(result) !== "{}") {
+      if (result.code === 200) {
+        sucMessage("基线成功！");
+      } else {
+        errorMessage(result.msg);
+      }
     }
   };
 
@@ -64,7 +70,7 @@ const QueryBar: React.FC<any> = (props: any) => {
   const iterNameChanged = async (iterId: any) => {
 
     const sqaInfo = await getSqaByIterName(iterId);
-    selected_sqa = sqaInfo.user_id
+
     iterDetailsForm.setFieldsValue({
       iterName: iterId,
       SQA: sqaInfo.user_name
@@ -72,8 +78,9 @@ const QueryBar: React.FC<any> = (props: any) => {
   };
 
   useEffect(() => {
+
     iterDetailsForm.setFieldsValue({
-      iterName: Number(prjInfo.iterID),
+      iterName: prjInfo.iterName,
       SQA: prjInfo.SQA === "null" ? "" : prjInfo.SQA
     });
   }, [iterateList])
@@ -85,8 +92,9 @@ const QueryBar: React.FC<any> = (props: any) => {
           <Col span={8}>
             <Form.Item label="迭代名称" name={"iterName"} style={{marginLeft: 10}}>
               <Select className={"iterName"} onChange={iterNameChanged} showSearch
-                      filterOption={(inputValue: string, option: any) =>
-                        !!option.children.includes(inputValue)}>
+                // filterOption={(inputValue: string, option: any) =>
+                //   !!option.children.includes(inputValue)}
+              >
                 {iterateList}
               </Select>
             </Form.Item>

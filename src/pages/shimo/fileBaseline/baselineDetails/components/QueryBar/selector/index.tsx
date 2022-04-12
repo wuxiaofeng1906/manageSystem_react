@@ -9,7 +9,7 @@ const getIterSelect = async () => {
   if (iterData && iterData.length > 0) {
     iterData.forEach((iter: any) => {
       selectArray.push(
-        <Option value={iter.execution_id}>{iter.execution_name}</Option>
+        <Option value={iter.execution_name}>{iter.execution_name}</Option>
       )
     });
   }

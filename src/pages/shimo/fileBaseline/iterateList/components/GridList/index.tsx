@@ -29,7 +29,6 @@ const GridList: React.FC<any> = () => {
 
   const {setListData, listData, queryInfo} = useModel("iterateList.index");
   const deptList: any = useRequest(() => getIterListData(queryInfo)).data;
-  console.log("deptList",deptList)
 
   useEffect(() => {
     setListData(deptList);

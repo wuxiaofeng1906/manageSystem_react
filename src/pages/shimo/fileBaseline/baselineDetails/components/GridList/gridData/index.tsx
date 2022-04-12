@@ -83,9 +83,9 @@ const contactResult = (oraData: any, firstName: string) => {
 
     const keys = Object.keys(newObject);
     keys.forEach((ele: any) => {
-      if (ele.indexOf("_file")>-1) {
+      if (ele.indexOf("_file") > -1) {
         fileTitleCount += 1;
-      } else if (ele.indexOf("_time")>-1) {
+      } else if (ele.indexOf("_time") > -1) {
         timeTitleCount += 1;
       }
     });
@@ -100,38 +100,59 @@ const contactResult = (oraData: any, firstName: string) => {
   return result;
 };
 
-//
+// 文件路径的列定义
 const getFileColumns = (filedArray: any) => {
 
   const arraySort = filedArray.sort((a: number, b: number) => {
     return b - a
   });
-
   const maxCount = arraySort[0];
+  const columns: any = [];
 
-  const columns: any = [{
-    headerName: `${maxCount + 1}级目录`,
-    field: `final_files`,
-    pinned: 'left',
-    columnGroupShow: 'closed',
-  }, {
-    headerName: '1级目录',
-    field: '1_file',
-    pinned: 'left',
-    columnGroupShow: 'open',
-  }];
-  for (let index = 2; index <= maxCount + 1; index += 1) {
+  // 如果目录大于4级时，则需要收缩
+  if (maxCount > 4) {
     columns.push({
-      headerName: `${index}级文件`,
-      field: `${index}_file`,
+      headerName: '1级目录',
+      field: '1_file',
       pinned: 'left',
       columnGroupShow: 'open',
-    })
+    }, {
+      headerName: `${maxCount + 1}级目录`,
+      field: `final_files`,
+      pinned: 'left',
+      columnGroupShow: 'closed',
+    });
+  } else {
+    columns.push({
+      headerName: '1级目录',
+      field: '1_file',
+      pinned: 'left'
+    });
+  }
+
+  for (let index = 2; index <= maxCount + 1; index += 1) {
+    if (maxCount > 4 && index > 4) {
+      columns.push({
+        headerName: `${index}级文件`,
+        field: `${index}_file`,
+        pinned: 'left',
+        columnGroupShow: 'open',
+      })
+    } else {
+      // <= 4层的正常展示
+      columns.push({
+        headerName: `${index}级文件`,
+        field: `${index}_file`,
+        pinned: 'left',
+      })
+    }
+
   }
 
   return columns;
 };
 
+// 获得基线时间的列
 const getBaseTimeColumns = (timeArray: any) => {
   if (timeArray.length === 0) {
     return [];
@@ -146,18 +167,26 @@ const getBaseTimeColumns = (timeArray: any) => {
   });
 
   const maxCount = arraySort[0];
-
-  const columns: any = [{
-    headerName: `${maxCount}次基线时间`,
-    field: `final_times`,
-    columnGroupShow: 'closed',
-  }];
-  for (let index = 1; index <= maxCount; index += 1) {
+  const columns: any = [];
+  // 超过4列则收缩
+  if (maxCount > 4) {
     columns.push({
+      headerName: `${maxCount}次基线时间`,
+      field: `final_times`,
+      columnGroupShow: 'closed',
+    });
+  }
+
+  for (let index = 1; index <= maxCount; index += 1) {
+    const baseObject = {
       headerName: `${index}次基线时间`,
       field: `${index}_time`,
-      columnGroupShow: 'open',
-    })
+    };
+
+    if (maxCount > 4) {
+      baseObject["columnGroupShow"] = 'open';
+    }
+    columns.push(baseObject);
   }
 
   return columns;

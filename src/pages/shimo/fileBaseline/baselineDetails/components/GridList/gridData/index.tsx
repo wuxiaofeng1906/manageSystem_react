@@ -1,26 +1,6 @@
 import {axiosGet} from "@/publicMethods/axios";
 import {getColumns} from "../columns";
 
-// 获取基线时间
-const getBaseLineVersion = (baseLineInfo: any) => {
-  if (!baseLineInfo) {
-    return {};
-  }
-
-  const versionInfo = {
-    is_save_version: baseLineInfo.is_save_version,
-    remark: baseLineInfo.remark,
-    zt_num: baseLineInfo.zt_num,
-  }
-
-  const baseInfo = baseLineInfo.save_version_data;
-  baseInfo.forEach((ele: any, index: number) => {
-    versionInfo[`${index + 1}_time`] = ele.save_time;
-  });
-  return {gridData: versionInfo, versionLength: baseInfo.length}
-};
-
-
 const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_allGrid: any, rt_basetimeArray: any) => {
 
   for (let i = 0, len = data.length; i < len; i += 1) {
@@ -89,11 +69,31 @@ const getChildData = (oraData: any, childData: any, gridResult: any, filedArrayL
   });
 
 };
+
+// 将（file和time）最后一条数据新增一个字段final_file和final_time
 const contactResult = (oraData: any, firstName: string) => {
   const result: any = [];
   oraData.forEach((dts: any) => {
+
     const newObject = {...dts};
     newObject["1_file"] = firstName;
+    // 需要判断tile和time最多有多少个
+    let fileTitleCount = 0;
+    let timeTitleCount = 0;
+
+    const keys = Object.keys(newObject);
+    keys.forEach((ele: any) => {
+      if (ele.indexOf("_file")>-1) {
+        fileTitleCount += 1;
+      } else if (ele.indexOf("_time")>-1) {
+        timeTitleCount += 1;
+      }
+    });
+
+    // 此列是总计列，需要取最新的数据
+    newObject["final_file"] = newObject[`${fileTitleCount}_file`];
+    newObject["final_time"] = newObject[`${timeTitleCount}_time`];
+
     result.push(newObject);
   });
 
@@ -111,7 +111,7 @@ const getFileColumns = (filedArray: any) => {
 
   const columns: any = [{
     headerName: `${maxCount + 1}级目录`,
-    field: `${maxCount + 1}_file`,
+    field: `final_file`,
     pinned: 'left',
     columnGroupShow: 'closed',
   }, {
@@ -149,10 +149,10 @@ const getBaseTimeColumns = (timeArray: any) => {
 
   const columns: any = [{
     headerName: `${maxCount}次基线时间`,
-    field: `${maxCount}_time`,
+    field: `final_time`,
     columnGroupShow: 'closed',
   }];
-  for (let index = 1; index <= maxCount ; index += 1) {
+  for (let index = 1; index <= maxCount; index += 1) {
     columns.push({
       headerName: `${index}次基线时间`,
       field: `${index}_time`,
@@ -183,9 +183,9 @@ const getIterDetailsData = async (myGuid: any) => {
   if ((details.children) && (details.children).length > 0) {
     getChildData(details.children, details.children, gridResult, filedArrayLength, basetimeLength);
   }
-   // 数据
+  // 数据
   const gridData = contactResult(gridResult, details.parent?.name);
-
+  debugger;
   // 获取文件的列
   const fileColumns = getFileColumns(filedArrayLength);
   // 获取基线时间的列

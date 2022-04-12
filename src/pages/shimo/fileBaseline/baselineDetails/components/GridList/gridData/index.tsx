@@ -33,6 +33,7 @@ const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_al
       rt_allGrid["file_url"] = current.file_url;
       //   获取version
       const baseLineInfo = current.version;
+      rt_allGrid["version_id"] = baseLineInfo.version_id;
       rt_allGrid["is_save_version"] = baseLineInfo.is_save_version;
       rt_allGrid["remark"] = baseLineInfo.remark;
       rt_allGrid["zt_num"] = baseLineInfo.zt_num;

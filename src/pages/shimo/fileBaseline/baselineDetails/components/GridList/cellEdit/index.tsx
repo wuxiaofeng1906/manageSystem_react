@@ -1,13 +1,6 @@
 import {axiosPut} from "@/publicMethods/axios";
 
-const modifyGridCells = async (cellData: any) => {
-  const data = {
-    "version_id": 0,
-    "remark": "string",
-    "zt_num": "string",
-    "is_save_version": "string",
-    "guid": "string"
-  };
+const modifyGridCells = async (data: any) => {
   return await axiosPut("/api/verify/shimo/save_version", data);
 };
 

@@ -7,9 +7,11 @@ const getSqaByIterName = async (excutId: number) => {
 
 const setBaseLineFor = (baseInfo: any) => {
   const data: any = {
-    "version_id": 0,
     "guid": "string",
-    "user_id": "string"
+    "user_id": "string",
+    "file_name": "string",
+    "file_type": "string",
+    "execution_name": "string"
   };
 
   return axiosPost("/api/verify/shimo/save_version", data);

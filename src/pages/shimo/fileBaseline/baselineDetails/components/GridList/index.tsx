@@ -5,7 +5,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {GridApi} from 'ag-grid-community';
 import {getHeight} from "@/publicMethods/pageSet";
-import {getColumns, setCellStyle} from "./columns";
+import {setCellStyle} from "./columns";
 import {gridDiv} from "./style.css"
 import {myUrls} from "./gridComponents/myUrls";
 import {BaseLineSelect} from "./gridComponents/BaseLineSelect";
@@ -13,6 +13,7 @@ import {useModel} from "@@/plugin-model/useModel";
 import {useRequest} from "ahooks";
 import {getIterDetailsData} from "./gridData";
 import {modifyGridCells} from "./cellEdit";
+import {sucMessage} from "@/publicMethods/showMessages";
 
 
 const GridList: React.FC<any> = (props: any) => {
@@ -27,12 +28,30 @@ const GridList: React.FC<any> = (props: any) => {
   };
 
   /* endregion 表格事件 */
+
   const prjInfo = props.hrefParams;
   const detailsInfo: any = useRequest(() => getIterDetailsData(prjInfo.storyId)).data;
 
   // 编辑表格
   const cellEditedStoped = async (params: any) => {
-    await modifyGridCells({});
+
+    const data = {
+      "version_id": params.data?.version_id,
+      "is_save_version": params.data?.is_save_version,
+      "zt_num": params.data?.zt_num,
+      "remark": params.data?.remark
+    };
+
+    if (params.column?.colId === "zt_num") {
+      data.zt_num = params.newValue;
+    } else if (params.column?.colId === "remark") {
+      data.remark = params.newValue;
+    }
+    const result = await modifyGridCells(data);
+
+    if (result.code === 200) {
+      sucMessage("保存成功！");
+    }
   };
 
   useEffect(() => {

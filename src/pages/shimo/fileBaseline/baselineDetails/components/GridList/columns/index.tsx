@@ -147,8 +147,11 @@ const getColumns = (baseFile: any, baseTime: any) => {
 
 
 const setCellStyle = (params: any) => {
-  const style = {"line-height": "28px"}
-  if (params.column?.colId === "description") {
+  const style = {"line-height": "28px"};
+
+  if (params.column?.colId !== "is_save_version"
+    && params.column?.colId !== "zt_num"
+    && params.column?.colId !== "remark") {
     style["background-color"] = '#F8F8F8';
   }
   return style;

@@ -5,7 +5,6 @@ import GridList from "./components/GridList";
 
 const BaseDetails: React.FC<any> = (props: any) => {
 
-
   return (
     <>
       {/* header */}

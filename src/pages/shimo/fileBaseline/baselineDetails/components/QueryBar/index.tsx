@@ -52,7 +52,7 @@ const QueryBar: React.FC<any> = (props: any) => {
         "file_name": getFileName(ele),
         "file_type": ele.file_type,
         "execution_name": iterInfo,
-        "user_id": usersInfo.userid,
+        "user_id": usersInfo.userid === "test" ? "ChenHuan" : usersInfo.userid,
       });
     });
 

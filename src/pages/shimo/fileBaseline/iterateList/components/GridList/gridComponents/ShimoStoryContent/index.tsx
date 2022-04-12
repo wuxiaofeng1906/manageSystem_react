@@ -10,7 +10,7 @@ const ShimoStoryContent: React.FC<any> = (props: any) => {
 
 
   const {data, column} = props;
-  const {setListData, queryInfo} = useModel("iterateList.index");
+  const {setListData, queryInfo, initTree} = useModel("iterateList.index");
 
   const [tree, setTreeData] = useState({
     values: "",
@@ -46,7 +46,6 @@ const ShimoStoryContent: React.FC<any> = (props: any) => {
     }
   };
 
-
   // 动态加载子文件
   const loadChildTree = async (params: any) => {
     const childs = await getTreeSelectData(params.value, params.id);
@@ -57,7 +56,6 @@ const ShimoStoryContent: React.FC<any> = (props: any) => {
     });
   };
 
-  const treeList: any = useRequest(() => getTreeSelectData()).data;
 
   useEffect(() => {
 
@@ -69,9 +67,9 @@ const ShimoStoryContent: React.FC<any> = (props: any) => {
     }
     setTreeData({
       values: currentValue,
-      treeData: treeList
+      treeData: initTree
     });
-  }, [treeList]);
+  }, [initTree]);
 
 
   return (<div>

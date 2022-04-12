@@ -30,6 +30,7 @@ const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_al
       rt_allGrid[`${(rt_pathArray.length) + 1}_file`] = current.name;
       rt_allGrid["author"] = current.author;
       rt_allGrid["file_format"] = current.file_format;
+      rt_allGrid["file_url"] = current.file_url;
       //   获取version
       const baseLineInfo = current.version;
       rt_allGrid["is_save_version"] = baseLineInfo.is_save_version;
@@ -37,7 +38,13 @@ const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_al
       rt_allGrid["zt_num"] = baseLineInfo.zt_num;
       const baseInfo = baseLineInfo.save_version_data;
       baseInfo.forEach((ele: any, index: number) => {
+        debugger;
         rt_allGrid[`${index + 1}_time`] = ele.save_time;
+        // 基线人和基线标识都取最后一个
+        if (index === baseInfo.length - 1) {
+          rt_allGrid["baseUser"] = ele.save_version_user_name;
+          rt_allGrid["baseFlag"] = ele.save_logo;
+        }
       });
 
       rt_basetimeArray.push(baseInfo.length);
@@ -49,7 +56,7 @@ const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_al
     const {children} = data[i]
     if (children && children.length) {
       rt_allGrid[`${(rt_pathArray.length + 1)}_file`] = current.name;
-      const result: any = getParentPathByChild(children, nodeName, rt_pathArray, rt_allGrid, rt_basetimeArray)
+      const result: any = getParentPathByChild(children, nodeName, rt_pathArray, rt_allGrid, rt_basetimeArray);
       if (result) {
         return {rt_pathArray, rt_allGrid, rt_basetimeArray};
       }

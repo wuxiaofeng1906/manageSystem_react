@@ -16,12 +16,14 @@ const BaseLineSelect: React.FC<any> = (props: any) => {
         gridSelectChanged(props, currentValue);
       }}
     >
-      <Option key="否" value="否">否</Option>
-      <Option key="免" value="免">免</Option>
+      <Option key="yes" value="yes" disabled={true}>是</Option>
+      <Option key="no" value="no">否</Option>
+      <Option key="free" value="free">免</Option>
 
     </Select>
   );
 };
+
 
 
 export {BaseLineSelect};

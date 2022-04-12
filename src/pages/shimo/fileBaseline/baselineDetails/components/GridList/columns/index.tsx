@@ -77,7 +77,7 @@ const getColumns = (baseFile: any, baseTime: any) => {
           },
         }, {
           headerName: '',
-          field: 'zentao_url',
+          field: 'file_url',
           cellRenderer: "myUrl",
           pinned: 'left',
           maxWidth: 50,
@@ -103,7 +103,7 @@ const getColumns = (baseFile: any, baseTime: any) => {
         maxWidth: 100,
       }, {
         headerName: '基线人',
-        field: '',
+        field: 'baseUser',
         pinned: 'left',
         minWidth: 90,
         maxWidth: 100,
@@ -124,7 +124,7 @@ const getColumns = (baseFile: any, baseTime: any) => {
       headerName: '',
       children: [{
         headerName: '最新基线标识',
-        field: '',
+        field: 'baseFlag',
         minWidth: 110,
       }, {
         headerName: '变更禅道编号',

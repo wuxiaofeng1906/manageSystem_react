@@ -1,9 +1,8 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {GridApi} from 'ag-grid-community';
 import {getHeight} from "@/publicMethods/pageSet";
 import {setCellStyle} from "./columns";
 import {gridDiv} from "./style.css"
@@ -14,7 +13,6 @@ import {useRequest} from "ahooks";
 import {getIterDetailsData} from "./gridData";
 import {modifyGridCells} from "./cellEdit";
 import {sucMessage} from "@/publicMethods/showMessages";
-
 
 const GridList: React.FC<any> = (props: any) => {
   const {
@@ -27,7 +25,8 @@ const GridList: React.FC<any> = (props: any) => {
   // const gridApi = useRef<GridApi>();
   window.onresize = function () {
     setGridHeight(getHeight() + 36);
-    gridApi?.sizeColumnsToFit();
+    // @ts-ignore
+    gridApi.sizeColumnsToFit();
   };
 
   /* endregion 表格事件 */

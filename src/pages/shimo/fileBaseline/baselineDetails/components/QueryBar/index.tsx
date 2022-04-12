@@ -3,17 +3,17 @@ import {Form, Row, Col, Select, Button, Input} from 'antd';
 import {queryCondition, queryRow, SQA} from "./style.css";
 import {CheckSquareTwoTone} from "@ant-design/icons";
 import {useRequest} from "ahooks";
-import {getIterSelect} from "./selector";
+import {getIterSelect, getIterSelectedValue} from "./selector";
 import {getSqaByIterName, setBaseLineFor} from "./dataAlaysis";
 import {useModel} from "@@/plugin-model/useModel";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
-
+import {getIterDetailsData} from "@/pages/shimo/fileBaseline/baselineDetails/components/GridList/gridData";
 
 const QueryBar: React.FC<any> = (props: any) => {
   const userLogins: any = localStorage.getItem('userLogins');
   const usersInfo = JSON.parse(userLogins);
 
-  const {gridApi} = useModel("iterateList.index");
+  const {gridApi, setDetailsData, setColumns} = useModel("iterateList.index");
   const prjInfo = props.hrefParams;
   const iterateList: any = useRequest(() => getIterSelect()).data;
   const [iterDetailsForm] = Form.useForm();
@@ -35,23 +35,23 @@ const QueryBar: React.FC<any> = (props: any) => {
   };
   // 基线按钮点击
   const BaseLineClicked = async () => {
-    const iterInfo = iterDetailsForm.getFieldValue("iterName");
 
     // @ts-ignore
     const sel_rows: any = gridApi.getSelectedRows();
-
     if (sel_rows.length === 0) {
       errorMessage("请选中需要基线的数据！");
       return;
     }
 
+    const iterInfoId = iterDetailsForm.getFieldValue("iterName");
+    const iterName = await getIterSelectedValue(iterInfoId);
     const data: any = [];
     sel_rows.forEach((ele: any) => {
       data.push({
         "guid": ele.guid,
         "file_name": getFileName(ele),
         "file_type": ele.file_type,
-        "execution_name": iterInfo,
+        "execution_name": iterName,
         "user_id": usersInfo.userid === "test" ? "ChenHuan" : usersInfo.userid,
       });
     });
@@ -60,6 +60,11 @@ const QueryBar: React.FC<any> = (props: any) => {
     if (JSON.stringify(result) !== "{}") {
       if (result.code === 200) {
         sucMessage("基线成功！");
+        //  基线成功后要刷新数据
+        const gridData: any = await getIterDetailsData(prjInfo.storyId);
+        setColumns(gridData?.columnsData); // 设置列
+        setDetailsData(gridData?.gridData); // 设置数据
+
       } else {
         errorMessage(result.msg);
       }
@@ -71,16 +76,20 @@ const QueryBar: React.FC<any> = (props: any) => {
 
     const sqaInfo = await getSqaByIterName(iterId);
 
+    let sqa_user = "";
+    if (sqaInfo && sqaInfo.user_name) {
+      sqa_user = sqaInfo.user_name;
+    }
     iterDetailsForm.setFieldsValue({
       iterName: iterId,
-      SQA: sqaInfo.user_name
+      SQA: sqa_user
     });
   };
 
   useEffect(() => {
 
     iterDetailsForm.setFieldsValue({
-      iterName: prjInfo.iterName,
+      iterName: Number(prjInfo.iterID),
       SQA: prjInfo.SQA === "null" ? "" : prjInfo.SQA
     });
   }, [iterateList])
@@ -92,8 +101,8 @@ const QueryBar: React.FC<any> = (props: any) => {
           <Col span={8}>
             <Form.Item label="迭代名称" name={"iterName"} style={{marginLeft: 10}}>
               <Select className={"iterName"} onChange={iterNameChanged} showSearch
-                // filterOption={(inputValue: string, option: any) =>
-                //   !!option.children.includes(inputValue)}
+                      filterOption={(inputValue: string, option: any) =>
+                        !!option.children.includes(inputValue)}
               >
                 {iterateList}
               </Select>

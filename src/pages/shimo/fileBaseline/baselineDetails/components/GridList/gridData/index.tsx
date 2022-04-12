@@ -91,8 +91,8 @@ const contactResult = (oraData: any, firstName: string) => {
     });
 
     // 此列是总计列，需要取最新的数据
-    newObject["final_file"] = newObject[`${fileTitleCount}_file`];
-    newObject["final_time"] = newObject[`${timeTitleCount}_time`];
+    newObject["final_files"] = newObject[`${fileTitleCount}_file`];
+    newObject["final_times"] = newObject[`${timeTitleCount}_time`];
 
     result.push(newObject);
   });
@@ -111,7 +111,7 @@ const getFileColumns = (filedArray: any) => {
 
   const columns: any = [{
     headerName: `${maxCount + 1}级目录`,
-    field: `final_file`,
+    field: `final_files`,
     pinned: 'left',
     columnGroupShow: 'closed',
   }, {
@@ -149,7 +149,7 @@ const getBaseTimeColumns = (timeArray: any) => {
 
   const columns: any = [{
     headerName: `${maxCount}次基线时间`,
-    field: `final_time`,
+    field: `final_times`,
     columnGroupShow: 'closed',
   }];
   for (let index = 1; index <= maxCount; index += 1) {

@@ -152,7 +152,7 @@ const getBaseTimeColumns = (timeArray: any) => {
     field: `${maxCount}_time`,
     columnGroupShow: 'closed',
   }];
-  for (let index = 1; index <= maxCount + 1; index += 1) {
+  for (let index = 1; index <= maxCount ; index += 1) {
     columns.push({
       headerName: `${index}次基线时间`,
       field: `${index}_time`,

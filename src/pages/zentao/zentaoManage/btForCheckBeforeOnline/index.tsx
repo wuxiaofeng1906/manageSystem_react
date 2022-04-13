@@ -86,9 +86,25 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
   // 项目执行修改
   const excutionChanged = async (values: any, params: any,) => {
+    debugger;
     const excuteInfo = values.split("&");
     const spProjectAssigned = (await loadProjectManager(Number(excuteInfo[0])));
-
+    // 同样需要同步人
+    if (params.sprintType === "sprint" || params.sprintType === "hotfix") { // 班车项目
+      formForZentaoTask.setFieldsValue({
+        assingedToSQA: dutyInfo.sqa,
+        assingedToFront: dutyInfo.front,
+        assingedToBackend: dutyInfo.backend,
+        assingedToTester: dutyInfo.test
+      });
+    } else {
+      formForZentaoTask.setFieldsValue({
+        assingedToSQA: spProjectAssigned.sqa.user_name,
+        assingedToFront: spProjectAssigned.front.user_name,
+        assingedToBackend: spProjectAssigned.backend.user_name,
+        assingedToTester: spProjectAssigned.test.user_name,
+      });
+    }
     const tabData = getTablesData();
     // 如果执行类型为班车项目（sprint或hotfix），则父任务取值班计划中的后端值班人，子任务取值班计划中所属端的值班人。
     // 如果执行类型为特性项目，则父任务取值班项目负责人，子任务特性项目中对应的所属端的人员
@@ -121,6 +137,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
         assignedTo = getChildTaskPersonForPrj(ele, spProjectAssigned);
         taskname = `${taskName.slice(0, 2)}${excuteInfo[1]}-${taskName.slice(2)}`;
       }
+
 
       atferValue.push({
         ...ele,

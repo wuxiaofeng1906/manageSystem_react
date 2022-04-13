@@ -1,12 +1,15 @@
 import {axiosGet} from "@/publicMethods/axios";
 import {getColumns} from "../columns";
 
-const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_allGrid: any, rt_basetimeArray: any) => {
 
+const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_allGrid: any, rt_basetimeArray: any) => {
+  // 忽略掉对rt_allGrid的检查
+  /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["rt_allGrid"] }] */
   for (let i = 0, len = data.length; i < len; i += 1) {
     const current = data[i];
     rt_pathArray.push(current.name);
     if (current.file_format !== "folder" && data[i].name === nodeName) {
+      // eslint-disable-next-line no-param-reassign
       rt_allGrid[`${(rt_pathArray.length) + 1}_file`] = current.name;
       rt_allGrid["author"] = current.author;
       rt_allGrid["file_format"] = current.file_format;

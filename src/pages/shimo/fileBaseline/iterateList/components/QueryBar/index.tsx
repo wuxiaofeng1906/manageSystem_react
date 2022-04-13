@@ -57,9 +57,7 @@ const QueryBar: React.FC<any> = () => {
   /* endregion 条件changed */
   const updateGrid = async () => {
     // 条件选择完成后会进行调用，刷新数据界面
-    console.log(queryInfo);
     const dts = await getIterListData(queryInfo);
-
     setListData(dts);
   }
 

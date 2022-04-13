@@ -57,7 +57,10 @@ const getChildData = (oraData: any, childData: any, gridResult: any, filedArrayL
 
   childData.forEach((field: any) => {
     if (field.file_format === "folder") { // 是文件夹，表示还有下一层children，继续遍历。
-      getChildData(oraData, field.children, gridResult, filedArrayLength, basetimeLength);
+      if (field.children) {
+        getChildData(oraData, field.children, gridResult, filedArrayLength, basetimeLength);
+      }
+
     } else {
       // 获取父节点路径
       const rt_pathArray: any = [];

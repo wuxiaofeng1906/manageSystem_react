@@ -86,7 +86,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
   // 项目执行修改
   const excutionChanged = async (values: any, params: any,) => {
-    debugger;
+
     const excuteInfo = values.split("&");
     const spProjectAssigned = (await loadProjectManager(Number(excuteInfo[0])));
     // 同样需要同步人

@@ -176,6 +176,33 @@ const generateTask = async (tempInfo: any, fromData: any, gridData: any) => {
     }
   }
 
+  // 其他指派人不能为空
+  if (!fromData.assingedToFront) {
+    return {
+      sucess: false,
+      message: "前端指派人不能为空！",
+    }
+  }
+
+  if (!fromData.assingedToTester) {
+    return {
+      sucess: false,
+      message: "测试指派人不能为空！",
+    }
+  }
+  if (!fromData.assingedToBackend) {
+    return {
+      sucess: false,
+      message: "后端指派人不能为空！",
+    }
+  }
+  if (!fromData.assingedToSQA) {
+    return {
+      sucess: false,
+      message: "SQA指派人不能为空！",
+    }
+  }
+
   if (!gridData || gridData.length === 0) {
 
     return {

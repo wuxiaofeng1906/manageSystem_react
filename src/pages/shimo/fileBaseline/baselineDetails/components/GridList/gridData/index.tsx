@@ -1,5 +1,6 @@
 import {axiosGet} from "@/publicMethods/axios";
 import {getColumns} from "../columns";
+import {errorMessage} from "@/publicMethods/showMessages";
 
 
 const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_allGrid: any, rt_basetimeArray: any) => {
@@ -203,35 +204,40 @@ const getBaseTimeColumns = (timeArray: any) => {
 const getIterDetailsData = async (myGuid: any) => {
   const details = await axiosGet("/api/verify/shimo/version_detail", {guid: myGuid});
   if (!details) {
-    return [];
+    return {};
+  }
+  try {
+    // 文件和基线时间要用最大的列数
+    // parent是一定有的(一级目录)。
+    const firstContent = {"1_file": details.parent?.name};
+    // 判断file_format 类型是不是为folder，是的话就有下级目录。其他类型就没有下级目录
+    if (details.parent?.file_format !== "folder") {
+      return [firstContent];
+    }
+
+    const gridResult: any = []; // 记录数据
+    const filedArrayLength: any = []; // 记录文件最大长度
+    const basetimeLength: any = []; // 记录文件最大长度
+
+    if ((details.children) && (details.children).length > 0) {
+      getChildData(details.children, details.children, gridResult, filedArrayLength, basetimeLength);
+    }
+    // 数据
+    const gridData = contactResult(gridResult, details.parent?.name);
+
+    // 获取文件的列
+    const fileColumns = getFileColumns(filedArrayLength);
+    // 获取基线时间的列
+    const basetimeColumns = getBaseTimeColumns(basetimeLength);
+
+    const columnsData = getColumns(fileColumns, basetimeColumns);
+
+    return {gridData, columnsData}
+  } catch (e) {
+    errorMessage(e);
+    return {};
   }
 
-  // 文件和基线时间要用最大的列数
-  // parent是一定有的(一级目录)。
-  const firstContent = {"1_file": details.parent?.name};
-  // 判断file_format 类型是不是为folder，是的话就有下级目录。其他类型就没有下级目录
-  if (details.parent?.file_format !== "folder") {
-    return [firstContent];
-  }
-
-  const gridResult: any = []; // 记录数据
-  const filedArrayLength: any = []; // 记录文件最大长度
-  const basetimeLength: any = []; // 记录文件最大长度
-
-  if ((details.children) && (details.children).length > 0) {
-    getChildData(details.children, details.children, gridResult, filedArrayLength, basetimeLength);
-  }
-  // 数据
-  const gridData = contactResult(gridResult, details.parent?.name);
-
-  // 获取文件的列
-  const fileColumns = getFileColumns(filedArrayLength);
-  // 获取基线时间的列
-  const basetimeColumns = getBaseTimeColumns(basetimeLength);
-
-  const columnsData = getColumns(fileColumns, basetimeColumns);
-
-  return {gridData, columnsData}
 
 };
 

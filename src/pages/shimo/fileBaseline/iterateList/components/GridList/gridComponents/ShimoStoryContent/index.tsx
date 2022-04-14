@@ -4,6 +4,7 @@ import {modifyListContent} from "./rowChanged";
 import {getTreeSelectData} from "./selector";
 import {getIterListData} from "@/pages/shimo/fileBaseline/iterateList/components/GridList/gridData";
 import {useModel} from "@@/plugin-model/useModel";
+import "../style.less";
 
 const ShimoStoryContent: React.FC<any> = (props: any) => {
 
@@ -54,6 +55,11 @@ const ShimoStoryContent: React.FC<any> = (props: any) => {
     });
   };
 
+  // 只有管理员才能操作按钮
+  let showOperate = true;
+  if ((JSON.parse(localStorage.getItem('userLogins') as string)).group === "superGroup") {
+    showOperate = false;
+  }
 
   useEffect(() => {
 
@@ -64,7 +70,7 @@ const ShimoStoryContent: React.FC<any> = (props: any) => {
   }, [initStoryTree]);
 
 
-  return (<div>
+  return (<div className={"treeSelectStyle"}>
     <TreeSelect
       treeDataSimpleMode
       style={{width: '100%'}}
@@ -74,6 +80,7 @@ const ShimoStoryContent: React.FC<any> = (props: any) => {
       onChange={storyContentChanged}
       loadData={loadChildTree}
       treeData={tree.treeData}
+      disabled={showOperate}
     />
   </div>);
 };

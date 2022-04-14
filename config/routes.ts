@@ -504,7 +504,7 @@ export default [
     icon: 'table',
     path: '/shimo',
     hideInMenu: false,
-    access: 'sysAdmin',
+    // access: 'sysAdmin', // 所有人可见，只有管理员可以编辑。
     routes: [
       {
         name: '文档基线',

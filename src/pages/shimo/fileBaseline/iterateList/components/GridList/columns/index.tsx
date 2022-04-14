@@ -1,5 +1,11 @@
 // 表格列的定义
 
+const baseLineStatus = (params: any) => {
+  if (params.value === "未知") {
+    return "未基线";
+  }
+  return params.value;
+};
 const columns: any = [
   {
     headerName: '序号',
@@ -48,6 +54,7 @@ const columns: any = [
     headerName: '需求基线状态',
     field: 'demand_status',
     minWidth: 120,
+    cellRenderer: baseLineStatus
   }, {
     headerName: '',
     field: 'design_directory_url',
@@ -61,6 +68,7 @@ const columns: any = [
     headerName: '概设基线状态',
     field: 'design_status',
     minWidth: 120,
+    cellRenderer: baseLineStatus
   }, {
     headerName: '操作',
     minWidth: 90,

@@ -34,7 +34,7 @@ const getDeptName = async () => {
 
 // 迭代名称下拉框
 const getIterateName = async () => {
-  const iterData = await axiosGet("/api/verify/zentao/executions");
+  const iterData = await axiosGet("/api/verify/shimo/execution");
   const treeData: any = [];
   if (iterData && iterData.length > 0) {
     iterData.forEach((iter: any) => {

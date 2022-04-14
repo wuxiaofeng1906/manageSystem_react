@@ -9,6 +9,7 @@ import {columns, setCellStyle} from "./columns";
 import {gridDiv} from "./style.css";
 import {ShimoStoryContent} from "./gridComponents/ShimoStoryContent";
 import {ShimoDesignContent} from "./gridComponents/ShimoDesignContent";
+import {BaseLineStatus} from "./gridComponents/BaseLineStatus";
 import {Operate} from "./gridComponents/Operate";
 import {myUrls} from "./gridComponents/myUrls";
 import {NameUrl} from "./gridComponents/NameUrl";
@@ -59,6 +60,7 @@ const GridList: React.FC<any> = () => {
           frameworkComponents={{
             myUrl: myUrls,
             nameUrl: NameUrl,
+            baseLineStatus: BaseLineStatus,
             shimoStoryContent: ShimoStoryContent,
             shimoDesignContent: ShimoDesignContent,
             operate: Operate

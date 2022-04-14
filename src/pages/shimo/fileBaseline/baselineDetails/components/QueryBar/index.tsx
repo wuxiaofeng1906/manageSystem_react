@@ -86,6 +86,12 @@ const QueryBar: React.FC<any> = (props: any) => {
     });
   };
 
+  // 只有管理员才能操作按钮
+  let showOperate = true;
+  if ((JSON.parse(localStorage.getItem('userLogins') as string)).group === "superGroup") {
+    showOperate = false;
+  }
+
   useEffect(() => {
 
     iterDetailsForm.setFieldsValue({
@@ -115,7 +121,7 @@ const QueryBar: React.FC<any> = (props: any) => {
           </Col>
           <Col span={3}>
             <Form.Item>
-              <Button icon={<EditTwoTone/>} className={baseLineButton}
+              <Button icon={<EditTwoTone/>} className={baseLineButton} disabled={showOperate}
                       onClick={BaseLineClicked}>基线</Button>
             </Form.Item>
           </Col>

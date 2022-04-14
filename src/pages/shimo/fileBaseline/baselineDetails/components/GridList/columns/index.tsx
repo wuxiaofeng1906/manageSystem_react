@@ -131,13 +131,23 @@ const getColumns = (baseFile: any, baseTime: any) => {
         field: 'zt_num',
         minWidth: 120,
         cellRenderer: manualInput,
-        editable: true
+        editable: () => {
+          if ((JSON.parse(localStorage.getItem('userLogins') as string)).group === "superGroup") {
+            return true;
+          }
+          return false;
+        }
       }, {
         headerName: '备注说明',
         field: 'remark',
         minWidth: 120,
         cellRenderer: manualInput,
-        editable: true
+        editable: () => {
+          if ((JSON.parse(localStorage.getItem('userLogins') as string)).group === "superGroup") {
+            return true;
+          }
+          return false;
+        }
       }]
     }
   ];

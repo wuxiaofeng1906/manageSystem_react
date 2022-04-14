@@ -2,6 +2,7 @@ import React from "react";
 import {Select} from "antd";
 import {modifyGridCells} from "../../cellEdit";
 import {sucMessage} from "@/publicMethods/showMessages";
+import "../style.less";
 
 const {Option} = Select;
 const BaseLineSelect: React.FC<any> = (props: any) => {
@@ -21,19 +22,29 @@ const BaseLineSelect: React.FC<any> = (props: any) => {
     }
   };
 
-  return (
-    <Select
-      size={'small'} defaultValue={props.value}
-      bordered={false} style={{width: '120%'}}
-      onChange={(currentValue: any) => {
-        gridSelectChanged(props, currentValue);
-      }}
-    >
-      <Option key="yes" value="yes" disabled={true}>是</Option>
-      <Option key="no" value="no">否</Option>
-      <Option key="free" value="free">免</Option>
+  // 只有管理员才能操作按钮
+  let showOperate = true;
+  if ((JSON.parse(localStorage.getItem('userLogins') as string)).group === "superGroup") {
+    showOperate = false;
+  }
 
-    </Select>
+  return (
+    <div className={"treeSelectStyle"}>
+      <Select
+        size={'small'} defaultValue={props.value}
+        bordered={false} style={{width: '120%'}}
+        onChange={(currentValue: any) => {
+          gridSelectChanged(props, currentValue);
+        }}
+        disabled={showOperate}
+      >
+        <Option key="yes" value="yes" disabled={true}>是</Option>
+        <Option key="no" value="no">否</Option>
+        <Option key="free" value="free">免</Option>
+
+      </Select>
+    </div>
+
   );
 };
 

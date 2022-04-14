@@ -202,6 +202,9 @@ const getBaseTimeColumns = (timeArray: any) => {
 // 获取迭代数据
 const getIterDetailsData = async (myGuid: any) => {
   const details = await axiosGet("/api/verify/shimo/version_detail", {guid: myGuid});
+  if (!details) {
+    return [];
+  }
 
   // 文件和基线时间要用最大的列数
   // parent是一定有的(一级目录)。

@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React from "react";
 import {Tabs} from "antd";
 import {myTabs, myTabPane} from "./style.css";
 import {useModel} from "@@/plugin-model/useModel";

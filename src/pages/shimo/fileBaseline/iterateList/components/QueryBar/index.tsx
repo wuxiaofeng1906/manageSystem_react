@@ -93,7 +93,9 @@ const QueryBar: React.FC<any> = () => {
           <Col span={8}>
             <Form.Item label="迭代状态" name={"iterStatus"}>
               <TreeSelect className={"iterStatus"}
-                          {...defaultTreeSelectParams} treeData={iterateStatusList}
+                          {...defaultTreeSelectParams}
+                          placeholder="默认选择未关闭"
+                          treeData={iterateStatusList}
                           onChange={iterStatusChanged}/>
             </Form.Item>
           </Col>

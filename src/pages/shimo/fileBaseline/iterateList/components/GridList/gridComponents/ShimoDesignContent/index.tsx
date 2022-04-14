@@ -72,6 +72,7 @@ const ShimoDesignContent: React.FC<any> = (props: any) => {
     <TreeSelect
       treeDataSimpleMode
       style={{width: '100%'}}
+      dropdownStyle={{overflow: 'auto', minWidth: 150}}
       bordered={false}
       value={tree.values}
       placeholder="请选择"

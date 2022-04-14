@@ -18,6 +18,7 @@ const columns: any = [
   }, {
     headerName: '',
     field: 'execution_url',
+    width: 50,
     cellRenderer: "myUrl"
   }, {
     headerName: '迭代名称',
@@ -44,6 +45,7 @@ const columns: any = [
   }, {
     headerName: '',
     field: 'demand_directory_url',
+    width: 50,
     cellRenderer: "myUrl"
   }, {
     headerName: '石墨需求目录',
@@ -58,6 +60,7 @@ const columns: any = [
   }, {
     headerName: '',
     field: 'design_directory_url',
+    width: 50,
     cellRenderer: "myUrl"
   }, {
     headerName: '石墨概设目录',

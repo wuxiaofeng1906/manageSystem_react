@@ -19,6 +19,7 @@ export default () => {
     dept: "",
     iterName: "",
     SQA: "",
+    iterStatus: ["undone", "wait", "doing", "suspended"], // 默认显示未关闭
     iterRange: [moment(dayjs().startOf("year").format("YYYYMMDD")), moment(dayjs().endOf("year").format("YYYYMMDD"))]
   });
   /* endregion */

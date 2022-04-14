@@ -63,7 +63,7 @@ const PageHeader: React.FC<any> = () => {
   // 只有管理员才能操作按钮
   let showOperate = true;
   if ((JSON.parse(localStorage.getItem('userLogins') as string)).group === "superGroup") {
-    showOperate = true;
+    showOperate = false;
   }
 
   return (

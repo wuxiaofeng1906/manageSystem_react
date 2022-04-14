@@ -51,6 +51,27 @@ const getIterateName = async () => {
   }];
 };
 
+// 迭代状态下拉框
+const getIterateStatus = async () => {
+  const iterData = await axiosGet("/api/verify/shimo/executions_status");
+  const treeData: any = [];
+  if (iterData && iterData.length > 0) {
+    iterData.forEach((iter: any) => {
+      if (iter.status_name !== "所有") {
+        treeData.push({
+          title: iter.status_name,
+          value: iter.status
+        });
+      }
+    });
+  }
+  return [{
+    title: "全部",
+    value: "",
+    children: treeData
+  }];
+};
+
 // 获取SQA人员
 const getSQAName = async () => {
   const sqaData = await axiosGet("/api/verify/duty/person", {tech: 7});
@@ -70,4 +91,4 @@ const getSQAName = async () => {
   }];
 };
 
-export {getIterateName, getSQAName, getDeptName};
+export {getIterateName, getSQAName, getDeptName, getIterateStatus};

@@ -114,6 +114,7 @@ const rendererUnitTest = (params: any) => {
     `;
 };
 
+// 图标一致性检查
 const iconCheckRender = (params: any) => {
 
   const values = params.value;
@@ -454,17 +455,24 @@ const sealStatusRenderer = (params: any) => {
       }
     });
     return `
-        <div style="margin-top: -20px">
-            <div style=" margin-top: 20px;font-size: 10px">
-                <div>${side} <label style="color: ${sideColor}"> ${status}</label> &nbsp;${time}</div>
+          <div>
+            <div style="margin-left: 100px">
+              <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC"
+                onclick='showCoverStatusLog(${JSON.stringify(params.value)})'>
+                  <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+               </Button>
             </div>
 
-        </div>
+              <div style="margin-top: -20px; font-size: 10px">
+                  <div>${side} <label style="color: ${sideColor}"> ${status}</label> &nbsp;${time}</div>
+              </div>
+
+          </div>
+
     `;
   }
 
   // 证明有前后端
-  // if (values.length === 2) {
   if (datas.technical_side === "3") {
     let frontValue = '';
     let frontTime = '';
@@ -485,7 +493,6 @@ const sealStatusRenderer = (params: any) => {
           frontColor = 'orange';
         }
 
-        // frontColor = ele.sealing_version === '1' ? '#2BF541' : 'orange';
       } else if (ele.technical_side === '2') {
         // 后端
         // backendValue = ele.sealing_version === '1' ? '已封版' : '未封版';
@@ -497,20 +504,23 @@ const sealStatusRenderer = (params: any) => {
         } else if (backendValue === "未封版") {
           bacnkendColor = 'orange';
         }
-
-        // bacnkendColor = ele.sealing_version === '1' ? '#2BF541' : 'orange';
       }
     });
 
     return `
-        <div style="margin-top: -20px">
-            <div style=" margin-top: 20px;font-size: 10px">
-                <div>前端：<label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
-                <div style="margin-top: -20px">
-                后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>&nbsp;${backendTime}</div>
+          <div>
+            <div style="margin-top: 0px;margin-left: 100px">
+              <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC"
+                onclick='showCoverStatusLog(${JSON.stringify(params.value)})'>
+                  <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+               </Button>
+            </div>
+            <div style="margin-top: -20px;font-size: 10px">
+              <div>前端：<label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
+              <div style="margin-top: -20px">后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>&nbsp;${backendTime}</div>
             </div>
 
-        </div>
+          </div>
     `;
   }
   return `<div></div>`;

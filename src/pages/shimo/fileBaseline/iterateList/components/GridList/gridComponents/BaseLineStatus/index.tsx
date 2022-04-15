@@ -10,7 +10,9 @@ const BaseLineStatus: React.FC<any> = (props: any) => {
   if (props.value === "已基线") {
     return (<Tag color={"green"}>已基线</Tag>);
   }
-
+  if (props.value === "部分基线") {
+    return (<Tag color={"blue"}>部分基线</Tag>);
+  }
   return props.value;
 };
 

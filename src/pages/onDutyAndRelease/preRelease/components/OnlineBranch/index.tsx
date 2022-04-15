@@ -1,19 +1,7 @@
 import React, {useRef, useState} from 'react';
 import {
-  Button,
-  Card,
-  Checkbox,
-  Col,
-  DatePicker,
-  Divider,
-  Form,
-  Input,
-  message,
-  Modal,
-  Row,
-  Select,
-  Spin,
-  Switch,
+  Button, Card, Checkbox, Col, DatePicker, Divider,
+  Form, Input, message, Modal, Row, Select, Spin, Switch,
 } from 'antd';
 import {useModel} from '@@/plugin-model/useModel';
 import {AgGridReact} from 'ag-grid-react';
@@ -21,20 +9,14 @@ import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {deleteLockStatus, getLockStatus} from '../../lock/rowLock';
 import {getOnlineBranchColumns} from './grid/columns';
 import {
-  getCheckNumForOnlineBranch,
-  getModifiedData,
-  saveOnlineBranchData,
-  executeOnlineCheck,
+  getCheckNumForOnlineBranch, getModifiedData,
+  saveOnlineBranchData, executeOnlineCheck,
 } from './axiosRequest';
 import moment from 'moment';
 import dayjs from 'dayjs';
 import {
-  loadBranchNameSelect,
-  loadBrowserTypeSelect,
-  loadCheckTypeSelect,
-  loadTestEnvSelect,
-  loadServiceSelect,
-  loadTechSideSelect,
+  loadBranchNameSelect, loadBrowserTypeSelect, loadCheckTypeSelect,
+  loadTestEnvSelect, loadServiceSelect, loadTechSideSelect,
 } from '../../comControl/controler';
 import {alalysisInitData} from '../../datas/dataAnalyze';
 import {getGridRowsHeight} from '../gridHeight';
@@ -46,14 +28,8 @@ const OnlineBranch: React.FC<any> = () => {
   const [formForOnlineBranch] = Form.useForm(); // 上线分支设置
   const firstOnlineBranchGridApi = useRef<GridApi>();
   const {
-    tabsData,
-    lockedItem,
-    modifyLockedItem,
-    onlineBranch,
-    setOnlineBranch,
-    setDataReviewConfirm,
-    allLockedArray,
-    operteStatus,
+    tabsData, lockedItem, modifyLockedItem, onlineBranch,
+    setOnlineBranch, setDataReviewConfirm, allLockedArray, operteStatus,
   } = useModel('releaseProcess');
   const [executeStatus, setExecuteStatus] = useState(false); // 上线分支点击执行后的进度展示
   const [onlineBranchModal, setOnlineBranchModal] = useState({
@@ -75,7 +51,9 @@ const OnlineBranch: React.FC<any> = () => {
     show: false,
     autoUrl: {style: 'none', ui: '', api: ''},
     versionUrl: {style: 'none', app: '', global: ''},
-    iconCheckUrl: {style: 'none', content: <div></div>}
+    iconCheckUrl: {style: 'none', content: <div></div>},
+    coveStatus: {style: 'none', content: <div></div>}
+
   });
   const onfirstOnlineBranchGridReady = (params: GridReadyEvent) => {
     firstOnlineBranchGridApi.current = params.api;
@@ -414,6 +392,7 @@ const OnlineBranch: React.FC<any> = () => {
       iconCheckUrl: {style: 'inline', content: <div style={{marginTop: -15}}> {logContent}</div>},
       autoUrl: {style: 'none', ui: '', api: ''},
       versionUrl: {style: 'none', app: '', global: ''},
+      coveStatus: {style: 'none', content: <div></div>}
     });
 
   };
@@ -437,6 +416,7 @@ const OnlineBranch: React.FC<any> = () => {
         iconCheckUrl: {style: 'none', content: <div></div>},
         autoUrl: {style: 'none', ui: '', api: ''},
         versionUrl: {style: 'inline', app: app_url, global: global_url},
+        coveStatus: {style: 'none', content: <div></div>},
         show: true,
       });
     } else {
@@ -488,6 +468,7 @@ const OnlineBranch: React.FC<any> = () => {
         iconCheckUrl: {style: 'none', content: <div></div>},
         autoUrl: {style: 'inline', ui: ui_url, api: api_url},
         versionUrl: {style: 'none', app: '', global: ''},
+        coveStatus: {style: 'none', content: <div></div>},
         show: true,
       });
     } else {
@@ -501,13 +482,50 @@ const OnlineBranch: React.FC<any> = () => {
     }
   };
 
-  // 自动化日志显示弹窗取消
+  // 封板状态日志显示
+  (window as any).showCoverStatusLog = (params: any) => {
+    debugger;
+    const contentDiv: any = [];
+
+    if (params && params.length) {
+      params.forEach((ele: any) => {
+        // {/* 【backend/apps/asset 】【已封版】检查开始时间：2022-04-13 17:23:01 ～ 检查结束时间: 2022-04-13 17:23:25 */}
+        let Color = "black";
+        if (ele.sealing_version === "已封版") {
+          Color = "#2BF541";
+        }
+        if (ele.sealing_version === "未封版") {
+          Color = "orange";
+        }
+        contentDiv.push(
+          <div>
+            <label>【{ele.name_path}】</label>
+            【<label style={{color: Color}}>{ele.sealing_version}</label>】
+            <label>检查开始时间:{ele.version_check_start_time}~检查结束时间：{ele.version_check_start_time} </label>
+          </div>
+        );
+      });
+
+    }
+
+    setLogModal({
+      show: true,
+      iconCheckUrl: {style: 'none', content: <div></div>},
+      autoUrl: {style: 'none', ui: '', api: ''},
+      versionUrl: {style: 'none', app: '', global: ''},
+      coveStatus: {style: 'inline', content: <div>{contentDiv}</div>}
+    });
+
+  };
+
+  // 日志显示弹窗取消
   const autoCancle = () => {
     setLogModal({
       show: false,
       iconCheckUrl: {style: 'none', content: <div></div>},
       autoUrl: {style: 'none', ui: '', api: ''},
       versionUrl: {style: 'none', app: '', global: ''},
+      coveStatus: {style: 'none', content: <div></div>}
     });
   };
 
@@ -544,7 +562,7 @@ const OnlineBranch: React.FC<any> = () => {
                       }),
                     }}
                     headerHeight={25}
-                    rowHeight={50}
+                    rowHeight={65}
                     getRowStyle={(params: any) => {
                       return releaseAppChangRowColor(
                         allLockedArray,
@@ -555,7 +573,10 @@ const OnlineBranch: React.FC<any> = () => {
                     onGridReady={onfirstOnlineBranchGridReady}
                     onGridSizeChanged={onChangefirstOnlineBranchGridReady}
                     onColumnEverythingChanged={onChangefirstOnlineBranchGridReady}
-                  ></AgGridReact>
+                  >
+
+
+                  </AgGridReact>
                 </div>
               </Spin>
             </div>
@@ -893,7 +914,7 @@ const OnlineBranch: React.FC<any> = () => {
         </Form>
       </Modal>
 
-      {/* 自动化日志的弹窗确认 */}
+      {/* 日志的弹窗 */}
       <Modal
         title={'日志'}
         visible={logModal.show}
@@ -904,6 +925,7 @@ const OnlineBranch: React.FC<any> = () => {
         // bodyStyle={{height: 145}}
       >
         <Form>
+          {/* 自动化日志 */}
           <div style={{display: logModal.autoUrl.style}}>
             <Form.Item name="UiLog" label="UI日志:" style={{marginTop: -15}}>
               <a
@@ -925,6 +947,7 @@ const OnlineBranch: React.FC<any> = () => {
               </a>
             </Form.Item>
           </div>
+          {/* 版本检查 */}
           <div style={{display: logModal.versionUrl.style}}>
             <Form.Item name="appLog" label="app日志:" style={{marginTop: -15}}>
               <a
@@ -946,8 +969,13 @@ const OnlineBranch: React.FC<any> = () => {
             </Form.Item>
           </div>
 
+          {/* 图标一致性检查日志 */}
           <div style={{display: logModal.iconCheckUrl.style}}>
             {logModal.iconCheckUrl.content}
+          </div>
+          {/* 封版状态日志 */}
+          <div style={{display: logModal.coveStatus.style}}>
+            {logModal.coveStatus.content}
           </div>
 
           {/* <Form.Item>

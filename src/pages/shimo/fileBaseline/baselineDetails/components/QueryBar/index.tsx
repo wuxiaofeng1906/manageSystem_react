@@ -104,6 +104,12 @@ const QueryBar: React.FC<any> = (props: any) => {
     <div className={queryCondition}>
       <Form form={iterDetailsForm}>
         <Row gutter={5} className={queryRow}>
+          <Col>
+            <Form.Item>
+              <Button icon={<EditTwoTone/>} className={baseLineButton} disabled={showOperate}
+                      onClick={BaseLineClicked}>基线</Button>
+            </Form.Item>
+          </Col>
           <Col span={8}>
             <Form.Item label="迭代名称" name={"iterName"} style={{marginLeft: 10}}>
               <Select className={"iterName"} onChange={iterNameChanged} showSearch
@@ -119,12 +125,7 @@ const QueryBar: React.FC<any> = (props: any) => {
               <Input className={SQA} disabled={true} style={{color: "black"}}/>
             </Form.Item>
           </Col>
-          <Col span={3}>
-            <Form.Item>
-              <Button icon={<EditTwoTone/>} className={baseLineButton} disabled={showOperate}
-                      onClick={BaseLineClicked}>基线</Button>
-            </Form.Item>
-          </Col>
+
         </Row>
       </Form>
     </div>

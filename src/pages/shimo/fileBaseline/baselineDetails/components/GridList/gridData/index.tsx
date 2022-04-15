@@ -138,7 +138,7 @@ const getFileColumns = (filedArray: any) => {
   }
 
   for (let index = 2; index <= maxCount + 1; index += 1) {
-    if (maxCount > 4 && index > 4) {
+    if (maxCount > 4) {
       columns.push({
         headerName: `${index}级文件`,
         field: `${index}_file`,

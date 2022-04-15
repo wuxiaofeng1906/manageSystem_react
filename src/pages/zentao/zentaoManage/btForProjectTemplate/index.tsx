@@ -89,17 +89,22 @@ const ProjectTemplate: React.FC<any> = () => {
     const tabData = getTablesData();
     const atferValue: any = [];
     tabData.forEach((ele: any) => {
+
       // 任务名称需要还原之前的名字再加上执行的名字
       let taskName = ele.task_name;
-      const nameHead = taskName.substring(taskName.indexOf("【") + 1, taskName.indexOf("】"));
-      if (nameHead.includes("-")) { // 如果名称包含-，则需要清除掉这个-
-        const head = nameHead.split("-")[0];
-        taskName = `${taskName.replace(`${head}-`, "")}`;
+      // 如果没有包含 【】，则，不拼接项目名
+      if (taskName.indexOf("【") > -1 && taskName.indexOf("】") > -1) {
+        const nameHead = taskName.substring(taskName.indexOf("【") + 1, taskName.indexOf("】"));
+        if (nameHead.includes("-")) { // 如果名称包含-，则需要清除掉这个-
+          const head = nameHead.split("-")[0];
+          taskName = `${taskName.replace(`${head}-`, "")}`;
+        }
+        taskName = `${taskName.slice(0, 1)}${excuteInfo[1]}-${taskName.slice(1)}`;
       }
-      const new_name = `${taskName.slice(0, 1)}${excuteInfo[1]}-${taskName.slice(1)}`;
+
       atferValue.push({
         ...ele,
-        task_name: new_name,
+        task_name: taskName,
         assigned_person_name: prjManager.user_name,
         module: `${excuteInfo[1]}里程碑`
       });

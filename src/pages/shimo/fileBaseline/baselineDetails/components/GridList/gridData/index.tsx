@@ -2,16 +2,28 @@ import {axiosGet} from "@/publicMethods/axios";
 import {getColumns} from "../columns";
 import {errorMessage} from "@/publicMethods/showMessages";
 
-
+// 根据拿到的最后一层文件获取之前的路径
 const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_allGrid: any, rt_basetimeArray: any) => {
   // 忽略掉对rt_allGrid的检查
   /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["rt_allGrid"] }] */
   for (let i = 0, len = data.length; i < len; i += 1) {
     const current = data[i];
     rt_pathArray.push(current.name);
+
     if (current.file_format !== "folder" && data[i].name === nodeName) {
-      // eslint-disable-next-line no-param-reassign
-      rt_allGrid[`${(rt_pathArray.length) + 1}_file`] = current.name;
+      const fileOrder = (rt_pathArray.length) + 1;
+      // 需要先删除掉rt_allGrid中>currentIndex的file，如果不删除，之前的数据会依旧存在rt_allGrid中
+      const gridKeys = Object.keys(rt_allGrid);
+      gridKeys.forEach((keys: string) => {
+        if (keys.indexOf("_file")) {
+          const num = keys.replace("_file", "");
+          if (num > fileOrder) {
+            delete rt_allGrid[`${num}_file`];
+          }
+        }
+      });
+
+      rt_allGrid[`${fileOrder}_file`] = current.name;
       rt_allGrid["author"] = current.author;
       rt_allGrid["file_format"] = current.file_format;
       rt_allGrid["file_url"] = current.file_url;
@@ -34,11 +46,13 @@ const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_al
       });
 
       rt_basetimeArray.push(baseInfo.length);
-    }
 
-    if (data[i].name === nodeName) {
       return {rt_pathArray, rt_allGrid, rt_basetimeArray};
     }
+
+    // if (data[i].name === nodeName) {
+    //   return {rt_pathArray, rt_allGrid, rt_basetimeArray};
+    // }
     const {children} = data[i]
     if (children && children.length) {
       rt_allGrid[`${(rt_pathArray.length + 1)}_file`] = current.name;

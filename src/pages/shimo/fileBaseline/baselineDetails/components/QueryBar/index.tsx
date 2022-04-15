@@ -65,6 +65,8 @@ const QueryBar: React.FC<any> = (props: any) => {
         setColumns(gridData?.columnsData); // 设置列
         setDetailsData(gridData?.gridData); // 设置数据
 
+      } else if ((result.msg).includes("不能重复创建版本")) {
+        errorMessage("该文档较上次基线无变化，不能重新创建版本！");
       } else {
         errorMessage(result.msg);
       }

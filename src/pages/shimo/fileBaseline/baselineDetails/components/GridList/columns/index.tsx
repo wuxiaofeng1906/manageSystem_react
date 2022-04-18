@@ -19,12 +19,17 @@ const getColumns = (baseFile: any, baseTime: any) => {
           maxWidth: 50,
           pinned: 'left',
         }, {
-          headerName: '序号',
-          minWidth: 70,
+          headerName: '序',
+          minWidth: 60,
           maxWidth: 75,
           pinned: 'left',
+          suppressMenu: true,
           cellRenderer: (params: any) => {
-            return Number(params.node.id) + 1;
+            const currentID = Number(params.node.id) + 1;
+            if (currentID < 10) {
+              return `<span>0${currentID}</span>`;
+            }
+            return `<span>${currentID}</span>`;
           },
         }, {
           headerName: '',
@@ -32,11 +37,11 @@ const getColumns = (baseFile: any, baseTime: any) => {
           cellRenderer: "myUrl",
           pinned: 'left',
           maxWidth: 50,
+          suppressMenu: true,
         }]
     },
     {
       headerName: '文件路径',
-      maxWidth:200,
       children: baseFile
     },
     {
@@ -57,14 +62,14 @@ const getColumns = (baseFile: any, baseTime: any) => {
         headerName: '基线人',
         field: 'baseUser',
         pinned: 'left',
-        minWidth: 90,
+        minWidth: 95,
         maxWidth: 100,
       }, {
         headerName: '是否基线',
         field: 'is_save_version',
         pinned: 'left',
-        minWidth: 90,
-        maxWidth: 100,
+        minWidth: 100,
+        maxWidth: 110,
         cellRenderer: "baseLine"
       }]
     },

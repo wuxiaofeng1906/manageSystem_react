@@ -139,20 +139,20 @@ const getFileColumns = (filedArray: any) => {
       field: '1_file',
       pinned: 'left',
       columnGroupShow: 'open',
-      minWidth:100
+      minWidth: 100
     }, {
       headerName: `${maxCount + 1}级目录`,
       field: `final_files`,
       pinned: 'left',
       columnGroupShow: 'closed',
-      minWidth:100
+      minWidth: 110
     });
   } else {
     columns.push({
       headerName: '1级目录',
       field: '1_file',
       pinned: 'left',
-      minWidth:100
+      minWidth: 100
     });
   }
 
@@ -163,7 +163,7 @@ const getFileColumns = (filedArray: any) => {
         field: `${index}_file`,
         pinned: 'left',
         columnGroupShow: 'open',
-        minWidth:100
+        minWidth: 100
       })
     } else {
       // <= 4层的正常展示
@@ -171,7 +171,7 @@ const getFileColumns = (filedArray: any) => {
         headerName: `${index}级文件`,
         field: `${index}_file`,
         pinned: 'left',
-        minWidth:100
+        minWidth: 100
       })
     }
 

@@ -68,6 +68,7 @@ const GridList: React.FC<any> = (props: any) => {
         <AgGridReact
           columnDefs={columns} // 定义列
           rowData={detailsData} // 数据绑定
+          debounceVerticalScrollbar={true}
           defaultColDef={{
             resizable: true,
             filter:true,

@@ -29,6 +29,8 @@ const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_al
       rt_allGrid["file_url"] = current.file_url;
       rt_allGrid["file_type"] = current.file_type;
       rt_allGrid["guid"] = current.guid;
+      rt_allGrid["execution_save_version"] = current.execution_save_version;
+
       //   获取version
       const baseLineInfo = current.version;
       rt_allGrid["version_id"] = baseLineInfo.version_id;
@@ -215,8 +217,8 @@ const getBaseTimeColumns = (timeArray: any) => {
 
 
 // 获取迭代数据
-const getIterDetailsData = async (myGuid: any) => {
-  const details = await axiosGet("/api/verify/shimo/version_detail", {guid: myGuid});
+const getIterDetailsData = async (myGuid: any, executionId: any) => {
+  const details = await axiosGet("/api/verify/shimo/version_detail", {guid: myGuid, execution_id: executionId});
   if (!details) {
     return {};
   }

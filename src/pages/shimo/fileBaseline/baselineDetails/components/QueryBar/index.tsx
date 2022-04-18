@@ -52,6 +52,7 @@ const QueryBar: React.FC<any> = (props: any) => {
         "file_name": getFileName(ele),
         "file_type": ele.file_type,
         "execution_name": iterName,
+        "execution_id":iterInfoId,
         "user_id": usersInfo.userid === "test" ? "ChenHuan" : usersInfo.userid,
       });
     });
@@ -61,7 +62,7 @@ const QueryBar: React.FC<any> = (props: any) => {
       if (result.code === 200) {
         sucMessage("基线成功！");
         //  基线成功后要刷新数据
-        const gridData: any = await getIterDetailsData(prjInfo.storyId);
+        const gridData: any = await getIterDetailsData(prjInfo.storyId, prjInfo.iterID);
         setColumns(gridData?.columnsData); // 设置列
         setDetailsData(gridData?.gridData); // 设置数据
 

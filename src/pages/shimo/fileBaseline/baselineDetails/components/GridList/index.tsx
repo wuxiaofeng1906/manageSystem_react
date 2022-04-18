@@ -33,7 +33,7 @@ const GridList: React.FC<any> = (props: any) => {
   /* endregion 表格事件 */
 
   const prjInfo = props.hrefParams;
-  const detailsInfo: any = useRequest(() => getIterDetailsData(prjInfo.storyId)).data;
+  const detailsInfo: any = useRequest(() => getIterDetailsData(prjInfo.storyId, prjInfo.iterID)).data;
 
   // 编辑表格
   const cellEditedStoped = async (params: any) => {

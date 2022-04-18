@@ -20,7 +20,7 @@ const Tab: React.FC<any> = (props: any) => {
     if (activeKey === "概设基线") {
       queryType = prjInfo.designId
     }
-    const result: any = await getIterDetailsData(queryType);
+    const result: any = await getIterDetailsData(queryType, prjInfo.iterID);
     setColumns(result?.columnsData); // 设置列
     setDetailsData(result?.gridData); // 设置数据
   };

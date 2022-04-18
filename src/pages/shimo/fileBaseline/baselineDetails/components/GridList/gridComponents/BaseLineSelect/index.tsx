@@ -28,11 +28,17 @@ const BaseLineSelect: React.FC<any> = (props: any) => {
     showOperate = false;
   }
 
+  let Color = "orange";
+  if (props.data?.execution_save_version) {
+    Color = "black";
+  }
+
   return (
     <div className={"treeSelectStyle"}>
       <Select
         size={'small'} defaultValue={props.value}
-        bordered={false} style={{width: '120%'}}
+        bordered={false}
+        style={{width: '120%', color: Color}}
         onChange={(currentValue: any) => {
           gridSelectChanged(props, currentValue);
         }}

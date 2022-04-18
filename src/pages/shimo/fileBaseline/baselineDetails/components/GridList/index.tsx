@@ -69,7 +69,7 @@ const GridList: React.FC<any> = (props: any) => {
           columnDefs={columns} // 定义列
           rowData={detailsData} // 数据绑定
           defaultColDef={{
-            // resizable: true,
+            resizable: true,
             filter:true,
             // suppressMenu: true,
             cellStyle: setCellStyle

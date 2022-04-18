@@ -1,4 +1,3 @@
-
 const manualInput = (params: any) => {
   if (!params.value) {
     return `<div style="color: #A9A9A9">手工输入</div>`;
@@ -78,6 +77,7 @@ const getColumns = (baseFile: any, baseTime: any) => {
         headerName: '最新基线标识',
         field: 'baseFlag',
         minWidth: 110,
+        cellRenderer: "baseFlag"
       }, {
         headerName: '变更禅道编号',
         field: 'zt_num',

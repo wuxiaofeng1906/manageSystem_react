@@ -8,6 +8,7 @@ import {setCellStyle} from "./columns";
 import {gridDiv} from "./style.css"
 import {myUrls} from "./gridComponents/myUrls";
 import {BaseLineSelect} from "./gridComponents/BaseLineSelect";
+import {BaseFlag} from "./gridComponents/BaseFlag";
 import {useModel} from "@@/plugin-model/useModel";
 import {useRequest} from "ahooks";
 import {getIterDetailsData} from "./gridData";
@@ -80,7 +81,10 @@ const GridList: React.FC<any> = (props: any) => {
           }}
           frameworkComponents={{
             myUrl: myUrls,
-            baseLine: BaseLineSelect
+            baseLine: BaseLineSelect,
+            baseFlag: (params: any) => {
+              return BaseFlag(params, prjInfo)
+            }
           }}
           rowSelection={'multiple'}
           onCellEditingStopped={cellEditedStoped}

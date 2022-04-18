@@ -45,7 +45,7 @@ const getColumns = (baseFile: any, baseTime: any) => {
         field: 'file_format',
         pinned: 'left',
         minWidth: 90,
-        maxWidth: 100,
+        // maxWidth: 110,
       }, {
         headerName: '作者',
         field: 'author',

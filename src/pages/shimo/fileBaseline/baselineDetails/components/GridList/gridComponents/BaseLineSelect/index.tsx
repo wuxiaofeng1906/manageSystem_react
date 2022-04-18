@@ -28,9 +28,9 @@ const BaseLineSelect: React.FC<any> = (props: any) => {
     showOperate = false;
   }
 
-  let Color = "orange";
-  if (props.data?.execution_save_version) {
-    Color = "black";
+  let Color = "black";
+  if (props.value === "yes" && !props.data?.execution_save_version) {
+    Color = "orange";
   }
 
   return (

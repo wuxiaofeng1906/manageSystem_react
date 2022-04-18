@@ -45,8 +45,9 @@ const BaseLineSelect: React.FC<any> = (props: any) => {
         disabled={showOperate}
       >
         <Option key="free" value="free">免</Option>
+        <Option key="no" value="no">否</Option>
         <Option key="yes" value="yes" disabled={true}>是</Option>
-        <Option key="no" value="no" disabled={true}>否</Option>
+
       </Select>
     </div>
 

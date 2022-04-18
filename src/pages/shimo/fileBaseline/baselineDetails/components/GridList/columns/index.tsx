@@ -36,6 +36,7 @@ const getColumns = (baseFile: any, baseTime: any) => {
     },
     {
       headerName: '文件路径',
+      maxWidth:200,
       children: baseFile
     },
     {

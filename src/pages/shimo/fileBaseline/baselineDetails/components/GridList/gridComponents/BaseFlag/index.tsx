@@ -16,7 +16,7 @@ const BaseFlag: React.FC<any> = (props: any, prjInfo: any) => {
   const tailInfo = baseFlag.replace(baseLineInfo[0], "");
   return (
     <div>
-      <label style={{color: "orange"}}>{baseLineInfo[0]}</label>_
+      <label style={{color: "orange"}}>{baseLineInfo[0]}</label>
       <label>{tailInfo}</label>
     </div>
 

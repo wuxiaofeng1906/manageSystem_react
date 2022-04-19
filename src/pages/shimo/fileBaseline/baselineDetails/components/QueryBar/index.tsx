@@ -13,7 +13,7 @@ const QueryBar: React.FC<any> = (props: any) => {
   const userLogins: any = localStorage.getItem('userLogins');
   const usersInfo = JSON.parse(userLogins);
 
-  const {gridApi, setDetailsData, setColumns} = useModel("iterateList.index");
+  const {gridApi, setDetailsData, setColumns, tabsInfo} = useModel("iterateList.index");
   const prjInfo = props.hrefParams;
   const iterateList: any = useRequest(() => getIterSelect()).data;
   const [iterDetailsForm] = Form.useForm();
@@ -52,7 +52,7 @@ const QueryBar: React.FC<any> = (props: any) => {
         "file_name": getFileName(ele),
         "file_type": ele.file_type,
         "execution_name": iterName,
-        "execution_id":iterInfoId,
+        "execution_id": iterInfoId,
         "user_id": usersInfo.userid === "test" ? "ChenHuan" : usersInfo.userid,
       });
     });
@@ -61,8 +61,12 @@ const QueryBar: React.FC<any> = (props: any) => {
     if (JSON.stringify(result) !== "{}") {
       if (result.code === 200) {
         sucMessage("基线成功！");
-        //  基线成功后要刷新数据
-        const gridData: any = await getIterDetailsData(prjInfo.storyId, prjInfo.iterID);
+        //  基线成功后要刷新数据 （看看当前是哪个tab）
+        let queryId = prjInfo.storyId;
+        if (tabsInfo.activeKey === "概设基线") {
+          queryId = prjInfo.designId;
+        }
+        const gridData: any = await getIterDetailsData(queryId, prjInfo.iterID);
         setColumns(gridData?.columnsData); // 设置列
         setDetailsData(gridData?.gridData); // 设置数据
 

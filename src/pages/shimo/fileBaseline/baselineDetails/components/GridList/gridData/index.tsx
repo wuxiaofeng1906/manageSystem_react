@@ -124,6 +124,31 @@ const contactResult = (oraData: any, firstName: string) => {
   return result;
 };
 
+// 文件路径各文件排序（没有数字开头的按字母降序，有数字开头的按数字降序）
+const sortFileData = (oraData: any, filedArray: any) => {
+
+  const arraySort = filedArray.sort((a: number, b: number) => {
+    return b - a
+  });
+  const maxCount = arraySort[0];
+
+  let newData: any = oraData;
+  for (let index = 0; index < maxCount; index += 1) {
+    newData = newData.sort((a: any, b: any) => {
+
+      const keys = `${index + 1}_file`;
+      if (b[`${index}_file`] === a[`${index}_file`]) { // 如果上一级文件相等，则调整下一个文件的位置，否则，不调整。
+        if (Object.keys(a).indexOf(keys) > -1 && Object.keys(b).indexOf(keys) > -1) {
+          const rt = b[keys].localeCompare(a[keys]);
+          return rt;
+        }
+      }
+
+      return 0;  // 0 为保持原样
+    });
+  }
+  return newData;
+};
 // 文件路径的列定义
 const getFileColumns = (filedArray: any) => {
 
@@ -252,7 +277,8 @@ const getIterDetailsData = async (myGuid: any, executionId: any) => {
       getChildData(details.children, details.children, gridResult, filedArrayLength, basetimeLength);
     }
     // 数据
-    const gridData = contactResult(gridResult, details.parent?.name);
+    let gridData = contactResult(gridResult, details.parent?.name);
+    gridData = sortFileData(gridData, filedArrayLength);
 
     // 获取文件的列
     const fileColumns = getFileColumns(filedArrayLength);
@@ -260,7 +286,6 @@ const getIterDetailsData = async (myGuid: any, executionId: any) => {
     const basetimeColumns = getBaseTimeColumns(basetimeLength);
 
     const columnsData = getColumns(fileColumns, basetimeColumns);
-
     return {gridData, columnsData}
   } catch (e) {
     errorMessage(e);

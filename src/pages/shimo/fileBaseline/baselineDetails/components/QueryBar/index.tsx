@@ -83,13 +83,15 @@ const QueryBar: React.FC<any> = (props: any) => {
 
     const sqaInfo = await getSqaByIterName(iterId);
 
-    let sqa_user = "";
-    if (sqaInfo && sqaInfo.user_name) {
-      sqa_user = sqaInfo.user_name;
+    const sqa_user: any = [];
+    if (sqaInfo && sqaInfo.length) {
+      sqaInfo.forEach((ele: any) => {
+        sqa_user.push(ele.user_name);
+      });
     }
     iterDetailsForm.setFieldsValue({
       iterName: iterId,
-      SQA: sqa_user
+      SQA: sqa_user.join("，")
     });
   };
 

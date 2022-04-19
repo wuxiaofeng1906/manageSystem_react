@@ -72,7 +72,7 @@ const GridList: React.FC<any> = (props: any) => {
           defaultColDef={{
             resizable: true,
             filter:true,
-            // suppressMenu: true,
+            suppressMenu: true,
             cellStyle: setCellStyle
           }}
           rowHeight={28}

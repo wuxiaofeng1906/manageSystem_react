@@ -82,7 +82,7 @@ const getColumns = (baseFile: any, baseTime: any) => {
       children: [{
         headerName: '最新基线标识',
         field: 'baseFlag',
-        minWidth: 110,
+        minWidth: 120,
         cellRenderer: "baseFlag"
       }, {
         headerName: '变更禅道编号',

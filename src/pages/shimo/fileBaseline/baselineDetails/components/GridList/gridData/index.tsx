@@ -140,20 +140,23 @@ const getFileColumns = (filedArray: any) => {
       field: '1_file',
       pinned: 'left',
       columnGroupShow: 'open',
-      minWidth: 100
+      minWidth: 100,
+      suppressMenu: false,
     }, {
       headerName: `${maxCount + 1}级目录`,
       field: `final_files`,
       pinned: 'left',
       columnGroupShow: 'closed',
-      minWidth: 110
+      minWidth: 110,
+      suppressMenu: false,
     });
   } else {
     columns.push({
       headerName: '1级目录',
       field: '1_file',
       pinned: 'left',
-      minWidth: 100
+      minWidth: 100,
+      suppressMenu: false,
     });
   }
 
@@ -164,7 +167,8 @@ const getFileColumns = (filedArray: any) => {
         field: `${index}_file`,
         pinned: 'left',
         columnGroupShow: 'open',
-        minWidth: 100
+        minWidth: 100,
+        suppressMenu: false,
       })
     } else {
       // <= 4层的正常展示
@@ -172,7 +176,8 @@ const getFileColumns = (filedArray: any) => {
         headerName: `${index}级文件`,
         field: `${index}_file`,
         pinned: 'left',
-        minWidth: 100
+        minWidth: 100,
+        suppressMenu: false,
       })
     }
 
@@ -203,6 +208,7 @@ const getBaseTimeColumns = (timeArray: any) => {
       headerName: `最新基线时间`,
       field: `final_times`,
       columnGroupShow: 'closed',
+      minWidth: 120,
     });
   }
 
@@ -210,6 +216,7 @@ const getBaseTimeColumns = (timeArray: any) => {
     const baseObject = {
       headerName: `${index}次基线时间`,
       field: `${index}_time`,
+      minWidth: 120,
     };
 
     if (maxCount > 4) {

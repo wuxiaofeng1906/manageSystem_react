@@ -403,15 +403,16 @@ export default [
     ],
   },
   {
+    name: '工具入口',
+    icon: 'table',
+    path: 'toolIntegration',
+    component: './toolIntegration',
+  },
+  {
     name: '检查工具',
     icon: 'table',
     path: '/checkTools',
     routes: [
-      {
-        name: '工具入口',
-        path: 'toolIntegration',
-        component: './checkTools/toolIntegration',
-      },
       {
         name: '上线前检查',
         path: 'checkBeforeOnline',

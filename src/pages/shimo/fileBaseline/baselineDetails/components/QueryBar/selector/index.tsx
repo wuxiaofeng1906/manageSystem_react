@@ -4,7 +4,7 @@ import {Select} from 'antd';
 const {Option} = Select;
 
 const getIterSelect = async () => {
-  const iterData = await axiosGet("/api/verify/zentao/executions");
+  const iterData = await axiosGet("/api/verify/shimo/execution");
   const selectArray: any = [];
   if (iterData && iterData.length > 0) {
     iterData.forEach((iter: any) => {
@@ -18,7 +18,7 @@ const getIterSelect = async () => {
 
 // 根据id获取名称
 const getIterSelectedValue = async (iterId: any) => {
-  const iterData = await axiosGet("/api/verify/zentao/executions");
+  const iterData = await axiosGet("/api/verify/shimo/execution");
   let iterName = "";
   if (iterData && iterData.length > 0) {
     for (let index = 0; index < iterData.length; index += 1) {

@@ -159,7 +159,7 @@ const getFileColumns = (filedArray: any) => {
   const columns: any = [];
 
   // 如果目录大于4级时，则需要收缩
-  if (maxCount > 4) {
+  if (maxCount > 3) {   // 因为还有一个一级目录需要算上，一共4级才收缩
     columns.push({
       headerName: '1级目录',
       field: '1_file',
@@ -186,7 +186,7 @@ const getFileColumns = (filedArray: any) => {
   }
 
   for (let index = 2; index <= maxCount + 1; index += 1) {
-    if (maxCount > 4) {
+    if (maxCount > 3) {
       columns.push({
         headerName: `${index}级文件`,
         field: `${index}_file`,

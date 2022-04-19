@@ -42,6 +42,7 @@ const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_al
         rt_allGrid[`${index + 1}_time`] = ele.save_time;
         // 基线人和基线标识都取最后一个
         if (index === baseInfo.length - 1) {
+
           rt_allGrid["baseUser"] = ele.save_version_user_name;
           rt_allGrid["baseFlag"] = ele.save_logo;
         }

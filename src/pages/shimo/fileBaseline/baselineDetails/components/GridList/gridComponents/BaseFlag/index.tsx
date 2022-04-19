@@ -13,11 +13,11 @@ const BaseFlag: React.FC<any> = (props: any, prjInfo: any) => {
 
   // 如果不是选中的项目，则把原先的名字标红。
   const baseLineInfo = baseFlag.split("_");
+  const tailInfo = baseFlag.replace(baseLineInfo[0], "");
   return (
     <div>
       <label style={{color: "orange"}}>{baseLineInfo[0]}</label>_
-      <label>{baseLineInfo[1]}</label>_
-      <label>{baseLineInfo[2]}</label>
+      <label>{tailInfo}</label>
     </div>
 
   );

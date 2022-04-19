@@ -86,7 +86,6 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
   // 项目执行修改
   const excutionChanged = async (values: any, params: any,) => {
-
     const excuteInfo = values.split("&");
     const spProjectAssigned = (await loadProjectManager(Number(excuteInfo[0])));
     // 同样需要同步人
@@ -98,8 +97,16 @@ const CheckBeforeOnline: React.FC<any> = () => {
         assingedToTester: dutyInfo.test
       });
     } else {
+
+      const SQA = spProjectAssigned.sqa;
+      const SqaArray: any = [];
+      if (SQA && SQA.length) {
+        SQA.forEach((ele: any) => {
+          SqaArray.push(ele.user_name);
+        });
+      }
       formForZentaoTask.setFieldsValue({
-        assingedToSQA: spProjectAssigned.sqa.user_name,
+        assingedToSQA: SqaArray,
         assingedToFront: spProjectAssigned.front.user_name,
         assingedToBackend: spProjectAssigned.backend.user_name,
         assingedToTester: spProjectAssigned.test.user_name,
@@ -297,6 +304,7 @@ const CheckBeforeOnline: React.FC<any> = () => {
                 <Col span={6}>
                   <Form.Item label="SQA指派人:" name="assingedToSQA" required={true} style={{marginLeft: 19}}>
                     <Select style={{width: '100%'}}
+                            mode="multiple"
                             onChange={(params: any) => {
                               changeAssignedTo("SQA", params);
                             }}>

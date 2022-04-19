@@ -130,8 +130,14 @@ const getChildTaskPersonForPrj = (newDts: any, assignedTo: any) => {
       return assignedTo.test.user_name;
     }
   } else if ((newDts.task_name).toString().includes("sqa】")) {
-    if (assignedTo.sqa && (assignedTo.sqa).user_name) {
-      return assignedTo.sqa.user_name;
+    if (assignedTo.sqa && (assignedTo.sqa).length) {
+
+      const SQA: any = [];
+      (assignedTo.sqa).forEach((ele: any) => {
+        SQA.push(ele.user_name);
+      });
+      // return SQA.join(",");
+      return SQA[0];
     }
   }
   return "";

@@ -200,7 +200,7 @@ const getBaseTimeColumns = (timeArray: any) => {
   // 超过4列则收缩
   if (maxCount > 4) {
     columns.push({
-      headerName: `${maxCount}次基线时间`,
+      headerName: `最新基线时间`,
       field: `final_times`,
       columnGroupShow: 'closed',
     });

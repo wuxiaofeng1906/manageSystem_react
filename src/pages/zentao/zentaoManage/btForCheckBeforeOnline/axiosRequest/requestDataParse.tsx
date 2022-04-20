@@ -202,7 +202,8 @@ const generateTask = async (tempInfo: any, fromData: any, gridData: any) => {
       message: "后端指派人不能为空！",
     }
   }
-  if (!fromData.assingedToSQA) {
+  debugger;
+  if (!fromData.assingedToSQA || (fromData.assingedToSQA).length === 0) {
     return {
       sucess: false,
       message: "SQA指派人不能为空！",

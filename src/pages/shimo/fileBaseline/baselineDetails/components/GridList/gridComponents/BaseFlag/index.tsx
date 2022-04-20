@@ -7,7 +7,7 @@ const BaseFlag: React.FC<any> = (props: any, prjInfo: any) => {
   if (!baseFlag) {
     return (<div></div>);
   }
-  if (baseFlag.startsWith(prjInfo.iterName)) {
+  if (baseFlag.startsWith(`${prjInfo.iterName}_`)) {
     return (<div>{baseFlag}</div>);
   }
 

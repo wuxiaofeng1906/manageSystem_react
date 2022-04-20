@@ -145,7 +145,6 @@ const CheckBeforeOnline: React.FC<any> = () => {
         taskname = `${taskName.slice(0, 2)}${excuteInfo[1]}-${taskName.slice(2)}`;
       }
 
-
       atferValue.push({
         ...ele,
         assigned_person_name: assignedTo,
@@ -180,14 +179,17 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
   // 指派人修改后，也要对应修改表格中所属端的指派人(只是修改子任务指派人)
   const changeAssignedTo = (side: string, currentValue: any) => {
+
     const tabData = getTablesData();
     const atferValue: any = [];
     tabData.forEach((ele: any) => {
       if (side === "Front" && (ele.task_name).includes("前端】")
         || side === "Backend" && (ele.task_name).includes("后端】")
         || side === "Tester" && (ele.task_name).includes("测试】")
-        || side === "SQA" && (ele.task_name).includes("sqa】")) {
+      ) {
         atferValue.push({...ele, assigned_person_name: currentValue});
+      } else if (side === "SQA" && (ele.task_name).includes("sqa】")) {
+        atferValue.push({...ele, assigned_person_name: currentValue.join(",")});
       } else {
         atferValue.push(ele);
       }

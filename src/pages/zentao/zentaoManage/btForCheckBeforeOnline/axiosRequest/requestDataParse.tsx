@@ -136,8 +136,8 @@ const getChildTaskPersonForPrj = (newDts: any, assignedTo: any) => {
       (assignedTo.sqa).forEach((ele: any) => {
         SQA.push(ele.user_name);
       });
-      // return SQA.join(",");
-      return SQA[0];
+      return SQA.join(",");
+      // return SQA[0];
     }
   }
   return "";
@@ -173,102 +173,117 @@ const getTempDetails = async (tempId: string, assignedTo: any) => {
 
 // 任务生成
 const generateTask = async (tempInfo: any, fromData: any, gridData: any) => {
+  try {
+    // 所属执行不能为空
+    if (!fromData.belongExcution) {
+      return {
+        sucess: false,
+        message: "所属执行不能为空！",
+      }
+    }
 
-  // 所属执行不能为空
-  if (!fromData.belongExcution) {
+    // 其他指派人不能为空
+    if (!fromData.assingedToFront) {
+      return {
+        sucess: false,
+        message: "前端指派人不能为空！",
+      }
+    }
+
+    if (!fromData.assingedToTester) {
+      return {
+        sucess: false,
+        message: "测试指派人不能为空！",
+      }
+    }
+    if (!fromData.assingedToBackend) {
+      return {
+        sucess: false,
+        message: "后端指派人不能为空！",
+      }
+    }
+
+    if (!fromData.assingedToSQA || (fromData.assingedToSQA).length === 0) {
+      return {
+        sucess: false,
+        message: "SQA指派人不能为空！",
+      }
+    }
+
+    if (!gridData || gridData.length === 0) {
+
+      return {
+        sucess: false,
+        message: "列表中任务不能为空！",
+      }
+    }
+
+    const usersInfo = await convertUserNameToID();
+
+    const headData = {
+      "temp_id": tempInfo.id,
+      "start_time": dayjs(fromData.planStart).format("YYYY-MM-DD"),
+      "end_time": dayjs(fromData.planEnd).format("YYYY-MM-DD"),
+      "execution_id": (fromData.belongExcution).split("&")[0],
+      "sqa": usersInfo[(fromData.assingedToSQA)[0]],
+      "test": usersInfo[fromData.assingedToTester],
+      "front": usersInfo[fromData.assingedToFront],
+      "backend": usersInfo[fromData.assingedToBackend]
+    };
+    const gridDataArray: any = [];
+    gridData.forEach((ele: any) => {
+
+      // 是否裁剪，是的时候不传（因为不做执行）
+      if (ele.is_tailoring !== "yes") {
+        // console.log(ele.task_name, ele.assigned_person_name)
+        // 如果指派人是两个，则只取第一个
+        let assignedPerson = "";
+        if (ele.assigned_person_name) {
+          const assigned = (ele.assigned_person_name).split(",");
+          assignedPerson = assigned[0].toString();
+        }
+
+        gridDataArray.push({
+          "add_type": ele.add_type,
+          "task_type": ele.task_type,
+          "task_name": ele.task_name,
+          "module": ele.module,
+          "subtask_dev_needs": ele.subtask_dev_needs,
+          "assigned_person": assignedPerson,
+          "priority": ele.priority,
+          "estimate": ele.estimate,
+          "desc": ele.desc,
+          "belongs": ele.belongs,
+          "tasksource": ele.tasksource,
+          "edit_user": usersLoginInfo.userid,
+          "temp_type": tempInfo.type,
+          "is_tailoring": "yes",
+          "start_time": ele.plan_start,
+          "end_time": ele.plan_end,
+          "task_id": ele.task_id,
+          "parent": ele.parent,
+        })
+      }
+
+    });
+
+    if (gridDataArray.length === 0) {
+      return {
+        sucess: false,
+        message: "列表中任务不能为空或者列表中的数据都被裁剪！",
+      }
+    }
+    return await requestGenerateTaskApi({
+      "person": headData,
+      "task_data": gridDataArray
+    });
+  } catch (e) {
+    // console.log("异常信息：", e);
     return {
       sucess: false,
-      message: "所属执行不能为空！",
-    }
+      message: `异常信息：${e.toString()}`,
+    };
   }
-
-  // 其他指派人不能为空
-  if (!fromData.assingedToFront) {
-    return {
-      sucess: false,
-      message: "前端指派人不能为空！",
-    }
-  }
-
-  if (!fromData.assingedToTester) {
-    return {
-      sucess: false,
-      message: "测试指派人不能为空！",
-    }
-  }
-  if (!fromData.assingedToBackend) {
-    return {
-      sucess: false,
-      message: "后端指派人不能为空！",
-    }
-  }
-  debugger;
-  if (!fromData.assingedToSQA || (fromData.assingedToSQA).length === 0) {
-    return {
-      sucess: false,
-      message: "SQA指派人不能为空！",
-    }
-  }
-
-  if (!gridData || gridData.length === 0) {
-
-    return {
-      sucess: false,
-      message: "列表中任务不能为空！",
-    }
-  }
-
-  const usersInfo = await convertUserNameToID();
-
-  const headData = {
-    "temp_id": tempInfo.id,
-    "start_time": dayjs(fromData.planStart).format("YYYY-MM-DD"),
-    "end_time": dayjs(fromData.planEnd).format("YYYY-MM-DD"),
-    "execution_id": (fromData.belongExcution).split("&")[0],
-    "sqa": usersInfo[fromData.assingedToSQA],
-    "test": usersInfo[fromData.assingedToTester],
-    "front": usersInfo[fromData.assingedToFront],
-    "backend": usersInfo[fromData.assingedToBackend]
-  };
-  const gridDataArray: any = [];
-  gridData.forEach((ele: any) => {
-
-    // 是否裁剪，是的时候不传（因为不做执行）
-    if (ele.is_tailoring !== "yes") {
-      gridDataArray.push({
-        "add_type": ele.add_type,
-        "task_type": ele.task_type,
-        "task_name": ele.task_name,
-        "module": ele.module,
-        "subtask_dev_needs": ele.subtask_dev_needs,
-        "assigned_person": usersInfo[ele.assigned_person_name],
-        "priority": ele.priority,
-        "estimate": ele.estimate,
-        "desc": ele.desc,
-        "belongs": ele.belongs,
-        "tasksource": ele.tasksource,
-        "edit_user": usersLoginInfo.userid,
-        "temp_type": tempInfo.type,
-        "is_tailoring": "yes",
-        "start_time": ele.plan_start,
-        "end_time": ele.plan_end,
-        "task_id": ele.task_id,
-        "parent": ele.parent,
-      })
-    }
-
-  });
-
-  if (gridDataArray.length === 0) {
-    return {
-      sucess: false,
-      message: "列表中任务不能为空或者列表中的数据都被裁剪！",
-    }
-  }
-  return await requestGenerateTaskApi({
-    "person": headData,
-    "task_data": gridDataArray
-  });
 };
 
 export {

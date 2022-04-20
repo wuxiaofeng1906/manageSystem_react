@@ -76,12 +76,30 @@ const getDutyPerson = async () => {
           dutyPerson.backend = ((info.user_name).split("/")[0]).toString();
         } else if (info.user_tech === "测试") {
           dutyPerson.test = ((info.user_name).split("/")[0]).toString();
-        } else if (info.user_tech === "SQA") {
+        }
+      });
+    }
+  }
+
+  // SQA 的人要拿下一周的人
+  const nextWeek = {
+    start: dayjs().startOf('week').add(8, 'day').format("YYYY/MM/DD"),
+    end: dayjs().endOf('week').add(8, 'day').format("YYYY/MM/DD"),
+  };
+
+  const SQAInfo = await queryDutyCardInfo(nextWeek);
+
+  if (SQAInfo && (SQAInfo.datas).length === 1) {
+    const dutyInfos = (SQAInfo.datas)[0];
+    if (dutyInfos && dutyInfos.length > 0) {
+      dutyInfos.forEach((info: any) => {
+        if (info.user_tech === "SQA") {
           dutyPerson.sqa = ((info.user_name).split("/")[0]).toString();
         }
       });
     }
   }
+
 
   return dutyPerson;
 };

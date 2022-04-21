@@ -123,9 +123,13 @@ const setCellStyle = (params: any) => {
     style["background-color"] = '#F8F8F8';
   }
 
-  if ((params.column?.colId).indexOf("_time") > -1 && params.column?.colId !=="final_times") {
-    style["background-color"] = 'white';
+  // 如果是管理员
+  if ((JSON.parse(localStorage.getItem('userLogins') as string)).group === "superGroup") {
+    if ((params.column?.colId).indexOf("_time") > -1 && params.column?.colId !== "final_times") {
+      style["background-color"] = 'white';
+    }
   }
+
 
   return style;
 

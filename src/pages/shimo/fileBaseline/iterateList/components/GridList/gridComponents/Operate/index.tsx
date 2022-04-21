@@ -38,21 +38,21 @@ const Operate: React.FC<any> = (props: any) => {
   };
 
   // 只有管理员才能操作按钮
-  let showOperate = true;
+  let hideOperate = true;
   if ((JSON.parse(localStorage.getItem('userLogins') as string)).group === "superGroup") {
-    showOperate = false;
+    hideOperate = false;
   }
   return (
     <div>
       <Button type="text" className={"bt_operate"} icon={<CopyOutlined/>} onClick={copyRow}
-              disabled={showOperate}></Button>
+              disabled={hideOperate}></Button>
       <Popconfirm
         icon={<QuestionCircleOutlined/>}
         title="确定删除这条数据吗？"
         okText="是"
         cancelText="否"
-        onConfirm={delRow} disabled={showOperate}>
-        <Button type="text" className={"bt_operate"} icon={<MinusOutlined/>} disabled={showOperate}></Button>
+        onConfirm={delRow} disabled={hideOperate}>
+        <Button type="text" className={"bt_operate"} icon={<MinusOutlined/>} disabled={hideOperate}></Button>
       </Popconfirm>
 
     </div>);

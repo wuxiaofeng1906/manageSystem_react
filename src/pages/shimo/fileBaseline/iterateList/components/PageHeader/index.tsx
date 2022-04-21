@@ -61,16 +61,16 @@ const PageHeader: React.FC<any> = () => {
   };
 
   // 只有管理员才能操作按钮
-  let showOperate = true;
+  let hideOperate = true;
   if ((JSON.parse(localStorage.getItem('userLogins') as string)).group === "superGroup") {
-    showOperate = false;
+    hideOperate = false;
   }
 
   return (
     <PageContainer className="myContainers"
                    extra={[
                      <Button icon={<CopyOutlined/>} className={vertifyButton} size={"small"}
-                             disabled={showOperate}
+                             disabled={hideOperate}
                              onClick={vertifyListRepeat}>列表验重</Button>
                    ]}/>
   );

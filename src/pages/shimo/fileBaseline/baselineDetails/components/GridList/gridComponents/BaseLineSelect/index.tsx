@@ -24,9 +24,9 @@ const BaseLineSelect: React.FC<any> = (props: any, prjInfo: any) => {
   };
 
   // 只有管理员才能操作按钮
-  let showOperate = true;
+  let hideOperate = true;
   if ((JSON.parse(localStorage.getItem('userLogins') as string)).group === "superGroup") {
-    showOperate = false;
+    hideOperate = false;
   }
 
   // let Color = "black";
@@ -34,7 +34,7 @@ const BaseLineSelect: React.FC<any> = (props: any, prjInfo: any) => {
   //   Color = "orange";
   // }
   let disableValue = false;
-  if(props.value === "yes"){
+  if (props.value === "yes") {
     disableValue = true;
   }
   return (
@@ -45,7 +45,7 @@ const BaseLineSelect: React.FC<any> = (props: any, prjInfo: any) => {
         onChange={(currentValue: any) => {
           gridSelectChanged(props, currentValue);
         }}
-        disabled={showOperate}
+        disabled={hideOperate}
       >
         <Option key="free" value="free" disabled={disableValue}>免</Option>
         <Option key="no" value="no" disabled={disableValue}>否</Option>

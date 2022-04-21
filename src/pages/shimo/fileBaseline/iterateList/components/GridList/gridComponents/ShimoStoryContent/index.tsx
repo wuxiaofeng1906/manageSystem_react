@@ -56,9 +56,9 @@ const ShimoStoryContent: React.FC<any> = (props: any) => {
   };
 
   // 只有管理员才能操作按钮
-  let showOperate = true;
+  let hideOperate = true;
   if ((JSON.parse(localStorage.getItem('userLogins') as string)).group === "superGroup") {
-    showOperate = false;
+    hideOperate = false;
   }
 
   useEffect(() => {
@@ -81,7 +81,7 @@ const ShimoStoryContent: React.FC<any> = (props: any) => {
       onChange={storyContentChanged}
       loadData={loadChildTree}
       treeData={tree.treeData}
-      disabled={showOperate}
+      disabled={hideOperate}
     />
   </div>);
 };

@@ -96,9 +96,9 @@ const QueryBar: React.FC<any> = (props: any) => {
   };
 
   // 只有管理员才能操作按钮
-  let showOperate = true;
+  let hideOperate = true;
   if ((JSON.parse(localStorage.getItem('userLogins') as string)).group === "superGroup") {
-    showOperate = false;
+    hideOperate = false;
   }
 
   useEffect(() => {
@@ -115,7 +115,7 @@ const QueryBar: React.FC<any> = (props: any) => {
         <Row gutter={5} className={queryRow}>
           <Col>
             <Form.Item>
-              <Button icon={<EditTwoTone/>} className={baseLineButton} disabled={showOperate}
+              <Button icon={<EditTwoTone/>} className={baseLineButton} disabled={hideOperate}
                       onClick={BaseLineClicked}>基线</Button>
             </Form.Item>
           </Col>

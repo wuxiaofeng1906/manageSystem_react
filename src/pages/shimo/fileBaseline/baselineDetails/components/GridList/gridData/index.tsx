@@ -29,7 +29,7 @@ const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_al
       rt_allGrid["file_url"] = current.file_url;
       rt_allGrid["file_type"] = current.file_type;
       rt_allGrid["guid"] = current.guid;
-      rt_allGrid["execution_save_version"] = current.execution_save_version;
+      // rt_allGrid["execution_save_version"] = current.execution_save_version;
 
       //   获取version
       const baseLineInfo = current.version;
@@ -40,6 +40,7 @@ const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_al
       const baseInfo = baseLineInfo.save_version_data;
       baseInfo.forEach((ele: any, index: number) => {
         rt_allGrid[`${index + 1}_time`] = ele.save_time;
+        rt_allGrid[`${index + 1}_saveTimeId`] = ele.save_id; // saveId用于删除当前版本的作用
         // 基线人和基线标识都取最后一个
         if (index === baseInfo.length - 1) {
 
@@ -242,6 +243,12 @@ const getBaseTimeColumns = (timeArray: any) => {
       headerName: `${index}次基线时间`,
       field: `${index}_time`,
       minWidth: 120,
+      editable: () => {
+        if ((JSON.parse(localStorage.getItem('userLogins') as string)).group === "superGroup") {
+          return true;
+        }
+        return false;
+      }
     };
 
     if (maxCount > 4) {

@@ -5,7 +5,7 @@ import {sucMessage} from "@/publicMethods/showMessages";
 import "../style.less";
 
 const {Option} = Select;
-const BaseLineSelect: React.FC<any> = (props: any) => {
+const BaseLineSelect: React.FC<any> = (props: any, prjInfo: any) => {
   // 是否基线选择
   const gridSelectChanged = async (oraData: any, currentValue: any) => {
 
@@ -13,7 +13,8 @@ const BaseLineSelect: React.FC<any> = (props: any) => {
       "version_id": oraData.data?.version_id,
       "is_save_version": currentValue,
       "remark": oraData.data?.remark,
-      "zt_num": oraData.data?.zt_num
+      "zt_num": oraData.data?.zt_num,
+      "execution_id": prjInfo.iterID
     };
     const result = await modifyGridCells(data);
 
@@ -28,24 +29,26 @@ const BaseLineSelect: React.FC<any> = (props: any) => {
     showOperate = false;
   }
 
-  let Color = "black";
-  if (props.value === "yes" && !props.data?.execution_save_version) {
-    Color = "orange";
+  // let Color = "black";
+  // if (props.value === "yes" && !props.data?.execution_save_version) {
+  //   Color = "orange";
+  // }
+  let disableValue = false;
+  if(props.value === "yes"){
+    disableValue = true;
   }
-
   return (
     <div className={"treeSelectStyle"}>
       <Select
         size={'small'} defaultValue={props.value}
         bordered={false}
-        style={{width: '120%', color: Color}}
         onChange={(currentValue: any) => {
           gridSelectChanged(props, currentValue);
         }}
         disabled={showOperate}
       >
-        <Option key="free" value="free">免</Option>
-        <Option key="no" value="no">否</Option>
+        <Option key="free" value="free" disabled={disableValue}>免</Option>
+        <Option key="no" value="no" disabled={disableValue}>否</Option>
         <Option key="yes" value="yes" disabled={true}>是</Option>
 
       </Select>

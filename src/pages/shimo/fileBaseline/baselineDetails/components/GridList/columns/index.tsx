@@ -113,7 +113,7 @@ const getColumns = (baseFile: any, baseTime: any) => {
   return columns;
 };
 
-
+// 设置表格的数据
 const setCellStyle = (params: any) => {
   const style = {"line-height": "28px"};
 
@@ -122,6 +122,11 @@ const setCellStyle = (params: any) => {
     && params.column?.colId !== "remark") {
     style["background-color"] = '#F8F8F8';
   }
+
+  if ((params.column?.colId).indexOf("_time") > -1 && params.column?.colId !=="final_times") {
+    style["background-color"] = 'white';
+  }
+
   return style;
 
 };

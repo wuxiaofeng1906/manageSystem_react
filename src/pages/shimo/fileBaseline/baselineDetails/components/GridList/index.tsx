@@ -12,8 +12,8 @@ import {BaseFlag} from "./gridComponents/BaseFlag";
 import {useModel} from "@@/plugin-model/useModel";
 import {useRequest} from "ahooks";
 import {getIterDetailsData} from "./gridData";
-import {modifyGridCells} from "./cellEdit";
-import {sucMessage} from "@/publicMethods/showMessages";
+import {modifyGridCells, deteleBaselinieTime} from "./cellEdit";
+import {sucMessage, warnMessage} from "@/publicMethods/showMessages";
 
 const GridList: React.FC<any> = (props: any) => {
   const {
@@ -38,23 +38,49 @@ const GridList: React.FC<any> = (props: any) => {
   // 编辑表格
   const cellEditedStoped = async (params: any) => {
 
-    const data = {
-      "version_id": params.data?.version_id,
-      "is_save_version": params.data?.is_save_version,
-      "zt_num": params.data?.zt_num,
-      "remark": params.data?.remark
-    };
+    // 需要判断是否是修改基线时间（是否为空，只有为空，才是删除）
 
-    if (params.column?.colId === "zt_num") {
-      data.zt_num = params.newValue;
-    } else if (params.column?.colId === "remark") {
-      data.remark = params.newValue;
-    }
-    const result = await modifyGridCells(data);
+    const currentColumn = params.column.colId;
+    if (currentColumn.indexOf("_time") > -1) {
+      if (params.newValue.trim() === "") { // 只有为空时才是删除
+        const currentSaveIdString = currentColumn.replace("_time", "_saveTimeId");
+        const currentSaveId = (params.data)[currentSaveIdString];
+        // 根据列名获取saveid
+        const result = await deteleBaselinieTime(currentSaveId);
 
-    if (result.code === 200) {
-      sucMessage("保存成功！");
+        if (result.code === 200) {
+          sucMessage("基线时间成功！");
+        }
+
+        const gridData: any = await getIterDetailsData(prjInfo.storyId, prjInfo.iterID);
+        setColumns(gridData?.columnsData); // 设置列
+        setDetailsData(gridData?.gridData); // 设置数据
+
+      } else {
+        warnMessage("不能修改基线时间，只能进行删除！");
+      }
+    } else {
+      const data = {
+        "version_id": params.data?.version_id,
+        "is_save_version": params.data?.is_save_version,
+        "zt_num": params.data?.zt_num,
+        "remark": params.data?.remark,
+        "execution_id": prjInfo.iterID
+      };
+
+      if (params.column?.colId === "zt_num") {
+        data.zt_num = params.newValue;
+      } else if (params.column?.colId === "remark") {
+        data.remark = params.newValue;
+      }
+      const result = await modifyGridCells(data);
+
+      if (result.code === 200) {
+        sucMessage("保存成功！");
+      }
     }
+
+
   };
 
   useEffect(() => {
@@ -71,7 +97,7 @@ const GridList: React.FC<any> = (props: any) => {
           debounceVerticalScrollbar={true}
           defaultColDef={{
             resizable: true,
-            filter:true,
+            filter: true,
             suppressMenu: true,
             cellStyle: setCellStyle
           }}
@@ -83,7 +109,10 @@ const GridList: React.FC<any> = (props: any) => {
           }}
           frameworkComponents={{
             myUrl: myUrls,
-            baseLine: BaseLineSelect,
+            baseLine: (params: any) => {
+              return BaseLineSelect(params, prjInfo)
+            }
+            ,
             baseFlag: (params: any) => {
               return BaseFlag(params, prjInfo)
             }

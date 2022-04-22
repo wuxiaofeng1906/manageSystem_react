@@ -268,9 +268,10 @@ const getIterDetailsData = async (fileType: string, executionId: any) => {
     file_type: fileType,
     execution_id: executionId
   });
-  if (!detailsArray || detailsArray.length === 0) {
+  if (!detailsArray || detailsArray.length === 0 || JSON.stringify(detailsArray) === "{}") {
     return {};
   }
+
   try {
     let gridData: any = [];
 

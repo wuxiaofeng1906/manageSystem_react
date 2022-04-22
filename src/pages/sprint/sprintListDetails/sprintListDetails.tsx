@@ -638,7 +638,8 @@ const SprintList: React.FC<any> = () => {
       testerCHandaoID: datas.ztNo,
       testerTitle: datas.title,
       testChandaoStatus: numberRenderToZentaoStatus({
-        value: datas.ztStatus === null ? '' : datas.ztStatus.toString(),}),
+        value: datas.ztStatus === null ? '' : datas.ztStatus.toString(),
+      }),
       testToTester: nameIdArray,
       testerProTested: datas.proposedTest,
       testerStage: numberRenderToCurrentStage({value: datas.stage}),
@@ -1359,7 +1360,7 @@ const SprintList: React.FC<any> = () => {
   const [isFieldModalVisible, setFieldModalVisible] = useState(false);
   const [selectedFiled, setSelectedFiled] = useState(['']);
   const nessField = ['选择', '类型', '编号']; // 必需的列
-  const unNessField = ['阶段', '测试', '标题内容', '创建时间', '解决时间','所属计划' ,'严重等级', '截止日期', '模块', '状态', '已提测', '发布环境',
+  const unNessField = ['阶段', '测试', '标题内容', '创建时间', '解决时间', '所属计划', '严重等级', '截止日期', '模块', '状态', '已提测', '发布环境',
     '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', "是否涉及页面调整", '是否可热更', '是否有数据升级',
     '是否有接口升级', '是否有预置数据', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人'];
 
@@ -1462,7 +1463,8 @@ const SprintList: React.FC<any> = () => {
     const tasks = data?.resCount.task === undefined ? 0 : data?.resCount.task;
     const storys = data?.resCount.story === undefined ? 0 : data?.resCount.story;
     const B_story = data?.resCount.B_story === undefined ? 0 : data?.resCount.B_story;
-    setPageTitle(`共 ${bugs + tasks + storys + B_story} 个，bug ${bugs} 个，task ${tasks} 个，story ${storys} 个，B-story ${B_story} 个`);
+    // 2022-04-22 ：欢姐说隐藏task个数的显示
+    setPageTitle(`共 ${bugs + tasks + storys + B_story} 个，bug ${bugs} 个，story ${storys} 个，B-story ${B_story} 个`);
   }, [data]);
 
   return (

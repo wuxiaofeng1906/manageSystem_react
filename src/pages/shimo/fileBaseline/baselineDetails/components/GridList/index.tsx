@@ -49,7 +49,7 @@ const GridList: React.FC<any> = (props: any) => {
         const result = await deteleBaselinieTime(currentSaveId);
 
         if (result.code === 200) {
-          sucMessage("基线时间成功！");
+          sucMessage("基线时间删除成功！");
         }
 
         const gridData: any = await getIterDetailsData(prjInfo.storyId, prjInfo.iterID);

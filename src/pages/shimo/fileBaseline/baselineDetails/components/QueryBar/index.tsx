@@ -62,11 +62,11 @@ const QueryBar: React.FC<any> = (props: any) => {
       if (result.code === 200) {
         sucMessage("基线成功！");
         //  基线成功后要刷新数据 （看看当前是哪个tab）
-        let queryId = prjInfo.storyId;
+        let queryType = "demand";
         if (tabsInfo.activeKey === "概设基线") {
-          queryId = prjInfo.designId;
+          queryType = "design";
         }
-        const gridData: any = await getIterDetailsData(queryId, prjInfo.iterID);
+        const gridData: any = await getIterDetailsData(queryType, prjInfo.iterID);
         setColumns(gridData?.columnsData); // 设置列
         setDetailsData(gridData?.gridData); // 设置数据
 

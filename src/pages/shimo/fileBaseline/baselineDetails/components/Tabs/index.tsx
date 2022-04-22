@@ -16,9 +16,10 @@ const Tab: React.FC<any> = (props: any) => {
   // 切换Tabs
   const tabChanged = async (activeKey: string) => {
     setTabsData(activeKey);
-    let queryType = prjInfo.storyId;
+
+    let queryType = "demand";
     if (activeKey === "概设基线") {
-      queryType = prjInfo.designId
+      queryType = "design"
     }
     const result: any = await getIterDetailsData(queryType, prjInfo.iterID);
     setColumns(result?.columnsData); // 设置列

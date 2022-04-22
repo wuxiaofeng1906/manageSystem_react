@@ -38,6 +38,7 @@ const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_al
       rt_allGrid["remark"] = baseLineInfo.remark;
       rt_allGrid["zt_num"] = baseLineInfo.zt_num;
       const baseInfo = baseLineInfo.save_version_data;
+
       baseInfo.forEach((ele: any, index: number) => {
         rt_allGrid[`${index + 1}_time`] = ele.save_time;
         rt_allGrid[`${index + 1}_saveTimeId`] = ele.save_id; // saveId用于删除当前版本的作用
@@ -262,38 +263,47 @@ const getBaseTimeColumns = (timeArray: any) => {
 
 
 // 获取迭代数据
-const getIterDetailsData = async (myGuid: any, executionId: any) => {
-  const details = await axiosGet("/api/verify/shimo/version_detail", {guid: myGuid, execution_id: executionId});
-  if (!details) {
+const getIterDetailsData = async (fileType: string, executionId: any) => {
+  const detailsArray = await axiosGet("/api/verify/shimo/version_detail", {
+    file_type: fileType,
+    execution_id: executionId
+  });
+  if (!detailsArray || detailsArray.length === 0) {
     return {};
   }
   try {
+    let gridData: any = [];
+
+    let allFiledArrayLength: any = []; // 记录所有文件最大长度
+    let allBasetimeLength: any = []; // 记录所有文件最大长度
+
+    detailsArray.forEach((details: any) => {
+
+
+      const gridResult: any = []; // 记录数据
+      const filedArrayLength: any = []; // 记录文件最大长度
+      const basetimeLength: any = []; // 记录文件最大长度
+
+      if ((details.children) && (details.children).length > 0) {
+        getChildData(details.children, details.children, gridResult, filedArrayLength, basetimeLength);
+      }
+      // 数据
+      let grid_data = contactResult(gridResult, details.parent?.name);
+      grid_data = sortFileData(grid_data, filedArrayLength);
+
+      // 拼接多个项目的数据
+      gridData = gridData.concat(grid_data);
+      allFiledArrayLength = allFiledArrayLength.concat(filedArrayLength); // 最大的文件列
+      allBasetimeLength = allBasetimeLength.concat(basetimeLength); // 最大的基线时间列
+    });
+
     // 文件和基线时间要用最大的列数
-    // parent是一定有的(一级目录)。
-    const firstContent = {"1_file": details.parent?.name};
-    // 判断file_format 类型是不是为folder，是的话就有下级目录。其他类型就没有下级目录
-    if (details.parent?.file_format !== "folder") {
-      return [firstContent];
-    }
-
-    const gridResult: any = []; // 记录数据
-    const filedArrayLength: any = []; // 记录文件最大长度
-    const basetimeLength: any = []; // 记录文件最大长度
-
-    if ((details.children) && (details.children).length > 0) {
-      getChildData(details.children, details.children, gridResult, filedArrayLength, basetimeLength);
-    }
-    // 数据
-    let gridData = contactResult(gridResult, details.parent?.name);
-    gridData = sortFileData(gridData, filedArrayLength);
-
     // 获取文件的列
-    const fileColumns = getFileColumns(filedArrayLength);
+    const fileColumns = getFileColumns(allFiledArrayLength);
     // 获取基线时间的列
-    const basetimeColumns = getBaseTimeColumns(basetimeLength);
+    const basetimeColumns = getBaseTimeColumns(allBasetimeLength);
 
-    const columnsData = getColumns(fileColumns, basetimeColumns);
-    return {gridData, columnsData}
+    return {gridData, columnsData: getColumns(fileColumns, basetimeColumns)}
   } catch (e) {
     errorMessage(e);
     return {};

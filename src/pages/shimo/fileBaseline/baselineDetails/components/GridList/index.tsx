@@ -18,7 +18,7 @@ import {sucMessage, warnMessage} from "@/publicMethods/showMessages";
 const GridList: React.FC<any> = (props: any) => {
   const {
     detailsData, setDetailsData, columns,
-    setColumns, gridApi, setGridApi
+    setColumns, gridApi, setGridApi,tabsInfo
   } = useModel("iterateList.index");
 
   /* region 表格事件 */
@@ -33,7 +33,7 @@ const GridList: React.FC<any> = (props: any) => {
   /* endregion 表格事件 */
 
   const prjInfo = props.hrefParams;
-  const detailsInfo: any = useRequest(() => getIterDetailsData(prjInfo.storyId, prjInfo.iterID)).data;
+  const detailsInfo: any = useRequest(() => getIterDetailsData("demand", prjInfo.iterID)).data;
 
   // 编辑表格
   const cellEditedStoped = async (params: any) => {
@@ -52,7 +52,11 @@ const GridList: React.FC<any> = (props: any) => {
           sucMessage("基线时间删除成功！");
         }
 
-        const gridData: any = await getIterDetailsData(prjInfo.storyId, prjInfo.iterID);
+        let queryType = "demand";
+        if (tabsInfo.activeKey === "概设基线") {
+          queryType = "design";
+        }
+        const gridData: any = await getIterDetailsData(queryType, prjInfo.iterID);
         setColumns(gridData?.columnsData); // 设置列
         setDetailsData(gridData?.gridData); // 设置数据
 

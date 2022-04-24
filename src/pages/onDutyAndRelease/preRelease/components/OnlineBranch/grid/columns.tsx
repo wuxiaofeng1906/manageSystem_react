@@ -420,6 +420,7 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
 
 // 封板状态
 const sealStatusRenderer = (params: any) => {
+
   if (!params.value) {
     return `<div></div>`;
   }
@@ -454,7 +455,8 @@ const sealStatusRenderer = (params: any) => {
         time = arrayData.sealing_version_time === '' ? '' : dayjs(arrayData.sealing_version_time).format('HH:mm:ss');
       }
     });
-    return `
+
+     return `
           <div>
             <div style="margin-left: 100px">
               <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC"

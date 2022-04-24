@@ -484,39 +484,49 @@ const OnlineBranch: React.FC<any> = () => {
 
   // 封板状态日志显示
   (window as any).showCoverStatusLog = (params: any) => {
-    debugger;
-
     const contentDiv: any = [];
-
     if (params && params.length) {
-      params.forEach((ele: any) => {
-        // {/* 【backend/apps/asset 】【已封版】检查开始时间：2022-04-13 17:23:01 ～ 检查结束时间: 2022-04-13 17:23:25 */}
-        let Color = "black";
-        if (ele.sealing_version === "已封版") {
-          Color = "#2BF541";
+      params.forEach((path: any) => {
+        const namePath = path.name_path;
+        if (namePath && namePath.length > 0) {
+          namePath.forEach((ele: any) => {
+            // {/* 【backend/apps/asset 】【已封版】检查开始时间：2022-04-13 17:23:01 ～ 检查结束时间: 2022-04-13 17:23:25 */}
+            let Color = "black";
+            if (ele.sealing_version === "已封版") {
+              Color = "#2BF541";
+            }
+            if (ele.sealing_version === "未封版") {
+              Color = "orange";
+            }
+            contentDiv.push(
+              <div>
+                <label>【{ele.name_path}】</label>
+                【<label style={{color: Color}}>{ele.sealing_version}</label>】
+                <label>检查开始时间:{ele.version_check_start_time}~检查结束时间：{ele.version_check_start_time} </label>
+              </div>
+            );
+          });
         }
-        if (ele.sealing_version === "未封版") {
-          Color = "orange";
-        }
-        contentDiv.push(
-          <div>
-            <label>【{ele.name_path}】</label>
-            【<label style={{color: Color}}>{ele.sealing_version}</label>】
-            <label>检查开始时间:{ele.version_check_start_time}~检查结束时间：{ele.version_check_start_time} </label>
-          </div>
-        );
       });
-
     }
 
-    setLogModal({
-      show: true,
-      iconCheckUrl: {style: 'none', content: <div></div>},
-      autoUrl: {style: 'none', ui: '', api: ''},
-      versionUrl: {style: 'none', app: '', global: ''},
-      coveStatus: {style: 'inline', content: <div>{contentDiv}</div>}
-    });
-
+    if (contentDiv.length > 0) {
+      setLogModal({
+        show: true,
+        iconCheckUrl: {style: 'none', content: <div></div>},
+        autoUrl: {style: 'none', ui: '', api: ''},
+        versionUrl: {style: 'none', app: '', global: ''},
+        coveStatus: {style: 'inline', content: <div style={{height: 300, overflowY: "scroll"}}>{contentDiv}</div>}
+      });
+    }else{
+      message.error({
+        content: '无封版日志！',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+    }
   };
 
   // 日志显示弹窗取消

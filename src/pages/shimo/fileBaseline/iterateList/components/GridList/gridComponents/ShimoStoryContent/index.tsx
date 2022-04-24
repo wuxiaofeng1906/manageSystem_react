@@ -64,7 +64,7 @@ const ShimoStoryContent: React.FC<any> = (props: any) => {
   useEffect(() => {
 
     setTreeData({
-      values: data.demand_directory,
+      values: data.demand_directory === " " ? undefined : data.demand_directory,
       treeData: initStoryTree
     });
   }, [initStoryTree]);

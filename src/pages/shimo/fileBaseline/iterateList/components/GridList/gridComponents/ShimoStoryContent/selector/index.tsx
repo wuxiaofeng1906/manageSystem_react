@@ -18,7 +18,12 @@ const getTreeSelectData = async (myGuid: string = "", parentId: string = "", fil
 
   // 分数字和非数字
   const newArray = sortShiMoContent(datas);
-  const treeData: any = [];
+  const treeData: any = [{
+    title: "请选择",
+    value: "empty",
+    id: "empty",
+    pId: -1
+  }];
   if (newArray && newArray.length > 0) {
     newArray.forEach((ele: any) => {
       treeData.push({

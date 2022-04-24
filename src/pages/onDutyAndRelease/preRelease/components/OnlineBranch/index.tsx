@@ -485,6 +485,7 @@ const OnlineBranch: React.FC<any> = () => {
   // 封板状态日志显示
   (window as any).showCoverStatusLog = (params: any) => {
     debugger;
+
     const contentDiv: any = [];
 
     if (params && params.length) {

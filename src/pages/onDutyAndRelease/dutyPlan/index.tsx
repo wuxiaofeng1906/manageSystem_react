@@ -746,7 +746,8 @@ const DutyPlan: React.FC<any> = () => {
       const startTime = ele_data[0].duty_start_time;
       const endTime = ele_data[0].duty_end_time;
       let border_color = {};
-      if (dayjs().isAfter(dayjs(startTime)) && dayjs().isBefore(dayjs(endTime))) {
+
+      if (dayjs(startTime).format("YYYY-MM-DD") <= dayjs().format("YYYY-MM-DD") && dayjs().format("YYYY-MM-DD") <= dayjs(endTime).format("YYYY-MM-DD")) {
         border_color = {border: "2px solid #46A0FC"};
       }
 

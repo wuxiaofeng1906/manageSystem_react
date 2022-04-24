@@ -2,7 +2,7 @@ import {requestExcutionApi, requestGenerateTaskApi} from "../../commenMethod/rea
 import {message, Select} from "antd";
 import {getAllUsers} from "@/publicMethods/verifyAxios";
 import React from "react";
-import {queryDutyCardInfo} from "@/pages/onDutyAndRelease/dutyPlan/axiosApi";
+import {queryDutyCardInfo} from "@/pages/onDutyAndRelease/dutyPlan/data/axiosApi";
 import dayjs from "dayjs";
 import {getTemplateDetails} from "@/pages/zentao/zentaoManage/editTemplate/gridMethod/girdData";
 import {convertUserNameToID} from "../../commenMethod/valueExchange";

@@ -456,16 +456,16 @@ const sealStatusRenderer = (params: any) => {
       }
     });
 
-     return `
+    return `
           <div>
             <div style="margin-left: 100px">
-              <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC"
+              <Button  style="margin-top: 8px;margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;height: 25px"
                 onclick='showCoverStatusLog(${JSON.stringify(params.value)})'>
                   <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
                </Button>
             </div>
 
-              <div style="margin-top: -20px; font-size: 10px">
+              <div style="margin-top: -25px; font-size: 10px">
                   <div>${side} <label style="color: ${sideColor}"> ${status}</label> &nbsp;${time}</div>
               </div>
 
@@ -512,12 +512,12 @@ const sealStatusRenderer = (params: any) => {
     return `
           <div>
             <div style="margin-left: 100px">
-              <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;"
+              <Button style="margin-top: 8px; margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;height: 25px"
                 onclick='showCoverStatusLog(${JSON.stringify(params.value)})'>
-                  <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志" style="margin-top: -20px">
+                  <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志" style="margin-top: -20px" >
                </Button>
             </div>
-            <div style="margin-top: -30px;font-size: 9px">
+            <div style="margin-top: -25px;font-size: 9px">
               <div>前端：<label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
               <div style="margin-top: -20px">后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>&nbsp;${backendTime}</div>
             </div>

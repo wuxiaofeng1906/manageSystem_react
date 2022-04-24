@@ -10,15 +10,13 @@ import moment from "moment";
 import dayjs from "dayjs";
 import {getAllProject} from '@/publicMethods/verifyAxios';
 import {
-  loadUserSelect,
-  loadPrjNameSelect,
-  loadPrjTypeSelect,
-  loadBanchSelect,
-  loadEnvironmentSelect
+  loadUserSelect, loadPrjNameSelect, loadPrjTypeSelect,
+  loadBanchSelect, loadEnvironmentSelect
 } from "./data/selector"
 import {queryDutyCardInfo, getPlanDetails, sendMessageToApi, submitModifyData} from './data/axiosApi';
 import {judgeAuthorityByName} from "@/publicMethods/authorityJudge";
-import {errorMessage, sucMessage} from "@/publicMethods/showMessages"
+import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
+import {parseSaveCardData} from "./data/cardDataAlaysis";
 
 const {RangePicker} = DatePicker;
 // 已选中的事件
@@ -815,7 +813,6 @@ const DutyPlan: React.FC<any> = () => {
   // 解析需要保存的值班人员
   const alasysDutyPerson = (data: any) => {
 
-    const person_data_array: any = [];
     const startTime = moment((data.dutyTime)[0]).format("YYYY/MM/DD");
     const endTime = moment((data.dutyTime)[1]).format("YYYY/MM/DD");
     const checkResult = checkInputData(data);
@@ -823,134 +820,7 @@ const DutyPlan: React.FC<any> = () => {
       return [];
     }
 
-    const {
-      firstFront, secondFront,
-      firstBackend, secondBackend,
-      firstTester, secondTester,
-      firstFlow, secondFlow,
-      firstSQA, secondSQA
-    } = data;
-
-    // 前端第一值班人
-    person_data_array.push({
-      "peron_num": oldDutyTask.personNum,  // 值班编号id 例如：202111190002
-      "duty_start_time": startTime,
-      "duty_end_time": endTime,
-      "person_id": oldDutyTask.firstFrontId,  // 序号 id
-      "user_id": firstFront === null ? "" : firstFront.split("&")[0],    // 用户id
-      "user_name": firstFront === null ? "" : firstFront.split("&")[1],  // 用户名
-      "user_tech": "1",  // 前端还是后端
-      "duty_order": "1", // 第几值班人
-    });
-
-    // 前端第二值班人
-    person_data_array.push({
-      "peron_num": oldDutyTask.personNum,
-      "duty_start_time": startTime,
-      "duty_end_time": endTime,
-      "person_id": oldDutyTask.secondFrontId,
-      "user_id": secondFront === null ? "" : secondFront.split("&")[0],
-      "user_name": secondFront === null ? "" : secondFront.split("&")[1],
-      "user_tech": "1",
-      "duty_order": "2",
-    });
-
-    // 后端第一值班人
-    person_data_array.push({
-      "peron_num": oldDutyTask.personNum,
-      "duty_start_time": startTime,
-      "duty_end_time": endTime,
-      "person_id": oldDutyTask.firstBackendId,
-      "user_id": firstBackend === null ? "" : firstBackend.split("&")[0],
-      "user_name": firstBackend === null ? "" : firstBackend.split("&")[1],
-      "user_tech": "2",
-      "duty_order": "1",
-    });
-
-    // 后端第二值班人
-    person_data_array.push({
-      "peron_num": oldDutyTask.personNum,
-      "duty_start_time": startTime,
-      "duty_end_time": endTime,
-      "person_id": oldDutyTask.secondBackendId,
-      "user_id": secondBackend === null ? "" : secondBackend.split("&")[0],
-      "user_name": secondBackend === null ? "" : secondBackend.split("&")[1],
-      "user_tech": "2",
-      "duty_order": "2",
-    });
-
-    // 测试第一值班人
-    person_data_array.push({
-      "peron_num": oldDutyTask.personNum,
-      "duty_start_time": startTime,
-      "duty_end_time": endTime,
-      "person_id": oldDutyTask.firstTesterId,
-      "user_id": firstTester === null ? "" : firstTester.split("&")[0],
-      "user_name": firstTester === null ? "" : firstTester.split("&")[1],
-      "user_tech": "3",
-      "duty_order": "1",
-    });
-
-    // 测试第二值班人
-    person_data_array.push({
-      "peron_num": oldDutyTask.personNum,
-      "duty_start_time": startTime,
-      "duty_end_time": endTime,
-      "person_id": oldDutyTask.secondTesterId,
-      "user_id": secondTester === null ? "" : secondTester.split("&")[0],
-      "user_name": secondTester === null ? "" : secondTester.split("&")[1],
-      "user_tech": "3",
-      "duty_order": "2",
-    });
-
-    // 流程第一值班人
-    person_data_array.push({
-      "peron_num": oldDutyTask.personNum,
-      "duty_start_time": startTime,
-      "duty_end_time": endTime,
-      "person_id": oldDutyTask.firstFlowId,
-      "user_id": firstFlow === null ? "" : firstFlow.split("&")[0],
-      "user_name": firstFlow === null ? "" : firstFlow.split("&")[1],
-      "user_tech": "6",
-      "duty_order": "1",
-    });
-
-    // 流程第二值班人
-    person_data_array.push({
-      "peron_num": oldDutyTask.personNum,
-      "duty_start_time": startTime,
-      "duty_end_time": endTime,
-      "person_id": oldDutyTask.secondFlowId,
-      "user_id": secondFlow === null ? "" : secondFlow.split("&")[0],
-      "user_name": secondFlow === null ? "" : secondFlow.split("&")[1],
-      "user_tech": "6",
-      "duty_order": "2",
-    });
-
-    // SQA第一值班人
-    person_data_array.push({
-      "peron_num": oldDutyTask.personNum,
-      "duty_start_time": startTime,
-      "duty_end_time": endTime,
-      "person_id": oldDutyTask.firstSQAId,
-      "user_id": firstSQA === null ? "" : firstSQA.split("&")[0],
-      "user_name": firstSQA === null ? "" : firstSQA.split("&")[1],
-      "user_tech": "7",
-      "duty_order": "1",
-    });
-
-    // SQA第二值班人
-    person_data_array.push({
-      "peron_num": oldDutyTask.personNum,
-      "duty_start_time": startTime,
-      "duty_end_time": endTime,
-      "person_id": oldDutyTask.secondSQAId,
-      "user_id": secondSQA === null ? "" : secondSQA.split("&")[0],
-      "user_name": secondSQA === null ? "" : secondSQA.split("&")[1],
-      "user_tech": "7",
-      "duty_order": "2",
-    });
-    return person_data_array;
+    return parseSaveCardData(data, oldDutyTask, startTime, endTime);
   };
 
   // 解析需要保存的值班项目
@@ -1065,6 +935,7 @@ const DutyPlan: React.FC<any> = () => {
 
   // 提交事件
   const submitForm = async () => {
+
     const formData = formForPlanModify.getFieldsValue();
     // 解析值班人数据
     const person_data = alasysDutyPerson(formData);
@@ -1072,7 +943,7 @@ const DutyPlan: React.FC<any> = () => {
     const project_data = alasysDutyProject(formData.projects);
 
     // 值班人员名单必须有数据
-    if (person_data.length > 0) {
+    if (person_data && person_data.length > 0) {
       // 判断项目是否为空
       if (deletedData.length > 0 && project_data.allEmpty === true && (project_data.allProject).length === 0) {
         await requestAPpiToSaveData(person_data, deletedData);

@@ -1,4 +1,3 @@
-
 // 解析数据
 const parseData = (params: any) => {
 
@@ -220,5 +219,241 @@ const parseData = (params: any) => {
   }
 
   return returnValue;
-}
-export {parseData}
+};
+
+const parseSaveCardData = (data: any, oldDutyTask: any, startTime: string, endTime: string) => {
+
+  const person_data_array: any = [];
+
+  const {
+    firstFront, secondFront,
+    firstBackend, secondBackend,
+    firstTester, secondTester,
+    firstFlow, secondFlow,
+    firstSQA, secondSQA,
+    firstJsf, secondJsf,
+    firstGlobal, secondGlobal,
+    firstOpenApil, secondOpenApi,
+    firstQbosStore, secondQbosStore
+  } = data;
+
+  // 前端第一值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,  // 值班编号id 例如：202111190002
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.firstFrontId,  // 序号 id
+    "user_id": firstFront === null ? "" : firstFront.split("&")[0],    // 用户id
+    "user_name": firstFront === null ? "" : firstFront.split("&")[1],  // 用户名
+    "user_tech": "1",  // 前端还是后端
+    "duty_order": "1", // 第几值班人
+  });
+
+  // 前端第二值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.secondFrontId,
+    "user_id": secondFront === null ? "" : secondFront.split("&")[0],
+    "user_name": secondFront === null ? "" : secondFront.split("&")[1],
+    "user_tech": "1",
+    "duty_order": "2",
+  });
+
+  // 后端第一值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.firstBackendId,
+    "user_id": firstBackend === null ? "" : firstBackend.split("&")[0],
+    "user_name": firstBackend === null ? "" : firstBackend.split("&")[1],
+    "user_tech": "2",
+    "duty_order": "1",
+  });
+
+  // 后端第二值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.secondBackendId,
+    "user_id": secondBackend === null ? "" : secondBackend.split("&")[0],
+    "user_name": secondBackend === null ? "" : secondBackend.split("&")[1],
+    "user_tech": "2",
+    "duty_order": "2",
+  });
+
+  // 测试第一值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.firstTesterId,
+    "user_id": firstTester === null ? "" : firstTester.split("&")[0],
+    "user_name": firstTester === null ? "" : firstTester.split("&")[1],
+    "user_tech": "3",
+    "duty_order": "1",
+  });
+
+  // 测试第二值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.secondTesterId,
+    "user_id": secondTester === null ? "" : secondTester.split("&")[0],
+    "user_name": secondTester === null ? "" : secondTester.split("&")[1],
+    "user_tech": "3",
+    "duty_order": "2",
+  });
+
+  // 流程第一值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.firstFlowId,
+    "user_id": firstFlow === null ? "" : firstFlow.split("&")[0],
+    "user_name": firstFlow === null ? "" : firstFlow.split("&")[1],
+    "user_tech": "6",
+    "duty_order": "1",
+  });
+
+  // 流程第二值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.secondFlowId,
+    "user_id": secondFlow === null ? "" : secondFlow.split("&")[0],
+    "user_name": secondFlow === null ? "" : secondFlow.split("&")[1],
+    "user_tech": "6",
+    "duty_order": "2",
+  });
+
+  // SQA第一值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.firstSQAId,
+    "user_id": firstSQA === null ? "" : firstSQA.split("&")[0],
+    "user_name": firstSQA === null ? "" : firstSQA.split("&")[1],
+    "user_tech": "7",
+    "duty_order": "1",
+  });
+
+  // SQA第二值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.secondSQAId,
+    "user_id": secondSQA === null ? "" : secondSQA.split("&")[0],
+    "user_name": secondSQA === null ? "" : secondSQA.split("&")[1],
+    "user_tech": "7",
+    "duty_order": "2",
+  });
+
+  // global第一值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.firstGlobalId,
+    "user_id": firstGlobal === null ? "" : firstGlobal.split("&")[0],
+    "user_name": firstGlobal === null ? "" : firstGlobal.split("&")[1],
+    "user_tech": "8",
+    "duty_order": "1",
+  });
+
+  // global第二值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.secondGlobalId,
+    "user_id": secondGlobal === null ? "" : secondGlobal.split("&")[0],
+    "user_name": secondGlobal === null ? "" : secondGlobal.split("&")[1],
+    "user_tech": "8",
+    "duty_order": "2",
+  });
+
+  // openApi第一值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.firstOpenApiId,
+    "user_id": firstOpenApil === null ? "" : firstOpenApil.split("&")[0],
+    "user_name": firstOpenApil === null ? "" : firstOpenApil.split("&")[1],
+    "user_tech": "10",
+    "duty_order": "1",
+  });
+
+  // openApi第二值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.secondOpenApiId,
+    "user_id": secondOpenApi === null ? "" : secondOpenApi.split("&")[0],
+    "user_name": secondOpenApi === null ? "" : secondOpenApi.split("&")[1],
+    "user_tech": "10",
+    "duty_order": "2",
+  });
+
+  // qbos&store第一值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.firstQbosStoreId,
+    "user_id": firstQbosStore === null ? "" : firstQbosStore.split("&")[0],
+    "user_name": firstQbosStore === null ? "" : firstQbosStore.split("&")[1],
+    "user_tech": "11",
+    "duty_order": "1",
+  });
+
+  // qbos&store第二值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.secondQbosStoreId,
+    "user_id": secondQbosStore === null ? "" : secondQbosStore.split("&")[0],
+    "user_name": secondQbosStore === null ? "" : secondQbosStore.split("&")[1],
+    "user_tech": "11",
+    "duty_order": "2",
+  });
+
+  // jsf第一值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.firstJsfId,
+    "user_id": firstJsf === null ? "" : firstJsf.split("&")[0],
+    "user_name": firstJsf === null ? "" : firstJsf.split("&")[1],
+    "user_tech": "12",
+    "duty_order": "1",
+  });
+
+  // jsf第二值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.secondJsfId,
+    "user_id": secondJsf === null ? "" : secondJsf.split("&")[0],
+    "user_name": secondJsf === null ? "" : secondJsf.split("&")[1],
+    "user_tech": "12",
+    "duty_order": "2",
+  });
+
+  return person_data_array;
+};
+
+export {parseData, parseSaveCardData}

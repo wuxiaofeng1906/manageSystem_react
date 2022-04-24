@@ -38,7 +38,6 @@ const ShimoDesignContent: React.FC<any> = (props: any) => {
       id: enValue,
       dir: result.join("/")
     });
-    debugger;
     if (modifyResult.code === 200) {
       const dts = await getIterListData(queryInfo);
       setListData(dts);
@@ -58,7 +57,7 @@ const ShimoDesignContent: React.FC<any> = (props: any) => {
 
   useEffect(() => {
     setTreeData({
-      values: data.demand_directory === " " ? undefined : data.demand_directory,
+      values: data.design_directory === " " ? undefined : data.design_directory,
       treeData: initDesignTree
     });
   }, [initDesignTree]);

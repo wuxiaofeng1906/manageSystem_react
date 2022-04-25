@@ -1153,7 +1153,7 @@ const DutyPlan: React.FC<any> = () => {
               {/* jsf  */}
               <Row gutter={40} style={{marginTop: -25}}>
                 <Col span={10}>
-                  <Form.Item name="firstJsf" label="JSF" style={{marginTop: 7}}>
+                  <Form.Item name="firstJsf" label="jsf" style={{marginTop: 7}}>
                     <Select showSearch>
                       {allUsers.jsf}
                     </Select>

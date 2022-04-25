@@ -1,5 +1,12 @@
 // 值班人员选择框
-import {getAllProject, getAllUsers, getBranchName, getEnvironment, getProjectType} from "@/publicMethods/verifyAxios";
+import {
+  getAllProject,
+  getAllUsers,
+  getAllDeptUsers,
+  getBranchName,
+  getEnvironment,
+  getProjectType
+} from "@/publicMethods/verifyAxios";
 import {message, Select} from "antd";
 import React from "react";
 
@@ -9,6 +16,30 @@ const loadUserSelect = async (teach: string) => {
 
   const teachData: any = [<Option key={""} value={`""&免`}>免</Option>];
   const userInfo = await getAllUsers(teach);
+
+  if (userInfo.message !== "") {
+    message.error({
+      content: userInfo.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (userInfo.data) {
+    const {data} = userInfo;
+    data.forEach((user: any) => {
+      teachData.push(
+        <Option key={user.user_id} value={`${user.user_id}&${user.user_name}`}>{user.user_name}</Option>);
+    });
+  }
+  return teachData;
+};
+
+// 获取企业微信所有人
+const loadAllUserSelect = async () => {
+
+  const teachData: any = [<Option key={""} value={`""&免`}>免</Option>];
+  const userInfo = await getAllDeptUsers();
 
   if (userInfo.message !== "") {
     message.error({
@@ -131,9 +162,7 @@ const loadEnvironmentSelect = async () => {
 };
 
 
-
-
-
 export {
-  loadUserSelect,loadPrjNameSelect,loadPrjTypeSelect,loadBanchSelect,loadEnvironmentSelect
+  loadUserSelect, loadPrjNameSelect, loadPrjTypeSelect, loadBanchSelect, loadEnvironmentSelect,
+  loadAllUserSelect
 }

@@ -11,7 +11,7 @@ import dayjs from "dayjs";
 import {getAllProject} from '@/publicMethods/verifyAxios';
 import {
   loadUserSelect, loadPrjNameSelect, loadPrjTypeSelect,
-  loadBanchSelect, loadEnvironmentSelect
+  loadBanchSelect, loadEnvironmentSelect, loadAllUserSelect
 } from "./data/selector"
 import {queryDutyCardInfo, getPlanDetails, sendMessageToApi, submitModifyData} from './data/axiosApi';
 import {judgeAuthorityByName} from "@/publicMethods/authorityJudge";
@@ -344,20 +344,20 @@ const DutyPlan: React.FC<any> = () => {
     const backendUserInfo = await loadUserSelect("2");
     const testerUserInfo = await loadUserSelect("3");
     const sqaUserInfo = await loadUserSelect("7");
-    const globalUserInfo = await loadUserSelect("8");
-    const openApiUserInfo = await loadUserSelect("10");
-    const abosStoreUserInfo = await loadUserSelect("11");
-    const jsfUserInfo = await loadUserSelect("12");
+    const wx_allUsers = await loadAllUserSelect();
+    // const openApiUserInfo = await loadUserSelect("10");
+    // const abosStoreUserInfo = await loadUserSelect("11");
+    // const jsfUserInfo = await loadUserSelect("12");
     setAllUsers({
       front: frontUserInfo,
       backend: backendUserInfo,
       tester: testerUserInfo,
       flow: backendUserInfo,
       SQA: sqaUserInfo,
-      my_global: globalUserInfo,
-      openApi: openApiUserInfo,
-      qbos_store: abosStoreUserInfo,
-      jsf: jsfUserInfo
+      my_global: wx_allUsers,
+      openApi: wx_allUsers,
+      qbos_store: wx_allUsers,
+      jsf: wx_allUsers
     });
 
     // 生成项目名称、项目类型、对应分支、对应测试环境、对应升级环境、项目负责人的下拉框

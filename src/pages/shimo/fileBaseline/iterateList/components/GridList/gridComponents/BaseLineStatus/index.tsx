@@ -1,7 +1,6 @@
 import React from "react";
 import {Tag} from 'antd';
 
-import "../style.less";
 
 const BaseLineStatus: React.FC<any> = (props: any) => {
   if (props.value === "未知" || props.value === "未基线") {
@@ -14,7 +13,14 @@ const BaseLineStatus: React.FC<any> = (props: any) => {
     return (<Tag color={"blue"}>部分基线</Tag>);
   }
   if (props.value === "已裁剪") {
-    return (<Tag style={{width: 63,height:20, textAlign: "center",backgroundColor:"transparent",color:"Silver",border:"0.5px solid Silver"}}   >已裁剪</Tag>);
+    return (<Tag style={{
+      width: 63,
+      height: 20,
+      textAlign: "center",
+      backgroundColor: "transparent",
+      color: "Silver",
+      border: "0.5px solid Silver"
+    }}>已裁剪</Tag>);
   }
   return props.value;
 };

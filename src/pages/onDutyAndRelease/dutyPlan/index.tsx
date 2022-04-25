@@ -1161,7 +1161,7 @@ const DutyPlan: React.FC<any> = () => {
                 </Col>
 
                 <Col span={14}>
-                  <Form.Item name="secondJsf" label="JSF第二值班人" style={{marginTop: 7}}>
+                  <Form.Item name="secondJsf" label="jsf第二值班人" style={{marginTop: 7}}>
                     <Select showSearch>
                       {allUsers.jsf}
                     </Select>

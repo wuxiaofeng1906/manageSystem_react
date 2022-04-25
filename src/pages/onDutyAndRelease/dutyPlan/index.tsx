@@ -1150,26 +1150,6 @@ const DutyPlan: React.FC<any> = () => {
 
               </Row>
 
-              {/* jsf  */}
-              <Row gutter={40} style={{marginTop: -25}}>
-                <Col span={10}>
-                  <Form.Item name="firstJsf" label="jsf" style={{marginTop: 7}}>
-                    <Select showSearch>
-                      {allUsers.jsf}
-                    </Select>
-                  </Form.Item>
-                </Col>
-
-                <Col span={14}>
-                  <Form.Item name="secondJsf" label="jsf第二值班人" style={{marginTop: 7}}>
-                    <Select showSearch>
-                      {allUsers.jsf}
-                    </Select>
-                  </Form.Item>
-                </Col>
-
-              </Row>
-
               {/* global  */}
               <Row gutter={40} style={{marginTop: -25}}>
                 <Col span={10}>
@@ -1224,6 +1204,26 @@ const DutyPlan: React.FC<any> = () => {
                   <Form.Item name="secondQbosStore" label="qbos&Store第二值班人" style={{marginTop: 7}}>
                     <Select showSearch>
                       {allUsers.qbos_store}
+                    </Select>
+                  </Form.Item>
+                </Col>
+
+              </Row>
+
+              {/* jsf  */}
+              <Row gutter={40} style={{marginTop: -25}}>
+                <Col span={10}>
+                  <Form.Item name="firstJsf" label="jsf" style={{marginTop: 7}}>
+                    <Select showSearch style={{width:100,marginLeft:60}}>
+                      {allUsers.jsf}
+                    </Select>
+                  </Form.Item>
+                </Col>
+
+                <Col span={14}>
+                  <Form.Item name="secondJsf" label="jsf第二值班人" style={{marginTop: 7}}>
+                    <Select showSearch style={{width:122,marginLeft:60}}>
+                      {allUsers.jsf}
                     </Select>
                   </Form.Item>
                 </Col>

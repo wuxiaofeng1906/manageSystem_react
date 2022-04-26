@@ -476,7 +476,7 @@ export default [
         hideInMenu: false
       },
       {
-        name: '禅道管理',
+        name: '禅道模板',
         icon: 'table',
         path: 'templateList',
         component: './zentao/zentaoManage/templateList',

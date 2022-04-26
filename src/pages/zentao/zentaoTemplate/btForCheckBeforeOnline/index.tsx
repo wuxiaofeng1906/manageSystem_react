@@ -20,7 +20,7 @@ import {
   getChildTaskPersonForPrj
 } from "./axiosRequest/requestDataParse";
 import {useRequest} from "ahooks";
-import {loadProjectManager} from "@/pages/zentao/zentaoManage/btForProjectTemplate/axiosRequest/requestDataParse";
+import {loadProjectManager} from "@/pages/zentao/zentaoTemplate/btForProjectTemplate/axiosRequest/requestDataParse";
 
 const {Option} = Select;
 let dutyInfo: any;

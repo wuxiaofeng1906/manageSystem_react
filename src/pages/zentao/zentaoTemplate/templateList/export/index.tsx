@@ -2,7 +2,7 @@ import ExcelJs from "exceljs";
 import {
   getTempTable, vertifyFileName
 } from "./tableInfo/tableCreate"
-import {getTemplateDetails} from "@/pages/zentao/zentaoManage/editTemplate/gridMethod/girdData";
+import {getTemplateDetails} from "@/pages/zentao/zentaoTemplate/editTemplate/gridMethod/girdData";
 
 // exceljs的说明文档： https://github.com/exceljs/exceljs/blob/master/README_zh.md
 

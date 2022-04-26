@@ -479,26 +479,31 @@ export default [
         name: '禅道模板',
         icon: 'table',
         path: 'templateList',
-        component: './zentao/zentaoManage/templateList',
+        component: './zentao/zentaoTemplate/templateList',
       }, {
         name: '禅道任务模板',
         icon: 'table',
         path: 'editTemplate',
-        component: './zentao/zentaoManage/editTemplate',
+        component: './zentao/zentaoTemplate/editTemplate',
         hideInMenu: true
       }, {
         name: '禅道任务生成（上线检查）',
         icon: 'table',
         path: 'btForCheckBeforeOnline',
-        component: './zentao/zentaoManage/btForCheckBeforeOnline',
+        component: './zentao/zentaoTemplate/btForCheckBeforeOnline',
         hideInMenu: true
       }, {
         name: '禅道任务生成（项目计划）',
         icon: 'table',
         path: 'btForProjectTemplate',
-        component: './zentao/zentaoManage/btForProjectTemplate',
+        component: './zentao/zentaoTemplate/btForProjectTemplate',
         hideInMenu: true
-      }
+      }, {
+        name: '禅道任务分解',
+        icon: 'table',
+        path: 'taskDecomposition',
+        component: './zentao/taskDecomposition',
+      },
     ]
   }, {
     name: "石墨管理",

@@ -5,7 +5,7 @@ import React from "react";
 import dayjs from "dayjs";
 import {convertUserNameToID} from "../../commenMethod/valueExchange";
 import {getPrjManegerApi} from "./reauestApi";
-import {getTemplateDetails} from "@/pages/zentao/zentaoManage/editTemplate/gridMethod/girdData";
+import {getTemplateDetails} from "@/pages/zentao/zentaoTemplate/editTemplate/gridMethod/girdData";
 
 const {Option} = Select;
 const userLogins: any = localStorage.getItem('userLogins');

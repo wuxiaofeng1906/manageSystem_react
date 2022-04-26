@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, useCallback, useMemo} from 'react';
 import {Button, Col, Form, Tooltip, Row, Select, Spin, TreeSelect, DatePicker} from "antd";
 import {CopyOutlined,} from "@ant-design/icons";
 import {AgGridReact} from "ag-grid-react";
@@ -13,6 +13,7 @@ import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {gridColumns} from "./grid/columns";
 import {getTaskGridData} from "./grid/datas";
 import moment from "moment";
+import DetailCellRenderer from "./grid/DetailCellRenderer";
 
 const {SHOW_PARENT} = TreeSelect;
 
@@ -34,6 +35,16 @@ const TaskDecompose: React.FC<any> = () => {
     gridApi.current?.sizeColumnsToFit();
   };
   const gridData = useRequest(() => getTaskGridData()).data;
+
+  const onFirstDataRendered = useCallback(() => {
+    gridApi.current?.forEachNode((node: any) => {
+      node.setExpanded(node.id === "2");
+    });
+  }, []);
+
+  const detailCellRenderer: any = useMemo(() => {
+    return DetailCellRenderer;
+  }, []);
 
   /* endregion 表格事件 */
 
@@ -104,7 +115,6 @@ const TaskDecompose: React.FC<any> = () => {
   };
 
   /* endregion 表格中事件触发 */
-
 
   return (
     <PageContainer style={{marginTop: -30}}>
@@ -210,6 +220,11 @@ const TaskDecompose: React.FC<any> = () => {
                   />);
                 }
               }}
+              masterDetail={true}
+              // detailCellRendererFramework={}
+              detailCellRenderer={detailCellRenderer}
+              detailRowHeight={25}
+              onFirstDataRendered={onFirstDataRendered}
             >
             </AgGridReact>
           </div>

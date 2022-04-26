@@ -221,7 +221,6 @@ const TaskDecompose: React.FC<any> = () => {
                 }
               }}
               masterDetail={true}
-              // detailCellRendererFramework={}
               detailCellRenderer={detailCellRenderer}
               detailRowHeight={25}
               onFirstDataRendered={onFirstDataRendered}

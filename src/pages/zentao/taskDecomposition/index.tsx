@@ -1,4 +1,4 @@
-import React, {useRef, useState, useCallback, useMemo} from 'react';
+import React, {useRef, useState, useCallback, useMemo, useEffect} from 'react';
 import {Button, Col, Form, Tooltip, Row, Select, Spin, TreeSelect, DatePicker} from "antd";
 import {CopyOutlined,} from "@ant-design/icons";
 import {AgGridReact} from "ag-grid-react";
@@ -11,9 +11,11 @@ import {zentaoExcutionSelect, zentaoStorySelect, zentaoDevCenterSelect} from "./
 import {getHeight} from "@/publicMethods/pageSet";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {gridColumns} from "./grid/columns";
-import {getTaskGridData} from "./grid/datas";
+import {getTaskTemplate} from "./grid/datas";
 import moment from "moment";
 import DetailCellRenderer from "./grid/DetailCellRenderer";
+import {errorMessage, infoMessage, sucMessage, warnMessage} from "@/publicMethods/showMessages";
+import {createZentaoTaskDecompose} from "./taskCreate";
 
 const {SHOW_PARENT} = TreeSelect;
 
@@ -34,7 +36,9 @@ const TaskDecompose: React.FC<any> = () => {
     setGridHeight(getHeight());
     gridApi.current?.sizeColumnsToFit();
   };
-  const gridData = useRequest(() => getTaskGridData()).data;
+
+  const zentaoTemplate = useRequest(() => getTaskTemplate()).data;
+
 
   const onFirstDataRendered = useCallback(() => {
     gridApi.current?.forEachNode((node: any) => {
@@ -50,39 +54,68 @@ const TaskDecompose: React.FC<any> = () => {
 
   /* region 下拉框加载 */
   const excutionSelect = useRequest(() => zentaoExcutionSelect()).data;
-  const storySelect = useRequest(() => zentaoStorySelect()).data;
   const devCenterSelect = useRequest(() => zentaoDevCenterSelect()).data;
   /* endregion 下拉框加载 */
 
   /* region 操作栏相关事件 */
 
-
   const [formForTaskQuery] = Form.useForm();
+  const [storySelect, setStorySelect] = useState([]);
 
-  // 所属执行改变
-  const executionChanged = () => {
-
+  // 根据条件获取需求数据
+  const getZentaoStory = async () => {
+    const formDt = formForTaskQuery.getFieldsValue();
+    if (!formDt.execution) {
+      errorMessage("请先选择所属执行！");
+      return;
+    }
+    const params = {
+      execution_id: formDt.execution,
+      create_user: formDt.creater,
+      assigned_to: formDt.assignedTo
+    };
+    const selectArray = await zentaoStorySelect(params);
+    setStorySelect(selectArray);
   };
-
+  //
+  // // 所属执行改变
+  // const executionChanged = async (executId: number) => {
+  //   if (executId) {
+  //     const params = {
+  //       execution_id: executId,
+  //       create_user: "",
+  //       assigned_to: ""
+  //     };
+  //     const selectArray = await zentaoStorySelect(params);
+  //     setStorySelect(selectArray);
+  //   }
+  // };
 
   // 禅道需求改变
   const ztStoryChanged = () => {
 
   }
-  // 指派人改变
-  const assignedToChanged = () => {
-
-  }
-
-  // 创建人改变
-  const createrChanged = () => {
-
-  };
+  // // 指派人改变
+  // const assignedToChanged = () => {
+  //
+  // }
+  //
+  // // 创建人改变
+  // const createrChanged = () => {
+  //
+  // };
 
   // 点击创建任务按钮
-  const createZentaoTask = () => {
-
+  const createZentaoTask = async () => {
     setCreateState(true);
+
+    const createResult = await createZentaoTaskDecompose();
+    if (createResult.code === 200) {
+      sucMessage("执行成功！");
+    } else {
+      errorMessage(`执行失败：${createResult.msg}`)
+    }
+    setCreateState(false);
   };
 
   /* endregion 操作栏相关事件 */
@@ -116,6 +149,10 @@ const TaskDecompose: React.FC<any> = () => {
 
   /* endregion 表格中事件触发 */
 
+  useEffect(()=>{
+
+
+  },[zentaoTemplate])
   return (
     <PageContainer style={{marginTop: -30}}>
       <Spin spinning={createState} tip="任务创建中..." size={"large"}>
@@ -135,7 +172,9 @@ const TaskDecompose: React.FC<any> = () => {
               </Col>
               <Col span={5}>
                 <Form.Item label="所属执行" name="execution">
-                  <Select style={{width: '100%'}} showSearch onChange={executionChanged}>
+                  <Select style={{width: '100%'}} showSearch onChange={getZentaoStory} allowClear placeholder="请选择"
+                          filterOption={(inputValue: string, option: any) =>
+                            !!option.children.includes(inputValue)}>
                     {excutionSelect}
                   </Select>
                 </Form.Item>
@@ -153,6 +192,11 @@ const TaskDecompose: React.FC<any> = () => {
                     showCheckedStrategy={SHOW_PARENT}
                     maxTagCount={'responsive'}
                     onChange={ztStoryChanged}
+                    placeholder={"请选择"}
+                    treeNodeLabelProp={"key"}
+                    filterTreeNode={(inputValue: string, treeNode: any) => {
+                      return !!treeNode?.title.includes(inputValue);
+                    }}
                   >
                   </TreeSelect>
 
@@ -160,14 +204,18 @@ const TaskDecompose: React.FC<any> = () => {
               </Col>
               <Col span={4}>
                 <Form.Item label="指派给" name="assignedTo">
-                  <Select style={{width: '100%'}} showSearch onChange={assignedToChanged}>
+                  <Select style={{width: '100%'}} showSearch onChange={getZentaoStory} allowClear placeholder="请选择"
+                          filterOption={(inputValue: string, option: any) =>
+                            !!option.children.includes(inputValue)}>
                     {devCenterSelect}
                   </Select>
                 </Form.Item>
               </Col>
               <Col span={4}>
                 <Form.Item label="由谁创建" name="creater">
-                  <Select style={{width: '100%'}} showSearch onChange={createrChanged}>
+                  <Select style={{width: '100%'}} showSearch onChange={getZentaoStory} allowClear placeholder="请选择"
+                          filterOption={(inputValue: string, option: any) =>
+                            !!option.children.includes(inputValue)}>
                     {devCenterSelect}
                   </Select>
                 </Form.Item>
@@ -180,7 +228,7 @@ const TaskDecompose: React.FC<any> = () => {
           <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
             <AgGridReact
               columnDefs={gridColumns} // 定义列
-              rowData={gridData} // 数据绑定
+              rowData={zentaoTemplate} // 数据绑定
               defaultColDef={{
                 resizable: true,
                 sortable: true,

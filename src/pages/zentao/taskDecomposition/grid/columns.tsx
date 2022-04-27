@@ -7,56 +7,56 @@ const gridColumns: any = [
     pinned: "left"
   }, {
     headerName: '增加类型',
-    field: '',
+    field: 'add_type_name',
     pinned: "left"
   }, {
     headerName: '任务名称',
-    field: '',
+    field: 'task_name',
     minWidth: 200,
     width: 90,
     pinned: "left",
     editable: true,
   }, {
     headerName: '所属模块',
-    field: '',
+    field: 'module',
   }, {
     headerName: '相关需求',
-    field: '',
+    field: 'subtask_dev_needs',
     cellRenderer: (params: any) => {
       return params.value;
     }
   }, {
     headerName: '指派给',
-    field: '',
+    field: 'assigned_person_name',
   }, {
     headerName: '预计开始',
-    field: '',
+    field: 'plan_start',
   }, {
     headerName: '预计截止',
-    field: '',
+    field: 'plan_end',
   }, {
     headerName: '优先级',
-    field: '',
+    field: 'priority',
   }, {
     headerName: '任务类型',
-    field: '',
+    field: 'task_type_name',
   }, {
     headerName: '最初预计',
-    field: '',
+    field: 'estimate',
     editable: true,
   }, {
     headerName: '任务描述',
-    field: '',
+    field: 'desc',
     editable: true,
   }, {
     headerName: '所属端',
-    field: '',
+    field: 'belongs_name',
   }, {
-    headerName: '任务类型',
-    field: '',
+    headerName: '任务来源',
+    field: 'tasksource_name',
   }, {
     headerName: '是否裁剪',
-    field: '',
+    field: 'is_tailoring',
   }
 ];
 

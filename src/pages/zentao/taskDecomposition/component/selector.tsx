@@ -1,68 +1,61 @@
 import {axiosGet} from "@/publicMethods/axios";
-import {Select, message} from "antd";
+import {Select} from "antd";
 
 const {Option} = Select;
 // 所属执行下拉框
 const zentaoExcutionSelect = async () => {
+  const execution = await axiosGet("/api/verify/sprint/execution");
 
-  return []
+  if (!execution || execution.length === 0) {
+    return []
+  }
+  const selectOption: any = [];
+  execution.forEach((ele: any) => {
+    selectOption.push(
+      <Option key={ele.execution_id} value={ele.execution_id}>{ele.execution_name}</Option>
+    );
+  });
+  return selectOption;
 };
 
 // 禅道需求下拉框
-const zentaoStorySelect = async () => {
-  return []
-  // const excuteType = await getExcuteType();
-  // const childType: any = [];
-  //
-  // if (excuteType.message !== '') {
-  //   message.error({
-  //     content: excuteType.message,
-  //     duration: 1,
-  //     style: {
-  //       marginTop: '50vh',
-  //     },
-  //   });
-  // } else if (excuteType.data) {
-  //   const datas = excuteType.data;
-  //   datas.forEach((types: any) => {
-  //     childType.push({
-  //       title: types.execution_type_name,
-  //       value: `${types.execution_type}&${types.execution_type_name}`,
-  //       key: types.execution_type,
-  //     })
-  //   });
-  // }
-  //
-  // let typeData: any = [
-  //   {
-  //     title: '全部',
-  //     value: 'all&全部',
-  //     key: 'all&全部',
-  //     children: childType
-  //   }];
-  //
-  // if (type === "exclude") {
-  //   typeData = [{
-  //     title: "空",
-  //     value: `''&空`,
-  //     key: `''&空`,
-  //   }, {
-  //     title: '全部',
-  //     value: 'all&全部',
-  //     key: 'all&全部',
-  //     children: childType
-  //   }];
-  //
-  // }
-  //
-  //
-  // return typeData;
+const zentaoStorySelect = async (params: any) => {
 
+  const zt_story = await axiosGet("/api/verify/sprint/demand", params);
+  const childType: any = [];
+  zt_story.forEach((storys: any) => {
+    childType.push({
+      title: `${storys.id}:${storys.name}`,
+      value: storys.id,
+      key: storys.id,
+    })
+  });
+
+  const typeData: any = [
+    {
+      title: '全选',
+      value: '全选',
+      key: '全选',
+      children: childType
+    }];
+
+  return typeData;
 };
 
 // 指派给和由谁创建下拉框
 const zentaoDevCenterSelect = async () => {
-  return []
+  const devPerson = await axiosGet("/api/verify/sprint/devperson");
+
+  if (!devPerson || devPerson.length === 0) {
+    return []
+  }
+  const selectOption: any = [];
+  devPerson.forEach((ele: any) => {
+    selectOption.push(
+      <Option key={ele.user_id} value={ele.user_id}>{ele.user_name}</Option>
+    );
+  });
+  return selectOption;
 };
 
 export {zentaoExcutionSelect, zentaoStorySelect, zentaoDevCenterSelect};

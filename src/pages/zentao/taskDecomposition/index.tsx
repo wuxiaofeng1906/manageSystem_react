@@ -10,8 +10,8 @@ import {useRequest} from "ahooks";
 import {zentaoExcutionSelect, zentaoStorySelect, zentaoDevCenterSelect} from "./component/selector";
 import {getHeight} from "@/publicMethods/pageSet";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
-import {gridColumns} from "./grid/columns";
-import {getTaskTemplate} from "./grid/datas";
+import {gridColumns, setCellStyle} from "./grid/columns";
+import {getInitGridData, getGridDataByStory} from "./grid/datas";
 import moment from "moment";
 import DetailCellRenderer from "./grid/DetailCellRenderer";
 import {errorMessage, infoMessage, sucMessage, warnMessage} from "@/publicMethods/showMessages";
@@ -19,6 +19,7 @@ import {createZentaoTaskDecompose} from "./taskCreate";
 
 const {SHOW_PARENT} = TreeSelect;
 
+let devCenterPerson: any = [];
 // 组件初始化
 const TaskDecompose: React.FC<any> = () => {
 
@@ -37,14 +38,8 @@ const TaskDecompose: React.FC<any> = () => {
     gridApi.current?.sizeColumnsToFit();
   };
 
-  const zentaoTemplate = useRequest(() => getTaskTemplate()).data;
+  const zentaoTemplate = useRequest(() => getInitGridData()).data;
 
-
-  const onFirstDataRendered = useCallback(() => {
-    gridApi.current?.forEachNode((node: any) => {
-      node.setExpanded(node.id === "2");
-    });
-  }, []);
 
   const detailCellRenderer: any = useMemo(() => {
     return DetailCellRenderer;
@@ -53,6 +48,7 @@ const TaskDecompose: React.FC<any> = () => {
   /* endregion 表格事件 */
 
   /* region 下拉框加载 */
+
   const excutionSelect = useRequest(() => zentaoExcutionSelect()).data;
   const devCenterSelect = useRequest(() => zentaoDevCenterSelect()).data;
   /* endregion 下拉框加载 */
@@ -77,33 +73,21 @@ const TaskDecompose: React.FC<any> = () => {
     const selectArray = await zentaoStorySelect(params);
     setStorySelect(selectArray);
   };
-  //
-  // // 所属执行改变
-  // const executionChanged = async (executId: number) => {
-  //   if (executId) {
-  //     const params = {
-  //       execution_id: executId,
-  //       create_user: "",
-  //       assigned_to: ""
-  //     };
-  //     const selectArray = await zentaoStorySelect(params);
-  //     setStorySelect(selectArray);
-  //   }
-  // };
+
 
   // 禅道需求改变
-  const ztStoryChanged = () => {
+  const ztStoryChanged = async (params: any) => {
+    //  需要同步到下面表格中，一个需求生成5条数据,如果小于4个需求，则显示4块，其他的为空白即可。
+    const formDt = formForTaskQuery.getFieldsValue();
+    const queryInfo = {
+      execution_id: formDt.execution,
+      create_user: formDt.creater,
+      assigned_to: formDt.assignedTo
+    };
+    const tempData = await getGridDataByStory(params, queryInfo);
+    gridApi.current?.setRowData(tempData);
 
   }
-  // // 指派人改变
-  // const assignedToChanged = () => {
-  //
-  // }
-  //
-  // // 创建人改变
-  // const createrChanged = () => {
-  //
-  // };
 
   // 点击创建任务按钮
   const createZentaoTask = async () => {
@@ -149,10 +133,9 @@ const TaskDecompose: React.FC<any> = () => {
 
   /* endregion 表格中事件触发 */
 
-  useEffect(()=>{
-
-
-  },[zentaoTemplate])
+  useEffect(() => {
+    devCenterPerson = devCenterSelect;
+  }, [devCenterSelect])
   return (
     <PageContainer style={{marginTop: -30}}>
       <Spin spinning={createState} tip="任务创建中..." size={"large"}>
@@ -236,7 +219,7 @@ const TaskDecompose: React.FC<any> = () => {
                 suppressMenu: true,
                 minWidth: 90,
                 width: 90,
-                cellStyle: {'line-height': '28px'},
+                cellStyle: setCellStyle,
               }}
               rowHeight={28}
               headerHeight={30}
@@ -253,14 +236,13 @@ const TaskDecompose: React.FC<any> = () => {
                         assignedSelectChanged(props, currentValue);
                       }}
                     >
-                      {devCenterSelect}
+                      {devCenterPerson}
                     </Select>
                   );
-
                 },
                 timeRender: (props: any) => {
                   return (<DatePicker
-                    allowClear={false} size={'small'}
+                    allowClear={false} size={'small'} style={{width: "100%"}}
                     defaultValue={moment(props.value)} bordered={false}
                     onChange={(params: any, value: any) => {
                       planTimeChanged(props, value)
@@ -270,8 +252,12 @@ const TaskDecompose: React.FC<any> = () => {
               }}
               masterDetail={true}
               detailCellRenderer={detailCellRenderer}
-              detailRowHeight={25}
-              onFirstDataRendered={onFirstDataRendered}
+              detailRowHeight={28}
+              onFirstDataRendered={() => {
+                gridApi.current?.forEachNode((node: any) => {
+                  node.setExpanded(Number(node.id) % 5 === 4);
+                })
+              }}
             >
             </AgGridReact>
           </div>

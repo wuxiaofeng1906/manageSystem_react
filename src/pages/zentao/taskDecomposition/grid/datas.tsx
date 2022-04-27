@@ -1,5 +1,6 @@
 import {axiosGet, axiosDelete, axiosPost, axiosPut} from "@/publicMethods/axios"
 
+// 获取模板
 const getTaskTemplate = async () => {
   const tempData = await axiosGet("/api/verify/sprint/temp_detail");
 
@@ -14,15 +15,75 @@ const getTaskTemplate = async () => {
     });
   }
 
+  return datas;
+};
+
+// 表格初始化数据展示
+const getInitGridData = async () => {
+  const tempDatas: any = await getTaskTemplate();
   // 默认显示4大块模块
   let girdData: any = [];
   let index = 1;
   while (index < 5) {
     index += 1;
-    girdData = girdData.concat(datas)
+    girdData = girdData.concat(tempDatas)
   }
 
   return girdData;
 };
 
-export {getTaskTemplate};
+// 根据ID获取相关需求
+const getStoryByStoryId = (allStoryInfo: any, storyId: any) => {
+
+  const finalStoryInfo: any = [];
+  storyId.forEach((ele: any) => {
+    for (let i = 0; i < allStoryInfo.length; i += 1) {
+      if (ele.toString() === (allStoryInfo[i].id).toString()) {
+        finalStoryInfo.push(allStoryInfo[i]);
+        break;
+      }
+    }
+  });
+  return finalStoryInfo;
+};
+
+// 根据选中的需求生成表格数据
+const getGridDataByStory = async (storyId: any, queryInfo: any) => {
+  const allStoryInfo = await axiosGet("/api/verify/sprint/demand", queryInfo);
+
+  // 获取选中的需求信息
+  let finalStoryInfo: any = [];
+  if (storyId && storyId.length === 1 && storyId[0] === "全选") {
+    //   如果storyInfo是"全部"选项,将全部的需求编号来创建任务。
+    finalStoryInfo = [...allStoryInfo];
+  } else {
+    //   如果storyInfo是具体的id，则直接生成响应数据即可。
+    finalStoryInfo = getStoryByStoryId(allStoryInfo, storyId);
+  }
+
+  // 获取模板
+  const tempDatas: any = await getTaskTemplate();
+
+  // 将需求信息替换到模板。
+  let storyGridData: any = [];
+  if (finalStoryInfo && finalStoryInfo.length > 0 && tempDatas && tempDatas.length > 0) {
+    finalStoryInfo.forEach((story: any) => {
+      tempDatas.forEach((template: any) => {
+
+        storyGridData.push({
+          ...template,
+          subtask_dev_needs: `${story.id}:${story.name}`
+        })
+      });
+    });
+  }
+
+// 看原本查询了多少个，如果少于4个，则需要拼接成4个块展示。
+  let index = finalStoryInfo.length;
+  while (index < 5) {
+    index += 1;
+    storyGridData = storyGridData.concat(tempDatas);
+  }
+  return storyGridData;
+}
+export {getInitGridData, getGridDataByStory};

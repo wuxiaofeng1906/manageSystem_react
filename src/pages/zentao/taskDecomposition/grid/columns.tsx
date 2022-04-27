@@ -28,12 +28,18 @@ const gridColumns: any = [
   }, {
     headerName: '指派给',
     field: 'assigned_person_name',
+    minWidth: 120,
+    cellRenderer: "assigenedTo"
   }, {
     headerName: '预计开始',
     field: 'plan_start',
+    minWidth: 150,
+    cellRenderer: "timeRender",
   }, {
     headerName: '预计截止',
     field: 'plan_end',
+    minWidth: 150,
+    cellRenderer: "timeRender"
   }, {
     headerName: '优先级',
     field: 'priority',
@@ -57,7 +63,22 @@ const gridColumns: any = [
   }, {
     headerName: '是否裁剪',
     field: 'is_tailoring',
+    valueFormatter: (params: any) => {
+      if (params.value === "yes") {
+        return "是";
+      }
+      return "否";
+    }
   }
 ];
 
-export {gridColumns};
+const setCellStyle = (params: any) => {
+  const style = {"line-height": "28px"}
+  const whiteCell = ["task_name", "assigned_person_name", "plan_start", "plan_end", "estimate", "desc"];
+  if (whiteCell.indexOf(params.column?.colId) < 0) {
+    style["background-color"] = '#F8F8F8';
+  }
+  return style;
+
+};
+export {gridColumns, setCellStyle};

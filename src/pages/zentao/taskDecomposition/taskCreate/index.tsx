@@ -13,7 +13,7 @@ const createZentaoTaskDecompose = async (gridData: any, executionId: number) => 
       "task_type": row.task_type,
       "task_name": row.task_name,
       "module": row.module,
-      "subtask_dev_needs": row.subtask_dev_needs,
+      "subtask_dev_needs": row.subtask_dev_id,
       "assigned_person": row.assigned_person,
       "priority": row.priority,
       "estimate": row.estimate,

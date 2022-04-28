@@ -107,7 +107,7 @@ const TaskDecompose: React.FC<any> = () => {
 
     const createResult = await createZentaoTaskDecompose(gridData, formForTaskQuery.getFieldValue("execution"));
     if (createResult.code === 200) {
-      sucMessage("执行成功！");
+      sucMessage("任务正在生成，请稍后查看！");
     } else {
       errorMessage(`执行失败：${createResult.msg}`)
     }

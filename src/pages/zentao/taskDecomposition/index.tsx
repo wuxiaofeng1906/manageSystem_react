@@ -37,7 +37,6 @@ const TaskDecompose: React.FC<any> = () => {
 
   const zentaoTemplate = useRequest(() => getInitGridData()).data;
 
-
   const detailCellRenderer: any = useMemo(() => {
     return DetailCellRenderer;
   }, []);
@@ -54,9 +53,14 @@ const TaskDecompose: React.FC<any> = () => {
   const [formForTaskQuery] = Form.useForm();
   const [storySelect, setStorySelect] = useState([]);
   const [createState, setCreateState] = useState(false); // 点击执行后的状态（是否执行完）
-
+  // 设置展开的行（用于设置空白行）
+  const setExpandedRow = () => {
+    gridApi.current?.forEachNode((node: any) => {
+      node.setExpanded(Number(node.id) % 5 === 4);
+    });
+  };
   // 根据条件获取需求数据
-  const getZentaoStory = async () => {
+  const getZentaoStory = async (param: any) => {
     const formDt = formForTaskQuery.getFieldsValue();
     if (!formDt.execution) {
       errorMessage("请先选择所属执行！");
@@ -69,13 +73,15 @@ const TaskDecompose: React.FC<any> = () => {
     };
     const selectArray = await zentaoStorySelect(params);
     setStorySelect(selectArray);
-  };
 
-  // 设置展开的行（用于设置空白行）
-  const setExpandedRow = () => {
-    gridApi.current?.forEachNode((node: any) => {
-      node.setExpanded(Number(node.id) % 5 === 4);
-    });
+    // 如果选择的是所属执行，并且禅道需求有选择数据，则也要清空禅道需求选择框以及表格的数据，指派给和由谁创建不需要清空
+    if (param === "execution" && formDt.ztStory && (formDt.ztStory).length > 0) {
+      formForTaskQuery.setFieldsValue({
+        ztStory: undefined
+      });
+      gridApi.current?.setRowData(await getInitGridData());
+      setExpandedRow();
+    }
   };
 
   // 禅道需求改变
@@ -155,7 +161,9 @@ const TaskDecompose: React.FC<any> = () => {
               </Col>
               <Col span={5}>
                 <Form.Item label="所属执行" name="execution">
-                  <Select style={{width: '100%'}} showSearch onChange={getZentaoStory} allowClear placeholder="请选择"
+                  <Select style={{width: '100%'}} showSearch onChange={() => {
+                    getZentaoStory("execution")
+                  }} allowClear placeholder="请选择"
                           filterOption={(inputValue: string, option: any) =>
                             !!option.children.includes(inputValue)}>
                     {excutionSelect}
@@ -187,7 +195,9 @@ const TaskDecompose: React.FC<any> = () => {
               </Col>
               <Col span={4}>
                 <Form.Item label="指派给" name="assignedTo">
-                  <Select style={{width: '100%'}} showSearch onChange={getZentaoStory} allowClear placeholder="请选择"
+                  <Select style={{width: '100%'}} showSearch onChange={() => {
+                    getZentaoStory("assignedTo")
+                  }} allowClear placeholder="请选择"
                           filterOption={(inputValue: string, option: any) =>
                             !!option.children.includes(inputValue)}>
                     {devCenterSelect}
@@ -196,7 +206,9 @@ const TaskDecompose: React.FC<any> = () => {
               </Col>
               <Col span={4}>
                 <Form.Item label="由谁创建" name="creater">
-                  <Select style={{width: '100%'}} showSearch onChange={getZentaoStory} allowClear placeholder="请选择"
+                  <Select style={{width: '100%'}} showSearch onChange={() => {
+                    getZentaoStory("creater")
+                  }} allowClear placeholder="请选择"
                           filterOption={(inputValue: string, option: any) =>
                             !!option.children.includes(inputValue)}>
                     {devCenterSelect}

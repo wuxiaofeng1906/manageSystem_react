@@ -97,7 +97,7 @@ const getGridDataByStory = async (storyId: any, queryInfo: any) => {
 
 // 看原本查询了多少个，如果少于4个，则需要拼接成4个块展示。
   let index = finalStoryInfo.length;
-  while (index < 5) {
+  while (index < 4) {
     index += 1;
     storyGridData = storyGridData.concat(tempDatas);
   }

@@ -7,33 +7,34 @@ const usersLoginInfo = JSON.parse(userLogins);
 // 获取模板
 const getTaskTemplate = async () => {
   const tempData = await axiosGet("/api/verify/sprint/temp_detail");
+  return tempData;
+};
 
-  const datas: any = [];
-  // 默认生成四个模块,新增显示的ID列
-  if (tempData && tempData.length) {
-    tempData.forEach((ele: any, index: number) => {
-      datas.push({
+// 要生成count个初始化块
+const getEmptyRow = (tempDatas: any, count: any) => {
+  // 默认显示4大块模块
+  const girdData: any = [];
+  let index = 0;
+  while (index < count) {
+    index += 1;
+    // eslint-disable-next-line @typescript-eslint/no-loop-func
+    tempDatas.forEach((ele: any, num: number) => {
+      girdData.push({
         ...ele,
-        No: index + 1
-      })
+        No: num + 1, // 固定的12345
+        ids: `${index}${num}`// 用于区分初始化中相同行
+      });
     });
   }
 
-  return datas;
+  return girdData;
 };
 
 // 表格初始化数据展示
 const getInitGridData = async () => {
   const tempDatas: any = await getTaskTemplate();
-  // 默认显示4大块模块
-  let girdData: any = [];
-  let index = 1;
-  while (index < 5) {
-    index += 1;
-    girdData = girdData.concat(tempDatas)
-  }
-
-  return girdData;
+  // 默认显示4块
+  return getEmptyRow(tempDatas, 4);
 };
 
 // 根据ID获取相关需求
@@ -71,9 +72,8 @@ const getGridDataByStory = async (storyId: any, queryInfo: any) => {
   // 将需求信息替换到模板。
   let storyGridData: any = [];
   if (finalStoryInfo && finalStoryInfo.length > 0 && tempDatas && tempDatas.length > 0) {
-    finalStoryInfo.forEach((story: any) => {
-      tempDatas.forEach((template: any) => {
-
+    finalStoryInfo.forEach((story: any, index: number) => {
+      tempDatas.forEach((template: any, num: number) => {
         let taskName = "";
         if (template.add_type === "add") {
           taskName = `【${story.name}】`;
@@ -81,7 +81,6 @@ const getGridDataByStory = async (storyId: any, queryInfo: any) => {
           const nameHead = (template.task_name).split("】")[0].toString();
           taskName = `${nameHead}】${story.name}`;
         }
-
         storyGridData.push({
           ...template,
           task_name: taskName,
@@ -90,16 +89,16 @@ const getGridDataByStory = async (storyId: any, queryInfo: any) => {
           assigned_person: usersLoginInfo.userid === "test" ? "ChenHuan" : usersLoginInfo.userid,
           plan_start: dayjs().format("YYYY-MM-DD"),
           plan_end: dayjs().format("YYYY-MM-DD"),
+          No: num + 1, // 固定的12345
+          ids: `${index}${num}`// 用于区分初始化中相同行
         })
       });
     });
   }
 
 // 看原本查询了多少个，如果少于4个，则需要拼接成4个块展示。
-  let index = finalStoryInfo.length;
-  while (index < 4) {
-    index += 1;
-    storyGridData = storyGridData.concat(tempDatas);
+  if (finalStoryInfo.length < 4) {
+    storyGridData = storyGridData.concat(getEmptyRow(tempDatas, 4 - finalStoryInfo.length));
   }
   return storyGridData;
 }

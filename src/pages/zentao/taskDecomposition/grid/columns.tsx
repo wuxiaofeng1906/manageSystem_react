@@ -22,6 +22,7 @@ const gridColumns: any = [
   }, {
     headerName: '相关需求',
     field: 'subtask_dev_needs',
+    minWidth: 200,
     cellRenderer: (params: any) => {
       const storyId = params.data?.subtask_dev_id;
       if (params.value && storyId) {
@@ -86,7 +87,7 @@ const setCellStyle = (params: any) => {
   const whiteCell = ["task_name", "assigned_person", "plan_start", "plan_end", "estimate", "desc"];
   if (whiteCell.indexOf(params.column?.colId) < 0) {
     style["background-color"] = '#F8F8F8';
-  }else{
+  } else {
     style["background-color"] = 'white';
   }
   return style;

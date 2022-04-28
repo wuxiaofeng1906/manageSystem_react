@@ -74,6 +74,12 @@ const TaskDecompose: React.FC<any> = () => {
     setStorySelect(selectArray);
   };
 
+  // 设置展开的行（用于设置空白行）
+  const setExpandedRow = () => {
+    gridApi.current?.forEachNode((node: any) => {
+      node.setExpanded(Number(node.id) % 5 === 4);
+    });
+  };
 
   // 禅道需求改变
   const ztStoryChanged = async (params: any) => {
@@ -86,7 +92,7 @@ const TaskDecompose: React.FC<any> = () => {
     };
     const tempData = await getGridDataByStory(params, queryInfo);
     gridApi.current?.setRowData(tempData);
-
+    setExpandedRow();
   }
 
   // 点击创建任务按钮
@@ -253,11 +259,7 @@ const TaskDecompose: React.FC<any> = () => {
               masterDetail={true}
               detailCellRenderer={detailCellRenderer}
               detailRowHeight={28}
-              onFirstDataRendered={() => {
-                gridApi.current?.forEachNode((node: any) => {
-                  node.setExpanded(Number(node.id) % 5 === 4);
-                })
-              }}
+              onFirstDataRendered={setExpandedRow}
             >
             </AgGridReact>
           </div>

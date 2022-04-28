@@ -22,6 +22,10 @@ const zentaoExcutionSelect = async () => {
 const zentaoStorySelect = async (params: any) => {
 
   const zt_story = await axiosGet("/api/verify/sprint/demand", params);
+
+  if (!zt_story || zt_story.length === 0) {
+    return [];
+  }
   const childType: any = [];
   zt_story.forEach((storys: any) => {
     childType.push({

@@ -23,6 +23,14 @@ const gridColumns: any = [
     headerName: '相关需求',
     field: 'subtask_dev_needs',
     cellRenderer: (params: any) => {
+      const storyId = params.data?.subtask_dev_id;
+      if (params.value && storyId) {
+        return `
+          <div>
+                <a target="_blank"; href='http://zentao.77hub.com/zentao/story-view-${storyId}.html'> ${storyId}</a>
+                :${params.value}
+          </div>`;
+      }
       return params.value;
     }
   }, {

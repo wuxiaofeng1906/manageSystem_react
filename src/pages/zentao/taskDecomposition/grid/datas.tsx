@@ -70,9 +70,19 @@ const getGridDataByStory = async (storyId: any, queryInfo: any) => {
     finalStoryInfo.forEach((story: any) => {
       tempDatas.forEach((template: any) => {
 
+        let taskName = "";
+        if (template.add_type === "add") {
+          taskName = `【${story.name}】`;
+        } else {
+          const nameHead = (template.task_name).split("】")[0].toString();
+          taskName = `${nameHead}】${story.name}`;
+        }
+
         storyGridData.push({
           ...template,
-          subtask_dev_needs: `${story.id}:${story.name}`
+          task_name: taskName,
+          subtask_dev_id: story.id,
+          subtask_dev_needs: story.name
         })
       });
     });

@@ -125,7 +125,8 @@ const TaskDecompose: React.FC<any> = () => {
       });
     }
 
-    const storyCount = Math.floor(fianlData / 4);
+    const storyCount = Math.floor((fianlData.length) / 5);
+
     // 看原本查询了多少个，如果少于4个，则需要拼接成4个块展示。
     if (storyCount < 4) {
       // 拿取剩余的初始化数据

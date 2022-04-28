@@ -11,7 +11,7 @@ import {zentaoExcutionSelect, zentaoStorySelect, zentaoDevCenterSelect} from "./
 import {getHeight} from "@/publicMethods/pageSet";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {gridColumns, setCellStyle} from "./grid/columns";
-import {getInitGridData, getGridDataByStory, getParentEstimate} from "./grid/datas";
+import {getInitGridData, getGridDataByStory, getParentEstimate, getEmptyRow} from "./grid/datas";
 import moment from "moment";
 import DetailCellRenderer from "./grid/DetailCellRenderer";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
@@ -41,6 +41,19 @@ const TaskDecompose: React.FC<any> = () => {
     return DetailCellRenderer;
   }, []);
 
+  // 通过接口获取表格的数据
+  const getOraGridData = () => {
+    const gridData: any = [];
+    gridApi.current?.forEachNode((node: any) => {
+      // 需要判断相关需求是不是为空，为空的话表示默认数据，则不生成。
+      const rowData = node.data;
+      if (rowData.subtask_dev_needs) {
+        gridData.push(rowData);
+      }
+    });
+
+    return gridData;
+  }
   /* endregion 表格事件 */
 
   /* region 下拉框加载 */
@@ -85,16 +98,43 @@ const TaskDecompose: React.FC<any> = () => {
   };
 
   // 禅道需求改变
-  const ztStoryChanged = async (params: any) => {
-    //  需要同步到下面表格中，一个需求生成5条数据,如果小于4个需求，则显示4块，其他的为空白即可。
-    const formDt = formForTaskQuery.getFieldsValue();
-    const queryInfo = {
-      execution_id: formDt.execution,
-      create_user: formDt.creater,
-      assigned_to: formDt.assignedTo
-    };
-    const tempData = await getGridDataByStory(params, queryInfo);
-    gridApi.current?.setRowData(tempData);
+  const ztStoryChanged = async (params: any, other: any, currentValue: any) => {
+    let fianlData = [];
+    // 通过currentValue的triggerValue可以拿到当前选择的值，之前选择的值就不用再改变了。
+    const selectedValue = currentValue.triggerValue;
+
+    if (currentValue.checked) { // 是选中的话就增加记录，如果是false，则删除本条记录
+      //  需要同步到下面表格中，一个需求生成5条数据,如果小于4个需求，则显示4块，其他的为空白即可。
+      const formDt = formForTaskQuery.getFieldsValue();
+      const queryInfo = {
+        execution_id: formDt.execution,
+        create_user: formDt.creater,
+        assigned_to: formDt.assignedTo
+      };
+      const tempData = await getGridDataByStory(selectedValue, queryInfo);
+      // 获取表格之前数据，拼接起来即可，不重新刷新之前的数据
+      fianlData = getOraGridData().concat(tempData);
+    } else {
+
+      const oraData = getOraGridData();
+      oraData.forEach((ele: any) => {
+        //   如果是删掉的id,则不添加到数据中去。
+        if (ele.subtask_dev_id !== selectedValue) {
+          fianlData.push(ele);
+        }
+      });
+    }
+
+    const storyCount = Math.floor(fianlData / 4);
+    // 看原本查询了多少个，如果少于4个，则需要拼接成4个块展示。
+    if (storyCount < 4) {
+      // 拿取剩余的初始化数据
+      const initData = await getEmptyRow(4 - storyCount);
+      fianlData = fianlData.concat(initData);
+      gridApi.current?.setRowData(fianlData);
+    } else {
+      gridApi.current?.setRowData(fianlData);
+    }
     setExpandedRow();
   }
 

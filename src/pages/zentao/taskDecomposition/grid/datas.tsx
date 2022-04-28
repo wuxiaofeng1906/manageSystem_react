@@ -11,7 +11,9 @@ const getTaskTemplate = async () => {
 };
 
 // 要生成count个初始化块
-const getEmptyRow = (tempDatas: any, count: any) => {
+const getEmptyRow = async (count: any) => {
+  debugger;
+  const tempDatas: any = await getTaskTemplate();
   // 默认显示4大块模块
   const girdData: any = [];
   let index = 0;
@@ -32,33 +34,30 @@ const getEmptyRow = (tempDatas: any, count: any) => {
 
 // 表格初始化数据展示
 const getInitGridData = async () => {
-  const tempDatas: any = await getTaskTemplate();
   // 默认显示4块
-  return getEmptyRow(tempDatas, 4);
+  return getEmptyRow(4);
 };
 
 // 根据ID获取相关需求
 const getStoryByStoryId = (allStoryInfo: any, storyId: any) => {
-
   const finalStoryInfo: any = [];
-  storyId.forEach((ele: any) => {
-    for (let i = 0; i < allStoryInfo.length; i += 1) {
-      if (ele.toString() === (allStoryInfo[i].id).toString()) {
-        finalStoryInfo.push(allStoryInfo[i]);
-        break;
-      }
+  for (let i = 0; i < allStoryInfo.length; i += 1) {
+    if (storyId.toString() === (allStoryInfo[i].id).toString()) {
+      finalStoryInfo.push(allStoryInfo[i]);
+      break;
     }
-  });
+  }
   return finalStoryInfo;
 };
 
 // 根据选中的需求生成表格数据
 const getGridDataByStory = async (storyId: any, queryInfo: any) => {
+  debugger;
   const allStoryInfo = await axiosGet("/api/verify/sprint/demand", queryInfo);
 
   // 获取选中的需求信息
   let finalStoryInfo: any = [];
-  if (storyId && storyId.length === 1 && storyId[0] === "全选") {
+  if (storyId === "全选") {
     //   如果storyInfo是"全部"选项,将全部的需求编号来创建任务。
     finalStoryInfo = [...allStoryInfo];
   } else {
@@ -70,7 +69,7 @@ const getGridDataByStory = async (storyId: any, queryInfo: any) => {
   const tempDatas: any = await getTaskTemplate();
 
   // 将需求信息替换到模板。
-  let storyGridData: any = [];
+  const storyGridData: any = [];
   if (finalStoryInfo && finalStoryInfo.length > 0 && tempDatas && tempDatas.length > 0) {
     finalStoryInfo.forEach((story: any, index: number) => {
       tempDatas.forEach((template: any, num: number) => {
@@ -96,10 +95,6 @@ const getGridDataByStory = async (storyId: any, queryInfo: any) => {
     });
   }
 
-// 看原本查询了多少个，如果少于4个，则需要拼接成4个块展示。
-  if (finalStoryInfo.length < 4) {
-    storyGridData = storyGridData.concat(getEmptyRow(tempDatas, 4 - finalStoryInfo.length));
-  }
   return storyGridData;
 }
 
@@ -138,4 +133,4 @@ const getParentEstimate = (tableData: any, currentRow: any) => {
 };
 
 
-export {getInitGridData, getGridDataByStory, getParentEstimate};
+export {getInitGridData, getGridDataByStory, getParentEstimate, getEmptyRow};

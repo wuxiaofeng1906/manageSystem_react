@@ -80,6 +80,7 @@ const gridColumns: any = [
   }
 ];
 
+// 设置cell颜色，可编辑为白色，不可编辑为灰色。
 const setCellStyle = (params: any) => {
   const style = {"line-height": "28px"}
   const whiteCell = ["task_name", "assigned_person_name", "plan_start", "plan_end", "estimate", "desc"];

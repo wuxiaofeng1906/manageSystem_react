@@ -1,11 +1,11 @@
-import {axiosGet, axiosDelete, axiosPost, axiosPut} from "@/publicMethods/axios";
+import {axiosPost} from "@/publicMethods/axios";
 
 const userLogins: any = localStorage.getItem('userLogins');
 const usersLoginInfo = JSON.parse(userLogins);
 
-// 创建禅道任务分解
+// 创建禅道分解任务
 const createZentaoTaskDecompose = async (gridData: any, executionId: number) => {
-  debugger;
+
   const taskArray: any = [];
   gridData.forEach((row: any) => {
     taskArray.push({

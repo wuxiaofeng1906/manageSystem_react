@@ -1,4 +1,4 @@
-import {axiosGet, axiosDelete, axiosPost, axiosPut} from "@/publicMethods/axios";
+import {axiosGet} from "@/publicMethods/axios";
 import dayjs from "dayjs";
 
 const userLogins: any = localStorage.getItem('userLogins');

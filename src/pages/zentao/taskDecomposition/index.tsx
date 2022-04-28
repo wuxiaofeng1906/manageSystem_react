@@ -1,4 +1,4 @@
-import React, {useRef, useState, useCallback, useMemo, useEffect} from 'react';
+import React, {useRef, useState, useMemo, useEffect} from 'react';
 import {Button, Col, Form, Tooltip, Row, Select, Spin, TreeSelect, DatePicker} from "antd";
 import {CopyOutlined,} from "@ant-design/icons";
 import {AgGridReact} from "ag-grid-react";
@@ -14,16 +14,13 @@ import {gridColumns, setCellStyle} from "./grid/columns";
 import {getInitGridData, getGridDataByStory} from "./grid/datas";
 import moment from "moment";
 import DetailCellRenderer from "./grid/DetailCellRenderer";
-import {errorMessage, infoMessage, sucMessage, warnMessage} from "@/publicMethods/showMessages";
+import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {createZentaoTaskDecompose} from "./taskCreate";
 
 const {SHOW_PARENT} = TreeSelect;
-
 let devCenterPerson: any = [];
 // 组件初始化
 const TaskDecompose: React.FC<any> = () => {
-
-  const [createState, setCreateState] = useState(false); // 点击执行后的状态（是否执行完）
 
   /* region 表格事件 */
   const [gridHeight, setGridHeight] = useState(getHeight());
@@ -54,9 +51,9 @@ const TaskDecompose: React.FC<any> = () => {
   /* endregion 下拉框加载 */
 
   /* region 操作栏相关事件 */
-
   const [formForTaskQuery] = Form.useForm();
   const [storySelect, setStorySelect] = useState([]);
+  const [createState, setCreateState] = useState(false); // 点击执行后的状态（是否执行完）
 
   // 根据条件获取需求数据
   const getZentaoStory = async () => {
@@ -128,18 +125,6 @@ const TaskDecompose: React.FC<any> = () => {
       [props.column.colId]: value
     });
   }
-  // // 指派人修改
-  // const assignedSelectChanged = (props: any, value: any) => {
-  //   const rowNode = gridApi.current?.getRowNode(props.rowIndex);
-  //   rowNode?.setData({
-  //     ...props.data,
-  //     [props.column.colId]: value
-  //   });
-  // }
-  // // 计划时间修改
-  // const planTimeChanged = (props: any, timeValue: any) => {
-  //   updateGridData(props, timeValue);
-  // };
 
   // 表格编辑完毕
   const gridEditedEnd = () => {

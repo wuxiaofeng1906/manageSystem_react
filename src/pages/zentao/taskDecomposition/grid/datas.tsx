@@ -1,4 +1,8 @@
-import {axiosGet, axiosDelete, axiosPost, axiosPut} from "@/publicMethods/axios"
+import {axiosGet, axiosDelete, axiosPost, axiosPut} from "@/publicMethods/axios";
+import dayjs from "dayjs";
+
+const userLogins: any = localStorage.getItem('userLogins');
+const usersLoginInfo = JSON.parse(userLogins);
 
 // 获取模板
 const getTaskTemplate = async () => {
@@ -82,7 +86,10 @@ const getGridDataByStory = async (storyId: any, queryInfo: any) => {
           ...template,
           task_name: taskName,
           subtask_dev_id: story.id,
-          subtask_dev_needs: story.name
+          subtask_dev_needs: story.name,
+          assigned_person: usersLoginInfo.userid === "test" ? "ChenHuan" : usersLoginInfo.userid,
+          plan_start: dayjs().format("YYYY-MM-DD"),
+          plan_end: dayjs().format("YYYY-MM-DD"),
         })
       });
     });

@@ -35,7 +35,7 @@ const gridColumns: any = [
     }
   }, {
     headerName: '指派给',
-    field: 'assigned_person_name',
+    field: 'assigned_person',
     minWidth: 120,
     cellRenderer: "assigenedTo"
   }, {

@@ -98,8 +98,17 @@ const TaskDecompose: React.FC<any> = () => {
   // 点击创建任务按钮
   const createZentaoTask = async () => {
     setCreateState(true);
+    const gridData: any = [];
+    gridApi.current?.forEachNode((node: any) => {
+      // 需要判断相关需求是不是为空，为空的话表示默认数据，则不生成。
 
-    const createResult = await createZentaoTaskDecompose();
+      const rowData = node.data;
+      if (rowData.subtask_dev_needs) {
+        gridData.push(rowData);
+      }
+    });
+
+    const createResult = await createZentaoTaskDecompose(gridData, formForTaskQuery.getFieldValue("execution"));
     if (createResult.code === 200) {
       sucMessage("执行成功！");
     } else {
@@ -119,18 +128,18 @@ const TaskDecompose: React.FC<any> = () => {
       [props.column.colId]: value
     });
   }
-  // 指派人修改
-  const assignedSelectChanged = (props: any, value: any) => {
-    const rowNode = gridApi.current?.getRowNode(props.rowIndex);
-    rowNode?.setData({
-      ...props.data,
-      [props.column.colId]: value
-    });
-  }
-  // 计划时间修改
-  const planTimeChanged = (props: any, timeValue: any) => {
-    updateGridData(props, timeValue);
-  };
+  // // 指派人修改
+  // const assignedSelectChanged = (props: any, value: any) => {
+  //   const rowNode = gridApi.current?.getRowNode(props.rowIndex);
+  //   rowNode?.setData({
+  //     ...props.data,
+  //     [props.column.colId]: value
+  //   });
+  // }
+  // // 计划时间修改
+  // const planTimeChanged = (props: any, timeValue: any) => {
+  //   updateGridData(props, timeValue);
+  // };
 
   // 表格编辑完毕
   const gridEditedEnd = () => {
@@ -238,8 +247,10 @@ const TaskDecompose: React.FC<any> = () => {
                     <Select
                       size={'small'} defaultValue={props.value}
                       bordered={false} style={{width: '120%'}} showSearch
+                      filterOption={(inputValue: string, option: any) =>
+                        !!option.children.includes(inputValue)}
                       onChange={(currentValue: any) => {
-                        assignedSelectChanged(props, currentValue);
+                        updateGridData(props, currentValue);
                       }}
                     >
                       {devCenterPerson}
@@ -250,8 +261,8 @@ const TaskDecompose: React.FC<any> = () => {
                   return (<DatePicker
                     allowClear={false} size={'small'} style={{width: "100%"}}
                     defaultValue={moment(props.value)} bordered={false}
-                    onChange={(params: any, value: any) => {
-                      planTimeChanged(props, value)
+                    onChange={(params: any, currentValue: any) => {
+                      updateGridData(props, currentValue)
                     }}
                   />);
                 }

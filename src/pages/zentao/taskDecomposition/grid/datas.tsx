@@ -103,4 +103,40 @@ const getGridDataByStory = async (storyId: any, queryInfo: any) => {
   }
   return storyGridData;
 }
-export {getInitGridData, getGridDataByStory};
+
+// 获取父任务的id和值【这个方法跟禅道任务生成有一点不一样，所以不能用同一个】
+const getParentEstimate = (tableData: any, currentRow: any) => {
+
+  let parentIndex = -1;
+  //  因为表格中有空白行，也占用了rowindex，所以需要减去对应的空白行
+  const currentIndex = currentRow.rowIndex - Math.floor(currentRow.rowIndex / 5);
+
+  // 往上找寻父任务并且相加子任务的值
+  for (let index = currentIndex; index >= 0; index -= 1) {
+    const rows = tableData[index];
+    if (rows.add_type_name === "新增") {  // 确定父任务ID
+      parentIndex = index;
+      break;
+    }
+  }
+
+  let parentValue = 0;
+  // 相加所有子任务的值
+  for (let index = parentIndex + 1; index < tableData.length; index += 1) {
+    const rows = tableData[index];
+    //  寻找到下一个下一个父任务时，就跳出循环，停止值的相加。
+    if (rows.add_type_name === "新增") { //
+      break;
+    } else {
+      parentValue = Number(rows.estimate) + parentValue;
+    }
+  }
+
+
+  // 还要获取
+  return {parentIndex, parentValue}
+
+};
+
+
+export {getInitGridData, getGridDataByStory, getParentEstimate};

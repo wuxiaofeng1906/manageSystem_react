@@ -11,7 +11,7 @@ import {zentaoExcutionSelect, zentaoStorySelect, zentaoDevCenterSelect} from "./
 import {getHeight} from "@/publicMethods/pageSet";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {gridColumns, setCellStyle} from "./grid/columns";
-import {getInitGridData, getGridDataByStory} from "./grid/datas";
+import {getInitGridData, getGridDataByStory, getParentEstimate} from "./grid/datas";
 import moment from "moment";
 import DetailCellRenderer from "./grid/DetailCellRenderer";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
@@ -104,7 +104,6 @@ const TaskDecompose: React.FC<any> = () => {
     const gridData: any = [];
     gridApi.current?.forEachNode((node: any) => {
       // 需要判断相关需求是不是为空，为空的话表示默认数据，则不生成。
-
       const rowData = node.data;
       if (rowData.subtask_dev_needs) {
         gridData.push(rowData);
@@ -133,8 +132,33 @@ const TaskDecompose: React.FC<any> = () => {
   }
 
   // 表格编辑完毕
-  const gridEditedEnd = () => {
+  const gridEditedEnd = (params: any) => {
 
+    // 最初预计进行格式验证
+    if (params.column.colId === "estimate") {
+      //   判断是不是为数字
+      if (params.newValue !== "0" && !Number(params.newValue)) {
+        errorMessage("【最初预计】必须为数字！");
+        updateGridData(params, params.oldValue);
+        return;
+      }
+
+      // 如果是子任务，还要把父任务的最初预计同步
+      if (params.data?.add_type === "subtask") {
+
+        const tabData: any = [];
+        gridApi.current?.forEachNode((node: any) => {
+          tabData.push(node.data);
+        });
+        // 计算父任务的最初预计
+        const parentInfo = getParentEstimate(tabData, params);
+        const rowNode = gridApi.current?.getRowNode((parentInfo.parentIndex).toString());
+        rowNode?.setData({
+          ...tabData[parentInfo.parentIndex],
+          "estimate": parentInfo.parentValue
+        })
+      }
+    }
   };
 
   /* endregion 表格中事件触发 */

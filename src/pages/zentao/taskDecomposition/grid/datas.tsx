@@ -32,10 +32,27 @@ const getEmptyRow = async (count: any) => {
   return girdData;
 };
 
+const insertEmptyRows = (oraData: any) => {
+  const result: any = [];
+  if (oraData && oraData.length > 0) {
+    oraData.forEach((ele: any, index: number) => {
+      result.push({...ele});
+      if (index % 5 === 4 && index !== oraData.length - 1) {
+        result.push({
+          No: 6,
+          ids: `6_${index}`
+        });
+      }
+    });
+  }
+
+  return result;
+}
 // 表格初始化数据展示
 const getInitGridData = async () => {
+  const datas = await getEmptyRow(4);
   // 默认显示4块
-  return getEmptyRow(4);
+  return insertEmptyRows(datas);
 };
 
 // 根据ID获取相关需求
@@ -98,7 +115,7 @@ const getGridDataByStory = async (storyId: any, perValueArray: any, queryInfo: a
           plan_end: dayjs().format("YYYY-MM-DD"),
           No: num + 1, // 固定的12345
           ids: `${index}${num}`// 用于区分初始化中相同行
-        })
+        });
       });
     });
   }
@@ -110,9 +127,7 @@ const getGridDataByStory = async (storyId: any, perValueArray: any, queryInfo: a
 const getParentEstimate = (tableData: any, currentRow: any) => {
 
   let parentIndex = -1;
-  //  因为表格中有空白行，也占用了rowindex，所以需要减去对应的空白行
-  const currentIndex = currentRow.rowIndex - Math.floor(currentRow.rowIndex / 5);
-
+  const currentIndex = currentRow.rowIndex;
   // 往上找寻父任务并且相加子任务的值
   for (let index = currentIndex; index >= 0; index -= 1) {
     const rows = tableData[index];
@@ -129,7 +144,7 @@ const getParentEstimate = (tableData: any, currentRow: any) => {
     //  寻找到下一个下一个父任务时，就跳出循环，停止值的相加。
     if (rows.add_type_name === "新增") { //
       break;
-    } else {
+    } else if (rows.estimate || Number(rows.estimate) === 0) {
       parentValue = Number(rows.estimate) + parentValue;
     }
   }
@@ -141,4 +156,4 @@ const getParentEstimate = (tableData: any, currentRow: any) => {
 };
 
 
-export {getInitGridData, getGridDataByStory, getParentEstimate, getEmptyRow};
+export {getInitGridData, getGridDataByStory, getParentEstimate, getEmptyRow, insertEmptyRows};

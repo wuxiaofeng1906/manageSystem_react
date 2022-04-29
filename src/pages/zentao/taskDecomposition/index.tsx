@@ -1,4 +1,4 @@
-import React, {useRef, useState, useMemo, useEffect} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import {Button, Col, Form, Tooltip, Row, Select, Spin, TreeSelect, DatePicker} from "antd";
 import {CopyOutlined,} from "@ant-design/icons";
 import {AgGridReact} from "ag-grid-react";
@@ -11,9 +11,8 @@ import {zentaoExcutionSelect, zentaoStorySelect, zentaoDevCenterSelect} from "./
 import {getHeight} from "@/publicMethods/pageSet";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {gridColumns, setCellStyle} from "./grid/columns";
-import {getInitGridData, getGridDataByStory, getParentEstimate, getEmptyRow} from "./grid/datas";
+import {getInitGridData, getGridDataByStory, getParentEstimate, getEmptyRow, insertEmptyRows} from "./grid/datas";
 import moment from "moment";
-import DetailCellRenderer from "./grid/DetailCellRenderer";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {createZentaoTaskDecompose} from "./taskCreate";
 import dayjs from "dayjs";
@@ -37,10 +36,6 @@ const TaskDecompose: React.FC<any> = () => {
   };
 
   const zentaoTemplate = useRequest(() => getInitGridData()).data;
-
-  const detailCellRenderer: any = useMemo(() => {
-    return DetailCellRenderer;
-  }, []);
 
   // 通过接口获取表格的数据
   const getOraGridData = () => {
@@ -142,9 +137,9 @@ const TaskDecompose: React.FC<any> = () => {
       // 拿取剩余的初始化数据
       const initData = await getEmptyRow(4 - storyCount);
       fianlData = fianlData.concat(initData);
-      gridApi.current?.setRowData(fianlData);
+      gridApi.current?.setRowData(insertEmptyRows(fianlData));
     } else {
-      gridApi.current?.setRowData(fianlData);
+      gridApi.current?.setRowData(insertEmptyRows(fianlData));
     }
     setExpandedRow();
   }
@@ -347,6 +342,9 @@ const TaskDecompose: React.FC<any> = () => {
               onCellEditingStopped={gridEditedEnd}
               frameworkComponents={{
                 assigenedTo: (props: any) => {
+                  if (props.data?.No === 6) {
+                    return "";
+                  }
                   return (
                     <Select
                       size={'small'} defaultValue={props.value}
@@ -362,6 +360,9 @@ const TaskDecompose: React.FC<any> = () => {
                   );
                 },
                 timeRender: (props: any) => {
+                  if (props.data?.No === 6) {
+                    return "";
+                  }
                   return (<DatePicker
                     allowClear={false} size={'small'} style={{width: "100%"}}
                     defaultValue={moment(props.value)} bordered={false}
@@ -371,10 +372,6 @@ const TaskDecompose: React.FC<any> = () => {
                   />);
                 }
               }}
-              masterDetail={true}
-              detailCellRenderer={detailCellRenderer}
-              detailRowHeight={28}
-              onFirstDataRendered={setExpandedRow}
             >
             </AgGridReact>
           </div>

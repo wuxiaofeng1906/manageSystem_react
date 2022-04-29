@@ -4,7 +4,13 @@ const gridColumns: any = [
     field: 'No',
     minWidth: 65,
     width: 90,
-    pinned: "left"
+    pinned: "left",
+    cellRenderer: (params: any) => {
+      if (params.data?.No === 6) {
+        return "";
+      }
+      return params.value;
+    }
   }, {
     headerName: '增加类型',
     field: 'add_type_name',
@@ -20,6 +26,9 @@ const gridColumns: any = [
     headerName: '所属模块',
     field: 'module',
     valueFormatter: (params: any) => {
+      if (params.data?.No === 6) {
+        return "";
+      }
       if (!params.value) {
         return "/";
       }
@@ -44,7 +53,7 @@ const gridColumns: any = [
     headerName: '指派给',
     field: 'assigned_person',
     minWidth: 120,
-    cellRenderer: "assigenedTo"
+    cellRenderer: "assigenedTo",
   }, {
     headerName: '预计开始',
     field: 'plan_start',
@@ -79,6 +88,9 @@ const gridColumns: any = [
     headerName: '是否裁剪',
     field: 'is_tailoring',
     valueFormatter: (params: any) => {
+      if (params.data?.No === 6) {
+        return "";
+      }
       if (params.value === "yes") {
         return "是";
       }
@@ -89,6 +101,10 @@ const gridColumns: any = [
 
 // 设置cell颜色，可编辑为白色，不可编辑为灰色。
 const setCellStyle = (params: any) => {
+
+  if (params.data?.No === 6) {
+    return {"background-color": "white"}
+  }
   const style = {"line-height": "28px"}
   const whiteCell = ["task_name", "assigned_person", "plan_start", "plan_end", "estimate", "desc"];
   if (whiteCell.indexOf(params.column?.colId) < 0) {

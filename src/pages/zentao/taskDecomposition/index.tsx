@@ -16,6 +16,7 @@ import moment from "moment";
 import DetailCellRenderer from "./grid/DetailCellRenderer";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {createZentaoTaskDecompose} from "./taskCreate";
+import dayjs from "dayjs";
 
 const {SHOW_PARENT} = TreeSelect;
 let devCenterPerson: any = [];
@@ -186,6 +187,33 @@ const TaskDecompose: React.FC<any> = () => {
     });
   }
 
+  // 预计时间选择事件
+  const planTimeChaned = (props: any, currentValue: any) => {
+    //  预计开始或者预计截止时间 ，需要判断开始时间不能大于截止时间
+    let oldValue = currentValue;
+    if (props.column?.colId === "plan_start") {
+      let planEnd = props.data?.plan_end;
+      if (!planEnd) {
+        planEnd = dayjs().format("YYYY-MM-DD");
+      }
+      if (currentValue > planEnd) {
+        oldValue = props.data?.plan_start;
+        errorMessage("预计开始时间不能大于预计截止时间！");
+      }
+    }
+
+    if (props.column?.colId === "plan_end") {
+      let planStart = props.data?.plan_start;
+      if (!planStart) {
+        planStart = dayjs().format("YYYY-MM-DD");
+      }
+      if (planStart > currentValue) {
+        oldValue = props.data?.plan_end;
+        errorMessage("预计截止时间不能小于预计开始时间！");
+      }
+    }
+    updateGridData(props, oldValue);
+  }
   // 表格编辑完毕
   const gridEditedEnd = (params: any) => {
 
@@ -338,7 +366,7 @@ const TaskDecompose: React.FC<any> = () => {
                     allowClear={false} size={'small'} style={{width: "100%"}}
                     defaultValue={moment(props.value)} bordered={false}
                     onChange={(params: any, currentValue: any) => {
-                      updateGridData(props, currentValue)
+                      planTimeChaned(props, currentValue)
                     }}
                   />);
                 }

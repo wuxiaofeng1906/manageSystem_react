@@ -1,16 +1,16 @@
 import React, {useRef, useState, useEffect} from 'react';
-import {Button, Col, Form, Tooltip, Row, Select, Spin, TreeSelect, DatePicker} from "antd";
+import {Button, Col, Form, Tooltip, Row, Select, Spin, TreeSelect, DatePicker, PageHeader, Breadcrumb} from "antd";
 import {CopyOutlined,} from "@ant-design/icons";
 import {AgGridReact} from "ag-grid-react";
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {PageContainer} from '@ant-design/pro-layout';
 import {useRequest} from "ahooks";
 import {zentaoExcutionSelect, zentaoStorySelect, zentaoDevCenterSelect} from "./component/selector";
 import {getHeight} from "@/publicMethods/pageSet";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {gridColumns, setCellStyle} from "./grid/columns";
+import Header from "./component/CusPageHeader";
 import {
   getInitGridData, getGridDataByStory, getParentEstimate, getEmptyRow,
   insertEmptyRows, judgeTaskName
@@ -227,7 +227,6 @@ const TaskDecompose: React.FC<any> = () => {
       }
     } else if (params.column.colId === "task_name") {
       // 任务名称不能为空，必须包含相关字段。
-      debugger;
       const message = judgeTaskName(params);
       if (message !== "") {
         errorMessage(message);
@@ -238,13 +237,15 @@ const TaskDecompose: React.FC<any> = () => {
 
   /* endregion 表格中事件触发 */
 
+
   useEffect(() => {
     devCenterPerson = devCenterSelect;
   }, [devCenterSelect])
   return (
-    <PageContainer style={{marginTop: -30}}>
+    <div>
+      <Header/>
       <Spin spinning={createState} tip="任务创建中..." size={"large"}>
-        <div style={{marginTop: -15}}>
+        <div style={{marginTop: 5}}>
           <Form form={formForTaskQuery}>
             {/* gutter col 之间的间隔 [水平，垂直] */}
             <Row style={{marginLeft: -10}} gutter={[4, 4]}>
@@ -318,7 +319,7 @@ const TaskDecompose: React.FC<any> = () => {
           </Form>
         </div>
         {/* 表格 */}
-        <div style={{marginTop: -15}}>
+        <div style={{marginTop: -20}}>
           <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
             <AgGridReact
               columnDefs={gridColumns} // 定义列
@@ -374,7 +375,9 @@ const TaskDecompose: React.FC<any> = () => {
           </div>
         </div>
       </Spin>
-    </PageContainer>
+    </div>
+
+
   );
 };
 

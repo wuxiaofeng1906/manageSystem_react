@@ -21,7 +21,12 @@ const gridColumns: any = [
     minWidth: 200,
     width: 90,
     pinned: "left",
-    editable: true,
+    editable: (params: any) => {
+      if (params.data?.No === 6) {
+        return false;
+      }
+      return true;
+    },
   }, {
     headerName: '所属模块',
     field: 'module',
@@ -73,11 +78,21 @@ const gridColumns: any = [
   }, {
     headerName: '最初预计',
     field: 'estimate',
-    editable: true,
+    editable: (params: any) => {
+      if (params.data?.No === 6) {
+        return false;
+      }
+      return true;
+    },
   }, {
     headerName: '任务描述',
     field: 'desc',
-    editable: true,
+    editable: (params: any) => {
+      if (params.data?.No === 6) {
+        return false;
+      }
+      return true;
+    },
   }, {
     headerName: '所属端',
     field: 'belongs_name',

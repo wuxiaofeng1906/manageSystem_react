@@ -27,6 +27,7 @@ const zentaoStorySelect = async (params: any) => {
     return [];
   }
   const childType: any = [];
+
   zt_story.forEach((storys: any) => {
     childType.push({
       title: `${storys.id}:${storys.name}`,
@@ -37,7 +38,7 @@ const zentaoStorySelect = async (params: any) => {
 
   const typeData: any = [
     {
-      title: '全选',
+      title: `全选 (${childType.length}个)`,
       value: '全选',
       key: '全选',
       children: childType

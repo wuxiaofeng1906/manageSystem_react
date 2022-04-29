@@ -99,7 +99,7 @@ const TaskDecompose: React.FC<any> = () => {
 
   // 禅道需求改变
   const ztStoryChanged = async (params: any, other: any, currentValue: any) => {
-    debugger;
+
     let fianlData = [];
     // 通过currentValue的triggerValue可以拿到当前选择的值，之前选择的值就不用再改变了。
     const selectedValue = currentValue.triggerValue;
@@ -112,22 +112,17 @@ const TaskDecompose: React.FC<any> = () => {
         create_user: formDt.creater,
         assigned_to: formDt.assignedTo
       };
-      debugger;
+
+      const perValueArray: any = [];
       const {preValue} = currentValue; // 之前选择框中的数据，用于全选时不覆盖之前的数据操作
-      const perValueArray = [];
-       preValue.forEach((ele: any) => {
-         perValueArray.push(ele.value);
+      preValue.forEach((ele: any) => {
+        perValueArray.push(ele.value);
       });
 
       const tempData = await getGridDataByStory(selectedValue, perValueArray, queryInfo);
-
-      //   如果是全选的话，就不拼接之前的数据了
-      // if (selectedValue === "全选") {
-      //   fianlData = [...tempData];
-      // } else {
       // 获取表格之前数据，拼接起来即可，不重新刷新之前的数据
       fianlData = getOraGridData().concat(tempData);
-      // }
+
     } else if (selectedValue !== "全选") {
 
       const oraData = getOraGridData();
@@ -155,6 +150,11 @@ const TaskDecompose: React.FC<any> = () => {
 
   // 点击创建任务按钮
   const createZentaoTask = async () => {
+    // 需要验证禅道需求不能为空（所属执行不需要判断，因为要选择禅道需求就必须选额所属执行）
+    if (!formForTaskQuery.getFieldValue("ztStory") || formForTaskQuery.getFieldValue("ztStory").length === 0) {
+      errorMessage("禅道需求不能为空！");
+      return;
+    }
     setCreateState(true);
     const gridData: any = [];
     gridApi.current?.forEachNode((node: any) => {

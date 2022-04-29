@@ -71,11 +71,8 @@ const getStoryByStoryId = async (queryInfo: any, storyId: any, perValueArray: an
 
 // 根据选中的需求生成表格数据
 const getGridDataByStory = async (storyId: any, perValueArray: any, queryInfo: any) => {
-
-
   // 获取选中的需求信息
   const finalStoryInfo = await getStoryByStoryId(queryInfo, storyId, perValueArray);
-
   // 获取模板
   const tempDatas: any = await getTaskTemplate();
 

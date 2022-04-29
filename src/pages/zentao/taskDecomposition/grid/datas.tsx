@@ -12,7 +12,7 @@ const getTaskTemplate = async () => {
 
 // 要生成count个初始化块
 const getEmptyRow = async (count: any) => {
-  debugger;
+
   const tempDatas: any = await getTaskTemplate();
   // 默认显示4大块模块
   const girdData: any = [];
@@ -52,7 +52,7 @@ const getStoryByStoryId = (allStoryInfo: any, storyId: any) => {
 
 // 根据选中的需求生成表格数据
 const getGridDataByStory = async (storyId: any, queryInfo: any) => {
-  debugger;
+
   const allStoryInfo = await axiosGet("/api/verify/sprint/demand", queryInfo);
 
   // 获取选中的需求信息

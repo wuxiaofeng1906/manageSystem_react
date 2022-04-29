@@ -19,6 +19,12 @@ const gridColumns: any = [
   }, {
     headerName: '所属模块',
     field: 'module',
+    valueFormatter: (params: any) => {
+      if (!params.value) {
+        return "/";
+      }
+      return params.value;
+    }
   }, {
     headerName: '相关需求',
     field: 'subtask_dev_needs',

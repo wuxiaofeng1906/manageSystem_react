@@ -51,15 +51,25 @@ const getStoryByStoryId = (allStoryInfo: any, storyId: any) => {
 };
 
 // 根据选中的需求生成表格数据
-const getGridDataByStory = async (storyId: any, queryInfo: any) => {
+const getGridDataByStory = async (storyId: any, perValueArray: any, queryInfo: any) => {
 
   const allStoryInfo = await axiosGet("/api/verify/sprint/demand", queryInfo);
 
   // 获取选中的需求信息
   let finalStoryInfo: any = [];
   if (storyId === "全选") {
-    //   如果storyInfo是"全部"选项,将全部的需求编号来创建任务。
-    finalStoryInfo = [...allStoryInfo];
+    if (!perValueArray || perValueArray.length === 0) {
+      //   如果storyInfo是"全部"选项,将全部的需求编号来创建任务。
+      finalStoryInfo = [...allStoryInfo];
+    } else {
+      //  如果之前的选择框有数据，则不再对之前的数据进行操作。
+      allStoryInfo.forEach((story: any) => {
+        if (perValueArray.indexOf(story.id) === -1) {
+          finalStoryInfo.push(story);
+        }
+      });
+    }
+
   } else {
     //   如果storyInfo是具体的id，则直接生成响应数据即可。
     finalStoryInfo = getStoryByStoryId(allStoryInfo, storyId);

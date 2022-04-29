@@ -320,7 +320,7 @@ const TaskDecompose: React.FC<any> = () => {
         </div>
         {/* 表格 */}
         <div style={{marginTop: -20}}>
-          <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
+          <div className="ag-theme-alpine" style={{height: gridHeight + 40, width: '100%'}}>
             <AgGridReact
               columnDefs={gridColumns} // 定义列
               rowData={zentaoTemplate} // 数据绑定

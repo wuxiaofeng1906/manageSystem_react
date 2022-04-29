@@ -41,7 +41,7 @@ const TaskDecompose: React.FC<any> = () => {
   const getOraGridData = () => {
     const gridData: any = [];
     gridApi.current?.forEachNode((node: any) => {
-      // 需要判断相关需求是不是为空，为空的话表示默认数据，则不生成。
+      // 需要判断相关需求是不是为空，为空的话表示默认数据，则不添加。
       const rowData = node.data;
       if (rowData.subtask_dev_needs) {
         gridData.push(rowData);
@@ -146,15 +146,7 @@ const TaskDecompose: React.FC<any> = () => {
       return;
     }
     setCreateState(true);
-    const gridData: any = [];
-    gridApi.current?.forEachNode((node: any) => {
-      // 需要判断相关需求是不是为空，为空的话表示默认数据，则不生成。
-      const rowData = node.data;
-      if (rowData.subtask_dev_needs) {
-        gridData.push(rowData);
-      }
-    });
-
+    const gridData: any = getOraGridData(); // 获取表格数据
     const createResult = await createZentaoTaskDecompose(gridData, formForTaskQuery.getFieldValue("execution"));
     if (createResult.code === 200) {
       sucMessage("任务正在生成，请稍后查看！");

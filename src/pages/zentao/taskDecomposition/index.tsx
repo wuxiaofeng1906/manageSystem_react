@@ -333,8 +333,8 @@ const TaskDecompose: React.FC<any> = () => {
                 width: 90,
                 cellStyle: setCellStyle,
               }}
-              rowHeight={28}
-              headerHeight={30}
+              rowHeight={27}
+              headerHeight={29}
               suppressRowTransform={true}
               onGridReady={onGridReady}
               onCellEditingStopped={gridEditedEnd}

@@ -112,8 +112,14 @@ const TaskDecompose: React.FC<any> = () => {
         assigned_to: formDt.assignedTo
       };
       const tempData = await getGridDataByStory(selectedValue, queryInfo);
-      // 获取表格之前数据，拼接起来即可，不重新刷新之前的数据
-      fianlData = getOraGridData().concat(tempData);
+
+      //   如果是全选的话，就不拼接之前的数据了
+      if (selectedValue === "全选") {
+        fianlData = [...tempData];
+      } else {
+        // 获取表格之前数据，拼接起来即可，不重新刷新之前的数据
+        fianlData = getOraGridData().concat(tempData);
+      }
     } else if (selectedValue !== "全选") {
 
       const oraData = getOraGridData();

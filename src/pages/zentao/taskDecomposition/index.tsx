@@ -62,12 +62,7 @@ const TaskDecompose: React.FC<any> = () => {
   const [formForTaskQuery] = Form.useForm();
   const [storySelect, setStorySelect] = useState([]);
   const [createState, setCreateState] = useState(false); // 点击执行后的状态（是否执行完）
-  // 设置展开的行（用于设置空白行）
-  const setExpandedRow = () => {
-    gridApi.current?.forEachNode((node: any) => {
-      node.setExpanded(Number(node.id) % 5 === 4);
-    });
-  };
+
   // 根据条件获取需求数据
   const getZentaoStory = async (param: any) => {
     const formDt = formForTaskQuery.getFieldsValue();
@@ -89,7 +84,6 @@ const TaskDecompose: React.FC<any> = () => {
         ztStory: undefined
       });
       gridApi.current?.setRowData(await getInitGridData());
-      setExpandedRow();
     }
   };
 
@@ -141,7 +135,7 @@ const TaskDecompose: React.FC<any> = () => {
     } else {
       gridApi.current?.setRowData(insertEmptyRows(fianlData));
     }
-    setExpandedRow();
+
   }
 
   // 点击创建任务按钮

@@ -11,7 +11,10 @@ import {zentaoExcutionSelect, zentaoStorySelect, zentaoDevCenterSelect} from "./
 import {getHeight} from "@/publicMethods/pageSet";
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {gridColumns, setCellStyle} from "./grid/columns";
-import {getInitGridData, getGridDataByStory, getParentEstimate, getEmptyRow, insertEmptyRows} from "./grid/datas";
+import {
+  getInitGridData, getGridDataByStory, getParentEstimate, getEmptyRow,
+  insertEmptyRows, judgeTaskName
+} from "./grid/datas";
 import moment from "moment";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {createZentaoTaskDecompose} from "./taskCreate";
@@ -221,6 +224,14 @@ const TaskDecompose: React.FC<any> = () => {
           ...tabData[parentInfo.parentIndex],
           "estimate": parentInfo.parentValue
         })
+      }
+    } else if (params.column.colId === "task_name") {
+      // 任务名称不能为空，必须包含相关字段。
+      debugger;
+      const message = judgeTaskName(params);
+      if (message !== "") {
+        errorMessage(message);
+        updateGridData(params, params.oldValue);
       }
     }
   };

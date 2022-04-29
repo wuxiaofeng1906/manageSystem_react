@@ -10,13 +10,14 @@ const Header: React.FC<any> = () => {
   return (
     <PageHeader
       ghost={false}
-      title={"禅道任务分解"}
-      style={{height: "85px", marginTop: -30}}
+      title={<div>禅道任务分解</div>}
+      style={{height: "65px", marginTop: -30}}
       breadcrumbRender={() => {
-        return <Breadcrumb>{breadcrumbItems}</Breadcrumb>;
+        return <Breadcrumb style={{height: 10}}>{breadcrumbItems}</Breadcrumb>;
       }}
     />
   );
 };
+
 
 export default Header;

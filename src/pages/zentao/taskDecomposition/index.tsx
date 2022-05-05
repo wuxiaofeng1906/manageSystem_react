@@ -1,6 +1,6 @@
 import React, {useRef, useState, useEffect} from 'react';
 import {Button, Col, Form, Tooltip, Row, Select, Spin, TreeSelect, DatePicker, PageHeader, Breadcrumb} from "antd";
-import {CopyOutlined,} from "@ant-design/icons";
+import {PlusOutlined,} from "@ant-design/icons";
 import {AgGridReact} from "ag-grid-react";
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
@@ -246,34 +246,33 @@ const TaskDecompose: React.FC<any> = () => {
     <div>
       <Header/>
       <Spin spinning={createState} tip="任务创建中..." size={"large"}>
-        <div style={{marginTop: 5}}>
+        <div style={{marginTop: 3}}>
           <Form form={formForTaskQuery}>
             {/* gutter col 之间的间隔 [水平，垂直] */}
-            <Row style={{marginLeft: -10}} gutter={[4, 4]}>
-              <Col>
-                <Tooltip title="创建任务">
-                  <Button type="text" icon={<CopyOutlined/>} size={'middle'}
-                          style={{
-                            color: '#46A0FC'
-                          }}
-                          onClick={createZentaoTask}>
+            <Row gutter={[4, 4]}>
+              <Col span={2}>
+                <Form.Item name="createTask">
+                  <Button type="primary" icon={<PlusOutlined/>} size={'small'}
+                          onClick={createZentaoTask} style={{width: "100%", borderRadius: 5}}>
+                    建任务
                   </Button>
-                </Tooltip>
+                </Form.Item>
               </Col>
               <Col span={5}>
                 <Form.Item label="所属执行" name="execution">
                   <Select style={{width: '100%'}} showSearch onChange={() => {
                     getZentaoStory("execution")
-                  }} allowClear placeholder="请选择"
+                  }} allowClear placeholder="请选择" size={"small"}
                           filterOption={(inputValue: string, option: any) =>
                             !!option.children.includes(inputValue)}>
                     {excutionSelect}
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={10}>
+              <Col span={9}>
                 <Form.Item label="禅道需求" name="ztStory">
                   <TreeSelect
+                    size={"small"}
                     showSearch
                     style={{width: '100%'}}
                     treeCheckable={true}
@@ -298,7 +297,7 @@ const TaskDecompose: React.FC<any> = () => {
                 <Form.Item label="指派给" name="assignedTo">
                   <Select style={{width: '100%'}} showSearch onChange={() => {
                     getZentaoStory("assignedTo")
-                  }} allowClear placeholder="请选择"
+                  }} allowClear placeholder="请选择" size={"small"}
                           filterOption={(inputValue: string, option: any) =>
                             !!option.children.includes(inputValue)}>
                     {devCenterSelect?.assignedOption}
@@ -309,7 +308,7 @@ const TaskDecompose: React.FC<any> = () => {
                 <Form.Item label="由谁创建" name="creater">
                   <Select style={{width: '100%'}} showSearch onChange={() => {
                     getZentaoStory("creater")
-                  }} allowClear placeholder="请选择"
+                  }} allowClear placeholder="请选择" size={"small"}
                           filterOption={(inputValue: string, option: any) =>
                             !!option.children.includes(inputValue)}>
                     {devCenterSelect?.createOption}
@@ -320,7 +319,7 @@ const TaskDecompose: React.FC<any> = () => {
           </Form>
         </div>
         {/* 表格 */}
-        <div style={{marginTop: -20}}>
+        <div style={{marginTop: -25}}>
           <div className="ag-theme-alpine" style={{height: gridHeight + 40, width: '100%'}}>
             <AgGridReact
               columnDefs={gridColumns} // 定义列
@@ -334,8 +333,8 @@ const TaskDecompose: React.FC<any> = () => {
                 width: 90,
                 cellStyle: setCellStyle,
               }}
-              rowHeight={27}
-              headerHeight={29}
+              rowHeight={25}
+              headerHeight={27}
               suppressRowTransform={true}
               onGridReady={onGridReady}
               onCellEditingStopped={gridEditedEnd}
@@ -354,7 +353,7 @@ const TaskDecompose: React.FC<any> = () => {
                         updateGridData(props, currentValue);
                       }}
                     >
-                      {devCenterPerson.assignedOption}
+                      {devCenterPerson?.assignedOption}
                     </Select>
                   );
                 },

@@ -89,13 +89,10 @@ const getStoryByStoryId = async (queryInfo: any, storyId: any, perValueArray: an
 
 // 根据选中的需求生成表格数据
 const getGridDataByStory = async (storyId: any, perValueArray: any, queryInfo: any) => {
-
   // 获取选中的需求信息
   const finalStoryInfo = await getStoryByStoryId(queryInfo, storyId, perValueArray);
-
   // 获取模板
   const tempDatas: any = await getTaskTemplate();
-
   // 将需求信息替换到模板。
   const storyGridData: any = [];
   if (finalStoryInfo && finalStoryInfo.length > 0 && tempDatas && tempDatas.length > 0) {
@@ -108,9 +105,10 @@ const getGridDataByStory = async (storyId: any, perValueArray: any, queryInfo: a
           const nameHead = (template.task_name).split("】")[0].toString();
           taskName = `${nameHead}】${story.name}`;
         }
+
         storyGridData.push({
           ...template,
-          module: "",
+          module: story.module === "" ? "/" : `/${story.module}`,
           task_name: taskName,
           subtask_dev_id: story.id,
           subtask_dev_needs: story.name,

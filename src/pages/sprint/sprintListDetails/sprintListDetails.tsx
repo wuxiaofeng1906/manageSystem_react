@@ -1455,7 +1455,7 @@ const SprintList: React.FC<any> = () => {
   const rightStyle = {marginLeft: '30px'};
   const widths = {width: '200px', color: 'black'};
   const routes = [
-    {path: '', breadcrumbName: 'sprint 工作台'},
+    {path: '', breadcrumbName: '班车工作台'},
     {path: '', breadcrumbName: '项目详情'}];
 
   useEffect(() => {

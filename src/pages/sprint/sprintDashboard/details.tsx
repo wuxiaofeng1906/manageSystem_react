@@ -534,7 +534,7 @@ const DetailsList: React.FC<any> = () => {
     const routes = [
       {
         path: '',
-        breadcrumbName: 'sprint 工作台',
+        breadcrumbName: '班车工作台',
       }, {
         path: '',
         breadcrumbName: `内容详情（${title}）`,

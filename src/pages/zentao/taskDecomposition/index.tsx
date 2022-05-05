@@ -21,7 +21,7 @@ import {createZentaoTaskDecompose} from "./taskCreate";
 import dayjs from "dayjs";
 
 const {SHOW_PARENT} = TreeSelect;
-let devCenterPerson: any = [];
+let devCenterPerson: any;
 // 组件初始化
 const TaskDecompose: React.FC<any> = () => {
 
@@ -58,7 +58,8 @@ const TaskDecompose: React.FC<any> = () => {
   /* region 下拉框加载 */
 
   const excutionSelect = useRequest(() => zentaoExcutionSelect()).data;
-  const devCenterSelect = useRequest(() => zentaoDevCenterSelect()).data;
+  const devCenterSelect: any = useRequest(() => zentaoDevCenterSelect()).data;
+
   /* endregion 下拉框加载 */
 
   /* region 操作栏相关事件 */
@@ -300,7 +301,7 @@ const TaskDecompose: React.FC<any> = () => {
                   }} allowClear placeholder="请选择"
                           filterOption={(inputValue: string, option: any) =>
                             !!option.children.includes(inputValue)}>
-                    {devCenterSelect}
+                    {devCenterSelect?.assignedOption}
                   </Select>
                 </Form.Item>
               </Col>
@@ -311,7 +312,7 @@ const TaskDecompose: React.FC<any> = () => {
                   }} allowClear placeholder="请选择"
                           filterOption={(inputValue: string, option: any) =>
                             !!option.children.includes(inputValue)}>
-                    {devCenterSelect}
+                    {devCenterSelect?.createOption}
                   </Select>
                 </Form.Item>
               </Col>
@@ -353,7 +354,7 @@ const TaskDecompose: React.FC<any> = () => {
                         updateGridData(props, currentValue);
                       }}
                     >
-                      {devCenterPerson}
+                      {devCenterPerson.assignedOption}
                     </Select>
                   );
                 },

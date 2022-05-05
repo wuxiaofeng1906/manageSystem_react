@@ -47,20 +47,22 @@ const zentaoStorySelect = async (params: any) => {
   return typeData;
 };
 
-// 指派给和由谁创建下拉框
+// 指派给和由谁创建下拉框(指派给需要新增一个“空”选项)
 const zentaoDevCenterSelect = async () => {
   const devPerson = await axiosGet("/api/verify/sprint/devperson");
 
   if (!devPerson || devPerson.length === 0) {
     return []
   }
-  const selectOption: any = [];
+  const createOption: any = [];
+  const assignedOption: any = [<Option key={"empty"} value={"empty"}>空</Option>];
   devPerson.forEach((ele: any) => {
-    selectOption.push(
+    createOption.push(
       <Option key={ele.user_id} value={ele.user_id}>{ele.user_name}</Option>
     );
+    assignedOption.push(<Option key={ele.user_id} value={ele.user_id}>{ele.user_name}</Option>);
   });
-  return selectOption;
+  return {createOption, assignedOption};
 };
 
 export {zentaoExcutionSelect, zentaoStorySelect, zentaoDevCenterSelect};

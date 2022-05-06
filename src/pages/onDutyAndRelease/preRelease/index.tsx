@@ -233,6 +233,7 @@ const PreRelease: React.FC<any> = () => {
     true,
   );
 
+  console.log("test")
   /* endregion */
 
   return (

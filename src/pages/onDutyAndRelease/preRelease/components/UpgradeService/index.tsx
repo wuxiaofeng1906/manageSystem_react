@@ -43,45 +43,31 @@ const UpgradeService: React.FC<any> = () => {
   const [formUpgradeService] = Form.useForm(); // 升级服务
   const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
 
-  /* region 升级服务 一  发布项 */
-  const firstUpSerGridApi = useRef<GridApi>();
-  const onFirstGridReady = (params: GridReadyEvent) => {
-    firstUpSerGridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-  const onChangeFirstGridReady = (params: GridReadyEvent) => {
-    firstUpSerGridApi.current = params.api;
+  /* region 升级服务： 发布项表格 */
+  const releaseItemGridApi = useRef<GridApi>();
+  const onReleaseItemGridReady = (params: GridReadyEvent) => {
+    releaseItemGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
 
   /* endregion  */
 
   /* region 升级服务 二  */
-  const secondUpSerGridApi = useRef<GridApi>();
-  const onSecondGridReady = (params: GridReadyEvent) => {
-    secondUpSerGridApi.current = params.api;
+  const upGradeGridApi = useRef<GridApi>();
+  const onUpGradeGridReady = (params: GridReadyEvent) => {
+    upGradeGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
 
-  const onChangeSecondGridReady = (params: GridReadyEvent) => {
-    secondUpSerGridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
 
   /* endregion   */
 
   /* region 升级服务 三  */
-  const thirdUpSerGridApi = useRef<GridApi>();
-  const onthirdGridReady = (params: GridReadyEvent) => {
-    thirdUpSerGridApi.current = params.api;
+  const serverConfirmGridApi = useRef<GridApi>();
+  const onConfirmGridReady = (params: GridReadyEvent) => {
+    serverConfirmGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
-
-  const onChangeThirdGridReady = (params: GridReadyEvent) => {
-    thirdUpSerGridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-
   /* endregion   */
 
   /* region 一键部署ID相关事件 */
@@ -104,7 +90,6 @@ const UpgradeService: React.FC<any> = () => {
         });
       } else {
         const newData: any = await alalysisInitData('pulishItem', tabsData.activeKey);
-        // firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
         formUpgradeService.setFieldsValue({
           hitMessage: await getAutoCheckMessage(tabsData.activeKey),
         });
@@ -163,7 +148,6 @@ const UpgradeService: React.FC<any> = () => {
       const apidata: any = await alalysisInitData('pulishApi', tabsData.activeKey);
 
       if (!apidata.upService_interface || apidata.upService_interface <= 0) {
-        // secondUpSerGridApi.current?.setRowData([{}]); // 需要给升级接口设置一行空值
         setUpgradeApi({gridHight: getGridRowsHeight([]).toString(), gridData: [{}]});
       }
     }
@@ -300,7 +284,6 @@ const UpgradeService: React.FC<any> = () => {
       });
 
       const newData: any = await alalysisInitData('pulishItem', tabsData.activeKey);
-      // firstUpSerGridApi.current?.setRowData(newData.upService_releaseItem);
       setRelesaeItem({
         gridHight: getGridRowsHeight(newData.upService_releaseItem),
         gridData: newData.upService_releaseItem,
@@ -310,7 +293,7 @@ const UpgradeService: React.FC<any> = () => {
       // setReleasedIdForm(newData?.upService_releaseItem);
       //   发布项结果保存成功之后，需要刷新发布项中的服务确认完成
       const newData_confirm: any = await alalysisInitData('pulishConfirm', tabsData.activeKey);
-      thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认设置一行空值
+      serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认设置一行空值
 
       // setGridHeight({
       //   ...gridHeight,
@@ -459,7 +442,7 @@ const UpgradeService: React.FC<any> = () => {
 
       // (不管成功或者失败)刷新表格
       const newData_confirm: any = await alalysisInitData('pulishConfirm', tabsData.activeKey);
-      thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+      serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
 
       if (upgradeIntModal.title === '修改') {
         //   释放锁
@@ -487,7 +470,7 @@ const UpgradeService: React.FC<any> = () => {
     if (!serverConfirmJudge(currentOperateStatus, props, formUpgradeService.getFieldValue("hitMessage"))) {
       // (不管成功或者失败)刷新表格
       const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
-      thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+      serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
       return;
     }
 
@@ -554,7 +537,7 @@ const UpgradeService: React.FC<any> = () => {
 
     //   (不管成功或者失败)刷新表格
     const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
-    thirdUpSerGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+    serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
   };
   /* endregion */
 
@@ -670,9 +653,9 @@ const UpgradeService: React.FC<any> = () => {
                   }}
                   headerHeight={25}
                   rowHeight={25}
-                  onGridReady={onFirstGridReady}
-                  onGridSizeChanged={onChangeFirstGridReady}
-                  onColumnEverythingChanged={onChangeFirstGridReady}
+                  onGridReady={onReleaseItemGridReady}
+                  onGridSizeChanged={onReleaseItemGridReady}
+                  onColumnEverythingChanged={onReleaseItemGridReady}
                 ></AgGridReact>
               </div>
 
@@ -700,9 +683,9 @@ const UpgradeService: React.FC<any> = () => {
                       params.data?.api_id,
                     );
                   }}
-                  onGridReady={onSecondGridReady}
-                  onGridSizeChanged={onChangeSecondGridReady}
-                  onColumnEverythingChanged={onChangeSecondGridReady}
+                  onGridReady={onUpGradeGridReady}
+                  onGridSizeChanged={onUpGradeGridReady}
+                  onColumnEverythingChanged={onUpGradeGridReady}
                 ></AgGridReact>
               </div>
             </div>
@@ -727,9 +710,9 @@ const UpgradeService: React.FC<any> = () => {
                   rowData={upgradeConfirm.gridData}
                   headerHeight={25}
                   rowHeight={25}
-                  onGridReady={onthirdGridReady}
-                  onGridSizeChanged={onChangeThirdGridReady}
-                  onColumnEverythingChanged={onChangeThirdGridReady}
+                  onGridReady={onConfirmGridReady}
+                  onGridSizeChanged={onConfirmGridReady}
+                  onColumnEverythingChanged={onConfirmGridReady}
                   frameworkComponents={{
                     confirmSelectChoice: (props: any) => {
                       let Color = 'black';
@@ -788,9 +771,9 @@ const UpgradeService: React.FC<any> = () => {
                   rowData={upgradeConfirm.gridData}
                   headerHeight={25}
                   rowHeight={25}
-                  onGridReady={onthirdGridReady}
-                  onGridSizeChanged={onChangeThirdGridReady}
-                  onColumnEverythingChanged={onChangeThirdGridReady}
+                  onGridReady={onConfirmGridReady}
+                  onGridSizeChanged={onConfirmGridReady}
+                  onColumnEverythingChanged={onConfirmGridReady}
                   frameworkComponents={{
                     confirmSelectChoice: (props: any) => {
                       let Color = 'black';
@@ -1040,17 +1023,17 @@ const UpgradeService: React.FC<any> = () => {
               </Form.Item>
             </Col>
           </Row>
-
-          {/*<Form.Item name="hotUpdate" label="是否支持热更新：" required style={{marginTop: -15}}>*/}
-          {/*  <Select>*/}
-          {/*    <Option key={'1'} value={'1'}>*/}
-          {/*      {'是'}*/}
-          {/*    </Option>*/}
-          {/*    <Option key={'2'} value={'2'}>*/}
-          {/*      {'否'}*/}
-          {/*    </Option>*/}
-          {/*  </Select>*/}
-          {/*</Form.Item>*/}
+          {/*
+          <Form.Item name="hotUpdate" label="是否支持热更新：" required style={{marginTop: -15}}>
+            <Select>
+              <Option key={'1'} value={'1'}>
+                {'是'}
+              </Option>
+              <Option key={'2'} value={'2'}>
+                {'否'}
+              </Option>
+            </Select>
+          </Form.Item> */}
 
           <Form.Item name="remark" label="备注：" style={{marginTop: -15}}>
             <TextArea/>

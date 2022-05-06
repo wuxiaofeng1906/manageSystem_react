@@ -10,6 +10,7 @@ import {useRequest} from 'ahooks';
 import {loadReleaseIDSelect} from '../../comControl/controler';
 import {
   getReleasedItemColumns, getReleasedApiColumns, getReleaseServiceComfirmColumns,
+  getNewRelServiceComfirmColumns
 } from './grid/columns';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {confirmUpgradeService} from './serviceConfirm';
@@ -32,7 +33,7 @@ const {TextArea} = Input;
 const {Option} = Select;
 const userLogins: any = localStorage.getItem('userLogins');
 const usersInfo = JSON.parse(userLogins);
-let currentOperateStatus = false;  // 需要将useState中的operteStatus值赋值过来，如果直接取operteStatus，下拉框那边获取不到罪行的operteStatus；
+let currentOperateStatus = false;  // 需要将useState中的operteStatus值赋值过来，如果直接取operteStatus，下拉框那边获取不到最新的operteStatus；
 const UpgradeService: React.FC<any> = () => {
   const {
     tabsData, modifyProcessStatus, releaseItem, upgradeApi, upgradeConfirm,
@@ -751,7 +752,63 @@ const UpgradeService: React.FC<any> = () => {
                       );
                     },
                   }}
-                ></AgGridReact>
+                >
+                </AgGridReact>
+              </div>
+              <div
+                className="ag-theme-alpine"
+                style={{height: upgradeConfirm.gridHight, width: '100%'}}
+              >
+                <AgGridReact
+                  columnDefs={getNewRelServiceComfirmColumns()} // 定义列
+                  defaultColDef={{
+                    resizable: true,
+                    sortable: true,
+                    suppressMenu: true,
+                    cellStyle: {'line-height': '25px'},
+                    minWidth: 90,
+                  }}
+                  rowData={upgradeConfirm.gridData}
+                  headerHeight={25}
+                  rowHeight={25}
+                  onGridReady={onthirdGridReady}
+                  onGridSizeChanged={onChangeThirdGridReady}
+                  onColumnEverythingChanged={onChangeThirdGridReady}
+                  frameworkComponents={{
+                    confirmSelectChoice: (props: any) => {
+                      let Color = 'black';
+                      const currentValue = props.value;
+                      if (currentValue === '1') {
+                        Color = '#2BF541';
+                      } else if (currentValue === '2') {
+                        Color = 'orange';
+                      } else if (currentValue === '9') {
+                        return <label></label>;
+                      }
+
+                      return (
+                        <Select
+                          size={'small'}
+                          defaultValue={currentValue}
+                          bordered={false}
+                          style={{width: '100%', color: Color}}
+                          onChange={(newValue: any) => {
+                            saveUperConfirmInfo(newValue, props);
+                          }}
+                          disabled={currentOperateStatus}
+                        >
+                          <Option key={'1'} value={'1'}>
+                            是
+                          </Option>
+                          <Option key={'2'} value={'2'}>
+                            否
+                          </Option>
+                        </Select>
+                      );
+                    },
+                  }}
+                >
+                </AgGridReact>
               </div>
             </div>
 

@@ -30,6 +30,7 @@ const getAllLockedData = async (releaseNum: string) => {
 
 // 获取是否加锁
 const getLockStatus = async (lockedId: string) => {
+  console.log("判断是否锁定以及加锁",lockedId);
   const datas = {
     user_name: usersInfo.name,
     user_id: usersInfo.userid,
@@ -46,6 +47,7 @@ const getLockStatus = async (lockedId: string) => {
     .then(function (res) {
       if (res.data.code === 200) {
         result.data = res.data.data;
+        console.log("判断结果",res.data.data);
         const personInfo = res.data.data;
         if (personInfo.user_name) {
           result.errMessage = `【${personInfo.user_name}】正在编辑，请稍后！`;
@@ -63,6 +65,7 @@ const getLockStatus = async (lockedId: string) => {
 
 // 删除锁
 const deleteLockStatus = async (lockedId: string) => {
+  console.log("删除锁",lockedId);
   let errorMessage = '';
 
   const datas = {

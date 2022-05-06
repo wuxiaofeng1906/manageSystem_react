@@ -125,7 +125,7 @@ const PreReleaseProject: React.FC<any> = () => {
 
     modifyLockedItem(`${tabsData.activeKey}-step1-project-${proId}`); // 如果是被锁了保存当前被锁的id
     const lockInfo = await getLockStatus(`${tabsData.activeKey}-step1-project-${proId}`);
-    console.log(lockInfo, `${tabsData.activeKey}-step1-project-${proId}`);
+    // console.log(lockInfo, `${tabsData.activeKey}-step1-project-${proId}`);
     if (lockInfo.errMessage) {
       const userInfo: any = lockInfo.data;
       if (userInfo.user_id !== usersInfo.userid) {

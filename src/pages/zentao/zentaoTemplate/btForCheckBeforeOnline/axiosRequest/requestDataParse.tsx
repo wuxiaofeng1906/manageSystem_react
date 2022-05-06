@@ -254,6 +254,7 @@ const generateTask = async (tempInfo: any, fromData: any, gridData: any) => {
       // 是否裁剪，是的时候不传（因为不做执行）
       if (ele.is_tailoring !== "yes") {
         // console.log(ele.task_name, ele.assigned_person_name)
+
         // 如果指派人是两个，则只取第一个
         let assignedPerson = "";
         if (ele.assigned_person_name) {
@@ -267,7 +268,7 @@ const generateTask = async (tempInfo: any, fromData: any, gridData: any) => {
           "task_name": ele.task_name,
           "module": ele.module,
           "subtask_dev_needs": ele.subtask_dev_needs,
-          "assigned_person": assignedPerson,
+          "assigned_person": usersInfo[assignedPerson] === undefined ? "" : usersInfo[assignedPerson],
           "priority": ele.priority,
           "estimate": ele.estimate,
           "desc": ele.desc,

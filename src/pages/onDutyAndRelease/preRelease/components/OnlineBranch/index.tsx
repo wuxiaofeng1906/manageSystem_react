@@ -26,7 +26,7 @@ let newOnlineBranchNum = '';
 
 const OnlineBranch: React.FC<any> = () => {
   const [formForOnlineBranch] = Form.useForm(); // 上线分支设置
-  const firstOnlineBranchGridApi = useRef<GridApi>();
+  const onlineBranchGridApi = useRef<GridApi>();
   const {
     tabsData, lockedItem, modifyLockedItem, onlineBranch,
     setOnlineBranch, setDataReviewConfirm, allLockedArray, operteStatus,
@@ -55,16 +55,10 @@ const OnlineBranch: React.FC<any> = () => {
     coveStatus: {style: 'none', content: <div></div>}
 
   });
-  const onfirstOnlineBranchGridReady = (params: GridReadyEvent) => {
-    firstOnlineBranchGridApi.current = params.api;
+  const onlineBranchGridReady = (params: GridReadyEvent) => {
+    onlineBranchGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
-
-  const onChangefirstOnlineBranchGridReady = (params: GridReadyEvent) => {
-    firstOnlineBranchGridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-
   // 取消
   const onlineBranchCancle = () => {
     setOnlineBranchModal({
@@ -329,7 +323,7 @@ const OnlineBranch: React.FC<any> = () => {
 
       // 刷新界面
       const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
-      firstOnlineBranchGridApi.current?.setRowData(newData.onlineBranch);
+      onlineBranchGridApi.current?.setRowData(newData.onlineBranch);
     } else {
       message.error({
         content: `${result}`,
@@ -518,7 +512,7 @@ const OnlineBranch: React.FC<any> = () => {
         versionUrl: {style: 'none', app: '', global: ''},
         coveStatus: {style: 'inline', content: <div style={{height: 300, overflowY: "scroll"}}>{contentDiv}</div>}
       });
-    }else{
+    } else {
       message.error({
         content: '无封版日志！',
         duration: 1,
@@ -581,11 +575,10 @@ const OnlineBranch: React.FC<any> = () => {
                         params.data?.branch_check_id,
                       );
                     }}
-                    onGridReady={onfirstOnlineBranchGridReady}
-                    onGridSizeChanged={onChangefirstOnlineBranchGridReady}
-                    onColumnEverythingChanged={onChangefirstOnlineBranchGridReady}
+                    onGridReady={onlineBranchGridReady}
+                    onGridSizeChanged={onlineBranchGridReady}
+                    onColumnEverythingChanged={onlineBranchGridReady}
                   >
-
 
                   </AgGridReact>
                 </div>

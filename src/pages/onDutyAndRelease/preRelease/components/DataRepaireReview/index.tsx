@@ -40,13 +40,9 @@ const DataRepaireReview: React.FC<any> = () => {
     category: [],
     repairCommiter: [],
   });
-  const firstDataReviewGridApi = useRef<GridApi>();
-  const onfirstDataReviewGridReady = (params: GridReadyEvent) => {
-    firstDataReviewGridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-  const onChangefirstDataReviewGridReady = (params: GridReadyEvent) => {
-    firstDataReviewGridApi.current = params.api;
+  const dataReviewGridApi = useRef<GridApi>();
+  const onDataReviewGridReady = (params: GridReadyEvent) => {
+    dataReviewGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
 
@@ -166,15 +162,12 @@ const DataRepaireReview: React.FC<any> = () => {
 
   /* region 数据修复确认 */
 
-  const secondDataReviewGridApi = useRef<GridApi>();
-  const onsecondDataReviewGridReady = (params: GridReadyEvent) => {
-    secondDataReviewGridApi.current = params.api;
+  const reviewConfirmGridApi = useRef<GridApi>();
+  const onReviewConfirmGridReady = (params: GridReadyEvent) => {
+    reviewConfirmGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
-  const onChangesecondDataReviewGridReady = (params: GridReadyEvent) => {
-    secondDataReviewGridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
+
 
   // 下拉框选择是否确认事件
   const saveDataRepaireConfirmInfo = async (newValue: string, oldData: any) => {
@@ -194,7 +187,7 @@ const DataRepaireReview: React.FC<any> = () => {
     if (newValue !== oldData.confirm_status) {
       // 需要确认修复内容中是否可重复执行全部有值的时候才可以选择。
       let modifyFlag = true;
-      firstDataReviewGridApi.current?.forEachNode((node: any) => {
+      dataReviewGridApi.current?.forEachNode((node: any) => {
         const dts = node.data;
         // 需要看本条数据是否有效，比如表格只有一条初始化的空数据时就无需验证
         if (dts.is_repeat && dts.is_repeat === '9') {
@@ -245,7 +238,7 @@ const DataRepaireReview: React.FC<any> = () => {
       }
       //   刷新表格
       const newData_confirm: any = await alalysisInitData('dataReviewConfirm', currentReleaseNum);
-      secondDataReviewGridApi.current?.setRowData(newData_confirm.reviewData_confirm);
+      reviewConfirmGridApi.current?.setRowData(newData_confirm.reviewData_confirm);
     }
   };
   /* endregion */
@@ -259,7 +252,7 @@ const DataRepaireReview: React.FC<any> = () => {
       <div>
         <fieldset className={'fieldStyle'}>
           <legend className={'legendStyle'}>Step3 数据修复Review
-            <label style={{color:"Gray"}}> (后端值班填写)</label>
+            <label style={{color: "Gray"}}> (后端值班填写)</label>
           </legend>
 
           <div>
@@ -288,9 +281,9 @@ const DataRepaireReview: React.FC<any> = () => {
                       params.data?.review_id,
                     );
                   }}
-                  onGridReady={onfirstDataReviewGridReady}
-                  onGridSizeChanged={onChangefirstDataReviewGridReady}
-                  onColumnEverythingChanged={onChangefirstDataReviewGridReady}
+                  onGridReady={onDataReviewGridReady}
+                  onGridSizeChanged={onDataReviewGridReady}
+                  onColumnEverythingChanged={onDataReviewGridReady}
                 ></AgGridReact>
               </div>
             </div>
@@ -352,9 +345,9 @@ const DataRepaireReview: React.FC<any> = () => {
                   }}
                   headerHeight={25}
                   rowHeight={25}
-                  onGridReady={onsecondDataReviewGridReady}
-                  onGridSizeChanged={onChangesecondDataReviewGridReady}
-                  onColumnEverythingChanged={onChangesecondDataReviewGridReady}
+                  onGridReady={onReviewConfirmGridReady}
+                  onGridSizeChanged={onReviewConfirmGridReady}
+                  onColumnEverythingChanged={onReviewConfirmGridReady}
                   // onCellEditingStopped={saveDataRepaireConfirmInfo}
                 >
                 </AgGridReact>

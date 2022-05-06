@@ -8,13 +8,9 @@ const CorrespondingWorkOrder: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const {correspOrder} = useModel('releaseProcess');
 
-  const firstListGridApi = useRef<GridApi>();
-  const onfirstListGridReady = (params: GridReadyEvent) => {
-    firstListGridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-  const onChangefirstListGridReady = (params: GridReadyEvent) => {
-    firstListGridApi.current = params.api;
+  const listGridApi = useRef<GridApi>();
+  const onListGridReady = (params: GridReadyEvent) => {
+    listGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
 
@@ -24,7 +20,7 @@ const CorrespondingWorkOrder: React.FC<any> = () => {
       <div>
         <fieldset className={'fieldStyle'}>
           <legend className={'legendStyle'}>Step5 对应工单
-            <label style={{color:"Gray"}}> (值班测试：在运维平台填写工单时，需要关联发布批次号)</label>
+            <label style={{color: "Gray"}}> (值班测试：在运维平台填写工单时，需要关联发布批次号)</label>
           </legend>
           <div>
             <div>
@@ -32,7 +28,7 @@ const CorrespondingWorkOrder: React.FC<any> = () => {
               <div>
                 <div
                   className="ag-theme-alpine"
-                  style={{height: correspOrder.gridHight, width: '100%',marginTop:-12}}
+                  style={{height: correspOrder.gridHight, width: '100%', marginTop: -12}}
                 >
                   <AgGridReact
                     columnDefs={getWorkOrderColumns()} // 定义列
@@ -46,9 +42,9 @@ const CorrespondingWorkOrder: React.FC<any> = () => {
                     }}
                     headerHeight={25}
                     rowHeight={25}
-                    onGridReady={onfirstListGridReady}
-                    onGridSizeChanged={onChangefirstListGridReady}
-                    onColumnEverythingChanged={onChangefirstListGridReady}
+                    onGridReady={onListGridReady}
+                    onGridSizeChanged={onListGridReady}
+                    onColumnEverythingChanged={onListGridReady}
                   >
                   </AgGridReact>
                 </div>

@@ -503,6 +503,7 @@ export default [
         icon: 'table',
         path: 'taskDecomposition',
         component: './zentao/taskDecomposition',
+        // hideInMenu: true
       },
     ]
   }, {

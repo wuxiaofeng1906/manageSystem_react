@@ -216,11 +216,13 @@ const PreRelease: React.FC<any> = () => {
   /* region 释放锁 */
   // 刷新释放正锁住的锁
   window.onbeforeunload = () => {
+    debugger;
     deleteLockStatus(lockedItem);
   };
 
   // 窗口关闭释放锁
   window.onunload = () => {
+    debugger;
     deleteLockStatus(lockedItem);
   };
 
@@ -228,6 +230,7 @@ const PreRelease: React.FC<any> = () => {
   window.addEventListener(
     'error',
     () => {
+      debugger;
       deleteLockStatus(lockedItem);
     },
     true,

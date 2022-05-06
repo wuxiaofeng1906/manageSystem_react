@@ -311,12 +311,6 @@ const DataRepaireReview: React.FC<any> = () => {
                     suppressMenu: true,
                     cellStyle: {'line-height': '25px'},
                   }}
-                  // getRowStyle={(params: any) => {
-                  //   if (params.data?.confirm_status === "9") {
-                  //     return {"backgroundColor": "#F8F8F8"};
-                  //   }
-                  //   return {};
-                  // }}
                   frameworkComponents={{
                     selectChoice: (props: any) => {
                       let Color = 'black';
@@ -326,7 +320,13 @@ const DataRepaireReview: React.FC<any> = () => {
                       } else if (currentValue === '2') {
                         Color = 'orange';
                       } else if (currentValue === '9') {
-                        return <label></label>;
+                        return (
+                          <Select
+                            size={'small'} bordered={false}
+                            style={{backgroundColor: "#F0F0F0", width: '120%'}}
+                            disabled
+                          >
+                          </Select>);
                       }
 
                       return (
@@ -356,7 +356,8 @@ const DataRepaireReview: React.FC<any> = () => {
                   onGridSizeChanged={onChangesecondDataReviewGridReady}
                   onColumnEverythingChanged={onChangesecondDataReviewGridReady}
                   // onCellEditingStopped={saveDataRepaireConfirmInfo}
-                ></AgGridReact>
+                >
+                </AgGridReact>
               </div>
             </div>
           </div>

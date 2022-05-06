@@ -310,107 +310,60 @@ const getNewRelServiceComfirmColumns = () => {
   const thirdUpSerColumn = [
     {
       headerName: 'global值班',
-      field: 'front_user_name',
+      field: 'global_user_name',
       minWidth: 90,
     },
     {
       headerName: '服务确认完成',
-      field: 'front_confirm_status',
+      field: 'global_confirm_status',
       minWidth: 115,
-      // editable: true,
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {values: confirmRender()},
-      // filterParams: {
-      //   valueFormatter: (params: any) => {
-      //     return confirmMappings[params.value];
-      //   },
-      // },
-      // valueFormatter: (params: any) => {
-      //   return confirmMappings[params.value];
-      // },
       cellRenderer: 'confirmSelectChoice',
     },
     {
       headerName: '确认时间',
-      field: 'front_confirm_time',
+      field: 'global_confirm_time',
     },
     {
       headerName: 'openapi值班',
-      field: 'back_end_user_name',
+      field: 'openapi_user_name',
     },
     {
       headerName: '服务确认完成',
-      field: 'back_end_confirm_status',
+      field: 'openapi_confirm_status',
       minWidth: 115,
-      // editable: true,
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {values: confirmRender()},
-      // filterParams: {
-      //   valueFormatter: (params: any) => {
-      //     return confirmMappings[params.value];
-      //   },
-      // },
-      // valueFormatter: (params: any) => {
-      //   return confirmMappings[params.value];
-      // },
-      // cellRenderer: selectColorRenderer
       cellRenderer: 'confirmSelectChoice',
     },
     {
       headerName: '确认时间',
-      field: 'back_end_confirm_time',
+      field: 'openapi_confirm_time',
     },
     {
       headerName: 'qbos&store值班',
-      field: 'process_user_name',
+      field: 'qbos_store_user_name',
     },
     {
       headerName: '服务确认完成',
-      field: 'process_confirm_status',
+      field: 'qbos_store_confirm_status',
       minWidth: 115,
-      // editable: true,
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {values: confirmRender()},
-      // filterParams: {
-      //   valueFormatter: (params: any) => {
-      //     return confirmMappings[params.value];
-      //   },
-      // },
-      // valueFormatter: (params: any) => {
-      //   return confirmMappings[params.value];
-      // },
-      // cellRenderer: selectColorRenderer
       cellRenderer: 'confirmSelectChoice',
     },
     {
       headerName: '确认时间',
-      field: 'process_confirm_time',
+      field: 'qbos_store_confirm_time',
     },
     {
       headerName: 'jsf值班',
-      field: 'test_user_name',
+      field: 'jsf_user_name',
     },
     {
       headerName: '服务确认完成',
-      field: 'test_confirm_status',
+      field: 'jsf_confirm_status',
       minWidth: 115,
-      // editable: true,
-      // cellEditor: "agSelectCellEditor",
-      // cellEditorParams: {values: confirmRender()},
-      // filterParams: {
-      //   valueFormatter: (params: any) => {
-      //     return confirmMappings[params.value];
-      //   },
-      // },
-      // valueFormatter: (params: any) => {
-      //   return confirmMappings[params.value];
-      // },
-      // cellRenderer: selectColorRenderer
       cellRenderer: 'confirmSelectChoice',
     },
     {
       headerName: '确认时间',
-      field: 'test_confirm_time',
+      field: 'jsf_confirm_time',
     },
   ];
   return thirdUpSerColumn;

@@ -511,7 +511,18 @@ const UpgradeService: React.FC<any> = () => {
         break;
       case 'test_confirm_status': // 测试
         datas.person_type = 'test';
-
+        break;
+      case 'global_confirm_status': // global
+        datas.person_type = 'global';
+        break;
+      case 'openapi_confirm_status': // openapi
+        datas.person_type = 'openapi';
+        break;
+      case 'qbos_store_confirm_status': // qbos
+        datas.person_type = 'qbos';
+        break;
+      case 'jsf_confirm_status': // 测试
+        datas.person_type = 'jsf';
         break;
       default:
         break;
@@ -728,7 +739,13 @@ const UpgradeService: React.FC<any> = () => {
                       } else if (currentValue === '2') {
                         Color = 'orange';
                       } else if (currentValue === '9') {
-                        return <label></label>;
+                        return (
+                          <Select
+                            size={'small'} bordered={false}
+                            style={{backgroundColor: "#F0F0F0", width: '120%'}}
+                            disabled
+                          >
+                          </Select>);
                       }
 
                       return (
@@ -783,7 +800,13 @@ const UpgradeService: React.FC<any> = () => {
                       } else if (currentValue === '2') {
                         Color = 'orange';
                       } else if (currentValue === '9') {
-                        return <label></label>;
+                        return (
+                          <Select
+                            size={'small'} bordered={false}
+                            style={{backgroundColor: "#F0F0F0", width: '120%'}}
+                            disabled
+                          >
+                          </Select>);
                       }
 
                       return (

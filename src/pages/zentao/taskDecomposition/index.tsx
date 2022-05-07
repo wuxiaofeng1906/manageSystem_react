@@ -103,32 +103,32 @@ const TaskDecompose: React.FC<any> = () => {
       gridApi.current?.setRowData(await getInitGridData());
       return;
     }
-    const allSelect = storyData[0].children;
     // 如果选择的是指派给和由谁创建,则需要判断禅道需求框里面有无符合筛选条件的数据，符合的数据就保留，不符合的就删除。
-
+    const allSelect = storyData[0].children;
     const oraData = getOraGridData();
-    // 判断需求框中的需求是否在查询后的结果中。
+
     if (storys && storys.length) {
       const newStoryArray: any = []; // 保存存在的id
       const fianlGridData: any = []; // 保存后面需要的表格数据
-      storys.forEach((id: number) => {
+      storys.forEach((id: number) => {    // 判断需求框中的需求是否在查询后的结果中。
         allSelect.forEach((ele: any) => {
           if (id === ele.key) {
             newStoryArray.push(id);
           }
         });
       });
+      // 更新需求数据
       formForTaskQuery.setFieldsValue({
         ztStory: newStoryArray
       });
-      //   更新表格的数据
+
       oraData.forEach((ele: any) => {
-        //   将已有的数据保存
+        // 将已有的数据保存
         if (newStoryArray.indexOf(ele.subtask_dev_id) > -1) {
           fianlGridData.push(ele);
         }
       });
-
+      // 更新表格数据
       await showGridData(fianlGridData);
     }
   };

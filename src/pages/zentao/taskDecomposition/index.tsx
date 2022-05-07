@@ -56,16 +56,82 @@ const TaskDecompose: React.FC<any> = () => {
   /* endregion 表格事件 */
 
   /* region 下拉框加载 */
-
   const excutionSelect = useRequest(() => zentaoExcutionSelect()).data;
   const devCenterSelect: any = useRequest(() => zentaoDevCenterSelect()).data;
-
   /* endregion 下拉框加载 */
 
   /* region 操作栏相关事件 */
   const [formForTaskQuery] = Form.useForm();
   const [storySelect, setStorySelect] = useState([]);
   const [createState, setCreateState] = useState(false); // 点击执行后的状态（是否执行完）
+
+  // 显示表格数据（包含拼初始化数据）
+  const showGridData = async (gridData: any) => {
+    let fianlGridData = gridData;
+    const storyCount = Math.floor((fianlGridData.length) / 5);
+    // 看原本查询了多少个，如果少于4个，则需要拼接成4个块展示。
+    if (storyCount < 4) {
+      // 拿取剩余的初始化数据
+      const initData = await getEmptyRow(4 - storyCount);
+      fianlGridData = fianlGridData.concat(initData);
+      gridApi.current?.setRowData(insertEmptyRows(fianlGridData));
+    } else {
+      gridApi.current?.setRowData(insertEmptyRows(fianlGridData));
+    }
+  };
+
+  // 所属执行和指派给以及由谁创建选择后数据展示。
+  const showSelectChangedData = async (params: any, storyData: any) => {
+    const storys = formForTaskQuery.getFieldValue("ztStory");
+    // 如果选择的是所属执行，需要清空数据
+    if (params === "execution") {
+      if (storys && storys.length > 0) {
+        formForTaskQuery.setFieldsValue({
+          ztStory: []
+        });
+        gridApi.current?.setRowData(await getInitGridData());
+        return;
+      }
+      return;
+    }
+
+    // 如果选择的不是所属执行，而是指派给和由谁创建，查询后的需求为空，则表格和查询栏都需要清空。
+    if (!storyData || storyData.length === 0) {
+      formForTaskQuery.setFieldsValue({
+        ztStory: undefined
+      });
+      gridApi.current?.setRowData(await getInitGridData());
+      return;
+    }
+    // 如果选择的是指派给和由谁创建,则需要判断禅道需求框里面有无符合筛选条件的数据，符合的数据就保留，不符合的就删除。
+    const allSelect = storyData[0].children;
+    const oraData = getOraGridData();
+
+    if (storys && storys.length) {
+      const newStoryArray: any = []; // 保存存在的id
+      const fianlGridData: any = []; // 保存后面需要的表格数据
+      storys.forEach((id: number) => {    // 判断需求框中的需求是否在查询后的结果中。
+        allSelect.forEach((ele: any) => {
+          if (id === ele.key) {
+            newStoryArray.push(id);
+          }
+        });
+      });
+      // 更新需求数据
+      formForTaskQuery.setFieldsValue({
+        ztStory: newStoryArray
+      });
+
+      oraData.forEach((ele: any) => {
+        // 将已有的数据保存
+        if (newStoryArray.indexOf(ele.subtask_dev_id) > -1) {
+          fianlGridData.push(ele);
+        }
+      });
+      // 更新表格数据
+      await showGridData(fianlGridData);
+    }
+  };
 
   // 根据条件获取需求数据
   const getZentaoStory = async (param: any) => {
@@ -80,15 +146,10 @@ const TaskDecompose: React.FC<any> = () => {
       assigned_to: formDt.assignedTo
     };
     const selectArray = await zentaoStorySelect(params);
+    // 下拉框数据
     setStorySelect(selectArray);
-
-    // 如果选择的是所属执行，并且禅道需求有选择数据，则也要清空禅道需求选择框以及表格的数据，指派给和由谁创建不需要清空
-    if (param === "execution" && formDt.ztStory && (formDt.ztStory).length > 0) {
-      formForTaskQuery.setFieldsValue({
-        ztStory: undefined
-      });
-      gridApi.current?.setRowData(await getInitGridData());
-    }
+    // 需要判断禅道需求和表格数据是否清空。
+    await showSelectChangedData(param, selectArray);
   };
 
   // 禅道需求改变
@@ -127,19 +188,7 @@ const TaskDecompose: React.FC<any> = () => {
         }
       });
     }
-
-    const storyCount = Math.floor((fianlData.length) / 5);
-
-    // 看原本查询了多少个，如果少于4个，则需要拼接成4个块展示。
-    if (storyCount < 4) {
-      // 拿取剩余的初始化数据
-      const initData = await getEmptyRow(4 - storyCount);
-      fianlData = fianlData.concat(initData);
-      gridApi.current?.setRowData(insertEmptyRows(fianlData));
-    } else {
-      gridApi.current?.setRowData(insertEmptyRows(fianlData));
-    }
-
+    await showGridData(fianlData);
   }
 
   // 点击创建任务按钮
@@ -153,9 +202,9 @@ const TaskDecompose: React.FC<any> = () => {
     const gridData: any = getOraGridData(); // 获取表格数据
     const createResult = await createZentaoTaskDecompose(gridData, formForTaskQuery.getFieldValue("execution"));
     if (createResult.code === 200) {
-      sucMessage("任务正在生成，请稍后查看！");
+      sucMessage("任务创建成功！");
     } else {
-      errorMessage(`执行失败：${createResult.msg}`)
+      errorMessage(`创建失败：${createResult.msg}`)
     }
     setCreateState(false);
   };

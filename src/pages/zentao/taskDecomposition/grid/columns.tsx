@@ -21,6 +21,11 @@ const gridColumns: any = [
     minWidth: 200,
     width: 90,
     pinned: "left",
+    cellEditorPopup: true,
+    cellEditor: 'agLargeTextCellEditor',
+    cellEditorParams: {
+      rows: 2
+    },
     editable: (params: any) => {
       if (params.data?.No === 6) {
         return false;

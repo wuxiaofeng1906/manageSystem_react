@@ -188,21 +188,7 @@ const TaskDecompose: React.FC<any> = () => {
         }
       });
     }
-
     await showGridData(fianlData);
-
-    // const storyCount = Math.floor((fianlData.length) / 5);
-    //
-    // // 看原本查询了多少个，如果少于4个，则需要拼接成4个块展示。
-    // if (storyCount < 4) {
-    //   // 拿取剩余的初始化数据
-    //   const initData = await getEmptyRow(4 - storyCount);
-    //   fianlData = fianlData.concat(initData);
-    //   gridApi.current?.setRowData(insertEmptyRows(fianlData));
-    // } else {
-    //   gridApi.current?.setRowData(insertEmptyRows(fianlData));
-    // }
-
   }
 
   // 点击创建任务按钮

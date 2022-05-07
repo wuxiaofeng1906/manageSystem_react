@@ -153,9 +153,9 @@ const TaskDecompose: React.FC<any> = () => {
     const gridData: any = getOraGridData(); // 获取表格数据
     const createResult = await createZentaoTaskDecompose(gridData, formForTaskQuery.getFieldValue("execution"));
     if (createResult.code === 200) {
-      sucMessage("任务正在生成，请稍后查看！");
+      sucMessage("任务创建成功！");
     } else {
-      errorMessage(`执行失败：${createResult.msg}`)
+      errorMessage(`创建失败：${createResult.msg}`)
     }
     setCreateState(false);
   };

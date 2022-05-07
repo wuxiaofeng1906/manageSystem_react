@@ -316,7 +316,8 @@ const DataRepaireReview: React.FC<any> = () => {
                         return (
                           <Select
                             size={'small'} bordered={false}
-                            style={{backgroundColor: "#F0F0F0", width: '120%'}}
+                            style={{width: '100%'}}
+                            defaultValue={"免"}
                             disabled
                           >
                           </Select>);

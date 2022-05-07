@@ -77,6 +77,14 @@ const parseData = (params: any) => {
         duty_end_time: "",
         duty_order: ""
       };
+      const projectItem_devops = {
+        person_num: "",
+        user_tech: "运维",
+        user_name: "",
+        duty_start_time: "",
+        duty_end_time: "",
+        duty_order: ""
+      };
       project.forEach((ele: any, index: number) => {
         const username = ele.user_name === null ? "" : ele.user_name;
         switch (ele.user_tech) {
@@ -197,6 +205,19 @@ const parseData = (params: any) => {
               projectItem_jsf.user_name = projectItem_jsf.user_name === "" ? username : `${projectItem_jsf.user_name}/${username}`;
             }
             break;
+          case "运维":
+            projectItem_devops.person_num = ele.person_num;
+            projectItem_devops.user_tech = ele.user_tech;
+            projectItem_devops.duty_start_time = ele.duty_start_time;
+            projectItem_devops.duty_end_time = ele.duty_end_time;
+            projectItem_devops.duty_order = ele.duty_order;
+            if (ele.duty_order === "1") {
+              projectItem_devops.user_name = projectItem_devops.user_name === "" ? username : `${username}/${projectItem_devops.user_name}`;
+
+            } else {
+              projectItem_devops.user_name = projectItem_devops.user_name === "" ? username : `${projectItem_devops.user_name}/${username}`;
+            }
+            break;
           default:
             break;
         }
@@ -206,11 +227,13 @@ const parseData = (params: any) => {
           projectItemArray.push(projectItem_Backend);
           projectItemArray.push(projectItem_Test);
           projectItemArray.push(projectItem_Flow);
+          projectItemArray.push(projectItem_devops);
           projectItemArray.push(projectItem_SQA);
           projectItemArray.push(projectItem_global);
           projectItemArray.push(projectItem_openApi);
           projectItemArray.push(projectItem_qbos_store);
           projectItemArray.push(projectItem_jsf);
+
         }
       });
       returnValue.push(projectItemArray);
@@ -234,7 +257,8 @@ const parseSaveCardData = (data: any, oldDutyTask: any, startTime: string, endTi
     firstJsf, secondJsf,
     firstGlobal, secondGlobal,
     firstOpenApil, secondOpenApi,
-    firstQbosStore, secondQbosStore
+    firstQbosStore, secondQbosStore,
+    firstDevops, secondDevops
   } = data;
 
   // 前端第一值班人
@@ -450,6 +474,30 @@ const parseSaveCardData = (data: any, oldDutyTask: any, startTime: string, endTi
     "user_id": secondJsf === null ? "" : secondJsf.split("&")[0],
     "user_name": secondJsf === null ? "" : secondJsf.split("&")[1],
     "user_tech": "12",
+    "duty_order": "2",
+  });
+
+  // 运维第一值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.firstDevopsId,
+    "user_id": firstDevops === null ? "" : firstDevops.split("&")[0],
+    "user_name": firstDevops === null ? "" : firstDevops.split("&")[1],
+    "user_tech": "13",
+    "duty_order": "1",
+  });
+
+  // 运维第二值班人
+  person_data_array.push({
+    "peron_num": oldDutyTask.personNum,
+    "duty_start_time": startTime,
+    "duty_end_time": endTime,
+    "person_id": oldDutyTask.secondDevopsId,
+    "user_id": secondDevops === null ? "" : secondDevops.split("&")[0],
+    "user_name": secondDevops === null ? "" : secondDevops.split("&")[1],
+    "user_tech": "13",
     "duty_order": "2",
   });
 

@@ -32,7 +32,8 @@ const oldDutyTask = {
   firstGlobalId: "", secondGlobalId: "",
   firstOpenApiId: "", secondOpenApiId: "",
   firstQbosStoreId: "", secondQbosStoreId: "",
-  firstJsfId: "", secondJsfId: ""
+  firstJsfId: "", secondJsfId: "",
+  firstDevopsId:"", secondDevopsId:"",
 };
 // 保存需要被删除的数据
 const deletedData: any = [];
@@ -64,7 +65,8 @@ const DutyPlan: React.FC<any> = () => {
   const [allUsers, setAllUsers] = useState({
     front: [], backend: [], tester: [],
     flow: [], SQA: [], my_global: [],
-    openApi: [], qbos_store: [], jsf: []
+    openApi: [], qbos_store: [], jsf: [],
+    devops: []
   });
   // 动态表单的下拉框
   const [projectInfo, setProjectInfo] = useState({
@@ -264,7 +266,6 @@ const DutyPlan: React.FC<any> = () => {
             }
             break;
           case "jsf":
-
             if (users.duty_order === "1") {
               oldDutyTask.firstJsfId = users.person_id;
               formForPlanModify.setFieldsValue({
@@ -276,6 +277,21 @@ const DutyPlan: React.FC<any> = () => {
               formForPlanModify.setFieldsValue({
                 ...formForPlanModify,
                 secondJsf: usersAccount
+              });
+            }
+            break;
+          case "运维":
+            if (users.duty_order === "1") {
+              oldDutyTask.firstDevopsId = users.person_id;
+              formForPlanModify.setFieldsValue({
+                ...formForPlanModify,
+                firstDevops: usersAccount
+              });
+            } else {
+              oldDutyTask.secondDevopsId = users.person_id;
+              formForPlanModify.setFieldsValue({
+                ...formForPlanModify,
+                secondDevops: usersAccount
               });
             }
             break;
@@ -357,7 +373,8 @@ const DutyPlan: React.FC<any> = () => {
       my_global: wx_allUsers,
       openApi: wx_allUsers,
       qbos_store: wx_allUsers,
-      jsf: wx_allUsers
+      jsf: wx_allUsers,
+      devops: wx_allUsers,
     });
 
     // 生成项目名称、项目类型、对应分支、对应测试环境、对应升级环境、项目负责人的下拉框
@@ -1053,7 +1070,7 @@ const DutyPlan: React.FC<any> = () => {
               <RangePicker style={{width: '100%', color: "red"}} disabled/>
             </Form.Item>
             {/* 值班人员Card */}
-            <Card size="small" title="值班人员" style={{marginTop: -15}} bodyStyle={{height: 350}}>
+            <Card size="small" title="值班人员" style={{marginTop: -15}} bodyStyle={{height: 400}}>
               {/* 前端 */}
               <Row gutter={40} style={{marginTop: -10}}>
                 <Col span={10}>
@@ -1129,7 +1146,25 @@ const DutyPlan: React.FC<any> = () => {
                 </Col>
 
               </Row>
+              {/* 运维 */}
+              <Row gutter={40} style={{marginTop: -25}}>
+                <Col span={10}>
+                  <Form.Item name="firstDevops" label="运维" style={{marginTop: 7}}>
+                    <Select showSearch>
+                      {allUsers.devops}
+                    </Select>
+                  </Form.Item>
+                </Col>
 
+                <Col span={14}>
+                  <Form.Item name="secondDevops" label="运维第二值班人" style={{marginTop: 7}}>
+                    <Select showSearch>
+                      {allUsers.devops}
+                    </Select>
+                  </Form.Item>
+                </Col>
+
+              </Row>
               {/* SQA */}
               <Row gutter={40} style={{marginTop: -25}}>
                 <Col span={10}>
@@ -1214,7 +1249,7 @@ const DutyPlan: React.FC<any> = () => {
               <Row gutter={40} style={{marginTop: -25}}>
                 <Col span={10}>
                   <Form.Item name="firstJsf" label="jsf" style={{marginTop: 7}}>
-                    <Select showSearch style={{width:100,marginLeft:60}}>
+                    <Select showSearch style={{width: 100, marginLeft: 60}}>
                       {allUsers.jsf}
                     </Select>
                   </Form.Item>
@@ -1222,7 +1257,7 @@ const DutyPlan: React.FC<any> = () => {
 
                 <Col span={14}>
                   <Form.Item name="secondJsf" label="jsf第二值班人" style={{marginTop: 7}}>
-                    <Select showSearch style={{width:122,marginLeft:60}}>
+                    <Select showSearch style={{width: 122, marginLeft: 60}}>
                       {allUsers.jsf}
                     </Select>
                   </Form.Item>

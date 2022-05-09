@@ -100,7 +100,7 @@ const getGridDataByStory = async (storyId: any, perValueArray: any, queryInfo: a
       tempDatas.forEach((template: any, num: number) => {
         let taskName = "";
         if (template.add_type === "add") {
-          taskName = `【${story.name}】`;
+          taskName = story.name;
         } else {
           const nameHead = (template.task_name).split("】")[0].toString();
           taskName = `${nameHead}】${story.name}`;

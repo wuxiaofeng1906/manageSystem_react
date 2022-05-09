@@ -409,7 +409,7 @@ const TaskDecompose: React.FC<any> = () => {
                         updateGridData(props, currentValue);
                       }}
                     >
-                      {devCenterPerson?.assignedOption}
+                      {devCenterPerson?.createOption}
                     </Select>
                   );
                 },

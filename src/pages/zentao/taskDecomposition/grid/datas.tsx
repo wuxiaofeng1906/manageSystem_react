@@ -160,11 +160,11 @@ const getParentEstimate = (tableData: any, currentRow: any) => {
 // 判断输入的任务名称是否符合规则 >【所属端】需求标题
 const judgeTaskName = (params: any) => {
   const {oldValue, newValue} = params
-  // 如果是父任务，则判断是不是【需求标题】
+  // 如果是父任务，则不判断方括号
   if (params.data?.add_type === "add") {
-    if (newValue.indexOf("【") === -1 || newValue.indexOf("】") === -1) {
-      return "任务名称输入格式错误，正确格式为【XXXX】！";
-    }
+    // if (newValue.indexOf("【") === -1 || newValue.indexOf("】") === -1) {
+    //   return "任务名称输入格式错误，正确格式为【XXXX】！";
+    // }
     return "";
   }
   // 如果是子任务，则也要判断所属端是否存在

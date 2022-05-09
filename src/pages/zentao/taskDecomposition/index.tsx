@@ -317,11 +317,12 @@ const TaskDecompose: React.FC<any> = () => {
                   </Button>
                 </Form.Item>
               </Col>
-              <Col span={5}>
+              <Col span={7}>
                 <Form.Item label="所属执行" name="execution">
-                  <Select style={{width: '100%'}} showSearch onChange={() => {
-                    getZentaoStory("execution")
-                  }} allowClear placeholder="请选择" size={"small"}
+                  <Select style={{width: '100%'}} showSearch
+                          onChange={() => {
+                            getZentaoStory("execution")
+                          }} allowClear placeholder="请选择" size={"small"}
                           filterOption={(inputValue: string, option: any) =>
                             !!option.children.includes(inputValue)}>
                     {excutionSelect}
@@ -352,7 +353,7 @@ const TaskDecompose: React.FC<any> = () => {
 
                 </Form.Item>
               </Col>
-              <Col span={4}>
+              <Col span={3}>
                 <Form.Item label="指派给" name="assignedTo">
                   <Select style={{width: '100%'}} showSearch onChange={() => {
                     getZentaoStory("assignedTo")
@@ -363,7 +364,7 @@ const TaskDecompose: React.FC<any> = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={4}>
+              <Col span={3}>
                 <Form.Item label="由谁创建" name="creater">
                   <Select style={{width: '100%'}} showSearch onChange={() => {
                     getZentaoStory("creater")

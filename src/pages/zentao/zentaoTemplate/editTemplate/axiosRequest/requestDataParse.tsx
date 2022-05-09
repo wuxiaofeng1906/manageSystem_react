@@ -277,10 +277,11 @@ const vertifyTaskName = (type: string, values: string) => {
 
   //   主任务（类型为新增）需要用【】包含起来。
   if (type === "新增") { // 主任务
-    if (values.startsWith("【") && values.endsWith("】")) {
-      return "";
-    }
-    return "主任务输入格式错误，正确格式为：【主任务名称】";
+    // if (values.startsWith("【") && values.endsWith("】")) {
+    //   return "";
+    // }
+    // return "主任务输入格式错误，正确格式为：【主任务名称】";
+    return  "";
   }
 
 //  子任务，需要用 > 【前端】【后端】【测试】【sqa】 开头

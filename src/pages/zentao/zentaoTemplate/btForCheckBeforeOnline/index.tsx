@@ -121,7 +121,12 @@ const CheckBeforeOnline: React.FC<any> = () => {
 
       // 任务名称需要还原之前的名
       let taskName = ele.task_name;
-      const nameHead = taskName.substring(taskName.indexOf("【") + 1, taskName.indexOf("】"));
+      let nameHead = taskName.substring(taskName.indexOf("【") + 1, taskName.indexOf("】"));
+      // 父任务没有【】
+      if (ele.add_type_name === "新增") {
+        nameHead = taskName;
+      }
+      // 还原之前的任务名称
       if (nameHead.includes("-")) { // 如果名称包含-，则需要清除掉这个-
         const head = nameHead.split("-")[0];
         taskName = `${taskName.replace(`${head}-`, "")}`;
@@ -132,14 +137,16 @@ const CheckBeforeOnline: React.FC<any> = () => {
       if (params.sprintType === "sprint" || params.sprintType === "hotfix") { // 班车项目
         if (ele.add_type_name === "新增") { //
           assignedTo = dutyInfo.backend;
-          taskname = `${taskName.slice(0, 1)}${excuteInfo[1]}-${taskName.slice(1)}`;
+          // taskname = `${taskName.slice(0, 1)}${excuteInfo[1]}-${taskName.slice(1)}`;
+          taskname = `${excuteInfo[1]}-${taskName}`;
         } else {
           assignedTo = getChildTaskPerson(ele, dutyInfo);
           taskname = `${taskName.slice(0, 2)}${excuteInfo[1]}-${taskName.slice(2)}`;
         }
       } else if (ele.add_type_name === "新增") {
         assignedTo = (spProjectAssigned.pm).user_name;
-        taskname = `${taskName.slice(0, 1)}${excuteInfo[1]}-${taskName.slice(1)}`;
+        // taskname = `${taskName.slice(0, 1)}${excuteInfo[1]}-${taskName.slice(1)}`;
+        taskname = `${excuteInfo[1]}-${taskName}`;
       } else {
         assignedTo = getChildTaskPersonForPrj(ele, spProjectAssigned);
         taskname = `${taskName.slice(0, 2)}${excuteInfo[1]}-${taskName.slice(2)}`;

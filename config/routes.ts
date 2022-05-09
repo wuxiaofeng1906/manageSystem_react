@@ -407,6 +407,7 @@ export default [
     icon: 'table',
     path: 'toolIntegration',
     component: './toolIntegration',
+    access: 'devCenter', // 仅研发中心人员可见，客服不可见
   },
   {
     name: '检查工具',
@@ -434,11 +435,13 @@ export default [
     // access: 'sysAdmin',
     // hideInMenu: true,
     component: './approvalFlow',
+    access: 'devCenter', // 仅研发中心人员可见，客服不可见
   },
   {
     name: '值班与发布',
     icon: 'table',
     path: '/onDutyAndRelease',
+    access: 'devCenter', // 仅研发中心人员可见，客服不可见
     routes: [
       {
         name: '值班计划',
@@ -466,7 +469,7 @@ export default [
     icon: 'table',
     path: '/zentao',
     // hideInMenu: true,
-    access: 'sysAdmin',
+    access: 'devCenter',
     routes: [
       {
         name: '人员执行设置',
@@ -511,7 +514,7 @@ export default [
     icon: 'table',
     path: '/shimo',
     hideInMenu: false,
-    // access: 'sysAdmin', // 所有人可见，只有管理员可以编辑。
+    access: 'devCenter', // 仅研发中心人员可见，客服不可见
     routes: [
       {
         name: '文档基线',

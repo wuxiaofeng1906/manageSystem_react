@@ -208,9 +208,10 @@ const TaskDecompose: React.FC<any> = () => {
       sucMessage("任务创建成功！");
       //   成功后需要重置禅道需求列表
       await getZentaoStoryByConditon();
-
+    } else if (createResult.data?.story) {
+      errorMessage(`创建失败：需求【${createResult.data?.story}】${createResult.msg}`);
     } else {
-      errorMessage(`创建失败：${createResult.msg}`)
+      errorMessage(`创建失败：${createResult.msg}`);
     }
     setCreateState(false);
   };

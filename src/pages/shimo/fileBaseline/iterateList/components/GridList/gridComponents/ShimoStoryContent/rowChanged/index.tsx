@@ -2,7 +2,6 @@ import {axiosPut} from "@/publicMethods/axios";
 
 // 修改石墨目录
 const modifyListContent = async (type: string, params: any) => {
-  debugger;
   const modifyItem = {
     "shimo_id": params.shimo
   };

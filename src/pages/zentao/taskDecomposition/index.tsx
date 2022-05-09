@@ -190,9 +190,6 @@ const TaskDecompose: React.FC<any> = () => {
           fianlData.push(ele);
         }
       });
-    } else if (currentValue.checked === undefined) {
-      //   成功后需要重置禅道需求列表
-      await getZentaoStoryByConditon();
     }
     await showGridData(fianlData);
   }
@@ -209,6 +206,8 @@ const TaskDecompose: React.FC<any> = () => {
     const createResult = await createZentaoTaskDecompose(gridData, formForTaskQuery.getFieldValue("execution"));
     if (createResult.code === 200) {
       sucMessage("任务创建成功！");
+      //   成功后需要重置禅道需求列表
+      await getZentaoStoryByConditon();
 
     } else {
       errorMessage(`创建失败：${createResult.msg}`)

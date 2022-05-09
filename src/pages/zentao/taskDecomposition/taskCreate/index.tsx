@@ -31,7 +31,7 @@ const createZentaoTaskDecompose = async (gridData: any, executionId: number) => 
       "create_user": usersLoginInfo.userid
     })
   });
-  debugger;
+
   const createResult = await axiosPost("/api/verify/sprint/task", taskArray);
   return createResult;
 

@@ -211,7 +211,7 @@ const TaskDecompose: React.FC<any> = () => {
     } else {
       const repeatStory = createResult.data;
       if (repeatStory && repeatStory.length > 0) {
-        errorMessage(`创建失败：需求【${repeatStory.join("、")}】已创建`);
+        errorMessage(`创建失败：需求【${repeatStory.join("、")}】已创建任务`);
       } else {
         errorMessage(`需求创建失败：${createResult.msg}`);
       }

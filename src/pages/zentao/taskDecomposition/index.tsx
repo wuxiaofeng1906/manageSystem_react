@@ -133,8 +133,7 @@ const TaskDecompose: React.FC<any> = () => {
     }
   };
 
-  // 根据条件获取需求数据
-  const getZentaoStory = async (param: any) => {
+  const getZentaoStoryByConditon = async () => {
     const formDt = formForTaskQuery.getFieldsValue();
     if (!formDt.execution) {
       errorMessage("请先选择所属执行！");
@@ -148,6 +147,10 @@ const TaskDecompose: React.FC<any> = () => {
     const selectArray = await zentaoStorySelect(params);
     // 下拉框数据
     setStorySelect(selectArray);
+  };
+  // 根据条件获取需求数据
+  const getZentaoStory = async (param: any) => {
+    const selectArray = await getZentaoStoryByConditon();
     // 需要判断禅道需求和表格数据是否清空。
     await showSelectChangedData(param, selectArray);
   };
@@ -178,7 +181,7 @@ const TaskDecompose: React.FC<any> = () => {
       // 获取表格之前数据，拼接起来即可，不重新刷新之前的数据
       fianlData = getOraGridData().concat(tempData);
 
-    } else if (selectedValue !== "全选") {
+    } else if (selectedValue !== "全选" && currentValue.checked === false) {
 
       const oraData = getOraGridData();
       oraData.forEach((ele: any) => {
@@ -187,6 +190,9 @@ const TaskDecompose: React.FC<any> = () => {
           fianlData.push(ele);
         }
       });
+    } else if (currentValue.checked === undefined) {
+      //   成功后需要重置禅道需求列表
+      await getZentaoStoryByConditon();
     }
     await showGridData(fianlData);
   }
@@ -203,6 +209,7 @@ const TaskDecompose: React.FC<any> = () => {
     const createResult = await createZentaoTaskDecompose(gridData, formForTaskQuery.getFieldValue("execution"));
     if (createResult.code === 200) {
       sucMessage("任务创建成功！");
+
     } else {
       errorMessage(`创建失败：${createResult.msg}`)
     }

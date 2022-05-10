@@ -452,16 +452,12 @@ export default [
         name: '发布过程',
         icon: 'table',
         path: 'preRelease',
-        // access: 'sysAdmin',
         component: './onDutyAndRelease/preRelease',
-        // hideInMenu: true
       }, {
         name: '发布历史',
         icon: 'table',
         path: 'releaseHistory',
-        // access: 'sysAdmin',
         component: './onDutyAndRelease/releaseHistory',
-        // hideInMenu: true
       }
     ],
   }, {
@@ -469,22 +465,20 @@ export default [
     icon: 'table',
     path: '/zentao',
     // hideInMenu: true,
-
     routes: [
       {
         name: '人员执行设置',
         icon: 'table',
         path: 'peopleExcuteSetting',
         component: './zentao/peopleExcuteSetting',
-        hideInMenu: false,
-        access: 'sysAdmin',
+        access: 'sysAdmin',  // 管理员可见
       },
       {
         name: '禅道模板',
         icon: 'table',
         path: 'templateList',
         component: './zentao/zentaoTemplate/templateList',
-        access: 'sysAdmin',
+        access: 'sysAdmin',  // 管理员可见
       }, {
         name: '禅道任务模板',
         icon: 'table',
@@ -508,7 +502,7 @@ export default [
         icon: 'table',
         path: 'taskDecomposition',
         component: './zentao/taskDecomposition',
-        access: 'devCenter',
+        access: 'devCenter', // 研发中心可见
         // hideInMenu: true
       },
     ]
@@ -517,7 +511,7 @@ export default [
     icon: 'table',
     path: '/shimo',
     hideInMenu: false,
-    access: 'devCenter', // 仅研发中心人员可见，客服不可见
+    access: 'devCenter', // 仅研发中心人员可见，客服不可见，
     routes: [
       {
         name: '文档基线',

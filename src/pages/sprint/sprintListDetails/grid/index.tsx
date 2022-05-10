@@ -213,8 +213,36 @@ const getColums = (prjNames: any) => {
     {
       headerName: '是否需要测试验证',
       field: 'testCheck',
-      cellRenderer: numberRenderToYesNo,
-      // tooltipField: "testCheck"
+      cellRenderer: (params: any) => {
+        // testCheck: 手动修改标识: "-1"、"-0";自动的是：0 ，1
+        // 自动规则生成的‘是’默认黑色，自动规则生成的‘否’默认红色
+        // 手动修改的‘是’默认紫色，手动修改的‘否’默认黄色
+        const values = params.value;
+        if (!values) {
+          return "";
+        }
+
+        let result = "";
+        let my_color = "";
+        if (values === "-1") { // 手动：是
+          result = "是";
+          my_color = "purple";// 紫色
+        } else if (values === "-0") { // 手动：否
+          result = "否";
+          my_color = "orange";// 黄色
+        } else if (values === "0") { // 自动：否
+          result = "否";
+          my_color = "red";// 红色
+        } else if (values === "1") { // 自动：是
+          result = "是";
+          my_color = "black";// 黑色
+        }
+        if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+          return `<span style="text-decoration:line-through"> ${result} </span>`;
+        }
+        return `<span style="color: ${my_color}"> ${result}  </span>`;
+      },
+
     },
     {
       headerName: '已提测',

@@ -6,7 +6,21 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useGqlClient} from '@/hooks';
-import {PageHeader, Button, message, Form, Select, Modal, Input, Row, Col, DatePicker, Checkbox, Spin} from 'antd';
+import {
+  PageHeader,
+  Button,
+  message,
+  Form,
+  Select,
+  Modal,
+  Input,
+  Row,
+  Col,
+  DatePicker,
+  Checkbox,
+  Spin,
+  Breadcrumb
+} from 'antd';
 import {formatMomentTime} from '@/publicMethods/timeMethods';
 import dayjs from "dayjs";
 import {
@@ -29,6 +43,7 @@ import {
   queryDevelopViews, queryRepeats, getDeptMemner,
   LoadCombobox, LoadTesterCombobox, GetSprintProject
 } from "./data";
+import {Link} from "react-router-dom";
 
 const {Option} = Select;
 
@@ -1454,9 +1469,11 @@ const SprintList: React.FC<any> = () => {
   const leftStyle = {marginLeft: '20px'};
   const rightStyle = {marginLeft: '30px'};
   const widths = {width: '200px', color: 'black'};
-  const routes = [
-    {path: '', breadcrumbName: '班车工作台'},
-    {path: '', breadcrumbName: '项目详情'}];
+  const path = [<Breadcrumb.Item key="班车工作台">班车工作台</Breadcrumb.Item>,
+    <Breadcrumb.Item key="项目列表">
+      <Link to="/sprint/sprintList">项目列表</Link>
+    </Breadcrumb.Item>,
+    <Breadcrumb.Item key="项目详情">项目详情</Breadcrumb.Item>];
 
   useEffect(() => {
     const bugs = data?.resCount.bug === undefined ? 0 : data?.resCount.bug;
@@ -1468,16 +1485,15 @@ const SprintList: React.FC<any> = () => {
   }, [data]);
 
   return (
-
-    <div style={{width: "100%", marginTop: "-20px"}}>
-
+    <div style={{width: "100%", marginTop: "-30px"}}>
       <PageHeader
         ghost={false}
         title={prjNames}
         subTitle={<div style={{color: "blue"}}> {pageTitle}</div>}
-        style={{height: "100px"}}
-        breadcrumb={{routes}}
-
+        style={{height: "85px"}}
+        breadcrumbRender={() => {
+          return <Breadcrumb>{path}</Breadcrumb>;
+        }}
       />
 
       <Spin spinning={refreshItem} tip="项目详情同步中..." size={"large"}>

@@ -18,7 +18,7 @@ const gridColumns: any = [
   }, {
     headerName: '任务名称',
     field: 'task_name',
-    minWidth: 200,
+    minWidth: 300,
     width: 90,
     pinned: "left",
     cellEditorPopup: true,
@@ -47,14 +47,13 @@ const gridColumns: any = [
   }, {
     headerName: '相关需求',
     field: 'subtask_dev_needs',
-    minWidth: 200,
+    minWidth: 90,
     cellRenderer: (params: any) => {
-      const storyId = params.data?.subtask_dev_id;
-      if (params.value && storyId) {
+      // const storyId = params.data?.subtask_dev_id;
+      if (params.value) {
         return `
           <div>
-                <a target="_blank"; href='http://zentao.77hub.com/zentao/story-view-${storyId}.html'> ${storyId}</a>
-                :${params.value}
+                <a target="_blank"; href='http://zentao.77hub.com/zentao/story-view-${params.value}.html'> ${params.value}</a>
           </div>`;
       }
       return params.value;

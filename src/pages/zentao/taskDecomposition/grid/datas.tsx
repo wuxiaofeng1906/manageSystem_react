@@ -111,7 +111,7 @@ const getGridDataByStory = async (storyId: any, perValueArray: any, queryInfo: a
           module: story.module === "" ? "/" : `/${story.module}`,
           task_name: taskName,
           subtask_dev_id: story.id,
-          subtask_dev_needs: story.name,
+          subtask_dev_needs: story.id,
           assigned_person: usersLoginInfo.userid === "test" ? "ChenHuan" : usersLoginInfo.userid,
           plan_start: dayjs().format("YYYY-MM-DD"),
           plan_end: dayjs().format("YYYY-MM-DD"),

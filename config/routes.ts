@@ -469,20 +469,22 @@ export default [
     icon: 'table',
     path: '/zentao',
     // hideInMenu: true,
-    access: 'devCenter',
+
     routes: [
       {
         name: '人员执行设置',
         icon: 'table',
         path: 'peopleExcuteSetting',
         component: './zentao/peopleExcuteSetting',
-        hideInMenu: false
+        hideInMenu: false,
+        access: 'sysAdmin',
       },
       {
         name: '禅道模板',
         icon: 'table',
         path: 'templateList',
         component: './zentao/zentaoTemplate/templateList',
+        access: 'sysAdmin',
       }, {
         name: '禅道任务模板',
         icon: 'table',
@@ -506,6 +508,7 @@ export default [
         icon: 'table',
         path: 'taskDecomposition',
         component: './zentao/taskDecomposition',
+        access: 'devCenter',
         // hideInMenu: true
       },
     ]

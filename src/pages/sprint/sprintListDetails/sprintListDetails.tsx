@@ -8,7 +8,7 @@ import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useGqlClient} from '@/hooks';
 import {
   PageHeader, Button, message, Form, Select, Modal, Input, Row, Col,
-  DatePicker, Checkbox, Spin, Breadcrumb
+  DatePicker, Checkbox, Spin, Breadcrumb, TreeSelect
 } from 'antd';
 import {formatMomentTime} from '@/publicMethods/timeMethods';
 import dayjs from "dayjs";
@@ -16,7 +16,7 @@ import {
   FolderAddTwoTone, SnippetsTwoTone, DeleteTwoTone, EditTwoTone,
   CloseSquareTwoTone, CheckSquareTwoTone, SettingOutlined, ReloadOutlined
 } from '@ant-design/icons';
-import {getProjectInfo, alayManagerData} from "./common";
+import {getProjectInfo, alayManagerData, defaultSelectParams, getRelatedPersonName} from "./common";
 import {getStaticMessage, headerPath} from "./header";
 import {
   numberRenderToCurrentStage, stageChangeToNumber, numberRenderToZentaoType,
@@ -33,8 +33,9 @@ import {
   queryDevelopViews, queryRepeats, getDeptMemner,
   LoadCombobox, LoadTesterCombobox, GetSprintProject
 } from "./data";
-
 import {errorMessage, infoMessage, sucMessage, warnMessage} from "@/publicMethods/showMessages";
+import defaultTreeSelectParams from "@/pages/shimo/fileBaseline/iterateList/defaultSetting";
+import {getStageOption, getTypeOption, getAssignedToOption, getTesterOption, getSolvedByOption} from "./filter";
 
 const {Option} = Select;
 
@@ -61,6 +62,11 @@ const SprintList: React.FC<any> = () => {
   // 移动新增项目
   const [formForMoveAddAnaMod] = Form.useForm();
   const [pageTitle, setPageTitle] = useState("");
+  const [personName, setPersonName] = useState({
+    assignedTo: [],
+    tester: [],
+    solvedBy: []
+  });
 
   /* endregion */
 
@@ -827,6 +833,75 @@ const SprintList: React.FC<any> = () => {
 
   /* endregion */
 
+  /* region 下拉框动态加载 以及条件筛选 */
+  const [selectOption, setSelectOptions] = useState({
+    stageSelect: [],
+    typeSelect: [],
+    assignedSelect: [],
+    testSelect: [],
+    solvedSelect: []
+  });
+
+  const getGridData = () => {
+    const datas: any = [];
+    gridApi.current?.forEachNode((rows: any) => {
+      datas.push(rows?.data);
+    });
+    return datas;
+  }
+
+  // 获取阶段下拉框
+  const onStageSelectFocus = () => {
+    const optionArray: any = getStageOption(getGridData());
+    setSelectOptions({
+      ...selectOption,
+      stageSelect: optionArray
+    });
+  };
+
+  // 获取类型下拉框
+  const onTypeSelectFocus = () => {
+    const optionArray: any = getTypeOption(getGridData());
+    setSelectOptions({
+      ...selectOption,
+      typeSelect: optionArray
+    });
+  }
+
+  // 获取指派给下拉框
+  const onAssignedSelectFocus = () => {
+    const optionArray: any = getAssignedToOption(personName?.assignedTo, getGridData());
+    setSelectOptions({
+      ...selectOption,
+      assignedSelect: optionArray
+    });
+  }
+
+  // 测试下拉框
+  const onTestSelectFocus = () => {
+    const optionArray: any = getTesterOption(personName?.tester, getGridData());
+    setSelectOptions({
+      ...selectOption,
+      testSelect: optionArray
+    });
+  };
+
+  // 解决人/完成人
+  const onSolvedSelectFocus = () => {
+    const optionArray: any = getSolvedByOption(personName?.solvedBy, getGridData());
+    setSelectOptions({
+      ...selectOption,
+      solvedSelect: optionArray
+    });
+
+  };
+
+  const onStageSelectChanged = (params: any, others: any) => {
+    debugger;
+
+  };
+  /* endregion 下拉框动态加载 */
+
   /* region 删除功能 */
 
   const [isdelModalVisible, setIsDelModalVisible] = useState(false);
@@ -1451,7 +1526,15 @@ const SprintList: React.FC<any> = () => {
 
   useEffect(() => {
     setPageTitle(getStaticMessage(data?.resCount));
+    //   需要取出最初的指派给、测试、解决完成人，用于下拉框筛选
+    const personData = getRelatedPersonName(data?.result);
+    setPersonName({
+      assignedTo: personData?.assigned,
+      tester: personData?.tester,
+      solvedBy: personData?.solvedBy
+    });
   }, [data]);
+
 
   const leftStyle = {marginLeft: '20px'};
   const rightStyle = {marginLeft: '30px'};
@@ -1470,8 +1553,79 @@ const SprintList: React.FC<any> = () => {
 
       <Spin spinning={refreshItem} tip="项目详情同步中..." size={"large"}>
 
+        {/* 条件筛选 */}
+        <Row gutter={5} style={{background: 'white', marginTop: "5px", height: 30}}>
+          <Col span={8}>
+            <Form.Item label="部门/组" name={"dept"}>
+              <TreeSelect className={"deptTree"} size={"small"}
+                          {...defaultTreeSelectParams}
+                // treeData={deptList}
+                // onChange={iterDeptChanged}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label="阶段" name={"stage"}>
+              <Select
+                {...defaultSelectParams}
+                style={{width: '100%'}}
+                onFocus={onStageSelectFocus}
+                onChange={onStageSelectChanged}
+              >
+                {selectOption.stageSelect}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label="类型" name={"types"}>
+              <Select
+                {...defaultSelectParams}
+                style={{width: '100%'}}
+                onFocus={onTypeSelectFocus}
+              >
+                {selectOption.typeSelect}
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={5} style={{background: 'white', height: 30}}>
+          <Col span={8}>
+            <Form.Item label="指派给" name={"assignedTo"}>
+              <Select
+                {...defaultSelectParams}
+                style={{width: '100%'}}
+                onFocus={onAssignedSelectFocus}
+              >
+                {selectOption.assignedSelect}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label="测试" name={"test"}>
+              <Select
+                {...defaultSelectParams}
+                style={{width: '100%'}}
+                onFocus={onTestSelectFocus}
+              >
+                {selectOption.testSelect}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item label="解决/完成" name={"solved"}>
+              <Select
+                {...defaultSelectParams}
+                style={{width: '100%'}}
+                onFocus={onSolvedSelectFocus}
+              >
+                {selectOption.solvedSelect}
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+
         {/* 明细操作按钮   */}
-        <Row style={{background: 'white', marginTop: "20px"}}>
+        <Row style={{background: 'white', marginTop: "5px"}}>
           <Col span={22}>
             <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap"}}>
               <Button type="text"
@@ -1479,72 +1633,72 @@ const SprintList: React.FC<any> = () => {
                         marginLeft: "-10px",
                         display: judgeAuthority("新增项目明细行") === true ? "inline" : "none"
                       }}
-                      icon={<FolderAddTwoTone/>} size={'large'}
+                      icon={<FolderAddTwoTone/>}
                       onClick={addProject}>新增</Button>
               <Button type="text"
                       style={{
-                        marginLeft: "-10px",
+                        marginLeft: "-25px",
                         display: judgeAuthority("修改项目明细行") === true ? "inline" : "none"
                       }}
-                      icon={<EditTwoTone/>} size={'large'}
+                      icon={<EditTwoTone/>}
                       onClick={btnModifyProject}>修改</Button>
               <Button type="text"
                       style={{
-                        marginLeft: "-10px",
+                        marginLeft: "-25px",
                         display: judgeAuthority("删除项目明细行") === true ? "inline" : "none"
                       }}
-                      icon={<DeleteTwoTone/>} size={'large'}
+                      icon={<DeleteTwoTone/>}
                       onClick={deleteSprintDetails}>删除</Button>
               <Button type="text"
                       style={{
-                        marginLeft: "-10px",
+                        marginLeft: "-25px",
                         display: judgeAuthority("移动项目明细行") === true ? "inline" : "none"
                       }}
-                      icon={<SnippetsTwoTone/>} size={'large'}
+                      icon={<SnippetsTwoTone/>}
                       onClick={moveProject}>移动</Button>
 
-              <label style={{marginTop: '10px', fontWeight: 'bold', marginLeft: "10px"}}>操作流程:</label>
+              <label style={{marginTop: '5px', fontWeight: 'bold', marginLeft: "10px"}}>操作流程:</label>
 
               <Button type="text"
                       style={{display: judgeAuthority("打基线") === true ? "inline" : "none"}}
-                      icon={<CheckSquareTwoTone/>} size={'large'}
+                      icon={<CheckSquareTwoTone/>}
                       onClick={flowForBaseLine}>基线</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-10px", display: judgeAuthority("撤销") === true ? "inline" : "none"}}
-                      icon={<CloseSquareTwoTone/>} size={'large'}
+                      style={{marginLeft: "-25px", display: judgeAuthority("撤销") === true ? "inline" : "none"}}
+                      icon={<CloseSquareTwoTone/>}
                       onClick={flowForRevoke}>撤销</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-10px", display: judgeAuthority("取消") === true ? "inline" : "none"}}
-                      icon={<CloseSquareTwoTone/>} size={'large'}
+                      style={{marginLeft: "-25px", display: judgeAuthority("取消") === true ? "inline" : "none"}}
+                      icon={<CloseSquareTwoTone/>}
                       onClick={flowForCancle}>取消</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-10px", display: judgeAuthority("开发已revert") === true ? "inline" : "none"}}
-                      icon={<CheckSquareTwoTone/>} size={'large'}
+                      style={{marginLeft: "-25px", display: judgeAuthority("开发已revert") === true ? "inline" : "none"}}
+                      icon={<CheckSquareTwoTone/>}
                       onClick={flowForDevRevert}>开发已revert</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-10px", display: judgeAuthority("测试已验revert") === true ? "inline" : "none"}}
-                      icon={<CheckSquareTwoTone/>} size={'large'}
+                      style={{marginLeft: "-25px", display: judgeAuthority("测试已验revert") === true ? "inline" : "none"}}
+                      icon={<CheckSquareTwoTone/>}
                       onClick={flowForTestRevert}>测试已验revert</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-10px", display: judgeAuthority("灰度已验证") === true ? "inline" : "none"}}
-                      icon={<CheckSquareTwoTone/>} size={'large'}
+                      style={{marginLeft: "-25px", display: judgeAuthority("灰度已验证") === true ? "inline" : "none"}}
+                      icon={<CheckSquareTwoTone/>}
                       onClick={flowForHuiduChecked}>灰度已验证</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-10px", display: judgeAuthority("线上已验证") === true ? "inline" : "none"}}
-                      icon={<CheckSquareTwoTone/>} size={'large'}
+                      style={{marginLeft: "-25px", display: judgeAuthority("线上已验证") === true ? "inline" : "none"}}
+                      icon={<CheckSquareTwoTone/>}
                       onClick={flowForOnlineChecked}>线上已验证</Button>
 
             </div>
           </Col>
           <Col span={1} style={{textAlign: "right",}}>
             <div>
-              <Button type="text" icon={<ReloadOutlined/>} onClick={refreshGrid} size={'large'}
+              <Button type="text" icon={<ReloadOutlined/>} onClick={refreshGrid}
                       style={{display: "inline", float: "right"}}>刷新</Button>
             </div>
 
@@ -1552,7 +1706,7 @@ const SprintList: React.FC<any> = () => {
 
           <Col span={1} style={{textAlign: "right",}}>
             <div>
-              <Button type="text" icon={<SettingOutlined/>} size={'large'} onClick={showFieldsModal}> </Button>
+              <Button type="text" icon={<SettingOutlined/>} onClick={showFieldsModal}> </Button>
             </div>
           </Col>
 

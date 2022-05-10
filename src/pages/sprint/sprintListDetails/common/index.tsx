@@ -51,5 +51,47 @@ const alayManagerData = (oradata: any, curRow: any, prjId: any) => {
   return datas;
 }
 
+const defaultSelectParams: any = {
+  mode: "multiple",
+  allowClear: true,
+  placeholder: "默认选择全部",
+  size: "small",
+  maxTagCount: "responsive"
+};
 
-export {getProjectInfo, alayManagerData};
+// 统计指派给、测试、解决人 人名
+const getRelatedPersonName = (oraData: any) => {
+
+  if (!oraData || oraData.length === 0) {
+    return {};
+  }
+  const tester: any = [];
+  const assigned: any = [];
+  const solvedBy: any = [];
+
+  oraData.forEach((rows: any) => {
+
+    // 测试人员
+    const test_person = (rows.tester).split(";");
+    test_person.forEach((name: any) => {
+      if (tester.indexOf(name) === -1) {
+        tester.push(name);
+      }
+    });
+
+    //   指派给
+    const assigned_person = rows.assignedTo;
+    if (assigned.indexOf(assigned_person) === -1) {
+      assigned.push(assigned_person);
+    }
+
+    //  解决人
+    const finished_person = rows.finishedBy;
+    if (solvedBy.indexOf(finished_person) === -1) {
+      solvedBy.push(finished_person);
+    }
+  });
+
+  return {tester, assigned, solvedBy};
+};
+export {getProjectInfo, alayManagerData, defaultSelectParams, getRelatedPersonName};

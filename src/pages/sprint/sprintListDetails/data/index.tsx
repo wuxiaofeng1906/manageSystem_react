@@ -6,7 +6,7 @@ const {Option} = Select;
 
 // 计算不同类型的个数
 const calTypeCount = (data: any) => {
-  debugger;
+
   // 统计类型
   let bug = 0;
   let task = 0;
@@ -398,6 +398,7 @@ const GetSprintProject = () => {
   }
   return projectArray;
 };
+
 
 
 export {queryDevelopViews, queryRepeats, getDeptMemner, LoadCombobox, LoadTesterCombobox, GetSprintProject}

@@ -185,4 +185,141 @@ const getSolvedByOption = (personName: any, gridData: any) => {
 
   return optionArray;
 };
-export {getStageOption, getTypeOption, getAssignedToOption, getTesterOption, getSolvedByOption};
+
+// 过滤部门数据
+const filterDeptData = (dept: any, oraData: any) => {
+  let filterDeptResult: any = [];
+  if (!dept || dept.length === 0) {
+    filterDeptResult = [...oraData];
+  } else {
+    dept.forEach(() => {
+      oraData.forEach(() => {
+
+      });
+    })
+  }
+  return filterDeptResult;
+};
+
+// 过滤阶段数据
+const filterStageData = (stage: any, oraData: any) => {
+  let filterStageResult: any = [];
+  if (!stage || stage.length === 0) {
+    filterStageResult = [...oraData];
+  } else {
+    stage.forEach((ele: any) => {
+      oraData.forEach((row: any) => {
+        if (ele === row.stage) {
+          filterStageResult.push(row);
+        }
+      });
+    })
+  }
+
+  return filterStageResult;
+};
+
+// 过滤类型
+const filterTypesData = (types: any, oraData: any) => {
+  let filterTypesResult: any = [];
+  if (!types || types.length === 0) {
+    filterTypesResult = [...oraData];
+  } else {
+    types.forEach((ele: any) => {
+      oraData.forEach((row: any) => {
+        let rowsType = "";
+        const {category, fromBug} = row;
+        if (category === "1") {  // type = "Bug";
+          rowsType = "bug";
+        } else if (category === "2") {   //   type = "Task";
+          rowsType = "task";
+        } else if (category === "3" && fromBug === 0) {   //   type = "Story";
+          rowsType = "story";
+        } else if (category === "3" && fromBug !== 1) {   //   type = "b_Story";
+          rowsType = "B_story";
+        }
+
+        if (ele === rowsType) {
+          filterTypesResult.push(row);
+        }
+      });
+    })
+  }
+  return filterTypesResult;
+};
+
+// 过滤指派给
+const filterAssignedData = (assignedTo: any, oraData: any) => {
+  let filterAssignedResult: any = [];
+  if (!assignedTo || assignedTo.length === 0) {
+    filterAssignedResult = [...oraData];
+  } else {
+    assignedTo.forEach((ele: any) => {
+      oraData.forEach((row: any) => {
+        if (ele === row.assignedTo) {
+          filterAssignedResult.push(row);
+        }
+      });
+    })
+  }
+  return filterAssignedResult;
+};
+
+// 过滤测试
+const filterTesterData = (test: any, oraData: any) => {
+  let filterTestResult: any = [];
+  if (!test || test.length === 0) {
+    filterTestResult = [...oraData];
+  } else {
+    test.forEach((ele: any) => {
+      oraData.forEach((row: any) => {
+        if ((row.tester).indexOf(ele) > -1) {
+          filterTestResult.push(row);
+        }
+      });
+    })
+  }
+  return filterTestResult;
+};
+
+// 过滤解决/已完成
+const filterSolvedData = (solved: any, oraData: any) => {
+  let filterSolvedResult: any = [];
+  if (!solved || solved.length === 0) {
+    filterSolvedResult = [...oraData];
+  } else {
+    solved.forEach((ele: any) => {
+      oraData.forEach((row: any) => {
+        if (row.finishedBy === ele) {
+          filterSolvedResult.push(row);
+        }
+      });
+    })
+  }
+  return filterSolvedResult;
+};
+
+// 对表格中的数据进行条件过滤
+const filterDatasByCondition = (condition: any, oraData: any) => {
+  if (!oraData || oraData.length === 0) {
+    return [];
+  }
+  const {dept, stage, types, assignedTo, test, solved} = condition;
+
+  // 过滤所属部门
+  let filteredResult = filterDeptData(dept, oraData);
+  // 过滤所属阶段
+  filteredResult = filterStageData(stage, filteredResult);
+  // 过滤类型
+  filteredResult = filterTypesData(types, filteredResult);
+  // 过滤指派给
+  filteredResult = filterAssignedData(assignedTo, filteredResult);
+  // 过滤测试
+  filteredResult = filterTesterData(test, filteredResult);
+  // 过滤解决/已完成
+  filteredResult = filterSolvedData(solved, filteredResult);
+
+  return filteredResult;
+};
+
+export {getStageOption, getTypeOption, getAssignedToOption, getTesterOption, getSolvedByOption, filterDatasByCondition};

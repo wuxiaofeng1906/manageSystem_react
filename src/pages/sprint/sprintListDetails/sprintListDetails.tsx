@@ -35,7 +35,10 @@ import {
 } from "./data";
 import {errorMessage, infoMessage, sucMessage, warnMessage} from "@/publicMethods/showMessages";
 import defaultTreeSelectParams from "@/pages/shimo/fileBaseline/iterateList/defaultSetting";
-import {getStageOption, getTypeOption, getAssignedToOption, getTesterOption, getSolvedByOption} from "./filter";
+import {
+  getStageOption, getTypeOption, getAssignedToOption,
+  getTesterOption, getSolvedByOption, filterDatasByCondition
+} from "./filter";
 
 const {Option} = Select;
 
@@ -47,6 +50,8 @@ const SprintList: React.FC<any> = () => {
   const {prjId, prjNames, prjType} = getProjectInfo();
 
   /* region 整个模块都需要用到的表单定义 */
+  // 模块查询
+  const [formForQuery] = Form.useForm();
   // admin 新增和修改from表单
   const [formForAdminToAddAnaMod] = Form.useForm();
   // 开发经理修改from表单
@@ -896,9 +901,11 @@ const SprintList: React.FC<any> = () => {
 
   };
 
-  const onStageSelectChanged = (params: any, others: any) => {
-    debugger;
-
+  // 阶段选择
+  const onSelectChanged = () => {
+    const queryCondition = formForQuery.getFieldsValue();
+    const filterData = filterDatasByCondition(queryCondition, data?.result);
+    gridApi.current?.setRowData(filterData);
   };
   /* endregion 下拉框动态加载 */
 
@@ -1554,76 +1561,81 @@ const SprintList: React.FC<any> = () => {
       <Spin spinning={refreshItem} tip="项目详情同步中..." size={"large"}>
 
         {/* 条件筛选 */}
-        <Row gutter={5} style={{background: 'white', marginTop: "5px", height: 30}}>
-          <Col span={8}>
-            <Form.Item label="部门/组" name={"dept"}>
-              <TreeSelect className={"deptTree"} size={"small"}
-                          {...defaultTreeSelectParams}
-                // treeData={deptList}
-                // onChange={iterDeptChanged}
-              />
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item label="阶段" name={"stage"}>
-              <Select
-                {...defaultSelectParams}
-                style={{width: '100%'}}
-                onFocus={onStageSelectFocus}
-                onChange={onStageSelectChanged}
-              >
-                {selectOption.stageSelect}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item label="类型" name={"types"}>
-              <Select
-                {...defaultSelectParams}
-                style={{width: '100%'}}
-                onFocus={onTypeSelectFocus}
-              >
-                {selectOption.typeSelect}
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={5} style={{background: 'white', height: 30}}>
-          <Col span={8}>
-            <Form.Item label="指派给" name={"assignedTo"}>
-              <Select
-                {...defaultSelectParams}
-                style={{width: '100%'}}
-                onFocus={onAssignedSelectFocus}
-              >
-                {selectOption.assignedSelect}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item label="测试" name={"test"}>
-              <Select
-                {...defaultSelectParams}
-                style={{width: '100%'}}
-                onFocus={onTestSelectFocus}
-              >
-                {selectOption.testSelect}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item label="解决/完成" name={"solved"}>
-              <Select
-                {...defaultSelectParams}
-                style={{width: '100%'}}
-                onFocus={onSolvedSelectFocus}
-              >
-                {selectOption.solvedSelect}
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-
+        <Form form={formForQuery}>
+          <Row gutter={5} style={{background: 'white', marginTop: "5px", height: 30}}>
+            <Col span={8}>
+              <Form.Item label="部门/组" name={"dept"}>
+                <TreeSelect className={"deptTree"} size={"small"}
+                            {...defaultTreeSelectParams}
+                  // treeData={deptList}
+                  // onChange={iterDeptChanged}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item label="阶段" name={"stage"}>
+                <Select
+                  {...defaultSelectParams}
+                  style={{width: '100%'}}
+                  onFocus={onStageSelectFocus}
+                  onChange={onSelectChanged}
+                >
+                  {selectOption.stageSelect}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item label="类型" name={"types"}>
+                <Select
+                  {...defaultSelectParams}
+                  style={{width: '100%'}}
+                  onFocus={onTypeSelectFocus}
+                  onChange={onSelectChanged}
+                >
+                  {selectOption.typeSelect}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={5} style={{background: 'white', height: 30}}>
+            <Col span={8}>
+              <Form.Item label="指派给" name={"assignedTo"}>
+                <Select
+                  {...defaultSelectParams}
+                  style={{width: '100%'}}
+                  onFocus={onAssignedSelectFocus}
+                  onChange={onSelectChanged}
+                >
+                  {selectOption.assignedSelect}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item label="测试" name={"test"}>
+                <Select
+                  {...defaultSelectParams}
+                  style={{width: '100%'}}
+                  onFocus={onTestSelectFocus}
+                  onChange={onSelectChanged}
+                >
+                  {selectOption.testSelect}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item label="解决/完成" name={"solved"}>
+                <Select
+                  {...defaultSelectParams}
+                  style={{width: '100%'}}
+                  onFocus={onSolvedSelectFocus}
+                  onChange={onSelectChanged}
+                >
+                  {selectOption.solvedSelect}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
         {/* 明细操作按钮   */}
         <Row style={{background: 'white', marginTop: "5px"}}>
           <Col span={22}>

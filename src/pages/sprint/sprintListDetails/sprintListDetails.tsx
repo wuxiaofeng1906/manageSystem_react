@@ -7,19 +7,8 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useGqlClient} from '@/hooks';
 import {
-  PageHeader,
-  Button,
-  message,
-  Form,
-  Select,
-  Modal,
-  Input,
-  Row,
-  Col,
-  DatePicker,
-  Checkbox,
-  Spin,
-  Breadcrumb
+  PageHeader, Button, message, Form, Select, Modal, Input, Row, Col,
+  DatePicker, Checkbox, Spin, Breadcrumb
 } from 'antd';
 import {formatMomentTime} from '@/publicMethods/timeMethods';
 import dayjs from "dayjs";
@@ -28,6 +17,7 @@ import {
   CloseSquareTwoTone, CheckSquareTwoTone, SettingOutlined, ReloadOutlined
 } from '@ant-design/icons';
 import {getProjectInfo, alayManagerData} from "./common";
+import {getStaticMessage, headerPath} from "./header";
 import {
   numberRenderToCurrentStage, stageChangeToNumber, numberRenderToZentaoType,
   zentaoTypeRenderToNumber, numberRenderToZentaoSeverity, numberRenderToZentaoStatus,
@@ -43,7 +33,8 @@ import {
   queryDevelopViews, queryRepeats, getDeptMemner,
   LoadCombobox, LoadTesterCombobox, GetSprintProject
 } from "./data";
-import {Link} from "react-router-dom";
+
+import {errorMessage, infoMessage, sucMessage, warnMessage} from "@/publicMethods/showMessages";
 
 const {Option} = Select;
 
@@ -52,8 +43,6 @@ const SprintList: React.FC<any> = () => {
   const {initialState} = useModel('@@initialState');
   const sys_accessToken = localStorage.getItem("accessId");
   axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
-
-  /* 获取网页的项目id */
   const {prjId, prjNames, prjType} = getProjectInfo();
 
   /* region 整个模块都需要用到的表单定义 */
@@ -105,13 +94,7 @@ const SprintList: React.FC<any> = () => {
   const updateGrid = async () => {
     const datas: any = await queryDevelopViews(gqlClient, prjId, prjType);
     gridApi.current?.setRowData(datas?.result);
-
-    const bugs = datas?.resCount.bug === undefined ? 0 : datas?.resCount.bug;
-    const tasks = datas?.resCount.task === undefined ? 0 : datas?.resCount.task;
-    const storys = datas?.resCount.story === undefined ? 0 : datas?.resCount.story;
-    const B_story = datas?.resCount.B_story === undefined ? 0 : datas?.resCount.B_story;
-    setPageTitle(`共${bugs + tasks + storys + B_story}个，bug ${bugs} 个，task ${tasks} 个，story ${storys} 个，B-story ${B_story} 个`);
-
+    setPageTitle(getStaticMessage(datas?.resCount));
   };
 
   /* endregion */
@@ -1466,24 +1449,13 @@ const SprintList: React.FC<any> = () => {
 
   /* endregion */
 
+  useEffect(() => {
+    setPageTitle(getStaticMessage(data?.resCount));
+  }, [data]);
+
   const leftStyle = {marginLeft: '20px'};
   const rightStyle = {marginLeft: '30px'};
   const widths = {width: '200px', color: 'black'};
-  const path = [<Breadcrumb.Item key="班车工作台">班车工作台</Breadcrumb.Item>,
-    <Breadcrumb.Item key="项目列表">
-      <Link to="/sprint/sprintList">项目列表</Link>
-    </Breadcrumb.Item>,
-    <Breadcrumb.Item key="项目详情">项目详情</Breadcrumb.Item>];
-
-  useEffect(() => {
-    const bugs = data?.resCount.bug === undefined ? 0 : data?.resCount.bug;
-    const tasks = data?.resCount.task === undefined ? 0 : data?.resCount.task;
-    const storys = data?.resCount.story === undefined ? 0 : data?.resCount.story;
-    const B_story = data?.resCount.B_story === undefined ? 0 : data?.resCount.B_story;
-    // 2022-04-22 ：欢姐说隐藏task个数的显示
-    setPageTitle(`共 ${bugs + tasks + storys + B_story} 个，bug ${bugs} 个，story ${storys} 个，B-story ${B_story} 个`);
-  }, [data]);
-
   return (
     <div style={{width: "100%", marginTop: "-30px"}}>
       <PageHeader
@@ -1492,7 +1464,7 @@ const SprintList: React.FC<any> = () => {
         subTitle={<div style={{color: "blue"}}> {pageTitle}</div>}
         style={{height: "85px"}}
         breadcrumbRender={() => {
-          return <Breadcrumb>{path}</Breadcrumb>;
+          return <Breadcrumb>{headerPath}</Breadcrumb>;
         }}
       />
 

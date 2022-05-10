@@ -6,12 +6,23 @@ const {Option} = Select;
 
 // 计算不同类型的个数
 const calTypeCount = (data: any) => {
+  debugger;
+  // 统计类型
   let bug = 0;
   let task = 0;
   let story = 0;
   let B_story = 0;
 
+  // 统计阶段
+  let wait = 0;
+  let devloping = 0;
+  let dev_finished = 0;
+  let testing = 0;
+  let test_finished = 0;
+  let onlined = 0;
+
   data.forEach((ele: any) => {
+    // 获取统计类型的个数
     if (ele.category === "1") {
       bug += 1;
     } else if (ele.category === "2") {
@@ -22,8 +33,35 @@ const calTypeCount = (data: any) => {
       story += 1;
     }
 
+    // 获取统计阶段的个数
+    const {stage} = ele;
+    switch (stage.toString()) {
+      case "1":  // stage = "未开始";
+        wait += 1;
+        break;
+      case "2":  // stage = "开发中";
+        devloping += 1;
+        break;
+      case "3":    // stage = "开发完";
+        dev_finished += 1;
+        break;
+      case "5":  // stage = "测试中";
+        testing += 1;
+        break;
+      case "6":  // stage = "TE测试环境已验过";  测试完
+        test_finished += 1;
+        break;
+      case "7":    // stage = "UED测试环境已验过"; 测试完
+        test_finished += 1;
+        break;
+      case "12":    // stage = "线上已验过"; 已上线
+        onlined += 1;
+        break;
+      default:
+        break;
+    }
   });
-  return {bug, task, story, B_story};
+  return {bug, task, story, B_story, wait, devloping, dev_finished, testing, test_finished, onlined};
 };
 
 // 将是相关需求或者相关任务的编号显示刀所属需求或者所属任务对应列。
@@ -133,7 +171,7 @@ const changeBaseLinePosition = (data: any) => {
 
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any, syncQuery: boolean = false) => {
-debugger;
+  debugger;
   // baseline
   const {data} = await client.query(`
       {
@@ -362,4 +400,4 @@ const GetSprintProject = () => {
 };
 
 
-export {queryDevelopViews,queryRepeats,getDeptMemner,LoadCombobox,LoadTesterCombobox,GetSprintProject}
+export {queryDevelopViews, queryRepeats, getDeptMemner, LoadCombobox, LoadTesterCombobox, GetSprintProject}

@@ -50,4 +50,6 @@ const alayManagerData = (oradata: any, curRow: any, prjId: any) => {
 
   return datas;
 }
-export {getProjectInfo,alayManagerData};
+
+
+export {getProjectInfo, alayManagerData};

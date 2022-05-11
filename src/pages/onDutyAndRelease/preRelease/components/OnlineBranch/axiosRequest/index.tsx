@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {getDutyPersonPermission, getSystemPersonPermission} from '../../../authority/permission';
 import dayjs from "dayjs";
+import {getServices} from "@/publicMethods/verifyAxios";
 
 const sys_accessToken = localStorage.getItem('accessId');
 axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
@@ -416,9 +417,22 @@ const saveVersonCheck = async (
     // 服务
     const {server} = sourceData;
     let serverStr = '';
-    server.forEach((ele: string) => {
-      serverStr = serverStr === '' ? ele : `${serverStr},${ele}`;
-    });
+    if (server && server.length > 0) {
+      if (server[0] === "全部") {
+        // 需要获取所有的服务
+        const allServices: any = (await getServices())?.data;
+        if (allServices && allServices.length > 0) {
+          allServices.forEach((ele: any) => {
+            serverStr = serverStr === '' ? ele.server_id : `${serverStr},${ele.server_id}`;
+          });
+        }
+      } else {
+        server.forEach((ele: string) => {
+          serverStr = serverStr === '' ? ele : `${serverStr},${ele}`;
+        });
+      }
+    }
+
     data.backend_version_check_flag = true;
     data['server'] = serverStr;
     data['image_branch'] = sourceData.branchName; // 传分支名称

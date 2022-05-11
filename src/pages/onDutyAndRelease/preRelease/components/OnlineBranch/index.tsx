@@ -1,7 +1,7 @@
 import React, {useRef, useState} from 'react';
 import {
   Button, Card, Checkbox, Col, DatePicker, Divider,
-  Form, Input, message, Modal, Row, Select, Spin, Switch,
+  Form, Input, message, Modal, Row, Select, Spin, Switch, TreeSelect
 } from 'antd';
 import {useModel} from '@@/plugin-model/useModel';
 import {AgGridReact} from 'ag-grid-react';
@@ -22,6 +22,7 @@ import {alalysisInitData} from '../../datas/dataAnalyze';
 import {getGridRowsHeight} from '../gridHeight';
 import {releaseAppChangRowColor} from '../../operate';
 
+const {SHOW_PARENT} = TreeSelect;
 let newOnlineBranchNum = '';
 
 const OnlineBranch: React.FC<any> = () => {
@@ -173,13 +174,7 @@ const OnlineBranch: React.FC<any> = () => {
       const oraData = await getModifiedData(newOnlineBranchNum);
 
       // 服务
-      let servers = oraData.versonCheck?.server;
-      if (servers) {
-        if (servers.length === 1 && servers.includes('')) {
-          servers = undefined;
-        }
-      }
-
+      const servers = oraData.versonCheck?.server;
       // 时间
       let mainSince;
       if (oraData.branchCheck?.branch_mainSince) {
@@ -249,7 +244,6 @@ const OnlineBranch: React.FC<any> = () => {
         beforeAutomationId: oraData.beforeOnlineCheck?.automationId,
         afterAutomationId: oraData.afterOnlineCheck?.automationId,
       });
-
       modifyLockedItem(
         `${tabsData.activeKey}-step4-onlineBranch-${oraData.checkHead?.branchCheckId}`,
       );
@@ -393,7 +387,6 @@ const OnlineBranch: React.FC<any> = () => {
 
   // 版本检查URL跳转
   (window as any).versionCheckLogUrlClick = (logUrl: any) => {
-    debugger;
 
     const logs: any = [];
     if (logUrl && logUrl.length > 0) {
@@ -674,14 +667,19 @@ const OnlineBranch: React.FC<any> = () => {
                   <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 40}}/>
                 </Form.Item>
                 <Form.Item name="server" label="服务" style={{marginTop: -22}}>
-                  <Select
-                    mode="multiple"
+                  <TreeSelect
                     placeholder="请选择相应的服务！"
                     style={{marginLeft: 68, width: 415}}
                     maxTagCount={"responsive"}
+                    treeCheckable={true}
+                    allowClear
+                    treeDefaultExpandAll
+                    treeData={onlineBranchFormSelected.server}
+                    showSearch
+                    showCheckedStrategy={SHOW_PARENT}
                   >
-                    {onlineBranchFormSelected.server}
-                  </Select>
+                  </TreeSelect>
+
                 </Form.Item>
                 <Form.Item name="imageevn" label="镜像环境" style={{marginTop: -20}}>
                   <Select
@@ -889,9 +887,7 @@ const OnlineBranch: React.FC<any> = () => {
                   float: 'right',
                 }}
                 onClick={saveOnlineBranchResult}
-              >
-                保存{' '}
-              </Button>
+              >保存</Button>
             </Form.Item>
           </Spin>
 

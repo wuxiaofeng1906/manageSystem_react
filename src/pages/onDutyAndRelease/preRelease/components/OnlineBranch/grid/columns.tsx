@@ -252,7 +252,6 @@ const beforeOnlineVersionCheck = (params: any) => {
   //   onclick='versionCheckLogUrlClick(${JSON.stringify(values.check_url)})'>
   //     <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
   //  </Button>
-  debugger;
   let gotoUrl = "";
   if (values.check_url) {
     gotoUrl = `
@@ -279,8 +278,6 @@ const beforeOnlineVersionCheck = (params: any) => {
           </div>
       </div>
     `;
-
-
 };
 
 // 上线前环境检查

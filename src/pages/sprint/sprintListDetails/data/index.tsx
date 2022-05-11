@@ -172,33 +172,101 @@ const changeBaseLinePosition = (data: any) => {
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any, syncQuery: boolean = false) => {
 
+  // proDetail(project:${prjID},category:"${prjType}",order:ASC,doSync:${syncQuery}){
+  //   id
+  //   stage
+  //   tester
+  //   category
+  //   ztNo
+  //   title
+  //   severity
+  //   planName
+  //   priority
+  //   moduleName
+  //   ztStatus
+  //   assignedTo
+  //   finishedBy
+  //   closedBy
+  //   pageAdjust
+  //   hotUpdate
+  //   dataUpdate
+  //   interUpdate
+  //   presetData
+  //   testCheck
+  //   scopeLimit
+  //   proposedTest
+  //   publishEnv
+  //   uedName
+  //   uedEnvCheck
+  //   uedOnlineCheck
+  //   memo
+  //   source
+  //   feedback
+  //   expectTest
+  //   submitTest
+  //   activeDuration
+  //   solveDuration
+  //   verifyDuration
+  //   closedDuration
+  //   relatedBugs
+  //   relatedTasks
+  //   relatedStories
+  //   deadline
+  //   belongStory
+  //   belongTask
+  //   baseline
+  //   resolvedAt
+  //   fromBug
+  //   openedAt
+  // }
+
   // baseline
   const {data} = await client.query(`
       {
-         proDetail(project:${prjID},category:"${prjType}",order:ASC,doSync:${syncQuery}){
+        proDetaiWithUser(project:${prjID},category:"${prjType}"){
+            planName
             id
             stage
-            tester
+            tester{
+              id
+              name
+              dept{
+                id
+                name
+              }
+            }
             category
             ztNo
             title
             severity
-            planName
             priority
             moduleName
             ztStatus
-            assignedTo
-            finishedBy
+            assignedTo{
+              id
+              name
+              dept{
+                id
+                name
+              }
+            }
+            finishedBy{
+              id
+              name
+              dept{
+                id
+                name
+              }
+            }
             closedBy
-            pageAdjust
             hotUpdate
             dataUpdate
             interUpdate
             presetData
             testCheck
             scopeLimit
-            proposedTest
             publishEnv
+            proposedTest
             uedName
             uedEnvCheck
             uedOnlineCheck
@@ -214,20 +282,22 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             relatedBugs
             relatedTasks
             relatedStories
+            createAt
             deadline
-            belongStory
-            belongTask
             baseline
             resolvedAt
             fromBug
             openedAt
+            pageAdjust
+            stageManual
+            testConfirmed
           }
       }
   `);
 
-  let oraData: any = data?.proDetail;
+  let oraData: any = data?.proDetaiWithUser;
   if (prjType === "") {
-    const changedRow = changeRowPosition(data?.proDetail); // 对数据进行想要的顺序排序(将需求相关的bug放到相关需求后面)
+    const changedRow = changeRowPosition(data?.proDetaiWithUser); // 对数据进行想要的顺序排序(将需求相关的bug放到相关需求后面)
     oraData = changeBaseLinePosition(changedRow); //  将基线值为0的数据统一起来，放到页面最前面
 
   }
@@ -398,7 +468,6 @@ const GetSprintProject = () => {
   }
   return projectArray;
 };
-
 
 
 export {queryDevelopViews, queryRepeats, getDeptMemner, LoadCombobox, LoadTesterCombobox, GetSprintProject}

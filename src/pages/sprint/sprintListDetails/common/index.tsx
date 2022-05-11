@@ -68,29 +68,29 @@ const getRelatedPersonName = (oraData: any) => {
   const tester: any = [];
   const assigned: any = [];
   const solvedBy: any = [];
-
-  oraData.forEach((rows: any) => {
-
-    // 测试人员
-    const test_person = (rows.tester).split(";");
-    test_person.forEach((name: any) => {
-      if (tester.indexOf(name) === -1) {
-        tester.push(name);
-      }
-    });
-
-    //   指派给
-    const assigned_person = rows.assignedTo;
-    if (assigned.indexOf(assigned_person) === -1) {
-      assigned.push(assigned_person);
-    }
-
-    //  解决人
-    const finished_person = rows.finishedBy;
-    if (solvedBy.indexOf(finished_person) === -1) {
-      solvedBy.push(finished_person);
-    }
-  });
+  //
+  // oraData.forEach((rows: any) => {
+  //
+  //   // 测试人员
+  //   const test_person = (rows.tester).split(";");
+  //   test_person.forEach((name: any) => {
+  //     if (tester.indexOf(name) === -1) {
+  //       tester.push(name);
+  //     }
+  //   });
+  //
+  //   //   指派给
+  //   const assigned_person = rows.assignedTo;
+  //   if (assigned.indexOf(assigned_person) === -1) {
+  //     assigned.push(assigned_person);
+  //   }
+  //
+  //   //  解决人
+  //   const finished_person = rows.finishedBy;
+  //   if (solvedBy.indexOf(finished_person) === -1) {
+  //     solvedBy.push(finished_person);
+  //   }
+  // });
 
   return {tester, assigned, solvedBy};
 };

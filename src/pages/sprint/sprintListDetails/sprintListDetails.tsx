@@ -281,6 +281,7 @@ const SprintList: React.FC<any> = () => {
 
   // 点击修改按钮赋值弹出窗
   const adminModify = async (datas: any) => {
+    debugger;
     // 还要获取英文名
     const teters = datas.tester.split(';');
     const deptUsers = await getDeptMemner(gqlClient, "测试");
@@ -314,7 +315,7 @@ const SprintList: React.FC<any> = () => {
       adminAddDataUpgrade: datas.dataUpdate,
       adminAddInteUpgrade: datas.interUpdate,
       adminAddPreData: datas.presetData,
-      adminAddtesterVerifi: datas.testCheck,
+      adminAddtesterVerifi: datas.testCheck === "-0" ? "0" : datas.testCheck === "-1" ? "1" : datas.testCheck,
       adminAddSuggestion: datas.scopeLimit,
       adminAddProposedTest: datas.proposedTest,
       adminAddEnvironment: publishEnv,
@@ -513,7 +514,6 @@ const SprintList: React.FC<any> = () => {
       dataUpdate: oradata.adminAddDataUpgrade === "" ? null : oradata.adminAddDataUpgrade,
       interUpdate: oradata.adminAddInteUpgrade === "" ? null : oradata.adminAddInteUpgrade,
       presetData: oradata.adminAddPreData === "" ? null : oradata.adminAddPreData,
-      testCheck: oradata.adminAddtesterVerifi === "" ? null : oradata.adminAddtesterVerifi,
       scopeLimit: oradata.adminAddSuggestion,
       proposedTest: oradata.adminAddProposedTest === "" ? null : oradata.adminAddProposedTest,
       publishEnv: pubEnv,
@@ -547,13 +547,14 @@ const SprintList: React.FC<any> = () => {
       datas["tester"] = testers;
       datas["uedName"] = oradata.adminAddForUED;
       datas["feedback"] = oradata.adminAddFeedbacker;
+      datas["testCheck"] = oradata.adminAddtesterVerifi === "" ? "" : `-${oradata.adminAddtesterVerifi}`; // 新增的行都是为手动修改的数据
 
       addCommitDetails(datas);
     } else {
       const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
       datas['id'] = curRow[0].id;
-
-      // 判断是否被修改过 禅道id 对应测试、对应UED、反馈人
+debugger;
+      // 判断是否被修改过 禅道id 对应测试、对应UED、反馈人,是否需要测试验证
       if (curRow[0].ztNo !== oradata.adminChandaoId) {
         datas["ztNo"] = oradata.adminChandaoId;
       }
@@ -1532,6 +1533,7 @@ const SprintList: React.FC<any> = () => {
   /* endregion */
 
   useEffect(() => {
+
     setPageTitle(getStaticMessage(data?.resCount));
     //   需要取出最初的指派给、测试、解决完成人，用于下拉框筛选
     const personData = getRelatedPersonName(data?.result);

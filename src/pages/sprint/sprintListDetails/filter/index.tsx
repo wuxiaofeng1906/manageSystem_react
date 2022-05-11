@@ -1,6 +1,82 @@
 import {Select} from 'antd';
+import {GqlClient} from "@/hooks";
 
 const {Option} = Select;
+
+// 解析成树形数据
+const getCenterTree = (parentData: any) => {
+  const parents = parentData.filter((value: any) => value.parent === 'undefined' || value.parent === null || value.parent === 1);
+  const children = parentData.filter((value: any) => value.parent !== 'undefined' && value.parent != null);
+  const translator = (parentB: any, childrenB: any) => {
+    parentB.forEach((parent: any) => {
+      childrenB.forEach((current: any, index: any) => {
+        if (current.parent === parent.key) {
+          const temp: any = JSON.parse(JSON.stringify(childrenB));
+          temp.splice(index, 1);
+          translator([current], temp);
+
+          if (typeof (parent.children) !== 'undefined') {
+            parent.children.push(current);
+          } else {
+            // eslint-disable-next-line no-param-reassign
+            parent.children = [current];
+
+          }
+        }
+      });
+    });
+  };
+
+  translator(parents, children);
+
+
+  return parents
+};
+
+// 对应部门和个数：  如果是测试部门，就看统计【测试】字段的值；如果是开发部门，则先看解决人/完成人。如果解决人为空，就看指派给。
+const getDeptAndCount = (dept: any, gridData: any) => {
+  const oldData = dept.organization;
+  const deptCountData: any = [];
+  oldData.forEach((item: any) => {
+    debugger;
+    deptCountData.push({
+      key: item.id,
+      title: item.name,
+      parent: item.parent,
+      value: item.id,
+      count: 0
+    })
+  });
+
+  return deptCountData;
+};
+
+const devCenterDept = async (client: GqlClient<object>, gridData: any) => {
+  const {data} = await client.query(`
+      {
+        organization{
+          organization{
+            id
+            name
+            parent
+            parentName
+          }
+        }
+      }
+  `);
+
+  const deptCountArray = getDeptAndCount(data?.organization, gridData);
+  const deptArray = getCenterTree(deptCountArray);
+  const devCenter: any = [];
+  if (deptArray && deptArray.length > 0) {
+    deptArray.forEach((ele: any) => {
+      if (ele.key === 59) {
+        devCenter.push(ele);
+      }
+    });
+  }
+  return devCenter;
+};
 
 // 阶段的下拉框数据
 const getStageOption = (gridData: any) => {
@@ -200,7 +276,7 @@ const getSolvedByOption = (personName: any, gridData: any) => {
   return optionArray;
 };
 
-// 过滤部门数据
+// 过滤部门数据： 如果是测试部门，就看统计【测试】字段的值；如果是开发部门，则先看解决人/完成人。如果解决人为空，就看指派给。
 const filterDeptData = (dept: any, oraData: any) => {
   let filterDeptResult: any = [];
   if (!dept || dept.length === 0) {
@@ -338,4 +414,7 @@ const filterDatasByCondition = (condition: any, oraData: any) => {
   return filteredResult;
 };
 
-export {getStageOption, getTypeOption, getAssignedToOption, getTesterOption, getSolvedByOption, filterDatasByCondition};
+export {
+  devCenterDept, getStageOption, getTypeOption, getAssignedToOption,
+  getTesterOption, getSolvedByOption, filterDatasByCondition
+};

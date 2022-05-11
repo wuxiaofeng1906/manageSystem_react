@@ -36,7 +36,7 @@ import {
 import {errorMessage, infoMessage, sucMessage, warnMessage} from "@/publicMethods/showMessages";
 import defaultTreeSelectParams from "@/pages/shimo/fileBaseline/iterateList/defaultSetting";
 import {
-  getStageOption, getTypeOption, getAssignedToOption,
+  devCenterDept, getStageOption, getTypeOption, getAssignedToOption,
   getTesterOption, getSolvedByOption, filterDatasByCondition
 } from "./filter";
 
@@ -851,6 +851,7 @@ const SprintList: React.FC<any> = () => {
 
   /* region 下拉框动态加载 以及条件筛选 */
   const [selectOption, setSelectOptions] = useState({
+    deptSelect: [],
     stageSelect: [],
     typeSelect: [],
     assignedSelect: [],
@@ -865,7 +866,14 @@ const SprintList: React.FC<any> = () => {
     });
     return datas;
   }
-
+  // 部门下拉框
+  const onDeptSelectFocus = async () => {
+    const optionArray: any = await devCenterDept(gqlClient, getGridData());
+    setSelectOptions({
+      ...selectOption,
+      deptSelect: optionArray
+    });
+  };
   // 获取阶段下拉框
   const onStageSelectFocus = () => {
     const optionArray: any = getStageOption(getGridData());
@@ -1579,9 +1587,11 @@ const SprintList: React.FC<any> = () => {
               <Form.Item label="部门/组" name={"dept"}>
                 <TreeSelect className={"deptTree"} size={"small"}
                             {...defaultTreeSelectParams}
-                  // treeData={deptList}
+                            onFocus={onDeptSelectFocus}
+                            treeData={selectOption.deptSelect}
                   // onChange={iterDeptChanged}
                 />
+
               </Form.Item>
             </Col>
             <Col span={8}>

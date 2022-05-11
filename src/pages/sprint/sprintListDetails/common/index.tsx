@@ -68,29 +68,43 @@ const getRelatedPersonName = (oraData: any) => {
   const tester: any = [];
   const assigned: any = [];
   const solvedBy: any = [];
-  //
-  // oraData.forEach((rows: any) => {
-  //
-  //   // 测试人员
-  //   const test_person = (rows.tester).split(";");
-  //   test_person.forEach((name: any) => {
-  //     if (tester.indexOf(name) === -1) {
-  //       tester.push(name);
-  //     }
-  //   });
-  //
-  //   //   指派给
-  //   const assigned_person = rows.assignedTo;
-  //   if (assigned.indexOf(assigned_person) === -1) {
-  //     assigned.push(assigned_person);
-  //   }
-  //
-  //   //  解决人
-  //   const finished_person = rows.finishedBy;
-  //   if (solvedBy.indexOf(finished_person) === -1) {
-  //     solvedBy.push(finished_person);
-  //   }
-  // });
+
+  oraData.forEach((rows: any) => {
+    // 测试人员
+    const test_person = rows.tester;
+    if (test_person && test_person.length > 0) {
+      test_person.forEach((testInfo: any) => {
+        const name = testInfo.name === "" ? "NA" : testInfo.name;
+        if (tester.indexOf(name) === -1) {
+          tester.push(name);
+        }
+      });
+    } else if (tester.indexOf("NA") === -1) {
+      tester.push("NA");
+    }
+
+    //   指派给
+    const assigned_person = rows.assignedTo;
+    if (assigned_person) {
+      if (assigned.indexOf(assigned_person?.name) === -1) {
+        assigned.push(assigned_person?.name);
+      }
+    } else if (assigned.indexOf("") === -1) {
+      assigned.push("");
+    }
+
+
+    //  解决人
+    const finished_person = rows.finishedBy;
+    if (finished_person) {
+      if (solvedBy.indexOf(finished_person?.name) === -1) {
+        solvedBy.push(finished_person?.name);
+      }
+    } else if (solvedBy.indexOf("") === -1) {
+      solvedBy.push("");
+    }
+
+  });
 
   return {tester, assigned, solvedBy};
 };

@@ -126,7 +126,11 @@ const getAssignedToOption = (personName: any, gridData: any) => {
   personName.forEach((name: string) => {
     let count = 0;
     gridData.forEach((rows: any) => {
-      if (name === rows.assignedTo) {
+      let assignedTo = (rows.assignedTo)?.name;
+      if (!assignedTo) {
+        assignedTo = "";
+      }
+      if (name === assignedTo) {
         count += 1;
       }
     });
@@ -149,7 +153,14 @@ const getTesterOption = (personName: any, gridData: any) => {
   personName.forEach((name: string) => {
     let count = 0;
     gridData.forEach((rows: any) => {
-      if ((rows.tester).indexOf(name) > -1) {
+      const testrArray = rows.tester;
+      if (testrArray && testrArray.length > 0) {
+        testrArray.forEach((ele: any) => {
+          if (ele.name === name) {
+            count += 1;
+          }
+        });
+      } else if (name === "NA") { // 没有数据的话则
         count += 1;
       }
     });
@@ -164,14 +175,17 @@ const getTesterOption = (personName: any, gridData: any) => {
   return optionArray;
 };
 
-// 测试下拉框
+// 由谁解决
 const getSolvedByOption = (personName: any, gridData: any) => {
-
   const optionArray: any = [];
   personName.forEach((name: string) => {
     let count = 0;
     gridData.forEach((rows: any) => {
-      if (rows.finishedBy === name) {
+      let finishedBy = (rows.finishedBy)?.name;
+      if (!finishedBy) {
+        finishedBy = "";
+      }
+      if (finishedBy === name) {
         count += 1;
       }
     });
@@ -256,7 +270,8 @@ const filterAssignedData = (assignedTo: any, oraData: any) => {
   } else {
     assignedTo.forEach((ele: any) => {
       oraData.forEach((row: any) => {
-        if (ele === row.assignedTo) {
+        const assignedT = row.assignedTo === null ? "" : (row.assignedTo).name;
+        if (ele === assignedT) {
           filterAssignedResult.push(row);
         }
       });
@@ -290,7 +305,8 @@ const filterSolvedData = (solved: any, oraData: any) => {
   } else {
     solved.forEach((ele: any) => {
       oraData.forEach((row: any) => {
-        if (row.finishedBy === ele) {
+        const finishedB = row.finishedBy === null ? "" : (row.finishedBy).name;
+        if (ele === finishedB) {
           filterSolvedResult.push(row);
         }
       });

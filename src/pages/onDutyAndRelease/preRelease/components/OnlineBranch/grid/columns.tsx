@@ -183,7 +183,7 @@ const beforeOnlineVersionCheck = (params: any) => {
 
   const values: any = params.value[0]; // 本数组只会有一条数据
   // 解析所属端
-  let side = '';
+  let side = '忽略：';
   if (values.technical_side === 'front') {
     side = '前端：';
   } else if (values.technical_side === 'backend') {
@@ -233,20 +233,20 @@ const beforeOnlineVersionCheck = (params: any) => {
 
   const checkNum = JSON.stringify(params.data?.check_num);
 
-  if (side === '') {
-    return `
-         <div>
-          <div style="width: 210px">
-              <div style="font-size: 10px">
-                  <div>
-                    <button style="text-align: left; color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
-                    <lable style="margin-left: -20px">${timeRange}</lable>
-                  </div>
-              </div>
-          </div>
-      </div>
-    `;
-  }
+  // if (side === '') {
+  //   return `
+  //     <div>
+  //         <div style="width: 210px">
+  //             <div style="font-size: 10px">
+  //                 <div>
+  //                   <button style="text-align: left; color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
+  //                   <lable style="margin-left: -20px">${timeRange}</lable>
+  //                 </div>
+  //             </div>
+  //         </div>
+  //     </div>
+  //   `;
+  // }
   return `
          <div>
           <div style="margin-top: -10px;margin-left: 120px">
@@ -266,7 +266,6 @@ const beforeOnlineVersionCheck = (params: any) => {
                   <lable style="margin-left: -20px">${timeRange}</lable>
                   </div>
               </div>
-
           </div>
       </div>
     `;

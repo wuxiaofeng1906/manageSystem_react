@@ -50,7 +50,7 @@ const OnlineBranch: React.FC<any> = () => {
   const [logModal, setLogModal] = useState({
     show: false,
     autoUrl: {style: 'none', ui: '', api: ''},
-    versionUrl: {style: 'none', app: '', global: ''},
+    versionUrl: {style: 'none', content: <div></div>},
     iconCheckUrl: {style: 'none', content: <div></div>},
     coveStatus: {style: 'none', content: <div></div>}
 
@@ -385,7 +385,7 @@ const OnlineBranch: React.FC<any> = () => {
       show: true,
       iconCheckUrl: {style: 'inline', content: <div style={{marginTop: -15}}> {logContent}</div>},
       autoUrl: {style: 'none', ui: '', api: ''},
-      versionUrl: {style: 'none', app: '', global: ''},
+      versionUrl: {style: 'none', content: <div></div>},
       coveStatus: {style: 'none', content: <div></div>}
     });
 
@@ -393,23 +393,30 @@ const OnlineBranch: React.FC<any> = () => {
 
   // 版本检查URL跳转
   (window as any).versionCheckLogUrlClick = (logUrl: any) => {
-    let app_url = '';
-    let global_url = '';
+    debugger;
+
+    const logs: any = [];
     if (logUrl && logUrl.length > 0) {
       logUrl.forEach((ele: any) => {
-        if (ele.server === 'apps') {
-          app_url = ele.check_url;
-        } else if (ele.server === 'global') {
-          global_url = ele.check_url;
-        }
+        logs.push(
+          <Form.Item name="appLog" label={`${ele.server}日志:`} style={{marginTop: -5}}>
+            <a
+              href={`${ele.check_url}`}
+              target={'_black'}
+              style={{textDecoration: 'underline'}}
+            >
+              {ele.check_url}
+            </a>
+          </Form.Item>)
+
       });
     }
 
-    if (app_url || global_url) {
+    if (logs.length > 0) {
       setLogModal({
         iconCheckUrl: {style: 'none', content: <div></div>},
         autoUrl: {style: 'none', ui: '', api: ''},
-        versionUrl: {style: 'inline', app: app_url, global: global_url},
+        versionUrl: {style: 'inline', content: <div>{logs}</div>},
         coveStatus: {style: 'none', content: <div></div>},
         show: true,
       });
@@ -461,7 +468,7 @@ const OnlineBranch: React.FC<any> = () => {
       setLogModal({
         iconCheckUrl: {style: 'none', content: <div></div>},
         autoUrl: {style: 'inline', ui: ui_url, api: api_url},
-        versionUrl: {style: 'none', app: '', global: ''},
+        versionUrl: {style: 'none', content: <div></div>},
         coveStatus: {style: 'none', content: <div></div>},
         show: true,
       });
@@ -509,7 +516,7 @@ const OnlineBranch: React.FC<any> = () => {
         show: true,
         iconCheckUrl: {style: 'none', content: <div></div>},
         autoUrl: {style: 'none', ui: '', api: ''},
-        versionUrl: {style: 'none', app: '', global: ''},
+        versionUrl: {style: 'none', content: <div></div>},
         coveStatus: {style: 'inline', content: <div style={{height: 300, overflowY: "scroll"}}>{contentDiv}</div>}
       });
     } else {
@@ -529,7 +536,7 @@ const OnlineBranch: React.FC<any> = () => {
       show: false,
       iconCheckUrl: {style: 'none', content: <div></div>},
       autoUrl: {style: 'none', ui: '', api: ''},
-      versionUrl: {style: 'none', app: '', global: ''},
+      versionUrl: {style: 'none', content: <div></div>},
       coveStatus: {style: 'none', content: <div></div>}
     });
   };
@@ -671,6 +678,7 @@ const OnlineBranch: React.FC<any> = () => {
                     mode="multiple"
                     placeholder="请选择相应的服务！"
                     style={{marginLeft: 68, width: 415}}
+                    maxTagCount={"responsive"}
                   >
                     {onlineBranchFormSelected.server}
                   </Select>
@@ -926,7 +934,6 @@ const OnlineBranch: React.FC<any> = () => {
         centered={true}
         footer={null}
         width={550}
-        // bodyStyle={{height: 145}}
       >
         <Form>
           {/* 自动化日志 */}
@@ -951,26 +958,10 @@ const OnlineBranch: React.FC<any> = () => {
               </a>
             </Form.Item>
           </div>
+
           {/* 版本检查 */}
           <div style={{display: logModal.versionUrl.style}}>
-            <Form.Item name="appLog" label="app日志:" style={{marginTop: -15}}>
-              <a
-                href={`${logModal.versionUrl.app}`}
-                target={'_black'}
-                style={{textDecoration: 'underline'}}
-              >
-                {logModal.versionUrl.app}
-              </a>
-            </Form.Item>
-            <Form.Item name="globalLog" label="global日志:" style={{marginTop: -1}}>
-              <a
-                href={`${logModal.versionUrl.global}`}
-                target={'_black'}
-                style={{textDecoration: 'underline'}}
-              >
-                {logModal.versionUrl.global}
-              </a>
-            </Form.Item>
+            {logModal.versionUrl.content}
           </div>
 
           {/* 图标一致性检查日志 */}

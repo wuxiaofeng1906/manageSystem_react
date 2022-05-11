@@ -50,4 +50,62 @@ const alayManagerData = (oradata: any, curRow: any, prjId: any) => {
 
   return datas;
 }
-export {getProjectInfo,alayManagerData};
+
+const defaultSelectParams: any = {
+  mode: "multiple",
+  allowClear: true,
+  placeholder: "默认选择全部",
+  size: "small",
+  maxTagCount: "responsive"
+};
+
+// 统计指派给、测试、解决人 人名
+const getRelatedPersonName = (oraData: any) => {
+
+  if (!oraData || oraData.length === 0) {
+    return {};
+  }
+  const tester: any = [];
+  const assigned: any = [];
+  const solvedBy: any = [];
+
+  oraData.forEach((rows: any) => {
+    // 测试人员
+    const test_person = rows.tester;
+    if (test_person && test_person.length > 0) {
+      test_person.forEach((testInfo: any) => {
+        const name = testInfo.name === "" ? "NA" : testInfo.name;
+        if (tester.indexOf(name) === -1) {
+          tester.push(name);
+        }
+      });
+    } else if (tester.indexOf("NA") === -1) {
+      tester.push("NA");
+    }
+
+    //   指派给
+    const assigned_person = rows.assignedTo;
+    if (assigned_person) {
+      if (assigned.indexOf(assigned_person?.name) === -1) {
+        assigned.push(assigned_person?.name);
+      }
+    } else if (assigned.indexOf("") === -1) {
+      assigned.push("");
+    }
+
+
+    //  解决人
+    const finished_person = rows.finishedBy;
+    if (finished_person) {
+      if (solvedBy.indexOf(finished_person?.name) === -1) {
+        solvedBy.push(finished_person?.name);
+      }
+    } else if (solvedBy.indexOf("") === -1) {
+      solvedBy.push("");
+    }
+
+  });
+
+  return {tester, assigned, solvedBy};
+};
+export {getProjectInfo, alayManagerData, defaultSelectParams, getRelatedPersonName};

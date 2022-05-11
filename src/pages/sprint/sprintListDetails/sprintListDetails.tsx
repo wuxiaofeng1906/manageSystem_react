@@ -6,14 +6,18 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useGqlClient} from '@/hooks';
-import {PageHeader, Button, message, Form, Select, Modal, Input, Row, Col, DatePicker, Checkbox, Spin} from 'antd';
+import {
+  PageHeader, Button, message, Form, Select, Modal, Input, Row, Col,
+  DatePicker, Checkbox, Spin, Breadcrumb, TreeSelect
+} from 'antd';
 import {formatMomentTime} from '@/publicMethods/timeMethods';
 import dayjs from "dayjs";
 import {
   FolderAddTwoTone, SnippetsTwoTone, DeleteTwoTone, EditTwoTone,
   CloseSquareTwoTone, CheckSquareTwoTone, SettingOutlined, ReloadOutlined
 } from '@ant-design/icons';
-import {getProjectInfo, alayManagerData} from "./common";
+import {getProjectInfo, alayManagerData, defaultSelectParams, getRelatedPersonName} from "./common";
+import {getStaticMessage, headerPath} from "./header";
 import {
   numberRenderToCurrentStage, stageChangeToNumber, numberRenderToZentaoType,
   zentaoTypeRenderToNumber, numberRenderToZentaoSeverity, numberRenderToZentaoStatus,
@@ -29,6 +33,12 @@ import {
   queryDevelopViews, queryRepeats, getDeptMemner,
   LoadCombobox, LoadTesterCombobox, GetSprintProject
 } from "./data";
+import {errorMessage, infoMessage, sucMessage, warnMessage} from "@/publicMethods/showMessages";
+import defaultTreeSelectParams from "@/pages/shimo/fileBaseline/iterateList/defaultSetting";
+import {
+  devCenterDept, getStageOption, getTypeOption, getAssignedToOption,
+  getTesterOption, getSolvedByOption, filterDatasByCondition
+} from "./filter";
 
 const {Option} = Select;
 
@@ -37,11 +47,11 @@ const SprintList: React.FC<any> = () => {
   const {initialState} = useModel('@@initialState');
   const sys_accessToken = localStorage.getItem("accessId");
   axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
-
-  /* 获取网页的项目id */
   const {prjId, prjNames, prjType} = getProjectInfo();
 
   /* region 整个模块都需要用到的表单定义 */
+  // 模块查询
+  const [formForQuery] = Form.useForm();
   // admin 新增和修改from表单
   const [formForAdminToAddAnaMod] = Form.useForm();
   // 开发经理修改from表单
@@ -57,6 +67,11 @@ const SprintList: React.FC<any> = () => {
   // 移动新增项目
   const [formForMoveAddAnaMod] = Form.useForm();
   const [pageTitle, setPageTitle] = useState("");
+  const [personName, setPersonName] = useState({
+    assignedTo: [],
+    tester: [],
+    solvedBy: []
+  });
 
   /* endregion */
 
@@ -90,13 +105,7 @@ const SprintList: React.FC<any> = () => {
   const updateGrid = async () => {
     const datas: any = await queryDevelopViews(gqlClient, prjId, prjType);
     gridApi.current?.setRowData(datas?.result);
-
-    const bugs = datas?.resCount.bug === undefined ? 0 : datas?.resCount.bug;
-    const tasks = datas?.resCount.task === undefined ? 0 : datas?.resCount.task;
-    const storys = datas?.resCount.story === undefined ? 0 : datas?.resCount.story;
-    const B_story = datas?.resCount.B_story === undefined ? 0 : datas?.resCount.B_story;
-    setPageTitle(`共${bugs + tasks + storys + B_story}个，bug ${bugs} 个，task ${tasks} 个，story ${storys} 个，B-story ${B_story} 个`);
-
+    setPageTitle(getStaticMessage(datas?.resCount));
   };
 
   /* endregion */
@@ -272,10 +281,18 @@ const SprintList: React.FC<any> = () => {
 
   // 点击修改按钮赋值弹出窗
   const adminModify = async (datas: any) => {
+    debugger;
     // 还要获取英文名
-    const teters = datas.tester.split(';');
-    const deptUsers = await getDeptMemner(gqlClient, "测试");
-    const nameIdArray = getUsersId(deptUsers, teters);
+    const nameIdArray: any = [];
+    const teters = datas.tester;
+    if (teters && teters.length > 0) {
+      teters.forEach((ele: any) => {
+        nameIdArray.push(ele.name);
+      });
+    }
+    // const teters = datas.tester.split(';');
+    // const deptUsers = await getDeptMemner(gqlClient, "测试");
+    // const nameIdArray = getUsersId(deptUsers, teters);
 
     let publishEnv: any = [];
     if (datas.publishEnv !== null && datas.publishEnv !== "") {
@@ -297,15 +314,15 @@ const SprintList: React.FC<any> = () => {
       adminAddChandaoStatus: numberRenderToZentaoStatus({
         value: datas.ztStatus === null ? '' : datas.ztStatus.toString(),
       }),
-      adminAddAssignTo: datas.assignedTo,
-      adminAddSolvedBy: datas.finishedBy,
+      adminAddAssignTo: (datas.assignedTo)?.name,
+      adminAddSolvedBy: (datas.finishedBy)?.name,
       adminAddClosedBy: datas.closedBy,
       adminAddPageadjust: datas.pageAdjust,
       adminAddHotUpdate: datas.hotUpdate,
       adminAddDataUpgrade: datas.dataUpdate,
       adminAddInteUpgrade: datas.interUpdate,
       adminAddPreData: datas.presetData,
-      adminAddtesterVerifi: datas.testCheck,
+      adminAddtesterVerifi: datas.testCheck === "-0" ? "0" : datas.testCheck === "-1" ? "1" : datas.testCheck,
       adminAddSuggestion: datas.scopeLimit,
       adminAddProposedTest: datas.proposedTest,
       adminAddEnvironment: publishEnv,
@@ -504,7 +521,6 @@ const SprintList: React.FC<any> = () => {
       dataUpdate: oradata.adminAddDataUpgrade === "" ? null : oradata.adminAddDataUpgrade,
       interUpdate: oradata.adminAddInteUpgrade === "" ? null : oradata.adminAddInteUpgrade,
       presetData: oradata.adminAddPreData === "" ? null : oradata.adminAddPreData,
-      testCheck: oradata.adminAddtesterVerifi === "" ? null : oradata.adminAddtesterVerifi,
       scopeLimit: oradata.adminAddSuggestion,
       proposedTest: oradata.adminAddProposedTest === "" ? null : oradata.adminAddProposedTest,
       publishEnv: pubEnv,
@@ -538,13 +554,13 @@ const SprintList: React.FC<any> = () => {
       datas["tester"] = testers;
       datas["uedName"] = oradata.adminAddForUED;
       datas["feedback"] = oradata.adminAddFeedbacker;
+      datas["testCheck"] = oradata.adminAddtesterVerifi === "" ? "" : `-${oradata.adminAddtesterVerifi}`; // 新增的行都是为手动修改的数据
 
       addCommitDetails(datas);
     } else {
       const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
       datas['id'] = curRow[0].id;
-
-      // 判断是否被修改过 禅道id 对应测试、对应UED、反馈人
+      // 判断是否被修改过 禅道id 对应测试、对应UED、反馈人,是否需要测试验证
       if (curRow[0].ztNo !== oradata.adminChandaoId) {
         datas["ztNo"] = oradata.adminChandaoId;
       }
@@ -555,6 +571,11 @@ const SprintList: React.FC<any> = () => {
         datas["newCategory"] = oradata.adminChandaoType;
       }
 
+      // 如果修改了是否需要测试验证，就要改为负值。
+      if (curRow[0].testCheck !== oradata.adminAddtesterVerifi) {
+        datas["testCheck"] = oradata.adminAddtesterVerifi === "" ? "" : `-${oradata.adminAddtesterVerifi}`; //  为手动修改的数据
+      }
+
       if (formForAdminToAddAnaMod.isFieldTouched('adminAddTester')) {
         datas["tester"] = testers;
       }
@@ -562,7 +583,6 @@ const SprintList: React.FC<any> = () => {
       if (formForAdminToAddAnaMod.isFieldTouched('adminAddForUED')) {
         datas["uedName"] = oradata.adminAddForUED;
       }
-
       if (curRow[0].feedback !== oradata.adminAddFeedbacker) {
         datas["feedback"] = oradata.adminAddFeedbacker;
       }
@@ -828,6 +848,85 @@ const SprintList: React.FC<any> = () => {
   };
 
   /* endregion */
+
+  /* region 下拉框动态加载 以及条件筛选 */
+  const [selectOption, setSelectOptions] = useState({
+    deptSelect: [],
+    stageSelect: [],
+    typeSelect: [],
+    assignedSelect: [],
+    testSelect: [],
+    solvedSelect: []
+  });
+
+  const getGridData = () => {
+    const datas: any = [];
+    gridApi.current?.forEachNode((rows: any) => {
+      datas.push(rows?.data);
+    });
+    return datas;
+  }
+  // 部门下拉框
+  const onDeptSelectFocus = async () => {
+    const optionArray: any = await devCenterDept(gqlClient, getGridData());
+    setSelectOptions({
+      ...selectOption,
+      deptSelect: optionArray
+    });
+  };
+  // 获取阶段下拉框
+  const onStageSelectFocus = () => {
+    const optionArray: any = getStageOption(getGridData());
+    setSelectOptions({
+      ...selectOption,
+      stageSelect: optionArray
+    });
+  };
+
+  // 获取类型下拉框
+  const onTypeSelectFocus = () => {
+    const optionArray: any = getTypeOption(getGridData());
+    setSelectOptions({
+      ...selectOption,
+      typeSelect: optionArray
+    });
+  }
+
+  // 获取指派给下拉框
+  const onAssignedSelectFocus = () => {
+    const optionArray: any = getAssignedToOption(personName?.assignedTo, getGridData());
+    setSelectOptions({
+      ...selectOption,
+      assignedSelect: optionArray
+    });
+  }
+
+  // 测试下拉框
+  const onTestSelectFocus = () => {
+    const optionArray: any = getTesterOption(personName?.tester, getGridData());
+    setSelectOptions({
+      ...selectOption,
+      testSelect: optionArray
+    });
+  };
+
+  // 解决人/完成人
+  const onSolvedSelectFocus = () => {
+    const optionArray: any = getSolvedByOption(personName?.solvedBy, getGridData());
+    setSelectOptions({
+      ...selectOption,
+      solvedSelect: optionArray
+    });
+
+  };
+
+  // 阶段选择
+  const onSelectChanged = () => {
+    const queryCondition = formForQuery.getFieldsValue();
+    const filterData = filterDatasByCondition(queryCondition, data?.result);
+    gridApi.current?.setRowData(filterData);
+  };
+  /* endregion 下拉框动态加载 */
 
   /* region 删除功能 */
 
@@ -1451,39 +1550,116 @@ const SprintList: React.FC<any> = () => {
 
   /* endregion */
 
+  useEffect(() => {
+
+    setPageTitle(getStaticMessage(data?.resCount));
+    //   需要取出最初的指派给、测试、解决完成人，用于下拉框筛选
+    const personData = getRelatedPersonName(data?.result);
+    setPersonName({
+      assignedTo: personData?.assigned,
+      tester: personData?.tester,
+      solvedBy: personData?.solvedBy
+    });
+  }, [data]);
+
+
   const leftStyle = {marginLeft: '20px'};
   const rightStyle = {marginLeft: '30px'};
   const widths = {width: '200px', color: 'black'};
-  const routes = [
-    {path: '', breadcrumbName: '班车工作台'},
-    {path: '', breadcrumbName: '项目详情'}];
-
-  useEffect(() => {
-    const bugs = data?.resCount.bug === undefined ? 0 : data?.resCount.bug;
-    const tasks = data?.resCount.task === undefined ? 0 : data?.resCount.task;
-    const storys = data?.resCount.story === undefined ? 0 : data?.resCount.story;
-    const B_story = data?.resCount.B_story === undefined ? 0 : data?.resCount.B_story;
-    // 2022-04-22 ：欢姐说隐藏task个数的显示
-    setPageTitle(`共 ${bugs + tasks + storys + B_story} 个，bug ${bugs} 个，story ${storys} 个，B-story ${B_story} 个`);
-  }, [data]);
-
   return (
-
-    <div style={{width: "100%", marginTop: "-20px"}}>
-
+    <div style={{width: "100%", marginTop: "-30px"}}>
       <PageHeader
         ghost={false}
         title={prjNames}
         subTitle={<div style={{color: "blue"}}> {pageTitle}</div>}
-        style={{height: "100px"}}
-        breadcrumb={{routes}}
-
+        style={{height: "85px"}}
+        breadcrumbRender={() => {
+          return <Breadcrumb>{headerPath}</Breadcrumb>;
+        }}
       />
 
       <Spin spinning={refreshItem} tip="项目详情同步中..." size={"large"}>
 
+        {/* 条件筛选 */}
+        <Form form={formForQuery}>
+          <Row gutter={5} style={{background: 'white', marginTop: "5px", height: 30}}>
+            <Col span={8}>
+              <Form.Item label="部门/组" name={"dept"}>
+                <TreeSelect className={"deptTree"} size={"small"}
+                            {...defaultTreeSelectParams}
+                            onFocus={onDeptSelectFocus}
+                            treeData={selectOption.deptSelect}
+                  // onChange={iterDeptChanged}
+                />
+
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item label="阶段" name={"stage"}>
+                <Select
+                  {...defaultSelectParams}
+                  style={{width: '100%'}}
+                  onFocus={onStageSelectFocus}
+                  onChange={onSelectChanged}
+                >
+                  {selectOption.stageSelect}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item label="类型" name={"types"}>
+                <Select
+                  {...defaultSelectParams}
+                  style={{width: '100%'}}
+                  onFocus={onTypeSelectFocus}
+                  onChange={onSelectChanged}
+                >
+                  {selectOption.typeSelect}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={5} style={{background: 'white', height: 30}}>
+            <Col span={8}>
+              <Form.Item label="指派给" name={"assignedTo"}>
+                <Select
+                  {...defaultSelectParams}
+                  style={{width: '100%'}}
+                  onFocus={onAssignedSelectFocus}
+                  onChange={onSelectChanged}
+                >
+                  {selectOption.assignedSelect}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item label="测试" name={"test"}>
+                <Select
+                  {...defaultSelectParams}
+                  style={{width: '100%'}}
+                  onFocus={onTestSelectFocus}
+                  onChange={onSelectChanged}
+                >
+                  {selectOption.testSelect}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item label="解决/完成" name={"solved"}>
+                <Select
+                  {...defaultSelectParams}
+                  style={{width: '100%'}}
+                  onFocus={onSolvedSelectFocus}
+                  onChange={onSelectChanged}
+                >
+                  {selectOption.solvedSelect}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
         {/* 明细操作按钮   */}
-        <Row style={{background: 'white', marginTop: "20px"}}>
+        <Row style={{background: 'white', marginTop: "5px"}}>
           <Col span={22}>
             <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap"}}>
               <Button type="text"
@@ -1491,72 +1667,72 @@ const SprintList: React.FC<any> = () => {
                         marginLeft: "-10px",
                         display: judgeAuthority("新增项目明细行") === true ? "inline" : "none"
                       }}
-                      icon={<FolderAddTwoTone/>} size={'large'}
+                      icon={<FolderAddTwoTone/>}
                       onClick={addProject}>新增</Button>
               <Button type="text"
                       style={{
-                        marginLeft: "-10px",
+                        marginLeft: "-25px",
                         display: judgeAuthority("修改项目明细行") === true ? "inline" : "none"
                       }}
-                      icon={<EditTwoTone/>} size={'large'}
+                      icon={<EditTwoTone/>}
                       onClick={btnModifyProject}>修改</Button>
               <Button type="text"
                       style={{
-                        marginLeft: "-10px",
+                        marginLeft: "-25px",
                         display: judgeAuthority("删除项目明细行") === true ? "inline" : "none"
                       }}
-                      icon={<DeleteTwoTone/>} size={'large'}
+                      icon={<DeleteTwoTone/>}
                       onClick={deleteSprintDetails}>删除</Button>
               <Button type="text"
                       style={{
-                        marginLeft: "-10px",
+                        marginLeft: "-25px",
                         display: judgeAuthority("移动项目明细行") === true ? "inline" : "none"
                       }}
-                      icon={<SnippetsTwoTone/>} size={'large'}
+                      icon={<SnippetsTwoTone/>}
                       onClick={moveProject}>移动</Button>
 
-              <label style={{marginTop: '10px', fontWeight: 'bold', marginLeft: "10px"}}>操作流程:</label>
+              <label style={{marginTop: '5px', fontWeight: 'bold', marginLeft: "10px"}}>操作流程:</label>
 
               <Button type="text"
                       style={{display: judgeAuthority("打基线") === true ? "inline" : "none"}}
-                      icon={<CheckSquareTwoTone/>} size={'large'}
+                      icon={<CheckSquareTwoTone/>}
                       onClick={flowForBaseLine}>基线</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-10px", display: judgeAuthority("撤销") === true ? "inline" : "none"}}
-                      icon={<CloseSquareTwoTone/>} size={'large'}
+                      style={{marginLeft: "-25px", display: judgeAuthority("撤销") === true ? "inline" : "none"}}
+                      icon={<CloseSquareTwoTone/>}
                       onClick={flowForRevoke}>撤销</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-10px", display: judgeAuthority("取消") === true ? "inline" : "none"}}
-                      icon={<CloseSquareTwoTone/>} size={'large'}
+                      style={{marginLeft: "-25px", display: judgeAuthority("取消") === true ? "inline" : "none"}}
+                      icon={<CloseSquareTwoTone/>}
                       onClick={flowForCancle}>取消</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-10px", display: judgeAuthority("开发已revert") === true ? "inline" : "none"}}
-                      icon={<CheckSquareTwoTone/>} size={'large'}
+                      style={{marginLeft: "-25px", display: judgeAuthority("开发已revert") === true ? "inline" : "none"}}
+                      icon={<CheckSquareTwoTone/>}
                       onClick={flowForDevRevert}>开发已revert</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-10px", display: judgeAuthority("测试已验revert") === true ? "inline" : "none"}}
-                      icon={<CheckSquareTwoTone/>} size={'large'}
+                      style={{marginLeft: "-25px", display: judgeAuthority("测试已验revert") === true ? "inline" : "none"}}
+                      icon={<CheckSquareTwoTone/>}
                       onClick={flowForTestRevert}>测试已验revert</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-10px", display: judgeAuthority("灰度已验证") === true ? "inline" : "none"}}
-                      icon={<CheckSquareTwoTone/>} size={'large'}
+                      style={{marginLeft: "-25px", display: judgeAuthority("灰度已验证") === true ? "inline" : "none"}}
+                      icon={<CheckSquareTwoTone/>}
                       onClick={flowForHuiduChecked}>灰度已验证</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-10px", display: judgeAuthority("线上已验证") === true ? "inline" : "none"}}
-                      icon={<CheckSquareTwoTone/>} size={'large'}
+                      style={{marginLeft: "-25px", display: judgeAuthority("线上已验证") === true ? "inline" : "none"}}
+                      icon={<CheckSquareTwoTone/>}
                       onClick={flowForOnlineChecked}>线上已验证</Button>
 
             </div>
           </Col>
           <Col span={1} style={{textAlign: "right",}}>
             <div>
-              <Button type="text" icon={<ReloadOutlined/>} onClick={refreshGrid} size={'large'}
+              <Button type="text" icon={<ReloadOutlined/>} onClick={refreshGrid}
                       style={{display: "inline", float: "right"}}>刷新</Button>
             </div>
 
@@ -1564,7 +1740,7 @@ const SprintList: React.FC<any> = () => {
 
           <Col span={1} style={{textAlign: "right",}}>
             <div>
-              <Button type="text" icon={<SettingOutlined/>} size={'large'} onClick={showFieldsModal}> </Button>
+              <Button type="text" icon={<SettingOutlined/>} onClick={showFieldsModal}> </Button>
             </div>
           </Col>
 
@@ -1821,7 +1997,6 @@ const SprintList: React.FC<any> = () => {
               </div>
             </Col>
           </Row>
-
           <Row gutter={16}>
             <Col className="gutter-row">
               <div style={leftStyle}>
@@ -1868,7 +2043,6 @@ const SprintList: React.FC<any> = () => {
               </div>
             </Col>
           </Row>
-
           <Row gutter={16}>
 
             <Col className="gutter-row">
@@ -2003,7 +2177,6 @@ const SprintList: React.FC<any> = () => {
               </div>
             </Col>
           </Row>
-
           <Row gutter={16}>
             <Col className="gutter-row">
 

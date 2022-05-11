@@ -6,12 +6,23 @@ const {Option} = Select;
 
 // 计算不同类型的个数
 const calTypeCount = (data: any) => {
+
+  // 统计类型
   let bug = 0;
   let task = 0;
   let story = 0;
   let B_story = 0;
 
+  // 统计阶段
+  let wait = 0;
+  let devloping = 0;
+  let dev_finished = 0;
+  let testing = 0;
+  let test_finished = 0;
+  let onlined = 0;
+
   data.forEach((ele: any) => {
+    // 获取统计类型的个数
     if (ele.category === "1") {
       bug += 1;
     } else if (ele.category === "2") {
@@ -22,8 +33,35 @@ const calTypeCount = (data: any) => {
       story += 1;
     }
 
+    // 获取统计阶段的个数
+    const {stage} = ele;
+    switch (stage.toString()) {
+      case "1":  // stage = "未开始";
+        wait += 1;
+        break;
+      case "2":  // stage = "开发中";
+        devloping += 1;
+        break;
+      case "3":    // stage = "开发完";
+        dev_finished += 1;
+        break;
+      case "5":  // stage = "测试中";
+        testing += 1;
+        break;
+      case "6":  // stage = "TE测试环境已验过";  测试完
+        test_finished += 1;
+        break;
+      case "7":    // stage = "UED测试环境已验过"; 测试完
+        test_finished += 1;
+        break;
+      case "12":    // stage = "线上已验过"; 已上线
+        onlined += 1;
+        break;
+      default:
+        break;
+    }
   });
-  return {bug, task, story, B_story};
+  return {bug, task, story, B_story, wait, devloping, dev_finished, testing, test_finished, onlined};
 };
 
 // 将是相关需求或者相关任务的编号显示刀所属需求或者所属任务对应列。
@@ -134,33 +172,101 @@ const changeBaseLinePosition = (data: any) => {
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any, syncQuery: boolean = false) => {
 
+  // proDetail(project:${prjID},category:"${prjType}",order:ASC,doSync:${syncQuery}){
+  //   id
+  //   stage
+  //   tester
+  //   category
+  //   ztNo
+  //   title
+  //   severity
+  //   planName
+  //   priority
+  //   moduleName
+  //   ztStatus
+  //   assignedTo
+  //   finishedBy
+  //   closedBy
+  //   pageAdjust
+  //   hotUpdate
+  //   dataUpdate
+  //   interUpdate
+  //   presetData
+  //   testCheck
+  //   scopeLimit
+  //   proposedTest
+  //   publishEnv
+  //   uedName
+  //   uedEnvCheck
+  //   uedOnlineCheck
+  //   memo
+  //   source
+  //   feedback
+  //   expectTest
+  //   submitTest
+  //   activeDuration
+  //   solveDuration
+  //   verifyDuration
+  //   closedDuration
+  //   relatedBugs
+  //   relatedTasks
+  //   relatedStories
+  //   deadline
+  //   belongStory
+  //   belongTask
+  //   baseline
+  //   resolvedAt
+  //   fromBug
+  //   openedAt
+  // }
+
   // baseline
   const {data} = await client.query(`
       {
-         proDetail(project:${prjID},category:"${prjType}",order:ASC,doSync:${syncQuery}){
+        proDetaiWithUser(project:${prjID},category:"${prjType}"){
+            planName
             id
             stage
-            tester
+            tester{
+              id
+              name
+              dept{
+                id
+                name
+              }
+            }
             category
             ztNo
             title
             severity
-            planName
             priority
             moduleName
             ztStatus
-            assignedTo
-            finishedBy
+            assignedTo{
+              id
+              name
+              dept{
+                id
+                name
+              }
+            }
+            finishedBy{
+              id
+              name
+              dept{
+                id
+                name
+              }
+            }
             closedBy
-            pageAdjust
             hotUpdate
             dataUpdate
             interUpdate
             presetData
             testCheck
             scopeLimit
-            proposedTest
             publishEnv
+            proposedTest
             uedName
             uedEnvCheck
             uedOnlineCheck
@@ -176,20 +282,22 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             relatedBugs
             relatedTasks
             relatedStories
+            createAt
             deadline
-            belongStory
-            belongTask
             baseline
             resolvedAt
             fromBug
             openedAt
+            pageAdjust
+            stageManual
+            testConfirmed
           }
       }
   `);
 
-  let oraData: any = data?.proDetail;
+  let oraData: any = data?.proDetaiWithUser;
   if (prjType === "") {
-    const changedRow = changeRowPosition(data?.proDetail); // 对数据进行想要的顺序排序(将需求相关的bug放到相关需求后面)
+    const changedRow = changeRowPosition(data?.proDetaiWithUser); // 对数据进行想要的顺序排序(将需求相关的bug放到相关需求后面)
     oraData = changeBaseLinePosition(changedRow); //  将基线值为0的数据统一起来，放到页面最前面
 
   }
@@ -362,4 +470,4 @@ const GetSprintProject = () => {
 };
 
 
-export {queryDevelopViews,queryRepeats,getDeptMemner,LoadCombobox,LoadTesterCombobox,GetSprintProject}
+export {queryDevelopViews, queryRepeats, getDeptMemner, LoadCombobox, LoadTesterCombobox, GetSprintProject}

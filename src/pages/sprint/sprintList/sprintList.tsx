@@ -6,22 +6,21 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient} from '@/hooks';
+import {useGqlClient} from '@/hooks';
+import {colums} from "./girdInfo";
+import {queryDevelopViews, queryRepeats, queryDeleteCount} from "./data";
 import moment from 'moment';
 import {Button, message, Form, DatePicker, Select, Modal, Input, Row, Col, Spin} from 'antd';
 import {FolderAddTwoTone, EditTwoTone, DeleteTwoTone, LogoutOutlined, ReloadOutlined} from '@ant-design/icons';
 import {formatMomentTime} from '@/publicMethods/timeMethods';
 import {getHeight} from '@/publicMethods/pageSet';
 import axios from 'axios';
-import {history} from 'umi';
 import {judgeAuthority} from "@/publicMethods/authorityJudge";
 import {useModel} from "@@/plugin-model/useModel";
-
-import dayjs from "dayjs";
+import {errorMessage, infoMessage, sucMessage, warnMessage} from "@/publicMethods/showMessages";
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
-
 // 默认条件：近一个月；未关闭的
 const defalutCondition: any = {
   projectName: '',
@@ -29,78 +28,8 @@ const defalutCondition: any = {
   dateRange: {start: "", end: ""},
   projectStatus: ['wait', 'doing', 'suspended'],
 };
-
 let orgPrjname = '';
 let delCounts = 0;
-
-// 查询数据
-const queryDevelopViews = async (client: GqlClient<object>, params: any, syncData: boolean) => {
-
-  const range = `{start:"${params.dateRange.start}", end:"${params.dateRange.end}"}`;
-  const {data} = await client.query(`
-      {
-         project(name:"${params.projectName}",category:[${params.projectType}], range:${range},status:[${params.projectStatus}],order:ASC,doSync:${syncData}){
-          id
-          name
-          type
-          startAt
-          testEnd
-          testFinish
-          expStage
-          expOnline
-          creator
-          status
-          createAt
-          ztId
-        }
-      }
-  `);
-
-  return data?.project;
-};
-
-// 查询是否有重复数据
-const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
-  const {data} = await client.query(`
-      {
-        proExist(name:"${prjName}"){
-          ok
-          data{
-            id
-            name
-            type
-            startAt
-            testEnd
-            testFinish
-            expStage
-            expOnline
-            creator
-            status
-            createAt
-            ztId
-          }
-          code
-          message
-        }
-      }
-  `);
-
-  console.log('data', data);
-  return data?.proExist;
-};
-
-const queryDeleteCount = async (client: GqlClient<object>, params: any) => {
-  const {data} = await client.query(`
-      {
-         proDetail(project:${params}){
-            id
-            category
-            ztNo
-          }
-      }
-  `);
-  return data?.proDetail;
-};
 
 // 组件初始化
 const SprintList: React.FC<any> = () => {
@@ -112,137 +41,6 @@ const SprintList: React.FC<any> = () => {
   if (initialState?.currentUser) {
     currentUser = initialState.currentUser === undefined ? "" : initialState.currentUser.userid;
   }
-  // 定义列名
-  const colums = () => {
-    const component = new Array();
-    component.push(
-      {
-        headerName: '',
-        checkboxSelection: true,
-        headerCheckboxSelection: true,
-        maxWidth: 50,
-        pinned: 'left',
-      },
-      {
-        headerName: 'NO.',
-        maxWidth: 70,
-        filter: false,
-        cellRenderer: (params: any) => {
-          return Number(params.node.id) + 1;
-        },
-      },
-      {
-        headerName: '项目名称',
-        field: 'name',
-        minWidth: 186,
-        cellRenderer: (params: any) => {
-          if (params.value === "emergency20210728") {
-            return `<a  style="color:blue;text-decoration: underline" >多组织阻塞bug跟踪</a>`;
-          }
-          if (params.value === "emergency20210930") {
-            return `<a  style="color:blue;text-decoration: underline" >线上问题跟踪</a>`;
-          }
-          return `<a  style="color:blue;text-decoration: underline" >${params.value}</a>`;
-        },
-        onCellClicked: (params: any) => {
-          // console.log('params', params.data);
-          if (params.data.name === "emergency20210728") {
-            history.push(`/sprint/sprintListDetails?projectid=${params.data.id}&project=多组织阻塞bug跟踪`);
-          } else if (params.value === "emergency20210930") {
-            history.push(`/sprint/sprintListDetails?projectid=${params.data.id}&project=线上问题跟踪`);
-          } else {
-            history.push(`/sprint/sprintListDetails?projectid=${params.data.id}&project=${params.data.name}`);
-          }
-        },
-      },
-      {
-        headerName: '开始时间',
-        field: 'startAt',
-        minWidth: 124,
-      },
-      {
-        headerName: '提测截止日期',
-        field: 'testEnd',
-        minWidth: 124,
-      },
-      {
-        headerName: '测试完成日期',
-        field: 'testFinish',
-        minWidth: 124,
-      },
-      {
-        headerName: '计划灰度日期',
-        field: 'expStage',
-        minWidth: 124,
-      },
-      {
-        headerName: '计划上线日期',
-        field: 'expOnline',
-        minWidth: 124,
-      },
-      {
-        headerName: '创建日期',
-        field: 'createAt',
-        minWidth: 124,
-        cellRenderer: (params: any) => {
-          return dayjs(params.value).format("YYYY-MM-DD");
-        }
-      },
-      {
-        headerName: '创建人',
-        field: 'creator',
-        minWidth: 80,
-      },
-      {
-        headerName: '状态',
-        field: 'status',
-        minWidth: 80,
-        cellRenderer: (params: any) => {
-          let returnValue = '';
-          switch (params.value) {
-            case 'closed':
-              returnValue = '已关闭';
-              break;
-            case 'wait':
-              returnValue = '未开始';
-              break;
-            case 'doing':
-              returnValue = '进行中';
-              break;
-
-            case 'suspended':
-              returnValue = '已挂起';
-              break;
-            default:
-              returnValue = params.value;
-              break;
-          }
-
-          return returnValue;
-        },
-      },
-      {
-        headerName: '去禅道',
-        field: 'ztId',
-        minWidth: 80,
-        cellRenderer: (params: any) => {
-          return `<a target="_blank" style="color:blue;text-decoration: underline" href='http://zentao.77hub.com/zentao/execution-task-${params.value}.html'>去禅道</a>`;
-        },
-      }, {
-        headerName: '来源',
-        field: 'type',
-        // minWidth: 70,
-        cellRenderer: (params: any) => {
-          if (params.value === 'AUTO') {
-            return '自动';
-          }
-          return '人工';
-        },
-      }
-    );
-
-    return component;
-  };
 
   /* 整个模块都需要用到的 */
   const [formForAddAnaMod] = Form.useForm();
@@ -254,12 +52,11 @@ const SprintList: React.FC<any> = () => {
     dateRange: {start: "", end: ""},
     projectStatus: ['wait', 'doing', 'suspended']
   });
+
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
-
   const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, defalutCondition, true));
-
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -273,12 +70,10 @@ const SprintList: React.FC<any> = () => {
   // 表格的屏幕大小自适应
   const [gridHeight, setGridHeight] = useState(getHeight());
   window.onresize = function () {
-    // console.log("新高度：", getHeight());
     setGridHeight(getHeight());
     gridApi.current?.sizeColumnsToFit();
   };
   /* endregion */
-
 
   /* region 条件查询功能 */
 
@@ -294,13 +89,10 @@ const SprintList: React.FC<any> = () => {
       ...choicedCondition,
       projectName: params.target.value
     });
-
   };
 
   // 项目类型选择事件
-  const prjTypeChanged = (value: any, params: any) => {
-    //  输入后在useEffect中实现查询
-    console.log(value, params);
+  const prjTypeChanged = (value: any) => {
     setQueryCondition({
       ...choicedCondition,
       projectType: value
@@ -310,8 +102,6 @@ const SprintList: React.FC<any> = () => {
 
   // 时间选择事件
   const onTimeSelected = async (params: any, dateString: any) => {
-    // if(dateString ===)
-
     //  输入后在useEffect中实现查询
     setQueryCondition({
       ...choicedCondition,
@@ -319,20 +109,16 @@ const SprintList: React.FC<any> = () => {
         start: dateString[0],
         end: dateString[1]
       }
-
     });
   };
 
   // 选择项目状态
-  const prjStatusChanged = async (value: any, params: any) => {
+  const prjStatusChanged = async (value: any) => {
     //  输入后在useEffect中实现查询
-    console.log(params);
     setQueryCondition({
       ...choicedCondition,
       projectStatus: value
-
     });
-
   };
 
   /* endregion */
@@ -375,13 +161,10 @@ const SprintList: React.FC<any> = () => {
       planOnline: formatMomentTime(currentDate),
       prjStatus: "wait"
     });
-
     setmodal({title: '新增项目'});
-
     // 赋值给控件
     setIsAddModalVisible(true);
     setisAble({shown: false});
-
   };
 
   const queryRepeatProjectasync = async () => {
@@ -390,18 +173,9 @@ const SprintList: React.FC<any> = () => {
       return;
     }
     const prjName = `${values.prjNames}${values.prjDate.format('YYYYMMDD')}`;
-
     const datas: any = await queryRepeats(gqlClient, prjName);
-
-
     if (datas === null) {
-      message.error({
-        content: '您无权新增或修改!',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage("您无权新增或修改!");
       setisAble({shown: true});
       return;
     }
@@ -430,14 +204,9 @@ const SprintList: React.FC<any> = () => {
     }
   };
 
-
-  // const formTimeSelected = async () => {
-  //   await queryRepeatProjectasync();
-  // };
   /* endregion */
 
   /* region 修改功能  */
-
   const showEditForm = (detailsInfo: any) => {
     const prjNames = detailsInfo.name.toString();
     orgPrjname = prjNames;
@@ -470,42 +239,24 @@ const SprintList: React.FC<any> = () => {
     setisAble({shown: false});
   };
 
-
   // 修改项目
   const modifyProject = () => {
-
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
     // 没有选中则提醒
     if (selRows.length === 0) {
-      message.error({
-        content: '请选中需要修改的数据!',
-        duration: 1,
-        className: 'modifyNone',
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage("请选中需要修改的数据!");
       return;
     }
     // 一次只能修改一条数据
     if (selRows.length > 1) {
-      message.error({
-        content: '一次只能修改一条数据!',
-        duration: 1,
-        className: 'modifyMore',
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage("一次只能修改一条数据!");
       return;
     }
-
     showEditForm(JSON.parse(JSON.stringify(selRows[0])));
   };
 
   // 行事件双击
   const rowClicked = (params: any) => {
-    // authorityForMod(params.data);
     showEditForm(params.data);
   };
 
@@ -521,43 +272,21 @@ const SprintList: React.FC<any> = () => {
   // sprint 项目保存
   const commitSprint = async () => {
     const values = formForAddAnaMod.getFieldsValue();
-
     const prjtype = values.prjNames;
-    if (prjtype === null || values.prjDate === null) {
-      message.error({
-        content: '项目名称不能包含空值!',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+    if (!prjtype || prjtype === null || values.prjDate === null) {
+      errorMessage("项目名称不能包含空值!");
       return;
     }
-
     if (values.starttime >= values.testCutoff) {
-      message.error({
-        content: '提测截止时间必须大于开始时间!',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage("提测截止时间必须大于开始时间!");
       return;
     }
-
     if (values.prjStatus === null) {
-      message.error({
-        content: '项目状态不能为空!',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage("项目状态不能为空!");
       return;
     }
 
     const prjdate = values.prjDate === null ? "" : values.prjDate.format('YYYYMMDD');
-
     const datas = {
       name: `${prjtype}${prjdate}`,
       startAt: (values.starttime).format("YYYY-MM-DD"),// formatMomentTime(values.starttime),
@@ -572,115 +301,48 @@ const SprintList: React.FC<any> = () => {
     if (modal.title === '新增项目') {
       datas['type'] = 'MANUAL';
       datas['creator'] = currentUser.toString();
-
-      axios
-        .post('/api/sprint/project', datas)
+      axios.post('/api/sprint/project', datas)
         .then(function (res) {
           if (res.data.ok === true) {
             setIsAddModalVisible(false);
             updateGrid();
-            message.info({
-              content: "项目新增成功！",
-              duration: 1,
-              style: {
-                marginTop: '50vh',
-              },
-            });
+            sucMessage("项目新增成功！");
           } else if (Number(res.data.code) === 403) {
-            message.info({
-              content: "您无权新增项目！",
-              duration: 1,
-              style: {
-                marginTop: '50vh',
-              },
-            });
+            errorMessage("您无权新增项目！");
           } else {
-            message.error({
-              content: `${res.data.message}`,
-              duration: 1,
-              style: {
-                marginTop: '50vh',
-              },
-            });
+            errorMessage(`${res.data.message}`);
           }
         })
         .catch(function (error) {
           if (error.toString().includes("403")) {
-            message.info({
-              content: "您无权新增项目！",
-              duration: 1,
-              style: {
-                marginTop: '50vh',
-              },
-            });
+            errorMessage("您无权新增项目！")
           } else {
-            message.error({
-              content: `异常信息：${error.toString()}`,
-              duration: 1,
-              style: {
-                marginTop: '50vh',
-              },
-            });
+            errorMessage(`异常信息：${error.toString()}`);
           }
-
         });
     } else {
-
       datas['id'] = values.prjId;
       if (orgPrjname === datas['name']) {
         datas['name'] = '';
       }
-      axios
-        .put('/api/sprint/project', datas)
+      axios.put('/api/sprint/project', datas)
         .then(function (res) {
           if (res.data.ok === true) {
             setIsAddModalVisible(false);
             updateGrid();
-            message.info({
-              content: "项目修改成功!",
-              duration: 1,
-              style: {
-                marginTop: '50vh',
-              },
-            });
+            sucMessage("项目修改成功!");
           } else if (Number(res.data.code) === 403) {
-            message.info({
-              content: "您无权修改项目！",
-              duration: 1,
-              style: {
-                marginTop: '50vh',
-              },
-            });
+            errorMessage("您无权修改项目！");
           } else {
-            message.error({
-              content: `${res.data.message}`,
-              duration: 1,
-              style: {
-                marginTop: '50vh',
-              },
-            });
+            errorMessage(`${res.data.message}`);
           }
         })
         .catch(function (error) {
           if (error.toString().includes("403")) {
-            message.info({
-              content: "您无权修改项目！",
-              duration: 1,
-              style: {
-                marginTop: '50vh',
-              },
-            });
+            errorMessage("您无权修改项目！");
           } else {
-            message.error({
-              content: `异常信息：${error.toString()}`,
-              duration: 1,
-              className: 'ModError',
-              style: {
-                marginTop: '50vh',
-              },
-            });
+            errorMessage(`异常信息：${error.toString()}`);
           }
-
         });
     }
   };
@@ -696,94 +358,42 @@ const SprintList: React.FC<any> = () => {
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
 
     if (selRows.length === 0) {
-      message.error({
-        content: '请选中需要删除的数据!',
-        duration: 1,
-        className: 'delNone',
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage('请选中需要删除的数据!');
       return;
     }
-
     if (selRows.length > 1) {
-      message.error({
-        content: '一次只能删除一条数据!',
-        duration: 1,
-        className: 'delMore',
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage('一次只能删除一条数据!');
       return;
     }
 
     const datas: any = await queryDeleteCount(gqlClient, selRows[0].id);
     delCounts = datas.length;
     setIsDelModalVisible(true);
-
   };
 
   // 请求删除选中的行
   const delSprintList = () => {
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
     const prjId = selRows[0].id;
-
     const url = `/api/sprint/project/${prjId}`;
-
-    axios
-      .delete(url)
+    axios.delete(url)
       .then(function (res) {
         if (res.data.ok === true) {
           setIsDelModalVisible(false);
           updateGrid();
-          message.info({
-            content: "项目删除成功！",
-            duration: 1,
-            className: 'delSuccess',
-            style: {
-              marginTop: '50vh',
-            },
-          });
+          sucMessage("项目删除成功！");
         } else if (Number(res.data.code) === 403) {
-          message.info({
-            content: "您无权删除项目！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
+          errorMessage("您无权删除项目！");
         } else {
-          message.error({
-            content: `${res.data.message}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
+          errorMessage(`${res.data.message}`);
         }
-      })
-      .catch(function (error) {
-        if (error.toString().includes("403")) {
-          message.info({
-            content: "您无权删除项目！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `异常信息：${error.toString()}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-
-      });
+      }).catch(function (error) {
+      if (error.toString().includes("403")) {
+        errorMessage("您无权删除项目！");
+      } else {
+        errorMessage(`异常信息：${error.toString()}`);
+      }
+    });
   };
 
   const DelCancel = () => {
@@ -800,31 +410,12 @@ const SprintList: React.FC<any> = () => {
       .then(function (res) {
         if (res.data.ok === true) {
           updateGrid();
-          message.info({
-            content: "项目同步成功！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
+          sucMessage("项目同步成功！")
         } else {
-          message.error({
-            content: `${res.data.message}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
+          errorMessage(`${res.data.message}`);
         }
-      })
-      .catch(function (error) {
-        message.error({
-          content: `异常信息：${error.toString()}`,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
+      }).catch(function (error) {
+        errorMessage(`异常信息：${error.toString()}`);
       });
 
     setRefreshProject(false);
@@ -846,10 +437,7 @@ const SprintList: React.FC<any> = () => {
       <Spin spinning={refreshProject} tip="项目同步中..." size={"large"}>
 
         {/* 查询条件 */}
-        <div style={{width: '100%', overflow: 'auto', whiteSpace: 'nowrap'}}>
-          {/* <button onClick={testTiaozhaun}>跳转测试</button> */}
-
-          {/* <div><Link to="/sprint/sprintListDetails">跳转测试</Link></div> */}
+        <div style={{width: '100%', overflow: 'auto', whiteSpace: 'nowrap', marginTop: -20}}>
           <Form.Item name="prjName">
             <label style={{marginLeft: '10px'}}>项目名称：</label>
             <Input
@@ -859,11 +447,6 @@ const SprintList: React.FC<any> = () => {
               onChange={projectChanged}
               value={choicedCondition.projectName}
             />
-            {/* <Select placeholder="请选择" mode="tags" style={{width: '18%'}} onChange={prjTypeHandleChange} */}
-            {/*        tokenSeparators={[',']}> {[ */}
-            {/*  <Option key={"emergency20201223"} value={"emergency20201223"}>emergency20201223 </Option> */}
-            {/* ]} */}
-            {/* </Select> */}
 
             <label style={{marginLeft: '10px'}}>项目类型：</label>
             <Select
@@ -874,13 +457,13 @@ const SprintList: React.FC<any> = () => {
               onChange={prjTypeChanged}
             >{[
               <Option key={'sprint'} value={'sprint'}>
-                sprint{' '}
+                sprint
               </Option>,
               <Option key={'hotfix'} value={'hotfix'}>
-                hotfix{' '}
+                hotfix
               </Option>,
               <Option key={'emergency'} value={'emergency'}>
-                emergency{' '}
+                emergency
               </Option>,
             ]}
             </Select>
@@ -889,8 +472,6 @@ const SprintList: React.FC<any> = () => {
             <RangePicker
               className={'times'}
               style={{width: '18%'}}
-              // defaultValue={[moment(getRecentMonth().start), moment(getRecentMonth().end)]}
-              // defaultValue={[choicedDateTime.start, choicedDateTime.end]}
               value={[choicedCondition.dateRange.start === "" ? null : moment(choicedCondition.dateRange.start),
                 choicedCondition.dateRange.end === "" ? null : moment(choicedCondition.dateRange.end)]}
 
@@ -904,7 +485,6 @@ const SprintList: React.FC<any> = () => {
               style={{width: '20%'}}
               onChange={prjStatusChanged}
               value={choicedCondition.projectStatus}
-
             >
               {[
                 <Option key={'closed'} value={'closed'}>
@@ -924,36 +504,30 @@ const SprintList: React.FC<any> = () => {
           </Form.Item>
         </div>
 
-
         {/* 新增、修改、删除按钮栏 */}
-        <div style={{background: 'white'}}>
-          {/* 使用一个图标就要导入一个图标 */}
+        <div style={{background: 'white', marginTop: -15}}>
           <Button type="text" style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}
-                  icon={<LogoutOutlined/>} size={'large'} onClick={showDefalultValue}>
+                  icon={<LogoutOutlined/>} onClick={showDefalultValue}>
             默认：</Button>
           <label style={{color: 'black', display: judgeAuthority("默认按钮") === true ? "inline" : "none"}}> 未关闭项目</label>
-          {/* <Button type="text" style={{"color": "black"}} disabled={true} size={"large"}> 近1月未关闭的 </Button> */}
-          <Button type="text" icon={<ReloadOutlined/>} onClick={refreshGrid} size={'large'}
+          <Button type="text" icon={<ReloadOutlined/>} onClick={refreshGrid}
                   style={{display: "inline", float: "right"}}>刷新</Button>
 
           <Button type="text"
                   style={{color: 'black', float: 'right', display: judgeAuthority("删除项目") === true ? "inline" : "none"}}
-                  icon={<DeleteTwoTone/>} size={'large'}
+                  icon={<DeleteTwoTone/>}
                   onClick={deleteSprintList}>删除</Button>
+
           <Button type="text"
                   style={{
-                    color: 'black',
-                    float: 'right',
-                    display: judgeAuthority("修改项目名称") === true ? "inline" : "none"
+                    color: 'black', float: 'right', display: judgeAuthority("修改项目名称") === true ? "inline" : "none"
                   }}
-                  icon={<EditTwoTone/>} size={'large'}
+                  icon={<EditTwoTone/>}
                   onClick={modifyProject}>修改</Button>
           <Button type="text"
                   style={{color: 'black', float: 'right', display: judgeAuthority("新增项目") === true ? "inline" : "none"}}
-                  icon={<FolderAddTwoTone/>} size={'large'}
+                  icon={<FolderAddTwoTone/>}
                   onClick={addProject}>新增</Button>
-
-
         </div>
 
         {/* ag-grid 表格定义 */}
@@ -964,7 +538,6 @@ const SprintList: React.FC<any> = () => {
             defaultColDef={{
               resizable: true,
               sortable: true,
-              // floatingFilter: true,
               filter: true,
               flex: 1,
               minWidth: 100,
@@ -974,9 +547,6 @@ const SprintList: React.FC<any> = () => {
               minWidth: 100,
             }}
             groupDefaultExpanded={9} // 展开分组
-            // suppressDragLeaveHidesColumns // 取消分组时，例如单击删除区域中某一列上的“ x” ，该列将不可见
-            // suppressMakeColumnVisibleAfterUnGroup // 如果用户在移动列时不小心将列移出了网格，但并不打算将其隐藏，那么这就很方便。
-            // rowGroupPanelShow="always"
             onGridReady={onGridReady}
             onRowDoubleClicked={rowClicked}
           >
@@ -1004,15 +574,9 @@ const SprintList: React.FC<any> = () => {
                       <Select id={'prjNames'} placeholder="请选择类型" style={{width: '150px'}}
                               onSelect={queryRepeatProjectasync}>
                         {[
-                          <Option key={'sprint'} value={'sprint'}>
-                            sprint
-                          </Option>,
-                          <Option key={'hotfix'} value={'hotfix'}>
-                            hotfix
-                          </Option>,
-                          <Option key={'emergency'} value={'emergency'}>
-                            emergency
-                          </Option>,
+                          <Option key={'sprint'} value={'sprint'}>sprint</Option>,
+                          <Option key={'hotfix'} value={'hotfix'}>hotfix</Option>,
+                          <Option key={'emergency'} value={'emergency'}>emergency</Option>,
                         ]}
                       </Select>
                     </Form.Item>
@@ -1023,9 +587,7 @@ const SprintList: React.FC<any> = () => {
                     <Form.Item name="prjLable">
                       <input
                         style={{
-                          marginLeft: '10px',
-                          color: 'red',
-                          border: 'none',
+                          marginLeft: '10px', color: 'red', border: 'none',
                           backgroundColor: 'transparent',
                         }}
                         disabled={true}
@@ -1089,18 +651,10 @@ const SprintList: React.FC<any> = () => {
                 <Form.Item name="prjStatus" label="项目状态:">
                   <Select placeholder="请选择" style={widths}>
                     {[
-                      <Option key={'closed'} value={'closed'}>
-                        已关闭
-                      </Option>,
-                      <Option key={'doing'} value={'doing'}>
-                        进行中
-                      </Option>,
-                      <Option key={'suspended'} value={'suspended'}>
-                        已挂起
-                      </Option>,
-                      <Option key={'wait'} value={'wait'}>
-                        未开始
-                      </Option>,
+                      <Option key={'closed'} value={'closed'}>已关闭</Option>,
+                      <Option key={'doing'} value={'doing'}>进行中</Option>,
+                      <Option key={'suspended'} value={'suspended'}>已挂起</Option>,
+                      <Option key={'wait'} value={'wait'}>未开始</Option>,
                     ]}
                   </Select>
                 </Form.Item>

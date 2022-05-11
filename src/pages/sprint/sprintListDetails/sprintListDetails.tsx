@@ -283,9 +283,16 @@ const SprintList: React.FC<any> = () => {
   const adminModify = async (datas: any) => {
     debugger;
     // 还要获取英文名
-    const teters = datas.tester.split(';');
-    const deptUsers = await getDeptMemner(gqlClient, "测试");
-    const nameIdArray = getUsersId(deptUsers, teters);
+    const nameIdArray: any = [];
+    const teters = datas.tester;
+    if (teters && teters.length > 0) {
+      teters.forEach((ele: any) => {
+        nameIdArray.push(ele.name);
+      });
+    }
+    // const teters = datas.tester.split(';');
+    // const deptUsers = await getDeptMemner(gqlClient, "测试");
+    // const nameIdArray = getUsersId(deptUsers, teters);
 
     let publishEnv: any = [];
     if (datas.publishEnv !== null && datas.publishEnv !== "") {
@@ -307,8 +314,8 @@ const SprintList: React.FC<any> = () => {
       adminAddChandaoStatus: numberRenderToZentaoStatus({
         value: datas.ztStatus === null ? '' : datas.ztStatus.toString(),
       }),
-      adminAddAssignTo: datas.assignedTo,
-      adminAddSolvedBy: datas.finishedBy,
+      adminAddAssignTo: (datas.assignedTo)?.name,
+      adminAddSolvedBy: (datas.finishedBy)?.name,
       adminAddClosedBy: datas.closedBy,
       adminAddPageadjust: datas.pageAdjust,
       adminAddHotUpdate: datas.hotUpdate,
@@ -553,7 +560,6 @@ const SprintList: React.FC<any> = () => {
     } else {
       const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
       datas['id'] = curRow[0].id;
-debugger;
       // 判断是否被修改过 禅道id 对应测试、对应UED、反馈人,是否需要测试验证
       if (curRow[0].ztNo !== oradata.adminChandaoId) {
         datas["ztNo"] = oradata.adminChandaoId;
@@ -565,6 +571,11 @@ debugger;
         datas["newCategory"] = oradata.adminChandaoType;
       }
 
+      // 如果修改了是否需要测试验证，就要改为负值。
+      if (curRow[0].testCheck !== oradata.adminAddtesterVerifi) {
+        datas["testCheck"] = oradata.adminAddtesterVerifi === "" ? "" : `-${oradata.adminAddtesterVerifi}`; //  为手动修改的数据
+      }
+
       if (formForAdminToAddAnaMod.isFieldTouched('adminAddTester')) {
         datas["tester"] = testers;
       }
@@ -572,7 +583,6 @@ debugger;
       if (formForAdminToAddAnaMod.isFieldTouched('adminAddForUED')) {
         datas["uedName"] = oradata.adminAddForUED;
       }
-
       if (curRow[0].feedback !== oradata.adminAddFeedbacker) {
         datas["feedback"] = oradata.adminAddFeedbacker;
       }
@@ -1977,7 +1987,6 @@ debugger;
               </div>
             </Col>
           </Row>
-
           <Row gutter={16}>
             <Col className="gutter-row">
               <div style={leftStyle}>
@@ -2024,7 +2033,6 @@ debugger;
               </div>
             </Col>
           </Row>
-
           <Row gutter={16}>
 
             <Col className="gutter-row">
@@ -2159,7 +2167,6 @@ debugger;
               </div>
             </Col>
           </Row>
-
           <Row gutter={16}>
             <Col className="gutter-row">
 

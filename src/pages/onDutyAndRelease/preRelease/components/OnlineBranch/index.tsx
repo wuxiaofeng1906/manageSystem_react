@@ -386,43 +386,43 @@ const OnlineBranch: React.FC<any> = () => {
   };
 
   // 版本检查URL跳转
-  (window as any).versionCheckLogUrlClick = (logUrl: any) => {
-
-    const logs: any = [];
-    if (logUrl && logUrl.length > 0) {
-      logUrl.forEach((ele: any) => {
-        logs.push(
-          <Form.Item name="appLog" label={`${ele.server}日志:`} style={{marginTop: -5}}>
-            <a
-              href={`${ele.check_url}`}
-              target={'_black'}
-              style={{textDecoration: 'underline'}}
-            >
-              {ele.check_url}
-            </a>
-          </Form.Item>)
-
-      });
-    }
-
-    if (logs.length > 0) {
-      setLogModal({
-        iconCheckUrl: {style: 'none', content: <div></div>},
-        autoUrl: {style: 'none', ui: '', api: ''},
-        versionUrl: {style: 'inline', content: <div>{logs}</div>},
-        coveStatus: {style: 'none', content: <div></div>},
-        show: true,
-      });
-    } else {
-      message.error({
-        content: '无检查日志，请执行后在查看！',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-    }
-  };
+  // (window as any).versionCheckLogUrlClick = (logUrl: any) => {
+  //
+  //   const logs: any = [];
+  //   if (logUrl && logUrl.length > 0) {
+  //     logUrl.forEach((ele: any) => {
+  //       logs.push(
+  //         <Form.Item name="appLog" label={`${ele.server}日志:`} style={{marginTop: -5}}>
+  //           <a
+  //             href={`${ele.check_url}`}
+  //             target={'_black'}
+  //             style={{textDecoration: 'underline'}}
+  //           >
+  //             {ele.check_url}
+  //           </a>
+  //         </Form.Item>)
+  //
+  //     });
+  //   }
+  //
+  //   if (logs.length > 0) {
+  //     setLogModal({
+  //       iconCheckUrl: {style: 'none', content: <div></div>},
+  //       autoUrl: {style: 'none', ui: '', api: ''},
+  //       versionUrl: {style: 'inline', content: <div>{logs}</div>},
+  //       coveStatus: {style: 'none', content: <div></div>},
+  //       show: true,
+  //     });
+  //   } else {
+  //     message.error({
+  //       content: '无检查日志，请执行后在查看！',
+  //       duration: 1,
+  //       style: {
+  //         marginTop: '50vh',
+  //       },
+  //     });
+  //   }
+  // };
 
   // 自动化URL跳转
   (window as any).autoLogUrlClick = (checkType: string, logUrl: string) => {

@@ -433,8 +433,8 @@ const loadBranchNameSelect = async () => {
 };
 
 // 服务下拉框
-const loadServiceSelect = async () => {
-  const source = await getServices();
+const loadServiceSelect = async (branchName: any) => {
+  const source = await getServices({branch: branchName});
   const resultArray: any = [];
 
   if (source.message !== '') {

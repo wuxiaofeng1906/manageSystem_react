@@ -138,6 +138,16 @@ const OnlineBranch: React.FC<any> = () => {
     }
   };
 
+  // 根据分支名称获取服务
+  const showServerSelect = async (params: any) => {
+    setOnlineBranchFormSelected({
+      ...onlineBranchFormSelected,
+      server: await loadServiceSelect(params),
+    });
+    formForOnlineBranch.setFieldsValue({
+      server: []
+    });
+  };
   // 上线分支弹出窗口进行修改和新增
   (window as any).showOnlineBranchForm = async (type: any, params: any) => {
     // 是否是已完成发布
@@ -153,6 +163,7 @@ const OnlineBranch: React.FC<any> = () => {
       return;
     }
 
+    let branchName = "";
     if (type === 'add') {
       formForOnlineBranch.resetFields();
       formForOnlineBranch.setFieldsValue({
@@ -203,6 +214,7 @@ const OnlineBranch: React.FC<any> = () => {
         }
       }
 
+      branchName = oraData.checkHead.branchName;
       formForOnlineBranch.setFieldsValue({
         // 表头设置
         branchName: oraData.checkHead.branchName,
@@ -271,7 +283,7 @@ const OnlineBranch: React.FC<any> = () => {
     setOnlineBranchFormSelected({
       branchName: await loadBranchNameSelect(),
       techSide: await loadTechSideSelect(),
-      server: await loadServiceSelect(),
+      server: await loadServiceSelect(branchName),
       imgEnv: await loadTestEnvSelect(),
       before_checkType: await loadCheckTypeSelect('before'),
       after_checkType: await loadCheckTypeSelect('after'),
@@ -612,7 +624,7 @@ const OnlineBranch: React.FC<any> = () => {
               <Col span={16}>
                 {/* 分支名称 */}
                 <Form.Item label="分支名称:" name="branchName" required={true}>
-                  <Select style={{width: '100%'}} showSearch>
+                  <Select style={{width: '100%'}} showSearch onChange={showServerSelect}>
                     {onlineBranchFormSelected.branchName}
                   </Select>
                 </Form.Item>

@@ -1338,6 +1338,7 @@ const SprintList: React.FC<any> = () => {
   };
 
   const modFlowStage = (content: any, values: any) => {
+
     const selRows: any = gridApi.current?.getSelectedRows();
     const selIds = [];
     for (let index = 0; index < selRows.length; index += 1) {
@@ -1463,13 +1464,13 @@ const SprintList: React.FC<any> = () => {
   };
 
   // 批量修改测试
-  const testConfirmSelect = () => {
+  const testConfirmSelect = (params: any) => {
     if (judgingSelectdRow()) {
-      const selRows: any = gridApi.current?.getSelectedRows();
-      selRows.forEach((row: any) => {
-
-      });
-
+      // const selRows: any = gridApi.current?.getSelectedRows();
+      // selRows.forEach((row: any) => {
+      //
+      // });
+      modFlowStage("testConfirmed", params);
     }
   }
   /* endregion */

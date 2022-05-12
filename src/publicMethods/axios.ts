@@ -62,4 +62,17 @@ const axiosPut = async (url: string, bodyData: any = {}, queryData: any = {}) =>
   return result;
 };
 
-export {axiosGet, axiosDelete, axiosPost, axiosPut}
+// patch
+const axiosPatch = async (url: string, bodyData: any = {}) => {
+  let result: any = {};
+
+  await axios.put(url, bodyData)
+    .then((res: any) => {
+      result = res.data;
+    }).catch((error) => {
+      errorMessage(`异常信息:${error.toString()}`);
+    });
+  return result;
+};
+
+export {axiosGet, axiosDelete, axiosPost, axiosPut, axiosPatch}

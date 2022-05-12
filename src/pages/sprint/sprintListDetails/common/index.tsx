@@ -42,12 +42,15 @@ const alayManagerData = (oradata: any, curRow: any, prjId: any) => {
     dataUpdate: oradata.managerDataUpgrade === "" ? null : oradata.managerDataUpgrade,
     interUpdate: oradata.managerInteUpgrade === "" ? null : oradata.managerInteUpgrade,
     presetData: oradata.managerPreData === "" ? null : oradata.managerPreData,
-    testCheck: oradata.managertesterVerifi === "" ? null : oradata.managertesterVerifi,
+    // testCheck: oradata.managertesterVerifi === "" ? null : oradata.managertesterVerifi,
     scopeLimit: oradata.managerSuggestion,
     proposedTest: oradata.managerProTested === "" ? null : oradata.managerProTested,
     publishEnv: pubEnv,
   };
-
+  // 如果修改了是否需要测试验证，就要改为负值。
+  if (curRow[0].testCheck !== oradata.managertesterVerifi) {
+    datas["testCheck"] = oradata.managertesterVerifi === "" ? "" : `-${oradata.managertesterVerifi}`; //  为手动修改的数据
+  }
   return datas;
 }
 

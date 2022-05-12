@@ -50,18 +50,43 @@ const getColums = (prjNames: any) => {
       suppressMenu: false,
       cellRenderer: (params: any) => {
         const testArray = params.value;
+        let myColor = "gray"; // 测试验证：已验证为黑色，没验证为灰色
+        const testConfirm = params.data?.testConfirmed;
+        if (testConfirm === "1") {
+          myColor = "black";
+        }
         if (!testArray || testArray.length === 0) {
-          return 'NA';
+          return `<span style="color: ${myColor}"> NA </span>`;
         }
         let testers = "";
         testArray.forEach((tester: any) => {
           testers = testers === "" ? tester.name : `${testers},${tester.name}`;
         });
         if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
-          return `<span style="text-decoration:line-through"> ${testers} </span>`;
+          return `<span style="color: ${myColor};text-decoration:line-through"> ${testers} </span>`;
         }
-        return testers;
+        return `<span style="color: ${myColor}"> ${testers} </span>`;
 
+      },
+    },
+    {
+      headerName: '测试确认',
+      field: 'testConfirmed',
+      pinned: 'left',
+      minWidth: 105,
+      suppressMenu: false,
+      cellRenderer: (params: any) => {
+        // 默认全部为：否
+        if (params.value === "0" || params.value === null || params.value === undefined) {
+          if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+            return `<span style="text-decoration:line-through"> 否 </span>`;
+          }
+          return "否";
+        }
+        if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+          return `<span style="text-decoration:line-through"> 是 </span>`;
+        }
+        return "是";
       },
     },
     {
@@ -220,7 +245,6 @@ const getColums = (prjNames: any) => {
     {
       headerName: '是否需要测试验证',
       field: 'testCheck',
-      pinned: "right",
       cellRenderer: (params: any) => {
         // testCheck: 手动修改标识: "-1"、"-0";自动的是：0 ，1
         // 自动规则生成的‘是’默认黑色，自动规则生成的‘否’默认红色

@@ -169,6 +169,21 @@ const changeBaseLinePosition = (data: any) => {
 
 };
 
+// bug转需求字段
+const changeTypeColumns = (oraData: any) => {
+  const changedStoryArray: any = [];
+  if (oraData && oraData.length > 0) {
+    oraData.forEach((ele: any) => {
+      const rows: any = {...ele};
+      if (ele.category === "3" && ele.fromBug !== 0) {
+        rows["category"] = "-3";// 表示为bug转需求
+      }
+      changedStoryArray.push(rows);
+    });
+  }
+
+  return changedStoryArray;
+}
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any, syncQuery: boolean = false) => {
 
@@ -223,7 +238,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
   // baseline
   const {data} = await client.query(`
       {
-        proDetaiWithUser(project:${prjID},category:"${prjType}"){
+        proDetaiWithUser(project:${prjID},category:"${prjType}",order:ASC,doSync:${syncQuery}){
             planName
             id
             stage
@@ -302,6 +317,8 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
 
   }
 
+  // 需要对B_Story直接显示在类型中，而不是渲染看见
+  oraData = changeTypeColumns(oraData);
   return {result: showBelongItem(oraData), resCount: calTypeCount(oraData)};
 };
 

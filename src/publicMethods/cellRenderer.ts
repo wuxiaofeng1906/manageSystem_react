@@ -400,6 +400,7 @@ const numberRenderToZentaoType = (params: any,) => {
       type = "Task";
       break;
     case "3":
+    case "-3":
       type = "Story";
       break;
     default:
@@ -410,7 +411,7 @@ const numberRenderToZentaoType = (params: any,) => {
 };
 
 
-const numberRenderToZentaoTypeFilter = (params: any, test: any) => {
+const numberRenderToZentaoTypeFilter = (params: any) => {
 
   if (!params.value || params.value === '(Select All)') {
     return params.value;
@@ -427,13 +428,10 @@ const numberRenderToZentaoTypeFilter = (params: any, test: any) => {
       type = "Task";
       break;
     case "3":
-
-      // if (params.data.fromBug) {
       type = "Story";
-      // } else {
-      //   type = "B-Story";
-      // }
-
+      break;
+    case "-3":
+      type = "B_Story";
       break;
     default:
       break;
@@ -491,6 +489,7 @@ const numberRenderToZentaoTypeForLine = (params: any,) => {
 };
 
 const numRenderToTypeForLineAndFromBug = (params: any,) => {
+
   // BUG = 1,
   // TASK = 2,
   // STORY = 3,
@@ -505,14 +504,17 @@ const numRenderToTypeForLineAndFromBug = (params: any,) => {
     case "3":
       type = "Story";
       break;
+    case "-3":
+      type = "B_Story";
+      break;
     default:
       break;
   }
 
 
-  if (params.data.fromBug) {
-    type = `B-${type}`;
-  }
+  // if (params.data.fromBug) {
+  //   type = `B-${type}`;
+  // }
   if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
     return `<span style="text-decoration:line-through"> ${type} </span>`;
 

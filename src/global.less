@@ -1,5 +1,5 @@
 @import '~antd/es/style/themes/default.less';
-
+@import './variable';
 html,
 body,
 #root {
@@ -50,5 +50,13 @@ ol {
 @media screen and(-ms-high-contrast: active), (-ms-high-contrast: none) {
   body .ant-design-pro > .ant-layout {
     min-height: 100vh;
+  }
+}
+
+:global {
+  .ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }

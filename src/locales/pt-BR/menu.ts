@@ -46,7 +46,7 @@ export default {
   'menu.account.trigger': 'Disparar Erro',
   'menu.account.logout': 'Sair',
   'menu.editor': 'Graphic Editor',
-  'menu.editor.flow': 'Flow Editor',
+  'menu.editor.flow': 'flow Editor',
   'menu.editor.mind': 'Mind Editor',
   'menu.editor.koni': 'Koni Editor',
 };

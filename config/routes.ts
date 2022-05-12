@@ -1,6 +1,6 @@
 ﻿// @ts-ignore
-import {MenuDataItem} from '@@/plugin-layout/runtime';
-import {ProjectKpiRoute} from './routes-tj';
+import { MenuDataItem } from '@@/plugin-layout/runtime';
+import { ProjectKpiRoute } from './routes-tj';
 
 export default [
   {
@@ -326,7 +326,7 @@ export default [
                 component: './kpi/performance/service/avgEstablishTime',
               },
             ],
-          }
+          },
         ],
       },
       {
@@ -425,7 +425,7 @@ export default [
         path: 'sonar',
         access: 'sonarCheck',
         component: './checkTools/sonar',
-      }
+      },
     ],
   },
   {
@@ -448,20 +448,23 @@ export default [
         icon: 'table',
         path: 'dutyPlan',
         component: './onDutyAndRelease/dutyPlan',
-      }, {
+      },
+      {
         name: '发布过程',
         icon: 'table',
         path: 'preRelease',
         component: './onDutyAndRelease/preRelease',
-      }, {
+      },
+      {
         name: '发布历史',
         icon: 'table',
         path: 'releaseHistory',
         component: './onDutyAndRelease/releaseHistory',
-      }
+      },
     ],
-  }, {
-    name: "禅道管理",
+  },
+  {
+    name: '禅道管理',
     icon: 'table',
     path: '/zentao',
     // hideInMenu: true,
@@ -471,33 +474,37 @@ export default [
         icon: 'table',
         path: 'peopleExcuteSetting',
         component: './zentao/peopleExcuteSetting',
-        access: 'sysAdmin',  // 管理员可见
+        access: 'sysAdmin', // 管理员可见
       },
       {
         name: '禅道模板',
         icon: 'table',
         path: 'templateList',
         component: './zentao/zentaoTemplate/templateList',
-        access: 'sysAdmin',  // 管理员可见
-      }, {
+        access: 'sysAdmin', // 管理员可见
+      },
+      {
         name: '禅道任务模板',
         icon: 'table',
         path: 'editTemplate',
         component: './zentao/zentaoTemplate/editTemplate',
-        hideInMenu: true
-      }, {
+        hideInMenu: true,
+      },
+      {
         name: '禅道任务生成（上线检查）',
         icon: 'table',
         path: 'btForCheckBeforeOnline',
         component: './zentao/zentaoTemplate/btForCheckBeforeOnline',
-        hideInMenu: true
-      }, {
+        hideInMenu: true,
+      },
+      {
         name: '禅道任务生成（项目计划）',
         icon: 'table',
         path: 'btForProjectTemplate',
         component: './zentao/zentaoTemplate/btForProjectTemplate',
-        hideInMenu: true
-      }, {
+        hideInMenu: true,
+      },
+      {
         name: '禅道任务分解',
         icon: 'table',
         path: 'taskDecomposition',
@@ -505,9 +512,10 @@ export default [
         access: 'devCenter', // 研发中心可见
         // hideInMenu: true
       },
-    ]
-  }, {
-    name: "石墨管理",
+    ],
+  },
+  {
+    name: '石墨管理',
     icon: 'table',
     path: '/shimo',
     hideInMenu: false,
@@ -530,10 +538,10 @@ export default [
             path: 'baselineDetails',
             component: './shimo/fileBaseline/baselineDetails',
             hideInMenu: true,
-          }
-        ]
-      }
-    ]
+          },
+        ],
+      },
+    ],
   },
   {
     name: '系统管理',
@@ -562,6 +570,64 @@ export default [
         name: '日志查询',
         path: 'logs',
         component: './log',
+      },
+    ],
+  },
+  {
+    name: '上线系统',
+    icon: 'table',
+    path: '/systemOnline',
+    // hideInMenu: true,
+    routes: [
+      {
+        name: '发布列表',
+        icon: 'table',
+        path: 'publishList',
+        component: './systemOnline/publishList',
+        // hideInMenu: true
+      },
+      {
+        name: '预发布',
+        icon: 'table',
+        path: 'prePublish',
+        component: './systemOnline/prePublish/layout',
+        hideChildrenInMenu: true,
+        routes: [
+          {
+            path: 'projectServices',
+            component: './systemOnline/prePublish/projectServices',
+          },
+          {
+            path: 'deploy',
+            component: './systemOnline/prePublish/deploy',
+          },
+          {
+            path: 'publish',
+            component: './systemOnline/prePublish/publish',
+          },
+          {
+            path: 'overview',
+            component: './systemOnline/prePublish/overview',
+          },
+          {
+            path: 'worksheet',
+            component: './systemOnline/prePublish/worksheet',
+          },
+        ],
+      },
+      {
+        name: '企业微信发布审批流程',
+        icon: 'table',
+        path: 'publish',
+        component: './systemOnline/flow',
+        // hideInMenu: true
+      },
+      {
+        name: '组件',
+        icon: 'table',
+        path: 'components',
+        component: './systemOnline/test',
+        // hideInMenu: true
       },
     ],
   },

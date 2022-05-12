@@ -3,10 +3,13 @@
     "outDir": "build/dist",
     "module": "esnext",
     "target": "esnext",
-    "lib": ["esnext", "dom"],
+    "lib": [
+      "esnext",
+      "dom"
+    ],
     "sourceMap": true,
     "baseUrl": ".",
-    "jsx": "preserve",
+    "jsx": "react",
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,

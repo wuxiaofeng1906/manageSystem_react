@@ -1,8 +1,12 @@
 import React from 'react';
 import { Button, message, notification } from 'antd';
-import {useIntl} from "@@/plugin-locale/localeExports";
+import { useIntl } from '@@/plugin-locale/localeExports';
 import '@ant-design/pro-form/dist/form.css';
 import defaultSettings from '../config/defaultSettings';
+
+import 'ag-grid-enterprise';
+import 'ag-grid-community/dist/styles/ag-grid.css';
+import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 
 const { pwa } = defaultSettings;
 const isHttps = document.location.protocol === 'https:';

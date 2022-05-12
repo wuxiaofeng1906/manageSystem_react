@@ -1,0 +1,105 @@
+@import '../../../../global.less';
+
+.flowArrow {
+  position: relative;
+  display: grid;
+  grid-row-gap: 60px;
+  grid-template-columns: repeat(4, 25%);
+
+  > div {
+    &:hover {
+      .left {
+        border-top: 65px solid goldenrod !important;
+        border-bottom: 65px solid goldenrod !important;
+      }
+
+      .right {
+        border-left: 65px solid goldenrod !important;
+      }
+
+      .content {
+        background: goldenrod !important;
+      }
+    }
+  }
+
+  .wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    cursor: pointer;
+  }
+
+  .right {
+    position: absolute;
+    top: 0;
+    right: 0px;
+    display: block;
+    border-top: 65px solid transparent;
+    border-bottom: 65px solid transparent;
+    border-left: 65px solid white;
+    content: '';
+  }
+
+  .left {
+    position: absolute;
+    top: 0;
+    left: 0px;
+    display: block;
+    border-top: 65px solid white;
+    border-bottom: 65px solid white;
+    border-left: 65px solid transparent;
+    content: '';
+  }
+
+  .content {
+    position: relative;
+    display: inline-block;
+    width: calc(100% - 130px);
+    margin: 0px 65px;
+    padding: 10px 5px;
+    color: black;
+    background: white;
+
+    > div {
+      max-width: min-content;
+    }
+  }
+
+  .leftArrow {
+    position: relative;
+    transform: rotate(180deg);
+
+    .content {
+      transform: rotate(-180deg);
+    }
+  }
+
+  .bottomArrow {
+    &::before {
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      display: inline-block;
+      width: 2px;
+      height: 60px;
+      background: red;
+      transform: translateX(-50%);
+      content: '';
+    }
+  }
+
+  .topArrow {
+    &::before {
+      position: absolute;
+      bottom: -60px;
+      left: 50%;
+      display: inline-block;
+      width: 2px;
+      height: 60px;
+      background: blue;
+      transform: translateX(-50%);
+      content: '';
+    }
+  }
+}

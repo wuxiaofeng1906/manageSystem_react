@@ -1,10 +1,10 @@
 /*
- * @Description: 
+ * @Description:
  * @Author: jieTan
  * @Date: 2021-11-19 16:33:15
  * @LastEditTime: 2021-11-23 14:32:33
  * @LastEditors: jieTan
- * @LastModify: 
+ * @LastModify:
  */
 // https://umijs.org/config/
 import { defineConfig } from 'umi';
@@ -62,6 +62,6 @@ export default defineConfig({
     babelOptions: {},
   },
   resolve: {
-    includes: ['src/components'],
+    includes: ['src/WechatFlow'],
   },
 });

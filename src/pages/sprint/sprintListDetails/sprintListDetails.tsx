@@ -22,28 +22,28 @@ import {
   numberRenderToCurrentStage, stageChangeToNumber, numberRenderToZentaoType,
   zentaoTypeRenderToNumber, numberRenderToZentaoSeverity, numberRenderToZentaoStatus,
 } from '@/publicMethods/cellRenderer';
-import axios from 'axios';
 import moment from "moment";
 import {getHeight} from '@/publicMethods/pageSet';
 import {judgeAuthority} from "@/publicMethods/authorityJudge";
 import {useModel} from "@@/plugin-model/useModel";
 import {getColums, setRowColor} from "./grid";
 import {
-  queryDevelopViews, queryRepeats, LoadCombobox, LoadTesterCombobox, GetSprintProject
+  queryDevelopViews, queryRepeats, LoadCombobox, LoadTesterCombobox, GetSprintProject, calTypeCount
 } from "./data";
-import {errorMessage, infoMessage, sucMessage, warnMessage} from "@/publicMethods/showMessages";
+import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import defaultTreeSelectParams from "@/pages/shimo/fileBaseline/iterateList/defaultSetting";
 import {
   devCenterDept, getStageOption, getTypeOption, getAssignedToOption,
   getTesterOption, getSolvedByOption, filterDatasByCondition
 } from "./filter";
-import {requestModFlowStage, addSprintDetails, mosidySprintDetails, getZentaoInfo} from "./common/axiosRequest";
+import {
+  requestModFlowStage, addSprintDetails, delSprintDetails, mosidySprintDetails,
+  moveSprintDetails, addNewProjects, getZentaoInfo, syncDetailsData
+} from "./common/axiosRequest";
 
 const {Option} = Select;
 const SprintList: React.FC<any> = () => {
   const {initialState} = useModel('@@initialState');
-  const sys_accessToken = localStorage.getItem("accessId");
-  axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
   const {prjId, prjNames, prjType} = getProjectInfo();
 
   /* region 整个模块都需要用到的表单定义 */
@@ -464,13 +464,7 @@ const SprintList: React.FC<any> = () => {
   const commitManagerModify = () => {
     const oradata = formForManagerToMod.getFieldsValue();
     if (oradata.testerChandaoType === '' || oradata.testerCHandaoID === '') {
-      message.error({
-        content: `禅道类型和禅道编号不能为空！`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage(`禅道类型和禅道编号不能为空！`);
       return;
     }
     const datas = alayManagerData(oradata, gridApi.current?.getSelectedRows(), prjId);
@@ -483,7 +477,7 @@ const SprintList: React.FC<any> = () => {
   // 测试 修改
   const testerModify = async (datas: any) => {
 
-    // 获取英文名
+    // 获取测试
     const nameIdArray: any = [];
     const testerArray = datas.tester;
     if (testerArray && testerArray.length > 0) {
@@ -517,27 +511,12 @@ const SprintList: React.FC<any> = () => {
 
   const commitTesterModify = () => {
     const oradata = formForTesterToMod.getFieldsValue();
-
     if (oradata.testToTester === '' || oradata.testToTester === null) {
-      message.error({
-        content: `对应测试不能为空！`,
-        duration: 1,
-        className: 'MNone',
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage(`对应测试不能为空！`);
       return;
     }
     if (oradata.testerChandaoType === '' || oradata.testerCHandaoID === '') {
-      message.error({
-        content: `禅道类型和禅道编号不能为空！`,
-        duration: 1,
-        className: 'MNone',
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage(`禅道类型和禅道编号不能为空！`);
       return;
     }
     const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
@@ -590,18 +569,11 @@ const SprintList: React.FC<any> = () => {
 
     const oradata = formForUEDToMod.getFieldsValue();
     if (oradata.uedChandaoType === '' || oradata.uedCHandaoID === '') {
-      message.error({
-        content: `禅道类型和禅道编号不能为空！`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage(`禅道类型和禅道编号不能为空！`);
       return;
     }
     const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
     const rowDatas = curRow[0];
-
     const datas = {
       id: rowDatas.id,
       project: prjId,
@@ -654,7 +626,6 @@ const SprintList: React.FC<any> = () => {
           break;
       }
     }
-
   };
 
   // 修改按钮点击事件
@@ -662,24 +633,12 @@ const SprintList: React.FC<any> = () => {
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
     // 没有选中则提醒
     if (selRows.length === 0) {
-      message.error({
-        content: '请选中需要修改的数据!',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage('请选中需要修改的数据!');
       return;
     }
     // 一次只能修改一条数据
     if (selRows.length > 1) {
-      message.error({
-        content: '一次只能修改一条数据!',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage('一次只能修改一条数据!');
       return;
     }
     authorityForMod(selRows[0]);
@@ -702,6 +661,7 @@ const SprintList: React.FC<any> = () => {
     solvedSelect: []
   });
 
+  // 获取表格中的数据
   const getGridData = () => {
     const datas: any = [];
     gridApi.current?.forEachNode((rows: any) => {
@@ -768,6 +728,9 @@ const SprintList: React.FC<any> = () => {
     const queryCondition = formForQuery.getFieldsValue();
     const filterData = filterDatasByCondition(queryCondition, data?.result);
     gridApi.current?.setRowData(filterData);
+    // 还要设置title
+    const countRt = calTypeCount(filterData);
+    setPageTitle(getStaticMessage(countRt));
   };
   /* endregion 下拉框动态加载 */
 
@@ -779,81 +742,25 @@ const SprintList: React.FC<any> = () => {
     // 判断是否选中数据
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
     if (selRows.length === 0) {
-      message.error({
-        content: '请选中需要删除的数据!',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage('请选中需要删除的数据!');
       return;
     }
     setIsDelModalVisible(true);
   };
 
-  const delSprintList = () => {
+  // 删除选中的数据
+  const delSprintList = async () => {
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
-    const deleteIdArray: any = [];
-    selRows.forEach((rows: any) => {
-      const {id} = rows;
-      if (rows.category === "1") {
-        deleteIdArray.push(`BUG_${id}`);
-      } else if (rows.category === "2") {
-        deleteIdArray.push(`TASK_${id}`);
-      } else if (rows.category === "3") {
-        deleteIdArray.push(`STORY_${id}`);
-      }
-    });
-
-    axios.delete('/api/sprint/project/child', {data: {data: deleteIdArray}})
-      .then(function (res) {
-        if (res.data.ok === true) {
-          setIsDelModalVisible(false);
-          updateGrid();
-          message.info({
-            content: "记录删除成功！",
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else if (Number(res.data.code) === 403) {
-          message.error({
-            content: "您无权删除明细！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `${res.data.message}`,
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-      })
-      .catch(function (error) {
-        if (error.toString().includes("403")) {
-          message.error({
-            content: "您无权删除明细！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: error.toString(),
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-      });
+    const result = await delSprintDetails(selRows);
+    if (result.ok === true) {
+      setIsDelModalVisible(false);
+      updateGrid();
+      sucMessage("记录删除成功！");
+    } else if (Number(result.code) === 403) {
+      errorMessage("您无权删除明细！");
+    } else {
+      errorMessage(`${result.message}`);
+    }
   };
 
   const DelCancel = () => {
@@ -870,14 +777,7 @@ const SprintList: React.FC<any> = () => {
   const moveProject = () => {
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
     if (selRows.length <= 0) {
-      message.error({
-        content: "请选择需要移动的数据！",
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
+      errorMessage("请选择需要移动的数据！");
       return;
     }
 
@@ -893,72 +793,22 @@ const SprintList: React.FC<any> = () => {
   };
 
   // 发送请求
-  const moveSprintList = () => {
+  const moveSprintList = async () => {
     // 获取被选择明细项
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
-    const idArray = [];
-    for (let index = 0; index < selRows.length; index += 1) {
-      const ztType = numberRenderToZentaoType({value: selRows[index].category});
-      idArray.push(`${ztType.toUpperCase()}_${selRows[index].id}`);
-    }
     const oradata = formForMove.getFieldsValue();
 
-    const params = {
-      "ids": idArray,
-      "source": prjId,
-      "target": oradata.moveNewPrj
-    };
-
-    axios.patch('/api/sprint/project/child/move', params)
-      .then(function (res) {
-        if (res.data.ok === true) {
-          setIsMoveModalVisible(false);
-          updateGrid();
-          message.info({
-            // content: res.data.message,
-            content: "明细移动成功！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else if (Number(res.data.code) === 403) {
-          message.error({
-            content: "您无权移动明细！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: res.data.verify === undefined ? res.data.message : res.data.verify,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-      })
-      .catch(function (error) {
-        if (error.toString().includes("403")) {
-          message.error({
-            content: "您无权移动明细！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `异常信息：${error.toString()}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-      });
+    const result = await moveSprintDetails(selRows, prjId, oradata);
+    if (result.ok === true) {
+      setIsMoveModalVisible(false);
+      updateGrid();
+      sucMessage("明细移动成功！");
+    } else if (Number(result.code) === 403) {
+      errorMessage("您无权移动明细！");
+    } else {
+      const messages = result.verify === undefined ? result.message : result.verify
+      errorMessage(messages.toString());
+    }
   };
 
   // 取消新增项目
@@ -990,13 +840,7 @@ const SprintList: React.FC<any> = () => {
     const prjName = `${values.prjNames}${values.prjDate.format('YYYYMMDD')}`;
     const datas: any = await queryRepeats(gqlClient, prjName);
     if (datas === null) {
-      message.error({
-        content: '判断重复数据失败！',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage('判断重复数据失败！')
     } else if (datas.ok === true) {  //  // 时间选择后禁用某些控件
       // 可以新增项目
       setisAble({shown: false});
@@ -1017,93 +861,23 @@ const SprintList: React.FC<any> = () => {
     const values = formForMoveAddAnaMod.getFieldsValue();
     const prjtype = values.prjNames;
     if (prjtype === null) {
-      message.error({
-        content: '项目类型不能为空!',
-        duration: 1,
-        className: 'AddNone',
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage('项目类型不能为空!');
       return;
     }
-
     if (values.prjStatus === null) {
-      message.error({
-        content: '项目状态不能为空!',
-        className: 'AddNone',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage('项目状态不能为空!')
       return;
     }
-
-    const prjdate = values.prjDate.format('YYYYMMDD');
-    const datas = {
-      name: `${prjtype}${prjdate}`,
-      type: 'MANUAL',
-      startAt: formatMomentTime(values.starttime),
-      endAt: formatMomentTime(values.testCutoff),
-      finishAt: formatMomentTime(values.testFinnished),
-      stageAt: formatMomentTime(values.planHuidu),
-      onlineAt: formatMomentTime(values.planOnline),
-      status: values.prjStatus,
-      creator: 'admin',
-    };
-    axios
-      .post('/api/sprint/project', datas)
-      .then(function (res) {
-        if (res.data.ok === true) {
-          setIsMoveModalVisible(false);
-          setIsMoveAddModalVisible(false);
-          // updateGrid();
-          message.info({
-            content: "新增项目成功！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else if (Number(res.data.code) === 403) {
-          message.error({
-            content: "您无权新增项目！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `${res.data.message}${res.data.zt.message.end[0]}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-      })
-      .catch(function (error) {
-        if (error.toString().includes("403")) {
-          message.error({
-            content: "您无权新增项目！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `异常信息：${error.toString()}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-
-      });
+    const result = await addNewProjects(values, prjtype);
+    if (result.ok === true) {
+      setIsMoveModalVisible(false);
+      setIsMoveAddModalVisible(false);
+      sucMessage("新增项目成功！");
+    } else if (Number(result.code) === 403) {
+      errorMessage("您无权新增项目！");
+    } else {
+      errorMessage(`${result.message}${result.zt.message.end[0]}`);
+    }
   };
 
   /* endregion */
@@ -1121,13 +895,7 @@ const SprintList: React.FC<any> = () => {
     if (selRows.length > 0) {
       return true;
     }
-    message.error({
-      content: `请至少选中一条记录进行操作！`,
-      duration: 1,
-      style: {
-        marginTop: '50vh',
-      },
-    });
+    errorMessage(`请至少选中一条记录进行操作！`);
     return false;
   };
 
@@ -1285,15 +1053,7 @@ const SprintList: React.FC<any> = () => {
     setFieldModalVisible(false);
     // 首先需要清空原有列，否则会导致列混乱
     gridApi.current?.setColumnDefs([]);
-
-    message.info({
-      content: "保存成功！",
-      duration: 1,
-      style: {
-        marginTop: '50vh',
-      },
-    });
-
+    sucMessage("保存成功！");
   };
   // 取消 按钮
   const fieldCancel = () => {
@@ -1305,46 +1065,18 @@ const SprintList: React.FC<any> = () => {
   const [refreshItem, setRefreshItem] = useState(false);
   const refreshGrid = async () => {
     setRefreshItem(true);
-    await axios.post('/api/project/system/sync/sprint/pdetail', {"pid": Number(prjId)})
-      .then(function (res) {
-
-        if (res.data.ok === true) {
-          updateGrid();
-          message.info({
-            content: "项目详情同步成功！",
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `错误：${res.data.message}`,
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-      })
-      .catch(function (error) {
-        message.error({
-          content: `异常信息：${error.toString()}`,
-          duration: 1, // 1S 后自动关闭
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      });
-
+    const result = await syncDetailsData(prjId);
+    if (result.ok === true) {
+      updateGrid();
+      sucMessage("项目详情同步成功！");
+    } else {
+      errorMessage(`错误：${result.message}`);
+    }
     setRefreshItem(false);
-
   };
-
   /* endregion */
 
   useEffect(() => {
-
     setPageTitle(getStaticMessage(data?.resCount));
     //   需要取出最初的指派给、测试、解决完成人，用于下拉框筛选
     const personData = getRelatedPersonName(data?.result);

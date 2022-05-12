@@ -31,19 +31,25 @@ import {getColums, setRowColor} from "./grid";
 import {
   queryDevelopViews, queryRepeats, LoadCombobox, LoadTesterCombobox, GetSprintProject
 } from "./data";
-import {errorMessage, infoMessage, sucMessage, warnMessage} from "@/publicMethods/showMessages";
+import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import defaultTreeSelectParams from "@/pages/shimo/fileBaseline/iterateList/defaultSetting";
 import {
   devCenterDept, getStageOption, getTypeOption, getAssignedToOption,
   getTesterOption, getSolvedByOption, filterDatasByCondition
 } from "./filter";
-import {requestModFlowStage, addSprintDetails, mosidySprintDetails, getZentaoInfo} from "./common/axiosRequest";
+import {
+  requestModFlowStage,
+  addSprintDetails,
+  delSprintDetails,
+  mosidySprintDetails,
+  moveSprintDetails,
+  getZentaoInfo
+} from "./common/axiosRequest";
+import {assertWrappingType} from "graphql";
 
 const {Option} = Select;
 const SprintList: React.FC<any> = () => {
   const {initialState} = useModel('@@initialState');
-  const sys_accessToken = localStorage.getItem("accessId");
-  axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
   const {prjId, prjNames, prjType} = getProjectInfo();
 
   /* region 整个模块都需要用到的表单定义 */
@@ -746,39 +752,18 @@ const SprintList: React.FC<any> = () => {
   };
 
   // 删除选中的数据
-  const delSprintList = () => {
+  const delSprintList = async () => {
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
-    const deleteIdArray: any = [];
-    selRows.forEach((rows: any) => {
-      const {id} = rows;
-      if (rows.category === "1") {
-        deleteIdArray.push(`BUG_${id}`);
-      } else if (rows.category === "2") {
-        deleteIdArray.push(`TASK_${id}`);
-      } else if (rows.category === "3") {
-        deleteIdArray.push(`STORY_${id}`);
-      }
-    });
-
-    axios.delete('/api/sprint/project/child', {data: {data: deleteIdArray}})
-      .then(function (res) {
-        if (res.data.ok === true) {
-          setIsDelModalVisible(false);
-          updateGrid();
-          sucMessage("记录删除成功！");
-        } else if (Number(res.data.code) === 403) {
-          errorMessage("您无权删除明细！");
-        } else {
-          errorMessage(`${res.data.message}`);
-        }
-      })
-      .catch(function (error) {
-        if (error.toString().includes("403")) {
-          errorMessage("您无权删除明细！");
-        } else {
-          errorMessage(error.toString());
-        }
-      });
+    const result = await delSprintDetails(selRows);
+    if (result.ok === true) {
+      setIsDelModalVisible(false);
+      updateGrid();
+      sucMessage("记录删除成功！");
+    } else if (Number(result.code) === 403) {
+      errorMessage("您无权删除明细！");
+    } else {
+      errorMessage(`${result.message}`);
+    }
   };
 
   const DelCancel = () => {
@@ -811,42 +796,22 @@ const SprintList: React.FC<any> = () => {
   };
 
   // 发送请求
-  const moveSprintList = () => {
+  const moveSprintList = async () => {
     // 获取被选择明细项
     const selRows: any = gridApi.current?.getSelectedRows(); // 获取选中的行
-    const idArray = [];
-    for (let index = 0; index < selRows.length; index += 1) {
-      const ztType = numberRenderToZentaoType({value: selRows[index].category});
-      idArray.push(`${ztType.toUpperCase()}_${selRows[index].id}`);
-    }
     const oradata = formForMove.getFieldsValue();
 
-    const params = {
-      "ids": idArray,
-      "source": prjId,
-      "target": oradata.moveNewPrj
-    };
-
-    axios.patch('/api/sprint/project/child/move', params)
-      .then(function (res) {
-        if (res.data.ok === true) {
-          setIsMoveModalVisible(false);
-          updateGrid();
-          sucMessage("明细移动成功！");
-        } else if (Number(res.data.code) === 403) {
-          errorMessage("您无权移动明细！");
-        } else {
-          const messages = res.data.verify === undefined ? res.data.message : res.data.verify
-          errorMessage(messages.toString());
-        }
-      })
-      .catch(function (error) {
-        if (error.toString().includes("403")) {
-          errorMessage("您无权移动明细！");
-        } else {
-          errorMessage(`异常信息：${error.toString()}`);
-        }
-      });
+    const result = await moveSprintDetails(selRows, prjId, oradata);
+    if (result.ok === true) {
+      setIsMoveModalVisible(false);
+      updateGrid();
+      sucMessage("明细移动成功！");
+    } else if (Number(result.code) === 403) {
+      errorMessage("您无权移动明细！");
+    } else {
+      const messages = result.verify === undefined ? result.message : result.verify
+      errorMessage(messages.toString());
+    }
   };
 
   // 取消新增项目

@@ -29,8 +29,7 @@ import {judgeAuthority} from "@/publicMethods/authorityJudge";
 import {useModel} from "@@/plugin-model/useModel";
 import {getColums, setRowColor} from "./grid";
 import {
-  queryDevelopViews, queryRepeats, getDeptMemner,
-  LoadCombobox, LoadTesterCombobox, GetSprintProject
+  queryDevelopViews, queryRepeats, LoadCombobox, LoadTesterCombobox, GetSprintProject
 } from "./data";
 import {errorMessage, infoMessage, sucMessage, warnMessage} from "@/publicMethods/showMessages";
 import defaultTreeSelectParams from "@/pages/shimo/fileBaseline/iterateList/defaultSetting";
@@ -38,11 +37,9 @@ import {
   devCenterDept, getStageOption, getTypeOption, getAssignedToOption,
   getTesterOption, getSolvedByOption, filterDatasByCondition
 } from "./filter";
-import {requestModFlowStage} from "./common/axiosRequest";
+import {requestModFlowStage, getZentaoInfo} from "./common/axiosRequest";
 
 const {Option} = Select;
-
-// 组件初始化
 const SprintList: React.FC<any> = () => {
   const {initialState} = useModel('@@initialState');
   const sys_accessToken = localStorage.getItem("accessId");
@@ -76,8 +73,6 @@ const SprintList: React.FC<any> = () => {
   /* endregion */
 
   /* region  表格相关事件 */
-
-  /* region  表格相关事件 */
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, prjId, prjType, true));
@@ -101,7 +96,7 @@ const SprintList: React.FC<any> = () => {
   };
   /* endregion */
 
-  /* region 其他 */
+  /* region 表格更新 */
   const updateGrid = async () => {
     const datas: any = await queryDevelopViews(gqlClient, prjId, prjType);
     gridApi.current?.setRowData(datas?.result);
@@ -109,6 +104,8 @@ const SprintList: React.FC<any> = () => {
   };
 
   /* endregion */
+
+  /* region  各个权限修改弹窗以及事件 */
 
   /* region admin 的新增功能和修改功能  */
   //  弹出框
@@ -119,126 +116,59 @@ const SprintList: React.FC<any> = () => {
   const [modal, setmodal] = useState({title: '新增明细行'});
 
   // 失去焦点后查询值
-  const checkZentaoInfo = (params: any) => {
+  const checkZentaoInfo = async (params: any) => {
     const ztno = params.target.value;
-    const addFormData = formForAdminToAddAnaMod.getFieldsValue();
-    const chanDaoType = addFormData.adminChandaoType;
+    const chanDaoType = formForAdminToAddAnaMod.getFieldValue("adminChandaoType");
     if (chanDaoType === '') {
-      message.error({
-        content: `禅道类型不能为空！`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage(`禅道类型不能为空！`);
       return;
     }
     if (ztno === '') {
-      message.error({
-        content: `禅道编号不能为空！`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage(`禅道编号不能为空！`);
       return;
     }
 
-    axios.get('/api/sprint/project/child', {
-      params: {
-        project: prjId,
-        category: chanDaoType,
-        ztNo: ztno,
-      },
-    }).then(function (res) {
-      if (res.data.ok === true) {
-        const queryDatas = res.data.ztRecord;
-
-        formForAdminToAddAnaMod.setFieldsValue({
-          adminCurStage: numberRenderToCurrentStage({
-            value: queryDatas.stage === undefined ? '' : queryDatas.stage.toString(),
-          }),
-          adminAddChandaoTitle: queryDatas.title,
-          adminAddSeverity: numberRenderToZentaoSeverity({
-            value: queryDatas.severity === null ? '' : queryDatas.severity.toString(),
-          }),
-          adminAddPriority: queryDatas.priority,
-          adminAddModule: queryDatas.module,
-          adminAddChandaoStatus: numberRenderToZentaoStatus({value: queryDatas.ztStatus === null ? '' : queryDatas.ztStatus.toString()}),
-          adminAddAssignTo: queryDatas.assignedTo,
-          adminAddSolvedBy: queryDatas.finishedBy === undefined ? queryDatas.resolvedBy : queryDatas.finishedBy,
-          adminAddClosedBy: queryDatas.closedBy,
-          // adminAddFeedbacker: queryDatas.feedback,
-          createTime_hidden: dayjs(queryDatas.openedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.openedAt).format("YYYY-MM-DD HH:mm:ss"),
-          activeTime_hidden: dayjs(queryDatas.activedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.activedAt).format("YYYY-MM-DD HH:mm:ss"),
-          resolveTime_hidden: dayjs(queryDatas.resolvedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.resolvedAt).format("YYYY-MM-DD HH:mm:ss")
-        });
-      } else {
-        if (Number(res.data.code) === 404) {
-          message.error({
-            content: `禅道不存在ID为${ztno}的${numberRenderToZentaoType({value: chanDaoType})}`,
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else if (Number(res.data.code) === 409) {
-          message.error({
-            content: `【${prjNames}】已存在ID为${ztno}的${numberRenderToZentaoType({value: chanDaoType})}`,
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else if (Number(res.data.code) === 403) {
-          message.error({
-            content: "您无权查询权限！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `${res.data.message}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-        formForAdminToAddAnaMod.setFieldsValue({
-          adminAddChandaoTitle: '',
-          adminAddSeverity: '',
-          adminAddPriority: '',
-          adminAddModule: '',
-          adminAddChandaoStatus: '',
-          adminAddAssignTo: '',
-          adminAddSolvedBy: '',
-          adminAddClosedBy: '',
-        });
-      }
-    })
-      .catch(function (error) {
-        if (error.toString().includes("403")) {
-          message.error({
-            content: "您无权查询权限！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `异常信息:${error.toString()}`,
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-
+    const result = await getZentaoInfo(prjId, chanDaoType, ztno);
+    if (result.ok === true) {
+      const queryDatas = result.ztRecord;
+      formForAdminToAddAnaMod.setFieldsValue({
+        adminCurStage: numberRenderToCurrentStage({
+          value: queryDatas.stage === undefined ? '' : queryDatas.stage.toString(),
+        }),
+        adminAddChandaoTitle: queryDatas.title,
+        adminAddSeverity: numberRenderToZentaoSeverity({
+          value: queryDatas.severity === null ? '' : queryDatas.severity.toString(),
+        }),
+        adminAddPriority: queryDatas.priority,
+        adminAddModule: queryDatas.module,
+        adminAddChandaoStatus: numberRenderToZentaoStatus({value: queryDatas.ztStatus === null ? '' : queryDatas.ztStatus.toString()}),
+        adminAddAssignTo: queryDatas.assignedTo,
+        adminAddSolvedBy: queryDatas.finishedBy === undefined ? queryDatas.resolvedBy : queryDatas.finishedBy,
+        adminAddClosedBy: queryDatas.closedBy,
+        // adminAddFeedbacker: queryDatas.feedback,
+        createTime_hidden: dayjs(queryDatas.openedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.openedAt).format("YYYY-MM-DD HH:mm:ss"),
+        activeTime_hidden: dayjs(queryDatas.activedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.activedAt).format("YYYY-MM-DD HH:mm:ss"),
+        resolveTime_hidden: dayjs(queryDatas.resolvedAt).format("YYYY-MM-DD HH:mm:ss") === "Invalid Date" ? '' : dayjs(queryDatas.resolvedAt).format("YYYY-MM-DD HH:mm:ss")
       });
+    } else {
+      if (Number(result.code) === 404) {
+        errorMessage(`禅道不存在ID为${ztno}的${numberRenderToZentaoType({value: chanDaoType})}`);
+      } else if (Number(result.code) === 409) {
+        errorMessage(`【${prjNames}】已存在ID为${ztno}的${numberRenderToZentaoType({value: chanDaoType})}`);
+      } else {
+        errorMessage(`${result.message.toString()}`);
+      }
+      formForAdminToAddAnaMod.setFieldsValue({
+        adminAddChandaoTitle: '',
+        adminAddSeverity: '',
+        adminAddPriority: '',
+        adminAddModule: '',
+        adminAddChandaoStatus: '',
+        adminAddAssignTo: '',
+        adminAddSolvedBy: '',
+        adminAddClosedBy: '',
+      });
+    }
   };
 
   // 点击新增按钮赋值弹出窗
@@ -796,7 +726,7 @@ const SprintList: React.FC<any> = () => {
     if (initialState?.currentUser) {
       currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
     }
-    currentUserGroup = 'superGroup';
+    // currentUserGroup = 'superGroup';
     if (currentUserGroup !== undefined) {
       switch (currentUserGroup.toString()) {
         case 'superGroup':

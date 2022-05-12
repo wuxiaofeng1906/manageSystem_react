@@ -140,12 +140,9 @@ const OnlineBranch: React.FC<any> = () => {
 
   // 根据分支名称获取服务
   const showServerSelect = async (params: any) => {
-    debugger;
-
     setOnlineBranchFormSelected({
       ...onlineBranchFormSelected,
       server: await loadServiceSelect(params),
-
     });
     formForOnlineBranch.setFieldsValue({
       server: []

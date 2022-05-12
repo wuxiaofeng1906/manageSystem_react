@@ -1462,13 +1462,23 @@ const SprintList: React.FC<any> = () => {
     }
   };
 
+  // 批量修改测试
+  const testConfirmSelect = () => {
+    if (judgingSelectdRow()) {
+      const selRows: any = gridApi.current?.getSelectedRows();
+      selRows.forEach((row: any) => {
+
+      });
+
+    }
+  }
   /* endregion */
 
   /* region 设置字段 */
   const [isFieldModalVisible, setFieldModalVisible] = useState(false);
   const [selectedFiled, setSelectedFiled] = useState(['']);
   const nessField = ['选择', '类型', '编号']; // 必需的列
-  const unNessField = ['阶段', '测试', '测试验证', '标题内容', '创建时间', '解决时间', '所属计划', '严重等级', '截止日期', '模块', '状态', '已提测', '发布环境',
+  const unNessField = ['阶段', '测试', '测试确认', '标题内容', '创建时间', '解决时间', '所属计划', '严重等级', '截止日期', '模块', '状态', '已提测', '发布环境',
     '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', "是否涉及页面调整", '是否可热更', '是否有数据升级',
     '是否有接口升级', '是否有预置数据', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人'];
 
@@ -1700,7 +1710,6 @@ const SprintList: React.FC<any> = () => {
                       onClick={moveProject}>移动</Button>
 
               <label style={{marginTop: '5px', fontWeight: 'bold', marginLeft: "10px"}}>操作流程:</label>
-
               <Button type="text"
                       style={{display: judgeAuthority("打基线") === true ? "inline" : "none"}}
                       icon={<CheckSquareTwoTone/>}
@@ -1735,7 +1744,18 @@ const SprintList: React.FC<any> = () => {
                       style={{marginLeft: "-25px", display: judgeAuthority("线上已验证") === true ? "inline" : "none"}}
                       icon={<CheckSquareTwoTone/>}
                       onClick={flowForOnlineChecked}>线上已验证</Button>
-
+              <label
+                style={{marginTop: '5px', display: judgeAuthority("线上已验证") === true ? "inline" : "none"}}>
+                测试确认:</label>
+              <Select placeholder="请选择" style={{
+                marginLeft: "5px", width: '100px', marginTop: '4px',
+                display: judgeAuthority("线上已验证") === true ? "inline" : "none"
+              }} size={"small"} onChange={testConfirmSelect}>
+                {[
+                  <Option key={'1'} value={'1'}>是</Option>,
+                  <Option key={'0'} value={'0'}>否</Option>,
+                ]}
+              </Select>
             </div>
           </Col>
           <Col span={1} style={{textAlign: "right",}}>
@@ -1745,7 +1765,6 @@ const SprintList: React.FC<any> = () => {
             </div>
 
           </Col>
-
           <Col span={1} style={{textAlign: "right",}}>
             <div>
               <Button type="text" icon={<SettingOutlined/>} onClick={showFieldsModal}> </Button>
@@ -1753,7 +1772,6 @@ const SprintList: React.FC<any> = () => {
           </Col>
 
         </Row>
-
         {/* ag-grid 表格定义 */}
         <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
           <AgGridReact
@@ -2905,7 +2923,7 @@ const SprintList: React.FC<any> = () => {
                   <Checkbox value="测试">测试</Checkbox>
                 </Col>
                 <Col span={4}>
-                  <Checkbox value="测试验证">测试验证</Checkbox>
+                  <Checkbox value="测试确认">测试确认</Checkbox>
                 </Col>
                 <Col span={4}>
                   <Checkbox value="标题内容">标题内容</Checkbox>

@@ -70,7 +70,7 @@ const getColums = (prjNames: any) => {
       },
     },
     {
-      headerName: '测试验证',
+      headerName: '测试确认',
       field: 'testConfirmed',
       pinned: 'left',
       minWidth: 105,

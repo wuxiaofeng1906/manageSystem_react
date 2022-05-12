@@ -464,13 +464,7 @@ const SprintList: React.FC<any> = () => {
   const commitManagerModify = () => {
     const oradata = formForManagerToMod.getFieldsValue();
     if (oradata.testerChandaoType === '' || oradata.testerCHandaoID === '') {
-      message.error({
-        content: `禅道类型和禅道编号不能为空！`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage(`禅道类型和禅道编号不能为空！`);
       return;
     }
     const datas = alayManagerData(oradata, gridApi.current?.getSelectedRows(), prjId);
@@ -483,7 +477,7 @@ const SprintList: React.FC<any> = () => {
   // 测试 修改
   const testerModify = async (datas: any) => {
 
-    // 获取英文名
+    // 获取测试
     const nameIdArray: any = [];
     const testerArray = datas.tester;
     if (testerArray && testerArray.length > 0) {

@@ -281,7 +281,7 @@ const SprintList: React.FC<any> = () => {
 
   // 点击修改按钮赋值弹出窗
   const adminModify = async (datas: any) => {
-    debugger;
+
     // 还要获取英文名
     const nameIdArray: any = [];
     const teters = datas.tester;
@@ -617,7 +617,7 @@ const SprintList: React.FC<any> = () => {
       managerPreData: datas.presetData,
       managerSuggestion: datas.scopeLimit,
       managerTitle: datas.title,
-      managertesterVerifi: datas.testCheck,
+      managertesterVerifi: datas.testCheck === "-0" ? "0" : datas.testCheck === "-1" ? "1" : datas.testCheck,
     });
     setformForManagerToModVisible(true);
   };
@@ -650,9 +650,18 @@ const SprintList: React.FC<any> = () => {
   // 测试 修改
   const testerModify = async (datas: any) => {
     // 获取英文名
-    const teters = datas.tester.split(';');
-    const deptUsers = await getDeptMemner(gqlClient, "测试");
-    const nameIdArray = getUsersId(deptUsers, teters);
+    const nameIdArray: any = [];
+    const testerArray = datas.tester;
+    if (testerArray && testerArray.length > 0) {
+      testerArray.forEach((tester: any) => {
+        nameIdArray.push(tester.id);
+      });
+    } else {
+      nameIdArray.push("NA");
+    }
+    // const teters = datas.tester.split(';');
+    // const deptUsers = await getDeptMemner(gqlClient, "测试");
+    // const nameIdArray = getUsersId(deptUsers, teters);
     formForTesterToMod.setFieldsValue({
       testerChandaoType: numberRenderToZentaoType({value: datas.category === null ? '' : datas.category.toString()}),
       testerCHandaoID: datas.ztNo,
@@ -787,7 +796,7 @@ const SprintList: React.FC<any> = () => {
     if (initialState?.currentUser) {
       currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
     }
-    // currentUserGroup = 'devGroup';
+    currentUserGroup = 'superGroup';
     if (currentUserGroup !== undefined) {
       switch (currentUserGroup.toString()) {
         case 'superGroup':
@@ -1561,7 +1570,6 @@ const SprintList: React.FC<any> = () => {
       solvedBy: personData?.solvedBy
     });
   }, [data]);
-
 
   const leftStyle = {marginLeft: '20px'};
   const rightStyle = {marginLeft: '30px'};
@@ -2487,7 +2495,6 @@ const SprintList: React.FC<any> = () => {
             </Col>
 
           </Row>
-
           <Row gutter={16}>
             <Col className="gutter-row">
               <div style={{marginLeft: '45px'}}>

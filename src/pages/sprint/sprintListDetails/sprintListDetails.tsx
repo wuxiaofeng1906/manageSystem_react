@@ -22,7 +22,6 @@ import {
   numberRenderToCurrentStage, stageChangeToNumber, numberRenderToZentaoType,
   zentaoTypeRenderToNumber, numberRenderToZentaoSeverity, numberRenderToZentaoStatus,
 } from '@/publicMethods/cellRenderer';
-import {getUsersId} from '@/publicMethods/userMethod';
 import axios from 'axios';
 import moment from "moment";
 import {getHeight} from '@/publicMethods/pageSet';
@@ -39,6 +38,7 @@ import {
   devCenterDept, getStageOption, getTypeOption, getAssignedToOption,
   getTesterOption, getSolvedByOption, filterDatasByCondition
 } from "./filter";
+import {requestModFlowStage} from "./common/axiosRequest";
 
 const {Option} = Select;
 
@@ -1337,77 +1337,16 @@ const SprintList: React.FC<any> = () => {
     }
   };
 
-  const modFlowStage = (content: any, values: any) => {
-
+  // 修改操作流程
+  const modFlowStage = async (content: any, values: any) => {
     const selRows: any = gridApi.current?.getSelectedRows();
-    const selIds = [];
-    for (let index = 0; index < selRows.length; index += 1) {
-      const rows = selRows[index];
-      if (rows.category === "1") {
-        selIds.push(`BUG_${rows.id}`);
-      } else if (rows.category === "2") {
-        selIds.push(`TASK_${rows.id}`);
-      } else if (rows.category === "3") {
-        selIds.push(`STORY_${rows.id}`);
-      }
+    const result = await requestModFlowStage(selRows, content, values);
+    if (result.code === 200) {
+      setIsFlowModalVisible(false);
+      setIsRevokeModalVisible(false);
+      updateGrid();
+      sucMessage("修改成功！");
     }
-    const params = {
-      id: selIds,
-      attribute: content,
-      value: values,
-    };
-
-    axios.patch('/api/sprint/project/child', params)
-      .then(function (res) {
-        if (res.data.ok === true) {
-          setIsFlowModalVisible(false);
-          setIsRevokeModalVisible(false);
-          updateGrid();
-          message.info({
-            content: "修改成功！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else if (Number(res.data.code) === 403) {
-          message.error({
-            content: "您无修改权限！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `${res.data.message}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-      })
-      .catch(function (error) {
-        if (error.toString().includes("403")) {
-          message.error({
-            content: "您无修改权限！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `异常信息：${error.toString()}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-
-      });
   };
 
   const commitFlow = () => {

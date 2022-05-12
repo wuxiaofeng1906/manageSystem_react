@@ -14,7 +14,11 @@ const axiosGet = async (url: string, queryData: any = {}) => {
       result = res.data.data;
     })
     .catch((error: string) => {
-      errorMessage(`异常信息:${error.toString()}`);
+      if (error.toString().includes("403")) {
+        errorMessage("您无操作权限！");
+      } else {
+        errorMessage(`异常信息:${error.toString()}`);
+      }
     });
 
   return result;
@@ -30,7 +34,11 @@ const axiosDelete = async (url: string, queryData: any = {}) => {
       result = res.data;
     })
     .catch((error: string) => {
-      errorMessage(`异常信息:${error.toString()}`);
+      if (error.toString().includes("403")) {
+        errorMessage("您无操作权限！");
+      } else {
+        errorMessage(`异常信息:${error.toString()}`);
+      }
     });
   return result;
 };
@@ -44,7 +52,11 @@ const axiosPost = async (url: string, bodyData: any = {}, queryData: any = {}) =
     .then((res: any) => {
       result = res.data;
     }).catch((error) => {
-      errorMessage(`异常信息:${error.toString()}`);
+      if (error.toString().includes("403")) {
+        errorMessage("您无操作权限！");
+      } else {
+        errorMessage(`异常信息:${error.toString()}`);
+      }
     });
   return result;
 };
@@ -57,7 +69,11 @@ const axiosPut = async (url: string, bodyData: any = {}, queryData: any = {}) =>
     .then((res: any) => {
       result = res.data;
     }).catch((error) => {
-      errorMessage(`异常信息:${error.toString()}`);
+      if (error.toString().includes("403")) {
+        errorMessage("您无操作权限！");
+      } else {
+        errorMessage(`异常信息:${error.toString()}`);
+      }
     });
   return result;
 };
@@ -65,13 +81,15 @@ const axiosPut = async (url: string, bodyData: any = {}, queryData: any = {}) =>
 // patch
 const axiosPatch = async (url: string, bodyData: any = {}) => {
   let result: any = {};
-
-  await axios.put(url, bodyData)
-    .then((res: any) => {
-      result = res.data;
-    }).catch((error) => {
+  await axios.patch(url, bodyData).then((res: any) => {
+    result = res.data;
+  }).catch((error) => {
+    if (error.toString().includes("403")) {
+      errorMessage("您无操作权限！");
+    } else {
       errorMessage(`异常信息:${error.toString()}`);
-    });
+    }
+  });
   return result;
 };
 

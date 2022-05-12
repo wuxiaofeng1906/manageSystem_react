@@ -22,7 +22,6 @@ import {
   numberRenderToCurrentStage, stageChangeToNumber, numberRenderToZentaoType,
   zentaoTypeRenderToNumber, numberRenderToZentaoSeverity, numberRenderToZentaoStatus,
 } from '@/publicMethods/cellRenderer';
-import axios from 'axios';
 import moment from "moment";
 import {getHeight} from '@/publicMethods/pageSet';
 import {judgeAuthority} from "@/publicMethods/authorityJudge";
@@ -38,14 +37,9 @@ import {
   getTesterOption, getSolvedByOption, filterDatasByCondition
 } from "./filter";
 import {
-  requestModFlowStage,
-  addSprintDetails,
-  delSprintDetails,
-  mosidySprintDetails,
-  moveSprintDetails,
-  getZentaoInfo
+  requestModFlowStage, addSprintDetails, delSprintDetails, mosidySprintDetails,
+  moveSprintDetails, addNewProjects, getZentaoInfo, syncDetailsData
 } from "./common/axiosRequest";
-import {assertWrappingType} from "graphql";
 
 const {Option} = Select;
 const SprintList: React.FC<any> = () => {
@@ -867,76 +861,20 @@ const SprintList: React.FC<any> = () => {
       errorMessage('项目类型不能为空!');
       return;
     }
-
     if (values.prjStatus === null) {
       errorMessage('项目状态不能为空!')
       return;
     }
-
-    const prjdate = values.prjDate.format('YYYYMMDD');
-    const datas = {
-      name: `${prjtype}${prjdate}`,
-      type: 'MANUAL',
-      startAt: formatMomentTime(values.starttime),
-      endAt: formatMomentTime(values.testCutoff),
-      finishAt: formatMomentTime(values.testFinnished),
-      stageAt: formatMomentTime(values.planHuidu),
-      onlineAt: formatMomentTime(values.planOnline),
-      status: values.prjStatus,
-      creator: 'admin',
-    };
-    axios
-      .post('/api/sprint/project', datas)
-      .then(function (res) {
-        if (res.data.ok === true) {
-          setIsMoveModalVisible(false);
-          setIsMoveAddModalVisible(false);
-          // updateGrid();
-          message.info({
-            content: "新增项目成功！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else if (Number(res.data.code) === 403) {
-          message.error({
-            content: "您无权新增项目！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `${res.data.message}${res.data.zt.message.end[0]}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-      })
-      .catch(function (error) {
-        if (error.toString().includes("403")) {
-          message.error({
-            content: "您无权新增项目！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `异常信息：${error.toString()}`,
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-
-      });
+    const result = await addNewProjects(values, prjtype);
+    if (result.ok === true) {
+      setIsMoveModalVisible(false);
+      setIsMoveAddModalVisible(false);
+      sucMessage("新增项目成功！");
+    } else if (Number(result.code) === 403) {
+      errorMessage("您无权新增项目！");
+    } else {
+      errorMessage(`${result.message}${result.zt.message.end[0]}`);
+    }
   };
 
   /* endregion */
@@ -1124,40 +1062,14 @@ const SprintList: React.FC<any> = () => {
   const [refreshItem, setRefreshItem] = useState(false);
   const refreshGrid = async () => {
     setRefreshItem(true);
-    await axios.post('/api/project/system/sync/sprint/pdetail', {"pid": Number(prjId)})
-      .then(function (res) {
-
-        if (res.data.ok === true) {
-          updateGrid();
-          message.info({
-            content: "项目详情同步成功！",
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `错误：${res.data.message}`,
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-      })
-      .catch(function (error) {
-        message.error({
-          content: `异常信息：${error.toString()}`,
-          duration: 1, // 1S 后自动关闭
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      });
-
+    const result = await syncDetailsData(prjId);
+    if (result.ok === true) {
+      updateGrid();
+      sucMessage("项目详情同步成功！");
+    } else {
+      errorMessage(`错误：${result.message}`);
+    }
     setRefreshItem(false);
-
   };
   /* endregion */
 

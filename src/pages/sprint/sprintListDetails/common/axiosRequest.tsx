@@ -1,5 +1,7 @@
 import {axiosGet, axiosGet_TJ, axiosDelete, axiosPost, axiosPut, axiosPatch} from "@/publicMethods/axios";
 import {numberRenderToZentaoType} from "@/publicMethods/cellRenderer";
+import {errorMessage} from "@/publicMethods/showMessages";
+import {formatMomentTime} from "@/publicMethods/timeMethods";
 
 // 失去焦点后查询
 const getZentaoInfo = async (prjId: any, chanDaoType: any, ztno: any) => {
@@ -55,6 +57,26 @@ const moveSprintDetails = async (selRows: any, prjId: any, oradata: any) => {
 
   return await axiosPatch('/api/sprint/project/child/move', params)
 };
+
+// 新增项目
+const addNewProjects = async (values: any, prjtype: any) => {
+
+  const prjdate = values.prjDate.format('YYYYMMDD');
+  const datas = {
+    name: `${prjtype}${prjdate}`,
+    type: 'MANUAL',
+    startAt: formatMomentTime(values.starttime),
+    endAt: formatMomentTime(values.testCutoff),
+    finishAt: formatMomentTime(values.testFinnished),
+    stageAt: formatMomentTime(values.planHuidu),
+    onlineAt: formatMomentTime(values.planOnline),
+    status: values.prjStatus,
+    creator: 'admin',
+  };
+
+  return await axiosPost('/api/sprint/project', datas);
+};
+
 // 修改操作流程相关字段
 const requestModFlowStage = async (selRows: any, content: any, values: any) => {
 
@@ -79,5 +101,12 @@ const requestModFlowStage = async (selRows: any, content: any, values: any) => {
 
 };
 
+// 同步数据
+const syncDetailsData = async (prjId: any) => {
+  return await axiosPost('/api/project/system/sync/sprint/pdetail', {"pid": Number(prjId)});
+};
 
-export {requestModFlowStage, addSprintDetails, mosidySprintDetails, delSprintDetails, moveSprintDetails, getZentaoInfo};
+export {
+  requestModFlowStage, addSprintDetails, mosidySprintDetails, delSprintDetails, moveSprintDetails,
+  addNewProjects, getZentaoInfo, syncDetailsData
+};

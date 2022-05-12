@@ -1,4 +1,4 @@
-import {axiosGet, axiosGet_TJ,axiosDelete, axiosPost, axiosPut, axiosPatch} from "@/publicMethods/axios";
+import {axiosGet, axiosGet_TJ, axiosDelete, axiosPost, axiosPut, axiosPatch} from "@/publicMethods/axios";
 
 // 失去焦点后查询
 const getZentaoInfo = async (prjId: any, chanDaoType: any, ztno: any) => {
@@ -8,6 +8,17 @@ const getZentaoInfo = async (prjId: any, chanDaoType: any, ztno: any) => {
     ztNo: ztno,
   }
   return await axiosGet_TJ('/api/sprint/project/child', params);
+};
+
+// 新增表单数据
+const addSprintDetails = async (datas: any) => {
+
+  return await axiosPost('/api/sprint/project/child', datas)
+};
+
+// 修改表单数据
+const mosidySprintDetails = async (datas: any) => {
+  return await axiosPut('/api/sprint/project/child', datas);
 };
 // 修改操作流程相关字段
 const requestModFlowStage = async (selRows: any, content: any, values: any) => {
@@ -34,4 +45,4 @@ const requestModFlowStage = async (selRows: any, content: any, values: any) => {
 };
 
 
-export {requestModFlowStage, getZentaoInfo};
+export {requestModFlowStage, addSprintDetails, mosidySprintDetails, getZentaoInfo};

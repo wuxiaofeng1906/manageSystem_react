@@ -37,7 +37,7 @@ import {
   devCenterDept, getStageOption, getTypeOption, getAssignedToOption,
   getTesterOption, getSolvedByOption, filterDatasByCondition
 } from "./filter";
-import {requestModFlowStage, getZentaoInfo} from "./common/axiosRequest";
+import {requestModFlowStage, addSprintDetails, mosidySprintDetails, getZentaoInfo} from "./common/axiosRequest";
 
 const {Option} = Select;
 const SprintList: React.FC<any> = () => {
@@ -269,135 +269,38 @@ const SprintList: React.FC<any> = () => {
   };
 
   //  发送请求 新增数据
-  const addCommitDetails = (datas: any) => {
-    axios
-      .post('/api/sprint/project/child', datas)
-      .then(function (res) {
-
-        if (res.data.ok === true) {
-          setIsAddModalVisible(false);
-          updateGrid();
-          message.info({
-            content: "明细新增成功！",
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else if (Number(res.data.code) === 403) {
-          message.error({
-            content: "您无权新增明细！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else if (Number(res.data.code) === 409) {
-          message.error({
-            content: `【${prjNames}】已存在ID为${datas.ztNo}的${numberRenderToZentaoType({value: datas.category})}`,
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `${res.data.message}`,
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-      })
-      .catch(function (error) {
-        if (error.toString().includes("403")) {
-          message.error({
-            content: "您无权新增明细！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `异常信息：${error.toString()}`,
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-
-      });
+  const addCommitDetails = async (datas: any) => {
+    const result = await addSprintDetails(datas);
+    if (result.ok === true) {
+      setIsAddModalVisible(false);
+      updateGrid();
+      sucMessage("明细新增成功！");
+    } else if (Number(result.code) === 403) {
+      errorMessage("您无权新增明细！");
+    } else if (Number(result.code) === 409) {
+      errorMessage(`【${prjNames}】已存在ID为${datas.ztNo}的${numberRenderToZentaoType({value: datas.category})}`);
+    } else {
+      errorMessage(`${result.message}`);
+    }
   };
 
   //   发送请求 修改数据
-  const modCommitDetails = (datas: any) => {
-
-    axios
-      .put('/api/sprint/project/child', datas)
-      .then(function (res) {
-        if (res.data.ok === true) {
-          setformForTesterToModVisible(false);
-          setIsAddModalVisible(false);
-          setformForManagerToModVisible(false);
-          setformForUEDToModVisible(false);
-          updateGrid();
-          message.info({
-            content: "修改成功！",
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else if (Number(res.data.code) === 409) {
-          message.error({
-            content: `【${prjNames}】已存在ID为${datas.ztNo}的${numberRenderToZentaoType({value: datas.category})}`,
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else if (Number(res.data.code) === 403) {
-          message.error({
-            content: "您无修改权限！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: `${res.data.message}`,
-            duration: 1, // 1S 后自动关闭
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-      })
-      .catch(function (error) {
-        if (error.toString().includes("403")) {
-          message.error({
-            content: "您无修改权限！",
-            duration: 1,
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        } else {
-          message.error({
-            content: error.toString(),
-            duration: 1,
-            className: 'ModError',
-            style: {
-              marginTop: '50vh',
-            },
-          });
-        }
-
-      });
+  const modCommitDetails = async (datas: any) => {
+    const result = await mosidySprintDetails(datas);
+    if (result.ok === true) {
+      setformForTesterToModVisible(false);
+      setIsAddModalVisible(false);
+      setformForManagerToModVisible(false);
+      setformForUEDToModVisible(false);
+      updateGrid();
+      sucMessage("修改成功！");
+    } else if (Number(result.code) === 403) {
+      errorMessage("您无权修改明细！");
+    } else if (Number(result.code) === 409) {
+      errorMessage(`【${prjNames}】已存在ID为${datas.ztNo}的${numberRenderToZentaoType({value: datas.category})}`);
+    } else {
+      errorMessage(`${result.message}`);
+    }
   };
 
   // commit 事件 admin 新增和修改的操作

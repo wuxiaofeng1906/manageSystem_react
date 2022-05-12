@@ -245,7 +245,6 @@ const getColums = (prjNames: any) => {
     {
       headerName: '是否需要测试验证',
       field: 'testCheck',
-      pinned: "right",
       cellRenderer: (params: any) => {
         // testCheck: 手动修改标识: "-1"、"-0";自动的是：0 ，1
         // 自动规则生成的‘是’默认黑色，自动规则生成的‘否’默认红色

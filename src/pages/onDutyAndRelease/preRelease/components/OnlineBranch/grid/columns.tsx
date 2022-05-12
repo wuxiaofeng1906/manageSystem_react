@@ -253,13 +253,13 @@ const beforeOnlineVersionCheck = (params: any) => {
   //   onclick='versionCheckLogUrlClick(${JSON.stringify(values.check_url)})'>
   //     <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
   //  </Button>
-  let gotoUrl = "";
-  if (values.check_url) {
-    gotoUrl = `
-            <a href="${values.check_url}" target={'_black'}>
-                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
-            </a>`;
-  }
+  // let gotoUrl = "";
+  // if (values.check_url) {
+  //   gotoUrl = `
+  //           <a href="${values.check_url}" target={'_black'} onClick="">
+  //               <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+  //           </a>`;
+  // }
   return `
         <div>
           <div style="margin-top: -10px;margin-left: 120px">
@@ -268,7 +268,10 @@ const beforeOnlineVersionCheck = (params: any) => {
             onclick='excuteCheckData("versionCheck",${checkNum},${JSON.stringify(result)})'>
               <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
             </Button>
-            ${gotoUrl}
+           <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC"
+                onclick='versionCheckLogUrlClick(${JSON.stringify(values.check_url)})'>
+                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+            </Button>
           </div>
           <div style="margin-top: -20px;width: 210px">
               <div style="font-size: 10px">

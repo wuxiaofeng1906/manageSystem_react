@@ -705,7 +705,6 @@ const OnlineBranch: React.FC<any> = () => {
                     treeDefaultExpandAll
                     treeData={onlineBranchFormSelected.server}
                     showSearch
-                    showCheckedStrategy={SHOW_PARENT}
                   >
                   </TreeSelect>
 

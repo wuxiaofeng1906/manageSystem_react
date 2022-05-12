@@ -238,7 +238,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
   // baseline
   const {data} = await client.query(`
       {
-        proDetaiWithUser(project:${prjID},category:"${prjType}"){
+        proDetaiWithUser(project:${prjID},category:"${prjType}",order:ASC,doSync:${syncQuery}){
             planName
             id
             stage

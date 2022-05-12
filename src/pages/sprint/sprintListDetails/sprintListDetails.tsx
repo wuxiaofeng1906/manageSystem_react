@@ -28,7 +28,7 @@ import {judgeAuthority} from "@/publicMethods/authorityJudge";
 import {useModel} from "@@/plugin-model/useModel";
 import {getColums, setRowColor} from "./grid";
 import {
-  queryDevelopViews, queryRepeats, LoadCombobox, LoadTesterCombobox, GetSprintProject
+  queryDevelopViews, queryRepeats, LoadCombobox, LoadTesterCombobox, GetSprintProject, calTypeCount
 } from "./data";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import defaultTreeSelectParams from "@/pages/shimo/fileBaseline/iterateList/defaultSetting";
@@ -728,6 +728,9 @@ const SprintList: React.FC<any> = () => {
     const queryCondition = formForQuery.getFieldsValue();
     const filterData = filterDatasByCondition(queryCondition, data?.result);
     gridApi.current?.setRowData(filterData);
+    // 还要设置title
+    const countRt = calTypeCount(filterData);
+    setPageTitle(getStaticMessage(countRt));
   };
   /* endregion 下拉框动态加载 */
 

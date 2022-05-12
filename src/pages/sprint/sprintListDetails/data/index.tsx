@@ -487,4 +487,4 @@ const GetSprintProject = () => {
 };
 
 
-export {queryDevelopViews, queryRepeats, getDeptMemner, LoadCombobox, LoadTesterCombobox, GetSprintProject}
+export {queryDevelopViews, queryRepeats, getDeptMemner, LoadCombobox, LoadTesterCombobox, GetSprintProject,calTypeCount}

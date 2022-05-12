@@ -235,7 +235,7 @@ const SprintList: React.FC<any> = () => {
         value: datas.stage === null ? '' : datas.stage.toString(),
       }),
       adminAddTester: nameIdArray,
-      adminChandaoType: datas.category,
+      adminChandaoType: datas.category === "-3" ? "3" : datas.category,
       adminChandaoId: datas.ztNo,
       adminAddChandaoTitle: datas.title,
       adminAddSeverity: datas.severity,
@@ -579,6 +579,7 @@ const SprintList: React.FC<any> = () => {
   /* region 测试 权限操作 */
   // 测试 修改
   const testerModify = async (datas: any) => {
+
     // 获取英文名
     const nameIdArray: any = [];
     const testerArray = datas.tester;
@@ -726,7 +727,7 @@ const SprintList: React.FC<any> = () => {
     if (initialState?.currentUser) {
       currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
     }
-    // currentUserGroup = 'superGroup';
+    // currentUserGroup = 'UedGroup';
     if (currentUserGroup !== undefined) {
       switch (currentUserGroup.toString()) {
         case 'superGroup':

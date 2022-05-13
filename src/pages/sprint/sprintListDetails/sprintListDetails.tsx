@@ -888,6 +888,7 @@ const SprintList: React.FC<any> = () => {
   const [buttonMessage, setButtonHintMessage] = useState({hintMessage: ''});
   const [isFlowModalVisible, setIsFlowModalVisible] = useState(false); // 其他流程按钮
   const [flowHitmessage, setFlowHitmessage] = useState({hintMessage: ''});
+  const [testConfirm, setTestConfirm] = useState(undefined);
 
   // 判断是否有勾选一条数据
   const judgingSelectdRow = () => {
@@ -948,6 +949,8 @@ const SprintList: React.FC<any> = () => {
       setIsRevokeModalVisible(false);
       updateGrid();
       sucMessage("修改成功！");
+      //   测试确认需要清空
+      setTestConfirm(undefined);
     }
   };
 
@@ -1011,6 +1014,7 @@ const SprintList: React.FC<any> = () => {
       // selRows.forEach((row: any) => {
       //
       // });
+      setTestConfirm(params);
       modFlowStage("testConfirmed", params);
     }
   }
@@ -1253,7 +1257,7 @@ const SprintList: React.FC<any> = () => {
               <label
                 style={{marginTop: '5px', display: judgeAuthority("线上已验证") === true ? "inline" : "none"}}>
                 测试确认:</label>
-              <Select placeholder="请选择" style={{
+              <Select placeholder="请选择" value={testConfirm} style={{
                 marginLeft: "5px", width: '100px', marginTop: '4px',
                 display: judgeAuthority("线上已验证") === true ? "inline" : "none"
               }} size={"small"} onChange={testConfirmSelect}>

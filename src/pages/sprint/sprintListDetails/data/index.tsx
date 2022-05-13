@@ -245,6 +245,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             tester{
               id
               name
+              tech
               dept{
                 id
                 name
@@ -259,6 +260,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             ztStatus
             assignedTo{
               id
+              tech
               name
               dept{
                 id
@@ -267,6 +269,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             }
             finishedBy{
               id
+              tech
               name
               dept{
                 id

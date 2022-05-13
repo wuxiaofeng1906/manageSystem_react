@@ -1113,9 +1113,10 @@ const SprintList: React.FC<any> = () => {
           <Row gutter={5} style={{background: 'white', marginTop: "5px", height: 30}}>
             <Col span={8}>
               <Form.Item label="部门/组" name={"dept"}>
-                <TreeSelect className={"deptTree"} size={"small"} disabled={true}
+                <TreeSelect className={"deptTree"} size={"small"}
                             {...defaultTreeSelectParams}
-                            placeholder={'开发中'}
+                  // disabled={}
+                  // placeholder={'开发中'}
                             onFocus={onDeptSelectFocus}
                             treeData={selectOption.deptSelect}
                             onChange={onSelectChanged}

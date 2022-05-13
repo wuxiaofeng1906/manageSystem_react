@@ -282,19 +282,45 @@ const getSolvedByOption = (personName: any, gridData: any) => {
   return optionArray;
 };
 
-// 过滤部门数据： 如果是测试部门，就看统计【测试】字段的值；如果是开发部门，则先看解决人/完成人。如果解决人为空，就看指派给。
-const filterDeptData = (dept: any, oraData: any) => {
-  debugger;
-  let filterDeptResult: any = [];
-  if (!dept || dept.length === 0) {
-    filterDeptResult = [...oraData];
-  } else {
-    dept.forEach(() => {
-      oraData.forEach(() => {
+// 过滤部门数据： 如果是测试部门，就看统计【测试】字段的值和是否需要测试验证（testCheck）；如果是开发部门，则先看解决人/完成人。如果解决人为空，就看指派给。
+// 最终相当于根据选择部门过滤数据中的（测试、是否需要测试验证字段）和（解决人/完成人或者指派给）
+const filterDeptData = (depts: any, oraData: any) => {
 
-      });
-    })
+  // 部门为空或者部门选了研发中心
+  if (!depts || depts.length === 0 || depts.includes(59) || !oraData || oraData.length === 0) {
+    return oraData;
   }
+  // 部门和源数据都不为的时候空
+  const filterDeptResult: any = [];
+  const filterDeptId: any = [];
+  depts.forEach((deptId: number) => {
+    oraData.forEach((rows: any) => {
+      /* 先比对测试，如果测试为空，就要看是否需要测试验证字段（testCheck），是的话，也算是测试 */
+      const testerArray = rows.tester;
+      if (testerArray && testerArray.length > 0) {
+        // 如果测试不为空，则对比选中的测试的部门id，放入数据
+        testerArray.forEach((testerInfo: any) => {
+          if (testerInfo.dept?.id === deptId && !filterDeptId.includes(rows.ztNo)) {
+            filterDeptResult.push(rows);
+            filterDeptId.push(rows.ztNo);
+          }
+        });
+      } else if (rows.testCheck && deptId === 74 && !filterDeptId.includes(rows.ztNo)) { // 是的话，也算是测试，需要挂到测试大部门
+        filterDeptResult.push(rows);
+        filterDeptId.push(rows.ztNo);
+      }
+      /* 再比对解决人和完成人; 先看解决人/完成人。如果解决人为空，就看指派给 */
+      let devPerson = rows.finishedBy;
+      if (!devPerson) {
+        devPerson = rows.assignedTo;
+      }
+      if (devPerson.dept?.id === deptId && !filterDeptId.includes(rows.ztNo)) {
+        filterDeptResult.push(rows);
+        filterDeptId.push(rows.ztNo);
+      }
+    });
+  })
+
   return filterDeptResult;
 };
 

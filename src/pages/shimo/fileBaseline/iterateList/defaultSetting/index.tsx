@@ -8,7 +8,7 @@ const defaultTreeSelectParams: any = {
   dropdownStyle: {maxHeight: 400, overflow: 'auto'},
   treeCheckable: true,
   maxTagCount: 'responsive',
-  showCheckedStrategy: 'SHOW_PARENT',
+  showCheckedStrategy: 'SHOW_ALL',
   filterTreeNode: (inputValue: string, treeNode: any) =>
     !!treeNode.title.includes(inputValue), // 返回true or false
 };

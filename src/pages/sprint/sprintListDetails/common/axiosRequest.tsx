@@ -33,7 +33,7 @@ const delSprintDetails = async (selRows: any) => {
       deleteIdArray.push(`BUG_${id}`);
     } else if (rows.category === "2") {
       deleteIdArray.push(`TASK_${id}`);
-    } else if (rows.category === "3") {
+    } else if (rows.category === "3" || rows.category === "-3") {
       deleteIdArray.push(`STORY_${id}`);
     }
   });
@@ -87,7 +87,7 @@ const requestModFlowStage = async (selRows: any, content: any, values: any) => {
       selIds.push(`BUG_${rows.id}`);
     } else if (rows.category === "2") {
       selIds.push(`TASK_${rows.id}`);
-    } else if (rows.category === "3") {
+    } else if (rows.category === "3" || rows.category === "-3") {
       selIds.push(`STORY_${rows.id}`);
     }
   }

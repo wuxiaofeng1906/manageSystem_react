@@ -27,7 +27,7 @@ const calTypeCount = (data: any) => {
       bug += 1;
     } else if (ele.category === "2") {
       task += 1;
-    } else if (ele.category === "3" && ele.fromBug) {
+    } else if (ele.category === "3" || ele.category === "-3") {
       B_story += 1;
     } else {
       story += 1;
@@ -100,7 +100,7 @@ const addPositionData = (inStoryAndTask: any, oraData: any) => {
 
       // 如果只是 需求 有值，并且禅道类型和禅道编号能对应，则添加到原始data上一个位置，然后break，否则会造成死循环
       if (be_story !== null && be_task === null) {
-        if (ele.belongStory === details.ztNo && details.category === "3") { // 如果对应的是需求
+        if (ele.belongStory === details.ztNo && (details.category === "3" || details.category === "-3")) { // 如果对应的是需求
           oraData.splice(index + 1, 0, ele);
           break;
         }
@@ -245,6 +245,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             tester{
               id
               name
+              tech
               dept{
                 id
                 name
@@ -259,6 +260,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             ztStatus
             assignedTo{
               id
+              tech
               name
               dept{
                 id
@@ -267,6 +269,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             }
             finishedBy{
               id
+              tech
               name
               dept{
                 id

@@ -359,16 +359,28 @@ const filterAssignedData = (assignedTo: any, oraData: any) => {
 // 过滤测试
 const filterTesterData = (test: any, oraData: any) => {
   let filterTestResult: any = [];
+  const filterTestID: any = [];
   if (!test || test.length === 0) {
     filterTestResult = [...oraData];
   } else {
-    test.forEach((ele: any) => {
-      oraData.forEach((row: any) => {
-        if ((row.tester).indexOf(ele) > -1) {
-          filterTestResult.push(row);
-        }
-      });
-    })
+    oraData.forEach((row: any) => {
+      const gridTester = row.tester;
+      const testerStr: any = [];
+      if (gridTester && gridTester.length > 0) {
+        gridTester.forEach((testers: any) => {
+          testerStr.push(testers.name);
+        });
+        test.forEach((ele: any) => {
+          if (testerStr.includes(ele)) {
+            // 重复的数据不添加
+            if (!filterTestID.includes(row.ztNo)) {
+              filterTestID.push(row.ztNo);
+              filterTestResult.push(row);
+            }
+          }
+        })
+      }
+    });
   }
   return filterTestResult;
 };
@@ -393,6 +405,7 @@ const filterSolvedData = (solved: any, oraData: any) => {
 
 // 对表格中的数据进行条件过滤
 const filterDatasByCondition = (condition: any, oraData: any) => {
+  debugger;
   if (!oraData || oraData.length === 0) {
     return [];
   }

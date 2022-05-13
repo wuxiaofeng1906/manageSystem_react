@@ -433,8 +433,8 @@ const loadBranchNameSelect = async () => {
 };
 
 // 服务下拉框
-const loadServiceSelect = async () => {
-  const source = await getServices();
+const loadServiceSelect = async (branchName: any) => {
+  const source = await getServices({branch: branchName});
   const resultArray: any = [];
 
   if (source.message !== '') {
@@ -449,14 +449,21 @@ const loadServiceSelect = async () => {
     const datas = source.data;
     datas.forEach((ele: any) => {
       resultArray.push(
-        <Option key={ele.server_id} value={`${ele.server_id}`}>
-          {ele.server}
-        </Option>,
+        {
+          title: (ele.server).toString(),
+          value: (ele.server_id).toString(),
+        }
       );
     });
   }
 
-  return resultArray;
+  return [
+    {
+      title: '全部',
+      value: '全部',
+      children: resultArray,
+    }
+  ];
 };
 
 // 镜像环境下拉框

@@ -112,7 +112,7 @@ const getGridDataByStory = async (storyId: any, perValueArray: any, queryInfo: a
           task_name: taskName,
           subtask_dev_id: story.id,
           subtask_dev_needs: story.id,
-          assigned_person: usersLoginInfo.userid === "test" ? "ChenHuan" : usersLoginInfo.userid,
+          assigned_person: story.assigned_to_id,
           plan_start: dayjs().format("YYYY-MM-DD"),
           plan_end: dayjs().format("YYYY-MM-DD"),
           No: num + 1, // 固定的12345

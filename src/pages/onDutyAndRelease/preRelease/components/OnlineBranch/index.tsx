@@ -1,7 +1,7 @@
 import React, {useRef, useState} from 'react';
 import {
   Button, Card, Checkbox, Col, DatePicker, Divider,
-  Form, Input, message, Modal, Row, Select, Spin, Switch,
+  Form, Input, message, Modal, Row, Select, Spin, Switch, TreeSelect
 } from 'antd';
 import {useModel} from '@@/plugin-model/useModel';
 import {AgGridReact} from 'ag-grid-react';
@@ -21,7 +21,9 @@ import {
 import {alalysisInitData} from '../../datas/dataAnalyze';
 import {getGridRowsHeight} from '../gridHeight';
 import {releaseAppChangRowColor} from '../../operate';
+import {history} from "@@/core/history";
 
+const {SHOW_PARENT} = TreeSelect;
 let newOnlineBranchNum = '';
 
 const OnlineBranch: React.FC<any> = () => {
@@ -50,7 +52,7 @@ const OnlineBranch: React.FC<any> = () => {
   const [logModal, setLogModal] = useState({
     show: false,
     autoUrl: {style: 'none', ui: '', api: ''},
-    versionUrl: {style: 'none', app: '', global: ''},
+    versionUrl: {style: 'none', content: <div></div>},
     iconCheckUrl: {style: 'none', content: <div></div>},
     coveStatus: {style: 'none', content: <div></div>}
 
@@ -137,6 +139,16 @@ const OnlineBranch: React.FC<any> = () => {
     }
   };
 
+  // 根据分支名称获取服务
+  const showServerSelect = async (params: any) => {
+    setOnlineBranchFormSelected({
+      ...onlineBranchFormSelected,
+      server: await loadServiceSelect(params),
+    });
+    formForOnlineBranch.setFieldsValue({
+      server: []
+    });
+  };
   // 上线分支弹出窗口进行修改和新增
   (window as any).showOnlineBranchForm = async (type: any, params: any) => {
     // 是否是已完成发布
@@ -152,6 +164,7 @@ const OnlineBranch: React.FC<any> = () => {
       return;
     }
 
+    let branchName = "";
     if (type === 'add') {
       formForOnlineBranch.resetFields();
       formForOnlineBranch.setFieldsValue({
@@ -173,13 +186,7 @@ const OnlineBranch: React.FC<any> = () => {
       const oraData = await getModifiedData(newOnlineBranchNum);
 
       // 服务
-      let servers = oraData.versonCheck?.server;
-      if (servers) {
-        if (servers.length === 1 && servers.includes('')) {
-          servers = undefined;
-        }
-      }
-
+      const servers = oraData.versonCheck?.server;
       // 时间
       let mainSince;
       if (oraData.branchCheck?.branch_mainSince) {
@@ -208,6 +215,7 @@ const OnlineBranch: React.FC<any> = () => {
         }
       }
 
+      branchName = oraData.checkHead.branchName;
       formForOnlineBranch.setFieldsValue({
         // 表头设置
         branchName: oraData.checkHead.branchName,
@@ -249,7 +257,6 @@ const OnlineBranch: React.FC<any> = () => {
         beforeAutomationId: oraData.beforeOnlineCheck?.automationId,
         afterAutomationId: oraData.afterOnlineCheck?.automationId,
       });
-
       modifyLockedItem(
         `${tabsData.activeKey}-step4-onlineBranch-${oraData.checkHead?.branchCheckId}`,
       );
@@ -277,7 +284,7 @@ const OnlineBranch: React.FC<any> = () => {
     setOnlineBranchFormSelected({
       branchName: await loadBranchNameSelect(),
       techSide: await loadTechSideSelect(),
-      server: await loadServiceSelect(),
+      server: await loadServiceSelect(branchName),
       imgEnv: await loadTestEnvSelect(),
       before_checkType: await loadCheckTypeSelect('before'),
       after_checkType: await loadCheckTypeSelect('after'),
@@ -296,7 +303,6 @@ const OnlineBranch: React.FC<any> = () => {
         },
       });
 
-      return;
       return;
     }
     if (values === '忽略') {
@@ -385,35 +391,17 @@ const OnlineBranch: React.FC<any> = () => {
       show: true,
       iconCheckUrl: {style: 'inline', content: <div style={{marginTop: -15}}> {logContent}</div>},
       autoUrl: {style: 'none', ui: '', api: ''},
-      versionUrl: {style: 'none', app: '', global: ''},
+      versionUrl: {style: 'none', content: <div></div>},
       coveStatus: {style: 'none', content: <div></div>}
     });
 
   };
 
+
   // 版本检查URL跳转
   (window as any).versionCheckLogUrlClick = (logUrl: any) => {
-    let app_url = '';
-    let global_url = '';
-    if (logUrl && logUrl.length > 0) {
-      logUrl.forEach((ele: any) => {
-        if (ele.server === 'apps') {
-          app_url = ele.check_url;
-        } else if (ele.server === 'global') {
-          global_url = ele.check_url;
-        }
-      });
-    }
 
-    if (app_url || global_url) {
-      setLogModal({
-        iconCheckUrl: {style: 'none', content: <div></div>},
-        autoUrl: {style: 'none', ui: '', api: ''},
-        versionUrl: {style: 'inline', app: app_url, global: global_url},
-        coveStatus: {style: 'none', content: <div></div>},
-        show: true,
-      });
-    } else {
+    if (!logUrl) {
       message.error({
         content: '无检查日志，请执行后在查看！',
         duration: 1,
@@ -421,7 +409,48 @@ const OnlineBranch: React.FC<any> = () => {
           marginTop: '50vh',
         },
       });
+      return;
     }
+
+    const goto = window.open('about:blank');
+    if (goto) {
+      goto.location.href = logUrl;
+    }
+
+    // const logs: any = [];
+    // if (logUrl && logUrl.length > 0) {
+    //   logUrl.forEach((ele: any) => {
+    //     logs.push(
+    //       <Form.Item name="appLog" label={`${ele.server}日志:`} style={{marginTop: -5}}>
+    //         <a
+    //           href={`${ele.check_url}`}
+    //           target={'_black'}
+    //           style={{textDecoration: 'underline'}}
+    //         >
+    //           {ele.check_url}
+    //         </a>
+    //       </Form.Item>)
+    //
+    //   });
+    // }
+    //
+    // if (logs.length > 0) {
+    //   setLogModal({
+    //     iconCheckUrl: {style: 'none', content: <div></div>},
+    //     autoUrl: {style: 'none', ui: '', api: ''},
+    //     versionUrl: {style: 'inline', content: <div>{logs}</div>},
+    //     coveStatus: {style: 'none', content: <div></div>},
+    //     show: true,
+    //   });
+    // } else {
+    //   message.error({
+    //     content: '无检查日志，请执行后在查看！',
+    //     duration: 1,
+    //     style: {
+    //       marginTop: '50vh',
+    //     },
+    //   });
+    // }
   };
 
   // 自动化URL跳转
@@ -461,7 +490,7 @@ const OnlineBranch: React.FC<any> = () => {
       setLogModal({
         iconCheckUrl: {style: 'none', content: <div></div>},
         autoUrl: {style: 'inline', ui: ui_url, api: api_url},
-        versionUrl: {style: 'none', app: '', global: ''},
+        versionUrl: {style: 'none', content: <div></div>},
         coveStatus: {style: 'none', content: <div></div>},
         show: true,
       });
@@ -509,7 +538,7 @@ const OnlineBranch: React.FC<any> = () => {
         show: true,
         iconCheckUrl: {style: 'none', content: <div></div>},
         autoUrl: {style: 'none', ui: '', api: ''},
-        versionUrl: {style: 'none', app: '', global: ''},
+        versionUrl: {style: 'none', content: <div></div>},
         coveStatus: {style: 'inline', content: <div style={{height: 300, overflowY: "scroll"}}>{contentDiv}</div>}
       });
     } else {
@@ -529,7 +558,7 @@ const OnlineBranch: React.FC<any> = () => {
       show: false,
       iconCheckUrl: {style: 'none', content: <div></div>},
       autoUrl: {style: 'none', ui: '', api: ''},
-      versionUrl: {style: 'none', app: '', global: ''},
+      versionUrl: {style: 'none', content: <div></div>},
       coveStatus: {style: 'none', content: <div></div>}
     });
   };
@@ -612,7 +641,7 @@ const OnlineBranch: React.FC<any> = () => {
               <Col span={16}>
                 {/* 分支名称 */}
                 <Form.Item label="分支名称:" name="branchName" required={true}>
-                  <Select style={{width: '100%'}} showSearch>
+                  <Select style={{width: '100%'}} showSearch onChange={showServerSelect}>
                     {onlineBranchFormSelected.branchName}
                   </Select>
                 </Form.Item>
@@ -667,13 +696,18 @@ const OnlineBranch: React.FC<any> = () => {
                   <Switch checkedChildren="是" unCheckedChildren="否" style={{marginLeft: 40}}/>
                 </Form.Item>
                 <Form.Item name="server" label="服务" style={{marginTop: -22}}>
-                  <Select
-                    mode="multiple"
+                  <TreeSelect
                     placeholder="请选择相应的服务！"
                     style={{marginLeft: 68, width: 415}}
+                    maxTagCount={"responsive"}
+                    treeCheckable={true}
+                    allowClear
+                    treeDefaultExpandAll
+                    treeData={onlineBranchFormSelected.server}
+                    showSearch
                   >
-                    {onlineBranchFormSelected.server}
-                  </Select>
+                  </TreeSelect>
+
                 </Form.Item>
                 <Form.Item name="imageevn" label="镜像环境" style={{marginTop: -20}}>
                   <Select
@@ -881,9 +915,7 @@ const OnlineBranch: React.FC<any> = () => {
                   float: 'right',
                 }}
                 onClick={saveOnlineBranchResult}
-              >
-                保存{' '}
-              </Button>
+              >保存</Button>
             </Form.Item>
           </Spin>
 
@@ -926,7 +958,6 @@ const OnlineBranch: React.FC<any> = () => {
         centered={true}
         footer={null}
         width={550}
-        // bodyStyle={{height: 145}}
       >
         <Form>
           {/* 自动化日志 */}
@@ -951,26 +982,10 @@ const OnlineBranch: React.FC<any> = () => {
               </a>
             </Form.Item>
           </div>
+
           {/* 版本检查 */}
           <div style={{display: logModal.versionUrl.style}}>
-            <Form.Item name="appLog" label="app日志:" style={{marginTop: -15}}>
-              <a
-                href={`${logModal.versionUrl.app}`}
-                target={'_black'}
-                style={{textDecoration: 'underline'}}
-              >
-                {logModal.versionUrl.app}
-              </a>
-            </Form.Item>
-            <Form.Item name="globalLog" label="global日志:" style={{marginTop: -1}}>
-              <a
-                href={`${logModal.versionUrl.global}`}
-                target={'_black'}
-                style={{textDecoration: 'underline'}}
-              >
-                {logModal.versionUrl.global}
-              </a>
-            </Form.Item>
+            {logModal.versionUrl.content}
           </div>
 
           {/* 图标一致性检查日志 */}

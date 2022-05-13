@@ -184,7 +184,7 @@ const beforeOnlineVersionCheck = (params: any) => {
 
   const values: any = params.value[0]; // 本数组只会有一条数据
   // 解析所属端
-  let side = '';
+  let side = '忽略：';
   if (values.technical_side === 'front') {
     side = '前端：';
   } else if (values.technical_side === 'backend') {
@@ -234,32 +234,44 @@ const beforeOnlineVersionCheck = (params: any) => {
 
   const checkNum = JSON.stringify(params.data?.check_num);
 
-  if (side === '') {
-    return `
-         <div>
-          <div style="width: 210px">
-              <div style="font-size: 10px">
-                  <div>
-                    <button style="text-align: left; color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
-                    <lable style="margin-left: -20px">${timeRange}</lable>
-                  </div>
-              </div>
-          </div>
-      </div>
-    `;
-  }
+  // if (side === '') {
+  //   return `
+  //     <div>
+  //         <div style="width: 210px">
+  //             <div style="font-size: 10px">
+  //                 <div>
+  //                   <button style="text-align: left; color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
+  //                   <lable style="margin-left: -20px">${timeRange}</lable>
+  //                 </div>
+  //             </div>
+  //         </div>
+  //     </div>
+  //   `;
+  // }
+
+  // <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC"
+  //   onclick='versionCheckLogUrlClick(${JSON.stringify(values.check_url)})'>
+  //     <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+  //  </Button>
+  // let gotoUrl = "";
+  // if (values.check_url) {
+  //   gotoUrl = `
+  //           <a href="${values.check_url}" target={'_black'} onClick="">
+  //               <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+  //           </a>`;
+  // }
   return `
-         <div>
+        <div>
           <div style="margin-top: -10px;margin-left: 120px">
 
             <Button  style="padding-bottom: 5px; margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
             onclick='excuteCheckData("versionCheck",${checkNum},${JSON.stringify(result)})'>
               <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
             </Button>
-            <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC"
-              onclick='versionCheckLogUrlClick(${JSON.stringify(values.check_url)})'>
+           <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC"
+                onclick='versionCheckLogUrlClick(${JSON.stringify(values.check_url)})'>
                 <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
-             </Button>
+            </Button>
           </div>
           <div style="margin-top: -20px;width: 210px">
               <div style="font-size: 10px">
@@ -267,7 +279,6 @@ const beforeOnlineVersionCheck = (params: any) => {
                   <lable style="margin-left: -20px">${timeRange}</lable>
                   </div>
               </div>
-
           </div>
       </div>
     `;

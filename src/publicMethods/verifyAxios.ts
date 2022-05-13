@@ -157,12 +157,12 @@ const getAllDeptUsers = async () => {
 };
 
 // 获取服务
-const getServices = async () => {
+const getServices = async (branchName: any = {}) => {
   const result = {
     message: "",
     data: []
   };
-  await axios.get('/api/verify/project/server', {params: {}})
+  await axios.get('/api/verify/project/server', {params: branchName})
     .then(function (res) {
       if (res.data.code === 200) {
 
@@ -224,5 +224,5 @@ const getTestEnv = async () => {
 
 export {
   getAllUsers, getAllProject, getProjectType, getBranchName, getEnvironment, getPrincipal, getAllDeptUsers,
-  getServices, getImgEnv,getTestEnv
+  getServices, getImgEnv, getTestEnv
 };

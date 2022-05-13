@@ -771,6 +771,7 @@ const linkToZentaoPage = (params: any) => {
       ztCategory = "task";
       break;
     case "3":
+    case "-3":
       ztCategory = "story";
       break;
     default:

@@ -47,6 +47,18 @@ const getColums = (prjNames: any) => {
       pinned: 'left',
       minWidth: 80,
       suppressMenu: false,
+      valueGetter: (params: any) => {
+        const testArray = params.data?.tester;
+        if (testArray && testArray.length > 0) {
+          let testers = "";
+          testArray.forEach((tester: any) => {
+            testers = testers === "" ? tester.name : `${testers},${tester.name}`;
+          });
+
+          return testers
+        }
+        return "NA";
+      },
       cellRenderer: (params: any) => {
         const testArray = params.value;
         let myColor = "gray"; // 测试验证：已验证为黑色，没验证为灰色
@@ -54,17 +66,17 @@ const getColums = (prjNames: any) => {
         if (testConfirm === "1") {
           myColor = "black";
         }
-        if (!testArray || testArray.length === 0) {
-          return `<span style="color: ${myColor}"> NA </span>`;
-        }
-        let testers = "";
-        testArray.forEach((tester: any) => {
-          testers = testers === "" ? tester.name : `${testers},${tester.name}`;
-        });
+        // if (!testArray || testArray.length === 0) {
+        //   return `<span style="color: ${myColor}"> NA </span>`;
+        // }
+        // let testers = "";
+        // testArray.forEach((tester: any) => {
+        //   testers = testers === "" ? tester.name : `${testers},${tester.name}`;
+        // });
         if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
-          return `<span style="color: ${myColor};text-decoration:line-through"> ${testers} </span>`;
+          return `<span style="color: ${myColor};text-decoration:line-through"> ${testArray} </span>`;
         }
-        return `<span style="color: ${myColor}"> ${testers} </span>`;
+        return `<span style="color: ${myColor}"> ${testArray} </span>`;
 
       },
     },
@@ -143,31 +155,24 @@ const getColums = (prjNames: any) => {
       headerName: '指派给',
       field: 'assignedTo',
       minWidth: 80,
+      suppressMenu: false,
+      valueGetter: (params: any) => {
+        const assignedInfo = params.data?.assignedTo;
+        if (assignedInfo) {
+          return params.data?.assignedTo.name
+        }
+        return "";
+      },
       cellRenderer: (params: any) => {
         const assignedPerson = params.value;
-        if (!assignedPerson || !assignedPerson.name) {
+        if (!assignedPerson) {
           return "";
         }
         if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
-          return `<span style="text-decoration:line-through"> ${assignedPerson.name} </span>`;
+          return `<span style="text-decoration:line-through"> ${assignedPerson} </span>`;
         }
-        return assignedPerson.name;
-      },
-      // tooltipField: "assignedTo",
-      suppressMenu: false,
-      // filterParams: {
-      //   cellRenderer: (params: any) => {
-      //     if (!params.value || params.value === '(Select All)') {
-      //       return params.value;
-      //     }
-      //     const assignedPerson = params.value;
-      //     if (!assignedPerson || !assignedPerson.name) {
-      //       return "";
-      //     }
-      //
-      //     return assignedPerson.name;
-      //   }
-      // }
+        return assignedPerson;
+      }
     },
     {
       headerName: '解决/完成人',
@@ -175,15 +180,22 @@ const getColums = (prjNames: any) => {
       minWidth: 80,
       tooltipField: "finishedBy",
       suppressMenu: false,
+      valueGetter: (params: any) => {
+        const finishedBy = params.data?.finishedBy;
+        if (finishedBy) {
+          return params.data?.finishedBy.name
+        }
+        return "";
+      },
       cellRenderer: (params: any) => {
-        const assignedPerson = params.value;
-        if (!assignedPerson || !assignedPerson.name) {
+        const finishedPerson = params.value;
+        if (!finishedPerson) {
           return "";
         }
         if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
-          return `<span style="text-decoration:line-through"> ${assignedPerson.name} </span>`;
+          return `<span style="text-decoration:line-through"> ${finishedPerson} </span>`;
         }
-        return assignedPerson.name;
+        return finishedPerson;
       },
     },
     {

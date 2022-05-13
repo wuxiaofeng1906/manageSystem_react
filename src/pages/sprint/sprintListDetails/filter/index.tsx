@@ -1,5 +1,6 @@
 import {Select} from 'antd';
 import {GqlClient} from "@/hooks";
+import {errorMessage} from "@/publicMethods/showMessages";
 
 const {Option} = Select;
 
@@ -16,10 +17,19 @@ const getCenterTree = (parentData: any) => {
           translator([current], temp);
 
           if (typeof (parent.children) !== 'undefined') {
-            parent.children.push(current);
+            const newData = {
+              ...current,
+              title: `${current.title}(${current.count})`
+            }
+            parent.children.push(newData);
           } else {
+            debugger;
+            const newData = {
+              ...current,
+              title: `${current.title}(${current.count})`
+            }
             // eslint-disable-next-line no-param-reassign
-            parent.children = [current];
+            parent.children = [newData];
 
           }
         }
@@ -36,12 +46,36 @@ const getCenterTree = (parentData: any) => {
 // 对应部门和个数：  如果是测试部门，就看统计【测试】字段的值；如果是开发部门，则先看解决人/完成人。如果解决人为空，就看指派给。
 const getDeptAndCount = (dept: any, gridData: any) => {
   const deptCountData: any = [];
+  // const filterDeptId: any = [];
   const deptData = dept.organization;
   if (deptData && deptData.length > 0) {
     deptData.forEach((item: any) => {
       let final_count = 0;
       gridData.forEach((rows: any) => {
-        console.log(rows);
+        // 先判断测试
+        const testerArray = rows.tester;
+        if (testerArray && testerArray.length > 0) {
+          testerArray.forEach((testerInfo: any) => {
+            if (testerInfo.dept?.id === item.id) {
+              // filterDeptId.push(rows.ztNo);
+              final_count += 1;
+            }
+          });
+        } else if (rows.testCheck && item.id === 74) { // 是的话，也算是测试，需要挂到测试大部门
+          final_count += 1;
+          // filterDeptId.push(rows.ztNo);
+        }
+
+        //
+        /* 再判断开发,比对解决人和完成人; 先看解决人/完成人。如果解决人为空，就看指派给 */
+        let devPerson = rows.finishedBy;
+        if (!devPerson) {
+          devPerson = rows.assignedTo;
+        }
+        if (devPerson && devPerson.dept?.id === item.id) {
+          final_count += 1;
+          // filterDeptId.push(rows.ztNo);
+        }
       });
 
       deptCountData.push({
@@ -54,6 +88,7 @@ const getDeptAndCount = (dept: any, gridData: any) => {
     });
   }
 
+  console.log("deptCountData", deptCountData)
   return deptCountData;
 };
 
@@ -293,34 +328,37 @@ const filterDeptData = (depts: any, oraData: any) => {
   // 部门和源数据都不为的时候空
   const filterDeptResult: any = [];
   const filterDeptId: any = [];
-  depts.forEach((deptId: number) => {
-    oraData.forEach((rows: any) => {
-      /* 先比对测试，如果测试为空，就要看是否需要测试验证字段（testCheck），是的话，也算是测试 */
-      const testerArray = rows.tester;
-      if (testerArray && testerArray.length > 0) {
-        // 如果测试不为空，则对比选中的测试的部门id，放入数据
-        testerArray.forEach((testerInfo: any) => {
-          if (testerInfo.dept?.id === deptId && !filterDeptId.includes(rows.ztNo)) {
-            filterDeptResult.push(rows);
-            filterDeptId.push(rows.ztNo);
-          }
-        });
-      } else if (rows.testCheck && deptId === 74 && !filterDeptId.includes(rows.ztNo)) { // 是的话，也算是测试，需要挂到测试大部门
-        filterDeptResult.push(rows);
-        filterDeptId.push(rows.ztNo);
-      }
-      /* 再比对解决人和完成人; 先看解决人/完成人。如果解决人为空，就看指派给 */
-      let devPerson = rows.finishedBy;
-      if (!devPerson) {
-        devPerson = rows.assignedTo;
-      }
-      if (devPerson.dept?.id === deptId && !filterDeptId.includes(rows.ztNo)) {
-        filterDeptResult.push(rows);
-        filterDeptId.push(rows.ztNo);
-      }
+  try {
+    depts.forEach((deptId: number) => {
+      oraData.forEach((rows: any) => {
+        /* 先比对测试，如果测试为空，就要看是否需要测试验证字段（testCheck），是的话，也算是测试 */
+        const testerArray = rows.tester;
+        if (testerArray && testerArray.length > 0) {
+          // 如果测试不为空，则对比选中的测试的部门id，放入数据
+          testerArray.forEach((testerInfo: any) => {
+            if (testerInfo.dept?.id === deptId && !filterDeptId.includes(rows.ztNo)) {
+              filterDeptResult.push(rows);
+              filterDeptId.push(rows.ztNo);
+            }
+          });
+        } else if (rows.testCheck && deptId === 74 && !filterDeptId.includes(rows.ztNo)) { // 是的话，也算是测试，需要挂到测试大部门
+          filterDeptResult.push(rows);
+          filterDeptId.push(rows.ztNo);
+        }
+        /* 再比对解决人和完成人; 先看解决人/完成人。如果解决人为空，就看指派给 */
+        let devPerson = rows.finishedBy;
+        if (!devPerson) {
+          devPerson = rows.assignedTo;
+        }
+        if (devPerson.dept?.id === deptId && !filterDeptId.includes(rows.ztNo)) {
+          filterDeptResult.push(rows);
+          filterDeptId.push(rows.ztNo);
+        }
+      });
     });
-  })
-
+  } catch (e) {
+    errorMessage(e.toString());
+  }
   return filterDeptResult;
 };
 

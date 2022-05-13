@@ -1113,7 +1113,7 @@ const SprintList: React.FC<any> = () => {
                             {...defaultTreeSelectParams}
                             onFocus={onDeptSelectFocus}
                             treeData={selectOption.deptSelect}
-                  // onChange={iterDeptChanged}
+                            onChange={onSelectChanged}
                 />
 
               </Form.Item>

@@ -27,9 +27,9 @@ const calTypeCount = (data: any) => {
       bug += 1;
     } else if (ele.category === "2") {
       task += 1;
-    } else if (ele.category === "3" || ele.category === "-3") {
+    } else if (ele.category === "-3") {
       B_story += 1;
-    } else {
+    } else if (ele.category === "3") {
       story += 1;
     }
 
@@ -490,4 +490,12 @@ const GetSprintProject = () => {
 };
 
 
-export {queryDevelopViews, queryRepeats, getDeptMemner, LoadCombobox, LoadTesterCombobox, GetSprintProject,calTypeCount}
+export {
+  queryDevelopViews,
+  queryRepeats,
+  getDeptMemner,
+  LoadCombobox,
+  LoadTesterCombobox,
+  GetSprintProject,
+  calTypeCount
+}

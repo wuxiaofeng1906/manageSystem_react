@@ -185,7 +185,7 @@ const getTypeOption = (gridData: any) => {
       count.count_task += 1;
     } else if (category === "3" && rows.fromBug === 0) {   //   type = "Story";
       count.count_story += 1;
-    } else if (category === "3" && rows.fromBug !== 1) {   //   type = "Story";
+    } else if (category === "-3") {   //   type = "Story";
       count.count_b_story += 1;
     }
   });
@@ -194,7 +194,7 @@ const getTypeOption = (gridData: any) => {
     <Option key={"1"} value={"bug"}>Bug({count.count_bug})</Option>,
     <Option key={"2"} value={"task"}>Task({count.count_task})</Option>,
     <Option key={"3"} value={"story"}>Story({count.count_story})</Option>,
-    <Option key={"3"} value={"B_story"}>B_Story({count.count_b_story})</Option>,
+    <Option key={"-3"} value={"B_story"}>B_Story({count.count_b_story})</Option>,
   ];
 };
 
@@ -331,7 +331,7 @@ const filterTypesData = (types: any, oraData: any) => {
           rowsType = "task";
         } else if (category === "3" && fromBug === 0) {   //   type = "Story";
           rowsType = "story";
-        } else if (category === "3" && fromBug !== 1) {   //   type = "b_Story";
+        } else if (category === "-3") {   //   type = "b_Story";
           rowsType = "B_story";
         }
 

@@ -33,7 +33,7 @@ const delSprintDetails = async (selRows: any) => {
       deleteIdArray.push(`BUG_${id}`);
     } else if (rows.category === "2") {
       deleteIdArray.push(`TASK_${id}`);
-    } else if (rows.category === "3") {
+    } else if (rows.category === "3" || rows.category === "-3") {
       deleteIdArray.push(`STORY_${id}`);
     }
   });

@@ -1255,11 +1255,11 @@ const SprintList: React.FC<any> = () => {
                       icon={<CheckSquareTwoTone/>}
                       onClick={flowForOnlineChecked}>线上已验证</Button>
               <label
-                style={{marginTop: '5px', display: judgeAuthority("线上已验证") === true ? "inline" : "none"}}>
+                style={{marginTop: '5px', display: judgeAuthority(`修改"测试已确认"字段`) === true ? "inline" : "none"}}>
                 测试确认:</label>
               <Select placeholder="请选择" value={testConfirm} style={{
                 marginLeft: "5px", width: '100px', marginTop: '4px',
-                display: judgeAuthority("线上已验证") === true ? "inline" : "none"
+                display: judgeAuthority(`修改"测试已确认"字段`) === true ? "inline" : "none"
               }} size={"small"} onChange={testConfirmSelect}>
                 {[
                   <Option key={'1'} value={'1'}>是</Option>,

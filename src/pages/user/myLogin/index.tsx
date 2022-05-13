@@ -100,7 +100,7 @@ const Login: React.FC<{}> = () => {
     };
     // 缓存状态
     localStorage.setItem("userLogins", JSON.stringify(userInfo)); // 正式环境应放开
-
+    console.log("userInfo",userInfo);
 
     if (userInfo) {
       setInitialState({

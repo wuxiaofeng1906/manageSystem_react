@@ -181,10 +181,16 @@ const getColums = (prjNames: any) => {
       tooltipField: "finishedBy",
       suppressMenu: false,
       valueGetter: (params: any) => {
+
         const finishedBy = params.data?.finishedBy;
-        if (finishedBy) {
-          return params.data?.finishedBy.name
+        if (finishedBy && finishedBy.length > 0) {
+          let finishedBys = "";
+          finishedBy.forEach((finisher: any) => {
+            finishedBys = finishedBys === "" ? finisher.name : `${finishedBys},${finisher.name}`;
+          });
+          return finishedBys;
         }
+
         return "";
       },
       cellRenderer: (params: any) => {

@@ -61,7 +61,7 @@ const getDeptAndCount = (dept: any, gridData: any) => {
             testerArray.forEach((testerInfo: any) => {
               if (testerInfo.dept?.id === item.id && !filterDeptId.includes(rows.ztNo)) {
                 filterDeptId.push(rows.ztNo);
-                final_count =filterDeptId.length; // 对于测试要特殊处理
+                final_count = filterDeptId.length; // 对于测试要特殊处理
               }
             });
           } else if (rows.testCheck && item.id === 74) { // 是的话，也算是测试，需要挂到测试大部门
@@ -299,17 +299,20 @@ const getTesterOption = (personName: any, gridData: any) => {
 
 // 由谁解决
 const getSolvedByOption = (personName: any, gridData: any) => {
+  debugger;
   const optionArray: any = [];
   personName.forEach((name: string) => {
     let count = 0;
     gridData.forEach((rows: any) => {
-      let finishedBy = (rows.finishedBy)?.name;
-      if (!finishedBy) {
-        finishedBy = "";
+      const finishedBy: any = rows.finishedBy;
+      if (finishedBy && finishedBy.length > 0) {
+        finishedBy.forEach((ele: any) => {
+          if (ele.name === name) {
+            count += 1;
+          }
+        });
       }
-      if (finishedBy === name) {
-        count += 1;
-      }
+
     });
     const person = name === "" ? "空" : name;
     if (person === "空") {  // 空值显示在最前面

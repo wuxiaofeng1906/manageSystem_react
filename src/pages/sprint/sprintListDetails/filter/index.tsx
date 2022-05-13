@@ -35,23 +35,24 @@ const getCenterTree = (parentData: any) => {
 
 // 对应部门和个数：  如果是测试部门，就看统计【测试】字段的值；如果是开发部门，则先看解决人/完成人。如果解决人为空，就看指派给。
 const getDeptAndCount = (dept: any, gridData: any) => {
-
-  const deptData = dept.organization;
   const deptCountData: any = [];
-  deptData.forEach((item: any) => {
-    let final_count = 0;
-    gridData.forEach((rows: any) => {
-      console.log(rows);
-    });
+  const deptData = dept.organization;
+  if (deptData && deptData.length > 0) {
+    deptData.forEach((item: any) => {
+      let final_count = 0;
+      gridData.forEach((rows: any) => {
+        console.log(rows);
+      });
 
-    deptCountData.push({
-      key: item.id,
-      title: item.name,
-      parent: item.parent,
-      value: item.id,
-      count: final_count
+      deptCountData.push({
+        key: item.id,
+        title: item.name,
+        parent: item.parent,
+        value: item.id,
+        count: final_count
+      });
     });
-  });
+  }
 
   return deptCountData;
 };

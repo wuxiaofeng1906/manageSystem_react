@@ -153,8 +153,21 @@ const getColums = (prjNames: any) => {
         }
         return assignedPerson.name;
       },
-      tooltipField: "assignedTo",
+      // tooltipField: "assignedTo",
       suppressMenu: false,
+      // filterParams: {
+      //   cellRenderer: (params: any) => {
+      //     if (!params.value || params.value === '(Select All)') {
+      //       return params.value;
+      //     }
+      //     const assignedPerson = params.value;
+      //     if (!assignedPerson || !assignedPerson.name) {
+      //       return "";
+      //     }
+      //
+      //     return assignedPerson.name;
+      //   }
+      // }
     },
     {
       headerName: '解决/完成人',

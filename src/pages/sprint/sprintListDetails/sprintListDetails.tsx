@@ -1113,7 +1113,7 @@ const SprintList: React.FC<any> = () => {
                             {...defaultTreeSelectParams}
                             onFocus={onDeptSelectFocus}
                             treeData={selectOption.deptSelect}
-                  // onChange={iterDeptChanged}
+                            onChange={onSelectChanged}
                 />
 
               </Form.Item>
@@ -1305,6 +1305,7 @@ const SprintList: React.FC<any> = () => {
             getRowStyle={setRowColor}
             onGridSizeChanged={onGridReady}
             onColumnEverythingChanged={onGridReady}
+            tooltipShowDelay={500}
           />
 
         </div>

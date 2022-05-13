@@ -46,7 +46,6 @@ const getColums = (prjNames: any) => {
       field: 'tester',
       pinned: 'left',
       minWidth: 80,
-      tooltipField: "tester",
       suppressMenu: false,
       cellRenderer: (params: any) => {
         const testArray = params.value;
@@ -245,6 +244,26 @@ const getColums = (prjNames: any) => {
     {
       headerName: '是否需要测试验证',
       field: 'testCheck',
+      headerTooltip: "自动生成’是‘为黑色；自动生成‘否’为红色；手动修改‘是’为紫色；手动修改‘否’为黄色",
+      tooltipValueGetter: (params: any) => {
+        const values = params.value;
+        if (!values) {
+          return "";
+        }
+        if (values === "-1") { // 手动：是
+          return "手动生成";
+        }
+        if (values === "-0") { // 手动：否
+          return "手动生成";
+        }
+        if (values === "0") { // 自动：否
+          return "自动生成";
+        }
+        if (values === "1") { // 自动：是
+          return "自动生成";
+        }
+        return values;
+      },
       cellRenderer: (params: any) => {
         // testCheck: 手动修改标识: "-1"、"-0";自动的是：0 ，1
         // 自动规则生成的‘是’默认黑色，自动规则生成的‘否’默认红色

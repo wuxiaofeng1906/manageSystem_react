@@ -1305,6 +1305,7 @@ const SprintList: React.FC<any> = () => {
             getRowStyle={setRowColor}
             onGridSizeChanged={onGridReady}
             onColumnEverythingChanged={onGridReady}
+            tooltipShowDelay={500}
           />
 
         </div>

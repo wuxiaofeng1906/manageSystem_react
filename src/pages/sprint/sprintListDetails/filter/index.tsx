@@ -71,14 +71,18 @@ const getDeptAndCount = (dept: any, gridData: any) => {
 
           //
           /* 再判断开发,比对解决人和完成人; 先看解决人/完成人。如果解决人为空，就看指派给 */
-          let devPerson = rows.finishedBy;
-          if (!devPerson) {
-            devPerson = rows.assignedTo;
+          let devPerson = [];
+          if (rows.finishedBy && (rows.finishedBy).length > 0) {
+            devPerson = [...rows.finishedBy];
+          } else if (rows.assignedTo) {
+            devPerson.push(rows.assignedTo);
           }
-          if (devPerson && devPerson.dept?.id === item.id) {
-            final_count += 1;
-            // filterDeptId.push(rows.ztNo);
-          }
+          if (devPerson.length > 0)
+            devPerson.forEach((ele: any) => {
+              if (ele && ele.dept?.id === item.id) {
+                final_count += 1;
+              }
+            });
         });
 
         deptCountData.push({
@@ -90,7 +94,7 @@ const getDeptAndCount = (dept: any, gridData: any) => {
         });
       });
     }
-  } catch (e) {
+  } catch (e: any) {
     errorMessage(e.toString())
   }
   return deptCountData;
@@ -358,7 +362,7 @@ const filterDeptData = (depts: any, oraData: any) => {
         const finishPerson = rows.finishedBy;
         if (finishPerson && finishPerson.length > 0) {
           devPerson = [...finishPerson];
-        } else {
+        } else if (rows.assignedTo) {
           devPerson.push(rows.assignedTo)
         }
         if (devPerson.length > 0) {

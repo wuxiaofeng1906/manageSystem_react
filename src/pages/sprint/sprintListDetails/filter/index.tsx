@@ -354,17 +354,25 @@ const filterDeptData = (depts: any, oraData: any) => {
           filterDeptId.push(rows.ztNo);
         }
         /* 再比对解决人和完成人; 先看解决人/完成人。如果解决人为空，就看指派给 */
-        let devPerson = rows.finishedBy;
-        if (!devPerson) {
-          devPerson = rows.assignedTo;
+        let devPerson = [];
+        const finishPerson = rows.finishedBy;
+        if (finishPerson && finishPerson.length > 0) {
+          devPerson = [...finishPerson];
+        } else {
+          devPerson.push(rows.assignedTo)
         }
-        if (devPerson.dept?.id === deptId && !filterDeptId.includes(rows.ztNo)) {
-          filterDeptResult.push(rows);
-          filterDeptId.push(rows.ztNo);
+        if (devPerson.length > 0) {
+          devPerson.forEach((ele: any) => {
+            if (ele.dept?.id === deptId && !filterDeptId.includes(rows.ztNo)) {
+              filterDeptResult.push(rows);
+              filterDeptId.push(rows.ztNo);
+            }
+          });
         }
+
       });
     });
-  } catch (e) {
+  } catch (e: any) {
     errorMessage(e.toString());
   }
   return filterDeptResult;

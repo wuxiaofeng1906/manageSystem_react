@@ -299,7 +299,6 @@ const getTesterOption = (personName: any, gridData: any) => {
 
 // 由谁解决
 const getSolvedByOption = (personName: any, gridData: any) => {
-  debugger;
   const optionArray: any = [];
   personName.forEach((name: string) => {
     let count = 0;
@@ -311,8 +310,9 @@ const getSolvedByOption = (personName: any, gridData: any) => {
             count += 1;
           }
         });
+      } else if (name === "") { // 没有数据的话则
+        count += 1;
       }
-
     });
     const person = name === "" ? "空" : name;
     if (person === "空") {  // 空值显示在最前面
@@ -442,23 +442,21 @@ const filterTesterData = (test: any, oraData: any) => {
   if (!test || test.length === 0) {
     filterTestResult = [...oraData];
   } else {
-    oraData.forEach((row: any) => {
-      const gridTester = row.tester;
-      const testerStr: any = [];
-      if (gridTester && gridTester.length > 0) {
-        gridTester.forEach((testers: any) => {
-          testerStr.push(testers.name);
-        });
-        test.forEach((ele: any) => {
-          if (testerStr.includes(ele)) {
-            // 重复的数据不添加
-            if (!filterTestID.includes(row.ztNo)) {
+    test.forEach((ele: any) => {
+      oraData.forEach((row: any) => {
+        const gridTester = row.tester;
+        if (gridTester && gridTester.length > 0) {
+          gridTester.forEach((person: any) => {
+            if (ele === person.name && !filterTestID.includes(row.ztNo)) {
               filterTestID.push(row.ztNo);
               filterTestResult.push(row);
             }
-          }
-        })
-      }
+          });
+        } else if (ele === "NA" && !filterTestID.includes(row.ztNo)) {
+          filterTestID.push(row.ztNo);
+          filterTestResult.push(row);
+        }
+      });
     });
   }
   return filterTestResult;
@@ -466,18 +464,29 @@ const filterTesterData = (test: any, oraData: any) => {
 
 // 过滤解决/已完成
 const filterSolvedData = (solved: any, oraData: any) => {
+
   let filterSolvedResult: any = [];
+  const filterSolvedID: any = [];
   if (!solved || solved.length === 0) {
     filterSolvedResult = [...oraData];
   } else {
+    debugger;
     solved.forEach((ele: any) => {
       oraData.forEach((row: any) => {
-        const finishedB = row.finishedBy === null ? "" : (row.finishedBy).name;
-        if (ele === finishedB) {
+        const finishedBArray = row.finishedBy === null ? "" : row.finishedBy;
+        if (finishedBArray && finishedBArray.length > 0) {
+          finishedBArray.forEach((person: any) => {
+            if (ele === person.name && !filterSolvedID.includes(row.ztNo)) {
+              filterSolvedID.push(row.ztNo);
+              filterSolvedResult.push(row);
+            }
+          });
+        } else if (finishedBArray === ele && !filterSolvedID.includes(row.ztNo)) {
+          filterSolvedID.push(row.ztNo);
           filterSolvedResult.push(row);
         }
       });
-    })
+    });
   }
   return filterSolvedResult;
 };

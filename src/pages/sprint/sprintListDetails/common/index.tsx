@@ -99,14 +99,15 @@ const getRelatedPersonName = (oraData: any) => {
 
     //  解决人
     const finished_person = rows.finishedBy;
-    if (finished_person) {
-      if (solvedBy.indexOf(finished_person?.name) === -1) {
-        solvedBy.push(finished_person?.name);
-      }
+    if (finished_person && finished_person.length > 0) {
+      finished_person.forEach((personInfo: any) => {
+        if (solvedBy.indexOf(personInfo?.name) === -1) {
+          solvedBy.push(personInfo?.name);
+        }
+      });
     } else if (solvedBy.indexOf("") === -1) {
       solvedBy.push("");
     }
-
   });
 
   return {tester, assigned, solvedBy};

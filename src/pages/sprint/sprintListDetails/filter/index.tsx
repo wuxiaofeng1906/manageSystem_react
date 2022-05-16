@@ -4,8 +4,8 @@ import {errorMessage} from "@/publicMethods/showMessages";
 
 const {Option} = Select;
 
-// 解析成树形数据
-const getCenterTree = (parentData: any) => {
+// 将部门对象解析成树形数据
+const getDevCenterTree = (parentData: any) => {
   const parents = parentData.filter((value: any) => value.parent === 'undefined' || value.parent === null || value.parent === 1);
   const children = parentData.filter((value: any) => value.parent !== 'undefined' && value.parent != null);
   const translator = (parentB: any, childrenB: any) => {
@@ -15,22 +15,32 @@ const getCenterTree = (parentData: any) => {
           const temp: any = JSON.parse(JSON.stringify(childrenB));
           temp.splice(index, 1);
           translator([current], temp);
-
           if (typeof (parent.children) !== 'undefined') {
-            const newData = {
-              ...current,
-              title: `${current.title}(${current.count})`
-            }
-            parent.children.push(newData);
-          } else {
-            debugger;
-            const newData = {
-              ...current,
-              title: `${current.title}(${current.count})`
-            }
-            // eslint-disable-next-line no-param-reassign
-            parent.children = [newData];
+            let titles = `${current.title}(${current.count})`;
+            // if (current.key === 74) {
+            if (current.naCount > 0) {
 
+              titles = `${current.title}(${current.count}(NA:${current.naCount}))`;
+            }
+
+            parent.children.push({
+              ...current,
+              title: titles
+            });
+          } else {
+
+            let titles = `${current.title}(${current.count})`;
+            // if (current.key === 74) {
+            if (current.naCount > 0) {
+
+              titles = `${current.title}(${current.count}(NA:${current.naCount}))`;
+            }
+
+            // eslint-disable-next-line no-param-reassign
+            parent.children = [{
+              ...current,
+              title: titles
+            }];
           }
         }
       });
@@ -43,55 +53,104 @@ const getCenterTree = (parentData: any) => {
   return parents
 };
 
-// 对应部门和个数：  如果是测试部门，就看统计【测试】字段的值；如果是开发部门，则先看解决人/完成人。如果解决人为空，就看指派给。
+// 获取各个部门对应的个数
+const getDeptsCount = (deptId: number, gridData: any) => {
+  let final_count = 0;
+  let Na_count = 0; // 用于记录测试是NA的个数
+  const filterDeptId: any = [];
+  gridData.forEach((rows: any) => {
+    // 先判断测试字段以及测试是否验证通过字段
+    const testerArray = rows.tester;
+    if (testerArray && testerArray.length > 0) {
+      testerArray.forEach((testerInfo: any) => {
+        if (testerInfo.dept?.id === deptId && !filterDeptId.includes(rows.ztNo)) {
+          filterDeptId.push(rows.ztNo);
+          final_count = filterDeptId.length; // 对于测试要特殊处理
+        }
+      });
+    } else if (rows.testCheck && deptId === 74) { // 是的话，也算是测试，需要挂到测试大部门,必须测试是否验证通过为是的时候，才算到测试部门
+      final_count += 1;
+      Na_count += 1;
+    }
+
+    //
+    /* 再判断开发,比对解决人和完成人; 先看解决人/完成人。如果解决人为空，就看指派给 */
+    let devPerson = [];
+    if (rows.finishedBy && (rows.finishedBy).length > 0) {
+      devPerson = [...rows.finishedBy];
+    } else if (rows.assignedTo) {
+      devPerson.push(rows.assignedTo);
+    }
+    if (devPerson.length > 0)
+      devPerson.forEach((ele: any) => {
+        if (ele && ele.dept?.id === deptId) {
+          final_count += 1;
+        }
+      });
+  });
+
+  return {final_count, Na_count};
+};
+
+// 根据当前部门获取子部门id
+const getChildDepts = (organizationData: any, parentId: number) => {
+  const childDept: any = [parentId]; // 不管有没有子部门，本次查询的部门是一定有的。
+  const parents = organizationData.filter((value: any) => value.parent === 'undefined' || value.parent === null || value.parent === parentId);
+  const children = organizationData.filter((value: any) => value.parent !== 'undefined' && value.parent != null);
+  const translator = (parentB: any, childrenB: any) => {
+    parentB.forEach((parent: any) => {
+      // 父部门也要一并写入
+      if (!childDept.includes(parent.id)) {
+        childDept.push(parent.id);
+      }
+
+      childrenB.forEach((current: any, index: any) => {
+        if (current.parent === parent.id) {
+          const temp: any = JSON.parse(JSON.stringify(childrenB));
+          temp.splice(index, 1);
+          translator([current], temp);
+          if (!childDept.includes(current.id)) {
+            childDept.push(current.id);
+          }
+        }
+      });
+    });
+  };
+
+  translator(parents, children);
+
+  return childDept
+};
+
+// 对应部门和个数：如果是测试部门，就看统计【测试】字段的值；如果是开发部门，则先看解决人/完成人。如果解决人为空，就看指派给。
 const getDeptAndCount = (dept: any, gridData: any) => {
   const deptCountData: any = [];
 
   try {
-    const deptData = dept.organization;
-    if (deptData && deptData.length > 0) {
-      deptData.forEach((item: any) => {
-        let final_count = 0;
-        const filterDeptId: any = [];
-        gridData.forEach((rows: any) => {
-          // 先判断测试
-          const testerArray = rows.tester;
-          if (testerArray && testerArray.length > 0) {
+    const {organization} = dept;
+    if (organization && organization.length > 0) {
+      organization.forEach((item: any) => {
+        // 需要先拿取下级所有部门信息
+        const childDeptId = getChildDepts(organization, item.id);
 
-            testerArray.forEach((testerInfo: any) => {
-              if (testerInfo.dept?.id === item.id && !filterDeptId.includes(rows.ztNo)) {
-                filterDeptId.push(rows.ztNo);
-                final_count = filterDeptId.length; // 对于测试要特殊处理
-              }
-            });
-          } else if (rows.testCheck && item.id === 74) { // 是的话，也算是测试，需要挂到测试大部门
-            final_count += 1;
-            // filterDeptId.push(rows.ztNo);
-          }
+        if (childDeptId) {
+          let final_count = 0;
+          let na_count = 0;
+          childDeptId.forEach((deptId: number) => {
+            const count = getDeptsCount(deptId, gridData);
+            final_count += count.final_count;
+            na_count += count.Na_count;
+          });
 
-          //
-          /* 再判断开发,比对解决人和完成人; 先看解决人/完成人。如果解决人为空，就看指派给 */
-          let devPerson = [];
-          if (rows.finishedBy && (rows.finishedBy).length > 0) {
-            devPerson = [...rows.finishedBy];
-          } else if (rows.assignedTo) {
-            devPerson.push(rows.assignedTo);
-          }
-          if (devPerson.length > 0)
-            devPerson.forEach((ele: any) => {
-              if (ele && ele.dept?.id === item.id) {
-                final_count += 1;
-              }
-            });
-        });
-
-        deptCountData.push({
-          key: item.id,
-          title: item.name,
-          parent: item.parent,
-          value: item.id,
-          count: final_count
-        });
+          deptCountData.push({
+            key: item.id,
+            title: item.name,
+            parent: item.parent,
+            value: item.id,
+            count: final_count,
+            naCount: na_count
+          });
+        }
       });
     }
   } catch (e: any) {
@@ -116,7 +175,7 @@ const devCenterDept = async (client: GqlClient<object>, gridData: any) => {
   `);
 
   const deptCountArray = getDeptAndCount(data?.organization, gridData);
-  const deptArray = getCenterTree(deptCountArray);
+  const deptArray = getDevCenterTree(deptCountArray);
   const devCenter: any = [];
   if (deptArray && deptArray.length > 0) {
     deptArray.forEach((ele: any) => {

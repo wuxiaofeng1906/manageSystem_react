@@ -32,15 +32,15 @@ const getColums = (prjNames: any) => {
       headerCheckboxSelection: true,
       maxWidth: 35,
     },
-    // {
-    //   headerName: '序号',
-    //   maxWidth: 80,
-    //   filter: false,
-    //   pinned: 'left',
-    //   cellRenderer: (params: any) => {
-    //     return Number(params.node.id) + 1;
-    //   },
-    // },
+    {
+      headerName: '序号',
+      maxWidth: 80,
+      filter: false,
+      pinned: 'left',
+      cellRenderer: (params: any) => {
+        return Number(params.node.id) + 1;
+      },
+    },
     {
       headerName: '阶段',
       field: 'stage',

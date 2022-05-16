@@ -54,23 +54,20 @@ const getDevCenterTree = (parentData: any) => {
 };
 
 // 获取各个部门对应的个数
-const getDeptsCount = (deptId: number, gridData: any) => {
-  let final_count = 0;
-  let Na_count = 0; // 用于记录测试是NA的个数
-  const filterDeptId: any = [];
+const getDeptsCount = (deptId: number, gridData: any, final_Array: any, na_count_array: any) => {
+
   gridData.forEach((rows: any) => {
     // 先判断测试字段以及测试是否验证通过字段
     const testerArray = rows.tester;
     if (testerArray && testerArray.length > 0) {
       testerArray.forEach((testerInfo: any) => {
-        if (testerInfo.dept?.id === deptId && !filterDeptId.includes(rows.ztNo)) {
-          filterDeptId.push(rows.ztNo);
-          final_count = filterDeptId.length; // 对于测试要特殊处理
+        if (testerInfo.dept?.id === deptId && !final_Array.includes(rows.id)) {
+          final_Array.push(rows.id);
         }
       });
-    } else if (rows.testCheck && deptId === 74) { // 是的话，也算是测试，需要挂到测试大部门,必须测试是否验证通过为是的时候，才算到测试部门
-      final_count += 1;
-      Na_count += 1;
+    } else if (rows.testCheck && deptId === 74 && !final_Array.includes(rows.id)) { // 是的话，也算是测试，需要挂到测试大部门,必须测试是否验证通过为是的时候，才算到测试部门
+      final_Array.push(rows.id);
+      na_count_array.push(rows.id);
     }
 
     //
@@ -81,15 +78,17 @@ const getDeptsCount = (deptId: number, gridData: any) => {
     } else if (rows.assignedTo) {
       devPerson.push(rows.assignedTo);
     }
-    if (devPerson.length > 0)
+    if (devPerson.length > 0) {
       devPerson.forEach((ele: any) => {
-        if (ele && ele.dept?.id === deptId) {
-          final_count += 1;
+        if (ele && ele.dept?.id === deptId && !final_Array.includes(rows.id)) {
+          final_Array.push(rows.id);
         }
       });
+    }
+
   });
 
-  return {final_count, Na_count};
+  return {final_Array, na_count_array};
 };
 
 // 根据当前部门获取子部门id
@@ -130,25 +129,26 @@ const getDeptAndCount = (dept: any, gridData: any) => {
     const {organization} = dept;
     if (organization && organization.length > 0) {
       organization.forEach((item: any) => {
+        if (item.id === 74) {
+          debugger;
+        }
         // 需要先拿取下级所有部门信息
         const childDeptId = getChildDepts(organization, item.id);
 
         if (childDeptId) {
-          let final_count = 0;
-          let na_count = 0;
+          const final_Array: any = [];
+          const na_count_array: any = [];
           childDeptId.forEach((deptId: number) => {
-            const count = getDeptsCount(deptId, gridData);
-            final_count += count.final_count;
-            na_count += count.Na_count;
+            getDeptsCount(deptId, gridData, final_Array, na_count_array);
           });
-
+          debugger;
           deptCountData.push({
             key: item.id,
             title: item.name,
             parent: item.parent,
             value: item.id,
-            count: final_count,
-            naCount: na_count
+            count: final_Array.length,
+            naCount: na_count_array.length
           });
         }
       });

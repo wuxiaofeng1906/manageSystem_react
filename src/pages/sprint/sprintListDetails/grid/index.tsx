@@ -187,7 +187,6 @@ const getColums = (prjNames: any) => {
       headerName: '解决/完成人',
       field: 'finishedBy',
       minWidth: 80,
-      tooltipField: "finishedBy",
       suppressMenu: false,
       valueGetter: (params: any) => {
 
@@ -237,8 +236,6 @@ const getColums = (prjNames: any) => {
           history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=2&count=${params.value}`);
         }
       },
-      // tooltipField: "relatedTasks"
-
     },
     {
       headerName: '相关bug',
@@ -346,14 +343,12 @@ const getColums = (prjNames: any) => {
       minWidth: 80,
       cellRenderer: stageForLineThrough,
       tooltipField: "publishEnv"
-
     },
     {
       headerName: '关闭人',
       field: 'closedBy',
       minWidth: 80,
       cellRenderer: stageForLineThrough,
-      tooltipField: "closedBy",
       suppressMenu: false,
 
     },
@@ -369,14 +364,12 @@ const getColums = (prjNames: any) => {
       headerName: '验证范围建议',
       field: 'scopeLimit',
       cellRenderer: stageForLineThrough,
-      // tooltipField: "scopeLimit"
     },
     {
       headerName: 'UED',
       field: 'uedName',
       cellRenderer: stageForLineThrough,
       suppressMenu: false,
-      // tooltipField: "uedName"
     },
     {
       headerName: 'UED测试环境验证',

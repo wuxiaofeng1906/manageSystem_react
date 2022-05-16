@@ -62,6 +62,7 @@ export default [
         path: 'sprintDashboard',
         component: './sprint/sprintDashboard/index',
         access: 'spAdmin',
+        hideInMenu: true,
       },
       {
         name: 'details',

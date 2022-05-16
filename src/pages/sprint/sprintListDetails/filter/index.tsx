@@ -129,9 +129,6 @@ const getDeptAndCount = (dept: any, gridData: any) => {
     const {organization} = dept;
     if (organization && organization.length > 0) {
       organization.forEach((item: any) => {
-        if (item.id === 74) {
-          debugger;
-        }
         // 需要先拿取下级所有部门信息
         const childDeptId = getChildDepts(organization, item.id);
 
@@ -141,7 +138,7 @@ const getDeptAndCount = (dept: any, gridData: any) => {
           childDeptId.forEach((deptId: number) => {
             getDeptsCount(deptId, gridData, final_Array, na_count_array);
           });
-          debugger;
+
           deptCountData.push({
             key: item.id,
             title: item.name,
@@ -366,7 +363,7 @@ const getSolvedByOption = (personName: any, gridData: any) => {
   personName.forEach((name: string) => {
     let count = 0;
     gridData.forEach((rows: any) => {
-      const finishedBy: any = rows.finishedBy;
+      const {finishedBy} = rows;
       if (finishedBy && finishedBy.length > 0) {
         finishedBy.forEach((ele: any) => {
           if (ele.name === name) {
@@ -407,14 +404,14 @@ const filterDeptData = (depts: any, oraData: any) => {
         if (testerArray && testerArray.length > 0) {
           // 如果测试不为空，则对比选中的测试的部门id，放入数据
           testerArray.forEach((testerInfo: any) => {
-            if (testerInfo.dept?.id === deptId && !filterDeptId.includes(rows.ztNo)) {
+            if (testerInfo.dept?.id === deptId && !filterDeptId.includes(rows.id)) {
               filterDeptResult.push(rows);
-              filterDeptId.push(rows.ztNo);
+              filterDeptId.push(rows.id);
             }
           });
-        } else if (rows.testCheck && deptId === 74 && !filterDeptId.includes(rows.ztNo)) { // 是的话，也算是测试，需要挂到测试大部门
+        } else if (rows.testCheck && deptId === 74 && !filterDeptId.includes(rows.id)) { // 是的话，也算是测试，需要挂到测试大部门
           filterDeptResult.push(rows);
-          filterDeptId.push(rows.ztNo);
+          filterDeptId.push(rows.id);
         }
         /* 再比对解决人和完成人; 先看解决人/完成人。如果解决人为空，就看指派给 */
         let devPerson = [];
@@ -426,9 +423,9 @@ const filterDeptData = (depts: any, oraData: any) => {
         }
         if (devPerson.length > 0) {
           devPerson.forEach((ele: any) => {
-            if (ele.dept?.id === deptId && !filterDeptId.includes(rows.ztNo)) {
+            if (ele.dept?.id === deptId && !filterDeptId.includes(rows.id)) {
               filterDeptResult.push(rows);
-              filterDeptId.push(rows.ztNo);
+              filterDeptId.push(rows.id);
             }
           });
         }
@@ -518,13 +515,13 @@ const filterTesterData = (test: any, oraData: any) => {
         const gridTester = row.tester;
         if (gridTester && gridTester.length > 0) {
           gridTester.forEach((person: any) => {
-            if (ele === person.name && !filterTestID.includes(row.ztNo)) {
-              filterTestID.push(row.ztNo);
+            if (ele === person.name && !filterTestID.includes(row.id)) {
+              filterTestID.push(row.id);
               filterTestResult.push(row);
             }
           });
-        } else if (ele === "NA" && !filterTestID.includes(row.ztNo)) {
-          filterTestID.push(row.ztNo);
+        } else if (ele === "NA" && !filterTestID.includes(row.id)) {
+          filterTestID.push(row.id);
           filterTestResult.push(row);
         }
       });
@@ -541,19 +538,18 @@ const filterSolvedData = (solved: any, oraData: any) => {
   if (!solved || solved.length === 0) {
     filterSolvedResult = [...oraData];
   } else {
-    debugger;
     solved.forEach((ele: any) => {
       oraData.forEach((row: any) => {
         const finishedBArray = row.finishedBy === null ? "" : row.finishedBy;
         if (finishedBArray && finishedBArray.length > 0) {
           finishedBArray.forEach((person: any) => {
-            if (ele === person.name && !filterSolvedID.includes(row.ztNo)) {
-              filterSolvedID.push(row.ztNo);
+            if (ele === person.name && !filterSolvedID.includes(row.id)) {
+              filterSolvedID.push(row.id);
               filterSolvedResult.push(row);
             }
           });
-        } else if (finishedBArray === ele && !filterSolvedID.includes(row.ztNo)) {
-          filterSolvedID.push(row.ztNo);
+        } else if (finishedBArray === ele && !filterSolvedID.includes(row.id)) {
+          filterSolvedID.push(row.id);
           filterSolvedResult.push(row);
         }
       });

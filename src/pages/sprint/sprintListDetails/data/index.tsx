@@ -303,6 +303,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             createAt
             deadline
             baseline
+            belongStory
             resolvedAt
             fromBug
             openedAt

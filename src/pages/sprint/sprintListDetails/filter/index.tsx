@@ -65,7 +65,7 @@ const getDeptsCount = (deptId: number, gridData: any, final_Array: any, na_count
           final_Array.push(rows.id);
         }
       });
-    } else if (rows.testCheck && deptId === 74 && !final_Array.includes(rows.id)) { // 是的话，也算是测试，需要挂到测试大部门,必须测试是否验证通过为是的时候，才算到测试部门
+    } else if ((rows.testCheck === "1" || rows.testCheck==="-1") && deptId === 74 && !final_Array.includes(rows.id)) { // 是的话，也算是测试，需要挂到测试大部门,必须测试是否验证通过为是的时候，才算到测试部门
       final_Array.push(rows.id);
       na_count_array.push(rows.id);
     }
@@ -409,7 +409,7 @@ const filterDeptData = (depts: any, oraData: any) => {
               filterDeptId.push(rows.id);
             }
           });
-        } else if (rows.testCheck && deptId === 74 && !filterDeptId.includes(rows.id)) { // 是的话，也算是测试，需要挂到测试大部门
+        } else if ((rows.testCheck === "1" || rows.testCheck === "-1") && deptId === 74 && !filterDeptId.includes(rows.id)) { // 是的话，也算是测试，需要挂到测试大部门
           filterDeptResult.push(rows);
           filterDeptId.push(rows.id);
         }

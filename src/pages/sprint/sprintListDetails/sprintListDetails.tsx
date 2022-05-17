@@ -21,6 +21,7 @@ import {getStaticMessage, headerPath} from "./header";
 import {
   numberRenderToCurrentStage, stageChangeToNumber, numberRenderToZentaoType,
   zentaoTypeRenderToNumber, numberRenderToZentaoSeverity, numberRenderToZentaoStatus,
+  numberValueGetter
 } from '@/publicMethods/cellRenderer';
 import moment from "moment";
 import {getHeight} from '@/publicMethods/pageSet';
@@ -211,6 +212,7 @@ const SprintList: React.FC<any> = () => {
 
   // 点击修改按钮赋值弹出窗
   const adminModify = async (datas: any) => {
+    debugger;
 
     // 还要获取英文名
     const nameIdArray: any = [];
@@ -247,12 +249,12 @@ const SprintList: React.FC<any> = () => {
       adminAddAssignTo: (datas.assignedTo)?.name,
       adminAddSolvedBy: (datas.finishedBy)?.name,
       adminAddClosedBy: datas.closedBy,
-      adminAddPageadjust: datas.pageAdjust,
-      adminAddHotUpdate: datas.hotUpdate,
-      adminAddDataUpgrade: datas.dataUpdate,
-      adminAddInteUpgrade: datas.interUpdate,
-      adminAddPreData: datas.presetData,
-      adminAddtesterVerifi: datas.testCheck === "-0" ? "0" : datas.testCheck === "-1" ? "1" : datas.testCheck,
+      adminAddPageadjust: numberValueGetter(datas.pageAdjust),
+      adminAddHotUpdate: numberValueGetter(datas.hotUpdate),
+      adminAddDataUpgrade: numberValueGetter(datas.dataUpdate),
+      adminAddInteUpgrade: numberValueGetter(datas.interUpdate),
+      adminAddPreData: numberValueGetter(datas.presetData),
+      adminAddtesterVerifi: numberValueGetter(datas.testCheck),
       adminAddSuggestion: datas.scopeLimit,
       adminAddProposedTest: datas.proposedTest,
       adminAddEnvironment: publishEnv,
@@ -441,16 +443,16 @@ const SprintList: React.FC<any> = () => {
     formForManagerToMod.setFieldsValue({
       managerCHandaoID: datas.ztNo,
       managerChandaoType: numberRenderToZentaoType({value: datas.category === null ? '' : datas.category.toString()}),
-      managerDataUpgrade: datas.dataUpdate,
+      managerDataUpgrade: numberValueGetter(datas.dataUpdate),
       managerProTested: datas.proposedTest,
       managerEnvironment: pubEnv,
-      managerPageAdjust: datas.pageAdjust,
-      managerHotUpdate: datas.hotUpdate,
-      managerInteUpgrade: datas.interUpdate,
-      managerPreData: datas.presetData,
+      managerPageAdjust: numberValueGetter(datas.pageAdjust),
+      managerHotUpdate: numberValueGetter(datas.hotUpdate),
+      managerInteUpgrade: numberValueGetter(datas.interUpdate),
+      managerPreData: numberValueGetter(datas.presetData),
       managerSuggestion: datas.scopeLimit,
       managerTitle: datas.title,
-      managertesterVerifi: datas.testCheck === "-0" ? "0" : datas.testCheck === "-1" ? "1" : datas.testCheck,
+      managertesterVerifi: numberValueGetter(datas.testCheck),
     });
     setformForManagerToModVisible(true);
   };
@@ -547,6 +549,7 @@ const SprintList: React.FC<any> = () => {
   /* region UED 权限操作 */
   // UED 修改
   const uedModify = (datas: any) => {
+    debugger;
     formForUEDToMod.setFieldsValue({
       uedCHandaoID: datas.ztNo,
       uedChandaoType: numberRenderToZentaoType({value: datas.category === null ? '' : datas.category.toString()}),
@@ -602,7 +605,7 @@ const SprintList: React.FC<any> = () => {
     if (initialState?.currentUser) {
       currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
     }
-    // currentUserGroup = 'UedGroup';
+    // currentUserGroup = 'devManageGroup';
     if (currentUserGroup !== undefined) {
       switch (currentUserGroup.toString()) {
         case 'superGroup':
@@ -1466,7 +1469,6 @@ const SprintList: React.FC<any> = () => {
                 </Form.Item>
               </div>
             </Col>
-
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddHotUpdate" label="是否可热更:">
@@ -2146,6 +2148,7 @@ const SprintList: React.FC<any> = () => {
                       <Option key={'5'} value={'5'}>《开发热更新申请》</Option>,
                       <Option key={'6'} value={'6'}>禅道自动写入</Option>,
                       <Option key={'7'} value={'7'}>手工录入</Option>,
+                      <Option key={'8'} value={'8'}>自动获取</Option>,
                     ]}
                   </Select>
                 </Form.Item>

@@ -953,6 +953,21 @@ const isOrNotValueGetter = (value: any) => {
 
   return "";
 };
+
+const numberValueGetter = (value: any) => {
+
+  if (value) {
+    if (value === "-1" || value === "1") {
+      return "1";
+    }
+    if (value === "-0" || value === "0") {
+      return "0";
+    }
+  }
+
+  return "";
+};
+
 export {
   numberRenderToYesNo,
   numberRenderTopass,
@@ -986,6 +1001,7 @@ export {
   projectStageRender,
   TimestampRender,
   isOrNotValueGetter,
-  textDecorateRender
+  textDecorateRender,
+  numberValueGetter
 };
 

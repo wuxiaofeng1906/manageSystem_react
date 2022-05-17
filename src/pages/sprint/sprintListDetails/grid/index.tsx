@@ -15,7 +15,9 @@ import {
   stageForLineThrough,
   testerRender,
   timeForLineThrough,
-  timestampChanges
+  timestampChanges,
+  isOrNotValueGetter,
+  textDecorateRender
 } from "@/publicMethods/cellRenderer";
 
 import {history} from "@@/core/history";
@@ -160,7 +162,8 @@ const getColums = (prjNames: any) => {
       field: 'ztStatus',
       cellRenderer: numberRenderToZentaoStatusForRed,
       minWidth: 80,
-    }, {
+    },
+    {
       headerName: '指派给',
       field: 'assignedTo',
       minWidth: 80,
@@ -256,27 +259,42 @@ const getColums = (prjNames: any) => {
     {
       headerName: '是否涉及页面调整',
       field: 'pageAdjust',
-      cellRenderer: numberRenderToYesNo,
+      valueGetter: (params: any) => {
+        return isOrNotValueGetter(params.data?.pageAdjust)
+      },
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '是否可热更',
       field: 'hotUpdate',
-      cellRenderer: numberRenderToYesNo,
+      valueGetter: (params: any) => {
+        return isOrNotValueGetter(params.data?.hotUpdate)
+      },
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '是否有数据升级',
       field: 'dataUpdate',
-      cellRenderer: numberRenderToYesNo,
+      valueGetter: (params: any) => {
+        return isOrNotValueGetter(params.data?.dataUpdate)
+      },
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '是否有接口升级',
       field: 'interUpdate',
-      cellRenderer: numberRenderToYesNo,
+      valueGetter: (params: any) => {
+        return isOrNotValueGetter(params.data?.interUpdate)
+      },
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '是否有预置数据修改',
       field: 'presetData',
-      cellRenderer: numberRenderToYesNo,
+      valueGetter: (params: any) => {
+        return isOrNotValueGetter(params.data?.presetData)
+      },
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '是否需要测试验证',

@@ -1,5 +1,14 @@
 import * as dayjs from 'dayjs';
 
+// 打删除线
+const textDecorateRender = (params: any) => {
+
+  if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+    return `<span style="text-decoration:line-through"> ${params.value} </span>`;
+  }
+  return params.value;
+
+};
 const numberRenderToYesNo = (params: any) => {
   if (params.value === null || params.value === undefined) {
     return "";
@@ -39,7 +48,6 @@ const numberRenderTopass = (params: any) => {
 };
 
 const numberRenderToCurrentStage = (params: any) => {
-
 
   let stage = "";
 
@@ -140,6 +148,7 @@ const testerRender = (params: any) => {
   return testers;
 
 };
+
 
 const stageForLineThrough = (params: any) => {
   if (params.value === null || params.value === undefined) {
@@ -930,6 +939,20 @@ const TimestampRender = (params: any) => {
   }
   return params.value;
 };
+
+const isOrNotValueGetter = (value: any) => {
+
+  if (value) {
+    if (value === "-1" || value === "1") {
+      return "是";
+    }
+    if (value === "-0" || value === "0") {
+      return "否";
+    }
+  }
+
+  return "";
+};
 export {
   numberRenderToYesNo,
   numberRenderTopass,
@@ -961,6 +984,8 @@ export {
   areaRender,
   attendanceRender,
   projectStageRender,
-  TimestampRender
+  TimestampRender,
+  isOrNotValueGetter,
+  textDecorateRender
 };
 

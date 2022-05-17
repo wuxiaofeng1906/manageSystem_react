@@ -1360,6 +1360,7 @@ const SprintList: React.FC<any> = () => {
                     mode="multiple"
                     style={widths}
                     placeholder="请输入"
+                    maxTagCount={"responsive"}
                     optionFilterProp="children"
                   >
                     {LoadTesterCombobox()}
@@ -1597,7 +1598,7 @@ const SprintList: React.FC<any> = () => {
               <div style={leftStyle}>
                 <Form.Item name="adminAddEnvironment" label="发布环境:">
                   <Select placeholder="请选择" style={widths} mode="multiple"
-                          optionFilterProp="children">
+                          optionFilterProp="children" maxTagCount={"responsive"}>
                     {[
                       <Option key={'集群1'} value={'集群1'}>集群1</Option>,
                       <Option key={'集群2'} value={'集群2'}>集群2</Option>,
@@ -1885,7 +1886,7 @@ const SprintList: React.FC<any> = () => {
               <div style={{marginLeft: '50px'}}>
                 <Form.Item name="managerEnvironment" label="发布环境:">
                   <Select placeholder="请选择" style={{width: 515}} mode="multiple"
-                          optionFilterProp="children">
+                          optionFilterProp="children" maxTagCount={"responsive"}>
                     {[
                       <Option key={'集群1'} value={'集群1'}>集群1</Option>,
                       <Option key={'集群2'} value={'集群2'}>集群2</Option>,
@@ -1977,6 +1978,7 @@ const SprintList: React.FC<any> = () => {
                   <Select placeholder="请选择"
                           style={widths}
                           mode="multiple"
+                          maxTagCount={"responsive"}
                           optionFilterProp="children">
                     {LoadTesterCombobox()}
                   </Select>
@@ -2499,7 +2501,7 @@ const SprintList: React.FC<any> = () => {
                   <Checkbox value="是否有接口升级">是否有接口升级</Checkbox>
                 </Col>
                 <Col span={4}>
-                  <Checkbox value="是否有预置数据">是否有预置数据</Checkbox>
+                  <Checkbox value="是否有预置数据修改">是否有预置数据修改</Checkbox>
                 </Col>
                 <Col span={4}>
                   <Checkbox value="是否需要测试验证">是否需要测试验证</Checkbox>

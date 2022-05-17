@@ -293,7 +293,7 @@ const getTypeOption = (gridData: any) => {
 
   return [
     <Option key={"1"} value={"bug"}>Bug({count.count_bug})</Option>,
-    <Option key={"2"} value={"task"}>Task({count.count_task})</Option>,
+    // <Option key={"2"} value={"task"}>Task({count.count_task})</Option>,
     <Option key={"3"} value={"story"}>Story({count.count_story})</Option>,
     <Option key={"-3"} value={"B_story"}>B_Story({count.count_b_story})</Option>,
   ];

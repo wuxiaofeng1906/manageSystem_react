@@ -1208,21 +1208,21 @@ const SprintList: React.FC<any> = () => {
                       onClick={addProject}>新增</Button>
               <Button type="text"
                       style={{
-                        marginLeft: "-25px",
+                        marginLeft: "-10px",
                         display: judgeAuthority("修改项目明细行") === true ? "inline" : "none"
                       }}
                       icon={<EditTwoTone/>}
                       onClick={btnModifyProject}>修改</Button>
               <Button type="text"
                       style={{
-                        marginLeft: "-25px",
+                        marginLeft: "-10px",
                         display: judgeAuthority("删除项目明细行") === true ? "inline" : "none"
                       }}
                       icon={<DeleteTwoTone/>}
                       onClick={deleteSprintDetails}>删除</Button>
               <Button type="text"
                       style={{
-                        marginLeft: "-25px",
+                        marginLeft: "-10px",
                         display: judgeAuthority("移动项目明细行") === true ? "inline" : "none"
                       }}
                       icon={<SnippetsTwoTone/>}
@@ -1235,39 +1235,39 @@ const SprintList: React.FC<any> = () => {
                       onClick={flowForBaseLine}>基线</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-25px", display: judgeAuthority("撤销") === true ? "inline" : "none"}}
+                      style={{marginLeft: "-10px", display: judgeAuthority("撤销") === true ? "inline" : "none"}}
                       icon={<CloseSquareTwoTone/>}
                       onClick={flowForRevoke}>撤销</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-25px", display: judgeAuthority("取消") === true ? "inline" : "none"}}
+                      style={{marginLeft: "-10px", display: judgeAuthority("取消") === true ? "inline" : "none"}}
                       icon={<CloseSquareTwoTone/>}
                       onClick={flowForCancle}>取消</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-25px", display: judgeAuthority("开发已revert") === true ? "inline" : "none"}}
+                      style={{marginLeft: "-10px", display: judgeAuthority("开发已revert") === true ? "inline" : "none"}}
                       icon={<CheckSquareTwoTone/>}
                       onClick={flowForDevRevert}>开发已revert</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-25px", display: judgeAuthority("测试已验revert") === true ? "inline" : "none"}}
+                      style={{marginLeft: "-10px", display: judgeAuthority("测试已验revert") === true ? "inline" : "none"}}
                       icon={<CheckSquareTwoTone/>}
                       onClick={flowForTestRevert}>测试已验revert</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-25px", display: judgeAuthority("灰度已验证") === true ? "inline" : "none"}}
+                      style={{marginLeft: "-10px", display: judgeAuthority("灰度已验证") === true ? "inline" : "none"}}
                       icon={<CheckSquareTwoTone/>}
                       onClick={flowForHuiduChecked}>灰度已验证</Button>
 
               <Button type="text"
-                      style={{marginLeft: "-25px", display: judgeAuthority("线上已验证") === true ? "inline" : "none"}}
+                      style={{marginLeft: "-10px", display: judgeAuthority("线上已验证") === true ? "inline" : "none"}}
                       icon={<CheckSquareTwoTone/>}
                       onClick={flowForOnlineChecked}>线上已验证</Button>
               <label
                 style={{marginTop: '5px', display: judgeAuthority(`修改"测试已确认"字段`) === true ? "inline" : "none"}}>
                 测试确认:</label>
               <Select placeholder="请选择" value={testConfirm} style={{
-                marginLeft: "5px", width: '100px', marginTop: '4px',
+                marginLeft: "5px", width: '85px', marginTop: '4px',
                 display: judgeAuthority(`修改"测试已确认"字段`) === true ? "inline" : "none"
               }} size={"small"} onChange={testConfirmSelect}>
                 {[

@@ -42,6 +42,7 @@ import {
   moveSprintDetails, addNewProjects, getZentaoInfo, syncDetailsData
 } from "./common/axiosRequest";
 
+let ora_filter_data: any = [];
 const {Option} = Select;
 const SprintList: React.FC<any> = () => {
   const {initialState} = useModel('@@initialState');
@@ -97,11 +98,96 @@ const SprintList: React.FC<any> = () => {
   };
   /* endregion */
 
+  /* region 下拉框动态加载 以及条件筛选 */
+  const [selectOption, setSelectOptions] = useState({
+    deptSelect: [],
+    stageSelect: [],
+    typeSelect: [],
+    assignedSelect: [],
+    testSelect: [],
+    solvedSelect: []
+  });
+
+  // 获取表格中的数据
+  const getGridData = () => {
+    const datas: any = [];
+    gridApi.current?.forEachNode((rows: any) => {
+      datas.push(rows?.data);
+    });
+    return datas;
+  }
+  // 部门下拉框
+  const onDeptSelectFocus = async () => {
+    const optionArray: any = await devCenterDept(gqlClient, getGridData());
+    setSelectOptions({
+      ...selectOption,
+      deptSelect: optionArray
+    });
+  };
+  // 获取阶段下拉框
+  const onStageSelectFocus = () => {
+    const optionArray: any = getStageOption(getGridData());
+    setSelectOptions({
+      ...selectOption,
+      stageSelect: optionArray
+    });
+  };
+
+  // 获取类型下拉框
+  const onTypeSelectFocus = () => {
+    const optionArray: any = getTypeOption(getGridData());
+    setSelectOptions({
+      ...selectOption,
+      typeSelect: optionArray
+    });
+  }
+
+  // 获取指派给下拉框
+  const onAssignedSelectFocus = () => {
+    const optionArray: any = getAssignedToOption(personName?.assignedTo, getGridData());
+    setSelectOptions({
+      ...selectOption,
+      assignedSelect: optionArray
+    });
+  }
+
+  // 测试下拉框
+  const onTestSelectFocus = () => {
+    const optionArray: any = getTesterOption(personName?.tester, getGridData());
+    setSelectOptions({
+      ...selectOption,
+      testSelect: optionArray
+    });
+  };
+
+  // 解决人/完成人
+  const onSolvedSelectFocus = () => {
+    const optionArray: any = getSolvedByOption(personName?.solvedBy, getGridData());
+    setSelectOptions({
+      ...selectOption,
+      solvedSelect: optionArray
+    });
+
+  };
+
+  // 阶段选择
+  const onSelectChanged = () => {
+    const queryCondition = formForQuery.getFieldsValue();
+    const filterData = filterDatasByCondition(queryCondition, ora_filter_data);
+    gridApi.current?.setRowData(filterData);
+    // 还要设置title
+    const countRt = calTypeCount(filterData);
+    setPageTitle(getStaticMessage(countRt));
+  };
+  /* endregion 下拉框动态加载 */
+
   /* region 表格更新 */
   const updateGrid = async () => {
     const datas: any = await queryDevelopViews(gqlClient, prjId, prjType);
-    gridApi.current?.setRowData(datas?.result);
-    setPageTitle(getStaticMessage(datas?.resCount));
+    ora_filter_data = datas?.result;
+    onSelectChanged()
+    // gridApi.current?.setRowData(datas?.result);
+    // setPageTitle(getStaticMessage(datas?.resCount));
   };
 
   /* endregion */
@@ -654,89 +740,6 @@ const SprintList: React.FC<any> = () => {
 
   /* endregion */
 
-  /* region 下拉框动态加载 以及条件筛选 */
-  const [selectOption, setSelectOptions] = useState({
-    deptSelect: [],
-    stageSelect: [],
-    typeSelect: [],
-    assignedSelect: [],
-    testSelect: [],
-    solvedSelect: []
-  });
-
-  // 获取表格中的数据
-  const getGridData = () => {
-    const datas: any = [];
-    gridApi.current?.forEachNode((rows: any) => {
-      datas.push(rows?.data);
-    });
-    return datas;
-  }
-  // 部门下拉框
-  const onDeptSelectFocus = async () => {
-    const optionArray: any = await devCenterDept(gqlClient, getGridData());
-    setSelectOptions({
-      ...selectOption,
-      deptSelect: optionArray
-    });
-  };
-  // 获取阶段下拉框
-  const onStageSelectFocus = () => {
-    const optionArray: any = getStageOption(getGridData());
-    setSelectOptions({
-      ...selectOption,
-      stageSelect: optionArray
-    });
-  };
-
-  // 获取类型下拉框
-  const onTypeSelectFocus = () => {
-    const optionArray: any = getTypeOption(getGridData());
-    setSelectOptions({
-      ...selectOption,
-      typeSelect: optionArray
-    });
-  }
-
-  // 获取指派给下拉框
-  const onAssignedSelectFocus = () => {
-    const optionArray: any = getAssignedToOption(personName?.assignedTo, getGridData());
-    setSelectOptions({
-      ...selectOption,
-      assignedSelect: optionArray
-    });
-  }
-
-  // 测试下拉框
-  const onTestSelectFocus = () => {
-    const optionArray: any = getTesterOption(personName?.tester, getGridData());
-    setSelectOptions({
-      ...selectOption,
-      testSelect: optionArray
-    });
-  };
-
-  // 解决人/完成人
-  const onSolvedSelectFocus = () => {
-    const optionArray: any = getSolvedByOption(personName?.solvedBy, getGridData());
-    setSelectOptions({
-      ...selectOption,
-      solvedSelect: optionArray
-    });
-
-  };
-
-  // 阶段选择
-  const onSelectChanged = () => {
-    const queryCondition = formForQuery.getFieldsValue();
-    const filterData = filterDatasByCondition(queryCondition, data?.result);
-    gridApi.current?.setRowData(filterData);
-    // 还要设置title
-    const countRt = calTypeCount(filterData);
-    setPageTitle(getStaticMessage(countRt));
-  };
-  /* endregion 下拉框动态加载 */
-
   /* region 删除功能 */
 
   const [isdelModalVisible, setIsDelModalVisible] = useState(false);
@@ -1085,6 +1088,7 @@ const SprintList: React.FC<any> = () => {
 
   useEffect(() => {
     setPageTitle(getStaticMessage(data?.resCount));
+    ora_filter_data = data?.result;
     //   需要取出最初的指派给、测试、解决完成人，用于下拉框筛选
     const personData = getRelatedPersonName(data?.result);
     setPersonName({
@@ -2423,7 +2427,7 @@ const SprintList: React.FC<any> = () => {
       >
         <Form>
           <div>
-            <Checkbox.Group style={{width: '110%',marginLeft:-10}} value={selectedFiled}
+            <Checkbox.Group style={{width: '110%', marginLeft: -10}} value={selectedFiled}
                             onChange={onSetFieldsChange}>
               <Row>
                 <Col span={4}>

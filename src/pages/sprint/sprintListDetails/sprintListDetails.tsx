@@ -298,7 +298,6 @@ const SprintList: React.FC<any> = () => {
 
   // 点击修改按钮赋值弹出窗
   const adminModify = async (datas: any) => {
-    debugger;
 
     // 还要获取英文名
     const nameIdArray: any = [];
@@ -635,7 +634,6 @@ const SprintList: React.FC<any> = () => {
   /* region UED 权限操作 */
   // UED 修改
   const uedModify = (datas: any) => {
-    debugger;
     formForUEDToMod.setFieldsValue({
       uedCHandaoID: datas.ztNo,
       uedChandaoType: numberRenderToZentaoType({value: datas.category === null ? '' : datas.category.toString()}),
@@ -646,7 +644,6 @@ const SprintList: React.FC<any> = () => {
       UedOnlineVerti: datas.uedOnlineCheck,
       uedSource: datas.source,
     });
-
     setformForUEDToModVisible(true);
   };
 

@@ -6,7 +6,6 @@ const {Option} = Select;
 
 // 将部门对象解析成树形数据
 const getDevCenterTree = (parentData: any) => {
-  debugger;
   const parents = parentData.filter((value: any) => value.parent === 'undefined' || value.parent === null || value.parent === 0);
   const children = parentData.filter((value: any) => value.parent !== 'undefined' && value.parent != null);
   const translator = (parentB: any, childrenB: any) => {

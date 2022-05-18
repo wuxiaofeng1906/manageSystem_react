@@ -6,7 +6,8 @@ const {Option} = Select;
 
 // 将部门对象解析成树形数据
 const getDevCenterTree = (parentData: any) => {
-  const parents = parentData.filter((value: any) => value.parent === 'undefined' || value.parent === null || value.parent === 1);
+  debugger;
+  const parents = parentData.filter((value: any) => value.parent === 'undefined' || value.parent === null || value.parent === 0);
   const children = parentData.filter((value: any) => value.parent !== 'undefined' && value.parent != null);
   const translator = (parentB: any, childrenB: any) => {
     parentB.forEach((parent: any) => {
@@ -17,9 +18,7 @@ const getDevCenterTree = (parentData: any) => {
           translator([current], temp);
           if (typeof (parent.children) !== 'undefined') {
             let titles = `${current.title}(${current.count})`;
-            // if (current.key === 74) {
-            if (current.naCount > 0) {
-
+            if (current.naCount > 0 && current.key === 74) {
               titles = `${current.title}(${current.count}(NA:${current.naCount}))`;
             }
 
@@ -30,9 +29,7 @@ const getDevCenterTree = (parentData: any) => {
           } else {
 
             let titles = `${current.title}(${current.count})`;
-            // if (current.key === 74) {
-            if (current.naCount > 0) {
-
+            if (current.naCount > 0 && current.key === 74) {
               titles = `${current.title}(${current.count}(NA:${current.naCount}))`;
             }
 
@@ -65,7 +62,7 @@ const getDeptsCount = (deptId: number, gridData: any, final_Array: any, na_count
           final_Array.push(rows.id);
         }
       });
-    } else if ((rows.testCheck === "1" || rows.testCheck==="-1") && deptId === 74 && !final_Array.includes(rows.id)) { // 是的话，也算是测试，需要挂到测试大部门,必须测试是否验证通过为是的时候，才算到测试部门
+    } else if ((rows.testCheck === "1" || rows.testCheck === "-1") && deptId === 74 && !final_Array.includes(rows.id)) { // 是的话，也算是测试，需要挂到测试大部门,必须测试是否验证通过为是的时候，才算到测试部门
       final_Array.push(rows.id);
       na_count_array.push(rows.id);
     }
@@ -174,8 +171,9 @@ const devCenterDept = async (client: GqlClient<object>, gridData: any) => {
   const deptCountArray = getDeptAndCount(data?.organization, gridData);
   const deptArray = getDevCenterTree(deptCountArray);
   const devCenter: any = [];
-  if (deptArray && deptArray.length > 0) {
-    deptArray.forEach((ele: any) => {
+  if (deptArray && deptArray.length === 1) {
+    // 只是拿研发中心部门即可。
+    deptArray[0].children.forEach((ele: any) => {
       if (ele.key === 59) {
         devCenter.push(ele);
       }

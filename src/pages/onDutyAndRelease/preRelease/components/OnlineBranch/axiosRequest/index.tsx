@@ -1,7 +1,6 @@
 import axios from 'axios';
 import {getDutyPersonPermission, getSystemPersonPermission} from '../../../authority/permission';
 import dayjs from "dayjs";
-import {getServices} from "@/publicMethods/verifyAxios";
 
 const sys_accessToken = localStorage.getItem('accessId');
 axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
@@ -403,7 +402,6 @@ const saveVersonCheck = async (
   newOnlineBranchNum: string,
   sourceData: any,
 ) => {
-  debugger;
   const data = {
     check_num: newOnlineBranchNum,
     user_name: usersInfo.name,
@@ -419,19 +417,19 @@ const saveVersonCheck = async (
     const {server} = sourceData;
     let serverStr = '';
     if (server && server.length > 0) {
-      if (server[0] === "全部") {
-        // 需要获取所有的服务
-        const allServices: any = (await getServices())?.data;
-        if (allServices && allServices.length > 0) {
-          allServices.forEach((ele: any) => {
-            serverStr = serverStr === '' ? ele.server_id : `${serverStr},${ele.server_id}`;
-          });
-        }
-      } else {
-        server.forEach((ele: string) => {
-          serverStr = serverStr === '' ? ele : `${serverStr},${ele}`;
-        });
-      }
+      // if (server[0] === "全部") {
+      //   // 需要获取所有的服务
+      //   const allServices: any = (await getServices())?.data;
+      //   if (allServices && allServices.length > 0) {
+      //     allServices.forEach((ele: any) => {
+      //       serverStr = serverStr === '' ? ele.server_id : `${serverStr},${ele.server_id}`;
+      //     });
+      //   }
+      // } else {
+      server.forEach((ele: string) => {
+        serverStr = serverStr === '' ? ele : `${serverStr},${ele}`;
+      });
+      // }
     }
 
     data.backend_version_check_flag = true;

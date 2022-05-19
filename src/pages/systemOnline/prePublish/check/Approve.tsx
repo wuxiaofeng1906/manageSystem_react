@@ -172,7 +172,7 @@ const ApproveFlow = ({ data, onAdd, onConfirm, onCancel }: IFlow) => {
       <PersonSelector
         visible={show}
         data={list}
-        onOk={(v: any[]) => {
+        onOk={(v) => {
           setList(v);
           setShow(false);
         }}

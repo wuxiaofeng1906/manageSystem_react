@@ -15,15 +15,16 @@ import {
   stageForLineThrough,
   testerRender,
   timeForLineThrough,
-  timestampChanges
-} from "@/publicMethods/cellRenderer";
+  timestampChanges,
+  isOrNotValueGetter,
+  textDecorateRender,
+} from '@/publicMethods/cellRenderer';
 
-import {history} from "@@/core/history";
+import { history } from '@@/core/history';
 // 定义列名
 const getColums = (prjNames: any) => {
-
   // 获取缓存的字段
-  const fields = localStorage.getItem("sp_details_filed");
+  const fields = localStorage.getItem('sp_details_filed');
   const oraFields: any = [
     {
       headerName: '选择',
@@ -33,35 +34,79 @@ const getColums = (prjNames: any) => {
       maxWidth: 35,
     },
     {
+      headerName: '序号',
+      maxWidth: 80,
+      filter: false,
+      pinned: 'left',
+      cellRenderer: (params: any) => {
+        return Number(params.node.id) + 1;
+      },
+    },
+    {
       headerName: '阶段',
       field: 'stage',
       pinned: 'left',
       cellRenderer: numberRenderToCurrentStageForColor,
       minWidth: 120,
       suppressMenu: false,
-      filterParams: {cellRenderer: numberRenderToCurrentStage}
+      filterParams: { cellRenderer: numberRenderToCurrentStage },
     },
     {
       headerName: '测试',
       field: 'tester',
       pinned: 'left',
       minWidth: 80,
-      tooltipField: "tester",
       suppressMenu: false,
+      valueGetter: (params: any) => {
+        const testArray = params.data?.tester;
+        if (testArray && testArray.length > 0) {
+          let testers = '';
+          testArray.forEach((tester: any) => {
+            testers = testers === '' ? tester.name : `${testers},${tester.name}`;
+          });
+
+          return testers;
+        }
+        return 'NA';
+      },
       cellRenderer: (params: any) => {
         const testArray = params.value;
-        if (!testArray || testArray.length === 0) {
-          return 'NA';
+        let myColor = 'gray'; // 测试验证：已验证为黑色，没验证为灰色
+        const testConfirm = params.data?.testConfirmed;
+        if (testConfirm === '1') {
+          myColor = 'black';
         }
-        let testers = "";
-        testArray.forEach((tester: any) => {
-          testers = testers === "" ? tester.name : `${testers},${tester.name}`;
-        });
+        // if (!testArray || testArray.length === 0) {
+        //   return `<span style="color: ${myColor}"> NA </span>`;
+        // }
+        // let testers = "";
+        // testArray.forEach((tester: any) => {
+        //   testers = testers === "" ? tester.name : `${testers},${tester.name}`;
+        // });
         if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
-          return `<span style="text-decoration:line-through"> ${testers} </span>`;
+          return `<span style="color: ${myColor};text-decoration:line-through"> ${testArray} </span>`;
         }
-        return testers;
-
+        return `<span style="color: ${myColor}"> ${testArray} </span>`;
+      },
+    },
+    {
+      headerName: '测试确认',
+      field: 'testConfirmed',
+      pinned: 'left',
+      minWidth: 105,
+      suppressMenu: false,
+      cellRenderer: (params: any) => {
+        // 默认全部为：否
+        if (params.value === '0' || params.value === null || params.value === undefined) {
+          if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+            return `<span style="text-decoration:line-through"> 否 </span>`;
+          }
+          return '否';
+        }
+        if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+          return `<span style="text-decoration:line-through"> 是 </span>`;
+        }
+        return '是';
       },
     },
     {
@@ -71,7 +116,7 @@ const getColums = (prjNames: any) => {
       pinned: 'left',
       minWidth: 95,
       suppressMenu: false,
-      filterParams: {cellRenderer: numberRenderToZentaoTypeFilter}
+      filterParams: { cellRenderer: numberRenderToZentaoTypeFilter },
     },
     {
       headerName: '编号',
@@ -86,7 +131,7 @@ const getColums = (prjNames: any) => {
       pinned: 'left',
       minWidth: 235,
       cellRenderer: stageForLineThrough,
-      tooltipField: "title"
+      tooltipField: 'title',
     },
     {
       headerName: '所属计划',
@@ -108,45 +153,63 @@ const getColums = (prjNames: any) => {
       field: 'moduleName',
       minWidth: 100,
       cellRenderer: stageForLineThrough,
-      tooltipField: "moduleName"
+      tooltipField: 'moduleName',
     },
     {
       headerName: '状态',
       field: 'ztStatus',
       cellRenderer: numberRenderToZentaoStatusForRed,
       minWidth: 80,
-    }, {
+    },
+    {
       headerName: '指派给',
       field: 'assignedTo',
       minWidth: 80,
+      suppressMenu: false,
+      valueGetter: (params: any) => {
+        const assignedInfo = params.data?.assignedTo;
+        if (assignedInfo) {
+          return params.data?.assignedTo.name;
+        }
+        return '';
+      },
       cellRenderer: (params: any) => {
         const assignedPerson = params.value;
-        if (!assignedPerson || !assignedPerson.name) {
-          return "";
+        if (!assignedPerson) {
+          return '';
         }
         if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
-          return `<span style="text-decoration:line-through"> ${assignedPerson.name} </span>`;
+          return `<span style="text-decoration:line-through"> ${assignedPerson} </span>`;
         }
-        return assignedPerson.name;
+        return assignedPerson;
       },
-      tooltipField: "assignedTo",
-      suppressMenu: false,
     },
     {
       headerName: '解决/完成人',
       field: 'finishedBy',
       minWidth: 80,
-      tooltipField: "finishedBy",
       suppressMenu: false,
+      valueGetter: (params: any) => {
+        const finishedBy = params.data?.finishedBy;
+        if (finishedBy && finishedBy.length > 0) {
+          let finishedBys = '';
+          finishedBy.forEach((finisher: any) => {
+            finishedBys = finishedBys === '' ? finisher.name : `${finishedBys},${finisher.name}`;
+          });
+          return finishedBys;
+        }
+
+        return '';
+      },
       cellRenderer: (params: any) => {
-        const assignedPerson = params.value;
-        if (!assignedPerson || !assignedPerson.name) {
-          return "";
+        const finishedPerson = params.value;
+        if (!finishedPerson) {
+          return '';
         }
         if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
-          return `<span style="text-decoration:line-through"> ${assignedPerson.name} </span>`;
+          return `<span style="text-decoration:line-through"> ${finishedPerson} </span>`;
         }
-        return assignedPerson.name;
+        return finishedPerson;
       },
     },
     {
@@ -159,7 +222,9 @@ const getColums = (prjNames: any) => {
         // TASK = 2,
         // STORY = 3,
         if (Number(params.value) < 500 && Number(params.value) > 0) {
-          history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=3&count=${params.value}`);
+          history.push(
+            `/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=3&count=${params.value}`,
+          );
         }
       },
     },
@@ -170,11 +235,11 @@ const getColums = (prjNames: any) => {
       cellRenderer: relatedNumberAndIdRender,
       onCellClicked: (params: any) => {
         if (Number(params.value) < 500 && Number(params.value) > 0) {
-          history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=2&count=${params.value}`);
+          history.push(
+            `/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=2&count=${params.value}`,
+          );
         }
       },
-      // tooltipField: "relatedTasks"
-
     },
     {
       headerName: '相关bug',
@@ -183,7 +248,9 @@ const getColums = (prjNames: any) => {
       cellRenderer: relatedNumberRender,
       onCellClicked: (params: any) => {
         if (Number(params.value) > 0) {
-          history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=1&count=${params.value}`);
+          history.push(
+            `/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=1&count=${params.value}`,
+          );
         }
       },
     },
@@ -195,62 +262,104 @@ const getColums = (prjNames: any) => {
     {
       headerName: '是否涉及页面调整',
       field: 'pageAdjust',
-      cellRenderer: numberRenderToYesNo,
+      valueGetter: (params: any) => {
+        return isOrNotValueGetter(params.data?.pageAdjust);
+      },
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '是否可热更',
       field: 'hotUpdate',
-      cellRenderer: numberRenderToYesNo,
+      valueGetter: (params: any) => {
+        return isOrNotValueGetter(params.data?.hotUpdate);
+      },
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '是否有数据升级',
       field: 'dataUpdate',
-      cellRenderer: numberRenderToYesNo,
+      valueGetter: (params: any) => {
+        return isOrNotValueGetter(params.data?.dataUpdate);
+      },
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '是否有接口升级',
       field: 'interUpdate',
-      cellRenderer: numberRenderToYesNo,
+      valueGetter: (params: any) => {
+        return isOrNotValueGetter(params.data?.interUpdate);
+      },
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '是否有预置数据修改',
       field: 'presetData',
-      cellRenderer: numberRenderToYesNo,
+      valueGetter: (params: any) => {
+        return isOrNotValueGetter(params.data?.presetData);
+      },
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '是否需要测试验证',
       field: 'testCheck',
-      pinned: "right",
+      headerTooltip:
+        '自动生成’是‘为黑色；自动生成‘否’为红色；手动修改‘是’为紫色；手动修改‘否’为黄色',
+      tooltipValueGetter: (params: any) => {
+        const values = params.value;
+        if (!values) {
+          return '';
+        }
+        if (values === '-1') {
+          // 手动：是
+          return '手动生成';
+        }
+        if (values === '-0') {
+          // 手动：否
+          return '手动生成';
+        }
+        if (values === '0') {
+          // 自动：否
+          return '自动生成';
+        }
+        if (values === '1') {
+          // 自动：是
+          return '自动生成';
+        }
+        return values;
+      },
       cellRenderer: (params: any) => {
         // testCheck: 手动修改标识: "-1"、"-0";自动的是：0 ，1
         // 自动规则生成的‘是’默认黑色，自动规则生成的‘否’默认红色
         // 手动修改的‘是’默认紫色，手动修改的‘否’默认黄色
         const values = params.value;
         if (!values) {
-          return "";
+          return '';
         }
 
-        let result = "";
-        let my_color = "";
-        if (values === "-1") { // 手动：是
-          result = "是";
-          my_color = "purple";// 紫色
-        } else if (values === "-0") { // 手动：否
-          result = "否";
-          my_color = "orange";// 黄色
-        } else if (values === "0") { // 自动：否
-          result = "否";
-          my_color = "red";// 红色
-        } else if (values === "1") { // 自动：是
-          result = "是";
-          my_color = "black";// 黑色
+        let result = '';
+        let my_color = '';
+        if (values === '-1') {
+          // 手动：是
+          result = '是';
+          my_color = 'purple'; // 紫色
+        } else if (values === '-0') {
+          // 手动：否
+          result = '否';
+          my_color = 'orange'; // 黄色
+        } else if (values === '0') {
+          // 自动：否
+          result = '否';
+          my_color = 'red'; // 红色
+        } else if (values === '1') {
+          // 自动：是
+          result = '是';
+          my_color = 'black'; // 黑色
         }
         if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
           return `<span style="text-decoration:line-through"> ${result} </span>`;
         }
         return `<span style="color: ${my_color}"> ${result}  </span>`;
       },
-
     },
     {
       headerName: '已提测',
@@ -262,38 +371,32 @@ const getColums = (prjNames: any) => {
       field: 'publishEnv',
       minWidth: 80,
       cellRenderer: stageForLineThrough,
-      tooltipField: "publishEnv"
-
+      tooltipField: 'publishEnv',
     },
     {
       headerName: '关闭人',
       field: 'closedBy',
       minWidth: 80,
       cellRenderer: stageForLineThrough,
-      tooltipField: "closedBy",
       suppressMenu: false,
-
     },
     {
       headerName: '备注',
       field: 'memo',
       minWidth: 150,
       cellRenderer: stageForLineThrough,
-      tooltipField: "memo"
-
+      tooltipField: 'memo',
     },
     {
       headerName: '验证范围建议',
       field: 'scopeLimit',
       cellRenderer: stageForLineThrough,
-      // tooltipField: "scopeLimit"
     },
     {
       headerName: 'UED',
       field: 'uedName',
       cellRenderer: stageForLineThrough,
       suppressMenu: false,
-      // tooltipField: "uedName"
     },
     {
       headerName: 'UED测试环境验证',
@@ -315,16 +418,16 @@ const getColums = (prjNames: any) => {
       field: 'feedback',
       cellRenderer: stageForLineThrough,
       suppressMenu: false,
-    }
+    },
   ];
 
-  if (prjNames === "多组织阻塞bug跟踪") {
+  if (prjNames === '多组织阻塞bug跟踪') {
     oraFields.splice(11, 0, {
       headerName: '创建时间',
       field: 'openedAt',
       minWidth: 150,
       cellRenderer: timeForLineThrough,
-      suppressMenu: false
+      suppressMenu: false,
     });
 
     oraFields.splice(12, 0, {
@@ -332,7 +435,7 @@ const getColums = (prjNames: any) => {
       field: 'resolvedAt',
       minWidth: 150,
       cellRenderer: timeForLineThrough,
-      suppressMenu: false
+      suppressMenu: false,
     });
   }
 
@@ -357,10 +460,11 @@ const getColums = (prjNames: any) => {
 
 // 设置行的颜色
 const setRowColor = (params: any) => {
-  if (params.data.baseline === '0') {  // 如果基线为0，则整行都渲染颜色
-    return {'background-color': '#FFF6F6'};
+  if (params.data.baseline === '0') {
+    // 如果基线为0，则整行都渲染颜色
+    return { 'background-color': '#FFF6F6' };
   }
-  return {'background-color': 'white'};
+  return { 'background-color': 'white' };
 };
 
-export {getColums, setRowColor};
+export { getColums, setRowColor };

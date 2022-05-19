@@ -1299,7 +1299,7 @@ const SprintList: React.FC<any> = () => {
               filter: true,
               flex: 1,
               minWidth: 100,
-              suppressMenu: true,
+              // suppressMenu: true,
               cellStyle: {"line-height": "28px"},
             }}
 

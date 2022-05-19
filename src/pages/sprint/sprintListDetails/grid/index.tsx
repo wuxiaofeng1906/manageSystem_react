@@ -16,9 +16,11 @@ import {
   testerRender,
   timeForLineThrough,
   timestampChanges,
-  isOrNotValueGetter,
-  textDecorateRender
+  isOrNotValueGetter
 } from "@/publicMethods/cellRenderer";
+
+
+import {textDecorateRender, stageValueGetter, stageRenderer} from "./columnRenderer";
 
 import {history} from "@@/core/history";
 // 定义列名
@@ -30,6 +32,7 @@ const getColums = (prjNames: any) => {
     {
       headerName: '选择',
       pinned: 'left',
+      filter: false,
       checkboxSelection: true,
       headerCheckboxSelection: true,
       maxWidth: 35,
@@ -47,10 +50,9 @@ const getColums = (prjNames: any) => {
       headerName: '阶段',
       field: 'stage',
       pinned: 'left',
-      cellRenderer: numberRenderToCurrentStageForColor,
+      valueGetter: stageValueGetter,
+      cellRenderer: stageRenderer,
       minWidth: 120,
-      suppressMenu: false,
-      filterParams: {cellRenderer: numberRenderToCurrentStage}
     },
     {
       headerName: '测试',
@@ -104,12 +106,7 @@ const getColums = (prjNames: any) => {
         }
         return "是";
       },
-      cellRenderer: (params: any) => {
-        if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
-          return `<span style="text-decoration:line-through"> ${params.value} </span>`;
-        }
-        return params.value;
-      },
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '类型',
@@ -144,7 +141,35 @@ const getColums = (prjNames: any) => {
     {
       headerName: '严重等级',
       field: 'severity',
-      cellRenderer: numRenderForSevAndpriForLine,
+      suppressMenu: false,
+      valueGetter: (params: any) => {
+        let severity = "";
+        if (params.data?.severity !== null && params.data?.severity !== undefined) {
+          switch (params.value.toString()) {
+            case "1":
+              severity = "P0-";
+              break;
+            case "2":
+              severity = "P1-";
+              break;
+            case "3":
+              severity = "P2-";
+              break;
+            case "4":
+              severity = "P3-";
+              break;
+            default:
+              break;
+          }
+        }
+
+        const pri = params.data.priority === null ? "" : params.data.priority;
+        if (pri === "" && severity === "") {
+          return "";
+        }
+        return `${severity}${pri}级`;
+      },
+      cellRenderer: textDecorateRender,
       minWidth: 90,
     },
     // {
@@ -162,9 +187,10 @@ const getColums = (prjNames: any) => {
     {
       headerName: '状态',
       field: 'ztStatus',
+      suppressMenu: false,
       cellRenderer: numberRenderToZentaoStatusForRed,
       minWidth: 80,
-      suppressMenu: false,
+
     },
     {
       headerName: '指派给',

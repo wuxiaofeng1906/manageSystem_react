@@ -1,15 +1,13 @@
 import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
-
 const publish_status = { success: '发布成功', error: '发布失败' };
 // 发布列表
+
 const publishColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
     field: 'publish_num',
     minWidth: 60,
-    cellRenderer: (params: any) => {
-      return (+params.node.id + 1).toString();
-    },
+    cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
   {
     headerName: '正式发布批号',
@@ -22,11 +20,8 @@ const publishColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '发布结果',
     field: 'publish_result',
-    cellRenderer: (params: any) => {
-      return `<span style="color:${params.value == 'success' ? 'green' : 'red'}">${
-        publish_status[params.value]
-      }</span>`;
-    },
+    cellRenderer: (params: any) =>
+      `<span class="color-${params.value}">${publish_status[params.value]}</span>`,
   },
   {
     headerName: '项目负责人',
@@ -52,6 +47,10 @@ const publishColumn: (ColDef | ColGroupDef)[] = [
     headerName: '正式发布时间',
     field: 'publish_date',
   },
+  {
+    headerName: '操作',
+    rowDrag: true,
+  },
 ];
 
 // 项目升级
@@ -59,24 +58,19 @@ const projectUpgradeColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
     field: 'publish_num',
-    cellRenderer: (params: any) => {
-      return (+params.node.id + 1).toString();
-    },
+    cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
   {
     headerName: '项目名称',
     field: 'name',
-    minWidth: 120,
   },
   {
     headerName: '是否涉及数据库升级',
     field: 'update_dbs',
-    minWidth: 120,
   },
   {
     headerName: '是否涉及数据Recovery',
     field: 'recovery',
-    minWidth: 120,
   },
   {
     headerName: '是否清理缓存',
@@ -85,23 +79,20 @@ const projectUpgradeColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '是否涉及配置项增加',
     field: 'setting_add',
-    minWidth: 120,
   },
   {
     headerName: '是否涉及元数据更新',
     field: 'origin_update',
-    minWidth: 120,
   },
   {
     headerName: '备注',
     field: 'mark',
-    minWidth: 120,
   },
   {
     headerName: '操作',
-    minWidth: 90,
+    width: 120,
     pinned: 'right',
-    cellRenderer: 'operate',
+    cellRenderer: 'operation',
   },
 ];
 // 服务升级
@@ -110,9 +101,7 @@ const publishServerColumn: (ColDef | ColGroupDef)[] = [
     headerName: '序号',
     field: 'publish_num',
     minWidth: 60,
-    cellRenderer: (params: any) => {
-      return (+params.node.id + 1).toString();
-    },
+    cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
   {
     headerName: '上线环境',
@@ -128,8 +117,8 @@ const publishServerColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '操作',
-    minWidth: 90,
-    cellRenderer: 'operate',
+    cellRenderer: 'operation',
+    width: 160,
   },
 ];
 // 数据修复
@@ -138,9 +127,7 @@ const dataReviewColumn: (ColDef | ColGroupDef)[] = [
     headerName: '序号',
     field: 'publish_num',
     minWidth: 60,
-    cellRenderer: (params: any) => {
-      return (+params.node.id + 1).toString();
-    },
+    cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
   {
     headerName: '数据修复内容',
@@ -178,9 +165,7 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
     headerName: '序号',
     field: 'publish_num',
     minWidth: 60,
-    cellRenderer: (params: any) => {
-      return (+params.node.id + 1).toString();
-    },
+    cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
   {
     headerName: '上线环境',
@@ -233,7 +218,7 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '操作',
     minWidth: 90,
-    cellRenderer: 'operate',
+    cellRenderer: 'operation',
   },
 ];
 // 部署
@@ -242,9 +227,7 @@ const deployColumn: (ColDef | ColGroupDef)[] = [
     headerName: '序号',
     field: 'num',
     minWidth: 60,
-    cellRenderer: (params: any) => {
-      return (+params.node.id + 1).toString();
-    },
+    cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
   {
     headerName: '目标环境',
@@ -277,7 +260,37 @@ const deployColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '操作',
     minWidth: 90,
-    cellRenderer: 'operate',
+    cellRenderer: 'operation',
+  },
+];
+// 检查详情
+const checkDetailColumn: (ColDef | ColGroupDef)[] = [
+  {
+    headerName: '序号',
+    field: 'num',
+    minWidth: 60,
+    cellRenderer: (params: any) => (+params.node.id + 1).toString(),
+  },
+  {
+    headerName: '检查类别',
+    field: 'type',
+  },
+  {
+    headerName: '检查状态',
+    field: 'status',
+  },
+  {
+    headerName: '检查开始时间',
+    field: 'start_time',
+  },
+  {
+    headerName: '检查结束时间',
+    field: 'end_time',
+  },
+  {
+    headerName: '操作',
+    minWidth: 90,
+    cellRenderer: 'operation',
   },
 ];
 export {
@@ -287,4 +300,5 @@ export {
   upgradeSQLColumn,
   dataReviewColumn,
   deployColumn,
+  checkDetailColumn,
 };

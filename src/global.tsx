@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, message, notification } from 'antd';
 import { useIntl } from '@@/plugin-locale/localeExports';
 import '@ant-design/pro-form/dist/form.css';
+import 'antd/dist/antd.css';
 import defaultSettings from '../config/defaultSettings';
 
 import 'ag-grid-enterprise';

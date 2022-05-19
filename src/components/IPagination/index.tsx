@@ -1,15 +1,22 @@
-import { Button, Input, Select } from 'antd';
+import { Button, InputNumber, Select } from 'antd';
 import React from 'react';
 
-const IPagation = ({ onNext, page, onPre, showQuickJumper, onShowSizeChange }) => {
+interface IParam {
+  page: Record<'pageSize' | 'current' | 'total' | 'pages', number>;
+  onChange: (page: number) => void;
+  showQuickJumper: (page: string) => void;
+  onShowSizeChange: (page: number) => void;
+}
+
+const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IParam) => {
   return (
     <div style={{ background: 'white', marginTop: 2, height: 50, paddingTop: 10 }}>
-      <label style={{ marginLeft: 20, fontWeight: 'bold' }}> 共 {page.totalCounts} 条</label>
+      <label style={{ marginLeft: 20, fontWeight: 'bold' }}> 共 {page.total} 条</label>
       <label style={{ marginLeft: 20, fontWeight: 'bold' }}>每页</label>
       <Select
         style={{ marginLeft: 10, width: 80 }}
         onChange={onShowSizeChange}
-        value={page.countsOfPage}
+        value={page.pageSize}
         options={[
           { value: 20, label: 20 },
           { value: 50, label: 50 },
@@ -18,9 +25,7 @@ const IPagation = ({ onNext, page, onPre, showQuickJumper, onShowSizeChange }) =
         ]}
       />
       <label style={{ marginLeft: 10, fontWeight: 'bold' }}>条</label>
-
-      <label style={{ marginLeft: 10, fontWeight: 'bold' }}>共 {page.totalpage} 页</label>
-
+      <label style={{ marginLeft: 10, fontWeight: 'bold' }}>共 {page.pages} 页</label>
       <Button
         size={'small'}
         style={{
@@ -29,12 +34,11 @@ const IPagation = ({ onNext, page, onPre, showQuickJumper, onShowSizeChange }) =
           color: 'black',
           backgroundColor: 'WhiteSmoke',
         }}
-        disabled={page.currentPage <= 1}
-        onClick={onPre}
+        disabled={page.current <= 1}
+        onClick={() => onChange(page.current - 1)}
       >
         &lt;
       </Button>
-
       <span
         style={{
           display: 'inline-block',
@@ -46,9 +50,8 @@ const IPagation = ({ onNext, page, onPre, showQuickJumper, onShowSizeChange }) =
           width: '40px',
         }}
       >
-        {page.currentPage}
+        {page.current}
       </span>
-
       <Button
         size={'small'}
         style={{
@@ -57,20 +60,21 @@ const IPagation = ({ onNext, page, onPre, showQuickJumper, onShowSizeChange }) =
           color: 'black',
           backgroundColor: 'WhiteSmoke',
         }}
-        disabled={page.totalpage < page.currentPage + 1}
-        onClick={onNext}
+        disabled={page.pages < page.current + 1}
+        onClick={() => onChange(page.current + 1)}
       >
         &gt;
       </Button>
-
       <label style={{ marginLeft: 20, fontWeight: 'bold' }}> 跳转到第 </label>
-      <Input
-        style={{ textAlign: 'center', width: 50, marginLeft: 2 }}
+      <InputNumber
+        style={{ display: 'inline-block' }}
         defaultValue={1}
-        onBlur={showQuickJumper}
+        onBlur={(e) => showQuickJumper(e.target.value)}
+        max={page.pages}
+        min={1}
       />
       <label style={{ marginLeft: 2, fontWeight: 'bold' }}> 页 </label>
     </div>
   );
 };
-export default IPagation;
+export default IPagination;

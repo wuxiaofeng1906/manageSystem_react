@@ -1,4 +1,5 @@
 import React from 'react';
+import { Modal } from 'antd';
 import styles from './index.less';
 import cls from 'classnames';
 
@@ -11,10 +12,10 @@ const flowStatus = {
 };
 const flowBg = {
   noStart: 'white',
-  success: 'green',
-  no: 'blue',
-  allReject: 'red',
-  partReject: 'pink',
+  success: '#099409',
+  no: '#21aff3',
+  allReject: '#e02c2c',
+  partReject: '#f68da0',
 };
 const matrixArray = (list: any[], num = 2) => {
   if (num <= 1 || list.length < num) return list;
@@ -31,19 +32,31 @@ const matrixArray = (list: any[], num = 2) => {
 };
 
 const FlowArrow: React.FC<{ data: any[] }> = ({ data }) => {
+  const onDoubleClick = (it: any) => {
+    Modal.info({
+      title: '状态信息',
+      content: (
+        <div>
+          <div className={'ellipsis'}>开始时间：{it?.start}</div>
+          <div className={'ellipsis'}>结束时间：{it?.end}</div>
+          <div className={'ellipsis'}>状态：{flowStatus[it?.status] ?? ''}</div>
+          <div className={'ellipsis'}>信息：{it?.info}</div>
+        </div>
+      ),
+    });
+  };
   return (
     <div className={cls(styles.flowArrow)}>
       {matrixArray(data, 4).map((arr, i) => {
+        const odd = (i + 1) % 2 == 0;
         return arr.map((it: any, index: number) => (
           <div key={it?.title + index}>
             <div
-              onDoubleClick={() => {
-                console.log(it);
-              }}
+              onDoubleClick={() => onDoubleClick(it)}
               className={cls(styles.wrapper, {
-                [styles.leftArrow]: (i + 1) % 2 == 0,
-                [styles.bottomArrow]: (i + 1) % 2 == 0 && index == 0,
-                [styles.topArrow]: (i + 1) % 2 == 0 && index == arr.length - 1,
+                [styles.leftArrow]: odd,
+                [styles.bottomArrow]: odd && index == 0,
+                [styles.topArrow]: odd && index == arr.length - 1,
               })}
             >
               <div className={styles.content} style={{ background: flowBg[it?.status] }}>

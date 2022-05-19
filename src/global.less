@@ -11,7 +11,7 @@ body,
 }
 
 .ant-layout {
-  min-height: 100vh;
+  min-height: 100%;
 }
 
 canvas {
@@ -58,5 +58,73 @@ ol {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+  }
+
+  .ant-btn-primary {
+    color: @color-approve;
+    background: #ECF5FF;
+    border-radius: 5px;
+    text-shadow: initial;
+    border-color: #b5d4ec;
+  }
+
+  .flex-row {
+    display: flex;
+    align-items: center;
+  }
+
+  .color-prefix {
+    color: @color-approve
+  }
+
+  .color-success {
+    color: @color-success
+  }
+
+  .color-error {
+    color: @color-error
+  }
+
+}
+
+// 全局ag-grid-react 样式
+.ag-initialize-theme {
+  .ag-header {
+    height: 40px !important;
+
+    .ag-header-row {
+      height: 100% !important;
+    }
+  }
+
+  .ag-row {
+    .ag-cell {
+      text-align: center;
+    }
+  }
+
+  .ag-cell-wrapper, .ag-header-cell-label {
+    justify-content: center;
+  }
+
+  .ag-row-drag {
+    margin-right: 0;
+
+    .ag-icon-grip {
+      &:before {
+        content: '';
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+        background: url("../public/move.png") center/100% no-repeat;
+      }
+    }
+  }
+
+  .operation {
+    img {
+      width: 20px;
+      height: 20px;
+    }
   }
 }

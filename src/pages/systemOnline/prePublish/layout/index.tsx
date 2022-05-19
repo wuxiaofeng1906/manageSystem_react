@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Layout, Form, Select, DatePicker, Button, Menu } from 'antd';
 import { history } from 'umi';
 import styles from './index.less';
-import dayjs from 'dayjs';
+import moment from 'moment';
 
 const menus = [
   { label: '项目&服务', key: 'projectServices' },
   { label: '部署', key: 'deploy' },
+  { label: '检查', key: 'check' },
   { label: '工单', key: 'worksheet' },
   { label: '发布', key: 'publish' },
   { label: '总览', key: 'overview' },
@@ -19,7 +20,7 @@ const PreLayout = ({ location, children }) => {
   const [condition] = useState({
     publish_type: '1',
     publish_by: 'no',
-    publish_date: dayjs().hour(23).minute(0),
+    publish_date: moment().hour(23).minute(0),
   });
   useEffect(() => {
     if (location.pathname === '/systemOnline/prePublish') {
@@ -30,7 +31,7 @@ const PreLayout = ({ location, children }) => {
   return (
     <div className={styles.preLayout}>
       <Layout>
-        <Layout.Sider width={300} theme={'light'} className={styles.layout}>
+        <Layout.Sider width={270} theme={'light'} className={styles.layout}>
           <div className={styles.formWrap}>
             <Form form={form} initialValues={condition}>
               <Form.Item label={'发布类型'} name={'publish_type'}>
@@ -53,11 +54,11 @@ const PreLayout = ({ location, children }) => {
               <Form.Item label={'发布时间'} name={'publish_date'}>
                 <DatePicker format={'YYYY-MM-DD HH:mm'} style={{ width: '100%' }} />
               </Form.Item>
-              <Form.Item label={'确认封板'}>
-                <Button block type={'primary'}>
-                  未封板
-                </Button>
-              </Form.Item>
+              {/*<Form.Item label={'确认封板'}>*/}
+              {/*  <Button block type={'primary'}>*/}
+              {/*    未封板*/}
+              {/*  </Button>*/}
+              {/*</Form.Item>*/}
               <Form.Item label={'发布结果'} name={'publish_result'}>
                 <Select options={[]} />
               </Form.Item>
@@ -69,7 +70,10 @@ const PreLayout = ({ location, children }) => {
                 key={it.key}
                 onClick={(e) => {
                   setActivePath(e.keyPath);
-                  history.push(`/systemOnline/prePublish/${it.key}`);
+                  history.push({
+                    pathname: `/systemOnline/prePublish/${it.key}`,
+                    query: location.query,
+                  });
                 }}
               >
                 {it.label}

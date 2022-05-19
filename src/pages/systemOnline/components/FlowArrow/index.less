@@ -9,16 +9,15 @@
   > div {
     &:hover {
       .left {
-        border-top: 65px solid goldenrod !important;
-        border-bottom: 65px solid goldenrod !important;
+        border-top: 65px solid rgba(@color-approve, 0.3) !important;
+        border-bottom: 65px solid rgba(@color-approve, 0.3) !important;
       }
-
       .right {
-        border-left: 65px solid goldenrod !important;
+        right: 0;
+        border-left: 65px solid rgba(@color-approve, 0.3) !important;
       }
-
       .content {
-        background: goldenrod !important;
+        background: rgba(@color-approve, 0.3) !important;
       }
     }
   }
@@ -33,7 +32,7 @@
   .right {
     position: absolute;
     top: 0;
-    right: 0px;
+    right: 1px;
     display: block;
     border-top: 65px solid transparent;
     border-bottom: 65px solid transparent;
@@ -65,11 +64,9 @@
       max-width: min-content;
     }
   }
-
   .leftArrow {
     position: relative;
     transform: rotate(180deg);
-
     .content {
       transform: rotate(-180deg);
     }
@@ -83,12 +80,11 @@
       display: inline-block;
       width: 2px;
       height: 60px;
-      background: red;
+      background: @color-divider;
       transform: translateX(-50%);
       content: '';
     }
   }
-
   .topArrow {
     &::before {
       position: absolute;
@@ -97,7 +93,7 @@
       display: inline-block;
       width: 2px;
       height: 60px;
-      background: blue;
+      background: @color-divider;
       transform: translateX(-50%);
       content: '';
     }

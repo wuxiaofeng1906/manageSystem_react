@@ -602,6 +602,10 @@ export default [
             component: './systemOnline/prePublish/deploy',
           },
           {
+            path: 'check',
+            component: './systemOnline/prePublish/check',
+          },
+          {
             path: 'publish',
             component: './systemOnline/prePublish/publish',
           },
@@ -614,13 +618,6 @@ export default [
             component: './systemOnline/prePublish/worksheet',
           },
         ],
-      },
-      {
-        name: '企业微信发布审批流程',
-        icon: 'table',
-        path: 'publish',
-        component: './systemOnline/flow',
-        // hideInMenu: true
       },
       {
         name: '组件',

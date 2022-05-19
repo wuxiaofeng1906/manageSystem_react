@@ -161,7 +161,7 @@ const ProjectServices = () => {
           defaultColDef={initColDef}
           onGridReady={onGridReady}
           frameworkComponents={{
-            operation: () => {
+            operation: (it: GridReadyEvent) => {
               return (
                 <Space size={15} className={'operation'}>
                   <img

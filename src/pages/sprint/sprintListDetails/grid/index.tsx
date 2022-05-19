@@ -97,18 +97,18 @@ const getColums = (prjNames: any) => {
       pinned: 'left',
       minWidth: 105,
       suppressMenu: false,
-      cellRenderer: (params: any) => {
-        // 默认全部为：否
-        if (params.value === "0" || params.value === null || params.value === undefined) {
-          if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
-            return `<span style="text-decoration:line-through"> 否 </span>`;
-          }
+      valueGetter: (params: any) => {
+        const testConfirme = params.data?.testConfirmed;
+        if (testConfirme === "0" || testConfirme === null || testConfirme === undefined) {
           return "否";
         }
-        if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
-          return `<span style="text-decoration:line-through"> 是 </span>`;
-        }
         return "是";
+      },
+      cellRenderer: (params: any) => {
+        if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+          return `<span style="text-decoration:line-through"> ${params.value} </span>`;
+        }
+        return params.value;
       },
     },
     {
@@ -139,6 +139,7 @@ const getColums = (prjNames: any) => {
       headerName: '所属计划',
       field: 'planName',
       minWidth: 100,
+      suppressMenu: false,
     },
     {
       headerName: '严重等级',
@@ -155,13 +156,15 @@ const getColums = (prjNames: any) => {
       field: 'moduleName',
       minWidth: 100,
       cellRenderer: stageForLineThrough,
-      tooltipField: "moduleName"
+      tooltipField: "moduleName",
+      suppressMenu: false,
     },
     {
       headerName: '状态',
       field: 'ztStatus',
       cellRenderer: numberRenderToZentaoStatusForRed,
       minWidth: 80,
+      suppressMenu: false,
     },
     {
       headerName: '指派给',

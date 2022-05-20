@@ -8,18 +8,13 @@ import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import {PageHeader} from 'antd';
 import {history} from 'umi';
-import {
-  linkToZentaoPage,
-  numberRenderToZentaoStatusForRed,
-  stageForLineThrough,
-  numRenderForSevAndpriForLine,
-  numberRenderToZentaoType,
-  numberRenderToCurrentStage,
-  timestampChanges
-
-} from '@/publicMethods/cellRenderer';
-
 import {getHeight} from '@/publicMethods/pageSet';
+import {
+  catagoryValueGetter,
+  linkToZentaoPage,
+  servertyValueGetter,
+  stageValueGetter, statusRenderer, statusValueGetter, timeRenderer
+} from "../sprintListDetails/grid/columnRenderer";
 
 const getColums = () => {
 
@@ -36,7 +31,7 @@ const getColums = () => {
     {
       headerName: '禅道类型',
       field: 'category',
-      cellRenderer: numberRenderToZentaoType,
+      valueGetter: catagoryValueGetter,
       minWidth: 70,
     },
     {
@@ -52,7 +47,7 @@ const getColums = () => {
     {
       headerName: '当前阶段',
       field: 'stage',
-      cellRenderer: numberRenderToCurrentStage
+      valueGetter: stageValueGetter,
     },
     {
       headerName: '相关测试',
@@ -66,13 +61,13 @@ const getColums = () => {
       headerName: '标题内容',
       field: 'title',
       minWidth: 350,
-      cellRenderer: stageForLineThrough,
+      // cellRenderer: stageForLineThrough,
       tooltipField: "title"
     },
     {
       headerName: '严重等级',
       field: 'severity',
-      cellRenderer: numRenderForSevAndpriForLine,
+      valueGetter: servertyValueGetter,
       minWidth: 90,
     },
 
@@ -80,13 +75,14 @@ const getColums = () => {
       headerName: '所属模块',
       field: 'moduleName',
       minWidth: 100,
-      cellRenderer: stageForLineThrough,
+      // cellRenderer: stageForLineThrough,
       tooltipField: "moduleName"
     },
     {
       headerName: '当前状态',
       field: 'ztStatus',
-      cellRenderer: numberRenderToZentaoStatusForRed,
+      valueGetter: statusValueGetter,
+      cellRenderer: statusRenderer,
       minWidth: 80,
     },
 
@@ -94,7 +90,7 @@ const getColums = () => {
       headerName: '指派给',
       field: 'assignedTo',
       minWidth: 80,
-      cellRenderer: stageForLineThrough,
+      // cellRenderer: stageForLineThrough,
       tooltipField: "assignedTo",
       suppressMenu: false,
 
@@ -103,7 +99,7 @@ const getColums = () => {
       headerName: '解决/完成人',
       field: 'finishedBy',
       minWidth: 80,
-      cellRenderer: stageForLineThrough,
+      // cellRenderer: stageForLineThrough,
       tooltipField: "finishedBy",
       suppressMenu: false,
 
@@ -111,13 +107,13 @@ const getColums = () => {
     {
       headerName: '反馈人',
       field: 'feedback',
-      cellRenderer: stageForLineThrough,
+      // cellRenderer: stageForLineThrough,
       suppressMenu: false,
     },
     {
       headerName: '截止日期',
       field: 'deadline',
-      cellRenderer: timestampChanges,
+      cellRenderer: timeRenderer,
       minWidth: 120,
     },
   ];
@@ -126,7 +122,6 @@ const getColums = () => {
 };
 
 const addNewAttributes = (source: any, category: string) => {
-
   const result = [];
 
   if (source !== null) {
@@ -141,6 +136,7 @@ const addNewAttributes = (source: any, category: string) => {
 };
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
+
   const {data} = await client.query(`
       {
           relatedNums(category:"${params.category}",ztNo:${params.ztNo},relatedType:"${params.relatedType}",needQuery:${params.needQuery}){
@@ -175,7 +171,6 @@ const DtDetailsList: React.FC<any> = () => {
       relatedType: "",
       needQuery: false,
     };
-
 
     const location = history.location.query;
     if (location) {
@@ -218,12 +213,32 @@ const DtDetailsList: React.FC<any> = () => {
         breadcrumbName: '详情信息',
       }];
 
+    const getPageTitle = () => {
+      let type = "";
+      switch (paramsInfo.category) {
+        case "1":
+          type = "Bug";
+          break;
+        case "2":
+          type = "Task";
+          break;
+        case "3":
+        case "-3":
+          type = "Story";
+          break;
+        default:
+          break;
+      }
+
+      return `${type} ${paramsInfo.ztNo}`;
+    }
+
     return (
       <div style={{marginTop: "-20px"}}>
 
         <PageHeader
           ghost={false}
-          title={`${numberRenderToZentaoType({value: paramsInfo.category})} ${paramsInfo.ztNo}`}
+          title={getPageTitle()}
           style={{height: "100px"}}
           breadcrumb={{routes}}
         />

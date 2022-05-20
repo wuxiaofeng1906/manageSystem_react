@@ -1,26 +1,11 @@
 import {
-  linkToZentaoPage,
-  numberRenderToCurrentStage,
-  numberRenderToCurrentStageForColor,
-  numberRenderTopass,
-  numberRenderToSource,
-  numberRenderToYesNo,
-  numberRenderToZentaoStatusForRed,
-  numberRenderToZentaoTypeFilter,
-  numRenderForSevAndpriForLine,
-  numRenderToTypeForLineAndFromBug,
-  proposedTestRender,
-  relatedNumberAndIdRender,
-  relatedNumberRender,
-  stageForLineThrough,
-  testerRender,
-  timeForLineThrough,
-  timestampChanges,
-  isOrNotValueGetter
-} from "@/publicMethods/cellRenderer";
-
-
-import {textDecorateRender, stageValueGetter, stageRenderer} from "./columnRenderer";
+  textDecorateRender, stageValueGetter, stageRenderer, testerValueGetter, testerRenderer,
+  testConfirmValueGetter, catagoryValueGetter, linkToZentaoPage, servertyValueGetter,
+  statusValueGetter, statusRenderer, assignedToValueGetter, solvedByValueGetter, relatedNumberRender,
+  timestampRenderer, isOrNotValueGetter, testConfirmTooltipValueGetter, testConfirmedRenderer,
+  proposedTestValueGetter,
+  vertifyResultValueGetter, sourceValueGetter, timeRenderer
+} from "./columnRenderer";
 
 import {history} from "@@/core/history";
 // 定义列名
@@ -59,116 +44,51 @@ const getColums = (prjNames: any) => {
       field: 'tester',
       pinned: 'left',
       minWidth: 80,
-      suppressMenu: false,
-      valueGetter: (params: any) => {
-        const testArray = params.data?.tester;
-        if (testArray && testArray.length > 0) {
-          let testers = "";
-          testArray.forEach((tester: any) => {
-            testers = testers === "" ? tester.name : `${testers},${tester.name}`;
-          });
-
-          return testers
-        }
-        return "NA";
-      },
-      cellRenderer: (params: any) => {
-        const testArray = params.value;
-        let myColor = "gray"; // 测试验证：已验证为黑色，没验证为灰色
-        const testConfirm = params.data?.testConfirmed;
-        if (testConfirm === "1") {
-          myColor = "black";
-        }
-        // if (!testArray || testArray.length === 0) {
-        //   return `<span style="color: ${myColor}"> NA </span>`;
-        // }
-        // let testers = "";
-        // testArray.forEach((tester: any) => {
-        //   testers = testers === "" ? tester.name : `${testers},${tester.name}`;
-        // });
-        if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
-          return `<span style="color: ${myColor};text-decoration:line-through"> ${testArray} </span>`;
-        }
-        return `<span style="color: ${myColor}"> ${testArray} </span>`;
-
-      },
+      valueGetter: testerValueGetter,
+      cellRenderer: testerRenderer,
     },
     {
       headerName: '测试确认',
       field: 'testConfirmed',
       pinned: 'left',
       minWidth: 105,
-      suppressMenu: false,
-      valueGetter: (params: any) => {
-        const testConfirme = params.data?.testConfirmed;
-        if (testConfirme === "0" || testConfirme === null || testConfirme === undefined) {
-          return "否";
-        }
-        return "是";
-      },
+      valueGetter: testConfirmValueGetter,
       cellRenderer: textDecorateRender,
     },
     {
       headerName: '类型',
       field: 'category',
-      cellRenderer: numRenderToTypeForLineAndFromBug,
       pinned: 'left',
       minWidth: 95,
-      suppressMenu: false,
-      filterParams: {cellRenderer: numberRenderToZentaoTypeFilter}
+      valueGetter: catagoryValueGetter,
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '编号',
       field: 'ztNo',
-      cellRenderer: linkToZentaoPage,
       pinned: 'left',
       minWidth: 90,
+      filter: false,
+      cellRenderer: linkToZentaoPage,
     },
     {
       headerName: '标题内容',
       field: 'title',
       pinned: 'left',
       minWidth: 235,
-      cellRenderer: stageForLineThrough,
-      tooltipField: "title"
+      cellRenderer: textDecorateRender,
+      tooltipField: "title",
+      filter: false,
     },
     {
       headerName: '所属计划',
       field: 'planName',
       minWidth: 100,
-      suppressMenu: false,
     },
     {
       headerName: '严重等级',
       field: 'severity',
-      suppressMenu: false,
-      valueGetter: (params: any) => {
-        let severity = "";
-        if (params.data?.severity !== null && params.data?.severity !== undefined) {
-          switch (params.value.toString()) {
-            case "1":
-              severity = "P0-";
-              break;
-            case "2":
-              severity = "P1-";
-              break;
-            case "3":
-              severity = "P2-";
-              break;
-            case "4":
-              severity = "P3-";
-              break;
-            default:
-              break;
-          }
-        }
-
-        const pri = params.data.priority === null ? "" : params.data.priority;
-        if (pri === "" && severity === "") {
-          return "";
-        }
-        return `${severity}${pri}级`;
-      },
+      valueGetter: servertyValueGetter,
       cellRenderer: textDecorateRender,
       minWidth: 90,
     },
@@ -180,75 +100,36 @@ const getColums = (prjNames: any) => {
       headerName: '模块',
       field: 'moduleName',
       minWidth: 100,
-      cellRenderer: stageForLineThrough,
+      cellRenderer: textDecorateRender,
       tooltipField: "moduleName",
-      suppressMenu: false,
     },
     {
       headerName: '状态',
       field: 'ztStatus',
-      suppressMenu: false,
-      cellRenderer: numberRenderToZentaoStatusForRed,
+      valueGetter: statusValueGetter,
+      cellRenderer: statusRenderer,
       minWidth: 80,
-
     },
     {
       headerName: '指派给',
       field: 'assignedTo',
       minWidth: 80,
-      suppressMenu: false,
-      valueGetter: (params: any) => {
-        const assignedInfo = params.data?.assignedTo;
-        if (assignedInfo) {
-          return params.data?.assignedTo.name
-        }
-        return "";
-      },
-      cellRenderer: (params: any) => {
-        const assignedPerson = params.value;
-        if (!assignedPerson) {
-          return "";
-        }
-        if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
-          return `<span style="text-decoration:line-through"> ${assignedPerson} </span>`;
-        }
-        return assignedPerson;
-      }
+      valueGetter: assignedToValueGetter,
+      cellRenderer: textDecorateRender
     },
     {
       headerName: '解决/完成人',
       field: 'finishedBy',
       minWidth: 80,
       suppressMenu: false,
-      valueGetter: (params: any) => {
-
-        const finishedBy = params.data?.finishedBy;
-        if (finishedBy && finishedBy.length > 0) {
-          let finishedBys = "";
-          finishedBy.forEach((finisher: any) => {
-            finishedBys = finishedBys === "" ? finisher.name : `${finishedBys},${finisher.name}`;
-          });
-          return finishedBys;
-        }
-
-        return "";
-      },
-      cellRenderer: (params: any) => {
-        const finishedPerson = params.value;
-        if (!finishedPerson) {
-          return "";
-        }
-        if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
-          return `<span style="text-decoration:line-through"> ${finishedPerson} </span>`;
-        }
-        return finishedPerson;
-      },
+      valueGetter: solvedByValueGetter,
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '相关需求',
       field: 'relatedStories',
       minWidth: 80,
-      cellRenderer: relatedNumberAndIdRender,
+      cellRenderer: relatedNumberRender,
       onCellClicked: (params: any) => {
         // BUG = 1,
         // TASK = 2,
@@ -262,7 +143,7 @@ const getColums = (prjNames: any) => {
       headerName: '相关任务',
       field: 'relatedTasks',
       minWidth: 80,
-      cellRenderer: relatedNumberAndIdRender,
+      cellRenderer: relatedNumberRender,
       onCellClicked: (params: any) => {
         if (Number(params.value) < 500 && Number(params.value) > 0) {
           history.push(`/sprint/dt_details?kind=${params.data.category}&ztNo=${params.data.ztNo}&relatedType=2&count=${params.value}`);
@@ -283,7 +164,7 @@ const getColums = (prjNames: any) => {
     {
       headerName: '截止日期',
       field: 'deadline',
-      cellRenderer: timestampChanges,
+      cellRenderer: timestampRenderer,
     },
     {
       headerName: '是否涉及页面调整',
@@ -329,115 +210,71 @@ const getColums = (prjNames: any) => {
       headerName: '是否需要测试验证',
       field: 'testCheck',
       headerTooltip: "自动生成’是‘为黑色；自动生成‘否’为红色；手动修改‘是’为紫色；手动修改‘否’为黄色",
-      tooltipValueGetter: (params: any) => {
-        const values = params.value;
-        if (!values) {
-          return "";
-        }
-        if (values === "-1") { // 手动：是
-          return "手动生成";
-        }
-        if (values === "-0") { // 手动：否
-          return "手动生成";
-        }
-        if (values === "0") { // 自动：否
-          return "自动生成";
-        }
-        if (values === "1") { // 自动：是
-          return "自动生成";
-        }
-        return values;
-      },
-      cellRenderer: (params: any) => {
-        // testCheck: 手动修改标识: "-1"、"-0";自动的是：0 ，1
-        // 自动规则生成的‘是’默认黑色，自动规则生成的‘否’默认红色
-        // 手动修改的‘是’默认紫色，手动修改的‘否’默认黄色
-        const values = params.value;
-        if (!values) {
-          return "";
-        }
-
-        let result = "";
-        let my_color = "";
-        if (values === "-1") { // 手动：是
-          result = "是";
-          my_color = "purple";// 紫色
-        } else if (values === "-0") { // 手动：否
-          result = "否";
-          my_color = "orange";// 黄色
-        } else if (values === "0") { // 自动：否
-          result = "否";
-          my_color = "red";// 红色
-        } else if (values === "1") { // 自动：是
-          result = "是";
-          my_color = "black";// 黑色
-        }
-        if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
-          return `<span style="text-decoration:line-through"> ${result} </span>`;
-        }
-        return `<span style="color: ${my_color}"> ${result}  </span>`;
-      },
-
+      tooltipValueGetter: testConfirmTooltipValueGetter,
+      cellRenderer: testConfirmedRenderer,
     },
     {
       headerName: '已提测',
       field: 'proposedTest',
-      cellRenderer: proposedTestRender,
+      valueGetter: proposedTestValueGetter,
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '发布环境',
       field: 'publishEnv',
       minWidth: 80,
-      cellRenderer: stageForLineThrough,
+      cellRenderer: textDecorateRender,
       tooltipField: "publishEnv"
     },
     {
       headerName: '关闭人',
       field: 'closedBy',
       minWidth: 80,
-      cellRenderer: stageForLineThrough,
-      suppressMenu: false,
-
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '备注',
       field: 'memo',
       minWidth: 150,
-      cellRenderer: stageForLineThrough,
+      cellRenderer: textDecorateRender,
       tooltipField: "memo"
-
     },
     {
       headerName: '验证范围建议',
       field: 'scopeLimit',
-      cellRenderer: stageForLineThrough,
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: 'UED',
       field: 'uedName',
-      cellRenderer: stageForLineThrough,
-      suppressMenu: false,
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: 'UED测试环境验证',
       field: 'uedEnvCheck',
-      cellRenderer: numberRenderTopass,
+      valueGetter: (params: any) => {
+        return vertifyResultValueGetter(params.data?.uedEnvCheck);
+      },
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: 'UED线上验证',
       field: 'uedOnlineCheck',
-      cellRenderer: numberRenderTopass,
+      valueGetter: (params: any) => {
+        return vertifyResultValueGetter(params.data?.uedOnlineCheck);
+      },
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '来源',
       field: 'source',
-      cellRenderer: numberRenderToSource,
+      valueGetter: sourceValueGetter,
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '反馈人',
       field: 'feedback',
-      cellRenderer: stageForLineThrough,
-      suppressMenu: false,
+      cellRenderer: textDecorateRender,
     }
   ];
 
@@ -446,16 +283,14 @@ const getColums = (prjNames: any) => {
       headerName: '创建时间',
       field: 'openedAt',
       minWidth: 150,
-      cellRenderer: timeForLineThrough,
-      suppressMenu: false
+      cellRenderer: timeRenderer,
     });
 
     oraFields.splice(12, 0, {
       headerName: '解决时间',
       field: 'resolvedAt',
       minWidth: 150,
-      cellRenderer: timeForLineThrough,
-      suppressMenu: false
+      cellRenderer: timeRenderer,
     });
   }
 

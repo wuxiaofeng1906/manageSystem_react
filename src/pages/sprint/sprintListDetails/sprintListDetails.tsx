@@ -65,7 +65,7 @@ const SprintList: React.FC<any> = () => {
   const [formForMove] = Form.useForm();
   // 移动新增项目
   const [formForMoveAddAnaMod] = Form.useForm();
-  const [pageTitle, setPageTitle] = useState("");
+  const [pageTitle, setPageTitle] = useState(<label></label>);
   const [personName, setPersonName] = useState({
     assignedTo: [],
     tester: [],
@@ -186,8 +186,6 @@ const SprintList: React.FC<any> = () => {
     const datas: any = await queryDevelopViews(gqlClient, prjId, prjType);
     ora_filter_data = datas?.result;
     onSelectChanged()
-    // gridApi.current?.setRowData(datas?.result);
-    // setPageTitle(getStaticMessage(datas?.resCount));
   };
 
   /* endregion */
@@ -1103,7 +1101,6 @@ const SprintList: React.FC<any> = () => {
       <PageHeader
         ghost={false}
         title={prjNames}
-        subTitle={<div style={{color: "blue"}}> {pageTitle}</div>}
         style={{height: "85px"}}
         breadcrumbRender={() => {
           return <Breadcrumb>{headerPath}</Breadcrumb>;
@@ -1111,7 +1108,8 @@ const SprintList: React.FC<any> = () => {
       />
 
       <Spin spinning={refreshItem} tip="项目详情同步中..." size={"large"}>
-
+        {/* 蓝色title展示 */}
+        <div style={{color: "blue", backgroundColor: "white"}}> {pageTitle}</div>
         {/* 条件筛选 */}
         <Form form={formForQuery}>
           <Row gutter={5} style={{background: 'white', marginTop: "5px", height: 30}}>

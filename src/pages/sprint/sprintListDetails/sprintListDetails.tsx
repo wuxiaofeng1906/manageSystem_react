@@ -484,7 +484,8 @@ const SprintList: React.FC<any> = () => {
       }
 
       // 如果修改了禅道类型，那么category传入旧值，newCategory传入新值。
-      if (curRow[0].category !== oradata.adminChandaoType) {
+      const rowCategory = curRow[0].category === "-3" ? "3" : curRow[0].category;
+      if (rowCategory !== oradata.adminChandaoType) {
         datas["category"] = curRow[0].category;
         datas["newCategory"] = oradata.adminChandaoType;
       }

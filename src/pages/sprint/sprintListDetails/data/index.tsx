@@ -20,20 +20,24 @@ const calTypeCount = (data: any) => {
   let test_finished = 0;
   let onlined = 0;
 
+  // 测试是否确认
+  let testConfirm_yes = 0;
+  let testConfirm_no = 0;
+
   data.forEach((ele: any) => {
+    const { category, stage, testConfirmed } = ele;
     // 获取统计类型的个数
-    if (ele.category === '1') {
+    if (category === '1') {
       bug += 1;
-    } else if (ele.category === '2') {
+    } else if (category === '2') {
       task += 1;
-    } else if (ele.category === '-3') {
+    } else if (category === '-3') {
       B_story += 1;
-    } else if (ele.category === '3') {
+    } else if (category === '3') {
       story += 1;
     }
 
     // 获取统计阶段的个数
-    const { stage } = ele;
     switch (stage.toString()) {
       case '1': // stage = "未开始";
         wait += 1;
@@ -59,6 +63,17 @@ const calTypeCount = (data: any) => {
       default:
         break;
     }
+
+    //   测试确认
+    if (testConfirmed === '1') {
+      testConfirm_yes += 1;
+    } else {
+      testConfirm_no += 1;
+    }
+    // if (testConfirme === "0" || testConfirme === null || testConfirme === undefined) {
+    //   return "否";
+    // }
+    // return "是";
   });
   return {
     bug,
@@ -71,6 +86,8 @@ const calTypeCount = (data: any) => {
     testing,
     test_finished,
     onlined,
+    testConfirm_yes,
+    testConfirm_no,
   };
 };
 

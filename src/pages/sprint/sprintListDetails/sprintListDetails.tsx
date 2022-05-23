@@ -1605,7 +1605,10 @@ const SprintList: React.FC<any> = () => {
                       <Option key={'集群2'} value={'集群2'}>集群2</Option>,
                       <Option key={'集群3'} value={'集群3'}>集群3</Option>,
                       <Option key={'集群4'} value={'集群4'}>集群4</Option>,
-                      <Option key={'集群5'} value={'集群5'}>集群5</Option>
+                      <Option key={'集群5'} value={'集群5'}>集群5</Option>,
+                      <Option key={'集群6'} value={'集群6'}>集群6</Option>,
+                      <Option key={'集群7'} value={'集群7'}>集群7</Option>,
+                      <Option key={'global'} value={'global'}>global</Option>
                     ]}
                   </Select>
                 </Form.Item>
@@ -1893,7 +1896,10 @@ const SprintList: React.FC<any> = () => {
                       <Option key={'集群2'} value={'集群2'}>集群2</Option>,
                       <Option key={'集群3'} value={'集群3'}>集群3</Option>,
                       <Option key={'集群4'} value={'集群4'}>集群4</Option>,
-                      <Option key={'集群5'} value={'集群5'}>集群5</Option>
+                      <Option key={'集群5'} value={'集群5'}>集群5</Option>,
+                      <Option key={'集群6'} value={'集群6'}>集群6</Option>,
+                      <Option key={'集群7'} value={'集群7'}>集群7</Option>,
+                      <Option key={'global'} value={'global'}>global</Option>
                     ]}
                   </Select>
                 </Form.Item>

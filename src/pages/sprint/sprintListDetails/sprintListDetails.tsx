@@ -550,7 +550,8 @@ const SprintList: React.FC<any> = () => {
       }
 
       // 如果修改了禅道类型，那么category传入旧值，newCategory传入新值。
-      if (curRow[0].category !== oradata.adminChandaoType) {
+      const rowCategory = curRow[0].category === '-3' ? '3' : curRow[0].category;
+      if (rowCategory !== oradata.adminChandaoType) {
         datas['category'] = curRow[0].category;
         datas['newCategory'] = oradata.adminChandaoType;
       }
@@ -1896,6 +1897,15 @@ const SprintList: React.FC<any> = () => {
                       <Option key={'集群5'} value={'集群5'}>
                         集群5
                       </Option>,
+                      <Option key={'集群6'} value={'集群6'}>
+                        集群6
+                      </Option>,
+                      <Option key={'集群7'} value={'集群7'}>
+                        集群7
+                      </Option>,
+                      <Option key={'global'} value={'global'}>
+                        global
+                      </Option>,
                     ]}
                   </Select>
                 </Form.Item>
@@ -2282,6 +2292,15 @@ const SprintList: React.FC<any> = () => {
                       </Option>,
                       <Option key={'集群5'} value={'集群5'}>
                         集群5
+                      </Option>,
+                      <Option key={'集群6'} value={'集群6'}>
+                        集群6
+                      </Option>,
+                      <Option key={'集群7'} value={'集群7'}>
+                        集群7
+                      </Option>,
+                      <Option key={'global'} value={'global'}>
+                        global
                       </Option>,
                     ]}
                   </Select>

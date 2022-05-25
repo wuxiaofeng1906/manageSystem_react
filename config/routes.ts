@@ -585,7 +585,6 @@ export default [
         icon: 'table',
         path: 'publishList',
         component: './systemOnline/publishList',
-        // hideInMenu: true
       },
       {
         name: '预发布',
@@ -593,6 +592,7 @@ export default [
         path: 'prePublish',
         component: './systemOnline/prePublish/layout',
         hideChildrenInMenu: true,
+        hideInMenu: true,
         routes: [
           {
             path: 'projectServices',
@@ -621,11 +621,10 @@ export default [
         ],
       },
       {
-        name: '组件',
+        name: '前端服务配置',
         icon: 'table',
-        path: 'components',
-        component: './systemOnline/test',
-        // hideInMenu: true
+        path: 'webServicesSetting',
+        component: './systemOnline/webServicesSetting',
       },
     ],
   },

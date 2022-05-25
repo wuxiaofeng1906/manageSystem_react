@@ -1,32 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { Layout, Form, Select, DatePicker, Button, Menu } from 'antd';
-import { history } from 'umi';
+import { Layout, Form, Select, DatePicker, Menu } from 'antd';
+import { history, useModel } from 'umi';
 import styles from './index.less';
 import moment from 'moment';
+import { PUBLISH_RESULT, MENUS } from '../../constants';
 
-const menus = [
-  { label: '项目&服务', key: 'projectServices' },
-  { label: '部署', key: 'deploy' },
-  { label: '检查', key: 'check' },
-  { label: '工单', key: 'worksheet' },
-  { label: '发布', key: 'publish' },
-  { label: '总览', key: 'overview' },
-];
 const PreLayout = ({ location, children }) => {
+  const [disabled, setting] = useModel('systemOnline', (system) => [
+    system.disabled,
+    system.setting,
+  ]);
   const [form] = Form.useForm();
   const [activePath, setActivePath] = useState([
     location.pathname.split('/systemOnline/prePublish/')[1] || 'projectServices',
   ]);
+
   const [condition] = useState({
     publish_type: '1',
     publish_by: 'no',
     publish_date: moment().hour(23).minute(0),
   });
+
   useEffect(() => {
     if (location.pathname === '/systemOnline/prePublish') {
       history.replace('/systemOnline/prePublish/projectServices');
     }
   }, [location.pathname]);
+
+  console.log(setting);
 
   return (
     <div className={styles.preLayout}>
@@ -36,6 +37,7 @@ const PreLayout = ({ location, children }) => {
             <Form form={form} initialValues={condition}>
               <Form.Item label={'发布类型'} name={'publish_type'}>
                 <Select
+                  disabled={disabled}
                   options={[
                     { value: '1', label: '灰度发布（集群1）' },
                     { value: '2', label: '热更线上（热更2-6/1-6）' },
@@ -45,6 +47,7 @@ const PreLayout = ({ location, children }) => {
               </Form.Item>
               <Form.Item label={'发布方式'} name={'publish_by'}>
                 <Select
+                  disabled={disabled}
                   options={[
                     { value: 'yes', label: '停服' },
                     { value: 'no', label: '不停服' },
@@ -52,20 +55,19 @@ const PreLayout = ({ location, children }) => {
                 />
               </Form.Item>
               <Form.Item label={'发布时间'} name={'publish_date'}>
-                <DatePicker format={'YYYY-MM-DD HH:mm'} style={{ width: '100%' }} />
+                <DatePicker
+                  format={'YYYY-MM-DD HH:mm'}
+                  style={{ width: '100%' }}
+                  disabled={disabled}
+                />
               </Form.Item>
-              {/*<Form.Item label={'确认封板'}>*/}
-              {/*  <Button block type={'primary'}>*/}
-              {/*    未封板*/}
-              {/*  </Button>*/}
-              {/*</Form.Item>*/}
               <Form.Item label={'发布结果'} name={'publish_result'}>
-                <Select options={[]} />
+                <Select options={PUBLISH_RESULT} disabled={disabled} />
               </Form.Item>
             </Form>
           </div>
           <Menu className={styles.menu} selectedKeys={activePath} mode="inline">
-            {menus.map((it) => (
+            {MENUS.map((it) => (
               <Menu.Item
                 key={it.key}
                 onClick={(e) => {

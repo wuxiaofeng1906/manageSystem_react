@@ -2,21 +2,16 @@ import React, { useRef, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { Button, Space } from 'antd';
 import { deployColumn } from '@/pages/systemOnline/column';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import type { GridApi } from 'ag-grid-community';
 import DeploySetting from '@/pages/systemOnline/prePublish/deploy/DeploySetting';
 import OneKeyDeploy from '@/pages/systemOnline/prePublish/deploy/OneKeyDeploy';
-import cls from 'classnames';
-import { initColDef } from '@/pages/systemOnline/constants';
+import { initGridTable } from '@/pages/systemOnline/constants';
 
 const Deploy = () => {
-  const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
+  const gridApi = useRef<GridApi>();
   const [deploySetting, setDeploySetting] = useState(false);
   const [oneKeyDeploy, setOneKeyDeploy] = useState(false);
   // const [data, setData] = useState({});
-  const onGridReady = (params: GridReadyEvent) => {
-    gridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
 
   return (
     <div>
@@ -30,11 +25,9 @@ const Deploy = () => {
       </Space>
       <div className={'AgGridReactTable'}>
         <AgGridReact
-          className={cls('ag-theme-alpine', 'ag-initialize-theme')}
+          {...initGridTable(gridApi)}
           columnDefs={deployColumn}
           rowData={[]}
-          defaultColDef={initColDef}
-          onGridReady={onGridReady}
           frameworkComponents={{
             operation: () => {
               return <div>日志</div>;

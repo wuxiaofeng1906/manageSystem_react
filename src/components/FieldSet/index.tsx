@@ -11,7 +11,7 @@ const FieldSet = ({ data, children }: IField) => {
     <fieldset className={styles.fieldset} style={data?.dot ? { border: '1px dotted silver' } : {}}>
       <legend className={styles.legend}>
         {data.title}
-        <label>{data?.mark}</label>
+        <label className="color-tips">{data?.mark}</label>
       </legend>
       <div>{children}</div>
     </fieldset>

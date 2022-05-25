@@ -1,23 +1,24 @@
 import { AgGridReact } from 'ag-grid-react';
 import { PageContainer } from '@ant-design/pro-layout';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Form, Row, Col, Select, DatePicker } from 'antd';
-import type { CellDoubleClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
+import type { CellDoubleClickedEvent, GridApi } from 'ag-grid-community';
 
-import { history, Link } from 'umi';
+import { history, Link, useModel } from 'umi';
 import moment from 'moment';
 import { publishColumn } from '../column';
-import { initColDef } from '../constants';
+import { initGridTable } from '../constants';
 import IPagination from '@/components/IPagination';
-import cls from 'classnames';
 import './index.less';
 
 const PublishList: React.ReactNode = () => {
-  // 确认高度
-  const gridApi = useRef<GridApi>(null); // 绑定ag-grid 组件
+  const gridApi = useRef<GridApi>();
 
-  // const [releaseItem] = useModel('releaseProcess', (release) => [release.releaseItem]);
+  const [setDisabled, setSetting] = useModel('systemOnline', (system) => [
+    system.setDisabled,
+    system.setSetting,
+  ]);
   const [publishSource, setPublishSource] = useState<Record<string, any>[]>([]);
   const [publishForm] = Form.useForm();
   const [publishCondition] = useState({
@@ -28,12 +29,9 @@ const PublishList: React.ReactNode = () => {
     publish_date: [moment().startOf('years'), moment()],
   });
 
-  const onGridReady = (params: GridReadyEvent) => {
-    gridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-
   useEffect(() => {
+    setSetting(null);
+    setDisabled(false);
     setPublishSource([
       {
         id: 1,
@@ -52,7 +50,7 @@ const PublishList: React.ReactNode = () => {
         id: 2,
         publish_version: '003',
         publish_project: '测试项目002',
-        publish_result: 'error',
+        publish_result: 'failure',
         publish_person: '李四',
         publish_branch: 'develop',
         publish_type: '热更',
@@ -64,7 +62,7 @@ const PublishList: React.ReactNode = () => {
         id: 3,
         publish_version: '002',
         publish_project: '测试项目002',
-        publish_result: 'error',
+        publish_result: 'failure',
         publish_person: '李四',
         publish_branch: 'develop',
         publish_type: '热更',
@@ -77,7 +75,7 @@ const PublishList: React.ReactNode = () => {
         id: 4,
         publish_version: '002',
         publish_project: '测试项目002',
-        publish_result: 'error',
+        publish_result: 'failure',
         publish_person: '李四',
         publish_branch: 'develop',
         publish_type: '热更',
@@ -90,7 +88,7 @@ const PublishList: React.ReactNode = () => {
         id: 5,
         publish_version: '002',
         publish_project: '测试项目002',
-        publish_result: 'error',
+        publish_result: 'failure',
         publish_person: '李四',
         publish_branch: 'develop',
         publish_type: '热更',
@@ -102,7 +100,7 @@ const PublishList: React.ReactNode = () => {
         id: 6,
         publish_version: '002',
         publish_project: '测试项目002',
-        publish_result: 'error',
+        publish_result: 'failure',
         publish_person: '李四',
         publish_branch: 'develop',
         publish_type: '热更',
@@ -111,15 +109,6 @@ const PublishList: React.ReactNode = () => {
         publish_date: '2022/05/01 18:30',
       },
     ]);
-  }, []);
-
-  // drag
-  const onRowDragMove = useCallback((event) => {
-    const result: Record<string, any>[] = [];
-    gridApi.current?.forEachNode(({ data }, index) => {
-      result.push(data.id);
-    });
-    console.log(result);
   }, []);
 
   return (
@@ -149,7 +138,6 @@ const PublishList: React.ReactNode = () => {
                   { value: '1', label: '发布成功' },
                   { value: '0', label: '发布失败' },
                 ]}
-                // disabled={currentOperateStatus}
               />
             </Form.Item>
           </Col>
@@ -166,7 +154,6 @@ const PublishList: React.ReactNode = () => {
                   { value: '3', label: '热更线上' },
                 ]}
                 style={{ width: '100%' }}
-                // disabled={currentOperateStatus}
               />
             </Form.Item>
           </Col>
@@ -192,24 +179,17 @@ const PublishList: React.ReactNode = () => {
           </Col>
         </Row>
       </Form>
-      <div
-        className={cls('ag-theme-alpine', 'ag-initialize-theme')}
-        style={{ height: '400px', width: '100%' }}
-      >
+      <div style={{ height: '400px', width: '100%' }}>
         <AgGridReact
-          columnDefs={publishColumn}
+          {...initGridTable(gridApi)}
           rowData={publishSource}
-          animateRows
-          rowDragManaged
-          suppressRowTransform
-          defaultColDef={initColDef}
-          onGridReady={onGridReady}
-          onGridSizeChanged={onGridReady}
-          onRowDragEnd={onRowDragMove}
-          onCellDoubleClicked={(it: CellDoubleClickedEvent) => {
+          columnDefs={publishColumn}
+          onCellDoubleClicked={({ data }: CellDoubleClickedEvent) => {
+            setDisabled(true);
+            setSetting(data);
             history.push({
               pathname: '/systemOnline/prePublish/projectServices',
-              query: { idx: it.data.id, disabled: '1' },
+              // query: { idx: data.id, disabled: '1' },
             });
           }}
         />

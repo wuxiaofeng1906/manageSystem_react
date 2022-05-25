@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Modal, Form, Switch, Row, Col, Divider, Select, Space } from 'antd';
-import { ModalFuncProps } from 'antd/lib/modal/Modal';
+import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 import styles from './index.less';
 
 const DeploySetting = (props: ModalFuncProps) => {

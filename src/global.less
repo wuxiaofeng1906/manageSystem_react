@@ -62,10 +62,10 @@ ol {
 
   .ant-btn-primary {
     color: @color-approve;
-    background: #ECF5FF;
-    border-radius: 5px;
     text-shadow: initial;
+    background: #ecf5ff;
     border-color: #b5d4ec;
+    border-radius: 5px;
   }
 
   .flex-row {
@@ -74,17 +74,19 @@ ol {
   }
 
   .color-prefix {
-    color: @color-approve
+    color: @color-approve;
   }
 
   .color-success {
-    color: @color-success
+    color: @color-success;
   }
 
-  .color-error {
-    color: @color-error
+  .color-failure {
+    color: @color-error;
   }
-
+  .color-tips {
+    color: @color-text-tips;
+  }
 }
 
 // 全局ag-grid-react 样式
@@ -98,25 +100,34 @@ ol {
   }
 
   .ag-row {
+    cursor: pointer;
     .ag-cell {
       text-align: center;
     }
+    .cell-span {
+      background: white;
+    }
   }
 
-  .ag-cell-wrapper, .ag-header-cell-label {
+  .ag-cell-wrapper,
+  .ag-header-cell-label {
     justify-content: center;
   }
+  .ag-drag {
+    .ag-cell-wrapper {
+      flex-direction: row-reverse;
+    }
+    .ag-row-drag {
+      margin-left: 10px;
 
-  .ag-row-drag {
-    margin-right: 0;
-
-    .ag-icon-grip {
-      &:before {
-        content: '';
-        width: 20px;
-        height: 20px;
-        display: inline-block;
-        background: url("../public/move.png") center/100% no-repeat;
+      .ag-icon-grip {
+        &:before {
+          display: inline-block;
+          width: 20px;
+          height: 20px;
+          background: url('../public/move.png') center/100% no-repeat;
+          content: '';
+        }
       }
     }
   }
@@ -125,6 +136,18 @@ ol {
     img {
       width: 20px;
       height: 20px;
+      &:not(:last-child) {
+        margin-right: 10px;
+      }
+    }
+  }
+  .ag-required {
+    .ag-header-cell-text {
+      &:before {
+        margin-right: 5px;
+        color: @color-text-primary;
+        content: '*';
+      }
     }
   }
 }

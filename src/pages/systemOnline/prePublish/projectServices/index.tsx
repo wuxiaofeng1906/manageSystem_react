@@ -1,51 +1,64 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Form, Row, Col, Select, Space } from 'antd';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { Form, Row, Col, Select, Space, Modal } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
-import ITableTitle from '../../components/ITableTitle';
 import {
   projectUpgradeColumn,
   publishServerColumn,
   upgradeSQLColumn,
   dataReviewColumn,
 } from '@/pages/systemOnline/column';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import { initColDef } from '@/pages/systemOnline/constants';
-import cls from 'classnames';
+import type { CellClickedEvent, GridApi } from 'ag-grid-community';
+import { initGridTable } from '@/pages/systemOnline/constants';
+import EditUpgrade, { UpgradeItem } from './EditUpgrade';
+import EditServices, { Iservices } from './EditServices';
+import EditSql, { Isql } from './EditSql';
+
+type enumType = 'upgrade' | 'services' | 'sql';
+interface Istate<T> {
+  visible: boolean;
+  data?: T;
+}
 
 const ProjectServices = () => {
   const [form] = Form.useForm();
 
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
-  const [data] = useState({
+  const [initData] = useState({
     prePublishEnv: 'nx-release-k8s',
   });
-  const [projectUpgrade, setProjectUpgrade] = useState<Record<string, any>[]>([]);
-  const [servicesData, setServicesData] = useState<Record<string, any>[]>([]);
-  const onGridReady = (params: GridReadyEvent) => {
-    gridApi.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
+  const [projectUpgrade, setProjectUpgrade] = useState<UpgradeItem[]>([]);
+  const [servicesData, setServicesData] = useState<Iservices[]>([]);
+  const [upgradeSQLData, setUpgradeSQLData] = useState<Isql[]>([]);
+  const [checkReviewData, setCheckReviewData] = useState<Record<string, any>[]>([]);
+
+  const [editUpgrade, setEditUpgrade] = useState<Istate<UpgradeItem> | null>();
+  const [editServices, setEditServices] = useState<Istate<Iservices> | null>();
+  const [editSql, setEditSql] = useState<Istate<Isql> | null>();
 
   const getProjectUpgradeData = async () => {
     setProjectUpgrade([
       {
         id: 1,
         name: '笑果文化',
-        update_dbs: '是',
-        recovery: '否',
-        clear: '否',
-        setting_add: '否',
-        origin_update: '否',
+        update_dbs: 'yes',
+        recovery: 'no',
+        clear: 'yes',
+        setting_add: 'no',
+        origin_update: 'yes',
+        application: 'yes',
+        leader: '吹烂',
         mark: 'test',
       },
       {
         id: 2,
-        name: '笑果文化',
-        update_dbs: '是',
-        recovery: '否',
-        clear: '否',
-        setting_add: '否',
-        origin_update: '否',
+        name: '老六',
+        update_dbs: 'yes',
+        recovery: 'no',
+        clear: 'yes',
+        setting_add: 'no',
+        origin_update: 'no',
+        application: 'no',
+        leader: '王洼',
         mark: 'test',
       },
     ]);
@@ -54,19 +67,66 @@ const ProjectServices = () => {
         id: 1,
         online_env: '集群1',
         application: 'h5',
-        mark: '测试',
+        version: 'yes',
+        side: '业务前端',
+        date: '2022-05-24 14:13:29',
+        rowSpan: 2,
       },
       {
         id: 2,
         online_env: '集群1',
         application: 'global',
-        mark: '测试',
+        version: 'yes',
+        side: '业务前端',
+        date: '',
       },
       {
         id: 3,
-        online_env: '集群1',
+        online_env: '集群3',
         application: 'web',
-        mark: '测试',
+        version: 'no',
+        side: '业务前端',
+        date: '',
+        rowSpan: 1,
+      },
+    ]);
+    setUpgradeSQLData([
+      {
+        id: 1,
+        online_env: '集群1',
+        upgrade_type: '接口升级',
+        upgrade_sql: '后端接口',
+        services: 'basebi',
+        sql: 'update project set\n;;;;  code=1;\n where projectid=1234 ...',
+        method: 'post',
+        data: '',
+        header: '',
+        users: '全量租户',
+        record: 'yes',
+      },
+      {
+        id: 2,
+        online_env: '',
+        upgrade_type: '接口升级',
+        upgrade_sql: '后端接口',
+        services: 'basebi',
+        method: 'post',
+        data: '',
+        header: '',
+        users: '全量租户',
+        record: 'no',
+      },
+    ]);
+    setCheckReviewData([
+      {
+        id: 1,
+        review_content: '测试',
+        users: 'all',
+        type: 'after',
+        commit_person: '王德',
+        branch: 'hotfux-inte',
+        result: '通过',
+        repeat: '是',
       },
     ]);
   };
@@ -74,10 +134,46 @@ const ProjectServices = () => {
     getProjectUpgradeData();
   }, []);
 
+  // drag
+  const onRowDragMove = useCallback(() => {
+    const result: string[] = [];
+    gridApi.current?.forEachNode(({ data }: any) => {
+      result.push(data.id);
+    });
+    console.log(result);
+  }, []);
+
+  // operation
+  const OperationDom = ({ data }: CellClickedEvent, type: enumType, showLog = true) => {
+    return (
+      <div className={'operation'}>
+        <img
+          src={require('../../../../../public/edit.png')}
+          onClick={() => {
+            const params = { visible: true, data };
+            if (type == 'upgrade') setEditUpgrade(params);
+            else if (type == 'services') setEditServices(params);
+            else setEditSql(params);
+          }}
+        />
+        {showLog && (
+          <img
+            src={require('../../../../../public/logs.png')}
+            onClick={() => {
+              console.log(data);
+            }}
+          />
+        )}
+      </div>
+    );
+  };
+
   return (
     <div>
-      <ITableTitle data={{ title: '一、预发布项目&环境填写', subTitle: '由测试人员依次填写' }} />
-      <Form form={form} initialValues={data}>
+      <h4>
+        一、预发布项目&环境填写 <span className="color-tips">【由测试人员依次填写】</span>
+      </h4>
+      <Form form={form} initialValues={initData}>
         <Row justify={'space-between'}>
           <Col span={8}>
             <Form.Item label={'预发布项目'} name={'prePublishPro'}>
@@ -101,6 +197,7 @@ const ProjectServices = () => {
           <Col span={8}>
             <Form.Item label={'测试环境绑定'} name={'prePublishEnv'}>
               <Select
+                disabled
                 options={[
                   { value: 'nx-release-k8s', label: 'nx-release-k8s' },
                   { value: 'nx-release-db-k8s', label: 'nx-release-db-k8s' },
@@ -114,121 +211,92 @@ const ProjectServices = () => {
           </Col>
         </Row>
       </Form>
-      <ITableTitle
-        data={{ title: '二、项目升级信息填写', subTitle: '由后端值班/流程值班人员填写' }}
-      />
+      <Space className={'flex-row'} size={40} style={{ marginBottom: 40 }}>
+        <div>
+          填写人： <span>詹三</span>
+        </div>
+        <div>
+          填写时间： <span>2022-05-08</span>
+        </div>
+      </Space>
+      <h4>
+        二、项目升级信息填写 <span className="color-tips">【由后端值班/流程值班人员填写】</span>
+      </h4>
       <div className={'AgGridReactTable'}>
         <AgGridReact
-          className={cls('ag-theme-alpine', 'ag-initialize-theme')}
+          {...initGridTable(gridApi)}
           columnDefs={projectUpgradeColumn}
           rowData={projectUpgrade}
-          defaultColDef={initColDef}
-          onGridReady={onGridReady}
-          onGridSizeChanged={onGridReady}
           frameworkComponents={{
-            operation: (it: GridReadyEvent) => {
-              return (
-                <Space size={10} className={'operation'}>
-                  <img
-                    src={require('../../../../../public/edit.png')}
-                    onClick={() => {
-                      console.log(it);
-                    }}
-                  />
-                  <img
-                    src={require('../../../../../public/logs.png')}
-                    onClick={() => {
-                      console.log(it);
-                    }}
-                  />
-                </Space>
-              );
-            },
+            operation: (it: CellClickedEvent) => OperationDom(it, 'upgrade'),
           }}
         />
       </div>
-      <ITableTitle
-        data={{
-          title: '三、发布服务填写',
-          subTitle: '由后端负责人/前端值班/后端值班/流程值班人员填写',
-        }}
-      />
+      <h4>
+        三、发布服务填写{' '}
+        <span className="color-tips">【由后端负责人/前端值班/后端值班/流程值班人员填写】</span>
+      </h4>
       <div className={'AgGridReactTable'}>
         <AgGridReact
-          className={cls('ag-theme-alpine', 'ag-initialize-theme')}
+          {...initGridTable(gridApi)}
           columnDefs={publishServerColumn}
           rowData={servicesData}
-          defaultColDef={initColDef}
-          onGridReady={onGridReady}
           frameworkComponents={{
-            operation: (it: GridReadyEvent) => {
-              return (
-                <Space size={15} className={'operation'}>
-                  <img
-                    src={require('../../../../../public/add_1.png')}
-                    onClick={() => {
-                      console.log(it);
-                    }}
-                  />
-                  <img
-                    src={require('../../../../../public/edit.png')}
-                    onClick={() => {
-                      console.log(it);
-                    }}
-                  />
-                  <img
-                    src={require('../../../../../public/delete_2.png')}
-                    onClick={() => {
-                      console.log(it);
-                    }}
-                  />
-                  <img
-                    src={require('../../../../../public/logs.png')}
-                    onClick={() => {
-                      console.log(it);
-                    }}
-                  />
-                </Space>
-              );
-            },
+            operation: (it: CellClickedEvent) => OperationDom(it, 'services'),
           }}
         />
       </div>
-      <ITableTitle
-        data={{
-          title: '四、升级接口&升级SQL填写',
-          subTitle: '前后端值班核对确认',
-        }}
-      />
+      <h4>
+        四、升级接口&升级SQL填写 <span className="color-tips">【前后端值班核对确认】</span>
+      </h4>
       <div className={'AgGridReactTable'}>
         <AgGridReact
-          className={cls('ag-theme-alpine', 'ag-initialize-theme')}
+          animateRows
+          rowDragManaged
+          suppressRowTransform
+          {...initGridTable(gridApi)}
           columnDefs={upgradeSQLColumn}
-          rowData={[]}
-          defaultColDef={initColDef}
-          onGridReady={onGridReady}
+          rowData={upgradeSQLData}
+          onRowDragEnd={onRowDragMove}
           frameworkComponents={{
-            operation: () => {
-              return <div>编辑</div>;
-            },
+            operation: (it: CellClickedEvent) => OperationDom(it, 'sql', false),
+          }}
+          onCellDoubleClicked={({ colDef, value }: CellClickedEvent) => {
+            if (colDef.field == 'sql' && value) {
+              Modal.info({
+                width: 600,
+                title: '详情',
+                content: (
+                  <div
+                    style={{
+                      maxHeight: 400,
+                      overflow: 'auto',
+                      margin: '10px 0',
+                      whiteSpace: 'pre-line',
+                    }}
+                  >
+                    {value}
+                  </div>
+                ),
+                okText: '好的',
+              });
+            }
           }}
         />
       </div>
-      <ITableTitle
-        data={{
-          title: '五、数据修复Review',
-          subTitle: '由后端值班人员核对确认',
-        }}
-      />
+      <h4>
+        五、数据修复Review <span className="color-tips">【由后端值班人员核对确认】</span>
+      </h4>
       <div className={'AgGridReactTable'}>
         <AgGridReact
-          className={cls('ag-theme-alpine', 'ag-initialize-theme')}
+          {...initGridTable(gridApi)}
           columnDefs={dataReviewColumn}
-          rowData={[]}
-          defaultColDef={initColDef}
-          onGridReady={onGridReady}
+          rowData={checkReviewData}
         />
       </div>
+      <EditUpgrade {...editUpgrade} onCancel={() => setEditUpgrade(null)} />
+      <EditServices {...editServices} onCancel={() => setEditServices(null)} />
+      <EditSql {...editSql} onCancel={() => setEditSql(null)} />
     </div>
   );
 };

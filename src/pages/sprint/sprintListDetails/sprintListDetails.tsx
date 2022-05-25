@@ -32,7 +32,6 @@ import {
   queryDevelopViews, queryRepeats, LoadCombobox, LoadTesterCombobox, GetSprintProject, calTypeCount
 } from "./data";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
-import defaultTreeSelectParams from "@/pages/shimo/fileBaseline/iterateList/defaultSetting";
 import {
   devCenterDept, getStageOption, getTypeOption, getAssignedToOption,
   getTesterOption, getSolvedByOption, filterDatasByCondition
@@ -41,6 +40,7 @@ import {
   requestModFlowStage, addSprintDetails, delSprintDetails, mosidySprintDetails,
   moveSprintDetails, addNewProjects, getZentaoInfo, syncDetailsData
 } from "./common/axiosRequest";
+import defaultTreeSelectParams from "@/pages/shimo/fileBaseline/iterateList/defaultSetting";
 
 let ora_filter_data: any = [];
 const {Option} = Select;
@@ -1118,8 +1118,9 @@ const SprintList: React.FC<any> = () => {
               <Form.Item label="部门/组" name={"dept"}>
                 <TreeSelect className={"deptTree"} size={"small"}
                             {...defaultTreeSelectParams}
-                  // disabled={}
-                  // placeholder={'开发中'}
+                            treeDefaultExpandedKeys={[59]}
+                            dropdownStyle={{minHeight: 400, overflow: 'auto'}}  // 下拉框的样式
+                            listHeight={1200}  // 下拉框中列表的设置。
                             onFocus={onDeptSelectFocus}
                             treeData={selectOption.deptSelect}
                             onChange={onSelectChanged}

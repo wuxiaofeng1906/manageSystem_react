@@ -166,7 +166,7 @@ const devCenterDept = async (client: GqlClient<object>, gridData: any) => {
         }
       }
   `);
-
+debugger;
   const deptCountArray = getDeptAndCount(data?.organization, gridData);
   const deptArray = getDevCenterTree(deptCountArray);
   const devCenter: any = [];

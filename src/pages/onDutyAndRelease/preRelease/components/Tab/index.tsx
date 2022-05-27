@@ -143,6 +143,16 @@ const Tab: React.FC<any> = () => {
     const newNum = await getNewPageNumber();
     const newTabs = newNum.data?.ready_release_num;
     const {panes}: any = tabsData;
+    // 点击新建发布过程标签时，判断是否已存在发布过程标签，如果存在，弹出提醒信息，提示“已存在发布过程，如服务已发布，请及时填写发布结果！”
+    if (panes.length > 0) {
+      message.warning({
+        content: '已存在发布过程，如服务已发布，请及时填写发布结果！',
+        duration: 3,
+        style: {
+          marginTop: '10vh',
+        },
+      });
+    }
     panes.push({
       title: `${newTabs}灰度预发布`,
       content: '',
@@ -275,7 +285,7 @@ const Tab: React.FC<any> = () => {
   // 保存tab名
   const saveModifyName = async () => {
     const formData = tabNameSetForm.getFieldsValue();
-    if((formData.newTabName).trim() === ""){
+    if ((formData.newTabName).trim() === "") {
       message.error({
         content: "新发布名称不能为空！",
         duration: 1,
@@ -330,6 +340,7 @@ const Tab: React.FC<any> = () => {
           activeKey={tabsData === undefined ? '' : tabsData.activeKey}
           onChange={onTabsChange}
           onEdit={(targetKey, action) => {
+            debugger;
             onEdits(targetKey, action);
           }}
           style={{marginTop: -20}}

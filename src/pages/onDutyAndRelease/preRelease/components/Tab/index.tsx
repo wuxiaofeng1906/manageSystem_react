@@ -8,6 +8,9 @@ import {showProgressData} from "@/pages/onDutyAndRelease/preRelease/components/C
 import {getGridRowsHeight} from "@/pages/onDutyAndRelease/preRelease/components/gridHeight";
 import {showReleasedId} from "@/pages/onDutyAndRelease/preRelease/components/UpgradeService/idDeal/dataDeal";
 import {getAllLockedData} from "@/pages/onDutyAndRelease/preRelease/lock/rowLock";
+import copy from "copy-to-clipboard";
+import {sucMessage, errorMessage} from "@/publicMethods/showMessages";
+import {history} from "@@/core/history";
 
 const {TabPane} = Tabs;
 let tabType: any = "editable-card";// 可新增和删除的tab
@@ -183,6 +186,7 @@ const Tab: React.FC<any> = () => {
 
   // 新增、修改或删除tab页
   const onEdits = (targetKey: any, action: any) => {
+    debugger;
     if (action === 'remove') {
       removeTabs(targetKey);
     } else if (action === 'add') {
@@ -331,6 +335,41 @@ const Tab: React.FC<any> = () => {
       tabType = "editable-card";
     }
   }, [operteStatus]);
+
+  const handleCopy = (id: any, title: any) => {
+
+  };
+
+  // 鼠标点击事件，右击时
+  const onContextMenu = (e: any) => {
+    debugger;
+    e.preventDefault()
+    const currentValue = e.target?.innerText;
+    const id = e.target?.id;
+
+    if (currentValue && id) { // 有数据才进行复制
+      const releaseNum = id.toString().split("-");
+      const href = `${window.location.href}?releasedNum=${releaseNum[releaseNum.length - 1]}&releaseRt=false`;
+      if (copy(href)) {
+        message.success({
+          content: `【${currentValue}】访问地址复制成功！`,
+          duration: 1,
+          style: {
+            marginTop: '10vh',
+          },
+        });
+      } else {
+        message.success({
+          content: `【${currentValue}】访问地址复制失败，请手动复制！`,
+          duration: 1,
+          style: {
+            marginTop: '10vh',
+          },
+        });
+      }
+    }
+  }
+
   return (
     <div>
       {/* Tabs 标签,固定在上面 */}
@@ -340,11 +379,11 @@ const Tab: React.FC<any> = () => {
           activeKey={tabsData === undefined ? '' : tabsData.activeKey}
           onChange={onTabsChange}
           onEdit={(targetKey, action) => {
-            debugger;
             onEdits(targetKey, action);
           }}
           style={{marginTop: -20}}
           onDoubleClick={tabsChangeName}
+          onContextMenu={onContextMenu}
         >
           {tabsData?.panes?.map((pane: any) => (
             <TabPane tab={pane.title} key={pane.key} closable={pane.closable}>
@@ -354,7 +393,8 @@ const Tab: React.FC<any> = () => {
         </Tabs>
       </div>
 
-      {/* Tabs删除确认 */}
+      {/* Tabs删除确认 */
+      }
       <Modal
         title={'删除'}
         visible={showTabs.shown}

@@ -47,7 +47,7 @@ const PreRelease: React.FC<any> = () => {
 
   // 获取当前链接是否有携带预发布编号（就是区分是否从历史记录跳转过来的），
   const location = history.location.query;
-  debugger;
+
   let releasedNumStr = '';
   if (JSON.stringify(location) !== '{}' && location) {
     releasedNumStr = location?.releasedNum === null ? '' : (location?.releasedNum).toString();

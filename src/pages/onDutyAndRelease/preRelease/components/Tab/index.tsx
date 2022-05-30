@@ -337,7 +337,6 @@ const Tab: React.FC<any> = () => {
   }, [operteStatus]);
 
 
-
   // 鼠标点击事件，右击时
   const onContextMenu = (e: any) => {
 
@@ -347,7 +346,7 @@ const Tab: React.FC<any> = () => {
 
     if (currentValue && id) { // 有数据才进行复制
       const releaseNum = id.toString().split("-");
-      const href = `${window.location.href}?releasedNum=${releaseNum[releaseNum.length - 1]}&releaseRt=false`;
+      const href = `${window.location.origin}${window.location.pathname}?releasedNum=${releaseNum[releaseNum.length - 1]}&releaseRt=false`;
       if (copy(href)) {
         message.success({
           content: `【${currentValue}】访问地址复制成功！`,
@@ -357,7 +356,7 @@ const Tab: React.FC<any> = () => {
           },
         });
       } else {
-        message.success({
+        message.error({
           content: `【${currentValue}】访问地址复制失败，请手动复制！`,
           duration: 1,
           style: {

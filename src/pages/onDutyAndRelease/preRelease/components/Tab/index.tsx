@@ -148,7 +148,7 @@ const Tab: React.FC<any> = () => {
     if (panes.length > 0) {
       message.info({
         content: '已存在发布过程，如服务已发布，请及时填写发布结果！',
-        duration: 3,
+        duration: 4,
         style: {
           marginTop: '5vh',
         },

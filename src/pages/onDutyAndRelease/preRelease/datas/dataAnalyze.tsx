@@ -127,9 +127,15 @@ const analysiCorrespondOrder = (datas: any) => {
 const alalysisInitData = async (queryData: string = '', queryReleaseNum: string = '') => {
   try {
     const result = await getInitPageData(queryReleaseNum);
-    if (result.data.length === 0) {
-      return {};
+
+    if (result.data.length === 0 && result.message !== "") {
+      return {errmessage: result.message};
     }
+
+    if (result.data.length === 0) {
+      return [];
+    }
+
     const datas = result.data;
 
     if (queryData === 'pulishItem') {
@@ -182,8 +188,8 @@ const alalysisInitData = async (queryData: string = '', queryReleaseNum: string 
       correspondOrder: analysiCorrespondOrder(datas[0].repair_order),
     };
   } catch (e) {
-    console.log(`数据获取解析错误:${e}`);
-    return {}
+    // console.log(`数据获取解析错误:${e}`);
+    return {errmessage: `数据获取解析错误:${e}`};
   }
 
 

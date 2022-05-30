@@ -18,27 +18,18 @@ import {getGridRowsHeight} from './components/gridHeight';
 import {showReleasedId} from './components/UpgradeService/idDeal/dataDeal';
 import {getNewPageNumber} from './components/Tab/axiosRequest';
 import {history} from '@@/core/history';
+import {message} from "antd";
+import {errorMessage} from "@/publicMethods/showMessages";
 
 let currentKey: any;
 let currentPanes: any;
 const PreRelease: React.FC<any> = () => {
   // Tab标签数据显示
   const {
-    modifyOperteStatus,
-    tabsData,
-    setTabsData,
-    modifyProcessStatus,
-    modifyPreReleaseData,
-    lockedItem,
-    setRelesaeItem,
-    setUpgradeApi,
-    setUpgradeConfirm,
-    modifyReleasedID,
-    setDataReview,
-    setDataReviewConfirm,
-    setOnlineBranch,
-    setCorrespOrder,
-    modifyAllLockedArray,
+    modifyOperteStatus, tabsData, setTabsData, modifyProcessStatus, modifyPreReleaseData,
+    lockedItem, setRelesaeItem, setUpgradeApi, setUpgradeConfirm,
+    modifyReleasedID, setDataReview, setDataReviewConfirm, setOnlineBranch,
+    setCorrespOrder, modifyAllLockedArray
   } = useModel('releaseProcess');
 
   // 用于定时任务显示数据，定是个hi任务useEffect中渲染了一次。不能实时更新
@@ -49,9 +40,11 @@ const PreRelease: React.FC<any> = () => {
   const location = history.location.query;
 
   let releasedNumStr = '';
+  let releaseResult = "true";
   if (JSON.stringify(location) !== '{}' && location) {
     releasedNumStr = location?.releasedNum === null ? '' : (location?.releasedNum).toString();
-    if (releasedNumStr) {
+    releaseResult = location?.releaseRt === null ? '' : location?.releaseRt === undefined ? "" : (location?.releaseRt).toString();
+    if (releasedNumStr && !releaseResult) {
       modifyOperteStatus(true);
     }
   } else {
@@ -59,6 +52,7 @@ const PreRelease: React.FC<any> = () => {
   }
   // 查询数据
   const {data, loading} = useRequest(() => alalysisInitData('', releasedNumStr));
+
   // 显示无数据界面
   const showNoneDataPage = async () => {
     // tab 页面
@@ -72,6 +66,7 @@ const PreRelease: React.FC<any> = () => {
           key: releaseNum,
         },
       ];
+
       setTabsData(releaseNum, panesArray);
     }
 
@@ -122,15 +117,26 @@ const PreRelease: React.FC<any> = () => {
   // 显示有数据界面
   const showPageInitData = async (initData: any, initShow: boolean) => {
 
-    if (!initData || JSON.stringify(initData) === '{}') {
-      // 数据是空对象时，才是正常返回的空数据
+    if (initData === undefined) {
+      return;
+    }
+
+    if (initData.errmessage) { // 出现异常情况时候，提醒错误，不更新界面。
+      errorMessage((initData.errmessage).toString());
+      return;
+    }
+    if (initData.length === 0) {
+      // 后端无数据
       showNoneDataPage();
       return;
     }
+
     // Tab数据
     const {tabPageInfo} = initData;
     if (initShow) {
-      setTabsData(tabPageInfo?.activeKey, tabPageInfo.panes);
+      const source = await alalysisInitData("tabPageInfo");
+      const tabsInfomation = source?.tabPageInfo;
+      setTabsData(tabPageInfo?.activeKey, tabsInfomation?.panes);
     } else {
       // const source = await alalysisInitData("tabPageInfo");
       // const tabsInfomation = source?.tabPageInfo;

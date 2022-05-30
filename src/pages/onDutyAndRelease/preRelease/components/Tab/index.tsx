@@ -148,11 +148,11 @@ const Tab: React.FC<any> = () => {
     const {panes}: any = tabsData;
     // 点击新建发布过程标签时，判断是否已存在发布过程标签，如果存在，弹出提醒信息，提示“已存在发布过程，如服务已发布，请及时填写发布结果！”
     if (panes.length > 0) {
-      message.warning({
+      message.info({
         content: '已存在发布过程，如服务已发布，请及时填写发布结果！',
         duration: 3,
         style: {
-          marginTop: '10vh',
+          marginTop: '5vh',
         },
       });
     }
@@ -186,7 +186,7 @@ const Tab: React.FC<any> = () => {
 
   // 新增、修改或删除tab页
   const onEdits = (targetKey: any, action: any) => {
-    debugger;
+
     if (action === 'remove') {
       removeTabs(targetKey);
     } else if (action === 'add') {
@@ -336,13 +336,11 @@ const Tab: React.FC<any> = () => {
     }
   }, [operteStatus]);
 
-  const handleCopy = (id: any, title: any) => {
 
-  };
 
   // 鼠标点击事件，右击时
   const onContextMenu = (e: any) => {
-    debugger;
+
     e.preventDefault()
     const currentValue = e.target?.innerText;
     const id = e.target?.id;

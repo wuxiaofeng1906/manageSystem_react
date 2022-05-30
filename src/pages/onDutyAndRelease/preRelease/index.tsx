@@ -18,7 +18,6 @@ import {getGridRowsHeight} from './components/gridHeight';
 import {showReleasedId} from './components/UpgradeService/idDeal/dataDeal';
 import {getNewPageNumber} from './components/Tab/axiosRequest';
 import {history} from '@@/core/history';
-import {message} from "antd";
 import {errorMessage} from "@/publicMethods/showMessages";
 
 let currentKey: any;
@@ -32,7 +31,7 @@ const PreRelease: React.FC<any> = () => {
     setCorrespOrder, modifyAllLockedArray
   } = useModel('releaseProcess');
 
-  // 用于定时任务显示数据，定是个hi任务useEffect中渲染了一次。不能实时更新
+  // 用于定时任务显示数据，定时任务useEffect中渲染了一次。不能实时更新
   currentKey = tabsData.activeKey;
   currentPanes = tabsData.panes;
 
@@ -40,13 +39,19 @@ const PreRelease: React.FC<any> = () => {
   const location = history.location.query;
 
   let releasedNumStr = '';
-  let releaseResult = "true";
+  let releaseHistory = "false"; // 默认为未发布
   if (JSON.stringify(location) !== '{}' && location) {
     releasedNumStr = location?.releasedNum === null ? '' : (location?.releasedNum).toString();
-    releaseResult = location?.releaseRt === null ? '' : location?.releaseRt === undefined ? "" : (location?.releaseRt).toString();
-    if (releasedNumStr && !releaseResult) {
-      modifyOperteStatus(true);
+    if (location?.history) {
+      releaseHistory = (location?.history).toString();
     }
+
+    if (releasedNumStr && releaseHistory === "true") { // 已发布
+      modifyOperteStatus(true);
+    } else {
+      modifyOperteStatus(false);
+    }
+
   } else {
     modifyOperteStatus(false);
   }
@@ -134,12 +139,15 @@ const PreRelease: React.FC<any> = () => {
     // Tab数据
     const {tabPageInfo} = initData;
     if (initShow) {
-      const source = await alalysisInitData("tabPageInfo");
-      const tabsInfomation = source?.tabPageInfo;
-      setTabsData(tabPageInfo?.activeKey, tabsInfomation?.panes);
+      if (releaseHistory === "false") { // 通过链接跳转到固定Tab
+        const source = await alalysisInitData("tabPageInfo");
+        const tabsInfomation: any = source?.tabPageInfo;
+        setTabsData(tabPageInfo?.activeKey, tabsInfomation?.panes);
+      } else {
+        setTabsData(tabPageInfo?.activeKey, tabPageInfo?.panes);
+      }
+
     } else {
-      // const source = await alalysisInitData("tabPageInfo");
-      // const tabsInfomation = source?.tabPageInfo;
       setTabsData(tabPageInfo?.activeKey, currentPanes);
     }
     // 进度条数据
@@ -209,7 +217,7 @@ const PreRelease: React.FC<any> = () => {
         // count += 1;
         // console.log(`刷新次数=${count},定时任务id=${id},currentKey=${currentKey}`);
         // 刷新
-        if (lockedItem === '') {
+        if (lockedItem === '' && releaseHistory === "false") { // 是历史记录查询则不需要进行刷新
           const datas = await alalysisInitData('', currentKey);
           showPageInitData(datas, false);
         }

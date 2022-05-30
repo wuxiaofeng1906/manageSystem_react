@@ -344,7 +344,10 @@ const Tab: React.FC<any> = () => {
 
     if (currentValue && id) { // 有数据才进行复制
       const releaseNum = id.toString().split("-");
-      const href = `${window.location.origin}${window.location.pathname}?releasedNum=${releaseNum[releaseNum.length - 1]}&releaseRt=false`;
+      let href = `${window.location.origin}${window.location.pathname}?releasedNum=${releaseNum[releaseNum.length - 1]}&history=false`;
+      if (operteStatus) {
+        href = `${window.location.origin}${window.location.pathname}?releasedNum=${releaseNum[releaseNum.length - 1]}&history=true`;
+      }
       if (copy(href)) {
         message.success({
           content: `【${currentValue}】访问地址复制成功！`,

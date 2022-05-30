@@ -9,8 +9,6 @@ import {getGridRowsHeight} from "@/pages/onDutyAndRelease/preRelease/components/
 import {showReleasedId} from "@/pages/onDutyAndRelease/preRelease/components/UpgradeService/idDeal/dataDeal";
 import {getAllLockedData} from "@/pages/onDutyAndRelease/preRelease/lock/rowLock";
 import copy from "copy-to-clipboard";
-import {sucMessage, errorMessage} from "@/publicMethods/showMessages";
-import {history} from "@@/core/history";
 
 const {TabPane} = Tabs;
 let tabType: any = "editable-card";// 可新增和删除的tab
@@ -357,7 +355,7 @@ const Tab: React.FC<any> = () => {
         });
       } else {
         message.error({
-          content: `【${currentValue}】访问地址复制失败，请手动复制！`,
+          content: `【${currentValue}】访问地址复制失败，请手动复制=>【${href}】！`,
           duration: 1,
           style: {
             marginTop: '10vh',

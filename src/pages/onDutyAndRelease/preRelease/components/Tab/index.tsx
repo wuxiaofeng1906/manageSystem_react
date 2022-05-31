@@ -1,27 +1,37 @@
-import React, {useEffect, useState} from 'react';
-import {Button, Form, Input, message, Modal, Tabs} from 'antd';
-import {useModel} from '@@/plugin-model/useModel';
-import {getNewPageNumber, deleteReleaseItem, modifyTabsName} from './axiosRequest';
-import {alalysisInitData} from '../../datas/dataAnalyze';
-import {getCheckProcess} from "@/pages/onDutyAndRelease/preRelease/components/CheckProgress/axiosRequest";
-import {showProgressData} from "@/pages/onDutyAndRelease/preRelease/components/CheckProgress/processAnalysis";
-import {getGridRowsHeight} from "@/pages/onDutyAndRelease/preRelease/components/gridHeight";
-import {showReleasedId} from "@/pages/onDutyAndRelease/preRelease/components/UpgradeService/idDeal/dataDeal";
-import {getAllLockedData} from "@/pages/onDutyAndRelease/preRelease/lock/rowLock";
+import React, { useEffect, useState } from 'react';
+import { Button, Form, Input, message, Modal, Tabs } from 'antd';
+import { useModel } from '@@/plugin-model/useModel';
+import { getNewPageNumber, deleteReleaseItem, modifyTabsName } from './axiosRequest';
+import { alalysisInitData } from '../../datas/dataAnalyze';
+import { getCheckProcess } from '@/pages/onDutyAndRelease/preRelease/components/CheckProgress/axiosRequest';
+import { showProgressData } from '@/pages/onDutyAndRelease/preRelease/components/CheckProgress/processAnalysis';
+import { getGridRowsHeight } from '@/pages/onDutyAndRelease/preRelease/components/gridHeight';
+import { showReleasedId } from '@/pages/onDutyAndRelease/preRelease/components/UpgradeService/idDeal/dataDeal';
+import { getAllLockedData } from '@/pages/onDutyAndRelease/preRelease/lock/rowLock';
+import copy from 'copy-to-clipboard';
 
-const {TabPane} = Tabs;
-let tabType: any = "editable-card";// 可新增和删除的tab
+const { TabPane } = Tabs;
+let tabType: any = 'editable-card'; // 可新增和删除的tab
 const Tab: React.FC<any> = () => {
   const {
     operteStatus,
-    tabsData, setTabsData, modifyProcessStatus, modifyPreReleaseData,
-    setRelesaeItem, setUpgradeApi, setUpgradeConfirm, modifyReleasedID,
-    setDataReview, setDataReviewConfirm, setOnlineBranch, setCorrespOrder,
-    modifyAllLockedArray
+    tabsData,
+    setTabsData,
+    modifyProcessStatus,
+    modifyPreReleaseData,
+    setRelesaeItem,
+    setUpgradeApi,
+    setUpgradeConfirm,
+    modifyReleasedID,
+    setDataReview,
+    setDataReviewConfirm,
+    setOnlineBranch,
+    setCorrespOrder,
+    modifyAllLockedArray,
   } = useModel('releaseProcess');
 
   /* region tab 自身事件 */
-  const [showTabs, setShowTabs] = useState({shown: false, targetKey: ''});
+  const [showTabs, setShowTabs] = useState({ shown: false, targetKey: '' });
 
   // 无数据
   const showNoneDataPage = async () => {
@@ -48,30 +58,29 @@ const Tab: React.FC<any> = () => {
     });
 
     //  发布项
-    setRelesaeItem({gridHight: "100px", gridData: []});
+    setRelesaeItem({ gridHight: '100px', gridData: [] });
     // 一键部署ID展示
     modifyReleasedID([], []);
     //  发布接口
-    setUpgradeApi({gridHight: "100px", gridData: []});
+    setUpgradeApi({ gridHight: '100px', gridData: [] });
     //  发布服务确认
-    setUpgradeConfirm({gridHight: "100px", gridData: []});
+    setUpgradeConfirm({ gridHight: '100px', gridData: [] });
     // 数据修复
-    setDataReview({gridHight: "100px", gridData: [{}]});
+    setDataReview({ gridHight: '100px', gridData: [{}] });
     // 数据修复确认
-    setDataReviewConfirm({gridHight: "100px", gridData: []});
+    setDataReviewConfirm({ gridHight: '100px', gridData: [] });
 
     // 上线分支
-    setOnlineBranch({gridHight: "100px", gridData: [{}]});
+    setOnlineBranch({ gridHight: '100px', gridData: [{}] });
 
     //   对应工单
-    setCorrespOrder({gridHight: "100px", gridData: []});
+    setCorrespOrder({ gridHight: '100px', gridData: [] });
   };
 
   // 显示表格数据
   const showAllDatas = async (initData: any) => {
-
     // Tab数据
-    const {tabPageInfo} = initData;
+    const { tabPageInfo } = initData;
     // 进度条数据
     const processData: any = await getCheckProcess(tabPageInfo?.activeKey);
     if (processData) {
@@ -88,41 +97,40 @@ const Tab: React.FC<any> = () => {
 
     //  发布项
     const releaseItem = initData?.upService_releaseItem;
-    setRelesaeItem({gridHight: getGridRowsHeight(releaseItem), gridData: releaseItem});
+    setRelesaeItem({ gridHight: getGridRowsHeight(releaseItem), gridData: releaseItem });
 
     // 一键部署ID展示
     const ids = await showReleasedId(initData?.deployment_id);
     modifyReleasedID(ids.showIdArray, ids.queryIdArray);
     //  发布接口
     const releaseApi = initData?.upService_interface;
-    setUpgradeApi({gridHight: getGridRowsHeight(releaseApi), gridData: releaseApi});
+    setUpgradeApi({ gridHight: getGridRowsHeight(releaseApi), gridData: releaseApi });
     //  发布服务确认
     const releaseConfirm = initData?.upService_confirm;
-    setUpgradeConfirm({gridHight: getGridRowsHeight(releaseConfirm), gridData: releaseConfirm});
+    setUpgradeConfirm({ gridHight: getGridRowsHeight(releaseConfirm), gridData: releaseConfirm });
     // 数据修复
     const dataRepaire = initData?.reviewData_repaire;
-    setDataReview({gridHight: getGridRowsHeight(dataRepaire), gridData: dataRepaire});
+    setDataReview({ gridHight: getGridRowsHeight(dataRepaire), gridData: dataRepaire });
     // 数据修复确认
     const dataRepaireConfirm = initData?.reviewData_confirm;
     setDataReviewConfirm({
       gridHight: getGridRowsHeight(dataRepaireConfirm),
-      gridData: dataRepaireConfirm
+      gridData: dataRepaireConfirm,
     });
 
     // 上线分支
     const onlineBranchDatas = initData?.onlineBranch;
     setOnlineBranch({
       gridHight: getGridRowsHeight(onlineBranchDatas, true),
-      gridData: onlineBranchDatas
+      gridData: onlineBranchDatas,
     });
 
     //   对应工单
     const correspondOrderData = initData?.correspondOrder;
     setCorrespOrder({
       gridHight: getGridRowsHeight(correspondOrderData),
-      gridData: correspondOrderData
+      gridData: correspondOrderData,
     });
-
   };
 
   // Tabs页面切换
@@ -142,7 +150,17 @@ const Tab: React.FC<any> = () => {
     // 获取新的pageNum
     const newNum = await getNewPageNumber();
     const newTabs = newNum.data?.ready_release_num;
-    const {panes}: any = tabsData;
+    const { panes }: any = tabsData;
+    // 点击新建发布过程标签时，判断是否已存在发布过程标签，如果存在，弹出提醒信息，提示“已存在发布过程，如服务已发布，请及时填写发布结果！”
+    if (panes.length > 0) {
+      message.info({
+        content: '已存在发布过程，如服务已发布，请及时填写发布结果！',
+        duration: 4,
+        style: {
+          marginTop: '5vh',
+        },
+      });
+    }
     panes.push({
       title: `${newTabs}灰度预发布`,
       content: '',
@@ -193,14 +211,14 @@ const Tab: React.FC<any> = () => {
 
   // 确认删除tabs
   const delTabsInfo = async () => {
-    const {targetKey} = showTabs;
+    const { targetKey } = showTabs;
     setShowTabs({
       ...showTabs,
       shown: false,
     });
 
-    const {panes}: any = tabsData;
-    const {activeKey}: any = tabsData;
+    const { panes }: any = tabsData;
+    const { activeKey }: any = tabsData;
     if (panes.length === 1) {
       message.error({
         content: '删除失败：页面需要至少保留一个预发布页面!',
@@ -275,9 +293,9 @@ const Tab: React.FC<any> = () => {
   // 保存tab名
   const saveModifyName = async () => {
     const formData = tabNameSetForm.getFieldsValue();
-    if((formData.newTabName).trim() === ""){
+    if (formData.newTabName.trim() === '') {
       message.error({
-        content: "新发布名称不能为空！",
+        content: '新发布名称不能为空！',
         duration: 1,
         style: {
           marginTop: '50vh',
@@ -297,7 +315,7 @@ const Tab: React.FC<any> = () => {
       });
       setTabNameModal(false);
       //   重置tab名
-      const {tabPageInfo} = await alalysisInitData('tabPageInfo', '');
+      const { tabPageInfo } = await alalysisInitData('tabPageInfo', '');
       if (tabPageInfo) {
         setTabsData(tabsData.activeKey, tabPageInfo.panes);
       }
@@ -316,15 +334,53 @@ const Tab: React.FC<any> = () => {
 
   useEffect(() => {
     if (operteStatus) {
-      tabType = "card";
+      tabType = 'card';
     } else {
-      tabType = "editable-card";
+      tabType = 'editable-card';
     }
   }, [operteStatus]);
+
+  // 鼠标点击事件，右击时
+  const onContextMenu = (e: any) => {
+    e.preventDefault();
+    const currentValue = e.target?.innerText;
+    const id = e.target?.id;
+
+    if (currentValue && id) {
+      // 有数据才进行复制
+      const releaseNum = id.toString().split('-');
+      let href = `${window.location.origin}${window.location.pathname}?releasedNum=${
+        releaseNum[releaseNum.length - 1]
+      }&history=false`;
+      if (operteStatus) {
+        href = `${window.location.origin}${window.location.pathname}?releasedNum=${
+          releaseNum[releaseNum.length - 1]
+        }&history=true`;
+      }
+      if (copy(href)) {
+        message.success({
+          content: `【${currentValue}】访问地址复制成功！`,
+          duration: 1,
+          style: {
+            marginTop: '10vh',
+          },
+        });
+      } else {
+        message.error({
+          content: `【${currentValue}】访问地址复制失败，请手动复制=>【${href}】！`,
+          duration: 1,
+          style: {
+            marginTop: '10vh',
+          },
+        });
+      }
+    }
+  };
+
   return (
     <div>
       {/* Tabs 标签,固定在上面 */}
-      <div style={{marginTop: -40}}>
+      <div style={{ marginTop: -40 }}>
         <Tabs
           type={tabType}
           activeKey={tabsData === undefined ? '' : tabsData.activeKey}
@@ -332,8 +388,9 @@ const Tab: React.FC<any> = () => {
           onEdit={(targetKey, action) => {
             onEdits(targetKey, action);
           }}
-          style={{marginTop: -20}}
+          style={{ marginTop: -20 }}
           onDoubleClick={tabsChangeName}
+          onContextMenu={onContextMenu}
         >
           {tabsData?.panes?.map((pane: any) => (
             <TabPane tab={pane.title} key={pane.key} closable={pane.closable}>
@@ -351,18 +408,18 @@ const Tab: React.FC<any> = () => {
         centered={true}
         footer={null}
         width={400}
-        bodyStyle={{height: 140}}
+        bodyStyle={{ height: 140 }}
       >
         <Form>
           <Form.Item>
-            <label style={{marginLeft: 25}}>
+            <label style={{ marginLeft: 25 }}>
               是否需要删除该批次发布过程，删除后下次发布需重新填写相关信息?
             </label>
           </Form.Item>
 
           <Form.Item>
             <Button
-              style={{borderRadius: 5, marginLeft: 20, float: 'right'}}
+              style={{ borderRadius: 5, marginLeft: 20, float: 'right' }}
               onClick={delTabsCancel}
             >
               取消
@@ -384,9 +441,9 @@ const Tab: React.FC<any> = () => {
 
           <Form.Item
             name="groupId"
-            style={{display: 'none', width: '32px', marginTop: '-55px', marginLeft: '270px'}}
+            style={{ display: 'none', width: '32px', marginTop: '-55px', marginLeft: '270px' }}
           >
-            <Input/>
+            <Input />
           </Form.Item>
         </Form>
       </Modal>
@@ -398,15 +455,15 @@ const Tab: React.FC<any> = () => {
         centered={true}
         footer={null}
         width={400}
-        bodyStyle={{height: 145}}
+        bodyStyle={{ height: 145 }}
       >
         <Form form={tabNameSetForm} autoComplete="off">
-          <Form.Item name="oldTabName" label="原发布名:" style={{marginTop: -15}}>
-            <Input disabled style={{color: 'black'}}/>
+          <Form.Item name="oldTabName" label="原发布名:" style={{ marginTop: -15 }}>
+            <Input disabled style={{ color: 'black' }} />
           </Form.Item>
 
-          <Form.Item name="newTabName" label="新发布名:" style={{marginTop: -15}}>
-            <Input/>
+          <Form.Item name="newTabName" label="新发布名:" style={{ marginTop: -15 }}>
+            <Input />
           </Form.Item>
 
           <Form.Item>

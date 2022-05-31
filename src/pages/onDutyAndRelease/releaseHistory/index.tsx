@@ -106,7 +106,7 @@ const ReleaseHistory: React.FC<any> = () => {
     if (releasedNum === "") {
       history.push(`/onDutyAndRelease/preRelease`);
     } else {
-      history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}`);
+      history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
     }
 
   };

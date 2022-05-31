@@ -127,39 +127,45 @@ const analysiCorrespondOrder = (datas: any) => {
 const alalysisInitData = async (queryData: string = '', queryReleaseNum: string = '') => {
   try {
     const result = await getInitPageData(queryReleaseNum);
-    if (result.data.length === 0) {
-      return {};
+
+    if (result.data.length === 0 && result.message !== '') {
+      return { errmessage: result.message };
     }
+
+    if (result.data.length === 0) {
+      return [];
+    }
+
     const datas = result.data;
 
     if (queryData === 'pulishItem') {
-      return {upService_releaseItem: analysisReleaseItem(datas[0].update_app)}; // 升级服务-发布项;
+      return { upService_releaseItem: analysisReleaseItem(datas[0].update_app) }; // 升级服务-发布项;
     }
     if (queryData === 'deployment_id') {
-      return {deployment_id: datas[0].deployment_id}; // 一键发布ID;
+      return { deployment_id: datas[0].deployment_id }; // 一键发布ID;
     }
     if (queryData === 'pulishApi') {
-      return {upService_interface: analysisUpInterface(datas[0].update_api)};
+      return { upService_interface: analysisUpInterface(datas[0].update_api) };
     }
 
     if (queryData === 'pulishConfirm') {
-      return {upService_confirm: analysisServiceConfirm(datas[0].update_confirm)}; // 升级服务-服务确认;
+      return { upService_confirm: analysisServiceConfirm(datas[0].update_confirm) }; // 升级服务-服务确认;
     }
 
     if (queryData === 'dataReview') {
-      return {reviewData_repaire: analysisReviewData(datas[0].review_data)};
+      return { reviewData_repaire: analysisReviewData(datas[0].review_data) };
     }
 
     if (queryData === 'dataReviewConfirm') {
-      return {reviewData_confirm: analysisReviewConfirm(datas[0].review_confirm)};
+      return { reviewData_confirm: analysisReviewConfirm(datas[0].review_confirm) };
     }
 
     if (queryData === 'onlineBranch') {
-      return {onlineBranch: analysisOnlineBranch(datas[0].release_branch)};
+      return { onlineBranch: analysisOnlineBranch(datas[0].release_branch) };
     }
 
     if (queryData === 'tabPageInfo') {
-      return {tabPageInfo: await analysisTabsPageInfo(datas)};
+      return { tabPageInfo: await analysisTabsPageInfo(datas) };
     }
 
     return {
@@ -182,8 +188,8 @@ const alalysisInitData = async (queryData: string = '', queryReleaseNum: string 
       correspondOrder: analysiCorrespondOrder(datas[0].repair_order),
     };
   } catch (e) {
-    console.log(`数据获取解析错误:${e}`);
-    return {}
+    // console.log(`数据获取解析错误:${e}`);
+    return {errmessage: `数据获取解析错误:${e}`};
   }
 
 

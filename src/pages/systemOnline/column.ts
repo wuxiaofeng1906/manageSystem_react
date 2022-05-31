@@ -1,56 +1,58 @@
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
+import { ColumnsType } from 'antd/lib/table';
+import { Iservices } from './prePublish/projectServices/EditServices';
+
 const common_status={
   yes:'是',
   no:'否',
   success: '发布成功',
-  failure: '发布失败'
+  feature: '发布失败'
 }
-const cellRenderStatus = ( {value}: any)=> `<span class="${['no','unknow'].includes(value) ? '': (['yes','success'].includes(value))?'color-success':'color-failure'}">${common_status[value] ||''}</span>`
+const cellRenderStatus = ( {value}: any)=> `<span class="${['no','unknow'].includes(value) ? '': (['yes','success'].includes(value))?'color-success':'color-feature'}">${common_status[value] ||''}</span>`
 
 // 发布列表
 const publishColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
-    field: 'publish_num',
     minWidth: 60,
     cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
   {
     headerName: '正式发布批号',
-    field: 'publish_version',
+    field: 'release_num',
   },
   {
     headerName: '发布项目',
-    field: 'publish_project',
+    field: 'release_project_name',
   },
   {
     headerName: '发布结果',
-    field: 'publish_result',
+    field: 'release_result',
     cellRenderer: cellRenderStatus
   },
   {
     headerName: '项目负责人',
-    field: 'publish_person',
+    field: 'pro_manager',
   },
   {
     headerName: '发布分支',
-    field: 'publish_branch',
+    field: 'release_branch',
   },
   {
     headerName: '发布类型',
-    field: 'publish_type',
+    field: 'release_type',
   },
   {
     headerName: '发布方式',
-    field: 'publish_by',
+    field: 'release_method',
   },
   {
     headerName: '发布环境',
-    field: 'publish_env',
+    field: 'release_env',
   },
   {
     headerName: '正式发布时间',
-    field: 'publish_date',
+    field: 'release_date',
   }
 ];
 
@@ -58,50 +60,49 @@ const publishColumn: (ColDef | ColGroupDef)[] = [
 const projectUpgradeColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
-    field: 'publish_num',
     cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
   {
     headerName: '项目名称',
-    field: 'name',
+    field: 'project_name',
   },
   {
     headerName: '项目负责人',
-    field: 'leader',
+    field: 'manager',
   },
   {
     headerName: '是否涉及数据库升级',
-    field: 'update_dbs',
+    field: 'is_database_upgrade',
     cellRenderer: cellRenderStatus,
     headerClass:'ag-required'
   },
   {
     headerName: '是否涉及数据Recovery',
-    field: 'recovery',
+    field: 'is_recovery_database',
     cellRenderer: cellRenderStatus,
     headerClass:'ag-required'
   },
   {
     headerName: '是否清理缓存',
-    field: 'clear',
+    field: 'is_clear_redis',
     cellRenderer: cellRenderStatus,
     headerClass:'ag-required'
   },
   {
     headerName: '是否清理应用缓存',
-    field: 'application',
+    field: 'is_clear_app_cache',
     cellRenderer: cellRenderStatus,
     headerClass:'ag-required'
   },
   {
     headerName: '后端是否涉及配置项增加',
-    field: 'setting_add',
+    field: 'is_add_front_config',
     cellRenderer: cellRenderStatus,
     headerClass:'ag-required'
   },
   {
     headerName: '前端是否涉及元数据更新',
-    field: 'origin_update',
+    field: 'is_front_data_update',
     cellRenderer: cellRenderStatus,
     headerClass:'ag-required'
   },
@@ -111,81 +112,33 @@ const projectUpgradeColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '操作',
-    width: 120,
-    pinned: 'right',
+    minWidth: 120,
     cellRenderer: 'operation',
-  },
-];
-// 发布服务
-const publishServerColumn: (ColDef | ColGroupDef)[] = [
-  {
-    headerName: '序号',
-    minWidth: 60,
-    cellRenderer: (params: any) => {
-      if(params.data.rowSpan) return (+params.node.id + 1).toString()
-      return ''
-    },
-    cellClass:'cell-span',
-    rowSpan:(v)=>v.data.rowSpan||1,
-  },
-  {
-    headerName: '上线环境',
-    field: 'online_env',
-    headerClass:'ag-required',
-    cellClass:'cell-span',
-    rowSpan:(v)=>v.data.rowSpan||1,
-    cellRenderer: (params: any) => {
-      if(params.data.rowSpan) return params.value
-      return ''
-    },
-  },
-  {
-    headerName: '应用',
-    field: 'application',
-  },
-  {
-    headerName: '对应侧',
-    field: 'side',
-  },
-  {
-    headerName: '是否封板',
-    field: 'version',
-    headerClass:'ag-required',
-    cellRenderer:cellRenderStatus
-  },
-  {
-    headerName: '封板时间',
-    field: 'date',
-  },
-  {
-    headerName: '操作',
-    cellRenderer: 'operation',
-    width: 160,
   },
 ];
 // 数据修复
 const dataReviewColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
-    field: 'publish_num',
-    minWidth: 60,
+    field: 'review_id',
+    minWidth: 90,
     cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
   {
     headerName: '数据修复内容',
-    field: 'review_content',
+    field: 'review_data',
   },
   {
     headerName: '涉及租户',
-    field: 'users',
+    field: 'tenant',
   },
   {
     headerName: '类型',
-    field: 'type',
+    field: 'review_type',
   },
   {
     headerName: '修复提交人',
-    field: 'commit_person',
+    field: 'user',
   },
   {
     headerName: '分支',
@@ -193,45 +146,45 @@ const dataReviewColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '评审结果',
-    field: 'result',
+    field: 'review_result',
   },
   {
     headerName: '是否可重复执行',
-    field:'repeat'
+    field:'is_repeat'
   },
 ];
 // 接口升级
 const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
-    field: 'publish_num',
-    minWidth: 60,
+    field: 'api_id',
+    minWidth: 90,
     cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
   {
     headerName: '上线环境',
-    field: 'online_env',
+    field: 'cluster_name',
     headerClass:'ag-required'
   },
   {
     headerName: '升级类型',
-    field: 'upgrade_type',
+    field: 'update_type',
   },
   {
     headerName: '升级接口',
-    field: 'upgrade_sql',
+    field: 'update_api',
   },
   {
     headerName: '接口服务',
-    field: 'services',
+    field: 'api_server',
   },
   {
     headerName: '接口Method',
-    field: 'method',
+    field: 'api_method',
   },
   {
     headerName: '接口URL或SQL',
-    field: 'sql',
+    field: 'api_content',
   },
   {
     headerName: 'Data',
@@ -243,17 +196,17 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '涉及租户',
-    field: 'users',
+    field: 'tenant',
   },
   {
     headerName: '是否记录积压',
-    field: 'record',
+    field: 'is_backlog',
     cellRenderer:cellRenderStatus,
     headerClass:'ag-required' // 表头标题添加 * 类名
   },
   {
     headerName: '操作',
-    minWidth: 90,
+    minWidth: 100,
     cellRenderer: 'operation',
     rowDrag:true,        // drag
     cellClass:'ag-drag' // 存在多个图标操作时，需要加上此类名【因为移动图标在最前面，一个情况下可忽略】
@@ -263,17 +216,16 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
 const deployColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
-    field: 'num',
-    minWidth: 60,
+    minWidth: 90,
     cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
   {
     headerName: '目标环境',
-    field: 'env',
+    field: 'release_env',
   },
   {
     headerName: '部署类型',
-    field: 'type',
+    field: 'deployment_type',
   },
   {
     headerName: '目标任务',
@@ -281,15 +233,15 @@ const deployColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '触发者',
-    field: 'trigger',
+    field: 'executor_name',
   },
   {
     headerName: '启动时间',
-    field: 'start_date',
+    field: 'start_time',
   },
   {
     headerName: '完成时间',
-    field: 'finish_date',
+    field: 'end_time',
   },
   {
     headerName: '当前状态',
@@ -297,8 +249,9 @@ const deployColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '操作',
-    minWidth: 90,
+    minWidth: 120,
     cellRenderer: 'operation',
+    pinned:'right'
   },
 ];
 
@@ -338,18 +291,17 @@ const checkDetailColumn: (ColDef | ColGroupDef)[] = [
 const servicesSettingColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
-    field: 'num',
-    width: 60,
+    minWidth: 90,
     cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
   {
     headerName: '所属执行',
-    field: 'macking',
+    field: 'project_name',
     headerClass:'ag-required'
   },
   {
     headerName: '涉及前端应用',
-    field: 'application',
+    field: 'app_name',
     headerClass:'ag-required'
   },
   {
@@ -359,25 +311,61 @@ const servicesSettingColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '编辑人',
-    field: 'editor',
+    field: 'edit_user_name',
   },
   {
     headerName: '编辑时间',
-    field: 'time',
+    field: 'edit_time',
   },
   {
     headerName: '操作',
-    width: 120,
+    minWidth: 140,
     cellRenderer: 'operation',
   },
 ];
+// 发布服务
+const serviceColumn: ColumnsType<Iservices> = [
+  {
+    title: '序号',
+    dataIndex: 'server_id',
+    align: 'center',
+    onCell: (it) => ({ rowSpan: it.rowSpan || 0 }),
+  },
+  {
+    title: '上线环境',
+    dataIndex: 'cluster_name',
+    align: 'center',
+    onCell: (it) => ({ rowSpan: it.rowSpan || 0 }),
+  },
+  {
+    title: '应用',
+    align: 'center',
+    dataIndex: 'app_name',
+  },
+  {
+    title: '对应侧',
+    align: 'center',
+    dataIndex: 'technical_side',
+  },
+  {
+    title: '是否封板',
+    align: 'center',
+    dataIndex: 'is_seal',
+  },
+  {
+    title: '封板时间',
+    align: 'center',
+    dataIndex: 'seal_time',
+  },
+];
+
 export {
   publishColumn,
   projectUpgradeColumn,
-  publishServerColumn,
   upgradeSQLColumn,
   dataReviewColumn,
   deployColumn,
   checkDetailColumn,
-  servicesSettingColumn
+  servicesSettingColumn,
+  serviceColumn
 };

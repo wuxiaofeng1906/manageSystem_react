@@ -618,6 +618,10 @@ export default [
             path: 'worksheet',
             component: './systemOnline/prePublish/worksheet',
           },
+          {
+            path: '/',
+            redirect: './systemOnline/prePublish/projectServices',
+          },
         ],
       },
       {

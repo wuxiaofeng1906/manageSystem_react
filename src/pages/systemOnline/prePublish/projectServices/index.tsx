@@ -1,155 +1,85 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { Form, Row, Col, Select, Space, Modal } from 'antd';
+import { Form, Row, Col, Select, Space, Modal, Table } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import {
   projectUpgradeColumn,
-  publishServerColumn,
+  serviceColumn,
   upgradeSQLColumn,
   dataReviewColumn,
 } from '@/pages/systemOnline/column';
 import type { CellClickedEvent, GridApi } from 'ag-grid-community';
 import { initGridTable } from '@/pages/systemOnline/constants';
-import EditUpgrade, { UpgradeItem } from './EditUpgrade';
-import EditServices, { Iservices } from './EditServices';
-import EditSql, { Isql } from './EditSql';
+import { useModel, useLocation } from 'umi';
+import EditUpgrade from './EditUpgrade';
+import EditServices from './EditServices';
+import EditSql from './EditSql';
+import OnlineServices from '@/services/online';
+import type { PreServices, PreSql, PreUpgradeItem } from '@/namespaces/interface';
 
 type enumType = 'upgrade' | 'services' | 'sql';
 interface Istate<T> {
   visible: boolean;
   data?: T;
 }
-
 const ProjectServices = () => {
+  const {
+    query: { idx, disable },
+  } = useLocation() as any;
+  const { projectSelectors, branchSelectors, getProInfo, updateColumn, proInfo } = useModel(
+    'systemOnline',
+  );
+  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [form] = Form.useForm();
 
-  const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
-  const [initData] = useState({
-    prePublishEnv: 'nx-release-k8s',
-  });
-  const [projectUpgrade, setProjectUpgrade] = useState<UpgradeItem[]>([]);
-  const [servicesData, setServicesData] = useState<Iservices[]>([]);
-  const [upgradeSQLData, setUpgradeSQLData] = useState<Isql[]>([]);
-  const [checkReviewData, setCheckReviewData] = useState<Record<string, any>[]>([]);
+  const gridUpgradeRef = useRef<GridApi>();
+  const gridSQLRef = useRef<GridApi>();
+  const gridReviewRef = useRef<GridApi>();
 
-  const [editUpgrade, setEditUpgrade] = useState<Istate<UpgradeItem> | null>();
-  const [editServices, setEditServices] = useState<Istate<Iservices> | null>();
-  const [editSql, setEditSql] = useState<Istate<Isql> | null>();
+  const [editUpgrade, setEditUpgrade] = useState<Istate<PreUpgradeItem> | null>();
+  const [editServices, setEditServices] = useState<Istate<PreServices> | null>();
+  const [editSql, setEditSql] = useState<Istate<PreSql> | null>();
 
-  const getProjectUpgradeData = async () => {
-    setProjectUpgrade([
-      {
-        id: 1,
-        name: '笑果文化',
-        update_dbs: 'yes',
-        recovery: 'no',
-        clear: 'yes',
-        setting_add: 'no',
-        origin_update: 'yes',
-        application: 'yes',
-        leader: '吹烂',
-        mark: 'test',
-      },
-      {
-        id: 2,
-        name: '老六',
-        update_dbs: 'yes',
-        recovery: 'no',
-        clear: 'yes',
-        setting_add: 'no',
-        origin_update: 'no',
-        application: 'no',
-        leader: '王洼',
-        mark: 'test',
-      },
-    ]);
-    setServicesData([
-      {
-        id: 1,
-        online_env: '集群1',
-        application: 'h5',
-        version: 'yes',
-        side: '业务前端',
-        date: '2022-05-24 14:13:29',
-        rowSpan: 2,
-      },
-      {
-        id: 2,
-        online_env: '集群1',
-        application: 'global',
-        version: 'yes',
-        side: '业务前端',
-        date: '',
-      },
-      {
-        id: 3,
-        online_env: '集群3',
-        application: 'web',
-        version: 'no',
-        side: '业务前端',
-        date: '',
-        rowSpan: 1,
-      },
-    ]);
-    setUpgradeSQLData([
-      {
-        id: 1,
-        online_env: '集群1',
-        upgrade_type: '接口升级',
-        upgrade_sql: '后端接口',
-        services: 'basebi',
-        sql: 'update project set\n;;;;  code=1;\n where projectid=1234 ...',
-        method: 'post',
-        data: '',
-        header: '',
-        users: '全量租户',
-        record: 'yes',
-      },
-      {
-        id: 2,
-        online_env: '',
-        upgrade_type: '接口升级',
-        upgrade_sql: '后端接口',
-        services: 'basebi',
-        method: 'post',
-        data: '',
-        header: '',
-        users: '全量租户',
-        record: 'no',
-      },
-    ]);
-    setCheckReviewData([
-      {
-        id: 1,
-        review_content: '测试',
-        users: 'all',
-        type: 'after',
-        commit_person: '王德',
-        branch: 'hotfux-inte',
-        result: '通过',
-        repeat: '是',
-      },
-    ]);
+  const updatePreData = async (value: any) => {
+    if (value.release_branch) {
+      console.log(value.release_branch);
+
+      // refresh env
+    }
+    if (value.release_project) {
+      await updateColumn({
+        ...proInfo?.release_project,
+        release_project: value.release_project.join(','),
+      });
+      getProInfo(idx);
+    }
   };
+
   useEffect(() => {
-    getProjectUpgradeData();
-  }, []);
+    if (proInfo?.release_project?.release_project) {
+      form.setFieldsValue({
+        release_project: proInfo.release_project.release_project.split(',') || [],
+      });
+    }
+  }, [JSON.stringify(proInfo)]);
 
   // drag
-  const onRowDragMove = useCallback(() => {
-    const result: string[] = [];
-    gridApi.current?.forEachNode(({ data }: any) => {
-      result.push(data.id);
+  const onRowDragMove = useCallback(async () => {
+    const data: { api_id: string; sort_num: number; user_id: string }[] = [];
+    gridSQLRef.current?.forEachNode((node, index) => {
+      data.push({ api_id: node.data.id, sort_num: index + 1, user_id: user?.userid || '' });
     });
-    console.log(result);
+    await OnlineServices.preInterfaceSort(data);
+    // refresh
   }, []);
 
   // operation
-  const OperationDom = ({ data }: CellClickedEvent, type: enumType, showLog = true) => {
+  const OperationDom = (data: any, type: enumType, showLog = true) => {
     return (
       <div className={'operation'}>
         <img
           src={require('../../../../../public/edit.png')}
           onClick={() => {
+            if (disable == 'success') return;
             const params = { visible: true, data };
             if (type == 'upgrade') setEditUpgrade(params);
             else if (type == 'services') setEditServices(params);
@@ -160,7 +90,9 @@ const ProjectServices = () => {
           <img
             src={require('../../../../../public/logs.png')}
             onClick={() => {
-              console.log(data);
+              if (data.logUrl) {
+                window.open(data.log_url);
+              }
             }}
           />
         )}
@@ -168,55 +100,89 @@ const ProjectServices = () => {
     );
   };
 
+  // sql detail
+  const showDetail = ({ colDef, value }: CellClickedEvent) => {
+    if (colDef.field == 'sql' && value) {
+      Modal.info({
+        width: 600,
+        title: '详情',
+        okText: '好的',
+        content: (
+          <div
+            style={{
+              maxHeight: 400,
+              overflow: 'auto',
+              margin: '10px 0',
+              whiteSpace: 'pre-line',
+            }}
+          >
+            {value}
+          </div>
+        ),
+      });
+    }
+  };
+
+  const formatTable = (arr: any[]) => {
+    const obj = {};
+    arr.forEach((it) => {
+      if (obj[it.cluster_id]) {
+        obj[it.cluster_id]++;
+      } else {
+        obj[it.cluster_id] = 1;
+      }
+    });
+    Object.entries(obj).map(([k, v]) => {
+      const index = arr.findIndex((it) => it.cluster_id == k);
+      arr[index].rowSpan = v;
+    });
+    return arr;
+  };
+
   return (
     <div>
       <h4>
         一、预发布项目&环境填写 <span className="color-tips">【由测试人员依次填写】</span>
       </h4>
-      <Form form={form} initialValues={initData}>
+      <Form form={form} onValuesChange={updatePreData}>
         <Row justify={'space-between'}>
           <Col span={8}>
-            <Form.Item label={'预发布项目'} name={'prePublishPro'}>
-              <Select options={[]} style={{ width: '100%' }} />
+            <Form.Item label={'预发布项目'} name={'release_project'}>
+              <Select
+                options={projectSelectors}
+                style={{ width: '100%' }}
+                mode="multiple"
+                maxTagCount="responsive"
+                optionFilterProp="label"
+                disabled={disable == 'success'}
+                filterOption={(input, option) =>
+                  ((option!.label as unknown) as string)?.includes(input)
+                }
+              />
             </Form.Item>
           </Col>
           <Col span={6}>
-            <Form.Item label={'预发布分支'} name={'prePublishBranch'}>
+            <Form.Item label={'预发布分支'} name={'release_branch'}>
               <Select
-                options={[
-                  { value: 'release', label: 'release' },
-                  { value: 'hotfix', label: 'hotfix' },
-                  { value: 'hotfix-inte', label: 'hotfix-inte' },
-                  { value: 'emergency', label: 'emergency' },
-                  { value: 'stage-emergency', label: 'stage-emergency' },
-                ]}
+                options={branchSelectors}
                 style={{ width: '100%' }}
+                disabled={disable == 'success'}
               />
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item label={'测试环境绑定'} name={'prePublishEnv'}>
-              <Select
-                disabled
-                options={[
-                  { value: 'nx-release-k8s', label: 'nx-release-k8s' },
-                  { value: 'nx-release-db-k8s', label: 'nx-release-db-k8s' },
-                  { value: 'nx-hotfix-k8s', label: 'nx-hotfix-k8s' },
-                  { value: 'nx-hotfix-inte-k8s', label: 'nx-hotfix-inte-k8s' },
-                  { value: 'nx-hotfix-db-k8s', label: 'nx-hotfix-db-k8s' },
-                ]}
-                style={{ width: '100%' }}
-              />
+            <Form.Item label={'测试环境绑定'} name={'release_env'}>
+              <Select disabled options={[]} style={{ width: '100%' }} />
             </Form.Item>
           </Col>
         </Row>
       </Form>
       <Space className={'flex-row'} size={40} style={{ marginBottom: 40 }}>
         <div>
-          填写人： <span>詹三</span>
+          填写人： <span>{proInfo?.release_project?.edit_user || '-'}</span>
         </div>
         <div>
-          填写时间： <span>2022-05-08</span>
+          填写时间： <span>{proInfo?.release_project?.edit_time || '-'}</span>
         </div>
       </Space>
       <h4>
@@ -224,28 +190,35 @@ const ProjectServices = () => {
       </h4>
       <div className={'AgGridReactTable'}>
         <AgGridReact
-          {...initGridTable(gridApi)}
+          {...initGridTable(gridUpgradeRef)}
           columnDefs={projectUpgradeColumn}
-          rowData={projectUpgrade}
+          rowData={proInfo?.upgrade_project || []}
           frameworkComponents={{
-            operation: (it: CellClickedEvent) => OperationDom(it, 'upgrade'),
+            operation: ({ data }: CellClickedEvent) => OperationDom(data, 'upgrade'),
           }}
         />
       </div>
       <h4>
-        三、发布服务填写{' '}
+        三、发布服务填写
         <span className="color-tips">【由后端负责人/前端值班/后端值班/流程值班人员填写】</span>
       </h4>
-      <div className={'AgGridReactTable'}>
-        <AgGridReact
-          {...initGridTable(gridApi)}
-          columnDefs={publishServerColumn}
-          rowData={servicesData}
-          frameworkComponents={{
-            operation: (it: CellClickedEvent) => OperationDom(it, 'services'),
-          }}
-        />
-      </div>
+      <Table
+        rowKey="id"
+        bordered
+        size="small"
+        dataSource={formatTable(proInfo?.upgrade_app || [])}
+        pagination={false}
+        columns={[
+          ...serviceColumn,
+          {
+            title: '操作',
+            align: 'center',
+            dataIndex: 'operation',
+            width: 120,
+            render: (_, record) => OperationDom(record, 'services'),
+          },
+        ]}
+      />
       <h4>
         四、升级接口&升级SQL填写 <span className="color-tips">【前后端值班核对确认】</span>
       </h4>
@@ -253,35 +226,16 @@ const ProjectServices = () => {
         <AgGridReact
           animateRows
           rowDragManaged
+          suppressAutoSize
           suppressRowTransform
-          {...initGridTable(gridApi)}
+          {...initGridTable(gridSQLRef)}
           columnDefs={upgradeSQLColumn}
-          rowData={upgradeSQLData}
+          rowData={proInfo?.upgrade_api || []}
           onRowDragEnd={onRowDragMove}
           frameworkComponents={{
-            operation: (it: CellClickedEvent) => OperationDom(it, 'sql', false),
+            operation: ({ data }: CellClickedEvent) => OperationDom(data, 'sql', false),
           }}
-          onCellDoubleClicked={({ colDef, value }: CellClickedEvent) => {
-            if (colDef.field == 'sql' && value) {
-              Modal.info({
-                width: 600,
-                title: '详情',
-                content: (
-                  <div
-                    style={{
-                      maxHeight: 400,
-                      overflow: 'auto',
-                      margin: '10px 0',
-                      whiteSpace: 'pre-line',
-                    }}
-                  >
-                    {value}
-                  </div>
-                ),
-                okText: '好的',
-              });
-            }
-          }}
+          onCellDoubleClicked={showDetail}
         />
       </div>
       <h4>
@@ -289,14 +243,32 @@ const ProjectServices = () => {
       </h4>
       <div className={'AgGridReactTable'}>
         <AgGridReact
-          {...initGridTable(gridApi)}
+          {...initGridTable(gridReviewRef)}
           columnDefs={dataReviewColumn}
-          rowData={checkReviewData}
+          rowData={proInfo?.upgrade_review || []}
         />
       </div>
-      <EditUpgrade {...editUpgrade} onCancel={() => setEditUpgrade(null)} />
-      <EditServices {...editServices} onCancel={() => setEditServices(null)} />
-      <EditSql {...editSql} onCancel={() => setEditSql(null)} />
+      <EditUpgrade
+        {...editUpgrade}
+        onCancel={(status) => {
+          if (status == true) getProInfo(idx);
+          setEditUpgrade(null);
+        }}
+      />
+      <EditServices
+        {...editServices}
+        onCancel={(status) => {
+          if (status == true) getProInfo(idx);
+          setEditServices(null);
+        }}
+      />
+      <EditSql
+        {...editSql}
+        onCancel={(status) => {
+          if (status == true) getProInfo(idx);
+          setEditSql(null);
+        }}
+      />
     </div>
   );
 };

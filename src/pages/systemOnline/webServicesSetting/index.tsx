@@ -1,31 +1,39 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Form, Row, Select, Tag, Col, Modal, DatePicker } from 'antd';
+import { Form, Row, Select, Tag, Col, Modal, Button } from 'antd';
 import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 
 import { AgGridReact } from 'ag-grid-react';
 import type { GridApi, CellClickedEvent } from 'ag-grid-community';
 import { initGridTable, SETTING_STATUS } from '../constants';
 import { servicesSettingColumn } from '../column';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
-import moment from 'moment';
+import { ExclamationCircleOutlined, FolderAddTwoTone } from '@ant-design/icons';
 import IPagination from '@/components/IPagination';
+import { useModel } from 'umi';
+import OnlineServices from '@/services/online';
+import { IRecord } from '@/namespaces/interface';
 
 const EditSetting = (props: { data?: any } & ModalFuncProps) => {
   const [form] = Form.useForm();
+  const [projectSelectors, frontSelector] = useModel('systemOnline', (system) => [
+    system.projectSelectors,
+    system.frontSelector,
+  ]);
 
   useEffect(() => {
     if (props.visible) {
       form.setFieldsValue({
         ...props.data,
-        time: props.data?.time ? moment(props.data.time) : null,
+        app_name: props.data?.app_name?.split(','),
+        // time: props.data?.time ? moment(props.data.time) : null,
       });
     } else form.resetFields();
   }, [props.visible]);
 
   const onFinish = async () => {
     const result = await form.validateFields();
-    props.onOk?.(result);
+    await OnlineServices.addProjectServer({ ...result, app_name: result.app_name.join(',') });
+    props.onCancel?.(true);
   };
 
   const isEdit = useMemo(() => !!props.data, [props.data]);
@@ -37,30 +45,34 @@ const EditSetting = (props: { data?: any } & ModalFuncProps) => {
       onCancel={props.onCancel}
       onOk={onFinish}
     >
-      <Form form={form} labelCol={{ span: 6 }}>
+      <Form form={form} wrapperCol={{ span: 16 }} labelCol={{ span: 6 }}>
         <Form.Item
-          name="macking"
+          name="project_id"
           label="所属执行"
           rules={[{ required: true, message: '请选择所属执行!' }]}
         >
-          <Select options={[]} />
+          <Select options={projectSelectors} />
         </Form.Item>
         <Form.Item
-          name="application"
+          name="app_name"
           label="涉及前端应用"
           rules={[{ required: true, message: '请选择涉及前端应用!' }]}
         >
-          <Select options={[]} />
+          <Select mode="multiple">
+            {frontSelector?.map((it: any) => (
+              <Select.Option key={it.app_name}>{it.app_name}</Select.Option>
+            ))}
+          </Select>
         </Form.Item>
-        <Form.Item name="status" label="项目状态">
+        {/* <Form.Item name="status" label="项目状态">
           <Select options={SETTING_STATUS} disabled={isEdit} />
-        </Form.Item>
-        <Form.Item name="editor" label="编辑人">
+        </Form.Item> */}
+        {/* <Form.Item name="editor" label="编辑人">
           <Select options={[]} disabled={isEdit} />
         </Form.Item>
         <Form.Item name="time" label="编辑时间">
-          <DatePicker format={'YYYY-MM-DD HH:mm:ss'} style={{ width: '100%' }} disabled={isEdit} />
-        </Form.Item>
+          <DatePicker format={MOMENT_FORMAT.utc} style={{ width: '100%' }} disabled={isEdit} />
+        </Form.Item> */}
       </Form>
     </Modal>
   );
@@ -69,59 +81,74 @@ const EditSetting = (props: { data?: any } & ModalFuncProps) => {
 const WebServicesSetting = () => {
   const [form] = Form.useForm();
   const gridApi = useRef<GridApi>();
-  const [source, setSource] = useState<Record<string, any>[]>([]);
+  const [projectSelectors, frontSelector] = useModel('systemOnline', (system) => [
+    system.projectSelectors,
+    system.frontSelector,
+  ]);
+  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
+
+  const [source, setSource] = useState<IRecord[]>([]);
   const [editSetting, setEditSetting] = useState<{ visible: boolean; data?: any } | null>();
 
+  const getTableList = async () => {
+    const values = await form.getFieldsValue();
+    const res = await OnlineServices.projectServerList({ ...values, page: 0, page_size: 20 });
+    setSource(res);
+  };
+
+  const onRemove = (data: any) => {
+    Modal.confirm({
+      title: '提示：',
+      icon: <ExclamationCircleOutlined />,
+      content: '确认删除该数据么？',
+      cancelText: '取消',
+      okText: '确认',
+      onOk: async () => {
+        if (!user?.userid || !data?.pro_server_id) return;
+        const res = await OnlineServices.removeProjectServer({
+          user_id: user.userid,
+          pro_server_id: data.pro_server_id,
+        });
+        console.log(res);
+      },
+    });
+  };
+
   useEffect(() => {
-    setSource([
-      {
-        id: 1,
-        macking: '采购发票',
-        application: 'web,h5',
-        status: 'pending',
-        editor: '旺旺',
-        time: '',
-      },
-      {
-        id: 2,
-        macking: '薪资',
-        application: 'web,h5',
-        status: 'close',
-        editor: '旺旺',
-        time: '',
-      },
-      {
-        id: 3,
-        macking: '采购发票',
-        application: 'web,h5',
-        status: 'hang',
-        editor: '旺旺',
-        time: '',
-      },
-      {
-        id: 4,
-        macking: '迭代',
-        application: 'web,h5',
-        status: 'wait',
-        editor: '旺旺',
-        time: '',
-      },
-    ]);
+    getTableList();
   }, []);
 
   return (
     <PageContainer>
       <Form form={form}>
-        <Row>
-          <Col span={5}>
-            <Form.Item name="" label="所属执行">
-              <Select options={[]} />
-            </Form.Item>
+        <Row justify="space-between">
+          <Col flex={2}>
+            <Button
+              icon={<FolderAddTwoTone />}
+              type="primary"
+              style={{ marginBottom: 5 }}
+              onClick={() => setEditSetting({ visible: true })}
+            >
+              新增
+            </Button>
           </Col>
-          <Col span={5} offset={1}>
-            <Form.Item name="" label="项目状态">
-              <Select options={[]} />
-            </Form.Item>
+          <Col flex={3}>
+            <Row justify={'end'}>
+              <Col span={12}>
+                <Form.Item name="pro_id" label="所属执行">
+                  <Select options={projectSelectors} />
+                </Form.Item>
+              </Col>
+              <Col span={9} offset={1}>
+                <Form.Item name="status" label="项目状态">
+                  <Select mode="multiple">
+                    {frontSelector?.map((it: any) => (
+                      <Select.Option key={it.app_name}>{it.app_name}</Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
           </Col>
         </Row>
       </Form>
@@ -143,18 +170,7 @@ const WebServicesSetting = () => {
                 />
                 <img
                   src={require('../../../../public/delete_2.png')}
-                  onClick={() => {
-                    Modal.confirm({
-                      title: '提示：',
-                      icon: <ExclamationCircleOutlined />,
-                      content: '确认删除该数据么？',
-                      cancelText: '取消',
-                      okText: '确认',
-                      onOk: () => {
-                        console.log(data);
-                      },
-                    });
-                  }}
+                  onClick={() => onRemove(data)}
                 />
               </div>
             ),
@@ -184,7 +200,10 @@ const WebServicesSetting = () => {
       />
       <EditSetting
         {...editSetting}
-        onCancel={() => setEditSetting({ visible: false, data: null })}
+        onCancel={(status) => {
+          if (status == true) getTableList();
+          setEditSetting({ visible: false, data: null });
+        }}
       />
     </PageContainer>
   );

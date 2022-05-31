@@ -1,22 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Form, Input, Select } from 'antd';
+import { useModel } from 'umi';
+
 import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 import { STATUS_MAP } from '../../constants';
+import OnlineServices from '@/services/online';
+import { PreSql } from '@/namespaces';
 
-export interface Isql {
-  id: number;
-  online_env: string;
-  upgrade_type: string;
-  services: string;
-  users: string;
-  record: string;
-  [key: string]: any;
-}
 interface IEditSql extends ModalFuncProps {
-  data?: Isql;
+  data?: PreSql;
 }
 
 const EditSql = (props: IEditSql) => {
+  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
+
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
@@ -27,10 +24,20 @@ const EditSql = (props: IEditSql) => {
   }, [props.visible]);
 
   const onConfirm = async () => {
-    setLoading(true);
-    const result = await form.validateFields().finally(() => setLoading(false));
-    console.log(result);
-    props.onOk?.(result);
+    const values = await form.validateFields();
+    try {
+      setLoading(true);
+      const res = await OnlineServices.updatePreInterface({
+        cluster_id: values.cluster_id,
+        is_backlog: values.is_backlog,
+        user_id: user?.userid,
+        api_id: props.data?.api_id,
+      });
+      console.log(res);
+      props.onCancel?.(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -43,28 +50,28 @@ const EditSql = (props: IEditSql) => {
       maskClosable={false}
       confirmLoading={loading}
     >
-      <Form form={form} labelCol={{ span: 8 }}>
-        <Form.Item name="upgrade_type" label="升级类型">
+      <Form form={form} wrapperCol={{ span: 16 }} labelCol={{ span: 6 }}>
+        <Form.Item name="update_type" label="升级类型">
           <Input disabled />
         </Form.Item>
-        <Form.Item name="upgrade_sql" label="升级接口">
+        <Form.Item name="update_api" label="升级接口">
           <Input disabled />
         </Form.Item>
-        <Form.Item name="services" label="接口服务">
+        <Form.Item name="api_server" label="接口服务">
           <Input disabled />
         </Form.Item>
-        <Form.Item name="users" label="涉及租户">
+        <Form.Item name="tenant" label="涉及租户">
           <Input disabled />
         </Form.Item>
         <Form.Item
-          name="online_env"
+          name="cluster_id"
           label="上线环境"
           rules={[{ required: true, message: '请选择上线环境!' }]}
         >
           <Select options={[]} />
         </Form.Item>
         <Form.Item
-          name="record"
+          name="is_backlog"
           label="是否记录积压"
           rules={[{ required: true, message: '请选择是否记录积压!' }]}
         >

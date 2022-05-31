@@ -1,7 +1,7 @@
 import React from 'react';
 import { Settings as LayoutSettings, PageLoading } from '@ant-design/pro-layout';
 import { notification } from 'antd';
-import { history } from 'umi';
+import { history, RunTimeLayoutConfig } from 'umi';
 import RightContent from '@/components/RightContent';
 // import Footer from '@/WechatFlow/Footer';
 import { ResponseError } from 'umi-request';
@@ -83,7 +83,7 @@ export async function getInitialState(): Promise<{
   };
 }
 
-export const layout = ({ initialState }: any) => {
+export const layout: RunTimeLayoutConfig = ({ initialState }: any) => {
   return {
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,

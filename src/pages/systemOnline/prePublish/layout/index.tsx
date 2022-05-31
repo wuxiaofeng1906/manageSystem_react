@@ -1,68 +1,82 @@
 import React, { useEffect, useState } from 'react';
 import { Layout, Form, Select, DatePicker, Menu } from 'antd';
-import { history, useModel } from 'umi';
+import { history, useModel, useLocation } from 'umi';
+
 import styles from './index.less';
 import moment from 'moment';
 import { PUBLISH_RESULT, MENUS } from '../../constants';
+import { MOMENT_FORMAT } from '@/namespaces';
 
-const PreLayout = ({ location, children }) => {
-  const [disabled, setting] = useModel('systemOnline', (system) => [
-    system.disabled,
-    system.setting,
-  ]);
-  const [form] = Form.useForm();
+const PreLayout = ({ location, children }: { location: any; children: React.ReactNode }) => {
+  const {
+    query: { idx, disable },
+  } = useLocation() as any;
   const [activePath, setActivePath] = useState([
     location.pathname.split('/systemOnline/prePublish/')[1] || 'projectServices',
   ]);
+  const { typeSelectors, methodSelectors, updateColumn, proInfo, getProInfo } = useModel(
+    'systemOnline',
+  );
+  const [form] = Form.useForm();
 
-  const [condition] = useState({
-    publish_type: '1',
-    publish_by: 'no',
-    publish_date: moment().hour(23).minute(0),
-  });
+  const update = async (type: any, values: any) => {
+    if (idx && disable !== 'success') {
+      await updateColumn({
+        ...values,
+        release_num: idx,
+        release_date: moment(values.release_date).format(MOMENT_FORMAT.utc),
+        release_project: proInfo?.release_project?.release_project || '',
+      });
+      await getProInfo(idx);
+    }
+  };
+
+  // create or query
+  useEffect(() => {
+    getProInfo(idx).then((res) => {
+      if (res?.release_project) {
+        getProInfo(idx);
+      } else
+        update('create', {
+          release_type: typeSelectors?.[0]?.value,
+          release_method: methodSelectors?.[0]?.value,
+          release_result: PUBLISH_RESULT[0]?.value,
+          release_date: moment().hour(23).minute(0).seconds(0),
+        });
+    });
+  }, [idx]);
 
   useEffect(() => {
-    if (location.pathname === '/systemOnline/prePublish') {
-      history.replace('/systemOnline/prePublish/projectServices');
+    if (proInfo?.release_project) {
+      form.setFieldsValue({
+        ...proInfo?.release_project,
+        release_date: moment(proInfo?.release_project?.release_date),
+      });
     }
-  }, [location.pathname]);
-
-  console.log(setting);
+  }, [JSON.stringify(proInfo)]);
 
   return (
     <div className={styles.preLayout}>
       <Layout>
-        <Layout.Sider width={270} theme={'light'} className={styles.layout}>
+        <Layout.Sider width={290} theme={'light'} className={styles.layout}>
           <div className={styles.formWrap}>
-            <Form form={form} initialValues={condition}>
-              <Form.Item label={'发布类型'} name={'publish_type'}>
-                <Select
-                  disabled={disabled}
-                  options={[
-                    { value: '1', label: '灰度发布（集群1）' },
-                    { value: '2', label: '热更线上（热更2-6/1-6）' },
-                    { value: '3', label: '灰度推线上（集群1推2-6）' },
-                  ]}
-                />
+            <Form form={form} onValuesChange={update}>
+              <Form.Item label={'发布类型'} name={'release_type'}>
+                <Select disabled={disable == 'success'} options={typeSelectors} />
               </Form.Item>
-              <Form.Item label={'发布方式'} name={'publish_by'}>
-                <Select
-                  disabled={disabled}
-                  options={[
-                    { value: 'yes', label: '停服' },
-                    { value: 'no', label: '不停服' },
-                  ]}
-                />
+              <Form.Item label={'发布方式'} name={'release_method'}>
+                <Select disabled={disable == 'success'} options={methodSelectors} />
               </Form.Item>
-              <Form.Item label={'发布时间'} name={'publish_date'}>
+              <Form.Item label={'发布时间'} name={'release_date'}>
                 <DatePicker
                   format={'YYYY-MM-DD HH:mm'}
                   style={{ width: '100%' }}
-                  disabled={disabled}
+                  disabled={disable == 'success'}
+                  allowClear={false}
                 />
               </Form.Item>
-              <Form.Item label={'发布结果'} name={'publish_result'}>
-                <Select options={PUBLISH_RESULT} disabled={disabled} />
+              <Form.Item label={'发布结果'} name={'release_result'}>
+                <Select options={PUBLISH_RESULT} disabled={disable} />
               </Form.Item>
             </Form>
           </div>

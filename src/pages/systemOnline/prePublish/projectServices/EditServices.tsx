@@ -3,37 +3,42 @@ import { Modal, Form, Input, Select, DatePicker } from 'antd';
 import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 import { STATUS_MAP } from '../../constants';
 import moment from 'moment';
+import OnlineServices from '@/services/online';
+import { useModel } from 'umi';
+import { PreServices } from '@/namespaces';
 
-export interface Iservices {
-  id: number;
-  online_env: string;
-  application: string;
-  side: string;
-  version: string;
-  date: string;
-  [key: string]: any;
-}
 interface IEditServices extends ModalFuncProps {
-  data?: Iservices;
+  data?: PreServices;
 }
 
 const EditServices = (props: IEditServices) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
 
   useEffect(() => {
     if (props.visible) {
       form.setFieldsValue({
         ...props.data,
-        date: props.data?.date ? moment(props.data?.date) : null,
+        seal_time: props.data?.seal_time ? moment(props.data?.seal_time) : null,
       });
     } else form.resetFields();
   }, [props.visible]);
 
   const onFinish = async () => {
-    setLoading(true);
-    const result = await form.validateFields().finally(() => setLoading(false));
-    props.onOk?.(result);
+    const result = await form.validateFields();
+    try {
+      setLoading(true);
+      const res = await OnlineServices.updatePublishServer({
+        user_id: user?.userid,
+        server_id: props.data?.server_id,
+        cluster_id: result.cluster_id,
+        is_seal: result.is_seal,
+      });
+      props.onCancel?.(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -46,28 +51,28 @@ const EditServices = (props: IEditServices) => {
       maskClosable={false}
       confirmLoading={loading}
     >
-      <Form form={form} labelCol={{ span: 8 }}>
+      <Form form={form} wrapperCol={{ span: 16 }} labelCol={{ span: 6 }}>
         <Form.Item
-          name="online_env"
+          name="cluster_id"
           label="上线环境"
           rules={[{ required: true, message: '请选择上线环境!' }]}
         >
           <Select options={[]} />
         </Form.Item>
-        <Form.Item name="application" label="应用">
+        <Form.Item name="app_name" label="应用">
           <Input disabled />
         </Form.Item>
-        <Form.Item name="side" label="对应侧">
+        <Form.Item name="technical_side" label="对应侧">
           <Input disabled />
         </Form.Item>
         <Form.Item
-          name="version"
+          name="is_seal"
           label="是否封板"
           rules={[{ required: true, message: '请选择是否封板!' }]}
         >
           <Select options={STATUS_MAP} />
         </Form.Item>
-        <Form.Item name="date" label="封板时间">
+        <Form.Item name="seal_time" label="封板时间">
           <DatePicker disabled format={'YYYY-MM-DD HH:mm:ss'} style={{ width: '100%' }} />
         </Form.Item>
       </Form>

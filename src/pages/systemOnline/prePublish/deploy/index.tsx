@@ -1,17 +1,31 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { Button, Space } from 'antd';
 import { deployColumn } from '@/pages/systemOnline/column';
-import type { GridApi } from 'ag-grid-community';
+import type { CellClickedEvent, GridApi } from 'ag-grid-community';
 import DeploySetting from '@/pages/systemOnline/prePublish/deploy/DeploySetting';
 import OneKeyDeploy from '@/pages/systemOnline/prePublish/deploy/OneKeyDeploy';
 import { initGridTable } from '@/pages/systemOnline/constants';
-
+import OnlineServices from '@/services/online';
+import { useLocation } from 'umi';
 const Deploy = () => {
+  const {
+    query: { idx, disable },
+  } = useLocation();
   const gridApi = useRef<GridApi>();
   const [deploySetting, setDeploySetting] = useState(false);
   const [oneKeyDeploy, setOneKeyDeploy] = useState(false);
-  // const [data, setData] = useState({});
+  const [list, setList] = useState([]);
+
+  const getTableList = async () => {
+    if (idx) return;
+    const result = await OnlineServices.deployList(idx);
+    setList(result);
+  };
+
+  useEffect(() => {
+    getTableList();
+  }, []);
 
   return (
     <div>
@@ -27,10 +41,20 @@ const Deploy = () => {
         <AgGridReact
           {...initGridTable(gridApi)}
           columnDefs={deployColumn}
-          rowData={[]}
+          rowData={list}
           frameworkComponents={{
-            operation: () => {
-              return <div>日志</div>;
+            operation: ({ data }: CellClickedEvent) => {
+              return (
+                <div
+                  onClick={() => {
+                    if (data.logUrl) {
+                      window.open(data.log_url);
+                    }
+                  }}
+                >
+                  日志
+                </div>
+              );
             },
           }}
         />

@@ -68,25 +68,25 @@ ol {
     border-radius: 5px;
   }
 
-  .flex-row {
-    display: flex;
-    align-items: center;
-  }
+}
+.flex-row {
+  display: flex;
+  align-items: center;
+}
 
-  .color-prefix {
-    color: @color-approve;
-  }
+.color-prefix {
+  color: @color-approve;
+}
 
-  .color-success {
-    color: @color-success;
-  }
+.color-success {
+  color: @color-success;
+}
 
-  .color-failure {
-    color: @color-error;
-  }
-  .color-tips {
-    color: @color-text-tips;
-  }
+.color-failure {
+  color: @color-error;
+}
+.color-tips {
+  color: @color-text-tips;
 }
 
 // 全局ag-grid-react 样式
@@ -118,7 +118,7 @@ ol {
       flex-direction: row-reverse;
     }
     .ag-row-drag {
-      margin-left: 10px;
+      margin: 0 0 0 10px;
 
       .ag-icon-grip {
         &:before {
@@ -151,3 +151,15 @@ ol {
     }
   }
 }
+.ant-table{
+  .operation {
+    img {
+      width: 20px;
+      height: 20px;
+      &:not(:last-child) {
+        margin-right: 10px;
+      }
+    }
+  }
+}
+

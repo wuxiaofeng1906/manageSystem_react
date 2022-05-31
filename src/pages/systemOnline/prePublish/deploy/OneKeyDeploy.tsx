@@ -1,22 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, TreeSelect } from 'antd';
+import { useModel, useLocation } from 'umi';
 import { ModalFuncProps } from 'antd/lib/modal/Modal';
+import OnlineServices from '@/services/online';
 
 const OneKeyDeploy = (props: ModalFuncProps) => {
+  const {
+    query: { idx, disable },
+  } = useLocation() as any;
   const [data, setData] = useState([]);
+
+  const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
+
+  const onFinish = async () => {
+    if (!idx || disable) return;
+    const res = await OnlineServices.deployConfirm({
+      user_id: currentUser?.userid,
+      release_num: idx,
+    });
+    console.log(res);
+  };
+
   useEffect(() => {
     if (!props.visible) setData([]);
   }, [props.visible]);
+
   return (
     <Modal
       title={'一键部署'}
       visible={props.visible}
-      onOk={() => props.onOk?.(data)}
+      onOk={onFinish}
       onCancel={props.onCancel}
       maskClosable={false}
       okText="点击部署"
     >
       <TreeSelect
+        disabled={disable}
         style={{ width: '100%' }}
         value={data}
         allowClear

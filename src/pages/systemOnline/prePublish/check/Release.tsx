@@ -1,25 +1,51 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Select, DatePicker, Checkbox, Row, Col, Button, Space } from 'antd';
 import FieldSet from '@/components/FieldSet';
-
-const Release = () => {
-  const [autoCheckForm] = Form.useForm();
+import OnlineServices from '@/services/online';
+import { useModel, useLocation } from 'umi';
+const Release = ({ onTab }: { onTab: (v: string) => void }) => {
+  // const [autoCheckForm] = Form.useForm();
   const [versionForm] = Form.useForm();
   const [branchForm] = Form.useForm();
   const [envForm] = Form.useForm();
+  const {
+    query: { idx, disable },
+  } = useLocation() as any;
+  const [frontSelector] = useModel('systemOnline', (system) => [system.frontSelector]);
 
-  const onFinish = () => {
-    console.log(autoCheckForm.getFieldsValue());
+  const getBranchInfo = async () => {
+    if (idx) {
+      const res = await OnlineServices.getCheckBranchInfo(idx);
+      if (res) {
+        versionForm.setFieldsValue({
+          env: res.env,
+          app_name: res.app_name?.split(','),
+        });
+      }
+    }
   };
+  useEffect(() => {
+    onTab('release');
+    getBranchInfo();
+  }, [idx]);
+
+  const onFinish = async () => {
+    const res = await OnlineServices.updateCheckBranchInfo({});
+  };
+
   return (
     <div className={'formItem'}>
       <FieldSet data={{ title: '版本检查', dot: true }}>
         <Form form={versionForm}>
-          <Form.Item label={'是否开启'} name={'open'}>
+          <Form.Item label={'是否开启'}>
             <span>是</span>
           </Form.Item>
-          <Form.Item label={'服务'} name={'serve'} style={{ marginLeft: 30 }}>
-            <Select options={[]} style={{ width: 300 }} disabled />
+          <Form.Item label={'服务'} name={'app_name'} style={{ marginLeft: 30 }}>
+            <Select mode="multiple" disabled style={{ width: 300 }}>
+              {frontSelector?.map((it: any) => (
+                <Select.Option key={it.app_name}>{it.app_name}</Select.Option>
+              ))}
+            </Select>
           </Form.Item>
           <Form.Item label={'镜像环境'} name={'env'}>
             <Select options={[]} style={{ width: 300 }} disabled />
@@ -27,27 +53,27 @@ const Release = () => {
         </Form>
       </FieldSet>
       <FieldSet data={{ title: '检查上线分支是否包含对比分支的提交', dot: true }}>
-        <Form form={branchForm}>
-          <Form.Item label={'是否开启'} name={'open'}>
+        <Form form={branchForm} onValuesChange={onFinish}>
+          <Form.Item label={'是否开启'}>
             <span>是</span>
           </Form.Item>
-          <Form.Item label={'被对比的主分支'} name={'branch'}>
+          <Form.Item label={'被对比的主分支'}>
             <span>stage & master</span>
           </Form.Item>
-          <Form.Item label={'技术侧'} name={'env'}>
+          <Form.Item label={'技术侧'}>
             <span>前后端</span>
           </Form.Item>
-          <Form.Item label={'对比起始时间'} name={'date'}>
-            <DatePicker />
+          <Form.Item label={'对比起始时间'} name={'create_time'}>
+            <DatePicker disabled={disable == 'success'} />
           </Form.Item>
         </Form>
       </FieldSet>
       <Form form={envForm}>
-        <Form.Item label={'环境一致性检查环境'} name={'date'} style={{ margin: '10px 0 0 10px' }}>
+        <Form.Item label={'环境一致性检查环境'} name={'env'} style={{ margin: '10px 0 0 10px' }}>
           <Select options={[]} style={{ width: 300 }} disabled />
         </Form.Item>
       </Form>
-      <FieldSet
+      {/* <FieldSet
         data={{ title: '自动化检查设置', mark: '【测试值班负责人填写自动化检查参数】', dot: true }}
       >
         <Form form={autoCheckForm} onFinish={onFinish}>
@@ -104,7 +130,7 @@ const Release = () => {
             </Space>
           </Form.Item>
         </Form>
-      </FieldSet>
+      </FieldSet> */}
     </div>
   );
 };

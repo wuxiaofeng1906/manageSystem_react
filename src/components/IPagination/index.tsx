@@ -1,14 +1,14 @@
 import { Button, InputNumber, Select } from 'antd';
-import React from 'react';
-
+import React, { useMemo } from 'react';
 interface IParam {
-  page: Record<'pageSize' | 'current' | 'total' | 'pages', number>;
+  page: Record<'pageSize' | 'current' | 'total', number>;
   onChange: (page: number) => void;
   showQuickJumper: (page: string) => void;
   onShowSizeChange: (page: number) => void;
 }
 
 const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IParam) => {
+  const pages = useMemo(() => Math.ceil(page.total / page.pageSize), [page.total, page.pageSize]);
   return (
     <div style={{ background: 'white', marginTop: 2, height: 50, paddingTop: 10 }}>
       <label style={{ marginLeft: 20, fontWeight: 'bold' }}> 共 {page.total} 条</label>
@@ -25,7 +25,7 @@ const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IPar
         ]}
       />
       <label style={{ marginLeft: 10, fontWeight: 'bold' }}>条</label>
-      <label style={{ marginLeft: 10, fontWeight: 'bold' }}>共 {page.pages} 页</label>
+      <label style={{ marginLeft: 10, fontWeight: 'bold' }}>共 {pages} 页</label>
       <Button
         size={'small'}
         style={{
@@ -60,7 +60,7 @@ const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IPar
           color: 'black',
           backgroundColor: 'WhiteSmoke',
         }}
-        disabled={page.pages < page.current + 1}
+        disabled={pages < page.current + 1}
         onClick={() => onChange(page.current + 1)}
       >
         &gt;
@@ -70,7 +70,7 @@ const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IPar
         style={{ display: 'inline-block' }}
         defaultValue={1}
         onBlur={(e) => showQuickJumper(e.target.value)}
-        max={page.pages}
+        max={pages}
         min={1}
       />
       <label style={{ marginLeft: 2, fontWeight: 'bold' }}> 页 </label>

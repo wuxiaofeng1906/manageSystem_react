@@ -1,13 +1,12 @@
-import {getInitPageData} from './datasGet';
+import { getInitPageData } from './datasGet';
 
 // 解析Tabs
 const analysisTabsPageInfo = async (datas: any) => {
-
   try {
     const tabsPageArray: any = [];
     if (datas) {
       datas.forEach((ele: any) => {
-        const {ready_release} = ele;
+        const { ready_release } = ele;
         const panes: any = {
           title: ready_release.ready_release_name,
           content: '',
@@ -32,7 +31,6 @@ const analysisTabsPageInfo = async (datas: any) => {
       panes: [],
     };
   }
-
 };
 
 // 预发布项目数据解析
@@ -55,8 +53,8 @@ const analysisPreReleaseProject = (datas: any, zentaoData: any) => {
         edit_user_name: project.edit_user_name,
         edit_time: project.edit_time,
         ready_release_num: project.ready_release_num,
-        ignoreZentaoList: zentaoData[0] === undefined ? "" : zentaoData[0].ignore_check,
-        checkListStatus: zentaoData[0] === undefined ? "" : zentaoData[0].task_status,
+        ignoreZentaoList: zentaoData[0] === undefined ? '' : zentaoData[0].ignore_check,
+        checkListStatus: zentaoData[0] === undefined ? '' : zentaoData[0].task_status,
       };
 
       return returnArray;
@@ -189,10 +187,8 @@ const alalysisInitData = async (queryData: string = '', queryReleaseNum: string 
     };
   } catch (e) {
     // console.log(`数据获取解析错误:${e}`);
-    return {errmessage: `数据获取解析错误:${e}`};
+    return { errmessage: `数据获取解析错误:${e}` };
   }
-
-
 };
 
-export {alalysisInitData};
+export { alalysisInitData };

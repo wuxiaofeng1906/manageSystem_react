@@ -20,7 +20,12 @@ const PublishList: React.ReactNode = () => {
 
   const { typeSelectors, projectSelectors, methodSelectors } = useModel('systemOnline');
 
-  const [publishSource, setPublishSource] = useState<IRecord[]>([]);
+  const [publishSource, setPublishSource] = useState<{
+    data: IRecord[];
+    total: number;
+    page: number;
+    page_size: number;
+  } | null>(null);
   const [form] = Form.useForm();
   const [pages, setPages] = useState({
     pageSize: 20,
@@ -76,7 +81,7 @@ const PublishList: React.ReactNode = () => {
                 optionFilterProp="label"
                 options={projectSelectors}
                 filterOption={(input, option) =>
-                  ((option!.label as unknown) as string)?.includes(input)
+                  (option!.label as unknown as string)?.includes(input)
                 }
               />
             </Form.Item>

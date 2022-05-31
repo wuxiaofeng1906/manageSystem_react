@@ -34,15 +34,14 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
   // create or query
   useEffect(() => {
     getProInfo(idx).then((res) => {
-      if (res?.release_project) {
-        getProInfo(idx);
-      } else
+      if (!res?.release_project) {
         update('create', {
           release_type: typeSelectors?.[0]?.value,
           release_method: methodSelectors?.[0]?.value,
           release_result: PUBLISH_RESULT[0]?.value,
           release_date: moment().hour(23).minute(0).seconds(0),
         });
+      }
     });
   }, [idx]);
 

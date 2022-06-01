@@ -3,7 +3,7 @@ import { PageContainer } from '@ant-design/pro-layout';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Form, Row, Col, Select, DatePicker, Button } from 'antd';
-import type { CellDoubleClickedEvent, GridApi } from 'ag-grid-community';
+import type { CellClickedEvent, CellDoubleClickedEvent, GridApi } from 'ag-grid-community';
 
 import { history, useModel } from 'umi';
 import moment from 'moment';
@@ -20,34 +20,33 @@ const PublishList: React.ReactNode = () => {
 
   const { typeSelectors, projectSelectors, methodSelectors } = useModel('systemOnline');
 
-  const [publishSource, setPublishSource] = useState<{
-    data: IRecord[];
-    total: number;
-    page: number;
-    page_size: number;
-  } | null>(null);
+  const [publishSource, setPublishSource] = useState<IRecord[]>([]);
   const [form] = Form.useForm();
   const [pages, setPages] = useState({
-    pageSize: 20,
+    page_size: 20,
     total: 0,
-    current: 0,
+    page: 0,
   });
-  const getList = async () => {
+  const getList = async (page = 0, page_size = 20) => {
     const values = await form.getFieldsValue();
     const data = {
       ...values,
-      page: pages.current,
-      page_size: pages.pageSize,
+      page,
+      page_size,
     };
     if (values.time) {
       data.release_start_time = values.time[0].startOf('years').format(MOMENT_FORMAT.utc);
       data.release_end_time = values.time[1].endOf('day').format(MOMENT_FORMAT.utc);
     }
     const list = await OnlineServices.releaseList(omit(data, ['time']));
-    setPublishSource(list);
+    setPublishSource(
+      list?.data?.map((it: any, index: number) => ({ ...it, num: page * page_size + index + 1 })) ||
+        [],
+    );
     setPages({
-      ...pages,
-      total: list.total,
+      page: list?.page || 0,
+      total: list?.total || 0,
+      page_size: list?.page_size || 20,
     });
   };
 
@@ -68,7 +67,7 @@ const PublishList: React.ReactNode = () => {
 
   return (
     <PageContainer>
-      <Form form={form} onValuesChange={getList}>
+      <Form form={form} onValuesChange={() => getList()}>
         <Row justify={'space-between'}>
           <Col span={4}>
             <Form.Item label="发布项目:" name="pro_id">
@@ -81,7 +80,7 @@ const PublishList: React.ReactNode = () => {
                 optionFilterProp="label"
                 options={projectSelectors}
                 filterOption={(input, option) =>
-                  (option!.label as unknown as string)?.includes(input)
+                  ((option!.label as unknown) as string)?.includes(input)
                 }
               />
             </Form.Item>
@@ -132,7 +131,7 @@ const PublishList: React.ReactNode = () => {
       <div style={{ height: '400px', width: '100%' }}>
         <AgGridReact
           {...initGridTable(gridApi)}
-          rowData={publishSource?.data || []}
+          rowData={publishSource}
           columnDefs={publishColumn}
           onCellDoubleClicked={({ data }: CellDoubleClickedEvent) => {
             history.push({
@@ -140,20 +139,26 @@ const PublishList: React.ReactNode = () => {
               query: { idx: data.release_num, disable: data.release_result || '' },
             });
           }}
+          frameworkComponents={{
+            typeFormat: ({ data }: CellClickedEvent) => (
+              <Select disabled bordered={false} options={typeSelectors} value={data.release_type} />
+            ),
+            methodFormat: ({ data }: CellClickedEvent) => (
+              <Select
+                disabled
+                bordered={false}
+                options={methodSelectors}
+                value={data.release_method}
+              />
+            ),
+          }}
         />
       </div>
-
       <IPagination
-        onChange={(it) => {
-          console.log(it);
-        }}
         page={pages}
-        showQuickJumper={(v) => {
-          console.log(v);
-        }}
-        onShowSizeChange={(v) => {
-          console.log(v);
-        }}
+        onChange={(page) => getList(page - 1)}
+        showQuickJumper={(page) => getList(page - 1)}
+        onShowSizeChange={(size) => getList(0, size)}
       />
     </PageContainer>
   );

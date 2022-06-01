@@ -1,13 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Select, DatePicker, Checkbox, Row, Col, Button, Space } from 'antd';
 import FieldSet from '@/components/FieldSet';
 import OnlineServices from '@/services/online';
 import { useModel, useLocation } from 'umi';
+import moment from 'moment';
+import { IRecord, MOMENT_FORMAT } from '@/namespaces';
+
 const Release = ({ onTab }: { onTab: (v: string) => void }) => {
   // const [autoCheckForm] = Form.useForm();
   const [versionForm] = Form.useForm();
   const [branchForm] = Form.useForm();
   const [envForm] = Form.useForm();
+  const [data, setData] = useState<IRecord | null>(null);
   const {
     query: { idx, disable },
   } = useLocation() as any;
@@ -16,22 +20,42 @@ const Release = ({ onTab }: { onTab: (v: string) => void }) => {
   const getBranchInfo = async () => {
     if (idx) {
       const res = await OnlineServices.getCheckBranchInfo(idx);
+      setData(res);
       if (res) {
         versionForm.setFieldsValue({
           env: res.env,
-          app_name: res.app_name?.split(','),
+          app_name: res.app_name,
+        });
+        branchForm.setFieldsValue({
+          create_time: moment(res?.create_time),
+        });
+        envForm.setFieldsValue({
+          env: res.env,
         });
       }
     }
   };
+
   useEffect(() => {
-    onTab('release');
     getBranchInfo();
   }, [idx]);
 
-  const onFinish = async () => {
-    const res = await OnlineServices.updateCheckBranchInfo({});
+  const onFinish = async (v: any) => {
+    await OnlineServices.updateCheckBranchInfo({
+      ...data,
+      release_num: idx,
+      server: '',
+      main_branch: 'stage,master',
+      create_time: moment(v.create_time).format(MOMENT_FORMAT.utc),
+    });
+    await getBranchInfo();
   };
+
+  useEffect(() => {
+    if (data) {
+      onTab(data.branch);
+    }
+  }, [data?.branch]);
 
   return (
     <div className={'formItem'}>

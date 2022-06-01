@@ -1,6 +1,6 @@
+import { PreServices } from '@/namespaces';
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import { ColumnsType } from 'antd/lib/table';
-import { Iservices } from './prePublish/projectServices/EditServices';
 
 const common_status={
   yes:'是',
@@ -9,13 +9,13 @@ const common_status={
   feature: '发布失败'
 }
 const cellRenderStatus = ( {value}: any)=> `<span class="${['no','unknow'].includes(value) ? '': (['yes','success'].includes(value))?'color-success':'color-feature'}">${common_status[value] ||''}</span>`
-
+const formatDeployStatus = ({ value }: any)=>`<span class="color-${value}">${value}</span>`
 // 发布列表
 const publishColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
+    field:'num',
     minWidth: 60,
-    cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
   {
     headerName: '正式发布批号',
@@ -28,7 +28,7 @@ const publishColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '发布结果',
     field: 'release_result',
-    cellRenderer: cellRenderStatus
+    cellRenderer: cellRenderStatus,
   },
   {
     headerName: '项目负责人',
@@ -37,14 +37,17 @@ const publishColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '发布分支',
     field: 'release_branch',
+    cellRenderer: 'branchFormat'
   },
   {
     headerName: '发布类型',
     field: 'release_type',
+    cellRenderer: 'typeFormat'
   },
   {
     headerName: '发布方式',
     field: 'release_method',
+    cellRenderer: 'methodFormat',
   },
   {
     headerName: '发布环境',
@@ -246,6 +249,7 @@ const deployColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '当前状态',
     field: 'status',
+    valueFormatter:formatDeployStatus
   },
   {
     headerName: '操作',
@@ -291,8 +295,8 @@ const checkDetailColumn: (ColDef | ColGroupDef)[] = [
 const servicesSettingColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
+    field:'num',
     minWidth: 90,
-    cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
   {
     headerName: '所属执行',
@@ -324,7 +328,7 @@ const servicesSettingColumn: (ColDef | ColGroupDef)[] = [
   },
 ];
 // 发布服务
-const serviceColumn: ColumnsType<Iservices> = [
+const serviceColumn: ColumnsType<PreServices> = [
   {
     title: '序号',
     dataIndex: 'server_id',

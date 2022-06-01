@@ -12,9 +12,11 @@ import IPagination from '@/components/IPagination';
 import { useModel } from 'umi';
 import OnlineServices from '@/services/online';
 import { IRecord } from '@/namespaces/interface';
+import { omit } from '@/utils/utils';
 
 const EditSetting = (props: { data?: any } & ModalFuncProps) => {
   const [form] = Form.useForm();
+  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [projectSelectors, frontSelector] = useModel('systemOnline', (system) => [
     system.projectSelectors,
     system.frontSelector,
@@ -32,7 +34,12 @@ const EditSetting = (props: { data?: any } & ModalFuncProps) => {
 
   const onFinish = async () => {
     const result = await form.validateFields();
-    await OnlineServices.addProjectServer({ ...result, app_name: result.app_name.join(',') });
+    await OnlineServices.addProjectServer({
+      ...props.data,
+      ...result,
+      user_id: user?.userid || '',
+      app_name: result.app_name.join(','),
+    });
     props.onCancel?.(true);
   };
 
@@ -89,11 +96,27 @@ const WebServicesSetting = () => {
 
   const [source, setSource] = useState<IRecord[]>([]);
   const [editSetting, setEditSetting] = useState<{ visible: boolean; data?: any } | null>();
-
-  const getTableList = async () => {
+  const [pages, setPages] = useState({
+    page_size: 20,
+    total: 0,
+    page: 0,
+  });
+  const getTableList = async (page = 0, page_size = 20) => {
     const values = await form.getFieldsValue();
-    const res = await OnlineServices.projectServerList({ ...values, page: 0, page_size: 20 });
-    setSource(res);
+    const res = await OnlineServices.projectServerList({
+      ...values,
+      page,
+      page_size,
+      project_status: values.project_status?.join(','),
+    });
+    setSource(
+      res?.data?.map((it: any, index: number) => ({ ...it, num: page * page_size + index + 1 })),
+    );
+    setPages({
+      page: res?.page,
+      page_size: res?.page_size,
+      total: res?.total || 0,
+    });
   };
 
   const onRemove = (data: any) => {
@@ -105,11 +128,11 @@ const WebServicesSetting = () => {
       okText: '确认',
       onOk: async () => {
         if (!user?.userid || !data?.pro_server_id) return;
-        const res = await OnlineServices.removeProjectServer({
+        await OnlineServices.removeProjectServer({
           user_id: user.userid,
           pro_server_id: data.pro_server_id,
         });
-        console.log(res);
+        await getTableList();
       },
     });
   };
@@ -120,7 +143,7 @@ const WebServicesSetting = () => {
 
   return (
     <PageContainer>
-      <Form form={form}>
+      <Form form={form} onValuesChange={() => getTableList()}>
         <Row justify="space-between">
           <Col flex={2}>
             <Button
@@ -140,12 +163,8 @@ const WebServicesSetting = () => {
                 </Form.Item>
               </Col>
               <Col span={9} offset={1}>
-                <Form.Item name="status" label="项目状态">
-                  <Select mode="multiple">
-                    {frontSelector?.map((it: any) => (
-                      <Select.Option key={it.app_name}>{it.app_name}</Select.Option>
-                    ))}
-                  </Select>
+                <Form.Item name="project_status" label="项目状态">
+                  <Select mode="multiple" options={SETTING_STATUS} />
                 </Form.Item>
               </Col>
             </Row>
@@ -175,28 +194,17 @@ const WebServicesSetting = () => {
               </div>
             ),
             cellTag: ({ data }: CellClickedEvent) => {
-              const item = SETTING_STATUS.find((it) => it.value == data.status);
+              const item = SETTING_STATUS.find((it) => it.value == data.project_status);
               return <Tag color={item?.key}>{item?.label}</Tag>;
             },
           }}
         />
       </div>
       <IPagination
-        onChange={(it) => {
-          console.log(it);
-        }}
-        page={{
-          pageSize: 20,
-          total: 100,
-          current: 1,
-          pages: 5,
-        }}
-        showQuickJumper={(v) => {
-          console.log(v);
-        }}
-        onShowSizeChange={(v) => {
-          console.log(v);
-        }}
+        page={pages}
+        onChange={(page) => getTableList(page - 1)}
+        showQuickJumper={(page) => getTableList(page - 1)}
+        onShowSizeChange={(size) => getTableList(0, size)}
       />
       <EditSetting
         {...editSetting}

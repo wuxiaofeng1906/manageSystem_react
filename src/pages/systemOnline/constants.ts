@@ -18,7 +18,7 @@ const PUBLISH_RESULT=[
     {label:'发布失败',value:'feature',key:'feature'},
 ];
 const SETTING_STATUS = [
-    { label: '进行中', value: 'running', key: 'blue' },
+    { label: '进行中', value: 'doing', key: 'blue' },
     { label: '已关闭', value: 'closed', key: 'green' },
     { label: '未开始', value: 'wait', key: '' },
     { label: '已挂起', value: 'suspended', key: 'gold' },

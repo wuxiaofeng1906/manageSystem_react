@@ -29,7 +29,7 @@ const EditServices = (props: IEditServices) => {
     const result = await form.validateFields();
     try {
       setLoading(true);
-      const res = await OnlineServices.updatePublishServer({
+      await OnlineServices.updatePublishServer({
         user_id: user?.userid,
         server_id: props.data?.server_id,
         cluster_id: result.cluster_id,

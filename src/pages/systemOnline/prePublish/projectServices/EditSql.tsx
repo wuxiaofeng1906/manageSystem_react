@@ -27,13 +27,12 @@ const EditSql = (props: IEditSql) => {
     const values = await form.validateFields();
     try {
       setLoading(true);
-      const res = await OnlineServices.updatePreInterface({
+      await OnlineServices.updatePreInterface({
         cluster_id: values.cluster_id,
         is_backlog: values.is_backlog,
         user_id: user?.userid,
         api_id: props.data?.api_id,
       });
-      console.log(res);
       props.onCancel?.(true);
     } finally {
       setLoading(false);

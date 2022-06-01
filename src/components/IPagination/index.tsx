@@ -1,14 +1,14 @@
 import { Button, InputNumber, Select } from 'antd';
 import React, { useMemo } from 'react';
 interface IParam {
-  page: Record<'pageSize' | 'current' | 'total', number>;
+  page: Record<'page_size' | 'page' | 'total', number>;
   onChange: (page: number) => void;
-  showQuickJumper: (page: string) => void;
+  showQuickJumper: (page: number) => void;
   onShowSizeChange: (page: number) => void;
 }
 
 const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IParam) => {
-  const pages = useMemo(() => Math.ceil(page.total / page.pageSize), [page.total, page.pageSize]);
+  const pages = useMemo(() => Math.ceil(page.total / page.page_size), [page.total, page.page_size]);
   return (
     <div style={{ background: 'white', marginTop: 2, height: 50, paddingTop: 10 }}>
       <label style={{ marginLeft: 20, fontWeight: 'bold' }}> 共 {page.total} 条</label>
@@ -16,7 +16,7 @@ const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IPar
       <Select
         style={{ marginLeft: 10, width: 80 }}
         onChange={onShowSizeChange}
-        value={page.pageSize}
+        value={page.page_size}
         options={[
           { value: 20, label: 20 },
           { value: 50, label: 50 },
@@ -34,8 +34,8 @@ const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IPar
           color: 'black',
           backgroundColor: 'WhiteSmoke',
         }}
-        disabled={page.current <= 1}
-        onClick={() => onChange(page.current - 1)}
+        disabled={page.page <= 1}
+        onClick={() => onChange(page.page - 1)}
       >
         &lt;
       </Button>
@@ -50,7 +50,7 @@ const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IPar
           width: '40px',
         }}
       >
-        {page.current}
+        {page.page || 1}
       </span>
       <Button
         size={'small'}
@@ -60,16 +60,21 @@ const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IPar
           color: 'black',
           backgroundColor: 'WhiteSmoke',
         }}
-        disabled={pages < page.current + 1}
-        onClick={() => onChange(page.current + 1)}
+        disabled={page.page >= pages}
+        onClick={() => onChange(page.page + 1)}
       >
         &gt;
       </Button>
       <label style={{ marginLeft: 20, fontWeight: 'bold' }}> 跳转到第 </label>
       <InputNumber
         style={{ display: 'inline-block' }}
-        defaultValue={1}
-        onBlur={(e) => showQuickJumper(e.target.value)}
+        onBlur={(e) => {
+          let current = +e.target.value;
+          if (+e.target.value <= 0) current = 1;
+          else if (+e.target.value > pages) current = pages;
+          if (current == page.page) return;
+          showQuickJumper(current);
+        }}
         max={pages}
         min={1}
       />

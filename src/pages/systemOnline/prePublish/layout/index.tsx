@@ -14,8 +14,9 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
   const [activePath, setActivePath] = useState([
     location.pathname.split('/systemOnline/prePublish/')[1] || 'projectServices',
   ]);
-  const { typeSelectors, methodSelectors, updateColumn, proInfo, getProInfo } =
-    useModel('systemOnline');
+  const { typeSelectors, methodSelectors, updateColumn, proInfo, getProInfo } = useModel(
+    'systemOnline',
+  );
   const [form] = Form.useForm();
   const isDisable = useMemo(() => disable == 'success', [disable]);
 
@@ -34,7 +35,7 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
   // create or query
   useEffect(() => {
     getProInfo(idx).then((res) => {
-      if (!res?.release_project) {
+      if (!Object.keys(res?.release_project).length) {
         update('create', {
           release_type: typeSelectors?.[0]?.value,
           release_method: methodSelectors?.[0]?.value,

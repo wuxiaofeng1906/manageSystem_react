@@ -11,7 +11,7 @@ import { useLocation } from 'umi';
 const Deploy = () => {
   const {
     query: { idx, disable },
-  } = useLocation();
+  } = useLocation() as any;
   const gridApi = useRef<GridApi>();
   const [deploySetting, setDeploySetting] = useState(false);
   const [oneKeyDeploy, setOneKeyDeploy] = useState(false);
@@ -46,6 +46,7 @@ const Deploy = () => {
             operation: ({ data }: CellClickedEvent) => {
               return (
                 <div
+                  className="color-prefix"
                   onClick={() => {
                     if (data.logUrl) {
                       window.open(data.log_url);

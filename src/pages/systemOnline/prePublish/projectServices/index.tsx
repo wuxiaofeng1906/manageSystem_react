@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { Form, Row, Col, Select, Space, Modal, Table } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import {
@@ -138,6 +138,7 @@ const ProjectServices = () => {
     });
     return arr;
   };
+  const isDisable = useMemo(() => disable == 'success', [disable]);
 
   return (
     <div>
@@ -154,7 +155,7 @@ const ProjectServices = () => {
                 mode="multiple"
                 maxTagCount="responsive"
                 optionFilterProp="label"
-                disabled={disable == 'success'}
+                disabled={isDisable}
                 filterOption={(input, option) =>
                   ((option!.label as unknown) as string)?.includes(input)
                 }
@@ -163,16 +164,12 @@ const ProjectServices = () => {
           </Col>
           <Col span={6}>
             <Form.Item label={'预发布分支'} name={'release_branch'}>
-              <Select
-                options={branchSelectors}
-                style={{ width: '100%' }}
-                disabled={disable == 'success'}
-              />
+              <Select options={branchSelectors} style={{ width: '100%' }} disabled={isDisable} />
             </Form.Item>
           </Col>
           <Col span={8}>
             <Form.Item label={'测试环境绑定'} name={'release_env'}>
-              <Select disabled options={[]} style={{ width: '100%' }} />
+              <Select disabled={isDisable} options={[]} style={{ width: '100%' }} />
             </Form.Item>
           </Col>
         </Row>

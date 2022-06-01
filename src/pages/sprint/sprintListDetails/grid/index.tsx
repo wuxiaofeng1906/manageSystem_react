@@ -3,7 +3,7 @@ import {
   testConfirmValueGetter, catagoryValueGetter, linkToZentaoPage, servertyValueGetter,
   statusValueGetter, statusRenderer, assignedToValueGetter, solvedByValueGetter, relatedNumberRender,
   timestampRenderer, isOrNotValueGetter, testConfirmTooltipValueGetter, testConfirmedRenderer,
-  proposedTestValueGetter,
+  proposedTestValueGetter, testVertifyFilter,
   vertifyResultValueGetter, sourceValueGetter, timeRenderer
 } from "./columnRenderer";
 
@@ -56,6 +56,15 @@ const getColums = (prjNames: any) => {
       cellRenderer: textDecorateRender,
     },
     {
+      headerName: '是否需要测试验证',
+      field: 'testCheck',
+      pinned: 'left',
+      headerTooltip: "自动生成’是‘为黑色；自动生成‘否’为红色；手动修改‘是’为紫色；手动修改‘否’为黄色",
+      tooltipValueGetter: testConfirmTooltipValueGetter,
+      cellRenderer: testConfirmedRenderer,
+      filterParams: {cellRenderer:testVertifyFilter}
+    },
+    {
       headerName: '类型',
       field: 'category',
       pinned: 'left',
@@ -104,16 +113,28 @@ const getColums = (prjNames: any) => {
       tooltipField: "moduleName",
     },
     {
-      headerName: '创建时间',
-      field: 'openedAt',
-      minWidth: 150,
-      cellRenderer: timeRenderer,
+      headerName: '是否可热更',
+      field: 'hotUpdate',
+      valueGetter: (params: any) => {
+        return isOrNotValueGetter(params.data?.hotUpdate)
+      },
+      cellRenderer: textDecorateRender,
     },
     {
-      headerName: '解决时间',
-      field: 'resolvedAt',
-      minWidth: 150,
-      cellRenderer: timeRenderer,
+      headerName: '是否有数据升级',
+      field: 'dataUpdate',
+      valueGetter: (params: any) => {
+        return isOrNotValueGetter(params.data?.dataUpdate)
+      },
+      cellRenderer: textDecorateRender,
+    },
+    {
+      headerName: '是否有接口升级',
+      field: 'interUpdate',
+      valueGetter: (params: any) => {
+        return isOrNotValueGetter(params.data?.interUpdate)
+      },
+      cellRenderer: textDecorateRender,
     },
     {
       headerName: '状态',
@@ -174,6 +195,18 @@ const getColums = (prjNames: any) => {
       },
     },
     {
+      headerName: '创建时间',
+      field: 'openedAt',
+      minWidth: 150,
+      cellRenderer: timeRenderer,
+    },
+    {
+      headerName: '解决时间',
+      field: 'resolvedAt',
+      minWidth: 150,
+      cellRenderer: timeRenderer,
+    },
+    {
       headerName: '截止日期',
       field: 'deadline',
       cellRenderer: timestampRenderer,
@@ -187,43 +220,12 @@ const getColums = (prjNames: any) => {
       cellRenderer: textDecorateRender,
     },
     {
-      headerName: '是否可热更',
-      field: 'hotUpdate',
-      valueGetter: (params: any) => {
-        return isOrNotValueGetter(params.data?.hotUpdate)
-      },
-      cellRenderer: textDecorateRender,
-    },
-    {
-      headerName: '是否有数据升级',
-      field: 'dataUpdate',
-      valueGetter: (params: any) => {
-        return isOrNotValueGetter(params.data?.dataUpdate)
-      },
-      cellRenderer: textDecorateRender,
-    },
-    {
-      headerName: '是否有接口升级',
-      field: 'interUpdate',
-      valueGetter: (params: any) => {
-        return isOrNotValueGetter(params.data?.interUpdate)
-      },
-      cellRenderer: textDecorateRender,
-    },
-    {
       headerName: '是否有预置数据修改',
       field: 'presetData',
       valueGetter: (params: any) => {
         return isOrNotValueGetter(params.data?.presetData)
       },
       cellRenderer: textDecorateRender,
-    },
-    {
-      headerName: '是否需要测试验证',
-      field: 'testCheck',
-      headerTooltip: "自动生成’是‘为黑色；自动生成‘否’为红色；手动修改‘是’为紫色；手动修改‘否’为黄色",
-      tooltipValueGetter: testConfirmTooltipValueGetter,
-      cellRenderer: testConfirmedRenderer,
     },
     {
       headerName: '已提测',

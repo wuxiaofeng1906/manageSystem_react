@@ -400,6 +400,25 @@ const testConfirmedRenderer = (params: any) => {
   return `<span style="color: ${my_color}"> ${result}  </span>`;
 };
 
+// 测试验证
+const testVertifyFilter = (params: any) => {
+  const testVertify = params.value;
+  if (testVertify === "0") {
+    return "否（自动）";
+  }
+  if (testVertify === "-0") {
+    return "否（手动）";
+  }
+  if (testVertify === "1") {
+    return "是（自动）";
+  }
+  if (testVertify === "-1") {
+    return "是（手动）";
+  }
+
+  return testVertify;
+};
+
 // 已提测值转换
 const proposedTestValueGetter = (params: any) => {
   if (params.data?.proposedTest === null || params.data?.proposedTest === undefined) {
@@ -460,7 +479,7 @@ const sourceValueGetter = (params: any) => {
   return sourceValue[source];
 };
 
-const timeRenderer= (params: any) => {
+const timeRenderer = (params: any) => {
 
   if (params.value === null || params.value === undefined) {
     return "";
@@ -479,6 +498,6 @@ export {
   testConfirmValueGetter, catagoryValueGetter, linkToZentaoPage, servertyValueGetter,
   statusValueGetter, statusRenderer, assignedToValueGetter, solvedByValueGetter, relatedNumberRender,
   timestampRenderer, isOrNotValueGetter, testConfirmTooltipValueGetter, testConfirmedRenderer,
-  proposedTestValueGetter,
-  vertifyResultValueGetter, sourceValueGetter,timeRenderer
+  proposedTestValueGetter, testVertifyFilter,
+  vertifyResultValueGetter, sourceValueGetter, timeRenderer
 };

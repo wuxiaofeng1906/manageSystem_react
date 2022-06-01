@@ -23,7 +23,7 @@ import {
   timeRenderer,
 } from './columnRenderer';
 
-import {history} from '@@/core/history';
+import { history } from '@@/core/history';
 // 定义列名
 const getColums = (prjNames: any) => {
   // 获取缓存的字段
@@ -318,31 +318,6 @@ const getColums = (prjNames: any) => {
     },
   ];
 
-  <
-  <
-  <
-  <
-  <
-  << HEAD
-    if (prjNames === '多组织阻塞bug跟踪'
-)
-  {
-    oraFields.splice(11, 0, {
-      headerName: '创建时间',
-      field: 'openedAt',
-      minWidth: 150,
-      cellRenderer: timeRenderer,
-    });
-
-    oraFields.splice(12, 0, {
-      headerName: '解决时间',
-      field: 'resolvedAt',
-      minWidth: 150,
-      cellRenderer: timeRenderer,
-    });
-  }
-======
-  =
   // if (prjNames === "多组织阻塞bug跟踪") {
   //   oraFields.splice(11, 0, {
   //     headerName: '创建时间',
@@ -358,8 +333,6 @@ const getColums = (prjNames: any) => {
   //     cellRenderer: timeRenderer,
   //   });
   // }
->>>>>>>
-  origin / testEv
 
   if (fields === null) {
     return oraFields;
@@ -384,9 +357,9 @@ const getColums = (prjNames: any) => {
 const setRowColor = (params: any) => {
   if (params.data.baseline === '0') {
     // 如果基线为0，则整行都渲染颜色
-    return {'background-color': '#FFF6F6'};
+    return { 'background-color': '#FFF6F6' };
   }
-  return {'background-color': 'white'};
+  return { 'background-color': 'white' };
 };
 
-export {getColums, setRowColor};
+export { getColums, setRowColor };

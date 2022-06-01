@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Layout, Form, Select, DatePicker, Menu } from 'antd';
 import { history, useModel, useLocation } from 'umi';
 
@@ -14,13 +14,13 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
   const [activePath, setActivePath] = useState([
     location.pathname.split('/systemOnline/prePublish/')[1] || 'projectServices',
   ]);
-  const { typeSelectors, methodSelectors, updateColumn, proInfo, getProInfo } = useModel(
-    'systemOnline',
-  );
+  const { typeSelectors, methodSelectors, updateColumn, proInfo, getProInfo } =
+    useModel('systemOnline');
   const [form] = Form.useForm();
+  const isDisable = useMemo(() => disable == 'success', [disable]);
 
   const update = async (type: any, values: any) => {
-    if (idx && disable !== 'success') {
+    if (idx && !isDisable) {
       await updateColumn({
         ...values,
         release_num: idx,
@@ -61,21 +61,21 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
           <div className={styles.formWrap}>
             <Form form={form} onValuesChange={update}>
               <Form.Item label={'发布类型'} name={'release_type'}>
-                <Select disabled={disable == 'success'} options={typeSelectors} />
+                <Select disabled={isDisable} options={typeSelectors} />
               </Form.Item>
               <Form.Item label={'发布方式'} name={'release_method'}>
-                <Select disabled={disable == 'success'} options={methodSelectors} />
+                <Select disabled={isDisable} options={methodSelectors} />
               </Form.Item>
               <Form.Item label={'发布时间'} name={'release_date'}>
                 <DatePicker
                   format={'YYYY-MM-DD HH:mm'}
                   style={{ width: '100%' }}
-                  disabled={disable == 'success'}
+                  disabled={isDisable}
                   allowClear={false}
                 />
               </Form.Item>
               <Form.Item label={'发布结果'} name={'release_result'}>
-                <Select options={PUBLISH_RESULT} disabled={disable} />
+                <Select options={PUBLISH_RESULT} disabled={isDisable} />
               </Form.Item>
             </Form>
           </div>

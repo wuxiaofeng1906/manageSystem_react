@@ -358,26 +358,28 @@ const OnlineBranch: React.FC<any> = () => {
 
     const logContent: any = [];
     logUrl.forEach((log: any) => {
-
+      const log_detail = log.replaceAll("***", "'");
       logContent.push(
         <div>
+          {log_detail}
+
           {/* 原始仓库 */}
-          <div style={{textIndent: "2em"}}>
-            <div>
-              <label>{log.warehouse.name}</label>
-              <label>【{log.warehouse.file}】 所包含图标库地址：</label>
-            </div>
-            <label style={{color: "orange"}}>{log.warehouse.tag_id}地址：{log.warehouse.src}</label>
-          </div>
+          {/*<div style={{textIndent: "2em"}}>*/}
+          {/*  <div>*/}
+          {/*    <label>{log.warehouse.name}</label>*/}
+          {/*    <label>【{log.warehouse.file}】 所包含图标库地址：</label>*/}
+          {/*  </div>*/}
+          {/*  <label style={{color: "orange"}}>{log.warehouse.tag_id}地址：{log.warehouse.src}</label>*/}
+          {/*</div>*/}
 
           {/* 被对比的仓库 */}
-          <div style={{textIndent: "2em"}}>
-            <div>
-              <label>{log.compar_warehouse.name}</label>
-              <label>【{log.compar_warehouse.file}】 所包含图标库地址：</label>
-            </div>
-            <label style={{color: "red"}}>{log.compar_warehouse.tag_id}地址：{log.compar_warehouse.src}</label>
-          </div>
+          {/*<div style={{textIndent: "2em"}}>*/}
+          {/*  <div>*/}
+          {/*    <label>{log.compar_warehouse.name}</label>*/}
+          {/*    <label>【{log.compar_warehouse.file}】 所包含图标库地址：</label>*/}
+          {/*  </div>*/}
+          {/*  <label style={{color: "red"}}>{log.compar_warehouse.tag_id}地址：{log.compar_warehouse.src}</label>*/}
+          {/*</div>*/}
 
         </div>
       );

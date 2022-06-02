@@ -117,6 +117,7 @@ const rendererUnitTest = (params: any) => {
 // 图标一致性检查
 const iconCheckRender = (params: any) => {
 
+
   const values = params.value;
   if (!values || JSON.stringify(values) === "{}") {
     if (params.data?.technical_side === "2") {
@@ -144,12 +145,12 @@ const iconCheckRender = (params: any) => {
     result = "未开始";
   }
 
-
+  const logs = JSON.stringify(values.check_log).replaceAll("'", "***"); // 如果包含单引号，解析会报错。需要用特殊符号替换掉，传过去之后再解析出来。
   return `
        <div>
           <div style="margin-top: -10px;margin-left: 100px">
             <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC"
-              onclick='showIconCheckLog(${JSON.stringify(values.check_log)})'>
+              onclick='showIconCheckLog(${logs})'>
                 <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
              </Button>
           </div>
@@ -448,7 +449,6 @@ const sealStatusRenderer = (params: any) => {
     let time = "";
     const arrayData = values[0];
     values.forEach((ele: any) => {
-
       if (ele.technical_side === datas.technical_side) {
         if (arrayData.technical_side === '1') {
           // 是前端
@@ -470,19 +470,17 @@ const sealStatusRenderer = (params: any) => {
 
     return `
           <div>
-            <div style="margin-left: 100px">
-              <Button  style="margin-top: 8px;margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;height: 25px"
+            <div style="margin-left: 100px;" >
+              <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;"
                 onclick='showCoverStatusLog(${JSON.stringify(params.value)})'>
-                  <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+                  <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志" style="background-color: white;padding-top: -10px">
                </Button>
             </div>
 
-              <div style="margin-top: -25px; font-size: 10px">
-                  <div>${side} <label style="color: ${sideColor}"> ${status}</label> &nbsp;${time}</div>
+              <div style=" font-size: 10px;background-color: transparent;" >
+                   ${side} <label style="color: ${sideColor}"> ${status}</label> &nbsp;${time}
               </div>
-
           </div>
-
     `;
   }
 

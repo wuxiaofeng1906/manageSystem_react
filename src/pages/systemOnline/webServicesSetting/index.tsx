@@ -88,10 +88,7 @@ const EditSetting = (props: { data?: any } & ModalFuncProps) => {
 const WebServicesSetting = () => {
   const [form] = Form.useForm();
   const gridApi = useRef<GridApi>();
-  const [projectSelectors, frontSelector] = useModel('systemOnline', (system) => [
-    system.projectSelectors,
-    system.frontSelector,
-  ]);
+  const [projectSelectors] = useModel('systemOnline', (system) => [system.projectSelectors]);
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
 
   const [source, setSource] = useState<IRecord[]>([]);
@@ -171,7 +168,7 @@ const WebServicesSetting = () => {
           </Col>
         </Row>
       </Form>
-      <div style={{ height: '400px', width: '100%' }}>
+      <div style={{ height: '600px', width: '100%' }}>
         <AgGridReact
           {...initGridTable(gridApi)}
           rowData={source}
@@ -179,10 +176,6 @@ const WebServicesSetting = () => {
           frameworkComponents={{
             operation: ({ data }: CellClickedEvent) => (
               <div className={'operation'}>
-                <img
-                  src={require('../../../../public/add_1.png')}
-                  onClick={() => setEditSetting({ visible: true })}
-                />
                 <img
                   src={require('../../../../public/edit.png')}
                   onClick={() => setEditSetting({ visible: true, data })}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Select, DatePicker, Checkbox, Row, Col, Button, Space } from 'antd';
+import { Form, DatePicker, Input } from 'antd';
 import FieldSet from '@/components/FieldSet';
 import OnlineServices from '@/services/online';
 import { useModel, useLocation } from 'umi';
@@ -13,9 +13,12 @@ const Release = ({ onTab }: { onTab: (v: string) => void }) => {
   const [envForm] = Form.useForm();
   const [data, setData] = useState<IRecord | null>(null);
   const {
-    query: { idx, disable },
+    query: { idx },
   } = useLocation() as any;
-  const [frontSelector] = useModel('systemOnline', (system) => [system.frontSelector]);
+  const [disabled, release_project] = useModel('systemOnline', (system) => [
+    system.disabled,
+    system.proInfo?.release_project,
+  ]);
 
   const getBranchInfo = async () => {
     if (idx) {
@@ -27,7 +30,7 @@ const Release = ({ onTab }: { onTab: (v: string) => void }) => {
           app_name: res.app_name,
         });
         branchForm.setFieldsValue({
-          create_time: moment(res?.create_time),
+          create_time: res?.create_time ? moment(res.create_time) : null,
         });
         envForm.setFieldsValue({
           env: res.env,
@@ -44,16 +47,16 @@ const Release = ({ onTab }: { onTab: (v: string) => void }) => {
     await OnlineServices.updateCheckBranchInfo({
       ...data,
       release_num: idx,
-      server: '',
       main_branch: 'stage,master',
-      create_time: moment(v.create_time).format(MOMENT_FORMAT.utc),
+      technical_side: 'backend,front',
+      create_time: v.create_time ? moment(v.create_time).format(MOMENT_FORMAT.utc) : null,
     });
     await getBranchInfo();
   };
 
   useEffect(() => {
     if (data) {
-      onTab(data.branch);
+      onTab(data.branch || '(无)');
     }
   }, [data?.branch]);
 
@@ -65,14 +68,10 @@ const Release = ({ onTab }: { onTab: (v: string) => void }) => {
             <span>是</span>
           </Form.Item>
           <Form.Item label={'服务'} name={'app_name'} style={{ marginLeft: 30 }}>
-            <Select mode="multiple" disabled style={{ width: 300 }}>
-              {frontSelector?.map((it: any) => (
-                <Select.Option key={it.app_name}>{it.app_name}</Select.Option>
-              ))}
-            </Select>
+            <Input style={{ width: 300 }} disabled />
           </Form.Item>
           <Form.Item label={'镜像环境'} name={'env'}>
-            <Select options={[]} style={{ width: 300 }} disabled />
+            <Input style={{ width: 300 }} disabled />
           </Form.Item>
         </Form>
       </FieldSet>
@@ -88,13 +87,17 @@ const Release = ({ onTab }: { onTab: (v: string) => void }) => {
             <span>前后端</span>
           </Form.Item>
           <Form.Item label={'对比起始时间'} name={'create_time'}>
-            <DatePicker disabled={disable == 'success'} />
+            <DatePicker
+              style={{ width: 300 }}
+              disabled={disabled || !release_project?.release_env}
+              allowClear={false}
+            />
           </Form.Item>
         </Form>
       </FieldSet>
       <Form form={envForm}>
         <Form.Item label={'环境一致性检查环境'} name={'env'} style={{ margin: '10px 0 0 10px' }}>
-          <Select options={[]} style={{ width: 300 }} disabled />
+          <Input style={{ width: 300 }} disabled />
         </Form.Item>
       </Form>
       {/* <FieldSet

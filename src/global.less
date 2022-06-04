@@ -88,20 +88,21 @@ ol {
 .color-tips {
   color: @color-text-tips;
 }
+.table-select-disabled {
+  .ant-select-selector {
+    cursor: initial;
+  }
+  .ant-select-selection-item {
+    color: #181d1f !important;
+  }
+}
 
 // 全局ag-grid-react 样式
 .ag-initialize-theme {
-  .ag-header {
-    height: 40px !important;
-
-    .ag-header-row {
-      height: 100% !important;
-    }
-  }
-
   .ag-row {
     cursor: pointer;
     .ag-cell {
+      // line-height: 32px !important;
       text-align: center;
     }
     .cell-span {
@@ -159,6 +160,14 @@ ol {
       &:not(:last-child) {
         margin-right: 10px;
       }
+    }
+  }
+  th.required {
+    &:before {
+      position: absolute;
+      left: calc(50% - 40px);
+      color: @color-text-primary;
+      content: '*' !important;
     }
   }
 }

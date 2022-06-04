@@ -6,14 +6,15 @@ import OnlineServices from '@/services/online';
 
 const OneKeyDeploy = (props: ModalFuncProps) => {
   const {
-    query: { idx, disable },
+    query: { idx },
   } = useLocation() as any;
   const [data, setData] = useState([]);
 
   const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
+  const [disabled] = useModel('systemOnline', (system) => [system.disabled]);
 
   const onFinish = async () => {
-    if (!idx || disable) return;
+    if (!idx || disabled) return;
     const res = await OnlineServices.deployConfirm({
       user_id: currentUser?.userid,
       release_num: idx,
@@ -35,7 +36,7 @@ const OneKeyDeploy = (props: ModalFuncProps) => {
       okText="点击部署"
     >
       <TreeSelect
-        disabled={disable}
+        disabled={disabled}
         style={{ width: '100%' }}
         value={data}
         allowClear

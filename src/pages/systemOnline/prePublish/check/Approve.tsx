@@ -1,7 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Button, Space } from 'antd';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { useModel } from 'umi';
+import { Button, Divider, Space } from 'antd';
 import styles from './index.less';
 import ApproveFlow from '../../components/ApproveFlow';
+import { valueMap } from '@/utils/utils';
+import { SERVERINFO } from '../../constants';
 
 const checkStatus = {
   green: '#099409',
@@ -22,10 +25,32 @@ const checkInfo = {
   backendVersion: '后端是否封板',
 };
 
-const Approve = () => {
-  const [checkSource, setCheckSource] = useState<Record<keyof typeof checkInfo, string> | null>(
-    null,
+const BuildProject = () => {
+  const [upgrade_project] = useModel('systemOnline', (system) => [system.proInfo?.upgrade_project]);
+  return (
+    <ul style={{ marginLeft: 40 }}>
+      {upgrade_project?.map((it) => {
+        return (
+          <li key={it.pro_id}>
+            <div className={'flex-row'}>
+              <div style={{ width: '260px' }}>{it.project_name}</div>
+              <span>项目负责人： {it.manager || '-'}</span>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
   );
+};
+
+const Approve = () => {
+  const [checkSource, setCheckSource] = useState<Record<keyof typeof checkInfo, string> | null>();
+  const [disabled, typeSelectors, methodSelectors, proInfo] = useModel('systemOnline', (system) => [
+    system.disabled,
+    system.typeSelectors,
+    system.methodSelectors,
+    system.proInfo,
+  ]);
 
   useEffect(() => {
     setCheckSource({
@@ -41,7 +66,6 @@ const Approve = () => {
       backendVersion: '已封板',
     });
   }, []);
-
   const renderColor = useCallback((v: string): React.CSSProperties => {
     let color = '#2f2f2f';
     if (v == '否') color = checkStatus.red;
@@ -50,41 +74,51 @@ const Approve = () => {
     if (v == '忽略') color = checkStatus.yellow;
     return { color };
   }, []);
+
+  const types = useMemo(() => valueMap(typeSelectors || [], ['value', 'label']), [typeSelectors]);
+  const methods = useMemo(() => valueMap(methodSelectors || [], ['value', 'label']), [
+    methodSelectors,
+  ]);
+
   return (
     <div className={styles.approve}>
       <div>
         <h3>一、发布项目：</h3>
+        <BuildProject />
+      </div>
+      <div style={{ margin: '16px 0' }}>
+        <h3>二、发布服务</h3>
         <ul style={{ marginLeft: 40 }}>
-          <li>
-            <Space size={40}>
-              <span>笑果文化</span>
-              <span>项目负责人： 张三</span>
-            </Space>
-          </li>
-          <li>
-            <Space size={40}>
-              <span>采购发票</span>
-              <span>项目负责人： 李珊珊</span>
-            </Space>
-          </li>
+          {Object.entries(SERVERINFO).map(([k, v]) => (
+            <li key={k}>
+              <div className={'flex-row'}>
+                <div style={{ width: 100 }}>{v}</div>
+                <span>{'-'}</span>
+              </div>
+            </li>
+          ))}
         </ul>
       </div>
       <ul>
         <li>
-          <strong>二、发布分支：</strong>release
+          <strong style={{ marginRight: 20 }}>三、发布分支：</strong>
+          {proInfo?.release_project?.release_branch || '-'}
         </li>
         <li>
-          <strong>三、发布类型：</strong>灰度发布
+          <strong style={{ marginRight: 20 }}>四、发布类型：</strong>
+          {types[proInfo?.release_project?.release_type] || '-'}
         </li>
         <li>
-          <strong>四、发布方式：</strong>不停服
+          <strong style={{ marginRight: 20 }}>五、发布方式：</strong>
+          {methods[proInfo?.release_project?.release_method] || '-'}
         </li>
         <li>
-          <strong>五、发布时间：</strong>2022-03-08 12：11
+          <strong style={{ marginRight: 20 }}>六、发布时间：</strong>
+          {proInfo?.release_project?.release_date || '-'}
         </li>
       </ul>
       <div style={{ margin: '16px 0' }}>
-        <h3>六、检查信息：</h3>
+        <h3>七、检查信息：</h3>
         <ul style={{ marginLeft: 40 }}>
           {Object.entries(checkInfo).map(([k, v], index) => {
             const status = checkSource && checkSource[k];
@@ -98,7 +132,7 @@ const Approve = () => {
         </ul>
       </div>
       <div>
-        <h3>七、审批流程：</h3>
+        <h3>九、审批流程：</h3>
         <ApproveFlow
           data={[
             {
@@ -107,7 +141,7 @@ const Approve = () => {
               key: '101',
             },
             {
-              label: '刘德饭',
+              label: '丸子',
               value: '102',
               key: '102',
             },
@@ -115,7 +149,9 @@ const Approve = () => {
         />
       </div>
       <Space size={8}>
-        <Button type={'primary'}>提交审批</Button>
+        <Button type={'primary'} disabled={disabled}>
+          提交审批
+        </Button>
         <Button type={'primary'} style={{ color: '#ffb012' }}>
           撤销审批
         </Button>

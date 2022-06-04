@@ -1,7 +1,7 @@
 import { AgGridReact } from 'ag-grid-react';
 import { PageContainer } from '@ant-design/pro-layout';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Form, Row, Col, Select, DatePicker, Button } from 'antd';
 import type { CellClickedEvent, CellDoubleClickedEvent, GridApi } from 'ag-grid-community';
 
@@ -9,7 +9,7 @@ import { history, useModel } from 'umi';
 import moment from 'moment';
 import IPagination from '@/components/IPagination';
 import OnlineServices from '@/services/online';
-import { omit } from '@/utils/utils';
+import { omit, valueMap } from '@/utils/utils';
 import { publishColumn } from '../column';
 import { initGridTable, PUBLISH_RESULT } from '../constants';
 import { IRecord, MOMENT_FORMAT } from '@/namespaces';
@@ -17,22 +17,25 @@ import './index.less';
 
 const PublishList: React.ReactNode = () => {
   const gridApi = useRef<GridApi>();
-
   const { typeSelectors, projectSelectors, methodSelectors } = useModel('systemOnline');
-
-  const [publishSource, setPublishSource] = useState<IRecord[]>([]);
   const [form] = Form.useForm();
+  const [publishSource, setPublishSource] = useState<IRecord[]>([]);
   const [pages, setPages] = useState({
     page_size: 20,
     total: 0,
     page: 0,
   });
+
   const getList = async (page = 0, page_size = 20) => {
     const values = await form.getFieldsValue();
     const data = {
       ...values,
       page,
       page_size,
+      pro_id: values.pro_id?.join(','),
+      release_method: values.release_method?.join(','),
+      release_result: values.release_result?.join(','),
+      release_type: values.release_type?.join(','),
     };
     if (values.time) {
       data.release_start_time = values.time[0].startOf('years').format(MOMENT_FORMAT.utc);
@@ -55,7 +58,7 @@ const PublishList: React.ReactNode = () => {
     if (res?.ready_release_num) {
       history.push({
         pathname: '/systemOnline/prePublish/projectServices',
-        query: { idx: res?.ready_release_num, disable: '' },
+        query: { idx: res?.ready_release_num },
       });
     }
   };
@@ -64,6 +67,11 @@ const PublishList: React.ReactNode = () => {
     form.setFieldsValue({ time: [moment().startOf('years'), moment()] });
     getList();
   }, []);
+
+  const types = useMemo(() => valueMap(typeSelectors || [], ['value', 'label']), [typeSelectors]);
+  const methods = useMemo(() => valueMap(methodSelectors || [], ['value', 'label']), [
+    methodSelectors,
+  ]);
 
   return (
     <PageContainer>
@@ -128,7 +136,7 @@ const PublishList: React.ReactNode = () => {
       <Button onClick={onAdd} type="primary" style={{ marginBottom: 10 }}>
         新增发布
       </Button>
-      <div style={{ height: '400px', width: '100%' }}>
+      <div style={{ height: '600px', width: '100%' }}>
         <AgGridReact
           {...initGridTable(gridApi)}
           rowData={publishSource}
@@ -136,20 +144,13 @@ const PublishList: React.ReactNode = () => {
           onCellDoubleClicked={({ data }: CellDoubleClickedEvent) => {
             history.push({
               pathname: '/systemOnline/prePublish/projectServices',
-              query: { idx: data.release_num, disable: data.release_result || '' },
+              query: { idx: data.release_num },
             });
           }}
           frameworkComponents={{
-            typeFormat: ({ data }: CellClickedEvent) => (
-              <Select disabled bordered={false} options={typeSelectors} value={data.release_type} />
-            ),
+            typeFormat: ({ data }: CellClickedEvent) => <span>{types[data.release_type]}</span>,
             methodFormat: ({ data }: CellClickedEvent) => (
-              <Select
-                disabled
-                bordered={false}
-                options={methodSelectors}
-                value={data.release_method}
-              />
+              <span>{methods[data.release_method]}</span>
             ),
           }}
         />

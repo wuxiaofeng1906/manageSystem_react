@@ -12,7 +12,10 @@ const DeploySetting = (props: ModalFuncProps) => {
     query: { idx },
   } = useLocation() as any;
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
-  const [proInfo] = useModel('systemOnline', (system) => [system.proInfo]);
+  const [proInfo, disabled] = useModel('systemOnline', (system) => [
+    system.proInfo,
+    system.disabled,
+  ]);
   const onConfirm = async () => {
     const values = await form.getFieldsValue();
     if (!idx || !user?.userid) return;
@@ -26,12 +29,13 @@ const DeploySetting = (props: ModalFuncProps) => {
   };
 
   useEffect(() => {
-    // if (release_env) {
-    //   OnlineServices.getDeploySetting('').then((res) => {
-    //     form.setFieldsValue(res);
-    //   });
-    // }
-  }, []);
+    const env = proInfo?.release_project?.release_env;
+    if (env && props.visible) {
+      OnlineServices.getDeploySetting(env).then((res) => {
+        form.setFieldsValue(res);
+      });
+    }
+  }, [props.visible]);
 
   return (
     <Modal
@@ -48,27 +52,19 @@ const DeploySetting = (props: ModalFuncProps) => {
         <Divider plain>① backend-build-image</Divider>
         <Row>
           <Col span={5}>
-            <Form.Item
-              label={'全局数据库升级'}
-              name={'backend_is_upgrade_database'}
-              valuePropName="checked"
-            >
+            <Form.Item label={'全局数据库升级'} name={'DBUP_GLOBAL'} valuePropName="checked">
               <Switch checkedChildren="是" unCheckedChildren="否" />
             </Form.Item>
           </Col>
           <Col span={6}>
-            <Form.Item
-              label={'默认对租户数据库升级'}
-              name={'backend_is_upgrade_tenant'}
-              valuePropName="checked"
-            >
+            <Form.Item label={'默认对租户数据库升级'} name={'DBUP_TANANT'} valuePropName="checked">
               <Switch checkedChildren="是" unCheckedChildren="否" />
             </Form.Item>
           </Col>
           <Col span={6}>
             <Form.Item
               label={'是否进行黑盒测试，输出测试覆盖率'}
-              name={'backend_is_back_box_test'}
+              name={'black_box'}
               valuePropName="checked"
             >
               <Switch checkedChildren="是" unCheckedChildren="否" />
@@ -78,7 +74,7 @@ const DeploySetting = (props: ModalFuncProps) => {
         <Divider plain>② bpmn</Divider>
         <Form.Item
           label={'推送流程定义batch到运维平台上线，需上灰度/生产环境时打勾'}
-          name={'bpmn_is_batch'}
+          name={'Batch_ops'}
           valuePropName="checked"
         >
           <Switch checkedChildren="是" unCheckedChildren="否" />
@@ -89,37 +85,29 @@ const DeploySetting = (props: ModalFuncProps) => {
             label={
               '需要更新依赖（需要耗费比较长的时间执行 rush update --purge --full 命令来更新依赖）'
             }
-            name={'front_authapp_is_update_rely'}
+            name={'needUpdateDependences'}
             valuePropName="checked"
           >
             <Switch checkedChildren="是" unCheckedChildren="否" />
           </Form.Item>
-          <Form.Item
-            label={'启动sourcemap 方便调试'}
-            name={'front_authapp_is_source_map'}
-            valuePropName="checked"
-          >
+          <Form.Item label={'启动sourcemap 方便调试'} name={'sourcemap'} valuePropName="checked">
             <Switch checkedChildren="是" unCheckedChildren="否" />
           </Form.Item>
           <Form.Item
             label={'是否启动sentry 错误监控（如果此次打包需要上线，需要勾上）'}
-            name={'front_authapp_is_sentry_monitoring'}
+            name={'needSentry'}
             valuePropName="checked"
           >
             <Switch checkedChildren="是" unCheckedChildren="否" />
           </Form.Item>
           <Form.Item
             label={'是否需要打包两次，服务于自动化测试'}
-            name={'front_authapp_is_front_test'}
+            name={'needBuildTwice'}
             valuePropName="checked"
           >
             <Switch checkedChildren="是" unCheckedChildren="否" />
           </Form.Item>
-          <Form.Item
-            label={'是否需要前端测试用例报告'}
-            name={'test_report'}
-            valuePropName="checked"
-          >
+          <Form.Item label={'是否需要前端测试用例报告'} name={'report'} valuePropName="checked">
             <Switch checkedChildren="是" unCheckedChildren="否" />
           </Form.Item>
           <Form.Item label={'weAppEnv'} name={'front_authapp_web_app_env'} valuePropName="checked">
@@ -134,29 +122,17 @@ const DeploySetting = (props: ModalFuncProps) => {
         <Divider plain>④front-authapp</Divider>
         <Row>
           <Col span={6}>
-            <Form.Item
-              label={'是否需要上传到sentry'}
-              name={'front_static_is_upload_sentry'}
-              valuePropName="checked"
-            >
+            <Form.Item label={'是否需要上传到sentry'} name={'SENTRY'} valuePropName="checked">
               <Switch checkedChildren="是" unCheckedChildren="否" />
             </Form.Item>
           </Col>
           <Col span={5}>
-            <Form.Item
-              label={'自动化测试'}
-              name={'front_static_is_automation_test'}
-              valuePropName="checked"
-            >
+            <Form.Item label={'自动化测试'} name={'AUTOMATION_TEST'} valuePropName="checked">
               <Switch checkedChildren="是" unCheckedChildren="否" />
             </Form.Item>
           </Col>
           <Col span={5}>
-            <Form.Item
-              label={'单元测试'}
-              name={'front_static_is_test_unit'}
-              valuePropName="checked"
-            >
+            <Form.Item label={'单元测试'} name={'UNIT_TEST'} valuePropName="checked">
               <Switch checkedChildren="是" unCheckedChildren="否" />
             </Form.Item>
           </Col>

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Layout, Form, Select, DatePicker, Menu } from 'antd';
 import { history, useModel, useLocation } from 'umi';
 
@@ -9,24 +9,25 @@ import { MOMENT_FORMAT } from '@/namespaces';
 
 const PreLayout = ({ location, children }: { location: any; children: React.ReactNode }) => {
   const {
-    query: { idx, disable },
+    query: { idx },
   } = useLocation() as any;
   const [activePath, setActivePath] = useState([
     location.pathname.split('/systemOnline/prePublish/')[1] || 'projectServices',
   ]);
-  const { typeSelectors, methodSelectors, updateColumn, proInfo, getProInfo } = useModel(
+  const { typeSelectors, methodSelectors, updateColumn, proInfo, getProInfo, disabled } = useModel(
     'systemOnline',
   );
   const [form] = Form.useForm();
-  const isDisable = useMemo(() => disable == 'success', [disable]);
 
   const update = async (type: any, values: any) => {
-    if (idx && !isDisable) {
+    if (idx && !disabled) {
       await updateColumn({
         ...values,
         release_num: idx,
         release_date: moment(values.release_date).format(MOMENT_FORMAT.utc),
-        release_project: proInfo?.release_project?.release_project || '',
+        release_project: type == 'create' ? '' : proInfo?.release_project?.release_project || '',
+        release_env: type == 'create' ? '' : proInfo?.release_project?.release_env || '',
+        release_branch: type == 'create' ? '' : proInfo?.release_project?.release_branch || '',
       });
       await getProInfo(idx);
     }
@@ -35,11 +36,11 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
   // create or query
   useEffect(() => {
     getProInfo(idx).then((res) => {
-      if (!Object.keys(res?.release_project).length) {
+      if (res && !Object.keys(res?.release_project).length) {
         update('create', {
           release_type: typeSelectors?.[0]?.value,
           release_method: methodSelectors?.[0]?.value,
-          release_result: PUBLISH_RESULT[0]?.value,
+          release_result: PUBLISH_RESULT[0].value,
           release_date: moment().hour(23).minute(0).seconds(0),
         });
       }
@@ -62,21 +63,22 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
           <div className={styles.formWrap}>
             <Form form={form} onValuesChange={update}>
               <Form.Item label={'发布类型'} name={'release_type'}>
-                <Select disabled={isDisable} options={typeSelectors} />
+                <Select disabled={disabled} options={typeSelectors} />
               </Form.Item>
               <Form.Item label={'发布方式'} name={'release_method'}>
-                <Select disabled={isDisable} options={methodSelectors} />
+                <Select disabled={disabled} options={methodSelectors} />
               </Form.Item>
               <Form.Item label={'发布时间'} name={'release_date'}>
                 <DatePicker
-                  format={'YYYY-MM-DD HH:mm'}
+                  format={MOMENT_FORMAT.utc}
                   style={{ width: '100%' }}
-                  disabled={isDisable}
+                  disabled={disabled}
                   allowClear={false}
+                  showTime
                 />
               </Form.Item>
               <Form.Item label={'发布结果'} name={'release_result'}>
-                <Select options={PUBLISH_RESULT} disabled={isDisable} />
+                <Select options={PUBLISH_RESULT} disabled={disabled} />
               </Form.Item>
             </Form>
           </div>

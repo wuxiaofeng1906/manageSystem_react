@@ -2,10 +2,27 @@ import type { ColDef,GridReadyEvent,GridApi } from 'ag-grid-community';
 import cls from 'classnames';
 
 const STATUS_MAP = [
-    {label:'空',value:'unknown',key:'unknown'},
+    {label:' ',value:'unknown',key:'unknown'},
     {label:'是',value:'yes',key:'yes'},
     {label:'否',value:'no',key:'no'},
 ]
+const COMMON_STATUS={
+    yes:'是',
+    no:'否',
+    success: '发布成功',
+    feature: '发布失败',
+    businessFront:'业务前端',
+    businessBackend: '业务后端',
+    platformBackend: '平台后端' ,
+    process:'流程'
+}
+
+  const SERVERINFO = {
+    front: '业务前端',
+    backend: '业务后端',
+    platform: '平台后端',
+    process: '流程',
+};
 const WEAPPENV = [
     {label:'beta',value:'beta',key:'beta'},
     {label:'development',value:'development',key:'development'},
@@ -32,7 +49,7 @@ const MENUS = [
     // { label: '总览', key: 'overview' },
   ];  
 
-const initColDef: ColDef = { resizable: true, suppressMenu: true };
+const initColDef: ColDef = { resizable: true, suppressMenu: true};
 
 const onGridReady = (params: GridReadyEvent,ref: React.MutableRefObject<GridApi | undefined>) => {
     ref.current = params.api;
@@ -42,13 +59,16 @@ const onGridReady = (params: GridReadyEvent,ref: React.MutableRefObject<GridApi 
 /*
     ref：绑定当前grid-react ref参数,
     border:默认有边框
+    height: 表格行高、格头高度
     options:其他colDef配置参数
 */ 
-const initGridTable = (ref: React.MutableRefObject<GridApi | undefined>,border=true,options?: ColDef)=>({
+const initGridTable = (ref: React.MutableRefObject<GridApi | undefined>,border=true,height =32,options?: ColDef)=>({
     className:cls('ag-theme-alpine', 'ag-initialize-theme'),
-    defaultColDef:{...initColDef,...(border? { cellStyle: { 'border-right': 'solid 0.5px #E3E6E6' }}:{}), ...options},
+    defaultColDef:{...initColDef,...{ cellStyle: { ...(border? {'border-right': 'solid 0.5px #E3E6E6'}:{}),'line-height':`${height}px` }},...options},
     onGridReady:(v: GridReadyEvent)=>onGridReady(v, ref),
-    onGridSizeChanged:(v: GridReadyEvent)=>onGridReady(v, ref)
+    onGridSizeChanged:(v: GridReadyEvent)=>onGridReady(v, ref),
+    rowHeight:height,
+    headerHeight:height
 })
 
-export {STATUS_MAP ,PUBLISH_RESULT,SETTING_STATUS,MENUS,WEAPPENV,initGridTable};
+export {STATUS_MAP ,COMMON_STATUS,PUBLISH_RESULT,SETTING_STATUS,MENUS,WEAPPENV,SERVERINFO,initGridTable};

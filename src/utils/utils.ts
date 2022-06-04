@@ -25,7 +25,7 @@ export const isAntDesignProOrDev = (): boolean => {
  * 从对象中排除某些属性
  * @param obj
  * @param keys
- * @example obj: {a:1,b:2,c:3} keys: ['a'] => {b:2,c:3}
+ * @example obj: {a:1,b:2,c:3} keys: ['a'] result: {b:2,c:3}
  */
 export const omit = <T extends IRecord,K extends keyof T = keyof T>
 (obj: T,keys: K[]): Omit<T, K> => {
@@ -41,7 +41,7 @@ export const omit = <T extends IRecord,K extends keyof T = keyof T>
  * 从对象中选择某些属性
  * @param obj
  * @param keys
- * @example obj: {a:1,b:2,c:3} keys: ['a'] => {a:1}
+ * @example obj: {a:1,b:2,c:3} keys: ['a'] result: {a:1}
  */
 
 export const pick = <T extends IRecord,K extends keyof T = keyof T>(
@@ -56,7 +56,7 @@ export const pick = <T extends IRecord,K extends keyof T = keyof T>(
  * 从数组对象中将key值修改为指定key
  * @param arr
  * @param keys
- * @example arr: [{a:1,b:2,c:3,...}], keys: [{a:'key',b:'value',c:'label'}] => [{key:1,value:2,label:3,...}]
+ * @example arr: [{a:1,b:2,c:3,...}], keys: [{a:'key',b:'value',c:'label'}] result: [{key:1,value:2,label:3,...}]
  */ 
 
 export const replaceKeyMap = <T extends IRecord, K extends keyof T = keyof T>(arr: T[], replaceKeys: Record<K,string>[]): IRecord[]=>{
@@ -103,3 +103,14 @@ function has(key: string): boolean {
   return false;
 }
 export const storage = { set, get, remove, has };
+
+export function valueMap(option: IRecord[],values: string[]) {
+  const result: IRecord ={};
+  option.forEach(it=>{
+    if(it.hasOwnProperty(values[0]) && it.hasOwnProperty(values[1])){
+      result[it[values[0]]] = it[values[1]]
+    }
+  })
+  return result;
+}
+export const isEmpty = (val: any) => val == null || !(Object.keys(val) || val).length;

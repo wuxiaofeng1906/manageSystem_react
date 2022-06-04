@@ -1,14 +1,9 @@
 import { PreServices } from '@/namespaces';
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import { ColumnsType } from 'antd/lib/table';
+import { COMMON_STATUS } from './constants';
 
-const common_status={
-  yes:'是',
-  no:'否',
-  success: '发布成功',
-  feature: '发布失败'
-}
-const cellRenderStatus = ( {value}: any)=> `<span class="${['no','unknow'].includes(value) ? '': (['yes','success'].includes(value))?'color-success':'color-feature'}">${common_status[value] ||''}</span>`
+const cellRenderStatus = ( {value}: any)=> `<span class="${['no','unknow'].includes(value) ? '': (['yes','success'].includes(value))?'color-success':'color-feature'}">${COMMON_STATUS[value] ||''}</span>`
 const formatDeployStatus = ({ value }: any)=>`<span class="color-${value}">${value}</span>`
 // 发布列表
 const publishColumn: (ColDef | ColGroupDef)[] = [
@@ -37,7 +32,6 @@ const publishColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '发布分支',
     field: 'release_branch',
-    cellRenderer: 'branchFormat'
   },
   {
     headerName: '发布类型',

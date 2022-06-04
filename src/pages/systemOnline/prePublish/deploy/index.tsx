@@ -10,7 +10,7 @@ import OnlineServices from '@/services/online';
 import { useLocation } from 'umi';
 const Deploy = () => {
   const {
-    query: { idx, disable },
+    query: { idx },
   } = useLocation() as any;
   const gridApi = useRef<GridApi>();
   const [deploySetting, setDeploySetting] = useState(false);

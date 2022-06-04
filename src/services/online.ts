@@ -18,6 +18,10 @@ const OnlineServices = {
   async releaseBranch() {
     return request(`${baseUrl}/branch`);
   },
+  // 镜像环境
+  async imageEnv() {
+    return request('/api/verify/project/image_env');
+  },
   // 前端应用
   async frontApp() {
     return request(`${baseUrl}/front_app`);
@@ -41,12 +45,12 @@ const OnlineServices = {
   },
   // 预发布分支和环境填写
   async updatePreProject(data: any) {
-    return request(`${baseUrl}/project`,{method:'post',data});
+    return request(`${baseUrl}/project`,{method:'post',data,msg:'更新成功'});
   },
   
   // 更新发布服务
   async updatePublishServer(data: any) {
-    return request(`${baseUrl}/server`,{method:'put',data});
+    return request(`${baseUrl}/server`,{method:'put',data,msg:'更新成功'});
   },
 
   // 升级接口排序
@@ -55,7 +59,7 @@ const OnlineServices = {
   },
   // 更新升级接口
   async updatePreInterface(data: any) {
-    return request(`${baseUrl}/interface`,{method:'put',data});
+    return request(`${baseUrl}/interface`,{method:'put',data,msg:'更新成功'});
   },
 
   // 项目关联服务列表【前端服务配置】
@@ -63,10 +67,10 @@ const OnlineServices = {
     return request(`${baseUrl}/project_server`,{params});
   },
   async addProjectServer(data: any) {
-    return request(`${baseUrl}/project_server`,{method:'post',data});
+    return request(`${baseUrl}/project_server`,{method:'post',data, msg:data.pro_server_id?'更新成功':'新增成功'});
   },
   async removeProjectServer(data: {user_id: string,pro_server_id: number}) {
-    return request(`${baseUrl}/project_server`,{method:'delete',data});
+    return request(`${baseUrl}/project_server`,{method:'delete',data,msg:'删除成功'});
   },
 
   // 部署服务列表
@@ -95,7 +99,7 @@ const OnlineServices = {
   },
    // 更新分支检查参数
    async updateCheckBranchInfo(data: any) {
-    return request(`${baseUrl}/version_check`,{data, method:'put'});
+    return request(`${baseUrl}/release_check_version`,{data, method:'put',msg:'更新成功'});
   },
   
 };

@@ -1,20 +1,20 @@
-import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Form, Row, Col, Select, Space, Modal, Table } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import {
   projectUpgradeColumn,
-  serviceColumn,
   upgradeSQLColumn,
   dataReviewColumn,
 } from '@/pages/systemOnline/column';
 import type { CellClickedEvent, GridApi } from 'ag-grid-community';
-import { initGridTable } from '@/pages/systemOnline/constants';
+import { COMMON_STATUS, initGridTable } from '@/pages/systemOnline/constants';
 import { useModel, useLocation } from 'umi';
 import EditUpgrade from './EditUpgrade';
 import EditServices from './EditServices';
 import EditSql from './EditSql';
 import OnlineServices from '@/services/online';
 import type { PreServices, PreSql, PreUpgradeItem } from '@/namespaces/interface';
+import { ColumnsType } from 'antd/lib/table/Table';
 
 type enumType = 'upgrade' | 'services' | 'sql';
 interface Istate<T> {
@@ -23,11 +23,17 @@ interface Istate<T> {
 }
 const ProjectServices = () => {
   const {
-    query: { idx, disable },
+    query: { idx },
   } = useLocation() as any;
-  const { projectSelectors, branchSelectors, getProInfo, updateColumn, proInfo } = useModel(
-    'systemOnline',
-  );
+  const {
+    projectSelectors,
+    branchSelectors,
+    imageEnvSelector,
+    getProInfo,
+    updateColumn,
+    proInfo,
+    disabled,
+  } = useModel('systemOnline');
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [form] = Form.useForm();
 
@@ -39,27 +45,29 @@ const ProjectServices = () => {
   const [editServices, setEditServices] = useState<Istate<PreServices> | null>();
   const [editSql, setEditSql] = useState<Istate<PreSql> | null>();
 
-  const updatePreData = async (value: any) => {
-    if (value.release_branch) {
-      console.log(value.release_branch);
+  const updatePreData = async (value: any, values: any) => {
+    // if (value.release_branch) {
+    //   // 分支对应环境
+    // }
 
-      // refresh env
-    }
-    if (value.release_project) {
+    if (value.release_project || value.release_branch || value.release_env) {
       await updateColumn({
         ...proInfo?.release_project,
-        release_project: value.release_project.join(','),
+        release_project: values.release_project?.join(',') || '',
+        release_branch: values.release_branch || '',
+        release_env: values.release_env || '',
       });
       getProInfo(idx);
     }
   };
 
   useEffect(() => {
-    if (proInfo?.release_project?.release_project) {
-      form.setFieldsValue({
-        release_project: proInfo.release_project.release_project.split(',') || [],
-      });
-    }
+    const info = proInfo?.release_project;
+    form.setFieldsValue({
+      release_project: info?.release_project ? info.release_project.split(',') : [],
+      release_branch: info?.release_branch,
+      release_env: info?.release_env,
+    });
   }, [JSON.stringify(proInfo)]);
 
   // drag
@@ -79,7 +87,7 @@ const ProjectServices = () => {
         <img
           src={require('../../../../../public/edit.png')}
           onClick={() => {
-            if (disable == 'success') return;
+            if (disabled) return;
             const params = { visible: true, data };
             if (type == 'upgrade') setEditUpgrade(params);
             else if (type == 'services') setEditServices(params);
@@ -138,7 +146,51 @@ const ProjectServices = () => {
     });
     return arr;
   };
-  const isDisable = useMemo(() => disable == 'success', [disable]);
+  const serviceColumn: ColumnsType<PreServices> = [
+    {
+      title: '序号',
+      dataIndex: 'server_id',
+      align: 'center',
+      onCell: (it) => ({ rowSpan: it.rowSpan || 0 }),
+    },
+    {
+      title: '上线环境',
+      dataIndex: 'cluster_name',
+      align: 'center',
+      onCell: (it) => ({ rowSpan: it.rowSpan || 0 }),
+      className: 'required',
+    },
+    {
+      title: '应用',
+      align: 'center',
+      dataIndex: 'app_name',
+    },
+    {
+      title: '对应侧',
+      align: 'center',
+      dataIndex: 'technical_side',
+      render: (v) => <span>{COMMON_STATUS[v]}</span>,
+    },
+    {
+      title: '是否封板',
+      align: 'center',
+      dataIndex: 'is_seal',
+      className: 'required',
+      render: (v) => <span className={`${v == 'yes'}? color-success:''`}>{COMMON_STATUS[v]}</span>,
+    },
+    {
+      title: '封板时间',
+      align: 'center',
+      dataIndex: 'seal_time',
+    },
+    {
+      title: '操作',
+      align: 'center',
+      dataIndex: 'operation',
+      width: 120,
+      render: (_, record) => OperationDom(record, 'services'),
+    },
+  ];
 
   return (
     <div>
@@ -155,7 +207,7 @@ const ProjectServices = () => {
                 mode="multiple"
                 maxTagCount="responsive"
                 optionFilterProp="label"
-                disabled={isDisable}
+                disabled={disabled}
                 filterOption={(input, option) =>
                   ((option!.label as unknown) as string)?.includes(input)
                 }
@@ -164,12 +216,20 @@ const ProjectServices = () => {
           </Col>
           <Col span={6}>
             <Form.Item label={'预发布分支'} name={'release_branch'}>
-              <Select options={branchSelectors} style={{ width: '100%' }} disabled={isDisable} />
+              <Select disabled={disabled} style={{ width: '100%' }}>
+                {branchSelectors?.map((it) => (
+                  <Select.Option key={it.label}>{it.label}</Select.Option>
+                ))}
+              </Select>
             </Form.Item>
           </Col>
           <Col span={8}>
             <Form.Item label={'测试环境绑定'} name={'release_env'}>
-              <Select disabled={isDisable} options={[]} style={{ width: '100%' }} />
+              <Select disabled={disabled} style={{ width: '100%' }}>
+                {imageEnvSelector?.map((it) => (
+                  <Select.Option key={it.label}>{it.label}</Select.Option>
+                ))}
+              </Select>
             </Form.Item>
           </Col>
         </Row>
@@ -200,21 +260,13 @@ const ProjectServices = () => {
         <span className="color-tips">【由后端负责人/前端值班/后端值班/流程值班人员填写】</span>
       </h4>
       <Table
-        rowKey="id"
-        bordered
+        rowKey="server_id"
         size="small"
+        bordered
         dataSource={formatTable(proInfo?.upgrade_app || [])}
         pagination={false}
-        columns={[
-          ...serviceColumn,
-          {
-            title: '操作',
-            align: 'center',
-            dataIndex: 'operation',
-            width: 120,
-            render: (_, record) => OperationDom(record, 'services'),
-          },
-        ]}
+        columns={serviceColumn}
+        style={{ marginBottom: 20 }}
       />
       <h4>
         四、升级接口&升级SQL填写 <span className="color-tips">【前后端值班核对确认】</span>

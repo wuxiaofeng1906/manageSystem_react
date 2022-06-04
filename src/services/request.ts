@@ -96,8 +96,7 @@ function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg
     }
     return res?.data;
   }).catch((err)=>{
-    console.log(err);
-    
+    // console.log(err);  
   });
 }
 

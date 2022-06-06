@@ -158,7 +158,7 @@ const Approve = () => {
           rows={5}
           showCount
           maxLength={500}
-          style={{ width: 500, marginLeft: 40 }}
+          style={{ width: 512, marginLeft: 40 }}
           placeholder={'审批备注...'}
         />
       </div>

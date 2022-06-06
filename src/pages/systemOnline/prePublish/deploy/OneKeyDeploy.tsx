@@ -15,7 +15,7 @@ const OneKeyDeploy = (props: ModalFuncProps) => {
 
   const onFinish = async () => {
     if (!idx || disabled) return;
-    const values = await form.getFieldsValue();
+    const values = await form.validateFields();
     const res = await OnlineServices.deployConfirm({
       user_id: currentUser?.userid,
       release_num: idx,
@@ -65,6 +65,7 @@ const OneKeyDeploy = (props: ModalFuncProps) => {
                 title: '全部',
                 value: 'all',
                 children: list,
+                disabled: list.length == 0,
               },
             ]}
           />

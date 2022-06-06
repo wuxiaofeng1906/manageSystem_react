@@ -80,10 +80,6 @@ function localCacheWrap(url: string, options: any) {
 function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg?: any) {
   return mRequest.then((res) => {
     if (res && res?.code !== 200) {
-      if (res?.code == 401 && forceLogin) {
-        localStorage.removeItem('accessId');
-        // 重新登录
-      }
       if (warn) {
         // eslint-disable-next-line no-param-reassign
         if (warn === true) warn = '';
@@ -95,8 +91,6 @@ function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg
       message.success(msg === true ? res.msg : msg);
     }
     return res?.data;
-  }).catch((err)=>{
-    // console.log(err);  
   });
 }
 

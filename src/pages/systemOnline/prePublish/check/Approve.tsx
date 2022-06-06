@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { useModel } from 'umi';
-import { Button, Divider, Space } from 'antd';
+import { useModel, history } from 'umi';
+import { Button, Input, Space } from 'antd';
 import styles from './index.less';
 import ApproveFlow from '../../components/ApproveFlow';
 import { valueMap } from '@/utils/utils';
-import { SERVERINFO } from '../../constants';
+import { COMMON_STATUS } from '../../constants';
 
 const checkStatus = {
   green: '#099409',
@@ -55,15 +55,15 @@ const Approve = () => {
   useEffect(() => {
     setCheckSource({
       web: '暂无',
-      backend: '是',
-      icon: '是',
-      version: '是',
-      dbs: '否',
-      env: '进行中',
+      backend: '暂无',
+      icon: '暂无',
+      version: '暂无',
+      dbs: '暂无',
+      env: '暂无',
       onlineBefore: '未开始',
       upgradeAfter: '忽略',
-      webVersion: '未封板',
-      backendVersion: '已封板',
+      webVersion: '暂无',
+      backendVersion: '暂无',
     });
   }, []);
   const renderColor = useCallback((v: string): React.CSSProperties => {
@@ -76,10 +76,10 @@ const Approve = () => {
   }, []);
 
   const types = useMemo(() => valueMap(typeSelectors || [], ['value', 'label']), [typeSelectors]);
-  const methods = useMemo(() => valueMap(methodSelectors || [], ['value', 'label']), [
-    methodSelectors,
-  ]);
-
+  const methods = useMemo(
+    () => valueMap(methodSelectors || [], ['value', 'label']),
+    [methodSelectors],
+  );
   return (
     <div className={styles.approve}>
       <div>
@@ -89,14 +89,16 @@ const Approve = () => {
       <div style={{ margin: '16px 0' }}>
         <h3>二、发布服务</h3>
         <ul style={{ marginLeft: 40 }}>
-          {Object.entries(SERVERINFO).map(([k, v]) => (
-            <li key={k}>
-              <div className={'flex-row'}>
-                <div style={{ width: 100 }}>{v}</div>
-                <span>{'-'}</span>
-              </div>
-            </li>
-          ))}
+          {proInfo?.upgrade_app.map((it) => {
+            return (
+              <li key={it.server_id}>
+                <div className={'flex-row'}>
+                  <div>{COMMON_STATUS[it.technical_side] || ''}:</div>
+                  <span style={{ marginLeft: 40 }}>{it.app_name || '-'}</span>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </div>
       <ul>
@@ -113,12 +115,31 @@ const Approve = () => {
           {methods[proInfo?.release_project?.release_method] || '-'}
         </li>
         <li>
-          <strong style={{ marginRight: 20 }}>六、发布时间：</strong>
+          <strong style={{ marginRight: 20 }}>六、发布集群：</strong>
+          {methods[proInfo?.release_project?.release_method] || '-'}
+        </li>
+        <li>
+          <strong style={{ marginRight: 20 }}>七、发布时间：</strong>
           {proInfo?.release_project?.release_date || '-'}
         </li>
       </ul>
+      <div className={'flex-row'}>
+        <h3 style={{ margin: 0 }}>八、检查详情：</h3>
+        <Button
+          onClick={() => {
+            history.push({
+              pathname: '/systemOnline/prePublish/check',
+              query: { ...history.location.query },
+              state: { key: 'detail' },
+            });
+          }}
+          type={'link'}
+        >
+          点击进入
+        </Button>
+      </div>
       <div style={{ margin: '16px 0' }}>
-        <h3>七、检查信息：</h3>
+        <h3>九、检查信息：</h3>
         <ul style={{ marginLeft: 40 }}>
           {Object.entries(checkInfo).map(([k, v], index) => {
             const status = checkSource && checkSource[k];
@@ -131,21 +152,32 @@ const Approve = () => {
           })}
         </ul>
       </div>
+      <div style={{ margin: '10px 0' }}>
+        <h3>十、备注</h3>
+        <Input.TextArea
+          rows={5}
+          showCount
+          maxLength={500}
+          style={{ width: 500, marginLeft: 40 }}
+          placeholder={'审批备注...'}
+        />
+      </div>
       <div>
-        <h3>九、审批流程：</h3>
+        <h3>十一、审批流程：</h3>
         <ApproveFlow
-          data={[
-            {
-              label: '张三',
-              value: '101',
-              key: '101',
-            },
-            {
-              label: '丸子',
-              value: '102',
-              key: '102',
-            },
-          ]}
+          // data={[
+          //   {
+          //     label: '张三',
+          //     value: '101',
+          //     key: '101',
+          //   },
+          //   {
+          //     label: '丸子',
+          //     value: '102',
+          //     key: '102',
+          //   },
+          // ]}
+          data={[]}
         />
       </div>
       <Space size={8}>

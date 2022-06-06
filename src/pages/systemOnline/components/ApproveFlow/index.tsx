@@ -31,7 +31,7 @@ const ApproveFlow = ({ data, disabled }: IFlow) => {
         <Timeline.Item dot={<UserOutlined />}>
           <div>
             <p>发起人</p>
-            <p>发发七</p>
+            <p>test</p>
           </div>
         </Timeline.Item>
         <Timeline.Item dot={<UserOutlined />}>

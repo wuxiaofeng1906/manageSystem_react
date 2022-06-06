@@ -23,7 +23,7 @@ const Detail = () => {
         start_time: '2022-03-21 22:12:12',
         end_time: '2022-03-21 22:12:12',
       },
-      { type: '创建库对比校验是否通过', status: '是', start_time: '', end_time: '' },
+      { type: '创建库对比校验是否通过', status: '暂无', start_time: '', end_time: '' },
       {
         type: '应用版本代码遗漏检查是否通过',
         status: '否',
@@ -40,7 +40,7 @@ const Detail = () => {
       },
       {
         type: '上线环境与预发布集群环境版本检查是否通过',
-        status: '是',
+        status: '暂无',
         start_time: '2022-03-21 22:12:12',
         end_time: '2022-03-21 22:12:12',
         refresh: true,
@@ -86,7 +86,11 @@ const Detail = () => {
                 )}
                 <img
                   src={require('../../../../../public/logs.png')}
+                  style={
+                    data.status == '暂无' ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {}
+                  }
                   onClick={() => {
+                    if (data.status == '暂无') return;
                     console.log(data);
                   }}
                 />

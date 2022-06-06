@@ -51,6 +51,7 @@ const EditServices = (props: IEditServices) => {
       onOk={onFinish}
       maskClosable={false}
       confirmLoading={loading}
+      centered
     >
       <Form form={form} wrapperCol={{ span: 16 }} labelCol={{ span: 6 }}>
         <Form.Item

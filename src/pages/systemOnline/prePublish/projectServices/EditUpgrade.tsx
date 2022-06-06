@@ -49,6 +49,7 @@ const EditUpgrade = (props: IEditUprade) => {
       onOk={onConfirm}
       maskClosable={false}
       confirmLoading={loading}
+      centered
     >
       <Form form={form} wrapperCol={{ span: 14 }} labelCol={{ span: 9 }}>
         <Form.Item name="project_name" label="项目名称">

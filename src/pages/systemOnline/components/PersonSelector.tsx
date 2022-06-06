@@ -22,33 +22,33 @@ const PersonSelector = (props: ModalFuncProps & { data: OptionType[] }) => {
   };
   useEffect(() => {
     if (props.visible) {
-      setList([
-        {
-          label: '张三',
-          value: '101',
-          key: '101',
-        },
-        {
-          label: '刘德饭',
-          value: '102',
-          key: '102',
-        },
-        {
-          label: '王麻子',
-          value: '201',
-          key: '201',
-        },
-        {
-          label: '赵思',
-          value: '202',
-          key: '202',
-        },
-        {
-          label: '加斯',
-          value: '203',
-          key: '203',
-        },
-      ]);
+      // setList([
+      //   {
+      //     label: '张三',
+      //     value: '101',
+      //     key: '101',
+      //   },
+      //   {
+      //     label: '刘德饭',
+      //     value: '102',
+      //     key: '102',
+      //   },
+      //   {
+      //     label: '王麻子',
+      //     value: '201',
+      //     key: '201',
+      //   },
+      //   {
+      //     label: '赵思',
+      //     value: '202',
+      //     key: '202',
+      //   },
+      //   {
+      //     label: '加斯',
+      //     value: '203',
+      //     key: '203',
+      //   },
+      // ]);
       setCheckData(props.data?.map((it) => it.value) || []);
     }
   }, [props.visible, props.data]);
@@ -59,6 +59,7 @@ const PersonSelector = (props: ModalFuncProps & { data: OptionType[] }) => {
       maskClosable={false}
       onOk={() => props.onOk?.(formatNode())}
       onCancel={props.onCancel}
+      centered
     >
       <Select
         showArrow

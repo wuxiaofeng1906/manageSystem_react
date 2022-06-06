@@ -48,6 +48,7 @@ const EditSql = (props: IEditSql) => {
       onOk={onConfirm}
       maskClosable={false}
       confirmLoading={loading}
+      centered
     >
       <Form form={form} wrapperCol={{ span: 16 }} labelCol={{ span: 6 }}>
         <Form.Item name="update_type" label="升级类型">

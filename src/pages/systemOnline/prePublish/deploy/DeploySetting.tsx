@@ -149,11 +149,6 @@ const DeploySetting = (props: ModalFuncProps) => {
           </Col>
         </Row>
       </Form>
-      <Divider plain>⑤ 全局</Divider>
-      <Space size={16}>
-        <span>前端是否封板：否</span>
-        <span>后端是否封板：否</span>
-      </Space>
     </Modal>
   );
 };

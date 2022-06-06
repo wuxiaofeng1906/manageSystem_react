@@ -80,6 +80,24 @@ const Approve = () => {
     () => valueMap(methodSelectors || [], ['value', 'label']),
     [methodSelectors],
   );
+
+  // technical_side group
+  const formatServerInfo = useMemo(() => {
+    let result: any[] = [];
+    ['businessFront', 'businessBackend', 'platformBackend', 'process'].map((it, i) => {
+      proInfo?.upgrade_app?.map((obj) => {
+        if (obj.technical_side == it) {
+          result[i] = {
+            app_name: [...(result[i]?.app_name || ''), obj.app_name],
+            technical_side: COMMON_STATUS[obj.technical_side] || '',
+            server_id: obj.server_id || 1,
+          };
+        }
+      });
+    });
+    return result || [];
+  }, [proInfo?.upgrade_app]);
+
   return (
     <div className={styles.approve}>
       <div>
@@ -89,12 +107,12 @@ const Approve = () => {
       <div style={{ margin: '16px 0' }}>
         <h3>二、发布服务</h3>
         <ul style={{ marginLeft: 40 }}>
-          {proInfo?.upgrade_app.map((it) => {
+          {formatServerInfo?.map((it) => {
             return (
               <li key={it.server_id}>
                 <div className={'flex-row'}>
-                  <div>{COMMON_STATUS[it.technical_side] || ''}:</div>
-                  <span style={{ marginLeft: 40 }}>{it.app_name || '-'}</span>
+                  <div style={{ width: 110 }}>{it.technical_side}:</div>
+                  <span>{it.app_name?.join() || '-'}</span>
                 </div>
               </li>
             );

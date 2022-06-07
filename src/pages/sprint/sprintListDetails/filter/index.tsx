@@ -303,6 +303,7 @@ const getAssignedToOption = (personName: any, gridData: any) => {
   if (!personName) {
     return [];
   }
+
   const optionArray: any = [];
   personName.forEach((name: string) => {
     let count = 0;
@@ -333,6 +334,7 @@ const getTesterOption = (personName: any, gridData: any) => {
   if (!personName) {
     return [];
   }
+
   const optionArray: any = [];
   personName.forEach((name: string) => {
     let count = 0;
@@ -364,6 +366,7 @@ const getSolvedByOption = (personName: any, gridData: any) => {
   if (!personName) {
     return [];
   }
+
   const optionArray: any = [];
   personName.forEach((name: string) => {
     let count = 0;

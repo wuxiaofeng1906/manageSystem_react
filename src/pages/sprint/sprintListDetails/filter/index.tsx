@@ -300,7 +300,9 @@ const getTypeOption = (gridData: any) => {
 
 // 指派给下拉框
 const getAssignedToOption = (personName: any, gridData: any) => {
-
+  if (!personName) {
+    return [];
+  }
   const optionArray: any = [];
   personName.forEach((name: string) => {
     let count = 0;
@@ -328,6 +330,9 @@ const getAssignedToOption = (personName: any, gridData: any) => {
 // 测试下拉框
 const getTesterOption = (personName: any, gridData: any) => {
 
+  if (!personName) {
+    return [];
+  }
   const optionArray: any = [];
   personName.forEach((name: string) => {
     let count = 0;
@@ -356,6 +361,9 @@ const getTesterOption = (personName: any, gridData: any) => {
 
 // 由谁解决
 const getSolvedByOption = (personName: any, gridData: any) => {
+  if (!personName) {
+    return [];
+  }
   const optionArray: any = [];
   personName.forEach((name: string) => {
     let count = 0;

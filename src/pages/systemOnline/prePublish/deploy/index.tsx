@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import { Button, message, Space } from 'antd';
+import { Button, message, Space, Spin } from 'antd';
 import { deployColumn } from '@/pages/systemOnline/column';
 import type { CellClickedEvent, GridApi } from 'ag-grid-community';
 import DeploySetting from '@/pages/systemOnline/prePublish/deploy/DeploySetting';
@@ -14,12 +14,16 @@ const Deploy = () => {
     query: { idx },
   } = useLocation() as any;
   const gridApi = useRef<GridApi>();
+  const [release_project] = useModel('systemOnline', (system) => [system.proInfo?.release_project]);
+
   const [deploySetting, setDeploySetting] = useState(false);
   const [oneKeyDeploy, setOneKeyDeploy] = useState(false);
   const [list, setList] = useState([]);
-  const [release_project] = useModel('systemOnline', (system) => [system.proInfo?.release_project]);
+  const [spinning, setSpinning] = useState(false);
+
   const getTableList = async () => {
-    const result = await OnlineServices.deployList(idx);
+    setSpinning(true);
+    const result = await OnlineServices.deployList(idx).finally(() => setSpinning(false));
     setList(result);
   };
 
@@ -29,7 +33,7 @@ const Deploy = () => {
   }, [idx]);
 
   return (
-    <div>
+    <Spin spinning={spinning} tip={'数据加载中...'}>
       <Space size={16}>
         <Button
           type={'primary'}
@@ -80,7 +84,7 @@ const Deploy = () => {
           getTableList();
         }}
       />
-    </div>
+    </Spin>
   );
 };
 export default Deploy;

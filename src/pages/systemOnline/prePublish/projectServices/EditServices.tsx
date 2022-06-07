@@ -14,7 +14,7 @@ interface IEditServices extends ModalFuncProps {
 const EditServices = (props: IEditServices) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [imageEnvSelector] = useModel('systemOnline', (system) => [system.imageEnvSelector]);
+  const [environmentSelector] = useModel('systemOnline', (system) => [system.environmentSelector]);
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
 
   useEffect(() => {
@@ -59,7 +59,12 @@ const EditServices = (props: IEditServices) => {
           label="上线环境"
           rules={[{ required: true, message: '请选择上线环境!' }]}
         >
-          <Select options={imageEnvSelector} />
+          <Select
+            showSearch
+            options={environmentSelector}
+            optionFilterProp="value"
+            filterOption={(input, option) => (option!.value as unknown as string)?.includes(input)}
+          />
         </Form.Item>
         <Form.Item name="app_name" label="应用">
           <Input disabled />

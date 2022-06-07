@@ -4,7 +4,7 @@ const baseUrl = '/api/verify/online';
 const OnlineServices = {
   // 发布类型
   async releaseType() {
-    return request(`${baseUrl}/release_type`, {}, false);
+    return request(`${baseUrl}/release_type`);
   },
   // 发布项目
   async releasePro() {
@@ -19,8 +19,8 @@ const OnlineServices = {
     return request(`${baseUrl}/branch`);
   },
   // 镜像环境
-  async imageEnv() {
-    return request('/api/verify/project/image_env');
+  async environment() {
+    return request(`${baseUrl}/environment`);
   },
   // 前端应用
   async frontApp() {
@@ -104,6 +104,38 @@ const OnlineServices = {
   // 更新分支检查参数
   async updateCheckBranchInfo(data: any) {
     return request(`${baseUrl}/release_check_version`, { data, method: 'put', msg: '更新成功' });
+  },
+  // 检查详情
+  async getCheckDetail(release_num: string) {
+    return request(`${baseUrl}/check_detail`, { params: { release_num } });
+  },
+  // 手动 环境一致性检查
+  async handleCheckEnv(data: any) {
+    return request(`${baseUrl}/check_env`, { data, method: 'post', msg: '执行成功' });
+  },
+  // 手动 上线版本检查
+  async handleCheckOnline(data: any) {
+    return request(`${baseUrl}/release_check_version`, { data, method: 'post', msg: '执行成功' });
+  },
+  // 审批流程
+  async getApproval(release_num: string) {
+    return request(`${baseUrl}/approval`, { params: { release_num } });
+  },
+  // 更新审批流程
+  async updateApproval(data: any) {
+    return request(`${baseUrl}/approval`, { data, method: 'post' });
+  },
+  // 默认申请人
+  async getApplicant(release_num: string) {
+    return request(`${baseUrl}/approval_user`, { params: { release_num } });
+  },
+  // 值班人
+  async getdutyList(params: any) {
+    return request('/api/verify/duty/plan_data', { params });
+  },
+  // 申请人
+  async applicant() {
+    return request('/api/verify/apply/applicant');
   },
 };
 export default OnlineServices;

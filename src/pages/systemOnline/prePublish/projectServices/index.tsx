@@ -28,7 +28,7 @@ const ProjectServices = () => {
   const {
     projectSelectors,
     branchSelectors,
-    imageEnvSelector,
+    environmentSelector,
     getProInfo,
     updateColumn,
     proInfo,
@@ -176,7 +176,9 @@ const ProjectServices = () => {
       align: 'center',
       dataIndex: 'is_seal',
       className: 'required',
-      render: (v) => <span className={`${v == 'yes'}? color-success:''`}>{COMMON_STATUS[v]}</span>,
+      render: (v) => (
+        <span className={`${v == 'yes' ? 'color-success' : ''}`}>{COMMON_STATUS[v]}</span>
+      ),
     },
     {
       title: '封板时间',
@@ -209,14 +211,22 @@ const ProjectServices = () => {
                 optionFilterProp="label"
                 disabled={disabled}
                 filterOption={(input, option) =>
-                  ((option!.label as unknown) as string)?.includes(input)
+                  (option!.label as unknown as string)?.includes(input)
                 }
               />
             </Form.Item>
           </Col>
           <Col span={6}>
             <Form.Item label={'预发布分支'} name={'release_branch'}>
-              <Select disabled={disabled} style={{ width: '100%' }}>
+              <Select
+                disabled={disabled}
+                style={{ width: '100%' }}
+                optionFilterProp="label"
+                showSearch
+                filterOption={(input, option) =>
+                  (option!.label as unknown as string)?.includes(input)
+                }
+              >
                 {branchSelectors?.map((it) => (
                   <Select.Option key={it.label}>{it.label}</Select.Option>
                 ))}
@@ -225,8 +235,16 @@ const ProjectServices = () => {
           </Col>
           <Col span={8}>
             <Form.Item label={'测试环境绑定'} name={'release_env'}>
-              <Select disabled={disabled} style={{ width: '100%' }}>
-                {imageEnvSelector?.map((it) => (
+              <Select
+                disabled={disabled}
+                style={{ width: '100%' }}
+                optionFilterProp="value"
+                showSearch
+                filterOption={(input, option) =>
+                  (option!.value as unknown as string)?.includes(input)
+                }
+              >
+                {environmentSelector?.map((it) => (
                   <Select.Option key={it.label}>{it.label}</Select.Option>
                 ))}
               </Select>

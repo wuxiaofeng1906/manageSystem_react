@@ -51,6 +51,7 @@ const DeploySetting = (props: ModalFuncProps) => {
       okText={'点击保存'}
       wrapClassName={styles.deploySetting}
       onOk={onConfirm}
+      cancelText={'取消'}
       okButtonProps={{ disabled }}
       centered
     >

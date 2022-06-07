@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs } from 'antd';
-import { history } from 'umi';
+import { history, useModel } from 'umi';
 import Release from './Release';
 import Detail from './Detail';
 import Approve from './Approve';
@@ -8,11 +8,13 @@ import styles from './index.less';
 const Check = () => {
   const [tabName, setTabName] = useState<string>('');
   const [activeKey, setActiveKey] = useState('');
+  const [release_project] = useModel('systemOnline', (system) => [system.proInfo?.release_project]);
 
   useEffect(() => {
-    const state = history.location.state as { key: string } | undefined;
-    setActiveKey(state?.key || 'release');
-  }, [history.location.state]);
+    const query = history.location.query as { active: string } | undefined;
+    setActiveKey(query?.active || 'release');
+  }, [history.location.query]);
+
   return (
     <div className={styles.check}>
       <Tabs
@@ -21,13 +23,12 @@ const Check = () => {
         onChange={(v) => {
           history.push({
             pathname: history.location.pathname,
-            query: { ...history.location.query },
-            state: { key: v },
+            query: { ...history.location.query, active: v },
           });
         }}
       >
-        <Tabs.TabPane tab={tabName} key="release">
-          <Release onTab={(v: string) => setTabName(v)} />
+        <Tabs.TabPane tab={release_project?.release_env || '(空)'} key="release">
+          <Release />
         </Tabs.TabPane>
         <Tabs.TabPane tab="检查详情" key="detail">
           <Detail />

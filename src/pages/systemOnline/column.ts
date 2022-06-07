@@ -277,6 +277,7 @@ const checkDetailColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '检查状态',
     field: 'status',
+    cellRenderer: 'checkStatus',
   },
   {
     headerName: '检查开始时间',

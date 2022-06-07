@@ -17,7 +17,7 @@ export default () => {
     projectSelectors: [] as IRecord[], // 发布项目
     branchSelectors: [] as IRecord[], // 发布分支
     frontSelector: [] as IRecord[], // 前端应用
-    imageEnvSelector: [] as IRecord[], // 镜像环境
+    environmentSelector: [] as IRecord[], // 镜像环境
   });
   const [proInfo, setProInfo] = useState<IProInfo | null>();
   const [disabled, setDisabled] = useState(false);
@@ -29,14 +29,14 @@ export default () => {
       branchSelectors,
       projectSelectors,
       frontSelector,
-      imageEnvSelector,
+      environmentSelector,
     ] = await Promise.all([
       OnlineServices.releaseType(),
       OnlineServices.releaseMethod(),
       OnlineServices.releaseBranch(),
       OnlineServices.releasePro(),
       OnlineServices.frontApp(),
-      OnlineServices.imageEnv(),
+      OnlineServices.environment(),
     ]);
 
     setState({
@@ -52,7 +52,9 @@ export default () => {
       projectSelectors: replaceKeyMap(projectSelectors, [
         { execution_name: 'label', execution_id: 'value' },
       ]),
-      imageEnvSelector: replaceKeyMap(imageEnvSelector, [{ image_env: 'label', env_id: 'value' }]),
+      environmentSelector: replaceKeyMap(environmentSelector, [
+        { online_environment_name: 'label', online_environment_id: 'value' },
+      ]),
       frontSelector,
     });
   }, []);
@@ -67,6 +69,7 @@ export default () => {
     setProInfo(result);
     return result;
   }, []);
+
   const updateColumn = useCallback(async (data) => {
     await OnlineServices.releaseColumn(data);
   }, []);

@@ -1,105 +1,97 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { checkDetailColumn } from '../../column';
 import { AgGridReact } from 'ag-grid-react';
 import type { CellClickedEvent, GridApi } from 'ag-grid-community';
 import { initGridTable } from '@/pages/systemOnline/constants';
+import OnlineServices from '@/services/online';
+import { useLocation, useModel } from 'umi';
+import { Modal, Spin } from 'antd';
+import { isArray } from 'lodash';
+import { useCheckDetail } from '@/hooks/online';
 
 const Detail = () => {
   const gridApi = useRef<GridApi>();
+  const {
+    query: { idx },
+  } = useLocation() as any;
+  const { getList, formatStatus, source, spinning } = useCheckDetail();
+  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
 
-  const [source, setSource] = useState<Record<string, any>[]>([]);
-  useEffect(() => {
-    setSource([
-      { type: '前端单元测试运行是否通过', status: '暂无', start_time: '', end_time: '' },
-      {
-        type: '后端单元测试运行是否通过',
-        status: '是',
-        start_time: '2022-03-21 22:12:12',
-        end_time: '2022-03-21 22:12:12',
-      },
-      {
-        type: 'web与h5图标一致性检查是否通过',
-        status: '是',
-        start_time: '2022-03-21 22:12:12',
-        end_time: '2022-03-21 22:12:12',
-      },
-      { type: '创建库对比校验是否通过', status: '暂无', start_time: '', end_time: '' },
-      {
-        type: '应用版本代码遗漏检查是否通过',
-        status: '否',
-        start_time: '2022-03-21 22:12:12',
-        end_time: '2022-03-21 22:12:12',
-        refresh: true,
-      },
-      {
-        type: '环境一致性检查是否通过',
-        status: '进行中',
-        start_time: '2022-03-21 22:12:12',
-        end_time: '2022-03-21 22:12:12',
-        refresh: true,
-      },
-      {
-        type: '上线环境与预发布集群环境版本检查是否通过',
-        status: '暂无',
-        start_time: '2022-03-21 22:12:12',
-        end_time: '2022-03-21 22:12:12',
-        refresh: true,
-      },
-      {
-        type: '上线自动化检查是否通过',
-        status: '未开始',
-        start_time: '2022-03-21 22:12:12',
-        end_time: '2022-03-21 22:12:12',
-        refresh: true,
-      },
-      { type: '升级后自动化检查是否通过', status: '未启用', start_time: '', end_time: '' },
-      { type: '业务前端是否封板', status: '未封板', start_time: '', end_time: '', colSpan: 2 },
-      {
-        type: '业务后端是否封板',
-        status: '已封板',
-        start_time: '2022-03-21 22:12:12',
-        end_time: '',
-        colSpan: 2,
-      },
-      { type: '平台后端是否封板', status: '不涉及', start_time: '', end_time: '', colSpan: 2 },
-      { type: '流程是否封板', status: '不涉及', start_time: '', end_time: '', colSpan: 2 },
-    ]);
-  }, []);
+  const handleCheck = async (data: any) => {
+    if (!idx && !user?.userid) return;
+    const request =
+      data.key == 'check_env'
+        ? await OnlineServices.handleCheckEnv
+        : OnlineServices.handleCheckOnline;
+    await request({ user_id: user?.userid, release_num: idx });
+    await getList();
+  };
 
   return (
-    <div className={'AgGridReactTable'} style={{ height: 610 }}>
-      <AgGridReact
-        columnDefs={checkDetailColumn}
-        {...initGridTable(gridApi)}
-        rowData={source}
-        frameworkComponents={{
-          operation: ({ data }: CellClickedEvent) => {
-            return (
-              <div className={'operation'}>
-                {data?.refresh && (
+    <Spin spinning={spinning} tip={'数据加载中...'}>
+      <div className={'AgGridReactTable'} style={{ height: 510 }}>
+        <AgGridReact
+          columnDefs={checkDetailColumn}
+          {...initGridTable(gridApi)}
+          rowData={source}
+          frameworkComponents={{
+            checkStatus: formatStatus,
+            operation: (it: CellClickedEvent) => {
+              const disabled = ['unknown', 'wait'].includes(it.data.status || 'unknown');
+              const refreshed = ['doing', 'running'].includes(it.data.status);
+              return (
+                <div className={'operation'}>
+                  {it.data?.refresh && (
+                    <img
+                      src={require('../../../../../public/excute.png')}
+                      onClick={() => {
+                        if (refreshed) return;
+                        handleCheck(it.data);
+                      }}
+                      style={refreshed ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {}}
+                    />
+                  )}
                   <img
-                    src={require('../../../../../public/excute.png')}
+                    src={require('../../../../../public/logs.png')}
+                    style={disabled ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {}}
                     onClick={() => {
-                      //auto check
+                      if (disabled) return;
+                      if (it.data.refresh && it.data.check_log) {
+                        window.open(it.data.check_log);
+                        return;
+                      }
+                      Modal.info({
+                        width: 600,
+                        title: '检查详情',
+                        okText: '好的',
+                        content: (
+                          <div
+                            style={{
+                              maxHeight: 400,
+                              overflow: 'auto',
+                              margin: '10px 0',
+                              whiteSpace: 'pre-line',
+                            }}
+                          >
+                            <div>检查状态： {formatStatus(it)}</div>
+                            <div>
+                              日志信息：
+                              {isArray(it.data?.check_log)
+                                ? it.data?.check_log.join(',')
+                                : it.data?.check_log}
+                            </div>
+                          </div>
+                        ),
+                      });
                     }}
                   />
-                )}
-                <img
-                  src={require('../../../../../public/logs.png')}
-                  style={
-                    data.status == '暂无' ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {}
-                  }
-                  onClick={() => {
-                    if (data.status == '暂无') return;
-                    console.log(data);
-                  }}
-                />
-              </div>
-            );
-          },
-        }}
-      />
-    </div>
+                </div>
+              );
+            },
+          }}
+        />
+      </div>
+    </Spin>
   );
 };
 export default Detail;

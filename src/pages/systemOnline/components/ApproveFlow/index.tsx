@@ -5,6 +5,7 @@ import {
   CloseCircleOutlined,
   UserOutlined,
   SendOutlined,
+  CheckCircleFilled,
 } from '@ant-design/icons';
 import PersonSelector, { OptionType } from '../PersonaSelector';
 import cls from 'classnames';
@@ -75,6 +76,8 @@ const TagSelector = ({
           {list?.[selector]?.map((it, index) => (
             <div key={it.value} className={cls(styles.signWrap, 'ellipsis')}>
               <span>{it.label}</span>
+              <br />
+              {it.status == 2 && <CheckCircleFilled />}
               {edit && (
                 <CloseCircleOutlined
                   onClick={() => {
@@ -180,13 +183,23 @@ const ApproveFlow = ({ data, disabled, remark, approveDetail, onConfirm }: IFlow
         </Timeline.Item>
       </Timeline>
       <Space size={8}>
+        {approveDetail?.sp_status && (
+          <Button
+            type={'primary'}
+            disabled={disabled || approveDetail?.sp_status}
+            onClick={handleConfirm}
+          >
+            {approveDetail?.sp_status && sp_status_map[approveDetail?.sp_status]}
+          </Button>
+        )}
         <Button
           type={'primary'}
           disabled={disabled || [1, 2].includes(approveDetail?.sp_status)}
           onClick={handleConfirm}
         >
-          提交审批
+          {approveDetail?.sp_status ? '重新提交审批' : '提交审批'}
         </Button>
+
         {/*<Button type={'primary'} style={{ color: '#ffb012' }}>*/}
         {/*  撤销审批*/}
         {/*</Button>*/}

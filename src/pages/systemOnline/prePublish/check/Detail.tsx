@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { checkDetailColumn } from '../../column';
 import { AgGridReact } from 'ag-grid-react';
 import type { CellClickedEvent, GridApi } from 'ag-grid-community';

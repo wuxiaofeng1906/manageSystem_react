@@ -118,13 +118,15 @@ const Approve = () => {
 
   useEffect(() => {
     getApproval();
-    getList();
   }, []);
 
   useEffect(() => {
+    if (approveDetail) {
+      getInitApproval();
+    }
     // 检查是否存在未通过选项
-    checkPass();
-  }, [source]);
+    else checkPass();
+  }, [source, approveDetail]);
 
   return (
     <div className={styles.approve}>
@@ -210,7 +212,7 @@ const Approve = () => {
               style={{ width: 512, marginLeft: 40 }}
               placeholder={'审批备注...'}
               value={remark}
-              disabled={disabled}
+              disabled={disabled || [1, 2].includes(approveDetail?.sp_status)}
               onChange={(e) => setRemark(e.target.value?.trim())}
             />
           </div>

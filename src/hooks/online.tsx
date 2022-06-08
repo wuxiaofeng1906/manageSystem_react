@@ -99,6 +99,7 @@ export const useCheckDetail = () => {
 
   // detail
   const getList = useCallback(async () => {
+    if (!idx) return;
     setSpinning(true);
     const res = await OnlineServices.getCheckDetail(idx).finally(() => setSpinning(false));
     const result = source.map((it, index) => {
@@ -150,10 +151,8 @@ export const useCheckDetail = () => {
   }, []);
 
   useEffect(() => {
-    if (idx) {
-      getList();
-    }
-  }, [idx]);
+    getList();
+  }, []);
 
   return { getList, formatStatus, source, setSource, spinning };
 };

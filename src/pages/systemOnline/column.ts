@@ -132,6 +132,8 @@ const dataReviewColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '数据修复内容',
     field: 'description',
+    headerClass: 'ag-align-left',
+    cellStyle: { textAlign: 'left' },
   },
   {
     headerName: '涉及租户',
@@ -184,6 +186,8 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '接口服务',
     field: 'app_server',
+    headerClass: 'ag-align-left',
+    cellStyle: { textAlign: 'left' },
   },
   {
     headerName: '接口Method',
@@ -192,14 +196,20 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '接口URL或SQL',
     field: 'url_or_sql',
+    headerClass: 'ag-align-left',
+    cellStyle: { textAlign: 'left' },
   },
   {
     headerName: 'Data',
     field: 'request_data',
+    headerClass: 'ag-align-left',
+    cellStyle: { textAlign: 'left' },
   },
   {
     headerName: 'Header',
     field: 'header',
+    headerClass: 'ag-align-left',
+    cellStyle: { textAlign: 'left' },
   },
   {
     headerName: '涉及租户',

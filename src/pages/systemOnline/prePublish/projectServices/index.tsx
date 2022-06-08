@@ -130,15 +130,17 @@ const ProjectServices = () => {
   const formatTable = (arr: any[]) => {
     const obj = {};
     arr.forEach((it) => {
-      if (obj[it.cluster_id]) {
+      if (it.cluster_id && obj[it.cluster_id]) {
         obj[it.cluster_id]++;
       } else {
-        obj[it.cluster_id] = 1;
+        obj[it.cluster_id || it.server_id] = 1;
       }
     });
     Object.entries(obj).map(([k, v]) => {
-      const index = arr.findIndex((it) => it.cluster_id == k);
-      arr[index].rowSpan = v;
+      const index = arr.findIndex((it) => [it.cluster_id, it.server_id].toString().includes(k));
+      if (index >= 0) {
+        arr[index] = { ...arr[index], rowSpan: v };
+      }
     });
     return arr;
   };
@@ -152,8 +154,8 @@ const ProjectServices = () => {
   const serviceColumn: ColumnsType<PreServices> = [
     {
       title: '序号',
-      dataIndex: 'server_id',
       align: 'center',
+      render: (record, v, index) => <span>{index + 1}</span>,
       onCell: (it) => ({ rowSpan: it.rowSpan || 0 }),
     },
     {

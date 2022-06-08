@@ -158,7 +158,10 @@ const Approve = () => {
         </li>
         <li>
           <strong style={{ marginRight: 20 }}>六、发布集群：</strong>
-          {proInfo?.upgrade_app?.map((it) => it.cluster_name)?.join(',') || '-'}
+          {proInfo?.upgrade_app
+            ?.map((it) => it.cluster_name)
+            .filter((it) => Boolean(it))
+            ?.join() || '-'}
         </li>
         <li>
           <strong style={{ marginRight: 20 }}>七、发布时间：</strong>

@@ -52,7 +52,7 @@ const Release = () => {
       release_num: idx,
       main_branch: 'stage,master',
       technical_side: 'backend,front',
-      create_time: v.create_time ? moment(v.create_time).format(MOMENT_FORMAT.utc) : null,
+      create_time: v.create_time ? moment(v.create_time).format(MOMENT_FORMAT.date) : null,
     });
     await getBranchInfo();
   };

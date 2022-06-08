@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { Button, message, Space, Spin } from 'antd';
+import { PoweroffOutlined } from '@ant-design/icons';
 import { deployColumn } from '@/pages/systemOnline/column';
 import type { CellClickedEvent, GridApi } from 'ag-grid-community';
 import DeploySetting from '@/pages/systemOnline/prePublish/deploy/DeploySetting';
@@ -9,6 +10,7 @@ import { initGridTable } from '@/pages/systemOnline/constants';
 import OnlineServices from '@/services/online';
 import { useLocation } from 'umi';
 import { useModel } from '@@/plugin-model/useModel';
+
 const Deploy = () => {
   const {
     query: { idx },
@@ -20,7 +22,6 @@ const Deploy = () => {
   const [oneKeyDeploy, setOneKeyDeploy] = useState(false);
   const [list, setList] = useState([]);
   const [spinning, setSpinning] = useState(false);
-
   const getTableList = async () => {
     setSpinning(true);
     const result = await OnlineServices.deployList(idx).finally(() => setSpinning(false));
@@ -47,8 +48,18 @@ const Deploy = () => {
         <Button type={'primary'} onClick={() => setOneKeyDeploy(true)}>
           一键部署
         </Button>
+        <Button
+          type={'primary'}
+          loading={spinning}
+          onClick={async () => {
+            await OnlineServices.deploymentStatus(idx);
+            getTableList();
+          }}
+        >
+          刷新
+        </Button>
       </Space>
-      <div className={'AgGridReactTable'}>
+      <div className={'AgGridReactTable'} style={{ height: 500 }}>
         <AgGridReact
           {...initGridTable(gridApi)}
           columnDefs={deployColumn}

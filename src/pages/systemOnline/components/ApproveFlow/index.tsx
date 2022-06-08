@@ -57,7 +57,7 @@ const TagSelector = ({
   approveDetail,
 }: ITag) => {
   const index = selector == 'duty' ? 0 : selector == 'director' ? 1 : -1;
-  const record = index == -1 ? null : approveDetail?.sp_record[index];
+  const record = index == -1 ? null : approveDetail?.sp_record?.[index];
   const edit = clearable && ![1, 2].includes(approveDetail?.sp_status);
   return (
     <div>

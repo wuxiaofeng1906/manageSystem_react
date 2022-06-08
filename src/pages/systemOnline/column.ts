@@ -1,6 +1,4 @@
-import { PreServices } from '@/namespaces';
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
-import { ColumnsType } from 'antd/lib/table';
 import { COMMON_STATUS, DEPLOY_TYPE } from './constants';
 
 const cellRenderStatus = ({ value }: any) =>
@@ -337,41 +335,6 @@ const servicesSettingColumn: (ColDef | ColGroupDef)[] = [
     pinned: 'right',
   },
 ];
-// 发布服务
-const serviceColumn: ColumnsType<PreServices> = [
-  {
-    title: '序号',
-    dataIndex: 'server_id',
-    align: 'center',
-    onCell: (it) => ({ rowSpan: it.rowSpan || 0 }),
-  },
-  {
-    title: '上线环境',
-    dataIndex: 'cluster_name',
-    align: 'center',
-    onCell: (it) => ({ rowSpan: it.rowSpan || 0 }),
-  },
-  {
-    title: '应用',
-    align: 'center',
-    dataIndex: 'app_name',
-  },
-  {
-    title: '对应侧',
-    align: 'center',
-    dataIndex: 'technical_side',
-  },
-  {
-    title: '是否封板',
-    align: 'center',
-    dataIndex: 'is_seal',
-  },
-  {
-    title: '封板时间',
-    align: 'center',
-    dataIndex: 'seal_time',
-  },
-];
 
 export {
   publishColumn,
@@ -381,5 +344,4 @@ export {
   deployColumn,
   checkDetailColumn,
   servicesSettingColumn,
-  serviceColumn,
 };

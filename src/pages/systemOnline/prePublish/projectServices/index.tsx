@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { Form, Row, Col, Select, Space, Modal, Table } from 'antd';
+import { Form, Row, Col, Select, Space, Modal, Table, Spin } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { sortBy } from 'lodash';
 import {
@@ -16,7 +16,6 @@ import EditSql from './EditSql';
 import OnlineServices from '@/services/online';
 import type { PreServices, PreSql, PreUpgradeItem } from '@/namespaces/interface';
 import { ColumnsType } from 'antd/lib/table/Table';
-import { delay } from 'lodash';
 
 type enumType = 'upgrade' | 'services' | 'sql';
 interface Istate<T> {
@@ -40,7 +39,7 @@ const ProjectServices = () => {
   const [editServices, setEditServices] = useState<Istate<PreServices> | null>();
   const [editSql, setEditSql] = useState<Istate<PreSql> | null>();
   const [preEnv, setPreEnv] = useState([]);
-
+  const [spinning, setPinning] = useState(false);
   const updatePreData = async (value: any, values: any) => {
     // if (value.release_branch) {
     //   // 分支对应环境
@@ -53,7 +52,8 @@ const ProjectServices = () => {
         release_branch: values.release_branch || '',
         release_env: values.release_env || '',
       });
-      await delay(() => getProInfo(idx), 30000);
+      setPinning(true);
+      await getProInfo(idx).finally(() => setPinning(false));
     }
   };
 
@@ -198,145 +198,147 @@ const ProjectServices = () => {
   ];
 
   return (
-    <div>
-      <h4>
-        一、预发布项目&环境填写 <span className="color-tips">【由测试人员依次填写】</span>
-      </h4>
-      <Form form={form} onValuesChange={updatePreData}>
-        <Row justify={'space-between'}>
-          <Col span={8}>
-            <Form.Item label={'预发布项目'} name={'release_project'}>
-              <Select
-                options={projectSelectors}
-                style={{ width: '100%' }}
-                mode="multiple"
-                maxTagCount="responsive"
-                optionFilterProp="label"
-                disabled={disabled}
-                filterOption={(input, option) =>
-                  (option!.label as unknown as string)?.includes(input)
-                }
-              />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
-            <Form.Item label={'预发布分支'} name={'release_branch'}>
-              <Select
-                disabled={disabled}
-                style={{ width: '100%' }}
-                optionFilterProp="label"
-                showSearch
-                filterOption={(input, option) =>
-                  (option!.label as unknown as string)?.includes(input)
-                }
-              >
-                {branchSelectors?.map((it) => (
-                  <Select.Option key={it.label}>{it.label}</Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={8}>
-            <Form.Item label={'测试环境绑定'} name={'release_env'}>
-              <Select
-                disabled={disabled}
-                style={{ width: '100%' }}
-                optionFilterProp="label"
-                options={preEnv}
-                showSearch
-                filterOption={(input, option) =>
-                  (option!.label as unknown as string)?.includes(input)
-                }
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
-      <Space className={'flex-row'} size={40} style={{ marginBottom: 40 }}>
-        <div>
-          填写人： <span>{proInfo?.release_project?.edit_user || '-'}</span>
+    <Spin spinning={spinning} tip={'数据加载中,请稍等...'}>
+      <div>
+        <h4>
+          一、预发布项目&环境填写 <span className="color-tips">【由测试人员依次填写】</span>
+        </h4>
+        <Form form={form} onValuesChange={updatePreData}>
+          <Row justify={'space-between'}>
+            <Col span={8}>
+              <Form.Item label={'预发布项目'} name={'release_project'}>
+                <Select
+                  options={projectSelectors}
+                  style={{ width: '100%' }}
+                  mode="multiple"
+                  maxTagCount="responsive"
+                  optionFilterProp="label"
+                  disabled={disabled}
+                  filterOption={(input, option) =>
+                    (option!.label as unknown as string)?.includes(input)
+                  }
+                />
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item label={'预发布分支'} name={'release_branch'}>
+                <Select
+                  disabled={disabled}
+                  style={{ width: '100%' }}
+                  optionFilterProp="label"
+                  showSearch
+                  filterOption={(input, option) =>
+                    (option!.label as unknown as string)?.includes(input)
+                  }
+                >
+                  {branchSelectors?.map((it) => (
+                    <Select.Option key={it.label}>{it.label}</Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item label={'测试环境绑定'} name={'release_env'}>
+                <Select
+                  disabled={disabled}
+                  style={{ width: '100%' }}
+                  optionFilterProp="label"
+                  options={preEnv}
+                  showSearch
+                  filterOption={(input, option) =>
+                    (option!.label as unknown as string)?.includes(input)
+                  }
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+        <Space className={'flex-row'} size={40} style={{ marginBottom: 40 }}>
+          <div>
+            填写人： <span>{proInfo?.release_project?.edit_user || '-'}</span>
+          </div>
+          <div>
+            填写时间： <span>{proInfo?.release_project?.edit_time || '-'}</span>
+          </div>
+        </Space>
+        <h4>
+          二、项目升级信息填写 <span className="color-tips">【由后端值班/流程值班人员填写】</span>
+        </h4>
+        <div className={'AgGridReactTable'}>
+          <AgGridReact
+            {...initGridTable(gridUpgradeRef)}
+            columnDefs={projectUpgradeColumn}
+            rowData={proInfo?.upgrade_project || []}
+            frameworkComponents={{
+              operation: ({ data }: CellClickedEvent) => OperationDom(data, 'upgrade'),
+            }}
+          />
         </div>
-        <div>
-          填写时间： <span>{proInfo?.release_project?.edit_time || '-'}</span>
+        <h4>
+          三、发布服务填写
+          <span className="color-tips">【由后端负责人/前端值班/后端值班/流程值班人员填写】</span>
+        </h4>
+        <Table
+          rowKey="server_id"
+          size="small"
+          bordered
+          dataSource={formatTable(proInfo?.upgrade_app || [])}
+          pagination={false}
+          columns={serviceColumn}
+          style={{ marginBottom: 20 }}
+        />
+        <h4>
+          四、升级接口&升级SQL填写 <span className="color-tips">【前后端值班核对确认】</span>
+        </h4>
+        <div className={'AgGridReactTable'}>
+          <AgGridReact
+            animateRows
+            rowDragManaged
+            suppressAutoSize
+            suppressRowTransform
+            {...initGridTable(gridSQLRef)}
+            columnDefs={upgradeSQLColumn}
+            rowData={sortBy(proInfo?.upgrade_api || [], (it) => it.index)}
+            onRowDragEnd={onRowDragMove}
+            frameworkComponents={{
+              operation: ({ data }: CellClickedEvent) => OperationDom(data, 'sql', false),
+            }}
+            onCellDoubleClicked={showDetail}
+          />
         </div>
-      </Space>
-      <h4>
-        二、项目升级信息填写 <span className="color-tips">【由后端值班/流程值班人员填写】</span>
-      </h4>
-      <div className={'AgGridReactTable'}>
-        <AgGridReact
-          {...initGridTable(gridUpgradeRef)}
-          columnDefs={projectUpgradeColumn}
-          rowData={proInfo?.upgrade_project || []}
-          frameworkComponents={{
-            operation: ({ data }: CellClickedEvent) => OperationDom(data, 'upgrade'),
+        <h4>
+          五、数据修复Review <span className="color-tips">【由后端值班人员核对确认】</span>
+        </h4>
+        <div className={'AgGridReactTable'}>
+          <AgGridReact
+            {...initGridTable(gridReviewRef)}
+            columnDefs={dataReviewColumn}
+            rowData={proInfo?.upgrade_review || []}
+          />
+        </div>
+        <EditUpgrade
+          {...editUpgrade}
+          onCancel={(status) => {
+            if (status == true) getProInfo(idx);
+            setEditUpgrade(null);
+          }}
+        />
+        <EditServices
+          {...editServices}
+          onCancel={(status) => {
+            if (status == true) getProInfo(idx);
+            setEditServices(null);
+          }}
+        />
+        <EditSql
+          {...editSql}
+          onCancel={(status) => {
+            if (status == true) getProInfo(idx);
+            setEditSql(null);
           }}
         />
       </div>
-      <h4>
-        三、发布服务填写
-        <span className="color-tips">【由后端负责人/前端值班/后端值班/流程值班人员填写】</span>
-      </h4>
-      <Table
-        rowKey="server_id"
-        size="small"
-        bordered
-        dataSource={formatTable(proInfo?.upgrade_app || [])}
-        pagination={false}
-        columns={serviceColumn}
-        style={{ marginBottom: 20 }}
-      />
-      <h4>
-        四、升级接口&升级SQL填写 <span className="color-tips">【前后端值班核对确认】</span>
-      </h4>
-      <div className={'AgGridReactTable'}>
-        <AgGridReact
-          animateRows
-          rowDragManaged
-          suppressAutoSize
-          suppressRowTransform
-          {...initGridTable(gridSQLRef)}
-          columnDefs={upgradeSQLColumn}
-          rowData={sortBy(proInfo?.upgrade_api || [], (it) => it.index)}
-          onRowDragEnd={onRowDragMove}
-          frameworkComponents={{
-            operation: ({ data }: CellClickedEvent) => OperationDom(data, 'sql', false),
-          }}
-          onCellDoubleClicked={showDetail}
-        />
-      </div>
-      <h4>
-        五、数据修复Review <span className="color-tips">【由后端值班人员核对确认】</span>
-      </h4>
-      <div className={'AgGridReactTable'}>
-        <AgGridReact
-          {...initGridTable(gridReviewRef)}
-          columnDefs={dataReviewColumn}
-          rowData={proInfo?.upgrade_review || []}
-        />
-      </div>
-      <EditUpgrade
-        {...editUpgrade}
-        onCancel={(status) => {
-          if (status == true) getProInfo(idx);
-          setEditUpgrade(null);
-        }}
-      />
-      <EditServices
-        {...editServices}
-        onCancel={(status) => {
-          if (status == true) getProInfo(idx);
-          setEditServices(null);
-        }}
-      />
-      <EditSql
-        {...editSql}
-        onCancel={(status) => {
-          if (status == true) getProInfo(idx);
-          setEditSql(null);
-        }}
-      />
-    </div>
+    </Spin>
   );
 };
 export default ProjectServices;

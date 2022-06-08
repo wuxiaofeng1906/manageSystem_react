@@ -141,5 +141,8 @@ const OnlineServices = {
   async preEnv() {
     return request('/api/verify/project/image_env');
   },
+  async deploymentStatus(release_num: string) {
+    return request(`${baseUrl}/deployment_status`, { params: { release_num } });
+  },
 };
 export default OnlineServices;

@@ -26,7 +26,7 @@ const Check = () => {
           });
         }}
       >
-        <Tabs.TabPane tab={release_project?.release_env || '(空)'} key="release">
+        <Tabs.TabPane tab={release_project?.release_branch || '(空)'} key="release">
           <Release />
         </Tabs.TabPane>
         <Tabs.TabPane tab="检查详情" key="detail">

@@ -72,6 +72,7 @@ const PersonSelector = (props: Iprops) => {
             mode={'multiple'}
             style={{ width: '100%' }}
             maxTagCount={5}
+            allowClear
             optionFilterProp="label"
             filterOption={(input, option) => (option!.label as unknown as string)?.includes(input)}
           />

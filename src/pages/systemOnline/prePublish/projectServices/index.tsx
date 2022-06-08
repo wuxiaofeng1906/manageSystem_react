@@ -16,6 +16,7 @@ import EditSql from './EditSql';
 import OnlineServices from '@/services/online';
 import type { PreServices, PreSql, PreUpgradeItem } from '@/namespaces/interface';
 import { ColumnsType } from 'antd/lib/table/Table';
+import { delay } from 'lodash';
 
 type enumType = 'upgrade' | 'services' | 'sql';
 interface Istate<T> {
@@ -26,15 +27,8 @@ const ProjectServices = () => {
   const {
     query: { idx },
   } = useLocation() as any;
-  const {
-    projectSelectors,
-    branchSelectors,
-    environmentSelector,
-    getProInfo,
-    updateColumn,
-    proInfo,
-    disabled,
-  } = useModel('systemOnline');
+  const { projectSelectors, branchSelectors, getProInfo, updateColumn, proInfo, disabled } =
+    useModel('systemOnline');
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [form] = Form.useForm();
 
@@ -45,6 +39,7 @@ const ProjectServices = () => {
   const [editUpgrade, setEditUpgrade] = useState<Istate<PreUpgradeItem> | null>();
   const [editServices, setEditServices] = useState<Istate<PreServices> | null>();
   const [editSql, setEditSql] = useState<Istate<PreSql> | null>();
+  const [preEnv, setPreEnv] = useState([]);
 
   const updatePreData = async (value: any, values: any) => {
     // if (value.release_branch) {
@@ -58,7 +53,7 @@ const ProjectServices = () => {
         release_branch: values.release_branch || '',
         release_env: values.release_env || '',
       });
-      await getProInfo(idx);
+      await delay(() => getProInfo(idx), 30000);
     }
   };
 
@@ -147,6 +142,13 @@ const ProjectServices = () => {
     });
     return arr;
   };
+
+  useEffect(() => {
+    OnlineServices.preEnv().then((res) => {
+      setPreEnv(res?.map((it) => ({ key: it.id, label: it.image_env, value: it.image_env })));
+    });
+  }, []);
+
   const serviceColumn: ColumnsType<PreServices> = [
     {
       title: '序号',
@@ -239,16 +241,13 @@ const ProjectServices = () => {
               <Select
                 disabled={disabled}
                 style={{ width: '100%' }}
-                optionFilterProp="value"
+                optionFilterProp="label"
+                options={preEnv}
                 showSearch
                 filterOption={(input, option) =>
-                  (option!.value as unknown as string)?.includes(input)
+                  (option!.label as unknown as string)?.includes(input)
                 }
-              >
-                {environmentSelector?.map((it) => (
-                  <Select.Option key={it.label}>{it.label}</Select.Option>
-                ))}
-              </Select>
+              />
             </Form.Item>
           </Col>
         </Row>

@@ -17,7 +17,7 @@ export default () => {
     projectSelectors: [] as IRecord[], // 发布项目
     branchSelectors: [] as IRecord[], // 发布分支
     frontSelector: [] as IRecord[], // 前端应用
-    environmentSelector: [] as IRecord[], // 镜像环境
+    environmentSelector: [] as IRecord[], // 上线环境
   });
   const [proInfo, setProInfo] = useState<IProInfo | null>();
   const [disabled, setDisabled] = useState(false);

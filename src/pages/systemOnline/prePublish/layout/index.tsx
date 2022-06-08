@@ -62,12 +62,9 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
         release_date: moment(proInfo?.release_project?.release_date),
       });
     }
-    const status = proInfo?.upgrade_project
-      ?.map((it) => ({
-        is_database_upgrade: it.is_database_upgrade,
-        is_recovery_database: it.is_recovery_database,
-      }))
-      .some((obj) => [obj.is_database_upgrade, obj.is_recovery_database].includes('yes'));
+    const status = proInfo?.upgrade_project?.some((it) =>
+      [it.is_database_upgrade, it.is_recovery_database].includes('yes'),
+    );
     setFlag(status || false);
   }, [JSON.stringify(proInfo)]);
 

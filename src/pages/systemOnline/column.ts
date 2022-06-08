@@ -133,11 +133,11 @@ const dataReviewColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '数据修复内容',
-    field: 'review_data',
+    field: 'description',
   },
   {
     headerName: '涉及租户',
-    field: 'tenant',
+    field: 'tenant_ids',
   },
   {
     headerName: '类型',
@@ -145,7 +145,7 @@ const dataReviewColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '修复提交人',
-    field: 'user',
+    field: 'commiter',
   },
   {
     headerName: '分支',

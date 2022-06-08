@@ -137,5 +137,9 @@ const OnlineServices = {
   async applicant() {
     return request('/api/verify/apply/applicant');
   },
+  // 预发布环境
+  async preEnv() {
+    return request('/api/verify/project/image_env');
+  },
 };
 export default OnlineServices;

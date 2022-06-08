@@ -192,13 +192,15 @@ const ApproveFlow = ({ data, disabled, remark, approveDetail, onConfirm }: IFlow
             {approveDetail?.sp_status && sp_status_map[approveDetail?.sp_status]}
           </Button>
         )}
-        <Button
-          type={'primary'}
-          disabled={disabled || [1, 2].includes(approveDetail?.sp_status)}
-          onClick={handleConfirm}
-        >
-          {approveDetail?.sp_status ? '重新提交审批' : '提交审批'}
-        </Button>
+        {![2, 13].includes(approveDetail?.sp_status) && (
+          <Button
+            type={'primary'}
+            disabled={disabled || [1, 2].includes(approveDetail?.sp_status)}
+            onClick={handleConfirm}
+          >
+            {approveDetail?.sp_status ? '重新提交审批' : '提交审批'}
+          </Button>
+        )}
 
         {/*<Button type={'primary'} style={{ color: '#ffb012' }}>*/}
         {/*  撤销审批*/}

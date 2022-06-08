@@ -210,9 +210,8 @@ const Approve = () => {
               style={{ width: 512, marginLeft: 40 }}
               placeholder={'审批备注...'}
               value={remark}
-              onChange={(e) => {
-                setRemark(e.target.value?.trim());
-              }}
+              disabled={disabled}
+              onChange={(e) => setRemark(e.target.value?.trim())}
             />
           </div>
           <div>

@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Form, Row, Col, Select, Space, Modal, Table } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
+import { sortBy } from 'lodash';
 import {
   projectUpgradeColumn,
   upgradeSQLColumn,
@@ -57,7 +58,7 @@ const ProjectServices = () => {
         release_branch: values.release_branch || '',
         release_env: values.release_env || '',
       });
-      getProInfo(idx);
+      await getProInfo(idx);
     }
   };
 
@@ -72,12 +73,12 @@ const ProjectServices = () => {
 
   // drag
   const onRowDragMove = useCallback(async () => {
-    const data: { api_id: string; sort_num: number; user_id: string }[] = [];
+    const data: { api_id: string; index: number; user_id: string }[] = [];
     gridSQLRef.current?.forEachNode((node, index) => {
-      data.push({ api_id: node.data.id, sort_num: index + 1, user_id: user?.userid || '' });
+      data.push({ api_id: node.data.api_id, index, user_id: user?.userid || '' });
     });
     await OnlineServices.preInterfaceSort(data);
-    // refresh
+    await getProInfo(idx);
   }, []);
 
   // operation
@@ -110,7 +111,7 @@ const ProjectServices = () => {
 
   // sql detail
   const showDetail = ({ colDef, value }: CellClickedEvent) => {
-    if (colDef.field == 'sql' && value) {
+    if (colDef.field == 'url_or_sql' && value) {
       Modal.info({
         width: 600,
         title: '详情',
@@ -297,7 +298,7 @@ const ProjectServices = () => {
           suppressRowTransform
           {...initGridTable(gridSQLRef)}
           columnDefs={upgradeSQLColumn}
-          rowData={proInfo?.upgrade_api || []}
+          rowData={sortBy(proInfo?.upgrade_api || [], (it) => it.index)}
           onRowDragEnd={onRowDragMove}
           frameworkComponents={{
             operation: ({ data }: CellClickedEvent) => OperationDom(data, 'sql', false),

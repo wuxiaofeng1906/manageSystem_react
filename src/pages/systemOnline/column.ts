@@ -5,12 +5,12 @@ import { COMMON_STATUS, DEPLOY_TYPE } from './constants';
 
 const cellRenderStatus = ({ value }: any) =>
   `<span class="${
-    ['no', 'unknow'].includes(value)
+    ['no', 'unknown'].includes(value)
       ? ''
       : ['yes', 'success'].includes(value)
       ? 'color-success'
       : 'color-feature'
-  }">${COMMON_STATUS[value] || ''}</span>`;
+  }">${COMMON_STATUS[value] || '-'}</span>`;
 
 const formatDeployStatus = ({ value }: any) => `<span class="color-${value}">${value}</span>`;
 
@@ -118,6 +118,7 @@ const projectUpgradeColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '操作',
+    pinned: 'right',
     minWidth: 120,
     cellRenderer: 'operation',
   },
@@ -175,26 +176,28 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '升级类型',
     field: 'update_type',
+    valueFormatter: ({ value }) => COMMON_STATUS[value] || '-',
   },
   {
     headerName: '升级接口',
     field: 'update_api',
+    valueFormatter: ({ value }) => COMMON_STATUS[value] || '-',
   },
   {
     headerName: '接口服务',
-    field: 'api_server',
+    field: 'app_server',
   },
   {
     headerName: '接口Method',
-    field: 'api_method',
+    field: 'method_name',
   },
   {
     headerName: '接口URL或SQL',
-    field: 'api_content',
+    field: 'url_or_sql',
   },
   {
     headerName: 'Data',
-    field: 'data',
+    field: 'request_data',
   },
   {
     headerName: 'Header',
@@ -202,11 +205,11 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '涉及租户',
-    field: 'tenant',
+    field: 'tenant_ids',
   },
   {
     headerName: '是否记录积压',
-    field: 'is_backlog',
+    field: 'record_backlog',
     cellRenderer: cellRenderStatus,
     headerClass: 'ag-required', // 表头标题添加 * 类名
   },
@@ -214,6 +217,7 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
     headerName: '操作',
     minWidth: 100,
     cellRenderer: 'operation',
+    pinned: 'right',
     rowDrag: true, // drag
     cellClass: 'ag-drag', // 存在多个图标操作时，需要加上此类名【因为移动图标在最前面，一个情况下可忽略】
   },
@@ -231,7 +235,7 @@ const deployColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '部署类型',
     field: 'deployment',
-    valueFormatter: ({ value }) => DEPLOY_TYPE[value] || '',
+    valueFormatter: ({ value }) => DEPLOY_TYPE[value] || '-',
   },
   {
     headerName: '目标任务',
@@ -290,6 +294,7 @@ const checkDetailColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '操作',
+    pinned: 'right',
     width: 90,
     cellRenderer: 'operation',
   },
@@ -329,6 +334,7 @@ const servicesSettingColumn: (ColDef | ColGroupDef)[] = [
     headerName: '操作',
     minWidth: 140,
     cellRenderer: 'operation',
+    pinned: 'right',
   },
 ];
 // 发布服务

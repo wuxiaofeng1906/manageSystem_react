@@ -58,6 +58,7 @@ const TagSelector = ({
 }: ITag) => {
   const index = selector == 'duty' ? 0 : selector == 'director' ? 1 : -1;
   const record = index == -1 ? null : approveDetail?.sp_record[index];
+  const edit = clearable && ![1, 2].includes(approveDetail?.sp_status);
   return (
     <div>
       <p style={{ marginBottom: 10 }}>
@@ -73,7 +74,7 @@ const TagSelector = ({
           {list?.[selector]?.map((it, index) => (
             <div key={it.value} className={cls(styles.signWrap, 'ellipsis')}>
               <span>{it.label}</span>
-              {(clearable || it.status !== 1) && (
+              {edit && (
                 <CloseCircleOutlined
                   disabled={disabled}
                   onClick={() => {
@@ -85,7 +86,7 @@ const TagSelector = ({
             </div>
           ))}
         </div>
-        {(clearable || approveDetail?.sp_status !== 1) && (
+        {edit && (
           <PlusSquareOutlined
             disabled={disabled}
             onClick={() => setShow({ visible: true, selector })}

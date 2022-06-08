@@ -18,6 +18,7 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
   const { typeSelectors, methodSelectors, updateColumn, proInfo, getProInfo, disabled } =
     useModel('systemOnline');
   const [form] = Form.useForm();
+  const [flag, setFlag] = useState(false);
   const [spinning, setSpinning] = useState(false);
 
   const update = async (type: any, values: any) => {
@@ -61,10 +62,17 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
         release_date: moment(proInfo?.release_project?.release_date),
       });
     }
+    const status = proInfo?.upgrade_project
+      ?.map((it) => ({
+        is_database_upgrade: it.is_database_upgrade,
+        is_recovery_database: it.is_recovery_database,
+      }))
+      .some((obj) => [obj.is_database_upgrade, obj.is_recovery_database].includes('yes'));
+    setFlag(status || false);
   }, [JSON.stringify(proInfo)]);
 
   return (
-    <Spin spinning={spinning} tip={'数据加载中...'}>
+    <Spin spinning={spinning} tip={'数据加载中...'} wrapperClassName={styles.spinWrap}>
       <div className={styles.preLayout}>
         <Layout>
           <Layout.Sider width={290} theme={'light'} className={styles.layout}>
@@ -74,7 +82,13 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
                   <Select disabled={disabled} options={typeSelectors} />
                 </Form.Item>
                 <Form.Item label={'发布方式'} name={'release_method'}>
-                  <Select disabled={disabled} options={methodSelectors} />
+                  <Select
+                    disabled={disabled}
+                    options={methodSelectors?.map((it) => ({
+                      ...it,
+                      disabled: it.value == 'keep_server' ? flag : false,
+                    }))}
+                  />
                 </Form.Item>
                 <Form.Item label={'发布时间'} name={'release_date'}>
                   <DatePicker

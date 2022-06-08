@@ -15,6 +15,10 @@ const COMMON_STATUS = {
   businessBackend: '业务后端',
   platformBackend: '平台后端',
   process: '流程',
+  upgradeApi: '升级接口',
+  upgradeSql: '升级Sql',
+  backend: '后端接口',
+  front: '前端接口',
 };
 const DEPLOY_TYPE = {
   aKeyDeployment: '一键部署',

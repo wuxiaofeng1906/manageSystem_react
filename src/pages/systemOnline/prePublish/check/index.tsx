@@ -6,7 +6,6 @@ import Detail from './Detail';
 import Approve from './Approve';
 import styles from './index.less';
 const Check = () => {
-  const [tabName, setTabName] = useState<string>('');
   const [activeKey, setActiveKey] = useState('');
   const [release_project] = useModel('systemOnline', (system) => [system.proInfo?.release_project]);
 

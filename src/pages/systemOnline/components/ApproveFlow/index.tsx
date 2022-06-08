@@ -46,6 +46,7 @@ const sp_status_map = {
   12: '已加签',
   13: '已同意并加签',
 };
+
 const TagSelector = ({
   title,
   list,
@@ -58,7 +59,7 @@ const TagSelector = ({
 }: ITag) => {
   const index = selector == 'duty' ? 0 : selector == 'director' ? 1 : -1;
   const record = index == -1 ? null : approveDetail?.sp_record?.[index];
-  const edit = clearable && ![1, 2].includes(approveDetail?.sp_status);
+  const edit = (clearable && ![1, 2].includes(approveDetail?.sp_status)) || disabled;
   return (
     <div>
       <p style={{ marginBottom: 10 }}>
@@ -76,7 +77,6 @@ const TagSelector = ({
               <span>{it.label}</span>
               {edit && (
                 <CloseCircleOutlined
-                  disabled={disabled}
                   onClick={() => {
                     list?.[selector].splice(index, 1);
                     setList({ ...list, [selector]: [...list?.[selector]] });
@@ -88,7 +88,6 @@ const TagSelector = ({
         </div>
         {edit && (
           <PlusSquareOutlined
-            disabled={disabled}
             onClick={() => setShow({ visible: true, selector })}
             className={styles.addAnticon}
           />
@@ -183,7 +182,7 @@ const ApproveFlow = ({ data, disabled, remark, approveDetail, onConfirm }: IFlow
       <Space size={8}>
         <Button
           type={'primary'}
-          disabled={disabled || approveDetail?.sp_status == 1}
+          disabled={disabled || [1, 2].includes(approveDetail?.sp_status)}
           onClick={handleConfirm}
         >
           提交审批

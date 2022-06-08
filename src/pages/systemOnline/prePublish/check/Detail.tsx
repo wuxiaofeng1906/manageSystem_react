@@ -16,6 +16,7 @@ const Detail = () => {
   } = useLocation() as any;
   const { getList, formatStatus, source, spinning } = useCheckDetail();
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
+  const [disabled] = useModel('systemOnline', (system) => [system.disabled]);
 
   const handleCheck = async (data: any) => {
     if (!idx && !user?.userid) return;
@@ -37,8 +38,8 @@ const Detail = () => {
           frameworkComponents={{
             checkStatus: formatStatus,
             operation: (it: CellClickedEvent) => {
-              const disabled = ['unknown', 'wait'].includes(it.data.status || 'unknown');
-              const refreshed = ['doing', 'running'].includes(it.data.status);
+              const showLog = ['unknown', 'wait'].includes(it.data.status || 'unknown');
+              const refreshed = ['doing', 'running'].includes(it.data.status) || disabled;
               return (
                 <div className={'operation'}>
                   {it.data?.refresh && (
@@ -53,9 +54,9 @@ const Detail = () => {
                   )}
                   <img
                     src={require('../../../../../public/logs.png')}
-                    style={disabled ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {}}
+                    style={showLog ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {}}
                     onClick={() => {
-                      if (disabled) return;
+                      if (showLog) return;
                       if (it.data.refresh && it.data.check_log) {
                         window.open(it.data.check_log);
                         return;
@@ -73,7 +74,10 @@ const Detail = () => {
                               whiteSpace: 'pre-line',
                             }}
                           >
-                            <div>检查状态： {formatStatus(it)}</div>
+                            <div>
+                              检查状态：{' '}
+                              {formatStatus({ data: it.data, rowIndex: it.rowIndex || 0 })}
+                            </div>
                             <div>
                               日志信息：
                               {isArray(it.data?.check_log)

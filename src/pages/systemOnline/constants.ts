@@ -10,7 +10,7 @@ const COMMON_STATUS = {
   yes: '是',
   no: '否',
   success: '发布成功',
-  feature: '发布失败',
+  failure: '发布失败',
   businessFront: '业务前端',
   businessBackend: '业务后端',
   platformBackend: '平台后端',
@@ -34,7 +34,7 @@ const PUBLISH_RESULT = [
   { label: '空', value: 'unknown', key: 'unknown' },
   // {label:'取消发布',value:'cancel',key:'cancel'},
   { label: '发布成功', value: 'success', key: 'success' },
-  { label: '发布失败', value: 'feature', key: 'feature' },
+  { label: '发布失败', value: 'failure', key: 'failure' },
 ];
 const SETTING_STATUS = [
   { label: '进行中', value: 'doing', key: 'blue' },

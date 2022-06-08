@@ -27,7 +27,7 @@ const BuildProject = () => {
 };
 
 const Approve = () => {
-  const { source, formatStatus } = useCheckDetail();
+  const { source, formatStatus, getList } = useCheckDetail();
   const {
     query: { idx },
   } = useLocation() as any;
@@ -68,8 +68,6 @@ const Approve = () => {
   const getApproval = async () => {
     const res = await OnlineServices.getApproval(idx);
     setApproveDetail(res);
-    // 检查是否存在未通过选项
-    checkPass();
   };
 
   const getInitApproval = async () => {
@@ -111,7 +109,7 @@ const Approve = () => {
   };
 
   const checkPass = () => {
-    const status = source.some((it) => ['feature', 'error'].includes(it.status));
+    const status = source.some((it) => ['failure', 'error'].includes(it.status));
     setFlag(status);
     if (status) {
       getInitApproval();
@@ -120,7 +118,13 @@ const Approve = () => {
 
   useEffect(() => {
     getApproval();
+    getList();
   }, []);
+
+  useEffect(() => {
+    // 检查是否存在未通过选项
+    checkPass();
+  }, [source]);
 
   return (
     <div className={styles.approve}>

@@ -36,7 +36,8 @@ const Detail = () => {
           {...initGridTable(gridApi)}
           rowData={source}
           frameworkComponents={{
-            checkStatus: formatStatus,
+            checkStatus: ({ data, rowIndex }: CellClickedEvent) =>
+              formatStatus({ data, rowIndex: rowIndex || 0 }),
             operation: (it: CellClickedEvent) => {
               const showLog = ['unknown', 'wait'].includes(it.data.status || 'unknown');
               const refreshed = ['doing', 'running'].includes(it.data.status) || disabled;

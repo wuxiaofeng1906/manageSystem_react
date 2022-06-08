@@ -120,37 +120,34 @@ export const useCheckDetail = () => {
   }, []);
 
   // format check status
-  const formatStatus = useCallback(
-    ({ data, rowIndex }: { data: IRecord; rowIndex: number }) => {
-      let it = { value: '', color: '#2f2f2f' };
-      switch (data.status) {
-        case 'success':
-          it = { value: '是', color: '#099409' };
-          break;
-        case 'error':
-        case 'feature':
-          it = { value: '否', color: '#e02c2c' };
-          break;
-        case 'running':
-        case 'doing':
-          it = { value: '进行中', color: '#21aff3' };
-          break;
-        case 'wait':
-          it = { value: '未开始', color: '' };
-          break;
-        case 'skip':
-          it = { value: '忽略', color: '#d4d453' };
-          break;
-        case 'done':
-          it = { value: '已封板', color: '#099409' };
-          break;
-        default:
-          it = { value: Number(rowIndex) > 5 ? '不涉及' : '暂无', color: '#2f2f2f' };
-      }
-      return <span style={{ color: it.color || 'initial' }}>{it.value}</span>;
-    },
-    [source],
-  );
+  const formatStatus = useCallback(({ data, rowIndex }: { data: IRecord; rowIndex: number }) => {
+    let it = { value: '', color: '#2f2f2f' };
+    switch (data.status) {
+      case 'success':
+        it = { value: '是', color: '#099409' };
+        break;
+      case 'error':
+      case 'failure':
+        it = { value: '否', color: '#e02c2c' };
+        break;
+      case 'running':
+      case 'doing':
+        it = { value: '进行中', color: '#21aff3' };
+        break;
+      case 'wait':
+        it = { value: '未开始', color: '' };
+        break;
+      case 'skip':
+        it = { value: '忽略', color: '#d4d453' };
+        break;
+      case 'done':
+        it = { value: '已封板', color: '#099409' };
+        break;
+      default:
+        it = { value: Number(rowIndex) > 5 ? '不涉及' : '暂无', color: '#2f2f2f' };
+    }
+    return <span style={{ color: it.color || 'initial' }}>{it.value}</span>;
+  }, []);
 
   useEffect(() => {
     if (idx) {

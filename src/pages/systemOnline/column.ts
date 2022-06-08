@@ -7,7 +7,7 @@ const cellRenderStatus = ({ value }: any) =>
       ? ''
       : ['yes', 'success'].includes(value)
       ? 'color-success'
-      : 'color-feature'
+      : 'color-failure'
   }">${COMMON_STATUS[value] || '-'}</span>`;
 
 const formatDeployStatus = ({ value }: any) => `<span class="color-${value}">${value}</span>`;

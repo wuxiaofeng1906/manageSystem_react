@@ -76,12 +76,12 @@ const EditServices = (props: IEditServices) => {
         </Form.Item>
         <Form.Item
           name="is_seal"
-          label="是否封版"
+          label="测试是否封版"
           rules={[{ required: true, message: '请选择是否封版!' }]}
         >
           <Select options={STATUS_MAP} />
         </Form.Item>
-        <Form.Item name="seal_time" label="封版时间">
+        <Form.Item name="seal_time" label="测试确认封版时间">
           <DatePicker disabled format={'YYYY-MM-DD HH:mm:ss'} style={{ width: '100%' }} />
         </Form.Item>
       </Form>

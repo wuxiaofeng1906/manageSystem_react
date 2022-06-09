@@ -97,24 +97,30 @@ const ProjectServices = () => {
 
   // drag
   const onRowDragMove = useCallback(async (p: GridReadyEvent) => {
-    console.log(p.api);
-    Modal.confirm({
-      width: 600,
-      title: '提示：',
-      okText: '确认移动',
-      content: '工单有从上到下的依次执行顺序，请谨慎移动！',
-      onOk: async () => {
-        const data: { api_id: string; index: number; user_id: string }[] = [];
-        gridSQLRef.current?.forEachNode((node, index) => {
-          data.push({ api_id: node.data.api_id, index, user_id: user?.userid || '' });
-        });
-        await OnlineServices.preInterfaceSort(data);
-        await getProInfo(idx);
-      },
-      onCancel: () => {
-        gridSQLRef.current?.setRowData(sortServiceData);
-      },
+    // console.log(p.api);
+    // Modal.confirm({
+    //   width: 600,
+    //   title: '提示：',
+    //   okText: '确认移动',
+    //   content: '工单有从上到下的依次执行顺序，请谨慎移动！',
+    //   onOk: async () => {
+    //     const data: { api_id: string; index: number; user_id: string }[] = [];
+    //     gridSQLRef.current?.forEachNode((node, index) => {
+    //       data.push({ api_id: node.data.api_id, index, user_id: user?.userid || '' });
+    //     });
+    //     await OnlineServices.preInterfaceSort(data);
+    //     await getProInfo(idx);
+    //   },
+    //   onCancel: () => {
+    //     gridSQLRef.current?.setRowData(sortServiceData);
+    //   },
+    // });
+    const data: { api_id: string; index: number; user_id: string }[] = [];
+    gridSQLRef.current?.forEachNode((node, index) => {
+      data.push({ api_id: node.data.api_id, index, user_id: user?.userid || '' });
     });
+    await OnlineServices.preInterfaceSort(data);
+    await getProInfo(idx);
   }, []);
 
   // operation

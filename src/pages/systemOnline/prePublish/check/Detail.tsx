@@ -8,6 +8,7 @@ import { useLocation, useModel } from 'umi';
 import { Modal, Spin } from 'antd';
 import { isArray } from 'lodash';
 import { useCheckDetail } from '@/hooks/online';
+import { omit } from '@/utils/utils';
 
 const Detail = () => {
   const gridApi = useRef<GridApi>();
@@ -20,11 +21,27 @@ const Detail = () => {
 
   const handleCheck = async (data: any) => {
     if (!idx && !user?.userid) return;
-    const request =
-      data.key == 'check_env'
-        ? await OnlineServices.handleCheckEnv
-        : OnlineServices.handleCheckOnline;
-    await request({ user_id: user?.userid, release_num: idx });
+    let request;
+    switch (data.key) {
+      case 'test_unit':
+        request = OnlineServices.handleCheckTestUnit;
+        break;
+      case 'icon_check':
+        request = OnlineServices.handleCheckIcon;
+        break;
+      case 'check_env':
+        request = OnlineServices.handleCheckEnv;
+        break;
+      case 'version_check':
+        request = OnlineServices.handleCheckOnline;
+        break;
+      default:
+        request = OnlineServices.handleCheckSealing;
+    }
+    const params = ['version_check', 'check_env'].includes(data.type)
+      ? { user_id: user?.userid, release_num: idx }
+      : { release_num: idx };
+    await request(params);
     await getList();
   };
 

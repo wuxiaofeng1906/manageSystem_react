@@ -32,7 +32,7 @@ const EditUpgrade = (props: IEditUprade) => {
         ...props.data,
         ...result,
         user_id: user?.userid,
-        mark: props.data?.mark || '',
+        mark: result.mark || '',
       });
       props.onCancel?.(true);
     } finally {
@@ -101,7 +101,7 @@ const EditUpgrade = (props: IEditUprade) => {
           <Select options={STATUS_MAP} />
         </Form.Item>
         <Form.Item name="mark" label="备注">
-          <Input.TextArea disabled />
+          <Input.TextArea />
         </Form.Item>
       </Form>
     </Modal>

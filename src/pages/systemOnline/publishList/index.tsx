@@ -70,7 +70,7 @@ const PublishList: React.ReactNode = () => {
   };
 
   useEffect(() => {
-    form.setFieldsValue({ time: [moment().startOf('years'), moment()] });
+    form.setFieldsValue({ time: [moment().startOf('years'), moment()], result: ['unknown'] });
     getList();
   }, []);
 

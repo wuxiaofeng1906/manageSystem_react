@@ -77,7 +77,9 @@ const TagSelector = ({
             <div key={it.value} className={cls(styles.signWrap, 'ellipsis')}>
               <span>{it.label}</span>
               <br />
-              {it.status == 2 && <CheckCircleFilled />}
+              {it.status == 2 && ![3, 11].includes(approveDetail?.sp_status) && (
+                <CheckCircleFilled />
+              )}
               {edit && (
                 <CloseCircleOutlined
                   onClick={() => {
@@ -145,7 +147,7 @@ const ApproveFlow = ({ data, disabled, remark, approveDetail, onConfirm }: IFlow
         <Timeline.Item dot={<UserOutlined />}>
           <div>
             <p>发起人</p>
-            <p>{user?.name}</p>
+            <p>{approveDetail?.applyer_name || user?.name}</p>
           </div>
         </Timeline.Item>
         <Timeline.Item dot={<UserOutlined />}>

@@ -58,7 +58,12 @@ const EditSetting = (props: { data?: any } & ModalFuncProps) => {
           label="所属执行"
           rules={[{ required: true, message: '请选择所属执行!' }]}
         >
-          <Select options={projectSelectors} />
+          <Select
+            showSearch
+            options={projectSelectors}
+            optionFilterProp="label"
+            filterOption={(input, option) => (option!.label as unknown as string)?.includes(input)}
+          />
         </Form.Item>
         <Form.Item
           name="app_name"
@@ -159,7 +164,14 @@ const WebServicesSetting = () => {
               <Row justify={'end'}>
                 <Col span={12}>
                   <Form.Item name="pro_id" label="所属执行">
-                    <Select options={projectSelectors} />
+                    <Select
+                      showSearch
+                      options={projectSelectors}
+                      optionFilterProp="label"
+                      filterOption={(input, option) =>
+                        (option!.label as unknown as string)?.includes(input)
+                      }
+                    />
                   </Form.Item>
                 </Col>
                 <Col span={9} offset={1}>

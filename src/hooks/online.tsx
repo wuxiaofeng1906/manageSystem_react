@@ -10,6 +10,7 @@ const initList = [
     end_time: '',
     key: 'test_unit',
     check_log: '',
+    refresh: true,
   },
   {
     type: '后端单元测试运行是否通过',
@@ -18,6 +19,7 @@ const initList = [
     end_time: '',
     key: 'test_unit',
     check_log: '',
+    refresh: true,
   },
   {
     type: 'web与h5图标一致性检查是否通过',
@@ -26,6 +28,7 @@ const initList = [
     end_time: '',
     key: 'icon_check',
     check_log: '',
+    refresh: true,
   },
   {
     type: '创建库对比校验是否通过',
@@ -34,6 +37,7 @@ const initList = [
     end_time: '',
     key: 'library_data',
     check_log: '',
+    refresh: true,
   },
   {
     type: '应用版本代码遗漏检查是否通过',
@@ -54,40 +58,44 @@ const initList = [
     check_log: '',
   },
   {
-    type: '业务前端是否封板',
+    type: '业务前端是否封版',
     status: '',
     start_time: '',
     end_time: '',
     colSpan: 2,
     key: 'front_seal_version',
     check_log: '',
+    refresh: true,
   },
   {
-    type: '业务后端是否封板',
+    type: '业务后端是否封版',
     status: '',
     start_time: '',
     end_time: '',
     colSpan: 2,
     key: 'backend_seal_version',
     check_log: '',
+    refresh: true,
   },
   {
-    type: '平台后端是否封板',
+    type: '平台后端是否封版',
     status: '',
     start_time: '',
     end_time: '',
     colSpan: 2,
     key: 'platform_backend_seal_version',
     check_log: '',
+    refresh: true,
   },
   {
-    type: '流程是否封板',
+    type: '流程是否封版',
     status: '',
     start_time: '',
     end_time: '',
     colSpan: 2,
     key: 'platform_backend_seal_version',
     check_log: '',
+    refresh: true,
   },
 ];
 export const useCheckDetail = () => {
@@ -125,11 +133,11 @@ export const useCheckDetail = () => {
     let it = { value: '', color: '#2f2f2f' };
     switch (data.status) {
       case 'success':
-        it = { value: '是', color: '#099409' };
+        it = { value: '通过', color: '#099409' };
         break;
       case 'error':
       case 'failure':
-        it = { value: '否', color: '#e02c2c' };
+        it = { value: '不通过', color: '#e02c2c' };
         break;
       case 'running':
       case 'doing':
@@ -142,7 +150,7 @@ export const useCheckDetail = () => {
         it = { value: '忽略', color: '#d4d453' };
         break;
       case 'done':
-        it = { value: '已封板', color: '#099409' };
+        it = { value: '已封版', color: '#099409' };
         break;
       default:
         it = { value: Number(rowIndex) > 5 ? '不涉及' : '暂无', color: '#2f2f2f' };

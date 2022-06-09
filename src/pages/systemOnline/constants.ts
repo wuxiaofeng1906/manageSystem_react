@@ -32,7 +32,7 @@ const WEAPPENV = [
 ];
 const PUBLISH_RESULT = [
   { label: '空', value: 'unknown', key: 'unknown' },
-  // {label:'取消发布',value:'cancel',key:'cancel'},
+  { label: '取消发布', value: 'cancel', key: 'cancel' },
   { label: '发布成功', value: 'success', key: 'success' },
   { label: '发布失败', value: 'failure', key: 'failure' },
 ];

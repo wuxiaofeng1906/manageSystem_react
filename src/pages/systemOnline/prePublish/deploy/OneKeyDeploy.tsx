@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, TreeSelect, Form } from 'antd';
+import { Modal, TreeSelect, Form, Button } from 'antd';
 import { useModel, useLocation } from 'umi';
 import { ModalFuncProps } from 'antd/lib/modal/Modal';
 import OnlineServices from '@/services/online';
@@ -9,6 +9,7 @@ const OneKeyDeploy = (props: ModalFuncProps) => {
     query: { idx },
   } = useLocation() as any;
   const [list, setList] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [disabled] = useModel('systemOnline', (system) => [system.disabled]);
@@ -16,12 +17,17 @@ const OneKeyDeploy = (props: ModalFuncProps) => {
   const onFinish = async () => {
     if (!idx || disabled) return;
     const values = await form.validateFields();
-    const res = await OnlineServices.deployConfirm({
-      user_id: currentUser?.userid,
-      release_num: idx,
-      app_name: values.app_name?.join(','),
-    });
-    props.onOk?.();
+    setLoading(true);
+    try {
+      await OnlineServices.deployConfirm({
+        user_id: currentUser?.userid,
+        release_num: idx,
+        app_name: values.app_name?.join(','),
+      });
+      props.onOk?.();
+    } catch (e) {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -40,7 +46,7 @@ const OneKeyDeploy = (props: ModalFuncProps) => {
       onCancel={props.onCancel}
       maskClosable={false}
       okText="点击部署"
-      okButtonProps={{ disabled }}
+      okButtonProps={{ disabled, loading }}
       centered
     >
       <Form form={form}>

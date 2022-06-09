@@ -8,9 +8,9 @@ const cellRenderStatus = ({ value }: any) =>
       : ['yes', 'success'].includes(value)
       ? 'color-success'
       : 'color-failure'
-  }">${COMMON_STATUS[value] || '-'}</span>`;
+  }">${COMMON_STATUS[value] || ''}</span>`;
 
-const formatDeployStatus = ({ value }: any) => `<span class="color-${value}">${value}</span>`;
+const formatDeployStatus = ({ value }: any) => `<span class="color-${value}">${value || ''}</span>`;
 
 // 发布列表
 const publishColumn: (ColDef | ColGroupDef)[] = [
@@ -20,12 +20,14 @@ const publishColumn: (ColDef | ColGroupDef)[] = [
     minWidth: 60,
   },
   {
-    headerName: '正式发布批号',
+    headerName: '正式发布批次号',
     field: 'release_num',
   },
   {
     headerName: '发布项目',
     field: 'release_project_name',
+    headerClass: 'ag-align-left',
+    cellStyle: { textAlign: 'left' },
   },
   {
     headerName: '发布结果',
@@ -65,14 +67,17 @@ const projectUpgradeColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
     cellRenderer: (params: any) => (+params.node.id + 1).toString(),
+    minWidth: 60,
   },
   {
     headerName: '项目名称',
     field: 'project_name',
+    cellStyle: { background: '#f5f5f5' },
   },
   {
     headerName: '项目负责人',
     field: 'manager',
+    cellStyle: { background: '#f5f5f5' },
   },
   {
     headerName: '是否涉及数据库升级',
@@ -126,30 +131,39 @@ const dataReviewColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
     field: 'review_id',
-    minWidth: 90,
+    width: 90,
     cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
   {
     headerName: '数据修复内容',
     field: 'description',
     headerClass: 'ag-align-left',
-    cellStyle: { textAlign: 'left' },
+    cellStyle: { textAlign: 'left', background: '#f5f5f5' },
   },
   {
     headerName: '涉及租户',
     field: 'tenant_ids',
+    cellStyle: { background: '#f5f5f5' },
   },
   {
     headerName: '类型',
     field: 'review_type',
+    cellStyle: { background: '#f5f5f5' },
   },
   {
     headerName: '修复提交人',
     field: 'commiter',
+    cellStyle: { background: '#f5f5f5' },
   },
   {
     headerName: '分支',
     field: 'branch',
+    cellStyle: { background: '#f5f5f5' },
+  },
+  {
+    headerName: 'sql详情',
+    field: 'content',
+    cellStyle: { background: '#f5f5f5' },
   },
   // {
   //   headerName: '评审结果',
@@ -165,7 +179,7 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
     field: 'api_id',
-    minWidth: 90,
+    minWidth: 60,
     cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
   {
@@ -176,44 +190,48 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '升级类型',
     field: 'update_type',
+    cellStyle: { background: '#f5f5f5' },
     valueFormatter: ({ value }) => COMMON_STATUS[value] || '-',
   },
   {
     headerName: '升级接口',
     field: 'update_api',
+    cellStyle: { background: '#f5f5f5' },
     valueFormatter: ({ value }) => COMMON_STATUS[value] || '-',
   },
   {
     headerName: '接口服务',
     field: 'app_server',
     headerClass: 'ag-align-left',
-    cellStyle: { textAlign: 'left' },
+    cellStyle: { textAlign: 'left', background: '#f5f5f5' },
   },
   {
     headerName: '接口Method',
     field: 'method_name',
+    cellStyle: { background: '#f5f5f5' },
   },
   {
     headerName: '接口URL或SQL',
     field: 'url_or_sql',
     headerClass: 'ag-align-left',
-    cellStyle: { textAlign: 'left' },
+    cellStyle: { textAlign: 'left', background: '#f5f5f5' },
   },
   {
     headerName: 'Data',
     field: 'request_data',
     headerClass: 'ag-align-left',
-    cellStyle: { textAlign: 'left' },
+    cellStyle: { textAlign: 'left', background: '#f5f5f5' },
   },
   {
     headerName: 'Header',
     field: 'header',
     headerClass: 'ag-align-left',
-    cellStyle: { textAlign: 'left' },
+    cellStyle: { textAlign: 'left', background: '#f5f5f5' },
   },
   {
     headerName: '涉及租户',
     field: 'tenant_ids',
+    cellStyle: { background: '#f5f5f5' },
   },
   {
     headerName: '是否记录积压',
@@ -223,7 +241,7 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '操作',
-    minWidth: 100,
+    minWidth: 140,
     cellRenderer: 'operation',
     pinned: 'right',
     rowDrag: true, // drag
@@ -234,6 +252,11 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
 const deployColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
+    cellRenderer: (params: any) => (+params.node.id + 1).toString(),
+    minWidth: 60,
+  },
+  {
+    headerName: '一键部署ID',
     field: 'sheet_id',
   },
   {
@@ -313,7 +336,7 @@ const servicesSettingColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
     field: 'num',
-    minWidth: 90,
+    minWidth: 60,
   },
   {
     headerName: '所属执行',

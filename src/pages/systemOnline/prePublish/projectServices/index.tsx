@@ -1,7 +1,8 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { Form, Row, Col, Select, Space, Modal, Table, Spin } from 'antd';
+import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
+import { Form, Row, Col, Select, Space, Modal, Table, Spin, Tooltip } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { sortBy } from 'lodash';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import {
   projectUpgradeColumn,
   upgradeSQLColumn,
@@ -16,12 +17,35 @@ import EditSql from './EditSql';
 import OnlineServices from '@/services/online';
 import type { PreServices, PreSql, PreUpgradeItem } from '@/namespaces/interface';
 import { ColumnsType } from 'antd/lib/table/Table';
+import { GridReadyEvent } from 'ag-grid-community';
 
 type enumType = 'upgrade' | 'services' | 'sql';
 interface Istate<T> {
   visible: boolean;
   data?: T;
 }
+
+interface ITitle {
+  data: {
+    title: string;
+    subTitle?: string;
+  };
+}
+const ITableTitle = ({ data }: ITitle) => {
+  return (
+    <h4>
+      {data.title}
+      {data.subTitle ? (
+        <Tooltip overlayInnerStyle={{ color: '#2f2f2f' }} title={data.subTitle} color={'white'}>
+          <InfoCircleOutlined style={{ color: '#000000b0', marginLeft: 5, fontSize: '16px' }} />
+        </Tooltip>
+      ) : (
+        <React.Fragment />
+      )}
+    </h4>
+  );
+};
+
 const ProjectServices = () => {
   const {
     query: { idx },
@@ -66,14 +90,31 @@ const ProjectServices = () => {
     });
   }, [JSON.stringify(proInfo)]);
 
+  const sortServiceData = useMemo(
+    () => sortBy(proInfo?.upgrade_api || [], (it) => it.index),
+    [proInfo?.upgrade_api],
+  );
+
   // drag
-  const onRowDragMove = useCallback(async () => {
-    const data: { api_id: string; index: number; user_id: string }[] = [];
-    gridSQLRef.current?.forEachNode((node, index) => {
-      data.push({ api_id: node.data.api_id, index, user_id: user?.userid || '' });
+  const onRowDragMove = useCallback(async (p: GridReadyEvent) => {
+    console.log(p.api);
+    Modal.confirm({
+      width: 600,
+      title: '提示：',
+      okText: '确认移动',
+      content: '工单有从上到下的依次执行顺序，请谨慎移动！',
+      onOk: async () => {
+        const data: { api_id: string; index: number; user_id: string }[] = [];
+        gridSQLRef.current?.forEachNode((node, index) => {
+          data.push({ api_id: node.data.api_id, index, user_id: user?.userid || '' });
+        });
+        await OnlineServices.preInterfaceSort(data);
+        await getProInfo(idx);
+      },
+      onCancel: () => {
+        gridSQLRef.current?.setRowData(sortServiceData);
+      },
     });
-    await OnlineServices.preInterfaceSort(data);
-    await getProInfo(idx);
   }, []);
 
   // operation
@@ -106,11 +147,12 @@ const ProjectServices = () => {
 
   // sql detail
   const showDetail = ({ colDef, value }: CellClickedEvent) => {
-    if (colDef.field == 'url_or_sql' && value) {
+    if (colDef.field && ['url_or_sql', 'content'].includes(colDef.field) && value) {
       Modal.info({
         width: 600,
-        title: '详情',
+        title: colDef.headerName,
         okText: '好的',
+        centered: true,
         content: (
           <div
             style={{
@@ -137,7 +179,7 @@ const ProjectServices = () => {
       }
     });
     Object.entries(obj).map(([k, v]) => {
-      const index = arr.findIndex((it) => [it.cluster_id, it.server_id].toString().includes(k));
+      const index = arr.findIndex((it) => [it.cluster_id, it.server_id.toString()].includes(k));
       if (index >= 0) {
         arr[index] = { ...arr[index], rowSpan: v };
       }
@@ -146,8 +188,9 @@ const ProjectServices = () => {
   };
 
   useEffect(() => {
+    Modal.destroyAll();
     OnlineServices.preEnv().then((res) => {
-      setPreEnv(res?.map((it) => ({ key: it.id, label: it.image_env, value: it.image_env })));
+      setPreEnv(res?.map((it: any) => ({ key: it.id, label: it.image_env, value: it.image_env })));
     });
   }, []);
 
@@ -177,7 +220,7 @@ const ProjectServices = () => {
       render: (v) => <span>{COMMON_STATUS[v]}</span>,
     },
     {
-      title: '是否封板',
+      title: '测试确认封版',
       align: 'center',
       dataIndex: 'is_seal',
       className: 'required',
@@ -186,7 +229,7 @@ const ProjectServices = () => {
       ),
     },
     {
-      title: '封板时间',
+      title: '测试确认封版时间',
       align: 'center',
       dataIndex: 'seal_time',
     },
@@ -202,9 +245,12 @@ const ProjectServices = () => {
   return (
     <Spin spinning={spinning} tip={'数据加载中,请稍等...'}>
       <div>
-        <h4>
-          一、预发布项目&环境填写 <span className="color-tips">【由测试人员依次填写】</span>
-        </h4>
+        <ITableTitle
+          data={{
+            title: '一、预发布项目名称&分支填写',
+            subTitle: '由测试值班人员填写-按从左到右一次填写',
+          }}
+        />
         <Form form={form} onValuesChange={updatePreData}>
           <Row justify={'space-between'}>
             <Col span={8}>
@@ -240,7 +286,7 @@ const ProjectServices = () => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item label={'测试环境绑定'} name={'release_env'}>
+              <Form.Item label={'镜像环境绑定'} name={'release_env'}>
                 <Select
                   disabled={disabled}
                   style={{ width: '100%' }}
@@ -263,9 +309,12 @@ const ProjectServices = () => {
             填写时间： <span>{proInfo?.release_project?.edit_time || '-'}</span>
           </div>
         </Space>
-        <h4>
-          二、项目升级信息填写 <span className="color-tips">【由后端值班/流程值班人员填写】</span>
-        </h4>
+        <ITableTitle
+          data={{
+            title: '二、项目升级信息填写',
+            subTitle: '特性项目由端负责人填写，班车项目由前后端周值班人填写',
+          }}
+        />
         <div className={'AgGridReactTable'}>
           <AgGridReact
             {...initGridTable(gridUpgradeRef)}
@@ -276,10 +325,7 @@ const ProjectServices = () => {
             }}
           />
         </div>
-        <h4>
-          三、发布服务填写
-          <span className="color-tips">【由后端负责人/前端值班/后端值班/流程值班人员填写】</span>
-        </h4>
+        <ITableTitle data={{ title: '三、发布服务填写', subTitle: '由测试值班人员填写' }} />
         <Table
           rowKey="server_id"
           size="small"
@@ -289,9 +335,12 @@ const ProjectServices = () => {
           columns={serviceColumn}
           style={{ marginBottom: 20 }}
         />
-        <h4>
-          四、升级接口&升级SQL填写 <span className="color-tips">【前后端值班核对确认】</span>
-        </h4>
+        <ITableTitle
+          data={{
+            title: '四、升级接口&升级SQL填写',
+            subTitle: '特性项目由端负责人填写，班车项目由前后端周值班人填写',
+          }}
+        />
         <div className={'AgGridReactTable'}>
           <AgGridReact
             animateRows
@@ -300,22 +349,26 @@ const ProjectServices = () => {
             suppressRowTransform
             {...initGridTable(gridSQLRef)}
             columnDefs={upgradeSQLColumn}
-            rowData={sortBy(proInfo?.upgrade_api || [], (it) => it.index)}
+            rowData={sortServiceData}
             onRowDragEnd={onRowDragMove}
             frameworkComponents={{
-              operation: ({ data }: CellClickedEvent) => OperationDom(data, 'sql', false),
+              operation: ({ data }: CellClickedEvent) => OperationDom(data, 'sql'),
             }}
             onCellDoubleClicked={showDetail}
           />
         </div>
-        <h4>
-          五、数据修复Review <span className="color-tips">【由后端值班人员核对确认】</span>
-        </h4>
+        <ITableTitle
+          data={{
+            title: '五、数据修复Review',
+            subTitle: '特性项目由后端技术负责人确认，班车项目由后端周值班人填写',
+          }}
+        />
         <div className={'AgGridReactTable'}>
           <AgGridReact
             {...initGridTable(gridReviewRef)}
             columnDefs={dataReviewColumn}
             rowData={proInfo?.upgrade_review || []}
+            onCellDoubleClicked={showDetail}
           />
         </div>
         <EditUpgrade

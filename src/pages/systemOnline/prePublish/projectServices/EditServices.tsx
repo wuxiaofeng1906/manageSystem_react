@@ -14,7 +14,7 @@ interface IEditServices extends ModalFuncProps {
 const EditServices = (props: IEditServices) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [environmentSelector] = useModel('systemOnline', (system) => [system.environmentSelector]);
+  // const [environmentSelector] = useModel('systemOnline', (system) => [system.environmentSelector]);
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   useEffect(() => {
     if (props.visible) {
@@ -22,7 +22,7 @@ const EditServices = (props: IEditServices) => {
         ...props.data,
         technical_side: props.data?.technical_side ? COMMON_STATUS[props.data.technical_side] : '',
         seal_time: props.data?.seal_time ? moment(props.data?.seal_time) : null,
-        cluster_id: props.data?.cluster_id ? props.data?.cluster_id?.split(',') : [],
+        // cluster_id: props.data?.cluster_id ? props.data?.cluster_id?.split(',') : [],
       });
     } else form.resetFields();
   }, [props.visible]);
@@ -34,7 +34,7 @@ const EditServices = (props: IEditServices) => {
       await OnlineServices.updatePublishServer({
         user_id: user?.userid,
         server_id: props.data?.server_id,
-        cluster_id: result.cluster_id?.join(),
+        // cluster_id: result.cluster_id?.join(),
         is_seal: result.is_seal,
       });
       props.onCancel?.(true);
@@ -55,19 +55,19 @@ const EditServices = (props: IEditServices) => {
       centered
     >
       <Form form={form} wrapperCol={{ span: 16 }} labelCol={{ span: 6 }}>
-        <Form.Item
-          name="cluster_id"
-          label="上线环境"
-          rules={[{ required: true, message: '请选择上线环境!' }]}
-        >
-          <Select
-            showSearch
-            mode={'multiple'}
-            options={environmentSelector}
-            optionFilterProp="value"
-            filterOption={(input, option) => (option!.value as unknown as string)?.includes(input)}
-          />
-        </Form.Item>
+        {/*<Form.Item*/}
+        {/*  name="cluster_id"*/}
+        {/*  label="上线环境"*/}
+        {/*  rules={[{ required: true, message: '请选择上线环境!' }]}*/}
+        {/*>*/}
+        {/*  <Select*/}
+        {/*    showSearch*/}
+        {/*    mode={'multiple'}*/}
+        {/*    options={environmentSelector}*/}
+        {/*    optionFilterProp="value"*/}
+        {/*    filterOption={(input, option) => (option!.value as unknown as string)?.includes(input)}*/}
+        {/*  />*/}
+        {/*</Form.Item>*/}
         <Form.Item name="app_name" label="应用">
           <Input disabled />
         </Form.Item>

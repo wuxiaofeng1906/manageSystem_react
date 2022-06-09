@@ -8,6 +8,8 @@ export interface OptionType {
   label: string;
   key: string;
   status?: number;
+  date?: string;
+  mark?: string;
 }
 interface Iprops extends ModalFuncProps {
   data: OptionType[];

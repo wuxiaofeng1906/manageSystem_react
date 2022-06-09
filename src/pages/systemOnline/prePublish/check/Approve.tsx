@@ -90,6 +90,8 @@ const Approve = () => {
                 label: it.approver_name,
                 value: it.approver,
                 status: it.sp_status,
+                date: it.sp_time,
+                mark: it?.sp_mark,
               }))
             : result?.duty?.map((it: any) => ({
                 key: it.user_id,
@@ -103,6 +105,8 @@ const Approve = () => {
                 label: it.approver_name,
                 value: it.approver,
                 status: it.sp_status,
+                date: it.sp_time,
+                mark: it?.sp_mark,
               }))
             : result?.director?.map((it: any) => ({
                 key: it.user_id,
@@ -136,7 +140,7 @@ const Approve = () => {
   }, [source]);
 
   return (
-    <Spin spinning={loading} tip={'数据加载中'}>
+    <Spin spinning={loading} tip={'数据加载中...'}>
       <div className={styles.approve}>
         <div>
           <h3>一、发布项目：</h3>

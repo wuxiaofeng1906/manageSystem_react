@@ -38,10 +38,7 @@ const Detail = () => {
       default:
         request = OnlineServices.handleCheckSealing;
     }
-    const params = ['version_check', 'check_env'].includes(data.type)
-      ? { user_id: user?.userid, release_num: idx }
-      : { release_num: idx };
-    await request(params);
+    await request({ user_id: user?.userid, release_num: idx });
     await getList();
   };
 

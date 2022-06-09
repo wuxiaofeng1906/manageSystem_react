@@ -86,11 +86,10 @@ const PublishList: React.ReactNode = () => {
         <Form form={form} onValuesChange={() => getList()}>
           <Row justify={'space-around'}>
             <Col span={4}>
-              <Form.Item label="发布项目:" name="pro_id">
+              <Form.Item label="发布项目:" name="pro_id" style={{ width: '100%' }}>
                 <Select
                   showSearch
                   showArrow
-                  style={{ width: '100%' }}
                   mode="multiple"
                   maxTagCount="responsive"
                   optionFilterProp="label"
@@ -102,41 +101,23 @@ const PublishList: React.ReactNode = () => {
               </Form.Item>
             </Col>
             <Col span={4}>
-              <Form.Item label="发布结果:" name="result">
-                <Select
-                  showArrow
-                  showSearch={false}
-                  mode="multiple"
-                  style={{ width: '100%' }}
-                  options={PUBLISH_RESULT}
-                />
+              <Form.Item label="发布结果:" name="result" style={{ width: '100%' }}>
+                <Select showArrow showSearch={false} mode="multiple" options={PUBLISH_RESULT} />
               </Form.Item>
             </Col>
             <Col span={4}>
-              <Form.Item label="发布类型:" name="release_type">
-                <Select
-                  showArrow
-                  mode="multiple"
-                  showSearch={false}
-                  style={{ width: '100%' }}
-                  options={typeSelectors}
-                />
+              <Form.Item label="发布类型:" name="release_type" style={{ width: '100%' }}>
+                <Select showArrow mode="multiple" showSearch={false} options={typeSelectors} />
               </Form.Item>
             </Col>
             <Col span={4}>
-              <Form.Item label="发布方式:" name="release_method">
-                <Select
-                  showArrow
-                  showSearch={false}
-                  mode="multiple"
-                  style={{ width: '100%' }}
-                  options={methodSelectors}
-                />
+              <Form.Item label="发布方式:" name="release_method" style={{ width: '100%' }}>
+                <Select showArrow showSearch={false} mode="multiple" options={methodSelectors} />
               </Form.Item>
             </Col>
             <Col span={7}>
-              <Form.Item label="发布日期:" name="time">
-                <DatePicker.RangePicker format={'YYYY-MM-DD'} style={{ width: '100%' }} />
+              <Form.Item label="发布日期:" name="time" style={{ width: '100%' }}>
+                <DatePicker.RangePicker format={'YYYY-MM-DD'} />
               </Form.Item>
             </Col>
           </Row>

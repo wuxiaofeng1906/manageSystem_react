@@ -7,6 +7,7 @@ import {
   projectUpgradeColumn,
   upgradeSQLColumn,
   dataReviewColumn,
+  serverColumn,
 } from '@/pages/systemOnline/column';
 import type { CellClickedEvent, GridApi } from 'ag-grid-community';
 import { COMMON_STATUS, initGridTable } from '@/pages/systemOnline/constants';
@@ -58,6 +59,7 @@ const ProjectServices = () => {
   const gridUpgradeRef = useRef<GridApi>();
   const gridSQLRef = useRef<GridApi>();
   const gridReviewRef = useRef<GridApi>();
+  const gridServerRef = useRef<GridApi>();
 
   const [editUpgrade, setEditUpgrade] = useState<Istate<PreUpgradeItem> | null>();
   const [editServices, setEditServices] = useState<Istate<PreServices> | null>();
@@ -96,31 +98,24 @@ const ProjectServices = () => {
   );
 
   // drag
-  const onRowDragMove = useCallback(async (p: GridReadyEvent) => {
-    // console.log(p.api);
-    // Modal.confirm({
-    //   width: 600,
-    //   title: '提示：',
-    //   okText: '确认移动',
-    //   content: '工单有从上到下的依次执行顺序，请谨慎移动！',
-    //   onOk: async () => {
-    //     const data: { api_id: string; index: number; user_id: string }[] = [];
-    //     gridSQLRef.current?.forEachNode((node, index) => {
-    //       data.push({ api_id: node.data.api_id, index, user_id: user?.userid || '' });
-    //     });
-    //     await OnlineServices.preInterfaceSort(data);
-    //     await getProInfo(idx);
-    //   },
-    //   onCancel: () => {
-    //     gridSQLRef.current?.setRowData(sortServiceData);
-    //   },
-    // });
-    const data: { api_id: string; index: number; user_id: string }[] = [];
-    gridSQLRef.current?.forEachNode((node, index) => {
-      data.push({ api_id: node.data.api_id, index, user_id: user?.userid || '' });
+  const onRowDragMove = useCallback(async () => {
+    Modal.confirm({
+      width: 600,
+      title: '提示：',
+      okText: '确认移动',
+      content: '工单有从上到下的依次执行顺序，请谨慎移动！',
+      onOk: async () => {
+        const data: { api_id: string; index: number; user_id: string }[] = [];
+        gridSQLRef.current?.forEachNode((node, index) => {
+          data.push({ api_id: node.data.api_id, index, user_id: user?.userid || '' });
+        });
+        await OnlineServices.preInterfaceSort(data);
+        await getProInfo(idx);
+      },
+      onCancel: () => {
+        gridSQLRef.current?.setRowData(sortServiceData);
+      },
     });
-    await OnlineServices.preInterfaceSort(data);
-    await getProInfo(idx);
   }, []);
 
   // operation
@@ -175,78 +170,12 @@ const ProjectServices = () => {
     }
   };
 
-  const formatTable = (arr: any[]) => {
-    const obj = {};
-    arr.forEach((it) => {
-      if (it.cluster_id && obj[it.cluster_id]) {
-        obj[it.cluster_id]++;
-      } else {
-        obj[it.cluster_id || it.server_id] = 1;
-      }
-    });
-    Object.entries(obj).map(([k, v]) => {
-      const index = arr.findIndex((it) => [it.cluster_id, it.server_id.toString()].includes(k));
-      if (index >= 0) {
-        arr[index] = { ...arr[index], rowSpan: v };
-      }
-    });
-    return arr;
-  };
-
   useEffect(() => {
     Modal.destroyAll();
     OnlineServices.preEnv().then((res) => {
       setPreEnv(res?.map((it: any) => ({ key: it.id, label: it.image_env, value: it.image_env })));
     });
   }, []);
-
-  const serviceColumn: ColumnsType<PreServices> = [
-    {
-      title: '序号',
-      align: 'center',
-      render: (record, v, index) => <span>{index + 1}</span>,
-      onCell: (it) => ({ rowSpan: it.rowSpan || 0 }),
-    },
-    {
-      title: '上线环境',
-      dataIndex: 'cluster_name',
-      align: 'center',
-      onCell: (it) => ({ rowSpan: it.rowSpan || 0 }),
-      className: 'required',
-    },
-    {
-      title: '应用',
-      align: 'center',
-      dataIndex: 'app_name',
-    },
-    {
-      title: '对应侧',
-      align: 'center',
-      dataIndex: 'technical_side',
-      render: (v) => <span>{COMMON_STATUS[v]}</span>,
-    },
-    {
-      title: '测试确认封版',
-      align: 'center',
-      dataIndex: 'is_seal',
-      className: 'required',
-      render: (v) => (
-        <span className={`${v == 'yes' ? 'color-success' : ''}`}>{COMMON_STATUS[v]}</span>
-      ),
-    },
-    {
-      title: '测试确认封版时间',
-      align: 'center',
-      dataIndex: 'seal_time',
-    },
-    {
-      title: '操作',
-      align: 'center',
-      dataIndex: 'operation',
-      width: 120,
-      render: (_, record) => OperationDom(record, 'services'),
-    },
-  ];
 
   return (
     <Spin spinning={spinning} tip={'数据加载中,请稍等...'}>
@@ -332,15 +261,16 @@ const ProjectServices = () => {
           />
         </div>
         <ITableTitle data={{ title: '三、发布服务填写', subTitle: '由测试值班人员填写' }} />
-        <Table
-          rowKey="server_id"
-          size="small"
-          bordered
-          dataSource={formatTable(proInfo?.upgrade_app || [])}
-          pagination={false}
-          columns={serviceColumn}
-          style={{ marginBottom: 20 }}
-        />
+        <div className={'AgGridReactTable'}>
+          <AgGridReact
+            {...initGridTable(gridServerRef)}
+            columnDefs={serverColumn}
+            rowData={proInfo?.upgrade_app || []}
+            frameworkComponents={{
+              operation: ({ data }: CellClickedEvent) => OperationDom(data, 'services'),
+            }}
+          />
+        </div>
         <ITableTitle
           data={{
             title: '四、升级接口&升级SQL填写',

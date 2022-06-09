@@ -111,23 +111,23 @@ const OnlineServices = {
   },
   // 手动 环境一致性检查
   async handleCheckEnv(data: any) {
-    return request(`${baseUrl}/check_env`, { data, method: 'post' });
+    return request(`${baseUrl}/check_env`, { data, method: 'post', msg: true });
   },
   // 手动 上线版本检查
   async handleCheckOnline(data: any) {
-    return request(`${baseUrl}/release_check_version`, { data, method: 'post' });
+    return request(`${baseUrl}/release_check_version`, { data, method: 'post', msg: true });
   },
   // 单元测试
-  async handleCheckTestUnit(release_num: string) {
-    return request(`${baseUrl}/test_unit`, { params: { release_num } });
+  async handleCheckTestUnit(data: any) {
+    return request(`${baseUrl}/test_unit`, { data, method: 'post', msg: true });
   },
   // 图标
-  async handleCheckIcon(release_num: string) {
-    return request(`${baseUrl}/icon_check`, { params: { release_num } });
+  async handleCheckIcon(data: any) {
+    return request(`${baseUrl}/icon_check`, { data, method: 'post', msg: true });
   },
   // 封板检查
-  async handleCheckSealing(release_num: string) {
-    return request(`${baseUrl}/sealing_version`, { params: { release_num }, msg: true });
+  async handleCheckSealing(data: any) {
+    return request(`${baseUrl}/sealing_version`, { data, method: 'post', msg: true });
   },
   // 审批流程
   async getApproval(release_num: string) {

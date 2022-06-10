@@ -284,7 +284,7 @@ const ProjectServices = () => {
         </div>
         <ITableTitle data={{ title: '三、服务可封版确认', subTitle: '由测试值班人员填写' }} />
         <Form form={sealForm} onValuesChange={updateSealVersion}>
-          <Row gutter={4}>
+          <Row>
             <Col span={6}>
               <Form.Item label={'业务前端应用可封版'} name={'business_front'}>
                 <Select

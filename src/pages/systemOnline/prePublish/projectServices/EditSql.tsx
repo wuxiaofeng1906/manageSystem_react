@@ -85,7 +85,7 @@ const EditSql = (props: IEditSql) => {
           />
         </Form.Item>
         <Form.Item label={'并发数'} name={'concurrent'}>
-          <InputNumber min={0} style={{ width: '100%' }} />
+          <InputNumber min={0} precision={0} maxLength={11} style={{ width: '100%' }} />
         </Form.Item>
         <Form.Item
           name="record_backlog"

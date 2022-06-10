@@ -45,6 +45,107 @@ const ITableTitle = ({ data }: ITitle) => {
   );
 };
 
+const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) => {
+  const [sealForm] = Form.useForm();
+  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
+
+  const [sealVersion, setSealVersion] = useState<Record<string, any>>();
+
+  const getSealVersion = async () => {
+    if (!idx) return;
+    const res = await OnlineServices.getSealVersion(idx);
+    setSealVersion(res);
+    const formatResult = clone(res);
+    if (formatResult) {
+      for (const k in formatResult) {
+        if (!formatResult[k]) {
+          formatResult[k] = '免';
+        }
+      }
+    }
+    sealForm.setFieldsValue({ ...formatResult });
+  };
+
+  const updateSealVersion = async (value: Record<string, any>) => {
+    const [k, v] = Object.entries(value).flat() as [string, any];
+    await OnlineServices.updateSealVersion({
+      user_id: user?.userid,
+      release_num: idx,
+      side: k?.replace('business_', ''),
+      is_seal: v,
+    });
+    await getSealVersion();
+  };
+
+  useEffect(() => {
+    getSealVersion();
+  }, [idx]);
+
+  return (
+    <Form form={sealForm} onValuesChange={updateSealVersion} wrapperCol={{ span: 10 }}>
+      <Row>
+        <Col span={6}>
+          <Form.Item label={'业务前端应用可封版'} name={'business_front'} style={{ width: '100%' }}>
+            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.business_front} />
+          </Form.Item>
+        </Col>
+        <Col span={6}>
+          <Form.Item
+            label={'业务后端应用可封版'}
+            name={'business_backend'}
+            style={{ width: '100%' }}
+          >
+            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.business_backend} />
+          </Form.Item>
+        </Col>
+        <Col span={6}>
+          <Form.Item label={'流程应用可封版'} name={'process'} style={{ width: '100%' }}>
+            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.process} />
+          </Form.Item>
+        </Col>
+        <Col span={6}>
+          <Form.Item label={'global可封版'} name={'global'} style={{ width: '100%' }}>
+            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.global} />
+          </Form.Item>
+        </Col>
+      </Row>
+      <Row>
+        <Col span={5}>
+          <Form.Item label={'openapi可封版'} name={'openapi'} style={{ width: '100%' }}>
+            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.openapi} />
+          </Form.Item>
+        </Col>
+        <Col span={5}>
+          <Form.Item label={'qbos可封版'} name={'qbos'} style={{ width: '100%' }}>
+            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.qbos} />
+          </Form.Item>
+        </Col>
+        <Col span={5}>
+          <Form.Item label={'store可封版'} name={'store'} style={{ width: '100%' }}>
+            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.store} />
+          </Form.Item>
+        </Col>
+        <Col span={5}>
+          <Form.Item label={'jsf可封版'} name={'jsf'} style={{ width: '100%' }}>
+            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.jsf} />
+          </Form.Item>
+        </Col>
+        <Col span={2} style={{ width: '100%' }}>
+          <Form.Item label={'日志'} style={{ textAlign: 'center' }}>
+            <img
+              width={20}
+              src={require('../../../../../public/logs.png')}
+              onClick={() => {
+                console.log('test');
+              }}
+            />
+          </Form.Item>
+        </Col>
+      </Row>
+    </Form>
+  );
+};
+
 const ProjectServices = () => {
   const {
     query: { idx },
@@ -53,7 +154,6 @@ const ProjectServices = () => {
     useModel('systemOnline');
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [form] = Form.useForm();
-  const [sealForm] = Form.useForm();
   const gridUpgradeRef = useRef<GridApi>();
   const gridSQLRef = useRef<GridApi>();
   const gridReviewRef = useRef<GridApi>();
@@ -64,7 +164,6 @@ const ProjectServices = () => {
   const [editSql, setEditSql] = useState<Istate<PreSql> | null>();
   const [preEnv, setPreEnv] = useState([]);
   const [spinning, setPinning] = useState(false);
-  const [sealVersion, setSealVersion] = useState<Record<string, any>>();
 
   const updatePreData = async (value: any, values: any) => {
     // if (value.release_branch) {
@@ -81,17 +180,6 @@ const ProjectServices = () => {
       setPinning(true);
       await getProInfo(idx).finally(() => setPinning(false));
     }
-  };
-
-  const updateSealVersion = async (value: Record<string, any>) => {
-    const [k, v] = Object.entries(value).flat() as [string, any];
-    await OnlineServices.updateSealVersion({
-      user_id: user?.userid,
-      release_num: idx,
-      side: k?.replace('business_', ''),
-      is_seal: v,
-    });
-    await getSealVersion();
   };
 
   const sortServiceData = useMemo(
@@ -172,27 +260,12 @@ const ProjectServices = () => {
     }
   };
 
-  const getSealVersion = async () => {
-    if (!idx) return;
-    const res = await OnlineServices.getSealVersion(idx);
-    setSealVersion(res);
-    const formatResult = clone(res);
-    if (formatResult) {
-      for (const k in formatResult) {
-        if (!formatResult[k]) {
-          formatResult[k] = '免';
-        }
-      }
-    }
-    sealForm.setFieldsValue({ ...formatResult });
-  };
   useEffect(() => {
     Modal.destroyAll();
     OnlineServices.preEnv().then((res) => {
       setPreEnv(res?.map((it: any) => ({ key: it.id, label: it.image_env, value: it.image_env })));
     });
-    getSealVersion();
-  }, [idx]);
+  }, []);
   useEffect(() => {
     const info = proInfo?.release_project;
     form.setFieldsValue({
@@ -201,6 +274,7 @@ const ProjectServices = () => {
       release_env: info?.release_env,
     });
   }, [JSON.stringify(proInfo)]);
+
   return (
     <Spin spinning={spinning} tip={'数据加载中,请稍等...'}>
       <div>
@@ -210,13 +284,12 @@ const ProjectServices = () => {
             subTitle: '由测试值班人员填写-按从左到右一次填写',
           }}
         />
-        <Form form={form} onValuesChange={updatePreData}>
+        <Form form={form} onValuesChange={updatePreData} wrapperCol={{ span: 18 }}>
           <Row justify={'space-between'}>
             <Col span={8}>
-              <Form.Item label={'预发布项目'} name={'release_project'}>
+              <Form.Item label={'预发布项目'} name={'release_project'} style={{ width: '100%' }}>
                 <Select
                   options={projectSelectors}
-                  style={{ width: '100%' }}
                   mode="multiple"
                   maxTagCount="responsive"
                   optionFilterProp="label"
@@ -228,12 +301,11 @@ const ProjectServices = () => {
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label={'预发布分支'} name={'release_branch'}>
+              <Form.Item label={'预发布分支'} name={'release_branch'} style={{ width: '100%' }}>
                 <Select
-                  disabled={disabled}
-                  style={{ width: '100%' }}
-                  optionFilterProp="label"
                   showSearch
+                  optionFilterProp="label"
+                  disabled={disabled}
                   filterOption={(input, option) =>
                     (option!.label as unknown as string)?.includes(input)
                   }
@@ -245,10 +317,9 @@ const ProjectServices = () => {
               </Form.Item>
             </Col>
             <Col span={7}>
-              <Form.Item label={'镜像环境绑定'} name={'release_env'}>
+              <Form.Item label={'镜像环境绑定'} name={'release_env'} style={{ width: '100%' }}>
                 <Select
                   disabled={disabled}
-                  style={{ width: '100%' }}
                   optionFilterProp="label"
                   options={preEnv}
                   showSearch
@@ -283,69 +354,7 @@ const ProjectServices = () => {
           />
         </div>
         <ITableTitle data={{ title: '三、服务可封版确认', subTitle: '由测试值班人员填写' }} />
-        <Form form={sealForm} onValuesChange={updateSealVersion}>
-          <Row>
-            <Col span={6}>
-              <Form.Item label={'业务前端应用可封版'} name={'business_front'}>
-                <Select
-                  options={PLATE_STATUS}
-                  disabled={disabled || !sealVersion?.business_front}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item label={'业务后端应用可封版'} name={'business_backend'}>
-                <Select
-                  options={PLATE_STATUS}
-                  disabled={disabled || !sealVersion?.business_backend}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item label={'流程应用可封版'} name={'process'}>
-                <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.process} />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item label={'global可封版'} name={'global'}>
-                <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.global} />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={5}>
-              <Form.Item label={'openapi可封版'} name={'openapi'}>
-                <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.openapi} />
-              </Form.Item>
-            </Col>
-            <Col span={5}>
-              <Form.Item label={'qbos可封版'} name={'qbos'}>
-                <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.qbos} />
-              </Form.Item>
-            </Col>
-            <Col span={5}>
-              <Form.Item label={'store可封版'} name={'store'}>
-                <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.store} />
-              </Form.Item>
-            </Col>
-            <Col span={5}>
-              <Form.Item label={'jsf可封版'} name={'jsf'}>
-                <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.jsf} />
-              </Form.Item>
-            </Col>
-            <Col span={2}>
-              <Form.Item label={'日志'} style={{ textAlign: 'center' }}>
-                <img
-                  width={20}
-                  src={require('../../../../../public/logs.png')}
-                  onClick={() => {
-                    console.log('test');
-                  }}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
+        <SealVersionForm disabled={disabled} idx={idx} />
         <ITableTitle
           data={{
             title: '四、项目升级信息填写',
@@ -362,7 +371,6 @@ const ProjectServices = () => {
             }}
           />
         </div>
-
         <ITableTitle
           data={{
             title: '五、升级接口&升级SQL填写',

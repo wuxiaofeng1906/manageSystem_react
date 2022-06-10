@@ -5,18 +5,15 @@
   height: 100%;
 
   :global {
-    .ant-tabs-nav-list {
-      justify-content: space-between;
-      width: 100%;
-      font-weight: 500;
-      background: rgba(217, 222, 232, 0.3);
-      border-radius: 6px;
-    }
-
     .ant-tabs-tab {
       font-size: 16px;
-      background: transparent !important;
-      border: 0 !important;
+    }
+    .ant-tabs-nav-list{
+      width: 50%;
+      justify-content: space-around;
+    }
+    .ant-tabs-nav{
+      margin-bottom: 30px;
     }
   }
 }
@@ -40,56 +37,4 @@
     font-size: 15px;
     line-height: 1.8em;
   }
-
-  // .signWrap {
-  //   max-width: 100px;
-  //   position: relative;
-  //   margin-right: 16px;
-  //   overflow: initial;
-
-  //   :global {
-  //     .anticon {
-  //       position: absolute;
-  //       top: -10px;
-  //       right: -10px;
-  //       color: @color-text-hint
-  //     }
-  //   }
-  // }
-
-  // .addAnticon {
-  //   font-size: 24px;
-  //   color: @color-divider
-  // }
-
-  // :global {
-  //   .ant-timeline-item {
-  //     .ant-timeline-item-content {
-  //       color: @color-text-title;
-  //       font-size: 15px;
-
-  //       p {
-  //         margin: 0;
-
-  //         &:last-child {
-  //           margin-top: 8px;
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   .ant-timeline-item-tail {
-  //     border-left: 2px solid #d2d4d8;
-  //     top: 20px;
-  //     height: calc(100% - 20px)
-  //   }
-
-  //   .ant-timeline-item-head-custom {
-  //     background: lightblue;
-  //     color: white;
-  //     border-radius: 50%;
-  //     padding: 5px;
-  //     font-size: 16px;
-  //   }
-  // }
 }

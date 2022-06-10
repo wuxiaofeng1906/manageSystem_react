@@ -7,6 +7,7 @@ import moment from 'moment';
 import { PUBLISH_RESULT, MENUS } from '../../constants';
 import { MOMENT_FORMAT } from '@/namespaces';
 import { omit } from '@/utils/utils';
+import { isEmpty } from 'lodash';
 
 const PreLayout = ({ location, children }: { location: any; children: React.ReactNode }) => {
   const {
@@ -44,7 +45,7 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
   // create or query
   useEffect(() => {
     getProInfo(idx).then((res) => {
-      if (res && !Object.keys(res?.release_project).length) {
+      if (res && isEmpty(res?.release_project)) {
         update('create', {
           release_type: typeSelectors?.[0]?.value,
           release_method: methodSelectors?.[0]?.value,

@@ -21,6 +21,7 @@ const Detail = () => {
 
   const handleCheck = async (data: any) => {
     if (!idx && !user?.userid) return;
+    let params = { user_id: user?.userid, release_num: idx, side: data.side };
     let request;
     switch (data.key) {
       case 'test_unit':
@@ -35,13 +36,13 @@ const Detail = () => {
       case 'version_check':
         request = OnlineServices.handleCheckOnline;
         break;
+      case 'library_data':
+        break;
       default:
         request = OnlineServices.handleCheckSealing;
     }
-    const params = ['version_check', 'check_env'].includes(data.type)
-      ? { user_id: user?.userid, release_num: idx }
-      : { release_num: idx };
-    await request(params);
+
+    await request(params.side ? params : omit(params, ['side']));
     await getList();
   };
 

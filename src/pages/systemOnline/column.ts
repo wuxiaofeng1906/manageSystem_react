@@ -54,7 +54,7 @@ const publishColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '发布环境',
-    field: 'release_env',
+    field: 'release_cluster',
   },
   {
     headerName: '正式发布时间',
@@ -72,11 +72,13 @@ const projectUpgradeColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '项目名称',
     field: 'project_name',
+    minWidth: 120,
     cellStyle: { background: '#f5f5f5' },
   },
   {
     headerName: '项目负责人',
     field: 'manager',
+    minWidth: 120,
     cellStyle: { background: '#f5f5f5' },
   },
   {
@@ -84,36 +86,42 @@ const projectUpgradeColumn: (ColDef | ColGroupDef)[] = [
     field: 'is_database_upgrade',
     cellRenderer: cellRenderStatus,
     headerClass: 'ag-required',
+    minWidth: 170,
   },
   {
     headerName: '是否涉及数据Recovery',
     field: 'is_recovery_database',
     cellRenderer: cellRenderStatus,
     headerClass: 'ag-required',
+    minWidth: 190,
   },
   {
     headerName: '是否清理缓存',
     field: 'is_clear_redis',
     cellRenderer: cellRenderStatus,
     headerClass: 'ag-required',
+    minWidth: 120,
   },
   {
     headerName: '是否清理应用缓存',
     field: 'is_clear_app_cache',
     cellRenderer: cellRenderStatus,
     headerClass: 'ag-required',
+    minWidth: 140,
   },
   {
     headerName: '后端是否涉及配置项增加',
     field: 'is_add_front_config',
     cellRenderer: cellRenderStatus,
     headerClass: 'ag-required',
+    minWidth: 180,
   },
   {
     headerName: '前端是否涉及元数据更新',
     field: 'is_front_data_update',
     cellRenderer: cellRenderStatus,
     headerClass: 'ag-required',
+    minWidth: 180,
   },
   {
     headerName: '备注',
@@ -123,6 +131,52 @@ const projectUpgradeColumn: (ColDef | ColGroupDef)[] = [
     headerName: '操作',
     pinned: 'right',
     minWidth: 120,
+    cellRenderer: 'operation',
+  },
+];
+const serverColumn: (ColDef | ColGroupDef)[] = [
+  {
+    headerName: '序号',
+    cellRenderer: (params: any) => (+params.node.id + 1).toString(),
+    width: 90,
+  },
+  {
+    headerName: '上线环境',
+    field: 'cluster_name',
+    headerClass: 'ag-required',
+    width: 100,
+    cellClassRules: { 'ag-disabled': 'value !== global' },
+  },
+  {
+    headerName: '应用',
+    field: 'app_name',
+    headerClass: 'ag-align-left',
+    cellStyle: { background: '#f5f5f5', textAlign: 'left' },
+  },
+  // {
+  //   headerName: '对应侧',
+  //   field: 'technical_side',
+  //   cellStyle: { background: '#f5f5f5' },
+  //   valueFormatter: ({ value }) => COMMON_STATUS[value] || '-',
+  // },
+  // {
+  //   headerName: '测试确认封板',
+  //   field: 'is_seal',
+  //   headerClass: 'ag-required',
+  //   cellRenderer: cellRenderStatus,
+  // },
+  // {
+  //   headerName: '测试确认封版时间',
+  //   field: 'seal_time',
+  //   cellStyle: { background: '#f5f5f5' },
+  // },
+  {
+    headerName: '操作',
+    pinned: 'right',
+    width: 90,
+    cellClassRules: {
+      'ag-disabled': (p) => p.data.cluster_name == 'global',
+    },
     cellRenderer: 'operation',
   },
 ];
@@ -186,58 +240,83 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
     headerName: '上线环境',
     field: 'cluster_name',
     headerClass: 'ag-required',
+    minWidth: 120,
   },
   {
     headerName: '升级类型',
     field: 'update_type',
     cellStyle: { background: '#f5f5f5' },
+    minWidth: 120,
     valueFormatter: ({ value }) => COMMON_STATUS[value] || '-',
   },
   {
     headerName: '升级接口',
     field: 'update_api',
+    minWidth: 120,
+
     cellStyle: { background: '#f5f5f5' },
     valueFormatter: ({ value }) => COMMON_STATUS[value] || '-',
   },
   {
     headerName: '接口服务',
     field: 'app_server',
+    minWidth: 120,
+
     headerClass: 'ag-align-left',
     cellStyle: { textAlign: 'left', background: '#f5f5f5' },
   },
   {
     headerName: '接口Method',
     field: 'method_name',
+    minWidth: 120,
+
     cellStyle: { background: '#f5f5f5' },
   },
   {
     headerName: '接口URL或SQL',
     field: 'url_or_sql',
+    minWidth: 120,
     headerClass: 'ag-align-left',
     cellStyle: { textAlign: 'left', background: '#f5f5f5' },
   },
   {
     headerName: 'Data',
     field: 'request_data',
+    minWidth: 120,
+
     headerClass: 'ag-align-left',
     cellStyle: { textAlign: 'left', background: '#f5f5f5' },
   },
   {
     headerName: 'Header',
     field: 'header',
+    minWidth: 120,
     headerClass: 'ag-align-left',
     cellStyle: { textAlign: 'left', background: '#f5f5f5' },
   },
   {
     headerName: '涉及租户',
     field: 'tenant_ids',
+    minWidth: 120,
     cellStyle: { background: '#f5f5f5' },
+  },
+  {
+    headerName: '并发数',
+    field: 'concurrent',
+    minWidth: 100,
   },
   {
     headerName: '是否记录积压',
     field: 'record_backlog',
+    minWidth: 120,
     cellRenderer: cellRenderStatus,
     headerClass: 'ag-required', // 表头标题添加 * 类名
+  },
+  {
+    headerName: '正式环境',
+    field: 'release_cluster_name',
+    cellStyle: { background: '#f5f5f5' },
+    minWidth: 100,
   },
   {
     headerName: '操作',
@@ -258,35 +337,44 @@ const deployColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '一键部署ID',
     field: 'sheet_id',
+    minWidth: 120,
   },
   {
     headerName: '目标环境',
     field: 'release_env',
+    minWidth: 120,
   },
   {
     headerName: '部署类型',
     field: 'deployment',
+    minWidth: 120,
+
     valueFormatter: ({ value }) => DEPLOY_TYPE[value] || '-',
   },
   {
     headerName: '目标任务',
     field: 'deployment_app',
+    minWidth: 120,
   },
   {
     headerName: '触发者',
     field: 'executor_name',
+    minWidth: 120,
   },
   {
     headerName: '启动时间',
     field: 'start_time',
+    minWidth: 120,
   },
   {
     headerName: '完成时间',
     field: 'end_time',
+    minWidth: 120,
   },
   {
     headerName: '当前状态',
     field: 'status',
+    minWidth: 120,
     cellRenderer: formatDeployStatus,
   },
   {
@@ -326,7 +414,7 @@ const checkDetailColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '操作',
     pinned: 'right',
-    width: 90,
+    width: 110,
     cellRenderer: 'operation',
   },
 ];
@@ -377,4 +465,5 @@ export {
   deployColumn,
   checkDetailColumn,
   servicesSettingColumn,
+  serverColumn,
 };

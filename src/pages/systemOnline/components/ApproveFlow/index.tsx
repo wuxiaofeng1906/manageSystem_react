@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Space, Timeline, Modal } from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Button, Space, Timeline, Modal, Tag, Collapse } from 'antd';
 import {
-  PlusSquareOutlined,
+  PlusCircleOutlined,
   CloseCircleOutlined,
   UserOutlined,
   SendOutlined,
   CheckCircleFilled,
 } from '@ant-design/icons';
+import { isEmpty } from 'lodash';
 import PersonSelector, { OptionType } from '../PersonaSelector';
 import cls from 'classnames';
 import { useModel, useLocation } from 'umi';
 import OnlineServices from '@/services/online';
+import dayjs from 'dayjs';
 
 import styles from './index.less';
 
@@ -39,13 +41,13 @@ interface ITag {
   setShow: (data: { visible: boolean; selector: TagType }) => void;
 }
 const sp_status_map = {
-  1: '审批中',
-  2: '已同意',
-  3: '已驳回',
-  4: '已转审',
-  11: '已退回',
-  12: '已加签',
-  13: '已同意并加签',
+  1: { title: '审批中', color: 'blue' },
+  2: { title: '已同意', color: 'green' },
+  3: { title: '已驳回', color: 'red' },
+  4: { title: '已转审', color: 'cyan' },
+  11: { title: '已退回', color: 'gold' },
+  12: { title: '已加签', color: 'lime' },
+  13: { title: '已同意并加签', color: 'magenta' },
 };
 
 const TagSelector = ({
@@ -59,46 +61,77 @@ const TagSelector = ({
   approveDetail,
 }: ITag) => {
   const index = selector == 'duty' ? 0 : selector == 'director' ? 1 : -1;
-  const record = index == -1 ? null : approveDetail?.sp_record?.[index];
+  const record = useMemo(
+    () => (index == -1 ? null : approveDetail?.sp_record?.[index]),
+    [approveDetail?.sp_record],
+  );
+
   const edit = (clearable && ![1, 2].includes(approveDetail?.sp_status)) || disabled;
   return (
-    <div>
-      <p style={{ marginBottom: 10 }}>
-        {title}:
-        <span className={'color-prefix'}>
-          {record?.sp_status && record?.approverattr
-            ? `${record.approverattr == 1 ? '或签' : '会签'}【${sp_status_map[record.sp_status]}】`
-            : ''}
-        </span>
-      </p>
-      <div className={'flex-row'}>
-        <div className={'flex-row'}>
-          {list?.[selector]?.map((it, index) => (
-            <div key={it.value} className={cls(styles.signWrap, 'ellipsis')}>
-              <span>{it.label}</span>
-              <br />
-              {it.status == 2 && ![3, 11].includes(approveDetail?.sp_status) && (
-                <CheckCircleFilled />
+    <Collapse ghost className={'tagSelector'} activeKey={['cc', 'director', 'duty']}>
+      <Collapse.Panel
+        key={selector}
+        header={
+          <div>
+            {title}
+            <span className={'color-prefix'} style={{ marginLeft: 8 }}>
+              {record?.approverattr && (record.approverattr == 1 ? '或签' : '会签')}
+              {record?.sp_status && (
+                <Tag color={sp_status_map[record?.sp_status].color} style={{ marginLeft: 8 }}>
+                  {sp_status_map[record?.sp_status].title}
+                </Tag>
               )}
-              {edit && (
-                <CloseCircleOutlined
-                  onClick={() => {
-                    list?.[selector].splice(index, 1);
-                    setList({ ...list, [selector]: [...list?.[selector]] });
-                  }}
-                />
-              )}
-            </div>
-          ))}
+            </span>
+          </div>
+        }
+      >
+        <div style={{ padding: isEmpty(approveDetail) ? '16px 0' : 0 }}>
+          <div className={selector == 'cc' || isEmpty(approveDetail) ? 'flex-row' : ''}>
+            {list?.[selector]?.map((it, index) => (
+              <ul key={it.value}>
+                <li
+                  className={cls(styles.signWrap)}
+                  style={
+                    selector == 'cc' || isEmpty(approveDetail) ? { margin: '0 15px 15px' } : {}
+                  }
+                >
+                  <div className={'personal'}>
+                    {it.label}
+                    {edit && (
+                      <CloseCircleOutlined
+                        onClick={() => {
+                          list?.[selector].splice(index, 1);
+                          setList({ ...list, [selector]: [...list?.[selector]] });
+                        }}
+                      />
+                    )}
+                    {it.status == 2 && ![3, 11].includes(approveDetail?.sp_status) && (
+                      <CheckCircleFilled />
+                    )}
+                  </div>
+                  <div className={cls('flex-row', 'info')}>
+                    {it?.status && <span>{sp_status_map[it?.status].title}</span>}
+                    {it?.date ? (
+                      <span>{dayjs((it?.date || 0) * 1000).format('YYYY/MM/DD HH:mm') || ''}</span>
+                    ) : (
+                      ''
+                    )}
+                  </div>
+                  {it?.mark && <span className={'mark'}>{it?.mark || ''}</span>}
+                </li>
+              </ul>
+            ))}
+          </div>
+
+          {edit && (
+            <PlusCircleOutlined
+              onClick={() => setShow({ visible: true, selector })}
+              className={styles.addAnticon}
+            />
+          )}
         </div>
-        {edit && (
-          <PlusSquareOutlined
-            onClick={() => setShow({ visible: true, selector })}
-            className={styles.addAnticon}
-          />
-        )}
-      </div>
-    </div>
+      </Collapse.Panel>
+    </Collapse>
   );
 };
 
@@ -145,7 +178,7 @@ const ApproveFlow = ({ data, disabled, remark, approveDetail, onConfirm }: IFlow
     <div className={styles.approveFlow}>
       <Timeline>
         <Timeline.Item dot={<UserOutlined />}>
-          <div>
+          <div style={{ marginLeft: 24 }}>
             <p>发起人</p>
             <p>{approveDetail?.applyer_name || user?.name}</p>
           </div>
@@ -153,33 +186,33 @@ const ApproveFlow = ({ data, disabled, remark, approveDetail, onConfirm }: IFlow
         <Timeline.Item dot={<UserOutlined />}>
           <TagSelector
             title={'开发值班人'}
+            selector={'duty'}
             list={list || null}
             disabled={disabled || false}
-            setList={(v) => setList(v)}
-            selector={'duty'}
             approveDetail={approveDetail}
             setShow={(v) => setShow(v)}
+            setList={(v) => setList(v)}
           />
         </Timeline.Item>
         <Timeline.Item dot={<UserOutlined />}>
           <TagSelector
             title={'总监审批'}
             list={list || null}
-            disabled={disabled || false}
-            setList={(v) => setList(v)}
             selector={'director'}
             approveDetail={approveDetail}
+            disabled={disabled || false}
             setShow={(v) => setShow(v)}
+            setList={(v) => setList(v)}
           />
         </Timeline.Item>
         <Timeline.Item dot={<SendOutlined />}>
           <TagSelector
             title={'抄送人'}
+            selector={'cc'}
+            clearable={false}
             list={list || null}
             disabled={disabled || false}
             setList={(v) => setList(v)}
-            selector={'cc'}
-            clearable={false}
             setShow={(v) => setShow(v)}
           />
         </Timeline.Item>
@@ -191,7 +224,7 @@ const ApproveFlow = ({ data, disabled, remark, approveDetail, onConfirm }: IFlow
             disabled={disabled || approveDetail?.sp_status}
             onClick={handleConfirm}
           >
-            {approveDetail?.sp_status && sp_status_map[approveDetail?.sp_status]}
+            {approveDetail?.sp_status && sp_status_map[approveDetail?.sp_status].title}
           </Button>
         )}
         {![2, 13].includes(approveDetail?.sp_status) && (
@@ -203,19 +236,15 @@ const ApproveFlow = ({ data, disabled, remark, approveDetail, onConfirm }: IFlow
             {approveDetail?.sp_status ? '重新提交审批' : '提交审批'}
           </Button>
         )}
-
-        {/*<Button type={'primary'} style={{ color: '#ffb012' }}>*/}
-        {/*  撤销审批*/}
-        {/*</Button>*/}
       </Space>
       <PersonSelector
         {...show}
         data={show?.selector && list ? list[show.selector] : []}
+        onCancel={() => setShow(null)}
         onOk={(v: OptionType[], selector: TagType) => {
           setList({ ...list, [selector]: v } as any);
           setShow(null);
         }}
-        onCancel={() => setShow(null)}
       />
     </div>
   );

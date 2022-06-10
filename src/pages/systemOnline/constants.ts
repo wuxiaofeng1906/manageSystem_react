@@ -51,7 +51,7 @@ const MENUS = [
   // { label: '总览', key: 'overview' },
 ];
 const PLATE_STATUS = [
-  { label: '未知', value: 'unknown', key: 'unknown' },
+  // { label: '未知', value: 'unknown', key: 'unknown' },
   { label: '是', value: 'yes', key: 'yes' },
   { label: '否', value: 'no', key: 'no' },
 ];

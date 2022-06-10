@@ -1,67 +1,7 @@
-// 进度指标数据
+/* region 各个指标的Table定义 */
+// 1.进度指标数据
 import dayjs from "dayjs";
 
-const cellStyle = {
-  theme: 'TableStyleMedium15',
-  showRowStripes: true, // 用交替的背景色显示行
-}
-
-
-// 项目质量
-const getProjectQualityTable = (data: any) => {
-  const column = [
-    {name: "title"}, {name: "技术侧"}, {name: "汇总"}, {name: "汇总1"}, {name: "汇总2"},
-    {name: "汇总3"}, {name: "汇总4"}, {name: "汇总5"}, {name: "有效Bug数"},
-    {name: "有效Bug数1"}, {name: "有效Bug数2"}, {name: "有效Bug数3"}, {name: "Bug总数"},
-    {name: "Bug总数1"}, {name: "Bug总数2"}, {name: "Bug总数3"}, {name: "说明"}];
-  const secondTitle = ["", "", "Bug总数", "有效Bug数", "加权有效Bug数", "代码量", "有效千行Bug率", "加权有效千行Bug率",
-    "P0", "P1", "P2", "P3", "P0", "P1", "P2", "P3", "说明"];
-  const rowData: any = [secondTitle];
-
-  rowData.push([1, 2, 3, 4, 5, 6, 7, 7, 8, 8, 8, 10],
-    [1, 2, 3, 4, 5, 6, 7, 7, 8, 8, 8, 10],
-    [1, 2, 3, 4, 5, 6, 7, 7, 8, 8, 8, 10]);
-
-  const tableInfo = {
-    name: "projectQuaTable", // 表格名称
-    ref: "A1",
-    style: cellStyle,
-    columns: column,
-    rows: rowData,
-
-  };
-
-  return tableInfo;
-};
-
-// 测试数据
-const getTestDataTable = (data: any) => {
-  const column = [
-    {name: "title"}, {name: "用例执行情况"}, {name: "用例执行情况1"}, {name: "用例执行情况2"}, {name: "用例执行情况3"},
-    {name: "用例执行情况4"}, {name: "用例执行情况5"}, {name: "用例执行情况6"}, {name: "用例执行情况7"},
-    {name: "Bug情况"}, {name: "Bug情况1"}, {name: "Bug情况2"}, {name: "Bug情况3"}, {name: "Bug情况4"}, {name: "说明"}];
-  const secondTitle = ["", "轮次测试", "用例总数", "用例执行次数", "已通过用例数", "未执行用例数", "未指派用例数", "执行率",
-    "通过率", "Bug总数", "有效Bug数", "加权有效Bug数", "激活Bug", "Reopen率", "说明"];
-  const rowData: any = [secondTitle];
-
-  rowData.push([1, 2, 3, 4, 5, 6, 7, 7, 8, 8, 8, 10], [1, 2, 3, 4, 5, 6, 7, 7, 8, 8, 8, 10],
-    [1, 2, 3, 4, 5, 6, 7, 7, 8, 8, 8, 10],
-    [1, 2, 3, 4, 5, 6, 7, 7, 8, 8, 8, 10],
-    [1, 2, 3, 4, 5, 6, 7, 7, 8, 8, 8, 10],
-    [1, 2, 3, 4, 5, 6, 7, 7, 8, 8, 8, 10]);
-
-  const tableInfo = {
-    name: "testDataTable", // 表格名称
-    ref: "A7",
-    style: cellStyle,
-    columns: column,
-    rows: rowData,
-  };
-
-  return tableInfo;
-};
-
-// 过程质量
 const getProcessTable = (data: any) => {
   const column = [
     {name: "title"},
@@ -138,7 +78,7 @@ const getProcessTable = (data: any) => {
   return tableInfo;
 };
 
-// 需求稳定性
+// 2.需求稳定性
 const getStoryStabilityTable = (data: any) => {
   const column = [
     {name: "title"},
@@ -197,7 +137,7 @@ const getStoryStabilityTable = (data: any) => {
   return tableInfo;
 };
 
-// 阶段工作量（单位：人天）
+// 3.阶段工作量（单位：人天）
 const getStageWorkloadTable = (data: any) => {
   const column = [
     {name: "title"},
@@ -251,7 +191,7 @@ const getStageWorkloadTable = (data: any) => {
       const currentRow: any = [
         ele.title, ele.stage,
         manpower, planHours, actualHours,
-        planWorkload, actualWorkload, stageRatio,
+        planWorkload, actualWorkload,stageRatio,
         ele.description];
       rowData.push(currentRow);
     });
@@ -259,8 +199,11 @@ const getStageWorkloadTable = (data: any) => {
 
   const tableInfo = {
     name: "stageWorkloadTable",
-    ref: "A1",
-    style: cellStyle,
+    ref: "A15",
+    style: {
+      theme: 'TableStyleMedium15',
+      showRowStripes: true,
+    },
     columns: column,
     rows: rowData
   };
@@ -268,7 +211,7 @@ const getStageWorkloadTable = (data: any) => {
   return tableInfo;
 };
 
-// 产能
+// 4.生产率
 const getProductRateTable = (data: any) => {
   const column = [
     {name: "title"},
@@ -293,8 +236,11 @@ const getProductRateTable = (data: any) => {
 
   const tableInfo = {
     name: "productRateTable",
-    ref: "A9",
-    style: cellStyle,
+    ref: "A23",
+    style: {
+      theme: 'TableStyleMedium15',
+      showRowStripes: true,
+    },
     columns: column,
     rows: rowData
   };
@@ -302,7 +248,7 @@ const getProductRateTable = (data: any) => {
   return tableInfo;
 };
 
-// 评审和缺陷
+// 5.评审和缺陷
 const getReviewDefectTable = (data: any) => {
   const column = [
     {name: "title"},
@@ -394,8 +340,11 @@ const getReviewDefectTable = (data: any) => {
 
   const tableInfo = {
     name: "reviewDefectTable",
-    ref: "A13",
-    style: cellStyle,
+    ref: "A27",
+    style: {
+      theme: 'TableStyleMedium15',
+      showRowStripes: true,
+    },
     columns: column,
     rows: rowData
   };
@@ -403,7 +352,8 @@ const getReviewDefectTable = (data: any) => {
   return tableInfo;
 };
 
-// 过程质量补充数据
+
+// 6 过程质量补充数据
 const getProcessQualityTable = (data: any) => {
   const column = [
     {name: "title"},
@@ -448,8 +398,11 @@ const getProcessQualityTable = (data: any) => {
 
   const tableInfo = {
     name: "processQualityTable",
-    ref: "A31",
-    style: cellStyle,
+    ref: "A45",
+    style: {
+      theme: 'TableStyleMedium15',
+      showRowStripes: true,
+    },
     columns: column,
     rows: rowData
   };
@@ -457,7 +410,8 @@ const getProcessQualityTable = (data: any) => {
   return tableInfo;
 };
 
-// 服务
+
+// 7 服务
 const getServiceTable = (data: any) => {
   const column = [
     {name: "title"},
@@ -485,8 +439,11 @@ const getServiceTable = (data: any) => {
 
   const tableInfo = {
     name: "serviceTable",
-    ref: "A42",
-    style: cellStyle,
+    ref: "A56",
+    style: {
+      theme: 'TableStyleMedium15',
+      showRowStripes: true,
+    },
     columns: column,
     rows: rowData
   };
@@ -494,6 +451,7 @@ const getServiceTable = (data: any) => {
   return tableInfo;
 };
 
+/* endregion */
 
 // 正则表达式验证table sheet名是否可用（不可用则进行处理）
 const vertifyFileName = (stName: string) => {
@@ -511,8 +469,6 @@ const vertifyFileName = (stName: string) => {
 };
 
 export {
-  getProjectQualityTable,
-  getTestDataTable,
   getProcessTable,
   getStoryStabilityTable,
   getStageWorkloadTable,

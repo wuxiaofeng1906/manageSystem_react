@@ -83,7 +83,7 @@ const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) 
 
   return (
     <Form form={sealForm} onValuesChange={updateSealVersion} wrapperCol={{ span: 10 }}>
-      <Row>
+      <Row wrap={false}>
         <Col span={6}>
           <Form.Item label={'业务前端应用可封版'} name={'business_front'} style={{ width: '100%' }}>
             <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.business_front} />
@@ -109,7 +109,7 @@ const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) 
           </Form.Item>
         </Col>
       </Row>
-      <Row>
+      <Row wrap={false}>
         <Col span={5}>
           <Form.Item label={'openapi可封版'} name={'openapi'} style={{ width: '100%' }}>
             <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.openapi} />
@@ -284,8 +284,8 @@ const ProjectServices = () => {
             subTitle: '由测试值班人员填写-按从左到右一次填写',
           }}
         />
-        <Form form={form} onValuesChange={updatePreData} wrapperCol={{ span: 18 }}>
-          <Row justify={'space-between'}>
+        <Form form={form} onValuesChange={updatePreData}>
+          <Row gutter={4} wrap={false}>
             <Col span={8}>
               <Form.Item label={'预发布项目'} name={'release_project'} style={{ width: '100%' }}>
                 <Select
@@ -317,7 +317,11 @@ const ProjectServices = () => {
               </Form.Item>
             </Col>
             <Col span={7}>
-              <Form.Item label={'镜像环境绑定'} name={'release_env'} style={{ width: '100%' }}>
+              <Form.Item
+                label={'镜像环境绑定'}
+                name={'release_env'}
+                style={{ width: '100%', flexWrap: 'nowrap' }}
+              >
                 <Select
                   disabled={disabled}
                   optionFilterProp="label"

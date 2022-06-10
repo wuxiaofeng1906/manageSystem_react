@@ -153,8 +153,17 @@ const OnlineServices = {
   async preEnv() {
     return request('/api/verify/project/image_env');
   },
+  // 手动刷新部署状态
   async deploymentStatus(release_num: string) {
     return request(`${baseUrl}/deployment_status`, { params: { release_num } });
+  },
+  // 获取服务封版信息
+  async getSealVersion(release_num: string) {
+    return request(`${baseUrl}/seal_version`, { params: { release_num } });
+  },
+  // 更新封版信息
+  async updateSealVersion(data: any) {
+    return request(`${baseUrl}/seal_version`, { data, method: 'put' });
   },
 };
 export default OnlineServices;

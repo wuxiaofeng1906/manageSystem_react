@@ -46,6 +46,7 @@
   }
   :global {
     .ant-timeline-item {
+      padding-bottom: 5px;
       .ant-timeline-item-content {
         color: @color-text-title;
         font-size: 15px;
@@ -65,7 +66,6 @@
       height: calc(100% - 20px);
       border-left: 2px solid #d2d4d8;
     }
-
     .ant-timeline-item-head-custom {
       padding: 5px;
       color: white;
@@ -76,6 +76,10 @@
     .tagSelector{
       .ant-collapse-header{
         padding: 0;
+      }
+      .ant-collapse-content > .ant-collapse-content-box{
+        margin-left: 8px;
+        padding: 0px 16px 5px;
       }
     }
   }

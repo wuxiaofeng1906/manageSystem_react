@@ -141,31 +141,42 @@ const serverColumn: (ColDef | ColGroupDef)[] = [
     width: 90,
   },
   {
+    headerName: '上线环境',
+    field: 'cluster_name',
+    headerClass: 'ag-required',
+    width: 100,
+    cellClassRules: { 'ag-disabled': 'value !== global' },
+  },
+  {
     headerName: '应用',
     field: 'app_name',
-    cellStyle: { background: '#f5f5f5' },
+    headerClass: 'ag-align-left',
+    cellStyle: { background: '#f5f5f5', textAlign: 'left' },
   },
-  {
-    headerName: '对应侧',
-    field: 'technical_side',
-    cellStyle: { background: '#f5f5f5' },
-    valueFormatter: ({ value }) => COMMON_STATUS[value] || '-',
-  },
-  {
-    headerName: '测试确认封板',
-    field: 'is_seal',
-    headerClass: 'ag-required',
-    cellRenderer: cellRenderStatus,
-  },
-  {
-    headerName: '测试确认封版时间',
-    field: 'seal_time',
-    cellStyle: { background: '#f5f5f5' },
-  },
+  // {
+  //   headerName: '对应侧',
+  //   field: 'technical_side',
+  //   cellStyle: { background: '#f5f5f5' },
+  //   valueFormatter: ({ value }) => COMMON_STATUS[value] || '-',
+  // },
+  // {
+  //   headerName: '测试确认封板',
+  //   field: 'is_seal',
+  //   headerClass: 'ag-required',
+  //   cellRenderer: cellRenderStatus,
+  // },
+  // {
+  //   headerName: '测试确认封版时间',
+  //   field: 'seal_time',
+  //   cellStyle: { background: '#f5f5f5' },
+  // },
   {
     headerName: '操作',
     pinned: 'right',
     width: 90,
+    cellClassRules: {
+      'ag-disabled': (p) => p.data.cluster_name == 'global',
+    },
     cellRenderer: 'operation',
   },
 ];
@@ -225,11 +236,12 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
     minWidth: 60,
     cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
-  // {
-  //   headerName: '上线环境',
-  //   field: 'cluster_name',
-  //   headerClass: 'ag-required',
-  // },
+  {
+    headerName: '上线环境',
+    field: 'cluster_name',
+    headerClass: 'ag-required',
+    minWidth: 120,
+  },
   {
     headerName: '升级类型',
     field: 'update_type',
@@ -286,16 +298,25 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
     headerName: '涉及租户',
     field: 'tenant_ids',
     minWidth: 120,
-
     cellStyle: { background: '#f5f5f5' },
+  },
+  {
+    headerName: '并发数',
+    field: 'concurrent',
+    minWidth: 100,
   },
   {
     headerName: '是否记录积压',
     field: 'record_backlog',
     minWidth: 120,
-
     cellRenderer: cellRenderStatus,
     headerClass: 'ag-required', // 表头标题添加 * 类名
+  },
+  {
+    headerName: '正式环境',
+    field: 'release_cluster_name',
+    cellStyle: { background: '#f5f5f5' },
+    minWidth: 100,
   },
   {
     headerName: '操作',

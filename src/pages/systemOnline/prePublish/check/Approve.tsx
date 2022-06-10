@@ -8,7 +8,11 @@ import { valueMap } from '@/utils/utils';
 import { COMMON_STATUS } from '../../constants';
 import { useCheckDetail } from '@/hooks/online';
 import OnlineServices from '@/services/online';
-
+const applicantType = {
+  0: 'duty', // 值班人员
+  1: 'director', // 总监审批
+  2: 'cc', // 抄送人
+};
 const BuildProject = () => {
   const [upgrade_project] = useModel('systemOnline', (system) => [system.proInfo?.upgrade_project]);
 
@@ -71,8 +75,22 @@ const Approve = () => {
   const getApproval = async () => {
     const res = await OnlineServices.getApproval(idx);
     setApproveDetail(res);
-    if (isEmpty(res)) {
-      getInitApproval();
+    if (!isEmpty(res)) {
+      let data = {};
+      if (res?.sp_record.length > 0) {
+        res?.sp_record.forEach((it: any, i: number) => {
+          const o = it?.detail?.map((obj: any) => ({
+            key: obj.approver,
+            label: obj.approver_name,
+            value: obj.approver,
+            status: obj.sp_status,
+            date: obj.sp_time,
+            mark: obj?.speech,
+          }));
+          Object.assign(data, { [applicantType[i]]: o || [] });
+        });
+      }
+      setIntSource(data as any);
     }
   };
 
@@ -82,60 +100,34 @@ const Approve = () => {
     try {
       const result = await OnlineServices.getApplicant(idx);
       setLoading(false);
-      setIntSource({
-        duty:
-          approveDetail?.sp_record?.length > 0
-            ? approveDetail?.sp_record[0]?.detail?.map((it: any) => ({
-                key: it.approver,
-                label: it.approver_name,
-                value: it.approver,
-                status: it.sp_status,
-                date: it.sp_time,
-                mark: it?.sp_mark,
-              }))
-            : result?.duty?.map((it: any) => ({
-                key: it.user_id,
-                label: it.user_name,
-                value: it.user_id,
-              })),
-        director:
-          approveDetail?.sp_record?.length > 1
-            ? approveDetail?.sp_record[1]?.detail?.map((it: any) => ({
-                key: it.approver,
-                label: it.approver_name,
-                value: it.approver,
-                status: it.sp_status,
-                date: it.sp_time,
-                mark: it?.sp_mark,
-              }))
-            : result?.director?.map((it: any) => ({
-                key: it.user_id,
-                label: it.user_name,
-                value: it.user_id,
-              })),
-        cc: result?.cc?.map((it: any) => ({
-          key: it.user_id,
-          label: it.user_name,
-          value: it.user_id,
-        })),
-      });
+      let data = {};
+      if (!isEmpty(result)) {
+        Object.values(applicantType).forEach((k) => {
+          const o = result[k]?.map((it: any, i: number) => ({
+            key: it.user_id,
+            label: it.user_name,
+            value: it.user_id,
+          }));
+          Object.assign(data, { [k]: o || [] });
+        });
+      }
+      setIntSource(data as any);
     } catch (e) {
       setLoading(false);
     }
   };
 
+  // 检查是否存在未通过选项
   const checkPass = () => {
     const status = source.some((it) => ['failure', 'error'].includes(it.status));
     setFlag(status);
-    getInitApproval();
+    if (status) {
+      getInitApproval();
+    }
   };
 
   useEffect(() => {
     getApproval();
-  }, []);
-
-  useEffect(() => {
-    // 检查是否存在未通过选项
     checkPass();
   }, [source]);
 

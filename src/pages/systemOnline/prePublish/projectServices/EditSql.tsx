@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, Select } from 'antd';
+import { Modal, Form, Input, Select, InputNumber } from 'antd';
 import { useModel } from 'umi';
 
 import type { ModalFuncProps } from 'antd/lib/modal/Modal';
@@ -13,7 +13,7 @@ interface IEditSql extends ModalFuncProps {
 
 const EditSql = (props: IEditSql) => {
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
-  // const [environmentSelector] = useModel('systemOnline', (system) => [system.environmentSelector]);
+  const [environmentSelector] = useModel('systemOnline', (system) => [system.environmentSelector]);
 
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -24,6 +24,7 @@ const EditSql = (props: IEditSql) => {
         ...props.data,
         update_type: props.data ? COMMON_STATUS[props.data.update_type] : null,
         update_api: props.data ? COMMON_STATUS[props.data.update_api] : null,
+        cluster_id: props.data?.cluster_id ? props.data.cluster_id?.split(',') : [],
       });
     } else form.resetFields();
   }, [props.visible]);
@@ -33,8 +34,10 @@ const EditSql = (props: IEditSql) => {
     try {
       setLoading(true);
       await OnlineServices.updatePreInterface({
-        // cluster_id: values.cluster_id?.join(),
+        cluster_id: values.cluster_id?.join(),
+        release_cluster_id: values.cluster_id?.join(),
         is_backlog: values.is_backlog,
+        concurrent: values?.concurrent,
         user_id: user?.userid,
         api_id: props.data?.api_id,
       });
@@ -68,18 +71,22 @@ const EditSql = (props: IEditSql) => {
         <Form.Item name="tenant_ids" label="涉及租户">
           <Input disabled />
         </Form.Item>
-        {/*<Form.Item*/}
-        {/*  name="cluster_id"*/}
-        {/*  label="上线环境"*/}
-        {/*  rules={[{ required: true, message: '请选择上线环境!' }]}*/}
-        {/*>*/}
-        {/*  <Select*/}
-        {/*    showSearch*/}
-        {/*    options={environmentSelector}*/}
-        {/*    optionFilterProp="value"*/}
-        {/*    filterOption={(input, option) => (option!.value as unknown as string)?.includes(input)}*/}
-        {/*  />*/}
-        {/*</Form.Item>*/}
+        <Form.Item
+          name="cluster_id"
+          label="上线环境"
+          rules={[{ required: true, message: '请选择上线环境!' }]}
+        >
+          <Select
+            showSearch
+            mode={'multiple'}
+            options={environmentSelector}
+            optionFilterProp="value"
+            filterOption={(input, option) => (option!.value as unknown as string)?.includes(input)}
+          />
+        </Form.Item>
+        <Form.Item label={'并发数'} name={'concurrent'}>
+          <InputNumber min={0} style={{ width: '100%' }} />
+        </Form.Item>
         <Form.Item
           name="record_backlog"
           label="是否记录积压"

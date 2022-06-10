@@ -50,6 +50,11 @@ const MENUS = [
   // { label: '发布', key: 'publish' },
   // { label: '总览', key: 'overview' },
 ];
+const PLATE_STATUS = [
+  { label: '未知', value: 'unknown', key: 'unknown' },
+  { label: '是', value: 'yes', key: 'yes' },
+  { label: '否', value: 'no', key: 'no' },
+];
 
 const initColDef: ColDef = { resizable: true, suppressMenu: true };
 
@@ -92,6 +97,7 @@ export {
   COMMON_STATUS,
   PUBLISH_RESULT,
   SETTING_STATUS,
+  PLATE_STATUS,
   MENUS,
   WEAPPENV,
   DEPLOY_TYPE,

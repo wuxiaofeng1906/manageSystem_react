@@ -37,7 +37,7 @@ const initList = [
     end_time: '',
     key: 'library_data',
     check_log: '',
-    refresh: true,
+    // refresh: true,
   },
   {
     type: '应用版本代码遗漏检查是否通过',
@@ -66,6 +66,7 @@ const initList = [
     key: 'front_seal_version',
     check_log: '',
     refresh: true,
+    side: 'businessFront',
   },
   {
     type: '业务后端是否封版',
@@ -76,6 +77,7 @@ const initList = [
     key: 'backend_seal_version',
     check_log: '',
     refresh: true,
+    side: 'businessBackend',
   },
   {
     type: '平台后端是否封版',
@@ -86,6 +88,7 @@ const initList = [
     key: 'platform_backend_seal_version',
     check_log: '',
     refresh: true,
+    side: 'platformBackend',
   },
   {
     type: '流程是否封版',
@@ -96,6 +99,7 @@ const initList = [
     key: 'platform_backend_seal_version',
     check_log: '',
     refresh: true,
+    side: 'process',
   },
 ];
 export const useCheckDetail = () => {

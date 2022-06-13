@@ -126,7 +126,7 @@ const ProjectIndicator1: React.FC<any> = (currentProject: any) => {
                   </Popover>
                 );
               }
-              return props.value;
+              return props.value === undefined ? "" : props.value;
             },
           }}
           onCellEditingStopped={projectQuanlityEdtied}

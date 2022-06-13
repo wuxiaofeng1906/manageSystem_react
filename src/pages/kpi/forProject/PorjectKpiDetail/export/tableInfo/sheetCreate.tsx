@@ -50,9 +50,9 @@ export const indicator1SheetCreate = (data: any, newSheet: any) => {
   // 按开始行，开始列，结束行，结束列合并
 
   // 项目质量列的合并
-  sheet.mergeCells(1, 3, 1, 9); // 合并汇总
-  sheet.mergeCells(1, 10, 1, 13); // 合并有效Bug数
-  sheet.mergeCells(1, 14, 1, 17);// 合并Bug总数
+  sheet.mergeCells(1, 3, 1, 8); // 合并汇总
+  sheet.mergeCells(1, 9, 1, 12); // 合并有效Bug数
+  sheet.mergeCells(1, 13, 1, 16);// 合并Bug总数
 
   // 测试数据列合并
   sheet.mergeCells(7, 2, 7, 9); // 合并用例执行情况

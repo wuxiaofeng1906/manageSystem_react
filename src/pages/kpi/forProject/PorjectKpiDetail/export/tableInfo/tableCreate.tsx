@@ -16,7 +16,7 @@ const getProjectQualityTable = (data: any) => {
     {name: "有效Bug数1"}, {name: "有效Bug数2"}, {name: "有效Bug数3"}, {name: "Bug总数"},
     {name: "Bug总数1"}, {name: "Bug总数2"}, {name: "Bug总数3"}, {name: "说明"}];
   const secondTitle = ["", "", "Bug总数", "有效Bug数", "加权有效Bug数", "代码量", "有效千行Bug率",
-    "加权有效千行Bug率", "P0", "P1", "P2", "P3", "P0", "P1", "P2", "P3", "说明"];
+    "加权有效千行Bug率", "P0", "P1", "P2", "P3", "P0", "P1", "P2", "P3", ""];
   const rowData: any = [secondTitle];
 
   if (data && data.length) {

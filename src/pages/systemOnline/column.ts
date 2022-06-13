@@ -145,7 +145,7 @@ const serverColumn: (ColDef | ColGroupDef)[] = [
     field: 'cluster_name',
     headerClass: 'ag-required',
     width: 100,
-    cellClassRules: { 'ag-disabled': 'value !== global' },
+    cellClassRules: { 'ag-disabled': 'value == global' },
   },
   {
     headerName: '应用',

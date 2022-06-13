@@ -131,7 +131,7 @@ const DeploySetting = (props: ModalFuncProps) => {
             </span>
           </Form.Item>
         </Col>
-        <Divider plain>④front-authapp</Divider>
+        <Divider plain>④front-static</Divider>
         <Row>
           <Col span={6}>
             <Form.Item label={'是否需要上传到sentry'} name={'SENTRY'} valuePropName="checked">

@@ -85,55 +85,83 @@ const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) 
   }, [idx]);
 
   return (
-    <Form form={sealForm} onValuesChange={updateSealVersion} wrapperCol={{ span: 10 }}>
-      <Row>
+    <Form form={sealForm} onValuesChange={updateSealVersion}>
+      <Row gutter={5}>
         <Col span={6}>
-          <Form.Item label={'业务前端应用可封版'} name={'business_front'} style={{ width: '100%' }}>
-            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.business_front} />
+          <Form.Item label={'业务前端应用可封版'} name={'business_front'}>
+            <Select
+              options={PLATE_STATUS}
+              disabled={disabled || !sealVersion?.business_front}
+              style={{ width: '100%' }}
+            />
           </Form.Item>
         </Col>
         <Col span={6}>
-          <Form.Item
-            label={'业务后端应用可封版'}
-            name={'business_backend'}
-            style={{ width: '100%' }}
-          >
-            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.business_backend} />
+          <Form.Item label={'业务后端应用可封版'} name={'business_backend'}>
+            <Select
+              options={PLATE_STATUS}
+              disabled={disabled || !sealVersion?.business_backend}
+              style={{ width: '100%' }}
+            />
           </Form.Item>
         </Col>
         <Col span={6}>
-          <Form.Item label={'流程应用可封版'} name={'process'} style={{ width: '100%' }}>
-            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.process} />
+          <Form.Item label={'流程应用可封版'} name={'process'}>
+            <Select
+              options={PLATE_STATUS}
+              disabled={disabled || !sealVersion?.process}
+              style={{ width: '100%' }}
+            />
           </Form.Item>
         </Col>
         <Col span={6}>
-          <Form.Item label={'global可封版'} name={'global'} style={{ width: '100%' }}>
-            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.global} />
+          <Form.Item label={'global可封版'} name={'global'}>
+            <Select
+              options={PLATE_STATUS}
+              disabled={disabled || !sealVersion?.global}
+              style={{ width: '100%' }}
+            />
           </Form.Item>
         </Col>
       </Row>
       <Row>
         <Col span={5}>
-          <Form.Item label={'openapi可封版'} name={'openapi'} style={{ width: '100%' }}>
-            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.openapi} />
+          <Form.Item label={'openapi可封版'} name={'openapi'}>
+            <Select
+              options={PLATE_STATUS}
+              disabled={disabled || !sealVersion?.openapi}
+              style={{ width: '100%' }}
+            />
           </Form.Item>
         </Col>
         <Col span={5}>
-          <Form.Item label={'qbos可封版'} name={'qbos'} style={{ width: '100%' }}>
-            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.qbos} />
+          <Form.Item label={'qbos可封版'} name={'qbos'}>
+            <Select
+              options={PLATE_STATUS}
+              disabled={disabled || !sealVersion?.qbos}
+              style={{ width: '100%' }}
+            />
           </Form.Item>
         </Col>
         <Col span={5}>
-          <Form.Item label={'store可封版'} name={'store'} style={{ width: '100%' }}>
-            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.store} />
+          <Form.Item label={'store可封版'} name={'store'}>
+            <Select
+              options={PLATE_STATUS}
+              disabled={disabled || !sealVersion?.store}
+              style={{ width: '100%' }}
+            />
           </Form.Item>
         </Col>
         <Col span={5}>
-          <Form.Item label={'jsf可封版'} name={'jsf'} style={{ width: '100%' }}>
-            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.jsf} />
+          <Form.Item label={'jsf可封版'} name={'jsf'}>
+            <Select
+              options={PLATE_STATUS}
+              disabled={disabled || !sealVersion?.jsf}
+              style={{ width: '100%' }}
+            />
           </Form.Item>
         </Col>
-        <Col span={2} style={{ width: '100%' }}>
+        <Col span={2}>
           <Form.Item label={'日志'} style={{ textAlign: 'center' }}>
             <img
               width={20}
@@ -213,14 +241,14 @@ const ProjectServices = () => {
 
   // operation
   const OperationDom = (data: any, type: enumType, showLog = true) => {
-    const isEditCluster = type == 'sql' && data.update_type == 'upgradeApi';
+    // const isEditCluster = type == 'sql' && data.update_type == 'upgradeApi';
     return (
       <div className={'operation'}>
         <img
           src={require('../../../../../public/edit.png')}
-          style={isEditCluster ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {}}
+          // style={isEditCluster ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {}}
           onClick={() => {
-            if (disabled || isEditCluster) return;
+            if (disabled) return;
             const params = { visible: true, data };
             if (type == 'upgrade') setEditUpgrade(params);
             else if (type == 'services') setEditServices(params);
@@ -358,7 +386,8 @@ const ProjectServices = () => {
             columnDefs={serverColumn}
             rowData={proInfo?.upgrade_app || []}
             frameworkComponents={{
-              operation: ({ data }: CellClickedEvent) => OperationDom(data, 'services'),
+              operation: ({ data }: CellClickedEvent) =>
+                data.cluster_name == 'global' ? <div /> : OperationDom(data, 'services'),
             }}
           />
         </div>

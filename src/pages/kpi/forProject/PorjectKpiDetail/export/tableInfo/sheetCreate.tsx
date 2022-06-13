@@ -24,12 +24,12 @@ export const indicator1SheetCreate = (data: any, newSheet: any) => {
   /* region 设置表格的主要数据部分:表格内容 */
 
   // 项目质量
-  const processTable: any = getProjectQualityTable(data.processData);
+  const processTable: any = getProjectQualityTable(data.prjQualityData);
   sheet.addTable(processTable);
 
   // 测试数据
-  const storyStabilityTable: any = getTestDataTable(data.storyStabilityData);
-  sheet.addTable(storyStabilityTable);
+  // const storyStabilityTable: any = getTestDataTable(data.storyStabilityData);
+  // sheet.addTable(storyStabilityTable);
 
   /* endregion */
 

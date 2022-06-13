@@ -9,18 +9,44 @@ const cellStyle = {
 
 // 项目质量
 const getProjectQualityTable = (data: any) => {
+
   const column = [
     {name: "title"}, {name: "技术侧"}, {name: "汇总"}, {name: "汇总1"}, {name: "汇总2"},
     {name: "汇总3"}, {name: "汇总4"}, {name: "汇总5"}, {name: "有效Bug数"},
     {name: "有效Bug数1"}, {name: "有效Bug数2"}, {name: "有效Bug数3"}, {name: "Bug总数"},
     {name: "Bug总数1"}, {name: "Bug总数2"}, {name: "Bug总数3"}, {name: "说明"}];
-  const secondTitle = ["", "", "Bug总数", "有效Bug数", "加权有效Bug数", "代码量", "有效千行Bug率", "加权有效千行Bug率",
-    "P0", "P1", "P2", "P3", "P0", "P1", "P2", "P3", "说明"];
+  const secondTitle = ["", "", "Bug总数", "有效Bug数", "加权有效Bug数", "代码量", "有效千行Bug率",
+    "加权有效千行Bug率", "P0", "P1", "P2", "P3", "P0", "P1", "P2", "P3", "说明"];
   const rowData: any = [secondTitle];
 
-  rowData.push([1, 2, 3, 4, 5, 6, 7, 7, 8, 8, 8, 10],
-    [1, 2, 3, 4, 5, 6, 7, 7, 8, 8, 8, 10],
-    [1, 2, 3, 4, 5, 6, 7, 7, 8, 8, 8, 10]);
+  if (data && data.length) {
+    data.forEach((dts: any) => {
+      rowData.push([
+        dts.detail_title,
+        dts.tech,
+        // 汇总
+        dts.total_bug,
+        dts.effective_bug,
+        dts.weighted_effective_bug,
+        dts.code_count,
+        dts.effective_bug_rate,
+        dts.weighted_effective_bug_rate,
+        // 有效Bug数
+        dts.effective_p0,
+        dts.effective_p1,
+        dts.effective_p2,
+        dts.effective_p3,
+        // Bug数
+        dts.total_p0,
+        dts.total_p1,
+        dts.total_p2,
+        dts.total_p3,
+        //   说明
+        dts.description,
+      ]);
+    });
+  }
+
 
   const tableInfo = {
     name: "projectQuaTable", // 表格名称
@@ -36,6 +62,7 @@ const getProjectQualityTable = (data: any) => {
 
 // 测试数据
 const getTestDataTable = (data: any) => {
+  console.log(data);
   const column = [
     {name: "title"}, {name: "用例执行情况"}, {name: "用例执行情况1"}, {name: "用例执行情况2"}, {name: "用例执行情况3"},
     {name: "用例执行情况4"}, {name: "用例执行情况5"}, {name: "用例执行情况6"}, {name: "用例执行情况7"},

@@ -33,9 +33,19 @@ const alaysisPrjQuaData = (sourceData: any) => {
         newData["total_bug"] = datas.commonTotal; // Bug总数
         newData["effective_bug"] = datas.effectiveTotal; // 有效Bug数
         newData["weighted_effective_bug"] = datas.weightTotal; // 加权有效Bug数
-        newData["code_count"] = datas.codes; // 代码量
-        newData["effective_bug_rate"] = (datas.effectiveTotal / datas.codes * 1000).toFixed(2); // 有效千行bug率：有效Bug数/代码行
-        newData["weighted_effective_bug_rate"] = (datas.weightTotal / datas.codes * 1000).toFixed(2); // 加权有效千行bug率：加权有效Bug数/代码行
+
+        const codesCount = Math.abs(datas.codes);
+        newData["code_count"] = codesCount; // 代码量:如果是被修改过的，则为负数
+        newData["code_changed"] = (datas.codes).toString().includes("-"); // 代码量是否为负数
+
+        if (codesCount === 0) { // 如果代码量为0，那么有效千行bug率和加权有效千行Bug率显示为对应的bug数。
+          newData["effective_bug_rate"] = datas.effectiveTotal; // 有效Bug数
+          newData["weighted_effective_bug_rate"] = datas.weightTotal; // 加权有效Bug数
+
+        } else {
+          newData["effective_bug_rate"] = (datas.effectiveTotal / codesCount * 1000).toFixed(2); // 有效千行bug率：有效Bug数/代码行
+          newData["weighted_effective_bug_rate"] = (datas.weightTotal / codesCount * 1000).toFixed(2); // 加权有效千行bug率：加权有效Bug数/代码行
+        }
 
         // 有效Bug数
         newData["effective_p0"] = datas.effectiveNums?.P0;
@@ -47,6 +57,10 @@ const alaysisPrjQuaData = (sourceData: any) => {
         newData["total_p1"] = datas.commonNums?.P1;
         newData["total_p2"] = datas.commonNums?.P2;
         newData["total_p3"] = datas.commonNums?.P3;
+
+        // 说明
+        newData["description"] = datas.desc;
+
         break;
       }
     }
@@ -80,7 +94,8 @@ const queryProjectQualityload = async (client: GqlClient<object>, projectId: str
             effectiveTotal
             weightTotal
             codes
-          }
+            desc
+        }
       }
   `);
 

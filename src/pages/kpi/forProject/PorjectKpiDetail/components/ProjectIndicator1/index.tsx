@@ -83,7 +83,7 @@ const ProjectIndicator1: React.FC<any> = (currentProject: any) => {
 
   const content = (
     <Comment
-      author="吴晓凤"
+      author="XXX"
       avatar={<Avatar src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png" alt="吴晓凤"/>}
       content={
         <div>
@@ -119,14 +119,18 @@ const ProjectIndicator1: React.FC<any> = (currentProject: any) => {
           onDisplayedColumnsChanged={() => projectQuaGridApi.current?.sizeColumnsToFit()}
           frameworkComponents={{
             codeRenderer: (props: any) => {
-              return (
-                <Popover content={content} title="修改记录" trigger="click" placement="right">
-                  <Button type="link" style={{color: "orange"}}>{props.value}</Button>
-                </Popover>
-              );
+              if (props.data?.code_changed) {
+                return (
+                  <Popover content={content} title="修改记录" trigger="click" placement="right">
+                    <Button type="link" style={{color: "orange"}}>{props.value}</Button>
+                  </Popover>
+                );
+              }
+              return props.value === undefined ? "" : props.value;
             },
           }}
           onCellEditingStopped={projectQuanlityEdtied}
+          stopEditingWhenCellsLoseFocus={true}
         >
         </AgGridReact>
       </div>

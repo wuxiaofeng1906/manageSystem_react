@@ -119,14 +119,14 @@ const ProjectIndicator1: React.FC<any> = (currentProject: any) => {
           onDisplayedColumnsChanged={() => projectQuaGridApi.current?.sizeColumnsToFit()}
           frameworkComponents={{
             codeRenderer: (props: any) => {
-              debugger;
-
-
-              return (
-                <Popover content={content} title="修改记录" trigger="click" placement="right">
-                  <Button type="link" style={{color: "orange"}}>{props.value}</Button>
-                </Popover>
-              );
+              if (props.data?.code_changed) {
+                return (
+                  <Popover content={content} title="修改记录" trigger="click" placement="right">
+                    <Button type="link" style={{color: "orange"}}>{props.value}</Button>
+                  </Popover>
+                );
+              }
+              return props.value;
             },
           }}
           onCellEditingStopped={projectQuanlityEdtied}

@@ -2,7 +2,7 @@ import {GqlClient} from "@/hooks";
 
 /* region  项目质量 */
 const alaysisPrjQuaData = (sourceData: any) => {
-debugger;
+
   let prjQualityData: any = [];
   if (sourceData && sourceData.length > 0) {
     prjQualityData = sourceData;

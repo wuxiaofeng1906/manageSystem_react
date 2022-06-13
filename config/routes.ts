@@ -238,6 +238,11 @@ export default [
                 icon: 'table',
                 path: 'on-lineBugRate',
                 component: './kpi/performance/testers/on-lineBugRate',
+              }, {
+                name: '线上千行bug率(new)',
+                icon: 'table',
+                path: 'on-lineBugRate-new',
+                component: './kpi/performance/testers/on-lineBugRate-new',
               },
               {
                 name: '线上千行bug率(参考)',

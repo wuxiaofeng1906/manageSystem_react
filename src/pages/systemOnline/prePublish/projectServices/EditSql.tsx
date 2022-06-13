@@ -46,7 +46,7 @@ const EditSql = (props: IEditSql) => {
       setLoading(false);
     }
   };
-
+  const isEditCluster = props.data?.update_type == 'upgradeApi';
   return (
     <Modal
       title="编辑升级接口&SQL"
@@ -74,13 +74,14 @@ const EditSql = (props: IEditSql) => {
         <Form.Item
           name="cluster_id"
           label="上线环境"
-          rules={[{ required: true, message: '请选择上线环境!' }]}
+          rules={[{ required: !isEditCluster, message: '请选择上线环境!' }]}
         >
           <Select
             showSearch
             mode={'multiple'}
             options={environmentSelector}
             optionFilterProp="value"
+            disabled={isEditCluster}
             filterOption={(input, option) => (option!.value as unknown as string)?.includes(input)}
           />
         </Form.Item>

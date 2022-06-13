@@ -73,7 +73,7 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
     <Spin spinning={spinning} tip={'数据加载中...'} wrapperClassName={styles.spinWrap}>
       <div className={styles.preLayout}>
         <Layout>
-          <Layout.Sider width={290} theme={'light'} className={styles.layout}>
+          <Layout.Sider width={280} theme={'light'} className={styles.layout}>
             <div className={styles.formWrap}>
               <Form form={form} onValuesChange={update}>
                 <Form.Item label={'发布类型'} name={'release_type'}>

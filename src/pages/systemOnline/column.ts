@@ -238,9 +238,11 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '上线环境',
-    field: 'cluster_name',
-    headerClass: 'ag-required',
+    // field: 'cluster_name',
+    // headerClass: 'ag-required',
     minWidth: 120,
+    cellRenderer: (params: any) => params.data.cluster_name,
+    cellClassRules: { 'ag-disabled': 'data.update_type == "upgradeApi"' }, // 升级类型为接口：上线环境不可编辑
   },
   {
     headerName: '升级类型',

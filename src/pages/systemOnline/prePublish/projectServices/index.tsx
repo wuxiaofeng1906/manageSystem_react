@@ -213,12 +213,14 @@ const ProjectServices = () => {
 
   // operation
   const OperationDom = (data: any, type: enumType, showLog = true) => {
+    const isEditCluster = type == 'sql' && data.update_type == 'upgradeApi';
     return (
       <div className={'operation'}>
         <img
           src={require('../../../../../public/edit.png')}
+          style={isEditCluster ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {}}
           onClick={() => {
-            if (disabled) return;
+            if (disabled || isEditCluster) return;
             const params = { visible: true, data };
             if (type == 'upgrade') setEditUpgrade(params);
             else if (type == 'services') setEditServices(params);

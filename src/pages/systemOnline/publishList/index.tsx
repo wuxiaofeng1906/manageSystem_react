@@ -83,10 +83,10 @@ const PublishList: React.ReactNode = () => {
   return (
     <Spin spinning={spinning} tip={'数据加载中...'}>
       <PageContainer>
-        <Form form={form} onValuesChange={() => getList()}>
-          <Row justify={'space-around'} style={{ display: 'flex', flexWrap: 'wrap' }}>
-            <Col span={4}>
-              <Form.Item label="发布项目:" name="pro_id" style={{ width: '100%' }}>
+        <Form form={form} onValuesChange={() => getList()} className={'system-init-form'}>
+          <Row justify={'space-between'}>
+            <Col span={4} style={{ width: 0 }}>
+              <Form.Item label="发布项目:" name="pro_id">
                 <Select
                   showSearch
                   showArrow
@@ -94,6 +94,7 @@ const PublishList: React.ReactNode = () => {
                   maxTagCount="responsive"
                   optionFilterProp="label"
                   options={projectSelectors}
+                  style={{ width: '100%' }}
                   filterOption={(input, option) =>
                     (option!.label as unknown as string)?.includes(input)
                   }
@@ -101,23 +102,41 @@ const PublishList: React.ReactNode = () => {
               </Form.Item>
             </Col>
             <Col span={4}>
-              <Form.Item label="发布结果:" name="result" style={{ width: '100%' }}>
-                <Select showArrow showSearch={false} mode="multiple" options={PUBLISH_RESULT} />
+              <Form.Item label="发布结果:" name="result">
+                <Select
+                  showArrow
+                  showSearch={false}
+                  mode="multiple"
+                  options={PUBLISH_RESULT}
+                  style={{ width: '100%' }}
+                />
               </Form.Item>
             </Col>
             <Col span={4}>
-              <Form.Item label="发布类型:" name="release_type" style={{ width: '100%' }}>
-                <Select showArrow mode="multiple" showSearch={false} options={typeSelectors} />
+              <Form.Item label="发布类型:" name="release_type">
+                <Select
+                  showArrow
+                  mode="multiple"
+                  showSearch={false}
+                  options={typeSelectors}
+                  style={{ width: '100%' }}
+                />
               </Form.Item>
             </Col>
             <Col span={4}>
-              <Form.Item label="发布方式:" name="release_method" style={{ width: '100%' }}>
-                <Select showArrow showSearch={false} mode="multiple" options={methodSelectors} />
+              <Form.Item label="发布方式:" name="release_method">
+                <Select
+                  showArrow
+                  showSearch={false}
+                  mode="multiple"
+                  options={methodSelectors}
+                  style={{ width: '100%' }}
+                />
               </Form.Item>
             </Col>
             <Col span={7}>
-              <Form.Item label="发布日期:" name="time" style={{ width: '100%' }}>
-                <DatePicker.RangePicker format={'YYYY-MM-DD'} />
+              <Form.Item label="发布日期:" name="time">
+                <DatePicker.RangePicker format={'YYYY-MM-DD'} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
           </Row>

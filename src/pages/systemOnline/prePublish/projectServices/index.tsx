@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { Form, Row, Col, Select, Modal, Spin, Tooltip } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { sortBy, clone } from 'lodash';
+import cls from 'classnames';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import {
   projectUpgradeColumn,
@@ -93,6 +94,7 @@ const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) 
               options={PLATE_STATUS}
               disabled={disabled || !sealVersion?.business_front}
               style={{ width: '100%' }}
+              className={cls({ 'form-select': sealVersion?.business_front == 'yes' })}
             />
           </Form.Item>
         </Col>
@@ -102,6 +104,7 @@ const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) 
               options={PLATE_STATUS}
               disabled={disabled || !sealVersion?.business_backend}
               style={{ width: '100%' }}
+              className={cls({ 'form-select': sealVersion?.business_backend == 'yes' })}
             />
           </Form.Item>
         </Col>
@@ -111,6 +114,7 @@ const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) 
               options={PLATE_STATUS}
               disabled={disabled || !sealVersion?.process}
               style={{ width: '100%' }}
+              className={cls({ 'form-select': sealVersion?.process == 'yes' })}
             />
           </Form.Item>
         </Col>
@@ -120,17 +124,19 @@ const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) 
               options={PLATE_STATUS}
               disabled={disabled || !sealVersion?.global}
               style={{ width: '100%' }}
+              className={cls({ 'form-select': sealVersion?.global == 'yes' })}
             />
           </Form.Item>
         </Col>
       </Row>
-      <Row>
+      <Row gutter={10}>
         <Col span={5}>
           <Form.Item label={'openapi可封版'} name={'openapi'}>
             <Select
               options={PLATE_STATUS}
               disabled={disabled || !sealVersion?.openapi}
               style={{ width: '100%' }}
+              className={cls({ 'form-select': sealVersion?.openapi == 'yes' })}
             />
           </Form.Item>
         </Col>
@@ -140,6 +146,7 @@ const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) 
               options={PLATE_STATUS}
               disabled={disabled || !sealVersion?.qbos}
               style={{ width: '100%' }}
+              className={cls({ 'form-select': sealVersion?.qbos == 'yes' })}
             />
           </Form.Item>
         </Col>
@@ -149,6 +156,7 @@ const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) 
               options={PLATE_STATUS}
               disabled={disabled || !sealVersion?.store}
               style={{ width: '100%' }}
+              className={cls({ 'form-select': sealVersion?.store == 'yes' })}
             />
           </Form.Item>
         </Col>
@@ -158,11 +166,12 @@ const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) 
               options={PLATE_STATUS}
               disabled={disabled || !sealVersion?.jsf}
               style={{ width: '100%' }}
+              className={cls({ 'form-select': sealVersion?.jsf == 'yes' })}
             />
           </Form.Item>
         </Col>
         <Col span={2}>
-          <Form.Item label={'日志'} style={{ textAlign: 'center' }}>
+          <Form.Item label={'日志'}>
             <img
               width={20}
               src={require('../../../../../public/logs.png')}

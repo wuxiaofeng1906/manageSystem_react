@@ -289,8 +289,8 @@ const ProjectServices = () => {
             subTitle: '由测试值班人员填写-按从左到右一次填写',
           }}
         />
-        <Form form={form} onValuesChange={updatePreData}>
-          <Row gutter={4} wrap={false}>
+        <Form form={form} onValuesChange={updatePreData} className={'system-init-form'}>
+          <Row gutter={4}>
             <Col span={8}>
               <Form.Item label={'预发布项目'} name={'release_project'} style={{ width: '100%' }}>
                 <Select

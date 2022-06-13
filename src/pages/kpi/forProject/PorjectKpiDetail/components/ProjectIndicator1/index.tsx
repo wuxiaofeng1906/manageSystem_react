@@ -83,7 +83,7 @@ const ProjectIndicator1: React.FC<any> = (currentProject: any) => {
 
   const content = (
     <Comment
-      author="吴晓凤"
+      author="XXX"
       avatar={<Avatar src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png" alt="吴晓凤"/>}
       content={
         <div>

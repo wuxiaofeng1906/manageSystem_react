@@ -167,6 +167,7 @@ const WebServicesSetting = () => {
                     <Select
                       showSearch
                       options={projectSelectors}
+                      allowClear
                       optionFilterProp="label"
                       filterOption={(input, option) =>
                         (option!.label as unknown as string)?.includes(input)
@@ -176,7 +177,7 @@ const WebServicesSetting = () => {
                 </Col>
                 <Col span={9} offset={1}>
                   <Form.Item name="project_status" label="项目状态">
-                    <Select mode="multiple" options={SETTING_STATUS} />
+                    <Select mode="multiple" options={SETTING_STATUS} allowClear />
                   </Form.Item>
                 </Col>
               </Row>

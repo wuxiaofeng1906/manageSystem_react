@@ -17,8 +17,8 @@ const Check = () => {
   return (
     <div className={styles.check}>
       <Tabs
-        type="card"
         activeKey={activeKey}
+        animated={false}
         onChange={(v) => {
           history.push({
             pathname: history.location.pathname,

@@ -1,23 +1,22 @@
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
-import { Form, Row, Col, Select, Space, Modal, Table, Spin, Tooltip } from 'antd';
+import { Form, Row, Col, Select, Modal, Spin, Tooltip } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
-import { sortBy } from 'lodash';
+import { sortBy, clone } from 'lodash';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import {
   projectUpgradeColumn,
   upgradeSQLColumn,
   dataReviewColumn,
+  serverColumn,
 } from '@/pages/systemOnline/column';
 import type { CellClickedEvent, GridApi } from 'ag-grid-community';
-import { COMMON_STATUS, initGridTable } from '@/pages/systemOnline/constants';
+import { initGridTable, PLATE_STATUS } from '@/pages/systemOnline/constants';
 import { useModel, useLocation } from 'umi';
 import EditUpgrade from './EditUpgrade';
 import EditServices from './EditServices';
 import EditSql from './EditSql';
 import OnlineServices from '@/services/online';
 import type { PreServices, PreSql, PreUpgradeItem } from '@/namespaces/interface';
-import { ColumnsType } from 'antd/lib/table/Table';
-import { GridReadyEvent } from 'ag-grid-community';
 
 type enumType = 'upgrade' | 'services' | 'sql';
 interface Istate<T> {
@@ -46,6 +45,110 @@ const ITableTitle = ({ data }: ITitle) => {
   );
 };
 
+const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) => {
+  const [sealForm] = Form.useForm();
+  const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
+
+  const [sealVersion, setSealVersion] = useState<Record<string, any>>();
+
+  const getSealVersion = async () => {
+    if (!idx) return;
+    const res = await OnlineServices.getSealVersion(idx);
+    setSealVersion(res);
+    const formatResult = clone(res);
+    if (formatResult) {
+      for (const k in formatResult) {
+        if (!formatResult[k]) {
+          formatResult[k] = '免';
+        }
+        if (formatResult[k] == 'unknown') {
+          formatResult[k] = '';
+        }
+      }
+    }
+    sealForm.setFieldsValue({ ...formatResult });
+  };
+
+  const updateSealVersion = async (value: Record<string, any>) => {
+    const [k, v] = Object.entries(value).flat() as [string, any];
+    await OnlineServices.updateSealVersion({
+      user_id: user?.userid,
+      release_num: idx,
+      side: k?.replace('business_', ''),
+      is_seal: v,
+    });
+    await getSealVersion();
+  };
+
+  useEffect(() => {
+    getSealVersion();
+  }, [idx]);
+
+  return (
+    <Form form={sealForm} onValuesChange={updateSealVersion} wrapperCol={{ span: 10 }}>
+      <Row>
+        <Col span={6}>
+          <Form.Item label={'业务前端应用可封版'} name={'business_front'} style={{ width: '100%' }}>
+            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.business_front} />
+          </Form.Item>
+        </Col>
+        <Col span={6}>
+          <Form.Item
+            label={'业务后端应用可封版'}
+            name={'business_backend'}
+            style={{ width: '100%' }}
+          >
+            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.business_backend} />
+          </Form.Item>
+        </Col>
+        <Col span={6}>
+          <Form.Item label={'流程应用可封版'} name={'process'} style={{ width: '100%' }}>
+            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.process} />
+          </Form.Item>
+        </Col>
+        <Col span={6}>
+          <Form.Item label={'global可封版'} name={'global'} style={{ width: '100%' }}>
+            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.global} />
+          </Form.Item>
+        </Col>
+      </Row>
+      <Row>
+        <Col span={5}>
+          <Form.Item label={'openapi可封版'} name={'openapi'} style={{ width: '100%' }}>
+            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.openapi} />
+          </Form.Item>
+        </Col>
+        <Col span={5}>
+          <Form.Item label={'qbos可封版'} name={'qbos'} style={{ width: '100%' }}>
+            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.qbos} />
+          </Form.Item>
+        </Col>
+        <Col span={5}>
+          <Form.Item label={'store可封版'} name={'store'} style={{ width: '100%' }}>
+            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.store} />
+          </Form.Item>
+        </Col>
+        <Col span={5}>
+          <Form.Item label={'jsf可封版'} name={'jsf'} style={{ width: '100%' }}>
+            <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.jsf} />
+          </Form.Item>
+        </Col>
+        <Col span={2} style={{ width: '100%' }}>
+          <Form.Item label={'日志'} style={{ textAlign: 'center' }}>
+            <img
+              width={20}
+              src={require('../../../../../public/logs.png')}
+              onClick={() => {
+                console.log('test');
+              }}
+            />
+          </Form.Item>
+        </Col>
+      </Row>
+    </Form>
+  );
+};
+
 const ProjectServices = () => {
   const {
     query: { idx },
@@ -54,16 +157,17 @@ const ProjectServices = () => {
     useModel('systemOnline');
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [form] = Form.useForm();
-
   const gridUpgradeRef = useRef<GridApi>();
   const gridSQLRef = useRef<GridApi>();
   const gridReviewRef = useRef<GridApi>();
+  const gridServerRef = useRef<GridApi>();
 
   const [editUpgrade, setEditUpgrade] = useState<Istate<PreUpgradeItem> | null>();
   const [editServices, setEditServices] = useState<Istate<PreServices> | null>();
   const [editSql, setEditSql] = useState<Istate<PreSql> | null>();
   const [preEnv, setPreEnv] = useState([]);
   const [spinning, setPinning] = useState(false);
+
   const updatePreData = async (value: any, values: any) => {
     // if (value.release_branch) {
     //   // 分支对应环境
@@ -81,46 +185,30 @@ const ProjectServices = () => {
     }
   };
 
-  useEffect(() => {
-    const info = proInfo?.release_project;
-    form.setFieldsValue({
-      release_project: info?.release_project ? info.release_project.split(',') : [],
-      release_branch: info?.release_branch,
-      release_env: info?.release_env,
-    });
-  }, [JSON.stringify(proInfo)]);
-
   const sortServiceData = useMemo(
     () => sortBy(proInfo?.upgrade_api || [], (it) => it.index),
     [proInfo?.upgrade_api],
   );
 
   // drag
-  const onRowDragMove = useCallback(async (p: GridReadyEvent) => {
-    // console.log(p.api);
-    // Modal.confirm({
-    //   width: 600,
-    //   title: '提示：',
-    //   okText: '确认移动',
-    //   content: '工单有从上到下的依次执行顺序，请谨慎移动！',
-    //   onOk: async () => {
-    //     const data: { api_id: string; index: number; user_id: string }[] = [];
-    //     gridSQLRef.current?.forEachNode((node, index) => {
-    //       data.push({ api_id: node.data.api_id, index, user_id: user?.userid || '' });
-    //     });
-    //     await OnlineServices.preInterfaceSort(data);
-    //     await getProInfo(idx);
-    //   },
-    //   onCancel: () => {
-    //     gridSQLRef.current?.setRowData(sortServiceData);
-    //   },
-    // });
-    const data: { api_id: string; index: number; user_id: string }[] = [];
-    gridSQLRef.current?.forEachNode((node, index) => {
-      data.push({ api_id: node.data.api_id, index, user_id: user?.userid || '' });
+  const onRowDragMove = useCallback(async () => {
+    Modal.confirm({
+      width: 600,
+      title: '提示：',
+      okText: '确认移动',
+      content: '工单有从上到下的依次执行顺序，请谨慎移动！',
+      onOk: async () => {
+        const data: { api_id: string; index: number; user_id: string }[] = [];
+        gridSQLRef.current?.forEachNode((node, index) => {
+          data.push({ api_id: node.data.api_id, index, user_id: user?.userid || '' });
+        });
+        await OnlineServices.preInterfaceSort(data);
+        await getProInfo(idx);
+      },
+      onCancel: () => {
+        gridSQLRef.current?.setRowData(sortServiceData);
+      },
     });
-    await OnlineServices.preInterfaceSort(data);
-    await getProInfo(idx);
   }, []);
 
   // operation
@@ -175,78 +263,20 @@ const ProjectServices = () => {
     }
   };
 
-  const formatTable = (arr: any[]) => {
-    const obj = {};
-    arr.forEach((it) => {
-      if (it.cluster_id && obj[it.cluster_id]) {
-        obj[it.cluster_id]++;
-      } else {
-        obj[it.cluster_id || it.server_id] = 1;
-      }
-    });
-    Object.entries(obj).map(([k, v]) => {
-      const index = arr.findIndex((it) => [it.cluster_id, it.server_id.toString()].includes(k));
-      if (index >= 0) {
-        arr[index] = { ...arr[index], rowSpan: v };
-      }
-    });
-    return arr;
-  };
-
   useEffect(() => {
     Modal.destroyAll();
     OnlineServices.preEnv().then((res) => {
       setPreEnv(res?.map((it: any) => ({ key: it.id, label: it.image_env, value: it.image_env })));
     });
   }, []);
-
-  const serviceColumn: ColumnsType<PreServices> = [
-    {
-      title: '序号',
-      align: 'center',
-      render: (record, v, index) => <span>{index + 1}</span>,
-      onCell: (it) => ({ rowSpan: it.rowSpan || 0 }),
-    },
-    {
-      title: '上线环境',
-      dataIndex: 'cluster_name',
-      align: 'center',
-      onCell: (it) => ({ rowSpan: it.rowSpan || 0 }),
-      className: 'required',
-    },
-    {
-      title: '应用',
-      align: 'center',
-      dataIndex: 'app_name',
-    },
-    {
-      title: '对应侧',
-      align: 'center',
-      dataIndex: 'technical_side',
-      render: (v) => <span>{COMMON_STATUS[v]}</span>,
-    },
-    {
-      title: '测试确认封版',
-      align: 'center',
-      dataIndex: 'is_seal',
-      className: 'required',
-      render: (v) => (
-        <span className={`${v == 'yes' ? 'color-success' : ''}`}>{COMMON_STATUS[v]}</span>
-      ),
-    },
-    {
-      title: '测试确认封版时间',
-      align: 'center',
-      dataIndex: 'seal_time',
-    },
-    {
-      title: '操作',
-      align: 'center',
-      dataIndex: 'operation',
-      width: 120,
-      render: (_, record) => OperationDom(record, 'services'),
-    },
-  ];
+  useEffect(() => {
+    const info = proInfo?.release_project;
+    form.setFieldsValue({
+      release_project: info?.release_project ? info.release_project.split(',') : [],
+      release_branch: info?.release_branch,
+      release_env: info?.release_env,
+    });
+  }, [JSON.stringify(proInfo)]);
 
   return (
     <Spin spinning={spinning} tip={'数据加载中,请稍等...'}>
@@ -258,12 +288,11 @@ const ProjectServices = () => {
           }}
         />
         <Form form={form} onValuesChange={updatePreData}>
-          <Row justify={'space-between'}>
+          <Row gutter={4} wrap={false}>
             <Col span={8}>
-              <Form.Item label={'预发布项目'} name={'release_project'}>
+              <Form.Item label={'预发布项目'} name={'release_project'} style={{ width: '100%' }}>
                 <Select
                   options={projectSelectors}
-                  style={{ width: '100%' }}
                   mode="multiple"
                   maxTagCount="responsive"
                   optionFilterProp="label"
@@ -275,12 +304,11 @@ const ProjectServices = () => {
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label={'预发布分支'} name={'release_branch'}>
+              <Form.Item label={'预发布分支'} name={'release_branch'} style={{ width: '100%' }}>
                 <Select
-                  disabled={disabled}
-                  style={{ width: '100%' }}
-                  optionFilterProp="label"
                   showSearch
+                  optionFilterProp="label"
+                  disabled={disabled}
                   filterOption={(input, option) =>
                     (option!.label as unknown as string)?.includes(input)
                   }
@@ -291,11 +319,14 @@ const ProjectServices = () => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={8}>
-              <Form.Item label={'镜像环境绑定'} name={'release_env'}>
+            <Col span={7}>
+              <Form.Item
+                label={'镜像环境绑定'}
+                name={'release_env'}
+                style={{ width: '100%', flexWrap: 'nowrap' }}
+              >
                 <Select
                   disabled={disabled}
-                  style={{ width: '100%' }}
                   optionFilterProp="label"
                   options={preEnv}
                   showSearch
@@ -305,19 +336,35 @@ const ProjectServices = () => {
                 />
               </Form.Item>
             </Col>
+            <Col span={2}>
+              <Form.Item label={'日志'}>
+                <img
+                  width={20}
+                  src={require('../../../../../public/logs.png')}
+                  onClick={() => {
+                    console.log('test');
+                  }}
+                />
+              </Form.Item>
+            </Col>
           </Row>
         </Form>
-        <Space className={'flex-row'} size={40} style={{ marginBottom: 40 }}>
-          <div>
-            填写人： <span>{proInfo?.release_project?.edit_user || '-'}</span>
-          </div>
-          <div>
-            填写时间： <span>{proInfo?.release_project?.edit_time || '-'}</span>
-          </div>
-        </Space>
+        <ITableTitle data={{ title: '二、服务发布环境填写', subTitle: '由测试值班人员填写' }} />
+        <div className={'AgGridReactTable'}>
+          <AgGridReact
+            {...initGridTable(gridServerRef)}
+            columnDefs={serverColumn}
+            rowData={proInfo?.upgrade_app || []}
+            frameworkComponents={{
+              operation: ({ data }: CellClickedEvent) => OperationDom(data, 'services'),
+            }}
+          />
+        </div>
+        <ITableTitle data={{ title: '三、服务可封版确认', subTitle: '由测试值班人员填写' }} />
+        <SealVersionForm disabled={disabled} idx={idx} />
         <ITableTitle
           data={{
-            title: '二、项目升级信息填写',
+            title: '四、项目升级信息填写',
             subTitle: '特性项目由端负责人填写，班车项目由前后端周值班人填写',
           }}
         />
@@ -331,19 +378,9 @@ const ProjectServices = () => {
             }}
           />
         </div>
-        <ITableTitle data={{ title: '三、发布服务填写', subTitle: '由测试值班人员填写' }} />
-        <Table
-          rowKey="server_id"
-          size="small"
-          bordered
-          dataSource={formatTable(proInfo?.upgrade_app || [])}
-          pagination={false}
-          columns={serviceColumn}
-          style={{ marginBottom: 20 }}
-        />
         <ITableTitle
           data={{
-            title: '四、升级接口&升级SQL填写',
+            title: '五、升级接口&升级SQL填写',
             subTitle: '特性项目由端负责人填写，班车项目由前后端周值班人填写',
           }}
         />
@@ -357,16 +394,16 @@ const ProjectServices = () => {
             columnDefs={upgradeSQLColumn}
             rowData={sortServiceData}
             onRowDragEnd={onRowDragMove}
+            onCellDoubleClicked={showDetail}
             frameworkComponents={{
               operation: ({ data }: CellClickedEvent) => OperationDom(data, 'sql'),
             }}
-            onCellDoubleClicked={showDetail}
           />
         </div>
         <ITableTitle
           data={{
-            title: '五、数据修复Review',
-            subTitle: '特性项目由后端技术负责人确认，班车项目由后端周值班人填写',
+            title: '六、数据修复Review',
+            subTitle: '特性项目由后端技术负责人确认，班车项目由后端周值班人确认',
           }}
         />
         <div className={'AgGridReactTable'}>

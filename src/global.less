@@ -71,6 +71,7 @@ ol {
 .flex-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .color-prefix {
@@ -103,9 +104,13 @@ ol {
     cursor: pointer;
     .ag-cell {
       text-align: center;
+
     }
-    .cell-span {
-      background: white;
+    .ag-disabled{
+      background: @color-disabled;
+    }
+    .ag-left{
+      text-align: left;
     }
   }
   .ag-align-left{
@@ -166,12 +171,20 @@ ol {
       }
     }
   }
-  th.required {
+  th.required .required-before{
+    position: relative;
+    padding-left: 5px;
     &:before {
       position: absolute;
-      left: calc(50% - 40px);
+      left: 0px;
       color: @color-text-primary;
-      //content: '*' !important;
+      content: '*';
     }
+  }
+  td{
+    background: #f5f5f5;
+  }
+  td.required{
+    background: initial;
   }
 }

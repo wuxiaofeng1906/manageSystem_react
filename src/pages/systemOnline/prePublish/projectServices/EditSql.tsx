@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Form, Input, Select } from 'antd';
+import { Modal, Form, Input, Select, InputNumber } from 'antd';
 import { useModel } from 'umi';
 
 import type { ModalFuncProps } from 'antd/lib/modal/Modal';
@@ -24,6 +24,7 @@ const EditSql = (props: IEditSql) => {
         ...props.data,
         update_type: props.data ? COMMON_STATUS[props.data.update_type] : null,
         update_api: props.data ? COMMON_STATUS[props.data.update_api] : null,
+        cluster_id: props.data?.cluster_id ? props.data.cluster_id?.split(',') : [],
       });
     } else form.resetFields();
   }, [props.visible]);
@@ -33,8 +34,10 @@ const EditSql = (props: IEditSql) => {
     try {
       setLoading(true);
       await OnlineServices.updatePreInterface({
-        cluster_id: values.cluster_id,
+        cluster_id: values.cluster_id?.join(),
+        release_cluster_id: values.cluster_id?.join(),
         is_backlog: values.is_backlog,
+        concurrent: values?.concurrent,
         user_id: user?.userid,
         api_id: props.data?.api_id,
       });
@@ -75,10 +78,14 @@ const EditSql = (props: IEditSql) => {
         >
           <Select
             showSearch
+            mode={'multiple'}
             options={environmentSelector}
             optionFilterProp="value"
             filterOption={(input, option) => (option!.value as unknown as string)?.includes(input)}
           />
+        </Form.Item>
+        <Form.Item label={'并发数'} name={'concurrent'}>
+          <InputNumber min={0} precision={0} maxLength={11} style={{ width: '100%' }} />
         </Form.Item>
         <Form.Item
           name="record_backlog"

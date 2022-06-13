@@ -62,7 +62,7 @@ export const prjQualityColumn: any = [
           }
           return true;
         },
-        // cellRenderer:"codeRenderer",
+        cellRenderer:"codeRenderer",
         ...CommonWidth,
       }, {
         headerName: '有效千行Bug率',

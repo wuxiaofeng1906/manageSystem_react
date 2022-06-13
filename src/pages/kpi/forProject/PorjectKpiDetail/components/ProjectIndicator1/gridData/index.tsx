@@ -33,7 +33,8 @@ const alaysisPrjQuaData = (sourceData: any) => {
         newData["total_bug"] = datas.commonTotal; // Bug总数
         newData["effective_bug"] = datas.effectiveTotal; // 有效Bug数
         newData["weighted_effective_bug"] = datas.weightTotal; // 加权有效Bug数
-        newData["code_count"] = datas.codes; // 代码量
+        newData["code_count"] = Math.abs(datas.codes); // 代码量:如果是被修改过的，则为负数
+        newData["code_changed"] = (datas.codes).toString().includes("-"); // 代码量是否为负数
         newData["effective_bug_rate"] = (datas.effectiveTotal / datas.codes * 1000).toFixed(2); // 有效千行bug率：有效Bug数/代码行
         newData["weighted_effective_bug_rate"] = (datas.weightTotal / datas.codes * 1000).toFixed(2); // 加权有效千行bug率：加权有效Bug数/代码行
 

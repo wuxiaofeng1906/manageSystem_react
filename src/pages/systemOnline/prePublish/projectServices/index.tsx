@@ -61,6 +61,9 @@ const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) 
         if (!formatResult[k]) {
           formatResult[k] = '免';
         }
+        if (formatResult[k] == 'unknown') {
+          formatResult[k] = '';
+        }
       }
     }
     sealForm.setFieldsValue({ ...formatResult });
@@ -83,7 +86,7 @@ const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) 
 
   return (
     <Form form={sealForm} onValuesChange={updateSealVersion} wrapperCol={{ span: 10 }}>
-      <Row wrap={false}>
+      <Row>
         <Col span={6}>
           <Form.Item label={'业务前端应用可封版'} name={'business_front'} style={{ width: '100%' }}>
             <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.business_front} />
@@ -109,7 +112,7 @@ const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) 
           </Form.Item>
         </Col>
       </Row>
-      <Row wrap={false}>
+      <Row>
         <Col span={5}>
           <Form.Item label={'openapi可封版'} name={'openapi'} style={{ width: '100%' }}>
             <Select options={PLATE_STATUS} disabled={disabled || !sealVersion?.openapi} />

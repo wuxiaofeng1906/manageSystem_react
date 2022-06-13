@@ -141,6 +141,7 @@ const ApproveFlow = ({ data, disabled, remark, approveDetail, onConfirm }: IFlow
   } = useLocation() as any;
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [list, setList] = useState<TagSource>();
+  const [loading, setLoading] = useState(false);
   const [show, setShow] = useState<{
     visible: boolean;
     selector: TagType;
@@ -166,8 +167,14 @@ const ApproveFlow = ({ data, disabled, remark, approveDetail, onConfirm }: IFlow
       release_num: idx,
       remark,
     };
-    await OnlineServices.updateApproval(data);
-    onConfirm();
+    setLoading(true);
+    try {
+      await OnlineServices.updateApproval(data);
+      setLoading(false);
+      onConfirm();
+    } catch (e) {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -223,6 +230,7 @@ const ApproveFlow = ({ data, disabled, remark, approveDetail, onConfirm }: IFlow
             type={'primary'}
             disabled={disabled || approveDetail?.sp_status}
             onClick={handleConfirm}
+            loading={loading}
           >
             {approveDetail?.sp_status && sp_status_map[approveDetail?.sp_status].title}
           </Button>
@@ -232,6 +240,7 @@ const ApproveFlow = ({ data, disabled, remark, approveDetail, onConfirm }: IFlow
             type={'primary'}
             disabled={disabled || [1, 2].includes(approveDetail?.sp_status)}
             onClick={handleConfirm}
+            loading={loading}
           >
             {approveDetail?.sp_status ? '重新提交审批' : '提交审批'}
           </Button>

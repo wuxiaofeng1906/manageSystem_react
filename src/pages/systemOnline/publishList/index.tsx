@@ -84,7 +84,7 @@ const PublishList: React.ReactNode = () => {
     <Spin spinning={spinning} tip={'数据加载中...'}>
       <PageContainer>
         <Form form={form} onValuesChange={() => getList()}>
-          <Row justify={'space-around'}>
+          <Row justify={'space-around'} style={{ display: 'flex', flexWrap: 'wrap' }}>
             <Col span={4}>
               <Form.Item label="发布项目:" name="pro_id" style={{ width: '100%' }}>
                 <Select

@@ -210,16 +210,23 @@ const TestBugRateTableList: React.FC<any> = () => {
           <p style={cssIndent}>按季统计：代码commit日期每季第一个月的第一个整周的周一00:00:00--每季第三个月的最后1个整周的周天23:59:59；</p>
 
           <p><strong>2.bug统计范围</strong></p>
-          <p style={cssIndent}>2.1 产品为“1.0/1.0正式版--产品经理”“产品实施--实施顾问反馈”“开发自提需求”； </p>
+          <p style={cssIndent}>2.1 产品为“1.0/1.0正式版--产品经理”“产品实施--实施顾问反馈”“前端平台”“经营会计”“后端平台”“供应链研发”； </p>
           <p style={cssIndent}>2.2 创建者为“顾问”“产品”“客服”； </p>
-          <p style={cssIndent}>2.3 线上bug统计，统计os操作系统字段值为线上bug-漏测、线上存在、线上bug-兼容性； </p>
+          <p style={cssIndent}>2.3 线上bug统计（按下面条件统计的bug结果要去重）：
+            统计zt_bug.os in ('','onlinecodeerror','Online','online_compatibility') ；
+            或者统计zt_bug.onlinebugtype in
+            ('onlinecodeerror','online_wait','online_interface','online_tips','online_outofscope','online_compatibility'，'online_outofscope','online_pullin','online_tips')
+            或者统计zt_bug.title 包含'线上存在'or'集群1'or'集群2'or'集群3'or'集群4'or'集群5'or'集群6'or'集群7'
+          </p>
+
           <p style={cssIndent}>(特殊判定条件：
-            当dept为3且os值为空时，仅查询项目名称包含hotfix字样的bug；当opendBy='fuyang.li'时，需增加条件bug创建时间 &gt;=2020-04-01) </p>
-          <p style={cssIndent}>2.4 解决方案为“空”“已解决”“延期处理”“后续版本”“代码未合并”的； </p>
-          <p style={cssIndent}>2.5 统计人员, 首先在zt_bug表中判断当前的assignedTo的值是不是测试，若是测试则该bug的用户名称则是该测试，
-            若不是测试则在zt_action表中按降序挨个查id 在zt_history表中的old字段按时间倒序去查测试人员，查到的第一个测试人员则该bug的用户名
-            称则是该测试,若old中仍查不到测试人员，则倒序查zt_action.actor的值，查到的第一个测试人员则将该bug的用户名称记录为该测试，若还查不
-            到测试人员则名称记录为空，并且人员的zt_user.dept in （35,36,37,38,39）。 </p>
+            当bug创建人的dept为3且os值为空时，仅查询所属执行名称包含hotfix或sprint或emergency或stage-emergency或线上需求池的bug；当openedBy='fuyang.li'时，需增加条件bug创建时间&gt;=2020-04-01
+          </p>
+          <p style={cssIndent}>2.4 解决方案为“空”“已解决”“延期处理”“后续版本”“转为需求”“代码未合并”的； </p>
+          <p style={cssIndent}>2.5 统计测试人员查zt_user.address = '测试', 首先在zt_bug表中判断当前的assignedTo的值是不是测试，
+            若是测试则该bug的用户名称则是该测试，若不是测试则在zt_action表中按降序挨个查id 在zt_history表中的old字段按时间倒序去查测试人员，
+            查到的第一个测试人员则该bug的用户名称则是该测试,若old中仍查不到测试人员，则倒序查zt_action.actor的值，查到的第一个测试人员则将
+            该bug的用户名称记录为该测试，若还查不到测试人员则名称记录为空。 </p>
 
           <p style={{color: "#1890FF"}}><strong>二.计算公式说明</strong></p>
           <p><strong>1.按人统计（以下人员都特指测试人员）</strong></p>

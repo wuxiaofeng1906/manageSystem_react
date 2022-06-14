@@ -238,7 +238,8 @@ export default [
                 icon: 'table',
                 path: 'on-lineBugRate',
                 component: './kpi/performance/testers/on-lineBugRate',
-              }, {
+              },
+              {
                 name: '线上千行bug率(new)',
                 icon: 'table',
                 path: 'on-lineBugRate-new',
@@ -255,6 +256,12 @@ export default [
                 icon: 'table',
                 path: 'on_lineBugIncTester',
                 component: './kpi/performance/testers/on_lineBugIncTester',
+              },
+              {
+                name: '千行bug率收敛',
+                icon: 'table',
+                path: 'bugRateConvergency',
+                component: './kpi/performance/testers/bugRateConvergency',
               },
               {
                 name: '用例执行率',

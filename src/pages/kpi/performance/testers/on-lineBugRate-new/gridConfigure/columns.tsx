@@ -49,18 +49,18 @@ export const columsForWeeks = () => {
           cellRenderer: dataRender,
           columnGroupShow: 'open'
         },
-        {
-          headerName: "bug数",
-          field: `${starttime}_bugs`,
-          cellRenderer: dataRender,
-          columnGroupShow: 'open'
-        },
-        {
-          headerName: "加权bug数",
-          field: `${starttime}_weightBugs`,
-          cellRenderer: dataRender,
-          columnGroupShow: 'open'
-        }
+        // {
+        //   headerName: "bug数",
+        //   field: `${starttime}_bugs`,
+        //   cellRenderer: dataRender,
+        //   columnGroupShow: 'open'
+        // },
+        // {
+        //   headerName: "加权bug数",
+        //   field: `${starttime}_weightBugs`,
+        //   cellRenderer: dataRender,
+        //   columnGroupShow: 'open'
+        // }
       ]
     });
   }
@@ -86,18 +86,18 @@ export const columsForMonths = () => {
           cellRenderer: dataRender,
           columnGroupShow: 'open'
         },
-        {
-          headerName: "bug数",
-          field: `${monthRanges[index].start}_bugs`,
-          cellRenderer: dataRender,
-          columnGroupShow: 'open'
-        },
-        {
-          headerName: "加权bug数",
-          field: `${monthRanges[index].start}_weightBugs`,
-          cellRenderer: dataRender,
-          columnGroupShow: 'open'
-        }
+        // {
+        //   headerName: "bug数",
+        //   field: `${monthRanges[index].start}_bugs`,
+        //   cellRenderer: dataRender,
+        //   columnGroupShow: 'open'
+        // },
+        // {
+        //   headerName: "加权bug数",
+        //   field: `${monthRanges[index].start}_weightBugs`,
+        //   cellRenderer: dataRender,
+        //   columnGroupShow: 'open'
+        // }
       ]
     });
 
@@ -125,18 +125,18 @@ export const columsForQuarters = () => {
           cellRenderer: dataRender,
           columnGroupShow: 'open'
         },
-        {
-          headerName: "bug数",
-          field: `${quarterTime[index].start}_bugs`,
-          cellRenderer: dataRender,
-          columnGroupShow: 'open'
-        },
-        {
-          headerName: "加权bug数",
-          field: `${quarterTime[index].start}_weightBugs`,
-          cellRenderer: dataRender,
-          columnGroupShow: 'open'
-        }
+        // {
+        //   headerName: "bug数",
+        //   field: `${quarterTime[index].start}_bugs`,
+        //   cellRenderer: dataRender,
+        //   columnGroupShow: 'open'
+        // },
+        // {
+        //   headerName: "加权bug数",
+        //   field: `${quarterTime[index].start}_weightBugs`,
+        //   cellRenderer: dataRender,
+        //   columnGroupShow: 'open'
+        // }
       ]
     });
 
@@ -169,18 +169,18 @@ export const columsForYears = () => {
           cellRenderer: dataRender,
           columnGroupShow: 'open'
         },
-        {
-          headerName: "bug数",
-          field: `${yearsTime[index].start}_bugs`,
-          cellRenderer: dataRender,
-          columnGroupShow: 'open'
-        },
-        {
-          headerName: "加权bug数",
-          field: `${yearsTime[index].start}_weightBugs`,
-          cellRenderer: dataRender,
-          columnGroupShow: 'open'
-        }
+        // {
+        //   headerName: "bug数",
+        //   field: `${yearsTime[index].start}_bugs`,
+        //   cellRenderer: dataRender,
+        //   columnGroupShow: 'open'
+        // },
+        // {
+        //   headerName: "加权bug数",
+        //   field: `${yearsTime[index].start}_weightBugs`,
+        //   cellRenderer: dataRender,
+        //   columnGroupShow: 'open'
+        // }
       ]
     });
 

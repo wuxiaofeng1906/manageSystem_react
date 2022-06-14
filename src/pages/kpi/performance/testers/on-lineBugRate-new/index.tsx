@@ -25,10 +25,11 @@ const queryOnlineBugRate = async (client: GqlClient<object>, params: string) => 
   if (condition.typeFlag === 0) {
     return [];
   }
-
+  debugger;
+  // newBugThousTestDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, thous: TEST) {
   const {data} = await client.query(`
       {
-         bugThousTestDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, thous: TEST) {
+         newBugThousTestDept(kind: "${condition.typeFlag}", ends:["2021-12-31"], thous: TEST) {
             total {
               dept
               deptName
@@ -42,6 +43,7 @@ const queryOnlineBugRate = async (client: GqlClient<object>, params: string) => 
             datas {
               dept
               deptName
+              codes
               kpi
               parent {
                 dept
@@ -57,7 +59,7 @@ const queryOnlineBugRate = async (client: GqlClient<object>, params: string) => 
 
       }
   `);
-  const datas = converseDataForAgGrid_code(data?.bugThousTestDept);
+  const datas = converseDataForAgGrid_code(data?.newBugThousTestDept);
   return datas;
 };
 

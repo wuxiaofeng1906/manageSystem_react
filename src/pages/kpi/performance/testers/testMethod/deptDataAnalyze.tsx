@@ -124,7 +124,6 @@ const converseFormatForAgGrid = (oraDatas: any) => {
 
 
 const converseDataForAgGrid_code = (oraDatas: any) => {
-  debugger;
 
   if (!oraDatas) {
     return [];
@@ -139,9 +138,9 @@ const converseDataForAgGrid_code = (oraDatas: any) => {
       Group: ['研发中心'],
       // [starttime]: elements.total.kpi,
       [`${starttime}_kpi`]: elements.total.kpi,
-      [`${starttime}_codes`]: 78,
-      [`${starttime}_bugs`]: 67,
-      [`${starttime}_weightBugs`]: 2,
+      [`${starttime}_codes`]: elements.code,
+      [`${starttime}_bugs`]: 0,
+      [`${starttime}_weightBugs`]: 0,
 
       isDept: true
     });
@@ -159,9 +158,9 @@ const converseDataForAgGrid_code = (oraDatas: any) => {
       resultArray.push({
         Group: groups,
         [`${starttime}_kpi`]: depts.kpi,
-        [`${starttime}_codes`]: 234,
-        [`${starttime}_bugs`]: 45,
-        [`${starttime}_weightBugs`]: 6,
+        [`${starttime}_codes`]: depts.codes,
+        [`${starttime}_bugs`]: 0,
+        [`${starttime}_weightBugs`]: 0,
         isDept: true
       });
 
@@ -178,9 +177,9 @@ const converseDataForAgGrid_code = (oraDatas: any) => {
           resultArray.push({
             Group: usersGroup,
             [`${starttime}_kpi`]: user.kpi,
-            [`${starttime}_codes`]: 123,
-            [`${starttime}_bugs`]: 333,
-            [`${starttime}_weightBugs`]: 111,
+            [`${starttime}_codes`]: 0,
+            [`${starttime}_bugs`]: 0,
+            [`${starttime}_weightBugs`]: 0,
             isDept: false
           });
         });

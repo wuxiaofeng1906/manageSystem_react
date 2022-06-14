@@ -8,7 +8,7 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {GqlClient, useGqlClient} from '@/hooks';
 import {getParamsByType} from '@/publicMethods/timeMethods';
-import {Button, Drawer} from "antd";
+import {Button, Drawer, Table} from "antd";
 import {
   ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone,
   QuestionCircleTwoTone, AppstoreTwoTone
@@ -16,7 +16,7 @@ import {
 import {getHeight} from "@/publicMethods/pageSet";
 import {converseDataForAgGrid_code} from "../testMethod/deptDataAnalyze";
 import {columsForWeeks, columsForMonths, columsForQuarters, columsForYears} from "./gridConfigure/columns";
-
+import {ruleColumns, ruleDatas} from "../testCommonRules/onlineBugRateRule";
 
 /* region 数据获取和解析 */
 
@@ -143,7 +143,10 @@ const TestBugRateTableList: React.FC<any> = () => {
   };
 
   const cssIndent = {textIndent: '2em'};
+
+
   /* endregion */
+
 
   return (
     <PageContainer>
@@ -197,6 +200,7 @@ const TestBugRateTableList: React.FC<any> = () => {
       <div>
         <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
                 placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
+
           <p><strong>一.测试类线上有效bug</strong></p>
           <p>1.统计周期说明</p>
 
@@ -228,7 +232,10 @@ const TestBugRateTableList: React.FC<any> = () => {
             查到的第一个测试人员则该bug的用户名称则是该测试,若old中仍查不到测试人员，则倒序查zt_action.actor的值，查到的第一个测试人员则将
             该bug的用户名称记录为该测试，若还查不到测试人员则名称记录为空。 </p>
 
-          <p style={{color: "#1890FF"}}><strong>二.计算公式说明</strong></p>
+          <p><strong>二.代码统计</strong></p>
+          <Table columns={ruleColumns} dataSource={ruleDatas} size={"small"} pagination={false} bordered/>
+
+          <p style={{color: "#1890FF"}}><strong>三.计算公式说明</strong></p>
           <p><strong>1.按人统计（以下人员都特指测试人员）</strong></p>
           <p style={cssIndent}>周报：周一至周天测试类线上有效bug求和/(当周周一至周天研发中心所有开发人员代码量之和/1000)；</p>
           <p style={cssIndent}>月报：按月统计bug求和/(按月统计研发中心所有开发人员代码量之和/1000)；</p>

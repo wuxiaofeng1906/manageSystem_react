@@ -5,7 +5,7 @@ const findParent = (departDatas: any, depts: any, result: any) => {
     if (item['deptName'] && idx) {
       if (idx === item['deptName']) {
         const pidName = item['parent'].deptName;
-        if(pidName !== "北京企企科技有限公司"){  // 不显示北京企企科技有限公司
+        if (pidName !== "北京企企科技有限公司") {  // 不显示北京企企科技有限公司
           result.unshift(pidName);
           findParent(departDatas, item['parent'], result);
         }
@@ -122,4 +122,77 @@ const converseFormatForAgGrid = (oraDatas: any) => {
   return converseArrayToOne(resultArray);
 };
 
-export {converseFormatForAgGrid};
+
+const converseDataForAgGrid_code = (oraDatas: any) => {
+  debugger;
+
+  if (!oraDatas) {
+    return [];
+  }
+
+  const resultArray: any = [];
+  // 解析部门数据
+  oraDatas.forEach((elements: any) => {
+    const starttime = elements.range.start;
+
+    resultArray.push({
+      Group: ['研发中心'],
+      // [starttime]: elements.total.kpi,
+      [`${starttime}_kpi`]: elements.total.kpi,
+      [`${starttime}_codes`]: 78,
+      [`${starttime}_bugs`]: 67,
+      [`${starttime}_weightBugs`]: 2,
+
+      isDept: true
+    });
+
+    const departDatas = elements.datas;
+    // 部门数据
+    departDatas.forEach((depts: any) => {
+
+      /* region 部门数据 */
+
+      const groups: any = [depts.deptName];
+      findParent(departDatas, depts, groups);
+
+      // 新增部门
+      resultArray.push({
+        Group: groups,
+        [`${starttime}_kpi`]: depts.kpi,
+        [`${starttime}_codes`]: 234,
+        [`${starttime}_bugs`]: 45,
+        [`${starttime}_weightBugs`]: 6,
+        isDept: true
+      });
+
+
+      /* endregion   */
+
+      /* region 人员数据 */
+
+      const usersArray = depts.users;
+      if (usersArray) {
+        usersArray.forEach((user: any) => {
+          const usersGroup = JSON.parse(JSON.stringify(groups));
+          usersGroup.push(user.userName);
+          resultArray.push({
+            Group: usersGroup,
+            [`${starttime}_kpi`]: user.kpi,
+            [`${starttime}_codes`]: 123,
+            [`${starttime}_bugs`]: 333,
+            [`${starttime}_weightBugs`]: 111,
+            isDept: false
+          });
+        });
+      }
+
+      /* endregion   */
+
+    });
+
+  });
+
+  return converseArrayToOne(resultArray);
+};
+
+export {converseFormatForAgGrid, converseDataForAgGrid_code};

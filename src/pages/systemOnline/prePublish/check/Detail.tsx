@@ -15,10 +15,12 @@ const Detail = () => {
   const {
     query: { idx },
   } = useLocation() as any;
+
   const { getList, formatStatus, source, spinning } = useCheckDetail();
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [disabled] = useModel('systemOnline', (system) => [system.disabled]);
 
+  // 手动触发检查
   const handleCheck = async (data: any) => {
     if (!idx && !user?.userid) return;
     let params = { user_id: user?.userid, release_num: idx, side: data.side };
@@ -36,8 +38,8 @@ const Detail = () => {
       case 'version_check':
         request = OnlineServices.handleCheckOnline;
         break;
-      case 'library_data':
-        break;
+      // case 'library_data':
+      //   break;
       default:
         request = OnlineServices.handleCheckSealing;
     }
@@ -59,24 +61,31 @@ const Detail = () => {
             operation: (it: CellClickedEvent) => {
               const showLog = ['unknown', 'wait'].includes(it.data.status || 'unknown');
               const refreshed = ['doing', 'running'].includes(it.data.status) || disabled;
+              const isLibrary = it.data.key == 'library_data';
               return (
                 <div className={'operation'}>
                   {it.data?.refresh && (
                     <img
                       src={require('../../../../../public/excute.png')}
                       onClick={() => {
-                        if (refreshed) return;
+                        if (refreshed || isLibrary) return;
                         handleCheck(it.data);
                       }}
-                      style={refreshed ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {}}
+                      style={
+                        refreshed || isLibrary
+                          ? { filter: 'grayscale(1)', cursor: 'not-allowed' }
+                          : {}
+                      }
                     />
                   )}
                   <img
                     src={require('../../../../../public/logs.png')}
-                    style={showLog ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {}}
+                    style={
+                      showLog || isLibrary ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {}
+                    }
                     onClick={() => {
-                      if (showLog) return;
-                      if (it.data.refresh && it.data.check_log) {
+                      if (showLog || isLibrary) return;
+                      if (it.data.check_log) {
                         window.open(it.data.check_log);
                         return;
                       }

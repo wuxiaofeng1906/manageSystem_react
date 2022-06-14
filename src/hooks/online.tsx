@@ -1,5 +1,6 @@
 import OnlineServices from '@/services/online';
 import React, { useCallback, useEffect, useState } from 'react';
+import { Modal, List } from 'antd';
 import { useLocation } from 'umi';
 import { IRecord } from '@/namespaces';
 const initList = [
@@ -37,7 +38,7 @@ const initList = [
     end_time: '',
     key: 'library_data',
     check_log: '',
-    // refresh: true,
+    refresh: true,
   },
   {
     type: '应用版本代码遗漏检查是否通过',
@@ -167,4 +168,66 @@ export const useCheckDetail = () => {
   }, []);
 
   return { getList, formatStatus, source, setSource, spinning };
+};
+
+export const useShowLog = () => {
+  const [logs, setLogs] = useState([]);
+  const [showLog, setShowLog] = useState<{
+    visible: boolean;
+    data: Record<'operation_id' | 'operation_address', string>;
+    title?: string;
+  }>();
+
+  const getLogs = useCallback(async () => {
+    if (!showLog?.data) return;
+    const res = await OnlineServices.optionsLog(showLog.data);
+    setLogs(res);
+  }, [showLog?.data]);
+
+  const logModal = () => {
+    Modal.info({
+      width: 800,
+      title: showLog?.title?.replace(/[是否通过,是否封板]/g, ''),
+      okText: '好的',
+      centered: true,
+      onOk: () => setShowLog(undefined),
+      content: (
+        <List style={{ maxHeight: 600, overflow: 'auto', marginTop: 8 }}>
+          {logs?.map((it: { option_content: string; option_time: string }, index: number) => {
+            return (
+              <List.Item key={it.option_time + index}>
+                <List.Item.Meta
+                  title={`操作内容： ${it.option_content}`}
+                  description={`操作时间： ${it.option_time}`}
+                />
+              </List.Item>
+            );
+          })}
+        </List>
+      ),
+    });
+  };
+
+  useEffect(() => {
+    if (showLog?.data) {
+      getLogs();
+    }
+  }, [showLog]);
+
+  useEffect(() => {
+    if (!showLog?.visible) return;
+    if (logs.length == 0) {
+      Modal.info({
+        centered: true,
+        title: showLog?.title?.replace(/[是否通过,是否封板]/g, ''),
+        content: '暂无操作日志！',
+        okText: '好的',
+        onOk: () => setShowLog(undefined),
+      });
+      return;
+    }
+    logModal();
+  }, [logs]);
+
+  return { setShowLog, logModal, showLog };
 };

@@ -148,6 +148,7 @@ const ApproveFlow = ({ data, disabled, remark, approveDetail, onConfirm }: IFlow
   } | null>();
 
   const handleConfirm = async () => {
+    setLoading(true);
     if (list?.cc.length == 0 || list?.duty?.length == 0 || list?.director?.length == 0) {
       Modal.confirm({
         content:
@@ -157,6 +158,7 @@ const ApproveFlow = ({ data, disabled, remark, approveDetail, onConfirm }: IFlow
             ? '【值班人】不能为空，请重新检查后再提交'
             : '【总监审批】不能为空，请重新检查后再提交',
       });
+      setLoading(false);
       return;
     }
     const data = {
@@ -167,7 +169,7 @@ const ApproveFlow = ({ data, disabled, remark, approveDetail, onConfirm }: IFlow
       release_num: idx,
       remark,
     };
-    setLoading(true);
+
     try {
       await OnlineServices.updateApproval(data);
       setLoading(false);

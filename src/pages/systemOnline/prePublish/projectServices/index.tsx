@@ -1,9 +1,9 @@
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
-import { Form, Row, Col, Select, Modal, Spin, Tooltip } from 'antd';
+import { Form, Row, Col, Select, Modal, Spin, Tooltip, Alert } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { sortBy, clone } from 'lodash';
 import cls from 'classnames';
-import { InfoCircleOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import {
   projectUpgradeColumn,
   upgradeSQLColumn,
@@ -18,8 +18,9 @@ import EditServices from './EditServices';
 import EditSql from './EditSql';
 import OnlineServices from '@/services/online';
 import type { PreServices, PreSql, PreUpgradeItem } from '@/namespaces/interface';
+import { useShowLog } from '@/hooks/online';
 
-type enumType = 'upgrade' | 'services' | 'sql';
+type enumType = 'online_project' | 'online_server' | 'online_upgrade_sql';
 interface Istate<T> {
   visible: boolean;
   data?: T;
@@ -47,6 +48,7 @@ const ITableTitle = ({ data }: ITitle) => {
 };
 
 const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) => {
+  const { setShowLog } = useShowLog();
   const [sealForm] = Form.useForm();
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
 
@@ -86,103 +88,110 @@ const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) 
   }, [idx]);
 
   return (
-    <Form form={sealForm} onValuesChange={updateSealVersion}>
-      <Row gutter={5}>
-        <Col span={6}>
-          <Form.Item label={'业务前端应用可封版'} name={'business_front'}>
-            <Select
-              options={PLATE_STATUS}
-              disabled={disabled || !sealVersion?.business_front}
-              style={{ width: '100%' }}
-              className={cls({ 'form-select': sealVersion?.business_front == 'yes' })}
-            />
-          </Form.Item>
-        </Col>
-        <Col span={6}>
-          <Form.Item label={'业务后端应用可封版'} name={'business_backend'}>
-            <Select
-              options={PLATE_STATUS}
-              disabled={disabled || !sealVersion?.business_backend}
-              style={{ width: '100%' }}
-              className={cls({ 'form-select': sealVersion?.business_backend == 'yes' })}
-            />
-          </Form.Item>
-        </Col>
-        <Col span={6}>
-          <Form.Item label={'流程应用可封版'} name={'process'}>
-            <Select
-              options={PLATE_STATUS}
-              disabled={disabled || !sealVersion?.process}
-              style={{ width: '100%' }}
-              className={cls({ 'form-select': sealVersion?.process == 'yes' })}
-            />
-          </Form.Item>
-        </Col>
-        <Col span={6}>
-          <Form.Item label={'global可封版'} name={'global'}>
-            <Select
-              options={PLATE_STATUS}
-              disabled={disabled || !sealVersion?.global}
-              style={{ width: '100%' }}
-              className={cls({ 'form-select': sealVersion?.global == 'yes' })}
-            />
-          </Form.Item>
-        </Col>
-      </Row>
-      <Row gutter={10}>
-        <Col span={5}>
-          <Form.Item label={'openapi可封版'} name={'openapi'}>
-            <Select
-              options={PLATE_STATUS}
-              disabled={disabled || !sealVersion?.openapi}
-              style={{ width: '100%' }}
-              className={cls({ 'form-select': sealVersion?.openapi == 'yes' })}
-            />
-          </Form.Item>
-        </Col>
-        <Col span={5}>
-          <Form.Item label={'qbos可封版'} name={'qbos'}>
-            <Select
-              options={PLATE_STATUS}
-              disabled={disabled || !sealVersion?.qbos}
-              style={{ width: '100%' }}
-              className={cls({ 'form-select': sealVersion?.qbos == 'yes' })}
-            />
-          </Form.Item>
-        </Col>
-        <Col span={5}>
-          <Form.Item label={'store可封版'} name={'store'}>
-            <Select
-              options={PLATE_STATUS}
-              disabled={disabled || !sealVersion?.store}
-              style={{ width: '100%' }}
-              className={cls({ 'form-select': sealVersion?.store == 'yes' })}
-            />
-          </Form.Item>
-        </Col>
-        <Col span={5}>
-          <Form.Item label={'jsf可封版'} name={'jsf'}>
-            <Select
-              options={PLATE_STATUS}
-              disabled={disabled || !sealVersion?.jsf}
-              style={{ width: '100%' }}
-              className={cls({ 'form-select': sealVersion?.jsf == 'yes' })}
-            />
-          </Form.Item>
-        </Col>
-        <Col span={2}>
-          <Form.Item label={'日志'}>
-            <img
-              width={20}
-              src={require('../../../../../public/logs.png')}
-              onClick={() => {
-                console.log('test');
-              }}
-            />
-          </Form.Item>
-        </Col>
-      </Row>
-    </Form>
+    <>
+      <Form form={sealForm} onValuesChange={updateSealVersion}>
+        <Row gutter={5}>
+          <Col span={6}>
+            <Form.Item label={'业务前端应用可封版'} name={'business_front'}>
+              <Select
+                options={PLATE_STATUS}
+                disabled={disabled || !sealVersion?.business_front}
+                style={{ width: '100%' }}
+                className={cls({ 'form-select': sealVersion?.business_front == 'yes' })}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={6}>
+            <Form.Item label={'业务后端应用可封版'} name={'business_backend'}>
+              <Select
+                options={PLATE_STATUS}
+                disabled={disabled || !sealVersion?.business_backend}
+                style={{ width: '100%' }}
+                className={cls({ 'form-select': sealVersion?.business_backend == 'yes' })}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={6}>
+            <Form.Item label={'流程应用可封版'} name={'process'}>
+              <Select
+                options={PLATE_STATUS}
+                disabled={disabled || !sealVersion?.process}
+                style={{ width: '100%' }}
+                className={cls({ 'form-select': sealVersion?.process == 'yes' })}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={6}>
+            <Form.Item label={'global可封版'} name={'global'}>
+              <Select
+                options={PLATE_STATUS}
+                disabled={disabled || !sealVersion?.global}
+                style={{ width: '100%' }}
+                className={cls({ 'form-select': sealVersion?.global == 'yes' })}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={10}>
+          <Col span={5}>
+            <Form.Item label={'openapi可封版'} name={'openapi'}>
+              <Select
+                options={PLATE_STATUS}
+                disabled={disabled || !sealVersion?.openapi}
+                style={{ width: '100%' }}
+                className={cls({ 'form-select': sealVersion?.openapi == 'yes' })}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={5}>
+            <Form.Item label={'qbos可封版'} name={'qbos'}>
+              <Select
+                options={PLATE_STATUS}
+                disabled={disabled || !sealVersion?.qbos}
+                style={{ width: '100%' }}
+                className={cls({ 'form-select': sealVersion?.qbos == 'yes' })}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={5}>
+            <Form.Item label={'store可封版'} name={'store'}>
+              <Select
+                options={PLATE_STATUS}
+                disabled={disabled || !sealVersion?.store}
+                style={{ width: '100%' }}
+                className={cls({ 'form-select': sealVersion?.store == 'yes' })}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={5}>
+            <Form.Item label={'jsf可封版'} name={'jsf'}>
+              <Select
+                options={PLATE_STATUS}
+                disabled={disabled || !sealVersion?.jsf}
+                style={{ width: '100%' }}
+                className={cls({ 'form-select': sealVersion?.jsf == 'yes' })}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={2}>
+            <Form.Item label={'日志'}>
+              <img
+                width={20}
+                style={{ cursor: 'pointer' }}
+                src={require('../../../../../public/logs.png')}
+                onClick={() =>
+                  setShowLog({
+                    visible: true,
+                    data: { operation_id: idx, operation_address: 'online_seal_version' },
+                    title: '服务可封板操作日志详情',
+                  })
+                }
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+      </Form>
+    </>
   );
 };
 
@@ -199,17 +208,19 @@ const ProjectServices = () => {
   const gridReviewRef = useRef<GridApi>();
   const gridServerRef = useRef<GridApi>();
 
+  const { setShowLog } = useShowLog();
   const [editUpgrade, setEditUpgrade] = useState<Istate<PreUpgradeItem> | null>();
   const [editServices, setEditServices] = useState<Istate<PreServices> | null>();
   const [editSql, setEditSql] = useState<Istate<PreSql> | null>();
   const [preEnv, setPreEnv] = useState([]);
   const [spinning, setPinning] = useState(false);
+  const [showTip, setShowTip] = useState('');
 
   const updatePreData = async (value: any, values: any) => {
-    // if (value.release_branch) {
-    //   // 分支对应环境
-    // }
-
+    // 分支对应环境
+    if (value.release_branch || value.release_env) {
+      await checkBranch();
+    }
     if (value.release_project || value.release_branch || value.release_env) {
       await updateColumn({
         ...proInfo?.release_project,
@@ -219,6 +230,14 @@ const ProjectServices = () => {
       });
       setPinning(true);
       await getProInfo(idx).finally(() => setPinning(false));
+    }
+  };
+  const checkBranch = async () => {
+    if (!idx) return;
+    try {
+      await OnlineServices.branchCheck(idx);
+    } catch (e: any) {
+      setShowTip(e.msg || '');
     }
   };
 
@@ -250,28 +269,38 @@ const ProjectServices = () => {
 
   // operation
   const OperationDom = (data: any, type: enumType, showLog = true) => {
-    // const isEditCluster = type == 'sql' && data.update_type == 'upgradeApi';
+    // const isEditCluster = type == 'online_upgrade_sql' && data.update_type == 'upgradeApi';
+
+    const optionLogMap = {
+      online_upgrade_sql: { title: '升级接口&SQL操作日志', id: data.api_id },
+      online_project: { title: '项目升级信息操作日志', id: data.pro_id },
+      online_server: { title: '服务发布环境操作日志', id: idx },
+    };
     return (
       <div className={'operation'}>
         <img
           src={require('../../../../../public/edit.png')}
           // style={isEditCluster ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {}}
           onClick={() => {
-            if (disabled) return;
             const params = { visible: true, data };
-            if (type == 'upgrade') setEditUpgrade(params);
-            else if (type == 'services') setEditServices(params);
+            if (type == 'online_project') setEditUpgrade(params);
+            else if (type == 'online_server') setEditServices(params);
             else setEditSql(params);
           }}
         />
         {showLog && (
           <img
             src={require('../../../../../public/logs.png')}
-            onClick={() => {
-              if (data.logUrl) {
-                window.open(data.log_url);
-              }
-            }}
+            onClick={() =>
+              setShowLog({
+                visible: true,
+                data: {
+                  operation_id: optionLogMap[type].id,
+                  operation_address: type,
+                },
+                title: optionLogMap[type].title,
+              })
+            }
           />
         )}
       </div>
@@ -308,6 +337,7 @@ const ProjectServices = () => {
       setPreEnv(res?.map((it: any) => ({ key: it.id, label: it.image_env, value: it.image_env })));
     });
   }, []);
+
   useEffect(() => {
     const info = proInfo?.release_project;
     form.setFieldsValue({
@@ -315,6 +345,7 @@ const ProjectServices = () => {
       release_branch: info?.release_branch,
       release_env: info?.release_env,
     });
+    info && checkBranch();
   }, [JSON.stringify(proInfo)]);
 
   return (
@@ -362,7 +393,17 @@ const ProjectServices = () => {
               <Form.Item
                 label={'镜像环境绑定'}
                 name={'release_env'}
-                style={{ width: '100%', flexWrap: 'nowrap' }}
+                style={{ width: '100%' }}
+                help={
+                  showTip ? (
+                    <strong className={'color-failure'}>
+                      <WarningOutlined style={{ margin: '8px 5px 0 0' }} />
+                      {showTip}
+                    </strong>
+                  ) : (
+                    ''
+                  )
+                }
               >
                 <Select
                   disabled={disabled}
@@ -380,9 +421,13 @@ const ProjectServices = () => {
                 <img
                   width={20}
                   src={require('../../../../../public/logs.png')}
-                  onClick={() => {
-                    console.log('test');
-                  }}
+                  onClick={() =>
+                    setShowLog({
+                      visible: true,
+                      data: { operation_id: idx, operation_address: 'online_release_task' },
+                      title: '预发布项目名称&分支操作日志',
+                    })
+                  }
                 />
               </Form.Item>
             </Col>
@@ -396,7 +441,7 @@ const ProjectServices = () => {
             rowData={proInfo?.upgrade_app || []}
             frameworkComponents={{
               operation: ({ data }: CellClickedEvent) =>
-                data.cluster_name == 'global' ? <div /> : OperationDom(data, 'services'),
+                data.cluster_name == 'global' ? <div /> : OperationDom(data, 'online_server'),
             }}
           />
         </div>
@@ -414,7 +459,7 @@ const ProjectServices = () => {
             columnDefs={projectUpgradeColumn}
             rowData={proInfo?.upgrade_project || []}
             frameworkComponents={{
-              operation: ({ data }: CellClickedEvent) => OperationDom(data, 'upgrade'),
+              operation: ({ data }: CellClickedEvent) => OperationDom(data, 'online_project'),
             }}
           />
         </div>
@@ -429,14 +474,14 @@ const ProjectServices = () => {
             animateRows
             rowDragManaged
             suppressAutoSize
-            suppressRowTransform
+            suppressRowDrag={disabled}
             {...initGridTable(gridSQLRef)}
             columnDefs={upgradeSQLColumn}
             rowData={sortServiceData}
             onRowDragEnd={onRowDragMove}
             onCellDoubleClicked={showDetail}
             frameworkComponents={{
-              operation: ({ data }: CellClickedEvent) => OperationDom(data, 'sql'),
+              operation: ({ data }: CellClickedEvent) => OperationDom(data, 'online_upgrade_sql'),
             }}
           />
         </div>

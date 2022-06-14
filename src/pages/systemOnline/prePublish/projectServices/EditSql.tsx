@@ -13,18 +13,26 @@ interface IEditSql extends ModalFuncProps {
 
 const EditSql = (props: IEditSql) => {
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
-  const [environmentSelector] = useModel('systemOnline', (system) => [system.environmentSelector]);
+  const [environmentSelector, disabled] = useModel('systemOnline', (system) => [
+    system.environmentSelector,
+    system.disabled,
+  ]);
 
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const isSql = props.data?.update_type == 'upgradeSql';
 
   useEffect(() => {
     if (props.visible) {
       form.setFieldsValue({
         ...props.data,
-        update_type: props.data ? COMMON_STATUS[props.data.update_type] : null,
-        update_api: props.data ? COMMON_STATUS[props.data.update_api] : null,
+        concurrent: isSql ? null : props.data?.concurrent ?? 20,
+        update_type: props.data?.update_type ? COMMON_STATUS[props.data.update_type] : null,
+        update_api: props.data?.update_api ? COMMON_STATUS[props.data.update_api] : null,
         cluster_id: props.data?.cluster_id ? props.data.cluster_id?.split(',') : [],
+        release_cluster_id: props.data?.release_cluster_id
+          ? props.data.release_cluster_id?.split(',')
+          : [],
       });
     } else form.resetFields();
   }, [props.visible]);
@@ -35,9 +43,9 @@ const EditSql = (props: IEditSql) => {
       setLoading(true);
       await OnlineServices.updatePreInterface({
         cluster_id: values.cluster_id?.join(),
-        release_cluster_id: values.cluster_id?.join(),
+        release_cluster_id: values.release_cluster_id?.join() ?? '',
         is_backlog: values.is_backlog,
-        concurrent: values?.concurrent,
+        concurrent: isSql ? undefined : values?.concurrent ?? 20,
         user_id: user?.userid,
         api_id: props.data?.api_id,
       });
@@ -46,7 +54,6 @@ const EditSql = (props: IEditSql) => {
       setLoading(false);
     }
   };
-  const isEditCluster = props.data?.update_type == 'upgradeApi';
   return (
     <Modal
       title="编辑升级接口&SQL"
@@ -57,6 +64,7 @@ const EditSql = (props: IEditSql) => {
       maskClosable={false}
       confirmLoading={loading}
       centered
+      okButtonProps={{ disabled }}
     >
       <Form form={form} wrapperCol={{ span: 16 }} labelCol={{ span: 6 }}>
         <Form.Item name="update_type" label="升级类型">
@@ -72,28 +80,85 @@ const EditSql = (props: IEditSql) => {
           <Input disabled />
         </Form.Item>
         <Form.Item
-          name="cluster_id"
-          label="上线环境"
-          rules={[{ required: !isEditCluster, message: '请选择上线环境!' }]}
+          noStyle
+          shouldUpdate={(prevValues, currentValues) =>
+            prevValues.release_cluster_id !== currentValues.release_cluster_id
+          }
         >
-          <Select
-            showSearch
-            mode={'multiple'}
-            options={environmentSelector}
-            optionFilterProp="value"
-            disabled={isEditCluster}
-            filterOption={(input, option) => (option!.value as unknown as string)?.includes(input)}
-          />
+          {({ getFieldValue }) => (
+            <Form.Item
+              name="cluster_id"
+              label="上线环境"
+              rules={[{ required: isSql, message: '请选择上线环境!' }]}
+            >
+              <Select
+                showSearch
+                mode={'multiple'}
+                options={environmentSelector.map((it) => ({
+                  ...it,
+                  disabled: (getFieldValue('release_cluster_id') || []).includes(it.value),
+                }))}
+                optionFilterProp="value"
+                placeholder={'上线环境'}
+                disabled={!isSql || disabled} // 接口不可编辑
+                filterOption={(input, option) =>
+                  (option!.value as unknown as string)?.includes(input)
+                }
+              />
+            </Form.Item>
+          )}
         </Form.Item>
         <Form.Item label={'并发数'} name={'concurrent'}>
-          <InputNumber min={0} precision={0} maxLength={11} style={{ width: '100%' }} />
+          <InputNumber
+            disabled={isSql || disabled} // sql无并发数
+            min={0}
+            precision={0}
+            maxLength={11}
+            style={{ width: '100%' }}
+            placeholder={'并发数'}
+          />
         </Form.Item>
         <Form.Item
           name="record_backlog"
           label="是否记录积压"
-          rules={[{ required: true, message: '请选择是否记录积压!' }]}
+          rules={[{ required: isSql, message: '请选择是否记录积压!' }]} // sql 可编辑
         >
-          <Select options={STATUS_MAP} />
+          <Select options={STATUS_MAP} disabled={!isSql || disabled} />
+        </Form.Item>
+        <Form.Item
+          noStyle
+          shouldUpdate={(prevValues, currentValues) =>
+            prevValues.record_backlog !== currentValues.record_backlog ||
+            prevValues.cluster_id !== currentValues.cluster_id
+          }
+        >
+          {({ getFieldValue }) => (
+            <Form.Item
+              name="release_cluster_id"
+              label="正式环境"
+              rules={[
+                {
+                  required: isSql && getFieldValue('record_backlog') == 'yes', // sql & 存在积压 必填项
+                  message: '请选择正式环境!',
+                },
+              ]}
+            >
+              <Select
+                showSearch
+                mode={'multiple'}
+                options={environmentSelector.map((it) => ({
+                  ...it,
+                  disabled: (getFieldValue('cluster_id') || []).includes(it.value),
+                }))}
+                optionFilterProp="value"
+                placeholder={'正式环境'}
+                disabled={!(isSql && getFieldValue('record_backlog') == 'yes') || disabled}
+                filterOption={(input, option) =>
+                  (option!.value as unknown as string)?.includes(input)
+                }
+              />
+            </Form.Item>
+          )}
         </Form.Item>
       </Form>
     </Modal>

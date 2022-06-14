@@ -7,6 +7,7 @@ import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 import { STATUS_MAP } from '../../constants';
 import OnlineServices from '@/services/online';
 import { PreUpgradeItem } from '@/namespaces';
+import { pick } from '@/utils/utils';
 
 interface IEditUprade extends ModalFuncProps {
   data?: PreUpgradeItem;
@@ -14,9 +15,14 @@ interface IEditUprade extends ModalFuncProps {
 
 const EditUpgrade = (props: IEditUprade) => {
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
+  const [disabled, release_project] = useModel('systemOnline', (system) => [
+    system.disabled,
+    system.proInfo?.release_project,
+  ]);
 
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [shouldConfirm, setShouldConfirm] = useState(false);
 
   useEffect(() => {
     if (props.visible) {
@@ -40,18 +46,33 @@ const EditUpgrade = (props: IEditUprade) => {
     }
   };
 
+  const checkValue = (value: any, values: any) => {
+    if (value.is_database_upgrade || value.is_recovery_database) {
+      const flag = Object.values(
+        pick(values, ['is_database_upgrade', 'is_recovery_database']),
+      ).some((it) => it == 'yes');
+      setShouldConfirm(release_project?.release_method == 'keep_server' && flag);
+    } else shouldConfirm && setShouldConfirm(false);
+  };
+
   return (
     <Modal
+      centered
+      okText="保存"
       title="编辑项目升级信息"
       visible={props.visible}
-      okText="保存"
       onCancel={props.onCancel}
       onOk={onConfirm}
       maskClosable={false}
       confirmLoading={loading}
-      centered
+      okButtonProps={{ disabled: disabled || shouldConfirm }}
     >
-      <Form form={form} wrapperCol={{ span: 14 }} labelCol={{ span: 9 }}>
+      <Form
+        form={form}
+        wrapperCol={{ span: 14 }}
+        labelCol={{ span: 9 }}
+        onValuesChange={checkValue}
+      >
         <Form.Item name="project_name" label="项目名称">
           <Input disabled />
         </Form.Item>
@@ -70,21 +91,21 @@ const EditUpgrade = (props: IEditUprade) => {
           label="是否涉及数据Recovery"
           rules={[{ required: true, message: '请选择是否涉及数据Recovery!' }]}
         >
-          <Select options={STATUS_MAP} />
+          <Select options={STATUS_MAP} disabled={disabled} />
         </Form.Item>
         <Form.Item
           name="is_clear_redis"
           label="是否清理缓存"
           rules={[{ required: true, message: '请选择是否清理缓存!' }]}
         >
-          <Select options={STATUS_MAP} />
+          <Select options={STATUS_MAP} disabled={disabled} />
         </Form.Item>
         <Form.Item
           name="is_clear_app_cache"
           label="是否清理应用缓存"
           rules={[{ required: true, message: '请选择是否清理应用缓存!' }]}
         >
-          <Select options={STATUS_MAP} />
+          <Select options={STATUS_MAP} disabled={disabled} />
         </Form.Item>
         <Form.Item
           name="is_add_front_config"
@@ -98,10 +119,10 @@ const EditUpgrade = (props: IEditUprade) => {
           label="前端是否涉及元数据更新"
           rules={[{ required: true, message: '请选择前端是否涉及配置项增加!' }]}
         >
-          <Select options={STATUS_MAP} />
+          <Select options={STATUS_MAP} disabled={disabled} />
         </Form.Item>
         <Form.Item name="mark" label="备注">
-          <Input.TextArea />
+          <Input.TextArea disabled={disabled} />
         </Form.Item>
       </Form>
     </Modal>

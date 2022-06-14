@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { Button, message, Space, Spin } from 'antd';
-import { PoweroffOutlined } from '@ant-design/icons';
 import { deployColumn } from '@/pages/systemOnline/column';
 import type { CellClickedEvent, GridApi } from 'ag-grid-community';
 import DeploySetting from '@/pages/systemOnline/prePublish/deploy/DeploySetting';

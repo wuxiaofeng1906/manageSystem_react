@@ -165,5 +165,13 @@ const OnlineServices = {
   async updateSealVersion(data: any) {
     return request(`${baseUrl}/seal_version`, { data, method: 'put' });
   },
+  // 操作日志接口
+  async optionsLog(params: { operation_id: string; operation_address: string }) {
+    return request(`${baseUrl}/options_log`, { params });
+  },
+  // 环境分支检查
+  async branchCheck(release_num: string) {
+    return request(`${baseUrl}/env_branch_check`, { params: { release_num }, warn: false });
+  },
 };
 export default OnlineServices;

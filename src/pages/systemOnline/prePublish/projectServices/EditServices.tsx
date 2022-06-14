@@ -18,7 +18,10 @@ const EditServices = (props: IEditServices) => {
 
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [environmentSelector] = useModel('systemOnline', (system) => [system.environmentSelector]);
+  const [environmentSelector, disabled] = useModel('systemOnline', (system) => [
+    system.environmentSelector,
+    system.disabled,
+  ]);
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   useEffect(() => {
     if (props.visible) {
@@ -50,6 +53,7 @@ const EditServices = (props: IEditServices) => {
 
   return (
     <Modal
+      centered
       title="编辑发布环境"
       visible={props.visible}
       okText="保存"
@@ -57,7 +61,7 @@ const EditServices = (props: IEditServices) => {
       onOk={onFinish}
       maskClosable={false}
       confirmLoading={loading}
-      centered
+      okButtonProps={{ disabled }}
     >
       <Form form={form} wrapperCol={{ span: 16 }} labelCol={{ span: 6 }}>
         <Form.Item name="app_name" label="应用">
@@ -69,6 +73,7 @@ const EditServices = (props: IEditServices) => {
           rules={[{ required: true, message: '请选择上线环境!' }]}
         >
           <Select
+            disabled={disabled}
             showSearch
             mode={'multiple'}
             options={environmentSelector}

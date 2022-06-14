@@ -16,6 +16,7 @@ import {
 } from "@/pages/kpi/forProject/PorjectKpiDetail/components/ProjectIndicator3/gridData";
 import {refreshProject} from "./data/axiosRequest";
 import {errorMessage} from "@/publicMethods/showMessages";
+import {queryProjectQualityload} from "@/pages/kpi/forProject/PorjectKpiDetail/components/ProjectIndicator1/gridData";
 
 
 const {Option} = Select;
@@ -116,8 +117,8 @@ const OperateBar: React.FC<any> = (props: any) => {
     // 需要获取数据，不能用存在state中的数据（在未点击其中一个Tab之前就去导出，state中没有相关Tab中的数据）
     const indicatorData = [
       {
-        prjQualityData: prjQualityData.data,
-        testData: testData.data
+        prjQualityData: await queryProjectQualityload(gqlClient, projectId),
+        // testData: testData.data
       },
       {
         stageWorkData: await queryStageWorkload(gqlClient, projectId),

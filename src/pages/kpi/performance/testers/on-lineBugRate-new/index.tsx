@@ -25,11 +25,10 @@ const queryOnlineBugRate = async (client: GqlClient<object>, params: string) => 
   if (condition.typeFlag === 0) {
     return [];
   }
-  debugger;
-  // newBugThousTestDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, thous: TEST) {
+
   const {data} = await client.query(`
       {
-         newBugThousTestDept(kind: "${condition.typeFlag}", ends:["2021-12-31"], thous: TEST) {
+        newBugThousTestDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, thous: TEST) {
             total {
               dept
               deptName

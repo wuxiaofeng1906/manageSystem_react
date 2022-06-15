@@ -215,30 +215,38 @@ const converseForAgGrid_Convergency = (oraDatas: any) => {
     // 部门数据
     const departDatas = elements.datas;
     departDatas.forEach((depts: any) => {
-      const groups: any = [depts.deptName];
-      findParent(departDatas, depts, groups);
+      // 不显示自动化平台和平台产品以及供应链研发部（供应链测试要展示）
+      if (depts.deptName !== "自动化平台" && depts.deptName !== "平台产品" && depts.deptName !== "供应链研发部") {
+        const groups: any = [depts.deptName];
+        // 如果是供应链测试，那么就不寻找父部门了，研发中心直接为父部门
+        if (depts.deptName === "供应链测试") {
+          groups.unshift("研发中心");
+        } else {
+          findParent(departDatas, depts, groups);
+        }
 
-      // 新增部门
-      resultArray.push({
-        Group: groups,
-        [starttime]: depts.kpi,
-        isDept: true
-      });
+        // 新增部门
+        resultArray.push({
+          Group: groups,
+          [starttime]: depts.kpi,
+          isDept: true
+        });
 
-      // 部门下面区分测试和开发
-      const testGroup: any = JSON.parse(JSON.stringify(groups));
-      testGroup.push("测试");
-      resultArray.push({
-        Group: testGroup,
-        [starttime]: depts.sideKpi.testKpi,
-      });
+        // 部门下面区分测试和开发
+        const testGroup: any = JSON.parse(JSON.stringify(groups));
+        testGroup.push("测试-线上千行bug率");
+        resultArray.push({
+          Group: testGroup,
+          [starttime]: depts.sideKpi.testKpi,
+        });
 
-      const devGroup: any = JSON.parse(JSON.stringify(groups));
-      devGroup.push("开发");
-      resultArray.push({
-        Group: devGroup,
-        [starttime]: depts.sideKpi.devkpi,
-      });
+        const devGroup: any = JSON.parse(JSON.stringify(groups));
+        devGroup.push("开发-千行bug率");
+        resultArray.push({
+          Group: devGroup,
+          [starttime]: depts.sideKpi.devkpi,
+        });
+      }
     });
   });
 

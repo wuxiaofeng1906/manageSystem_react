@@ -122,7 +122,7 @@ const converseFormatForAgGrid = (oraDatas: any) => {
   return converseArrayToOne(resultArray);
 };
 
-
+// 使用界面：测试千行bug率
 const converseDataForAgGrid_code = (oraDatas: any) => {
 
   if (!oraDatas) {
@@ -194,4 +194,56 @@ const converseDataForAgGrid_code = (oraDatas: any) => {
   return converseArrayToOne(resultArray);
 };
 
-export {converseFormatForAgGrid, converseDataForAgGrid_code};
+// 使用界面：千行bug率收敛
+const converseForAgGrid_Convergency = (oraDatas: any) => {
+
+  if (!oraDatas) return [];
+
+  const resultArray: any = [];
+
+  // 解析部门数据
+  oraDatas.forEach((elements: any) => {
+    const starttime = elements.range.start;
+
+    // 新增研发中心数据
+    resultArray.push({
+      Group: ['研发中心'],
+      [starttime]: elements.total.kpi,
+      isDept: true
+    });
+
+    // 部门数据
+    const departDatas = elements.datas;
+    departDatas.forEach((depts: any) => {
+      const groups: any = [depts.deptName];
+      findParent(departDatas, depts, groups);
+
+      // 新增部门
+      resultArray.push({
+        Group: groups,
+        [starttime]: depts.kpi,
+        isDept: true
+      });
+
+      // 部门下面区分测试和开发
+      const testGroup: any = JSON.parse(JSON.stringify(groups));
+      testGroup.push("测试");
+      resultArray.push({
+        Group: testGroup,
+        [starttime]: depts.sideKpi.testKpi,
+      });
+
+      const devGroup: any = JSON.parse(JSON.stringify(groups));
+      devGroup.push("开发");
+      resultArray.push({
+        Group: devGroup,
+        [starttime]: depts.sideKpi.devkpi,
+      });
+    });
+  });
+
+
+  return converseArrayToOne(resultArray);
+};
+
+export {converseFormatForAgGrid, converseDataForAgGrid_code, converseForAgGrid_Convergency};

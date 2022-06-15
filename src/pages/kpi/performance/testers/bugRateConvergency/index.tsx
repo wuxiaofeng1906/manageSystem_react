@@ -6,169 +6,23 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient} from '@/hooks';
-import {
-  getWeeksRange,
-  getMonthWeek,
-  getTwelveMonthTime,
-  getFourQuarterTime,
-  getParamsByType, getYearsTime
-} from '@/publicMethods/timeMethods';
+import {useGqlClient} from '@/hooks';
+import {columsForWeeks, columsForMonths, columsForQuarters, columsForYears} from "./gridConfigure/columns";
 import {Button, Drawer} from "antd";
 import {
-  ScheduleTwoTone,
-  CalendarTwoTone,
-  ProfileTwoTone,
-  QuestionCircleTwoTone,
-  AppstoreTwoTone
+  ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone,
+  QuestionCircleTwoTone, AppstoreTwoTone
 } from "@ant-design/icons";
-import {customRound, getHeight} from "@/publicMethods/pageSet";
-import {converseFormatForAgGrid} from "../testMethod/deptDataAnalyze";
+import {getHeight} from "@/publicMethods/pageSet";
+import {queryBugRateConfigure} from "./gridConfigure/data";
 
-
-// 获取近四周的时间范围
-const weekRanges = getWeeksRange(8);
-const monthRanges = getTwelveMonthTime();
-const quarterTime = getFourQuarterTime();
-
-/* region 列的定义和渲染 */
-// 数据渲染
-const dataRender = (params: any) => {
-  const node = params.data;
-
-  if (params.value) {
-    let result = customRound(params.value, 4);
-    if ((node.Group)[0] === "代码量") {
-      result = params.value;
-    }
-
-    if (node && node.isDept === true) {
-      return `<span style="font-weight: bold"> ${result}</span>`;
-    }
-
-    return `<span> ${result}</span>`;
-  }
-
-  if (node && node.isDept === true) {
-    return `<span style="font-weight: bold"> ${0}</span>`;
-  }
-
-  return `<span style="color: silver"> ${0}</span>`;
-
-}
-
-const columsForWeeks = () => {
-  const component = new Array();
-  for (let index = weekRanges.length - 1; index >= 0; index -= 1) {
-    const starttime = weekRanges[index].from;
-    const weekName = getMonthWeek(starttime);
-    component.push({
-      headerName: weekName,
-      field: starttime.toString(),
-      cellRenderer: dataRender,
-      minWidth: 100
-    });
-
-  }
-  return component;
-};
-
-const columsForMonths = () => {
-  const component = new Array();
-  for (let index = 0; index < monthRanges.length; index += 1) {
-    component.push({
-      headerName: monthRanges[index].title,
-      field: monthRanges[index].start,
-      cellRenderer: dataRender,
-      minWidth: 110
-    });
-
-  }
-  return component;
-};
-
-const columsForQuarters = () => {
-  const component = new Array();
-  for (let index = 0; index < quarterTime.length; index += 1) {
-    component.push({
-      headerName: quarterTime[index].title,
-      field: quarterTime[index].start,
-      cellRenderer: dataRender
-    });
-
-  }
-  return component;
-};
-
-const columsForYears = () => {
-  const yearsTime = getYearsTime();
-  const component = new Array();
-  for (let index = 0; index < yearsTime.length; index += 1) {
-    component.push({
-      headerName: yearsTime[index].title,
-      field: yearsTime[index].start,
-      cellRenderer: dataRender
-    });
-
-  }
-  return component;
-};
-/* endregion */
-
-/* region 数据获取和解析 */
-
-const queryOnlineBugRate = async (client: GqlClient<object>, params: string) => {
-  const condition = getParamsByType(params);
-  if (condition.typeFlag === 0) {
-    return [];
-  }
-  //
-  // const {data} = await client.query(`
-  //     {
-  //        bugThousTestDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, thous: TEST) {
-  //           total {
-  //             dept
-  //             deptName
-  //             kpi
-  //           }
-  //           code
-  //           range {
-  //             start
-  //             end
-  //           }
-  //           datas {
-  //             dept
-  //             deptName
-  //             kpi
-  //             parent {
-  //               dept
-  //               deptName
-  //             }
-  //             users {
-  //               userId
-  //               userName
-  //               kpi
-  //             }
-  //           }
-  //         }
-  //
-  //     }
-  // `);
-  // const datas = converseFormatForAgGrid(data?.bugThousTestDept);
-  // return datas;
-
-  return []
-};
-
-/* endregion */
-
-const TestBugRateTableList: React.FC<any> = () => {
+const BugRateConvergency: React.FC<any> = () => {
 
   /* region ag-grid */
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
   const {data, loading} = useRequest(() =>
-    queryOnlineBugRate(gqlClient, 'quarter'),
+    queryBugRateConfigure(gqlClient, 'quarter'),
   );
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -195,7 +49,7 @@ const TestBugRateTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const weekColums = columsForWeeks();
     gridApi.current?.setColumnDefs(weekColums);
-    const datas: any = await queryOnlineBugRate(gqlClient, 'week');
+    const datas: any = await queryBugRateConfigure(gqlClient, 'week');
     gridApi.current?.setRowData(datas);
 
   };
@@ -206,7 +60,7 @@ const TestBugRateTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const monthColums = columsForMonths();
     gridApi.current?.setColumnDefs(monthColums);
-    const datas: any = await queryOnlineBugRate(gqlClient, 'month');
+    const datas: any = await queryBugRateConfigure(gqlClient, 'month');
     gridApi.current?.setRowData(datas);
 
   };
@@ -217,7 +71,7 @@ const TestBugRateTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const quartersColums = columsForQuarters();
     gridApi.current?.setColumnDefs(quartersColums);
-    const datas: any = await queryOnlineBugRate(gqlClient, 'quarter');
+    const datas: any = await queryBugRateConfigure(gqlClient, 'quarter');
     gridApi.current?.setRowData(datas);
   };
   // 按年统计
@@ -225,7 +79,7 @@ const TestBugRateTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs([]);
     const yearColums = columsForYears();
     gridApi.current?.setColumnDefs(yearColums);
-    const datas: any = await queryOnlineBugRate(gqlClient, 'year');
+    const datas: any = await queryBugRateConfigure(gqlClient, 'year');
     gridApi.current?.setRowData(datas);
   };
 
@@ -306,4 +160,4 @@ const TestBugRateTableList: React.FC<any> = () => {
   );
 };
 
-export default TestBugRateTableList;
+export default BugRateConvergency;

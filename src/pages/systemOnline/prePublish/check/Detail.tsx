@@ -16,7 +16,7 @@ const Detail = () => {
     query: { idx },
   } = useLocation() as any;
 
-  const { getList, formatStatus, source, spinning } = useCheckDetail();
+  const { getList, formatCheckStatus, source, spinning } = useCheckDetail();
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [disabled] = useModel('systemOnline', (system) => [system.disabled]);
 
@@ -56,8 +56,7 @@ const Detail = () => {
           {...initGridTable(gridApi)}
           rowData={source}
           frameworkComponents={{
-            checkStatus: ({ data, rowIndex }: CellClickedEvent) =>
-              formatStatus({ data, rowIndex: rowIndex || 0 }),
+            checkStatus: formatCheckStatus,
             operation: (it: CellClickedEvent) => {
               const showLog = ['unknown', 'wait'].includes(it.data.status || 'unknown');
               const refreshed = ['doing', 'running'].includes(it.data.status) || disabled;
@@ -104,7 +103,7 @@ const Detail = () => {
                           >
                             <div>
                               检查状态：{' '}
-                              {formatStatus({ data: it.data, rowIndex: it.rowIndex || 0 })}
+                              {formatCheckStatus({ data: it.data, rowIndex: it.rowIndex || 0 })}
                             </div>
                             <div>
                               日志信息：

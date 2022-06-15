@@ -33,7 +33,7 @@ const BuildProject = () => {
 };
 
 const Approve = () => {
-  const { source, formatStatus } = useCheckDetail();
+  const { source, formatCheckStatus } = useCheckDetail();
   const {
     query: { idx },
   } = useLocation() as any;
@@ -181,13 +181,13 @@ const Approve = () => {
         <div className={'flex-row'}>
           <h3 style={{ margin: 0 }}>八、检查详情：</h3>
           <Button
+            type={'link'}
             onClick={() => {
               history.push({
                 pathname: '/systemOnline/prePublish/check',
                 query: { ...history.location.query, active: 'detail' },
               });
             }}
-            type={'link'}
           >
             点击进入
           </Button>
@@ -199,7 +199,7 @@ const Approve = () => {
               return (
                 <li key={it.key + index}>
                   <span style={{ marginRight: 10 }}>{`${index + 1}、${it.type}：`}</span>
-                  {formatStatus({ data: it, rowIndex: index })}
+                  {formatCheckStatus({ data: it, rowIndex: index })}
                 </li>
               );
             })}

@@ -196,43 +196,25 @@ const converseDataForAgGrid_code = (oraDatas: any) => {
 
 // 使用界面：千行bug率收敛
 const converseForAgGrid_Convergency = (oraDatas: any) => {
-  debugger;
-  if (!oraDatas) {
-    return [];
-  }
+
+  if (!oraDatas) return [];
 
   const resultArray: any = [];
 
   // 解析部门数据
   oraDatas.forEach((elements: any) => {
-
     const starttime = elements.range.start;
 
     // 新增研发中心数据
     resultArray.push({
-        Group: ['研发中心'],
-        [starttime]: elements.total.kpi,
-        isDept: true
-      }
-      //   {
-      //   Group: ['研发中心', '前端'],
-      //   [starttime]: elements.side.front,
-      //   isDept: true
-      // }, {
-      //   Group: ['研发中心', '后端'],
-      //   [starttime]: elements.side.backend,
-      //   isDept: true
-      // }
-
-    );
-
-    const departDatas = elements.datas;
+      Group: ['研发中心'],
+      [starttime]: elements.total.kpi,
+      isDept: true
+    });
 
     // 部门数据
+    const departDatas = elements.datas;
     departDatas.forEach((depts: any) => {
-
-      /* region 部门数据 */
-
       const groups: any = [depts.deptName];
       findParent(departDatas, depts, groups);
 
@@ -243,30 +225,21 @@ const converseForAgGrid_Convergency = (oraDatas: any) => {
         isDept: true
       });
 
-      const devGroup: any = JSON.parse(JSON.stringify(groups));
-
-      devGroup.push("开发");
-      resultArray.push({
-        Group: devGroup,
-        [starttime]: depts.sideKpi.devkpi,
-        // isDept: true
-      });
-
-
+      // 部门下面区分测试和开发
       const testGroup: any = JSON.parse(JSON.stringify(groups));
-
       testGroup.push("测试");
       resultArray.push({
         Group: testGroup,
         [starttime]: depts.sideKpi.testKpi,
-        // isDept: true
       });
 
-
-      /* endregion 部门数据 */
-
+      const devGroup: any = JSON.parse(JSON.stringify(groups));
+      devGroup.push("开发");
+      resultArray.push({
+        Group: devGroup,
+        [starttime]: depts.sideKpi.devkpi,
+      });
     });
-
   });
 
 

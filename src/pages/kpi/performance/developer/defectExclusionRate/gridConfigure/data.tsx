@@ -1,7 +1,7 @@
 /* region 数据获取和解析 */
 import {GqlClient} from "@/hooks";
 import {getParamsByType} from "@/publicMethods/timeMethods";
-import {converseFormatForAgGrid} from "@/pages/kpi/performance/developer/devMethod/deptDataAnalyze";
+import {converseForAgGrid_defectRate} from "@/pages/kpi/performance/developer/devMethod/deptDataAnalyze";
 
 export const queryDevDefectExcRate = async (client: GqlClient<object>, params: string) => {
   const condition = getParamsByType(params);
@@ -11,7 +11,7 @@ export const queryDevDefectExcRate = async (client: GqlClient<object>, params: s
 
   const {data} = await client.query(`
       {
-          bugThousDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, thous:ALL) {
+          devDefectRepairDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
             total {
               dept
               deptName
@@ -21,36 +21,25 @@ export const queryDevDefectExcRate = async (client: GqlClient<object>, params: s
               start
               end
             }
-            side {
-              both
-              front
-              backend
-            }
             datas {
               dept
               deptName
               kpi
-              side {
-                both
-                front
-                backend
+              sideKpi{
+                testKpi
+                devkpi
               }
               parent {
                 dept
                 deptName
               }
-              users {
-                userId
-                userName
-                kpi
-                tech
-              }
             }
+
           }
       }
   `);
 
-  const datas = converseFormatForAgGrid(data?.bugThousDept);
+  const datas = converseForAgGrid_defectRate(data?.devDefectRepairDept);
   return datas;
 };
 /* endregion */

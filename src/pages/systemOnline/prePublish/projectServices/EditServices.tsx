@@ -76,7 +76,10 @@ const EditServices = (props: IEditServices) => {
             disabled={disabled}
             showSearch
             mode={'multiple'}
-            options={environmentSelector}
+            options={environmentSelector.map((it) => ({
+              ...it,
+              disabled: it.value == 'cn-northwest-global' || it.label == 'global',
+            }))}
             optionFilterProp="value"
             filterOption={(input, option) => (option!.value as unknown as string)?.includes(input)}
           />

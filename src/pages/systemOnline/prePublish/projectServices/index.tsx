@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { Form, Row, Col, Select, Modal, Spin, Tooltip, Alert } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
-import { sortBy, clone } from 'lodash';
+import { sortBy, clone, debounce } from 'lodash';
 import cls from 'classnames';
 import { InfoCircleOutlined, WarningOutlined } from '@ant-design/icons';
 import {
@@ -216,22 +216,26 @@ const ProjectServices = () => {
   const [spinning, setPinning] = useState(false);
   const [showTip, setShowTip] = useState('');
 
-  const updatePreData = async (value: any, values: any) => {
-    // 分支对应环境
-    if (value.release_branch || value.release_env) {
-      await checkBranch();
-    }
-    if (value.release_project || value.release_branch || value.release_env) {
-      await updateColumn({
-        ...proInfo?.release_project,
-        release_project: values.release_project?.join(',') || '',
-        release_branch: values.release_branch || '',
-        release_env: values.release_env || '',
-      });
-      setPinning(true);
-      await getProInfo(idx).finally(() => setPinning(false));
-    }
-  };
+  const updatePreData = debounce(
+    async (value: any, values: any) => {
+      // 分支对应环境
+      if (value.release_branch || value.release_env) {
+        await checkBranch();
+      }
+      if (value.release_project || value.release_branch || value.release_env) {
+        await updateColumn({
+          ...proInfo?.release_project,
+          release_project: values.release_project?.join(',') || '',
+          release_branch: values.release_branch || '',
+          release_env: values.release_env || '',
+        });
+        setPinning(true);
+        await getProInfo(idx).finally(() => setPinning(false));
+      }
+    },
+    800,
+    { trailing: true },
+  );
   const checkBranch = async () => {
     if (!idx) return;
     try {

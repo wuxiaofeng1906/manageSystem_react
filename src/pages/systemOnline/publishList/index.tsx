@@ -14,6 +14,7 @@ import { omit, valueMap } from '@/utils/utils';
 import { publishColumn } from '../column';
 import { initGridTable, PUBLISH_RESULT } from '../constants';
 import { IRecord, MOMENT_FORMAT } from '@/namespaces';
+import { debounce } from 'lodash';
 import './index.less';
 
 const PublishList: React.ReactNode = () => {
@@ -83,7 +84,11 @@ const PublishList: React.ReactNode = () => {
   return (
     <Spin spinning={spinning} tip={'数据加载中...'}>
       <PageContainer>
-        <Form form={form} onValuesChange={() => getList()} className={'system-init-form'}>
+        <Form
+          form={form}
+          onValuesChange={debounce(() => getList(), 800, { trailing: true })}
+          className={'system-init-form'}
+        >
           <Row justify={'space-between'}>
             <Col span={4} style={{ width: 0 }}>
               <Form.Item label="发布项目:" name="pro_id">

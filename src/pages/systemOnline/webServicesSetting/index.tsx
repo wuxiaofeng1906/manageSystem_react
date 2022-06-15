@@ -13,6 +13,7 @@ import { useModel } from 'umi';
 import OnlineServices from '@/services/online';
 import { IRecord } from '@/namespaces/interface';
 import { omit } from '@/utils/utils';
+import { useShowLog } from '@/hooks/online';
 
 const EditSetting = (props: { data?: any } & ModalFuncProps) => {
   const [form] = Form.useForm();
@@ -93,6 +94,7 @@ const EditSetting = (props: { data?: any } & ModalFuncProps) => {
 const WebServicesSetting = () => {
   const [form] = Form.useForm();
   const gridApi = useRef<GridApi>();
+  const { setShowLog } = useShowLog();
   const [projectSelectors] = useModel('systemOnline', (system) => [system.projectSelectors]);
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
 
@@ -199,6 +201,19 @@ const WebServicesSetting = () => {
                   <img
                     src={require('../../../../public/delete_2.png')}
                     onClick={() => onRemove(data)}
+                  />
+                  <img
+                    src={require('../../../../public/logs.png')}
+                    onClick={() =>
+                      setShowLog({
+                        visible: true,
+                        data: {
+                          operation_id: 'pro_server_id',
+                          operation_address: 'online_front_server',
+                        },
+                        title: '前端服务配置 操作日志',
+                      })
+                    }
                   />
                 </div>
               ),

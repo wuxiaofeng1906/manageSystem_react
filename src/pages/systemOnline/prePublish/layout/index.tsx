@@ -8,6 +8,7 @@ import { PUBLISH_RESULT, MENUS } from '../../constants';
 import { MOMENT_FORMAT } from '@/namespaces';
 import { omit } from '@/utils/utils';
 import { isEmpty } from 'lodash';
+import cls from 'classnames';
 
 const PreLayout = ({ location, children }: { location: any; children: React.ReactNode }) => {
   const {
@@ -21,6 +22,7 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
   const [form] = Form.useForm();
   const [flag, setFlag] = useState(false);
   const [spinning, setSpinning] = useState(false);
+  const [collapse, setCollapse] = useState(true);
 
   const update = async (type: any, values: any) => {
     if (idx && !disabled) {
@@ -47,7 +49,9 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
     getProInfo(idx).then((res) => {
       if (res && isEmpty(res?.release_project)) {
         update('create', {
-          release_type: typeSelectors?.[0]?.value,
+          release_type:
+            typeSelectors?.find((it) => it.value == 'gray_release')?.value ??
+            typeSelectors?.[0]?.value,
           release_method: methodSelectors?.[0]?.value,
           release_result: PUBLISH_RESULT[0].value,
           release_date: moment().hour(23).minute(0).seconds(0),
@@ -73,7 +77,19 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
     <Spin spinning={spinning} tip={'数据加载中...'} wrapperClassName={styles.spinWrap}>
       <div className={styles.preLayout}>
         <Layout>
-          <Layout.Sider width={280} theme={'light'} className={styles.layout}>
+          <Layout.Sider
+            width={collapse ? 280 : 0}
+            theme={'light'}
+            zeroWidthTriggerStyle={{ zIndex: 10 }}
+            className={cls(styles.layout, { layoutHidden: collapse })}
+          >
+            <div className={styles.collapse} onClick={() => setCollapse(!collapse)}>
+              <img
+                src={require(`../../../../../public/arrow_double_${
+                  collapse ? 'left' : 'right'
+                }_outlined.png`)}
+              />
+            </div>
             <div className={styles.formWrap}>
               <Form form={form} onValuesChange={update}>
                 <Form.Item label={'发布类型'} name={'release_type'}>

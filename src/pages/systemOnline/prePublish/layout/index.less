@@ -9,7 +9,9 @@
 }
 .preLayout {
   height: 100%;
+  transition: all 0.5s;
   .layout {
+    position: relative;
     background: rgba(194, 209, 220, 0.4);
     //height: 100%;
     .formWrap {
@@ -28,6 +30,9 @@
       font-weight: bold;
       background: transparent;
     }
+  }
+  .layoutHidden{
+    width: 0px!important;
   }
 
   .content {
@@ -76,6 +81,22 @@
       .ant-select-selection-item{
         color:@color-success;
       }
+    }
+  }
+  .collapse{
+    position: absolute;
+    top:calc(50% - 14px);
+    right: -14px;
+    width:28px;
+    height: 50px;
+    border-radius: 8px;
+    background: rgba(white,0.4);
+    box-shadow: @card-shadow;
+    cursor:pointer;
+    line-height: 45px;
+    z-index: 99;
+    img{
+      width: 24px;
     }
   }
 }

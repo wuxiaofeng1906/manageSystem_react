@@ -302,7 +302,7 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
     headerName: '并发数',
     minWidth: 100,
     field: 'concurrent',
-    cellRenderer: (data) => (data.data.update_type == 'upgradeSql' ? '' : data.value),
+    cellRenderer: (data) => (data.data.update_type == 'upgradeSql' ? '' : data.value ?? 20),
     cellClassRules: { 'ag-disabled': 'data.update_type !== "upgradeApi"' },
   },
   {

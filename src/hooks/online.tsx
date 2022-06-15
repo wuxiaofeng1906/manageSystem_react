@@ -41,11 +41,11 @@ export const useCheckDetail = () => {
       let it = { value: '', color: '#2f2f2f' };
       switch (data.status) {
         case 'success':
-          it = { value: '通过', color: '#099409' };
+          it = { value: rowIndex <= 5 ? '通过' : '已封板', color: '#099409' };
           break;
         case 'error':
         case 'failure':
-          it = { value: '不通过', color: '#e02c2c' };
+          it = { value: rowIndex <= 5 ? '不通过' : '未封板', color: '#e02c2c' };
           break;
         case 'running':
         case 'doing':
@@ -56,6 +56,9 @@ export const useCheckDetail = () => {
           break;
         case 'skip':
           it = { value: '忽略', color: '#d4d453' };
+          break;
+        case 'no_branch':
+          it = { value: '暂无分支', color: '#2f2f2f' };
           break;
         case 'done':
           it = { value: '已封版', color: '#099409' };

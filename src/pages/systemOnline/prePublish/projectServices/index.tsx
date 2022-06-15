@@ -1,9 +1,9 @@
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
-import { Form, Row, Col, Select, Modal, Spin, Tooltip, Alert } from 'antd';
+import { Form, Row, Col, Select, Modal, Spin, Tooltip } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
-import { sortBy, clone, debounce } from 'lodash';
+import { sortBy, cloneDeep, isEqual } from 'lodash';
 import cls from 'classnames';
-import { InfoCircleOutlined, WarningOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, WarningOutlined, SyncOutlined } from '@ant-design/icons';
 import {
   projectUpgradeColumn,
   upgradeSQLColumn,
@@ -58,7 +58,7 @@ const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) 
     if (!idx) return;
     const res = await OnlineServices.getSealVersion(idx);
     setSealVersion(res);
-    const formatResult = clone(res);
+    const formatResult = cloneDeep(res);
     if (formatResult) {
       for (const k in formatResult) {
         if (!formatResult[k]) {
@@ -89,7 +89,7 @@ const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) 
 
   return (
     <>
-      <Form form={sealForm} onValuesChange={updateSealVersion}>
+      <Form form={sealForm} onValuesChange={updateSealVersion} className={'system-init-form'}>
         <Row gutter={5}>
           <Col span={6}>
             <Form.Item label={'业务前端应用可封版'} name={'business_front'}>
@@ -214,28 +214,49 @@ const ProjectServices = () => {
   const [editSql, setEditSql] = useState<Istate<PreSql> | null>();
   const [preEnv, setPreEnv] = useState([]);
   const [spinning, setPinning] = useState(false);
+  const [finished, setFinished] = useState(true);
   const [showTip, setShowTip] = useState('');
+  const [recordForm, setRecordForm] = useState<any>();
 
-  const updatePreData = debounce(
-    async (value: any, values: any) => {
+  const updatePreData = async (key: string) => {
+    const values = form.getFieldsValue();
+    if (isEqual(recordForm, values)) return;
+    setPinning(true);
+    try {
       // 分支对应环境
-      if (value.release_branch || value.release_env) {
+      if (key == 'release_branch' || key == 'release_env') {
         await checkBranch();
       }
-      if (value.release_project || value.release_branch || value.release_env) {
-        await updateColumn({
-          ...proInfo?.release_project,
-          release_project: values.release_project?.join(',') || '',
-          release_branch: values.release_branch || '',
-          release_env: values.release_env || '',
-        });
-        setPinning(true);
-        await getProInfo(idx).finally(() => setPinning(false));
+      await updateColumn({
+        ...proInfo?.release_project,
+        release_project: values.release_project?.join(',') || '',
+        release_branch: values.release_branch || '',
+        release_env: values.release_env || '',
+      });
+      setPinning(false);
+      checkDataSyncFinished();
+    } catch (e) {
+      setFinished(true);
+      setPinning(false);
+    }
+  };
+
+  // fresh twice
+  const checkDataSyncFinished = () => {
+    let count = 0;
+    let oldData = cloneDeep(proInfo);
+    setFinished(false);
+    const timer = setInterval(async () => {
+      ++count;
+      const result = await getProInfo(idx);
+      if (!isEqual(result, oldData) || count >= 2) {
+        clearInterval(timer);
+        oldData = undefined;
+        setFinished(true);
       }
-    },
-    800,
-    { trailing: true },
-  );
+    }, 30000);
+  };
+
   const checkBranch = async () => {
     if (!idx) return;
     try {
@@ -273,18 +294,16 @@ const ProjectServices = () => {
 
   // operation
   const OperationDom = (data: any, type: enumType, showLog = true) => {
-    // const isEditCluster = type == 'online_upgrade_sql' && data.update_type == 'upgradeApi';
-
     const optionLogMap = {
       online_upgrade_sql: { title: '升级接口&SQL 操作日志', id: data.api_id },
       online_project: { title: '项目升级信息 操作日志', id: data.pro_id },
       online_server: { title: '服务发布环境 操作日志', id: idx },
     };
+
     return (
       <div className={'operation'}>
         <img
           src={require('../../../../../public/edit.png')}
-          // style={isEditCluster ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {}}
           onClick={() => {
             const params = { visible: true, data };
             if (type == 'online_project') setEditUpgrade(params);
@@ -344,24 +363,43 @@ const ProjectServices = () => {
 
   useEffect(() => {
     const info = proInfo?.release_project;
-    form.setFieldsValue({
+    const formData = {
       release_project: info?.release_project ? info.release_project.split(',') : [],
       release_branch: info?.release_branch,
       release_env: info?.release_env,
-    });
+    };
+    setRecordForm(formData);
+    form.setFieldsValue(formData);
     info && checkBranch();
   }, [JSON.stringify(proInfo)]);
+
+  const WrapLoader = ({ data, finished }: ITitle & { finished: boolean }) => {
+    return (
+      <div className={'flex-row'}>
+        <ITableTitle data={data} />
+        {finished ? (
+          <span />
+        ) : (
+          <span className={'color-prefix'}>
+            <SyncOutlined spin style={{ margin: '0 7px 7px' }} />
+            数据同步中
+          </span>
+        )}
+      </div>
+    );
+  };
 
   return (
     <Spin spinning={spinning} tip={'数据加载中,请稍等...'}>
       <div>
-        <ITableTitle
+        <WrapLoader
+          finished={true}
           data={{
             title: '一、预发布项目名称&分支填写',
             subTitle: '由测试值班人员填写-按从左到右一次填写',
           }}
         />
-        <Form form={form} onValuesChange={updatePreData} className={'system-init-form'}>
+        <Form form={form} className={'system-init-form'}>
           <Row gutter={4}>
             <Col span={8}>
               <Form.Item label={'预发布项目'} name={'release_project'} style={{ width: '100%' }}>
@@ -374,6 +412,7 @@ const ProjectServices = () => {
                   filterOption={(input, option) =>
                     (option!.label as unknown as string)?.includes(input)
                   }
+                  onBlur={() => updatePreData('release_project')}
                 />
               </Form.Item>
             </Col>
@@ -383,6 +422,7 @@ const ProjectServices = () => {
                   showSearch
                   optionFilterProp="label"
                   disabled={disabled}
+                  onBlur={() => updatePreData('release_branch')}
                   filterOption={(input, option) =>
                     (option!.label as unknown as string)?.includes(input)
                   }
@@ -414,6 +454,7 @@ const ProjectServices = () => {
                   optionFilterProp="label"
                   options={preEnv}
                   showSearch
+                  onBlur={() => updatePreData('release_env')}
                   filterOption={(input, option) =>
                     (option!.label as unknown as string)?.includes(input)
                   }
@@ -437,7 +478,10 @@ const ProjectServices = () => {
             </Col>
           </Row>
         </Form>
-        <ITableTitle data={{ title: '二、服务发布环境填写', subTitle: '由测试值班人员填写' }} />
+        <WrapLoader
+          finished={finished}
+          data={{ title: '二、服务发布环境填写', subTitle: '由测试值班人员填写' }}
+        />
         <div className={'AgGridReactTable'}>
           <AgGridReact
             {...initGridTable(gridServerRef)}
@@ -451,7 +495,8 @@ const ProjectServices = () => {
         </div>
         <ITableTitle data={{ title: '三、服务可封版确认', subTitle: '由测试值班人员填写' }} />
         <SealVersionForm disabled={disabled} idx={idx} />
-        <ITableTitle
+        <WrapLoader
+          finished={finished}
           data={{
             title: '四、项目升级信息填写',
             subTitle: '特性项目由端负责人填写，班车项目由前后端周值班人填写',
@@ -467,7 +512,8 @@ const ProjectServices = () => {
             }}
           />
         </div>
-        <ITableTitle
+        <WrapLoader
+          finished={finished}
           data={{
             title: '五、升级接口&升级SQL填写',
             subTitle: '特性项目由端负责人填写，班车项目由前后端周值班人填写',
@@ -489,7 +535,8 @@ const ProjectServices = () => {
             }}
           />
         </div>
-        <ITableTitle
+        <WrapLoader
+          finished={finished}
           data={{
             title: '六、数据修复Review',
             subTitle: '特性项目由后端技术负责人确认，班车项目由后端周值班人确认',

@@ -183,7 +183,7 @@ const SealVersionForm = ({ disabled, idx }: { disabled: boolean; idx: string }) 
                   setShowLog({
                     visible: true,
                     data: { operation_id: idx, operation_address: 'online_seal_version' },
-                    title: '服务可封板操作日志详情',
+                    title: '服务可封板 操作日志',
                   })
                 }
               />
@@ -272,9 +272,9 @@ const ProjectServices = () => {
     // const isEditCluster = type == 'online_upgrade_sql' && data.update_type == 'upgradeApi';
 
     const optionLogMap = {
-      online_upgrade_sql: { title: '升级接口&SQL操作日志', id: data.api_id },
-      online_project: { title: '项目升级信息操作日志', id: data.pro_id },
-      online_server: { title: '服务发布环境操作日志', id: idx },
+      online_upgrade_sql: { title: '升级接口&SQL 操作日志', id: data.api_id },
+      online_project: { title: '项目升级信息 操作日志', id: data.pro_id },
+      online_server: { title: '服务发布环境 操作日志', id: idx },
     };
     return (
       <div className={'operation'}>
@@ -425,7 +425,7 @@ const ProjectServices = () => {
                     setShowLog({
                       visible: true,
                       data: { operation_id: idx, operation_address: 'online_release_task' },
-                      title: '预发布项目名称&分支操作日志',
+                      title: '预发布项目名称&分支 操作日志',
                     })
                   }
                 />

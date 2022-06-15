@@ -187,7 +187,7 @@ export const useShowLog = () => {
   const logModal = () => {
     Modal.info({
       width: 800,
-      title: showLog?.title?.replace(/[是否通过,是否封板]/g, ''),
+      title: showLog?.title,
       okText: '好的',
       centered: true,
       onOk: () => setShowLog(undefined),
@@ -219,7 +219,7 @@ export const useShowLog = () => {
     if (logs.length == 0) {
       Modal.info({
         centered: true,
-        title: showLog?.title?.replace(/[是否通过,是否封板]/g, ''),
+        title: showLog?.title,
         content: '暂无操作日志！',
         okText: '好的',
         onOk: () => setShowLog(undefined),

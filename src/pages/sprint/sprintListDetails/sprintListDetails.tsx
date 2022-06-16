@@ -692,7 +692,7 @@ const SprintList: React.FC<any> = () => {
     if (initialState?.currentUser) {
       currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
     }
-    // currentUserGroup = 'devGroup';
+    currentUserGroup = 'UedGroup';
     if (currentUserGroup !== undefined) {
       switch (currentUserGroup.toString()) {
         case 'superGroup':
@@ -2061,60 +2061,51 @@ const SprintList: React.FC<any> = () => {
       {/* UED修改表单 */}
       <Modal
         title="编辑明细行(UED)"
-        visible={isformForUEDToModVisible}
+        visible={isformForUEDToModVisible}   // isformForUEDToModVisible
         onCancel={UEDHandleCancel}
         centered={true}
         footer={null}
-        width={750}
+        width={650}
       >
         <Form form={formForUEDToMod}>
-          <Row gutter={16}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="uedChandaoType" label="禅道类型：">
-                  <Select placeholder="请选择" style={widths} disabled={true}>
-                    {[
-                      <Option value={'1'}> Bug </Option>,
-                      <Option value={'3'}> 需求 </Option>,
-                      <Option value={'2'}> Task </Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+          <Row gutter={16} style={{...marginTopHeight}}>
+            <Col span={12}>
+              <Form.Item name="uedChandaoType" label="禅道类型：">
+                <Select placeholder="请选择" disabled={true}>
+                  {[
+                    <Option value={'1'}> Bug </Option>,
+                    <Option value={'3'}> 需求 </Option>,
+                    <Option value={'2'}> Task </Option>,
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
 
-            <Col className="gutter-row">
-              <div style={{marginLeft: '50px'}}>
-                <Form.Item name="uedCHandaoID" label="禅道编号:">
-                  <Input placeholder="请输入" style={widths} disabled={true}/>
-                </Form.Item>
-              </div>
+            <Col span={12}>
+              <Form.Item name="uedCHandaoID" label="禅道编号:">
+                <Input placeholder="请输入" disabled={true}/>
+              </Form.Item>
             </Col>
           </Row>
-          <Row gutter={16}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="uedTitle" label="标题内容:">
-                  <Input disabled={true} style={{width: '540px', color: 'black'}}/>
-                </Form.Item>
-              </div>
+          <Row gutter={16} style={{...marginTopHeight}}>
+            <Col span={24}>
+              <Form.Item name="uedTitle" label="标题内容:">
+                <Input disabled={true} style={{color: 'black'}}/>
+              </Form.Item>
             </Col>
           </Row>
-
-          <Row gutter={16}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="uedForUED" label="对应UED：">
-                  <Select placeholder="请选择" style={widths}>
-                    {LoadCombobox('UED')}
-                  </Select>
-                </Form.Item>
-              </div>
+          <Row gutter={16} style={{...marginTopHeight}}>
+            <Col span={12}>
+              <Form.Item name="uedForUED" label="对应UED：">
+                <Select placeholder="请选择">
+                  {LoadCombobox('UED')}
+                </Select>
+              </Form.Item>
             </Col>
-            <Col className="gutter-row">
+            <Col span={12}>
               <div style={leftStyle}>
                 <Form.Item name="uedForUedVerify" label="UED测试环境验证：">
-                  <Select placeholder="请选择" style={{width: '180px'}}>
+                  <Select placeholder="请选择">
                     {[
                       <Option key={''} value={''}> </Option>,
                       <Option key={'1'} value={'1'}>验证通过</Option>,
@@ -2126,55 +2117,49 @@ const SprintList: React.FC<any> = () => {
               </div>
             </Col>
           </Row>
-
-          <Row gutter={16}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="UedOnlineVerti" label="UED线上验证:">
-                  <Select placeholder="请选择" style={widths}>
-                    {[
-                      <Option key={''} value={''}> </Option>,
-                      <Option key={'1'} value={'1'}>验证通过</Option>,
-                      <Option key={'0'} value={'0'}>未通过</Option>,
-                      <Option key={'2'} value={'2'}>无需验证</Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+          <Row gutter={16} style={{...marginTopHeight}}>
+            <Col span={12}>
+              <Form.Item name="UedOnlineVerti" label="UED线上验证:">
+                <Select placeholder="请选择">
+                  {[
+                    <Option key={''} value={''}> </Option>,
+                    <Option key={'1'} value={'1'}>验证通过</Option>,
+                    <Option key={'0'} value={'0'}>未通过</Option>,
+                    <Option key={'2'} value={'2'}>无需验证</Option>,
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
 
-            <Col className="gutter-row">
-              <div style={{marginLeft: '50px'}}>
-                <Form.Item name="uedSource" label="来 源:">
-                  <Select placeholder="请选择" style={widths} disabled={true}>
-                    {[
-                      <Option key={'1'} value={'1'}>《产品hotfix申请》</Option>,
-                      <Option key={'2'} value={'2'}>《UED-hotfix申请》</Option>,
-                      <Option key={'3'} value={'3'}>《开发hotfix申请》</Option>,
-                      <Option key={'4'} value={'4'}>《emergency申请》</Option>,
-                      <Option key={'5'} value={'5'}>《开发热更新申请》</Option>,
-                      <Option key={'6'} value={'6'}>禅道自动写入</Option>,
-                      <Option key={'7'} value={'7'}>手工录入</Option>,
-                      <Option key={'8'} value={'8'}>自动获取</Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={12}>
+              <Form.Item name="uedSource" label="来 源:">
+                <Select placeholder="请选择" disabled={true}>
+                  {[
+                    <Option key={'1'} value={'1'}>《产品hotfix申请》</Option>,
+                    <Option key={'2'} value={'2'}>《UED-hotfix申请》</Option>,
+                    <Option key={'3'} value={'3'}>《开发hotfix申请》</Option>,
+                    <Option key={'4'} value={'4'}>《emergency申请》</Option>,
+                    <Option key={'5'} value={'5'}>《开发热更新申请》</Option>,
+                    <Option key={'6'} value={'6'}>禅道自动写入</Option>,
+                    <Option key={'7'} value={'7'}>手工录入</Option>,
+                    <Option key={'8'} value={'8'}>自动获取</Option>,
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
           </Row>
-
-          <Row gutter={16}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
+          <Row gutter={16} style={{...marginTopHeight}}>
+            <Col span={24}>
+              <div>
                 <Form.Item name="uedRemark" label="备 注:">
-                  <Input style={{width: '575px'}}/>
+                  <Input/>
                 </Form.Item>
               </div>
             </Col>
           </Row>
 
-          <Form.Item style={{marginTop: '50px'}}>
-            <Button type="primary" style={{marginLeft: '300px'}} onClick={commitUedModify}>
+          <Form.Item>
+            <Button type="primary" style={{marginLeft: '230px'}} onClick={commitUedModify}>
               确定
             </Button>
             <Button type="primary" style={{marginLeft: '20px'}} onClick={UEDHandleCancel}>

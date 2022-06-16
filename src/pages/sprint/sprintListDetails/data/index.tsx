@@ -422,11 +422,15 @@ const LoadCombobox = (params: any) => {
 
   const {data: {WxDeptUsers = []} = {}} = useQuery(deptMember);
 
-  for (let index = 0; index < WxDeptUsers.length; index += 1) {
-    deptMan.push(
-      <Option value={WxDeptUsers[index].id}> {WxDeptUsers[index].userName}</Option>,
-    );
+  if (WxDeptUsers && WxDeptUsers.length > 0) {
+
+    for (let index = 0; index < WxDeptUsers.length; index += 1) {
+      deptMan.push(
+        <Option value={WxDeptUsers[index].id}> {WxDeptUsers[index].userName}</Option>,
+      );
+    }
   }
+
   return deptMan;
 
 };
@@ -442,11 +446,14 @@ const LoadTesterCombobox = () => {
           }
       `);
 
-  for (let index = 0; index < WxDeptUsers.length; index += 1) {
-    deptMan.push(
-      <Option value={WxDeptUsers[index].id}> {WxDeptUsers[index].userName}</Option>,
-    );
+  if (WxDeptUsers && WxDeptUsers.length > 0) {
+    for (let index = 0; index < WxDeptUsers.length; index += 1) {
+      deptMan.push(
+        <Option value={WxDeptUsers[index].id}> {WxDeptUsers[index].userName}</Option>,
+      );
+    }
   }
+
   return deptMan;
 
 };
@@ -462,11 +469,14 @@ const GetSprintProject = () => {
       }
     }`);
 
-  for (let index = 0; index < project.length; index += 1) {
-    projectArray.push(
-      <Option value={project[index].id.toString()}> {project[index].name}</Option>,
-    );
+  if (project && project.length > 0) {
+    for (let index = 0; index < project.length; index += 1) {
+      projectArray.push(
+        <Option value={project[index].id.toString()}> {project[index].name}</Option>,
+      );
+    }
   }
+
   return projectArray;
 };
 

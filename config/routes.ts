@@ -226,6 +226,12 @@ export default [
                 path: 'bugRepairRate',
                 component: './kpi/performance/developer/bugRepairRate',
               },
+              {
+                name: '开发缺陷排除率',
+                icon: 'table',
+                path: 'defectExclusionRate',
+                component: './kpi/performance/developer/defectExclusionRate',
+              },
             ],
           },
           {

@@ -16,6 +16,10 @@ export const queryDevDefectExcRate = async (client: GqlClient<object>, params: s
               dept
               deptName
               kpi
+              sideKpi{
+                testKpi
+                devkpi
+              }
             }
             range {
               start

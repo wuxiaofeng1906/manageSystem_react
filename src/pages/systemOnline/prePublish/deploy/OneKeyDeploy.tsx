@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, TreeSelect, Form, Button } from 'antd';
+import { Modal, TreeSelect, Form } from 'antd';
 import { useModel, useLocation } from 'umi';
 import { ModalFuncProps } from 'antd/lib/modal/Modal';
 import OnlineServices from '@/services/online';
@@ -8,7 +8,7 @@ const OneKeyDeploy = (props: ModalFuncProps) => {
   const {
     query: { idx },
   } = useLocation() as any;
-  const [list, setList] = useState([]);
+  const [list, setList] = useState<{ title: string; value: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
@@ -33,23 +33,24 @@ const OneKeyDeploy = (props: ModalFuncProps) => {
   useEffect(() => {
     if (idx && props.visible) {
       OnlineServices.deployServer(idx).then((res) => {
-        setList(res.map((v: string) => ({ title: v, value: v })));
+        const data = Array.from(new Set(res || []))?.map((v = '') => ({ title: v, value: v }));
+        setList(data as any);
       });
-    } else form.resetFields();
+    }
   }, [props.visible]);
-
   return (
     <Modal
       title={'一键部署'}
+      okText="点击部署"
+      centered
+      destroyOnClose
+      maskClosable={false}
       visible={props.visible}
       onOk={onFinish}
       onCancel={props.onCancel}
-      maskClosable={false}
-      okText="点击部署"
       okButtonProps={{ disabled, loading }}
-      centered
     >
-      <Form form={form}>
+      <Form form={form} preserve={false}>
         <Form.Item
           label={'部署服务'}
           name={'app_name'}

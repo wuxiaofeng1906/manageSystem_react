@@ -31,7 +31,7 @@ const EditServices = (props: IEditServices) => {
         // seal_time: props.data?.seal_time ? moment(props.data?.seal_time) : null,
         cluster_id: props.data?.cluster_id ? props.data?.cluster_id?.split(',') : [],
       });
-    } else form.resetFields();
+    }
   }, [props.visible]);
 
   const onFinish = async () => {
@@ -55,15 +55,16 @@ const EditServices = (props: IEditServices) => {
     <Modal
       centered
       title="编辑发布环境"
-      visible={props.visible}
       okText="保存"
-      onCancel={props.onCancel}
-      onOk={onFinish}
+      destroyOnClose
       maskClosable={false}
+      visible={props.visible}
+      onOk={onFinish}
+      onCancel={props.onCancel}
       confirmLoading={loading}
       okButtonProps={{ disabled }}
     >
-      <Form form={form} wrapperCol={{ span: 16 }} labelCol={{ span: 6 }}>
+      <Form form={form} wrapperCol={{ span: 16 }} labelCol={{ span: 6 }} preserve={false}>
         <Form.Item name="app_name" label="应用">
           <Input disabled />
         </Form.Item>

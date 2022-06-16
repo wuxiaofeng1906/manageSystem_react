@@ -28,9 +28,8 @@ const EditSetting = (props: { data?: any } & ModalFuncProps) => {
       form.setFieldsValue({
         ...props.data,
         app_name: props.data?.app_name?.split(','),
-        // time: props.data?.time ? moment(props.data.time) : null,
       });
-    } else form.resetFields();
+    }
   }, [props.visible]);
 
   const onFinish = async () => {
@@ -52,8 +51,9 @@ const EditSetting = (props: { data?: any } & ModalFuncProps) => {
       visible={props.visible}
       onCancel={props.onCancel}
       onOk={onFinish}
+      destroyOnClose
     >
-      <Form form={form} wrapperCol={{ span: 16 }} labelCol={{ span: 6 }}>
+      <Form form={form} wrapperCol={{ span: 16 }} labelCol={{ span: 6 }} preserve={false}>
         <Form.Item
           name="project_id"
           label="所属执行"
@@ -77,15 +77,6 @@ const EditSetting = (props: { data?: any } & ModalFuncProps) => {
             ))}
           </Select>
         </Form.Item>
-        {/* <Form.Item name="status" label="项目状态">
-          <Select options={SETTING_STATUS} disabled={isEdit} />
-        </Form.Item> */}
-        {/* <Form.Item name="editor" label="编辑人">
-          <Select options={[]} disabled={isEdit} />
-        </Form.Item>
-        <Form.Item name="time" label="编辑时间">
-          <DatePicker format={MOMENT_FORMAT.utc} style={{ width: '100%' }} disabled={isEdit} />
-        </Form.Item> */}
       </Form>
     </Modal>
   );

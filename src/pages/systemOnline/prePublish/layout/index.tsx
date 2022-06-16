@@ -22,7 +22,7 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
   const [form] = Form.useForm();
   const [flag, setFlag] = useState(false);
   const [spinning, setSpinning] = useState(false);
-  const [collapse, setCollapse] = useState(true);
+  const [collapse, setCollapse] = useState(false);
 
   const update = async (type: any, values: any) => {
     if (idx && !disabled) {
@@ -80,7 +80,6 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
           <Layout.Sider
             width={collapse ? 280 : 0}
             theme={'light'}
-            zeroWidthTriggerStyle={{ zIndex: 10 }}
             className={cls(styles.layout, { layoutHidden: collapse })}
           >
             <div className={styles.collapse} onClick={() => setCollapse(!collapse)}>

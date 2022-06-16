@@ -38,24 +38,24 @@ const DeploySetting = (props: ModalFuncProps) => {
           ...res['front-static'],
         });
       });
-    } else form.resetFields();
+    }
   }, [props.visible]);
 
   return (
     <Modal
+      centered
       destroyOnClose
       width={1000}
-      visible={props.visible}
       title={props.title}
-      onCancel={props.onCancel}
       okText={'点击保存'}
+      cancelText={'取消'}
+      visible={props.visible}
       wrapClassName={styles.deploySetting}
       onOk={onConfirm}
-      cancelText={'取消'}
+      onCancel={props.onCancel}
       okButtonProps={{ disabled }}
-      centered
     >
-      <Form form={form}>
+      <Form form={form} className={'system-init-form'} preserve={false}>
         <Divider plain>① backend-build-image</Divider>
         <Row>
           <Col span={5}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { checkDetailColumn } from '../../column';
 import { AgGridReact } from 'ag-grid-react';
 import type { CellClickedEvent, GridApi } from 'ag-grid-community';
@@ -16,7 +16,7 @@ const Detail = () => {
     query: { idx },
   } = useLocation() as any;
 
-  const { getList, formatCheckStatus, source, spinning } = useCheckDetail();
+  const { getList, formatCheckStatus, checkSource, spinning } = useCheckDetail();
   const [user] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [disabled] = useModel('systemOnline', (system) => [system.disabled]);
 
@@ -54,7 +54,7 @@ const Detail = () => {
         <AgGridReact
           columnDefs={checkDetailColumn}
           {...initGridTable(gridApi)}
-          rowData={source}
+          rowData={checkSource}
           frameworkComponents={{
             checkStatus: formatCheckStatus,
             operation: (it: CellClickedEvent) => {

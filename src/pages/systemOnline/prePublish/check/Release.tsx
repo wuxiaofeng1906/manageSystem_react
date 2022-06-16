@@ -62,11 +62,11 @@ const Release = () => {
       <div className={'formItem'}>
         <FieldSet data={{ title: '版本检查', dot: true }}>
           <Form form={versionForm}>
-            <Form.Item label={'服务'} name={'app_name'} style={{ marginLeft: 30 }}>
-              <Input style={{ width: 300 }} disabled />
+            <Form.Item label={'服务'} name={'app_name'}>
+              <Input style={{ width: 370, marginLeft: 30 }} disabled />
             </Form.Item>
             <Form.Item label={'镜像环境'} name={'env'}>
-              <Input style={{ width: 300 }} disabled />
+              <Input style={{ width: 370 }} disabled />
             </Form.Item>
           </Form>
         </FieldSet>
@@ -83,7 +83,7 @@ const Release = () => {
             </Form.Item>
             <Form.Item label={'对比起始时间'} name={'create_time'}>
               <DatePicker
-                style={{ width: 300 }}
+                style={{ width: 300, marginLeft: 40 }}
                 disabled={disabled || !release_project?.release_env}
                 allowClear={false}
               />

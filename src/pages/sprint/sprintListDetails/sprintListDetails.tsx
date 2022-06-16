@@ -692,7 +692,7 @@ const SprintList: React.FC<any> = () => {
     if (initialState?.currentUser) {
       currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
     }
-    currentUserGroup = 'UedGroup';
+    // currentUserGroup = 'testGroup';
     if (currentUserGroup !== undefined) {
       switch (currentUserGroup.toString()) {
         case 'superGroup':
@@ -1933,122 +1933,101 @@ const SprintList: React.FC<any> = () => {
       {/* 测试修改表单 */}
       <Modal
         title="编辑明细行(测试)"
-        visible={isformForTesterToModVisible}
+        visible={isformForTesterToModVisible} //  isformForTesterToModVisible
         onCancel={testerHandleCancel}
         centered={true}
         footer={null}
-        width={750}
+        width={650}
       >
         <Form form={formForTesterToMod}>
-          <Row gutter={16}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="testerChandaoType" label="禅道类型：">
-                  <Select placeholder="请选择" style={widths} disabled={true}>
-                    {[
-                      <Option value={'1'}> Bug </Option>,
-                      <Option value={'3'}> 需求 </Option>,
-                      <Option value={'2'}> Task </Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+          <Row gutter={16} style={{...marginTopHeight}}>
+            <Col span={12}>
+              <Form.Item name="testerChandaoType" label="禅道类型：">
+                <Select placeholder="请选择" disabled={true}>
+                  {[
+                    <Option value={'1'}> Bug </Option>,
+                    <Option value={'3'}> 需求 </Option>,
+                    <Option value={'2'}> Task </Option>,
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
 
-            <Col className="gutter-row">
-              <div style={{marginLeft: '50px'}}>
-                <Form.Item name="testerCHandaoID" label="禅道编号:">
-                  <Input placeholder="请输入" style={widths} disabled={true}/>
-                </Form.Item>
-              </div>
+            <Col span={12}>
+              <Form.Item name="testerCHandaoID" label="禅道编号:">
+                <Input placeholder="请输入" disabled={true}/>
+              </Form.Item>
             </Col>
           </Row>
-          <Row gutter={16}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="testerTitle" label="标题内容:">
-                  <Input disabled={true} style={{width: '540px', color: 'black'}}/>
-                </Form.Item>
-              </div>
+          <Row gutter={16} style={{...marginTopHeight}}>
+            <Col span={24}>
+              <Form.Item name="testerTitle" label="标题内容:">
+                <Input disabled={true} style={{color: 'black'}}/>
+              </Form.Item>
             </Col>
           </Row>
-          <Row gutter={16}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="testChandaoStatus" label="禅道状态:">
-                  <Input disabled={true} style={widths}/>
-                </Form.Item>
-              </div>
+          <Row gutter={16} style={{...marginTopHeight}}>
+            <Col span={12}>
+              <Form.Item name="testChandaoStatus" label="禅道状态:">
+                <Input disabled={true}/>
+              </Form.Item>
             </Col>
+            <Col span={12}>
+              <Form.Item name="testerStage" label="当前阶段:">
+                <Select disabled={true}>
+                  {[
+                    <Option key={'1'} value={'1'}>未开始</Option>,
+                    <Option key={'2'} value={'2'}>开发中</Option>,
+                    <Option key={'3'} value={'3'}>开发完</Option>,
+                    <Option key={'4'} value={'4'}>已提测</Option>,
+                    <Option key={'5'} value={'5'}>测试中</Option>,
+                    <Option key={'6'} value={'6'}>TE测试环境已验过</Option>,
+                    <Option key={'7'} value={'7'}>UED测试环境已验过</Option>,
+                    <Option key={'8'} value={'8'}>已取消</Option>,
+                    <Option key={'9'} value={'9'}>开发已revert</Option>,
+                    <Option key={'10'} value={'10'}>测试已验证revert</Option>,
+                    <Option key={'11'} value={'11'}>灰度已验过</Option>,
+                    <Option key={'12'} value={'12'}>线上已验过</Option>
 
-            <Col className="gutter-row">
-              <div style={{marginLeft: '50px'}}>
-                <Form.Item name="testToTester" label="对应测试:" rules={[{required: true}]}>
-                  <Select placeholder="请选择"
-                          style={widths}
-                          mode="multiple"
-                          maxTagCount={"responsive"}
-                          optionFilterProp="children">
-                    {LoadTesterCombobox()}
-                  </Select>
-                </Form.Item>
-              </div>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="testerStage" label="当前阶段:">
-                  <Select style={widths} disabled={true}>
-                    {[
-                      <Option key={'1'} value={'1'}>未开始</Option>,
-                      <Option key={'2'} value={'2'}>开发中</Option>,
-                      <Option key={'3'} value={'3'}>开发完</Option>,
-                      <Option key={'4'} value={'4'}>已提测</Option>,
-                      <Option key={'5'} value={'5'}>测试中</Option>,
-                      <Option key={'6'} value={'6'}>TE测试环境已验过</Option>,
-                      <Option key={'7'} value={'7'}>UED测试环境已验过</Option>,
-                      <Option key={'8'} value={'8'}>已取消</Option>,
-                      <Option key={'9'} value={'9'}>开发已revert</Option>,
-                      <Option key={'10'} value={'10'}>测试已验证revert</Option>,
-                      <Option key={'11'} value={'11'}>灰度已验过</Option>,
-                      <Option key={'12'} value={'12'}>线上已验过</Option>
-
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
-            </Col>
-
-            <Col className="gutter-row">
-              <div style={{marginLeft: '75px'}}>
-                <Form.Item name="testerProTested" label="已提测：">
-                  <Select placeholder="请选择" style={{width: '200px'}}>
-                    {[
-                      <Option key={''} value={''}> </Option>,
-                      <Option key={'0'} value={'0'}>否</Option>,
-                      <Option key={'1'} value={'1'}>是</Option>,
-                      <Option key={'2'} value={'2'}>免</Option>,
-                      <Option key={'3'} value={'3'}>驳回修改中</Option>
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
-            </Col>
-
-          </Row>
-          <Row gutter={16}>
-            <Col className="gutter-row">
-              <div style={{marginLeft: '45px'}}>
-                <Form.Item name="testerRemark" label="备 注:">
-                  <Input style={{width: '550px'}}/>
-                </Form.Item>
-              </div>
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
           </Row>
-
-          <Form.Item style={{marginTop: '50px'}}>
-            <Button type="primary" style={{marginLeft: '300px'}} onClick={commitTesterModify}>
+          <Row gutter={16} style={{...marginTopHeight}}>
+            <Col span={12}>
+              <Form.Item name="testToTester" label="对应测试:" rules={[{required: true}]}>
+                <Select placeholder="请选择"
+                        mode="multiple"
+                        maxTagCount={"responsive"}
+                        optionFilterProp="children">
+                  {LoadTesterCombobox()}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="testerProTested" label="已提测：">
+                <Select placeholder="请选择">
+                  {[
+                    <Option key={''} value={''}> </Option>,
+                    <Option key={'0'} value={'0'}>否</Option>,
+                    <Option key={'1'} value={'1'}>是</Option>,
+                    <Option key={'2'} value={'2'}>免</Option>,
+                    <Option key={'3'} value={'3'}>驳回修改中</Option>
+                  ]}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16} style={{...marginTopHeight}}>
+            <Col span={24}>
+              <Form.Item name="testerRemark" label="备 注:">
+                <Input/>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Form.Item>
+            <Button type="primary" style={{marginLeft: '230px'}} onClick={commitTesterModify}>
               确定
             </Button>
             <Button type="primary" style={{marginLeft: '20px'}} onClick={testerHandleCancel}>

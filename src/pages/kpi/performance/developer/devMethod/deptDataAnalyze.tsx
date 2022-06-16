@@ -280,7 +280,7 @@ const converseForAgGrid_defectRate = (oraDatas: any) => {
     // 新增研发中心数据
     resultArray.push({
       Group: ['研发中心'],
-      [starttime]: elements.total.kpi,
+      [starttime]: (elements.total.kpi)*100,
       isDept: true
     }, {
       Group: ['研发中心', '开发自测加权bug数'],
@@ -306,7 +306,7 @@ const converseForAgGrid_defectRate = (oraDatas: any) => {
       // 新增部门
       resultArray.push({
         Group: groups,
-        [starttime]: depts.kpi,
+        [starttime]: (depts.kpi)*100,
         isDept: true
       });
 

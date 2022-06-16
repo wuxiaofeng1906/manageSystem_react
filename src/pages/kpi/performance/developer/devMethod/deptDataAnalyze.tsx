@@ -282,6 +282,12 @@ const converseForAgGrid_defectRate = (oraDatas: any) => {
       Group: ['研发中心'],
       [starttime]: elements.total.kpi,
       isDept: true
+    }, {
+      Group: ['研发中心', '开发自测加权bug数'],
+      [starttime]: elements.total.sideKpi?.devkpi,
+    }, {
+      Group: ['研发中心', '测试发现加权bug数'],
+      [starttime]: elements.total.sideKpi?.testKpi,
     });
 
     // 部门数据

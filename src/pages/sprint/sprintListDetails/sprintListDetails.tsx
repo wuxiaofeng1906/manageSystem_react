@@ -1340,7 +1340,7 @@ const SprintList: React.FC<any> = () => {
       {/* admin新增和修改表单 */}
       <Modal
         title={modal.title}
-        visible={isAddModalVisible}
+        visible={true} // isAddModalVisible
         onCancel={handleCancel}
         centered={true}
         footer={null}
@@ -1348,7 +1348,7 @@ const SprintList: React.FC<any> = () => {
       >
         {/* admin 权限组新增和修改的界面 */}
         <Form form={formForAdminToAddAnaMod}>
-          <Row gutter={16}>
+          <Row gutter={16} style={{...marginTopHeight}}>
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminCurStage" label="当前阶段:">
@@ -1402,7 +1402,7 @@ const SprintList: React.FC<any> = () => {
               </div>
             </Col>
           </Row>
-          <Row gutter={16}>
+          <Row gutter={16} style={{...marginTopHeight}}>
             <Col className="gutter-row">
               <div style={{marginLeft: '10px'}}>
                 <Form.Item name="adminChandaoId" label="禅道编号:" rules={[{required: true}]}>
@@ -1418,7 +1418,7 @@ const SprintList: React.FC<any> = () => {
               </div>
             </Col>
           </Row>
-          <Row gutter={16}>
+          <Row gutter={16} style={{...marginTopHeight}}>
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddSeverity" label="严重程度:">
@@ -1455,7 +1455,7 @@ const SprintList: React.FC<any> = () => {
               </div>
             </Col>
           </Row>
-          <Row gutter={16}>
+          <Row gutter={16} style={{...marginTopHeight}}>
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddChandaoStatus" label="禅道状态:">
@@ -1478,7 +1478,7 @@ const SprintList: React.FC<any> = () => {
               </div>
             </Col>
           </Row>
-          <Row gutter={16}>
+          <Row gutter={16} style={{...marginTopHeight}}>
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddClosedBy" label="由谁关闭:">
@@ -1513,7 +1513,7 @@ const SprintList: React.FC<any> = () => {
               </div>
             </Col>
           </Row>
-          <Row gutter={16}>
+          <Row gutter={16} style={{...marginTopHeight}}>
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddInteUpgrade" label="是否有接口升级：">
@@ -1556,7 +1556,7 @@ const SprintList: React.FC<any> = () => {
               </div>
             </Col>
           </Row>
-          <Row gutter={16}>
+          <Row gutter={16} style={{...marginTopHeight}}>
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddPageadjust" label="是否涉及页面调整：">
@@ -1602,7 +1602,7 @@ const SprintList: React.FC<any> = () => {
               </div>
             </Col>
           </Row>
-          <Row gutter={16}>
+          <Row gutter={16} style={{...marginTopHeight}}>
 
             <Col className="gutter-row">
               <div style={leftStyle}>
@@ -1612,7 +1612,7 @@ const SprintList: React.FC<any> = () => {
               </div>
             </Col>
           </Row>
-          <Row gutter={16}>
+          <Row gutter={16} style={{...marginTopHeight}}>
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddEnvironment" label="发布环境:">
@@ -1656,7 +1656,7 @@ const SprintList: React.FC<any> = () => {
               </div>
             </Col>
           </Row>
-          <Row gutter={16}>
+          <Row gutter={16} style={{...marginTopHeight}}>
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAdminUedOnline" label="UED线上验证:">
@@ -1705,7 +1705,7 @@ const SprintList: React.FC<any> = () => {
               </div>
             </Col>
           </Row>
-          <Row gutter={16}>
+          <Row gutter={16} style={{...marginTopHeight}}>
             <Col className="gutter-row">
               <div style={leftStyle}>
                 <Form.Item name="adminAddRemark" label="备注:">

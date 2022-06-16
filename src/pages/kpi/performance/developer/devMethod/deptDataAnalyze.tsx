@@ -306,14 +306,14 @@ const converseForAgGrid_defectRate = (oraDatas: any) => {
 
       // 部门下面区分测试和开发
       const testGroup: any = JSON.parse(JSON.stringify(groups));
-      testGroup.push("测试");
+      testGroup.push("测试发现加权bug数");
       resultArray.push({
         Group: testGroup,
         [starttime]: depts.sideKpi.testKpi,
       });
 
       const devGroup: any = JSON.parse(JSON.stringify(groups));
-      devGroup.push("开发");
+      devGroup.push("开发自测加权bug数");
       resultArray.push({
         Group: devGroup,
         [starttime]: depts.sideKpi.devkpi,

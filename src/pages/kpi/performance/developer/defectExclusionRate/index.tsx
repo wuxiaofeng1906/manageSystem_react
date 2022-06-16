@@ -152,15 +152,15 @@ const BugRateTableList: React.FC<any> = () => {
           <p style={cssIndent}>按周、按月、按季、按年统计（查bug创建日期，落在对应区间的；周/月/季/年的规则参考2021年度量指标的规则）；</p>
 
           <p style={{color: "#1890FF"}}><strong>二、计算公式说明</strong></p>
-          <p style={cssIndent}> 计算公式：开发缺陷排除率 = 开发自测加权bug数/（开发自测加权bug数 + 测试发现加权bug数）；</p>
+          <p style={cssIndent}> 开发缺陷排除率 = 开发自测加权bug数/（开发自测加权bug数 + 测试发现加权bug数）；</p>
           <p> 1.分子：开发自测加权bug数的bug范围。 </p>
           <p style={cssIndent}>（1）bug创建人是开发；</p>
           <p style={cssIndent}>（2）bug来源是'概设评审、详设评审、CodeReview、开发自测、开发联调、内部演示、外部演示’；</p>
-          <p style={cssIndent}>（3）解决方案为“空”“已解决”“延期处理”“后续版本”“转为需求”“代码未合并”的；</p>
+          <p style={cssIndent}>（3）解决方案为“空”“已解决”“延期处理”“后续版本”“转为需求”的；</p>
           <p style={cssIndent}>（4）且线上bug类型为‘空’；</p>
           <p style={cssIndent}>（5）bug加权取bug严重程度 = 1*5+2*2+3*1+4*0.1；</p>
 
-          <p> 2.分母：开发自测加权bug数取上面4的结果，测试发现加权bug数的bug范围。 </p>
+          <p> 2.分母：开发自测加权bug数取上面分子的结果，测试发现加权bug数的bug范围。 </p>
           <p style={cssIndent}>（1）bug创建人是测试；</p>
           <p style={cssIndent}>（2）bug来源是'系统测试、提测演示、测试环境自动化发现'；</p>
           <p style={cssIndent}>（3）解决方案为“空”“已解决”“延期处理”“后续版本”“转为需求”“代码未合并”的；</p>

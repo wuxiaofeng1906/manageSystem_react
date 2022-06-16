@@ -416,8 +416,10 @@ const checkDetailColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '检查开始时间',
-    field: 'start_time',
+    // field: 'start_time',
     colSpan: (v) => v.data.colSpan || 1,
+    cellRenderer: (param) =>
+      param.rowIndex <= 5 ? param.data.start_time : param.data.version_time,
   },
   {
     headerName: '检查结束时间',
@@ -474,6 +476,7 @@ const publishDetailColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
     minWidth: 60,
+    maxWidth: 120,
     field: 'num',
   },
   {
@@ -483,7 +486,7 @@ const publishDetailColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '状态',
     field: 'status',
-    cellRenderer: ({ value }) => `<span class="color-${value}">{PUBLISH_STATUS[value]}</span>`,
+    cellRenderer: ({ value }) => `<span class="color-${value}">${PUBLISH_STATUS[value]}</span>`,
   },
   {
     headerName: '开始时间',

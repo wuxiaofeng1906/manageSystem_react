@@ -76,7 +76,14 @@ const Approve = () => {
     const res = await OnlineServices.getApproval(idx);
     setApproveDetail(res);
     if (!isEmpty(res)) {
-      let data = {};
+      let data = {
+        cc:
+          res?.cc?.map((it: any) => ({
+            key: it.user_id,
+            value: it.user_id,
+            label: it.user_name,
+          })) || [],
+      };
       if (res?.sp_record.length > 0) {
         res?.sp_record.forEach((it: any, i: number) => {
           const o = it?.detail?.map((obj: any) => ({
@@ -91,7 +98,7 @@ const Approve = () => {
         });
       }
       setIntSource(data as any);
-    }
+    } else getInitApproval();
   };
 
   const getInitApproval = async () => {
@@ -121,18 +128,14 @@ const Approve = () => {
   const checkPassable = () => {
     const status = checkSource.some((it) => ['failure', 'error'].includes(it.status));
     setFlag(status);
-    if (status && !isEmpty(approveDetail)) {
-      getInitApproval();
+    if (status) {
+      getApproval();
     }
   };
 
   useEffect(() => {
-    getApproval();
-  }, []);
-
-  useEffect(() => {
     checkPassable();
-  }, [checkSource, approveDetail]);
+  }, [checkSource]);
 
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>

@@ -48,6 +48,40 @@ const Detail = () => {
     await getList();
   };
 
+  const handleLog = ({ data, rowIndex }: CellClickedEvent) => {
+    if (!data.check_log) return;
+    if (['version_check', 'check_env'].includes(data.key)) {
+      window.open(data.check_log);
+      return;
+    }
+    Modal.info({
+      width: 600,
+      title: '检查日志',
+      centered: true,
+      closable: true,
+      okButtonProps: { style: { display: 'none' } },
+      content: (
+        <div style={{ maxHeight: 400, overflow: 'auto', margin: '10px 0', whiteSpace: 'pre-line' }}>
+          {/*<div>检查状态： {formatCheckStatus({ data: data, rowIndex: rowIndex || 0 })}</div>*/}
+          <div>
+            {isArray(data?.check_log) ? (
+              <div>
+                <p>{`检查时间：${
+                  data.start_time && data.end_time ? data.start_time + '~' + data.end_time : '-'
+                }`}</p>
+                {data.check_log?.map((it: any) => {
+                  return <p>{`【${it.name_path}】【${it.sealing_version}】`}</p>;
+                })}
+              </div>
+            ) : (
+              data?.check_log
+            )}
+          </div>
+        </div>
+      ),
+    });
+  };
+
   return (
     <Spin spinning={spinning} tip={'数据加载中...'}>
       <div className={'AgGridReactTable'} style={{ height: 510 }}>
@@ -58,7 +92,8 @@ const Detail = () => {
           frameworkComponents={{
             checkStatus: formatCheckStatus,
             operation: (it: CellClickedEvent) => {
-              const showLog = ['unknown', 'wait'].includes(it.data.status || 'unknown');
+              const showLog =
+                ['unknown', 'wait'].includes(it.data.status || 'unknown') || !it.data.check_log;
               const refreshed = ['doing', 'running'].includes(it.data.status) || disabled;
               const isLibrary = it.data.key == 'library_data';
               return (
@@ -84,36 +119,7 @@ const Detail = () => {
                     }
                     onClick={() => {
                       if (showLog || isLibrary) return;
-                      if (it.data.check_log) {
-                        window.open(it.data.check_log);
-                        return;
-                      }
-                      Modal.info({
-                        width: 600,
-                        title: '检查详情',
-                        okText: '好的',
-                        content: (
-                          <div
-                            style={{
-                              maxHeight: 400,
-                              overflow: 'auto',
-                              margin: '10px 0',
-                              whiteSpace: 'pre-line',
-                            }}
-                          >
-                            <div>
-                              检查状态：{' '}
-                              {formatCheckStatus({ data: it.data, rowIndex: it.rowIndex || 0 })}
-                            </div>
-                            <div>
-                              日志信息：
-                              {isArray(it.data?.check_log)
-                                ? it.data?.check_log.join(',')
-                                : it.data?.check_log}
-                            </div>
-                          </div>
-                        ),
-                      });
+                      handleLog(it);
                     }}
                   />
                 </div>

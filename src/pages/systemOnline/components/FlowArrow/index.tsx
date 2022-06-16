@@ -16,6 +16,7 @@ const flowBg = {
   no: '#21aff3',
   allReject: '#e02c2c',
   partReject: '#f68da0',
+  init: '#e3e6ed',
 };
 const matrixArray = (list: any[], num = 2) => {
   if (num <= 1 || list.length < num) return [list];
@@ -35,6 +36,9 @@ const FlowArrow: React.FC<{ data: any[] }> = ({ data }) => {
   const onDoubleClick = (it: any) => {
     Modal.info({
       title: '状态信息',
+      closable: true,
+      centered: true,
+      okButtonProps: { style: { display: 'none' } },
       content: (
         <div>
           <div className={'ellipsis'}>开始时间：{it?.start}</div>
@@ -59,7 +63,7 @@ const FlowArrow: React.FC<{ data: any[] }> = ({ data }) => {
                 [styles.topArrow]: odd && index == arr.length - 1,
               })}
             >
-              <div className={styles.content} style={{ background: flowBg[it?.status] }}>
+              <div className={styles.content} style={{ background: flowBg[it?.status || 'init'] }}>
                 <div className={'ellipsis'}>步骤名：{it?.title}</div>
                 <div className={'ellipsis'}>开始时间：{it?.start}</div>
                 <div className={'ellipsis'}>结束时间：{it?.end}</div>

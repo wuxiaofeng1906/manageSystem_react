@@ -28,6 +28,12 @@ export const useCheckDetail = () => {
             : obj?.check_result,
         start_time: obj?.check_start_time,
         end_time: obj?.check_end_time,
+        version_time:
+          index > 5
+            ? obj.check_result == 'failure'
+              ? ''
+              : obj.check_log?.[0]?.sealing_version_time
+            : '',
         check_log: obj?.check_log,
       };
       return it;

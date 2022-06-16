@@ -32,11 +32,13 @@ const Content = ({ id }: { id: string }) => {
   }, [id]);
   return (
     <div>
-      <AgGridReact
-        {...initGridTable(gridApi)}
-        columnDefs={publishDetailColumn}
-        rowData={publishData}
-      />
+      <div style={{ height: '300px' }}>
+        <AgGridReact
+          {...initGridTable(gridApi)}
+          columnDefs={publishDetailColumn}
+          rowData={publishData}
+        />
+      </div>
       <FlowArrow
         data={[
           {

@@ -50,11 +50,11 @@ const SETTING_STATUS = [
 const MENUS = [
   { label: '项目&服务', key: 'projectServices' },
   { label: '部署', key: 'deploy' },
-  { label: '值班', key: 'duty' },
+  // { label: '值班', key: 'duty' },
   { label: '检查', key: 'check' },
-  { label: '工单', key: 'worksheet' },
-  { label: '发布', key: 'publish' },
-  { label: '总览', key: 'overview' },
+  // { label: '工单', key: 'worksheet' },
+  // { label: '发布', key: 'publish' },
+  // { label: '总览', key: 'overview' },
 ];
 const PLATE_STATUS = [
   // { label: '未知', value: 'unknown', key: 'unknown' },
@@ -67,6 +67,7 @@ const CHECK_LIST = [
     status: '',
     start_time: '',
     end_time: '',
+    version_time: '',
     key: 'test_unit',
     check_log: '',
     refresh: true,
@@ -78,6 +79,8 @@ const CHECK_LIST = [
     end_time: '',
     key: 'test_unit',
     check_log: '',
+    version_time: '',
+
     refresh: true,
   },
   {
@@ -87,6 +90,7 @@ const CHECK_LIST = [
     end_time: '',
     key: 'icon_check',
     check_log: '',
+    version_time: '',
     refresh: true,
   },
   {
@@ -96,6 +100,7 @@ const CHECK_LIST = [
     end_time: '',
     key: 'library_data',
     check_log: '',
+    version_time: '',
     refresh: true,
   },
   {
@@ -106,6 +111,7 @@ const CHECK_LIST = [
     refresh: true,
     key: 'version_check',
     check_log: '',
+    version_time: '',
   },
   {
     type: '环境一致性检查是否通过',
@@ -115,6 +121,7 @@ const CHECK_LIST = [
     refresh: true,
     key: 'check_env',
     check_log: '',
+    version_time: '',
   },
   {
     type: '业务前端是否封版',
@@ -126,6 +133,7 @@ const CHECK_LIST = [
     check_log: '',
     refresh: true,
     side: 'businessFront',
+    version_time: '',
   },
   {
     type: '业务后端是否封版',
@@ -137,6 +145,7 @@ const CHECK_LIST = [
     check_log: '',
     refresh: true,
     side: 'businessBackend',
+    version_time: '',
   },
   {
     type: '平台后端是否封版',
@@ -148,6 +157,7 @@ const CHECK_LIST = [
     check_log: '',
     refresh: true,
     side: 'platformBackend',
+    version_time: '',
   },
   {
     type: '流程是否封版',
@@ -155,10 +165,11 @@ const CHECK_LIST = [
     start_time: '',
     end_time: '',
     colSpan: 2,
-    key: 'platform_backend_seal_version',
+    key: 'proces_seal_version',
     check_log: '',
     refresh: true,
     side: 'process',
+    version_time: '',
   },
 ];
 

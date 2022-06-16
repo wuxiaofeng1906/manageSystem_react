@@ -20,6 +20,11 @@ const COMMON_STATUS = {
   backend: '后端接口',
   front: '前端接口',
 };
+
+const PUBLISH_STATUS = {
+  success: '成功',
+  failure: '失败',
+};
 const DEPLOY_TYPE = {
   aKeyDeployment: '一键部署',
   automaticDeployment: '自动部署',
@@ -45,10 +50,11 @@ const SETTING_STATUS = [
 const MENUS = [
   { label: '项目&服务', key: 'projectServices' },
   { label: '部署', key: 'deploy' },
+  { label: '值班', key: 'duty' },
   { label: '检查', key: 'check' },
-  // { label: '工单', key: 'worksheet' },
-  // { label: '发布', key: 'publish' },
-  // { label: '总览', key: 'overview' },
+  { label: '工单', key: 'worksheet' },
+  { label: '发布', key: 'publish' },
+  { label: '总览', key: 'overview' },
 ];
 const PLATE_STATUS = [
   // { label: '未知', value: 'unknown', key: 'unknown' },
@@ -202,5 +208,6 @@ export {
   WEAPPENV,
   DEPLOY_TYPE,
   CHECK_LIST,
+  PUBLISH_STATUS,
   initGridTable,
 };

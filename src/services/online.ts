@@ -41,7 +41,7 @@ const OnlineServices = {
 
   // 项目&服务数据
   async proDetail(release_num: string) {
-    return request(`${baseUrl}/pro_detail`, { params: { release_num }, warn: false });
+    return request(`${baseUrl}/pro_detail`, { params: { release_num } });
   },
   // 预发布分支和环境填写
   async updatePreProject(data: any) {

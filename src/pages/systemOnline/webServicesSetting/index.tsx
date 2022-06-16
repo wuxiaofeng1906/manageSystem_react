@@ -12,7 +12,6 @@ import IPagination from '@/components/IPagination';
 import { useModel } from 'umi';
 import OnlineServices from '@/services/online';
 import { IRecord } from '@/namespaces/interface';
-import { omit } from '@/utils/utils';
 import { useShowLog } from '@/hooks/online';
 
 const EditSetting = (props: { data?: any } & ModalFuncProps) => {

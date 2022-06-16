@@ -18,7 +18,7 @@ const flowBg = {
   partReject: '#f68da0',
 };
 const matrixArray = (list: any[], num = 2) => {
-  if (num <= 1 || list.length < num) return list;
+  if (num <= 1 || list.length < num) return [list];
   const group = [];
   const len = Math.ceil(list.length / num);
   for (let i = 0; i < len; i++) {
@@ -47,9 +47,9 @@ const FlowArrow: React.FC<{ data: any[] }> = ({ data }) => {
   };
   return (
     <div className={cls(styles.flowArrow)}>
-      {matrixArray(data, 4).map((arr, i) => {
+      {matrixArray(data, 4)?.map((arr, i) => {
         const odd = (i + 1) % 2 == 0;
-        return arr.map((it: any, index: number) => (
+        return arr?.map((it: any, index: number) => (
           <div key={it?.title + index}>
             <div
               onDoubleClick={() => onDoubleClick(it)}

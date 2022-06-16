@@ -1,5 +1,5 @@
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
-import { COMMON_STATUS, DEPLOY_TYPE } from './constants';
+import { COMMON_STATUS, DEPLOY_TYPE, PUBLISH_STATUS } from './constants';
 
 const cellRenderStatus = ({ value }: any) =>
   `<span class="${
@@ -469,6 +469,36 @@ const servicesSettingColumn: (ColDef | ColGroupDef)[] = [
   },
 ];
 
+// 发布
+const publishDetailColumn: (ColDef | ColGroupDef)[] = [
+  {
+    headerName: '序号',
+    minWidth: 60,
+    field: 'num',
+  },
+  {
+    headerName: '集群',
+    field: 'cluster_name',
+  },
+  {
+    headerName: '状态',
+    field: 'status',
+    cellRenderer: ({ value }) => `<span class="color-${value}">{PUBLISH_STATUS[value]}</span>`,
+  },
+  {
+    headerName: '开始时间',
+    field: 'start_time',
+  },
+  {
+    headerName: '完成时间',
+    field: 'end_time',
+  },
+  {
+    headerName: '信息',
+    field: 'content',
+  },
+];
+
 export {
   publishColumn,
   projectUpgradeColumn,
@@ -478,4 +508,5 @@ export {
   checkDetailColumn,
   servicesSettingColumn,
   serverColumn,
+  publishDetailColumn,
 };

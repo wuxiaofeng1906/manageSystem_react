@@ -253,7 +253,7 @@ const ProjectServices = () => {
   const [finished, setFinished] = useState(true); // 同步状态
   const [showTip, setShowTip] = useState(''); // 分支检查提示
   const [reFreshSeal, setReFreshSeal] = useState(false); // 刷新版本数据
-  const [refreshAll, setRefreshAll] = useState(false);
+  const [refreshConfig, setRefreshConfig] = useState(false);
 
   const updatePreData = async (key: string) => {
     const info = proInfo?.release_project;
@@ -398,16 +398,17 @@ const ProjectServices = () => {
   };
 
   const refreshAllSource = async () => {
-    setRefreshAll(true);
+    setRefreshConfig(true);
     try {
       if (idx) {
+        await OnlineServices.refreshConfig(idx);
         await getProInfo(idx);
         setReFreshSeal(true);
-        setRefreshAll(false);
+        setRefreshConfig(false);
       }
     } catch (e) {
       setReFreshSeal(false);
-      setRefreshAll(false);
+      setRefreshConfig(false);
     }
   };
 
@@ -442,7 +443,7 @@ const ProjectServices = () => {
             <Button
               type={'primary'}
               style={{ marginLeft: 'auto' }}
-              loading={refreshAll}
+              loading={refreshConfig}
               onClick={refreshAllSource}
             >
               刷新
@@ -552,7 +553,7 @@ const ProjectServices = () => {
           disabled={disabled}
           idx={idx}
           reFreshSeal={reFreshSeal}
-          refDom={() => setReFreshSeal(false)}
+          resetFun={() => setReFreshSeal(false)}
         />
         <WrapLoader
           finished={finished}

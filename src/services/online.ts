@@ -173,5 +173,9 @@ const OnlineServices = {
   async branchCheck(release_num: string) {
     return request(`${baseUrl}/env_branch_check`, { params: { release_num }, warn: false });
   },
+  // 刷新 服务数据
+  async refreshConfig(release_num: string) {
+    return request(`${baseUrl}/refresh_data`, { params: { release_num } });
+  },
 };
 export default OnlineServices;

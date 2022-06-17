@@ -1475,7 +1475,7 @@ const SprintList: React.FC<any> = () => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item name="adminAddDataUpgrade" label="是否有数据升级:">
+              <Form.Item name="adminAddPerception" label="用户是否有感:">
                 <Select placeholder="请选择">
                   {[
                     <Option key={''} value={''}> </Option>,
@@ -1487,6 +1487,17 @@ const SprintList: React.FC<any> = () => {
             </Col>
           </Row>
           <Row gutter={16} style={{...marginTopHeight}}>
+            <Col span={8}>
+              <Form.Item name="adminAddDataUpgrade" label="是否有数据升级:">
+                <Select placeholder="请选择">
+                  {[
+                    <Option key={''} value={''}> </Option>,
+                    <Option key={'1'} value={'1'}>是</Option>,
+                    <Option key={'0'} value={'0'}>否</Option>,
+                  ]}
+                </Select>
+              </Form.Item>
+            </Col>
             <Col span={8}>
               <Form.Item name="adminAddInteUpgrade" label="是否有接口升级：">
                 <Select placeholder="请选择">
@@ -1498,21 +1509,8 @@ const SprintList: React.FC<any> = () => {
                 </Select>
               </Form.Item>
             </Col>
-
             <Col span={8}>
               <Form.Item name="adminAddPreData" label="是否有预置数据:">
-                <Select placeholder="请选择">
-                  {[
-                    <Option key={''} value={''}> </Option>,
-                    <Option key={'1'} value={'1'}>是</Option>,
-                    <Option key={'0'} value={'0'}>否</Option>,
-                  ]}
-                </Select>
-              </Form.Item>
-            </Col>
-
-            <Col span={8}>
-              <Form.Item name="adminAddtesterVerifi" label="是否需要测试验证：">
                 <Select placeholder="请选择">
                   {[
                     <Option key={''} value={''}> </Option>,
@@ -1525,6 +1523,17 @@ const SprintList: React.FC<any> = () => {
           </Row>
           <Row gutter={16} style={{...marginTopHeight}}>
             <Col span={8}>
+              <Form.Item name="adminAddtesterVerifi" label="是否需要测试验证：">
+                <Select placeholder="请选择">
+                  {[
+                    <Option key={''} value={''}> </Option>,
+                    <Option key={'1'} value={'1'}>是</Option>,
+                    <Option key={'0'} value={'0'}>否</Option>,
+                  ]}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={8}>
               <Form.Item name="adminAddPageadjust" label="是否涉及页面调整：">
                 <Select placeholder="请选择">
                   {[
@@ -1535,7 +1544,6 @@ const SprintList: React.FC<any> = () => {
                 </Select>
               </Form.Item>
             </Col>
-
             <Col span={8}>
               <Form.Item name="adminAddProposedTest" label="已提测：">
                 <Select placeholder="请选择">
@@ -1549,7 +1557,8 @@ const SprintList: React.FC<any> = () => {
                 </Select>
               </Form.Item>
             </Col>
-
+          </Row>
+          <Row gutter={16} style={{...marginTopHeight}}>
             <Col span={8}>
               <Form.Item name="adminAddBaseLine" label="是否基线：">
                 <Select placeholder="请选择">
@@ -1561,9 +1570,7 @@ const SprintList: React.FC<any> = () => {
                 </Select>
               </Form.Item>
             </Col>
-          </Row>
-          <Row gutter={16} style={{...marginTopHeight}}>
-            <Col span={24}>
+            <Col span={16}>
               <Form.Item name="adminAddSuggestion" label="验证范围建议:">
                 <Input/>
               </Form.Item>

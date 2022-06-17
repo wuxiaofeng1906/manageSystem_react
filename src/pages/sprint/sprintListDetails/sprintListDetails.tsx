@@ -1340,7 +1340,7 @@ const SprintList: React.FC<any> = () => {
       {/* admin新增和修改表单 */}
       <Modal
         title={modal.title}
-        visible={true} // isAddModalVisible
+        visible={isAddModalVisible} //
         onCancel={handleCancel}
         centered={true}
         footer={null}

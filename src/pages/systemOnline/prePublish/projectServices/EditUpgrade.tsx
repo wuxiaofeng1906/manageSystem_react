@@ -86,7 +86,7 @@ const EditUpgrade = (props: IEditUprade) => {
           label="是否涉及数据库升级"
           rules={[{ required: true, message: '请选择是否涉及数据库升级!' }]}
         >
-          <Select options={STATUS_MAP} />
+          <Select options={STATUS_MAP} disabled={disabled} />
         </Form.Item>
         <Form.Item
           name="is_recovery_database"
@@ -114,7 +114,7 @@ const EditUpgrade = (props: IEditUprade) => {
           label="后端是否涉及配置项增加"
           rules={[{ required: true, message: '请选择后端是否涉及配置项增加!' }]}
         >
-          <Select options={STATUS_MAP} />
+          <Select options={STATUS_MAP} disabled={disabled} />
         </Form.Item>
         <Form.Item
           name="is_front_data_update"

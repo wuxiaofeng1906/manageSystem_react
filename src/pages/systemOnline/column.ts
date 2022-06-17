@@ -379,7 +379,7 @@ const deployColumn: (ColDef | ColGroupDef)[] = [
     field: 'end_time',
   },
   {
-    headerName: '部署时间',
+    headerName: '部署耗时',
     minWidth: 120,
     cellRenderer: 'deployTime',
   },

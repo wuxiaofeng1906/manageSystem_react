@@ -65,7 +65,7 @@ export default () => {
 
   const getProInfo = useCallback(async (data) => {
     const result = (await OnlineServices.proDetail(data)) as IProInfo;
-    setDisabled(result?.release_project?.release_result == 'success' || false);
+    setDisabled(result?.release_project?.release_result !== 'unknown' || false);
     setProInfo(result);
     return result;
   }, []);

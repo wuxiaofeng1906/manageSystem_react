@@ -16,7 +16,10 @@ const Deploy = () => {
     query: { idx },
   } = useLocation() as any;
   const gridApi = useRef<GridApi>();
-  const [release_project] = useModel('systemOnline', (system) => [system.proInfo?.release_project]);
+  const [release_project, disabled] = useModel('systemOnline', (system) => [
+    system.proInfo?.release_project,
+    system.disabled,
+  ]);
 
   const [deploySetting, setDeploySetting] = useState(false);
   const [oneKeyDeploy, setOneKeyDeploy] = useState(false);
@@ -65,6 +68,7 @@ const Deploy = () => {
         <Button
           type={'primary'}
           loading={spinning}
+          disabled={disabled}
           onClick={async () => {
             await OnlineServices.deploymentStatus(idx);
             getTableList();
@@ -82,16 +86,16 @@ const Deploy = () => {
             deployTime: formatTime,
             operation: ({ data }: CellClickedEvent) => {
               return (
-                <div
-                  className="color-prefix"
+                <img
+                  title={'日志'}
+                  width={20}
+                  src={require('../../../../../public/logs.png')}
                   onClick={() => {
                     if (data.log_url) {
                       window.open(data.log_url);
                     }
                   }}
-                >
-                  日志
-                </div>
+                />
               );
             },
           }}

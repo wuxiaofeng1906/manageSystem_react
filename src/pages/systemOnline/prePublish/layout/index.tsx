@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Layout, Form, Select, DatePicker, Menu, Spin } from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Layout, Form, Select, DatePicker, Menu, Spin, Affix } from 'antd';
 import { history, useModel, useLocation } from 'umi';
 
 import styles from './index.less';
@@ -22,7 +22,7 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
   const [form] = Form.useForm();
   const [flag, setFlag] = useState(false);
   const [spinning, setSpinning] = useState(false);
-  const [collapse, setCollapse] = useState(false);
+  const [collapse, setCollapse] = useState(true);
 
   const update = async (type: any, values: any) => {
     if (idx && !disabled) {
@@ -73,6 +73,8 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
     setFlag(status || false);
   }, [JSON.stringify(proInfo)]);
 
+  const clientHeight = useMemo(() => document.documentElement.clientHeight / 2, []);
+
   return (
     <Spin spinning={spinning} tip={'数据加载中...'} wrapperClassName={styles.spinWrap}>
       <div className={styles.preLayout}>
@@ -82,13 +84,16 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
             theme={'light'}
             className={cls(styles.layout, { layoutHidden: collapse })}
           >
-            <div className={styles.collapse} onClick={() => setCollapse(!collapse)}>
-              <img
-                src={require(`../../../../../public/arrow_double_${
-                  collapse ? 'left' : 'right'
-                }_outlined.png`)}
-              />
-            </div>
+            <Affix offsetTop={clientHeight}>
+              <div className={styles.collapse} onClick={() => setCollapse(!collapse)}>
+                <img
+                  src={require(`../../../../../public/arrow_double_${
+                    collapse ? 'left' : 'right'
+                  }_outlined.png`)}
+                />
+              </div>
+            </Affix>
+
             <div className={styles.formWrap}>
               <Form form={form} onValuesChange={update}>
                 <Form.Item label={'发布类型'} name={'release_type'}>

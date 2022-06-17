@@ -1344,374 +1344,314 @@ const SprintList: React.FC<any> = () => {
         onCancel={handleCancel}
         centered={true}
         footer={null}
-        width={1000}
+        width={900}
       >
         {/* admin 权限组新增和修改的界面 */}
         <Form form={formForAdminToAddAnaMod}>
           <Row gutter={16} style={{...marginTopHeight}}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminCurStage" label="当前阶段:">
-                  <Select style={widths} disabled={specialFieldEdit.adminStage}>
-                    {[
-                      <Option key={'1'} value={'1'}>未开始</Option>,
-                      <Option key={'2'} value={'2'}>开发中</Option>,
-                      <Option key={'3'} value={'3'}>开发完</Option>,
-                      <Option key={'4'} value={'4'}>已提测</Option>,
-                      <Option key={'5'} value={'5'}>测试中</Option>,
-                      <Option key={'6'} value={'6'}>TE测试环境已验过</Option>,
-                      <Option key={'7'} value={'7'}>UED测试环境已验过</Option>,
-                      <Option key={'8'} value={'8'}>已取消</Option>,
-                      <Option key={'9'} value={'9'}>开发已revert</Option>,
-                      <Option key={'10'} value={'10'}>测试已验证revert</Option>,
-                      <Option key={'11'} value={'11'}>灰度已验过</Option>,
-                      <Option key={'12'} value={'12'}>线上已验过</Option>
+            <Col span={8}>
+              <Form.Item name="adminCurStage" label="当前阶段:">
+                <Select disabled={specialFieldEdit.adminStage}>
+                  {[
+                    <Option key={'1'} value={'1'}>未开始</Option>,
+                    <Option key={'2'} value={'2'}>开发中</Option>,
+                    <Option key={'3'} value={'3'}>开发完</Option>,
+                    <Option key={'4'} value={'4'}>已提测</Option>,
+                    <Option key={'5'} value={'5'}>测试中</Option>,
+                    <Option key={'6'} value={'6'}>TE测试环境已验过</Option>,
+                    <Option key={'7'} value={'7'}>UED测试环境已验过</Option>,
+                    <Option key={'8'} value={'8'}>已取消</Option>,
+                    <Option key={'9'} value={'9'}>开发已revert</Option>,
+                    <Option key={'10'} value={'10'}>测试已验证revert</Option>,
+                    <Option key={'11'} value={'11'}>灰度已验过</Option>,
+                    <Option key={'12'} value={'12'}>线上已验过</Option>
+                  ]}
+                </Select>
+              </Form.Item>
 
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
             </Col>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddTester" label="对应测试:" rules={[{required: true}]}>
-                  <Select
-                    // mode="tags"
-                    mode="multiple"
-                    style={widths}
-                    placeholder="请输入"
-                    maxTagCount={"responsive"}
-                    optionFilterProp="children"
-                  >
-                    {LoadTesterCombobox()}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddTester" label="对应测试:" rules={[{required: true}]}>
+                <Select
+                  // mode="tags"
+                  mode="multiple"
+                  placeholder="请输入"
+                  maxTagCount={"responsive"}
+                  optionFilterProp="children"
+                >
+                  {LoadTesterCombobox()}
+                </Select>
+              </Form.Item>
             </Col>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminChandaoType" label="禅道类型：" rules={[{required: true}]}>
-                  <Select placeholder="请选择" style={{width: '180px', color: 'black'}}> {/* disabled={isSelectType} */}
-                    {[
-                      <Option value={'1'}> Bug </Option>,
-                      <Option value={'3'}> 需求 </Option>,
-                      <Option value={'2'}> Task </Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminChandaoType" label="禅道类型：" rules={[{required: true}]}>
+                <Select placeholder="请选择" style={{color: 'black'}}> {/* disabled={isSelectType} */}
+                  {[
+                    <Option value={'1'}> Bug </Option>,
+                    <Option value={'3'}> 需求 </Option>,
+                    <Option value={'2'}> Task </Option>,
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
           </Row>
           <Row gutter={16} style={{...marginTopHeight}}>
-            <Col className="gutter-row">
-              <div style={{marginLeft: '10px'}}>
-                <Form.Item name="adminChandaoId" label="禅道编号:" rules={[{required: true}]}>
-                  <Input placeholder="请输入" style={widths} onBlur={checkZentaoInfo}/>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminChandaoId" label="禅道编号:" rules={[{required: true}]}>
+                <Input placeholder="请输入" onBlur={checkZentaoInfo}/>
+              </Form.Item>
             </Col>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddChandaoTitle" label="标题内容:">
-                  <Input disabled={true} style={{width: '510px', color: 'black'}}/>
-                </Form.Item>
-              </div>
+            <Col span={16}>
+              <Form.Item name="adminAddChandaoTitle" label="标题内容:">
+                <Input disabled={true} style={{color: 'black'}}/>
+              </Form.Item>
             </Col>
           </Row>
           <Row gutter={16} style={{...marginTopHeight}}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddSeverity" label="严重程度:">
-                  <Select disabled={true} placeholder="请选择" style={widths}>
-                    {[
-                      <Option key={'1'} value={'1'}>P0</Option>,
-                      <Option key={'2'} value={'2'}>P1</Option>,
-                      <Option key={'3'} value={'3'}>P2</Option>,
-                      <Option key={'4'} value={'4'}>P3</Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddSeverity" label="严重程度:">
+                <Select disabled={true} placeholder="请选择">
+                  {[
+                    <Option key={'1'} value={'1'}>P0</Option>,
+                    <Option key={'2'} value={'2'}>P1</Option>,
+                    <Option key={'3'} value={'3'}>P2</Option>,
+                    <Option key={'4'} value={'4'}>P3</Option>,
+                  ]}
+                </Select>
+              </Form.Item>
+
             </Col>
-            <Col className="gutter-row">
-              <div style={{marginLeft: "35px"}}>
-                <Form.Item name="adminAddPriority" label="优先级：">
-                  <Select disabled={true} placeholder="请选择" style={{width: '210px', color: 'black'}}>
-                    {[
-                      <Option value={'1'}>1</Option>,
-                      <Option value={'2'}>2</Option>,
-                      <Option value={'3'}>3</Option>,
-                      <Option value={'4'}>4</Option>
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddPriority" label="优先级：">
+                <Select disabled={true} placeholder="请选择" style={{color: 'black'}}>
+                  {[
+                    <Option value={'1'}>1</Option>,
+                    <Option value={'2'}>2</Option>,
+                    <Option value={'3'}>3</Option>,
+                    <Option value={'4'}>4</Option>
+                  ]}
+                </Select>
+              </Form.Item>
+
             </Col>
-            <Col className="gutter-row">
-              <div style={{marginLeft: "30px"}}>
-                <Form.Item name="adminAddModule" label="所属模块:">
-                  <Input disabled={true} style={{width: '188px'}}/>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddModule" label="所属模块:">
+                <Input disabled={true}/>
+              </Form.Item>
             </Col>
           </Row>
           <Row gutter={16} style={{...marginTopHeight}}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddChandaoStatus" label="禅道状态:">
-                  <Input disabled={true} style={widths}/>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddChandaoStatus" label="禅道状态:">
+                <Input disabled={true}/>
+              </Form.Item>
             </Col>
-            <Col className="gutter-row">
-              <div style={{marginLeft: '33px'}}>
-                <Form.Item name="adminAddAssignTo" label="指派给:">
-                  <Input disabled={true} style={{width: '212px', color: 'black'}}/>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddAssignTo" label="指派给:">
+                <Input disabled={true} style={{color: 'black'}}/>
+              </Form.Item>
             </Col>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddSolvedBy" label="解决/完成人:">
-                  <Input disabled={true} style={{width: '180px', color: 'black'}}/>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddSolvedBy" label="解决/完成人:">
+                <Input disabled={true} style={{color: 'black'}}/>
+              </Form.Item>
             </Col>
           </Row>
           <Row gutter={16} style={{...marginTopHeight}}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddClosedBy" label="由谁关闭:">
-                  <Input disabled={true} style={widths}/>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddClosedBy" label="由谁关闭:">
+                <Input disabled={true}/>
+              </Form.Item>
             </Col>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddHotUpdate" label="是否可热更:">
-                  <Select placeholder="请选择" style={{width: '195px'}}>
-                    {[
-                      <Option key={''} value={''}> </Option>,
-                      <Option key={'1'} value={'1'}>是</Option>,
-                      <Option key={'0'} value={'0'}>否</Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddHotUpdate" label="是否可热更:">
+                <Select placeholder="请选择">
+                  {[
+                    <Option key={''} value={''}> </Option>,
+                    <Option key={'1'} value={'1'}>是</Option>,
+                    <Option key={'0'} value={'0'}>否</Option>,
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddDataUpgrade" label="是否有数据升级:">
-                  <Select placeholder="请选择" style={{width: '160px'}}>
-                    {[
-                      <Option key={''} value={''}> </Option>,
-                      <Option key={'1'} value={'1'}>是</Option>,
-                      <Option key={'0'} value={'0'}>否</Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddDataUpgrade" label="是否有数据升级:">
+                <Select placeholder="请选择">
+                  {[
+                    <Option key={''} value={''}> </Option>,
+                    <Option key={'1'} value={'1'}>是</Option>,
+                    <Option key={'0'} value={'0'}>否</Option>,
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
           </Row>
           <Row gutter={16} style={{...marginTopHeight}}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddInteUpgrade" label="是否有接口升级：">
-                  <Select placeholder="请选择" style={{width: '160px'}}>
-                    {[
-                      <Option key={''} value={''}> </Option>,
-                      <Option key={'1'} value={'1'}>是</Option>,
-                      <Option key={'0'} value={'0'}>否</Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddInteUpgrade" label="是否有接口升级：">
+                <Select placeholder="请选择">
+                  {[
+                    <Option key={''} value={''}> </Option>,
+                    <Option key={'1'} value={'1'}>是</Option>,
+                    <Option key={'0'} value={'0'}>否</Option>,
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
 
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddPreData" label="是否有预置数据:">
-                  <Select placeholder="请选择" style={{width: '165px'}}>
-                    {[
-                      <Option key={''} value={''}> </Option>,
-                      <Option key={'1'} value={'1'}>是</Option>,
-                      <Option key={'0'} value={'0'}>否</Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddPreData" label="是否有预置数据:">
+                <Select placeholder="请选择">
+                  {[
+                    <Option key={''} value={''}> </Option>,
+                    <Option key={'1'} value={'1'}>是</Option>,
+                    <Option key={'0'} value={'0'}>否</Option>,
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
 
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddtesterVerifi" label="是否需要测试验证：">
-                  <Select placeholder="请选择" style={{width: '148px'}}>
-                    {[
-                      <Option key={''} value={''}> </Option>,
-                      <Option key={'1'} value={'1'}>是</Option>,
-                      <Option key={'0'} value={'0'}>否</Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddtesterVerifi" label="是否需要测试验证：">
+                <Select placeholder="请选择">
+                  {[
+                    <Option key={''} value={''}> </Option>,
+                    <Option key={'1'} value={'1'}>是</Option>,
+                    <Option key={'0'} value={'0'}>否</Option>,
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
           </Row>
           <Row gutter={16} style={{...marginTopHeight}}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddPageadjust" label="是否涉及页面调整：">
-                  <Select placeholder="请选择" style={{width: '150px'}}>
-                    {[
-                      <Option key={''} value={''}> </Option>,
-                      <Option key={'1'} value={'1'}>是</Option>,
-                      <Option key={'0'} value={'0'}>否</Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddPageadjust" label="是否涉及页面调整：">
+                <Select placeholder="请选择">
+                  {[
+                    <Option key={''} value={''}> </Option>,
+                    <Option key={'1'} value={'1'}>是</Option>,
+                    <Option key={'0'} value={'0'}>否</Option>,
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
 
-
-            <Col className="gutter-row">
-              <div style={{marginLeft: '35px'}}>
-                <Form.Item name="adminAddProposedTest" label="已提测：">
-                  <Select placeholder="请选择" style={{width: '200px'}}>
-                    {[
-                      <Option key={''} value={''}> </Option>,
-                      <Option key={'0'} value={'0'}>否</Option>,
-                      <Option key={'1'} value={'1'}>是</Option>,
-                      <Option key={'2'} value={'2'}>免</Option>,
-                      <Option key={'3'} value={'3'}>驳回修改中</Option>
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddProposedTest" label="已提测：">
+                <Select placeholder="请选择">
+                  {[
+                    <Option key={''} value={''}> </Option>,
+                    <Option key={'0'} value={'0'}>否</Option>,
+                    <Option key={'1'} value={'1'}>是</Option>,
+                    <Option key={'2'} value={'2'}>免</Option>,
+                    <Option key={'3'} value={'3'}>驳回修改中</Option>
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
 
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddBaseLine" label="是否基线：">
-                  <Select placeholder="请选择" style={{width: '210px'}}>
-                    {[
-                      <Option key={''} value={''}> </Option>,
-                      <Option key={'1'} value={'1'}>是</Option>,
-                      <Option key={'0'} value={'0'}>否</Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddBaseLine" label="是否基线：">
+                <Select placeholder="请选择">
+                  {[
+                    <Option key={''} value={''}> </Option>,
+                    <Option key={'1'} value={'1'}>是</Option>,
+                    <Option key={'0'} value={'0'}>否</Option>,
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
           </Row>
           <Row gutter={16} style={{...marginTopHeight}}>
-
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddSuggestion" label="验证范围建议:">
-                  <Input style={{width: '800px'}}/>
-                </Form.Item>
-              </div>
+            <Col span={24}>
+              <Form.Item name="adminAddSuggestion" label="验证范围建议:">
+                <Input/>
+              </Form.Item>
             </Col>
           </Row>
           <Row gutter={16} style={{...marginTopHeight}}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddEnvironment" label="发布环境:">
-                  <Select placeholder="请选择" style={widths} mode="multiple"
-                          optionFilterProp="children" maxTagCount={"responsive"}>
-                    {[
-                      <Option key={'集群1'} value={'集群1'}>集群1</Option>,
-                      <Option key={'集群2'} value={'集群2'}>集群2</Option>,
-                      <Option key={'集群3'} value={'集群3'}>集群3</Option>,
-                      <Option key={'集群4'} value={'集群4'}>集群4</Option>,
-                      <Option key={'集群5'} value={'集群5'}>集群5</Option>,
-                      <Option key={'集群6'} value={'集群6'}>集群6</Option>,
-                      <Option key={'集群7'} value={'集群7'}>集群7</Option>,
-                      <Option key={'global'} value={'global'}>global</Option>
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddEnvironment" label="发布环境:">
+                <Select placeholder="请选择" mode="multiple" optionFilterProp="children" maxTagCount={"responsive"}>
+                  {[
+                    <Option key={'集群1'} value={'集群1'}>集群1</Option>,
+                    <Option key={'集群2'} value={'集群2'}>集群2</Option>,
+                    <Option key={'集群3'} value={'集群3'}>集群3</Option>,
+                    <Option key={'集群4'} value={'集群4'}>集群4</Option>,
+                    <Option key={'集群5'} value={'集群5'}>集群5</Option>,
+                    <Option key={'集群6'} value={'集群6'}>集群6</Option>,
+                    <Option key={'集群7'} value={'集群7'}>集群7</Option>,
+                    <Option key={'global'} value={'global'}>global</Option>
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
-            <Col className="gutter-row">
-              <div style={{marginLeft: '30px'}}>
-                <Form.Item name="adminAddForUED" label="对应UED：">
-                  <Select placeholder="请选择" style={widths}>
-                    {LoadCombobox('UED')}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddForUED" label="对应UED：">
+                <Select placeholder="请选择">
+                  {LoadCombobox('UED')}
+                </Select>
+              </Form.Item>
             </Col>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddForUedVerify" label="UED测试环境验证：">
-                  <Select placeholder="请选择" style={{width: '150px'}}>
-                    {[
-                      <Option key={''} value={''}> </Option>,
-                      <Option key={'1'} value={'1'}>验证通过</Option>,
-                      <Option key={'0'} value={'0'}>未通过</Option>,
-                      <Option key={'2'} value={'2'}>无需验证</Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddForUedVerify" label="UED测试环境验证：">
+                <Select placeholder="请选择">
+                  {[
+                    <Option key={''} value={''}> </Option>,
+                    <Option key={'1'} value={'1'}>验证通过</Option>,
+                    <Option key={'0'} value={'0'}>未通过</Option>,
+                    <Option key={'2'} value={'2'}>无需验证</Option>,
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
           </Row>
           <Row gutter={16} style={{...marginTopHeight}}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAdminUedOnline" label="UED线上验证:">
-                  <Select placeholder="请选择" style={{width: '175px', color: 'black'}}>
-                    {[
-                      <Option key={''} value={''}> </Option>,
-                      <Option key={'1'} value={'1'}>验证通过</Option>,
-                      <Option key={'0'} value={'0'}>未通过</Option>,
-                      <Option key={'2'} value={'2'}>无需验证</Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAdminUedOnline" label="UED线上验证:">
+                <Select placeholder="请选择" style={{color: 'black'}}>
+                  {[
+                    <Option key={''} value={''}> </Option>,
+                    <Option key={'1'} value={'1'}>验证通过</Option>,
+                    <Option key={'0'} value={'0'}>未通过</Option>,
+                    <Option key={'2'} value={'2'}>无需验证</Option>,
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
-            <Col className="gutter-row">
-              <div style={{marginLeft: '50px'}}>
-                <Form.Item name="adminAddSource" label="来源:">
-                  <Select
-                    placeholder="请选择"
-                    defaultValue={['手工录入']}
-                    disabled={true}
-                    style={{width: '210px', color: 'black'}}
-                  >
-                    {[
-                      <Option key={'6'} value={'6'}>禅道自动写入</Option>,
-                      <Option key={'7'} value={'7'}>手工录入</Option>,
-                      <Option key={'1'} value={'1'}>《产品hotfix申请》</Option>,
-                      <Option key={'2'} value={'2'}>《UED-hotfix申请》</Option>,
-                      <Option key={'3'} value={'3'}>《开发hotfix申请》</Option>,
-                      <Option key={'4'} value={'4'}>《emergency申请》</Option>,
-                      <Option key={'5'} value={'5'}>《开发热更新申请》</Option>,
-                      <Option key={'8'} value={'8'}>自动获取</Option>,
-                    ]}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddSource" label="来源:">
+                <Select
+                  placeholder="请选择" defaultValue={['手工录入']}
+                  disabled={true} style={{color: 'black'}}
+                >
+                  {[
+                    <Option key={'6'} value={'6'}>禅道自动写入</Option>,
+                    <Option key={'7'} value={'7'}>手工录入</Option>,
+                    <Option key={'1'} value={'1'}>《产品hotfix申请》</Option>,
+                    <Option key={'2'} value={'2'}>《UED-hotfix申请》</Option>,
+                    <Option key={'3'} value={'3'}>《开发hotfix申请》</Option>,
+                    <Option key={'4'} value={'4'}>《emergency申请》</Option>,
+                    <Option key={'5'} value={'5'}>《开发热更新申请》</Option>,
+                    <Option key={'8'} value={'8'}>自动获取</Option>,
+                  ]}
+                </Select>
+              </Form.Item>
             </Col>
 
-            <Col className="gutter-row">
-              <div style={{marginLeft: "35px"}}>
-                <Form.Item name="adminAddFeedbacker" label="反馈人:">
-                  <Select placeholder="请选择" style={widths} showSearch optionFilterProp="children">
-                    {LoadCombobox('all')}
-                  </Select>
-                </Form.Item>
-              </div>
+            <Col span={8}>
+              <Form.Item name="adminAddFeedbacker" label="反馈人:">
+                <Select placeholder="请选择" showSearch optionFilterProp="children">
+                  {LoadCombobox('all')}
+                </Select>
+              </Form.Item>
             </Col>
           </Row>
           <Row gutter={16} style={{...marginTopHeight}}>
-            <Col className="gutter-row">
-              <div style={leftStyle}>
-                <Form.Item name="adminAddRemark" label="备注:">
-                  <Input style={{width: '850px'}}/>
-                </Form.Item>
-              </div>
+            <Col span={24}>
+              <Form.Item name="adminAddRemark" label="备注:">
+                <Input/>
+              </Form.Item>
             </Col>
 
           </Row>

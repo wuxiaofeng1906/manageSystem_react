@@ -3,7 +3,7 @@ import {
   testConfirmValueGetter, catagoryValueGetter, linkToZentaoPage, servertyValueGetter,
   statusValueGetter, statusRenderer, assignedToValueGetter, solvedByValueGetter, relatedNumberRender,
   timestampRenderer, isOrNotValueGetter, testConfirmTooltipValueGetter, testConfirmedRenderer,
-  proposedTestValueGetter, testVertifyFilter,
+  proposedTestValueGetter, testVertifyFilter,consumerAffectedRenderer,
   vertifyResultValueGetter, sourceValueGetter, timeRenderer
 } from "./columnRenderer";
 
@@ -122,11 +122,9 @@ const getColums = (prjNames: any) => {
     },
     {
       headerName: '用户是否有感',
-      field: '',
-      // valueGetter: (params: any) => {
-      //   return isOrNotValueGetter(params.data?.hotUpdate)
-      // },
-      // cellRenderer: textDecorateRender,
+      field: 'consumerAffected',
+      cellRenderer: consumerAffectedRenderer,
+      filterParams: {cellRenderer: testVertifyFilter}
     },
     {
       headerName: '是否有数据升级',
@@ -135,6 +133,7 @@ const getColums = (prjNames: any) => {
         return isOrNotValueGetter(params.data?.dataUpdate)
       },
       cellRenderer: textDecorateRender,
+
     },
     {
       headerName: '是否有接口升级',

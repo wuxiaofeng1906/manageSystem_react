@@ -347,7 +347,8 @@ const SprintList: React.FC<any> = () => {
       adminAddSource: datas.source,
       adminAddFeedbacker: datas.feedback,
       adminAddRemark: datas.memo,
-      adminAddBaseLine: datas.baseline
+      adminAddBaseLine: datas.baseline,
+      adminAddPerception: datas.consumerAffected === "-1" ? "1" : datas.consumerAffected === "-0" ? "0" : datas.consumerAffected
     });
     setmodal({title: '修改明细行(admin)'});
     setIsAddModalVisible(true);
@@ -466,6 +467,7 @@ const SprintList: React.FC<any> = () => {
 
     // 判断是管理员新增明细还是管理员修改明细行
     if (modal.title === '新增明细行') {
+      debugger;
 
       datas["source"] = 7;
       datas["ztNo"] = oradata.adminChandaoId;
@@ -473,6 +475,7 @@ const SprintList: React.FC<any> = () => {
       datas["uedName"] = oradata.adminAddForUED;
       datas["feedback"] = oradata.adminAddFeedbacker;
       datas["testCheck"] = oradata.adminAddtesterVerifi === "" ? "" : `-${oradata.adminAddtesterVerifi}`; // 新增的行都是为手动修改的数据
+      datas["consumerAffected"] = oradata.adminAddPerception === "" ? "" : `-${oradata.adminAddPerception}`; // 手动修改用户是否有感
 
       addCommitDetails(datas);
     } else {
@@ -493,6 +496,11 @@ const SprintList: React.FC<any> = () => {
       // 如果修改了是否需要测试验证，就要改为负值。
       if (curRow[0].testCheck !== oradata.adminAddtesterVerifi) {
         datas["testCheck"] = oradata.adminAddtesterVerifi === "" ? "" : `-${oradata.adminAddtesterVerifi}`; //  为手动修改的数据
+      }
+
+      // 如果修改了用户是否有感，就要改为负值。
+      if (curRow[0].consumerAffected !== oradata.adminAddPerception) {
+        datas["consumerAffected"] = oradata.adminAddPerception === "" ? "" : `-${oradata.adminAddPerception}`; //  为手动修改的数据
       }
 
       if (formForAdminToAddAnaMod.isFieldTouched('adminAddTester')) {
@@ -537,6 +545,7 @@ const SprintList: React.FC<any> = () => {
       managerSuggestion: datas.scopeLimit,
       managerTitle: datas.title,
       managertesterVerifi: numberValueGetter(datas.testCheck),
+      managerUserIsPerceive: datas.consumerAffected === "-1" ? "1" : datas.consumerAffected === "-0" ? "0" : datas.consumerAffected,
     });
     setformForManagerToModVisible(true);
   };
@@ -692,7 +701,7 @@ const SprintList: React.FC<any> = () => {
     if (initialState?.currentUser) {
       currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
     }
-    // currentUserGroup = 'testGroup';
+    currentUserGroup = 'devManageGroup';
     if (currentUserGroup !== undefined) {
       switch (currentUserGroup.toString()) {
         case 'superGroup':

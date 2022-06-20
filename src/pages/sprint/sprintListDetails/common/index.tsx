@@ -51,6 +51,12 @@ const alayManagerData = (oradata: any, curRow: any, prjId: any) => {
   if (curRow[0].testCheck !== oradata.managertesterVerifi) {
     datas["testCheck"] = oradata.managertesterVerifi === "" ? "" : `-${oradata.managertesterVerifi}`; //  为手动修改的数据
   }
+
+  // 如果修改了用户是否有感，就要改为负值。
+  if (curRow[0].consumerAffected !== oradata.managerUserIsPerceive) {
+    datas["consumerAffected"] = oradata.managerUserIsPerceive === "" ? "" : `-${oradata.managerUserIsPerceive}`; //  为手动修改的数据
+  }
+
   return datas;
 }
 

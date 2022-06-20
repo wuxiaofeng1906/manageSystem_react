@@ -12,22 +12,13 @@
   transition: all 0.5s;
   .layout {
     position: relative;
-    background: rgba(194, 209, 220, 0.4);
-    //height: 100%;
+    background: rgba(0, 0, 0, 0.02);
     .formWrap {
-      padding: 10px 20px;
-      background: linear-gradient(to left top, #b6d2e0, #faf2f2);
-
-      :global {
-        .ant-form-item-label > label {
-          font-weight: 500 !important;
-        }
-      }
+      padding: 24px 16px;
     }
 
     .menu {
-      color: @color-text-title;
-      font-weight: bold;
+      color: initial;
       background: transparent;
     }
   }
@@ -46,11 +37,12 @@
     .ant-menu-inline .ant-menu-item::after {
       right: initial;
       left: 0;
-      border-right: 3px solid rgba(9, 109, 217, 0.51);
+      border:none;
+      //border-right: 3px dashed rgba(9, 109, 217, 0.1);
     }
 
     .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
-      background: rgba(110, 153, 173, 0.3) !important;
+      background: rgba(0, 0, 0, 0.03) !important;
     }
     .ant-picker-input > input[disabled],
     .ant-select-disabled.ant-select:not(.ant-select-customize-input) .ant-select-selector {
@@ -80,6 +72,14 @@
     .form-select{
       .ant-select-selection-item{
         color:@color-success;
+      }
+    }
+    .sealVersionForm{
+      .ant-form-item{
+        margin-bottom: 12px;
+        .ant-col-10{
+          max-width: 100% !important;
+        }
       }
     }
   }

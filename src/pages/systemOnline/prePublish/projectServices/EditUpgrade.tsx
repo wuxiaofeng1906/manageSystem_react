@@ -27,7 +27,7 @@ const EditUpgrade = (props: IEditUprade) => {
   useEffect(() => {
     if (props.visible) {
       form.setFieldsValue(props.data);
-    } else form.resetFields();
+    }
   }, [props.visible]);
 
   const onConfirm = async () => {
@@ -65,6 +65,7 @@ const EditUpgrade = (props: IEditUprade) => {
       onOk={onConfirm}
       maskClosable={false}
       confirmLoading={loading}
+      destroyOnClose
       okButtonProps={{ disabled: disabled || shouldConfirm }}
     >
       <Form
@@ -72,6 +73,7 @@ const EditUpgrade = (props: IEditUprade) => {
         wrapperCol={{ span: 14 }}
         labelCol={{ span: 9 }}
         onValuesChange={checkValue}
+        preserve={false}
       >
         <Form.Item name="project_name" label="项目名称">
           <Input disabled />

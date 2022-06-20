@@ -9,7 +9,7 @@ export const useCheckDetail = () => {
   const {
     query: { idx },
   } = useLocation() as any;
-  const [source, setSource] = useState(CHECK_LIST);
+  const [checkSource, setCheckSource] = useState(CHECK_LIST);
   const [spinning, setSpinning] = useState(false);
 
   // detail
@@ -17,7 +17,7 @@ export const useCheckDetail = () => {
     if (!idx) return;
     setSpinning(true);
     const res = await OnlineServices.getCheckDetail(idx).finally(() => setSpinning(false));
-    const result = source.map((it, index) => {
+    const result = checkSource.map((it, index) => {
       const front = res?.test_unit[index]?.test_case_technical_side == 'front';
       const obj = it.key == 'test_unit' ? res?.[it.key]?.[front ? 0 : 1] : res?.[it.key];
       it = {
@@ -28,11 +28,17 @@ export const useCheckDetail = () => {
             : obj?.check_result,
         start_time: obj?.check_start_time,
         end_time: obj?.check_end_time,
+        version_time:
+          index > 5
+            ? obj.check_result == 'failure'
+              ? ''
+              : obj.check_log?.[0]?.sealing_version_time
+            : '',
         check_log: obj?.check_log,
       };
       return it;
     });
-    setSource(result);
+    setCheckSource(result);
   }, []);
 
   // format check status
@@ -75,7 +81,7 @@ export const useCheckDetail = () => {
     getList();
   }, []);
 
-  return { getList, formatCheckStatus, source, setSource, spinning };
+  return { getList, formatCheckStatus, checkSource, setCheckSource, spinning };
 };
 
 export const useShowLog = () => {
@@ -96,9 +102,10 @@ export const useShowLog = () => {
     Modal.info({
       width: logs.length == 0 ? 520 : 800,
       title: showLog?.title,
-      okText: '好的',
       centered: true,
-      onOk: () => setShowLog(undefined),
+      closable: true,
+      okButtonProps: { style: { display: 'none' } },
+      onCancel: () => setShowLog(undefined),
       content:
         logs.length == 0 ? (
           '暂无操作日志'

@@ -22,7 +22,7 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
   const [form] = Form.useForm();
   const [flag, setFlag] = useState(false);
   const [spinning, setSpinning] = useState(false);
-  const [collapse, setCollapse] = useState(true);
+  const [collapse, setCollapse] = useState(false);
 
   const update = async (type: any, values: any) => {
     if (idx && !disabled) {
@@ -80,7 +80,6 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
           <Layout.Sider
             width={collapse ? 280 : 0}
             theme={'light'}
-            zeroWidthTriggerStyle={{ zIndex: 10 }}
             className={cls(styles.layout, { layoutHidden: collapse })}
           >
             <div className={styles.collapse} onClick={() => setCollapse(!collapse)}>
@@ -93,10 +92,11 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
             <div className={styles.formWrap}>
               <Form form={form} onValuesChange={update}>
                 <Form.Item label={'发布类型'} name={'release_type'}>
-                  <Select disabled={disabled} options={typeSelectors} />
+                  <Select disabled={disabled} options={typeSelectors} placeholder={'发布类型'} />
                 </Form.Item>
                 <Form.Item label={'发布方式'} name={'release_method'}>
                   <Select
+                    placeholder={'发布方式'}
                     disabled={disabled}
                     options={methodSelectors?.map((it) => ({
                       ...it,
@@ -106,6 +106,7 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
                 </Form.Item>
                 <Form.Item label={'发布时间'} name={'release_date'}>
                   <DatePicker
+                    placeholder={'发布时间'}
                     format={MOMENT_FORMAT.utc}
                     style={{ width: '100%' }}
                     disabled={disabled}
@@ -114,7 +115,7 @@ const PreLayout = ({ location, children }: { location: any; children: React.Reac
                   />
                 </Form.Item>
                 <Form.Item label={'发布结果'} name={'release_result'}>
-                  <Select options={PUBLISH_RESULT} disabled={disabled} />
+                  <Select options={PUBLISH_RESULT} disabled={disabled} placeholder={'发布结果'} />
                 </Form.Item>
               </Form>
             </div>

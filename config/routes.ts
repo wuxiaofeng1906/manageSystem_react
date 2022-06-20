@@ -621,6 +621,10 @@ export default [
             component: './systemOnline/prePublish/deploy',
           },
           {
+            path: 'duty',
+            component: './systemOnline/prePublish/duty',
+          },
+          {
             path: 'check',
             component: './systemOnline/prePublish/check',
           },

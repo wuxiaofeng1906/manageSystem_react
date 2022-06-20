@@ -34,7 +34,7 @@ const EditSql = (props: IEditSql) => {
           ? props.data.release_cluster_id?.split(',')
           : [],
       });
-    } else form.resetFields();
+    }
   }, [props.visible]);
 
   const onConfirm = async () => {
@@ -59,14 +59,15 @@ const EditSql = (props: IEditSql) => {
       title="编辑升级接口&SQL"
       visible={props.visible}
       okText="保存"
-      onCancel={props.onCancel}
+      centered
+      destroyOnClose
       onOk={onConfirm}
       maskClosable={false}
+      onCancel={props.onCancel}
       confirmLoading={loading}
-      centered
       okButtonProps={{ disabled }}
     >
-      <Form form={form} wrapperCol={{ span: 16 }} labelCol={{ span: 6 }}>
+      <Form form={form} wrapperCol={{ span: 16 }} labelCol={{ span: 6 }} preserve={false}>
         <Form.Item name="update_type" label="升级类型">
           <Input disabled />
         </Form.Item>

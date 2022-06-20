@@ -68,7 +68,7 @@ const TagSelector = ({
 
   const edit = (clearable && ![1, 2].includes(approveDetail?.sp_status)) || disabled;
   return (
-    <Collapse ghost className={'tagSelector'} activeKey={['cc', 'director', 'duty']}>
+    <Collapse ghost className={'tagSelector'} defaultActiveKey={['cc', 'director', 'duty']}>
       <Collapse.Panel
         key={selector}
         header={

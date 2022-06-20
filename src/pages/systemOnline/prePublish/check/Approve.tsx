@@ -33,7 +33,7 @@ const BuildProject = () => {
 };
 
 const Approve = () => {
-  const { source, formatCheckStatus } = useCheckDetail();
+  const { checkSource, formatCheckStatus } = useCheckDetail();
   const {
     query: { idx },
   } = useLocation() as any;
@@ -56,7 +56,7 @@ const Approve = () => {
   );
 
   // technical_side group
-  const formatServerInfo = useMemo(() => {
+  const serverGroup = useMemo(() => {
     let result: any[] = [];
     ['businessFront', 'businessBackend', 'platformBackend', 'process'].map((it, i) => {
       proInfo?.upgrade_app?.map((obj) => {
@@ -76,7 +76,14 @@ const Approve = () => {
     const res = await OnlineServices.getApproval(idx);
     setApproveDetail(res);
     if (!isEmpty(res)) {
-      let data = {};
+      let data = {
+        cc:
+          res?.cc?.map((it: any) => ({
+            key: it.user_id,
+            value: it.user_id,
+            label: it.user_name,
+          })) || [],
+      };
       if (res?.sp_record.length > 0) {
         res?.sp_record.forEach((it: any, i: number) => {
           const o = it?.detail?.map((obj: any) => ({
@@ -91,7 +98,7 @@ const Approve = () => {
         });
       }
       setIntSource(data as any);
-    }
+    } else getInitApproval();
   };
 
   const getInitApproval = async () => {
@@ -118,18 +125,17 @@ const Approve = () => {
   };
 
   // 检查是否存在未通过选项
-  const checkPass = () => {
-    const status = source.some((it) => ['failure', 'error'].includes(it.status));
+  const checkPassable = () => {
+    const status = checkSource.some((it) => ['failure', 'error'].includes(it.status));
     setFlag(status);
     if (status) {
-      getInitApproval();
+      getApproval();
     }
   };
 
   useEffect(() => {
-    getApproval();
-    checkPass();
-  }, [source]);
+    checkPassable();
+  }, [checkSource]);
 
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>
@@ -141,7 +147,7 @@ const Approve = () => {
         <div style={{ margin: '16px 0' }}>
           <h3>二、发布服务</h3>
           <ul style={{ marginLeft: 40 }}>
-            {formatServerInfo?.map((it) => {
+            {serverGroup?.map((it) => {
               return (
                 <li key={it.server_id}>
                   <div className={'flex-row'}>
@@ -195,7 +201,7 @@ const Approve = () => {
         <div style={{ margin: '16px 0' }}>
           <h3>九、检查信息：</h3>
           <ul style={{ marginLeft: 40 }}>
-            {source.map((it, index) => {
+            {checkSource.map((it, index) => {
               return (
                 <li key={it.key + index}>
                   <span style={{ marginRight: 10 }}>{`${index + 1}、${it.type}：`}</span>

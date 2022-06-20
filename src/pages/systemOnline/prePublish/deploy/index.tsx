@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { Button, message, Space, Spin } from 'antd';
+import dayjs from 'dayjs';
 import { deployColumn } from '@/pages/systemOnline/column';
 import type { CellClickedEvent, GridApi } from 'ag-grid-community';
 import DeploySetting from '@/pages/systemOnline/prePublish/deploy/DeploySetting';
@@ -25,6 +26,20 @@ const Deploy = () => {
     setSpinning(true);
     const result = await OnlineServices.deployList(idx).finally(() => setSpinning(false));
     setList(result);
+  };
+  const formatTime = ({ data }: CellClickedEvent) => {
+    let str: string = '';
+    if (data.start_time && data.end_time) {
+      let seconds = dayjs(data.end_time).diff(data.start_time, 'seconds');
+      const hours = Math.floor(seconds / 3600);
+      seconds = seconds - hours * 3600;
+      const minutes = Math.floor(seconds / 60);
+      seconds = seconds - minutes * 60;
+      if (seconds) str = `${seconds}秒`;
+      if (minutes) str = `${minutes}分${seconds}秒`;
+      if (hours) str = `${hours}小时${minutes}分${seconds}秒`;
+    }
+    return str;
   };
 
   useEffect(() => {
@@ -64,6 +79,7 @@ const Deploy = () => {
           columnDefs={deployColumn}
           rowData={list}
           frameworkComponents={{
+            deployTime: formatTime,
             operation: ({ data }: CellClickedEvent) => {
               return (
                 <div

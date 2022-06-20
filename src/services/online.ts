@@ -41,7 +41,7 @@ const OnlineServices = {
 
   // 项目&服务数据
   async proDetail(release_num: string) {
-    return request(`${baseUrl}/pro_detail`, { params: { release_num }, warn: false });
+    return request(`${baseUrl}/pro_detail`, { params: { release_num } });
   },
   // 预发布分支和环境填写
   async updatePreProject(data: any) {
@@ -172,6 +172,10 @@ const OnlineServices = {
   // 环境分支检查
   async branchCheck(release_num: string) {
     return request(`${baseUrl}/env_branch_check`, { params: { release_num }, warn: false });
+  },
+  // 刷新 服务数据
+  async refreshConfig(release_num: string) {
+    return request(`${baseUrl}/refresh_data`, { params: { release_num } });
   },
 };
 export default OnlineServices;

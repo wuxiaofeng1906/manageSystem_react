@@ -1,5 +1,5 @@
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
-import { COMMON_STATUS, DEPLOY_TYPE } from './constants';
+import { COMMON_STATUS, DEPLOY_TYPE, PUBLISH_STATUS } from './constants';
 
 const cellRenderStatus = ({ value }: any) =>
   `<span class="${
@@ -251,6 +251,12 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
     valueFormatter: ({ value }) => COMMON_STATUS[value] || '-',
   },
   {
+    headerName: '申请人',
+    minWidth: 120,
+    field: 'commiter',
+    cellStyle: { background: '#f5f5f5' },
+  },
+  {
     headerName: '升级接口',
     minWidth: 120,
     field: 'update_api',
@@ -281,7 +287,6 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
     headerName: 'Data',
     minWidth: 120,
     field: 'request_data',
-
     headerClass: 'ag-align-left',
     cellStyle: { textAlign: 'left', background: '#f5f5f5' },
   },
@@ -334,7 +339,7 @@ const upgradeSQLColumn: (ColDef | ColGroupDef)[] = [
 const deployColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
-    minWidth: 60,
+    minWidth: 70,
     cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
   {
@@ -365,13 +370,18 @@ const deployColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '启动时间',
-    minWidth: 120,
+    minWidth: 190,
     field: 'start_time',
   },
   {
     headerName: '完成时间',
-    minWidth: 120,
+    minWidth: 190,
     field: 'end_time',
+  },
+  {
+    headerName: '部署时间',
+    minWidth: 120,
+    cellRenderer: 'deployTime',
   },
   {
     headerName: '当前状态',
@@ -391,7 +401,7 @@ const deployColumn: (ColDef | ColGroupDef)[] = [
 const checkDetailColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
-    width: 60,
+    width: 70,
     field: 'num',
     cellRenderer: (params: any) => (+params.node.id + 1).toString(),
   },
@@ -406,8 +416,10 @@ const checkDetailColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '检查开始时间',
-    field: 'start_time',
+    // field: 'start_time',
     colSpan: (v) => v.data.colSpan || 1,
+    cellRenderer: (param) =>
+      param.rowIndex <= 5 ? param.data.start_time : param.data.version_time,
   },
   {
     headerName: '检查结束时间',
@@ -459,6 +471,37 @@ const servicesSettingColumn: (ColDef | ColGroupDef)[] = [
   },
 ];
 
+// 发布
+const publishDetailColumn: (ColDef | ColGroupDef)[] = [
+  {
+    headerName: '序号',
+    minWidth: 60,
+    maxWidth: 120,
+    field: 'num',
+  },
+  {
+    headerName: '集群',
+    field: 'cluster_name',
+  },
+  {
+    headerName: '状态',
+    field: 'status',
+    cellRenderer: ({ value }) => `<span class="color-${value}">${PUBLISH_STATUS[value]}</span>`,
+  },
+  {
+    headerName: '开始时间',
+    field: 'start_time',
+  },
+  {
+    headerName: '完成时间',
+    field: 'end_time',
+  },
+  {
+    headerName: '信息',
+    field: 'content',
+  },
+];
+
 export {
   publishColumn,
   projectUpgradeColumn,
@@ -468,4 +511,5 @@ export {
   checkDetailColumn,
   servicesSettingColumn,
   serverColumn,
+  publishDetailColumn,
 };

@@ -286,7 +286,8 @@ const SprintList: React.FC<any> = () => {
       adminAdminUedOnline: '',
       adminAddFeedbacker: '',
       adminAddRemark: '',
-      adminAddBaseLine: ''
+      adminAddBaseLine: '',
+      adminAddPerception: ''
     });
 
     setmodal({title: '新增明细行'});
@@ -467,7 +468,6 @@ const SprintList: React.FC<any> = () => {
 
     // 判断是管理员新增明细还是管理员修改明细行
     if (modal.title === '新增明细行') {
-      debugger;
 
       datas["source"] = 7;
       datas["ztNo"] = oradata.adminChandaoId;
@@ -701,7 +701,7 @@ const SprintList: React.FC<any> = () => {
     if (initialState?.currentUser) {
       currentUserGroup = initialState.currentUser === undefined ? "" : initialState.currentUser.group;
     }
-    currentUserGroup = 'devManageGroup';
+    // currentUserGroup = 'devGroup';
     if (currentUserGroup !== undefined) {
       switch (currentUserGroup.toString()) {
         case 'superGroup':

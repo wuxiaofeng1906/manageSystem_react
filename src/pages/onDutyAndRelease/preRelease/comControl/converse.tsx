@@ -157,12 +157,15 @@ const getOnlineDev = (idStr: string) => {
       case '7':
         name = '集群6';
         break;
-
+      case '8':
+        name = '集群7';
+        break;
       case '9':
         name = '';
         break;
 
       default:
+        name = ele;
         break;
     }
 

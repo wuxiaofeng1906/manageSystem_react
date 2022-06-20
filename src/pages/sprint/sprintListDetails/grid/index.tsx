@@ -3,7 +3,7 @@ import {
   testConfirmValueGetter, catagoryValueGetter, linkToZentaoPage, servertyValueGetter,
   statusValueGetter, statusRenderer, assignedToValueGetter, solvedByValueGetter, relatedNumberRender,
   timestampRenderer, isOrNotValueGetter, testConfirmTooltipValueGetter, testConfirmedRenderer,
-  proposedTestValueGetter, testVertifyFilter,
+  proposedTestValueGetter, testVertifyFilter,consumerAffectedRenderer,
   vertifyResultValueGetter, sourceValueGetter, timeRenderer
 } from "./columnRenderer";
 
@@ -62,7 +62,7 @@ const getColums = (prjNames: any) => {
       headerTooltip: "自动生成’是‘为黑色；自动生成‘否’为红色；手动修改‘是’为紫色；手动修改‘否’为黄色",
       tooltipValueGetter: testConfirmTooltipValueGetter,
       cellRenderer: testConfirmedRenderer,
-      filterParams: {cellRenderer:testVertifyFilter}
+      filterParams: {cellRenderer: testVertifyFilter}
     },
     {
       headerName: '类型',
@@ -121,12 +121,19 @@ const getColums = (prjNames: any) => {
       cellRenderer: textDecorateRender,
     },
     {
+      headerName: '用户是否有感',
+      field: 'consumerAffected',
+      cellRenderer: consumerAffectedRenderer,
+      filterParams: {cellRenderer: testVertifyFilter}
+    },
+    {
       headerName: '是否有数据升级',
       field: 'dataUpdate',
       valueGetter: (params: any) => {
         return isOrNotValueGetter(params.data?.dataUpdate)
       },
       cellRenderer: textDecorateRender,
+
     },
     {
       headerName: '是否有接口升级',

@@ -445,6 +445,33 @@ const proposedTestValueGetter = (params: any) => {
   return value;
 };
 
+
+// 用户是否有感
+const consumerAffectedRenderer = (params: any) => {
+  //  默认是：红色。修改的是：橙色，否都为黑色。
+  const values = params.value;
+  if (!values) {
+    return "";
+  }
+
+  let result = "";
+  let my_color = "";
+  if (values === "-1") { // 手动：是
+    result = "是";
+    my_color = "orange";// 橙色
+  } else if (values === "-0" || values === "0") { // 手动：否
+    result = "否";
+    my_color = "black";// 黄色
+  } else if (values === "1") { // 自动：是
+    result = "是";
+    my_color = "red";// 红色
+  }
+  if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+    return `<span style="text-decoration:line-through"> ${result} </span>`;
+  }
+  return `<span style="color: ${my_color}"> ${result}  </span>`;
+};
+
 // 验证结果
 const vertifyResultValueGetter = (values: any) => {
   if (values === null || values === undefined) {
@@ -495,7 +522,7 @@ const timeRenderer = (params: any) => {
 
 export {
   textDecorateRender, stageValueGetter, stageRenderer, testerValueGetter, testerRenderer,
-  testConfirmValueGetter, catagoryValueGetter, linkToZentaoPage, servertyValueGetter,
+  testConfirmValueGetter, catagoryValueGetter, linkToZentaoPage, servertyValueGetter, consumerAffectedRenderer,
   statusValueGetter, statusRenderer, assignedToValueGetter, solvedByValueGetter, relatedNumberRender,
   timestampRenderer, isOrNotValueGetter, testConfirmTooltipValueGetter, testConfirmedRenderer,
   proposedTestValueGetter, testVertifyFilter,

@@ -5,7 +5,7 @@ const findParent = (departDatas: any, depts: any, result: any) => {
     if (item['deptName'] && idx) {
       if (idx === item['deptName']) {
         const pidName = item['parent'].deptName;
-        if(pidName !== "北京企企科技有限公司"){  // 不显示北京企企科技有限公司
+        if (pidName !== "北京企企科技有限公司") {  // 不显示北京企企科技有限公司
           result.unshift(pidName);
           findParent(departDatas, item['parent'], result);
         }
@@ -122,4 +122,136 @@ const converseFormatForAgGrid = (oraDatas: any) => {
   return converseArrayToOne(resultArray);
 };
 
-export {converseFormatForAgGrid};
+// 使用界面：测试千行bug率
+const converseDataForAgGrid_code = (oraDatas: any) => {
+
+  if (!oraDatas) {
+    return [];
+  }
+
+  const resultArray: any = [];
+  // 解析部门数据
+  oraDatas.forEach((elements: any) => {
+    const starttime = elements.range.start;
+
+    resultArray.push({
+      Group: ['研发中心'],
+      // [starttime]: elements.total.kpi,
+      [`${starttime}_kpi`]: elements.total.kpi,
+      [`${starttime}_codes`]: elements.code,
+      [`${starttime}_bugs`]: 0,
+      [`${starttime}_weightBugs`]: 0,
+
+      isDept: true
+    });
+
+    const departDatas = elements.datas;
+    // 部门数据
+    departDatas.forEach((depts: any) => {
+
+      /* region 部门数据 */
+
+      const groups: any = [depts.deptName];
+      findParent(departDatas, depts, groups);
+
+      // 新增部门
+      resultArray.push({
+        Group: groups,
+        [`${starttime}_kpi`]: depts.kpi,
+        [`${starttime}_codes`]: depts.codes,
+        [`${starttime}_bugs`]: 0,
+        [`${starttime}_weightBugs`]: 0,
+        isDept: true
+      });
+
+
+      /* endregion   */
+
+      /* region 人员数据 */
+
+      const usersArray = depts.users;
+      if (usersArray) {
+        usersArray.forEach((user: any) => {
+          const usersGroup = JSON.parse(JSON.stringify(groups));
+          usersGroup.push(user.userName);
+          resultArray.push({
+            Group: usersGroup,
+            [`${starttime}_kpi`]: user.kpi,
+            [`${starttime}_codes`]: 0,
+            [`${starttime}_bugs`]: 0,
+            [`${starttime}_weightBugs`]: 0,
+            isDept: false
+          });
+        });
+      }
+
+      /* endregion   */
+
+    });
+
+  });
+
+  return converseArrayToOne(resultArray);
+};
+
+// 使用界面：千行bug率收敛
+const converseForAgGrid_Convergency = (oraDatas: any) => {
+
+  if (!oraDatas) return [];
+
+  const resultArray: any = [];
+
+  // 解析部门数据
+  oraDatas.forEach((elements: any) => {
+    const starttime = elements.range.start;
+
+    // 新增研发中心数据
+    resultArray.push({
+      Group: ['研发中心'],
+      [starttime]: elements.total.kpi,
+      isDept: true
+    });
+
+    // 部门数据
+    const departDatas = elements.datas;
+    departDatas.forEach((depts: any) => {
+      // 不显示自动化平台和平台产品以及供应链研发部（供应链测试要展示）
+      if (depts.deptName !== "自动化平台" && depts.deptName !== "平台产品" && depts.deptName !== "供应链研发部") {
+        const groups: any = [depts.deptName];
+        // 如果是供应链测试，那么就不寻找父部门了，研发中心直接为父部门
+        if (depts.deptName === "供应链测试") {
+          groups.unshift("研发中心");
+        } else {
+          findParent(departDatas, depts, groups);
+        }
+
+        // 新增部门
+        resultArray.push({
+          Group: groups,
+          [starttime]: depts.kpi,
+          isDept: true
+        });
+
+        // 部门下面区分测试和开发
+        const testGroup: any = JSON.parse(JSON.stringify(groups));
+        testGroup.push("测试-线上千行bug率");
+        resultArray.push({
+          Group: testGroup,
+          [starttime]: depts.sideKpi.testKpi,
+        });
+
+        const devGroup: any = JSON.parse(JSON.stringify(groups));
+        devGroup.push("开发-千行bug率");
+        resultArray.push({
+          Group: devGroup,
+          [starttime]: depts.sideKpi.devkpi,
+        });
+      }
+    });
+  });
+
+
+  return converseArrayToOne(resultArray);
+};
+
+export {converseFormatForAgGrid, converseDataForAgGrid_code, converseForAgGrid_Convergency};

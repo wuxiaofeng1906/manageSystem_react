@@ -226,6 +226,12 @@ export default [
                 path: 'bugRepairRate',
                 component: './kpi/performance/developer/bugRepairRate',
               },
+              {
+                name: '开发缺陷排除率',
+                icon: 'table',
+                path: 'defectExclusionRate',
+                component: './kpi/performance/developer/defectExclusionRate',
+              },
             ],
           },
           {
@@ -233,11 +239,17 @@ export default [
             icon: 'table',
             path: '/kpi/performance/testers',
             routes: [
+              // {
+              //   name: '线上千行bug率',
+              //   icon: 'table',
+              //   path: 'on-lineBugRate',
+              //   component: './kpi/performance/testers/on-lineBugRate',
+              // },
               {
                 name: '线上千行bug率',
                 icon: 'table',
-                path: 'on-lineBugRate',
-                component: './kpi/performance/testers/on-lineBugRate',
+                path: 'on-lineBugRate-new',
+                component: './kpi/performance/testers/on-lineBugRate-new',
               },
               {
                 name: '线上千行bug率(参考)',
@@ -250,6 +262,13 @@ export default [
                 icon: 'table',
                 path: 'on_lineBugIncTester',
                 component: './kpi/performance/testers/on_lineBugIncTester',
+              },
+              {
+                name: '千行bug率收敛',
+                icon: 'table',
+                path: 'bugRateConvergency',
+                component: './kpi/performance/testers/bugRateConvergency',
+                hideInMenu: true,
               },
               {
                 name: '用例执行率',

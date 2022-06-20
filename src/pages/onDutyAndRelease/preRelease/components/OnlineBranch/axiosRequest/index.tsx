@@ -33,6 +33,7 @@ const getCheckNumForOnlineBranch = async () => {
 
 // 上线分支修改-表头数据解析
 const alayOnlineCheckHead = (source_data: any) => {
+
   let f_ignore = '2';
   let b_ignore = '2';
   const testUnit = source_data.test_unit;
@@ -54,8 +55,8 @@ const alayOnlineCheckHead = (source_data: any) => {
     checkNum: source_data.check_num,
     branchName: source_data.branch_name,
     module: source_data.technical_side,
-    ignoreBackendCheck: f_ignore,
-    ignoreFrontCheck: b_ignore,
+    ignoreFrontCheck: f_ignore,
+    ignoreBackendCheck: b_ignore,
   };
 
   return checkHeadData;
@@ -348,6 +349,7 @@ const saveOnlineBranch = async (
   newOnlineBranchNum: string,
   sourceData: any,
 ) => {
+
   let frontCheck = '2';
   if (sourceData.ignoreFrontCheck) {
     if (Array.isArray(sourceData.ignoreFrontCheck)) {

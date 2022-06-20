@@ -216,6 +216,8 @@ const OnlineBranch: React.FC<any> = () => {
       }
 
       branchName = oraData.checkHead.branchName;
+      debugger;
+      console.log("222222", oraData.checkHead.ignoreFrontCheck, oraData.checkHead.ignoreBackendCheck)
       formForOnlineBranch.setFieldsValue({
         // 表头设置
         branchName: oraData.checkHead.branchName,

@@ -40,7 +40,7 @@ const DutyListServices = {
   },
   // 推送
   async pushWechat(data: any) {
-    return request(`${baseUrl}/duty/file`, { data, method: 'post' });
+    return request(`${baseUrl}/duty/file`, { data, method: 'post', msg: '推送成功' });
   },
 };
 export default DutyListServices;

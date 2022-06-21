@@ -8,13 +8,17 @@ import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useGqlClient} from '@/hooks';
 import {columsForWeeks, columsForMonths, columsForQuarters, columsForYears} from "./gridConfigure/columns";
-import {Button, Drawer} from "antd";
+import {Button, Drawer, Table} from "antd";
 import {
   ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone,
   QuestionCircleTwoTone, AppstoreTwoTone
 } from "@ant-design/icons";
 import {getHeight} from "@/publicMethods/pageSet";
 import {queryPalnDeviationRate} from "./gridConfigure/data";
+import {
+  planDevRateRuleColumns,
+  planDevRateRuleDatas
+} from "@/pages/kpi/performance/testers/testCommonRules/onlineBugRateRule";
 
 const PlanDeviationRate: React.FC<any> = () => {
 
@@ -147,12 +151,19 @@ const PlanDeviationRate: React.FC<any> = () => {
       <div>
         <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>}
                 placement="right" width={300} closable={false} onClose={onClose} visible={messageVisible}>
-          <p><strong>一.统计周期说明</strong></p>
+          {/* <p><strong>一.统计周期说明</strong></p>
           <p style={cssIndent}>按周、按月、按季、按年统计；</p>
-          <p style={{color: "#1890FF"}}><strong>二.计算公式说明</strong></p>
-          <p style={cssIndent}>1.测试-千行bug率收敛 = 测试-线上千行bug率 / 开发-千行bug率（不含线上）；</p>
-          <p style={cssIndent}>2.计算时分子分母取对应周期的值，测试部门/开发部门（到部门级，不到具体人员）；</p>
-
+          <p style={{color: "#1890FF"}}><strong>二.计算公式说明</strong></p> */}
+          <p style={cssIndent}>1.周期：按周、按月、按季、按年统计（实际灰度日期落在哪个周期，就算到对应周期）；</p>
+          <p style={cssIndent}>2.只展示部门数据（不展示人员数据）；</p>
+          <p style={cssIndent}>3.计算公式：测试计划偏差率 =Average（各项目的测试计划偏差率）；</p>
+          <p style={cssIndent}>单个项目的测试计划偏差率 = (实际灰度日期 - 计划灰度日期)/(计划灰度日期 - 计划系统测试开始日期）*100；</p>
+          <p style={cssIndent}>4.项目取值范围：；</p>
+          <Table columns={planDevRateRuleColumns} dataSource={planDevRateRuleDatas}
+                 size={"small"} pagination={false} bordered/>
+          <p style={cssIndent}>5.实际灰度日期取值：任务类型为‘计划’，且任务名称包含'计划灰度’，且任务状态为‘已完成 或 已关闭’ ，取该任务的‘实际完成日期’；</p>
+          <p style={cssIndent}>6.计划灰度日期取值：取执行概况中的'计划灰度时间；</p>
+          <p style={cssIndent}>7.计划系统测试开始日期取值：任务类型为‘计划’，且任务名称包含'测试阶段计划’，且任务状态为‘已完成 或 已关闭’ ，取该任务的‘预计开始日期’；</p>
 
         </Drawer>
       </div>

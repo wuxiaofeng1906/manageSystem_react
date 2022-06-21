@@ -76,7 +76,7 @@ const DutyList = () => {
             </Col>
             <Col span={10}>
               <Form.Item name={'time'} label={'值班周期'}>
-                <DatePicker.RangePicker style={{ width: '100%' }} onBlur={getList} />
+                <DatePicker.RangePicker style={{ width: '100%' }} onChange={getList} />
               </Form.Item>
             </Col>
           </Row>

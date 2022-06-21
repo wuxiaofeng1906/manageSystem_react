@@ -157,7 +157,7 @@ const DutyCatalog = () => {
     form.setFieldsValue({ project_pm: result?.map((it: any) => it.user?.user_id) });
   };
 
-  const onShort = async () => {
+  const onScreenShot = async () => {
     const errTip = {
       project_ids: '请填写项目名称!',
       project_pm: '请填写负责人!',
@@ -235,7 +235,7 @@ const DutyCatalog = () => {
         user_id: it?.split('_')?.[0],
       })),
     };
-    const res = await DutyListServices.addDuty(data);
+    await DutyListServices.addDuty(data);
     getDetail();
   };
 
@@ -263,17 +263,16 @@ const DutyCatalog = () => {
   };
 
   useEffect(() => {
-    if (recentDuty) {
+    if (recentDuty && !isEmpty(recentDuty)) {
       form.setFieldsValue({
-        front: [`${recentDuty.front.value}_${recentDuty.front.type}`],
-        backend: [`${recentDuty.backend.value}_${recentDuty.backend.type}`],
-        test: [`${recentDuty.test.value}_${recentDuty.test.type}`],
-        sqa: [`${recentDuty.sqa.value}_${recentDuty.sqa.type}`],
-        operations: [`${recentDuty.operations.value}_${recentDuty.operations.type}`],
+        front: [`${recentDuty?.front.value}_${recentDuty?.front.type}`],
+        backend: [`${recentDuty?.backend.value}_${recentDuty?.backend.type}`],
+        test: [`${recentDuty?.test.value}_${recentDuty?.test.type}`],
+        sqa: [`${recentDuty?.sqa.value}_${recentDuty?.sqa.type}`],
+        operations: [`${recentDuty?.operations.value}_${recentDuty?.operations.type}`],
         duty_date: moment(),
         release_time: moment().hour(23).minute(0),
       });
-      return;
     }
   }, [recentDuty]);
 
@@ -323,6 +322,7 @@ const DutyCatalog = () => {
       });
     }
   }, [envList, detail]);
+
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>
       <div className={styles.dutyCatalog} id={'dutyForm'}>
@@ -330,6 +330,7 @@ const DutyCatalog = () => {
           <h3>{title}</h3>
           <Button
             type={'text'}
+            disabled={!visible}
             style={{
               position: 'absolute',
               right: 0,
@@ -345,13 +346,13 @@ const DutyCatalog = () => {
             }
             onClick={() => {
               setVisible(false);
-              onShort();
+              onScreenShot();
             }}
           >
             一键推送
           </Button>
         </div>
-        <Form form={form}>
+        <Form form={form} onBlur={onSave}>
           <table className={styles.table}>
             <thead>
               <tr>

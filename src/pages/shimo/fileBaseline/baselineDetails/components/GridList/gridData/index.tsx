@@ -10,6 +10,7 @@ const getParentPathByChild = (data: any, node: any, rt_pathArray: any, rt_allGri
     const current = data[i];
     rt_pathArray.push(current.name);
 
+    // 需要同时判断文件名字和文件格式
     if (current.file_format !== "folder" && data[i].name === node.name && data[i].file_format === node.file_format) {
       const fileOrder = (rt_pathArray.length) + 1;
       // 需要先删除掉rt_allGrid中>currentIndex的file，如果不删除，之前的数据会依旧存在rt_allGrid中

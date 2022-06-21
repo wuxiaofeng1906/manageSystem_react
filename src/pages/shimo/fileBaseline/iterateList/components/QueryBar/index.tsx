@@ -69,9 +69,6 @@ const QueryBar: React.FC<any> = () => {
     setListData(dts);
   }
 
-  // treeSelect 默认参数
-
-
   useEffect(() => {
     updateGrid();
   }, [queryInfo]);

@@ -1,6 +1,6 @@
 ﻿// @ts-ignore
-import {MenuDataItem} from '@@/plugin-layout/runtime';
-import {ProjectKpiRoute} from './routes-tj';
+import { MenuDataItem } from '@@/plugin-layout/runtime';
+import { ProjectKpiRoute } from './routes-tj';
 
 export default [
   {
@@ -327,7 +327,7 @@ export default [
                 component: './kpi/performance/service/avgEstablishTime',
               },
             ],
-          }
+          },
         ],
       },
       {
@@ -426,7 +426,7 @@ export default [
         path: 'sonar',
         access: 'sonarCheck',
         component: './checkTools/sonar',
-      }
+      },
     ],
   },
   {
@@ -449,20 +449,36 @@ export default [
         icon: 'table',
         path: 'dutyPlan',
         component: './onDutyAndRelease/dutyPlan',
-      }, {
+      },
+      {
+        name: '值班列表',
+        icon: 'table',
+        path: 'dutyList',
+        component: './onDutyAndRelease/dutyDirectory/dutyList',
+      },
+      {
+        name: '值班名单',
+        icon: 'table',
+        path: 'dutyCatalog/:id',
+        hideInMenu: true,
+        component: './onDutyAndRelease/dutyDirectory/dutyCatalog',
+      },
+      {
         name: '发布过程',
         icon: 'table',
         path: 'preRelease',
         component: './onDutyAndRelease/preRelease',
-      }, {
+      },
+      {
         name: '发布历史',
         icon: 'table',
         path: 'releaseHistory',
         component: './onDutyAndRelease/releaseHistory',
-      }
+      },
     ],
-  }, {
-    name: "禅道管理",
+  },
+  {
+    name: '禅道管理',
     icon: 'table',
     path: '/zentao',
     // hideInMenu: true,
@@ -472,33 +488,37 @@ export default [
         icon: 'table',
         path: 'peopleExcuteSetting',
         component: './zentao/peopleExcuteSetting',
-        access: 'sysAdmin',  // 管理员可见
+        access: 'sysAdmin', // 管理员可见
       },
       {
         name: '禅道模板',
         icon: 'table',
         path: 'templateList',
         component: './zentao/zentaoTemplate/templateList',
-        access: 'sysAdmin',  // 管理员可见
-      }, {
+        access: 'sysAdmin', // 管理员可见
+      },
+      {
         name: '禅道任务模板',
         icon: 'table',
         path: 'editTemplate',
         component: './zentao/zentaoTemplate/editTemplate',
-        hideInMenu: true
-      }, {
+        hideInMenu: true,
+      },
+      {
         name: '禅道任务生成（上线检查）',
         icon: 'table',
         path: 'btForCheckBeforeOnline',
         component: './zentao/zentaoTemplate/btForCheckBeforeOnline',
-        hideInMenu: true
-      }, {
+        hideInMenu: true,
+      },
+      {
         name: '禅道任务生成（项目计划）',
         icon: 'table',
         path: 'btForProjectTemplate',
         component: './zentao/zentaoTemplate/btForProjectTemplate',
-        hideInMenu: true
-      }, {
+        hideInMenu: true,
+      },
+      {
         name: '禅道任务分解',
         icon: 'table',
         path: 'taskDecomposition',
@@ -506,9 +526,10 @@ export default [
         access: 'devCenter', // 研发中心可见
         // hideInMenu: true
       },
-    ]
-  }, {
-    name: "石墨管理",
+    ],
+  },
+  {
+    name: '石墨管理',
     icon: 'table',
     path: '/shimo',
     hideInMenu: false,
@@ -531,10 +552,10 @@ export default [
             path: 'baselineDetails',
             component: './shimo/fileBaseline/baselineDetails',
             hideInMenu: true,
-          }
-        ]
-      }
-    ]
+          },
+        ],
+      },
+    ],
   },
   {
     name: '系统管理',

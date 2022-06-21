@@ -9,32 +9,30 @@
 // 测试服务器地址
 export default {
   dev: {
-
     '/api/verify/': {
       target: 'http://10.0.144.53:5000/',
       changeOrigin: true,
-      pathRewrite: {'^': ''},
+      pathRewrite: { '^': '' },
     },
     '/api/': {
       target: 'http://10.0.144.53:8300/',
       changeOrigin: true,
-      pathRewrite: {'^': ''},
+      pathRewrite: { '^': '' },
     },
   },
 
   // 本地测试地址
   test: {
     '/api/verify/': {
-      target: 'http://192.168.11.184:5001/',
+      target: 'http://192.168.10.205:5001/',
       changeOrigin: true,
-      pathRewrite: {'^': ''},
+      pathRewrite: { '^': '' },
     },
     '/api/': {
       target: 'http://10.0.144.53:8300/',
       changeOrigin: true,
-      pathRewrite: {'^': ''},
+      pathRewrite: { '^': '' },
     },
-
   },
 
   // 正式环境地址
@@ -42,14 +40,13 @@ export default {
     '/api/verify/': {
       target: 'http://10.0.144.51:5000/',
       changeOrigin: true,
-      pathRewrite: {'^': ''},
+      pathRewrite: { '^': '' },
     },
     '/api/': {
       // target: 'http://dms.q7link.com:8300/',
       target: 'http://rd.q7link.com:8300/',
       changeOrigin: true,
-      pathRewrite: {'^': ''},
+      pathRewrite: { '^': '' },
     },
   },
-
 };

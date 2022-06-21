@@ -1,0 +1,102 @@
+.dutyCatalog{
+  background: white;
+  height: 100%;
+  padding: 20px;
+  .header{
+    position: relative;
+    margin-bottom: 20px;
+    h3{
+      margin: 0;
+      text-align: center;
+    }
+  }
+  .table{
+    width: 100%;
+    height: max-content;
+    //table-layout: fixed;
+    :global{
+      tr{
+        td,th{
+          border: 1px solid #ccc;
+          .ant-select,.ant-picker{
+            padding: 0;
+            width:100%;
+            height: 100%;
+          }
+          .ant-select-single:not(.ant-select-customize-input) .ant-select-selector{
+            height: 100%;
+            padding: 0;
+          }
+          .ant-form-item{
+            height: 100%;
+            margin-bottom: 0;
+            .ant-form-item-control-input-content,.ant-form-item-control-input{
+              height: 100%;
+            }
+          }
+          .ant-select:not(.ant-select-customize-input) .ant-select-selector{
+            border:none
+          }
+        }
+        th{
+          text-align: left;
+          &:nth-child(odd){
+            background: #f0f2f5;
+            width: 80px;
+            text-align: center;
+          }
+          .ant-select-selection-overflow-item{
+            width: 100%;
+            background: white;
+            .ant-select-selection-item{
+              border:none;
+              background: white !important;
+            }
+          }
+          .ant-select-selection-overflow-item-suffix{
+            display: none;
+          }
+          &:nth-child(4){
+            .ant-form-item-control-input-content{
+              display: flex;
+              justify-content: center;
+              flex-direction: column;
+            }
+          }
+        }
+        td{
+          line-height: 50px;
+
+          &:first-child{
+            background: #f0f2f5;
+            font-weight: bold;
+            text-align: center;
+          }
+          .ant-select{
+            padding: 0;
+            width:100%;
+            height: 100%;
+          }
+
+        }
+        .ant-select:not(.ant-select-customize-input) .ant-select-selector{
+          //border:none;
+          height: 100%;
+        }
+      }
+    }
+
+  }
+}
+.dutyList{
+  background: white;
+  padding:10px;
+  margin-top: -10px;
+  .dutyListForm{
+    :global{
+      .ant-form-item{
+        margin-bottom: 0;
+      }
+    }
+  }
+}

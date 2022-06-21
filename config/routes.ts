@@ -469,6 +469,19 @@ export default [
         component: './onDutyAndRelease/dutyPlan',
       },
       {
+        name: '值班列表',
+        icon: 'table',
+        path: 'dutyList',
+        component: './onDutyAndRelease/dutyDirectory/dutyList',
+      },
+      {
+        name: '值班名单',
+        icon: 'table',
+        path: 'dutyCatalog/:id',
+        hideInMenu: true,
+        component: './onDutyAndRelease/dutyDirectory/dutyCatalog',
+      },
+      {
         name: '发布过程',
         icon: 'table',
         path: 'preRelease',

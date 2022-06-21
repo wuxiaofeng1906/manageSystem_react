@@ -69,6 +69,9 @@ const QueryBar: React.FC<any> = () => {
     setListData(dts);
   }
 
+  // treeSelect 默认参数
+
+
   useEffect(() => {
     updateGrid();
   }, [queryInfo]);
@@ -79,14 +82,18 @@ const QueryBar: React.FC<any> = () => {
           <Col span={8}>
             <Form.Item label="部门/组" name={"dept"}>
               <TreeSelect className={"deptTree"}
-                          {...defaultTreeSelectParams} treeData={deptList}
+                          {...defaultTreeSelectParams}
+                          showCheckedStrategy={'SHOW_PARENT'}
+                          treeData={deptList}
                           onChange={iterDeptChanged}/>
             </Form.Item>
           </Col>
           <Col span={8}>
             <Form.Item label="迭代名称" name={"iterName"}>
               <TreeSelect className={"iterName"}
-                          {...defaultTreeSelectParams} treeData={iterateList}
+                          {...defaultTreeSelectParams}
+                          showCheckedStrategy={'SHOW_PARENT'}
+                          treeData={iterateList}
                           onChange={iterNameChanged}/>
             </Form.Item>
           </Col>
@@ -94,6 +101,7 @@ const QueryBar: React.FC<any> = () => {
             <Form.Item label="迭代状态" name={"iterStatus"}>
               <TreeSelect className={"iterStatus"}
                           {...defaultTreeSelectParams}
+                          showCheckedStrategy={'SHOW_PARENT'}
                           placeholder="默认选择未关闭"
                           treeData={iterateStatusList}
                           onChange={iterStatusChanged}/>
@@ -106,7 +114,9 @@ const QueryBar: React.FC<any> = () => {
           <Col span={8}>
             <Form.Item label="SQA" name={"SQA"} style={{marginLeft: 20}}>
               <TreeSelect className={"SQA"}
-                          {...defaultTreeSelectParams} treeData={sqaList}
+                          {...defaultTreeSelectParams}
+                          showCheckedStrategy={'SHOW_PARENT'}
+                          treeData={sqaList}
                           onChange={iterSQAChanged}/>
             </Form.Item>
           </Col>

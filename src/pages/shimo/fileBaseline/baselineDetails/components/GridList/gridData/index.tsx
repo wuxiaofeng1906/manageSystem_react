@@ -10,8 +10,8 @@ const getParentPathByChild = (data: any, node: any, rt_pathArray: any, rt_allGri
     const current = data[i];
     rt_pathArray.push(current.name);
 
-    // 需要同时判断文件名字和文件格式
-    if (current.file_format !== "folder" && data[i].name === node.name && data[i].file_format === node.file_format) {
+    // 需要同时判断文件名字和文件格式以及父id
+    if (current.file_format !== "folder" && data[i].name === node.name && data[i].file_format === node.file_format&& data[i].parent === node.parent) {
       const fileOrder = (rt_pathArray.length) + 1;
       // 需要先删除掉rt_allGrid中>currentIndex的file，如果不删除，之前的数据会依旧存在rt_allGrid中
       const gridKeys = Object.keys(rt_allGrid);
@@ -75,6 +75,7 @@ const getParentPathByChild = (data: any, node: any, rt_pathArray: any, rt_allGri
 
 // 递归解析数据
 const getChildData = (oraData: any, childData: any, gridResult: any, filedArrayLength: any, basetimeLength: any) => {
+
   childData.forEach((field: any) => {
     if (field.file_format === "folder") { // 是文件夹，表示还有下一层children，继续遍历。
       if (field.children) {
@@ -86,6 +87,7 @@ const getChildData = (oraData: any, childData: any, gridResult: any, filedArrayL
       const rt_pathArray: any = [];
       const rt_basetimeArray: any = [];
       const rt_allGrid: any = {};
+
       getParentPathByChild(oraData, field, rt_pathArray, rt_allGrid, rt_basetimeArray);
 
       gridResult.push(rt_allGrid);

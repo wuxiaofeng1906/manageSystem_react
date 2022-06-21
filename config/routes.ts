@@ -268,7 +268,7 @@ export default [
                 icon: 'table',
                 path: 'bugRateConvergency',
                 component: './kpi/performance/testers/bugRateConvergency',
-                hideInMenu: true,
+                // hideInMenu: true,
               },
               {
                 name: '用例执行率',

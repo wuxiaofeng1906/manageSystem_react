@@ -45,7 +45,15 @@
             width: 80px;
             text-align: center;
           }
+          &:nth-child(2){
+            .ant-select-selection-overflow-item{
+              &:first-child{
+                display: none;
+              }
+            }
+          }
           .ant-select-selection-overflow-item{
+
             width: 100%;
             background: white;
             .ant-select-selection-item{
@@ -62,6 +70,12 @@
               justify-content: center;
               flex-direction: column;
             }
+          }
+          .ant-select-single .ant-select-selector .ant-select-selection-item, .ant-select-single .ant-select-selector .ant-select-selection-placeholder{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-top: 30px;
           }
         }
         td{

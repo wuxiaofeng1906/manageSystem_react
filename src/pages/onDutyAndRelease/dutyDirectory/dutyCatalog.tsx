@@ -65,6 +65,7 @@ const DutyCatalog = () => {
   const [visible, setVisible] = useState(true);
   const [recentDuty, setRecentDuty] = useState<Record<string, any>>();
   const [loading, setLoading] = useState(false);
+  const [detail, setDetail] = useState<Record<string, any>>();
   const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
 
   const [form] = Form.useForm();
@@ -94,10 +95,18 @@ const DutyCatalog = () => {
         (it: any) =>
           it.duty_order == '1' && Object.keys(recentType).includes(it.user_tech) && it.user_name,
       );
+    const first = envs
+      ?.filter((it: any) => !['cn-northwest-global'].includes(it.env))
+      .map((it: any) => it.env)
+      ?.join();
+    const second = envs
+      ?.filter((it: any) => !['cn-northwest-global', 'cn-northwest-1'].includes(it.env))
+      .map((it: any) => it.env)
+      ?.join();
     setEnvList(
       [
-        { value: '2-7', label: '集群2-7' },
-        { value: '1-7', label: '集群1-7' },
+        { value: first, label: '集群1-7', key: first },
+        { value: second, label: '集群2-7', key: second },
       ].concat(envs.map((it: any) => ({ value: it.env, label: it.env_name, key: it.env }))),
     );
     setMethodList(
@@ -149,9 +158,23 @@ const DutyCatalog = () => {
   };
 
   const onShort = async () => {
+    const errTip = {
+      project_ids: '请填写项目名称!',
+      project_pm: '请填写负责人!',
+      duty_date: '请填写值班日期!',
+      release_time: '请填写发布时间!',
+      release_env: '请填写发布环境!',
+      front: '请填写前端值班人员!',
+      backend: '请填写后端值班人员!',
+      test: '请填写测试值班人员!',
+      operations: '请填写运维值班人员!',
+      sqa: '请填写SQA值班人员!',
+    };
     const values = await form.getFieldsValue();
-    if (Object.values(values).some((it) => isEmpty(it))) {
-      message.warning('所有数据均为必填项，请仔细填写');
+    const valid = Object.values(values).some((it) => isEmpty(it));
+    if (valid) {
+      const errArr = Object.entries(values).find(([k, v]) => isEmpty(v)) as any[];
+      message.warning(errTip[errArr?.[0]]);
       setVisible(true);
       return;
     }
@@ -169,7 +192,7 @@ const DutyCatalog = () => {
         formData.append('file', file);
         formData.append('person_duty_num', id);
         formData.append('user_id', currentUser?.userid ?? '');
-        const res = await DutyListServices.pushWechat(formData);
+        // await DutyListServices.pushWechat(formData);
       });
       setVisible(true);
     });
@@ -178,20 +201,9 @@ const DutyCatalog = () => {
   const onSave = async () => {
     const values = await form.getFieldsValue();
     let release_env = '';
-    if (values.release_env?.includes('2-7')) {
-      release_env = envList
-        ?.filter(
-          (it) => !['cn-northwest-global', 'cn-northwest-1', '2-7', '1-7'].includes(it.value),
-        )
-        .map((it) => it.value)
-        ?.join();
-    } else if (values.release_env?.includes('1-7')) {
-      release_env = envList
-        ?.filter((it) => !['cn-northwest-global', '1-7', '2-7'].includes(it.value))
-        .map((it) => it.value)
-        ?.join();
-    } else release_env = uniqWith(values?.release_env, isEqual)?.join();
-
+    if (!isEmpty(values?.release_env)) {
+      release_env = Array.from(new Set(values?.release_env))?.join(',');
+    }
     const data = {
       person_duty_num: id,
       duty_name: title,
@@ -199,7 +211,7 @@ const DutyCatalog = () => {
       duty_date: moment(values.duty_date).format('YYYY-MM-DD'),
       project_ids: values.project_ids?.join(),
       project_pm: user?.map((it: any) => it.user_id)?.join(),
-      release_env,
+      release_env: Array.from(new Set(release_env.split(',')))?.join(','),
       release_method: values.release_method,
       release_time: moment(values.release_time).format('YYYY-MM-DD HH:mm:ss'),
       front: values.front?.map((it: any) => ({
@@ -231,43 +243,10 @@ const DutyCatalog = () => {
     setLoading(true);
     try {
       const res = await DutyListServices.getDutyDetail({ person_duty_num: id });
-      setLoading(false);
-      if (isEmpty(res)) return;
-      let release_env = [];
-      const first = envList?.filter(
-        (it) => !['cn-northwest-global', '2-7', '1-7'].includes(it.value),
-      );
-      const second = envList?.filter(
-        (it) => !['cn-northwest-global', '2-7', '1-7', 'cn-northwest-1'].includes(it.value),
-      );
-      if (!isEmpty(envList)) {
-        if (isEqual(res.release_env?.split(','), first)) {
-          release_env = ['1-7'];
-        } else if (isEqual(res.release_env?.split(','), second)) {
-          release_env = ['2-7'];
-        } else
-          release_env =
-            res.release_env == 'unknown' || !res.release_env
-              ? undefined
-              : res?.release_env?.split(',');
-      }
+      setDetail(res);
       setUser(res?.project_pm);
-
       setTitle(res?.duty_name);
-      form.setFieldsValue({
-        front: res?.front?.map((it: any) => `${it.user_id}_${it.user_type}`),
-        backend: res?.backend?.map((it: any) => `${it.user_id}_${it.user_type}`),
-        test: res?.test?.map((it: any) => `${it.user_id}_${it.user_type}`),
-        sqa: res?.sqa?.map((it: any) => `${it.user_id}_${it.user_type}`),
-        operations: res?.operations?.map((it: any) => `${it.user_id}_${it.user_type}`),
-        project_ids: res?.project_ids?.split(','),
-        project_pm: res?.project_pm?.map((it: any) => it.user_id),
-        release_time: moment(res?.release_time),
-        duty_date: moment(res?.duty_date),
-        release_env,
-        release_method:
-          res.release_method == 'unknown' || !res.release_method ? undefined : res.release_method,
-      });
+      setLoading(false);
     } catch (e) {
       setLoading(false);
     }
@@ -284,10 +263,6 @@ const DutyCatalog = () => {
   };
 
   useEffect(() => {
-    form.setFieldsValue({ duty_date: moment(), release_time: moment().hour(23).minute(0) });
-  }, []);
-
-  useEffect(() => {
     if (recentDuty) {
       form.setFieldsValue({
         front: [`${recentDuty.front.value}_${recentDuty.front.type}`],
@@ -295,6 +270,8 @@ const DutyCatalog = () => {
         test: [`${recentDuty.test.value}_${recentDuty.test.type}`],
         sqa: [`${recentDuty.sqa.value}_${recentDuty.sqa.type}`],
         operations: [`${recentDuty.operations.value}_${recentDuty.operations.type}`],
+        duty_date: moment(),
+        release_time: moment().hour(23).minute(0),
       });
       return;
     }
@@ -306,6 +283,46 @@ const DutyCatalog = () => {
     });
   }, [id]);
 
+  useEffect(() => {
+    let release_env: string[] =
+      detail?.release_env == 'unknown' || !detail?.release_env
+        ? undefined
+        : detail?.release_env.split(',');
+    const env = detail?.release_env?.split(',');
+    if (!isEmpty(envList) && !isEmpty(detail)) {
+      const first = envList[0].key?.split(',');
+      const second = envList[1].key?.split(',');
+      const global = ['cn-northwest-global'];
+      if (isEqual(env, first)) {
+        release_env = [first.join(',')];
+      }
+      if (isEqual(env, second)) {
+        release_env = [second.join(',')];
+      }
+      if (isEqual(env, first.concat(global))) {
+        release_env = [first.join(','), global.join()];
+      }
+      if (isEqual(env, second.concat(global))) {
+        release_env = [second.join(','), global.join()];
+      }
+      form.setFieldsValue({
+        front: detail?.front?.map((it: any) => `${it.user_id}_${it.user_type}`),
+        backend: detail?.backend?.map((it: any) => `${it.user_id}_${it.user_type}`),
+        test: detail?.test?.map((it: any) => `${it.user_id}_${it.user_type}`),
+        sqa: detail?.sqa?.map((it: any) => `${it.user_id}_${it.user_type}`),
+        operations: detail?.operations?.map((it: any) => `${it.user_id}_${it.user_type}`),
+        project_ids: detail?.project_ids?.split(','),
+        project_pm: detail?.project_pm?.map((it: any) => it.user_id),
+        release_time: moment(detail?.release_time),
+        duty_date: moment(detail?.duty_date),
+        release_env,
+        release_method:
+          detail?.release_method == 'unknown' || !detail?.release_method
+            ? undefined
+            : detail?.release_method,
+      });
+    }
+  }, [envList, detail]);
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>
       <div className={styles.dutyCatalog} id={'dutyForm'}>

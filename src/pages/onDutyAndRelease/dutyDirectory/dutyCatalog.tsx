@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useModel } from 'umi';
 import DutyListServices from '@/services/dutyList';
 import html2canvas from 'html2canvas';
-import { isEmpty, isEqual, uniqWith } from 'lodash';
+import { isEmpty, isEqual, omit } from 'lodash';
 import moment from 'moment';
 const opts = {
   showSearch: true,
@@ -41,11 +41,14 @@ const FilterSelector = ({
               bordered={false}
               placeholder={placeholder}
               removeIcon={''}
-              options={[{ ...init, label: init.name }].concat(options).map((it: any) => ({
-                ...it,
-                value: `${it.value}_${it.type}`,
-                disabled: getFieldValue(name)?.includes(it.fit),
-              }))}
+              options={[{ ...init, label: init.name }]
+                .concat(options)
+                .map((it: any) => ({
+                  ...it,
+                  value: `${it.value}_${it.type}`,
+                  disabled: getFieldValue(name)?.includes(it.fit),
+                }))
+                .filter((it) => it.type == 'head' || it.key !== init.key)}
             />
           </Form.Item>
         );
@@ -70,11 +73,6 @@ const DutyCatalog = () => {
 
   const [form] = Form.useForm();
   // scene(现场) remote(远程) head(负责人)
-
-  const resetArr = (arr1: any[], arr2: any[]) => {
-    var set = arr2.map((item) => item.user_id);
-    return arr1.filter((item) => !set.includes(item.value));
-  };
 
   const getSource = async () => {
     const params = {
@@ -192,7 +190,7 @@ const DutyCatalog = () => {
         formData.append('file', file);
         formData.append('person_duty_num', id);
         formData.append('user_id', currentUser?.userid ?? '');
-        // await DutyListServices.pushWechat(formData);
+        await DutyListServices.pushWechat(formData);
       });
       setVisible(true);
     });
@@ -213,7 +211,9 @@ const DutyCatalog = () => {
       project_pm: user?.map((it: any) => it.user_id)?.join(),
       release_env: Array.from(new Set(release_env.split(',')))?.join(','),
       release_method: values.release_method,
-      release_time: moment(values.release_time).format('YYYY-MM-DD HH:mm:ss'),
+      release_time: `${moment(values.duty_date).format('YYYY-MM-DD')} ${moment(
+        values.release_time,
+      ).format('HH:mm:ss')}`,
       front: values.front?.map((it: any) => ({
         user_type: it?.split('_')?.[1],
         user_id: it?.split('_')?.[0],
@@ -235,21 +235,24 @@ const DutyCatalog = () => {
         user_id: it?.split('_')?.[0],
       })),
     };
+    const flag = isEqual(omit(data, 'user_id'), {
+      ...detail,
+      project_pm: detail?.project_pm?.map((it: any) => it.user_id).join(),
+    });
+    if (flag) return;
     await DutyListServices.addDuty(data);
     getDetail();
   };
 
   const getDetail = async () => {
-    setLoading(true);
-    try {
-      const res = await DutyListServices.getDutyDetail({ person_duty_num: id });
-      setDetail(res);
-      setUser(res?.project_pm);
-      setTitle(res?.duty_name);
-      setLoading(false);
-    } catch (e) {
-      setLoading(false);
+    const res = await DutyListServices.getDutyDetail({ person_duty_num: id });
+    if (isEmpty(res)) {
+      form.setFieldsValue({ duty_date: moment(), release_time: moment().hour(23).minute(0) });
+      return;
     }
+    setDetail(res);
+    setUser(res?.project_pm);
+    res?.duty_name && setTitle(res?.duty_name);
   };
 
   const updateTitle = async () => {
@@ -270,16 +273,19 @@ const DutyCatalog = () => {
         test: [`${recentDuty?.test.value}_${recentDuty?.test.type}`],
         sqa: [`${recentDuty?.sqa.value}_${recentDuty?.sqa.type}`],
         operations: [`${recentDuty?.operations.value}_${recentDuty?.operations.type}`],
-        duty_date: moment(),
-        release_time: moment().hour(23).minute(0),
       });
     }
   }, [recentDuty]);
 
   useEffect(() => {
-    getSource().then((res) => {
+    try {
+      setLoading(true);
+      getSource();
       getDetail();
-    });
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+    }
   }, [id]);
 
   useEffect(() => {
@@ -312,7 +318,11 @@ const DutyCatalog = () => {
         operations: detail?.operations?.map((it: any) => `${it.user_id}_${it.user_type}`),
         project_ids: detail?.project_ids?.split(','),
         project_pm: detail?.project_pm?.map((it: any) => it.user_id),
-        release_time: moment(detail?.release_time),
+        release_time: moment(
+          `${moment(detail?.duty_date).format('YYYY-MM-DD')} ${moment(detail?.release_time).format(
+            'HH:mm:ss',
+          )}`,
+        ),
         duty_date: moment(detail?.duty_date),
         release_env,
         release_method:

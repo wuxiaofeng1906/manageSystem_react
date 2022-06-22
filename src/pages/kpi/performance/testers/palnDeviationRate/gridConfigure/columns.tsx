@@ -18,7 +18,7 @@ const dataRender = (params: any) => {
   const node = params.data;
 
   if (params.value) {
-    let result = customRound(params.value, 4);
+    let result = customRound(params.value, 2);
     if ((node.Group)[0] === "代码量") {
       result = params.value;
     }

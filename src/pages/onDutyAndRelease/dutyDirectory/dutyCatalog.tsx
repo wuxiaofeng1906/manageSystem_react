@@ -392,7 +392,7 @@ const DutyCatalog = () => {
                           (it: any, index: number) =>
                             it.user_id && (
                               <p
-                                key={it.user_id}
+                                key={it.user_id + index}
                                 style={{ margin: '5px 0', fontWeight: 'initial' }}
                               >
                                 {`${it?.user_name}${

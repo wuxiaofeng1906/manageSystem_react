@@ -434,7 +434,8 @@ const DutyCatalog = () => {
                             options={limitEnv}
                             mode={'multiple'}
                             onSelect={updateTitle}
-                            onDropdownVisibleChange={(open) => !open && onSave()}
+                            onDeselect={onSave}
+                            onBlur={onSave}
                           />
                         </Form.Item>
                       );
@@ -449,7 +450,7 @@ const DutyCatalog = () => {
                       bordered={false}
                       showSearch={false}
                       showArrow={false}
-                      onBlur={onSave}
+                      onChange={onSave}
                     />
                   </Form.Item>
                 </th>

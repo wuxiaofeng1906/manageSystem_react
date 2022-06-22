@@ -183,6 +183,7 @@ const DutyCatalog = () => {
       duty_date: '请填写值班日期!',
       release_time: '请填写发布时间!',
       release_env: '请填写发布环境!',
+      release_method: '请填写发布方式!',
       front: '请填写前端值班人员!',
       backend: '请填写后端值班人员!',
       test: '请填写测试值班人员!',

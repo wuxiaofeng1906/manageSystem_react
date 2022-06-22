@@ -22,9 +22,8 @@ const recentType = {
 };
 const envType = {
   '集群1-7':
-    'cn-northwest-1,cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7',
-  '集群2-7':
-    'cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7',
+    'cn-northwest-1cn-northwest-2cn-northwest-3cn-northwest-4cn-northwest-5cn-northwest-6cn-northwest-7',
+  '集群2-7': 'cn-northwest-2cn-northwest-3cn-northwest-4cn-northwest-5cn-northwest-6cn-northwest-7',
   global: 'cn-northwest-global',
 };
 
@@ -246,7 +245,11 @@ const DutyCatalog = () => {
         user_id: it?.split('_')?.[0],
       })),
     };
-    const flag = isEqual(omit(data, 'user_id'), detail);
+    const flag = isEqual(omit(data, 'user_id'), {
+      ...detail,
+      project_pm: detail?.project_pm?.map((it: any) => it.user_id).join(),
+      release_method: detail?.release_method == 'unknown' ? undefined : detail?.release_method,
+    });
     if (flag) return;
     await DutyListServices.addDuty(data);
     getDetail();
@@ -258,7 +261,10 @@ const DutyCatalog = () => {
       const res = await DutyListServices.getDutyDetail({ person_duty_num: id });
       setLoading(false);
       if (isEmpty(res)) {
-        form.setFieldsValue({ duty_date: moment(), release_time: moment().hour(23).minute(0) });
+        form.setFieldsValue({
+          duty_date: moment(),
+          release_time: moment().hour(23).minute(0).second(0),
+        });
         return;
       }
       setDetail(res);
@@ -270,11 +276,7 @@ const DutyCatalog = () => {
         operations: res?.operations?.map((it: any) => `${it.user_id}_${it.user_type}`),
         project_ids: res?.project_ids ? res?.project_ids?.split(',') : undefined,
         project_pm: res?.project_pm,
-        release_time: moment(
-          `${moment(res?.duty_date).format('YYYY-MM-DD')} ${moment(detail?.release_time).format(
-            'HH:mm:ss',
-          )}`,
-        ),
+        release_time: moment(res?.release_time),
         duty_date: moment(res?.duty_date),
         release_env:
           res?.release_env == 'unknown' || !res?.release_env

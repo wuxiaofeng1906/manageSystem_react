@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, history } from 'umi';
+import { history } from 'umi';
 import { Form, DatePicker, Row, Col, Button, Select } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import dayjs from 'dayjs';
 import { AgGridReact } from 'ag-grid-react';
 import { FolderAddTwoTone } from '@ant-design/icons';
 import dutyColumn from '@/pages/onDutyAndRelease/dutyDirectory/column';
-import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import styles from './index.less';
 import DutyListServices from '@/services/dutyList';
 const DutyList = () => {
@@ -43,7 +43,7 @@ const DutyList = () => {
     <PageContainer>
       <div className={styles.dutyList}>
         <Form className={styles.dutyListForm} form={form}>
-          <Row justify={'space-between'}>
+          <Row justify={'space-between'} style={{ marginBottom: 5 }}>
             <Col>
               <Form.Item>
                 <Button
@@ -98,16 +98,6 @@ const DutyList = () => {
             suppressRowTransform={true}
             onGridReady={onGridReady}
             onGridSizeChanged={onGridReady}
-            frameworkComponents={{
-              dutyName: ({ data }: CellClickedEvent) => (
-                <Link
-                  style={{ textDecoration: 'underline' }}
-                  to={`/onDutyAndRelease/dutyCatalog/${data.person_duty_num}`}
-                >
-                  {data.duty_name}
-                </Link>
-              ),
-            }}
           />
         </div>
       </div>

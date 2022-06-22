@@ -9,6 +9,7 @@ import dutyColumn from '@/pages/onDutyAndRelease/dutyDirectory/column';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import styles from './index.less';
 import DutyListServices from '@/services/dutyList';
+import moment from 'moment';
 const DutyList = () => {
   const [list, setList] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
@@ -35,6 +36,9 @@ const DutyList = () => {
     );
   };
   useEffect(() => {
+    form.setFieldsValue({
+      time: [moment().startOf('month'), moment().endOf('month')],
+    });
     getProjects();
     getList();
   }, []);

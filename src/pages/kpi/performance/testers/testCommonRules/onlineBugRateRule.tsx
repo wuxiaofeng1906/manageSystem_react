@@ -44,37 +44,43 @@ export const planDevRateRuleColumns: any = [
   {
     title: '部门',
     dataIndex: 'dept',
+    width: 70,
   },
   {
     title: '项目范围',
     dataIndex: 'projectRange',
-    onCell: (params: any, index: number) => {
-
-      debugger;
+    render: (value: any, row: any, index: number) => {
+      const obj: any = {
+        children: value,
+        props: {},
+      };
       if (index === 0) {
-        return {rowSpan: 2};
+        obj.props.rowSpan = 2;
+      } else if (index === 2) {
+        obj.props.rowSpan = 5;
+      } else {
+        obj.props.rowSpan = 0; // 其他行不进行渲染
       }
-
-      if (index === 2) {
-        return {rowSpan: 5};
-      }
-      return {};
-    },
+      return obj;
+    }
   },
   {
     title: '补充说明',
     dataIndex: 'instructions',
-    onCell: (params: any, index: number) => {
-      debugger;
+    render: (value: any, row: any, index: number) => {
+      const obj: any = {
+        children: value,
+        props: {},
+      };
       if (index === 0) {
-        return {rowSpan: 2};
+        obj.props.rowSpan = 2;
+      } else if (index === 2) {
+        obj.props.rowSpan = 5;
+      } else {
+        obj.props.rowSpan = 0; // 其他行不进行渲染
       }
-
-      if (index === 2) {
-        return {rowSpan: 5};
-      }
-      return {rowSpan: 1};
-    },
+      return obj;
+    }
   }
 ];
 

@@ -254,4 +254,40 @@ const converseForAgGrid_Convergency = (oraDatas: any) => {
   return converseArrayToOne(resultArray);
 };
 
-export {converseFormatForAgGrid, converseDataForAgGrid_code, converseForAgGrid_Convergency};
+
+// 使用界面：计划偏差率
+const converseForAgGrid_planDevition = (oraDatas: any) => {
+  if (!oraDatas) return [];
+  const resultArray: any = [];
+  // 解析部门数据
+  oraDatas.forEach((elements: any) => {
+    const starttime = elements.range.start;
+    // 新增研发中心数据
+    resultArray.push({
+      Group: ['研发中心'],
+      [starttime]: (elements.total.kpi)*100,
+      isDept: true
+    });
+
+    // 部门数据
+    const departDatas = elements.datas;
+    departDatas.forEach((depts: any) => {
+      const groups: any = [depts.deptName];
+      findParent(departDatas, depts, groups);
+      // 新增部门
+      resultArray.push({
+        Group: groups,
+        [starttime]: (depts.kpi)*100,
+        isDept: true
+      });
+    });
+  });
+  return converseArrayToOne(resultArray);
+};
+
+export {
+  converseFormatForAgGrid,
+  converseDataForAgGrid_code,
+  converseForAgGrid_Convergency,
+  converseForAgGrid_planDevition
+};

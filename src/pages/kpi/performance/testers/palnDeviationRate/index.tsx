@@ -112,6 +112,7 @@ const PlanDeviationRate: React.FC<any> = () => {
                 onClick={statisticsByQuarters}>按季统计</Button>
         <Button type="text" style={{color: 'black'}} icon={<AppstoreTwoTone/>} size={'large'}
                 onClick={statisticsByYear}>按年统计</Button>
+        <label style={{fontWeight: "bold"}}>(统计单位：%)</label>
         <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
                 size={'large'} onClick={showRules}>计算规则</Button>
       </div>

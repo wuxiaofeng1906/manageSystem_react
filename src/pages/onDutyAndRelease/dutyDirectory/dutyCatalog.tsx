@@ -153,9 +153,9 @@ const DutyCatalog = () => {
       );
       const formatProject = projects?.map((it: any) => ({
         ...it,
-        user: ['newfeature', 'enhancements'].includes(it.sprint_type)
-          ? it.user
-          : { user_id: initDutyObj?.backend?.key, user_name: initDutyObj?.backend?.label },
+        user: ['sprint', 'emergency', 'hotfix'].includes(it.sprint_type)
+          ? { user_id: initDutyObj?.backend?.key, user_name: initDutyObj?.backend?.label }
+          : it.user,
       }));
       setProjects(formatProject);
     } catch (e) {

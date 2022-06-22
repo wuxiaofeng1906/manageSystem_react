@@ -454,6 +454,7 @@ export default [
         name: '值班列表',
         icon: 'table',
         path: 'dutyList',
+        access: 'dutyManager',
         component: './onDutyAndRelease/dutyDirectory/dutyList',
       },
       {
@@ -461,6 +462,7 @@ export default [
         icon: 'table',
         path: 'dutyCatalog/:id',
         hideInMenu: true,
+        access: 'dutyManager',
         component: './onDutyAndRelease/dutyDirectory/dutyCatalog',
       },
       {

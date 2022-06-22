@@ -11,8 +11,17 @@ export default function access(initialState: { currentUser?: API.CurrentUser | u
       currentUser.access === 'devGroup' || currentUser.access === 'testGroup' || currentUser.access === 'projectListMG'
       || currentUser.access === 'frontManager'),
     // sonar扫描：超级管理员、开发经理/总监、开发人员组
-    sonarCheck: currentUser && (currentUser.access === 'superGroup' || currentUser.access === 'devManageGroup' ||
-      currentUser.access === 'devGroup' || currentUser.access === 'frontManager'),
-    frontManager: currentUser && (currentUser.access === 'superGroup' || currentUser.access === 'frontManager')
+    sonarCheck:
+      currentUser &&
+      (currentUser.access === 'superGroup' ||
+        currentUser.access === 'devManageGroup' ||
+        currentUser.access === 'devGroup' ||
+        currentUser.access === 'frontManager'),
+    frontManager:
+      currentUser && (currentUser.access === 'superGroup' || currentUser.access === 'frontManager'),
+    // 值班名单： 超级管理员、开发经理/总监、前端管理人员
+    dutyManager:
+      currentUser?.access &&
+      ['superGroup', 'devManageGroup', 'frontManager'].includes(currentUser.access),
   };
 }

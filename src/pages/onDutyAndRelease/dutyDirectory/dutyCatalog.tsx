@@ -1,10 +1,11 @@
+import React from 'react';
 import { Select, DatePicker, Button, Form, message, Spin } from 'antd';
 import styles from './index.less';
 import { useEffect, useState } from 'react';
 import { useParams, useModel } from 'umi';
 import DutyListServices from '@/services/dutyList';
 import html2canvas from 'html2canvas';
-import { isEmpty, isEqual, omit } from 'lodash';
+import { isEmpty, isEqual, omit, pick } from 'lodash';
 import moment from 'moment';
 import { SelectProps } from 'antd/lib/select';
 const opts = {
@@ -26,7 +27,13 @@ const envType = {
   '集群2-7': 'cn-northwest-2cn-northwest-3cn-northwest-4cn-northwest-5cn-northwest-6cn-northwest-7',
   global: 'cn-northwest-global',
 };
-
+const tbodyConfig = [
+  { title: '前端值班', name: 'front' },
+  { title: '后端值班', name: 'backend' },
+  { title: '测试值班', name: 'test' },
+  { title: '运维值班', name: 'operations' },
+  { title: 'SQA值班', name: 'sqa' },
+];
 const FilterSelector = ({
   options = [],
   name,
@@ -212,10 +219,19 @@ const DutyCatalog = () => {
 
   const onSave = async () => {
     const values = await form.getFieldsValue();
+    const pickDuty = pick(values, ['front', 'backend', 'test', 'operations', 'sqa']);
+    let dutyPersons: Record<string, any> = {};
+    Object.entries(pickDuty).forEach(([k, v]) => {
+      dutyPersons[k] = v?.map((it: string) => ({
+        user_type: it?.split('_')?.[1],
+        user_id: it?.split('_')?.[0],
+      }));
+    });
     const data = {
       person_duty_num: id,
       duty_name: title,
       user_id: currentUser?.userid,
+      ...dutyPersons,
       duty_date: moment(values.duty_date).format('YYYY-MM-DD'),
       project_ids: values.project_ids ? values.project_ids?.join() : undefined,
       project_pm: values.project_pm?.map((it: any) => it.user_id)?.join(),
@@ -224,26 +240,6 @@ const DutyCatalog = () => {
       release_time: `${moment(values.duty_date).format('YYYY-MM-DD')} ${moment(
         values.release_time,
       ).format('HH:mm:ss')}`,
-      front: values.front?.map((it: any) => ({
-        user_type: it?.split('_')?.[1],
-        user_id: it?.split('_')?.[0],
-      })),
-      backend: values.backend?.map((it: any) => ({
-        user_type: it?.split('_')?.[1],
-        user_id: it?.split('_')?.[0],
-      })),
-      test: values.test?.map((it: any) => ({
-        user_type: it?.split('_')?.[1],
-        user_id: it?.split('_')?.[0],
-      })),
-      sqa: values.sqa?.map((it: any) => ({
-        user_type: it?.split('_')?.[1],
-        user_id: it?.split('_')?.[0],
-      })),
-      operations: values.operations?.map((it: any) => ({
-        user_type: it?.split('_')?.[1],
-        user_id: it?.split('_')?.[0],
-      })),
     };
     const flag = isEqual(omit(data, 'user_id'), {
       ...detail,
@@ -465,79 +461,23 @@ const DutyCatalog = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>前端值班</td>
-                <td colSpan={11}>
-                  <FilterSelector
-                    options={allPerson}
-                    name={'front'}
-                    placeholder={'前端值班人员'}
-                    init={recentDuty?.front}
-                    onDeselect={onSave}
-                    onBlur={onSave}
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td>后端值班</td>
-                <td colSpan={11}>
-                  <Form.Item name={'backend'}>
-                    <FilterSelector
-                      init={recentDuty?.backend}
-                      options={allPerson}
-                      name={'backend'}
-                      placeholder={'后端值班人员'}
-                      onDeselect={onSave}
-                      onBlur={onSave}
-                    />
-                  </Form.Item>
-                </td>
-              </tr>
-              <tr>
-                <td>测试值班</td>
-                <td colSpan={11}>
-                  <Form.Item name={'test'}>
-                    <FilterSelector
-                      options={allPerson}
-                      name={'test'}
-                      placeholder={'测试值班人员'}
-                      init={recentDuty?.test}
-                      onDeselect={onSave}
-                      onBlur={onSave}
-                    />
-                  </Form.Item>
-                </td>
-              </tr>
-              <tr>
-                <td>运维值班</td>
-                <td colSpan={11}>
-                  <Form.Item name={'operations'}>
-                    <FilterSelector
-                      options={allPerson}
-                      name={'operations'}
-                      placeholder={'运维值班人员'}
-                      init={recentDuty?.operations}
-                      onDeselect={onSave}
-                      onBlur={onSave}
-                    />
-                  </Form.Item>
-                </td>
-              </tr>
-              <tr>
-                <td>SQA值班</td>
-                <td colSpan={11}>
-                  <Form.Item name={'sqa'}>
-                    <FilterSelector
-                      options={allPerson}
-                      name={'sqa'}
-                      placeholder={'SQA值班人员'}
-                      init={recentDuty?.sqa}
-                      onDeselect={onSave}
-                      onBlur={onSave}
-                    />
-                  </Form.Item>
-                </td>
-              </tr>
+              {tbodyConfig.map((config) => {
+                return (
+                  <tr key={config.name}>
+                    <td>{config.title}</td>
+                    <td colSpan={11}>
+                      <FilterSelector
+                        options={allPerson}
+                        name={config.name}
+                        placeholder={`${config.title}人员`}
+                        init={recentDuty?.[config.name]}
+                        onDeselect={onSave}
+                        onBlur={onSave}
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </Form>

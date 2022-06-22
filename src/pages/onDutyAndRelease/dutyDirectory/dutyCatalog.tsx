@@ -128,7 +128,7 @@ const DutyCatalog = () => {
           disabled: true,
           name: ['运维', 'SQA'].includes(o.user_tech)
             ? `${o.user_name}(远程)`
-            : `${o.user_name}(${o.user_tech}值班负责人：远程)`,
+            : `${o.user_name}(${o.user_tech}值班负责人)`,
           fit: `${o.user_id}_head`,
         };
       });

@@ -231,6 +231,11 @@ export default [
                 icon: 'table',
                 path: 'defectExclusionRate',
                 component: './kpi/performance/developer/defectExclusionRate',
+              }, {
+                name: '项目计划偏差率',
+                icon: 'table',
+                path: 'projectPlanDeviationRate',
+                component: './kpi/performance/developer/projectPlanDeviationRate',
               },
             ],
           },

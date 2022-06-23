@@ -246,7 +246,6 @@ const DutyCatalog = () => {
         values.release_time,
       ).format('HH:mm:ss')}`,
     };
-    console.log(data);
 
     const flag = isEqual(omit(data, 'user_id'), {
       ...detail,

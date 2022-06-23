@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {message, Progress, Row, Select, Modal} from 'antd';
+import {message, Progress, Row, Select, Modal, Button} from 'antd';
 import {useModel} from '@@/plugin-model/useModel';
 import {saveProcessResult} from './axiosRequest';
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
@@ -154,7 +154,15 @@ const CheckProgress: React.FC<any> = () => {
 
       {/* 发布结果确认弹出窗 */}
       <Modal title="发布结果确认" visible={isModalVisible.show} width={400}
-             onOk={handleOk} onCancel={handleCancel} centered={true}>
+             onCancel={handleCancel} centered={true}
+             footer={[
+               <Button key="cancle" onClick={handleCancel}>
+                 取消
+               </Button>,
+               <Button key="submit" type="primary" onClick={handleOk}>
+                 确定
+               </Button>,
+             ]}>
         <p>{isModalVisible.hintMsg}</p>
       </Modal>
 

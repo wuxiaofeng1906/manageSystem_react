@@ -12,12 +12,12 @@ const dutyColumn: (ColDef | ColGroupDef)[] = [
     field: 'duty_name',
     cellRenderer: (data) =>
       `<a style="color:#1890ff;text-decoration: underline" href='/onDutyAndRelease/dutyCatalog/${data.data.person_duty_num}'>${data.value}</a>`,
-    // minWidth: 170,
+    minWidth: 220,
   },
   {
     headerName: '项目名称',
     field: 'project_name',
-    // minWidth: 120,
+    minWidth: 140,
   },
   {
     headerName: '值班日期',
@@ -28,7 +28,7 @@ const dutyColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '发布环境',
     field: 'release_env',
-    minWidth: 120,
+    minWidth: 100,
   },
   {
     headerName: '发布方式',
@@ -44,7 +44,8 @@ const dutyColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '消息状态',
     field: 'push_status',
-    maxWidth: 140,
+    minWidth: 90,
+    maxWidth: 110,
     valueFormatter: ({ data }) =>
       data.is_push_msg ? (data.is_push_msg == 'yes' ? '已发' : '未发') : '',
   },
@@ -56,6 +57,7 @@ const dutyColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '发送人',
     field: 'user_name',
+    minWidth: 90,
     maxWidth: 110,
   },
 ];

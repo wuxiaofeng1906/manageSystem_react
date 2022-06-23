@@ -1,57 +1,68 @@
-import React from 'react';
-import {message, Progress, Row, Select} from 'antd';
+import React, {useState} from 'react';
+import {message, Progress, Row, Select, Modal, Button} from 'antd';
 import {useModel} from '@@/plugin-model/useModel';
 import {saveProcessResult} from './axiosRequest';
+import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 
 const {Option} = Select;
 
 const CheckProgress: React.FC<any> = () => {
   // 获取当前页面的进度数据
-  const {tabsData, processStatus, modifyProcessStatus, modifyOperteStatus, operteStatus} = useModel('releaseProcess');
+  const {tabsData, processStatus, modifyProcessStatus, operteStatus} = useModel('releaseProcess');
+  const [isModalVisible, setModalVisible] = useState({show: false, result: "", hintMsg: ""});
   // 发布结果修改
   const pulishResulttChanged = async (params: any) => {
+
     // 需要验证前面的检查是否全部成功(前三个成功即可)。
     if (processStatus.releaseProject === 'Gainsboro' ||
       processStatus.upgradeService === 'Gainsboro' ||
       processStatus.dataReview === 'Gainsboro') {
-      message.error({
-        content: '检查未全部完成，不能保存发布结果！',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
+      errorMessage('检查未全部完成，不能保存发布结果！');
       return;
     }
-    const result = await saveProcessResult(tabsData.activeKey, params);
+
+    let hintMsgs = "请确认是否修改服务发布结果为空！"
+    if (params === "1") {
+      hintMsgs = "请确认服务是否发布成功，如有自动化也执行通过!";
+    } else if (params === "2") {
+      hintMsgs = "请确认服务是否发布失败！";
+    }
+    setModalVisible({
+      hintMsg: hintMsgs,
+      result: params,
+      show: true
+    });
+
+  };
+
+  // 确认发布
+  const handleOk = async () => {
+    const result = await saveProcessResult(tabsData.activeKey, isModalVisible.result);
     if (result === '') {
-      message.info({
-        content: '发布结果保存成功！',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      sucMessage('发布结果保存成功！')
       modifyProcessStatus({
         ...processStatus,
-        releaseResult: params,
+        releaseResult: isModalVisible.result,
       });
-
-      // modifyOperteStatus(true);
+      setModalVisible({
+        ...isModalVisible,
+        result: "",
+        show: false
+      });
     } else {
-      message.error({
-        content: result,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage(result.toString())
     }
   };
-  // useEffect(()=>{
-  //   console.log("2222", tabsData);
-  // },[tabsData])
+
+  // 取消发布
+  const handleCancel = () => {
+    setModalVisible({
+      ...isModalVisible,
+      result: "",
+      show: false
+    });
+  };
+
   return (
     <div>
       {/* 检查进度 */}
@@ -140,6 +151,21 @@ const CheckProgress: React.FC<any> = () => {
           </label>
         </div>
       </div>
+
+      {/* 发布结果确认弹出窗 */}
+      <Modal title="发布结果确认" visible={isModalVisible.show} width={400}
+             onCancel={handleCancel} centered={true}
+             footer={[
+               <Button key="cancle" onClick={handleCancel}>
+                 取消
+               </Button>,
+               <Button key="submit" type="primary" onClick={handleOk}>
+                 确定
+               </Button>,
+             ]}>
+        <p>{isModalVisible.hintMsg}</p>
+      </Modal>
+
     </div>
   );
 };

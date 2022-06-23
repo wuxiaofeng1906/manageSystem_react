@@ -137,6 +137,8 @@ const iconCheckRender = (params: any) => {
     } else if (values.check_result === "否") {
       Color = '#8B4513';
       result = "不通过";
+    } else {
+      result = values.check_result;
     }
   } else if (values.check_status === "doing") {
     result = "执行中";

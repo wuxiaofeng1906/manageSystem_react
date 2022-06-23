@@ -133,9 +133,7 @@ const DutyCatalog = () => {
           key: o.user_id,
           type: 'head',
           disabled: true,
-          name: ['运维', 'SQA'].includes(o.user_tech)
-            ? `${o.user_name}(远程)`
-            : `${o.user_name}(${o.user_tech}值班负责人)`,
+          name: `${o.user_name}(${o.user_tech}值班负责人)`,
           fit: `${o.user_id}_head`,
         };
       });
@@ -365,7 +363,7 @@ const DutyCatalog = () => {
                       placeholder={'项目名称'}
                       showSearch
                       onDeselect={getProjectUser}
-                      onBlur={getProjectUser}
+                      onDropdownVisibleChange={(open) => !open && getProjectUser()}
                     >
                       {projects.map((it: any) => (
                         <Select.Option key={it.project_id} label={it.project_name}>
@@ -438,7 +436,7 @@ const DutyCatalog = () => {
                             mode={'multiple'}
                             onSelect={updateTitle}
                             onDeselect={onSave}
-                            onBlur={onSave}
+                            onDropdownVisibleChange={(open) => !open && onSave()}
                           />
                         </Form.Item>
                       );

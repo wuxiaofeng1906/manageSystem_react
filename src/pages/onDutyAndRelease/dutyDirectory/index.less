@@ -58,6 +58,11 @@
           .ant-select-selection-overflow-item-suffix{
             display: none;
           }
+          &:nth-child(2){
+            .ant-select-multiple .ant-select-selector{
+              align-items: start;
+            }
+          }
           &:nth-child(4){
             .ant-form-item-control-input-content{
               display: flex;
@@ -70,10 +75,9 @@
             }
           }
           .ant-select-single .ant-select-selector .ant-select-selection-item, .ant-select-single .ant-select-selector .ant-select-selection-placeholder{
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            margin-top: 30px;
+            position: relative;
+            top:50%;
+            transform: translateY(-15px);
           }
         }
         td{

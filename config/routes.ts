@@ -237,6 +237,12 @@ export default [
                 path: 'projectPlanDeviationRate',
                 component: './kpi/performance/developer/projectPlanDeviationRate',
               },
+              {
+                name: '管理事务计划偏差率',
+                icon: 'table',
+                path: 'manWorkPlanDevRate',
+                component: './kpi/performance/developer/manWorkPlanDevRate',
+              },
             ],
           },
           {

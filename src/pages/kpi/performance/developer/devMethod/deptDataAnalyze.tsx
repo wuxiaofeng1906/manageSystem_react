@@ -265,7 +265,6 @@ const converseCoverageFormatForAgGrid = (oraDatas: any) => {
   return converseArrayToOne(resultArray);
 };
 
-
 // 使用界面：开发缺陷排除率
 const converseForAgGrid_defectRate = (oraDatas: any) => {
 
@@ -280,7 +279,7 @@ const converseForAgGrid_defectRate = (oraDatas: any) => {
     // 新增研发中心数据
     resultArray.push({
       Group: ['研发中心'],
-      [starttime]: (elements.total.kpi)*100,
+      [starttime]: (elements.total.kpi) * 100,
       isDept: true
     }, {
       Group: ['研发中心', '开发自测加权bug数'],
@@ -306,7 +305,7 @@ const converseForAgGrid_defectRate = (oraDatas: any) => {
       // 新增部门
       resultArray.push({
         Group: groups,
-        [starttime]: (depts.kpi)*100,
+        [starttime]: (depts.kpi) * 100,
         isDept: true
       });
 
@@ -334,4 +333,41 @@ const converseForAgGrid_defectRate = (oraDatas: any) => {
   return converseArrayToOne(resultArray);
 };
 
-export {converseFormatForAgGrid, converseCoverageFormatForAgGrid, converseForAgGrid_defectRate};
+
+// 使用界面：项目计划偏差率
+const converseForAgGrid_projectPlanDevition = (oraDatas: any) => {
+  if (!oraDatas) return [];
+  const resultArray: any = [];
+  // 解析部门数据
+  oraDatas.forEach((elements: any) => {
+    const starttime = elements.range.start;
+    // 新增研发中心数据
+    resultArray.push({
+      Group: ['研发中心'],
+      [starttime]: (elements.total.kpi) * 100,
+      isDept: true
+    });
+
+    // 部门数据
+    const departDatas = elements.datas;
+    departDatas.forEach((depts: any) => {
+      const groups: any = [depts.deptName];
+      findParent(departDatas, depts, groups);
+      // 新增部门
+      resultArray.push({
+        Group: groups,
+        [starttime]: (depts.kpi) * 100,
+        isDept: true
+      });
+    });
+  });
+  return converseArrayToOne(resultArray);
+};
+
+
+export {
+  converseFormatForAgGrid,
+  converseCoverageFormatForAgGrid,
+  converseForAgGrid_defectRate,
+  converseForAgGrid_projectPlanDevition
+};

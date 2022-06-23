@@ -226,9 +226,15 @@ const DutyCatalog = () => {
         user_id: it?.split('_')?.[0],
       }));
     });
+    const time = moment(values.duty_date).format('YYYYMMDD');
+    let type = '';
+    if (isEmpty(values.release_env)) type = '';
+    else if (values.release_env?.includes('cn-northwest-1') && values.release_env?.length == 1) {
+      type = '灰度发布';
+    } else type = '线上发布';
     const data = {
       person_duty_num: id,
-      duty_name: title,
+      duty_name: `${time}${type}值班名单`,
       user_id: currentUser?.userid,
       ...dutyPersons,
       duty_date: moment(values.duty_date).format('YYYY-MM-DD'),
@@ -240,6 +246,8 @@ const DutyCatalog = () => {
         values.release_time,
       ).format('HH:mm:ss')}`,
     };
+    console.log(data);
+
     const flag = isEqual(omit(data, 'user_id'), {
       ...detail,
       project_pm: detail?.project_pm?.map((it: any) => it.user_id).join(),
@@ -292,7 +300,8 @@ const DutyCatalog = () => {
     const values = await form.getFieldsValue();
     const time = moment(values.duty_date).format('YYYYMMDD');
     let type = '';
-    if (values.release_env?.includes('cn-northwest-1') && values.release_env?.length == 1) {
+    if (isEmpty(values.release_env)) type = '';
+    else if (values.release_env?.includes('cn-northwest-1') && values.release_env?.length == 1) {
       type = '灰度发布';
     } else type = '线上发布';
     setTitle(`${time}${type}值班名单`);
@@ -435,7 +444,10 @@ const DutyCatalog = () => {
                             options={limitEnv}
                             mode={'multiple'}
                             onSelect={updateTitle}
-                            onDeselect={onSave}
+                            onDeselect={async () => {
+                              await updateTitle();
+                              await onSave();
+                            }}
                             onDropdownVisibleChange={(open) => !open && onSave()}
                           />
                         </Form.Item>

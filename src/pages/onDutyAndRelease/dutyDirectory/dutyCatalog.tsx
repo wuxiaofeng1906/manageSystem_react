@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useModel } from 'umi';
 import DutyListServices from '@/services/dutyList';
 import html2canvas from 'html2canvas';
-import { isEmpty, isEqual, omit, pick } from 'lodash';
+import { isEmpty, isEqual, omit, pick, intersection } from 'lodash';
 import moment from 'moment';
 import { SelectProps } from 'antd/lib/select';
 const opts = {
@@ -424,7 +424,10 @@ const DutyCatalog = () => {
                       const limitEnv = envList.map((it: any) => ({
                         ...it,
                         disabled:
-                          isEmpty(env) || (it.type == 'other' && otherEnv.includes(env?.[0]))
+                          isEmpty(env) ||
+                          (it.type == 'other' && intersection(otherEnv, env).length > 0) ||
+                          it.label == 'global' ||
+                          env?.join(',') == 'cn-northwest-global'
                             ? false
                             : !env.includes(it.type),
                       }));

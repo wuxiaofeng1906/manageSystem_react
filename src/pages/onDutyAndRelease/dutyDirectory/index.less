@@ -1,80 +1,82 @@
-.dutyCatalog{
-  background: white;
+.dutyCatalog {
   height: 100%;
   padding: 20px;
-  .header{
+  background: white;
+  .header {
     position: relative;
     margin-bottom: 20px;
-    h3{
+    h3 {
       margin: 0;
       text-align: center;
     }
   }
-  .table{
+  .table {
     width: 100%;
     height: max-content;
-    //table-layout: fixed;
-    :global{
-      tr{
-        td,th{
+    :global {
+      tr {
+        td,
+        th {
           border: 1px solid #ccc;
-          .ant-select,.ant-picker{
-            padding: 0;
-            width:100%;
-            height: 100%;
-          }
-          .ant-select-single:not(.ant-select-customize-input) .ant-select-selector{
+          .ant-select,
+          .ant-picker {
+            width: 100%;
             height: 100%;
             padding: 0;
           }
-          .ant-form-item{
+          .ant-select-disabled.ant-select-multiple .ant-select-selection-item{
+            background: #f8f8f8;
+          }
+          .ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
+            height: 100%;
+            padding: 0;
+          }
+          .ant-form-item {
             height: 100%;
             margin-bottom: 0;
-            .ant-form-item-control-input-content,.ant-form-item-control-input{
+            .ant-form-item-control-input-content,
+            .ant-form-item-control-input {
               height: 100%;
             }
           }
-          .ant-select:not(.ant-select-customize-input) .ant-select-selector{
-            border:none
+          .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+            border: none;
           }
         }
-        th{
+        th {
           text-align: left;
-          &:nth-child(odd){
-            background: #f0f2f5;
+          &:nth-child(odd) {
             width: 80px;
             text-align: center;
+            background: #f0f2f5;
           }
-          .ant-form-item{
+          .ant-form-item {
             font-weight: initial;
           }
-          .ant-select-selection-overflow-item{
-
+          .ant-select-selection-overflow-item {
             width: 100%;
-            background: white;
-            .ant-select-selection-item{
-              border:none;
+            background: transparent;
+            .ant-select-selection-item {
               width: max-content;
+              border: none;
             }
           }
-          //.ant-select-selection-overflow-item-suffix{
-          //  display: none;
-          //}
-          &:nth-child(2){
-            .ant-select-selection-overflow{
+
+          &:nth-child(2) {
+            .ant-select-selection-overflow {
+              align-items: start;
               height: 100%;
-              align-items: start;
             }
-            .ant-select-multiple .ant-select-selector{
+            .ant-select-multiple .ant-select-selector {
               align-items: start;
             }
           }
-          &:nth-child(4){
-            .ant-form-item-control-input-content{
+          &:nth-child(4) {
+            .ant-form-item-control-input-content {
               display: flex;
               //justify-content: space-between;
               flex-direction: column;
-              p{
+              p {
                 margin: 0 !important;
                 line-height: 28px;
               }
@@ -85,43 +87,121 @@
               display: none;
             }
           }
-          .ant-select-single .ant-select-selector .ant-select-selection-item, .ant-select-single .ant-select-selector .ant-select-selection-placeholder{
+          .ant-select-single .ant-select-selector .ant-select-selection-item,
+          .ant-select-single .ant-select-selector .ant-select-selection-placeholder {
             position: relative;
-            top:50%;
+            top: 50%;
             transform: translateY(-15px);
           }
         }
-        td{
+        td {
           line-height: 40px;
 
-          &:first-child{
-            background: #f0f2f5;
+          &:first-child {
             font-weight: bold;
             text-align: center;
+            background: #f0f2f5;
           }
-          .ant-select{
-            padding: 0;
-            width:100%;
+          .ant-select {
+            width: 100%;
             height: 100%;
+            padding: 0;
           }
-
         }
-        .ant-select:not(.ant-select-customize-input) .ant-select-selector{
+        .ant-select:not(.ant-select-customize-input) .ant-select-selector {
           //border:none;
           height: 100%;
         }
+        .ant-select-selection-item-remove{
+          visibility: hidden;
+        }
+        .ant-select-selection-overflow-item{
+          &:hover{
+            .ant-select-selection-item-remove{
+              visibility:visible;
+            }
+          }
+        }
       }
     }
-
   }
+
+  //@media only screen and (min-width:1425px) and (max-width:1899px) {
+  //  tr{
+  //    th{
+  //      &:nth-child(2){
+  //        max-width: 240px;
+  //        min-width: 200px;
+  //      }
+  //      &:nth-child(4){
+  //        max-width: 150px;
+  //        min-width: 100px;
+  //      }
+  //      &:nth-child(6){
+  //        min-width: 120px;
+  //        max-width: 150px;
+  //      }
+  //      &:nth-child(8){
+  //        min-width: 100px;
+  //        max-width: 120px;
+  //      }
+  //      &:nth-child(10){
+  //        min-width: 80px;
+  //        max-width: 120px;
+  //      }
+  //      &:nth-child(12){
+  //        min-width: 70px;
+  //        max-width: 120px;
+  //      }
+  //    }
+  //  }
+  //}
+  //@media only screen and (min-width:1900px) {
+  //  .table {
+  //    table-layout: fixed;
+  //
+  //    tr {
+  //      th {
+  //        &:nth-child(odd) {
+  //          width: 110px;
+  //        }
+  //
+  //        &:nth-child(2) {
+  //          width: 200px;
+  //          max-width: 300px;
+  //        }
+  //
+  //        &:nth-child(4) {
+  //          min-width: 100px;
+  //        }
+  //
+  //        &:nth-child(6) {
+  //          min-width: 120px;
+  //        }
+  //
+  //        &:nth-child(8) {
+  //          min-width: 100px;
+  //        }
+  //
+  //        &:nth-child(10) {
+  //          min-width: 80px;
+  //        }
+  //
+  //        &:nth-child(12) {
+  //          min-width: 70px;
+  //        }
+  //      }
+  //    }
+  //  }
+  //}
 }
-.dutyList{
-  background: white;
-  padding:10px;
+.dutyList {
   margin-top: -10px;
-  .dutyListForm{
-    :global{
-      .ant-form-item{
+  padding: 10px;
+  background: white;
+  .dutyListForm {
+    :global {
+      .ant-form-item {
         margin-bottom: 0;
       }
     }

@@ -158,6 +158,7 @@ const DutyCatalog = () => {
   };
 
   const getProjectUser = async () => {
+    if (!hasPermission) return;
     const values = await form.getFieldsValue();
     let result: any[] = [];
     values.project_ids?.forEach((id: string) => {
@@ -171,6 +172,7 @@ const DutyCatalog = () => {
   };
 
   const onScreenShot = async () => {
+    if (!hasPermission) return;
     const errTip = {
       project_ids: '请填写项目名称!',
       project_pm: '请填写负责人!',
@@ -222,6 +224,7 @@ const DutyCatalog = () => {
   };
 
   const onSave = async () => {
+    if (!hasPermission) return;
     const values = await form.getFieldsValue();
     const title = await updateTitle();
     const pickDuty = pick(values, ['front', 'backend', 'test', 'operations', 'sqa']);
@@ -315,6 +318,7 @@ const DutyCatalog = () => {
   };
 
   const updateTitle = async () => {
+    if (!hasPermission) return;
     const values = await form.getFieldsValue();
     const time = moment(values.duty_date).format('YYYYMMDD');
     let type = '';
@@ -390,7 +394,11 @@ const DutyCatalog = () => {
               <img
                 src={require('../../../../public/navigation.png')}
                 width={20}
-                style={{ marginRight: 8 }}
+                style={
+                  hasPermission
+                    ? { marginRight: 8 }
+                    : { filter: 'grayscale(1)', cursor: 'not-allowed', marginRight: 8 }
+                }
               />
             }
             onClick={() => {
@@ -468,7 +476,7 @@ const DutyCatalog = () => {
                   </Form.Item>
                 </th>
                 <th>发布环境</th>
-                <th>
+                <th style={{ width: 120, maxWidth: 170 }}>
                   <Form.Item
                     noStyle
                     shouldUpdate={(pre, next) => pre.release_env != next.release_env}

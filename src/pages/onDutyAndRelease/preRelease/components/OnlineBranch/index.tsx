@@ -21,11 +21,8 @@ import {
 import {alalysisInitData} from '../../datas/dataAnalyze';
 import {getGridRowsHeight} from '../gridHeight';
 import {releaseAppChangRowColor} from '../../operate';
-import {history} from "@@/core/history";
 
-const {SHOW_PARENT} = TreeSelect;
 let newOnlineBranchNum = '';
-
 const OnlineBranch: React.FC<any> = () => {
   const [formForOnlineBranch] = Form.useForm(); // 上线分支设置
   const onlineBranchGridApi = useRef<GridApi>();
@@ -205,20 +202,7 @@ const OnlineBranch: React.FC<any> = () => {
         }
       }
 
-      // 上线后的检查类型
-      let afterType = oraData.afterOnlineCheck?.afterCheckType;
-      if (oraData.afterOnlineCheck?.afterCheckType) {
-        if (
-          (oraData.afterOnlineCheck?.afterCheckType).length === 1 &&
-          (oraData.afterOnlineCheck?.afterCheckType).includes('9')
-        ) {
-          afterType = undefined;
-        }
-      }
-
       branchName = oraData.checkHead.branchName;
-      debugger;
-      console.log("222222", oraData.checkHead.ignoreFrontCheck, oraData.checkHead.ignoreBackendCheck)
       formForOnlineBranch.setFieldsValue({
         // 表头设置
         branchName: oraData.checkHead.branchName,
@@ -246,12 +230,6 @@ const OnlineBranch: React.FC<any> = () => {
         beforeCheckType: beforeType,
         beforeTestEnv: oraData.beforeOnlineCheck?.beforeTestEnv,
         beforeBrowser: oraData.beforeOnlineCheck?.beforeBrowser,
-
-        //  上线后自动化检查
-        autoAfterIgnoreCheck: oraData.afterOnlineCheck?.autoAfterIgnoreCheck,
-        afterCheckType: afterType,
-        afterTestEnv: oraData.afterOnlineCheck?.afterTestEnv,
-        afterBrowser: oraData.afterOnlineCheck?.afterBrowser,
 
         //   隐藏字段，修改时需要使用
         branchCheckId: oraData.checkHead?.branchCheckId,
@@ -818,7 +796,7 @@ const OnlineBranch: React.FC<any> = () => {
               </Col>
             </Row>
             <Row style={{marginTop: -20}}>
-              <Form.Item label="检查结果" name="autoCheckResult" >
+              <Form.Item label="检查结果" name="autoCheckResult">
                 <Checkbox.Group style={{width: '100%', marginLeft: 27}}>
                   <Row>
                     <Col span={7}>

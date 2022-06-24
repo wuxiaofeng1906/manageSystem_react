@@ -656,18 +656,18 @@ const getOnlineBranchColumns = () => {
       headerName: '上线前自动化检查是否通过',
       field: 'automation_check',
       minWidth: 200,
-      cellRenderer: (param: any) => {
-        return beforeOnlineAutoCheck(param, '1');
-      },
+      // cellRenderer: (param: any) => {
+      //   return beforeOnlineAutoCheck(param, '1');
+      // },
     },
-    {
-      headerName: '升级后自动化检查是否通过',
-      field: 'automation_check',
-      minWidth: 200,
-      cellRenderer: (param: any) => {
-        return beforeOnlineAutoCheck(param, '2');
-      },
-    },
+    // {
+    //   headerName: '升级后自动化检查是否通过',
+    //   field: 'automation_check',
+    //   minWidth: 200,
+    //   cellRenderer: (param: any) => {
+    //     return beforeOnlineAutoCheck(param, '2');
+    //   },
+    // },
     {
       headerName: '封板状态',
       field: 'branch_sealing_check',

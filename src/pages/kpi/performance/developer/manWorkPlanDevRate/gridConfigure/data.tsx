@@ -1,7 +1,7 @@
 /* region 数据获取和解析 */
 import {GqlClient} from "@/hooks";
 import {getParamsByType} from "@/publicMethods/timeMethods";
-import {converseForAgGrid_projectPlanDevition} from "@/pages/kpi/performance/developer/devMethod/deptDataAnalyze";
+import {converseForAgGrid_manageWorkDeviRate} from "@/pages/kpi/performance/developer/devMethod/deptDataAnalyze";
 
 export const queryManWorkDeviRate = async (client: GqlClient<object>, params: string) => {
   const condition = getParamsByType(params);
@@ -12,12 +12,37 @@ export const queryManWorkDeviRate = async (client: GqlClient<object>, params: st
   // devBiasProportionDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
   const {data} = await client.query(`
       {
-
+        devManagementAffairsDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+          total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+          dept
+          deptName
+          parent{
+            dept
+            deptName
+          }
+          kpi
+          users{
+            userId
+            userName
+            kpi
+            hired
+            }
+          }
+        }
 
       }
   `);
 
-  const datas = converseForAgGrid_projectPlanDevition(data?.devBiasProportionDept);
+  const datas = converseForAgGrid_manageWorkDeviRate(data?.devManagementAffairsDept);
   return datas;
 };
 /* endregion */

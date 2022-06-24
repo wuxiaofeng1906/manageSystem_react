@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {message, Progress, Row, Select, Modal, Button} from 'antd';
+import {message, Progress, Row, Select, Modal, Button, Form, Col, Checkbox} from 'antd';
 import {useModel} from '@@/plugin-model/useModel';
 import {saveProcessResult} from './axiosRequest';
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
@@ -10,6 +10,9 @@ const CheckProgress: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const {tabsData, processStatus, modifyProcessStatus, operteStatus} = useModel('releaseProcess');
   const [isModalVisible, setModalVisible] = useState({show: false, result: "", hintMsg: ""});
+
+  const [pulishResultForm] = Form.useForm();
+
   // 发布结果修改
   const pulishResulttChanged = async (params: any) => {
 
@@ -33,10 +36,19 @@ const CheckProgress: React.FC<any> = () => {
       show: true
     });
 
+    pulishResultForm.resetFields();
   };
 
   // 确认发布
   const handleOk = async () => {
+
+    const formData = pulishResultForm.getFieldsValue();
+    if (formData.ignoreAfterCheck === undefined || (formData.ignoreAfterCheck).length === 0) { // 不忽略的时候
+      if (formData.checkResult === undefined || (formData.checkResult).length === 0) { // 一个结果都没选中
+        errorMessage("检查结果必须至少勾选一项！")
+        return;
+      }
+    }
     const result = await saveProcessResult(tabsData.activeKey, isModalVisible.result);
     if (result === '') {
       sucMessage('发布结果保存成功！')
@@ -152,18 +164,39 @@ const CheckProgress: React.FC<any> = () => {
         </div>
       </div>
 
-      {/* 发布结果确认弹出窗 */}
+      {/* 发布结果确认弹出窗   */}
       <Modal title="发布结果确认" visible={isModalVisible.show} width={400}
              onCancel={handleCancel} centered={true}
+             bodyStyle={{height: 120}}
              footer={[
-               <Button key="cancle" onClick={handleCancel}>
+               <Button key="cancle" onClick={handleCancel} style={{borderRadius: 5}}>
                  取消
                </Button>,
-               <Button key="submit" type="primary" onClick={handleOk}>
+               <Button key="submit" type="primary" onClick={handleOk}
+                       style={{
+                         color: '#46A0FC', backgroundColor: '#ECF5FF',
+                         borderRadius: 5
+                       }}>
                  确定
                </Button>,
              ]}>
-        <p>{isModalVisible.hintMsg}</p>
+
+        <Form form={pulishResultForm} style={{marginTop: -15}}>
+          <Form.Item>
+            {isModalVisible.hintMsg}
+          </Form.Item>
+          <Form.Item label="是否忽略发布成功后自动化检查:" name="ignoreAfterCheck" style={{marginTop: -25}}>
+            <Checkbox.Group style={{width: '100%'}}>
+              <Checkbox value="ignoreCheck">忽略检查</Checkbox>
+            </Checkbox.Group>
+          </Form.Item>
+          <Form.Item label="检查结果:" name="checkResult" style={{marginTop: -25}}>
+            <Checkbox.Group style={{width: '100%'}}>
+              <Checkbox value="UI_Pass">UI执行通过</Checkbox>
+              <Checkbox value="Applets_Pass">小程序执行通过</Checkbox>
+            </Checkbox.Group>
+          </Form.Item>
+        </Form>
       </Modal>
 
     </div>

@@ -77,6 +77,7 @@ const ProjectTemplate: React.FC<any> = () => {
 
   // 项目执行修改
   const excutionChanged = async (params: any) => {
+    debugger;
 
     //   获取项目负责人
     const excuteInfo = params.split("&");
@@ -106,12 +107,19 @@ const ProjectTemplate: React.FC<any> = () => {
         // 如果没有包含 【】，则，不拼接项目名
         // eslint-disable-next-line no-lonely-if
         if (taskName.indexOf("【") > -1 && taskName.indexOf("】") > -1) {
+
           const nameHead = taskName.substring(taskName.indexOf("【") + 1, taskName.indexOf("】"));
           if (nameHead.includes("-")) { // 如果名称包含-，则需要清除掉这个-
             const head = nameHead.split("-")[0];
             taskName = `${taskName.replace(`${head}-`, "")}`;
           }
-          taskName = `${taskName.slice(0, 1)}${excuteInfo[1]}-${taskName.slice(1)}`;
+
+          let newName = taskName.slice(1);
+          if (newName.includes("-")) { // 如果名称包含-，则需要清除掉这个-
+            newName = newName.split("-")[1].toString();
+          }
+
+          taskName = `${taskName.slice(0, 1)}${excuteInfo[1]}-${newName}`;
         }
       }
 

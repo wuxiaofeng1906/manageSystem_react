@@ -29,6 +29,8 @@ export default function access(initialState: { currentUser?: API.CurrentUser | u
     // 值班名单： 超级管理员、开发经理/总监、前端管理人员
     dutyManager:
       currentUser?.access &&
-      ['superGroup', 'devManageGroup', 'frontManager'].includes(currentUser.access),
+      ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(
+        currentUser.access,
+      ),
   };
 }

@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { history } from 'umi';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { history, useModel } from 'umi';
 import { Form, DatePicker, Row, Col, Button, Select } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import dayjs from 'dayjs';
@@ -10,11 +10,14 @@ import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import styles from './index.less';
 import DutyListServices from '@/services/dutyList';
 import moment from 'moment';
+
 const DutyList = () => {
   const [list, setList] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [form] = Form.useForm();
   const gridRef = useRef<GridApi>();
+  const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
+
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
     params.api.sizeColumnsToFit();
@@ -43,6 +46,15 @@ const DutyList = () => {
     getList();
   }, []);
 
+  // 值班名单权限： 超级管理员、开发经理/总监、前端管理人员
+  const hasPermission = useMemo(
+    () =>
+      ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(
+        currentUser?.group || '',
+      ),
+    [currentUser?.group],
+  );
+
   return (
     <PageContainer>
       <div className={styles.dutyList}>
@@ -52,7 +64,12 @@ const DutyList = () => {
               <Form.Item>
                 <Button
                   type={'text'}
-                  icon={<FolderAddTwoTone />}
+                  disabled={!hasPermission}
+                  icon={
+                    <FolderAddTwoTone
+                      style={hasPermission ? {} : { filter: 'grayscale(1)', cursor: 'not-allowed' }}
+                    />
+                  }
                   onClick={async () => {
                     const res = await DutyListServices.getDutyNum();
                     history.push(`/onDutyAndRelease/dutyCatalog/${res.ready_release_num}`);

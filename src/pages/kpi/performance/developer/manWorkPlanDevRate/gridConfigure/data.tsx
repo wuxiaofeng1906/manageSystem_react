@@ -9,7 +9,6 @@ export const queryManWorkDeviRate = async (client: GqlClient<object>, params: st
     return [];
   }
 
-  // devBiasProportionDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
   const {data} = await client.query(`
       {
         devManagementAffairsDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {

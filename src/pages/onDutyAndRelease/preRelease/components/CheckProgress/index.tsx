@@ -9,7 +9,7 @@ const {Option} = Select;
 const CheckProgress: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const {tabsData, processStatus, modifyProcessStatus, operteStatus} = useModel('releaseProcess');
-  const [isModalVisible, setModalVisible] = useState({show: false, result: "", hintMsg: ""});
+  const [isModalVisible, setModalVisible] = useState({show: false, result: "", hintMsg: "", autoCheckDisabled: true});
 
   const [pulishResultForm] = Form.useForm();
 
@@ -24,13 +24,16 @@ const CheckProgress: React.FC<any> = () => {
       return;
     }
 
+    let autoDisable = true;
     let hintMsgs = "请确认是否修改服务发布结果为空！"
     if (params === "1") {
       hintMsgs = "请确认服务是否发布成功，如有自动化也执行通过!";
+      autoDisable = false;
     } else if (params === "2") {
       hintMsgs = "请确认服务是否发布失败！";
     }
     setModalVisible({
+      autoCheckDisabled: autoDisable,
       hintMsg: hintMsgs,
       result: params,
       show: true
@@ -42,13 +45,17 @@ const CheckProgress: React.FC<any> = () => {
   // 确认发布
   const handleOk = async () => {
 
-    const formData = pulishResultForm.getFieldsValue();
-    if (formData.ignoreAfterCheck === undefined || (formData.ignoreAfterCheck).length === 0) { // 不忽略的时候
-      if (formData.checkResult === undefined || (formData.checkResult).length === 0) { // 一个结果都没选中
-        errorMessage("检查结果必须至少勾选一项！")
-        return;
+    // 如果是发布成功，则需要判断下面自动化选项是否勾选
+    if (!isModalVisible.autoCheckDisabled) { // 是发布成功
+      const formData = pulishResultForm.getFieldsValue();
+      if (formData.ignoreAfterCheck === undefined || (formData.ignoreAfterCheck).length === 0) { // 不忽略的时候
+        if (formData.checkResult === undefined || (formData.checkResult).length === 0) { // 一个结果都没选中
+          errorMessage("检查结果必须至少勾选一项！")
+          return;
+        }
       }
     }
+
     const result = await saveProcessResult(tabsData.activeKey, isModalVisible.result);
     if (result === '') {
       sucMessage('发布结果保存成功！')
@@ -186,12 +193,12 @@ const CheckProgress: React.FC<any> = () => {
             {isModalVisible.hintMsg}
           </Form.Item>
           <Form.Item label="是否忽略发布成功后自动化检查:" name="ignoreAfterCheck" style={{marginTop: -25}}>
-            <Checkbox.Group style={{width: '100%'}}>
+            <Checkbox.Group style={{width: '100%'}} disabled={isModalVisible.autoCheckDisabled}>
               <Checkbox value="ignoreCheck">忽略检查</Checkbox>
             </Checkbox.Group>
           </Form.Item>
           <Form.Item label="检查结果:" name="checkResult" style={{marginTop: -25}}>
-            <Checkbox.Group style={{width: '100%'}}>
+            <Checkbox.Group style={{width: '100%'}} disabled={isModalVisible.autoCheckDisabled}>
               <Checkbox value="UI_Pass">UI执行通过</Checkbox>
               <Checkbox value="Applets_Pass">小程序执行通过</Checkbox>
             </Checkbox.Group>

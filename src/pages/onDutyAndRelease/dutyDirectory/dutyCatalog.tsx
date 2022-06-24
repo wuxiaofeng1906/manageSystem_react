@@ -1,11 +1,12 @@
-import React from 'react';
-import { Select, DatePicker, Button, Form, message, Spin } from 'antd';
+import React, { useMemo } from 'react';
+import { Select, DatePicker, Button, Form, message, Spin, Modal } from 'antd';
 import styles from './index.less';
 import { useEffect, useState } from 'react';
 import { useParams, useModel } from 'umi';
 import DutyListServices from '@/services/dutyList';
 import html2canvas from 'html2canvas';
 import { isEmpty, isEqual, omit, pick, intersection } from 'lodash';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { SelectProps } from 'antd/lib/select';
 const opts = {
@@ -41,8 +42,10 @@ const FilterSelector = ({
   init = {},
   onDeselect,
   onBlur,
+  disabled,
 }: {
   name: string;
+  disabled: boolean;
   init?: Record<string, any>;
 } & SelectProps) => {
   return (
@@ -56,14 +59,15 @@ const FilterSelector = ({
               placeholder={placeholder}
               onDeselect={onDeselect}
               onBlur={onBlur}
-              options={[{ ...init, label: init.name }]
-                .concat(options)
-                .map((it: any) => ({
-                  ...it,
-                  value: `${it.value}_${it.type}`,
-                  disabled: getFieldValue(name)?.includes(it.fit),
-                }))
-                .filter((it) => it.type == 'head' || it.key !== init.key)}
+              disabled={disabled}
+              options={[{ ...init }].concat(
+                options
+                  .map((it: any) => ({
+                    ...it,
+                    disabled: getFieldValue(name)?.includes(it.fit),
+                  }))
+                  .filter((it) => it.key !== init.key),
+              )}
             />
           </Form.Item>
         );
@@ -74,8 +78,8 @@ const FilterSelector = ({
 
 const DutyCatalog = () => {
   const { id } = useParams() as { id: string };
-  const [allPerson, setAllPerson] = useState([]);
-  const [projects, setProjects] = useState([]);
+  const [allPerson, setAllPerson] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
   const [envList, setEnvList] = useState<any[]>([]);
   const [methodList, setMethodList] = useState<any[]>([]);
   const [title, setTitle] = useState(`${moment().format('YYYYMMDD')}值班名单`);
@@ -83,34 +87,46 @@ const DutyCatalog = () => {
   const [recentDuty, setRecentDuty] = useState<Record<string, any>>();
   const [loading, setLoading] = useState(false);
   const [detail, setDetail] = useState<Record<string, any>>();
+  const [dutyPerson, setDutyPerson] = useState<Record<string, any>[]>([]);
   const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
-
   const [form] = Form.useForm();
   // scene(现场) remote(远程) head(负责人)
+
+  // 默认第一值班人
+  const getFirstDuty = async () => {
+    const params = {
+      start_time: moment().startOf('week').format('YYYY/MM/DD'),
+      end_time: moment().endOf('week').format('YYYY/MM/DD'),
+    };
+    const firstDuty = await DutyListServices.getFirstDutyPerson(params);
+    const duty = firstDuty?.data
+      ?.flat()
+      .filter(
+        (it: any) =>
+          it.duty_order == '1' && Object.keys(recentType).includes(it.user_tech) && it.user_name,
+      );
+    const data = duty.map((o: any, i: number) => ({
+      value: `${o.user_id}_head`,
+      key: o.user_id,
+      type: 'head',
+      fit: `${o.user_id}_head`,
+      disabled: true,
+      user_tech: o.user_tech,
+      label: `${o.user_name}(${o.user_tech}值班负责人)`,
+    }));
+    setDutyPerson(data);
+  };
 
   const getSource = async () => {
     try {
       setLoading(true);
-      const params = {
-        start_time: moment().startOf('week').format('YYYY/MM/DD'),
-        end_time: moment().endOf('week').format('YYYY/MM/DD'),
-      };
-      const [allPersons, projects, envs, methods, firstDuty] = await Promise.all([
+      const [allPersons, envs, methods] = await Promise.all([
         DutyListServices.getDevperson(),
-        DutyListServices.getProject(),
         DutyListServices.releaseEnv(),
         DutyListServices.releaseMethod(),
-        DutyListServices.getFirstDutyPerson(params),
       ]);
       setLoading(false);
 
-      let initDutyObj = {};
-      const duty = firstDuty?.data
-        ?.flat()
-        .filter(
-          (it: any) =>
-            it.duty_order == '1' && Object.keys(recentType).includes(it.user_tech) && it.user_name,
-        );
       setEnvList(
         envs.map((it: any) => ({
           value: it.env,
@@ -126,42 +142,23 @@ const DutyCatalog = () => {
           key: it.method_name,
         })),
       );
-      duty.forEach((o: any) => {
-        initDutyObj[recentType[o.user_tech]] = {
-          value: o.user_id,
-          label: o.user_name,
-          key: o.user_id,
-          type: 'head',
-          disabled: true,
-          name: `${o.user_name}(${o.user_tech}值班负责人)`,
-          fit: `${o.user_id}_head`,
-        };
-      });
-      setRecentDuty(initDutyObj);
 
       setAllPerson(
         allPersons?.map((it: any) => ({
           key: it.user_id,
-          value: it.user_id,
+          value: `${it.user_id}_${it.user_type}`,
           label: it.user_name,
           type: it.user_type,
-          disabled: it.user_type,
           fit: `${it.user_id}_${it.user_type == 'scene' ? 'remote' : 'scene'}`,
         })),
       );
-      const formatProject = projects?.map((it: any) => ({
-        ...it,
-        user: ['sprint', 'emergency', 'hotfix'].includes(it.sprint_type)
-          ? { user_id: initDutyObj?.backend?.key, user_name: initDutyObj?.backend?.label }
-          : it.user,
-      }));
-      setProjects(formatProject);
     } catch (e) {
       setLoading(false);
     }
   };
 
   const getProjectUser = async () => {
+    if (!hasPermission) return;
     const values = await form.getFieldsValue();
     let result: any[] = [];
     values.project_ids?.forEach((id: string) => {
@@ -175,6 +172,7 @@ const DutyCatalog = () => {
   };
 
   const onScreenShot = async () => {
+    if (!hasPermission) return;
     const errTip = {
       project_ids: '请填写项目名称!',
       project_pm: '请填写负责人!',
@@ -196,28 +194,39 @@ const DutyCatalog = () => {
       setVisible(true);
       return;
     }
-    const dom = document.getElementById('dutyForm') as HTMLElement;
-    if (!dom) return;
-    html2canvas(dom, {
-      scale: window.devicePixelRatio || 2,
-      allowTaint: true,
-    }).then((canvas) => {
-      canvas.toBlob(async (blob) => {
-        if (!blob) return;
-        const filename = new Date().getTime().toString();
-        const file = new File([blob], filename, { type: 'image/png' });
-        let formData = new FormData();
-        formData.append('file', file);
-        formData.append('person_duty_num', id);
-        formData.append('user_id', currentUser?.userid ?? '');
-        await DutyListServices.pushWechat(formData);
-      });
-      setVisible(true);
+    // 截图推送提醒
+    Modal.confirm({
+      title: '推送提醒',
+      icon: <ExclamationCircleOutlined />,
+      content: '请确认是否发送到研发中心群?',
+      onCancel: () => setVisible(true),
+      onOk: () => {
+        const dom = document.getElementById('dutyForm') as HTMLElement;
+        if (!dom) return;
+        html2canvas(dom, {
+          scale: window.devicePixelRatio || 2,
+          allowTaint: true,
+        }).then((canvas) => {
+          canvas.toBlob(async (blob) => {
+            if (!blob) return;
+            const filename = new Date().getTime().toString();
+            const file = new File([blob], filename, { type: 'image/png' });
+            let formData = new FormData();
+            formData.append('file', file);
+            formData.append('person_duty_num', id);
+            formData.append('user_id', currentUser?.userid ?? '');
+            await DutyListServices.pushWechat(formData);
+          });
+          setVisible(true);
+        });
+      },
     });
   };
 
   const onSave = async () => {
+    if (!hasPermission) return;
     const values = await form.getFieldsValue();
+    const title = await updateTitle();
     const pickDuty = pick(values, ['front', 'backend', 'test', 'operations', 'sqa']);
     let dutyPersons: Record<string, any> = {};
     Object.entries(pickDuty).forEach(([k, v]) => {
@@ -226,15 +235,10 @@ const DutyCatalog = () => {
         user_id: it?.split('_')?.[0],
       }));
     });
-    const time = moment(values.duty_date).format('YYYYMMDD');
-    let type = '';
-    if (isEmpty(values.release_env)) type = '';
-    else if (values.release_env?.includes('cn-northwest-1') && values.release_env?.length == 1) {
-      type = '灰度发布';
-    } else type = '线上发布';
+
     const data = {
       person_duty_num: id,
-      duty_name: `${time}${type}值班名单`,
+      duty_name: title,
       user_id: currentUser?.userid,
       ...dutyPersons,
       duty_date: moment(values.duty_date).format('YYYY-MM-DD'),
@@ -267,8 +271,26 @@ const DutyCatalog = () => {
           duty_date: moment(),
           release_time: moment().hour(23).minute(0).second(0),
         });
+        getFirstDuty();
         return;
       }
+      const front = res.front?.filter((it: any) => it.user_type == 'head');
+      const backend = res.backend?.filter((it: any) => it.user_type == 'head');
+      const test = res.test?.filter((it: any) => it.user_type == 'head');
+      const sqa = res.sqa?.filter((it: any) => it.user_type == 'head');
+      const operations = res.operations?.filter((it: any) => it.user_type == 'head');
+
+      setDutyPerson(
+        front.concat(backend, test, operations, sqa).map((o: any, i: number) => ({
+          value: `${o.user_id}_head`,
+          key: o.user_id,
+          type: 'head',
+          disabled: true,
+          user_tech: Object.keys(recentType)[i] ?? '',
+          label: `${o.user_name}(${Object.keys(recentType)[i] ?? ''}值班负责人)`,
+          fit: `${o.user_id}_head`,
+        })),
+      );
       setDetail(res);
       form.setFieldsValue({
         front: res?.front?.map((it: any) => `${it.user_id}_${it.user_type}`),
@@ -296,6 +318,7 @@ const DutyCatalog = () => {
   };
 
   const updateTitle = async () => {
+    if (!hasPermission) return;
     const values = await form.getFieldsValue();
     const time = moment(values.duty_date).format('YYYYMMDD');
     let type = '';
@@ -303,31 +326,55 @@ const DutyCatalog = () => {
     else if (values.release_env?.includes('cn-northwest-1') && values.release_env?.length == 1) {
       type = '灰度发布';
     } else type = '线上发布';
-    setTitle(`${time}${type}值班名单`);
+    return `${time}${type}值班名单`;
   };
 
   useEffect(() => {
-    if (recentDuty && !isEmpty(recentDuty)) {
-      form.setFieldsValue({
-        front: [`${recentDuty?.front.value}_${recentDuty?.front.type}`],
-        backend: [`${recentDuty?.backend.value}_${recentDuty?.backend.type}`],
-        test: [`${recentDuty?.test.value}_${recentDuty?.test.type}`],
-        sqa: [`${recentDuty?.sqa.value}_${recentDuty?.sqa.type}`],
-        operations: [`${recentDuty?.operations.value}_${recentDuty?.operations.type}`],
-      });
-    }
-  }, [recentDuty]);
-
-  useEffect(() => {
     if (!id) return;
-    getSource().then(() => {
-      getDetail();
-    });
+    DutyListServices.getProject().then((res) => setProjects(res));
+    getDetail();
+    getSource();
   }, [id]);
+
+  // 保存后的第一值班人
+  useEffect(() => {
+    let initDutyObj: any = {};
+    if (isEmpty(dutyPerson)) return;
+    dutyPerson?.forEach((o: any) => {
+      initDutyObj[recentType[o.user_tech]] = { ...o };
+    });
+    const formatProject = projects?.map((it: any) => ({
+      ...it,
+      user: ['sprint', 'emergency', 'hotfix'].includes(it.sprint_type)
+        ? {
+            user_id: initDutyObj?.backend?.key,
+            user_name: initDutyObj?.backend?.label.replace('(后端值班负责人)', ''),
+          }
+        : it.user,
+    }));
+    form.setFieldsValue({
+      front: [initDutyObj?.front.value],
+      backend: [initDutyObj?.backend.value],
+      test: [initDutyObj?.test.value],
+      sqa: [initDutyObj?.sqa.value],
+      operations: [initDutyObj?.operations.value],
+    });
+    setProjects(formatProject);
+    setRecentDuty(initDutyObj);
+  }, [dutyPerson]);
 
   const otherEnv = envList
     .filter((o: any) => !Object.values(envType).includes(o.value))
     .map((it) => it.value);
+
+  // 值班名单权限： 超级管理员、开发经理/总监、前端管理人员
+  const hasPermission = useMemo(
+    () =>
+      ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(
+        currentUser?.group || '',
+      ),
+    [currentUser?.group],
+  );
 
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>
@@ -336,7 +383,7 @@ const DutyCatalog = () => {
           <h3>{title}</h3>
           <Button
             type={'text'}
-            disabled={!visible}
+            disabled={!visible || !hasPermission}
             style={{
               position: 'absolute',
               right: 0,
@@ -347,7 +394,11 @@ const DutyCatalog = () => {
               <img
                 src={require('../../../../public/navigation.png')}
                 width={20}
-                style={{ marginRight: 8 }}
+                style={
+                  hasPermission
+                    ? { marginRight: 8 }
+                    : { filter: 'grayscale(1)', cursor: 'not-allowed', marginRight: 8 }
+                }
               />
             }
             onClick={() => {
@@ -363,10 +414,11 @@ const DutyCatalog = () => {
             <thead>
               <tr>
                 <th>项目名称</th>
-                <th style={{ minWidth: 240 }}>
+                <th style={{ minWidth: 240, maxWidth: 400 }}>
                   <Form.Item name={'project_ids'}>
                     <Select
                       {...opts}
+                      disabled={!hasPermission}
                       bordered={false}
                       placeholder={'项目名称'}
                       showSearch
@@ -414,7 +466,11 @@ const DutyCatalog = () => {
                     <DatePicker
                       format={'YYYY-MM-DD'}
                       allowClear={false}
-                      onChange={updateTitle}
+                      disabled={!hasPermission}
+                      onChange={async () => {
+                        const title = await updateTitle();
+                        setTitle(title);
+                      }}
                       onBlur={onSave}
                     />
                   </Form.Item>
@@ -442,9 +498,14 @@ const DutyCatalog = () => {
                           <Select
                             options={limitEnv}
                             mode={'multiple'}
-                            onSelect={updateTitle}
+                            disabled={!hasPermission}
+                            onSelect={async () => {
+                              const title = await updateTitle();
+                              setTitle(title);
+                            }}
                             onDeselect={async () => {
-                              await updateTitle();
+                              const title = await updateTitle();
+                              setTitle(title);
                               await onSave();
                             }}
                             onDropdownVisibleChange={(open) => !open && onSave()}
@@ -458,6 +519,7 @@ const DutyCatalog = () => {
                 <th style={{ width: 120, maxWidth: 170 }}>
                   <Form.Item name={'release_method'}>
                     <Select
+                      disabled={!hasPermission}
                       options={methodList}
                       bordered={false}
                       showSearch={false}
@@ -469,7 +531,12 @@ const DutyCatalog = () => {
                 <th>发布时间</th>
                 <th style={{ width: 90, maxWidth: 120 }}>
                   <Form.Item name={'release_time'}>
-                    <DatePicker.TimePicker format={'HH:mm'} allowClear={false} onBlur={onSave} />
+                    <DatePicker.TimePicker
+                      format={'HH:mm'}
+                      allowClear={false}
+                      onBlur={onSave}
+                      disabled={!hasPermission}
+                    />
                   </Form.Item>
                 </th>
               </tr>
@@ -487,6 +554,7 @@ const DutyCatalog = () => {
                         init={recentDuty?.[config.name]}
                         onDeselect={onSave}
                         onBlur={onSave}
+                        disabled={!hasPermission}
                       />
                     </td>
                   </tr>

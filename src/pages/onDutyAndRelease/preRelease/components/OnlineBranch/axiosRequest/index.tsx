@@ -290,38 +290,11 @@ const checkOnlineEnvData = async (sourceData: any) => {
 };
 
 const checkOnlineAutoData = async (sourceData: any) => {
-  //   只有没有勾选忽略检查，后面参数才必填
-  if (
-    sourceData.autoBeforeIgnoreCheck === undefined ||
-    sourceData.autoBeforeIgnoreCheck.length === 0
-  ) {
-    if (sourceData.beforeCheckType === undefined || sourceData.beforeCheckType.length === 0) {
-      return '上线前自动化检查中检查类型不能为空！';
-    }
 
-    if (!sourceData.beforeTestEnv) {
-      return '上线前自动化检查中测试环境不能为空！';
-    }
-
-    if (!sourceData.beforeBrowser) {
-      return '上线前自动化检查中浏览器不能为空！';
-    }
-  }
-
-  if (
-    sourceData.autoAfterIgnoreCheck === undefined ||
-    sourceData.autoAfterIgnoreCheck.length === 0
-  ) {
-    if (sourceData.afterCheckType === undefined || sourceData.afterCheckType.length === 0) {
-      return '上线后自动化检查中检查类型不能为空！';
-    }
-
-    if (!sourceData.afterTestEnv) {
-      return '上线后自动化检查中测试环境不能为空！';
-    }
-
-    if (!sourceData.afterBrowser) {
-      return '上线后自动化检查中浏览器不能为空！';
+  //   没有勾选忽略检查，后面参数必填。如果勾选了，后面的参数可以为空
+  if (sourceData.autoBeforeIgnoreCheck === undefined || sourceData.autoBeforeIgnoreCheck.length === 0) {
+    if (sourceData.autoCheckResult === undefined || (sourceData.autoCheckResult).length === 0) {
+      return "检查结果必须至少勾选一项！";
     }
   }
 
@@ -644,17 +617,12 @@ const saveOnlineAutoCheck = async (
 };
 
 // 保存上线分支的设置
-const saveOnlineBranchData = async (
-  type: string,
-  currentListNo: string,
-  newOnlineBranchNum: string,
-  sourceData: any,
-) => {
+const saveOnlineBranchData = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any,) => {
   //   保存分了4个接口，
   //  1.上线分支头部设置
   //  2.版本检查设置
   //  3.环境一致性检查
-  //  4.(上线前后)自动化检查设置
+  //  4.自动化检查设置
 
   // 上线分支头部验证分支名称和技术侧
   const checkMsg_onlineHead = await checkOnlineHeadData(sourceData);
@@ -681,41 +649,36 @@ const saveOnlineBranchData = async (
     return checkMsg_autoCheck;
   }
 
-  let returnMessage = '';
 
+  /* 开始调用接口进行结果保存  */
+
+  let returnMessage = '';
+  // 保存线上分支
   const onlineBranch = await saveOnlineBranch(type, currentListNo, newOnlineBranchNum, sourceData);
   if (onlineBranch !== '') {
     returnMessage = `上线分支保存失败：${onlineBranch}`;
   }
+
+  // 保存版本检查
   const versonCheck = await saveVersonCheck(type, currentListNo, newOnlineBranchNum, sourceData);
   if (versonCheck !== '') {
-    returnMessage =
-      returnMessage === ''
-        ? `版本检查设置保存失败：${versonCheck}`
-        : `${returnMessage}；\n版本检查设置保存失败：${versonCheck}`;
+    returnMessage = returnMessage === ''
+      ? `版本检查设置保存失败：${versonCheck}`
+      : `${returnMessage}；\n版本检查设置保存失败：${versonCheck}`;
   }
 
-  const enviromentCheck = await saveEnvironmentCheck(
-    type,
-    currentListNo,
-    newOnlineBranchNum,
-    sourceData,
-  );
+  // 保存环境检查
+  const enviromentCheck = await saveEnvironmentCheck(type, currentListNo, newOnlineBranchNum, sourceData,);
   if (enviromentCheck !== '') {
-    returnMessage =
-      returnMessage === ''
+    returnMessage = returnMessage === ''
         ? `环境一致性检查保存失败：${enviromentCheck}`
         : `${returnMessage}；\n环境一致性检查保存失败：${enviromentCheck}`;
   }
-  const onlineAutoCheck = await saveOnlineAutoCheck(
-    type,
-    currentListNo,
-    newOnlineBranchNum,
-    sourceData,
-  );
+
+  // 保存自动化检查
+  const onlineAutoCheck = await saveOnlineAutoCheck(type, currentListNo, newOnlineBranchNum, sourceData,);
   if (onlineAutoCheck !== '') {
-    returnMessage =
-      returnMessage === ''
+    returnMessage = returnMessage === ''
         ? `自动化检查保存失败：${onlineAutoCheck}`
         : `${returnMessage}；\n自动化检查保存失败：${onlineAutoCheck}`;
   }

@@ -13,9 +13,7 @@ import {loadPrjNameSelect} from "@/pages/onDutyAndRelease/preRelease/comControl/
 import dayjs from "dayjs";
 import moment from 'moment';
 import {gridHeight, grayscaleBacklogList, releasedList} from './gridSet';
-import {myUrls} from "@/pages/shimo/fileBaseline/baselineDetails/components/GridList/gridComponents/myUrls";
-import {BaseLineSelect} from "@/pages/shimo/fileBaseline/baselineDetails/components/GridList/gridComponents/BaseLineSelect";
-import {BaseFlag} from "@/pages/shimo/fileBaseline/baselineDetails/components/GridList/gridComponents/BaseFlag";
+
 
 const {RangePicker} = DatePicker;
 
@@ -109,13 +107,16 @@ const ReleaseHistory: React.FC<any> = () => {
 
   /* endregion */
 
-  // 发布详情
-  const releaseProcessDetail = (releData: any) => {
+  // 灰度和正式发布详情页面跳转
+  const releaseProcessDetail = (releData: any, type: string) => {
     const releasedNum = releData.data?.ready_release_num;
-    if (releasedNum === "") {
-      history.push(`/onDutyAndRelease/preRelease`);
-    } else {
-      history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
+
+    if (releasedNum !== "") {
+      if (type === "gray") {
+        history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
+      } else {
+        history.push(`/onDutyAndRelease/officialRelease?releasedNum=${releasedNum}&history=true`);
+      }
     }
   };
 
@@ -142,6 +143,7 @@ const ReleaseHistory: React.FC<any> = () => {
                     float: "right"
                     // display: judgeAuthorityByName("addDutyMsgPush") === true ? "inline" : "none"
                   }}>
+
             <img src="../pushMessage.png" width="25" height="25" alt="待发布详情" title="待发布详情"/> &nbsp;待发布详情
           </Button>
           <Button type="text" onClick={generateFormalRelease}
@@ -149,7 +151,8 @@ const ReleaseHistory: React.FC<any> = () => {
                     float: "right"
                     // display: judgeAuthorityByName("addDutyMsgPush") === true ? "inline" : "none"
                   }}>
-            <img src="../pushMessage.png" width="25" height="25" alt="一键生成正式发布" title="一键生成正式发布"/> &nbsp;一键生成正式发布
+
+            <img src="../pushMessage_gray.png" width="25" height="25" alt="一键生成正式发布" title="一键生成正式发布"/> &nbsp;一键生成正式发布
           </Button>
         </div>
 
@@ -173,7 +176,7 @@ const ReleaseHistory: React.FC<any> = () => {
               grayReleaseDetails: (params: any) => {
                 return (
                   <Button style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
-                          onClick={() => releaseProcessDetail(params)}>
+                          onClick={() => releaseProcessDetail(params, "gray")}>
                     <img src="../logs.png" width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情"/>
                   </Button>)
               }
@@ -222,6 +225,24 @@ const ReleaseHistory: React.FC<any> = () => {
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onReleasedGridReady}
+            frameworkComponents={{
+              officialReleaseDetails: (params: any) => {
+                return (
+                  <div>
+                    <Button
+                      style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
+                      onClick={() => releaseProcessDetail(params, "gray")}>
+                      <img src="../logs.png" width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情"/>
+                    </Button>
+                    <Button
+                      style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
+                      onClick={() => releaseProcessDetail(params, "official")}>
+                      <img src="../logs.png" width="20" height="20" alt="正式发布过程详情" title="正式发布过程详情"/>
+                    </Button>
+                  </div>
+                )
+              }
+            }}
           >
           </AgGridReact>
         </div>

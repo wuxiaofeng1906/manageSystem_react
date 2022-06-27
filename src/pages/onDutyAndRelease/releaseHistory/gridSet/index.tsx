@@ -72,7 +72,7 @@ const releasedList = () => {
   }, {
     headerName: '正式发布批次号',
     field: 'ready_release_num',
-    minWidth: 135,
+    minWidth: 130,
     maxWidth: 150,
     // sort: "asc"
   }, {
@@ -82,7 +82,7 @@ const releasedList = () => {
   }, {
     headerName: '工单编号',
     field: 'order',
-    minWidth: 100,
+    minWidth: 90,
   }, {
     headerName: '项目名称',
     field: 'project_name'
@@ -100,16 +100,17 @@ const releasedList = () => {
     field: 'plan_release_time'
   }, {
     headerName: '操作',
-    cellRenderer: (params: any) => {
-      const readyReleaseNum = params.data?.ready_release_num;
-      return `
-        <div style="margin-top: -5px">
-             <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='releaseProcessDetail(${JSON.stringify(readyReleaseNum)})'>
-                <img src="../logs.png" width="20" height="20" alt="正式发布过程详情" title="正式发布过程详情" />
-            </Button>
-        </div>
-            `;
-    }
+    cellRenderer: "officialReleaseDetails"
+    // cellRenderer: (params: any) => {
+    //   const readyReleaseNum = params.data?.ready_release_num;
+    //   return `
+    //     <div style="margin-top: -5px">
+    //          <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='releaseProcessDetail(${JSON.stringify(readyReleaseNum)})'>
+    //             <img src="../logs.png" width="20" height="20" alt="正式发布过程详情" title="正式发布过程详情" />
+    //         </Button>
+    //     </div>
+    //         `;
+    // }
   }];
   return columns;
 };

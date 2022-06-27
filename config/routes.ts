@@ -485,6 +485,7 @@ export default [
         icon: 'table',
         path: 'officialRelease',
         component: './onDutyAndRelease/officialRelease',
+        hideInMenu: true
       }
     ],
   },

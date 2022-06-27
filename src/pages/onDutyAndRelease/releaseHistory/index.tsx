@@ -8,11 +8,14 @@ import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useRequest} from "ahooks";
 import {getGrayscaleListData} from './axiosRequest/apiPage';
 import {history} from "@@/core/history";
-import {Button, Col, DatePicker, Form, Row, Select} from "antd";
+import {Button, DatePicker, Select} from "antd";
 import {loadPrjNameSelect} from "@/pages/onDutyAndRelease/preRelease/comControl/controler";
 import dayjs from "dayjs";
 import moment from 'moment';
 import {gridHeight, grayscaleBacklogList, releasedList} from './gridSet';
+import {myUrls} from "@/pages/shimo/fileBaseline/baselineDetails/components/GridList/gridComponents/myUrls";
+import {BaseLineSelect} from "@/pages/shimo/fileBaseline/baselineDetails/components/GridList/gridComponents/BaseLineSelect";
+import {BaseFlag} from "@/pages/shimo/fileBaseline/baselineDetails/components/GridList/gridComponents/BaseFlag";
 
 const {RangePicker} = DatePicker;
 
@@ -35,7 +38,13 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 一键生成正式发布
   const generateFormalRelease = () => {
+    history.push(`/onDutyAndRelease/officialRelease`);
 
+  };
+
+  // 待发布详情
+  const releaseDetails = () => {
+    history.push(`/onDutyAndRelease/officialRelease`);
 
   };
   /* endregion */
@@ -101,14 +110,13 @@ const ReleaseHistory: React.FC<any> = () => {
   /* endregion */
 
   // 发布详情
-  (window as any).releaseProcessDetail = (releasedNum: string) => {
-
+  const releaseProcessDetail = (releData: any) => {
+    const releasedNum = releData.data?.ready_release_num;
     if (releasedNum === "") {
       history.push(`/onDutyAndRelease/preRelease`);
     } else {
       history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
     }
-
   };
 
   window.addEventListener('resize', () => {
@@ -122,14 +130,20 @@ const ReleaseHistory: React.FC<any> = () => {
   return (
     <PageContainer>
       {/* 灰度积压列表 */}
-      <div>
+      <div style={{marginTop: -20}}>
         <div style={{
           height: "35px", lineHeight: "35px", verticalAlign: "middle",
           textAlign: "left", backgroundColor: "#F8F8F8", width: '100%',
           border: "solid 1px #CCCCCC"
         }}> &nbsp;
-
           <label style={{fontWeight: "bold",}}>灰度积压列表 </label>
+          <Button type="text" onClick={releaseDetails}
+                  style={{
+                    float: "right"
+                    // display: judgeAuthorityByName("addDutyMsgPush") === true ? "inline" : "none"
+                  }}>
+            <img src="../pushMessage.png" width="25" height="25" alt="待发布详情" title="待发布详情"/> &nbsp;待发布详情
+          </Button>
           <Button type="text" onClick={generateFormalRelease}
                   style={{
                     float: "right"
@@ -152,9 +166,18 @@ const ReleaseHistory: React.FC<any> = () => {
             }}
             rowHeight={30}
             headerHeight={35}
+            rowSelection={'multiple'} // 设置多行选中
             suppressRowTransform={true}
             onGridReady={onGrayscaleGridReady}
-          >
+            frameworkComponents={{
+              grayReleaseDetails: (params: any) => {
+                return (
+                  <Button style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
+                          onClick={() => releaseProcessDetail(params)}>
+                    <img src="../logs.png" width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情"/>
+                  </Button>)
+              }
+            }}>
           </AgGridReact>
         </div>
       </div>
@@ -170,8 +193,6 @@ const ReleaseHistory: React.FC<any> = () => {
         >
           <label style={{fontWeight: "bold", float: "left"}}>已正式发布列表</label>
           <div style={{textAlign: "right"}}>
-
-
             <label> 项目名称:</label>
             <Select size={"small"} showSearch mode="multiple" onChange={onProjectChanged}
                     style={{minWidth: 300, marginLeft: 5}}>
@@ -182,7 +203,6 @@ const ReleaseHistory: React.FC<any> = () => {
                          defaultValue={[moment(queryCondition.start), moment(queryCondition.end)]}
                          onChange={onReleaseProject}/>
           </div>
-
 
         </div>
 
@@ -212,5 +232,6 @@ const ReleaseHistory: React.FC<any> = () => {
     </PageContainer>
   );
 };
+
 
 export default ReleaseHistory;

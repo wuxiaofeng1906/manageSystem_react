@@ -468,19 +468,27 @@ export default [
         icon: 'table',
         path: 'dutyPlan',
         component: './onDutyAndRelease/dutyPlan',
-      }, {
+      },
+      {
         name: '发布过程',
         icon: 'table',
         path: 'preRelease',
         component: './onDutyAndRelease/preRelease',
-      }, {
+      },
+      {
         name: '发布历史',
         icon: 'table',
         path: 'releaseHistory',
         component: './onDutyAndRelease/releaseHistory',
+      }, {
+        name: '正式发布',
+        icon: 'table',
+        path: 'officialRelease',
+        component: './onDutyAndRelease/officialRelease',
       }
     ],
-  }, {
+  },
+  {
     name: "禅道管理",
     icon: 'table',
     path: '/zentao',
@@ -526,7 +534,8 @@ export default [
         // hideInMenu: true
       },
     ]
-  }, {
+  },
+  {
     name: "石墨管理",
     icon: 'table',
     path: '/shimo',

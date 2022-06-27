@@ -334,7 +334,7 @@ const converseForAgGrid_defectRate = (oraDatas: any) => {
 };
 
 
-// 使用界面：项目计划偏差率
+// 使用界面：项目计划偏差率、提测计划偏差率
 const converseForAgGrid_projectPlanDevition = (oraDatas: any) => {
   if (!oraDatas) return [];
   const resultArray: any = [];

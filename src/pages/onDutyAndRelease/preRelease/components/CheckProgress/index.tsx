@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {message, Progress, Row, Select, Modal, Button, Form, Col, Checkbox} from 'antd';
 import {useModel} from '@@/plugin-model/useModel';
-import {saveProcessResult} from './axiosRequest';
+import {saveProcessResult, executeAutoCheck} from './axiosRequest';
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 
 const {Option} = Select;
@@ -44,33 +44,35 @@ const CheckProgress: React.FC<any> = () => {
 
   // 确认发布
   const handleOk = async () => {
-
+    const formData = pulishResultForm.getFieldsValue();
     // 如果是发布成功，则需要判断下面自动化选项是否勾选
     if (!isModalVisible.autoCheckDisabled) { // 是发布成功
-      const formData = pulishResultForm.getFieldsValue();
       if (formData.ignoreAfterCheck === undefined || (formData.ignoreAfterCheck).length === 0) { // 不忽略的时候
         if (formData.checkResult === undefined || (formData.checkResult).length === 0) { // 一个结果都没选中
           errorMessage("检查结果必须至少勾选一项！")
           return;
         }
       }
+
+      // 发布成功才调用自动化检查接口()
+      await executeAutoCheck(formData,tabsData.activeKey);
     }
 
-    const result = await saveProcessResult(tabsData.activeKey, isModalVisible.result);
-    if (result === '') {
-      sucMessage('发布结果保存成功！')
-      modifyProcessStatus({
-        ...processStatus,
-        releaseResult: isModalVisible.result,
-      });
-      setModalVisible({
-        ...isModalVisible,
-        result: "",
-        show: false
-      });
-    } else {
-      errorMessage(result.toString())
-    }
+    // const result = await saveProcessResult(tabsData.activeKey, isModalVisible.result);
+    // if (result === '') {
+    //   sucMessage('发布结果保存成功！')
+    //   modifyProcessStatus({
+    //     ...processStatus,
+    //     releaseResult: isModalVisible.result,
+    //   });
+    //   setModalVisible({
+    //     ...isModalVisible,
+    //     result: "",
+    //     show: false
+    //   });
+    // } else {
+    //   errorMessage(result.toString())
+    // }
   };
 
   // 取消发布
@@ -194,13 +196,13 @@ const CheckProgress: React.FC<any> = () => {
           </Form.Item>
           <Form.Item label="是否忽略发布成功后自动化检查:" name="ignoreAfterCheck" style={{marginTop: -25}}>
             <Checkbox.Group style={{width: '100%'}} disabled={isModalVisible.autoCheckDisabled}>
-              <Checkbox value="ignoreCheck">忽略检查</Checkbox>
+              <Checkbox value="yes">忽略检查</Checkbox>
             </Checkbox.Group>
           </Form.Item>
           <Form.Item label="检查结果:" name="checkResult" style={{marginTop: -25}}>
             <Checkbox.Group style={{width: '100%'}} disabled={isModalVisible.autoCheckDisabled}>
-              <Checkbox value="UI_Pass">UI执行通过</Checkbox>
-              <Checkbox value="Applets_Pass">小程序执行通过</Checkbox>
+              <Checkbox value="ui">UI执行通过</Checkbox>
+              <Checkbox value="applet">小程序执行通过</Checkbox>
             </Checkbox.Group>
           </Form.Item>
         </Form>

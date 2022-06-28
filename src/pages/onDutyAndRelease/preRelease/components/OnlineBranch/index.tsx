@@ -179,6 +179,7 @@ const OnlineBranch: React.FC<any> = () => {
       const result = await getCheckNumForOnlineBranch();
       newOnlineBranchNum = result.data?.check_num;
     } else {
+
       newOnlineBranchNum = params.check_num;
       const oraData = await getModifiedData(newOnlineBranchNum);
 
@@ -188,17 +189,6 @@ const OnlineBranch: React.FC<any> = () => {
       let mainSince;
       if (oraData.branchCheck?.branch_mainSince) {
         mainSince = moment(oraData.branchCheck?.branch_mainSince);
-      }
-
-      // 上线前的检查类型
-      let beforeType = oraData.beforeOnlineCheck?.beforeCheckType;
-      if (oraData.beforeOnlineCheck?.beforeCheckType) {
-        if (
-          (oraData.beforeOnlineCheck?.beforeCheckType).length === 1 &&
-          (oraData.beforeOnlineCheck?.beforeCheckType).includes('9')
-        ) {
-          beforeType = undefined;
-        }
       }
 
       branchName = oraData.checkHead.branchName;
@@ -225,17 +215,15 @@ const OnlineBranch: React.FC<any> = () => {
         checkEnv: oraData.envCheck.checkEnv,
 
         // 上线前自动化检查
-        autoBeforeIgnoreCheck: oraData.beforeOnlineCheck?.autoBeforeIgnoreCheck,
-        beforeCheckType: beforeType,
-        beforeTestEnv: oraData.beforeOnlineCheck?.beforeTestEnv,
-        beforeBrowser: oraData.beforeOnlineCheck?.beforeBrowser,
+        autoBeforeIgnoreCheck: oraData.beforeOnlineCheck?.ignoreCheck,
+        autoCheckResult: oraData.beforeOnlineCheck?.checkResult,
 
         //   隐藏字段，修改时需要使用
         branchCheckId: oraData.checkHead?.branchCheckId,
         versionCheckId: oraData.versonCheck?.versionCheckId,
         envCheckId: oraData.envCheck?.checkId,
-        beforeAutomationId: oraData.beforeOnlineCheck?.automationId,
-        afterAutomationId: oraData.afterOnlineCheck?.automationId,
+        // beforeAutomationId: oraData.beforeOnlineCheck?.automationId,
+        // afterAutomationId: oraData.afterOnlineCheck?.automationId,
       });
       modifyLockedItem(
         `${tabsData.activeKey}-step4-onlineBranch-${oraData.checkHead?.branchCheckId}`,

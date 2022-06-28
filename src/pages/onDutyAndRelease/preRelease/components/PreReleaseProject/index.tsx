@@ -34,6 +34,7 @@ const PreReleaseProject: React.FC<any> = () => {
     const result = await modifyTabsName(activeKey, newTabName);
     if (result === '') {
       //   重置tab名
+      // @ts-ignore
       const {tabPageInfo} = await alalysisInitData('tabPageInfo', '');
       if (tabPageInfo) {
         setTabsData(tabsData.activeKey, tabPageInfo.panes);

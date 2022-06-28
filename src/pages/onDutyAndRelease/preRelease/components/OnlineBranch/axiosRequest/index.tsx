@@ -109,51 +109,30 @@ const alayEnvironmentCheck = (source_data: any) => {
 
 // 自动化检查
 const autoCheck = (source_data: any) => {
+
+  const autoCheckData = source_data.automation_check;
   if (!source_data.automation_check || source_data.automation_check.length === 0) {
     return {};
   }
 
-  const beforeOnline = {
-    automationId: '',
-    checkNum: '',
-    autoBeforeIgnoreCheck: '',
-    beforeCheckType: '',
-    beforeTestEnv: '',
-    beforeBrowser: '',
+  const beforeOnline: any = {
+    ignoreCheck: '',
+    checkResult: []
   };
-  const afterOnliinie = {
-    automationId: '',
-    checkNum: '',
-    autoAfterIgnoreCheck: '',
-    afterCheckType: '',
-    afterTestEnv: '',
-    afterBrowser: '',
-  };
-  source_data.automation_check.forEach((ele: any) => {
-    let checkType = [];
-    if (ele.check_type) {
-      checkType = ele.check_type.split(',');
-    }
-    if (ele.check_time === '1') {
-      // 上线前
-      beforeOnline.automationId = ele.automation_id;
-      beforeOnline.checkNum = ele.check_num;
-      beforeOnline.autoBeforeIgnoreCheck = ele.ignore_check;
-      beforeOnline.beforeCheckType = checkType;
-      beforeOnline.beforeTestEnv = ele.test_env;
-      beforeOnline.beforeBrowser = ele.browser;
-    } else if (ele.check_time === '2') {
-      // 上线后
-      afterOnliinie.automationId = ele.automation_id;
-      afterOnliinie.checkNum = ele.check_num;
-      afterOnliinie.autoAfterIgnoreCheck = ele.ignore_check;
-      afterOnliinie.afterCheckType = checkType;
-      afterOnliinie.afterTestEnv = ele.test_env;
-      afterOnliinie.afterBrowser = ele.browser;
+  autoCheckData.forEach((ele: any) => {
+    beforeOnline.ignoreCheck = ele.ignore_check;
+
+    if (ele.check_type === "ui" && ele.check_result === "yes") {
+      beforeOnline.checkResult.push("ui");
+    } else if (ele.check_type === "api" && ele.check_result === "yes") {
+      beforeOnline.checkResult.push("api");
+    } else if (ele.check_type === "applet" && ele.check_result === "yes") {
+      beforeOnline.checkResult.push("applet");
     }
   });
 
-  return {beforeOnline, afterOnliinie};
+
+  return beforeOnline;
 };
 
 
@@ -189,8 +168,8 @@ const getModifiedData = async (checkNum: string) => {
     versonCheck: alayVersonCheck(source_data).versonCheckData,
     branchCheck: alayVersonCheck(source_data).branchCheck,
     envCheck: alayEnvironmentCheck(source_data),
-    beforeOnlineCheck: autoCheck(source_data).beforeOnline,
-    afterOnlineCheck: autoCheck(source_data).afterOnliinie,
+    beforeOnlineCheck: autoCheck(source_data),
+    // afterOnlineCheck: autoCheck(source_data).afterOnliinie,
   };
 };
 
@@ -461,12 +440,12 @@ const saveEnvironmentCheck = async (
   newOnlineBranchNum: string,
   sourceData: any,
 ) => {
-  let ignore_check = '2';
+  let ignoreCheck = '2';
   if (sourceData.ignoreCheck) {
     if (Array.isArray(sourceData.ignoreCheck)) {
-      ignore_check = sourceData.ignoreCheck.length === 1 ? '1' : '2';
+      ignoreCheck = sourceData.ignoreCheck.length === 1 ? '1' : '2';
     } else {
-      ignore_check = sourceData.ignoreCheck;
+      ignoreCheck = sourceData.ignoreCheck;
     }
   }
 
@@ -474,7 +453,7 @@ const saveEnvironmentCheck = async (
     check_num: newOnlineBranchNum,
     user_name: usersInfo.name,
     user_id: usersInfo.userid,
-    ignore_check: ignore_check,
+    ignore_check: ignoreCheck,
     check_env: sourceData.checkEnv,
   };
 
@@ -503,7 +482,7 @@ const saveEnvironmentCheck = async (
 
 // 上线前自动化检查
 const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any) => {
-  debugger;
+
   // 上线前检查: 打勾是yes，没打勾是no
   let before_ignore_check = 'no';
   if (sourceData.autoBeforeIgnoreCheck) {

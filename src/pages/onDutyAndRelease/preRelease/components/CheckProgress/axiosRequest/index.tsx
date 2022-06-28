@@ -73,6 +73,7 @@ const saveProcessResult = async (releaseNum: string, result: string) => {
 
 // 执行上线后自动化检查功能
 const executeAutoCheck = async (source: any, currentListNo: string) => {
+
   // 上线前后检查: 打勾是yes，没打勾是no
   let after_ignore_check = 'no';
   if (source.ignoreAfterCheck && (source.ignoreAfterCheck).length > 0) {
@@ -85,7 +86,7 @@ const executeAutoCheck = async (source: any, currentListNo: string) => {
     "ignore_check": after_ignore_check,
     "check_time": "after",
     "check_type": "ui",
-    "check_result": after_ignore_check === "yes" ? "no" : "yes", // 与忽略检查的值相反
+    "check_result": "no",
     "ready_release_num": currentListNo
   }, {
     "user_name": usersInfo.name,
@@ -93,9 +94,19 @@ const executeAutoCheck = async (source: any, currentListNo: string) => {
     "ignore_check": after_ignore_check,
     "check_time": "after",
     "check_type": "applet",
-    "check_result": after_ignore_check === "yes" ? "no" : "yes", // 与忽略检查的值相反
+    "check_result": "no",
     "ready_release_num": currentListNo
   }];
+
+  if (after_ignore_check === "no" && (source.checkResult).length > 0) {
+    (source.checkResult).forEach((ele: string) => {
+      if (ele === "ui") {
+        data[0].check_result = "yes";
+      } else if (ele === "applet") {
+        data[1].check_result = "yes";
+      }
+    });
+  }
 
   const saveRt = await saveBeforeAndAfterOnlineAutoCheck(data);
   return saveRt;

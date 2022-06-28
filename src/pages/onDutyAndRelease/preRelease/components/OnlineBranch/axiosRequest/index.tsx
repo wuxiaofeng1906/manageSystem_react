@@ -503,7 +503,7 @@ const saveEnvironmentCheck = async (
 
 // 上线前自动化检查
 const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any) => {
-
+  debugger;
   // 上线前检查: 打勾是yes，没打勾是no
   let before_ignore_check = 'no';
   if (sourceData.autoBeforeIgnoreCheck) {
@@ -513,31 +513,51 @@ const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlin
       before_ignore_check = sourceData.autoBeforeIgnoreCheck;
     }
   }
-
-  const beforeData = {
+  const data = [{
     "user_name": usersInfo.name,
     "user_id": usersInfo.userid,
     "ignore_check": before_ignore_check,
     "check_time": "before",
-    "check_type": "",
-    "check_result": before_ignore_check === "yes" ? "no" : "yes", // 与忽略检查的值相反
-    "test_env": sourceData.imageevn,  // 传版本检查中的镜像环境
+    "check_type": "api",
+    "check_result": "no",
+    "test_env": sourceData.imageevn,
     "check_num": newOnlineBranchNum,
     "ready_release_num": currentListNo
-  };
-  const data = [];
-  // 有几个检查结果，数组里面就添加几个对象
+  }, {
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "ignore_check": before_ignore_check,
+    "check_time": "before",
+    "check_type": "ui",
+    "check_result": "no",
+    "test_env": sourceData.imageevn,
+    "check_num": newOnlineBranchNum,
+    "ready_release_num": currentListNo
+  }, {
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "ignore_check": before_ignore_check,
+    "check_time": "before",
+    "check_type": "applet",
+    "check_result": "no",
+    "test_env": sourceData.imageevn,
+    "check_num": newOnlineBranchNum,
+    "ready_release_num": currentListNo
+  }];
+
   if (before_ignore_check === "no" && (sourceData.autoCheckResult).length > 0) {
     (sourceData.autoCheckResult).forEach((ele: string) => {
-      const newDt = {...beforeData};
-      newDt.check_type = ele.toString();
-      data.push(newDt);
+      if (ele === "api") {
+        data[0].check_result = "yes";
+      } else if (ele === "ui") {
+        data[1].check_result = "yes";
+      } else if (ele === "applet") {
+        data[2].check_result = "yes";
+      }
     });
-  } else {
-    data.push(beforeData);
   }
-
-  return await saveBeforeAndAfterOnlineAutoCheck(data);
+  const messageRt = await saveBeforeAndAfterOnlineAutoCheck(data)
+  return messageRt;
 };
 
 // 保存上线分支的设置

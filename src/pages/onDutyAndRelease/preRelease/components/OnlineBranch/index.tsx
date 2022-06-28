@@ -767,7 +767,7 @@ const OnlineBranch: React.FC<any> = () => {
                     </Checkbox.Group>
                   </Form.Item>
                 </Col>
-                <Col span={8}>
+                <Col span={15}>
                   {/* 检查环境 */}
                   <Form.Item label="检查环境:" name="checkEnv" style={{marginTop: -10}}>
                     <Select style={{width: '100%'}} showSearch>
@@ -790,7 +790,7 @@ const OnlineBranch: React.FC<any> = () => {
                   style={{marginTop: -10}}
                 >
                   <Checkbox.Group>
-                    <Checkbox value={'1'}>忽略检查</Checkbox>
+                    <Checkbox value={'yes'}>忽略检查</Checkbox>
                   </Checkbox.Group>
                 </Form.Item>
               </Col>
@@ -800,13 +800,13 @@ const OnlineBranch: React.FC<any> = () => {
                 <Checkbox.Group style={{width: '100%', marginLeft: 27}}>
                   <Row>
                     <Col span={7}>
-                      <Checkbox value="UI_Pass">UI执行通过</Checkbox>
+                      <Checkbox value="ui">UI执行通过</Checkbox>
                     </Col>
                     <Col span={9}>
-                      <Checkbox value="Applets_Pass">小程序执行通过</Checkbox>
+                      <Checkbox value="applet">小程序执行通过</Checkbox>
                     </Col>
                     <Col span={8}>
-                      <Checkbox value="Interface_Pass">接口执行通过</Checkbox>
+                      <Checkbox value="api">接口执行通过</Checkbox>
                     </Col>
                   </Row>
                 </Checkbox.Group>

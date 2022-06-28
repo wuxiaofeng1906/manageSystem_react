@@ -500,106 +500,42 @@ const saveEnvironmentCheck = async (
   return errorMessage;
 };
 
-// (上线前后)自动化检查
-const saveOnlineAutoCheck = async (
-  type: string,
-  currentListNo: string,
-  newOnlineBranchNum: string,
-  sourceData: any,
-) => {
+// 上线前自动化检查
+const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any) => {
 
-  const data = [];
-
-  // 上线前检查: 打勾是1，没打勾是2
-  let before_ignore_check = '2';
+  // 上线前检查: 打勾是yes，没打勾是no
+  let before_ignore_check = 'no';
   if (sourceData.autoBeforeIgnoreCheck) {
     if (Array.isArray(sourceData.autoBeforeIgnoreCheck)) {
-      before_ignore_check = sourceData.autoBeforeIgnoreCheck.length === 1 ? '1' : '2';
+      before_ignore_check = sourceData.autoBeforeIgnoreCheck.length === 1 ? 'yes' : 'no';
     } else {
       before_ignore_check = sourceData.autoBeforeIgnoreCheck;
     }
   }
 
-  let before_check_type = '';
-  if (sourceData.beforeCheckType && sourceData.beforeCheckType.length) {
-    sourceData.beforeCheckType.forEach((ele: string) => {
-      before_check_type = before_check_type === '' ? ele : `${before_check_type},${ele}`;
-    });
-  } else {
-    before_check_type = '9';
-  }
-
   const beforeData = {
-    check_num: newOnlineBranchNum,
-    user_name: usersInfo.name,
-    user_id: usersInfo.userid,
-    check_time: '1', // 1 上线前检查， 2 上线后检查
-    ignore_check: before_ignore_check,
-    check_type: before_check_type,
-    test_env: sourceData.beforeTestEnv,
-    browser: sourceData.beforeBrowser,
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "ignore_check": before_ignore_check,
+    "check_time": "before",
+    "check_type": "",
+    "check_result": before_ignore_check === "yes" ? "no" : "yes", // 与忽略检查的值相反
+    "test_env": sourceData.imageevn,  // 传版本检查中的镜像环境
+    "check_num": newOnlineBranchNum,
+    "ready_release_num": currentListNo
   };
-
-  // if (before_ignore_check === "2") {
-  //   let before_check_type = "";
-  //   (sourceData.beforeCheckType).forEach((ele: string) => {
-  //     before_check_type = before_check_type === "" ? ele : `${before_check_type},${ele}`;
-  //   });
-  //   beforeData["check_type"] = before_check_type;
-  //   beforeData["test_env"] = sourceData.beforeTestEnv;
-  //   beforeData["browser"] = sourceData.beforeBrowser;
-  // }
-  if (type === '修改') {
-    beforeData['automation_id'] = sourceData.beforeAutomationId;
-  }
-
-  data.push(beforeData);
-
-  // 上线后检查
-  let after_ignore_check = '2';
-  if (sourceData.autoAfterIgnoreCheck) {
-    if (Array.isArray(sourceData.autoAfterIgnoreCheck)) {
-      after_ignore_check = sourceData.autoAfterIgnoreCheck.length === 1 ? '1' : '2';
-    } else {
-      after_ignore_check = sourceData.autoAfterIgnoreCheck;
-    }
-  }
-
-  let after_check_type = '';
-
-  if (sourceData.afterCheckType && sourceData.afterCheckType.length > 0) {
-    sourceData.afterCheckType.forEach((ele: string) => {
-      after_check_type = after_check_type === '' ? ele : `${after_check_type},${ele}`;
+  const data = [];
+  // 有几个检查结果，数组里面就添加几个对象
+  if (before_ignore_check === "no" && (sourceData.autoCheckResult).length > 0) {
+    (sourceData.autoCheckResult).forEach((ele: string) => {
+      const newDt = {...beforeData};
+      newDt.check_type = ele.toString();
+      data.push(newDt);
     });
   } else {
-    after_check_type = '9';
+    data.push(beforeData);
   }
 
-  const afterData = {
-    check_num: newOnlineBranchNum,
-    user_name: usersInfo.name,
-    user_id: usersInfo.userid,
-    check_time: '2', // 1 上线前检查， 2 上线后检查
-    ignore_check: after_ignore_check,
-    check_type: after_check_type,
-    test_env: sourceData.afterTestEnv,
-    browser: sourceData.afterBrowser,
-  };
-
-  // if (after_ignore_check === "2") {
-  //   let after_check_type = "";
-  //   (sourceData.afterCheckType).forEach((ele: string) => {
-  //     after_check_type = after_check_type === "" ? ele : `${after_check_type},${ele}`;
-  //   });
-  //   afterData["check_type"] = after_check_type;
-  //   afterData["test_env"] = sourceData.afterTestEnv;
-  //   afterData["browser"] = sourceData.afterBrowser;
-  // }
-
-  if (type === '修改') {
-    afterData['automation_id'] = sourceData.afterAutomationId;
-  }
-  data.push(afterData);
 
   let errorMessage = '';
   await axios
@@ -618,6 +554,7 @@ const saveOnlineAutoCheck = async (
 
 // 保存上线分支的设置
 const saveOnlineBranchData = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any,) => {
+
   //   保存分了4个接口，
   //  1.上线分支头部设置
   //  2.版本检查设置
@@ -671,16 +608,16 @@ const saveOnlineBranchData = async (type: string, currentListNo: string, newOnli
   const enviromentCheck = await saveEnvironmentCheck(type, currentListNo, newOnlineBranchNum, sourceData,);
   if (enviromentCheck !== '') {
     returnMessage = returnMessage === ''
-        ? `环境一致性检查保存失败：${enviromentCheck}`
-        : `${returnMessage}；\n环境一致性检查保存失败：${enviromentCheck}`;
+      ? `环境一致性检查保存失败：${enviromentCheck}`
+      : `${returnMessage}；\n环境一致性检查保存失败：${enviromentCheck}`;
   }
 
   // 保存自动化检查
   const onlineAutoCheck = await saveOnlineAutoCheck(type, currentListNo, newOnlineBranchNum, sourceData,);
   if (onlineAutoCheck !== '') {
     returnMessage = returnMessage === ''
-        ? `自动化检查保存失败：${onlineAutoCheck}`
-        : `${returnMessage}；\n自动化检查保存失败：${onlineAutoCheck}`;
+      ? `自动化检查保存失败：${onlineAutoCheck}`
+      : `${returnMessage}；\n自动化检查保存失败：${onlineAutoCheck}`;
   }
 
   return returnMessage;

@@ -308,6 +308,22 @@ const getBrowserType = async () => {
   return result;
 };
 
+
+const saveBeforeAndAfterOnlineAutoCheck = async (data: any) => {
+  let errorMessage = '';
+  await axios
+    .post('/api/verify/release/automation_check', data)
+    .then(function (res) {
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    })
+    .catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+};
 export {
   queryReleaseType,
   queryReleaseWay,
@@ -322,5 +338,6 @@ export {
   getTechSide,
   getCheckType,
   getBrowserType,
-  queryDutyNames
+  queryDutyNames,
+  saveBeforeAndAfterOnlineAutoCheck
 };

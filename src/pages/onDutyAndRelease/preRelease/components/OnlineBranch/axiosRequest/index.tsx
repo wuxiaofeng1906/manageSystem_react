@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {getDutyPersonPermission, getSystemPersonPermission} from '../../../authority/permission';
 import dayjs from "dayjs";
+import {saveBeforeAndAfterOnlineAutoCheck} from "../../../comControl/axiosRequest";
 
 const sys_accessToken = localStorage.getItem('accessId');
 axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
@@ -536,20 +537,7 @@ const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlin
     data.push(beforeData);
   }
 
-
-  let errorMessage = '';
-  await axios
-    .post('/api/verify/release/automation_check', data)
-    .then(function (res) {
-      if (res.data.code !== 200) {
-        errorMessage = `错误：${res.data.msg}`;
-      }
-    })
-    .catch(function (error) {
-      errorMessage = `异常信息:${error.toString()}`;
-    });
-
-  return errorMessage;
+  return await saveBeforeAndAfterOnlineAutoCheck(data);
 };
 
 // 保存上线分支的设置

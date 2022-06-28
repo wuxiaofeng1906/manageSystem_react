@@ -9,9 +9,14 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {Col, DatePicker, Form, Input, Row, Select} from "antd";
 import "./style/style.css"
 import {useRequest} from "ahooks";
-import {loadReleaseTypeSelect, loadReleaseWaySelect} from "@/pages/onDutyAndRelease/preRelease/comControl/controler";
+import {
+  loadReleaseTypeSelect,
+  loadReleaseWaySelect,
+  loadDutyNamesSelect
+} from "@/pages/onDutyAndRelease/preRelease/comControl/controler";
 import {getHeight} from "@/publicMethods/pageSet";
 import {releaseColumns} from "./grid/columns";
+import moment from 'moment';
 
 const {Option} = Select;
 const OfficialRelease: React.FC<any> = () => {
@@ -24,7 +29,7 @@ const OfficialRelease: React.FC<any> = () => {
   const [formForOfficialRelease] = Form.useForm(); // 预发布
   const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
   const releaseWayArray = useRequest(() => loadReleaseWaySelect()).data;
-
+  const dutyNameArray = useRequest(() => loadDutyNamesSelect()).data; // 关联值班名单
 
   // 表格的屏幕大小自适应
   const [gridHeight, setGridHeight] = useState(getHeight() - 180);
@@ -79,19 +84,21 @@ const OfficialRelease: React.FC<any> = () => {
                   <Col span={7}>
                     {/* 发布类型 */}
                     <Form.Item label="发布类型:" name="pulishType">
-                      <Select>{releaseTypeArray}</Select>
+                      <Select disabled={true} defaultValue={"2"}>{releaseTypeArray}</Select>
                     </Form.Item>
                   </Col>
                   <Col span={7}>
                     {/* 发布方式 */}
                     <Form.Item label="发布方式:" name="pulishMethod">
-                      <Select>{releaseWayArray}</Select>
+                      <Select defaultValue={"1"}>{releaseWayArray}</Select>
                     </Form.Item>
                   </Col>
                   <Col span={10}>
                     {/* 发布时间 */}
                     <Form.Item label="计划发布时间" name="pulishTime">
-                      <DatePicker showTime format="YYYY-MM-DD HH:mm" style={{width: '100%'}}/>
+                      <DatePicker defaultValue={moment(moment().add(1, "days").format("YYYY-MM-DD"))} showTime
+                                  format="YYYY-MM-DD HH:mm"
+                                  style={{width: '100%'}}/>
                     </Form.Item>
                   </Col>
                 </Row>
@@ -99,7 +106,9 @@ const OfficialRelease: React.FC<any> = () => {
                   <Col span={14}>
                     {/* 关联值班名单 */}
                     <Form.Item label="关联值班名单" name="pulishTime" style={{marginLeft: 5}}>
-                      <Select>{releaseWayArray}</Select>
+                      <Select filterOption={(inputValue: string, option: any) =>
+                        !!option.children.includes(inputValue)} showSearch
+                      >{dutyNameArray}</Select>
                     </Form.Item>
                   </Col>
                   <Col span={5}>

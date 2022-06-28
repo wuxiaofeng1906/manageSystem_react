@@ -6,7 +6,7 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useRequest} from "ahooks";
-import {getGrayscaleListData} from './axiosRequest/apiPage';
+import {getGrayscaleListData, getFormalListData} from './axiosRequest/apiPage';
 import {history} from "@@/core/history";
 import {Button, DatePicker, Select} from "antd";
 import {loadPrjNameSelect} from "@/pages/onDutyAndRelease/preRelease/comControl/controler";
@@ -17,11 +17,16 @@ import {gridHeight, grayscaleBacklogList, releasedList} from './gridSet';
 
 const {RangePicker} = DatePicker;
 
-const queryCondition = {
+const formalQueryCondition = {
   start: dayjs().subtract(7, 'day').format("YYYY-MM-DD HH:mm:ss"),
   end: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-  project: ""
+  project: "",
+  page: 1, // 跳转到第几页
+  pageSize: 10  // 一页显示多少条数据
 }
+const start = dayjs().subtract(30, 'day').format("YYYY-MM-DD HH:mm:ss");
+const end = dayjs().format("YYYY-MM-DD HH:mm:ss");
+
 const ReleaseHistory: React.FC<any> = () => {
 
   /* region 灰度积压列表 */
@@ -30,20 +35,22 @@ const ReleaseHistory: React.FC<any> = () => {
     grayscaleGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
-
   // 积压列表数据
-  const grayscaleData = useRequest(() => getGrayscaleListData({release_type: "1"})).data;
+  const grayscaleData = useRequest(() => getGrayscaleListData(start, end)).data;
 
+  // 根据时间查询
+  const onGrayReleaseTimeChanged = async (params: any, times: any) => {
+    const grayReleaseList = await getGrayscaleListData(dayjs(times[0]).format("YYYY-MM-DD HH:mm:ss"), dayjs(times[1]).format("YYYY-MM-DD HH:mm:ss"));
+    grayscaleGridApi.current?.setRowData(grayReleaseList);
+  };
   // 一键生成正式发布
   const generateFormalRelease = () => {
     history.push(`/onDutyAndRelease/officialRelease`);
-
   };
 
   // 待发布详情
   const releaseDetails = () => {
     history.push(`/onDutyAndRelease/officialRelease`);
-
   };
   /* endregion */
 
@@ -61,24 +68,23 @@ const ReleaseHistory: React.FC<any> = () => {
   const projectsArray = useRequest(() => loadPrjNameSelect()).data;
 
   // 正式发布列表数据
-  const releasedData = useRequest(() => getGrayscaleListData({
-    release_type: "2",
-    release_start_time: queryCondition.start,
-    release_end_time: queryCondition.end
-  })).data;
+  const releasedData = useRequest(() => getFormalListData(formalQueryCondition)).data;
 
   // 根据查询条件获取数据
   const getReleasedList = async () => {
-    const cond = {release_type: "2"};
+    const cond = {
+      page: 1,
+      pageSize: 10
+    };
 
-    if (queryCondition.start && queryCondition.end) {
-      cond["release_start_time"] = queryCondition.start;
-      cond["release_end_time"] = queryCondition.end;
+    if (formalQueryCondition.start && formalQueryCondition.end) {
+      cond["release_start_time"] = formalQueryCondition.start;
+      cond["release_end_time"] = formalQueryCondition.end;
     }
-    if (queryCondition.project) {
-      cond["project_id"] = queryCondition.project;
+    if (formalQueryCondition.project) {
+      cond["project_id"] = formalQueryCondition.project;
     }
-    const result = await getGrayscaleListData(cond);
+    const result = await getFormalListData(cond);
     releasedGridApi.current?.setRowData(result.data);
     setReleasedGridHight(gridHeight(result?.data))
   };
@@ -93,16 +99,15 @@ const ReleaseHistory: React.FC<any> = () => {
       });
     }
 
-    queryCondition.project = prjStr;
+    formalQueryCondition.project = prjStr;
     getReleasedList();
   };
 
   // 根据时间获取
   const onReleaseProject = (params: any, times: any) => {
-    queryCondition.start = times[0] === "" ? "" : dayjs(times[0]).format("YYYY-MM-DD HH:mm:ss");
-    queryCondition.end = times[1] === "" ? "" : dayjs(times[1]).format("YYYY-MM-DD HH:mm:ss");
+    formalQueryCondition.start = times[0] === "" ? "" : dayjs(times[0]).format("YYYY-MM-DD HH:mm:ss");
+    formalQueryCondition.end = times[1] === "" ? "" : dayjs(times[1]).format("YYYY-MM-DD HH:mm:ss");
     getReleasedList();
-
   }
 
   /* endregion */
@@ -138,25 +143,23 @@ const ReleaseHistory: React.FC<any> = () => {
           border: "solid 1px #CCCCCC"
         }}> &nbsp;
           <label style={{fontWeight: "bold",}}>灰度积压列表 </label>
-          <Button type="text" onClick={releaseDetails}
-                  style={{
-                    float: "right"
-                    // display: judgeAuthorityByName("addDutyMsgPush") === true ? "inline" : "none"
-                  }}>
+          <Button type="text" onClick={releaseDetails} style={{float: "right"}}>
 
             <img src="../pushMessage.png" width="25" height="25" alt="待发布详情" title="待发布详情"/> &nbsp;待发布详情
           </Button>
-          <Button type="text" onClick={generateFormalRelease}
-                  style={{
-                    float: "right"
-                    // display: judgeAuthorityByName("addDutyMsgPush") === true ? "inline" : "none"
-                  }}>
+          <Button type="text" onClick={generateFormalRelease} style={{float: "right"}}>
 
             <img src="../pushMessage_gray.png" width="25" height="25" alt="一键生成正式发布" title="一键生成正式发布"/> &nbsp;一键生成正式发布
           </Button>
+          <div style={{float: "right"}}>
+            <label style={{marginLeft: 10}}>发布时间: </label>
+            <RangePicker style={{marginLeft: 5}} size={"small"} defaultValue={[moment(start), moment(end)]}
+                         onChange={onGrayReleaseTimeChanged}/>
+          </div>
         </div>
-
-        <div className="ag-theme-alpine" style={{height: gridHeight(grayscaleData?.data), width: '100%'}}>
+        <button></button>
+        <div className="ag-theme-alpine"
+             style={{marginTop: -21, height: gridHeight(grayscaleData?.data), width: '100%'}}>
           <AgGridReact
             columnDefs={grayscaleBacklogList()} // 定义列
             rowData={grayscaleData?.data} // 数据绑定
@@ -187,13 +190,11 @@ const ReleaseHistory: React.FC<any> = () => {
 
       {/*  已正式发布列表 */}
       <div style={{marginTop: 20}}>
-        <div
-          style={{
-            height: "35px", lineHeight: "35px",
-            width: "100%", backgroundColor: "#F8F8F8",
-            border: "solid 1px #CCCCCC",
-          }}
-        >
+        <div style={{
+          height: "35px", lineHeight: "35px",
+          width: "100%", backgroundColor: "#F8F8F8",
+          border: "solid 1px #CCCCCC",
+        }}>
           <label style={{fontWeight: "bold", float: "left"}}>已正式发布列表</label>
           <div style={{textAlign: "right"}}>
             <label> 项目名称:</label>
@@ -203,7 +204,7 @@ const ReleaseHistory: React.FC<any> = () => {
             </Select>
             <label style={{marginLeft: 10}}>发布时间: </label>
             <RangePicker style={{marginLeft: 5}} size={"small"}
-                         defaultValue={[moment(queryCondition.start), moment(queryCondition.end)]}
+                         defaultValue={[moment(formalQueryCondition.start), moment(formalQueryCondition.end)]}
                          onChange={onReleaseProject}/>
           </div>
 
@@ -246,8 +247,6 @@ const ReleaseHistory: React.FC<any> = () => {
           >
           </AgGridReact>
         </div>
-
-
       </div>
 
     </PageContainer>

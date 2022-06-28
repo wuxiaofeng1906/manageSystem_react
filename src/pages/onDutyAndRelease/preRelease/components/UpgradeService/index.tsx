@@ -41,7 +41,9 @@ const UpgradeService: React.FC<any> = () => {
     modifyReleasedID, allLockedArray, operteStatus,
   } = useModel('releaseProcess');
   const [formUpgradeService] = Form.useForm(); // 升级服务
-  const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
+  // 暂时忽略掉一键部署ID后端服务的获取
+  // const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
+  const releaseIDArray = [];
 
   /* region 升级服务： 发布项表格 */
   const releaseItemGridApi = useRef<GridApi>();

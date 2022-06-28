@@ -15,8 +15,7 @@ import {
 import moment from 'moment';
 import dayjs from 'dayjs';
 import {
-  loadBranchNameSelect, loadBrowserTypeSelect, loadCheckTypeSelect,
-  loadTestEnvSelect, loadServiceSelect, loadTechSideSelect,
+  loadBranchNameSelect, loadTestEnvSelect, loadServiceSelect, loadTechSideSelect,
 } from '../../comControl/controler';
 import {alalysisInitData} from '../../datas/dataAnalyze';
 import {getGridRowsHeight} from '../gridHeight';
@@ -42,9 +41,9 @@ const OnlineBranch: React.FC<any> = () => {
     techSide: [],
     server: [],
     imgEnv: [],
-    before_checkType: [],
-    after_checkType: [],
-    browser: [],
+    // before_checkType: [],
+    // after_checkType: [],
+    // browser: [],
   });
   const [logModal, setLogModal] = useState({
     show: false,
@@ -267,9 +266,9 @@ const OnlineBranch: React.FC<any> = () => {
       techSide: await loadTechSideSelect(),
       server: await loadServiceSelect(branchName),
       imgEnv: await loadTestEnvSelect(),
-      before_checkType: await loadCheckTypeSelect('before'),
-      after_checkType: await loadCheckTypeSelect('after'),
-      browser: await loadBrowserTypeSelect(),
+      // before_checkType: await loadCheckTypeSelect('before'),
+      // after_checkType: await loadCheckTypeSelect('after'),
+      // browser: await loadBrowserTypeSelect(),
     });
   };
 

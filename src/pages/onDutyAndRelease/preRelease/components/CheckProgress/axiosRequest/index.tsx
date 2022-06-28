@@ -79,32 +79,25 @@ const executeAutoCheck = async (source: any, currentListNo: string) => {
     after_ignore_check = 'yes'
   }
 
-  const afterData = {
+  const data = [{
     "user_name": usersInfo.name,
     "user_id": usersInfo.userid,
     "ignore_check": after_ignore_check,
     "check_time": "after",
-    "check_type": "",
+    "check_type": "ui",
     "check_result": after_ignore_check === "yes" ? "no" : "yes", // 与忽略检查的值相反
-    // "test_env": sourceData.imageevn,  // 传版本检查中的镜像环境
-    // "check_num": newOnlineBranchNum,
     "ready_release_num": currentListNo
-  };
-
-  const data = [];
-  // 有几个检查结果，数组里面就添加几个对象
-  if (after_ignore_check === "no" && (source.checkResult).length > 0) {
-    (source.checkResult).forEach((ele: string) => {
-      const newDt = {...afterData};
-      newDt.check_type = ele.toString();
-      data.push(newDt);
-    });
-  } else {
-    data.push(afterData);
-  }
+  }, {
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "ignore_check": after_ignore_check,
+    "check_time": "after",
+    "check_type": "applet",
+    "check_result": after_ignore_check === "yes" ? "no" : "yes", // 与忽略检查的值相反
+    "ready_release_num": currentListNo
+  }];
 
   const saveRt = await saveBeforeAndAfterOnlineAutoCheck(data);
-
   return saveRt;
 };
 

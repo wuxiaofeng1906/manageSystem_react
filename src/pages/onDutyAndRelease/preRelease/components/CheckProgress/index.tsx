@@ -54,25 +54,28 @@ const CheckProgress: React.FC<any> = () => {
         }
       }
 
-      // 发布成功才调用自动化检查接口()
-      await executeAutoCheck(formData,tabsData.activeKey);
+      // 发布成功才调用自动化检查接口
+      const result = await executeAutoCheck(formData, tabsData.activeKey);
+      if (result) {
+        errorMessage(`发布成功后自动化检查失败：${result}`);
+      }
     }
 
-    // const result = await saveProcessResult(tabsData.activeKey, isModalVisible.result);
-    // if (result === '') {
-    //   sucMessage('发布结果保存成功！')
-    //   modifyProcessStatus({
-    //     ...processStatus,
-    //     releaseResult: isModalVisible.result,
-    //   });
-    //   setModalVisible({
-    //     ...isModalVisible,
-    //     result: "",
-    //     show: false
-    //   });
-    // } else {
-    //   errorMessage(result.toString())
-    // }
+    const result = await saveProcessResult(tabsData.activeKey, isModalVisible.result);
+    if (result === '') {
+      sucMessage('发布结果保存成功！')
+      modifyProcessStatus({
+        ...processStatus,
+        releaseResult: isModalVisible.result,
+      });
+      setModalVisible({
+        ...isModalVisible,
+        result: "",
+        show: false
+      });
+    } else {
+      errorMessage(result.toString())
+    }
   };
 
   // 取消发布

@@ -446,18 +446,17 @@ const autoCheckRenderer = (params: any) => {
 
   if (autoValue && autoValue.length > 0) {
     autoValue.forEach((ele: any) => {
-      if (ele.ignore_check === "no") {
+      if (ele.ignore_check === "no" && ele.check_time==="before") {
         if (ele.check_type === 'ui') {
           ui_result = ele.check_result === "yes" ? "通过" : "不通过";
-          ui_color = ele.check_result === "yes" ? "#2BF541" : "black";
+          ui_color = ele.check_result === "yes" ? "#2BF541" : "#8B4513";
         } else if (ele.check_type === 'api') {
           api_result = ele.check_result === "yes" ? "通过" : "不通过";
-          api_color = ele.check_result === "yes" ? "#2BF541" : "black";
+          api_color = ele.check_result === "yes" ? "#2BF541" : "#8B4513";
         } else if (ele.check_type === 'applet') {
           applet_result = ele.check_result === "yes" ? "通过" : "不通过";
-          applet_color = ele.check_result === "yes" ? "#2BF541" : "black";
+          applet_color = ele.check_result === "yes" ? "#2BF541" : "#8B4513";
         }
-
       }
     });
   }
@@ -468,12 +467,10 @@ const autoCheckRenderer = (params: any) => {
 
   return `
   <div>
-      <div style="margin-top: -3px">ui:<label style="color: ${ui_color};font-size: 10px;padding-left: 25px"> ${ui_result}</label></div>
-      <div style="margin-top: -20px">api:<label style="color: ${api_color};font-size: 10px;padding-left: 16px"> ${api_result}</label></div>
-      <div style="margin-top: -20px">applet:<label style="color: ${applet_color};font-size: 10px"> ${applet_result}</label></div>
-
-  </div>
-`;
+      <div style="margin-top: -3px;font-size: 10px;">UI:<label style="color: ${ui_color};padding-left: 22px"> ${ui_result}</label></div>
+      <div style="margin-top: -20px;font-size: 10px">接口:<label style="color: ${api_color};padding-left: 13px"> ${api_result}</label></div>
+      <div style="margin-top: -20px;font-size: 10px">小程序:<label style="color: ${applet_color}"> ${applet_result}</label></div>
+  </div>`;
 
 
 };

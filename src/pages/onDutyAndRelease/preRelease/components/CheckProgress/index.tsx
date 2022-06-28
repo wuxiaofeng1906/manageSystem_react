@@ -3,6 +3,7 @@ import {message, Progress, Row, Select, Modal, Button, Form, Col, Checkbox} from
 import {useModel} from '@@/plugin-model/useModel';
 import {saveProcessResult, executeAutoCheck} from './axiosRequest';
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
+import {alalysisInitData} from "@/pages/onDutyAndRelease/preRelease/datas/dataAnalyze";
 
 const {Option} = Select;
 
@@ -58,24 +59,30 @@ const CheckProgress: React.FC<any> = () => {
       const result = await executeAutoCheck(formData, tabsData.activeKey);
       if (result) {
         errorMessage(`发布成功后自动化检查失败：${result}`);
+      } else {
+
+        // const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
+        // //  需要看后端的上线后自动化检查结果
+        // debugger;
+        // console.log(newData)
       }
     }
 
-    const result = await saveProcessResult(tabsData.activeKey, isModalVisible.result);
-    if (result === '') {
-      sucMessage('发布结果保存成功！')
-      modifyProcessStatus({
-        ...processStatus,
-        releaseResult: isModalVisible.result,
-      });
-      setModalVisible({
-        ...isModalVisible,
-        result: "",
-        show: false
-      });
-    } else {
-      errorMessage(result.toString())
-    }
+    // const result = await saveProcessResult(tabsData.activeKey, isModalVisible.result);
+    // if (result === '') {
+    //   sucMessage('发布结果保存成功！')
+    //   modifyProcessStatus({
+    //     ...processStatus,
+    //     releaseResult: isModalVisible.result,
+    //   });
+    //   setModalVisible({
+    //     ...isModalVisible,
+    //     result: "",
+    //     show: false
+    //   });
+    // } else {
+    //   errorMessage(result.toString())
+    // }
   };
 
   // 取消发布

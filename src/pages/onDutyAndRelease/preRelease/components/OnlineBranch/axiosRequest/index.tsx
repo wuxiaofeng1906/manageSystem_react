@@ -119,20 +119,36 @@ const autoCheck = (source_data: any) => {
     ignoreCheck: '',
     checkResult: []
   };
+  const afterOnline: any = {
+    ignoreCheck: '',
+    checkResult: []
+  };
   autoCheckData.forEach((ele: any) => {
-    beforeOnline.ignoreCheck = ele.ignore_check;
 
-    if (ele.check_type === "ui" && ele.check_result === "yes") {
-      beforeOnline.checkResult.push("ui");
-    } else if (ele.check_type === "api" && ele.check_result === "yes") {
-      beforeOnline.checkResult.push("api");
-    } else if (ele.check_type === "applet" && ele.check_result === "yes") {
-      beforeOnline.checkResult.push("applet");
+    if (ele.check_time === "before") {
+      beforeOnline.ignoreCheck = ele.ignore_check;
+
+      if (ele.check_type === "ui" && ele.check_result === "yes") {
+        beforeOnline.checkResult.push("ui");
+      } else if (ele.check_type === "api" && ele.check_result === "yes") {
+        beforeOnline.checkResult.push("api");
+      } else if (ele.check_type === "applet" && ele.check_result === "yes") {
+        beforeOnline.checkResult.push("applet");
+      }
+    } else if (ele.check_time === "before") {
+      afterOnline.ignoreCheck = ele.ignore_check;
+
+      if (ele.check_type === "ui" && ele.check_result === "yes") {
+        afterOnline.checkResult.push("ui");
+      } else if (ele.check_type === "applet" && ele.check_result === "yes") {
+        afterOnline.checkResult.push("applet");
+      }
     }
+
   });
 
 
-  return beforeOnline;
+  return {beforeOnline, afterOnline};
 };
 
 
@@ -168,8 +184,8 @@ const getModifiedData = async (checkNum: string) => {
     versonCheck: alayVersonCheck(source_data).versonCheckData,
     branchCheck: alayVersonCheck(source_data).branchCheck,
     envCheck: alayEnvironmentCheck(source_data),
-    beforeOnlineCheck: autoCheck(source_data),
-    // afterOnlineCheck: autoCheck(source_data).afterOnliinie,
+    beforeOnlineCheck: autoCheck(source_data).beforeOnline,
+    afterOnlineCheck: autoCheck(source_data).afterOnline,
   };
 };
 

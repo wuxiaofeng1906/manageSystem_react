@@ -221,7 +221,17 @@ const PreReleaseProject: React.FC<any> = () => {
                     </Form.Item>
                   </Col>
 
-                  <Col span={13}>
+                  <Col span={7}>
+                    {/* 关联值班名单 */}
+                    <Form.Item label="关联值班名单:" name="relateDutyName" style={{marginLeft: 5}}>
+                      <Select onFocus={releaseItemFocus}>
+                        <Option value="1">是</Option>
+                        <Option value="2">否</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+
+                  <Col span={6}>
                     {/* 是否忽略禅道checklist */}
                     <Form.Item label="是否忽略禅道checklist:" name="ignoreZentaoList" style={{marginLeft: 5}}>
                       <Select onFocus={releaseItemFocus}>
@@ -247,7 +257,6 @@ const PreReleaseProject: React.FC<any> = () => {
                       />
                     </Form.Item>
                   </Col>
-
                   <Col span={5}>
                     {/* 编辑人信息 */}
                     {/* 编辑人 */}

@@ -361,11 +361,11 @@ const DutyCatalog = () => {
         : it.user,
     }));
     form.setFieldsValue({
-      front: initDutyObj?.front ? [initDutyObj?.front?.value] : undefined,
-      backend: initDutyObj?.backend ? [initDutyObj?.backend?.value] : undefined,
-      test: initDutyObj?.test ? [initDutyObj?.test?.value] : undefined,
-      sqa: initDutyObj?.sqa ? [initDutyObj?.sqa?.value] : undefined,
-      operations: initDutyObj?.operations ? [initDutyObj?.operations?.value] : undefined,
+      front: initDutyObj?.front?.value.split(),
+      backend: initDutyObj?.backend?.value.split(),
+      test: initDutyObj?.test?.value.split(),
+      sqa: initDutyObj?.sqa?.value.split(),
+      operations: initDutyObj?.operations?.value.split(),
     });
     setProjects(formatProject);
     setRecentDuty(initDutyObj);

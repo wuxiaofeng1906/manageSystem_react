@@ -3,9 +3,7 @@ import {Button, Col, DatePicker, Form, Input, message, Row, Select} from 'antd';
 import {useModel} from '@@/plugin-model/useModel';
 import {useRequest} from 'ahooks';
 import {
-  loadPrjNameSelect,
-  loadReleaseTypeSelect,
-  loadReleaseWaySelect,
+  loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadDutyNamesSelect
 } from '../../comControl/controler';
 import '../../style/style.css';
 import moment from 'moment';
@@ -29,7 +27,7 @@ const PreReleaseProject: React.FC<any> = () => {
   const projectsArray = useRequest(() => loadPrjNameSelect()).data;
   const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
   const releaseWayArray = useRequest(() => loadReleaseWaySelect()).data;
-
+  const relateDutyNameArray = useRequest(() => loadDutyNamesSelect()).data;
   // 保存tab名
   const saveModifyName = async (activeKey: string, newTabName: string) => {
     // 被修改的一定是当前activekey中的数据
@@ -152,6 +150,7 @@ const PreReleaseProject: React.FC<any> = () => {
         proid: preReleaseData.pro_id,
         ignoreZentaoList: preReleaseData.ignoreZentaoList,
         checkListStatus: preReleaseData.checkListStatus,
+        relateDutyName: preReleaseData.relateDutyName
       });
     }
   }, [preReleaseData]);
@@ -224,9 +223,10 @@ const PreReleaseProject: React.FC<any> = () => {
                   <Col span={7}>
                     {/* 关联值班名单 */}
                     <Form.Item label="关联值班名单:" name="relateDutyName" style={{marginLeft: 5}}>
-                      <Select onFocus={releaseItemFocus}>
-                        <Option value="1">是</Option>
-                        <Option value="2">否</Option>
+                      <Select onFocus={releaseItemFocus} showSearch
+                              filterOption={(inputValue: string, option: any) =>
+                                !!option.children.includes(inputValue)}>
+                        {relateDutyNameArray}
                       </Select>
                     </Form.Item>
                   </Col>

@@ -71,6 +71,7 @@ export default () => {
     pro_id: '',
     ignoreZentaoList: '',
     checkListStatus: '',
+    relateDutyName:''
   });
 
   // 设置Tab的数据

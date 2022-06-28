@@ -44,6 +44,28 @@ const queryReleaseWay = async () => {
   return result;
 };
 
+// 发布方式
+const queryDutyNames = async () => {
+  const result: any = {
+    message: '',
+    data: [],
+  };
+  await axios
+    .get('/api/verify/release/duty', {})
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    })
+    .catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+};
+
 // 一键部署Id
 const queryReleaseId = async () => {
   const result: any = {
@@ -300,4 +322,5 @@ export {
   getTechSide,
   getCheckType,
   getBrowserType,
+  queryDutyNames
 };

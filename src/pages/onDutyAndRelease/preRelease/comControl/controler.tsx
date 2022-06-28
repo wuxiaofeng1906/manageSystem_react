@@ -7,7 +7,7 @@ import {
   queryReleaseType, queryReleaseWay, queryReleaseId, getOnlineDev,
   getPulishItem, getIsApiAndDatabaseUpgrade, getUpgradeApi,
   getApiService, getApiMethod, getRepaireCategory, getTechSide,
-  getCheckType, getBrowserType,
+  getCheckType, getBrowserType, queryDutyNames
 } from './axiosRequest';
 
 const {Option} = Select;
@@ -96,6 +96,34 @@ const loadReleaseWaySelect = async () => {
   }
 
   return wayData;
+};
+
+
+// 关联值班名单
+const loadDutyNamesSelect = async () => {
+  const dutyNames = await queryDutyNames();
+  const nameOptions: any = [];
+
+  if (dutyNames.message !== '') {
+    message.error({
+      content: dutyNames.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (dutyNames.data) {
+    const datas = dutyNames.data;
+    datas.forEach((dutyInfo: any) => {
+      nameOptions.push(
+        <Option key={dutyInfo.person_duty_num} value={`${dutyInfo.person_duty_num}`}>
+          {dutyInfo.duty_name}
+        </Option>,
+      );
+
+    });
+  }
+  return nameOptions;
 };
 
 /* endregion */
@@ -611,4 +639,5 @@ export {
   loadTestEnvSelect,
   loadCheckTypeSelect,
   loadBrowserTypeSelect,
+  loadDutyNamesSelect
 };

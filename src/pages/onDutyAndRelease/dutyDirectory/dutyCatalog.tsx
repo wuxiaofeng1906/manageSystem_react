@@ -77,7 +77,7 @@ const FilterSelector = ({
 };
 
 const DutyCatalog = () => {
-  const { id } = useParams() as { id: string };
+  const { id, status } = useParams() as { id: string; status: string };
   const [allPerson, setAllPerson] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [envList, setEnvList] = useState<any[]>([]);
@@ -225,18 +225,21 @@ const DutyCatalog = () => {
     });
   };
   // 保存
-  const onSave = async () => {
+  const onSave = async (updateDutyData: Record<string, any> | undefined) => {
     if (!hasPermission) return;
     const values = await form.getFieldsValue();
     const title = await updateTitle();
     const pickDuty = pick(values, ['front', 'backend', 'test', 'operations', 'sqa']);
     let dutyPersons: Record<string, any> = {};
-    Object.entries(pickDuty).forEach(([k, v]) => {
-      dutyPersons[k] = v?.map((it: string) => ({
-        user_type: it?.split('_')?.[1],
-        user_id: it?.split('_')?.[0],
-      }));
-    });
+    if (updateDutyData) {
+      dutyPersons = updateDutyData;
+    } else
+      Object.entries(pickDuty).forEach(([k, v]) => {
+        dutyPersons[k] = v?.map((it: string) => ({
+          user_type: it?.split('_')?.[1],
+          user_id: it?.split('_')?.[0],
+        }));
+      });
 
     const data = {
       person_duty_num: id,
@@ -256,9 +259,7 @@ const DutyCatalog = () => {
       project_pm: detail?.project_pm?.map((it: any) => it.user_id).join(),
       release_method: detail?.release_method == 'unknown' ? undefined : detail?.release_method,
     });
-    console.log(data);
     if (flag) return;
-
     // await DutyListServices.addDuty(data);
     // getDetail();
   };
@@ -328,6 +329,7 @@ const DutyCatalog = () => {
       fit: `${o.user_id}_head`,
     }));
     setDutyPerson(duty);
+    if (status == 'yes') return;
     const flag = isEqual(duty, updateDutySource);
     if (duty.length > updateDutySource.length) {
       setIsSameDuty(true);
@@ -370,8 +372,14 @@ const DutyCatalog = () => {
       icon: <ExclamationCircleOutlined />,
       content: '请确认是否需要更新为最新的值班负责人?',
       onOk: async () => {
-        await initalFormDuty(updateDutySource);
-        onSave();
+        let initDutyObj = {};
+        updateDutySource?.forEach((o: any) => {
+          initDutyObj[recentType[o.user_tech]] = {
+            user_type: o?.type,
+            user_id: o?.key,
+          };
+        });
+        await onSave(initDutyObj);
         setVisible(true);
       },
       onCancel: () => {

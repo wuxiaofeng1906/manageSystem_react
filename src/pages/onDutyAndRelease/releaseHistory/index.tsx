@@ -126,13 +126,19 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 灰度和正式发布详情页面跳转
   const releaseProcessDetail = (releData: any, type: string) => {
-    const releasedNum = releData.data?.ready_release_num;
 
-    if (releasedNum !== "") {
-      if (type === "gray") {
-        history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
+    if (type === "gray") { // 灰度列表跳到发布过程界面
+      const releasedNum = releData.data?.ready_release_num;
+      history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
+    } else {
+
+      const onlineReleasedNum = releData.data?.online_release_num;
+      if (type === "onlineGrayDetail") {
+        // 正式发布列表跳到发布过程界面
+        history.push(`/onDutyAndRelease/preRelease?releasedNum=${onlineReleasedNum}&history=true`);
       } else {
-        history.push(`/onDutyAndRelease/officialRelease?releasedNum=${releasedNum}&history=true`);
+        // 正式发布列表跳到正式发布界面
+        history.push(`/onDutyAndRelease/officialRelease?releaseNum=${onlineReleasedNum}&history=true`);
       }
     }
   };
@@ -242,16 +248,25 @@ const ReleaseHistory: React.FC<any> = () => {
             onGridReady={onReleasedGridReady}
             frameworkComponents={{
               officialReleaseDetails: (params: any) => {
+                // 需要判断有没有灰度，没有则置灰
+                let srcPath = "../gray_detail_normal.png";
+                let buttonDisable = false;
+                if (false) {
+                  srcPath = "../gray_detail_forbit.png";
+                  buttonDisable = true;
+                }
+
                 return (
                   <div>
                     <Button
+                      disabled={buttonDisable}
                       style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
-                      onClick={() => releaseProcessDetail(params, "gray")}>
-                      <img src="../gray_detail_forbit.png" width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情"/>
+                      onClick={() => releaseProcessDetail(params, "onlineGrayDetail")}>
+                      <img src={srcPath} width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情"/>
                     </Button>
                     <Button
                       style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
-                      onClick={() => releaseProcessDetail(params, "official")}>
+                      onClick={() => releaseProcessDetail(params, "officialDetail")}>
                       <img src="../formal_detail.png" width="20" height="20" alt="正式发布过程详情" title="正式发布过程详情"/>
                     </Button>
                   </div>

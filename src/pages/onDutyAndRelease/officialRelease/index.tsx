@@ -33,6 +33,8 @@ const {Option} = Select;
 
 const OfficialRelease: React.FC<any> = (props: any) => {
   const releaseNums = props.location?.query?.releaseNum;
+  const historyQuery = props.location?.query?.history;
+  debugger;
 
   const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
   const dutyNameArray = useRequest(() => loadDutyNamesSelect()).data; // 关联值班名单
@@ -360,6 +362,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                   frameworkComponents={{
                     releaseEnvRenderer: (params: any) => {
                       if (params && params.data.rowSpan) {
+                        debugger;
                         const currentValue = (params.value).split(",");
                         otherSaveCondition.releaseEnv = params.value;
                         showProcessStatus(); // 展示进度

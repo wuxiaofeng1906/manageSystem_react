@@ -21,15 +21,8 @@ let currentOperateStatus = false;  // 需要将useState中的operteStatus值赋�
 const DataRepaireReview: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const {
-    tabsData,
-    modifyProcessStatus,
-    dataReview,
-    allLockedArray,
-    setDataReview,
-    dataReviewConfirm,
-    lockedItem,
-    modifyLockedItem,
-    operteStatus,
+    tabsData, modifyProcessStatus, dataReview, allLockedArray, setDataReview,
+    dataReviewConfirm, lockedItem, modifyLockedItem, operteStatus,
   } = useModel('releaseProcess');
 
   /* region 数据修复review */

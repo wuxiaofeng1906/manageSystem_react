@@ -1,9 +1,10 @@
 import React, {useState} from 'react';
 import {message, Progress, Row, Select, Modal, Button, Form, Col, Checkbox} from 'antd';
 import {useModel} from '@@/plugin-model/useModel';
-import {saveProcessResult, executeAutoCheck} from './axiosRequest';
+import {saveProcessResult, executeAutoCheck, getOnlinedAutoCheckResult} from './axiosRequest';
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {alalysisInitData} from "@/pages/onDutyAndRelease/preRelease/datas/dataAnalyze";
+import {getAutoResult} from "./processAnalysis";
 
 const {Option} = Select;
 
@@ -60,11 +61,10 @@ const CheckProgress: React.FC<any> = () => {
       if (result) {
         errorMessage(`发布成功后自动化检查失败：${result}`);
       } else {
-
-        // const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
-        // //  需要看后端的上线后自动化检查结果
-        // debugger;
-        // console.log(newData)
+        modifyProcessStatus({
+          ...processStatus,
+          autoCheckResult: await getAutoResult(tabsData.activeKey)
+        });
       }
     }
 
@@ -179,6 +179,10 @@ const CheckProgress: React.FC<any> = () => {
                 {' '}
               </Option>
             </Select>
+          </label>
+
+          <label style={{marginLeft: 10}}>
+            {processStatus.autoCheckResult}
           </label>
         </div>
       </div>

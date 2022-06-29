@@ -34,6 +34,7 @@ const Tab: React.FC<any> = () => {
       onliineCheck: 'Gainsboro',
       releaseResult: '9',
       processPercent: 0,
+      autoCheckResult: <label></label>
     });
 
     // 预发布项目

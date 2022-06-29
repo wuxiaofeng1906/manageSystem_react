@@ -123,13 +123,14 @@ const runAutoCheck = async () => {
 };
 
 // 自动化检查结果获取
-const getAutoCheckResult = async () => {
+const getAutoCheckResult = async (readyReleaseNum: string) => {
 
   const data = {
-    ready_release_num: "",
-    release_time: ""
+    ready_release_num: readyReleaseNum,
+    release_time: "online"
   }
-  await axiosGet("/api/verify/release/automation", data)
+  const result = await axiosGet("/api/verify/release/automation", data);
+  return result;
 };
 
 export {getOfficialReleaseDetails, saveReleaseResult, editReleaseForm, runAutoCheck, getAutoCheckResult};

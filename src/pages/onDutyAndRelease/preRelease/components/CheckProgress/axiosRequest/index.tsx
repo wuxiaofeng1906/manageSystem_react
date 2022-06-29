@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {getDutyPersonPermission, getSystemPersonPermission} from '../../../authority/permission';
 import {saveBeforeAndAfterOnlineAutoCheck} from "@/pages/onDutyAndRelease/preRelease/comControl/axiosRequest";
+import {axiosGet} from "@/publicMethods/axios";
 
 const sys_accessToken = localStorage.getItem('accessId');
 axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
@@ -112,4 +113,16 @@ const executeAutoCheck = async (source: any, currentListNo: string) => {
   return saveRt;
 };
 
-export {saveProcessResult, getCheckProcess, executeAutoCheck};
+
+// 自动化检查结果获取
+const getOnlinedAutoCheckResult = async (readyReleaseNum: string) => {
+
+  const data = {
+    ready_release_num: readyReleaseNum,
+    release_time: "gray"
+  }
+  const result = await axiosGet("/api/verify/release/automation", data);
+  return result;
+};
+
+export {saveProcessResult, getCheckProcess, executeAutoCheck, getOnlinedAutoCheckResult};

@@ -25,7 +25,7 @@ let currentPanes: any;
 const PreRelease: React.FC<any> = () => {
   // Tab标签数据显示
   const {
-    modifyOperteStatus, tabsData, setTabsData, modifyProcessStatus, modifyPreReleaseData,
+    modifyOperteStatus, tabsData, setTabsData, processStatus, modifyProcessStatus, modifyPreReleaseData,
     lockedItem, setRelesaeItem, setUpgradeApi, setUpgradeConfirm,
     modifyReleasedID, setDataReview, setDataReviewConfirm, setOnlineBranch,
     setCorrespOrder, modifyAllLockedArray
@@ -77,6 +77,7 @@ const PreRelease: React.FC<any> = () => {
 
     // 进度条
     modifyProcessStatus({
+      ...processStatus,
       // 进度条相关数据和颜色
       releaseProject: 'Gainsboro', // #2BF541
       upgradeService: 'Gainsboro',

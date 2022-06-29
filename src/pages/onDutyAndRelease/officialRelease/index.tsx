@@ -17,10 +17,20 @@ import {
 import {getHeight} from "@/publicMethods/pageSet";
 import {releaseColumns} from "./grid/columns";
 import moment from 'moment';
-import {executeAutoCheck} from "@/pages/onDutyAndRelease/preRelease/components/CheckProgress/axiosRequest";
+import {
+  getOfficialReleaseDetails, saveReleaseResult, editReleaseForm, runAutoCheck, getAutoCheckResult
+} from "./axiosRequest/apiPage";
+import {sucMessage} from "@/publicMethods/showMessages";
 
 const {Option} = Select;
-const OfficialRelease: React.FC<any> = () => {
+const OfficialRelease: React.FC<any> = (props: any) => {
+
+  const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
+  const releaseWayArray = useRequest(() => loadReleaseWaySelect()).data;
+  const dutyNameArray = useRequest(() => loadDutyNamesSelect()).data; // 关联值班名单
+  // const pageData = useRequest(() => getOfficialReleaseDetails(props.location?.query?.releaseNum)).data; // 界面数据获取
+  const pageData = [];
+
   const releaseServiceGridApi = useRef<GridApi>();
   const serviceGridReady = (params: GridReadyEvent) => {
     releaseServiceGridApi.current = params.api;
@@ -28,16 +38,8 @@ const OfficialRelease: React.FC<any> = () => {
   };
 
   const [formForOfficialRelease] = Form.useForm(); // 预发布
-  const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
-  const releaseWayArray = useRequest(() => loadReleaseWaySelect()).data;
-  const dutyNameArray = useRequest(() => loadDutyNamesSelect()).data; // 关联值班名单
 
-  // 表格的屏幕大小自适应
-  const [gridHeight, setGridHeight] = useState(getHeight() - 180);
-  window.onresize = function () {
-    setGridHeight(getHeight() - 180);
-  };
-
+  // 发布结果选择
   const [pulishResultForm] = Form.useForm();
   const [isModalVisible, setModalVisible] = useState({show: false, result: "", hintMsg: "", autoCheckDisabled: true});
   // 取消发布
@@ -61,35 +63,69 @@ const OfficialRelease: React.FC<any> = () => {
         }
       }
 
-      console.log("")
       // 发布成功才调用自动化检查接口
-      //   const result = await executeAutoCheck(formData, tabsData.activeKey);
-      //   if (result) {
-      //     errorMessage(`发布成功后自动化检查失败：${result}`);
-      //   } else {
-      //
-      //     // const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
-      //     // //  需要看后端的上线后自动化检查结果
-      //     // debugger;
-      //     // console.log(newData)
-      //   }
-      // }
-
-      // const result = await saveProcessResult(tabsData.activeKey, isModalVisible.result);
-      // if (result === '') {
-      //   sucMessage('发布结果保存成功！')
-      //   modifyProcessStatus({
-      //     ...processStatus,
-      //     releaseResult: isModalVisible.result,
-      //   });
-      //   setModalVisible({
-      //     ...isModalVisible,
-      //     result: "",
-      //     show: false
-      //   });
+      // const result = await executeAutoCheck(formData, tabsData.activeKey);
+      // if (result) {
+      //   errorMessage(`发布成功后自动化检查失败：${result}`);
       // } else {
-      //   errorMessage(result.toString())
+      //
+      //   // const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
+      //   // //  需要看后端的上线后自动化检查结果
+      //   // debugger;
+      //   // console.log(newData)
+      // }
     }
+
+
+    // const result = await saveProcessResult(tabsData.activeKey, isModalVisible.result);
+    // if (result === '') {
+    //   sucMessage('发布结果保存成功！')
+    //   setModalVisible({
+    //     ...isModalVisible,
+    //     result: "",
+    //     show: false
+    //   });
+    // } else {
+    //   errorMessage(result.toString())
+    // }
+
+  };
+
+  // 发布结果修改
+  const pulishResulttChanged = async (params: any) => {
+
+    // 需要验证前面的检查是否全部成功(前三个成功即可)。
+    let autoDisable = true;
+    let hintMsgs = "请确认是否修改服务发布结果为空！"
+    if (params === "1") {
+      hintMsgs = "请确认服务是否发布成功，如有自动化也执行通过!";
+      autoDisable = false;
+    } else if (params === "2") {
+      hintMsgs = "请确认服务是否发布失败！";
+    } else if (params === "3") {
+      hintMsgs = "请确认是否取消发布！";
+    }
+    setModalVisible({
+      autoCheckDisabled: autoDisable,
+      hintMsg: hintMsgs,
+      result: params,
+      show: true
+    });
+
+    pulishResultForm.resetFields();
+  };
+
+
+  useEffect(() => {
+    debugger;
+    console.log(pageData)
+
+  }, [pageData]);
+
+  // 表格的屏幕大小自适应
+  const [gridHeight, setGridHeight] = useState(getHeight() - 180);
+  window.onresize = function () {
+    setGridHeight(getHeight() - 180);
   };
 
   return (
@@ -110,7 +146,8 @@ const OfficialRelease: React.FC<any> = () => {
             <Select
               size={'small'}
               style={{width: 100}}
-              // onChange={pulishResulttChanged}
+              onChange={pulishResulttChanged}
+              value={isModalVisible.result}
             >
               <Option key={'1'} value={'1'}>
                 发布成功

@@ -437,6 +437,10 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
 const autoCheckRenderer = (params: any) => {
 
   const autoValue = params.value;
+  if (!autoValue || autoValue.length === 0) {
+    return "";
+  }
+
   let ignoreCheck = "";
   let ui_result = "";
   let ui_color = "black";
@@ -464,13 +468,10 @@ const autoCheckRenderer = (params: any) => {
     });
   }
 
-  if (ignoreCheck === "") {
-    return "";
-  }
+
   if (ignoreCheck === "忽略") {
     return `<label style="color: blue">忽略</label>`;
   }
-
 
   return `
   <div>

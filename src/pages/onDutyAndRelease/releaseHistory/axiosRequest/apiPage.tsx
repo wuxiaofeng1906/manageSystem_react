@@ -88,4 +88,5 @@ const vertifyOnlineProjectExit = async () => {
   return exitProjectNotRelease;
 }
 
+
 export {getGrayscaleListData, getFormalListData, vertifyOnlineProjectExit};

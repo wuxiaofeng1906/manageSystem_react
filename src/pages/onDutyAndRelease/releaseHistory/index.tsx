@@ -30,7 +30,6 @@ const end = dayjs().format("YYYY-MM-DD HH:mm:ss");
 const ReleaseHistory: React.FC<any> = () => {
 
   /* region 灰度积压列表 */
-
   const grayscaleGridApi = useRef<GridApi>();
   const onGrayscaleGridReady = (params: GridReadyEvent) => {
     grayscaleGridApi.current = params.api;
@@ -48,15 +47,22 @@ const ReleaseHistory: React.FC<any> = () => {
   // 一键生成正式发布
   const generateFormalRelease = () => {
     const sel_rows = grayscaleGridApi.current?.getSelectedRows();
+
     // 如果是待发布详情，则不需要判断有没有勾选
-    if (buttonTitle === "一键生成正式发布") {
+    if (buttonTitle === "待发布详情") {
+      history.push(`/onDutyAndRelease/officialRelease`);
+    } else {
       if (sel_rows?.length === 0) {
         errorMessage("请先勾选需要发布的数据！")
         return;
       }
-      history.push(`/onDutyAndRelease/officialRelease`);
-    } else {
-      history.push(`/onDutyAndRelease/officialRelease`);
+
+      const ready_release_num: any = [];
+      sel_rows?.forEach((ele: any) => {
+        ready_release_num.push(ele.ready_release_num);
+      });
+
+      history.push(`/onDutyAndRelease/officialRelease?releaseNum=${ready_release_num.join("|")}`);
     }
   };
 

@@ -4,6 +4,8 @@ import dayjs from "dayjs";
 import {errorMessage} from "@/publicMethods/showMessages";
 import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
 import {message, Select} from "antd";
+import {getOnlinedAutoCheckResult} from "@/pages/onDutyAndRelease/preRelease/components/CheckProgress/axiosRequest";
+import React from "react";
 
 const {Option} = Select;
 const users = getCurrentUserInfo();
@@ -142,21 +144,48 @@ const editReleaseForm = async (releaseInfo: any, otherCondition: any) => {
 
 // 发布结果自动化检查
 const runAutoCheck = async (formData: any, releaseNum: string) => {
+  debugger;
+  // 上线前后检查: 打勾是yes，没打勾是no
+  let after_ignore_check = 'no';
+  if (formData.ignoreAfterCheck && (formData.ignoreAfterCheck).length > 0) {
+    after_ignore_check = 'yes'
+  }
 
-  const data = [
+  const data = [{
+    "user_name": users.name,
+    "user_id": users.userid,
+    "ignore_check": after_ignore_check,
+    "check_time": "after",
+    "check_type": "api",
+    "check_result": "no",
+    "ready_release_num": releaseNum,
+    "test_env": "string",
+    "check_num": "string",
+  },
     {
-      "user_name": "string",
-      "user_id": "string",
-      "ignore_check": "yes",
+      "user_name": users.name,
+      "user_id": users.userid,
+      "ignore_check": after_ignore_check,
       "check_time": "after",
-      "check_type": "api",
-      "check_result": "yes",
+      "check_type": "applet",
+      "check_result": "no",
+      "ready_release_num": releaseNum,
       "test_env": "string",
       "check_num": "string",
-      "ready_release_num": "string"
-    }
-  ];
-  return axiosPost("/api/verify/release/automation", data);
+    }];
+
+  if (after_ignore_check === "no" && (formData.checkResult).length > 0) {
+    (formData.checkResult).forEach((ele: string) => {
+      if (ele === "ui") {
+        data[0].check_result = "yes";
+      } else if (ele === "applet") {
+        data[1].check_result = "yes";
+      }
+    });
+  }
+
+  console.log("data", data);
+  // return axiosPost("/api/verify/release/automation", data);
 };
 
 // 自动化检查结果获取
@@ -170,4 +199,47 @@ const getAutoCheckResult = async (readyReleaseNum: string) => {
   return result;
 };
 
-export {getOfficialReleaseDetails, cancleReleaseResult, editReleaseForm, runAutoCheck, getAutoCheckResult, getOnlineEnv};
+
+const getOnlineAutoResult = async (releaseNum: string) => {
+
+  const newData: any = await getAutoCheckResult(releaseNum);
+  //  需要看后端的上线后自动化检查结果
+  if (newData && newData.length > 0) {
+    let ignore = "";
+    let ui_rt = "";
+    let ui_color = "";
+    let app_rt = "";
+    let app_color = "";
+    newData.forEach((ele: any) => {
+      if (ele.ignore_check === "yes") {
+        ignore = "忽略检查"
+      } else if (ele.check_type === "ui") {
+        ui_rt = ele.check_result === "yes" ? "通过" : "不通过";
+        ui_color = ele.check_result === "yes" ? "#2BF541" : "#8B4513";
+      } else if (ele.check_type === "applet") {
+        app_rt = ele.check_result === "yes" ? "通过" : "不通过";
+        app_color = ele.check_result === "yes" ? "#2BF541" : "#8B4513";
+      }
+    });
+
+    if (ignore === "忽略检查") {
+      return <label style={{color: "blue"}}>忽略检查</label>
+    }
+
+    return <label>
+      UI：<label style={{color: ui_color}}>{ui_rt}</label>；
+      小程序：<label style={{color: app_color}}>{app_rt}</label>；
+    </label>
+  }
+
+  return <label></label>;
+};
+
+export {
+  getOfficialReleaseDetails,
+  cancleReleaseResult,
+  editReleaseForm,
+  runAutoCheck,
+  getOnlineAutoResult,
+  getOnlineEnv
+};

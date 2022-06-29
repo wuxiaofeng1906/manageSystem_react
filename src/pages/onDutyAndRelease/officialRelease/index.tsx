@@ -16,7 +16,7 @@ import {getHeight} from "@/publicMethods/pageSet";
 import {releaseColumns} from "./grid/columns";
 import moment from 'moment';
 import {
-  getOfficialReleaseDetails, cancleReleaseResult, editReleaseForm, runAutoCheck, getAutoCheckResult, getOnlineEnv
+  getOfficialReleaseDetails, cancleReleaseResult, editReleaseForm, runAutoCheck, getOnlineAutoResult, getOnlineEnv
 } from "./axiosRequest/apiPage";
 import {sucMessage} from "@/publicMethods/showMessages";
 import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
@@ -48,14 +48,20 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   const [formForOfficialRelease] = Form.useForm();
 
   /* region 编辑即保存 */
-  const [processStatus, setProcessStatus] = useState("gray");
+  const [processStatus, setProcessStatus] = useState({
+    processColor: "gray",
+    releaseMessage: null
+  });
 
   // 显示进度
   const showProcessStatus = () => {
 
     const releaseInfo = formForOfficialRelease.getFieldsValue();
     if (otherSaveCondition.releaseEnv && releaseInfo.pulishTime && releaseInfo.relateDutyName) {
-      setProcessStatus("#2BF541");
+      setProcessStatus({
+        ...processStatus,
+        processColor: "#2BF541"
+      });
     }
   };
 
@@ -112,24 +118,28 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       }
 
       // 发布成功才调用自动化检查接口
-      const result = await runAutoCheck(formData, "");
+      const result = await runAutoCheck(formData, otherSaveCondition.onlineReleaseNum);
       if (result) {
-        errorMessage(`发布成功后自动化检查失败：${result}`);
+        errorMessage(`发布成功后自动化检查结果保存失败：${result}`);
+      } else {
+        // 保存成功后获取自动化检查结果
+        const autoRt: any = await getOnlineAutoResult(otherSaveCondition.onlineReleaseNum);
+        setProcessStatus({
+          ...processStatus,
+          releaseMessage: autoRt
+        });
       }
     }
 
-    // 调用保存接口，并获取自动化检查结果
-
-    // 如果是取消，则单独调用取消接口
+    // 调用保存接口: 如果是取消，则单独调用取消接口
     if (isModalVisible.result === "cancle") {
-      const result = await cancleReleaseResult("");
-
+      const result = await cancleReleaseResult(otherSaveCondition.onlineReleaseNum);
+      if (result.code === 200) {
+        sucMessage("当前正式发布取消成功！")
+      }
     } else {
       saveReleaseInfo();
     }
-
-    // 获取自动化检查结果
-    getAutoCheckResult("");
   };
 
   // 发布结果修改
@@ -138,12 +148,12 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     // 需要验证前面的检查是否全部成功(前三个成功即可)。
     let autoDisable = true;
     let hintMsgs = "请确认是否修改服务发布结果为空！"
-    if (params === "1") {
+    if (params === "success") {
       hintMsgs = "请确认服务是否发布成功，如有自动化也执行通过!";
       autoDisable = false;
-    } else if (params === "2") {
+    } else if (params === "failure") {
       hintMsgs = "请确认服务是否发布失败！";
-    } else if (params === "3") {
+    } else if (params === "cancle") {
       hintMsgs = "请确认是否取消发布！";
     }
     setModalVisible({
@@ -212,7 +222,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
         <div style={{backgroundColor: 'white', paddingTop: 10, height: 45,}}>
           <label style={{fontWeight: 'bold', marginLeft: 5}}>检查总览：</label>
           <label>
-            <button style={{height: 13, width: 13, border: 'none', backgroundColor: processStatus,}}
+            <button style={{height: 13, width: 13, border: 'none', backgroundColor: processStatus.processColor,}}
             ></button>
             &nbsp;发布服务已填写完成
           </label>
@@ -237,6 +247,10 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                 {' '}
               </Option>
             </Select>
+          </label>
+
+          <label style={{marginLeft: 10}}>
+
           </label>
         </div>
         {/* step 1 发布方式及时间 */}

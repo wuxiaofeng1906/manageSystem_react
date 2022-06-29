@@ -154,7 +154,7 @@ const PreRelease: React.FC<any> = () => {
     // 进度条数据
     const processData: any = await getCheckProcess(tabPageInfo?.activeKey);
     if (processData) {
-      modifyProcessStatus(showProgressData(processData.data));
+      modifyProcessStatus(await showProgressData(processData.data));
     }
     // 当前界面被锁住的ID
     const lockedData = await getAllLockedData(tabPageInfo?.activeKey);

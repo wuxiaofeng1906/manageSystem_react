@@ -52,7 +52,7 @@ export default () => {
     onliineCheck: 'Gainsboro',
     releaseResult: '9',
     processPercent: 0,
-    autoCheckResult: <label></label>
+    autoCheckResult: null
   });
 
   // 设置Tab的数据

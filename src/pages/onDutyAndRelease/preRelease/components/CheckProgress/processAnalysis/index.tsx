@@ -2,6 +2,7 @@ import {getOnlinedAutoCheckResult} from "@/pages/onDutyAndRelease/preRelease/com
 import React from "react";
 
 const getAutoResult = async (releaseNum: string) => {
+  debugger;
   const newData: any = await getOnlinedAutoCheckResult(releaseNum);
   //  需要看后端的上线后自动化检查结果
   if (newData && newData.length > 0) {
@@ -12,7 +13,7 @@ const getAutoResult = async (releaseNum: string) => {
     let app_color = "";
     newData.forEach((ele: any) => {
       if (ele.ignore_check === "yes") {
-        ignore = "忽略"
+        ignore = "忽略检查"
       } else if (ele.check_type === "ui") {
         ui_rt = ele.check_result === "yes" ? "通过" : "不通过";
         ui_color = ele.check_result === "yes" ? "#2BF541" : "#8B4513";
@@ -22,8 +23,8 @@ const getAutoResult = async (releaseNum: string) => {
       }
     });
 
-    if (ignore === "忽略") {
-      return <label style={{color: "blue"}}>忽略</label>
+    if (ignore === "忽略检查") {
+      return <label style={{color: "blue"}}>忽略检查</label>
     }
 
     return <label>
@@ -38,7 +39,7 @@ const getAutoResult = async (releaseNum: string) => {
 
 // 解析进度条相关数据来显示
 const showProgressData = async (datas: any) => {
-  debugger;
+
   const results = {
     releaseProject: 'Gainsboro', // #2BF541
     upgradeService: 'Gainsboro',
@@ -71,7 +72,7 @@ const showProgressData = async (datas: any) => {
 
   results.releaseResult = datas.release_result;
   results.processPercent = (successCount / 4) * 100;
-  results.autoCheckResult = await getAutoResult("releaseNum");
+  results.autoCheckResult = await getAutoResult(datas.ready_release_num);
   return results;
 };
 

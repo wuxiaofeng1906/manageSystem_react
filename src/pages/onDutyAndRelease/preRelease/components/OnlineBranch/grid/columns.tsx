@@ -470,7 +470,7 @@ const autoCheckRenderer = (params: any) => {
 
 
   if (ignoreCheck === "忽略") {
-    return `<label style="color: blue">忽略</label>`;
+    return `<label style="color: blue;font-size: 10px">忽略</label>`;
   }
 
   return `

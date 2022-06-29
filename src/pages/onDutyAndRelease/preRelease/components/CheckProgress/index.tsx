@@ -46,6 +46,7 @@ const CheckProgress: React.FC<any> = () => {
 
   // 确认发布
   const handleOk = async () => {
+    let checkResult: any;
     const formData = pulishResultForm.getFieldsValue();
     // 如果是发布成功，则需要判断下面自动化选项是否勾选
     if (!isModalVisible.autoCheckDisabled) { // 是发布成功
@@ -61,28 +62,26 @@ const CheckProgress: React.FC<any> = () => {
       if (result) {
         errorMessage(`发布成功后自动化检查失败：${result}`);
       } else {
-        modifyProcessStatus({
-          ...processStatus,
-          autoCheckResult: await getAutoResult(tabsData.activeKey)
-        });
+        checkResult = await getAutoResult(tabsData.activeKey)
       }
     }
 
-    // const result = await saveProcessResult(tabsData.activeKey, isModalVisible.result);
-    // if (result === '') {
-    //   sucMessage('发布结果保存成功！')
-    //   modifyProcessStatus({
-    //     ...processStatus,
-    //     releaseResult: isModalVisible.result,
-    //   });
-    //   setModalVisible({
-    //     ...isModalVisible,
-    //     result: "",
-    //     show: false
-    //   });
-    // } else {
-    //   errorMessage(result.toString())
-    // }
+    const result = await saveProcessResult(tabsData.activeKey, isModalVisible.result);
+    if (result === '') {
+      sucMessage('发布结果保存成功！')
+      modifyProcessStatus({
+        ...processStatus,
+        releaseResult: isModalVisible.result,
+        autoCheckResult: checkResult
+      });
+      setModalVisible({
+        ...isModalVisible,
+        result: "",
+        show: false
+      });
+    } else {
+      errorMessage(result.toString())
+    }
   };
 
   // 取消发布

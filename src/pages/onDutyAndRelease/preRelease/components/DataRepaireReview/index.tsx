@@ -217,7 +217,7 @@ const DataRepaireReview: React.FC<any> = () => {
           // 刷新状态进度条
           const processData: any = await getCheckProcess(currentReleaseNum);
           if (processData) {
-            modifyProcessStatus(showProgressData(processData.data));
+            modifyProcessStatus(await showProgressData(processData.data));
           }
         } else {
           message.error({

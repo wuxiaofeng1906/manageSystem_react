@@ -97,7 +97,7 @@ const getOnlineEnv = async () => {
 };
 
 // 保存发布结果
-const saveReleaseResult = async (onlineReleaseNum: string) => {
+const cancleReleaseResult = async (onlineReleaseNum: string) => {
   // 取消发布跟其他发布结果所调用接口不是同一个
 
   const data = {
@@ -141,7 +141,7 @@ const editReleaseForm = async (releaseInfo: any, otherCondition: any) => {
 };
 
 // 发布结果自动化检查
-const runAutoCheck = async () => {
+const runAutoCheck = async (formData: any, releaseNum: string) => {
 
   const data = [
     {
@@ -156,7 +156,7 @@ const runAutoCheck = async () => {
       "ready_release_num": "string"
     }
   ];
-  axiosPost("/api/verify/release/automation", data);
+  return axiosPost("/api/verify/release/automation", data);
 };
 
 // 自动化检查结果获取
@@ -170,4 +170,4 @@ const getAutoCheckResult = async (readyReleaseNum: string) => {
   return result;
 };
 
-export {getOfficialReleaseDetails, saveReleaseResult, editReleaseForm, runAutoCheck, getAutoCheckResult, getOnlineEnv};
+export {getOfficialReleaseDetails, cancleReleaseResult, editReleaseForm, runAutoCheck, getAutoCheckResult, getOnlineEnv};

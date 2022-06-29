@@ -16,7 +16,7 @@ import {getHeight} from "@/publicMethods/pageSet";
 import {releaseColumns} from "./grid/columns";
 import moment from 'moment';
 import {
-  getOfficialReleaseDetails, saveReleaseResult, editReleaseForm, runAutoCheck, getAutoCheckResult, getOnlineEnv
+  getOfficialReleaseDetails, cancleReleaseResult, editReleaseForm, runAutoCheck, getAutoCheckResult, getOnlineEnv
 } from "./axiosRequest/apiPage";
 import {sucMessage} from "@/publicMethods/showMessages";
 import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
@@ -28,9 +28,9 @@ const otherSaveCondition: any = {
   releaseResult: "unknown",// 发布结果
   onlineReleaseNum: ""// 正式发布编号
 };
-
 let onlineEnv: any = [];
 const {Option} = Select;
+
 const OfficialRelease: React.FC<any> = (props: any) => {
   const releaseNums = props.location?.query?.releaseNum;
 
@@ -46,86 +46,6 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   };
 
   const [formForOfficialRelease] = Form.useForm();
-
-  /* region 发布结果 */
-  // 发布结果选择
-  const [pulishResultForm] = Form.useForm();
-  const [isModalVisible, setModalVisible] = useState({show: false, result: "", hintMsg: "", autoCheckDisabled: true});
-  // 取消发布
-  const handleCancel = () => {
-    setModalVisible({
-      ...isModalVisible,
-      result: "unknown",
-      show: false
-    });
-  };
-
-  // 确认发布
-  const handleOk = async () => {
-    const formData = pulishResultForm.getFieldsValue();
-    // 如果是发布成功，则需要判断下面自动化选项是否勾选
-    if (!isModalVisible.autoCheckDisabled) { // 是发布成功
-      if (formData.ignoreAfterCheck === undefined || (formData.ignoreAfterCheck).length === 0) { // 不忽略的时候
-        if (formData.checkResult === undefined || (formData.checkResult).length === 0) { // 一个结果都没选中
-          errorMessage("检查结果必须至少勾选一项！")
-          return;
-        }
-      }
-
-      // 发布成功才调用自动化检查接口
-      // const result = await executeAutoCheck(formData, tabsData.activeKey);
-      // if (result) {
-      //   errorMessage(`发布成功后自动化检查失败：${result}`);
-      // } else {
-      //
-      //   // const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
-      //   // //  需要看后端的上线后自动化检查结果
-      //   // debugger;
-      //   // console.log(newData)
-      // }
-    }
-
-
-    // const result = await saveProcessResult(tabsData.activeKey, isModalVisible.result);
-    // if (result === '') {
-    //   sucMessage('发布结果保存成功！')
-    //   setModalVisible({
-    //     ...isModalVisible,
-    //     result: "",
-    //     show: false
-    //   });
-    // } else {
-    //   errorMessage(result.toString())
-    // }
-
-  };
-
-  // 发布结果修改
-  const pulishResulttChanged = async (params: any) => {
-
-    // 需要验证前面的检查是否全部成功(前三个成功即可)。
-    let autoDisable = true;
-    let hintMsgs = "请确认是否修改服务发布结果为空！"
-    if (params === "1") {
-      hintMsgs = "请确认服务是否发布成功，如有自动化也执行通过!";
-      autoDisable = false;
-    } else if (params === "2") {
-      hintMsgs = "请确认服务是否发布失败！";
-    } else if (params === "3") {
-      hintMsgs = "请确认是否取消发布！";
-    }
-    setModalVisible({
-      autoCheckDisabled: autoDisable,
-      hintMsg: hintMsgs,
-      result: params,
-      show: true
-    });
-
-    pulishResultForm.resetFields();
-    otherSaveCondition.grayReleaseNums = params;
-  };
-
-  /* endregion 发布结果 */
 
   /* region 编辑即保存 */
   const [processStatus, setProcessStatus] = useState("gray");
@@ -165,6 +85,79 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
   /* endregion 编辑即保存 */
 
+  /* region 发布结果 */
+  // 发布结果选择
+  const [pulishResultForm] = Form.useForm();
+  const [isModalVisible, setModalVisible] = useState({show: false, result: "", hintMsg: "", autoCheckDisabled: true});
+
+  // 取消发布
+  const handleCancel = () => {
+    setModalVisible({
+      ...isModalVisible,
+      result: "unknown",
+      show: false
+    });
+  };
+
+  // 确认发布
+  const handleOk = async () => {
+    const formData = pulishResultForm.getFieldsValue();
+    // 如果是发布成功，则需要判断下面自动化选项是否勾选
+    if (!isModalVisible.autoCheckDisabled) { // 是发布成功
+      if (formData.ignoreAfterCheck === undefined || (formData.ignoreAfterCheck).length === 0) { // 不忽略的时候
+        if (formData.checkResult === undefined || (formData.checkResult).length === 0) { // 一个结果都没选中
+          errorMessage("检查结果必须至少勾选一项！")
+          return;
+        }
+      }
+
+      // 发布成功才调用自动化检查接口
+      const result = await runAutoCheck(formData, "");
+      if (result) {
+        errorMessage(`发布成功后自动化检查失败：${result}`);
+      }
+    }
+
+    // 调用保存接口，并获取自动化检查结果
+
+    // 如果是取消，则单独调用取消接口
+    if (isModalVisible.result === "cancle") {
+      const result = await cancleReleaseResult("");
+
+    } else {
+      saveReleaseInfo();
+    }
+
+    // 获取自动化检查结果
+    getAutoCheckResult("");
+  };
+
+  // 发布结果修改
+  const pulishResulttChanged = async (params: any) => {
+
+    // 需要验证前面的检查是否全部成功(前三个成功即可)。
+    let autoDisable = true;
+    let hintMsgs = "请确认是否修改服务发布结果为空！"
+    if (params === "1") {
+      hintMsgs = "请确认服务是否发布成功，如有自动化也执行通过!";
+      autoDisable = false;
+    } else if (params === "2") {
+      hintMsgs = "请确认服务是否发布失败！";
+    } else if (params === "3") {
+      hintMsgs = "请确认是否取消发布！";
+    }
+    setModalVisible({
+      autoCheckDisabled: autoDisable,
+      hintMsg: hintMsgs,
+      result: params,
+      show: true
+    });
+
+    pulishResultForm.resetFields();
+    otherSaveCondition.grayReleaseNums = params;
+  };
+
+  /* endregion 发布结果 */
 
   // 显示界面
   const showPagesData = (sourceData: any) => {

@@ -24,7 +24,7 @@ import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
 // 编辑后的数据
 const otherSaveCondition: any = {
   grayReleaseNums: [], // 灰度发布编号
-  releaseEnv: "",// 发布环境
+  releaseEnv: "",// 发布集群
   releaseResult: "unknown",// 发布结果
   onlineReleaseNum: ""// 正式发布编号
 };
@@ -45,7 +45,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     params.api.sizeColumnsToFit();
   };
 
-  const [formForOfficialRelease] = Form.useForm(); // 预发布
+  const [formForOfficialRelease] = Form.useForm();
 
   /* region 发布结果 */
   // 发布结果选择
@@ -128,6 +128,17 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   /* endregion 发布结果 */
 
   /* region 编辑即保存 */
+  const [processStatus, setProcessStatus] = useState("gray");
+
+  // 显示进度
+  const showProcessStatus = () => {
+
+    const releaseInfo = formForOfficialRelease.getFieldsValue();
+    if (otherSaveCondition.releaseEnv && releaseInfo.pulishTime && releaseInfo.relateDutyName) {
+      setProcessStatus("#2BF541");
+    }
+  };
+
   // 保存发布方式及时间
   const saveReleaseInfo = async () => {
     //   获取发布方式及时间
@@ -145,13 +156,16 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       formForOfficialRelease.setFieldsValue({
         editor: getCurrentUserInfo().name,
         editTime: result?.data?.edit_time
-      })
+      });
+      // 需要判断整体进度是否已完成
+      showProcessStatus();
     }
 
   };
 
-
   /* endregion 编辑即保存 */
+
+
   // 显示界面
   const showPagesData = (sourceData: any) => {
     if (sourceData && sourceData.length > 0) {
@@ -182,11 +196,14 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       }
 
       releaseServiceGridApi.current?.setRowData(gridData);
+
     }
   };
   useEffect(() => {
     showPagesData(pageData);
+
   }, [pageData]);
+
 
   // 表格的屏幕大小自适应
   const [gridHeight, setGridHeight] = useState(getHeight() - 180);
@@ -202,8 +219,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
         <div style={{backgroundColor: 'white', paddingTop: 10, height: 45,}}>
           <label style={{fontWeight: 'bold', marginLeft: 5}}>检查总览：</label>
           <label>
-            <button
-              style={{height: 13, width: 13, border: 'none', backgroundColor: "#2BF541",}}
+            <button style={{height: 13, width: 13, border: 'none', backgroundColor: processStatus,}}
             ></button>
             &nbsp;发布服务已填写完成
           </label>
@@ -339,6 +355,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                       if (params && params.data.rowSpan) {
                         const currentValue = (params.value).split(",");
                         otherSaveCondition.releaseEnv = params.value;
+                        showProcessStatus(); // 展示进度
                         return (
                           <Select
                             size={'small'}

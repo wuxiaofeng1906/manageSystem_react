@@ -13,7 +13,7 @@ const opts = {
   showSearch: true,
   mode: 'multiple',
   optionFilterProp: 'label',
-  filterOption: (input, option) => (option!.label as unknown as string)?.includes(input),
+  filterOption: (input, option) => ((option!.label as unknown) as string)?.includes(input),
 };
 const recentType = {
   前端: 'front',
@@ -225,7 +225,7 @@ const DutyCatalog = () => {
     });
   };
   // 保存
-  const onSave = async (updateDutyData: Record<string, any> | undefined) => {
+  const onSave = async (updateDutyData?: Record<string, any>) => {
     if (!hasPermission) return;
     const values = await form.getFieldsValue();
     const title = await updateTitle();
@@ -539,7 +539,7 @@ const DutyCatalog = () => {
                         const title = (await updateTitle()) || '';
                         setTitle(title);
                       }}
-                      onBlur={onSave}
+                      onBlur={() => onSave()}
                     />
                   </Form.Item>
                 </th>
@@ -592,7 +592,7 @@ const DutyCatalog = () => {
                       bordered={false}
                       showSearch={false}
                       showArrow={false}
-                      onChange={onSave}
+                      onChange={() => onSave()}
                     />
                   </Form.Item>
                 </th>
@@ -602,7 +602,7 @@ const DutyCatalog = () => {
                     <DatePicker
                       format={'YYYY-MM-DD HH:mm'}
                       allowClear={false}
-                      onBlur={onSave}
+                      onBlur={() => onSave()}
                       showTime={{ defaultValue: moment('23:00:00', 'HH:mm') }}
                       disabled={!hasPermission}
                     />
@@ -621,8 +621,8 @@ const DutyCatalog = () => {
                         name={config.name}
                         placeholder={`${config.title}人员`}
                         init={recentDuty?.[config.name]}
-                        onDeselect={onSave}
-                        onBlur={onSave}
+                        onDeselect={() => onSave()}
+                        onBlur={() => onSave()}
                         disabled={!hasPermission}
                       />
                     </td>

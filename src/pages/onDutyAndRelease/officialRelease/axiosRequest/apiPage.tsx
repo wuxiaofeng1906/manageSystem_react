@@ -3,7 +3,9 @@ import {axiosGet, axiosPost, axiosPut, axiosDelete} from "@/publicMethods/axios"
 import dayjs from "dayjs";
 import {errorMessage} from "@/publicMethods/showMessages";
 import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
+import {message, Select} from "antd";
 
+const {Option} = Select;
 const users = getCurrentUserInfo();
 
 // 获取预发布编号
@@ -75,6 +77,25 @@ const getOfficialReleaseDetails = async (releaseNums: string) => {
   return details;
 };
 
+// 获取上线集群环境
+const getOnlineEnv = async () => {
+
+  const envData = await axiosGet("/api/verify/release/environment");
+  const nameOptions: any = [];
+
+  if (envData) {
+    const datas = envData;
+    datas.forEach((envInfo: any) => {
+      nameOptions.push(
+        <Option key={envInfo.online_environment_id} value={`${envInfo.online_environment_id}`}>
+          {envInfo.online_environment_name}
+        </Option>,
+      );
+    });
+  }
+  return nameOptions;
+};
+
 // 保存发布结果
 const saveReleaseResult = async (onlineReleaseNum: string) => {
   // 取消发布跟其他发布结果所调用接口不是同一个
@@ -88,21 +109,30 @@ const saveReleaseResult = async (onlineReleaseNum: string) => {
   return result;
 };
 // 正式发布界面编辑
-const editReleaseForm = async () => {
+const editReleaseForm = async (releaseInfo: any, otherCondition: any) => {
+
+  let {relateDutyName, pulishTime} = releaseInfo;
+  if (!relateDutyName) {
+    relateDutyName = "";
+  }
+
+  if (!pulishTime) {
+    pulishTime = "";
+  }
 
   const data = {
     "user_name": users.name,
     "user_id": users.userid,
-    "ready_release_num": "string",
-    "online_release_num": "string",
-    "release_result": "unknown",
-    "release_env": "string",
-    "release_way": "unknown",
-    "release_type": "online",
-    "plan_release_time": "",
-    "duty_num": "",
-    "online_environment": "string",
-    "online_release_name": "string"
+    "ready_release_num": otherCondition.grayReleaseNums.join(","),
+    "online_release_num": otherCondition.onlineReleaseNum,  // 正式发布编号
+    "release_result": otherCondition.releaseResult,  // 发布结果
+    "release_env": otherCondition.releaseEnv, // 集群
+    "release_way": releaseInfo.pulishMethod, // 发布方式
+    "release_type": "online", // 发布类型
+    "plan_release_time": pulishTime === "" ? "" : dayjs(pulishTime).format("YYYY-MM-DD HH:mm:ss"), // 计划发布时间
+    "duty_num": relateDutyName, // 值班名单
+    // "online_environment": "string",
+    // "online_release_name": "string"  发布名称
   }
 
   const result = await axiosPut("/api/verify/release/online", data);
@@ -140,4 +170,4 @@ const getAutoCheckResult = async (readyReleaseNum: string) => {
   return result;
 };
 
-export {getOfficialReleaseDetails, saveReleaseResult, editReleaseForm, runAutoCheck, getAutoCheckResult};
+export {getOfficialReleaseDetails, saveReleaseResult, editReleaseForm, runAutoCheck, getAutoCheckResult, getOnlineEnv};

@@ -10,24 +10,34 @@ import {Button, Checkbox, Col, DatePicker, Form, Input, Modal, Row, Select} from
 import "./style/style.css"
 import {useRequest} from "ahooks";
 import {
-  loadReleaseTypeSelect, loadReleaseWaySelect, loadDutyNamesSelect
+  loadReleaseTypeSelect, loadDutyNamesSelect
 } from "@/pages/onDutyAndRelease/preRelease/comControl/controler";
 import {getHeight} from "@/publicMethods/pageSet";
 import {releaseColumns} from "./grid/columns";
 import moment from 'moment';
 import {
-  getOfficialReleaseDetails, saveReleaseResult, editReleaseForm, runAutoCheck, getAutoCheckResult
+  getOfficialReleaseDetails, saveReleaseResult, editReleaseForm, runAutoCheck, getAutoCheckResult, getOnlineEnv
 } from "./axiosRequest/apiPage";
 import {sucMessage} from "@/publicMethods/showMessages";
+import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
 
+// 编辑后的数据
+const otherSaveCondition: any = {
+  grayReleaseNums: [], // 灰度发布编号
+  releaseEnv: "",// 发布环境
+  releaseResult: "unknown",// 发布结果
+  onlineReleaseNum: ""// 正式发布编号
+};
+
+let onlineEnv: any = [];
 const {Option} = Select;
 const OfficialRelease: React.FC<any> = (props: any) => {
+  const releaseNums = props.location?.query?.releaseNum;
 
   const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
   const dutyNameArray = useRequest(() => loadDutyNamesSelect()).data; // 关联值班名单
-
-  const pageData = useRequest(() => getOfficialReleaseDetails(props.location?.query?.releaseNum)).data; // 界面数据获取
-
+  const pageData = useRequest(() => getOfficialReleaseDetails(releaseNums)).data; // 界面数据获取
+  onlineEnv = useRequest(() => getOnlineEnv()).data; // 上线集群环境
 
   const releaseServiceGridApi = useRef<GridApi>();
   const serviceGridReady = (params: GridReadyEvent) => {
@@ -37,6 +47,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
   const [formForOfficialRelease] = Form.useForm(); // 预发布
 
+  /* region 发布结果 */
   // 发布结果选择
   const [pulishResultForm] = Form.useForm();
   const [isModalVisible, setModalVisible] = useState({show: false, result: "", hintMsg: "", autoCheckDisabled: true});
@@ -44,7 +55,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   const handleCancel = () => {
     setModalVisible({
       ...isModalVisible,
-      result: "",
+      result: "unknown",
       show: false
     });
   };
@@ -111,17 +122,46 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     });
 
     pulishResultForm.resetFields();
+    otherSaveCondition.grayReleaseNums = params;
   };
 
+  /* endregion 发布结果 */
+
+  /* region 编辑即保存 */
+  // 保存发布方式及时间
+  const saveReleaseInfo = async () => {
+    //   获取发布方式及时间
+    const releaseInfo = formForOfficialRelease.getFieldsValue();
+    // 获取灰度所有的发布编号
+    releaseServiceGridApi.current?.forEachNode((node: any) => {
+      const readyReleaseNum = node.data?.ready_release_num;
+      otherSaveCondition.grayReleaseNums.push(readyReleaseNum);
+    });
+
+    const result = await editReleaseForm(releaseInfo, otherSaveCondition);
+    if (result.code === 200) {
+      sucMessage("数据保存成功！");
+      // 需要回显编辑人和编辑时间
+      formForOfficialRelease.setFieldsValue({
+        editor: getCurrentUserInfo().name,
+        editTime: result?.data?.edit_time
+      })
+    }
+
+  };
+
+
+  /* endregion 编辑即保存 */
   // 显示界面
   const showPagesData = (sourceData: any) => {
     if (sourceData && sourceData.length > 0) {
       // 当前只有一个Tab，不会有多个。
       const datas = sourceData[0];
+      otherSaveCondition.onlineReleaseNum = datas.online_release_num;
       //   显示发布方式
       formForOfficialRelease.setFieldsValue({
         pulishMethod: datas.release_way,
-        pulishTime: datas.plan_release_time,
+        pulishTime: datas.plan_release_time === "Invalid Date" ? null : moment(datas.plan_release_time),
         relateDutyName: datas.person_duty_num,
         editor: datas.edit_user,
         editTime: datas.edit_time
@@ -131,12 +171,16 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       const gridData: any = [];
       const projectData = datas.project_info;
       if (projectData && projectData.length > 0) {
-        projectData.forEach((ele: any) => {
+        projectData.forEach((ele: any, index: number) => {
           const details = {...ele};
+          if (index === 0) {
+            details["rowSpan"] = projectData.length;
+          }
           details["release_env"] = datas.release_env;
           gridData.push(details);
         });
       }
+
       releaseServiceGridApi.current?.setRowData(gridData);
     }
   };
@@ -171,16 +215,16 @@ const OfficialRelease: React.FC<any> = (props: any) => {
               onChange={pulishResulttChanged}
               value={isModalVisible.result}
             >
-              <Option key={'1'} value={'1'}>
+              <Option key={'success'} value={'success'}>
                 发布成功
               </Option>
-              <Option key={'2'} value={'2'}>
+              <Option key={'failure'} value={'failure'}>
                 发布失败
               </Option>
-              <Option key={'3'} value={'3'}>
+              <Option key={'cancle'} value={'cancel'}>
                 取消发布
               </Option>
-              <Option key={'9'} value={'9'}>
+              <Option key={'unknown'} value={'unknown'}>
                 {' '}
               </Option>
             </Select>
@@ -204,7 +248,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                   <Col span={7}>
                     {/* 发布方式 */}
                     <Form.Item label="发布方式:" name="pulishMethod">
-                      <Select defaultValue={"stop_serve"}>
+                      <Select defaultValue={"stop_serve"} onChange={saveReleaseInfo}>
                         <Option key={'stop_server'} value={'stop_server'}>
                           停服
                         </Option>
@@ -219,7 +263,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                     <Form.Item label="计划发布时间" name="pulishTime">
                       <DatePicker defaultValue={moment(moment().add(1, "days").format("YYYY-MM-DD"))} showTime
                                   format="YYYY-MM-DD HH:mm"
-                                  style={{width: '100%'}}/>
+                                  style={{width: '100%'}} onChange={saveReleaseInfo}/>
                     </Form.Item>
                   </Col>
                 </Row>
@@ -229,6 +273,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                     <Form.Item label="关联值班名单" name="relateDutyName" style={{marginLeft: 5}}>
                       <Select filterOption={(inputValue: string, option: any) =>
                         !!option.children.includes(inputValue)} showSearch
+                              onChange={saveReleaseInfo}
                       >{dutyNameArray}</Select>
                     </Form.Item>
                   </Col>
@@ -289,8 +334,33 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                   onGridReady={serviceGridReady}
                   onGridSizeChanged={serviceGridReady}
                   onColumnEverythingChanged={serviceGridReady}
+                  frameworkComponents={{
+                    releaseEnvRenderer: (params: any) => {
+                      if (params && params.data.rowSpan) {
+                        const currentValue = (params.value).split(",");
+                        otherSaveCondition.releaseEnv = params.value;
+                        return (
+                          <Select
+                            size={'small'}
+                            defaultValue={currentValue}
+                            bordered={false}
+                            style={{width: '100%'}}
+                            mode={"multiple"}
+                            onChange={(newValue: any) => {
+                              otherSaveCondition.releaseEnv = newValue.join(",");
+                              saveReleaseInfo();
+                            }}
+                            maxTagCount={"responsive"}
+                            // disabled={currentOperateStatus}
+                          >
+                            {onlineEnv}
+                          </Select>
+                        );
+                      }
+                      return "";
+                    }
+                  }}
                 >
-
                 </AgGridReact>
               </div>
             </div>

@@ -3,6 +3,9 @@ export const releaseColumns: any = [
   {
     headerName: '集群',
     field: 'release_env',
+    cellClass: 'cell-span',
+    rowSpan: (params: any) => params.data?.rowSpan || 1,
+    cellRenderer: "releaseEnvRenderer"
   },
   {
     headerName: '发布项目',

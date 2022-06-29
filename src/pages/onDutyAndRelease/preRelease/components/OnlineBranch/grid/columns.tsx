@@ -437,16 +437,19 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
 const autoCheckRenderer = (params: any) => {
 
   const autoValue = params.value;
-  let ui_result = "忽略";
+  let ignoreCheck = "";
+  let ui_result = "";
   let ui_color = "black";
-  let api_result = "忽略";
+  let api_result = "";
   let api_color = "black";
-  let applet_result = "忽略";
+  let applet_result = "";
   let applet_color = "black";
 
   if (autoValue && autoValue.length > 0) {
     autoValue.forEach((ele: any) => {
-      if (ele.ignore_check === "no" && ele.check_time==="before") {
+      if (ele.ignore_check === "yes") {
+        ignoreCheck = "忽略";
+      } else if (ele.ignore_check === "no" && ele.check_time === "before") {
         if (ele.check_type === 'ui') {
           ui_result = ele.check_result === "yes" ? "通过" : "不通过";
           ui_color = ele.check_result === "yes" ? "#2BF541" : "#8B4513";
@@ -461,9 +464,13 @@ const autoCheckRenderer = (params: any) => {
     });
   }
 
-  if (ui_result === "忽略" && api_result === "忽略" && applet_result === "忽略") {
+  if (ignoreCheck === "") {
+    return "";
+  }
+  if (ignoreCheck === "忽略") {
     return `<label style="color: blue">忽略</label>`;
   }
+
 
   return `
   <div>

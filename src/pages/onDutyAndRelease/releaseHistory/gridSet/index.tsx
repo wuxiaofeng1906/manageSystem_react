@@ -71,13 +71,13 @@ const releasedList = () => {
     },
   }, {
     headerName: '正式发布批次号',
-    field: 'ready_release_num',
+    field: 'online_release_num',
     minWidth: 130,
     maxWidth: 150,
     // sort: "asc"
   }, {
     headerName: '发布名称',
-    field: 'ready_release_name',
+    field: 'release_name',
     minWidth: 145
   }, {
     headerName: '工单编号',

@@ -6,17 +6,17 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useRequest} from "ahooks";
-import {getGrayscaleListData, getFormalListData} from './axiosRequest/apiPage';
+import {getGrayscaleListData, getFormalListData, vertifyOnlineProjectExit} from './axiosRequest/apiPage';
 import {history} from "@@/core/history";
 import {Button, DatePicker, Select} from "antd";
 import {loadPrjNameSelect} from "@/pages/onDutyAndRelease/preRelease/comControl/controler";
 import dayjs from "dayjs";
 import moment from 'moment';
-import {gridHeight, grayscaleBacklogList, releasedList} from './gridSet';
-
+import {grayscaleBacklogList, releasedList} from './gridSet';
+import {errorMessage} from "@/publicMethods/showMessages";
+import {getHeight} from "@/publicMethods/pageSet";
 
 const {RangePicker} = DatePicker;
-
 const formalQueryCondition = {
   start: dayjs().subtract(7, 'day').format("YYYY-MM-DD HH:mm:ss"),
   end: dayjs().format("YYYY-MM-DD HH:mm:ss"),
@@ -30,14 +30,16 @@ const end = dayjs().format("YYYY-MM-DD HH:mm:ss");
 const ReleaseHistory: React.FC<any> = () => {
 
   /* region 灰度积压列表 */
+
   const grayscaleGridApi = useRef<GridApi>();
   const onGrayscaleGridReady = (params: GridReadyEvent) => {
     grayscaleGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
+
+  const [buttonTitle, setButtonTitle] = useState("一键生成正式发布");  // 待发布详情
   // 积压列表数据
   const grayscaleData = useRequest(() => getGrayscaleListData(start, end)).data;
-
   // 根据时间查询
   const onGrayReleaseTimeChanged = async (params: any, times: any) => {
     const grayReleaseList = await getGrayscaleListData(dayjs(times[0]).format("YYYY-MM-DD HH:mm:ss"), dayjs(times[1]).format("YYYY-MM-DD HH:mm:ss"));
@@ -45,13 +47,19 @@ const ReleaseHistory: React.FC<any> = () => {
   };
   // 一键生成正式发布
   const generateFormalRelease = () => {
-    history.push(`/onDutyAndRelease/officialRelease`);
+    const sel_rows = grayscaleGridApi.current?.getSelectedRows();
+    // 如果是待发布详情，则不需要判断有没有勾选
+    if (buttonTitle === "一键生成正式发布") {
+      if (sel_rows?.length === 0) {
+        errorMessage("请先勾选需要发布的数据！")
+        return;
+      }
+      history.push(`/onDutyAndRelease/officialRelease`);
+    } else {
+      history.push(`/onDutyAndRelease/officialRelease`);
+    }
   };
 
-  // 待发布详情
-  const releaseDetails = () => {
-    history.push(`/onDutyAndRelease/officialRelease`);
-  };
   /* endregion */
 
   /* region 已正式发布列表 */
@@ -61,8 +69,6 @@ const ReleaseHistory: React.FC<any> = () => {
     params.api.sizeColumnsToFit();
   };
 
-  // 表格高度
-  const [releasedGridHight, setReleasedGridHight] = useState(100);
 
   // 项目名称
   const projectsArray = useRequest(() => loadPrjNameSelect()).data;
@@ -86,7 +92,7 @@ const ReleaseHistory: React.FC<any> = () => {
     }
     const result = await getFormalListData(cond);
     releasedGridApi.current?.setRowData(result.data);
-    setReleasedGridHight(gridHeight(result?.data))
+
   };
 
   // 根据项目获取
@@ -130,8 +136,15 @@ const ReleaseHistory: React.FC<any> = () => {
     releasedGridApi.current?.sizeColumnsToFit();
   });
 
+  // 显示button title
+  const showButtonTitle = async () => {
+    const result = await vertifyOnlineProjectExit();
+    if (result) {
+      setButtonTitle("待发布详情");
+    }
+  }
   useEffect(() => {
-    setReleasedGridHight(gridHeight(releasedData?.data))
+    showButtonTitle();
   }, [releasedData]);
   return (
     <PageContainer>
@@ -142,14 +155,8 @@ const ReleaseHistory: React.FC<any> = () => {
           textAlign: "left", backgroundColor: "#F8F8F8", width: '100%',
           border: "solid 1px #CCCCCC"
         }}> &nbsp;
-          <label style={{fontWeight: "bold",}}>灰度积压列表 </label>
-          <Button type="text" onClick={releaseDetails} style={{float: "right"}}>
-
-            <img src="../pushMessage.png" width="25" height="25" alt="待发布详情" title="待发布详情"/> &nbsp;待发布详情
-          </Button>
           <Button type="text" onClick={generateFormalRelease} style={{float: "right"}}>
-
-            <img src="../pushMessage_gray.png" width="25" height="25" alt="一键生成正式发布" title="一键生成正式发布"/> &nbsp;一键生成正式发布
+            <img src="../pushMessage.png" width="25" height="25" alt="一键生成正式发布" title="一键生成正式发布"/> &nbsp;{buttonTitle}
           </Button>
           <div style={{float: "right"}}>
             <label style={{marginLeft: 10}}>发布时间: </label>
@@ -159,7 +166,7 @@ const ReleaseHistory: React.FC<any> = () => {
         </div>
         <button></button>
         <div className="ag-theme-alpine"
-             style={{marginTop: -21, height: gridHeight(grayscaleData?.data), width: '100%'}}>
+             style={{marginTop: -21, height: getHeight() / 2, width: '100%'}}>
           <AgGridReact
             columnDefs={grayscaleBacklogList()} // 定义列
             rowData={grayscaleData?.data} // 数据绑定
@@ -180,7 +187,7 @@ const ReleaseHistory: React.FC<any> = () => {
                 return (
                   <Button style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
                           onClick={() => releaseProcessDetail(params, "gray")}>
-                    <img src="../logs.png" width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情"/>
+                    <img src="../gray_detail_normal.png" width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情"/>
                   </Button>)
               }
             }}>
@@ -211,7 +218,7 @@ const ReleaseHistory: React.FC<any> = () => {
         </div>
 
         <button></button>
-        <div className="ag-theme-alpine" style={{marginTop: -21, height: releasedGridHight, width: '100%'}}>
+        <div className="ag-theme-alpine" style={{marginTop: -21, height: getHeight() / 2, width: '100%'}}>
           <AgGridReact
             columnDefs={releasedList()} // 定义列
             rowData={releasedData?.data} // 数据绑定
@@ -233,12 +240,12 @@ const ReleaseHistory: React.FC<any> = () => {
                     <Button
                       style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
                       onClick={() => releaseProcessDetail(params, "gray")}>
-                      <img src="../logs.png" width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情"/>
+                      <img src="../gray_detail_forbit.png" width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情"/>
                     </Button>
                     <Button
                       style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
                       onClick={() => releaseProcessDetail(params, "official")}>
-                      <img src="../logs.png" width="20" height="20" alt="正式发布过程详情" title="正式发布过程详情"/>
+                      <img src="../formal_detail.png" width="20" height="20" alt="正式发布过程详情" title="正式发布过程详情"/>
                     </Button>
                   </div>
                 )

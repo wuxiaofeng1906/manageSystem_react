@@ -1,5 +1,7 @@
 import axios from "axios";
+import {axiosGet} from "@/publicMethods/axios";
 import dayjs from "dayjs";
+import {errorMessage} from "@/publicMethods/showMessages";
 
 // const getGrayscaleListData = async (paramData: any) => {
 //   const result: any = {
@@ -21,6 +23,7 @@ import dayjs from "dayjs";
 //
 // };
 
+// 灰度发布列表
 const getGrayscaleListData = async (startTime: string, endTime: string) => {
   const result: any = {
     message: "",
@@ -40,25 +43,25 @@ const getGrayscaleListData = async (startTime: string, endTime: string) => {
   return result;
 };
 
-
 // 正式发布列表
 const getFormalListData = async (condition: any) => {
+
   const result: any = {
     message: "",
     data: []
   };
 
   const data = {
-    release_start_time: condition.start,
-    release_end_time: condition.end,
-    project_id: condition.project,
+    // release_start_time: condition.start,
+    // release_end_time: condition.end,
+    // project_id: condition.project,
     page: condition.page,
     page_size: condition.pageSize
   }
-  await axios.get('/api/verify/release/gray', {params: data})
+  await axios.get('/api/verify/release/online', {params: data})
     .then(function (res) {
       if (res.data.code === 200) {
-        result.data = res.data.data;
+        result.data = res.data.data.data;
       } else {
         result.message = `错误：${res.data.msg}`;
       }
@@ -70,4 +73,19 @@ const getFormalListData = async (condition: any) => {
 
 };
 
-export {getGrayscaleListData, getFormalListData};
+// 判断有没有正式发布的列表未发布
+const vertifyOnlineProjectExit = async () => {
+  let exitProjectNotRelease = false;
+  await axios.get("/api/verify/release/online_app")
+    .then(function (res) {
+      if (res.data.code === 4001) {// 表示有正式发布的列表未发布
+        exitProjectNotRelease = true;
+      }
+    }).catch(function (error) {
+      errorMessage(`异常信息:${error.toString()}`);
+    });
+
+  return exitProjectNotRelease;
+}
+
+export {getGrayscaleListData, getFormalListData, vertifyOnlineProjectExit};

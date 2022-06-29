@@ -1,9 +1,8 @@
 import React, {useState} from 'react';
-import {message, Progress, Row, Select, Modal, Button, Form, Col, Checkbox} from 'antd';
+import {Progress, Row, Select, Modal, Button, Form, Checkbox} from 'antd';
 import {useModel} from '@@/plugin-model/useModel';
-import {saveProcessResult, executeAutoCheck, getOnlinedAutoCheckResult} from './axiosRequest';
+import {saveProcessResult, executeAutoCheck} from './axiosRequest';
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
-import {alalysisInitData} from "@/pages/onDutyAndRelease/preRelease/datas/dataAnalyze";
 import {getAutoResult} from "./processAnalysis";
 
 const {Option} = Select;

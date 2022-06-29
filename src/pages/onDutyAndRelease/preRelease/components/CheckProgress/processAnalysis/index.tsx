@@ -2,7 +2,7 @@ import {getOnlinedAutoCheckResult} from "@/pages/onDutyAndRelease/preRelease/com
 import React from "react";
 
 const getAutoResult = async (releaseNum: string) => {
-  debugger;
+
   const newData: any = await getOnlinedAutoCheckResult(releaseNum);
   //  需要看后端的上线后自动化检查结果
   if (newData && newData.length > 0) {

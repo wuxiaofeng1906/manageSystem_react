@@ -44,28 +44,35 @@ const releaseOnline = async (onlineReleaseNum: string, releaseNums: string) => {
 };
 
 // 获取发布详情
-const getDetails = async (newReleaseNum: string) => {
+const getDetails = async (newReleaseNum: string = "") => {
   const result = await axiosGet('/api/verify/release/online_detail', {online_release_num: newReleaseNum});
   return result;
 };
 
 // 判断有没有正式发布的列表未发布
 const getOfficialReleaseDetails = async (releaseNums: string) => {
+  // 判断是通过详情过来的还是通过新建过来的。
+
+  if (!releaseNums) {  // 如果没有发布编号，则直接进入详情数据获取
+    return await getDetails();
+  }
 
   // 首先需要先获取预发布编号
   const newReleaseNum = (await getPreReleaseNum())?.ready_release_num;
   if (!newReleaseNum) {
-    return;
+    return [];
   }
 
   // 再调用 “一键正式发布”
   const releaseRt = await releaseOnline(newReleaseNum, releaseNums);
   if (releaseRt.code !== 200) {
-    return;
+    return [];
   }
 
   // 最后再调用正式发布过程详情
   const details = await getDetails(newReleaseNum);
+
+  return details;
 };
 
 // 保存发布结果

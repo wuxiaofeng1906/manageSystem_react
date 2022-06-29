@@ -10,9 +10,7 @@ import {Button, Checkbox, Col, DatePicker, Form, Input, Modal, Row, Select} from
 import "./style/style.css"
 import {useRequest} from "ahooks";
 import {
-  loadReleaseTypeSelect,
-  loadReleaseWaySelect,
-  loadDutyNamesSelect
+  loadReleaseTypeSelect, loadReleaseWaySelect, loadDutyNamesSelect
 } from "@/pages/onDutyAndRelease/preRelease/comControl/controler";
 import {getHeight} from "@/publicMethods/pageSet";
 import {releaseColumns} from "./grid/columns";
@@ -26,10 +24,10 @@ const {Option} = Select;
 const OfficialRelease: React.FC<any> = (props: any) => {
 
   const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
-  const releaseWayArray = useRequest(() => loadReleaseWaySelect()).data;
   const dutyNameArray = useRequest(() => loadDutyNamesSelect()).data; // 关联值班名单
-  // const pageData = useRequest(() => getOfficialReleaseDetails(props.location?.query?.releaseNum)).data; // 界面数据获取
-  const pageData = [];
+
+  const pageData = useRequest(() => getOfficialReleaseDetails(props.location?.query?.releaseNum)).data; // 界面数据获取
+
 
   const releaseServiceGridApi = useRef<GridApi>();
   const serviceGridReady = (params: GridReadyEvent) => {
@@ -115,11 +113,35 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     pulishResultForm.resetFields();
   };
 
+  // 显示界面
+  const showPagesData = (sourceData: any) => {
+    if (sourceData && sourceData.length > 0) {
+      // 当前只有一个Tab，不会有多个。
+      const datas = sourceData[0];
+      //   显示发布方式
+      formForOfficialRelease.setFieldsValue({
+        pulishMethod: datas.release_way,
+        pulishTime: datas.plan_release_time,
+        relateDutyName: datas.person_duty_num,
+        editor: datas.edit_user,
+        editTime: datas.edit_time
+      });
 
+      //   显示列表
+      const gridData: any = [];
+      const projectData = datas.project_info;
+      if (projectData && projectData.length > 0) {
+        projectData.forEach((ele: any) => {
+          const details = {...ele};
+          details["release_env"] = datas.release_env;
+          gridData.push(details);
+        });
+      }
+      releaseServiceGridApi.current?.setRowData(gridData);
+    }
+  };
   useEffect(() => {
-    debugger;
-    console.log(pageData)
-
+    showPagesData(pageData);
   }, [pageData]);
 
   // 表格的屏幕大小自适应
@@ -182,7 +204,14 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                   <Col span={7}>
                     {/* 发布方式 */}
                     <Form.Item label="发布方式:" name="pulishMethod">
-                      <Select defaultValue={"1"}>{releaseWayArray}</Select>
+                      <Select defaultValue={"stop_serve"}>
+                        <Option key={'stop_server'} value={'stop_server'}>
+                          停服
+                        </Option>
+                        <Option key={'keep_server'} value={'keep_server'}>
+                          不停服
+                        </Option>
+                      </Select>
                     </Form.Item>
                   </Col>
                   <Col span={10}>
@@ -197,7 +226,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                 <Row gutter={8} style={{marginTop: -10}}>
                   <Col span={14}>
                     {/* 关联值班名单 */}
-                    <Form.Item label="关联值班名单" name="pulishTime" style={{marginLeft: 5}}>
+                    <Form.Item label="关联值班名单" name="relateDutyName" style={{marginLeft: 5}}>
                       <Select filterOption={(inputValue: string, option: any) =>
                         !!option.children.includes(inputValue)} showSearch
                       >{dutyNameArray}</Select>
@@ -252,14 +281,14 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                     resizable: true,
                     sortable: true,
                     suppressMenu: true,
-                    // autoHeight: true,
                     minWidth: 75,
+                    cellStyle: {"line-height": "35px"},
                   }}
-                  headerHeight={25}
-                  rowHeight={65}
+                  headerHeight={35}
+                  rowHeight={30}
                   onGridReady={serviceGridReady}
                   onGridSizeChanged={serviceGridReady}
-                  // onColumnEverythingChanged={onlineBranchGridReady}
+                  onColumnEverythingChanged={serviceGridReady}
                 >
 
                 </AgGridReact>

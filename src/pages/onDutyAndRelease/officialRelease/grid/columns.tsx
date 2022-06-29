@@ -2,27 +2,27 @@
 export const releaseColumns: any = [
   {
     headerName: '集群',
-    field: 'repair_order_type',
+    field: 'release_env',
   },
   {
     headerName: '发布项目',
-    field: 'repair_order_num',
+    field: 'project',
   },
   {
     headerName: '灰度发布日期',
-    field: 'approval_name',
+    field: 'plan_release_time',
   },
   {
     headerName: '工单编号',
-    field: 'approval_instructions',
+    field: 'order_num',
   },
   {
     headerName: '编辑人',
-    field: 'applicant_name',
+    field: 'edit_user_name',
   },
   {
     headerName: '编辑时间',
-    field: 'applicant_name',
+    field: 'edit_time',
   },
 ];
 

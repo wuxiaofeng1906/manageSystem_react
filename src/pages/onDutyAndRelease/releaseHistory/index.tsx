@@ -145,6 +145,7 @@ const ReleaseHistory: React.FC<any> = () => {
   // 显示button title
   const showButtonTitle = async () => {
     const result = await vertifyOnlineProjectExit();
+
     if (result) {
       setButtonTitle("待发布详情");
     }

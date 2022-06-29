@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useModel } from 'umi';
 import DutyListServices from '@/services/dutyList';
 import html2canvas from 'html2canvas';
-import { isEmpty, isEqual, omit, pick, intersection } from 'lodash';
+import { isEmpty, isEqual, omit, pick, intersection, orderBy } from 'lodash';
 import { ExclamationCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { SelectProps } from 'antd/lib/select';
@@ -13,7 +13,7 @@ const opts = {
   showSearch: true,
   mode: 'multiple',
   optionFilterProp: 'label',
-  filterOption: (input, option) => ((option!.label as unknown) as string)?.includes(input),
+  filterOption: (input, option) => (option!.label as unknown as string)?.includes(input),
 };
 const recentType = {
   前端: 'front',
@@ -24,8 +24,9 @@ const recentType = {
 };
 const envType = {
   '集群1-7':
-    'cn-northwest-1cn-northwest-2cn-northwest-3cn-northwest-4cn-northwest-5cn-northwest-6cn-northwest-7',
-  '集群2-7': 'cn-northwest-2cn-northwest-3cn-northwest-4cn-northwest-5cn-northwest-6cn-northwest-7',
+    'cn-northwest-1,cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7',
+  '集群2-7':
+    'cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7',
   global: 'cn-northwest-global',
 };
 const tbodyConfig = [
@@ -77,7 +78,7 @@ const FilterSelector = ({
 };
 
 const DutyCatalog = () => {
-  const { id, status } = useParams() as { id: string; status: string };
+  const { id } = useParams() as { id: string };
   const [allPerson, setAllPerson] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [envList, setEnvList] = useState<any[]>([]);
@@ -89,7 +90,7 @@ const DutyCatalog = () => {
   const [detail, setDetail] = useState<Record<string, any>>();
   const [dutyPerson, setDutyPerson] = useState<Record<string, any>[]>([]);
   const [isSameDuty, setIsSameDuty] = useState(true);
-  const [updateDutySource, setUpdateDutySource] = useState([]);
+  const [initDuty, setInitDuty] = useState([]);
   const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [form] = Form.useForm();
   // scene(现场) remote(远程) head(负责人)
@@ -116,7 +117,7 @@ const DutyCatalog = () => {
       user_tech: o.user_tech,
       label: `${o.user_name}(${o.user_tech}值班负责人)`,
     }));
-    setUpdateDutySource(data);
+    setInitDuty(data);
   };
 
   const getSource = async () => {
@@ -227,19 +228,25 @@ const DutyCatalog = () => {
   // 保存
   const onSave = async (updateDutyData?: Record<string, any>) => {
     if (!hasPermission) return;
+    const dutyKey = ['front', 'backend', 'test', 'operations', 'sqa'];
     const values = await form.getFieldsValue();
     const title = await updateTitle();
-    const pickDuty = pick(values, ['front', 'backend', 'test', 'operations', 'sqa']);
+    const pickDuty = pick(values, dutyKey);
     let dutyPersons: Record<string, any> = {};
+    Object.entries(pickDuty).forEach(([k, v]) => {
+      dutyPersons[k] = v?.map((it: string) => ({
+        user_type: it?.split('_')?.[1],
+        user_id: it?.split('_')?.[0],
+      }));
+    });
+    // 更新为最新的值班人员【更新保存后，可能修改了值班负责人数据情况】
     if (updateDutyData) {
-      dutyPersons = updateDutyData;
-    } else
-      Object.entries(pickDuty).forEach(([k, v]) => {
-        dutyPersons[k] = v?.map((it: string) => ({
-          user_type: it?.split('_')?.[1],
-          user_id: it?.split('_')?.[0],
-        }));
+      dutyKey.forEach((key: string) => {
+        if (!isEqual(dutyPersons[key]?.[0], updateDutyData[key]) && !isEmpty(updateDutyData[key])) {
+          dutyPersons[key][0] = updateDutyData[key];
+        }
       });
+    }
 
     const data = {
       person_duty_num: id,
@@ -253,15 +260,15 @@ const DutyCatalog = () => {
       release_method: values.release_method,
       release_time: moment(values.release_time).format('YYYY-MM-DD HH:mm:ss'),
     };
-
     const flag = isEqual(omit(data, 'user_id'), {
       ...detail,
       project_pm: detail?.project_pm?.map((it: any) => it.user_id).join(),
       release_method: detail?.release_method == 'unknown' ? undefined : detail?.release_method,
     });
     if (flag) return;
-    // await DutyListServices.addDuty(data);
-    // getDetail();
+    await DutyListServices.addDuty(data);
+    setIsSameDuty(true);
+    getDetail();
   };
   // 详情
   const getDetail = async () => {
@@ -329,11 +336,14 @@ const DutyCatalog = () => {
       fit: `${o.user_id}_head`,
     }));
     setDutyPerson(duty);
-    if (status == 'yes') return;
-    const flag = isEqual(duty, updateDutySource);
-    if (duty.length > updateDutySource.length) {
-      setIsSameDuty(true);
-    } else setIsSameDuty(flag);
+    // 存在某个默认值班负责人为空的情况【替换后】
+    if (duty.length != initDuty.length) {
+      const flag = initDuty.every((it: any) => duty.map((o: any) => o.value).includes(it.value));
+      setIsSameDuty(flag);
+    } else {
+      const flag = isEqual(orderBy(duty, 'user_tech'), orderBy(initDuty, 'user_tech'));
+      setIsSameDuty(flag);
+    }
   };
 
   const updateTitle = async () => {
@@ -347,20 +357,22 @@ const DutyCatalog = () => {
     } else type = '线上发布';
     return `${time}${type}值班名单`;
   };
-  // form 格式
+
+  // form 格式【默认值班人员disabled,并过滤值班人员的现场、远程】
   const initalFormDuty = (data: any[]) => {
     let initDutyObj: any = {};
     if (isEmpty(data)) return;
     data?.forEach((o: any) => {
       initDutyObj[recentType[o.user_tech]] = { ...o };
     });
-    form.setFieldsValue({
-      front: initDutyObj?.front?.value.split(),
-      backend: initDutyObj?.backend?.value.split(),
-      test: initDutyObj?.test?.value.split(),
-      sqa: initDutyObj?.sqa?.value.split(),
-      operations: initDutyObj?.operations?.value.split(),
-    });
+    isEmpty(detail) &&
+      form.setFieldsValue({
+        front: initDutyObj?.front?.value.split(),
+        backend: initDutyObj?.backend?.value.split(),
+        test: initDutyObj?.test?.value.split(),
+        sqa: initDutyObj?.sqa?.value.split(),
+        operations: initDutyObj?.operations?.value.split(),
+      });
     return initDutyObj;
   };
 
@@ -368,12 +380,12 @@ const DutyCatalog = () => {
   const updateFirstDuty = async () => {
     setVisible(false);
     Modal.confirm({
-      title: '更新提醒',
+      title: '更新值班负责人提醒',
       icon: <ExclamationCircleOutlined />,
-      content: '请确认是否需要更新为最新的值班负责人?',
+      content: '请确认是否需要将当前值班负责人更新为本周最新值班负责人?',
       onOk: async () => {
         let initDutyObj = {};
-        updateDutySource?.forEach((o: any) => {
+        initDuty?.forEach((o: any) => {
           initDutyObj[recentType[o.user_tech]] = {
             user_type: o?.type,
             user_id: o?.key,
@@ -414,12 +426,12 @@ const DutyCatalog = () => {
   }, [dutyPerson]);
 
   useEffect(() => {
-    if (!isEmpty(updateDutySource)) {
+    if (!isEmpty(initDuty)) {
       if (!isEmpty(detail)) {
         formatSaveDuty(detail);
-      } else setDutyPerson(updateDutySource);
+      } else setDutyPerson(initDuty);
     }
-  }, [detail, updateDutySource]);
+  }, [detail, initDuty]);
 
   const otherEnv = envList
     .filter((o: any) => !Object.values(envType).includes(o.value))
@@ -494,8 +506,16 @@ const DutyCatalog = () => {
                       onDropdownVisibleChange={(open) => !open && getProjectUser()}
                     >
                       {projects.map((it: any) => (
-                        <Select.Option key={it.project_id} label={it.project_name}>
-                          <span style={{ color: it.is_pm ? 'initial' : 'red' }}>
+                        <Select.Option
+                          key={it.project_id}
+                          label={it.project_name}
+                          disabled={it.status == 'closed'}
+                        >
+                          <span
+                            style={{
+                              color: it.status == 'closed' ? '#ccc' : it.is_pm ? 'initial' : 'red',
+                            }}
+                          >
                             {it.project_name}
                           </span>
                         </Select.Option>

@@ -11,7 +11,7 @@ const dutyColumn: (ColDef | ColGroupDef)[] = [
     headerName: '值班名单',
     field: 'duty_name',
     cellRenderer: (data) =>
-      `<a style="color:#1890ff;text-decoration: underline" href='/onDutyAndRelease/dutyCatalog/${data.data.person_duty_num}/${data.data.is_push_msg}'>${data.value}</a>`,
+      `<a style="color:#1890ff;text-decoration: underline" href='/onDutyAndRelease/dutyCatalog/${data.data.person_duty_num}'>${data.value}</a>`,
     minWidth: 220,
   },
   {

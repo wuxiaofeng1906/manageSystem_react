@@ -73,7 +73,7 @@ const DutyList = () => {
                   onClick={async () => {
                     if (!hasPermission) return;
                     const res = await DutyListServices.getDutyNum();
-                    history.push(`/onDutyAndRelease/dutyCatalog/${res.ready_release_num}/no`);
+                    history.push(`/onDutyAndRelease/dutyCatalog/${res.ready_release_num}`);
                   }}
                 >
                   新增

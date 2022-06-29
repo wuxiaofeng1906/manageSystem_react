@@ -479,7 +479,7 @@ export default [
       {
         name: '值班名单',
         icon: 'table',
-        path: 'dutyCatalog/:id/:status',
+        path: 'dutyCatalog/:id',
         hideInMenu: true,
         // access: 'dutyManager',
         component: './onDutyAndRelease/dutyDirectory/dutyCatalog',

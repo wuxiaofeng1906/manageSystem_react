@@ -47,14 +47,10 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
   const [formForOfficialRelease] = Form.useForm();
 
-  /* region 编辑即保存 */
-  const [processStatus, setProcessStatus] = useState({
-    processColor: "gray",
-    releaseRt: "unknown"
-  });
+  /* region 检查总览 */
+  // 检查总览的颜色
+  const [processStatus, setProcessStatus] = useState({processColor: "gray"});
 
-  // 自动化线上发布结果
-  const [autoCheckRt, setAutoCheckRt] = useState(null)
   // 显示进度
   const showProcessStatus = () => {
 
@@ -64,15 +60,31 @@ const OfficialRelease: React.FC<any> = (props: any) => {
         ...processStatus,
         processColor: "#2BF541"
       });
+    } else {
+      setProcessStatus({
+        ...processStatus,
+        processColor: "gray"
+      });
     }
   };
 
   /* endregion 编辑即保存 */
 
   /* region 发布结果 */
-  // 发布结果选择
   const [pulishResultForm] = Form.useForm();
+  // 自动化线上发布结果
+  const [autoCheckRt, setAutoCheckRt] = useState(null);
+  // 发布结果确认弹窗
   const [isModalVisible, setModalVisible] = useState({show: false, result: "", hintMsg: "", autoCheckDisabled: true});
+
+  // 取消发布
+  const handleCancel = () => {
+    setModalVisible({
+      ...isModalVisible,
+      result: "unknown",
+      show: false
+    });
+  };
 
   // 保存发布方式及时间
   const saveReleaseInfo = async () => {
@@ -97,27 +109,13 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       showProcessStatus();
       setModalVisible({
         ...isModalVisible,
-        result: "unknown",
+        result: otherSaveCondition.releaseResult,
         show: false
       });
-      setProcessStatus({
-        ...processStatus,
-        releaseRt: isModalVisible.result
-      });
     }
-
   };
 
-  // 取消发布
-  const handleCancel = () => {
-    setModalVisible({
-      ...isModalVisible,
-      result: "unknown",
-      show: false
-    });
-  };
-
-  // 确认发布
+  // 点击保存按钮
   const handleOk = async () => {
 
     const formData = pulishResultForm.getFieldsValue();
@@ -151,17 +149,13 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           result: "unknown",
           show: false
         });
-        setProcessStatus({
-          ...processStatus,
-          releaseRt: isModalVisible.result
-        });
       }
     } else {
       saveReleaseInfo();
     }
   };
 
-  // 发布结果修改
+  // 发布结果下拉框选择
   const pulishResulttChanged = async (params: any) => {
 
     // 需要判断发布服务有没有填写完成(取消发布可以不填写全)
@@ -189,13 +183,14 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     });
 
     pulishResultForm.resetFields();
+    // 赋值发布结果
     otherSaveCondition.releaseResult = params;
   };
 
   /* endregion 发布结果 */
 
   // 显示界面
-  const showPagesData = (sourceData: any) => {
+  const showPagesData = async (sourceData: any) => {
     if (sourceData && sourceData.length > 0) {
       // 当前只有一个Tab，不会有多个。
       const datas = sourceData[0];
@@ -204,7 +199,8 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       if (datas.plan_release_time && datas.plan_release_time !== "Invalid Date") {
         releaseTime = moment(datas.plan_release_time);
       }
-      //   显示发布方式
+
+      // 显示step1发布方式以及时间
       formForOfficialRelease.setFieldsValue({
         pulishMethod: datas.release_way,
         pulishTime: releaseTime,
@@ -213,7 +209,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
         editTime: datas.edit_time
       });
 
-      //   显示列表
+      // 显示step2 发布服务填写确认列表
       const gridData: any = [];
       const projectData = datas.project_info;
       if (projectData && projectData.length > 0) {
@@ -226,16 +222,20 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           gridData.push(details);
         });
       }
-
       releaseServiceGridApi.current?.setRowData(gridData);
+      setModalVisible({
+        ...isModalVisible,
+        result: datas.release_result
+      });
 
+      // 显示自动化检查结果
+      const autoRt: any = await getOnlineAutoResult(otherSaveCondition.onlineReleaseNum);
+      setAutoCheckRt(autoRt)
     }
   };
   useEffect(() => {
     showPagesData(pageData);
-
   }, [pageData]);
-
 
   // 表格的屏幕大小自适应
   const [gridHeight, setGridHeight] = useState(getHeight() - 180);
@@ -262,6 +262,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
               style={{width: 100}}
               onChange={pulishResulttChanged}
               value={isModalVisible.result}
+              disabled={historyQuery}
             >
               <Option key={'success'} value={'success'}>
                 发布成功
@@ -300,7 +301,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                   <Col span={7}>
                     {/* 发布方式 */}
                     <Form.Item label="发布方式:" name="pulishMethod">
-                      <Select onChange={saveReleaseInfo}>
+                      <Select onChange={saveReleaseInfo} disabled={historyQuery}>
                         <Option key={'stop_server'} value={'stop_server'}>
                           停服
                         </Option>
@@ -314,7 +315,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                     {/* 发布时间 */}
                     <Form.Item label="计划发布时间" name="pulishTime">
                       <DatePicker defaultValue={moment(moment().add(1, "days").format("YYYY-MM-DD"))} showTime
-                                  format="YYYY-MM-DD HH:mm"
+                                  format="YYYY-MM-DD HH:mm" disabled={historyQuery}
                                   style={{width: '100%'}} onChange={saveReleaseInfo}/>
                     </Form.Item>
                   </Col>
@@ -324,7 +325,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                     {/* 关联值班名单 */}
                     <Form.Item label="关联值班名单" name="relateDutyName" style={{marginLeft: 5}}>
                       <Select filterOption={(inputValue: string, option: any) =>
-                        !!option.children.includes(inputValue)} showSearch
+                        !!option.children.includes(inputValue)} showSearch disabled={historyQuery}
                               onChange={saveReleaseInfo}
                       >{dutyNameArray}</Select>
                     </Form.Item>
@@ -389,7 +390,11 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                   frameworkComponents={{
                     releaseEnvRenderer: (params: any) => {
                       if (params && params.data.rowSpan) {
-                        const currentValue = params.value === null ? undefined : (params.value).split(",");
+                        let currentValue;
+                        if (params.value) {
+                          currentValue = (params.value).split(",");
+                        }
+
                         otherSaveCondition.releaseEnv = params.value;
                         showProcessStatus(); // 展示进度
                         return (
@@ -404,7 +409,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                               saveReleaseInfo();
                             }}
                             maxTagCount={"responsive"}
-                            // disabled={currentOperateStatus}
+                            disabled={historyQuery}
                           >
                             {onlineEnv}
                           </Select>

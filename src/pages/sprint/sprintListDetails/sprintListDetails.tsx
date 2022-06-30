@@ -287,7 +287,7 @@ const SprintList: React.FC<any> = () => {
       adminAddFeedbacker: '',
       adminAddRemark: '',
       adminAddBaseLine: '',
-      adminAddPerception: ''
+      adminClearCache: ''
     });
 
     setmodal({title: '新增明细行'});
@@ -349,7 +349,7 @@ const SprintList: React.FC<any> = () => {
       adminAddFeedbacker: datas.feedback,
       adminAddRemark: datas.memo,
       adminAddBaseLine: datas.baseline,
-      adminAddPerception: datas.consumerAffected === "-1" ? "1" : datas.consumerAffected === "-0" ? "0" : datas.consumerAffected
+      adminClearCache: datas.clearCache === "-1" ? "1" : datas.clearCache === "-0" ? "0" : datas.clearCache
     });
     setmodal({title: '修改明细行(admin)'});
     setIsAddModalVisible(true);
@@ -475,7 +475,7 @@ const SprintList: React.FC<any> = () => {
       datas["uedName"] = oradata.adminAddForUED;
       datas["feedback"] = oradata.adminAddFeedbacker;
       datas["testCheck"] = oradata.adminAddtesterVerifi === "" ? "" : `-${oradata.adminAddtesterVerifi}`; // 新增的行都是为手动修改的数据
-      datas["consumerAffected"] = oradata.adminAddPerception === "" ? "" : `-${oradata.adminAddPerception}`; // 手动修改用户是否有感
+      datas["clearCache"] = oradata.adminClearCache === "" ? "" : `-${oradata.adminClearCache}`; // 手动修改是否清缓存
 
       addCommitDetails(datas);
     } else {
@@ -498,9 +498,9 @@ const SprintList: React.FC<any> = () => {
         datas["testCheck"] = oradata.adminAddtesterVerifi === "" ? "" : `-${oradata.adminAddtesterVerifi}`; //  为手动修改的数据
       }
 
-      // 如果修改了用户是否有感，就要改为负值。
-      if (curRow[0].consumerAffected !== oradata.adminAddPerception) {
-        datas["consumerAffected"] = oradata.adminAddPerception === "" ? "" : `-${oradata.adminAddPerception}`; //  为手动修改的数据
+      // 如果修改了是否清缓存，就要改为负值。
+      if (curRow[0].clearCache !== oradata.adminClearCache) {
+        datas["clearCache"] = oradata.adminClearCache === "" ? "" : `-${oradata.adminClearCache}`; //  为手动修改的数据
       }
 
       if (formForAdminToAddAnaMod.isFieldTouched('adminAddTester')) {
@@ -545,7 +545,7 @@ const SprintList: React.FC<any> = () => {
       managerSuggestion: datas.scopeLimit,
       managerTitle: datas.title,
       managertesterVerifi: numberValueGetter(datas.testCheck),
-      managerUserIsPerceive: datas.consumerAffected === "-1" ? "1" : datas.consumerAffected === "-0" ? "0" : datas.consumerAffected,
+      managerClearCache: datas.clearCache === "-1" ? "1" : datas.clearCache === "-0" ? "0" : datas.clearCache,
     });
     setformForManagerToModVisible(true);
   };
@@ -557,6 +557,7 @@ const SprintList: React.FC<any> = () => {
 
   // 开发经理提交修改
   const commitManagerModify = () => {
+
     const oradata = formForManagerToMod.getFieldsValue();
     if (oradata.testerChandaoType === '' || oradata.testerCHandaoID === '') {
       errorMessage(`禅道类型和禅道编号不能为空！`);
@@ -718,7 +719,7 @@ const SprintList: React.FC<any> = () => {
           testerModify(detailsInfo);
           break;
         case 'devManageGroup':
-          // 开发经理可以修改用户是否有感字段，其他开发不可以修改。
+          // 开发经理可以修改是否清缓存字段，其他开发不可以修改。
           setSpecialFieldEdit({
             ...specialFieldEdit,
             managerUserPerceive: false
@@ -1051,7 +1052,7 @@ const SprintList: React.FC<any> = () => {
   const [selectedFiled, setSelectedFiled] = useState(['']);
   const nessField = ['选择', '序号', '类型', '编号']; // 必需的列
   const unNessField = ['阶段', '测试', '测试确认', '标题内容', '创建时间', '解决时间', '所属计划', '严重等级', '截止日期', '模块', '状态', '已提测', '发布环境',
-    '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', "是否涉及页面调整", '是否可热更', '用户是否有感', '是否有数据升级',
+    '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', "是否涉及页面调整", '是否可热更', '是否清缓存', '是否有数据升级',
     '是否有接口升级', '是否有预置数据修改', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人'];
 
   const onSetFieldsChange = (checkedValues: any) => {
@@ -1484,7 +1485,7 @@ const SprintList: React.FC<any> = () => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item name="adminAddPerception" label="用户是否有感:">
+              <Form.Item name="adminClearCache" label="是否清缓存:">
                 <Select placeholder="请选择">
                   {[
                     <Option key={''} value={''}> </Option>,
@@ -1760,7 +1761,7 @@ const SprintList: React.FC<any> = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="managerUserIsPerceive" label="用户是否有感:">
+              <Form.Item name="managerClearCache" label="是否清缓存:">
                 <Select placeholder="请选择" disabled={specialFieldEdit.managerUserPerceive}>
                   {[
                     <Option key={''} value={''}> </Option>,
@@ -2426,7 +2427,7 @@ const SprintList: React.FC<any> = () => {
                   <Checkbox value="是否可热更">是否可热更</Checkbox>
                 </Col>
                 <Col span={4}>
-                  <Checkbox value="用户是否有感">用户是否有感</Checkbox>
+                  <Checkbox value="是否清缓存">是否清缓存</Checkbox>
                 </Col>
                 <Col span={4}>
                   <Checkbox value="是否有数据升级">是否有数据升级</Checkbox>

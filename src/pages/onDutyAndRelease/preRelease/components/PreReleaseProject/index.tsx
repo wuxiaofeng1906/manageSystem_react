@@ -3,9 +3,7 @@ import {Button, Col, DatePicker, Form, Input, message, Row, Select} from 'antd';
 import {useModel} from '@@/plugin-model/useModel';
 import {useRequest} from 'ahooks';
 import {
-  loadPrjNameSelect,
-  loadReleaseTypeSelect,
-  loadReleaseWaySelect,
+  loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadDutyNamesSelect
 } from '../../comControl/controler';
 import '../../style/style.css';
 import moment from 'moment';
@@ -29,13 +27,14 @@ const PreReleaseProject: React.FC<any> = () => {
   const projectsArray = useRequest(() => loadPrjNameSelect()).data;
   const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
   const releaseWayArray = useRequest(() => loadReleaseWaySelect()).data;
-
+  const relateDutyNameArray = useRequest(() => loadDutyNamesSelect()).data;
   // 保存tab名
   const saveModifyName = async (activeKey: string, newTabName: string) => {
     // 被修改的一定是当前activekey中的数据
     const result = await modifyTabsName(activeKey, newTabName);
     if (result === '') {
       //   重置tab名
+      // @ts-ignore
       const {tabPageInfo} = await alalysisInitData('tabPageInfo', '');
       if (tabPageInfo) {
         setTabsData(tabsData.activeKey, tabPageInfo.panes);
@@ -96,7 +95,7 @@ const PreReleaseProject: React.FC<any> = () => {
       // 保存成功后需要刷新状态
       const processData: any = await getCheckProcess(tabsData?.activeKey);
       if (processData) {
-        modifyProcessStatus(showProgressData(processData.data));
+        modifyProcessStatus(await showProgressData(processData.data));
       }
 
       // 保存成功后需要判断tab标签有没有被修改过，如果有，则跳过，如果没有，上面的标签名字需要与发布类型同步，
@@ -152,6 +151,7 @@ const PreReleaseProject: React.FC<any> = () => {
         proid: preReleaseData.pro_id,
         ignoreZentaoList: preReleaseData.ignoreZentaoList,
         checkListStatus: preReleaseData.checkListStatus,
+        relateDutyName: preReleaseData.relateDutyName
       });
     }
   }, [preReleaseData]);
@@ -221,7 +221,18 @@ const PreReleaseProject: React.FC<any> = () => {
                     </Form.Item>
                   </Col>
 
-                  <Col span={13}>
+                  <Col span={7}>
+                    {/* 关联值班名单 */}
+                    <Form.Item label="关联值班名单:" name="relateDutyName" style={{marginLeft: 5}}>
+                      <Select onFocus={releaseItemFocus} showSearch
+                              filterOption={(inputValue: string, option: any) =>
+                                !!option.children.includes(inputValue)}>
+                        {relateDutyNameArray}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+
+                  <Col span={6}>
                     {/* 是否忽略禅道checklist */}
                     <Form.Item label="是否忽略禅道checklist:" name="ignoreZentaoList" style={{marginLeft: 5}}>
                       <Select onFocus={releaseItemFocus}>
@@ -247,7 +258,6 @@ const PreReleaseProject: React.FC<any> = () => {
                       />
                     </Form.Item>
                   </Col>
-
                   <Col span={5}>
                     {/* 编辑人信息 */}
                     {/* 编辑人 */}

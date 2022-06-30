@@ -52,6 +52,7 @@ export default () => {
     onliineCheck: 'Gainsboro',
     releaseResult: '9',
     processPercent: 0,
+    autoCheckResult: null
   });
 
   // 设置Tab的数据
@@ -71,6 +72,7 @@ export default () => {
     pro_id: '',
     ignoreZentaoList: '',
     checkListStatus: '',
+    relateDutyName: ''
   });
 
   // 设置Tab的数据

@@ -226,7 +226,7 @@ const DutyCatalog = () => {
     });
   };
   // 保存
-  const onSave = async (updateDutyData?: Record<string, any>) => {
+  const onSave = async (updateDutyData?: Record<string, any>, pm?: string[]) => {
     if (!hasPermission) return;
     const dutyKey = ['front', 'backend', 'test', 'operations', 'sqa'];
     const values = await form.getFieldsValue();
@@ -255,7 +255,9 @@ const DutyCatalog = () => {
       ...dutyPersons,
       duty_date: moment(values.duty_date).format('YYYY-MM-DD'),
       project_ids: values.project_ids ? values.project_ids?.join() : undefined,
-      project_pm: values.project_pm?.map((it: any) => it.user_id)?.join(),
+      project_pm: !isEmpty(pm)
+        ? pm?.join()
+        : values.project_pm?.map((it: any) => it.user_id)?.join(),
       release_env: values?.release_env?.join(),
       release_method: values.release_method,
       release_time: moment(values.release_time).format('YYYY-MM-DD HH:mm:ss'),
@@ -384,14 +386,28 @@ const DutyCatalog = () => {
       icon: <ExclamationCircleOutlined />,
       content: '请确认是否需要将当前值班负责人更新为本周最新值班负责人?',
       onOk: async () => {
+        // 更新默认值班人员及含特性项目项目对应的负责人
         let initDutyObj = {};
+        const { project_ids } = await form.getFieldsValue();
+
         initDuty?.forEach((o: any) => {
           initDutyObj[recentType[o.user_tech]] = {
             user_type: o?.type,
             user_id: o?.key,
           };
         });
-        await onSave(initDutyObj);
+        const formatPro = projects
+          ?.filter((it: any) => project_ids?.includes(it.project_id.toString()))
+          .map((o: any) => ({
+            user: ['sprint', 'emergency', 'hotfix', 'stage-emergency'].includes(o.sprint_type)
+              ? initDutyObj?.backend?.user_id
+              : o.user?.user_id,
+            project_id: o.project_id.toString(),
+          }));
+        const projectPM = project_ids?.map(
+          (pro: string) => formatPro?.find((it) => it.project_id == pro)?.user,
+        );
+        await onSave(initDutyObj, projectPM);
         setVisible(true);
       },
       onCancel: () => {
@@ -414,7 +430,7 @@ const DutyCatalog = () => {
     const initDutyObj = initalFormDuty(dutyPerson);
     const formatProject = projects?.map((it: any) => ({
       ...it,
-      user: ['sprint', 'emergency', 'hotfix'].includes(it.sprint_type)
+      user: ['sprint', 'emergency', 'hotfix', 'stage-emergency'].includes(it.sprint_type)
         ? {
             user_id: initDutyObj?.backend?.key,
             user_name: initDutyObj?.backend?.label.replace('(后端值班负责人)', ''),

@@ -32,10 +32,15 @@ const dataRender = (params: any) => {
     }
 
     if (node && node.isDept === true) {
-      return `<span style="font-weight: bold"> ${result}  (${numerator},${denominator})</span>`;
+      return `<span>
+                <label style="font-weight: bold">${result}</label>
+                <label style="color: gray"> (${numerator},${denominator})</label>
+            </span>`;
     }
 
-    return `<span>  ${result}  (${numerator},${denominator})</span>`;
+    return `<span>  ${result}
+                <label style="color: gray"> (${numerator},${denominator})</label>
+            </span>`;
   }
 
   if (node && node.isDept === true) {

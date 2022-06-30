@@ -48,7 +48,7 @@ const converseArrayToOne = (data: any) => {
   return resultData;
 };
 
-// 转化为ag-grid能被显示的格式
+// 转化为ag-grid能被显示的格式（添加了前后端以及人员数据）
 const converseFormatForAgGrid = (oraDatas: any) => {
   if (!oraDatas) {
     return [];
@@ -154,14 +154,12 @@ const converseFormatForAgGrid = (oraDatas: any) => {
   return converseArrayToOne(resultArray);
 };
 
-// 转化为ag-grid能被显示的格式
+// 转化为ag-grid能被显示的格式（覆盖率专用格式转化）
 const converseCoverageFormatForAgGrid = (oraDatas: any) => {
   if (!oraDatas) {
     return [];
   }
-
   const resultArray: any = [];
-
   // 解析部门数据
   oraDatas.forEach((elements: any) => {
 
@@ -333,8 +331,7 @@ const converseForAgGrid_defectRate = (oraDatas: any) => {
   return converseArrayToOne(resultArray);
 };
 
-
-// 使用界面：项目计划偏差率、提测计划偏差率
+// 使用界面：项目计划偏差率、提测计划偏差率（只显示部门数据，数据*100）
 const converseForAgGrid_projectPlanDevition = (oraDatas: any) => {
   if (!oraDatas) return [];
   const resultArray: any = [];
@@ -364,7 +361,38 @@ const converseForAgGrid_projectPlanDevition = (oraDatas: any) => {
   return converseArrayToOne(resultArray);
 };
 
-// 使用界面：管理事务偏差率
+// 使用界面：发布引入emergency数（只显示部门数据，显示原始数据）
+const converseForAgGrid_showDepts = (oraDatas: any) => {
+  if (!oraDatas) return [];
+  const resultArray: any = [];
+  // 解析部门数据
+  oraDatas.forEach((elements: any) => {
+    const starttime = elements.range.start;
+    // 新增研发中心数据
+    resultArray.push({
+      Group: ['研发中心'],
+      [starttime]: elements.total.kpi,
+      isDept: true
+    });
+
+    // 部门数据
+    const departDatas = elements.datas;
+    departDatas.forEach((depts: any) => {
+      const groups: any = [depts.deptName];
+      findParent(departDatas, depts, groups);
+      // 新增部门
+      resultArray.push({
+        Group: groups,
+        [starttime]: depts.kpi,
+        isDept: true
+      });
+    });
+  });
+  return converseArrayToOne(resultArray);
+};
+
+
+// 使用界面：管理事务偏差率（显示人员数据，并且数据*100）
 const converseForAgGrid_manageWorkDeviRate = (oraDatas: any) => {
   if (!oraDatas) return [];
   const resultArray: any = [];
@@ -410,7 +438,7 @@ const converseForAgGrid_manageWorkDeviRate = (oraDatas: any) => {
   return converseArrayToOne(resultArray);
 };
 
-// 使用界面：管理事务偏差率
+// 使用界面：开发A类客户服务投入比（展示分子和分母）
 const converseForAgGrid_cusInputRate = (oraDatas: any) => {
   if (!oraDatas) return [];
   const resultArray: any = [];
@@ -468,5 +496,6 @@ export {
   converseForAgGrid_defectRate,
   converseForAgGrid_projectPlanDevition,
   converseForAgGrid_manageWorkDeviRate,
-  converseForAgGrid_cusInputRate
+  converseForAgGrid_cusInputRate,
+  converseForAgGrid_showDepts
 };

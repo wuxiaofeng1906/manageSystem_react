@@ -41,8 +41,16 @@ const ReleaseHistory: React.FC<any> = () => {
   const grayscaleData = useRequest(() => getGrayscaleListData(start, end)).data;
   // 根据时间查询
   const onGrayReleaseTimeChanged = async (params: any, times: any) => {
-    const grayReleaseList = await getGrayscaleListData(dayjs(times[0]).format("YYYY-MM-DD HH:mm:ss"), dayjs(times[1]).format("YYYY-MM-DD HH:mm:ss"));
-    grayscaleGridApi.current?.setRowData(grayReleaseList);
+    let startTimes = times[0];
+    if (startTimes) {
+      startTimes = dayjs(start).format("YYYY-MM-DD HH:mm:ss");
+    }
+    let endTimes = times[1];
+    if (endTimes) {
+      endTimes = dayjs(end).format("YYYY-MM-DD HH:mm:ss");
+    }
+    const grayReleaseList = await getGrayscaleListData(startTimes, endTimes);
+    grayscaleGridApi.current?.setRowData(grayReleaseList?.data);
   };
   // 一键生成正式发布
   const generateFormalRelease = () => {
@@ -75,7 +83,6 @@ const ReleaseHistory: React.FC<any> = () => {
     params.api.sizeColumnsToFit();
   };
 
-
   // 项目名称
   const projectsArray = useRequest(() => loadPrjNameSelect()).data;
 
@@ -86,7 +93,7 @@ const ReleaseHistory: React.FC<any> = () => {
   const getReleasedList = async () => {
     const cond = {
       page: 1,
-      pageSize: 10
+      pageSize: 100
     };
 
     if (formalQueryCondition.start && formalQueryCondition.end) {
@@ -124,23 +131,16 @@ const ReleaseHistory: React.FC<any> = () => {
 
   /* endregion */
 
-  // 灰度和正式发布详情页面跳转
-  const releaseProcessDetail = (releData: any, type: string) => {
+  // 跳转到灰度界面
+  const gotoGrayReleasePage = (releData: any) => {
+    const releasedNum = releData.data?.ready_release_num;
+    history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
+  };
 
-    if (type === "gray") { // 灰度列表跳到发布过程界面
-      const releasedNum = releData.data?.ready_release_num;
-      history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
-    } else {
-
-      const onlineReleasedNum = releData.data?.online_release_num;
-      if (type === "onlineGrayDetail") {
-        // 正式发布列表跳到发布过程界面
-        history.push(`/onDutyAndRelease/preRelease?releasedNum=${onlineReleasedNum}&history=true`);
-      } else {
-        // 正式发布列表跳到正式发布界面
-        history.push(`/onDutyAndRelease/officialRelease?releaseNum=${onlineReleasedNum}&history=true`);
-      }
-    }
+  // 跳转到正式发布界面
+  const gotoOnlineReleasePage = (releData: any) => {
+    const onlineReleasedNum = releData.data?.online_release_num;
+    history.push(`/onDutyAndRelease/officialRelease?releaseNum=${onlineReleasedNum}&history=true`);
   };
 
   window.addEventListener('resize', () => {
@@ -155,7 +155,7 @@ const ReleaseHistory: React.FC<any> = () => {
     if (result) {
       setButtonTitle("待发布详情");
     }
-  }
+  };
   useEffect(() => {
     showButtonTitle();
   }, [releasedData]);
@@ -199,7 +199,7 @@ const ReleaseHistory: React.FC<any> = () => {
               grayReleaseDetails: (params: any) => {
                 return (
                   <Button style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
-                          onClick={() => releaseProcessDetail(params, "gray")}>
+                          onClick={() => gotoGrayReleasePage(params)}>
                     <img src="../gray_detail_normal.png" width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情"/>
                   </Button>)
               }
@@ -270,13 +270,13 @@ const ReleaseHistory: React.FC<any> = () => {
                   <div>
                     <Button
                       style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
-                      onClick={() => releaseProcessDetail(params, "onlineGrayDetail")}>
+                      onClick={() => gotoGrayReleasePage(params)}>
                       <img src={"../gray_detail_normal.png"} width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情"/>
                     </Button>
                     <Button
                       disabled={buttonDisable}
                       style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
-                      onClick={() => releaseProcessDetail(params, "officialDetail")}>
+                      onClick={() => gotoOnlineReleasePage(params)}>
                       <img src={srcPath} width="20" height="20" alt="正式发布过程详情" title="正式发布过程详情"/>
                     </Button>
                   </div>

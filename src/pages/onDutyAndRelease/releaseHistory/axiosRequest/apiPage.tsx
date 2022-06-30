@@ -25,6 +25,8 @@ import {errorMessage} from "@/publicMethods/showMessages";
 
 // 灰度发布列表
 const getGrayscaleListData = async (startTime: string, endTime: string) => {
+  debugger
+
   const result: any = {
     message: "",
     data: []

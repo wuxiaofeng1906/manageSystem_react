@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react';
 import { useParams, useModel } from 'umi';
 import DutyListServices from '@/services/dutyList';
 import html2canvas from 'html2canvas';
-import { isEmpty, isEqual, omit, pick, intersection } from 'lodash';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { isEmpty, isEqual, omit, pick, intersection, orderBy } from 'lodash';
+import { ExclamationCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { SelectProps } from 'antd/lib/select';
 const opts = {
@@ -24,8 +24,9 @@ const recentType = {
 };
 const envType = {
   '集群1-7':
-    'cn-northwest-1cn-northwest-2cn-northwest-3cn-northwest-4cn-northwest-5cn-northwest-6cn-northwest-7',
-  '集群2-7': 'cn-northwest-2cn-northwest-3cn-northwest-4cn-northwest-5cn-northwest-6cn-northwest-7',
+    'cn-northwest-1,cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7',
+  '集群2-7':
+    'cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7',
   global: 'cn-northwest-global',
 };
 const tbodyConfig = [
@@ -88,6 +89,8 @@ const DutyCatalog = () => {
   const [loading, setLoading] = useState(false);
   const [detail, setDetail] = useState<Record<string, any>>();
   const [dutyPerson, setDutyPerson] = useState<Record<string, any>[]>([]);
+  const [isSameDuty, setIsSameDuty] = useState(true);
+  const [initDuty, setInitDuty] = useState([]);
   const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [form] = Form.useForm();
   // scene(现场) remote(远程) head(负责人)
@@ -114,7 +117,7 @@ const DutyCatalog = () => {
       user_tech: o.user_tech,
       label: `${o.user_name}(${o.user_tech}值班负责人)`,
     }));
-    setDutyPerson(data);
+    setInitDuty(data);
   };
 
   const getSource = async () => {
@@ -156,7 +159,7 @@ const DutyCatalog = () => {
       setLoading(false);
     }
   };
-
+  // 获取项目负责人
   const getProjectUser = async () => {
     if (!hasPermission) return;
     const values = await form.getFieldsValue();
@@ -170,7 +173,7 @@ const DutyCatalog = () => {
     form.setFieldsValue({ project_pm: result?.map((it: any) => it.user) });
     await onSave();
   };
-
+  // 推送
   const onScreenShot = async () => {
     if (!hasPermission) return;
     const errTip = {
@@ -222,12 +225,13 @@ const DutyCatalog = () => {
       },
     });
   };
-
-  const onSave = async () => {
+  // 保存
+  const onSave = async (updateDutyData?: Record<string, any>, pm?: string[]) => {
     if (!hasPermission) return;
+    const dutyKey = ['front', 'backend', 'test', 'operations', 'sqa'];
     const values = await form.getFieldsValue();
     const title = await updateTitle();
-    const pickDuty = pick(values, ['front', 'backend', 'test', 'operations', 'sqa']);
+    const pickDuty = pick(values, dutyKey);
     let dutyPersons: Record<string, any> = {};
     Object.entries(pickDuty).forEach(([k, v]) => {
       dutyPersons[k] = v?.map((it: string) => ({
@@ -235,6 +239,14 @@ const DutyCatalog = () => {
         user_id: it?.split('_')?.[0],
       }));
     });
+    // 更新为最新的值班人员【更新保存后，可能修改了值班负责人数据情况】
+    if (updateDutyData) {
+      dutyKey.forEach((key: string) => {
+        if (!isEqual(dutyPersons[key]?.[0], updateDutyData[key]) && !isEmpty(updateDutyData[key])) {
+          dutyPersons[key][0] = updateDutyData[key];
+        }
+      });
+    }
 
     const data = {
       person_duty_num: id,
@@ -243,12 +255,13 @@ const DutyCatalog = () => {
       ...dutyPersons,
       duty_date: moment(values.duty_date).format('YYYY-MM-DD'),
       project_ids: values.project_ids ? values.project_ids?.join() : undefined,
-      project_pm: values.project_pm?.map((it: any) => it.user_id)?.join(),
+      project_pm: !isEmpty(pm)
+        ? pm?.join()
+        : values.project_pm?.map((it: any) => it.user_id)?.join(),
       release_env: values?.release_env?.join(),
       release_method: values.release_method,
       release_time: moment(values.release_time).format('YYYY-MM-DD HH:mm:ss'),
     };
-
     const flag = isEqual(omit(data, 'user_id'), {
       ...detail,
       project_pm: detail?.project_pm?.map((it: any) => it.user_id).join(),
@@ -256,9 +269,10 @@ const DutyCatalog = () => {
     });
     if (flag) return;
     await DutyListServices.addDuty(data);
+    setIsSameDuty(true);
     getDetail();
   };
-
+  // 详情
   const getDetail = async () => {
     try {
       setLoading(true);
@@ -269,36 +283,8 @@ const DutyCatalog = () => {
           duty_date: moment(),
           release_time: moment().hour(23).minute(0).second(0),
         });
-        getFirstDuty();
         return;
       }
-      const front = res.front
-        ?.filter((it: any) => it.user_type == 'head')
-        .map((it: any) => ({ ...it, user_tech: '前端' }));
-      const backend = res.backend
-        ?.filter((it: any) => it.user_type == 'head')
-        .map((it: any) => ({ ...it, user_tech: '后端' }));
-      const test = res.test
-        ?.filter((it: any) => it.user_type == 'head')
-        .map((it: any) => ({ ...it, user_tech: '测试' }));
-      const sqa = res.sqa
-        ?.filter((it: any) => it.user_type == 'head')
-        .map((it: any) => ({ ...it, user_tech: 'SQA' }));
-      const operations = res.operations
-        ?.filter((it: any) => it.user_type == 'head')
-        .map((it: any) => ({ ...it, user_tech: '运维' }));
-
-      setDutyPerson(
-        front.concat(backend, test, operations, sqa).map((o: any, i: number) => ({
-          value: `${o.user_id}_head`,
-          key: o.user_id,
-          type: 'head',
-          disabled: true,
-          user_tech: o.user_tech,
-          label: `${o.user_name}(${o.user_tech}值班负责人)`,
-          fit: `${o.user_id}_head`,
-        })),
-      );
       setDetail(res);
       form.setFieldsValue({
         front: res?.front?.map((it: any) => `${it.user_id}_${it.user_type}`),
@@ -324,6 +310,43 @@ const DutyCatalog = () => {
       setLoading(false);
     }
   };
+  // 保存后【默认值班人】
+  const formatSaveDuty = (data: Record<string, any>) => {
+    const front = data.front
+      ?.filter((it: any) => it.user_type == 'head')
+      .map((it: any) => ({ ...it, user_tech: '前端' }));
+    const backend = data.backend
+      ?.filter((it: any) => it.user_type == 'head')
+      .map((it: any) => ({ ...it, user_tech: '后端' }));
+    const test = data.test
+      ?.filter((it: any) => it.user_type == 'head')
+      .map((it: any) => ({ ...it, user_tech: '测试' }));
+    const sqa = data.sqa
+      ?.filter((it: any) => it.user_type == 'head')
+      .map((it: any) => ({ ...it, user_tech: 'SQA' }));
+    const operations = data.operations
+      ?.filter((it: any) => it.user_type == 'head')
+      .map((it: any) => ({ ...it, user_tech: '运维' }));
+
+    const duty = front.concat(backend, test, operations, sqa).map((o: any, i: number) => ({
+      value: `${o.user_id}_head`,
+      key: o.user_id,
+      type: 'head',
+      disabled: true,
+      user_tech: o.user_tech,
+      label: `${o.user_name}(${o.user_tech}值班负责人)`,
+      fit: `${o.user_id}_head`,
+    }));
+    setDutyPerson(duty);
+    // 存在某个默认值班负责人为空的情况【替换后】
+    if (duty.length != initDuty.length) {
+      const flag = initDuty.every((it: any) => duty.map((o: any) => o.value).includes(it.value));
+      setIsSameDuty(flag);
+    } else {
+      const flag = isEqual(orderBy(duty, 'user_tech'), orderBy(initDuty, 'user_tech'));
+      setIsSameDuty(flag);
+    }
+  };
 
   const updateTitle = async () => {
     if (!hasPermission) return;
@@ -337,8 +360,65 @@ const DutyCatalog = () => {
     return `${time}${type}值班名单`;
   };
 
+  // form 格式【默认值班人员disabled,并过滤值班人员的现场、远程】
+  const initalFormDuty = (data: any[]) => {
+    let initDutyObj: any = {};
+    if (isEmpty(data)) return;
+    data?.forEach((o: any) => {
+      initDutyObj[recentType[o.user_tech]] = { ...o };
+    });
+    isEmpty(detail) &&
+      form.setFieldsValue({
+        front: initDutyObj?.front?.value.split(),
+        backend: initDutyObj?.backend?.value.split(),
+        test: initDutyObj?.test?.value.split(),
+        sqa: initDutyObj?.sqa?.value.split(),
+        operations: initDutyObj?.operations?.value.split(),
+      });
+    return initDutyObj;
+  };
+
+  // 更新为最新值班负责人员【修改了值班数据且与保存的默认值班人不一致】
+  const updateFirstDuty = async () => {
+    setVisible(false);
+    Modal.confirm({
+      title: '更新值班负责人提醒',
+      icon: <ExclamationCircleOutlined />,
+      content: '请确认是否需要将当前值班负责人更新为本周最新值班负责人?',
+      onOk: async () => {
+        // 更新默认值班人员及含特性项目项目对应的负责人
+        let initDutyObj = {};
+        const { project_ids } = await form.getFieldsValue();
+
+        initDuty?.forEach((o: any) => {
+          initDutyObj[recentType[o.user_tech]] = {
+            user_type: o?.type,
+            user_id: o?.key,
+          };
+        });
+        const formatPro = projects
+          ?.filter((it: any) => project_ids?.includes(it.project_id.toString()))
+          .map((o: any) => ({
+            user: ['sprint', 'emergency', 'hotfix', 'stage-emergency'].includes(o.sprint_type)
+              ? initDutyObj?.backend?.user_id
+              : o.user?.user_id,
+            project_id: o.project_id.toString(),
+          }));
+        const projectPM = project_ids?.map(
+          (pro: string) => formatPro?.find((it) => it.project_id == pro)?.user,
+        );
+        await onSave(initDutyObj, projectPM);
+        setVisible(true);
+      },
+      onCancel: () => {
+        setVisible(true);
+      },
+    });
+  };
+
   useEffect(() => {
     if (!id) return;
+    getFirstDuty();
     DutyListServices.getProject().then((res) => setProjects(res));
     getDetail();
     getSource();
@@ -346,36 +426,34 @@ const DutyCatalog = () => {
 
   // 保存后的第一值班人
   useEffect(() => {
-    let initDutyObj: any = {};
     if (isEmpty(dutyPerson)) return;
-    dutyPerson?.forEach((o: any) => {
-      initDutyObj[recentType[o.user_tech]] = { ...o };
-    });
+    const initDutyObj = initalFormDuty(dutyPerson);
     const formatProject = projects?.map((it: any) => ({
       ...it,
-      user: ['sprint', 'emergency', 'hotfix'].includes(it.sprint_type)
+      user: ['sprint', 'emergency', 'hotfix', 'stage-emergency'].includes(it.sprint_type)
         ? {
             user_id: initDutyObj?.backend?.key,
             user_name: initDutyObj?.backend?.label.replace('(后端值班负责人)', ''),
           }
         : it.user,
     }));
-    form.setFieldsValue({
-      front: initDutyObj?.front ? [initDutyObj?.front?.value] : undefined,
-      backend: initDutyObj?.backend ? [initDutyObj?.backend?.value] : undefined,
-      test: initDutyObj?.test ? [initDutyObj?.test?.value] : undefined,
-      sqa: initDutyObj?.sqa ? [initDutyObj?.sqa?.value] : undefined,
-      operations: initDutyObj?.operations ? [initDutyObj?.operations?.value] : undefined,
-    });
     setProjects(formatProject);
     setRecentDuty(initDutyObj);
   }, [dutyPerson]);
+
+  useEffect(() => {
+    if (!isEmpty(initDuty)) {
+      if (!isEmpty(detail)) {
+        formatSaveDuty(detail);
+      } else setDutyPerson(initDuty);
+    }
+  }, [detail, initDuty]);
 
   const otherEnv = envList
     .filter((o: any) => !Object.values(envType).includes(o.value))
     .map((it) => it.value);
 
-  // 值班名单权限： 超级管理员、开发经理/总监、前端管理人员
+  // 值班名单权限： 超级管理员、开发经理/总监、前端管理人员 、测试部门与业务经理
   const hasPermission = useMemo(
     () =>
       ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(
@@ -389,33 +467,43 @@ const DutyCatalog = () => {
       <div className={styles.dutyCatalog} id={'dutyForm'}>
         <div className={styles.header}>
           <h3>{title}</h3>
-          <Button
-            type={'text'}
-            disabled={!visible || !hasPermission}
+          <div
             style={{
               position: 'absolute',
               right: 0,
               top: 0,
               visibility: visible ? 'visible' : 'hidden',
             }}
-            icon={
-              <img
-                src={require('../../../../public/navigation.png')}
-                width={20}
-                style={
-                  hasPermission
-                    ? { marginRight: 8 }
-                    : { filter: 'grayscale(1)', cursor: 'not-allowed', marginRight: 8 }
-                }
-              />
-            }
-            onClick={() => {
-              setVisible(false);
-              onScreenShot();
-            }}
           >
-            一键推送
-          </Button>
+            <Button
+              style={{ visibility: isSameDuty ? 'hidden' : 'visible' }}
+              type={'text'}
+              icon={<SyncOutlined style={{ color: '#1597e1' }} />}
+              disabled={!visible || !hasPermission}
+              onClick={updateFirstDuty}
+            />
+            <Button
+              type={'text'}
+              disabled={!visible || !hasPermission}
+              icon={
+                <img
+                  src={require('../../../../public/navigation.png')}
+                  width={20}
+                  style={
+                    hasPermission
+                      ? { marginRight: 8 }
+                      : { filter: 'grayscale(1)', cursor: 'not-allowed', marginRight: 8 }
+                  }
+                />
+              }
+              onClick={() => {
+                setVisible(false);
+                onScreenShot();
+              }}
+            >
+              一键推送
+            </Button>
+          </div>
         </div>
         <Form form={form}>
           <table className={styles.table}>
@@ -434,8 +522,16 @@ const DutyCatalog = () => {
                       onDropdownVisibleChange={(open) => !open && getProjectUser()}
                     >
                       {projects.map((it: any) => (
-                        <Select.Option key={it.project_id} label={it.project_name}>
-                          <span style={{ color: it.is_pm ? 'initial' : 'red' }}>
+                        <Select.Option
+                          key={it.project_id}
+                          label={it.project_name}
+                          disabled={it.status == 'closed'}
+                        >
+                          <span
+                            style={{
+                              color: it.status == 'closed' ? '#ccc' : it.is_pm ? 'initial' : 'red',
+                            }}
+                          >
                             {it.project_name}
                           </span>
                         </Select.Option>
@@ -479,7 +575,7 @@ const DutyCatalog = () => {
                         const title = (await updateTitle()) || '';
                         setTitle(title);
                       }}
-                      onBlur={onSave}
+                      onBlur={() => onSave()}
                     />
                   </Form.Item>
                 </th>
@@ -532,7 +628,7 @@ const DutyCatalog = () => {
                       bordered={false}
                       showSearch={false}
                       showArrow={false}
-                      onChange={onSave}
+                      onChange={() => onSave()}
                     />
                   </Form.Item>
                 </th>
@@ -542,7 +638,7 @@ const DutyCatalog = () => {
                     <DatePicker
                       format={'YYYY-MM-DD HH:mm'}
                       allowClear={false}
-                      onBlur={onSave}
+                      onBlur={() => onSave()}
                       showTime={{ defaultValue: moment('23:00:00', 'HH:mm') }}
                       disabled={!hasPermission}
                     />
@@ -561,8 +657,8 @@ const DutyCatalog = () => {
                         name={config.name}
                         placeholder={`${config.title}人员`}
                         init={recentDuty?.[config.name]}
-                        onDeselect={onSave}
-                        onBlur={onSave}
+                        onDeselect={() => onSave()}
+                        onBlur={() => onSave()}
                         disabled={!hasPermission}
                       />
                     </td>

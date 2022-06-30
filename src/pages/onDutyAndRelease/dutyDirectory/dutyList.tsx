@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { history, useModel } from 'umi';
 import { Form, DatePicker, Row, Col, Button, Select } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -46,7 +46,7 @@ const DutyList = () => {
     getList();
   }, []);
 
-  // 值班名单权限： 超级管理员、开发经理/总监、前端管理人员
+  // 值班名单权限： 超级管理员、开发经理/总监、前端管理人员、测试部门与业务经理
   const hasPermission = useMemo(
     () =>
       ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(

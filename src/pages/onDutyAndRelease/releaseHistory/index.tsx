@@ -249,27 +249,35 @@ const ReleaseHistory: React.FC<any> = () => {
             frameworkComponents={{
               officialReleaseDetails: (params: any) => {
 
+                // 发布过程详情都可以跳转，正式发布详情需要判断。
                 const onlineNum = params.data?.online_release_num; // 为空。就可以跳到发布过程详情
                 // 需要判断有没有灰度，没有则置灰
-                let srcPath = "../gray_detail_normal.png";
+                // let srcPath = "../gray_detail_normal.png";
+                // let buttonDisable = false;
+                // if (onlineNum) {
+                //   srcPath = "../gray_detail_forbit.png";
+                //   buttonDisable = true;
+                // }
+
+                let srcPath = "../formal_detail.png";
                 let buttonDisable = false;
-                if (onlineNum) {
-                  srcPath = "../gray_detail_forbit.png";
+                if (!onlineNum) {
+                  srcPath = "../formal_detail_gray.png";
                   buttonDisable = true;
                 }
 
                 return (
                   <div>
                     <Button
-                      disabled={buttonDisable}
                       style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
                       onClick={() => releaseProcessDetail(params, "onlineGrayDetail")}>
-                      <img src={srcPath} width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情"/>
+                      <img src={"../gray_detail_normal.png"} width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情"/>
                     </Button>
                     <Button
+                      disabled={buttonDisable}
                       style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
                       onClick={() => releaseProcessDetail(params, "officialDetail")}>
-                      <img src="../formal_detail.png" width="20" height="20" alt="正式发布过程详情" title="正式发布过程详情"/>
+                      <img src={srcPath} width="20" height="20" alt="正式发布过程详情" title="正式发布过程详情"/>
                     </Button>
                   </div>
                 )

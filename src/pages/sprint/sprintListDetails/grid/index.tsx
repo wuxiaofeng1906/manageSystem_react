@@ -3,7 +3,7 @@ import {
   testConfirmValueGetter, catagoryValueGetter, linkToZentaoPage, servertyValueGetter,
   statusValueGetter, statusRenderer, assignedToValueGetter, solvedByValueGetter, relatedNumberRender,
   timestampRenderer, isOrNotValueGetter, testConfirmTooltipValueGetter, testConfirmedRenderer,
-  proposedTestValueGetter, testVertifyFilter,consumerAffectedRenderer,
+  proposedTestValueGetter, testVertifyFilter, clearCacheRenderer,
   vertifyResultValueGetter, sourceValueGetter, timeRenderer
 } from "./columnRenderer";
 
@@ -121,9 +121,9 @@ const getColums = (prjNames: any) => {
       cellRenderer: textDecorateRender,
     },
     {
-      headerName: '用户是否有感',
-      field: 'consumerAffected',
-      cellRenderer: consumerAffectedRenderer,
+      headerName: '是否清缓存',
+      field: 'clearCache',
+      cellRenderer: clearCacheRenderer,
       filterParams: {cellRenderer: testVertifyFilter}
     },
     {

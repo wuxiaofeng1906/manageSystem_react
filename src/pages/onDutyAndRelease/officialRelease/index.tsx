@@ -262,6 +262,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
               style={{width: 100}}
               onChange={pulishResulttChanged}
               value={isModalVisible.result}
+              disabled={historyQuery}
             >
               <Option key={'success'} value={'success'}>
                 发布成功
@@ -300,7 +301,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                   <Col span={7}>
                     {/* 发布方式 */}
                     <Form.Item label="发布方式:" name="pulishMethod">
-                      <Select onChange={saveReleaseInfo}>
+                      <Select onChange={saveReleaseInfo} disabled={historyQuery}>
                         <Option key={'stop_server'} value={'stop_server'}>
                           停服
                         </Option>
@@ -314,7 +315,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                     {/* 发布时间 */}
                     <Form.Item label="计划发布时间" name="pulishTime">
                       <DatePicker defaultValue={moment(moment().add(1, "days").format("YYYY-MM-DD"))} showTime
-                                  format="YYYY-MM-DD HH:mm"
+                                  format="YYYY-MM-DD HH:mm" disabled={historyQuery}
                                   style={{width: '100%'}} onChange={saveReleaseInfo}/>
                     </Form.Item>
                   </Col>
@@ -324,7 +325,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                     {/* 关联值班名单 */}
                     <Form.Item label="关联值班名单" name="relateDutyName" style={{marginLeft: 5}}>
                       <Select filterOption={(inputValue: string, option: any) =>
-                        !!option.children.includes(inputValue)} showSearch
+                        !!option.children.includes(inputValue)} showSearch disabled={historyQuery}
                               onChange={saveReleaseInfo}
                       >{dutyNameArray}</Select>
                     </Form.Item>
@@ -408,7 +409,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                               saveReleaseInfo();
                             }}
                             maxTagCount={"responsive"}
-                            // disabled={currentOperateStatus}
+                            disabled={historyQuery}
                           >
                             {onlineEnv}
                           </Select>

@@ -251,7 +251,7 @@ export default [
                 component: './kpi/performance/developer/devShowTestPlanDeviationRate',
               },
               {
-                name: 'A类客户服务投入比',
+                name: '开发A类客户服务投入比',
                 icon: 'table',
                 path: 'cusInputRate_A',
                 component: './kpi/performance/developer/cusInputRate_A',
@@ -336,6 +336,12 @@ export default [
                 path: 'palnDeviationRate',
                 component: './kpi/performance/testers/palnDeviationRate',
                 // hideInMenu: true,
+              },
+              {
+                name: '测试A类客户服务投入比',
+                icon: 'table',
+                path: 'cusInputRate_A',
+                component: './kpi/performance/testers/cusInputRate_A',
               },
             ],
           },

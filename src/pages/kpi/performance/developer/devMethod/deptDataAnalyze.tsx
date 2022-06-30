@@ -410,7 +410,7 @@ const converseForAgGrid_manageWorkDeviRate = (oraDatas: any) => {
   return converseArrayToOne(resultArray);
 };
 
-// 使用界面：管理事务偏差率
+// 使用界面：开发A类客户服务投入比
 const converseForAgGrid_cusInputRate = (oraDatas: any) => {
   if (!oraDatas) return [];
   const resultArray: any = [];

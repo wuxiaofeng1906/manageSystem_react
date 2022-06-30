@@ -131,8 +131,8 @@ const loadDutyNamesSelect = async () => {
 /* region 升级服务 */
 
 // 一键部署ID下拉框
-const loadReleaseIDSelect = async () => {
-  const IDs = await queryReleaseId();
+const loadReleaseIDSelect = async (releaseNum: string) => {
+  const IDs = await queryReleaseId(releaseNum);
   const idData: any = [];
 
   if (IDs.message !== '') {

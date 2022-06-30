@@ -33,10 +33,10 @@ const {Option} = Select;
 
 const OfficialRelease: React.FC<any> = (props: any) => {
   const releaseNums = props.location?.query?.releaseNum;
-  const historyQuery = props.location?.query?.history;
+  const historyQuery = props.location?.query?.history === "true";
   const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
   const dutyNameArray = useRequest(() => loadDutyNamesSelect()).data; // 关联值班名单
-  const pageData = useRequest(() => getOfficialReleaseDetails(releaseNums)).data; // 界面数据获取
+  const pageData = useRequest(() => getOfficialReleaseDetails(releaseNums, historyQuery)).data; // 界面数据获取
   onlineEnv = useRequest(() => getOnlineEnv()).data; // 上线集群环境
 
   const releaseServiceGridApi = useRef<GridApi>();
@@ -50,10 +50,10 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   /* region 编辑即保存 */
   const [processStatus, setProcessStatus] = useState({
     processColor: "gray",
-    releaseRt: ""
+    releaseRt: "unknown"
   });
 
-  // 线上发布结果自动化
+  // 自动化线上发布结果
   const [autoCheckRt, setAutoCheckRt] = useState(null)
   // 显示进度
   const showProcessStatus = () => {
@@ -300,7 +300,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                   <Col span={7}>
                     {/* 发布方式 */}
                     <Form.Item label="发布方式:" name="pulishMethod">
-                      <Select defaultValue={"stop_serve"} onChange={saveReleaseInfo}>
+                      <Select onChange={saveReleaseInfo}>
                         <Option key={'stop_server'} value={'stop_server'}>
                           停服
                         </Option>

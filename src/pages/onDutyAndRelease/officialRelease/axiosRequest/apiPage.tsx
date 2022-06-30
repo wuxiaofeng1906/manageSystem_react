@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
 import {Select} from "antd";
 import React from "react";
+import {errorMessage} from "@/publicMethods/showMessages";
 
 const {Option} = Select;
 const users = getCurrentUserInfo();
@@ -32,9 +33,14 @@ const getDetails = async (newReleaseNum: string = "") => {
 };
 
 // 判断有没有正式发布的列表未发布
-const getOfficialReleaseDetails = async (releaseNums: string) => {
-  // 判断是通过详情过来的还是通过新建过来的。
+const getOfficialReleaseDetails = async (releaseNums: string, historyQuery: boolean) => {
 
+  // 如果是查看历史，那么直接用相关编号取值
+  if (historyQuery) {
+    return await getDetails(releaseNums);
+  }
+
+  // 判断是通过详情过来的还是通过新建过来的。
   if (!releaseNums) {  // 如果没有发布编号，则直接进入详情数据获取
     return await getDetails();
   }
@@ -48,6 +54,7 @@ const getOfficialReleaseDetails = async (releaseNums: string) => {
   // 再调用 “一键正式发布”
   const releaseRt = await releaseOnline(newReleaseNum, releaseNums);
   if (releaseRt.code !== 200) {
+    errorMessage(releaseRt.msg);
     return [];
   }
 

@@ -1,29 +1,16 @@
-import { message, Select } from 'antd';
+import {message, Select} from 'antd';
 import {
-  getAllProject,
-  getAllDeptUsers,
-  getBranchName,
-  getServices,
-  getImgEnv,
-  getTestEnv,
+  getAllProject, getAllDeptUsers, getBranchName,
+  getServices, getImgEnv, getTestEnv
 } from '@/publicMethods/verifyAxios';
 import {
-  queryReleaseType,
-  queryReleaseWay,
-  queryReleaseId,
-  getOnlineDev,
-  getPulishItem,
-  getIsApiAndDatabaseUpgrade,
-  getUpgradeApi,
-  getApiService,
-  getApiMethod,
-  getRepaireCategory,
-  getTechSide,
-  getCheckType,
-  getBrowserType,
+  queryReleaseType, queryReleaseWay, queryReleaseId, getOnlineDev,
+  getPulishItem, getIsApiAndDatabaseUpgrade, getUpgradeApi,
+  getApiService, getApiMethod, getRepaireCategory, getTechSide,
+  getCheckType, getBrowserType, queryDutyNames
 } from './axiosRequest';
 
-const { Option } = Select;
+const {Option} = Select;
 
 /* region 预发布项目 */
 // 项目名称下拉框
@@ -109,6 +96,34 @@ const loadReleaseWaySelect = async () => {
   }
 
   return wayData;
+};
+
+
+// 关联值班名单
+const loadDutyNamesSelect = async () => {
+  const dutyNames = await queryDutyNames();
+  const nameOptions: any = [];
+
+  if (dutyNames.message !== '') {
+    message.error({
+      content: dutyNames.message,
+      duration: 1,
+      style: {
+        marginTop: '50vh',
+      },
+    });
+  } else if (dutyNames.data) {
+    const datas = dutyNames.data;
+    datas.forEach((dutyInfo: any) => {
+      nameOptions.push(
+        <Option key={dutyInfo.person_duty_num} value={`${dutyInfo.person_duty_num}`}>
+          {dutyInfo.duty_name}
+        </Option>,
+      );
+
+    });
+  }
+  return nameOptions;
 };
 
 /* endregion */
@@ -447,7 +462,7 @@ const loadBranchNameSelect = async () => {
 
 // 服务下拉框
 const loadServiceSelect = async (branchName: any) => {
-  const source = await getServices({ branch: branchName });
+  const source = await getServices({branch: branchName});
   const resultArray: any = [];
 
   if (source.message !== '') {
@@ -461,10 +476,12 @@ const loadServiceSelect = async (branchName: any) => {
   } else if (source.data) {
     const datas = source.data;
     datas.forEach((ele: any) => {
-      resultArray.push({
-        title: ele.server.toString(),
-        value: ele.server_id.toString(),
-      });
+      resultArray.push(
+        {
+          title: (ele.server).toString(),
+          value: (ele.server_id).toString(),
+        }
+      );
     });
   }
 
@@ -473,7 +490,7 @@ const loadServiceSelect = async (branchName: any) => {
       title: '全部',
       value: '全部',
       children: resultArray,
-    },
+    }
   ];
 };
 
@@ -549,8 +566,8 @@ const loadCheckTypeSelect = async (type: string) => {
     const datas = source.data;
     datas.forEach((ele: any) => {
       if (ele.check_type_id !== '9') {
-        if (type === 'after') {
-          if (ele.check_type_name === 'UI') {
+        if (type === "after") {
+          if (ele.check_type_name === "UI") {
             resultArray.push(
               <Option key={ele.check_type_id} value={`${ele.check_type_id}`}>
                 {ele.check_type_name}
@@ -564,6 +581,7 @@ const loadCheckTypeSelect = async (type: string) => {
             </Option>,
           );
         }
+
       }
     });
   }
@@ -621,4 +639,5 @@ export {
   loadTestEnvSelect,
   loadCheckTypeSelect,
   loadBrowserTypeSelect,
+  loadDutyNamesSelect
 };

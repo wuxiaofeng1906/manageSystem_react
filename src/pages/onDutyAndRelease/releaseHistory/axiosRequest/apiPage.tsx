@@ -1,7 +1,7 @@
 import axios from "axios";
-import {axiosGet} from "@/publicMethods/axios";
-import dayjs from "dayjs";
+import {axiosGet, axiosPost} from "@/publicMethods/axios";
 import {errorMessage} from "@/publicMethods/showMessages";
+import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
 
 // const getGrayscaleListData = async (paramData: any) => {
 //   const result: any = {
@@ -25,7 +25,6 @@ import {errorMessage} from "@/publicMethods/showMessages";
 
 // 灰度发布列表
 const getGrayscaleListData = async (startTime: string, endTime: string) => {
-  debugger
 
   const result: any = {
     message: "",
@@ -91,4 +90,40 @@ const vertifyOnlineProjectExit = async () => {
 }
 
 
-export {getGrayscaleListData, getFormalListData, vertifyOnlineProjectExit};
+// 获取预发布编号
+const getPreReleaseNum = async () => {
+  return axiosGet('/api/verify/release/release_num');
+};
+
+// 一键正式发布
+const releaseOnline = async (onlineReleaseNum: string, releaseNums: string) => {
+  const users = getCurrentUserInfo();
+  const data = {
+    "user_name": users.name,
+    "user_id": users.userid,
+    "ready_release_num": releaseNums.replaceAll("|", ","),
+    "online_release_num": onlineReleaseNum
+  };
+
+  const result = await axiosPost("/api/verify/release/online", data);
+  return result;
+};
+
+// 获取预发布详情，只有获取成功了才跳转页面
+const getOnlineProocessDetails = async (releaseNums: any) => {
+  // 首先需要先获取预发布编号
+  const newReleaseNum = (await getPreReleaseNum())?.ready_release_num;
+  if (!newReleaseNum) {
+    return [];
+  }
+
+  // 再调用 “一键正式发布”
+  const releaseRt = await releaseOnline(newReleaseNum, releaseNums);
+  if (releaseRt.code !== 200) {
+    errorMessage(releaseRt.msg);
+    return [];
+  }
+
+  return newReleaseNum;
+}
+export {getGrayscaleListData, getFormalListData, vertifyOnlineProjectExit, getOnlineProocessDetails};

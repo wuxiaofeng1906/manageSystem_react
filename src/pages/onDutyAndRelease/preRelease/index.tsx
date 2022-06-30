@@ -256,9 +256,9 @@ const PreRelease: React.FC<any> = () => {
       <Tab/>
       <CheckProgress/>
       <PreReleaseProject/>
-      <UpgradeService/>
-      <DataRepaireReview/>
       <OnlineBranch/>
+      <DataRepaireReview/>
+      <UpgradeService/>
       <CorrespondingWorkOrder/>
       <DeleteRow/>
     </PageContainer>

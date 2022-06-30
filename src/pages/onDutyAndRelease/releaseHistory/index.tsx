@@ -6,7 +6,12 @@ import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useRequest} from "ahooks";
-import {getGrayscaleListData, getFormalListData, vertifyOnlineProjectExit} from './axiosRequest/apiPage';
+import {
+  getGrayscaleListData,
+  getFormalListData,
+  vertifyOnlineProjectExit,
+  getOnlineProocessDetails
+} from './axiosRequest/apiPage';
 import {history} from "@@/core/history";
 import {Button, DatePicker, Select} from "antd";
 import {loadPrjNameSelect} from "@/pages/onDutyAndRelease/preRelease/comControl/controler";
@@ -53,13 +58,14 @@ const ReleaseHistory: React.FC<any> = () => {
     grayscaleGridApi.current?.setRowData(grayReleaseList?.data);
   };
   // 一键生成正式发布
-  const generateFormalRelease = () => {
+  const generateFormalRelease = async () => {
     const sel_rows = grayscaleGridApi.current?.getSelectedRows();
 
     // 如果是待发布详情，则不需要判断有没有勾选
     if (buttonTitle === "待发布详情") {
       history.push(`/onDutyAndRelease/officialRelease`);
     } else {
+
       if (sel_rows?.length === 0) {
         errorMessage("请先勾选需要发布的数据！")
         return;
@@ -70,7 +76,12 @@ const ReleaseHistory: React.FC<any> = () => {
         ready_release_num.push(ele.ready_release_num);
       });
 
-      history.push(`/onDutyAndRelease/officialRelease?releaseNum=${ready_release_num.join("|")}`);
+      // 需要在这个页面生成发布编号。只有成功了才跳转到详情界面
+      const readyReleaseNum = ready_release_num.join("|");
+      const onlineNum = await getOnlineProocessDetails(readyReleaseNum);
+      if(onlineNum){
+        history.push(`/onDutyAndRelease/officialRelease?releaseNum=${readyReleaseNum}&onlineReleaseNum=${onlineNum}`);
+      }
     }
   };
 
@@ -140,7 +151,7 @@ const ReleaseHistory: React.FC<any> = () => {
   // 跳转到正式发布界面
   const gotoOnlineReleasePage = (releData: any) => {
     const onlineReleasedNum = releData.data?.online_release_num;
-    history.push(`/onDutyAndRelease/officialRelease?releaseNum=${onlineReleasedNum}&history=true`);
+    history.push(`/onDutyAndRelease/officialRelease?onlineReleaseNum=${onlineReleasedNum}&history=true`);
   };
 
   window.addEventListener('resize', () => {

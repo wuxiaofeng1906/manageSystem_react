@@ -3,28 +3,9 @@ import dayjs from "dayjs";
 import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
 import {Select} from "antd";
 import React from "react";
-import {errorMessage} from "@/publicMethods/showMessages";
 
 const {Option} = Select;
 const users = getCurrentUserInfo();
-
-// 获取预发布编号
-const getPreReleaseNum = async () => {
-  return axiosGet('/api/verify/release/release_num');
-};
-
-// 一键正式发布
-const releaseOnline = async (onlineReleaseNum: string, releaseNums: string) => {
-  const data = {
-    "user_name": users.name,
-    "user_id": users.userid,
-    "ready_release_num": releaseNums.replaceAll("|", ","),
-    "online_release_num": onlineReleaseNum
-  };
-
-  const result = await axiosPost("/api/verify/release/online", data);
-  return result;
-};
 
 // 获取发布详情
 const getDetails = async (newReleaseNum: string = "") => {
@@ -33,35 +14,15 @@ const getDetails = async (newReleaseNum: string = "") => {
 };
 
 // 判断有没有正式发布的列表未发布
-const getOfficialReleaseDetails = async (releaseNums: string, historyQuery: boolean) => {
-
-  // 如果是查看历史，那么直接用相关编号取值
-  if (historyQuery) {
-    return await getDetails(releaseNums);
-  }
+const getOfficialReleaseDetails = async (releaseNums: string) => {
 
   // 判断是通过详情过来的还是通过新建过来的。
-  if (!releaseNums) {  // 如果没有发布编号，则直接进入详情数据获取
+  if (!releaseNums) {  // 如果没有发布编号，则直接进入详情数据获取，不传入编号
     return await getDetails();
   }
 
-  // 首先需要先获取预发布编号
-  const newReleaseNum = (await getPreReleaseNum())?.ready_release_num;
-  if (!newReleaseNum) {
-    return [];
-  }
-
-  // 再调用 “一键正式发布”
-  const releaseRt = await releaseOnline(newReleaseNum, releaseNums);
-  if (releaseRt.code !== 200) {
-    errorMessage(releaseRt.msg);
-    return [];
-  }
-
   // 最后再调用正式发布过程详情
-  const details = await getDetails(newReleaseNum);
-
-  return details;
+  return await getDetails(releaseNums);
 };
 
 // 获取上线集群环境
@@ -69,15 +30,17 @@ const getOnlineEnv = async () => {
 
   const envData = await axiosGet("/api/verify/release/environment");
   const nameOptions: any = [];
-
   if (envData) {
     const datas = envData;
+
     datas.forEach((envInfo: any) => {
-      nameOptions.push(
-        <Option key={envInfo.online_environment_id} value={`${envInfo.online_environment_id}`}>
-          {envInfo.online_environment_name}
-        </Option>,
-      );
+      if (envInfo.online_environment_id !== "cn-northwest-global") {  // 不需要展示global
+        nameOptions.push(
+          <Option key={envInfo.online_environment_id} value={`${envInfo.online_environment_id}`}>
+            {envInfo.online_environment_name}
+          </Option>,
+        );
+      }
     });
   }
   return nameOptions;
@@ -85,13 +48,14 @@ const getOnlineEnv = async () => {
 
 // 保存发布结果
 const cancleReleaseResult = async (onlineReleaseNum: string) => {
+
   // 取消发布跟其他发布结果所调用接口不是同一个
-  const data = {
+  const delData = {
     "user_name": users.name,
     "user_id": users.userid,
     "online_release_num": onlineReleaseNum
   };
-  const result = await axiosDelete("/api/verify/release/online", data);
+  const result = await axiosDelete("/api/verify/release/online", {data: delData});
   return result;
 };
 // 正式发布界面编辑

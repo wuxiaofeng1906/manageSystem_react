@@ -20,6 +20,7 @@ import {
 } from "./axiosRequest/apiPage";
 import {sucMessage} from "@/publicMethods/showMessages";
 import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
+import {history} from "@@/core/history";
 
 // 编辑后的数据
 const otherSaveCondition: any = {
@@ -32,11 +33,11 @@ let onlineEnv: any = [];
 const {Option} = Select;
 
 const OfficialRelease: React.FC<any> = (props: any) => {
-  const releaseNums = props.location?.query?.releaseNum;
+  const onlineReleaseNum = props.location?.query?.onlineReleaseNum; // 正式发布列表的数据
   const historyQuery = props.location?.query?.history === "true";
   const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
   const dutyNameArray = useRequest(() => loadDutyNamesSelect()).data; // 关联值班名单
-  const pageData = useRequest(() => getOfficialReleaseDetails(releaseNums, historyQuery)).data; // 界面数据获取
+  const pageData = useRequest(() => getOfficialReleaseDetails(onlineReleaseNum)).data; // 界面数据获取
   onlineEnv = useRequest(() => getOnlineEnv()).data; // 上线集群环境
 
   const releaseServiceGridApi = useRef<GridApi>();
@@ -143,7 +144,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     if (isModalVisible.result === "cancel") {
       const result = await cancleReleaseResult(otherSaveCondition.onlineReleaseNum);
       if (result.code === 200) {
-        sucMessage("当前正式发布取消成功！");
+        sucMessage("当前发布取消成功！");
         setModalVisible({
           ...isModalVisible,
           result: "unknown",
@@ -153,6 +154,9 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     } else {
       saveReleaseInfo();
     }
+
+    // 无论发布成功或者失败，都要跳转到详情页面
+    history.push(`/onDutyAndRelease/releaseHistory`);
   };
 
   // 发布结果下拉框选择

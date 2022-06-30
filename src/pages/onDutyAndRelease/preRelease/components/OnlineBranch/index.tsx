@@ -548,7 +548,7 @@ const OnlineBranch: React.FC<any> = () => {
       {/* 上线分支 */}
       <div>
         <fieldset className={'fieldStyle'}>
-          <legend className={'legendStyle'}>Step4 上线分支
+          <legend className={'legendStyle'}>Step2 上线分支
             <label style={{color: "Gray"}}> (值班测试填写)</label>
           </legend>
 

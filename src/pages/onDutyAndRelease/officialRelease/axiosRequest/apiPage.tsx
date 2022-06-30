@@ -69,15 +69,18 @@ const getOnlineEnv = async () => {
 
   const envData = await axiosGet("/api/verify/release/environment");
   const nameOptions: any = [];
-
   if (envData) {
     const datas = envData;
+
     datas.forEach((envInfo: any) => {
-      nameOptions.push(
-        <Option key={envInfo.online_environment_id} value={`${envInfo.online_environment_id}`}>
-          {envInfo.online_environment_name}
-        </Option>,
-      );
+      if (envInfo.online_environment_id !== "cn-northwest-global") {  // 不需要展示global
+        nameOptions.push(
+          <Option key={envInfo.online_environment_id} value={`${envInfo.online_environment_id}`}>
+            {envInfo.online_environment_name}
+          </Option>,
+        );
+      }
+
     });
   }
   return nameOptions;
@@ -85,13 +88,14 @@ const getOnlineEnv = async () => {
 
 // 保存发布结果
 const cancleReleaseResult = async (onlineReleaseNum: string) => {
+
   // 取消发布跟其他发布结果所调用接口不是同一个
-  const data = {
+  const delData = {
     "user_name": users.name,
     "user_id": users.userid,
     "online_release_num": onlineReleaseNum
   };
-  const result = await axiosDelete("/api/verify/release/online", data);
+  const result = await axiosDelete("/api/verify/release/online", {data: delData});
   return result;
 };
 // 正式发布界面编辑

@@ -1,10 +1,7 @@
-import axios from "axios";
 import {axiosGet, axiosPost, axiosPut, axiosDelete} from "@/publicMethods/axios";
 import dayjs from "dayjs";
-import {errorMessage} from "@/publicMethods/showMessages";
 import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
-import {message, Select} from "antd";
-import {getOnlinedAutoCheckResult} from "@/pages/onDutyAndRelease/preRelease/components/CheckProgress/axiosRequest";
+import {Select} from "antd";
 import React from "react";
 
 const {Option} = Select;
@@ -12,24 +9,6 @@ const users = getCurrentUserInfo();
 
 // 获取预发布编号
 const getPreReleaseNum = async () => {
-  // const result: any = {
-  //   message: '',
-  //   data: [],
-  // };
-  // await axios
-  //   .get('/api/verify/release/release_num', {})
-  //   .then(function (res) {
-  //     if (res.data.code === 200) {
-  //       result.data = res.data.data;
-  //     } else {
-  //       result.message = `错误：${res.data.msg}`;
-  //     }
-  //   })
-  //   .catch(function (error) {
-  //     result.message = `异常信息:${error.toString()}`;
-  //   });
-  //
-  // return result;
   return axiosGet('/api/verify/release/release_num');
 };
 
@@ -41,10 +20,9 @@ const releaseOnline = async (onlineReleaseNum: string, releaseNums: string) => {
     "ready_release_num": releaseNums.replaceAll("|", ","),
     "online_release_num": onlineReleaseNum
   };
-  debugger;
+
   const result = await axiosPost("/api/verify/release/online", data);
   return result;
-
 };
 
 // 获取发布详情
@@ -101,7 +79,6 @@ const getOnlineEnv = async () => {
 // 保存发布结果
 const cancleReleaseResult = async (onlineReleaseNum: string) => {
   // 取消发布跟其他发布结果所调用接口不是同一个
-
   const data = {
     "user_name": users.name,
     "user_id": users.userid,
@@ -144,7 +121,7 @@ const editReleaseForm = async (releaseInfo: any, otherCondition: any) => {
 
 // 发布结果自动化检查
 const runAutoCheck = async (formData: any, releaseNum: string) => {
-  debugger;
+
   // 上线前后检查: 打勾是yes，没打勾是no
   let after_ignore_check = 'no';
   if (formData.ignoreAfterCheck && (formData.ignoreAfterCheck).length > 0) {
@@ -170,7 +147,7 @@ const runAutoCheck = async (formData: any, releaseNum: string) => {
       "check_type": "applet",
       "check_result": "no",
       "ready_release_num": releaseNum,
-      // "test_env": "string",
+      // "test_env": "string", // 果果说不用传
       // "check_num": "string",
     }];
 
@@ -184,7 +161,6 @@ const runAutoCheck = async (formData: any, releaseNum: string) => {
     });
   }
 
-  console.log("data", data);
   return axiosPost("/api/verify/release/automation", data);
 };
 

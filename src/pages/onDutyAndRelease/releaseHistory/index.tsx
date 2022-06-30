@@ -248,10 +248,12 @@ const ReleaseHistory: React.FC<any> = () => {
             onGridReady={onReleasedGridReady}
             frameworkComponents={{
               officialReleaseDetails: (params: any) => {
+
+                const onlineNum = params.data?.online_release_num; // 为空。就可以跳到发布过程详情
                 // 需要判断有没有灰度，没有则置灰
                 let srcPath = "../gray_detail_normal.png";
                 let buttonDisable = false;
-                if (false) {
+                if (onlineNum) {
                   srcPath = "../gray_detail_forbit.png";
                   buttonDisable = true;
                 }

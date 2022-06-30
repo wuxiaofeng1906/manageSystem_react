@@ -45,7 +45,6 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     params.api.sizeColumnsToFit();
   };
 
-
   const [formForOfficialRelease] = Form.useForm();
 
   /* region 编辑即保存 */

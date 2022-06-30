@@ -41,8 +41,16 @@ const ReleaseHistory: React.FC<any> = () => {
   const grayscaleData = useRequest(() => getGrayscaleListData(start, end)).data;
   // 根据时间查询
   const onGrayReleaseTimeChanged = async (params: any, times: any) => {
-    const grayReleaseList = await getGrayscaleListData(dayjs(times[0]).format("YYYY-MM-DD HH:mm:ss"), dayjs(times[1]).format("YYYY-MM-DD HH:mm:ss"));
-    grayscaleGridApi.current?.setRowData(grayReleaseList);
+    let startTimes = times[0];
+    if (startTimes) {
+      startTimes = dayjs(start).format("YYYY-MM-DD HH:mm:ss");
+    }
+    let endTimes = times[1];
+    if (endTimes) {
+      endTimes = dayjs(end).format("YYYY-MM-DD HH:mm:ss");
+    }
+    const grayReleaseList = await getGrayscaleListData(startTimes, endTimes);
+    grayscaleGridApi.current?.setRowData(grayReleaseList?.data);
   };
   // 一键生成正式发布
   const generateFormalRelease = () => {
@@ -75,7 +83,6 @@ const ReleaseHistory: React.FC<any> = () => {
     params.api.sizeColumnsToFit();
   };
 
-
   // 项目名称
   const projectsArray = useRequest(() => loadPrjNameSelect()).data;
 
@@ -86,7 +93,7 @@ const ReleaseHistory: React.FC<any> = () => {
   const getReleasedList = async () => {
     const cond = {
       page: 1,
-      pageSize: 10
+      pageSize: 100
     };
 
     if (formalQueryCondition.start && formalQueryCondition.end) {
@@ -136,7 +143,6 @@ const ReleaseHistory: React.FC<any> = () => {
     history.push(`/onDutyAndRelease/officialRelease?releaseNum=${onlineReleasedNum}&history=true`);
   };
 
-
   window.addEventListener('resize', () => {
     grayscaleGridApi.current?.sizeColumnsToFit();
     releasedGridApi.current?.sizeColumnsToFit();
@@ -149,7 +155,7 @@ const ReleaseHistory: React.FC<any> = () => {
     if (result) {
       setButtonTitle("待发布详情");
     }
-  }
+  };
   useEffect(() => {
     showButtonTitle();
   }, [releasedData]);

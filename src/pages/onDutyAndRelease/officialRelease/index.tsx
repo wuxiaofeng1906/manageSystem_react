@@ -34,8 +34,6 @@ const {Option} = Select;
 const OfficialRelease: React.FC<any> = (props: any) => {
   const releaseNums = props.location?.query?.releaseNum;
   const historyQuery = props.location?.query?.history;
-  debugger;
-
   const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
   const dutyNameArray = useRequest(() => loadDutyNamesSelect()).data; // 关联值班名单
   const pageData = useRequest(() => getOfficialReleaseDetails(releaseNums)).data; // 界面数据获取
@@ -47,14 +45,17 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     params.api.sizeColumnsToFit();
   };
 
+
   const [formForOfficialRelease] = Form.useForm();
 
   /* region 编辑即保存 */
   const [processStatus, setProcessStatus] = useState({
     processColor: "gray",
-    releaseMessage: null
+    releaseRt: ""
   });
 
+  // 线上发布结果自动化
+  const [autoCheckRt, setAutoCheckRt] = useState(null)
   // 显示进度
   const showProcessStatus = () => {
 
@@ -67,8 +68,16 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     }
   };
 
+  /* endregion 编辑即保存 */
+
+  /* region 发布结果 */
+  // 发布结果选择
+  const [pulishResultForm] = Form.useForm();
+  const [isModalVisible, setModalVisible] = useState({show: false, result: "", hintMsg: "", autoCheckDisabled: true});
+
   // 保存发布方式及时间
   const saveReleaseInfo = async () => {
+
     //   获取发布方式及时间
     const releaseInfo = formForOfficialRelease.getFieldsValue();
     // 获取灰度所有的发布编号
@@ -87,16 +96,18 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       });
       // 需要判断整体进度是否已完成
       showProcessStatus();
+      setModalVisible({
+        ...isModalVisible,
+        result: "unknown",
+        show: false
+      });
+      setProcessStatus({
+        ...processStatus,
+        releaseRt: isModalVisible.result
+      });
     }
 
   };
-
-  /* endregion 编辑即保存 */
-
-  /* region 发布结果 */
-  // 发布结果选择
-  const [pulishResultForm] = Form.useForm();
-  const [isModalVisible, setModalVisible] = useState({show: false, result: "", hintMsg: "", autoCheckDisabled: true});
 
   // 取消发布
   const handleCancel = () => {
@@ -109,6 +120,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
   // 确认发布
   const handleOk = async () => {
+
     const formData = pulishResultForm.getFieldsValue();
     // 如果是发布成功，则需要判断下面自动化选项是否勾选
     if (!isModalVisible.autoCheckDisabled) { // 是发布成功
@@ -121,23 +133,29 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
       // 发布成功才调用自动化检查接口
       const result = await runAutoCheck(formData, otherSaveCondition.onlineReleaseNum);
-      if (result) {
+      if (result.code !== 200) {
         errorMessage(`发布成功后自动化检查结果保存失败：${result}`);
       } else {
         // 保存成功后获取自动化检查结果
         const autoRt: any = await getOnlineAutoResult(otherSaveCondition.onlineReleaseNum);
-        setProcessStatus({
-          ...processStatus,
-          releaseMessage: autoRt
-        });
+        setAutoCheckRt(autoRt)
       }
     }
 
     // 调用保存接口: 如果是取消，则单独调用取消接口
-    if (isModalVisible.result === "cancle") {
+    if (isModalVisible.result === "cancel") {
       const result = await cancleReleaseResult(otherSaveCondition.onlineReleaseNum);
       if (result.code === 200) {
-        sucMessage("当前正式发布取消成功！")
+        sucMessage("当前正式发布取消成功！");
+        setModalVisible({
+          ...isModalVisible,
+          result: "unknown",
+          show: false
+        });
+        setProcessStatus({
+          ...processStatus,
+          releaseRt: isModalVisible.result
+        });
       }
     } else {
       saveReleaseInfo();
@@ -147,7 +165,13 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   // 发布结果修改
   const pulishResulttChanged = async (params: any) => {
 
-    // 需要验证前面的检查是否全部成功(前三个成功即可)。
+    // 需要判断发布服务有没有填写完成(取消发布可以不填写全)
+    if (processStatus.processColor === "gray" && params !== "cancel") {
+      errorMessage("发布服务未填写完成，不能填写发布结果!");
+      return;
+    }
+
+    // 不同选择弹出不同的提示框
     let autoDisable = true;
     let hintMsgs = "请确认是否修改服务发布结果为空！"
     if (params === "success") {
@@ -155,7 +179,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       autoDisable = false;
     } else if (params === "failure") {
       hintMsgs = "请确认服务是否发布失败！";
-    } else if (params === "cancle") {
+    } else if (params === "cancel") {
       hintMsgs = "请确认是否取消发布！";
     }
     setModalVisible({
@@ -166,7 +190,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     });
 
     pulishResultForm.resetFields();
-    otherSaveCondition.grayReleaseNums = params;
+    otherSaveCondition.releaseResult = params;
   };
 
   /* endregion 发布结果 */
@@ -177,10 +201,14 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       // 当前只有一个Tab，不会有多个。
       const datas = sourceData[0];
       otherSaveCondition.onlineReleaseNum = datas.online_release_num;
+      let releaseTime = null;
+      if (datas.plan_release_time && datas.plan_release_time !== "Invalid Date") {
+        releaseTime = moment(datas.plan_release_time);
+      }
       //   显示发布方式
       formForOfficialRelease.setFieldsValue({
         pulishMethod: datas.release_way,
-        pulishTime: datas.plan_release_time === "Invalid Date" ? null : moment(datas.plan_release_time),
+        pulishTime: releaseTime,
         relateDutyName: datas.person_duty_num,
         editor: datas.edit_user,
         editTime: datas.edit_time
@@ -242,7 +270,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
               <Option key={'failure'} value={'failure'}>
                 发布失败
               </Option>
-              <Option key={'cancle'} value={'cancel'}>
+              <Option key={'cancel'} value={'cancel'}>
                 取消发布
               </Option>
               <Option key={'unknown'} value={'unknown'}>
@@ -252,7 +280,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           </label>
 
           <label style={{marginLeft: 10}}>
-
+            {autoCheckRt}
           </label>
         </div>
         {/* step 1 发布方式及时间 */}
@@ -362,8 +390,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                   frameworkComponents={{
                     releaseEnvRenderer: (params: any) => {
                       if (params && params.data.rowSpan) {
-                        debugger;
-                        const currentValue = (params.value).split(",");
+                        const currentValue = params.value === null ? undefined : (params.value).split(",");
                         otherSaveCondition.releaseEnv = params.value;
                         showProcessStatus(); // 展示进度
                         return (
@@ -400,7 +427,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                onCancel={handleCancel} centered={true}
                bodyStyle={{height: 120}}
                footer={[
-                 <Button key="cancle" onClick={handleCancel} style={{borderRadius: 5}}>
+                 <Button key="cancel" onClick={handleCancel} style={{borderRadius: 5}}>
                    取消
                  </Button>,
                  <Button key="submit" type="primary" onClick={handleOk}

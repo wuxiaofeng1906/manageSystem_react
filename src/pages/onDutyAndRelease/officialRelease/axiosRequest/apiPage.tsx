@@ -156,11 +156,11 @@ const runAutoCheck = async (formData: any, releaseNum: string) => {
     "user_id": users.userid,
     "ignore_check": after_ignore_check,
     "check_time": "after",
-    "check_type": "api",
+    "check_type": "ui",
     "check_result": "no",
     "ready_release_num": releaseNum,
-    "test_env": "string",
-    "check_num": "string",
+    // "test_env": "string",
+    // "check_num": "string",
   },
     {
       "user_name": users.name,
@@ -170,8 +170,8 @@ const runAutoCheck = async (formData: any, releaseNum: string) => {
       "check_type": "applet",
       "check_result": "no",
       "ready_release_num": releaseNum,
-      "test_env": "string",
-      "check_num": "string",
+      // "test_env": "string",
+      // "check_num": "string",
     }];
 
   if (after_ignore_check === "no" && (formData.checkResult).length > 0) {
@@ -185,7 +185,7 @@ const runAutoCheck = async (formData: any, releaseNum: string) => {
   }
 
   console.log("data", data);
-  // return axiosPost("/api/verify/release/automation", data);
+  return axiosPost("/api/verify/release/automation", data);
 };
 
 // 自动化检查结果获取

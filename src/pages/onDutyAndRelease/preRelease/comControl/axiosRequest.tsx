@@ -67,13 +67,13 @@ const queryDutyNames = async () => {
 };
 
 // 一键部署Id
-const queryReleaseId = async () => {
+const queryReleaseId = async (releaseNum: string) => {
   const result: any = {
     message: '',
     data: [],
   };
-  await axios
-    .get('/api/verify/release/deployment_id', {})
+  const data = {ready_release_num : releaseNum};
+  await axios.get('/api/verify/release/deployment_id', {params: data})
     .then(function (res) {
       if (res.data.code === 200) {
         result.data = res.data.data;

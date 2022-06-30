@@ -42,8 +42,6 @@ const UpgradeService: React.FC<any> = () => {
   } = useModel('releaseProcess');
   const [formUpgradeService] = Form.useForm(); // 升级服务
   // 暂时忽略掉一键部署ID后端服务的获取
-  const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
-
 
   /* region 升级服务： 发布项表格 */
   const releaseItemGridApi = useRef<GridApi>();
@@ -73,6 +71,12 @@ const UpgradeService: React.FC<any> = () => {
   /* endregion   */
 
   /* region 一键部署ID相关事件 */
+  const [releaseIDArray, setReleaseIDArray] = useState(null);
+  const getReleaseID = async () => {
+    const releaseIds = await loadReleaseIDSelect(tabsData.activeKey);
+    setReleaseIDArray(releaseIds);
+  };
+
   // ID changed
   const onReleaseIdChanges = async (selectedId: any, params: any) => {
     const allaResult = alaReleasedChanged(releasedID, params, selectedId);
@@ -140,8 +144,7 @@ const UpgradeService: React.FC<any> = () => {
         },
       });
     } else {
-      const newData: any = (await alalysisInitData('pulishItem', tabsData.activeKey))
-        .upService_releaseItem;
+      const newData: any = (await alalysisInitData('pulishItem', tabsData.activeKey)).upService_releaseItem;
       formUpgradeService.setFieldsValue({
         hitMessage: await getAutoCheckMessage(tabsData.activeKey),
       });
@@ -589,6 +592,7 @@ const UpgradeService: React.FC<any> = () => {
                         style={{width: '100%'}}
                         showSearch
                         onChange={onReleaseIdChanges}
+                        onFocus={getReleaseID}
                       >
                         {releaseIDArray}
                       </Select>

@@ -256,6 +256,12 @@ export default [
                 path: 'cusInputRate_A',
                 component: './kpi/performance/developer/cusInputRate_A',
               },
+              {
+                name: '开发用户体验优化投入比',
+                icon: 'table',
+                path: 'cusExperienceInputRate',
+                component: './kpi/performance/developer/cusExperienceInputRate',
+              },
             ],
           },
           {

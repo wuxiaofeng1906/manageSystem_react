@@ -20,6 +20,7 @@ import {
 } from "./axiosRequest/apiPage";
 import {sucMessage} from "@/publicMethods/showMessages";
 import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
+import {history} from "@@/core/history";
 
 // 编辑后的数据
 const otherSaveCondition: any = {
@@ -143,7 +144,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     if (isModalVisible.result === "cancel") {
       const result = await cancleReleaseResult(otherSaveCondition.onlineReleaseNum);
       if (result.code === 200) {
-        sucMessage("当前正式发布取消成功！");
+        sucMessage("当前发布取消成功！");
         setModalVisible({
           ...isModalVisible,
           result: "unknown",
@@ -153,6 +154,9 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     } else {
       saveReleaseInfo();
     }
+
+    // 无论发布成功或者失败，都要跳转到详情页面
+    history.push(`/onDutyAndRelease/releaseHistory`);
   };
 
   // 发布结果下拉框选择

@@ -3,7 +3,7 @@ import {GqlClient} from "@/hooks";
 import {getParamsByType} from "@/publicMethods/timeMethods";
 import {converseForAgGrid_cusInputRate} from "../../testMethod/deptDataAnalyze";
 
-export const queryCustomInputRate = async (client: GqlClient<object>, params: string) => {
+export const queryCustomExpInputRate = async (client: GqlClient<object>, params: string) => {
   const condition = getParamsByType(params);
   if (condition.typeFlag === 0) {
     return [];
@@ -11,7 +11,7 @@ export const queryCustomInputRate = async (client: GqlClient<object>, params: st
 
   const {data} = await client.query(`
       {
-         devTestSiConsumerADept(kind: "${condition.typeFlag}", ends: ${condition.ends}, identity:TESTER) {
+         devTestConsumerUseoptimizeDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, identity:TESTER) {
           total{
             dept
             deptName
@@ -49,10 +49,11 @@ export const queryCustomInputRate = async (client: GqlClient<object>, params: st
             }
           }
         }
+
       }
   `);
 
-  const datas = converseForAgGrid_cusInputRate(data?.devTestSiConsumerADept);
+  const datas = converseForAgGrid_cusInputRate(data?.devTestConsumerUseoptimizeDept);
   return datas;
 };
 /* endregion */

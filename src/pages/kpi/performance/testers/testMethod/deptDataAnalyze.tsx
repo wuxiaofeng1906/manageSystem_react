@@ -285,6 +285,36 @@ const converseForAgGrid_planDevition = (oraDatas: any) => {
   return converseArrayToOne(resultArray);
 };
 
+// 使用界面：发布引入emergency数（只显示部门数据，显示原始数据）
+const converseForAgGrid_showDepts = (oraDatas: any) => {
+  if (!oraDatas) return [];
+  const resultArray: any = [];
+  // 解析部门数据
+  oraDatas.forEach((elements: any) => {
+    const starttime = elements.range.start;
+    // 新增研发中心数据
+    resultArray.push({
+      Group: ['研发中心'],
+      [starttime]: elements.total.kpi,
+      isDept: true
+    });
+
+    // 部门数据
+    const departDatas = elements.datas;
+    departDatas.forEach((depts: any) => {
+      const groups: any = [depts.deptName];
+      findParent(departDatas, depts, groups);
+      // 新增部门
+      resultArray.push({
+        Group: groups,
+        [starttime]: depts.kpi,
+        isDept: true
+      });
+    });
+  });
+  return converseArrayToOne(resultArray);
+};
+
 // 测试A类客户投入比
 const converseForAgGrid_cusInputRate = (oraDatas: any) => {
   if (!oraDatas) return [];
@@ -342,5 +372,6 @@ export {
   converseDataForAgGrid_code,
   converseForAgGrid_Convergency,
   converseForAgGrid_planDevition,
-  converseForAgGrid_cusInputRate
+  converseForAgGrid_cusInputRate,
+  converseForAgGrid_showDepts
 };

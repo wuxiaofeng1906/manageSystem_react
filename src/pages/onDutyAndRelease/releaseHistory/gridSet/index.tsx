@@ -90,7 +90,14 @@ const releasedList = () => {
   }, {
     headerName: '灰度发布编号',
     field: 'ready_release_num',
-    minWidth: 145
+    minWidth: 145,
+    cellRenderer: (params: any) => {
+      // 如果没有正式发布编号， 灰度发布编号在正式上显示了，现在就不显示了。
+      if (params.data?.online_release_num) {
+        return params.value;
+      }
+      return '';
+    }
   }, {
     headerName: '工单编号',
     field: 'order',

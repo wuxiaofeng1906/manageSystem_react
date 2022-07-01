@@ -111,17 +111,18 @@ const releaseOnline = async (onlineReleaseNum: string, releaseNums: string) => {
 
 // 获取预发布详情，只有获取成功了才跳转页面
 const getOnlineProocessDetails = async (releaseNums: any) => {
+
   // 首先需要先获取预发布编号
   const newReleaseNum = (await getPreReleaseNum())?.ready_release_num;
   if (!newReleaseNum) {
-    return [];
+    return "";
   }
 
   // 再调用 “一键正式发布”
   const releaseRt = await releaseOnline(newReleaseNum, releaseNums);
   if (releaseRt.code !== 200) {
-    errorMessage(releaseRt.msg);
-    return [];
+    errorMessage(`正式发布生成失败：${releaseRt.msg}`);
+    return "";
   }
 
   return newReleaseNum;

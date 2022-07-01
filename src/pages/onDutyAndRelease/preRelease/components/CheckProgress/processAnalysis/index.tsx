@@ -24,10 +24,10 @@ const getAutoResult = async (releaseNum: string) => {
     });
 
     if (ignore === "忽略检查") {
-      return <label style={{color: "blue"}}>忽略检查</label>
+      return <label style={{color: "blue"}}>发布成功后自动化检查结果:忽略检查</label>
     }
 
-    return <label>
+    return <label>发布成功后自动化检查结果:
       UI：<label style={{color: ui_color}}>{ui_rt}</label>；
       小程序：<label style={{color: app_color}}>{app_rt}</label>；
     </label>

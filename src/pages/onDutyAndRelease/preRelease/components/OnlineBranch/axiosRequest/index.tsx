@@ -285,14 +285,14 @@ const checkOnlineEnvData = async (sourceData: any) => {
   return systemPermission.errorMessage;
 };
 
-const checkOnlineAutoData = async (sourceData: any) => {
+const checkOnlineAutoData = async () => {
 
-  //   没有勾选忽略检查，后面参数必填。如果勾选了，后面的参数可以为空
-  if (sourceData.autoBeforeIgnoreCheck === undefined || sourceData.autoBeforeIgnoreCheck.length === 0) {
-    if (sourceData.autoCheckResult === undefined || (sourceData.autoCheckResult).length === 0) {
-      return "检查结果必须至少勾选一项！";
-    }
-  }
+  //   没有勾选忽略检查，后面参数必填。如果勾选了，后面的参数可以为空（不再做忽略检查）
+  // if (sourceData.autoBeforeIgnoreCheck === undefined || sourceData.autoBeforeIgnoreCheck.length === 0) {
+  //   if (sourceData.autoCheckResult === undefined || (sourceData.autoCheckResult).length === 0) {
+  //     return "检查结果必须至少勾选一项！";
+  //   }
+  // }
 
   const authData = {
     operate: `保存上线分支-自动化检查`,
@@ -583,11 +583,11 @@ const saveOnlineBranchData = async (type: string, currentListNo: string, newOnli
     return checkMsg_envCheck;
   }
 
-  // 自动化检查参数
-  const checkMsg_autoCheck = await checkOnlineAutoData(sourceData);
-  if (checkMsg_autoCheck) {
-    return checkMsg_autoCheck;
-  }
+  // 自动化检查参数（暂时不做自动化必填参数检查）
+  // const checkMsg_autoCheck = await checkOnlineAutoData(sourceData);
+  // if (checkMsg_autoCheck) {
+  //   return checkMsg_autoCheck;
+  // }
 
 
   /* 开始调用接口进行结果保存  */
@@ -615,14 +615,24 @@ const saveOnlineBranchData = async (type: string, currentListNo: string, newOnli
       : `${returnMessage}；\n环境一致性检查保存失败：${enviromentCheck}`;
   }
 
-  // 保存自动化检查
-  const onlineAutoCheck = await saveOnlineAutoCheck(type, currentListNo, newOnlineBranchNum, sourceData,);
-  if (onlineAutoCheck !== '') {
-    returnMessage = returnMessage === ''
-      ? `自动化检查保存失败：${onlineAutoCheck}`
-      : `${returnMessage}；\n自动化检查保存失败：${onlineAutoCheck}`;
-  }
 
+  // 如果有勾选信息，才进行 自动化检查接口调用
+  if ((sourceData.autoBeforeIgnoreCheck && sourceData.autoBeforeIgnoreCheck.length > 0) ||
+    (sourceData.autoCheckResult && (sourceData.autoCheckResult).length > 0)) {
+
+    // 要做权限判断
+    const checkMsg_autoCheck = await checkOnlineAutoData();
+    if (checkMsg_autoCheck) {
+      return checkMsg_autoCheck;
+    }
+
+    const onlineAutoCheck = await saveOnlineAutoCheck(type, currentListNo, newOnlineBranchNum, sourceData,);
+    if (onlineAutoCheck !== '') {
+      returnMessage = returnMessage === ''
+        ? `自动化检查保存失败：${onlineAutoCheck}`
+        : `${returnMessage}；\n自动化检查保存失败：${onlineAutoCheck}`;
+    }
+  }
   return returnMessage;
 };
 

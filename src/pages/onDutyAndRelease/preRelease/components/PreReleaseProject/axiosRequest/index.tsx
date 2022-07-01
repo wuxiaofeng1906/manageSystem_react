@@ -27,7 +27,7 @@ const savePrePulishProjects = async (params: any, listNo: string) => {
     plan_release_time: dayjs(params.pulishTime).format('YYYY-MM-DD HH:mm:ss'),
     ready_release_num: listNo,
     ignore_check: params.ignoreZentaoList,
-    person_duty_num: params.relateDutyName
+    person_duty_num: params.relateDutyName === '免' ? "" : params.relateDutyName
   };
 
   if (params.proid) {
@@ -64,7 +64,7 @@ const savePrePulishProjects = async (params: any, listNo: string) => {
 
 // 保存预发布项目
 const savePreProjects = async (source: any, releaseNum: string) => {
-  debugger;
+
   let result = {
     datas: [],
     errorMessage: '',
@@ -90,11 +90,11 @@ const savePreProjects = async (source: any, releaseNum: string) => {
     return result;
   }
 
-  // 如果只有一个emergency项目，则不需要验证是否为空
-  // if (!source.relateDutyName) {
-  //   result.errorMessage = '关联值班名单不能为空！';
-  //   return result;
-  // }
+
+  if (!source.relateDutyName) {
+    result.errorMessage = '关联值班名单不能为空！';
+    return result;
+  }
 
   // 验证权限(值班测试和超级管理员)
   const authData = {

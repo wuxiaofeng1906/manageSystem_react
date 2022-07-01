@@ -151,7 +151,7 @@ const PreReleaseProject: React.FC<any> = () => {
         proid: preReleaseData.pro_id,
         ignoreZentaoList: preReleaseData.ignoreZentaoList,
         checkListStatus: preReleaseData.checkListStatus,
-        relateDutyName: preReleaseData.relateDutyName
+        relateDutyName: preReleaseData.relateDutyName === '' ? "免" : preReleaseData.relateDutyName
       });
     }
   }, [preReleaseData]);

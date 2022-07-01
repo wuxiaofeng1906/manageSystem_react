@@ -113,7 +113,7 @@ const loadDutyNamesSelect = async () => {
       },
     });
   } else if (dutyNames.data) {
-    nameOptions.push(<Option key={''} value={''}>{'免'}</Option>)
+    nameOptions.push(<Option key={'免'} value={'免'}>{'免'}</Option>)
     const datas = dutyNames.data;
     datas.forEach((dutyInfo: any) => {
       nameOptions.push(

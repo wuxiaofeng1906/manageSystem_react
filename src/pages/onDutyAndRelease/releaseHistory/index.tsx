@@ -211,7 +211,7 @@ const ReleaseHistory: React.FC<any> = () => {
                 return (
                   <Button style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
                           onClick={() => gotoGrayReleasePage(params)}>
-                    <img src="../gray_detail_normal.png" width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情"/>
+                    <img src="../gray_detail_normal.png" width="20" height="20" alt="发布过程详情" title="发布过程详情"/>
                   </Button>)
               }
             }}>
@@ -282,13 +282,13 @@ const ReleaseHistory: React.FC<any> = () => {
                     <Button
                       style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
                       onClick={() => gotoGrayReleasePage(params)}>
-                      <img src={"../gray_detail_normal.png"} width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情"/>
+                      <img src={"../gray_detail_normal.png"} width="20" height="20" alt="发布过程详情" title="发布过程详情"/>
                     </Button>
                     <Button
                       disabled={buttonDisable}
                       style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
                       onClick={() => gotoOnlineReleasePage(params)}>
-                      <img src={srcPath} width="20" height="20" alt="正式发布过程详情" title="正式发布过程详情"/>
+                      <img src={srcPath} width="20" height="20" alt="正式发布详情" title="正式发布详情"/>
                     </Button>
                   </div>
                 )

@@ -32,9 +32,8 @@ const getOnlineEnv = async () => {
   const nameOptions: any = [];
   if (envData) {
     const datas = envData;
-
     datas.forEach((envInfo: any) => {
-      if (envInfo.online_environment_id !== "cn-northwest-global") {  // 不需要展示global
+      if (envInfo.online_environment_id !== "cn-northwest-global" && envInfo.online_environment_id !== "cn-northwest-1" && envInfo.online_environment_name !== "集群1-7" ) {  // 不需要展示global 和集群1
         nameOptions.push(
           <Option key={envInfo.online_environment_id} value={`${envInfo.online_environment_id}`}>
             {envInfo.online_environment_name}

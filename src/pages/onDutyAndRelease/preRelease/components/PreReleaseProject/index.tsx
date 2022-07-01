@@ -161,7 +161,7 @@ const PreReleaseProject: React.FC<any> = () => {
       <div>
         <fieldset className={'fieldStyle'}>
           <legend className={'legendStyle'}>Step1 预发布项目
-            <label style={{color: "Gray"}}> (值班测试填写)</label>
+            <label style={{color: "Gray"}}> (值班测试填写)[只有global发布、修复0-7集群发布、修复2-7集群发布，选择"正式发布"; 其他都选择“灰度发布”]</label>
           </legend>
 
           <div style={{marginBottom: -20, marginTop: -5}}>

@@ -267,6 +267,7 @@ export default [
                 icon: 'table',
                 path: 'releaseEmergencyCount',
                 component: './kpi/performance/developer/releaseEmergencyCount',
+
               },
             ],
           },

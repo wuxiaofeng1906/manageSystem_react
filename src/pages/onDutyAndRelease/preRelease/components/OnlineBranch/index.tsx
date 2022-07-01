@@ -15,17 +15,13 @@ import {
 import moment from 'moment';
 import dayjs from 'dayjs';
 import {
-  loadBranchNameSelect, loadBrowserTypeSelect, loadCheckTypeSelect,
-  loadTestEnvSelect, loadServiceSelect, loadTechSideSelect,
+  loadBranchNameSelect, loadTestEnvSelect, loadServiceSelect, loadTechSideSelect,
 } from '../../comControl/controler';
 import {alalysisInitData} from '../../datas/dataAnalyze';
 import {getGridRowsHeight} from '../gridHeight';
 import {releaseAppChangRowColor} from '../../operate';
-import {history} from "@@/core/history";
 
-const {SHOW_PARENT} = TreeSelect;
 let newOnlineBranchNum = '';
-
 const OnlineBranch: React.FC<any> = () => {
   const [formForOnlineBranch] = Form.useForm(); // 上线分支设置
   const onlineBranchGridApi = useRef<GridApi>();
@@ -45,9 +41,9 @@ const OnlineBranch: React.FC<any> = () => {
     techSide: [],
     server: [],
     imgEnv: [],
-    before_checkType: [],
-    after_checkType: [],
-    browser: [],
+    // before_checkType: [],
+    // after_checkType: [],
+    // browser: [],
   });
   const [logModal, setLogModal] = useState({
     show: false,
@@ -76,6 +72,7 @@ const OnlineBranch: React.FC<any> = () => {
 
   // 保存
   const saveOnlineBranchResult = async () => {
+
     setOnlineBranchModal({
       ...onlineBranchModal,
       loading: true,
@@ -182,6 +179,7 @@ const OnlineBranch: React.FC<any> = () => {
       const result = await getCheckNumForOnlineBranch();
       newOnlineBranchNum = result.data?.check_num;
     } else {
+
       newOnlineBranchNum = params.check_num;
       const oraData = await getModifiedData(newOnlineBranchNum);
 
@@ -191,28 +189,6 @@ const OnlineBranch: React.FC<any> = () => {
       let mainSince;
       if (oraData.branchCheck?.branch_mainSince) {
         mainSince = moment(oraData.branchCheck?.branch_mainSince);
-      }
-
-      // 上线前的检查类型
-      let beforeType = oraData.beforeOnlineCheck?.beforeCheckType;
-      if (oraData.beforeOnlineCheck?.beforeCheckType) {
-        if (
-          (oraData.beforeOnlineCheck?.beforeCheckType).length === 1 &&
-          (oraData.beforeOnlineCheck?.beforeCheckType).includes('9')
-        ) {
-          beforeType = undefined;
-        }
-      }
-
-      // 上线后的检查类型
-      let afterType = oraData.afterOnlineCheck?.afterCheckType;
-      if (oraData.afterOnlineCheck?.afterCheckType) {
-        if (
-          (oraData.afterOnlineCheck?.afterCheckType).length === 1 &&
-          (oraData.afterOnlineCheck?.afterCheckType).includes('9')
-        ) {
-          afterType = undefined;
-        }
       }
 
       branchName = oraData.checkHead.branchName;
@@ -239,23 +215,15 @@ const OnlineBranch: React.FC<any> = () => {
         checkEnv: oraData.envCheck.checkEnv,
 
         // 上线前自动化检查
-        autoBeforeIgnoreCheck: oraData.beforeOnlineCheck?.autoBeforeIgnoreCheck,
-        beforeCheckType: beforeType,
-        beforeTestEnv: oraData.beforeOnlineCheck?.beforeTestEnv,
-        beforeBrowser: oraData.beforeOnlineCheck?.beforeBrowser,
-
-        //  上线后自动化检查
-        autoAfterIgnoreCheck: oraData.afterOnlineCheck?.autoAfterIgnoreCheck,
-        afterCheckType: afterType,
-        afterTestEnv: oraData.afterOnlineCheck?.afterTestEnv,
-        afterBrowser: oraData.afterOnlineCheck?.afterBrowser,
+        autoBeforeIgnoreCheck: oraData.beforeOnlineCheck?.ignoreCheck,
+        autoCheckResult: oraData.beforeOnlineCheck?.checkResult,
 
         //   隐藏字段，修改时需要使用
         branchCheckId: oraData.checkHead?.branchCheckId,
         versionCheckId: oraData.versonCheck?.versionCheckId,
         envCheckId: oraData.envCheck?.checkId,
-        beforeAutomationId: oraData.beforeOnlineCheck?.automationId,
-        afterAutomationId: oraData.afterOnlineCheck?.automationId,
+        // beforeAutomationId: oraData.beforeOnlineCheck?.automationId,
+        // afterAutomationId: oraData.afterOnlineCheck?.automationId,
       });
       modifyLockedItem(
         `${tabsData.activeKey}-step4-onlineBranch-${oraData.checkHead?.branchCheckId}`,
@@ -286,9 +254,9 @@ const OnlineBranch: React.FC<any> = () => {
       techSide: await loadTechSideSelect(),
       server: await loadServiceSelect(branchName),
       imgEnv: await loadTestEnvSelect(),
-      before_checkType: await loadCheckTypeSelect('before'),
-      after_checkType: await loadCheckTypeSelect('after'),
-      browser: await loadBrowserTypeSelect(),
+      // before_checkType: await loadCheckTypeSelect('before'),
+      // after_checkType: await loadCheckTypeSelect('after'),
+      // browser: await loadBrowserTypeSelect(),
     });
   };
 
@@ -580,7 +548,7 @@ const OnlineBranch: React.FC<any> = () => {
       {/* 上线分支 */}
       <div>
         <fieldset className={'fieldStyle'}>
-          <legend className={'legendStyle'}>Step4 上线分支
+          <legend className={'legendStyle'}>Step2 上线分支
             <label style={{color: "Gray"}}> (值班测试填写)</label>
           </legend>
 
@@ -639,16 +607,17 @@ const OnlineBranch: React.FC<any> = () => {
       {/* 上线分支设置  */}
       <Modal
         title={`上线分支设置-${onlineBranchModal.title}`}
-        visible={onlineBranchModal.shown}
+        visible={onlineBranchModal.shown}  // onlineBranchModal.shown
         onCancel={onlineBranchCancle}
         maskClosable={false}
         centered={true}
         footer={null}
         width={652}
+        bodyStyle={{height: "650px"}}
       >
         <Form form={formForOnlineBranch}>
           {/* 总设置 */}
-          <div>
+          <div style={{marginTop: -15}}>
             <Row>
               <Col span={16}>
                 {/* 分支名称 */}
@@ -688,11 +657,9 @@ const OnlineBranch: React.FC<any> = () => {
             </Row>
 
           </div>
-
           {/* ① 版本检查设置 */}
-          <div style={{marginTop: -35}}>
+          <div style={{marginTop: -50}}>
             <Divider plain>① 版本检查设置</Divider>
-
             <div>
               <Card
                 size="small"
@@ -732,12 +699,11 @@ const OnlineBranch: React.FC<any> = () => {
                 </Form.Item>
               </Card>
             </div>
-
             <div>
               <Card
                 size="small"
                 title="检查上线分支是否包含对比分支的提交"
-                style={{width: '100%', height: 200}}
+                style={{width: '100%', height: 190}}
               >
                 <Form.Item
                   name="branchcheck"
@@ -759,14 +725,14 @@ const OnlineBranch: React.FC<any> = () => {
                   </Checkbox.Group>
                 </Form.Item>
 
-                <Form.Item label="技术侧" name="branch_teachnicalSide" style={{marginTop: -25}}>
+                <Form.Item label="技术侧" name="branch_teachnicalSide" style={{marginTop: -30}}>
                   <Checkbox.Group style={{marginLeft: 56}}>
                     <Checkbox value={'front'}>前端</Checkbox>
                     <Checkbox value={'backend'}>后端</Checkbox>
                   </Checkbox.Group>
                 </Form.Item>
 
-                <Form.Item label="对比起始时间" name="branch_mainSince" style={{marginTop: -20}}>
+                <Form.Item label="对比起始时间" name="branch_mainSince" style={{marginTop: -25}}>
                   <DatePicker style={{marginLeft: 13, width: 415}}/>
                 </Form.Item>
                 <div style={{color: 'gray', marginTop: -25, marginLeft: 110}}>
@@ -775,7 +741,6 @@ const OnlineBranch: React.FC<any> = () => {
               </Card>
             </div>
           </div>
-
           {/* ② 环境一致性检查 */}
           <div style={{marginTop: -10}}>
             <Divider plain>② 环境一致性检查</Divider>
@@ -789,7 +754,7 @@ const OnlineBranch: React.FC<any> = () => {
                     </Checkbox.Group>
                   </Form.Item>
                 </Col>
-                <Col span={8}>
+                <Col span={15}>
                   {/* 检查环境 */}
                   <Form.Item label="检查环境:" name="checkEnv" style={{marginTop: -10}}>
                     <Select style={{width: '100%'}} showSearch>
@@ -800,9 +765,8 @@ const OnlineBranch: React.FC<any> = () => {
               </Row>
             </div>
           </div>
-
           {/* ③ 上线前自动化检查设置 */}
-          <div style={{marginTop: -30}}>
+          <div style={{marginTop: -35}}>
             <Divider plain>③ 上线前自动化检查设置</Divider>
             <Row style={{marginTop: -10}}>
               <Col>
@@ -813,124 +777,48 @@ const OnlineBranch: React.FC<any> = () => {
                   style={{marginTop: -10}}
                 >
                   <Checkbox.Group>
-                    <Checkbox value={'1'}>忽略检查</Checkbox>
+                    <Checkbox value={'yes'}>忽略检查</Checkbox>
                   </Checkbox.Group>
                 </Form.Item>
               </Col>
             </Row>
-            <Row style={{marginTop: -10}}>
-              <Col span={8}>
-                {/* 检查类型 */}
-                <Form.Item label="检查类型:" name="beforeCheckType" style={{marginTop: -10}}>
-                  <Select mode="multiple" style={{width: '100%'}} showSearch>
-                    {onlineBranchFormSelected.before_checkType}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col span={9}>
-                {/* 测试环境 */}
-                <Form.Item
-                  label="测试环境:"
-                  name="beforeTestEnv"
-                  style={{marginTop: -10, marginLeft: 10}}
-                >
-                  <Select style={{width: '100%'}} showSearch>
-                    {onlineBranchFormSelected.imgEnv}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col span={7}>
-                {/* 浏览器 */}
-                <Form.Item
-                  label="浏览器:"
-                  name="beforeBrowser"
-                  style={{marginTop: -10, marginLeft: 10}}
-                >
-                  <Select style={{width: '100%'}} showSearch>
-                    {onlineBranchFormSelected.browser}
-                  </Select>
-                </Form.Item>
-              </Col>
+            <Row style={{marginTop: -20}}>
+              <Form.Item label="检查结果" name="autoCheckResult">
+                <Checkbox.Group style={{width: '100%', marginLeft: 27}}>
+                  <Row>
+                    <Col span={7}>
+                      <Checkbox value="ui">UI执行通过</Checkbox>
+                    </Col>
+                    <Col span={9}>
+                      <Checkbox value="applet">小程序执行通过</Checkbox>
+                    </Col>
+                    <Col span={8}>
+                      <Checkbox value="api">接口执行通过</Checkbox>
+                    </Col>
+                  </Row>
+                </Checkbox.Group>
+              </Form.Item>
             </Row>
           </div>
-
-          {/* ④ 上线后自动化检查设置 */}
-          <div style={{marginTop: -30}}>
-            <Divider plain>④ 上线后自动化检查设置</Divider>
-            <Row style={{marginTop: -10}}>
-              <Col>
-                {/* 忽略检查 */}
-                <Form.Item
-                  label="是否忽略检查"
-                  name="autoAfterIgnoreCheck"
-                  style={{marginTop: -10}}
-                >
-                  <Checkbox.Group>
-                    <Checkbox value={'1'}>忽略检查</Checkbox>
-                  </Checkbox.Group>
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row style={{marginTop: -10}}>
-              <Col span={8}>
-                {/* 检查类型 */}
-                <Form.Item label="检查类型:" name="afterCheckType" style={{marginTop: -10}}>
-                  <Select mode="multiple" style={{width: '100%'}} showSearch>
-                    {onlineBranchFormSelected.after_checkType}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col span={9}>
-                {/* 测试环境 */}
-                <Form.Item
-                  label="测试环境:"
-                  name="afterTestEnv"
-                  style={{marginTop: -10, marginLeft: 10}}
-                >
-                  <Select style={{width: '100%'}} showSearch>
-                    {onlineBranchFormSelected.imgEnv}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col span={7}>
-                {/* 浏览器 */}
-                <Form.Item
-                  label="浏览器:"
-                  name="afterBrowser"
-                  style={{marginTop: -10, marginLeft: 10}}
-                >
-                  <Select style={{width: '100%'}} showSearch>
-                    {onlineBranchFormSelected.browser}
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
-          </div>
-
+          {/* 保存、清空按钮 */}
           <Spin spinning={onlineBranchModal.loading} tip="保存中...">
-            <Form.Item>
+            <Form.Item style={{marginTop: -15}}>
               <Button
                 style={{borderRadius: 5, marginLeft: 20, float: 'right'}}
                 onClick={() => {
                   formForOnlineBranch.resetFields();
                 }}
-              >
-                清空
-              </Button>
+              >清空</Button>
 
               <Button
                 type="primary"
                 style={{
-                  color: '#46A0FC',
-                  backgroundColor: '#ECF5FF',
-                  borderRadius: 5,
-                  float: 'right',
-                }}
-                onClick={saveOnlineBranchResult}
+                  color: '#46A0FC', backgroundColor: '#ECF5FF',
+                  borderRadius: 5, float: 'right',
+                }} onClick={saveOnlineBranchResult}
               >保存</Button>
             </Form.Item>
           </Spin>
-
           {/* 隐藏字段，进行修改需要的字段 */}
           <Row style={{marginTop: -60}}>
             <Col span={2}>

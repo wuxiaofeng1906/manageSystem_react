@@ -44,14 +44,36 @@ const queryReleaseWay = async () => {
   return result;
 };
 
-// 一键部署Id
-const queryReleaseId = async () => {
+// 发布方式
+const queryDutyNames = async () => {
   const result: any = {
     message: '',
     data: [],
   };
   await axios
-    .get('/api/verify/release/deployment_id', {})
+    .get('/api/verify/release/duty', {})
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    })
+    .catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+};
+
+// 一键部署Id
+const queryReleaseId = async (releaseNum: string) => {
+  const result: any = {
+    message: '',
+    data: [],
+  };
+  const data = {ready_release_num : releaseNum};
+  await axios.get('/api/verify/release/deployment_id', {params: data})
     .then(function (res) {
       if (res.data.code === 200) {
         result.data = res.data.data;
@@ -286,6 +308,22 @@ const getBrowserType = async () => {
   return result;
 };
 
+
+const saveBeforeAndAfterOnlineAutoCheck = async (data: any) => {
+  let errorMessage = '';
+  await axios
+    .post('/api/verify/release/automation_check', data)
+    .then(function (res) {
+      if (res.data.code !== 200) {
+        errorMessage = `错误：${res.data.msg}`;
+      }
+    })
+    .catch(function (error) {
+      errorMessage = `异常信息:${error.toString()}`;
+    });
+
+  return errorMessage;
+};
 export {
   queryReleaseType,
   queryReleaseWay,
@@ -300,4 +338,6 @@ export {
   getTechSide,
   getCheckType,
   getBrowserType,
+  queryDutyNames,
+  saveBeforeAndAfterOnlineAutoCheck
 };

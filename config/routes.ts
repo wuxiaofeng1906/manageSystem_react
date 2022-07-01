@@ -1,6 +1,6 @@
 ﻿// @ts-ignore
-import { MenuDataItem } from '@@/plugin-layout/runtime';
-import { ProjectKpiRoute } from './routes-tj';
+import {MenuDataItem} from '@@/plugin-layout/runtime';
+import {ProjectKpiRoute} from './routes-tj';
 
 export default [
   {
@@ -232,6 +232,43 @@ export default [
                 path: 'defectExclusionRate',
                 component: './kpi/performance/developer/defectExclusionRate',
               },
+              {
+                name: '项目计划偏差率',
+                icon: 'table',
+                path: 'projectPlanDeviationRate',
+                component: './kpi/performance/developer/projectPlanDeviationRate',
+              },
+              {
+                name: '管理事务计划偏差率',
+                icon: 'table',
+                path: 'manWorkPlanDevRate',
+                component: './kpi/performance/developer/manWorkPlanDevRate',
+              },
+              {
+                name: '提测计划偏差率',
+                icon: 'table',
+                path: 'devShowTestPlanDeviationRate',
+                component: './kpi/performance/developer/devShowTestPlanDeviationRate',
+              },
+              {
+                name: '开发-A类客户服务投入比',
+                icon: 'table',
+                path: 'cusInputRate_A',
+                component: './kpi/performance/developer/cusInputRate_A',
+              },
+              {
+                name: '开发-用户体验优化投入比',
+                icon: 'table',
+                path: 'cusExperienceInputRate',
+                component: './kpi/performance/developer/cusExperienceInputRate',
+              },
+              {
+                name: '开发-发布引入emergency数',
+                icon: 'table',
+                path: 'releaseEmergencyCount',
+                component: './kpi/performance/developer/releaseEmergencyCount',
+
+              },
             ],
           },
           {
@@ -239,14 +276,14 @@ export default [
             icon: 'table',
             path: '/kpi/performance/testers',
             routes: [
+              // {
+              //   name: '线上千行bug率',
+              //   icon: 'table',
+              //   path: 'on-lineBugRate',
+              //   component: './kpi/performance/testers/on-lineBugRate',
+              // },
               {
                 name: '线上千行bug率',
-                icon: 'table',
-                path: 'on-lineBugRate',
-                component: './kpi/performance/testers/on-lineBugRate',
-              },
-              {
-                name: '线上千行bug率(new)',
                 icon: 'table',
                 path: 'on-lineBugRate-new',
                 component: './kpi/performance/testers/on-lineBugRate-new',
@@ -268,6 +305,7 @@ export default [
                 icon: 'table',
                 path: 'bugRateConvergency',
                 component: './kpi/performance/testers/bugRateConvergency',
+                hideInMenu: true,
               },
               {
                 name: '用例执行率',
@@ -304,6 +342,37 @@ export default [
                 icon: 'table',
                 path: 'effectiveExampleRate',
                 component: './kpi/performance/testers/effectiveExampleRate',
+              },
+              {
+                name: '千行bug率收敛',
+                icon: 'table',
+                path: 'bugRateConvergency',
+                component: './kpi/performance/testers/bugRateConvergency',
+                // hideInMenu: true,
+              },
+              {
+                name: '测试计划偏差率',
+                icon: 'table',
+                path: 'palnDeviationRate',
+                component: './kpi/performance/testers/palnDeviationRate',
+              },
+              {
+                name: '测试-A类客户服务投入比',
+                icon: 'table',
+                path: 'cusInputRate_A',
+                component: './kpi/performance/testers/cusInputRate_A',
+              },
+              {
+                name: '测试-用户体验优化投入比',
+                icon: 'table',
+                path: 'cusExperienceInputRate',
+                component: './kpi/performance/testers/cusExperienceInputRate',
+              },
+              {
+                name: '测试-发布引入emergency数',
+                icon: 'table',
+                path: 'releaseEmergencyCount',
+                component: './kpi/performance/testers/releaseEmergencyCount',
               },
             ],
           },
@@ -345,7 +414,7 @@ export default [
                 component: './kpi/performance/service/avgEstablishTime',
               },
             ],
-          },
+          }
         ],
       },
       {
@@ -444,7 +513,7 @@ export default [
         path: 'sonar',
         access: 'sonarCheck',
         component: './checkTools/sonar',
-      },
+      }
     ],
   },
   {
@@ -469,6 +538,19 @@ export default [
         component: './onDutyAndRelease/dutyPlan',
       },
       {
+        name: '值班列表',
+        icon: 'table',
+        path: 'dutyList',
+        component: './onDutyAndRelease/dutyDirectory/dutyList',
+      },
+      {
+        name: '值班名单',
+        icon: 'table',
+        path: 'dutyCatalog/:id',
+        hideInMenu: true,
+        component: './onDutyAndRelease/dutyDirectory/dutyCatalog',
+      },
+      {
         name: '发布过程',
         icon: 'table',
         path: 'preRelease',
@@ -479,11 +561,18 @@ export default [
         icon: 'table',
         path: 'releaseHistory',
         component: './onDutyAndRelease/releaseHistory',
-      },
+      }, {
+        name: '正式发布',
+        icon: 'table',
+        path: 'officialRelease',
+        component: './onDutyAndRelease/officialRelease',
+        hideInMenu: true
+
+      }
     ],
   },
   {
-    name: '禅道管理',
+    name: "禅道管理",
     icon: 'table',
     path: '/zentao',
     // hideInMenu: true,
@@ -493,37 +582,33 @@ export default [
         icon: 'table',
         path: 'peopleExcuteSetting',
         component: './zentao/peopleExcuteSetting',
-        access: 'sysAdmin', // 管理员可见
+        access: 'sysAdmin',  // 管理员可见
       },
       {
         name: '禅道模板',
         icon: 'table',
         path: 'templateList',
         component: './zentao/zentaoTemplate/templateList',
-        access: 'sysAdmin', // 管理员可见
-      },
-      {
+        access: 'sysAdmin',  // 管理员可见
+      }, {
         name: '禅道任务模板',
         icon: 'table',
         path: 'editTemplate',
         component: './zentao/zentaoTemplate/editTemplate',
-        hideInMenu: true,
-      },
-      {
+        hideInMenu: true
+      }, {
         name: '禅道任务生成（上线检查）',
         icon: 'table',
         path: 'btForCheckBeforeOnline',
         component: './zentao/zentaoTemplate/btForCheckBeforeOnline',
-        hideInMenu: true,
-      },
-      {
+        hideInMenu: true
+      }, {
         name: '禅道任务生成（项目计划）',
         icon: 'table',
         path: 'btForProjectTemplate',
         component: './zentao/zentaoTemplate/btForProjectTemplate',
-        hideInMenu: true,
-      },
-      {
+        hideInMenu: true
+      }, {
         name: '禅道任务分解',
         icon: 'table',
         path: 'taskDecomposition',
@@ -531,10 +616,10 @@ export default [
         access: 'devCenter', // 研发中心可见
         // hideInMenu: true
       },
-    ],
+    ]
   },
   {
-    name: '石墨管理',
+    name: "石墨管理",
     icon: 'table',
     path: '/shimo',
     hideInMenu: false,
@@ -557,10 +642,10 @@ export default [
             path: 'baselineDetails',
             component: './shimo/fileBaseline/baselineDetails',
             hideInMenu: true,
-          },
-        ],
-      },
-    ],
+          }
+        ]
+      }
+    ]
   },
   {
     name: '系统管理',
@@ -619,10 +704,6 @@ export default [
           {
             path: 'deploy',
             component: './systemOnline/prePublish/deploy',
-          },
-          {
-            path: 'duty',
-            component: './systemOnline/prePublish/duty',
           },
           {
             path: 'check',

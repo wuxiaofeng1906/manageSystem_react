@@ -1,57 +1,97 @@
-import React from 'react';
-import {message, Progress, Row, Select} from 'antd';
+import React, {useState} from 'react';
+import {Progress, Row, Select, Modal, Button, Form, Checkbox} from 'antd';
 import {useModel} from '@@/plugin-model/useModel';
-import {saveProcessResult} from './axiosRequest';
+import {saveProcessResult, executeAutoCheck} from './axiosRequest';
+import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
+import {getAutoResult} from "./processAnalysis";
 
 const {Option} = Select;
 
 const CheckProgress: React.FC<any> = () => {
   // 获取当前页面的进度数据
-  const {tabsData, processStatus, modifyProcessStatus, modifyOperteStatus, operteStatus} = useModel('releaseProcess');
+  const {tabsData, processStatus, modifyProcessStatus, operteStatus} = useModel('releaseProcess');
+  const [isModalVisible, setModalVisible] = useState({show: false, result: "", hintMsg: "", autoCheckDisabled: true});
+
+  const [pulishResultForm] = Form.useForm();
+
   // 发布结果修改
   const pulishResulttChanged = async (params: any) => {
+
     // 需要验证前面的检查是否全部成功(前三个成功即可)。
     if (processStatus.releaseProject === 'Gainsboro' ||
       processStatus.upgradeService === 'Gainsboro' ||
       processStatus.dataReview === 'Gainsboro') {
-      message.error({
-        content: '检查未全部完成，不能保存发布结果！',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
+      errorMessage('检查未全部完成，不能保存发布结果！');
       return;
     }
-    const result = await saveProcessResult(tabsData.activeKey, params);
+
+    let autoDisable = true;
+    let hintMsgs = "请确认是否修改服务发布结果为空！"
+    if (params === "1") {
+      hintMsgs = "请确认服务是否发布成功，如有自动化也执行通过!";
+      autoDisable = false;
+    } else if (params === "2") {
+      hintMsgs = "请确认服务是否发布失败！";
+    }
+    setModalVisible({
+      autoCheckDisabled: autoDisable,
+      hintMsg: hintMsgs,
+      result: params,
+      show: true
+    });
+
+    pulishResultForm.resetFields();
+  };
+
+  // 确认发布
+  const handleOk = async () => {
+    let checkResult: any;
+    const formData = pulishResultForm.getFieldsValue();
+    // 如果是发布成功，则需要判断下面自动化选项是否勾选
+    if (!isModalVisible.autoCheckDisabled) { // 是发布成功
+      if (formData.ignoreAfterCheck === undefined || (formData.ignoreAfterCheck).length === 0) { // 不忽略的时候
+        if (formData.checkResult === undefined || (formData.checkResult).length === 0) { // 一个结果都没选中
+          errorMessage("检查结果必须至少勾选一项！")
+          return;
+        }
+      }
+
+      // 发布成功才调用自动化检查接口
+      const result = await executeAutoCheck(formData, tabsData.activeKey);
+      if (result) {
+        errorMessage(`发布成功后自动化检查失败：${result}`);
+      } else {
+        checkResult = await getAutoResult(tabsData.activeKey)
+      }
+    }
+
+    const result = await saveProcessResult(tabsData.activeKey, isModalVisible.result);
     if (result === '') {
-      message.info({
-        content: '发布结果保存成功！',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      sucMessage('发布结果保存成功！')
       modifyProcessStatus({
         ...processStatus,
-        releaseResult: params,
+        releaseResult: isModalVisible.result,
+        autoCheckResult: checkResult
       });
-
-      // modifyOperteStatus(true);
+      setModalVisible({
+        ...isModalVisible,
+        result: "",
+        show: false
+      });
     } else {
-      message.error({
-        content: result,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage(result.toString())
     }
   };
-  // useEffect(()=>{
-  //   console.log("2222", tabsData);
-  // },[tabsData])
+
+  // 取消发布
+  const handleCancel = () => {
+    setModalVisible({
+      ...isModalVisible,
+      result: "",
+      show: false
+    });
+  };
+
   return (
     <div>
       {/* 检查进度 */}
@@ -138,8 +178,48 @@ const CheckProgress: React.FC<any> = () => {
               </Option>
             </Select>
           </label>
+
+          <label style={{marginLeft: 10}}>
+            {processStatus.autoCheckResult}
+          </label>
         </div>
       </div>
+
+      {/* 发布结果确认弹出窗   */}
+      <Modal title="发布结果确认" visible={isModalVisible.show} width={400}
+             onCancel={handleCancel} centered={true}
+             bodyStyle={{height: 120}}
+             footer={[
+               <Button key="cancle" onClick={handleCancel} style={{borderRadius: 5}}>
+                 取消
+               </Button>,
+               <Button key="submit" type="primary" onClick={handleOk}
+                       style={{
+                         color: '#46A0FC', backgroundColor: '#ECF5FF',
+                         borderRadius: 5
+                       }}>
+                 确定
+               </Button>,
+             ]}>
+
+        <Form form={pulishResultForm} style={{marginTop: -15}}>
+          <Form.Item>
+            {isModalVisible.hintMsg}
+          </Form.Item>
+          <Form.Item label="是否忽略发布成功后自动化检查:" name="ignoreAfterCheck" style={{marginTop: -25}}>
+            <Checkbox.Group style={{width: '100%'}} disabled={isModalVisible.autoCheckDisabled}>
+              <Checkbox value="yes">忽略检查</Checkbox>
+            </Checkbox.Group>
+          </Form.Item>
+          <Form.Item label="检查结果:" name="checkResult" style={{marginTop: -25}}>
+            <Checkbox.Group style={{width: '100%'}} disabled={isModalVisible.autoCheckDisabled}>
+              <Checkbox value="ui">UI执行通过</Checkbox>
+              <Checkbox value="applet">小程序执行通过</Checkbox>
+            </Checkbox.Group>
+          </Form.Item>
+        </Form>
+      </Modal>
+
     </div>
   );
 };

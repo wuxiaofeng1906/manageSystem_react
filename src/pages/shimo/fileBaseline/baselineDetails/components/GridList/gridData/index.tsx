@@ -3,14 +3,15 @@ import {getColumns} from "../columns";
 import {errorMessage} from "@/publicMethods/showMessages";
 
 // 根据拿到的最后一层文件获取之前的路径
-const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_allGrid: any, rt_basetimeArray: any) => {
+const getParentPathByChild = (data: any, node: any, rt_pathArray: any, rt_allGrid: any, rt_basetimeArray: any) => {
   // 忽略掉对rt_allGrid的检查
   /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["rt_allGrid"] }] */
   for (let i = 0, len = data.length; i < len; i += 1) {
     const current = data[i];
     rt_pathArray.push(current.name);
 
-    if (current.file_format !== "folder" && data[i].name === nodeName) {
+    // 需要同时判断文件名字和文件格式以及父id
+    if (current.file_format !== "folder" && data[i].name === node.name && data[i].file_format === node.file_format&& data[i].parent === node.parent) {
       const fileOrder = (rt_pathArray.length) + 1;
       // 需要先删除掉rt_allGrid中>currentIndex的file，如果不删除，之前的数据会依旧存在rt_allGrid中
       const gridKeys = Object.keys(rt_allGrid);
@@ -61,7 +62,7 @@ const getParentPathByChild = (data: any, nodeName: any, rt_pathArray: any, rt_al
     const {children} = data[i]
     if (children && children.length) {
       rt_allGrid[`${(rt_pathArray.length + 1)}_file`] = current.name;
-      const result: any = getParentPathByChild(children, nodeName, rt_pathArray, rt_allGrid, rt_basetimeArray);
+      const result: any = getParentPathByChild(children, node, rt_pathArray, rt_allGrid, rt_basetimeArray);
       if (result) {
         return {rt_pathArray, rt_allGrid, rt_basetimeArray};
       }
@@ -86,7 +87,8 @@ const getChildData = (oraData: any, childData: any, gridResult: any, filedArrayL
       const rt_pathArray: any = [];
       const rt_basetimeArray: any = [];
       const rt_allGrid: any = {};
-      getParentPathByChild(oraData, field.name, rt_pathArray, rt_allGrid, rt_basetimeArray);
+
+      getParentPathByChild(oraData, field, rt_pathArray, rt_allGrid, rt_basetimeArray);
 
       gridResult.push(rt_allGrid);
       filedArrayLength.push(rt_pathArray.length);
@@ -264,6 +266,7 @@ const getBaseTimeColumns = (timeArray: any) => {
 
 // 获取迭代数据
 const getIterDetailsData = async (fileType: string, executionId: any) => {
+
   const detailsArray = await axiosGet("/api/verify/shimo/version_detail", {
     file_type: fileType,
     execution_id: executionId

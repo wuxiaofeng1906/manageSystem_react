@@ -1,6 +1,7 @@
-import { getTechSide } from '../../../comControl/converse';
-import dayjs from 'dayjs';
-import { message } from 'antd';
+import {getTechSide} from '../../../comControl/converse';
+import dayjs from "dayjs";
+import {message} from "antd";
+
 
 // 渲染单元测试运行是否通过字段
 const rendererUnitTest = (params: any) => {
@@ -115,35 +116,38 @@ const rendererUnitTest = (params: any) => {
 
 // 图标一致性检查
 const iconCheckRender = (params: any) => {
+
+
   const values = params.value;
-  if (!values || JSON.stringify(values) === '{}') {
-    if (params.data?.technical_side === '2') {
+  if (!values || JSON.stringify(values) === "{}") {
+    if (params.data?.technical_side === "2") {
       return `     <div style="color:blue;font-size: 10px">忽略</div>`;
     }
-    return '';
+    return "";
   }
 
   let result = values.check_status;
-  let Color = 'black';
+  let Color = "black";
 
-  if (values.check_status === 'done') {
-    // done  doing（执行中） wait（未开始）
+  if (values.check_status === "done") {// done  doing（执行中） wait（未开始）
     // check_result:  暂无分支、是、否
-    if (values.check_result === '是') {
+    if (values.check_result === "是") {
       Color = '#2BF541';
-      result = '通过';
-    } else if (values.check_result === '否') {
+      result = "通过";
+    } else if (values.check_result === "否") {
       Color = '#8B4513';
-      result = '不通过';
+      result = "不通过";
+    } else {
+      result = values.check_result;
     }
-  } else if (values.check_status === 'doing') {
-    result = '执行中';
+  } else if (values.check_status === "doing") {
+    result = "执行中";
     Color = '#46A0FC';
-  } else if (values.check_status === 'wait') {
-    result = '未开始';
+  } else if (values.check_status === "wait") {
+    result = "未开始";
   }
 
-  const logs = JSON.stringify(values.check_log).replaceAll("'", '***'); // 如果包含单引号，解析会报错。需要用特殊符号替换掉，传过去之后再解析出来。
+  const logs = JSON.stringify(values.check_log).replaceAll("'", "***"); // 如果包含单引号，解析会报错。需要用特殊符号替换掉，传过去之后再解析出来。
   return `
        <div>
           <div style="margin-top: -10px;margin-left: 100px">
@@ -155,8 +159,9 @@ const iconCheckRender = (params: any) => {
           <div style="margin-top: -20px;width: 210px">
                 <div style="color:${Color};font-size: 10px">${result}</div>
           </div>
-       </div>`;
+       </div>`
 };
+
 
 (window as any).visitCommenLog = (logUrl: string) => {
   if (logUrl && logUrl !== 'null') {
@@ -174,6 +179,8 @@ const iconCheckRender = (params: any) => {
 
 // 渲染上线前版本检查是否通过
 const beforeOnlineVersionCheck = (params: any) => {
+
+
   if (!params.value || params.value.length === 0) {
     return '';
   }
@@ -336,9 +343,7 @@ const beforeOnlineEnvCheck = (params: any) => {
                 <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
               </Button>
 
-              <a href="${values.check_url}" target="_blank"  onclick="return visitCommenLog('${
-    values.check_url
-  }')" >
+              <a href="${values.check_url}" target="_blank"  onclick="return visitCommenLog('${values.check_url}')" >
                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
              </a>
             </div>
@@ -351,6 +356,7 @@ const beforeOnlineEnvCheck = (params: any) => {
 };
 // 上线前自动化检查
 const beforeOnlineAutoCheck = (params: any, type: string) => {
+
   const values = params.value;
   if (!values) {
     return '';
@@ -411,13 +417,11 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
         <div style="margin-top: -10px">
             <div style="margin-left: 120px" >
               <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
-              onclick='excuteCheckData(${JSON.stringify(title)},${JSON.stringify(
-    params.data?.check_num,
-  )},${JSON.stringify(value)})'>
+              onclick='excuteCheckData(${JSON.stringify(title)},${JSON.stringify(params.data?.check_num,)},${JSON.stringify(value)})'>
                 <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
               </Button>
               <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC"
-              onclick='autoLogUrlClick(${JSON.stringify(checkType)},${JSON.stringify(logUrl)})'>
+              onclick='autoLogUrlClick(${JSON.stringify(checkType,)},${JSON.stringify(logUrl)})'>
                 <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
               </Button>
             </div>
@@ -429,8 +433,58 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
     `;
 };
 
+// 上线前自动化检查
+const autoCheckRenderer = (params: any) => {
+
+  const autoValue = params.value;
+  if (!autoValue || autoValue.length === 0) {
+    return "";
+  }
+
+  let ignoreCheck = "";
+  let ui_result = "";
+  let ui_color = "black";
+  let api_result = "";
+  let api_color = "black";
+  let applet_result = "";
+  let applet_color = "black";
+
+  if (autoValue && autoValue.length > 0) {
+    autoValue.forEach((ele: any) => {
+      if (ele.ignore_check === "yes") {
+        ignoreCheck = "忽略";
+      } else if (ele.ignore_check === "no" && ele.check_time === "before") {
+        if (ele.check_type === 'ui') {
+          ui_result = ele.check_result === "yes" ? "通过" : "不通过";
+          ui_color = ele.check_result === "yes" ? "#2BF541" : "#8B4513";
+        } else if (ele.check_type === 'api') {
+          api_result = ele.check_result === "yes" ? "通过" : "不通过";
+          api_color = ele.check_result === "yes" ? "#2BF541" : "#8B4513";
+        } else if (ele.check_type === 'applet') {
+          applet_result = ele.check_result === "yes" ? "通过" : "不通过";
+          applet_color = ele.check_result === "yes" ? "#2BF541" : "#8B4513";
+        }
+      }
+    });
+  }
+
+
+  if (ignoreCheck === "忽略") {
+    return `<label style="color: blue;font-size: 10px">忽略</label>`;
+  }
+
+  return `
+  <div>
+      <div style="margin-top: -3px;font-size: 10px;">UI:<label style="color: ${ui_color};padding-left: 22px"> ${ui_result}</label></div>
+      <div style="margin-top: -20px;font-size: 10px">接口:<label style="color: ${api_color};padding-left: 13px"> ${api_result}</label></div>
+      <div style="margin-top: -20px;font-size: 10px">小程序:<label style="color: ${applet_color}"> ${applet_result}</label></div>
+  </div>`;
+
+
+};
 // 封板状态
 const sealStatusRenderer = (params: any) => {
+
   if (!params.value) {
     return `<div></div>`;
   }
@@ -438,11 +492,12 @@ const sealStatusRenderer = (params: any) => {
   const values = params.value;
   const datas = params.data;
   // 代表只有前端或者只有后端
-  if (datas.technical_side === '1' || datas.technical_side === '2') {
+  if (datas.technical_side === "1" || datas.technical_side === "2") {
+
     let side = '';
-    let status = '';
-    let sideColor = 'black';
-    let time = '';
+    let status = "";
+    let sideColor = "black";
+    let time = "";
     const arrayData = values[0];
     values.forEach((ele: any) => {
       if (ele.technical_side === datas.technical_side) {
@@ -455,15 +510,12 @@ const sealStatusRenderer = (params: any) => {
         }
         // status = arrayData.sealing_version === '1' ? '已封版' : '未封版';
         status = arrayData.sealing_version;
-        if (status === '已封版') {
+        if (status === "已封版") {
           sideColor = '#2BF541';
-        } else if (status === '未封版') {
+        } else if (status === "未封版") {
           sideColor = 'orange';
         }
-        time =
-          arrayData.sealing_version_time === ''
-            ? ''
-            : dayjs(arrayData.sealing_version_time).format('HH:mm:ss');
+        time = arrayData.sealing_version_time === '' ? '' : dayjs(arrayData.sealing_version_time).format('HH:mm:ss');
       }
     });
 
@@ -484,7 +536,7 @@ const sealStatusRenderer = (params: any) => {
   }
 
   // 证明有前后端
-  if (datas.technical_side === '3') {
+  if (datas.technical_side === "3") {
     let frontValue = '';
     let frontTime = '';
     let frontColor = 'black';
@@ -497,22 +549,22 @@ const sealStatusRenderer = (params: any) => {
         // 前端
         // frontValue = ele.sealing_version === '1' ? '已封版' : '未封版';
         frontValue = ele.sealing_version;
-        frontTime =
-          ele.sealing_version_time === '' ? '' : dayjs(ele.sealing_version_time).format('HH:mm:ss');
-        if (frontValue === '已封版') {
+        frontTime = ele.sealing_version_time === '' ? '' : dayjs(ele.sealing_version_time).format('HH:mm:ss');
+        if (frontValue === "已封版") {
           frontColor = '#2BF541';
-        } else if (frontValue === '未封版') {
+        } else if (frontValue === "未封版") {
           frontColor = 'orange';
         }
+
       } else if (ele.technical_side === '2') {
         // 后端
         // backendValue = ele.sealing_version === '1' ? '已封版' : '未封版';
         backendValue = ele.sealing_version;
         backendTime =
           ele.sealing_version_time === '' ? '' : dayjs(ele.sealing_version_time).format('HH:mm:ss');
-        if (backendValue === '已封版') {
+        if (backendValue === "已封版") {
           bacnkendColor = '#2BF541';
-        } else if (backendValue === '未封版') {
+        } else if (backendValue === "未封版") {
           bacnkendColor = 'orange';
         }
       }
@@ -543,8 +595,8 @@ const branchGitTime = (params: any) => {
   // if (datas.branch_front_create_time || datas.branch_create_time) {
 
   // 只有前端
-  if (datas.technical_side === '1') {
-    let values = '';
+  if (datas.technical_side === "1") {
+    let values = "";
     if (datas.branch_front_create_time) {
       values = datas.branch_front_create_time;
     }
@@ -558,8 +610,8 @@ const branchGitTime = (params: any) => {
     `;
   }
   // 只有后端
-  if (datas.technical_side === '2') {
-    let values = '';
+  if (datas.technical_side === "2") {
+    let values = "";
     if (datas.branch_create_time) {
       values = datas.branch_create_time;
     }
@@ -575,13 +627,13 @@ const branchGitTime = (params: any) => {
 
   // 有前后端
   // if (datas.branch_front_create_time && datas.branch_create_time) {
-  if (datas.technical_side === '3') {
-    let front_value = '';
+  if (datas.technical_side === "3") {
+    let front_value = "";
     if (datas.branch_front_create_time) {
       front_value = datas.branch_front_create_time;
     }
 
-    let backend_value = '';
+    let backend_value = "";
     if (datas.branch_create_time) {
       backend_value = datas.branch_create_time;
     }
@@ -615,6 +667,7 @@ const getOnlineBranchColumns = () => {
       headerName: '分支名称',
       field: 'branch_name',
       minWidth: 90,
+
     },
     {
       headerName: '技术侧',
@@ -622,24 +675,25 @@ const getOnlineBranchColumns = () => {
       cellRenderer: (params: any) => {
         return `<span style="font-size: smaller">${getTechSide(params.value)}</span>`;
       },
+
     },
     {
       headerName: '单元测试运行是否通过',
       field: 'test_unit',
       cellRenderer: rendererUnitTest,
       minWidth: 170,
-    },
-    {
+    }, {
       headerName: '图标一致性检查',
       field: 'icon_check',
       minWidth: 130,
-      cellRenderer: iconCheckRender,
+      cellRenderer: iconCheckRender
     },
     {
       headerName: '上线前版本检查是否通过',
       field: 'version_check',
       cellRenderer: beforeOnlineVersionCheck,
       minWidth: 190,
+
     },
     {
       headerName: '上线前环境检查是否通过',
@@ -651,20 +705,18 @@ const getOnlineBranchColumns = () => {
       headerName: '上线前自动化检查是否通过',
       field: 'automation_check',
       minWidth: 200,
-      cellRenderer: (param: any) => {
-        return beforeOnlineAutoCheck(param, '1');
-      },
+      cellRenderer: autoCheckRenderer
     },
+    // {
+    //   headerName: '升级后自动化检查是否通过',
+    //   field: 'automation_check',
+    //   minWidth: 200,
+    //   cellRenderer: (param: any) => {
+    //     return beforeOnlineAutoCheck(param, '2');
+    //   },
+    // },
     {
-      headerName: '升级后自动化检查是否通过',
-      field: 'automation_check',
-      minWidth: 200,
-      cellRenderer: (param: any) => {
-        return beforeOnlineAutoCheck(param, '2');
-      },
-    },
-    {
-      headerName: '封版状态',
+      headerName: '封板状态',
       field: 'branch_sealing_check',
       minWidth: 160,
       cellRenderer: sealStatusRenderer,
@@ -683,8 +735,7 @@ const getOnlineBranchColumns = () => {
       maxWidth: 100,
       cellRenderer: (params: any) => {
         const paramData = JSON.stringify(params.data).replace(/'/g, '’');
-        if (paramData === '{}') {
-          // 当上线分支没数据时，只显示新增按钮，其余按钮不显示
+        if (paramData === '{}') { // 当上线分支没数据时，只显示新增按钮，其余按钮不显示
           return `
         <div style="margin-top: -5px">
             <Button  style="border: none; background-color: transparent; " onclick='showOnlineBranchForm("add",${paramData})'>
@@ -712,4 +763,4 @@ const getOnlineBranchColumns = () => {
   return firstOnlineBranchColumn;
 };
 
-export { getOnlineBranchColumns };
+export {getOnlineBranchColumns}

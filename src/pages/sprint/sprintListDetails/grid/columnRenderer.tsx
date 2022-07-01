@@ -445,6 +445,34 @@ const proposedTestValueGetter = (params: any) => {
   return value;
 };
 
+
+// 是否清缓存
+const clearCacheRenderer = (params: any) => {
+  // 当‘是否清缓存’为’是’的，需要红色显示；
+  // 当‘是否有数据升级’为’是’的，也需要红色显示；
+
+  const values = params.value;
+  if (!values) {
+    return "";
+  }
+
+  let result = "";
+  if (values === "-1" || values === "1") {
+    result = "是";
+  } else if (values === "-0" || values === "0") {
+    result = "否";
+  }
+
+  let my_color = "";
+  if (values === "-1" || values === "1" || params.data?.dataUpdate === "1") {
+    my_color = "red";// 红色
+  }
+  if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+    return `<span style="text-decoration:line-through"> ${result} </span>`;
+  }
+  return `<span style="color: ${my_color}"> ${result}  </span>`;
+};
+
 // 验证结果
 const vertifyResultValueGetter = (values: any) => {
   if (values === null || values === undefined) {
@@ -495,7 +523,7 @@ const timeRenderer = (params: any) => {
 
 export {
   textDecorateRender, stageValueGetter, stageRenderer, testerValueGetter, testerRenderer,
-  testConfirmValueGetter, catagoryValueGetter, linkToZentaoPage, servertyValueGetter,
+  testConfirmValueGetter, catagoryValueGetter, linkToZentaoPage, servertyValueGetter, clearCacheRenderer,
   statusValueGetter, statusRenderer, assignedToValueGetter, solvedByValueGetter, relatedNumberRender,
   timestampRenderer, isOrNotValueGetter, testConfirmTooltipValueGetter, testConfirmedRenderer,
   proposedTestValueGetter, testVertifyFilter,

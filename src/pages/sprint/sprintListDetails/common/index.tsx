@@ -50,6 +50,12 @@ const alayManagerData = (oradata: any, curRow: any, prjId: any) => {
     datas['testCheck'] =
       oradata.managertesterVerifi === '' ? '' : `-${oradata.managertesterVerifi}`; //  为手动修改的数据
   }
+
+  // 如果修改了是否清缓存，就要改为负值。
+  if (curRow[0].clearCache !== oradata.managerClearCache) {
+    datas["clearCache"] = oradata.managerClearCache === "" ? "" : `-${oradata.managerClearCache}`; //  为手动修改的数据
+  }
+
   return datas;
 };
 

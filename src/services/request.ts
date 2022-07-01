@@ -13,7 +13,7 @@ const errorHandler = (error: { response: Response; message: any }): Response => 
 };
 
 const _request = extend({
-  errorHandler, // 默认错误处理
+  // errorHandler, // 默认错误处理
   // credentials: 'include', // 默认请求是否带上cookie
 });
 

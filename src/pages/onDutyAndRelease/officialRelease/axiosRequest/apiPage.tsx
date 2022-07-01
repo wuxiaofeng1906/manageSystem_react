@@ -59,6 +59,7 @@ const cancleReleaseResult = async (onlineReleaseNum: string) => {
 };
 // 正式发布界面编辑
 const editReleaseForm = async (releaseInfo: any, otherCondition: any) => {
+  debugger;
 
   let {relateDutyName, pulishTime} = releaseInfo;
   if (!relateDutyName) {

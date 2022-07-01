@@ -24,7 +24,7 @@ const getAutoResult = async (releaseNum: string) => {
     });
 
     if (ignore === "忽略检查") {
-      return <label style={{color: "blue"}}>发布成功后自动化检查结果:忽略检查</label>
+      return <div> 发布成功后自动化检查结果: <label style={{color: "blue"}}>忽略检查</label></div>
     }
 
     return <label>发布成功后自动化检查结果:

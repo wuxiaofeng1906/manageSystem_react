@@ -100,7 +100,7 @@ const loadReleaseWaySelect = async () => {
 
 
 // 关联值班名单
-const loadDutyNamesSelect = async () => {
+const loadDutyNamesSelect = async (showEmpty: boolean = true) => {
   const dutyNames = await queryDutyNames();
   const nameOptions: any = [];
 
@@ -113,7 +113,10 @@ const loadDutyNamesSelect = async () => {
       },
     });
   } else if (dutyNames.data) {
-    nameOptions.push(<Option key={'免'} value={'免'}>{'免'}</Option>)
+    if (showEmpty) {
+      nameOptions.push(<Option key={'免'} value={'免'}>{'免'}</Option>);
+    }
+
     const datas = dutyNames.data;
     datas.forEach((dutyInfo: any) => {
       nameOptions.push(
@@ -124,7 +127,7 @@ const loadDutyNamesSelect = async () => {
 
     });
   }
-return nameOptions;
+  return nameOptions;
 };
 
 /* endregion */
@@ -132,8 +135,7 @@ return nameOptions;
 /* region 升级服务 */
 
 // 一键部署ID下拉框
-const loadReleaseIDSelect = async (releaseNum: string) =>
-  {
+const loadReleaseIDSelect = async (releaseNum: string) => {
     const IDs = await queryReleaseId(releaseNum);
     const idData: any = [];
 
@@ -171,8 +173,7 @@ const loadReleaseIDSelect = async (releaseNum: string) =>
 ;
 
 // 上线环境
-const loadOnlineEnvSelect = async () =>
-  {
+const loadOnlineEnvSelect = async () => {
     const envs = await getOnlineDev();
     const envData: any = [];
 
@@ -202,8 +203,7 @@ const loadOnlineEnvSelect = async () =>
 ;
 
 // 发布项
-const loadPulishItemSelect = async () =>
-  {
+const loadPulishItemSelect = async () => {
     const source = await getPulishItem();
     const resultArray: any = [];
 
@@ -231,8 +231,7 @@ const loadPulishItemSelect = async () =>
 ;
 
 // 是否接口和数据库升级
-const loadIsApiAndDbUpgradeSelect = async () =>
-  {
+const loadIsApiAndDbUpgradeSelect = async () => {
     const source = await getIsApiAndDatabaseUpgrade();
     const resultArray: any = [];
 
@@ -266,8 +265,7 @@ const loadIsApiAndDbUpgradeSelect = async () =>
 /* region 升级接口 */
 
 // 升级接口
-const loadUpgradeApiSelect = async () =>
-  {
+const loadUpgradeApiSelect = async () => {
     const source = await getUpgradeApi();
     const resultArray: any = [];
 
@@ -297,8 +295,7 @@ const loadUpgradeApiSelect = async () =>
 ;
 
 // 接口服务
-const loadApiServiceSelect = async () =>
-  {
+const loadApiServiceSelect = async () => {
     const source = await getApiService();
     const resultArray: any = [];
 
@@ -326,8 +323,7 @@ const loadApiServiceSelect = async () =>
 ;
 
 // 接口method
-const loadApiMethodSelect = async () =>
-  {
+const loadApiMethodSelect = async () => {
     const source = await getApiMethod();
     const resultArray: any = [];
 
@@ -361,8 +357,7 @@ const loadApiMethodSelect = async () =>
 /* region 数据修复 */
 
 // 修复类型select
-const loadCategorySelect = async () =>
-  {
+const loadCategorySelect = async () => {
     const source = await getRepaireCategory();
     const resultArray: any = [];
 
@@ -392,8 +387,7 @@ const loadCategorySelect = async () =>
 ;
 
 // 修复类型select
-const loadCommiterSelect = async () =>
-  {
+const loadCommiterSelect = async () => {
     const source = await getAllDeptUsers();
     const resultArray: any = [];
 
@@ -424,8 +418,7 @@ const loadCommiterSelect = async () =>
 /* region 上线分支 */
 
 // 技术侧下拉框
-const loadTechSideSelect = async () =>
-  {
+const loadTechSideSelect = async () => {
     const source = await getTechSide();
     const resultArray: any = [];
 
@@ -455,8 +448,7 @@ const loadTechSideSelect = async () =>
 ;
 
 // 分支名称下拉框
-const loadBranchNameSelect = async () =>
-  {
+const loadBranchNameSelect = async () => {
     const source = await getBranchName();
     const resultArray: any = [];
 
@@ -484,8 +476,7 @@ const loadBranchNameSelect = async () =>
 ;
 
 // 服务下拉框
-const loadServiceSelect = async (branchName: any) =>
-  {
+const loadServiceSelect = async (branchName: any) => {
     const source = await getServices({branch: branchName});
     const resultArray: any = [];
 
@@ -520,8 +511,7 @@ const loadServiceSelect = async (branchName: any) =>
 ;
 
 // 镜像环境下拉框
-const loadImgEnvSelect = async () =>
-  {
+const loadImgEnvSelect = async () => {
     const source = await getImgEnv();
     const resultArray: any = [];
 
@@ -549,8 +539,7 @@ const loadImgEnvSelect = async () =>
 ;
 
 // 测试环境
-const loadTestEnvSelect = async () =>
-  {
+const loadTestEnvSelect = async () => {
     const source = await getTestEnv();
     const resultArray: any = [];
 
@@ -578,8 +567,7 @@ const loadTestEnvSelect = async () =>
 ;
 
 // 检查类型下拉框
-const loadCheckTypeSelect = async (type: string) =>
-  {
+const loadCheckTypeSelect = async (type: string) => {
     // 检查类型，上线后自动化检查类型只显示UI选项，其余不显示。
     const source = await getCheckType();
     const resultArray: any = [];
@@ -621,8 +609,7 @@ const loadCheckTypeSelect = async (type: string) =>
 ;
 
 // 浏览器下拉框
-const loadBrowserTypeSelect = async () =>
-  {
+const loadBrowserTypeSelect = async () => {
     const source = await getBrowserType();
     const resultArray: any = [];
 
@@ -653,26 +640,26 @@ const loadBrowserTypeSelect = async () =>
 /* endregion */
 
 export
-  {
-    loadPrjNameSelect,
-      loadReleaseTypeSelect,
-      loadReleaseWaySelect,
-      loadReleaseIDSelect,
-      loadOnlineEnvSelect,
-      loadPulishItemSelect,
-      loadIsApiAndDbUpgradeSelect,
-      loadUpgradeApiSelect,
-      loadApiServiceSelect,
-      loadApiMethodSelect,
-      loadCategorySelect,
-      loadCommiterSelect,
-      loadTechSideSelect,
-      loadBranchNameSelect,
-      loadServiceSelect,
-      loadImgEnvSelect,
-      loadTestEnvSelect,
-      loadCheckTypeSelect,
-      loadBrowserTypeSelect,
-      loadDutyNamesSelect
-  }
-;
+{
+  loadPrjNameSelect,
+  loadReleaseTypeSelect,
+  loadReleaseWaySelect,
+  loadReleaseIDSelect,
+  loadOnlineEnvSelect,
+  loadPulishItemSelect,
+  loadIsApiAndDbUpgradeSelect,
+  loadUpgradeApiSelect,
+  loadApiServiceSelect,
+  loadApiMethodSelect,
+  loadCategorySelect,
+  loadCommiterSelect,
+  loadTechSideSelect,
+  loadBranchNameSelect,
+  loadServiceSelect,
+  loadImgEnvSelect,
+  loadTestEnvSelect,
+  loadCheckTypeSelect,
+  loadBrowserTypeSelect,
+  loadDutyNamesSelect
+}
+  ;

@@ -76,7 +76,13 @@ const releasedList = () => {
     field: 'online_release_num',
     minWidth: 130,
     maxWidth: 150,
-    // sort: "asc"
+    cellRenderer: (params: any) => {
+      //   如果没有正式发布编号，则显示未灰度发布编号
+      if (params.value) {
+        return params.value;
+      }
+      return params.data?.ready_release_num;
+    }
   }, {
     headerName: '发布名称',
     field: 'release_name',

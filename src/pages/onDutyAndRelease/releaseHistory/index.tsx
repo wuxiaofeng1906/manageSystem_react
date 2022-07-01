@@ -27,7 +27,7 @@ const formalQueryCondition = {
   end: dayjs().format("YYYY-MM-DD HH:mm:ss"),
   project: "",
   page: 1, // 跳转到第几页
-  pageSize: 10  // 一页显示多少条数据
+  pageSize: 100  // 一页显示多少条数据
 }
 const start = dayjs().subtract(30, 'day').format("YYYY-MM-DD HH:mm:ss");
 const end = dayjs().format("YYYY-MM-DD HH:mm:ss");

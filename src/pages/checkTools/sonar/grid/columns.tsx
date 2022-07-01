@@ -71,9 +71,15 @@ export const colums = () => {
       }
     },
     {
-      headerName: 'bug生成到禅道',
+      headerName: '严重bug生成到禅道',
       field: 'releaseToZt',
       minWidth: 90,
+      cellRenderer: (params: any) => {
+        if (params.value === "yes") {
+          return "是";
+        }
+        return "否";
+      }
     },
     {
       headerName: 'bug指派人',

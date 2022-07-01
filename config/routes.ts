@@ -347,7 +347,6 @@ export default [
                 icon: 'table',
                 path: 'palnDeviationRate',
                 component: './kpi/performance/testers/palnDeviationRate',
-                // hideInMenu: true,
               },
               {
                 name: '测试-A类客户服务投入比',

@@ -90,10 +90,11 @@ const savePreProjects = async (source: any, releaseNum: string) => {
     return result;
   }
 
-  if (!source.relateDutyName) {
-    result.errorMessage = '关联值班名单不能为空！';
-    return result;
-  }
+  // 如果只有一个emergency项目，则不需要验证是否为空
+  // if (!source.relateDutyName) {
+  //   result.errorMessage = '关联值班名单不能为空！';
+  //   return result;
+  // }
 
   // 验证权限(值班测试和超级管理员)
   const authData = {

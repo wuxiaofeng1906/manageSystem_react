@@ -538,6 +538,19 @@ export default [
         component: './onDutyAndRelease/dutyPlan',
       },
       {
+        name: '值班列表',
+        icon: 'table',
+        path: 'dutyList',
+        component: './onDutyAndRelease/dutyDirectory/dutyList',
+      },
+      {
+        name: '值班名单',
+        icon: 'table',
+        path: 'dutyCatalog/:id',
+        hideInMenu: true,
+        component: './onDutyAndRelease/dutyDirectory/dutyCatalog',
+      },
+      {
         name: '发布过程',
         icon: 'table',
         path: 'preRelease',
@@ -661,6 +674,64 @@ export default [
         name: '日志查询',
         path: 'logs',
         component: './log',
+      },
+    ],
+  },
+  {
+    name: '上线系统',
+    icon: 'table',
+    path: '/systemOnline',
+    // hideInMenu: true,
+    routes: [
+      {
+        name: '发布列表',
+        icon: 'table',
+        path: 'publishList',
+        component: './systemOnline/publishList',
+      },
+      {
+        name: '预发布',
+        icon: 'table',
+        path: 'prePublish',
+        component: './systemOnline/prePublish/layout',
+        hideChildrenInMenu: true,
+        hideInMenu: true,
+        routes: [
+          {
+            path: 'projectServices',
+            component: './systemOnline/prePublish/projectServices',
+          },
+          {
+            path: 'deploy',
+            component: './systemOnline/prePublish/deploy',
+          },
+          {
+            path: 'check',
+            component: './systemOnline/prePublish/check',
+          },
+          {
+            path: 'publish',
+            component: './systemOnline/prePublish/publish',
+          },
+          {
+            path: 'overview',
+            component: './systemOnline/prePublish/overview',
+          },
+          {
+            path: 'worksheet',
+            component: './systemOnline/prePublish/worksheet',
+          },
+          {
+            path: '/',
+            redirect: './systemOnline/prePublish/projectServices',
+          },
+        ],
+      },
+      {
+        name: '前端服务配置',
+        icon: 'table',
+        path: 'webServicesSetting',
+        component: './systemOnline/webServicesSetting',
       },
     ],
   },

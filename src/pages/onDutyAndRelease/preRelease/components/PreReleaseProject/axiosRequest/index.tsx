@@ -27,7 +27,7 @@ const savePrePulishProjects = async (params: any, listNo: string) => {
     plan_release_time: dayjs(params.pulishTime).format('YYYY-MM-DD HH:mm:ss'),
     ready_release_num: listNo,
     ignore_check: params.ignoreZentaoList,
-    person_duty_num: params.relateDutyName
+    person_duty_num: params.relateDutyName === '免' ? "" : params.relateDutyName
   };
 
   if (params.proid) {
@@ -64,7 +64,7 @@ const savePrePulishProjects = async (params: any, listNo: string) => {
 
 // 保存预发布项目
 const savePreProjects = async (source: any, releaseNum: string) => {
-  debugger;
+
   let result = {
     datas: [],
     errorMessage: '',
@@ -89,6 +89,7 @@ const savePreProjects = async (source: any, releaseNum: string) => {
     result.errorMessage = '发布时间不能为空！';
     return result;
   }
+
 
   if (!source.relateDutyName) {
     result.errorMessage = '关联值班名单不能为空！';

@@ -151,7 +151,7 @@ const PreReleaseProject: React.FC<any> = () => {
         proid: preReleaseData.pro_id,
         ignoreZentaoList: preReleaseData.ignoreZentaoList,
         checkListStatus: preReleaseData.checkListStatus,
-        relateDutyName: preReleaseData.relateDutyName
+        relateDutyName: preReleaseData.relateDutyName === '' ? "免" : preReleaseData.relateDutyName
       });
     }
   }, [preReleaseData]);
@@ -224,7 +224,7 @@ const PreReleaseProject: React.FC<any> = () => {
                   <Col span={7}>
                     {/* 关联值班名单 */}
                     <Form.Item label="关联值班名单:" name="relateDutyName" style={{marginLeft: 5}}>
-                      <Select onFocus={releaseItemFocus} showSearch
+                      <Select onFocus={releaseItemFocus} showSearch defaultValue={''}
                               filterOption={(inputValue: string, option: any) =>
                                 !!option.children.includes(inputValue)}>
                         {relateDutyNameArray}

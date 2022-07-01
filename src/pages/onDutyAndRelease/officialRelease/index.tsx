@@ -36,7 +36,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   const onlineReleaseNum = props.location?.query?.onlineReleaseNum; // 正式发布列表的数据
   const historyQuery = props.location?.query?.history === "true";
   const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
-  const dutyNameArray = useRequest(() => loadDutyNamesSelect()).data; // 关联值班名单
+  const dutyNameArray = useRequest(() => loadDutyNamesSelect(false)).data; // 关联值班名单
   const pageData = useRequest(() => getOfficialReleaseDetails(onlineReleaseNum)).data; // 界面数据获取
   onlineEnv = useRequest(() => getOnlineEnv()).data; // 上线集群环境
 
@@ -397,9 +397,8 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                         let currentValue;
                         if (params.value) {
                           currentValue = (params.value).split(",");
+                          otherSaveCondition.releaseEnv = params.value;
                         }
-
-                        otherSaveCondition.releaseEnv = params.value;
                         showProcessStatus(); // 展示进度
                         return (
                           <Select

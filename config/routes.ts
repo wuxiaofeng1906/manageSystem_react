@@ -232,6 +232,43 @@ export default [
                 path: 'defectExclusionRate',
                 component: './kpi/performance/developer/defectExclusionRate',
               },
+              {
+                name: '项目计划偏差率',
+                icon: 'table',
+                path: 'projectPlanDeviationRate',
+                component: './kpi/performance/developer/projectPlanDeviationRate',
+              },
+              {
+                name: '管理事务计划偏差率',
+                icon: 'table',
+                path: 'manWorkPlanDevRate',
+                component: './kpi/performance/developer/manWorkPlanDevRate',
+              },
+              {
+                name: '提测计划偏差率',
+                icon: 'table',
+                path: 'devShowTestPlanDeviationRate',
+                component: './kpi/performance/developer/devShowTestPlanDeviationRate',
+              },
+              {
+                name: '开发-A类客户服务投入比',
+                icon: 'table',
+                path: 'cusInputRate_A',
+                component: './kpi/performance/developer/cusInputRate_A',
+              },
+              {
+                name: '开发-用户体验优化投入比',
+                icon: 'table',
+                path: 'cusExperienceInputRate',
+                component: './kpi/performance/developer/cusExperienceInputRate',
+              },
+              {
+                name: '开发-发布引入emergency数',
+                icon: 'table',
+                path: 'releaseEmergencyCount',
+                component: './kpi/performance/developer/releaseEmergencyCount',
+
+              },
             ],
           },
           {

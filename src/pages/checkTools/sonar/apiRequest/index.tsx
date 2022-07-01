@@ -3,6 +3,7 @@ import {Select} from "antd";
 import {axiosGet, axiosPost} from "@/publicMethods/axios";
 import {errorMessage} from "@/publicMethods/showMessages";
 import React from "react";
+import {getAllDeptUsers} from "@/publicMethods/verifyAxios";
 
 const {Option} = Select;
 const sys_accessToken = localStorage.getItem("accessId");
@@ -34,6 +35,7 @@ export const queryDevelopViews = async (pages: Number, pageSize: Number) => {
         }
         const serverDatas = res.data.data.data;
         serverDatas.forEach((ele: any, index: any) => {
+          // debugger;
           datas.push({
             NO: startId - index,
             ID: ele.number,
@@ -45,6 +47,8 @@ export const queryDevelopViews = async (pages: Number, pageSize: Number) => {
             excResult: ele.perform_result,
             url: ele.task_url,
             taskLog: ele.log_url,
+            releaseToZt: ele.is_bug_zt,
+            bugAssignedTo: ele.bug_assign
           });
         });
       } else {
@@ -116,5 +120,22 @@ export const getProjectPathCombobox = async () => {
 // 执行扫描任务
 export const executeTask = async (datas: any) => {
   return await axiosPost('/api/sonar/job/build', datas)
+}
 
+// bug指派人
+export const getBugAssigendTo = async () => {
+  const devCenterPerson = await getAllDeptUsers();
+  if (devCenterPerson.message) {
+    errorMessage(devCenterPerson.message);
+    return [];
+  }
+  const userOption: any = [];
+  const users = devCenterPerson.data;
+  if (users && users.length) {
+    users.forEach((ele: any) => {
+      userOption.push(<Option key={ele.user_id} value={ele.user_id}>{ele.user_name}</Option>,);
+    });
+  }
+
+  return userOption;
 }

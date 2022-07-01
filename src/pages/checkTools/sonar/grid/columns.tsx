@@ -71,6 +71,16 @@ export const colums = () => {
       }
     },
     {
+      headerName: 'bug生成到禅道',
+      field: 'releaseToZt',
+      minWidth: 90,
+    },
+    {
+      headerName: 'bug指派人',
+      field: 'bugAssignedTo',
+      minWidth: 90,
+    },
+    {
       headerName: '操作',
       minWidth: 130,
       cellRenderer: (params: any) => {

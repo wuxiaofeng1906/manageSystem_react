@@ -8,14 +8,14 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {
-  Button, message, Form, Select,
-  Modal, Input, Divider, Spin
+  Button, message, Form, Select, Row, Col,
+  Modal, Input, Divider, Spin, Checkbox
 } from 'antd';
 import {colums} from "./grid/columns";
 import {getHeight} from '@/publicMethods/pageSet';
 import {
   queryDevelopViews, getSonarDetails, getBranchNameCombobox, getProjectPathCombobox,
-  executeTask
+  executeTask, getBugAssigendTo
 } from "./apiRequest";
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 
@@ -29,6 +29,7 @@ const JenkinsCheck: React.FC<any> = () => {
     currentUser.user_id = initialState.currentUser === undefined ? "" : initialState.currentUser.userid;
   }
 
+  const personArray = useRequest(() => getBugAssigendTo()).data;
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>();
   const {data, loading} = useRequest(() => queryDevelopViews(1, 20));
@@ -54,6 +55,8 @@ const JenkinsCheck: React.FC<any> = () => {
   const [loadState, setLoadSate] = useState(false);
   // 执行按钮是否禁用
   const [isButtonClick, setIsButtonClick] = useState("none");
+  // bug指派人是否禁用
+  const [bugAssigned, setBugAssigned] = useState(true);
   // 弹出层是否可见
   const [isCheckModalVisible, setCheckModalVisible] = useState(false);
   const [formForCarrySonar] = Form.useForm();
@@ -167,6 +170,8 @@ const JenkinsCheck: React.FC<any> = () => {
       ProjectPath: "",
       BranchName: "",
       ProjectKey: "",
+      releaseToZentao: "no",
+      bugAssignedTo: ""
     });
   };
 
@@ -176,44 +181,64 @@ const JenkinsCheck: React.FC<any> = () => {
     // LanguageType 、 ProjectPath 和 BranchName不能为空
     const language = modalData.LanguageType;
     if (!language) {
-      errorMessage(`LanguageType 为必选项！`)
+      errorMessage(`LanguageType 为必选项！`);
+      return;
     }
     const ProjectPaths = modalData.ProjectPath;
     if (!ProjectPaths) {
       errorMessage(`ProjectPaths 为必选项！`);
+      return;
     }
     const BranchNames = modalData.BranchName;
     if (!BranchNames) {
       errorMessage(`BranchName 为必选项！`);
+      return;
     }
-    if (language && ProjectPaths && BranchNames) {
-      // 传入参数错误：422  ；连接问题：422
-      const datas = {
-        name: "sonar-project-scan",
-        user_name: currentUser.user_name,
-        user_id: currentUser.user_id,
-        job_parm: [
-          {name: "languageType", value: language},
-          {name: "projectPath", value: ProjectPaths},
-          {name: "branchName", value: BranchNames},
-          {name: "projectKey", value: modalData.ProjectKey},
-        ]
-      };
 
-      setLoadSate(true);
-      const executeRt = await executeTask(datas);
-      if (executeRt.code === 200) {
-        const newData = await queryDevelopViews(1, 20);
-        gridApi.current?.setRowData(newData.datas);
-        showPageInfo(newData.pageInfo);
-        setCheckModalVisible(false);
-        sucMessage("执行完毕！");
-        setIntervalForUpdateStatus();
-      } else {
-        errorMessage(`执行失败：${executeRt.msg}`);
+    // 严重bug是否生成到禅道：如果勾选了，那么后面的指派人为必填项。如果没勾选，后面指派人可以为空。
+    let isBugToZentao = modalData.releaseToZentao;
+    let bugAssignedt = "";
+    if (isBugToZentao && isBugToZentao.length > 0) {
+      bugAssignedt = modalData.bugAssignedTo;
+      if (!bugAssignedt) {
+        errorMessage(`Bug指派人不能为空！`);
+        return;
       }
-      setLoadSate(false);
+      isBugToZentao = isBugToZentao[0].toString();
+
+    } else {
+      isBugToZentao = "no";
     }
+
+    // 传入参数错误：422 ；连接问题：422
+    const datas = {
+      name: "sonar-project-scan",
+      user_name: currentUser.user_name,
+      user_id: currentUser.user_id,
+      job_parm: [
+        {name: "languageType", value: language},
+        {name: "projectPath", value: ProjectPaths},
+        {name: "branchName", value: BranchNames},
+        {name: "projectKey", value: modalData.ProjectKey},
+        {name: "is_bug_zt", value: isBugToZentao},  // yes  no
+        {name: "bug_assign", value: bugAssignedt},
+      ]
+    };
+    debugger;
+    setLoadSate(true);
+    const executeRt = await executeTask(datas);
+    if (executeRt.code === 200) {
+      const newData = await queryDevelopViews(1, 20);
+      gridApi.current?.setRowData(newData.datas);
+      showPageInfo(newData.pageInfo);
+      setCheckModalVisible(false);
+      sucMessage("执行完毕！");
+      setIntervalForUpdateStatus();
+    } else {
+      errorMessage(`执行失败：${executeRt.msg}`);
+    }
+    setLoadSate(false);
+
   };
 
   // 刷新表格
@@ -223,6 +248,14 @@ const JenkinsCheck: React.FC<any> = () => {
     showPageInfo(newData.pageInfo);
   };
 
+  // 扫描成功后bug生成到禅道(指派人是否可用)
+  const bugToZentaoChanged = (params: any) => {
+    if (params && params.length > 0) {
+      setBugAssigned(false);
+    } else {
+      setBugAssigned(true);
+    }
+  }
   /* endregion */
 
   /* region 翻页以及页面跳转功能 */
@@ -433,11 +466,11 @@ const JenkinsCheck: React.FC<any> = () => {
       {/* 弹出层：扫描任务  isCheckModalVisible */}
       <Modal
         title={'sonar扫描任务'}
-        visible={isCheckModalVisible}
+        visible={isCheckModalVisible}  //
         onCancel={checkModalCancel}
         centered={true}
         width={550}
-        bodyStyle={{height: 300}}
+        bodyStyle={{height: 340}}
         footer={
           [
             <Spin spinning={loadState} tip="Loading...">
@@ -465,7 +498,6 @@ const JenkinsCheck: React.FC<any> = () => {
             <Input defaultValue={"sonar-project-scan"} disabled={true}
                    style={{marginLeft: 35, width: 390, color: "black"}}/>
           </Form.Item>
-
           <Divider style={{marginTop: -25}}>任务参数</Divider>
           <div>
             <Form.Item name="LanguageType" label="LanguageType" style={{marginTop: -15}}>
@@ -503,7 +535,28 @@ const JenkinsCheck: React.FC<any> = () => {
             <div style={{marginTop: -23, marginLeft: 104, fontSize: "x-small", color: "gray"}}>
               sonar中展示的项目名称，唯一
             </div>
+          </div>
+          <div>
+            <Row gutter={8}>
+              <Col span={14}>
+                <Form.Item name="releaseToZentao" label="扫描成功后严重bug是否自动生成到禅道" style={{marginTop: 7}}>
 
+                  <Checkbox.Group style={{width: '100%'}} onChange={bugToZentaoChanged}>
+                    <Checkbox value={"yes"}></Checkbox>
+                  </Checkbox.Group>
+
+                </Form.Item>
+              </Col>
+              <Col span={10}>
+                <Form.Item name="bugAssignedTo" label="Bug指派人" style={{marginTop: 7}}>
+                  <Select showSearch style={{marginLeft: 10, width: '100%'}} disabled={bugAssigned}
+                          filterOption={(inputValue: string, option: any) =>
+                            !!option.children.includes(inputValue)}>
+                    {personArray}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
           </div>
         </Form>
       </Modal>

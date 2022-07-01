@@ -8,7 +8,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {useRequest} from 'ahooks';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {
-  Button, message, Form, Select, Row, Col,
+  Button, Form, Select, Row, Col,
   Modal, Input, Divider, Spin, Checkbox
 } from 'antd';
 import {colums} from "./grid/columns";
@@ -117,7 +117,6 @@ const JenkinsCheck: React.FC<any> = () => {
       currentPages = Number(pageInfo.pageCount);
     }
 
-
     setPages({
       totalCounts: totalCount,
       countsOfPage: countsOfPages,
@@ -126,7 +125,6 @@ const JenkinsCheck: React.FC<any> = () => {
       jumpToPage: 1
     });
   };
-
 
   /* endregion 下拉框数据加载 */
 
@@ -224,7 +222,7 @@ const JenkinsCheck: React.FC<any> = () => {
         {name: "bug_assign", value: bugAssignedt},
       ]
     };
-    debugger;
+
     setLoadSate(true);
     const executeRt = await executeTask(datas);
     if (executeRt.code === 200) {
@@ -281,17 +279,10 @@ const JenkinsCheck: React.FC<any> = () => {
         ...Pages,
         currentPage: Pages.currentPage - 1
       });
-
       const newData = await queryDevelopViews(Pages.currentPage - 1, Pages.countsOfPage);
       gridApi.current?.setRowData(newData.datas);
     } else {
-      message.error({
-        content: '当前页已是第一页！',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage('当前页已是第一页！');
     }
   };
 
@@ -307,13 +298,7 @@ const JenkinsCheck: React.FC<any> = () => {
       const newData = await queryDevelopViews(Pages.currentPage + 1, Pages.countsOfPage);
       gridApi.current?.setRowData(newData.datas);
     } else {
-      message.error({
-        content: '当前页已是最后一页！',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage('当前页已是最后一页！');
     }
   };
 
@@ -322,22 +307,10 @@ const JenkinsCheck: React.FC<any> = () => {
 
     const pageCounts = Number(params.currentTarget.defaultValue);
     if (pageCounts.toString() === "NaN") {
-      message.error({
-        content: '请输入有效跳转页数！',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage('请输入有效跳转页数！')
     } else if (pageCounts > Pages.totalPages) {
       // 提示已超过最大跳转页数
-      message.error({
-        content: '已超过最大跳转页数!',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      errorMessage('已超过最大跳转页数!');
     } else {
       const newData = await queryDevelopViews(Number(params.currentTarget.defaultValue), Pages.countsOfPage);
       gridApi.current?.setRowData(newData.datas);
@@ -358,6 +331,8 @@ const JenkinsCheck: React.FC<any> = () => {
       let prjPath = "";
       let branchNames = "";
       let prjKey = "";
+      let butTpzt = "";
+      let assignedTo = "";
       details.forEach((dts: any) => {
         switch (dts.name) {
           case "languageType":
@@ -372,6 +347,13 @@ const JenkinsCheck: React.FC<any> = () => {
           case "projectKey":
             prjKey = dts.value;
             break;
+          case "is_bug_zt":
+            butTpzt = dts.value;
+            break;
+          case "bug_assign":
+            assignedTo = dts.value;
+            break;
+
           default:
             break;
         }
@@ -383,7 +365,15 @@ const JenkinsCheck: React.FC<any> = () => {
         ProjectPath: prjPath,
         BranchName: branchNames,
         ProjectKey: prjKey,
+        releaseToZentao: butTpzt,
+        bugAssignedTo: assignedTo
       });
+
+      if (butTpzt === 'yes') {
+        setBugAssigned(false);
+      } else {
+        setBugAssigned(true);
+      }
     }
   };
   /* endregion */

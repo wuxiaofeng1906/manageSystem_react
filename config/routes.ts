@@ -306,6 +306,37 @@ export default [
                 path: 'effectiveExampleRate',
                 component: './kpi/performance/testers/effectiveExampleRate',
               },
+              {
+                name: '千行bug率收敛',
+                icon: 'table',
+                path: 'bugRateConvergency',
+                component: './kpi/performance/testers/bugRateConvergency',
+                // hideInMenu: true,
+              },
+              {
+                name: '测试计划偏差率',
+                icon: 'table',
+                path: 'palnDeviationRate',
+                component: './kpi/performance/testers/palnDeviationRate',
+              },
+              {
+                name: '测试-A类客户服务投入比',
+                icon: 'table',
+                path: 'cusInputRate_A',
+                component: './kpi/performance/testers/cusInputRate_A',
+              },
+              {
+                name: '测试-用户体验优化投入比',
+                icon: 'table',
+                path: 'cusExperienceInputRate',
+                component: './kpi/performance/testers/cusExperienceInputRate',
+              },
+              {
+                name: '测试-发布引入emergency数',
+                icon: 'table',
+                path: 'releaseEmergencyCount',
+                component: './kpi/performance/testers/releaseEmergencyCount',
+              },
             ],
           },
           {

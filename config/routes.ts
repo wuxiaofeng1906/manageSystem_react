@@ -486,6 +486,7 @@ export default [
         path: 'officialRelease',
         component: './onDutyAndRelease/officialRelease',
         hideInMenu: true
+
       }
     ],
   },

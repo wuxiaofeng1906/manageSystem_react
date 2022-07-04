@@ -40,6 +40,7 @@ const UpgradeService: React.FC<any> = () => {
     modifyReleasedID, allLockedArray, operteStatus,
   } = useModel('releaseProcess');
   const [formUpgradeService] = Form.useForm(); // 升级服务
+  const [releaseIdDisable, setReleaseIdDisable] = useState(false);
   // 暂时忽略掉一键部署ID后端服务的获取
 
   /* region 升级服务： 发布项表格 */
@@ -476,6 +477,26 @@ const UpgradeService: React.FC<any> = () => {
 
   /* region 服务确认 */
 
+  // 修改一键部署ID是否可以修改状态
+  const modifyReleaseIdStatus = (newData_confirm: any) => {
+    debugger
+
+    // 任务：62713 ：升级服务当所有人员都确认通过，一键部署ID列表置为灰色不可编辑，需要编辑时，需要测试取消确认(修改确认状态为"是")
+    if (newData_confirm && newData_confirm.length > 0) {
+      const confirmInfo = newData_confirm[0];
+
+      if (confirmInfo.front_confirm_status === "1" && confirmInfo.back_end_confirm_status === "1"
+        && confirmInfo.global_confirm_status === "1" && confirmInfo.jsf_confirm_status === "1"
+        && confirmInfo.openapi_confirm_status === "1" && confirmInfo.process_confirm_status === "1"
+        && confirmInfo.qbos_store_confirm_status === "1" && confirmInfo.test_confirm_status === "1") {
+        setReleaseIdDisable(true);
+      } else if (confirmInfo.test_confirm_status === "2") {
+        setReleaseIdDisable(false);
+      }
+    } else {
+      setReleaseIdDisable(false);
+    }
+  };
   // 下拉框选择是否确认事件
   const saveUperConfirmInfo = async (newValue: string, props: any) => {
     const currentReleaseNum = props.data?.ready_release_num;
@@ -529,7 +550,7 @@ const UpgradeService: React.FC<any> = () => {
     const result = await confirmUpgradeService(datas);
     if (result === '') {
       message.info({
-        content: '保存成功！',
+        content: '确认结果保存成功！',
         duration: 1,
         style: {
           marginTop: '50vh',
@@ -553,10 +574,10 @@ const UpgradeService: React.FC<any> = () => {
     }
 
     //   (不管成功或者失败)刷新表格
-    const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
-    serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
-    serverConfirmGridApi2.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
-
+    const newData_confirm: any = (await alalysisInitData('pulishConfirm', currentReleaseNum))?.upService_confirm;
+    serverConfirmGridApi.current?.setRowData(newData_confirm); // 需要给服务确认刷新数据
+    serverConfirmGridApi2.current?.setRowData(newData_confirm); // 需要给服务确认刷新数据
+    modifyReleaseIdStatus(newData_confirm);
   };
   /* endregion */
 
@@ -569,13 +590,16 @@ const UpgradeService: React.FC<any> = () => {
     });
   };
   useEffect(() => {
-
     showArrays();
+
   }, [releasedID]);
 
   useEffect(() => {
     currentOperateStatus = operteStatus;
-  }, [operteStatus]);
+    // 一键部署ID是否可以修改
+    modifyReleaseIdStatus(upgradeConfirm.gridData);
+
+  }, [operteStatus,upgradeConfirm.gridData]);
   return (
     <div>
       {/* 升级服务 */}
@@ -602,7 +626,7 @@ const UpgradeService: React.FC<any> = () => {
                       <Select
                         mode="multiple"
                         size={'small'}
-                        disabled={currentOperateStatus}
+                        disabled={releaseIdDisable}
                         style={{width: '100%'}}
                         showSearch
                         onChange={onReleaseIdChanges}
@@ -624,7 +648,7 @@ const UpgradeService: React.FC<any> = () => {
                         marginLeft: 10,
                         marginTop: 3,
                       }}
-                      disabled={currentOperateStatus}
+                      disabled={releaseIdDisable}
                       onClick={inquireServiceClick}
                     >
                       点击查询

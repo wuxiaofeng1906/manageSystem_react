@@ -254,4 +254,124 @@ const converseForAgGrid_Convergency = (oraDatas: any) => {
   return converseArrayToOne(resultArray);
 };
 
-export {converseFormatForAgGrid, converseDataForAgGrid_code, converseForAgGrid_Convergency};
+
+// 使用界面：计划偏差率
+const converseForAgGrid_planDevition = (oraDatas: any) => {
+  if (!oraDatas) return [];
+  const resultArray: any = [];
+  // 解析部门数据
+  oraDatas.forEach((elements: any) => {
+    const starttime = elements.range.start;
+    // 新增研发中心数据
+    resultArray.push({
+      Group: ['研发中心'],
+      [starttime]: (elements.total.kpi)*100,
+      isDept: true
+    });
+
+    // 部门数据
+    const departDatas = elements.datas;
+    departDatas.forEach((depts: any) => {
+      const groups: any = [depts.deptName];
+      findParent(departDatas, depts, groups);
+      // 新增部门
+      resultArray.push({
+        Group: groups,
+        [starttime]: (depts.kpi)*100,
+        isDept: true
+      });
+    });
+  });
+  return converseArrayToOne(resultArray);
+};
+
+// 使用界面：发布引入emergency数（只显示部门数据，显示原始数据）
+const converseForAgGrid_showDepts = (oraDatas: any) => {
+  if (!oraDatas) return [];
+  const resultArray: any = [];
+  // 解析部门数据
+  oraDatas.forEach((elements: any) => {
+    const starttime = elements.range.start;
+    // 新增研发中心数据
+    resultArray.push({
+      Group: ['研发中心'],
+      [starttime]: elements.total.kpi,
+      isDept: true
+    });
+
+    // 部门数据
+    const departDatas = elements.datas;
+    departDatas.forEach((depts: any) => {
+      const groups: any = [depts.deptName];
+      findParent(departDatas, depts, groups);
+      // 新增部门
+      resultArray.push({
+        Group: groups,
+        [starttime]: depts.kpi,
+        isDept: true
+      });
+    });
+  });
+  return converseArrayToOne(resultArray);
+};
+
+// 测试A类客户投入比
+const converseForAgGrid_cusInputRate = (oraDatas: any) => {
+  if (!oraDatas) return [];
+  const resultArray: any = [];
+  // 解析部门数据
+  oraDatas.forEach((elements: any) => {
+    const starttime = elements.range.start;
+    // 新增研发中心数据
+    resultArray.push({
+      Group: ['研发中心'],
+      [starttime]: (elements.total.kpi) * 100,
+      [`${starttime}_numerator`]: elements.total.sideKpi.numerator,
+      [`${starttime}_denominator`]: elements.total.sideKpi.denominator,
+      isDept: true
+    });
+
+    // 部门数据
+    const departDatas = elements.datas;
+    departDatas.forEach((depts: any) => {
+      const groups: any = [depts.deptName];
+      findParent(departDatas, depts, groups);
+      // 新增部门
+      resultArray.push({
+        Group: groups,
+        [starttime]: (depts.kpi) * 100,
+        [`${starttime}_numerator`]: depts.sideKpi.numerator,
+        [`${starttime}_denominator`]: depts.sideKpi.denominator,
+        isDept: true
+      });
+
+      /* region 人员数据 */
+      const usersArray = depts.users;
+      if (usersArray) {
+        usersArray.forEach((user: any) => {
+          const usersGroup = JSON.parse(JSON.stringify(groups));
+          usersGroup.push(user.userName);
+          resultArray.push({
+            Group: usersGroup,
+            [starttime]: (user.kpi) * 100,
+            [`${starttime}_numerator`]: user.sideKpi.numerator,
+            [`${starttime}_denominator`]: user.sideKpi.denominator,
+            isDept: false
+          });
+        });
+      }
+
+      /* endregion 人员数据 */
+    });
+  });
+  return converseArrayToOne(resultArray);
+};
+
+export {
+  converseFormatForAgGrid,
+  converseDataForAgGrid_code,
+  converseForAgGrid_Convergency,
+  converseForAgGrid_planDevition,
+  converseForAgGrid_cusInputRate,
+  converseForAgGrid_showDepts
+};

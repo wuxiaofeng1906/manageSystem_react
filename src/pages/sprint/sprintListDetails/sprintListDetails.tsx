@@ -43,6 +43,7 @@ import {
 import defaultTreeSelectParams from "@/pages/shimo/fileBaseline/iterateList/defaultSetting";
 
 let ora_filter_data: any = [];
+let gird_filter_condition: any = []; // 表格自带过滤了的条件
 const {Option} = Select;
 const SprintList: React.FC<any> = () => {
   const {initialState} = useModel('@@initialState');
@@ -182,7 +183,35 @@ const SprintList: React.FC<any> = () => {
   /* endregion 下拉框动态加载 */
 
   /* region 表格更新 */
+
+  // 获取表格中的过滤条件
+  const getGridFilterValue = (params: any) => {
+    const columnID = params.column?.colId;
+    // 判断是否有对应列，有的话删除后再添加，
+    if (gird_filter_condition && gird_filter_condition.length) {
+      gird_filter_condition.forEach((ele: any, index: number) => {
+        if (ele.column === columnID) {
+          gird_filter_condition.splice(index, 1);
+        }
+      })
+    }
+
+    const filterValues: any = [];
+    const currentValue: any = params.filterInstance.valueModel.selectedValues;
+    currentValue.forEach((ele: any) => {
+      filterValues.push(ele);
+    });
+    if (filterValues.length > 0) {
+      gird_filter_condition.push({
+        column: columnID,
+        filterValue: filterValues
+      });
+    }
+
+    console.log("gird_filter_condition", gird_filter_condition)
+  }
   const updateGrid = async () => {
+    // 需要结合筛选条件
     const datas: any = await queryDevelopViews(gqlClient, prjId, prjType);
     ora_filter_data = datas?.result;
     onSelectChanged()
@@ -1053,7 +1082,7 @@ const SprintList: React.FC<any> = () => {
   const nessField = ['选择', '序号', '类型', '编号']; // 必需的列
   const unNessField = ['阶段', '测试', '测试确认', '标题内容', '创建时间', '解决时间', '所属计划', '严重等级', '截止日期', '模块', '状态', '已提测', '发布环境',
     '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', "是否涉及页面调整", '是否可热更', '是否清缓存', '是否有数据升级',
-    '是否有接口升级', '是否有预置数据修改', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人','是否延期'];
+    '是否有接口升级', '是否有预置数据修改', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人', '是否延期'];
 
   const onSetFieldsChange = (checkedValues: any) => {
     setSelectedFiled(checkedValues);
@@ -1342,6 +1371,7 @@ const SprintList: React.FC<any> = () => {
             onGridSizeChanged={onGridReady}
             onColumnEverythingChanged={onGridReady}
             tooltipShowDelay={500}
+            onFilterModified={getGridFilterValue}
           />
 
         </div>

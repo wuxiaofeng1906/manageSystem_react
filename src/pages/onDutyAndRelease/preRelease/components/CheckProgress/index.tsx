@@ -51,7 +51,7 @@ const CheckProgress: React.FC<any> = () => {
     if (!isModalVisible.autoCheckDisabled) { // 是发布成功
       if (formData.ignoreAfterCheck === undefined || (formData.ignoreAfterCheck).length === 0) { // 不忽略的时候
         if (formData.checkResult === undefined || (formData.checkResult).length === 0) { // 一个结果都没选中
-          errorMessage("检查结果必须至少勾选一项！")
+          errorMessage("检查结果必须至少勾选一项！", 1);
           return;
         }
       }

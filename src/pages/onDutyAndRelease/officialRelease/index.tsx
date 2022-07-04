@@ -388,6 +388,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                   }}
                   headerHeight={35}
                   rowHeight={30}
+                  suppressRowTransform={true} // 合并单元格需要
                   onGridReady={serviceGridReady}
                   onGridSizeChanged={serviceGridReady}
                   onColumnEverythingChanged={serviceGridReady}

@@ -60,7 +60,7 @@ const FilterSelector = ({
               onDeselect={onDeselect}
               onBlur={onBlur}
               disabled={disabled}
-              options={[{ ...init }].concat(
+              options={(isEmpty(init) ? [] : [init]).concat(
                 options
                   .map((it: any) => ({
                     ...it,
@@ -246,9 +246,7 @@ const DutyCatalog = () => {
       project_pm: values.project_pm?.map((it: any) => it.user_id)?.join(),
       release_env: values?.release_env?.join(),
       release_method: values.release_method,
-      release_time: `${moment(values.duty_date).format('YYYY-MM-DD')} ${moment(
-        values.release_time,
-      ).format('HH:mm:ss')}`,
+      release_time: moment(values.release_time).format('YYYY-MM-DD HH:mm:ss'),
     };
 
     const flag = isEqual(omit(data, 'user_id'), {
@@ -274,11 +272,21 @@ const DutyCatalog = () => {
         getFirstDuty();
         return;
       }
-      const front = res.front?.filter((it: any) => it.user_type == 'head');
-      const backend = res.backend?.filter((it: any) => it.user_type == 'head');
-      const test = res.test?.filter((it: any) => it.user_type == 'head');
-      const sqa = res.sqa?.filter((it: any) => it.user_type == 'head');
-      const operations = res.operations?.filter((it: any) => it.user_type == 'head');
+      const front = res.front
+        ?.filter((it: any) => it.user_type == 'head')
+        .map((it: any) => ({ ...it, user_tech: '前端' }));
+      const backend = res.backend
+        ?.filter((it: any) => it.user_type == 'head')
+        .map((it: any) => ({ ...it, user_tech: '后端' }));
+      const test = res.test
+        ?.filter((it: any) => it.user_type == 'head')
+        .map((it: any) => ({ ...it, user_tech: '测试' }));
+      const sqa = res.sqa
+        ?.filter((it: any) => it.user_type == 'head')
+        .map((it: any) => ({ ...it, user_tech: 'SQA' }));
+      const operations = res.operations
+        ?.filter((it: any) => it.user_type == 'head')
+        .map((it: any) => ({ ...it, user_tech: '运维' }));
 
       setDutyPerson(
         front.concat(backend, test, operations, sqa).map((o: any, i: number) => ({
@@ -286,8 +294,8 @@ const DutyCatalog = () => {
           key: o.user_id,
           type: 'head',
           disabled: true,
-          user_tech: Object.keys(recentType)[i] ?? '',
-          label: `${o.user_name}(${Object.keys(recentType)[i] ?? ''}值班负责人)`,
+          user_tech: o.user_tech,
+          label: `${o.user_name}(${o.user_tech}值班负责人)`,
           fit: `${o.user_id}_head`,
         })),
       );
@@ -353,11 +361,11 @@ const DutyCatalog = () => {
         : it.user,
     }));
     form.setFieldsValue({
-      front: [initDutyObj?.front.value],
-      backend: [initDutyObj?.backend.value],
-      test: [initDutyObj?.test.value],
-      sqa: [initDutyObj?.sqa.value],
-      operations: [initDutyObj?.operations.value],
+      front: initDutyObj?.front ? [initDutyObj?.front?.value] : undefined,
+      backend: initDutyObj?.backend ? [initDutyObj?.backend?.value] : undefined,
+      test: initDutyObj?.test ? [initDutyObj?.test?.value] : undefined,
+      sqa: initDutyObj?.sqa ? [initDutyObj?.sqa?.value] : undefined,
+      operations: initDutyObj?.operations ? [initDutyObj?.operations?.value] : undefined,
     });
     setProjects(formatProject);
     setRecentDuty(initDutyObj);
@@ -468,7 +476,7 @@ const DutyCatalog = () => {
                       allowClear={false}
                       disabled={!hasPermission}
                       onChange={async () => {
-                        const title = await updateTitle();
+                        const title = (await updateTitle()) || '';
                         setTitle(title);
                       }}
                       onBlur={onSave}
@@ -500,11 +508,11 @@ const DutyCatalog = () => {
                             mode={'multiple'}
                             disabled={!hasPermission}
                             onSelect={async () => {
-                              const title = await updateTitle();
+                              const title = (await updateTitle()) || '';
                               setTitle(title);
                             }}
                             onDeselect={async () => {
-                              const title = await updateTitle();
+                              const title = (await updateTitle()) || '';
                               setTitle(title);
                               await onSave();
                             }}
@@ -529,12 +537,13 @@ const DutyCatalog = () => {
                   </Form.Item>
                 </th>
                 <th>发布时间</th>
-                <th style={{ width: 90, maxWidth: 120 }}>
+                <th style={{ width: 150, maxWidth: 170 }}>
                   <Form.Item name={'release_time'}>
-                    <DatePicker.TimePicker
-                      format={'HH:mm'}
+                    <DatePicker
+                      format={'YYYY-MM-DD HH:mm'}
                       allowClear={false}
                       onBlur={onSave}
+                      showTime={{ defaultValue: moment('23:00:00', 'HH:mm') }}
                       disabled={!hasPermission}
                     />
                   </Form.Item>

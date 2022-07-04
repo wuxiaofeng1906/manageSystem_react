@@ -43,7 +43,7 @@ import {
 import defaultTreeSelectParams from "@/pages/shimo/fileBaseline/iterateList/defaultSetting";
 
 let ora_filter_data: any = [];
-let gird_filter_condition: any = []; // 表格自带过滤了的条件
+const gird_filter_condition: any = []; // 表格自带过滤了的条件
 const {Option} = Select;
 const SprintList: React.FC<any> = () => {
   const {initialState} = useModel('@@initialState');
@@ -109,17 +109,27 @@ const SprintList: React.FC<any> = () => {
     solvedSelect: []
   });
 
-  // 获取表格中的数据
-  const getGridData = () => {
+  // 获取表格中的数据(最原始的，从gql中拿取的数据)
+  const getOraGridData = () => {
     const datas: any = [];
     gridApi.current?.forEachNode((rows: any) => {
       datas.push(rows?.data);
     });
     return datas;
   }
+
+  // 获取表格中的数据（进行过滤后，界面可以看到的数据）
+  const getFilteredGridData = () => {
+    const datas: any = [];
+    gridApi.current?.forEachNodeAfterFilter((rows: any) => {
+      datas.push(rows?.data);
+    });
+    return datas;
+  }
+
   // 部门下拉框
   const onDeptSelectFocus = async () => {
-    const optionArray: any = await devCenterDept(gqlClient, getGridData());
+    const optionArray: any = await devCenterDept(gqlClient, getFilteredGridData());
     setSelectOptions({
       ...selectOption,
       deptSelect: optionArray
@@ -127,7 +137,7 @@ const SprintList: React.FC<any> = () => {
   };
   // 获取阶段下拉框
   const onStageSelectFocus = () => {
-    const optionArray: any = getStageOption(getGridData());
+    const optionArray: any = getStageOption(getFilteredGridData());
     setSelectOptions({
       ...selectOption,
       stageSelect: optionArray
@@ -136,7 +146,7 @@ const SprintList: React.FC<any> = () => {
 
   // 获取类型下拉框
   const onTypeSelectFocus = () => {
-    const optionArray: any = getTypeOption(getGridData());
+    const optionArray: any = getTypeOption(getFilteredGridData());
     setSelectOptions({
       ...selectOption,
       typeSelect: optionArray
@@ -145,7 +155,7 @@ const SprintList: React.FC<any> = () => {
 
   // 获取指派给下拉框
   const onAssignedSelectFocus = () => {
-    const optionArray: any = getAssignedToOption(personName?.assignedTo, getGridData());
+    const optionArray: any = getAssignedToOption(personName?.assignedTo, getFilteredGridData());
     setSelectOptions({
       ...selectOption,
       assignedSelect: optionArray
@@ -154,7 +164,7 @@ const SprintList: React.FC<any> = () => {
 
   // 测试下拉框
   const onTestSelectFocus = () => {
-    const optionArray: any = getTesterOption(personName?.tester, getGridData());
+    const optionArray: any = getTesterOption(personName?.tester, getFilteredGridData());
     setSelectOptions({
       ...selectOption,
       testSelect: optionArray
@@ -163,7 +173,7 @@ const SprintList: React.FC<any> = () => {
 
   // 解决人/完成人
   const onSolvedSelectFocus = () => {
-    const optionArray: any = getSolvedByOption(personName?.solvedBy, getGridData());
+    const optionArray: any = getSolvedByOption(personName?.solvedBy, getFilteredGridData());
     setSelectOptions({
       ...selectOption,
       solvedSelect: optionArray
@@ -171,13 +181,21 @@ const SprintList: React.FC<any> = () => {
 
   };
 
-  // 阶段选择
+  // 条件选择
   const onSelectChanged = () => {
     const queryCondition = formForQuery.getFieldsValue();
     const filterData = filterDatasByCondition(queryCondition, ora_filter_data);
     gridApi.current?.setRowData(filterData);
+
+    // 过滤表格自带条件
+    const hardcodedFilter = {};
+    gird_filter_condition.forEach((ele: any) => {
+      hardcodedFilter[ele.column] = {type: "set", values: ele.filterValue};
+    });
+    gridApi.current?.setFilterModel(hardcodedFilter);
+
     // 还要设置title
-    const countRt = calTypeCount(filterData);
+    const countRt = calTypeCount(getFilteredGridData());
     setPageTitle(getStaticMessage(countRt));
   };
   /* endregion 下拉框动态加载 */

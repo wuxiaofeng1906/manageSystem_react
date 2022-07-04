@@ -6,9 +6,8 @@ import { initGridTable } from '@/pages/systemOnline/constants';
 import OnlineServices from '@/services/online';
 import { useLocation, useModel } from 'umi';
 import { Modal, Spin } from 'antd';
-import { isArray } from 'lodash';
+import { isArray, omit } from 'lodash';
 import { useCheckDetail } from '@/hooks/online';
-import { omit } from '@/utils/utils';
 
 const Detail = () => {
   const gridApi = useRef<GridApi>();

@@ -1,5 +1,6 @@
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import { COMMON_STATUS, DEPLOY_TYPE, PUBLISH_STATUS } from './constants';
+import { ColumnType } from 'antd/lib/table';
 
 const cellRenderStatus = ({ value }: any) =>
   `<span class="${
@@ -502,6 +503,266 @@ const publishDetailColumn: (ColDef | ColGroupDef)[] = [
   },
 ];
 
+const OverviewSummary: (ColDef | ColGroupDef)[] = [
+  {
+    headerName: '序号',
+    width: 90,
+    field: 'num',
+    cellRenderer: (params: any) => (+params.node.id + 1).toString(),
+  },
+  {
+    headerName: '项目名称',
+    field: 'project_name',
+  },
+  {
+    headerName: '项目负责人',
+    field: 'project_pm',
+  },
+  {
+    headerName: 'BUG总数',
+    field: 'bugTotal',
+  },
+  {
+    headerName: '激活BUG',
+    field: 'bugActive',
+  },
+  {
+    headerName: '已解决BUG',
+    field: 'bugDone',
+  },
+  {
+    headerName: '已关闭BUG',
+    field: 'bugClosed',
+  },
+  {
+    headerName: 'BUG-P0',
+    field: 'bugP0',
+  },
+  {
+    headerName: 'BUG-P1',
+    field: 'bugP1',
+  },
+  {
+    headerName: 'BUG-P2',
+    field: 'bugP2',
+  },
+  {
+    headerName: 'BUG-P3',
+    field: 'bugP3',
+  },
+];
+const OverviewInfo: ColumnType<any>[] = [
+  {
+    title: '序号',
+    dataIndex: 'num',
+    align: 'center',
+    fixed: 'left',
+    onCell: (record: any) => ({ rowSpan: record.rowSpan }),
+  },
+  {
+    title: '归属执行',
+    dataIndex: 'project_name',
+    fixed: 'left',
+    className: 'pre-line',
+    width: '8%',
+    onCell: (record: any) => ({ rowSpan: record.rowSpan }),
+  },
+  {
+    title: '需求编号',
+    dataIndex: 'taskNum',
+    fixed: 'left',
+    onCell: (record: any) => ({ rowSpan: record.rowSpan }),
+  },
+  {
+    title: '需求标题',
+    dataIndex: 'title',
+    fixed: 'left',
+    width: '8%',
+    className: 'pre-line',
+    onCell: (record: any) => ({ rowSpan: record.rowSpan }),
+  },
+  {
+    title: '需求状态',
+    dataIndex: 'demandStatus',
+    onCell: (record: any) => ({ rowSpan: record.rowSpan }),
+  },
+  {
+    title: '需求阶段',
+    dataIndex: 'taskStage',
+    onCell: (record: any) => ({ rowSpan: record.rowSpan }),
+  },
+  {
+    title: '对应任务ID',
+    dataIndex: 'taskID',
+  },
+  {
+    title: '对应任务名称',
+    dataIndex: 'taskName',
+    width: '13%',
+  },
+  {
+    title: '对应指派人',
+    dataIndex: 'pointer',
+  },
+  {
+    title: '对应完成人',
+    dataIndex: 'finishedPerson',
+  },
+  {
+    title: '任务状态',
+    dataIndex: 'taskStatus',
+  },
+  {
+    title: '计划开始时间',
+    dataIndex: 'planStartTime',
+  },
+  {
+    title: '计划截止时间',
+    dataIndex: 'planEndTime',
+  },
+  {
+    title: '实际开始时间',
+    dataIndex: 'actualStartTime',
+  },
+  {
+    title: '实际完成时间',
+    dataIndex: 'actualEndTime',
+  },
+];
+const OverviewBugLog: (ColDef | ColGroupDef)[] = [
+  {
+    headerName: '序号',
+    width: 70,
+    field: 'num',
+    cellRenderer: (params: any) => (+params.node.id + 1).toString(),
+  },
+  {
+    headerName: '归属执行',
+    field: 'project_name',
+  },
+  {
+    headerName: 'BUG编号',
+    field: 'bugNum',
+  },
+  {
+    headerName: 'BUG描述',
+    field: 'desc',
+  },
+  {
+    headerName: 'BUG创建时间',
+    field: 'createTime',
+  },
+  {
+    headerName: 'BUG指派时间',
+    field: 'pointTime',
+  },
+  {
+    headerName: 'BUG状态',
+    field: 'status',
+  },
+  {
+    headerName: 'BUG解决时间',
+    field: 'endTime',
+  },
+];
+const OverviewBug: (ColDef | ColGroupDef)[] = [
+  {
+    headerName: '序号',
+    width: 100,
+    field: 'num',
+    cellRenderer: (params: any) => (+params.node.id + 1).toString(),
+  },
+  {
+    headerName: '归属执行',
+    field: 'project_name',
+    minWidth: 120,
+  },
+  {
+    headerName: '测试单名称',
+    field: 'testName',
+    minWidth: 120,
+  },
+  {
+    headerName: '测试单对应版本',
+    field: 'version',
+    minWidth: 120,
+  },
+  {
+    headerName: '状态',
+    field: 'status',
+    minWidth: 120,
+  },
+  {
+    headerName: '负责人',
+    field: 'editer',
+    minWidth: 120,
+  },
+  {
+    headerName: '开始日期',
+    field: 'startTime',
+    minWidth: 120,
+  },
+  {
+    headerName: '结束日期',
+    field: 'endTime',
+    minWidth: 120,
+  },
+  {
+    headerName: '用例总数',
+    field: 'caseTotal',
+    minWidth: 120,
+  },
+  {
+    headerName: '通过用例',
+    field: 'passNumber',
+    minWidth: 120,
+  },
+  {
+    headerName: '阻塞用例数',
+    field: 'blockCase',
+    minWidth: 120,
+  },
+  {
+    headerName: '失败用例数',
+    field: 'errorCase',
+    minWidth: 120,
+  },
+  {
+    headerName: '失败用例数',
+    field: 'errorCase',
+    minWidth: 120,
+  },
+  {
+    headerName: '未执行用例数',
+    field: 'unexecutedCase',
+    minWidth: 120,
+  },
+  {
+    headerName: 'BUG总数',
+    field: 'bugTotal',
+    minWidth: 120,
+  },
+  {
+    headerName: 'BUG-P1',
+    field: 'bugP1',
+    minWidth: 120,
+  },
+  {
+    headerName: 'BUG-P2',
+    field: 'bugP2',
+    minWidth: 120,
+  },
+  {
+    headerName: 'BUG-P3',
+    field: 'bugP3',
+    minWidth: 120,
+  },
+  {
+    headerName: 'BUG-P4',
+    field: 'bugP4',
+    minWidth: 120,
+  },
+];
 export {
   publishColumn,
   projectUpgradeColumn,
@@ -512,4 +773,8 @@ export {
   servicesSettingColumn,
   serverColumn,
   publishDetailColumn,
+  OverviewSummary,
+  OverviewBugLog,
+  OverviewBug,
+  OverviewInfo,
 };

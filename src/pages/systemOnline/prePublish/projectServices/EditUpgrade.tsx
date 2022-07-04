@@ -7,7 +7,7 @@ import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 import { STATUS_MAP } from '../../constants';
 import OnlineServices from '@/services/online';
 import { PreUpgradeItem } from '@/namespaces';
-import { pick } from '@/utils/utils';
+import { pick } from 'lodash';
 
 interface IEditUprade extends ModalFuncProps {
   data?: PreUpgradeItem;

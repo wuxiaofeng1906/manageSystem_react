@@ -1,0 +1,24 @@
+@import '../../../../global.less';
+
+.overview{
+  .tagList{
+    padding: 0;
+    display: grid;
+    grid-template-columns:repeat(6,auto);
+    grid-row-gap: 8px;
+    li{
+      vertical-align: middle;
+      position: relative;
+      &:before{
+        margin-right: 5px;
+        vertical-align: middle;
+        content: '';
+        width: 16px;
+        height: 16px;
+        background: rgba(@success-color,.75);
+        border: 1px solid #ddd;
+        display: inline-block;
+      }
+    }
+  }
+}

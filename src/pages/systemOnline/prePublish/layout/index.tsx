@@ -6,8 +6,7 @@ import styles from './index.less';
 import moment from 'moment';
 import { PUBLISH_RESULT, MENUS } from '../../constants';
 import { MOMENT_FORMAT } from '@/namespaces';
-import { omit } from '@/utils/utils';
-import { isEmpty } from 'lodash';
+import { isEmpty, omit } from 'lodash';
 import cls from 'classnames';
 
 const PreLayout = ({ location, children }: { location: any; children: React.ReactNode }) => {

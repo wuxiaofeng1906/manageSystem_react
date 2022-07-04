@@ -1,5 +1,7 @@
 import axios from 'axios';
-import { getDutyPersonPermission, getSystemPersonPermission } from '../../../authority/permission';
+import {getDutyPersonPermission, getSystemPersonPermission} from '../../../authority/permission';
+import {saveBeforeAndAfterOnlineAutoCheck} from "@/pages/onDutyAndRelease/preRelease/comControl/axiosRequest";
+import {axiosGet} from "@/publicMethods/axios";
 
 const sys_accessToken = localStorage.getItem('accessId');
 axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
@@ -14,7 +16,7 @@ const getCheckProcess = async (releaseNum: string) => {
     data: [],
   };
   await axios
-    .get('/api/verify/release/progress', { params: { ready_release_num: releaseNum } })
+    .get('/api/verify/release/progress', {params: {ready_release_num: releaseNum}})
     .then(function (res) {
       if (res.data.code === 200) {
         result.data = res.data.data;
@@ -70,4 +72,57 @@ const saveProcessResult = async (releaseNum: string, result: string) => {
   return systemPermission.errorMessage;
 };
 
-export { saveProcessResult, getCheckProcess };
+// 执行上线后自动化检查功能
+const executeAutoCheck = async (source: any, currentListNo: string) => {
+
+  // 上线前后检查: 打勾是yes，没打勾是no
+  let after_ignore_check = 'no';
+  if (source.ignoreAfterCheck && (source.ignoreAfterCheck).length > 0) {
+    after_ignore_check = 'yes'
+  }
+
+  const data = [{
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "ignore_check": after_ignore_check,
+    "check_time": "after",
+    "check_type": "ui",
+    "check_result": "no",
+    "ready_release_num": currentListNo
+  }, {
+    "user_name": usersInfo.name,
+    "user_id": usersInfo.userid,
+    "ignore_check": after_ignore_check,
+    "check_time": "after",
+    "check_type": "applet",
+    "check_result": "no",
+    "ready_release_num": currentListNo
+  }];
+
+  if (after_ignore_check === "no" && (source.checkResult).length > 0) {
+    (source.checkResult).forEach((ele: string) => {
+      if (ele === "ui") {
+        data[0].check_result = "yes";
+      } else if (ele === "applet") {
+        data[1].check_result = "yes";
+      }
+    });
+  }
+
+  const saveRt = await saveBeforeAndAfterOnlineAutoCheck(data);
+  return saveRt;
+};
+
+
+// 自动化检查结果获取
+const getOnlinedAutoCheckResult = async (readyReleaseNum: string) => {
+
+  const data = {
+    ready_release_num: readyReleaseNum,
+    release_time: "gray"
+  }
+  const result = await axiosGet("/api/verify/release/automation", data);
+  return result;
+};
+
+export {saveProcessResult, getCheckProcess, executeAutoCheck, getOnlinedAutoCheckResult};

@@ -6,7 +6,6 @@ import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import '../../style/style.css';
-import {useRequest} from 'ahooks';
 import {loadReleaseIDSelect} from '../../comControl/controler';
 import {
   getReleasedItemColumns, getReleasedApiColumns, getReleaseServiceComfirmColumns,
@@ -41,7 +40,7 @@ const UpgradeService: React.FC<any> = () => {
     modifyReleasedID, allLockedArray, operteStatus,
   } = useModel('releaseProcess');
   const [formUpgradeService] = Form.useForm(); // 升级服务
-  const releaseIDArray = useRequest(() => loadReleaseIDSelect()).data;
+  // 暂时忽略掉一键部署ID后端服务的获取
 
   /* region 升级服务： 发布项表格 */
   const releaseItemGridApi = useRef<GridApi>();
@@ -68,9 +67,22 @@ const UpgradeService: React.FC<any> = () => {
     serverConfirmGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
+
+  const serverConfirmGridApi2 = useRef<GridApi>();
+  const onConfirmGridReady2 = (params: GridReadyEvent) => {
+    serverConfirmGridApi2.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
   /* endregion   */
 
   /* region 一键部署ID相关事件 */
+  const [releaseIDArray, setReleaseIDArray] = useState(null);
+  const getReleaseID = async () => {
+    const releaseIds = await loadReleaseIDSelect(tabsData.activeKey);
+    setReleaseIDArray(releaseIds);
+  };
+
   // ID changed
   const onReleaseIdChanges = async (selectedId: any, params: any) => {
     const allaResult = alaReleasedChanged(releasedID, params, selectedId);
@@ -138,8 +150,7 @@ const UpgradeService: React.FC<any> = () => {
         },
       });
     } else {
-      const newData: any = (await alalysisInitData('pulishItem', tabsData.activeKey))
-        .upService_releaseItem;
+      const newData: any = (await alalysisInitData('pulishItem', tabsData.activeKey))?.upService_releaseItem;
       formUpgradeService.setFieldsValue({
         hitMessage: await getAutoCheckMessage(tabsData.activeKey),
       });
@@ -294,6 +305,7 @@ const UpgradeService: React.FC<any> = () => {
       //   发布项结果保存成功之后，需要刷新发布项中的服务确认完成
       const newData_confirm: any = await alalysisInitData('pulishConfirm', tabsData.activeKey);
       serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认设置一行空值
+      serverConfirmGridApi2.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认设置一行空值
 
       // setGridHeight({
       //   ...gridHeight,
@@ -443,6 +455,7 @@ const UpgradeService: React.FC<any> = () => {
       // (不管成功或者失败)刷新表格
       const newData_confirm: any = await alalysisInitData('pulishConfirm', tabsData.activeKey);
       serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+      serverConfirmGridApi2.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
 
       if (upgradeIntModal.title === '修改') {
         //   释放锁
@@ -471,6 +484,8 @@ const UpgradeService: React.FC<any> = () => {
       // (不管成功或者失败)刷新表格
       const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
       serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+      serverConfirmGridApi2.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+
       return;
     }
 
@@ -523,8 +538,10 @@ const UpgradeService: React.FC<any> = () => {
       // 刷新状态进度条
       const processData: any = await getCheckProcess(currentReleaseNum);
       if (processData) {
-        modifyProcessStatus(showProgressData(processData.data));
+        modifyProcessStatus(await showProgressData(processData.data));
       }
+
+      //   刷新表格
     } else {
       message.error({
         content: `${result}`,
@@ -538,6 +555,8 @@ const UpgradeService: React.FC<any> = () => {
     //   (不管成功或者失败)刷新表格
     const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
     serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+    serverConfirmGridApi2.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+
   };
   /* endregion */
 
@@ -563,7 +582,7 @@ const UpgradeService: React.FC<any> = () => {
       <div>
         <fieldset className={'fieldStyle'}>
           <legend className={'legendStyle'}>
-            Step2 升级服务
+            Step4 升级服务
             <label style={{color: "Gray"}}> (值班测试：填写一键部署ID和测试服务确认完成；前后端值班：填写应用服务和升级接口/对应服务确认完成)
             </label>
           </legend>
@@ -587,6 +606,7 @@ const UpgradeService: React.FC<any> = () => {
                         style={{width: '100%'}}
                         showSearch
                         onChange={onReleaseIdChanges}
+                        onFocus={getReleaseID}
                       >
                         {releaseIDArray}
                       </Select>
@@ -756,6 +776,8 @@ const UpgradeService: React.FC<any> = () => {
                 >
                 </AgGridReact>
               </div>
+
+
               <div
                 className="ag-theme-alpine"
                 style={{height: upgradeConfirm.gridHight, width: '100%'}}
@@ -772,9 +794,9 @@ const UpgradeService: React.FC<any> = () => {
                   rowData={upgradeConfirm.gridData}
                   headerHeight={25}
                   rowHeight={25}
-                  onGridReady={onConfirmGridReady}
-                  onGridSizeChanged={onConfirmGridReady}
-                  onColumnEverythingChanged={onConfirmGridReady}
+                  onGridReady={onConfirmGridReady2}
+                  onGridSizeChanged={onConfirmGridReady2}
+                  onColumnEverythingChanged={onConfirmGridReady2}
                   frameworkComponents={{
                     confirmSelectChoice: (props: any) => {
                       let Color = 'black';

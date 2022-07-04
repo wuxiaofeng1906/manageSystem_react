@@ -433,6 +433,55 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
     `;
 };
 
+// 上线前自动化检查
+const autoCheckRenderer = (params: any) => {
+
+  const autoValue = params.value;
+  if (!autoValue || autoValue.length === 0) {
+    return "";
+  }
+
+  let ignoreCheck = "";
+  let ui_result = "";
+  let ui_color = "black";
+  let api_result = "";
+  let api_color = "black";
+  let applet_result = "";
+  let applet_color = "black";
+
+  if (autoValue && autoValue.length > 0) {
+    autoValue.forEach((ele: any) => {
+      if (ele.ignore_check === "yes") {
+        ignoreCheck = "忽略";
+      } else if (ele.ignore_check === "no" && ele.check_time === "before") {
+        if (ele.check_type === 'ui') {
+          ui_result = ele.check_result === "yes" ? "通过" : "不通过";
+          ui_color = ele.check_result === "yes" ? "#2BF541" : "#8B4513";
+        } else if (ele.check_type === 'api') {
+          api_result = ele.check_result === "yes" ? "通过" : "不通过";
+          api_color = ele.check_result === "yes" ? "#2BF541" : "#8B4513";
+        } else if (ele.check_type === 'applet') {
+          applet_result = ele.check_result === "yes" ? "通过" : "不通过";
+          applet_color = ele.check_result === "yes" ? "#2BF541" : "#8B4513";
+        }
+      }
+    });
+  }
+
+
+  if (ignoreCheck === "忽略") {
+    return `<label style="color: blue;font-size: 10px">忽略</label>`;
+  }
+
+  return `
+  <div>
+      <div style="margin-top: -3px;font-size: 10px;">UI:<label style="color: ${ui_color};padding-left: 22px"> ${ui_result}</label></div>
+      <div style="margin-top: -20px;font-size: 10px">接口:<label style="color: ${api_color};padding-left: 13px"> ${api_result}</label></div>
+      <div style="margin-top: -20px;font-size: 10px">小程序:<label style="color: ${applet_color}"> ${applet_result}</label></div>
+  </div>`;
+
+
+};
 // 封板状态
 const sealStatusRenderer = (params: any) => {
 
@@ -656,18 +705,16 @@ const getOnlineBranchColumns = () => {
       headerName: '上线前自动化检查是否通过',
       field: 'automation_check',
       minWidth: 200,
-      cellRenderer: (param: any) => {
-        return beforeOnlineAutoCheck(param, '1');
-      },
+      cellRenderer: autoCheckRenderer
     },
-    {
-      headerName: '升级后自动化检查是否通过',
-      field: 'automation_check',
-      minWidth: 200,
-      cellRenderer: (param: any) => {
-        return beforeOnlineAutoCheck(param, '2');
-      },
-    },
+    // {
+    //   headerName: '升级后自动化检查是否通过',
+    //   field: 'automation_check',
+    //   minWidth: 200,
+    //   cellRenderer: (param: any) => {
+    //     return beforeOnlineAutoCheck(param, '2');
+    //   },
+    // },
     {
       headerName: '封板状态',
       field: 'branch_sealing_check',

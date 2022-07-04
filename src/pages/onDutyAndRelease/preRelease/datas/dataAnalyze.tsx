@@ -57,6 +57,7 @@ const analysisPreReleaseProject = (datas: any, zentaoData: any) => {
         ready_release_num: project.ready_release_num,
         ignoreZentaoList: zentaoData[0] === undefined ? "" : zentaoData[0].ignore_check,
         checkListStatus: zentaoData[0] === undefined ? "" : zentaoData[0].task_status,
+        relateDutyName:project.person_duty_num
       };
 
       return returnArray;

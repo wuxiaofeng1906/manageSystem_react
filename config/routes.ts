@@ -306,6 +306,13 @@ export default [
                 component: './kpi/performance/testers/on_lineBugIncTester',
               },
               {
+                name: '千行bug率收敛',
+                icon: 'table',
+                path: 'bugRateConvergency',
+                component: './kpi/performance/testers/bugRateConvergency',
+                hideInMenu: true,
+              },
+              {
                 name: '用例执行率',
                 icon: 'table',
                 path: 'exampleCarryRate',
@@ -565,11 +572,18 @@ export default [
         icon: 'table',
         path: 'releaseHistory',
         component: './onDutyAndRelease/releaseHistory',
-      },
+      }, {
+        name: '正式发布',
+        icon: 'table',
+        path: 'officialRelease',
+        component: './onDutyAndRelease/officialRelease',
+        hideInMenu: true
+
+      }
     ],
   },
   {
-    name: '禅道管理',
+    name: "禅道管理",
     icon: 'table',
     path: '/zentao',
     // hideInMenu: true,

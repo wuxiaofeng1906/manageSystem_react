@@ -34,4 +34,10 @@ const judgeAuthorityByName = (method: string) => {
   return authFlag;
 };
 
-export {judgeAuthority, judgeAuthorityByName};
+
+const getCurrentUserInfo = () => {
+  const userLogins: any = localStorage.getItem('userLogins');
+  const usersInfo = JSON.parse(userLogins);
+  return usersInfo;
+}
+export {judgeAuthority, judgeAuthorityByName,getCurrentUserInfo};

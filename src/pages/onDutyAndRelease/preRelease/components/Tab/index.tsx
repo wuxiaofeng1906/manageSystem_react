@@ -34,6 +34,7 @@ const Tab: React.FC<any> = () => {
       onliineCheck: 'Gainsboro',
       releaseResult: '9',
       processPercent: 0,
+      autoCheckResult: <label></label>
     });
 
     // 预发布项目
@@ -76,7 +77,7 @@ const Tab: React.FC<any> = () => {
     // 进度条数据
     const processData: any = await getCheckProcess(tabPageInfo?.activeKey);
     if (processData) {
-      modifyProcessStatus(showProgressData(processData.data));
+      modifyProcessStatus(await showProgressData(processData.data));
     }
 
     // 当前界面被锁住的ID

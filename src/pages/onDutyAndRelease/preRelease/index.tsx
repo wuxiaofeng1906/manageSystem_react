@@ -25,7 +25,7 @@ let currentPanes: any;
 const PreRelease: React.FC<any> = () => {
   // Tab标签数据显示
   const {
-    modifyOperteStatus, tabsData, setTabsData, modifyProcessStatus, modifyPreReleaseData,
+    modifyOperteStatus, tabsData, setTabsData, processStatus, modifyProcessStatus, modifyPreReleaseData,
     lockedItem, setRelesaeItem, setUpgradeApi, setUpgradeConfirm,
     modifyReleasedID, setDataReview, setDataReviewConfirm, setOnlineBranch,
     setCorrespOrder, modifyAllLockedArray
@@ -77,6 +77,7 @@ const PreRelease: React.FC<any> = () => {
 
     // 进度条
     modifyProcessStatus({
+      ...processStatus,
       // 进度条相关数据和颜色
       releaseProject: 'Gainsboro', // #2BF541
       upgradeService: 'Gainsboro',
@@ -153,7 +154,7 @@ const PreRelease: React.FC<any> = () => {
     // 进度条数据
     const processData: any = await getCheckProcess(tabPageInfo?.activeKey);
     if (processData) {
-      modifyProcessStatus(showProgressData(processData.data));
+      modifyProcessStatus(await showProgressData(processData.data));
     }
     // 当前界面被锁住的ID
     const lockedData = await getAllLockedData(tabPageInfo?.activeKey);
@@ -255,9 +256,9 @@ const PreRelease: React.FC<any> = () => {
       <Tab/>
       <CheckProgress/>
       <PreReleaseProject/>
-      <UpgradeService/>
-      <DataRepaireReview/>
       <OnlineBranch/>
+      <DataRepaireReview/>
+      <UpgradeService/>
       <CorrespondingWorkOrder/>
       <DeleteRow/>
     </PageContainer>

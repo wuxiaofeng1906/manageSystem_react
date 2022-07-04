@@ -479,7 +479,6 @@ const UpgradeService: React.FC<any> = () => {
 
   // 修改一键部署ID是否可以修改状态
   const modifyReleaseIdStatus = (newData_confirm: any) => {
-    debugger
 
     // 任务：62713 ：升级服务当所有人员都确认通过，一键部署ID列表置为灰色不可编辑，需要编辑时，需要测试取消确认(修改确认状态为"是")
     if (newData_confirm && newData_confirm.length > 0) {

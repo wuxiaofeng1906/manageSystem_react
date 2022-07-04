@@ -290,7 +290,8 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
             pageAdjust
             stageManual
             testConfirmed
-            consumerAffected
+            clearCache
+            isDelay
           }
       }
   `);

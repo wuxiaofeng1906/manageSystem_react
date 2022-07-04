@@ -446,24 +446,25 @@ const proposedTestValueGetter = (params: any) => {
 };
 
 
-// 用户是否有感
-const consumerAffectedRenderer = (params: any) => {
-  //  默认是：红色。修改的是：橙色，否都为黑色。
+// 是否清缓存
+const clearCacheRenderer = (params: any) => {
+  // 当‘是否清缓存’为’是’的，需要红色显示；
+  // 当‘是否有数据升级’为’是’的，也需要红色显示；
+
   const values = params.value;
   if (!values) {
     return "";
   }
 
   let result = "";
-  let my_color = "";
-  if (values === "-1") { // 手动：是
+  if (values === "-1" || values === "1") {
     result = "是";
-    my_color = "orange";// 橙色
-  } else if (values === "-0" || values === "0") { // 手动：否
+  } else if (values === "-0" || values === "0") {
     result = "否";
-    my_color = "black";// 黄色
-  } else if (values === "1") { // 自动：是
-    result = "是";
+  }
+
+  let my_color = "";
+  if (values === "-1" || values === "1" || params.data?.dataUpdate === "1") {
     my_color = "red";// 红色
   }
   if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
@@ -520,11 +521,24 @@ const timeRenderer = (params: any) => {
 
 };
 
+// 是否延期
+const isDelayTextDecorateRender = (params: any) => {
+  let colors = "black";
+  if (params.value === "是") {
+    colors = "red";
+  }
+
+  if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+    return `<span style="text-decoration:line-through;color: ${colors}"> ${params.value} </span>`;
+  }
+  return `<span style="color: ${colors}"> ${params.value} </span>`;
+
+};
 export {
   textDecorateRender, stageValueGetter, stageRenderer, testerValueGetter, testerRenderer,
-  testConfirmValueGetter, catagoryValueGetter, linkToZentaoPage, servertyValueGetter, consumerAffectedRenderer,
+  testConfirmValueGetter, catagoryValueGetter, linkToZentaoPage, servertyValueGetter, clearCacheRenderer,
   statusValueGetter, statusRenderer, assignedToValueGetter, solvedByValueGetter, relatedNumberRender,
   timestampRenderer, isOrNotValueGetter, testConfirmTooltipValueGetter, testConfirmedRenderer,
   proposedTestValueGetter, testVertifyFilter,
-  vertifyResultValueGetter, sourceValueGetter, timeRenderer
+  vertifyResultValueGetter, sourceValueGetter, timeRenderer, isDelayTextDecorateRender
 };

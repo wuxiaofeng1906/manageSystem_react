@@ -22,14 +22,14 @@ import "./style.css";
 
 const {RangePicker} = DatePicker;
 const formalQueryCondition = {
-  start: dayjs().subtract(7, 'day').format("YYYY-MM-DD HH:mm:ss"),
-  end: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+  start: dayjs().subtract(7, 'day').format("YYYY-MM-DD"),
+  end: dayjs().format("YYYY-MM-DD"),
   project: "",
   page: 1, // 跳转到第几页
   pageSize: 100  // 一页显示多少条数据
 }
-const start = dayjs().subtract(30, 'day').format("YYYY-MM-DD HH:mm:ss");
-const end = dayjs().format("YYYY-MM-DD HH:mm:ss");
+const start = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
+const end = dayjs().format("YYYY-MM-DD");
 
 const ReleaseHistory: React.FC<any> = () => {
   // 设置表格的高度。
@@ -50,18 +50,18 @@ const ReleaseHistory: React.FC<any> = () => {
 
   const [zeroButtonTitle, setZeroButtonTitle] = useState("一键生成1级灰度发布");  // 待发布详情
   // 0级灰度积压列表数据
-  const zeroGrayscaleData = useRequest(() => getGrayscaleListData("zero", start, end)).data;
+  const zeroGrayscaleData = useRequest(() => getGrayscaleListData("zero", start, `${end} 23:59:59`)).data;
   // 根据时间查询
   const onZeroGrayReleaseTimeChanged = async (params: any, times: any) => {
     let startTimes = times[0];
     if (startTimes) {
-      startTimes = dayjs(start).format("YYYY-MM-DD HH:mm:ss");
+      startTimes = dayjs(startTimes).format("YYYY-MM-DD");
     }
     let endTimes = times[1];
     if (endTimes) {
-      endTimes = dayjs(end).format("YYYY-MM-DD HH:mm:ss");
+      endTimes = dayjs(endTimes).format("YYYY-MM-DD");
     }
-    const grayReleaseList = await getGrayscaleListData("zero", startTimes, endTimes);
+    const grayReleaseList = await getGrayscaleListData("zero", startTimes, `${endTimes} 23:59:59`);
     zeroGrayscaleGridApi.current?.setRowData(grayReleaseList?.data);
   };
   // 一键生成正式发布
@@ -102,18 +102,18 @@ const ReleaseHistory: React.FC<any> = () => {
   };
   const [firstButtonTitle, setFirstButtonTitle] = useState("一键生成正式发布");  // 待发布详情
   // 1级灰度积压列表数据
-  const firstGrayscaleData = useRequest(() => getGrayscaleListData("one", start, end)).data;
+  const firstGrayscaleData = useRequest(() => getGrayscaleListData("one", start, `${end} 23:59:59`)).data;
   // 根据时间查询
   const onFirstGrayReleaseTimeChanged = async (params: any, times: any) => {
     let startTimes = times[0];
     if (startTimes) {
-      startTimes = dayjs(start).format("YYYY-MM-DD HH:mm:ss");
+      startTimes = dayjs(startTimes).format("YYYY-MM-DD");
     }
     let endTimes = times[1];
     if (endTimes) {
-      endTimes = dayjs(end).format("YYYY-MM-DD HH:mm:ss");
+      endTimes = dayjs(endTimes).format("YYYY-MM-DD");
     }
-    const grayReleaseList = await getGrayscaleListData("one", startTimes, endTimes);
+    const grayReleaseList = await getGrayscaleListData("one", startTimes, `${endTimes} 23:59:59`);
     firstGrayscaleGridApi.current?.setRowData(grayReleaseList?.data);
   };
   // 一键生成正式发布
@@ -231,7 +231,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
     if (formalQueryCondition.start && formalQueryCondition.end) {
       cond["release_start_time"] = formalQueryCondition.start;
-      cond["release_end_time"] = formalQueryCondition.end;
+      cond["release_end_time"] = `${formalQueryCondition.end} 23:59:59`;
     }
     if (formalQueryCondition.project) {
       cond["project_id"] = formalQueryCondition.project;
@@ -257,8 +257,8 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 根据时间获取
   const onReleaseProject = (params: any, times: any) => {
-    formalQueryCondition.start = times[0] === "" ? "" : dayjs(times[0]).format("YYYY-MM-DD HH:mm:ss");
-    formalQueryCondition.end = times[1] === "" ? "" : dayjs(times[1]).format("YYYY-MM-DD HH:mm:ss");
+    formalQueryCondition.start = times[0] === "" ? "" : dayjs(times[0]).format("YYYY-MM-DD");
+    formalQueryCondition.end = times[1] === "" ? "" : dayjs(times[1]).format("YYYY-MM-DD");
     getReleasedList();
   }
 

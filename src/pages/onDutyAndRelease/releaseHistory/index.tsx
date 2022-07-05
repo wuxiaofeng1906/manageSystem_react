@@ -32,6 +32,11 @@ const start = dayjs().subtract(30, 'day').format("YYYY-MM-DD HH:mm:ss");
 const end = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
 const ReleaseHistory: React.FC<any> = () => {
+  const [gridHeight, setGridHeight] = useState({
+    zeroGrid: 100,
+    firstGrid: 100,
+    formalGrid: 100
+  });
 
   /* region 灰度发布界面 */
 
@@ -144,12 +149,10 @@ const ReleaseHistory: React.FC<any> = () => {
     const releasedNum = releData.data?.ready_release_num;
     history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
   };
-  const [deleteValue, setDeleteValue] = useState(null);
+
   // 删除发布详情
-  const confirmDelete = () => {
-    //
-    console.log(deleteValue);
-    debugger;
+  const confirmDelete = (params: any) => {
+    console.log(params);
   };
 
   // 操作按钮
@@ -162,23 +165,16 @@ const ReleaseHistory: React.FC<any> = () => {
       <Popconfirm
         placement="topRight"
         title={"已停留在灰度积压列表中，请谨慎核对是否需要删除?"}
-        onConfirm={confirmDelete}
+        onConfirm={() => {
+          confirmDelete(params?.data);
+        }}
         okText="是"
         cancelText="否"
       >
-        <Button
-          className={"operateButton"}
-          style={{marginLeft: -20}}
-          onClick={() => {
-            setDeleteValue(params);
-          }
-          }
-        >
+        <Button className={"operateButton"} style={{marginLeft: -20}}>
           <img src="../delete.png" width="20" height="20" alt="删除发布详情" title="删除发布详情"/>
         </Button>
       </Popconfirm>
-
-
     </div>;
   }
 
@@ -195,7 +191,7 @@ const ReleaseHistory: React.FC<any> = () => {
   const projectsArray = useRequest(() => loadPrjNameSelect()).data;
 
   // 正式发布列表数据
-  const releasedData = useRequest(() => getFormalListData(formalQueryCondition)).data;
+  const formalReleasedData = useRequest(() => getFormalListData(formalQueryCondition)).data;
 
   // 根据查询条件获取数据
   const getReleasedList = async () => {
@@ -264,7 +260,28 @@ const ReleaseHistory: React.FC<any> = () => {
   };
   useEffect(() => {
     showButtonTitle();
-  }, [releasedData]);
+
+    // 设置表格高度
+    if (zeroGrayscaleData?.data) {
+      setGridHeight({
+        ...gridHeight,
+        zeroGrid: (zeroGrayscaleData?.data).length * 30 + 80,
+      });
+    }
+
+    if (firstGrayscaleData?.data) {
+      setGridHeight({
+        ...gridHeight,
+        firstGrid: (firstGrayscaleData?.data).length * 30 + 80,
+      });
+    }
+    if (formalReleasedData?.data) {
+      setGridHeight({
+        ...gridHeight,
+        formalGrid: (formalReleasedData?.data).length * 30 + 80
+      });
+    }
+  }, [zeroGrayscaleData, firstGrayscaleData, formalReleasedData]);
 
 
   return (
@@ -285,7 +302,7 @@ const ReleaseHistory: React.FC<any> = () => {
         </div>
         <button></button>
         <div className="ag-theme-alpine"
-             style={{marginTop: -21, height: getHeight() / 3, width: '100%'}}>
+             style={{marginTop: -21, height: gridHeight.zeroGrid, width: '100%'}}>
           <AgGridReact
             columnDefs={grayscaleBacklogList()} // 定义列
             rowData={zeroGrayscaleData?.data} // 数据绑定
@@ -320,7 +337,7 @@ const ReleaseHistory: React.FC<any> = () => {
         </div>
         <button></button>
         <div className="ag-theme-alpine"
-             style={{marginTop: -21, height: getHeight() / 3, width: '100%'}}>
+             style={{marginTop: -21, height: gridHeight.firstGrid, width: '100%'}}>
           <AgGridReact
             columnDefs={grayscaleBacklogList()} // 定义列
             rowData={firstGrayscaleData?.data} // 数据绑定
@@ -357,10 +374,10 @@ const ReleaseHistory: React.FC<any> = () => {
         </div>
 
         <button></button>
-        <div className="ag-theme-alpine" style={{marginTop: -21, height: getHeight() / 3, width: '100%'}}>
+        <div className="ag-theme-alpine" style={{marginTop: -21, height: gridHeight.formalGrid, width: '100%'}}>
           <AgGridReact
             columnDefs={releasedList()} // 定义列
-            rowData={releasedData?.data} // 数据绑定
+            rowData={formalReleasedData?.data} // 数据绑定
             defaultColDef={girdDefaultSetting}
             rowHeight={30}
             headerHeight={35}

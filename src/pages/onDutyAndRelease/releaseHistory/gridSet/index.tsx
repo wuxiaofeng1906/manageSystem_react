@@ -18,7 +18,8 @@ const grayscaleBacklogList = () => {
       maxWidth: 40,
     }, {
       headerName: '序号',
-      maxWidth: 80,
+      minWidth: 70,
+      maxWidth: 70,
       cellRenderer: (params: any) => {
         return Number(params.node.id) + 1;
       },
@@ -35,13 +36,15 @@ const grayscaleBacklogList = () => {
     }, {
       headerName: '工单编号',
       field: 'order',
-      minWidth: 100,
+      minWidth: 90,
     }, {
       headerName: '项目名称',
-      field: 'project_name'
+      field: 'project_name',
+      minWidth: 100,
     }, {
       headerName: '发布环境',
-      field: 'online_environment'
+      field: 'online_environment',
+      minWidth: 100,
     },
     // {
     //   headerName: '发布镜像ID',
@@ -49,14 +52,18 @@ const grayscaleBacklogList = () => {
     // },
     {
       headerName: '发布分支',
-      field: 'branch'
+      field: 'branch',
+      minWidth: 100,
     }, {
       headerName: '灰度发布时间',
       field: 'plan_release_time',
+      minWidth: 100,
       maxWidth: 185
     }, {
       headerName: '操作',
-      cellRenderer: "grayReleaseDetails"
+      cellRenderer: "grayReleaseDetails",
+      minWidth: 120,
+      maxWidth: 120
     }];
 
   return column;
@@ -104,10 +111,12 @@ const releasedList = () => {
     minWidth: 90,
   }, {
     headerName: '项目名称',
-    field: 'project_name'
+    field: 'project_name',
+    minWidth: 90,
   }, {
     headerName: '发布环境',
-    field: 'online_environment'
+    field: 'online_environment',
+    minWidth: 90,
   },
     //   {
     //   headerName: '发布镜像ID',
@@ -115,23 +124,16 @@ const releasedList = () => {
     // },
     {
       headerName: '发布分支',
-      field: 'branch'
+      field: 'branch',
+      minWidth: 90,
     }, {
       headerName: '正式发布时间',
       field: 'plan_release_time'
     }, {
       headerName: '操作',
-      cellRenderer: "officialReleaseDetails"
-      // cellRenderer: (params: any) => {
-      //   const readyReleaseNum = params.data?.ready_release_num;
-      //   return `
-      //     <div style="margin-top: -5px">
-      //          <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='releaseProcessDetail(${JSON.stringify(readyReleaseNum)})'>
-      //             <img src="../logs.png" width="20" height="20" alt="正式发布过程详情" title="正式发布过程详情" />
-      //         </Button>
-      //     </div>
-      //         `;
-      // }
+      cellRenderer: "officialReleaseDetails",
+      minWidth: 120,
+      maxWidth: 120
     }];
   return columns;
 };

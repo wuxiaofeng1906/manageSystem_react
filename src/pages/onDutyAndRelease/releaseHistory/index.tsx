@@ -438,13 +438,20 @@ const ReleaseHistory: React.FC<any> = () => {
                 return (
                   <div>
                     <Button
-                      style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
+                      className={"operateButton"}
                       onClick={() => gotoGrayReleasePage(params)}>
                       <img src={"../gray_detail_normal.png"} width="20" height="20" alt="发布过程详情" title="发布过程详情"/>
                     </Button>
                     <Button
+                      // className={"operateButton"}
                       disabled={buttonDisable}
-                      style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
+                      style={{
+                        border: "none",
+                        backgroundColor: "transparent",
+                        fontSize: "small",
+                        color: "#46A0FC",
+                        marginLeft: -15
+                      }}
                       onClick={() => gotoOnlineReleasePage(params)}>
                       <img src={srcPath} width="20" height="20" alt="正式发布详情" title="正式发布详情"/>
                     </Button>

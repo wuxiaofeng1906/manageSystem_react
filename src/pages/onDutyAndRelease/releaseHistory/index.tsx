@@ -28,14 +28,12 @@ const formalQueryCondition = {
   page: 1, // 跳转到第几页
   pageSize: 100  // 一页显示多少条数据
 }
-
-
+// 0级灰度发布列表时间
 let zeroStart = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
 let zeroEnd = dayjs().format("YYYY-MM-DD");
-
+// 1级灰度发布列表时间
 let firstStart = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
 let firstEnd = dayjs().format("YYYY-MM-DD");
-
 
 const ReleaseHistory: React.FC<any> = () => {
   // 设置表格的高度。
@@ -60,17 +58,14 @@ const ReleaseHistory: React.FC<any> = () => {
   // 一键生成正式发布
   const generateFormalZeroRelease = async () => {
     const sel_rows = zeroGrayscaleGridApi.current?.getSelectedRows();
-
     // 如果是待发布详情，则不需要判断有没有勾选
     if (zeroButtonTitle === "待发布详情") {
       history.push(`/onDutyAndRelease/officialRelease?releaseType=gray`);
     } else {
-
       if (sel_rows?.length === 0) {
         errorMessage("请先勾选需要发布的数据！")
         return;
       }
-
       const ready_release_num: any = [];
       sel_rows?.forEach((ele: any) => {
         ready_release_num.push(ele.ready_release_num);
@@ -101,13 +96,11 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 根据时间查询
   const onZeroGrayReleaseTimeChanged = async (params: any, times: any) => {
-    const startTimes = times[0];
-    if (startTimes) {
-      zeroStart = dayjs(startTimes).format("YYYY-MM-DD");
+    if (times[0]) {
+      zeroStart = dayjs(times[0]).format("YYYY-MM-DD");
     }
-    const endTimes = times[1];
-    if (endTimes) {
-      zeroEnd = dayjs(endTimes).format("YYYY-MM-DD");
+    if (times[1]) {
+      zeroEnd = dayjs(times[1]).format("YYYY-MM-DD");
     }
     // 更新数据
     await refreshZeroReleaseGrid();
@@ -165,20 +158,18 @@ const ReleaseHistory: React.FC<any> = () => {
   };
   // 根据时间查询
   const onFirstGrayReleaseTimeChanged = async (params: any, times: any) => {
-    const startTimes = times[0];
-    if (startTimes) {
-      firstStart = dayjs(startTimes).format("YYYY-MM-DD");
+    if (times[0]) {
+      firstStart = dayjs(times[0]).format("YYYY-MM-DD");
     }
-    const endTimes = times[1];
-    if (endTimes) {
-      firstEnd = dayjs(endTimes).format("YYYY-MM-DD");
+    if (times[1]) {
+      firstEnd = dayjs(times[1]).format("YYYY-MM-DD");
     }
     await refreshFirstReleaseGrid();
   };
 
   /* endregion */
 
-  // 跳转到灰度界面
+  // 跳转到预发布界面
   const gotoGrayReleasePage = (releData: any) => {
     const releasedNum = releData.data?.ready_release_num;
     history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
@@ -252,7 +243,10 @@ const ReleaseHistory: React.FC<any> = () => {
     }
     const result = await getFormalListData(cond);
     releasedGridApi.current?.setRowData(result.data);
-
+    setGridHeight({
+      ...gridHeight,
+      formalGrid: (result.data).length * 30 + 80
+    })
   };
 
   // 根据项目获取

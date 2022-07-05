@@ -39,7 +39,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
   const dutyNameArray = useRequest(() => loadDutyNamesSelect(false)).data; // 关联值班名单
   const pageData = useRequest(() => getOfficialReleaseDetails(onlineReleaseNum, releaseType)).data; // 界面数据获取
-  onlineEnv = useRequest(() => getOnlineEnv()).data; // 上线集群环境
+  onlineEnv = useRequest(() => getOnlineEnv(releaseType)).data; // 上线集群环境
 
   const releaseServiceGridApi = useRef<GridApi>();
   const serviceGridReady = (params: GridReadyEvent) => {

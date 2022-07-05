@@ -25,7 +25,6 @@ import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
 
 // 灰度发布列表
 const getGrayscaleListData = async (releaseMethod: string, startTime: string, endTime: string) => {
-  debugger;
 
   const result: any = {
     message: "",
@@ -103,7 +102,7 @@ const getPreReleaseNum = async () => {
 };
 
 // 一键正式发布
-const releaseOnline = async (onlineReleaseNum: string, releaseNums: string, releaseType) => {
+const releaseOnline = async (onlineReleaseNum: string, releaseNums: string, releaseType: string) => {
   const users = getCurrentUserInfo();
   const data = {
     "user_name": users.name,
@@ -118,7 +117,7 @@ const releaseOnline = async (onlineReleaseNum: string, releaseNums: string, rele
 };
 
 // 获取预发布详情，只有获取成功了才跳转页面
-const getOnlineProocessDetails = async (releaseNums: any, releaseType) => {
+const getOnlineProocessDetails = async (releaseNums: any, releaseType: string) => {
 
   // 首先需要先获取预发布编号
   const newReleaseNum = (await getPreReleaseNum())?.ready_release_num;

@@ -4,7 +4,7 @@ import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {GridApi, GridReadyEvent} from 'ag-grid-community';
+import type {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useRequest} from "ahooks";
 import {
   getGrayscaleListData, getFormalListData, vertifyOnlineProjectExit, getOnlineProocessDetails,
@@ -28,8 +28,14 @@ const formalQueryCondition = {
   page: 1, // 跳转到第几页
   pageSize: 100  // 一页显示多少条数据
 }
-const start = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
-const end = dayjs().format("YYYY-MM-DD");
+
+
+let zeroStart = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
+let zeroEnd = dayjs().format("YYYY-MM-DD");
+
+let firstStart = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
+let firstEnd = dayjs().format("YYYY-MM-DD");
+
 
 const ReleaseHistory: React.FC<any> = () => {
   // 设置表格的高度。
@@ -50,20 +56,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
   const [zeroButtonTitle, setZeroButtonTitle] = useState("一键生成1级灰度发布");  // 待发布详情
   // 0级灰度积压列表数据
-  const zeroGrayscaleData = useRequest(() => getGrayscaleListData("zero", start, `${end} 23:59:59`)).data;
-  // 根据时间查询
-  const onZeroGrayReleaseTimeChanged = async (params: any, times: any) => {
-    let startTimes = times[0];
-    if (startTimes) {
-      startTimes = dayjs(startTimes).format("YYYY-MM-DD");
-    }
-    let endTimes = times[1];
-    if (endTimes) {
-      endTimes = dayjs(endTimes).format("YYYY-MM-DD");
-    }
-    const grayReleaseList = await getGrayscaleListData("zero", startTimes, `${endTimes} 23:59:59`);
-    zeroGrayscaleGridApi.current?.setRowData(grayReleaseList?.data);
-  };
+  const zeroGrayscaleData = useRequest(() => getGrayscaleListData("zero", zeroStart, `${zeroEnd} 23:59:59`)).data;
   // 一键生成正式发布
   const generateFormalZeroRelease = async () => {
     const sel_rows = zeroGrayscaleGridApi.current?.getSelectedRows();
@@ -92,6 +85,34 @@ const ReleaseHistory: React.FC<any> = () => {
     }
   };
 
+  // 刷新0级灰度发布
+  const refreshZeroReleaseGrid = async () => {
+    const girdDatas = await getGrayscaleListData("zero", zeroStart, `${zeroEnd} 23:59:59`);
+    if (girdDatas.message !== "") {
+      errorMessage((girdDatas.message).toString());
+    } else {
+      zeroGrayscaleGridApi.current?.setRowData(girdDatas?.data);
+      setGridHeight({
+        ...gridHeight,
+        zeroGrid: (girdDatas?.data).length * 30 + 80,
+      });
+    }
+  };
+
+  // 根据时间查询
+  const onZeroGrayReleaseTimeChanged = async (params: any, times: any) => {
+    const startTimes = times[0];
+    if (startTimes) {
+      zeroStart = dayjs(startTimes).format("YYYY-MM-DD");
+    }
+    const endTimes = times[1];
+    if (endTimes) {
+      zeroEnd = dayjs(endTimes).format("YYYY-MM-DD");
+    }
+    // 更新数据
+    await refreshZeroReleaseGrid();
+  };
+
   /* endregion */
 
   /* region 1级灰度积压列表 */
@@ -102,20 +123,7 @@ const ReleaseHistory: React.FC<any> = () => {
   };
   const [firstButtonTitle, setFirstButtonTitle] = useState("一键生成正式发布");  // 待发布详情
   // 1级灰度积压列表数据
-  const firstGrayscaleData = useRequest(() => getGrayscaleListData("one", start, `${end} 23:59:59`)).data;
-  // 根据时间查询
-  const onFirstGrayReleaseTimeChanged = async (params: any, times: any) => {
-    let startTimes = times[0];
-    if (startTimes) {
-      startTimes = dayjs(startTimes).format("YYYY-MM-DD");
-    }
-    let endTimes = times[1];
-    if (endTimes) {
-      endTimes = dayjs(endTimes).format("YYYY-MM-DD");
-    }
-    const grayReleaseList = await getGrayscaleListData("one", startTimes, `${endTimes} 23:59:59`);
-    firstGrayscaleGridApi.current?.setRowData(grayReleaseList?.data);
-  };
+  const firstGrayscaleData = useRequest(() => getGrayscaleListData("one", firstStart, `${firstEnd} 23:59:59`)).data;
   // 一键生成正式发布
   const generateFormalFirstRelease = async () => {
     const sel_rows = firstGrayscaleGridApi.current?.getSelectedRows();
@@ -141,6 +149,33 @@ const ReleaseHistory: React.FC<any> = () => {
       }
     }
   };
+
+  // 刷新1级灰度发布列表
+  const refreshFirstReleaseGrid = async () => {
+    const girdDatas = await getGrayscaleListData("one", firstStart, `${firstEnd} 23:59:59`);
+    if (girdDatas.message !== "") {
+      errorMessage((girdDatas.message).toString());
+    } else {
+      firstGrayscaleGridApi.current?.setRowData(girdDatas?.data);
+      setGridHeight({
+        ...gridHeight,
+        firstGrid: (girdDatas?.data).length * 30 + 80,
+      });
+    }
+  };
+  // 根据时间查询
+  const onFirstGrayReleaseTimeChanged = async (params: any, times: any) => {
+    const startTimes = times[0];
+    if (startTimes) {
+      firstStart = dayjs(startTimes).format("YYYY-MM-DD");
+    }
+    const endTimes = times[1];
+    if (endTimes) {
+      firstEnd = dayjs(endTimes).format("YYYY-MM-DD");
+    }
+    await refreshFirstReleaseGrid();
+  };
+
   /* endregion */
 
   // 跳转到灰度界面
@@ -156,30 +191,9 @@ const ReleaseHistory: React.FC<any> = () => {
       sucMessage("删除成功！")
       // 刷新数据
       if (releaseType === "zero") {
-        const girdDatas = await getGrayscaleListData("zero", start, end);
-        if (girdDatas.message !== "") {
-          errorMessage((girdDatas.message).toString());
-        } else {
-          zeroGrayscaleGridApi.current?.setRowData(girdDatas?.data);
-          setGridHeight({
-            ...gridHeight,
-            zeroGrid: (girdDatas?.data).length * 30 + 80,
-          });
-        }
-
-
+        await refreshZeroReleaseGrid();
       } else if (releaseType === "one") {
-        const girdDatas = await getGrayscaleListData("one", start, end);
-        if (girdDatas.message !== "") {
-          errorMessage((girdDatas.message).toString());
-        } else {
-          firstGrayscaleGridApi.current?.setRowData(girdDatas?.data);
-          setGridHeight({
-            ...gridHeight,
-            firstGrid: (girdDatas?.data).length * 30 + 80,
-          });
-        }
-
+        await refreshFirstReleaseGrid();
       }
     }
   };
@@ -224,17 +238,17 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 根据查询条件获取数据
   const getReleasedList = async () => {
-    const cond = {
+    const cond: any = {
       page: 1,
       pageSize: 100
     };
 
     if (formalQueryCondition.start && formalQueryCondition.end) {
-      cond["release_start_time"] = formalQueryCondition.start;
-      cond["release_end_time"] = `${formalQueryCondition.end} 23:59:59`;
+      cond.release_start_time = formalQueryCondition.start;
+      cond.release_end_time = `${formalQueryCondition.end} 23:59:59`;
     }
     if (formalQueryCondition.project) {
-      cond["project_id"] = formalQueryCondition.project;
+      cond.project_id = formalQueryCondition.project;
     }
     const result = await getFormalListData(cond);
     releasedGridApi.current?.setRowData(result.data);
@@ -329,7 +343,7 @@ const ReleaseHistory: React.FC<any> = () => {
           </Button>
           <div style={{float: "right"}}>
             <label style={{marginLeft: 10}}>发布时间: </label>
-            <RangePicker style={{marginLeft: 5}} size={"small"} defaultValue={[moment(start), moment(end)]}
+            <RangePicker style={{marginLeft: 5}} size={"small"} defaultValue={[moment(zeroStart), moment(zeroEnd)]}
                          onChange={onZeroGrayReleaseTimeChanged}/>
           </div>
         </div>
@@ -364,7 +378,7 @@ const ReleaseHistory: React.FC<any> = () => {
           </Button>
           <div style={{float: "right"}}>
             <label style={{marginLeft: 10}}>发布时间: </label>
-            <RangePicker style={{marginLeft: 5}} size={"small"} defaultValue={[moment(start), moment(end)]}
+            <RangePicker style={{marginLeft: 5}} size={"small"} defaultValue={[moment(firstStart), moment(firstEnd)]}
                          onChange={onFirstGrayReleaseTimeChanged}/>
           </div>
         </div>

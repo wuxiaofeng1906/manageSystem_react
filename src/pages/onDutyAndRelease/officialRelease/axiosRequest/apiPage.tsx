@@ -30,14 +30,21 @@ const getOfficialReleaseDetails = async (releaseNums: string, releaseType: strin
 };
 
 // 获取上线集群环境
-const getOnlineEnv = async () => {
-
+const getOnlineEnv = async (releaseType: any) => {
+  // 0级灰度跳转过来的（releaseType=gray），不显示集群0，和global
+  // 1级灰度跳转过来的（releaseType=online），不显示集群0、集群1和global
   const envData = await axiosGet("/api/verify/release/environment");
   const nameOptions: any = [];
   if (envData) {
     const datas = envData;
     datas.forEach((envInfo: any) => {
-      if (envInfo.online_environment_id !== "cn-northwest-global" && envInfo.online_environment_id !== "cn-northwest-1" && envInfo.online_environment_name !== "集群1-7") {  // 不需要展示global 和集群1
+      if (releaseType === "gray" && envInfo.online_environment_id !== "cn-northwest-global" && envInfo.online_environment_id !== "cn-northwest-0") {
+        nameOptions.push(
+          <Option key={envInfo.online_environment_id} value={`${envInfo.online_environment_id}`}>
+            {envInfo.online_environment_name}
+          </Option>,
+        );
+      } else if (releaseType === "online" && envInfo.online_environment_id !== "cn-northwest-global" && envInfo.online_environment_id !== "cn-northwest-0" && envInfo.online_environment_id !== "cn-northwest-1" && envInfo.online_environment_name !== "集群1-7") {
         nameOptions.push(
           <Option key={envInfo.online_environment_id} value={`${envInfo.online_environment_id}`}>
             {envInfo.online_environment_name}

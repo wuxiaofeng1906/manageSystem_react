@@ -7,7 +7,8 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useRequest} from "ahooks";
 import {
-  getGrayscaleListData, getFormalListData, vertifyOnlineProjectExit, getOnlineProocessDetails
+  getGrayscaleListData, getFormalListData, vertifyOnlineProjectExit, getOnlineProocessDetails,
+  delGrayReleaseHistory
 } from './axiosRequest/apiPage';
 import {history} from "@@/core/history";
 import {Button, DatePicker, Select, Popconfirm} from "antd";
@@ -15,8 +16,7 @@ import {loadPrjNameSelect} from "@/pages/onDutyAndRelease/preRelease/comControl/
 import dayjs from "dayjs";
 import moment from 'moment';
 import {grayscaleBacklogList, releasedList} from './gridSet';
-import {errorMessage} from "@/publicMethods/showMessages";
-import {getHeight} from "@/publicMethods/pageSet";
+import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {gridHeadDivStyle, girdDefaultSetting} from "./commonSetting";
 import "./style.css";
 
@@ -32,6 +32,7 @@ const start = dayjs().subtract(30, 'day').format("YYYY-MM-DD HH:mm:ss");
 const end = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
 const ReleaseHistory: React.FC<any> = () => {
+  // 设置表格的高度。
   const [gridHeight, setGridHeight] = useState({
     zeroGrid: 100,
     firstGrid: 100,
@@ -49,7 +50,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
   const [zeroButtonTitle, setZeroButtonTitle] = useState("一键生成1级灰度发布");  // 待发布详情
   // 0级灰度积压列表数据
-  const zeroGrayscaleData = useRequest(() => getGrayscaleListData(start, end)).data;
+  const zeroGrayscaleData = useRequest(() => getGrayscaleListData("zero", start, end)).data;
   // 根据时间查询
   const onZeroGrayReleaseTimeChanged = async (params: any, times: any) => {
     let startTimes = times[0];
@@ -60,7 +61,7 @@ const ReleaseHistory: React.FC<any> = () => {
     if (endTimes) {
       endTimes = dayjs(end).format("YYYY-MM-DD HH:mm:ss");
     }
-    const grayReleaseList = await getGrayscaleListData(startTimes, endTimes);
+    const grayReleaseList = await getGrayscaleListData("zero", startTimes, endTimes);
     zeroGrayscaleGridApi.current?.setRowData(grayReleaseList?.data);
   };
   // 一键生成正式发布
@@ -101,7 +102,7 @@ const ReleaseHistory: React.FC<any> = () => {
   };
   const [firstButtonTitle, setFirstButtonTitle] = useState("一键生成正式发布");  // 待发布详情
   // 1级灰度积压列表数据
-  const firstGrayscaleData = useRequest(() => getGrayscaleListData(start, end)).data;
+  const firstGrayscaleData = useRequest(() => getGrayscaleListData("one", start, end)).data;
   // 根据时间查询
   const onFirstGrayReleaseTimeChanged = async (params: any, times: any) => {
     let startTimes = times[0];
@@ -112,7 +113,7 @@ const ReleaseHistory: React.FC<any> = () => {
     if (endTimes) {
       endTimes = dayjs(end).format("YYYY-MM-DD HH:mm:ss");
     }
-    const grayReleaseList = await getGrayscaleListData(startTimes, endTimes);
+    const grayReleaseList = await getGrayscaleListData("one", startTimes, endTimes);
     zeroGrayscaleGridApi.current?.setRowData(grayReleaseList?.data);
   };
   // 一键生成正式发布
@@ -151,12 +152,42 @@ const ReleaseHistory: React.FC<any> = () => {
   };
 
   // 删除发布详情
-  const confirmDelete = (params: any) => {
-    console.log(params);
+  const confirmDelete = async (releaseType: string, params: any) => {
+    const delResult = await delGrayReleaseHistory(params.ready_release_num);
+    if (delResult.code === 200) {
+      sucMessage("删除成功！")
+      // 刷新数据
+      if (releaseType === "zero") {
+        const girdDatas = await getGrayscaleListData("zero", start, end);
+        if (girdDatas.message !== "") {
+          errorMessage((girdDatas.message).toString());
+        } else {
+          zeroGrayscaleGridApi.current?.setRowData(girdDatas?.data);
+          setGridHeight({
+            ...gridHeight,
+            zeroGrid: (girdDatas?.data).length * 30 + 80,
+          });
+        }
+
+
+      } else if (releaseType === "one") {
+        const girdDatas = await getGrayscaleListData("one", start, end);
+        if (girdDatas.message !== "") {
+          errorMessage((girdDatas.message).toString());
+        } else {
+          firstGrayscaleGridApi.current?.setRowData(girdDatas?.data);
+          setGridHeight({
+            ...gridHeight,
+            firstGrid: (girdDatas?.data).length * 30 + 80,
+          });
+        }
+
+      }
+    }
   };
 
   // 操作按钮
-  const grayListOperate = (params: any) => {
+  const grayListOperate = (releaseType: string, params: any) => {
     return <div>
       <Button className={"operateButton"}
               onClick={() => gotoGrayReleasePage(params)}>
@@ -164,9 +195,9 @@ const ReleaseHistory: React.FC<any> = () => {
       </Button>
       <Popconfirm
         placement="topRight"
-        title={"已停留在灰度积压列表中，请谨慎核对是否需要删除?"}
+        title={"已停留在灰度积压列表中，请谨慎核对,是否确认需要删除?"}
         onConfirm={() => {
-          confirmDelete(params?.data);
+          confirmDelete(releaseType, params?.data);
         }}
         okText="是"
         cancelText="否"
@@ -248,19 +279,28 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 显示button title
   const showButtonTitle = async () => {
-    const result = await vertifyOnlineProjectExit();
-
-    if (result) {
+    const zeroResult = await vertifyOnlineProjectExit("gray");
+    if (zeroResult) {
       // 0级灰度发布列表按钮title
       setZeroButtonTitle("待发布详情");
-
-      //   1级灰度发布列表按钮title
+    }
+    const firstResult = await vertifyOnlineProjectExit("online");
+    if (firstResult) {
       setFirstButtonTitle("待发布详情");
     }
   };
+
   useEffect(() => {
     showButtonTitle();
+    if (formalReleasedData?.data) {
+      setGridHeight({
+        ...gridHeight,
+        formalGrid: (formalReleasedData?.data).length * 30 + 80
+      });
+    }
+  }, [formalReleasedData]);
 
+  useEffect(() => {
     // 设置表格高度
     if (zeroGrayscaleData?.data) {
       setGridHeight({
@@ -275,13 +315,8 @@ const ReleaseHistory: React.FC<any> = () => {
         firstGrid: (firstGrayscaleData?.data).length * 30 + 80,
       });
     }
-    if (formalReleasedData?.data) {
-      setGridHeight({
-        ...gridHeight,
-        formalGrid: (formalReleasedData?.data).length * 30 + 80
-      });
-    }
-  }, [zeroGrayscaleData, firstGrayscaleData, formalReleasedData]);
+
+  }, [zeroGrayscaleData, firstGrayscaleData]);
 
 
   return (
@@ -314,7 +349,7 @@ const ReleaseHistory: React.FC<any> = () => {
             onGridReady={onZeroGrayscaleGridReady}
             frameworkComponents={{
               grayReleaseDetails: (params: any) => {
-                return grayListOperate(params);
+                return grayListOperate("zero", params);
               }
             }}>
           </AgGridReact>
@@ -349,7 +384,7 @@ const ReleaseHistory: React.FC<any> = () => {
             onGridReady={onFirstGrayscaleGridReady}
             frameworkComponents={{
               grayReleaseDetails: (params: any) => {
-                return grayListOperate(params);
+                return grayListOperate("one", params);
               }
             }}>
           </AgGridReact>
@@ -385,17 +420,8 @@ const ReleaseHistory: React.FC<any> = () => {
             onGridReady={onReleasedGridReady}
             frameworkComponents={{
               officialReleaseDetails: (params: any) => {
-
                 // 发布过程详情都可以跳转，正式发布详情需要判断。
                 const onlineNum = params.data?.online_release_num; // 为空。就可以跳到发布过程详情
-                // 需要判断有没有灰度，没有则置灰
-                // let srcPath = "../gray_detail_normal.png";
-                // let buttonDisable = false;
-                // if (onlineNum) {
-                //   srcPath = "../gray_detail_forbit.png";
-                //   buttonDisable = true;
-                // }
-
                 let srcPath = "../formal_detail.png";
                 let buttonDisable = false;
                 if (!onlineNum) {

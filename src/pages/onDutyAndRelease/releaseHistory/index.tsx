@@ -70,7 +70,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
     // 如果是待发布详情，则不需要判断有没有勾选
     if (zeroButtonTitle === "待发布详情") {
-      history.push(`/onDutyAndRelease/officialRelease`);
+      history.push(`/onDutyAndRelease/officialRelease?releaseType=gray`);
     } else {
 
       if (sel_rows?.length === 0) {
@@ -85,9 +85,9 @@ const ReleaseHistory: React.FC<any> = () => {
 
       // 需要在这个页面生成发布编号。只有成功了才跳转到详情界面
       const readyReleaseNum = ready_release_num.join("|");
-      const onlineNum = await getOnlineProocessDetails(readyReleaseNum);
+      const onlineNum = await getOnlineProocessDetails(readyReleaseNum, "gray");
       if (onlineNum) {
-        history.push(`/onDutyAndRelease/officialRelease?releaseNum=${readyReleaseNum}&onlineReleaseNum=${onlineNum}`);
+        history.push(`/onDutyAndRelease/officialRelease?releaseType=gray&releaseNum=${readyReleaseNum}&onlineReleaseNum=${onlineNum}`);
       }
     }
   };
@@ -114,22 +114,20 @@ const ReleaseHistory: React.FC<any> = () => {
       endTimes = dayjs(end).format("YYYY-MM-DD HH:mm:ss");
     }
     const grayReleaseList = await getGrayscaleListData("one", startTimes, endTimes);
-    zeroGrayscaleGridApi.current?.setRowData(grayReleaseList?.data);
+    firstGrayscaleGridApi.current?.setRowData(grayReleaseList?.data);
   };
   // 一键生成正式发布
   const generateFormalFirstRelease = async () => {
-    const sel_rows = zeroGrayscaleGridApi.current?.getSelectedRows();
+    const sel_rows = firstGrayscaleGridApi.current?.getSelectedRows();
 
     // 如果是待发布详情，则不需要判断有没有勾选
-    if (zeroButtonTitle === "待发布详情") {
-      history.push(`/onDutyAndRelease/officialRelease`);
+    if (firstButtonTitle === "待发布详情") {
+      history.push(`/onDutyAndRelease/officialRelease?releaseType=online`);
     } else {
-
       if (sel_rows?.length === 0) {
         errorMessage("请先勾选需要发布的数据！")
         return;
       }
-
       const ready_release_num: any = [];
       sel_rows?.forEach((ele: any) => {
         ready_release_num.push(ele.ready_release_num);
@@ -137,9 +135,9 @@ const ReleaseHistory: React.FC<any> = () => {
 
       // 需要在这个页面生成发布编号。只有成功了才跳转到详情界面
       const readyReleaseNum = ready_release_num.join("|");
-      const onlineNum = await getOnlineProocessDetails(readyReleaseNum);
+      const onlineNum = await getOnlineProocessDetails(readyReleaseNum, "online");
       if (onlineNum) {
-        history.push(`/onDutyAndRelease/officialRelease?releaseNum=${readyReleaseNum}&onlineReleaseNum=${onlineNum}`);
+        history.push(`/onDutyAndRelease/officialRelease?releaseType=online&releaseNum=${readyReleaseNum}&onlineReleaseNum=${onlineNum}`);
       }
     }
   };

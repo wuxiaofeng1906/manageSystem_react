@@ -8,21 +8,25 @@ const {Option} = Select;
 const users = getCurrentUserInfo();
 
 // 获取发布详情
-const getDetails = async (newReleaseNum: string = "") => {
-  const result = await axiosGet('/api/verify/release/online_detail', {online_release_num: newReleaseNum});
+const getDetails = async (newReleaseNum: string = "", releaseType: string) => {
+  //
+  const result = await axiosGet('/api/verify/release/online_detail', {
+    online_release_num: newReleaseNum,
+    release_type: releaseType
+  });
   return result;
 };
 
 // 判断有没有正式发布的列表未发布
-const getOfficialReleaseDetails = async (releaseNums: string) => {
+const getOfficialReleaseDetails = async (releaseNums: string, releaseType: string) => {
 
   // 判断是通过详情过来的还是通过新建过来的。
   if (!releaseNums) {  // 如果没有发布编号，则直接进入详情数据获取，不传入编号
-    return await getDetails();
+    return await getDetails("", releaseType);
   }
 
   // 最后再调用正式发布过程详情
-  return await getDetails(releaseNums);
+  return await getDetails(releaseNums, releaseType);
 };
 
 // 获取上线集群环境
@@ -33,7 +37,7 @@ const getOnlineEnv = async () => {
   if (envData) {
     const datas = envData;
     datas.forEach((envInfo: any) => {
-      if (envInfo.online_environment_id !== "cn-northwest-global" && envInfo.online_environment_id !== "cn-northwest-1" && envInfo.online_environment_name !== "集群1-7" ) {  // 不需要展示global 和集群1
+      if (envInfo.online_environment_id !== "cn-northwest-global" && envInfo.online_environment_id !== "cn-northwest-1" && envInfo.online_environment_name !== "集群1-7") {  // 不需要展示global 和集群1
         nameOptions.push(
           <Option key={envInfo.online_environment_id} value={`${envInfo.online_environment_id}`}>
             {envInfo.online_environment_name}

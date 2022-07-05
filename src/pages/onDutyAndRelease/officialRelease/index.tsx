@@ -35,9 +35,10 @@ const {Option} = Select;
 const OfficialRelease: React.FC<any> = (props: any) => {
   const onlineReleaseNum = props.location?.query?.onlineReleaseNum; // 正式发布列表的数据
   const historyQuery = props.location?.query?.history === "true";
+  const releaseType = props.location?.query?.releaseType;
   const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
   const dutyNameArray = useRequest(() => loadDutyNamesSelect(false)).data; // 关联值班名单
-  const pageData = useRequest(() => getOfficialReleaseDetails(onlineReleaseNum)).data; // 界面数据获取
+  const pageData = useRequest(() => getOfficialReleaseDetails(onlineReleaseNum, releaseType)).data; // 界面数据获取
   onlineEnv = useRequest(() => getOnlineEnv()).data; // 上线集群环境
 
   const releaseServiceGridApi = useRef<GridApi>();

@@ -102,13 +102,14 @@ const getPreReleaseNum = async () => {
 };
 
 // 一键正式发布
-const releaseOnline = async (onlineReleaseNum: string, releaseNums: string) => {
+const releaseOnline = async (onlineReleaseNum: string, releaseNums: string, releaseType) => {
   const users = getCurrentUserInfo();
   const data = {
     "user_name": users.name,
     "user_id": users.userid,
     "ready_release_num": releaseNums.replaceAll("|", ","),
-    "online_release_num": onlineReleaseNum
+    "online_release_num": onlineReleaseNum,
+    "release_type": releaseType
   };
 
   const result = await axiosPost("/api/verify/release/online", data);
@@ -116,7 +117,7 @@ const releaseOnline = async (onlineReleaseNum: string, releaseNums: string) => {
 };
 
 // 获取预发布详情，只有获取成功了才跳转页面
-const getOnlineProocessDetails = async (releaseNums: any) => {
+const getOnlineProocessDetails = async (releaseNums: any, releaseType) => {
 
   // 首先需要先获取预发布编号
   const newReleaseNum = (await getPreReleaseNum())?.ready_release_num;
@@ -125,7 +126,7 @@ const getOnlineProocessDetails = async (releaseNums: any) => {
   }
 
   // 再调用 “一键正式发布”
-  const releaseRt = await releaseOnline(newReleaseNum, releaseNums);
+  const releaseRt = await releaseOnline(newReleaseNum, releaseNums, releaseType);
   if (releaseRt.code !== 200) {
     errorMessage(`正式发布生成失败：${releaseRt.msg}`);
     return "";

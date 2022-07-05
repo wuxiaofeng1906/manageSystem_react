@@ -1,5 +1,5 @@
 import axios from "axios";
-import {axiosGet, axiosPost} from "@/publicMethods/axios";
+import {axiosDelete, axiosGet, axiosPost} from "@/publicMethods/axios";
 import {errorMessage} from "@/publicMethods/showMessages";
 import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
 
@@ -24,13 +24,19 @@ import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
 // };
 
 // 灰度发布列表
-const getGrayscaleListData = async (startTime: string, endTime: string) => {
+const getGrayscaleListData = async (releaseMethod: string, startTime: string, endTime: string) => {
 
   const result: any = {
     message: "",
     data: []
   };
-  await axios.get('/api/verify/release/gray', {params: {release_start_time: startTime, release_end_time: endTime}})
+  await axios.get('/api/verify/release/gray', {
+    params: {
+      release_method: releaseMethod,
+      release_start_time: startTime,
+      release_end_time: endTime
+    }
+  })
     .then(function (res) {
       if (res.data.code === 200) {
         result.data = res.data.data;
@@ -53,9 +59,9 @@ const getFormalListData = async (condition: any) => {
   };
 
   const data = {
-    // release_start_time: condition.start,
-    // release_end_time: condition.end,
-    // project_id: condition.project,
+    release_start_time: condition.start,
+    release_end_time: condition.end,
+    project_id: condition.project,
     page: condition.page,
     page_size: condition.pageSize
   }
@@ -75,9 +81,9 @@ const getFormalListData = async (condition: any) => {
 };
 
 // 判断有没有正式发布的列表未发布
-const vertifyOnlineProjectExit = async () => {
+const vertifyOnlineProjectExit = async (releaseMethod: string) => {
   let exitProjectNotRelease = false;
-  await axios.get("/api/verify/release/online_app")
+  await axios.get("/api/verify/release/online_app", {params: {release_type: releaseMethod}})
     .then(function (res) {
       if (res.data.code === 4001) {// 表示有正式发布的列表未发布
         exitProjectNotRelease = true;
@@ -96,13 +102,14 @@ const getPreReleaseNum = async () => {
 };
 
 // 一键正式发布
-const releaseOnline = async (onlineReleaseNum: string, releaseNums: string) => {
+const releaseOnline = async (onlineReleaseNum: string, releaseNums: string, releaseType: string) => {
   const users = getCurrentUserInfo();
   const data = {
     "user_name": users.name,
     "user_id": users.userid,
     "ready_release_num": releaseNums.replaceAll("|", ","),
-    "online_release_num": onlineReleaseNum
+    "online_release_num": onlineReleaseNum,
+    "release_type": releaseType
   };
 
   const result = await axiosPost("/api/verify/release/online", data);
@@ -110,7 +117,7 @@ const releaseOnline = async (onlineReleaseNum: string, releaseNums: string) => {
 };
 
 // 获取预发布详情，只有获取成功了才跳转页面
-const getOnlineProocessDetails = async (releaseNums: any) => {
+const getOnlineProocessDetails = async (releaseNums: any, releaseType: string) => {
 
   // 首先需要先获取预发布编号
   const newReleaseNum = (await getPreReleaseNum())?.ready_release_num;
@@ -119,12 +126,45 @@ const getOnlineProocessDetails = async (releaseNums: any) => {
   }
 
   // 再调用 “一键正式发布”
-  const releaseRt = await releaseOnline(newReleaseNum, releaseNums);
+  const releaseRt = await releaseOnline(newReleaseNum, releaseNums, releaseType);
   if (releaseRt.code !== 200) {
     errorMessage(`正式发布生成失败：${releaseRt.msg}`);
     return "";
   }
 
   return newReleaseNum;
-}
-export {getGrayscaleListData, getFormalListData, vertifyOnlineProjectExit, getOnlineProocessDetails};
+};
+
+// 删除预发布tab
+const delGrayReleaseHistory = async (releaseNum: string) => {
+
+  const users = getCurrentUserInfo();
+  const datas = {
+    user_name: users.name,
+    user_id: users.userid,
+    ready_release_num: releaseNum,
+  };
+
+  return await axiosDelete('/api/verify/release/release_detail', {data: datas})
+  // await axios
+  //   .delete('/api/verify/release/release_detail', { data: datas })
+  //   .then(function (res) {
+  //     if (res.data.code !== 200) {
+  //       errorMessage = `错误：${res.data.msg}`;
+  //     }
+  //   })
+  //   .catch(function (error) {
+  //     errorMessage = `异常信息:${error.toString()}`;
+  //   });
+  //
+  // return errorMessage;
+};
+
+
+export {
+  getGrayscaleListData,
+  getFormalListData,
+  vertifyOnlineProjectExit,
+  getOnlineProocessDetails,
+  delGrayReleaseHistory
+};

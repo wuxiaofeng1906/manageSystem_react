@@ -136,6 +136,7 @@ const loadDutyNamesSelect = async (showEmpty: boolean = true) => {
 
 // 一键部署ID下拉框
 const loadReleaseIDSelect = async (releaseNum: string) => {
+
     const IDs = await queryReleaseId(releaseNum);
     const idData: any = [];
 

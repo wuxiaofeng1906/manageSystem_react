@@ -24,7 +24,7 @@ const Tab: React.FC<any> = () => {
   /* region tab 自身事件 */
   const [showTabs, setShowTabs] = useState({shown: false, targetKey: ''});
 
-  // 无数据
+  // 无数据F
   const showNoneDataPage = async () => {
     modifyProcessStatus({
       // 进度条相关数据和颜色
@@ -70,18 +70,23 @@ const Tab: React.FC<any> = () => {
   };
 
   // 显示表格数据
-  const showAllDatas = async (initData: any) => {
+  const showAllDatas = async (initData: any, activeKeys: string = "") => {
 
     // Tab数据
     const {tabPageInfo} = initData;
+    let currentKey = activeKeys;
+    if (tabPageInfo?.activeKey) {
+      currentKey = tabPageInfo?.activeKey;  // 不能直接取原始数据中的发布ID，有时候初始值会为空。也就没有发布ID
+    }
+
     // 进度条数据
-    const processData: any = await getCheckProcess(tabPageInfo?.activeKey);
+    const processData: any = await getCheckProcess(currentKey);
     if (processData) {
-      modifyProcessStatus(await showProgressData(processData.data));
+      modifyProcessStatus(await showProgressData(processData.data, currentKey));
     }
 
     // 当前界面被锁住的ID
-    const lockedData = await getAllLockedData(tabPageInfo?.activeKey);
+    const lockedData = await getAllLockedData(currentKey);
     modifyAllLockedArray(lockedData.data);
 
     // 预发布项目
@@ -93,7 +98,7 @@ const Tab: React.FC<any> = () => {
     setRelesaeItem({gridHight: getGridRowsHeight(releaseItem), gridData: releaseItem});
 
     // 一键部署ID展示
-    const ids = await showReleasedId(initData?.deployment_id);
+    const ids = await showReleasedId(initData?.deployment_id, currentKey);
     modifyReleasedID(ids.showIdArray, ids.queryIdArray);
     //  发布接口
     const releaseApi = initData?.upService_interface;
@@ -135,7 +140,7 @@ const Tab: React.FC<any> = () => {
       showNoneDataPage();
     } else {
       setTabsData(activeKeys, tabsData.panes);
-      showAllDatas(newTabData);
+      showAllDatas(newTabData, activeKeys);
     }
   };
 

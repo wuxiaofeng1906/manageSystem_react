@@ -254,28 +254,6 @@ const addPulishApi = async (formData: any, currentListNo: string, type: string) 
   return systemPermission.errorMessage;
 };
 
-// 一键部署Id
-const queryReleaseId = async () => {
-  const result: any = {
-    message: '',
-    data: [],
-  };
-  await axios
-    .get('/api/verify/release/deployment_id', {})
-    .then(function (res) {
-      if (res.data.code === 200) {
-        result.data = res.data.data;
-      } else {
-        result.message = `错误：${res.data.msg}`;
-      }
-    })
-    .catch(function (error) {
-      result.message = `异常信息:${error.toString()}`;
-    });
-
-  return result;
-};
-
 // 删除接口
 const deleteReleasedId = async (ready_release_num: string, deployment_id: string) => {
   let errorMessage = '';
@@ -321,4 +299,4 @@ const deleteReleasedID = async (deployment_id: string, ready_release_num: string
   return systemPermission.errorMessage;
 };
 
-export {inquireService, upgradePulishItem, addPulishApi, queryReleaseId, deleteReleasedID};
+export {inquireService, upgradePulishItem, addPulishApi, deleteReleasedID};

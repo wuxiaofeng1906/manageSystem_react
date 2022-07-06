@@ -1,12 +1,13 @@
-import {queryReleaseId} from '../axiosRequest';
+import {queryReleaseId} from '../../../comControl/axiosRequest';
 import {alalysisInitData} from '../../../datas/dataAnalyze';
 
+
 // 展示已部署ID
-const showReleasedId = async (deploymentIDs: any) => {
+const showReleasedId = async (deploymentIDs: any, releaseNum: string) => {
 
   const showIdArray: any = [];
   // 查询id
-  const IDs = (await queryReleaseId()).data;
+  const IDs = (await queryReleaseId(releaseNum)).data;
   const queryIdArray: any = [];
 
   if (deploymentIDs && deploymentIDs.length > 0) {

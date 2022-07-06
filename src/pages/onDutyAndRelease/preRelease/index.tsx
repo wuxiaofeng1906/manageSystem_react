@@ -42,17 +42,9 @@ const PreRelease: React.FC<any> = () => {
   let releaseHistory = "false"; // 默认为未发布
   if (JSON.stringify(location) !== '{}' && location) {
     releasedNumStr = location?.releasedNum === null ? '' : (location?.releasedNum).toString();
-
     if (location?.history) {
       releaseHistory = (location?.history).toString();
     }
-    // 不能用历史发布标识来判断，如果在网页上修改了url，那么禁用标识就会失效
-    // if (releasedNumStr && releaseHistory === "true") { // 已发布
-    //   modifyOperteStatus(true);
-    // } else {
-    //   modifyOperteStatus(false);
-    // }
-
   } else {
     modifyOperteStatus(false);
   }
@@ -163,6 +155,7 @@ const PreRelease: React.FC<any> = () => {
       }
       modifyProcessStatus(await showProgressData(processData.data));
     }
+
     // 当前界面被锁住的ID
     const lockedData = await getAllLockedData(tabPageInfo?.activeKey);
     modifyAllLockedArray(lockedData.data);

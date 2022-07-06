@@ -28,7 +28,7 @@ const CheckProgress: React.FC<any> = () => {
     let autoDisable = true;
     let hintMsgs = "请确认是否修改服务发布结果为空！"
     if (params === "1") {
-      hintMsgs = "请确认服务是否发布成功，如有自动化也执行通过!";
+      hintMsgs = "请确认服务是否发布成功，如有自动化也执行通过!确认通过，会自动开放所有租户。";
       autoDisable = false;
     } else if (params === "2") {
       hintMsgs = "请确认服务是否发布失败！";

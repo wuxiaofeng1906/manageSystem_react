@@ -42,9 +42,9 @@ const DataRepaireReview: React.FC<any> = () => {
   // 数据修复review弹出窗口进行修改和新增
   (window as any).showDataRepaireForm = async (type: any, params: any) => {
     // 是否是已完成发布
-    if (currentOperateStatus) {
+    if (currentOperateStatus && type === 'add') {
       message.error({
-        content: `发布已完成，不能进行新增和修改！`,
+        content: `发布已完成，不能新增操作！`,
         duration: 1,
         style: {
           marginTop: '50vh',
@@ -470,8 +470,9 @@ const DataRepaireReview: React.FC<any> = () => {
                 float: 'right',
               }}
               onClick={saveDataReviewResult}
+              disabled={currentOperateStatus}
             >
-              确定{' '}
+              确定
             </Button>
           </Form.Item>
           {/* 隐藏字段，进行修改需要的字段 */}

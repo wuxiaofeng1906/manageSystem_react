@@ -163,6 +163,27 @@ const UpgradeService: React.FC<any> = () => {
       }
     }
   };
+
+  const [releaseIdDisable, setReleaseIdDisable] = useState(false);
+  const modifyReleaseIdStatus = (newData_confirm: any) => {
+
+    // 任务：62713 ：升级服务当所有人员都确认通过，一键部署ID列表置为灰色不可编辑，需要编辑时，需要测试取消确认(修改确认状态为"是")
+    if (newData_confirm && newData_confirm.length > 0) {
+      const confirmInfo = newData_confirm[0];
+
+      if (confirmInfo.front_confirm_status === "1" && confirmInfo.back_end_confirm_status === "1"
+        && confirmInfo.global_confirm_status === "1" && confirmInfo.jsf_confirm_status === "1"
+        && confirmInfo.openapi_confirm_status === "1" && confirmInfo.process_confirm_status === "1"
+        && confirmInfo.qbos_store_confirm_status === "1" && confirmInfo.test_confirm_status === "1") {
+        setReleaseIdDisable(true);
+      } else if (confirmInfo.test_confirm_status === "2") {
+        setReleaseIdDisable(false);
+      }
+    } else {
+      setReleaseIdDisable(false);
+    }
+  };
+
   /* endregion */
 
   /* region 行的新增和修改 */
@@ -178,18 +199,7 @@ const UpgradeService: React.FC<any> = () => {
   });
 
   (window as any).showPulishItemForm = async (type: any, params: any) => {
-    // 是否是已完成发布
-    if (currentOperateStatus) {
-      message.error({
-        content: `发布已完成，不能进行修改！`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
 
-      return;
-    }
     // 验证是否已经确认服务，如果已经确认了，就不能新增和修改了
     const flag = await vertifyModifyFlag(1, tabsData.activeKey);
     if (!flag) {
@@ -342,18 +352,6 @@ const UpgradeService: React.FC<any> = () => {
 
   // 发布接口弹出窗口进行修改和新增
   (window as any).showUpgradeApiForm = async (type: any, params: any) => {
-    // 是否是已完成发布
-    if (currentOperateStatus) {
-      message.error({
-        content: `发布已完成，不能进行新增和修改！`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
-      return;
-    }
 
     const flag = await vertifyModifyFlag(2, tabsData.activeKey);
     if (!flag) {
@@ -557,6 +555,7 @@ const UpgradeService: React.FC<any> = () => {
     serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
     serverConfirmGridApi2.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
 
+    modifyReleaseIdStatus(newData_confirm);
   };
   /* endregion */
 
@@ -575,7 +574,11 @@ const UpgradeService: React.FC<any> = () => {
 
   useEffect(() => {
     currentOperateStatus = operteStatus;
-  }, [operteStatus]);
+    // 一键部署ID是否可以修改
+    setReleaseIdDisable(operteStatus);
+    // modifyReleaseIdStatus(upgradeConfirm.gridData);
+
+  }, [operteStatus, upgradeConfirm.gridData]);
   return (
     <div>
       {/* 升级服务 */}
@@ -602,7 +605,7 @@ const UpgradeService: React.FC<any> = () => {
                       <Select
                         mode="multiple"
                         size={'small'}
-                        disabled={currentOperateStatus}
+                        disabled={releaseIdDisable}
                         style={{width: '100%'}}
                         showSearch
                         onChange={onReleaseIdChanges}
@@ -624,7 +627,7 @@ const UpgradeService: React.FC<any> = () => {
                         marginLeft: 10,
                         marginTop: 3,
                       }}
-                      disabled={currentOperateStatus}
+                      disabled={releaseIdDisable}
                       onClick={inquireServiceClick}
                     >
                       点击查询
@@ -950,8 +953,9 @@ const UpgradeService: React.FC<any> = () => {
                 float: 'right',
               }}
               onClick={savePulishResult}
+              disabled={currentOperateStatus}
             >
-              确定{' '}
+              确定
             </Button>
           </Form.Item>
 
@@ -1079,8 +1083,9 @@ const UpgradeService: React.FC<any> = () => {
                 float: 'right',
               }}
               onClick={saveUpgradeInterResult}
+              disabled={currentOperateStatus}
             >
-              确定{' '}
+              确定
             </Button>
           </Form.Item>
           {/* 隐藏字段，进行修改需要的字段 */}

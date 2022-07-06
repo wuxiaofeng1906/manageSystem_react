@@ -45,13 +45,6 @@ const PreRelease: React.FC<any> = () => {
     if (location?.history) {
       releaseHistory = (location?.history).toString();
     }
-
-    if (releasedNumStr && releaseHistory === "true") { // 已发布
-      modifyOperteStatus(true);
-    } else {
-      modifyOperteStatus(false);
-    }
-
   } else {
     modifyOperteStatus(false);
   }
@@ -154,8 +147,15 @@ const PreRelease: React.FC<any> = () => {
     // 进度条数据
     const processData: any = await getCheckProcess(tabPageInfo?.activeKey);
     if (processData) {
+      // 根据发布结果判定是否可以进行修改
+      if (processData.data?.release_result !== "9") {
+        modifyOperteStatus(true);
+      } else {
+        modifyOperteStatus(false);
+      }
       modifyProcessStatus(await showProgressData(processData.data));
     }
+
     // 当前界面被锁住的ID
     const lockedData = await getAllLockedData(tabPageInfo?.activeKey);
     modifyAllLockedArray(lockedData.data);

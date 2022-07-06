@@ -19,6 +19,7 @@ const getDetails = async (newReleaseNum: string = "", releaseType: string) => {
 
 // 判断有没有正式发布的列表未发布
 const getOfficialReleaseDetails = async (releaseNums: string, releaseType: string) => {
+  debugger;
 
   // 判断是通过详情过来的还是通过新建过来的。
   if (!releaseNums) {  // 如果没有发布编号，则直接进入详情数据获取，不传入编号

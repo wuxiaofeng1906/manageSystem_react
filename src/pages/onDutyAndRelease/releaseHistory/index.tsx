@@ -274,13 +274,13 @@ const ReleaseHistory: React.FC<any> = () => {
   // 跳转到正式发布界面
   const gotoOnlineReleasePage = (releData: any) => {
     const onlineReleasedNum = releData.data?.online_release_num;
-    history.push(`/onDutyAndRelease/officialRelease?onlineReleaseNum=${onlineReleasedNum}&history=true`);
+    history.push(`/onDutyAndRelease/officialRelease?releaseType=online&onlineReleaseNum=${onlineReleasedNum}&history=true`);
   };
 
-  // 跳转到正式发布界面
+  // 一级灰度跳转到正式发布界面
   const gotoFirstReleasePage = (releData: any) => {
     const onlineReleasedNum = releData.data?.release_gray_num;
-    history.push(`/onDutyAndRelease/officialRelease?onlineReleaseNum=${onlineReleasedNum}&history=true`);
+    history.push(`/onDutyAndRelease/officialRelease?releaseType=gray&onlineReleaseNum=${onlineReleasedNum}&history=true`);
   };
   /* endregion */
 

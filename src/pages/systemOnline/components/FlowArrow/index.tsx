@@ -12,12 +12,11 @@ const flowStatus = {
   partReject: '部分失败',
 };
 const flowBg = {
-  noStart: 'white',
-  success: '#099409',
-  no: '#21aff3',
-  allReject: '#e02c2c',
-  partReject: '#f68da0',
-  init: '#e3e6ed',
+  success: '#e4f6e7',
+  no: '#a8e3ff',
+  allReject: '#fd8686',
+  partReject: '#f7e5e8',
+  init: '#e8eaee',
 };
 const matrixArray = (list: any[], num = 4) => {
   if (num <= 1 || list.length < num) return [list];

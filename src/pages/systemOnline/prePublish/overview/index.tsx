@@ -4,7 +4,7 @@ import {
   OverviewBugLog,
   OverviewInfo,
   OverviewSummary,
-} from '@/pages/systemOnline/column';
+} from '@/pages/systemOnline/Column';
 import { IRecord } from '@/namespaces';
 import { Table, Checkbox, Form, Select, Row, Col } from 'antd';
 import { AgGridReact } from 'ag-grid-react';

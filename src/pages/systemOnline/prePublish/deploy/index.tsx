@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { Button, message, Space, Spin } from 'antd';
 import dayjs from 'dayjs';
-import { deployColumn } from '@/pages/systemOnline/column';
+import { deployColumn } from '@/pages/systemOnline/Column';
 import type { CellClickedEvent, GridApi } from 'ag-grid-community';
 import DeploySetting from '@/pages/systemOnline/prePublish/deploy/DeploySetting';
 import OneKeyDeploy from '@/pages/systemOnline/prePublish/deploy/OneKeyDeploy';

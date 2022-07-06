@@ -9,7 +9,7 @@ import {
   upgradeSQLColumn,
   dataReviewColumn,
   serverColumn,
-} from '@/pages/systemOnline/column';
+} from '@/pages/systemOnline/Column';
 import type { CellClickedEvent, GridApi } from 'ag-grid-community';
 import { initGridTable, PLATE_STATUS } from '@/pages/systemOnline/constants';
 import { useModel, useLocation } from 'umi';

@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { checkDetailColumn } from '../../column';
+import { checkDetailColumn } from '../../Column';
 import { AgGridReact } from 'ag-grid-react';
 import type { CellClickedEvent, GridApi } from 'ag-grid-community';
 import { initGridTable } from '@/pages/systemOnline/constants';

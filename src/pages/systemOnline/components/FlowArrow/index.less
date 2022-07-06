@@ -9,15 +9,14 @@
   > div {
     &:hover {
       .left {
-        border-top: 65px solid rgba(@color-approve, 0.3) !important;
-        border-bottom: 65px solid rgba(@color-approve, 0.3) !important;
+        border-top: 65px solid rgba(#d7dbfc, 0.7) !important;
+        border-bottom: 65px solid rgba(#d7dbfc, 0.7) !important;
       }
       .right {
-        right: 0;
-        border-left: 65px solid rgba(@color-approve, 0.3) !important;
+        border-left: 65px solid rgba(#d7dbfc, 0.7) !important;
       }
       .content {
-        background: rgba(@color-approve, 0.3) !important;
+        background: rgba(#d7dbfc, 0.7) !important;
       }
     }
   }
@@ -32,11 +31,11 @@
   .right {
     position: absolute;
     top: 0;
-    right: 1px;
+    right: 0px;
     display: block;
     border-top: 65px solid transparent;
     border-bottom: 65px solid transparent;
-    border-left: 65px solid @color-divider;
+    border-left: 65px solid #e8eaee;
     content: '';
   }
 
@@ -45,8 +44,8 @@
     top: 0;
     left: 0px;
     display: block;
-    border-top: 65px solid @color-divider;
-    border-bottom: 65px solid @color-divider;
+    border-top: 65px solid #e8eaee;
+    border-bottom: 65px solid #e8eaee;
     border-left: 65px solid transparent;
     content: '';
   }
@@ -58,7 +57,6 @@
     margin: 0px 65px;
     padding: 10px 5px;
     color: black;
-    background: @color-divider;
 
     > div {
       max-width: min-content;
@@ -69,6 +67,10 @@
     transform: rotate(180deg);
     .content {
       transform: rotate(-180deg);
+    }
+    .left,.right{
+      transform: translateX(0.3px);
+
     }
   }
 

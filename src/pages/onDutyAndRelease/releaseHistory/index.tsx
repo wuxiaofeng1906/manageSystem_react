@@ -191,12 +191,13 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 操作按钮
   const grayListOperate = (releaseType: string, params: any) => {
+    // 跳转到灰度发布详情
+    const grayButton = <Button className={"operateButton"} onClick={() => gotoGrayReleasePage(params)}>
+      <img src={"../gray_detail_normal.png"} width="20" height="20" alt="0级灰度发布过程详情" title="0级灰度发布过程详情"/>
+    </Button>;
 
-    return <div>
-      <Button className={"operateButton"}
-              onClick={() => gotoGrayReleasePage(params)}>
-        <img src={"../gray_detail_normal.png"} width="20" height="20" alt="发布过程详情" title="发布过程详情"/>
-      </Button>
+    // 删除功能
+    const deleteButton =
       <Popconfirm
         placement="topRight"
         title={"已停留在灰度积压列表中，请谨慎核对,是否确认需要删除?"}
@@ -209,8 +210,38 @@ const ReleaseHistory: React.FC<any> = () => {
         <Button className={"operateButton"} style={{marginLeft: -20}}>
           <img src="../delete.png" width="20" height="20" alt="删除发布详情" title="删除发布详情"/>
         </Button>
-      </Popconfirm>
-    </div>;
+      </Popconfirm>;
+
+    // 跳转到正式发布列表
+    const firstGrayNum = params.data?.release_gray_num;
+    let firstSrcPath = "../details_0.png";
+    let firstButtonDisable = false;
+    if (!firstGrayNum) {
+      firstSrcPath = "../details_0_gray.png";
+      firstButtonDisable = true;
+    }
+
+    const onlineButton =
+      <Button style={{
+        border: "none", backgroundColor: "transparent",
+        fontSize: "small", color: "#46A0FC", marginLeft: -20
+      }} disabled={firstButtonDisable}
+              onClick={() => gotoFirstReleasePage(params)}>
+        <img src={firstSrcPath} width="20" height="20" alt="1级灰度发布过程详情" title="1级灰度发布过程详情"/>
+      </Button>;
+
+    if (releaseType === "one") {
+      return <div>
+        {grayButton}
+        {onlineButton}
+        {deleteButton}
+      </div>;
+    } else {
+      return <div>
+        {grayButton}
+        {deleteButton}
+      </div>;
+    }
   }
 
   /* endregion 灰度发布界面 */

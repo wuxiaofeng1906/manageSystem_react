@@ -70,7 +70,6 @@ const cancleReleaseResult = async (onlineReleaseNum: string) => {
 };
 // 正式发布界面编辑
 const editReleaseForm = async (releaseInfo: any, otherCondition: any) => {
-  debugger;
 
   let {relateDutyName, pulishTime} = releaseInfo;
   if (!relateDutyName) {
@@ -89,7 +88,7 @@ const editReleaseForm = async (releaseInfo: any, otherCondition: any) => {
     "release_result": otherCondition.releaseResult,  // 发布结果
     "release_env": otherCondition.releaseEnv, // 集群
     "release_way": releaseInfo.pulishMethod, // 发布方式
-    "release_type": "online", // 发布类型
+    "release_type": releaseInfo.pulishType, // 发布类型
     "plan_release_time": pulishTime === "" ? "" : dayjs(pulishTime).format("YYYY-MM-DD HH:mm:ss"), // 计划发布时间
     "duty_num": relateDutyName, // 值班名单
     // "online_environment": "string",

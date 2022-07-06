@@ -9,9 +9,7 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import {Button, Checkbox, Col, DatePicker, Form, Input, Modal, Row, Select} from "antd";
 import "./style/style.css"
 import {useRequest} from "ahooks";
-import {
-  loadReleaseTypeSelect, loadDutyNamesSelect
-} from "@/pages/onDutyAndRelease/preRelease/comControl/controler";
+import {loadDutyNamesSelect} from "@/pages/onDutyAndRelease/preRelease/comControl/controler";
 import {getHeight} from "@/publicMethods/pageSet";
 import {releaseColumns} from "./grid/columns";
 import moment from 'moment';
@@ -36,7 +34,6 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   const onlineReleaseNum = props.location?.query?.onlineReleaseNum; // 正式发布列表的数据
   const historyQuery = props.location?.query?.history === "true";
   const releaseType = props.location?.query?.releaseType;
-  const releaseTypeArray = useRequest(() => loadReleaseTypeSelect()).data;
   const dutyNameArray = useRequest(() => loadDutyNamesSelect(false)).data; // 关联值班名单
   const pageData = useRequest(() => getOfficialReleaseDetails(onlineReleaseNum, releaseType)).data; // 界面数据获取
   onlineEnv = useRequest(() => getOnlineEnv(releaseType)).data; // 上线集群环境
@@ -207,6 +204,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
       // 显示step1发布方式以及时间
       formForOfficialRelease.setFieldsValue({
+        pulishType: datas.release_type,
         pulishMethod: datas.release_way,
         pulishTime: releaseTime,
         relateDutyName: datas.person_duty_num,
@@ -300,7 +298,14 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                   <Col span={7}>
                     {/* 发布类型 */}
                     <Form.Item label="发布类型:" name="pulishType">
-                      <Select disabled={true} defaultValue={"2"}>{releaseTypeArray}</Select>
+                      <Select disabled={true}>
+                        <Option key={'gray'} value={'gray'}>
+                          灰度发布
+                        </Option>
+                        <Option key={'online'} value={'online'}>
+                          正式发布
+                        </Option>
+                      </Select>
                     </Form.Item>
                   </Col>
                   <Col span={7}>
@@ -393,6 +398,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                   onGridReady={serviceGridReady}
                   onGridSizeChanged={serviceGridReady}
                   onColumnEverythingChanged={serviceGridReady}
+                  suppressRowTransform={true}
                   frameworkComponents={{
                     releaseEnvRenderer: (params: any) => {
                       if (params && params.data.rowSpan) {

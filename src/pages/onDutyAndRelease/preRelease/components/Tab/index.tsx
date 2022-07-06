@@ -9,6 +9,7 @@ import {getGridRowsHeight} from "@/pages/onDutyAndRelease/preRelease/components/
 import {showReleasedId} from "@/pages/onDutyAndRelease/preRelease/components/UpgradeService/idDeal/dataDeal";
 import {getAllLockedData} from "@/pages/onDutyAndRelease/preRelease/lock/rowLock";
 import copy from "copy-to-clipboard";
+import dayjs from "dayjs";
 
 const {TabPane} = Tabs;
 let tabType: any = "editable-card";// 可新增和删除的tab
@@ -47,6 +48,8 @@ const Tab: React.FC<any> = () => {
       edit_time: '',
       pro_id: '',
       ignoreZentaoList: '2',
+      checkListStatus: '',
+      // relateDutyName: ''
     });
 
     //  发布项
@@ -88,7 +91,7 @@ const Tab: React.FC<any> = () => {
     // 当前界面被锁住的ID
     const lockedData = await getAllLockedData(currentKey);
     modifyAllLockedArray(lockedData.data);
-
+debugger;
     // 预发布项目
     const preReleaseProject = initData?.preProject;
     modifyPreReleaseData(preReleaseProject);

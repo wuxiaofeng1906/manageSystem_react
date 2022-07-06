@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {Button, Col, DatePicker, Form, Input, message, Row, Select} from 'antd';
 import {useModel} from '@@/plugin-model/useModel';
 import {useRequest} from 'ahooks';
@@ -188,7 +188,7 @@ const PreReleaseProject: React.FC<any> = () => {
                   <Col span={11}>
                     {/* 项目名称 */}
                     <Form.Item label="项目名称:" name="projectsName">
-                      <Select showSearch mode="multiple" onFocus={releaseItemFocus}>
+                      <Select showSearch mode="multiple" onFocus={releaseItemFocus} disabled={operteStatus}>
                         {projectsArray}
                       </Select>
                     </Form.Item>
@@ -197,14 +197,14 @@ const PreReleaseProject: React.FC<any> = () => {
                   <Col span={7}>
                     {/* 发布类型 */}
                     <Form.Item label="发布类型:" name="pulishType" style={{marginLeft: 5}}>
-                      <Select onFocus={releaseItemFocus}>{releaseTypeArray}</Select>
+                      <Select onFocus={releaseItemFocus} disabled={operteStatus}>{releaseTypeArray}</Select>
                     </Form.Item>
                   </Col>
 
                   <Col span={6}>
                     {/* 发布方式 */}
                     <Form.Item label="发布方式:" name="pulishMethod" style={{marginLeft: 5}}>
-                      <Select onFocus={releaseItemFocus}>{releaseWayArray}</Select>
+                      <Select onFocus={releaseItemFocus} disabled={operteStatus}>{releaseWayArray}</Select>
                     </Form.Item>
                   </Col>
                 </Row>
@@ -217,6 +217,7 @@ const PreReleaseProject: React.FC<any> = () => {
                         format="YYYY-MM-DD HH:mm"
                         style={{width: '100%'}}
                         onFocus={releaseItemFocus}
+                        disabled={operteStatus}
                       />
                     </Form.Item>
                   </Col>
@@ -224,7 +225,7 @@ const PreReleaseProject: React.FC<any> = () => {
                   <Col span={7}>
                     {/* 关联值班名单 */}
                     <Form.Item label="关联值班名单:" name="relateDutyName" style={{marginLeft: 5}}>
-                      <Select onFocus={releaseItemFocus} showSearch defaultValue={''}
+                      <Select onFocus={releaseItemFocus} showSearch defaultValue={''} disabled={operteStatus}
                               filterOption={(inputValue: string, option: any) =>
                                 !!option.children.includes(inputValue)}>
                         {relateDutyNameArray}
@@ -235,7 +236,7 @@ const PreReleaseProject: React.FC<any> = () => {
                   <Col span={6}>
                     {/* 是否忽略禅道checklist */}
                     <Form.Item label="是否忽略禅道checklist:" name="ignoreZentaoList" style={{marginLeft: 5}}>
-                      <Select onFocus={releaseItemFocus}>
+                      <Select onFocus={releaseItemFocus} disabled={operteStatus}>
                         <Option value="1">是</Option>
                         <Option value="2">否</Option>
                       </Select>

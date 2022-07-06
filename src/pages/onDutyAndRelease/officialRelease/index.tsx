@@ -411,6 +411,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                         return (
                           <Select
                             size={'small'}
+                            placeholder={"请选择"}
                             defaultValue={currentValue}
                             bordered={false}
                             style={{width: '100%'}}

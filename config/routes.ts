@@ -274,6 +274,12 @@ export default [
                 component: './kpi/performance/developer/releaseEmergencyCount',
                 // hideInMenu: true,
               },
+              {
+                name: '发布引入patch数',
+                icon: 'table',
+                path: 'patch',
+                component: './kpi/performance/developer/patch',
+              },
             ],
           },
           {
@@ -375,6 +381,12 @@ export default [
                 path: 'releaseEmergencyCount',
                 component: './kpi/performance/testers/releaseEmergencyCount',
                 // hideInMenu: true,
+              },
+              {
+                name: '发布引入patch数',
+                icon: 'table',
+                path: 'patch',
+                component: './kpi/performance/testers/patch',
               },
             ],
           },
@@ -565,18 +577,18 @@ export default [
         icon: 'table',
         path: 'releaseHistory',
         component: './onDutyAndRelease/releaseHistory',
-      }, {
+      },
+      {
         name: '正式发布',
         icon: 'table',
         path: 'officialRelease',
         component: './onDutyAndRelease/officialRelease',
-        hideInMenu: true
-
-      }
+        hideInMenu: true,
+      },
     ],
   },
   {
-    name: "禅道管理",
+    name: '禅道管理',
     icon: 'table',
     path: '/zentao',
     // hideInMenu: true,

@@ -127,8 +127,16 @@ const getOnlineProocessDetails = async (releaseNums: any, releaseType: string) =
 
   // 再调用 “一键正式发布”
   const releaseRt = await releaseOnline(newReleaseNum, releaseNums, releaseType);
+
   if (releaseRt.code !== 200) {
-    errorMessage(`正式发布生成失败：${releaseRt.msg}`);
+    if (releaseType === "gray") {
+      errorMessage(`1级灰度发布生成失败：${releaseRt.msg}`);
+    } else if (releaseType === "online") {
+      errorMessage(`正式发布生成失败：${releaseRt.msg}`);
+    } else {
+      errorMessage(`错误：${releaseRt.msg}`);
+    }
+
     return "";
   }
 

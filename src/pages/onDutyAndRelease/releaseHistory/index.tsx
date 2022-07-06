@@ -191,10 +191,14 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 操作按钮
   const grayListOperate = (releaseType: string, params: any) => {
+    let iconPath = "../gray_detail_normal.png";
+    if (releaseType === "zero") {
+      iconPath = "../details_0.png";
+    }
     return <div>
       <Button className={"operateButton"}
               onClick={() => gotoGrayReleasePage(params)}>
-        <img src="../gray_detail_normal.png" width="20" height="20" alt="发布过程详情" title="发布过程详情"/>
+        <img src={iconPath} width="20" height="20" alt="发布过程详情" title="发布过程详情"/>
       </Button>
       <Popconfirm
         placement="topRight"
@@ -440,7 +444,13 @@ const ReleaseHistory: React.FC<any> = () => {
                     <Button
                       className={"operateButton"}
                       onClick={() => gotoGrayReleasePage(params)}>
-                      <img src={"../gray_detail_normal.png"} width="20" height="20" alt="发布过程详情" title="发布过程详情"/>
+                      <img src={"../details_0.png"} width="20" height="20" alt="0级灰度发布详情" title="0级灰度发布详情"/>
+                    </Button>
+                    <Button
+                      className={"operateButton"}
+                      style={{marginLeft: -20}}
+                      onClick={() => gotoGrayReleasePage(params)}>
+                      <img src={"../gray_detail_normal.png"} width="20" height="20" alt="1级灰度发布详情" title="1级灰度发布详情"/>
                     </Button>
                     <Button
                       // className={"operateButton"}
@@ -450,7 +460,7 @@ const ReleaseHistory: React.FC<any> = () => {
                         backgroundColor: "transparent",
                         fontSize: "small",
                         color: "#46A0FC",
-                        marginLeft: -15
+                        marginLeft: -20
                       }}
                       onClick={() => gotoOnlineReleasePage(params)}>
                       <img src={srcPath} width="20" height="20" alt="正式发布详情" title="正式发布详情"/>

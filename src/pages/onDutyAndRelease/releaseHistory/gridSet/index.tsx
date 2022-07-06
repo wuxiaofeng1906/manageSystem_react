@@ -74,6 +74,7 @@ const grayscaleBacklogList = () => {
 const releasedList = () => {
   const columns: any = [{
     headerName: '序号',
+    minWidth: 60,
     maxWidth: 80,
     cellRenderer: (params: any) => {
       return Number(params.node.id) + 1;
@@ -133,7 +134,7 @@ const releasedList = () => {
       headerName: '操作',
       cellRenderer: "officialReleaseDetails",
       minWidth: 120,
-      maxWidth: 120
+      maxWidth: 140
     }];
   return columns;
 };

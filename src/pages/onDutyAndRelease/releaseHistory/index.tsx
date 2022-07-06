@@ -191,10 +191,11 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 操作按钮
   const grayListOperate = (releaseType: string, params: any) => {
+
     return <div>
       <Button className={"operateButton"}
               onClick={() => gotoGrayReleasePage(params)}>
-        <img src="../gray_detail_normal.png" width="20" height="20" alt="发布过程详情" title="发布过程详情"/>
+        <img src={"../gray_detail_normal.png"} width="20" height="20" alt="发布过程详情" title="发布过程详情"/>
       </Button>
       <Popconfirm
         placement="topRight"
@@ -273,6 +274,12 @@ const ReleaseHistory: React.FC<any> = () => {
   // 跳转到正式发布界面
   const gotoOnlineReleasePage = (releData: any) => {
     const onlineReleasedNum = releData.data?.online_release_num;
+    history.push(`/onDutyAndRelease/officialRelease?onlineReleaseNum=${onlineReleasedNum}&history=true`);
+  };
+
+  // 跳转到正式发布界面
+  const gotoFirstReleasePage = (releData: any) => {
+    const onlineReleasedNum = releData.data?.release_gray_num;
     history.push(`/onDutyAndRelease/officialRelease?onlineReleaseNum=${onlineReleasedNum}&history=true`);
   };
   /* endregion */
@@ -435,22 +442,37 @@ const ReleaseHistory: React.FC<any> = () => {
                   buttonDisable = true;
                 }
 
+                // 1级灰度跳转图标
+                const firstGrayNum = params.data?.release_gray_num;
+                let firstSrcPath = "../details_0.png";
+                let firstButtonDisable = false;
+                if (!firstGrayNum) {
+                  firstSrcPath = "../details_0_gray.png";
+                  firstButtonDisable = true;
+                }
+
                 return (
                   <div>
                     <Button
                       className={"operateButton"}
                       onClick={() => gotoGrayReleasePage(params)}>
-                      <img src={"../gray_detail_normal.png"} width="20" height="20" alt="发布过程详情" title="发布过程详情"/>
+                      <img src={"../gray_detail_normal.png"} width="20" height="20" alt="0级灰度发布详情" title="0级灰度发布详情"/>
+                    </Button>
+                    <Button
+                      disabled={firstButtonDisable}
+                      style={{
+                        border: "none", backgroundColor: "transparent",
+                        fontSize: "small", color: "#46A0FC", marginLeft: -20
+                      }}
+                      onClick={() => gotoFirstReleasePage(params)}>
+                      <img src={firstSrcPath} width="20" height="20" alt="1级灰度发布详情" title="1级灰度发布详情"/>
                     </Button>
                     <Button
                       // className={"operateButton"}
                       disabled={buttonDisable}
                       style={{
-                        border: "none",
-                        backgroundColor: "transparent",
-                        fontSize: "small",
-                        color: "#46A0FC",
-                        marginLeft: -15
+                        border: "none", backgroundColor: "transparent", fontSize: "small",
+                        color: "#46A0FC", marginLeft: -20
                       }}
                       onClick={() => gotoOnlineReleasePage(params)}>
                       <img src={srcPath} width="20" height="20" alt="正式发布详情" title="正式发布详情"/>

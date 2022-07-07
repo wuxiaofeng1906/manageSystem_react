@@ -1,5 +1,6 @@
 import { GqlClient } from '@/hooks';
 import { getParamsByType } from '@/publicMethods/timeMethods';
+import { converseForAgGrid_showDepts } from '@/pages/kpi/performance/testers/testMethod/deptDataAnalyze';
 
 export const patchDeveloperServices = async (client: GqlClient<object>, params: string) => {
   const condition = getParamsByType(params);
@@ -29,7 +30,7 @@ export const patchDeveloperServices = async (client: GqlClient<object>, params: 
 
       }
   `);
-  return data;
+  return converseForAgGrid_showDepts(data.data);
 };
 
 export const patchTesterServices = async (client: GqlClient<object>, params: string) => {
@@ -60,5 +61,5 @@ export const patchTesterServices = async (client: GqlClient<object>, params: str
 
       }
   `);
-  return data;
+  return converseForAgGrid_showDepts(data.data);
 };

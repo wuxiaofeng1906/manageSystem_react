@@ -22,7 +22,7 @@ interface IStatic {
     expression: string[];
   };
 }
-const IStaticPerformance: React.FC<IStatic> = ({ request, ruleData }) => {
+const IStaticPerformance: React.FC<IStatic> = ({ request, ruleData, showSplit = false }) => {
   const gridApi = useRef<GridApi>();
   const { handleStaticBy, columns, rowData } = useStatistic();
   const [visible, setVisible] = useState(false);
@@ -40,7 +40,7 @@ const IStaticPerformance: React.FC<IStatic> = ({ request, ruleData }) => {
   };
 
   const changeStaticBy = async (type: IStaticBy) => {
-    await handleStaticBy(request, type);
+    await handleStaticBy(request, type, showSplit);
   };
   useEffect(() => {
     changeStaticBy('quarter');

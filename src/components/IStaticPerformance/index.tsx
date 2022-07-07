@@ -17,7 +17,7 @@ import { isEmpty } from 'lodash';
 
 interface IStatic {
   request: (client: GqlClient<object>, params: any) => void;
-  showSplit: boolean; // 以分子、分母展示
+  showSplit?: boolean; // 以分子、分母展示
   ruleData: {
     range: string[];
     expression: string[];

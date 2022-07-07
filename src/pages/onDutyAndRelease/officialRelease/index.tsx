@@ -97,7 +97,6 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
   // 保存发布方式及时间
   const saveReleaseInfo = async () => {
-    debugger;
     console.log(otherSaveCondition);
 
     //   获取发布方式及时间

@@ -11,15 +11,8 @@ import {showReleasedId} from "@/pages/onDutyAndRelease/preRelease/components/Upg
 const DeleteRow: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const {
-    tabsData,
-    delModal,
-    setDelModal,
-    modifyReleasedID,
-    setRelesaeItem,
-    setUpgradeApi,
-    setDataReview,
-    setOnlineBranch,
-    operteStatus
+    tabsData, delModal, setDelModal, modifyReleasedID, setRelesaeItem, setUpgradeApi,
+    setDataReview, setOnlineBranch, operteStatus
   } = useModel('releaseProcess');
 
   // 删除事件
@@ -63,17 +56,15 @@ const DeleteRow: React.FC<any> = () => {
     const currentListNo = tabsData.activeKey;
     switch (type) {
       case 1: {
-        const newDatas = await alalysisInitData('pulishItem', currentListNo);
+        const newDatas: any = await alalysisInitData('pulishItem', currentListNo);
         setRelesaeItem({
           gridHight: getGridRowsHeight((newDatas.upService_releaseItem)),
           gridData: newDatas.upService_releaseItem
         });
         // firstUpSerGridApi.current?.setRowData(newDatas.upService_releaseItem);
-        const deptIDs = await alalysisInitData('deployment_id', currentListNo);
+        const deptIDs: any = await alalysisInitData('deployment_id', currentListNo);
         const ids = await showReleasedId(deptIDs?.deployment_id);
-        modifyReleasedID(ids.showIdArray, ids.queryIdArray);
-
-        // modifyReleasedID(newDatas?.upService_releaseItem); // 也要刷新一键部署ID
+        modifyReleasedID(ids);
       }
         break;
       case 2: {

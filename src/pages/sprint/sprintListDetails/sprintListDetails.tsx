@@ -1639,6 +1639,7 @@ const SprintList: React.FC<any> = () => {
               <Form.Item name="adminAddEnvironment" label="发布环境:">
                 <Select placeholder="请选择" mode="multiple" optionFilterProp="children" maxTagCount={"responsive"}>
                   {[
+                    <Option key={'集群0'} value={'集群0'}>集群1</Option>,
                     <Option key={'集群1'} value={'集群1'}>集群1</Option>,
                     <Option key={'集群2'} value={'集群2'}>集群2</Option>,
                     <Option key={'集群3'} value={'集群3'}>集群3</Option>,
@@ -1902,6 +1903,7 @@ const SprintList: React.FC<any> = () => {
                 <Select placeholder="请选择" mode="multiple"
                         optionFilterProp="children" maxTagCount={"responsive"}>
                   {[
+                    <Option key={'集群0'} value={'集群0'}>集群1</Option>,
                     <Option key={'集群1'} value={'集群1'}>集群1</Option>,
                     <Option key={'集群2'} value={'集群2'}>集群2</Option>,
                     <Option key={'集群3'} value={'集群3'}>集群3</Option>,

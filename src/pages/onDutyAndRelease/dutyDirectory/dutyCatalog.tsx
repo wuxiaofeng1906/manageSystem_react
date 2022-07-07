@@ -9,6 +9,7 @@ import { isEmpty, isEqual, omit, pick, intersection } from 'lodash';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { SelectProps } from 'antd/lib/select';
+import * as dayjs from 'dayjs';
 const opts = {
   showSearch: true,
   mode: 'multiple',
@@ -94,18 +95,17 @@ const DutyCatalog = () => {
 
   // 默认第一值班人
   const getFirstDuty = async () => {
-    const params = {
-      start_time: moment().startOf('week').format('YYYY/MM/DD'),
-      end_time: moment().endOf('week').format('YYYY/MM/DD'),
-    };
+    const dateStart = dayjs().day(0);
+    const dateEnd = dayjs().day(6);
     const oldSafari = {
-      start_time: moment().startOf('week').add(1).format('YYYY/MM/DD'),
-      end_time: moment().endOf('week').add(1).format('YYYY/MM/DD'),
+      start_time: dayjs(
+        `${dateStart.year()}-${dateStart.month() + 1}-${dateStart.date() + 1}`,
+      ).format('YYYY/MM/DD'),
+      end_time: dayjs(`${dateEnd.year()}-${dateEnd.month() + 1}-${dateEnd.date() + 1}`).format(
+        'YYYY/MM/DD',
+      ),
     };
-    let firstDuty = await DutyListServices.getFirstDutyPerson(params);
-    if (isEmpty(firstDuty?.data)) {
-      firstDuty = await DutyListServices.getFirstDutyPerson(oldSafari);
-    }
+    const firstDuty = await DutyListServices.getFirstDutyPerson(oldSafari);
     const duty = firstDuty?.data
       ?.flat()
       .filter(

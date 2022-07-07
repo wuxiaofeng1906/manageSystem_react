@@ -10,7 +10,12 @@ const {Option} = Select;
 const CheckProgress: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const {tabsData, processStatus, modifyProcessStatus, operteStatus} = useModel('releaseProcess');
-  const [isModalVisible, setModalVisible] = useState({show: false, result: "", hintMsg: "", autoCheckDisabled: true});
+  const [isModalVisible, setModalVisible] = useState({
+    show: false,
+    result: "",
+    hintMsg: {message1: "", message2: ""},
+    autoCheckDisabled: true
+  });
 
   const [pulishResultForm] = Form.useForm();
 
@@ -26,12 +31,16 @@ const CheckProgress: React.FC<any> = () => {
     }
 
     let autoDisable = true;
-    let hintMsgs = "请确认是否修改服务发布结果为空！"
+    let hintMsgs = {
+      message1: "请确认是否修改服务发布结果为空！",
+      message2: ""
+    };
     if (params === "1") {
-      hintMsgs = "请确认服务是否发布成功，如有自动化也执行通过!确认通过，会自动开放所有租户。";
+      hintMsgs.message1 = "请确认服务是否发布成功?";
+      hintMsgs.message2 = "如有自动化也执行通过!确认通过，会自动开放所有租户。";
       autoDisable = false;
     } else if (params === "2") {
-      hintMsgs = "请确认服务是否发布失败！";
+      hintMsgs.message1 = "请确认服务是否发布失败！";
     }
     setModalVisible({
       autoCheckDisabled: autoDisable,
@@ -188,7 +197,7 @@ const CheckProgress: React.FC<any> = () => {
       {/* 发布结果确认弹出窗   */}
       <Modal title="发布结果确认" visible={isModalVisible.show} width={400}
              onCancel={handleCancel} centered={true}
-             bodyStyle={{height: 120}}
+             bodyStyle={{height: 145}}
              footer={[
                <Button key="cancle" onClick={handleCancel} style={{borderRadius: 5}}>
                  取消
@@ -204,7 +213,11 @@ const CheckProgress: React.FC<any> = () => {
 
         <Form form={pulishResultForm} style={{marginTop: -15}}>
           <Form.Item>
-            {isModalVisible.hintMsg}
+            {isModalVisible.hintMsg.message1}
+          </Form.Item>
+          <Form.Item
+            style={{marginTop: -25, display: isModalVisible.hintMsg.message2 === "" ? "none" : "inline-block"}}>
+            {isModalVisible.hintMsg.message2}
           </Form.Item>
           <Form.Item label="是否忽略发布成功后自动化检查:" name="ignoreAfterCheck" style={{marginTop: -25}}>
             <Checkbox.Group style={{width: '100%'}} disabled={isModalVisible.autoCheckDisabled}>

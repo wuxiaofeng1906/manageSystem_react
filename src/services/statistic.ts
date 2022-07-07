@@ -1,11 +1,16 @@
 import { GqlClient } from '@/hooks';
 import { getParamsByType } from '@/publicMethods/timeMethods';
-import { converseForAgGrid_showDepts } from '@/pages/kpi/performance/testers/testMethod/deptDataAnalyze';
+import {
+  converseForAgGrid_showDepts,
+  converseForAgGrid_cusInputRate,
+} from '@/pages/kpi/performance/testers/testMethod/deptDataAnalyze';
 
-export const patchDeveloperServices = async (client: GqlClient<object>, params: string) => {
-  const condition = getParamsByType(params);
-  if (condition.typeFlag === 0) return [];
-  const { data } = await client.query(`
+const StatisticServices = {
+  // patch
+  async patchDeveloper(client: GqlClient<object>, params: string) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data } = await client.query(`
       {
          data:devTestReleasePatchDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, identity:DEVELOPER) {
           total{
@@ -30,15 +35,14 @@ export const patchDeveloperServices = async (client: GqlClient<object>, params: 
 
       }
   `);
-  return converseForAgGrid_showDepts(data.data);
-};
-
-export const patchTesterServices = async (client: GqlClient<object>, params: string) => {
-  const condition = getParamsByType(params);
-  if (condition.typeFlag === 0) return [];
-  const { data } = await client.query(`
+    return converseForAgGrid_showDepts(data.data);
+  },
+  async patchTester(client: GqlClient<object>, params: string) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data } = await client.query(`
       {
-         data:devTestReleasePatchDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, identity:DEVELOPER) {
+         data:devTestReleasePatchDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, identity:TESTER) {
           total{
             dept
             deptName
@@ -58,8 +62,47 @@ export const patchTesterServices = async (client: GqlClient<object>, params: str
             kpi
           }
         }
-
       }
   `);
-  return converseForAgGrid_showDepts(data.data);
+    return converseForAgGrid_showDepts(data.data);
+  },
+  // feedback
+  async feedbackTester(client: GqlClient<object>, params: string) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data } = await client.query(`
+      {
+         data:testOnlineFeedbackAvgonlineDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+        total{
+            dept
+            deptName
+            kpi
+            sideKpi{
+              numerator
+              denominator
+            }
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            parent{
+              dept
+              deptName
+            }
+            kpi
+            sideKpi{
+              numerator
+              denominator
+            }
+          }
+        }
+      }
+  `);
+    return converseForAgGrid_cusInputRate(data.data);
+  },
 };
+export default StatisticServices;

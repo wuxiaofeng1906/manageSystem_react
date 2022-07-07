@@ -18,10 +18,7 @@ import { isEmpty } from 'lodash';
 interface IStatic {
   request: (client: GqlClient<object>, params: any) => void;
   showSplit?: boolean; // 以分子、分母展示
-  ruleData: {
-    range: string[];
-    expression: string[];
-  };
+  ruleData: { title: string; child: string[] }[];
 }
 const IStaticPerformance: React.FC<IStatic> = ({ request, ruleData, showSplit = false }) => {
   const gridApi = useRef<GridApi>();
@@ -136,13 +133,13 @@ const IStaticPerformance: React.FC<IStatic> = ({ request, ruleData, showSplit = 
         onClose={() => setVisible(false)}
         visible={visible}
       >
-        <p>1.取值范围：</p>
-        {ruleData.range?.map((v) => (
-          <p style={{ textIndent: '2em' }}>{`${v};`}</p>
-        ))}
-        <p>2.计算公式：</p>
-        {ruleData.expression?.map((v) => (
-          <p style={{ textIndent: '2em' }}>{`${v};`}</p>
+        {ruleData.map((it, i) => (
+          <div key={it.title}>
+            <p>{`${i + 1}.${it.title}:`}</p>
+            {it.child?.map((v) => (
+              <p style={{ textIndent: '2em' }}>{`${v};`}</p>
+            ))}
+          </div>
         ))}
       </Drawer>
     </PageContainer>

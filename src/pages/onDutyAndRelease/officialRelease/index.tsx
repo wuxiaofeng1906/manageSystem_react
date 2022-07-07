@@ -82,7 +82,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   const [isModalVisible, setModalVisible] = useState({
     show: false,
     result: '',
-    hintMsg: '',
+    hintMsg: {message1: "", message2: ""},
     autoCheckDisabled: true,
   });
 
@@ -189,14 +189,18 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
     // 不同选择弹出不同的提示框
     let autoDisable = true;
-    let hintMsgs = '请确认是否修改服务发布结果为空！';
+    let hintMsgs = {
+      message1: "请确认是否修改服务发布结果为空！",
+      message2: ""
+    };
     if (params === 'success') {
-      hintMsgs = '请确认服务是否发布成功，如有自动化也执行通过!';
+      hintMsgs.message1 = "请确认服务是否发布成功?";
+      hintMsgs.message2 = "如有自动化也执行通过!确认通过，会自动开放所有租户。";
       autoDisable = false;
     } else if (params === 'failure') {
-      hintMsgs = '请确认服务是否发布失败！';
+      hintMsgs.message1 = '请确认服务是否发布失败！';
     } else if (params === 'cancel') {
-      hintMsgs = '请确认是否取消发布！';
+      hintMsgs.message1 = '请确认是否取消发布！';
     }
     setModalVisible({
       autoCheckDisabled: autoDisable,
@@ -483,7 +487,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           width={400}
           onCancel={handleCancel}
           centered={true}
-          bodyStyle={{height: 120}}
+          bodyStyle={{height: 145}}
           footer={[
             <Button key="cancel" onClick={handleCancel} style={{borderRadius: 5}}>
               取消
@@ -503,7 +507,14 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           ]}
         >
           <Form form={pulishResultForm} style={{marginTop: -15}}>
-            <Form.Item>{isModalVisible.hintMsg}</Form.Item>
+            <Form.Item>
+              {isModalVisible.hintMsg.message1}
+            </Form.Item>
+            <Form.Item
+              style={{marginTop: -25, display: isModalVisible.hintMsg.message2 === "" ? "none" : "inline-block"}}>
+              {isModalVisible.hintMsg.message2}
+            </Form.Item>
+
             <Form.Item
               label="是否忽略发布成功后自动化检查:"
               name="ignoreAfterCheck"

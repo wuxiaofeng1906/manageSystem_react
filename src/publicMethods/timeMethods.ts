@@ -10,8 +10,6 @@ function getWeeksRange(weekCounts: number) {
   const ranges = new Array();
   // 最近几周
   for (let idx = 0; idx < weekCounts; idx += 1) {
-
-
     // const tttt = dayjs().startOf('week').format('YYYY-MM-DD');
     // const ttttss = dayjs().endOf('week').format('YYYY-MM-DD');
 

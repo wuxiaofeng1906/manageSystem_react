@@ -25,8 +25,9 @@ import {
 } from '../../comControl/controler';
 import {upgradePulishItem, addPulishApi, deleteReleasedID} from './axiosRequest';
 import {getGridRowsHeight} from '../../components/gridHeight';
-import {alaReleasedChanged, getAutoCheckMessage} from './idDeal/dataDeal';
+import {getAutoCheckMessage} from './idDeal/dataDeal';
 import {serverConfirmJudge} from './checkExcute';
+import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 
 const {TextArea} = Input;
 const {Option} = Select;
@@ -36,8 +37,8 @@ let currentOperateStatus = false;  // 需要将useState中的operteStatus值赋�
 const UpgradeService: React.FC<any> = () => {
   const {
     tabsData, modifyProcessStatus, releaseItem, upgradeApi, upgradeConfirm,
-    lockedItem, modifyLockedItem, setRelesaeItem, setUpgradeApi, releasedID,
-    modifyReleasedID, allLockedArray, operteStatus,
+    lockedItem, modifyLockedItem, setRelesaeItem, setUpgradeApi, releasedIDArray, modifyReleasedID,
+    allLockedArray, operteStatus,
   } = useModel('releaseProcess');
   const [formUpgradeService] = Form.useForm(); // 升级服务
   // 暂时忽略掉一键部署ID后端服务的获取
@@ -57,7 +58,6 @@ const UpgradeService: React.FC<any> = () => {
     upGradeGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
-
 
   /* endregion   */
 
@@ -83,34 +83,30 @@ const UpgradeService: React.FC<any> = () => {
     setReleaseIDArray(releaseIds);
   };
 
-  // ID changed
-  const onReleaseIdChanges = async (selectedId: any, params: any) => {
-    const allaResult = alaReleasedChanged(releasedID, params, selectedId);
-    // modifyReleasedID(releasedID.oraID, allaResult.queryArray);
-    modifyReleasedID(selectedId, allaResult.queryArray);
+  //  设置已选中的id
+  const onReleaseIdChanges = async (selectedId: any) => {
+    modifyReleasedID(selectedId);
+  };
 
-    if (allaResult.deletedData) {
-      // 如果有需要被删除的数据就删除，并且更新列表
-      const result = await deleteReleasedID(tabsData.activeKey, allaResult.deletedData);
-      if (result !== '') {
-        message.error({
-          content: result,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
-      } else {
-        const newData: any = await alalysisInitData('pulishItem', tabsData.activeKey);
-        formUpgradeService.setFieldsValue({
-          hitMessage: await getAutoCheckMessage(tabsData.activeKey),
-        });
-        setRelesaeItem({
-          gridHight: getGridRowsHeight(newData.upService_releaseItem),
-          gridData: newData.upService_releaseItem,
-        });
-      }
+  // 删除一键部署ID
+  const deleteReleaseId = async (deletedId: string) => {
+
+    // 如果有需要被删除的数据就删除，并且更新列表
+    const result = await deleteReleasedID(tabsData.activeKey, deletedId);
+    if (result !== '') {
+      errorMessage(result.toString());
+      return;
     }
+    sucMessage(`【${deletedId}】删除成功！`);
+    const newData: any = await alalysisInitData('pulishItem', tabsData.activeKey);
+    formUpgradeService.setFieldsValue({
+      hitMessage: await getAutoCheckMessage(tabsData.activeKey),
+    });
+    setRelesaeItem({
+      gridHight: getGridRowsHeight(newData.upService_releaseItem),
+      gridData: newData.upService_releaseItem,
+    });
+
   };
 
   // 一键部署ID查询
@@ -140,7 +136,7 @@ const UpgradeService: React.FC<any> = () => {
     }
 
     // releaseIdArray 需要注意
-    const result = await inquireService(releasedID, tabsData.activeKey);
+    const result = await inquireService(releasedIDArray, tabsData.activeKey);
     if (result.message !== '') {
       message.error({
         content: result.message,
@@ -150,7 +146,8 @@ const UpgradeService: React.FC<any> = () => {
         },
       });
     } else {
-      const newData: any = (await alalysisInitData('pulishItem', tabsData.activeKey))?.upService_releaseItem;
+      const pulishData: any = await alalysisInitData('pulishItem', tabsData.activeKey);
+      const newData: any = pulishData.upService_releaseItem;
       formUpgradeService.setFieldsValue({
         hitMessage: await getAutoCheckMessage(tabsData.activeKey),
       });
@@ -159,12 +156,14 @@ const UpgradeService: React.FC<any> = () => {
       const apidata: any = await alalysisInitData('pulishApi', tabsData.activeKey);
 
       if (!apidata.upService_interface || apidata.upService_interface <= 0) {
+        // @ts-ignore
         setUpgradeApi({gridHight: getGridRowsHeight([]).toString(), gridData: [{}]});
       }
     }
   };
 
   const [releaseIdDisable, setReleaseIdDisable] = useState(false);
+
   const modifyReleaseIdStatus = (newData_confirm: any) => {
 
     // 任务：62713 ：升级服务当所有人员都确认通过，一键部署ID列表置为灰色不可编辑，需要编辑时，需要测试取消确认(修改确认状态为"是")
@@ -563,14 +562,14 @@ const UpgradeService: React.FC<any> = () => {
 
   const showArrays = async () => {
     formUpgradeService.setFieldsValue({
-      deployID: releasedID.oraID,
+      deployID: releasedIDArray,
       hitMessage: await getAutoCheckMessage(tabsData.activeKey), // 31357
     });
   };
   useEffect(() => {
 
     showArrays();
-  }, [releasedID]);
+  }, [releasedIDArray]);
 
   useEffect(() => {
     currentOperateStatus = operteStatus;
@@ -610,6 +609,7 @@ const UpgradeService: React.FC<any> = () => {
                         showSearch
                         onChange={onReleaseIdChanges}
                         onFocus={getReleaseID}
+                        onDeselect={deleteReleaseId}
                       >
                         {releaseIDArray}
                       </Select>
@@ -679,7 +679,9 @@ const UpgradeService: React.FC<any> = () => {
                   onGridReady={onReleaseItemGridReady}
                   onGridSizeChanged={onReleaseItemGridReady}
                   onColumnEverythingChanged={onReleaseItemGridReady}
-                ></AgGridReact>
+                >
+
+                </AgGridReact>
               </div>
 
               {/* 升级接口 */}
@@ -709,7 +711,9 @@ const UpgradeService: React.FC<any> = () => {
                   onGridReady={onUpGradeGridReady}
                   onGridSizeChanged={onUpGradeGridReady}
                   onColumnEverythingChanged={onUpGradeGridReady}
-                ></AgGridReact>
+                >
+
+                </AgGridReact>
               </div>
             </div>
 

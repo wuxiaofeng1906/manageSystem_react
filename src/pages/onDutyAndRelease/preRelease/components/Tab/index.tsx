@@ -9,7 +9,6 @@ import {getGridRowsHeight} from "@/pages/onDutyAndRelease/preRelease/components/
 import {showReleasedId} from "@/pages/onDutyAndRelease/preRelease/components/UpgradeService/idDeal/dataDeal";
 import {getAllLockedData} from "@/pages/onDutyAndRelease/preRelease/lock/rowLock";
 import copy from "copy-to-clipboard";
-import dayjs from "dayjs";
 
 const {TabPane} = Tabs;
 let tabType: any = "editable-card";// 可新增和删除的tab
@@ -55,17 +54,19 @@ const Tab: React.FC<any> = () => {
     //  发布项
     setRelesaeItem({gridHight: "100px", gridData: []});
     // 一键部署ID展示
-    modifyReleasedID([], []);
+    modifyReleasedID([]);
     //  发布接口
     setUpgradeApi({gridHight: "100px", gridData: []});
     //  发布服务确认
     setUpgradeConfirm({gridHight: "100px", gridData: []});
     // 数据修复
+    // @ts-ignore
     setDataReview({gridHight: "100px", gridData: [{}]});
     // 数据修复确认
     setDataReviewConfirm({gridHight: "100px", gridData: []});
 
     // 上线分支
+    // @ts-ignore
     setOnlineBranch({gridHight: "100px", gridData: [{}]});
 
     //   对应工单
@@ -91,7 +92,7 @@ const Tab: React.FC<any> = () => {
     // 当前界面被锁住的ID
     const lockedData = await getAllLockedData(currentKey);
     modifyAllLockedArray(lockedData.data);
-debugger;
+    debugger;
     // 预发布项目
     const preReleaseProject = initData?.preProject;
     modifyPreReleaseData(preReleaseProject);
@@ -101,8 +102,8 @@ debugger;
     setRelesaeItem({gridHight: getGridRowsHeight(releaseItem), gridData: releaseItem});
 
     // 一键部署ID展示
-    const ids = await showReleasedId(initData?.deployment_id, currentKey);
-    modifyReleasedID(ids.showIdArray, ids.queryIdArray);
+    const ids = await showReleasedId(initData?.deployment_id);
+    modifyReleasedID(ids.showIdArray);
     //  发布接口
     const releaseApi = initData?.upService_interface;
     setUpgradeApi({gridHight: getGridRowsHeight(releaseApi), gridData: releaseApi});
@@ -318,7 +319,8 @@ debugger;
       });
       setTabNameModal(false);
       //   重置tab名
-      const {tabPageInfo} = await alalysisInitData('tabPageInfo', '');
+      const tabInfo: any = await alalysisInitData('tabPageInfo', '');
+      const {tabPageInfo} = tabInfo;
       if (tabPageInfo) {
         setTabsData(tabsData.activeKey, tabPageInfo.panes);
       }

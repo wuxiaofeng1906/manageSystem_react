@@ -16,13 +16,10 @@ export default () => {
     setAllLockedArray(lockedArray);
   }, []);
 
-  // 全局的一键部署ID数据,已发布的一键部署ID，用于保存查询条件，其中包含service等属性
-  const [releasedID, setReleasedID] = useState({
-    oraID: [],
-    queryId: [],
-  });
-  const modifyReleasedID = useCallback((oraID: any, queryId: any) => {
-    setReleasedID({oraID, queryId});
+  // 保存一键部署ID
+  const [releasedIDArray, setReleasedID] = useState([]);
+  const modifyReleasedID = useCallback((oraID: any) => {
+    setReleasedID(oraID);
   }, []);
 
 
@@ -124,7 +121,7 @@ export default () => {
     operteStatus, modifyOperteStatus, // 页面中按钮是否可用
     lockedItem, modifyLockedItem, // 当前被锁的id
     allLockedArray, modifyAllLockedArray, // 所有被锁的ID
-    releasedID, modifyReleasedID, // 已选中的一键部署ID
+    releasedIDArray, modifyReleasedID, // 已选中的一键部署ID
     tabsData, setTabsData, // tabs
     processStatus, modifyProcessStatus, // 进度条
     delModal, setDelModal, // 行数据的删除

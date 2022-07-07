@@ -96,17 +96,19 @@ const PreRelease: React.FC<any> = () => {
     //  发布项
     setRelesaeItem({gridHight: '100px', gridData: []});
     // 一键部署ID展示
-    modifyReleasedID([], []);
+    modifyReleasedID([]);
     //  发布接口
     setUpgradeApi({gridHight: '100px', gridData: []});
     //  发布服务确认
     setUpgradeConfirm({gridHight: '100px', gridData: []});
     // 数据修复
+    // @ts-ignore
     setDataReview({gridHight: '100px', gridData: [{}]});
     // 数据修复确认
     setDataReviewConfirm({gridHight: '100px', gridData: []});
 
     // 上线分支
+    // @ts-ignore
     setOnlineBranch({gridHight: '100px', gridData: [{}]});
 
     //   对应工单
@@ -134,7 +136,7 @@ const PreRelease: React.FC<any> = () => {
     const {tabPageInfo} = initData;
     if (initShow) {
       if (releaseHistory === "false") { // 通过链接跳转到固定Tab
-        const source = await alalysisInitData("tabPageInfo");
+        const source: any = await alalysisInitData("tabPageInfo");
         const tabsInfomation: any = source?.tabPageInfo;
         setTabsData(tabPageInfo?.activeKey, tabsInfomation?.panes);
       } else {
@@ -166,9 +168,11 @@ const PreRelease: React.FC<any> = () => {
     //  发布项
     const releaseItem = initData?.upService_releaseItem;
     setRelesaeItem({gridHight: getGridRowsHeight(releaseItem), gridData: releaseItem});
+    debugger;
     // 一键部署ID展示
     const ids = await showReleasedId(initData?.deployment_id);
-    modifyReleasedID(ids.showIdArray, ids.queryIdArray);
+    debugger;
+    modifyReleasedID(ids.showIdArray);
     //  发布接口
     const releaseApi = initData?.upService_interface;
     setUpgradeApi({gridHight: getGridRowsHeight(releaseApi), gridData: releaseApi});

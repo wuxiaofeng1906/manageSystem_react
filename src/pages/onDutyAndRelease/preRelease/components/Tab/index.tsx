@@ -92,7 +92,6 @@ const Tab: React.FC<any> = () => {
     // 当前界面被锁住的ID
     const lockedData = await getAllLockedData(currentKey);
     modifyAllLockedArray(lockedData.data);
-    debugger;
     // 预发布项目
     const preReleaseProject = initData?.preProject;
     modifyPreReleaseData(preReleaseProject);
@@ -103,7 +102,7 @@ const Tab: React.FC<any> = () => {
 
     // 一键部署ID展示
     const ids = await showReleasedId(initData?.deployment_id);
-    modifyReleasedID(ids.showIdArray);
+    modifyReleasedID(ids);
     //  发布接口
     const releaseApi = initData?.upService_interface;
     setUpgradeApi({gridHight: getGridRowsHeight(releaseApi), gridData: releaseApi});

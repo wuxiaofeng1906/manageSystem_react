@@ -64,7 +64,7 @@ const DeleteRow: React.FC<any> = () => {
         // firstUpSerGridApi.current?.setRowData(newDatas.upService_releaseItem);
         const deptIDs: any = await alalysisInitData('deployment_id', currentListNo);
         const ids = await showReleasedId(deptIDs?.deployment_id);
-        modifyReleasedID(ids.showIdArray);
+        modifyReleasedID(ids);
       }
         break;
       case 2: {

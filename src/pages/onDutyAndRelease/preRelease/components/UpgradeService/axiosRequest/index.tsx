@@ -34,7 +34,6 @@ const queryServiceByID = async (params: string) => {
 
 // 点击查询
 const inquireService = async (releasedIDArray: any, currentListNo: string) => {
-  debugger;
   if (!releasedIDArray || releasedIDArray.length === 0) {
     return {
       message: '一键部署ID不能为空！',

@@ -101,7 +101,14 @@ const DutyCatalog = () => {
       start_time: moment().startOf('week').format('YYYY/MM/DD'),
       end_time: moment().endOf('week').format('YYYY/MM/DD'),
     };
-    const firstDuty = await DutyListServices.getFirstDutyPerson(params);
+    const oldSafari = {
+      start_time: moment().startOf('week').add(1).format('YYYY/MM/DD'),
+      end_time: moment().endOf('week').add(1).format('YYYY/MM/DD'),
+    };
+    let firstDuty = await DutyListServices.getFirstDutyPerson(params);
+    if (isEmpty(firstDuty?.data)) {
+      firstDuty = await DutyListServices.getFirstDutyPerson(oldSafari);
+    }
     const duty = firstDuty?.data
       ?.flat()
       .filter(

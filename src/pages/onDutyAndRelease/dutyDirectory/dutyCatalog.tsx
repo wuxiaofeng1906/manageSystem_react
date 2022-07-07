@@ -152,7 +152,7 @@ const DutyCatalog = () => {
 
       setAllPerson(
         allPersons?.map((it: any) => ({
-          key: it.user_id,
+          key: it.user_name,
           value: `${it.user_id}_${it.user_type}`,
           label: it.user_name,
           type: it.user_type,

@@ -337,22 +337,27 @@ const ReleaseHistory: React.FC<any> = () => {
     const detailsLinks: any = [];
     if (gotoType === "0级灰度发布详情") {  // 跳转到发布过程详情
       const releasedNums = releData.data?.ready_release_num;
-      releasedNums.forEach((reInfo: any) => {
-        detailsLinks.push(
-          <p> {reInfo.ready_release_name}:
-            <Link
-              to={`/onDutyAndRelease/preRelease?releasedNum=${reInfo.ready_release_num}&history=true`}>{reInfo.ready_release_num}</Link>
-          </p>);
-      });
+      if (releasedNums && releasedNums.length > 0) {
+        releasedNums.forEach((reInfo: any) => {
+          detailsLinks.push(
+            <p> {reInfo.ready_release_name}:
+              <Link
+                to={`/onDutyAndRelease/preRelease?releasedNum=${reInfo.ready_release_num}&history=true`}>{reInfo.ready_release_num}</Link>
+            </p>);
+        });
+      }
+
     } else if (gotoType === "1级灰度发布详情") { // 跳转到正式发布详情
       const releasedNums = releData.data?.release_gray_num;
-      releasedNums.forEach((reInfo: any) => {
-        detailsLinks.push(
-          <p> {reInfo.release_gray_name}:
-            <Link
-              to={`/onDutyAndRelease/officialRelease?releaseType=gray&onlineReleaseNum=${reInfo.release_gray_num}&history=true`}>{reInfo.release_gray_num}</Link>
-          </p>);
-      });
+      if (releasedNums && releasedNums.length > 0) {
+        releasedNums.forEach((reInfo: any) => {
+          detailsLinks.push(
+            <p> {reInfo.release_gray_name}:
+              <Link
+                to={`/onDutyAndRelease/officialRelease?releaseType=gray&onlineReleaseNum=${reInfo.release_gray_num}&history=true`}>{reInfo.release_gray_num}</Link>
+            </p>);
+        });
+      }
     }
     setModalInfo({
       visible: true,

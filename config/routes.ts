@@ -387,6 +387,12 @@ export default [
                 path: 'patch',
                 component: './kpi/performance/testers/patch',
               },
+              {
+                name: '线上反馈平均上线时长',
+                icon: 'table',
+                path: 'avgOnlineTimeFeedBack',
+                component: './kpi/performance/testers/avgOnlineTimeFeedBack',
+              },
             ],
           },
           {

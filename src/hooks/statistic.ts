@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useGqlClient } from '@/hooks/index';
 import { isNumber } from 'lodash';
 import {
@@ -54,7 +54,7 @@ export const useStatistic = () => {
       month: getTwelveMonthTime,
     };
     const ranges = typeMap[type]?.();
-    const weekRanges = getWeeksRange(8);
+    const weekRanges = type == 'week' ? getWeeksRange(8) : [];
     const data = type == 'week' ? weekRanges?.reverse() : ranges;
     for (let index = 0; index < data?.length; index += 1) {
       if (type == 'week') {

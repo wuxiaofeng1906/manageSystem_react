@@ -7,12 +7,12 @@ import {
 
 const StatisticServices = {
   // patch
-  async patchDeveloper(client: GqlClient<object>, params: string) {
+  async patch(client: GqlClient<object>, params: string, identity: string) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data } = await client.query(`
+    const { data, loading } = await client.query(`
       {
-         data:devTestReleasePatchDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, identity:DEVELOPER) {
+         data:devTestReleasePatchDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, identity:${identity}) {
           total{
             dept
             deptName
@@ -34,42 +34,13 @@ const StatisticServices = {
         }
       }
   `);
-    return converseForAgGrid_showDepts(data.data);
-  },
-  async patchTester(client: GqlClient<object>, params: string) {
-    const condition = getParamsByType(params);
-    if (condition.typeFlag === 0) return [];
-    const { data } = await client.query(`
-      {
-         data:devTestReleasePatchDept(kind: "${condition.typeFlag}", ends: ${condition.ends}, identity:TESTER) {
-          total{
-            dept
-            deptName
-            kpi
-          }
-          range{
-            start
-            end
-          }
-          datas{
-            dept
-            deptName
-            parent{
-              dept
-              deptName
-            }
-            kpi
-          }
-        }
-      }
-  `);
-    return converseForAgGrid_showDepts(data.data);
+    return { data: converseForAgGrid_showDepts(data.data), loading };
   },
   // feedback
   async feedbackTester(client: GqlClient<object>, params: string) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
-    const { data } = await client.query(`
+    const { data, loading } = await client.query(`
       {
          data:testOnlineFeedbackAvgonlineDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
         total{
@@ -101,7 +72,37 @@ const StatisticServices = {
         }
       }
   `);
-    return converseForAgGrid_cusInputRate(data.data);
+    return { data: converseForAgGrid_cusInputRate(data.data), loading };
+  },
+
+  async productScale(client: GqlClient<object>, params: string, identity: string) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:devTestProductionScaleDept(kind: "${condition.typeFlag}", ends: ${condition.ends},identity:${identity}) {
+        total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            parent{
+              dept
+              deptName
+            }
+            kpi
+          }
+        }
+      }
+  `);
+    return { data: converseForAgGrid_showDepts(data.data), loading };
   },
 };
 export default StatisticServices;

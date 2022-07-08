@@ -279,6 +279,12 @@ export default [
                 path: 'patch',
                 component: './kpi/performance/developer/patch',
               },
+              {
+                name: '生产规模',
+                icon: 'table',
+                path: 'productionScale',
+                component: './kpi/performance/developer/productionScale',
+              },
             ],
           },
           {
@@ -392,6 +398,12 @@ export default [
                 icon: 'table',
                 path: 'avgOnlineTimeFeedBack',
                 component: './kpi/performance/testers/avgOnlineTimeFeedBack',
+              },
+              {
+                name: '生产规模',
+                icon: 'table',
+                path: 'productionScale',
+                component: './kpi/performance/testers/productionScale',
               },
             ],
           },

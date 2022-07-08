@@ -12,16 +12,36 @@ import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef'
 
 // 统计
 export type IStaticBy = 'year' | 'quarter' | 'month' | 'week';
-
+export type IIdentity = 'DEVELOPER' | 'TESTER';
+export interface IRequest {
+  request: Function;
+  type: IStaticBy;
+  identity?: IIdentity;
+  showSplit?: boolean;
+}
 export const useStatistic = () => {
   const gqlClient = useGqlClient();
   const [columns, setColumns] = useState<(ColDef | ColGroupDef)[]>([]);
-  const [rowData, setRowData] = useState<any[]>([]);
+  const [rowData, setRowData] = useState<any[] | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleStaticBy = async (request: Function, type: IStaticBy = 'week', showSplit = false) => {
+  const handleStaticBy = async ({
+    request,
+    type = 'week',
+    identity,
+    showSplit = false,
+  }: IRequest) => {
     renderColumn(type, showSplit);
-    const data: any = await request(gqlClient, type);
-    setRowData(data);
+    setRowData([]);
+    setLoading(true);
+    try {
+      const { data, loading }: any = await request(gqlClient, type, identity);
+      setRowData(data);
+      setLoading(loading);
+    } catch (e) {
+      setLoading(false);
+      setRowData(null);
+    }
   };
 
   const cellRenderer = (params: any, showSplit = false) => {
@@ -80,5 +100,6 @@ export const useStatistic = () => {
     }
     setColumns(component);
   };
-  return { handleStaticBy, columns, rowData };
+
+  return { handleStaticBy, columns, rowData, loading };
 };

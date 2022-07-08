@@ -11,24 +11,30 @@ import {
   AppstoreTwoTone,
 } from '@ant-design/icons';
 import { getHeight } from '@/publicMethods/pageSet';
-import { IStaticBy, useStatistic } from '@/hooks/statistic';
+import { IStaticBy, useStatistic, IIdentity } from '@/hooks/statistic';
 import { GqlClient } from '@/hooks';
 import { isEmpty } from 'lodash';
 import { ColumnsType } from 'antd/lib/table/interface';
 
 interface IStatic {
-  request: (client: GqlClient<object>, params: any) => void;
+  request: (client: GqlClient<object>, type: string, identify: IIdentity) => void;
   showSplit?: boolean; // 以分子、分母展示
   ruleData: IRuleData[];
+  identity?: IIdentity;
 }
 export interface IRuleData {
   title: string;
   child: string[];
   table?: { dataSource: any[]; column: ColumnsType<any> }; // 支持antd table
 }
-const IStaticPerformance: React.FC<IStatic> = ({ request, ruleData, showSplit = false }) => {
+const IStaticPerformance: React.FC<IStatic> = ({
+  request,
+  ruleData,
+  identity,
+  showSplit = false,
+}) => {
   const gridApi = useRef<GridApi>();
-  const { handleStaticBy, columns, rowData } = useStatistic();
+  const { handleStaticBy, columns, rowData, loading } = useStatistic();
   const [visible, setVisible] = useState(false);
 
   const onGridReady = (params: GridReadyEvent) => {
@@ -38,17 +44,26 @@ const IStaticPerformance: React.FC<IStatic> = ({ request, ruleData, showSplit = 
 
   // 表格的屏幕大小自适应
   const [gridHeight, setGridHeight] = useState(getHeight());
+
   window.onresize = function () {
     setGridHeight(getHeight());
     gridApi.current?.sizeColumnsToFit();
   };
 
   const changeStaticBy = async (type: IStaticBy) => {
-    await handleStaticBy(request, type, showSplit);
+    await handleStaticBy({ request, type, identity, showSplit });
   };
+
   useEffect(() => {
     changeStaticBy('quarter');
   }, []);
+  useEffect(() => {
+    if (gridApi.current) {
+      if (loading) gridApi.current.showLoadingOverlay();
+      else gridApi.current.hideOverlay();
+    }
+  }, [loading]);
+
   return (
     <PageContainer>
       <div style={{ background: 'white' }}>
@@ -99,7 +114,6 @@ const IStaticPerformance: React.FC<IStatic> = ({ request, ruleData, showSplit = 
           计算规则
         </Button>
       </div>
-
       <div className="ag-theme-alpine" style={{ height: gridHeight, width: '100%' }}>
         {isEmpty(columns) ? (
           <div />

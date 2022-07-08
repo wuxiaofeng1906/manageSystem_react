@@ -21,7 +21,13 @@ const ruleData: IRuleData[] = [
   },
 ];
 const Patch: React.FC<any> = () => {
-  return <IStaticPerformance ruleData={ruleData} request={StatisticServices.patchDeveloper} />;
+  return (
+    <IStaticPerformance
+      ruleData={ruleData}
+      request={StatisticServices.patch}
+      identity={'DEVELOPER'}
+    />
+  );
 };
 
 export default Patch;

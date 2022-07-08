@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { AgGridReact } from 'ag-grid-react';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import { Button, Drawer } from 'antd';
+import { Button, Drawer, Table } from 'antd';
 import {
   ScheduleTwoTone,
   CalendarTwoTone,
@@ -14,11 +14,17 @@ import { getHeight } from '@/publicMethods/pageSet';
 import { IStaticBy, useStatistic } from '@/hooks/statistic';
 import { GqlClient } from '@/hooks';
 import { isEmpty } from 'lodash';
+import { ColumnsType } from 'antd/lib/table/interface';
 
 interface IStatic {
   request: (client: GqlClient<object>, params: any) => void;
   showSplit?: boolean; // 以分子、分母展示
-  ruleData: { title: string; child: string[] }[];
+  ruleData: IRuleData[];
+}
+export interface IRuleData {
+  title: string;
+  child: string[];
+  table?: { dataSource: any[]; column: ColumnsType<any> }; // 支持antd table
 }
 const IStaticPerformance: React.FC<IStatic> = ({ request, ruleData, showSplit = false }) => {
   const gridApi = useRef<GridApi>();
@@ -139,6 +145,16 @@ const IStaticPerformance: React.FC<IStatic> = ({ request, ruleData, showSplit = 
             {it.child?.map((v) => (
               <p style={{ textIndent: '2em' }}>{`${v};`}</p>
             ))}
+            {isEmpty(it.table) ? (
+              <div />
+            ) : (
+              <Table
+                dataSource={it.table?.dataSource}
+                columns={it.table?.column}
+                pagination={false}
+                bordered
+              />
+            )}
           </div>
         ))}
       </Drawer>

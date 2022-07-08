@@ -32,7 +32,6 @@ const StatisticServices = {
             kpi
           }
         }
-
       }
   `);
     return converseForAgGrid_showDepts(data.data);

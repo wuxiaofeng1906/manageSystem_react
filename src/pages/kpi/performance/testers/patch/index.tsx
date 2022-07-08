@@ -1,7 +1,7 @@
 import React from 'react';
-import IStaticPerformance from '@/components/IStaticPerformance';
+import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
 import StatisticServices from '@/services/statistic';
-const ruleData = [
+const ruleData: IRuleData[] = [
   {
     title: '取值范围',
     child: [

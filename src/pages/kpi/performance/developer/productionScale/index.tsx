@@ -1,7 +1,7 @@
 import React from 'react';
-import IStaticPerformance from '@/components/IStaticPerformance';
+import IStaticPerformance, { IRuleData } from '@/components/IStaticPerformance';
 import StatisticServices from '@/services/statistic';
-const ruleData = [
+const ruleData: IRuleData[] = [
   {
     title: '统计范围',
     child: [
@@ -21,13 +21,7 @@ const ruleData = [
   },
 ];
 const ProductionScale: React.FC<any> = () => {
-  return (
-    <IStaticPerformance
-      ruleData={ruleData}
-      request={StatisticServices.feedbackTester}
-      showSplit={true}
-    />
-  );
+  return <IStaticPerformance ruleData={ruleData} request={StatisticServices.feedbackTester} />;
 };
 
 export default ProductionScale;

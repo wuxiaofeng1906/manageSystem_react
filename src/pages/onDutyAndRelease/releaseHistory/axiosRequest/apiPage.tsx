@@ -23,8 +23,36 @@ import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
 //
 // };
 
-// 灰度发布列表
-const getGrayscaleListData = async (releaseMethod: string, startTime: string, endTime: string) => {
+// 0级灰度发布列表
+const getZeroGrayscaleListData = async (releaseMethod: string, startTime: string, endTime: string) => {
+  debugger;
+
+  const result: any = {
+    message: "",
+    data: []
+  };
+  await axios.get('/api/verify/release/gray', {
+    params: {
+      release_method: releaseMethod,
+      release_start_time: startTime,
+      release_end_time: endTime
+    }
+  })
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+};
+
+// 1级灰度发布列表
+const getFirstGrayscaleListData = async (releaseMethod: string, startTime: string, endTime: string) => {
   debugger;
 
   const result: any = {
@@ -172,9 +200,11 @@ const delGrayReleaseHistory = async (releaseNum: string) => {
 
 
 export {
-  getGrayscaleListData,
+  getZeroGrayscaleListData,
+  getFirstGrayscaleListData,
   getFormalListData,
   vertifyOnlineProjectExit,
   getOnlineProocessDetails,
-  delGrayReleaseHistory
+  delGrayReleaseHistory,
+
 };

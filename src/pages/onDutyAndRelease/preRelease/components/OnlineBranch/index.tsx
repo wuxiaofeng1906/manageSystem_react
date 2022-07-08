@@ -719,13 +719,17 @@ const OnlineBranch: React.FC<any> = () => {
                   name="branch_mainBranch"
                   style={{marginTop: -25}}
                 >
-                  <Checkbox.Group>
-                    <Checkbox value={'stage'}>stage</Checkbox>
-                    <Checkbox value={'master'}>master</Checkbox>
-                  </Checkbox.Group>
+                  <Select style={{width: 415}} showSearch mode="multiple" maxTagCount={"responsive"}>
+                    {onlineBranchFormSelected.branchName}
+                  </Select>
+
+                  {/*<Checkbox.Group>*/}
+                  {/*  <Checkbox value={'stage'}>stage</Checkbox>*/}
+                  {/*  <Checkbox value={'master'}>master</Checkbox>*/}
+                  {/*</Checkbox.Group>*/}
                 </Form.Item>
 
-                <Form.Item label="技术侧" name="branch_teachnicalSide" style={{marginTop: -30}}>
+                <Form.Item label="技术侧" name="branch_teachnicalSide" style={{marginTop: -25}}>
                   <Checkbox.Group style={{marginLeft: 56}}>
                     <Checkbox value={'front'}>前端</Checkbox>
                     <Checkbox value={'backend'}>后端</Checkbox>

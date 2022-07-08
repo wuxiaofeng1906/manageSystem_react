@@ -44,7 +44,7 @@ const ReleaseHistory: React.FC<any> = () => {
     formalGrid: 100
   });
 
-  /* region 0级灰度发布界面 */
+  /* region 灰度发布界面 */
   const gotoGrayReleasePage = (releData: any) => {
     // const releasedNum = releData.data?.ready_release_num;
     // history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
@@ -109,9 +109,13 @@ const ReleaseHistory: React.FC<any> = () => {
   const onZeroGrayReleaseTimeChanged = async (params: any, times: any) => {
     if (times[0]) {
       zeroStart = dayjs(times[0]).format("YYYY-MM-DD");
+    } else {
+      zeroStart = "";
     }
     if (times[1]) {
       zeroEnd = dayjs(times[1]).format("YYYY-MM-DD");
+    } else {
+      zeroEnd = "";
     }
     // 更新数据
     await refreshZeroReleaseGrid();
@@ -171,9 +175,13 @@ const ReleaseHistory: React.FC<any> = () => {
   const onFirstGrayReleaseTimeChanged = async (params: any, times: any) => {
     if (times[0]) {
       firstStart = dayjs(times[0]).format("YYYY-MM-DD");
+    } else {
+      firstStart = "";
     }
     if (times[1]) {
       firstEnd = dayjs(times[1]).format("YYYY-MM-DD");
+    } else {
+      firstEnd = ""
     }
     await refreshFirstReleaseGrid();
   };
@@ -199,6 +207,12 @@ const ReleaseHistory: React.FC<any> = () => {
   const grayListOperate = (releaseType: string, params: any) => {
     // 跳转到灰度发布详情
     const grayButton = <Button className={"operateButton"} onClick={() => gotoGrayReleasePage(params)}>
+      <img src={"../gray_detail_normal.png"} width="20" height="20" alt="0级灰度发布过程详情" title="0级灰度发布过程详情"/>
+    </Button>;
+
+    // 跳转到灰度发布详情
+    const firstGrayButton = <Button className={"operateButton"}
+                                    onClick={() => formalToReleasePage(params, "0级灰度发布详情")}>
       <img src={"../gray_detail_normal.png"} width="20" height="20" alt="0级灰度发布过程详情" title="0级灰度发布过程详情"/>
     </Button>;
 
@@ -238,7 +252,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
     if (releaseType === "one") {
       return <div>
-        {grayButton}
+        {firstGrayButton}
         {onlineButton}
         {deleteButton}
       </div>;

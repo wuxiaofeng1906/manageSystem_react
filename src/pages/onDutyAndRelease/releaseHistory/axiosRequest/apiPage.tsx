@@ -25,6 +25,7 @@ import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
 
 // 灰度发布列表
 const getGrayscaleListData = async (releaseMethod: string, startTime: string, endTime: string) => {
+  debugger;
 
   const result: any = {
     message: "",
@@ -52,6 +53,7 @@ const getGrayscaleListData = async (releaseMethod: string, startTime: string, en
 
 // 正式发布列表
 const getFormalListData = async (condition: any) => {
+  debugger;
 
   const result: any = {
     message: "",

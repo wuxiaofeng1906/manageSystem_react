@@ -84,13 +84,6 @@ const releasedList = () => {
     field: 'online_release_num',
     minWidth: 130,
     maxWidth: 150,
-    cellRenderer: (params: any) => {
-      //   如果没有正式发布编号，则显示未灰度发布编号
-      if (params.value) {
-        return params.value;
-      }
-      return params.data?.ready_release_num;
-    }
   }, {
     headerName: '发布名称',
     field: 'release_name',
@@ -100,11 +93,15 @@ const releasedList = () => {
     field: 'ready_release_num',
     minWidth: 145,
     cellRenderer: (params: any) => {
-      // 如果没有正式发布编号， 灰度发布编号在正式上显示了，现在就不显示了。
-      if (params.data?.online_release_num) {
-        return params.value;
+      const {value} = params;
+      if (!value || value.length === 0) {
+        return "";
       }
-      return '';
+      const retunValue: any = [];
+      value.forEach((ele: any) => {
+        retunValue.push(ele.ready_release_num);
+      });
+      return retunValue.join(",");
     }
   }, {
     headerName: '工单编号',

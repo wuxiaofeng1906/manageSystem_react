@@ -11,7 +11,7 @@ import {
   delGrayReleaseHistory
 } from './axiosRequest/apiPage';
 import {history} from "@@/core/history";
-import {Button, DatePicker, Select, Popconfirm} from "antd";
+import {Button, DatePicker, Select, Popconfirm, Modal} from "antd";
 import {loadPrjNameSelect} from "@/pages/onDutyAndRelease/preRelease/comControl/controler";
 import dayjs from "dayjs";
 import moment from 'moment';
@@ -19,6 +19,7 @@ import {grayscaleBacklogList, releasedList} from './gridSet';
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {gridHeadDivStyle, girdDefaultSetting} from "./commonSetting";
 import "./style.css";
+import {Link} from 'umi';
 
 const {RangePicker} = DatePicker;
 const formalQueryCondition = {
@@ -43,7 +44,17 @@ const ReleaseHistory: React.FC<any> = () => {
     formalGrid: 100
   });
 
-  /* region 灰度发布界面 */
+  /* region 0级灰度发布界面 */
+  const gotoGrayReleasePage = (releData: any) => {
+    // const releasedNum = releData.data?.ready_release_num;
+    // history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
+  };
+
+  // 一级灰度跳转到正式发布界面
+  const gotoFirstReleasePage = (releData: any) => {
+    const onlineReleasedNum = releData.data?.release_gray_num;
+    history.push(`/onDutyAndRelease/officialRelease?releaseType=gray&onlineReleaseNum=${onlineReleasedNum}&history=true`);
+  };
 
   /* region 0级灰度积压列表 */
   const zeroGrayscaleGridApi = useRef<GridApi>();
@@ -169,11 +180,6 @@ const ReleaseHistory: React.FC<any> = () => {
 
   /* endregion */
 
-  // 跳转到预发布界面
-  const gotoGrayReleasePage = (releData: any) => {
-    const releasedNum = releData.data?.ready_release_num;
-    history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
-  };
 
   // 删除发布详情
   const confirmDelete = async (releaseType: string, params: any) => {
@@ -302,17 +308,54 @@ const ReleaseHistory: React.FC<any> = () => {
     getReleasedList();
   }
 
+  const [modalInfo, setModalInfo] = useState({
+    visible: false,
+    title: "",
+    content: ""
+  });
+  // 跳转到预发布界面
+  const formalToReleasePage = (releData: any, gotoType: string) => {
+    const detailsLinks: any = [];
+    if (gotoType === "0级灰度发布详情") {  // 跳转到发布过程详情
+      const releasedNums = releData.data?.ready_release_num;
+      releasedNums.forEach((reInfo: any) => {
+        detailsLinks.push(
+          <p> {reInfo.ready_release_name}:
+            <Link
+              to={`/onDutyAndRelease/preRelease?releasedNum=${reInfo.ready_release_num}&history=true`}>{reInfo.ready_release_num}</Link>
+          </p>);
+      });
+    } else if (gotoType === "1级灰度发布详情") { // 跳转到正式发布详情
+      const releasedNums = releData.data?.release_gray_num;
+      releasedNums.forEach((reInfo: any) => {
+        detailsLinks.push(
+          <p> {reInfo.release_gray_name}:
+            <Link
+              to={`/onDutyAndRelease/officialRelease?releaseType=gray&onlineReleaseNum=${reInfo.release_gray_num}&history=true`}>{reInfo.release_gray_num}</Link>
+          </p>);
+      });
+    }
+    setModalInfo({
+      visible: true,
+      title: gotoType,
+      content: detailsLinks
+    });
+  }
+
   // 跳转到正式发布界面
   const gotoOnlineReleasePage = (releData: any) => {
     const onlineReleasedNum = releData.data?.online_release_num;
     history.push(`/onDutyAndRelease/officialRelease?releaseType=online&onlineReleaseNum=${onlineReleasedNum}&history=true`);
   };
 
-  // 一级灰度跳转到正式发布界面
-  const gotoFirstReleasePage = (releData: any) => {
-    const onlineReleasedNum = releData.data?.release_gray_num;
-    history.push(`/onDutyAndRelease/officialRelease?releaseType=gray&onlineReleaseNum=${onlineReleasedNum}&history=true`);
-  };
+  // 取消弹出框
+  const handleCancel = () => {
+    setModalInfo({
+      visible: false,
+      title: "",
+      content: ""
+    });
+  }
   /* endregion */
 
   window.addEventListener('resize', () => {
@@ -464,49 +507,53 @@ const ReleaseHistory: React.FC<any> = () => {
             onGridReady={onReleasedGridReady}
             frameworkComponents={{
               officialReleaseDetails: (params: any) => {
-                // 发布过程详情都可以跳转，正式发布详情需要判断。
-                const onlineNum = params.data?.online_release_num; // 为空。就可以跳到发布过程详情
-                let srcPath = "../formal_detail.png";
-                let buttonDisable = false;
-                if (!onlineNum) {
-                  srcPath = "../formal_detail_gray.png";
-                  buttonDisable = true;
-                }
-
-                // 1级灰度跳转图标
-                const firstGrayNum = params.data?.release_gray_num;
-                let firstSrcPath = "../details_0.png";
+                // 如果ready_release_num 数组中只有一个值，需要和online_release_num进行对比，如果值相同，则只显示发布过程详情。1级灰度和正式发布详情不能进行跳转。
+                let firstSrcPath = "../details_0.png"; // 1级灰度跳转图标
                 let firstButtonDisable = false;
-                if (!firstGrayNum) {
-                  firstSrcPath = "../details_0_gray.png";
-                  firstButtonDisable = true;
+                let onlineSrcPath = "../formal_detail.png";  // 正式发布详情图标
+                let buttonDisable = false;
+                const {ready_release_num, release_gray_num, online_release_num} = params.data;
+                if (ready_release_num && ready_release_num === 1) {
+                  if (ready_release_num[0].ready_release_num === online_release_num) {
+                    firstButtonDisable = true;
+                    buttonDisable = true;
+                  }
+                } else {
+                  // 1级发布
+                  if (!release_gray_num || release_gray_num.length === 0) {
+                    firstSrcPath = "../details_0_gray.png";
+                    firstButtonDisable = true;
+                  }
+                  // 正式发布
+                  if (!online_release_num) {
+                    onlineSrcPath = "../formal_detail_gray.png";
+                    buttonDisable = true;
+                  }
                 }
-
                 return (
                   <div>
                     <Button
-                      className={"operateButton"}
-                      onClick={() => gotoGrayReleasePage(params)}>
+                      className={"operateButton"}     // ready_release_num
+                      onClick={() => formalToReleasePage(params, "0级灰度发布详情")}>
                       <img src={"../gray_detail_normal.png"} width="20" height="20" alt="0级灰度发布详情" title="0级灰度发布详情"/>
                     </Button>
                     <Button
-                      disabled={firstButtonDisable}
+                      disabled={firstButtonDisable}   // release_gray_num
                       style={{
                         border: "none", backgroundColor: "transparent",
                         fontSize: "small", color: "#46A0FC", marginLeft: -20
                       }}
-                      onClick={() => gotoFirstReleasePage(params)}>
+                      onClick={() => formalToReleasePage(params, "1级灰度发布详情")}>
                       <img src={firstSrcPath} width="20" height="20" alt="1级灰度发布详情" title="1级灰度发布详情"/>
                     </Button>
                     <Button
-                      // className={"operateButton"}
-                      disabled={buttonDisable}
+                      disabled={buttonDisable} // online_release_num
                       style={{
                         border: "none", backgroundColor: "transparent", fontSize: "small",
                         color: "#46A0FC", marginLeft: -20
                       }}
                       onClick={() => gotoOnlineReleasePage(params)}>
-                      <img src={srcPath} width="20" height="20" alt="正式发布详情" title="正式发布详情"/>
+                      <img src={onlineSrcPath} width="20" height="20" alt="正式发布详情" title="正式发布详情"/>
                     </Button>
                   </div>
                 )
@@ -515,6 +562,14 @@ const ReleaseHistory: React.FC<any> = () => {
           >
           </AgGridReact>
         </div>
+      </div>
+
+      {/*详情跳转选择 */}
+      <div>
+        <Modal title={modalInfo.title} visible={modalInfo.visible} onCancel={handleCancel} footer={null}
+               centered={true}>
+          {modalInfo.content}
+        </Modal>
       </div>
 
     </PageContainer>

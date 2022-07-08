@@ -52,6 +52,7 @@ const getGrayscaleListData = async (releaseMethod: string, startTime: string, en
 
 // 正式发布列表
 const getFormalListData = async (condition: any) => {
+  debugger;
 
   const result: any = {
     message: "",

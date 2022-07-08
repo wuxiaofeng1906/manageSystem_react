@@ -441,8 +441,16 @@ const DutyCatalog = () => {
                       onDropdownVisibleChange={(open) => !open && getProjectUser()}
                     >
                       {projects.map((it: any) => (
-                        <Select.Option key={it.project_id} label={it.project_name}>
-                          <span style={{ color: it.is_pm ? 'initial' : 'red' }}>
+                        <Select.Option
+                          key={it.project_id}
+                          label={it.project_name}
+                          disabled={it.status == 'closed'}
+                        >
+                          <span
+                            style={{
+                              color: it.status == 'closed' ? '#ccc' : it.is_pm ? 'initial' : 'red',
+                            }}
+                          >
                             {it.project_name}
                           </span>
                         </Select.Option>

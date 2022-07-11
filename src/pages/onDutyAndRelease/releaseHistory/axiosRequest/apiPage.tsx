@@ -25,7 +25,6 @@ import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
 
 // 0级灰度发布列表
 const getZeroGrayscaleListData = async (startTime: string, endTime: string) => {
-  debugger;
 
   const result: any = {
     message: "",
@@ -53,7 +52,6 @@ const getZeroGrayscaleListData = async (startTime: string, endTime: string) => {
 
 // 1级灰度发布列表
 const getFirstGrayscaleListData = async (startTime: string, endTime: string) => {
-  debugger;
 
   const result: any = {
     message: "",
@@ -81,7 +79,6 @@ const getFirstGrayscaleListData = async (startTime: string, endTime: string) => 
 
 // 正式发布列表
 const getFormalListData = async (condition: any) => {
-  debugger;
 
   const result: any = {
     message: "",
@@ -175,7 +172,6 @@ const getOnlineProocessDetails = async (releaseNums: any, releaseType: string) =
 
 // 删除预发布tab
 const delGrayReleaseHistory = async (releaseType: string, releaseInfo: any) => {
-  debugger;
   // 如果是0级灰度发布，就调用删除接口
   const users = getCurrentUserInfo();
   if (releaseType === "zero") {

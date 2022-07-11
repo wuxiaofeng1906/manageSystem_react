@@ -61,7 +61,6 @@ const Detail = () => {
       okButtonProps: { style: { display: 'none' } },
       content: (
         <div style={{ maxHeight: 400, overflow: 'auto', margin: '10px 0', whiteSpace: 'pre-line' }}>
-          {/*<div>检查状态： {formatCheckStatus({ data: data, rowIndex: rowIndex || 0 })}</div>*/}
           <div>
             {isArray(data?.check_log) ? (
               <div>

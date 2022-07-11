@@ -8,8 +8,7 @@ import DeploySetting from '@/pages/systemOnline/prePublish/deploy/DeploySetting'
 import OneKeyDeploy from '@/pages/systemOnline/prePublish/deploy/OneKeyDeploy';
 import { initGridTable } from '@/pages/systemOnline/constants';
 import OnlineServices from '@/services/online';
-import { useLocation } from 'umi';
-import { useModel } from '@@/plugin-model/useModel';
+import { useLocation, useModel } from 'umi';
 
 const Deploy = () => {
   const {

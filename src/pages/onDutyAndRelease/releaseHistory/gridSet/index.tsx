@@ -15,8 +15,14 @@ const grayscaleBacklogList = (type: string) => {
     maxWidth: 150,
 
   };
+  let grayNumName = {
+    headerName: '灰度发布名称',
+    field: 'ready_release_name',
+    minWidth: 145
+  };
   if (type === "one") {
     grayNum.field = "release_gray_num";
+    grayNumName.field = "release_name";
   }
 
   const column: any = [
@@ -37,9 +43,7 @@ const grayscaleBacklogList = (type: string) => {
     }, {
       ...grayNum
     }, {
-      headerName: '灰度发布名称',
-      field: 'ready_release_name',
-      minWidth: 145
+      ...grayNumName
     }, {
       headerName: '工单编号',
       field: 'order',

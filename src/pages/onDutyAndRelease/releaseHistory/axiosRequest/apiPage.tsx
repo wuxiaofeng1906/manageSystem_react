@@ -23,8 +23,8 @@ import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
 //
 // };
 
-// 灰度发布列表
-const getGrayscaleListData = async (releaseMethod: string, startTime: string, endTime: string) => {
+// 0级灰度发布列表
+const getZeroGrayscaleListData = async (startTime: string, endTime: string) => {
   debugger;
 
   const result: any = {
@@ -33,7 +33,35 @@ const getGrayscaleListData = async (releaseMethod: string, startTime: string, en
   };
   await axios.get('/api/verify/release/gray', {
     params: {
-      release_method: releaseMethod,
+      // release_method: releaseMethod,
+      release_start_time: startTime,
+      release_end_time: endTime
+    }
+  })
+    .then(function (res) {
+      if (res.data.code === 200) {
+        result.data = res.data.data;
+      } else {
+        result.message = `错误：${res.data.msg}`;
+      }
+    }).catch(function (error) {
+      result.message = `异常信息:${error.toString()}`;
+    });
+
+  return result;
+};
+
+// 1级灰度发布列表
+const getFirstGrayscaleListData = async (startTime: string, endTime: string) => {
+  debugger;
+
+  const result: any = {
+    message: "",
+    data: []
+  };
+  await axios.get('/api/verify/release/gray_one', {
+    params: {
+      // release_method: releaseMethod,
       release_start_time: startTime,
       release_end_time: endTime
     }
@@ -146,35 +174,36 @@ const getOnlineProocessDetails = async (releaseNums: any, releaseType: string) =
 };
 
 // 删除预发布tab
-const delGrayReleaseHistory = async (releaseNum: string) => {
-
+const delGrayReleaseHistory = async (releaseType: string, releaseNum: string) => {
+  // 如果是0级灰度发布，就调用删除接口
   const users = getCurrentUserInfo();
-  const datas = {
-    user_name: users.name,
-    user_id: users.userid,
-    ready_release_num: releaseNum,
-  };
+  if (releaseType === "zero") {
+    const datas = {
+      user_name: users.name,
+      user_id: users.userid,
+      ready_release_num: releaseNum,
+    };
 
-  return await axiosDelete('/api/verify/release/release_detail', {data: datas})
-  // await axios
-  //   .delete('/api/verify/release/release_detail', { data: datas })
-  //   .then(function (res) {
-  //     if (res.data.code !== 200) {
-  //       errorMessage = `错误：${res.data.msg}`;
-  //     }
-  //   })
-  //   .catch(function (error) {
-  //     errorMessage = `异常信息:${error.toString()}`;
-  //   });
-  //
-  // return errorMessage;
+    return await axiosDelete('/api/verify/release/release_detail', {data: datas})
+  } else {
+    // 如果是1级灰度发布，就调用取消发布接口
+    const delData = {
+      "user_name": users.name,
+      "user_id": users.userid,
+      "online_release_num": releaseNum
+    };
+    const result = await axiosDelete("/api/verify/release/online", {data: delData});
+    return result;
+  }
 };
 
 
 export {
-  getGrayscaleListData,
+  getZeroGrayscaleListData,
+  getFirstGrayscaleListData,
   getFormalListData,
   vertifyOnlineProjectExit,
   getOnlineProocessDetails,
-  delGrayReleaseHistory
+  delGrayReleaseHistory,
+
 };

@@ -7,8 +7,8 @@ import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import type {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useRequest} from "ahooks";
 import {
-  getGrayscaleListData, getFormalListData, vertifyOnlineProjectExit, getOnlineProocessDetails,
-  delGrayReleaseHistory
+  getFirstGrayscaleListData, getFormalListData, vertifyOnlineProjectExit, getOnlineProocessDetails,
+  delGrayReleaseHistory, getZeroGrayscaleListData
 } from './axiosRequest/apiPage';
 import {history} from "@@/core/history";
 import {Button, DatePicker, Select, Popconfirm, Modal} from "antd";
@@ -21,7 +21,7 @@ import {gridHeadDivStyle, girdDefaultSetting} from "./commonSetting";
 import "./style.css";
 import {Link} from 'umi';
 
-const {RangePicker} = DatePicker;
+const RangePicker: any = DatePicker.RangePicker;
 const formalQueryCondition = {
   start: dayjs().subtract(7, 'day').format("YYYY-MM-DD"),
   end: dayjs().format("YYYY-MM-DD"),
@@ -45,16 +45,6 @@ const ReleaseHistory: React.FC<any> = () => {
   });
 
   /* region 灰度发布界面 */
-  const gotoGrayReleasePage = (releData: any) => {
-    // const releasedNum = releData.data?.ready_release_num;
-    // history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
-  };
-
-  // 一级灰度跳转到正式发布界面
-  const gotoFirstReleasePage = (releData: any) => {
-    const onlineReleasedNum = releData.data?.release_gray_num;
-    history.push(`/onDutyAndRelease/officialRelease?releaseType=gray&onlineReleaseNum=${onlineReleasedNum}&history=true`);
-  };
 
   /* region 0级灰度积压列表 */
   const zeroGrayscaleGridApi = useRef<GridApi>();
@@ -65,7 +55,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
   const [zeroButtonTitle, setZeroButtonTitle] = useState("一键生成1级灰度发布");  // 待发布详情
   // 0级灰度积压列表数据
-  const zeroGrayscaleData = useRequest(() => getGrayscaleListData("zero", zeroStart, `${zeroEnd} 23:59:59`)).data;
+  const zeroGrayscaleData = useRequest(() => getZeroGrayscaleListData(zeroStart, `${zeroEnd} 23:59:59`)).data;
   // 一键生成正式发布
   const generateFormalZeroRelease = async () => {
     const sel_rows = zeroGrayscaleGridApi.current?.getSelectedRows();
@@ -93,7 +83,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 刷新0级灰度发布
   const refreshZeroReleaseGrid = async () => {
-    const girdDatas = await getGrayscaleListData("zero", zeroStart, `${zeroEnd} 23:59:59`);
+    const girdDatas = await getZeroGrayscaleListData(zeroStart, `${zeroEnd} 23:59:59`);
     if (girdDatas.message !== "") {
       errorMessage((girdDatas.message).toString());
     } else {
@@ -131,7 +121,7 @@ const ReleaseHistory: React.FC<any> = () => {
   };
   const [firstButtonTitle, setFirstButtonTitle] = useState("一键生成正式发布");  // 待发布详情
   // 1级灰度积压列表数据
-  const firstGrayscaleData = useRequest(() => getGrayscaleListData("one", firstStart, `${firstEnd} 23:59:59`)).data;
+  const firstGrayscaleData = useRequest(() => getFirstGrayscaleListData(firstStart, `${firstEnd} 23:59:59`)).data;
   // 一键生成正式发布
   const generateFormalFirstRelease = async () => {
     const sel_rows = firstGrayscaleGridApi.current?.getSelectedRows();
@@ -160,7 +150,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 刷新1级灰度发布列表
   const refreshFirstReleaseGrid = async () => {
-    const girdDatas = await getGrayscaleListData("one", firstStart, `${firstEnd} 23:59:59`);
+    const girdDatas = await getFirstGrayscaleListData(firstStart, `${firstEnd} 23:59:59`);
     if (girdDatas.message !== "") {
       errorMessage((girdDatas.message).toString());
     } else {
@@ -188,10 +178,10 @@ const ReleaseHistory: React.FC<any> = () => {
 
   /* endregion */
 
-
+  /* region 操作按钮 */
   // 删除发布详情
   const confirmDelete = async (releaseType: string, params: any) => {
-    const delResult = await delGrayReleaseHistory(params.ready_release_num);
+    const delResult = await delGrayReleaseHistory(releaseType, params.ready_release_num,);
     if (delResult.code === 200) {
       sucMessage("删除成功！")
       // 刷新数据
@@ -201,6 +191,18 @@ const ReleaseHistory: React.FC<any> = () => {
         await refreshFirstReleaseGrid();
       }
     }
+  };
+
+  // 跳转到发布过程详情页面
+  const gotoGrayReleasePage = (releData: any) => {
+    const releasedNum = releData.data?.ready_release_num;
+    history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
+  };
+
+  // 一级灰度跳转到正式发布界面
+  const gotoFirstReleasePage = (releData: any) => {
+    const onlineReleasedNum = releData.data?.release_gray_num;
+    history.push(`/onDutyAndRelease/officialRelease?releaseType=gray&onlineReleaseNum=${onlineReleasedNum}&history=true`);
   };
 
   // 操作按钮
@@ -263,6 +265,9 @@ const ReleaseHistory: React.FC<any> = () => {
       </div>;
     }
   }
+
+  /* endregion 操作按钮 */
+
 
   /* endregion 灰度发布界面 */
 
@@ -332,22 +337,27 @@ const ReleaseHistory: React.FC<any> = () => {
     const detailsLinks: any = [];
     if (gotoType === "0级灰度发布详情") {  // 跳转到发布过程详情
       const releasedNums = releData.data?.ready_release_num;
-      releasedNums.forEach((reInfo: any) => {
-        detailsLinks.push(
-          <p> {reInfo.ready_release_name}:
-            <Link
-              to={`/onDutyAndRelease/preRelease?releasedNum=${reInfo.ready_release_num}&history=true`}>{reInfo.ready_release_num}</Link>
-          </p>);
-      });
+      if (releasedNums && releasedNums.length > 0) {
+        releasedNums.forEach((reInfo: any) => {
+          detailsLinks.push(
+            <p> {reInfo.ready_release_name}:
+              <Link
+                to={`/onDutyAndRelease/preRelease?releasedNum=${reInfo.ready_release_num}&history=true`}>{reInfo.ready_release_num}</Link>
+            </p>);
+        });
+      }
+
     } else if (gotoType === "1级灰度发布详情") { // 跳转到正式发布详情
       const releasedNums = releData.data?.release_gray_num;
-      releasedNums.forEach((reInfo: any) => {
-        detailsLinks.push(
-          <p> {reInfo.release_gray_name}:
-            <Link
-              to={`/onDutyAndRelease/officialRelease?releaseType=gray&onlineReleaseNum=${reInfo.release_gray_num}&history=true`}>{reInfo.release_gray_num}</Link>
-          </p>);
-      });
+      if (releasedNums && releasedNums.length > 0) {
+        releasedNums.forEach((reInfo: any) => {
+          detailsLinks.push(
+            <p> {reInfo.release_gray_name}:
+              <Link
+                to={`/onDutyAndRelease/officialRelease?releaseType=gray&onlineReleaseNum=${reInfo.release_gray_num}&history=true`}>{reInfo.release_gray_num}</Link>
+            </p>);
+        });
+      }
     }
     setModalInfo({
       visible: true,
@@ -402,23 +412,22 @@ const ReleaseHistory: React.FC<any> = () => {
   }, [formalReleasedData]);
 
   useEffect(() => {
-    // 设置表格高度
-    if (zeroGrayscaleData?.data) {
-      setGridHeight({
-        ...gridHeight,
-        zeroGrid: (zeroGrayscaleData?.data).length * 30 + 80,
-      });
-    }
-
     if (firstGrayscaleData?.data) {
       setGridHeight({
         ...gridHeight,
         firstGrid: (firstGrayscaleData?.data).length * 30 + 80,
       });
     }
+  }, [firstGrayscaleData]);
 
-  }, [zeroGrayscaleData, firstGrayscaleData]);
-
+  useEffect(() => {
+    if (zeroGrayscaleData?.data) {
+      setGridHeight({
+        ...gridHeight,
+        zeroGrid: (zeroGrayscaleData?.data).length * 30 + 80,
+      });
+    }
+  }, [zeroGrayscaleData]);
 
   return (
     <PageContainer>
@@ -440,7 +449,7 @@ const ReleaseHistory: React.FC<any> = () => {
         <div className="ag-theme-alpine"
              style={{marginTop: -21, height: gridHeight.zeroGrid, width: '100%'}}>
           <AgGridReact
-            columnDefs={grayscaleBacklogList()} // 定义列
+            columnDefs={grayscaleBacklogList("zero")} // 定义列
             rowData={zeroGrayscaleData?.data} // 数据绑定
             defaultColDef={girdDefaultSetting}
             rowHeight={30}
@@ -475,7 +484,7 @@ const ReleaseHistory: React.FC<any> = () => {
         <div className="ag-theme-alpine"
              style={{marginTop: -21, height: gridHeight.firstGrid, width: '100%'}}>
           <AgGridReact
-            columnDefs={grayscaleBacklogList()} // 定义列
+            columnDefs={grayscaleBacklogList("one")} // 定义列
             rowData={firstGrayscaleData?.data} // 数据绑定
             defaultColDef={girdDefaultSetting}
             rowHeight={30}

@@ -7,7 +7,18 @@ const gridHeight = (datas: any) => {
 }
 
 // 灰度积压列表
-const grayscaleBacklogList = () => {
+const grayscaleBacklogList = (type: string) => {
+  let grayNum = {
+    headerName: '灰度发布批次号',
+    field: 'ready_release_num',
+    minWidth: 135,
+    maxWidth: 150,
+
+  };
+  if (type === "one") {
+    grayNum.field = "release_gray_num";
+  }
+
   const column: any = [
     {
       headerName: '选择',
@@ -24,11 +35,7 @@ const grayscaleBacklogList = () => {
         return Number(params.node.id) + 1;
       },
     }, {
-      headerName: '灰度发布批次号',
-      field: 'ready_release_num',
-      minWidth: 135,
-      maxWidth: 150,
-      // sort: "asc"
+      ...grayNum
     }, {
       headerName: '灰度发布名称',
       field: 'ready_release_name',

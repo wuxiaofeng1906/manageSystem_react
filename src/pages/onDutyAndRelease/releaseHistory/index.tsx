@@ -21,7 +21,7 @@ import {gridHeadDivStyle, girdDefaultSetting} from "./commonSetting";
 import "./style.css";
 import {Link} from 'umi';
 
-const {RangePicker} = DatePicker;
+const RangePicker: any = DatePicker.RangePicker;
 const formalQueryCondition = {
   start: dayjs().subtract(7, 'day').format("YYYY-MM-DD"),
   end: dayjs().format("YYYY-MM-DD"),
@@ -55,7 +55,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
   const [zeroButtonTitle, setZeroButtonTitle] = useState("一键生成1级灰度发布");  // 待发布详情
   // 0级灰度积压列表数据
-  const zeroGrayscaleData = useRequest(() => getZeroGrayscaleListData("zero", zeroStart, `${zeroEnd} 23:59:59`)).data;
+  const zeroGrayscaleData = useRequest(() => getZeroGrayscaleListData(zeroStart, `${zeroEnd} 23:59:59`)).data;
   // 一键生成正式发布
   const generateFormalZeroRelease = async () => {
     const sel_rows = zeroGrayscaleGridApi.current?.getSelectedRows();
@@ -83,7 +83,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 刷新0级灰度发布
   const refreshZeroReleaseGrid = async () => {
-    const girdDatas = await getZeroGrayscaleListData("zero", zeroStart, `${zeroEnd} 23:59:59`);
+    const girdDatas = await getZeroGrayscaleListData(zeroStart, `${zeroEnd} 23:59:59`);
     if (girdDatas.message !== "") {
       errorMessage((girdDatas.message).toString());
     } else {
@@ -121,7 +121,7 @@ const ReleaseHistory: React.FC<any> = () => {
   };
   const [firstButtonTitle, setFirstButtonTitle] = useState("一键生成正式发布");  // 待发布详情
   // 1级灰度积压列表数据
-  const firstGrayscaleData = useRequest(() => getFirstGrayscaleListData("one", firstStart, `${firstEnd} 23:59:59`)).data;
+  const firstGrayscaleData = useRequest(() => getFirstGrayscaleListData(firstStart, `${firstEnd} 23:59:59`)).data;
   // 一键生成正式发布
   const generateFormalFirstRelease = async () => {
     const sel_rows = firstGrayscaleGridApi.current?.getSelectedRows();
@@ -150,7 +150,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 刷新1级灰度发布列表
   const refreshFirstReleaseGrid = async () => {
-    const girdDatas = await getFirstGrayscaleListData("one", firstStart, `${firstEnd} 23:59:59`);
+    const girdDatas = await getFirstGrayscaleListData(firstStart, `${firstEnd} 23:59:59`);
     if (girdDatas.message !== "") {
       errorMessage((girdDatas.message).toString());
     } else {
@@ -181,7 +181,7 @@ const ReleaseHistory: React.FC<any> = () => {
   /* region 操作按钮 */
   // 删除发布详情
   const confirmDelete = async (releaseType: string, params: any) => {
-    const delResult = await delGrayReleaseHistory(params.ready_release_num);
+    const delResult = await delGrayReleaseHistory(releaseType, params.ready_release_num,);
     if (delResult.code === 200) {
       sucMessage("删除成功！")
       // 刷新数据
@@ -412,23 +412,22 @@ const ReleaseHistory: React.FC<any> = () => {
   }, [formalReleasedData]);
 
   useEffect(() => {
-    // 设置表格高度
-    if (zeroGrayscaleData?.data) {
-      setGridHeight({
-        ...gridHeight,
-        zeroGrid: (zeroGrayscaleData?.data).length * 30 + 80,
-      });
-    }
-
     if (firstGrayscaleData?.data) {
       setGridHeight({
         ...gridHeight,
         firstGrid: (firstGrayscaleData?.data).length * 30 + 80,
       });
     }
+  }, [firstGrayscaleData]);
 
-  }, [zeroGrayscaleData, firstGrayscaleData]);
-
+  useEffect(() => {
+    if (zeroGrayscaleData?.data) {
+      setGridHeight({
+        ...gridHeight,
+        zeroGrid: (zeroGrayscaleData?.data).length * 30 + 80,
+      });
+    }
+  }, [zeroGrayscaleData]);
 
   return (
     <PageContainer>
@@ -450,7 +449,7 @@ const ReleaseHistory: React.FC<any> = () => {
         <div className="ag-theme-alpine"
              style={{marginTop: -21, height: gridHeight.zeroGrid, width: '100%'}}>
           <AgGridReact
-            columnDefs={grayscaleBacklogList()} // 定义列
+            columnDefs={grayscaleBacklogList("zero")} // 定义列
             rowData={zeroGrayscaleData?.data} // 数据绑定
             defaultColDef={girdDefaultSetting}
             rowHeight={30}
@@ -485,7 +484,7 @@ const ReleaseHistory: React.FC<any> = () => {
         <div className="ag-theme-alpine"
              style={{marginTop: -21, height: gridHeight.firstGrid, width: '100%'}}>
           <AgGridReact
-            columnDefs={grayscaleBacklogList()} // 定义列
+            columnDefs={grayscaleBacklogList("one")} // 定义列
             rowData={firstGrayscaleData?.data} // 数据绑定
             defaultColDef={girdDefaultSetting}
             rowHeight={30}

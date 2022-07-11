@@ -22,19 +22,25 @@ import "./style.css";
 import {Link} from 'umi';
 
 const RangePicker: any = DatePicker.RangePicker;
+
+// 0级灰度发布列表时间
+// let zeroStart = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
+// let zeroEnd = dayjs().format("YYYY-MM-DD");
+let zeroStart = dayjs().startOf('month').format("YYYY-MM-DD");
+let zeroEnd = dayjs().endOf('month').format("YYYY-MM-DD");
+// 1级灰度发布列表时间
+// let firstStart = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
+// let firstEnd = dayjs().format("YYYY-MM-DD");
+let firstStart = dayjs().startOf('month').format("YYYY-MM-DD");
+let firstEnd = dayjs().endOf('month').format("YYYY-MM-DD");
+// 正式发布时间等条件
 const formalQueryCondition = {
   start: dayjs().subtract(7, 'day').format("YYYY-MM-DD"),
-  end: dayjs().format("YYYY-MM-DD"),
+  end: dayjs().add(7,'day').format("YYYY-MM-DD"),
   project: "",
   page: 1, // 跳转到第几页
   pageSize: 100  // 一页显示多少条数据
 }
-// 0级灰度发布列表时间
-let zeroStart = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
-let zeroEnd = dayjs().format("YYYY-MM-DD");
-// 1级灰度发布列表时间
-let firstStart = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
-let firstEnd = dayjs().format("YYYY-MM-DD");
 
 const ReleaseHistory: React.FC<any> = () => {
   // 设置表格的高度。
@@ -136,7 +142,13 @@ const ReleaseHistory: React.FC<any> = () => {
       }
       const ready_release_num: any = [];
       sel_rows?.forEach((ele: any) => {
-        ready_release_num.push(ele.release_gray_num);
+        // 这里的编号不传release_gray_num，使用：ready_release_num（ready_release_num是一个数组，需要循环取出来）
+        const readyReleaseNum = ele.ready_release_num;
+        if (readyReleaseNum && readyReleaseNum.length > 0) {
+          readyReleaseNum.forEach((nums: any) => {
+            ready_release_num.push(nums.ready_release_num);
+          });
+        }
       });
 
       // 需要在这个页面生成发布编号。只有成功了才跳转到详情界面

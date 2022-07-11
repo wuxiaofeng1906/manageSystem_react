@@ -232,7 +232,7 @@ const Overview = () => {
           </Col>
         </Row>
       </Form>
-      <div className={'AgGridReactTable'} style={{ height: 400 }}>
+      <div className={'AgGridReactTable'} style={{ height: 300 }}>
         <AgGridReact {...initGridTable(bugLogRef)} columnDefs={OverviewBugLog} rowData={[]} />
       </div>
       <Form form={bugForm}>
@@ -254,7 +254,7 @@ const Overview = () => {
           </Col>
         </Row>
       </Form>
-      <div className={'AgGridReactTable'} style={{ height: 400 }}>
+      <div className={'AgGridReactTable'} style={{ height: 300 }}>
         <AgGridReact {...initGridTable(bugRef)} columnDefs={OverviewBug} rowData={[]} />
       </div>
     </div>

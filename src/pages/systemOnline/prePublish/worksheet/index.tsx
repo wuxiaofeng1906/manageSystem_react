@@ -27,7 +27,6 @@ const Worksheet = () => {
   const [tabs, setTabs] = useState<IRecord[]>([]);
   const [activeTab, setActiveTab] = useState('11');
   const [subTab, setSubTab] = useState('info');
-  const [closable, setClosable] = useState(false);
 
   const onAdd = () => {
     const add = [...tabs];
@@ -53,7 +52,7 @@ const Worksheet = () => {
       >
         {tabs.map((it) => {
           return (
-            <Tabs.TabPane tab={it.title} key={it.id} closable={closable}>
+            <Tabs.TabPane tab={it.title} key={it.id} closable={false}>
               <Tabs
                 activeKey={subTab}
                 onChange={(v) => setSubTab(v)}
@@ -177,7 +176,7 @@ const WorksheetHot = ({ data }: { data: any }) => {
 
   useEffect(() => {
     // fresh
-    console.log(selected);
+    // console.log(selected);
   }, [selected]);
 
   return (
@@ -197,50 +196,54 @@ const WorksheetHot = ({ data }: { data: any }) => {
           ])}
           dataSource={mergeCellsTable(serviceSource, 'id')}
           className={'initial-ant-table'}
+          pagination={false}
           bordered
         />
       </FieldSet>
-      <FieldSet data={{ title: '一、工单-基础设置' }}>
-        <Form form={form}>
-          <Row gutter={8}>
-            <Col span={6}>
-              <Form.Item name={'type'} label={'工单类型选择'}>
-                <Select
-                  options={[
-                    { value: '1', label: '蓝绿发布' },
-                    { value: '2', label: '接口工单' },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item name={'id'} label={'工单名称'}>
-                <Select />
-              </Form.Item>
-            </Col>
-            {watchType !== '2' ? (
-              <Col span={4}>
-                <Form.Item name={'count'} label={'并发数'}>
-                  <InputNumber style={{ width: '100%' }} min={0} precision={0} maxLength={11} />
+      <div className={'formItem'} style={{ margin: '10px 0' }}>
+        <FieldSet data={{ title: '一、工单-基础设置' }}>
+          <Form form={form}>
+            <Row gutter={8}>
+              <Col span={6}>
+                <Form.Item name={'type'} label={'工单类型选择'}>
+                  <Select
+                    options={[
+                      { value: '1', label: '蓝绿发布' },
+                      { value: '2', label: '接口工单' },
+                    ]}
+                  />
                 </Form.Item>
               </Col>
-            ) : (
-              <div />
-            )}
-            <Col span={6}>
-              <Form.Item name={'add'}>
-                <Checkbox>仅需发布一次，在灰度推线上时不会算做积压</Checkbox>
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
-      </FieldSet>
+              <Col span={8}>
+                <Form.Item name={'id'} label={'工单名称'}>
+                  <Select />
+                </Form.Item>
+              </Col>
+              {watchType !== '2' ? (
+                <Col span={4}>
+                  <Form.Item name={'count'} label={'并发数'}>
+                    <InputNumber style={{ width: '100%' }} min={0} precision={0} maxLength={11} />
+                  </Form.Item>
+                </Col>
+              ) : (
+                <div />
+              )}
+              <Col span={6}>
+                <Form.Item name={'add'}>
+                  <Checkbox>仅需发布一次，在灰度推线上时不会算做积压</Checkbox>
+                </Form.Item>
+              </Col>
+            </Row>
+          </Form>
+        </FieldSet>
+      </div>
       <FieldSet data={{ title: '二、工单-表单设置' }}>
         <Table
           bordered
           columns={worksheetFormColumn}
           dataSource={mergeCellsTable(formSource, 'id')}
           className={'initial-ant-table'}
+          pagination={false}
         />
       </FieldSet>
     </div>
@@ -344,7 +347,13 @@ const WorksheetGrey = ({ data }: { data: any }) => {
           <Checkbox onChange={(e) => onIgnore(e.target.checked, record, index)}>
             上线后继续保留灰度积压
           </Checkbox>
-          <Button type={'text'} style={{ color: 'red' }}>
+          <Button
+            type={'text'}
+            className={'color-failure'}
+            onClick={() => {
+              console.log(index, record);
+            }}
+          >
             删除积压工单
           </Button>
         </>
@@ -359,41 +368,45 @@ const WorksheetGrey = ({ data }: { data: any }) => {
           columns={worksheetServiceGreyColumn.concat(operationColumn)}
           dataSource={mergeCellsTable(serviceSource, 'id')}
           className={'initial-ant-table'}
+          pagination={false}
           bordered
         />
       </FieldSet>
-      <FieldSet data={{ title: '一、工单-基础设置' }}>
-        <Form form={form}>
-          <Row gutter={8}>
-            <Col span={6}>
-              <Form.Item name={'type'} label={'工单类型选择'}>
-                <Select
-                  options={[
-                    { value: '1', label: '蓝绿发布' },
-                    { value: '2', label: '接口工单' },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item name={'id'} label={'工单名称'}>
-                <Select />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item name={'mark'} label={'工单说明'}>
-                <Input.TextArea />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
-      </FieldSet>
+      <div className={'formItem'} style={{ margin: '10px 0' }}>
+        <FieldSet data={{ title: '一、工单-基础设置' }}>
+          <Form form={form}>
+            <Row gutter={8}>
+              <Col span={7}>
+                <Form.Item name={'type'} label={'工单类型选择'}>
+                  <Select
+                    options={[
+                      { value: '1', label: '蓝绿发布' },
+                      { value: '2', label: '接口工单' },
+                    ]}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={7}>
+                <Form.Item name={'id'} label={'工单名称'}>
+                  <Select />
+                </Form.Item>
+              </Col>
+              <Col span={10}>
+                <Form.Item name={'mark'} label={'工单说明'}>
+                  <Input.TextArea />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Form>
+        </FieldSet>
+      </div>
       <FieldSet data={{ title: '二、工单-表单设置' }}>
         <Table
           bordered
           columns={envColumn.concat(worksheetFormGreyColumn)}
           dataSource={mergeCellsTable(formSource, 'id')}
           className={'initial-ant-table'}
+          pagination={false}
         />
       </FieldSet>
     </div>

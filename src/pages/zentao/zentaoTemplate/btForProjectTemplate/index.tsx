@@ -77,7 +77,6 @@ const ProjectTemplate: React.FC<any> = () => {
 
   // 项目执行修改
   const excutionChanged = async (params: any) => {
-    debugger;
 
     //   获取项目负责人
     const excuteInfo = params.split("&");

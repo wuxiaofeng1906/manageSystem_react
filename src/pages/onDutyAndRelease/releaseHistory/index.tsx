@@ -4,73 +4,68 @@ import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {GridApi, GridReadyEvent} from 'ag-grid-community';
+import type {GridApi, GridReadyEvent} from 'ag-grid-community';
 import {useRequest} from "ahooks";
 import {
-  getGrayscaleListData,
-  getFormalListData,
-  vertifyOnlineProjectExit,
-  getOnlineProocessDetails
+  getGrayscaleListData, getFormalListData, vertifyOnlineProjectExit, getOnlineProocessDetails,
+  delGrayReleaseHistory
 } from './axiosRequest/apiPage';
 import {history} from "@@/core/history";
-import {Button, DatePicker, Select} from "antd";
+import {Button, DatePicker, Select, Popconfirm} from "antd";
 import {loadPrjNameSelect} from "@/pages/onDutyAndRelease/preRelease/comControl/controler";
 import dayjs from "dayjs";
 import moment from 'moment';
 import {grayscaleBacklogList, releasedList} from './gridSet';
-import {errorMessage} from "@/publicMethods/showMessages";
-import {getHeight} from "@/publicMethods/pageSet";
+import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
+import {gridHeadDivStyle, girdDefaultSetting} from "./commonSetting";
+import "./style.css";
 
 const {RangePicker} = DatePicker;
 const formalQueryCondition = {
-  start: dayjs().subtract(7, 'day').format("YYYY-MM-DD HH:mm:ss"),
-  end: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+  start: dayjs().subtract(7, 'day').format("YYYY-MM-DD"),
+  end: dayjs().format("YYYY-MM-DD"),
   project: "",
   page: 1, // 跳转到第几页
   pageSize: 100  // 一页显示多少条数据
 }
-const start = dayjs().subtract(30, 'day').format("YYYY-MM-DD HH:mm:ss");
-const end = dayjs().format("YYYY-MM-DD HH:mm:ss");
+// 0级灰度发布列表时间
+let zeroStart = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
+let zeroEnd = dayjs().format("YYYY-MM-DD");
+// 1级灰度发布列表时间
+let firstStart = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
+let firstEnd = dayjs().format("YYYY-MM-DD");
 
 const ReleaseHistory: React.FC<any> = () => {
+  // 设置表格的高度。
+  const [gridHeight, setGridHeight] = useState({
+    zeroGrid: 100,
+    firstGrid: 100,
+    formalGrid: 100
+  });
 
-  /* region 灰度积压列表 */
-  const grayscaleGridApi = useRef<GridApi>();
-  const onGrayscaleGridReady = (params: GridReadyEvent) => {
-    grayscaleGridApi.current = params.api;
+  /* region 灰度发布界面 */
+
+  /* region 0级灰度积压列表 */
+  const zeroGrayscaleGridApi = useRef<GridApi>();
+  const onZeroGrayscaleGridReady = (params: GridReadyEvent) => {
+    zeroGrayscaleGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
 
-  const [buttonTitle, setButtonTitle] = useState("一键生成正式发布");  // 待发布详情
-  // 积压列表数据
-  const grayscaleData = useRequest(() => getGrayscaleListData(start, end)).data;
-  // 根据时间查询
-  const onGrayReleaseTimeChanged = async (params: any, times: any) => {
-    let startTimes = times[0];
-    if (startTimes) {
-      startTimes = dayjs(start).format("YYYY-MM-DD HH:mm:ss");
-    }
-    let endTimes = times[1];
-    if (endTimes) {
-      endTimes = dayjs(end).format("YYYY-MM-DD HH:mm:ss");
-    }
-    const grayReleaseList = await getGrayscaleListData(startTimes, endTimes);
-    grayscaleGridApi.current?.setRowData(grayReleaseList?.data);
-  };
+  const [zeroButtonTitle, setZeroButtonTitle] = useState("一键生成1级灰度发布");  // 待发布详情
+  // 0级灰度积压列表数据
+  const zeroGrayscaleData = useRequest(() => getGrayscaleListData("zero", zeroStart, `${zeroEnd} 23:59:59`)).data;
   // 一键生成正式发布
-  const generateFormalRelease = async () => {
-    const sel_rows = grayscaleGridApi.current?.getSelectedRows();
-
+  const generateFormalZeroRelease = async () => {
+    const sel_rows = zeroGrayscaleGridApi.current?.getSelectedRows();
     // 如果是待发布详情，则不需要判断有没有勾选
-    if (buttonTitle === "待发布详情") {
-      history.push(`/onDutyAndRelease/officialRelease`);
+    if (zeroButtonTitle === "待发布详情") {
+      history.push(`/onDutyAndRelease/officialRelease?releaseType=gray`);
     } else {
-
       if (sel_rows?.length === 0) {
         errorMessage("请先勾选需要发布的数据！")
         return;
       }
-
       const ready_release_num: any = [];
       sel_rows?.forEach((ele: any) => {
         ready_release_num.push(ele.ready_release_num);
@@ -78,14 +73,178 @@ const ReleaseHistory: React.FC<any> = () => {
 
       // 需要在这个页面生成发布编号。只有成功了才跳转到详情界面
       const readyReleaseNum = ready_release_num.join("|");
-      const onlineNum = await getOnlineProocessDetails(readyReleaseNum);
-      if(onlineNum){
-        history.push(`/onDutyAndRelease/officialRelease?releaseNum=${readyReleaseNum}&onlineReleaseNum=${onlineNum}`);
+      const onlineNum = await getOnlineProocessDetails(readyReleaseNum, "gray");
+      if (onlineNum) {
+        history.push(`/onDutyAndRelease/officialRelease?releaseType=gray&releaseNum=${readyReleaseNum}&onlineReleaseNum=${onlineNum}`);
       }
     }
   };
 
+  // 刷新0级灰度发布
+  const refreshZeroReleaseGrid = async () => {
+    const girdDatas = await getGrayscaleListData("zero", zeroStart, `${zeroEnd} 23:59:59`);
+    if (girdDatas.message !== "") {
+      errorMessage((girdDatas.message).toString());
+    } else {
+      zeroGrayscaleGridApi.current?.setRowData(girdDatas?.data);
+      setGridHeight({
+        ...gridHeight,
+        zeroGrid: (girdDatas?.data).length * 30 + 80,
+      });
+    }
+  };
+
+  // 根据时间查询
+  const onZeroGrayReleaseTimeChanged = async (params: any, times: any) => {
+    if (times[0]) {
+      zeroStart = dayjs(times[0]).format("YYYY-MM-DD");
+    }
+    if (times[1]) {
+      zeroEnd = dayjs(times[1]).format("YYYY-MM-DD");
+    }
+    // 更新数据
+    await refreshZeroReleaseGrid();
+  };
+
   /* endregion */
+
+  /* region 1级灰度积压列表 */
+  const firstGrayscaleGridApi = useRef<GridApi>();
+  const onFirstGrayscaleGridReady = (params: GridReadyEvent) => {
+    firstGrayscaleGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+  const [firstButtonTitle, setFirstButtonTitle] = useState("一键生成正式发布");  // 待发布详情
+  // 1级灰度积压列表数据
+  const firstGrayscaleData = useRequest(() => getGrayscaleListData("one", firstStart, `${firstEnd} 23:59:59`)).data;
+  // 一键生成正式发布
+  const generateFormalFirstRelease = async () => {
+    const sel_rows = firstGrayscaleGridApi.current?.getSelectedRows();
+
+    // 如果是待发布详情，则不需要判断有没有勾选
+    if (firstButtonTitle === "待发布详情") {
+      history.push(`/onDutyAndRelease/officialRelease?releaseType=online`);
+    } else {
+      if (sel_rows?.length === 0) {
+        errorMessage("请先勾选需要发布的数据！")
+        return;
+      }
+      const ready_release_num: any = [];
+      sel_rows?.forEach((ele: any) => {
+        ready_release_num.push(ele.ready_release_num);
+      });
+
+      // 需要在这个页面生成发布编号。只有成功了才跳转到详情界面
+      const readyReleaseNum = ready_release_num.join("|");
+      const onlineNum = await getOnlineProocessDetails(readyReleaseNum, "online");
+      if (onlineNum) {
+        history.push(`/onDutyAndRelease/officialRelease?releaseType=online&releaseNum=${readyReleaseNum}&onlineReleaseNum=${onlineNum}`);
+      }
+    }
+  };
+
+  // 刷新1级灰度发布列表
+  const refreshFirstReleaseGrid = async () => {
+    const girdDatas = await getGrayscaleListData("one", firstStart, `${firstEnd} 23:59:59`);
+    if (girdDatas.message !== "") {
+      errorMessage((girdDatas.message).toString());
+    } else {
+      firstGrayscaleGridApi.current?.setRowData(girdDatas?.data);
+      setGridHeight({
+        ...gridHeight,
+        firstGrid: (girdDatas?.data).length * 30 + 80,
+      });
+    }
+  };
+  // 根据时间查询
+  const onFirstGrayReleaseTimeChanged = async (params: any, times: any) => {
+    if (times[0]) {
+      firstStart = dayjs(times[0]).format("YYYY-MM-DD");
+    }
+    if (times[1]) {
+      firstEnd = dayjs(times[1]).format("YYYY-MM-DD");
+    }
+    await refreshFirstReleaseGrid();
+  };
+
+  /* endregion */
+
+  // 跳转到预发布界面
+  const gotoGrayReleasePage = (releData: any) => {
+    const releasedNum = releData.data?.ready_release_num;
+    history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
+  };
+
+  // 删除发布详情
+  const confirmDelete = async (releaseType: string, params: any) => {
+    const delResult = await delGrayReleaseHistory(params.ready_release_num);
+    if (delResult.code === 200) {
+      sucMessage("删除成功！")
+      // 刷新数据
+      if (releaseType === "zero") {
+        await refreshZeroReleaseGrid();
+      } else if (releaseType === "one") {
+        await refreshFirstReleaseGrid();
+      }
+    }
+  };
+
+  // 操作按钮
+  const grayListOperate = (releaseType: string, params: any) => {
+    // 跳转到灰度发布详情
+    const grayButton = <Button className={"operateButton"} onClick={() => gotoGrayReleasePage(params)}>
+      <img src={"../gray_detail_normal.png"} width="20" height="20" alt="0级灰度发布过程详情" title="0级灰度发布过程详情"/>
+    </Button>;
+
+    // 删除功能
+    const deleteButton =
+      <Popconfirm
+        placement="topRight"
+        title={"已停留在灰度积压列表中，请谨慎核对,是否确认需要删除?"}
+        onConfirm={() => {
+          confirmDelete(releaseType, params?.data);
+        }}
+        okText="是"
+        cancelText="否"
+      >
+        <Button className={"operateButton"} style={{marginLeft: -20}}>
+          <img src="../delete.png" width="20" height="20" alt="删除发布详情" title="删除发布详情"/>
+        </Button>
+      </Popconfirm>;
+
+    // 跳转到正式发布列表
+    const firstGrayNum = params.data?.release_gray_num;
+    let firstSrcPath = "../details_0.png";
+    let firstButtonDisable = false;
+    if (!firstGrayNum) {
+      firstSrcPath = "../details_0_gray.png";
+      firstButtonDisable = true;
+    }
+
+    const onlineButton =
+      <Button style={{
+        border: "none", backgroundColor: "transparent",
+        fontSize: "small", color: "#46A0FC", marginLeft: -20
+      }} disabled={firstButtonDisable}
+              onClick={() => gotoFirstReleasePage(params)}>
+        <img src={firstSrcPath} width="20" height="20" alt="1级灰度发布过程详情" title="1级灰度发布过程详情"/>
+      </Button>;
+
+    if (releaseType === "one") {
+      return <div>
+        {grayButton}
+        {onlineButton}
+        {deleteButton}
+      </div>;
+    } else {
+      return <div>
+        {grayButton}
+        {deleteButton}
+      </div>;
+    }
+  }
+
+  /* endregion 灰度发布界面 */
 
   /* region 已正式发布列表 */
   const releasedGridApi = useRef<GridApi>();
@@ -98,25 +257,28 @@ const ReleaseHistory: React.FC<any> = () => {
   const projectsArray = useRequest(() => loadPrjNameSelect()).data;
 
   // 正式发布列表数据
-  const releasedData = useRequest(() => getFormalListData(formalQueryCondition)).data;
+  const formalReleasedData = useRequest(() => getFormalListData(formalQueryCondition)).data;
 
   // 根据查询条件获取数据
   const getReleasedList = async () => {
-    const cond = {
+    const cond: any = {
       page: 1,
       pageSize: 100
     };
 
     if (formalQueryCondition.start && formalQueryCondition.end) {
-      cond["release_start_time"] = formalQueryCondition.start;
-      cond["release_end_time"] = formalQueryCondition.end;
+      cond.release_start_time = formalQueryCondition.start;
+      cond.release_end_time = `${formalQueryCondition.end} 23:59:59`;
     }
     if (formalQueryCondition.project) {
-      cond["project_id"] = formalQueryCondition.project;
+      cond.project_id = formalQueryCondition.project;
     }
     const result = await getFormalListData(cond);
     releasedGridApi.current?.setRowData(result.data);
-
+    setGridHeight({
+      ...gridHeight,
+      formalGrid: (result.data).length * 30 + 80
+    })
   };
 
   // 根据项目获取
@@ -135,84 +297,138 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 根据时间获取
   const onReleaseProject = (params: any, times: any) => {
-    formalQueryCondition.start = times[0] === "" ? "" : dayjs(times[0]).format("YYYY-MM-DD HH:mm:ss");
-    formalQueryCondition.end = times[1] === "" ? "" : dayjs(times[1]).format("YYYY-MM-DD HH:mm:ss");
+    formalQueryCondition.start = times[0] === "" ? "" : dayjs(times[0]).format("YYYY-MM-DD");
+    formalQueryCondition.end = times[1] === "" ? "" : dayjs(times[1]).format("YYYY-MM-DD");
     getReleasedList();
   }
-
-  /* endregion */
-
-  // 跳转到灰度界面
-  const gotoGrayReleasePage = (releData: any) => {
-    const releasedNum = releData.data?.ready_release_num;
-    history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
-  };
 
   // 跳转到正式发布界面
   const gotoOnlineReleasePage = (releData: any) => {
     const onlineReleasedNum = releData.data?.online_release_num;
-    history.push(`/onDutyAndRelease/officialRelease?onlineReleaseNum=${onlineReleasedNum}&history=true`);
+    history.push(`/onDutyAndRelease/officialRelease?releaseType=online&onlineReleaseNum=${onlineReleasedNum}&history=true`);
   };
 
+  // 一级灰度跳转到正式发布界面
+  const gotoFirstReleasePage = (releData: any) => {
+    const onlineReleasedNum = releData.data?.release_gray_num;
+    history.push(`/onDutyAndRelease/officialRelease?releaseType=gray&onlineReleaseNum=${onlineReleasedNum}&history=true`);
+  };
+  /* endregion */
+
   window.addEventListener('resize', () => {
-    grayscaleGridApi.current?.sizeColumnsToFit();
+    zeroGrayscaleGridApi.current?.sizeColumnsToFit();
+    firstGrayscaleGridApi.current?.sizeColumnsToFit();
     releasedGridApi.current?.sizeColumnsToFit();
   });
 
   // 显示button title
   const showButtonTitle = async () => {
-    const result = await vertifyOnlineProjectExit();
-
-    if (result) {
-      setButtonTitle("待发布详情");
+    const zeroResult = await vertifyOnlineProjectExit("gray");
+    if (zeroResult) {
+      // 0级灰度发布列表按钮title
+      setZeroButtonTitle("待发布详情");
+    }
+    const firstResult = await vertifyOnlineProjectExit("online");
+    if (firstResult) {
+      setFirstButtonTitle("待发布详情");
     }
   };
+
   useEffect(() => {
     showButtonTitle();
-  }, [releasedData]);
+    if (formalReleasedData?.data) {
+      setGridHeight({
+        ...gridHeight,
+        formalGrid: (formalReleasedData?.data).length * 30 + 80
+      });
+    }
+  }, [formalReleasedData]);
+
+  useEffect(() => {
+    // 设置表格高度
+    if (zeroGrayscaleData?.data) {
+      setGridHeight({
+        ...gridHeight,
+        zeroGrid: (zeroGrayscaleData?.data).length * 30 + 80,
+      });
+    }
+
+    if (firstGrayscaleData?.data) {
+      setGridHeight({
+        ...gridHeight,
+        firstGrid: (firstGrayscaleData?.data).length * 30 + 80,
+      });
+    }
+
+  }, [zeroGrayscaleData, firstGrayscaleData]);
+
+
   return (
     <PageContainer>
-      {/* 灰度积压列表 */}
+      {/* 0级灰度积压列表 */}
       <div style={{marginTop: -20}}>
-        <div style={{
-          height: "35px", lineHeight: "35px", verticalAlign: "middle",
-          textAlign: "left", backgroundColor: "#F8F8F8", width: '100%',
-          border: "solid 1px #CCCCCC"
-        }}> &nbsp;
-          <Button type="text" onClick={generateFormalRelease} style={{float: "right"}}>
-            <img src="../pushMessage.png" width="25" height="25" alt="一键生成正式发布" title="一键生成正式发布"/> &nbsp;{buttonTitle}
+        <div style={gridHeadDivStyle}> &nbsp;
+          <label style={{fontWeight: "bold", float: "left"}}>0级灰度发布列表</label>
+          <Button type="text" onClick={generateFormalZeroRelease} style={{float: "right"}}>
+            <img src="../pushMessage.png" width="25" height="25" alt="一键生成1级灰度发布"
+                 title="一键生成1级灰度发布"/> &nbsp;{zeroButtonTitle}
           </Button>
           <div style={{float: "right"}}>
             <label style={{marginLeft: 10}}>发布时间: </label>
-            <RangePicker style={{marginLeft: 5}} size={"small"} defaultValue={[moment(start), moment(end)]}
-                         onChange={onGrayReleaseTimeChanged}/>
+            <RangePicker style={{marginLeft: 5}} size={"small"} defaultValue={[moment(zeroStart), moment(zeroEnd)]}
+                         onChange={onZeroGrayReleaseTimeChanged}/>
           </div>
         </div>
         <button></button>
         <div className="ag-theme-alpine"
-             style={{marginTop: -21, height: getHeight() / 2, width: '100%'}}>
+             style={{marginTop: -21, height: gridHeight.zeroGrid, width: '100%'}}>
           <AgGridReact
             columnDefs={grayscaleBacklogList()} // 定义列
-            rowData={grayscaleData?.data} // 数据绑定
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true,
-              suppressMenu: true,
-              cellStyle: {'line-height': '30px'},
-            }}
+            rowData={zeroGrayscaleData?.data} // 数据绑定
+            defaultColDef={girdDefaultSetting}
             rowHeight={30}
             headerHeight={35}
             rowSelection={'multiple'} // 设置多行选中
             suppressRowTransform={true}
-            onGridReady={onGrayscaleGridReady}
+            onGridReady={onZeroGrayscaleGridReady}
             frameworkComponents={{
               grayReleaseDetails: (params: any) => {
-                return (
-                  <Button style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
-                          onClick={() => gotoGrayReleasePage(params)}>
-                    <img src="../gray_detail_normal.png" width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情"/>
-                  </Button>)
+                return grayListOperate("zero", params);
+              }
+            }}>
+          </AgGridReact>
+        </div>
+      </div>
+
+      {/* 1级灰度积压列表 */}
+      <div style={{marginTop: 20}}>
+        <div style={gridHeadDivStyle}> &nbsp;
+          <label style={{fontWeight: "bold", float: "left"}}>1级灰度发布列表</label>
+          <Button type="text" onClick={generateFormalFirstRelease} style={{float: "right"}}>
+            <img src="../pushMessage.png" width="25" height="25" alt="一键生成正式发布"
+                 title="一键生成正式发布"/> &nbsp;{firstButtonTitle}
+          </Button>
+          <div style={{float: "right"}}>
+            <label style={{marginLeft: 10}}>发布时间: </label>
+            <RangePicker style={{marginLeft: 5}} size={"small"} defaultValue={[moment(firstStart), moment(firstEnd)]}
+                         onChange={onFirstGrayReleaseTimeChanged}/>
+          </div>
+        </div>
+        <button></button>
+        <div className="ag-theme-alpine"
+             style={{marginTop: -21, height: gridHeight.firstGrid, width: '100%'}}>
+          <AgGridReact
+            columnDefs={grayscaleBacklogList()} // 定义列
+            rowData={firstGrayscaleData?.data} // 数据绑定
+            defaultColDef={girdDefaultSetting}
+            rowHeight={30}
+            headerHeight={35}
+            rowSelection={'multiple'} // 设置多行选中
+            suppressRowTransform={true}
+            onGridReady={onFirstGrayscaleGridReady}
+            frameworkComponents={{
+              grayReleaseDetails: (params: any) => {
+                return grayListOperate("one", params);
               }
             }}>
           </AgGridReact>
@@ -221,11 +437,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
       {/*  已正式发布列表 */}
       <div style={{marginTop: 20}}>
-        <div style={{
-          height: "35px", lineHeight: "35px",
-          width: "100%", backgroundColor: "#F8F8F8",
-          border: "solid 1px #CCCCCC",
-        }}>
+        <div style={gridHeadDivStyle}>
           <label style={{fontWeight: "bold", float: "left"}}>已正式发布列表</label>
           <div style={{textAlign: "right"}}>
             <label> 项目名称:</label>
@@ -238,38 +450,22 @@ const ReleaseHistory: React.FC<any> = () => {
                          defaultValue={[moment(formalQueryCondition.start), moment(formalQueryCondition.end)]}
                          onChange={onReleaseProject}/>
           </div>
-
         </div>
 
         <button></button>
-        <div className="ag-theme-alpine" style={{marginTop: -21, height: getHeight() / 2, width: '100%'}}>
+        <div className="ag-theme-alpine" style={{marginTop: -21, height: gridHeight.formalGrid, width: '100%'}}>
           <AgGridReact
             columnDefs={releasedList()} // 定义列
-            rowData={releasedData?.data} // 数据绑定
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true,
-              suppressMenu: true,
-              cellStyle: {'line-height': '30px'},
-            }}
+            rowData={formalReleasedData?.data} // 数据绑定
+            defaultColDef={girdDefaultSetting}
             rowHeight={30}
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onReleasedGridReady}
             frameworkComponents={{
               officialReleaseDetails: (params: any) => {
-
                 // 发布过程详情都可以跳转，正式发布详情需要判断。
                 const onlineNum = params.data?.online_release_num; // 为空。就可以跳到发布过程详情
-                // 需要判断有没有灰度，没有则置灰
-                // let srcPath = "../gray_detail_normal.png";
-                // let buttonDisable = false;
-                // if (onlineNum) {
-                //   srcPath = "../gray_detail_forbit.png";
-                //   buttonDisable = true;
-                // }
-
                 let srcPath = "../formal_detail.png";
                 let buttonDisable = false;
                 if (!onlineNum) {
@@ -277,18 +473,40 @@ const ReleaseHistory: React.FC<any> = () => {
                   buttonDisable = true;
                 }
 
+                // 1级灰度跳转图标
+                const firstGrayNum = params.data?.release_gray_num;
+                let firstSrcPath = "../details_0.png";
+                let firstButtonDisable = false;
+                if (!firstGrayNum) {
+                  firstSrcPath = "../details_0_gray.png";
+                  firstButtonDisable = true;
+                }
+
                 return (
                   <div>
                     <Button
-                      style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
+                      className={"operateButton"}
                       onClick={() => gotoGrayReleasePage(params)}>
-                      <img src={"../gray_detail_normal.png"} width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情"/>
+                      <img src={"../gray_detail_normal.png"} width="20" height="20" alt="0级灰度发布详情" title="0级灰度发布详情"/>
                     </Button>
                     <Button
+                      disabled={firstButtonDisable}
+                      style={{
+                        border: "none", backgroundColor: "transparent",
+                        fontSize: "small", color: "#46A0FC", marginLeft: -20
+                      }}
+                      onClick={() => gotoFirstReleasePage(params)}>
+                      <img src={firstSrcPath} width="20" height="20" alt="1级灰度发布详情" title="1级灰度发布详情"/>
+                    </Button>
+                    <Button
+                      // className={"operateButton"}
                       disabled={buttonDisable}
-                      style={{border: "none", backgroundColor: "transparent", fontSize: "small", color: "#46A0FC"}}
+                      style={{
+                        border: "none", backgroundColor: "transparent", fontSize: "small",
+                        color: "#46A0FC", marginLeft: -20
+                      }}
                       onClick={() => gotoOnlineReleasePage(params)}>
-                      <img src={srcPath} width="20" height="20" alt="正式发布过程详情" title="正式发布过程详情"/>
+                      <img src={srcPath} width="20" height="20" alt="正式发布详情" title="正式发布详情"/>
                     </Button>
                   </div>
                 )

@@ -2,7 +2,6 @@ import {getOnlinedAutoCheckResult} from "@/pages/onDutyAndRelease/preRelease/com
 import React from "react";
 
 const getAutoResult = async (releaseNum: string) => {
-
   const newData: any = await getOnlinedAutoCheckResult(releaseNum);
   //  需要看后端的上线后自动化检查结果
   if (newData && newData.length > 0) {
@@ -24,7 +23,7 @@ const getAutoResult = async (releaseNum: string) => {
     });
 
     if (ignore === "忽略检查") {
-      return <label style={{color: "blue"}}>发布成功后自动化检查结果:忽略检查</label>
+      return <div> 发布成功后自动化检查结果: <label style={{color: "blue"}}>忽略检查</label></div>
     }
 
     return <label>发布成功后自动化检查结果:
@@ -38,7 +37,7 @@ const getAutoResult = async (releaseNum: string) => {
 
 
 // 解析进度条相关数据来显示
-const showProgressData = async (datas: any) => {
+const showProgressData = async (datas: any, activeKey: string = "") => {
 
   const results = {
     releaseProject: 'Gainsboro', // #2BF541
@@ -72,7 +71,11 @@ const showProgressData = async (datas: any) => {
 
   results.releaseResult = datas.release_result;
   results.processPercent = (successCount / 4) * 100;
-  results.autoCheckResult = await getAutoResult(datas.ready_release_num);
+  if (datas.ready_release_num) {
+    results.autoCheckResult = await getAutoResult(datas.ready_release_num);
+  } else {
+    results.autoCheckResult = await getAutoResult(activeKey);
+  }
   return results;
 };
 

@@ -148,10 +148,11 @@ const OnlineBranch: React.FC<any> = () => {
   };
   // 上线分支弹出窗口进行修改和新增
   (window as any).showOnlineBranchForm = async (type: any, params: any) => {
+
     // 是否是已完成发布
-    if (operteStatus) {
+    if (type === 'add' && operteStatus) {
       message.error({
-        content: `发布已完成，不能进行新增和修改！`,
+        content: `发布已完成，不能新增！`,
         duration: 1,
         style: {
           marginTop: '50vh',
@@ -160,7 +161,6 @@ const OnlineBranch: React.FC<any> = () => {
 
       return;
     }
-
     let branchName = "";
     if (type === 'add') {
       formForOnlineBranch.resetFields();
@@ -808,6 +808,7 @@ const OnlineBranch: React.FC<any> = () => {
                 onClick={() => {
                   formForOnlineBranch.resetFields();
                 }}
+                disabled={operteStatus}
               >清空</Button>
 
               <Button
@@ -815,7 +816,7 @@ const OnlineBranch: React.FC<any> = () => {
                 style={{
                   color: '#46A0FC', backgroundColor: '#ECF5FF',
                   borderRadius: 5, float: 'right',
-                }} onClick={saveOnlineBranchResult}
+                }} onClick={saveOnlineBranchResult} disabled={operteStatus}
               >保存</Button>
             </Form.Item>
           </Spin>

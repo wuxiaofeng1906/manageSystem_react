@@ -521,11 +521,24 @@ const timeRenderer = (params: any) => {
 
 };
 
+// 是否延期
+const isDelayTextDecorateRender = (params: any) => {
+  let colors = "black";
+  if (params.value === "是") {
+    colors = "red";
+  }
+
+  if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
+    return `<span style="text-decoration:line-through;color: ${colors}"> ${params.value} </span>`;
+  }
+  return `<span style="color: ${colors}"> ${params.value} </span>`;
+
+};
 export {
   textDecorateRender, stageValueGetter, stageRenderer, testerValueGetter, testerRenderer,
   testConfirmValueGetter, catagoryValueGetter, linkToZentaoPage, servertyValueGetter, clearCacheRenderer,
   statusValueGetter, statusRenderer, assignedToValueGetter, solvedByValueGetter, relatedNumberRender,
   timestampRenderer, isOrNotValueGetter, testConfirmTooltipValueGetter, testConfirmedRenderer,
   proposedTestValueGetter, testVertifyFilter,
-  vertifyResultValueGetter, sourceValueGetter, timeRenderer
+  vertifyResultValueGetter, sourceValueGetter, timeRenderer, isDelayTextDecorateRender
 };

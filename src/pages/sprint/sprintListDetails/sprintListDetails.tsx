@@ -43,6 +43,7 @@ import {
 import defaultTreeSelectParams from "@/pages/shimo/fileBaseline/iterateList/defaultSetting";
 
 let ora_filter_data: any = [];
+const gird_filter_condition: any = []; // 表格自带过滤了的条件
 const {Option} = Select;
 const SprintList: React.FC<any> = () => {
   const {initialState} = useModel('@@initialState');
@@ -108,17 +109,27 @@ const SprintList: React.FC<any> = () => {
     solvedSelect: []
   });
 
-  // 获取表格中的数据
-  const getGridData = () => {
+  // 获取表格中的数据(最原始的，从gql中拿取的数据)
+  const getOraGridData = () => {
     const datas: any = [];
     gridApi.current?.forEachNode((rows: any) => {
       datas.push(rows?.data);
     });
     return datas;
   }
+
+  // 获取表格中的数据（进行过滤后，界面可以看到的数据）
+  const getFilteredGridData = () => {
+    const datas: any = [];
+    gridApi.current?.forEachNodeAfterFilter((rows: any) => {
+      datas.push(rows?.data);
+    });
+    return datas;
+  }
+
   // 部门下拉框
   const onDeptSelectFocus = async () => {
-    const optionArray: any = await devCenterDept(gqlClient, getGridData());
+    const optionArray: any = await devCenterDept(gqlClient, getFilteredGridData());
     setSelectOptions({
       ...selectOption,
       deptSelect: optionArray
@@ -126,7 +137,7 @@ const SprintList: React.FC<any> = () => {
   };
   // 获取阶段下拉框
   const onStageSelectFocus = () => {
-    const optionArray: any = getStageOption(getGridData());
+    const optionArray: any = getStageOption(getFilteredGridData());
     setSelectOptions({
       ...selectOption,
       stageSelect: optionArray
@@ -135,7 +146,7 @@ const SprintList: React.FC<any> = () => {
 
   // 获取类型下拉框
   const onTypeSelectFocus = () => {
-    const optionArray: any = getTypeOption(getGridData());
+    const optionArray: any = getTypeOption(getFilteredGridData());
     setSelectOptions({
       ...selectOption,
       typeSelect: optionArray
@@ -144,7 +155,7 @@ const SprintList: React.FC<any> = () => {
 
   // 获取指派给下拉框
   const onAssignedSelectFocus = () => {
-    const optionArray: any = getAssignedToOption(personName?.assignedTo, getGridData());
+    const optionArray: any = getAssignedToOption(personName?.assignedTo, getFilteredGridData());
     setSelectOptions({
       ...selectOption,
       assignedSelect: optionArray
@@ -153,7 +164,7 @@ const SprintList: React.FC<any> = () => {
 
   // 测试下拉框
   const onTestSelectFocus = () => {
-    const optionArray: any = getTesterOption(personName?.tester, getGridData());
+    const optionArray: any = getTesterOption(personName?.tester, getFilteredGridData());
     setSelectOptions({
       ...selectOption,
       testSelect: optionArray
@@ -162,7 +173,7 @@ const SprintList: React.FC<any> = () => {
 
   // 解决人/完成人
   const onSolvedSelectFocus = () => {
-    const optionArray: any = getSolvedByOption(personName?.solvedBy, getGridData());
+    const optionArray: any = getSolvedByOption(personName?.solvedBy, getFilteredGridData());
     setSelectOptions({
       ...selectOption,
       solvedSelect: optionArray
@@ -170,19 +181,55 @@ const SprintList: React.FC<any> = () => {
 
   };
 
-  // 阶段选择
+  // 条件选择
   const onSelectChanged = () => {
     const queryCondition = formForQuery.getFieldsValue();
     const filterData = filterDatasByCondition(queryCondition, ora_filter_data);
     gridApi.current?.setRowData(filterData);
+
+    // 过滤表格自带条件
+    const hardcodedFilter = {};
+    gird_filter_condition.forEach((ele: any) => {
+      hardcodedFilter[ele.column] = {type: "set", values: ele.filterValue};
+    });
+    gridApi.current?.setFilterModel(hardcodedFilter);
+
     // 还要设置title
-    const countRt = calTypeCount(filterData);
+    const countRt = calTypeCount(getFilteredGridData());
     setPageTitle(getStaticMessage(countRt));
   };
   /* endregion 下拉框动态加载 */
 
   /* region 表格更新 */
+
+  // 获取表格中的过滤条件
+  const getGridFilterValue = (params: any) => {
+    const columnID = params.column?.colId;
+    // 判断是否有对应列，有的话删除后再添加，
+    if (gird_filter_condition && gird_filter_condition.length) {
+      gird_filter_condition.forEach((ele: any, index: number) => {
+        if (ele.column === columnID) {
+          gird_filter_condition.splice(index, 1);
+        }
+      })
+    }
+
+    const filterValues: any = [];
+    const currentValue: any = params.filterInstance.valueModel.selectedValues;
+    currentValue.forEach((ele: any) => {
+      filterValues.push(ele);
+    });
+    if (filterValues.length > 0) {
+      gird_filter_condition.push({
+        column: columnID,
+        filterValue: filterValues
+      });
+    }
+
+    console.log("gird_filter_condition", gird_filter_condition)
+  }
   const updateGrid = async () => {
+    // 需要结合筛选条件
     const datas: any = await queryDevelopViews(gqlClient, prjId, prjType);
     ora_filter_data = datas?.result;
     onSelectChanged()
@@ -1053,7 +1100,7 @@ const SprintList: React.FC<any> = () => {
   const nessField = ['选择', '序号', '类型', '编号']; // 必需的列
   const unNessField = ['阶段', '测试', '测试确认', '标题内容', '创建时间', '解决时间', '所属计划', '严重等级', '截止日期', '模块', '状态', '已提测', '发布环境',
     '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', "是否涉及页面调整", '是否可热更', '是否清缓存', '是否有数据升级',
-    '是否有接口升级', '是否有预置数据修改', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人'];
+    '是否有接口升级', '是否有预置数据修改', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人', '是否延期'];
 
   const onSetFieldsChange = (checkedValues: any) => {
     setSelectedFiled(checkedValues);
@@ -1342,6 +1389,7 @@ const SprintList: React.FC<any> = () => {
             onGridSizeChanged={onGridReady}
             onColumnEverythingChanged={onGridReady}
             tooltipShowDelay={500}
+            onFilterModified={getGridFilterValue}
           />
 
         </div>
@@ -1591,6 +1639,7 @@ const SprintList: React.FC<any> = () => {
               <Form.Item name="adminAddEnvironment" label="发布环境:">
                 <Select placeholder="请选择" mode="multiple" optionFilterProp="children" maxTagCount={"responsive"}>
                   {[
+                    <Option key={'集群0'} value={'集群0'}>集群1</Option>,
                     <Option key={'集群1'} value={'集群1'}>集群1</Option>,
                     <Option key={'集群2'} value={'集群2'}>集群2</Option>,
                     <Option key={'集群3'} value={'集群3'}>集群3</Option>,
@@ -1854,6 +1903,7 @@ const SprintList: React.FC<any> = () => {
                 <Select placeholder="请选择" mode="multiple"
                         optionFilterProp="children" maxTagCount={"responsive"}>
                   {[
+                    <Option key={'集群0'} value={'集群0'}>集群1</Option>,
                     <Option key={'集群1'} value={'集群1'}>集群1</Option>,
                     <Option key={'集群2'} value={'集群2'}>集群2</Option>,
                     <Option key={'集群3'} value={'集群3'}>集群3</Option>,
@@ -2464,6 +2514,9 @@ const SprintList: React.FC<any> = () => {
                 </Col>
                 <Col span={4}>
                   <Checkbox value="反馈人">反馈人</Checkbox>
+                </Col>
+                <Col span={4}>
+                  <Checkbox value="是否延期">是否延期</Checkbox>
                 </Col>
               </Row>
             </Checkbox.Group>,

@@ -9,6 +9,7 @@ import { isEmpty, isEqual, omit, pick, intersection, orderBy } from 'lodash';
 import { ExclamationCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { SelectProps } from 'antd/lib/select';
+import * as dayjs from 'dayjs';
 const opts = {
   showSearch: true,
   mode: 'multiple',
@@ -97,11 +98,17 @@ const DutyCatalog = () => {
 
   // 默认第一值班人
   const getFirstDuty = async () => {
-    const params = {
-      start_time: moment().startOf('week').format('YYYY/MM/DD'),
-      end_time: moment().endOf('week').format('YYYY/MM/DD'),
+    const dateStart = dayjs().day(0);
+    const dateEnd = dayjs().day(6);
+    const oldSafari = {
+      start_time: dayjs(
+        `${dateStart.year()}-${dateStart.month() + 1}-${dateStart.date() + 1}`,
+      ).format('YYYY/MM/DD'),
+      end_time: dayjs(`${dateEnd.year()}-${dateEnd.month() + 1}-${dateEnd.date() + 1}`).format(
+        'YYYY/MM/DD',
+      ),
     };
-    const firstDuty = await DutyListServices.getFirstDutyPerson(params);
+    const firstDuty = await DutyListServices.getFirstDutyPerson(oldSafari);
     const duty = firstDuty?.data
       ?.flat()
       .filter(
@@ -148,7 +155,7 @@ const DutyCatalog = () => {
 
       setAllPerson(
         allPersons?.map((it: any) => ({
-          key: it.user_id,
+          key: it.user_name,
           value: `${it.user_id}_${it.user_type}`,
           label: it.user_name,
           type: it.user_type,

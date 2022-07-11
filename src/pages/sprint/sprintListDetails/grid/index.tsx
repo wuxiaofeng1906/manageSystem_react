@@ -4,7 +4,7 @@ import {
   statusValueGetter, statusRenderer, assignedToValueGetter, solvedByValueGetter, relatedNumberRender,
   timestampRenderer, isOrNotValueGetter, testConfirmTooltipValueGetter, testConfirmedRenderer,
   proposedTestValueGetter, testVertifyFilter, clearCacheRenderer,
-  vertifyResultValueGetter, sourceValueGetter, timeRenderer
+  vertifyResultValueGetter, sourceValueGetter, timeRenderer,isDelayTextDecorateRender
 } from "./columnRenderer";
 
 import {history} from "@@/core/history";
@@ -246,6 +246,16 @@ const getColums = (prjNames: any) => {
       minWidth: 80,
       cellRenderer: textDecorateRender,
       tooltipField: "publishEnv"
+    },
+    {
+      headerName: '是否延期',
+      field: 'isDelay',
+      minWidth: 80,
+      valueGetter: (params: any) => {
+        return isOrNotValueGetter(params.data?.isDelay)
+      },
+
+      cellRenderer: isDelayTextDecorateRender,
     },
     {
       headerName: '关闭人',

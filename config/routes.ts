@@ -1,6 +1,6 @@
 ﻿// @ts-ignore
-import {MenuDataItem} from '@@/plugin-layout/runtime';
-import {ProjectKpiRoute} from './routes-tj';
+import { MenuDataItem } from '@@/plugin-layout/runtime';
+import { ProjectKpiRoute } from './routes-tj';
 
 export default [
   {
@@ -227,7 +227,7 @@ export default [
                 component: './kpi/performance/developer/bugRepairRate',
               },
               {
-                name: '开发缺陷排除率',
+                name: '缺陷排除率',
                 icon: 'table',
                 path: 'defectExclusionRate',
                 component: './kpi/performance/developer/defectExclusionRate',
@@ -237,37 +237,42 @@ export default [
                 icon: 'table',
                 path: 'projectPlanDeviationRate',
                 component: './kpi/performance/developer/projectPlanDeviationRate',
+                // hideInMenu: true,
               },
               {
                 name: '管理事务计划偏差率',
                 icon: 'table',
                 path: 'manWorkPlanDevRate',
                 component: './kpi/performance/developer/manWorkPlanDevRate',
+                // hideInMenu: true,
               },
               {
                 name: '提测计划偏差率',
                 icon: 'table',
                 path: 'devShowTestPlanDeviationRate',
                 component: './kpi/performance/developer/devShowTestPlanDeviationRate',
+                // hideInMenu: true,
               },
               {
-                name: '开发-A类客户服务投入比',
+                name: 'A类客户服务投入比',
                 icon: 'table',
                 path: 'cusInputRate_A',
                 component: './kpi/performance/developer/cusInputRate_A',
+                // hideInMenu: true,
               },
               {
-                name: '开发-用户体验优化投入比',
+                name: '用户体验优化投入比',
                 icon: 'table',
                 path: 'cusExperienceInputRate',
                 component: './kpi/performance/developer/cusExperienceInputRate',
+                // hideInMenu: true,
               },
               {
-                name: '开发-发布引入emergency数',
+                name: '发布引入emergency数',
                 icon: 'table',
                 path: 'releaseEmergencyCount',
                 component: './kpi/performance/developer/releaseEmergencyCount',
-
+                // hideInMenu: true,
               },
             ],
           },
@@ -299,13 +304,6 @@ export default [
                 icon: 'table',
                 path: 'on_lineBugIncTester',
                 component: './kpi/performance/testers/on_lineBugIncTester',
-              },
-              {
-                name: '千行bug率收敛',
-                icon: 'table',
-                path: 'bugRateConvergency',
-                component: './kpi/performance/testers/bugRateConvergency',
-                hideInMenu: true,
               },
               {
                 name: '用例执行率',
@@ -351,28 +349,32 @@ export default [
                 // hideInMenu: true,
               },
               {
-                name: '测试计划偏差率',
+                name: '计划偏差率',
                 icon: 'table',
                 path: 'palnDeviationRate',
                 component: './kpi/performance/testers/palnDeviationRate',
+                // hideInMenu: true,
               },
               {
-                name: '测试-A类客户服务投入比',
+                name: 'A类客户服务投入比',
                 icon: 'table',
                 path: 'cusInputRate_A',
                 component: './kpi/performance/testers/cusInputRate_A',
+                // hideInMenu: true,
               },
               {
-                name: '测试-用户体验优化投入比',
+                name: '用户体验优化投入比',
                 icon: 'table',
                 path: 'cusExperienceInputRate',
                 component: './kpi/performance/testers/cusExperienceInputRate',
+                // hideInMenu: true,
               },
               {
-                name: '测试-发布引入emergency数',
+                name: '发布引入emergency数',
                 icon: 'table',
                 path: 'releaseEmergencyCount',
                 component: './kpi/performance/testers/releaseEmergencyCount',
+                // hideInMenu: true,
               },
             ],
           },
@@ -541,6 +543,7 @@ export default [
         name: '值班列表',
         icon: 'table',
         path: 'dutyList',
+        // access: 'dutyManager',
         component: './onDutyAndRelease/dutyDirectory/dutyList',
       },
       {
@@ -548,6 +551,7 @@ export default [
         icon: 'table',
         path: 'dutyCatalog/:id',
         hideInMenu: true,
+        // access: 'dutyManager',
         component: './onDutyAndRelease/dutyDirectory/dutyCatalog',
       },
       {
@@ -616,10 +620,10 @@ export default [
         access: 'devCenter', // 研发中心可见
         // hideInMenu: true
       },
-    ]
+    ],
   },
   {
-    name: "石墨管理",
+    name: '石墨管理',
     icon: 'table',
     path: '/shimo',
     hideInMenu: false,

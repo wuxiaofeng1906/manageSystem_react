@@ -136,7 +136,7 @@ const ReleaseHistory: React.FC<any> = () => {
       }
       const ready_release_num: any = [];
       sel_rows?.forEach((ele: any) => {
-        ready_release_num.push(ele.ready_release_num);
+        ready_release_num.push(ele.release_gray_num);
       });
 
       // 需要在这个页面生成发布编号。只有成功了才跳转到详情界面
@@ -536,10 +536,12 @@ const ReleaseHistory: React.FC<any> = () => {
                 let onlineSrcPath = "../formal_detail.png";  // 正式发布详情图标
                 let buttonDisable = false;
                 const {ready_release_num, release_gray_num, online_release_num} = params.data;
-                if (ready_release_num && ready_release_num === 1) {
+                if (ready_release_num && ready_release_num.length === 1) {
                   if (ready_release_num[0].ready_release_num === online_release_num) {
                     firstButtonDisable = true;
+                    firstSrcPath = "../details_0_gray.png";
                     buttonDisable = true;
+                    onlineSrcPath = "../formal_detail_gray.png";
                   }
                 } else {
                   // 1级发布

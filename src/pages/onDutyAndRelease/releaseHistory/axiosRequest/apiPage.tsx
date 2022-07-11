@@ -174,14 +174,15 @@ const getOnlineProocessDetails = async (releaseNums: any, releaseType: string) =
 };
 
 // 删除预发布tab
-const delGrayReleaseHistory = async (releaseType: string, releaseNum: string) => {
+const delGrayReleaseHistory = async (releaseType: string, releaseInfo: any) => {
+  debugger;
   // 如果是0级灰度发布，就调用删除接口
   const users = getCurrentUserInfo();
   if (releaseType === "zero") {
     const datas = {
       user_name: users.name,
       user_id: users.userid,
-      ready_release_num: releaseNum,
+      ready_release_num: releaseInfo.ready_release_num,
     };
 
     return await axiosDelete('/api/verify/release/release_detail', {data: datas})
@@ -190,9 +191,9 @@ const delGrayReleaseHistory = async (releaseType: string, releaseNum: string) =>
     const delData = {
       "user_name": users.name,
       "user_id": users.userid,
-      "online_release_num": releaseNum
+      "release_gray_num": releaseInfo.release_gray_num
     };
-    const result = await axiosDelete("/api/verify/release/online", {data: delData});
+    const result = await axiosDelete("/api/verify/release/gray_one", {data: delData});
     return result;
   }
 };

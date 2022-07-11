@@ -181,7 +181,7 @@ const ReleaseHistory: React.FC<any> = () => {
   /* region 操作按钮 */
   // 删除发布详情
   const confirmDelete = async (releaseType: string, params: any) => {
-    const delResult = await delGrayReleaseHistory(releaseType, params.ready_release_num,);
+    const delResult = await delGrayReleaseHistory(releaseType, params);
     if (delResult.code === 200) {
       sucMessage("删除成功！")
       // 刷新数据

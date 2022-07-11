@@ -22,19 +22,25 @@ import "./style.css";
 import {Link} from 'umi';
 
 const RangePicker: any = DatePicker.RangePicker;
+
+// 0级灰度发布列表时间
+// let zeroStart = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
+// let zeroEnd = dayjs().format("YYYY-MM-DD");
+let zeroStart = dayjs().startOf('month').format("YYYY-MM-DD");
+let zeroEnd = dayjs().endOf('month').format("YYYY-MM-DD");
+// 1级灰度发布列表时间
+// let firstStart = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
+// let firstEnd = dayjs().format("YYYY-MM-DD");
+let firstStart = dayjs().startOf('month').format("YYYY-MM-DD");
+let firstEnd = dayjs().endOf('month').format("YYYY-MM-DD");
+// 正式发布时间等条件
 const formalQueryCondition = {
   start: dayjs().subtract(7, 'day').format("YYYY-MM-DD"),
-  end: dayjs().format("YYYY-MM-DD"),
+  end: dayjs().add(7,'day').format("YYYY-MM-DD"),
   project: "",
   page: 1, // 跳转到第几页
   pageSize: 100  // 一页显示多少条数据
 }
-// 0级灰度发布列表时间
-let zeroStart = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
-let zeroEnd = dayjs().format("YYYY-MM-DD");
-// 1级灰度发布列表时间
-let firstStart = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
-let firstEnd = dayjs().format("YYYY-MM-DD");
 
 const ReleaseHistory: React.FC<any> = () => {
   // 设置表格的高度。

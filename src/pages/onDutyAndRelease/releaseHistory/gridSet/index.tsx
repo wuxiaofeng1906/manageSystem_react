@@ -7,7 +7,24 @@ const gridHeight = (datas: any) => {
 }
 
 // 灰度积压列表
-const grayscaleBacklogList = () => {
+const grayscaleBacklogList = (type: string) => {
+  let grayNum = {
+    headerName: '灰度发布批次号',
+    field: 'ready_release_num',
+    minWidth: 135,
+    maxWidth: 150,
+
+  };
+  let grayNumName = {
+    headerName: '灰度发布名称',
+    field: 'ready_release_name',
+    minWidth: 145
+  };
+  if (type === "one") {
+    grayNum.field = "release_gray_num";
+    grayNumName.field = "release_name";
+  }
+
   const column: any = [
     {
       headerName: '选择',
@@ -24,15 +41,9 @@ const grayscaleBacklogList = () => {
         return Number(params.node.id) + 1;
       },
     }, {
-      headerName: '灰度发布批次号',
-      field: 'ready_release_num',
-      minWidth: 135,
-      maxWidth: 150,
-      // sort: "asc"
+      ...grayNum
     }, {
-      headerName: '灰度发布名称',
-      field: 'ready_release_name',
-      minWidth: 145
+      ...grayNumName
     }, {
       headerName: '工单编号',
       field: 'order',
@@ -84,13 +95,6 @@ const releasedList = () => {
     field: 'online_release_num',
     minWidth: 130,
     maxWidth: 150,
-    cellRenderer: (params: any) => {
-      //   如果没有正式发布编号，则显示未灰度发布编号
-      if (params.value) {
-        return params.value;
-      }
-      return params.data?.ready_release_num;
-    }
   }, {
     headerName: '发布名称',
     field: 'release_name',
@@ -100,11 +104,15 @@ const releasedList = () => {
     field: 'ready_release_num',
     minWidth: 145,
     cellRenderer: (params: any) => {
-      // 如果没有正式发布编号， 灰度发布编号在正式上显示了，现在就不显示了。
-      if (params.data?.online_release_num) {
-        return params.value;
+      const {value} = params;
+      if (!value || value.length === 0) {
+        return "";
       }
-      return '';
+      const retunValue: any = [];
+      value.forEach((ele: any) => {
+        retunValue.push(ele.ready_release_num);
+      });
+      return retunValue.join(",");
     }
   }, {
     headerName: '工单编号',

@@ -26,17 +26,17 @@ const RangePicker: any = DatePicker.RangePicker;
 // 0级灰度发布列表时间
 // let zeroStart = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
 // let zeroEnd = dayjs().format("YYYY-MM-DD");
-let zeroStart = dayjs().startOf('month').format("YYYY-MM-DD");
-let zeroEnd = dayjs().endOf('month').format("YYYY-MM-DD");
+// let zeroStart = dayjs().startOf('month').format("YYYY-MM-DD");
+// let zeroEnd = dayjs().endOf('month').format("YYYY-MM-DD");
 // 1级灰度发布列表时间
 // let firstStart = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
 // let firstEnd = dayjs().format("YYYY-MM-DD");
-let firstStart = dayjs().startOf('month').format("YYYY-MM-DD");
-let firstEnd = dayjs().endOf('month').format("YYYY-MM-DD");
+// let firstStart = dayjs().startOf('month').format("YYYY-MM-DD");
+// let firstEnd = dayjs().endOf('month').format("YYYY-MM-DD");
 // 正式发布时间等条件
 const formalQueryCondition = {
   start: dayjs().subtract(7, 'day').format("YYYY-MM-DD"),
-  end: dayjs().add(7,'day').format("YYYY-MM-DD"),
+  end: dayjs().add(7, 'day').format("YYYY-MM-DD"),
   project: "",
   page: 1, // 跳转到第几页
   pageSize: 100  // 一页显示多少条数据
@@ -61,7 +61,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
   const [zeroButtonTitle, setZeroButtonTitle] = useState("一键生成1级灰度发布");  // 待发布详情
   // 0级灰度积压列表数据
-  const zeroGrayscaleData = useRequest(() => getZeroGrayscaleListData(zeroStart, `${zeroEnd} 23:59:59`)).data;
+  const zeroGrayscaleData = useRequest(() => getZeroGrayscaleListData()).data;
   // 一键生成正式发布
   const generateFormalZeroRelease = async () => {
     const sel_rows = zeroGrayscaleGridApi.current?.getSelectedRows();
@@ -89,7 +89,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 刷新0级灰度发布
   const refreshZeroReleaseGrid = async () => {
-    const girdDatas = await getZeroGrayscaleListData(zeroStart, `${zeroEnd} 23:59:59`);
+    const girdDatas = await getZeroGrayscaleListData();
     if (girdDatas.message !== "") {
       errorMessage((girdDatas.message).toString());
     } else {
@@ -101,21 +101,21 @@ const ReleaseHistory: React.FC<any> = () => {
     }
   };
 
-  // 根据时间查询
-  const onZeroGrayReleaseTimeChanged = async (params: any, times: any) => {
-    if (times[0]) {
-      zeroStart = dayjs(times[0]).format("YYYY-MM-DD");
-    } else {
-      zeroStart = "";
-    }
-    if (times[1]) {
-      zeroEnd = dayjs(times[1]).format("YYYY-MM-DD");
-    } else {
-      zeroEnd = "";
-    }
-    // 更新数据
-    await refreshZeroReleaseGrid();
-  };
+  // // 根据时间查询
+  // const onZeroGrayReleaseTimeChanged = async (params: any, times: any) => {
+  //   if (times[0]) {
+  //     zeroStart = dayjs(times[0]).format("YYYY-MM-DD");
+  //   } else {
+  //     zeroStart = "";
+  //   }
+  //   if (times[1]) {
+  //     zeroEnd = dayjs(times[1]).format("YYYY-MM-DD");
+  //   } else {
+  //     zeroEnd = "";
+  //   }
+  //   // 更新数据
+  //   await refreshZeroReleaseGrid();
+  // };
 
   /* endregion */
 
@@ -127,7 +127,7 @@ const ReleaseHistory: React.FC<any> = () => {
   };
   const [firstButtonTitle, setFirstButtonTitle] = useState("一键生成正式发布");  // 待发布详情
   // 1级灰度积压列表数据
-  const firstGrayscaleData = useRequest(() => getFirstGrayscaleListData(firstStart, `${firstEnd} 23:59:59`)).data;
+  const firstGrayscaleData = useRequest(() => getFirstGrayscaleListData()).data;
   // 一键生成正式发布
   const generateFormalFirstRelease = async () => {
     const sel_rows = firstGrayscaleGridApi.current?.getSelectedRows();
@@ -162,7 +162,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 刷新1级灰度发布列表
   const refreshFirstReleaseGrid = async () => {
-    const girdDatas = await getFirstGrayscaleListData(firstStart, `${firstEnd} 23:59:59`);
+    const girdDatas = await getFirstGrayscaleListData();
     if (girdDatas.message !== "") {
       errorMessage((girdDatas.message).toString());
     } else {
@@ -174,19 +174,19 @@ const ReleaseHistory: React.FC<any> = () => {
     }
   };
   // 根据时间查询
-  const onFirstGrayReleaseTimeChanged = async (params: any, times: any) => {
-    if (times[0]) {
-      firstStart = dayjs(times[0]).format("YYYY-MM-DD");
-    } else {
-      firstStart = "";
-    }
-    if (times[1]) {
-      firstEnd = dayjs(times[1]).format("YYYY-MM-DD");
-    } else {
-      firstEnd = ""
-    }
-    await refreshFirstReleaseGrid();
-  };
+  // const onFirstGrayReleaseTimeChanged = async (params: any, times: any) => {
+  //   if (times[0]) {
+  //     firstStart = dayjs(times[0]).format("YYYY-MM-DD");
+  //   } else {
+  //     firstStart = "";
+  //   }
+  //   if (times[1]) {
+  //     firstEnd = dayjs(times[1]).format("YYYY-MM-DD");
+  //   } else {
+  //     firstEnd = ""
+  //   }
+  //   await refreshFirstReleaseGrid();
+  // };
 
   /* endregion */
 
@@ -451,11 +451,11 @@ const ReleaseHistory: React.FC<any> = () => {
             <img src="../pushMessage.png" width="25" height="25" alt="一键生成1级灰度发布"
                  title="一键生成1级灰度发布"/> &nbsp;{zeroButtonTitle}
           </Button>
-          <div style={{float: "right"}}>
-            <label style={{marginLeft: 10}}>发布时间: </label>
-            <RangePicker style={{marginLeft: 5}} size={"small"} defaultValue={[moment(zeroStart), moment(zeroEnd)]}
-                         onChange={onZeroGrayReleaseTimeChanged}/>
-          </div>
+          {/*<div style={{float: "right"}}>*/}
+          {/*  <label style={{marginLeft: 10}}>发布时间: </label>*/}
+          {/*  <RangePicker style={{marginLeft: 5}} size={"small"} defaultValue={[moment(zeroStart), moment(zeroEnd)]}*/}
+          {/*               onChange={onZeroGrayReleaseTimeChanged}/>*/}
+          {/*</div>*/}
         </div>
         <button></button>
         <div className="ag-theme-alpine"
@@ -486,11 +486,11 @@ const ReleaseHistory: React.FC<any> = () => {
             <img src="../pushMessage.png" width="25" height="25" alt="一键生成正式发布"
                  title="一键生成正式发布"/> &nbsp;{firstButtonTitle}
           </Button>
-          <div style={{float: "right"}}>
-            <label style={{marginLeft: 10}}>发布时间: </label>
-            <RangePicker style={{marginLeft: 5}} size={"small"} defaultValue={[moment(firstStart), moment(firstEnd)]}
-                         onChange={onFirstGrayReleaseTimeChanged}/>
-          </div>
+          {/*<div style={{float: "right"}}>*/}
+          {/*  <label style={{marginLeft: 10}}>发布时间: </label>*/}
+          {/*  <RangePicker style={{marginLeft: 5}} size={"small"} defaultValue={[moment(firstStart), moment(firstEnd)]}*/}
+          {/*               onChange={onFirstGrayReleaseTimeChanged}/>*/}
+          {/*</div>*/}
         </div>
         <button></button>
         <div className="ag-theme-alpine"

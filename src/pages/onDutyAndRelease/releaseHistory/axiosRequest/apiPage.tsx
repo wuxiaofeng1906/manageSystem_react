@@ -24,7 +24,7 @@ import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
 // };
 
 // 0级灰度发布列表
-const getZeroGrayscaleListData = async (startTime: string, endTime: string) => {
+const getZeroGrayscaleListData = async () => {
 
   const result: any = {
     message: "",
@@ -33,8 +33,8 @@ const getZeroGrayscaleListData = async (startTime: string, endTime: string) => {
   await axios.get('/api/verify/release/gray', {
     params: {
       // release_method: releaseMethod,
-      release_start_time: startTime,
-      release_end_time: endTime
+      release_start_time: "",
+      release_end_time: ""
     }
   })
     .then(function (res) {
@@ -51,7 +51,7 @@ const getZeroGrayscaleListData = async (startTime: string, endTime: string) => {
 };
 
 // 1级灰度发布列表
-const getFirstGrayscaleListData = async (startTime: string, endTime: string) => {
+const getFirstGrayscaleListData = async () => {
 
   const result: any = {
     message: "",
@@ -60,8 +60,8 @@ const getFirstGrayscaleListData = async (startTime: string, endTime: string) => 
   await axios.get('/api/verify/release/gray_one', {
     params: {
       // release_method: releaseMethod,
-      release_start_time: startTime,
-      release_end_time: endTime
+      release_start_time: "",
+      release_end_time: ""
     }
   })
     .then(function (res) {

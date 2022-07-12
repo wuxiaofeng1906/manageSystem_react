@@ -39,7 +39,7 @@ const formalQueryCondition = {
   end: dayjs().add(7, 'day').format("YYYY-MM-DD"),
   project: "",
   page: 1, // 跳转到第几页
-  pageSize: 100  // 一页显示多少条数据
+  pageSize: 1000  // 一页显示多少条数据
 }
 
 const ReleaseHistory: React.FC<any> = () => {

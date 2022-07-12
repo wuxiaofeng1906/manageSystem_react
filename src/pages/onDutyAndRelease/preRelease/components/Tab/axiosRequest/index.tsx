@@ -56,7 +56,7 @@ const delTabsInfo = async (releaseNum: string) => {
 const deleteReleaseItem = async (releaseNum: string) => {
   // 验证权限(值班测试和超级管理员)
   const authData = {
-    operate: '删除发布名称',
+    operate: '删除发布过程',
     method: 'delete',
     path: '/api/verify/release/release_detail',
   };

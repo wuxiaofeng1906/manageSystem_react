@@ -247,12 +247,17 @@ const ReleaseHistory: React.FC<any> = () => {
       </Popconfirm>;
 
     // 跳转到正式发布列表
-    const firstGrayNum = params.data?.release_gray_num;
     let firstSrcPath = "../details_0.png";
     let firstButtonDisable = false;
-    if (!firstGrayNum) {
-      firstSrcPath = "../details_0_gray.png";
-      firstButtonDisable = true;
+
+    // 需要对比release_gray_num和ready_release_num
+    const readyReleaseNumArray = params.data?.ready_release_num;
+    if (readyReleaseNumArray && readyReleaseNumArray.length === 1) {
+      const readyReleaseNum = readyReleaseNumArray[0].ready_release_num;
+      if (readyReleaseNum === params.data?.release_gray_num) {
+        firstSrcPath = "../details_0_gray.png";
+        firstButtonDisable = true;
+      }
     }
 
     const onlineButton =

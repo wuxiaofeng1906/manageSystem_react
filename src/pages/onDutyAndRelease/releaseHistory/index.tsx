@@ -300,7 +300,7 @@ const ReleaseHistory: React.FC<any> = () => {
   const getReleasedList = async () => {
     const cond: any = {
       page: 1,
-      pageSize: 100
+      pageSize: 1000
     };
 
     if (formalQueryCondition.start && formalQueryCondition.end) {

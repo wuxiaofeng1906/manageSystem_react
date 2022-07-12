@@ -86,9 +86,9 @@ const getFormalListData = async (condition: any) => {
   };
 
   const data = {
-    release_start_time: condition.start,
-    release_end_time: condition.end,
-    project_id: condition.project,
+    release_start_time: condition.release_start_time,
+    release_end_time: condition.release_end_time,
+    project_id: condition.project_id,
     page: condition.page,
     page_size: condition.pageSize
   }

@@ -39,7 +39,7 @@ const formalQueryCondition = {
   end: dayjs().add(7, 'day').format("YYYY-MM-DD"),
   project: "",
   page: 1, // 跳转到第几页
-  pageSize: 1000  // 一页显示多少条数据
+  pageSize: 100  // 一页显示多少条数据
 }
 
 const ReleaseHistory: React.FC<any> = () => {
@@ -303,13 +303,14 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 根据查询条件获取数据
   const getReleasedList = async () => {
+
     const cond: any = {
       page: 1,
-      pageSize: 1000
+      pageSize: 100
     };
 
     if (formalQueryCondition.start && formalQueryCondition.end) {
-      cond.release_start_time = formalQueryCondition.start;
+      cond.release_start_time = `${formalQueryCondition.start} 00:00:00`;
       cond.release_end_time = `${formalQueryCondition.end} 23:59:59`;
     }
     if (formalQueryCondition.project) {

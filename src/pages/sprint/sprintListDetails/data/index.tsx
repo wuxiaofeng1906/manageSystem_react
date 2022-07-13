@@ -200,19 +200,6 @@ const changeBaseLinePosition = (data: any) => {
 
 // bug转需求字段
 const changeTypeColumns = (oraData: any) => {
-  const changedStoryArray: any = [];
-  if (oraData && oraData.length > 0) {
-    oraData.forEach((ele: any) => {
-      if (ele.testConfirmed !== "1") {
-        changedStoryArray.push(ele);
-      }
-    });
-  }
-  return changedStoryArray;
-}
-
-// 过滤测试验证为是的数据
-const filterTestConfirmed = (oraData: any) => {
   const changedArray: any = [];
   if (oraData && oraData.length > 0) {
     oraData.forEach((ele: any) => {
@@ -226,9 +213,22 @@ const filterTestConfirmed = (oraData: any) => {
   return changedArray;
 }
 
+// 过滤测试验证为是的数据
+const filterTestConfirmed = (oraData: any) => {
+  const changedArray: any = [];
+  if (oraData && oraData.length > 0) {
+    oraData.forEach((ele: any) => {
+      if (ele.testConfirmed !== "1") {
+        changedArray.push(ele);
+      }
+    });
+  }
+  return changedArray;
+}
+
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any, syncQuery: boolean = false, showTestConfirmFlag: boolean) => {
-
+  debugger;
   const {data} = await client.query(`
       {
         proDetaiWithUser(project:${prjID},category:"${prjType}",order:ASC,doSync:${syncQuery}){
@@ -313,7 +313,6 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
   if (prjType === "") {
     const changedRow = changeRowPosition(data?.proDetaiWithUser); // 对数据进行想要的顺序排序(将需求相关的bug放到相关需求后面)
     oraData = changeBaseLinePosition(changedRow); //  将基线值为0的数据统一起来，放到页面最前面
-
   }
 
   // 需要对B_Story直接显示在类型中，而不是渲染看见
@@ -322,6 +321,7 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
   if (showTestConfirmFlag) { // 过滤掉测试验证为是数据
     oraData = filterTestConfirmed(oraData);
   }
+
   return {result: showBelongItem(oraData), resCount: calTypeCount(oraData)};
 };
 

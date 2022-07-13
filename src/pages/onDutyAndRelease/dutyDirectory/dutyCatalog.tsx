@@ -360,7 +360,7 @@ const DutyCatalog = () => {
     });
     const formatProject = projects?.map((it: any) => ({
       ...it,
-      user: ['sprint', 'emergency', 'hotfix'].includes(it.sprint_type)
+      user: ['sprint', 'emergency', 'hotfix', 'stagepatch'].includes(it.sprint_type)
         ? {
             user_id: initDutyObj?.backend?.key,
             user_name: initDutyObj?.backend?.label.replace('(后端值班负责人)', ''),

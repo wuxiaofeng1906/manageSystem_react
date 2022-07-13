@@ -155,7 +155,7 @@ const servertyValueGetter = (params: any) => {
     }
   }
 
-  const pri = params.data.priority === null ? "" : params.data.priority;
+  const pri = params.data.priority === null ? "" : Number(params.data.priority)-1;
   if (pri === "" && severity === "") {
     return "";
   }

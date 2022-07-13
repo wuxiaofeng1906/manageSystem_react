@@ -286,6 +286,18 @@ export default [
                 path: 'productionScale',
                 component: './kpi/performance/developer/productionScale',
               },
+              {
+                name: '人效统计',
+                icon: 'table',
+                path: 'humanEffect',
+                component: './kpi/performance/developer/humanEffect',
+              },
+              {
+                name: '班车延期需求数',
+                icon: 'table',
+                path: 'shuttleDelay',
+                component: './kpi/performance/developer/shuttleDelay',
+              },
             ],
           },
           {
@@ -405,6 +417,18 @@ export default [
                 icon: 'table',
                 path: 'productionScale',
                 component: './kpi/performance/testers/productionScale',
+              },
+              {
+                name: '人效统计',
+                icon: 'table',
+                path: 'humanEffect',
+                component: './kpi/performance/testers/humanEffect',
+              },
+              {
+                name: '班车延期需求数',
+                icon: 'table',
+                path: 'shuttleDelay',
+                component: './kpi/performance/testers/shuttleDelay',
               },
             ],
           },

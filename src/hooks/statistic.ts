@@ -17,7 +17,7 @@ export interface IRequest {
   request: Function;
   type: IStaticBy;
   identity?: IIdentity;
-  showSplit?: boolean;
+  showDenominator?: boolean;
 }
 export const useStatistic = () => {
   const gqlClient = useGqlClient();
@@ -29,9 +29,9 @@ export const useStatistic = () => {
     request,
     type = 'week',
     identity,
-    showSplit = false,
+    showDenominator = false,
   }: IRequest) => {
-    renderColumn(type, showSplit);
+    renderColumn(type, showDenominator);
     setRowData([]);
     setLoading(true);
     try {

@@ -1,10 +1,12 @@
 import {history} from "@@/core/history";
 import {zentaoTypeRenderToNumber} from "@/publicMethods/cellRenderer";
 
+// 获取界面跳转过来的参数
 const getProjectInfo = () => {
   let prjId: string = '';
   let prjNames: string = '';
   let prjType: string = '';
+  let showTestConfirmFlag = false;
   const location = history.location.query;
   if (JSON.stringify(location) !== '{}') {
     if (location !== undefined && location.projectid !== null) {
@@ -14,9 +16,12 @@ const getProjectInfo = () => {
     if (location !== undefined && location.type !== undefined && location.type !== null) {
       prjType = location.type.toString();
     }
+    if (location !== undefined && location.showTestConfirm !== undefined && location.showTestConfirm !== null) {
+      showTestConfirmFlag = location.showTestConfirm === "true";
+    }
   }
 
-  return {prjId, prjNames, prjType};
+  return {prjId, prjNames, prjType, showTestConfirmFlag};
 }
 
 

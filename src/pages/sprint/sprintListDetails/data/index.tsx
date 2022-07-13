@@ -203,18 +203,31 @@ const changeTypeColumns = (oraData: any) => {
   const changedStoryArray: any = [];
   if (oraData && oraData.length > 0) {
     oraData.forEach((ele: any) => {
+      if (ele.testConfirmed !== "1") {
+        changedStoryArray.push(ele);
+      }
+    });
+  }
+  return changedStoryArray;
+}
+
+// 过滤测试验证为是的数据
+const filterTestConfirmed = (oraData: any) => {
+  const changedArray: any = [];
+  if (oraData && oraData.length > 0) {
+    oraData.forEach((ele: any) => {
       const rows: any = {...ele};
       if (ele.category === "3" && ele.fromBug !== 0) {
         rows["category"] = "-3";// 表示为bug转需求
       }
-      changedStoryArray.push(rows);
+      changedArray.push(rows);
     });
   }
-
-  return changedStoryArray;
+  return changedArray;
 }
+
 // 查询数据
-const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any, syncQuery: boolean = false) => {
+const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any, syncQuery: boolean = false, showTestConfirmFlag: boolean) => {
 
   const {data} = await client.query(`
       {
@@ -305,6 +318,10 @@ const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType:
 
   // 需要对B_Story直接显示在类型中，而不是渲染看见
   oraData = changeTypeColumns(oraData);
+
+  if (showTestConfirmFlag) { // 过滤掉测试验证为是数据
+    oraData = filterTestConfirmed(oraData);
+  }
   return {result: showBelongItem(oraData), resCount: calTypeCount(oraData)};
 };
 

@@ -43,11 +43,12 @@ import {
 import defaultTreeSelectParams from "@/pages/shimo/fileBaseline/iterateList/defaultSetting";
 
 let ora_filter_data: any = [];
+
 const gird_filter_condition: any = []; // 表格自带过滤了的条件
 const {Option} = Select;
 const SprintList: React.FC<any> = () => {
   const {initialState} = useModel('@@initialState');
-  const {prjId, prjNames, prjType} = getProjectInfo();
+  const {prjId, prjNames, prjType, showTestConfirmFlag} = getProjectInfo();
 
   /* region 整个模块都需要用到的表单定义 */
   // 模块查询
@@ -78,12 +79,11 @@ const SprintList: React.FC<any> = () => {
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, prjId, prjType, true));
+  const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, prjId, prjType, true, showTestConfirmFlag));
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
-
   };
 
   if (gridApi.current) {
@@ -146,6 +146,7 @@ const SprintList: React.FC<any> = () => {
 
   // 获取类型下拉框
   const onTypeSelectFocus = () => {
+
     const optionArray: any = getTypeOption(getFilteredGridData());
     setSelectOptions({
       ...selectOption,
@@ -230,7 +231,7 @@ const SprintList: React.FC<any> = () => {
   }
   const updateGrid = async () => {
     // 需要结合筛选条件
-    const datas: any = await queryDevelopViews(gqlClient, prjId, prjType);
+    const datas: any = await queryDevelopViews(gqlClient, prjId, prjType, false, showTestConfirmFlag);
     ora_filter_data = datas?.result;
     onSelectChanged()
   };
@@ -1165,6 +1166,18 @@ const SprintList: React.FC<any> = () => {
       solvedBy: personData?.solvedBy
     });
   }, [data]);
+
+  // useEffect(() => {
+  //
+  //   console.log(1111111, testConfirmFlag)
+  //   // 过滤表格自带条件
+  //   if (testConfirmFlag) {
+  //     const hardcodedFilter = {"testConfirmed": {type: "set", values: ["否"]}};
+  //     gridApi.current?.setFilterModel(hardcodedFilter);
+  //     // testConfirmFlag = false;
+  //   }
+  // },[])
+
 
   const leftStyle = {marginLeft: '20px'};
   const rightStyle = {marginLeft: '30px'};

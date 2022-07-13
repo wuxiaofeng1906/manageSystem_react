@@ -10,11 +10,11 @@ import { history, useModel } from 'umi';
 import moment from 'moment';
 import IPagination from '@/components/IPagination';
 import OnlineServices from '@/services/online';
-import { omit, valueMap } from '@/utils/utils';
-import { publishColumn } from '../column';
+import { valueMap } from '@/utils/utils';
+import { publishColumn } from '../Column';
 import { initGridTable, PUBLISH_RESULT } from '../constants';
 import { IRecord, MOMENT_FORMAT } from '@/namespaces';
-import { debounce } from 'lodash';
+import { debounce, omit } from 'lodash';
 import './index.less';
 
 const PublishList: React.ReactNode = () => {

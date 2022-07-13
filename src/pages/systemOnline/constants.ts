@@ -172,6 +172,20 @@ const CHECK_LIST = [
     version_time: '',
   },
 ];
+const PROJECT_SUMMARY = [
+  '项目名&分支填写',
+  '项目升级信息填写',
+  '发布服务填写完成',
+  '升级接口与sql填写完成',
+  '相关检查通过',
+  '工单填写完成',
+  '工单审批中',
+  '工单审批完成',
+  '服务升级中',
+  '服务升级完成',
+  '升级后业务测试完成',
+  '升级后自动化执行完成',
+];
 
 const initColDef: ColDef = { resizable: true, suppressMenu: true };
 
@@ -220,5 +234,6 @@ export {
   DEPLOY_TYPE,
   CHECK_LIST,
   PUBLISH_STATUS,
+  PROJECT_SUMMARY,
   initGridTable,
 };

@@ -2,21 +2,23 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { Button, message, Space, Spin } from 'antd';
 import dayjs from 'dayjs';
-import { deployColumn } from '@/pages/systemOnline/column';
+import { deployColumn } from '@/pages/systemOnline/Column';
 import type { CellClickedEvent, GridApi } from 'ag-grid-community';
 import DeploySetting from '@/pages/systemOnline/prePublish/deploy/DeploySetting';
 import OneKeyDeploy from '@/pages/systemOnline/prePublish/deploy/OneKeyDeploy';
 import { initGridTable } from '@/pages/systemOnline/constants';
 import OnlineServices from '@/services/online';
-import { useLocation } from 'umi';
-import { useModel } from '@@/plugin-model/useModel';
+import { useLocation, useModel } from 'umi';
 
 const Deploy = () => {
   const {
     query: { idx },
   } = useLocation() as any;
   const gridApi = useRef<GridApi>();
-  const [release_project] = useModel('systemOnline', (system) => [system.proInfo?.release_project]);
+  const [release_project, disabled] = useModel('systemOnline', (system) => [
+    system.proInfo?.release_project,
+    system.disabled,
+  ]);
 
   const [deploySetting, setDeploySetting] = useState(false);
   const [oneKeyDeploy, setOneKeyDeploy] = useState(false);
@@ -65,6 +67,7 @@ const Deploy = () => {
         <Button
           type={'primary'}
           loading={spinning}
+          disabled={disabled}
           onClick={async () => {
             await OnlineServices.deploymentStatus(idx);
             getTableList();
@@ -82,16 +85,16 @@ const Deploy = () => {
             deployTime: formatTime,
             operation: ({ data }: CellClickedEvent) => {
               return (
-                <div
-                  className="color-prefix"
+                <img
+                  title={'日志'}
+                  width={20}
+                  src={require('../../../../../public/logs.png')}
                   onClick={() => {
                     if (data.log_url) {
                       window.open(data.log_url);
                     }
                   }}
-                >
-                  日志
-                </div>
+                />
               );
             },
           }}

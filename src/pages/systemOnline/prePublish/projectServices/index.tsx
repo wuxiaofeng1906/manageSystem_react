@@ -9,7 +9,7 @@ import {
   upgradeSQLColumn,
   dataReviewColumn,
   serverColumn,
-} from '@/pages/systemOnline/column';
+} from '@/pages/systemOnline/Column';
 import type { CellClickedEvent, GridApi } from 'ag-grid-community';
 import { initGridTable, PLATE_STATUS } from '@/pages/systemOnline/constants';
 import { useModel, useLocation } from 'umi';
@@ -251,9 +251,8 @@ const ProjectServices = () => {
   const [preEnv, setPreEnv] = useState([]);
   const [spinning, setPinning] = useState(false);
   const [finished, setFinished] = useState(true); // 同步状态
-  const [showTip, setShowTip] = useState(''); // 分支检查提示
+  const [showTip, setShowTip] = useState(''); // 分支检查异常提示
   const [reFreshSeal, setReFreshSeal] = useState(false); // 刷新版本数据
-  const [refreshConfig, setRefreshConfig] = useState(false);
 
   const updatePreData = async (key: string) => {
     const info = proInfo?.release_project;
@@ -277,9 +276,11 @@ const ProjectServices = () => {
         release_env: values.release_env || '',
       });
       setPinning(false);
+      setReFreshSeal(true);
       syncProInfo();
     } catch (e) {
       setFinished(true);
+      setReFreshSeal(false);
       setPinning(false);
     }
   };
@@ -302,7 +303,7 @@ const ProjectServices = () => {
   };
 
   const checkBranch = async () => {
-    if (!idx) return;
+    if (!idx || disabled) return;
     const values = form.getFieldsValue();
     if (values.release_branch && values.release_env) {
       try {
@@ -346,6 +347,8 @@ const ProjectServices = () => {
       <div className={'operation'}>
         <img
           src={require('../../../../../public/edit.png')}
+          alt={'编辑'}
+          title={'编辑'}
           onClick={() => {
             const params = { visible: true, data };
             if (type == 'online_project') setEditUpgrade(params);
@@ -355,6 +358,8 @@ const ProjectServices = () => {
         />
         {showLog && (
           <img
+            alt={'日志'}
+            title={'日志'}
             src={require('../../../../../public/logs.png')}
             onClick={() =>
               setShowLog({
@@ -383,12 +388,7 @@ const ProjectServices = () => {
         okButtonProps: { style: { display: 'none' } },
         content: (
           <div
-            style={{
-              maxHeight: 400,
-              overflow: 'auto',
-              margin: '10px 0',
-              whiteSpace: 'pre-line',
-            }}
+            style={{ maxHeight: 400, overflow: 'auto', margin: '10px 0', whiteSpace: 'pre-line' }}
           >
             {value}
           </div>
@@ -398,17 +398,17 @@ const ProjectServices = () => {
   };
 
   const refreshAllSource = async () => {
-    setRefreshConfig(true);
+    setPinning(true);
     try {
       if (idx) {
         await OnlineServices.refreshConfig(idx);
         await getProInfo(idx);
         setReFreshSeal(true);
-        setRefreshConfig(false);
+        setPinning(false);
       }
     } catch (e) {
       setReFreshSeal(false);
-      setRefreshConfig(false);
+      setPinning(false);
     }
   };
 
@@ -443,8 +443,9 @@ const ProjectServices = () => {
             <Button
               type={'primary'}
               style={{ marginLeft: 'auto' }}
-              loading={refreshConfig}
+              loading={spinning}
               onClick={refreshAllSource}
+              disabled={disabled}
             >
               刷新
             </Button>

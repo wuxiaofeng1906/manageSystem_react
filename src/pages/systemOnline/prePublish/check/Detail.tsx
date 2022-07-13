@@ -1,14 +1,13 @@
 import React, { useRef } from 'react';
-import { checkDetailColumn } from '../../column';
+import { checkDetailColumn } from '../../Column';
 import { AgGridReact } from 'ag-grid-react';
 import type { CellClickedEvent, GridApi } from 'ag-grid-community';
 import { initGridTable } from '@/pages/systemOnline/constants';
 import OnlineServices from '@/services/online';
 import { useLocation, useModel } from 'umi';
 import { Modal, Spin } from 'antd';
-import { isArray } from 'lodash';
+import { isArray, omit } from 'lodash';
 import { useCheckDetail } from '@/hooks/online';
-import { omit } from '@/utils/utils';
 
 const Detail = () => {
   const gridApi = useRef<GridApi>();
@@ -62,7 +61,6 @@ const Detail = () => {
       okButtonProps: { style: { display: 'none' } },
       content: (
         <div style={{ maxHeight: 400, overflow: 'auto', margin: '10px 0', whiteSpace: 'pre-line' }}>
-          {/*<div>检查状态： {formatCheckStatus({ data: data, rowIndex: rowIndex || 0 })}</div>*/}
           <div>
             {isArray(data?.check_log) ? (
               <div>

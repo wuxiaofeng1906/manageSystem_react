@@ -7,7 +7,6 @@ import moment from 'moment';
 import { IRecord, MOMENT_FORMAT } from '@/namespaces';
 
 const Release = () => {
-  // const [autoCheckForm] = Form.useForm();
   const [versionForm] = Form.useForm();
   const [branchForm] = Form.useForm();
   const [envForm] = Form.useForm();
@@ -95,64 +94,6 @@ const Release = () => {
             <Input style={{ width: 300 }} disabled />
           </Form.Item>
         </Form>
-        {/* <FieldSet
-        data={{ title: '自动化检查设置', mark: '【测试值班负责人填写自动化检查参数】', dot: true }}
-      >
-        <Form form={autoCheckForm} onFinish={onFinish}>
-          <Form.Item label={'①上线前自动化检查设置'} name={'auto_check'} valuePropName="checked">
-            <Checkbox>是否立即启用</Checkbox>
-          </Form.Item>
-          <Row gutter={12}>
-            <Col span={6}>
-              <Form.Item label={'检查类型'} name={'check_type'}>
-                <Select options={[]} style={{ width: '100%' }} />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item label={'测试环境'} name={'test_env'}>
-                <Select options={[]} style={{ width: '100%' }} />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item label={'浏览器'} name={'test_env'}>
-                <Select options={[]} style={{ width: '100%' }} />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Form.Item
-            label={'②上线后自动化检查设置'}
-            name={'auto_check_after'}
-            valuePropName="checked"
-          >
-            <Checkbox>是否立即启用</Checkbox>
-          </Form.Item>
-          <Row gutter={12}>
-            <Col span={6}>
-              <Form.Item label={'检查类型'} name={'check_type_after'}>
-                <Select options={[]} style={{ width: '100%' }} />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item label={'测试环境'} name={'test_env_after'}>
-                <Select options={[]} style={{ width: '100%' }} />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item label={'浏览器'} name={'test_env'}>
-                <Select options={[]} style={{ width: '100%' }} />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Form.Item style={{ textAlign: 'right' }}>
-            <Space size={10}>
-              <Button onClick={() => autoCheckForm.resetFields()}>清空</Button>
-              <Button type="primary" htmlType="submit">
-                点击保存
-              </Button>
-            </Space>
-          </Form.Item>
-        </Form>
-      </FieldSet> */}
       </div>
     </Spin>
   );

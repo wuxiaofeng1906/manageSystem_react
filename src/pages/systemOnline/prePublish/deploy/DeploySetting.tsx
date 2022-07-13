@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useModel, useLocation } from 'umi';
-import { Modal, Form, Switch, Row, Col, Divider, Select, Space } from 'antd';
+import { Modal, Form, Switch, Row, Col, Divider, Select } from 'antd';
 import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 import styles from './index.less';
 import OnlineServices from '@/services/online';
@@ -19,7 +19,7 @@ const DeploySetting = (props: ModalFuncProps) => {
   const onConfirm = async () => {
     const values = await form.getFieldsValue();
     if (!idx || !user?.userid) return;
-    const res = await OnlineServices.updateDeploySetting({
+    await OnlineServices.updateDeploySetting({
       ...values,
       user_id: user.userid,
       release_env: release_project?.release_env,

@@ -6,7 +6,7 @@ import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 import { AgGridReact } from 'ag-grid-react';
 import type { GridApi, CellClickedEvent } from 'ag-grid-community';
 import { initGridTable, SETTING_STATUS } from '../constants';
-import { servicesSettingColumn } from '../column';
+import { servicesSettingColumn } from '../Column';
 import { ExclamationCircleOutlined, FolderAddTwoTone } from '@ant-design/icons';
 import IPagination from '@/components/IPagination';
 import { useModel } from 'umi';

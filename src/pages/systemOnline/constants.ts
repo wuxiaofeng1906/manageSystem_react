@@ -52,9 +52,9 @@ const MENUS = [
   { label: '部署', key: 'deploy' },
   // { label: '值班', key: 'duty' },
   { label: '检查', key: 'check' },
-  { label: '工单', key: 'worksheet' },
-  { label: '发布', key: 'publish' },
-  { label: '总览', key: 'overview' },
+  // { label: '工单', key: 'worksheet' },
+  // { label: '发布', key: 'publish' },
+  // { label: '总览', key: 'overview' },
 ];
 const PLATE_STATUS = [
   // { label: '未知', value: 'unknown', key: 'unknown' },

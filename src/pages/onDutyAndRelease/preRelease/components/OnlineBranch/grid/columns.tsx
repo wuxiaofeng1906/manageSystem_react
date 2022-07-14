@@ -91,7 +91,7 @@ const rendererUnitTest = (params: any) => {
   return `
         <div>
         <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
-                  style="margin-left:100px;cursor: pointer"
+                  style="margin-top: 5px;margin-left:100px;cursor: pointer"
                   onclick='refreshStatus(${JSON.stringify({
                     ready_release_num: params.data.ready_release_num,
                     refresh_param: 'test_unit',
@@ -139,7 +139,7 @@ const iconCheckRender = (params: any) => {
   const logs = JSON.stringify(values.check_log).replaceAll("'", '***'); // 如果包含单引号，解析会报错。需要用特殊符号替换掉，传过去之后再解析出来。
   return `
        <div>
-          <div style="margin-top: 2px;margin-left: 100px">
+          <div style="margin-top: -17px;margin-left: 80px">
           <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
             style="margin-right: 10px;cursor: pointer"
             onclick='refreshStatus(${JSON.stringify({
@@ -151,7 +151,7 @@ const iconCheckRender = (params: any) => {
                 <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
              </Button>
           </div>
-          <div style="margin-top: -20px;width: 210px">
+          <div style="width: 210px;margin-top: -25px;">
                 <div style="color:${Color};font-size: 10px">${result}</div>
           </div>
        </div>`;
@@ -328,7 +328,7 @@ const beforeOnlineEnvCheck = (params: any) => {
   const checkNum = JSON.stringify(params.data?.check_num);
 
   return `
-        <div style="margin-top: -10px">
+        <div style="margin-top: -12px">
             <div style="margin-left: 120px" >
               <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
               onclick='excuteCheckData("envCheck",${checkNum},${JSON.stringify(result)})'>
@@ -341,7 +341,7 @@ const beforeOnlineEnvCheck = (params: any) => {
                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
              </a>
             </div>
-            <div style=" margin-top: -20px;font-size: 10px;width: 200px">
+            <div style=" margin-top: -25px;font-size: 10px;width: 200px">
                 <div><label style="color: ${Color}"> ${result}</label> &nbsp;${timeRange}</div>
             </div>
 
@@ -571,7 +571,7 @@ const sealStatusRenderer = (params: any) => {
               ready_release_num: params.data.ready_release_num,
               refresh_param: 'sealing_version',
             })})'/>
-              <Button style="margin-top: 8px; margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;height: 25px;cursor: pointer"
+              <Button style="margin-top: 10px; margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;height: 25px;cursor: pointer"
                 onclick='showCoverStatusLog(${JSON.stringify(params.value)})'>
                   <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志" style="margin-top: -20px" >
                </Button>

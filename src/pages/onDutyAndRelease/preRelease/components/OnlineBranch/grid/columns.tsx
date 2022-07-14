@@ -146,26 +146,24 @@ const iconCheckRender = (params: any) => {
   return `
        <div>
           <div style="margin-top: -15px;margin-left: 60px">
-           ${
-             isEmpty(values) && !technical
-               ? ''
-               : `<img src="../执行.png" width="16" height="16" alt="执行" title="执行"
+          ${
+            !technical
+              ? ''
+              : `<div>
+          <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
             style="margin-right: 10px;cursor: pointer"
             onclick='refreshStatus(${JSON.stringify({
               ready_release_num: params.data.ready_release_num,
               refresh_param: 'icon',
-            })})'/>`
-           }
-            ${
-              technical || isEmpty(values)
-                ? ''
-                : `<Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
-                                     onclick='showIconCheckLog(${logs})'>
-    <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
-  </Button>`
-            }
+            })})'/>
+          <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
+                  onclick='showIconCheckLog(${logs})'>
+            <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+          </Button>
+          </div>`
+          }
           </div>
-          <div style="width: 210px;margin-top: -20px;">
+          <div style="width: 210px;margin-top: ${technical ? '-20px' : '23px'};">
                 <div style="color:${Color};font-size: 10px">${result}</div>
           </div>
        </div>`;

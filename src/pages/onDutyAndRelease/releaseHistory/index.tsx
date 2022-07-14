@@ -513,7 +513,7 @@ const ReleaseHistory: React.FC<any> = () => {
         <div style={gridHeadDivStyle}>
           {' '}
           &nbsp;
-          <label style={{ fontWeight: 'bold', float: 'left' }}>0级灰度发布列表</label>
+          <label style={{ fontWeight: 'bold', float: 'left' }}>0级灰度积压列表</label>
           <Button type="text" onClick={generateFormalZeroRelease} style={{ float: 'right' }}>
             <img
               src="../pushMessage.png"
@@ -558,7 +558,7 @@ const ReleaseHistory: React.FC<any> = () => {
         <div style={gridHeadDivStyle}>
           {' '}
           &nbsp;
-          <label style={{ fontWeight: 'bold', float: 'left' }}>1级灰度发布列表</label>
+          <label style={{ fontWeight: 'bold', float: 'left' }}>1级灰度积压列表</label>
           <Button type="text" onClick={generateFormalFirstRelease} style={{ float: 'right' }}>
             <img
               src="../pushMessage.png"

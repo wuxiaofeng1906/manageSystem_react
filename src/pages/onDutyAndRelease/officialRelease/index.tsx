@@ -1,18 +1,19 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {PageContainer} from '@ant-design/pro-layout';
-import {errorMessage} from '@/publicMethods/showMessages';
-import {AgGridReact} from 'ag-grid-react';
-import {GridApi, GridReadyEvent} from 'ag-grid-community';
+import React, { useEffect, useRef, useState } from 'react';
+import { PageContainer } from '@ant-design/pro-layout';
+import { errorMessage } from '@/publicMethods/showMessages';
+import { AgGridReact } from 'ag-grid-react';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {Button, Checkbox, Col, DatePicker, Form, Input, Modal, Row, Select} from 'antd';
+import { Button, Checkbox, Col, DatePicker, Form, Input, Modal, Row, Select, message } from 'antd';
 import './style/style.css';
-import {useRequest} from 'ahooks';
-import {loadDutyNamesSelect} from '@/pages/onDutyAndRelease/preRelease/comControl/controler';
-import {getHeight} from '@/publicMethods/pageSet';
-import {releaseColumns} from './grid/columns';
+import { useRequest } from 'ahooks';
+import { loadDutyNamesSelect } from '@/pages/onDutyAndRelease/preRelease/comControl/controler';
+import { getHeight } from '@/publicMethods/pageSet';
+import { releaseColumns } from './grid/columns';
 import moment from 'moment';
+import { isEmpty } from 'lodash';
 import {
   getOfficialReleaseDetails,
   cancleReleaseResult,
@@ -21,9 +22,9 @@ import {
   getOnlineAutoResult,
   getOnlineEnv,
 } from './axiosRequest/apiPage';
-import {sucMessage} from '@/publicMethods/showMessages';
-import {getCurrentUserInfo} from '@/publicMethods/authorityJudge';
-import {history} from '@@/core/history';
+import { sucMessage } from '@/publicMethods/showMessages';
+import { getCurrentUserInfo } from '@/publicMethods/authorityJudge';
+import { history } from '@@/core/history';
 
 // 编辑后的数据
 let otherSaveCondition: any = {
@@ -33,10 +34,9 @@ let otherSaveCondition: any = {
   onlineReleaseNum: '', // 正式发布编号
 };
 let onlineEnv: any = [];
-const {Option} = Select;
+const { Option } = Select;
 
 const OfficialRelease: React.FC<any> = (props: any) => {
-
   const onlineReleaseNum = props.location?.query?.onlineReleaseNum; // 正式发布列表的数据
   const historyQuery = props.location?.query?.history === 'true';
   const releaseType = props.location?.query?.releaseType;
@@ -45,6 +45,8 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   onlineEnv = useRequest(() => getOnlineEnv(releaseType)).data; // 上线集群环境
 
   const releaseServiceGridApi = useRef<GridApi>();
+  const [releaseNameForm] = Form.useForm();
+
   const serviceGridReady = (params: GridReadyEvent) => {
     releaseServiceGridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -54,7 +56,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
   /* region 检查总览 */
   // 检查总览的颜色
-  const [processStatus, setProcessStatus] = useState({processColor: 'gray'});
+  const [processStatus, setProcessStatus] = useState({ processColor: 'gray' });
 
   // 显示进度
   const showProcessStatus = () => {
@@ -82,7 +84,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   const [isModalVisible, setModalVisible] = useState({
     show: false,
     result: '',
-    hintMsg: {message1: "", message2: ""},
+    hintMsg: { message1: '', message2: '' },
     autoCheckDisabled: true,
   });
 
@@ -101,6 +103,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
     //   获取发布方式及时间
     const releaseInfo = formForOfficialRelease.getFieldsValue();
+    const releaseName = await releaseNameForm.getFieldsValue();
     otherSaveCondition.grayReleaseNums.length = 0;
     // 获取灰度所有的发布编号
     releaseServiceGridApi.current?.forEachNode((node: any) => {
@@ -108,7 +111,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       otherSaveCondition.grayReleaseNums.push(readyReleaseNum);
     });
 
-    const result = await editReleaseForm(releaseInfo, otherSaveCondition);
+    const result = await editReleaseForm({ ...releaseInfo, ...releaseName }, otherSaveCondition);
     if (result.code === 200) {
       sucMessage('数据保存成功！');
       // 需要回显编辑人和编辑时间
@@ -175,7 +178,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       releaseEnv: '', // 发布集群
       releaseResult: 'unknown', // 发布结果
       onlineReleaseNum: '', // 正式发布编号
-    }
+    };
   };
 
   // 发布结果下拉框选择
@@ -189,12 +192,12 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     // 不同选择弹出不同的提示框
     let autoDisable = true;
     let hintMsgs = {
-      message1: "请确认是否修改服务发布结果为空！",
-      message2: ""
+      message1: '请确认是否修改服务发布结果为空！',
+      message2: '',
     };
     if (params === 'success') {
-      hintMsgs.message1 = "请确认服务是否发布成功?";
-      hintMsgs.message2 = "如有自动化也执行通过!确认通过，会自动开放所有租户。";
+      hintMsgs.message1 = '请确认服务是否发布成功?';
+      hintMsgs.message2 = '如有自动化也执行通过!确认通过，会自动开放所有租户。';
       autoDisable = false;
     } else if (params === 'failure') {
       hintMsgs.message1 = '请确认服务是否发布失败！';
@@ -220,6 +223,9 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     if (sourceData && sourceData.length > 0) {
       // 当前只有一个Tab，不会有多个。
       const datas = sourceData[0];
+      releaseNameForm.setFieldsValue({
+        release_name: datas?.release_name ?? '',
+      });
       otherSaveCondition.onlineReleaseNum = datas.online_release_num;
       let releaseTime = null;
       if (datas.plan_release_time && datas.plan_release_time !== 'Invalid Date') {
@@ -241,7 +247,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       const projectData = datas.project_info;
       if (projectData && projectData.length > 0) {
         projectData.forEach((ele: any, index: number) => {
-          const details = {...ele};
+          const details = { ...ele };
           if (index === 0) {
             details['rowSpan'] = projectData.length;
           }
@@ -265,17 +271,30 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   }, [pageData]);
 
   // 表格的屏幕大小自适应
-  const [gridHeight, setGridHeight] = useState(getHeight() - 180);
+  const [gridHeight, setGridHeight] = useState(getHeight() - 210);
   window.onresize = function () {
-    setGridHeight(getHeight() - 180);
+    setGridHeight(getHeight() - 210);
   };
 
   return (
     <PageContainer>
-      <div style={{marginTop: -15}}>
+      <div style={{ marginTop: -15 }}>
         {/* 检查总览 */}
-        <div style={{backgroundColor: 'white', paddingTop: 10, height: 45}}>
-          <label style={{fontWeight: 'bold', marginLeft: 5}}>检查总览：</label>
+        <div style={{ backgroundColor: 'white', padding: '10px 0 10px 5px' }}>
+          <Form form={releaseNameForm}>
+            <Form.Item label={'发布名称'} name={'release_name'}>
+              <Input
+                style={{ width: 350 }}
+                placeholder={'发布名称'}
+                onBlur={async () => {
+                  const release_name = releaseNameForm.getFieldsValue().release_name;
+                  if (isEmpty(release_name?.trim())) return message.info('请填写发布名称！');
+                  saveReleaseInfo();
+                }}
+              />
+            </Form.Item>
+          </Form>
+          <label style={{ fontWeight: 'bold' }}>检查总览：</label>
           <label>
             <button
               style={{
@@ -287,11 +306,11 @@ const OfficialRelease: React.FC<any> = (props: any) => {
             ></button>
             &nbsp;发布服务已填写完成
           </label>
-          <label style={{marginLeft: 10}}>
-            <label style={{fontWeight: 'bold'}}>线上发布结果：</label>
+          <label style={{ marginLeft: 10 }}>
+            <label style={{ fontWeight: 'bold' }}>线上发布结果：</label>
             <Select
               size={'small'}
-              style={{width: 100}}
+              style={{ width: 100 }}
               onChange={pulishResulttChanged}
               value={isModalVisible.result}
               disabled={historyQuery}
@@ -311,18 +330,18 @@ const OfficialRelease: React.FC<any> = (props: any) => {
             </Select>
           </label>
 
-          <label style={{marginLeft: 10}}>{autoCheckRt}</label>
+          <label style={{ marginLeft: 10 }}>{autoCheckRt}</label>
         </div>
         {/* step 1 发布方式及时间 */}
-        <div style={{backgroundColor: 'white', marginTop: 4}}>
-          <fieldset className={'fieldStyle'} style={{height: 135}}>
+        <div style={{ backgroundColor: 'white', marginTop: 4 }}>
+          <fieldset className={'fieldStyle'} style={{ height: 135 }}>
             <legend className={'legendStyle'}>
               Step1 发布方式及时间
-              <label style={{color: 'Gray'}}> (值班测试填写)</label>
+              <label style={{ color: 'Gray' }}> (值班测试填写)</label>
             </legend>
             <div>
               <Form form={formForOfficialRelease}>
-                <Row gutter={8} style={{marginTop: -5}}>
+                <Row gutter={8} style={{ marginTop: -5 }}>
                   <Col span={7}>
                     {/* 发布类型 */}
                     <Form.Item label="发布类型:" name="pulishType">
@@ -357,16 +376,16 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                         showTime
                         format="YYYY-MM-DD HH:mm"
                         disabled={historyQuery}
-                        style={{width: '100%'}}
+                        style={{ width: '100%' }}
                         onChange={saveReleaseInfo}
                       />
                     </Form.Item>
                   </Col>
                 </Row>
-                <Row gutter={8} style={{marginTop: -10}}>
+                <Row gutter={8} style={{ marginTop: -10 }}>
                   <Col span={14}>
                     {/* 关联值班名单 */}
-                    <Form.Item label="关联值班名单" name="relateDutyName" style={{marginLeft: 5}}>
+                    <Form.Item label="关联值班名单" name="relateDutyName" style={{ marginLeft: 5 }}>
                       <Select
                         filterOption={(inputValue: string, option: any) =>
                           !!option.children.includes(inputValue)
@@ -395,7 +414,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                   </Col>
                   <Col span={5}>
                     {/* 编辑时间 */}
-                    <Form.Item label="编辑时间:" name="editTime" style={{marginLeft: 5}}>
+                    <Form.Item label="编辑时间:" name="editTime" style={{ marginLeft: 5 }}>
                       <Input
                         style={{
                           border: 'none',
@@ -414,16 +433,16 @@ const OfficialRelease: React.FC<any> = (props: any) => {
         </div>
 
         {/* step 2 发布服务填写确认 */}
-        <div style={{backgroundColor: 'white', marginTop: 4}}>
+        <div style={{ backgroundColor: 'white', marginTop: 4 }}>
           <fieldset className={'fieldStyle'}>
             <legend className={'legendStyle'}>
               Step2 发布服务填写确认
-              <label style={{color: 'Gray'}}> (值班测试填写)</label>
+              <label style={{ color: 'Gray' }}> (值班测试填写)</label>
             </legend>
             <div>
               <div
                 className="ag-theme-alpine"
-                style={{height: gridHeight, width: '100%', marginTop: -12}}
+                style={{ height: gridHeight, width: '100%', marginTop: -12 }}
               >
                 <AgGridReact
                   columnDefs={releaseColumns} // 定义列
@@ -433,7 +452,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                     sortable: true,
                     suppressMenu: true,
                     minWidth: 75,
-                    cellStyle: {'line-height': '35px'},
+                    cellStyle: { 'line-height': '35px' },
                   }}
                   headerHeight={35}
                   rowHeight={30}
@@ -456,7 +475,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                             placeholder={'请选择'}
                             defaultValue={currentValue}
                             bordered={false}
-                            style={{width: '100%'}}
+                            style={{ width: '100%' }}
                             mode={'multiple'}
                             onChange={(newValue: any) => {
                               otherSaveCondition.releaseEnv = newValue.join(',');
@@ -485,9 +504,9 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           width={400}
           onCancel={handleCancel}
           centered={true}
-          bodyStyle={{height: 145}}
+          bodyStyle={{ height: 145 }}
           footer={[
-            <Button key="cancel" onClick={handleCancel} style={{borderRadius: 5}}>
+            <Button key="cancel" onClick={handleCancel} style={{ borderRadius: 5 }}>
               取消
             </Button>,
             <Button
@@ -504,26 +523,28 @@ const OfficialRelease: React.FC<any> = (props: any) => {
             </Button>,
           ]}
         >
-          <Form form={pulishResultForm} style={{marginTop: -15}}>
-            <Form.Item>
-              {isModalVisible.hintMsg.message1}
-            </Form.Item>
+          <Form form={pulishResultForm} style={{ marginTop: -15 }}>
+            <Form.Item>{isModalVisible.hintMsg.message1}</Form.Item>
             <Form.Item
-              style={{marginTop: -25, display: isModalVisible.hintMsg.message2 === "" ? "none" : "inline-block"}}>
+              style={{
+                marginTop: -25,
+                display: isModalVisible.hintMsg.message2 === '' ? 'none' : 'inline-block',
+              }}
+            >
               {isModalVisible.hintMsg.message2}
             </Form.Item>
 
             <Form.Item
               label="是否忽略发布成功后自动化检查:"
               name="ignoreAfterCheck"
-              style={{marginTop: -25}}
+              style={{ marginTop: -25 }}
             >
-              <Checkbox.Group style={{width: '100%'}} disabled={isModalVisible.autoCheckDisabled}>
+              <Checkbox.Group style={{ width: '100%' }} disabled={isModalVisible.autoCheckDisabled}>
                 <Checkbox value="yes">忽略检查</Checkbox>
               </Checkbox.Group>
             </Form.Item>
-            <Form.Item label="检查结果:" name="checkResult" style={{marginTop: -25}}>
-              <Checkbox.Group style={{width: '100%'}} disabled={isModalVisible.autoCheckDisabled}>
+            <Form.Item label="检查结果:" name="checkResult" style={{ marginTop: -25 }}>
+              <Checkbox.Group style={{ width: '100%' }} disabled={isModalVisible.autoCheckDisabled}>
                 <Checkbox value="ui">UI执行通过</Checkbox>
                 <Checkbox value="applet">小程序执行通过</Checkbox>
               </Checkbox.Group>

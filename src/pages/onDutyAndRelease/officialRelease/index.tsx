@@ -279,7 +279,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   };
 
   return (
-    <PageContainer>
+    <PageContainer title={<div />}>
       <div style={{ marginTop: -15 }}>
         {/* 检查总览 */}
         <div style={{ backgroundColor: 'white', padding: '10px 0 10px 5px' }}>

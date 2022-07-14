@@ -45,7 +45,7 @@ const rendererUnitTest = (params: any) => {
     }
     let timeRange = '';
     if (start) {
-      timeRange = `${start}~${end}`;
+      timeRange = end ? `${start}~${end}` : start;
     }
     if (ele.test_case_technical_side === '1') {
       // 前端
@@ -92,12 +92,12 @@ const rendererUnitTest = (params: any) => {
   return `
         <div>
         <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
-                  style="margin-top: -12px;margin-left:100px;cursor: pointer"
+                  style="margin-top: -15px;margin-left:100px;cursor: pointer"
                   onclick='refreshStatus(${JSON.stringify({
                     ready_release_num: params.data.ready_release_num,
                     refresh_param: 'test_unit',
                   })})'/>
-            <div style="font-size: 10px;margin-top: -25px">
+            <div style="font-size: 10px;margin-top: -30px">
               ${['1', '3'].includes(params.data?.technical_side) ? front : ''}
               ${['2', '3'].includes(params.data?.technical_side) ? backend : ''}
             </div>
@@ -142,19 +142,22 @@ const iconCheckRender = (params: any) => {
       result = '未开始';
     }
   }
-
-  const logs = JSON.stringify(values.check_log).replaceAll("'", '***'); // 如果包含单引号，解析会报错。需要用特殊符号替换掉，传过去之后再解析出来。
+  const logs = !isEmpty(values) && JSON.stringify(values?.check_log).replaceAll("'", '***'); // 如果包含单引号，解析会报错。需要用特殊符号替换掉，传过去之后再解析出来。
   return `
        <div>
-          <div style="margin-top: -17px;margin-left: 80px">
-          <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
+          <div style="margin-top: -15px;margin-left: 60px">
+           ${
+             isEmpty(values) && !technical
+               ? ''
+               : `<img src="../执行.png" width="16" height="16" alt="执行" title="执行"
             style="margin-right: 10px;cursor: pointer"
             onclick='refreshStatus(${JSON.stringify({
               ready_release_num: params.data.ready_release_num,
               refresh_param: 'icon',
-            })})'/>
+            })})'/>`
+           }
             ${
-              technical
+              technical || isEmpty(values)
                 ? ''
                 : `<Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
                                      onclick='showIconCheckLog(${logs})'>
@@ -162,7 +165,7 @@ const iconCheckRender = (params: any) => {
   </Button>`
             }
           </div>
-          <div style="width: 210px;margin-top: -25px;">
+          <div style="width: 210px;margin-top: -20px;">
                 <div style="color:${Color};font-size: 10px">${result}</div>
           </div>
        </div>`;
@@ -525,14 +528,20 @@ const sealStatusRenderer = (params: any) => {
 
     return `
           <div>
-            <div style="margin-left: 100px;" >
+            <div style="margin-left: 100px;margin-top: -13px" >
+            <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
+            style="margin:4px 10px 0 0;cursor: pointer"
+            onclick='refreshStatus(${JSON.stringify({
+              ready_release_num: params.data.ready_release_num,
+              refresh_param: 'sealing_version',
+            })})'/>
               <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
                 onclick='showCoverStatusLog(${JSON.stringify(params.value)})'>
                   <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志" style="background-color: white;padding-top: -10px">
                </Button>
             </div>
 
-              <div style=" font-size: 10px;background-color: transparent;" >
+              <div style=" font-size: 10px;background-color: transparent;margin-top: -20px" >
                    ${side} <label style="color: ${sideColor}"> ${status}</label> &nbsp;${time}
               </div>
           </div>

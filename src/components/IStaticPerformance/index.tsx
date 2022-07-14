@@ -13,25 +13,27 @@ import {
 import { getHeight } from '@/publicMethods/pageSet';
 import { IStaticBy, useStatistic, IIdentity } from '@/hooks/statistic';
 import { GqlClient } from '@/hooks';
-import { isEmpty } from 'lodash';
+import { isEmpty, isString } from 'lodash';
 import { ColumnsType } from 'antd/lib/table/interface';
 
 interface IStatic {
   request: (client: GqlClient<object>, type: string, identify: IIdentity) => void;
-  showSplit?: boolean; // 以分子、分母展示
+  showDenominator?: boolean; // 以分子、分母展示
   ruleData: IRuleData[];
   identity?: IIdentity;
 }
+
+type INode = string | React.ReactNode;
 export interface IRuleData {
-  title: string;
-  child: string[];
+  title: INode;
+  child: Array<INode>;
   table?: { dataSource: any[]; column: ColumnsType<any> }; // 支持antd table
 }
 const IStaticPerformance: React.FC<IStatic> = ({
   request,
   ruleData,
   identity,
-  showSplit = false,
+  showDenominator = false,
 }) => {
   const gridApi = useRef<GridApi>();
   const { handleStaticBy, columns, rowData, loading } = useStatistic();
@@ -51,12 +53,13 @@ const IStaticPerformance: React.FC<IStatic> = ({
   };
 
   const changeStaticBy = async (type: IStaticBy) => {
-    await handleStaticBy({ request, type, identity, showSplit });
+    await handleStaticBy({ request, type, identity, showDenominator });
   };
 
   useEffect(() => {
     changeStaticBy('quarter');
   }, []);
+
   useEffect(() => {
     if (gridApi.current) {
       if (loading) gridApi.current.showLoadingOverlay();
@@ -154,18 +157,20 @@ const IStaticPerformance: React.FC<IStatic> = ({
         visible={visible}
       >
         {ruleData.map((it, i) => (
-          <div key={it.title}>
-            <p>{`${i + 1}.${it.title}:`}</p>
-            {it.child?.map((v) => (
-              <p style={{ textIndent: '2em' }}>{`${v};`}</p>
-            ))}
-            {isEmpty(it.table) ? (
-              <div />
-            ) : (
+          <div key={i}>
+            {isString(it.title)
+              ? it.title && <p style={{ fontWeight: 'bold' }}>{`${i + 1}.${it.title}:`}</p>
+              : it.title}
+            {it.child?.map((v) =>
+              isString(v) ? <p style={{ textIndent: '2em', margin: '5px 0' }}>{`${v};`}</p> : v,
+            )}
+            {!isEmpty(it.table) && (
               <Table
+                style={{ wordBreak: 'keep-all' }}
                 dataSource={it.table?.dataSource}
                 columns={it.table?.column}
                 pagination={false}
+                scroll={{ x: 300 }}
                 bordered
               />
             )}

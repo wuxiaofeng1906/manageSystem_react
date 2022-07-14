@@ -572,6 +572,13 @@ export default [
         component: './onDutyAndRelease/officialRelease',
         hideInMenu: true
 
+      }, {
+        name: '发布公告',
+        icon: 'table',
+        path: 'releaseAnnouncement',
+        component: './onDutyAndRelease/releaseAnnouncement',
+        // hideInMenu: true
+
       }
     ],
   },

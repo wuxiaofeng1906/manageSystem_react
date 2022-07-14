@@ -4,6 +4,7 @@ import {useModel} from '@@/plugin-model/useModel';
 import {saveProcessResult, executeAutoCheck} from './axiosRequest';
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {getAutoResult} from "./processAnalysis";
+import {history} from "@@/core/history";
 
 const {Option} = Select;
 
@@ -101,8 +102,18 @@ const CheckProgress: React.FC<any> = () => {
     });
   };
 
+  // 跳转到发布公告界面
+
+  const href = `http://localhost:8000/onDutyAndRelease/releaseAnnouncement?releaseNum=${tabsData.activeKey}&releaseName=test`;
+
   return (
     <div>
+
+      <a href={href} target={"_blank"} style={{float: "right"}}>
+        <img src="../annouce.png" width="20" height="20" alt="发布公告" title="发布公告"/> &nbsp;
+        发布公告
+      </a>
+
       {/* 检查进度 */}
       <div style={{marginTop: -10}}>
         <div>
@@ -115,7 +126,6 @@ const CheckProgress: React.FC<any> = () => {
             />
           </Row>
         </div>
-
         {/* 检查总览 */}
         <div style={{marginTop: 5, marginLeft: 5}}>
           <label style={{fontWeight: 'bold'}}>检查总览：</label>

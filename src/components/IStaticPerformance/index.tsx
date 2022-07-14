@@ -166,11 +166,12 @@ const IStaticPerformance: React.FC<IStatic> = ({
             )}
             {!isEmpty(it.table) && (
               <Table
+                style={{ wordBreak: 'keep-all' }}
                 dataSource={it.table?.dataSource}
                 columns={it.table?.column}
                 pagination={false}
-                bordered
                 scroll={{ x: 300 }}
+                bordered
               />
             )}
           </div>

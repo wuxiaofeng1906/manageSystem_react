@@ -338,14 +338,15 @@ const DutyCatalog = () => {
     const values = await form.getFieldsValue();
     const time = moment(values.duty_date).format('YYYYMMDD');
     let type = '';
+    console.log(values.release_env);
     if (isEmpty(values.release_env)) type = '';
     else if (
       values.release_env?.length == 1 &&
-      ['cn-northwest-1', 'cn-northwest-0'].includes(values.release_env)
+      ['cn-northwest-1', 'cn-northwest-0'].includes(values.release_env[0])
     ) {
-      type = `${values.release_env.replace('cn-northwest-', '')}级灰度发布`;
+      type = `${values.release_env[0].replace('cn-northwest-', '')}级灰度发布`;
     } else type = '线上发布';
-    return `${time}${type}值班名单`;
+    return `${time}_${type}值班名单`;
   };
 
   useEffect(() => {

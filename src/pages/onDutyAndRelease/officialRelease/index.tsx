@@ -40,6 +40,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   const onlineReleaseNum = props.location?.query?.onlineReleaseNum; // 正式发布列表的数据
   const historyQuery = props.location?.query?.history === 'true';
   const releaseType = props.location?.query?.releaseType;
+  const [rowData, setRowData] = useState([]);
   const dutyNameArray = useRequest(() => loadDutyNamesSelect(true)).data; // 关联值班名单
   const pageData = useRequest(() => getOfficialReleaseDetails(onlineReleaseNum, releaseType)).data; // 界面数据获取
   onlineEnv = useRequest(() => getOnlineEnv(releaseType)).data; // 上线集群环境
@@ -265,7 +266,9 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           gridData.push(details);
         });
       }
-      releaseServiceGridApi.current?.setRowData(gridData);
+
+      setRowData(gridData);
+      // releaseServiceGridApi.current?.setRowData(gridData);
       setModalVisible({
         ...isModalVisible,
         result: datas.release_result,
@@ -285,7 +288,6 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   window.onresize = function () {
     setGridHeight(getHeight() - 210);
   };
-
   return (
     <PageContainer title={<div />}>
       <div style={{ marginTop: -15 }}>
@@ -456,7 +458,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
               >
                 <AgGridReact
                   columnDefs={releaseColumns} // 定义列
-                  rowData={[]} // 数据绑定
+                  rowData={rowData} // 数据绑定
                   defaultColDef={{
                     resizable: true,
                     sortable: true,

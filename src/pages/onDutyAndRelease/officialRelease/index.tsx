@@ -46,6 +46,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
   const releaseServiceGridApi = useRef<GridApi>();
   const [releaseNameForm] = Form.useForm();
+  const [disabled, setDisabled] = useState(false);
 
   const serviceGridReady = (params: GridReadyEvent) => {
     releaseServiceGridApi.current = params.api;
@@ -133,54 +134,61 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
   // 点击保存按钮
   const handleOk = async () => {
-    const formData = pulishResultForm.getFieldsValue();
-    // 如果是发布成功，则需要判断下面自动化选项是否勾选
-    if (!isModalVisible.autoCheckDisabled) {
-      // 是发布成功
-      if (formData.ignoreAfterCheck === undefined || formData.ignoreAfterCheck.length === 0) {
-        // 不忽略的时候
-        if (formData.checkResult === undefined || formData.checkResult.length === 0) {
-          // 一个结果都没选中
-          errorMessage('检查结果必须至少勾选一项！');
-          return;
+    setDisabled(true);
+    try {
+      const formData = pulishResultForm.getFieldsValue();
+      // 如果是发布成功，则需要判断下面自动化选项是否勾选
+      if (!isModalVisible.autoCheckDisabled) {
+        // 是发布成功
+        if (formData.ignoreAfterCheck === undefined || formData.ignoreAfterCheck.length === 0) {
+          // 不忽略的时候
+          if (formData.checkResult === undefined || formData.checkResult.length === 0) {
+            // 一个结果都没选中
+            setDisabled(false);
+            errorMessage('检查结果必须至少勾选一项！');
+            return;
+          }
+        }
+
+        // 发布成功才调用自动化检查接口
+        const result = await runAutoCheck(formData, otherSaveCondition.onlineReleaseNum);
+        if (result.code !== 200) {
+          errorMessage(`发布成功后自动化检查结果保存失败：${result}`);
+        } else {
+          // 保存成功后获取自动化检查结果
+          const autoRt: any = await getOnlineAutoResult(otherSaveCondition.onlineReleaseNum);
+          setAutoCheckRt(autoRt);
         }
       }
 
-      // 发布成功才调用自动化检查接口
-      const result = await runAutoCheck(formData, otherSaveCondition.onlineReleaseNum);
-      if (result.code !== 200) {
-        errorMessage(`发布成功后自动化检查结果保存失败：${result}`);
+      // 调用保存接口: 如果是取消，则单独调用取消接口
+      if (isModalVisible.result === 'cancel') {
+        const result = await cancleReleaseResult(otherSaveCondition.onlineReleaseNum);
+        if (result.code === 200) {
+          sucMessage('当前发布取消成功！');
+          setModalVisible({
+            ...isModalVisible,
+            result: 'unknown',
+            show: false,
+          });
+        }
       } else {
-        // 保存成功后获取自动化检查结果
-        const autoRt: any = await getOnlineAutoResult(otherSaveCondition.onlineReleaseNum);
-        setAutoCheckRt(autoRt);
+        saveReleaseInfo();
       }
-    }
+      setDisabled(false);
 
-    // 调用保存接口: 如果是取消，则单独调用取消接口
-    if (isModalVisible.result === 'cancel') {
-      const result = await cancleReleaseResult(otherSaveCondition.onlineReleaseNum);
-      if (result.code === 200) {
-        sucMessage('当前发布取消成功！');
-        setModalVisible({
-          ...isModalVisible,
-          result: 'unknown',
-          show: false,
-        });
-      }
-    } else {
-      saveReleaseInfo();
+      // 无论发布成功或者失败，都要跳转到详情页面
+      history.push(`/onDutyAndRelease/releaseHistory`);
+      //   需要清空原有的条件，不然重新进来保存时发布结果还是原有的，会报错。
+      otherSaveCondition = {
+        grayReleaseNums: [], // 灰度发布编号
+        releaseEnv: '', // 发布集群
+        releaseResult: 'unknown', // 发布结果
+        onlineReleaseNum: '', // 正式发布编号
+      };
+    } catch (e) {
+      setDisabled(false);
     }
-
-    // 无论发布成功或者失败，都要跳转到详情页面
-    history.push(`/onDutyAndRelease/releaseHistory`);
-    //   需要清空原有的条件，不然重新进来保存时发布结果还是原有的，会报错。
-    otherSaveCondition = {
-      grayReleaseNums: [], // 灰度发布编号
-      releaseEnv: '', // 发布集群
-      releaseResult: 'unknown', // 发布结果
-      onlineReleaseNum: '', // 正式发布编号
-    };
   };
 
   // 发布结果下拉框选择
@@ -516,6 +524,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
               key="submit"
               type="primary"
               onClick={handleOk}
+              disabled={disabled}
               style={{
                 color: '#46A0FC',
                 backgroundColor: '#ECF5FF',

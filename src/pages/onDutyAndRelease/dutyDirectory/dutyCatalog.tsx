@@ -338,7 +338,6 @@ const DutyCatalog = () => {
     const values = await form.getFieldsValue();
     const time = moment(values.duty_date).format('YYYYMMDD');
     let type = '';
-    console.log(values.release_env);
     if (isEmpty(values.release_env)) type = '';
     else if (
       values.release_env?.length == 1 &&

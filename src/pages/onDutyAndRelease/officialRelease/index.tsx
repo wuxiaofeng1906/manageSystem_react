@@ -13,7 +13,7 @@ import { loadDutyNamesSelect } from '@/pages/onDutyAndRelease/preRelease/comCont
 import { getHeight } from '@/publicMethods/pageSet';
 import { releaseColumns } from './grid/columns';
 import moment from 'moment';
-import { isEmpty } from 'lodash';
+import { isEmpty, cloneDeep } from 'lodash';
 import {
   getOfficialReleaseDetails,
   cancleReleaseResult,
@@ -99,19 +99,21 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
   // 保存发布方式及时间
   const saveReleaseInfo = async () => {
-    console.log(otherSaveCondition);
-
     //   获取发布方式及时间
+    const condition = cloneDeep(otherSaveCondition);
+    let grayReleaseNums: string[] = [];
     const releaseInfo = formForOfficialRelease.getFieldsValue();
-    const releaseName = await releaseNameForm.getFieldsValue();
-    otherSaveCondition.grayReleaseNums.length = 0;
+    const releaseName = releaseNameForm.getFieldsValue();
     // 获取灰度所有的发布编号
     releaseServiceGridApi.current?.forEachNode((node: any) => {
       const readyReleaseNum = node.data?.ready_release_num;
-      otherSaveCondition.grayReleaseNums.push(readyReleaseNum);
+      grayReleaseNums.push(readyReleaseNum);
     });
 
-    const result = await editReleaseForm({ ...releaseInfo, ...releaseName }, otherSaveCondition);
+    const result = await editReleaseForm(
+      { ...releaseInfo, ...releaseName },
+      { ...condition, grayReleaseNums },
+    );
     if (result.code === 200) {
       sucMessage('数据保存成功！');
       // 需要回显编辑人和编辑时间

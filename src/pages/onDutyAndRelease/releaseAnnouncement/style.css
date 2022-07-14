@@ -1,0 +1,29 @@
+.marginStyle {
+  margin-left: 70px;
+  margin-top: -25px;
+}
+
+.preview {
+  text-indent: 2em;
+  margin-top: -10px;
+}
+
+.fieldStyleA {
+  /*margin: 0 2px;*/
+  /*padding: .35em .625em .75em;*/
+  border: 1px solid gray;
+}
+
+.legendStyleA {
+  /*width: auto;*/
+  /*padding: .5em .5em .5em .5em; !* 上右下左 *!*/
+  /*!*font-weight: bold;*!*/
+  /*font-size: small;*/
+  /*border: 0;*/
+}
+
+.saveButtonStyle {
+  color: #46A0FC;
+  background-color: #ECF5FF;
+  border-radius: 5px;
+}

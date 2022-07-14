@@ -4,10 +4,8 @@ import {useModel} from '@@/plugin-model/useModel';
 import {saveProcessResult, executeAutoCheck} from './axiosRequest';
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {getAutoResult} from "./processAnalysis";
-import {history} from "@@/core/history";
 
 const {Option} = Select;
-
 const CheckProgress: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const {tabsData, processStatus, modifyProcessStatus, operteStatus} = useModel('releaseProcess');
@@ -103,6 +101,7 @@ const CheckProgress: React.FC<any> = () => {
   };
 
   // 跳转到发布公告界面
+
 
   const href = `http://localhost:8000/onDutyAndRelease/releaseAnnouncement?releaseNum=${tabsData.activeKey}&releaseName=test`;
 

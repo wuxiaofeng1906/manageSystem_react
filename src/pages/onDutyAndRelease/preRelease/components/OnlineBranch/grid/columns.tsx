@@ -1,6 +1,7 @@
 import { getTechSide } from '../../../comControl/converse';
 import dayjs from 'dayjs';
 import { message } from 'antd';
+import { isEmpty } from 'lodash';
 
 // 渲染单元测试运行是否通过字段
 const rendererUnitTest = (params: any) => {
@@ -91,12 +92,12 @@ const rendererUnitTest = (params: any) => {
   return `
         <div>
         <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
-                  style="margin-top: 5px;margin-left:100px;cursor: pointer"
+                  style="margin-top: -12px;margin-left:100px;cursor: pointer"
                   onclick='refreshStatus(${JSON.stringify({
                     ready_release_num: params.data.ready_release_num,
                     refresh_param: 'test_unit',
                   })})'/>
-            <div style="font-size: 10px;margin-top: -20px">
+            <div style="font-size: 10px;margin-top: -25px">
               ${['1', '3'].includes(params.data?.technical_side) ? front : ''}
               ${['2', '3'].includes(params.data?.technical_side) ? backend : ''}
             </div>
@@ -107,33 +108,39 @@ const rendererUnitTest = (params: any) => {
 // 图标一致性检查
 const iconCheckRender = (params: any) => {
   const values = params.value;
-  if (!values || JSON.stringify(values) === '{}') {
-    if (params.data?.technical_side === '2') {
-      return `     <div style="color:blue;font-size: 10px">忽略</div>`;
-    }
-    return '';
-  }
-
-  let result = values.check_status;
+  const technical = params.data?.technical_side === '2';
+  // if (!values || JSON.stringify(values) === '{}') {
+  //   if (params.data?.technical_side === '2') {
+  //     return `<div style="color:blue;font-size: 10px">忽略</div>`;
+  //   }
+  //   return '';
+  // }
+  let result = values?.check_status;
   let Color = 'black';
-
-  if (values.check_status === 'done') {
-    // done  doing（执行中） wait（未开始）
-    // check_result:  暂无分支、是、否
-    if (values.check_result === '是') {
-      Color = '#2BF541';
-      result = '通过';
-    } else if (values.check_result === '否') {
-      Color = '#8B4513';
-      result = '不通过';
-    } else {
-      result = values.check_result;
+  if (isEmpty(values)) {
+    if (technical) {
+      result = '忽略';
+      Color = 'blue';
+    } else result = '';
+  } else {
+    if (values?.check_status === 'done') {
+      // done  doing（执行中） wait（未开始）
+      // check_result:  暂无分支、是、否
+      if (values?.check_result === '是') {
+        Color = '#2BF541';
+        result = '通过';
+      } else if (values.check_result === '否') {
+        Color = '#8B4513';
+        result = '不通过';
+      } else {
+        result = values.check_result;
+      }
+    } else if (values.check_status === 'doing') {
+      result = '执行中';
+      Color = '#46A0FC';
+    } else if (values.check_status === 'wait') {
+      result = '未开始';
     }
-  } else if (values.check_status === 'doing') {
-    result = '执行中';
-    Color = '#46A0FC';
-  } else if (values.check_status === 'wait') {
-    result = '未开始';
   }
 
   const logs = JSON.stringify(values.check_log).replaceAll("'", '***'); // 如果包含单引号，解析会报错。需要用特殊符号替换掉，传过去之后再解析出来。
@@ -146,10 +153,14 @@ const iconCheckRender = (params: any) => {
               ready_release_num: params.data.ready_release_num,
               refresh_param: 'icon',
             })})'/>
-            <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
-              onclick='showIconCheckLog(${logs})'>
-                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
-             </Button>
+            ${
+              technical
+                ? ''
+                : `<Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
+                                     onclick='showIconCheckLog(${logs})'>
+    <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+  </Button>`
+            }
           </div>
           <div style="width: 210px;margin-top: -25px;">
                 <div style="color:${Color};font-size: 10px">${result}</div>

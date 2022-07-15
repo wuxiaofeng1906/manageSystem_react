@@ -57,7 +57,7 @@ const rendererUnitTest = (params: any) => {
       backendTime = timeRange;
     }
   });
-  const renderColor = { 是: '#2BF541', 否: '#8B4513', 忽略: 'blue' };
+  const renderColor = { 是: '#2BF541', 否: '#8B4513', 忽略: 'blue', 构建时跳过用例: 'blue' };
   // 前端的颜色
   const frontColor = renderColor[frontValue] ?? 'black';
   // 后端的颜色

@@ -26,7 +26,7 @@ const rendererUnitTest = (params: any) => {
     } else if (ele.test_case_status === 'error') {
       passFlag = '否';
     } else if (ele.test_case_status === 'skip') {
-      passFlag = '忽略';
+      passFlag = '构建时跳过用例'; // 运维人工忽略
     } else if (ele.test_case_status === 'running') {
       passFlag = '执行中';
     } else {
@@ -57,26 +57,12 @@ const rendererUnitTest = (params: any) => {
       backendTime = timeRange;
     }
   });
-
+  const renderColor = { 是: '#2BF541', 否: '#8B4513', 忽略: 'blue' };
   // 前端的颜色
-  let frontColor = 'black';
-  if (frontValue === '是') {
-    frontColor = '#2BF541';
-  } else if (frontValue === '否') {
-    frontColor = '#8B4513';
-  } else if (frontValue === '忽略') {
-    frontColor = 'blue';
-  }
-
+  const frontColor = renderColor[frontValue] ?? 'black';
   // 后端的颜色
-  let bacnkendColor = 'black';
-  if (backendValue === '是') {
-    bacnkendColor = '#2BF541';
-  } else if (backendValue === '否') {
-    bacnkendColor = '#8B4513';
-  } else if (backendValue === '忽略') {
-    bacnkendColor = 'blue';
-  }
+  const bacnkendColor = renderColor[backendValue] ?? 'black';
+
   const front = `
     <div>
       前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}
@@ -109,12 +95,7 @@ const rendererUnitTest = (params: any) => {
 const iconCheckRender = (params: any) => {
   const values = params.value;
   const technical = params.data?.technical_side === '2';
-  // if (!values || JSON.stringify(values) === '{}') {
-  //   if (params.data?.technical_side === '2') {
-  //     return `<div style="color:blue;font-size: 10px">忽略</div>`;
-  //   }
-  //   return '';
-  // }
+
   let result = values?.check_status;
   let Color = 'black';
   if (isEmpty(values)) {
@@ -150,17 +131,17 @@ const iconCheckRender = (params: any) => {
             !technical
               ? ''
               : `<div>
-          <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
-            style="margin-right: 10px;cursor: pointer"
-            onclick='refreshStatus(${JSON.stringify({
-              ready_release_num: params.data.ready_release_num,
-              refresh_param: 'icon',
-            })})'/>
-          <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
-                  onclick='showIconCheckLog(${logs})'>
-            <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
-          </Button>
-          </div>`
+                  <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
+                    style="margin-right: 10px;cursor: pointer"
+                    onclick='refreshStatus(${JSON.stringify({
+                      ready_release_num: params.data.ready_release_num,
+                      refresh_param: 'icon',
+                    })})'/>
+                  <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
+                          onclick='showIconCheckLog(${logs})'>
+                    <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+                  </Button>
+              </div>`
           }
           </div>
           <div style="width: 210px;margin-top: ${technical ? '-20px' : '23px'};">
@@ -236,7 +217,7 @@ const beforeOnlineVersionCheck = (params: any) => {
 
   let timeRange = '';
   if (start) {
-    timeRange = `${start}~${end}`;
+    timeRange = end ? `${start}~${end}` : start;
   }
 
   const checkNum = JSON.stringify(params.data?.check_num);
@@ -334,7 +315,7 @@ const beforeOnlineEnvCheck = (params: any) => {
 
   let timeRange = '';
   if (start) {
-    timeRange = `${start}~${end}`;
+    timeRange = end ? `${start}~${end}` : start;
   }
 
   const checkNum = JSON.stringify(params.data?.check_num);
@@ -405,7 +386,7 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
         }
       }
       if (start) {
-        timeRange = `${start}~${end}`;
+        timeRange = end ? `${start}~${end}` : start;
       }
       checkType = ele.check_type;
       logUrl = ele.check_log_url;
@@ -457,18 +438,23 @@ const autoCheckRenderer = (params: any) => {
 
   if (autoValue && autoValue.length > 0) {
     autoValue.forEach((ele: any) => {
+      const result =
+        ele.check_result === 'yes'
+          ? { color: '#2BF541', value: '通过' }
+          : { color: '#8B4513', value: '不通过' };
+
       if (ele.ignore_check === 'yes') {
         ignoreCheck = '忽略';
       } else if (ele.ignore_check === 'no' && ele.check_time === 'before') {
         if (ele.check_type === 'ui') {
-          ui_result = ele.check_result === 'yes' ? '通过' : '不通过';
-          ui_color = ele.check_result === 'yes' ? '#2BF541' : '#8B4513';
+          ui_result = result.value;
+          ui_color = result.color;
         } else if (ele.check_type === 'api') {
-          api_result = ele.check_result === 'yes' ? '通过' : '不通过';
-          api_color = ele.check_result === 'yes' ? '#2BF541' : '#8B4513';
+          api_result = result.value;
+          api_color = result.color;
         } else if (ele.check_type === 'applet') {
-          applet_result = ele.check_result === 'yes' ? '通过' : '不通过';
-          applet_color = ele.check_result === 'yes' ? '#2BF541' : '#8B4513';
+          applet_result = result.value;
+          applet_color = result.color;
         }
       }
     });

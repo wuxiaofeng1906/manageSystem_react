@@ -134,7 +134,7 @@ const findParent = (departments: any[], dept: any, result: any) => {
 };
 
 export const formatTreeData = (origin: any[], showDenominator = false, percent: number = 100) => {
-  if (!origin) return [];
+  if (!origin) return null;
   const result: any = [];
   origin.forEach((elements: any) => {
     const startTime = elements.range.start;

@@ -149,5 +149,35 @@ const StatisticServices = {
   `);
     return { data: formatTreeData(data.data), loading };
   },
+
+  async shuttleDelay(client: GqlClient<object>, params: string, identity: string) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:devTestDelayStoryDept(kind: "${condition.typeFlag}", ends: ${condition.ends},identity:${identity}) {
+        total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            parent{
+              dept
+              deptName
+            }
+            kpi
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData(data.data), loading };
+  },
 };
 export default StatisticServices;

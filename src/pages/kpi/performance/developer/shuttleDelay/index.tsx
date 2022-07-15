@@ -84,7 +84,7 @@ const ShuttleDelay: React.FC<any> = () => {
   return (
     <IStaticPerformance
       ruleData={ruleData}
-      request={StatisticServices.humanEffect}
+      request={StatisticServices.shuttleDelay}
       identity={'DEVELOPER'}
     />
   );

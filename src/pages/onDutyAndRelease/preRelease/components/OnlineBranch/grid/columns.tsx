@@ -126,9 +126,9 @@ const iconCheckRender = (params: any) => {
   const logs = !isEmpty(values) && JSON.stringify(values?.check_log).replaceAll("'", '***'); // 如果包含单引号，解析会报错。需要用特殊符号替换掉，传过去之后再解析出来。
   return `
        <div>
-          <div style="margin-top: -15px;margin-left: 60px">
+          <div style="margin-top: ${!result ? '-10px' : '-5px'};margin-left: 60px">
           ${
-            !technical
+            !result
               ? ''
               : `<div>
                   <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
@@ -144,7 +144,7 @@ const iconCheckRender = (params: any) => {
               </div>`
           }
           </div>
-          <div style="width: 210px;margin-top: ${technical ? '-20px' : '23px'};">
+          <div style="width: 210px;margin-top: ${result ? '-15px' : '0px'};">
                 <div style="color:${Color};font-size: 10px">${result}</div>
           </div>
        </div>`;

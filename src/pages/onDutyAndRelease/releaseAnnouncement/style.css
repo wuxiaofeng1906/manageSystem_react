@@ -9,17 +9,17 @@
 }
 
 .fieldStyleA {
-  /*margin: 0 2px;*/
-  /*padding: .35em .625em .75em;*/
+  margin: 0 2px;
+  padding: .35em .625em .75em;
   border: 1px solid gray;
 }
 
 .legendStyleA {
-  /*width: auto;*/
-  /*padding: .5em .5em .5em .5em; !* 上右下左 *!*/
-  /*!*font-weight: bold;*!*/
-  /*font-size: small;*/
-  /*border: 0;*/
+  width: auto;
+  padding: .5em .5em .5em .5em; /* 上右下左 */
+  font-weight: bold;
+  font-size: small;
+  border: 0;
 }
 
 .saveButtonStyle {

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {errorMessage, sucMessage} from '@/publicMethods/showMessages';
 import {Button, DatePicker, Form, Input, Radio, Tabs} from 'antd';
@@ -6,51 +6,16 @@ import './style.css';
 import {useRequest} from 'ahooks';
 import {postAnnouncement, getAnnouncement} from "./axiosRequest/apiPage";
 import moment from "moment";
+import {getHeight} from "@/publicMethods/pageSet";
 
 const {TextArea} = Input;
 const {TabPane} = Tabs;
 let releaseTime = "before"; // 升级前公告还是升级后公告
 const Announce: React.FC<any> = (props: any) => {
   const releaseNum = props.location?.query?.releaseNum;
-  const [announceContent] = Form.useForm();
-  const [formDatas, setFormDatas] = useState({});
-
-  const announceData = useRequest(() => getAnnouncement(releaseNum, "before")).data; // 关联值班名单
-
-  // 展示界面数据
-  const showFormData = (resData: any) => {
-    //   有数据的时候需要显示在界面上
-    if (resData.code === 4001) { // 没有发布公告，需要显示默认信息。
-      setFormDatas({
-        announcementId: 0,
-        announceTime: moment().add(1, 'day').startOf('day').format("YYYY-MM-DD HH:mm:ss"),
-        announceDetails_1: "亲爱的用户：您好，企企经营管理平台将于",
-        announceDetails_2: "",
-        showUpdateDetails: "true"
-      });
-
-    } else if (resData.data) { // 有数据，则展示出来
-      const {data} = resData;
-      const time = data.upgrade_time;
-      const details = (data.upgrade_description).split(time);
-      setFormDatas({
-        announcementId: data.announcement_id,
-        announceTime: time,
-        announceDetails_1: details[0],
-        announceDetails_2: details[1],
-        showUpdateDetails: data.is_upgrade === "yes" ? "true" : "false"
-      });
-    }
-  };
-
-  // Tab 修改
-  const onTabChanged = async (activeKey: string) => {
-
-    releaseTime = activeKey;
-    const announceContent = await getAnnouncement(releaseNum, activeKey);
-    debugger;
-    showFormData(announceContent);
-  }
+  const [announceContentForm] = Form.useForm();
+  const [pageHeight, setPageHeight] = useState(getHeight());
+  const [formDatas, setFormDatas]: any = useState({});
 
   // 当表单种数据被改变时候
   const whenFormValueChanged = (changedFields: any, allFields: any) => {
@@ -101,11 +66,58 @@ const Announce: React.FC<any> = (props: any) => {
     }
   };
 
+  // 展示界面数据
+  const showFormData = (resData: any) => {
+
+    //   有数据的时候需要显示在界面上
+    if (resData.code === 4001) { // 没有发布公告，需要显示默认信息。
+      setFormDatas({
+        announcementId: 0,
+        announceTime: moment(moment().add(1, 'day').startOf('day').format("YYYY-MM-DD HH:mm:ss")).format("YYYY-MM-DD HH:mm:ss").toString(),
+        announceDetails_1: "亲爱的用户：您好，企企经营管理平台将于",
+        announceDetails_2: "",
+        showUpdateDetails: "true"
+      });
+
+    } else if (resData.data) { // 有数据，则展示出来
+      const {data} = resData;
+      const time = data.upgrade_time;
+      const details = (data.upgrade_description).split(time);
+
+      announceContentForm.setFieldsValue({
+        announceTime: moment(time),
+        announceDetails_1: details[0],
+        showAnnounceTime: moment(time).format("YYYY-MM-DD HH:mm:ss"),
+        announceDetails_2: details[1],
+        showUpdateDetails: data.is_upgrade === "yes" ? "true" : "false",
+      });
+      setFormDatas({
+        announcementId: data.announcement_id,
+        announceTime: time,
+        announceDetails_1: details[0],
+        announceDetails_2: details[1],
+        showUpdateDetails: data.is_upgrade === "yes" ? "true" : "false"
+      });
+    }
+  };
+
+  // Tab 修改
+  const onTabChanged = async (activeKey: string) => {
+    releaseTime = activeKey;
+    const announceContent = await getAnnouncement(releaseNum, activeKey);
+    showFormData(announceContent);
+  }
+
+  const announceData = useRequest(() => getAnnouncement(releaseNum, "before")).data; // 关联值班名单
   useEffect(() => {
     if (announceData) {
       showFormData(announceData);
     }
-  }, [announceData])
+  }, [announceData]);
+
+  window.onresize = function () {
+    setPageHeight(getHeight());
+  };
   return (
     <PageContainer>
       <div style={{marginTop: -15}}>
@@ -118,22 +130,22 @@ const Announce: React.FC<any> = (props: any) => {
         </Tabs>
 
         {/* Tab内容 */}
-        <div style={{backgroundColor: "white", height: "700px", marginTop: -15}}>
-          <Form form={announceContent} autoComplete="off" onFieldsChange={whenFormValueChanged}>
+        <div style={{backgroundColor: "white", height: pageHeight, minHeight: "500px", marginTop: -15}}>
+          <Form form={announceContentForm} autoComplete="off" onFieldsChange={whenFormValueChanged}>
             <Form.Item label="升级时间:" name="announceTime" style={{paddingTop: 5}}>
-              <DatePicker value={moment(formDatas.announceTime)} showTime/>
+              <DatePicker showTime/>
             </Form.Item>
             <Form.Item label="公告详情:" name="announceDetails_1" style={{marginTop: -20}}>
-              <Input value={formDatas.announceDetails_1}/>
+              <Input/>
             </Form.Item>
             <Form.Item name="showAnnounceTime" className={"marginStyle"}>
-              <label style={{color: "gray"}}>{formDatas.announceTime}</label>
+              <Input style={{color: "gray"}} disabled bordered={false}></Input>
             </Form.Item>
             <Form.Item name="announceDetails_2" className={"marginStyle"}>
-              <TextArea value={formDatas.announceDetails_2} rows={2}/>
+              <TextArea rows={2}/>
             </Form.Item>
             <Form.Item label="展示查看更新详情:" name="showUpdateDetails" style={{marginTop: -20}}>
-              <Radio.Group value={formDatas.showUpdateDetails}>
+              <Radio.Group>
                 <Radio value={"true"}>是</Radio>
                 <Radio value={"false"}>否</Radio>
               </Radio.Group>

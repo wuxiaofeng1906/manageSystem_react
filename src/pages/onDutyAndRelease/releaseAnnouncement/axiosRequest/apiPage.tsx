@@ -31,7 +31,7 @@ export const postAnnouncement = async (formData: any, basicInfo: any) => {
     "announcement_time": basicInfo.releaseTime
   };
 
-  if (formData.announcementId > 0) {
+  if (basicInfo.announceId > 0) {
     data.announcement_id = formData.announcementId;
   }
   return axiosPost("/api/verify/release/announcement", data);

@@ -11,11 +11,11 @@ import {getHeight} from "@/publicMethods/pageSet";
 const {TextArea} = Input;
 const {TabPane} = Tabs;
 let releaseTime = "before"; // 升级前公告还是升级后公告
+let announceId = 0; // 记录升级ID
 const Announce: React.FC<any> = (props: any) => {
   const releaseNum = props.location?.query?.releaseNum;
   const [announceContentForm] = Form.useForm();
   const [pageHeight, setPageHeight] = useState(getHeight());
-  const [formDatas, setFormDatas]: any = useState({});
 
   // 当表单种数据被改变时候
   const whenFormValueChanged = (changedFields: any, allFields: any) => {
@@ -28,39 +28,42 @@ const Announce: React.FC<any> = (props: any) => {
           announceContentForm.setFieldsValue({
             showAnnounceTime: fieldValue,
           });
-
-          setFormDatas({
-            ...formDatas,
-            announceTime: fieldValue
-          });
           break;
         case "announceDetails_1":
-          setFormDatas({
-            ...formDatas,
-            announceDetails_1: fieldValue
+          announceContentForm.setFieldsValue({
+            announceDetails_1: fieldValue,
           });
+
           break;
         case "announceDetails_2":
-          setFormDatas({
-            ...formDatas,
-            announceDetails_2: fieldValue
+          announceContentForm.setFieldsValue({
+            announceDetails_2: fieldValue,
           });
+
           break;
         case "showUpdateDetails":
-          setFormDatas({
-            ...formDatas,
-            showUpdateDetails: fieldValue
+          announceContentForm.setFieldsValue({
+            showUpdateDetails: fieldValue,
           });
           break;
         default:
           break;
       }
+
+      const formData = announceContentForm.getFieldsValue();
+      // 无论前面更新了哪个字段，后面的预览都要更新
+      announceContentForm.setFieldsValue({
+        UpgradeIntroDate: `"${formData.showAnnounceTime}"`,
+        UpgradeDescription: `"${formData.announceDetails_1}${formData.showAnnounceTime}${formData.announceDetails_2}"`,
+        isUpdated: `"${formData.showUpdateDetails}"`
+      });
     }
   };
 
   // 点击保存或者发布按钮
   const saveAndReleaseAnnouncement = async (releaseType: string) => {
-    const basicInfo = {releaseNum, releaseType, releaseTime}
+    const basicInfo = {releaseNum, releaseType, releaseTime, announceId};
+    const formDatas = announceContentForm.getFieldsValue();
     const result = await postAnnouncement(formDatas, basicInfo);
     const operate = releaseType === "save" ? "保存" : "公告挂起";
     if (result.code === 200) {
@@ -75,12 +78,19 @@ const Announce: React.FC<any> = (props: any) => {
 
     //   有数据的时候需要显示在界面上
     if (resData.code === 4001) { // 没有发布公告，需要显示默认信息。
-      setFormDatas({
-        announcementId: 0,
-        announceTime: moment(moment().add(1, 'day').startOf('day').format("YYYY-MM-DD HH:mm:ss")).format("YYYY-MM-DD HH:mm:ss").toString(),
+      const initTime = moment(moment().add(1, 'day').startOf('day').format("YYYY-MM-DD HH:mm:ss")).format("YYYY-MM-DD HH:mm:ss").toString();
+
+      announceContentForm.setFieldsValue({
+        announceTime: initTime,
         announceDetails_1: "亲爱的用户：您好，企企经营管理平台将于",
+        showAnnounceTime: initTime,
         announceDetails_2: "",
-        showUpdateDetails: "true"
+        showUpdateDetails: "true",
+
+        //   以下为预览数据
+        UpgradeIntroDate: `"${initTime}"`,
+        UpgradeDescription: "",
+        isUpdated: "true"
       });
 
     } else if (resData.data) { // 有数据，则展示出来
@@ -88,19 +98,18 @@ const Announce: React.FC<any> = (props: any) => {
       const time = data.upgrade_time;
       const details = (data.upgrade_description).split(time);
 
+      announceId = data.announcement_id;
       announceContentForm.setFieldsValue({
         announceTime: moment(time),
         announceDetails_1: details[0],
         showAnnounceTime: moment(time).format("YYYY-MM-DD HH:mm:ss"),
         announceDetails_2: details[1],
         showUpdateDetails: data.is_upgrade === "yes" ? "true" : "false",
-      });
-      setFormDatas({
-        announcementId: data.announcement_id,
-        announceTime: time,
-        announceDetails_1: details[0],
-        announceDetails_2: details[1],
-        showUpdateDetails: data.is_upgrade === "yes" ? "true" : "false"
+
+        //   以下为预览数据
+        UpgradeIntroDate: `"${moment(time).format("YYYY-MM-DD HH:mm:ss")}"`,
+        UpgradeDescription: `"${data.upgrade_description}"`,
+        isUpdated: data.is_upgrade === "yes" ? "true" : "false"
       });
     }
   };
@@ -154,22 +163,39 @@ const Announce: React.FC<any> = (props: any) => {
                 <Radio value={"false"}>否</Radio>
               </Radio.Group>
             </Form.Item>
-          </Form>
 
-          {/*预览界面 */}
-          <div style={{marginTop: -20}}>
             <fieldset className={"fieldStyleA"}>
               <legend className={"legendStyleA"}>预览</legend>
               <div>
-                <p>{"{"}</p>
-                <p className={"preview"}>"UpgradeIntroDate":"{formDatas.announceTime}"</p>
-                <p
-                  className={"preview"}>"UpgradeDescription":"{`${formDatas.announceDetails_1}${formDatas.announceTime}${formDatas.announceDetails_2}`}"</p>
-                <p className={"preview"}> "isUpdated"：{formDatas.showUpdateDetails}</p>
-                <p>{"}"}</p>
+                <Form.Item>{"{"}</Form.Item>
+                <Form.Item label={'"UpgradeIntroDate"'} name="UpgradeIntroDate" className={"marginStyle"}>
+                  <Input disabled bordered={false} style={{color: "black"}}></Input>
+                </Form.Item>
+                <Form.Item label={'"UpgradeDescription"'} name="UpgradeDescription" className={"marginStyle"}>
+                  <Input disabled bordered={false} style={{color: "black"}}></Input>
+                </Form.Item>
+                <Form.Item label={'"isUpdated"'} name="isUpdated" className={"marginStyle"}>
+                  <Input disabled bordered={false} style={{color: "black"}}></Input>
+                </Form.Item>
+                <Form.Item style={{marginTop: -25}}>{"}"}</Form.Item>
               </div>
             </fieldset>
-          </div>
+
+          </Form>
+          {/*预览界面 */}
+          {/*<div style={{marginTop: 20}}>*/}
+          {/*  <fieldset className={"fieldStyleA"}>*/}
+          {/*    <legend className={"legendStyleA"}>预览</legend>*/}
+          {/*    <div>*/}
+          {/*      <p>{"{"}</p>*/}
+          {/*      <p className={"preview"}>"UpgradeIntroDate":"{formDatas.announceTime}"</p>*/}
+          {/*      <p*/}
+          {/*        className={"preview"}>"UpgradeDescription":"{`${formDatas.announceDetails_1}${formDatas.announceTime}${formDatas.announceDetails_2}`}"</p>*/}
+          {/*      <p className={"preview"}> "isUpdated"：{formDatas.showUpdateDetails}</p>*/}
+          {/*      <p>{"}"}</p>*/}
+          {/*    </div>*/}
+          {/*  </fieldset>*/}
+          {/*</div>*/}
 
           {/* 保存按钮 */}
           <div style={{float: "right", marginTop: 20}}>

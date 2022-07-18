@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {errorMessage, sucMessage} from '@/publicMethods/showMessages';
-import {Button, DatePicker, Form, Input, Radio, Tabs} from 'antd';
+import {Button, DatePicker, Form, Input, Radio, Tabs, Divider} from 'antd';
 import './style.css';
 import {useRequest} from 'ahooks';
 import {postAnnouncement, getAnnouncement} from "./axiosRequest/apiPage";
@@ -162,23 +162,26 @@ const Announce: React.FC<any> = (props: any) => {
             </Form.Item>
             {/* 预览界面 */}
             <Form.Item style={{marginTop: -20}}>
-              <fieldset className={"fieldStyleA"}>
-                <legend className={"legendStyleA"}>预览</legend>
-                <div>
-                  <Form.Item>{"{"}</Form.Item>
-                  <Form.Item label={'"UpgradeIntroDate"'} name="UpgradeIntroDate" className={"marginStyle"}>
-                    <Input disabled bordered={false} style={{color: "black"}}></Input>
-                  </Form.Item>
-                  <Form.Item label={'"UpgradeDescription"'} name="UpgradeDescription" className={"marginStyle"}>
-                    <Input disabled bordered={false} style={{color: "black"}}></Input>
-                  </Form.Item>
-                  <Form.Item label={'"isUpdated"'} name="isUpdated" className={"marginStyle"}>
-                    <Input disabled bordered={false} style={{color: "black"}}></Input>
-                  </Form.Item>
-                  <Form.Item style={{marginTop: -25}}>{"}"}</Form.Item>
-                </div>
-              </fieldset>
+              <Divider orientation="left" style={{fontSize:"small"}}>预览</Divider>
+              <div style={{marginTop: -20}}>
+                <Form.Item>{"{"}</Form.Item>
+                <Form.Item label={'"UpgradeIntroDate"'} name="UpgradeIntroDate" className={"marginStyle"}>
+                  <Input disabled bordered={false} style={{color: "black"}}></Input>
+                </Form.Item>
+                <Form.Item label={'"UpgradeDescription"'} name="UpgradeDescription" className={"marginStyle"}>
+                  <Input disabled bordered={false} style={{color: "black"}}></Input>
+                </Form.Item>
+                <Form.Item label={'"isUpdated"'} name="isUpdated" className={"marginStyle"}>
+                  <Input disabled bordered={false} style={{color: "black"}}></Input>
+                </Form.Item>
+                <Form.Item style={{marginTop: -25}}>{"}"}</Form.Item>
+              </div>
+              <Divider orientation="left" style={{marginTop: -20}}></Divider>
             </Form.Item>
+            {/*<fieldset className={"fieldStyleA"}>*/}
+            {/*  <legend className={"legendStyleA"}>预览</legend>*/}
+            {/*</fieldset>*/}
+
           </Form>
 
           {/* 保存按钮 */}

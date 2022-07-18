@@ -270,6 +270,8 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     setGridHeight(getHeight() - 180);
   };
 
+  const href = `http://localhost:8000/onDutyAndRelease/releaseAnnouncement?releaseNum=${onlineReleaseNum}&releaseName=test`;
+
   return (
     <PageContainer>
       <div style={{marginTop: -15}}>
@@ -312,6 +314,12 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           </label>
 
           <label style={{marginLeft: 10}}>{autoCheckRt}</label>
+
+          <a href={href} target={"_blank"} style={{float: "right"}}>
+            <img src="../annouce.png" width="20" height="20" alt="发布公告" title="发布公告"/> &nbsp;
+            发布公告
+          </a>
+
         </div>
         {/* step 1 发布方式及时间 */}
         <div style={{backgroundColor: 'white', marginTop: 4}}>

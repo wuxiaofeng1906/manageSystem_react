@@ -75,24 +75,21 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 展示界面数据
   const showFormData = (resData: any) => {
-
     //   有数据的时候需要显示在界面上
     if (resData.code === 4001) { // 没有发布公告，需要显示默认信息。
-      const initTime = moment(moment().add(1, 'day').startOf('day').format("YYYY-MM-DD HH:mm:ss")).format("YYYY-MM-DD HH:mm:ss").toString();
-
+      const initTime = moment().add(1, 'day').startOf('day');
       announceContentForm.setFieldsValue({
         announceTime: initTime,
         announceDetails_1: "亲爱的用户：您好，企企经营管理平台将于",
-        showAnnounceTime: initTime,
+        showAnnounceTime: initTime.format("YYYY-MM-DD HH:mm:ss"),
         announceDetails_2: "",
         showUpdateDetails: "true",
 
         //   以下为预览数据
-        UpgradeIntroDate: `"${initTime}"`,
+        UpgradeIntroDate: `"${initTime.format("YYYY-MM-DD HH:mm:ss")}"`,
         UpgradeDescription: "",
         isUpdated: "true"
       });
-
     } else if (resData.data) { // 有数据，则展示出来
       const {data} = resData;
       const time = data.upgrade_time;
@@ -151,10 +148,10 @@ const Announce: React.FC<any> = (props: any) => {
             <Form.Item label="公告详情:" name="announceDetails_1" style={{marginTop: -15}}>
               <Input/>
             </Form.Item>
-            <Form.Item name="showAnnounceTime" className={"marginStyle"}>
+            <Form.Item name="showAnnounceTime" className={"itemStyle"}>
               <Input style={{color: "gray"}} disabled bordered={false}></Input>
             </Form.Item>
-            <Form.Item name="announceDetails_2" className={"marginStyle"}>
+            <Form.Item name="announceDetails_2" className={"itemStyle"}>
               <TextArea rows={2}/>
             </Form.Item>
             <Form.Item label="展示查看更新详情:" name="showUpdateDetails" style={{marginTop: -20}}>
@@ -163,47 +160,35 @@ const Announce: React.FC<any> = (props: any) => {
                 <Radio value={"false"}>否</Radio>
               </Radio.Group>
             </Form.Item>
-
-            <fieldset className={"fieldStyleA"}>
-              <legend className={"legendStyleA"}>预览</legend>
-              <div>
-                <Form.Item>{"{"}</Form.Item>
-                <Form.Item label={'"UpgradeIntroDate"'} name="UpgradeIntroDate" className={"marginStyle"}>
-                  <Input disabled bordered={false} style={{color: "black"}}></Input>
-                </Form.Item>
-                <Form.Item label={'"UpgradeDescription"'} name="UpgradeDescription" className={"marginStyle"}>
-                  <Input disabled bordered={false} style={{color: "black"}}></Input>
-                </Form.Item>
-                <Form.Item label={'"isUpdated"'} name="isUpdated" className={"marginStyle"}>
-                  <Input disabled bordered={false} style={{color: "black"}}></Input>
-                </Form.Item>
-                <Form.Item style={{marginTop: -25}}>{"}"}</Form.Item>
-              </div>
-            </fieldset>
-
+            {/* 预览界面 */}
+            <Form.Item style={{marginTop: -20}}>
+              <fieldset className={"fieldStyleA"}>
+                <legend className={"legendStyleA"}>预览</legend>
+                <div>
+                  <Form.Item>{"{"}</Form.Item>
+                  <Form.Item label={'"UpgradeIntroDate"'} name="UpgradeIntroDate" className={"marginStyle"}>
+                    <Input disabled bordered={false} style={{color: "black"}}></Input>
+                  </Form.Item>
+                  <Form.Item label={'"UpgradeDescription"'} name="UpgradeDescription" className={"marginStyle"}>
+                    <Input disabled bordered={false} style={{color: "black"}}></Input>
+                  </Form.Item>
+                  <Form.Item label={'"isUpdated"'} name="isUpdated" className={"marginStyle"}>
+                    <Input disabled bordered={false} style={{color: "black"}}></Input>
+                  </Form.Item>
+                  <Form.Item style={{marginTop: -25}}>{"}"}</Form.Item>
+                </div>
+              </fieldset>
+            </Form.Item>
           </Form>
-          {/*预览界面 */}
-          {/*<div style={{marginTop: 20}}>*/}
-          {/*  <fieldset className={"fieldStyleA"}>*/}
-          {/*    <legend className={"legendStyleA"}>预览</legend>*/}
-          {/*    <div>*/}
-          {/*      <p>{"{"}</p>*/}
-          {/*      <p className={"preview"}>"UpgradeIntroDate":"{formDatas.announceTime}"</p>*/}
-          {/*      <p*/}
-          {/*        className={"preview"}>"UpgradeDescription":"{`${formDatas.announceDetails_1}${formDatas.announceTime}${formDatas.announceDetails_2}`}"</p>*/}
-          {/*      <p className={"preview"}> "isUpdated"：{formDatas.showUpdateDetails}</p>*/}
-          {/*      <p>{"}"}</p>*/}
-          {/*    </div>*/}
-          {/*  </fieldset>*/}
-          {/*</div>*/}
 
           {/* 保存按钮 */}
-          <div style={{float: "right", marginTop: 20}}>
-            <Button type="primary" className={"saveButtonStyle"} onClick={() => saveAndReleaseAnnouncement("save")}>
+          <div style={{float: "right"}}>
+            <Button type="primary" className={"saveButtonStyle"}
+                    onClick={() => saveAndReleaseAnnouncement("save")}>
               保存
             </Button>
-            <Button type="primary" className={"saveButtonStyle"} onClick={() => saveAndReleaseAnnouncement("release")}
-                    style={{marginLeft: 10}}>
+            <Button type="primary" className={"saveButtonStyle"} style={{marginLeft: 10}}
+                    onClick={() => saveAndReleaseAnnouncement("release")}>
               一键挂起公告
             </Button>
           </div>

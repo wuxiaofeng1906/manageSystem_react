@@ -577,7 +577,7 @@ export default [
         icon: 'table',
         path: 'releaseAnnouncement',
         component: './onDutyAndRelease/releaseAnnouncement',
-        // hideInMenu: true
+        hideInMenu: true
 
       }
     ],

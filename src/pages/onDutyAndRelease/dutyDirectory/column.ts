@@ -2,6 +2,13 @@ import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/co
 
 const dutyColumn: (ColDef | ColGroupDef)[] = [
   {
+    filter: false,
+    checkboxSelection: true,
+    headerCheckboxSelection: false,
+    width: 45,
+    pinned: 'left',
+  },
+  {
     headerName: 'NO.',
     minWidth: 70,
     maxWidth: 90,
@@ -59,6 +66,12 @@ const dutyColumn: (ColDef | ColGroupDef)[] = [
     field: 'user_name',
     minWidth: 90,
     maxWidth: 110,
+  },
+  {
+    field: 'editer',
+    headerName: '',
+    maxWidth: 150,
+    cellRenderer: (p) => `<span class="editer">${p.value ?? ''}正在编辑</span>`,
   },
 ];
 export default dutyColumn;

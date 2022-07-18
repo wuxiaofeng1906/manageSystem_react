@@ -25,28 +25,32 @@ const Announce: React.FC<any> = (props: any) => {
       switch (fieldName) {
         case "announceTime":
           fieldValue = moment(fieldValue).format("YYYY-MM-DD HH:mm:ss");
+          announceContentForm.setFieldsValue({
+            showAnnounceTime: fieldValue,
+          });
+
           setFormDatas({
             ...formDatas,
             announceTime: fieldValue
-          })
+          });
           break;
         case "announceDetails_1":
           setFormDatas({
             ...formDatas,
             announceDetails_1: fieldValue
-          })
+          });
           break;
         case "announceDetails_2":
           setFormDatas({
             ...formDatas,
             announceDetails_2: fieldValue
-          })
+          });
           break;
         case "showUpdateDetails":
           setFormDatas({
             ...formDatas,
             showUpdateDetails: fieldValue
-          })
+          });
           break;
         default:
           break;
@@ -135,7 +139,7 @@ const Announce: React.FC<any> = (props: any) => {
             <Form.Item label="升级时间:" name="announceTime" style={{paddingTop: 5}}>
               <DatePicker showTime/>
             </Form.Item>
-            <Form.Item label="公告详情:" name="announceDetails_1" style={{marginTop: -20}}>
+            <Form.Item label="公告详情:" name="announceDetails_1" style={{marginTop: -15}}>
               <Input/>
             </Form.Item>
             <Form.Item name="showAnnounceTime" className={"marginStyle"}>
@@ -153,7 +157,7 @@ const Announce: React.FC<any> = (props: any) => {
           </Form>
 
           {/*预览界面 */}
-          <div>
+          <div style={{marginTop: -20}}>
             <fieldset className={"fieldStyleA"}>
               <legend className={"legendStyleA"}>预览</legend>
               <div>

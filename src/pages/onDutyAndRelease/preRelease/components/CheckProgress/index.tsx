@@ -101,9 +101,7 @@ const CheckProgress: React.FC<any> = () => {
   };
 
   // 跳转到发布公告界面
-
-
-  const href = `http://localhost:8000/onDutyAndRelease/releaseAnnouncement?releaseNum=${tabsData.activeKey}&releaseName=test`;
+  const href = `http://${window.location.host}/onDutyAndRelease/releaseAnnouncement?releaseNum=${tabsData.activeKey}&releaseName=test`;
 
   return (
     <div>

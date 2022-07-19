@@ -402,6 +402,8 @@ const UpgradeService: React.FC<any> = () => {
         renter: params.related_tenant,
         remark: params.remarks,
         apiId: apiid,
+        data: params.data,
+        header: params.header,
       });
       modifyLockedItem(`${tabsData.activeKey}-step2-api-${apiid}`);
       const lockInfo = await getLockStatus(`${tabsData.activeKey}-step2-api-${apiid}`);
@@ -1010,6 +1012,7 @@ const UpgradeService: React.FC<any> = () => {
         centered={true}
         footer={null}
         width={630}
+        destroyOnClose
       >
         <Form form={upgradeIntForm}>
           <Row>

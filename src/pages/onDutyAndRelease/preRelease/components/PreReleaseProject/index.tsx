@@ -20,7 +20,10 @@ const {Option} = Select;
 
 const PreReleaseProject: React.FC<any> = () => {
   // 获取当前页面的进度数据
-  const {tabsData, setTabsData, preReleaseData, modifyProcessStatus, lockedItem, modifyLockedItem, operteStatus} =
+  const {
+    tabsData, setTabsData, preReleaseData, modifyPreReleaseData, modifyProcessStatus, lockedItem, modifyLockedItem,
+    operteStatus
+  } =
     useModel('releaseProcess');
   const [formForPreReleaseProject] = Form.useForm(); // 预发布
 
@@ -102,6 +105,11 @@ const PreReleaseProject: React.FC<any> = () => {
       // 发布类型为正式发布，标签页需要改为xxxxxx正式预发布，如果是灰度发布，则改为xxxxx灰度预发布。
       autoModifyTabsName(datas.pulishType);
 
+      // 这里需要改个状态，用于step4租户集群选择时候的变更
+      modifyPreReleaseData({
+        ...preReleaseData,
+        release_cluster: datas.pulishCluster
+      })
     } else {
       message.error({
         content: result.errorMessage,
@@ -146,6 +154,7 @@ const PreReleaseProject: React.FC<any> = () => {
         pulishType: preReleaseData.release_type,
         pulishMethod: preReleaseData.release_way,
         pulishTime: moment(preReleaseData.plan_release_time),
+        pulishCluster: preReleaseData.release_cluster,
         editor: preReleaseData.edit_user_name,
         editTime: preReleaseData.edit_time,
         proid: preReleaseData.pro_id,
@@ -209,7 +218,17 @@ const PreReleaseProject: React.FC<any> = () => {
                   </Col>
                 </Row>
                 <Row style={{marginTop: -15}}>
-                  <Col span={11}>
+                  <Col span={5}>
+                    {/* 发布集群 */}
+                    <Form.Item label="发布集群:" name="pulishCluster" style={{marginLeft: 5}}>
+                      <Select onFocus={releaseItemFocus} disabled={operteStatus}>
+                        <Option key={"tenant"} value={"tenant"}>租户集群发布</Option>
+                        <Option key={"global"} value={"global"}>global集群发布</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+
+                  <Col span={6}>
                     {/* 发布时间 */}
                     <Form.Item label="发布时间" name="pulishTime" style={{marginLeft: 5}}>
                       <DatePicker

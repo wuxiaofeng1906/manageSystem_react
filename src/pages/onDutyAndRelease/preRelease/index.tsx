@@ -91,6 +91,7 @@ const PreRelease: React.FC<any> = () => {
       pro_id: '',
       ignoreZentaoList: "2",
       checkListStatus: "",
+      release_cluster:"tenant"
     });
 
     //  发布项

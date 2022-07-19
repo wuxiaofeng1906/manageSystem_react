@@ -70,7 +70,8 @@ export default () => {
     pro_id: '',
     ignoreZentaoList: '2',
     checkListStatus: '',
-    relateDutyName: ''
+    relateDutyName: '',
+    release_cluster:'tenant'
   });
 
   // 设置Tab的数据

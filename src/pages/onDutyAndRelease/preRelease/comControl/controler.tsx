@@ -174,7 +174,7 @@ const loadReleaseIDSelect = async (releaseNum: string) => {
 ;
 
 // 上线环境
-const loadOnlineEnvSelect = async () => {
+const loadOnlineEnvSelect = async (releseCluser: string = "") => {
     const envs = await getOnlineDev();
     const envData: any = [];
 
@@ -190,8 +190,15 @@ const loadOnlineEnvSelect = async () => {
       const datas = envs.data;
       datas.forEach((ele: any) => {
         if (ele.online_environment_id !== '9') {
+          // 如果“发布集群”选择global集群，那么下边集群就只能选择global集群；如果是选择租户集群发布，则可以选择的集群为0-7
+          let optionDisable = true;
+          if (releseCluser === "global" && ele.online_environment_name === "global") {
+            optionDisable = false
+          } else if (releseCluser === "tenant" && ele.online_environment_name !== "global") {
+            optionDisable = false
+          }
           envData.push(
-            <Option key={ele.online_environment_id} value={`${ele.online_environment_id}`}>
+            <Option key={ele.online_environment_id} value={`${ele.online_environment_id}`} disabled={optionDisable}>
               {ele.online_environment_name}
             </Option>,
           );

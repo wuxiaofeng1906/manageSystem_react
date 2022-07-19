@@ -36,7 +36,7 @@ const usersInfo = JSON.parse(userLogins);
 let currentOperateStatus = false;  // 需要将useState中的operteStatus值赋值过来，如果直接取operteStatus，下拉框那边获取不到最新的operteStatus；
 const UpgradeService: React.FC<any> = () => {
   const {
-    tabsData, modifyProcessStatus, releaseItem, upgradeApi, upgradeConfirm,
+    tabsData, modifyProcessStatus, releaseItem, upgradeApi, upgradeConfirm,preReleaseData,
     lockedItem, modifyLockedItem, setRelesaeItem, setUpgradeApi, releasedIDArray, modifyReleasedID,
     allLockedArray, operteStatus,
   } = useModel('releaseProcess');
@@ -267,7 +267,7 @@ const UpgradeService: React.FC<any> = () => {
     }
 
     setPulishItemFormSelected({
-      onlineEnv: await loadOnlineEnvSelect(),
+      onlineEnv: await loadOnlineEnvSelect(preReleaseData.release_cluster),
       pulishItem: await loadPulishItemSelect(),
       isApiDbUpgrade: await loadIsApiAndDbUpgradeSelect(),
     });
@@ -351,6 +351,7 @@ const UpgradeService: React.FC<any> = () => {
 
   // 发布接口弹出窗口进行修改和新增
   (window as any).showUpgradeApiForm = async (type: any, params: any) => {
+    debugger;
 
     const flag = await vertifyModifyFlag(2, tabsData.activeKey);
     if (!flag) {
@@ -406,7 +407,7 @@ const UpgradeService: React.FC<any> = () => {
     }
 
     setUpgradeApiFormSelected({
-      onlineEnv: await loadOnlineEnvSelect(),
+      onlineEnv: await loadOnlineEnvSelect(preReleaseData.release_cluster),
       upgradeApi: await loadUpgradeApiSelect(),
       apiService: await loadApiServiceSelect(),
       apiMethod: await loadApiMethodSelect(),

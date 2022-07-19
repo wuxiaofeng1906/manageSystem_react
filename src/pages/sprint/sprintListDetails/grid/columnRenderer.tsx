@@ -135,6 +135,7 @@ const linkToZentaoPage = (params: any) => {
 
 // 严重等级值的转换
 const servertyValueGetter = (params: any) => {
+  debugger;
   let severity = "";
   if (params.data?.severity !== null && params.data?.severity !== undefined) {
     switch (params.data?.severity.toString()) {
@@ -155,7 +156,13 @@ const servertyValueGetter = (params: any) => {
     }
   }
 
-  const pri = params.data.priority === null ? "" : Number(params.data.priority)-1;
+  // 如果是bug类型的话，需要调整优先级（-1），是需求或者bug转需求的话就不用调整。
+  let pri = params.data.priority === null ? "" : params.data.priority;
+
+  if (params.data?.category === "1" && pri !== "") {
+    pri = (Number(params.data.priority) - 1).toString();
+  }
+
   if (pri === "" && severity === "") {
     return "";
   }

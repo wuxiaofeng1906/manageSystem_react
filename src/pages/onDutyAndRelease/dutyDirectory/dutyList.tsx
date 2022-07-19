@@ -62,7 +62,6 @@ const DutyList = () => {
     const rowNode = gridRef.current?.getRowNode(current?.rowIndex);
     const editer = await getLockStatus(num);
     if (editer && num) {
-      console.log(current);
       // rowNode
       rowNode?.setData({ ...rowNode.data, editer: editer });
     } else {
@@ -82,7 +81,7 @@ const DutyList = () => {
   const getLockStatus = async (lockId: string) => {
     const data = await LockServices.lockStatus(
       { user_id: currentUser?.userid, user_name: currentUser?.name, param: lockId },
-      'post',
+      'delete',
     );
     return data?.user_name;
   };

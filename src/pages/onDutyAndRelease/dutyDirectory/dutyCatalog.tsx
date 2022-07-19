@@ -11,6 +11,7 @@ import moment from 'moment';
 import { SelectProps } from 'antd/lib/select';
 import * as dayjs from 'dayjs';
 import LockServices from '@/services/lock';
+import { useUnmount } from 'ahooks';
 const opts = {
   showSearch: true,
   mode: 'multiple',
@@ -354,7 +355,7 @@ const DutyCatalog = () => {
     if (!id) return;
     LockServices.lockStatus(
       { user_id: currentUser?.userid, user_name: currentUser?.name, param: id },
-      'post',
+      'get',
     ).then((res) => {
       setEditer(res.user_name);
     });
@@ -362,6 +363,13 @@ const DutyCatalog = () => {
     getDetail();
     getSource();
   }, [id]);
+
+  useUnmount(() => {
+    LockServices.lockStatus(
+      { user_id: currentUser?.userid, user_name: currentUser?.name, param: id },
+      'delete',
+    );
+  });
 
   // 保存后的第一值班人
   useEffect(() => {

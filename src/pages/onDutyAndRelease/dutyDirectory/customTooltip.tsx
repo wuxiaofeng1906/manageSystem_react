@@ -1,18 +1,15 @@
-import { useEffect } from 'react';
-import LockServices from '@/services/lock';
-
 function CustomTooltip() {}
 
-CustomTooltip.prototype.init = function (param: any) {
+CustomTooltip.prototype.init = function (params: any) {
   // eslint-disable-next-line no-multi-assign
   const eGui = (this.eGui = document.createElement('div'));
 
   eGui.classList.add('custom-tooltip');
-  console.log(param.data.editer, param.data);
-  if (param.data.editer) {
-    eGui.innerHTML = `<strong>${param.data.editer}</strong> `;
-  } else {
-    eGui.innerHTML = 'sssss';
+  console.log(params);
+  if (params.editer) {
+    if (params.location === 'cell') {
+      eGui.innerHTML = `<strong>${params.value}</strong> `;
+    }
   }
 };
 

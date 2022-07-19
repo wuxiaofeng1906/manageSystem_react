@@ -17,6 +17,7 @@ const DutyList = () => {
   const [list, setList] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [editer, setEditer] = useState('');
+  const [rowStyle, setRowStyle] = useState(null);
   const [current, setCurrent] = useState<any>(null);
   const [form] = Form.useForm();
   const gridRef = useRef<GridApi>();
@@ -60,14 +61,24 @@ const DutyList = () => {
   const mouse = async () => {
     const num = current?.data.person_duty_num;
     if (!num) return;
+
     const rowNode = gridRef.current?.getRowNode(current?.rowIndex);
     const editer = await getLockStatus(num);
     if (editer && num) {
       rowNode?.setData({ ...rowNode.data, editer: editer });
+      gridRef.current?.forEachNode((node) => {
+        console.log(node.data.person_duty_num == num);
+        if (node.data.person_duty_num == num) {
+          gridRef.current?.setGetRowStyle(() => ({ 'background-color': '#FFF6F6' }));
+        } else {
+          gridRef.current?.setGetRowStyle(() => ({ 'background-color': 'white' }));
+        }
+      });
     } else {
       rowNode?.setData(rowNode.data);
     }
   };
+
   useEffect(() => {
     mouse();
   }, [current?.data.person_duty_num]);
@@ -173,9 +184,6 @@ const DutyList = () => {
               suppressMenu: true,
               cellStyle: { 'line-height': '30px' },
             }}
-            components={{ customTooltip: CustomTooltip }}
-            tooltipShowDelay={0}
-            tooltipMouseTrack={true}
             onCellMouseOver={debounce((e) => setCurrent(e.node), 500)}
             onCellMouseOut={() => {
               setCurrent(null);

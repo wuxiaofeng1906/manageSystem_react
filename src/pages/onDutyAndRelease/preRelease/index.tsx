@@ -127,7 +127,9 @@ const PreRelease: React.FC<any> = () => {
       errorMessage((initData.errmessage).toString());
       return;
     }
-    if (initData.length === 0) {
+
+    // 自动刷新时无数据不更新数据
+    if (initData.length === 0 && initShow) {
       // 后端无数据
       showNoneDataPage();
       return;

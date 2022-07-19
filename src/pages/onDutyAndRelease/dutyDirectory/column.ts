@@ -17,6 +17,8 @@ const dutyColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '值班名单',
     field: 'duty_name',
+    tooltipField: 'duty_name',
+    tooltipComponent: 'customTooltip',
     cellRenderer: (data) =>
       `<a style="color:#1890ff;text-decoration: underline" href='/onDutyAndRelease/dutyCatalog/${data.data.person_duty_num}'>${data.value}</a>`,
     minWidth: 220,
@@ -67,11 +69,11 @@ const dutyColumn: (ColDef | ColGroupDef)[] = [
     minWidth: 90,
     maxWidth: 110,
   },
-  {
-    field: 'editer',
-    headerName: '',
-    maxWidth: 150,
-    cellRenderer: (p) => `<span class="editer">${p.value ?? ''}正在编辑</span>`,
-  },
+  // {
+  //   field: 'editer',
+  //   headerName: '',
+  //   maxWidth: 150,
+  //   cellRenderer: (p) => `<span class="editer">${p.value ?? ''}正在编辑</span>`,
+  // },
 ];
 export default dutyColumn;

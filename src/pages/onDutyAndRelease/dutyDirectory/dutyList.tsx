@@ -9,11 +9,15 @@ import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import styles from './index.less';
 import DutyListServices from '@/services/dutyList';
 import moment from 'moment';
-import { isEmpty } from 'lodash';
+import { isEmpty, debounce } from 'lodash';
+import LockServices from '@/services/lock';
+import { CustomTooltip } from './customTooltip';
 
 const DutyList = () => {
   const [list, setList] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
+  const [editer, setEditer] = useState('');
+  const [current, setCurrent] = useState<any>(null);
   const [form] = Form.useForm();
   const gridRef = useRef<GridApi>();
   const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
@@ -39,14 +43,46 @@ const DutyList = () => {
     );
   };
   const onCopy = async () => {
-    if (!hasPermission) return;
     const selected: any = gridRef.current?.getSelectedRows();
     if (isEmpty(selected)) return message.warning('请先选择需复制的行数据！');
-    console.log(selected);
+    const releaseNum = await getDutyNumber();
+    const data = await DutyListServices.getDutyDetail({
+      person_duty_num: selected[0].person_duty_num,
+    });
+
+    await DutyListServices.addDuty({
+      ...data,
+      person_duty_num: releaseNum,
+      project_pm: data.project_pm?.map((it: any) => it.user_name).join(),
+    });
+    await getList();
   };
-  const onCellMouseOver = (event: any) => {
-    const rowNode = gridRef.current?.getRowNode(event.node.rowIndex);
-    rowNode?.setData({ ...rowNode.data, editer: `测试${event.node.rowIndex}` });
+  const mouse = async () => {
+    const num = current?.data.person_duty_num;
+    if (!num) return;
+    const rowNode = gridRef.current?.getRowNode(current?.rowIndex);
+    const editer = await getLockStatus(num);
+    if (editer && num) {
+      rowNode?.setData({ ...rowNode.data, editer: editer });
+    } else {
+      rowNode?.setData(rowNode.data);
+    }
+  };
+  useEffect(() => {
+    mouse();
+  }, [current?.data.person_duty_num]);
+
+  const getDutyNumber = async () => {
+    if (!hasPermission) return;
+    const res = await DutyListServices.getDutyNum();
+    return res.ready_release_num;
+  };
+  const getLockStatus = async (lockId: string) => {
+    const data = await LockServices.lockStatus(
+      { user_id: currentUser?.userid, user_name: currentUser?.name, param: lockId },
+      'post',
+    );
+    return data?.user_name;
   };
 
   useEffect(() => {
@@ -82,9 +118,8 @@ const DutyList = () => {
                     />
                   }
                   onClick={async () => {
-                    if (!hasPermission) return;
-                    const res = await DutyListServices.getDutyNum();
-                    history.push(`/onDutyAndRelease/dutyCatalog/${res.ready_release_num}`);
+                    const release_num = await getDutyNumber();
+                    history.push(`/onDutyAndRelease/dutyCatalog/${release_num}`);
                   }}
                 >
                   新增
@@ -138,7 +173,14 @@ const DutyList = () => {
               suppressMenu: true,
               cellStyle: { 'line-height': '30px' },
             }}
-            onCellMouseOver={onCellMouseOver}
+            components={{ customTooltip: CustomTooltip }}
+            tooltipShowDelay={0}
+            tooltipMouseTrack={true}
+            onCellMouseOver={debounce((e) => setCurrent(e.node), 500)}
+            onCellMouseOut={() => {
+              setCurrent(null);
+              gridRef.current?.setRowData(list);
+            }}
             rowHeight={30}
             headerHeight={35}
             suppressRowTransform={true}

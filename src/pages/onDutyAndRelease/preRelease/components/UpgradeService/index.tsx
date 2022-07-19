@@ -383,6 +383,9 @@ const UpgradeService: React.FC<any> = () => {
     }
     if (type === 'add') {
       upgradeIntForm.resetFields();
+      upgradeIntForm.setFieldsValue({
+        renter: 'ALL', // 新增:租户ID默认值
+      });
       setUpgradeIntModal({
         shown: true,
         title: '新增',
@@ -1012,7 +1015,6 @@ const UpgradeService: React.FC<any> = () => {
         centered={true}
         footer={null}
         width={630}
-        destroyOnClose
       >
         <Form form={upgradeIntForm}>
           <Row>

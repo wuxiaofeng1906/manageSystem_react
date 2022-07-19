@@ -65,15 +65,9 @@ const DutyList = () => {
     const rowNode = gridRef.current?.getRowNode(current?.rowIndex);
     const editer = await getLockStatus(num);
     if (editer && num) {
+      console.log(current);
+      // rowNode
       rowNode?.setData({ ...rowNode.data, editer: editer });
-      gridRef.current?.forEachNode((node) => {
-        console.log(node.data.person_duty_num == num);
-        if (node.data.person_duty_num == num) {
-          gridRef.current?.setGetRowStyle(() => ({ 'background-color': '#FFF6F6' }));
-        } else {
-          gridRef.current?.setGetRowStyle(() => ({ 'background-color': 'white' }));
-        }
-      });
     } else {
       rowNode?.setData(rowNode.data);
     }
@@ -184,7 +178,9 @@ const DutyList = () => {
               suppressMenu: true,
               cellStyle: { 'line-height': '30px' },
             }}
-            onCellMouseOver={debounce((e) => setCurrent(e.node), 500)}
+            onCellMouseOver={debounce((e) => {
+              setCurrent(e.node);
+            }, 500)}
             onCellMouseOut={() => {
               setCurrent(null);
               gridRef.current?.setRowData(list);

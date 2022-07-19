@@ -10,6 +10,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { SelectProps } from 'antd/lib/select';
 import * as dayjs from 'dayjs';
+import LockServices from '@/services/lock';
 const opts = {
   showSearch: true,
   mode: 'multiple',
@@ -88,6 +89,7 @@ const DutyCatalog = () => {
   const [visible, setVisible] = useState(true);
   const [recentDuty, setRecentDuty] = useState<Record<string, any>>();
   const [loading, setLoading] = useState(false);
+  const [editer, setEditer] = useState('');
   const [detail, setDetail] = useState<Record<string, any>>();
   const [dutyPerson, setDutyPerson] = useState<Record<string, any>[]>([]);
   const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
@@ -350,6 +352,12 @@ const DutyCatalog = () => {
 
   useEffect(() => {
     if (!id) return;
+    LockServices.lockStatus(
+      { user_id: currentUser?.userid, user_name: currentUser?.name, param: id },
+      'post',
+    ).then((res) => {
+      setEditer(res.user_name);
+    });
     DutyListServices.getProject().then((res) => setProjects(res));
     getDetail();
     getSource();
@@ -391,8 +399,8 @@ const DutyCatalog = () => {
     () =>
       ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(
         currentUser?.group || '',
-      ),
-    [currentUser?.group],
+      ) || isEmpty(editer),
+    [currentUser?.group, editer],
   );
 
   return (

@@ -1,11 +1,11 @@
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
+import { isEmpty } from 'lodash';
 
 const dutyColumn: (ColDef | ColGroupDef)[] = [
   {
-    filter: false,
     checkboxSelection: true,
     headerCheckboxSelection: false,
-    width: 45,
+    width: 35,
     pinned: 'left',
   },
   {
@@ -17,10 +17,8 @@ const dutyColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '值班名单',
     field: 'duty_name',
-    tooltipField: 'duty_name',
-    tooltipComponent: 'customTooltip',
-    cellRenderer: (data) =>
-      `<a style="color:#1890ff;text-decoration: underline" href='/onDutyAndRelease/dutyCatalog/${data.data.person_duty_num}'>${data.value}</a>`,
+    cellRenderer: (param) =>
+      ` <a style="color:#1890ff;text-decoration: underline" href='/onDutyAndRelease/dutyCatalog/${param.data.person_duty_num}'>${param.value}</a>`,
     minWidth: 220,
   },
   {
@@ -69,11 +67,12 @@ const dutyColumn: (ColDef | ColGroupDef)[] = [
     minWidth: 90,
     maxWidth: 110,
   },
-  // {
-  //   field: 'editer',
-  //   headerName: '',
-  //   maxWidth: 150,
-  //   cellRenderer: (p) => `<span class="editer">${p.value ?? ''}正在编辑</span>`,
-  // },
+  {
+    field: 'editer',
+    headerName: '',
+    maxWidth: 150,
+    cellClassRules: { editer: (p) => !isEmpty(p.value) },
+    cellRenderer: (p) => `${isEmpty(p.value) ? '' : p.value + '正在编辑'}`,
+  },
 ];
 export default dutyColumn;

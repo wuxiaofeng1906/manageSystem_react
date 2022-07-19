@@ -11,13 +11,10 @@ import DutyListServices from '@/services/dutyList';
 import moment from 'moment';
 import { isEmpty, debounce } from 'lodash';
 import LockServices from '@/services/lock';
-import { CustomTooltip } from './customTooltip';
 
 const DutyList = () => {
   const [list, setList] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
-  const [editer, setEditer] = useState('');
-  const [rowStyle, setRowStyle] = useState(null);
   const [current, setCurrent] = useState<any>(null);
   const [form] = Form.useForm();
   const gridRef = useRef<GridApi>();

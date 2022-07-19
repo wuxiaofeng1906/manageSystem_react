@@ -5,8 +5,16 @@ const dutyColumn: (ColDef | ColGroupDef)[] = [
   {
     checkboxSelection: true,
     headerCheckboxSelection: false,
-    width: 35,
-    pinned: 'left',
+    maxWidth: 35,
+    minWidth: 35,
+  },
+  {
+    field: 'editer',
+    headerName: '',
+    maxWidth: 120,
+    minWidth: 90,
+    cellClassRules: { editer: (p) => !isEmpty(p.value) },
+    cellRenderer: (p) => `${isEmpty(p.value) ? '' : p.value + '正在编辑'}`,
   },
   {
     headerName: 'NO.',
@@ -66,13 +74,6 @@ const dutyColumn: (ColDef | ColGroupDef)[] = [
     field: 'user_name',
     minWidth: 90,
     maxWidth: 110,
-  },
-  {
-    field: 'editer',
-    headerName: '',
-    maxWidth: 150,
-    cellClassRules: { editer: (p) => !isEmpty(p.value) },
-    cellRenderer: (p) => `${isEmpty(p.value) ? '' : p.value + '正在编辑'}`,
   },
 ];
 export default dutyColumn;

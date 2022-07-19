@@ -101,8 +101,15 @@ const CheckProgress: React.FC<any> = () => {
   };
 
   // 跳转到发布公告界面
-  const href = `http://${window.location.host}/onDutyAndRelease/releaseAnnouncement?releaseNum=${tabsData.activeKey}&releaseName=test`;
-
+  let href;
+  const {panes} = tabsData;
+  if (panes && panes.length > 0) {
+    panes.forEach((ele: any) => {
+      if (ele.key === tabsData.activeKey) {
+        href = `http://${window.location.host}/onDutyAndRelease/releaseAnnouncement?releaseNum=${tabsData.activeKey}&releaseName=${ele.title}`;
+      }
+    });
+  }
   return (
     <div>
 

@@ -141,7 +141,7 @@ const Announce: React.FC<any> = (props: any) => {
 
         {/* Tab内容 */}
         <div style={{backgroundColor: "white", height: pageHeight, minHeight: "500px", marginTop: -15}}>
-          <Form form={announceContentForm} autoComplete="off" onFieldsChange={whenFormValueChanged}>
+          <Form form={announceContentForm} autoComplete="off" onFieldsChange={whenFormValueChanged} style={{marginLeft:15}}>
             <Form.Item label="升级时间:" name="announceTime" style={{paddingTop: 5}}>
               <DatePicker showTime/>
             </Form.Item>

@@ -49,12 +49,6 @@ const CheckProgress: React.FC<any> = () => {
 
       // 需要查询当前发布编号有没有对应的发布后公告内容
       announceContent = await getAnnouncement(tabsData.activeKey, "after");
-      if (announceContent.code === 200) {
-        setAnnounceInfo(announceContent.data);
-      } else {
-        setAnnounceInfo(null);
-      }
-
     } else if (params === "2") {
       hintMsgs.message1 = "请确认服务是否发布失败！";
     }
@@ -71,8 +65,10 @@ const CheckProgress: React.FC<any> = () => {
         checkResult: [],
         sendAnnouncementMsg: ["yes"]
       });
+      setAnnounceInfo(announceContent.data);
     } else {
       pulishResultForm.resetFields();
+      setAnnounceInfo(null);
     }
   };
 
@@ -97,6 +93,7 @@ const CheckProgress: React.FC<any> = () => {
       } else {
         checkResult = await getAutoResult(tabsData.activeKey)
       }
+      debugger;
       // 如果勾选了发布公告复选框，还要调用公告发布接口发布公告
       if (formData.sendAnnouncementMsg && (formData.sendAnnouncementMsg).length > 0) {
         const announceResult = await postAnnouncementForOtherPage(announceInfo);

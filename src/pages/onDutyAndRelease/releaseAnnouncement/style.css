@@ -30,3 +30,10 @@
   background-color: #ECF5FF;
   border-radius: 5px;
 }
+
+.saveButtonUnableStyle {
+  color: white;
+  border: #C0C0C0  ;
+  background-color: #C0C0C0 ;
+  border-radius: 5px;
+}

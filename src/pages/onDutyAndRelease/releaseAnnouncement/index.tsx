@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import {errorMessage, sucMessage} from '@/publicMethods/showMessages';
-import {Button, DatePicker, Form, Input, Radio, Tabs, Divider} from 'antd';
+import {Button, DatePicker, Form, Input, Radio, Tabs, Divider, Popconfirm} from 'antd';
 import './style.css';
 import {useRequest} from 'ahooks';
 import {postAnnouncement, getAnnouncement} from "./axiosRequest/apiPage";
@@ -16,6 +16,11 @@ const Announce: React.FC<any> = (props: any) => {
   const releaseNum = props.location?.query?.releaseNum;
   const [announceContentForm] = Form.useForm();
   const [pageHeight, setPageHeight] = useState(getHeight());
+  // 一键挂起公告按钮是否可用以及style
+  const [buttonDisable, setButtonDisable] = useState({
+    disable: true,
+    buttonStyle: "saveButtonUnableStyle"
+  });
 
   // 当表单种数据被改变时候
   const whenFormValueChanged = (changedFields: any, allFields: any) => {
@@ -64,10 +69,18 @@ const Announce: React.FC<any> = (props: any) => {
   const saveAndReleaseAnnouncement = async (releaseType: string) => {
     const basicInfo = {releaseNum, releaseType, releaseTime, announceId};
     const formDatas = announceContentForm.getFieldsValue();
+    if (!formDatas.announceDetails_1 || !formDatas.announceDetails_2) {
+      errorMessage("公告详情不能为空！")
+      return;
+    }
     const result = await postAnnouncement(formDatas, basicInfo);
     const operate = releaseType === "save" ? "保存" : "公告挂起";
     if (result.code === 200) {
       sucMessage(`${operate}成功！`);
+      setButtonDisable({
+        disable: false,
+        buttonStyle: "saveButtonStyle"
+      });
     } else {
       errorMessage(`${operate}失败！`);
     }
@@ -108,6 +121,11 @@ const Announce: React.FC<any> = (props: any) => {
         UpgradeDescription: `"${data.upgrade_description}"`,
         isUpdated: data.is_upgrade === "yes" ? "true" : "false"
       });
+
+      setButtonDisable({
+        disable: false,
+        buttonStyle: "saveButtonStyle"
+      });
     }
   };
 
@@ -141,9 +159,10 @@ const Announce: React.FC<any> = (props: any) => {
 
         {/* Tab内容 */}
         <div style={{backgroundColor: "white", height: pageHeight, minHeight: "500px", marginTop: -15}}>
-          <Form form={announceContentForm} autoComplete="off" onFieldsChange={whenFormValueChanged} style={{marginLeft:15}}>
+          <Form form={announceContentForm} autoComplete="off" onFieldsChange={whenFormValueChanged}
+                style={{marginLeft: 15}}>
             <Form.Item label="升级时间:" name="announceTime" style={{paddingTop: 5}}>
-              <DatePicker showTime/>
+              <DatePicker allowClear={false} showTime/>
             </Form.Item>
             <Form.Item label="公告详情:" name="announceDetails_1" style={{marginTop: -15}}>
               <Input/>
@@ -162,7 +181,7 @@ const Announce: React.FC<any> = (props: any) => {
             </Form.Item>
             {/* 预览界面 */}
             <Form.Item style={{marginTop: -20}}>
-              <Divider orientation="left" style={{fontSize:"small"}}>预览</Divider>
+              <Divider orientation="left" style={{fontSize: "small"}}>预览</Divider>
               <div style={{marginTop: -20}}>
                 <Form.Item>{"{"}</Form.Item>
                 <Form.Item label={'"UpgradeIntroDate"'} name="UpgradeIntroDate" className={"marginStyle"}>
@@ -190,10 +209,15 @@ const Announce: React.FC<any> = (props: any) => {
                     onClick={() => saveAndReleaseAnnouncement("save")}>
               保存
             </Button>
-            <Button type="primary" className={"saveButtonStyle"} style={{marginLeft: 10}}
-                    onClick={() => saveAndReleaseAnnouncement("release")}>
-              一键挂起公告
-            </Button>
+            <Popconfirm placement="top" title={"确定一键挂起公告吗？"} okText="是" cancelText="否" disabled={buttonDisable.disable}
+                        onConfirm={() => saveAndReleaseAnnouncement("release")}>
+              <Button type="primary" className={buttonDisable.buttonStyle} style={{marginLeft: 10}}
+              >
+                一键挂起公告
+              </Button>
+            </Popconfirm>
+
+
           </div>
         </div>
       </div>

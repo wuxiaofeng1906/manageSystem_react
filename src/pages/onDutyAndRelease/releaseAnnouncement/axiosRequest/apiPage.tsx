@@ -1,6 +1,7 @@
 import {axiosGet_TJ, axiosPost} from "@/publicMethods/axios";
 import {getCurrentUserInfo} from "@/publicMethods/authorityJudge";
 import dayjs from "dayjs";
+import {errorMessage} from "@/publicMethods/showMessages";
 
 const users = getCurrentUserInfo();
 
@@ -18,7 +19,7 @@ export const getAnnouncement = async (readyReleaseNum: string, releaseType: stri
 
 // 发送（保存）公告
 export const postAnnouncement = async (formData: any, basicInfo: any) => {
-
+  // 需要判断内容是否为空
   const upgradeTime = dayjs(formData.announceTime).format("YYYY-MM-DD HH:mm:ss");
   const data: any = {
     "user_name": users.name,

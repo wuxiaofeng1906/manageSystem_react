@@ -53,7 +53,7 @@ const getOnlineEnv = async (releaseType: any) => {
         envInfo.online_environment_id !== 'cn-northwest-global' &&
         envInfo.online_environment_id !== 'cn-northwest-0' &&
         envInfo.online_environment_id !== 'cn-northwest-1' &&
-        envInfo.online_environment_name !== '集群1-7'
+        envInfo.online_environment_name !== '集群1-8'
       ) {
         nameOptions.push(
           <Option key={envInfo.online_environment_id} value={`${envInfo.online_environment_id}`}>

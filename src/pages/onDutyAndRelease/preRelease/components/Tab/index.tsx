@@ -48,6 +48,7 @@ const Tab: React.FC<any> = () => {
       pro_id: '',
       ignoreZentaoList: '2',
       checkListStatus: '',
+      release_cluster:'tenant',
       // relateDutyName: ''
     });
 

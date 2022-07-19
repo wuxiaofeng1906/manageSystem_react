@@ -13,6 +13,7 @@ import {showProgressData} from '../../components/CheckProgress/processAnalysis';
 import {getCheckProcess} from '../../components/CheckProgress/axiosRequest';
 import {modifyTabsName} from "@/pages/onDutyAndRelease/preRelease/components/Tab/axiosRequest";
 import {alalysisInitData} from "@/pages/onDutyAndRelease/preRelease/datas/dataAnalyze";
+import dayjs from "dayjs";
 
 const userLogins: any = localStorage.getItem('userLogins');
 const usersInfo = JSON.parse(userLogins);
@@ -90,11 +91,27 @@ const PreReleaseProject: React.FC<any> = () => {
         },
       });
       const modifyTime: any = result.datas;
-      formForPreReleaseProject.setFieldsValue({
-        editor: modifyTime.editor,
-        editTime: modifyTime.editTime,
-        checkListStatus: ""
+      // formForPreReleaseProject.setFieldsValue({
+      //   editor: modifyTime.editor,
+      //   editTime: modifyTime.editTime,
+      //   checkListStatus: ""
+      // });
+
+      modifyPreReleaseData({
+        ...preReleaseData,
+        release_cluster: datas.pulishCluster,// 这里需要改个状态，用于step4租户集群选择时候的变更
+        projectId: datas.projectsName,
+        release_type: datas.pulishType,
+        release_way: datas.pulishMethod,
+        plan_release_time: dayjs(datas.pulishTime).format("YYYY-MM-DD HH:mm:ss"),
+        edit_user_name: modifyTime.editor,
+        edit_time: modifyTime.editTime,
+        pro_id: datas.proid,
+        ignoreZentaoList: datas.ignoreZentaoList,
+        checkListStatus: "",
+        relateDutyName: datas.relateDutyName,
       });
+
       // 保存成功后需要刷新状态
       const processData: any = await getCheckProcess(tabsData?.activeKey);
       if (processData) {
@@ -105,11 +122,6 @@ const PreReleaseProject: React.FC<any> = () => {
       // 发布类型为正式发布，标签页需要改为xxxxxx正式预发布，如果是灰度发布，则改为xxxxx灰度预发布。
       autoModifyTabsName(datas.pulishType);
 
-      // 这里需要改个状态，用于step4租户集群选择时候的变更
-      modifyPreReleaseData({
-        ...preReleaseData,
-        release_cluster: datas.pulishCluster
-      })
     } else {
       message.error({
         content: result.errorMessage,

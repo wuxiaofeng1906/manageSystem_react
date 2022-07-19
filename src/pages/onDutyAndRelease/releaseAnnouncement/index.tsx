@@ -88,6 +88,7 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 展示界面数据
   const showFormData = (resData: any) => {
+
     //   有数据的时候需要显示在界面上
     if (resData.code === 4001) { // 没有发布公告，需要显示默认信息。
       const initTime = moment().add(1, 'day').startOf('day');
@@ -103,6 +104,11 @@ const Announce: React.FC<any> = (props: any) => {
         UpgradeDescription: "",
         isUpdated: "true"
       });
+      setButtonDisable({
+        disable: true,
+        buttonStyle: "saveButtonUnableStyle"
+      });
+
     } else if (resData.data) { // 有数据，则展示出来
       const {data} = resData;
       const time = data.upgrade_time;

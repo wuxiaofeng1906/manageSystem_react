@@ -4,6 +4,10 @@ import {useModel} from '@@/plugin-model/useModel';
 import {saveProcessResult, executeAutoCheck} from './axiosRequest';
 import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
 import {getAutoResult} from "./processAnalysis";
+import {
+  getAnnouncement,
+  postAnnouncementForOtherPage
+} from "@/pages/onDutyAndRelease/releaseAnnouncement/axiosRequest/apiPage";
 
 const {Option} = Select;
 const CheckProgress: React.FC<any> = () => {
@@ -13,8 +17,11 @@ const CheckProgress: React.FC<any> = () => {
     show: false,
     result: "",
     hintMsg: {message1: "", message2: ""},
-    autoCheckDisabled: true
+    autoCheckDisabled: true,
   });
+
+  // 保存发布公告的内容
+  const [announceInfo, setAnnounceInfo] = useState(null);
 
   const [pulishResultForm] = Form.useForm();
 
@@ -30,6 +37,7 @@ const CheckProgress: React.FC<any> = () => {
     }
 
     let autoDisable = true;
+    let announceContent: any = {};
     let hintMsgs = {
       message1: "请确认是否修改服务发布结果为空！",
       message2: ""
@@ -38,6 +46,15 @@ const CheckProgress: React.FC<any> = () => {
       hintMsgs.message1 = "请确认服务是否发布成功?";
       hintMsgs.message2 = "如有自动化也执行通过!确认通过，会自动开放所有租户。";
       autoDisable = false;
+
+      // 需要查询当前发布编号有没有对应的发布后公告内容
+      announceContent = await getAnnouncement(tabsData.activeKey, "after");
+      if (announceContent.code === 200) {
+        setAnnounceInfo(announceContent.data);
+      } else {
+        setAnnounceInfo(null);
+      }
+
     } else if (params === "2") {
       hintMsgs.message1 = "请确认服务是否发布失败！";
     }
@@ -48,11 +65,20 @@ const CheckProgress: React.FC<any> = () => {
       show: true
     });
 
-    pulishResultForm.resetFields();
+    if (announceContent.data) {
+      pulishResultForm.setFieldsValue({
+        ignoreAfterCheck: [],
+        checkResult: [],
+        sendAnnouncementMsg: ["yes"]
+      });
+    } else {
+      pulishResultForm.resetFields();
+    }
   };
 
   // 确认发布
   const handleOk = async () => {
+
     let checkResult: any;
     const formData = pulishResultForm.getFieldsValue();
     // 如果是发布成功，则需要判断下面自动化选项是否勾选
@@ -70,6 +96,13 @@ const CheckProgress: React.FC<any> = () => {
         errorMessage(`发布成功后自动化检查失败：${result}`);
       } else {
         checkResult = await getAutoResult(tabsData.activeKey)
+      }
+      // 如果勾选了发布公告复选框，还要调用公告发布接口发布公告
+      if (formData.sendAnnouncementMsg && (formData.sendAnnouncementMsg).length > 0) {
+        const announceResult = await postAnnouncementForOtherPage(announceInfo);
+        if (announceResult.code !== 200) {
+          errorMessage("发布后公告挂起失败！");
+        }
       }
     }
 
@@ -211,7 +244,7 @@ const CheckProgress: React.FC<any> = () => {
       {/* 发布结果确认弹出窗   */}
       <Modal title="发布结果确认" visible={isModalVisible.show} width={400}
              onCancel={handleCancel} centered={true}
-             bodyStyle={{height: 145}}
+             bodyStyle={{height: 175}}
              footer={[
                <Button key="cancle" onClick={handleCancel} style={{borderRadius: 5}}>
                  取消
@@ -244,6 +277,12 @@ const CheckProgress: React.FC<any> = () => {
               <Checkbox value="applet">小程序执行通过</Checkbox>
             </Checkbox.Group>
           </Form.Item>
+          <Form.Item label="是否进行升级公告发布:" name="sendAnnouncementMsg" style={{marginTop: -25}}>
+            <Checkbox.Group style={{width: '100%'}} disabled={announceInfo === null}>
+              <Checkbox value="yes" defaultChecked={true}></Checkbox>
+            </Checkbox.Group>
+          </Form.Item>
+
         </Form>
       </Modal>
 

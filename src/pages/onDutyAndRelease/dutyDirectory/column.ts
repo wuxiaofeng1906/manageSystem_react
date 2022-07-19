@@ -3,18 +3,18 @@ import { isEmpty } from 'lodash';
 
 const dutyColumn: (ColDef | ColGroupDef)[] = [
   {
+    field: 'editer',
+    headerName: '',
+    maxWidth: 110,
+    minWidth: 80,
+    cellClassRules: { editer: (p) => !isEmpty(p.value) },
+    cellRenderer: (p) => `${isEmpty(p.value) ? '' : p.value + '正在编辑'}`,
+  },
+  {
     checkboxSelection: true,
     headerCheckboxSelection: false,
     maxWidth: 35,
     minWidth: 35,
-  },
-  {
-    field: 'editer',
-    headerName: '',
-    maxWidth: 120,
-    minWidth: 90,
-    cellClassRules: { editer: (p) => !isEmpty(p.value) },
-    cellRenderer: (p) => `${isEmpty(p.value) ? '' : p.value + '正在编辑'}`,
   },
   {
     headerName: 'NO.',

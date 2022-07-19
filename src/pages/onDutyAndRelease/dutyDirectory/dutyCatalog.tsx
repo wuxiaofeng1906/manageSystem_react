@@ -399,7 +399,7 @@ const DutyCatalog = () => {
     () =>
       ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(
         currentUser?.group || '',
-      ) || isEmpty(editer),
+      ) && isEmpty(editer),
     [currentUser?.group, editer],
   );
 

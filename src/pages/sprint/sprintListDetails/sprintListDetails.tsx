@@ -1101,7 +1101,7 @@ const SprintList: React.FC<any> = () => {
   const nessField = ['选择', '序号', '类型', '编号']; // 必需的列
   const unNessField = ['阶段', '测试', '测试确认', '标题内容', '创建时间', '解决时间', '所属计划', '严重等级', '截止日期', '模块', '状态', '已提测', '发布环境',
     '指派给', '解决/完成人', '关闭人', '备注', '相关需求', '相关任务', '相关bug', "是否涉及页面调整", '是否可热更', '是否清缓存', '是否有数据升级',
-    '是否有接口升级', '是否有预置数据修改', '是否需要测试验证', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人', '是否延期'];
+    '是否有接口升级', '是否有预置数据修改', '测试验证?', '验证范围建议', 'UED', 'UED测试环境验证', 'UED线上验证', '来源', '反馈人', '是否延期'];
 
   const onSetFieldsChange = (checkedValues: any) => {
     setSelectedFiled(checkedValues);
@@ -2502,7 +2502,7 @@ const SprintList: React.FC<any> = () => {
                   <Checkbox value="是否有预置数据修改">是否有预置数据修改</Checkbox>
                 </Col>
                 <Col span={4}>
-                  <Checkbox value="是否需要测试验证">是否需要测试验证</Checkbox>
+                  <Checkbox value="测试验证?">测试验证?</Checkbox>
                 </Col>
                 <Col span={4}>
                   <Checkbox value="创建时间">创建时间</Checkbox>

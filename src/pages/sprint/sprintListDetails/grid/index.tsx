@@ -24,7 +24,7 @@ const getColums = (prjNames: any) => {
     },
     {
       headerName: '序号',
-      maxWidth: 65,
+      maxWidth: 50,
       suppressMenu: true,
       pinned: 'left',
       cellRenderer: (params: any) => {
@@ -37,7 +37,7 @@ const getColums = (prjNames: any) => {
       pinned: 'left',
       valueGetter: stageValueGetter,
       cellRenderer: stageRenderer,
-      minWidth: 90,
+      minWidth: 150,
     },
     {
       headerName: '测试',
@@ -56,11 +56,11 @@ const getColums = (prjNames: any) => {
       cellRenderer: textDecorateRender,
     },
     {
-      headerName: '是否需要测试验证',
+      headerName: '测试验证?',
       field: 'testCheck',
       pinned: 'left',
-      minWidth: 160,
-      headerTooltip: "自动生成’是‘为黑色；自动生成‘否’为红色；手动修改‘是’为紫色；手动修改‘否’为黄色",
+      minWidth: 110,
+      headerTooltip: "是否需要测试验证：自动生成’是‘为黑色；自动生成‘否’为红色；手动修改‘是’为紫色；手动修改‘否’为黄色",
       tooltipValueGetter: testConfirmTooltipValueGetter,
       cellRenderer: testConfirmedRenderer,
       filterParams: {cellRenderer: testVertifyFilter}
@@ -93,7 +93,7 @@ const getColums = (prjNames: any) => {
     {
       headerName: '所属计划',
       field: 'planName',
-      minWidth: 110,
+      minWidth: 140,
     },
     {
       headerName: '严重等级',

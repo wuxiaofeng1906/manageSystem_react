@@ -166,6 +166,9 @@ const getOnlineDev = (idStr: string) => {
       case '9':
         name = '';
         break;
+      case '10':
+        name = '集群8';
+        break;
 
       default:
         name = ele;

@@ -24,9 +24,10 @@ const recentType = {
   SQA: 'sqa',
 };
 const envType = {
-  '集群1-7':
-    'cn-northwest-1cn-northwest-2cn-northwest-3cn-northwest-4cn-northwest-5cn-northwest-6cn-northwest-7',
-  '集群2-7': 'cn-northwest-2cn-northwest-3cn-northwest-4cn-northwest-5cn-northwest-6cn-northwest-7',
+  '集群1-8':
+    'cn-northwest-1,cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-8',
+  '集群2-8':
+    'cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-8',
   global: 'cn-northwest-global',
 };
 const tbodyConfig = [
@@ -338,10 +339,13 @@ const DutyCatalog = () => {
     const time = moment(values.duty_date).format('YYYYMMDD');
     let type = '';
     if (isEmpty(values.release_env)) type = '';
-    else if (values.release_env?.includes('cn-northwest-1') && values.release_env?.length == 1) {
-      type = '灰度发布';
+    else if (
+      values.release_env?.length == 1 &&
+      ['cn-northwest-1', 'cn-northwest-0'].includes(values.release_env[0])
+    ) {
+      type = `${values.release_env[0].replace('cn-northwest-', '')}级灰度发布`;
     } else type = '线上发布';
-    return `${time}${type}值班名单`;
+    return `${time}_${type}值班名单`;
   };
 
   useEffect(() => {

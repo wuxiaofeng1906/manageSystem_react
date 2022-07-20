@@ -1,13 +1,12 @@
 import axios from 'axios';
-import {getDutyPersonPermission, getSystemPersonPermission} from '../../../authority/permission';
-import {queryReleaseId} from "@/pages/onDutyAndRelease/preRelease/comControl/axiosRequest";
+import { getDutyPersonPermission, getSystemPersonPermission } from '../../../authority/permission';
+import { queryReleaseId } from '@/pages/onDutyAndRelease/preRelease/comControl/axiosRequest';
 
 const sys_accessToken = localStorage.getItem('accessId');
 axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
 
 const userLogins: any = localStorage.getItem('userLogins');
 const usersInfo = JSON.parse(userLogins);
-
 
 // 一键部署ID之升级接口数据获取
 const queryServiceByID = async (params: string) => {
@@ -52,12 +51,12 @@ const inquireService = async (releasedIDArray: any, currentListNo: string) => {
   const paramsData: any = [];
   releasedIDArray.forEach((ele: any) => {
     allIdsArray.forEach((id_str: any) => {
-      if (ele === (id_str.id).toString()) {
+      if (ele === id_str.id.toString()) {
         paramsData.push({
-          "deployment_id": ele,
-          "automation_check": id_str.automation_test,
-          "service": id_str.service,
-          "ready_release_num": currentListNo
+          deployment_id: ele,
+          automation_check: id_str.automation_test,
+          service: id_str.service,
+          ready_release_num: currentListNo,
         });
       }
     });
@@ -227,10 +226,12 @@ const addPulishApi = async (formData: any, currentListNo: string, type: string) 
     api_service: formData.interService,
     api_url: formData.URL,
     api_method: formData.method,
-    hot_update: "2",
+    hot_update: '2',
     related_tenant: formData.renter,
     remarks: formData.remark,
     ready_release_num: currentListNo,
+    data: formData.data,
+    header: formData.header,
   };
 
   if (type === '修改') {
@@ -266,7 +267,7 @@ const deleteReleasedId = async (ready_release_num: string, deployment_id: string
   };
 
   await axios
-    .delete('/api/verify/release/upgrade_service_deployment', {data: datas})
+    .delete('/api/verify/release/upgrade_service_deployment', { data: datas })
     .then(function (res) {
       if (res.data.code !== 200) {
         errorMessage = `错误：${res.data.msg}`;
@@ -299,4 +300,4 @@ const deleteReleasedID = async (deployment_id: string, ready_release_num: string
   return systemPermission.errorMessage;
 };
 
-export {inquireService, upgradePulishItem, addPulishApi, deleteReleasedID};
+export { inquireService, upgradePulishItem, addPulishApi, deleteReleasedID };

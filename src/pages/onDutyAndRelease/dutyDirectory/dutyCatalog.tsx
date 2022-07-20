@@ -27,10 +27,10 @@ const recentType = {
   SQA: 'sqa',
 };
 const envType = {
-  '集群1-7':
-    'cn-northwest-1,cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7',
-  '集群2-7':
-    'cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7',
+  '集群1-8':
+    'cn-northwest-1,cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-8',
+  '集群2-8':
+    'cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-7',
   global: 'cn-northwest-global',
 };
 const tbodyConfig = [
@@ -157,7 +157,7 @@ const DutyCatalog = () => {
 
       setAllPerson(
         allPersons?.map((it: any) => ({
-          key: it.user_name,
+          key: it.user_id,
           value: `${it.user_id}_${it.user_type}`,
           label: it.user_name,
           type: it.user_type,
@@ -168,7 +168,7 @@ const DutyCatalog = () => {
       setLoading(false);
     }
   };
-
+  // 获取项目负责人
   const getProjectUser = async () => {
     if (!hasPermission) return;
     const values = await form.getFieldsValue();
@@ -182,7 +182,7 @@ const DutyCatalog = () => {
     form.setFieldsValue({ project_pm: result?.map((it: any) => it.user) });
     await onSave();
   };
-
+  // 推送
   const onScreenShot = async () => {
     if (!hasPermission) return;
     const errTip = {

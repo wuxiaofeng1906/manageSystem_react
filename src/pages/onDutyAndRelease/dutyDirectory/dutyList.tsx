@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { history, useModel } from 'umi';
-import { Form, DatePicker, Row, Col, Button, Select, message } from 'antd';
+import { Form, DatePicker, Row, Col, Button, Select, message, Modal, Input } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import { AgGridReact } from 'ag-grid-react';
 import { FolderAddTwoTone, CopyTwoTone } from '@ant-design/icons';
@@ -17,6 +17,7 @@ const DutyList = () => {
   const [projects, setProjects] = useState<any[]>([]);
   const { updateLockStatus, getAllLock, lockList } = useLock();
   const [form] = Form.useForm();
+  const [modifyDutyForm] = Form.useForm();
   const gridRef = useRef<GridApi>();
   const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
 
@@ -48,13 +49,36 @@ const DutyList = () => {
     const data = await DutyListServices.getDutyDetail({
       person_duty_num: selected[0].person_duty_num,
     });
-
-    await DutyListServices.addDuty({
-      ...data,
-      person_duty_num: releaseNum,
-      project_pm: data.project_pm?.map((it: any) => it.user_name).join(),
+    const update = async (value: string) => {
+      await DutyListServices.addDuty({
+        ...data,
+        person_duty_num: releaseNum,
+        duty_name: value ?? data.duty_name,
+        project_pm: data.project_pm?.map((it: any) => it.user_id).join(),
+      });
+      await getList();
+    };
+    Modal.confirm({
+      title: '复制提示：',
+      content: (
+        <Form form={modifyDutyForm}>
+          <Form.Item
+            label={'值班名单标题'}
+            name={'duty_name'}
+            initialValue={data.duty_name}
+            rules={[{ required: true, message: '请填写值班名称标题！' }]}
+          >
+            <Input />
+          </Form.Item>
+        </Form>
+      ),
+      okText: '复制',
+      cancelText: '取消复制',
+      onOk: async () => {
+        const value = await modifyDutyForm.validateFields();
+        update(value.duty_name);
+      },
     });
-    await getList();
   };
 
   useEffect(() => {

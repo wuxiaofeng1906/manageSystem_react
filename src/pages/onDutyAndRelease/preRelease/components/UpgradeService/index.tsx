@@ -352,7 +352,6 @@ const UpgradeService: React.FC<any> = () => {
 
   // 发布接口弹出窗口进行修改和新增
   (window as any).showUpgradeApiForm = async (type: any, params: any) => {
-    debugger;
 
     const flag = await vertifyModifyFlag(2, tabsData.activeKey);
     if (!flag) {

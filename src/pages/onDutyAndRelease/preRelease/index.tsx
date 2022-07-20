@@ -91,7 +91,7 @@ const PreRelease: React.FC<any> = () => {
       pro_id: '',
       ignoreZentaoList: "2",
       checkListStatus: "",
-      release_cluster:"tenant"
+      release_cluster: "tenant"
     });
 
     //  发布项
@@ -118,7 +118,7 @@ const PreRelease: React.FC<any> = () => {
 
   // 显示有数据界面
   const showPageInitData = async (initData: any, initShow: boolean) => {
-
+    debugger;
     if (initData === undefined) {
       return;
     }
@@ -129,9 +129,12 @@ const PreRelease: React.FC<any> = () => {
     }
 
     // 自动刷新时无数据不更新数据
-    if (initData.length === 0 && initShow) {
-      // 后端无数据
-      showNoneDataPage();
+    if (initData.length === 0) {
+      // 初始化的时候无数据再显示，自动刷新无数据不更新界面
+      if (initShow) {
+        // 后端无数据
+        showNoneDataPage();
+      }
       return;
     }
 

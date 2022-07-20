@@ -93,7 +93,6 @@ const CheckProgress: React.FC<any> = () => {
       } else {
         checkResult = await getAutoResult(tabsData.activeKey)
       }
-      debugger;
       // 如果勾选了发布公告复选框，还要调用公告发布接口发布公告
       if (formData.sendAnnouncementMsg && (formData.sendAnnouncementMsg).length > 0) {
         const announceResult = await postAnnouncementForOtherPage(announceInfo);

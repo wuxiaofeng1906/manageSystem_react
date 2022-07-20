@@ -228,7 +228,7 @@ const filterTestConfirmed = (oraData: any) => {
 
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, prjID: any, prjType: any, syncQuery: boolean = false, showTestConfirmFlag: boolean) => {
-  debugger;
+
   const {data} = await client.query(`
       {
         proDetaiWithUser(project:${prjID},category:"${prjType}",order:ASC,doSync:${syncQuery}){

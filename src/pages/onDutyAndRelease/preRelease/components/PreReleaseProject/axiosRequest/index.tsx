@@ -10,7 +10,6 @@ const usersInfo = JSON.parse(userLogins);
 
 // 保存预发布项目
 const savePrePulishProjects = async (params: any, listNo: string) => {
-  debugger;
 
   const prjIdArray = params.projectsName;
   let projectId = '';

@@ -306,7 +306,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
     const cond: any = {
       page: 1,
-      pageSize: 100
+      pageSize: 100,
     };
 
     if (formalQueryCondition.start && formalQueryCondition.end) {
@@ -340,6 +340,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 根据时间获取
   const onReleaseProject = (params: any, times: any) => {
+    debugger;
     formalQueryCondition.start = times[0] === "" ? "" : dayjs(times[0]).format("YYYY-MM-DD");
     formalQueryCondition.end = times[1] === "" ? "" : dayjs(times[1]).format("YYYY-MM-DD");
     getReleasedList();

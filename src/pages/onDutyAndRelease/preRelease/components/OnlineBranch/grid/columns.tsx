@@ -77,8 +77,8 @@ const rendererUnitTest = (params: any) => {
 
   return `
         <div>
-        <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
-                  style="margin-top: -15px;margin-left:100px;cursor: pointer"
+        <img src="../refresh.png" width="16" height="16" alt="刷新" title="刷新"
+                  style="margin-top: -17px;margin-left:100px;cursor: pointer"
                   onclick='refreshStatus(${JSON.stringify({
                     ready_release_num: params.data.ready_release_num,
                     refresh_param: 'test_unit',
@@ -513,8 +513,8 @@ const sealStatusRenderer = (params: any) => {
     return `
           <div>
             <div style="margin-left: 100px;margin-top: -13px" >
-            <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
-            style="margin:4px 10px 0 0;cursor: pointer"
+            <img src="../refresh.png" width="16" height="16" alt="刷新" title="刷新"
+            style="margin:2px 10px 0 0;cursor: pointer"
             onclick='refreshStatus(${JSON.stringify({
               ready_release_num: params.data.ready_release_num,
               refresh_param: 'sealing_version',

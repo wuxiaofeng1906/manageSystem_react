@@ -5,7 +5,7 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { AgGridReact } from 'ag-grid-react';
 import { FolderAddTwoTone, CopyTwoTone } from '@ant-design/icons';
 import dutyColumn from '@/pages/onDutyAndRelease/dutyDirectory/column';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import styles from './index.less';
 import DutyListServices from '@/services/dutyList';
 import moment from 'moment';
@@ -72,18 +72,19 @@ const DutyList = () => {
     return res.ready_release_num;
   };
 
+  // 新增 & 编辑
   const onAdd = async (data?: any) => {
     let release_num = '';
     if (!isEmpty(data)) {
       release_num = data.person_duty_num;
     } else release_num = await getDutyNumber();
-    // 加锁
-    if (isEmpty(data) || isEmpty(data?.editer)) {
+    // 加锁（当前行未锁定）
+    const lockedNode = lockList.find((it) => it.param.replace('duty_', '') == release_num);
+    if (isEmpty(lockedNode) && isEmpty(data)) {
       await updateLockStatus(release_num, 'post');
     }
     history.push(`/onDutyAndRelease/dutyCatalog/${release_num}`);
   };
-  (window as any)._updateDutyCatalog = onAdd;
 
   useEffect(() => {
     form.setFieldsValue({
@@ -183,6 +184,16 @@ const DutyList = () => {
             suppressRowTransform={true}
             onGridReady={onGridReady}
             onGridSizeChanged={onGridReady}
+            frameworkComponents={{
+              dutyCatalog: (params: CellClickedEvent) => (
+                <div
+                  style={{ color: '#1890ff', textDecoration: 'underline' }}
+                  onClick={() => onAdd(params.data)}
+                >
+                  {params.value}
+                </div>
+              ),
+            }}
           />
         </div>
       </div>

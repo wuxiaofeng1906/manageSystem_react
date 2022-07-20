@@ -6,6 +6,8 @@ const useLock = () => {
   const [lockList, setLockList] = useState<any[]>([]);
   const [singleLock, setsingleLock] = useState<any>();
   const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
+
+  // 加锁、删锁
   const updateLockStatus = async (id: string, method: 'post' | 'delete', page = 'duty') => {
     await LockServices.updateLockStatus(
       {
@@ -16,10 +18,12 @@ const useLock = () => {
       method,
     );
   };
+  // 获取所有锁、单行锁
   const getAllLock = async (page: string, isSingle = false) => {
     const res = await LockServices.getLockAll(page);
     setLockList(res);
     isSingle && setsingleLock(res[0] ?? null);
+    return res;
   };
   return { updateLockStatus, getAllLock, lockList, singleLock };
 };

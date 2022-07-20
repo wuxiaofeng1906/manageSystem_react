@@ -12,6 +12,7 @@ import { SelectProps } from 'antd/lib/select';
 import * as dayjs from 'dayjs';
 import { useUnmount } from 'ahooks';
 import useLock from '@/hooks/lock';
+
 const opts = {
   showSearch: true,
   mode: 'multiple',
@@ -268,6 +269,9 @@ const DutyCatalog = () => {
     if (flag) return;
     await DutyListServices.addDuty(data);
     getDetail();
+    // 【未加锁】保存后：加锁
+    if (singleLock?.param.replace('duty_', '') == id) return;
+    updateLockStatus(id, 'post');
   };
 
   const getDetail = async () => {
@@ -359,11 +363,11 @@ const DutyCatalog = () => {
     getSource();
   }, [id]);
 
-  useUnmount(() => {
+  const onDeleteLock = () => {
     if (singleLock?.user_id == currentUser?.userid) {
       updateLockStatus(id, 'delete');
     }
-  });
+  };
 
   // 保存后的第一值班人
   useEffect(() => {
@@ -409,15 +413,19 @@ const DutyCatalog = () => {
   useEffect(() => {
     let timer: any;
     if (singleLock?.user_id == currentUser?.userid) return;
-    else if (isEmpty(singleLock)) updateLockStatus(id, 'post');
-    else
-      timer = setInterval(() => {
-        getAllLock(id, true);
-      }, 5000);
+    timer = setInterval(() => {
+      getAllLock(id, true).then((res) => {
+        if (isEmpty(res)) updateLockStatus(id, 'post');
+      });
+    }, 5000);
     return () => {
       clearInterval(timer);
     };
   }, [singleLock]);
+
+  useUnmount(() => {
+    onDeleteLock();
+  });
 
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>

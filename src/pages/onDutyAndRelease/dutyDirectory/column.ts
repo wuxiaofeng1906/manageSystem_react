@@ -25,11 +25,7 @@ const dutyColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '值班名单',
     field: 'duty_name',
-    // /onDutyAndRelease/dutyCatalog/${param.data.person_duty_num}
-    cellRenderer: (param) =>
-      ` <div style="color:#1890ff;text-decoration: underline" onclick='_updateDutyCatalog(${JSON.stringify(
-        param.data,
-      )})'>${param.value}</div>`,
+    cellRenderer: 'dutyCatalog',
     minWidth: 220,
   },
   {

@@ -77,7 +77,7 @@ const getColums = (prjNames: any) => {
       headerName: '编号',
       field: 'ztNo',
       pinned: 'left',
-      minWidth: 70,
+      minWidth: 75,
       suppressMenu: true,
       cellRenderer: linkToZentaoPage,
     },

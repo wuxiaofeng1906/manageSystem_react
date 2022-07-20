@@ -268,7 +268,7 @@ const UpgradeService: React.FC<any> = () => {
 
     // 设置下拉框
     setPulishItemFormSelected({
-      onlineEnv: await loadOnlineEnvSelect(preReleaseData.release_cluster),
+      onlineEnv: await loadOnlineEnvSelect(preReleaseData.release_cluster ),
       pulishItem: await loadPulishItemSelect(),
       isApiDbUpgrade: await loadIsApiAndDbUpgradeSelect(),
     });
@@ -408,7 +408,7 @@ const UpgradeService: React.FC<any> = () => {
     }
     // 设置下拉框
     setUpgradeApiFormSelected({
-      onlineEnv: await loadOnlineEnvSelect(preReleaseData.release_cluster),
+      onlineEnv: await loadOnlineEnvSelect(preReleaseData.release_cluster ),
       upgradeApi: await loadUpgradeApiSelect(),
       apiService: await loadApiServiceSelect(),
       apiMethod: await loadApiMethodSelect(),

@@ -561,7 +561,22 @@ const OnlineBranch: React.FC<any> = () => {
     ready_release_num: string;
     refresh_param: string;
   }) => {
+    if (operteStatus) {
+      message.error({
+        content: '发布已完成，不能进行执行操作',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+    setExecuteStatus(true);
     await PreReleaseServices.refreshCheckStatus(data);
+    // 刷新界面
+    const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
+    onlineBranchGridApi.current?.setRowData(newData.onlineBranch);
+    setExecuteStatus(false);
   };
   // 日志显示弹窗取消
   const autoCancle = () => {

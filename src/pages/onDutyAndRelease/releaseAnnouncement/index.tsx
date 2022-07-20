@@ -18,6 +18,7 @@ const Announce: React.FC<any> = (props: any) => {
   const [pageHeight, setPageHeight] = useState(getHeight());
   // 一键挂起公告按钮是否可用以及style
   const [buttonDisable, setButtonDisable] = useState({
+    title: "前",
     disable: true,
     buttonStyle: "saveButtonUnableStyle"
   });
@@ -78,6 +79,7 @@ const Announce: React.FC<any> = (props: any) => {
     if (result.code === 200) {
       sucMessage(`${operate}成功！`);
       setButtonDisable({
+        ...buttonDisable,
         disable: false,
         buttonStyle: "saveButtonStyle"
       });
@@ -105,6 +107,7 @@ const Announce: React.FC<any> = (props: any) => {
         isUpdated: "true"
       });
       setButtonDisable({
+        title: releaseTime === "after" ? "后" : "前",
         disable: true,
         buttonStyle: "saveButtonUnableStyle"
       });
@@ -129,6 +132,7 @@ const Announce: React.FC<any> = (props: any) => {
       });
 
       setButtonDisable({
+        title: releaseTime === "after" ? "后" : "前",
         disable: false,
         buttonStyle: "saveButtonStyle"
       });
@@ -210,10 +214,11 @@ const Announce: React.FC<any> = (props: any) => {
             <Button type="primary" className={"saveButtonStyle"} onClick={() => saveAndReleaseAnnouncement("save")}>
               保存
             </Button>
-            <Popconfirm placement="top" title={"确定一键挂起公告吗？"} okText="是" cancelText="否" disabled={buttonDisable.disable}
+            <Popconfirm placement="top" title={`确定一键挂起升级${buttonDisable.title}公告吗？`} okText="是" cancelText="否"
+                        disabled={buttonDisable.disable}
                         onConfirm={() => saveAndReleaseAnnouncement("release")}>
               <Button type="primary" className={buttonDisable.buttonStyle} style={{marginLeft: 10}}>
-                一键挂起公告
+                {`一键挂起升级${buttonDisable.title}公告`}
               </Button>
             </Popconfirm>
           </div>

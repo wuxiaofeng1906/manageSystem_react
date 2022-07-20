@@ -88,13 +88,13 @@ const Announce: React.FC<any> = (props: any) => {
 
   // 展示界面数据
   const showFormData = (resData: any) => {
-
     //   有数据的时候需要显示在界面上
     if (resData.code === 4001) { // 没有发布公告，需要显示默认信息。
       const initTime = moment().add(1, 'day').startOf('day');
+
       announceContentForm.setFieldsValue({
         announceTime: initTime,
-        announceDetails_1: "亲爱的用户：您好，企企经营管理平台将于",
+        announceDetails_1: releaseTime === "after" ? "亲爱的用户：您好，企企经营管理平台已于" : "亲爱的用户：您好，企企经营管理平台将于",
         showAnnounceTime: initTime.format("YYYY-MM-DD HH:mm:ss"),
         announceDetails_2: "",
         showUpdateDetails: "true",
@@ -203,27 +203,19 @@ const Announce: React.FC<any> = (props: any) => {
               </div>
               <Divider orientation="left" style={{marginTop: -20}}></Divider>
             </Form.Item>
-            {/*<fieldset className={"fieldStyleA"}>*/}
-            {/*  <legend className={"legendStyleA"}>预览</legend>*/}
-            {/*</fieldset>*/}
-
           </Form>
 
           {/* 保存按钮 */}
           <div style={{float: "right"}}>
-            <Button type="primary" className={"saveButtonStyle"}
-                    onClick={() => saveAndReleaseAnnouncement("save")}>
+            <Button type="primary" className={"saveButtonStyle"} onClick={() => saveAndReleaseAnnouncement("save")}>
               保存
             </Button>
             <Popconfirm placement="top" title={"确定一键挂起公告吗？"} okText="是" cancelText="否" disabled={buttonDisable.disable}
                         onConfirm={() => saveAndReleaseAnnouncement("release")}>
-              <Button type="primary" className={buttonDisable.buttonStyle} style={{marginLeft: 10}}
-              >
+              <Button type="primary" className={buttonDisable.buttonStyle} style={{marginLeft: 10}}>
                 一键挂起公告
               </Button>
             </Popconfirm>
-
-
           </div>
         </div>
       </div>

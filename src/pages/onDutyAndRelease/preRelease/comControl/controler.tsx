@@ -173,7 +173,7 @@ const loadReleaseIDSelect = async (releaseNum: string) => {
   }
 ;
 
-// 上线环境
+// 上线环境（需要根据预发布项目所写的集群来判断）
 const loadOnlineEnvSelect = async (releseCluser: string = "") => {
     const envs = await getOnlineDev();
     const envData: any = [];

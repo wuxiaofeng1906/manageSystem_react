@@ -561,7 +561,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                 <Checkbox value="applet">小程序执行通过</Checkbox>
               </Checkbox.Group>
             </Form.Item>
-            <Form.Item label="是否进行升级公告发布:" name="sendAnnouncementMsg" style={{marginTop: -25}}>
+            <Form.Item label="是否挂起升级后公告:" name="sendAnnouncementMsg" style={{marginTop: -25}}>
               <Checkbox.Group style={{width: '100%'}} disabled={announceInfo === null}>
                 <Checkbox value="yes" defaultChecked={true}></Checkbox>
               </Checkbox.Group>

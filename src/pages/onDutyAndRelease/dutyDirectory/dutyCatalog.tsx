@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Select, DatePicker, Button, Form, message, Spin, Modal } from 'antd';
+import { Select, DatePicker, Button, Form, message, Spin, Modal, Alert } from 'antd';
 import styles from './index.less';
 import { useEffect, useState } from 'react';
 import { useParams, useModel } from 'umi';
@@ -9,6 +9,10 @@ import { isEmpty, isEqual, omit, pick, intersection, orderBy } from 'lodash';
 import { ExclamationCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { SelectProps } from 'antd/lib/select';
+import * as dayjs from 'dayjs';
+import { useUnmount } from 'ahooks';
+import useLock from '@/hooks/lock';
+
 const opts = {
   showSearch: true,
   mode: 'multiple',
@@ -23,10 +27,10 @@ const recentType = {
   SQA: 'sqa',
 };
 const envType = {
-  '集群1-7':
-    'cn-northwest-1,cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7',
-  '集群2-7':
-    'cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7',
+  '集群1-8':
+    'cn-northwest-1,cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-8',
+  '集群2-8':
+    'cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-7',
   global: 'cn-northwest-global',
 };
 const tbodyConfig = [
@@ -79,6 +83,7 @@ const FilterSelector = ({
 
 const DutyCatalog = () => {
   const { id } = useParams() as { id: string };
+  const { getAllLock, updateLockStatus, singleLock } = useLock();
   const [allPerson, setAllPerson] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [envList, setEnvList] = useState<any[]>([]);
@@ -97,11 +102,17 @@ const DutyCatalog = () => {
 
   // 默认第一值班人
   const getFirstDuty = async () => {
-    const params = {
-      start_time: moment().startOf('week').format('YYYY/MM/DD'),
-      end_time: moment().endOf('week').format('YYYY/MM/DD'),
+    const dateStart = dayjs().day(0);
+    const dateEnd = dayjs().day(6);
+    const oldSafari = {
+      start_time: dayjs(
+        `${dateStart.year()}-${dateStart.month() + 1}-${dateStart.date() + 1}`,
+      ).format('YYYY/MM/DD'),
+      end_time: dayjs(`${dateEnd.year()}-${dateEnd.month() + 1}-${dateEnd.date() + 1}`).format(
+        'YYYY/MM/DD',
+      ),
     };
-    const firstDuty = await DutyListServices.getFirstDutyPerson(params);
+    const firstDuty = await DutyListServices.getFirstDutyPerson(oldSafari);
     const duty = firstDuty?.data
       ?.flat()
       .filter(
@@ -271,6 +282,9 @@ const DutyCatalog = () => {
     await DutyListServices.addDuty(data);
     setIsSameDuty(true);
     getDetail();
+    // 【未加锁】保存后：加锁
+    if (singleLock?.param.replace('duty_', '') == id) return;
+    updateLockStatus(id, 'post');
   };
   // 详情
   const getDetail = async () => {
@@ -354,10 +368,13 @@ const DutyCatalog = () => {
     const time = moment(values.duty_date).format('YYYYMMDD');
     let type = '';
     if (isEmpty(values.release_env)) type = '';
-    else if (values.release_env?.includes('cn-northwest-1') && values.release_env?.length == 1) {
-      type = '灰度发布';
+    else if (
+      values.release_env?.length == 1 &&
+      ['cn-northwest-1', 'cn-northwest-0'].includes(values.release_env[0])
+    ) {
+      type = `${values.release_env[0].replace('cn-northwest-', '')}级灰度发布`;
     } else type = '线上发布';
-    return `${time}${type}值班名单`;
+    return `${time}_${type}值班名单`;
   };
 
   // form 格式【默认值班人员disabled,并过滤值班人员的现场、远程】
@@ -382,7 +399,7 @@ const DutyCatalog = () => {
   const updateFirstDuty = async () => {
     setVisible(false);
     Modal.confirm({
-      title: '更新值班负责人提醒',
+      title: '更新值班负责人提醒:',
       icon: <ExclamationCircleOutlined />,
       content: '请确认是否需要将当前值班负责人更新为本周最新值班负责人?',
       onOk: async () => {
@@ -399,7 +416,9 @@ const DutyCatalog = () => {
         const formatPro = projects
           ?.filter((it: any) => project_ids?.includes(it.project_id.toString()))
           .map((o: any) => ({
-            user: ['sprint', 'emergency', 'hotfix', 'stage-emergency'].includes(o.sprint_type)
+            user: ['sprint', 'emergency', 'hotfix', 'stage-emergency', 'stagepatch'].includes(
+              o.sprint_type,
+            )
               ? initDutyObj?.backend?.user_id
               : o.user?.user_id,
             project_id: o.project_id.toString(),
@@ -418,11 +437,18 @@ const DutyCatalog = () => {
 
   useEffect(() => {
     if (!id) return;
+    getAllLock(id, true);
     getFirstDuty();
     DutyListServices.getProject().then((res) => setProjects(res));
     getDetail();
     getSource();
   }, [id]);
+
+  const onDeleteLock = () => {
+    if (singleLock?.user_id == currentUser?.userid) {
+      updateLockStatus(id, 'delete');
+    }
+  };
 
   // 保存后的第一值班人
   useEffect(() => {
@@ -430,7 +456,7 @@ const DutyCatalog = () => {
     const initDutyObj = initalFormDuty(dutyPerson);
     const formatProject = projects?.map((it: any) => ({
       ...it,
-      user: ['sprint', 'emergency', 'hotfix', 'stage-emergency'].includes(it.sprint_type)
+      user: ['sprint', 'emergency', 'hotfix', 'stagepatch'].includes(it.sprint_type)
         ? {
             user_id: initDutyObj?.backend?.key,
             user_name: initDutyObj?.backend?.label.replace('(后端值班负责人)', ''),
@@ -442,11 +468,12 @@ const DutyCatalog = () => {
   }, [dutyPerson]);
 
   useEffect(() => {
-    if (!isEmpty(initDuty)) {
-      if (!isEmpty(detail)) {
-        formatSaveDuty(detail);
-      } else setDutyPerson(initDuty);
+    if (isEmpty(initDuty)) return;
+    if (isEmpty(detail)) {
+      setDutyPerson(initDuty);
+      return;
     }
+    formatSaveDuty(detail);
   }, [detail, initDuty]);
 
   const otherEnv = envList
@@ -458,12 +485,41 @@ const DutyCatalog = () => {
     () =>
       ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(
         currentUser?.group || '',
-      ),
-    [currentUser?.group],
+      ) &&
+      (singleLock?.user_id == currentUser?.userid || isEmpty(singleLock)), // 是否锁定
+    [currentUser?.group, singleLock],
   );
+
+  useEffect(() => {
+    let timer: any;
+    if (singleLock?.user_id == currentUser?.userid) return;
+    timer = setInterval(() => {
+      getAllLock(id, true).then((res) => {
+        if (isEmpty(res)) updateLockStatus(id, 'post');
+      });
+    }, 5000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, [singleLock]);
+
+  useUnmount(() => {
+    onDeleteLock();
+  });
 
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>
+      {singleLock?.user_id != currentUser?.userid && !isEmpty(singleLock) ? (
+        <Alert
+          message={`【${singleLock?.user_name ?? ''}】正在编辑中，请稍等...`}
+          type={'warning'}
+          closable
+          showIcon
+          banner
+        />
+      ) : (
+        <div />
+      )}
       <div className={styles.dutyCatalog} id={'dutyForm'}>
         <div className={styles.header}>
           <h3>{title}</h3>
@@ -571,11 +627,11 @@ const DutyCatalog = () => {
                       format={'YYYY-MM-DD'}
                       allowClear={false}
                       disabled={!hasPermission}
+                      onBlur={() => onSave()}
                       onChange={async () => {
                         const title = (await updateTitle()) || '';
                         setTitle(title);
                       }}
-                      onBlur={() => onSave()}
                     />
                   </Form.Item>
                 </th>

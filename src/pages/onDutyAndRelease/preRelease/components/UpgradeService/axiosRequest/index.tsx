@@ -1,12 +1,12 @@
 import axios from 'axios';
-import {getDutyPersonPermission, getSystemPersonPermission} from '../../../authority/permission';
+import { getDutyPersonPermission, getSystemPersonPermission } from '../../../authority/permission';
+import { queryReleaseId } from '@/pages/onDutyAndRelease/preRelease/comControl/axiosRequest';
 
 const sys_accessToken = localStorage.getItem('accessId');
 axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
 
 const userLogins: any = localStorage.getItem('userLogins');
 const usersInfo = JSON.parse(userLogins);
-
 
 // 一键部署ID之升级接口数据获取
 const queryServiceByID = async (params: string) => {
@@ -32,36 +32,35 @@ const queryServiceByID = async (params: string) => {
 };
 
 // 点击查询
-const inquireService = async (sorce: any, currentListNo: string) => {
-  if (!sorce) {
+const inquireService = async (releasedIDArray: any, currentListNo: string) => {
+  if (!releasedIDArray || releasedIDArray.length === 0) {
     return {
       message: '一键部署ID不能为空！',
       datas: [],
     };
   }
+  //
+  // if (sorce.oraID.length > 0 && sorce.queryId.length <= 0) {
+  //   return {
+  //     message: 'ID已不存在运维平台！',
+  //     datas: [],
+  //   };
+  // }
 
-  if (sorce.oraID.length > 0 && sorce.queryId.length <= 0) {
-    return {
-      message: 'ID已不存在运维平台！',
-      datas: [],
-    };
-  }
-
-  if (!sorce.queryId) {
-    return {
-      message: '一键部署ID不能为空！',
-      datas: [],
-    };
-  }
-
+  const allIdsArray = (await queryReleaseId(currentListNo)).data;
   const paramsData: any = [];
-  if (sorce.queryId.length > 0) {
-    sorce.queryId.forEach((ele: any) => {
-      const newEle = ele;
-      newEle.ready_release_num = currentListNo;
-      paramsData.push(newEle);
+  releasedIDArray.forEach((ele: any) => {
+    allIdsArray.forEach((id_str: any) => {
+      if (ele === id_str.id.toString()) {
+        paramsData.push({
+          deployment_id: ele,
+          automation_check: id_str.automation_test,
+          service: id_str.service,
+          ready_release_num: currentListNo,
+        });
+      }
     });
-  }
+  });
 
   // 验证权限
   const authData = {
@@ -227,10 +226,12 @@ const addPulishApi = async (formData: any, currentListNo: string, type: string) 
     api_service: formData.interService,
     api_url: formData.URL,
     api_method: formData.method,
-    hot_update: "2",
+    hot_update: '2',
     related_tenant: formData.renter,
     remarks: formData.remark,
     ready_release_num: currentListNo,
+    data: formData.data,
+    header: formData.header,
   };
 
   if (type === '修改') {
@@ -254,28 +255,6 @@ const addPulishApi = async (formData: any, currentListNo: string, type: string) 
   return systemPermission.errorMessage;
 };
 
-// 一键部署Id
-const queryReleaseId = async () => {
-  const result: any = {
-    message: '',
-    data: [],
-  };
-  await axios
-    .get('/api/verify/release/deployment_id', {})
-    .then(function (res) {
-      if (res.data.code === 200) {
-        result.data = res.data.data;
-      } else {
-        result.message = `错误：${res.data.msg}`;
-      }
-    })
-    .catch(function (error) {
-      result.message = `异常信息:${error.toString()}`;
-    });
-
-  return result;
-};
-
 // 删除接口
 const deleteReleasedId = async (ready_release_num: string, deployment_id: string) => {
   let errorMessage = '';
@@ -288,7 +267,7 @@ const deleteReleasedId = async (ready_release_num: string, deployment_id: string
   };
 
   await axios
-    .delete('/api/verify/release/upgrade_service_deployment', {data: datas})
+    .delete('/api/verify/release/upgrade_service_deployment', { data: datas })
     .then(function (res) {
       if (res.data.code !== 200) {
         errorMessage = `错误：${res.data.msg}`;
@@ -321,4 +300,4 @@ const deleteReleasedID = async (deployment_id: string, ready_release_num: string
   return systemPermission.errorMessage;
 };
 
-export {inquireService, upgradePulishItem, addPulishApi, queryReleaseId, deleteReleasedID};
+export { inquireService, upgradePulishItem, addPulishApi, deleteReleasedID };

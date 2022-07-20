@@ -1,10 +1,12 @@
 import {history} from "@@/core/history";
 import {zentaoTypeRenderToNumber} from "@/publicMethods/cellRenderer";
 
+// 获取界面跳转过来的参数
 const getProjectInfo = () => {
   let prjId: string = '';
   let prjNames: string = '';
   let prjType: string = '';
+  let showTestConfirmFlag = false;
   const location = history.location.query;
   if (JSON.stringify(location) !== '{}') {
     if (location !== undefined && location.projectid !== null) {
@@ -14,9 +16,12 @@ const getProjectInfo = () => {
     if (location !== undefined && location.type !== undefined && location.type !== null) {
       prjType = location.type.toString();
     }
+    if (location !== undefined && location.showTestConfirm !== undefined && location.showTestConfirm !== null) {
+      showTestConfirmFlag = location.showTestConfirm === "true";
+    }
   }
 
-  return {prjId, prjNames, prjType};
+  return {prjId, prjNames, prjType, showTestConfirmFlag};
 }
 
 
@@ -52,9 +57,9 @@ const alayManagerData = (oradata: any, curRow: any, prjId: any) => {
     datas["testCheck"] = oradata.managertesterVerifi === "" ? "" : `-${oradata.managertesterVerifi}`; //  为手动修改的数据
   }
 
-  // 如果修改了用户是否有感，就要改为负值。
-  if (curRow[0].consumerAffected !== oradata.managerUserIsPerceive) {
-    datas["consumerAffected"] = oradata.managerUserIsPerceive === "" ? "" : `-${oradata.managerUserIsPerceive}`; //  为手动修改的数据
+  // 如果修改了是否清缓存，就要改为负值。
+  if (curRow[0].clearCache !== oradata.managerClearCache) {
+    datas["clearCache"] = oradata.managerClearCache === "" ? "" : `-${oradata.managerClearCache}`; //  为手动修改的数据
   }
 
   return datas;

@@ -77,6 +77,7 @@ const ProjectTemplate: React.FC<any> = () => {
 
   // 项目执行修改
   const excutionChanged = async (params: any) => {
+
     //   获取项目负责人
     const excuteInfo = params.split("&");
     const prjManager = (await loadProjectManager(Number(excuteInfo[0]))).pm;
@@ -94,17 +95,30 @@ const ProjectTemplate: React.FC<any> = () => {
       let taskName = ele.task_name;
       // 如果是父任务，则不需要判断 【】，子任务则需要
       if (ele.add_type === "add") {
-        taskName = `${excuteInfo[1]}-${taskName}`;
+        // 如果之前有拼接项目名，则需要去掉之前的项目名
+        let detail = taskName;
+        if (taskName.includes("-")) { // 如果名称包含-，则需要清除掉这个-
+          detail = taskName.split("-")[1].toString();
+        }
+
+        taskName = `${excuteInfo[1]}-${detail}`;
       } else {
         // 如果没有包含 【】，则，不拼接项目名
         // eslint-disable-next-line no-lonely-if
         if (taskName.indexOf("【") > -1 && taskName.indexOf("】") > -1) {
+
           const nameHead = taskName.substring(taskName.indexOf("【") + 1, taskName.indexOf("】"));
           if (nameHead.includes("-")) { // 如果名称包含-，则需要清除掉这个-
             const head = nameHead.split("-")[0];
             taskName = `${taskName.replace(`${head}-`, "")}`;
           }
-          taskName = `${taskName.slice(0, 1)}${excuteInfo[1]}-${taskName.slice(1)}`;
+
+          let newName = taskName.slice(1);
+          if (newName.includes("-")) { // 如果名称包含-，则需要清除掉这个-
+            newName = newName.split("-")[1].toString();
+          }
+
+          taskName = `${taskName.slice(0, 1)}${excuteInfo[1]}-${newName}`;
         }
       }
 

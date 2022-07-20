@@ -7,56 +7,75 @@ const gridHeight = (datas: any) => {
 }
 
 // 灰度积压列表
-const grayscaleBacklogList = () => {
-  const column: any = [{
-    headerName: '序号',
-    maxWidth: 80,
-    cellRenderer: (params: any) => {
-      return Number(params.node.id) + 1;
-    },
-  }, {
+const grayscaleBacklogList = (type: string) => {
+  let grayNum = {
     headerName: '灰度发布批次号',
     field: 'ready_release_num',
     minWidth: 135,
     maxWidth: 150,
-    // sort: "asc"
-  }, {
+
+  };
+  let grayNumName = {
     headerName: '灰度发布名称',
     field: 'ready_release_name',
     minWidth: 145
-  }, {
-    headerName: '工单编号',
-    field: 'order',
-    minWidth: 100,
-  }, {
-    headerName: '项目名称',
-    field: 'project_name'
-  }, {
-    headerName: '发布环境',
-    field: 'online_environment'
-  }, {
-    headerName: '发布镜像ID',
-    field: 'deployment_id',
-  }, {
-    headerName: '发布分支',
-    field: 'branch'
-  }, {
-    headerName: '灰度发布时间',
-    field: 'plan_release_time',
-    maxWidth: 185
-  }, {
-    headerName: '操作',
-    cellRenderer: (params: any) => {
-      const readyReleaseNum = params.data?.ready_release_num;
-      return `
-        <div style="margin-top: -5px">
-             <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='releaseProcessDetail(${JSON.stringify(readyReleaseNum)})'>
-                <img src="../logs.png" width="20" height="20" alt="灰度发布过程详情" title="灰度发布过程详情" />
-            </Button>
-        </div>
-            `;
-    }
-  }];
+  };
+  if (type === "one") {
+    grayNum.field = "release_gray_num";
+    grayNumName.field = "release_name";
+  }
+
+  const column: any = [
+    {
+      headerName: '选择',
+      pinned: 'left',
+      filter: false,
+      checkboxSelection: true,
+      headerCheckboxSelection: true,
+      maxWidth: 40,
+    }, {
+      headerName: '序号',
+      minWidth: 70,
+      maxWidth: 70,
+      cellRenderer: (params: any) => {
+        return Number(params.node.id) + 1;
+      },
+    }, {
+      ...grayNum
+    }, {
+      ...grayNumName
+    }, {
+      headerName: '工单编号',
+      field: 'order',
+      minWidth: 90,
+    }, {
+      headerName: '项目名称',
+      field: 'project_name',
+      minWidth: 100,
+    }, {
+      headerName: '发布环境',
+      field: 'online_environment',
+      minWidth: 100,
+    },
+    // {
+    //   headerName: '发布镜像ID',
+    //   field: 'deployment_id',
+    // },
+    {
+      headerName: '发布分支',
+      field: 'branch',
+      minWidth: 100,
+    }, {
+      headerName: '灰度发布时间',
+      field: 'plan_release_time',
+      minWidth: 100,
+      maxWidth: 185
+    }, {
+      headerName: '操作',
+      cellRenderer: "grayReleaseDetails",
+      minWidth: 120,
+      maxWidth: 120
+    }];
 
   return column;
 
@@ -66,52 +85,65 @@ const grayscaleBacklogList = () => {
 const releasedList = () => {
   const columns: any = [{
     headerName: '序号',
+    minWidth: 60,
     maxWidth: 80,
     cellRenderer: (params: any) => {
       return Number(params.node.id) + 1;
     },
   }, {
     headerName: '正式发布批次号',
-    field: 'ready_release_num',
-    minWidth: 135,
+    field: 'online_release_num',
+    minWidth: 130,
     maxWidth: 150,
-    // sort: "asc"
   }, {
     headerName: '发布名称',
-    field: 'ready_release_name',
+    field: 'release_name',
     minWidth: 145
+  }, {
+    headerName: '灰度发布编号',
+    field: 'ready_release_num',
+    minWidth: 145,
+    cellRenderer: (params: any) => {
+      const {value} = params;
+      if (!value || value.length === 0) {
+        return "";
+      }
+      const retunValue: any = [];
+      value.forEach((ele: any) => {
+        retunValue.push(ele.ready_release_num);
+      });
+      return retunValue.join(",");
+    }
   }, {
     headerName: '工单编号',
     field: 'order',
-    minWidth: 100,
+    minWidth: 90,
   }, {
     headerName: '项目名称',
-    field: 'project_name'
+    field: 'project_name',
+    minWidth: 90,
   }, {
     headerName: '发布环境',
-    field: 'online_environment'
-  }, {
-    headerName: '发布镜像ID',
-    field: 'deployment_id'
-  }, {
-    headerName: '发布分支',
-    field: 'branch'
-  }, {
-    headerName: '正式发布时间',
-    field: 'plan_release_time'
-  }, {
-    headerName: '操作',
-    cellRenderer: (params: any) => {
-      const readyReleaseNum = params.data?.ready_release_num;
-      return `
-        <div style="margin-top: -5px">
-             <Button  style="border: none; background-color: transparent; font-size: small; color: #46A0FC" onclick='releaseProcessDetail(${JSON.stringify(readyReleaseNum)})'>
-                <img src="../logs.png" width="20" height="20" alt="正式发布过程详情" title="正式发布过程详情" />
-            </Button>
-        </div>
-            `;
-    }
-  }];
+    field: 'online_environment',
+    minWidth: 90,
+  },
+    //   {
+    //   headerName: '发布镜像ID',
+    //   field: 'deployment_id'
+    // },
+    {
+      headerName: '发布分支',
+      field: 'branch',
+      minWidth: 90,
+    }, {
+      headerName: '正式发布时间',
+      field: 'plan_release_time'
+    }, {
+      headerName: '操作',
+      cellRenderer: "officialReleaseDetails",
+      minWidth: 120,
+      maxWidth: 140
+    }];
   return columns;
 };
 

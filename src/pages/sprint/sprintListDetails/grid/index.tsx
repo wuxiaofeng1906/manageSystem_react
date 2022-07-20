@@ -3,8 +3,8 @@ import {
   testConfirmValueGetter, catagoryValueGetter, linkToZentaoPage, servertyValueGetter,
   statusValueGetter, statusRenderer, assignedToValueGetter, solvedByValueGetter, relatedNumberRender,
   timestampRenderer, isOrNotValueGetter, testConfirmTooltipValueGetter, testConfirmedRenderer,
-  proposedTestValueGetter, testVertifyFilter,consumerAffectedRenderer,
-  vertifyResultValueGetter, sourceValueGetter, timeRenderer
+  proposedTestValueGetter, testVertifyFilter, clearCacheRenderer,
+  vertifyResultValueGetter, sourceValueGetter, timeRenderer, isDelayTextDecorateRender
 } from "./columnRenderer";
 
 import {history} from "@@/core/history";
@@ -24,8 +24,8 @@ const getColums = (prjNames: any) => {
     },
     {
       headerName: '序号',
-      maxWidth: 80,
-      filter: false,
+      minWidth: 70,
+      suppressMenu: true,
       pinned: 'left',
       cellRenderer: (params: any) => {
         return Number(params.node.id) + 1;
@@ -37,7 +37,7 @@ const getColums = (prjNames: any) => {
       pinned: 'left',
       valueGetter: stageValueGetter,
       cellRenderer: stageRenderer,
-      minWidth: 120,
+      minWidth: 155,
     },
     {
       headerName: '测试',
@@ -56,10 +56,11 @@ const getColums = (prjNames: any) => {
       cellRenderer: textDecorateRender,
     },
     {
-      headerName: '是否需要测试验证',
+      headerName: '测试验证?',
       field: 'testCheck',
       pinned: 'left',
-      headerTooltip: "自动生成’是‘为黑色；自动生成‘否’为红色；手动修改‘是’为紫色；手动修改‘否’为黄色",
+      minWidth: 115,
+      headerTooltip: "是否需要测试验证：自动生成’是‘为黑色；自动生成‘否’为红色；手动修改‘是’为紫色；手动修改‘否’为黄色",
       tooltipValueGetter: testConfirmTooltipValueGetter,
       cellRenderer: testConfirmedRenderer,
       filterParams: {cellRenderer: testVertifyFilter}
@@ -68,7 +69,7 @@ const getColums = (prjNames: any) => {
       headerName: '类型',
       field: 'category',
       pinned: 'left',
-      minWidth: 95,
+      minWidth: 90,
       valueGetter: catagoryValueGetter,
       cellRenderer: textDecorateRender,
     },
@@ -76,8 +77,8 @@ const getColums = (prjNames: any) => {
       headerName: '编号',
       field: 'ztNo',
       pinned: 'left',
-      minWidth: 90,
-      filter: false,
+      minWidth: 80,
+      suppressMenu: true,
       cellRenderer: linkToZentaoPage,
     },
     {
@@ -92,14 +93,14 @@ const getColums = (prjNames: any) => {
     {
       headerName: '所属计划',
       field: 'planName',
-      minWidth: 100,
+      minWidth: 150,
     },
     {
       headerName: '严重等级',
       field: 'severity',
       valueGetter: servertyValueGetter,
       cellRenderer: textDecorateRender,
-      minWidth: 90,
+      minWidth: 110,
     },
     // {
     //   headerName: '优先级',
@@ -115,20 +116,23 @@ const getColums = (prjNames: any) => {
     {
       headerName: '是否可热更',
       field: 'hotUpdate',
+      minWidth: 120,
       valueGetter: (params: any) => {
         return isOrNotValueGetter(params.data?.hotUpdate)
       },
       cellRenderer: textDecorateRender,
     },
     {
-      headerName: '用户是否有感',
-      field: 'consumerAffected',
-      cellRenderer: consumerAffectedRenderer,
+      headerName: '是否清缓存',
+      field: 'clearCache',
+      minWidth: 120,
+      cellRenderer: clearCacheRenderer,
       filterParams: {cellRenderer: testVertifyFilter}
     },
     {
       headerName: '是否有数据升级',
       field: 'dataUpdate',
+      minWidth: 150,
       valueGetter: (params: any) => {
         return isOrNotValueGetter(params.data?.dataUpdate)
       },
@@ -138,6 +142,7 @@ const getColums = (prjNames: any) => {
     {
       headerName: '是否有接口升级',
       field: 'interUpdate',
+      minWidth: 150,
       valueGetter: (params: any) => {
         return isOrNotValueGetter(params.data?.interUpdate)
       },
@@ -153,14 +158,14 @@ const getColums = (prjNames: any) => {
     {
       headerName: '指派给',
       field: 'assignedTo',
-      minWidth: 80,
+      minWidth: 100,
       valueGetter: assignedToValueGetter,
       cellRenderer: textDecorateRender
     },
     {
       headerName: '解决/完成人',
       field: 'finishedBy',
-      minWidth: 80,
+      minWidth: 130,
       suppressMenu: false,
       valueGetter: solvedByValueGetter,
       cellRenderer: textDecorateRender,
@@ -168,7 +173,8 @@ const getColums = (prjNames: any) => {
     {
       headerName: '相关需求',
       field: 'relatedStories',
-      minWidth: 80,
+      minWidth: 90,
+      suppressMenu: true,
       cellRenderer: relatedNumberRender,
       onCellClicked: (params: any) => {
         // BUG = 1,
@@ -182,7 +188,8 @@ const getColums = (prjNames: any) => {
     {
       headerName: '相关任务',
       field: 'relatedTasks',
-      minWidth: 80,
+      minWidth: 90,
+      suppressMenu: true,
       cellRenderer: relatedNumberRender,
       onCellClicked: (params: any) => {
         if (Number(params.value) < 500 && Number(params.value) > 0) {
@@ -193,7 +200,8 @@ const getColums = (prjNames: any) => {
     {
       headerName: '相关bug',
       field: 'relatedBugs',
-      minWidth: 80,
+      minWidth: 90,
+      suppressMenu: true,
       cellRenderer: relatedNumberRender,
       onCellClicked: (params: any) => {
         if (Number(params.value) > 0) {
@@ -204,23 +212,28 @@ const getColums = (prjNames: any) => {
     {
       headerName: '创建时间',
       field: 'openedAt',
-      minWidth: 150,
+      minWidth: 90,
       cellRenderer: timeRenderer,
+      suppressMenu: true,
     },
     {
       headerName: '解决时间',
       field: 'resolvedAt',
-      minWidth: 150,
+      minWidth: 90,
       cellRenderer: timeRenderer,
+      suppressMenu: true,
     },
     {
       headerName: '截止日期',
       field: 'deadline',
       cellRenderer: timestampRenderer,
+      minWidth: 90,
+      suppressMenu: true,
     },
     {
       headerName: '是否涉及页面调整',
       field: 'pageAdjust',
+      minWidth: 160,
       valueGetter: (params: any) => {
         return isOrNotValueGetter(params.data?.pageAdjust)
       },
@@ -229,6 +242,7 @@ const getColums = (prjNames: any) => {
     {
       headerName: '是否有预置数据修改',
       field: 'presetData',
+      minWidth: 170,
       valueGetter: (params: any) => {
         return isOrNotValueGetter(params.data?.presetData)
       },
@@ -237,20 +251,31 @@ const getColums = (prjNames: any) => {
     {
       headerName: '已提测',
       field: 'proposedTest',
+      minWidth: 100,
       valueGetter: proposedTestValueGetter,
       cellRenderer: textDecorateRender,
     },
     {
       headerName: '发布环境',
       field: 'publishEnv',
-      minWidth: 80,
+      minWidth: 110,
       cellRenderer: textDecorateRender,
       tooltipField: "publishEnv"
     },
     {
+      headerName: '是否延期',
+      field: 'isDelay',
+      minWidth: 110,
+      valueGetter: (params: any) => {
+        return isOrNotValueGetter(params.data?.isDelay)
+      },
+
+      cellRenderer: isDelayTextDecorateRender,
+    },
+    {
       headerName: '关闭人',
       field: 'closedBy',
-      minWidth: 80,
+      minWidth: 100,
       cellRenderer: textDecorateRender,
     },
     {
@@ -264,6 +289,8 @@ const getColums = (prjNames: any) => {
       headerName: '验证范围建议',
       field: 'scopeLimit',
       cellRenderer: textDecorateRender,
+      suppressMenu: true,
+      minWidth: 110,
     },
     {
       headerName: 'UED',
@@ -273,6 +300,7 @@ const getColums = (prjNames: any) => {
     {
       headerName: 'UED测试环境验证',
       field: 'uedEnvCheck',
+      minWidth: 160,
       valueGetter: (params: any) => {
         return vertifyResultValueGetter(params.data?.uedEnvCheck);
       },
@@ -281,6 +309,7 @@ const getColums = (prjNames: any) => {
     {
       headerName: 'UED线上验证',
       field: 'uedOnlineCheck',
+      minWidth: 130,
       valueGetter: (params: any) => {
         return vertifyResultValueGetter(params.data?.uedOnlineCheck);
       },

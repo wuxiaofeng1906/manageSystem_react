@@ -1,6 +1,21 @@
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
+// import { isEmpty } from 'lodash';
 
 const dutyColumn: (ColDef | ColGroupDef)[] = [
+  // {
+  //   field: 'editer',
+  //   headerName: 'Editer',
+  //   maxWidth: 110,
+  //   minWidth: 80,
+  //   // cellClassRules: { editer: (p) => !isEmpty(p.value) },
+  //   cellRenderer: (p) => `${isEmpty(p.value) ? '' : p.value + '正在编辑'}`,
+  // },
+  {
+    checkboxSelection: true,
+    headerCheckboxSelection: false,
+    maxWidth: 35,
+    minWidth: 35,
+  },
   {
     headerName: 'NO.',
     minWidth: 70,
@@ -10,8 +25,7 @@ const dutyColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '值班名单',
     field: 'duty_name',
-    cellRenderer: (data) =>
-      `<a style="color:#1890ff;text-decoration: underline" href='/onDutyAndRelease/dutyCatalog/${data.data.person_duty_num}'>${data.value}</a>`,
+    cellRenderer: 'dutyCatalog',
     minWidth: 220,
   },
   {

@@ -24,7 +24,7 @@ const Tab: React.FC<any> = () => {
   /* region tab 自身事件 */
   const [showTabs, setShowTabs] = useState({shown: false, targetKey: ''});
 
-  // 无数据
+  // 无数据F
   const showNoneDataPage = async () => {
     modifyProcessStatus({
       // 进度条相关数据和颜色
@@ -34,6 +34,7 @@ const Tab: React.FC<any> = () => {
       onliineCheck: 'Gainsboro',
       releaseResult: '9',
       processPercent: 0,
+      autoCheckResult: <label></label>
     });
 
     // 预发布项目
@@ -46,22 +47,26 @@ const Tab: React.FC<any> = () => {
       edit_time: '',
       pro_id: '',
       ignoreZentaoList: '2',
+      checkListStatus: '',
+      // relateDutyName: ''
     });
 
     //  发布项
     setRelesaeItem({gridHight: "100px", gridData: []});
     // 一键部署ID展示
-    modifyReleasedID([], []);
+    modifyReleasedID([]);
     //  发布接口
     setUpgradeApi({gridHight: "100px", gridData: []});
     //  发布服务确认
     setUpgradeConfirm({gridHight: "100px", gridData: []});
     // 数据修复
+    // @ts-ignore
     setDataReview({gridHight: "100px", gridData: [{}]});
     // 数据修复确认
     setDataReviewConfirm({gridHight: "100px", gridData: []});
 
     // 上线分支
+    // @ts-ignore
     setOnlineBranch({gridHight: "100px", gridData: [{}]});
 
     //   对应工单
@@ -69,20 +74,24 @@ const Tab: React.FC<any> = () => {
   };
 
   // 显示表格数据
-  const showAllDatas = async (initData: any) => {
+  const showAllDatas = async (initData: any, activeKeys: string = "") => {
 
     // Tab数据
     const {tabPageInfo} = initData;
+    let currentKey = activeKeys;
+    if (tabPageInfo?.activeKey) {
+      currentKey = tabPageInfo?.activeKey;  // 不能直接取原始数据中的发布ID，有时候初始值会为空。也就没有发布ID
+    }
+
     // 进度条数据
-    const processData: any = await getCheckProcess(tabPageInfo?.activeKey);
+    const processData: any = await getCheckProcess(currentKey);
     if (processData) {
-      modifyProcessStatus(showProgressData(processData.data));
+      modifyProcessStatus(await showProgressData(processData.data, currentKey));
     }
 
     // 当前界面被锁住的ID
-    const lockedData = await getAllLockedData(tabPageInfo?.activeKey);
+    const lockedData = await getAllLockedData(currentKey);
     modifyAllLockedArray(lockedData.data);
-
     // 预发布项目
     const preReleaseProject = initData?.preProject;
     modifyPreReleaseData(preReleaseProject);
@@ -93,7 +102,7 @@ const Tab: React.FC<any> = () => {
 
     // 一键部署ID展示
     const ids = await showReleasedId(initData?.deployment_id);
-    modifyReleasedID(ids.showIdArray, ids.queryIdArray);
+    modifyReleasedID(ids);
     //  发布接口
     const releaseApi = initData?.upService_interface;
     setUpgradeApi({gridHight: getGridRowsHeight(releaseApi), gridData: releaseApi});
@@ -134,7 +143,7 @@ const Tab: React.FC<any> = () => {
       showNoneDataPage();
     } else {
       setTabsData(activeKeys, tabsData.panes);
-      showAllDatas(newTabData);
+      showAllDatas(newTabData, activeKeys);
     }
   };
 
@@ -309,7 +318,8 @@ const Tab: React.FC<any> = () => {
       });
       setTabNameModal(false);
       //   重置tab名
-      const {tabPageInfo} = await alalysisInitData('tabPageInfo', '');
+      const tabInfo: any = await alalysisInitData('tabPageInfo', '');
+      const {tabPageInfo} = tabInfo;
       if (tabPageInfo) {
         setTabsData(tabsData.activeKey, tabPageInfo.panes);
       }

@@ -136,6 +136,9 @@ const getOnlineDev = (idStr: string) => {
   devArray.forEach((ele: string) => {
     let name = '';
     switch (ele) {
+      case '0':
+        name = '集群0';
+        break;
       case '1':
         name = 'global';
         break;
@@ -162,6 +165,9 @@ const getOnlineDev = (idStr: string) => {
         break;
       case '9':
         name = '';
+        break;
+      case '10':
+        name = '集群8';
         break;
 
       default:

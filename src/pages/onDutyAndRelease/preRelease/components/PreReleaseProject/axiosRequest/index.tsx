@@ -10,6 +10,7 @@ const usersInfo = JSON.parse(userLogins);
 
 // 保存预发布项目
 const savePrePulishProjects = async (params: any, listNo: string) => {
+
   const prjIdArray = params.projectsName;
   let projectId = '';
   prjIdArray.forEach((project: string) => {
@@ -25,7 +26,8 @@ const savePrePulishProjects = async (params: any, listNo: string) => {
     release_way: params.pulishMethod,
     plan_release_time: dayjs(params.pulishTime).format('YYYY-MM-DD HH:mm:ss'),
     ready_release_num: listNo,
-    ignore_check: params.ignoreZentaoList
+    ignore_check: params.ignoreZentaoList,
+    person_duty_num: params.relateDutyName === '免' ? "" : params.relateDutyName
   };
 
   if (params.proid) {
@@ -62,6 +64,7 @@ const savePrePulishProjects = async (params: any, listNo: string) => {
 
 // 保存预发布项目
 const savePreProjects = async (source: any, releaseNum: string) => {
+
   let result = {
     datas: [],
     errorMessage: '',
@@ -84,6 +87,12 @@ const savePreProjects = async (source: any, releaseNum: string) => {
 
   if (!source.pulishTime) {
     result.errorMessage = '发布时间不能为空！';
+    return result;
+  }
+
+
+  if (!source.relateDutyName) {
+    result.errorMessage = '关联值班名单不能为空！';
     return result;
   }
 

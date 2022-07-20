@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Select, DatePicker, Button, Form, message, Spin, Modal } from 'antd';
+import { Select, DatePicker, Button, Form, message, Spin, Modal, Alert } from 'antd';
 import styles from './index.less';
 import { useEffect, useState } from 'react';
 import { useParams, useModel } from 'umi';
@@ -10,8 +10,8 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { SelectProps } from 'antd/lib/select';
 import * as dayjs from 'dayjs';
-import LockServices from '@/services/lock';
 import { useUnmount } from 'ahooks';
+import useLock from '@/hooks/lock';
 const opts = {
   showSearch: true,
   mode: 'multiple',
@@ -82,6 +82,7 @@ const FilterSelector = ({
 
 const DutyCatalog = () => {
   const { id } = useParams() as { id: string };
+  const { getAllLock, updateLockStatus, singleLock } = useLock();
   const [allPerson, setAllPerson] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [envList, setEnvList] = useState<any[]>([]);
@@ -90,7 +91,6 @@ const DutyCatalog = () => {
   const [visible, setVisible] = useState(true);
   const [recentDuty, setRecentDuty] = useState<Record<string, any>>();
   const [loading, setLoading] = useState(false);
-  const [editer, setEditer] = useState('');
   const [detail, setDetail] = useState<Record<string, any>>();
   const [dutyPerson, setDutyPerson] = useState<Record<string, any>[]>([]);
   const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
@@ -353,22 +353,16 @@ const DutyCatalog = () => {
 
   useEffect(() => {
     if (!id) return;
-    LockServices.lockStatus(
-      { user_id: currentUser?.userid, user_name: currentUser?.name, param: id },
-      'get',
-    ).then((res) => {
-      setEditer(res.user_name);
-    });
+    getAllLock(id, true);
     DutyListServices.getProject().then((res) => setProjects(res));
     getDetail();
     getSource();
   }, [id]);
 
   useUnmount(() => {
-    LockServices.lockStatus(
-      { user_id: currentUser?.userid, user_name: currentUser?.name, param: id },
-      'delete',
-    );
+    if (singleLock?.user_id == currentUser?.userid) {
+      updateLockStatus(id, 'delete');
+    }
   });
 
   // 保存后的第一值班人
@@ -407,12 +401,37 @@ const DutyCatalog = () => {
     () =>
       ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(
         currentUser?.group || '',
-      ) && isEmpty(editer),
-    [currentUser?.group, editer],
+      ) &&
+      (singleLock?.user_id == currentUser?.userid || isEmpty(singleLock)), // 是否锁定
+    [currentUser?.group, singleLock],
   );
+
+  useEffect(() => {
+    let timer: any;
+    if (singleLock?.user_id == currentUser?.userid) return;
+    else if (isEmpty(singleLock)) updateLockStatus(id, 'post');
+    else
+      timer = setInterval(() => {
+        getAllLock(id, true);
+      }, 5000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, [singleLock]);
 
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>
+      {singleLock?.user_id != currentUser?.userid && !isEmpty(singleLock) ? (
+        <Alert
+          message={`【${singleLock?.user_name ?? ''}】正在编辑中，请稍等...`}
+          type={'warning'}
+          closable
+          showIcon
+          banner
+        />
+      ) : (
+        <div />
+      )}
       <div className={styles.dutyCatalog} id={'dutyForm'}>
         <div className={styles.header}>
           <h3>{title}</h3>

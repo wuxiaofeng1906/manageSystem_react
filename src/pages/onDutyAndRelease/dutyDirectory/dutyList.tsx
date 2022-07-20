@@ -9,13 +9,13 @@ import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import styles from './index.less';
 import DutyListServices from '@/services/dutyList';
 import moment from 'moment';
-import { isEmpty, debounce } from 'lodash';
-import LockServices from '@/services/lock';
+import { isEmpty } from 'lodash';
+import useLock from '@/hooks/lock';
 
 const DutyList = () => {
   const [list, setList] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
-  const [current, setCurrent] = useState<any>(null);
+  const { updateLockStatus, getAllLock, lockList } = useLock();
   const [form] = Form.useForm();
   const gridRef = useRef<GridApi>();
   const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
@@ -40,6 +40,7 @@ const DutyList = () => {
       res?.map((it: any) => ({ key: it.project_id, value: it.project_id, label: it.project_name })),
     );
   };
+
   const onCopy = async () => {
     const selected: any = gridRef.current?.getSelectedRows();
     if (isEmpty(selected)) return message.warning('请先选择需复制的行数据！');
@@ -55,41 +56,40 @@ const DutyList = () => {
     });
     await getList();
   };
-  const mouse = async () => {
-    const num = current?.data.person_duty_num;
-    if (!num) return;
-
-    const rowNode = gridRef.current?.getRowNode(current?.rowIndex);
-    const editer = await getLockStatus(num);
-    if (editer && num) {
-      // rowNode
-      rowNode?.setData({ ...rowNode.data, editer: editer });
-    } else {
-      rowNode?.setData(rowNode.data);
-    }
-  };
 
   useEffect(() => {
-    mouse();
-  }, [current?.data.person_duty_num]);
+    let timer = setInterval(() => {
+      getAllLock('duty');
+    }, 5000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
 
   const getDutyNumber = async () => {
     if (!hasPermission) return;
     const res = await DutyListServices.getDutyNum();
     return res.ready_release_num;
   };
-  const getLockStatus = async (lockId: string) => {
-    const data = await LockServices.lockStatus(
-      { user_id: currentUser?.userid, user_name: currentUser?.name, param: lockId },
-      'delete',
-    );
-    return data?.user_name;
+
+  const onAdd = async (data?: any) => {
+    let release_num = '';
+    if (!isEmpty(data)) {
+      release_num = data.person_duty_num;
+    } else release_num = await getDutyNumber();
+    // 加锁
+    if (isEmpty(data) || isEmpty(data?.editer)) {
+      await updateLockStatus(release_num, 'post');
+    }
+    history.push(`/onDutyAndRelease/dutyCatalog/${release_num}`);
   };
+  (window as any)._updateDutyCatalog = onAdd;
 
   useEffect(() => {
     form.setFieldsValue({
       time: [moment().startOf('month'), moment().endOf('month')],
     });
+    getAllLock('duty');
     getProjects();
     getList();
   }, []);
@@ -102,6 +102,12 @@ const DutyList = () => {
       ),
     [currentUser?.group],
   );
+  const getRowStyle = (params: any) => {
+    const lockNode = lockList.map((it) => it.param.replace('duty_', ''));
+    return lockNode.includes(params.data.person_duty_num)
+      ? { border: '1px solid red', background: '#FFF6F6' }
+      : null;
+  };
 
   return (
     <PageContainer>
@@ -118,10 +124,7 @@ const DutyList = () => {
                       style={hasPermission ? {} : { filter: 'grayscale(1)', cursor: 'not-allowed' }}
                     />
                   }
-                  onClick={async () => {
-                    const release_num = await getDutyNumber();
-                    history.push(`/onDutyAndRelease/dutyCatalog/${release_num}`);
-                  }}
+                  onClick={() => onAdd()}
                 >
                   新增
                 </Button>
@@ -174,13 +177,7 @@ const DutyList = () => {
               suppressMenu: true,
               cellStyle: { 'line-height': '30px' },
             }}
-            onCellMouseOver={debounce((e) => {
-              setCurrent(e.node);
-            }, 500)}
-            onCellMouseOut={() => {
-              setCurrent(null);
-              gridRef.current?.setRowData(list);
-            }}
+            getRowStyle={getRowStyle as any}
             rowHeight={30}
             headerHeight={35}
             suppressRowTransform={true}

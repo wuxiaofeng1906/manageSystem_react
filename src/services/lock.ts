@@ -1,9 +1,14 @@
 import request from './request';
 const baseUrl = '/api/verify';
-// 加锁，删锁
 const LockServices = {
-  async lockStatus(data: any, method: 'post' | 'delete' | 'get') {
+  // 加锁，删锁
+  async updateLockStatus(data: any, method: 'post' | 'delete') {
     return request(`${baseUrl}/release/lock`, { data, method: method });
   },
+  // 获取锁定数据
+  async getLockAll(page: string) {
+    return request(`${baseUrl}/duty/lock`, { params: { keys: page }, method: 'get' });
+  },
 };
+
 export default LockServices;

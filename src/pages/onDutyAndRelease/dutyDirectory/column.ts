@@ -1,15 +1,15 @@
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
-import { isEmpty } from 'lodash';
+// import { isEmpty } from 'lodash';
 
 const dutyColumn: (ColDef | ColGroupDef)[] = [
-  {
-    field: 'editer',
-    headerName: '',
-    maxWidth: 110,
-    minWidth: 80,
-    cellClassRules: { editer: (p) => !isEmpty(p.value) },
-    cellRenderer: (p) => `${isEmpty(p.value) ? '' : p.value + '正在编辑'}`,
-  },
+  // {
+  //   field: 'editer',
+  //   headerName: 'Editer',
+  //   maxWidth: 110,
+  //   minWidth: 80,
+  //   // cellClassRules: { editer: (p) => !isEmpty(p.value) },
+  //   cellRenderer: (p) => `${isEmpty(p.value) ? '' : p.value + '正在编辑'}`,
+  // },
   {
     checkboxSelection: true,
     headerCheckboxSelection: false,
@@ -25,8 +25,11 @@ const dutyColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '值班名单',
     field: 'duty_name',
+    // /onDutyAndRelease/dutyCatalog/${param.data.person_duty_num}
     cellRenderer: (param) =>
-      ` <a style="color:#1890ff;text-decoration: underline" href='/onDutyAndRelease/dutyCatalog/${param.data.person_duty_num}'>${param.value}</a>`,
+      ` <div style="color:#1890ff;text-decoration: underline" onclick='_updateDutyCatalog(${JSON.stringify(
+        param.data,
+      )})'>${param.value}</div>`,
     minWidth: 220,
   },
   {

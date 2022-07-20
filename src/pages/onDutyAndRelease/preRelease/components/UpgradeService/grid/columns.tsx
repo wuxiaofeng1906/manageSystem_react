@@ -1,10 +1,15 @@
 import {
-  getOnlineDev, getReleaseItem, getIfOrNot, getDatabseAndApiUpgrade, getUpgradeApi, getApiMethod
+  getOnlineDev,
+  getReleaseItem,
+  getIfOrNot,
+  getDatabseAndApiUpgrade,
+  getUpgradeApi,
+  getApiMethod,
 } from '../../../comControl/converse';
 // 渲染表格行的颜色(正在修改的行)
 const releaseAppChangRowColor = (allLockedArray: any, type: string, idFlag: number) => {
   const lockInfoArray = allLockedArray;
-  let returnValue = {'background-color': 'transparent'};
+  let returnValue = { 'background-color': 'transparent' };
   if (!idFlag) {
     return returnValue;
   }
@@ -15,7 +20,7 @@ const releaseAppChangRowColor = (allLockedArray: any, type: string, idFlag: numb
         // 判断是不是属于当前渲染表格的数据
         if (idFlag.toString() === paramsArray[3]) {
           // 判断有没有对应id
-          returnValue = {'background-color': '#FFF6F6'};
+          returnValue = { 'background-color': '#FFF6F6' };
           break;
         }
       }
@@ -25,7 +30,6 @@ const releaseAppChangRowColor = (allLockedArray: any, type: string, idFlag: numb
 };
 
 // 操作按钮
-
 
 // 发布项表格定义
 const getReleasedItemColumns = () => {
@@ -107,7 +111,6 @@ const getReleasedItemColumns = () => {
             </Button>
         </div>
            `;
-
       },
     },
   ];
@@ -154,6 +157,18 @@ const getReleasedApiColumns = () => {
       field: 'api_url',
     },
     {
+      headerName: 'Data',
+      field: 'data',
+    },
+    {
+      headerName: 'Header',
+      field: 'header',
+    },
+    {
+      headerName: '租户ID',
+      field: 'related_tenant',
+    },
+    {
       headerName: '编辑人',
       field: 'edit_user_name',
       minWidth: 75,
@@ -161,10 +176,6 @@ const getReleasedApiColumns = () => {
     {
       headerName: '编辑时间',
       field: 'edit_time',
-    },
-    {
-      headerName: '涉及租户',
-      field: 'related_tenant',
     },
     {
       headerName: '备注',
@@ -369,4 +380,10 @@ const getNewRelServiceComfirmColumns = () => {
   return thirdUpSerColumn;
 };
 
-export {getReleasedItemColumns, getReleasedApiColumns, getReleaseServiceComfirmColumns, releaseAppChangRowColor,getNewRelServiceComfirmColumns}
+export {
+  getReleasedItemColumns,
+  getReleasedApiColumns,
+  getReleaseServiceComfirmColumns,
+  releaseAppChangRowColor,
+  getNewRelServiceComfirmColumns,
+};

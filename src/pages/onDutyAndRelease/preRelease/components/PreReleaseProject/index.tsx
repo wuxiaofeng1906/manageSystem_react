@@ -1,27 +1,37 @@
-import React, {useEffect} from 'react';
-import {Button, Col, DatePicker, Form, Input, message, Row, Select} from 'antd';
-import {useModel} from '@@/plugin-model/useModel';
-import {useRequest} from 'ahooks';
+import React, { useEffect } from 'react';
+import { Button, Col, DatePicker, Form, Input, message, Row, Select } from 'antd';
+import { useModel } from '@@/plugin-model/useModel';
+import { useRequest } from 'ahooks';
 import {
-  loadPrjNameSelect, loadReleaseTypeSelect, loadReleaseWaySelect, loadDutyNamesSelect
+  loadPrjNameSelect,
+  loadReleaseTypeSelect,
+  loadReleaseWaySelect,
+  loadDutyNamesSelect,
 } from '../../comControl/controler';
 import '../../style/style.css';
 import moment from 'moment';
-import {getLockStatus, deleteLockStatus} from '../../lock/rowLock';
-import {savePreProjects} from './axiosRequest';
-import {showProgressData} from '../../components/CheckProgress/processAnalysis';
-import {getCheckProcess} from '../../components/CheckProgress/axiosRequest';
-import {modifyTabsName} from "@/pages/onDutyAndRelease/preRelease/components/Tab/axiosRequest";
-import {alalysisInitData} from "@/pages/onDutyAndRelease/preRelease/datas/dataAnalyze";
+import { getLockStatus, deleteLockStatus } from '../../lock/rowLock';
+import { savePreProjects } from './axiosRequest';
+import { showProgressData } from '../../components/CheckProgress/processAnalysis';
+import { getCheckProcess } from '../../components/CheckProgress/axiosRequest';
+import { modifyTabsName } from '@/pages/onDutyAndRelease/preRelease/components/Tab/axiosRequest';
+import { alalysisInitData } from '@/pages/onDutyAndRelease/preRelease/datas/dataAnalyze';
 
 const userLogins: any = localStorage.getItem('userLogins');
 const usersInfo = JSON.parse(userLogins);
-const {Option} = Select;
+const { Option } = Select;
 
 const PreReleaseProject: React.FC<any> = () => {
   // 获取当前页面的进度数据
-  const {tabsData, setTabsData, preReleaseData, modifyProcessStatus, lockedItem, modifyLockedItem, operteStatus} =
-    useModel('releaseProcess');
+  const {
+    tabsData,
+    setTabsData,
+    preReleaseData,
+    modifyProcessStatus,
+    lockedItem,
+    modifyLockedItem,
+    operteStatus,
+  } = useModel('releaseProcess');
   const [formForPreReleaseProject] = Form.useForm(); // 预发布
 
   const projectsArray = useRequest(() => loadPrjNameSelect()).data;
@@ -35,7 +45,7 @@ const PreReleaseProject: React.FC<any> = () => {
     if (result === '') {
       //   重置tab名
       // @ts-ignore
-      const {tabPageInfo} = await alalysisInitData('tabPageInfo', '');
+      const { tabPageInfo } = await alalysisInitData('tabPageInfo', '');
       if (tabPageInfo) {
         setTabsData(tabsData.activeKey, tabPageInfo.panes);
       }
@@ -52,24 +62,23 @@ const PreReleaseProject: React.FC<any> = () => {
 
   // 自动修改tab名
   const autoModifyTabsName = (pulishType: any) => {
-
     // 获取当前标签页的真实名字
-    const {activeKey} = tabsData;
-    let activeTitle = "";
-    if (tabsData.panes && (tabsData.panes).length > 0) {
-      (tabsData.panes).forEach((ele: any) => {
+    const { activeKey } = tabsData;
+    let activeTitle = '';
+    if (tabsData.panes && tabsData.panes.length > 0) {
+      tabsData.panes.forEach((ele: any) => {
         if (activeKey === ele.key) {
-          activeTitle = (ele.title).toString();
+          activeTitle = ele.title.toString();
         }
-
       });
     }
 
     // 判断选择的是灰度发布还是正式发布
-    if (activeTitle === `${activeKey}正式预发布` && pulishType === "1") { // 灰度发布
+    if (activeTitle === `${activeKey}正式预发布` && pulishType === '1') {
+      // 灰度发布
       saveModifyName(activeKey, `${activeKey}灰度预发布`);
-
-    } else if (activeTitle === `${activeKey}灰度预发布` && pulishType === "2") { // 正式发布
+    } else if (activeTitle === `${activeKey}灰度预发布` && pulishType === '2') {
+      // 正式发布
       saveModifyName(activeKey, `${activeKey}正式预发布`);
     }
   };
@@ -90,7 +99,7 @@ const PreReleaseProject: React.FC<any> = () => {
       formForPreReleaseProject.setFieldsValue({
         editor: modifyTime.editor,
         editTime: modifyTime.editTime,
-        checkListStatus: ""
+        checkListStatus: '',
       });
       // 保存成功后需要刷新状态
       const processData: any = await getCheckProcess(tabsData?.activeKey);
@@ -101,7 +110,6 @@ const PreReleaseProject: React.FC<any> = () => {
       // 保存成功后需要判断tab标签有没有被修改过，如果有，则跳过，如果没有，上面的标签名字需要与发布类型同步，
       // 发布类型为正式发布，标签页需要改为xxxxxx正式预发布，如果是灰度发布，则改为xxxxx灰度预发布。
       autoModifyTabsName(datas.pulishType);
-
     } else {
       message.error({
         content: result.errorMessage,
@@ -118,7 +126,6 @@ const PreReleaseProject: React.FC<any> = () => {
 
   // 编辑框聚焦时检查是否可以编辑
   const releaseItemFocus = async () => {
-
     const formData = formForPreReleaseProject.getFieldsValue();
     const proId = formData.proid;
 
@@ -151,7 +158,7 @@ const PreReleaseProject: React.FC<any> = () => {
         proid: preReleaseData.pro_id,
         ignoreZentaoList: preReleaseData.ignoreZentaoList,
         checkListStatus: preReleaseData.checkListStatus,
-        relateDutyName: preReleaseData.relateDutyName === '' ? "免" : preReleaseData.relateDutyName
+        relateDutyName: preReleaseData.relateDutyName === '' ? '免' : preReleaseData.relateDutyName,
       });
     }
   }, [preReleaseData]);
@@ -160,12 +167,17 @@ const PreReleaseProject: React.FC<any> = () => {
     <div>
       <div>
         <fieldset className={'fieldStyle'}>
-          <legend className={'legendStyle'}>Step1 预发布项目
-            <label style={{color: "Gray"}}> (值班测试填写)[只有global发布、修复0-7集群发布、修复2-7集群发布，选择"正式发布"; 其他都选择“灰度发布”]</label>
+          <legend className={'legendStyle'}>
+            Step1 预发布项目
+            <label style={{ color: 'Gray' }}>
+              {' '}
+              (值班测试填写)[只有global发布、修复0-8集群发布、修复2-8集群发布，选择"正式发布";
+              其他都选择“灰度发布”]
+            </label>
           </legend>
 
-          <div style={{marginBottom: -20, marginTop: -5}}>
-            <div style={{float: 'right', marginTop: 5}}>
+          <div style={{ marginBottom: -20, marginTop: -5 }}>
+            <div style={{ float: 'right', marginTop: 5 }}>
               <Button
                 type="primary"
                 disabled={operteStatus}
@@ -174,7 +186,7 @@ const PreReleaseProject: React.FC<any> = () => {
                   backgroundColor: '#ECF5FF',
                   borderRadius: 5,
                   marginLeft: 10,
-                  height: 60
+                  height: 60,
                 }}
                 onClick={savePreRelaseProjects}
               >
@@ -188,7 +200,12 @@ const PreReleaseProject: React.FC<any> = () => {
                   <Col span={11}>
                     {/* 项目名称 */}
                     <Form.Item label="项目名称:" name="projectsName">
-                      <Select showSearch mode="multiple" onFocus={releaseItemFocus} disabled={operteStatus}>
+                      <Select
+                        showSearch
+                        mode="multiple"
+                        onFocus={releaseItemFocus}
+                        disabled={operteStatus}
+                      >
                         {projectsArray}
                       </Select>
                     </Form.Item>
@@ -196,26 +213,30 @@ const PreReleaseProject: React.FC<any> = () => {
 
                   <Col span={7}>
                     {/* 发布类型 */}
-                    <Form.Item label="发布类型:" name="pulishType" style={{marginLeft: 5}}>
-                      <Select onFocus={releaseItemFocus} disabled={operteStatus}>{releaseTypeArray}</Select>
+                    <Form.Item label="发布类型:" name="pulishType" style={{ marginLeft: 5 }}>
+                      <Select onFocus={releaseItemFocus} disabled={operteStatus}>
+                        {releaseTypeArray}
+                      </Select>
                     </Form.Item>
                   </Col>
 
                   <Col span={6}>
                     {/* 发布方式 */}
-                    <Form.Item label="发布方式:" name="pulishMethod" style={{marginLeft: 5}}>
-                      <Select onFocus={releaseItemFocus} disabled={operteStatus}>{releaseWayArray}</Select>
+                    <Form.Item label="发布方式:" name="pulishMethod" style={{ marginLeft: 5 }}>
+                      <Select onFocus={releaseItemFocus} disabled={operteStatus}>
+                        {releaseWayArray}
+                      </Select>
                     </Form.Item>
                   </Col>
                 </Row>
-                <Row style={{marginTop: -15}}>
+                <Row style={{ marginTop: -15 }}>
                   <Col span={11}>
                     {/* 发布时间 */}
-                    <Form.Item label="发布时间" name="pulishTime" style={{marginLeft: 5}}>
+                    <Form.Item label="发布时间" name="pulishTime" style={{ marginLeft: 5 }}>
                       <DatePicker
                         showTime
                         format="YYYY-MM-DD HH:mm"
-                        style={{width: '100%'}}
+                        style={{ width: '100%' }}
                         onFocus={releaseItemFocus}
                         disabled={operteStatus}
                       />
@@ -224,10 +245,20 @@ const PreReleaseProject: React.FC<any> = () => {
 
                   <Col span={7}>
                     {/* 关联值班名单 */}
-                    <Form.Item label="关联值班名单:" name="relateDutyName" style={{marginLeft: 5}}>
-                      <Select onFocus={releaseItemFocus} showSearch defaultValue={''} disabled={operteStatus}
-                              filterOption={(inputValue: string, option: any) =>
-                                !!option.children.includes(inputValue)}>
+                    <Form.Item
+                      label="关联值班名单:"
+                      name="relateDutyName"
+                      style={{ marginLeft: 5 }}
+                    >
+                      <Select
+                        onFocus={releaseItemFocus}
+                        showSearch
+                        defaultValue={''}
+                        disabled={operteStatus}
+                        filterOption={(inputValue: string, option: any) =>
+                          !!option.children.includes(inputValue)
+                        }
+                      >
                         {relateDutyNameArray}
                       </Select>
                     </Form.Item>
@@ -235,18 +266,20 @@ const PreReleaseProject: React.FC<any> = () => {
 
                   <Col span={6}>
                     {/* 是否忽略禅道checklist */}
-                    <Form.Item label="是否忽略禅道checklist:" name="ignoreZentaoList" style={{marginLeft: 5}}>
+                    <Form.Item
+                      label="是否忽略禅道checklist:"
+                      name="ignoreZentaoList"
+                      style={{ marginLeft: 5 }}
+                    >
                       <Select onFocus={releaseItemFocus} disabled={operteStatus}>
                         <Option value="1">是</Option>
                         <Option value="2">否</Option>
                       </Select>
                     </Form.Item>
                   </Col>
-
                 </Row>
-                <Row style={{marginTop: -20}}>
+                <Row style={{ marginTop: -20 }}>
                   <Col span={12}>
-
                     <Form.Item label="禅道checklist检查状态:" name="checkListStatus">
                       <Input
                         style={{
@@ -276,7 +309,7 @@ const PreReleaseProject: React.FC<any> = () => {
                   </Col>
                   <Col span={6}>
                     {/* 编辑时间 */}
-                    <Form.Item label="编辑时间:" name="editTime" style={{marginLeft: 5}}>
+                    <Form.Item label="编辑时间:" name="editTime" style={{ marginLeft: 5 }}>
                       <Input
                         style={{
                           border: 'none',
@@ -291,7 +324,7 @@ const PreReleaseProject: React.FC<any> = () => {
                   <Col span={1}>
                     {/* 隐藏的pro_id，对数据的操作需要 */}
                     <Form.Item name="proid">
-                      <Input style={{display: 'none'}}/>
+                      <Input style={{ display: 'none' }} />
                     </Form.Item>
                   </Col>
                 </Row>

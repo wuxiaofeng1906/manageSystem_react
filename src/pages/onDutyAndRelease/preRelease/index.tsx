@@ -118,7 +118,7 @@ const PreRelease: React.FC<any> = () => {
 
   // 显示有数据界面
   const showPageInitData = async (initData: any, initShow: boolean) => {
-    debugger;
+
     if (initData === undefined) {
       return;
     }

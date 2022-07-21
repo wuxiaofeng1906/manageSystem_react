@@ -526,8 +526,9 @@ const OnlineBranch: React.FC<any> = () => {
                 <label style={{ color: Color }}>{ele.sealing_version}</label>】
                 <label>
                   检查开始时间:{ele.version_check_start_time}~检查结束时间：
-                  {ele.version_check_start_time}{' '}
+                  {ele.version_check_start_time}
                 </label>
+                <label style={{ marginLeft: 8 }}>封板时间:{ele.sealing_version_time}</label>
               </div>,
             );
           });

@@ -1014,13 +1014,13 @@ const UpgradeService: React.FC<any> = () => {
         onCancel={upgradeIntModalCancle}
         centered={true}
         footer={null}
-        width={630}
+        width={1000}
       >
         <Form form={upgradeIntForm}>
           <Row>
             <Col span={12}>
               <Form.Item name="onlineEnv" label="上线环境:" required style={{ marginTop: -15 }}>
-                <Select showSearch mode="multiple" style={{ marginLeft: 20, width: 185 }}>
+                <Select showSearch mode="multiple" style={{ width: '100%' }}>
                   {upgradeApiFormSelected.onlineEnv}
                 </Select>
               </Form.Item>
@@ -1042,7 +1042,7 @@ const UpgradeService: React.FC<any> = () => {
           <Row>
             <Col span={12}>
               <Form.Item name="interService" label="接口服务：" required style={{ marginTop: -15 }}>
-                <Select showSearch style={{ marginLeft: 21, width: 185 }}>
+                <Select showSearch style={{ width: '100%' }}>
                   {upgradeApiFormSelected.apiService}
                 </Select>
               </Form.Item>

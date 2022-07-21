@@ -1,4 +1,5 @@
 /* style项中样式是有顺序的,否则会有警告信息 */
+@import url('../../../../global.less');
 .legendStyle {
   width: auto;
   padding: .5em .5em .5em .5em;     /* 上右下左 */

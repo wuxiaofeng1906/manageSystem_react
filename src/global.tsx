@@ -6,7 +6,6 @@ import 'ag-grid-enterprise';
 import 'antd/dist/antd.css';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import './global.less';
 import defaultSettings from '../config/defaultSettings';
 
 const { pwa } = defaultSettings;

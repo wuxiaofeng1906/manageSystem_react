@@ -9,7 +9,7 @@ import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import styles from './index.less';
 import DutyListServices from '@/services/dutyList';
 import moment from 'moment';
-import { isEmpty } from 'lodash';
+import { isEmpty, replace } from 'lodash';
 import useLock from '@/hooks/lock';
 
 const DutyList = () => {
@@ -41,6 +41,32 @@ const DutyList = () => {
       res?.map((it: any) => ({ key: it.project_id, value: it.project_id, label: it.project_name })),
     );
   };
+  const copyReplaceTitle = (data: any) => {
+    const duty_date = moment().format('YYYY-MM-DD');
+    const release_time = moment().hour(23).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss');
+    const time = moment().format('YYYYMMDD');
+    const date = moment(data.duty_date).format('YYYYMMDD');
+    const env = data.release_env;
+    let type = ''; // 集群
+    let newTitle = ''; // 新生成值班标题
+    const specifyFormat = data.duty_name?.indexOf(date) > -1;
+    // 标题包含指定格式的日期，直接替换为当前日期，否则重新生成标题
+    if (specifyFormat) {
+      newTitle = replace(data.duty_name, moment(data.duty_date).format('YYYYMMDD'), time);
+    } else {
+      if (isEmpty(data.release_env) || data.release_env == 'unknown') type = '';
+      else if (
+        env?.split()?.length == 1 &&
+        ['cn-northwest-1', 'cn-northwest-0'].includes(env?.split()?.[0])
+      ) {
+        type = `${env?.split()?.[0].replace('cn-northwest-', '')}级灰度发布`;
+      } else type = '线上发布';
+      newTitle = `${time}_${type}值班名单`;
+    }
+
+    modifyDutyForm.setFieldsValue({ duty_name: newTitle });
+    return { release_time, duty_date, newTitle };
+  };
 
   const onCopy = async () => {
     const selected: any = gridRef.current?.getSelectedRows();
@@ -49,11 +75,15 @@ const DutyList = () => {
     const data = await DutyListServices.getDutyDetail({
       person_duty_num: selected[0].person_duty_num,
     });
+    const { duty_date, release_time, newTitle } = copyReplaceTitle(data);
+
     const update = async (value: string) => {
       await DutyListServices.addDuty({
         ...data,
         person_duty_num: releaseNum,
-        duty_name: value ?? data.duty_name,
+        duty_name: value ?? newTitle,
+        duty_date,
+        release_time,
         project_pm: data.project_pm?.map((it: any) => it.user_id).join(),
       });
       await getList();
@@ -69,14 +99,10 @@ const DutyList = () => {
       onOk: async () => {
         const value = await modifyDutyForm.validateFields();
         update(value.duty_name);
+        modifyDutyForm.resetFields();
       },
       content: (
-        <Form
-          form={modifyDutyForm}
-          initialValues={{
-            duty_name: data.duty_name,
-          }}
-        >
+        <Form form={modifyDutyForm}>
           <Form.Item
             label={'值班名单标题'}
             name={'duty_name'}

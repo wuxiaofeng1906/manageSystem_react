@@ -483,11 +483,12 @@ const DutyCatalog = () => {
   // 值班名单权限： 超级管理员、开发经理/总监、前端管理人员 、测试部门与业务经理
   const hasPermission = useMemo(
     () =>
+      detail?.is_push_msg == 'no' && // 未推送
       ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(
         currentUser?.group || '',
-      ) &&
-      (singleLock?.user_id == currentUser?.userid || isEmpty(singleLock)), // 是否锁定
-    [currentUser?.group, singleLock],
+      ) && // 有权限
+      (singleLock?.user_id == currentUser?.userid || isEmpty(singleLock)), // 未锁定
+    [currentUser?.group, singleLock, detail?.is_push_msg],
   );
 
   useEffect(() => {
@@ -532,7 +533,7 @@ const DutyCatalog = () => {
             }}
           >
             <Button
-              style={{ visibility: isSameDuty ? 'hidden' : 'visible' }}
+              style={{ visibility: isSameDuty || !hasPermission ? 'hidden' : 'visible' }}
               type={'text'}
               icon={<SyncOutlined style={{ color: '#1597e1' }} />}
               disabled={!visible || !hasPermission}

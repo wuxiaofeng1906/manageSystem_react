@@ -538,7 +538,9 @@ const DutyCatalog = () => {
               icon={<SyncOutlined style={{ color: '#1597e1' }} />}
               disabled={!visible || !hasPermission}
               onClick={updateFirstDuty}
-            />
+            >
+              更新值班负责人
+            </Button>
             <Button
               type={'text'}
               disabled={!visible || !hasPermission}

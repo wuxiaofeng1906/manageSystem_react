@@ -13,14 +13,15 @@ const {TabPane} = Tabs;
 let releaseTime = "before"; // 升级前公告还是升级后公告
 let announceId = 0; // 记录升级ID
 const Announce: React.FC<any> = (props: any) => {
-  const releaseNum = props.location?.query?.releaseNum;
+  const {releaseNum, operteStatus} = props.location?.query;
+
   const [announceContentForm] = Form.useForm();
   const [pageHeight, setPageHeight] = useState(getHeight());
   // 一键挂起公告按钮是否可用以及style
   const [buttonDisable, setButtonDisable] = useState({
     title: "前",
     disable: true,
-    buttonStyle: "saveButtonUnableStyle"
+    buttonStyle: ""
   });
 
   // 当表单种数据被改变时候
@@ -109,7 +110,7 @@ const Announce: React.FC<any> = (props: any) => {
       setButtonDisable({
         title: releaseTime === "after" ? "后" : "前",
         disable: true,
-        buttonStyle: "saveButtonUnableStyle"
+        buttonStyle: ""
       });
 
     } else if (resData.data) { // 有数据，则展示出来
@@ -130,11 +131,11 @@ const Announce: React.FC<any> = (props: any) => {
         UpgradeDescription: `"${data.upgrade_description}"`,
         isUpdated: data.is_upgrade === "yes" ? "true" : "false"
       });
-
+      // 判断是否是历史信息(如果是历史信息，保存按钮和发布按钮都不能点击)
       setButtonDisable({
         title: releaseTime === "after" ? "后" : "前",
-        disable: false,
-        buttonStyle: "saveButtonStyle"
+        disable: operteStatus === "true",
+        buttonStyle: operteStatus === "true" ? "" : "saveButtonStyle"
       });
     }
   };
@@ -211,13 +212,15 @@ const Announce: React.FC<any> = (props: any) => {
 
           {/* 保存按钮 */}
           <div style={{float: "right"}}>
-            <Button type="primary" className={"saveButtonStyle"} onClick={() => saveAndReleaseAnnouncement("save")}>
+            <Button type="primary" className={"saveButtonStyle"} onClick={() => saveAndReleaseAnnouncement("save")}
+                    disabled={operteStatus === "true"}>
               保存
             </Button>
             <Popconfirm placement="top" title={`确定一键挂起升级${buttonDisable.title}公告吗？`} okText="是" cancelText="否"
                         disabled={buttonDisable.disable}
                         onConfirm={() => saveAndReleaseAnnouncement("release")}>
-              <Button type="primary" className={buttonDisable.buttonStyle} style={{marginLeft: 10}}>
+              <Button type="primary" className={buttonDisable.buttonStyle} style={{marginLeft: 10}}
+                      disabled={buttonDisable.disable}>
                 {`一键挂起升级${buttonDisable.title}公告`}
               </Button>
             </Popconfirm>

@@ -528,7 +528,12 @@ const OnlineBranch: React.FC<any> = () => {
                   检查开始时间:{ele.version_check_start_time}~检查结束时间：
                   {ele.version_check_start_time}
                 </label>
-                <label style={{ marginLeft: 8 }}>封板时间:{ele.sealing_version_time}</label>
+                <label style={{ marginLeft: 8, wordBreak: 'break-all' }}>
+                  封板时间:
+                  {ele.sealing_version_time
+                    ? dayjs(ele.sealing_version_time).format('YYYY-MM-DD HH:mm:ss')
+                    : ''}
+                </label>
               </div>,
             );
           });

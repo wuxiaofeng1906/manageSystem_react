@@ -179,8 +179,6 @@ const iconCheckRender = (params: any) => {
 
 // 渲染上线前版本检查是否通过
 const beforeOnlineVersionCheck = (params: any) => {
-
-
   if (!params.value || params.value.length === 0) {
     return '';
   }
@@ -236,45 +234,12 @@ const beforeOnlineVersionCheck = (params: any) => {
   }
 
   const checkNum = JSON.stringify(params.data?.check_num);
-
-  // if (side === '') {
-  //   return `
-  //     <div>
-  //         <div style="width: 210px">
-  //             <div style="font-size: 10px">
-  //                 <div>
-  //                   <button style="text-align: left; color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
-  //                   <lable style="margin-left: -20px">${timeRange}</lable>
-  //                 </div>
-  //             </div>
-  //         </div>
-  //     </div>
-  //   `;
-  // }
-
-  // <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC"
-  //   onclick='versionCheckLogUrlClick(${JSON.stringify(values.check_url)})'>
-  //     <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
-  //  </Button>
-  // let gotoUrl = "";
-  // if (values.check_url) {
-  //   gotoUrl = `
-  //           <a href="${values.check_url}" target={'_black'} onClick="">
-  //               <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
-  //           </a>`;
-  // }
   return `
         <div>
-          <div style="margin-top: -10px;margin-left: 120px">
-
-            <Button  style="padding-bottom: 5px; margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
-            onclick='excuteCheckData("versionCheck",${checkNum},${JSON.stringify(result)})'>
-              <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
-            </Button>
-           <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC"
-                onclick='versionCheckLogUrlClick(${JSON.stringify(values.check_url)})'>
-                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
-            </Button>
+          <div style="margin-top: -10px;margin-left: 120px;">
+            <img src="../执行.png" width="16" height="16" alt="执行" title="执行"   onclick='excuteCheckData("versionCheck",${checkNum},${JSON.stringify(result)})'>
+            <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志" style="margin-left: 5px"
+            onclick='versionCheckLogUrlClick(${JSON.stringify(values.check_url)})'>
           </div>
           <div style="margin-top: -20px;width: 210px">
               <div style="font-size: 10px">
@@ -338,19 +303,13 @@ const beforeOnlineEnvCheck = (params: any) => {
   return `
         <div style="margin-top: -10px">
             <div style="margin-left: 120px" >
-              <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC"
-              onclick='excuteCheckData("envCheck",${checkNum},${JSON.stringify(result)})'>
-                <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
-              </Button>
-
-              <a href="${values.check_url}" target="_blank"  onclick="return visitCommenLog('${values.check_url}')" >
-               <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
-             </a>
+               <img src="../执行.png" width="16" height="16" alt="执行" title="执行" onclick='excuteCheckData("envCheck",${checkNum},${JSON.stringify(result)})'>
+               <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志"  style="margin-left: 5px"
+               onclick="return visitCommenLog('${values.check_url}')">
             </div>
             <div style=" margin-top: -20px;font-size: 10px;width: 200px">
                 <div><label style="color: ${Color}"> ${result}</label> &nbsp;${timeRange}</div>
             </div>
-
         </div>
     `;
 };

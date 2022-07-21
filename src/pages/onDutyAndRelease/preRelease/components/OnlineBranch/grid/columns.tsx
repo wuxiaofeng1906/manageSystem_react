@@ -237,8 +237,9 @@ const beforeOnlineVersionCheck = (params: any) => {
   return `
         <div>
           <div style="margin-top: -10px;margin-left: 120px;">
-            <img src="../执行.png" width="16" height="16" alt="执行" title="执行"   onclick='excuteCheckData("versionCheck",${checkNum},${JSON.stringify(result)})'>
-            <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志" style="margin-left: 5px"
+            <img src="../执行.png" width="16" height="16" alt="执行" title="执行"  style="cursor: pointer"
+            onclick='excuteCheckData("versionCheck",${checkNum},${JSON.stringify(result)})'>
+            <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志" style="margin-left: 5px;cursor: pointer"
             onclick='versionCheckLogUrlClick(${JSON.stringify(values.check_url)})'>
           </div>
           <div style="margin-top: -20px;width: 210px">
@@ -303,8 +304,9 @@ const beforeOnlineEnvCheck = (params: any) => {
   return `
         <div style="margin-top: -10px">
             <div style="margin-left: 120px" >
-               <img src="../执行.png" width="16" height="16" alt="执行" title="执行" onclick='excuteCheckData("envCheck",${checkNum},${JSON.stringify(result)})'>
-               <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志"  style="margin-left: 5px"
+               <img src="../执行.png" width="16" height="16" alt="执行" title="执行"  style="cursor: pointer"
+               onclick='excuteCheckData("envCheck",${checkNum},${JSON.stringify(result)})'>
+               <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志"  style="margin-left: 5px;cursor: pointer"
                onclick="return visitCommenLog('${values.check_url}')">
             </div>
             <div style=" margin-top: -20px;font-size: 10px;width: 200px">

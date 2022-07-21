@@ -242,7 +242,7 @@ const PreRelease: React.FC<any> = () => {
           const datas = await alalysisInitData('', currentKey);
           showPageInitData(datas, false, true);
         }
-      }, 300 * 1000);
+      }, 30 * 1000);
 
       interValRef.current = id;
     }

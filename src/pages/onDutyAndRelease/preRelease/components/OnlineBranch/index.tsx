@@ -526,7 +526,13 @@ const OnlineBranch: React.FC<any> = () => {
                 <label style={{ color: Color }}>{ele.sealing_version}</label>】
                 <label>
                   检查开始时间:{ele.version_check_start_time}~检查结束时间：
-                  {ele.version_check_start_time}{' '}
+                  {ele.version_check_start_time}
+                </label>
+                <label style={{ marginLeft: 8, wordBreak: 'break-all' }}>
+                  封版时间:
+                  {ele.sealing_version_time
+                    ? dayjs(ele.sealing_version_time).format('YYYY-MM-DD HH:mm:ss')
+                    : ''}
                 </label>
               </div>,
             );
@@ -561,7 +567,22 @@ const OnlineBranch: React.FC<any> = () => {
     ready_release_num: string;
     refresh_param: string;
   }) => {
+    if (operteStatus) {
+      message.error({
+        content: '发布已完成，不能进行执行操作',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+    setExecuteStatus(true);
     await PreReleaseServices.refreshCheckStatus(data);
+    // 刷新界面
+    const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
+    onlineBranchGridApi.current?.setRowData(newData.onlineBranch);
+    setExecuteStatus(false);
   };
   // 日志显示弹窗取消
   const autoCancle = () => {

@@ -327,6 +327,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
               <Input
                 style={{ width: 350 }}
                 placeholder={'发布名称'}
+                disabled={historyQuery}
                 onBlur={async () => {
                   const release_name = releaseNameForm.getFieldsValue().release_name;
                   if (isEmpty(release_name?.trim())) return message.info('请填写发布名称！');

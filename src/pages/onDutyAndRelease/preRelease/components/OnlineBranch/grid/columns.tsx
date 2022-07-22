@@ -63,27 +63,20 @@ const rendererUnitTest = (params: any) => {
   // 后端的颜色
   const bacnkendColor = renderColor[backendValue] ?? 'black';
 
-  const front = `
-    <div>
-      前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}
-    </div>`;
+  const front = `<div>前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>`;
 
-  const backend = `
-    <div style="margin-top: -20px">
-      后端：
-      <label style="color: ${bacnkendColor}"> ${backendValue}</label>
-      &nbsp;${backendTime}
-    </div>`;
+  const backend = `<div>后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>${backendTime}</div>`;
 
   return `
-        <div>
-        <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
-                  style="margin-top: -15px;margin-left:100px;cursor: pointer"
+        <div style="height: 66px">
+            <div style="line-height: 26px;margin-left:100px;cursor: pointer">
+                <img src="../refresh.png" width="16" height="16" alt="刷新" title="刷新"
                   onclick='refreshStatus(${JSON.stringify({
                     ready_release_num: params.data.ready_release_num,
                     refresh_param: 'test_unit',
                   })})'/>
-            <div style="font-size: 10px;margin-top: -30px">
+            </div>
+            <div style="font-size: 10px;line-height: 20px">
               ${['1', '3'].includes(params.data?.technical_side) ? front : ''}
               ${['2', '3'].includes(params.data?.technical_side) ? backend : ''}
             </div>
@@ -125,12 +118,12 @@ const iconCheckRender = (params: any) => {
   }
   const logs = !isEmpty(values) && JSON.stringify(values?.check_log).replaceAll("'", '***'); // 如果包含单引号，解析会报错。需要用特殊符号替换掉，传过去之后再解析出来。
   return `
-       <div>
-          <div style="margin-top: ${!result ? '-10px' : '-5px'};margin-left: 60px">
+       <div style="height: 66px">
+          <div>
           ${
             !result
               ? ''
-              : `<div>
+              : `<div style="line-height: 26px;margin-left: 60px">
                   <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
                     style="margin-right: 10px;cursor: pointer"
                     onclick='refreshStatus(${JSON.stringify({
@@ -144,7 +137,7 @@ const iconCheckRender = (params: any) => {
               </div>`
           }
           </div>
-          <div style="width: 210px;margin-top: ${result ? '-15px' : '0px'};">
+          <div style="width: 210px;line-height: 20px;">
                 <div style="color:${Color};font-size: 10px">${result}</div>
           </div>
        </div>`;
@@ -249,10 +242,9 @@ const beforeOnlineVersionCheck = (params: any) => {
   //           </a>`;
   // }
   return `
-        <div>
-          <div style="margin-top: -10px;margin-left: 120px">
-
-            <Button  style="padding-bottom: 5px; margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
+        <div style="height: 66px">
+          <div style="line-height: 26px;margin-left: 120px">
+            <Button  style=" margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
             onclick='excuteCheckData("versionCheck",${checkNum},${JSON.stringify(result)})'>
               <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
             </Button>
@@ -261,8 +253,8 @@ const beforeOnlineVersionCheck = (params: any) => {
                 <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
             </Button>
           </div>
-          <div style="margin-top: -20px;width: 210px">
-              <div style="font-size: 10px">
+          <div style="width: 210px">
+              <div style="font-size: 10px;line-height: 20px;">
                   <div>${side} <button style="text-align: left;margin-left: -10px; color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
                   <lable style="margin-left: -20px">${timeRange}</lable>
                   </div>
@@ -321,23 +313,21 @@ const beforeOnlineEnvCheck = (params: any) => {
   const checkNum = JSON.stringify(params.data?.check_num);
 
   return `
-        <div style="margin-top: -12px">
-            <div style="margin-left: 120px" >
+        <div style="height: 66px">
+            <div style="margin-left: 120px;line-height: 26px" >
               <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
               onclick='excuteCheckData("envCheck",${checkNum},${JSON.stringify(result)})'>
                 <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
               </Button>
-
               <a href="${values.check_url}" target="_blank"  onclick="return visitCommenLog('${
     values.check_url
   }')" >
                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
              </a>
             </div>
-            <div style=" margin-top: -25px;font-size: 10px;width: 200px">
+            <div style="line-height: 20px;font-size: 10px;width: 200px">
                 <div><label style="color: ${Color}"> ${result}</label> &nbsp;${timeRange}</div>
             </div>
-
         </div>
     `;
 };
@@ -461,7 +451,7 @@ const autoCheckRenderer = (params: any) => {
   }
 
   if (ignoreCheck === '忽略') {
-    return `<label style="color: blue;font-size: 10px">忽略</label>`;
+    return `<div style="color: blue;font-size: 10px;line-height: 66px;">忽略</div>`;
   }
 
   return `
@@ -511,10 +501,10 @@ const sealStatusRenderer = (params: any) => {
     });
 
     return `
-          <div>
-            <div style="margin-left: 100px;margin-top: -13px" >
-            <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
-            style="margin:4px 10px 0 0;cursor: pointer"
+          <div style="height: 66px">
+            <div style="margin-left: 100px;line-height: 26px;" >
+            <img src="../refresh.png" width="16" height="16" alt="刷新" title="刷新"
+            style="margin-right: 10px;cursor: pointer"
             onclick='refreshStatus(${JSON.stringify({
               ready_release_num: params.data.ready_release_num,
               refresh_param: 'sealing_version',
@@ -524,8 +514,7 @@ const sealStatusRenderer = (params: any) => {
                   <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志" style="background-color: white;padding-top: -10px">
                </Button>
             </div>
-
-              <div style=" font-size: 10px;background-color: transparent;margin-top: -20px" >
+              <div style="line-height: 20px; font-size: 10px;background-color: transparent;" >
                    ${side} <label style="color: ${sideColor}"> ${status}</label> &nbsp;${time}
               </div>
           </div>
@@ -567,24 +556,23 @@ const sealStatusRenderer = (params: any) => {
       }
     });
     return `
-          <div>
-            <div style="margin-left: 100px">
-            <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
-            style="margin:-16px 10px 0 0;cursor: pointer"
-            onclick='refreshStatus(${JSON.stringify({
-              ready_release_num: params.data.ready_release_num,
-              refresh_param: 'sealing_version',
-            })})'/>
-              <Button style="margin-top: 10px; margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;height: 25px;cursor: pointer"
-                onclick='showCoverStatusLog(${JSON.stringify(params.value)})'>
-                  <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志" style="margin-top: -20px" >
+          <div style="height: 66px">
+            <div style="margin-left: 100px;line-height: 26px;">
+              <img src="../refresh.png" width="16" height="16" alt="刷新" title="刷新"
+              style="cursor: pointer;margin-right: 10px"
+              onclick='refreshStatus(${JSON.stringify({
+                ready_release_num: params.data.ready_release_num,
+                refresh_param: 'sealing_version',
+              })})'/>
+                <Button style=" margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;height: 25px;cursor: pointer"
+                  onclick='showCoverStatusLog(${JSON.stringify(params.value)})'>
+                    <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
                </Button>
             </div>
-            <div style="margin-top: -25px;font-size: 9px">
-              <div>前端：<label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
-              <div style="margin-top: -20px">后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>&nbsp;${backendTime}</div>
+            <div style="font-size: 9px;height: 40px;line-height: 20px">
+              <div >前端：<label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>
+              <div>后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>&nbsp;${backendTime}</div>
             </div>
-
           </div>
     `;
   }
@@ -716,7 +704,7 @@ const getOnlineBranchColumns = () => {
     //   },
     // },
     {
-      headerName: '封板状态',
+      headerName: '封版状态',
       field: 'branch_sealing_check',
       minWidth: 160,
       cellRenderer: sealStatusRenderer,

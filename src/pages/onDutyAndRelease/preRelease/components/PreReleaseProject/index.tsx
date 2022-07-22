@@ -184,7 +184,6 @@ const PreReleaseProject: React.FC<any> = () => {
           <legend className={'legendStyle'}>
             Step1 预发布项目
             <label style={{ color: 'Gray' }}>
-              {' '}
               (值班测试填写)[只有global发布、修复0-8集群发布、修复2-8集群发布，选择"正式发布";
               其他都选择“灰度发布”]
             </label>
@@ -209,7 +208,7 @@ const PreReleaseProject: React.FC<any> = () => {
             </div>
 
             <div>
-              <Form form={formForPreReleaseProject}>
+              <Form form={formForPreReleaseProject} className={'no-wrap-form'}>
                 <Row>
                   <Col span={11}>
                     {/* 项目名称 */}

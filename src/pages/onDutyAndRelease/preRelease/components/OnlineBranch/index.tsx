@@ -529,7 +529,7 @@ const OnlineBranch: React.FC<any> = () => {
                   {ele.version_check_start_time}
                 </label>
                 <label style={{ marginLeft: 8, wordBreak: 'break-all' }}>
-                  封板时间:
+                  封版时间:
                   {ele.sealing_version_time
                     ? dayjs(ele.sealing_version_time).format('YYYY-MM-DD HH:mm:ss')
                     : ''}

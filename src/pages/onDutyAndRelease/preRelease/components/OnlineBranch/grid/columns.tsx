@@ -704,7 +704,7 @@ const getOnlineBranchColumns = () => {
     //   },
     // },
     {
-      headerName: '封板状态',
+      headerName: '封版状态',
       field: 'branch_sealing_check',
       minWidth: 160,
       cellRenderer: sealStatusRenderer,

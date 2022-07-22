@@ -11,9 +11,11 @@ import {
 import usePermission from '@/hooks/permission';
 
 const { Option } = Select;
+
 const CheckProgress: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const { tabsData, processStatus, modifyProcessStatus, operteStatus } = useModel('releaseProcess');
+  const [disabled, setDisabled] = useState(false);
   const { announcePermission } = usePermission();
   const [isModalVisible, setModalVisible] = useState({
     show: false,
@@ -77,51 +79,58 @@ const CheckProgress: React.FC<any> = () => {
 
   // 确认发布
   const handleOk = async () => {
+    setDisabled(true);
+
     let checkResult: any;
     const formData = pulishResultForm.getFieldsValue();
     // 如果是发布成功，则需要判断下面自动化选项是否勾选
-    if (!isModalVisible.autoCheckDisabled) {
-      // 是发布成功
-      if (formData.ignoreAfterCheck === undefined || formData.ignoreAfterCheck.length === 0) {
-        // 不忽略的时候
-        if (formData.checkResult === undefined || formData.checkResult.length === 0) {
-          // 一个结果都没选中
-          errorMessage('检查结果必须至少勾选一项！');
-          return;
+    try {
+      if (!isModalVisible.autoCheckDisabled) {
+        // 是发布成功
+        if (formData.ignoreAfterCheck === undefined || formData.ignoreAfterCheck.length === 0) {
+          // 不忽略的时候
+          if (formData.checkResult === undefined || formData.checkResult.length === 0) {
+            // 一个结果都没选中
+            errorMessage('检查结果必须至少勾选一项！');
+            return;
+          }
+        }
+
+        // 发布成功才调用自动化检查接口
+        const result = await executeAutoCheck(formData, tabsData.activeKey);
+        if (result) {
+          errorMessage(`发布成功后自动化检查失败：${result}`);
+        } else {
+          checkResult = await getAutoResult(tabsData.activeKey);
+        }
+        // 如果勾选了发布公告复选框，还要调用公告发布接口发布公告
+        if (formData.sendAnnouncementMsg && formData.sendAnnouncementMsg.length > 0) {
+          const announceResult = await postAnnouncementForOtherPage(announceInfo);
+          if (announceResult.code !== 200) {
+            errorMessage('发布后公告挂起失败！');
+          }
         }
       }
 
-      // 发布成功才调用自动化检查接口
-      const result = await executeAutoCheck(formData, tabsData.activeKey);
-      if (result) {
-        errorMessage(`发布成功后自动化检查失败：${result}`);
+      const result = await saveProcessResult(tabsData.activeKey, isModalVisible.result);
+      if (result === '') {
+        sucMessage('发布结果保存成功！');
+        modifyProcessStatus({
+          ...processStatus,
+          releaseResult: isModalVisible.result,
+          autoCheckResult: checkResult,
+        });
+        setModalVisible({
+          ...isModalVisible,
+          result: '',
+          show: false,
+        });
       } else {
-        checkResult = await getAutoResult(tabsData.activeKey);
+        errorMessage(result.toString());
       }
-      // 如果勾选了发布公告复选框，还要调用公告发布接口发布公告
-      if (formData.sendAnnouncementMsg && formData.sendAnnouncementMsg.length > 0) {
-        const announceResult = await postAnnouncementForOtherPage(announceInfo);
-        if (announceResult.code !== 200) {
-          errorMessage('发布后公告挂起失败！');
-        }
-      }
-    }
-
-    const result = await saveProcessResult(tabsData.activeKey, isModalVisible.result);
-    if (result === '') {
-      sucMessage('发布结果保存成功！');
-      modifyProcessStatus({
-        ...processStatus,
-        releaseResult: isModalVisible.result,
-        autoCheckResult: checkResult,
-      });
-      setModalVisible({
-        ...isModalVisible,
-        result: '',
-        show: false,
-      });
-    } else {
-      errorMessage(result.toString());
+      setDisabled(false);
+    }catch (e) {
+      setDisabled(false);
     }
   };
 
@@ -259,6 +268,7 @@ const CheckProgress: React.FC<any> = () => {
             key="submit"
             type="primary"
             onClick={handleOk}
+            disabled={disabled}
             style={{
               color: '#46A0FC',
               backgroundColor: '#ECF5FF',

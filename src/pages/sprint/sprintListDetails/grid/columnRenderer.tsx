@@ -155,7 +155,13 @@ const servertyValueGetter = (params: any) => {
     }
   }
 
-  const pri = params.data.priority === null ? "" : Number(params.data.priority)-1;
+  // 如果是bug类型的话，需要调整优先级（-1），是需求或者bug转需求的话就不用调整。
+  let pri = params.data.priority === null ? "" : params.data.priority;
+
+  if (params.data?.category === "1" && pri !== "") {
+    pri = (Number(params.data.priority) - 1).toString();
+  }
+
   if (pri === "" && severity === "") {
     return "";
   }

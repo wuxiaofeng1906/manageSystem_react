@@ -91,6 +91,7 @@ const CheckProgress: React.FC<any> = () => {
           // 不忽略的时候
           if (formData.checkResult === undefined || formData.checkResult.length === 0) {
             // 一个结果都没选中
+            setDisabled(false);
             errorMessage('检查结果必须至少勾选一项！');
             return;
           }
@@ -129,7 +130,7 @@ const CheckProgress: React.FC<any> = () => {
         errorMessage(result.toString());
       }
       setDisabled(false);
-    }catch (e) {
+    } catch (e) {
       setDisabled(false);
     }
   };

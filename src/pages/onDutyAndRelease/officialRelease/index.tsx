@@ -1,11 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { errorMessage } from '@/publicMethods/showMessages';
 import { AgGridReact } from 'ag-grid-react';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import 'ag-grid-enterprise';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Button, Checkbox, Col, DatePicker, Form, Input, Modal, Row, Select, message } from 'antd';
 import './style/style.css';
 import { useRequest } from 'ahooks';
@@ -13,7 +10,7 @@ import { loadDutyNamesSelect } from '@/pages/onDutyAndRelease/preRelease/comCont
 import { getHeight } from '@/publicMethods/pageSet';
 import { releaseColumns } from './grid/columns';
 import moment from 'moment';
-import { isEmpty, cloneDeep, intersection, isArray } from 'lodash';
+import { isEmpty, cloneDeep, intersection } from 'lodash';
 import {
   getOfficialReleaseDetails,
   cancleReleaseResult,
@@ -33,7 +30,6 @@ import {
 // 编辑后的数据
 let otherSaveCondition: any = {
   grayReleaseNums: [], // 灰度发布编号
-  releaseEnv: '', // 发布集群
   releaseResult: 'unknown', // 发布结果
   onlineReleaseNum: '', // 正式发布编号
 };
@@ -44,6 +40,7 @@ const envType = {
     'cn-northwest-1,cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-8',
   '集群2-8':
     'cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-8',
+  global: 'cn-northwest-global',
 };
 
 const OfficialRelease: React.FC<any> = (props: any) => {
@@ -51,7 +48,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   const historyQuery = props.location?.query?.history === 'true';
   const releaseType = props.location?.query?.releaseType;
   const [rowData, setRowData] = useState([]);
-  const [limitOpts, setLimitOpts] = useState([]);
+  const [releaseEnvForm] = Form.useForm();
   const dutyNameArray = useRequest(() => loadDutyNamesSelect(true)).data; // 关联值班名单
   const pageData = useRequest(() => getOfficialReleaseDetails(onlineReleaseNum, releaseType)).data; // 界面数据获取
   onlineEnv = useRequest(() => getOnlineEnv(releaseType)).data; // 上线集群环境
@@ -73,8 +70,9 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
   // 显示进度
   const showProcessStatus = () => {
+    const releaseEnv = releaseEnvForm.getFieldValue('releaseEnv');
     const releaseInfo = formForOfficialRelease.getFieldsValue();
-    if (otherSaveCondition.releaseEnv && releaseInfo.pulishTime && releaseInfo.relateDutyName) {
+    if (releaseEnv && releaseInfo.pulishTime && releaseInfo.relateDutyName) {
       setProcessStatus({
         ...processStatus,
         processColor: '#2BF541',
@@ -116,6 +114,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   const saveReleaseInfo = async () => {
     //   获取发布方式及时间
     const condition = cloneDeep(otherSaveCondition);
+    const releaseEnv = releaseEnvForm.getFieldValue('releaseEnv')?.join();
     let grayReleaseNums: string[] = [];
     const releaseInfo = formForOfficialRelease.getFieldsValue();
     const releaseName = releaseNameForm.getFieldsValue();
@@ -124,10 +123,9 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       const readyReleaseNum = node.data?.ready_release_num;
       grayReleaseNums.push(readyReleaseNum);
     });
-
     const result = await editReleaseForm(
       { ...releaseInfo, ...releaseName },
-      { ...condition, grayReleaseNums },
+      { ...condition, releaseEnv, grayReleaseNums },
     );
     if (result.code === 200) {
       sucMessage('数据保存成功！');
@@ -325,27 +323,23 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
   const href = `http://${window.location.host}/onDutyAndRelease/releaseAnnouncement?releaseNum=${otherSaveCondition.onlineReleaseNum}&operteStatus=${historyQuery}`;
 
-  useEffect(() => {
-    console.log(onlineEnv);
+  const formatOpts = (value: string[]) => {
     if (isEmpty(onlineEnv)) return;
     const otherEnv = onlineEnv
       ?.filter((o: any) => !Object.values(envType).includes(o.value))
       .map((it: any) => it.value);
-    const env = otherSaveCondition.releaseEnv?.split();
-
-    console.log(otherEnv, env);
-    const data = onlineEnv?.map((it: any) => ({
+    return onlineEnv?.map((it: any) => ({
       ...it,
       disabled:
-        isEmpty(env) ||
-        (it.type == 'other' && intersection(otherEnv, env).length > 0) ||
-        it.label == 'global'
+        isEmpty(value) ||
+        (it.type == 'other' && intersection(otherEnv, value).length > 0) ||
+        it.label == 'global' ||
+        value?.join(',') == 'cn-northwest-global'
           ? false
-          : !env.includes(it.type),
+          : !value.includes(it.type),
     }));
-    console.log(data);
-    setLimitOpts(data);
-  }, [onlineEnv, otherSaveCondition.releaseEnv]);
+  };
+
   return (
     <PageContainer title={<div />}>
       <div style={{ marginTop: -15 }}>
@@ -539,28 +533,34 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                   frameworkComponents={{
                     releaseEnvRenderer: (params: any) => {
                       if (params && params.data.rowSpan) {
-                        let currentValue;
-                        if (params.value) {
-                          currentValue = params.value.split(',');
-                          otherSaveCondition.releaseEnv = params.value;
-                        }
+                        releaseEnvForm.setFieldsValue({
+                          releaseEnv: params.value?.split() ?? [],
+                        });
                         showProcessStatus(); // 展示进度
                         return (
-                          <Select
-                            size={'small'}
-                            placeholder={'请选择'}
-                            defaultValue={currentValue}
-                            bordered={false}
-                            style={{ width: '100%' }}
-                            mode={'multiple'}
-                            onChange={(newValue: any) => {
-                              otherSaveCondition.releaseEnv = newValue?.join(',');
-                              saveReleaseInfo();
-                            }}
-                            maxTagCount={'responsive'}
-                            disabled={historyQuery}
-                            options={limitOpts}
-                          />
+                          <Form form={releaseEnvForm} onValuesChange={saveReleaseInfo}>
+                            <Form.Item
+                              noStyle
+                              shouldUpdate={(pre, next) => pre.releaseEnv != next.releaseEnv}
+                            >
+                              {({ getFieldValue }) => {
+                                return (
+                                  <Form.Item name={'releaseEnv'}>
+                                    <Select
+                                      size={'small'}
+                                      placeholder={'请选择'}
+                                      bordered={false}
+                                      style={{ width: '100%' }}
+                                      mode={'multiple'}
+                                      maxTagCount={'responsive'}
+                                      disabled={historyQuery}
+                                      options={formatOpts(getFieldValue('releaseEnv'))}
+                                    />
+                                  </Form.Item>
+                                );
+                              }}
+                            </Form.Item>
+                          </Form>
                         );
                       }
                       return '';

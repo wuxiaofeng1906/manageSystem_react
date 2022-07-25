@@ -258,6 +258,7 @@ export default [
                 icon: 'table',
                 path: 'cusInputRate_A',
                 component: './kpi/performance/developer/cusInputRate_A',
+                // hideInMenu: true,
               },
               {
                 name: '用户体验优化投入比',
@@ -632,8 +633,16 @@ export default [
         icon: 'table',
         path: 'officialRelease',
         component: './onDutyAndRelease/officialRelease',
-        hideInMenu: true,
-      },
+        hideInMenu: true
+
+      }, {
+        name: '发布公告',
+        icon: 'table',
+        path: 'releaseAnnouncement',
+        component: './onDutyAndRelease/releaseAnnouncement',
+        hideInMenu: true
+
+      }
     ],
   },
   {

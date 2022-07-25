@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Progress, Row, Select, Modal, Button, Form, Checkbox } from 'antd';
 import { useModel } from '@@/plugin-model/useModel';
 import { saveProcessResult, executeAutoCheck } from './axiosRequest';
 import { errorMessage, sucMessage } from '@/publicMethods/showMessages';
 import { getAutoResult } from './processAnalysis';
+import {
+  getAnnouncement,
+  postAnnouncementForOtherPage,
+} from '@/pages/onDutyAndRelease/releaseAnnouncement/axiosRequest/apiPage';
+import usePermission from '@/hooks/permission';
 
 const { Option } = Select;
 
@@ -11,12 +16,16 @@ const CheckProgress: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const { tabsData, processStatus, modifyProcessStatus, operteStatus } = useModel('releaseProcess');
   const [disabled, setDisabled] = useState(false);
+  const { announcePermission } = usePermission();
   const [isModalVisible, setModalVisible] = useState({
     show: false,
     result: '',
     hintMsg: { message1: '', message2: '' },
     autoCheckDisabled: true,
   });
+
+  // 保存发布公告的内容
+  const [announceInfo, setAnnounceInfo] = useState(null);
 
   const [pulishResultForm] = Form.useForm();
 
@@ -33,6 +42,7 @@ const CheckProgress: React.FC<any> = () => {
     }
 
     let autoDisable = true;
+    let announceContent: any = {};
     let hintMsgs = {
       message1: '请确认是否修改服务发布结果为空！',
       message2: '',
@@ -41,6 +51,9 @@ const CheckProgress: React.FC<any> = () => {
       hintMsgs.message1 = '请确认服务是否发布成功?';
       hintMsgs.message2 = '如有自动化也执行通过!确认通过，会自动开放所有租户。';
       autoDisable = false;
+
+      // 需要查询当前发布编号有没有对应的发布后公告内容
+      announceContent = await getAnnouncement(tabsData.activeKey, 'after');
     } else if (params === '2') {
       hintMsgs.message1 = '请确认服务是否发布失败！';
     }
@@ -51,7 +64,17 @@ const CheckProgress: React.FC<any> = () => {
       show: true,
     });
 
-    pulishResultForm.resetFields();
+    if (announceContent.data) {
+      pulishResultForm.setFieldsValue({
+        ignoreAfterCheck: [],
+        checkResult: [],
+        sendAnnouncementMsg: ['yes'],
+      });
+      setAnnounceInfo(announceContent.data);
+    } else {
+      pulishResultForm.resetFields();
+      setAnnounceInfo(null);
+    }
   };
 
   // 确认发布
@@ -80,6 +103,13 @@ const CheckProgress: React.FC<any> = () => {
           errorMessage(`发布成功后自动化检查失败：${result}`);
         } else {
           checkResult = await getAutoResult(tabsData.activeKey);
+        }
+        // 如果勾选了发布公告复选框，还要调用公告发布接口发布公告
+        if (formData.sendAnnouncementMsg && formData.sendAnnouncementMsg.length > 0) {
+          const announceResult = await postAnnouncementForOtherPage(announceInfo);
+          if (announceResult.code !== 200) {
+            errorMessage('发布后公告挂起失败！');
+          }
         }
       }
 
@@ -114,8 +144,27 @@ const CheckProgress: React.FC<any> = () => {
     });
   };
 
+  // 跳转到发布公告界面
+  let href;
+  const { panes } = tabsData;
+  if (panes && panes.length > 0) {
+    panes.forEach((ele: any) => {
+      if (ele.key === tabsData.activeKey) {
+        href = `http://${window.location.host}/onDutyAndRelease/releaseAnnouncement?releaseNum=${tabsData.activeKey}&releaseName=${ele.title}&operteStatus=${operteStatus}`;
+      }
+    });
+  }
   return (
     <div>
+      {announcePermission()?.check ? (
+        <a href={href} target={'_blank'} style={{ float: 'right' }}>
+          <img src="../annouce.png" width="20" height="20" alt="发布公告" title="发布公告" /> &nbsp;
+          发布公告
+        </a>
+      ) : (
+        <div />
+      )}
+
       {/* 检查进度 */}
       <div style={{ marginTop: -10 }}>
         <div>
@@ -128,7 +177,6 @@ const CheckProgress: React.FC<any> = () => {
             />
           </Row>
         </div>
-
         {/* 检查总览 */}
         <div style={{ marginTop: 5, marginLeft: 5 }}>
           <label style={{ fontWeight: 'bold' }}>检查总览：</label>
@@ -212,7 +260,7 @@ const CheckProgress: React.FC<any> = () => {
         width={400}
         onCancel={handleCancel}
         centered={true}
-        bodyStyle={{ height: 145 }}
+        bodyStyle={{ height: 175 }}
         footer={[
           <Button key="cancle" onClick={handleCancel} style={{ borderRadius: 5 }}>
             取消
@@ -220,8 +268,8 @@ const CheckProgress: React.FC<any> = () => {
           <Button
             key="submit"
             type="primary"
-            disabled={disabled}
             onClick={handleOk}
+            disabled={disabled}
             style={{
               color: '#46A0FC',
               backgroundColor: '#ECF5FF',
@@ -255,6 +303,15 @@ const CheckProgress: React.FC<any> = () => {
             <Checkbox.Group style={{ width: '100%' }} disabled={isModalVisible.autoCheckDisabled}>
               <Checkbox value="ui">UI执行通过</Checkbox>
               <Checkbox value="applet">小程序执行通过</Checkbox>
+            </Checkbox.Group>
+          </Form.Item>
+          <Form.Item
+            label="是否挂起升级后公告:"
+            name="sendAnnouncementMsg"
+            style={{ marginTop: -25 }}
+          >
+            <Checkbox.Group style={{ width: '100%' }} disabled={announceInfo === null}>
+              <Checkbox value="yes" defaultChecked={true}></Checkbox>
             </Checkbox.Group>
           </Form.Item>
         </Form>

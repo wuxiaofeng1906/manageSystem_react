@@ -1,38 +1,41 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {useModel} from "@@/plugin-model/useModel";
-import {PageContainer} from '@ant-design/pro-layout';
-import {AgGridReact} from 'ag-grid-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useModel } from '@@/plugin-model/useModel';
+import { PageContainer } from '@ant-design/pro-layout';
+import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {useRequest} from 'ahooks';
-import {GridApi, GridReadyEvent} from 'ag-grid-community';
+import { useRequest } from 'ahooks';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { Button, Form, Select, Row, Col, Modal, Input, Divider, Spin, Checkbox } from 'antd';
+import { colums } from './grid/columns';
+import { getHeight } from '@/publicMethods/pageSet';
 import {
-  Button, Form, Select, Row, Col,
-  Modal, Input, Divider, Spin, Checkbox
-} from 'antd';
-import {colums} from "./grid/columns";
-import {getHeight} from '@/publicMethods/pageSet';
-import {
-  queryDevelopViews, getSonarDetails, getBranchNameCombobox, getProjectPathCombobox,
-  executeTask, getBugAssigendTo
-} from "./apiRequest";
-import {errorMessage, sucMessage} from "@/publicMethods/showMessages";
+  queryDevelopViews,
+  getSonarDetails,
+  getBranchNameCombobox,
+  getProjectPathCombobox,
+  executeTask,
+  getBugAssigendTo,
+} from './apiRequest';
+import { errorMessage, sucMessage } from '@/publicMethods/showMessages';
 
-const {Option} = Select;
+const { Option } = Select;
 // 组件初始化
 const JenkinsCheck: React.FC<any> = () => {
-  const {initialState} = useModel('@@initialState');
-  const currentUser: any = {user_name: "", user_id: ""};
+  const { initialState } = useModel('@@initialState');
+  const currentUser: any = { user_name: '', user_id: '' };
   if (initialState?.currentUser) {
-    currentUser.user_name = initialState.currentUser === undefined ? "" : initialState.currentUser.name;
-    currentUser.user_id = initialState.currentUser === undefined ? "" : initialState.currentUser.userid;
+    currentUser.user_name =
+      initialState.currentUser === undefined ? '' : initialState.currentUser.name;
+    currentUser.user_id =
+      initialState.currentUser === undefined ? '' : initialState.currentUser.userid;
   }
 
   const personArray = useRequest(() => getBugAssigendTo()).data;
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>();
-  const {data, loading} = useRequest(() => queryDevelopViews(1, 20));
+  const { data, loading } = useRequest(() => queryDevelopViews(1, 20));
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -54,7 +57,7 @@ const JenkinsCheck: React.FC<any> = () => {
   // 判断是否显示loading状态
   const [loadState, setLoadSate] = useState(false);
   // 执行按钮是否禁用
-  const [isButtonClick, setIsButtonClick] = useState("none");
+  const [isButtonClick, setIsButtonClick] = useState('none');
   // bug指派人是否禁用
   const [bugAssigned, setBugAssigned] = useState(true);
   // 弹出层是否可见
@@ -63,7 +66,7 @@ const JenkinsCheck: React.FC<any> = () => {
   // 取消
   const checkModalCancel = () => {
     setCheckModalVisible(false);
-  }
+  };
 
   /* region 下拉框数据加载 */
 
@@ -87,7 +90,7 @@ const JenkinsCheck: React.FC<any> = () => {
     formForCarrySonar.setFieldsValue({
       ProjectKey: `${name.ProjectKey}-${value}`,
     });
-  }
+  };
 
   // 项目下拉框
   const [projectPath, setProjectPath] = useState([]);
@@ -97,11 +100,11 @@ const JenkinsCheck: React.FC<any> = () => {
   };
 
   const [Pages, setPages] = useState({
-    totalCounts: 0,  // 总条数
-    countsOfPage: 20,  // 每页显示多少条
-    totalPages: 0,  // 一共多少页
+    totalCounts: 0, // 总条数
+    countsOfPage: 20, // 每页显示多少条
+    totalPages: 0, // 一共多少页
     currentPage: 0, // 当前是第几页
-    jumpToPage: 0  // 跳转到第几页
+    jumpToPage: 0, // 跳转到第几页
   });
 
   // 计算分页信息
@@ -113,7 +116,10 @@ const JenkinsCheck: React.FC<any> = () => {
     if (data) {
       totalCount = Number(pageInfo.itemCount);
       countsOfPages = Number(pageInfo.pageSize);
-      totalPage = Number(pageInfo.itemCount) === 0 ? 0 : Math.ceil(Number(pageInfo.itemCount) / Number(pageInfo.pageSize));
+      totalPage =
+        Number(pageInfo.itemCount) === 0
+          ? 0
+          : Math.ceil(Number(pageInfo.itemCount) / Number(pageInfo.pageSize));
       currentPages = Number(pageInfo.pageCount);
     }
 
@@ -122,26 +128,27 @@ const JenkinsCheck: React.FC<any> = () => {
       countsOfPage: countsOfPages,
       totalPages: totalPage,
       currentPage: currentPages,
-      jumpToPage: 1
+      jumpToPage: 1,
     });
   };
 
   /* endregion 下拉框数据加载 */
 
   // 执行定时任务
-  const [currentTimerId, setCurrentTimerId] = useState("");
+  const [currentTimerId, setCurrentTimerId] = useState('');
   const setIntervalForUpdateStatus = () => {
     // 判断有没有定时器id,有的话就代表有定时器，就不再创建了，如果没有，则创建
-    if (currentTimerId === "") {
+    if (currentTimerId === '') {
       const myTimer = setInterval(async () => {
         const newData = await queryDevelopViews(1, 20); // 一次只运行几条
-        const {datas} = newData;
+        const { datas } = newData;
         gridApi.current?.setRowData(datas);
 
         // 是否还在运行
         let isRunning = false;
         for (let index = 0; index < datas.length; index += 1) {
-          if (datas[index].excStatus === null) { // 没有状态时,直接跳出循环，继续等待下一次循环
+          if (datas[index].excStatus === null) {
+            // 没有状态时,直接跳出循环，继续等待下一次循环
             isRunning = true;
             break;
           }
@@ -149,7 +156,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
         // 如果所有运行结束，那么则清除定时任务
         if (isRunning === false) {
-          setCurrentTimerId("");
+          setCurrentTimerId('');
           clearInterval(myTimer);
         }
       }, 10000); // 10S刷新一次
@@ -161,21 +168,21 @@ const JenkinsCheck: React.FC<any> = () => {
   const runSonarTask = () => {
     setCheckModalVisible(true);
     setLoadSate(false);
-    setIsButtonClick("inline");
+    setIsButtonClick('inline');
     LoadProjectPathCombobox();
     formForCarrySonar.setFieldsValue({
-      LanguageType: "java",
-      ProjectPath: "",
-      BranchName: "",
-      ProjectKey: "",
+      LanguageType: 'java',
+      ProjectPath: '',
+      BranchName: '',
+      ProjectKey: '',
       releaseToZentao: [],
-      bugAssignedTo: ""
+      bugAssignedTo: '',
     });
   };
 
   // 确定执行任务
   const carrySonarCheck = async () => {
-    const modalData = formForCarrySonar.getFieldsValue()
+    const modalData = formForCarrySonar.getFieldsValue();
     // LanguageType 、 ProjectPath 和 BranchName不能为空
     const language = modalData.LanguageType;
     if (!language) {
@@ -196,7 +203,7 @@ const JenkinsCheck: React.FC<any> = () => {
     // 严重bug是否生成到禅道：如果勾选了，那么后面的指派人为必填项。如果没勾选，后面指派人可以为空。
     debugger;
     let isBugToZentao = modalData.releaseToZentao;
-    let bugAssignedt = "";
+    let bugAssignedt = '';
     if (isBugToZentao && isBugToZentao.length > 0) {
       bugAssignedt = modalData.bugAssignedTo;
       if (!bugAssignedt) {
@@ -204,24 +211,23 @@ const JenkinsCheck: React.FC<any> = () => {
         return;
       }
       isBugToZentao = isBugToZentao[0].toString();
-
     } else {
-      isBugToZentao = "no";
+      isBugToZentao = 'no';
     }
 
     // 传入参数错误：422 ；连接问题：422
     const datas = {
-      name: "sonar-project-scan",
+      name: 'sonar-project-scan',
       user_name: currentUser.user_name,
       user_id: currentUser.user_id,
       job_parm: [
-        {name: "languageType", value: language},
-        {name: "projectPath", value: ProjectPaths},
-        {name: "branchName", value: BranchNames},
-        {name: "projectKey", value: modalData.ProjectKey},
-        {name: "is_bug_zt", value: isBugToZentao},
-        {name: "bug_assign", value: bugAssignedt},
-      ]
+        { name: 'languageType', value: language },
+        { name: 'projectPath', value: ProjectPaths },
+        { name: 'branchName', value: BranchNames },
+        { name: 'projectKey', value: modalData.ProjectKey },
+        { name: 'is_bug_zt', value: isBugToZentao },
+        { name: 'bug_assign', value: bugAssignedt },
+      ],
     };
 
     setLoadSate(true);
@@ -231,13 +237,12 @@ const JenkinsCheck: React.FC<any> = () => {
       gridApi.current?.setRowData(newData.datas);
       showPageInfo(newData.pageInfo);
       setCheckModalVisible(false);
-      sucMessage("执行完毕！");
+      sucMessage('执行完毕！');
       setIntervalForUpdateStatus();
     } else {
       errorMessage(`执行失败：${executeRt.msg}`);
     }
     setLoadSate(false);
-
   };
 
   // 刷新表格
@@ -254,7 +259,7 @@ const JenkinsCheck: React.FC<any> = () => {
     } else {
       setBugAssigned(true);
     }
-  }
+  };
   /* endregion */
 
   /* region 翻页以及页面跳转功能 */
@@ -278,7 +283,7 @@ const JenkinsCheck: React.FC<any> = () => {
     if (Pages.currentPage > 1) {
       setPages({
         ...Pages,
-        currentPage: Pages.currentPage - 1
+        currentPage: Pages.currentPage - 1,
       });
       const newData = await queryDevelopViews(Pages.currentPage - 1, Pages.countsOfPage);
       gridApi.current?.setRowData(newData.datas);
@@ -294,7 +299,7 @@ const JenkinsCheck: React.FC<any> = () => {
     if (nextPage <= Pages.totalPages) {
       setPages({
         ...Pages,
-        currentPage: Pages.currentPage + 1
+        currentPage: Pages.currentPage + 1,
       });
       const newData = await queryDevelopViews(Pages.currentPage + 1, Pages.countsOfPage);
       gridApi.current?.setRowData(newData.datas);
@@ -305,53 +310,54 @@ const JenkinsCheck: React.FC<any> = () => {
 
   // 跳转到第几页
   const goToPage = async (params: any) => {
-
     const pageCounts = Number(params.currentTarget.defaultValue);
-    if (pageCounts.toString() === "NaN") {
-      errorMessage('请输入有效跳转页数！')
+    if (pageCounts.toString() === 'NaN') {
+      errorMessage('请输入有效跳转页数！');
     } else if (pageCounts > Pages.totalPages) {
       // 提示已超过最大跳转页数
       errorMessage('已超过最大跳转页数!');
     } else {
-      const newData = await queryDevelopViews(Number(params.currentTarget.defaultValue), Pages.countsOfPage);
+      const newData = await queryDevelopViews(
+        Number(params.currentTarget.defaultValue),
+        Pages.countsOfPage,
+      );
       gridApi.current?.setRowData(newData.datas);
     }
-  }
+  };
   /* endregion */
 
   /* region 定义列以及单元格的点击事件 */
   (window as any).showParams = async (params: any) => {
-
     setCheckModalVisible(true);
     setLoadSate(false);
     // 这个点击事件只能够进行查看
-    setIsButtonClick("none");
+    setIsButtonClick('none');
     const details = await getSonarDetails(params.taskName, params.ID);
     if (details && details.length > 0) {
-      let language = "";
-      let prjPath = "";
-      let branchNames = "";
-      let prjKey = "";
-      let butTpzt = "";
-      let assignedTo = "";
+      let language = '';
+      let prjPath = '';
+      let branchNames = '';
+      let prjKey = '';
+      let butTpzt = '';
+      let assignedTo = '';
       details.forEach((dts: any) => {
         switch (dts.name) {
-          case "languageType":
+          case 'languageType':
             language = dts.value;
             break;
-          case "projectPath":
+          case 'projectPath':
             prjPath = dts.value;
             break;
-          case "branchName":
+          case 'branchName':
             branchNames = dts.value;
             break;
-          case "projectKey":
+          case 'projectKey':
             prjKey = dts.value;
             break;
-          case "is_bug_zt":
+          case 'is_bug_zt':
             butTpzt = dts.value;
             break;
-          case "bug_assign":
+          case 'bug_assign':
             assignedTo = dts.value;
             break;
 
@@ -367,7 +373,7 @@ const JenkinsCheck: React.FC<any> = () => {
         BranchName: branchNames,
         ProjectKey: prjKey,
         releaseToZentao: butTpzt,
-        bugAssignedTo: assignedTo
+        bugAssignedTo: assignedTo,
       });
 
       if (butTpzt === 'yes') {
@@ -381,22 +387,29 @@ const JenkinsCheck: React.FC<any> = () => {
 
   useEffect(() => {
     showPageInfo(data?.pageInfo);
-  }, [loading])
+  }, [loading]);
 
   return (
-    <PageContainer style={{marginLeft: -30, marginRight: -30}}>
+    <PageContainer style={{ marginLeft: -30, marginRight: -30 }}>
       {/* 按钮 */}
-      <div style={{background: 'white', marginTop: -20, height: 42}}>
+      <div style={{ background: 'white', marginTop: -20, height: 42 }}>
         {/* 使用一个图标就要导入一个图标 */}
-        <Button type="text" onClick={runSonarTask} style={{padding: 10}}>
-          <img src="../operate.png" width="22" height="22" alt="执行sonar扫描任务" title="执行sonar扫描任务"/> &nbsp;执行sonar扫描任务
+        <Button type="text" onClick={runSonarTask} style={{ padding: 10 }}>
+          <img
+            src="../operate.png"
+            width="22"
+            height="22"
+            alt="执行sonar扫描任务"
+            title="执行sonar扫描任务"
+          />{' '}
+          &nbsp;执行sonar扫描任务
         </Button>
         <Button type="text" onClick={refreshGrid}>
-          <img src="../refresh.png" width="30" height="30" alt="刷新" title="刷新"/> 刷新
+          <img src="../refresh.png" width="30" height="30" alt="刷新" title="刷新" /> 刷新
         </Button>
       </div>
       {/* ag-grid 表格定义 */}
-      <div className="ag-theme-alpine" style={{marginTop: 3, height: gridHeight, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{ marginTop: 3, height: gridHeight, width: '100%' }}>
         <AgGridReact
           columnDefs={colums()} // 定义列
           rowData={data?.datas} // 数据绑定
@@ -404,145 +417,188 @@ const JenkinsCheck: React.FC<any> = () => {
             resizable: true,
             sortable: true,
             suppressMenu: true,
-            cellStyle: {"border-right": "solid 0.5px #E3E6E6"}
+            cellStyle: { 'border-right': 'solid 0.5px #E3E6E6' },
           }}
           onGridReady={onGridReady}
           onGridSizeChanged={onGridReady}
-        >
-        </AgGridReact>
+        ></AgGridReact>
       </div>
 
       {/* 分页控件 */}
-      <div style={{background: 'white', marginTop: 2, height: 50, paddingTop: 10}}>
-
+      <div style={{ background: 'white', marginTop: 2, height: 50, paddingTop: 10 }}>
         {/* 共XX条 */}
-        <label style={{marginLeft: 20, fontWeight: "bold"}}> 共 {Pages.totalCounts} 条</label>
+        <label style={{ marginLeft: 20, fontWeight: 'bold' }}> 共 {Pages.totalCounts} 条</label>
 
         {/* 每页 XX 条 */}
-        <label style={{marginLeft: 20, fontWeight: "bold"}}>每页</label>
-        <Select style={{marginLeft: 10, width: 80}} onChange={showItemChange} value={Pages.countsOfPage}>
+        <label style={{ marginLeft: 20, fontWeight: 'bold' }}>每页</label>
+        <Select
+          style={{ marginLeft: 10, width: 80 }}
+          onChange={showItemChange}
+          value={Pages.countsOfPage}
+        >
           <Option value={20}>20 </Option>
           <Option value={50}>50 </Option>
           <Option value={100}>100 </Option>
           <Option value={200}>200 </Option>
         </Select>
 
-        <label style={{marginLeft: 10, fontWeight: "bold"}}>条</label>
-        <label style={{marginLeft: 10, fontWeight: "bold"}}>共 {Pages.totalPages} 页</label>
+        <label style={{ marginLeft: 10, fontWeight: 'bold' }}>条</label>
+        <label style={{ marginLeft: 10, fontWeight: 'bold' }}>共 {Pages.totalPages} 页</label>
         {/* 上一页 */}
-        <Button size={"small"}
-                style={{fontWeight: "bold", marginLeft: 20, color: 'black', backgroundColor: "WhiteSmoke"}}
-                onClick={showPreviousPage}>&lt;</Button>
+        <Button
+          size={'small'}
+          style={{
+            fontWeight: 'bold',
+            marginLeft: 20,
+            color: 'black',
+            backgroundColor: 'WhiteSmoke',
+          }}
+          onClick={showPreviousPage}
+        >
+          &lt;
+        </Button>
 
         {/* 条数显示 */}
-        <span style={{
-          display: "inline-block", marginLeft: 10, textAlign: "center",
-          fontWeight: "bold", backgroundColor: "#46A0FC", color: "white", width: "40px"
-        }}> {Pages.currentPage} </span>
+        <span
+          style={{
+            display: 'inline-block',
+            marginLeft: 10,
+            textAlign: 'center',
+            fontWeight: 'bold',
+            backgroundColor: '#46A0FC',
+            color: 'white',
+            width: '40px',
+          }}
+        >
+          {' '}
+          {Pages.currentPage}{' '}
+        </span>
 
         {/* 下一页 */}
-        <Button size={"small"}
-                style={{fontWeight: "bold", marginLeft: 10, color: 'black', backgroundColor: "WhiteSmoke"}}
-                onClick={showNextPage}>&gt;</Button>
+        <Button
+          size={'small'}
+          style={{
+            fontWeight: 'bold',
+            marginLeft: 10,
+            color: 'black',
+            backgroundColor: 'WhiteSmoke',
+          }}
+          onClick={showNextPage}
+        >
+          &gt;
+        </Button>
 
         {/* 跳转到第几页 */}
-        <label style={{marginLeft: 20, fontWeight: "bold"}}> 跳转到第 </label>
-        <Input style={{textAlign: "center", width: 50, marginLeft: 2}} defaultValue={1}
-               onBlur={goToPage}/>
-        <label style={{marginLeft: 2, fontWeight: "bold"}}> 页 </label>
-
-
+        <label style={{ marginLeft: 20, fontWeight: 'bold' }}> 跳转到第 </label>
+        <Input
+          style={{ textAlign: 'center', width: 50, marginLeft: 2 }}
+          defaultValue={1}
+          onBlur={goToPage}
+        />
+        <label style={{ marginLeft: 2, fontWeight: 'bold' }}> 页 </label>
       </div>
 
       {/* 弹出层：扫描任务  isCheckModalVisible */}
       <Modal
         title={'sonar扫描任务'}
-        visible={isCheckModalVisible}  //
+        visible={isCheckModalVisible} //
         onCancel={checkModalCancel}
         centered={true}
         width={550}
-        bodyStyle={{height: 340}}
-        footer={
-          [
-            <Spin spinning={loadState} tip="Loading...">
-              <Button
-                style={{borderRadius: 5, marginTop: -100}}
-                onClick={checkModalCancel}>取消
-              </Button>
-              <Button type="primary"
-                      style={{
-                        marginLeft: 10,
-                        color: '#46A0FC',
-                        backgroundColor: "#ECF5FF",
-                        borderRadius: 5,
-                        display: isButtonClick
-                      }}
-
-                      onClick={carrySonarCheck}>执行
-              </Button>
-            </Spin>
-          ]
-        }
+        bodyStyle={{ height: 380 }}
+        footer={[
+          <Spin spinning={loadState} tip="Loading...">
+            <Button style={{ borderRadius: 5, marginTop: -100 }} onClick={checkModalCancel}>
+              取消
+            </Button>
+            <Button
+              type="primary"
+              style={{
+                marginLeft: 10,
+                color: '#46A0FC',
+                backgroundColor: '#ECF5FF',
+                borderRadius: 5,
+                display: isButtonClick,
+              }}
+              onClick={carrySonarCheck}
+            >
+              执行
+            </Button>
+          </Spin>,
+        ]}
       >
-        <Form form={formForCarrySonar} style={{marginTop: -15}}>
+        <Form form={formForCarrySonar} style={{ marginTop: -15 }}>
           <Form.Item label="任务名称" name="taskName">
-            <Input defaultValue={"sonar-project-scan"} disabled={true}
-                   style={{marginLeft: 35, width: 390, color: "black"}}/>
+            <Input
+              defaultValue={'sonar-project-scan'}
+              disabled={true}
+              style={{ marginLeft: 35, width: 390, color: 'black' }}
+            />
           </Form.Item>
-          <Divider style={{marginTop: -25}}>任务参数</Divider>
+          <Divider style={{ marginTop: -25 }}>任务参数</Divider>
           <div>
-            <Form.Item name="LanguageType" label="LanguageType" style={{marginTop: -15}}>
-              <Select style={{width: 390}}>
+            <Form.Item name="LanguageType" label="LanguageType" style={{ marginTop: -15 }}>
+              <Select style={{ width: 390 }}>
                 <Option value="java">java</Option>
                 <Option value="ts">ts</Option>
                 <Option value="go">go</Option>
               </Select>
             </Form.Item>
-            <div style={{marginTop: -23, marginLeft: 104, fontSize: "x-small", color: "gray"}}>
+            <div style={{ marginTop: -23, marginLeft: 104, fontSize: 'x-small', color: 'gray' }}>
               语言类型：默认是java；如果是前端，则选择ts；如果是golang，则选择go
             </div>
 
-            <Form.Item name="ProjectPath" label="ProjectPath" style={{marginTop: 7}}>
-              <Select showSearch style={{marginLeft: 20, width: 390}} onChange={ProjectPathChanged}>
+            <Form.Item name="ProjectPath" label="ProjectPath" style={{ marginTop: 7 }}>
+              <Select
+                showSearch
+                style={{ marginLeft: 20, width: 390 }}
+                onChange={ProjectPathChanged}
+              >
                 {projectPath}
               </Select>
             </Form.Item>
-            <div style={{marginTop: -23, marginLeft: 104, fontSize: "x-small", color: "gray"}}>
+            <div style={{ marginTop: -23, marginLeft: 104, fontSize: 'x-small', color: 'gray' }}>
               项目路径：如：backend/apps/asset
             </div>
 
-            <Form.Item name="BranchName" label="BranchName" style={{marginTop: 7}}>
-              <Select showSearch style={{marginLeft: 10, width: 390}} onChange={branchChanged}>
+            <Form.Item name="BranchName" label="BranchName" style={{ marginTop: 7 }}>
+              <Select showSearch style={{ marginLeft: 10, width: 390 }} onChange={branchChanged}>
                 {branchName}
               </Select>
             </Form.Item>
-            <div style={{marginTop: -23, marginLeft: 104, fontSize: "x-small", color: "gray"}}>
+            <div style={{ marginTop: -23, marginLeft: 104, fontSize: 'x-small', color: 'gray' }}>
               分支名称：如：feature-multi-org2
             </div>
-            <Form.Item name="ProjectKey" label="ProjectKey" style={{marginTop: 7}}>
-
-              <Input style={{marginLeft: 25, width: 390}}/>
+            <Form.Item name="ProjectKey" label="ProjectKey" style={{ marginTop: 7 }}>
+              <Input style={{ marginLeft: 25, width: 390 }} />
             </Form.Item>
-            <div style={{marginTop: -23, marginLeft: 104, fontSize: "x-small", color: "gray"}}>
+            <div style={{ marginTop: -23, marginLeft: 104, fontSize: 'x-small', color: 'gray' }}>
               sonar中展示的项目名称，唯一
             </div>
           </div>
           <div>
             <Row gutter={8}>
               <Col span={14}>
-                <Form.Item name="releaseToZentao" label="扫描成功后严重bug是否自动生成到禅道" style={{marginTop: 7}}>
-
-                  <Checkbox.Group style={{width: '100%'}} onChange={bugToZentaoChanged}>
-                    <Checkbox value={"yes"}></Checkbox>
+                <Form.Item
+                  name="releaseToZentao"
+                  label="扫描成功后严重bug是否自动生成到禅道"
+                  style={{ marginTop: 7 }}
+                >
+                  <Checkbox.Group style={{ width: '100%' }} onChange={bugToZentaoChanged}>
+                    <Checkbox value={'yes'}></Checkbox>
                   </Checkbox.Group>
-
                 </Form.Item>
               </Col>
               <Col span={10}>
-                <Form.Item name="bugAssignedTo" label="Bug指派人" style={{marginTop: 7}}>
-                  <Select showSearch style={{marginLeft: 10, width: '100%'}} disabled={bugAssigned}
-                          filterOption={(inputValue: string, option: any) =>
-                            !!option.children.includes(inputValue)}>
+                <Form.Item name="bugAssignedTo" label="Bug指派人" style={{ marginTop: 7 }}>
+                  <Select
+                    showSearch
+                    style={{ marginLeft: 10, width: '100%' }}
+                    disabled={bugAssigned}
+                    filterOption={(inputValue: string, option: any) =>
+                      !!option.children.includes(inputValue)
+                    }
+                  >
                     {personArray}
                   </Select>
                 </Form.Item>
@@ -551,10 +607,8 @@ const JenkinsCheck: React.FC<any> = () => {
           </div>
         </Form>
       </Modal>
-
     </PageContainer>
   );
 };
-
 
 export default JenkinsCheck;

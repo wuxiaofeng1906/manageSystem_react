@@ -354,11 +354,11 @@ const ReleaseHistory: React.FC<any> = () => {
     };
 
     if (formalQueryCondition.start && formalQueryCondition.end) {
-      cond.release_start_time = `${formalQueryCondition.start} 00:00:00`;
-      cond.release_end_time = `${formalQueryCondition.end} 23:59:59`;
+      cond.start = `${formalQueryCondition.start}`;
+      cond.end = `${formalQueryCondition.end}`;
     }
     if (formalQueryCondition.project) {
-      cond.project_id = formalQueryCondition.project;
+      cond.project = formalQueryCondition.project;
     }
     const result = await getFormalListData(cond);
     releasedGridApi.current?.setRowData(result.data);

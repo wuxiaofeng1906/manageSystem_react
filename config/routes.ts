@@ -633,16 +633,15 @@ export default [
         icon: 'table',
         path: 'officialRelease',
         component: './onDutyAndRelease/officialRelease',
-        hideInMenu: true
-
-      }, {
+        hideInMenu: true,
+      },
+      {
         name: '发布公告',
         icon: 'table',
         path: 'releaseAnnouncement',
         component: './onDutyAndRelease/releaseAnnouncement',
-        hideInMenu: true
-
-      }
+        hideInMenu: true,
+      },
     ],
   },
   {
@@ -759,7 +758,7 @@ export default [
     name: '上线系统',
     icon: 'table',
     path: '/systemOnline',
-    // hideInMenu: true,
+    hideInMenu: true,
     routes: [
       {
         name: '发布列表',

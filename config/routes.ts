@@ -755,64 +755,6 @@ export default [
     ],
   },
   {
-    name: '上线系统',
-    icon: 'table',
-    path: '/systemOnline',
-    hideInMenu: true,
-    routes: [
-      {
-        name: '发布列表',
-        icon: 'table',
-        path: 'publishList',
-        component: './systemOnline/publishList',
-      },
-      {
-        name: '预发布',
-        icon: 'table',
-        path: 'prePublish',
-        component: './systemOnline/prePublish/layout',
-        hideChildrenInMenu: true,
-        hideInMenu: true,
-        routes: [
-          {
-            path: 'projectServices',
-            component: './systemOnline/prePublish/projectServices',
-          },
-          {
-            path: 'deploy',
-            component: './systemOnline/prePublish/deploy',
-          },
-          {
-            path: 'check',
-            component: './systemOnline/prePublish/check',
-          },
-          {
-            path: 'publish',
-            component: './systemOnline/prePublish/publish',
-          },
-          {
-            path: 'overview',
-            component: './systemOnline/prePublish/overview',
-          },
-          {
-            path: 'worksheet',
-            component: './systemOnline/prePublish/worksheet',
-          },
-          {
-            path: '/',
-            redirect: './systemOnline/prePublish/projectServices',
-          },
-        ],
-      },
-      {
-        name: '前端服务配置',
-        icon: 'table',
-        path: 'webServicesSetting',
-        component: './systemOnline/webServicesSetting',
-      },
-    ],
-  },
-  {
     path: '/',
     redirect: './welcomes',
   },

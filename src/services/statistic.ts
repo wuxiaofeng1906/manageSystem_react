@@ -2,9 +2,14 @@ import { GqlClient } from '@/hooks';
 import { getParamsByType } from '@/publicMethods/timeMethods';
 import { formatTreeData } from '@/utils/utils';
 
+export interface IStatisticQuery {
+  client: GqlClient<object>;
+  params: string;
+  identity?: string;
+}
 const StatisticServices = {
   // patch
-  async patch(client: GqlClient<object>, params: string, identity: string) {
+  async patch({ client, params, identity }: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
     const { data, loading } = await client.query(`
@@ -34,20 +39,16 @@ const StatisticServices = {
     return { data: formatTreeData(data.data), loading };
   },
   // feedback
-  async feedbackTester(client: GqlClient<object>, params: string) {
+  async feedback({ client, params, identity }: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
     const { data, loading } = await client.query(`
       {
-         data:testOnlineFeedbackAvgonlineDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+         data:devTestOnlineFeedbackAvgrespDept(kind: "${condition.typeFlag}", ends: ${condition.ends},identity:${identity}) {
         total{
             dept
             deptName
             kpi
-            sideKpi{
-              numerator
-              denominator
-            }
           }
           range{
             start
@@ -61,10 +62,6 @@ const StatisticServices = {
               deptName
             }
             kpi
-            sideKpi{
-              numerator
-              denominator
-            }
           }
         }
       }
@@ -72,7 +69,7 @@ const StatisticServices = {
     return { data: formatTreeData(data.data), loading };
   },
 
-  async productScale(client: GqlClient<object>, params: string, identity: string) {
+  async productScale({ client, params, identity }: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
     const { data, loading } = await client.query(`
@@ -102,7 +99,7 @@ const StatisticServices = {
     return { data: formatTreeData(data.data), loading };
   },
 
-  async humanEffect(client: GqlClient<object>, params: string, identity: string) {
+  async humanEffect({ client, params, identity }: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
     const { data, loading } = await client.query(`
@@ -150,7 +147,7 @@ const StatisticServices = {
     return { data: formatTreeData(data.data), loading };
   },
 
-  async shuttleDelay(client: GqlClient<object>, params: string, identity: string) {
+  async shuttleDelay({ client, params, identity }: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
     const { data, loading } = await client.query(`

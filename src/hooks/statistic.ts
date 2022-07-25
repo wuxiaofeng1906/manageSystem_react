@@ -9,12 +9,13 @@ import {
   getWeeksRange,
 } from '@/publicMethods/timeMethods';
 import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
+import { IStatisticQuery } from '@/services/statistic';
 
 // 统计
 export type IStaticBy = 'year' | 'quarter' | 'month' | 'week';
 export type IIdentity = 'DEVELOPER' | 'TESTER';
 export interface IRequest {
-  request: Function;
+  request: (data: IStatisticQuery) => void;
   type: IStaticBy;
   identity?: IIdentity;
   showDenominator?: boolean;
@@ -35,7 +36,7 @@ export const useStatistic = () => {
     setRowData([]);
     setLoading(true);
     try {
-      const { data, loading }: any = await request(gqlClient, type, identity);
+      const { data, loading }: any = await request({ client: gqlClient, params: type, identity });
       setRowData(data);
       setLoading(loading);
     } catch (e) {

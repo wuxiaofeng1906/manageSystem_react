@@ -280,6 +280,12 @@ export default [
                 component: './kpi/performance/developer/patch',
               },
               {
+                name: '线上反馈平均时长',
+                icon: 'table',
+                path: 'avgOnlineTimeFeedBack',
+                component: './kpi/performance/developer/avgOnlineTimeFeedBack',
+              },
+              {
                 name: '生产规模',
                 icon: 'table',
                 path: 'productionScale',
@@ -407,7 +413,7 @@ export default [
                 component: './kpi/performance/testers/patch',
               },
               {
-                name: '线上反馈平均上线时长',
+                name: '线上反馈平均时长',
                 icon: 'table',
                 path: 'avgOnlineTimeFeedBack',
                 component: './kpi/performance/testers/avgOnlineTimeFeedBack',
@@ -641,33 +647,37 @@ export default [
         icon: 'table',
         path: 'peopleExcuteSetting',
         component: './zentao/peopleExcuteSetting',
-        access: 'sysAdmin',  // 管理员可见
+        access: 'sysAdmin', // 管理员可见
       },
       {
         name: '禅道模板',
         icon: 'table',
         path: 'templateList',
         component: './zentao/zentaoTemplate/templateList',
-        access: 'sysAdmin',  // 管理员可见
-      }, {
+        access: 'sysAdmin', // 管理员可见
+      },
+      {
         name: '禅道任务模板',
         icon: 'table',
         path: 'editTemplate',
         component: './zentao/zentaoTemplate/editTemplate',
-        hideInMenu: true
-      }, {
+        hideInMenu: true,
+      },
+      {
         name: '禅道任务生成（上线检查）',
         icon: 'table',
         path: 'btForCheckBeforeOnline',
         component: './zentao/zentaoTemplate/btForCheckBeforeOnline',
-        hideInMenu: true
-      }, {
+        hideInMenu: true,
+      },
+      {
         name: '禅道任务生成（项目计划）',
         icon: 'table',
         path: 'btForProjectTemplate',
         component: './zentao/zentaoTemplate/btForProjectTemplate',
-        hideInMenu: true
-      }, {
+        hideInMenu: true,
+      },
+      {
         name: '禅道任务分解',
         icon: 'table',
         path: 'taskDecomposition',

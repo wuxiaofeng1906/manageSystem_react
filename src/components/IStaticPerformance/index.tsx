@@ -12,12 +12,12 @@ import {
 } from '@ant-design/icons';
 import { getHeight } from '@/publicMethods/pageSet';
 import { IStaticBy, useStatistic, IIdentity } from '@/hooks/statistic';
-import { GqlClient } from '@/hooks';
 import { isEmpty, isString } from 'lodash';
 import { ColumnsType } from 'antd/lib/table/interface';
+import { IStatisticQuery } from '@/services/statistic';
 
 interface IStatic {
-  request: (client: GqlClient<object>, type: string, identify: IIdentity) => void;
+  request: (data: IStatisticQuery) => void;
   showDenominator?: boolean; // 以分子、分母展示
   ruleData: IRuleData[];
   identity?: IIdentity;

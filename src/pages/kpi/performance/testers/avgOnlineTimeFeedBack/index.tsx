@@ -42,7 +42,8 @@ const AvgOnlineTimeFeedBack: React.FC<any> = () => {
   return (
     <IStaticPerformance
       ruleData={ruleData}
-      request={StatisticServices.feedbackTester}
+      request={StatisticServices.feedback}
+      identity={'TESTER'}
       // showSplit={true}
     />
   );

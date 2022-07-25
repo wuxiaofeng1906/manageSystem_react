@@ -36,18 +36,25 @@ const getOnlineEnv = async (releaseType: any) => {
   const envData = await axiosGet('/api/verify/release/environment');
   const nameOptions: any = [];
   if (envData) {
-    const datas = envData;
+    const datas = envData?.map((it: any) => ({
+      label: it.online_environment_name,
+      value: it.online_environment_id,
+      type: ['集群1-8', '集群2-8'].includes(it.online_environment_name)
+        ? it.online_environment_id
+        : 'other',
+    }));
     datas.forEach((envInfo: any) => {
       if (
         releaseType === 'gray' &&
         envInfo.online_environment_id !== 'cn-northwest-global' &&
         envInfo.online_environment_id !== 'cn-northwest-0'
       ) {
-        nameOptions.push(
-          <Option key={envInfo.online_environment_id} value={`${envInfo.online_environment_id}`}>
-            {envInfo.online_environment_name}
-          </Option>,
-        );
+        nameOptions.push(envInfo);
+        // nameOptions.push(
+        //   <Option key={envInfo.online_environment_id} value={`${envInfo.online_environment_id}`}>
+        //     {envInfo.online_environment_name}
+        //   </Option>,
+        // );
       } else if (
         releaseType === 'online' &&
         envInfo.online_environment_id !== 'cn-northwest-global' &&
@@ -55,11 +62,12 @@ const getOnlineEnv = async (releaseType: any) => {
         envInfo.online_environment_id !== 'cn-northwest-1' &&
         envInfo.online_environment_name !== '集群1-8'
       ) {
-        nameOptions.push(
-          <Option key={envInfo.online_environment_id} value={`${envInfo.online_environment_id}`}>
-            {envInfo.online_environment_name}
-          </Option>,
-        );
+        nameOptions.push(envInfo);
+        // nameOptions.push(
+        //   <Option key={envInfo.online_environment_id} value={`${envInfo.online_environment_id}`}>
+        //     {envInfo.online_environment_name}
+        //   </Option>,
+        // );
       }
     });
   }

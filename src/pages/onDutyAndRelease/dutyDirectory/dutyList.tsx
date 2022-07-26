@@ -176,7 +176,12 @@ const DutyList = () => {
   }, []);
 
   // useEffect(() => {
-  //   gridRef?.current?.refreshCells({ force: true });
+  //   gridRef?.current?.forEachNode((rowNode, index) => {
+  //     const lock = lockList.find(
+  //       (it) => it.param.replace('duty_', '') == rowNode.data.person_duty_num,
+  //     );
+  //     gridRef.current?.updateRowData({ update: [{ ...rowNode.data, bg: !isEmpty(lock) }] });
+  //   });
   // }, [JSON.stringify(lockList)]);
 
   return (

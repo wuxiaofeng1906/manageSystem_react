@@ -60,6 +60,7 @@ const dutyColumn: (ColDef | ColGroupDef)[] = [
     headerName: '消息时间',
     field: 'push_time',
     minWidth: 100,
+    cellStyle: (p) => (p.data.bg ? { background: 'red' } : undefined),
   },
   {
     headerName: '发送人',

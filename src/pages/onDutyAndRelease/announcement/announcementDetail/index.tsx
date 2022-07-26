@@ -8,17 +8,28 @@ import { postAnnouncement, getAnnouncement } from './axiosRequest/apiPage';
 import moment from 'moment';
 import { getHeight } from '@/publicMethods/pageSet';
 import usePermission from '@/hooks/permission';
+import { useParams } from 'umi';
 
 const { TextArea } = Input;
 const { TabPane } = Tabs;
 let releaseTime = 'before'; // 升级前公告还是升级后公告
 let announceId = 0; // 记录升级ID
 const Announce: React.FC<any> = (props: any) => {
-  const { releaseNum, operteStatus } = props.location?.query;
+  const {
+    id: releaseNum,
+    status: operteStatus,
+    type,
+  } = useParams() as {
+    id: string;
+    status: string;
+    type: 'add' | 'detail';
+  };
+
   const { announcePermission } = usePermission();
   const hasPermission = announcePermission();
 
   const [announceContentForm] = Form.useForm();
+  const [announcementNameForm] = Form.useForm();
   const [pageHeight, setPageHeight] = useState(getHeight());
   // 一键挂起公告按钮是否可用以及style
   const [buttonDisable, setButtonDisable] = useState({
@@ -63,23 +74,31 @@ const Announce: React.FC<any> = (props: any) => {
       const formData = announceContentForm.getFieldsValue();
       // 无论前面更新了哪个字段，后面的预览都要更新
       announceContentForm.setFieldsValue({
-        UpgradeIntroDate: `"${formData.showAnnounceTime}"`,
-        UpgradeDescription: `"${formData.announceDetails_1}${formData.showAnnounceTime}${formData.announceDetails_2}"`,
-        isUpdated: `"${formData.showUpdateDetails}"`,
+        UpgradeIntroDate: `"${formData.showAnnounceTime ?? ''}"`,
+        UpgradeDescription: `"${formData.announceDetails_1 ?? ''}${
+          formData.showAnnounceTime ?? ''
+        }${formData.announceDetails_2 ?? ''}"`,
+        isUpdated: `"${formData.showUpdateDetails ?? ''}"`,
       });
     }
   };
 
   // 点击保存或者发布按钮
   const saveAndReleaseAnnouncement = async (releaseType: string) => {
-    const basicInfo = { releaseNum, releaseType, releaseTime, announceId };
+    const basicInfo = {
+      releaseNum,
+      releaseTime,
+      announceId,
+      releaseType,
+    };
+    const nameValid = await announcementNameForm.validateFields();
     const formDatas = announceContentForm.getFieldsValue();
     if (!formDatas.announceDetails_1 || !formDatas.announceDetails_2) {
       errorMessage('公告详情不能为空！');
       return;
     }
-    const result = await postAnnouncement(formDatas, basicInfo);
-    const operate = releaseType === 'save' ? '保存' : '公告挂起';
+    const result = await postAnnouncement({ ...formDatas, ...nameValid }, basicInfo);
+    const operate = type == 'add' ? '新增' : releaseType === 'save' ? '保存' : '公告挂起';
     if (result.code === 200) {
       sucMessage(`${operate}成功！`);
       setButtonDisable({
@@ -154,12 +173,19 @@ const Announce: React.FC<any> = (props: any) => {
     showFormData(announceContent);
   };
 
-  const announceData = useRequest(() => getAnnouncement(releaseNum, 'before')).data; // 关联值班名单
+  const announceData =
+    type == 'add' ? null : useRequest(() => getAnnouncement(releaseNum, 'before')).data; // 关联值班名单
   useEffect(() => {
     if (announceData) {
       showFormData(announceData);
     }
   }, [announceData]);
+
+  useEffect(() => {
+    announcementNameForm.setFieldsValue({
+      announcement_name: `${releaseNum}升级公告`,
+    });
+  }, [releaseNum]);
 
   window.onresize = function () {
     setPageHeight(getHeight());
@@ -167,7 +193,16 @@ const Announce: React.FC<any> = (props: any) => {
 
   return (
     <PageContainer>
-      <div style={{ marginTop: -15 }}>
+      <div style={{ marginTop: -15, background: 'white', padding: 10 }}>
+        <Form form={announcementNameForm}>
+          <Form.Item
+            label={'公告批次名称'}
+            name={'announcement_name'}
+            rules={[{ required: true, message: '请填写公告批次名称！' }]}
+          >
+            <Input placeholder={'公告批次名称'} style={{ width: '300px' }} />
+          </Form.Item>
+        </Form>
         {/* Tab展示 */}
         <Tabs onChange={onTabChanged} type="card">
           <TabPane tab="升级前公告" key="before"></TabPane>

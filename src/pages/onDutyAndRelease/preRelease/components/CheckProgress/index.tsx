@@ -150,7 +150,7 @@ const CheckProgress: React.FC<any> = () => {
   if (panes && panes.length > 0) {
     panes.forEach((ele: any) => {
       if (ele.key === tabsData.activeKey) {
-        href = `http://${window.location.host}/onDutyAndRelease/announcementDetail?releaseNum=${tabsData.activeKey}&releaseName=${ele.title}&operteStatus=${operteStatus}`;
+        href = `http://${window.location.host}/onDutyAndRelease/announcementDetail/${tabsData.activeKey}/detail/${operteStatus}`;
       }
     });
   }

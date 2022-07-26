@@ -316,7 +316,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     setGridHeight(getHeight() - 210);
   };
 
-  const href = `http://${window.location.host}/onDutyAndRelease/announcementDetail?releaseNum=${otherSaveCondition.onlineReleaseNum}&operteStatus=${historyQuery}`;
+  const href = `http://${window.location.host}/onDutyAndRelease/announcementDetail/${otherSaveCondition.onlineReleaseNum}/detail/${historyQuery}`;
   return (
     <PageContainer title={<div />}>
       <div style={{ marginTop: -15 }}>

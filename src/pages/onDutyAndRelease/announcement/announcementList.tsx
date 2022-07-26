@@ -6,6 +6,7 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { FolderAddTwoTone } from '@ant-design/icons';
 import { announcementListColumn } from './column';
 import styles from './index.less';
+import DutyListServices from '@/services/dutyList';
 
 const announcementList = () => {
   const [list, setList] = useState<any[]>([]);
@@ -45,14 +46,20 @@ const announcementList = () => {
       },
     ]);
   }, []);
+  const onAdd = async () => {
+    const res = await DutyListServices.getDutyNum();
+    window.open(
+      `${location.origin}/onDutyAndRelease/announcementDetail/${res.ready_release_num}/add/false`,
+    );
+  };
 
   return (
     <PageContainer>
       <div className={styles.announcementList}>
         <Form form={form} className={styles.resetForm}>
-          <Row justify={'space-around'} style={{ marginBottom: 5 }}>
+          <Row justify={'space-between'} gutter={3} style={{ marginBottom: 5 }}>
             <Col span={3}>
-              <Button type={'text'} icon={<FolderAddTwoTone />}>
+              <Button type={'text'} icon={<FolderAddTwoTone />} onClick={onAdd}>
                 新增
               </Button>
             </Col>
@@ -66,7 +73,7 @@ const announcementList = () => {
                 <DatePicker style={{ width: '100%' }} />
               </Form.Item>
             </Col>
-            <Col span={7}>
+            <Col span={9}>
               <Form.Item label={'公告内容'} name={'content'}>
                 <Input style={{ width: '100%' }} />
               </Form.Item>

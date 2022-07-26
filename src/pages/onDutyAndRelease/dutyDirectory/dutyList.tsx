@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { history, useModel } from 'umi';
 import { Form, DatePicker, Row, Col, Button, Select, message, Modal, Input } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import { AgGridReact } from 'ag-grid-react';
 import { FolderAddTwoTone, CopyTwoTone } from '@ant-design/icons';
 import dutyColumn from '@/pages/onDutyAndRelease/dutyDirectory/column';
-import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
+import { CellClickedEvent, CellMouseOverEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import styles from './index.less';
 import DutyListServices from '@/services/dutyList';
 import moment from 'moment';
@@ -149,6 +149,16 @@ const DutyList = () => {
       ? { border: '1px solid red', background: '#FFF6F6' }
       : null;
   };
+
+  const onCellMouseOver = (param: CellMouseOverEvent) => {
+    const id = param.data.person_duty_num;
+    const lock = lockList.find((it) => it.param.replace('duty_', '') == id);
+    if (isEmpty(lock)) return;
+    param.colDef.tooltipComponentParams = {
+      value: `${lock?.user_name}正在编辑`,
+    };
+  };
+
   useEffect(() => {
     form.setFieldsValue({
       time: [moment().startOf('month'), moment().endOf('month')],
@@ -157,14 +167,19 @@ const DutyList = () => {
     getProjects();
     getList();
   }, []);
+
   useEffect(() => {
     let timer = setInterval(() => {
       getAllLock('duty');
-    }, 5000);
+    }, 3000);
     return () => {
       clearInterval(timer);
     };
   }, []);
+
+  // useEffect(() => {
+  //   gridRef?.current?.refreshCells({ force: true });
+  // }, [JSON.stringify(lockList)]);
 
   return (
     <PageContainer>
@@ -237,7 +252,6 @@ const DutyList = () => {
             getRowStyle={getRowStyle as any}
             rowHeight={30}
             headerHeight={35}
-            suppressRowTransform={true}
             onGridReady={onGridReady}
             onGridSizeChanged={onGridReady}
             frameworkComponents={{
@@ -249,6 +263,12 @@ const DutyList = () => {
                   {params.value}
                 </div>
               ),
+            }}
+            tooltipMouseTrack={true}
+            onCellMouseOver={onCellMouseOver}
+            onCellMouseOut={(e) => {
+              e.colDef.tooltipField = undefined;
+              e.colDef.tooltipComponentParams = null;
             }}
           />
         </div>

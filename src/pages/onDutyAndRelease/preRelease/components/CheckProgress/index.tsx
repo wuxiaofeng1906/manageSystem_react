@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Progress, Row, Select, Modal, Button, Form, Checkbox } from 'antd';
 import { useModel } from '@@/plugin-model/useModel';
 import { saveProcessResult, executeAutoCheck } from './axiosRequest';
@@ -9,25 +9,27 @@ import {
   postAnnouncementForOtherPage,
 } from '@/pages/onDutyAndRelease/announcement/announcementDetail/axiosRequest/apiPage';
 import usePermission from '@/hooks/permission';
+import AnnouncementServices from '@/services/announcement';
 
 const { Option } = Select;
 
 const CheckProgress: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const { tabsData, processStatus, modifyProcessStatus, operteStatus } = useModel('releaseProcess');
-  const [disabled, setDisabled] = useState(false);
+  const [announcementForm] = Form.useForm();
+  const [pulishResultForm] = Form.useForm();
   const { announcePermission } = usePermission();
+
+  const [disabled, setDisabled] = useState(false);
+  const [announcementList, setAnnouncementList] = useState<any[]>([]);
   const [isModalVisible, setModalVisible] = useState({
     show: false,
     result: '',
     hintMsg: { message1: '', message2: '' },
     autoCheckDisabled: true,
   });
-
   // 保存发布公告的内容
   const [announceInfo, setAnnounceInfo] = useState(null);
-
-  const [pulishResultForm] = Form.useForm();
 
   // 发布结果修改
   const pulishResulttChanged = async (params: any) => {
@@ -144,23 +146,27 @@ const CheckProgress: React.FC<any> = () => {
     });
   };
 
-  // 跳转到发布公告界面
-  let href;
-  const { panes } = tabsData;
-  if (panes && panes.length > 0) {
-    panes.forEach((ele: any) => {
-      if (ele.key === tabsData.activeKey) {
-        href = `http://${window.location.host}/onDutyAndRelease/announcementDetail/${tabsData.activeKey}/detail/${operteStatus}`;
-      }
-    });
-  }
+  const getAnnouncementList = async () => {
+    const res = await AnnouncementServices.announcementList({});
+    setAnnouncementList(
+      res.data?.map((it: any) => ({ label: it.announcement_name, value: it.announcement_num })),
+    );
+  };
+  useEffect(() => {
+    getAnnouncementList();
+  }, []);
+
   return (
     <div>
       {announcePermission()?.check ? (
-        <a href={href} target={'_blank'} style={{ float: 'right' }}>
-          <img src="../annouce.png" width="20" height="20" alt="发布公告" title="发布公告" /> &nbsp;
-          发布公告
-        </a>
+        <Form form={announcementForm} size={'small'}>
+          <Form.Item
+            label={<strong style={{ marginLeft: 5 }}>发布公告</strong>}
+            name={'announcement'}
+          >
+            <Select options={[]} style={{ width: 200 }} />
+          </Form.Item>
+        </Form>
       ) : (
         <div />
       )}

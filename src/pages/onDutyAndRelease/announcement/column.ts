@@ -4,11 +4,12 @@ export const announcementListColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: 'ID',
     field: 'num',
-    maxWidth: 90,
+    minWidth: 90,
+    maxWidth: 100,
   },
   {
     headerName: '公告批次名称',
-    field: 'name',
+    field: 'announcement_name',
     minWidth: 120,
   },
   {
@@ -28,7 +29,7 @@ export const announcementListColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '升级后公告内容',
-    field: 'afterContent',
+    field: 'upgrade_description',
     minWidth: 130,
   },
   {
@@ -39,17 +40,17 @@ export const announcementListColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '创建时间',
-    field: 'createTime',
+    field: 'announcement_time',
     minWidth: 150,
   },
   {
     headerName: '编辑人',
-    field: 'editer',
+    field: 'user_name',
     minWidth: 120,
   },
   {
     headerName: '编辑时间',
-    field: 'editeTime',
+    field: 'upgrade_time',
     minWidth: 100,
   },
   {

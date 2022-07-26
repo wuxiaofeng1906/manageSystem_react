@@ -145,9 +145,7 @@ const DutyList = () => {
   );
   const getRowStyle = (params: any) => {
     const lockNode = lockList.map((it) => it.param.replace('duty_', ''));
-    return lockNode.includes(params.data.person_duty_num)
-      ? { border: '1px solid red', background: '#FFF6F6' }
-      : null;
+    return lockNode.includes(params.data.person_duty_num) ? { background: '#fddede' } : null;
   };
 
   const onCellMouseOver = (param: CellMouseOverEvent) => {

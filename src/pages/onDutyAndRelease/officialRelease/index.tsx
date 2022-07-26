@@ -22,13 +22,14 @@ import {
   getOnlineAutoResult,
   getOnlineEnv,
 } from './axiosRequest/apiPage';
-import {sucMessage} from '@/publicMethods/showMessages';
-import {getCurrentUserInfo} from '@/publicMethods/authorityJudge';
-import {history} from '@@/core/history';
+import { sucMessage } from '@/publicMethods/showMessages';
+import { getCurrentUserInfo } from '@/publicMethods/authorityJudge';
+import { history } from '@@/core/history';
 import {
   getAnnouncement,
-  postAnnouncementForOtherPage
-} from "@/pages/onDutyAndRelease/releaseAnnouncement/axiosRequest/apiPage";
+  postAnnouncementForOtherPage,
+} from '@/pages/onDutyAndRelease/releaseAnnouncement/axiosRequest/apiPage';
+import usePermission from '@/hooks/permission';
 
 // 编辑后的数据
 let otherSaveCondition: any = {
@@ -45,6 +46,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   const historyQuery = props.location?.query?.history === 'true';
   const releaseType = props.location?.query?.releaseType;
   const [rowData, setRowData] = useState([]);
+  const { announcePermission } = usePermission();
   const dutyNameArray = useRequest(() => loadDutyNamesSelect(true)).data; // 关联值班名单
   const pageData = useRequest(() => getOfficialReleaseDetails(onlineReleaseNum, releaseType)).data; // 界面数据获取
   onlineEnv = useRequest(() => getOnlineEnv(releaseType)).data; // 上线集群环境
@@ -157,24 +159,24 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           }
         }
 
-      // 发布成功才调用自动化检查接口
-      const result = await runAutoCheck(formData, otherSaveCondition.onlineReleaseNum);
-      if (result.code !== 200) {
-        errorMessage(`发布成功后自动化检查结果保存失败：${result}`);
-      } else {
-        // 保存成功后获取自动化检查结果
-        const autoRt: any = await getOnlineAutoResult(otherSaveCondition.onlineReleaseNum);
-        setAutoCheckRt(autoRt);
-      }
+        // 发布成功才调用自动化检查接口
+        const result = await runAutoCheck(formData, otherSaveCondition.onlineReleaseNum);
+        if (result.code !== 200) {
+          errorMessage(`发布成功后自动化检查结果保存失败：${result}`);
+        } else {
+          // 保存成功后获取自动化检查结果
+          const autoRt: any = await getOnlineAutoResult(otherSaveCondition.onlineReleaseNum);
+          setAutoCheckRt(autoRt);
+        }
 
-      // 如果勾选了发布公告复选框，还要调用公告发布接口发布公告
-      if (formData.sendAnnouncementMsg && (formData.sendAnnouncementMsg).length > 0) {
-        const announceResult = await postAnnouncementForOtherPage(announceInfo);
-        if (announceResult.code !== 200) {
-          errorMessage("发布后公告挂起失败！");
+        // 如果勾选了发布公告复选框，还要调用公告发布接口发布公告
+        if (formData.sendAnnouncementMsg && formData.sendAnnouncementMsg.length > 0) {
+          const announceResult = await postAnnouncementForOtherPage(announceInfo);
+          if (announceResult.code !== 200) {
+            errorMessage('发布后公告挂起失败！');
+          }
         }
       }
-    }
 
       // 调用保存接口: 如果是取消，则单独调用取消接口
       if (isModalVisible.result === 'cancel') {
@@ -226,7 +228,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       hintMsgs.message2 = '如有自动化也执行通过!确认通过，会自动开放所有租户。';
       autoDisable = false;
       // 需要查询当前发布编号有没有对应的发布后公告内容
-      announceContent = await getAnnouncement(otherSaveCondition.onlineReleaseNum, "after");
+      announceContent = await getAnnouncement(otherSaveCondition.onlineReleaseNum, 'after');
     } else if (params === 'failure') {
       hintMsgs.message1 = '请确认服务是否发布失败！';
     } else if (params === 'cancel') {
@@ -243,7 +245,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       pulishResultForm.setFieldsValue({
         ignoreAfterCheck: [],
         checkResult: [],
-        sendAnnouncementMsg: ["yes"]
+        sendAnnouncementMsg: ['yes'],
       });
       setAnnounceInfo(announceContent.data);
     } else {
@@ -372,13 +374,16 @@ const OfficialRelease: React.FC<any> = (props: any) => {
             </Select>
           </label>
 
-          <label style={{marginLeft: 10}}>{autoCheckRt}</label>
+          <label style={{ marginLeft: 10 }}>{autoCheckRt}</label>
 
-          <a href={href} target={"_blank"} style={{float: "right"}}>
-            <img src="../annouce.png" width="20" height="20" alt="发布公告" title="发布公告"/> &nbsp;
-            发布公告
-          </a>
-
+          {announcePermission()?.check ? (
+            <a href={href} target={'_blank'} style={{ float: 'right' }}>
+              <img src="../annouce.png" width="20" height="20" alt="发布公告" title="发布公告" />{' '}
+              &nbsp; 发布公告
+            </a>
+          ) : (
+            <div />
+          )}
         </div>
         {/* step 1 发布方式及时间 */}
         <div style={{ backgroundColor: 'white', marginTop: 4 }}>
@@ -552,7 +557,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           width={400}
           onCancel={handleCancel}
           centered={true}
-          bodyStyle={{height: 175}}
+          bodyStyle={{ height: 175 }}
           footer={[
             <Button key="cancel" onClick={handleCancel} style={{ borderRadius: 5 }}>
               取消
@@ -598,8 +603,12 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                 <Checkbox value="applet">小程序执行通过</Checkbox>
               </Checkbox.Group>
             </Form.Item>
-            <Form.Item label="是否挂起升级后公告:" name="sendAnnouncementMsg" style={{marginTop: -25}}>
-              <Checkbox.Group style={{width: '100%'}} disabled={announceInfo === null}>
+            <Form.Item
+              label="是否挂起升级后公告:"
+              name="sendAnnouncementMsg"
+              style={{ marginTop: -25 }}
+            >
+              <Checkbox.Group style={{ width: '100%' }} disabled={announceInfo === null}>
                 <Checkbox value="yes" defaultChecked={true}></Checkbox>
               </Checkbox.Group>
             </Form.Item>

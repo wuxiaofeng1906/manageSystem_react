@@ -25,22 +25,10 @@ let currentPanes: any;
 const PreRelease: React.FC<any> = () => {
   // Tab标签数据显示
   const {
-    modifyOperteStatus,
-    tabsData,
-    setTabsData,
-    processStatus,
-    modifyProcessStatus,
-    modifyPreReleaseData,
-    lockedItem,
-    setRelesaeItem,
-    setUpgradeApi,
-    setUpgradeConfirm,
-    modifyReleasedID,
-    setDataReview,
-    setDataReviewConfirm,
-    setOnlineBranch,
-    setCorrespOrder,
-    modifyAllLockedArray,
+    modifyOperteStatus, tabsData, setTabsData, processStatus, modifyProcessStatus, modifyPreReleaseData,
+    lockedItem, setRelesaeItem, setUpgradeApi, setUpgradeConfirm,
+    modifyReleasedID, setDataReview, setDataReviewConfirm, setOnlineBranch,
+    setCorrespOrder, modifyAllLockedArray
   } = useModel('releaseProcess');
 
   // 用于定时任务显示数据，定时任务useEffect中渲染了一次。不能实时更新
@@ -102,8 +90,9 @@ const PreRelease: React.FC<any> = () => {
       edit_user_name: '',
       edit_time: '',
       pro_id: '',
-      ignoreZentaoList: '2',
-      checkListStatus: '',
+      ignoreZentaoList: "2",
+      checkListStatus: "",
+      release_cluster: "tenant"
     });
 
     //  发布项
@@ -139,9 +128,14 @@ const PreRelease: React.FC<any> = () => {
       errorMessage(initData.errmessage.toString());
       return;
     }
+
+    // 自动刷新时无数据不更新数据
     if (initData.length === 0) {
-      // 后端无数据
-      showNoneDataPage();
+      // 初始化的时候无数据再显示，自动刷新无数据不更新界面
+      if (initShow) {
+        // 后端无数据
+        showNoneDataPage();
+      }
       return;
     }
 
@@ -156,6 +150,7 @@ const PreRelease: React.FC<any> = () => {
       } else {
         setTabsData(tabPageInfo?.activeKey, tabPageInfo?.panes);
       }
+
     } else {
       setTabsData(tabPageInfo?.activeKey, currentPanes);
     }

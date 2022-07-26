@@ -12,6 +12,10 @@
   padding: .35em .625em .75em;
   border: 1px solid silver;
 }
+ .no-wrap-form .ant-form-item-control{
+   min-width: 0 !important;
+ }
+
 
 
 

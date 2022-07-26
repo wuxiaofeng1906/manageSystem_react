@@ -10,12 +10,13 @@ import {
 } from '../../comControl/controler';
 import '../../style/style.css';
 import moment from 'moment';
-import { getLockStatus, deleteLockStatus } from '../../lock/rowLock';
-import { savePreProjects } from './axiosRequest';
-import { showProgressData } from '../../components/CheckProgress/processAnalysis';
-import { getCheckProcess } from '../../components/CheckProgress/axiosRequest';
-import { modifyTabsName } from '@/pages/onDutyAndRelease/preRelease/components/Tab/axiosRequest';
-import { alalysisInitData } from '@/pages/onDutyAndRelease/preRelease/datas/dataAnalyze';
+import {getLockStatus, deleteLockStatus} from '../../lock/rowLock';
+import {savePreProjects} from './axiosRequest';
+import {showProgressData} from '../../components/CheckProgress/processAnalysis';
+import {getCheckProcess} from '../../components/CheckProgress/axiosRequest';
+import {modifyTabsName} from "@/pages/onDutyAndRelease/preRelease/components/Tab/axiosRequest";
+import {alalysisInitData} from "@/pages/onDutyAndRelease/preRelease/datas/dataAnalyze";
+import dayjs from "dayjs";
 
 const userLogins: any = localStorage.getItem('userLogins');
 const usersInfo = JSON.parse(userLogins);
@@ -24,14 +25,10 @@ const { Option } = Select;
 const PreReleaseProject: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const {
-    tabsData,
-    setTabsData,
-    preReleaseData,
-    modifyProcessStatus,
-    lockedItem,
-    modifyLockedItem,
-    operteStatus,
-  } = useModel('releaseProcess');
+    tabsData, setTabsData, preReleaseData, modifyPreReleaseData, modifyProcessStatus, lockedItem, modifyLockedItem,
+    operteStatus
+  } =
+    useModel('releaseProcess');
   const [formForPreReleaseProject] = Form.useForm(); // 预发布
 
   const projectsArray = useRequest(() => loadPrjNameSelect()).data;
@@ -96,11 +93,27 @@ const PreReleaseProject: React.FC<any> = () => {
         },
       });
       const modifyTime: any = result.datas;
-      formForPreReleaseProject.setFieldsValue({
-        editor: modifyTime.editor,
-        editTime: modifyTime.editTime,
-        checkListStatus: '',
+      // formForPreReleaseProject.setFieldsValue({
+      //   editor: modifyTime.editor,
+      //   editTime: modifyTime.editTime,
+      //   checkListStatus: ""
+      // });
+
+      modifyPreReleaseData({
+        ...preReleaseData,
+        release_cluster: datas.pulishCluster,// 这里需要改个状态，用于step4租户集群选择时候的变更
+        projectId: datas.projectsName,
+        release_type: datas.pulishType,
+        release_way: datas.pulishMethod,
+        plan_release_time: dayjs(datas.pulishTime).format("YYYY-MM-DD HH:mm:ss"),
+        edit_user_name: modifyTime.editor,
+        edit_time: modifyTime.editTime,
+        pro_id: datas.proid,
+        ignoreZentaoList: datas.ignoreZentaoList,
+        checkListStatus: "",
+        relateDutyName: datas.relateDutyName,
       });
+
       // 保存成功后需要刷新状态
       const processData: any = await getCheckProcess(tabsData?.activeKey);
       if (processData) {
@@ -153,6 +166,7 @@ const PreReleaseProject: React.FC<any> = () => {
         pulishType: preReleaseData.release_type,
         pulishMethod: preReleaseData.release_way,
         pulishTime: moment(preReleaseData.plan_release_time),
+        pulishCluster: preReleaseData.release_cluster,
         editor: preReleaseData.edit_user_name,
         editTime: preReleaseData.edit_time,
         proid: preReleaseData.pro_id,
@@ -170,7 +184,6 @@ const PreReleaseProject: React.FC<any> = () => {
           <legend className={'legendStyle'}>
             Step1 预发布项目
             <label style={{ color: 'Gray' }}>
-              {' '}
               (值班测试填写)[只有global发布、修复0-8集群发布、修复2-8集群发布，选择"正式发布";
               其他都选择“灰度发布”]
             </label>
@@ -195,7 +208,7 @@ const PreReleaseProject: React.FC<any> = () => {
             </div>
 
             <div>
-              <Form form={formForPreReleaseProject}>
+              <Form form={formForPreReleaseProject} className={'no-wrap-form'}>
                 <Row>
                   <Col span={11}>
                     {/* 项目名称 */}
@@ -229,8 +242,18 @@ const PreReleaseProject: React.FC<any> = () => {
                     </Form.Item>
                   </Col>
                 </Row>
-                <Row style={{ marginTop: -15 }}>
-                  <Col span={11}>
+                <Row style={{marginTop: -15}}>
+                  <Col span={5}>
+                    {/* 发布集群 */}
+                    <Form.Item label="发布集群:" name="pulishCluster" style={{marginLeft: 5}}>
+                      <Select onFocus={releaseItemFocus} disabled={operteStatus}>
+                        <Option key={"tenant"} value={"tenant"}>租户集群发布</Option>
+                        <Option key={"global"} value={"global"}>global集群发布</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+
+                  <Col span={6}>
                     {/* 发布时间 */}
                     <Form.Item label="发布时间" name="pulishTime" style={{ marginLeft: 5 }}>
                       <DatePicker

@@ -25,6 +25,11 @@ import {
 import { sucMessage } from '@/publicMethods/showMessages';
 import { getCurrentUserInfo } from '@/publicMethods/authorityJudge';
 import { history } from '@@/core/history';
+import {
+  getAnnouncement,
+  postAnnouncementForOtherPage,
+} from '@/pages/onDutyAndRelease/releaseAnnouncement/axiosRequest/apiPage';
+import usePermission from '@/hooks/permission';
 
 // 编辑后的数据
 let otherSaveCondition: any = {
@@ -41,6 +46,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   const historyQuery = props.location?.query?.history === 'true';
   const releaseType = props.location?.query?.releaseType;
   const [rowData, setRowData] = useState([]);
+  const { announcePermission } = usePermission();
   const dutyNameArray = useRequest(() => loadDutyNamesSelect(true)).data; // 关联值班名单
   const pageData = useRequest(() => getOfficialReleaseDetails(onlineReleaseNum, releaseType)).data; // 界面数据获取
   onlineEnv = useRequest(() => getOnlineEnv(releaseType)).data; // 上线集群环境
@@ -89,6 +95,8 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     hintMsg: { message1: '', message2: '' },
     autoCheckDisabled: true,
   });
+  // 保存发布公告的内容
+  const [announceInfo, setAnnounceInfo] = useState(null);
 
   // 取消发布
   const handleCancel = () => {
@@ -160,6 +168,14 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           const autoRt: any = await getOnlineAutoResult(otherSaveCondition.onlineReleaseNum);
           setAutoCheckRt(autoRt);
         }
+
+        // 如果勾选了发布公告复选框，还要调用公告发布接口发布公告
+        if (formData.sendAnnouncementMsg && formData.sendAnnouncementMsg.length > 0) {
+          const announceResult = await postAnnouncementForOtherPage(announceInfo);
+          if (announceResult.code !== 200) {
+            errorMessage('发布后公告挂起失败！');
+          }
+        }
       }
 
       // 调用保存接口: 如果是取消，则单独调用取消接口
@@ -202,6 +218,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
     // 不同选择弹出不同的提示框
     let autoDisable = true;
+    let announceContent: any = {};
     let hintMsgs = {
       message1: '请确认是否修改服务发布结果为空！',
       message2: '',
@@ -210,6 +227,8 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       hintMsgs.message1 = '请确认服务是否发布成功?';
       hintMsgs.message2 = '如有自动化也执行通过!确认通过，会自动开放所有租户。';
       autoDisable = false;
+      // 需要查询当前发布编号有没有对应的发布后公告内容
+      announceContent = await getAnnouncement(otherSaveCondition.onlineReleaseNum, 'after');
     } else if (params === 'failure') {
       hintMsgs.message1 = '请确认服务是否发布失败！';
     } else if (params === 'cancel') {
@@ -222,7 +241,17 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       show: true,
     });
 
-    pulishResultForm.resetFields();
+    if (announceContent.data) {
+      pulishResultForm.setFieldsValue({
+        ignoreAfterCheck: [],
+        checkResult: [],
+        sendAnnouncementMsg: ['yes'],
+      });
+      setAnnounceInfo(announceContent.data);
+    } else {
+      pulishResultForm.resetFields();
+      setAnnounceInfo(null);
+    }
     // 赋值发布结果
     otherSaveCondition.releaseResult = params;
   };
@@ -288,6 +317,8 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   window.onresize = function () {
     setGridHeight(getHeight() - 210);
   };
+
+  const href = `http://${window.location.host}/onDutyAndRelease/releaseAnnouncement?releaseNum=${otherSaveCondition.onlineReleaseNum}&operteStatus=${historyQuery}`;
   return (
     <PageContainer title={<div />}>
       <div style={{ marginTop: -15 }}>
@@ -298,6 +329,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
               <Input
                 style={{ width: 350 }}
                 placeholder={'发布名称'}
+                disabled={historyQuery}
                 onBlur={async () => {
                   const release_name = releaseNameForm.getFieldsValue().release_name;
                   if (isEmpty(release_name?.trim())) return message.info('请填写发布名称！');
@@ -343,6 +375,15 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           </label>
 
           <label style={{ marginLeft: 10 }}>{autoCheckRt}</label>
+
+          {announcePermission()?.check ? (
+            <a href={href} target={'_blank'} style={{ float: 'right' }}>
+              <img src="../annouce.png" width="20" height="20" alt="发布公告" title="发布公告" />{' '}
+              &nbsp; 发布公告
+            </a>
+          ) : (
+            <div />
+          )}
         </div>
         {/* step 1 发布方式及时间 */}
         <div style={{ backgroundColor: 'white', marginTop: 4 }}>
@@ -516,7 +557,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           width={400}
           onCancel={handleCancel}
           centered={true}
-          bodyStyle={{ height: 145 }}
+          bodyStyle={{ height: 175 }}
           footer={[
             <Button key="cancel" onClick={handleCancel} style={{ borderRadius: 5 }}>
               取消
@@ -560,6 +601,15 @@ const OfficialRelease: React.FC<any> = (props: any) => {
               <Checkbox.Group style={{ width: '100%' }} disabled={isModalVisible.autoCheckDisabled}>
                 <Checkbox value="ui">UI执行通过</Checkbox>
                 <Checkbox value="applet">小程序执行通过</Checkbox>
+              </Checkbox.Group>
+            </Form.Item>
+            <Form.Item
+              label="是否挂起升级后公告:"
+              name="sendAnnouncementMsg"
+              style={{ marginTop: -25 }}
+            >
+              <Checkbox.Group style={{ width: '100%' }} disabled={announceInfo === null}>
+                <Checkbox value="yes" defaultChecked={true}></Checkbox>
               </Checkbox.Group>
             </Form.Item>
           </Form>

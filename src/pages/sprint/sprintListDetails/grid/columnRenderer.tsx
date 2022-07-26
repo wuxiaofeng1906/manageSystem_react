@@ -135,7 +135,6 @@ const linkToZentaoPage = (params: any) => {
 
 // 严重等级值的转换
 const servertyValueGetter = (params: any) => {
-  debugger;
   let severity = "";
   if (params.data?.severity !== null && params.data?.severity !== undefined) {
     switch (params.data?.severity.toString()) {

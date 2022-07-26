@@ -1660,6 +1660,7 @@ const SprintList: React.FC<any> = () => {
                     <Option key={'集群5'} value={'集群5'}>集群5</Option>,
                     <Option key={'集群6'} value={'集群6'}>集群6</Option>,
                     <Option key={'集群7'} value={'集群7'}>集群7</Option>,
+                    <Option key={'集群8'} value={'集群8'}>集群8</Option>,
                     <Option key={'global'} value={'global'}>global</Option>
                   ]}
                 </Select>
@@ -1924,6 +1925,7 @@ const SprintList: React.FC<any> = () => {
                     <Option key={'集群5'} value={'集群5'}>集群5</Option>,
                     <Option key={'集群6'} value={'集群6'}>集群6</Option>,
                     <Option key={'集群7'} value={'集群7'}>集群7</Option>,
+                    <Option key={'集群8'} value={'集群8'}>集群8</Option>,
                     <Option key={'global'} value={'global'}>global</Option>
                   ]}
                 </Select>

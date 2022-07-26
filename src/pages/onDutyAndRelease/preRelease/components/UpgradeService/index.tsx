@@ -42,19 +42,9 @@ const usersInfo = JSON.parse(userLogins);
 let currentOperateStatus = false; // 需要将useState中的operteStatus值赋值过来，如果直接取operteStatus，下拉框那边获取不到最新的operteStatus；
 const UpgradeService: React.FC<any> = () => {
   const {
-    tabsData,
-    modifyProcessStatus,
-    releaseItem,
-    upgradeApi,
-    upgradeConfirm,
-    lockedItem,
-    modifyLockedItem,
-    setRelesaeItem,
-    setUpgradeApi,
-    releasedIDArray,
-    modifyReleasedID,
-    allLockedArray,
-    operteStatus,
+    tabsData, modifyProcessStatus, releaseItem, upgradeApi, upgradeConfirm,preReleaseData,
+    lockedItem, modifyLockedItem, setRelesaeItem, setUpgradeApi, releasedIDArray, modifyReleasedID,
+    allLockedArray, operteStatus,
   } = useModel('releaseProcess');
   const [formUpgradeService] = Form.useForm(); // 升级服务
   // 暂时忽略掉一键部署ID后端服务的获取
@@ -284,8 +274,9 @@ const UpgradeService: React.FC<any> = () => {
       }
     }
 
+    // 设置下拉框
     setPulishItemFormSelected({
-      onlineEnv: await loadOnlineEnvSelect(),
+      onlineEnv: await loadOnlineEnvSelect(preReleaseData.release_cluster ),
       pulishItem: await loadPulishItemSelect(),
       isApiDbUpgrade: await loadIsApiAndDbUpgradeSelect(),
     });
@@ -426,9 +417,9 @@ const UpgradeService: React.FC<any> = () => {
         });
       }
     }
-
+    // 设置下拉框
     setUpgradeApiFormSelected({
-      onlineEnv: await loadOnlineEnvSelect(),
+      onlineEnv: await loadOnlineEnvSelect(preReleaseData.release_cluster ),
       upgradeApi: await loadUpgradeApiSelect(),
       apiService: await loadApiServiceSelect(),
       apiMethod: await loadApiMethodSelect(),
@@ -611,9 +602,7 @@ const UpgradeService: React.FC<any> = () => {
         <fieldset className={'fieldStyle'}>
           <legend className={'legendStyle'}>
             Step4 升级服务
-            <label style={{ color: 'Gray' }}>
-              {' '}
-              (值班测试：填写一键部署ID和测试服务确认完成；前后端值班：填写应用服务和升级接口/对应服务确认完成)
+            <label style={{color: "Gray"}}> (值班测试：填写一键部署ID和测试服务确认完成；前后端值班：填写应用服务和升级接口/对应服务确认完成)
             </label>
           </legend>
           <div>
@@ -1014,13 +1003,13 @@ const UpgradeService: React.FC<any> = () => {
         onCancel={upgradeIntModalCancle}
         centered={true}
         footer={null}
-        width={630}
+        width={1000}
       >
         <Form form={upgradeIntForm}>
           <Row>
             <Col span={12}>
               <Form.Item name="onlineEnv" label="上线环境:" required style={{ marginTop: -15 }}>
-                <Select showSearch mode="multiple" style={{ marginLeft: 20, width: 185 }}>
+                <Select showSearch mode="multiple" style={{ width: '100%' }}>
                   {upgradeApiFormSelected.onlineEnv}
                 </Select>
               </Form.Item>
@@ -1042,7 +1031,7 @@ const UpgradeService: React.FC<any> = () => {
           <Row>
             <Col span={12}>
               <Form.Item name="interService" label="接口服务：" required style={{ marginTop: -15 }}>
-                <Select showSearch style={{ marginLeft: 21, width: 185 }}>
+                <Select showSearch style={{ width: '100%' }}>
                   {upgradeApiFormSelected.apiService}
                 </Select>
               </Form.Item>

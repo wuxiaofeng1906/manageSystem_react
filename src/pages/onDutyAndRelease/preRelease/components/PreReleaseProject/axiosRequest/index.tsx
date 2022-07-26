@@ -27,7 +27,8 @@ const savePrePulishProjects = async (params: any, listNo: string) => {
     plan_release_time: dayjs(params.pulishTime).format('YYYY-MM-DD HH:mm:ss'),
     ready_release_num: listNo,
     ignore_check: params.ignoreZentaoList,
-    person_duty_num: params.relateDutyName === '免' ? "" : params.relateDutyName
+    person_duty_num: params.relateDutyName === '免' ? "" : params.relateDutyName,
+    cluster: params.pulishCluster
   };
 
   if (params.proid) {
@@ -82,6 +83,12 @@ const savePreProjects = async (source: any, releaseNum: string) => {
 
   if (!source.pulishMethod) {
     result.errorMessage = '发布方式不能为空！';
+    return result;
+  }
+
+
+  if (!source.pulishCluster) {
+    result.errorMessage = '发布集群不能为空！';
     return result;
   }
 

@@ -102,6 +102,7 @@ const OnlineBranch: React.FC<any> = () => {
     });
 
     const formData = formForOnlineBranch.getFieldsValue();
+    console.log(newOnlineBranchNum, { ...formData, checkEnv: formData.imageevn });
     const result = await saveOnlineBranchData(
       onlineBranchModal.title,
       tabsData.activeKey,
@@ -663,14 +664,14 @@ const OnlineBranch: React.FC<any> = () => {
         maskClosable={false}
         centered={true}
         footer={null}
-        width={652}
-        bodyStyle={{ height: '650px' }}
+        width={900}
+        bodyStyle={{ height: '680px' }}
       >
         <Form form={formForOnlineBranch}>
           {/* 总设置 */}
           <div style={{ marginTop: -15 }}>
-            <Row>
-              <Col span={16}>
+            <Row gutter={8}>
+              <Col span={9}>
                 {/* 分支名称 */}
                 <Form.Item label="分支名称:" name="branchName" required={true}>
                   <Select style={{ width: '100%' }} showSearch onChange={showServerSelect}>
@@ -678,11 +679,18 @@ const OnlineBranch: React.FC<any> = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={8}>
+              <Col span={6}>
                 {/* 技术侧 */}
-                <Form.Item label="技术侧:" name="module" style={{ marginLeft: 10 }} required={true}>
+                <Form.Item label="技术侧:" name="module" required={true}>
                   <Select style={{ width: '100%' }} showSearch>
                     {onlineBranchFormSelected.techSide}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={9}>
+                <Form.Item name="imageevn" label="镜像环境" required={true}>
+                  <Select placeholder="请选择对应的环境！" showSearch style={{ width: '100%' }}>
+                    {onlineBranchFormSelected.imgEnv}
                   </Select>
                 </Form.Item>
               </Col>
@@ -714,7 +722,7 @@ const OnlineBranch: React.FC<any> = () => {
               <Card
                 size="small"
                 title="版本检查"
-                style={{ width: '100%', marginTop: -10, height: 150 }}
+                style={{ width: '100%', marginTop: -10, height: 115 }}
               >
                 <Form.Item
                   name="verson_check"
@@ -735,15 +743,6 @@ const OnlineBranch: React.FC<any> = () => {
                     treeData={onlineBranchFormSelected.server}
                     showSearch
                   ></TreeSelect>
-                </Form.Item>
-                <Form.Item name="imageevn" label="镜像环境" style={{ marginTop: -20 }}>
-                  <Select
-                    placeholder="请选择对应的环境！"
-                    style={{ marginLeft: 40, width: 415 }}
-                    showSearch
-                  >
-                    {onlineBranchFormSelected.imgEnv}
-                  </Select>
                 </Form.Item>
               </Card>
             </div>
@@ -811,20 +810,42 @@ const OnlineBranch: React.FC<any> = () => {
                     </Checkbox.Group>
                   </Form.Item>
                 </Col>
-                <Col span={15}>
-                  {/* 检查环境 */}
-                  <Form.Item label="检查环境:" name="checkEnv" style={{ marginTop: -10 }}>
-                    <Select style={{ width: '100%' }} showSearch>
-                      {onlineBranchFormSelected.imgEnv}
-                    </Select>
+                {/*<Col span={15}>*/}
+                {/*  /!* 检查环境 *!/*/}
+                {/*  <Form.Item label="检查环境:" name="checkEnv" style={{ marginTop: -10 }}>*/}
+                {/*    <Select style={{ width: '100%' }} showSearch>*/}
+                {/*      {onlineBranchFormSelected.imgEnv}*/}
+                {/*    </Select>*/}
+                {/*  </Form.Item>*/}
+                {/*</Col>*/}
+              </Row>
+            </div>
+          </div>
+          {/* ③ 是否可以热更新检查 */}
+          <div style={{ marginTop: -35 }}>
+            <Divider plain>③ 是否可以热更新检查</Divider>
+            <div>
+              <Row>
+                <Col span={6}>
+                  {/* 忽略检查 */}
+                  <Form.Item label="是否忽略检查" name="ignoreCheckHot" style={{ marginTop: -10 }}>
+                    <Checkbox.Group>
+                      <Checkbox value={'1'}>忽略检查</Checkbox>
+                    </Checkbox.Group>
+                  </Form.Item>
+                </Col>
+                <Col span={18}>
+                  {/* 发布环境 */}
+                  <Form.Item label="发布环境:" name="publishEnv" style={{ marginTop: -10 }}>
+                    <Select style={{ width: '100%' }} showSearch options={[]} />
                   </Form.Item>
                 </Col>
               </Row>
             </div>
           </div>
-          {/* ③ 上线前自动化检查设置 */}
+          {/* ④ 上线前自动化检查设置 */}
           <div style={{ marginTop: -35 }}>
-            <Divider plain>③ 上线前自动化检查设置</Divider>
+            <Divider plain>④ 上线前自动化检查设置</Divider>
             <Row style={{ marginTop: -10 }}>
               <Col>
                 {/* 忽略检查 */}

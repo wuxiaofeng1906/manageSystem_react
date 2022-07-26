@@ -1,7 +1,8 @@
 import axios from 'axios';
-import {getDutyPersonPermission, getSystemPersonPermission} from '../../../authority/permission';
-import dayjs from "dayjs";
-import {saveBeforeAndAfterOnlineAutoCheck} from "../../../comControl/axiosRequest";
+import { getDutyPersonPermission, getSystemPersonPermission } from '../../../authority/permission';
+import dayjs from 'dayjs';
+import { saveBeforeAndAfterOnlineAutoCheck } from '../../../comControl/axiosRequest';
+import { isEmpty } from 'lodash';
 
 const sys_accessToken = localStorage.getItem('accessId');
 axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
@@ -31,10 +32,8 @@ const getCheckNumForOnlineBranch = async () => {
   return result;
 };
 
-
 // 上线分支修改-表头数据解析
 const alayOnlineCheckHead = (source_data: any) => {
-
   let f_ignore = '2';
   let b_ignore = '2';
   const testUnit = source_data.test_unit;
@@ -88,7 +87,7 @@ const alayVersonCheck = (source_data: any) => {
     branch_mainSince: checkData.main_since,
   };
 
-  return {versonCheckData, branchCheck};
+  return { versonCheckData, branchCheck };
 };
 
 // 环境一致性检查
@@ -109,7 +108,6 @@ const alayEnvironmentCheck = (source_data: any) => {
 
 // 自动化检查
 const autoCheck = (source_data: any) => {
-
   const autoCheckData = source_data.automation_check;
   if (!source_data.automation_check || source_data.automation_check.length === 0) {
     return {};
@@ -117,40 +115,36 @@ const autoCheck = (source_data: any) => {
 
   const beforeOnline: any = {
     ignoreCheck: '',
-    checkResult: []
+    checkResult: [],
   };
   const afterOnline: any = {
     ignoreCheck: '',
-    checkResult: []
+    checkResult: [],
   };
   autoCheckData.forEach((ele: any) => {
-
-    if (ele.check_time === "before") {
+    if (ele.check_time === 'before') {
       beforeOnline.ignoreCheck = ele.ignore_check;
 
-      if (ele.check_type === "ui" && ele.check_result === "yes") {
-        beforeOnline.checkResult.push("ui");
-      } else if (ele.check_type === "api" && ele.check_result === "yes") {
-        beforeOnline.checkResult.push("api");
-      } else if (ele.check_type === "applet" && ele.check_result === "yes") {
-        beforeOnline.checkResult.push("applet");
+      if (ele.check_type === 'ui' && ele.check_result === 'yes') {
+        beforeOnline.checkResult.push('ui');
+      } else if (ele.check_type === 'api' && ele.check_result === 'yes') {
+        beforeOnline.checkResult.push('api');
+      } else if (ele.check_type === 'applet' && ele.check_result === 'yes') {
+        beforeOnline.checkResult.push('applet');
       }
-    } else if (ele.check_time === "before") {
+    } else if (ele.check_time === 'before') {
       afterOnline.ignoreCheck = ele.ignore_check;
 
-      if (ele.check_type === "ui" && ele.check_result === "yes") {
-        afterOnline.checkResult.push("ui");
-      } else if (ele.check_type === "applet" && ele.check_result === "yes") {
-        afterOnline.checkResult.push("applet");
+      if (ele.check_type === 'ui' && ele.check_result === 'yes') {
+        afterOnline.checkResult.push('ui');
+      } else if (ele.check_type === 'applet' && ele.check_result === 'yes') {
+        afterOnline.checkResult.push('applet');
       }
     }
-
   });
 
-
-  return {beforeOnline, afterOnline};
+  return { beforeOnline, afterOnline };
 };
-
 
 // 修改时获取原有数据
 const getDetaisByCHeckNum = async (checkNum: string) => {
@@ -159,7 +153,7 @@ const getDetaisByCHeckNum = async (checkNum: string) => {
     data: [],
   };
   await axios
-    .get('/api/verify/release/release_branch', {params: {check_num: checkNum}})
+    .get('/api/verify/release/release_branch', { params: { check_num: checkNum } })
     .then(function (res) {
       if (res.data.code === 200) {
         result.data = res.data.data;
@@ -200,6 +194,9 @@ const checkOnlineHeadData = async (sourceData: any) => {
   if (!sourceData.module) {
     return '技术侧不能为空！';
   }
+  if (!sourceData.imageevn) {
+    return '镜像环境不能为空！';
+  }
 
   const authData = {
     operate: `保存上线分支`,
@@ -222,10 +219,6 @@ const checkOnlineVersionData = async (sourceData: any) => {
     // 如果开启了版本检查，就要判断服务和镜像环境是否填写值
     if (!sourceData.server || sourceData.server.length === 0) {
       return '版本检查-服务不能为空！';
-    }
-
-    if (!sourceData.imageevn) {
-      return '版本检查-镜像环境不能为空！';
     }
   }
 
@@ -263,11 +256,11 @@ const checkOnlineVersionData = async (sourceData: any) => {
 // 上线环境检查验证
 const checkOnlineEnvData = async (sourceData: any) => {
   //   只有没有勾选忽略检查，后面参数才必填
-  if (sourceData.ignoreCheck === undefined || sourceData.ignoreCheck.length === 0) {
-    if (!sourceData.checkEnv) {
-      return '环境一致性检查中检察环境不能为空！';
-    }
-  }
+  // if (sourceData.ignoreCheck === undefined || sourceData.ignoreCheck.length === 0) {
+  //   if (!sourceData.checkEnv) {
+  //     return '环境一致性检查中检察环境不能为空！';
+  //   }
+  // }
 
   const authData = {
     operate: `保存上线分支-环境一致性检查设置`,
@@ -286,7 +279,6 @@ const checkOnlineEnvData = async (sourceData: any) => {
 };
 
 const checkOnlineAutoData = async () => {
-
   //   没有勾选忽略检查，后面参数必填。如果勾选了，后面的参数可以为空（不再做忽略检查）
   // if (sourceData.autoBeforeIgnoreCheck === undefined || sourceData.autoBeforeIgnoreCheck.length === 0) {
   //   if (sourceData.autoCheckResult === undefined || (sourceData.autoCheckResult).length === 0) {
@@ -318,7 +310,6 @@ const saveOnlineBranch = async (
   newOnlineBranchNum: string,
   sourceData: any,
 ) => {
-
   let frontCheck = '2';
   if (sourceData.ignoreFrontCheck) {
     if (Array.isArray(sourceData.ignoreFrontCheck)) {
@@ -385,7 +376,7 @@ const saveVersonCheck = async (
   if (sourceData?.verson_check) {
     // true 已开启
     // 服务
-    const {server} = sourceData;
+    const { server } = sourceData;
     let serverStr = '';
     if (server && server.length > 0) {
       // if (server[0] === "全部") {
@@ -497,8 +488,12 @@ const saveEnvironmentCheck = async (
 };
 
 // 上线前自动化检查
-const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any) => {
-
+const saveOnlineAutoCheck = async (
+  type: string,
+  currentListNo: string,
+  newOnlineBranchNum: string,
+  sourceData: any,
+) => {
   // 上线前检查: 打勾是yes，没打勾是no
   let before_ignore_check = 'no';
   if (sourceData.autoBeforeIgnoreCheck) {
@@ -508,61 +503,70 @@ const saveOnlineAutoCheck = async (type: string, currentListNo: string, newOnlin
       before_ignore_check = sourceData.autoBeforeIgnoreCheck;
     }
   }
-  const data = [{
-    "user_name": usersInfo.name,
-    "user_id": usersInfo.userid,
-    "ignore_check": before_ignore_check,
-    "check_time": "before",
-    "check_type": "api",
-    "check_result": "no",
-    "test_env": sourceData.imageevn,
-    "check_num": newOnlineBranchNum,
-    "ready_release_num": currentListNo
-  }, {
-    "user_name": usersInfo.name,
-    "user_id": usersInfo.userid,
-    "ignore_check": before_ignore_check,
-    "check_time": "before",
-    "check_type": "ui",
-    "check_result": "no",
-    "test_env": sourceData.imageevn,
-    "check_num": newOnlineBranchNum,
-    "ready_release_num": currentListNo
-  }, {
-    "user_name": usersInfo.name,
-    "user_id": usersInfo.userid,
-    "ignore_check": before_ignore_check,
-    "check_time": "before",
-    "check_type": "applet",
-    "check_result": "no",
-    "test_env": sourceData.imageevn,
-    "check_num": newOnlineBranchNum,
-    "ready_release_num": currentListNo
-  }];
+  const data = [
+    {
+      user_name: usersInfo.name,
+      user_id: usersInfo.userid,
+      ignore_check: before_ignore_check,
+      check_time: 'before',
+      check_type: 'api',
+      check_result: 'no',
+      test_env: sourceData.imageevn,
+      check_num: newOnlineBranchNum,
+      ready_release_num: currentListNo,
+    },
+    {
+      user_name: usersInfo.name,
+      user_id: usersInfo.userid,
+      ignore_check: before_ignore_check,
+      check_time: 'before',
+      check_type: 'ui',
+      check_result: 'no',
+      test_env: sourceData.imageevn,
+      check_num: newOnlineBranchNum,
+      ready_release_num: currentListNo,
+    },
+    {
+      user_name: usersInfo.name,
+      user_id: usersInfo.userid,
+      ignore_check: before_ignore_check,
+      check_time: 'before',
+      check_type: 'applet',
+      check_result: 'no',
+      test_env: sourceData.imageevn,
+      check_num: newOnlineBranchNum,
+      ready_release_num: currentListNo,
+    },
+  ];
 
-  if (before_ignore_check === "no" && (sourceData.autoCheckResult).length > 0) {
-    (sourceData.autoCheckResult).forEach((ele: string) => {
-      if (ele === "api") {
-        data[0].check_result = "yes";
-      } else if (ele === "ui") {
-        data[1].check_result = "yes";
-      } else if (ele === "applet") {
-        data[2].check_result = "yes";
+  if (before_ignore_check === 'no' && sourceData.autoCheckResult.length > 0) {
+    sourceData.autoCheckResult.forEach((ele: string) => {
+      if (ele === 'api') {
+        data[0].check_result = 'yes';
+      } else if (ele === 'ui') {
+        data[1].check_result = 'yes';
+      } else if (ele === 'applet') {
+        data[2].check_result = 'yes';
       }
     });
   }
-  const messageRt = await saveBeforeAndAfterOnlineAutoCheck(data)
+  const messageRt = await saveBeforeAndAfterOnlineAutoCheck(data);
   return messageRt;
 };
 
 // 保存上线分支的设置
-const saveOnlineBranchData = async (type: string, currentListNo: string, newOnlineBranchNum: string, sourceData: any,) => {
-
-  //   保存分了4个接口，
+const saveOnlineBranchData = async (
+  type: string,
+  currentListNo: string,
+  newOnlineBranchNum: string,
+  sourceData: any,
+) => {
+  //  保存分了5个接口，
   //  1.上线分支头部设置
   //  2.版本检查设置
   //  3.环境一致性检查
-  //  4.自动化检查设置
+  //  4.是否热更
+  //  5.自动化检查设置
 
   // 上线分支头部验证分支名称和技术侧
   const checkMsg_onlineHead = await checkOnlineHeadData(sourceData);
@@ -582,13 +586,17 @@ const saveOnlineBranchData = async (type: string, currentListNo: string, newOnli
   if (checkMsg_envCheck) {
     return checkMsg_envCheck;
   }
+  // 热更新检查
+  const checkMsg_hotFreshCheck = await checkHotFreshData(sourceData);
+  if (checkMsg_hotFreshCheck) {
+    return checkMsg_hotFreshCheck;
+  }
 
   // 自动化检查参数（暂时不做自动化必填参数检查）
   // const checkMsg_autoCheck = await checkOnlineAutoData(sourceData);
   // if (checkMsg_autoCheck) {
   //   return checkMsg_autoCheck;
   // }
-
 
   /* 开始调用接口进行结果保存  */
 
@@ -602,35 +610,48 @@ const saveOnlineBranchData = async (type: string, currentListNo: string, newOnli
   // 保存版本检查
   const versonCheck = await saveVersonCheck(type, currentListNo, newOnlineBranchNum, sourceData);
   if (versonCheck !== '') {
-    returnMessage = returnMessage === ''
-      ? `版本检查设置保存失败：${versonCheck}`
-      : `${returnMessage}；\n版本检查设置保存失败：${versonCheck}`;
+    returnMessage =
+      returnMessage === ''
+        ? `版本检查设置保存失败：${versonCheck}`
+        : `${returnMessage}；\n版本检查设置保存失败：${versonCheck}`;
   }
 
   // 保存环境检查
-  const enviromentCheck = await saveEnvironmentCheck(type, currentListNo, newOnlineBranchNum, sourceData,);
+  const enviromentCheck = await saveEnvironmentCheck(
+    type,
+    currentListNo,
+    newOnlineBranchNum,
+    sourceData,
+  );
   if (enviromentCheck !== '') {
-    returnMessage = returnMessage === ''
-      ? `环境一致性检查保存失败：${enviromentCheck}`
-      : `${returnMessage}；\n环境一致性检查保存失败：${enviromentCheck}`;
+    returnMessage =
+      returnMessage === ''
+        ? `环境一致性检查保存失败：${enviromentCheck}`
+        : `${returnMessage}；\n环境一致性检查保存失败：${enviromentCheck}`;
   }
 
-
   // 如果有勾选信息，才进行 自动化检查接口调用
-  if ((sourceData.autoBeforeIgnoreCheck && sourceData.autoBeforeIgnoreCheck.length > 0) ||
-    (sourceData.autoCheckResult && (sourceData.autoCheckResult).length > 0)) {
-
+  if (
+    (sourceData.autoBeforeIgnoreCheck && sourceData.autoBeforeIgnoreCheck.length > 0) ||
+    (sourceData.autoCheckResult && sourceData.autoCheckResult.length > 0)
+  ) {
     // 要做权限判断
     const checkMsg_autoCheck = await checkOnlineAutoData();
     if (checkMsg_autoCheck) {
       return checkMsg_autoCheck;
     }
 
-    const onlineAutoCheck = await saveOnlineAutoCheck(type, currentListNo, newOnlineBranchNum, sourceData,);
+    const onlineAutoCheck = await saveOnlineAutoCheck(
+      type,
+      currentListNo,
+      newOnlineBranchNum,
+      sourceData,
+    );
     if (onlineAutoCheck !== '') {
-      returnMessage = returnMessage === ''
-        ? `自动化检查保存失败：${onlineAutoCheck}`
-        : `${returnMessage}；\n自动化检查保存失败：${onlineAutoCheck}`;
+      returnMessage =
+        returnMessage === ''
+          ? `自动化检查保存失败：${onlineAutoCheck}`
+          : `${returnMessage}；\n自动化检查保存失败：${onlineAutoCheck}`;
     }
   }
   return returnMessage;
@@ -728,4 +749,10 @@ const executeOnlineCheck = async (type: string, checkNum: string) => {
   }
 };
 
-export {getCheckNumForOnlineBranch, getModifiedData, saveOnlineBranchData, executeOnlineCheck};
+export {
+  getCheckNumForOnlineBranch,
+  getModifiedData,
+  saveOnlineBranchData,
+  executeOnlineCheck,
+  checkHotFreshData,
+};

@@ -565,25 +565,31 @@ export default [
         icon: 'table',
         path: 'releaseHistory',
         component: './onDutyAndRelease/releaseHistory',
-      }, {
+      },
+      {
         name: '正式发布',
         icon: 'table',
         path: 'officialRelease',
         component: './onDutyAndRelease/officialRelease',
-        hideInMenu: true
-
-      }, {
+        hideInMenu: true,
+      },
+      {
         name: '发布公告',
         icon: 'table',
-        path: 'releaseAnnouncement',
-        component: './onDutyAndRelease/releaseAnnouncement',
-        hideInMenu: true
-
-      }
+        path: 'announcementList',
+        component: './onDutyAndRelease/announcement/announcementList',
+      },
+      {
+        name: '发布公告',
+        icon: 'table',
+        path: 'announcementDetail',
+        component: './onDutyAndRelease/announcement/announcementDetail',
+        hideInMenu: true,
+      },
     ],
   },
   {
-    name: "禅道管理",
+    name: '禅道管理',
     icon: 'table',
     path: '/zentao',
     // hideInMenu: true,

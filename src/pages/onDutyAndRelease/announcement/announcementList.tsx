@@ -37,27 +37,32 @@ const announcementList = () => {
 
   const getList = async (page = 1, page_size = 20) => {
     setSpinning(true);
-    const values = form.getFieldsValue();
-    const res = await AnnouncementServices.announcementList({
-      page,
-      page_size,
-      ...values,
-      create_time: isEmpty(values.create_time)
-        ? null
-        : moment(values.create_time).format('YYYY-MM-DD'),
-    });
-    setSpinning(false);
-    setList(
-      res?.data?.map((it: any, index: number) => ({
-        ...it,
-        num: (page - 1) * page_size + index + 1,
-      })),
-    );
-    setPages({
-      page: res?.page || 1,
-      page_size: res?.page_size || 20,
-      total: res?.total || 0,
-    });
+    try {
+      const values = form.getFieldsValue();
+      const res = await AnnouncementServices.announcementList({
+        page,
+        page_size,
+        ...values,
+        create_user: values.create_user?.join(','),
+        create_time: isEmpty(values.create_time)
+          ? null
+          : moment(values.create_time).format('YYYY-MM-DD'),
+      });
+      setSpinning(false);
+      setList(
+        res?.data?.map((it: any, index: number) => ({
+          ...it,
+          num: (page - 1) * page_size + index + 1,
+        })),
+      );
+      setPages({
+        page: res?.page || 1,
+        page_size: res?.page_size || 20,
+        total: res?.total || 0,
+      });
+    } catch (e) {
+      setSpinning(false);
+    }
   };
 
   const getPerson = async () => {
@@ -102,14 +107,14 @@ const announcementList = () => {
     <Spin spinning={spinning} tip="数据加载中...">
       <PageContainer>
         <div className={styles.announcementList}>
-          <Form form={form} className={styles.resetForm} onBlur={() => getList()}>
+          <Form form={form} className={styles.resetForm}>
             <Row justify={'space-between'} gutter={3} style={{ marginBottom: 5 }}>
               <Col span={3}>
                 <Button type={'text'} icon={<FolderAddTwoTone />} onClick={() => onAdd()}>
                   新增
                 </Button>
               </Col>
-              <Col span={5}>
+              <Col span={7}>
                 <Form.Item label={'创建人'} name={'create_user'}>
                   <Select
                     options={persons}
@@ -118,6 +123,8 @@ const announcementList = () => {
                     allowClear
                     optionFilterProp={'label'}
                     onDeselect={() => getList()}
+                    onBlur={() => getList()}
+                    mode={'multiple'}
                   />
                 </Form.Item>
               </Col>
@@ -126,9 +133,9 @@ const announcementList = () => {
                   <DatePicker style={{ width: '100%' }} onChange={() => getList()} />
                 </Form.Item>
               </Col>
-              <Col span={9}>
+              <Col span={7}>
                 <Form.Item label={'公告内容'} name={'content'}>
-                  <Input style={{ width: '100%' }} />
+                  <Input style={{ width: '100%' }} onBlur={() => getList()} />
                 </Form.Item>
               </Col>
             </Row>

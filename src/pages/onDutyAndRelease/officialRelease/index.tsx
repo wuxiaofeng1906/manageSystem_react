@@ -3,9 +3,6 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { errorMessage } from '@/publicMethods/showMessages';
 import { AgGridReact } from 'ag-grid-react';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import 'ag-grid-enterprise';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { Button, Checkbox, Col, DatePicker, Form, Input, Modal, Row, Select, message } from 'antd';
 import './style/style.css';
 import { useRequest } from 'ahooks';
@@ -29,7 +26,7 @@ import {
   getAnnouncement,
   postAnnouncementForOtherPage,
 } from '../announcement/announcementDetail/axiosRequest/apiPage';
-import usePermission from '@/hooks/permission';
+import AnnounceSelector from '@/pages/onDutyAndRelease/preRelease/components/announceSelector';
 
 // 编辑后的数据
 let otherSaveCondition: any = {
@@ -46,7 +43,6 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   const historyQuery = props.location?.query?.history === 'true';
   const releaseType = props.location?.query?.releaseType;
   const [rowData, setRowData] = useState([]);
-  const { announcePermission } = usePermission();
   const dutyNameArray = useRequest(() => loadDutyNamesSelect(true)).data; // 关联值班名单
   const pageData = useRequest(() => getOfficialReleaseDetails(onlineReleaseNum, releaseType)).data; // 界面数据获取
   onlineEnv = useRequest(() => getOnlineEnv(releaseType)).data; // 上线集群环境
@@ -318,7 +314,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     setGridHeight(getHeight() - 210);
   };
 
-  const href = `http://${window.location.host}/onDutyAndRelease/announcementDetail/${otherSaveCondition.onlineReleaseNum}/detail/${historyQuery}`;
+  // const href = `http://${window.location.host}/onDutyAndRelease/announcementDetail/${otherSaveCondition.onlineReleaseNum}/detail/${historyQuery}`;
   return (
     <PageContainer title={<div />}>
       <div style={{ marginTop: -15 }}>
@@ -375,15 +371,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           </label>
 
           <label style={{ marginLeft: 10 }}>{autoCheckRt}</label>
-
-          {announcePermission()?.check ? (
-            <a href={href} target={'_blank'} style={{ float: 'right' }}>
-              <img src="../annouce.png" width="20" height="20" alt="发布公告" title="发布公告" />{' '}
-              &nbsp; 发布公告
-            </a>
-          ) : (
-            <div />
-          )}
+          <AnnounceSelector type={'history'} ready_release_num={onlineReleaseNum} />
         </div>
         {/* step 1 发布方式及时间 */}
         <div style={{ backgroundColor: 'white', marginTop: 4 }}>

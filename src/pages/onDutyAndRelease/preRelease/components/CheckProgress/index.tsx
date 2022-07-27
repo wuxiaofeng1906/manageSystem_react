@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Progress, Row, Select, Modal, Button, Form, Checkbox } from 'antd';
 import { useModel } from '@@/plugin-model/useModel';
 import { saveProcessResult, executeAutoCheck } from './axiosRequest';
@@ -8,20 +8,16 @@ import {
   getAnnouncement,
   postAnnouncementForOtherPage,
 } from '@/pages/onDutyAndRelease/announcement/announcementDetail/axiosRequest/apiPage';
-import usePermission from '@/hooks/permission';
-import AnnouncementServices from '@/services/announcement';
+import AnnounceSelector from '@/pages/onDutyAndRelease/preRelease/components/announceSelector';
 
 const { Option } = Select;
 
 const CheckProgress: React.FC<any> = () => {
   // 获取当前页面的进度数据
   const { tabsData, processStatus, modifyProcessStatus, operteStatus } = useModel('releaseProcess');
-  const [announcementForm] = Form.useForm();
   const [pulishResultForm] = Form.useForm();
-  const { announcePermission } = usePermission();
 
   const [disabled, setDisabled] = useState(false);
-  const [announcementList, setAnnouncementList] = useState<any[]>([]);
   const [isModalVisible, setModalVisible] = useState({
     show: false,
     result: '',
@@ -146,31 +142,9 @@ const CheckProgress: React.FC<any> = () => {
     });
   };
 
-  const getAnnouncementList = async () => {
-    const res = await AnnouncementServices.announcementList({});
-    setAnnouncementList(
-      res.data?.map((it: any) => ({ label: it.announcement_name, value: it.announcement_num })),
-    );
-  };
-  useEffect(() => {
-    getAnnouncementList();
-  }, []);
-
   return (
     <div style={{ width: '100%' }}>
-      {announcePermission()?.check ? (
-        <Form form={announcementForm} size={'small'} style={{ width: '25%', float: 'right' }}>
-          <Form.Item
-            label={<strong style={{ marginLeft: 5 }}>发布公告</strong>}
-            name={'announcement'}
-          >
-            <Select options={[]} style={{ width: '100%' }} />
-          </Form.Item>
-        </Form>
-      ) : (
-        <div />
-      )}
-
+      <AnnounceSelector type={'pre'} ready_release_num={tabsData.activeKey} />
       {/* 检查进度 */}
       <div style={{ marginTop: -10 }}>
         <div>

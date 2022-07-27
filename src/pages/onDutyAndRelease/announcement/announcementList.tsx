@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import { Form, Select, DatePicker, Input, Row, Col, Button, Space } from 'antd';
+import { Form, Select, DatePicker, Input, Row, Col, Button, Space, Spin } from 'antd';
 import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { PageContainer } from '@ant-design/pro-layout';
 import { FolderAddTwoTone } from '@ant-design/icons';
@@ -17,13 +17,14 @@ import moment from 'moment';
 const announcementList = () => {
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [list, setList] = useState<any[]>([]);
+  const [spinning, setSpinning] = useState(false);
   const [persons, setPersons] = useState<any[]>([]);
   const [gridHeight, setGridHeight] = useState(getHeight() - 60);
 
   const [pages, setPages] = useState({
     page_size: 20,
     total: 0,
-    page: 0,
+    page: 1,
   });
 
   const [form] = Form.useForm();
@@ -35,6 +36,7 @@ const announcementList = () => {
   };
 
   const getList = async (page = 1, page_size = 20) => {
+    setSpinning(true);
     const values = form.getFieldsValue();
     const res = await AnnouncementServices.announcementList({
       page,
@@ -44,6 +46,7 @@ const announcementList = () => {
         ? null
         : moment(values.create_time).format('YYYY-MM-DD'),
     });
+    setSpinning(false);
     setList(
       res?.data?.map((it: any, index: number) => ({
         ...it,
@@ -96,87 +99,89 @@ const announcementList = () => {
   };
 
   return (
-    <PageContainer>
-      <div className={styles.announcementList}>
-        <Form form={form} className={styles.resetForm} onBlur={() => getList()}>
-          <Row justify={'space-between'} gutter={3} style={{ marginBottom: 5 }}>
-            <Col span={3}>
-              <Button type={'text'} icon={<FolderAddTwoTone />} onClick={() => onAdd()}>
-                新增
-              </Button>
-            </Col>
-            <Col span={5}>
-              <Form.Item label={'创建人'} name={'create_user'}>
-                <Select
-                  options={persons}
-                  style={{ width: '100%' }}
-                  showSearch
-                  allowClear
-                  optionFilterProp={'label'}
-                  onDeselect={() => getList()}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item label={'创建日期'} name={'create_time'}>
-                <DatePicker style={{ width: '100%' }} onChange={() => getList()} />
-              </Form.Item>
-            </Col>
-            <Col span={9}>
-              <Form.Item label={'公告内容'} name={'content'}>
-                <Input style={{ width: '100%' }} />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
-        <div style={{ height: gridHeight }}>
-          <AgGridReact
-            className="ag-theme-alpine"
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true,
-              suppressMenu: true,
-              cellStyle: { 'line-height': '30px' },
-            }}
-            rowHeight={30}
-            headerHeight={35}
-            suppressRowTransform={true}
-            onGridReady={onGridReady}
-            onGridSizeChanged={onGridReady}
-            columnDefs={announcementListColumn}
-            rowData={list}
-            frameworkComponents={{
-              operation: (params: CellClickedEvent) => {
-                return (
-                  <Space size={8}>
-                    <img
-                      width={16}
-                      style={{ cursor: 'pointer' }}
-                      src={require('../../../../public/params.png')}
-                      onClick={() => onAdd(params)}
-                    />
-                    <img
-                      width={16}
-                      height={17}
-                      style={{ cursor: 'pointer' }}
-                      src={require('../../../../public/delete_red.png')}
-                      onClick={() => onDelete(params)}
-                    />
-                  </Space>
-                );
-              },
-            }}
+    <Spin spinning={spinning} tip="数据加载中...">
+      <PageContainer>
+        <div className={styles.announcementList}>
+          <Form form={form} className={styles.resetForm} onBlur={() => getList()}>
+            <Row justify={'space-between'} gutter={3} style={{ marginBottom: 5 }}>
+              <Col span={3}>
+                <Button type={'text'} icon={<FolderAddTwoTone />} onClick={() => onAdd()}>
+                  新增
+                </Button>
+              </Col>
+              <Col span={5}>
+                <Form.Item label={'创建人'} name={'create_user'}>
+                  <Select
+                    options={persons}
+                    style={{ width: '100%' }}
+                    showSearch
+                    allowClear
+                    optionFilterProp={'label'}
+                    onDeselect={() => getList()}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label={'创建日期'} name={'create_time'}>
+                  <DatePicker style={{ width: '100%' }} onChange={() => getList()} />
+                </Form.Item>
+              </Col>
+              <Col span={9}>
+                <Form.Item label={'公告内容'} name={'content'}>
+                  <Input style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Form>
+          <div style={{ height: gridHeight }}>
+            <AgGridReact
+              className="ag-theme-alpine"
+              defaultColDef={{
+                resizable: true,
+                sortable: true,
+                filter: true,
+                suppressMenu: true,
+                cellStyle: { 'line-height': '30px' },
+              }}
+              rowHeight={30}
+              headerHeight={35}
+              suppressRowTransform={true}
+              onGridReady={onGridReady}
+              onGridSizeChanged={onGridReady}
+              columnDefs={announcementListColumn}
+              rowData={list}
+              frameworkComponents={{
+                operation: (params: CellClickedEvent) => {
+                  return (
+                    <Space size={8}>
+                      <img
+                        width={16}
+                        style={{ cursor: 'pointer' }}
+                        src={require('../../../../public/params.png')}
+                        onClick={() => onAdd(params)}
+                      />
+                      <img
+                        width={16}
+                        height={17}
+                        style={{ cursor: 'pointer' }}
+                        src={require('../../../../public/delete_red.png')}
+                        onClick={() => onDelete(params)}
+                      />
+                    </Space>
+                  );
+                },
+              }}
+            />
+          </div>
+          <IPagination
+            page={pages}
+            onChange={getList}
+            showQuickJumper={getList}
+            onShowSizeChange={(size) => getList(1, size)}
           />
         </div>
-        <IPagination
-          page={pages}
-          onChange={getList}
-          showQuickJumper={getList}
-          onShowSizeChange={(size) => getList(1, size)}
-        />
-      </div>
-    </PageContainer>
+      </PageContainer>
+    </Spin>
   );
 };
 export default announcementList;

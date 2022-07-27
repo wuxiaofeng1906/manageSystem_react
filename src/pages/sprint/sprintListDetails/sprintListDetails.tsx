@@ -1,8 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-enterprise';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { useRequest } from 'ahooks';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { useGqlClient } from '@/hooks';
@@ -84,7 +81,7 @@ import {
   syncDetailsData,
 } from './common/axiosRequest';
 import defaultTreeSelectParams from '@/pages/shimo/fileBaseline/iterateList/defaultSetting';
-
+import styles from './sprintListDetails.less';
 let ora_filter_data: any = [];
 
 const gird_filter_condition: any = []; // 表格自带过滤了的条件
@@ -1296,7 +1293,7 @@ const SprintList: React.FC<any> = () => {
   const widths = { width: '200px', color: 'black' };
   const marginTopHeight = { marginTop: -15 };
   return (
-    <div style={{ width: '100%', marginTop: '-30px' }}>
+    <div style={{ width: '100%', marginTop: '-30px' }} className={styles.sprintListDetails}>
       <PageHeader
         ghost={false}
         title={prjNames}

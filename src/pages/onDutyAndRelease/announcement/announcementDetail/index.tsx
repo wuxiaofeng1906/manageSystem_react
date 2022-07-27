@@ -9,6 +9,7 @@ import moment from 'moment';
 import { getHeight } from '@/publicMethods/pageSet';
 import usePermission from '@/hooks/permission';
 import { useParams } from 'umi';
+import { isEmpty } from 'lodash';
 
 const { TextArea } = Input;
 const { TabPane } = Tabs;
@@ -199,7 +200,15 @@ const Announce: React.FC<any> = (props: any) => {
           <Form.Item
             label={'公告批次名称'}
             name={'announcement_name'}
-            rules={[{ required: true, message: '请填写公告批次名称！' }]}
+            rules={[
+              {
+                required: true,
+                validator: (r, v, callback) => {
+                  if (isEmpty(v?.trim())) callback('请填写公告批次名称！');
+                  else callback();
+                },
+              },
+            ]}
           >
             <Input placeholder={'公告批次名称'} style={{ width: '300px' }} />
           </Form.Item>

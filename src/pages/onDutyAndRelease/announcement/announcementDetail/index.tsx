@@ -74,11 +74,9 @@ const Announce: React.FC<any> = (props: any) => {
       const formData = announceContentForm.getFieldsValue();
       // 无论前面更新了哪个字段，后面的预览都要更新
       announceContentForm.setFieldsValue({
-        UpgradeIntroDate: `"${formData.showAnnounceTime ?? ''}"`,
-        UpgradeDescription: `"${formData.announceDetails_1 ?? ''}${
-          formData.showAnnounceTime ?? ''
-        }${formData.announceDetails_2 ?? ''}"`,
-        isUpdated: `"${formData.showUpdateDetails ?? ''}"`,
+        UpgradeIntroDate: `"${formData.showAnnounceTime}"`,
+        UpgradeDescription: `"${formData.announceDetails_1}${formData.showAnnounceTime}${formData.announceDetails_2}"`,
+        isUpdated: `"${formData.showUpdateDetails}"`,
       });
     }
   };
@@ -110,29 +108,32 @@ const Announce: React.FC<any> = (props: any) => {
       errorMessage(`${operate}失败！`);
     }
   };
+  const initForm = () => {
+    const initTime = moment().add(1, 'day').startOf('day');
+
+    announceContentForm.setFieldsValue({
+      announceTime: initTime,
+      announceDetails_1:
+        releaseTime === 'after'
+          ? '亲爱的用户：您好，企企经营管理平台已于'
+          : '亲爱的用户：您好，企企经营管理平台将于',
+      showAnnounceTime: initTime.format('YYYY-MM-DD HH:mm:ss'),
+      announceDetails_2: '',
+      showUpdateDetails: 'true',
+
+      //   以下为预览数据
+      UpgradeIntroDate: `"${initTime.format('YYYY-MM-DD HH:mm:ss')}"`,
+      UpgradeDescription: '',
+      isUpdated: 'true',
+    });
+  };
 
   // 展示界面数据
   const showFormData = (resData: any) => {
     //   有数据的时候需要显示在界面上
     if (resData.code === 4001) {
       // 没有发布公告，需要显示默认信息。
-      const initTime = moment().add(1, 'day').startOf('day');
-
-      announceContentForm.setFieldsValue({
-        announceTime: initTime,
-        announceDetails_1:
-          releaseTime === 'after'
-            ? '亲爱的用户：您好，企企经营管理平台已于'
-            : '亲爱的用户：您好，企企经营管理平台将于',
-        showAnnounceTime: initTime.format('YYYY-MM-DD HH:mm:ss'),
-        announceDetails_2: '',
-        showUpdateDetails: 'true',
-
-        //   以下为预览数据
-        UpgradeIntroDate: `"${initTime.format('YYYY-MM-DD HH:mm:ss')}"`,
-        UpgradeDescription: '',
-        isUpdated: 'true',
-      });
+      initForm();
       setButtonDisable({
         title: releaseTime === 'after' ? '后' : '前',
         disable: true,
@@ -174,7 +175,7 @@ const Announce: React.FC<any> = (props: any) => {
   };
 
   const announceData =
-    type == 'add' ? null : useRequest(() => getAnnouncement(releaseNum, 'before')).data; // 关联值班名单
+    type == 'add' ? initForm() : useRequest(() => getAnnouncement(releaseNum, 'before')).data; // 关联值班名单
   useEffect(() => {
     if (announceData) {
       showFormData(announceData);

@@ -6,11 +6,15 @@ const AnnouncementServices = {
   async announcementList(params: any) {
     return request(`${baseUrl}/release/announcement_list`, { params });
   },
+  // 所有人员
+  async applicant() {
+    return request(`${baseUrl}/apply/applicant`);
+  },
 
   // 删除
-  async deleteAnnouncement(announcement_num: string) {
+  async deleteAnnouncement(data: any) {
     return request(`${baseUrl}/release/announcement`, {
-      data: { announcement_num },
+      data,
       method: 'delete',
       msg: '删除成功！',
     });

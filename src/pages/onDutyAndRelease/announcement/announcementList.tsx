@@ -11,9 +11,13 @@ import AnnouncementServices from '@/services/announcement';
 import { isEmpty } from 'lodash';
 import IPagination from '@/components/IPagination';
 import { getHeight } from '@/publicMethods/pageSet';
+import { useModel, history } from 'umi';
+import moment from 'moment';
 
 const announcementList = () => {
+  const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [list, setList] = useState<any[]>([]);
+  const [persons, setPersons] = useState<any[]>([]);
   const [gridHeight, setGridHeight] = useState(getHeight() - 60);
 
   const [pages, setPages] = useState({
@@ -30,39 +34,59 @@ const announcementList = () => {
     params.api.sizeColumnsToFit();
   };
 
-  const getList = async (page = 0, page_size = 20) => {
+  const getList = async (page = 1, page_size = 20) => {
     const values = form.getFieldsValue();
-    const res = await AnnouncementServices.announcementList({ ...values, page, page_size });
+    const res = await AnnouncementServices.announcementList({
+      page,
+      page_size,
+      ...values,
+      create_time: isEmpty(values.create_time)
+        ? null
+        : moment(values.create_time).format('YYYY-MM-DD'),
+    });
     setList(
-      res?.data?.map((it: any, index: number) => ({ ...it, num: page * page_size + index + 1 })),
+      res?.data?.map((it: any, index: number) => ({
+        ...it,
+        num: (page - 1) * page_size + index + 1,
+      })),
     );
     setPages({
-      page: res?.page,
-      page_size: res?.page_size,
+      page: res?.page || 1,
+      page_size: res?.page_size || 20,
       total: res?.total || 0,
     });
   };
 
+  const getPerson = async () => {
+    const res = await AnnouncementServices.applicant();
+    setPersons(res?.map((it: any) => ({ label: it.user_name, value: it.user_id })));
+  };
   // 新增、修改
   const onAdd = async (params?: CellClickedEvent) => {
     let releaseNum = '';
-    let type = 'save';
+    let type = 'detail';
     if (isEmpty(params)) {
       const res = await DutyListServices.getDutyNum();
       releaseNum = res.ready_release_num;
       type = 'add';
     } else releaseNum = params?.data.announcement_num;
-    window.open(
-      `${location.origin}/onDutyAndRelease/announcementDetail/${releaseNum}/${type}/false`,
-    );
+    history.push(`/onDutyAndRelease/announcementDetail/${releaseNum}/${type}/false`);
+    // window.open(
+    //   `${location.origin}/onDutyAndRelease/announcementDetail/${releaseNum}/${type}/false`,
+    // );
   };
 
   const onDelete = async (params: CellClickedEvent) => {
-    await AnnouncementServices.deleteAnnouncement(params.data.announcement_num);
+    await AnnouncementServices.deleteAnnouncement({
+      announcement_num: params.data.announcement_num,
+      user_id: user?.userid,
+      user_name: user?.name,
+    });
     getList();
   };
 
   useEffect(() => {
+    getPerson();
     getList();
   }, []);
 
@@ -74,7 +98,7 @@ const announcementList = () => {
   return (
     <PageContainer>
       <div className={styles.announcementList}>
-        <Form form={form} className={styles.resetForm}>
+        <Form form={form} className={styles.resetForm} onBlur={() => getList()}>
           <Row justify={'space-between'} gutter={3} style={{ marginBottom: 5 }}>
             <Col span={3}>
               <Button type={'text'} icon={<FolderAddTwoTone />} onClick={() => onAdd()}>
@@ -83,12 +107,19 @@ const announcementList = () => {
             </Col>
             <Col span={5}>
               <Form.Item label={'创建人'} name={'create_user'}>
-                <Select options={[]} style={{ width: '100%' }} />
+                <Select
+                  options={persons}
+                  style={{ width: '100%' }}
+                  showSearch
+                  allowClear
+                  optionFilterProp={'label'}
+                  onDeselect={() => getList()}
+                />
               </Form.Item>
             </Col>
             <Col span={6}>
               <Form.Item label={'创建日期'} name={'create_time'}>
-                <DatePicker style={{ width: '100%' }} />
+                <DatePicker style={{ width: '100%' }} onChange={() => getList()} />
               </Form.Item>
             </Col>
             <Col span={9}>
@@ -140,9 +171,9 @@ const announcementList = () => {
         </div>
         <IPagination
           page={pages}
-          onChange={(page) => getList(page - 1)}
-          showQuickJumper={(page) => getList(page - 1)}
-          onShowSizeChange={(size) => getList(0, size)}
+          onChange={getList}
+          showQuickJumper={getList}
+          onShowSizeChange={(size) => getList(1, size)}
         />
       </div>
     </PageContainer>

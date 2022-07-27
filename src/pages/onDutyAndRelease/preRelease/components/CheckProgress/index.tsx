@@ -157,14 +157,14 @@ const CheckProgress: React.FC<any> = () => {
   }, []);
 
   return (
-    <div>
+    <div style={{ width: '100%' }}>
       {announcePermission()?.check ? (
-        <Form form={announcementForm} size={'small'}>
+        <Form form={announcementForm} size={'small'} style={{ width: '25%', float: 'right' }}>
           <Form.Item
             label={<strong style={{ marginLeft: 5 }}>发布公告</strong>}
             name={'announcement'}
           >
-            <Select options={[]} style={{ width: 200 }} />
+            <Select options={[]} style={{ width: '100%' }} />
           </Form.Item>
         </Form>
       ) : (
@@ -178,7 +178,7 @@ const CheckProgress: React.FC<any> = () => {
             <label style={{ marginLeft: 5, fontWeight: 'bold' }}>检查进度：</label>
             <Progress
               strokeColor={'#2BF541'}
-              style={{ width: 800 }}
+              style={{ width: '70%' }}
               percent={processStatus.processPercent}
             />
           </Row>

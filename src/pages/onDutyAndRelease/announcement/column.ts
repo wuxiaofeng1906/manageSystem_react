@@ -2,10 +2,15 @@ import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/co
 
 export const announcementListColumn: (ColDef | ColGroupDef)[] = [
   {
-    headerName: 'ID',
+    headerName: '序号',
     field: 'num',
     minWidth: 90,
     maxWidth: 100,
+  },
+  {
+    headerName: 'ID',
+    field: 'announcement_num',
+    minWidth: 90,
   },
   {
     headerName: '公告批次名称',
@@ -14,43 +19,43 @@ export const announcementListColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '升级前公告时间',
-    field: 'beforeTime',
+    field: 'before_upgrade_time',
     minWidth: 130,
   },
   {
     headerName: '升级前公告内容',
-    field: 'beforeContent',
+    field: 'before_upgrade_description',
     minWidth: 130,
   },
   {
     headerName: '升级后公告时间',
-    field: 'afterTime',
+    field: 'after_upgrade_time',
     minWidth: 130,
   },
   {
     headerName: '升级后公告内容',
-    field: 'upgrade_description',
+    field: 'after_upgrade_description',
     minWidth: 130,
   },
   {
     headerName: '创建人',
-    field: 'creater',
+    field: 'create_user',
     minWidth: 120,
     maxWidth: 150,
   },
   {
     headerName: '创建时间',
-    field: 'announcement_time',
+    field: 'create_time',
     minWidth: 150,
   },
   {
     headerName: '编辑人',
-    field: 'user_name',
+    field: 'update_user',
     minWidth: 120,
   },
   {
     headerName: '编辑时间',
-    field: 'upgrade_time',
+    field: 'update_time',
     minWidth: 100,
   },
   {

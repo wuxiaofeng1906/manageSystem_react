@@ -28,7 +28,7 @@ import { history } from '@@/core/history';
 import {
   getAnnouncement,
   postAnnouncementForOtherPage,
-} from '@/pages/onDutyAndRelease/releaseAnnouncement/axiosRequest/apiPage';
+} from '../announcement/announcementDetail/axiosRequest/apiPage';
 import usePermission from '@/hooks/permission';
 
 // 编辑后的数据

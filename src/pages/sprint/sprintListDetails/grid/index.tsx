@@ -404,7 +404,7 @@ const setRowColor = (params: any) => {
   }
   // 禅道需求移除 灰色背景
   else if (isDelete) {
-    style = { background: '#f7f7f7' };
+    style = { background: '#e1e4ea80' };
   }
   return style;
 };

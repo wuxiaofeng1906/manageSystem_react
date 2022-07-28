@@ -316,7 +316,6 @@ const queryDevelopViews = async (
   `);
 
   let oraData: any = data?.proDetaiWithUser;
-  const result = oraData.map((it: any) => {
   if (prjType === '') {
     const changedRow = changeRowPosition(data?.proDetaiWithUser); // 对数据进行想要的顺序排序(将需求相关的bug放到相关需求后面)
     oraData = changeBaseLinePosition(changedRow); //  将基线值为0的数据统一起来，放到页面最前面

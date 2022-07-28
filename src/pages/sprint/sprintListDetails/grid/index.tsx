@@ -410,6 +410,8 @@ const setRowColor = (params: any) => {
   return style;
 };
 
+const attendanceMappings = { yes: '是', no: '否', '': '' };
+const attendanceRender = () => Object.keys(attendanceMappings);
 const removeColumns: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
@@ -434,27 +436,51 @@ const removeColumns: (ColDef | ColGroupDef)[] = [
   {
     headerName: '测试',
     field: 'tester',
-    cellRenderer: 'test',
+    editable: true,
+    cellEditor: 'agSelectCellEditor',
+    cellEditorParams: { values: attendanceRender() },
+    valueFormatter: (p: any) => attendanceMappings[p.value],
+    filterParams: {
+      valueFormatter: (p: any) => attendanceMappings[p.value],
+    },
   },
   {
     headerName: '是否要测试验证',
     field: 'testCheck',
-    cellRenderer: 'testCheck',
+    editable: true,
+    cellEditor: 'agSelectCellEditor',
+    cellEditorParams: { values: attendanceRender() },
+    valueFormatter: (p: any) => attendanceMappings[p.value],
+    filterParams: {
+      valueFormatter: (p: any) => attendanceMappings[p.value],
+    },
   },
   {
     headerName: '是否提交代码',
     field: 'commit',
-    cellRenderer: 'commit',
+    editable: true,
+    cellEditor: 'agSelectCellEditor',
+    cellEditorParams: { values: attendanceRender() },
+    valueFormatter: (p: any) => attendanceMappings[p.value],
+    filterParams: {
+      valueFormatter: (p: any) => attendanceMappings[p.value],
+    },
   },
   {
     headerName: '代码是否Revert',
     field: 'revert',
-    cellRenderer: 'revert',
+    editable: true,
+    cellEditor: 'agSelectCellEditor',
+    cellEditorParams: { values: attendanceRender() },
+    valueFormatter: (p: any) => attendanceMappings[p.value],
+    filterParams: {
+      valueFormatter: (p: any) => attendanceMappings[p.value],
+    },
   },
   {
     headerName: '免Revert原因',
     field: 'reason',
-    cellRenderer: 'reason',
+    minWidth: 300,
   },
 ];
 

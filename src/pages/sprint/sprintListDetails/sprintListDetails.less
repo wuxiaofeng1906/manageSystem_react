@@ -1,7 +1,27 @@
 .sprintListDetails{
   :global{
-    .ag-theme-alpine .ag-header{
-      background: rgba(0,0,0,0.1) !important;
+    .ag-theme-alpine {
+      .ag-header{
+        background: rgba(0,0,0,0.1) !important;
+      }
+    }
+  }
+  :global{
+    .removeModalWraper{
+      .ant-table {
+        width: 100%;
+        overflow-x: auto;
+        &-thead > tr,
+        &-tbody > tr {
+          > th,
+          > td {
+            white-space: pre;
+            > span {
+              display: block;
+            }
+          }
+        }
+      }
     }
   }
 }

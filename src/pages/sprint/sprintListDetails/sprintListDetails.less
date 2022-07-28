@@ -6,21 +6,19 @@
       }
     }
   }
+
+}
+.removeTableWarp{
+  background:red;
   :global{
-    .removeModalWraper{
-      .ant-table {
-        width: 100%;
-        overflow-x: auto;
-        &-thead > tr,
-        &-tbody > tr {
-          > th,
-          > td {
-            white-space: pre;
-            > span {
-              display: block;
-            }
-          }
-        }
+    .ant-table {
+      width: 100%;
+      th, td {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 120px;
+        padding: 5px !important;
       }
     }
   }

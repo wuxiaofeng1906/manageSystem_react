@@ -3062,7 +3062,6 @@ const SprintList: React.FC<any> = () => {
                 </Col>
               </Row>
             </Checkbox.Group>
-            ,
           </div>
 
           <div>

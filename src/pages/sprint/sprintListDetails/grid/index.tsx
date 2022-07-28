@@ -396,11 +396,18 @@ const getColums = (prjNames: any) => {
 
 // 设置行的颜色
 const setRowColor = (params: any) => {
+  let style: any = { background: 'white' };
+  const isDelete = params.data.ztUnlinkedAt != null;
+  // 超范围 + 禅道需求移除
   if (params.data.baseline === '0') {
-    // 如果基线为0，则整行都渲染颜色
-    return { 'background-color': '#FFF6F6' };
+    // 如果基线为0，则整行都渲染颜色 // ztUnlinkedAt: null 禅道需求未移除
+    style = { background: '#FFF6F6', color: isDelete ? 'red' : 'initial' };
   }
-  return { 'background-color': 'white' };
+  // 禅道需求移除 灰色背景
+  else if (isDelete) {
+    style = { background: '#e1e4ea80' };
+  }
+  return style;
 };
 
 const removeColumns: (ColDef | ColGroupDef)[] = [

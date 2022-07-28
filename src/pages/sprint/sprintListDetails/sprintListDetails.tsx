@@ -86,6 +86,7 @@ import {
 import defaultTreeSelectParams from '@/pages/shimo/fileBaseline/iterateList/defaultSetting';
 import styles from './sprintListDetails.less';
 import { isEmpty } from 'lodash';
+import RemoveModal from '@/pages/sprint/sprintListDetails/removeModal';
 let ora_filter_data: any = [];
 
 const gird_filter_condition: any = []; // 表格自带过滤了的条件
@@ -93,6 +94,7 @@ const { Option } = Select;
 const SprintList: React.FC<any> = () => {
   const { initialState } = useModel('@@initialState');
   const { prjId, prjNames, prjType, showTestConfirmFlag } = getProjectInfo();
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
 
   /* region 整个模块都需要用到的表单定义 */
   // 模块查询
@@ -1322,7 +1324,11 @@ const SprintList: React.FC<any> = () => {
     console.log(selected);
   };
 
-  const onRemove = async () => {};
+  const onRemove = async () => {
+    if (isEmpty(gridApi.current?.getSelectedRows()))
+      return message.warning('请先选择需要移除的需求！');
+    setShowRemoveModal(true);
+  };
 
   useEffect(() => {
     setPageTitle(getStaticMessage(data?.resCount));
@@ -3137,6 +3143,12 @@ const SprintList: React.FC<any> = () => {
           </div>
         </Form>
       </Modal>
+      <RemoveModal
+        visible={showRemoveModal}
+        gridRef={gridApi}
+        onCancel={() => setShowRemoveModal(false)}
+        onOk={() => setShowRemoveModal(false)}
+      />
     </div>
   );
 };

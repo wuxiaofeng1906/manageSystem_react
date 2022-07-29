@@ -1,20 +1,22 @@
-import React, { useMemo, useState } from 'react';
-import { Progress, Row, Select, Modal, Button, Form, Checkbox } from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Progress, Row, Select, Modal, Button, Form, Checkbox, message } from 'antd';
 import { useModel } from '@@/plugin-model/useModel';
 import { saveProcessResult, executeAutoCheck } from './axiosRequest';
-import { errorMessage, sucMessage } from '@/publicMethods/showMessages';
+import { errorMessage, infoMessage, sucMessage } from '@/publicMethods/showMessages';
 import { getAutoResult } from './processAnalysis';
 import {
   getAnnouncement,
   postAnnouncementForOtherPage,
 } from '@/pages/onDutyAndRelease/releaseAnnouncement/axiosRequest/apiPage';
 import usePermission from '@/hooks/permission';
+import { checkOnlineEnvSource } from '@/pages/onDutyAndRelease/preRelease/datas/dataAnalyze';
 
 const { Option } = Select;
 
 const CheckProgress: React.FC<any> = () => {
   // 获取当前页面的进度数据
-  const { tabsData, processStatus, modifyProcessStatus, operteStatus } = useModel('releaseProcess');
+  const { tabsData, processStatus, modifyProcessStatus, operteStatus, releaseItem, upgradeApi } =
+    useModel('releaseProcess');
   const [disabled, setDisabled] = useState(false);
   const { announcePermission } = usePermission();
   const [isModalVisible, setModalVisible] = useState({
@@ -40,6 +42,10 @@ const CheckProgress: React.FC<any> = () => {
       errorMessage('检查未全部完成，不能保存发布结果！');
       return;
     }
+    if (checkOnlineEnvFlag) {
+      infoMessage('发布集群未填写，不能保存发布结果！');
+      return;
+    }
 
     let autoDisable = true;
     let announceContent: any = {};
@@ -47,6 +53,7 @@ const CheckProgress: React.FC<any> = () => {
       message1: '请确认是否修改服务发布结果为空！',
       message2: '',
     };
+
     if (params === '1') {
       hintMsgs.message1 = '请确认服务是否发布成功?';
       hintMsgs.message2 = '如有自动化也执行通过!确认通过，会自动开放所有租户。';
@@ -143,6 +150,12 @@ const CheckProgress: React.FC<any> = () => {
       show: false,
     });
   };
+  // 发布结果判断
+  const checkOnlineEnvFlag = useMemo(() => {
+    // 存在有一项数据不完整 为true
+    const flag = checkOnlineEnvSource(releaseItem, upgradeApi);
+    return flag;
+  }, [JSON.stringify(releaseItem.gridData), JSON.stringify(upgradeApi.gridData)]);
 
   // 跳转到发布公告界面
   let href;

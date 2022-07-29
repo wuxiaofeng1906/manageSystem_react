@@ -9,7 +9,6 @@
 
 }
 .removeTableWarp{
-  background:red;
   :global{
     .ant-table {
       width: 100%;
@@ -18,7 +17,21 @@
         text-overflow: ellipsis;
         overflow: hidden;
         max-width: 120px;
-        padding: 5px !important;
+        padding: 0px 8px 0!important;
+      }
+      th{
+        padding: 6px!important;
+      }
+      .ant-form-item{
+        margin-bottom: 12px;
+      }
+      .ant-form-item-with-help .ant-form-item-explain{
+        height:10px;
+        min-height: 10px;
+      }
+      .ant-form-item-explain-error{
+        line-height: 10px;
+        font-size: 12px;
       }
     }
   }

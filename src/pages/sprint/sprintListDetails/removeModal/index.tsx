@@ -6,6 +6,7 @@ import { ColumnsType } from 'antd/lib/table';
 import { getDeptMemner } from '@/pages/sprint/sprintListDetails/data';
 import { useGqlClient } from '@/hooks/index';
 import styles from '../sprintListDetails.less';
+import { isEmpty } from 'lodash';
 
 const list = [
   { label: '是', value: '1' },
@@ -33,6 +34,9 @@ const RemoveModal = (
         testCheck: '1',
         commit: undefined,
         revert: undefined,
+        tester: isEmpty(it.tester)
+          ? []
+          : it.tester?.map((it: any) => ({ label: it.id, value: it.name })),
         reason: '',
       })) ?? [];
     form.setFieldsValue({ form: formData });
@@ -62,7 +66,13 @@ const RemoveModal = (
             name={['form', i, 'tester']}
             rules={[{ required: true, message: '请填写测试！' }]}
           >
-            <Select options={testUser} showSearch optionFilterProp={'label'} size={'small'} />
+            <Select
+              options={testUser}
+              showSearch
+              optionFilterProp={'label'}
+              size={'small'}
+              mode={'multiple'}
+            />
           </Form.Item>
         );
       },
@@ -128,6 +138,8 @@ const RemoveModal = (
   return (
     <Modal
       title={'移除操作'}
+      okText={'确定'}
+      cancelText={'取消'}
       {...props}
       width={1300}
       onOk={onOK}
@@ -144,7 +156,7 @@ const RemoveModal = (
           columns={columns}
           dataSource={source}
           size={'small'}
-          scroll={{ x: 1100, y: 400 }}
+          scroll={{ y: 400 }}
           pagination={false}
         />
       </Form>

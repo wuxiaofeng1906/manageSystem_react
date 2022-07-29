@@ -277,6 +277,7 @@ const checkOnlineEnvData = async (sourceData: any) => {
   }
   return systemPermission.errorMessage;
 };
+const checkHotFreshData = async (sourceData: any) => {};
 
 const checkOnlineAutoData = async () => {
   //   没有勾选忽略检查，后面参数必填。如果勾选了，后面的参数可以为空（不再做忽略检查）
@@ -587,10 +588,10 @@ const saveOnlineBranchData = async (
     return checkMsg_envCheck;
   }
   // 热更新检查
-  const checkMsg_hotFreshCheck = await checkHotFreshData(sourceData);
-  if (checkMsg_hotFreshCheck) {
-    return checkMsg_hotFreshCheck;
-  }
+  // const checkMsg_hotFreshCheck = await checkHotFreshData(sourceData);
+  // if (checkMsg_hotFreshCheck) {
+  //   return checkMsg_hotFreshCheck;
+  // }
 
   // 自动化检查参数（暂时不做自动化必填参数检查）
   // const checkMsg_autoCheck = await checkOnlineAutoData(sourceData);
@@ -749,10 +750,4 @@ const executeOnlineCheck = async (type: string, checkNum: string) => {
   }
 };
 
-export {
-  getCheckNumForOnlineBranch,
-  getModifiedData,
-  saveOnlineBranchData,
-  executeOnlineCheck,
-  checkHotFreshData,
-};
+export { getCheckNumForOnlineBranch, getModifiedData, saveOnlineBranchData, executeOnlineCheck };

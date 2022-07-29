@@ -126,6 +126,61 @@ export default [
     ],
   },
   {
+    name: '值班与发布',
+    icon: 'table',
+    path: '/onDutyAndRelease',
+    access: 'devCenter', // 仅研发中心人员可见，客服不可见
+    routes: [
+      {
+        name: '值班计划',
+        icon: 'table',
+        path: 'dutyPlan',
+        component: './onDutyAndRelease/dutyPlan',
+      },
+      {
+        name: '值班列表',
+        icon: 'table',
+        path: 'dutyList',
+        // access: 'dutyManager',
+        component: './onDutyAndRelease/dutyDirectory/dutyList',
+      },
+      {
+        name: '值班名单',
+        icon: 'table',
+        path: 'dutyCatalog/:id',
+        hideInMenu: true,
+        // access: 'dutyManager',
+        component: './onDutyAndRelease/dutyDirectory/dutyCatalog',
+      },
+      {
+        name: '发布过程',
+        icon: 'table',
+        path: 'preRelease',
+        component: './onDutyAndRelease/preRelease',
+      },
+      {
+        name: '发布历史',
+        icon: 'table',
+        path: 'releaseHistory',
+        component: './onDutyAndRelease/releaseHistory',
+      },
+      {
+        name: '正式发布',
+        icon: 'table',
+        path: 'officialRelease',
+        component: './onDutyAndRelease/officialRelease',
+        hideInMenu: true,
+      },
+      {
+        name: '发布公告',
+        icon: 'table',
+        path: 'releaseAnnouncement',
+        component: './onDutyAndRelease/releaseAnnouncement',
+        hideInMenu: true,
+      },
+    ],
+  },
+  {
     name: '研发过程数据',
     access: 'devCenter', // 仅研发中心人员可见，客服不可见
     icon: 'table',
@@ -528,62 +583,7 @@ export default [
     access: 'devCenter', // 仅研发中心人员可见，客服不可见
   },
   {
-    name: '值班与发布',
-    icon: 'table',
-    path: '/onDutyAndRelease',
-    access: 'devCenter', // 仅研发中心人员可见，客服不可见
-    routes: [
-      {
-        name: '值班计划',
-        icon: 'table',
-        path: 'dutyPlan',
-        component: './onDutyAndRelease/dutyPlan',
-      },
-      {
-        name: '值班列表',
-        icon: 'table',
-        path: 'dutyList',
-        // access: 'dutyManager',
-        component: './onDutyAndRelease/dutyDirectory/dutyList',
-      },
-      {
-        name: '值班名单',
-        icon: 'table',
-        path: 'dutyCatalog/:id',
-        hideInMenu: true,
-        // access: 'dutyManager',
-        component: './onDutyAndRelease/dutyDirectory/dutyCatalog',
-      },
-      {
-        name: '发布过程',
-        icon: 'table',
-        path: 'preRelease',
-        component: './onDutyAndRelease/preRelease',
-      },
-      {
-        name: '发布历史',
-        icon: 'table',
-        path: 'releaseHistory',
-        component: './onDutyAndRelease/releaseHistory',
-      }, {
-        name: '正式发布',
-        icon: 'table',
-        path: 'officialRelease',
-        component: './onDutyAndRelease/officialRelease',
-        hideInMenu: true
-
-      }, {
-        name: '发布公告',
-        icon: 'table',
-        path: 'releaseAnnouncement',
-        component: './onDutyAndRelease/releaseAnnouncement',
-        hideInMenu: true
-
-      }
-    ],
-  },
-  {
-    name: "禅道管理",
+    name: '禅道管理',
     icon: 'table',
     path: '/zentao',
     // hideInMenu: true,

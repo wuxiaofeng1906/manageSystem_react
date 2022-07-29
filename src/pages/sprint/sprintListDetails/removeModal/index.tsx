@@ -31,21 +31,23 @@ const RemoveModal = (
     const formData =
       selected?.map((it: any) => ({
         ...it,
-        testCheck: '1',
+        reason: '',
         commit: undefined,
         revert: undefined,
+        relatedStories: it.relatedStories ?? 0,
         tester: isEmpty(it.tester)
           ? []
           : it.tester?.map((it: any) => ({ label: it.id, value: it.name })),
-        reason: '',
+        testCheck: isEmpty(it.testCheck) ? Math.abs(Number(it.testCheck)).toString() : undefined,
       })) ?? [];
-    form.setFieldsValue({ form: formData });
+    form.setFieldsValue({ formList: formData });
     setSource(formData);
     getTestUserList();
   }, [JSON.stringify(selected)]);
 
   const onOK = async () => {
     const values = await form.validateFields();
+    console.log(values);
   };
   const onCancel = () => {
     props.onCancel?.();
@@ -53,18 +55,18 @@ const RemoveModal = (
 
   const columns: ColumnsType<any> = [
     { title: '序号', render: (v, r, i) => i + 1, width: 60 },
-    { title: '编号', dataIndex: 'ztNo' },
+    { title: '编号', dataIndex: 'ztNo', width: 90 },
     { title: '标题内容', dataIndex: 'title' },
-    { title: '相关需求', dataIndex: 'relatedStories' },
-    { title: '相关bug', dataIndex: 'relatedBugs' },
+    { title: '相关需求', dataIndex: 'relatedStories', width: 90 },
+    { title: '相关bug', dataIndex: 'relatedBugs', width: 90 },
     {
       title: '测试',
       dataIndex: 'tester',
       render: (value, record, i) => {
         return (
           <Form.Item
-            name={['form', i, 'tester']}
-            rules={[{ required: true, message: '请填写测试！' }]}
+            name={['formList', i, 'tester']}
+            rules={[{ required: true, message: '请填写测试人员！' }]}
           >
             <Select
               options={testUser}
@@ -83,8 +85,8 @@ const RemoveModal = (
       render: (value, record, i) => {
         return (
           <Form.Item
-            name={['form', i, 'testCheck']}
-            rules={[{ required: true, message: '请填写测试验证！' }]}
+            name={['formList', i, 'testCheck']}
+            rules={[{ required: true, message: '请填写是否要测试验证！' }]}
           >
             <Select options={list} size={'small'} />
           </Form.Item>
@@ -96,11 +98,27 @@ const RemoveModal = (
       dataIndex: 'commit',
       render: (value, record, i) => {
         return (
-          <Form.Item
-            name={['form', i, 'commit']}
-            rules={[{ required: true, message: '必须测试验证！' }]}
-          >
-            <Select options={list} size={'small'} />
+          <Form.Item noStyle shouldUpdate>
+            {({ setFieldsValue }) => {
+              const formList = form.getFieldsValue()?.formList;
+              return (
+                <Form.Item
+                  name={['formList', i, 'commit']}
+                  rules={[{ required: true, message: '请填写是否提交代码！' }]}
+                >
+                  <Select
+                    options={list}
+                    size={'small'}
+                    onChange={(v) => {
+                      const status = v == '0';
+                      formList[i].revert = status ? '-1' : undefined;
+                      formList[i].commit = v;
+                      setFieldsValue({ formList: formList });
+                    }}
+                  />
+                </Form.Item>
+              );
+            }}
           </Form.Item>
         );
       },
@@ -110,11 +128,22 @@ const RemoveModal = (
       dataIndex: 'revert',
       render: (value, record, i) => {
         return (
-          <Form.Item
-            name={['form', i, 'revert']}
-            rules={[{ required: true, message: '必须测试验证！' }]}
-          >
-            <Select options={list} size={'small'} />
+          <Form.Item noStyle shouldUpdate>
+            {() => {
+              const values = form.getFieldsValue()?.formList?.[i];
+              return (
+                <Form.Item
+                  name={['formList', i, 'revert']}
+                  rules={[{ required: true, message: '请填写代码是否Revert！' }]}
+                >
+                  <Select
+                    size={'small'}
+                    options={list.concat([{ label: '免', value: '-1' }])}
+                    disabled={values?.commit == '0'}
+                  />
+                </Form.Item>
+              );
+            }}
           </Form.Item>
         );
       },
@@ -124,11 +153,24 @@ const RemoveModal = (
       dataIndex: 'reason',
       render: (value, record, i) => {
         return (
-          <Form.Item
-            name={['form', i, 'reason']}
-            rules={[{ required: true, message: '请填写免revert原因！' }]}
-          >
-            <Input.TextArea size={'small'} autoSize={{ minRows: 1, maxRows: 3 }} />
+          <Form.Item noStyle shouldUpdate>
+            {() => {
+              const values = form.getFieldsValue()?.formList?.[i];
+
+              return (
+                <Form.Item
+                  name={['formList', i, 'reason']}
+                  rules={[
+                    {
+                      required: values?.revert == '-1' && values?.commit == '1',
+                      message: '请填写免revert原因！',
+                    },
+                  ]}
+                >
+                  <Input.TextArea size={'small'} autoSize={{ minRows: 1, maxRows: 3 }} />
+                </Form.Item>
+              );
+            }}
           </Form.Item>
         );
       },

@@ -180,8 +180,9 @@ const DutyList = () => {
       const lock = lockList.find(
         (it) => it.param.replace('duty_', '') == rowNode.data.person_duty_num,
       );
-      rowNode?.setData({ ...rowNode.data, bg: !isEmpty(lock) });
-      // gridRef.current?.updateRowData({ update: [{ ...rowNode.data, bg: !isEmpty(lock) }] });
+      console.log(!isEmpty(lock));
+      const row = gridRef.current?.getRowNode(index.toString());
+      row?.setData({ ...rowNode.data, bg: !isEmpty(lock) });
     });
   }, [JSON.stringify(lockList)]);
 
@@ -271,8 +272,8 @@ const DutyList = () => {
             tooltipMouseTrack={true}
             onCellMouseOver={onCellMouseOver}
             onCellMouseOut={(e) => {
-              e.colDef.tooltipField = undefined;
-              e.colDef.tooltipComponentParams = null;
+              // e.colDef.tooltipField = undefined;
+              e.colDef.tooltipComponentParams = '';
             }}
           />
         </div>

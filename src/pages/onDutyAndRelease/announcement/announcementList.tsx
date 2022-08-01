@@ -13,9 +13,12 @@ import IPagination from '@/components/IPagination';
 import { getHeight } from '@/publicMethods/pageSet';
 import { useModel, history } from 'umi';
 import moment from 'moment';
+import usePermission from '@/hooks/permission';
 
+const disabledStyle = { filter: 'grayscale(1)', cursor: 'not-allowed' };
 const announcementList = () => {
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
+  const { announcePermission } = usePermission();
   const [list, setList] = useState<any[]>([]);
   const [spinning, setSpinning] = useState(false);
   const [persons, setPersons] = useState<any[]>([]);
@@ -71,6 +74,7 @@ const announcementList = () => {
   };
   // 新增、修改
   const onAdd = async (params?: CellClickedEvent) => {
+    if (!announcePermission?.().add || !announcePermission?.().edit) return;
     let releaseNum = '';
     let type = 'detail';
     if (isEmpty(params)) {
@@ -85,6 +89,7 @@ const announcementList = () => {
   };
 
   const onDelete = async (params: CellClickedEvent) => {
+    if (!announcePermission?.().delete) return;
     await AnnouncementServices.deleteAnnouncement({
       announcement_num: params.data.announcement_num,
       user_id: user?.userid,
@@ -110,7 +115,14 @@ const announcementList = () => {
           <Form form={form} className={styles.resetForm}>
             <Row justify={'space-between'} gutter={3} style={{ marginBottom: 5 }}>
               <Col span={3}>
-                <Button type={'text'} icon={<FolderAddTwoTone />} onClick={() => onAdd()}>
+                <Button
+                  type={'text'}
+                  onClick={() => onAdd()}
+                  disabled={!announcePermission?.().add}
+                  icon={
+                    <FolderAddTwoTone style={announcePermission?.().add ? {} : disabledStyle} />
+                  }
+                >
                   新增
                 </Button>
               </Col>
@@ -163,14 +175,16 @@ const announcementList = () => {
                     <Space size={8}>
                       <img
                         width={16}
-                        style={{ cursor: 'pointer' }}
+                        style={announcePermission?.().edit ? { cursor: 'pointer' } : disabledStyle}
                         src={require('../../../../public/params.png')}
                         onClick={() => onAdd(params)}
                       />
                       <img
                         width={16}
                         height={17}
-                        style={{ cursor: 'pointer' }}
+                        style={
+                          announcePermission?.().delete ? { cursor: 'pointer' } : disabledStyle
+                        }
                         src={require('../../../../public/delete_red.png')}
                         onClick={() => onDelete(params)}
                       />

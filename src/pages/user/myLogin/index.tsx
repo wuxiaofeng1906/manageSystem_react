@@ -1507,6 +1507,35 @@ const Login: React.FC<{}> = () => {
           roleId: 1,
         },
       },
+      {
+        id: 150,
+        name: 'announcementDelete',
+        level: 1,
+        description: '公告删除',
+        parentId: 146,
+        path: null,
+        method: null,
+        RdSysRolePermission: {
+          id: 1630,
+          name: 'releaseAnnouncement',
+          permissionId: 150,
+          roleId: 1,
+        },
+      },
+      {
+        id: 151,
+        name: 'announcementAdd',
+        level: 1,
+        description: '公告新增',
+        parentId: 146,
+        path: null,
+        method: null,
+        RdSysRolePermission: {
+          id: 2631,
+          permissionId: 151,
+          roleId: 1,
+        },
+      },
     ];
     // endregion
 

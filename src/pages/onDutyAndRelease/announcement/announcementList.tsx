@@ -74,7 +74,9 @@ const announcementList = () => {
   };
   // 新增、修改
   const onAdd = async (params?: CellClickedEvent) => {
-    if (!announcePermission?.().add || !announcePermission?.().edit) return;
+    // 新增
+    if (isEmpty(params) && !announcePermission?.().add) return;
+    if (!announcePermission?.().edit) return;
     let releaseNum = '';
     let type = 'detail';
     if (isEmpty(params)) {

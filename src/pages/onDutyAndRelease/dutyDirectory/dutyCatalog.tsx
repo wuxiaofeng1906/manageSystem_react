@@ -34,25 +34,45 @@ const envType = {
   global: 'cn-northwest-global',
 };
 const tbodyConfig = [
-  { title: '前端值班', name: 'front' },
-  { title: '后端值班', name: 'backend' },
-  { title: '测试值班', name: 'test' },
+  { title: '前端值班', name: 'front', tech: 1 },
+  { title: '后端值班', name: 'backend', tech: 2 },
+  { title: '测试值班', name: 'test', tech: 3 },
   { title: '运维值班', name: 'operations' },
   { title: 'SQA值班', name: 'sqa' },
 ];
 const FilterSelector = ({
-  options = [],
+  // options = [],
   name,
   placeholder = '',
   init = {},
   onDeselect,
   onBlur,
   disabled,
+  tech,
 }: {
   name: string;
   disabled: boolean;
   init?: Record<string, any>;
+  tech?: number;
 } & SelectProps) => {
+  const [options, setOptions] = useState([]);
+
+  const getPerson = async () => {
+    const res = await DutyListServices.getDevperson(tech ? { tech } : {});
+    setOptions(
+      res?.map((it: any) => ({
+        key: it.user_id,
+        value: `${it.user_id}_${it.user_type}`,
+        label: it.user_name,
+        type: it.user_type,
+        fit: `${it.user_id}_${it.user_type == 'scene' ? 'remote' : 'scene'}`,
+      })),
+    );
+  };
+  useEffect(() => {
+    getPerson();
+  }, [tech]);
+
   return (
     <Form.Item noStyle shouldUpdate={(pre, current) => pre[name] !== current[name]}>
       {({ getFieldValue }) => {
@@ -84,7 +104,7 @@ const FilterSelector = ({
 const DutyCatalog = () => {
   const { id } = useParams() as { id: string };
   const { getAllLock, updateLockStatus, singleLock } = useLock();
-  const [allPerson, setAllPerson] = useState<any[]>([]);
+  // const [allPerson, setAllPerson] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [envList, setEnvList] = useState<any[]>([]);
   const [methodList, setMethodList] = useState<any[]>([]);
@@ -134,8 +154,7 @@ const DutyCatalog = () => {
   const getSource = async () => {
     try {
       setLoading(true);
-      const [allPersons, envs, methods] = await Promise.all([
-        DutyListServices.getDevperson(),
+      const [envs, methods] = await Promise.all([
         DutyListServices.releaseEnv(),
         DutyListServices.releaseMethod(),
       ]);
@@ -154,16 +173,6 @@ const DutyCatalog = () => {
           value: it.method,
           label: it.method_name,
           key: it.method_name,
-        })),
-      );
-
-      setAllPerson(
-        allPersons?.map((it: any) => ({
-          key: it.user_id,
-          value: `${it.user_id}_${it.user_type}`,
-          label: it.user_name,
-          type: it.user_type,
-          fit: `${it.user_id}_${it.user_type == 'scene' ? 'remote' : 'scene'}`,
         })),
       );
     } catch (e) {
@@ -364,16 +373,17 @@ const DutyCatalog = () => {
 
   const updateTitle = async () => {
     if (!hasPermission) return;
+    const greyEnv = ['cn-northwest-0', 'cn-northwest-1'];
     const values = await form.getFieldsValue();
+    const greyLength = intersection(values.release_env, greyEnv).length;
+    const releaseEnvLength = values.release_env?.length;
     const time = moment(values.duty_date).format('YYYYMMDD');
     let type = '';
     if (isEmpty(values.release_env)) type = '';
-    else if (
-      values.release_env?.length == 1 &&
-      ['cn-northwest-1', 'cn-northwest-0'].includes(values.release_env[0])
-    ) {
+    else if (greyLength == 1 && releaseEnvLength == 1) {
       type = `${values.release_env[0].replace('cn-northwest-', '')}级灰度发布`;
-    } else type = '线上发布';
+    } else if (releaseEnvLength == 2 && greyLength == 2) type = '灰度发布';
+    else type = '线上发布';
     return `${time}_${type}值班名单`;
   };
 
@@ -712,7 +722,8 @@ const DutyCatalog = () => {
                     <td>{config.title}</td>
                     <td colSpan={11}>
                       <FilterSelector
-                        options={allPerson}
+                        // options={allPerson}
+                        tech={config.tech}
                         name={config.name}
                         placeholder={`${config.title}人员`}
                         init={recentDuty?.[config.name]}

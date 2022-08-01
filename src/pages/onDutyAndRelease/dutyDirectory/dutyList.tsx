@@ -9,7 +9,7 @@ import { CellClickedEvent, CellMouseOverEvent, GridApi, GridReadyEvent } from 'a
 import styles from './index.less';
 import DutyListServices from '@/services/dutyList';
 import moment from 'moment';
-import { isEmpty, replace } from 'lodash';
+import { intersection, isEmpty, replace } from 'lodash';
 import useLock from '@/hooks/lock';
 
 const DutyList = () => {
@@ -46,7 +46,9 @@ const DutyList = () => {
     const release_time = moment().hour(23).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss');
     const time = moment().format('YYYYMMDD');
     const date = moment(data.duty_date).format('YYYYMMDD');
+    const greyEnv = ['cn-northwest-0', 'cn-northwest-1'];
     const env = data.release_env;
+    const greyLength = intersection(env, greyEnv).length;
     let type = ''; // 集群
     let newTitle = ''; // 新生成值班标题
     const specifyFormat = data.duty_name?.indexOf(date) > -1;
@@ -55,12 +57,10 @@ const DutyList = () => {
       newTitle = replace(data.duty_name, moment(data.duty_date).format('YYYYMMDD'), time);
     } else {
       if (isEmpty(data.release_env) || data.release_env == 'unknown') type = '';
-      else if (
-        env?.split()?.length == 1 &&
-        ['cn-northwest-1', 'cn-northwest-0'].includes(env?.split()?.[0])
-      ) {
+      else if (env?.split()?.length == 1 && greyLength == 1) {
         type = `${env?.split()?.[0].replace('cn-northwest-', '')}级灰度发布`;
-      } else type = '线上发布';
+      } else if (env?.split()?.length == 2 && greyLength == 2) type = '灰度发布';
+      else type = '线上发布';
       newTitle = `${time}_${type}值班名单`;
     }
 
@@ -145,7 +145,7 @@ const DutyList = () => {
   );
   const getRowStyle = (params: any) => {
     const lockNode = lockList.map((it) => it.param.replace('duty_', ''));
-    return lockNode.includes(params.data.person_duty_num) ? { background: '#fddede' } : null;
+    return lockNode.includes(params.data.person_duty_num) ? { background: '#FFF6F6' } : null;
   };
 
   const onCellMouseOver = (param: CellMouseOverEvent) => {
@@ -175,14 +175,15 @@ const DutyList = () => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   gridRef?.current?.forEachNode((rowNode, index) => {
-  //     const lock = lockList.find(
-  //       (it) => it.param.replace('duty_', '') == rowNode.data.person_duty_num,
-  //     );
-  //     gridRef.current?.updateRowData({ update: [{ ...rowNode.data, bg: !isEmpty(lock) }] });
-  //   });
-  // }, [JSON.stringify(lockList)]);
+  useEffect(() => {
+    gridRef?.current?.forEachNode((rowNode, index) => {
+      const lock = lockList.find(
+        (it) => it.param.replace('duty_', '') == rowNode.data.person_duty_num,
+      );
+      rowNode?.setData({ ...rowNode.data, bg: !isEmpty(lock) });
+      // gridRef.current?.updateRowData({ update: [{ ...rowNode.data, bg: !isEmpty(lock) }] });
+    });
+  }, [JSON.stringify(lockList)]);
 
   return (
     <PageContainer>

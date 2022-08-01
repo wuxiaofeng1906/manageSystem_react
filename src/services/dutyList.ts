@@ -2,8 +2,9 @@ import request from './request';
 const baseUrl = '/api/verify';
 const DutyListServices = {
   // 研发所有人
-  async getDevperson() {
-    return request(`${baseUrl}/duty/devperson`);
+  // 1：前端 2：后端 3：测试
+  async getDevperson(params: any) {
+    return request(`${baseUrl}/duty/devperson`, { params });
   },
   async getSQA() {
     return request(`${baseUrl}/duty/person?tech=7`);

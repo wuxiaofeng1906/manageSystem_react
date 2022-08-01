@@ -16,11 +16,7 @@ const { TabPane } = Tabs;
 let releaseTime = 'before'; // 升级前公告还是升级后公告
 let announceId = 0; // 记录升级ID
 const Announce: React.FC<any> = (props: any) => {
-  const {
-    id: releaseNum,
-    status: operteStatus,
-    type,
-  } = useParams() as {
+  const { id: releaseNum, status: operteStatus } = useParams() as {
     id: string;
     status: string;
     type: 'add' | 'detail';
@@ -132,7 +128,7 @@ const Announce: React.FC<any> = (props: any) => {
   // 展示界面数据
   const showFormData = (resData: any) => {
     //   有数据的时候需要显示在界面上
-    if (resData.code === 4001) {
+    if (resData.code === 4001 || isEmpty(resData.data)) {
       // 没有发布公告，需要显示默认信息。
       initForm();
       setButtonDisable({
@@ -175,8 +171,7 @@ const Announce: React.FC<any> = (props: any) => {
     showFormData(announceContent);
   };
 
-  const announceData =
-    type == 'add' ? initForm() : useRequest(() => getAnnouncement(releaseNum, 'before')).data; // 关联值班名单
+  const announceData = useRequest(() => getAnnouncement(releaseNum, 'before')).data; // 关联值班名单
   useEffect(() => {
     if (announceData) {
       showFormData(announceData);
@@ -185,8 +180,9 @@ const Announce: React.FC<any> = (props: any) => {
 
   useEffect(() => {
     announcementNameForm.setFieldsValue({
-      announcement_name:
-        type == 'add' ? `${releaseNum}升级公告` : announceData?.data?.announcement_name ?? '',
+      announcement_name: isEmpty(announceData?.data)
+        ? `${releaseNum}升级公告`
+        : announceData?.data?.announcement_name ?? '',
     });
   }, [releaseNum, announceData?.data?.announcement_name]);
 

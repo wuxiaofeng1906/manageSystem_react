@@ -80,6 +80,7 @@ const AnnounceSelector = ({
               optionFilterProp={'label'}
               onBlur={onSave}
               onDeselect={onSave}
+              allowClear
             />
           </Form.Item>
         </Form>

@@ -32,38 +32,29 @@ const getOfficialReleaseDetails = async (releaseNums: string, releaseType: strin
 // 获取上线集群环境
 const getOnlineEnv = async (releaseType: any) => {
   // 0级灰度跳转过来的（releaseType=gray），不显示集群0，和global
-  // 1级灰度跳转过来的（releaseType=online），不显示集群0、集群1和global
+  // 1级灰度跳转过来的（releaseType=online），不显示集群0、集群1和global 集群1-8
   const envData = await axiosGet('/api/verify/release/environment');
-  const nameOptions: any = [];
+  let opt: any[] = [];
   if (envData) {
-    const datas = envData;
-    datas.forEach((envInfo: any) => {
-      if (
-        releaseType === 'gray' &&
-        envInfo.online_environment_id !== 'cn-northwest-global' &&
-        envInfo.online_environment_id !== 'cn-northwest-0'
-      ) {
-        nameOptions.push(
-          <Option key={envInfo.online_environment_id} value={`${envInfo.online_environment_id}`}>
-            {envInfo.online_environment_name}
-          </Option>,
-        );
-      } else if (
-        releaseType === 'online' &&
-        envInfo.online_environment_id !== 'cn-northwest-global' &&
-        envInfo.online_environment_id !== 'cn-northwest-0' &&
-        envInfo.online_environment_id !== 'cn-northwest-1' &&
-        envInfo.online_environment_name !== '集群1-8'
-      ) {
-        nameOptions.push(
-          <Option key={envInfo.online_environment_id} value={`${envInfo.online_environment_id}`}>
-            {envInfo.online_environment_name}
-          </Option>,
-        );
-      }
-    });
+    const data = envData?.map((it: any) => ({
+      label: it.online_environment_name,
+      value: it.online_environment_id,
+      type: ['集群1-8', '集群2-8', 'global'].includes(it.online_environment_name)
+        ? it.online_environment_id
+        : 'other',
+    }));
+    if (releaseType === 'gray') {
+      opt = data.filter((it: any) => !['cn-northwest-global', 'cn-northwest-0'].includes(it.value));
+    }
+    if (releaseType === 'online') {
+      opt = data.filter(
+        (it: any) =>
+          !['cn-northwest-global', 'cn-northwest-0', 'cn-northwest-1'].includes(it.value) ||
+          it.label !== '集群1-8',
+      );
+    }
   }
-  return nameOptions;
+  return opt;
 };
 
 // 保存发布结果
@@ -100,6 +91,7 @@ const editReleaseForm = async (releaseInfo: any, otherCondition: any) => {
     plan_release_time: pulishTime === '' ? '' : dayjs(pulishTime).format('YYYY-MM-DD HH:mm:ss'), // 计划发布时间
     duty_num: relateDutyName, // 值班名单
     release_name: releaseInfo.release_name,
+    announcement_num: releaseInfo?.announcement_num,
     // "online_environment": "string",
     // "online_release_name": "string"  发布名称
   };

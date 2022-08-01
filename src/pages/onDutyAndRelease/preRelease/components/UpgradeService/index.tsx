@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Col, Form, Input, message, Modal, Row, Select } from 'antd';
 import { useModel } from '@@/plugin-model/useModel';
 import { AgGridReact } from 'ag-grid-react';
@@ -15,7 +15,7 @@ import {
 } from './grid/columns';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { confirmUpgradeService } from './serviceConfirm';
-import { alalysisInitData } from '../../datas/dataAnalyze';
+import { alalysisInitData, checkOnlineEnvSource } from '../../datas/dataAnalyze';
 import { getCheckProcess } from '../../components/CheckProgress/axiosRequest';
 import { showProgressData } from '../../components/CheckProgress/processAnalysis';
 import { vertifyModifyFlag, releaseAppChangRowColor } from '../../operate';
@@ -33,7 +33,8 @@ import { upgradePulishItem, addPulishApi, deleteReleasedID } from './axiosReques
 import { getGridRowsHeight } from '../../components/gridHeight';
 import { getAutoCheckMessage } from './idDeal/dataDeal';
 import { serverConfirmJudge } from './checkExcute';
-import { errorMessage, sucMessage } from '@/publicMethods/showMessages';
+import { errorMessage, infoMessage, sucMessage } from '@/publicMethods/showMessages';
+import { isBoolean, isEmpty } from 'lodash';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -42,10 +43,22 @@ const usersInfo = JSON.parse(userLogins);
 let currentOperateStatus = false; // 需要将useState中的operteStatus值赋值过来，如果直接取operteStatus，下拉框那边获取不到最新的operteStatus；
 const UpgradeService: React.FC<any> = () => {
   const {
-    tabsData, modifyProcessStatus, releaseItem, upgradeApi, upgradeConfirm,preReleaseData,
-    lockedItem, modifyLockedItem, setRelesaeItem, setUpgradeApi, releasedIDArray, modifyReleasedID,
-    allLockedArray, operteStatus,
+    tabsData,
+    modifyProcessStatus,
+    releaseItem,
+    upgradeApi,
+    upgradeConfirm,
+    preReleaseData,
+    lockedItem,
+    modifyLockedItem,
+    setRelesaeItem,
+    setUpgradeApi,
+    releasedIDArray,
+    modifyReleasedID,
+    allLockedArray,
+    operteStatus,
   } = useModel('releaseProcess');
+  const [applicantConfirmForm] = Form.useForm(); // 应用
   const [formUpgradeService] = Form.useForm(); // 升级服务
   // 暂时忽略掉一键部署ID后端服务的获取
 
@@ -276,7 +289,7 @@ const UpgradeService: React.FC<any> = () => {
 
     // 设置下拉框
     setPulishItemFormSelected({
-      onlineEnv: await loadOnlineEnvSelect(preReleaseData.release_cluster ),
+      onlineEnv: await loadOnlineEnvSelect(preReleaseData.release_cluster),
       pulishItem: await loadPulishItemSelect(),
       isApiDbUpgrade: await loadIsApiAndDbUpgradeSelect(),
     });
@@ -419,7 +432,7 @@ const UpgradeService: React.FC<any> = () => {
     }
     // 设置下拉框
     setUpgradeApiFormSelected({
-      onlineEnv: await loadOnlineEnvSelect(preReleaseData.release_cluster ),
+      onlineEnv: await loadOnlineEnvSelect(preReleaseData.release_cluster),
       upgradeApi: await loadUpgradeApiSelect(),
       apiService: await loadApiServiceSelect(),
       apiMethod: await loadApiMethodSelect(),
@@ -487,10 +500,13 @@ const UpgradeService: React.FC<any> = () => {
   /* region 服务确认 */
 
   // 下拉框选择是否确认事件
-  const saveUperConfirmInfo = async (newValue: string, props: any) => {
+  const saveUperConfirmInfo = async (newValue: string, props: any, checkStepFourSource = false) => {
     const currentReleaseNum = props.data?.ready_release_num;
+    // checkStepFourSource: 检查step 4的上线环境是否存在未填【1.填写了应用2.填写了升级接口】
+    if (checkStepFourSource) infoMessage('step4 中上线环境未填写，不能修改服务已确认！');
     // 验证是否可以修改确认值
     if (
+      checkStepFourSource ||
       !serverConfirmJudge(
         currentOperateStatus,
         props,
@@ -595,6 +611,14 @@ const UpgradeService: React.FC<any> = () => {
     setReleaseIdDisable(operteStatus);
     // modifyReleaseIdStatus(upgradeConfirm.gridData);
   }, [operteStatus, upgradeConfirm.gridData]);
+
+  //  测试修改服务确认完成为【是】：检查 上线环境是否存在未填
+  useEffect(() => {
+    // 存在有一项数据不完整 为true
+    const flag = checkOnlineEnvSource(releaseItem, upgradeApi);
+    applicantConfirmForm.setFieldsValue({ status: flag });
+  }, [JSON.stringify(releaseItem.gridData), JSON.stringify(upgradeApi.gridData)]);
+
   return (
     <div>
       {/* 升级服务 */}
@@ -602,7 +626,9 @@ const UpgradeService: React.FC<any> = () => {
         <fieldset className={'fieldStyle'}>
           <legend className={'legendStyle'}>
             Step4 升级服务
-            <label style={{color: "Gray"}}> (值班测试：填写一键部署ID和测试服务确认完成；前后端值班：填写应用服务和升级接口/对应服务确认完成)
+            <label style={{ color: 'Gray' }}>
+              {' '}
+              (值班测试：填写一键部署ID和测试服务确认完成；前后端值班：填写应用服务和升级接口/对应服务确认完成)
             </label>
           </legend>
           <div>
@@ -755,6 +781,9 @@ const UpgradeService: React.FC<any> = () => {
                   onColumnEverythingChanged={onConfirmGridReady}
                   frameworkComponents={{
                     confirmSelectChoice: (props: any) => {
+                      applicantConfirmForm.setFieldsValue({
+                        test_confirm_status: props.value,
+                      });
                       let Color = 'black';
                       const currentValue = props.value;
                       if (currentValue === '1') {
@@ -774,23 +803,35 @@ const UpgradeService: React.FC<any> = () => {
                       }
 
                       return (
-                        <Select
-                          size={'small'}
-                          defaultValue={currentValue}
-                          bordered={false}
-                          style={{ width: '100%', color: Color }}
-                          onChange={(newValue: any) => {
-                            saveUperConfirmInfo(newValue, props);
-                          }}
-                          disabled={currentOperateStatus}
-                        >
-                          <Option key={'1'} value={'1'}>
-                            是
-                          </Option>
-                          <Option key={'2'} value={'2'}>
-                            否
-                          </Option>
-                        </Select>
+                        <Form form={applicantConfirmForm}>
+                          <Form.Item
+                            noStyle
+                            shouldUpdate={(old, next) => old.status != next.status}
+                          >
+                            {({ getFieldValue }) => {
+                              return (
+                                <Form.Item name={'test_confirm_status'}>
+                                  <Select
+                                    size={'small'}
+                                    bordered={false}
+                                    disabled={currentOperateStatus}
+                                    style={{ width: '100%', color: Color }}
+                                    onChange={(newValue: any) => {
+                                      saveUperConfirmInfo(newValue, props, getFieldValue('status'));
+                                    }}
+                                  >
+                                    <Option key={'1'} value={'1'}>
+                                      是
+                                    </Option>
+                                    <Option key={'2'} value={'2'}>
+                                      否
+                                    </Option>
+                                  </Select>
+                                </Form.Item>
+                              );
+                            }}
+                          </Form.Item>
+                        </Form>
                       );
                     },
                   }}
@@ -841,11 +882,11 @@ const UpgradeService: React.FC<any> = () => {
                           size={'small'}
                           defaultValue={currentValue}
                           bordered={false}
+                          disabled={currentOperateStatus}
                           style={{ width: '100%', color: Color }}
                           onChange={(newValue: any) => {
                             saveUperConfirmInfo(newValue, props);
                           }}
-                          disabled={currentOperateStatus}
                         >
                           <Option key={'1'} value={'1'}>
                             是

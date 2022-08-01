@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import { errorMessage } from '@/publicMethods/showMessages';
+import { errorMessage, infoMessage } from '@/publicMethods/showMessages';
 import { AgGridReact } from 'ag-grid-react';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { Button, Checkbox, Col, DatePicker, Form, Input, Modal, Row, Select, message } from 'antd';
@@ -10,7 +10,7 @@ import { loadDutyNamesSelect } from '@/pages/onDutyAndRelease/preRelease/comCont
 import { getHeight } from '@/publicMethods/pageSet';
 import { releaseColumns } from './grid/columns';
 import moment from 'moment';
-import { isEmpty, cloneDeep } from 'lodash';
+import { isEmpty, cloneDeep, intersection } from 'lodash';
 import {
   getOfficialReleaseDetails,
   cancleReleaseResult,
@@ -31,18 +31,25 @@ import AnnounceSelector from '@/pages/onDutyAndRelease/preRelease/components/ann
 // 编辑后的数据
 let otherSaveCondition: any = {
   grayReleaseNums: [], // 灰度发布编号
-  releaseEnv: '', // 发布集群
   releaseResult: 'unknown', // 发布结果
   onlineReleaseNum: '', // 正式发布编号
 };
 let onlineEnv: any = [];
 const { Option } = Select;
+const envType = {
+  '集群1-8':
+    'cn-northwest-1,cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-8',
+  '集群2-8':
+    'cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-8',
+  global: 'cn-northwest-global',
+};
 
 const OfficialRelease: React.FC<any> = (props: any) => {
   const onlineReleaseNum = props.location?.query?.onlineReleaseNum; // 正式发布列表的数据
   const historyQuery = props.location?.query?.history === 'true';
   const releaseType = props.location?.query?.releaseType;
   const [rowData, setRowData] = useState([]);
+  const [releaseEnvForm] = Form.useForm();
   const dutyNameArray = useRequest(() => loadDutyNamesSelect(true)).data; // 关联值班名单
   const pageData = useRequest(() => getOfficialReleaseDetails(onlineReleaseNum, releaseType)).data; // 界面数据获取
   onlineEnv = useRequest(() => getOnlineEnv(releaseType)).data; // 上线集群环境
@@ -64,8 +71,9 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
   // 显示进度
   const showProcessStatus = () => {
+    const releaseEnv = releaseEnvForm.getFieldValue('releaseEnv');
     const releaseInfo = formForOfficialRelease.getFieldsValue();
-    if (otherSaveCondition.releaseEnv && releaseInfo.pulishTime && releaseInfo.relateDutyName) {
+    if (releaseEnv && releaseInfo.pulishTime && releaseInfo.relateDutyName) {
       setProcessStatus({
         ...processStatus,
         processColor: '#2BF541',
@@ -107,6 +115,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   const saveReleaseInfo = async () => {
     //   获取发布方式及时间
     const condition = cloneDeep(otherSaveCondition);
+    const releaseEnv = releaseEnvForm.getFieldValue('releaseEnv')?.join();
     let grayReleaseNums: string[] = [];
     const releaseInfo = formForOfficialRelease.getFieldsValue();
     const releaseName = releaseNameForm.getFieldsValue();
@@ -115,10 +124,9 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       const readyReleaseNum = node.data?.ready_release_num;
       grayReleaseNums.push(readyReleaseNum);
     });
-
     const result = await editReleaseForm(
-      { ...releaseInfo, ...releaseName },
-      { ...condition, grayReleaseNums },
+      { ...releaseInfo, ...releaseName, announcement_num: '' },
+      { ...condition, releaseEnv, grayReleaseNums },
     );
     if (result.code === 200) {
       sucMessage('数据保存成功！');
@@ -206,6 +214,8 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
   // 发布结果下拉框选择
   const pulishResulttChanged = async (params: any) => {
+    const releaseEnv = releaseEnvForm.getFieldValue('releaseEnv');
+    if (isEmpty(releaseEnv)) return infoMessage('step2中集群未填写，不能修改发布结果!');
     // 需要判断发布服务有没有填写完成(取消发布可以不填写全)
     if (processStatus.processColor === 'gray' && params !== 'cancel') {
       errorMessage('发布服务未填写完成，不能填写发布结果!');
@@ -314,7 +324,25 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     setGridHeight(getHeight() - 210);
   };
 
-  // const href = `http://${window.location.host}/onDutyAndRelease/announcementDetail/${otherSaveCondition.onlineReleaseNum}/detail/${historyQuery}`;
+  // const href = `http://${window.location.host}/onDutyAndRelease/releaseAnnouncement?releaseNum=${otherSaveCondition.onlineReleaseNum}&operteStatus=${historyQuery}`;
+
+  const formatOpts = (value: string[]) => {
+    if (isEmpty(onlineEnv)) return;
+    const otherEnv = onlineEnv
+      ?.filter((o: any) => !Object.values(envType).includes(o.value))
+      .map((it: any) => it.value);
+    return onlineEnv?.map((it: any) => ({
+      ...it,
+      disabled:
+        isEmpty(value) ||
+        (it.type == 'other' && intersection(otherEnv, value).length > 0) ||
+        it.label == 'global' ||
+        value?.join(',') == 'cn-northwest-global'
+          ? false
+          : !value.includes(it.type),
+    }));
+  };
+
   return (
     <PageContainer title={<div />}>
       <div style={{ marginTop: -15 }}>
@@ -371,11 +399,15 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           </label>
 
           <label style={{ marginLeft: 10 }}>{autoCheckRt}</label>
-          <AnnounceSelector type={'history'} ready_release_num={onlineReleaseNum} />
+          <AnnounceSelector
+            type={'history'}
+            ready_release_num={otherSaveCondition.onlineReleaseNum}
+            value={pageData?.[0]?.announcement_num ?? ''}
+          />
         </div>
         {/* step 1 发布方式及时间 */}
-        <div style={{ backgroundColor: 'white', marginTop: 4 }}>
-          <fieldset className={'fieldStyle'} style={{ height: 135 }}>
+        <div style={{ backgroundColor: 'white', marginTop: 4, width: '100%' }}>
+          <fieldset className={'fieldStyle'} style={{ height: 135, width: '100%' }}>
             <legend className={'legendStyle'}>
               Step1 发布方式及时间
               <label style={{ color: 'Gray' }}> (值班测试填写)</label>
@@ -504,29 +536,34 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                   frameworkComponents={{
                     releaseEnvRenderer: (params: any) => {
                       if (params && params.data.rowSpan) {
-                        let currentValue;
-                        if (params.value) {
-                          currentValue = params.value.split(',');
-                          otherSaveCondition.releaseEnv = params.value;
-                        }
+                        releaseEnvForm.setFieldsValue({
+                          releaseEnv: params.value?.split() ?? [],
+                        });
                         showProcessStatus(); // 展示进度
                         return (
-                          <Select
-                            size={'small'}
-                            placeholder={'请选择'}
-                            defaultValue={currentValue}
-                            bordered={false}
-                            style={{ width: '100%' }}
-                            mode={'multiple'}
-                            onChange={(newValue: any) => {
-                              otherSaveCondition.releaseEnv = newValue.join(',');
-                              saveReleaseInfo();
-                            }}
-                            maxTagCount={'responsive'}
-                            disabled={historyQuery}
-                          >
-                            {onlineEnv}
-                          </Select>
+                          <Form form={releaseEnvForm} onValuesChange={saveReleaseInfo}>
+                            <Form.Item
+                              noStyle
+                              shouldUpdate={(pre, next) => pre.releaseEnv != next.releaseEnv}
+                            >
+                              {({ getFieldValue }) => {
+                                return (
+                                  <Form.Item name={'releaseEnv'}>
+                                    <Select
+                                      size={'small'}
+                                      placeholder={'请选择'}
+                                      bordered={false}
+                                      style={{ width: '100%' }}
+                                      mode={'multiple'}
+                                      maxTagCount={'responsive'}
+                                      disabled={historyQuery}
+                                      options={formatOpts(getFieldValue('releaseEnv'))}
+                                    />
+                                  </Form.Item>
+                                );
+                              }}
+                            </Form.Item>
+                          </Form>
                         );
                       }
                       return '';

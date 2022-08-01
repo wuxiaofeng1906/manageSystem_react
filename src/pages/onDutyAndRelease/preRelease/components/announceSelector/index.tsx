@@ -6,11 +6,13 @@ import { useModel } from '@@/plugin-model/useModel';
 const AnnounceSelector = ({
   type,
   ready_release_num,
+  value,
 }: {
   type: 'pre' | 'history';
   ready_release_num: string;
+  value?: string;
 }) => {
-  const { operteStatus } = useModel('releaseProcess');
+  const { operteStatus, processStatus } = useModel('releaseProcess');
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
 
   const [announcementForm] = Form.useForm();
@@ -42,6 +44,12 @@ const AnnounceSelector = ({
   useEffect(() => {
     getAnnouncementList();
   }, []);
+
+  useEffect(() => {
+    announcementForm.setFieldsValue({
+      announcement_num: value == undefined ? processStatus.announcement_num : value,
+    });
+  }, [processStatus.announcement_num, value]);
 
   return (
     <>

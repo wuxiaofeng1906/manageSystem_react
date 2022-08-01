@@ -79,6 +79,7 @@ const AnnounceSelector = ({
               style={{ width: '100%' }}
               optionFilterProp={'label'}
               onBlur={onSave}
+              onDeselect={onSave}
             />
           </Form.Item>
         </Form>

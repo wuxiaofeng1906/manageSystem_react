@@ -8,7 +8,7 @@ const gridHeight = (datas: any) => {
 
 // 灰度积压列表
 // isPreStatus： 是否为待发布状态
-const grayscaleBacklogList = (type: string, isPreStatus = false) => {
+const grayscaleBacklogList = (type: string, isPreStatus: boolean) => {
   let grayNum = {
     headerName: '灰度发布批次号',
     field: 'ready_release_num',

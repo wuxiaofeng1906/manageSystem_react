@@ -506,10 +506,6 @@ const ReleaseHistory: React.FC<any> = () => {
     }
   }, [zeroGrayscaleData]);
 
-  const isPrePublish = zeroButtonTitle == '待发布详情';
-  const changeColor = (p) => ({
-    'background-color': isPrePublish ? '#f7f7f7' : 'white',
-  });
   return (
     <PageContainer>
       {/* 0级灰度积压列表 */}
@@ -540,7 +536,7 @@ const ReleaseHistory: React.FC<any> = () => {
           style={{ marginTop: -21, height: gridHeight.zeroGrid, width: '100%' }}
         >
           <AgGridReact
-            columnDefs={grayscaleBacklogList('zero', isPrePublish)} // 定义列
+            columnDefs={grayscaleBacklogList('zero', zeroButtonTitle == '待发布详情')} // 定义列
             rowData={zeroGrayscaleData?.data} // 数据绑定
             defaultColDef={girdDefaultSetting}
             rowHeight={30}
@@ -586,7 +582,7 @@ const ReleaseHistory: React.FC<any> = () => {
           style={{ marginTop: -21, height: gridHeight.firstGrid, width: '100%' }}
         >
           <AgGridReact
-            columnDefs={grayscaleBacklogList('one', isPrePublish)} // 定义列
+            columnDefs={grayscaleBacklogList('one', firstButtonTitle == '待发布详情')} // 定义列
             rowData={firstGrayscaleData?.data} // 数据绑定
             defaultColDef={girdDefaultSetting}
             rowHeight={30}

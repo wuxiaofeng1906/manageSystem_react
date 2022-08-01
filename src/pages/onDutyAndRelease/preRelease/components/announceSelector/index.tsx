@@ -3,6 +3,7 @@ import { Form, Select } from 'antd';
 import usePermission from '@/hooks/permission';
 import AnnouncementServices from '@/services/announcement';
 import { useModel } from '@@/plugin-model/useModel';
+import '../../style/style.css';
 const AnnounceSelector = ({
   type,
   ready_release_num,
@@ -14,7 +15,7 @@ const AnnounceSelector = ({
   value?: string;
   disabled: boolean;
 }) => {
-  const { operteStatus, processStatus } = useModel('releaseProcess');
+  const { processStatus } = useModel('releaseProcess');
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
 
   const [announcementForm] = Form.useForm();
@@ -56,7 +57,12 @@ const AnnounceSelector = ({
   return (
     <>
       {announcePermission()?.check ? (
-        <Form form={announcementForm} size={'small'} style={{ width: '25%', float: 'right' }}>
+        <Form
+          form={announcementForm}
+          size={'small'}
+          style={{ width: '25%', float: 'right' }}
+          className={'no-wrap-form'}
+        >
           <Form.Item
             name={'announcement_num'}
             label={

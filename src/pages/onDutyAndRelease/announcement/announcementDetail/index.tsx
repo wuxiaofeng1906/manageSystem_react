@@ -185,9 +185,10 @@ const Announce: React.FC<any> = (props: any) => {
 
   useEffect(() => {
     announcementNameForm.setFieldsValue({
-      announcement_name: `${releaseNum}升级公告`,
+      announcement_name:
+        type == 'add' ? `${releaseNum}升级公告` : announceData?.data?.announcement_name ?? '',
     });
-  }, [releaseNum]);
+  }, [releaseNum, announceData?.data?.announcement_name]);
 
   window.onresize = function () {
     setPageHeight(getHeight());

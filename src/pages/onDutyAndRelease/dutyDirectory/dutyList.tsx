@@ -80,6 +80,7 @@ const DutyList = () => {
     const update = async (value: string) => {
       await DutyListServices.addDuty({
         ...data,
+        is_push_msg: 'no',
         person_duty_num: releaseNum,
         duty_name: value ?? newTitle,
         duty_date,
@@ -116,7 +117,7 @@ const DutyList = () => {
   };
 
   const getDutyNumber = async () => {
-    if (!hasPermission) return;
+    if (!hasPermission.part) return;
     const res = await DutyListServices.getDutyNum();
     return res.ready_release_num;
   };
@@ -134,15 +135,31 @@ const DutyList = () => {
     }
     history.push(`/onDutyAndRelease/dutyCatalog/${release_num}`);
   };
+  const onDelete = async () => {
+    const selected: any = gridRef.current?.getSelectedRows();
+    if (isEmpty(selected)) return message.warning('请先选择需删除的行！');
+    const lock = lockList.find(
+      (it) => it.param.replace('duty_', '') == selected[0].person_duty_num,
+    );
+    if (!isEmpty(lock)) return message.warning(`当前【${lock.user_name}】正在编辑，不能删除该行！`);
+    await DutyListServices.deleteDuty({
+      person_duty_num: selected[0].person_duty_num,
+      user_id: currentUser?.userid,
+    });
+    getList();
+  };
 
   // 值班名单权限： 超级管理员、开发经理/总监、前端管理人员、测试部门与业务经理
   const hasPermission = useMemo(
-    () =>
-      ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(
+    () => ({
+      part: ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(
         currentUser?.group || '',
       ),
+      super: (currentUser?.group || '') == 'superGroup',
+    }),
     [currentUser?.group],
   );
+
   const getRowStyle = (params: any) => {
     const lockNode = lockList.map((it) => it.param.replace('duty_', ''));
     return lockNode.includes(params.data.person_duty_num) ? { background: '#FFF6F6' } : null;
@@ -180,7 +197,6 @@ const DutyList = () => {
       const lock = lockList.find(
         (it) => it.param.replace('duty_', '') == rowNode.data.person_duty_num,
       );
-      console.log(!isEmpty(lock));
       const row = gridRef.current?.getRowNode(index.toString());
       row?.setData({ ...rowNode.data, bg: !isEmpty(lock) });
     });
@@ -191,14 +207,16 @@ const DutyList = () => {
       <div className={styles.dutyList}>
         <Form className={styles.dutyListForm} form={form}>
           <Row justify={'space-between'} style={{ marginBottom: 5 }} gutter={4}>
-            <Col span={5}>
+            <Col span={6}>
               <Form.Item>
                 <Button
                   type={'text'}
-                  disabled={!hasPermission}
+                  disabled={!hasPermission.part}
                   icon={
                     <FolderAddTwoTone
-                      style={hasPermission ? {} : { filter: 'grayscale(1)', cursor: 'not-allowed' }}
+                      style={
+                        hasPermission.part ? {} : { filter: 'grayscale(1)', cursor: 'not-allowed' }
+                      }
                     />
                   }
                   onClick={() => onAdd()}
@@ -207,10 +225,26 @@ const DutyList = () => {
                 </Button>
                 <Button
                   type={'text'}
-                  disabled={!hasPermission}
+                  disabled={!hasPermission.super}
                   icon={
                     <CopyTwoTone
-                      style={hasPermission ? {} : { filter: 'grayscale(1)', cursor: 'not-allowed' }}
+                      style={
+                        hasPermission.super ? {} : { filter: 'grayscale(1)', cursor: 'not-allowed' }
+                      }
+                    />
+                  }
+                  onClick={onDelete}
+                >
+                  删除
+                </Button>
+                <Button
+                  type={'text'}
+                  disabled={!hasPermission.part}
+                  icon={
+                    <CopyTwoTone
+                      style={
+                        hasPermission.part ? {} : { filter: 'grayscale(1)', cursor: 'not-allowed' }
+                      }
                     />
                   }
                   onClick={onCopy}
@@ -219,7 +253,7 @@ const DutyList = () => {
                 </Button>
               </Form.Item>
             </Col>
-            <Col span={10}>
+            <Col span={9}>
               <Form.Item name={'pro_id'} label={'项目名称'}>
                 <Select
                   showSearch

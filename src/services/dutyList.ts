@@ -43,5 +43,13 @@ const DutyListServices = {
   async pushWechat(data: any) {
     return request(`${baseUrl}/duty/file`, { data, method: 'post', msg: '推送成功' });
   },
+  // 删除值班
+  async deleteDuty(data: any) {
+    return request(`${baseUrl}/duty/list`, { data, method: 'delete', msg: '删除成功' });
+  },
+  // 根据项目获取值班人员
+  async projectDuty(pro_ids: string) {
+    return request(`${baseUrl}/duty/pro_duty`, { params: { pro_ids } });
+  },
 };
 export default DutyListServices;

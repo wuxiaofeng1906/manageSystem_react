@@ -180,8 +180,10 @@ const DutyCatalog = () => {
     }
   };
   // 获取项目负责人
-  const getProjectUser = async () => {
+  const getProjectUser = async (isDelete) => {
     if (!hasPermission) return;
+    // 项目关联的值班人员
+    const persons = await getProjectToPersons();
     const values = await form.getFieldsValue();
     let result: any[] = [];
     values.project_ids?.forEach((id: string) => {
@@ -190,7 +192,43 @@ const DutyCatalog = () => {
       );
       o && result.push(o);
     });
-    form.setFieldsValue({ project_pm: result?.map((it: any) => it.user) });
+
+    // 自己手动选择
+    const ownerFront =
+      (values?.front || [])?.filter(
+        (it: string) =>
+          !persons.front?.map((projectPm: any) => !projectPm.user_id).includes(it.split('_')[0]),
+      ) ?? [];
+    const ownerBackend =
+      (values?.backend || [])?.filter(
+        (it: string) =>
+          !persons.backend?.map((projectPm: any) => projectPm.user_id).includes(it.split('_')[0]),
+      ) ?? [];
+    const ownerTest =
+      (values?.test || [])?.filter(
+        (it: string) =>
+          !persons.test?.map((projectPm: any) => projectPm.user_id).includes(it.split('_')[0]),
+      ) ?? [];
+    // 需处理删除项目的关联人员
+    form.setFieldsValue({
+      ...(!isDelete
+        ? {
+            front: [
+              ...ownerFront,
+              ...persons?.front?.map((it: any) => `${it.user_id}_${it.user_type}`),
+            ],
+            backend: [
+              ...ownerBackend,
+              ...persons?.backend?.map((it: any) => `${it.user_id}_${it.user_type}`),
+            ],
+            test: [
+              ...ownerTest,
+              ...persons?.test?.map((it: any) => `${it.user_id}_${it.user_type}`),
+            ],
+          }
+        : {}),
+      project_pm: result?.map((it: any) => it.user),
+    });
     await onSave();
   };
   // 推送
@@ -445,6 +483,15 @@ const DutyCatalog = () => {
     });
   };
 
+  // 根据项目获取对应的负责人
+  const getProjectToPersons = async () => {
+    const data = form.getFieldsValue();
+    if (isEmpty(data.project_ids)) return;
+    // 项目关联人员
+    const res = await DutyListServices.projectDuty(data.project_ids.join());
+    return res;
+  };
+
   useEffect(() => {
     if (!id) return;
     getAllLock(id, true);
@@ -493,7 +540,7 @@ const DutyCatalog = () => {
   // 值班名单权限： 超级管理员、开发经理/总监、前端管理人员 、测试部门与业务经理
   const hasPermission = useMemo(
     () =>
-      detail?.is_push_msg == 'no' && // 未推送
+      (detail?.is_push_msg == 'no' || isEmpty(detail)) && // 未推送
       ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(
         currentUser?.group || '',
       ) && // 有权限
@@ -587,7 +634,7 @@ const DutyCatalog = () => {
                       bordered={false}
                       placeholder={'项目名称'}
                       showSearch
-                      onDeselect={getProjectUser}
+                      onDeselect={() => getProjectUser(true)}
                       onDropdownVisibleChange={(open) => !open && getProjectUser()}
                     >
                       {projects.map((it: any) => (

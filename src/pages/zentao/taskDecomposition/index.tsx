@@ -52,9 +52,8 @@ const TaskDecompose: React.FC<any> = () => {
     const gridData: any = [];
     gridApi.current?.forEachNode((node: any) => {
       // 需要判断相关需求是不是为空，为空的话表示默认数据，则不添加。
-      // 过滤到裁剪为是的
       const rowData = node.data;
-      if (rowData.subtask_dev_needs || rowData.is_tailoring != 'no') {
+      if (rowData.subtask_dev_needs) {
         gridData.push(rowData);
       }
     });
@@ -214,7 +213,7 @@ const TaskDecompose: React.FC<any> = () => {
     setCreateState(true);
     const gridData: any = getOraGridData(); // 获取表格数据
     const createResult = await createZentaoTaskDecompose(
-      gridData,
+      gridData?.filter((it: any) => it.is_tailoring != 'yes'),
       formForTaskQuery.getFieldValue('execution'),
     );
     if (createResult.code === 200) {
@@ -491,7 +490,6 @@ const TaskDecompose: React.FC<any> = () => {
                         if (v == 'yes') {
                           rowNode?.setData({
                             ...params.data,
-                            task_name: '',
                             is_tailoring: v,
                           });
                         }

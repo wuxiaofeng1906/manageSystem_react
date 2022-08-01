@@ -7,10 +7,12 @@ const AnnounceSelector = ({
   type,
   ready_release_num,
   value,
+  disabled,
 }: {
   type: 'pre' | 'history';
   ready_release_num: string;
   value?: string;
+  disabled: boolean;
 }) => {
   const { operteStatus, processStatus } = useModel('releaseProcess');
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
@@ -73,7 +75,7 @@ const AnnounceSelector = ({
           >
             <Select
               showSearch
-              disabled={operteStatus}
+              disabled={disabled}
               options={announcementList}
               placeholder={'发布公告'}
               style={{ width: '100%' }}

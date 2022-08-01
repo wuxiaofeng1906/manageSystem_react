@@ -156,7 +156,11 @@ const CheckProgress: React.FC<any> = () => {
 
   return (
     <div style={{ width: '100%' }}>
-      <AnnounceSelector type={'pre'} ready_release_num={tabsData.activeKey} />
+      <AnnounceSelector
+        type={'pre'}
+        ready_release_num={tabsData.activeKey}
+        disabled={operteStatus}
+      />
       {/* 检查进度 */}
       <div style={{ marginTop: -10 }}>
         <div>

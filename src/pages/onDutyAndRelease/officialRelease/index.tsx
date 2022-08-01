@@ -403,6 +403,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
             type={'history'}
             ready_release_num={otherSaveCondition.onlineReleaseNum}
             value={pageData?.[0]?.announcement_num ?? ''}
+            disabled={historyQuery}
           />
         </div>
         {/* step 1 发布方式及时间 */}

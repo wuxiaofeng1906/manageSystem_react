@@ -63,7 +63,7 @@ const AnnounceSelector = ({
         <Form
           form={announcementForm}
           size={'small'}
-          style={{ width: '25%', float: 'right' }}
+          style={{ width: '25%', height: 25, float: 'right' }}
           className={'no-wrap-form'}
         >
           <Form.Item

@@ -92,7 +92,14 @@ const Announce: React.FC<any> = (props: any) => {
       errorMessage('公告详情不能为空！');
       return;
     }
-    const result = await postAnnouncement({ ...formDatas, ...nameValid }, basicInfo);
+    const result = await postAnnouncement(
+      {
+        ...formDatas,
+        ...nameValid,
+        announcement_num: releaseNum,
+      },
+      basicInfo,
+    );
     const operate = releaseType === 'save' ? '保存' : '公告挂起';
     if (result.code === 200) {
       sucMessage(`${operate}成功！`);

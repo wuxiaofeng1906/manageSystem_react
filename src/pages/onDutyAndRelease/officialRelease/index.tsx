@@ -234,7 +234,8 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       hintMsgs.message2 = '如有自动化也执行通过!确认通过，会自动开放所有租户。';
       autoDisable = false;
       // 需要查询当前发布编号有没有对应的发布后公告内容
-      announceContent = await getAnnouncement(otherSaveCondition.onlineReleaseNum, 'after');
+      const res = await getOfficialReleaseDetails(otherSaveCondition.onlineReleaseNum, 'online');
+      announceContent = await getAnnouncement(res?.[0]?.announcement_num, 'after');
     } else if (params === 'failure') {
       hintMsgs.message1 = '请确认服务是否发布失败！';
     } else if (params === 'cancel') {

@@ -21,7 +21,7 @@ export const postAnnouncement = async (formData: any, basicInfo: any) => {
   const data: any = {
     user_name: users.name,
     user_id: users.userid,
-    announcement_num: basicInfo.releaseNum,
+    announcement_num: formData.announcement_num,
     upgrade_time: upgradeTime,
     upgrade_description: `${formData.announceDetails_1}${upgradeTime}${formData.announceDetails_2}`,
     is_upgrade: formData.showUpdateDetails === 'true' ? 'yes' : 'no',
@@ -42,13 +42,14 @@ export const postAnnouncementForOtherPage = async (formData: any) => {
     user_name: users.name,
     user_id: users.userid,
     announcement_id: formData.announcement_id,
-    ready_release_num: formData.ready_release_num,
+    // ready_release_num: formData.ready_release_num,
     upgrade_time: formData.upgrade_time,
     upgrade_description: formData.upgrade_description,
     is_upgrade: formData.is_upgrade,
     announcement_status: 'release',
     announcement_time: formData.announcement_time,
+    announcement_num: formData.announcement_num,
+    announcement_name: formData.announcement_name,
   };
-
   return axiosPost('/api/verify/release/announcement', data);
 };

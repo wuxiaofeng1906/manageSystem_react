@@ -4,6 +4,7 @@ import usePermission from '@/hooks/permission';
 import AnnouncementServices from '@/services/announcement';
 import { useModel } from '@@/plugin-model/useModel';
 import '../../style/style.css';
+import { alalysisInitData } from '@/pages/onDutyAndRelease/preRelease/datas/dataAnalyze';
 const AnnounceSelector = ({
   type,
   ready_release_num,
@@ -43,6 +44,8 @@ const AnnounceSelector = ({
       user_name: user?.name,
       user_id: user?.userid,
     });
+    // 刷新界面
+    await alalysisInitData('onlineBranch', ready_release_num);
   };
   useEffect(() => {
     getAnnouncementList();

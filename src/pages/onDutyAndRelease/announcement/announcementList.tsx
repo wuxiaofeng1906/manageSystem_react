@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import { Form, Select, DatePicker, Input, Row, Col, Button, Space, Spin } from 'antd';
+import { Form, Select, DatePicker, Input, Row, Col, Button, Space, Spin, Modal } from 'antd';
 import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { PageContainer } from '@ant-design/pro-layout';
-import { FolderAddTwoTone } from '@ant-design/icons';
+import { ExclamationCircleOutlined, FolderAddTwoTone } from '@ant-design/icons';
 import { announcementListColumn } from './column';
 import styles from './index.less';
 import DutyListServices from '@/services/dutyList';
@@ -92,12 +92,19 @@ const announcementList = () => {
 
   const onDelete = async (params: CellClickedEvent) => {
     if (!announcePermission?.().delete) return;
-    await AnnouncementServices.deleteAnnouncement({
-      announcement_num: params.data.announcement_num,
-      user_id: user?.userid,
-      user_name: user?.name,
+    Modal.confirm({
+      title: '删除提醒',
+      icon: <ExclamationCircleOutlined />,
+      content: '请确认是否删除该公告?',
+      onOk: async () => {
+        await AnnouncementServices.deleteAnnouncement({
+          announcement_num: params.data.announcement_num,
+          user_id: user?.userid,
+          user_name: user?.name,
+        });
+        getList();
+      },
     });
-    getList();
   };
 
   useEffect(() => {

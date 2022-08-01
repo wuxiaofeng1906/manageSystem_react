@@ -57,7 +57,7 @@ const CheckProgress: React.FC<any> = () => {
       autoDisable = false;
 
       // 需要查询当前发布编号有没有对应的发布后公告内容
-      announceContent = await getAnnouncement(tabsData.activeKey, 'after');
+      announceContent = await getAnnouncement(processStatus.announcement_num ?? '', 'after');
     } else if (params === '2') {
       hintMsgs.message1 = '请确认服务是否发布失败！';
     }

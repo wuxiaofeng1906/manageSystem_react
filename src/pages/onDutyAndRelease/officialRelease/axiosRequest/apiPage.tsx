@@ -47,11 +47,7 @@ const getOnlineEnv = async (releaseType: any) => {
       opt = data.filter((it: any) => !['cn-northwest-global', 'cn-northwest-0'].includes(it.value));
     }
     if (releaseType === 'online') {
-      opt = data.filter(
-        (it: any) =>
-          !['cn-northwest-global', 'cn-northwest-0', 'cn-northwest-1'].includes(it.value) ||
-          it.label !== '集群1-8',
-      );
+      opt = data.filter((it: any) => !['global', '集群0', '集群1', '集群1-8'].includes(it.label));
     }
   }
   return opt;

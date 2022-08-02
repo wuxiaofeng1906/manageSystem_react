@@ -234,8 +234,8 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       hintMsgs.message2 = '如有自动化也执行通过!确认通过，会自动开放所有租户。';
       autoDisable = false;
       // 需要查询当前发布编号有没有对应的发布后公告内容
-      const res = await getOfficialReleaseDetails(otherSaveCondition.onlineReleaseNum, 'online');
-      announceContent = await getAnnouncement(res?.[0]?.announcement_num, 'after');
+      const res = await getOfficialReleaseDetails(otherSaveCondition.onlineReleaseNum, releaseType);
+      announceContent = await getAnnouncement(res?.[0]?.announcement_num ?? '', 'after');
     } else if (params === 'failure') {
       hintMsgs.message1 = '请确认服务是否发布失败！';
     } else if (params === 'cancel') {
@@ -539,7 +539,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                     releaseEnvRenderer: (params: any) => {
                       if (params && params.data.rowSpan) {
                         releaseEnvForm.setFieldsValue({
-                          releaseEnv: params.value?.split() ?? [],
+                          releaseEnv: isEmpty(params.value) ? [] : params.value?.split(',') ?? [],
                         });
                         showProcessStatus(); // 展示进度
                         return (

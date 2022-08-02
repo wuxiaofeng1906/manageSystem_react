@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useModel } from 'umi';
 import DutyListServices from '@/services/dutyList';
 import html2canvas from 'html2canvas';
-import { isEmpty, isEqual, omit, pick, intersection, orderBy, uniq, cloneDeep } from 'lodash';
+import { isEmpty, isEqual, pick, intersection, orderBy, uniq, cloneDeep } from 'lodash';
 import { ExclamationCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { SelectProps } from 'antd/lib/select';
@@ -13,19 +13,8 @@ import * as dayjs from 'dayjs';
 import { useUnmount } from 'ahooks';
 import useLock from '@/hooks/lock';
 
-const opts = {
-  showSearch: true,
-  mode: 'multiple',
-  optionFilterProp: 'label',
-  filterOption: (input, option) => (option!.label as unknown as string)?.includes(input),
-};
-const recentType = {
-  前端: 'front',
-  后端: 'backend',
-  测试: 'test',
-  运维: 'operations',
-  SQA: 'sqa',
-};
+const opts = { showSearch: true, mode: 'multiple', optionFilterProp: 'label' };
+const recentType = { 前端: 'front', 后端: 'backend', 测试: 'test', 运维: 'operations', SQA: 'sqa' };
 const envType = {
   '集群1-8':
     'cn-northwest-1,cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-8',
@@ -41,7 +30,6 @@ const tbodyConfig = [
   { title: 'SQA值班', name: 'sqa' },
 ];
 const FilterSelector = ({
-  // options = [],
   name,
   placeholder = '',
   init = {},
@@ -67,6 +55,7 @@ const FilterSelector = ({
         label: it.user_name,
         type: it.user_type,
         fit: `${it.user_id}_${it.user_type == 'scene' ? 'remote' : 'scene'}`,
+        id: it.user_id,
       })),
     );
   };
@@ -89,11 +78,11 @@ const FilterSelector = ({
               disabled={disabled}
               options={(isEmpty(init) ? [] : [init]).concat(
                 options
-                  .map((it: any) => ({
+                  ?.map((it: any) => ({
                     ...it,
                     disabled: getFieldValue(name)?.includes(it.fit),
                   }))
-                  .filter((it) => it.key !== init.key),
+                  ?.filter((it) => it.id !== init.key) ?? [],
               )}
             />
           </Form.Item>
@@ -105,26 +94,27 @@ const FilterSelector = ({
 
 const DutyCatalog = () => {
   const { id } = useParams() as { id: string };
+  const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const { getAllLock, updateLockStatus, singleLock } = useLock();
-  // const [allPerson, setAllPerson] = useState<any[]>([]);
+  const [form] = Form.useForm();
+
   const [projects, setProjects] = useState<any[]>([]);
   const [envList, setEnvList] = useState<any[]>([]);
   const [methodList, setMethodList] = useState<any[]>([]);
   const [title, setTitle] = useState(`${moment().format('YYYYMMDD')}值班名单`);
   const [visible, setVisible] = useState(true);
-  const [recentDuty, setRecentDuty] = useState<Record<string, any>>();
   const [loading, setLoading] = useState(false);
   const [detail, setDetail] = useState<Record<string, any>>();
-  const [dutyPerson, setDutyPerson] = useState<Record<string, any>[]>([]);
   const [isSameDuty, setIsSameDuty] = useState(true);
-  const [initDuty, setInitDuty] = useState([]);
-  const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
-  const [stageOwner, setStageOwner] = useState<{
+  const [recentDuty, setRecentDuty] = useState<Record<string, any>>(); // (过滤值班负责人的远程与现场数据)
+  const [dutyPerson, setDutyPerson] = useState<Record<string, any>[]>([]); // 接口保存的默认负责人
+  const [initDuty, setInitDuty] = useState([]); // 当周默认值班负责人
+  const [recordOwner, setRecordOwner] = useState<{
     front: string[];
     backend: string[];
     test: string[];
-  }>({ front: [], backend: [], test: [] });
-  const [form] = Form.useForm();
+  }>({ front: [], backend: [], test: [] }); // 记录手动添加的人员
+
   // scene(现场) remote(远程) head(负责人)
 
   // 默认第一值班人
@@ -186,13 +176,14 @@ const DutyCatalog = () => {
       setLoading(false);
     }
   };
-  // 获取项目负责人
+
+  // 项目 (联动项目负责人及值班人员)
   const getProjectUser = async () => {
     if (!hasPermission) return;
-    // 项目关联的值班人员
     const values = await form.getFieldsValue();
     let persons = {} as any;
     if (!isEmpty(values.project_ids)) {
+      // 项目对应值班人员
       persons = await getProjectToPersons();
     }
     let result: any[] = [];
@@ -202,15 +193,30 @@ const DutyCatalog = () => {
       );
       o && result.push(o);
     });
-    const autoFront = persons?.front?.map((it: any) => `${it.user_id}_${it.user_type}`) ?? [];
-    const autoBackend = persons?.backend?.map((it: any) => `${it.user_id}_${it.user_type}`) ?? [];
-    const autoTest = persons?.test?.map((it: any) => `${it.user_id}_${it.user_type}`) ?? [];
+    // 手动添加的人员ids
+    const frontIds = recordOwner?.front?.map((it) => it.split('_')[0]);
+    const backendIds = recordOwner?.backend?.map((it) => it.split('_')[0]);
+    const testIds = recordOwner?.test?.map((it) => it.split('_')[0]);
 
-    // 去重： 项目 自带的值班人员 + 人为手动添加的
+    // 项目的值班人员 =>（过滤掉已经存在于手动添加的数据）
+    const autoFront =
+      persons?.front
+        ?.filter((o: any) => !frontIds.includes(o.user_id))
+        ?.map((it: any) => `${it.user_id}_${it.user_type}`) ?? [];
+    const autoBackend =
+      persons?.backend
+        ?.filter((o: any) => !backendIds.includes(o.user_id))
+        ?.map((it: any) => `${it.user_id}_${it.user_type}`) ?? [];
+    const autoTest =
+      persons?.test
+        ?.filter((o: any) => !testIds.includes(o.user_id))
+        ?.map((it: any) => `${it.user_id}_${it.user_type}`) ?? [];
+
+    // 项目 自带的值班人员 + 人为手动添加人员（删除项目：不删除手动添加的人员）
     form.setFieldsValue({
-      front: uniq([...(stageOwner?.front ?? []), ...autoFront]),
-      backend: uniq([...(stageOwner?.backend ?? []), ...autoBackend]),
-      test: uniq([...(stageOwner?.test ?? []), ...autoTest]),
+      front: uniq([...(recordOwner?.front ?? []), ...autoFront]),
+      backend: uniq([...(recordOwner?.backend ?? []), ...autoBackend]),
+      test: uniq([...(recordOwner?.test ?? []), ...autoTest]),
       project_pm: result?.map((it: any) => it.user),
     });
     await onSave();
@@ -304,19 +310,14 @@ const DutyCatalog = () => {
       release_method: values.release_method,
       release_time: moment(values.release_time).format('YYYY-MM-DD HH:mm:ss'),
     };
-    const flag = isEqual(omit(data, 'user_id'), {
-      ...detail,
-      project_pm: detail?.project_pm?.map((it: any) => it.user_id).join(),
-      release_method: detail?.release_method == 'unknown' ? undefined : detail?.release_method,
-    });
-    if (flag) return;
-    // await DutyListServices.addDuty(data);
+    await DutyListServices.addDuty(data);
     setIsSameDuty(true);
     getDetail();
     // 【未加锁】保存后：加锁
     if (singleLock?.param.replace('duty_', '') == id) return;
     updateLockStatus(id, 'post');
   };
+
   // 详情
   const getDetail = async () => {
     try {
@@ -355,6 +356,7 @@ const DutyCatalog = () => {
       setLoading(false);
     }
   };
+
   // 保存后【默认值班人】
   const formatSaveDuty = (data: Record<string, any>) => {
     const front = data.front
@@ -467,7 +469,7 @@ const DutyCatalog = () => {
     });
   };
 
-  // 根据项目获取对应的负责人
+  // 根据项目获取对应的值班人员
   const getProjectToPersons = async () => {
     const data = form.getFieldsValue();
     if (isEmpty(data.project_ids)) return;
@@ -490,6 +492,29 @@ const DutyCatalog = () => {
       updateLockStatus(id, 'delete');
     }
   };
+  // 更新手动新加的人员
+  const updateRecordOwner = (v: string, config: any) => {
+    if (['front', 'backend', 'test'].includes(config.name)) {
+      let stageArr = [];
+      let stage = cloneDeep(recordOwner);
+      stageArr.push(v);
+      stage = {
+        ...stage,
+        [config.name]: uniq([...stage[config.name], ...stageArr]),
+      };
+      setRecordOwner(stage);
+    }
+  };
+  // 删除手动添加的人员
+  const onDeSelect = (v: string, config: any) => {
+    if (['front', 'backend', 'test'].includes(config.name)) {
+      setRecordOwner({
+        ...recordOwner,
+        [config.name]: uniq(recordOwner[config.name].filter((key: string) => key !== v)),
+      });
+    }
+    onSave();
+  };
 
   // 保存后的第一值班人
   useEffect(() => {
@@ -497,28 +522,27 @@ const DutyCatalog = () => {
     const initDutyObj = initalFormDuty(dutyPerson);
     const formatProject = projects?.map((it: any) => ({
       ...it,
-      user: ['sprint', 'emergency', 'hotfix', 'stagepatch'].includes(it.sprint_type)
+      user: ['sprint', 'emergency', 'hotfix', 'stagepatch'].includes(it.sprint_type) // 该项目类型取默认值班负责人
         ? {
             user_id: initDutyObj?.backend?.key,
             user_name: initDutyObj?.backend?.label.replace('(后端值班负责人)', ''),
           }
         : it.user,
     }));
+    // 同步更新相应的默认值班负责人
     setProjects(formatProject);
     setRecentDuty(initDutyObj);
-    // 设置手动添加暂存的默认值班人员(更新时需同时删除之前的值班负责人)
-    console.log(initDutyObj?.front?.value, stageOwner?.front);
-    setStageOwner({
-      front: uniq([...initDutyObj?.front?.value?.split(), ...(stageOwner?.front ?? [])]),
-      backend: uniq([...initDutyObj?.backend?.value?.split(), ...(stageOwner?.backend ?? [])]),
-      test: uniq([...initDutyObj?.test?.value?.split(), ...(stageOwner?.test ?? [])]),
+    setRecordOwner({
+      front: initDutyObj?.front?.value?.split() ?? [],
+      backend: initDutyObj?.backend?.value?.split() ?? [],
+      test: initDutyObj?.test?.value?.split() ?? [],
     });
   }, [dutyPerson]);
 
   useEffect(() => {
     if (isEmpty(initDuty)) return;
     if (isEmpty(detail)) {
-      setDutyPerson(initDuty);
+      setDutyPerson(initDuty); // 初始化为默认值班负责人
       return;
     }
     formatSaveDuty(detail);
@@ -760,36 +784,14 @@ const DutyCatalog = () => {
                     <td>{config.title}</td>
                     <td colSpan={11}>
                       <FilterSelector
-                        // options={allPerson}
                         tech={config.tech}
                         name={config.name}
+                        disabled={!hasPermission}
                         placeholder={`${config.title}人员`}
                         init={recentDuty?.[config.name]}
-                        onDeselect={(v: string) => {
-                          if (['front', 'backend', 'test'].includes(config.name)) {
-                            setStageOwner({
-                              ...stageOwner,
-                              [config.name]: stageOwner[config.name].filter(
-                                (key: string) => key !== v,
-                              ),
-                            });
-                          }
-                          onSave();
-                        }}
                         onBlur={() => onSave()}
-                        disabled={!hasPermission}
-                        onSelect={(v: string) => {
-                          if (['front', 'backend', 'test'].includes(config.name)) {
-                            let stageArr = [];
-                            let stage = cloneDeep(stageOwner);
-                            stageArr.push(v);
-                            stage = {
-                              ...stage,
-                              [config.name]: [...stage[config.name], ...stageArr],
-                            };
-                            setStageOwner(stage);
-                          }
-                        }}
+                        onDeselect={(v: string) => onDeSelect(v, config)}
+                        onSelect={(v: string) => updateRecordOwner(v, config)}
                       />
                     </td>
                   </tr>

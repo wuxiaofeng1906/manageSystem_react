@@ -217,7 +217,8 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   // 发布结果下拉框选择
   const pulishResulttChanged = async (params: any) => {
     const releaseEnv = releaseEnvForm.getFieldValue('releaseEnv');
-    if (isEmpty(releaseEnv)) return infoMessage('step2中集群未填写，不能修改发布结果!');
+    if (isEmpty(releaseEnv) && ['failure', 'success'].includes(params))
+      return infoMessage('step2中集群未填写，不能修改发布结果!');
     // 需要判断发布服务有没有填写完成(取消发布可以不填写全)
     if (processStatus.processColor === 'gray' && params !== 'cancel') {
       errorMessage('发布服务未填写完成，不能填写发布结果!');

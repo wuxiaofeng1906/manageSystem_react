@@ -95,6 +95,7 @@ const announcementList = () => {
   const onDelete = async (params: CellClickedEvent) => {
     if (!announcePermission?.().delete) return;
     // 判断是否关联了发布过程公告
+    if (isEmpty(params.data.announcement_num)) return infoMessage('数据异常');
     const res = await AnnouncementServices.checkDeleteAnnouncement(params.data.announcement_num);
     let content = '请确认是否删除该公告?';
     if (res.data == false) {

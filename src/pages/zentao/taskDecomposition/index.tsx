@@ -494,7 +494,7 @@ const TaskDecompose: React.FC<any> = () => {
                           rowNode?.setData({
                             ...params.data,
                             is_tailoring: v,
-                            task_name: params.data.task_name,
+                            task_name: `${params.data.task_name.split('】')[0]}】无`,
                           });
                         }
                       }}

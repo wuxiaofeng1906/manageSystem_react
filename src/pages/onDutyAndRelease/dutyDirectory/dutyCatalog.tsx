@@ -216,14 +216,15 @@ const DutyCatalog = () => {
     const autoBackend = persons?.backend?.map((it: any) => `${it.user_id}_${it.user_type}`) ?? [];
     const autoTest = persons?.test?.map((it: any) => `${it.user_id}_${it.user_type}`) ?? [];
 
+    // 去重： 项目 自带的值班人员 + 人为手动添加的
     form.setFieldsValue({
-      front: uniq([...stageOwner.front, ...autoFront]),
-      backend: uniq([...stageOwner.backend, ...autoBackend]),
-      test: uniq([...stageOwner.test, ...autoTest]),
+      front: uniq([...(stageOwner?.front ?? []), ...autoFront]),
+      backend: uniq([...(stageOwner?.backend ?? []), ...autoBackend]),
+      test: uniq([...(stageOwner?.test ?? []), ...autoTest]),
       project_pm: result?.map((it: any) => it.user),
     });
     console.log(values?.front, autoFront);
-    await onSave();
+    // await onSave();
   };
   // 推送
   const onScreenShot = async () => {
@@ -516,11 +517,11 @@ const DutyCatalog = () => {
     }));
     setProjects(formatProject);
     setRecentDuty(initDutyObj);
-    // 设置手动添加暂存的默认值班人员
+    // 设置手动添加暂存的默认值班人员(更新时需同时删除之前的值班负责人)
     setStageOwner({
-      front: initDutyObj?.front?.value.split(),
-      backend: initDutyObj?.backend?.value.split(),
-      test: initDutyObj?.test?.value.split(),
+      front: [...initDutyObj?.front?.value?.split(), ...(stageOwner?.front ?? [])],
+      backend: [...initDutyObj?.backend?.value?.split(), ...(stageOwner?.backend ?? [])],
+      test: [...initDutyObj?.test?.value?.split(), ...(stageOwner?.test ?? [])],
     });
   }, [dutyPerson]);
 

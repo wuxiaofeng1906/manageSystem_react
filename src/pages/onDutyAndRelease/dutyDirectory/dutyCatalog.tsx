@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useModel } from 'umi';
 import DutyListServices from '@/services/dutyList';
 import html2canvas from 'html2canvas';
-import { isEmpty, isEqual, omit, pick, intersection, orderBy } from 'lodash';
+import { isEmpty, isEqual, omit, pick, intersection, orderBy, xorBy, uniq } from 'lodash';
 import { ExclamationCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { SelectProps } from 'antd/lib/select';
@@ -61,7 +61,7 @@ const FilterSelector = ({
     const res = await DutyListServices.getDevperson(tech ? { tech } : {});
     setOptions(
       res?.map((it: any) => ({
-        key: it.user_id,
+        key: it.user_name,
         value: `${it.user_id}_${it.user_type}`,
         label: it.user_name,
         type: it.user_type,
@@ -180,11 +180,11 @@ const DutyCatalog = () => {
     }
   };
   // 获取项目负责人
-  const getProjectUser = async (isDelete) => {
+  const getProjectUser = async (deletekey = '', isDelete = false) => {
     if (!hasPermission) return;
     // 项目关联的值班人员
-    const persons = await getProjectToPersons();
     const values = await form.getFieldsValue();
+    const persons = await getProjectToPersons(isEmpty(values.project_ids) ? deletekey : '');
     let result: any[] = [];
     values.project_ids?.forEach((id: string) => {
       const o = projects.find(
@@ -192,44 +192,47 @@ const DutyCatalog = () => {
       );
       o && result.push(o);
     });
-
+    const autoFront = persons?.front?.map((it: any) => `${it.user_id}_${it.user_type}`) ?? [];
+    const autoBackend = persons?.backend?.map((it: any) => `${it.user_id}_${it.user_type}`) ?? [];
+    const autoTest = persons?.test?.map((it: any) => `${it.user_id}_${it.user_type}`) ?? [];
     // 自己手动选择
     const ownerFront =
       (values?.front || [])?.filter(
         (it: string) =>
-          !persons.front?.map((projectPm: any) => !projectPm.user_id).includes(it.split('_')[0]),
+          !persons?.front?.map((projectPm: any) => !projectPm.user_id).includes(it.split('_')[0]),
       ) ?? [];
     const ownerBackend =
       (values?.backend || [])?.filter(
         (it: string) =>
-          !persons.backend?.map((projectPm: any) => projectPm.user_id).includes(it.split('_')[0]),
+          !persons?.backend?.map((projectPm: any) => projectPm.user_id).includes(it.split('_')[0]),
       ) ?? [];
     const ownerTest =
       (values?.test || [])?.filter(
         (it: string) =>
-          !persons.test?.map((projectPm: any) => projectPm.user_id).includes(it.split('_')[0]),
+          !persons?.test?.map((projectPm: any) => projectPm.user_id).includes(it.split('_')[0]),
       ) ?? [];
     // 需处理删除项目的关联人员
+    // 添加项目： 手动添加人员+项目关联人员（存在默认值班负责人）
+    // 删除项目：删除项目关联人员
     form.setFieldsValue({
-      ...(!isDelete
+      ...(isDelete
         ? {
-            front: [
-              ...ownerFront,
-              ...persons?.front?.map((it: any) => `${it.user_id}_${it.user_type}`),
-            ],
-            backend: [
-              ...ownerBackend,
-              ...persons?.backend?.map((it: any) => `${it.user_id}_${it.user_type}`),
-            ],
-            test: [
-              ...ownerTest,
-              ...persons?.test?.map((it: any) => `${it.user_id}_${it.user_type}`),
-            ],
+            // front: uniq(xorBy(values?.front ?? [], autoFront)),
+            // backend: uniq(xorBy(values?.backend ?? [], autoBackend)),
+            // test: uniq(xorBy(values?.test ?? [], autoTest)),
+            front: uniq(autoFront ?? []),
+            backend: uniq(autoBackend),
+            test: uniq(autoTest),
           }
-        : {}),
+        : {
+            front: uniq([...ownerFront, ...autoFront]),
+            backend: uniq([...ownerBackend, ...autoBackend]),
+            test: uniq([...ownerTest, ...autoTest]),
+          }),
       project_pm: result?.map((it: any) => it.user),
     });
-    await onSave();
+    console.log(values?.front, autoFront);
+    // await onSave();
   };
   // 推送
   const onScreenShot = async () => {
@@ -484,11 +487,11 @@ const DutyCatalog = () => {
   };
 
   // 根据项目获取对应的负责人
-  const getProjectToPersons = async () => {
+  const getProjectToPersons = async (deletekey: string = '') => {
     const data = form.getFieldsValue();
-    if (isEmpty(data.project_ids)) return;
+    if (isEmpty(data.project_ids) && !deletekey) return;
     // 项目关联人员
-    const res = await DutyListServices.projectDuty(data.project_ids.join());
+    const res = await DutyListServices.projectDuty(deletekey ? deletekey : data.project_ids.join());
     return res;
   };
 
@@ -634,7 +637,7 @@ const DutyCatalog = () => {
                       bordered={false}
                       placeholder={'项目名称'}
                       showSearch
-                      onDeselect={() => getProjectUser(true)}
+                      onDeselect={(v: any) => getProjectUser(v, true)}
                       onDropdownVisibleChange={(open) => !open && getProjectUser()}
                     >
                       {projects.map((it: any) => (

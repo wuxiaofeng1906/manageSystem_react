@@ -174,8 +174,14 @@ export default [
       {
         name: '发布公告',
         icon: 'table',
-        path: 'releaseAnnouncement',
-        component: './onDutyAndRelease/releaseAnnouncement',
+        path: 'announcementList',
+        component: './onDutyAndRelease/announcement/announcementList',
+      },
+      {
+        name: '发布公告详情',
+        icon: 'table',
+        path: 'announcementDetail/:id/:type/:status',
+        component: './onDutyAndRelease/announcement/announcementDetail',
         hideInMenu: true,
       },
     ],

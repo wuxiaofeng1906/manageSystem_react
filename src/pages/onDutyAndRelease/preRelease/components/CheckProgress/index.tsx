@@ -1,33 +1,32 @@
 import React, { useMemo, useState } from 'react';
-import { Progress, Row, Select, Modal, Button, Form, Checkbox } from 'antd';
+import { Progress, Row, Select, Modal, Button, Form, Checkbox, message } from 'antd';
 import { useModel } from '@@/plugin-model/useModel';
 import { saveProcessResult, executeAutoCheck } from './axiosRequest';
-import { errorMessage, sucMessage } from '@/publicMethods/showMessages';
+import { errorMessage, infoMessage, sucMessage } from '@/publicMethods/showMessages';
 import { getAutoResult } from './processAnalysis';
 import {
   getAnnouncement,
   postAnnouncementForOtherPage,
-} from '@/pages/onDutyAndRelease/releaseAnnouncement/axiosRequest/apiPage';
-import usePermission from '@/hooks/permission';
+} from '@/pages/onDutyAndRelease/announcement/announcementDetail/axiosRequest/apiPage';
+import AnnounceSelector from '@/pages/onDutyAndRelease/preRelease/components/announceSelector';
+import { checkOnlineEnvSource } from '@/pages/onDutyAndRelease/preRelease/datas/dataAnalyze';
 
 const { Option } = Select;
 
 const CheckProgress: React.FC<any> = () => {
   // 获取当前页面的进度数据
-  const { tabsData, processStatus, modifyProcessStatus, operteStatus } = useModel('releaseProcess');
+  const { tabsData, processStatus, modifyProcessStatus, operteStatus, releaseItem, upgradeApi } =
+    useModel('releaseProcess');
+  const [pulishResultForm] = Form.useForm();
   const [disabled, setDisabled] = useState(false);
-  const { announcePermission } = usePermission();
   const [isModalVisible, setModalVisible] = useState({
     show: false,
     result: '',
     hintMsg: { message1: '', message2: '' },
     autoCheckDisabled: true,
   });
-
   // 保存发布公告的内容
   const [announceInfo, setAnnounceInfo] = useState(null);
-
-  const [pulishResultForm] = Form.useForm();
 
   // 发布结果修改
   const pulishResulttChanged = async (params: any) => {
@@ -40,6 +39,10 @@ const CheckProgress: React.FC<any> = () => {
       errorMessage('检查未全部完成，不能保存发布结果！');
       return;
     }
+    if (checkOnlineEnvFlag && ['1', '2'].includes(params)) {
+      infoMessage('发布集群未填写，不能保存发布结果！');
+      return;
+    }
 
     let autoDisable = true;
     let announceContent: any = {};
@@ -47,13 +50,14 @@ const CheckProgress: React.FC<any> = () => {
       message1: '请确认是否修改服务发布结果为空！',
       message2: '',
     };
+
     if (params === '1') {
       hintMsgs.message1 = '请确认服务是否发布成功?';
       hintMsgs.message2 = '如有自动化也执行通过!确认通过，会自动开放所有租户。';
       autoDisable = false;
 
       // 需要查询当前发布编号有没有对应的发布后公告内容
-      announceContent = await getAnnouncement(tabsData.activeKey, 'after');
+      announceContent = await getAnnouncement(processStatus.announcement_num ?? '', 'after');
     } else if (params === '2') {
       hintMsgs.message1 = '请确认服务是否发布失败！';
     }
@@ -143,28 +147,20 @@ const CheckProgress: React.FC<any> = () => {
       show: false,
     });
   };
+  // 发布结果判断
+  const checkOnlineEnvFlag = useMemo(() => {
+    // 存在有一项数据不完整 为true
+    const flag = checkOnlineEnvSource(releaseItem, upgradeApi);
+    return flag;
+  }, [JSON.stringify(releaseItem.gridData), JSON.stringify(upgradeApi.gridData)]);
 
-  // 跳转到发布公告界面
-  let href;
-  const { panes } = tabsData;
-  if (panes && panes.length > 0) {
-    panes.forEach((ele: any) => {
-      if (ele.key === tabsData.activeKey) {
-        href = `http://${window.location.host}/onDutyAndRelease/releaseAnnouncement?releaseNum=${tabsData.activeKey}&releaseName=${ele.title}&operteStatus=${operteStatus}`;
-      }
-    });
-  }
   return (
-    <div>
-      {announcePermission()?.check ? (
-        <a href={href} target={'_blank'} style={{ float: 'right' }}>
-          <img src="../annouce.png" width="20" height="20" alt="发布公告" title="发布公告" /> &nbsp;
-          发布公告
-        </a>
-      ) : (
-        <div />
-      )}
-
+    <div style={{ width: '100%' }}>
+      <AnnounceSelector
+        type={'pre'}
+        ready_release_num={tabsData.activeKey}
+        disabled={operteStatus}
+      />
       {/* 检查进度 */}
       <div style={{ marginTop: -10 }}>
         <div>
@@ -172,7 +168,7 @@ const CheckProgress: React.FC<any> = () => {
             <label style={{ marginLeft: 5, fontWeight: 'bold' }}>检查进度：</label>
             <Progress
               strokeColor={'#2BF541'}
-              style={{ width: 800 }}
+              style={{ width: '70%' }}
               percent={processStatus.processPercent}
             />
           </Row>

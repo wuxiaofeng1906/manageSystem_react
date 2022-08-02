@@ -5,7 +5,17 @@ import { useEffect, useState } from 'react';
 import { useParams, useModel } from 'umi';
 import DutyListServices from '@/services/dutyList';
 import html2canvas from 'html2canvas';
-import { isEmpty, isEqual, omit, pick, intersection, orderBy, xorBy, uniq } from 'lodash';
+import {
+  isEmpty,
+  isEqual,
+  omit,
+  pick,
+  intersection,
+  orderBy,
+  xorBy,
+  uniq,
+  cloneDeep,
+} from 'lodash';
 import { ExclamationCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { SelectProps } from 'antd/lib/select';
@@ -46,6 +56,7 @@ const FilterSelector = ({
   placeholder = '',
   init = {},
   onDeselect,
+  onSelect,
   onBlur,
   disabled,
   tech,
@@ -83,6 +94,7 @@ const FilterSelector = ({
               bordered={false}
               placeholder={placeholder}
               onDeselect={onDeselect}
+              onSelect={onSelect}
               onBlur={onBlur}
               disabled={disabled}
               options={(isEmpty(init) ? [] : [init]).concat(
@@ -117,6 +129,11 @@ const DutyCatalog = () => {
   const [isSameDuty, setIsSameDuty] = useState(true);
   const [initDuty, setInitDuty] = useState([]);
   const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
+  const [stageOwner, setStageOwner] = useState<{
+    front: string[];
+    backend: string[];
+    test: string[];
+  }>({ front: [], backend: [], test: [] });
   const [form] = Form.useForm();
   // scene(现场) remote(远程) head(负责人)
 
@@ -180,11 +197,14 @@ const DutyCatalog = () => {
     }
   };
   // 获取项目负责人
-  const getProjectUser = async (deletekey = '', isDelete = false) => {
+  const getProjectUser = async () => {
     if (!hasPermission) return;
     // 项目关联的值班人员
     const values = await form.getFieldsValue();
-    const persons = await getProjectToPersons(isEmpty(values.project_ids) ? deletekey : '');
+    let persons = {} as any;
+    if (!isEmpty(values.project_ids)) {
+      persons = await getProjectToPersons();
+    }
     let result: any[] = [];
     values.project_ids?.forEach((id: string) => {
       const o = projects.find(
@@ -195,44 +215,15 @@ const DutyCatalog = () => {
     const autoFront = persons?.front?.map((it: any) => `${it.user_id}_${it.user_type}`) ?? [];
     const autoBackend = persons?.backend?.map((it: any) => `${it.user_id}_${it.user_type}`) ?? [];
     const autoTest = persons?.test?.map((it: any) => `${it.user_id}_${it.user_type}`) ?? [];
-    // 自己手动选择
-    const ownerFront =
-      (values?.front || [])?.filter(
-        (it: string) =>
-          !persons?.front?.map((projectPm: any) => !projectPm.user_id).includes(it.split('_')[0]),
-      ) ?? [];
-    const ownerBackend =
-      (values?.backend || [])?.filter(
-        (it: string) =>
-          !persons?.backend?.map((projectPm: any) => projectPm.user_id).includes(it.split('_')[0]),
-      ) ?? [];
-    const ownerTest =
-      (values?.test || [])?.filter(
-        (it: string) =>
-          !persons?.test?.map((projectPm: any) => projectPm.user_id).includes(it.split('_')[0]),
-      ) ?? [];
-    // 需处理删除项目的关联人员
-    // 添加项目： 手动添加人员+项目关联人员（存在默认值班负责人）
-    // 删除项目：删除项目关联人员
+
     form.setFieldsValue({
-      ...(isDelete
-        ? {
-            // front: uniq(xorBy(values?.front ?? [], autoFront)),
-            // backend: uniq(xorBy(values?.backend ?? [], autoBackend)),
-            // test: uniq(xorBy(values?.test ?? [], autoTest)),
-            front: uniq(autoFront ?? []),
-            backend: uniq(autoBackend),
-            test: uniq(autoTest),
-          }
-        : {
-            front: uniq([...ownerFront, ...autoFront]),
-            backend: uniq([...ownerBackend, ...autoBackend]),
-            test: uniq([...ownerTest, ...autoTest]),
-          }),
+      front: uniq([...stageOwner.front, ...autoFront]),
+      backend: uniq([...stageOwner.backend, ...autoBackend]),
+      test: uniq([...stageOwner.test, ...autoTest]),
       project_pm: result?.map((it: any) => it.user),
     });
     console.log(values?.front, autoFront);
-    // await onSave();
+    await onSave();
   };
   // 推送
   const onScreenShot = async () => {
@@ -487,11 +478,11 @@ const DutyCatalog = () => {
   };
 
   // 根据项目获取对应的负责人
-  const getProjectToPersons = async (deletekey: string = '') => {
+  const getProjectToPersons = async () => {
     const data = form.getFieldsValue();
-    if (isEmpty(data.project_ids) && !deletekey) return;
+    if (isEmpty(data.project_ids)) return;
     // 项目关联人员
-    const res = await DutyListServices.projectDuty(deletekey ? deletekey : data.project_ids.join());
+    const res = await DutyListServices.projectDuty(data.project_ids.join() ?? '');
     return res;
   };
 
@@ -525,6 +516,12 @@ const DutyCatalog = () => {
     }));
     setProjects(formatProject);
     setRecentDuty(initDutyObj);
+    // 设置手动添加暂存的默认值班人员
+    setStageOwner({
+      front: initDutyObj?.front?.value.split(),
+      backend: initDutyObj?.backend?.value.split(),
+      test: initDutyObj?.test?.value.split(),
+    });
   }, [dutyPerson]);
 
   useEffect(() => {
@@ -558,7 +555,7 @@ const DutyCatalog = () => {
       getAllLock(id, true).then((res) => {
         if (isEmpty(res)) updateLockStatus(id, 'post');
       });
-    }, 5000);
+    }, 3000);
     return () => {
       clearInterval(timer);
     };
@@ -637,7 +634,7 @@ const DutyCatalog = () => {
                       bordered={false}
                       placeholder={'项目名称'}
                       showSearch
-                      onDeselect={(v: any) => getProjectUser(v, true)}
+                      onDeselect={(v: any) => getProjectUser()}
                       onDropdownVisibleChange={(open) => !open && getProjectUser()}
                     >
                       {projects.map((it: any) => (
@@ -777,9 +774,31 @@ const DutyCatalog = () => {
                         name={config.name}
                         placeholder={`${config.title}人员`}
                         init={recentDuty?.[config.name]}
-                        onDeselect={() => onSave()}
+                        onDeselect={(v: string) => {
+                          if (['front', 'backend', 'test'].includes(config.name)) {
+                            setStageOwner({
+                              ...stageOwner,
+                              [config.name]: stageOwner[config.name].filter(
+                                (key: string) => key !== v,
+                              ),
+                            });
+                          }
+                          onSave();
+                        }}
                         onBlur={() => onSave()}
                         disabled={!hasPermission}
+                        onSelect={(v: string) => {
+                          if (['front', 'backend', 'test'].includes(config.name)) {
+                            let stageArr = [];
+                            let stage = cloneDeep(stageOwner);
+                            stageArr.push(v);
+                            stage = {
+                              ...stage,
+                              [config.name]: [...stage[config.name], ...stageArr],
+                            };
+                            setStageOwner(stage);
+                          }
+                        }}
                       />
                     </td>
                   </tr>

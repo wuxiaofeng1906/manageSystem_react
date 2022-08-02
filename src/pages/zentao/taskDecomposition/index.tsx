@@ -57,7 +57,6 @@ const TaskDecompose: React.FC<any> = () => {
         gridData.push(rowData);
       }
     });
-
     return gridData;
   };
   /* endregion 表格事件 */
@@ -212,8 +211,12 @@ const TaskDecompose: React.FC<any> = () => {
     }
     setCreateState(true);
     const gridData: any = getOraGridData(); // 获取表格数据
+    console.log(
+      gridData,
+      gridData?.filter((it: any) => it.is_tailoring !== 'yes'),
+    );
     const createResult = await createZentaoTaskDecompose(
-      gridData?.filter((it: any) => it.is_tailoring != 'yes'),
+      gridData?.filter((it: any) => it.is_tailoring !== 'yes'),
       formForTaskQuery.getFieldValue('execution'),
     );
     if (createResult.code === 200) {
@@ -491,6 +494,7 @@ const TaskDecompose: React.FC<any> = () => {
                           rowNode?.setData({
                             ...params.data,
                             is_tailoring: v,
+                            task_name: params.data.task_name,
                           });
                         }
                       }}

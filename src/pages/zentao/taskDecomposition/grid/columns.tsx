@@ -110,14 +110,6 @@ const gridColumns: any = [
     },
   },
   {
-    headerName: '所属端',
-    field: 'belongs_name',
-  },
-  {
-    headerName: '任务来源',
-    field: 'tasksource_name',
-  },
-  {
     headerName: '是否裁剪',
     field: 'is_tailoring',
     cellRenderer: 'tailoring',
@@ -137,6 +129,14 @@ const gridColumns: any = [
     //   return '否';
     // },
   },
+  {
+    headerName: '所属端',
+    field: 'belongs_name',
+  },
+  {
+    headerName: '任务来源',
+    field: 'tasksource_name',
+  },
 ];
 
 // 设置cell颜色，可编辑为白色，不可编辑为灰色。
@@ -145,7 +145,15 @@ const setCellStyle = (params: any) => {
     return { 'background-color': 'white' };
   }
   const style = { 'line-height': '25px' };
-  const whiteCell = ['task_name', 'assigned_person', 'plan_start', 'plan_end', 'estimate', 'desc'];
+  const whiteCell = [
+    'task_name',
+    'assigned_person',
+    'plan_start',
+    'plan_end',
+    'estimate',
+    'desc',
+    'is_tailoring',
+  ];
   if (whiteCell.indexOf(params.column?.colId) < 0) {
     style['background-color'] = '#F8F8F8';
   } else {

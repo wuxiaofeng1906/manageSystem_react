@@ -5,17 +5,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useModel } from 'umi';
 import DutyListServices from '@/services/dutyList';
 import html2canvas from 'html2canvas';
-import {
-  isEmpty,
-  isEqual,
-  omit,
-  pick,
-  intersection,
-  orderBy,
-  xorBy,
-  uniq,
-  cloneDeep,
-} from 'lodash';
+import { isEmpty, isEqual, omit, pick, intersection, orderBy, uniq, cloneDeep } from 'lodash';
 import { ExclamationCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { SelectProps } from 'antd/lib/select';
@@ -223,8 +213,7 @@ const DutyCatalog = () => {
       test: uniq([...(stageOwner?.test ?? []), ...autoTest]),
       project_pm: result?.map((it: any) => it.user),
     });
-    console.log(values?.front, autoFront);
-    // await onSave();
+    await onSave();
   };
   // 推送
   const onScreenShot = async () => {
@@ -321,7 +310,7 @@ const DutyCatalog = () => {
       release_method: detail?.release_method == 'unknown' ? undefined : detail?.release_method,
     });
     if (flag) return;
-    await DutyListServices.addDuty(data);
+    // await DutyListServices.addDuty(data);
     setIsSameDuty(true);
     getDetail();
     // 【未加锁】保存后：加锁
@@ -343,11 +332,11 @@ const DutyCatalog = () => {
       }
       setDetail(res);
       form.setFieldsValue({
-        front: res?.front?.map((it: any) => `${it.user_id}_${it.user_type}`),
-        backend: res?.backend?.map((it: any) => `${it.user_id}_${it.user_type}`),
-        test: res?.test?.map((it: any) => `${it.user_id}_${it.user_type}`),
-        sqa: res?.sqa?.map((it: any) => `${it.user_id}_${it.user_type}`),
-        operations: res?.operations?.map((it: any) => `${it.user_id}_${it.user_type}`),
+        front: uniq(res?.front?.map((it: any) => `${it.user_id}_${it.user_type}`)),
+        backend: uniq(res?.backend?.map((it: any) => `${it.user_id}_${it.user_type}`)),
+        test: uniq(res?.test?.map((it: any) => `${it.user_id}_${it.user_type}`)),
+        sqa: uniq(res?.sqa?.map((it: any) => `${it.user_id}_${it.user_type}`)),
+        operations: uniq(res?.operations?.map((it: any) => `${it.user_id}_${it.user_type}`)),
         project_ids: res?.project_ids ? res?.project_ids?.split(',') : undefined,
         project_pm: res?.project_pm,
         release_time: moment(res?.release_time),
@@ -518,10 +507,11 @@ const DutyCatalog = () => {
     setProjects(formatProject);
     setRecentDuty(initDutyObj);
     // 设置手动添加暂存的默认值班人员(更新时需同时删除之前的值班负责人)
+    console.log(initDutyObj?.front?.value, stageOwner?.front);
     setStageOwner({
-      front: [...initDutyObj?.front?.value?.split(), ...(stageOwner?.front ?? [])],
-      backend: [...initDutyObj?.backend?.value?.split(), ...(stageOwner?.backend ?? [])],
-      test: [...initDutyObj?.test?.value?.split(), ...(stageOwner?.test ?? [])],
+      front: uniq([...initDutyObj?.front?.value?.split(), ...(stageOwner?.front ?? [])]),
+      backend: uniq([...initDutyObj?.backend?.value?.split(), ...(stageOwner?.backend ?? [])]),
+      test: uniq([...initDutyObj?.test?.value?.split(), ...(stageOwner?.test ?? [])]),
     });
   }, [dutyPerson]);
 

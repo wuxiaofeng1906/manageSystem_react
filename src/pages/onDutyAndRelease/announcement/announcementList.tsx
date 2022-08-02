@@ -14,6 +14,7 @@ import { getHeight } from '@/publicMethods/pageSet';
 import { useModel, history } from 'umi';
 import moment from 'moment';
 import usePermission from '@/hooks/permission';
+import { infoMessage } from '@/publicMethods/showMessages';
 
 const disabledStyle = { filter: 'grayscale(1)', cursor: 'not-allowed' };
 const announcementList = () => {
@@ -84,6 +85,7 @@ const announcementList = () => {
       releaseNum = res.ready_release_num;
       type = 'add';
     } else releaseNum = params?.data.announcement_num;
+    if (isEmpty(releaseNum)) return infoMessage('数据异常');
     history.push(`/onDutyAndRelease/announcementDetail/${releaseNum}/${type}/false`);
     // window.open(
     //   `${location.origin}/onDutyAndRelease/announcementDetail/${releaseNum}/${type}/false`,

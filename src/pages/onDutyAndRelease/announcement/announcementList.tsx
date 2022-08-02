@@ -92,10 +92,16 @@ const announcementList = () => {
 
   const onDelete = async (params: CellClickedEvent) => {
     if (!announcePermission?.().delete) return;
+    // 判断是否关联了发布过程公告
+    const res = await AnnouncementServices.checkDeleteAnnouncement(params.data.announcement_num);
+    let content = '请确认是否删除该公告?';
+    if (res.data == false) {
+      content = '该公告已关联发布，请确认是否仍要删除？';
+    }
     Modal.confirm({
       title: '删除提醒',
       icon: <ExclamationCircleOutlined />,
-      content: '请确认是否删除该公告?',
+      content: content,
       onOk: async () => {
         await AnnouncementServices.deleteAnnouncement({
           announcement_num: params.data.announcement_num,

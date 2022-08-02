@@ -31,5 +31,11 @@ const AnnouncementServices = {
       msg: '删除成功！',
     });
   },
+  // 删除验证是否存在关联公告
+  async checkDeleteAnnouncement(announcement_num: string) {
+    return request(`${baseUrl}/release/release_announcement_num`, {
+      params: { announcement_num },
+    });
+  },
 };
 export default AnnouncementServices;

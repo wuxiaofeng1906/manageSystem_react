@@ -104,6 +104,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
   // 取消发布
   const handleCancel = () => {
+    otherSaveCondition.releaseResult = 'unknown';
     setModalVisible({
       ...isModalVisible,
       result: 'unknown',
@@ -124,8 +125,9 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       const readyReleaseNum = node.data?.ready_release_num;
       grayReleaseNums.push(readyReleaseNum);
     });
+    const res = await getOfficialReleaseDetails(otherSaveCondition.onlineReleaseNum, releaseType);
     const result = await editReleaseForm(
-      { ...releaseInfo, ...releaseName, announcement_num: '' },
+      { ...releaseInfo, ...releaseName, announcement_num: res?.[0]?.announcement_num ?? '' },
       { ...condition, releaseEnv, grayReleaseNums },
     );
     if (result.code === 200) {

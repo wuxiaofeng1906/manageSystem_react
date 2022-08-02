@@ -44,7 +44,7 @@ const getOnlineEnv = async (releaseType: any) => {
         : 'other',
     }));
     if (releaseType === 'gray') {
-      opt = data.filter((it: any) => !['cn-northwest-global', 'cn-northwest-0'].includes(it.value));
+      opt = data.filter((it: any) => !['global', '集群0'].includes(it.label));
     }
     if (releaseType === 'online') {
       opt = data.filter((it: any) => !['global', '集群0', '集群1', '集群1-8'].includes(it.label));

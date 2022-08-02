@@ -16,7 +16,7 @@ const AnnounceSelector = ({
   value?: string;
   disabled: boolean;
 }) => {
-  const { processStatus } = useModel('releaseProcess');
+  const { processStatus, modifyProcessStatus } = useModel('releaseProcess');
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
 
   const [announcementForm] = Form.useForm();
@@ -44,8 +44,7 @@ const AnnounceSelector = ({
       user_name: user?.name,
       user_id: user?.userid,
     });
-    // 刷新界面
-    await alalysisInitData('onlineBranch', ready_release_num);
+    modifyProcessStatus({ ...processStatus, announcement_num });
   };
   useEffect(() => {
     getAnnouncementList();

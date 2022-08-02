@@ -1,6 +1,5 @@
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
-// import { isEmpty } from 'lodash';
-const renderBg = (p) => ({ background: p.data.bg ? '#FFF6F6' : 'white' });
+const renderBg = (p) => ({ background: p.data.bg ? '#FFF6F6' : 'white', lineHeight: '30px' });
 const dutyColumn: (ColDef | ColGroupDef)[] = [
   {
     checkboxSelection: true,

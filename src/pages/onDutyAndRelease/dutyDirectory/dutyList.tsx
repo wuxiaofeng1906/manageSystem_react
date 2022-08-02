@@ -11,15 +11,17 @@ import DutyListServices from '@/services/dutyList';
 import moment from 'moment';
 import { intersection, isEmpty, replace } from 'lodash';
 import useLock from '@/hooks/lock';
+import { getHeight } from '@/publicMethods/pageSet';
 
 const DutyList = () => {
+  const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
   const [list, setList] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const { updateLockStatus, getAllLock, lockList } = useLock();
   const [form] = Form.useForm();
   const [modifyDutyForm] = Form.useForm();
   const gridRef = useRef<GridApi>();
-  const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
+  const [gridHeight, setGridHeight] = useState(getHeight() - 20);
 
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
@@ -142,6 +144,7 @@ const DutyList = () => {
       (it) => it.param.replace('duty_', '') == selected[0].person_duty_num,
     );
     if (!isEmpty(lock)) return message.warning(`当前【${lock.user_name}】正在编辑，不能删除该行！`);
+    if (selected[0].is_push_msg == 'yes') return message.warning('当前数据已发送，不能删除！');
     await DutyListServices.deleteDuty({
       person_duty_num: selected[0].person_duty_num,
       user_id: currentUser?.userid,
@@ -201,6 +204,11 @@ const DutyList = () => {
       row?.setData({ ...rowNode.data, bg: !isEmpty(lock) });
     });
   }, [JSON.stringify(lockList)]);
+
+  window.onresize = function () {
+    setGridHeight(Number(getHeight()) - 20);
+    gridRef.current?.sizeColumnsToFit();
+  };
 
   return (
     <PageContainer>
@@ -276,7 +284,7 @@ const DutyList = () => {
             </Col>
           </Row>
         </Form>
-        <div style={{ height: 600, width: '100%' }}>
+        <div style={{ height: gridHeight, width: '100%' }}>
           <AgGridReact
             className="ag-theme-alpine"
             columnDefs={dutyColumn}
@@ -293,6 +301,7 @@ const DutyList = () => {
             headerHeight={35}
             onGridReady={onGridReady}
             onGridSizeChanged={onGridReady}
+            onRowDataChanged={onGridReady}
             frameworkComponents={{
               dutyCatalog: (params: CellClickedEvent) => (
                 <div

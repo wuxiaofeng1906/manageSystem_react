@@ -211,12 +211,8 @@ const TaskDecompose: React.FC<any> = () => {
     }
     setCreateState(true);
     const gridData: any = getOraGridData(); // 获取表格数据
-    console.log(
-      gridData,
-      gridData?.filter((it: any) => it.is_tailoring !== 'yes'),
-    );
     const createResult = await createZentaoTaskDecompose(
-      gridData?.filter((it: any) => it.is_tailoring !== 'yes'),
+      gridData,
       formForTaskQuery.getFieldValue('execution'),
     );
     if (createResult.code === 200) {

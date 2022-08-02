@@ -39,7 +39,7 @@ const CheckProgress: React.FC<any> = () => {
       errorMessage('检查未全部完成，不能保存发布结果！');
       return;
     }
-    if (checkOnlineEnvFlag) {
+    if (checkOnlineEnvFlag && ['1', '2'].includes(params)) {
       infoMessage('发布集群未填写，不能保存发布结果！');
       return;
     }

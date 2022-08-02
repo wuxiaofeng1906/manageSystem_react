@@ -40,7 +40,7 @@ const CheckProgress: React.FC<any> = () => {
       return;
     }
     if (checkOnlineEnvFlag && ['1', '2'].includes(params)) {
-      infoMessage('发布集群未填写，不能保存发布结果！');
+      infoMessage('step4中上线环境未填写，不能保存发布结果！');
       return;
     }
 

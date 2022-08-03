@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { history, useModel } from 'umi';
 import { Form, DatePicker, Row, Col, Button, Select, message, Modal, Input } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -12,7 +12,7 @@ import moment from 'moment';
 import { intersection, isEmpty, replace } from 'lodash';
 import useLock from '@/hooks/lock';
 import { getHeight } from '@/publicMethods/pageSet';
-import { setCellStyle } from '@/pages/zentao/taskDecomposition/grid/columns';
+import { infoMessage } from '@/publicMethods/showMessages';
 
 const DutyList = () => {
   const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
@@ -35,7 +35,7 @@ const DutyList = () => {
       start_time: values.time?.length > 0 ? moment(values.time[0]).format('YYYY-MM-DD') : '',
       end_time: values.time?.length > 0 ? moment(values.time[1]).format('YYYY-MM-DD') : '',
     });
-    setList(res?.map((it) => ({ ...it, bg: false })));
+    setList(res?.map((it: any) => ({ ...it, bg: false })));
   };
 
   const getProjects = async () => {
@@ -127,6 +127,7 @@ const DutyList = () => {
 
   // 新增 & 编辑
   const onAdd = async (data?: any) => {
+    if (!hasPermission.part) return;
     let release_num = '';
     if (!isEmpty(data)) {
       release_num = data.person_duty_num;
@@ -139,13 +140,14 @@ const DutyList = () => {
     history.push(`/onDutyAndRelease/dutyCatalog/${release_num}`);
   };
   const onDelete = async () => {
+    if (!hasPermission.super) return;
     const selected: any = gridRef.current?.getSelectedRows();
-    if (isEmpty(selected)) return message.warning('请先选择需删除的行！');
+    if (isEmpty(selected)) return infoMessage('请先选择需删除的行！');
     const lock = lockList.find(
       (it) => it.param.replace('duty_', '') == selected[0].person_duty_num,
     );
-    if (!isEmpty(lock)) return message.warning(`当前【${lock.user_name}】正在编辑，不能删除该行！`);
-    if (selected[0].is_push_msg == 'yes') return message.warning('当前数据已发送，不能删除！');
+    if (!isEmpty(lock)) return infoMessage(`当前【${lock.user_name}】正在编辑，不能删除该行！`);
+    if (selected[0].is_push_msg == 'yes') return infoMessage('当前数据已发送，不能删除！');
     await DutyListServices.deleteDuty({
       person_duty_num: selected[0].person_duty_num,
       user_id: currentUser?.userid,

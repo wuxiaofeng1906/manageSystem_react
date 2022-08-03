@@ -501,14 +501,17 @@ const TaskDecompose: React.FC<any> = () => {
                       bordered={false}
                       onChange={(v) => {
                         let rowNode = gridApi.current?.getRowNode(params.rowIndex);
-                        if (v == 'yes') {
-                          rowNode?.setData({
-                            ...params.data,
-                            is_tailoring: v,
-                            app_server: ['notinvolved'],
-                            task_name: `${params.data.task_name.split('】')[0]}】无`,
-                          });
-                        } else rowNode?.setData({ ...params.data, app_server: [] });
+                        // 为是： 标题修改为无，应用服务为 不涉及
+                        rowNode?.setData({
+                          ...params.data,
+                          is_tailoring: v,
+                          origin_task_name: params.data.task_name, // 用于将任务名称还原为最初的标题
+                          app_server: v == 'yes' ? ['notinvolved'] : [],
+                          task_name:
+                            v == 'yes'
+                              ? `${params.data.task_name.split('】')[0]}】无`
+                              : params.data.origin_task_name || params.data.task_name,
+                        });
                       }}
                     />
                   );

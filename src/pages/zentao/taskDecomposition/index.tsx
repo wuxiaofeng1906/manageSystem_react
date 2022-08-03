@@ -219,7 +219,7 @@ const TaskDecompose: React.FC<any> = () => {
       }
     });
     if (!isEmpty(validRow))
-      return infoMessage(`第${validRow.join(',')}行中开发的应用服务不能为空！`);
+      return infoMessage(`第${validRow.join(',')}行中任务类型为开发，应用服务不能为空！`);
     setCreateState(true);
     const createResult = await createZentaoTaskDecompose(
       gridData,

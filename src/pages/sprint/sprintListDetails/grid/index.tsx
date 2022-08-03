@@ -353,7 +353,7 @@ const getColums = (prjNames: any) => {
       cellRenderer: textDecorateRender,
     },
     {
-      headerName: '反馈人',
+      headerName: '创建人',
       field: 'feedback',
       cellRenderer: textDecorateRender,
     },

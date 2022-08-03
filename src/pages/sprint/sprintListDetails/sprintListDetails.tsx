@@ -607,7 +607,7 @@ const SprintList: React.FC<any> = () => {
     } else {
       const curRow: any = gridApi.current?.getSelectedRows(); // 获取选中的行
       datas['id'] = curRow[0].id;
-      // 判断是否被修改过 禅道id 对应测试、对应UED、反馈人,是否需要测试验证
+      // 判断是否被修改过 禅道id 对应测试、对应UED、创建人,是否需要测试验证
       if (curRow[0].ztNo !== oradata.adminChandaoId) {
         datas['ztNo'] = oradata.adminChandaoId;
       }
@@ -1215,7 +1215,7 @@ const SprintList: React.FC<any> = () => {
     'UED测试环境验证',
     'UED线上验证',
     '来源',
-    '反馈人',
+    '创建人',
     '是否延期',
   ];
 
@@ -2129,7 +2129,7 @@ const SprintList: React.FC<any> = () => {
             </Col>
 
             <Col span={8}>
-              <Form.Item name="adminAddFeedbacker" label="反馈人:">
+              <Form.Item name="adminAddFeedbacker" label="创建人:">
                 <Select placeholder="请选择" showSearch optionFilterProp="children">
                   {LoadCombobox('all')}
                 </Select>
@@ -3121,14 +3121,13 @@ const SprintList: React.FC<any> = () => {
                   <Checkbox value="来源">来源</Checkbox>
                 </Col>
                 <Col span={4}>
-                  <Checkbox value="反馈人">反馈人</Checkbox>
+                  <Checkbox value="创建人">创建人</Checkbox>
                 </Col>
                 <Col span={4}>
                   <Checkbox value="是否延期">是否延期</Checkbox>
                 </Col>
               </Row>
             </Checkbox.Group>
-            ,
           </div>
 
           <div>

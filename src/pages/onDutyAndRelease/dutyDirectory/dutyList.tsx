@@ -12,6 +12,7 @@ import moment from 'moment';
 import { intersection, isEmpty, replace } from 'lodash';
 import useLock from '@/hooks/lock';
 import { getHeight } from '@/publicMethods/pageSet';
+import { setCellStyle } from '@/pages/zentao/taskDecomposition/grid/columns';
 
 const DutyList = () => {
   const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
@@ -34,7 +35,7 @@ const DutyList = () => {
       start_time: values.time?.length > 0 ? moment(values.time[0]).format('YYYY-MM-DD') : '',
       end_time: values.time?.length > 0 ? moment(values.time[1]).format('YYYY-MM-DD') : '',
     });
-    setList(res);
+    setList(res?.map((it) => ({ ...it, bg: false })));
   };
 
   const getProjects = async () => {
@@ -163,11 +164,6 @@ const DutyList = () => {
     [currentUser?.group],
   );
 
-  const getRowStyle = (params: any) => {
-    const lockNode = lockList.map((it) => it.param.replace('duty_', ''));
-    return lockNode.includes(params.data.person_duty_num) ? { background: '#FFF6F6' } : null;
-  };
-
   const onCellMouseOver = (param: CellMouseOverEvent) => {
     const id = param.data.person_duty_num;
     const lock = lockList.find((it) => it.param.replace('duty_', '') == id);
@@ -196,19 +192,23 @@ const DutyList = () => {
   }, []);
 
   useEffect(() => {
-    gridRef?.current?.forEachNode((rowNode, index) => {
-      const lock = lockList.find(
-        (it) => it.param.replace('duty_', '') == rowNode.data.person_duty_num,
-      );
-      const row = gridRef.current?.getRowNode(index.toString());
-      row?.setData({ ...rowNode.data, bg: !isEmpty(lock) });
+    const format = list.map((it) => {
+      const lock = lockList.find((o) => o.param.replace('duty_', '') == it.person_duty_num);
+      it.bg = !isEmpty(lock);
+      return it;
     });
-  }, [JSON.stringify(lockList)]);
+    gridRef.current?.setRowData(format);
+  }, [JSON.stringify(lockList), JSON.stringify(list)]);
 
   window.onresize = function () {
     setGridHeight(Number(getHeight()) - 20);
     gridRef.current?.sizeColumnsToFit();
   };
+
+  const updateCellStyle = (p) => ({
+    background: p.data.bg ? '#FFF6F6' : 'white',
+    lineHeight: '30px',
+  });
 
   return (
     <PageContainer>
@@ -294,14 +294,11 @@ const DutyList = () => {
               sortable: true,
               filter: true,
               suppressMenu: true,
-              cellStyle: { 'line-height': '30px' },
+              cellStyle: updateCellStyle,
             }}
-            getRowStyle={getRowStyle as any}
             rowHeight={30}
             headerHeight={35}
             onGridReady={onGridReady}
-            onGridSizeChanged={onGridReady}
-            onRowDataChanged={onGridReady}
             frameworkComponents={{
               dutyCatalog: (params: CellClickedEvent) => (
                 <div

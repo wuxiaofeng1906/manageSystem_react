@@ -331,6 +331,73 @@ const beforeOnlineEnvCheck = (params: any) => {
         </div>
     `;
 };
+// 是否可以热更新检查
+const hotCheck = (params: any) => {
+  if (!params.value || params.value.length === 0) {
+    return '';
+  }
+  const values = params.value[0]; // 也只会有一条数据
+
+  // 显示结果和颜色
+  let result = '';
+  let Color = 'black';
+  if (values.ignore_check === '1') {
+    // 忽略
+    result = '忽略';
+    Color = 'blue';
+  } else if (values.ignore_check === '2') {
+    // 不忽略
+    if (values.check_result === null) {
+      result = '未开始';
+    } else if (values.check_result === 'success') {
+      result = '是';
+      Color = '#2BF541';
+    } else if (values.check_result === 'failed') {
+      result = '否';
+      Color = '#8B4513';
+    } else if (values.check_result === 'running') {
+      result = '执行中';
+      Color = '#46A0FC';
+    }
+  }
+
+  // 解析时间
+  let start = '';
+  if (values.check_start_time) {
+    start = dayjs(values.check_start_time).format('HH:mm:ss');
+  }
+
+  let end = '';
+  if (values.check_end_time) {
+    end = dayjs(values.check_end_time).format('HH:mm:ss');
+  }
+
+  let timeRange = '';
+  if (start) {
+    timeRange = end ? `${start}~${end}` : start;
+  }
+
+  const checkNum = JSON.stringify(params.data?.check_num);
+
+  return `
+        <div style="height: 66px">
+            <div style="margin-left: 120px;line-height: 26px" >
+              <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
+              onclick='excuteCheckData("hotCheck",${checkNum},${JSON.stringify(result)})'>
+                <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
+              </Button>
+              <a href="${values.check_url}" target="_blank"  onclick="return visitCommenLog('${
+    values.check_url
+  }')" >
+               <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+             </a>
+            </div>
+            <div style="line-height: 20px;font-size: 10px;width: 200px">
+                <div><label style="color: ${Color}"> ${result}</label> &nbsp;${timeRange}</div>
+            </div>
+        </div>
+    `;
+};
 // 上线前自动化检查
 const beforeOnlineAutoCheck = (params: any, type: string) => {
   const values = params.value;
@@ -688,6 +755,12 @@ const getOnlineBranchColumns = () => {
       field: 'env_check',
       minWidth: 190,
       cellRenderer: beforeOnlineEnvCheck,
+    },
+    {
+      headerName: '是否可以热更新检查',
+      field: 'hot_check',
+      minWidth: 190,
+      cellRenderer: hotCheck,
     },
     {
       headerName: '上线前自动化检查是否通过',

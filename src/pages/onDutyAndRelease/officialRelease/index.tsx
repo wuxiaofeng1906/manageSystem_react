@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import { errorMessage } from '@/publicMethods/showMessages';
+import { errorMessage, infoMessage } from '@/publicMethods/showMessages';
 import { AgGridReact } from 'ag-grid-react';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { Button, Checkbox, Col, DatePicker, Form, Input, Modal, Row, Select, message } from 'antd';
@@ -25,8 +25,8 @@ import { history } from '@@/core/history';
 import {
   getAnnouncement,
   postAnnouncementForOtherPage,
-} from '@/pages/onDutyAndRelease/releaseAnnouncement/axiosRequest/apiPage';
-import usePermission from '@/hooks/permission';
+} from '../announcement/announcementDetail/axiosRequest/apiPage';
+import AnnounceSelector from '@/pages/onDutyAndRelease/preRelease/components/announceSelector';
 
 // 编辑后的数据
 let otherSaveCondition: any = {
@@ -49,7 +49,6 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   const historyQuery = props.location?.query?.history === 'true';
   const releaseType = props.location?.query?.releaseType;
   const [rowData, setRowData] = useState([]);
-  const { announcePermission } = usePermission();
   const [releaseEnvForm] = Form.useForm();
   const dutyNameArray = useRequest(() => loadDutyNamesSelect(true)).data; // 关联值班名单
   const pageData = useRequest(() => getOfficialReleaseDetails(onlineReleaseNum, releaseType)).data; // 界面数据获取
@@ -105,6 +104,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
   // 取消发布
   const handleCancel = () => {
+    otherSaveCondition.releaseResult = 'unknown';
     setModalVisible({
       ...isModalVisible,
       result: 'unknown',
@@ -125,8 +125,9 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       const readyReleaseNum = node.data?.ready_release_num;
       grayReleaseNums.push(readyReleaseNum);
     });
+    const res = await getOfficialReleaseDetails(otherSaveCondition.onlineReleaseNum, releaseType);
     const result = await editReleaseForm(
-      { ...releaseInfo, ...releaseName },
+      { ...releaseInfo, ...releaseName, announcement_num: res?.[0]?.announcement_num ?? '' },
       { ...condition, releaseEnv, grayReleaseNums },
     );
     if (result.code === 200) {
@@ -215,6 +216,9 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
   // 发布结果下拉框选择
   const pulishResulttChanged = async (params: any) => {
+    const releaseEnv = releaseEnvForm.getFieldValue('releaseEnv');
+    if (isEmpty(releaseEnv) && ['failure', 'success'].includes(params))
+      return infoMessage('step2中集群未填写，不能修改发布结果!');
     // 需要判断发布服务有没有填写完成(取消发布可以不填写全)
     if (processStatus.processColor === 'gray' && params !== 'cancel') {
       errorMessage('发布服务未填写完成，不能填写发布结果!');
@@ -233,7 +237,8 @@ const OfficialRelease: React.FC<any> = (props: any) => {
       hintMsgs.message2 = '如有自动化也执行通过!确认通过，会自动开放所有租户。';
       autoDisable = false;
       // 需要查询当前发布编号有没有对应的发布后公告内容
-      announceContent = await getAnnouncement(otherSaveCondition.onlineReleaseNum, 'after');
+      const res = await getOfficialReleaseDetails(otherSaveCondition.onlineReleaseNum, releaseType);
+      announceContent = await getAnnouncement(res?.[0]?.announcement_num ?? '', 'after');
     } else if (params === 'failure') {
       hintMsgs.message1 = '请确认服务是否发布失败！';
     } else if (params === 'cancel') {
@@ -323,7 +328,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     setGridHeight(getHeight() - 210);
   };
 
-  const href = `http://${window.location.host}/onDutyAndRelease/releaseAnnouncement?releaseNum=${otherSaveCondition.onlineReleaseNum}&operteStatus=${historyQuery}`;
+  // const href = `http://${window.location.host}/onDutyAndRelease/releaseAnnouncement?releaseNum=${otherSaveCondition.onlineReleaseNum}&operteStatus=${historyQuery}`;
 
   const formatOpts = (value: string[]) => {
     if (isEmpty(onlineEnv)) return;
@@ -398,19 +403,16 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           </label>
 
           <label style={{ marginLeft: 10 }}>{autoCheckRt}</label>
-
-          {announcePermission()?.check ? (
-            <a href={href} target={'_blank'} style={{ float: 'right' }}>
-              <img src="../annouce.png" width="20" height="20" alt="发布公告" title="发布公告" />{' '}
-              &nbsp; 发布公告
-            </a>
-          ) : (
-            <div />
-          )}
+          <AnnounceSelector
+            type={'history'}
+            ready_release_num={otherSaveCondition.onlineReleaseNum}
+            value={pageData?.[0]?.announcement_num ?? ''}
+            disabled={historyQuery}
+          />
         </div>
         {/* step 1 发布方式及时间 */}
-        <div style={{ backgroundColor: 'white', marginTop: 4 }}>
-          <fieldset className={'fieldStyle'} style={{ height: 135 }}>
+        <div style={{ backgroundColor: 'white', marginTop: 4, width: '100%' }}>
+          <fieldset className={'fieldStyle'} style={{ height: 135, width: '100%' }}>
             <legend className={'legendStyle'}>
               Step1 发布方式及时间
               <label style={{ color: 'Gray' }}> (值班测试填写)</label>
@@ -540,7 +542,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                     releaseEnvRenderer: (params: any) => {
                       if (params && params.data.rowSpan) {
                         releaseEnvForm.setFieldsValue({
-                          releaseEnv: params.value?.split() ?? [],
+                          releaseEnv: isEmpty(params.value) ? [] : params.value?.split(',') ?? [],
                         });
                         showProcessStatus(); // 展示进度
                         return (

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -536,7 +536,7 @@ const ReleaseHistory: React.FC<any> = () => {
           style={{ marginTop: -21, height: gridHeight.zeroGrid, width: '100%' }}
         >
           <AgGridReact
-            columnDefs={grayscaleBacklogList('zero')} // 定义列
+            columnDefs={grayscaleBacklogList('zero', zeroButtonTitle == '待发布详情')} // 定义列
             rowData={zeroGrayscaleData?.data} // 数据绑定
             defaultColDef={girdDefaultSetting}
             rowHeight={30}
@@ -544,12 +544,13 @@ const ReleaseHistory: React.FC<any> = () => {
             rowSelection={'multiple'} // 设置多行选中
             suppressRowTransform={true}
             onGridReady={onZeroGrayscaleGridReady}
+            onGridSizeChanged={onZeroGrayscaleGridReady}
             frameworkComponents={{
               grayReleaseDetails: (params: any) => {
                 return grayListOperate('zero', params);
               },
             }}
-          ></AgGridReact>
+          />
         </div>
       </div>
 
@@ -581,7 +582,7 @@ const ReleaseHistory: React.FC<any> = () => {
           style={{ marginTop: -21, height: gridHeight.firstGrid, width: '100%' }}
         >
           <AgGridReact
-            columnDefs={grayscaleBacklogList('one')} // 定义列
+            columnDefs={grayscaleBacklogList('one', firstButtonTitle == '待发布详情')} // 定义列
             rowData={firstGrayscaleData?.data} // 数据绑定
             defaultColDef={girdDefaultSetting}
             rowHeight={30}
@@ -589,12 +590,13 @@ const ReleaseHistory: React.FC<any> = () => {
             rowSelection={'multiple'} // 设置多行选中
             suppressRowTransform={true}
             onGridReady={onFirstGrayscaleGridReady}
+            onGridSizeChanged={onFirstGrayscaleGridReady}
             frameworkComponents={{
               grayReleaseDetails: (params: any) => {
                 return grayListOperate('one', params);
               },
             }}
-          ></AgGridReact>
+          />
         </div>
       </div>
 

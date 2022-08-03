@@ -1,44 +1,49 @@
-import {getOnlinedAutoCheckResult} from "@/pages/onDutyAndRelease/preRelease/components/CheckProgress/axiosRequest";
-import React from "react";
+import { getOnlinedAutoCheckResult } from '@/pages/onDutyAndRelease/preRelease/components/CheckProgress/axiosRequest';
+import React from 'react';
 
 const getAutoResult = async (releaseNum: string) => {
   const newData: any = await getOnlinedAutoCheckResult(releaseNum);
   //  需要看后端的上线后自动化检查结果
   if (newData && newData.length > 0) {
-    let ignore = "";
-    let ui_rt = "";
-    let ui_color = "";
-    let app_rt = "";
-    let app_color = "";
+    let ignore = '';
+    let ui_rt = '';
+    let ui_color = '';
+    let app_rt = '';
+    let app_color = '';
     newData.forEach((ele: any) => {
-      if (ele.ignore_check === "yes") {
-        ignore = "忽略检查"
-      } else if (ele.check_type === "ui") {
-        ui_rt = ele.check_result === "yes" ? "通过" : "不通过";
-        ui_color = ele.check_result === "yes" ? "#2BF541" : "#8B4513";
-      } else if (ele.check_type === "applet") {
-        app_rt = ele.check_result === "yes" ? "通过" : "不通过";
-        app_color = ele.check_result === "yes" ? "#2BF541" : "#8B4513";
+      if (ele.ignore_check === 'yes') {
+        ignore = '忽略检查';
+      } else if (ele.check_type === 'ui') {
+        ui_rt = ele.check_result === 'yes' ? '通过' : '不通过';
+        ui_color = ele.check_result === 'yes' ? '#2BF541' : '#8B4513';
+      } else if (ele.check_type === 'applet') {
+        app_rt = ele.check_result === 'yes' ? '通过' : '不通过';
+        app_color = ele.check_result === 'yes' ? '#2BF541' : '#8B4513';
       }
     });
 
-    if (ignore === "忽略检查") {
-      return <div> 发布成功后自动化检查结果: <label style={{color: "blue"}}>忽略检查</label></div>
+    if (ignore === '忽略检查') {
+      return (
+        <div>
+          {' '}
+          发布成功后自动化检查结果: <label style={{ color: 'blue' }}>忽略检查</label>
+        </div>
+      );
     }
 
-    return <label>发布成功后自动化检查结果:
-      UI：<label style={{color: ui_color}}>{ui_rt}</label>；
-      小程序：<label style={{color: app_color}}>{app_rt}</label>；
-    </label>
+    return (
+      <label>
+        发布成功后自动化检查结果: UI：<label style={{ color: ui_color }}>{ui_rt}</label>； 小程序：
+        <label style={{ color: app_color }}>{app_rt}</label>；
+      </label>
+    );
   }
 
   return <label></label>;
 };
 
-
 // 解析进度条相关数据来显示
-const showProgressData = async (datas: any, activeKey: string = "") => {
-
+const showProgressData = async (datas: any, activeKey: string = '') => {
   const results = {
     releaseProject: 'Gainsboro', // #2BF541
     upgradeService: 'Gainsboro',
@@ -46,7 +51,8 @@ const showProgressData = async (datas: any, activeKey: string = "") => {
     onliineCheck: 'Gainsboro',
     releaseResult: '9',
     processPercent: 0,
-    autoCheckResult: <label></label>
+    autoCheckResult: <label></label>,
+    announcement_num: datas.announcement_num ?? '',
   };
 
   let successCount = 0;
@@ -79,4 +85,4 @@ const showProgressData = async (datas: any, activeKey: string = "") => {
   return results;
 };
 
-export {showProgressData, getAutoResult};
+export { showProgressData, getAutoResult };

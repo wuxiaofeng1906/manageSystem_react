@@ -277,7 +277,29 @@ const checkOnlineEnvData = async (sourceData: any) => {
   }
   return systemPermission.errorMessage;
 };
-const checkHotFreshData = async (sourceData: any) => {};
+const checkHotFreshData = async (sourceData: any) => {
+  //   只有没有勾选忽略检查，后面参数才必填
+  if (isEmpty(sourceData.ignoreCheckHot)) {
+    if (isEmpty(sourceData.publishEnv)) {
+      return 'step3 热更新检查中发布环境不能为空！';
+    }
+  }
+
+  const authData = {
+    operate: `保存上线分支-是否可以热更新检查`,
+    method: 'post',
+    path: '/api/verify/release/refresh_hot_check',
+  };
+  const dutyPermission = await getDutyPersonPermission(authData);
+  const systemPermission = await getSystemPersonPermission(authData);
+  if (dutyPermission.flag || systemPermission.flag) {
+    return '';
+  }
+  if (dutyPermission.errorMessage) {
+    return dutyPermission.errorMessage;
+  }
+  return systemPermission.errorMessage;
+};
 
 const checkOnlineAutoData = async () => {
   //   没有勾选忽略检查，后面参数必填。如果勾选了，后面的参数可以为空（不再做忽略检查）
@@ -588,10 +610,10 @@ const saveOnlineBranchData = async (
     return checkMsg_envCheck;
   }
   // 热更新检查
-  // const checkMsg_hotFreshCheck = await checkHotFreshData(sourceData);
-  // if (checkMsg_hotFreshCheck) {
-  //   return checkMsg_hotFreshCheck;
-  // }
+  const checkMsg_hotFreshCheck = await checkHotFreshData(sourceData);
+  if (checkMsg_hotFreshCheck) {
+    return checkMsg_hotFreshCheck;
+  }
 
   // 自动化检查参数（暂时不做自动化必填参数检查）
   // const checkMsg_autoCheck = await checkOnlineAutoData(sourceData);

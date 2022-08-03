@@ -44,14 +44,10 @@ const getOnlineEnv = async (releaseType: any) => {
         : 'other',
     }));
     if (releaseType === 'gray') {
-      opt = data.filter((it: any) => !['cn-northwest-global', 'cn-northwest-0'].includes(it.value));
+      opt = data.filter((it: any) => !['global', '集群0'].includes(it.label));
     }
     if (releaseType === 'online') {
-      opt = data.filter(
-        (it: any) =>
-          !['cn-northwest-global', 'cn-northwest-0', 'cn-northwest-1'].includes(it.value) ||
-          it.label !== '集群1-8',
-      );
+      opt = data.filter((it: any) => !['global', '集群0', '集群1', '集群1-8'].includes(it.label));
     }
   }
   return opt;
@@ -91,6 +87,7 @@ const editReleaseForm = async (releaseInfo: any, otherCondition: any) => {
     plan_release_time: pulishTime === '' ? '' : dayjs(pulishTime).format('YYYY-MM-DD HH:mm:ss'), // 计划发布时间
     duty_num: relateDutyName, // 值班名单
     release_name: releaseInfo.release_name,
+    announcement_num: releaseInfo?.announcement_num,
     // "online_environment": "string",
     // "online_release_name": "string"  发布名称
   };

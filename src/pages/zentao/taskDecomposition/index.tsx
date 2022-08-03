@@ -499,6 +499,7 @@ const TaskDecompose: React.FC<any> = () => {
                       defaultValue={params.value}
                       disabled={params.data.add_type == 'add'}
                       bordered={false}
+                      style={{ width: '100%' }}
                       onChange={(v) => {
                         let rowNode = gridApi.current?.getRowNode(params.rowIndex);
                         // 为是： 标题修改为无，应用服务为 不涉及
@@ -527,6 +528,7 @@ const TaskDecompose: React.FC<any> = () => {
                       bordered={false}
                       showArrow
                       maxTagCount={'responsive'}
+                      optionFilterProp={'children'}
                       onChange={(v) => {
                         let rowNode = gridApi.current?.getRowNode(params.rowIndex);
                         rowNode?.setData({ ...params.data, app_server: v });

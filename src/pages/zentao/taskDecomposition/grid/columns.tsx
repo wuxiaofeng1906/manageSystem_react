@@ -113,14 +113,12 @@ const gridColumns: any = [
     headerName: '是否裁剪',
     field: 'is_tailoring',
     cellRenderer: 'tailoring',
-    editable: (params: any) => params.data?.No !== 6,
   },
   {
     minWidth: 150,
     headerName: '应用服务',
     field: 'app_server',
     cellRenderer: 'appServer',
-    editable: (params: any) => params.data?.No !== 6,
   },
   {
     headerName: '所属端',

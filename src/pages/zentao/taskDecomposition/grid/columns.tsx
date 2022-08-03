@@ -113,21 +113,14 @@ const gridColumns: any = [
     headerName: '是否裁剪',
     field: 'is_tailoring',
     cellRenderer: 'tailoring',
-    editable: (params: any) => {
-      if (params.data?.No === 6) {
-        return false;
-      }
-      return true;
-    },
-    // valueFormatter: (params: any) => {
-    //   if (params.data?.No === 6) {
-    //     return '';
-    //   }
-    //   if (params.value === 'yes') {
-    //     return '是';
-    //   }
-    //   return '否';
-    // },
+    editable: (params: any) => params.data?.No !== 6,
+  },
+  {
+    minWidth: 150,
+    headerName: '应用服务',
+    field: 'app_server',
+    cellRenderer: 'appServer',
+    editable: (params: any) => params.data?.No !== 6,
   },
   {
     headerName: '所属端',
@@ -153,6 +146,7 @@ const setCellStyle = (params: any) => {
     'estimate',
     'desc',
     'is_tailoring',
+    'app_server',
   ];
   if (whiteCell.indexOf(params.column?.colId) < 0) {
     style['background-color'] = '#F8F8F8';

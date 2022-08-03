@@ -2,14 +2,12 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Button, Col, Form, Row, Select, Spin, TreeSelect, DatePicker } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-enterprise';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { useRequest } from 'ahooks';
 import {
   zentaoExcutionSelect,
   zentaoStorySelect,
   zentaoDevCenterSelect,
+  zentaoAppServerSelect,
 } from './component/selector';
 import { getHeight } from '@/publicMethods/pageSet';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
@@ -24,12 +22,14 @@ import {
   judgeTaskName,
 } from './grid/datas';
 import moment from 'moment';
-import { errorMessage, sucMessage } from '@/publicMethods/showMessages';
+import { errorMessage, infoMessage, sucMessage } from '@/publicMethods/showMessages';
 import { createZentaoTaskDecompose } from './taskCreate';
 import dayjs from 'dayjs';
+import { isEmpty } from 'lodash';
 
 const { SHOW_PARENT } = TreeSelect;
 let devCenterPerson: any;
+let appServerList: string[] = [];
 // 组件初始化
 const TaskDecompose: React.FC<any> = () => {
   /* region 表格事件 */
@@ -64,6 +64,7 @@ const TaskDecompose: React.FC<any> = () => {
   /* region 下拉框加载 */
   const excutionSelect = useRequest(() => zentaoExcutionSelect()).data;
   const devCenterSelect: any = useRequest(() => zentaoDevCenterSelect()).data;
+  const appServerSource: any = useRequest(() => zentaoAppServerSelect()).data;
   /* endregion 下拉框加载 */
 
   /* region 操作栏相关事件 */
@@ -209,8 +210,17 @@ const TaskDecompose: React.FC<any> = () => {
       errorMessage('禅道需求不能为空！');
       return;
     }
-    setCreateState(true);
+    // 任务类型为开发时，应用服务不能为空
     const gridData: any = getOraGridData(); // 获取表格数据
+    let validRow: number[] = [];
+    gridData.forEach((it: any, index: number) => {
+      if (it.task_type_name == '开发' && isEmpty(it.app_server)) {
+        validRow.push(index + 1);
+      }
+    });
+    if (!isEmpty(validRow))
+      return infoMessage(`第${validRow.join(',')}行中开发的应用服务不能为空！`);
+    setCreateState(true);
     const createResult = await createZentaoTaskDecompose(
       gridData,
       formForTaskQuery.getFieldValue('execution'),
@@ -309,6 +319,11 @@ const TaskDecompose: React.FC<any> = () => {
   useEffect(() => {
     devCenterPerson = devCenterSelect;
   }, [devCenterSelect]);
+
+  useEffect(() => {
+    appServerList = appServerSource;
+  }, [appServerSource]);
+
   return (
     <div>
       <Header />
@@ -490,11 +505,36 @@ const TaskDecompose: React.FC<any> = () => {
                           rowNode?.setData({
                             ...params.data,
                             is_tailoring: v,
+                            app_server: ['notinvolved'],
                             task_name: `${params.data.task_name.split('】')[0]}】无`,
                           });
-                        }
+                        } else rowNode?.setData({ ...params.data, app_server: [] });
                       }}
                     />
+                  );
+                },
+                appServer: (params: any) => {
+                  return params.data?.No === 6 ? (
+                    ''
+                  ) : (
+                    <Select
+                      style={{ width: '120%' }}
+                      mode={'multiple'}
+                      defaultValue={params.value}
+                      bordered={false}
+                      showArrow
+                      maxTagCount={'responsive'}
+                      onChange={(v) => {
+                        let rowNode = gridApi.current?.getRowNode(params.rowIndex);
+                        rowNode?.setData({ ...params.data, app_server: v });
+                      }}
+                    >
+                      {appServerList?.map((it) => (
+                        <Select.Option value={it} key={it}>
+                          {it == 'notinvolved' ? '不涉及' : it}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   );
                 },
               }}

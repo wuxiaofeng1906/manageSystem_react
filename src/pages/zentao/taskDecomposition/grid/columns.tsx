@@ -113,9 +113,10 @@ const gridColumns: any = [
     headerName: '是否裁剪',
     field: 'is_tailoring',
     cellRenderer: 'tailoring',
+    minWidth: 120,
   },
   {
-    minWidth: 150,
+    minWidth: 300,
     headerName: '应用服务',
     field: 'app_server',
     cellRenderer: 'appServer',

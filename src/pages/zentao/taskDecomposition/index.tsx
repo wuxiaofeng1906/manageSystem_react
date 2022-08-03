@@ -522,7 +522,7 @@ const TaskDecompose: React.FC<any> = () => {
                     ''
                   ) : (
                     <Select
-                      style={{ width: '110%' }}
+                      style={{ width: '100%' }}
                       mode={'multiple'}
                       defaultValue={params.value}
                       bordered={false}

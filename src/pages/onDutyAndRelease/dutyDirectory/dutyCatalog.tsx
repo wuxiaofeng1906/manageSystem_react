@@ -28,8 +28,8 @@ const tbodyConfig = [
   { title: '前端值班', name: 'front', tech: 1 },
   { title: '后端值班', name: 'backend', tech: 2 },
   { title: '测试值班', name: 'test', tech: 3 },
-  { title: '运维值班', name: 'operations' },
-  { title: 'SQA值班', name: 'sqa' },
+  { title: '运维值班', name: 'operations', tech: 94 },
+  { title: 'SQA值班', name: 'sqa', tech: 95 },
 ];
 const FilterSelector = ({
   name,

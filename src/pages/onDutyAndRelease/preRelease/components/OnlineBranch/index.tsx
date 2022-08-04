@@ -103,61 +103,61 @@ const OnlineBranch: React.FC<any> = () => {
 
     const formData = formForOnlineBranch.getFieldsValue();
     console.log(newOnlineBranchNum, { ...formData, checkEnv: formData.imageevn });
-    const result = await saveOnlineBranchData(
-      onlineBranchModal.title,
-      tabsData.activeKey,
-      newOnlineBranchNum,
-      formData,
-    );
-
-    if (result === '') {
-      message.info({
-        content: '保存成功！',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-      setOnlineBranchModal({
-        shown: false,
-        title: '新增',
-        loading: false,
-      });
-
-      const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
-      if (newData.onlineBranch) {
-        setOnlineBranch({
-          gridHight: getGridRowsHeight(newData.onlineBranch, true),
-          gridData: newData.onlineBranch,
-        });
-      }
-
-      // 刷新数据review确认框
-      const reviewData: any = await alalysisInitData('dataReviewConfirm', tabsData.activeKey);
-      if (reviewData.reviewData_confirm) {
-        setDataReviewConfirm({
-          gridHight: getGridRowsHeight(reviewData.reviewData_confirm),
-          gridData: reviewData.reviewData_confirm,
-        });
-      }
-
-      if (onlineBranchModal.title === '修改') {
-        deleteLockStatus(lockedItem);
-      }
-    } else {
-      message.error({
-        content: result,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
-      setOnlineBranchModal({
-        ...onlineBranchModal,
-        loading: false,
-      });
-    }
+    // const result = await saveOnlineBranchData(
+    //   onlineBranchModal.title,
+    //   tabsData.activeKey,
+    //   newOnlineBranchNum,
+    //   formData,
+    // );
+    //
+    // if (result === '') {
+    //   message.info({
+    //     content: '保存成功！',
+    //     duration: 1,
+    //     style: {
+    //       marginTop: '50vh',
+    //     },
+    //   });
+    //   setOnlineBranchModal({
+    //     shown: false,
+    //     title: '新增',
+    //     loading: false,
+    //   });
+    //
+    //   const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
+    //   if (newData.onlineBranch) {
+    //     setOnlineBranch({
+    //       gridHight: getGridRowsHeight(newData.onlineBranch, true),
+    //       gridData: newData.onlineBranch,
+    //     });
+    //   }
+    //
+    //   // 刷新数据review确认框
+    //   const reviewData: any = await alalysisInitData('dataReviewConfirm', tabsData.activeKey);
+    //   if (reviewData.reviewData_confirm) {
+    //     setDataReviewConfirm({
+    //       gridHight: getGridRowsHeight(reviewData.reviewData_confirm),
+    //       gridData: reviewData.reviewData_confirm,
+    //     });
+    //   }
+    //
+    //   if (onlineBranchModal.title === '修改') {
+    //     deleteLockStatus(lockedItem);
+    //   }
+    // } else {
+    //   message.error({
+    //     content: result,
+    //     duration: 1,
+    //     style: {
+    //       marginTop: '50vh',
+    //     },
+    //   });
+    //
+    //   setOnlineBranchModal({
+    //     ...onlineBranchModal,
+    //     loading: false,
+    //   });
+    // }
   };
 
   // 根据分支名称获取服务
@@ -828,7 +828,7 @@ const OnlineBranch: React.FC<any> = () => {
               <Row>
                 <Col span={6}>
                   {/* 忽略检查 */}
-                  <Form.Item label="是否忽略检查" name="ignoreCheckHot" style={{ marginTop: -10 }}>
+                  <Form.Item label="是否忽略检查" name="is_ignore" style={{ marginTop: -10 }}>
                     <Checkbox.Group>
                       <Checkbox value={'1'}>忽略检查</Checkbox>
                     </Checkbox.Group>
@@ -836,8 +836,8 @@ const OnlineBranch: React.FC<any> = () => {
                 </Col>
                 <Col span={18}>
                   {/* 发布环境 */}
-                  <Form.Item label="发布环境:" name="publishEnv" style={{ marginTop: -10 }}>
-                    <Select style={{ width: '100%' }} showSearch options={[]} />
+                  <Form.Item label="发布环境:" name="check_env" style={{ marginTop: -10 }}>
+                    <Select style={{ width: 415 }} showSearch options={[]} mode={'multiple'} />
                   </Form.Item>
                 </Col>
               </Row>

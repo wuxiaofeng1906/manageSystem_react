@@ -279,8 +279,8 @@ const checkOnlineEnvData = async (sourceData: any) => {
 };
 const checkHotFreshData = async (sourceData: any) => {
   //   只有没有勾选忽略检查，后面参数才必填
-  if (isEmpty(sourceData.ignoreCheckHot)) {
-    if (isEmpty(sourceData.publishEnv)) {
+  if (isEmpty(sourceData.is_ignore)) {
+    if (isEmpty(sourceData.check_env)) {
       return 'step3 热更新检查中发布环境不能为空！';
     }
   }
@@ -288,7 +288,7 @@ const checkHotFreshData = async (sourceData: any) => {
   const authData = {
     operate: `保存上线分支-是否可以热更新检查`,
     method: 'post',
-    path: '/api/verify/release/refresh_hot_check',
+    path: '/api/verify/release/hotupdate',
   };
   const dutyPermission = await getDutyPersonPermission(authData);
   const systemPermission = await getSystemPersonPermission(authData);

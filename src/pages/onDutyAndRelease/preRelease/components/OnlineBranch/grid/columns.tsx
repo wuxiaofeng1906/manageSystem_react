@@ -337,29 +337,15 @@ const hotCheck = (params: any) => {
     return '';
   }
   const values = params.value[0]; // 也只会有一条数据
-
+  // 'wait', 'running', 'yes', 'no', 'skip'
+  const tips = {
+    wait: { text: '未开始' },
+    running: { text: '执行中', color: '#46A0FC' },
+    yes: { text: '是', color: '#2BF541' },
+    no: { text: '否', color: '#8B4513' },
+    skip: { text: '忽略', color: 'blue' },
+  };
   // 显示结果和颜色
-  let result = '';
-  let Color = 'black';
-  if (values.ignore_check === '1') {
-    // 忽略
-    result = '忽略';
-    Color = 'blue';
-  } else if (values.ignore_check === '2') {
-    // 不忽略
-    if (values.check_result === null) {
-      result = '未开始';
-    } else if (values.check_result === 'success') {
-      result = '是';
-      Color = '#2BF541';
-    } else if (values.check_result === 'failed') {
-      result = '否';
-      Color = '#8B4513';
-    } else if (values.check_result === 'running') {
-      result = '执行中';
-      Color = '#46A0FC';
-    }
-  }
 
   // 解析时间
   let start = '';
@@ -368,7 +354,7 @@ const hotCheck = (params: any) => {
   }
 
   let end = '';
-  if (values.check_end_time) {
+  if (values?.check_end_time) {
     end = dayjs(values.check_end_time).format('HH:mm:ss');
   }
 
@@ -383,17 +369,21 @@ const hotCheck = (params: any) => {
         <div style="height: 66px">
             <div style="margin-left: 120px;line-height: 26px" >
               <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
-              onclick='excuteCheckData("hotCheck",${checkNum},${JSON.stringify(result)})'>
+              onclick='excuteCheckData("hotCheck",${checkNum},${JSON.stringify(
+    tips[values.check_status].text ?? '',
+  )})'>
                 <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
               </Button>
               <a href="${values.check_url}" target="_blank"  onclick="return visitCommenLog('${
-    values.check_url
+    values.check_log
   }')" >
                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
              </a>
             </div>
             <div style="line-height: 20px;font-size: 10px;width: 200px">
-                <div><label style="color: ${Color}"> ${result}</label> &nbsp;${timeRange}</div>
+                <div><label style="color: ${tips[values.check_status].color ?? 'black'}"> ${
+    tips[values.check_status].text ?? ''
+  }</label> &nbsp;${timeRange}</div>
             </div>
         </div>
     `;
@@ -758,7 +748,7 @@ const getOnlineBranchColumns = () => {
     },
     {
       headerName: '是否可以热更新检查',
-      field: 'hot_check',
+      field: 'hot_update_check',
       minWidth: 190,
       cellRenderer: hotCheck,
     },

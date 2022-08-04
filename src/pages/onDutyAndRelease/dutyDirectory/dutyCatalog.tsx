@@ -16,10 +16,12 @@ import useLock from '@/hooks/lock';
 const opts = { showSearch: true, mode: 'multiple', optionFilterProp: 'label' };
 const recentType = { 前端: 'front', 后端: 'backend', 测试: 'test', 运维: 'operations', SQA: 'sqa' };
 const envType = {
+  '集群0-8':
+    'cn-northwest-0,cn-northwest-1,cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-8',
   '集群1-8':
     'cn-northwest-1,cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-8',
   '集群2-8':
-    'cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-7',
+    'cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-8',
   global: 'cn-northwest-global',
 };
 const tbodyConfig = [

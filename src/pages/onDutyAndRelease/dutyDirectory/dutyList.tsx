@@ -46,7 +46,6 @@ const DutyList = () => {
   };
   const copyReplaceTitle = (data: any) => {
     const duty_date = moment().format('YYYY-MM-DD');
-    const release_time = moment().hour(23).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss');
     const time = moment().format('YYYYMMDD');
     const date = moment(data.duty_date).format('YYYYMMDD');
     const greyEnv = ['cn-northwest-0', 'cn-northwest-1'];
@@ -68,7 +67,7 @@ const DutyList = () => {
     }
 
     modifyDutyForm.setFieldsValue({ duty_name: newTitle });
-    return { release_time, duty_date, newTitle };
+    return { duty_date, newTitle };
   };
 
   const onCopy = async () => {
@@ -78,7 +77,11 @@ const DutyList = () => {
     const data = await DutyListServices.getDutyDetail({
       person_duty_num: selected[0].person_duty_num,
     });
-    const { duty_date, release_time, newTitle } = copyReplaceTitle(data);
+    const { duty_date, newTitle } = copyReplaceTitle(data);
+    const flag = newTitle.indexOf('灰度') > -1;
+    const release_time = flag
+      ? moment().hour(22).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss')
+      : moment().add('d', 1).startOf('day').format('YYYY-MM-DD HH:mm:ss');
 
     const update = async (value: string) => {
       await DutyListServices.addDuty({

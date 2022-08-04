@@ -329,7 +329,7 @@ const DutyCatalog = () => {
       if (isEmpty(res)) {
         form.setFieldsValue({
           duty_date: moment(),
-          release_time: moment().hour(23).minute(0).second(0),
+          release_time: moment().hour(22).minute(0).second(0),
         });
         return;
       }
@@ -410,6 +410,14 @@ const DutyCatalog = () => {
       type = `${values.release_env[0].replace('cn-northwest-', '')}级灰度发布`;
     } else if (releaseEnvLength == 2 && greyLength == 2) type = '灰度发布';
     else type = '线上发布';
+    const flag = type.indexOf('灰度') > -1;
+
+    const initTime = flag
+      ? moment().hour(22).minute(0).second(0)
+      : moment().add('d', 1).startOf('d');
+    form.setFieldsValue({
+      release_time: initTime,
+    });
     return `${time}_${type}值班名单`;
   };
 
@@ -772,7 +780,7 @@ const DutyCatalog = () => {
                       format={'YYYY-MM-DD HH:mm'}
                       allowClear={false}
                       onBlur={() => onSave()}
-                      showTime={{ defaultValue: moment('23:00:00', 'HH:mm') }}
+                      showTime={{ defaultValue: moment('22:00:00', 'HH:mm') }}
                       disabled={!hasPermission}
                     />
                   </Form.Item>

@@ -100,16 +100,6 @@ const gridColumns: any = [
     },
   },
   {
-    headerName: '任务描述',
-    field: 'desc',
-    editable: (params: any) => {
-      if (params.data?.No === 6) {
-        return false;
-      }
-      return true;
-    },
-  },
-  {
     headerName: '是否裁剪',
     field: 'is_tailoring',
     cellRenderer: 'tailoring',
@@ -120,6 +110,16 @@ const gridColumns: any = [
     headerName: '应用服务',
     field: 'app_server',
     cellRenderer: 'appServer',
+  },
+  {
+    headerName: '任务描述',
+    field: 'desc',
+    editable: (params: any) => {
+      if (params.data?.No === 6) {
+        return false;
+      }
+      return true;
+    },
   },
   {
     headerName: '所属端',

@@ -508,7 +508,7 @@ const TaskDecompose: React.FC<any> = () => {
                           is_tailoring: v,
                           origin_task_name: params.data.task_name, // 用于将任务名称还原为最初的标题
                           app_server:
-                            v == 'yes' && params.data.task_type_name?.indexOf('开发') > -1
+                            v == 'yes' && params.data.task_type_name == '开发'
                               ? ['notinvolved']
                               : [],
                           task_name:

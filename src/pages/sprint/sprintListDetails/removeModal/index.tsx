@@ -1,5 +1,5 @@
 import React, { forwardRef, MutableRefObject, useEffect, useState } from 'react';
-import { Modal, Select, Input, Form, Table } from 'antd';
+import { Modal, Select, Input, Form, Table, Space, Button } from 'antd';
 import { GridApi } from 'ag-grid-community';
 import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 import { ColumnsType } from 'antd/lib/table';
@@ -7,11 +7,15 @@ import { getDeptMemner } from '@/pages/sprint/sprintListDetails/data';
 import { useGqlClient } from '@/hooks/index';
 import styles from '../sprintListDetails.less';
 import { isEmpty } from 'lodash';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { stageType } from '@/pages/sprint/sprintListDetails/common';
+import { warnMessage } from '@/publicMethods/showMessages';
 
 const list = [
   { label: '是', value: '1' },
   { label: '否', value: '0' },
 ];
+
 const RemoveModal = (
   props: { gridRef: MutableRefObject<GridApi | undefined> } & ModalFuncProps,
 ) => {
@@ -48,7 +52,78 @@ const RemoveModal = (
   const onOK = async () => {
     const values = await form.validateFields();
     console.log(values);
+    onClear(values);
   };
+
+  const onClear = async (data: { formList: any[] }) => {
+    /*
+        3 :story: 规则【未开始、开发中、开发完】
+        1 、-3 : bug/b_story: 规则【未开始、开发中】
+     */
+    const list: { stage: number; id: number; category: string; flag: boolean }[] | undefined =
+      selected?.map((it) => ({
+        stage: it.stage,
+        id: it.id,
+        category: it.category,
+        flag: ['1', '-3'].includes(it.category)
+          ? [1, 2].includes(it.stage)
+            ? true
+            : false
+          : ['3'].includes(it.category)
+          ? [1, 2, 3].includes(it.stage)
+            ? true
+            : false
+          : false,
+      }));
+    if (isEmpty(selected)) return warnMessage('请先选择需要移除的需求！');
+
+    // 不满足规则的
+    const dissatisfy = list?.filter((it) => !it.flag);
+    if (!isEmpty(dissatisfy)) {
+      Modal.confirm({
+        width: 600,
+        centered: true,
+        title: '移除需求提醒',
+        // okText: '移除',
+        // cancelText: '去禅道',
+        icon: <ExclamationCircleOutlined />,
+        onOk: () => {
+          console.log(list);
+        },
+        content: (
+          <div style={{ maxHeight: 500, overflowY: 'auto' }}>
+            <p style={{ marginBottom: 5 }}>您需要移除的需求如下:请确认是否仍要移除？</p>
+            {dissatisfy?.map((it) => (
+              <div style={{ display: 'flex', textIndent: '1em' }} key={it.id}>
+                <div style={{ minWidth: 100 }}>{it.id}</div>
+                <div style={{ minWidth: 100 }}>阶段为：{stageType[it.stage]}</div>
+                <Space>
+                  <Button
+                    onClick={() => {
+                      console.log('移除');
+                    }}
+                  >
+                    移除
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      console.log('去禅道');
+                    }}
+                  >
+                    去禅道
+                  </Button>
+                </Space>
+              </div>
+            ))}
+            {/*<p style={{ marginTop: 5 }}>请确认是否仍要移除？</p>*/}
+          </div>
+        ),
+      });
+      return;
+    }
+    console.log(selected);
+  };
+
   const onCancel = () => {
     props.onCancel?.();
   };

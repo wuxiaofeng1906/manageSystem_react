@@ -18,14 +18,15 @@ import {
   Spin,
   Breadcrumb,
   TreeSelect,
+  Tooltip,
 } from 'antd';
 import { formatMomentTime } from '@/publicMethods/timeMethods';
 import dayjs from 'dayjs';
 import {
-  FolderAddTwoTone,
-  SnippetsTwoTone,
-  DeleteTwoTone,
-  EditTwoTone,
+  // FolderAddTwoTone,
+  // SnippetsTwoTone,
+  // DeleteTwoTone,
+  // EditTwoTone,
   CloseSquareTwoTone,
   CheckSquareTwoTone,
   SettingOutlined,
@@ -1497,15 +1498,20 @@ const SprintList: React.FC<any> = () => {
               {/*>*/}
               {/*  移动*/}
               {/*</Button>*/}
-              <Button
-                type="text"
-                style={{ marginLeft: '-10px' }}
-                icon={<ClearOutlined style={{ color: '#228dff' }} />}
-                // onClick={onClear}
-                onClick={onRemove}
+              <Tooltip
+                title={'移除默认将该移除的内容关联到下个班车中'}
+                overlayStyle={{ color: 'black' }}
               >
-                移除
-              </Button>
+                <Button
+                  type="text"
+                  style={{ marginLeft: '-10px' }}
+                  icon={<ClearOutlined style={{ color: '#228dff' }} />}
+                  onClick={onRemove}
+                >
+                  移除
+                </Button>
+              </Tooltip>
+
               <label style={{ marginTop: '5px', fontWeight: 'bold', marginLeft: '10px' }}>
                 操作流程:
               </label>

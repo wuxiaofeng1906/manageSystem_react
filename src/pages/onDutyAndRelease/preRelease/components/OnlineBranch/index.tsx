@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   Button,
   Card,
@@ -55,6 +55,8 @@ const OnlineBranch: React.FC<any> = () => {
     operteStatus,
   } = useModel('releaseProcess');
   const [executeStatus, setExecuteStatus] = useState(false); // 上线分支点击执行后的进度展示
+  const [hotEnvList, setHotEnvList] = useState<any[]>([]); // 上线分支点击执行后的进度展示
+  const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [onlineBranchModal, setOnlineBranchModal] = useState({
     shown: false,
     title: '新增',
@@ -103,61 +105,61 @@ const OnlineBranch: React.FC<any> = () => {
 
     const formData = formForOnlineBranch.getFieldsValue();
     console.log(newOnlineBranchNum, { ...formData, checkEnv: formData.imageevn });
-    // const result = await saveOnlineBranchData(
-    //   onlineBranchModal.title,
-    //   tabsData.activeKey,
-    //   newOnlineBranchNum,
-    //   formData,
-    // );
-    //
-    // if (result === '') {
-    //   message.info({
-    //     content: '保存成功！',
-    //     duration: 1,
-    //     style: {
-    //       marginTop: '50vh',
-    //     },
-    //   });
-    //   setOnlineBranchModal({
-    //     shown: false,
-    //     title: '新增',
-    //     loading: false,
-    //   });
-    //
-    //   const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
-    //   if (newData.onlineBranch) {
-    //     setOnlineBranch({
-    //       gridHight: getGridRowsHeight(newData.onlineBranch, true),
-    //       gridData: newData.onlineBranch,
-    //     });
-    //   }
-    //
-    //   // 刷新数据review确认框
-    //   const reviewData: any = await alalysisInitData('dataReviewConfirm', tabsData.activeKey);
-    //   if (reviewData.reviewData_confirm) {
-    //     setDataReviewConfirm({
-    //       gridHight: getGridRowsHeight(reviewData.reviewData_confirm),
-    //       gridData: reviewData.reviewData_confirm,
-    //     });
-    //   }
-    //
-    //   if (onlineBranchModal.title === '修改') {
-    //     deleteLockStatus(lockedItem);
-    //   }
-    // } else {
-    //   message.error({
-    //     content: result,
-    //     duration: 1,
-    //     style: {
-    //       marginTop: '50vh',
-    //     },
-    //   });
-    //
-    //   setOnlineBranchModal({
-    //     ...onlineBranchModal,
-    //     loading: false,
-    //   });
-    // }
+    const result = await saveOnlineBranchData(
+      onlineBranchModal.title,
+      tabsData.activeKey,
+      newOnlineBranchNum,
+      formData,
+    );
+
+    if (result === '') {
+      message.info({
+        content: '保存成功！',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      setOnlineBranchModal({
+        shown: false,
+        title: '新增',
+        loading: false,
+      });
+
+      const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
+      if (newData.onlineBranch) {
+        setOnlineBranch({
+          gridHight: getGridRowsHeight(newData.onlineBranch, true),
+          gridData: newData.onlineBranch,
+        });
+      }
+
+      // 刷新数据review确认框
+      const reviewData: any = await alalysisInitData('dataReviewConfirm', tabsData.activeKey);
+      if (reviewData.reviewData_confirm) {
+        setDataReviewConfirm({
+          gridHight: getGridRowsHeight(reviewData.reviewData_confirm),
+          gridData: reviewData.reviewData_confirm,
+        });
+      }
+
+      if (onlineBranchModal.title === '修改') {
+        deleteLockStatus(lockedItem);
+      }
+    } else {
+      message.error({
+        content: result,
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+
+      setOnlineBranchModal({
+        ...onlineBranchModal,
+        loading: false,
+      });
+    }
   };
 
   // 根据分支名称获取服务
@@ -585,6 +587,30 @@ const OnlineBranch: React.FC<any> = () => {
     onlineBranchGridApi.current?.setRowData(newData.onlineBranch);
     setExecuteStatus(false);
   };
+  // 是否可热更新检查
+  (window as any).hotUpdateCheck = async (check_num: string) => {
+    if (operteStatus) {
+      message.error({
+        content: '发布已完成，不能进行执行操作',
+        duration: 1,
+        style: {
+          marginTop: '50vh',
+        },
+      });
+      return;
+    }
+    setExecuteStatus(true);
+    await PreReleaseServices.hotUpdateCheck({
+      user_name: user.name,
+      user_id: user.user_id,
+      check_num,
+    });
+    // 刷新界面
+    const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
+    onlineBranchGridApi.current?.setRowData(newData.onlineBranch);
+    setExecuteStatus(false);
+  };
+
   // 日志显示弹窗取消
   const autoCancle = () => {
     setLogModal({
@@ -595,6 +621,13 @@ const OnlineBranch: React.FC<any> = () => {
       coveStatus: { style: 'none', content: <div></div> },
     });
   };
+
+  useEffect(() => {
+    PreReleaseServices.getEnvList().then((res) => {
+      const formatdata = Object.entries(res)?.map(([k, v]) => ({ key: k, value: k, label: v }));
+      setHotEnvList(formatdata);
+    });
+  }, []);
 
   return (
     <div>
@@ -837,7 +870,7 @@ const OnlineBranch: React.FC<any> = () => {
                 <Col span={18}>
                   {/* 发布环境 */}
                   <Form.Item label="发布环境:" name="check_env" style={{ marginTop: -10 }}>
-                    <Select style={{ width: 415 }} showSearch options={[]} mode={'multiple'} />
+                    <Select style={{ width: 415 }} showSearch options={hotEnvList} />
                   </Form.Item>
                 </Col>
               </Row>

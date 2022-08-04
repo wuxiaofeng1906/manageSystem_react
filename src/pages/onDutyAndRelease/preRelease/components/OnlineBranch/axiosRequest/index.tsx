@@ -3,6 +3,7 @@ import { getDutyPersonPermission, getSystemPersonPermission } from '../../../aut
 import dayjs from 'dayjs';
 import { saveBeforeAndAfterOnlineAutoCheck } from '../../../comControl/axiosRequest';
 import { isEmpty } from 'lodash';
+import PreReleaseServices from '@/services/preRelease';
 
 const sys_accessToken = localStorage.getItem('accessId');
 axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
@@ -284,21 +285,21 @@ const checkHotFreshData = async (sourceData: any) => {
       return 'step3 热更新检查中发布环境不能为空！';
     }
   }
-
-  const authData = {
-    operate: `保存上线分支-是否可以热更新检查`,
-    method: 'post',
-    path: '/api/verify/release/hotupdate',
-  };
-  const dutyPermission = await getDutyPersonPermission(authData);
-  const systemPermission = await getSystemPersonPermission(authData);
-  if (dutyPermission.flag || systemPermission.flag) {
-    return '';
-  }
-  if (dutyPermission.errorMessage) {
-    return dutyPermission.errorMessage;
-  }
-  return systemPermission.errorMessage;
+  return '';
+  //   const authData = {
+  //     operate: `保存上线分支-是否可以热更新检查`,
+  //     method: 'post',
+  //     path: '/api/verify/release/hotupdate',
+  //   };
+  //   const dutyPermission = await getDutyPersonPermission(authData);
+  //   const systemPermission = await getSystemPersonPermission(authData);
+  //   if (dutyPermission.flag || systemPermission.flag) {
+  //     return '';
+  //   }
+  //   if (dutyPermission.errorMessage) {
+  //     return dutyPermission.errorMessage;
+  //   }
+  //   return systemPermission.errorMessage;
 };
 
 const checkOnlineAutoData = async () => {
@@ -652,6 +653,23 @@ const saveOnlineBranchData = async (
         ? `环境一致性检查保存失败：${enviromentCheck}`
         : `${returnMessage}；\n环境一致性检查保存失败：${enviromentCheck}`;
   }
+
+  // 热更新检查
+  console.log({
+    check_num: newOnlineBranchNum,
+    user_name: usersInfo.name,
+    user_id: usersInfo.userid,
+    check_env: sourceData.check_env,
+    is_ignore: isEmpty(sourceData.is_ignore) ? 'no' : 'yes',
+  });
+  const hotUpdateCheck = await PreReleaseServices.saveHotEnv({
+    check_num: newOnlineBranchNum,
+    user_name: usersInfo.name,
+    user_id: usersInfo.userid,
+    check_env: sourceData.imageevn,
+    is_ignore: isEmpty(sourceData.is_ignore) ? 'no' : 'yes',
+    release_env: sourceData.check_env,
+  });
 
   // 如果有勾选信息，才进行 自动化检查接口调用
   if (

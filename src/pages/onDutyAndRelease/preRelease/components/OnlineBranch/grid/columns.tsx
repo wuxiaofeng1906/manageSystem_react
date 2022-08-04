@@ -249,7 +249,7 @@ const beforeOnlineVersionCheck = (params: any) => {
               <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
             </Button>
            <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
-                onclick='versionCheckLogUrlClick(${JSON.stringify(values.check_url)})'>
+                onclick='versionCheckLogUrlClick(${JSON.stringify(values?.check_url)})'>
                 <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
             </Button>
           </div>
@@ -319,8 +319,8 @@ const beforeOnlineEnvCheck = (params: any) => {
               onclick='excuteCheckData("envCheck",${checkNum},${JSON.stringify(result)})'>
                 <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
               </Button>
-              <a href="${values.check_url}" target="_blank"  onclick="return visitCommenLog('${
-    values.check_url
+              <a href="${values?.check_url}" target="_blank"  onclick="return visitCommenLog('${
+    values?.check_url
   }')" >
                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
              </a>
@@ -349,7 +349,7 @@ const hotCheck = (params: any) => {
 
   // 解析时间
   let start = '';
-  if (values.check_start_time) {
+  if (values?.check_start_time) {
     start = dayjs(values.check_start_time).format('HH:mm:ss');
   }
 
@@ -369,20 +369,18 @@ const hotCheck = (params: any) => {
         <div style="height: 66px">
             <div style="margin-left: 120px;line-height: 26px" >
               <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
-              onclick='excuteCheckData("hotCheck",${checkNum},${JSON.stringify(
-    tips[values.check_status].text ?? '',
-  )})'>
+              onclick='hotUpdateCheck(${checkNum})'>
                 <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
               </Button>
-              <a href="${values.check_url}" target="_blank"  onclick="return visitCommenLog('${
-    values.check_log
+              <a href="${values?.check_log}" target="_blank"  onclick="return visitCommenLog('${
+    values?.check_log
   }')" >
                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
              </a>
             </div>
             <div style="line-height: 20px;font-size: 10px;width: 200px">
-                <div><label style="color: ${tips[values.check_status].color ?? 'black'}"> ${
-    tips[values.check_status].text ?? ''
+                <div><label style="color: ${tips[values?.check_status]?.color ?? 'black'}"> ${
+    tips[values?.check_status]?.text ?? ''
   }</label> &nbsp;${timeRange}</div>
             </div>
         </div>

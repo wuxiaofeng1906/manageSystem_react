@@ -257,11 +257,11 @@ const checkOnlineVersionData = async (sourceData: any) => {
 // 上线环境检查验证
 const checkOnlineEnvData = async (sourceData: any) => {
   //   只有没有勾选忽略检查，后面参数才必填
-  // if (sourceData.ignoreCheck === undefined || sourceData.ignoreCheck.length === 0) {
-  //   if (!sourceData.checkEnv) {
-  //     return '环境一致性检查中检察环境不能为空！';
-  //   }
-  // }
+  if (sourceData.ignoreCheck === undefined || sourceData.ignoreCheck.length === 0) {
+    if (!sourceData.checkEnv) {
+      return '环境一致性检查中检察环境不能为空！';
+    }
+  }
 
   const authData = {
     operate: `保存上线分支-环境一致性检查设置`,
@@ -662,7 +662,7 @@ const saveOnlineBranchData = async (
     check_env: sourceData.check_env,
     is_ignore: isEmpty(sourceData.is_ignore) ? 'no' : 'yes',
   });
-  const hotUpdateCheck = await PreReleaseServices.saveHotEnv({
+  await PreReleaseServices.saveHotEnv({
     check_num: newOnlineBranchNum,
     user_name: usersInfo.name,
     user_id: usersInfo.userid,

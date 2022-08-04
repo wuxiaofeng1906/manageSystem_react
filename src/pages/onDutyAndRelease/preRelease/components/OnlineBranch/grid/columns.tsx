@@ -372,11 +372,11 @@ const hotCheck = (params: any) => {
               onclick='hotUpdateCheck(${checkNum})'>
                 <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
               </Button>
-              <a href="${values?.check_log}" target="_blank"  onclick="return visitCommenLog('${
-    values?.check_log
-  }')" >
+              <div style="cursor: pointer" onclick='showCoverStatusLog(${JSON.stringify(
+                params.data?.hot_update?.check_log,
+              )}) >
                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
-             </a>
+             </div>
             </div>
             <div style="line-height: 20px;font-size: 10px;width: 200px">
                 <div><label style="color: ${tips[values?.check_status]?.color ?? 'black'}"> ${

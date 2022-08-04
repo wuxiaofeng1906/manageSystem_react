@@ -699,6 +699,7 @@ const OnlineBranch: React.FC<any> = () => {
         footer={null}
         width={900}
         bodyStyle={{ height: '680px' }}
+        destroyOnClose
       >
         <Form form={formForOnlineBranch}>
           {/* 总设置 */}

@@ -60,54 +60,61 @@ const RemoveModal = (
         3 :story: 规则【未开始、开发中、开发完】
         1 、-3 : bug/b_story: 规则【未开始、开发中】
      */
-    const list: { stage: number; id: number; category: string; flag: boolean }[] | undefined =
-      selected?.map((it) => ({
-        stage: it.stage,
-        id: it.id,
-        category: it.category,
-        flag: ['1', '-3'].includes(it.category)
-          ? [1, 2].includes(it.stage)
-            ? true
-            : false
-          : ['3'].includes(it.category)
-          ? [1, 2, 3].includes(it.stage)
-            ? true
-            : false
-          : false,
-      }));
+    const list:
+      | { stage: number; id: number; category: string; flag: boolean; ztNo: number }[]
+      | undefined = selected?.map((it) => ({
+      stage: it.stage,
+      id: it.id,
+      category: it.category,
+      ztNo: it.ztNo,
+      flag: ['1', '-3'].includes(it.category)
+        ? [1, 2].includes(it.stage)
+          ? true
+          : false
+        : ['3'].includes(it.category)
+        ? [1, 2, 3].includes(it.stage)
+          ? true
+          : false
+        : false,
+    }));
     if (isEmpty(selected)) return warnMessage('请先选择需要移除的需求！');
 
     // 不满足规则的
     const dissatisfy = list?.filter((it) => !it.flag);
     if (!isEmpty(dissatisfy)) {
       Modal.confirm({
-        width: 600,
+        width: 540,
         centered: true,
         title: '移除需求提醒',
-        // okText: '移除',
-        // cancelText: '去禅道',
+        closable: true,
+        okButtonProps: { style: { display: 'none' } },
+        cancelButtonProps: { style: { display: 'none' } },
         icon: <ExclamationCircleOutlined />,
-        onOk: () => {
+        onCancel: () => {
           console.log(list);
         },
         content: (
           <div style={{ maxHeight: 500, overflowY: 'auto' }}>
-            <p style={{ marginBottom: 5 }}>您需要移除的需求如下:请确认是否仍要移除？</p>
+            <p style={{ marginBottom: 5 }}>您需要移除的需求如下,请确认是否仍要移除？</p>
             {dissatisfy?.map((it) => (
-              <div style={{ display: 'flex', textIndent: '1em' }} key={it.id}>
+              <div style={{ display: 'flex', textIndent: '1em', marginBottom: 5 }} key={it.id}>
                 <div style={{ minWidth: 100 }}>{it.id}</div>
                 <div style={{ minWidth: 100 }}>阶段为：{stageType[it.stage]}</div>
-                <Space>
+                <Space style={{ marginLeft: 10 }}>
                   <Button
+                    size={'small'}
                     onClick={() => {
-                      console.log('移除');
+                      console.log('移除', it);
                     }}
                   >
                     移除
                   </Button>
                   <Button
+                    size={'small'}
+                    type={'primary'}
                     onClick={() => {
-                      console.log('去禅道');
+                      if (!it.ztNo) return;
+                      window.open(`http://zentao.77hub.com/zentao/execution-task-${it.ztNo}.html`);
                     }}
                   >
                     去禅道

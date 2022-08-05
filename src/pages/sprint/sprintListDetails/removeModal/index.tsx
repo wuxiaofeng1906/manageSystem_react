@@ -96,7 +96,7 @@ const RemoveModal = (
             <p style={{ marginBottom: 5 }}>您需要移除的需求如下,请确认是否仍要移除？</p>
             {dissatisfy?.map((it) => (
               <div style={{ display: 'flex', textIndent: '1em', marginBottom: 5 }} key={it.id}>
-                <div style={{ minWidth: 100 }}>{it.id}</div>
+                <div style={{ minWidth: 100 }}>{it.ztNo}</div>
                 <div style={{ minWidth: 100 }}>阶段为：{stageType[it.stage]}</div>
                 <Space style={{ marginLeft: 10 }}>
                   <Button
@@ -135,7 +135,7 @@ const RemoveModal = (
 
   const columns: ColumnsType<any> = [
     { title: '序号', render: (v, r, i) => i + 1, width: 60 },
-    { title: '编号', dataIndex: 'id', width: 90 },
+    { title: '编号', dataIndex: 'ztNo', width: 90 },
     { title: '标题内容', dataIndex: 'title' },
     { title: '相关需求', dataIndex: 'relatedStories', width: 90 },
     { title: '相关bug', dataIndex: 'relatedBugs', width: 90 },

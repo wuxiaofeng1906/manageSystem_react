@@ -55,7 +55,7 @@ const getColums = (prjNames: any) => {
       field: 'stage',
       pinned: 'left',
       valueGetter: stageValueGetter,
-      cellRenderer: stageRenderer,
+      cellRenderer: 'stageRender',
       minWidth: 155,
     },
     {

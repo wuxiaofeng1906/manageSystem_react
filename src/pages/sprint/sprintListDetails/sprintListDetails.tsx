@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { useRequest } from 'ahooks';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { useGqlClient } from '@/hooks';
 import {
   PageHeader,
@@ -33,6 +33,7 @@ import {
   ReloadOutlined,
   ClearOutlined,
   ExclamationCircleOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 import {
   getProjectInfo,
@@ -1674,6 +1675,35 @@ const SprintList: React.FC<any> = () => {
             onColumnEverythingChanged={onGridReady}
             tooltipShowDelay={500}
             onFilterModified={getGridFilterValue}
+            frameworkComponents={{
+              stageRender: (params: CellClickedEvent) => {
+                const lineThroughStage = ['已取消', '开发已revert', '测试已验证revert'];
+                return (
+                  <div>
+                    <span
+                      style={{
+                        color: params.value == '未开始' ? 'red' : 'initial',
+                        textDecoration: lineThroughStage.includes(params.value)
+                          ? 'line-through'
+                          : 'initial',
+                      }}
+                    >
+                      {params.value}
+                    </span>
+                    {/*开发已revert提示*/}
+                    <Tooltip title={'开发已revert代码'}>
+                      <InfoCircleOutlined
+                        style={{
+                          color: '#ccc',
+                          marginLeft: 8,
+                          display: params.value == '未开始' ? 'none' : 'initial',
+                        }}
+                      />
+                    </Tooltip>
+                  </div>
+                );
+              },
+            }}
           />
         </div>
       </Spin>

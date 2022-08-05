@@ -246,6 +246,9 @@ const OnlineBranch: React.FC<any> = () => {
         branchCheckId: oraData.checkHead?.branchCheckId,
         versionCheckId: oraData.versonCheck?.versionCheckId,
         envCheckId: oraData.envCheck?.checkId,
+        // 是否可热更新检查
+        is_ignore: oraData.hotCheck?.is_ignore,
+        check_env: oraData.hotCheck?.check_env,
         // beforeAutomationId: oraData.beforeOnlineCheck?.automationId,
         // afterAutomationId: oraData.afterOnlineCheck?.automationId,
       });
@@ -601,8 +604,8 @@ const OnlineBranch: React.FC<any> = () => {
     }
     setExecuteStatus(true);
     await PreReleaseServices.hotUpdateCheck({
-      user_name: user.name,
-      user_id: user.user_id,
+      user_name: user?.name,
+      user_id: user?.user_id,
       check_num,
     });
     // 刷新界面

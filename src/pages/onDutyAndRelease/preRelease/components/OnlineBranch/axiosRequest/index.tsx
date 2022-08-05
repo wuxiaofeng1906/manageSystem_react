@@ -181,6 +181,7 @@ const getModifiedData = async (checkNum: string) => {
     envCheck: alayEnvironmentCheck(source_data),
     beforeOnlineCheck: autoCheck(source_data).beforeOnline,
     afterOnlineCheck: autoCheck(source_data).afterOnline,
+    hotCheck: source_data.hotCheck,
   };
 };
 

@@ -333,16 +333,15 @@ const beforeOnlineEnvCheck = (params: any) => {
 };
 // 是否可以热更新检查
 const hotCheck = (params: any) => {
-  if (!params.value || params.value.length === 0) {
+  if (isEmpty(params.value)) {
     return '';
   }
-  const values = params.value[0]; // 也只会有一条数据
-  // 'wait', 'running', 'yes', 'no', 'skip'
+  const values = params.value[0];
   const tips = {
     wait: { text: '未开始' },
     running: { text: '执行中', color: '#46A0FC' },
-    yes: { text: '是', color: '#2BF541' },
-    no: { text: '否', color: '#8B4513' },
+    yes: { text: '可热更', color: '#2BF541' },
+    no: { text: '不可热更', color: '#8B4513' },
     skip: { text: '忽略', color: 'blue' },
   };
   // 显示结果和颜色
@@ -373,7 +372,7 @@ const hotCheck = (params: any) => {
                 <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
               </Button>
               <div style="cursor: pointer" onclick='showCoverStatusLog(${JSON.stringify(
-                params.data?.hot_update?.check_log,
+                values?.hot_update?.check_log,
               )}) >
                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
              </div>

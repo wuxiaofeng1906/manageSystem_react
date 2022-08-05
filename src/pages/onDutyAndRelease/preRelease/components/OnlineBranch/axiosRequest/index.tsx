@@ -181,7 +181,7 @@ const getModifiedData = async (checkNum: string) => {
     envCheck: alayEnvironmentCheck(source_data),
     beforeOnlineCheck: autoCheck(source_data).beforeOnline,
     afterOnlineCheck: autoCheck(source_data).afterOnline,
-    hotCheck: source_data.hotCheck,
+    hotCheck: source_data.hot_update_check,
   };
 };
 
@@ -656,21 +656,18 @@ const saveOnlineBranchData = async (
   }
 
   // 热更新检查
-  console.log({
-    check_num: newOnlineBranchNum,
-    user_name: usersInfo.name,
-    user_id: usersInfo.userid,
-    check_env: sourceData.check_env,
-    is_ignore: isEmpty(sourceData.is_ignore) ? 'no' : 'yes',
-  });
-  await PreReleaseServices.saveHotEnv({
-    check_num: newOnlineBranchNum,
-    user_name: usersInfo.name,
-    user_id: usersInfo.userid,
-    check_env: sourceData.imageevn,
-    is_ignore: isEmpty(sourceData.is_ignore) ? 'no' : 'yes',
-    release_env: sourceData.check_env,
-  });
+  try {
+    await PreReleaseServices.saveHotEnv({
+      check_num: newOnlineBranchNum,
+      user_name: usersInfo.name,
+      user_id: usersInfo.userid,
+      check_env: sourceData.imageevn,
+      is_ignore: isEmpty(sourceData.is_ignore) ? 'no' : 'yes',
+      release_env: sourceData.check_env ?? '',
+    });
+  } catch (e) {
+    returnMessage = `热更新检查保存失败：${e}`;
+  }
 
   // 如果有勾选信息，才进行 自动化检查接口调用
   if (

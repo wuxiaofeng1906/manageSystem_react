@@ -39,6 +39,8 @@ import { alalysisInitData } from '../../datas/dataAnalyze';
 import { getGridRowsHeight } from '../gridHeight';
 import { releaseAppChangRowColor } from '../../operate';
 import PreReleaseServices from '@/services/preRelease';
+import { isEmpty } from 'lodash';
+import { infoMessage } from '@/publicMethods/showMessages';
 
 let newOnlineBranchNum = '';
 const OnlineBranch: React.FC<any> = () => {
@@ -247,8 +249,8 @@ const OnlineBranch: React.FC<any> = () => {
         versionCheckId: oraData.versonCheck?.versionCheckId,
         envCheckId: oraData.envCheck?.checkId,
         // 是否可热更新检查
-        is_ignore: oraData.hotCheck?.is_ignore,
-        check_env: oraData.hotCheck?.check_env,
+        is_ignore: isEmpty(oraData.hotCheck?.release_env) ? ['1'] : undefined,
+        check_env: oraData.hotCheck?.release_env,
         // beforeAutomationId: oraData.beforeOnlineCheck?.automationId,
         // afterAutomationId: oraData.afterOnlineCheck?.automationId,
       });
@@ -401,6 +403,22 @@ const OnlineBranch: React.FC<any> = () => {
       autoUrl: { style: 'none', ui: '', api: '' },
       versionUrl: { style: 'none', content: <div></div> },
       coveStatus: { style: 'none', content: <div></div> },
+    });
+  };
+
+  (window as any).showHotUpdateCheckLog = (log: string) => {
+    if (!log) {
+      infoMessage('暂无可热更新检查日志！');
+      return;
+    }
+    return Modal.info({
+      title: '热更新检查日志',
+      width: 520,
+      okButtonProps: { style: { display: 'none' } },
+      closable: true,
+      content: (
+        <div style={{ whiteSpace: 'pre-wrap', maxHeight: 500, overflowY: 'auto' }}>{log}</div>
+      ),
     });
   };
 
@@ -591,27 +609,26 @@ const OnlineBranch: React.FC<any> = () => {
     setExecuteStatus(false);
   };
   // 是否可热更新检查
-  (window as any).hotUpdateCheck = async (check_num: string) => {
+  (window as any).hotUpdateCheckStatus = async (check_num: string, status: string) => {
+    if (status == 'running') return infoMessage('正在执行中，请稍后');
     if (operteStatus) {
-      message.error({
-        content: '发布已完成，不能进行执行操作',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      infoMessage('发布已完成，不能进行执行操作');
       return;
     }
     setExecuteStatus(true);
-    await PreReleaseServices.hotUpdateCheck({
-      user_name: user?.name,
-      user_id: user?.user_id,
-      check_num,
-    });
-    // 刷新界面
-    const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
-    onlineBranchGridApi.current?.setRowData(newData.onlineBranch);
-    setExecuteStatus(false);
+    try {
+      await PreReleaseServices.hotUpdateCheck({
+        user_name: user?.name,
+        user_id: user?.userid,
+        check_num,
+      });
+      // 刷新界面
+      const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
+      onlineBranchGridApi.current?.setRowData(newData.onlineBranch);
+      setExecuteStatus(false);
+    } catch (e) {
+      setExecuteStatus(false);
+    }
   };
 
   // 日志显示弹窗取消

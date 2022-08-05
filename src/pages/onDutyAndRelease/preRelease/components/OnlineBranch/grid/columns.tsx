@@ -336,7 +336,12 @@ const hotCheck = (params: any) => {
   if (isEmpty(params.value)) {
     return '';
   }
-  const values = params.value[0];
+  const hot_update_check = params.value;
+  let start = '';
+  let end = '';
+  let timeRange = '';
+  const checkNum = JSON.stringify(params.data?.check_num);
+
   const tips = {
     wait: { text: '未开始' },
     running: { text: '执行中', color: '#46A0FC' },
@@ -344,42 +349,36 @@ const hotCheck = (params: any) => {
     no: { text: '不可热更', color: '#8B4513' },
     skip: { text: '忽略', color: 'blue' },
   };
-  // 显示结果和颜色
-
-  // 解析时间
-  let start = '';
-  if (values?.check_start_time) {
-    start = dayjs(values.check_start_time).format('HH:mm:ss');
+  if (hot_update_check?.check_start_time) {
+    start = dayjs(hot_update_check.check_start_time).format('HH:mm:ss');
   }
-
-  let end = '';
-  if (values?.check_end_time) {
-    end = dayjs(values.check_end_time).format('HH:mm:ss');
+  if (hot_update_check?.check_end_time) {
+    end = dayjs(hot_update_check.check_end_time).format('HH:mm:ss');
   }
-
-  let timeRange = '';
   if (start) {
     timeRange = end ? `${start}~${end}` : start;
   }
-
-  const checkNum = JSON.stringify(params.data?.check_num);
-
   return `
         <div style="height: 66px">
             <div style="margin-left: 120px;line-height: 26px" >
-              <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
-              onclick='hotUpdateCheck(${checkNum})'>
-                <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
-              </Button>
-              <div style="cursor: pointer" onclick='showCoverStatusLog(${JSON.stringify(
-                values?.hot_update?.check_log,
-              )}) >
-               <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
-             </div>
+              <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
+                    style="margin-right: 10px;cursor: pointer"
+                    onclick='hotUpdateCheckStatus(${checkNum},${JSON.stringify(
+    hot_update_check?.check_status,
+  )})'/>
+                  <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
+                          onclick='showHotUpdateCheckLog(${JSON.stringify(
+                            hot_update_check?.check_log,
+                          )})'>
+                    <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+                  </Button>
             </div>
-            <div style="line-height: 20px;font-size: 10px;width: 200px">
-                <div><label style="color: ${tips[values?.check_status]?.color ?? 'black'}"> ${
-    tips[values?.check_status]?.text ?? ''
+            <div style="font-size: 10px;width: 200px;height:40px">
+                <div>
+                    <label style="color: ${
+                      tips[hot_update_check?.check_status]?.color ?? 'black'
+                    }"> ${
+    tips[hot_update_check?.check_status]?.text ?? ''
   }</label> &nbsp;${timeRange}</div>
             </div>
         </div>

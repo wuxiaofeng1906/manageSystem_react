@@ -503,16 +503,18 @@ const UpgradeService: React.FC<any> = () => {
   const saveUperConfirmInfo = async (newValue: string, props: any, checkStepFourSource = false) => {
     const currentReleaseNum = props.data?.ready_release_num;
     // checkStepFourSource: 检查step 4的上线环境是否存在未填【1.填写了应用2.填写了升级接口】
-    if (checkStepFourSource) infoMessage('step4 中上线环境未填写，不能修改服务已确认！');
     // 验证是否可以修改确认值
-    if (
-      checkStepFourSource ||
-      !serverConfirmJudge(
-        currentOperateStatus,
-        props,
-        formUpgradeService.getFieldValue('hitMessage'),
-      )
-    ) {
+
+    // 测试确认服务 集群是否未填写
+    const testCheckEnv = checkStepFourSource && props.column.colId == 'test_confirm_status';
+    // 测试确认开发是否已确认
+    const checkDeveloper = serverConfirmJudge(
+      currentOperateStatus,
+      props,
+      formUpgradeService.getFieldValue('hitMessage'),
+    );
+    if (testCheckEnv && checkDeveloper) infoMessage('step4 中上线环境未填写，不能修改服务已确认！');
+    if (!checkDeveloper || testCheckEnv) {
       // (不管成功或者失败)刷新表格
       const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
       serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
@@ -782,7 +784,7 @@ const UpgradeService: React.FC<any> = () => {
                   frameworkComponents={{
                     confirmSelectChoice: (props: any) => {
                       applicantConfirmForm.setFieldsValue({
-                        test_confirm_status: props.value,
+                        [props.column.colId]: props.value,
                       });
                       let Color = 'black';
                       const currentValue = props.value;
@@ -803,14 +805,18 @@ const UpgradeService: React.FC<any> = () => {
                       }
 
                       return (
-                        <Form form={applicantConfirmForm}>
+                        <Form
+                          form={applicantConfirmForm}
+                          key={props.column.colId}
+                          initialValues={{ [props.column.colId]: props.value }}
+                        >
                           <Form.Item
                             noStyle
                             shouldUpdate={(old, next) => old.status != next.status}
                           >
                             {({ getFieldValue }) => {
                               return (
-                                <Form.Item name={'test_confirm_status'}>
+                                <Form.Item name={props.column.colId}>
                                   <Select
                                     size={'small'}
                                     bordered={false}

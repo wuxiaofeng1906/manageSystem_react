@@ -39,9 +39,7 @@ const RemoveModal = (
         commit: undefined,
         revert: undefined,
         relatedStories: it.relatedStories ?? 0,
-        tester: isEmpty(it.tester)
-          ? []
-          : it.tester?.map((it: any) => ({ label: it.id, value: it.name })),
+        tester: isEmpty(it.tester) ? [] : it.tester?.map((it: any) => it.id),
         testCheck: isEmpty(it.testCheck) ? Math.abs(Number(it.testCheck)).toString() : undefined,
       })) ?? [];
     form.setFieldsValue({ formList: formData });
@@ -137,7 +135,7 @@ const RemoveModal = (
 
   const columns: ColumnsType<any> = [
     { title: '序号', render: (v, r, i) => i + 1, width: 60 },
-    { title: '编号', dataIndex: 'ztNo', width: 90 },
+    { title: '编号', dataIndex: 'id', width: 90 },
     { title: '标题内容', dataIndex: 'title' },
     { title: '相关需求', dataIndex: 'relatedStories', width: 90 },
     { title: '相关bug', dataIndex: 'relatedBugs', width: 90 },
@@ -145,31 +143,37 @@ const RemoveModal = (
       title: '测试',
       dataIndex: 'tester',
       render: (value, record, i) => {
-        const formList = form.getFieldsValue()?.formList;
-
         return (
-          <Form.Item
-            name={['formList', i, 'tester']}
-            rules={[
-              {
-                required:
-                  formList[i].testCheck == '1' &&
-                  (isEmpty(formList[i].tester) || formList[i].tester?.[0] == 'NA'),
-                message: '请填写测试人员！',
-              },
-            ]}
-            shouldUpdate={true}
-          >
-            <Select
-              options={[
-                [{ label: 'NA', value: 'NA', key: 'NA', disabled: !isEmpty(formList[i].tester) }],
-                ...testUser,
-              ]}
-              showSearch
-              optionFilterProp={'label'}
-              size={'small'}
-              mode={'multiple'}
-            />
+          <Form.Item noStyle shouldUpdate>
+            {() => {
+              const values = form.getFieldsValue()?.formList?.[i];
+              return (
+                <Form.Item
+                  name={['formList', i, 'tester']}
+                  rules={[
+                    {
+                      validator: (r, v, cb) => {
+                        // 需要测试验证：测试人员必填
+                        if (
+                          values?.testCheck == '1' &&
+                          (isEmpty(v) || (v?.length == 1 && v?.[0] == 'NA'))
+                        )
+                          return cb('请填写测试人员!');
+                        else cb();
+                      },
+                    },
+                  ]}
+                >
+                  <Select
+                    options={[...[{ label: 'NA', value: 'NA' }], ...testUser]}
+                    showSearch
+                    optionFilterProp={'label'}
+                    size={'small'}
+                    mode={'multiple'}
+                  />
+                </Form.Item>
+              );
+            }}
           </Form.Item>
         );
       },
@@ -206,7 +210,7 @@ const RemoveModal = (
                     size={'small'}
                     onChange={(v) => {
                       const status = v == '0';
-                      formList[i].revert = status ? '-1' : undefined;
+                      formList[i].revert = status ? '-1' : undefined; // 提交代码为否： 代码revert 自动为免且不可编辑
                       formList[i].commit = v;
                       setFieldsValue({ formList: formList });
                     }}
@@ -226,15 +230,27 @@ const RemoveModal = (
           <Form.Item noStyle shouldUpdate>
             {() => {
               const values = form.getFieldsValue()?.formList?.[i];
+              console.log(values);
               return (
                 <Form.Item
                   name={['formList', i, 'revert']}
-                  rules={[{ required: true, message: '请填写代码是否Revert！' }]}
+                  rules={[
+                    {
+                      validator: (r, v, cb) => {
+                        if (values?.commit == '1' && v == '0') return cb('必须revert代码！');
+                        else if (v == undefined) return cb('必须revert代码！');
+                        return cb();
+                      },
+                    },
+                  ]}
                 >
                   <Select
                     size={'small'}
-                    options={list.concat([{ label: '免', value: '-1' }])}
                     disabled={values?.commit == '0'}
+                    options={list.concat([{ label: '免', value: '-1' }]).map((it) => ({
+                      ...it,
+                      disabled: values?.commit == '1' && it.value == '0', // 提交代码，revert 否：不可选
+                    }))}
                   />
                 </Form.Item>
               );
@@ -257,7 +273,7 @@ const RemoveModal = (
                   name={['formList', i, 'reason']}
                   rules={[
                     {
-                      required: values?.revert == '-1' && values?.commit == '1',
+                      required: values?.revert == '-1' && values?.commit == '1', // 人工修改为免且代码提交为是： 原因必填
                       message: '请填写免revert原因！',
                     },
                   ]}

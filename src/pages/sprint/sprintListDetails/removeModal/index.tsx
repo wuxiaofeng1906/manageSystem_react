@@ -145,13 +145,26 @@ const RemoveModal = (
       title: '测试',
       dataIndex: 'tester',
       render: (value, record, i) => {
+        const formList = form.getFieldsValue()?.formList;
+
         return (
           <Form.Item
             name={['formList', i, 'tester']}
-            rules={[{ required: true, message: '请填写测试人员！' }]}
+            rules={[
+              {
+                required:
+                  formList[i].testCheck == '1' &&
+                  (isEmpty(formList[i].tester) || formList[i].tester?.[0] == 'NA'),
+                message: '请填写测试人员！',
+              },
+            ]}
+            shouldUpdate={true}
           >
             <Select
-              options={testUser}
+              options={[
+                [{ label: 'NA', value: 'NA', key: 'NA', disabled: !isEmpty(formList[i].tester) }],
+                ...testUser,
+              ]}
               showSearch
               optionFilterProp={'label'}
               size={'small'}

@@ -37,6 +37,8 @@ let otherSaveCondition: any = {
 let onlineEnv: any = [];
 const { Option } = Select;
 const envType = {
+  '集群0-8':
+    'cn-northwest-0,cn-northwest-1,cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-8',
   '集群1-8':
     'cn-northwest-1,cn-northwest-2,cn-northwest-3,cn-northwest-4,cn-northwest-5,cn-northwest-6,cn-northwest-7,cn-northwest-8',
   '集群2-8':

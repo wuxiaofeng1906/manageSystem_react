@@ -172,13 +172,13 @@ export default [
         hideInMenu: true,
       },
       {
-        name: '发布公告',
+        name: '升级公告',
         icon: 'table',
         path: 'announcementList',
         component: './onDutyAndRelease/announcement/announcementList',
       },
       {
-        name: '发布公告详情',
+        name: '升级公告详情',
         icon: 'table',
         path: 'announcementDetail/:id/:type/:status',
         component: './onDutyAndRelease/announcement/announcementDetail',

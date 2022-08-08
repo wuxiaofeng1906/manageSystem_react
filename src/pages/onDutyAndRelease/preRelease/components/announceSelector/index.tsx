@@ -73,11 +73,11 @@ const AnnounceSelector = ({
                   src="../../../annouce.png"
                   width="20"
                   height="20"
-                  alt="发布公告"
-                  title="发布公告"
+                  alt="升级公告"
+                  title="升级公告"
                   style={{ marginRight: 5 }}
                 />
-                关联发布公告
+                关联升级公告
               </strong>
             }
           >

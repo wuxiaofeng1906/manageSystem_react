@@ -44,10 +44,12 @@ const getOnlineEnv = async (releaseType: any) => {
         : 'other',
     }));
     if (releaseType === 'gray') {
-      opt = data.filter((it: any) => !['global', '集群0'].includes(it.label));
+      opt = data.filter((it: any) => !['global', '集群0', '集群0-8'].includes(it.label));
     }
     if (releaseType === 'online') {
-      opt = data.filter((it: any) => !['global', '集群0', '集群1', '集群1-8'].includes(it.label));
+      opt = data.filter(
+        (it: any) => !['global', '集群0', '集群1', '集群0-8', '集群1-8'].includes(it.label),
+      );
     }
   }
   return opt;
@@ -76,8 +78,8 @@ const editReleaseForm = async (releaseInfo: any, otherCondition: any) => {
   }
 
   const data = {
-    user_name: users.name,
-    user_id: users.userid,
+    user_name: users?.name,
+    user_id: users?.userid,
     ready_release_num: otherCondition.grayReleaseNums.join(','),
     online_release_num: otherCondition.onlineReleaseNum, // 正式发布编号
     release_result: otherCondition.releaseResult, // 发布结果

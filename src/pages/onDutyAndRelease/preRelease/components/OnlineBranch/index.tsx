@@ -406,18 +406,40 @@ const OnlineBranch: React.FC<any> = () => {
     });
   };
 
-  (window as any).showHotUpdateCheckLog = (log: string) => {
+  (window as any).showHotUpdateCheckLog = (log: {
+    present_env: string;
+    online_env: string;
+    servers_check: string;
+  }) => {
     if (!log) {
       infoMessage('暂无可热更新检查日志！');
       return;
     }
     return Modal.info({
       title: '热更新检查日志',
-      width: 520,
+      width: 1200,
       okButtonProps: { style: { display: 'none' } },
       closable: true,
       content: (
-        <div style={{ whiteSpace: 'pre-wrap', maxHeight: 500, overflowY: 'auto' }}>{log}</div>
+        <div style={{ whiteSpace: 'pre-wrap', maxHeight: 500, overflowY: 'auto' }}>
+          <div style={{ display: 'flex' }}>
+            <div style={{ width: '30%' }}>
+              <strong>收集数据当前环境数据：</strong>
+              <br />
+              {log.present_env}
+            </div>
+            <div style={{ width: '30%' }}>
+              <strong>收集数据线上环境数据：</strong>
+              <br />
+              {log.online_env}
+            </div>
+            <div style={{ width: '40%' }}>
+              <strong>集群服务状态版本检查：</strong>
+              <br />
+              {log.servers_check}
+            </div>
+          </div>
+        </div>
       ),
     });
   };

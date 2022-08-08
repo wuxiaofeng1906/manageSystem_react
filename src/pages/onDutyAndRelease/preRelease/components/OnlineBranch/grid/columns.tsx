@@ -737,7 +737,7 @@ const getOnlineBranchColumns = () => {
       minWidth: 190,
     },
     {
-      headerName: '上线前环境检查是否通过',
+      headerName: '环境一致性检查是否通过',
       field: 'env_check',
       minWidth: 190,
       cellRenderer: beforeOnlineEnvCheck,

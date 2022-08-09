@@ -2,14 +2,12 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Button, Col, Form, Row, Select, Spin, TreeSelect, DatePicker } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-enterprise';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { useRequest } from 'ahooks';
 import {
   zentaoExcutionSelect,
   zentaoStorySelect,
   zentaoDevCenterSelect,
+  zentaoAppServerSelect,
 } from './component/selector';
 import { getHeight } from '@/publicMethods/pageSet';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
@@ -24,12 +22,14 @@ import {
   judgeTaskName,
 } from './grid/datas';
 import moment from 'moment';
-import { errorMessage, sucMessage } from '@/publicMethods/showMessages';
+import { errorMessage, infoMessage, sucMessage } from '@/publicMethods/showMessages';
 import { createZentaoTaskDecompose } from './taskCreate';
 import dayjs from 'dayjs';
+import { isEmpty } from 'lodash';
 
 const { SHOW_PARENT } = TreeSelect;
 let devCenterPerson: any;
+let appServerList: string[] = [];
 // 组件初始化
 const TaskDecompose: React.FC<any> = () => {
   /* region 表格事件 */
@@ -57,7 +57,6 @@ const TaskDecompose: React.FC<any> = () => {
         gridData.push(rowData);
       }
     });
-
     return gridData;
   };
   /* endregion 表格事件 */
@@ -65,6 +64,7 @@ const TaskDecompose: React.FC<any> = () => {
   /* region 下拉框加载 */
   const excutionSelect = useRequest(() => zentaoExcutionSelect()).data;
   const devCenterSelect: any = useRequest(() => zentaoDevCenterSelect()).data;
+  const appServerSource: any = useRequest(() => zentaoAppServerSelect()).data;
   /* endregion 下拉框加载 */
 
   /* region 操作栏相关事件 */
@@ -168,7 +168,7 @@ const TaskDecompose: React.FC<any> = () => {
     let fianlData = [];
     // 通过currentValue的triggerValue可以拿到当前选择的值，之前选择的值就不用再改变了。
     const selectedValue = currentValue.triggerValue;
-    debugger;
+
     if (currentValue.checked) {
       // 是选中的话就增加记录，如果是false，则删除本条记录
       //  需要同步到下面表格中，一个需求生成5条数据,如果小于4个需求，则显示4块，其他的为空白即可。
@@ -210,8 +210,17 @@ const TaskDecompose: React.FC<any> = () => {
       errorMessage('禅道需求不能为空！');
       return;
     }
-    setCreateState(true);
+    // 任务类型为开发时，应用服务不能为空
     const gridData: any = getOraGridData(); // 获取表格数据
+    let validRow: number[] = [];
+    gridData.forEach((it: any, index: number) => {
+      if (it.task_type_name == '开发' && isEmpty(it.app_server)) {
+        validRow.push(index + 1);
+      }
+    });
+    if (!isEmpty(validRow))
+      return infoMessage(`第${validRow.join(',')}行中任务类型为开发，应用服务不能为空！`);
+    setCreateState(true);
     const createResult = await createZentaoTaskDecompose(
       gridData,
       formForTaskQuery.getFieldValue('execution'),
@@ -310,6 +319,11 @@ const TaskDecompose: React.FC<any> = () => {
   useEffect(() => {
     devCenterPerson = devCenterSelect;
   }, [devCenterSelect]);
+
+  useEffect(() => {
+    appServerList = appServerSource;
+  }, [appServerSource]);
+
   return (
     <div>
       <Header />
@@ -471,6 +485,64 @@ const TaskDecompose: React.FC<any> = () => {
                         planTimeChaned(props, currentValue);
                       }}
                     />
+                  );
+                },
+                tailoring: (params: any) => {
+                  return params.data?.No === 6 ? (
+                    ''
+                  ) : (
+                    <Select
+                      options={[
+                        { label: '是', value: 'yes' },
+                        { label: '否', value: 'no' },
+                      ]}
+                      defaultValue={params.value}
+                      disabled={params.data.add_type == 'add'}
+                      bordered={false}
+                      style={{ width: '100%' }}
+                      onChange={(v) => {
+                        let rowNode = gridApi.current?.getRowNode(params.rowIndex);
+                        // 为是： 标题修改为无，应用服务为 不涉及
+                        rowNode?.setData({
+                          ...params.data,
+                          is_tailoring: v,
+                          origin_task_name: params.data.task_name, // 用于将任务名称还原为最初的标题
+                          app_server:
+                            v == 'yes' && params.data.task_type_name == '开发'
+                              ? ['notinvolved']
+                              : [],
+                          task_name:
+                            v == 'yes'
+                              ? `${params.data.task_name.split('】')[0]}】无`
+                              : params.data.origin_task_name || params.data.task_name,
+                        });
+                      }}
+                    />
+                  );
+                },
+                appServer: (params: any) => {
+                  return params.data?.No === 6 ? (
+                    ''
+                  ) : (
+                    <Select
+                      style={{ width: '110%' }}
+                      mode={'multiple'}
+                      defaultValue={params.value}
+                      bordered={false}
+                      showArrow
+                      maxTagCount={'responsive'}
+                      optionFilterProp={'children'}
+                      onChange={(v) => {
+                        let rowNode = gridApi.current?.getRowNode(params.rowIndex);
+                        rowNode?.setData({ ...params.data, app_server: v });
+                      }}
+                    >
+                      {appServerList?.map((it) => (
+                        <Select.Option value={it} key={it}>
+                          {it == 'notinvolved' ? '不涉及' : it}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   );
                 },
               }}

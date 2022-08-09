@@ -4,27 +4,29 @@ const gridColumns: any = [
     field: 'No',
     minWidth: 65,
     width: 90,
-    pinned: "left",
+    pinned: 'left',
     cellRenderer: (params: any) => {
       if (params.data?.No === 6) {
-        return "";
+        return '';
       }
       return params.value;
-    }
-  }, {
+    },
+  },
+  {
     headerName: '增加类型',
     field: 'add_type_name',
-    pinned: "left"
-  }, {
+    pinned: 'left',
+  },
+  {
     headerName: '任务名称',
     field: 'task_name',
     minWidth: 300,
     width: 90,
-    pinned: "left",
+    pinned: 'left',
     cellEditorPopup: true,
     cellEditor: 'agLargeTextCellEditor',
     cellEditorParams: {
-      rows: 2
+      rows: 2,
     },
     editable: (params: any) => {
       if (params.data?.No === 6) {
@@ -32,19 +34,21 @@ const gridColumns: any = [
       }
       return true;
     },
-  }, {
+  },
+  {
     headerName: '所属模块',
     field: 'module',
     valueFormatter: (params: any) => {
       if (params.data?.No === 6) {
-        return "";
+        return '';
       }
       if (!params.value) {
-        return "/";
+        return '/';
       }
       return params.value;
-    }
-  }, {
+    },
+  },
+  {
     headerName: '相关需求',
     field: 'subtask_dev_needs',
     minWidth: 90,
@@ -57,29 +61,35 @@ const gridColumns: any = [
           </div>`;
       }
       return params.value;
-    }
-  }, {
+    },
+  },
+  {
     headerName: '指派给',
     field: 'assigned_person',
     minWidth: 120,
-    cellRenderer: "assigenedTo",
-  }, {
+    cellRenderer: 'assigenedTo',
+  },
+  {
     headerName: '预计开始',
     field: 'plan_start',
     minWidth: 150,
-    cellRenderer: "timeRender",
-  }, {
+    cellRenderer: 'timeRender',
+  },
+  {
     headerName: '预计截止',
     field: 'plan_end',
     minWidth: 150,
-    cellRenderer: "timeRender"
-  }, {
+    cellRenderer: 'timeRender',
+  },
+  {
     headerName: '优先级',
     field: 'priority',
-  }, {
+  },
+  {
     headerName: '任务类型',
     field: 'task_type_name',
-  }, {
+  },
+  {
     headerName: '最初预计',
     field: 'estimate',
     editable: (params: any) => {
@@ -88,7 +98,20 @@ const gridColumns: any = [
       }
       return true;
     },
-  }, {
+  },
+  {
+    headerName: '是否裁剪',
+    field: 'is_tailoring',
+    cellRenderer: 'tailoring',
+    minWidth: 120,
+  },
+  {
+    minWidth: 300,
+    headerName: '应用服务',
+    field: 'app_server',
+    cellRenderer: 'appServer',
+  },
+  {
     headerName: '任务描述',
     field: 'desc',
     editable: (params: any) => {
@@ -97,41 +120,38 @@ const gridColumns: any = [
       }
       return true;
     },
-  }, {
+  },
+  {
     headerName: '所属端',
     field: 'belongs_name',
-  }, {
+  },
+  {
     headerName: '任务来源',
     field: 'tasksource_name',
-  }, {
-    headerName: '是否裁剪',
-    field: 'is_tailoring',
-    valueFormatter: (params: any) => {
-      if (params.data?.No === 6) {
-        return "";
-      }
-      if (params.value === "yes") {
-        return "是";
-      }
-      return "否";
-    }
-  }
+  },
 ];
 
 // 设置cell颜色，可编辑为白色，不可编辑为灰色。
 const setCellStyle = (params: any) => {
-
   if (params.data?.No === 6) {
-    return {"background-color": "white"}
+    return { 'background-color': 'white' };
   }
-  const style = {"line-height": "25px"}
-  const whiteCell = ["task_name", "assigned_person", "plan_start", "plan_end", "estimate", "desc"];
+  const style = { 'line-height': '25px' };
+  const whiteCell = [
+    'task_name',
+    'assigned_person',
+    'plan_start',
+    'plan_end',
+    'estimate',
+    'desc',
+    'is_tailoring',
+    'app_server',
+  ];
   if (whiteCell.indexOf(params.column?.colId) < 0) {
-    style["background-color"] = '#F8F8F8';
+    style['background-color'] = '#F8F8F8';
   } else {
-    style["background-color"] = 'white';
+    style['background-color'] = 'white';
   }
   return style;
-
 };
-export {gridColumns, setCellStyle};
+export { gridColumns, setCellStyle };

@@ -1,6 +1,11 @@
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
-
 const dutyColumn: (ColDef | ColGroupDef)[] = [
+  {
+    checkboxSelection: true,
+    headerCheckboxSelection: false,
+    maxWidth: 35,
+    minWidth: 35,
+  },
   {
     headerName: 'NO.',
     minWidth: 70,
@@ -10,8 +15,8 @@ const dutyColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '值班名单',
     field: 'duty_name',
-    cellRenderer: (data) =>
-      `<a style="color:#1890ff;text-decoration: underline" href='/onDutyAndRelease/dutyCatalog/${data.data.person_duty_num}'>${data.value}</a>`,
+    cellRenderer: 'dutyCatalog',
+    tooltipField: 'duty_name',
     minWidth: 220,
   },
   {

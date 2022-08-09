@@ -8,8 +8,8 @@ import {
   getYearsTime,
   getWeeksRange,
 } from '@/publicMethods/timeMethods';
-import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
-import { IStatisticQuery } from '@/services/statistic';
+import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
+import type { IStatisticQuery } from '@/services/statistic';
 
 // 统计
 export type IStaticBy = 'year' | 'quarter' | 'month' | 'week';
@@ -32,10 +32,12 @@ export const useStatistic = () => {
     identity,
     showDenominator = false,
   }: IRequest) => {
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     renderColumn(type, showDenominator);
     setRowData([]);
     setLoading(true);
     try {
+      // eslint-disable-next-line @typescript-eslint/no-shadow
       const { data, loading }: any = await request({ client: gqlClient, params: type, identity });
       setRowData(data);
       setLoading(loading);
@@ -48,9 +50,13 @@ export const useStatistic = () => {
   const cellRenderer = (params: any, showSplit = false) => {
     const node = params.data;
     const result = params.value;
-    const currentTime = params.column?.colId;
-    const numerator = node[`${currentTime}_numerator`] ?? 0; // 分子
-    const denominator = node[`${currentTime}_denominator`] ?? 0; // 分母
+    let numerator = 0; // 分子
+    let denominator = 0; // 分母
+    if (showSplit) {
+      const currentTime = params.column?.colId;
+      numerator = node[`${currentTime}_numerator`] ?? 0; // 分子
+      denominator = node[`${currentTime}_denominator`] ?? 0; // 分母
+    }
     const weight = node?.isDept ? 'bold' : 'initial';
     const data = isNumber(result) && result ? result.toFixed(2) : 0;
     if (isNumber(result)) {

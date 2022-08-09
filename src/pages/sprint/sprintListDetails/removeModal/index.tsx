@@ -1,8 +1,9 @@
-import React, { forwardRef, MutableRefObject, useEffect, useState } from 'react';
+import type { MutableRefObject } from 'react';
+import React, { forwardRef, useEffect, useState } from 'react';
 import { Modal, Select, Input, Form, Table, Space, Button } from 'antd';
-import { GridApi } from 'ag-grid-community';
+import type { GridApi } from 'ag-grid-community';
 import type { ModalFuncProps } from 'antd/lib/modal/Modal';
-import { ColumnsType } from 'antd/lib/table';
+import type { ColumnsType } from 'antd/lib/table';
 import { getDeptMemner } from '@/pages/sprint/sprintListDetails/data';
 import { useGqlClient } from '@/hooks/index';
 import styles from '../sprintListDetails.less';
@@ -26,7 +27,7 @@ const RemoveModal = (
   const [source, setSource] = useState<any[]>([]);
 
   const getTestUserList = async () => {
-    const res = await getDeptMemner(client, '测试');
+    const res = await getDeptMemner(client, 'TEST');
     setTestUser(res?.map((it: any) => ({ label: it.userName, value: it.id })));
   };
 
@@ -46,12 +47,6 @@ const RemoveModal = (
     setSource(formData);
     getTestUserList();
   }, [JSON.stringify(selected)]);
-
-  const onOK = async () => {
-    const values = await form.validateFields();
-    console.log(values);
-    onClear(values);
-  };
 
   const onClear = async (data: { formList: any[] }) => {
     /*
@@ -120,13 +115,18 @@ const RemoveModal = (
                 </Space>
               </div>
             ))}
-            {/*<p style={{ marginTop: 5 }}>请确认是否仍要移除？</p>*/}
           </div>
         ),
       });
       return;
     }
     console.log(selected);
+  };
+
+  const onOK = async () => {
+    const values = await form.validateFields();
+    console.log(values);
+    onClear(values);
   };
 
   const onCancel = () => {
@@ -230,7 +230,6 @@ const RemoveModal = (
           <Form.Item noStyle shouldUpdate>
             {() => {
               const values = form.getFieldsValue()?.formList?.[i];
-              console.log(values);
               return (
                 <Form.Item
                   name={['formList', i, 'revert']}

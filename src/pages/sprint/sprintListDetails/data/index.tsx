@@ -1,4 +1,5 @@
-import { GqlClient, useQuery } from '@/hooks';
+import type { GqlClient } from '@/hooks';
+import { useQuery } from '@/hooks';
 import React from 'react';
 import { Select } from 'antd';
 import { sortBy } from 'lodash';
@@ -204,7 +205,7 @@ const changeTypeColumns = (oraData: any) => {
     oraData.forEach((ele: any) => {
       const rows: any = { ...ele };
       if (ele.category === '3' && ele.fromBug !== 0) {
-        rows['category'] = '-3'; // 表示为bug转需求
+        rows.category = '-3'; // 表示为bug转需求
       }
       changedArray.push(rows);
     });
@@ -395,6 +396,16 @@ const getDeptMemner = async (client: GqlClient<object>, params: any) => {
               }
           }
       `;
+  }
+  // 全部的测试人员
+  if (params === 'TEST') {
+    deptMember = `{
+            WxDeptUsers(techs:[TEST]){
+                id
+                userName
+                ztName
+              }
+          }`;
   }
 
   const { data } = await client.query(deptMember);

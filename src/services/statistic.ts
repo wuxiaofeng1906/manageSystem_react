@@ -1,5 +1,5 @@
-import { GqlClient } from '@/hooks';
-import { getParamsByType } from '@/publicMethods/timeMethods';
+import type { GqlClient } from '@/hooks';
+import { getHalfYearTime, getParamsByType } from '@/publicMethods/timeMethods';
 import { formatTreeData } from '@/utils/utils';
 
 export interface IStatisticQuery {

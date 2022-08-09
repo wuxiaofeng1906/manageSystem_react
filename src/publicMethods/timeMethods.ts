@@ -1,5 +1,6 @@
 import * as dayjs from 'dayjs'; // 使用dayjs
-import moment from 'moment'; // 使用moment
+import moment from 'moment';
+import type { IStaticBy } from '@/hooks/statistic'; // 使用moment
 
 function formatMomentTime(time: any) {
   return time === null ? null : moment(time, 'YYYY-MM-DD');
@@ -198,6 +199,27 @@ function getCurrentQuarterTime() {
   return { start: `${currentYear}-${from}`, end: `${currentYear}-${to}` };
 }
 
+// 默认获取近四年的每半年数据
+function getHalfYearTime(year = 4) {
+  const half = [];
+  for (let index = 0; index < year; index++) {
+    const currentYear = dayjs().subtract(index, 'year').format('YYYY');
+    half.push(
+      {
+        title: `${currentYear}上半年`,
+        start: `${currentYear}-01-01`,
+        end: `${currentYear}-06-30`,
+      },
+      {
+        title: `${currentYear}下半年`,
+        start: `${currentYear}-07-01`,
+        end: `${currentYear}-12-31`,
+      },
+    );
+  }
+  return half;
+}
+
 // 获取年的开始和结束时间
 function getYearsTime() {
   const ranges = new Array();
@@ -214,44 +236,26 @@ function getYearsTime() {
   return ranges;
 }
 
-const getParamsByType = (params: any, isCurMonth: boolean = false) => {
+const getParamsByType = (type: IStaticBy, isCurMonth = false) => {
   let typeFlag = 0;
-  let ends = '';
-  if (params === 'week') {
-    const weekRanges = getWeeksRange(8);
-    const timeRange = new Array();
-    for (let index = 0; index < weekRanges.length; index += 1) {
-      timeRange.push(`"${weekRanges[index].to}"`);
-    }
-    ends = `[${timeRange.join(',')}]`;
+  let ends = [];
+  if (type === 'week') {
     typeFlag = 1;
-  } else if (params === 'month') {
-    const monthRanges = getTwelveMonthTime();
-    const timeRange = new Array();
-    for (let index = 0; index < monthRanges.length; index += 1) {
-      timeRange.push(`"${monthRanges[index].end}"`);
-    }
-    ends = `[${timeRange.join(',')}]`;
+    ends = getWeeksRange(8);
+  } else if (type === 'month') {
     typeFlag = 2;
-  } else if (params === 'quarter') {
-    const timeRange = new Array();
-    const quarterTime = getFourQuarterTime(isCurMonth);
-    for (let index = 0; index < quarterTime.length; index += 1) {
-      timeRange.push(`"${quarterTime[index].end}"`);
-    }
-    ends = `[${timeRange.join(',')}]`;
+    ends = getTwelveMonthTime();
+  } else if (type === 'quarter') {
     typeFlag = 3;
-  } else if (params === 'year') {
-    const timeRange = new Array();
-    const quarterTime = getYearsTime();
-    for (let index = 0; index < quarterTime.length; index += 1) {
-      timeRange.push(`"${quarterTime[index].end}"`);
-    }
-    ends = `[${timeRange.join(',')}]`;
+    ends = getFourQuarterTime(isCurMonth);
+  } else if (type === 'year') {
     typeFlag = 4;
+    ends = getYearsTime();
+  } else if (type == 'halfYear') {
+    typeFlag = 5;
+    ends = getHalfYearTime();
   }
-
-  return { typeFlag, ends };
+  return { typeFlag, ends: JSON.stringify(ends?.map((it) => (type == 'week' ? it.to : it.end))) };
 };
 
 // 根据开始和结束时间，获取开始时间当周的周一和结束时间当周的周末。
@@ -326,6 +330,7 @@ export {
   getParamsByType,
   getCurrentQuarterTime,
   getYearsTime,
+  getHalfYearTime,
   getWeekStartAndEndTime,
   getWeekStartAndEndTimeByEndtime,
 };

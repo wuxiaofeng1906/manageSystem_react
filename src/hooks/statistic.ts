@@ -7,12 +7,13 @@ import {
   getFourQuarterTime,
   getYearsTime,
   getWeeksRange,
+  getHalfYearTime,
 } from '@/publicMethods/timeMethods';
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import type { IStatisticQuery } from '@/services/statistic';
 
 // 统计
-export type IStaticBy = 'year' | 'quarter' | 'month' | 'week';
+export type IStaticBy = 'year' | 'halfYear' | 'quarter' | 'month' | 'week';
 export type IIdentity = 'DEVELOPER' | 'TESTER';
 export interface IRequest {
   request: (data: IStatisticQuery) => void;
@@ -77,6 +78,7 @@ export const useStatistic = () => {
     const component: (ColDef | ColGroupDef)[] = new Array();
     const typeMap = {
       year: getYearsTime,
+      halfYear: getHalfYearTime,
       quarter: getFourQuarterTime,
       month: getTwelveMonthTime,
     };

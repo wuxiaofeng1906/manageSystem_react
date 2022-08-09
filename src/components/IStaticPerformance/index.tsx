@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { AgGridReact } from 'ag-grid-react';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import type { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { Button, Drawer, Table } from 'antd';
 import {
   ScheduleTwoTone,
@@ -9,16 +9,19 @@ import {
   ProfileTwoTone,
   QuestionCircleTwoTone,
   AppstoreTwoTone,
+  FundTwoTone,
 } from '@ant-design/icons';
 import { getHeight } from '@/publicMethods/pageSet';
-import { IStaticBy, useStatistic, IIdentity } from '@/hooks/statistic';
+import type { IStaticBy, IIdentity } from '@/hooks/statistic';
+import { useStatistic } from '@/hooks/statistic';
 import { isEmpty, isString } from 'lodash';
-import { ColumnsType } from 'antd/lib/table/interface';
-import { IStatisticQuery } from '@/services/statistic';
+import type { ColumnsType } from 'antd/lib/table/interface';
+import type { IStatisticQuery } from '@/services/statistic';
 
 interface IStatic {
   request: (data: IStatisticQuery) => void;
   showDenominator?: boolean; // 以分子、分母展示
+  showHalfYear?: boolean; // 按半年
   ruleData: IRuleData[];
   identity?: IIdentity;
 }
@@ -26,7 +29,7 @@ interface IStatic {
 type INode = string | React.ReactNode;
 export interface IRuleData {
   title: INode;
-  child: Array<INode>;
+  child: INode[];
   table?: { dataSource: any[]; column: ColumnsType<any> }; // 支持antd table
 }
 const IStaticPerformance: React.FC<IStatic> = ({
@@ -34,6 +37,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
   ruleData,
   identity,
   showDenominator = false,
+  showHalfYear = false,
 }) => {
   const gridApi = useRef<GridApi>();
   const { handleStaticBy, columns, rowData, loading } = useStatistic();
@@ -97,6 +101,17 @@ const IStaticPerformance: React.FC<IStatic> = ({
         >
           按季统计
         </Button>
+        {showHalfYear && (
+          <Button
+            type="text"
+            style={{ color: 'black' }}
+            icon={<FundTwoTone />}
+            size={'large'}
+            onClick={() => changeStaticBy('halfYear')}
+          >
+            按半年统计
+          </Button>
+        )}
         <Button
           type="text"
           style={{ color: 'black' }}

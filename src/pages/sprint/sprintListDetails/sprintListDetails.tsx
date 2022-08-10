@@ -1272,59 +1272,6 @@ const SprintList: React.FC<any> = () => {
     setRefreshItem(false);
   };
   /* endregion */
-  const onClear = async () => {
-    /*
-        3 :story: 规则【未开始、开发中、开发完】
-        1 、-3 : bug/b_story: 规则【未开始、开发中】
-     */
-    const selected: { stage: number; id: number; category: string; flag: boolean }[] | undefined =
-      gridApi.current?.getSelectedRows().map((it) => ({
-        stage: it.stage,
-        id: it.id,
-        category: it.category,
-        flag: ['1', '-3'].includes(it.category)
-          ? [1, 2].includes(it.stage)
-            ? true
-            : false
-          : ['3'].includes(it.category)
-          ? [1, 2, 3].includes(it.stage)
-            ? true
-            : false
-          : false,
-      }));
-    message.destroy();
-    if (isEmpty(selected)) return message.warning('请先选择需要移除的需求！');
-
-    // 不满足规则的
-    const dissatisfy = selected?.filter((it) => !it.flag);
-    if (!isEmpty(dissatisfy)) {
-      Modal.confirm({
-        width: 500,
-        centered: true,
-        title: '移除需求提醒',
-        okText: '确认',
-        cancelText: '取消',
-        icon: <ExclamationCircleOutlined />,
-        onOk: () => {
-          console.log(selected);
-        },
-        content: (
-          <div style={{ maxHeight: 500, overflowY: 'auto' }}>
-            <p style={{ marginBottom: 5 }}>您需要移除的需求:</p>
-            {dissatisfy?.map((it) => (
-              <div style={{ display: 'flex', textIndent: '1em' }} key={it.id}>
-                <div style={{ minWidth: 100 }}>{it.id}</div>
-                <div style={{ minWidth: 100 }}>阶段为：{stageType[it.stage]}</div>
-              </div>
-            ))}
-            <p style={{ marginTop: 5 }}>请确认是否仍要移除？</p>
-          </div>
-        ),
-      });
-      return;
-    }
-    console.log(selected);
-  };
 
   const onRemove = async () => {
     if (isEmpty(gridApi.current?.getSelectedRows()))

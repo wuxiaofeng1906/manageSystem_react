@@ -1,6 +1,6 @@
 import type { MutableRefObject } from 'react';
 import React, { forwardRef, useEffect, useState } from 'react';
-import { Modal, Select, Input, Form, Table, Space, Button } from 'antd';
+import { Modal, Select, Input, Form, Table, Space, Button, Spin } from 'antd';
 import type { GridApi } from 'ag-grid-community';
 import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 import type { ColumnsType } from 'antd/lib/table';
@@ -25,10 +25,17 @@ const RemoveModal = (
   const [form] = Form.useForm();
   const [testUser, setTestUser] = useState<any[]>([]);
   const [source, setSource] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const getTestUserList = async () => {
-    const res = await getDeptMemner(client, 'TEST');
-    setTestUser(res?.map((it: any) => ({ label: it.userName, value: it.id })));
+    try {
+      const res = await getDeptMemner(client, 'TEST');
+      setTestUser(res?.map((it: any) => ({ label: it.userName, value: it.id })));
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -46,34 +53,34 @@ const RemoveModal = (
     form.setFieldsValue({ formList: formData });
     setSource(formData);
     getTestUserList();
-  }, [JSON.stringify(selected)]);
+  }, [JSON.stringify(selected), props.visible]);
 
   const onClear = async (data: { formList: any[] }) => {
     /*
-        3 :story: 规则【未开始、开发中、开发完】
-        1 、-3 : bug/b_story: 规则【未开始、开发中】
+        3 :story类型: 规则【未开始、开发中、开发完】
+        1 、-3 : bug/b_story类型: 规则【未开始、开发中】
      */
-    const list:
-      | { stage: number; id: number; category: string; flag: boolean; ztNo: number }[]
-      | undefined = selected?.map((it) => ({
-      stage: it.stage,
-      id: it.id,
-      category: it.category,
-      ztNo: it.ztNo,
-      flag: ['1', '-3'].includes(it.category)
-        ? [1, 2].includes(it.stage)
-          ? true
-          : false
-        : ['3'].includes(it.category)
-        ? [1, 2, 3].includes(it.stage)
-          ? true
-          : false
-        : false,
-    }));
+    setConfirmLoading(false);
+    const formatSelected =
+      selected?.map((it) => ({
+        stage: it.stage,
+        id: it.id,
+        category: it.category,
+        ztNo: it.ztNo,
+        flag: ['1', '-3'].includes(it.category)
+          ? [1, 2].includes(it.stage)
+            ? true
+            : false
+          : ['3'].includes(it.category)
+          ? [1, 2, 3].includes(it.stage)
+            ? true
+            : false
+          : false,
+      })) ?? [];
     if (isEmpty(selected)) return warnMessage('请先选择需要移除的需求！');
 
     // 不满足规则的
-    const dissatisfy = list?.filter((it) => !it.flag);
+    const dissatisfy = formatSelected?.filter((it) => !it.flag);
     if (!isEmpty(dissatisfy)) {
       Modal.confirm({
         width: 540,
@@ -84,7 +91,7 @@ const RemoveModal = (
         cancelButtonProps: { style: { display: 'none' } },
         icon: <ExclamationCircleOutlined />,
         onCancel: () => {
-          console.log(list);
+          console.log(data.formList, '取消');
         },
         content: (
           <div style={{ maxHeight: 500, overflowY: 'auto' }}>
@@ -120,12 +127,15 @@ const RemoveModal = (
       });
       return;
     }
-    console.log(selected);
+    // 满足移除条件的
+    else {
+      console.log(data.formList);
+    }
   };
 
   const onOK = async () => {
     const values = await form.validateFields();
-    console.log(values);
+    setConfirmLoading(true);
     onClear(values);
   };
 
@@ -135,7 +145,12 @@ const RemoveModal = (
 
   const columns: ColumnsType<any> = [
     { title: '序号', render: (v, r, i) => i + 1, width: 60 },
-    { title: '编号', dataIndex: 'ztNo', width: 90 },
+    {
+      title: '编号',
+      dataIndex: 'ztNo',
+      width: 90,
+      render: (value, record, i) => <Form.Item name={['formList', i, 'ztNo']}>{value}</Form.Item>,
+    },
     { title: '标题内容', dataIndex: 'title' },
     { title: '相关需求', dataIndex: 'relatedStories', width: 90 },
     { title: '相关bug', dataIndex: 'relatedBugs', width: 90 },
@@ -147,6 +162,7 @@ const RemoveModal = (
           <Form.Item noStyle shouldUpdate>
             {() => {
               const values = form.getFieldsValue()?.formList?.[i];
+              const testCheckFlag = values?.testCheck == '1';
               return (
                 <Form.Item
                   name={['formList', i, 'tester']}
@@ -154,18 +170,18 @@ const RemoveModal = (
                     {
                       validator: (r, v, cb) => {
                         // 需要测试验证：测试人员必填
-                        if (
-                          values?.testCheck == '1' &&
-                          (isEmpty(v) || (v?.length == 1 && v?.[0] == 'NA'))
-                        )
+                        if (testCheckFlag && (isEmpty(v) || v?.includes('NA')))
                           return cb('请填写测试人员!');
-                        else cb();
+                        cb();
                       },
                     },
                   ]}
                 >
                   <Select
-                    options={[...[{ label: 'NA', value: 'NA' }], ...testUser]}
+                    options={[
+                      ...[{ label: 'NA', value: 'NA', disabled: testCheckFlag }],
+                      ...testUser.map((it) => ({ ...it, disabled: !testCheckFlag })),
+                    ]}
                     showSearch
                     optionFilterProp={'label'}
                     size={'small'}
@@ -183,11 +199,30 @@ const RemoveModal = (
       dataIndex: 'testCheck',
       render: (value, record, i) => {
         return (
-          <Form.Item
-            name={['formList', i, 'testCheck']}
-            rules={[{ required: true, message: '请填写是否要测试验证！' }]}
-          >
-            <Select options={list} size={'small'} />
+          <Form.Item noStyle shouldUpdate>
+            {({ setFieldsValue }) => {
+              const formList = form.getFieldsValue()?.formList;
+
+              return (
+                <Form.Item
+                  name={['formList', i, 'testCheck']}
+                  rules={[{ required: true, message: '请填写是否要测试验证！' }]}
+                >
+                  <Select
+                    options={list}
+                    size={'small'}
+                    onChange={(v) => {
+                      formList[i].testCheck = v;
+                      formList[i].tester =
+                        v == '1'
+                          ? formList[i].tester?.filter((it: string) => it !== 'NA') ?? []
+                          : [];
+                      setFieldsValue({ formList });
+                    }}
+                  />
+                </Form.Item>
+              );
+            }}
           </Form.Item>
         );
       },
@@ -212,7 +247,7 @@ const RemoveModal = (
                       const status = v == '0';
                       formList[i].revert = status ? '-1' : undefined; // 提交代码为否： 代码revert 自动为免且不可编辑
                       formList[i].commit = v;
-                      setFieldsValue({ formList: formList });
+                      setFieldsValue({ formList });
                     }}
                   />
                 </Form.Item>
@@ -300,18 +335,21 @@ const RemoveModal = (
       onCancel={onCancel}
       destroyOnClose
       bodyStyle={{ maxHeight: 500 }}
+      confirmLoading={confirmLoading}
     >
-      <Form form={form}>
-        <Table
-          bordered
-          className={styles.removeTableWarp}
-          columns={columns}
-          dataSource={source}
-          size={'small'}
-          scroll={{ y: 400 }}
-          pagination={false}
-        />
-      </Form>
+      <Spin tip="加载中..." spinning={loading}>
+        <Form form={form}>
+          <Table
+            bordered
+            className={styles.removeTableWarp}
+            columns={columns}
+            dataSource={source}
+            size={'small'}
+            scroll={{ y: 400 }}
+            pagination={false}
+          />
+        </Form>
+      </Spin>
     </Modal>
   );
 };

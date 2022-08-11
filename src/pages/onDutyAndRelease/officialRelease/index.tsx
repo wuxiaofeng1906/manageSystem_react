@@ -75,7 +75,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   const showProcessStatus = () => {
     const releaseEnv = releaseEnvForm.getFieldValue('releaseEnv');
     const releaseInfo = formForOfficialRelease.getFieldsValue();
-    if (releaseEnv && releaseInfo.pulishTime && releaseInfo.relateDutyName) {
+    if (!isEmpty(releaseEnv) && releaseInfo.pulishTime && releaseInfo.relateDutyName) {
       setProcessStatus({
         ...processStatus,
         processColor: '#2BF541',
@@ -119,7 +119,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     //   获取发布方式及时间
     const condition = cloneDeep(otherSaveCondition);
     const releaseEnv = releaseEnvForm.getFieldValue('releaseEnv')?.join();
-    let grayReleaseNums: string[] = [];
+    const grayReleaseNums: string[] = [];
     const releaseInfo = formForOfficialRelease.getFieldsValue();
     const releaseName = releaseNameForm.getFieldsValue();
     // 获取灰度所有的发布编号
@@ -219,18 +219,28 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   // 发布结果下拉框选择
   const pulishResulttChanged = async (params: any) => {
     const releaseEnv = releaseEnvForm.getFieldValue('releaseEnv');
-    if (isEmpty(releaseEnv) && ['failure', 'success'].includes(params))
+    const checkFlag = ['failure', 'success'].includes(params); // 发布成功、失败
+    const releaseInfo = formForOfficialRelease.getFieldsValue();
+
+    // step2 集群检查
+    if (isEmpty(releaseEnv) && checkFlag)
       return infoMessage('step2中集群未填写，不能修改发布结果!');
+    // step1 检查 发布时间及关联名单
+    if (checkFlag && isEmpty(releaseInfo.pulishTime))
+      return infoMessage('step1中计划发布时间未填写，不能修改发布结果!');
+    if (checkFlag && isEmpty(releaseInfo.relateDutyName))
+      return infoMessage('step1中关联值班名单未填写，不能修改发布结果!');
+
     // 需要判断发布服务有没有填写完成(取消发布可以不填写全)
-    if (processStatus.processColor === 'gray' && params !== 'cancel') {
-      errorMessage('发布服务未填写完成，不能填写发布结果!');
-      return;
-    }
+    // if (processStatus.processColor === 'gray' && params !== 'cancel') {
+    //   errorMessage('发布服务未填写完成，不能填写发布结果!');
+    //   return;
+    // }
 
     // 不同选择弹出不同的提示框
     let autoDisable = true;
     let announceContent: any = {};
-    let hintMsgs = {
+    const hintMsgs = {
       message1: '请确认是否修改服务发布结果为空！',
       message2: '',
     };
@@ -450,7 +460,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                   </Col>
                   <Col span={10}>
                     {/* 发布时间 */}
-                    <Form.Item label="计划发布时间" name="pulishTime">
+                    <Form.Item label="计划发布时间" name="pulishTime" required>
                       <DatePicker
                         defaultValue={moment(moment().add(1, 'days').format('YYYY-MM-DD'))}
                         showTime
@@ -465,7 +475,12 @@ const OfficialRelease: React.FC<any> = (props: any) => {
                 <Row gutter={8} style={{ marginTop: -10 }}>
                   <Col span={14}>
                     {/* 关联值班名单 */}
-                    <Form.Item label="关联值班名单" name="relateDutyName" style={{ marginLeft: 5 }}>
+                    <Form.Item
+                      label="关联值班名单"
+                      name="relateDutyName"
+                      style={{ marginLeft: 5 }}
+                      required
+                    >
                       <Select
                         filterOption={(inputValue: string, option: any) =>
                           !!option.children.includes(inputValue)

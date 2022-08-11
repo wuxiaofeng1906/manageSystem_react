@@ -165,7 +165,7 @@ const beforeOnlineVersionCheck = (params: any) => {
 
   const values: any = params.value[0]; // 本数组只会有一条数据
   // 解析所属端
-  let side = '忽略：';
+  let side = '忽略';
   if (values.technical_side === 'front') {
     side = '前端：';
   } else if (values.technical_side === 'backend') {
@@ -190,7 +190,7 @@ const beforeOnlineVersionCheck = (params: any) => {
   } else if (values.check_status === '2') {
     result = '执行中';
     frontColor = '#46A0FC';
-  } else if (values.check_status === '3') {
+  } else if (values.check_status === '3' && side !== '忽略') {
     //  result = "已结束";
 
     if (values.check_start_time && values.check_start_time !== '-') {
@@ -207,6 +207,7 @@ const beforeOnlineVersionCheck = (params: any) => {
       frontColor = '#8B4513';
     }
   }
+  if (side == '忽略') result = '';
 
   let timeRange = '';
   if (start) {
@@ -326,7 +327,9 @@ const beforeOnlineEnvCheck = (params: any) => {
              </a>
             </div>
             <div style="line-height: 20px;font-size: 10px;width: 200px">
-                <div><label style="color: ${Color}"> ${result}</label> &nbsp;${timeRange}</div>
+                <div><label style="color: ${Color}"> ${result}</label> &nbsp;${
+    result == '忽略' ? '' : timeRange
+  }</div>
             </div>
         </div>
     `;
@@ -377,9 +380,9 @@ const hotCheck = (params: any) => {
                 <div>
                     <label style="color: ${
                       tips[hot_update_check?.check_status]?.color ?? 'black'
-                    }"> ${
-    tips[hot_update_check?.check_status]?.text ?? ''
-  }</label> &nbsp;${timeRange}</div>
+                    }"> ${tips[hot_update_check?.check_status]?.text ?? ''}</label> &nbsp;${
+    hot_update_check?.check_status == 'skip' ? '' : timeRange
+  }</div>
             </div>
         </div>
     `;
@@ -412,7 +415,7 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
       } else if (ele.check_status === '2') {
         value = '执行中';
         Color = '#46A0FC';
-      } else if (ele.check_status === '3') {
+      } else if (ele.check_status === '3' && value != '忽略') {
         // 检查完毕，已结束
         if (ele.check_start_time) {
           start = dayjs(ele.check_start_time).format('HH:mm:ss');
@@ -457,7 +460,7 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
               </Button>
             </div>
             <div style=" margin-top: -20px;font-size: 10px;width: 200px">
-                <div><label style="color: ${Color}"> ${value}</label> &nbsp;${timeRange}</div>
+                <div><label style="color: ${Color}"> ${value}</label> &nbsp;${value=='忽略'? '': timeRange}</div>
             </div>
 
         </div>

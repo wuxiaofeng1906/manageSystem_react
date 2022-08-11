@@ -219,17 +219,17 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   // 发布结果下拉框选择
   const pulishResulttChanged = async (params: any) => {
     const releaseEnv = releaseEnvForm.getFieldValue('releaseEnv');
-    const checkFlag = ['failure', 'success'].includes(params); // 发布成功、失败
     const releaseInfo = formForOfficialRelease.getFieldsValue();
 
-    // step2 集群检查
-    if (isEmpty(releaseEnv) && checkFlag)
-      return infoMessage('step2中集群未填写，不能修改发布结果!');
-    // step1 检查 发布时间及关联名单
-    if (checkFlag && isEmpty(releaseInfo.pulishTime))
-      return infoMessage('step1中计划发布时间未填写，不能修改发布结果!');
-    if (checkFlag && isEmpty(releaseInfo.relateDutyName))
-      return infoMessage('step1中关联值班名单未填写，不能修改发布结果!');
+    //  发布结果检查： 发布成功、失败
+    let tips = '';
+    if (['failure', 'success'].includes(params)) {
+      if (isEmpty(releaseInfo.pulishTime)) tips = 'step1中计划发布时间未填写，不能修改发布结果!';
+      else if (isEmpty(releaseInfo.relateDutyName))
+        tips = 'step1中关联值班名单未填写，不能修改发布结果!';
+      else if (isEmpty(releaseEnv)) tips = 'step2中集群未填写，不能修改发布结果!';
+    }
+    if (tips) return infoMessage(tips);
 
     // 需要判断发布服务有没有填写完成(取消发布可以不填写全)
     // if (processStatus.processColor === 'gray' && params !== 'cancel') {

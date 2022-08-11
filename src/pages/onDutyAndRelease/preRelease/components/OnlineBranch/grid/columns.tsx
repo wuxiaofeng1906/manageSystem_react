@@ -460,7 +460,9 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
               </Button>
             </div>
             <div style=" margin-top: -20px;font-size: 10px;width: 200px">
-                <div><label style="color: ${Color}"> ${value}</label> &nbsp;${value=='忽略'? '': timeRange}</div>
+                <div><label style="color: ${Color}"> ${value}</label> &nbsp;${
+    value == '忽略' ? '' : timeRange
+  }</div>
             </div>
 
         </div>

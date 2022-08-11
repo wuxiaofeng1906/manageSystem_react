@@ -73,7 +73,7 @@ const alayVersonCheck = (source_data: any) => {
     versionCheckId: checkData.version_check_id,
     checkNum: checkData.check_num,
     verson_check: checkData.backend_version_check_flag,
-    server: checkData.server === null ? undefined : checkData.server.split(','),
+    server: isEmpty(checkData.server) ? undefined : checkData.server.split(','),
     imageevn: checkData.image_env,
   };
 
@@ -81,10 +81,12 @@ const alayVersonCheck = (source_data: any) => {
     versionCheckId: checkData.version_check_id,
     checkNum: checkData.check_num,
     branchcheck: checkData.inclusion_check_flag,
-    branch_mainBranch:
-      checkData.main_branch === null ? undefined : checkData.main_branch.split(','),
-    branch_teachnicalSide:
-      checkData.technical_side === null ? undefined : checkData.technical_side.split(','),
+    branch_mainBranch: isEmpty(checkData.main_branch)
+      ? undefined
+      : checkData.main_branch.split(','),
+    branch_teachnicalSide: isEmpty(checkData.technical_side)
+      ? undefined
+      : checkData.technical_side.split(','),
     branch_mainSince: checkData.main_since,
   };
 
@@ -227,15 +229,15 @@ const checkOnlineVersionData = async (sourceData: any) => {
   if (sourceData.branchcheck) {
     // 如果开启了分支对比检查，就要判断被对比的主分支和技术侧以及起始时间是否填写值
     if (!sourceData.branch_mainBranch || sourceData.branch_mainBranch.length === 0) {
-      return '分支检查-被对比的主分支不能为空！';
+      return '检查上线分支-被对比的主分支不能为空！';
     }
 
     if (!sourceData.branch_teachnicalSide || sourceData.branch_teachnicalSide.length === 0) {
-      return '分支检查-技术侧不能为空！';
+      return '检查上线分支-技术侧不能为空！';
     }
 
     if (!sourceData.branch_mainSince) {
-      return '版本检查-对比起始时间不能为空！';
+      return '检查上线分支-对比起始时间不能为空！';
     }
   }
 
@@ -395,6 +397,7 @@ const saveVersonCheck = async (
     user_id: usersInfo.userid,
     backend_version_check_flag: false, // 是否开启版本检查
     inclusion_check_flag: false, // 是否开启分支检查
+    image_env: sourceData.imageevn,
   };
 
   // 判断是否开启版本检查，如果没开启，则不传相关字段
@@ -422,7 +425,7 @@ const saveVersonCheck = async (
     data.backend_version_check_flag = true;
     data['server'] = serverStr;
     data['image_branch'] = sourceData.branchName; // 传分支名称
-    data['image_env'] = sourceData.imageevn; // 镜像环境
+    // data['image_env'] = sourceData.imageevn; // 镜像环境
   }
 
   if (sourceData?.branchcheck) {
@@ -486,7 +489,7 @@ const saveEnvironmentCheck = async (
     user_name: usersInfo.name,
     user_id: usersInfo.userid,
     ignore_check: ignoreCheck,
-    check_env: sourceData.checkEnv,
+    check_env: sourceData.imageevn,
   };
 
   // if (ignore_check === "2") { // 如果没有忽略检查

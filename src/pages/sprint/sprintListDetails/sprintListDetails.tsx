@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { useRequest } from 'ahooks';
 import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
@@ -1273,7 +1273,16 @@ const SprintList: React.FC<any> = () => {
   };
   /* endregion */
 
+  const hasPermission = useMemo(
+    () =>
+      ['superGroup', 'devManageGroup', 'projectListMG'].includes(
+        initialState?.currentUser?.group || '',
+      ),
+    [initialState?.currentUser],
+  );
+
   const onRemove = async () => {
+    if (!hasPermission) return;
     if (isEmpty(gridApi.current?.getSelectedRows()))
       return message.warning('请先选择需要移除的需求！');
     setShowRemoveModal(true);
@@ -1453,7 +1462,11 @@ const SprintList: React.FC<any> = () => {
                 <Button
                   type="text"
                   style={{ marginLeft: '-10px' }}
-                  icon={<ClearOutlined style={{ color: '#228dff' }} />}
+                  icon={
+                    <ClearOutlined
+                      style={{ color: '#228dff', display: hasPermission ? 'initial' : 'none' }}
+                    />
+                  }
                   onClick={onRemove}
                 >
                   移除

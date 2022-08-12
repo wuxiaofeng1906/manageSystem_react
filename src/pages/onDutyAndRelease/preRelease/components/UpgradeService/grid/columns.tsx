@@ -37,18 +37,13 @@ const getReleasedItemColumns = () => {
     {
       headerName: '上线环境',
       field: 'online_environment',
-      cellRenderer: (params: any) => {
-        return `<span>${getOnlineDev(params.value)}</span>`;
-      },
+      cellRenderer: (params: any) => getOnlineDev(params.value),
     },
     {
       headerName: '发布项',
       field: 'release_item',
       minWidth: 95,
-      cellRenderer: (params: any) => {
-        const item = getReleaseItem(params.value);
-        return `<span>${item}</span>`;
-      },
+      cellRenderer: (params: any) => getReleaseItem(params.value),
     },
     {
       headerName: '应用',
@@ -59,17 +54,13 @@ const getReleasedItemColumns = () => {
       headerName: '是否支持热更新',
       field: 'hot_update',
       minWidth: 130,
-      cellRenderer: (params: any) => {
-        return `<span>${getIfOrNot(params.value)}</span>`;
-      },
+      cellRenderer: (params: any) => getIfOrNot(params.value),
     },
     {
       headerName: '是否涉及接口与数据库升级',
       field: 'is_upgrade_api_database',
       minWidth: 196,
-      cellRenderer: (params: any) => {
-        return `<span>${getDatabseAndApiUpgrade(params.value)}</span>`;
-      },
+      cellRenderer: (params: any) => getDatabseAndApiUpgrade(params.value),
     },
     {
       headerName: '分支和环境',
@@ -86,10 +77,6 @@ const getReleasedItemColumns = () => {
       field: 'edit_time',
     },
     {
-      headerName: '说明',
-      field: 'instructions',
-    },
-    {
       headerName: '备注',
       field: 'remarks',
     },
@@ -98,20 +85,7 @@ const getReleasedItemColumns = () => {
       pinned: 'right',
       minWidth: 115,
       maxWidth: 115,
-      cellRenderer: (params: any) => {
-        const paramData = JSON.stringify(params.data).replace(/'/g, '’');
-        // 发布项没有新增功能
-        return `
-        <div style="margin-top: -5px">
-             <Button  style="border: none; background-color: transparent;  margin-left: -10px; "  onclick='showPulishItemForm("modify",${paramData})'>
-              <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
-            </Button>
-            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteGridRows(1,${paramData})'>
-              <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
-            </Button>
-        </div>
-           `;
-      },
+      cellRenderer: 'operation',
     },
   ];
   return firstUpSerColumn;
@@ -123,51 +97,39 @@ const getReleasedApiColumns = () => {
     {
       headerName: '上线环境',
       field: 'online_environment',
-      cellRenderer: (params: any) => {
-        return `<span>${getOnlineDev(params.value)}</span>`;
-      },
     },
     {
       headerName: '升级接口',
       field: 'update_api',
-      cellRenderer: (params: any) => {
-        return `<span>${getUpgradeApi(params.value)}</span>`;
-      },
     },
     {
       headerName: '接口服务',
       field: 'api_name',
     },
-    // {
-    //   headerName: '是否支持热更新',
-    //   field: 'hot_update',
-    //   cellRenderer: (params: any) => {
-    //     return `<span>${getIfOrNot(params.value)}</span>`;
-    //   },
-    // },
+    {
+      headerName: '是否支持热更新',
+      field: 'hot_update',
+    },
     {
       headerName: '接口Method',
       field: 'api_method',
-      cellRenderer: (params: any) => {
-        return `<span>${getApiMethod(params.value)}</span>`;
-      },
     },
     {
       headerName: '接口URL',
       field: 'api_url',
     },
-    {
-      headerName: 'Data',
-      field: 'data',
-    },
-    {
-      headerName: 'Header',
-      field: 'header',
-    },
-    {
-      headerName: '租户ID',
-      field: 'related_tenant',
-    },
+    // {
+    //   headerName: 'Data',
+    //   field: 'data',
+    // },
+    // {
+    //   headerName: 'Header',
+    //   field: 'header',
+    // },
+    // {
+    //   headerName: '租户ID',
+    //   field: 'related_tenant',
+    // },
     {
       headerName: '编辑人',
       field: 'edit_user_name',
@@ -186,22 +148,7 @@ const getReleasedApiColumns = () => {
       pinned: 'right',
       minWidth: 100,
       maxWidth: 100,
-      cellRenderer: (params: any) => {
-        const paramData = JSON.stringify(params.data).replace(/'/g, '’');
-        return `
-        <div style="margin-top: -5px">
-            <Button  style="border: none; background-color: transparent; " onclick='showUpgradeApiForm("add",${paramData})'>
-              <img src="../add_1.png" width="15" height="15" alt="新增" title="新增">
-            </Button>
-             <Button  style="border: none; background-color: transparent;  margin-left: -10px; " onclick='showUpgradeApiForm("modify",${paramData})'>
-              <img src="../edit_1.png" width="15" height="15" alt="修改" title="修改">
-            </Button>
-            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteGridRows(2,${paramData})'>
-              <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
-            </Button>
-        </div>
-           `;
-      },
+      cellRenderer: 'operation',
     },
   ];
   return secondUpSerColumn;

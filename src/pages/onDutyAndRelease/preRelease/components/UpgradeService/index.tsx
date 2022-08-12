@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Col, Form, Input, message, Modal, Row, Select } from 'antd';
+import { Button, Col, Form, Input, message, Modal, Row, Select, Space } from 'antd';
 import { useModel } from '@@/plugin-model/useModel';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -13,7 +13,7 @@ import {
   getReleaseServiceComfirmColumns,
   getNewRelServiceComfirmColumns,
 } from './grid/columns';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { confirmUpgradeService } from './serviceConfirm';
 import { alalysisInitData, checkOnlineEnvSource } from '../../datas/dataAnalyze';
 import { getCheckProcess } from '../../components/CheckProgress/axiosRequest';
@@ -57,6 +57,7 @@ const UpgradeService: React.FC<any> = () => {
     modifyReleasedID,
     allLockedArray,
     operteStatus,
+    setDelModal,
   } = useModel('releaseProcess');
   const [applicantConfirmForm] = Form.useForm(); // 应用
   const [formUpgradeService] = Form.useForm(); // 升级服务
@@ -219,20 +220,10 @@ const UpgradeService: React.FC<any> = () => {
     isApiDbUpgrade: [],
   });
 
-  (window as any).showPulishItemForm = async (type: any, params: any) => {
+  const showPulishItemForm = async (type: any, params: any) => {
     // 验证是否已经确认服务，如果已经确认了，就不能新增和修改了
     const flag = await vertifyModifyFlag(1, tabsData.activeKey);
-    if (!flag) {
-      message.error({
-        content: `服务确认已完成，不能进行修改！`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
-      return;
-    }
+    if (!flag) return infoMessage('服务确认已完成，不能进行修改！');
     if (type === 'add') {
       pulishItemForm.resetFields();
       setPulishItemModal({
@@ -293,6 +284,12 @@ const UpgradeService: React.FC<any> = () => {
       pulishItem: await loadPulishItemSelect(),
       isApiDbUpgrade: await loadIsApiAndDbUpgradeSelect(),
     });
+  };
+  const onDelete = async (type: number, data: any) => {
+    if (operteStatus) return infoMessage('发布已完成，不能进行删除！');
+    const flag = await vertifyModifyFlag(type, tabsData.activeKey);
+    if (!flag) return infoMessage('服务确认已完成，不能进行删除！');
+    setDelModal({ type, shown: true, datas: data });
   };
 
   // 取消发布项弹出窗
@@ -603,6 +600,33 @@ const UpgradeService: React.FC<any> = () => {
       hitMessage: await getAutoCheckMessage(tabsData.activeKey), // 31357
     });
   };
+
+  const operations = (params: CellClickedEvent, type: 'server' | 'applicant') => {
+    const styles = { width: 15, height: 15 };
+    return (
+      <Space size={5}>
+        <img
+          src={require('../../../../../../public/add_1.png')}
+          title={'新增'}
+          style={styles}
+          onClick={() => showPulishItemForm('add', params.data)}
+        />
+        <img
+          src={require('../../../../../../public/edit.png')}
+          title={'编辑'}
+          style={styles}
+          onClick={() => showPulishItemForm('modify', params.data)}
+        />
+        <img
+          src={require('../../../../../../public/delete_2.png')}
+          title={'删除'}
+          style={styles}
+          onClick={() => onDelete(type == 'applicant' ? 1 : 2, params.data)}
+        />
+      </Space>
+    );
+  };
+
   useEffect(() => {
     showArrays();
   }, [releasedIDArray]);
@@ -634,68 +658,6 @@ const UpgradeService: React.FC<any> = () => {
             </label>
           </legend>
           <div>
-            {/* 条件查询 */}
-            <div style={{ height: 35, marginTop: -15, overflow: 'hidden' }}>
-              <Form form={formUpgradeService}>
-                <Row>
-                  <Col span={12}>
-                    {/* 一键部署ID */}
-                    <Form.Item
-                      label="一键部署ID:"
-                      name="deployID"
-                      required
-                      style={{ marginLeft: 10 }}
-                    >
-                      <Select
-                        mode="multiple"
-                        size={'small'}
-                        disabled={releaseIdDisable}
-                        style={{ width: '100%' }}
-                        showSearch
-                        onChange={onReleaseIdChanges}
-                        onFocus={getReleaseID}
-                        onDeselect={deleteReleaseId}
-                      >
-                        {releaseIDArray}
-                      </Select>
-                    </Form.Item>
-                  </Col>
-
-                  <Col span={12}>
-                    <Button
-                      size={'small'}
-                      type="primary"
-                      style={{
-                        color: '#46A0FC',
-                        backgroundColor: '#ECF5FF',
-                        borderRadius: 5,
-                        marginLeft: 10,
-                        marginTop: 3,
-                      }}
-                      disabled={releaseIdDisable}
-                      onClick={inquireServiceClick}
-                    >
-                      点击查询
-                    </Button>
-                    <Form.Item
-                      label=""
-                      name="hitMessage"
-                      style={{ marginLeft: 85, marginTop: -28 }}
-                    >
-                      <Input
-                        style={{
-                          border: 'none',
-                          backgroundColor: 'white',
-                          color: 'red',
-                        }}
-                        disabled
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-              </Form>
-            </div>
-
             <div>
               {/* 升级服务 */}
               <div
@@ -724,7 +686,10 @@ const UpgradeService: React.FC<any> = () => {
                   onGridReady={onReleaseItemGridReady}
                   onGridSizeChanged={onReleaseItemGridReady}
                   onColumnEverythingChanged={onReleaseItemGridReady}
-                ></AgGridReact>
+                  frameworkComponents={{
+                    operation: (data: CellClickedEvent) => operations(data, 'applicant'),
+                  }}
+                />
               </div>
 
               {/* 升级接口 */}
@@ -754,10 +719,68 @@ const UpgradeService: React.FC<any> = () => {
                   onGridReady={onUpGradeGridReady}
                   onGridSizeChanged={onUpGradeGridReady}
                   onColumnEverythingChanged={onUpGradeGridReady}
-                ></AgGridReact>
+                  frameworkComponents={{
+                    operation: (data: CellClickedEvent) => operations(data, 'server'),
+                  }}
+                />
               </div>
             </div>
+            {/* 条件查询 */}
+            <div style={{ height: 35, width: '100%' }}>
+              <Form form={formUpgradeService}>
+                <Row gutter={10}>
+                  <Col span={12}>
+                    {/* 一键部署ID */}
+                    <Form.Item label="一键部署ID:" name="deployID" required>
+                      <Select
+                        mode="multiple"
+                        size={'small'}
+                        disabled={releaseIdDisable}
+                        style={{ width: '100%' }}
+                        showSearch
+                        onChange={onReleaseIdChanges}
+                        onFocus={getReleaseID}
+                        onDeselect={deleteReleaseId}
+                      >
+                        {releaseIDArray}
+                      </Select>
+                    </Form.Item>
+                  </Col>
 
+                  <Col span={12}>
+                    <Button
+                      size={'small'}
+                      type="primary"
+                      style={{
+                        color: '#46A0FC',
+                        backgroundColor: '#ECF5FF',
+                        borderRadius: 5,
+                        marginTop: 3,
+                        width: 'max-content',
+                      }}
+                      disabled={releaseIdDisable}
+                      onClick={inquireServiceClick}
+                    >
+                      点击一键校验
+                    </Button>
+                    {/*<Form.Item*/}
+                    {/*  label=""*/}
+                    {/*  name="hitMessage"*/}
+                    {/*  style={{ marginLeft: 85, marginTop: -28 }}*/}
+                    {/*>*/}
+                    {/*  <Input*/}
+                    {/*    style={{*/}
+                    {/*      border: 'none',*/}
+                    {/*      backgroundColor: 'white',*/}
+                    {/*      color: 'red',*/}
+                    {/*    }}*/}
+                    {/*    disabled*/}
+                    {/*  />*/}
+                    {/*</Form.Item>*/}
+                  </Col>
+                </Row>
+              </Form>
+            </div>
             {/* 服务确认完成 */}
             <div>
               <div style={{ fontWeight: 'bold' }}> 服务确认完成</div>

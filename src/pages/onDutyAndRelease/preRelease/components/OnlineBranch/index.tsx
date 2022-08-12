@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   Button,
   Card,
@@ -39,6 +39,8 @@ import { alalysisInitData } from '../../datas/dataAnalyze';
 import { getGridRowsHeight } from '../gridHeight';
 import { releaseAppChangRowColor } from '../../operate';
 import PreReleaseServices from '@/services/preRelease';
+import { isEmpty } from 'lodash';
+import { infoMessage } from '@/publicMethods/showMessages';
 
 let newOnlineBranchNum = '';
 const OnlineBranch: React.FC<any> = () => {
@@ -55,6 +57,8 @@ const OnlineBranch: React.FC<any> = () => {
     operteStatus,
   } = useModel('releaseProcess');
   const [executeStatus, setExecuteStatus] = useState(false); // 上线分支点击执行后的进度展示
+  const [hotEnvList, setHotEnvList] = useState<any[]>([]); // 上线分支点击执行后的进度展示
+  const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [onlineBranchModal, setOnlineBranchModal] = useState({
     shown: false,
     title: '新增',
@@ -102,6 +106,7 @@ const OnlineBranch: React.FC<any> = () => {
     });
 
     const formData = formForOnlineBranch.getFieldsValue();
+    console.log(newOnlineBranchNum, { ...formData, checkEnv: formData.imageevn });
     const result = await saveOnlineBranchData(
       onlineBranchModal.title,
       tabsData.activeKey,
@@ -243,6 +248,9 @@ const OnlineBranch: React.FC<any> = () => {
         branchCheckId: oraData.checkHead?.branchCheckId,
         versionCheckId: oraData.versonCheck?.versionCheckId,
         envCheckId: oraData.envCheck?.checkId,
+        // 是否可热更新检查
+        is_ignore: isEmpty(oraData.hotCheck?.release_env) ? ['1'] : undefined,
+        check_env: oraData.hotCheck?.release_env,
         // beforeAutomationId: oraData.beforeOnlineCheck?.automationId,
         // afterAutomationId: oraData.afterOnlineCheck?.automationId,
       });
@@ -395,6 +403,44 @@ const OnlineBranch: React.FC<any> = () => {
       autoUrl: { style: 'none', ui: '', api: '' },
       versionUrl: { style: 'none', content: <div></div> },
       coveStatus: { style: 'none', content: <div></div> },
+    });
+  };
+
+  (window as any).showHotUpdateCheckLog = (log: {
+    present_env: string;
+    online_env: string;
+    servers_check: string;
+  }) => {
+    if (!log) {
+      infoMessage('暂无可热更新检查日志！');
+      return;
+    }
+    return Modal.info({
+      title: '热更新检查日志',
+      width: 1200,
+      okButtonProps: { style: { display: 'none' } },
+      closable: true,
+      content: (
+        <div style={{ whiteSpace: 'pre-wrap', maxHeight: 500, overflowY: 'auto' }}>
+          <div style={{ display: 'flex' }}>
+            <div style={{ width: '30%' }}>
+              <strong>收集数据当前环境数据：</strong>
+              <br />
+              {log.present_env}
+            </div>
+            <div style={{ width: '30%' }}>
+              <strong>收集数据线上环境数据：</strong>
+              <br />
+              {log.online_env}
+            </div>
+            <div style={{ width: '40%' }}>
+              <strong>集群服务状态版本检查：</strong>
+              <br />
+              {log.servers_check}
+            </div>
+          </div>
+        </div>
+      ),
     });
   };
 
@@ -584,6 +630,29 @@ const OnlineBranch: React.FC<any> = () => {
     onlineBranchGridApi.current?.setRowData(newData.onlineBranch);
     setExecuteStatus(false);
   };
+  // 是否可热更新检查
+  (window as any).hotUpdateCheckStatus = async (check_num: string, status: string) => {
+    if (status == 'running') return infoMessage('正在执行中，请稍后');
+    if (operteStatus) {
+      infoMessage('发布已完成，不能进行执行操作');
+      return;
+    }
+    setExecuteStatus(true);
+    try {
+      await PreReleaseServices.hotUpdateCheck({
+        user_name: user?.name,
+        user_id: user?.userid,
+        check_num,
+      });
+      // 刷新界面
+      const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
+      onlineBranchGridApi.current?.setRowData(newData.onlineBranch);
+      setExecuteStatus(false);
+    } catch (e) {
+      setExecuteStatus(false);
+    }
+  };
+
   // 日志显示弹窗取消
   const autoCancle = () => {
     setLogModal({
@@ -594,6 +663,13 @@ const OnlineBranch: React.FC<any> = () => {
       coveStatus: { style: 'none', content: <div></div> },
     });
   };
+
+  useEffect(() => {
+    PreReleaseServices.getEnvList().then((res) => {
+      const formatdata = Object.entries(res)?.map(([k, v]) => ({ key: k, value: k, label: v }));
+      setHotEnvList(formatdata);
+    });
+  }, []);
 
   return (
     <div>
@@ -663,14 +739,15 @@ const OnlineBranch: React.FC<any> = () => {
         maskClosable={false}
         centered={true}
         footer={null}
-        width={652}
-        bodyStyle={{ height: '650px' }}
+        width={900}
+        bodyStyle={{ height: '680px' }}
+        destroyOnClose
       >
         <Form form={formForOnlineBranch}>
           {/* 总设置 */}
           <div style={{ marginTop: -15 }}>
-            <Row>
-              <Col span={16}>
+            <Row gutter={8}>
+              <Col span={9}>
                 {/* 分支名称 */}
                 <Form.Item label="分支名称:" name="branchName" required={true}>
                   <Select style={{ width: '100%' }} showSearch onChange={showServerSelect}>
@@ -678,11 +755,18 @@ const OnlineBranch: React.FC<any> = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={8}>
+              <Col span={6}>
                 {/* 技术侧 */}
-                <Form.Item label="技术侧:" name="module" style={{ marginLeft: 10 }} required={true}>
+                <Form.Item label="技术侧:" name="module" required={true}>
                   <Select style={{ width: '100%' }} showSearch>
                     {onlineBranchFormSelected.techSide}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={9}>
+                <Form.Item name="imageevn" label="镜像环境" required={true}>
+                  <Select placeholder="请选择对应的环境！" showSearch style={{ width: '100%' }}>
+                    {onlineBranchFormSelected.imgEnv}
                   </Select>
                 </Form.Item>
               </Col>
@@ -714,7 +798,7 @@ const OnlineBranch: React.FC<any> = () => {
               <Card
                 size="small"
                 title="版本检查"
-                style={{ width: '100%', marginTop: -10, height: 150 }}
+                style={{ width: '100%', marginTop: -10, height: 115 }}
               >
                 <Form.Item
                   name="verson_check"
@@ -735,15 +819,6 @@ const OnlineBranch: React.FC<any> = () => {
                     treeData={onlineBranchFormSelected.server}
                     showSearch
                   ></TreeSelect>
-                </Form.Item>
-                <Form.Item name="imageevn" label="镜像环境" style={{ marginTop: -20 }}>
-                  <Select
-                    placeholder="请选择对应的环境！"
-                    style={{ marginLeft: 40, width: 415 }}
-                    showSearch
-                  >
-                    {onlineBranchFormSelected.imgEnv}
-                  </Select>
                 </Form.Item>
               </Card>
             </div>
@@ -811,20 +886,42 @@ const OnlineBranch: React.FC<any> = () => {
                     </Checkbox.Group>
                   </Form.Item>
                 </Col>
-                <Col span={15}>
-                  {/* 检查环境 */}
-                  <Form.Item label="检查环境:" name="checkEnv" style={{ marginTop: -10 }}>
-                    <Select style={{ width: '100%' }} showSearch>
-                      {onlineBranchFormSelected.imgEnv}
-                    </Select>
+                {/*<Col span={15}>*/}
+                {/*  /!* 检查环境 *!/*/}
+                {/*  <Form.Item label="检查环境:" name="checkEnv" style={{ marginTop: -10 }}>*/}
+                {/*    <Select style={{ width: '100%' }} showSearch>*/}
+                {/*      {onlineBranchFormSelected.imgEnv}*/}
+                {/*    </Select>*/}
+                {/*  </Form.Item>*/}
+                {/*</Col>*/}
+              </Row>
+            </div>
+          </div>
+          {/* ③ 是否可以热更新检查 */}
+          <div style={{ marginTop: -35 }}>
+            <Divider plain>③ 是否可以热更新检查</Divider>
+            <div>
+              <Row>
+                <Col span={6}>
+                  {/* 忽略检查 */}
+                  <Form.Item label="是否忽略检查" name="is_ignore" style={{ marginTop: -10 }}>
+                    <Checkbox.Group>
+                      <Checkbox value={'1'}>忽略检查</Checkbox>
+                    </Checkbox.Group>
+                  </Form.Item>
+                </Col>
+                <Col span={18}>
+                  {/* 发布环境 */}
+                  <Form.Item label="发布环境:" name="check_env" style={{ marginTop: -10 }}>
+                    <Select style={{ width: 415 }} showSearch options={hotEnvList} />
                   </Form.Item>
                 </Col>
               </Row>
             </div>
           </div>
-          {/* ③ 上线前自动化检查设置 */}
+          {/* ④ 上线前自动化检查设置 */}
           <div style={{ marginTop: -35 }}>
-            <Divider plain>③ 上线前自动化检查设置</Divider>
+            <Divider plain>④ 上线前自动化检查设置</Divider>
             <Row style={{ marginTop: -10 }}>
               <Col>
                 {/* 忽略检查 */}

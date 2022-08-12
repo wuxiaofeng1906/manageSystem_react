@@ -377,7 +377,7 @@ const hotCheck = (params: any) => {
                   </Button>
             </div>
             <div style="font-size: 10px;width: 200px;height:40px">
-                <div>
+                <div style="line-height:20px">
                     <label style="color: ${
                       tips[hot_update_check?.check_status]?.color ?? 'black'
                     }"> ${tips[hot_update_check?.check_status]?.text ?? ''}</label> &nbsp;${

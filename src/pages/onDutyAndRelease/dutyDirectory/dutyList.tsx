@@ -94,9 +94,9 @@ const DutyList = () => {
     if (!isEmpty(data)) {
       release_num = data.person_duty_num;
     } else release_num = await getDutyNumber();
-    // 加锁（当前行未锁定）
+    // 编辑加锁（当前行未锁定且未发）
     const lockedNode = lockList.find((it) => it.param.replace('duty_', '') == release_num);
-    if (isEmpty(lockedNode) && isEmpty(data)) {
+    if (isEmpty(lockedNode) && isEmpty(data) && data.is_push_msg != 'yes') {
       await updateLockStatus(release_num, 'post');
     }
     history.push(`/onDutyAndRelease/dutyCatalog/${release_num}`);

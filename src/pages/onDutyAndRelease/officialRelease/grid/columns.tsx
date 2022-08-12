@@ -4,8 +4,9 @@ export const releaseColumns: any = [
     headerName: '集群',
     field: 'release_env',
     cellClass: 'cell-span',
+    headerClass: 'ag-required',
     rowSpan: (params: any) => params.data?.rowSpan || 1,
-    cellRenderer: "releaseEnvRenderer"
+    cellRenderer: 'releaseEnvRenderer',
   },
   {
     headerName: '发布项目',
@@ -28,5 +29,3 @@ export const releaseColumns: any = [
     field: 'edit_time',
   },
 ];
-
-

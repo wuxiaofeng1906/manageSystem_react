@@ -1284,7 +1284,7 @@ const SprintList: React.FC<any> = () => {
   const onRemove = async () => {
     if (!hasPermission) return;
     if (isEmpty(gridApi.current?.getSelectedRows()))
-      return message.warning('请先选择需要移除的需求！');
+      return message.warning('请先选择需要移除的项目！');
     setShowRemoveModal(true);
   };
 

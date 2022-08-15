@@ -6,20 +6,29 @@ import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 import type { ColumnsType } from 'antd/lib/table';
 import { getDeptMemner } from '@/pages/sprint/sprintListDetails/data';
 import { useGqlClient } from '@/hooks/index';
-import styles from '../sprintListDetails.less';
 import { isEmpty } from 'lodash';
+import { useLocation } from 'umi';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { stageType } from '@/pages/sprint/sprintListDetails/common';
 import { warnMessage } from '@/publicMethods/showMessages';
+import styles from '../sprintListDetails.less';
+import SprintDetailServices from '@/services/sprintDetail';
 
 const list = [
   { label: '是', value: '1' },
   { label: '否', value: '0' },
 ];
+const category = {
+  '1': 'BUG',
+  '2': 'TASK',
+  '3': 'STORY',
+  '-3': 'STORY',
+};
 
 const RemoveModal = (
   props: { gridRef: MutableRefObject<GridApi | undefined> } & ModalFuncProps,
 ) => {
+  const query = useLocation()?.query;
   const selected = props.gridRef.current?.getSelectedRows();
   const client = useGqlClient();
   const [form] = Form.useForm();
@@ -55,6 +64,15 @@ const RemoveModal = (
     getTestUserList();
   }, [JSON.stringify(selected), props.visible]);
 
+  const removeFn = async (data: any) => {
+    try {
+      const res = await SprintDetailServices.remove(data);
+      console.log(res);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   const onClear = async (data: { formList: any[] }) => {
     /*
         3 :story类型: 规则【未开始、开发中、开发完】
@@ -77,7 +95,18 @@ const RemoveModal = (
             : false
           : false,
       })) ?? [];
+
     if (isEmpty(selected)) return warnMessage('请先选择需要移除的需求！');
+
+    // ids： 需求类型_禅道id_需求id，project:项目id
+    const ids = formatSelected
+      ?.filter((it) => it.flag)
+      .map((it) => `${category[it.category]}_${it.ztNo}_${it.id}`);
+
+    // 满足移除条件的
+    if (!isEmpty(ids)) {
+      removeFn({ ids, project: query?.projectid ?? '' });
+    }
 
     // 不满足规则的
     const dissatisfy = formatSelected?.filter((it) => !it.flag);
@@ -104,7 +133,10 @@ const RemoveModal = (
                   <Button
                     size={'small'}
                     onClick={() => {
-                      console.log('移除', it);
+                      removeFn({
+                        ids: `${category[it.category]}_${it.ztNo}_${it.id}`.split(),
+                        project: query.projectid,
+                      });
                     }}
                   >
                     移除
@@ -126,10 +158,6 @@ const RemoveModal = (
         ),
       });
       return;
-    }
-    // 满足移除条件的
-    else {
-      console.log(data.formList);
     }
   };
 

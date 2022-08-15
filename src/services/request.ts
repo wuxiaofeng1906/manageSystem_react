@@ -3,17 +3,17 @@ import { extend } from 'umi-request';
 import { notification, message } from 'antd';
 
 const errorHandler = (error: { response: Response; message: any }): Response => {
-  notification.destroy();
-  notification.error({
-    message: '网络异常',
-    description: '网络发生异常，请稍后重试',
-  });
+  // notification.destroy();
+  // notification.error({
+  //   message: '网络异常',
+  //   description: '网络发生异常，请稍后重试',
+  // });
   // eslint-disable-next-line @typescript-eslint/no-throw-literal
   throw error.response || error;
 };
 
 const _request = extend({
-  // errorHandler, // 默认错误处理
+  errorHandler, // 默认错误处理
   // credentials: 'include', // 默认请求是否带上cookie
 });
 
@@ -78,20 +78,27 @@ function localCacheWrap(url: string, options: any) {
 }
 
 function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg?: any) {
-  return mRequest.then((res) => {
-    if (res && res?.code !== 200) {
-      if (warn) {
-        // eslint-disable-next-line no-param-reassign
-        if (warn === true) warn = '';
-        message.warn(warn || res?.msg || '操作失败');
+  return mRequest
+    .then((res) => {
+      if (res && res?.code !== 200) {
+        if (warn) {
+          // eslint-disable-next-line no-param-reassign
+          if (warn === true) warn = '';
+          message.warn(warn || res?.msg || '操作失败');
+        }
+        return Promise.reject(res);
       }
-      return Promise.reject(res);
-    }
-    if (msg) {
-      message.info(msg === true ? res.msg : msg);
-    }
-    return res?.data;
-  });
+      if (msg) {
+        message.info(msg === true ? res.msg : msg);
+      }
+      return res?.data;
+    })
+    .catch((e) => {
+      if (e.status == 403) {
+        message.info('对不起，您无权操作');
+      }
+      return Promise.reject(e);
+    });
 }
 
 export default request;

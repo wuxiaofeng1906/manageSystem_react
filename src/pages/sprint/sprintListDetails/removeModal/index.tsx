@@ -1,12 +1,12 @@
 import type { MutableRefObject } from 'react';
 import React, { forwardRef, useEffect, useState } from 'react';
-import { Modal, Select, Input, Form, Table, Space, Button, Spin } from 'antd';
+import { Modal, Select, Input, Form, Table, Space, Button, Spin, ModalProps } from 'antd';
 import type { GridApi } from 'ag-grid-community';
 import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 import type { ColumnsType } from 'antd/lib/table';
 import { getDeptMemner } from '@/pages/sprint/sprintListDetails/data';
 import { useGqlClient } from '@/hooks/index';
-import { isEmpty } from 'lodash';
+import { isEmpty, omit } from 'lodash';
 import { useLocation } from 'umi';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { stageType } from '@/pages/sprint/sprintListDetails/common';
@@ -15,15 +15,9 @@ import styles from '../sprintListDetails.less';
 import SprintDetailServices from '@/services/sprintDetail';
 
 const list = [
-  { label: '是', value: '1' },
-  { label: '否', value: '0' },
+  { label: '是', value: 1 },
+  { label: '否', value: 0 },
 ];
-const category = {
-  '1': 'BUG',
-  '2': 'TASK',
-  '3': 'STORY',
-  '-3': 'STORY',
-};
 
 const RemoveModal = (
   props: { gridRef: MutableRefObject<GridApi | undefined> } & ModalFuncProps,
@@ -36,6 +30,7 @@ const RemoveModal = (
   const [source, setSource] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [dissatisfy, setDissatisfy] = useState<any[]>([]);
 
   const getTestUserList = async () => {
     try {
@@ -48,28 +43,30 @@ const RemoveModal = (
   };
 
   useEffect(() => {
+    Modal.destroyAll();
     if (!props.visible) return;
     const formData =
       selected?.map((it: any) => ({
         ...it,
-        reason: '',
-        commit: undefined,
-        revert: undefined,
+        notRevertMemo: '',
+        hasCode: undefined,
+        codeRevert: undefined,
         relatedStories: it.relatedStories ?? 0,
-        tester: isEmpty(it.tester) ? [] : it.tester?.map((it: any) => it.id),
-        testCheck: isEmpty(it.testCheck) ? Math.abs(Number(it.testCheck)).toString() : undefined,
+        testers: isEmpty(it.tester) ? [] : it.tester?.map((it: any) => it.id),
+        testVerify: !isEmpty(it.testCheck) ? Math.abs(Number(it.testCheck)) : undefined,
       })) ?? [];
     form.setFieldsValue({ formList: formData });
     setSource(formData);
     getTestUserList();
   }, [JSON.stringify(selected), props.visible]);
 
-  const removeFn = async (data: any) => {
+  const removeFn = async (data: any, isPass = false) => {
     try {
       const res = await SprintDetailServices.remove(data);
-      console.log(res);
+      return res;
     } catch (e) {
-      console.log(e);
+      // if (isPass && e?.status != 403) return true;
+      throw e;
     }
   };
 
@@ -83,6 +80,7 @@ const RemoveModal = (
       selected?.map((it) => ({
         stage: it.stage,
         id: it.id,
+        rdId: it.id,
         category: it.category,
         ztNo: it.ztNo,
         flag: ['1', '-3'].includes(it.category)
@@ -98,19 +96,37 @@ const RemoveModal = (
 
     if (isEmpty(selected)) return warnMessage('请先选择需要移除的需求！');
 
-    // ids： 需求类型_禅道id_需求id，project:项目id
-    const ids = formatSelected
-      ?.filter((it) => it.flag)
-      .map((it) => `${category[it.category]}_${it.ztNo}_${it.id}`);
+    let queryData: any[] = [];
+    formatSelected.forEach((it) => {
+      return data.formList.forEach((form) => {
+        if (form.ztNo == it.ztNo)
+          queryData.push({ ...it, ...form, category: Math.abs(it.category) });
+      });
+    });
 
     // 满足移除条件的
-    if (!isEmpty(ids)) {
-      removeFn({ ids, project: query?.projectid ?? '' });
+    const pass = queryData?.filter((it) => it.flag).map((o) => omit(o, ['id', 'flag', 'stage']));
+    if (!isEmpty(pass)) {
+      await removeFn({ datas: pass, project: query?.projectid ?? '' }, true);
+      setSource(formatSelected.filter((it) => !it.flag));
     }
-
     // 不满足规则的
-    const dissatisfy = formatSelected?.filter((it) => !it.flag);
+    setDissatisfy(queryData?.filter((it) => !it.flag));
+  };
+
+  const onOK = async () => {
+    const values = await form.validateFields();
+    setConfirmLoading(true);
+    onClear(values);
+  };
+
+  const onCancel = () => {
+    props.onCancel?.();
+  };
+
+  useEffect(() => {
     if (!isEmpty(dissatisfy)) {
+      Modal.destroyAll();
       Modal.confirm({
         width: 540,
         centered: true,
@@ -119,24 +135,25 @@ const RemoveModal = (
         okButtonProps: { style: { display: 'none' } },
         cancelButtonProps: { style: { display: 'none' } },
         icon: <ExclamationCircleOutlined />,
-        onCancel: () => {
-          console.log(data.formList, '取消');
-        },
+        onCancel: props.onCancel,
         content: (
           <div style={{ maxHeight: 500, overflowY: 'auto' }}>
             <p style={{ marginBottom: 5 }}>您需要移除的需求如下,请确认是否仍要移除？</p>
             {dissatisfy?.map((it) => (
               <div style={{ display: 'flex', textIndent: '1em', marginBottom: 5 }} key={it.id}>
-                <div style={{ minWidth: 100 }}>{it.ztNo}</div>
-                <div style={{ minWidth: 100 }}>阶段为：{stageType[it.stage]}</div>
+                <div style={{ minWidth: 200 }}>{it.ztNo}</div>
+                <div style={{ minWidth: 150 }}>阶段为：{stageType[it.stage]}</div>
                 <Space style={{ marginLeft: 10 }}>
                   <Button
                     size={'small'}
-                    onClick={() => {
-                      removeFn({
-                        ids: `${category[it.category]}_${it.ztNo}_${it.id}`.split(),
-                        project: query.projectid,
-                      });
+                    onClick={async () => {
+                      try {
+                        await removeFn({
+                          datas: [omit(it, ['id', 'flag', 'stage'])],
+                          project: query.projectid,
+                        });
+                        setDissatisfy(dissatisfy.filter((o) => o.ztNo != it.ztNo));
+                      } catch (e) {}
                     }}
                   >
                     移除
@@ -159,17 +176,7 @@ const RemoveModal = (
       });
       return;
     }
-  };
-
-  const onOK = async () => {
-    const values = await form.validateFields();
-    setConfirmLoading(true);
-    onClear(values);
-  };
-
-  const onCancel = () => {
-    props.onCancel?.();
-  };
+  }, [JSON.stringify(dissatisfy)]);
 
   const columns: ColumnsType<any> = [
     { title: '序号', render: (v, r, i) => i + 1, width: 60 },
@@ -184,16 +191,16 @@ const RemoveModal = (
     { title: '相关bug', dataIndex: 'relatedBugs', width: 90 },
     {
       title: '测试',
-      dataIndex: 'tester',
+      dataIndex: 'testers',
       render: (value, record, i) => {
         return (
           <Form.Item noStyle shouldUpdate>
             {() => {
               const values = form.getFieldsValue()?.formList?.[i];
-              const testCheckFlag = values?.testCheck == '1';
+              const testCheckFlag = values?.testVerify == 1;
               return (
                 <Form.Item
-                  name={['formList', i, 'tester']}
+                  name={['formList', i, 'testers']}
                   rules={[
                     {
                       validator: (r, v, cb) => {
@@ -224,7 +231,7 @@ const RemoveModal = (
     },
     {
       title: '是否要测试验证',
-      dataIndex: 'testCheck',
+      dataIndex: 'testVerify',
       render: (value, record, i) => {
         return (
           <Form.Item noStyle shouldUpdate>
@@ -233,18 +240,18 @@ const RemoveModal = (
 
               return (
                 <Form.Item
-                  name={['formList', i, 'testCheck']}
+                  name={['formList', i, 'testVerify']}
                   rules={[{ required: true, message: '请填写是否要测试验证！' }]}
                 >
                   <Select
                     options={list}
                     size={'small'}
                     onChange={(v) => {
-                      formList[i].testCheck = v;
-                      formList[i].tester =
-                        v == '1'
-                          ? formList[i].tester?.filter((it: string) => it !== 'NA') ?? []
-                          : [];
+                      formList[i].testVerify = v;
+                      formList[i].testers =
+                        v == 1
+                          ? formList[i].testers?.filter((it: string) => it !== 'NA') ?? []
+                          : formList[i].testers;
                       setFieldsValue({ formList });
                     }}
                   />
@@ -257,7 +264,7 @@ const RemoveModal = (
     },
     {
       title: '是否提交代码',
-      dataIndex: 'commit',
+      dataIndex: 'hasCode',
       render: (value, record, i) => {
         return (
           <Form.Item noStyle shouldUpdate>
@@ -265,16 +272,16 @@ const RemoveModal = (
               const formList = form.getFieldsValue()?.formList;
               return (
                 <Form.Item
-                  name={['formList', i, 'commit']}
+                  name={['formList', i, 'hasCode']}
                   rules={[{ required: true, message: '请填写是否提交代码！' }]}
                 >
                   <Select
                     options={list}
                     size={'small'}
                     onChange={(v) => {
-                      const status = v == '0';
-                      formList[i].revert = status ? '-1' : undefined; // 提交代码为否： 代码revert 自动为免且不可编辑
-                      formList[i].commit = v;
+                      const status = v == 0;
+                      formList[i].codeRevert = status ? 2 : undefined; // 提交代码为否： 代码revert 自动为免且不可编辑
+                      formList[i].hasCode = v;
                       setFieldsValue({ formList });
                     }}
                   />
@@ -287,7 +294,7 @@ const RemoveModal = (
     },
     {
       title: '代码是否Revert',
-      dataIndex: 'revert',
+      dataIndex: 'codeRevert',
       render: (value, record, i) => {
         return (
           <Form.Item noStyle shouldUpdate>
@@ -295,12 +302,12 @@ const RemoveModal = (
               const values = form.getFieldsValue()?.formList?.[i];
               return (
                 <Form.Item
-                  name={['formList', i, 'revert']}
+                  name={['formList', i, 'codeRevert']}
                   rules={[
                     {
                       validator: (r, v, cb) => {
-                        if (values?.commit == '1' && v == '0') return cb('必须revert代码！');
-                        else if (v == undefined) return cb('必须revert代码！');
+                        if (values?.hasCode == 1 && v == 0) return cb('必须revert代码！');
+                        else if (v == undefined) return cb('请选择是否revert代码！');
                         return cb();
                       },
                     },
@@ -308,10 +315,10 @@ const RemoveModal = (
                 >
                   <Select
                     size={'small'}
-                    disabled={values?.commit == '0'}
-                    options={list.concat([{ label: '免', value: '-1' }]).map((it) => ({
+                    disabled={values?.hasCode == '0'}
+                    options={list.concat([{ label: '免', value: 2 }]).map((it) => ({
                       ...it,
-                      disabled: values?.commit == '1' && it.value == '0', // 提交代码，revert 否：不可选
+                      disabled: values?.hasCode == 1 && it.value == 0, // 提交代码，revert 否：不可选
                     }))}
                   />
                 </Form.Item>
@@ -323,7 +330,7 @@ const RemoveModal = (
     },
     {
       title: '免Revert原因',
-      dataIndex: 'reason',
+      dataIndex: 'notRevertMemo',
       render: (value, record, i) => {
         return (
           <Form.Item noStyle shouldUpdate>
@@ -332,10 +339,10 @@ const RemoveModal = (
 
               return (
                 <Form.Item
-                  name={['formList', i, 'reason']}
+                  name={['formList', i, 'notRevertMemo']}
                   rules={[
                     {
-                      required: values?.revert == '-1' && values?.commit == '1', // 人工修改为免且代码提交为是： 原因必填
+                      required: values?.codeRevert == 2 && values?.hasCode == 1, // 人工修改为免且代码提交为是： 原因必填
                       message: '请填写免revert原因！',
                     },
                   ]}

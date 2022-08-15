@@ -1,12 +1,13 @@
 import { Modal, Form, Select, ModalProps } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { publishListColumn } from './grid/columns';
 
 const PublishListModal = (props: ModalProps) => {
   const gridRef = useRef<GridApi>();
   const [form] = Form.useForm();
+  const [rowData, setRowData] = useState<any[]>([]);
 
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
@@ -17,6 +18,46 @@ const PublishListModal = (props: ModalProps) => {
     console.log(selected);
   };
 
+  const getList = async () => {
+    // const res = await
+    const mock = [
+      {
+        id: 1,
+        ztNo: 1234,
+        content: 'ceshi',
+        env: '12',
+        level: 1,
+        module: '对对对',
+        hot_update: '是',
+        point: 'sss',
+        create: 'aaa',
+        checked: false,
+      },
+      {
+        id: 2,
+        ztNo: 1234,
+        content: 'ceshi',
+        env: '12',
+        level: 1,
+        module: '对对asda对',
+        hot_update: '是',
+        point: 'sdddss',
+        create: 'bb',
+        checked: true,
+      },
+    ];
+    setRowData(mock);
+  };
+  const onUpdate = () => {
+    gridRef.current?.forEachNode((node) => {
+      node.setSelected(node.data.checked ?? false);
+    });
+  };
+  useEffect(() => {
+    if (!props.visible) return;
+    getList();
+  }, [props.visible]);
+
   return (
     <Modal
       title={'待发布需求列表'}
@@ -24,6 +65,7 @@ const PublishListModal = (props: ModalProps) => {
       onCancel={props.onCancel}
       onOk={onConfirm}
       width={1200}
+      destroyOnClose
     >
       <Form form={form} size={'small'} layout={'inline'}>
         <Form.Item name={''} label={'所属执行'}>
@@ -37,7 +79,7 @@ const PublishListModal = (props: ModalProps) => {
         <AgGridReact
           className="ag-theme-alpine"
           columnDefs={publishListColumn}
-          rowData={[]}
+          rowData={rowData}
           defaultColDef={{
             resizable: true,
             sortable: true,
@@ -45,8 +87,10 @@ const PublishListModal = (props: ModalProps) => {
             minWidth: 90,
             cellStyle: { 'line-height': '25px' },
           }}
+          rowHeight={25}
           headerHeight={25}
           onGridReady={onGridReady}
+          onRowDataChanged={onUpdate}
         />
       </div>
       <div>提示：如本次发布不涉及的需求，请将对应需求前勾选的复选框去掉</div>

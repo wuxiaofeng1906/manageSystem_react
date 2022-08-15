@@ -342,7 +342,7 @@ const publishListColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '需求编号',
-    field: 'ztNO',
+    field: 'ztNo',
     cellRenderer: (p) =>
       `<a target="_blank" href="http://zentao.77hub.com/zentao/story-view-${p.value}.html">${p.value}</a>`,
   },

@@ -65,7 +65,7 @@ import {
   GetSprintProject,
   calTypeCount,
 } from './data';
-import { errorMessage, sucMessage } from '@/publicMethods/showMessages';
+import { errorMessage, infoMessage, sucMessage } from '@/publicMethods/showMessages';
 import {
   devCenterDept,
   getStageOption,
@@ -1079,6 +1079,17 @@ const SprintList: React.FC<any> = () => {
   // 流程-测试已验revert
   const flowForTestRevert = () => {
     if (judgingSelectdRow()) {
+      const selected: any[] = gridApi.current?.getSelectedRows() ?? [];
+      // 1.codeRevert true 2.pushCode false， codeRevert 免  3.codeRevert：否， notrevertMemo：有原因
+      if (
+        !selected?.every(
+          (it) =>
+            it.codeRevert == 1 ||
+            it.pushCode == 0 ||
+            (it.codeRevert == 2 && !isEmpty(it.notrevertMemo)),
+        )
+      )
+        return infoMessage('存在开发未revert');
       setFlowHitmessage({ hintMessage: '测试已验证revert' });
       setIsFlowModalVisible(true);
     }
@@ -1656,7 +1667,13 @@ const SprintList: React.FC<any> = () => {
                         style={{
                           color: '#ccc',
                           marginLeft: 8,
-                          display: params.value == '未开始' ? 'none' : 'initial',
+                          // 1.codeRevert true 2.pushCode false， codeRevert 免  3.codeRevert：否， notrevertMemo：有原因
+                          display:
+                            params.data.codeRevert == 1 ||
+                            params.data.pushCode == 0 ||
+                            (params.data.codeRevert == 2 && !isEmpty(params.data.notrevertMemo))
+                              ? 'initial'
+                              : 'none',
                         }}
                       />
                     </Tooltip>

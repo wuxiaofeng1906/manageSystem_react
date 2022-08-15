@@ -1,6 +1,6 @@
 import type { MutableRefObject } from 'react';
 import React, { forwardRef, useEffect, useState } from 'react';
-import { Modal, Select, Input, Form, Table, Space, Button, Spin, ModalProps } from 'antd';
+import { Modal, Select, Input, Form, Table, Space, Button, Spin, Popconfirm } from 'antd';
 import type { GridApi } from 'ag-grid-community';
 import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 import type { ColumnsType } from 'antd/lib/table';
@@ -8,9 +8,7 @@ import { getDeptMemner } from '@/pages/sprint/sprintListDetails/data';
 import { useGqlClient } from '@/hooks/index';
 import { isEmpty, omit } from 'lodash';
 import { useLocation } from 'umi';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { stageType } from '@/pages/sprint/sprintListDetails/common';
-import { warnMessage } from '@/publicMethods/showMessages';
 import styles from '../sprintListDetails.less';
 import SprintDetailServices from '@/services/sprintDetail';
 
@@ -18,6 +16,76 @@ const list = [
   { label: '是', value: 1 },
   { label: '否', value: 0 },
 ];
+const ignore = ['flag', 'stage', 'relatedBugs', 'relatedStories', 'id'];
+
+const DissatisfyModal = (
+  props: ModalFuncProps & {
+    dissatisfy: any[];
+    removeFn: Function;
+    projectid: string;
+    setDissatisfy: Function;
+  },
+) => {
+  const query = useLocation()?.query;
+
+  // 移除
+  const onConfirm = async (item: any) => {
+    await props.removeFn({
+      datas: [omit(item, ignore)],
+      project: props.projectid,
+    });
+    props.setDissatisfy(props.dissatisfy.filter((o) => o.ztNo != item.ztNo));
+  };
+
+  return (
+    <Modal
+      visible={props.visible}
+      onCancel={props.onCancel}
+      footer={false}
+      centered
+      title={'移除需求提醒'}
+    >
+      <div style={{ maxHeight: 500, overflowY: 'auto' }}>
+        <p style={{ marginBottom: 5 }}>您需要移除的需求如下,请确认是否仍要移除？</p>
+        {props.dissatisfy?.map((it) => (
+          <div style={{ display: 'flex', textIndent: '1em', marginBottom: 5 }} key={it.id}>
+            <div style={{ minWidth: 100 }}>{it.ztNo}</div>
+            <div style={{ minWidth: 200 }}>阶段为：{stageType[it.stage]}</div>
+            <Space style={{ marginLeft: 10 }}>
+              {it.relatedStories || it.relatedBugs ? (
+                <Popconfirm
+                  placement="top"
+                  title={`需求${it.ztNo} ${it.title}在${query.project}关联${
+                    it.relatedStories ?? 0
+                  }任务和${it.relatedBugs ?? 0}个bug,将同步移到xxx？`}
+                  okText="确认"
+                  cancelText="取消"
+                  onConfirm={() => onConfirm(it)}
+                >
+                  <Button size={'small'}>移除</Button>
+                </Popconfirm>
+              ) : (
+                <Button size={'small'} onClick={() => onConfirm(it)}>
+                  移除
+                </Button>
+              )}
+              <Button
+                size={'small'}
+                type={'primary'}
+                onClick={() => {
+                  if (!it.ztNo) return;
+                  window.open(`http://zentao.77hub.com/zentao/execution-task-${it.ztNo}.html`);
+                }}
+              >
+                去禅道
+              </Button>
+            </Space>
+          </div>
+        ))}
+      </div>
+    </Modal>
+  );
+};
 
 const RemoveModal = (
   props: { gridRef: MutableRefObject<GridApi | undefined> } & ModalFuncProps,
@@ -43,14 +111,14 @@ const RemoveModal = (
   };
 
   useEffect(() => {
-    Modal.destroyAll();
     if (!props.visible) return;
     const formData =
       selected?.map((it: any) => ({
         ...it,
-        notRevertMemo: '',
-        hasCode: undefined,
-        codeRevert: undefined,
+        rdId: it.id,
+        notRevertMemo: it.notrevertMemo ?? '',
+        hasCode: it.pushCode ?? undefined,
+        codeRevert: it.codeRevert ?? undefined,
         relatedStories: it.relatedStories ?? 0,
         testers: isEmpty(it.tester) ? [] : it.tester?.map((it: any) => it.id),
         testVerify: !isEmpty(it.testCheck) ? Math.abs(Number(it.testCheck)) : undefined,
@@ -79,10 +147,12 @@ const RemoveModal = (
     const formatSelected =
       selected?.map((it) => ({
         stage: it.stage,
-        id: it.id,
         rdId: it.id,
         category: it.category,
         ztNo: it.ztNo,
+        title: it.title,
+        relatedStories: it.relatedStories,
+        relatedBugs: it.relatedBugs,
         flag: ['1', '-3'].includes(it.category)
           ? [1, 2].includes(it.stage)
             ? true
@@ -94,18 +164,16 @@ const RemoveModal = (
           : false,
       })) ?? [];
 
-    if (isEmpty(selected)) return warnMessage('请先选择需要移除的需求！');
-
     let queryData: any[] = [];
     formatSelected.forEach((it) => {
-      return data.formList.forEach((form) => {
+      data.formList.forEach((form) => {
         if (form.ztNo == it.ztNo)
           queryData.push({ ...it, ...form, category: Math.abs(it.category) });
       });
     });
 
     // 满足移除条件的
-    const pass = queryData?.filter((it) => it.flag).map((o) => omit(o, ['id', 'flag', 'stage']));
+    const pass = queryData?.filter((it) => it.flag).map((o) => omit(o, ignore));
     if (!isEmpty(pass)) {
       await removeFn({ datas: pass, project: query?.projectid ?? '' }, true);
       setSource(formatSelected.filter((it) => !it.flag));
@@ -123,60 +191,6 @@ const RemoveModal = (
   const onCancel = () => {
     props.onCancel?.();
   };
-
-  useEffect(() => {
-    if (!isEmpty(dissatisfy)) {
-      Modal.destroyAll();
-      Modal.confirm({
-        width: 540,
-        centered: true,
-        title: '移除需求提醒',
-        closable: true,
-        okButtonProps: { style: { display: 'none' } },
-        cancelButtonProps: { style: { display: 'none' } },
-        icon: <ExclamationCircleOutlined />,
-        onCancel: props.onCancel,
-        content: (
-          <div style={{ maxHeight: 500, overflowY: 'auto' }}>
-            <p style={{ marginBottom: 5 }}>您需要移除的需求如下,请确认是否仍要移除？</p>
-            {dissatisfy?.map((it) => (
-              <div style={{ display: 'flex', textIndent: '1em', marginBottom: 5 }} key={it.id}>
-                <div style={{ minWidth: 200 }}>{it.ztNo}</div>
-                <div style={{ minWidth: 150 }}>阶段为：{stageType[it.stage]}</div>
-                <Space style={{ marginLeft: 10 }}>
-                  <Button
-                    size={'small'}
-                    onClick={async () => {
-                      try {
-                        await removeFn({
-                          datas: [omit(it, ['id', 'flag', 'stage'])],
-                          project: query.projectid,
-                        });
-                        setDissatisfy(dissatisfy.filter((o) => o.ztNo != it.ztNo));
-                      } catch (e) {}
-                    }}
-                  >
-                    移除
-                  </Button>
-                  <Button
-                    size={'small'}
-                    type={'primary'}
-                    onClick={() => {
-                      if (!it.ztNo) return;
-                      window.open(`http://zentao.77hub.com/zentao/execution-task-${it.ztNo}.html`);
-                    }}
-                  >
-                    去禅道
-                  </Button>
-                </Space>
-              </div>
-            ))}
-          </div>
-        ),
-      });
-      return;
-    }
-  }, [JSON.stringify(dissatisfy)]);
 
   const columns: ColumnsType<any> = [
     { title: '序号', render: (v, r, i) => i + 1, width: 60 },
@@ -251,7 +265,7 @@ const RemoveModal = (
                       formList[i].testers =
                         v == 1
                           ? formList[i].testers?.filter((it: string) => it !== 'NA') ?? []
-                          : formList[i].testers;
+                          : [];
                       setFieldsValue({ formList });
                     }}
                   />
@@ -384,6 +398,14 @@ const RemoveModal = (
             pagination={false}
           />
         </Form>
+        <DissatisfyModal
+          projectid={query.projectid}
+          dissatisfy={dissatisfy}
+          removeFn={removeFn}
+          setDissatisfy={setDissatisfy}
+          visible={!isEmpty(dissatisfy)}
+          onCancel={(e) => setDissatisfy([])}
+        />
       </Spin>
     </Modal>
   );

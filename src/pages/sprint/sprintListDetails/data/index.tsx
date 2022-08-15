@@ -312,6 +312,9 @@ const queryDevelopViews = async (
             clearCache
             isDelay
             ztUnlinkedAt
+            pushCode
+            codeRevert
+            notrevertMemo
           }
       }
   `);

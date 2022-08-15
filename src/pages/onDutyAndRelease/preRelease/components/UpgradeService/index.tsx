@@ -1,17 +1,16 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, Col, Form, Input, message, Modal, Row, Select, Space } from 'antd';
+import { UnorderedListOutlined, SyncOutlined } from '@ant-design/icons';
+
 import { useModel } from '@@/plugin-model/useModel';
 import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-enterprise';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import '../../style/style.css';
 import { loadReleaseIDSelect } from '../../comControl/controler';
 import {
   getReleasedItemColumns,
   getReleasedApiColumns,
   getReleaseServiceComfirmColumns,
-  getNewRelServiceComfirmColumns,
+  // getNewRelServiceComfirmColumns,
 } from './grid/columns';
 import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { confirmUpgradeService } from './serviceConfirm';
@@ -34,7 +33,7 @@ import { getGridRowsHeight } from '../../components/gridHeight';
 import { getAutoCheckMessage } from './idDeal/dataDeal';
 import { serverConfirmJudge } from './checkExcute';
 import { errorMessage, infoMessage, sucMessage } from '@/publicMethods/showMessages';
-import { isBoolean, isEmpty } from 'lodash';
+import PublishListModal from '@/pages/onDutyAndRelease/preRelease/components/UpgradeService/publishListModal';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -62,6 +61,7 @@ const UpgradeService: React.FC<any> = () => {
   const [applicantConfirmForm] = Form.useForm(); // 应用
   const [formUpgradeService] = Form.useForm(); // 升级服务
   // 暂时忽略掉一键部署ID后端服务的获取
+  const [publishModal, setPublishModal] = useState(false);
 
   /* region 升级服务： 发布项表格 */
   const releaseItemGridApi = useRef<GridApi>();
@@ -369,28 +369,15 @@ const UpgradeService: React.FC<any> = () => {
   });
 
   // 发布接口弹出窗口进行修改和新增
-  (window as any).showUpgradeApiForm = async (type: any, params: any) => {
+  const showUpgradeApiForm = async (type: any, params: any) => {
     const flag = await vertifyModifyFlag(2, tabsData.activeKey);
-    if (!flag) {
-      message.error({
-        content: `服务确认已完成，不能进行修改！`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
-      return;
-    }
+    if (!flag) return infoMessage('服务确认已完成，不能进行修改！');
     if (type === 'add') {
       upgradeIntForm.resetFields();
       upgradeIntForm.setFieldsValue({
         renter: 'ALL', // 新增:租户ID默认值
       });
-      setUpgradeIntModal({
-        shown: true,
-        title: '新增',
-      });
+      setUpgradeIntModal({ shown: true, title: '新增' });
     } else {
       const apiid = params.api_id;
       upgradeIntForm.setFieldsValue({
@@ -413,18 +400,9 @@ const UpgradeService: React.FC<any> = () => {
       const lockInfo = await getLockStatus(`${tabsData.activeKey}-step2-api-${apiid}`);
 
       if (lockInfo.errMessage) {
-        message.error({
-          content: `${lockInfo.errMessage}`,
-          duration: 1,
-          style: {
-            marginTop: '50vh',
-          },
-        });
+        infoMessage(lockInfo.errMessage);
       } else {
-        setUpgradeIntModal({
-          shown: true,
-          title: '修改',
-        });
+        setUpgradeIntModal({ shown: true, title: '修改' });
       }
     }
     // 设置下拉框
@@ -437,10 +415,7 @@ const UpgradeService: React.FC<any> = () => {
   };
   // 取消事件
   const upgradeIntModalCancle = () => {
-    setUpgradeIntModal({
-      ...upgradeIntModal,
-      shown: false,
-    });
+    setUpgradeIntModal({ ...upgradeIntModal, shown: false });
 
     if (upgradeIntModal.title === '修改') {
       //   释放锁
@@ -453,18 +428,8 @@ const UpgradeService: React.FC<any> = () => {
     const formData = upgradeIntForm.getFieldsValue();
     const result = await addPulishApi(formData, tabsData.activeKey, upgradeIntModal.title);
     if (result === '') {
-      message.info({
-        content: '保存成功！',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
-      setUpgradeIntModal({
-        ...upgradeIntModal,
-        shown: false,
-      });
+      sucMessage('保存成功！');
+      setUpgradeIntModal({ ...upgradeIntModal, shown: false });
 
       const newData: any = await alalysisInitData('pulishApi', tabsData.activeKey);
       setUpgradeApi({
@@ -482,13 +447,7 @@ const UpgradeService: React.FC<any> = () => {
         deleteLockStatus(lockedItem);
       }
     } else {
-      message.error({
-        content: `${result}`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      infoMessage(result);
     }
   };
 
@@ -559,13 +518,7 @@ const UpgradeService: React.FC<any> = () => {
 
     const result = await confirmUpgradeService(datas);
     if (result === '') {
-      message.info({
-        content: '保存成功！',
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      sucMessage('保存成功！');
       // 刷新状态进度条
       const processData: any = await getCheckProcess(currentReleaseNum);
       if (processData) {
@@ -574,13 +527,7 @@ const UpgradeService: React.FC<any> = () => {
 
       //   刷新表格
     } else {
-      message.error({
-        content: `${result}`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      infoMessage(result);
     }
 
     //   (不管成功或者失败)刷新表格
@@ -603,19 +550,20 @@ const UpgradeService: React.FC<any> = () => {
 
   const operations = (params: CellClickedEvent, type: 'server' | 'applicant') => {
     const styles = { width: 15, height: 15 };
+    const fn = type == 'server' ? showUpgradeApiForm : showPulishItemForm;
     return (
       <Space size={5}>
         <img
           src={require('../../../../../../public/add_1.png')}
           title={'新增'}
           style={styles}
-          onClick={() => showPulishItemForm('add', params.data)}
+          onClick={() => fn('add', params.data)}
         />
         <img
           src={require('../../../../../../public/edit.png')}
           title={'编辑'}
           style={styles}
-          onClick={() => showPulishItemForm('modify', params.data)}
+          onClick={() => fn('modify', params.data)}
         />
         <img
           src={require('../../../../../../public/delete_2.png')}
@@ -659,6 +607,21 @@ const UpgradeService: React.FC<any> = () => {
           </legend>
           <div>
             <div>
+              <Space size={8} style={{ width: '100%', display: 'flex', justifyContent: 'right' }}>
+                <Button
+                  title={'刷新'}
+                  type={'text'}
+                  size={'small'}
+                  icon={<SyncOutlined style={{ color: '#46A0FC' }} />}
+                />
+                <Button
+                  title={'待发布需求列表'}
+                  icon={<UnorderedListOutlined style={{ color: '#46A0FC' }} />}
+                  type={'text'}
+                  size={'small'}
+                  onClick={(e) => setPublishModal(true)}
+                />
+              </Space>
               {/* 升级服务 */}
               <div
                 className="ag-theme-alpine"
@@ -867,68 +830,68 @@ const UpgradeService: React.FC<any> = () => {
                 ></AgGridReact>
               </div>
 
-              <div
-                className="ag-theme-alpine"
-                style={{ height: upgradeConfirm.gridHight, width: '100%' }}
-              >
-                <AgGridReact
-                  columnDefs={getNewRelServiceComfirmColumns()} // 定义列
-                  defaultColDef={{
-                    resizable: true,
-                    sortable: true,
-                    suppressMenu: true,
-                    cellStyle: { 'line-height': '25px' },
-                    minWidth: 90,
-                  }}
-                  rowData={upgradeConfirm.gridData}
-                  headerHeight={25}
-                  rowHeight={25}
-                  onGridReady={onConfirmGridReady2}
-                  onGridSizeChanged={onConfirmGridReady2}
-                  onColumnEverythingChanged={onConfirmGridReady2}
-                  frameworkComponents={{
-                    confirmSelectChoice: (props: any) => {
-                      let Color = 'black';
-                      const currentValue = props.value;
-                      if (currentValue === '1') {
-                        Color = '#2BF541';
-                      } else if (currentValue === '2') {
-                        Color = 'orange';
-                      } else if (currentValue === '9') {
-                        return (
-                          <Select
-                            size={'small'}
-                            bordered={false}
-                            style={{ width: '100%' }}
-                            defaultValue={'免'}
-                            disabled
-                          ></Select>
-                        );
-                      }
+              {/*<div*/}
+              {/*  className="ag-theme-alpine"*/}
+              {/*  style={{ height: upgradeConfirm.gridHight, width: '100%' }}*/}
+              {/*>*/}
+              {/*  <AgGridReact*/}
+              {/*    columnDefs={getNewRelServiceComfirmColumns()} // 定义列*/}
+              {/*    defaultColDef={{*/}
+              {/*      resizable: true,*/}
+              {/*      sortable: true,*/}
+              {/*      suppressMenu: true,*/}
+              {/*      cellStyle: { 'line-height': '25px' },*/}
+              {/*      minWidth: 90,*/}
+              {/*    }}*/}
+              {/*    rowData={upgradeConfirm.gridData}*/}
+              {/*    headerHeight={25}*/}
+              {/*    rowHeight={25}*/}
+              {/*    onGridReady={onConfirmGridReady2}*/}
+              {/*    onGridSizeChanged={onConfirmGridReady2}*/}
+              {/*    onColumnEverythingChanged={onConfirmGridReady2}*/}
+              {/*    frameworkComponents={{*/}
+              {/*      confirmSelectChoice: (props: any) => {*/}
+              {/*        let Color = 'black';*/}
+              {/*        const currentValue = props.value;*/}
+              {/*        if (currentValue === '1') {*/}
+              {/*          Color = '#2BF541';*/}
+              {/*        } else if (currentValue === '2') {*/}
+              {/*          Color = 'orange';*/}
+              {/*        } else if (currentValue === '9') {*/}
+              {/*          return (*/}
+              {/*            <Select*/}
+              {/*              size={'small'}*/}
+              {/*              bordered={false}*/}
+              {/*              style={{ width: '100%' }}*/}
+              {/*              defaultValue={'免'}*/}
+              {/*              disabled*/}
+              {/*            ></Select>*/}
+              {/*          );*/}
+              {/*        }*/}
 
-                      return (
-                        <Select
-                          size={'small'}
-                          defaultValue={currentValue}
-                          bordered={false}
-                          disabled={currentOperateStatus}
-                          style={{ width: '100%', color: Color }}
-                          onChange={(newValue: any) => {
-                            saveUperConfirmInfo(newValue, props);
-                          }}
-                        >
-                          <Option key={'1'} value={'1'}>
-                            是
-                          </Option>
-                          <Option key={'2'} value={'2'}>
-                            否
-                          </Option>
-                        </Select>
-                      );
-                    },
-                  }}
-                ></AgGridReact>
-              </div>
+              {/*        return (*/}
+              {/*          <Select*/}
+              {/*            size={'small'}*/}
+              {/*            defaultValue={currentValue}*/}
+              {/*            bordered={false}*/}
+              {/*            disabled={currentOperateStatus}*/}
+              {/*            style={{ width: '100%', color: Color }}*/}
+              {/*            onChange={(newValue: any) => {*/}
+              {/*              saveUperConfirmInfo(newValue, props);*/}
+              {/*            }}*/}
+              {/*          >*/}
+              {/*            <Option key={'1'} value={'1'}>*/}
+              {/*              是*/}
+              {/*            </Option>*/}
+              {/*            <Option key={'2'} value={'2'}>*/}
+              {/*              否*/}
+              {/*            </Option>*/}
+              {/*          </Select>*/}
+              {/*        );*/}
+              {/*      },*/}
+              {/*    }}*/}
+              {/*  ></AgGridReact>*/}
+              {/*</div>*/}
             </div>
 
             {/*  提示标签 */}
@@ -1109,7 +1072,7 @@ const UpgradeService: React.FC<any> = () => {
             <Col span={12}>
               <Form.Item
                 name="renter"
-                label="租户ID："
+                label="涉及租户："
                 required
                 style={{ marginLeft: 10, marginTop: -15 }}
               >
@@ -1137,8 +1100,7 @@ const UpgradeService: React.FC<any> = () => {
               </Form.Item>
             </Col>
           </Row>
-          {/*
-          <Form.Item name="hotUpdate" label="是否支持热更新：" required style={{marginTop: -15}}>
+          <Form.Item name="hotUpdate" label="是否支持热更新：" required style={{ marginTop: -15 }}>
             <Select>
               <Option key={'1'} value={'1'}>
                 {'是'}
@@ -1147,19 +1109,19 @@ const UpgradeService: React.FC<any> = () => {
                 {'否'}
               </Option>
             </Select>
-          </Form.Item> */}
-          <Row>
-            <Col span={12}>
-              <Form.Item name="data" label="Data" style={{ marginTop: -15 }}>
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="header" label="Header" style={{ marginLeft: 10, marginTop: -15 }}>
-                <Input />
-              </Form.Item>
-            </Col>
-          </Row>
+          </Form.Item>
+          {/*<Row>*/}
+          {/*  <Col span={12}>*/}
+          {/*    <Form.Item name="data" label="Data" style={{ marginTop: -15 }}>*/}
+          {/*      <Input />*/}
+          {/*    </Form.Item>*/}
+          {/*  </Col>*/}
+          {/*  <Col span={12}>*/}
+          {/*    <Form.Item name="header" label="Header" style={{ marginLeft: 10, marginTop: -15 }}>*/}
+          {/*      <Input />*/}
+          {/*    </Form.Item>*/}
+          {/*  </Col>*/}
+          {/*</Row>*/}
           <Form.Item name="remark" label="备注：" style={{ marginTop: -15 }}>
             <TextArea />
           </Form.Item>
@@ -1195,6 +1157,7 @@ const UpgradeService: React.FC<any> = () => {
           </Row>
         </Form>
       </Modal>
+      <PublishListModal visible={publishModal} onCancel={(e) => setPublishModal(false)} />
     </div>
   );
 };

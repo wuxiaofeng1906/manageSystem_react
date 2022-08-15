@@ -3,9 +3,10 @@ import {
   getReleaseItem,
   getIfOrNot,
   getDatabseAndApiUpgrade,
-  getUpgradeApi,
-  getApiMethod,
+  // getUpgradeApi,
+  // getApiMethod,
 } from '../../../comControl/converse';
+import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 // 渲染表格行的颜色(正在修改的行)
 const releaseAppChangRowColor = (allLockedArray: any, type: string, idFlag: number) => {
   const lockInfoArray = allLockedArray;
@@ -126,10 +127,10 @@ const getReleasedApiColumns = () => {
     //   headerName: 'Header',
     //   field: 'header',
     // },
-    // {
-    //   headerName: '租户ID',
-    //   field: 'related_tenant',
-    // },
+    {
+      headerName: '涉及租户',
+      field: 'related_tenant',
+    },
     {
       headerName: '编辑人',
       field: 'edit_user_name',
@@ -326,6 +327,54 @@ const getNewRelServiceComfirmColumns = () => {
   ];
   return thirdUpSerColumn;
 };
+const publishListColumn: (ColDef | ColGroupDef)[] = [
+  { checkboxSelection: true, headerCheckboxSelection: true },
+  {
+    headerName: '序号',
+    field: 'id',
+    minWidth: 70,
+    maxWidth: 90,
+    cellRenderer: (params: any) => (+params.node.id + 1).toString(),
+  },
+  {
+    headerName: 'ID',
+    field: 'id',
+  },
+  {
+    headerName: '需求编号',
+    field: 'ztNO',
+    cellRenderer: (p) =>
+      `<a target="_blank" href="http://zentao.77hub.com/zentao/story-view-${p.value}.html">${p.value}</a>`,
+  },
+  {
+    headerName: '标题内容',
+    field: 'content',
+  },
+  {
+    headerName: '所属执行',
+    field: 'env',
+  },
+  {
+    headerName: '优先级',
+    field: 'level',
+  },
+  {
+    headerName: '模块名',
+    field: 'module',
+  },
+  {
+    headerName: '是否可热更',
+    field: 'hot_update',
+  },
+  {
+    headerName: '创建人',
+    field: 'create',
+  },
+  {
+    headerName: '指派人',
+    field: 'point',
+  },
+];
 
 export {
   getReleasedItemColumns,
@@ -333,4 +382,5 @@ export {
   getReleaseServiceComfirmColumns,
   releaseAppChangRowColor,
   getNewRelServiceComfirmColumns,
+  publishListColumn,
 };

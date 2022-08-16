@@ -590,11 +590,11 @@ const DutyCatalog = () => {
   useUnmount(() => {
     onDeleteLock();
   });
-  window.onbeforeunload = () => {
+  window.onbeforeunload = function () {
     onDeleteLock();
   };
 
-  window.onunload = () => {
+  window.onunload = function () {
     onDeleteLock();
   };
 

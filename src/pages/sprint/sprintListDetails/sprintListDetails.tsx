@@ -19,6 +19,7 @@ import {
   Breadcrumb,
   TreeSelect,
   Tooltip,
+  Tag,
 } from 'antd';
 import { formatMomentTime } from '@/publicMethods/timeMethods';
 import dayjs from 'dayjs';
@@ -88,7 +89,8 @@ import {
 import defaultTreeSelectParams from '@/pages/shimo/fileBaseline/iterateList/defaultSetting';
 import styles from './sprintListDetails.less';
 import { isEmpty } from 'lodash';
-import RemoveModal from '@/pages/sprint/sprintListDetails/removeModal';
+import RemoveModal, { DissatisfyModal } from '@/pages/sprint/sprintListDetails/removeModal';
+import SprintDetailServices from '@/services/sprintDetail';
 let ora_filter_data: any = [];
 
 const gird_filter_condition: any = []; // 表格自带过滤了的条件
@@ -97,7 +99,8 @@ const SprintList: React.FC<any> = () => {
   const { initialState } = useModel('@@initialState');
   const { prjId, prjNames, prjType, showTestConfirmFlag } = getProjectInfo();
   const [showRemoveModal, setShowRemoveModal] = useState(false);
-
+  // 不满足移除的数据
+  const [dissatisfy, setDissatisfy] = useState<any[]>([]);
   /* region 整个模块都需要用到的表单定义 */
   // 模块查询
   const [formForQuery] = Form.useForm();
@@ -1077,22 +1080,43 @@ const SprintList: React.FC<any> = () => {
   };
 
   // 流程-测试已验revert
-  const flowForTestRevert = () => {
+  const flowForTestRevert = async () => {
     if (judgingSelectdRow()) {
       const selected: any[] = gridApi.current?.getSelectedRows() ?? [];
-      // 1.codeRevert true 2.pushCode false， codeRevert 免  3.codeRevert：否， notrevertMemo：有原因
-      if (
-        !selected?.every(
-          (it) =>
-            it.codeRevert == 1 ||
-            it.pushCode == 0 ||
-            (it.codeRevert == 2 && !isEmpty(it.notrevertMemo)),
-        )
-      )
-        return infoMessage('存在开发未revert');
-      setFlowHitmessage({ hintMessage: '测试已验证revert' });
-      setIsFlowModalVisible(true);
+
+      const formatSelected = selected.map((it) => ({
+        ...it,
+        flag: ['1', '-3'].includes(it.category)
+          ? [1, 2].includes(it.stage)
+            ? true
+            : false
+          : ['3'].includes(it.category)
+          ? [1, 2, 3].includes(it.stage)
+            ? true
+            : false
+          : false,
+      }));
+      const pass = formatSelected.find((it) => it.flag);
+      const findDissatisfy = formatSelected.find((it) => !it.flag);
+      if (!isEmpty(pass)) {
+        await removeFn(pass);
+      }
+      setDissatisfy(findDissatisfy);
+
+      // setFlowHitmessage({ hintMessage: '测试已验证revert' });
+      // setIsFlowModalVisible(true);
     }
+  };
+  const removeFn = async (data: any[]) => {
+    await SprintDetailServices.remove({
+      project: '',
+      datas: data.map((it) => ({
+        rdId: it.id,
+        ztNo: it.ztNo,
+        category: Math.abs(it.category),
+        codeRevert: it.codeRevert,
+      })),
+    });
   };
 
   // 流程-灰度已验
@@ -1285,10 +1309,7 @@ const SprintList: React.FC<any> = () => {
   /* endregion */
 
   const hasPermission = useMemo(
-    () =>
-      ['superGroup', 'devManageGroup', 'projectListMG'].includes(
-        initialState?.currentUser?.group || '',
-      ),
+    () => initialState?.currentUser?.authority?.find((it: any) => it?.id == 149)?.id == 149,
     [initialState?.currentUser],
   );
 
@@ -1456,6 +1477,7 @@ const SprintList: React.FC<any> = () => {
               {/*  删除*/}
               {/*</Button>*/}
               {/*<Button*/}
+              {/*<Button*/}
               {/*  type="text"*/}
               {/*  style={{*/}
               {/*    marginLeft: '-10px',*/}
@@ -1472,12 +1494,8 @@ const SprintList: React.FC<any> = () => {
               >
                 <Button
                   type="text"
-                  style={{ marginLeft: '-10px' }}
-                  icon={
-                    <ClearOutlined
-                      style={{ color: '#228dff', display: hasPermission ? 'initial' : 'none' }}
-                    />
-                  }
+                  style={{ marginLeft: '-10px', display: hasPermission ? 'initial' : 'none' }}
+                  icon={<ClearOutlined style={{ color: '#228dff' }} />}
                   onClick={onRemove}
                 >
                   移除
@@ -1651,6 +1669,23 @@ const SprintList: React.FC<any> = () => {
                 const lineThroughStage = ['已取消', '开发已revert', '测试已验证revert'];
                 return (
                   <div>
+                    {/*开发已revert标识： 【revert:是，测试验证：是 或者 revert：免，测试验证：是】*/}
+                    <Tag
+                      color={'processing'}
+                      style={{
+                        marginRight: 4,
+                        fontSize: 10,
+                        lineHeight: '18px',
+                        height: 18,
+                        padding: 2,
+                        display:
+                          [1, 2].includes(params.data.codeRevert) && params.data.testVerify == 1
+                            ? 'initial'
+                            : 'none',
+                      }}
+                    >
+                      开发已revert
+                    </Tag>
                     <span
                       style={{
                         color: params.value == '未开始' ? 'red' : 'initial',
@@ -1661,22 +1696,6 @@ const SprintList: React.FC<any> = () => {
                     >
                       {params.value}
                     </span>
-                    {/*开发已revert提示*/}
-                    <Tooltip title={'开发已revert代码'}>
-                      <InfoCircleOutlined
-                        style={{
-                          color: '#ccc',
-                          marginLeft: 8,
-                          // 1.codeRevert true 2.pushCode false， codeRevert 免  3.codeRevert：否， notrevertMemo：有原因
-                          display:
-                            params.data.codeRevert == 1 ||
-                            params.data.pushCode == 0 ||
-                            (params.data.codeRevert == 2 && !isEmpty(params.data.notrevertMemo))
-                              ? 'initial'
-                              : 'none',
-                        }}
-                      />
-                    </Tooltip>
                   </div>
                 );
               },
@@ -3164,6 +3183,7 @@ const SprintList: React.FC<any> = () => {
         }}
         onOk={() => setShowRemoveModal(false)}
       />
+      <DissatisfyModal dissatisfy={dissatisfy} removeFn={removeFn} setDissatisfy={setDissatisfy} />
     </div>
   );
 };

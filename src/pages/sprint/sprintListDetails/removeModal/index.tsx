@@ -6,7 +6,7 @@ import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 import type { ColumnsType } from 'antd/lib/table';
 import { getDeptMemner } from '@/pages/sprint/sprintListDetails/data';
 import { useGqlClient } from '@/hooks/index';
-import { isEmpty, omit } from 'lodash';
+import { isEmpty, pick } from 'lodash';
 import { useLocation } from 'umi';
 import { stageType } from '@/pages/sprint/sprintListDetails/common';
 import styles from '../sprintListDetails.less';
@@ -16,26 +16,37 @@ const list = [
   { label: '是', value: 1 },
   { label: '否', value: 0 },
 ];
-const ignore = ['flag', 'stage', 'relatedBugs', 'relatedStories', 'id'];
+const pickData = ['rdId', 'ztNo', 'category', 'codeRevert'];
+const pickTag = pickData.concat(['testers', 'testVerify', 'hasCode', 'notRevertMemo']);
 
-const DissatisfyModal = (
+export const DissatisfyModal = (
   props: ModalFuncProps & {
     dissatisfy: any[];
     removeFn: Function;
-    projectid: string;
     setDissatisfy: Function;
   },
 ) => {
   const query = useLocation()?.query;
 
+  const getNextSprint = async () => {
+    const res = await SprintDetailServices.getNextSprint(query.projectid);
+    setNextSprint(res);
+  };
+
+  const [nextSprint, setNextSprint] = useState<any[]>([]);
   // 移除
   const onConfirm = async (item: any) => {
     await props.removeFn({
-      datas: [omit(item, ignore)],
-      project: props.projectid,
+      datas: [pick(item, pickTag)],
+      project: query.projectid,
     });
     props.setDissatisfy(props.dissatisfy.filter((o) => o.ztNo != item.ztNo));
   };
+  useEffect(() => {
+    if (props.visible) {
+      getNextSprint();
+    }
+  }, [props.visible]);
 
   return (
     <Modal
@@ -57,27 +68,24 @@ const DissatisfyModal = (
                   placement="top"
                   title={`需求${it.ztNo} ${it.title}在${query.project}关联${
                     it.relatedStories ?? 0
-                  }任务和${it.relatedBugs ?? 0}个bug,将同步移到xxx？`}
+                  }个任务和${it.relatedBugs ?? 0}个bug,将同步移到${nextSprint?.[1]?.name ?? ''}？`}
                   okText="确认"
-                  cancelText="取消"
+                  cancelText="去禅道"
                   onConfirm={() => onConfirm(it)}
+                  onCancel={() => {
+                    if (!it.ztNo) return;
+                    window.open(`http://zentao.77hub.com/zentao/execution-task-${it.ztNo}.html`);
+                  }}
                 >
-                  <Button size={'small'}>移除</Button>
+                  <Button size={'small'}>确认</Button>
                 </Popconfirm>
               ) : (
                 <Button size={'small'} onClick={() => onConfirm(it)}>
-                  移除
+                  确认
                 </Button>
               )}
-              <Button
-                size={'small'}
-                type={'primary'}
-                onClick={() => {
-                  if (!it.ztNo) return;
-                  window.open(`http://zentao.77hub.com/zentao/execution-task-${it.ztNo}.html`);
-                }}
-              >
-                去禅道
+              <Button size={'small'} type={'primary'} onClick={props.onCancel}>
+                取消
               </Button>
             </Space>
           </div>
@@ -98,7 +106,6 @@ const RemoveModal = (
   const [source, setSource] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [dissatisfy, setDissatisfy] = useState<any[]>([]);
 
   const getTestUserList = async () => {
     try {
@@ -128,21 +135,7 @@ const RemoveModal = (
     getTestUserList();
   }, [JSON.stringify(selected), props.visible]);
 
-  const removeFn = async (data: any, isPass = false) => {
-    try {
-      const res = await SprintDetailServices.remove(data);
-      return res;
-    } catch (e) {
-      // if (isPass && e?.status != 403) return true;
-      throw e;
-    }
-  };
-
   const onClear = async (data: { formList: any[] }) => {
-    /*
-        3 :story类型: 规则【未开始、开发中、开发完】
-        1 、-3 : bug/b_story类型: 规则【未开始、开发中】
-     */
     setConfirmLoading(false);
     const formatSelected =
       selected?.map((it) => ({
@@ -153,15 +146,6 @@ const RemoveModal = (
         title: it.title,
         relatedStories: it.relatedStories,
         relatedBugs: it.relatedBugs,
-        flag: ['1', '-3'].includes(it.category)
-          ? [1, 2].includes(it.stage)
-            ? true
-            : false
-          : ['3'].includes(it.category)
-          ? [1, 2, 3].includes(it.stage)
-            ? true
-            : false
-          : false,
       })) ?? [];
 
     let queryData: any[] = [];
@@ -172,14 +156,23 @@ const RemoveModal = (
       });
     });
 
-    // 满足移除条件的
-    const pass = queryData?.filter((it) => it.flag).map((o) => omit(o, ignore));
+    // 直接移除
+    const pass = queryData
+      ?.filter((it) => !([1, 2].includes(it.codeRevert) && it.testVerify == 1))
+      ?.map((o) => pick(o, pickData));
+
+    // 标识开发已revert数据 【revert:是，测试验证：是 或者 revert：免，测试验证：是】
+    const tagData = queryData
+      ?.filter((it) => [1, 2].includes(it.codeRevert) && it.testVerify == 1)
+      ?.map((o) => pick(o, pickTag));
+
     if (!isEmpty(pass)) {
-      await removeFn({ datas: pass, project: query?.projectid ?? '' }, true);
-      setSource(formatSelected.filter((it) => !it.flag));
+      await SprintDetailServices.remove({ datas: pass, project: query?.projectid ?? '' });
     }
-    // 不满足规则的
-    setDissatisfy(queryData?.filter((it) => !it.flag));
+    if (!isEmpty(tagData)) {
+      await SprintDetailServices.removeTag({ datas: tagData, project: query?.projectid ?? '' });
+    }
+    props.onCancel?.();
   };
 
   const onOK = async () => {
@@ -398,14 +391,6 @@ const RemoveModal = (
             pagination={false}
           />
         </Form>
-        <DissatisfyModal
-          projectid={query.projectid}
-          dissatisfy={dissatisfy}
-          removeFn={removeFn}
-          setDissatisfy={setDissatisfy}
-          visible={!isEmpty(dissatisfy)}
-          onCancel={(e) => setDissatisfy([])}
-        />
       </Spin>
     </Modal>
   );

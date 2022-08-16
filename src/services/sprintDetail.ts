@@ -1,8 +1,16 @@
 import request from './request';
 const SprintDetailServices = {
+  // 记录标识
+  async removeTag(data: any) {
+    return request('/api/sprint/project/child/remove', { data, method: 'put' });
+  },
+  // 移除
   async remove(data: any) {
-    // 移除
     return request('/api/sprint/project/child/remove', { data, method: 'delete' });
+  },
+  // 获取最近的班车
+  async getNextSprint(params: any) {
+    return request('/api/sprint/project', { params });
   },
 };
 export default SprintDetailServices;

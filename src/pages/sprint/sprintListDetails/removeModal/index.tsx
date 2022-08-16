@@ -36,7 +36,13 @@ export const DissatisfyModal = (
       await SprintDetailServices.remove({
         source: Number(query.projectid),
         target: Number(props.nextSprint?.[1]?.id),
-        datas: [{ ...pick(item, pickData), rdId: item.id || item.rdId }],
+        datas: [
+          {
+            ...pick(item, pickData),
+            rdId: item.id || item.rdId,
+            category: String(Math.abs(Number(item.category))),
+          },
+        ],
       });
       props.setDissatisfy(props.dissatisfy.filter((o) => o.ztNo != item.ztNo));
       props.onRefresh();
@@ -49,7 +55,7 @@ export const DissatisfyModal = (
   return (
     <Modal
       visible={!isEmpty(props.dissatisfy)}
-      onCancel={props.onCancel}
+      onCancel={() => props.setDissatisfy([])}
       footer={false}
       centered
       title={'移除需求提醒'}
@@ -87,7 +93,7 @@ export const DissatisfyModal = (
                     确认
                   </Button>
                 )}
-                <Button size={'small'} onClick={props.onCancel}>
+                <Button size={'small'} onClick={() => props.setDissatisfy([])}>
                   取消
                 </Button>
               </Space>
@@ -150,7 +156,7 @@ const RemoveModal = (
       selected?.map((it) => ({
         stage: it.stage,
         rdId: it.id,
-        category: String(Math.abs(it.category)),
+        category: String(Math.abs(Number(it.category))),
         ztNo: it.ztNo,
         title: it.title,
         relatedStories: it.relatedStories,

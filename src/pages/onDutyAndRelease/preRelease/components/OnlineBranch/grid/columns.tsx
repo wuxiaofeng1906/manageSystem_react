@@ -92,10 +92,8 @@ const iconCheckRender = (params: any) => {
   let result = values?.check_status;
   let Color = 'black';
   if (isEmpty(values)) {
-    if (technical) {
-      result = '忽略';
-      Color = 'blue';
-    } else result = '';
+    result = '忽略';
+    Color = 'blue';
   } else {
     if (values?.check_status === 'done') {
       // done  doing（执行中） wait（未开始）

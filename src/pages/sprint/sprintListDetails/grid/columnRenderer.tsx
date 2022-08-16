@@ -67,6 +67,7 @@ const testerRenderer = (params: any) => {
   if (testConfirm === '1') {
     myColor = 'black';
   }
+  if (params.data.ztUnlinkedAt != null) myColor = 'red';
   // if (!testArray || testArray.length === 0) {
   //   return `<span style="color: ${myColor}"> NA </span>`;
   // }
@@ -393,6 +394,7 @@ const testConfirmedRenderer = (params: any) => {
     result = '是';
     my_color = 'black'; // 黑色
   }
+  if (params.data.ztUnlinkedAt != null) my_color = 'red';
   if (params.data.stage === 8 || params.data.stage === 9 || params.data.stage === 10) {
     return `<span style="text-decoration:line-through"> ${result} </span>`;
   }

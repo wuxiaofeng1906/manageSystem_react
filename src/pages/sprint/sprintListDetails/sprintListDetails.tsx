@@ -1085,43 +1085,19 @@ const SprintList: React.FC<any> = () => {
   const flowForTestRevert = async () => {
     if (judgingSelectdRow()) {
       const selected: any[] = gridApi.current?.getSelectedRows() ?? [];
-
-      // const formatSelected = selected.map((it) => ({
-      // ...it,
-      // flag: ['1', '-3'].includes(it.category)
-      //   ? [1, 2].includes(it.stage)
-      //     ? true
-      //     : false
-      //   : ['3'].includes(it.category)
-      //   ? [1, 2, 3].includes(it.stage)
-      //     ? true
-      //     : false
-      //   : false,
-      // }));
-      // const pass = formatSelected.find((it) => it.flag);
       const findDissatisfy = selected.filter(
         (it) => [1, 2].includes(Number(it.codeRevert)) && Number(it.testCheck) == 1,
       );
-      // if (!isEmpty(pass)) {
-      //   await removeFn(pass);
-      // }
-      if (isEmpty(findDissatisfy)) return infoMessage('请选选择移除数据');
+      if (
+        isEmpty(findDissatisfy) ||
+        !selected.every((it) => [1, 2].includes(Number(it.codeRevert)) && Number(it.testCheck) == 1)
+      )
+        return infoMessage('请勾选标识为开发已revert数据');
       setDissatisfy(findDissatisfy);
 
       // setFlowHitmessage({ hintMessage: '测试已验证revert' });
       // setIsFlowModalVisible(true);
     }
-  };
-  const removeFn = async (data: any[]) => {
-    await SprintDetailServices.remove({
-      project: Number(prjId),
-      datas: data.map((it) => ({
-        rdId: it.id,
-        ztNo: it.ztNo,
-        category: String(Math.abs(Number(it.category))),
-        codeRevert: it.codeRevert,
-      })),
-    });
   };
 
   // 流程-灰度已验
@@ -1705,7 +1681,10 @@ const SprintList: React.FC<any> = () => {
                     </Tag>
                     <span
                       style={{
-                        color: params.value == '未开始' ? 'red' : 'initial',
+                        color:
+                          params.value == '未开始' || params.data.ztUnlinkedAt != null
+                            ? 'red'
+                            : 'initial',
                         textDecoration: lineThroughStage.includes(params.value)
                           ? 'line-through'
                           : 'initial',

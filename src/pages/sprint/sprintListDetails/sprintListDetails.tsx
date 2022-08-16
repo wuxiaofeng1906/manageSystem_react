@@ -3200,11 +3200,13 @@ const SprintList: React.FC<any> = () => {
         }}
         onOk={() => setShowRemoveModal(false)}
         nextSprint={nextSprint}
+        onRefresh={updateGrid}
       />
       <DissatisfyModal
         dissatisfy={dissatisfy}
         setDissatisfy={setDissatisfy}
         nextSprint={nextSprint}
+        onRefresh={updateGrid}
       />
     </div>
   );

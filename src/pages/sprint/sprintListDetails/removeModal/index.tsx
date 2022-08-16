@@ -24,6 +24,7 @@ export const DissatisfyModal = (
     dissatisfy: any[];
     setDissatisfy: Function;
     nextSprint: any[];
+    onRefresh: Function;
   },
 ) => {
   const query = useLocation()?.query;
@@ -38,6 +39,7 @@ export const DissatisfyModal = (
         datas: [{ ...pick(item, pickData), rdId: item.id || item.rdId }],
       });
       props.setDissatisfy(props.dissatisfy.filter((o) => o.ztNo != item.ztNo));
+      props.onRefresh();
       setLoading(false);
     } catch (e) {
       setLoading(false);
@@ -98,7 +100,11 @@ export const DissatisfyModal = (
 };
 
 const RemoveModal = (
-  props: { gridRef: MutableRefObject<GridApi | undefined>; nextSprint: any[] } & ModalFuncProps,
+  props: {
+    gridRef: MutableRefObject<GridApi | undefined>;
+    nextSprint: any[];
+    onRefresh: Function;
+  } & ModalFuncProps,
 ) => {
   const query = useLocation()?.query;
   const selected = props.gridRef.current?.getSelectedRows();
@@ -423,6 +429,7 @@ const RemoveModal = (
           dissatisfy={dissatisfy}
           setDissatisfy={setDissatisfy}
           nextSprint={props.nextSprint}
+          onRefresh={props.onRefresh}
         />
       </Spin>
     </Modal>

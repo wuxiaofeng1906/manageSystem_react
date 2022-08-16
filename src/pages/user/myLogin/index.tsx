@@ -1545,7 +1545,7 @@ const Login: React.FC<{}> = () => {
         path: null,
         method: null,
         RdSysRolePermission: {
-          id: 2631,
+          id: 2632,
           permissionId: 152,
           roleId: 1,
         },

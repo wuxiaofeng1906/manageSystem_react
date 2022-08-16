@@ -101,6 +101,8 @@ const SprintList: React.FC<any> = () => {
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   // 不满足移除的数据
   const [dissatisfy, setDissatisfy] = useState<any[]>([]);
+  const [nextSprint, setNextSprint] = useState<any[]>([]);
+
   /* region 整个模块都需要用到的表单定义 */
   // 模块查询
   const [formForQuery] = Form.useForm();
@@ -1084,23 +1086,26 @@ const SprintList: React.FC<any> = () => {
     if (judgingSelectdRow()) {
       const selected: any[] = gridApi.current?.getSelectedRows() ?? [];
 
-      const formatSelected = selected.map((it) => ({
-        ...it,
-        flag: ['1', '-3'].includes(it.category)
-          ? [1, 2].includes(it.stage)
-            ? true
-            : false
-          : ['3'].includes(it.category)
-          ? [1, 2, 3].includes(it.stage)
-            ? true
-            : false
-          : false,
-      }));
-      const pass = formatSelected.find((it) => it.flag);
-      const findDissatisfy = formatSelected.find((it) => !it.flag);
-      if (!isEmpty(pass)) {
-        await removeFn(pass);
-      }
+      // const formatSelected = selected.map((it) => ({
+      // ...it,
+      // flag: ['1', '-3'].includes(it.category)
+      //   ? [1, 2].includes(it.stage)
+      //     ? true
+      //     : false
+      //   : ['3'].includes(it.category)
+      //   ? [1, 2, 3].includes(it.stage)
+      //     ? true
+      //     : false
+      //   : false,
+      // }));
+      // const pass = formatSelected.find((it) => it.flag);
+      const findDissatisfy = selected.filter(
+        (it) => [1, 2].includes(Number(it.codeRevert)) && Number(it.testCheck) == 1,
+      );
+      // if (!isEmpty(pass)) {
+      //   await removeFn(pass);
+      // }
+      if (isEmpty(findDissatisfy)) return infoMessage('请选选择移除数据');
       setDissatisfy(findDissatisfy);
 
       // setFlowHitmessage({ hintMessage: '测试已验证revert' });
@@ -1109,11 +1114,11 @@ const SprintList: React.FC<any> = () => {
   };
   const removeFn = async (data: any[]) => {
     await SprintDetailServices.remove({
-      project: '',
+      project: Number(prjId),
       datas: data.map((it) => ({
         rdId: it.id,
         ztNo: it.ztNo,
-        category: Math.abs(it.category),
+        category: String(Math.abs(Number(it.category))),
         codeRevert: it.codeRevert,
       })),
     });
@@ -1331,6 +1336,17 @@ const SprintList: React.FC<any> = () => {
       solvedBy: personData?.solvedBy,
     });
   }, [data]);
+
+  const getNextSprint = async () => {
+    const res = await SprintDetailServices.getNextSprint({
+      project: Number(prjId),
+      offset: 1,
+    });
+    setNextSprint(res);
+  };
+  useEffect(() => {
+    getNextSprint();
+  }, []);
 
   // useEffect(() => {
   //
@@ -1679,7 +1695,8 @@ const SprintList: React.FC<any> = () => {
                         height: 18,
                         padding: 2,
                         display:
-                          [1, 2].includes(params.data.codeRevert) && params.data.testVerify == 1
+                          [1, 2].includes(Number(params.data.codeRevert)) &&
+                          Number(params.data.testCheck) == 1
                             ? 'initial'
                             : 'none',
                       }}
@@ -3182,8 +3199,13 @@ const SprintList: React.FC<any> = () => {
           updateGrid();
         }}
         onOk={() => setShowRemoveModal(false)}
+        nextSprint={nextSprint}
       />
-      <DissatisfyModal dissatisfy={dissatisfy} removeFn={removeFn} setDissatisfy={setDissatisfy} />
+      <DissatisfyModal
+        dissatisfy={dissatisfy}
+        setDissatisfy={setDissatisfy}
+        nextSprint={nextSprint}
+      />
     </div>
   );
 };

@@ -22,81 +22,83 @@ const pickTag = pickData.concat(['testers', 'testVerify', 'hasCode', 'notRevertM
 export const DissatisfyModal = (
   props: ModalFuncProps & {
     dissatisfy: any[];
-    removeFn: Function;
     setDissatisfy: Function;
+    nextSprint: any[];
   },
 ) => {
   const query = useLocation()?.query;
-
-  const getNextSprint = async () => {
-    const res = await SprintDetailServices.getNextSprint(query.projectid);
-    setNextSprint(res);
-  };
-
-  const [nextSprint, setNextSprint] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   // 移除
   const onConfirm = async (item: any) => {
-    await props.removeFn({
-      datas: [pick(item, pickTag)],
-      project: query.projectid,
-    });
-    props.setDissatisfy(props.dissatisfy.filter((o) => o.ztNo != item.ztNo));
-  };
-  useEffect(() => {
-    if (props.visible) {
-      getNextSprint();
+    setLoading(true);
+    try {
+      await SprintDetailServices.remove({
+        source: Number(query.projectid),
+        target: Number(props.nextSprint?.[1]?.id),
+        datas: [{ ...pick(item, pickData), rdId: item.id || item.rdId }],
+      });
+      props.setDissatisfy(props.dissatisfy.filter((o) => o.ztNo != item.ztNo));
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
     }
-  }, [props.visible]);
+  };
 
   return (
     <Modal
-      visible={props.visible}
+      visible={!isEmpty(props.dissatisfy)}
       onCancel={props.onCancel}
       footer={false}
       centered
       title={'移除需求提醒'}
     >
-      <div style={{ maxHeight: 500, overflowY: 'auto' }}>
-        <p style={{ marginBottom: 5 }}>您需要移除的需求如下,请确认是否仍要移除？</p>
-        {props.dissatisfy?.map((it) => (
-          <div style={{ display: 'flex', textIndent: '1em', marginBottom: 5 }} key={it.id}>
-            <div style={{ minWidth: 100 }}>{it.ztNo}</div>
-            <div style={{ minWidth: 200 }}>阶段为：{stageType[it.stage]}</div>
-            <Space style={{ marginLeft: 10 }}>
-              {it.relatedStories || it.relatedBugs ? (
-                <Popconfirm
-                  placement="top"
-                  title={`需求${it.ztNo} ${it.title}在${query.project}关联${
-                    it.relatedStories ?? 0
-                  }个任务和${it.relatedBugs ?? 0}个bug,将同步移到${nextSprint?.[1]?.name ?? ''}？`}
-                  okText="确认"
-                  cancelText="去禅道"
-                  onConfirm={() => onConfirm(it)}
-                  onCancel={() => {
-                    if (!it.ztNo) return;
-                    window.open(`http://zentao.77hub.com/zentao/execution-task-${it.ztNo}.html`);
-                  }}
-                >
-                  <Button size={'small'}>确认</Button>
-                </Popconfirm>
-              ) : (
-                <Button size={'small'} onClick={() => onConfirm(it)}>
-                  确认
+      <Spin tip="加载中..." spinning={loading}>
+        <div style={{ maxHeight: 500, overflowY: 'auto' }}>
+          <p style={{ marginBottom: 5 }}>您需要移除的需求如下,请确认是否仍要移除？</p>
+          {props.dissatisfy?.map((it) => (
+            <div style={{ display: 'flex', textIndent: '1em', marginBottom: 5 }} key={it.id}>
+              <div style={{ minWidth: 100 }}>{it.ztNo}</div>
+              <div style={{ minWidth: 200 }}>阶段为：{stageType[it.stage]}</div>
+              <Space style={{ marginLeft: 10 }}>
+                {it.relatedStories || it.relatedBugs ? (
+                  <Popconfirm
+                    placement="top"
+                    title={`需求${it.ztNo} ${it.title}在${query.project}关联${
+                      it.relatedStories ?? 0
+                    }个任务和${it.relatedBugs ?? 0}个bug,将同步移到${
+                      props.nextSprint?.[1]?.name ?? ''
+                    }？`}
+                    okText="确认"
+                    cancelText="去禅道"
+                    onConfirm={() => onConfirm(it)}
+                    onCancel={() => {
+                      if (!it.ztNo) return;
+                      window.open(`http://zentao.77hub.com/zentao/execution-task-${it.ztNo}.html`);
+                    }}
+                  >
+                    <Button size={'small'} type={'primary'}>
+                      确认
+                    </Button>
+                  </Popconfirm>
+                ) : (
+                  <Button size={'small'} type={'primary'} onClick={() => onConfirm(it)}>
+                    确认
+                  </Button>
+                )}
+                <Button size={'small'} onClick={props.onCancel}>
+                  取消
                 </Button>
-              )}
-              <Button size={'small'} type={'primary'} onClick={props.onCancel}>
-                取消
-              </Button>
-            </Space>
-          </div>
-        ))}
-      </div>
+              </Space>
+            </div>
+          ))}
+        </div>
+      </Spin>
     </Modal>
   );
 };
 
 const RemoveModal = (
-  props: { gridRef: MutableRefObject<GridApi | undefined> } & ModalFuncProps,
+  props: { gridRef: MutableRefObject<GridApi | undefined>; nextSprint: any[] } & ModalFuncProps,
 ) => {
   const query = useLocation()?.query;
   const selected = props.gridRef.current?.getSelectedRows();
@@ -106,6 +108,7 @@ const RemoveModal = (
   const [source, setSource] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [dissatisfy, setDissatisfy] = useState<any[]>([]);
 
   const getTestUserList = async () => {
     try {
@@ -141,38 +144,63 @@ const RemoveModal = (
       selected?.map((it) => ({
         stage: it.stage,
         rdId: it.id,
-        category: it.category,
+        category: String(Math.abs(it.category)),
         ztNo: it.ztNo,
         title: it.title,
         relatedStories: it.relatedStories,
         relatedBugs: it.relatedBugs,
+        flag: ['1', '-3'].includes(it.category)
+          ? [1, 2].includes(it.stage)
+            ? true
+            : false
+          : ['3'].includes(it.category)
+          ? [1, 2, 3].includes(it.stage)
+            ? true
+            : false
+          : false,
       })) ?? [];
 
     let queryData: any[] = [];
     formatSelected.forEach((it) => {
       data.formList.forEach((form) => {
-        if (form.ztNo == it.ztNo)
-          queryData.push({ ...it, ...form, category: Math.abs(it.category) });
+        if (form.ztNo == it.ztNo) queryData.push({ ...it, ...form });
       });
     });
 
-    // 直接移除
-    const pass = queryData
-      ?.filter((it) => !([1, 2].includes(it.codeRevert) && it.testVerify == 1))
-      ?.map((o) => pick(o, pickData));
+    const pass = queryData?.filter((it) => !([1, 2].includes(it.codeRevert) && it.testVerify == 1));
 
     // 标识开发已revert数据 【revert:是，测试验证：是 或者 revert：免，测试验证：是】
     const tagData = queryData
       ?.filter((it) => [1, 2].includes(it.codeRevert) && it.testVerify == 1)
       ?.map((o) => pick(o, pickTag));
-
-    if (!isEmpty(pass)) {
-      await SprintDetailServices.remove({ datas: pass, project: query?.projectid ?? '' });
-    }
     if (!isEmpty(tagData)) {
-      await SprintDetailServices.removeTag({ datas: tagData, project: query?.projectid ?? '' });
+      await SprintDetailServices.removeTag({
+        datas: tagData,
+        project: Number(query?.projectid ?? 0),
+      });
     }
-    props.onCancel?.();
+    if (!isEmpty(pass)) {
+      // 有相关需求 或不满足条件的
+      const relatedData = pass.filter((it) => it.relatedStories || it.relatedBugs || !it.flag);
+      // 可直接移除
+      const notRelatedData = pass.filter((it) => it.relatedStories == 0 && it.relatedBugs == 0);
+      if (!isEmpty(notRelatedData)) {
+        await SprintDetailServices.remove({
+          datas: notRelatedData.map((it) => ({
+            rdId: it.id,
+            ztNo: it.ztNo,
+            category: String(Math.abs(Number(it.category))),
+            codeRevert: it.codeRevert,
+          })),
+          source: Number(query.projectid),
+          target: Number(props.nextSprint?.[1]?.id),
+        });
+      }
+      if (!isEmpty(relatedData)) {
+        setDissatisfy(relatedData);
+      }
+      if (isEmpty(relatedData)) props.onCancel?.();
+    }
   };
 
   const onOK = async () => {
@@ -391,6 +419,11 @@ const RemoveModal = (
             pagination={false}
           />
         </Form>
+        <DissatisfyModal
+          dissatisfy={dissatisfy}
+          setDissatisfy={setDissatisfy}
+          nextSprint={props.nextSprint}
+        />
       </Spin>
     </Modal>
   );

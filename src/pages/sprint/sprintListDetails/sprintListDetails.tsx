@@ -3173,13 +3173,12 @@ const SprintList: React.FC<any> = () => {
       <RemoveModal
         visible={showRemoveModal}
         gridRef={gridApi}
+        nextSprint={nextSprint}
+        onRefresh={updateGrid}
         onCancel={() => {
           setShowRemoveModal(false);
           updateGrid();
         }}
-        onOk={() => setShowRemoveModal(false)}
-        nextSprint={nextSprint}
-        onRefresh={updateGrid}
       />
       <DissatisfyModal
         dissatisfy={dissatisfy}

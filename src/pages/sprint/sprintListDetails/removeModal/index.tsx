@@ -25,6 +25,7 @@ export const DissatisfyModal = (
     setDissatisfy: Function;
     nextSprint: any[];
     onRefresh: Function;
+    onRefreshForm?: Function;
   },
 ) => {
   const query = useLocation()?.query;
@@ -44,8 +45,10 @@ export const DissatisfyModal = (
           },
         ],
       });
-      props.setDissatisfy(props.dissatisfy.filter((o) => o.ztNo != item.ztNo));
-      props.onRefresh();
+      const update = props.dissatisfy.filter((o) => o.ztNo != item.ztNo);
+      props.onRefreshForm?.(update);
+      props.setDissatisfy(update);
+      if (isEmpty(props.dissatisfy)) props.onRefresh();
       setLoading(false);
     } catch (e) {
       setLoading(false);
@@ -140,7 +143,7 @@ const RemoveModal = (
         rdId: it.id,
         notRevertMemo: it.notrevertMemo ?? '',
         hasCode: it.pushCode ?? undefined,
-        codeRevert: it.codeRevert ?? undefined,
+        codeRevert: it.pushCode == 0 ? 2 : it.codeRevert ?? undefined,
         relatedStories: it.relatedStories ?? 0,
         testers: isEmpty(it.tester) ? [] : it.tester?.map((it: any) => it.id),
         testVerify: !isEmpty(it.testCheck) ? Math.abs(Number(it.testCheck)) : undefined,
@@ -178,10 +181,10 @@ const RemoveModal = (
         if (form.ztNo == it.ztNo) queryData.push({ ...it, ...form });
       });
     });
-
+    // 可移除的数据（含满足和不满足移除条件的）
     const pass = queryData?.filter((it) => !([1, 2].includes(it.codeRevert) && it.testVerify == 1));
 
-    // 标识开发已revert数据 【revert:是，测试验证：是 或者 revert：免，测试验证：是】
+    // 打标识 开发已revert数据 【revert:是，测试验证：是 或者 revert：免，测试验证：是】
     const tagData = queryData
       ?.filter((it) => [1, 2].includes(it.codeRevert) && it.testVerify == 1)
       ?.map((o) => pick(o, pickTag));
@@ -190,6 +193,7 @@ const RemoveModal = (
         datas: tagData,
         project: Number(query?.projectid ?? 0),
       });
+      setSource(queryData.filter((it) => !([1, 2].includes(it.codeRevert) && it.testVerify == 1)));
     }
     if (!isEmpty(pass)) {
       // 有相关需求 或不满足条件的
@@ -436,6 +440,10 @@ const RemoveModal = (
           setDissatisfy={setDissatisfy}
           nextSprint={props.nextSprint}
           onRefresh={props.onRefresh}
+          onRefreshForm={(v: any[]) => {
+            setSource(v);
+            if (isEmpty(v)) props.onCancel?.();
+          }}
         />
       </Spin>
     </Modal>

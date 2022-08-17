@@ -3,10 +3,12 @@ import {
   getReleaseItem,
   getIfOrNot,
   getDatabseAndApiUpgrade,
-  // getUpgradeApi,
-  // getApiMethod,
+  getUpgradeApi,
+  getApiMethod,
 } from '../../../comControl/converse';
 import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
+import { ColumnType } from 'antd/es/table';
+import { ColumnsType } from 'antd/lib/table/interface';
 // 渲染表格行的颜色(正在修改的行)
 const releaseAppChangRowColor = (allLockedArray: any, type: string, idFlag: number) => {
   const lockInfoArray = allLockedArray;
@@ -78,6 +80,10 @@ const getReleasedItemColumns = () => {
       field: 'edit_time',
     },
     {
+      headerName: '说明',
+      field: 'instructions',
+    },
+    {
       headerName: '备注',
       field: 'remarks',
     },
@@ -98,37 +104,43 @@ const getReleasedApiColumns = () => {
     {
       headerName: '上线环境',
       field: 'online_environment',
+      cellRenderer: (params: any) => getOnlineDev(params.value),
     },
     {
       headerName: '升级接口',
       field: 'update_api',
+      cellRenderer: (params: any) => getUpgradeApi(params.value),
     },
     {
       headerName: '接口服务',
       field: 'api_name',
     },
-    {
-      headerName: '是否支持热更新',
-      field: 'hot_update',
-    },
+    // {
+    //   headerName: '是否支持热更新',
+    //   field: 'hot_update',
+    //   cellRenderer: (params: any) => {
+    //     return `<span>${getIfOrNot(params.value)}</span>`;
+    //   },
+    // },
     {
       headerName: '接口Method',
       field: 'api_method',
+      cellRenderer: (params: any) => getApiMethod(params.value),
     },
     {
       headerName: '接口URL',
       field: 'api_url',
     },
-    // {
-    //   headerName: 'Data',
-    //   field: 'data',
-    // },
-    // {
-    //   headerName: 'Header',
-    //   field: 'header',
-    // },
     {
-      headerName: '涉及租户',
+      headerName: 'Data',
+      field: 'data',
+    },
+    {
+      headerName: 'Header',
+      field: 'header',
+    },
+    {
+      headerName: '租户ID',
       field: 'related_tenant',
     },
     {
@@ -327,52 +339,48 @@ const getNewRelServiceComfirmColumns = () => {
   ];
   return thirdUpSerColumn;
 };
-const publishListColumn: (ColDef | ColGroupDef)[] = [
-  { checkboxSelection: true, headerCheckboxSelection: true },
+const publishListColumn: ColumnsType<any> = [
   {
-    headerName: '序号',
-    field: 'id',
-    minWidth: 70,
-    maxWidth: 90,
-    cellRenderer: (params: any) => (+params.node.id + 1).toString(),
+    title: '序号',
+    render: (v: any, record, i) => (i + 1).toString(),
   },
   {
-    headerName: 'ID',
-    field: 'id',
+    title: '需求编号',
+    dataIndex: 'story_num',
+    render: (v) => (
+      <a target="_blank" href={`http://zentao.77hub.com/zentao/story-view-${v}.html`}>
+        {v}
+      </a>
+    ),
   },
   {
-    headerName: '需求编号',
-    field: 'ztNo',
-    cellRenderer: (p) =>
-      `<a target="_blank" href="http://zentao.77hub.com/zentao/story-view-${p.value}.html">${p.value}</a>`,
+    title: '标题内容',
+    dataIndex: 'title',
   },
   {
-    headerName: '标题内容',
-    field: 'content',
+    title: '所属执行',
+    dataIndex: 'execution',
   },
   {
-    headerName: '所属执行',
-    field: 'env',
+    title: '优先级',
+    dataIndex: 'priority',
   },
   {
-    headerName: '优先级',
-    field: 'level',
+    title: '模块名',
+    dataIndex: 'module',
   },
   {
-    headerName: '模块名',
-    field: 'module',
+    title: '是否可热更',
+    dataIndex: 'is_hot_update',
+    render: (v) => (v == 'no' ? '否' : v == 'yes' ? '是' : ''),
   },
   {
-    headerName: '是否可热更',
-    field: 'hot_update',
+    title: '创建人',
+    dataIndex: 'create_user_name',
   },
   {
-    headerName: '创建人',
-    field: 'create',
-  },
-  {
-    headerName: '指派人',
-    field: 'point',
+    title: '指派人',
+    dataIndex: 'assigned_to_name',
   },
 ];
 

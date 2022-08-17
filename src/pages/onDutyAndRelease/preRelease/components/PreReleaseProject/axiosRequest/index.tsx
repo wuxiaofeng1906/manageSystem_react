@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {getDutyPersonPermission, getSystemPersonPermission} from '../../../authority/permission';
+import { getDutyPersonPermission, getSystemPersonPermission } from '../../../authority/permission';
 import dayjs from 'dayjs';
 
 const sys_accessToken = localStorage.getItem('accessId');
@@ -10,14 +10,12 @@ const usersInfo = JSON.parse(userLogins);
 
 // 保存预发布项目
 const savePrePulishProjects = async (params: any, listNo: string) => {
-
   const prjIdArray = params.projectsName;
   let projectId = '';
   prjIdArray.forEach((project: string) => {
     const proID = project.split('&')[1];
     projectId = projectId === '' ? proID : `${projectId},${proID}`;
   });
-
   const data = {
     user_name: usersInfo.name,
     user_id: usersInfo.userid,
@@ -27,8 +25,8 @@ const savePrePulishProjects = async (params: any, listNo: string) => {
     plan_release_time: dayjs(params.pulishTime).format('YYYY-MM-DD HH:mm:ss'),
     ready_release_num: listNo,
     ignore_check: params.ignoreZentaoList,
-    person_duty_num: params.relateDutyName === '免' ? "" : params.relateDutyName,
-    cluster: params.pulishCluster
+    person_duty_num: params.relateDutyName === '免' ? '' : params.relateDutyName,
+    cluster: params.pulishCluster,
   };
 
   if (params.proid) {
@@ -65,7 +63,6 @@ const savePrePulishProjects = async (params: any, listNo: string) => {
 
 // 保存预发布项目
 const savePreProjects = async (source: any, releaseNum: string) => {
-
   let result = {
     datas: [],
     errorMessage: '',
@@ -86,7 +83,6 @@ const savePreProjects = async (source: any, releaseNum: string) => {
     return result;
   }
 
-
   if (!source.pulishCluster) {
     result.errorMessage = '发布集群不能为空！';
     return result;
@@ -96,7 +92,6 @@ const savePreProjects = async (source: any, releaseNum: string) => {
     result.errorMessage = '发布时间不能为空！';
     return result;
   }
-
 
   if (!source.relateDutyName) {
     result.errorMessage = '关联值班名单不能为空！';
@@ -124,4 +119,4 @@ const savePreProjects = async (source: any, releaseNum: string) => {
   return result;
 };
 
-export {savePreProjects};
+export { savePreProjects };

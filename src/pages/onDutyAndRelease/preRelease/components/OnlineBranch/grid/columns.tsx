@@ -88,10 +88,10 @@ const rendererUnitTest = (params: any) => {
 const iconCheckRender = (params: any) => {
   const values = params.value;
   const technical = params.data?.technical_side === '2';
-
   let result = values?.check_status;
   let Color = 'black';
-  if (isEmpty(values)) {
+  if (isEmpty(params.data)) result = '';
+  else if (isEmpty(values)) {
     result = '忽略';
     Color = 'blue';
   } else {

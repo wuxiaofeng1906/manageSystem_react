@@ -12,6 +12,7 @@ import { SelectProps } from 'antd/lib/select';
 import * as dayjs from 'dayjs';
 import { useUnmount } from 'ahooks';
 import useLock from '@/hooks/lock';
+import { deleteLockStatus } from '@/pages/onDutyAndRelease/preRelease/lock/rowLock';
 
 const opts = { showSearch: true, mode: 'multiple', optionFilterProp: 'label' };
 const recentType = { 前端: 'front', 后端: 'backend', 测试: 'test', 运维: 'operations', SQA: 'sqa' };
@@ -589,6 +590,13 @@ const DutyCatalog = () => {
   useUnmount(() => {
     onDeleteLock();
   });
+  window.onbeforeunload = function () {
+    onDeleteLock();
+  };
+
+  window.onunload = function () {
+    onDeleteLock();
+  };
 
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>

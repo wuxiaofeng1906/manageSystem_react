@@ -1,4 +1,4 @@
-import {getRepaireType, getIfOrNot, getPassOrNot} from '../../../comControl/converse';
+import { getRepaireType, getIfOrNot, getPassOrNot } from '../../../comControl/converse';
 
 // 数据修复review
 const getReviewColumns = () => {
@@ -16,7 +16,7 @@ const getReviewColumns = () => {
       headerName: '提交ID',
       field: 'commit_id',
       minWidth: 100,
-      maxWidth: 100,
+      maxWidth: 130,
     },
     {
       headerName: '数据修复内容',
@@ -76,7 +76,7 @@ const getReviewColumns = () => {
       cellRenderer: (params: any) => {
         const paramData = JSON.stringify(params.data).replace(/'/g, '’');
 
-        if (paramData === "{}") {
+        if (paramData === '{}') {
           return `
             <Button  style="border: none; background-color: transparent; " onclick='showDataRepaireForm("add",${paramData})'>
               <img src="../add_1.png" width="15" height="15" alt="新增" title="新增">
@@ -121,5 +121,4 @@ const getReviewConfirmColums = () => {
   return secondDataReviewColumn;
 };
 
-
-export {getReviewColumns, getReviewConfirmColums}
+export { getReviewColumns, getReviewConfirmColums };

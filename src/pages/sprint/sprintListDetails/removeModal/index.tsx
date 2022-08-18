@@ -241,8 +241,8 @@ const RemoveModal = (
   };
 
   const columns: ColumnsType<any> = [
-    { title: '序号', render: (v, r, i) => i + 1, width: 80 },
-    { title: '类型', dataIndex: 'category', render: (v, r, i) => categoryType[v] ?? '', width: 60 },
+    { title: '序号', render: (v, r, i) => i + 1, width: 60 },
+    { title: '类型', dataIndex: 'category', render: (v, r, i) => categoryType[v] ?? '', width: 80 },
     {
       title: '编号',
       dataIndex: 'ztNo',

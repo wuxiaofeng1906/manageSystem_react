@@ -161,14 +161,17 @@ const UpgradeService: React.FC<any> = () => {
     // releaseIdArray 需要注意
     const result = await inquireService(releasedIDArray, tabsData.activeKey);
     if (result.message !== '') {
-      // message.error({
-      //   content: result.message,
-      //   duration: 1,
-      //   style: {
-      //     marginTop: '50vh',
-      //   },
-      // });
-      setDeployTip(result.message);
+      if (result.code == 4001) {
+        setDeployTip(result.message.replace('错误：', ''));
+      } else {
+        message.error({
+          content: result.message,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
     } else {
       setDeployTip('');
       const pulishData: any = await alalysisInitData('pulishItem', tabsData.activeKey);
@@ -763,10 +766,10 @@ const UpgradeService: React.FC<any> = () => {
                     </Form.Item>
                   </Col>
                 </Row>
-                {/*一键部署检查错误提示*/}
-                <div style={{ color: 'red' }}>{deployTip}</div>
               </Form>
             </div>
+            {/*一键部署检查错误提示*/}
+            <div style={{ color: 'red' }}>{deployTip}</div>
             {/* 服务确认完成 */}
             <div>
               <div style={{ fontWeight: 'bold' }}> 服务确认完成</div>

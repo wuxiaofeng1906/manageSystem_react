@@ -11,6 +11,7 @@ const usersInfo = JSON.parse(userLogins);
 // 一键部署ID之升级接口数据获取
 const queryServiceByID = async (params: string) => {
   const result: any = {
+    code: 200,
     message: '',
     data: [],
   };
@@ -21,6 +22,7 @@ const queryServiceByID = async (params: string) => {
       if (res.data.code === 200) {
         result.data = []; // 无用代码，没有删除
       } else {
+        result.code = res.data.code;
         result.message = `错误：${res.data.msg}`;
       }
     })

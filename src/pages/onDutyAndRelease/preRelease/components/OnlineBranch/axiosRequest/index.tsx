@@ -201,6 +201,9 @@ const checkOnlineHeadData = async (sourceData: any) => {
   if (!sourceData.imageevn) {
     return '镜像环境不能为空！';
   }
+  if (isEmpty(sourceData.server)) {
+    return '上线服务不能为空！';
+  }
 
   const authData = {
     operate: `保存上线分支`,
@@ -604,10 +607,10 @@ const saveOnlineBranchData = async (
   }
 
   // 版本检查设置
-  const checkMsg_versonCheck = await checkOnlineVersionData(sourceData);
-  if (checkMsg_versonCheck) {
-    return checkMsg_versonCheck;
-  }
+  // const checkMsg_versonCheck = await checkOnlineVersionData(sourceData);
+  // if (checkMsg_versonCheck) {
+  //   return checkMsg_versonCheck;
+  // }
 
   // 环境一致性检查设置
   const checkMsg_envCheck = await checkOnlineEnvData(sourceData);

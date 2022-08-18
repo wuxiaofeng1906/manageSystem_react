@@ -106,7 +106,7 @@ const OnlineBranch: React.FC<any> = () => {
     });
 
     const formData = formForOnlineBranch.getFieldsValue();
-    console.log(newOnlineBranchNum, { ...formData, checkEnv: formData.imageevn });
+    // console.log(newOnlineBranchNum, { ...formData, checkEnv: formData.imageevn });
     const result = await saveOnlineBranchData(
       onlineBranchModal.title,
       tabsData.activeKey,

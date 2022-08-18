@@ -520,7 +520,7 @@ const autoCheckRenderer = (params: any) => {
 // 封板状态
 const sealStatusRenderer = (params: any) => {
   // console.log(params.data.ready_release_num);
-  if (!params.value) {
+  if (isEmpty(params.value)) {
     return `<div></div>`;
   }
 

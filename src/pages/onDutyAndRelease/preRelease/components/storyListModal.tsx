@@ -136,7 +136,11 @@ const StoryListModal = () => {
               setSelected(
                 isEmpty(selectedRowKeys)
                   ? []
-                  : record?.map((it) => ({ story_num: it.story_num, execution: it.execution })),
+                  : record?.map((it) => ({
+                      story_num: it.story_num,
+                      execution: it.execution,
+                      ready_release_num: tabsData.activeKey,
+                    })),
               );
             },
           }}

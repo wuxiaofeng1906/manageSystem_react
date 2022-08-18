@@ -24,7 +24,7 @@ const PreReleaseServices = {
   },
   // 更新待发布需求列表
   async updateStory(data: any) {
-    return request(`${baseUrl}/release/story`, { data, method: 'post' });
+    return request(`${baseUrl}/release/story`, { data, method: 'post', msg: '保存成功' });
   },
   // 获取需求编号
   async getStoryNum(executions_id: string) {

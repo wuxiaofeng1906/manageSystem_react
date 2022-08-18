@@ -4,6 +4,7 @@ import { publishListColumn } from './UpgradeService/grid/columns';
 import { useModel } from '@@/plugin-model/useModel';
 import PreReleaseServices from '@/services/preRelease';
 import { isEmpty, groupBy } from 'lodash';
+import { useUnmount } from 'ahooks';
 
 const StoryListModal = () => {
   const {
@@ -26,12 +27,12 @@ const StoryListModal = () => {
   const onConfirm = async () => {
     try {
       setLoading(true);
-      const checked = tableSource.filter((it) => selected.includes(it.story_num));
+      const checked = tableSource.filter((it) => selected.includes(String(it.story_num)));
       const group = groupBy(checked, 'execution_id');
-      const data = Object.entries(group).map(([execution, arr]) => ({
+      const data = Object.entries(group).map(([executions_id, arr]) => ({
         story_num: isEmpty(selected) ? '' : arr.map((o) => o.story_num)?.join(),
-        execution,
-        ready_release_num: arr[0]?.ready_release_num,
+        execution: executions_id,
+        ready_release_num: tabsData.activeKey,
       }));
       await updateStoryList(data);
       setLoading(false);
@@ -49,7 +50,6 @@ const StoryListModal = () => {
     const initChecked = isEmpty(res?.check_story)
       ? res.story_data?.map((it: any) => it.story_num) ?? []
       : res?.check_story;
-    console.log(initChecked);
     setStageFilter(res.story_data);
     setSelected(initChecked);
   };
@@ -71,7 +71,7 @@ const StoryListModal = () => {
     const data = autoStoryList.filter(
       (it) =>
         (values.story_num ?? []).includes(it.story_num) ||
-        (values.execution_ids ?? []).includes(it.execution),
+        (values.execution_ids ?? []).includes(String(it.execution_id)),
     );
     setStageFilter(data);
   };
@@ -97,6 +97,9 @@ const StoryListModal = () => {
       isEmpty(formData.execution_ids) && isEmpty(formData.story_num) ? autoStoryList : stageFilter,
     [JSON.stringify(formData)],
   );
+  useUnmount(() => {
+    setShowStoryModal(false);
+  });
 
   return (
     <Modal
@@ -112,7 +115,7 @@ const StoryListModal = () => {
       cancelText={'取消'}
     >
       <Spin spinning={loading}>
-        <Form form={form} size={'small'} layout={'inline'} onBlur={onFilter}>
+        <Form form={form} size={'small'} layout={'inline'} onFieldsChange={onFilter}>
           <Form.Item name={'execution_ids'} label={'所属执行'}>
             <Select
               style={{ width: 500 }}
@@ -133,27 +136,16 @@ const StoryListModal = () => {
           </Form.Item>
         </Form>
         <Table
-          style={{ maxHeight: 500, width: '100%', margin: '4px 0' }}
+          style={{ width: '100%', margin: '4px 0' }}
           size={'small'}
-          rowKey={(record) => record.story_num}
+          rowKey={(record) => String(record.story_num)}
           columns={publishListColumn}
           dataSource={tableSource ?? []}
           pagination={false}
+          scroll={{ y: 500, x: 1000 }}
           rowSelection={{
             selectedRowKeys: selected,
-            onChange: (selectedRowKeys, record) => {
-              console.log(record);
-              setSelected(selectedRowKeys);
-              // setSelected(
-              //   isEmpty(selectedRowKeys)
-              //     ? []
-              //     : record?.map((it) => ({
-              //         story_num: it.story_num,
-              //         execution: it.execution,
-              //         ready_release_num: tabsData.activeKey,
-              //       })),
-              // );
-            },
+            onChange: (selectedRowKeys) => setSelected(selectedRowKeys),
           }}
         />
         <div>提示：如本次发布不涉及的需求，请将对应需求前勾选的复选框去掉</div>

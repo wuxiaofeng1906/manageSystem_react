@@ -9,6 +9,7 @@ import {
 import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import { ColumnType } from 'antd/es/table';
 import { ColumnsType } from 'antd/lib/table/interface';
+import { Tooltip } from 'antd';
 // 渲染表格行的颜色(正在修改的行)
 const releaseAppChangRowColor = (allLockedArray: any, type: string, idFlag: number) => {
   const lockInfoArray = allLockedArray;
@@ -342,11 +343,13 @@ const getNewRelServiceComfirmColumns = () => {
 const publishListColumn: ColumnsType<any> = [
   {
     title: '序号',
+    width: 50,
     render: (v: any, record, i) => (i + 1).toString(),
   },
   {
     title: '需求编号',
     dataIndex: 'story_num',
+    width: 80,
     render: (v) => (
       <a target="_blank" href={`http://zentao.77hub.com/zentao/story-view-${v}.html`}>
         {v}
@@ -356,6 +359,13 @@ const publishListColumn: ColumnsType<any> = [
   {
     title: '标题内容',
     dataIndex: 'title',
+    width: 200,
+    ellipsis: { showTitle: false },
+    render: (v) => (
+      <Tooltip placement={'topLeft'} title={v}>
+        {v}
+      </Tooltip>
+    ),
   },
   {
     title: '所属执行',
@@ -364,6 +374,7 @@ const publishListColumn: ColumnsType<any> = [
   {
     title: '优先级',
     dataIndex: 'priority',
+    width: 60,
   },
   {
     title: '模块名',
@@ -372,15 +383,18 @@ const publishListColumn: ColumnsType<any> = [
   {
     title: '是否可热更',
     dataIndex: 'is_hot_update',
+    width: 100,
     render: (v) => (v == 'no' ? '否' : v == 'yes' ? '是' : ''),
   },
   {
     title: '创建人',
     dataIndex: 'create_user_name',
+    width: 90,
   },
   {
     title: '指派人',
     dataIndex: 'assigned_to_name',
+    width: 90,
   },
 ];
 

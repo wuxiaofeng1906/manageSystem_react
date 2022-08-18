@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Button, Col, DatePicker, Form, Input, message, Row, Select } from 'antd';
 import { useModel } from '@@/plugin-model/useModel';
-import { useRequest } from 'ahooks';
+import { useRequest, useUnmount } from 'ahooks';
 import {
   loadPrjNameSelect,
   loadReleaseTypeSelect,
@@ -89,14 +89,13 @@ const PreReleaseProject: React.FC<any> = () => {
   };
 
   // 包存 包含'emergency', 'stage-patch' 项目id
-  const updateExecutionIds = () => {
-    const ids = (preReleaseData.projectId ?? [])?.map((it: string) => it.split('&')[1]);
+  const updateExecutionIds = (projectId = preReleaseData.projectId) => {
+    const ids = (projectId ?? [])?.map((it: string) => it.split('&')[1]);
     const executionIds = projectsArray
       ?.filter((it) => ids.includes(String(it.key)))
       ?.filter((it) => ['emergency', 'stage-patch'].includes(it.type))
       .map((it) => String(it.key));
     setStoryExecutionId(executionIds ?? []);
-    console.log(executionIds, 'executionIds', tabsData.activeKey);
     return executionIds;
   };
 
@@ -145,7 +144,7 @@ const PreReleaseProject: React.FC<any> = () => {
       autoModifyTabsName(datas.pulishType);
 
       // 查找项目是否包含有'emergency', 'stage-patch' 项目id
-      const executionIds = updateExecutionIds();
+      const executionIds = updateExecutionIds(datas.projectsName);
       if (!isEmpty(executionIds)) {
         setShowStoryModal(true);
       }
@@ -200,11 +199,19 @@ const PreReleaseProject: React.FC<any> = () => {
         checkListStatus: preReleaseData.checkListStatus,
         relateDutyName: preReleaseData.relateDutyName === '' ? '免' : preReleaseData.relateDutyName,
       });
-      // 更新执行id
-      updateExecutionIds();
     }
   }, [preReleaseData]);
 
+  useEffect(() => {
+    // 更新执行id
+    if (tabsData.activeKey && preReleaseData.projectId && projectsArray) {
+      updateExecutionIds();
+    } else setStoryExecutionId([]);
+  }, [tabsData.activeKey, preReleaseData.projectId, projectsArray]);
+
+  useUnmount(() => {
+    setShowStoryModal(false);
+  });
   return (
     <div>
       <div>

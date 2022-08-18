@@ -131,7 +131,6 @@ export default () => {
   // 更新预发布需求列表
   const updateStoryList = useCallback(async (data) => {
     await PreReleaseServices.updateStory(data);
-    await getStoryList(data);
   }, []);
 
   // 预发布需求列表

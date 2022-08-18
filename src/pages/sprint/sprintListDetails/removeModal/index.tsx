@@ -187,8 +187,8 @@ const RemoveModal = (
       })) ?? [];
 
     let queryData: any[] = [];
-    formatSelected.forEach((it) => {
-      data.formList.forEach((form) => {
+    formatSelected?.forEach((it) => {
+      data.formList?.forEach((form) => {
         if (form.ztNo == it.ztNo) queryData.push({ ...it, ...form });
       });
     });
@@ -204,7 +204,13 @@ const RemoveModal = (
         datas: tagData,
         project: Number(query?.projectid ?? 0),
       });
-      setSource(queryData.filter((it) => !([1, 2].includes(it.codeRevert) && it.testVerify == 1)));
+      const updateSource = queryData.filter(
+        (it) => !([1, 2].includes(it.codeRevert) && it.testVerify == 1),
+      );
+      setSource(updateSource);
+      if (isEmpty(updateSource)) {
+        props.onCancel?.();
+      }
     }
     if (!isEmpty(pass)) {
       // 有相关需求 或不满足条件的

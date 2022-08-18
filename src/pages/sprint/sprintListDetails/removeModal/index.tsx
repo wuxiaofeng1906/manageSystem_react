@@ -1,5 +1,5 @@
 import type { MutableRefObject } from 'react';
-import React, { forwardRef, useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useMemo, useState } from 'react';
 import { Modal, Select, Input, Form, Table, Space, Button, Spin, Popconfirm, Tooltip } from 'antd';
 import type { GridApi } from 'ag-grid-community';
 import type { ModalFuncProps } from 'antd/lib/modal/Modal';
@@ -222,7 +222,7 @@ const RemoveModal = (
       }
     }
     if (!isEmpty(pass)) {
-      // 有相关需求 或不满足条件的
+      // 有相关bug、task 或不满足条件的(阶段)
       const relatedData = pass.filter((it) => it.relatedTasks || it.relatedBugs || !it.flag);
       // 可直接移除
       const notRelatedData = pass.filter((it) => it.relatedTasks == 0 && it.relatedBugs == 0);
@@ -255,192 +255,197 @@ const RemoveModal = (
     props.onCancel?.();
   };
 
-  const columns: ColumnsType<any> = [
-    { title: '序号', render: (v, r, i) => i + 1, width: 60 },
-    { title: '类型', dataIndex: 'category', render: (v, r, i) => categoryType[v] ?? '', width: 80 },
-    {
-      title: '编号',
-      dataIndex: 'ztNo',
-      width: 90,
-      render: (value, record, i) => <Form.Item name={['formList', i, 'ztNo']}>{value}</Form.Item>,
-    },
-    {
-      title: '标题内容',
-      dataIndex: 'title',
-      render: (v) => (
-        <Tooltip title={v} placement="topLeft">
-          {v}
-        </Tooltip>
-      ),
-    },
-    { title: '相关需求', dataIndex: 'relatedStories', width: 90 },
-    { title: '相关bug', dataIndex: 'relatedBugs', width: 90 },
-    {
-      title: '测试',
-      dataIndex: 'testers',
-      render: (value, record, i) => {
-        return (
-          <Form.Item noStyle shouldUpdate>
-            {() => {
-              const values = form.getFieldsValue()?.formList?.[i];
-              const testCheckFlag = values?.testVerify == 1;
-              return (
-                <Form.Item
-                  name={['formList', i, 'testers']}
-                  rules={[
-                    {
-                      validator: (r, v, cb) => {
-                        // 需要测试验证：测试人员必填
-                        if (testCheckFlag && (isEmpty(v) || v?.includes('NA')))
-                          return cb('请填写测试人员!');
-                        cb();
+  const memoColumns = useMemo(() => {
+    if (!props.visible) return [];
+    const columns: ColumnsType<any> = [
+      { title: '序号', render: (v, r, i) => i + 1, width: 60 },
+      {
+        title: '类型',
+        dataIndex: 'category',
+        render: (v, r, i) => categoryType[v] ?? '',
+        width: 80,
+      },
+      {
+        title: '编号',
+        dataIndex: 'ztNo',
+        width: 90,
+        render: (value, record, i) => <Form.Item name={['formList', i, 'ztNo']}>{value}</Form.Item>,
+      },
+      {
+        title: '标题内容',
+        dataIndex: 'title',
+        render: (v) => (
+          <Tooltip title={v} placement="topLeft">
+            {v}
+          </Tooltip>
+        ),
+      },
+      { title: '相关需求', dataIndex: 'relatedStories', width: 90 },
+      { title: '相关bug', dataIndex: 'relatedBugs', width: 90 },
+      {
+        title: '测试',
+        dataIndex: 'testers',
+        render: (value, record, i) => {
+          return (
+            <Form.Item noStyle shouldUpdate>
+              {() => {
+                const values = form.getFieldsValue()?.formList?.[i];
+                const testCheckFlag = values?.testVerify == 1;
+                return (
+                  <Form.Item
+                    name={['formList', i, 'testers']}
+                    rules={[
+                      {
+                        validator: (r, v, cb) => {
+                          // 需要测试验证：测试人员必填
+                          if (testCheckFlag && (isEmpty(v) || v?.includes('NA')))
+                            return cb('请填写测试人员!');
+                          cb();
+                        },
                       },
-                    },
-                  ]}
-                >
-                  <Select
-                    options={[
-                      ...[{ label: 'NA', value: 'NA', disabled: testCheckFlag }],
-                      ...testUser.map((it) => ({ ...it, disabled: !testCheckFlag })),
                     ]}
-                    showSearch
-                    optionFilterProp={'label'}
-                    size={'small'}
-                    mode={'multiple'}
-                  />
-                </Form.Item>
-              );
-            }}
-          </Form.Item>
-        );
+                  >
+                    <Select
+                      options={[
+                        ...[{ label: 'NA', value: 'NA', disabled: testCheckFlag }],
+                        ...testUser.map((it) => ({ ...it, disabled: !testCheckFlag })),
+                      ]}
+                      showSearch
+                      optionFilterProp={'label'}
+                      mode={'multiple'}
+                    />
+                  </Form.Item>
+                );
+              }}
+            </Form.Item>
+          );
+        },
       },
-    },
-    {
-      title: '是否要测试验证',
-      dataIndex: 'testVerify',
-      render: (value, record, i) => {
-        return (
-          <Form.Item noStyle shouldUpdate>
-            {({ setFieldsValue }) => {
-              const formList = form.getFieldsValue()?.formList;
+      {
+        title: '是否要测试验证',
+        dataIndex: 'testVerify',
+        render: (value, record, i) => {
+          return (
+            <Form.Item noStyle shouldUpdate>
+              {({ setFieldsValue }) => {
+                const formList = form.getFieldsValue()?.formList;
 
-              return (
-                <Form.Item
-                  name={['formList', i, 'testVerify']}
-                  rules={[{ required: true, message: '请填写是否要测试验证！' }]}
-                >
-                  <Select
-                    options={list}
-                    size={'small'}
-                    onChange={(v) => {
-                      formList[i].testVerify = v;
-                      formList[i].testers =
-                        v == 1
-                          ? formList[i].testers?.filter((it: string) => it !== 'NA') ?? []
-                          : formList[i].testers;
-                      setFieldsValue({ formList });
-                    }}
-                  />
-                </Form.Item>
-              );
-            }}
-          </Form.Item>
-        );
+                return (
+                  <Form.Item
+                    name={['formList', i, 'testVerify']}
+                    rules={[{ required: true, message: '请填写是否要测试验证！' }]}
+                  >
+                    <Select
+                      options={list}
+                      onChange={(v) => {
+                        formList[i].testVerify = v;
+                        formList[i].testers =
+                          v == 1
+                            ? formList[i].testers?.filter((it: string) => it !== 'NA') ?? []
+                            : formList[i].testers;
+                        setFieldsValue({ formList });
+                      }}
+                    />
+                  </Form.Item>
+                );
+              }}
+            </Form.Item>
+          );
+        },
       },
-    },
-    {
-      title: '是否提交代码',
-      dataIndex: 'hasCode',
-      render: (value, record, i) => {
-        return (
-          <Form.Item noStyle shouldUpdate>
-            {({ setFieldsValue, setFields }) => {
-              const formList = form.getFieldsValue()?.formList;
-              return (
-                <Form.Item
-                  name={['formList', i, 'hasCode']}
-                  rules={[{ required: true, message: '请填写是否提交代码！' }]}
-                >
-                  <Select
-                    options={list}
-                    size={'small'}
-                    onChange={(v) => {
-                      const status = v == 0;
-                      formList[i].codeRevert = status ? 2 : undefined; // 提交代码为否： 代码revert 自动为免且不可编辑
-                      formList[i].hasCode = v;
-                      setFieldsValue({ formList });
-                    }}
-                  />
-                </Form.Item>
-              );
-            }}
-          </Form.Item>
-        );
+      {
+        title: '是否提交代码',
+        dataIndex: 'hasCode',
+        render: (value, record, i) => {
+          return (
+            <Form.Item noStyle shouldUpdate>
+              {({ setFieldsValue }) => {
+                const formList = form.getFieldsValue()?.formList;
+                return (
+                  <Form.Item
+                    name={['formList', i, 'hasCode']}
+                    rules={[{ required: true, message: '请填写是否提交代码！' }]}
+                  >
+                    <Select
+                      options={list}
+                      onChange={(v) => {
+                        const status = v == 0;
+                        formList[i].codeRevert = status ? 2 : undefined; // 提交代码为否： 代码revert 自动为免且不可编辑
+                        formList[i].hasCode = v;
+                        setFieldsValue({ formList });
+                      }}
+                    />
+                  </Form.Item>
+                );
+              }}
+            </Form.Item>
+          );
+        },
       },
-    },
-    {
-      title: '代码是否Revert',
-      dataIndex: 'codeRevert',
-      render: (value, record, i) => {
-        return (
-          <Form.Item noStyle shouldUpdate>
-            {() => {
-              const values = form.getFieldsValue()?.formList?.[i];
-              return (
-                <Form.Item
-                  name={['formList', i, 'codeRevert']}
-                  rules={[
-                    {
-                      validator: (r, v, cb) => {
-                        if (values?.hasCode == 1 && v == 0) return cb('必须revert代码！');
-                        else if (v == undefined) return cb('请选择是否revert代码！');
-                        return cb();
+      {
+        title: '代码是否Revert',
+        dataIndex: 'codeRevert',
+        render: (value, record, i) => {
+          return (
+            <Form.Item noStyle shouldUpdate>
+              {() => {
+                const values = form.getFieldsValue()?.formList?.[i];
+                return (
+                  <Form.Item
+                    name={['formList', i, 'codeRevert']}
+                    rules={[
+                      {
+                        validator: (r, v, cb) => {
+                          if (values?.hasCode == 1 && v == 0) return cb('必须revert代码！');
+                          else if (v == undefined) return cb('请选择是否revert代码！');
+                          return cb();
+                        },
                       },
-                    },
-                  ]}
-                >
-                  <Select
-                    size={'small'}
-                    disabled={values?.hasCode == '0'}
-                    options={list.concat([{ label: '免', value: 2 }]).map((it) => ({
-                      ...it,
-                      disabled: values?.hasCode == 1 && it.value == 0, // 提交代码，revert 否：不可选
-                    }))}
-                  />
-                </Form.Item>
-              );
-            }}
-          </Form.Item>
-        );
+                    ]}
+                  >
+                    <Select
+                      disabled={values?.hasCode == '0'}
+                      options={list.concat([{ label: '免', value: 2 }]).map((it) => ({
+                        ...it,
+                        disabled: values?.hasCode == 1 && it.value == 0, // 提交代码，revert 否：不可选
+                      }))}
+                    />
+                  </Form.Item>
+                );
+              }}
+            </Form.Item>
+          );
+        },
       },
-    },
-    {
-      title: '免Revert原因',
-      dataIndex: 'notRevertMemo',
-      render: (value, record, i) => {
-        return (
-          <Form.Item noStyle shouldUpdate>
-            {({ setFields }) => {
-              const values = form.getFieldsValue()?.formList?.[i];
-              return (
-                <Form.Item
-                  name={['formList', i, 'notRevertMemo']}
-                  rules={[
-                    {
-                      required: values?.codeRevert == 2 && values?.hasCode == 1, // 人工修改为免且代码提交为是： 原因必填
-                      message: '请填写免revert原因！',
-                    },
-                  ]}
-                >
-                  <Input.TextArea size={'small'} autoSize={{ minRows: 1, maxRows: 3 }} />
-                </Form.Item>
-              );
-            }}
-          </Form.Item>
-        );
+      {
+        title: '免Revert原因',
+        dataIndex: 'notRevertMemo',
+        render: (value, _, i) => {
+          return (
+            <Form.Item noStyle shouldUpdate>
+              {() => {
+                const values = form.getFieldsValue()?.formList?.[i];
+                return (
+                  <Form.Item
+                    name={['formList', i, 'notRevertMemo']}
+                    rules={[
+                      {
+                        required: values?.codeRevert == 2 && values?.hasCode == 1, // 人工修改为免且代码提交为是： 原因必填
+                        message: '请填写免revert原因！',
+                      },
+                    ]}
+                  >
+                    <Input.TextArea autoSize={{ minRows: 1, maxRows: 3 }} />
+                  </Form.Item>
+                );
+              }}
+            </Form.Item>
+          );
+        },
       },
-    },
-  ];
+    ];
+    return columns;
+  }, [props.visible, JSON.stringify(testUser)]);
 
   return (
     <Modal
@@ -458,11 +463,11 @@ const RemoveModal = (
       confirmLoading={confirmLoading}
     >
       <Spin tip="加载中..." spinning={loading}>
-        <Form form={form}>
+        <Form form={form} size={'small'}>
           <Table
-            bordered
+            bordered={false}
             className={styles.removeTableWarp}
-            columns={columns}
+            columns={memoColumns}
             dataSource={source}
             size={'small'}
             scroll={{ y: 400 }}

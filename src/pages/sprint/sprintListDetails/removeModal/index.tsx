@@ -1,6 +1,6 @@
 import type { MutableRefObject } from 'react';
 import React, { forwardRef, useEffect, useState } from 'react';
-import { Modal, Select, Input, Form, Table, Space, Button, Spin, Popconfirm } from 'antd';
+import { Modal, Select, Input, Form, Table, Space, Button, Spin, Popconfirm, Tooltip } from 'antd';
 import type { GridApi } from 'ag-grid-community';
 import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 import type { ColumnsType } from 'antd/lib/table';
@@ -18,7 +18,12 @@ const list = [
 ];
 const pickData = ['rdId', 'ztNo', 'category', 'codeRevert'];
 const pickTag = pickData.concat(['testers', 'testVerify', 'hasCode', 'notRevertMemo']);
-
+const categoryType = {
+  '1': 'Bug',
+  '2': 'Task',
+  '3': 'Story',
+  '-3': 'B_Story',
+};
 export const DissatisfyModal = (
   props: ModalFuncProps & {
     dissatisfy: any[];
@@ -84,7 +89,7 @@ export const DissatisfyModal = (
                     onConfirm={() => onConfirm(it)}
                     onCancel={() => {
                       if (!it.ztNo) return;
-                      window.open(`http://zentao.77hub.com/zentao/execution-task-${it.ztNo}.html`);
+                      window.open(`http://zentao.77hub.com/zentao/story-view-${it.ztNo}.html`);
                     }}
                   >
                     <Button size={'small'} type={'primary'}>
@@ -96,7 +101,13 @@ export const DissatisfyModal = (
                     确认
                   </Button>
                 )}
-                <Button size={'small'} onClick={() => props.setDissatisfy([])}>
+                <Button
+                  size={'small'}
+                  onClick={() => {
+                    props.onRefreshForm?.(props.dissatisfy.filter((o) => o.ztNo !== it.ztNo));
+                    props.setDissatisfy([]);
+                  }}
+                >
                   取消
                 </Button>
               </Space>
@@ -230,14 +241,23 @@ const RemoveModal = (
   };
 
   const columns: ColumnsType<any> = [
-    { title: '序号', render: (v, r, i) => i + 1, width: 60 },
+    { title: '序号', render: (v, r, i) => i + 1, width: 80 },
+    { title: '类型', dataIndex: 'category', render: (v, r, i) => categoryType[v] ?? '', width: 60 },
     {
       title: '编号',
       dataIndex: 'ztNo',
       width: 90,
       render: (value, record, i) => <Form.Item name={['formList', i, 'ztNo']}>{value}</Form.Item>,
     },
-    { title: '标题内容', dataIndex: 'title' },
+    {
+      title: '标题内容',
+      dataIndex: 'title',
+      render: (v) => (
+        <Tooltip title={v} placement="topLeft">
+          {v}
+        </Tooltip>
+      ),
+    },
     { title: '相关需求', dataIndex: 'relatedStories', width: 90 },
     { title: '相关bug', dataIndex: 'relatedBugs', width: 90 },
     {
@@ -302,7 +322,7 @@ const RemoveModal = (
                       formList[i].testers =
                         v == 1
                           ? formList[i].testers?.filter((it: string) => it !== 'NA') ?? []
-                          : [];
+                          : formList[i].testers;
                       setFieldsValue({ formList });
                     }}
                   />

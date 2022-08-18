@@ -1682,7 +1682,8 @@ const SprintList: React.FC<any> = () => {
                     <span
                       style={{
                         color:
-                          params.value == '未开始' || params.data.ztUnlinkedAt != null
+                          params.value == '未开始' ||
+                          (params.data.ztUnlinkedAt != null && params.data.baseline == '0')
                             ? 'red'
                             : 'initial',
                         textDecoration: lineThroughStage.includes(params.value)

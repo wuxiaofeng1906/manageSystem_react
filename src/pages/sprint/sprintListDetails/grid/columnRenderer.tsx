@@ -67,7 +67,7 @@ const testerRenderer = (params: any) => {
   if (testConfirm === '1') {
     myColor = 'black';
   }
-  if (params.data.ztUnlinkedAt != null) myColor = 'red';
+  if (params.data.ztUnlinkedAt != null && params.data.baseline == '0') myColor = 'red';
   // if (!testArray || testArray.length === 0) {
   //   return `<span style="color: ${myColor}"> NA </span>`;
   // }

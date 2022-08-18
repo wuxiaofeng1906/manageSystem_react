@@ -76,20 +76,25 @@ export const DissatisfyModal = (
               <div style={{ minWidth: 100 }}>{it.ztNo}</div>
               <div style={{ minWidth: 200 }}>阶段为：{stageType[it.stage]}</div>
               <Space style={{ marginLeft: 10 }}>
-                {it.relatedStories || it.relatedBugs ? (
+                {it.relatedTasks || it.relatedBugs ? (
                   <Popconfirm
                     placement="top"
-                    title={`需求${it.ztNo} ${it.title}在${query.project}关联${
-                      it.relatedStories ?? 0
-                    }个任务和${it.relatedBugs ?? 0}个bug,将同步移到${
-                      props.nextSprint?.[1]?.name ?? ''
-                    }？`}
+                    title={
+                      <div style={{ maxWidth: 500 }}>
+                        <p>{`需求${it.ztNo} ${it.title}`}</p>
+                        <p>{`在${query.project}关联 ${it.relatedTasks ?? 0}个任务和${
+                          it.relatedBugs ?? 0
+                        }个bug,将同步移到${props.nextSprint?.[1]?.name ?? ''}`}</p>
+                      </div>
+                    }
                     okText="确认"
                     cancelText="去禅道"
                     onConfirm={() => onConfirm(it)}
                     onCancel={() => {
                       if (!it.ztNo) return;
-                      window.open(`http://zentao.77hub.com/zentao/story-view-${it.ztNo}.html`);
+                      window.open(
+                        `http://zentao.77hub.com/zentao/execution-story-${query.ztId}.html`,
+                      );
                     }}
                   >
                     <Button size={'small'} type={'primary'}>
@@ -156,6 +161,7 @@ const RemoveModal = (
         hasCode: it.pushCode ?? undefined,
         codeRevert: it.pushCode == 0 ? 2 : it.codeRevert ?? undefined,
         relatedStories: it.relatedStories ?? 0,
+        relatedTasks: it.relatedTasks ?? 0,
         testers: isEmpty(it.tester) ? [] : it.tester?.map((it: any) => it.id),
         testVerify: !isEmpty(it.testCheck) ? Math.abs(Number(it.testCheck)) : undefined,
       })) ?? [];
@@ -174,6 +180,7 @@ const RemoveModal = (
         ztNo: it.ztNo,
         title: it.title,
         relatedStories: it.relatedStories,
+        relatedTasks: it.relatedTasks,
         relatedBugs: it.relatedBugs,
         flag: ['1', '-3'].includes(it.category)
           ? [1, 2].includes(it.stage)
@@ -216,9 +223,9 @@ const RemoveModal = (
     }
     if (!isEmpty(pass)) {
       // 有相关需求 或不满足条件的
-      const relatedData = pass.filter((it) => it.relatedStories || it.relatedBugs || !it.flag);
+      const relatedData = pass.filter((it) => it.relatedTasks || it.relatedBugs || !it.flag);
       // 可直接移除
-      const notRelatedData = pass.filter((it) => it.relatedStories == 0 && it.relatedBugs == 0);
+      const notRelatedData = pass.filter((it) => it.relatedTasks == 0 && it.relatedBugs == 0);
       if (!isEmpty(notRelatedData)) {
         await SprintDetailServices.remove({
           datas: notRelatedData.map((it) => ({
@@ -347,7 +354,7 @@ const RemoveModal = (
       render: (value, record, i) => {
         return (
           <Form.Item noStyle shouldUpdate>
-            {({ setFieldsValue }) => {
+            {({ setFieldsValue, setFields }) => {
               const formList = form.getFieldsValue()?.formList;
               return (
                 <Form.Item
@@ -413,9 +420,8 @@ const RemoveModal = (
       render: (value, record, i) => {
         return (
           <Form.Item noStyle shouldUpdate>
-            {() => {
+            {({ setFields }) => {
               const values = form.getFieldsValue()?.formList?.[i];
-
               return (
                 <Form.Item
                   name={['formList', i, 'notRevertMemo']}

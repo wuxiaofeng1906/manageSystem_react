@@ -194,7 +194,11 @@ const changeBaseLinePosition = (data: any) => {
   // });
 
   // return noBaseLineArray.concat(baseLineArray);
-  const result = sortBy(data, ['baseline', 'ztUnlinkedAt']); // 顺序:  超范围-> 禅道需求移除 -> 未超范围
+  const format = data.map((it: any) => ({
+    ...it,
+    order: it.baseline == '0' && it.ztUnlinkedAt != null ? 2 : it.baseline == '0' ? 1 : 3,
+  }));
+  const result = sortBy(format, ['order', 'ztUnlinkedAt']); // 顺序:  超范围-> 禅道需求移除 -> 未超范围
   return result;
 };
 

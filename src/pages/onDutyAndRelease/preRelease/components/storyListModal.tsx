@@ -113,6 +113,7 @@ const StoryListModal = () => {
       okButtonProps={{ disabled: loading }}
       okText={'确定'}
       cancelText={'取消'}
+      centered
     >
       <Spin spinning={loading}>
         <Form form={form} size={'small'} layout={'inline'} onFieldsChange={onFilter}>
@@ -123,6 +124,7 @@ const StoryListModal = () => {
               mode={'multiple'}
               showSearch
               allowClear
+              getPopupContainer={(triggerNode) => triggerNode.parentElement || document.body}
             />
           </Form.Item>
           <Form.Item name={'story_num'} label={'需求编号'}>
@@ -132,6 +134,7 @@ const StoryListModal = () => {
               mode={'multiple'}
               showSearch
               allowClear
+              getPopupContainer={(triggerNode) => triggerNode.parentElement || document.body}
             />
           </Form.Item>
         </Form>

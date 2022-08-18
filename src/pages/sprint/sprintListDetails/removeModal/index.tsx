@@ -193,11 +193,13 @@ const RemoveModal = (
       });
     });
     // 可移除的数据（含满足和不满足移除条件的）
-    const pass = queryData?.filter((it) => !([1, 2].includes(it.codeRevert) && it.testVerify == 1));
+    const pass = queryData?.filter(
+      (it) => !(it.codeRevert == 1 && it.testVerify == 1 && it.hasCode == 1),
+    );
 
-    // 打标识 开发已revert数据 【revert:是，测试验证：是 或者 revert：免，测试验证：是】
+    // 打标识 开发已revert数据 【代码revert:是，测试验证：是 代码提交：是】
     const tagData = queryData
-      ?.filter((it) => [1, 2].includes(it.codeRevert) && it.testVerify == 1)
+      ?.filter((it) => it.codeRevert == 1 && it.testVerify == 1 && it.hasCode == 1)
       ?.map((o) => pick(o, pickTag));
     if (!isEmpty(tagData)) {
       await SprintDetailServices.removeTag({
@@ -205,7 +207,7 @@ const RemoveModal = (
         project: Number(query?.projectid ?? 0),
       });
       const updateSource = queryData.filter(
-        (it) => !([1, 2].includes(it.codeRevert) && it.testVerify == 1),
+        (it) => !(it.codeRevert == 1 && it.testVerify == 1 && it.hasCode == 1),
       );
       setSource(updateSource);
       if (isEmpty(updateSource)) {

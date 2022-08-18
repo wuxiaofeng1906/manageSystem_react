@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { publishListColumn } from './UpgradeService/grid/columns';
 import { useModel } from '@@/plugin-model/useModel';
 import PreReleaseServices from '@/services/preRelease';
-import { isEmpty } from 'lodash';
+import { isEmpty, groupBy } from 'lodash';
 
 const StoryListModal = () => {
   const {
@@ -26,8 +26,14 @@ const StoryListModal = () => {
   const onConfirm = async () => {
     try {
       setLoading(true);
-      console.log(selected);
-      await updateStoryList(selected);
+      const checked = tableSource.filter((it) => selected.includes(it.story_num));
+      const group = groupBy(checked, 'execution_id');
+      const data = Object.entries(group).map(([execution, arr]) => ({
+        story_num: isEmpty(selected) ? '' : arr.map((o) => o.story_num)?.join(),
+        execution,
+        ready_release_num: arr[0]?.ready_release_num,
+      }));
+      await updateStoryList(data);
       setLoading(false);
     } catch (e) {
       setLoading(false);
@@ -40,7 +46,12 @@ const StoryListModal = () => {
       executions_id,
       ready_release_num: tabsData.activeKey ?? '',
     });
-    setStageFilter(res);
+    const initChecked = isEmpty(res?.check_story)
+      ? res.story_data?.map((it: any) => it.story_num) ?? []
+      : res?.check_story;
+    console.log(initChecked);
+    setStageFilter(res.story_data);
+    setSelected(initChecked);
   };
 
   const getSelectList = async () => {
@@ -48,9 +59,8 @@ const StoryListModal = () => {
     const storyNums = await PreReleaseServices.getStoryNum(storyExecutionId?.join() ?? '');
     setExecutionList(
       executions?.map((it: any) => ({
-        label: it.project_name,
-        value: it.project_id,
-        type: it.sprint_type,
+        label: it.execution_name,
+        value: it.execution_id,
       })),
     );
     setStoryNum(storyNums.map((id: number) => ({ label: id, value: id })));
@@ -127,21 +137,22 @@ const StoryListModal = () => {
           size={'small'}
           rowKey={(record) => record.story_num}
           columns={publishListColumn}
-          dataSource={tableSource}
+          dataSource={tableSource ?? []}
           pagination={false}
           rowSelection={{
-            defaultSelectedRowKeys: selected?.map((it) => it.story_num),
+            selectedRowKeys: selected,
             onChange: (selectedRowKeys, record) => {
               console.log(record);
-              setSelected(
-                isEmpty(selectedRowKeys)
-                  ? []
-                  : record?.map((it) => ({
-                      story_num: it.story_num,
-                      execution: it.execution,
-                      ready_release_num: tabsData.activeKey,
-                    })),
-              );
+              setSelected(selectedRowKeys);
+              // setSelected(
+              //   isEmpty(selectedRowKeys)
+              //     ? []
+              //     : record?.map((it) => ({
+              //         story_num: it.story_num,
+              //         execution: it.execution,
+              //         ready_release_num: tabsData.activeKey,
+              //       })),
+              // );
             },
           }}
         />

@@ -35,6 +35,7 @@ import { serverConfirmJudge } from './checkExcute';
 import { errorMessage, infoMessage, sucMessage } from '@/publicMethods/showMessages';
 import StoryListModal from '@/pages/onDutyAndRelease/preRelease/components/storyListModal';
 import PreReleaseServices from '@/services/preRelease';
+import { getServices } from '@/publicMethods/verifyAxios';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -62,6 +63,9 @@ const UpgradeService: React.FC<any> = () => {
   } = useModel('releaseProcess');
   const [applicantConfirmForm] = Form.useForm(); // 应用
   const [formUpgradeService] = Form.useForm(); // 升级服务
+
+  const [appServerList, setAppserverList] = useState<any[]>([]);
+  const [deployTip, setDeployTip] = useState('');
   // 暂时忽略掉一键部署ID后端服务的获取
 
   /* region 升级服务： 发布项表格 */
@@ -157,14 +161,16 @@ const UpgradeService: React.FC<any> = () => {
     // releaseIdArray 需要注意
     const result = await inquireService(releasedIDArray, tabsData.activeKey);
     if (result.message !== '') {
-      message.error({
-        content: result.message,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
+      // message.error({
+      //   content: result.message,
+      //   duration: 1,
+      //   style: {
+      //     marginTop: '50vh',
+      //   },
+      // });
+      setDeployTip(result.message);
     } else {
+      setDeployTip('');
       const pulishData: any = await alalysisInitData('pulishItem', tabsData.activeKey);
       const newData: any = pulishData.upService_releaseItem;
       formUpgradeService.setFieldsValue({
@@ -244,7 +250,7 @@ const UpgradeService: React.FC<any> = () => {
         application: params.app,
         hotUpdate: params.hot_update,
         interAndDbUpgrade: params.is_upgrade_api_database,
-        branchAndEnv: params.branch_environment,
+        // branchAndEnv: params.branch_environment,
         description: params.instructions,
         remark: params.remarks,
         appId: appid,
@@ -581,6 +587,15 @@ const UpgradeService: React.FC<any> = () => {
     );
   };
 
+  const getServerList = async () => {
+    const res = await getServices('');
+    setAppserverList(
+      res.data?.map((it: any) => ({ label: it.server, value: it.server, key: it.server_id })) ?? [],
+    );
+  };
+  useEffect(() => {
+    getServerList();
+  }, []);
   useEffect(() => {
     showArrays();
   }, [releasedIDArray]);
@@ -748,12 +763,13 @@ const UpgradeService: React.FC<any> = () => {
                     </Form.Item>
                   </Col>
                 </Row>
+                {/*一键部署检查错误提示*/}
+                <div style={{ color: 'red' }}>{deployTip}</div>
               </Form>
             </div>
             {/* 服务确认完成 */}
             <div>
               <div style={{ fontWeight: 'bold' }}> 服务确认完成</div>
-
               <div
                 className="ag-theme-alpine"
                 style={{ height: upgradeConfirm.gridHight, width: '100%' }}
@@ -945,25 +961,27 @@ const UpgradeService: React.FC<any> = () => {
             </Col>
           </Row>
           <Row>
-            <Col span={12}>
+            <Col span={24}>
               <Form.Item name="application" label="应用：" required style={{ marginTop: -15 }}>
-                <Input
-                  autoComplete="off"
-                  style={{ marginLeft: 28, width: 206, color: 'black' }}
-                  disabled
+                <Select
+                  placeholder="请选择相应的应用！"
+                  style={{ width: '100%', color: 'black' }}
+                  allowClear
+                  options={appServerList}
+                  showSearch
                 />
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item
-                name="branchAndEnv"
-                label="分支和环境："
-                required
-                style={{ marginTop: -15, marginLeft: 10 }}
-              >
-                <Input autoComplete="off" disabled style={{ color: 'black' }} />
-              </Form.Item>
-            </Col>
+            {/*<Col span={12}>*/}
+            {/*  <Form.Item*/}
+            {/*    name="branchAndEnv"*/}
+            {/*    label="分支和环境："*/}
+            {/*    required*/}
+            {/*    style={{ marginTop: -15, marginLeft: 10 }}*/}
+            {/*  >*/}
+            {/*    <Input disabled style={{ color: 'black' }} />*/}
+            {/*  </Form.Item>*/}
+            {/*</Col>*/}
           </Row>
 
           <Form.Item

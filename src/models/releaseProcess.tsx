@@ -125,7 +125,7 @@ export default () => {
 
   // 待发布需求列表
   const [autoStoryList, setAutoStoryList] = useState<any[]>([]); // 预发布保存的需求列表
-  const [storyExecutionId, setStoryExecutionId] = useState<number[]>([]);
+  const [storyExecutionId, setStoryExecutionId] = useState<string[]>([]);
   const [showStoryModal, setShowStoryModal] = useState(false);
 
   // 更新预发布需求列表
@@ -137,7 +137,7 @@ export default () => {
   // 预发布需求列表
   const getStoryList = useCallback(async (data: IStory) => {
     const res = await PreReleaseServices.getStoryList(data);
-    setAutoStoryList(res);
+    setAutoStoryList(res?.story_data ?? []);
     return res;
   }, []);
 

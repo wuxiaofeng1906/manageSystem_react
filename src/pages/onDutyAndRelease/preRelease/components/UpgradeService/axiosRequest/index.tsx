@@ -116,9 +116,9 @@ const upgradePulishItem = async (formData: any, currentListNo: string) => {
   if (!formData.application) {
     return '应用不能为空！';
   }
-  if (!formData.branchAndEnv) {
-    return '分支和环境不能为空！';
-  }
+  // if (!formData.branchAndEnv) {
+  //   return '分支和环境不能为空！';
+  // }
   if (!formData.interAndDbUpgrade) {
     return '是否涉及接口和数据库升级不能为空！';
   }
@@ -144,7 +144,7 @@ const upgradePulishItem = async (formData: any, currentListNo: string) => {
     app: formData.application,
     is_upgrade_api_database: formData.interAndDbUpgrade,
     hot_update: formData.hotUpdate,
-    branch_environment: formData.branchAndEnv,
+    // branch_environment: formData.branchAndEnv,
     instructions: formData.description,
     remarks: formData.remark,
   };

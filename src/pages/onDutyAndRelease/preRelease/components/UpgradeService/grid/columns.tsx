@@ -65,11 +65,11 @@ const getReleasedItemColumns = () => {
       minWidth: 196,
       cellRenderer: (params: any) => getDatabseAndApiUpgrade(params.value),
     },
-    {
-      headerName: '分支和环境',
-      field: 'branch_environment',
-      minWidth: 105,
-    },
+    // {
+    //   headerName: '分支和环境',
+    //   field: 'branch_environment',
+    //   minWidth: 105,
+    // },
     {
       headerName: '编辑人',
       field: 'edit_user_name',
@@ -359,7 +359,7 @@ const publishListColumn: ColumnsType<any> = [
   },
   {
     title: '所属执行',
-    dataIndex: 'execution',
+    dataIndex: 'execution_name',
   },
   {
     title: '优先级',

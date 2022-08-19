@@ -404,32 +404,32 @@ const saveVersonCheck = async (
   };
 
   // 判断是否开启版本检查，如果没开启，则不传相关字段
-  if (sourceData?.verson_check) {
-    // true 已开启
-    // 服务
-    const { server } = sourceData;
-    let serverStr = '';
-    if (server && server.length > 0) {
-      // if (server[0] === "全部") {
-      //   // 需要获取所有的服务
-      //   const allServices: any = (await getServices())?.data;
-      //   if (allServices && allServices.length > 0) {
-      //     allServices.forEach((ele: any) => {
-      //       serverStr = serverStr === '' ? ele.server_id : `${serverStr},${ele.server_id}`;
-      //     });
-      //   }
-      // } else {
-      server.forEach((ele: string) => {
-        serverStr = serverStr === '' ? ele : `${serverStr},${ele}`;
-      });
-      // }
-    }
-
-    data.backend_version_check_flag = true;
-    data['server'] = serverStr;
-    data['image_branch'] = sourceData.branchName; // 传分支名称
-    // data['image_env'] = sourceData.imageevn; // 镜像环境
+  // if (sourceData?.verson_check) {
+  // true 已开启
+  // 服务
+  const { server } = sourceData;
+  let serverStr = '';
+  if (server && server.length > 0) {
+    // if (server[0] === "全部") {
+    //   // 需要获取所有的服务
+    //   const allServices: any = (await getServices())?.data;
+    //   if (allServices && allServices.length > 0) {
+    //     allServices.forEach((ele: any) => {
+    //       serverStr = serverStr === '' ? ele.server_id : `${serverStr},${ele.server_id}`;
+    //     });
+    //   }
+    // } else {
+    server.forEach((ele: string) => {
+      serverStr = serverStr === '' ? ele : `${serverStr},${ele}`;
+    });
+    // }
   }
+
+  data.backend_version_check_flag = sourceData?.verson_check;
+  data['server'] = serverStr;
+  data['image_branch'] = sourceData.branchName; // 传分支名称
+  // data['image_env'] = sourceData.imageevn; // 镜像环境
+  // }
 
   if (sourceData?.branchcheck) {
     // 被对比的主分支

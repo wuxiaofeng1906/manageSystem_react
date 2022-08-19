@@ -43,6 +43,7 @@ export const DissatisfyModal = (
     nextSprint: any[];
     onRefresh: Function;
     onRefreshForm?: Function;
+    isTester?: Boolean;
   },
 ) => {
   const query = useLocation()?.query;
@@ -52,7 +53,7 @@ export const DissatisfyModal = (
     setLoading(true);
     try {
       const isTagData = item.codeRevert == 1 && item.testVerify == 1 && item.hasCode == 1;
-      if (isTagData) {
+      if (isTagData && props.isTester != true) {
         await SprintDetailServices.removeTag({
           datas: pick(item, pickTag),
           project: Number(query?.projectid ?? 0),

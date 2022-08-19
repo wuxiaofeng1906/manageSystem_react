@@ -3186,6 +3186,7 @@ const SprintList: React.FC<any> = () => {
         setDissatisfy={setDissatisfy}
         nextSprint={nextSprint}
         onRefresh={updateGrid}
+        isTester={true}
       />
     </div>
   );

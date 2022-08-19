@@ -747,33 +747,71 @@ const OnlineBranch: React.FC<any> = () => {
           {/* 总设置 */}
           <div style={{ marginTop: -15 }}>
             <Row gutter={8}>
-              <Col span={9}>
+              <Col span={12}>
                 {/* 分支名称 */}
-                <Form.Item label="分支名称:" name="branchName" required={true}>
-                  <Select style={{ width: '100%' }} showSearch onChange={showServerSelect}>
+                <Form.Item
+                  label="分支名称"
+                  name="branchName"
+                  required={true}
+                  labelCol={{ span: 5 }}
+                >
+                  <Select
+                    style={{ width: '100%' }}
+                    placeholder="请选择对应的分支名称！"
+                    showSearch
+                    onChange={showServerSelect}
+                  >
                     {onlineBranchFormSelected.branchName}
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 {/* 技术侧 */}
-                <Form.Item label="技术侧:" name="module" required={true}>
-                  <Select style={{ width: '100%' }} showSearch>
+                <Form.Item label="技术侧" name="module" required={true} labelCol={{ span: 5 }}>
+                  <Select style={{ width: '100%' }} showSearch placeholder="请选择相应的技术侧！">
                     {onlineBranchFormSelected.techSide}
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={9}>
-                <Form.Item name="imageevn" label="镜像环境" required={true}>
-                  <Select placeholder="请选择对应的环境！" showSearch style={{ width: '100%' }}>
+            </Row>
+            <Row gutter={8}>
+              <Col span={12}>
+                <Form.Item
+                  name="imageevn"
+                  label="镜像环境"
+                  required={true}
+                  style={{ marginTop: -20 }}
+                  labelCol={{ span: 5 }}
+                >
+                  <Select placeholder="请选择相应的环境！" showSearch style={{ width: '100%' }}>
                     {onlineBranchFormSelected.imgEnv}
                   </Select>
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="server"
+                  label="上线服务"
+                  style={{ marginTop: -20 }}
+                  required={true}
+                  labelCol={{ span: 5 }}
+                >
+                  <TreeSelect
+                    placeholder="请选择相应的上线服务！"
+                    style={{ width: '100%' }}
+                    maxTagCount={'responsive'}
+                    treeCheckable={true}
+                    allowClear
+                    treeDefaultExpandAll
+                    treeData={onlineBranchFormSelected.server}
+                    showSearch
+                  />
                 </Form.Item>
               </Col>
             </Row>
 
             <Row>
-              <Col span={16}>
+              <Col span={15}>
                 {/* 忽略前端单元测试检查 */}
                 <Form.Item name="ignoreFrontCheck" style={{ marginLeft: 0, marginTop: -20 }}>
                   <Checkbox.Group>
@@ -781,9 +819,9 @@ const OnlineBranch: React.FC<any> = () => {
                   </Checkbox.Group>
                 </Form.Item>
               </Col>
-              <Col span={8}>
+              <Col span={9}>
                 {/* 忽略后端单元测试检查 */}
-                <Form.Item name="ignoreBackendCheck" style={{ marginLeft: 0, marginTop: -20 }}>
+                <Form.Item name="ignoreBackendCheck" style={{ marginLeft: -14, marginTop: -20 }}>
                   <Checkbox.Group>
                     <Checkbox value={'1'}>忽略后端单元测试检查</Checkbox>
                   </Checkbox.Group>
@@ -798,7 +836,7 @@ const OnlineBranch: React.FC<any> = () => {
               <Card
                 size="small"
                 title="版本检查"
-                style={{ width: '100%', marginTop: -10, height: 115 }}
+                style={{ width: '100%', marginTop: -10, height: 80, borderBottom: 0 }}
               >
                 <Form.Item
                   name="verson_check"
@@ -807,18 +845,6 @@ const OnlineBranch: React.FC<any> = () => {
                   style={{ marginTop: -10 }}
                 >
                   <Switch checkedChildren="是" unCheckedChildren="否" style={{ marginLeft: 40 }} />
-                </Form.Item>
-                <Form.Item name="server" label="服务" style={{ marginTop: -22 }}>
-                  <TreeSelect
-                    placeholder="请选择相应的服务！"
-                    style={{ marginLeft: 68, width: 415 }}
-                    maxTagCount={'responsive'}
-                    treeCheckable={true}
-                    allowClear
-                    treeDefaultExpandAll
-                    treeData={onlineBranchFormSelected.server}
-                    showSearch
-                  ></TreeSelect>
                 </Form.Item>
               </Card>
             </div>
@@ -913,7 +939,12 @@ const OnlineBranch: React.FC<any> = () => {
                 <Col span={18}>
                   {/* 发布环境 */}
                   <Form.Item label="发布环境:" name="check_env" style={{ marginTop: -10 }}>
-                    <Select style={{ width: 415 }} showSearch options={hotEnvList} />
+                    <Select
+                      style={{ width: 415 }}
+                      showSearch
+                      options={hotEnvList}
+                      placeholder={'发布环境'}
+                    />
                   </Form.Item>
                 </Col>
               </Row>
@@ -958,27 +989,27 @@ const OnlineBranch: React.FC<any> = () => {
           <Spin spinning={onlineBranchModal.loading} tip="保存中...">
             <Form.Item style={{ marginTop: -15 }}>
               <Button
-                style={{ borderRadius: 5, marginLeft: 20, float: 'right' }}
-                onClick={() => {
-                  formForOnlineBranch.resetFields();
-                }}
-                disabled={operteStatus}
-              >
-                清空
-              </Button>
-
-              <Button
                 type="primary"
                 style={{
                   color: '#46A0FC',
                   backgroundColor: '#ECF5FF',
                   borderRadius: 5,
                   float: 'right',
+                  marginLeft: 20,
                 }}
                 onClick={saveOnlineBranchResult}
                 disabled={operteStatus}
               >
                 保存
+              </Button>
+              <Button
+                style={{ borderRadius: 5, float: 'right' }}
+                onClick={() => {
+                  formForOnlineBranch.resetFields();
+                }}
+                disabled={operteStatus}
+              >
+                清空
               </Button>
             </Form.Item>
           </Spin>

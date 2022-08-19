@@ -88,14 +88,12 @@ const rendererUnitTest = (params: any) => {
 const iconCheckRender = (params: any) => {
   const values = params.value;
   const technical = params.data?.technical_side === '2';
-
   let result = values?.check_status;
   let Color = 'black';
-  if (isEmpty(values)) {
-    if (technical) {
-      result = '忽略';
-      Color = 'blue';
-    } else result = '';
+  if (isEmpty(params.data)) result = '';
+  else if (isEmpty(values)) {
+    result = '忽略';
+    Color = 'blue';
   } else {
     if (values?.check_status === 'done') {
       // done  doing（执行中） wait（未开始）
@@ -165,7 +163,7 @@ const beforeOnlineVersionCheck = (params: any) => {
 
   const values: any = params.value[0]; // 本数组只会有一条数据
   // 解析所属端
-  let side = '忽略：';
+  let side = '忽略';
   if (values.technical_side === 'front') {
     side = '前端：';
   } else if (values.technical_side === 'backend') {
@@ -190,7 +188,7 @@ const beforeOnlineVersionCheck = (params: any) => {
   } else if (values.check_status === '2') {
     result = '执行中';
     frontColor = '#46A0FC';
-  } else if (values.check_status === '3') {
+  } else if (values.check_status === '3' && side !== '忽略') {
     //  result = "已结束";
 
     if (values.check_start_time && values.check_start_time !== '-') {
@@ -207,6 +205,7 @@ const beforeOnlineVersionCheck = (params: any) => {
       frontColor = '#8B4513';
     }
   }
+  if (side == '忽略') result = '';
 
   let timeRange = '';
   if (start) {
@@ -249,7 +248,7 @@ const beforeOnlineVersionCheck = (params: any) => {
               <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
             </Button>
            <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
-                onclick='versionCheckLogUrlClick(${JSON.stringify(values.check_url)})'>
+                onclick='versionCheckLogUrlClick(${JSON.stringify(values?.check_url)})'>
                 <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
             </Button>
           </div>
@@ -319,14 +318,69 @@ const beforeOnlineEnvCheck = (params: any) => {
               onclick='excuteCheckData("envCheck",${checkNum},${JSON.stringify(result)})'>
                 <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
               </Button>
-              <a href="${values.check_url}" target="_blank"  onclick="return visitCommenLog('${
-    values.check_url
+              <a href="${values?.check_url}" target="_blank"  onclick="return visitCommenLog('${
+    values?.check_url
   }')" >
                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
              </a>
             </div>
             <div style="line-height: 20px;font-size: 10px;width: 200px">
-                <div><label style="color: ${Color}"> ${result}</label> &nbsp;${timeRange}</div>
+                <div><label style="color: ${Color}"> ${result}</label> &nbsp;${
+    result == '忽略' ? '' : timeRange
+  }</div>
+            </div>
+        </div>
+    `;
+};
+// 是否可以热更新检查
+const hotCheck = (params: any) => {
+  if (isEmpty(params.value)) {
+    return '';
+  }
+  const hot_update_check = params.value;
+  let start = '';
+  let end = '';
+  let timeRange = '';
+  const checkNum = JSON.stringify(params.data?.check_num);
+
+  const tips = {
+    wait: { text: '未开始' },
+    running: { text: '执行中', color: '#46A0FC' },
+    yes: { text: '可热更', color: '#2BF541' },
+    no: { text: '不可热更', color: '#8B4513' },
+    skip: { text: '忽略', color: 'blue' },
+  };
+  if (hot_update_check?.check_start_time) {
+    start = dayjs(hot_update_check.check_start_time).format('HH:mm:ss');
+  }
+  if (hot_update_check?.check_end_time) {
+    end = dayjs(hot_update_check.check_end_time).format('HH:mm:ss');
+  }
+  if (start) {
+    timeRange = end ? `${start}~${end}` : start;
+  }
+  return `
+        <div style="height: 66px">
+            <div style="margin-left: 120px;line-height: 26px" >
+              <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
+                    style="margin-right: 10px;cursor: pointer"
+                    onclick='hotUpdateCheckStatus(${checkNum},${JSON.stringify(
+    hot_update_check?.check_status,
+  )})'/>
+                  <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
+                          onclick='showHotUpdateCheckLog(${JSON.stringify(
+                            hot_update_check?.check_log,
+                          )})'>
+                    <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+                  </Button>
+            </div>
+            <div style="font-size: 10px;width: 200px;height:40px">
+                <div style="line-height:20px">
+                    <label style="color: ${
+                      tips[hot_update_check?.check_status]?.color ?? 'black'
+                    }"> ${tips[hot_update_check?.check_status]?.text ?? ''}</label> &nbsp;${
+    hot_update_check?.check_status == 'skip' ? '' : timeRange
+  }</div>
             </div>
         </div>
     `;
@@ -359,7 +413,7 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
       } else if (ele.check_status === '2') {
         value = '执行中';
         Color = '#46A0FC';
-      } else if (ele.check_status === '3') {
+      } else if (ele.check_status === '3' && value != '忽略') {
         // 检查完毕，已结束
         if (ele.check_start_time) {
           start = dayjs(ele.check_start_time).format('HH:mm:ss');
@@ -404,7 +458,9 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
               </Button>
             </div>
             <div style=" margin-top: -20px;font-size: 10px;width: 200px">
-                <div><label style="color: ${Color}"> ${value}</label> &nbsp;${timeRange}</div>
+                <div><label style="color: ${Color}"> ${value}</label> &nbsp;${
+    value == '忽略' ? '' : timeRange
+  }</div>
             </div>
 
         </div>
@@ -464,7 +520,7 @@ const autoCheckRenderer = (params: any) => {
 // 封板状态
 const sealStatusRenderer = (params: any) => {
   // console.log(params.data.ready_release_num);
-  if (!params.value) {
+  if (isEmpty(params.value)) {
     return `<div></div>`;
   }
 
@@ -684,10 +740,16 @@ const getOnlineBranchColumns = () => {
       minWidth: 190,
     },
     {
-      headerName: '上线前环境检查是否通过',
+      headerName: '环境一致性检查是否通过',
       field: 'env_check',
       minWidth: 190,
       cellRenderer: beforeOnlineEnvCheck,
+    },
+    {
+      headerName: '是否可以热更新检查',
+      field: 'hot_update_check',
+      minWidth: 190,
+      cellRenderer: hotCheck,
     },
     {
       headerName: '上线前自动化检查是否通过',

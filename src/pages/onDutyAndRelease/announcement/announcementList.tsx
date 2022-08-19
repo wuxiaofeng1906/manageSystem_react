@@ -150,7 +150,6 @@ const announcementList = () => {
                     options={persons}
                     style={{ width: '100%' }}
                     showSearch
-                    allowClear
                     optionFilterProp={'label'}
                     onDeselect={() => getList()}
                     onBlur={() => getList()}

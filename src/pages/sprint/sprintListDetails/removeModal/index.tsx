@@ -429,7 +429,9 @@ const RemoveModal = (
                         disabled: formList?.[i]?.hasCode == 1 && it.value == 0, // 提交代码，revert 否：不可选
                       }))}
                       onChange={(v) => {
-                        formList[i].notRevertMemo = formList[i].notRevertMemo?.trim() ?? undefined;
+                        const memo = formList[i].notRevertMemo?.trim();
+                        formList[i].notRevertMemo =
+                          v == 1 && isEmpty(memo) ? ' ' : memo ?? undefined;
                         formList[i].codeRevert = v;
                         setFieldsValue({ formList });
                       }}

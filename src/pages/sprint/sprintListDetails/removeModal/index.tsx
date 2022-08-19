@@ -68,7 +68,7 @@ export const DissatisfyModal = (
           datas: [
             {
               ...pick(item, pickData),
-              rdId: item.id || item.rdId,
+              rdId: item.id,
               category: String(Math.abs(Number(item.category))),
             },
           ],
@@ -182,7 +182,6 @@ const RemoveModal = (
     const formData =
       selected?.map((it: any) => ({
         ...it,
-        rdId: it.id,
         notRevertMemo: it.notrevertMemo ?? '',
         hasCode: it.pushCode ?? undefined,
         codeRevert: it.pushCode == 0 ? 2 : it.codeRevert ?? undefined,
@@ -201,7 +200,7 @@ const RemoveModal = (
     const formatSelected =
       selected?.map((it) => ({
         stage: it.stage,
-        rdId: it.id,
+        id: it.id,
         category: String(Math.abs(Number(it.category))),
         ztNo: it.ztNo,
         title: it.title,

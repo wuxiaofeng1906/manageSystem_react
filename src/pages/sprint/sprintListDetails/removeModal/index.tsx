@@ -253,11 +253,10 @@ const RemoveModal = (
           target: Number(props.nextSprint?.[1]?.id),
         });
         message.success({
-          icon: '',
           content: (
             <div style={{ maxWidth: 300 }}>
               {(
-                notRelatedData?.map((it) => categoryType[it.category] ?? '' + it.ztNo) ?? []
+                notRelatedData?.map((it) => `${categoryType[it.category] ?? ''}${it.ztNo}`) ?? []
               ).join()}
               ，移除成功！
             </div>

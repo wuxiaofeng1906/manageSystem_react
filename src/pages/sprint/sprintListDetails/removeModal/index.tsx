@@ -23,6 +23,7 @@ import { useLocation } from 'umi';
 import { stageType } from '@/pages/sprint/sprintListDetails/common';
 import styles from '../sprintListDetails.less';
 import SprintDetailServices from '@/services/sprintDetail';
+import { infoMessage } from '@/publicMethods/showMessages';
 
 const list = [
   { label: '是', value: 1 },
@@ -115,7 +116,7 @@ export const DissatisfyModal = (
                     cancelText="去禅道"
                     onConfirm={() => onConfirm(it)}
                     onCancel={() => {
-                      if (!it.ztNo) return;
+                      if (!query.ztId) return infoMessage('禅道执行id异常！');
                       window.open(
                         `http://zentao.77hub.com/zentao/execution-story-${query.ztId}.html`,
                       );

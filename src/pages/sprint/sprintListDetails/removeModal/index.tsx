@@ -109,8 +109,9 @@ export const DissatisfyModal = (
                 <Button
                   size={'small'}
                   onClick={() => {
-                    props.onRefreshForm?.(props.dissatisfy.filter((o) => o.ztNo !== it.ztNo));
-                    props.setDissatisfy([]);
+                    const nextData = props.dissatisfy.filter((o) => o.ztNo !== it.ztNo) ?? [];
+                    props.onRefreshForm?.(nextData);
+                    props.setDissatisfy(nextData);
                   }}
                 >
                   取消

@@ -313,13 +313,12 @@ const DutyCatalog = () => {
       release_method: values.release_method,
       release_time: moment(values.release_time).format('YYYY-MM-DD HH:mm:ss'),
     };
-    console.log(data);
-    // await DutyListServices.addDuty(data);
-    // setIsSameDuty(true);
-    // getDetail();
-    // 【未加锁】保存后：加锁
-    // if (singleLock?.param.replace('duty_', '') == id) return;
-    // updateLockStatus(id, 'post');
+    await DutyListServices.addDuty(data);
+    setIsSameDuty(true);
+    getDetail();
+    //【未加锁】保存后：加锁
+    if (singleLock?.param.replace('duty_', '') == id) return;
+    updateLockStatus(id, 'post');
   };
 
   // 详情

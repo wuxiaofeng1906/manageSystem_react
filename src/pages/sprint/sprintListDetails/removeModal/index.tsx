@@ -52,7 +52,9 @@ export const DissatisfyModal = (
   const onConfirm = async (item: any) => {
     setLoading(true);
     try {
-      const isTagData = item.codeRevert == 1 && item.testVerify == 1 && item.hasCode == 1;
+      const isTagData =
+        [1, 2].includes(item.codeRevert) && item.testVerify == 1 && item.hasCode == 1;
+
       if (isTagData && props.isTester != true) {
         await SprintDetailServices.removeTag({
           datas: [pick(item, pickTag)],
@@ -223,11 +225,21 @@ const RemoveModal = (
       });
     });
     if (!isEmpty(queryData)) {
-      // 有相关bug、task 或不满足条件的(阶段)
-      const relatedData = queryData.filter((it) => it.relatedTasks || it.relatedBugs || !it.flag);
+      // 有相关bug、task 或不满足条件的(阶段) 或者 需要测试验证,已提交代码 (已revert|免revert)
+      const relatedData = queryData.filter(
+        (it) =>
+          it.relatedTasks ||
+          it.relatedBugs ||
+          !it.flag ||
+          ([1, 2].includes(it.codeRevert) && it.testVerify == 1 && it.hasCode == 1),
+      );
       // 可直接移除
       const notRelatedData = queryData.filter(
-        (it) => Number(it.relatedTasks) == 0 && Number(it.relatedBugs) == 0 && it.flag,
+        (it) =>
+          Number(it.relatedTasks) == 0 &&
+          Number(it.relatedBugs) == 0 &&
+          it.flag &&
+          !([1, 2].includes(it.codeRevert) && it.testVerify == 1 && it.hasCode == 1),
       );
       if (!isEmpty(notRelatedData)) {
         await SprintDetailServices.remove({

@@ -1661,7 +1661,7 @@ const SprintList: React.FC<any> = () => {
                 const lineThroughStage = ['已取消', '开发已revert', '测试已验证revert'];
                 return (
                   <div>
-                    {/*开发已revert标识： 【revert:是，测试验证：是 或者 revert：免，测试验证：是】*/}
+                    {/*开发已revert标识： 【是是是，是是免】*/}
                     <Tag
                       color={'processing'}
                       style={{
@@ -1672,7 +1672,8 @@ const SprintList: React.FC<any> = () => {
                         padding: 2,
                         display:
                           [1, 2].includes(Number(params.data.codeRevert)) &&
-                          Number(params.data.testCheck) == 1
+                          Number(params.data.testCheck) == 1 &&
+                          Number(params.data.pushCode) == 1
                             ? 'initial'
                             : 'none',
                       }}

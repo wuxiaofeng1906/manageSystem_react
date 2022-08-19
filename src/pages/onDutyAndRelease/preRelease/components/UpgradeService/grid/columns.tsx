@@ -378,7 +378,7 @@ const publishListColumn: ColumnsType<any> = [
   },
   {
     title: '模块名',
-    dataIndex: 'module',
+    dataIndex: 'module_name',
   },
   {
     title: '是否可热更',

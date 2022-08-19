@@ -5,6 +5,7 @@ import { useModel } from '@@/plugin-model/useModel';
 import PreReleaseServices from '@/services/preRelease';
 import { isEmpty, groupBy } from 'lodash';
 import { useUnmount } from 'ahooks';
+import { infoMessage } from '@/publicMethods/showMessages';
 
 const StoryListModal = () => {
   const {
@@ -25,6 +26,7 @@ const StoryListModal = () => {
   const [loading, setLoading] = useState(false);
 
   const onConfirm = async () => {
+    if (isEmpty(selected)) return infoMessage('请至少勾选一条需求！');
     try {
       setLoading(true);
       const checked = tableSource.filter((it) => selected.includes(String(it.story_num)));

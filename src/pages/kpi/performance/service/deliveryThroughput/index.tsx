@@ -33,7 +33,6 @@ const DeliveryThroughput: React.FC<any> = () => {
       ruleData={ruleData}
       request={StatisticServices.shuttleDelay}
       identity={'DEVELOPER'}
-      showHalfYear={true}
     />
   );
 };

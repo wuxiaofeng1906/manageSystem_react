@@ -192,7 +192,7 @@ const DutyCatalog = () => {
     let result: any[] = [];
     values.project_ids?.forEach((id: string) => {
       const o = projects.find(
-        (it: any) => id.toString() == it.project_id.toString() && !isEmpty(it.user),
+        (it: any) => String(id) == String(it.project_id) && !isEmpty(it.user),
       );
       o && result.push(o);
     });
@@ -316,7 +316,7 @@ const DutyCatalog = () => {
     await DutyListServices.addDuty(data);
     setIsSameDuty(true);
     getDetail();
-    // 【未加锁】保存后：加锁
+    //【未加锁】保存后：加锁
     if (singleLock?.param.replace('duty_', '') == id) return;
     updateLockStatus(id, 'post');
   };
@@ -540,7 +540,7 @@ const DutyCatalog = () => {
 
   // 保存后的第一值班人
   useEffect(() => {
-    if (isEmpty(dutyPerson)) return;
+    if (isEmpty(dutyPerson) || isEmpty(projects)) return;
     const initDutyObj = initalFormDuty(dutyPerson);
     const formatProject = projects?.map((it: any) => ({
       ...it,
@@ -559,7 +559,7 @@ const DutyCatalog = () => {
       backend: initDutyObj?.backend?.value?.split() ?? [],
       test: initDutyObj?.test?.value?.split() ?? [],
     });
-  }, [dutyPerson]);
+  }, [dutyPerson, JSON.stringify(projects)]);
 
   useEffect(() => {
     if (isEmpty(initDuty)) return;

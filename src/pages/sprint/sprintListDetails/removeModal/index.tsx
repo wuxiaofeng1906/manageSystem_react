@@ -70,7 +70,7 @@ export const DissatisfyModal = (
             },
           ],
         });
-        message.success(`${categoryType[item.category]}${item.ztNo},移除成功！`);
+        message.success(`${categoryType[item.category] ?? ''}${item.ztNo},移除成功！`);
       }
       const update = props.dissatisfy.filter((o) => o.ztNo != item.ztNo);
       props.onRefreshForm?.(update);
@@ -244,7 +244,10 @@ const RemoveModal = (
           icon: '',
           content: (
             <div style={{ maxWidth: 300 }}>
-              {(notRelatedData?.map((it) => it.categoryName + it.ztNo) ?? []).join()}，移除成功！
+              {(
+                notRelatedData?.map((it) => categoryType[it.category] ?? '' + it.ztNo) ?? []
+              ).join()}
+              ，移除成功！
             </div>
           ),
         });

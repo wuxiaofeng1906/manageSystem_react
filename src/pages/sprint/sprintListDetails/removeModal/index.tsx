@@ -55,7 +55,7 @@ export const DissatisfyModal = (
       const isTagData = item.codeRevert == 1 && item.testVerify == 1 && item.hasCode == 1;
       if (isTagData && props.isTester != true) {
         await SprintDetailServices.removeTag({
-          datas: pick(item, pickTag),
+          datas: [pick(item, pickTag)],
           project: Number(query?.projectid ?? 0),
         });
       } else {
@@ -70,7 +70,7 @@ export const DissatisfyModal = (
             },
           ],
         });
-        message.success(`${item.categoryName}${item.ztNo},移除成功！`);
+        message.success(`${categoryType[item.category]}${item.ztNo},移除成功！`);
       }
       const update = props.dissatisfy.filter((o) => o.ztNo != item.ztNo);
       props.onRefreshForm?.(update);
@@ -200,7 +200,6 @@ const RemoveModal = (
         stage: it.stage,
         rdId: it.id,
         category: String(Math.abs(Number(it.category))),
-        categoryName: categoryType[it.category] ?? '',
         ztNo: it.ztNo,
         title: it.title,
         relatedStories: it.relatedStories,

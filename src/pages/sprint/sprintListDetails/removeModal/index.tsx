@@ -1,6 +1,18 @@
 import type { MutableRefObject } from 'react';
 import React, { forwardRef, useEffect, useMemo, useState } from 'react';
-import { Modal, Select, Input, Form, Table, Space, Button, Spin, Popconfirm, Tooltip } from 'antd';
+import {
+  Modal,
+  Select,
+  Input,
+  Form,
+  Table,
+  Space,
+  Button,
+  Spin,
+  Popconfirm,
+  Tooltip,
+  message,
+} from 'antd';
 import type { GridApi } from 'ag-grid-community';
 import type { ModalFuncProps } from 'antd/lib/modal/Modal';
 import type { ColumnsType } from 'antd/lib/table';
@@ -39,17 +51,26 @@ export const DissatisfyModal = (
   const onConfirm = async (item: any) => {
     setLoading(true);
     try {
-      await SprintDetailServices.remove({
-        source: Number(query.projectid),
-        target: Number(props.nextSprint?.[1]?.id),
-        datas: [
-          {
-            ...pick(item, pickData),
-            rdId: item.id || item.rdId,
-            category: String(Math.abs(Number(item.category))),
-          },
-        ],
-      });
+      const isTagData = item.codeRevert == 1 && item.testVerify == 1 && item.hasCode == 1;
+      if (isTagData) {
+        await SprintDetailServices.removeTag({
+          datas: pick(item, pickTag),
+          project: Number(query?.projectid ?? 0),
+        });
+      } else {
+        await SprintDetailServices.remove({
+          source: Number(query.projectid),
+          target: Number(props.nextSprint?.[1]?.id),
+          datas: [
+            {
+              ...pick(item, pickData),
+              rdId: item.id || item.rdId,
+              category: String(Math.abs(Number(item.category))),
+            },
+          ],
+        });
+        message.success(`${item.categoryName}${item.ztNo},移除成功！`);
+      }
       const update = props.dissatisfy.filter((o) => o.ztNo != item.ztNo);
       props.onRefreshForm?.(update);
       props.setDissatisfy(update);
@@ -178,6 +199,7 @@ const RemoveModal = (
         stage: it.stage,
         rdId: it.id,
         category: String(Math.abs(Number(it.category))),
+        categoryName: categoryType[it.category] ?? '',
         ztNo: it.ztNo,
         title: it.title,
         relatedStories: it.relatedStories,
@@ -200,33 +222,13 @@ const RemoveModal = (
         if (form.ztNo == it.ztNo) queryData.push({ ...it, ...form });
       });
     });
-    // 可移除的数据（含满足和不满足移除条件的）
-    const pass = queryData?.filter(
-      (it) => !(it.codeRevert == 1 && it.testVerify == 1 && it.hasCode == 1),
-    );
-
-    // 打标识 开发已revert数据 【代码revert:是，测试验证：是 代码提交：是】
-    const tagData = queryData
-      ?.filter((it) => it.codeRevert == 1 && it.testVerify == 1 && it.hasCode == 1)
-      ?.map((o) => pick(o, pickTag));
-    if (!isEmpty(tagData)) {
-      await SprintDetailServices.removeTag({
-        datas: tagData,
-        project: Number(query?.projectid ?? 0),
-      });
-      const updateSource = queryData.filter(
-        (it) => !(it.codeRevert == 1 && it.testVerify == 1 && it.hasCode == 1),
-      );
-      setSource(updateSource);
-      if (isEmpty(updateSource)) {
-        props.onCancel?.();
-      }
-    }
-    if (!isEmpty(pass)) {
+    if (!isEmpty(queryData)) {
       // 有相关bug、task 或不满足条件的(阶段)
-      const relatedData = pass.filter((it) => it.relatedTasks || it.relatedBugs || !it.flag);
+      const relatedData = queryData.filter((it) => it.relatedTasks || it.relatedBugs || !it.flag);
       // 可直接移除
-      const notRelatedData = pass.filter((it) => it.relatedTasks == 0 && it.relatedBugs == 0);
+      const notRelatedData = queryData.filter(
+        (it) => Number(it.relatedTasks) == 0 && Number(it.relatedBugs) == 0 && it.flag,
+      );
       if (!isEmpty(notRelatedData)) {
         await SprintDetailServices.remove({
           datas: notRelatedData.map((it) => ({
@@ -238,6 +240,15 @@ const RemoveModal = (
           source: Number(query.projectid),
           target: Number(props.nextSprint?.[1]?.id),
         });
+        message.success({
+          icon: '',
+          content: (
+            <div style={{ maxWidth: 300 }}>
+              {(notRelatedData?.map((it) => it.categoryName + it.ztNo) ?? []).join()}，移除成功！
+            </div>
+          ),
+        });
+        setSource(relatedData);
       }
       if (!isEmpty(relatedData)) {
         setDissatisfy(relatedData);
@@ -373,6 +384,10 @@ const RemoveModal = (
                         const status = v == 0;
                         formList[i].codeRevert = status ? 2 : undefined; // 提交代码为否： 代码revert 自动为免且不可编辑
                         formList[i].hasCode = v;
+                        formList[i].notRevertMemo =
+                          status && isEmpty(formList[i].notRevertMemo?.trim())
+                            ? ' '
+                            : formList[i].notRevertMemo?.trim();
                         setFieldsValue({ formList });
                       }}
                     />
@@ -389,15 +404,15 @@ const RemoveModal = (
         render: (value, record, i) => {
           return (
             <Form.Item noStyle shouldUpdate>
-              {() => {
-                const values = form.getFieldsValue()?.formList?.[i];
+              {({ setFieldsValue }) => {
+                const formList = form.getFieldsValue()?.formList;
                 return (
                   <Form.Item
                     name={['formList', i, 'codeRevert']}
                     rules={[
                       {
                         validator: (r, v, cb) => {
-                          if (values?.hasCode == 1 && v == 0) return cb('必须revert代码！');
+                          if (formList[i]?.hasCode == 1 && v == 0) return cb('必须revert代码！');
                           else if (v == undefined) return cb('请选择是否revert代码！');
                           return cb();
                         },
@@ -405,11 +420,16 @@ const RemoveModal = (
                     ]}
                   >
                     <Select
-                      disabled={values?.hasCode == '0'}
+                      disabled={formList?.[i]?.hasCode == '0'}
                       options={list.concat([{ label: '免', value: 2 }]).map((it) => ({
                         ...it,
-                        disabled: values?.hasCode == 1 && it.value == 0, // 提交代码，revert 否：不可选
+                        disabled: formList?.[i]?.hasCode == 1 && it.value == 0, // 提交代码，revert 否：不可选
                       }))}
+                      onChange={(v) => {
+                        formList[i].notRevertMemo = formList[i].notRevertMemo?.trim() ?? undefined;
+                        formList[i].codeRevert = v;
+                        setFieldsValue({ formList });
+                      }}
                     />
                   </Form.Item>
                 );
@@ -424,15 +444,19 @@ const RemoveModal = (
         render: (value, _, i) => {
           return (
             <Form.Item noStyle shouldUpdate>
-              {() => {
-                const values = form.getFieldsValue()?.formList?.[i];
+              {({ getFieldsValue }) => {
+                const values = getFieldsValue()?.formList?.[i];
                 return (
                   <Form.Item
                     name={['formList', i, 'notRevertMemo']}
                     rules={[
                       {
-                        required: values?.codeRevert == 2 && values?.hasCode == 1, // 人工修改为免且代码提交为是： 原因必填
-                        message: '请填写免revert原因！',
+                        validator: (r, v, cb) => {
+                          // 人工修改为免且代码提交为是： 原因必填
+                          if (isEmpty(v?.trim()) && values?.codeRevert == 2 && values?.hasCode == 1)
+                            return cb('请填写免revert原因！');
+                          return cb();
+                        },
                       },
                     ]}
                   >

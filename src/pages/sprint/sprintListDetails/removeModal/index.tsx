@@ -58,7 +58,13 @@ export const DissatisfyModal = (
 
       if (isTagData && props.isTester != true) {
         await SprintDetailServices.removeTag({
-          datas: [{ ...pick(item, pickTag), rdId: item.id }],
+          datas: [
+            {
+              ...pick(item, pickTag),
+              rdId: item.id,
+              category: String(Math.abs(Number(item.category))),
+            },
+          ],
           project: Number(query?.projectid ?? 0),
         });
       } else {

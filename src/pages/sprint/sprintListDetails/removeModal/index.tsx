@@ -185,6 +185,7 @@ const RemoveModal = (
         notRevertMemo: it.notrevertMemo ?? '',
         hasCode: it.pushCode ?? undefined,
         codeRevert: it.pushCode == 0 ? 2 : it.codeRevert ?? undefined,
+        relatedBugs: it.relatedBugs ?? 0,
         relatedStories: it.relatedStories ?? 0,
         relatedTasks: it.relatedTasks ?? 0,
         testers: isEmpty(it.tester) ? [] : it.tester?.map((it: any) => it.id),
@@ -254,7 +255,7 @@ const RemoveModal = (
         });
         message.success({
           content: (
-            <div style={{ maxWidth: 300 }}>
+            <div style={{ maxWidth: 400 }}>
               {(
                 notRelatedData?.map((it) => `${categoryType[it.category] ?? ''}${it.ztNo}`) ?? []
               ).join()}

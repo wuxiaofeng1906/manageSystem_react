@@ -58,7 +58,13 @@ export const DissatisfyModal = (
 
       if (isTagData && props.isTester != true) {
         await SprintDetailServices.removeTag({
-          datas: [{ ...pick(item, pickTag), rdId: item.id }],
+          datas: [
+            {
+              ...pick(item, pickTag),
+              rdId: item.id,
+              category: String(Math.abs(Number(item.category))),
+            },
+          ],
           project: Number(query?.projectid ?? 0),
         });
       } else {
@@ -182,6 +188,17 @@ const RemoveModal = (
       setLoading(false);
     }
   };
+  // format
+  const formatFormData = (origin: any[], source: any[]) => {
+    let result: any[] = [];
+    if (isEmpty(origin) || isEmpty(source)) return [];
+    origin?.forEach((it) => {
+      source?.forEach((form) => {
+        if (form.ztNo == it.ztNo) result.push({ ...it, ...form });
+      });
+    });
+    return result;
+  };
 
   useEffect(() => {
     if (!props.visible) return;
@@ -224,13 +241,7 @@ const RemoveModal = (
             : false
           : false,
       })) ?? [];
-
-    let queryData: any[] = [];
-    formatSelected?.forEach((it) => {
-      data.formList?.forEach((form) => {
-        if (form.ztNo == it.ztNo) queryData.push({ ...it, ...form });
-      });
-    });
+    const queryData = formatFormData(formatSelected, data.formList);
     if (!isEmpty(queryData)) {
       // 有相关bug、task 或不满足条件的(阶段) 或者 需要测试验证,已提交代码 (已revert|免revert)
       const relatedData = queryData.filter(
@@ -286,6 +297,28 @@ const RemoveModal = (
 
   const onCancel = () => {
     props.onCancel?.();
+  };
+
+  // 点取消 当存在已revert标识的数据，重置状态
+  const onHandleCancel = async () => {
+    const values = await form.getFieldsValue();
+    const resetTagData = formatFormData(source, values.formList)
+      ?.filter((it) => [1, 2].includes(it.codeRevert) && it.testVerify == 1 && it.hasCode == 1)
+      .map((it) => ({
+        ...pick(it, pickTag),
+        category: String(Math.abs(Number(it.category))),
+        rdId: it.id,
+        hasCode: 0,
+        codeRevert: 0,
+        testVerify: 0,
+      }));
+    if (!isEmpty(resetTagData)) {
+      await SprintDetailServices.removeTag({
+        datas: resetTagData,
+        project: Number(query?.projectid ?? 0),
+      });
+    }
+    onCancel();
   };
 
   const memoColumns = useMemo(() => {
@@ -498,17 +531,20 @@ const RemoveModal = (
   return (
     <Modal
       title={'移除操作'}
-      okText={'确定'}
-      cancelText={'取消'}
       {...props}
       width={1300}
-      onOk={onOK}
       maskClosable={false}
       centered
       onCancel={onCancel}
       destroyOnClose
       bodyStyle={{ maxHeight: 500 }}
       confirmLoading={confirmLoading}
+      footer={[
+        <Button onClick={onHandleCancel}>取消</Button>,
+        <Button type={'primary'} onClick={onOK}>
+          确定
+        </Button>,
+      ]}
     >
       <Spin tip="加载中..." spinning={loading}>
         <Form form={form} size={'small'}>
@@ -529,7 +565,6 @@ const RemoveModal = (
           onRefresh={props.onRefresh}
           onRefreshForm={(v: any[]) => {
             setSource(v);
-            console.log(isEmpty(v));
             if (isEmpty(v)) onCancel();
           }}
         />

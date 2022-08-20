@@ -214,7 +214,7 @@ const RemoveModal = (
       selected?.map((it) => ({
         stage: it.stage,
         id: it.id,
-        category: String(Math.abs(Number(it.category))),
+        category: it.category,
         ztNo: it.ztNo,
         title: it.title,
         relatedStories: it.relatedStories,
@@ -535,7 +535,6 @@ const RemoveModal = (
           onRefresh={props.onRefresh}
           onRefreshForm={(v: any[]) => {
             setSource(v);
-            console.log(isEmpty(v));
             if (isEmpty(v)) onCancel();
           }}
         />

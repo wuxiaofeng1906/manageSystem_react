@@ -78,7 +78,7 @@ export const DissatisfyModal = (
       const update = props.dissatisfy.filter((o) => o.ztNo != item.ztNo);
       props.onRefreshForm?.(update);
       props.setDissatisfy(update);
-      if (isEmpty(props.dissatisfy)) props.onRefresh();
+      if (isEmpty(update)) props.onRefresh();
       setLoading(false);
     } catch (e) {
       setLoading(false);
@@ -88,7 +88,12 @@ export const DissatisfyModal = (
   return (
     <Modal
       visible={!isEmpty(props.dissatisfy)}
-      onCancel={() => props.setDissatisfy([])}
+      onCancel={() => {
+        if (props.isTester) {
+          props.onRefresh();
+        }
+        props.setDissatisfy([]);
+      }}
       footer={false}
       centered
       title={'移除需求提醒'}
@@ -137,6 +142,7 @@ export const DissatisfyModal = (
                     const nextData = props.dissatisfy.filter((o) => o.ztNo !== it.ztNo) ?? [];
                     props.onRefreshForm?.(nextData);
                     props.setDissatisfy(nextData);
+                    if (isEmpty(nextData)) props.onRefresh();
                   }}
                 >
                   取消
@@ -268,7 +274,7 @@ const RemoveModal = (
       if (!isEmpty(relatedData)) {
         setDissatisfy(relatedData);
       }
-      if (isEmpty(relatedData)) props.onCancel?.();
+      if (isEmpty(relatedData)) onCancel();
     }
   };
 
@@ -523,7 +529,8 @@ const RemoveModal = (
           onRefresh={props.onRefresh}
           onRefreshForm={(v: any[]) => {
             setSource(v);
-            if (isEmpty(v)) props.onCancel?.();
+            console.log(isEmpty(v));
+            if (isEmpty(v)) onCancel();
           }}
         />
       </Spin>

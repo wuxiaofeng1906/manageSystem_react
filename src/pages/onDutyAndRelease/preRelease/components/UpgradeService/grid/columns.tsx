@@ -66,6 +66,11 @@ const getReleasedItemColumns = () => {
       minWidth: 196,
       cellRenderer: (params: any) => getDatabseAndApiUpgrade(params.value),
     },
+    {
+      headerName: '来源',
+      field: 'source',
+      minWidth: 110,
+    },
     // {
     //   headerName: '分支和环境',
     //   field: 'branch_environment',

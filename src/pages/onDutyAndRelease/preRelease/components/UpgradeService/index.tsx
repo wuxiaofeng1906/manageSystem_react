@@ -36,6 +36,7 @@ import { errorMessage, infoMessage, sucMessage } from '@/publicMethods/showMessa
 import StoryListModal from '@/pages/onDutyAndRelease/preRelease/components/storyListModal';
 import PreReleaseServices from '@/services/preRelease';
 import { getServices } from '@/publicMethods/verifyAxios';
+import { isEmpty, isEqual } from 'lodash';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -66,6 +67,7 @@ const UpgradeService: React.FC<any> = () => {
 
   const [appServerList, setAppserverList] = useState<any[]>([]);
   const [deployTip, setDeployTip] = useState('');
+  const [initPage, setInitPage] = useState(true);
   // 暂时忽略掉一键部署ID后端服务的获取
 
   /* region 升级服务： 发布项表格 */
@@ -601,7 +603,19 @@ const UpgradeService: React.FC<any> = () => {
   }, []);
   useEffect(() => {
     showArrays();
+    // 初始化部署检查错误提示
+    if (isEmpty(releasedIDArray)) {
+      setDeployTip('');
+    } else if (initPage && !isEmpty(releasedIDArray) && !releaseIdDisable) {
+      inquireServiceClick().then(() => {
+        setInitPage(false);
+      });
+    }
   }, [releasedIDArray]);
+
+  useEffect(() => {
+    setInitPage(true);
+  }, [tabsData.activeKey]);
 
   useEffect(() => {
     currentOperateStatus = operteStatus;

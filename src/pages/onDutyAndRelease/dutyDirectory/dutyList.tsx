@@ -4,15 +4,15 @@ import { Form, DatePicker, Row, Col, Button, Select, message, Modal, Input } fro
 import { PageContainer } from '@ant-design/pro-layout';
 import { AgGridReact } from 'ag-grid-react';
 import { FolderAddTwoTone, CopyTwoTone } from '@ant-design/icons';
-import dutyColumn from '@/pages/onDutyAndRelease/dutyDirectory/column';
-import { CellClickedEvent, CellMouseOverEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
-import styles from './index.less';
-import DutyListServices from '@/services/dutyList';
-import moment from 'moment';
 import { intersection, isEmpty, replace } from 'lodash';
+import { CellClickedEvent, CellMouseOverEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
+import moment from 'moment';
+import DutyListServices from '@/services/dutyList';
+import dutyColumn from '@/pages/onDutyAndRelease/dutyDirectory/column';
 import useLock from '@/hooks/lock';
 import { getHeight } from '@/publicMethods/pageSet';
 import { infoMessage } from '@/publicMethods/showMessages';
+import styles from './index.less';
 
 const DutyList = () => {
   const [currentUser] = useModel('@@initialState', (app) => [app.initialState?.currentUser]);
@@ -44,6 +44,7 @@ const DutyList = () => {
       res?.map((it: any) => ({ key: it.project_id, value: it.project_id, label: it.project_name })),
     );
   };
+
   const copyReplaceTitle = (data: any) => {
     const duty_date = moment().format('YYYY-MM-DD');
     const time = moment().format('YYYYMMDD');
@@ -70,6 +71,51 @@ const DutyList = () => {
     return { duty_date, newTitle };
   };
 
+  // 值班名单权限： 超级管理员、开发经理/总监、前端管理人员、测试部门与业务经理
+  const hasPermission = useMemo(
+    () => ({
+      part: ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(
+        currentUser?.group || '',
+      ),
+      super: (currentUser?.group || '') == 'superGroup',
+    }),
+    [currentUser?.group],
+  );
+  const getDutyNumber = async () => {
+    if (!hasPermission.part) return;
+    const res = await DutyListServices.getDutyNum();
+    return res.ready_release_num;
+  };
+
+  // 新增 & 编辑
+  const onAdd = async (data?: any) => {
+    if (!hasPermission.part) return;
+    let release_num = '';
+    if (!isEmpty(data)) {
+      release_num = data.person_duty_num;
+    } else release_num = await getDutyNumber();
+    // 编辑加锁（当前行未锁定且未发）
+    const lockedNode = lockList.find((it) => it.param.replace('duty_', '') == release_num);
+    if (isEmpty(lockedNode) && isEmpty(data) && data.is_push_msg != 'yes') {
+      await updateLockStatus(release_num, 'post');
+    }
+    history.push(`/onDutyAndRelease/dutyCatalog/${release_num}`);
+  };
+  const onDelete = async () => {
+    if (!hasPermission.super) return;
+    const selected: any = gridRef.current?.getSelectedRows();
+    if (isEmpty(selected)) return infoMessage('请先选择需删除的行！');
+    const lock = lockList.find(
+      (it) => it.param.replace('duty_', '') == selected[0].person_duty_num,
+    );
+    if (!isEmpty(lock)) return infoMessage(`当前【${lock.user_name}】正在编辑，不能删除该行！`);
+    if (selected[0].is_push_msg == 'yes') return infoMessage('当前数据已发送，不能删除！');
+    await DutyListServices.deleteDuty({
+      person_duty_num: selected[0].person_duty_num,
+      user_id: currentUser?.userid,
+    });
+    getList();
+  };
   const onCopy = async () => {
     const selected: any = gridRef.current?.getSelectedRows();
     if (isEmpty(selected)) return message.warning('请先选择需复制的行数据！');
@@ -122,53 +168,6 @@ const DutyList = () => {
     });
   };
 
-  const getDutyNumber = async () => {
-    if (!hasPermission.part) return;
-    const res = await DutyListServices.getDutyNum();
-    return res.ready_release_num;
-  };
-
-  // 新增 & 编辑
-  const onAdd = async (data?: any) => {
-    if (!hasPermission.part) return;
-    let release_num = '';
-    if (!isEmpty(data)) {
-      release_num = data.person_duty_num;
-    } else release_num = await getDutyNumber();
-    // 加锁（当前行未锁定）
-    const lockedNode = lockList.find((it) => it.param.replace('duty_', '') == release_num);
-    if (isEmpty(lockedNode) && isEmpty(data)) {
-      await updateLockStatus(release_num, 'post');
-    }
-    history.push(`/onDutyAndRelease/dutyCatalog/${release_num}`);
-  };
-  const onDelete = async () => {
-    if (!hasPermission.super) return;
-    const selected: any = gridRef.current?.getSelectedRows();
-    if (isEmpty(selected)) return infoMessage('请先选择需删除的行！');
-    const lock = lockList.find(
-      (it) => it.param.replace('duty_', '') == selected[0].person_duty_num,
-    );
-    if (!isEmpty(lock)) return infoMessage(`当前【${lock.user_name}】正在编辑，不能删除该行！`);
-    if (selected[0].is_push_msg == 'yes') return infoMessage('当前数据已发送，不能删除！');
-    await DutyListServices.deleteDuty({
-      person_duty_num: selected[0].person_duty_num,
-      user_id: currentUser?.userid,
-    });
-    getList();
-  };
-
-  // 值班名单权限： 超级管理员、开发经理/总监、前端管理人员、测试部门与业务经理
-  const hasPermission = useMemo(
-    () => ({
-      part: ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(
-        currentUser?.group || '',
-      ),
-      super: (currentUser?.group || '') == 'superGroup',
-    }),
-    [currentUser?.group],
-  );
-
   const onCellMouseOver = (param: CellMouseOverEvent) => {
     const id = param.data.person_duty_num;
     const lock = lockList.find((it) => it.param.replace('duty_', '') == id);
@@ -188,7 +187,7 @@ const DutyList = () => {
   }, []);
 
   useEffect(() => {
-    let timer = setInterval(() => {
+    const timer = setInterval(() => {
       getAllLock('duty');
     }, 3000);
     return () => {
@@ -205,15 +204,15 @@ const DutyList = () => {
     gridRef.current?.setRowData(format);
   }, [JSON.stringify(lockList), JSON.stringify(list)]);
 
+  const updateCellStyle = (p: CellClickedEvent) => ({
+    background: p.data.bg ? '#FFF6F6' : 'white',
+    lineHeight: '30px',
+  });
+
   window.onresize = function () {
     setGridHeight(Number(getHeight()) - 20);
     gridRef.current?.sizeColumnsToFit();
   };
-
-  const updateCellStyle = (p) => ({
-    background: p.data.bg ? '#FFF6F6' : 'white',
-    lineHeight: '30px',
-  });
 
   return (
     <PageContainer>
@@ -299,7 +298,7 @@ const DutyList = () => {
               sortable: true,
               filter: true,
               suppressMenu: true,
-              cellStyle: updateCellStyle,
+              cellStyle: updateCellStyle as any,
             }}
             rowHeight={30}
             headerHeight={35}

@@ -1536,6 +1536,20 @@ const Login: React.FC<{}> = () => {
           roleId: 1,
         },
       },
+      {
+        id: 149,
+        name: 'rdWithZtDetailsRemove',
+        level: 1,
+        description: '明细移除',
+        parentId: 3,
+        path: null,
+        method: null,
+        RdSysRolePermission: {
+          id: 2632,
+          permissionId: 152,
+          roleId: 1,
+        },
+      },
     ];
     // endregion
 

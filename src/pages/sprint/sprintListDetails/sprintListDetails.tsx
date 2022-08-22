@@ -1,10 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-enterprise';
-import 'ag-grid-community/dist/styles/ag-grid.css';
-import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { useRequest } from 'ahooks';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { useGqlClient } from '@/hooks';
 import {
   PageHeader,
@@ -21,24 +18,30 @@ import {
   Spin,
   Breadcrumb,
   TreeSelect,
+  Tooltip,
+  Tag,
 } from 'antd';
 import { formatMomentTime } from '@/publicMethods/timeMethods';
 import dayjs from 'dayjs';
 import {
-  FolderAddTwoTone,
-  SnippetsTwoTone,
-  DeleteTwoTone,
-  EditTwoTone,
+  // FolderAddTwoTone,
+  // SnippetsTwoTone,
+  // DeleteTwoTone,
+  // EditTwoTone,
   CloseSquareTwoTone,
   CheckSquareTwoTone,
   SettingOutlined,
   ReloadOutlined,
+  ClearOutlined,
+  ExclamationCircleOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 import {
   getProjectInfo,
   alayManagerData,
   defaultSelectParams,
   getRelatedPersonName,
+  stageType,
 } from './common';
 import { getStaticMessage, headerPath } from './header';
 import {
@@ -63,7 +66,7 @@ import {
   GetSprintProject,
   calTypeCount,
 } from './data';
-import { errorMessage, sucMessage } from '@/publicMethods/showMessages';
+import { errorMessage, infoMessage, sucMessage } from '@/publicMethods/showMessages';
 import {
   devCenterDept,
   getStageOption,
@@ -84,7 +87,10 @@ import {
   syncDetailsData,
 } from './common/axiosRequest';
 import defaultTreeSelectParams from '@/pages/shimo/fileBaseline/iterateList/defaultSetting';
-
+import styles from './sprintListDetails.less';
+import { isEmpty } from 'lodash';
+import RemoveModal, { DissatisfyModal } from '@/pages/sprint/sprintListDetails/removeModal';
+import SprintDetailServices from '@/services/sprintDetail';
 let ora_filter_data: any = [];
 
 const gird_filter_condition: any = []; // 表格自带过滤了的条件
@@ -92,6 +98,10 @@ const { Option } = Select;
 const SprintList: React.FC<any> = () => {
   const { initialState } = useModel('@@initialState');
   const { prjId, prjNames, prjType, showTestConfirmFlag } = getProjectInfo();
+  const [showRemoveModal, setShowRemoveModal] = useState(false);
+  // 不满足移除的数据
+  const [dissatisfy, setDissatisfy] = useState<any[]>([]);
+  const [nextSprint, setNextSprint] = useState<any[]>([]);
 
   /* region 整个模块都需要用到的表单定义 */
   // 模块查询
@@ -1072,10 +1082,21 @@ const SprintList: React.FC<any> = () => {
   };
 
   // 流程-测试已验revert
-  const flowForTestRevert = () => {
+  const flowForTestRevert = async () => {
     if (judgingSelectdRow()) {
-      setFlowHitmessage({ hintMessage: '测试已验证revert' });
-      setIsFlowModalVisible(true);
+      const selected: any[] = gridApi.current?.getSelectedRows() ?? [];
+      const findDissatisfy = selected.filter(
+        (it) => [1, 2].includes(Number(it.codeRevert)) && Number(it.testCheck) == 1,
+      );
+      if (
+        isEmpty(findDissatisfy) ||
+        !selected.every((it) => [1, 2].includes(Number(it.codeRevert)) && Number(it.testCheck) == 1)
+      )
+        return infoMessage('请勾选标识为开发已revert数据');
+      setDissatisfy(findDissatisfy);
+
+      // setFlowHitmessage({ hintMessage: '测试已验证revert' });
+      // setIsFlowModalVisible(true);
     }
   };
 
@@ -1268,6 +1289,18 @@ const SprintList: React.FC<any> = () => {
   };
   /* endregion */
 
+  const hasPermission = useMemo(
+    () => initialState?.currentUser?.authority?.find((it: any) => it?.id == 149)?.id == 149,
+    [initialState?.currentUser],
+  );
+
+  const onRemove = async () => {
+    if (!hasPermission) return;
+    if (isEmpty(gridApi.current?.getSelectedRows()))
+      return message.warning('请先选择需要移除的项目！');
+    setShowRemoveModal(true);
+  };
+
   useEffect(() => {
     setPageTitle(getStaticMessage(data?.resCount));
     ora_filter_data = data?.result;
@@ -1279,6 +1312,17 @@ const SprintList: React.FC<any> = () => {
       solvedBy: personData?.solvedBy,
     });
   }, [data]);
+
+  const getNextSprint = async () => {
+    const res = await SprintDetailServices.getNextSprint({
+      project: Number(prjId),
+      offset: 1,
+    });
+    setNextSprint(res);
+  };
+  useEffect(() => {
+    getNextSprint();
+  }, []);
 
   // useEffect(() => {
   //
@@ -1296,7 +1340,7 @@ const SprintList: React.FC<any> = () => {
   const widths = { width: '200px', color: 'black' };
   const marginTopHeight = { marginTop: -15 };
   return (
-    <div style={{ width: '100%', marginTop: '-30px' }}>
+    <div style={{ width: '100%', marginTop: '-30px' }} className={styles.sprintListDetails}>
       <PageHeader
         ghost={false}
         title={prjNames}
@@ -1395,50 +1439,60 @@ const SprintList: React.FC<any> = () => {
         <Row style={{ background: 'white', marginTop: '5px' }}>
           <Col span={22}>
             <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
-              <Button
-                type="text"
-                style={{
-                  marginLeft: '-10px',
-                  display: judgeAuthority('新增项目明细行') === true ? 'inline' : 'none',
-                }}
-                icon={<FolderAddTwoTone />}
-                onClick={addProject}
+              {/*<Button type="text"*/}
+              {/*        style={{*/}
+              {/*          marginLeft: "-10px",*/}
+              {/*          display: judgeAuthority("新增项目明细行") === true ? "inline" : "none"*/}
+              {/*        }}*/}
+              {/*        icon={<FolderAddTwoTone/>}*/}
+              {/*        onClick={addProject}>新增</Button>*/}
+              {/*<Button*/}
+              {/*  type="text"*/}
+              {/*  style={{*/}
+              {/*    marginLeft: '-10px',*/}
+              {/*    display: judgeAuthority('修改项目明细行') === true ? 'inline' : 'none',*/}
+              {/*  }}*/}
+              {/*  icon={<EditTwoTone />}*/}
+              {/*  onClick={btnModifyProject}*/}
+              {/*>*/}
+              {/*  修改*/}
+              {/*</Button>*/}
+              {/*<Button*/}
+              {/*  type="text"*/}
+              {/*  style={{*/}
+              {/*    marginLeft: '-10px',*/}
+              {/*    display: judgeAuthority('删除项目明细行') === true ? 'inline' : 'none',*/}
+              {/*  }}*/}
+              {/*  icon={<DeleteTwoTone />}*/}
+              {/*  onClick={deleteSprintDetails}*/}
+              {/*>*/}
+              {/*  删除*/}
+              {/*</Button>*/}
+              {/*<Button*/}
+              {/*<Button*/}
+              {/*  type="text"*/}
+              {/*  style={{*/}
+              {/*    marginLeft: '-10px',*/}
+              {/*    display: judgeAuthority('移动项目明细行') === true ? 'inline' : 'none',*/}
+              {/*  }}*/}
+              {/*  icon={<SnippetsTwoTone />}*/}
+              {/*  onClick={moveProject}*/}
+              {/*>*/}
+              {/*  移动*/}
+              {/*</Button>*/}
+              <Tooltip
+                title={'移除默认将该移除的内容关联到下个班车中'}
+                overlayStyle={{ color: 'black' }}
               >
-                新增
-              </Button>
-              <Button
-                type="text"
-                style={{
-                  marginLeft: '-10px',
-                  display: judgeAuthority('修改项目明细行') === true ? 'inline' : 'none',
-                }}
-                icon={<EditTwoTone />}
-                onClick={btnModifyProject}
-              >
-                修改
-              </Button>
-              <Button
-                type="text"
-                style={{
-                  marginLeft: '-10px',
-                  display: judgeAuthority('删除项目明细行') === true ? 'inline' : 'none',
-                }}
-                icon={<DeleteTwoTone />}
-                onClick={deleteSprintDetails}
-              >
-                删除
-              </Button>
-              <Button
-                type="text"
-                style={{
-                  marginLeft: '-10px',
-                  display: judgeAuthority('移动项目明细行') === true ? 'inline' : 'none',
-                }}
-                icon={<SnippetsTwoTone />}
-                onClick={moveProject}
-              >
-                移动
-              </Button>
+                <Button
+                  type="text"
+                  style={{ marginLeft: '-10px', display: hasPermission ? 'initial' : 'none' }}
+                  icon={<ClearOutlined style={{ color: '#228dff' }} />}
+                  onClick={onRemove}
+                >
+                  移除
+                </Button>
+              </Tooltip>
 
               <label style={{ marginTop: '5px', fontWeight: 'bold', marginLeft: '10px' }}>
                 操作流程:
@@ -1464,29 +1518,29 @@ const SprintList: React.FC<any> = () => {
                 撤销
               </Button>
 
-              <Button
-                type="text"
-                style={{
-                  marginLeft: '-10px',
-                  display: judgeAuthority('取消') === true ? 'inline' : 'none',
-                }}
-                icon={<CloseSquareTwoTone />}
-                onClick={flowForCancle}
-              >
-                取消
-              </Button>
+              {/*<Button*/}
+              {/*  type="text"*/}
+              {/*  style={{*/}
+              {/*    marginLeft: '-10px',*/}
+              {/*    display: judgeAuthority('取消') === true ? 'inline' : 'none',*/}
+              {/*  }}*/}
+              {/*  icon={<CloseSquareTwoTone />}*/}
+              {/*  onClick={flowForCancle}*/}
+              {/*>*/}
+              {/*  取消*/}
+              {/*</Button>*/}
 
-              <Button
-                type="text"
-                style={{
-                  marginLeft: '-10px',
-                  display: judgeAuthority('开发已revert') === true ? 'inline' : 'none',
-                }}
-                icon={<CheckSquareTwoTone />}
-                onClick={flowForDevRevert}
-              >
-                开发已revert
-              </Button>
+              {/*<Button*/}
+              {/*  type="text"*/}
+              {/*  style={{*/}
+              {/*    marginLeft: '-10px',*/}
+              {/*    display: judgeAuthority('开发已revert') === true ? 'inline' : 'none',*/}
+              {/*  }}*/}
+              {/*  icon={<CheckSquareTwoTone />}*/}
+              {/*  onClick={flowForDevRevert}*/}
+              {/*>*/}
+              {/*  开发已revert*/}
+              {/*</Button>*/}
 
               <Button
                 type="text"
@@ -1602,6 +1656,48 @@ const SprintList: React.FC<any> = () => {
             onColumnEverythingChanged={onGridReady}
             tooltipShowDelay={500}
             onFilterModified={getGridFilterValue}
+            frameworkComponents={{
+              stageRender: (params: CellClickedEvent) => {
+                const lineThroughStage = ['已取消', '开发已revert', '测试已验证revert'];
+                return (
+                  <div>
+                    {/*开发已revert标识： 【是是是，是是免】*/}
+                    <Tag
+                      color={'processing'}
+                      style={{
+                        marginRight: 4,
+                        fontSize: 10,
+                        lineHeight: '18px',
+                        height: 18,
+                        padding: 2,
+                        display:
+                          [1, 2].includes(Number(params.data.codeRevert)) &&
+                          Number(params.data.testCheck) == 1 &&
+                          Number(params.data.pushCode) == 1
+                            ? 'initial'
+                            : 'none',
+                      }}
+                    >
+                      开发已revert
+                    </Tag>
+                    <span
+                      style={{
+                        color:
+                          params.value == '未开始' ||
+                          (params.data.ztUnlinkedAt != null && params.data.baseline == '0')
+                            ? 'red'
+                            : 'initial',
+                        textDecoration: lineThroughStage.includes(params.value)
+                          ? 'line-through'
+                          : 'initial',
+                      }}
+                    >
+                      {params.value}
+                    </span>
+                  </div>
+                );
+              },
+            }}
           />
         </div>
       </Spin>
@@ -3076,6 +3172,23 @@ const SprintList: React.FC<any> = () => {
           </div>
         </Form>
       </Modal>
+      <RemoveModal
+        visible={showRemoveModal}
+        gridRef={gridApi}
+        nextSprint={nextSprint}
+        onRefresh={updateGrid}
+        onCancel={() => {
+          setShowRemoveModal(false);
+          updateGrid();
+        }}
+      />
+      <DissatisfyModal
+        dissatisfy={dissatisfy}
+        setDissatisfy={setDissatisfy}
+        nextSprint={nextSprint}
+        onRefresh={updateGrid}
+        isTester={true}
+      />
     </div>
   );
 };

@@ -3,17 +3,17 @@ import { extend } from 'umi-request';
 import { notification, message } from 'antd';
 
 const errorHandler = (error: { response: Response; message: any }): Response => {
-  notification.destroy();
-  notification.error({
-    message: '网络异常',
-    description: '网络发生异常，请稍后重试',
-  });
+  // notification.destroy();
+  // notification.error({
+  //   message: '网络异常',
+  //   description: '网络发生异常，请稍后重试',
+  // });
   // eslint-disable-next-line @typescript-eslint/no-throw-literal
   throw error.response || error;
 };
 
 const _request = extend({
-  // errorHandler, // 默认错误处理
+  errorHandler, // 默认错误处理
   // credentials: 'include', // 默认请求是否带上cookie
 });
 
@@ -45,12 +45,13 @@ interface IOption extends RequestOptionsInit {
   [key: string]: any;
 }
 
-function request(url: string, ioptions: IOption = {}) {
+function request(url: string, ioptions: IOption = {}, hasStandard = true) {
   const { dealRes = true, warn = true, forceLogin = true, msg, localCache, ...options } = ioptions;
   let mRequest;
+  const resWrap = hasStandard ? dealResWrap : notStandardResWrap;
   if (localCache) mRequest = localCacheWrap(url, options);
   if (!mRequest) mRequest = _request(url, options);
-  if (dealRes) mRequest = dealResWrap(mRequest, warn, forceLogin, msg);
+  if (dealRes) mRequest = resWrap(mRequest, warn, forceLogin, msg);
   return mRequest;
 }
 
@@ -78,20 +79,48 @@ function localCacheWrap(url: string, options: any) {
 }
 
 function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg?: any) {
-  return mRequest.then((res) => {
-    if (res && res?.code !== 200) {
-      if (warn) {
-        // eslint-disable-next-line no-param-reassign
-        if (warn === true) warn = '';
-        message.warn(warn || res?.msg || '操作失败');
+  return mRequest
+    .then((res) => {
+      if (res?.code !== 200) {
+        if (warn) {
+          // eslint-disable-next-line no-param-reassign
+          if (warn === true) warn = '';
+          message.warn(warn || res?.msg || '操作失败');
+        }
+        return Promise.reject(res);
       }
-      return Promise.reject(res);
-    }
-    if (msg) {
-      message.info(msg === true ? res.msg : msg);
-    }
-    return res?.data;
-  });
+      if (msg) {
+        message.info(msg === true ? res.msg : msg);
+      }
+      return res?.data;
+    })
+    .catch((e) => {
+      return Promise.reject(e);
+    });
+}
+
+function notStandardResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg?: any) {
+  return mRequest
+    .then((res) => {
+      if (res.ok == false) {
+        if (warn) {
+          // eslint-disable-next-line no-param-reassign
+          if (warn === true) warn = '';
+          message.warn(warn || res?.msg || '操作失败');
+        }
+        return Promise.reject(res);
+      }
+      if (msg) {
+        message.info(msg === true ? res.msg : msg);
+      }
+      return res?.data;
+    })
+    .catch((e) => {
+      if (e.status == 403) {
+        message.info('对不起，您无权操作');
+      } else message.info('操作失败');
+      return Promise.reject(e);
+    });
 }
 
 export default request;

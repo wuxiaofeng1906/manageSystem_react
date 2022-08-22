@@ -1,5 +1,4 @@
-import {request} from "@@/plugin-request/request";
-
+import { request } from '@@/plugin-request/request';
 export async function query() {
   return request<API.CurrentUser[]>('/api/users');
 }

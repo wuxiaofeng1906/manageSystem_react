@@ -192,7 +192,7 @@ const DutyCatalog = () => {
     let result: any[] = [];
     values.project_ids?.forEach((id: string) => {
       const o = projects.find(
-        (it: any) => id.toString() == it.project_id.toString() && !isEmpty(it.user),
+        (it: any) => String(id) == String(it.project_id) && !isEmpty(it.user),
       );
       o && result.push(o);
     });
@@ -316,10 +316,21 @@ const DutyCatalog = () => {
     await DutyListServices.addDuty(data);
     setIsSameDuty(true);
     getDetail();
-    // 【未加锁】保存后：加锁
+    //【未加锁】保存后：加锁
     if (singleLock?.param.replace('duty_', '') == id) return;
     updateLockStatus(id, 'post');
   };
+
+  // 值班名单权限： 超级管理员、开发经理/总监、前端管理人员 、测试部门与业务经理
+  const hasPermission = useMemo(
+    () =>
+      (detail?.is_push_msg == 'no' || isEmpty(detail)) && // 未推送
+      ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(
+        currentUser?.group || '',
+      ) && // 有权限
+      (singleLock?.user_id == currentUser?.userid || isEmpty(singleLock)), // 未锁定
+    [currentUser?.group, singleLock, detail?.is_push_msg],
+  );
 
   // 详情
   const getDetail = async () => {
@@ -424,7 +435,7 @@ const DutyCatalog = () => {
 
   // form 格式【默认值班人员disabled,并过滤值班人员的现场、远程】
   const initalFormDuty = (data: any[]) => {
-    let initDutyObj: any = {};
+    const initDutyObj: any = {};
     if (isEmpty(data)) return;
     data?.forEach((o: any) => {
       initDutyObj[recentType[o.user_tech]] = { ...o };
@@ -449,7 +460,7 @@ const DutyCatalog = () => {
       content: '请确认是否需要将当前值班负责人更新为本周最新值班负责人?',
       onOk: async () => {
         // 更新默认值班人员及含特性项目项目对应的负责人
-        let initDutyObj = {};
+        const initDutyObj: any = {};
         const { project_ids } = await form.getFieldsValue();
 
         initDuty?.forEach((o: any) => {
@@ -506,7 +517,7 @@ const DutyCatalog = () => {
   // 更新手动新加的人员
   const updateRecordOwner = (v: string, config: any) => {
     if (['front', 'backend', 'test'].includes(config.name)) {
-      let stageArr = [];
+      const stageArr = [];
       let stage = cloneDeep(recordOwner);
       stageArr.push(v);
       stage = {
@@ -529,7 +540,7 @@ const DutyCatalog = () => {
 
   // 保存后的第一值班人
   useEffect(() => {
-    if (isEmpty(dutyPerson)) return;
+    if (isEmpty(dutyPerson) || isEmpty(projects)) return;
     const initDutyObj = initalFormDuty(dutyPerson);
     const formatProject = projects?.map((it: any) => ({
       ...it,
@@ -548,7 +559,7 @@ const DutyCatalog = () => {
       backend: initDutyObj?.backend?.value?.split() ?? [],
       test: initDutyObj?.test?.value?.split() ?? [],
     });
-  }, [dutyPerson]);
+  }, [dutyPerson, JSON.stringify(projects)]);
 
   useEffect(() => {
     if (isEmpty(initDuty)) return;
@@ -563,23 +574,12 @@ const DutyCatalog = () => {
     .filter((o: any) => !Object.values(envType).includes(o.value))
     .map((it) => it.value);
 
-  // 值班名单权限： 超级管理员、开发经理/总监、前端管理人员 、测试部门与业务经理
-  const hasPermission = useMemo(
-    () =>
-      (detail?.is_push_msg == 'no' || isEmpty(detail)) && // 未推送
-      ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(
-        currentUser?.group || '',
-      ) && // 有权限
-      (singleLock?.user_id == currentUser?.userid || isEmpty(singleLock)), // 未锁定
-    [currentUser?.group, singleLock, detail?.is_push_msg],
-  );
-
   useEffect(() => {
     let timer: any;
     if (singleLock?.user_id == currentUser?.userid) return;
     timer = setInterval(() => {
       getAllLock(id, true).then((res) => {
-        if (isEmpty(res)) updateLockStatus(id, 'post');
+        if (isEmpty(res) && detail?.is_push_msg != 'yes') updateLockStatus(id, 'post');
       });
     }, 3000);
     return () => {
@@ -667,7 +667,7 @@ const DutyCatalog = () => {
                       bordered={false}
                       placeholder={'项目名称'}
                       showSearch
-                      onDeselect={(v: any) => getProjectUser()}
+                      onDeselect={getProjectUser}
                       onDropdownVisibleChange={(open) => !open && getProjectUser()}
                     >
                       {projects.map((it: any) => (

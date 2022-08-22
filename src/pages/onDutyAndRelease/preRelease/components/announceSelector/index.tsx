@@ -4,6 +4,7 @@ import usePermission from '@/hooks/permission';
 import AnnouncementServices from '@/services/announcement';
 import { useModel } from '@@/plugin-model/useModel';
 import '../../style/style.css';
+
 const AnnounceSelector = ({
   type,
   ready_release_num,

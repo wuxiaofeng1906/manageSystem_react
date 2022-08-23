@@ -100,7 +100,23 @@ const getReleasedItemColumns = () => {
       pinned: 'right',
       minWidth: 115,
       maxWidth: 115,
-      cellRenderer: 'operation',
+      cellRenderer: (params: any) => {
+        const paramData = JSON.stringify(params.data).replace(/'/g, '’');
+        // 发布项没有新增功能
+        return `
+        <div style="margin-top: -5px">
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ;" onclick='showPulishItemForm("add",${paramData})'>
+              <img src="../add_1.png" width="15" height="15" alt="新增" title="新增">
+            </Button>
+             <Button  style="border: none; background-color: transparent;  margin-left: -10px; "  onclick='showPulishItemForm("modify",${paramData})'>
+              <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
+            </Button>
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteGridRows(1,${paramData})'>
+              <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
+            </Button>
+        </div>
+           `;
+      },
     },
   ];
   return firstUpSerColumn;
@@ -169,7 +185,22 @@ const getReleasedApiColumns = () => {
       pinned: 'right',
       minWidth: 100,
       maxWidth: 100,
-      cellRenderer: 'operation',
+      cellRenderer: (params: any) => {
+        const paramData = JSON.stringify(params.data).replace(/'/g, '’');
+        return `
+        <div style="margin-top: -5px">
+            <Button  style="border: none; background-color: transparent; " onclick='showUpgradeApiForm("add",${paramData})'>
+              <img src="../add_1.png" width="15" height="15" alt="新增" title="新增">
+            </Button>
+             <Button  style="border: none; background-color: transparent;  margin-left: -10px; " onclick='showUpgradeApiForm("modify",${paramData})'>
+              <img src="../edit_1.png" width="15" height="15" alt="修改" title="修改">
+            </Button>
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ; " onclick='deleteGridRows(2,${paramData})'>
+              <img src="../delete_2.png" width="15" height="15" alt="删除" title="删除">
+            </Button>
+        </div>
+           `;
+      },
     },
   ];
   return secondUpSerColumn;

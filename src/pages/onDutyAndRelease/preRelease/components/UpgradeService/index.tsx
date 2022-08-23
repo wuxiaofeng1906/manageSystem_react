@@ -232,7 +232,7 @@ const UpgradeService: React.FC<any> = () => {
     isApiDbUpgrade: [],
   });
 
-  const showPulishItemForm = async (type: any, params: any) => {
+  (window as any).showPulishItemForm = async (type: any, params: any) => {
     // 验证是否已经确认服务，如果已经确认了，就不能新增和修改了
     const flag = await vertifyModifyFlag(1, tabsData.activeKey);
     if (!flag) return infoMessage('服务确认已完成，不能进行修改！');
@@ -270,7 +270,6 @@ const UpgradeService: React.FC<any> = () => {
           title: '修改',
         });
       } else {
-        console.log(tabsData, 'activeKey');
         modifyLockedItem(`${tabsData.activeKey}-step2-app-${appid}`);
         const lockInfo = await getLockStatus(`${tabsData.activeKey}-step2-app-${appid}`);
         if (lockInfo.errMessage) {
@@ -296,12 +295,6 @@ const UpgradeService: React.FC<any> = () => {
       pulishItem: await loadPulishItemSelect(),
       isApiDbUpgrade: await loadIsApiAndDbUpgradeSelect(),
     });
-  };
-  const onDelete = async (type: number, data: any) => {
-    if (operteStatus) return infoMessage('发布已完成，不能进行删除！');
-    const flag = await vertifyModifyFlag(type, tabsData.activeKey);
-    if (!flag) return infoMessage('服务确认已完成，不能进行删除！');
-    setDelModal({ type, shown: true, datas: data });
   };
 
   // 取消发布项弹出窗
@@ -381,7 +374,7 @@ const UpgradeService: React.FC<any> = () => {
   });
 
   // 发布接口弹出窗口进行修改和新增
-  const showUpgradeApiForm = async (type: any, params: any) => {
+  (window as any).showUpgradeApiForm = async (type: any, params: any) => {
     const flag = await vertifyModifyFlag(2, tabsData.activeKey);
     if (!flag) return infoMessage('服务确认已完成，不能进行修改！');
     if (type === 'add') {

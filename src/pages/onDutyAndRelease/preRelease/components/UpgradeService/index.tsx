@@ -270,9 +270,9 @@ const UpgradeService: React.FC<any> = () => {
           title: '修改',
         });
       } else {
+        console.log(tabsData, 'activeKey');
         modifyLockedItem(`${tabsData.activeKey}-step2-app-${appid}`);
         const lockInfo = await getLockStatus(`${tabsData.activeKey}-step2-app-${appid}`);
-
         if (lockInfo.errMessage) {
           message.error({
             content: `${lockInfo.errMessage}`,
@@ -564,7 +564,6 @@ const UpgradeService: React.FC<any> = () => {
     await PreReleaseServices.refreshService(tabsData.activeKey ?? '');
     await alalysisInitData('pulishItem', tabsData.activeKey);
   };
-
   const operations = (params: CellClickedEvent, type: 'server' | 'applicant') => {
     const styles = { width: 15, height: 15 };
     const fn = type == 'server' ? showUpgradeApiForm : showPulishItemForm;
@@ -645,22 +644,24 @@ const UpgradeService: React.FC<any> = () => {
           </legend>
           <div>
             <div>
-              <Space size={8} style={{ width: '100%', display: 'flex', justifyContent: 'right' }}>
-                <Button
-                  title={'刷新'}
-                  type={'text'}
-                  size={'small'}
-                  icon={<SyncOutlined style={{ color: '#46A0FC' }} />}
-                  onClick={onRefreshService}
-                />
-                <Button
-                  title={'待发布需求列表'}
-                  icon={<UnorderedListOutlined style={{ color: '#46A0FC' }} />}
-                  type={'text'}
-                  size={'small'}
-                  onClick={() => setShowStoryModal(true)}
-                />
-              </Space>
+              <div style={{ width: '100%', display: 'flex', justifyContent: 'right' }}>
+                <Space size={8}>
+                  <Button
+                    title={'刷新'}
+                    type={'text'}
+                    size={'small'}
+                    icon={<SyncOutlined style={{ color: '#46A0FC' }} />}
+                    onClick={onRefreshService}
+                  />
+                  <Button
+                    title={'待发布需求列表'}
+                    icon={<UnorderedListOutlined style={{ color: '#46A0FC' }} />}
+                    type={'text'}
+                    size={'small'}
+                    onClick={() => setShowStoryModal(true)}
+                  />
+                </Space>
+              </div>
               {/* 升级服务 */}
               <div
                 className="ag-theme-alpine"

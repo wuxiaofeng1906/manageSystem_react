@@ -36,7 +36,10 @@ const PreReleaseServices = {
   },
   // 刷新服务
   async refreshService(ready_release_num: string) {
-    return request(`${baseUrl}/release/refresh_server`, { params: { ready_release_num } });
+    return request(`${baseUrl}/release/refresh_server`, {
+      params: { ready_release_num },
+      msg: '刷新成功',
+    });
   },
 };
 export default PreReleaseServices;

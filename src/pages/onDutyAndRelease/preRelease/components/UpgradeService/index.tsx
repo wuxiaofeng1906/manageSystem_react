@@ -68,6 +68,7 @@ const UpgradeService: React.FC<any> = () => {
   const [appServerList, setAppserverList] = useState<any[]>([]);
   const [deployTip, setDeployTip] = useState('');
   const [initPage, setInitPage] = useState(true);
+  const [refreshLoading, setRefreshLoading] = useState(false);
   // 暂时忽略掉一键部署ID后端服务的获取
 
   /* region 升级服务： 发布项表格 */
@@ -562,8 +563,15 @@ const UpgradeService: React.FC<any> = () => {
   };
 
   const onRefreshService = async () => {
-    await PreReleaseServices.refreshService(tabsData.activeKey ?? '');
-    await alalysisInitData('pulishItem', tabsData.activeKey);
+    try {
+      setRefreshLoading(true);
+      await PreReleaseServices.refreshService(tabsData.activeKey ?? '');
+      await alalysisInitData('pulishItem', tabsData.activeKey);
+      message.success('刷新成功');
+      setRefreshLoading(false);
+    } catch (e) {
+      setRefreshLoading(false);
+    }
   };
 
   const getServerList = async () => {
@@ -622,8 +630,9 @@ const UpgradeService: React.FC<any> = () => {
                     title={'刷新'}
                     type={'text'}
                     size={'small'}
-                    icon={<SyncOutlined style={{ color: '#46A0FC' }} />}
+                    icon={<SyncOutlined style={{ color: '#46A0FC' }} spin={refreshLoading} />}
                     onClick={onRefreshService}
+                    disabled={refreshLoading}
                   />
                   <Button
                     title={'待发布需求列表'}

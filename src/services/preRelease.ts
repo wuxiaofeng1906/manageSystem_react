@@ -38,7 +38,6 @@ const PreReleaseServices = {
   async refreshService(ready_release_num: string) {
     return request(`${baseUrl}/release/refresh_server`, {
       params: { ready_release_num },
-      msg: '刷新成功',
     });
   },
 };

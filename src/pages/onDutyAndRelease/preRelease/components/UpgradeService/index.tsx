@@ -149,7 +149,7 @@ const UpgradeService: React.FC<any> = () => {
     }
 
     const queryCondition = formUpgradeService.getFieldsValue().deployID;
-    if (!queryCondition || queryCondition.length === 0) {
+    if (isEmpty(queryCondition)) {
       message.error({
         content: '一键部署ID不能为空！',
         duration: 1,
@@ -551,6 +551,14 @@ const UpgradeService: React.FC<any> = () => {
       deployID: releasedIDArray,
       hitMessage: await getAutoCheckMessage(tabsData.activeKey), // 31357
     });
+    // 初始化部署检查错误提示
+    if (isEmpty(releasedIDArray)) {
+      setDeployTip('');
+    } else if (initPage && !isEmpty(releasedIDArray) && !releaseIdDisable) {
+      inquireServiceClick().then(() => {
+        setInitPage(false);
+      });
+    }
   };
 
   const onRefreshService = async () => {
@@ -569,14 +577,6 @@ const UpgradeService: React.FC<any> = () => {
   }, []);
   useEffect(() => {
     showArrays();
-    // 初始化部署检查错误提示
-    if (isEmpty(releasedIDArray)) {
-      setDeployTip('');
-    } else if (initPage && !isEmpty(releasedIDArray) && !releaseIdDisable) {
-      inquireServiceClick().then(() => {
-        setInitPage(false);
-      });
-    }
   }, [releasedIDArray]);
 
   useEffect(() => {

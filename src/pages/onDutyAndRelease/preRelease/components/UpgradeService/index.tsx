@@ -36,7 +36,7 @@ import { errorMessage, infoMessage, sucMessage } from '@/publicMethods/showMessa
 import StoryListModal from '@/pages/onDutyAndRelease/preRelease/components/storyListModal';
 import PreReleaseServices from '@/services/preRelease';
 import { getServices } from '@/publicMethods/verifyAxios';
-import { isEmpty, isEqual } from 'lodash';
+import { isEmpty } from 'lodash';
 
 const { TextArea } = Input;
 const { Option } = Select;

@@ -71,7 +71,7 @@ const getReleasedItemColumns = () => {
       field: 'add_type',
       minWidth: 110,
       cellRenderer: (params: any) =>
-        params.value == 'auto' ? '自动添加' : params.value == 'manual' ? '手动获取' : '',
+        params.value == 'auto' ? '自动获取' : params.value == 'manual' ? '手动添加' : '',
     },
     // {
     //   headerName: '分支和环境',

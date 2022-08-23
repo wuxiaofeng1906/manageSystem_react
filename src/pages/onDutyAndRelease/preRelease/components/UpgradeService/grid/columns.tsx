@@ -68,8 +68,10 @@ const getReleasedItemColumns = () => {
     },
     {
       headerName: '来源',
-      field: 'source',
+      field: 'add_type',
       minWidth: 110,
+      cellRenderer: (params: any) =>
+        params.value == 'auto' ? '自动添加' : params.value == 'manual' ? '手动获取' : '',
     },
     // {
     //   headerName: '分支和环境',

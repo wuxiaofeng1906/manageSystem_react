@@ -557,32 +557,6 @@ const UpgradeService: React.FC<any> = () => {
     await PreReleaseServices.refreshService(tabsData.activeKey ?? '');
     await alalysisInitData('pulishItem', tabsData.activeKey);
   };
-  const operations = (params: CellClickedEvent, type: 'server' | 'applicant') => {
-    const styles = { width: 15, height: 15 };
-    const fn = type == 'server' ? showUpgradeApiForm : showPulishItemForm;
-    return (
-      <Space size={5}>
-        <img
-          src={require('../../../../../../public/add_1.png')}
-          title={'新增'}
-          style={styles}
-          onClick={() => fn('add', params.data)}
-        />
-        <img
-          src={require('../../../../../../public/edit.png')}
-          title={'编辑'}
-          style={styles}
-          onClick={() => fn('modify', params.data)}
-        />
-        <img
-          src={require('../../../../../../public/delete_2.png')}
-          title={'删除'}
-          style={styles}
-          onClick={() => onDelete(type == 'applicant' ? 1 : 2, params.data)}
-        />
-      </Space>
-    );
-  };
 
   const getServerList = async () => {
     const res = await getServices('');
@@ -637,7 +611,12 @@ const UpgradeService: React.FC<any> = () => {
           </legend>
           <div>
             <div>
-              <div style={{ width: '100%', display: 'flex', justifyContent: 'right' }}>
+              <div
+                style={{
+                  width: '100%',
+                  textAlign: 'right',
+                }}
+              >
                 <Space size={8}>
                   <Button
                     title={'刷新'}

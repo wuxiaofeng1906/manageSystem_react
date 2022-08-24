@@ -419,6 +419,10 @@ const publishListColumn: ColumnsType<any> = [
     dataIndex: 'module_name',
   },
   {
+    title: '服务',
+    dataIndex: 'app',
+  },
+  {
     title: '是否可热更',
     dataIndex: 'is_hot_update',
     width: 100,

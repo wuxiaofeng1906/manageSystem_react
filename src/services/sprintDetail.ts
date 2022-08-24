@@ -12,5 +12,9 @@ const SprintDetailServices = {
   async getNextSprint(params: any) {
     return request('/api/sprint/project', { params });
   },
+  // 验证测试确认是否可修改
+  async checkUpdateTest(params: any) {
+    return request('/api/sprint/project/baseline/valid', { params });
+  },
 };
 export default SprintDetailServices;

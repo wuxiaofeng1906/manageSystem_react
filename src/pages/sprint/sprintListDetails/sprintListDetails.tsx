@@ -99,6 +99,7 @@ const SprintList: React.FC<any> = () => {
   const { initialState } = useModel('@@initialState');
   const { prjId, prjNames, prjType, showTestConfirmFlag } = getProjectInfo();
   const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [testSelectorDisabled, setTestSelectorDisabled] = useState(false);
   // 不满足移除的数据
   const [dissatisfy, setDissatisfy] = useState<any[]>([]);
   const [nextSprint, setNextSprint] = useState<any[]>([]);
@@ -1119,13 +1120,15 @@ const SprintList: React.FC<any> = () => {
   // 修改操作流程
   const modFlowStage = async (content: any, values: any) => {
     const selRows: any = gridApi.current?.getSelectedRows();
-    const result = await requestModFlowStage(selRows, content, values);
-    if (result.code === 200) {
+    const result = await requestModFlowStage(selRows, content, values, prjNames);
+    if (result?.code === 200) {
       setIsFlowModalVisible(false);
       setIsRevokeModalVisible(false);
       updateGrid();
       sucMessage('修改成功！');
       //   测试确认需要清空
+      setTestConfirm(undefined);
+    } else {
       setTestConfirm(undefined);
     }
   };
@@ -1293,6 +1296,18 @@ const SprintList: React.FC<any> = () => {
     () => initialState?.currentUser?.authority?.find((it: any) => it?.id == 149)?.id == 149,
     [initialState?.currentUser],
   );
+  // 验证是否可批量 修改测试确认
+  const checkTestValid = async () => {
+    try {
+      await SprintDetailServices.checkUpdateTest({
+        execName: prjNames,
+        currAt: moment().format('YYYY-MM-DD HH:mm:ss'),
+      });
+      setTestSelectorDisabled(false);
+    } catch (e) {
+      setTestSelectorDisabled(e.ok == false && e.status == 405);
+    }
+  };
 
   const onRemove = async () => {
     if (!hasPermission) return;
@@ -1323,6 +1338,18 @@ const SprintList: React.FC<any> = () => {
   useEffect(() => {
     getNextSprint();
   }, []);
+
+  useEffect(() => {
+    let timer: any;
+
+    timer = setInterval(() => {
+      checkTestValid();
+    }, 1000);
+    if (testSelectorDisabled && timer) clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+    };
+  }, [testSelectorDisabled]);
 
   // useEffect(() => {
   //
@@ -1596,6 +1623,7 @@ const SprintList: React.FC<any> = () => {
                 }}
                 size={'small'}
                 onChange={testConfirmSelect}
+                disabled={testSelectorDisabled}
               >
                 {[
                   <Option key={'1'} value={'1'}>

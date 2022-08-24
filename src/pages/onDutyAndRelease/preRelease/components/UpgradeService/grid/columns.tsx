@@ -378,6 +378,11 @@ const getNewRelServiceComfirmColumns = () => {
   ];
   return thirdUpSerColumn;
 };
+const RenderTooltip = (v: any) => (
+  <Tooltip placement={'topLeft'} title={v}>
+    {v}
+  </Tooltip>
+);
 const publishListColumn: ColumnsType<any> = [
   {
     title: '序号',
@@ -399,15 +404,14 @@ const publishListColumn: ColumnsType<any> = [
     dataIndex: 'title',
     width: 200,
     ellipsis: { showTitle: false },
-    render: (v) => (
-      <Tooltip placement={'topLeft'} title={v}>
-        {v}
-      </Tooltip>
-    ),
+    render: RenderTooltip,
   },
   {
     title: '所属执行',
     dataIndex: 'execution_name',
+    width: 180,
+    ellipsis: { showTitle: false },
+    render: RenderTooltip,
   },
   {
     title: '优先级',
@@ -417,10 +421,16 @@ const publishListColumn: ColumnsType<any> = [
   {
     title: '模块名',
     dataIndex: 'module_name',
+    width: 120,
+    ellipsis: { showTitle: false },
+    render: RenderTooltip,
   },
   {
     title: '服务',
     dataIndex: 'app',
+    width: 120,
+    ellipsis: { showTitle: false },
+    render: RenderTooltip,
   },
   {
     title: '是否可热更',

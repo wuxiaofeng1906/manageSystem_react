@@ -669,6 +669,12 @@ export default [
     ],
   },
   {
+    name: '发布一览图',
+    icon: 'table',
+    path: './visual',
+    component: './visual',
+  },
+  {
     name: '系统管理',
     icon: 'table',
     path: '/authority',

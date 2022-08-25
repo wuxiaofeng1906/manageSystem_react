@@ -45,16 +45,22 @@ const StoryListModal = (props: { onRefersh?: Function }) => {
   };
 
   const getList = async () => {
-    const executions_id = form.getFieldValue('execution_ids')?.join() ?? '';
-    const res = await getStoryList({
-      executions_id,
-      ready_release_num: tabsData.activeKey ?? '',
-    });
-    const initChecked = isEmpty(res?.check_story)
-      ? res.story_data?.map((it: any) => it.story_num) ?? []
-      : res?.check_story;
-    setStageFilter(res.story_data);
-    setSelected(initChecked);
+    setLoading(true);
+    try {
+      const executions_id = form.getFieldValue('execution_ids')?.join() ?? '';
+      const res = await getStoryList({
+        executions_id,
+        ready_release_num: tabsData.activeKey ?? '',
+      });
+      const initChecked = isEmpty(res?.check_story)
+        ? res.story_data?.map((it: any) => it.story_num) ?? []
+        : res?.check_story;
+      setStageFilter(res.story_data);
+      setSelected(initChecked);
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+    }
   };
 
   const getSelectList = async () => {
@@ -82,13 +88,11 @@ const StoryListModal = (props: { onRefersh?: Function }) => {
   useEffect(() => {
     if (!showStoryModal) return;
     try {
-      setLoading(true);
       form.setFieldsValue({
         execution_ids: storyExecutionId ?? undefined,
       });
       getSelectList();
       getList();
-      setLoading(false);
     } catch (e) {
       setLoading(false);
     }

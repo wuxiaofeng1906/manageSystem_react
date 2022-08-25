@@ -562,12 +562,14 @@ const UpgradeService: React.FC<any> = () => {
     }
   };
 
-  const onRefreshService = async () => {
+  const onRefreshService = async (showMessage = true) => {
     try {
       setRefreshLoading(true);
       await PreReleaseServices.refreshService(tabsData.activeKey ?? '');
       await alalysisInitData('pulishItem', tabsData.activeKey);
-      message.success('刷新成功');
+      if (showMessage) {
+        message.success('刷新成功');
+      }
       setRefreshLoading(false);
     } catch (e) {
       setRefreshLoading(false);
@@ -622,7 +624,7 @@ const UpgradeService: React.FC<any> = () => {
               <div
                 style={{
                   width: '100%',
-                  textAlign: 'right',
+                  textAlign: 'left',
                 }}
               >
                 <Space size={8}>
@@ -670,9 +672,6 @@ const UpgradeService: React.FC<any> = () => {
                   onGridReady={onReleaseItemGridReady}
                   onGridSizeChanged={onReleaseItemGridReady}
                   onColumnEverythingChanged={onReleaseItemGridReady}
-                  frameworkComponents={{
-                    operation: (data: CellClickedEvent) => operations(data, 'applicant'),
-                  }}
                 />
               </div>
 
@@ -703,9 +702,6 @@ const UpgradeService: React.FC<any> = () => {
                   onGridReady={onUpGradeGridReady}
                   onGridSizeChanged={onUpGradeGridReady}
                   onColumnEverythingChanged={onUpGradeGridReady}
-                  frameworkComponents={{
-                    operation: (data: CellClickedEvent) => operations(data, 'server'),
-                  }}
                 />
               </div>
             </div>
@@ -1181,7 +1177,7 @@ const UpgradeService: React.FC<any> = () => {
           </Row>
         </Form>
       </Modal>
-      <StoryListModal />
+      <StoryListModal onRefersh={onRefreshService} />
     </div>
   );
 };

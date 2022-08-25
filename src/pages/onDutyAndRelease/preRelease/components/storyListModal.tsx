@@ -7,7 +7,7 @@ import { isEmpty, groupBy } from 'lodash';
 import { useUnmount } from 'ahooks';
 import { infoMessage } from '@/publicMethods/showMessages';
 
-const StoryListModal = () => {
+const StoryListModal = (props: { onRefersh?: Function }) => {
   const {
     setShowStoryModal,
     showStoryModal,
@@ -38,6 +38,7 @@ const StoryListModal = () => {
       }));
       await updateStoryList(data);
       setLoading(false);
+      props.onRefersh?.(false);
     } catch (e) {
       setLoading(false);
     }
@@ -107,7 +108,10 @@ const StoryListModal = () => {
     <Modal
       title={'待发布需求列表'}
       visible={showStoryModal}
-      onCancel={() => setShowStoryModal(false)}
+      onCancel={() => {
+        setShowStoryModal(false);
+        props.onRefersh?.(false);
+      }}
       onOk={onConfirm}
       width={1200}
       destroyOnClose

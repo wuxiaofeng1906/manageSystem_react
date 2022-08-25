@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { useRequest } from 'ahooks';
 import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
@@ -1366,6 +1366,34 @@ const SprintList: React.FC<any> = () => {
   const rightStyle = { marginLeft: '30px' };
   const widths = { width: '200px', color: 'black' };
   const marginTopHeight = { marginTop: -15 };
+
+  const renderTestSelect = useCallback(() => {
+    return (
+      <Select
+        placeholder="请选择"
+        value={testConfirm}
+        style={{
+          marginLeft: '5px',
+          width: '85px',
+          marginTop: '4px',
+          display: judgeAuthority(`修改"测试已确认"字段`) === true ? 'inline' : 'none',
+        }}
+        size={'small'}
+        onChange={testConfirmSelect}
+        disabled={testSelectorDisabled}
+      >
+        {[
+          <Option key={'1'} value={'1'}>
+            是
+          </Option>,
+          <Option key={'0'} value={'0'}>
+            否
+          </Option>,
+        ]}
+      </Select>
+    );
+  }, [testSelectorDisabled, testConfirm]);
+
   return (
     <div style={{ width: '100%', marginTop: '-30px' }} className={styles.sprintListDetails}>
       <PageHeader
@@ -1612,28 +1640,11 @@ const SprintList: React.FC<any> = () => {
               >
                 测试确认:
               </label>
-              <Select
-                placeholder="请选择"
-                value={testConfirm}
-                style={{
-                  marginLeft: '5px',
-                  width: '85px',
-                  marginTop: '4px',
-                  display: judgeAuthority(`修改"测试已确认"字段`) === true ? 'inline' : 'none',
-                }}
-                size={'small'}
-                onChange={testConfirmSelect}
-                disabled={testSelectorDisabled}
-              >
-                {[
-                  <Option key={'1'} value={'1'}>
-                    是
-                  </Option>,
-                  <Option key={'0'} value={'0'}>
-                    否
-                  </Option>,
-                ]}
-              </Select>
+              {testSelectorDisabled ? (
+                <Tooltip title={'已基线，不能修改'}>{renderTestSelect()}</Tooltip>
+              ) : (
+                renderTestSelect()
+              )}
             </div>
           </Col>
           <Col span={1} style={{ textAlign: 'right' }}>

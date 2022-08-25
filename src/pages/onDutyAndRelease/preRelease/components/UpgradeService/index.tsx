@@ -555,7 +555,7 @@ const UpgradeService: React.FC<any> = () => {
     // 初始化部署检查错误提示
     if (isEmpty(releasedIDArray)) {
       setDeployTip('');
-    } else if (initPage && !isEmpty(releasedIDArray) && !releaseIdDisable) {
+    } else if (initPage && !isEmpty(releasedIDArray) && !releaseIdDisable && !operteStatus) {
       inquireServiceClick().then(() => {
         setInitPage(false);
       });

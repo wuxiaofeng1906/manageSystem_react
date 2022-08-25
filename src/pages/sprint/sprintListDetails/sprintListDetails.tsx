@@ -26,7 +26,7 @@ import dayjs from 'dayjs';
 import {
   // FolderAddTwoTone,
   // SnippetsTwoTone,
-  // DeleteTwoTone,
+  DeleteTwoTone,
   // EditTwoTone,
   CloseSquareTwoTone,
   CheckSquareTwoTone,
@@ -1457,17 +1457,17 @@ const SprintList: React.FC<any> = () => {
               {/*>*/}
               {/*  修改*/}
               {/*</Button>*/}
-              {/*<Button*/}
-              {/*  type="text"*/}
-              {/*  style={{*/}
-              {/*    marginLeft: '-10px',*/}
-              {/*    display: judgeAuthority('删除项目明细行') === true ? 'inline' : 'none',*/}
-              {/*  }}*/}
-              {/*  icon={<DeleteTwoTone />}*/}
-              {/*  onClick={deleteSprintDetails}*/}
-              {/*>*/}
-              {/*  删除*/}
-              {/*</Button>*/}
+              <Button
+                type="text"
+                style={{
+                  marginLeft: '-10px',
+                  display: judgeAuthority('删除项目明细行') === true ? 'inline' : 'none',
+                }}
+                icon={<DeleteTwoTone />}
+                onClick={deleteSprintDetails}
+              >
+                删除
+              </Button>
               {/*<Button*/}
               {/*<Button*/}
               {/*  type="text"*/}

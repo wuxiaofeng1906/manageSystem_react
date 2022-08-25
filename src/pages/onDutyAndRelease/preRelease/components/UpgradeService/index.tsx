@@ -652,7 +652,7 @@ const UpgradeService: React.FC<any> = () => {
               >
                 <AgGridReact
                   columnDefs={getReleasedItemColumns()} // 定义列
-                  rowData={releaseItem.gridData} // 数据绑定
+                  rowData={isEmpty(releaseItem.gridData) ? [{}] : releaseItem.gridData} // 数据绑定
                   defaultColDef={{
                     resizable: true,
                     sortable: true,

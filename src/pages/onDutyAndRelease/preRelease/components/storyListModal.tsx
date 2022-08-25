@@ -21,7 +21,7 @@ const StoryListModal = (props: { onRefersh?: Function }) => {
   const [form] = Form.useForm();
   const [executionList, setExecutionList] = useState<any[]>([]);
   const [storyNum, setStoryNum] = useState<any[]>([]);
-  const [selected, setSelected] = useState<any[]>([]);
+  const [selected, setSelected] = useState<string[]>([]);
   const [stageFilter, setStageFilter] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -53,7 +53,7 @@ const StoryListModal = (props: { onRefersh?: Function }) => {
         ready_release_num: tabsData.activeKey ?? '',
       });
       const initChecked = isEmpty(res?.check_story)
-        ? res.story_data?.map((it: any) => it.story_num) ?? []
+        ? res.story_data?.map((it: any) => String(it.story_num)) ?? []
         : res?.check_story;
       setStageFilter(res.story_data);
       setSelected(initChecked);

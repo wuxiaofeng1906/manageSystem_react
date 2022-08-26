@@ -1,11 +1,11 @@
-import {alalysisInitData} from '../../../datas/dataAnalyze';
+import { alalysisInitData } from '../../../datas/dataAnalyze';
 
 // 展示已部署ID
 const showReleasedId = async (deploymentIDs: any) => {
   const showIdArray: any = [];
   if (deploymentIDs && deploymentIDs.length > 0) {
     deploymentIDs.forEach((ele: any) => {
-      if (!showIdArray.includes(ele.deployment_id)) {
+      if (!showIdArray.includes(ele.deployment_id) && ele.deployment_id) {
         showIdArray.push(ele.deployment_id);
       }
     });
@@ -81,32 +81,32 @@ const showReleasedId = async (deploymentIDs: any) => {
 
 // 检查是否勾选自动化测试
 const getAutoCheckMessage = async (activeKey: string) => {
-
-  const source: any = await alalysisInitData("deployment_id", activeKey);
+  const source: any = await alalysisInitData('deployment_id', activeKey);
 
   const deploymentIDs = source.deployment_id;
 
   if (!deploymentIDs || deploymentIDs.length === 0) {
-    return "";
+    return '';
   }
 
   const noCheckArray: any = [];
-  let noCheckString = "";
+  let noCheckString = '';
   deploymentIDs.forEach((ele: any) => {
-
-    if (ele.automation_check === "2") { // 表示未勾选自动化用例参数
+    if (ele.automation_check === '2') {
+      // 表示未勾选自动化用例参数
       if (!noCheckArray.includes(ele.deployment_id)) {
         noCheckArray.push(ele.deployment_id);
-        noCheckString = noCheckString === "" ? `【${ele.deployment_id}】` : `${noCheckString}【${ele.deployment_id}】`;
+        noCheckString =
+          noCheckString === ''
+            ? `【${ele.deployment_id}】`
+            : `${noCheckString}【${ele.deployment_id}】`;
       }
     }
-
   });
 
   if (noCheckArray.length === 0) {
-    return "";
+    return '';
   }
   return `提示：构建镜像${noCheckString}未勾选自动化用例参数`;
-
 };
-export {showReleasedId, getAutoCheckMessage};
+export { showReleasedId, getAutoCheckMessage };

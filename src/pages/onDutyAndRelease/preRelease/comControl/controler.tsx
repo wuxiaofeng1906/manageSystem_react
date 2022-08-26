@@ -42,10 +42,10 @@ const loadPrjNameSelect = async () => {
     });
   } else if (prjNames.data) {
     prjData = prjNames.data?.map((it: any) => ({
-      label: it.project_name,
-      value: `${it.project_name}&${it.project_id}`,
+      label: it?.project_name,
+      value: `${it?.project_name}&${it?.project_id}`,
       key: it.project_id,
-      type: it.sprint_type,
+      type: it?.sprint_type,
     }));
     // const datas = prjNames.data;
     // datas.forEach((project: any) => {

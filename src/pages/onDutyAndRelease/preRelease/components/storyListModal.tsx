@@ -114,10 +114,7 @@ const StoryListModal = (props: { onRefresh?: Function }) => {
     <Modal
       title={'待发布需求列表'}
       visible={showStoryModal}
-      onCancel={() => {
-        setShowStoryModal(false);
-        props.onRefresh?.(false);
-      }}
+      onCancel={() => setShowStoryModal(false)}
       onOk={onConfirm}
       width={1200}
       destroyOnClose

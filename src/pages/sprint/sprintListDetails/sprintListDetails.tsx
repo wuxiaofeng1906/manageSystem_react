@@ -26,7 +26,7 @@ import dayjs from 'dayjs';
 import {
   // FolderAddTwoTone,
   // SnippetsTwoTone,
-  // DeleteTwoTone,
+  DeleteTwoTone,
   // EditTwoTone,
   CloseSquareTwoTone,
   CheckSquareTwoTone,
@@ -424,7 +424,8 @@ const SprintList: React.FC<any> = () => {
     const teters = datas.tester;
     if (teters && teters.length > 0) {
       teters.forEach((ele: any) => {
-        nameIdArray.push(ele.name);
+        // nameIdArray.push(ele.name);
+        nameIdArray.push(ele.id);
       });
     }
     // const teters = datas.tester.split(';');
@@ -1509,17 +1510,17 @@ const SprintList: React.FC<any> = () => {
               {/*>*/}
               {/*  修改*/}
               {/*</Button>*/}
-              {/*<Button*/}
-              {/*  type="text"*/}
-              {/*  style={{*/}
-              {/*    marginLeft: '-10px',*/}
-              {/*    display: judgeAuthority('删除项目明细行') === true ? 'inline' : 'none',*/}
-              {/*  }}*/}
-              {/*  icon={<DeleteTwoTone />}*/}
-              {/*  onClick={deleteSprintDetails}*/}
-              {/*>*/}
-              {/*  删除*/}
-              {/*</Button>*/}
+              <Button
+                type="text"
+                style={{
+                  marginLeft: '-10px',
+                  display: judgeAuthority('删除项目明细行') === true ? 'inline' : 'none',
+                }}
+                icon={<DeleteTwoTone />}
+                onClick={deleteSprintDetails}
+              >
+                删除
+              </Button>
               {/*<Button*/}
               {/*<Button*/}
               {/*  type="text"*/}

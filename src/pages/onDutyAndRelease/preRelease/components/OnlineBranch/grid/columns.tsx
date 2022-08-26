@@ -44,7 +44,9 @@ const rendererUnitTest = (params: any) => {
       end = dayjs(ele.test_case_end_time).format('HH:mm:ss');
     }
     let timeRange = '';
-    if (start) {
+
+    // 忽略不展示时间
+    if (start && ele.ignore_check !== '1') {
       timeRange = end ? `${start}~${end}` : start;
     }
     if (ele.test_case_technical_side === '1') {
@@ -188,7 +190,7 @@ const beforeOnlineVersionCheck = (params: any) => {
   } else if (values.check_status === '2') {
     result = '执行中';
     frontColor = '#46A0FC';
-  } else if (values.check_status === '3' && side !== '忽略') {
+  } else if (values.check_status === '3') {
     //  result = "已结束";
 
     if (values.check_start_time && values.check_start_time !== '-') {
@@ -205,10 +207,12 @@ const beforeOnlineVersionCheck = (params: any) => {
       frontColor = '#8B4513';
     }
   }
+  // 忽略不显示 状态
   if (side == '忽略') result = '';
 
   let timeRange = '';
-  if (start) {
+  // 忽略不显示时间
+  if (start && side !== '忽略') {
     timeRange = end ? `${start}~${end}` : start;
   }
 

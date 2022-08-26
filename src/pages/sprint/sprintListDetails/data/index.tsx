@@ -411,6 +411,7 @@ const getDeptMemner = async (client: GqlClient<object>, params: any) => {
                 id
                 userName
                 ztName
+                hired
               }
           }`;
   }
@@ -472,16 +473,21 @@ const LoadTesterCombobox = () => {
   const deptMan = [<Option value="NA">NA</Option>];
   const { data: { WxDeptUsers = [] } = {} } = useQuery(`
           {
-            WxDeptUsers(deptNames:["测试","业务"], techs:[TEST]){
+            WxDeptUsers(techs:[TEST]){
                 id
                 userName
+                hired
               }
           }
       `);
-
-  if (WxDeptUsers && WxDeptUsers.length > 0) {
-    for (let index = 0; index < WxDeptUsers.length; index += 1) {
-      deptMan.push(<Option value={WxDeptUsers[index].id}> {WxDeptUsers[index].userName}</Option>);
+  const result = WxDeptUsers?.filter((it: any) => it.hired != '0');
+  if (result && result.length > 0) {
+    for (let index = 0; index < result.length; index += 1) {
+      deptMan.push(
+        <Option value={result[index].id} key={result[index].id}>
+          {result[index].userName}
+        </Option>,
+      );
     }
   }
 

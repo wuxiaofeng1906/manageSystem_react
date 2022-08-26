@@ -1,5 +1,10 @@
 import { useCallback, useState } from 'react';
 import dayjs from 'dayjs';
+import PreReleaseServices from '@/services/preRelease';
+interface IStory {
+  ready_release_num: string;
+  executions_id: string;
+}
 
 export default () => {
   /* region 其他全局变量 */
@@ -118,6 +123,23 @@ export default () => {
   const [correspOrder, setCorrespOrder] = useState({ gridHight: '100px', gridData: [] });
   /* endregion  */
 
+  // 待发布需求列表
+  const [autoStoryList, setAutoStoryList] = useState<any[]>([]); // 预发布保存的需求列表
+  const [storyExecutionId, setStoryExecutionId] = useState<string[]>([]);
+  const [showStoryModal, setShowStoryModal] = useState(false);
+
+  // 更新预发布需求列表
+  const updateStoryList = useCallback(async (data) => {
+    await PreReleaseServices.updateStory(data);
+  }, []);
+
+  // 预发布需求列表
+  const getStoryList = useCallback(async (data: IStory) => {
+    const res = await PreReleaseServices.getStoryList(data);
+    setAutoStoryList(res?.story_data ?? []);
+    return res;
+  }, []);
+
   return {
     operteStatus,
     modifyOperteStatus, // 页面中按钮是否可用
@@ -149,5 +171,12 @@ export default () => {
     setOnlineBranch, // 上线分支
     correspOrder,
     setCorrespOrder, // 对应工单
+    updateStoryList, // 更新预发布需求列表
+    getStoryList, // 获取预发布需求列表
+    autoStoryList, // 预发布需求列表
+    showStoryModal, // 预发布需求列表弹窗显示
+    setShowStoryModal,
+    storyExecutionId,
+    setStoryExecutionId, // 所属执行（含有 “emergency”、“stage-patch”）
   };
 };

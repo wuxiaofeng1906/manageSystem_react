@@ -18,5 +18,27 @@ const PreReleaseServices = {
   async saveHotEnv(data: any) {
     return request(`${baseUrl}/release/hotupdate`, { data, method: 'post' });
   },
+  // 待发布需求列表-预发布项目保存后 弹窗 sprint-type 含有emergency，stage-patch
+  async getStoryList(params: any) {
+    return request(`${baseUrl}/release/story`, { params });
+  },
+  // 更新待发布需求列表
+  async updateStory(data: any) {
+    return request(`${baseUrl}/release/story`, { data, method: 'post', msg: '保存成功' });
+  },
+  // 获取需求编号
+  async getStoryNum(executions_id: string) {
+    return request(`${baseUrl}/release/execution_story`, { params: { executions_id } });
+  },
+  // 获取所属执行
+  async getExecutions(ready_release_num: string) {
+    return request(`${baseUrl}/release/execution`, { params: { ready_release_num } });
+  },
+  // 刷新服务
+  async refreshService(ready_release_num: string) {
+    return request(`${baseUrl}/release/refresh_server`, {
+      params: { ready_release_num },
+    });
+  },
 };
 export default PreReleaseServices;

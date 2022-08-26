@@ -6,6 +6,10 @@ import {
   getUpgradeApi,
   getApiMethod,
 } from '../../../comControl/converse';
+import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
+import { ColumnType } from 'antd/es/table';
+import { ColumnsType } from 'antd/lib/table/interface';
+import { Tooltip } from 'antd';
 // 渲染表格行的颜色(正在修改的行)
 const releaseAppChangRowColor = (allLockedArray: any, type: string, idFlag: number) => {
   const lockInfoArray = allLockedArray;
@@ -37,18 +41,13 @@ const getReleasedItemColumns = () => {
     {
       headerName: '上线环境',
       field: 'online_environment',
-      cellRenderer: (params: any) => {
-        return `<span>${getOnlineDev(params.value)}</span>`;
-      },
+      cellRenderer: (params: any) => getOnlineDev(params.value),
     },
     {
       headerName: '发布项',
       field: 'release_item',
       minWidth: 95,
-      cellRenderer: (params: any) => {
-        const item = getReleaseItem(params.value);
-        return `<span>${item}</span>`;
-      },
+      cellRenderer: (params: any) => getReleaseItem(params.value),
     },
     {
       headerName: '应用',
@@ -59,23 +58,26 @@ const getReleasedItemColumns = () => {
       headerName: '是否支持热更新',
       field: 'hot_update',
       minWidth: 130,
-      cellRenderer: (params: any) => {
-        return `<span>${getIfOrNot(params.value)}</span>`;
-      },
+      cellRenderer: (params: any) => getIfOrNot(params.value),
     },
     {
       headerName: '是否涉及接口与数据库升级',
       field: 'is_upgrade_api_database',
       minWidth: 196,
-      cellRenderer: (params: any) => {
-        return `<span>${getDatabseAndApiUpgrade(params.value)}</span>`;
-      },
+      cellRenderer: (params: any) => getDatabseAndApiUpgrade(params.value),
     },
     {
-      headerName: '分支和环境',
-      field: 'branch_environment',
-      minWidth: 105,
+      headerName: '来源',
+      field: 'add_type',
+      minWidth: 110,
+      cellRenderer: (params: any) =>
+        params.value == 'auto' ? '自动获取' : params.value == 'manual' ? '手动添加' : '',
     },
+    // {
+    //   headerName: '分支和环境',
+    //   field: 'branch_environment',
+    //   minWidth: 105,
+    // },
     {
       headerName: '编辑人',
       field: 'edit_user_name',
@@ -103,6 +105,9 @@ const getReleasedItemColumns = () => {
         // 发布项没有新增功能
         return `
         <div style="margin-top: -5px">
+            <Button  style="border: none; background-color: transparent; margin-left: -10px ;" onclick='showPulishItemForm("add",${paramData})'>
+              <img src="../add_1.png" width="15" height="15" alt="新增" title="新增">
+            </Button>
              <Button  style="border: none; background-color: transparent;  margin-left: -10px; "  onclick='showPulishItemForm("modify",${paramData})'>
               <img src="../edit.png" width="15" height="15" alt="修改" title="修改">
             </Button>
@@ -123,16 +128,12 @@ const getReleasedApiColumns = () => {
     {
       headerName: '上线环境',
       field: 'online_environment',
-      cellRenderer: (params: any) => {
-        return `<span>${getOnlineDev(params.value)}</span>`;
-      },
+      cellRenderer: (params: any) => getOnlineDev(params.value),
     },
     {
       headerName: '升级接口',
       field: 'update_api',
-      cellRenderer: (params: any) => {
-        return `<span>${getUpgradeApi(params.value)}</span>`;
-      },
+      cellRenderer: (params: any) => getUpgradeApi(params.value),
     },
     {
       headerName: '接口服务',
@@ -148,9 +149,7 @@ const getReleasedApiColumns = () => {
     {
       headerName: '接口Method',
       field: 'api_method',
-      cellRenderer: (params: any) => {
-        return `<span>${getApiMethod(params.value)}</span>`;
-      },
+      cellRenderer: (params: any) => getApiMethod(params.value),
     },
     {
       headerName: '接口URL',
@@ -379,6 +378,77 @@ const getNewRelServiceComfirmColumns = () => {
   ];
   return thirdUpSerColumn;
 };
+const RenderTooltip = (v: any) => (
+  <Tooltip placement={'topLeft'} title={v}>
+    {v}
+  </Tooltip>
+);
+const publishListColumn: ColumnsType<any> = [
+  {
+    title: '序号',
+    width: 50,
+    render: (v: any, record, i) => (i + 1).toString(),
+  },
+  {
+    title: '需求编号',
+    dataIndex: 'story_num',
+    width: 80,
+    render: (v) => (
+      <a target="_blank" href={`http://zentao.77hub.com/zentao/story-view-${v}.html`}>
+        {v}
+      </a>
+    ),
+  },
+  {
+    title: '标题内容',
+    dataIndex: 'title',
+    width: 200,
+    ellipsis: { showTitle: false },
+    render: RenderTooltip,
+  },
+  {
+    title: '所属执行',
+    dataIndex: 'execution_name',
+    width: 180,
+    ellipsis: { showTitle: false },
+    render: RenderTooltip,
+  },
+  {
+    title: '优先级',
+    dataIndex: 'priority',
+    width: 60,
+  },
+  {
+    title: '模块名',
+    dataIndex: 'module_name',
+    width: 120,
+    ellipsis: { showTitle: false },
+    render: RenderTooltip,
+  },
+  {
+    title: '服务',
+    dataIndex: 'app',
+    width: 120,
+    ellipsis: { showTitle: false },
+    render: RenderTooltip,
+  },
+  {
+    title: '是否可热更',
+    dataIndex: 'is_hot_update',
+    width: 100,
+    render: (v) => (v == 'no' ? '否' : v == 'yes' ? '是' : ''),
+  },
+  {
+    title: '创建人',
+    dataIndex: 'create_user_name',
+    width: 90,
+  },
+  {
+    title: '指派人',
+    dataIndex: 'assigned_to_name',
+    width: 90,
+  },
+];
 
 export {
   getReleasedItemColumns,
@@ -386,4 +456,5 @@ export {
   getReleaseServiceComfirmColumns,
   releaseAppChangRowColor,
   getNewRelServiceComfirmColumns,
+  publishListColumn,
 };

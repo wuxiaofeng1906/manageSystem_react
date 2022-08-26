@@ -96,7 +96,7 @@ const DutyList = () => {
     } else release_num = await getDutyNumber();
     // 编辑加锁（当前行未锁定且未发）
     const lockedNode = lockList.find((it) => it.param.replace('duty_', '') == release_num);
-    if (isEmpty(lockedNode) && isEmpty(data) && data.is_push_msg != 'yes') {
+    if (isEmpty(lockedNode) && isEmpty(data)) {
       await updateLockStatus(release_num, 'post');
     }
     history.push(`/onDutyAndRelease/dutyCatalog/${release_num}`);
@@ -276,7 +276,7 @@ const DutyList = () => {
                   onDeselect={getList}
                   allowClear
                   filterOption={(input, option) =>
-                    (option!.label as unknown as string)?.includes(input)
+                    ((option!.label as unknown) as string)?.includes(input)
                   }
                 />
               </Form.Item>

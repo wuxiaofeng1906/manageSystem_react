@@ -612,8 +612,9 @@ const ReleaseHistory: React.FC<any> = () => {
               mode="multiple"
               onChange={onProjectChanged}
               style={{ minWidth: 300, marginLeft: 5 }}
+              options={projectsArray}
             >
-              {projectsArray}
+              {/*{projectsArray}*/}
             </Select>
             <label style={{ marginLeft: 10 }}>发布时间: </label>
             <RangePicker

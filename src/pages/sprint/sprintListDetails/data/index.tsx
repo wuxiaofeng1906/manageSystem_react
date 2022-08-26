@@ -480,7 +480,7 @@ const LoadTesterCombobox = () => {
               }
           }
       `);
-  const result = WxDeptUsers?.filter((it: any) => it.hired != 0);
+  const result = WxDeptUsers?.filter((it: any) => it.hired != '0');
   if (result && result.length > 0) {
     for (let index = 0; index < result.length; index += 1) {
       deptMan.push(

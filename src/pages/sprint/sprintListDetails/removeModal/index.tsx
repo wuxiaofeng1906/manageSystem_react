@@ -184,7 +184,7 @@ const RemoveModal = (
       const res = await getDeptMemner(client, 'TEST');
       setTestUser(
         res
-          ?.filter((it: any) => it.hired != 0)
+          ?.filter((it: any) => it.hired != '0')
           ?.map((it: any) => ({ label: it.userName, value: it.id })),
       );
       setLoading(false);

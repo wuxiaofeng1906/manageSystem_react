@@ -182,7 +182,11 @@ const RemoveModal = (
   const getTestUserList = async () => {
     try {
       const res = await getDeptMemner(client, 'TEST');
-      setTestUser(res?.map((it: any) => ({ label: it.userName, value: it.id })));
+      setTestUser(
+        res
+          ?.filter((it: any) => it.hired != 0)
+          ?.map((it: any) => ({ label: it.userName, value: it.id })),
+      );
       setLoading(false);
     } catch (e) {
       setLoading(false);

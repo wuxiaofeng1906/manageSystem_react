@@ -423,7 +423,8 @@ const SprintList: React.FC<any> = () => {
     const teters = datas.tester;
     if (teters && teters.length > 0) {
       teters.forEach((ele: any) => {
-        nameIdArray.push(ele.name);
+        // nameIdArray.push(ele.name);
+        nameIdArray.push(ele.id);
       });
     }
     // const teters = datas.tester.split(';');

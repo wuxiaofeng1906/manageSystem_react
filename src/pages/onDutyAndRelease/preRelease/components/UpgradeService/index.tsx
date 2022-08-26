@@ -136,16 +136,17 @@ const UpgradeService: React.FC<any> = () => {
   };
 
   // 一键部署ID查询
-  const inquireServiceClick = async () => {
+  const inquireServiceClick = async (showErrorTip = true) => {
     if (!(await vertifyModifyFlag(6, tabsData.activeKey))) {
-      message.error({
-        content: `服务确认已完成，不能进行查询！`,
-        duration: 1,
-        style: {
-          marginTop: '50vh',
-        },
-      });
-
+      if (showErrorTip) {
+        message.error({
+          content: `服务确认已完成，不能进行查询！`,
+          duration: 1,
+          style: {
+            marginTop: '50vh',
+          },
+        });
+      }
       return;
     }
 
@@ -556,7 +557,7 @@ const UpgradeService: React.FC<any> = () => {
     if (isEmpty(releasedIDArray)) {
       setDeployTip('');
     } else if (initPage && !isEmpty(releasedIDArray) && !releaseIdDisable && !operteStatus) {
-      inquireServiceClick().then(() => {
+      inquireServiceClick(false).then(() => {
         setInitPage(false);
       });
     }
@@ -738,7 +739,7 @@ const UpgradeService: React.FC<any> = () => {
                         width: 'max-content',
                       }}
                       disabled={releaseIdDisable}
-                      onClick={inquireServiceClick}
+                      onClick={() => inquireServiceClick()}
                     >
                       点击一键校验
                     </Button>

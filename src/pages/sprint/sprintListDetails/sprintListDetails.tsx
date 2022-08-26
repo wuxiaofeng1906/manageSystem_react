@@ -1187,13 +1187,19 @@ const SprintList: React.FC<any> = () => {
   };
 
   // 批量修改测试
-  const testConfirmSelect = (params: any) => {
+  const testConfirmSelect = async (params: any) => {
+    const flag = await checkTestValid();
     if (judgingSelectdRow()) {
       // const selRows: any = gridApi.current?.getSelectedRows();
       // selRows.forEach((row: any) => {
       //
       // });
       setTestConfirm(params);
+      if (flag) {
+        setTestConfirm(undefined);
+        infoMessage('已基线，不能修改');
+        return;
+      }
       modFlowStage('testConfirmed', params);
     }
   };
@@ -1304,8 +1310,10 @@ const SprintList: React.FC<any> = () => {
         currAt: moment().format('YYYY-MM-DD HH:mm:ss'),
       });
       setTestSelectorDisabled(false);
+      return false;
     } catch (e) {
-      setTestSelectorDisabled(e.ok == false && e.status == 405);
+      setTestSelectorDisabled(e.ok == false);
+      return e.ok == false;
     }
   };
 
@@ -1337,19 +1345,8 @@ const SprintList: React.FC<any> = () => {
   };
   useEffect(() => {
     getNextSprint();
+    checkTestValid();
   }, []);
-
-  useEffect(() => {
-    let timer: any;
-
-    timer = setInterval(() => {
-      checkTestValid();
-    }, 1000);
-    if (testSelectorDisabled && timer) clearInterval(timer);
-    return () => {
-      clearInterval(timer);
-    };
-  }, [testSelectorDisabled]);
 
   // useEffect(() => {
   //

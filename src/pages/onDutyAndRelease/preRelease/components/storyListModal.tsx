@@ -27,6 +27,7 @@ const StoryListModal = (props: { onRefersh?: Function }) => {
   const [stageFilter, setStageFilter] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const onConfirm = async () => {
+    if (loactionQuery?.history == 'true') return;
     if (isEmpty(selected)) return infoMessage('请至少勾选一条需求！');
     try {
       setLoading(true);
@@ -39,7 +40,6 @@ const StoryListModal = (props: { onRefersh?: Function }) => {
       }));
       await updateStoryList(data);
       setLoading(false);
-      if (loactionQuery?.history == 'true') return;
       props.onRefersh?.(false);
     } catch (e) {
       setLoading(false);

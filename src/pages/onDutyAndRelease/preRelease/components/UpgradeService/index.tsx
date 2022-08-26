@@ -12,7 +12,7 @@ import {
   getReleaseServiceComfirmColumns,
   getNewRelServiceComfirmColumns,
 } from './grid/columns';
-import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { confirmUpgradeService } from './serviceConfirm';
 import { alalysisInitData, checkOnlineEnvSource } from '../../datas/dataAnalyze';
 import { getCheckProcess } from '../../components/CheckProgress/axiosRequest';
@@ -37,7 +37,6 @@ import StoryListModal from '@/pages/onDutyAndRelease/preRelease/components/story
 import PreReleaseServices from '@/services/preRelease';
 import { getServices } from '@/publicMethods/verifyAxios';
 import { isEmpty } from 'lodash';
-import { useLocation } from 'umi';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -65,7 +64,6 @@ const UpgradeService: React.FC<any> = () => {
   } = useModel('releaseProcess');
   const [applicantConfirmForm] = Form.useForm(); // 应用
   const [formUpgradeService] = Form.useForm(); // 升级服务
-  const loactionQuery = useLocation().query;
   const [appServerList, setAppserverList] = useState<any[]>([]);
   const [deployTip, setDeployTip] = useState('');
   const [initPage, setInitPage] = useState(true);
@@ -565,7 +563,7 @@ const UpgradeService: React.FC<any> = () => {
   };
 
   const onRefreshService = async (showMessage = true) => {
-    if (loactionQuery.history == 'true') return;
+    if (operteStatus) return;
     try {
       setRefreshLoading(true);
       await PreReleaseServices.refreshService(tabsData.activeKey ?? '');
@@ -637,7 +635,7 @@ const UpgradeService: React.FC<any> = () => {
                     size={'small'}
                     icon={<SyncOutlined style={{ color: '#46A0FC' }} spin={refreshLoading} />}
                     onClick={() => onRefreshService()}
-                    disabled={refreshLoading || loactionQuery.history == 'true'}
+                    disabled={refreshLoading || operteStatus}
                   />
                   <Button
                     title={'待发布需求列表'}
@@ -1180,7 +1178,7 @@ const UpgradeService: React.FC<any> = () => {
           </Row>
         </Form>
       </Modal>
-      <StoryListModal onRefersh={onRefreshService} />
+      <StoryListModal onRefresh={onRefreshService} />
     </div>
   );
 };

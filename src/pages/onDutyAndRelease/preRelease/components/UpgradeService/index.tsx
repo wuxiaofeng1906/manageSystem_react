@@ -37,6 +37,7 @@ import StoryListModal from '@/pages/onDutyAndRelease/preRelease/components/story
 import PreReleaseServices from '@/services/preRelease';
 import { getServices } from '@/publicMethods/verifyAxios';
 import { isEmpty } from 'lodash';
+import { useLocation } from 'umi';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -64,7 +65,7 @@ const UpgradeService: React.FC<any> = () => {
   } = useModel('releaseProcess');
   const [applicantConfirmForm] = Form.useForm(); // 应用
   const [formUpgradeService] = Form.useForm(); // 升级服务
-
+  const loactionQuery = useLocation().query;
   const [appServerList, setAppserverList] = useState<any[]>([]);
   const [deployTip, setDeployTip] = useState('');
   const [initPage, setInitPage] = useState(true);
@@ -564,6 +565,7 @@ const UpgradeService: React.FC<any> = () => {
   };
 
   const onRefreshService = async (showMessage = true) => {
+    if (loactionQuery.history == 'true') return;
     try {
       setRefreshLoading(true);
       await PreReleaseServices.refreshService(tabsData.activeKey ?? '');
@@ -634,8 +636,8 @@ const UpgradeService: React.FC<any> = () => {
                     type={'text'}
                     size={'small'}
                     icon={<SyncOutlined style={{ color: '#46A0FC' }} spin={refreshLoading} />}
-                    onClick={onRefreshService}
-                    disabled={refreshLoading}
+                    onClick={() => onRefreshService()}
+                    disabled={refreshLoading || loactionQuery.history == 'true'}
                   />
                   <Button
                     title={'待发布需求列表'}

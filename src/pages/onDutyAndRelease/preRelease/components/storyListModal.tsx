@@ -4,6 +4,7 @@ import { publishListColumn } from './UpgradeService/grid/columns';
 import { useModel } from '@@/plugin-model/useModel';
 import PreReleaseServices from '@/services/preRelease';
 import { isEmpty, groupBy } from 'lodash';
+import { useLocation } from 'umi';
 import { useUnmount } from 'ahooks';
 import { infoMessage } from '@/publicMethods/showMessages';
 
@@ -19,12 +20,12 @@ const StoryListModal = (props: { onRefersh?: Function }) => {
   } = useModel('releaseProcess');
 
   const [form] = Form.useForm();
+  const loactionQuery = useLocation().query;
   const [executionList, setExecutionList] = useState<any[]>([]);
   const [storyNum, setStoryNum] = useState<any[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
   const [stageFilter, setStageFilter] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-
   const onConfirm = async () => {
     if (isEmpty(selected)) return infoMessage('请至少勾选一条需求！');
     try {
@@ -38,6 +39,7 @@ const StoryListModal = (props: { onRefersh?: Function }) => {
       }));
       await updateStoryList(data);
       setLoading(false);
+      if (loactionQuery?.history == 'true') return;
       props.onRefersh?.(false);
     } catch (e) {
       setLoading(false);
@@ -120,7 +122,7 @@ const StoryListModal = (props: { onRefersh?: Function }) => {
       width={1200}
       destroyOnClose
       maskClosable={false}
-      okButtonProps={{ disabled: loading }}
+      okButtonProps={{ disabled: loading || loactionQuery?.history == 'true' }}
       okText={'确定'}
       cancelText={'取消'}
       centered

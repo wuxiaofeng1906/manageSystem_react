@@ -93,7 +93,7 @@ const PreReleaseProject: React.FC<any> = () => {
     const ids = (projectId ?? [])?.map((it: string) => it.split('&')[1]);
     const executionIds = projectsArray
       ?.filter((it) => ids.includes(String(it.key)))
-      ?.filter((it) => ['emergency', 'stage-patch'].includes(it.type))
+      ?.filter((it) => ['emergency', 'stagepatch'].includes(it.type))
       .map((it) => String(it.key));
     setStoryExecutionId(executionIds ?? []);
     return executionIds;

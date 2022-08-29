@@ -217,6 +217,14 @@ const RemoveModal = (
     const currentIndex = props.sprintProject?.findIndex(
       (it) => String(it.id) == String(query.projectid),
     );
+    // 下一个班车所属执行 需判断类型
+    let nextProject: any = {};
+    for (let i = currentIndex + 1; i < props.sprintProject?.length; i++) {
+      if (props.sprintProject[i].category == props.sprintProject[currentIndex].category) {
+        nextProject = props.sprintProject[i];
+        break;
+      }
+    }
 
     const formData =
       selected?.map((it: any) => ({
@@ -230,7 +238,7 @@ const RemoveModal = (
         testers: isEmpty(it.tester) ? [] : it.tester?.map((it: any) => it.id),
         testVerify: !isEmpty(it.testCheck) ? Math.abs(Number(it.testCheck)) : undefined,
         // 设置默认为下一个班车的所属执行
-        targetPid: it.targetPid ?? props.sprintProject?.[currentIndex + 1]?.id ?? undefined,
+        targetPid: it.targetPid ?? nextProject?.id ?? undefined,
       })) ?? [];
     form.setFieldsValue({ formList: formData });
     setSource(formData);

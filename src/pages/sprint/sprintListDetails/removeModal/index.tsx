@@ -62,31 +62,21 @@ export const DissatisfyModal = (
             {
               ...pick(item, pickTag),
               rdId: item.id,
+              targetPid: +item.targetPid,
               category: String(Math.abs(Number(item.category))),
             },
           ],
           project: Number(query?.projectid ?? 0),
         });
       } else {
-        console.log({
-          source: Number(query.projectid),
-          datas: [
-            {
-              ...pick(item, pickData),
-              rdId: item.id,
-              category: String(Math.abs(Number(item.category))),
-              target: Number(item.target),
-            },
-          ],
-        });
         await SprintDetailServices.remove({
-          source: Number(query.projectid),
+          project: Number(query.projectid),
           datas: [
             {
               ...pick(item, pickData),
               rdId: item.id,
               category: String(Math.abs(Number(item.category))),
-              target: Number(item.target),
+              targetPid: Number(item.targetPid),
             },
           ],
         });
@@ -132,8 +122,8 @@ export const DissatisfyModal = (
                         <p>{`在${query.project}关联 ${it.relatedTasks ?? 0}个任务和${
                           it.relatedBugs ?? 0
                         }个bug,将同步移到${
-                          props.sprintProject?.find((project) => +project.id == +it.target)?.name ??
-                          ''
+                          props.sprintProject?.find((project) => +project.id == +it.targetPid)
+                            ?.name ?? ''
                         }`}</p>
                       </div>
                     }
@@ -240,7 +230,7 @@ const RemoveModal = (
         testers: isEmpty(it.tester) ? [] : it.tester?.map((it: any) => it.id),
         testVerify: !isEmpty(it.testCheck) ? Math.abs(Number(it.testCheck)) : undefined,
         // 设置默认为下一个班车的所属执行
-        target: props.sprintProject?.[currentIndex + 1]?.id ?? undefined,
+        targetPid: it.targetPid ?? props.sprintProject?.[currentIndex + 1]?.id ?? undefined,
       })) ?? [];
     form.setFieldsValue({ formList: formData });
     setSource(formData);
@@ -294,9 +284,9 @@ const RemoveModal = (
             ztNo: it.ztNo,
             category: String(Math.abs(Number(it.category))),
             codeRevert: it.codeRevert,
-            target: Number(it.target),
+            targetPid: Number(it.targetPid),
           })),
-          source: Number(query.projectid),
+          project: Number(query.projectid),
         });
         message.success({
           content: (
@@ -339,6 +329,7 @@ const RemoveModal = (
         hasCode: 0,
         codeRevert: 0,
         testVerify: 0,
+        targetPid: +it.targetPid,
       }));
     if (!isEmpty(resetTagData)) {
       await SprintDetailServices.removeTag({
@@ -378,12 +369,12 @@ const RemoveModal = (
       { title: '相关bug', dataIndex: 'relatedBugs', width: 80 },
       {
         title: '目标执行',
-        dataIndex: 'target',
+        dataIndex: 'targetPid',
         width: 180,
         render: (value, record, i) => {
           return (
             <Form.Item
-              name={['formList', i, 'target']}
+              name={['formList', i, 'targetPid']}
               rules={[{ required: true, message: '请选择目标执行！' }]}
             >
               <Select

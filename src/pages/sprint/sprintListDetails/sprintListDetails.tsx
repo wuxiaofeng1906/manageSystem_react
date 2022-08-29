@@ -1659,9 +1659,7 @@ const SprintList: React.FC<any> = () => {
           </Col>
           <Col span={1} style={{ textAlign: 'right' }}>
             <div>
-              <Button type="text" icon={<SettingOutlined />} onClick={showFieldsModal}>
-                {' '}
-              </Button>
+              <Button type="text" icon={<SettingOutlined />} onClick={showFieldsModal} />
             </div>
           </Col>
         </Row>

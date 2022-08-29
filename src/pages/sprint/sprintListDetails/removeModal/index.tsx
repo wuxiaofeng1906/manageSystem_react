@@ -353,6 +353,20 @@ const RemoveModal = (
       { title: '相关需求', dataIndex: 'relatedStories', width: 90 },
       { title: '相关bug', dataIndex: 'relatedBugs', width: 90 },
       {
+        title: '目标执行',
+        dataIndex: 'target',
+        render: (value, record, i) => {
+          return (
+            <Form.Item
+              name={['formList', i, 'target']}
+              rules={[{ required: true, message: '请选择目标执行！' }]}
+            >
+              <Select options={[]} showSearch allowClear />
+            </Form.Item>
+          );
+        },
+      },
+      {
         title: '测试',
         dataIndex: 'testers',
         render: (value, record, i) => {
@@ -536,7 +550,7 @@ const RemoveModal = (
     <Modal
       title={'移除操作'}
       {...props}
-      width={1300}
+      width={1450}
       maskClosable={false}
       centered
       onCancel={onCancel}

@@ -46,9 +46,7 @@ const getColums = (prjNames: any) => {
       minWidth: 70,
       suppressMenu: true,
       pinned: 'left',
-      cellRenderer: (params: any) => {
-        return Number(params.node.id) + 1;
-      },
+      cellRenderer: (params: any) => Number(params.node.id) + 1,
     },
     {
       headerName: '阶段',
@@ -413,78 +411,4 @@ const setRowColor = (params: any) => {
   return style;
 };
 
-const attendanceMappings = { yes: '是', no: '否', '': '' };
-const attendanceRender = () => Object.keys(attendanceMappings);
-const removeColumns: (ColDef | ColGroupDef)[] = [
-  {
-    headerName: '序号',
-    cellRenderer: (params: any) => (Number(params.node.id) + 1).toString(),
-  },
-  {
-    headerName: '编号',
-    field: 'ztNo',
-  },
-  {
-    headerName: '标题内容',
-    field: 'title',
-  },
-  {
-    headerName: '相关需求',
-    field: 'relatedStories',
-  },
-  {
-    headerName: '相关bug',
-    field: 'relatedBugs',
-  },
-  {
-    headerName: '测试',
-    field: 'tester',
-    editable: true,
-    cellEditor: 'agSelectCellEditor',
-    cellEditorParams: { values: attendanceRender() },
-    valueFormatter: (p: any) => attendanceMappings[p.value],
-    filterParams: {
-      valueFormatter: (p: any) => attendanceMappings[p.value],
-    },
-  },
-  {
-    headerName: '是否要测试验证',
-    field: 'testCheck',
-    editable: true,
-    cellEditor: 'agSelectCellEditor',
-    cellEditorParams: { values: attendanceRender() },
-    valueFormatter: (p: any) => attendanceMappings[p.value],
-    filterParams: {
-      valueFormatter: (p: any) => attendanceMappings[p.value],
-    },
-  },
-  {
-    headerName: '是否提交代码',
-    field: 'commit',
-    editable: true,
-    cellEditor: 'agSelectCellEditor',
-    cellEditorParams: { values: attendanceRender() },
-    valueFormatter: (p: any) => attendanceMappings[p.value],
-    filterParams: {
-      valueFormatter: (p: any) => attendanceMappings[p.value],
-    },
-  },
-  {
-    headerName: '代码是否Revert',
-    field: 'revert',
-    editable: true,
-    cellEditor: 'agSelectCellEditor',
-    cellEditorParams: { values: attendanceRender() },
-    valueFormatter: (p: any) => attendanceMappings[p.value],
-    filterParams: {
-      valueFormatter: (p: any) => attendanceMappings[p.value],
-    },
-  },
-  {
-    headerName: '免Revert原因',
-    field: 'reason',
-    minWidth: 300,
-  },
-];
-
-export { getColums, setRowColor, removeColumns };
+export { getColums, setRowColor };

@@ -102,7 +102,8 @@ const SprintList: React.FC<any> = () => {
   const [testSelectorDisabled, setTestSelectorDisabled] = useState(false);
   // 不满足移除的数据
   const [dissatisfy, setDissatisfy] = useState<any[]>([]);
-  const [nextSprint, setNextSprint] = useState<any[]>([]);
+  // 获取所有的班车所属执行
+  const [sprintProject, setSprintProject] = useState<any[]>([]);
 
   /* region 整个模块都需要用到的表单定义 */
   // 模块查询
@@ -1340,9 +1341,9 @@ const SprintList: React.FC<any> = () => {
   const getNextSprint = async () => {
     const res = await SprintDetailServices.getNextSprint({
       project: Number(prjId),
-      offset: 1,
+      // offset: 1,
     });
-    setNextSprint(res);
+    setSprintProject(res);
   };
   useEffect(() => {
     getNextSprint();
@@ -3210,7 +3211,7 @@ const SprintList: React.FC<any> = () => {
       <RemoveModal
         visible={showRemoveModal}
         gridRef={gridApi}
-        nextSprint={nextSprint}
+        sprintProject={sprintProject}
         onRefresh={updateGrid}
         onCancel={() => {
           setShowRemoveModal(false);
@@ -3220,7 +3221,7 @@ const SprintList: React.FC<any> = () => {
       <DissatisfyModal
         dissatisfy={dissatisfy}
         setDissatisfy={setDissatisfy}
-        nextSprint={nextSprint}
+        sprintProject={sprintProject}
         onRefresh={updateGrid}
         isTester={true}
       />

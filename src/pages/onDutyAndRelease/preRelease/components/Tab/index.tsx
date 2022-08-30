@@ -32,7 +32,7 @@ const Tab: React.FC<any> = () => {
   } = useModel('releaseProcess');
 
   /* region tab 自身事件 */
-  const [showTabs, setShowTabs] = useState({shown: false, targetKey: ''});
+  const [showTabs, setShowTabs] = useState({ shown: false, targetKey: '' });
 
   // 无数据F
   const showNoneDataPage = async () => {
@@ -44,7 +44,7 @@ const Tab: React.FC<any> = () => {
       onliineCheck: 'Gainsboro',
       releaseResult: '9',
       processPercent: 0,
-      autoCheckResult: <label></label>
+      autoCheckResult: <label></label>,
     });
 
     // 预发布项目

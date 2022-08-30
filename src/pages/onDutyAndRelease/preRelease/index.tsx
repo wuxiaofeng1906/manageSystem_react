@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { Spin } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import Tab from './components/Tab';
 import CheckProgress from './components/CheckProgress';
@@ -25,10 +26,24 @@ let currentPanes: any;
 const PreRelease: React.FC<any> = () => {
   // Tab标签数据显示
   const {
-    modifyOperteStatus, tabsData, setTabsData, processStatus, modifyProcessStatus, modifyPreReleaseData,
-    lockedItem, setRelesaeItem, setUpgradeApi, setUpgradeConfirm,
-    modifyReleasedID, setDataReview, setDataReviewConfirm, setOnlineBranch,
-    setCorrespOrder, modifyAllLockedArray
+    modifyOperteStatus,
+    tabsData,
+    setTabsData,
+    processStatus,
+    globalLoading,
+    modifyProcessStatus,
+    modifyPreReleaseData,
+    lockedItem,
+    setRelesaeItem,
+    setUpgradeApi,
+    setUpgradeConfirm,
+    modifyReleasedID,
+    setDataReview,
+    setDataReviewConfirm,
+    setOnlineBranch,
+    setCorrespOrder,
+    modifyAllLockedArray,
+    setGlobalLoading,
   } = useModel('releaseProcess');
 
   // 用于定时任务显示数据，定时任务useEffect中渲染了一次。不能实时更新
@@ -90,9 +105,9 @@ const PreRelease: React.FC<any> = () => {
       edit_user_name: '',
       edit_time: '',
       pro_id: '',
-      ignoreZentaoList: "2",
-      checkListStatus: "",
-      release_cluster: "tenant"
+      ignoreZentaoList: '2',
+      checkListStatus: '',
+      release_cluster: 'tenant',
     });
 
     //  发布项
@@ -125,6 +140,7 @@ const PreRelease: React.FC<any> = () => {
 
     if (initData.errmessage) {
       // 出现异常情况时候，提醒错误，不更新界面。
+      setGlobalLoading(false);
       errorMessage(initData.errmessage.toString());
       return;
     }
@@ -150,7 +166,6 @@ const PreRelease: React.FC<any> = () => {
       } else {
         setTabsData(tabPageInfo?.activeKey, tabPageInfo?.panes);
       }
-
     } else {
       setTabsData(tabPageInfo?.activeKey, currentPanes);
     }
@@ -268,14 +283,16 @@ const PreRelease: React.FC<any> = () => {
 
   return (
     <PageContainer style={{ backgroundColor: 'white' }}>
-      <Tab />
-      <CheckProgress />
-      <PreReleaseProject />
-      <OnlineBranch />
-      <DataRepaireReview />
-      <UpgradeService />
-      <CorrespondingWorkOrder />
-      <DeleteRow />
+      <Spin spinning={loading || globalLoading} tip={'数据加载中...'}>
+        <Tab />
+        <CheckProgress />
+        <PreReleaseProject />
+        <OnlineBranch />
+        <DataRepaireReview />
+        <UpgradeService />
+        <CorrespondingWorkOrder />
+        <DeleteRow />
+      </Spin>
     </PageContainer>
   );
 };

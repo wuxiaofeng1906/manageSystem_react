@@ -7,7 +7,6 @@ axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
 // axios中常见的get/delete请求，也称作query请求：
 // get 请求
 const axiosGet = async (url: string, queryData: any = {}) => {
-
   let result: any = {};
   await axios
     .get(url, { params: queryData })
@@ -113,7 +112,8 @@ const axiosPatch = async (url: string, bodyData: any = {}) => {
       if (error.toString().includes('403')) {
         errorMessage('您无操作权限！');
       } else {
-        errorMessage(`异常信息:${error.toString()}`);
+        const errTip = JSON.parse(error.response.request.response);
+        errorMessage(`异常信息:${errTip.message ?? ''}`);
       }
     });
   return result;

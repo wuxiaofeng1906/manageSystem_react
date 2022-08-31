@@ -27,6 +27,7 @@ import {
 } from './columnRenderer';
 
 import { history } from '@@/core/history';
+import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 // 定义列名
 const getColums = (prjNames: any) => {
   // 获取缓存的字段
@@ -45,16 +46,14 @@ const getColums = (prjNames: any) => {
       minWidth: 70,
       suppressMenu: true,
       pinned: 'left',
-      cellRenderer: (params: any) => {
-        return Number(params.node.id) + 1;
-      },
+      cellRenderer: (params: any) => Number(params.node.id) + 1,
     },
     {
       headerName: '阶段',
       field: 'stage',
       pinned: 'left',
       valueGetter: stageValueGetter,
-      cellRenderer: stageRenderer,
+      cellRenderer: 'stageRender',
       minWidth: 155,
     },
     {
@@ -395,11 +394,21 @@ const getColums = (prjNames: any) => {
 
 // 设置行的颜色
 const setRowColor = (params: any) => {
-  if (params.data.baseline === '0') {
+  let style: any = { background: 'white' };
+  // ztUnlinkedAt: null 禅道需求未移除
+  const isDelete = params.data.ztUnlinkedAt != null;
+  // 超范围 + 禅道需求移除
+  if (params.data.baseline == '0' && isDelete) {
+    style = { background: '#e1e4ea80', color: isDelete ? 'red' : 'initial' };
+  } else if (params.data.baseline === '0') {
     // 如果基线为0，则整行都渲染颜色
-    return { 'background-color': '#FFF6F6' };
+    style = { background: '#FFF6F6' };
   }
-  return { 'background-color': 'white' };
+  // 禅道需求移除 灰色背景
+  else if (isDelete) {
+    style = { background: '#e1e4ea80' };
+  }
+  return style;
 };
 
 export { getColums, setRowColor };

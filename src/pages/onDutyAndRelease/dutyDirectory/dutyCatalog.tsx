@@ -587,7 +587,7 @@ const DutyCatalog = () => {
     return () => {
       clearInterval(timer);
     };
-  }, [singleLock, detail]);
+  }, [singleLock, detail?.is_push_msg]);
 
   useUnmount(() => {
     onDeleteLock();

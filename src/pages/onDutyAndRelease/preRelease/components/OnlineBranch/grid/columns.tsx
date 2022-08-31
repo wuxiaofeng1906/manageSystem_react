@@ -59,15 +59,21 @@ const rendererUnitTest = (params: any) => {
       backendTime = timeRange;
     }
   });
-  const renderColor = { 是: '#2BF541', 否: '#8B4513', 忽略: 'blue', 构建时跳过用例: 'blue' };
+  const renderColor = {
+    是: '#2BF541',
+    否: '#8B4513',
+    忽略: 'blue',
+    构建时跳过用例: 'blue',
+    执行中: '#46A0FC',
+  };
   // 前端的颜色
   const frontColor = renderColor[frontValue] ?? 'black';
   // 后端的颜色
-  const bacnkendColor = renderColor[backendValue] ?? 'black';
+  const backendColor = renderColor[backendValue] ?? 'black';
 
   const front = `<div>前端： <label style="color: ${frontColor}"> ${frontValue}</label> &nbsp;${frontTime}</div>`;
 
-  const backend = `<div>后端：<label style="color: ${bacnkendColor}"> ${backendValue}</label>${backendTime}</div>`;
+  const backend = `<div>后端：<label style="color: ${backendColor}"> ${backendValue}</label>${backendTime}</div>`;
 
   return `
         <div style="height: 66px">

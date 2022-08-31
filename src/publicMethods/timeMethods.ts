@@ -33,10 +33,11 @@ function getMonthWeek(starttime: string) {
   // starttime  为周一的日期
   // 求周四的日期
   // 兼容safari
-  const date = dayjs(starttime);
-  const year = date.year();
-  const month = date.month() + 1;
-  const day = date.date() + 3; // 增加3天，求周四的日期
+  const date = new Date(starttime);
+  date.setDate(date.getDate() + 3); // 增加3天，求周四的日期
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
 
   const newDates = new Date(year, month - 1, day);
   const d = newDates.getDate();
@@ -46,8 +47,8 @@ function getMonthWeek(starttime: string) {
   }
 
   const config = {
-    getMonth: month,
-    getYear: year,
+    getMonth: date.getMonth() + 1,
+    getYear: date.getFullYear(),
     getWeek: Math.ceil((d + 4 - w) / 7),
   };
   let monthStr = config.getMonth.toString();
@@ -55,7 +56,6 @@ function getMonthWeek(starttime: string) {
     monthStr = `0${config.getMonth}`;
   }
   const week = `${monthStr}月0${config.getWeek}周`;
-  // console.log('weeks', week);
   return week;
 }
 

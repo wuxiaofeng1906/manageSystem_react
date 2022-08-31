@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { useRequest } from 'ahooks';
 import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
@@ -99,9 +99,11 @@ const SprintList: React.FC<any> = () => {
   const { initialState } = useModel('@@initialState');
   const { prjId, prjNames, prjType, showTestConfirmFlag } = getProjectInfo();
   const [showRemoveModal, setShowRemoveModal] = useState(false);
+  const [testSelectorDisabled, setTestSelectorDisabled] = useState(false);
   // 不满足移除的数据
   const [dissatisfy, setDissatisfy] = useState<any[]>([]);
-  const [nextSprint, setNextSprint] = useState<any[]>([]);
+  // 获取所有的班车所属执行
+  const [sprintProject, setSprintProject] = useState<any[]>([]);
 
   /* region 整个模块都需要用到的表单定义 */
   // 模块查询
@@ -1094,7 +1096,7 @@ const SprintList: React.FC<any> = () => {
         !selected.every((it) => [1, 2].includes(Number(it.codeRevert)) && Number(it.testCheck) == 1)
       )
         return infoMessage('请勾选标识为开发已revert数据');
-      setDissatisfy(findDissatisfy);
+      setDissatisfy(findDissatisfy?.map((it) => ({ ...it, targetPid: it.targetPid })));
 
       // setFlowHitmessage({ hintMessage: '测试已验证revert' });
       // setIsFlowModalVisible(true);
@@ -1120,13 +1122,15 @@ const SprintList: React.FC<any> = () => {
   // 修改操作流程
   const modFlowStage = async (content: any, values: any) => {
     const selRows: any = gridApi.current?.getSelectedRows();
-    const result = await requestModFlowStage(selRows, content, values);
-    if (result.code === 200) {
+    const result = await requestModFlowStage(selRows, content, values, prjNames);
+    if (result?.code === 200) {
       setIsFlowModalVisible(false);
       setIsRevokeModalVisible(false);
       updateGrid();
       sucMessage('修改成功！');
       //   测试确认需要清空
+      setTestConfirm(undefined);
+    } else {
       setTestConfirm(undefined);
     }
   };
@@ -1185,13 +1189,19 @@ const SprintList: React.FC<any> = () => {
   };
 
   // 批量修改测试
-  const testConfirmSelect = (params: any) => {
+  const testConfirmSelect = async (params: any) => {
+    const flag = await checkTestValid();
     if (judgingSelectdRow()) {
       // const selRows: any = gridApi.current?.getSelectedRows();
       // selRows.forEach((row: any) => {
       //
       // });
       setTestConfirm(params);
+      if (flag) {
+        setTestConfirm(undefined);
+        infoMessage('已基线，不能修改');
+        return;
+      }
       modFlowStage('testConfirmed', params);
     }
   };
@@ -1294,6 +1304,20 @@ const SprintList: React.FC<any> = () => {
     () => initialState?.currentUser?.authority?.find((it: any) => it?.id == 149)?.id == 149,
     [initialState?.currentUser],
   );
+  // 验证是否可批量 修改测试确认
+  const checkTestValid = async () => {
+    try {
+      await SprintDetailServices.checkUpdateTest({
+        execName: prjNames,
+        currAt: moment().format('YYYY-MM-DD HH:mm:ss'),
+      });
+      setTestSelectorDisabled(false);
+      return false;
+    } catch (e) {
+      setTestSelectorDisabled(e.ok == false);
+      return e.ok == false;
+    }
+  };
 
   const onRemove = async () => {
     if (!hasPermission) return;
@@ -1317,12 +1341,13 @@ const SprintList: React.FC<any> = () => {
   const getNextSprint = async () => {
     const res = await SprintDetailServices.getNextSprint({
       project: Number(prjId),
-      offset: 1,
+      // offset: 1,
     });
-    setNextSprint(res);
+    setSprintProject(res);
   };
   useEffect(() => {
     getNextSprint();
+    checkTestValid();
   }, []);
 
   // useEffect(() => {
@@ -1340,6 +1365,34 @@ const SprintList: React.FC<any> = () => {
   const rightStyle = { marginLeft: '30px' };
   const widths = { width: '200px', color: 'black' };
   const marginTopHeight = { marginTop: -15 };
+
+  const renderTestSelect = useCallback(() => {
+    return (
+      <Select
+        placeholder="请选择"
+        value={testConfirm}
+        style={{
+          marginLeft: '5px',
+          width: '85px',
+          marginTop: '4px',
+          display: judgeAuthority(`修改"测试已确认"字段`) === true ? 'inline' : 'none',
+        }}
+        size={'small'}
+        onChange={testConfirmSelect}
+        disabled={testSelectorDisabled}
+      >
+        {[
+          <Option key={'1'} value={'1'}>
+            是
+          </Option>,
+          <Option key={'0'} value={'0'}>
+            否
+          </Option>,
+        ]}
+      </Select>
+    );
+  }, [testSelectorDisabled, testConfirm]);
+
   return (
     <div style={{ width: '100%', marginTop: '-30px' }} className={styles.sprintListDetails}>
       <PageHeader
@@ -1586,27 +1639,11 @@ const SprintList: React.FC<any> = () => {
               >
                 测试确认:
               </label>
-              <Select
-                placeholder="请选择"
-                value={testConfirm}
-                style={{
-                  marginLeft: '5px',
-                  width: '85px',
-                  marginTop: '4px',
-                  display: judgeAuthority(`修改"测试已确认"字段`) === true ? 'inline' : 'none',
-                }}
-                size={'small'}
-                onChange={testConfirmSelect}
-              >
-                {[
-                  <Option key={'1'} value={'1'}>
-                    是
-                  </Option>,
-                  <Option key={'0'} value={'0'}>
-                    否
-                  </Option>,
-                ]}
-              </Select>
+              {testSelectorDisabled ? (
+                <Tooltip title={'已基线，不能修改'}>{renderTestSelect()}</Tooltip>
+              ) : (
+                renderTestSelect()
+              )}
             </div>
           </Col>
           <Col span={1} style={{ textAlign: 'right' }}>
@@ -1623,9 +1660,7 @@ const SprintList: React.FC<any> = () => {
           </Col>
           <Col span={1} style={{ textAlign: 'right' }}>
             <div>
-              <Button type="text" icon={<SettingOutlined />} onClick={showFieldsModal}>
-                {' '}
-              </Button>
+              <Button type="text" icon={<SettingOutlined />} onClick={showFieldsModal} />
             </div>
           </Col>
         </Row>
@@ -3176,7 +3211,7 @@ const SprintList: React.FC<any> = () => {
       <RemoveModal
         visible={showRemoveModal}
         gridRef={gridApi}
-        nextSprint={nextSprint}
+        sprintProject={sprintProject}
         onRefresh={updateGrid}
         onCancel={() => {
           setShowRemoveModal(false);
@@ -3186,7 +3221,7 @@ const SprintList: React.FC<any> = () => {
       <DissatisfyModal
         dissatisfy={dissatisfy}
         setDissatisfy={setDissatisfy}
-        nextSprint={nextSprint}
+        sprintProject={sprintProject}
         onRefresh={updateGrid}
         isTester={true}
       />

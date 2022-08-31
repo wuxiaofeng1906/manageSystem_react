@@ -41,7 +41,7 @@ export const DissatisfyModal = (
   props: ModalFuncProps & {
     dissatisfy: any[];
     setDissatisfy: Function;
-    nextSprint: any[];
+    sprintProject: any[];
     onRefresh: Function;
     onRefreshForm?: Function;
     isTester?: Boolean;
@@ -62,6 +62,7 @@ export const DissatisfyModal = (
             {
               ...pick(item, pickTag),
               rdId: item.id,
+              targetPid: +item.targetPid,
               category: String(Math.abs(Number(item.category))),
             },
           ],
@@ -69,13 +70,13 @@ export const DissatisfyModal = (
         });
       } else {
         await SprintDetailServices.remove({
-          source: Number(query.projectid),
-          target: Number(props.nextSprint?.[1]?.id),
+          project: Number(query.projectid),
           datas: [
             {
               ...pick(item, pickData),
               rdId: item.id,
               category: String(Math.abs(Number(item.category))),
+              targetPid: Number(item.targetPid),
             },
           ],
         });
@@ -120,12 +121,18 @@ export const DissatisfyModal = (
                         <p>{`需求${it.ztNo} ${it.title}`}</p>
                         <p>{`在${query.project}关联 ${it.relatedTasks ?? 0}个任务和${
                           it.relatedBugs ?? 0
-                        }个bug,将同步移到${props.nextSprint?.[1]?.name ?? ''}`}</p>
+                        }个bug,将同步移到${
+                          props.sprintProject?.find((project) => +project.id == +it.targetPid)
+                            ?.name ?? ''
+                        }`}</p>
                       </div>
                     }
                     okText="确认"
                     cancelText="去禅道"
-                    onConfirm={() => onConfirm(it)}
+                    onConfirm={(e) => {
+                      e?.preventDefault();
+                      onConfirm(it);
+                    }}
                     onCancel={() => {
                       if (!query.ztId) return infoMessage('禅道执行id异常！');
                       window.open(
@@ -165,7 +172,7 @@ export const DissatisfyModal = (
 const RemoveModal = (
   props: {
     gridRef: MutableRefObject<GridApi | undefined>;
-    nextSprint: any[];
+    sprintProject: any[];
     onRefresh: Function;
   } & ModalFuncProps,
 ) => {
@@ -206,6 +213,19 @@ const RemoveModal = (
 
   useEffect(() => {
     if (!props.visible) return;
+    // 获取当前所属执行索引
+    const currentIndex = props.sprintProject?.findIndex(
+      (it) => String(it.id) == String(query.projectid),
+    );
+    // 下一个班车所属执行 需判断类型
+    let nextProject: any = {};
+    for (let i = currentIndex + 1; i < props.sprintProject?.length; i++) {
+      if (props.sprintProject[i].category == props.sprintProject[currentIndex].category) {
+        nextProject = props.sprintProject[i];
+        break;
+      }
+    }
+
     const formData =
       selected?.map((it: any) => ({
         ...it,
@@ -217,6 +237,8 @@ const RemoveModal = (
         relatedTasks: it.relatedTasks ?? 0,
         testers: isEmpty(it.tester) ? [] : it.tester?.map((it: any) => it.id),
         testVerify: !isEmpty(it.testCheck) ? Math.abs(Number(it.testCheck)) : undefined,
+        // 设置默认为下一个班车的所属执行
+        targetPid: it.targetPid ?? nextProject?.id ?? undefined,
       })) ?? [];
     form.setFieldsValue({ formList: formData });
     setSource(formData);
@@ -270,9 +292,9 @@ const RemoveModal = (
             ztNo: it.ztNo,
             category: String(Math.abs(Number(it.category))),
             codeRevert: it.codeRevert,
+            targetPid: Number(it.targetPid),
           })),
-          source: Number(query.projectid),
-          target: Number(props.nextSprint?.[1]?.id),
+          project: Number(query.projectid),
         });
         message.success({
           content: (
@@ -315,6 +337,7 @@ const RemoveModal = (
         hasCode: 0,
         codeRevert: 0,
         testVerify: 0,
+        targetPid: +it.targetPid,
       }));
     if (!isEmpty(resetTagData)) {
       await SprintDetailServices.removeTag({
@@ -328,7 +351,7 @@ const RemoveModal = (
   const memoColumns = useMemo(() => {
     if (!props.visible) return [];
     const columns: ColumnsType<any> = [
-      { title: '序号', render: (v, r, i) => i + 1, width: 60 },
+      { title: '序号', render: (v, r, i) => i + 1, width: 50 },
       {
         title: '类型',
         dataIndex: 'category',
@@ -351,7 +374,31 @@ const RemoveModal = (
         ),
       },
       { title: '相关需求', dataIndex: 'relatedStories', width: 90 },
-      { title: '相关bug', dataIndex: 'relatedBugs', width: 90 },
+      { title: '相关bug', dataIndex: 'relatedBugs', width: 80 },
+      {
+        title: '目标执行',
+        dataIndex: 'targetPid',
+        width: 180,
+        render: (value, record, i) => {
+          return (
+            <Form.Item
+              name={['formList', i, 'targetPid']}
+              rules={[{ required: true, message: '请选择目标执行！' }]}
+            >
+              <Select
+                showSearch
+                allowClear
+                optionFilterProp={'label'}
+                options={props.sprintProject?.map((it) => ({
+                  value: it.id,
+                  label: it.name,
+                  disabled: String(it.id) == String(query?.projectid),
+                }))}
+              />
+            </Form.Item>
+          );
+        },
+      },
       {
         title: '测试',
         dataIndex: 'testers',
@@ -501,6 +548,7 @@ const RemoveModal = (
       {
         title: '免Revert原因',
         dataIndex: 'notRevertMemo',
+        width: 120,
         render: (value, _, i) => {
           return (
             <Form.Item noStyle shouldUpdate>
@@ -531,12 +579,11 @@ const RemoveModal = (
     ];
     return columns;
   }, [props.visible, JSON.stringify(testUser)]);
-
   return (
     <Modal
       title={'移除操作'}
       {...props}
-      width={1300}
+      width={1500}
       maskClosable={false}
       centered
       onCancel={onCancel}
@@ -565,7 +612,7 @@ const RemoveModal = (
         <DissatisfyModal
           dissatisfy={dissatisfy}
           setDissatisfy={setDissatisfy}
-          nextSprint={props.nextSprint}
+          sprintProject={props.sprintProject}
           onRefresh={props.onRefresh}
           onRefreshForm={(v: any[]) => {
             setSource(v);

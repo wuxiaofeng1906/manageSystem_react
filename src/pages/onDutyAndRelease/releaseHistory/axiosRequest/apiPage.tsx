@@ -165,7 +165,7 @@ const getOnlineProocessDetails = async (releaseNums: any, releaseType: string) =
   if (releaseRt.code !== 200) {
     if (releaseType === 'gray') {
       errorMessage(`1级灰度发布生成失败：${releaseRt.msg}`);
-    } else if (releaseType === 'online') {
+    } else if (['online', 'ongoing'].includes(releaseType)) {
       errorMessage(`正式发布生成失败：${releaseRt.msg}`);
     } else {
       errorMessage(`错误：${releaseRt.msg}`);

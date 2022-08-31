@@ -561,7 +561,7 @@ const ReleaseHistory: React.FC<any> = () => {
         </div>
         <button></button>
         <div
-          className="ag-theme-alpine"
+          className="ag-theme-alpine init-agGrid"
           style={{ marginTop: -21, height: gridHeight.zeroGrid, width: '100%' }}
         >
           <AgGridReact
@@ -611,7 +611,7 @@ const ReleaseHistory: React.FC<any> = () => {
         </div>
         <button></button>
         <div
-          className="ag-theme-alpine"
+          className="ag-theme-alpine init-agGrid"
           style={{ marginTop: -21, height: gridHeight.firstGrid, width: '100%' }}
         >
           <AgGridReact
@@ -702,7 +702,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
         <button></button>
         <div
-          className="ag-theme-alpine"
+          className="ag-theme-alpine init-agGrid"
           style={{ marginTop: -21, height: gridHeight.formalGrid, width: '100%' }}
         >
           <AgGridReact

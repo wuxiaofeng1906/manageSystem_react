@@ -296,7 +296,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
 
       // 显示step1发布方式以及时间
       formForOfficialRelease.setFieldsValue({
-        pulishType: datas.release_type,
+        pulishType: datas.release_type == 'ongoing' ? 'online' : datas.release_type,
         pulishMethod: datas.release_way,
         pulishTime: releaseTime,
         relateDutyName: datas.person_duty_num,

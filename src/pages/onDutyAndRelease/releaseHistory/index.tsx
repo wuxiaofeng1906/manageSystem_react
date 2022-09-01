@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
@@ -51,6 +51,7 @@ const ReleaseHistory: React.FC<any> = () => {
   const [gridHeight, setGridHeight] = useState({
     zeroGrid: 100,
     firstGrid: 100,
+    peddingGrid: 100,
     formalGrid: 100,
   });
 
@@ -135,12 +136,16 @@ const ReleaseHistory: React.FC<any> = () => {
   // 1级灰度积压列表数据
   const firstGrayscaleData = useRequest(() => getFirstGrayscaleListData()).data;
   // 一键生成正式发布
-  const generateFormalFirstRelease = async () => {
-    const sel_rows = firstGrayscaleGridApi.current?.getSelectedRows();
-
+  const generateFormalFirstRelease = async (type = 'online') => {
+    const sel_rows =
+      type == 'ongoing'
+        ? peddingGridApi?.current?.getSelectedRows()
+        : firstGrayscaleGridApi.current?.getSelectedRows();
+    const flag =
+      type == 'ongoing' ? peddingButtonTitle === '待发布详情' : firstButtonTitle === '待发布详情';
     // 如果是待发布详情，则不需要判断有没有勾选
-    if (firstButtonTitle === '待发布详情') {
-      history.push(`/onDutyAndRelease/officialRelease?releaseType=online`);
+    if (flag) {
+      history.push(`/onDutyAndRelease/officialRelease?releaseType=${type}`);
     } else {
       if (sel_rows?.length === 0) {
         errorMessage('请先勾选需要发布的数据！');
@@ -159,10 +164,10 @@ const ReleaseHistory: React.FC<any> = () => {
 
       // 需要在这个页面生成发布编号。只有成功了才跳转到详情界面
       const readyReleaseNum = ready_release_num.join('|');
-      const onlineNum = await getOnlineProocessDetails(readyReleaseNum, 'online');
+      const onlineNum = await getOnlineProocessDetails(readyReleaseNum, type);
       if (onlineNum) {
         history.push(
-          `/onDutyAndRelease/officialRelease?releaseType=online&releaseNum=${readyReleaseNum}&onlineReleaseNum=${onlineNum}`,
+          `/onDutyAndRelease/officialRelease?releaseType=${type}&releaseNum=${readyReleaseNum}&onlineReleaseNum=${onlineNum}`,
         );
       }
     }
@@ -228,7 +233,7 @@ const ReleaseHistory: React.FC<any> = () => {
   };
 
   // 操作按钮
-  const grayListOperate = (releaseType: string, params: any) => {
+  const grayListOperate = (releaseType: string, params: any, showDelete = true) => {
     // 跳转到灰度发布详情
     const grayButton = (
       <Button className={'operateButton'} onClick={() => gotoGrayReleasePage(params)}>
@@ -259,7 +264,7 @@ const ReleaseHistory: React.FC<any> = () => {
     );
 
     // 删除功能
-    const deleteButton = (
+    const deleteButton = showDelete ? (
       <Popconfirm
         placement="topRight"
         title={'已停留在灰度积压列表中，请谨慎核对,是否确认需要删除?'}
@@ -273,6 +278,8 @@ const ReleaseHistory: React.FC<any> = () => {
           <img src="../delete.png" width="20" height="20" alt="删除发布详情" title="删除发布详情" />
         </Button>
       </Popconfirm>
+    ) : (
+      <div />
     );
 
     // 跳转到正式发布列表
@@ -332,6 +339,15 @@ const ReleaseHistory: React.FC<any> = () => {
   /* endregion 操作按钮 */
 
   /* endregion 灰度发布界面 */
+
+  //发布中列表 数据
+  const peddingPublishData = useRequest(() => getFirstGrayscaleListData('ongoing')).data;
+  const [peddingButtonTitle, setPeddingButtonTitle] = useState('一键生成正式发布'); // 待发布详情
+  const peddingGridApi = useRef<GridApi>();
+  const onPeddingGridReady = (params: GridReadyEvent) => {
+    peddingGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
 
   /* region 已正式发布列表 */
   const releasedGridApi = useRef<GridApi>();
@@ -463,6 +479,7 @@ const ReleaseHistory: React.FC<any> = () => {
     zeroGrayscaleGridApi.current?.sizeColumnsToFit();
     firstGrayscaleGridApi.current?.sizeColumnsToFit();
     releasedGridApi.current?.sizeColumnsToFit();
+    peddingGridApi.current?.sizeColumnsToFit();
   });
 
   // 显示button title
@@ -476,6 +493,9 @@ const ReleaseHistory: React.FC<any> = () => {
     if (firstResult) {
       setFirstButtonTitle('待发布详情');
     }
+    // 发布中列表
+    const pedding = await vertifyOnlineProjectExit('ongoing');
+    if (pedding) setPeddingButtonTitle('待发布详情');
   };
 
   useEffect(() => {
@@ -506,6 +526,15 @@ const ReleaseHistory: React.FC<any> = () => {
     }
   }, [zeroGrayscaleData]);
 
+  useEffect(() => {
+    if (peddingPublishData?.data) {
+      setGridHeight({
+        ...gridHeight,
+        peddingGrid: (peddingPublishData?.data).length * 30 + 80,
+      });
+    }
+  }, [peddingPublishData]);
+
   return (
     <PageContainer>
       {/* 0级灰度积压列表 */}
@@ -532,7 +561,7 @@ const ReleaseHistory: React.FC<any> = () => {
         </div>
         <button></button>
         <div
-          className="ag-theme-alpine"
+          className="ag-theme-alpine init-agGrid"
           style={{ marginTop: -21, height: gridHeight.zeroGrid, width: '100%' }}
         >
           <AgGridReact
@@ -560,7 +589,11 @@ const ReleaseHistory: React.FC<any> = () => {
           {' '}
           &nbsp;
           <label style={{ fontWeight: 'bold', float: 'left' }}>1级灰度积压列表</label>
-          <Button type="text" onClick={generateFormalFirstRelease} style={{ float: 'right' }}>
+          <Button
+            type="text"
+            onClick={() => generateFormalFirstRelease()}
+            style={{ float: 'right' }}
+          >
             <img
               src="../pushMessage.png"
               width="25"
@@ -578,7 +611,7 @@ const ReleaseHistory: React.FC<any> = () => {
         </div>
         <button></button>
         <div
-          className="ag-theme-alpine"
+          className="ag-theme-alpine init-agGrid"
           style={{ marginTop: -21, height: gridHeight.firstGrid, width: '100%' }}
         >
           <AgGridReact
@@ -594,6 +627,47 @@ const ReleaseHistory: React.FC<any> = () => {
             frameworkComponents={{
               grayReleaseDetails: (params: any) => {
                 return grayListOperate('one', params);
+              },
+            }}
+          />
+        </div>
+      </div>
+      {/*发布中*/}
+      <div style={{ marginTop: 20 }}>
+        <div style={gridHeadDivStyle}>
+          <label style={{ fontWeight: 'bold', float: 'left' }}>线上2-8集群进行中列表</label>
+          <Button
+            type="text"
+            onClick={() => generateFormalFirstRelease('ongoing')}
+            style={{ float: 'right' }}
+          >
+            <img
+              src="../pushMessage.png"
+              width="25"
+              height="25"
+              alt="一键生成正式发布"
+              title="一键生成正式发布"
+            />
+            &nbsp;{peddingButtonTitle}
+          </Button>
+        </div>
+        <div
+          className="ag-theme-alpine init-agGrid"
+          style={{ height: gridHeight.peddingGrid, width: '100%' }}
+        >
+          <AgGridReact
+            columnDefs={grayscaleBacklogList('one', peddingButtonTitle == '待发布详情')} // 定义列
+            rowData={peddingPublishData?.data} // 数据绑定
+            defaultColDef={girdDefaultSetting}
+            rowHeight={30}
+            headerHeight={35}
+            rowSelection={'multiple'} // 设置多行选中
+            suppressRowTransform={true}
+            onGridReady={onPeddingGridReady}
+            onColumnEverythingChanged={onPeddingGridReady}
+            frameworkComponents={{
+              grayReleaseDetails: (params: any) => {
+                return grayListOperate('one', params, false);
               },
             }}
           />
@@ -628,7 +702,7 @@ const ReleaseHistory: React.FC<any> = () => {
 
         <button></button>
         <div
-          className="ag-theme-alpine"
+          className="ag-theme-alpine init-agGrid"
           style={{ marginTop: -21, height: gridHeight.formalGrid, width: '100%' }}
         >
           <AgGridReact

@@ -46,7 +46,7 @@ const getOnlineEnv = async (releaseType: any) => {
     if (releaseType === 'gray') {
       opt = data.filter((it: any) => !['global', '集群0', '集群0-8'].includes(it.label));
     }
-    if (releaseType === 'online') {
+    if (['online', 'ongoing'].includes(releaseType)) {
       opt = data.filter(
         (it: any) => !['global', '集群0', '集群1', '集群0-8', '集群1-8'].includes(it.label),
       );

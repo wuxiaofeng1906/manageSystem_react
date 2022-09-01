@@ -12,7 +12,6 @@ import { SelectProps } from 'antd/lib/select';
 import * as dayjs from 'dayjs';
 import { useUnmount } from 'ahooks';
 import useLock from '@/hooks/lock';
-import { deleteLockStatus } from '@/pages/onDutyAndRelease/preRelease/lock/rowLock';
 
 const opts = { showSearch: true, mode: 'multiple', optionFilterProp: 'label' };
 const recentType = { 前端: 'front', 后端: 'backend', 测试: 'test', 运维: 'operations', SQA: 'sqa' };
@@ -570,26 +569,30 @@ const DutyCatalog = () => {
     formatSaveDuty(detail);
   }, [detail, initDuty]);
 
-  const otherEnv = envList
-    .filter((o: any) => !Object.values(envType).includes(o.value))
-    .map((it) => it.value);
-
   useEffect(() => {
     let timer: any;
+    // 已发值班， 删除锁
+    if (detail?.is_push_msg == 'yes') {
+      updateLockStatus(id, 'delete');
+      clearInterval(timer);
+      return;
+    }
     if (singleLock?.user_id == currentUser?.userid) return;
     timer = setInterval(() => {
       getAllLock(id, true).then((res) => {
-        if (isEmpty(res) && detail?.is_push_msg != 'yes') updateLockStatus(id, 'post');
+        if (isEmpty(res) && !isEmpty(detail) && detail?.is_push_msg != 'yes')
+          updateLockStatus(id, 'post');
       });
     }, 3000);
     return () => {
       clearInterval(timer);
     };
-  }, [singleLock]);
+  }, [singleLock, detail?.is_push_msg]);
 
   useUnmount(() => {
     onDeleteLock();
   });
+
   window.onbeforeunload = function () {
     onDeleteLock();
   };
@@ -597,6 +600,10 @@ const DutyCatalog = () => {
   window.onunload = function () {
     onDeleteLock();
   };
+
+  const otherEnv = envList
+    .filter((o: any) => !Object.values(envType).includes(o.value))
+    .map((it) => it.value);
 
   return (
     <Spin spinning={loading} tip={'数据加载中...'}>

@@ -29,6 +29,7 @@ export default () => {
 
   // 控件是否可用
   const [operteStatus, setOperteStatus] = useState(false);
+  const [globalLoading, setGlobalLoading] = useState(false);
   const modifyOperteStatus = useCallback((values: boolean) => {
     setOperteStatus(values);
   }, []);
@@ -178,5 +179,7 @@ export default () => {
     setShowStoryModal,
     storyExecutionId,
     setStoryExecutionId, // 所属执行（含有 “emergency”、“stage-patch”）
+    globalLoading,
+    setGlobalLoading,
   };
 };

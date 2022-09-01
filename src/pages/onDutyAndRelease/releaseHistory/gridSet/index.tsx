@@ -144,12 +144,12 @@ const releasedList = () => {
     },
     {
       headerName: '发布结果',
-      field: 'result',
+      field: 'release_result',
       minWidth: 90,
       cellRenderer: (p: any) =>
-        `<span style="color:${p.value == 1 ? '#2BF541' : p.value == 2 ? 'red' : 'initial'}">${
-          p.value == 1 ? '发布成功' : p.value == 2 ? '发布失败' : ''
-        }</span>`,
+        `<span style="color:${
+          p.value == 'success' ? '#2BF541' : p.value == 'failure' ? 'red' : 'initial'
+        }">${p.value == 'success' ? '发布成功' : p.value == 'failure' ? '发布失败' : ''}</span>`,
     },
     //   {
     //   headerName: '发布镜像ID',

@@ -1,10 +1,11 @@
 import type { GqlClient } from '@/hooks';
-import { getHalfYearTime, getParamsByType } from '@/publicMethods/timeMethods';
+import { getParamsByType } from '@/publicMethods/timeMethods';
 import { formatTreeData } from '@/utils/utils';
+import { IStaticBy } from '@/hooks/statistic';
 
 export interface IStatisticQuery {
   client: GqlClient<object>;
-  params: string;
+  params: IStaticBy;
   identity?: string;
 }
 const StatisticServices = {
@@ -170,6 +171,28 @@ const StatisticServices = {
               deptName
             }
             kpi
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData(data.data), loading };
+  },
+
+  // 产品上线后引入emergency
+  async onlineEmergency({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:onlineEmerProportion(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+          range{
+            start
+            end
+          }
+          datas{
+            date
+            storyNum
+            recordNum
           }
         }
       }

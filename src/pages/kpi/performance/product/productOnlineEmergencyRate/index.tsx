@@ -29,13 +29,7 @@ const ruleData: IRuleData[] = [
   },
 ];
 const ProductOnlineEmergencyRate: React.FC<any> = () => {
-  return (
-    <IStaticPerformance
-      ruleData={ruleData}
-      request={StatisticServices.productScale}
-      identity={'DEVELOPER'}
-    />
-  );
+  return <IStaticPerformance ruleData={ruleData} request={StatisticServices.onlineEmergency} />;
 };
 
 export default ProductOnlineEmergencyRate;

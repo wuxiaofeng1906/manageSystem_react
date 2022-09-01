@@ -540,7 +540,6 @@ const ReleaseHistory: React.FC<any> = () => {
       {/* 0级灰度积压列表 */}
       <div style={{ marginTop: -20 }}>
         <div style={gridHeadDivStyle}>
-          {' '}
           &nbsp;
           <label style={{ fontWeight: 'bold', float: 'left' }}>0级灰度积压列表</label>
           <Button type="text" onClick={generateFormalZeroRelease} style={{ float: 'right' }}>
@@ -550,7 +549,7 @@ const ReleaseHistory: React.FC<any> = () => {
               height="25"
               alt="一键生成1级灰度发布"
               title="一键生成1级灰度发布"
-            />{' '}
+            />
             &nbsp;{zeroButtonTitle}
           </Button>
           {/*<div style={{float: "right"}}>*/}
@@ -559,7 +558,6 @@ const ReleaseHistory: React.FC<any> = () => {
           {/*               onChange={onZeroGrayReleaseTimeChanged}/>*/}
           {/*</div>*/}
         </div>
-        <button></button>
         <div
           className="ag-theme-alpine init-agGrid"
           style={{ marginTop: -21, height: gridHeight.zeroGrid, width: '100%' }}
@@ -586,7 +584,6 @@ const ReleaseHistory: React.FC<any> = () => {
       {/* 1级灰度积压列表 */}
       <div style={{ marginTop: 20 }}>
         <div style={gridHeadDivStyle}>
-          {' '}
           &nbsp;
           <label style={{ fontWeight: 'bold', float: 'left' }}>1级灰度积压列表</label>
           <Button
@@ -600,7 +597,7 @@ const ReleaseHistory: React.FC<any> = () => {
               height="25"
               alt="一键生成正式发布"
               title="一键生成正式发布"
-            />{' '}
+            />
             &nbsp;{firstButtonTitle}
           </Button>
           {/*<div style={{float: "right"}}>*/}
@@ -609,7 +606,6 @@ const ReleaseHistory: React.FC<any> = () => {
           {/*               onChange={onFirstGrayReleaseTimeChanged}/>*/}
           {/*</div>*/}
         </div>
-        <button></button>
         <div
           className="ag-theme-alpine init-agGrid"
           style={{ marginTop: -21, height: gridHeight.firstGrid, width: '100%' }}
@@ -699,8 +695,6 @@ const ReleaseHistory: React.FC<any> = () => {
             />
           </div>
         </div>
-
-        <button></button>
         <div
           className="ag-theme-alpine init-agGrid"
           style={{ marginTop: -21, height: gridHeight.formalGrid, width: '100%' }}

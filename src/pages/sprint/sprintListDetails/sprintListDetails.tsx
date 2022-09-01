@@ -2449,7 +2449,7 @@ const SprintList: React.FC<any> = () => {
                 >
                   {[
                     <Option key={'集群0'} value={'集群0'}>
-                      集群1
+                      集群0
                     </Option>,
                     <Option key={'集群1'} value={'集群1'}>
                       集群1

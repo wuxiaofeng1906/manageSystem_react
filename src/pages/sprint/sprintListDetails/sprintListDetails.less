@@ -24,9 +24,9 @@
           border-radius: 4px;
           color:#46a0fc;
           border-color: #e0e0e0;
+          background:  #ecf5ff;
           &:first-child{
             margin-right: 5px;
-            background:  #ecf5ff;
           }
         }
       }
@@ -45,7 +45,6 @@
           display: inline-block;
           min-width:80px;
           text-align: center;
-
           border:1px solid #fcf6f6;
           line-height: 26px;
           &:nth-child(2){
@@ -54,9 +53,9 @@
           &:last-child{
             background: #e1e4ea80;
           }
-          &:not(:last-child){
-            margin-right: 5px;
-          }
+          //&:not(:last-child){
+          //  margin-right: 5px;
+          //}
         }
       }
     }
@@ -88,6 +87,24 @@
         line-height: 12px;
         font-size: 12px;
       }
+    }
+  }
+}
+:global{
+  .sprintModal{
+    position: relative;
+    float: right;
+    margin: 0;
+    right: 5px;
+    top:125px;
+    padding: 0;
+    .ant-modal-body{
+      padding: 20px 20px 0;
+    }
+    .ant-modal-close-x{
+      width: 40px;
+      height: 40px;
+      line-height: 35px;
     }
   }
 }

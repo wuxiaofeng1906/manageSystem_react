@@ -1113,7 +1113,12 @@ const JenkinsCheck: React.FC<any> = () => {
               labelCol={{ span: 5 }}
               labelAlign={'left'}
             >
-              <Select placeholder="请选择相应的服务！" style={{ width: '100%' }} mode={'multiple'}>
+              <Select
+                placeholder="请选择相应的服务！"
+                style={{ width: '100%' }}
+                maxTagCount={'responsive'}
+                mode={'multiple'}
+              >
                 {servers}
               </Select>
             </Form.Item>

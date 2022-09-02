@@ -1110,12 +1110,10 @@ const JenkinsCheck: React.FC<any> = () => {
               label="Server"
               style={{ marginTop: -22 }}
               required={true}
+              labelCol={{ span: 5 }}
+              labelAlign={'left'}
             >
-              <Select
-                placeholder="请选择相应的服务！"
-                style={{ marginLeft: 41, width: 375 }}
-                mode={'multiple'}
-              >
+              <Select placeholder="请选择相应的服务！" style={{ width: '100%' }} mode={'multiple'}>
                 {servers}
               </Select>
             </Form.Item>
@@ -1123,19 +1121,21 @@ const JenkinsCheck: React.FC<any> = () => {
             <Form.Item
               name="verson_imagebranch"
               label="ImageBranch"
-              style={{ marginTop: -20, width: 468 }}
+              style={{ marginTop: -20, width: '100%' }}
             >
               <Select placeholder="请选择待检查分支！" showSearch>
                 {targetBranch}
               </Select>
             </Form.Item>
 
-            <Form.Item name="verson_imageevn" label="ImageEvn" style={{ marginTop: -20 }}>
-              <Select
-                placeholder="请选择对应的环境！"
-                style={{ marginLeft: 20, width: 375 }}
-                showSearch
-              >
+            <Form.Item
+              name="verson_imageevn"
+              label="ImageEvn"
+              style={{ marginTop: -20 }}
+              labelCol={{ span: 5 }}
+              labelAlign={'left'}
+            >
+              <Select placeholder="请选择对应的环境！" style={{ width: '100%' }} showSearch>
                 {imageEvn}
               </Select>
             </Form.Item>

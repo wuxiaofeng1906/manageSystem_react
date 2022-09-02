@@ -27,7 +27,7 @@ import axios from 'axios';
 
 import dayjs from 'dayjs';
 import moment from 'moment';
-import { isEmpty } from 'lodash';
+import { isArray, isEmpty } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
 
 const { Option } = Select;
@@ -427,12 +427,17 @@ const JenkinsCheck: React.FC<any> = () => {
     // 传入参数错误：422  ；连接问题：422
 
     const params: any = [];
-    params.push({ name: 'server', value: modalData.verson_server?.join() });
+    params.push({
+      name: 'server',
+      value: isArray(modalData.verson_server)
+        ? modalData.verson_server?.join(',')
+        : modalData.verson_server,
+    });
     // 版本检查选中
     if (modalData.verson_check) {
       params.push(
         { name: 'BackendVersionCkeckFlag', value: modalData.verson_check },
-        // {name: "server", value: modalData.verson_server?.join()},
+        // {name: "server", value: modalData.verson_server},
         { name: 'imageBranch', value: modalData.verson_imagebranch },
         { name: 'imageEnv', value: modalData.verson_imageevn },
       );
@@ -491,6 +496,7 @@ const JenkinsCheck: React.FC<any> = () => {
       user_id: currentUser.user_id,
       job_parm: params,
     };
+    debugger;
     setLoadSate(true);
     // axios.post('/api/verify/job/build', datas).then(async function (res) {
     axios

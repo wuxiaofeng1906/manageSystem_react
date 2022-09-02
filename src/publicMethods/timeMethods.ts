@@ -100,9 +100,9 @@ function getTwelveMonthTime(monthCount: number = 12) {
 }
 
 // 获取季度 的开始和结束时间
-function getFourQuarterTime(isCurMonth: boolean = false) {
+function getFourQuarterTime(isCurMonth: boolean = false, len = 12) {
   const quarterArray = [];
-  for (let index = 0; index < 12; index += 3) {
+  for (let index = 0; index < len; index += 3) {
     // 0,3,6,9
     let currentMonth;
     if (isCurMonth === true) {

@@ -148,7 +148,6 @@ const TestBugRateTableList: React.FC<any> = () => {
   const cssIndent = { textIndent: '2em' };
 
   /* endregion */
-  console.log(data, '=====');
 
   return (
     <PageContainer>
@@ -211,17 +210,17 @@ const TestBugRateTableList: React.FC<any> = () => {
             flex: 1,
             suppressMenu: true,
           }}
-          autoGroupColumnDef={{
-            minWidth: 240,
-            headerName: '部门-人员',
-            cellRendererParams: { suppressCount: true },
-            pinned: 'left',
-            suppressMenu: false,
-          }}
+          // autoGroupColumnDef={{
+          //   minWidth: 240,
+          //   headerName: '部门-人员',
+          //   cellRendererParams: { suppressCount: true },
+          //   pinned: 'left',
+          //   suppressMenu: false,
+          // }}
           rowHeight={32}
           headerHeight={35}
           onGridReady={onGridReady}
-          treeData={true}
+          // treeData={true}
           animateRows={true}
           groupDefaultExpanded={-1}
           getDataPath={(source: any) => {

@@ -179,12 +179,16 @@ const StatisticServices = {
   },
 
   // 产品上线后引入emergency
-  async onlineEmergency({ client, params }: IStatisticQuery) {
-    const condition = getParamsByType(params);
-    if (condition.typeFlag === 0) return [];
+  async onlineEmergency({
+    client,
+    params,
+  }: {
+    client: GqlClient<object>;
+    params: { kind: number; ends: string };
+  }) {
     const { data, loading } = await client.query(`
       {
-         data:onlineEmerProportion(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+         data:onlineEmerProportion(kind: "${params.kind}", ends: ${params.ends}) {
           range{
             start
             end
@@ -197,7 +201,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data), loading };
+    return { data: data.data, loading };
   },
 };
 export default StatisticServices;

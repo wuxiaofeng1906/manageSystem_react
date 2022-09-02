@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { IRuleData } from '@/components/IStaticPerformance';
-import IStaticPerformance from '@/components/IStaticPerformance';
 import StatisticServices from '@/services/statistic';
+import { AgGridReact } from 'ag-grid-react';
+import { getFourQuarterTime, getTwelveMonthTime } from '@/publicMethods/timeMethods';
+import moment from 'moment';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { Button } from 'antd';
+import { CalendarTwoTone, QuestionCircleTwoTone, ScheduleTwoTone } from '@ant-design/icons';
+import { PageContainer } from '@ant-design/pro-layout';
+import { useGqlClient } from '@/hooks';
 const ruleData: IRuleData[] = [
   {
     title: '发布日期统计',
@@ -28,8 +35,159 @@ const ruleData: IRuleData[] = [
     ],
   },
 ];
-const ProductOnlineEmergencyRate: React.FC<any> = () => {
-  return <IStaticPerformance ruleData={ruleData} request={StatisticServices.onlineEmergency} />;
+
+const ProductOnlineEmergencyRate: React.FC = () => {
+  const client = useGqlClient();
+  const gridRef = useRef<GridApi>();
+  const [catagory, setCatagory] = useState<'month' | 'quarter'>('month');
+  const [visible, setVisible] = useState(false);
+  const [data, setData] = useState<any[]>([]);
+  const [columns, setColums] = useState<any[]>([]);
+  const onGridReady = (params: GridReadyEvent) => {
+    gridRef.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  const mock = [
+    {
+      range: {
+        start: '2022-09-01',
+        end: '2022-09-30',
+      },
+      datas: [],
+    },
+    {
+      range: {
+        start: '2022-08-01',
+        end: '2022-08-31',
+      },
+      datas: [
+        {
+          date: '2022-08-25',
+          storyNum: 1,
+          recordNum: 2524,
+        },
+      ],
+    },
+    {
+      range: {
+        start: '2022-07-01',
+        end: '2022-07-31',
+      },
+      datas: [
+        {
+          date: '2022-07-22',
+          storyNum: 2,
+          recordNum: 2865,
+        },
+        {
+          date: '2022-07-14',
+          storyNum: 3,
+          recordNum: 2986,
+        },
+      ],
+    },
+  ];
+
+  const rowData = mock.map((it) =>
+    it.datas.map((child) => ({
+      date: child.date,
+      [child.date]: (child.storyNum ?? 0 / child.recordNum ?? 0) * 100,
+    })),
+  );
+
+  const formatColumn = (data: any) => {
+    // 最近两个季度
+    if (catagory == 'quarter') {
+      return data.map((it) => ({
+        headerName: `${moment(it.range.start).format('YYYY')}Q${moment(it.range.start).quarter()}`,
+        children: it.datas.map((child: any, index: number) => ({
+          columnGroupShow: (it.datas.length ?? 0) / 2 > index ? 'open' : 'closed',
+          field: child.date,
+          headerName: moment(child.date).format('YYYYMMDD'),
+        })),
+      }));
+    }
+    return data.map((it) => ({
+      headerName: moment(it.range.start).format('YYYY年MM月'),
+      children: it.datas?.map((child: any, index: number) => ({
+        columnGroupShow: (it.datas?.length ?? 0) / 2 > index ? 'open' : 'closed',
+        field: child.date,
+        headerName: moment(child.date).format('YYYYMMDD'),
+      })),
+    }));
+  };
+
+  const getTableSource = async () => {
+    const ends = catagory == 'month' ? getTwelveMonthTime(3) : getFourQuarterTime(false, 6);
+    const { loading, data } = await StatisticServices.onlineEmergency({
+      client,
+      params: {
+        kind: catagory == 'month' ? 2 : 1,
+        ends: JSON.stringify(ends?.map((it) => it.end)),
+      },
+    });
+    setColums(formatColumn(data));
+    setData(
+      data
+        ?.map((it: any) =>
+          it.datas.map((child: any) => ({
+            date: child.date,
+            [child.date]: (child.storyNum ?? 0 / child.recordNum ?? 0) * 100,
+          })),
+        )
+        .flat(),
+    );
+  };
+
+  useEffect(() => {
+    getTableSource();
+  }, [catagory]);
+
+  return (
+    <PageContainer>
+      <div style={{ background: 'white' }}>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<CalendarTwoTone />}
+          size={'large'}
+          onClick={() => setCatagory('month')}
+        >
+          按月统计
+        </Button>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<ScheduleTwoTone />}
+          size={'large'}
+          onClick={() => setCatagory('quarter')}
+        >
+          按季统计
+        </Button>
+        <label style={{ fontWeight: 'bold' }}>(统计单位：%)</label>
+        <Button
+          type="text"
+          style={{ color: '#1890FF', float: 'right' }}
+          icon={<QuestionCircleTwoTone />}
+          size={'large'}
+          onClick={() => setVisible(true)}
+        >
+          计算规则
+        </Button>
+      </div>
+      <div className={'ag-theme-alpine'} style={{ width: '100%', height: 500 }}>
+        <AgGridReact
+          columnDefs={columns}
+          rowData={data}
+          defaultColDef={{ sortable: true, resizable: true, filter: true }}
+          rowHeight={32}
+          headerHeight={35}
+          onGridReady={onGridReady}
+        />
+      </div>
+    </PageContainer>
+  );
 };
 
 export default ProductOnlineEmergencyRate;

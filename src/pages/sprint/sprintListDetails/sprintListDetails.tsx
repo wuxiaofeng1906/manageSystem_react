@@ -1413,7 +1413,7 @@ const SprintList: React.FC<any> = () => {
           <Button
             onClick={() => {
               Modal.confirm({
-                width: 350,
+                width: 380,
                 centered: true,
                 icon: <div />,
                 bodyStyle: { margin: 0 },

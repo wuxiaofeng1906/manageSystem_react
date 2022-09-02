@@ -90,7 +90,8 @@ const grayscaleBacklogList = (type: string, isPreStatus: boolean) => {
 };
 
 // 正式发布列表
-const releasedList = () => {
+const releasedList = (type: 'online' | 'gray' = 'online') => {
+  const flag = type == 'gray';
   const columns: any = [
     {
       headerName: '序号',
@@ -101,7 +102,7 @@ const releasedList = () => {
       },
     },
     {
-      headerName: '正式发布批次号',
+      headerName: `${flag ? '灰度' : '正式'}发布批次号`,
       field: 'online_release_num',
       minWidth: 130,
       maxWidth: 150,
@@ -115,6 +116,7 @@ const releasedList = () => {
       headerName: '灰度发布编号',
       field: 'ready_release_num',
       minWidth: 145,
+      hide: flag,
       cellRenderer: (params: any) => {
         const { value } = params;
         if (!value || value.length === 0) {
@@ -161,14 +163,14 @@ const releasedList = () => {
       minWidth: 90,
     },
     {
-      headerName: '正式发布时间',
+      headerName: `${flag ? '' : '正式'}发布时间`,
       field: 'plan_release_time',
     },
     {
       headerName: '操作',
       cellRenderer: 'officialReleaseDetails',
-      minWidth: 120,
-      maxWidth: 140,
+      minWidth: flag ? 100 : 120,
+      maxWidth: flag ? 120 : 140,
     },
   ];
   return columns;

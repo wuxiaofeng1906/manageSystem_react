@@ -53,6 +53,7 @@ const ReleaseHistory: React.FC<any> = () => {
     firstGrid: 100,
     peddingGrid: 100,
     formalGrid: 100,
+    grayFailGrid: 100,
   });
 
   /* region 灰度发布界面 */
@@ -221,6 +222,7 @@ const ReleaseHistory: React.FC<any> = () => {
   // 跳转到发布过程详情页面
   const gotoGrayReleasePage = (releData: any) => {
     const releasedNum = releData.data?.ready_release_num;
+    debugger;
     history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
   };
 
@@ -355,12 +357,19 @@ const ReleaseHistory: React.FC<any> = () => {
     releasedGridApi.current = params.api;
     params.api.sizeColumnsToFit();
   };
+  //灰度发布失败列表
+  const grayFailRef = useRef<GridApi>();
+  const onGrayFailReady = (params: GridReadyEvent) => {
+    grayFailRef.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
 
   // 项目名称
   const projectsArray = useRequest(() => loadPrjNameSelect()).data;
 
   // 正式发布列表数据
   const formalReleasedData = useRequest(() => getFormalListData(formalQueryCondition)).data;
+  const grayPublishData = useRequest(() => getFormalListData(formalQueryCondition)).data;
 
   // 根据查询条件获取数据
   const getReleasedList = async () => {
@@ -534,6 +543,14 @@ const ReleaseHistory: React.FC<any> = () => {
       });
     }
   }, [peddingPublishData]);
+  useEffect(() => {
+    if (peddingPublishData?.data) {
+      setGridHeight({
+        ...gridHeight,
+        formalReleasedData: (peddingPublishData?.data).length * 30 + 80,
+      });
+    }
+  }, [grayPublishData]);
 
   return (
     <PageContainer>
@@ -791,6 +808,66 @@ const ReleaseHistory: React.FC<any> = () => {
               },
             }}
           ></AgGridReact>
+        </div>
+      </div>
+      {/*灰度发布失败列表*/}
+      <div style={{ marginTop: 20 }}>
+        <div style={gridHeadDivStyle}>
+          <label style={{ fontWeight: 'bold', float: 'left' }}>灰度发布失败列表</label>
+          <div style={{ textAlign: 'right' }}>
+            <label> 发布项目:</label>
+            <Select
+              size={'small'}
+              showSearch
+              mode="multiple"
+              onChange={onProjectChanged}
+              style={{ minWidth: 300, marginLeft: 5 }}
+              options={projectsArray}
+            />
+            <label style={{ marginLeft: 10 }}>发布时间: </label>
+            <RangePicker
+              style={{ marginLeft: 5 }}
+              size={'small'}
+              defaultValue={[moment(formalQueryCondition.start), moment(formalQueryCondition.end)]}
+              onChange={onReleaseProject}
+            />
+          </div>
+        </div>
+        <div
+          className="ag-theme-alpine init-agGrid"
+          style={{ height: gridHeight.grayFailGrid, width: '100%' }}
+        >
+          <AgGridReact
+            columnDefs={releasedList('gray')} // 定义列
+            rowData={grayPublishData?.data} // 数据绑定
+            defaultColDef={girdDefaultSetting}
+            rowHeight={30}
+            headerHeight={35}
+            suppressRowTransform={true}
+            onGridReady={onGrayFailReady}
+            // onColumnEverythingChanged={onGrayFailReady}
+            frameworkComponents={{
+              officialReleaseDetails: (params: any) => {
+                return (
+                  <div>
+                    <Button
+                      className={'operateButton'}
+                      onClick={() => gotoFirstReleasePage(params)}
+                      // gotoFirstReleasePage// online_release_num
+                    >
+                      <img
+                        src={'../gray_detail_normal.png'}
+                        width="20"
+                        height="20"
+                        alt="0级灰度发布详情"
+                        title="0级灰度发布详情"
+                      />
+                    </Button>
+                  </div>
+                );
+              },
+            }}
+          />
         </div>
       </div>
 

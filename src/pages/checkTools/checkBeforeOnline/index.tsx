@@ -478,7 +478,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
       params.push(
         { name: 'InclusionCheckFlag', value: modalData.branch_check },
-        { name: 'MainBranch', value: mainBranch },
+        { name: 'MainBranch', value: mainBranch?.join(',') },
         { name: 'technicalSide', value: teachnicalSide },
         { name: 'TargetBranch', value: target_branch },
         { name: 'MainSince', value: dayjs(modalData.branch_mainSince).format('YYYY-MM-DD') },

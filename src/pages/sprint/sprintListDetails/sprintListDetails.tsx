@@ -1416,9 +1416,8 @@ const SprintList: React.FC<any> = () => {
                 width: 350,
                 className: 'sprintModal',
                 icon: <div />,
-                bodyStyle: { margin: 0, right: 0 },
                 closable: true,
-                okButtonProps: { style: { display: 'none', margin: 0 } },
+                okButtonProps: { style: { display: 'none' } },
                 cancelButtonProps: { style: { display: 'none' } },
                 content: (
                   <img

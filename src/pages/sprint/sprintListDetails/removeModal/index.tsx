@@ -229,9 +229,9 @@ const RemoveModal = (
     const currentIndex = props.sprintProject?.findIndex(
       (it) => String(it.rpId) == String(query.projectid),
     );
-    // 下一个班车所属执行 需判断类型
+    // 下一个班车所属执行 需判断类型 (接口是按日期降序)
     let nextProject: any = {};
-    for (let i = currentIndex - 1; i > 0; i--) {
+    for (let i = currentIndex - 1; i >= 0; i--) {
       if (props.sprintProject[i].category == props.sprintProject[currentIndex]?.category) {
         nextProject = props.sprintProject[i];
         break;

@@ -163,37 +163,51 @@ const IStaticPerformance: React.FC<IStatic> = ({
           />
         )}
       </div>
-      <Drawer
-        title={<label style={{ fontWeight: 'bold', fontSize: 20 }}>计算规则</label>}
-        placement="right"
-        width={300}
-        closable={false}
-        onClose={() => setVisible(false)}
-        visible={visible}
-      >
-        {ruleData.map((it, i) => (
-          <div key={i}>
-            {isString(it.title)
-              ? it.title && <p style={{ fontWeight: 'bold' }}>{`${i + 1}.${it.title}:`}</p>
-              : it.title}
-            {it.child?.map((v) =>
-              isString(v) ? <p style={{ textIndent: '2em', margin: '5px 0' }}>{`${v};`}</p> : v,
-            )}
-            {!isEmpty(it.table) && (
-              <Table
-                style={{ wordBreak: 'keep-all' }}
-                dataSource={it.table?.dataSource}
-                columns={it.table?.column}
-                pagination={false}
-                scroll={{ x: 300 }}
-                bordered
-              />
-            )}
-          </div>
-        ))}
-      </Drawer>
+      <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData} />
     </PageContainer>
   );
 };
 
 export default IStaticPerformance;
+
+export const IDrawer = ({
+  visible,
+  setVisible,
+  ruleData,
+}: {
+  visible: boolean;
+  setVisible: (v: boolean) => void;
+  ruleData: IRuleData[];
+}) => {
+  return (
+    <Drawer
+      title={<label style={{ fontWeight: 'bold', fontSize: 20 }}>计算规则</label>}
+      placement="right"
+      width={300}
+      closable={false}
+      onClose={() => setVisible(false)}
+      visible={visible}
+    >
+      {ruleData.map((it, i) => (
+        <div key={i}>
+          {isString(it.title)
+            ? it.title && <p style={{ fontWeight: 'bold' }}>{`${i + 1}.${it.title}:`}</p>
+            : it.title}
+          {it.child?.map((v) =>
+            isString(v) ? <p style={{ textIndent: '2em', margin: '5px 0' }}>{`${v};`}</p> : v,
+          )}
+          {!isEmpty(it.table) && (
+            <Table
+              style={{ wordBreak: 'keep-all' }}
+              dataSource={it.table?.dataSource}
+              columns={it.table?.column}
+              pagination={false}
+              scroll={{ x: 300 }}
+              bordered
+            />
+          )}
+        </div>
+      ))}
+    </Drawer>
+  );
+};

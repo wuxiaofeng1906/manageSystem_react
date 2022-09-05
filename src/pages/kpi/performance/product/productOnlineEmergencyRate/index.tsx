@@ -9,6 +9,9 @@ import { Button } from 'antd';
 import { CalendarTwoTone, QuestionCircleTwoTone, ScheduleTwoTone } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import { useGqlClient } from '@/hooks';
+import { IDrawer } from '@/components/IStaticPerformance';
+import { isEmpty } from 'lodash';
+
 const ruleData: IRuleData[] = [
   {
     title: '发布日期统计',
@@ -42,101 +45,49 @@ const ProductOnlineEmergencyRate: React.FC = () => {
   const [catagory, setCatagory] = useState<'month' | 'quarter'>('month');
   const [visible, setVisible] = useState(false);
   const [data, setData] = useState<any[]>([]);
-  const [columns, setColums] = useState<any[]>([]);
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
     params.api.sizeColumnsToFit();
   };
-
-  const mock = [
-    {
-      range: {
-        start: '2022-09-01',
-        end: '2022-09-30',
-      },
-      datas: [],
-    },
-    {
-      range: {
-        start: '2022-08-01',
-        end: '2022-08-31',
-      },
-      datas: [
-        {
-          date: '2022-08-25',
-          storyNum: 1,
-          recordNum: 2524,
-        },
-      ],
-    },
-    {
-      range: {
-        start: '2022-07-01',
-        end: '2022-07-31',
-      },
-      datas: [
-        {
-          date: '2022-07-22',
-          storyNum: 2,
-          recordNum: 2865,
-        },
-        {
-          date: '2022-07-14',
-          storyNum: 3,
-          recordNum: 2986,
-        },
-      ],
-    },
-  ];
-
-  const rowData = mock.map((it) =>
-    it.datas.map((child) => ({
-      date: child.date,
-      [child.date]: (child.storyNum ?? 0 / child.recordNum ?? 0) * 100,
-    })),
-  );
-
-  const formatColumn = (data: any) => {
-    // 最近两个季度
-    if (catagory == 'quarter') {
-      return data.map((it) => ({
-        headerName: `${moment(it.range.start).format('YYYY')}Q${moment(it.range.start).quarter()}`,
-        children: it.datas.map((child: any, index: number) => ({
-          columnGroupShow: index == 0 ? 'closed' : 'open',
-          field: child.date,
-          headerName: moment(child.date).format('YYYYMMDD'),
-        })),
-      }));
-    }
-    return data.map((it) => ({
-      headerName: moment(it.range.start).format('YYYY年MM月'),
-      children: it.datas?.map((child: any, index: number) => ({
-        // columnGroupShow: index == 0 ? 'closed' : 'open',
-        field: child.date,
-        headerName: moment(child.date).format('YYYYMMDD'),
-        filter: 'agNumberColumnFilter',
-      })),
-    }));
+  const getDate = () => {
+    const ends = catagory == 'month' ? getTwelveMonthTime(3) : getFourQuarterTime(false, 6);
+    const columns =
+      ends.map((it) => ({
+        subTitle: '',
+        total: '',
+        title:
+          catagory == 'quarter'
+            ? `${moment(it.end).format('YYYY')}Q${moment(it.end).quarter()}`
+            : moment(it.end).format('YYYY年MM月'),
+      })) ?? [];
+    return JSON.stringify(ends?.map((it) => it.end));
   };
 
   const getTableSource = async () => {
-    const ends = catagory == 'month' ? getTwelveMonthTime(3) : getFourQuarterTime(false, 6);
+    const ends = getDate();
     const { loading, data } = await StatisticServices.onlineEmergency({
       client,
       params: {
         kind: catagory == 'month' ? 2 : 1,
-        ends: JSON.stringify(ends?.map((it) => it.end)),
+        ends,
       },
     });
-    setColums(formatColumn(data));
     setData(
       data
-        ?.map((it: any) =>
-          it.datas.map((child: any) => ({
-            date: child.date,
-            [child.date]: (child.storyNum ?? 0 / child.recordNum ?? 0) * 100,
-          })),
-        )
+        ?.map((it: any) => {
+          const title =
+            catagory == 'quarter'
+              ? `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`
+              : moment(it.range.start).format('YYYY年MM月');
+
+          if (isEmpty(it.datas)) return { title: title, total: 0 };
+
+          return it.datas.map((child: any) => ({
+            subTitle: moment(child.date).format('YYYYMMDD'),
+            title: title,
+            total: child.storyNum ?? 0 / child.recordNum ?? 0 * 100,
+          }));
+        })
         .flat(),
     );
   };
@@ -177,16 +128,28 @@ const ProductOnlineEmergencyRate: React.FC = () => {
           计算规则
         </Button>
       </div>
-      <div className={'ag-theme-alpine'} style={{ width: '100%', height: 500 }}>
+      <div className={'ag-theme-alpine'} style={{ width: '100%', height: 400 }}>
         <AgGridReact
-          columnDefs={columns}
+          columnDefs={[
+            { field: 'total', aggFunc: 'sum', headerName: '总计' },
+            { field: 'title', enablePivot: true, pivot: true },
+            { field: 'subTitle', enablePivot: true, pivot: true },
+          ]}
           rowData={data}
-          defaultColDef={{ sortable: true, resizable: true, filter: true }}
+          defaultColDef={{
+            sortable: true,
+            resizable: true,
+            filter: true,
+            flex: 1,
+            minWidth: 100,
+          }}
           rowHeight={32}
           headerHeight={35}
           onGridReady={onGridReady}
+          pivotMode={true}
         />
       </div>
+      <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData} />
     </PageContainer>
   );
 };

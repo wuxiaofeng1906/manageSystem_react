@@ -201,7 +201,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: data.data, loading };
+    return { data: data.data };
   },
 };
 export default StatisticServices;

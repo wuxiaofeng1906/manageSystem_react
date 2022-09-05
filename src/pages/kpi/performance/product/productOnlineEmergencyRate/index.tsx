@@ -102,7 +102,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
       return data.map((it) => ({
         headerName: `${moment(it.range.start).format('YYYY')}Q${moment(it.range.start).quarter()}`,
         children: it.datas.map((child: any, index: number) => ({
-          columnGroupShow: (it.datas.length ?? 0) / 2 > index ? 'open' : 'closed',
+          columnGroupShow: index == 0 ? 'closed' : 'open',
           field: child.date,
           headerName: moment(child.date).format('YYYYMMDD'),
         })),
@@ -111,9 +111,10 @@ const ProductOnlineEmergencyRate: React.FC = () => {
     return data.map((it) => ({
       headerName: moment(it.range.start).format('YYYY年MM月'),
       children: it.datas?.map((child: any, index: number) => ({
-        columnGroupShow: (it.datas?.length ?? 0) / 2 > index ? 'open' : 'closed',
+        // columnGroupShow: index == 0 ? 'closed' : 'open',
         field: child.date,
         headerName: moment(child.date).format('YYYYMMDD'),
+        filter: 'agNumberColumnFilter',
       })),
     }));
   };

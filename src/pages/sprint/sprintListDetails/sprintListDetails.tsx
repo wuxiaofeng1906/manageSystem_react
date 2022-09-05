@@ -1096,7 +1096,12 @@ const SprintList: React.FC<any> = () => {
         !selected.every((it) => [1, 2].includes(Number(it.codeRevert)) && Number(it.testCheck) == 1)
       )
         return infoMessage('请勾选标识为开发已revert数据');
-      setDissatisfy(findDissatisfy?.map((it) => ({ ...it, targetPid: it.targetPid })));
+      setDissatisfy(
+        findDissatisfy?.map((it) => ({
+          ...it,
+          targetPno: it.targetPno, // 目标禅道id
+        })),
+      );
 
       // setFlowHitmessage({ hintMessage: '测试已验证revert' });
       // setIsFlowModalVisible(true);

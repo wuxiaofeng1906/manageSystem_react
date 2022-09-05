@@ -10,7 +10,7 @@ const SprintDetailServices = {
   },
   // 获取最近的班车执行
   async getNextSprint(params: any) {
-    return request('/api/sprint/project', { params });
+    return request('/api/sprint/project/notclosed', { params });
   },
   // 验证测试确认是否可修改
   async checkUpdateTest(params: any) {

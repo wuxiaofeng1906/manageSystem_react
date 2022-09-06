@@ -20,6 +20,7 @@ import {
   TreeSelect,
   Tooltip,
   Tag,
+  Popover,
 } from 'antd';
 import { formatMomentTime } from '@/publicMethods/timeMethods';
 import dayjs from 'dayjs';
@@ -33,15 +34,14 @@ import {
   SettingOutlined,
   ReloadOutlined,
   ClearOutlined,
-  ExclamationCircleOutlined,
-  InfoCircleOutlined,
+  // ExclamationCircleOutlined,
+  // InfoCircleOutlined,
 } from '@ant-design/icons';
 import {
   getProjectInfo,
   alayManagerData,
   defaultSelectParams,
   getRelatedPersonName,
-  stageType,
 } from './common';
 import { getStaticMessage, headerPath } from './header';
 import {
@@ -1096,7 +1096,12 @@ const SprintList: React.FC<any> = () => {
         !selected.every((it) => [1, 2].includes(Number(it.codeRevert)) && Number(it.testCheck) == 1)
       )
         return infoMessage('请勾选标识为开发已revert数据');
-      setDissatisfy(findDissatisfy?.map((it) => ({ ...it, targetPid: it.targetPid })));
+      setDissatisfy(
+        findDissatisfy?.map((it) => ({
+          ...it,
+          targetPno: it.targetPno, // 目标禅道id
+        })),
+      );
 
       // setFlowHitmessage({ hintMessage: '测试已验证revert' });
       // setIsFlowModalVisible(true);
@@ -1393,11 +1398,56 @@ const SprintList: React.FC<any> = () => {
     );
   }, [testSelectorDisabled, testConfirm]);
 
+  useEffect(() => {
+    Modal.destroyAll();
+  }, []);
+
+  const renderHeader = useMemo(() => {
+    return (
+      <div className={styles.header}>
+        <div className={styles.desc}>
+          {prjNames}
+          <div className={styles.tag}>
+            <label>班车背景色说明：</label>
+            <span>未基线</span>
+            <span>已基线</span>
+            <span>禅道已移除</span>
+          </div>
+        </div>
+        <div className={styles.sprintTip}>
+          <Button
+            onClick={() => {
+              Modal.confirm({
+                width: 350,
+                className: 'sprintModal',
+                icon: <div />,
+                closable: true,
+                okButtonProps: { style: { display: 'none' } },
+                cancelButtonProps: { style: { display: 'none' } },
+                content: (
+                  <img
+                    style={{ width: '100%' }}
+                    src={require('../../../../public/sprintBashLine.png')}
+                  />
+                ),
+              });
+            }}
+          >
+            基线标准
+          </Button>
+          <Button onClick={() => window.open('https://shimo.im/docs/sEdSfMC9sXImA0wZ')}>
+            班车流程
+          </Button>
+        </div>
+      </div>
+    );
+  }, []);
+
   return (
     <div style={{ width: '100%', marginTop: '-30px' }} className={styles.sprintListDetails}>
       <PageHeader
         ghost={false}
-        title={prjNames}
+        title={renderHeader}
         style={{ height: '85px' }}
         breadcrumbRender={() => {
           return <Breadcrumb>{headerPath}</Breadcrumb>;
@@ -2076,7 +2126,7 @@ const SprintList: React.FC<any> = () => {
                 >
                   {[
                     <Option key={'集群0'} value={'集群0'}>
-                      集群1
+                      集群0
                     </Option>,
                     <Option key={'集群1'} value={'集群1'}>
                       集群1
@@ -2449,7 +2499,7 @@ const SprintList: React.FC<any> = () => {
                 >
                   {[
                     <Option key={'集群0'} value={'集群0'}>
-                      集群1
+                      集群0
                     </Option>,
                     <Option key={'集群1'} value={'集群1'}>
                       集群1

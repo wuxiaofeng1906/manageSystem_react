@@ -24,6 +24,7 @@ import { errorMessage, sucMessage } from '@/publicMethods/showMessages';
 import { gridHeadDivStyle, girdDefaultSetting } from './commonSetting';
 import './style.css';
 import { Link } from 'umi';
+import PreReleaseServices from '@/services/preRelease';
 
 const RangePicker: any = DatePicker.RangePicker;
 
@@ -222,7 +223,6 @@ const ReleaseHistory: React.FC<any> = () => {
   // 跳转到发布过程详情页面
   const gotoGrayReleasePage = (releData: any) => {
     const releasedNum = releData.data?.ready_release_num;
-    debugger;
     history.push(`/onDutyAndRelease/preRelease?releasedNum=${releasedNum}&history=true`);
   };
 
@@ -359,6 +359,7 @@ const ReleaseHistory: React.FC<any> = () => {
   };
   //灰度发布失败列表
   const grayFailRef = useRef<GridApi>();
+  const [grayFailList, setGrayFailList] = useState<any[]>([]);
   const onGrayFailReady = (params: GridReadyEvent) => {
     grayFailRef.current = params.api;
     params.api.sizeColumnsToFit();
@@ -369,7 +370,6 @@ const ReleaseHistory: React.FC<any> = () => {
 
   // 正式发布列表数据
   const formalReleasedData = useRequest(() => getFormalListData(formalQueryCondition)).data;
-  const grayPublishData = useRequest(() => getFormalListData(formalQueryCondition)).data;
 
   // 根据查询条件获取数据
   const getReleasedList = async () => {
@@ -543,14 +543,24 @@ const ReleaseHistory: React.FC<any> = () => {
       });
     }
   }, [peddingPublishData]);
+
   useEffect(() => {
     if (peddingPublishData?.data) {
       setGridHeight({
         ...gridHeight,
-        formalReleasedData: (peddingPublishData?.data).length * 30 + 80,
+        grayFailGrid: grayFailList.length * 30 + 80,
       });
     }
-  }, [grayPublishData]);
+  }, [grayFailList]);
+
+  const requestGrayFailList = async () => {
+    const data = await PreReleaseServices.getGrayFailList({ release_type: 'zero' });
+    setGrayFailList(data);
+  };
+
+  useEffect(() => {
+    requestGrayFailList();
+  }, []);
 
   return (
     <PageContainer>
@@ -839,13 +849,12 @@ const ReleaseHistory: React.FC<any> = () => {
         >
           <AgGridReact
             columnDefs={releasedList('gray')} // 定义列
-            rowData={grayPublishData?.data} // 数据绑定
+            rowData={grayFailList} // 数据绑定
             defaultColDef={girdDefaultSetting}
             rowHeight={30}
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onGrayFailReady}
-            // onColumnEverythingChanged={onGrayFailReady}
             frameworkComponents={{
               officialReleaseDetails: (params: any) => {
                 return (

@@ -835,7 +835,7 @@ const ReleaseHistory: React.FC<any> = () => {
         </div>
       </div>
       {/*灰度发布失败列表*/}
-      <div style={{ marginTop: 20 }}>
+      <div style={{ marginTop: 40 }}>
         <div
           style={{
             ...gridHeadDivStyle,

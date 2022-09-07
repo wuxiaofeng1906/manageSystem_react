@@ -15,7 +15,7 @@ import {
   getZeroGrayscaleListData,
 } from './axiosRequest/apiPage';
 import { history } from '@@/core/history';
-import { Button, DatePicker, Select, Popconfirm, Modal } from 'antd';
+import { Button, DatePicker, Select, Popconfirm, Modal, Form } from 'antd';
 import { loadPrjNameSelect } from '@/pages/onDutyAndRelease/preRelease/comControl/controler';
 import dayjs from 'dayjs';
 import moment from 'moment';
@@ -25,6 +25,7 @@ import { gridHeadDivStyle, girdDefaultSetting } from './commonSetting';
 import './style.css';
 import { Link } from 'umi';
 import PreReleaseServices from '@/services/preRelease';
+import { isEmpty } from 'lodash';
 
 const RangePicker: any = DatePicker.RangePicker;
 
@@ -359,6 +360,7 @@ const ReleaseHistory: React.FC<any> = () => {
   };
   //灰度发布失败列表
   const grayFailRef = useRef<GridApi>();
+  const [grayFailForm] = Form.useForm();
   const [grayFailList, setGrayFailList] = useState<any[]>([]);
   const onGrayFailReady = (params: GridReadyEvent) => {
     grayFailRef.current = params.api;
@@ -554,11 +556,23 @@ const ReleaseHistory: React.FC<any> = () => {
   }, [grayFailList]);
 
   const requestGrayFailList = async () => {
-    const data = await PreReleaseServices.getGrayFailList({ release_type: 'zero' });
+    const values = grayFailForm.getFieldsValue();
+    if (!isEmpty(values.time)) {
+      values.start = moment(values.time[0]).format('YYYY-MM-DD HH:mm:ss');
+      values.end = moment(values.time[1]).format('YYYY-MM-DD HH:mm:ss');
+    }
+    const data = await PreReleaseServices.getGrayFailList({
+      project_ids: values.project_ids?.join() ?? '',
+      start_time: values.start ?? '',
+      end_time: values.end ?? '',
+    });
     setGrayFailList(data);
   };
 
   useEffect(() => {
+    grayFailForm.setFieldsValue({
+      time: [moment().subtract(7, 'day'), moment().add(7, 'day')],
+    });
     requestGrayFailList();
   }, []);
 
@@ -822,26 +836,33 @@ const ReleaseHistory: React.FC<any> = () => {
       </div>
       {/*灰度发布失败列表*/}
       <div style={{ marginTop: 20 }}>
-        <div style={gridHeadDivStyle}>
-          <label style={{ fontWeight: 'bold', float: 'left' }}>灰度发布失败列表</label>
-          <div style={{ textAlign: 'right' }}>
-            <label> 发布项目:</label>
-            <Select
-              size={'small'}
-              showSearch
-              mode="multiple"
-              onChange={onProjectChanged}
-              style={{ minWidth: 300, marginLeft: 5 }}
-              options={projectsArray}
-            />
-            <label style={{ marginLeft: 10 }}>发布时间: </label>
-            <RangePicker
-              style={{ marginLeft: 5 }}
-              size={'small'}
-              defaultValue={[moment(formalQueryCondition.start), moment(formalQueryCondition.end)]}
-              onChange={onReleaseProject}
-            />
-          </div>
+        <div
+          style={{
+            ...gridHeadDivStyle,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <label style={{ fontWeight: 'bold' }}>灰度发布失败列表</label>
+          <Form
+            form={grayFailForm}
+            layout={'inline'}
+            size={'small'}
+            onFieldsChange={(v) => requestGrayFailList()}
+          >
+            <Form.Item label={'发布项目'} name={'project_ids'}>
+              <Select
+                showSearch
+                mode="multiple"
+                options={projectsArray}
+                style={{ minWidth: 300 }}
+              />
+            </Form.Item>
+            <Form.Item label={'发布时间'} name={'time'} style={{ marginRight: 0 }}>
+              <RangePicker format={'YYYY-MM-DD'} />
+            </Form.Item>
+          </Form>
         </div>
         <div
           className="ag-theme-alpine init-agGrid"
@@ -855,14 +876,25 @@ const ReleaseHistory: React.FC<any> = () => {
             headerHeight={35}
             suppressRowTransform={true}
             onGridReady={onGrayFailReady}
+            onRowDataChanged={onGrayFailReady}
             frameworkComponents={{
               officialReleaseDetails: (params: any) => {
+                const type = params.data.release_type;
                 return (
                   <div>
                     <Button
                       className={'operateButton'}
-                      onClick={() => gotoFirstReleasePage(params)}
-                      // gotoFirstReleasePage// online_release_num
+                      onClick={() => {
+                        if (type == 'zero') {
+                          history.push(
+                            `/onDutyAndRelease/preRelease?releasedNum=${params.data.release_gray_num}&history=true`,
+                          );
+                        } else if (type == 'one') {
+                          history.push(
+                            `/onDutyAndRelease/officialRelease?releaseType=gray&onlineReleaseNum=${params.data.release_gray_num}&history=true`,
+                          );
+                        }
+                      }}
                     >
                       <img
                         src={'../gray_detail_normal.png'}

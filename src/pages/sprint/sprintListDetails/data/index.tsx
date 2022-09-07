@@ -320,6 +320,7 @@ const queryDevelopViews = async (
             codeRevert
             notrevertMemo
             targetPno
+            revertActor
           }
       }
   `);

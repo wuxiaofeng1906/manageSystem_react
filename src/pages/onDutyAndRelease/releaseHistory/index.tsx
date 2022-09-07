@@ -900,8 +900,8 @@ const ReleaseHistory: React.FC<any> = () => {
                         src={'../gray_detail_normal.png'}
                         width="20"
                         height="20"
-                        alt="0级灰度发布详情"
-                        title="0级灰度发布详情"
+                        alt={`${type == 'zero' ? 0 : 1}级灰度发布详情`}
+                        title={`${type == 'zero' ? 0 : 1}级灰度发布详情`}
                       />
                     </Button>
                   </div>

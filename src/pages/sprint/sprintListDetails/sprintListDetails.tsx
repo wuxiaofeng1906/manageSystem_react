@@ -1764,7 +1764,7 @@ const SprintList: React.FC<any> = () => {
                             : 'none',
                       }}
                     >
-                      开发已revert
+                      {params.data.revertActor ?? ''}已revert
                     </Tag>
                     <span
                       style={{

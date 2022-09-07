@@ -48,6 +48,7 @@ export const DissatisfyModal = (
   },
 ) => {
   const query = useLocation()?.query;
+
   const [loading, setLoading] = useState(false);
   // 移除
   const onConfirm = async (item: any) => {
@@ -59,7 +60,6 @@ export const DissatisfyModal = (
         String(item?.targetPno)?.indexOf('_') != -1
           ? +item.targetPno.split('_')[1]
           : +item.targetPno;
-
       if (isTagData && props.isTester != true) {
         await SprintDetailServices.removeTag({
           datas: [
@@ -84,6 +84,7 @@ export const DissatisfyModal = (
               rdId: item.id,
               category: String(Math.abs(Number(item.category))),
               targetO: { ztNo: targetZtNo },
+              revertActor: item.revertActor ?? '',
             },
           ],
         });
@@ -275,6 +276,7 @@ const RemoveModal = (
         relatedStories: it.relatedStories,
         relatedTasks: it.relatedTasks,
         relatedBugs: it.relatedBugs,
+        revertActor: it.revertActor ?? '',
         flag: ['1', '-3'].includes(it.category)
           ? [1, 2].includes(it.stage)
             ? true
@@ -311,6 +313,7 @@ const RemoveModal = (
             category: String(Math.abs(Number(it.category))),
             codeRevert: it.codeRevert,
             targetO: { ztNo: Number(it.targetPno.split('_')[1]) },
+            revertActor: it?.revertActor ?? '',
           })),
           projectO: {
             rdId: Number(query?.projectid ?? 0),

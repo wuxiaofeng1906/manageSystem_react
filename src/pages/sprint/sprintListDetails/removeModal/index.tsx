@@ -19,7 +19,7 @@ import type { ColumnsType } from 'antd/lib/table';
 import { getDeptMemner } from '@/pages/sprint/sprintListDetails/data';
 import { useGqlClient } from '@/hooks/index';
 import { isEmpty, pick } from 'lodash';
-import { useLocation } from 'umi';
+import { useLocation, useModel } from 'umi';
 import { stageType } from '@/pages/sprint/sprintListDetails/common';
 import styles from '../sprintListDetails.less';
 import SprintDetailServices from '@/services/sprintDetail';
@@ -48,6 +48,8 @@ export const DissatisfyModal = (
   },
 ) => {
   const query = useLocation()?.query;
+  const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
+
   const [loading, setLoading] = useState(false);
   // 移除
   const onConfirm = async (item: any) => {
@@ -84,6 +86,7 @@ export const DissatisfyModal = (
               rdId: item.id,
               category: String(Math.abs(Number(item.category))),
               targetO: { ztNo: targetZtNo },
+              revertActor: user?.name ?? '',
             },
           ],
         });
@@ -191,6 +194,7 @@ const RemoveModal = (
   const selected = props.gridRef.current?.getSelectedRows();
   const client = useGqlClient();
   const [form] = Form.useForm();
+  const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [testUser, setTestUser] = useState<any[]>([]);
   const [source, setSource] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -311,6 +315,7 @@ const RemoveModal = (
             category: String(Math.abs(Number(it.category))),
             codeRevert: it.codeRevert,
             targetO: { ztNo: Number(it.targetPno.split('_')[1]) },
+            revertActor: user?.name ?? '',
           })),
           projectO: {
             rdId: Number(query?.projectid ?? 0),

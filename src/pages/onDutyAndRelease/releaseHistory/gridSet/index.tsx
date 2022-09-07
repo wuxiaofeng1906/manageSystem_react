@@ -103,7 +103,7 @@ const releasedList = (type: 'online' | 'gray' = 'online') => {
     },
     {
       headerName: `${flag ? '灰度' : '正式'}发布批次号`,
-      field: 'online_release_num',
+      field: flag ? 'release_gray_num' : 'online_release_num',
       minWidth: 130,
       maxWidth: 150,
     },

@@ -562,7 +562,7 @@ const ReleaseHistory: React.FC<any> = () => {
       values.end = moment(values.time[1]).format('YYYY-MM-DD HH:mm:ss');
     }
     const data = await PreReleaseServices.getGrayFailList({
-      project_ids: values.project_ids?.join() ?? '',
+      project_ids: values.project_ids?.map((it: string) => it.split('&')[1])?.join(',') ?? '',
       start_time: values.start ?? '',
       end_time: values.end ?? '',
     });

@@ -1,11 +1,6 @@
 import { message } from 'antd';
 
-const serverConfirmJudge = (
-  currentOperateStatus: any,
-  props: any,
-  autoHitMessage: any,
-  flag: boolean,
-) => {
+const serverConfirmJudge = (currentOperateStatus: any, props: any, autoHitMessage: any) => {
   // 判断发布是否已完成，已完成不能修改
   if (currentOperateStatus) {
     message.error({
@@ -20,7 +15,7 @@ const serverConfirmJudge = (
 
   // 需要判断前后端和流程的数据是否确认，只有都确认了测试才能确认（如果不涉及某一段的，就跳过那一段）
   const confirmData = props?.data;
-  if (props.column.colId === 'test_confirm_status' && flag) {
+  if (props.column.colId === 'test_confirm_status') {
     if (
       confirmData.front_confirm_status === '2' ||
       confirmData.back_end_confirm_status === '2' ||

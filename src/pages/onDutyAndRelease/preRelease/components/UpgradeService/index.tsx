@@ -475,8 +475,9 @@ const UpgradeService: React.FC<any> = () => {
       props,
       formUpgradeService.getFieldValue('hitMessage'),
     );
-    if (testCheckEnv && checkDeveloper) infoMessage('step4 中上线环境未填写，不能修改服务已确认！');
-    if (!checkDeveloper || testCheckEnv) {
+    if (testCheckEnv && checkDeveloper && newValue == '1')
+      infoMessage('step4 中上线环境未填写，不能修改服务已确认！');
+    if (!checkDeveloper || (testCheckEnv && newValue == '1')) {
       // (不管成功或者失败)刷新表格
       const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
       serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据

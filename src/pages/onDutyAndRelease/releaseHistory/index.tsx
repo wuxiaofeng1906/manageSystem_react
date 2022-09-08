@@ -55,7 +55,7 @@ const ReleaseHistory: React.FC<any> = () => {
     firstGrid: 100,
     peddingGrid: 100,
     formalGrid: 100,
-    grayFailGrid: 100,
+    grayFailGrid: 200,
   });
 
   /* region 灰度发布界面 */
@@ -553,7 +553,7 @@ const ReleaseHistory: React.FC<any> = () => {
         grayFailGrid: grayFailList.length * 30 + 80,
       });
     }
-  }, [grayFailList]);
+  }, [JSON.stringify(grayFailList)]);
 
   const requestGrayFailList = async () => {
     const values = grayFailForm.getFieldsValue();

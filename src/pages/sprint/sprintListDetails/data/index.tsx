@@ -319,7 +319,8 @@ const queryDevelopViews = async (
             pushCode
             codeRevert
             notrevertMemo
-            targetPid
+            targetPno
+            revertActor
           }
       }
   `);

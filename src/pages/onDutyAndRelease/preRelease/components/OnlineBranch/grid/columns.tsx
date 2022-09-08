@@ -264,7 +264,9 @@ const beforeOnlineVersionCheck = (params: any) => {
           </div>
           <div style="width: 210px">
               <div style="font-size: 10px;line-height: 20px;">
-                  <div>${side} <button style="text-align: left;margin-left: -10px; color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
+                  <div> <span style="color:${
+                    side == '忽略' ? 'blue' : 'black'
+                  }">${side}</span> <button style="text-align: left;margin-left: -10px; color: ${frontColor};width: 40px;border: none;background-color: transparent"> ${result}</button>
                   <lable style="margin-left: -20px">${timeRange}</lable>
                   </div>
               </div>

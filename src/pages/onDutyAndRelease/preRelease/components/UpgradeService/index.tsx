@@ -474,6 +474,7 @@ const UpgradeService: React.FC<any> = () => {
       currentOperateStatus,
       props,
       formUpgradeService.getFieldValue('hitMessage'),
+      newValue == '1',
     );
     if (testCheckEnv && checkDeveloper && newValue == '1')
       infoMessage('step4 中上线环境未填写，不能修改服务已确认！');

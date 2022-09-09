@@ -431,7 +431,6 @@ const ReleaseHistory: React.FC<any> = () => {
         releasedNums.forEach((reInfo: any) => {
           detailsLinks.push(
             <p>
-              {' '}
               {reInfo.ready_release_name}:
               <Link
                 to={`/onDutyAndRelease/preRelease?releasedNum=${reInfo.ready_release_num}&history=true`}
@@ -449,7 +448,6 @@ const ReleaseHistory: React.FC<any> = () => {
         releasedNums.forEach((reInfo: any) => {
           detailsLinks.push(
             <p>
-              {' '}
               {reInfo.release_gray_name}:
               <Link
                 to={`/onDutyAndRelease/officialRelease?releaseType=gray&onlineReleaseNum=${reInfo.release_gray_num}&history=true`}

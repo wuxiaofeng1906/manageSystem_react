@@ -285,7 +285,14 @@ const PreRelease: React.FC<any> = () => {
     <PageContainer style={{ backgroundColor: 'white' }}>
       <Spin spinning={loading || globalLoading} tip={'数据加载中...'}>
         <Tab />
-        <CheckProgress />
+        <CheckProgress
+          refreshPage={async () => {
+            setGlobalLoading(true);
+            const datas = await alalysisInitData('', '');
+            showPageInitData(datas, true);
+            setGlobalLoading(false);
+          }}
+        />
         <PreReleaseProject />
         <OnlineBranch />
         <DataRepaireReview />

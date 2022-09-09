@@ -13,7 +13,7 @@ import { checkOnlineEnvSource } from '@/pages/onDutyAndRelease/preRelease/datas/
 
 const { Option } = Select;
 
-const CheckProgress: React.FC<any> = () => {
+const CheckProgress: React.FC<{ refreshPage: Function }> = ({ refreshPage }) => {
   // 获取当前页面的进度数据
   const { tabsData, processStatus, modifyProcessStatus, operteStatus, releaseItem, upgradeApi } =
     useModel('releaseProcess');
@@ -130,6 +130,7 @@ const CheckProgress: React.FC<any> = () => {
           result: '',
           show: false,
         });
+        refreshPage?.();
       } else {
         errorMessage(result.toString());
       }

@@ -463,30 +463,37 @@ const UpgradeService: React.FC<any> = () => {
 
   // 下拉框选择是否确认事件
   const saveUperConfirmInfo = async (newValue: string, props: any, checkStepFourSource = false) => {
+    const isOk = newValue == '1'; // 当前测试修改确认状态为是
     const currentReleaseNum = props.data?.ready_release_num;
+    const testField = props.column.colId == 'test_confirm_status';
     // checkStepFourSource: 检查step 4的上线环境是否存在未填【1.填写了应用2.填写了升级接口】
-    // 验证是否可以修改确认值
 
-    // 测试确认服务 集群是否未填写
-    const testCheckEnv = checkStepFourSource && props.column.colId == 'test_confirm_status';
-    // 测试确认开发是否已确认
-    const checkDeveloper = serverConfirmJudge(
-      currentOperateStatus,
-      props,
-      formUpgradeService.getFieldValue('hitMessage'),
-      newValue == '1',
-    );
-    if (testCheckEnv && checkDeveloper && newValue == '1')
-      infoMessage('step4 中上线环境未填写，不能修改服务已确认！');
-    if (!checkDeveloper || (testCheckEnv && newValue == '1')) {
-      // (不管成功或者失败)刷新表格
-      const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
-      serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
-      serverConfirmGridApi2.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+    // 验证 集群是否未填写
+    const checkEnvIsEmpty = checkStepFourSource && testField;
 
-      return;
+    // 忽略检查 由【是】修改为【否】 不校验
+    const ignoreCheck = testField && !isOk;
+
+    if (!ignoreCheck) {
+      // 验证 开发是否已确认
+      const checkDeveloperHasFinish = serverConfirmJudge(
+        currentOperateStatus,
+        props,
+        formUpgradeService.getFieldValue('hitMessage'),
+      );
+      // 存在集群未填写 并开完均已确认 且测试修改为是
+      if (checkEnvIsEmpty && checkDeveloperHasFinish)
+        infoMessage('step4 中上线环境未填写，不能修改服务已确认！');
+
+      // 重置为初始状态（不更新确认状态）
+      if (!checkDeveloperHasFinish || checkEnvIsEmpty) {
+        // (不管成功或者失败)刷新表格
+        const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
+        serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+        serverConfirmGridApi2.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+        return;
+      }
     }
-
     const datas = {
       user_name: usersInfo.name,
       user_id: usersInfo.userid,

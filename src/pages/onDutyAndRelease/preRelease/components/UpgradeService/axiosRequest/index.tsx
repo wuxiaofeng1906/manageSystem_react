@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { getDutyPersonPermission, getSystemPersonPermission } from '../../../authority/permission';
 import { queryReleaseId } from '@/pages/onDutyAndRelease/preRelease/comControl/axiosRequest';
+import { isEmpty } from 'lodash';
 
 const sys_accessToken = localStorage.getItem('accessId');
 axios.defaults.headers.Authorization = `Bearer ${sys_accessToken}`;
@@ -109,7 +110,7 @@ const saveUpgradeItem = async (params: any) => {
 
 // 发布项的修改
 const upgradePulishItem = async (formData: any, currentListNo: string) => {
-  if (!formData.onlineEnv) {
+  if (isEmpty(formData.onlineEnv)) {
     return '上线环境不能为空！';
   }
   if (!formData.pulishItem) {

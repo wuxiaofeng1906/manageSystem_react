@@ -198,7 +198,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           });
         }
       } else {
-        saveReleaseInfo();
+        await saveReleaseInfo();
       }
       setDisabled(false);
 

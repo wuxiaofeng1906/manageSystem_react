@@ -89,9 +89,9 @@ const GrayScaleBugRate: React.FC = () => {
             return it.datas.map((child: any) => ({
               subTitle: moment(child.date).format('YYYYMMDD'),
               title: title,
-              denominator: it.denominator,
               numerator: child.numerator,
-              total: +((child.numerator / child.denominator) * 100).toFixed(5),
+              denominator: child.denominator,
+              total: (child.numerator / child.denominator) * 100,
             }));
           })
           .flat(),
@@ -144,11 +144,24 @@ const GrayScaleBugRate: React.FC = () => {
             columnDefs={[
               {
                 field: 'total',
-                aggFunc: 'sum',
+                aggFunc: (data: any) => {
+                  let sum = 0;
+                  data?.forEach(function (value) {
+                    if (value) {
+                      sum = sum + parseFloat(value);
+                    }
+                  });
+                  if (!sum) return 0;
+                  return sum.toFixed(5);
+                },
                 headerName: '总计',
               },
               { field: 'title', enablePivot: true, pivot: true },
-              { field: 'subTitle', enablePivot: true, pivot: true },
+              {
+                field: 'subTitle',
+                enablePivot: true,
+                pivot: true,
+              },
             ]}
             rowData={data}
             defaultColDef={{

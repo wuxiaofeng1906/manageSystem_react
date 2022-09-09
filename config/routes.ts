@@ -371,7 +371,7 @@ export default [
                 icon: 'table',
                 path: 'grayScaleBugRate',
                 component: './kpi/performance/developer/grayScaleBugRate',
-                hideInMenu: true,
+                // hideInMenu: true,
               },
               {
                 name: '阻塞次数',

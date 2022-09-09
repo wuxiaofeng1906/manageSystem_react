@@ -52,15 +52,6 @@ const ProductOnlineEmergencyRate: React.FC = () => {
   };
   const getDate = () => {
     const ends = catagory == 'month' ? getTwelveMonthTime(3) : getFourQuarterTime(false, 6);
-    const columns =
-      ends.map((it) => ({
-        subTitle: '',
-        total: '',
-        title:
-          catagory == 'quarter'
-            ? `${moment(it.end).format('YYYY')}Q${moment(it.end).quarter()}`
-            : moment(it.end).format('YYYY年MM月'),
-      })) ?? [];
     return JSON.stringify(ends?.map((it) => it.end));
   };
 
@@ -71,7 +62,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
       const { data } = await StatisticServices.onlineEmergency({
         client,
         params: {
-          kind: catagory == 'month' ? 2 : 1,
+          kind: catagory == 'month' ? 2 : 3,
           ends,
         },
       });
@@ -88,7 +79,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
             return it.datas.map((child: any) => ({
               subTitle: moment(child.date).format('YYYYMMDD'),
               title: title,
-              total: child.storyNum ?? 0 / child.recordNum ?? 0 * 100,
+              total: (child.storyNum / child.recordNum) * 100,
             }));
           })
           .flat(),

@@ -186,7 +186,7 @@ const StatisticServices = {
     client: GqlClient<object>;
     params: { kind: number; ends: string };
   }) {
-    const { data, loading } = await client.query(`
+    const { data } = await client.query(`
       {
          data:onlineEmerProportion(kind: "${params.kind}", ends: ${params.ends}) {
           range{
@@ -197,6 +197,31 @@ const StatisticServices = {
             date
             storyNum
             recordNum
+          }
+        }
+      }
+  `);
+    return { data: data.data };
+  },
+  //灰度千行bug率
+  async grayThousBugRate({
+    client,
+    params,
+  }: {
+    client: GqlClient<object>;
+    params: { kind: number; ends: string };
+  }) {
+    const { data } = await client.query(`
+      {
+         data:stageThousBugRate(kind: "${params.kind}", ends: ${params.ends}) {
+          range{
+            start
+            end
+          }
+          datas{
+            date
+            numerator
+            denominator
           }
         }
       }

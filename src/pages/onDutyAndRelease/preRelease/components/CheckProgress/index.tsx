@@ -15,8 +15,14 @@ const { Option } = Select;
 
 const CheckProgress: React.FC<{ refreshPage: Function }> = ({ refreshPage }) => {
   // 获取当前页面的进度数据
-  const { tabsData, processStatus, modifyProcessStatus, operteStatus, releaseItem, upgradeApi } =
-    useModel('releaseProcess');
+  const {
+    tabsData,
+    processStatus,
+    modifyProcessStatus,
+    operteStatus,
+    releaseItem,
+    upgradeApi,
+  } = useModel('releaseProcess');
   const [pulishResultForm] = Form.useForm();
   const [disabled, setDisabled] = useState(false);
   const [isModalVisible, setModalVisible] = useState({

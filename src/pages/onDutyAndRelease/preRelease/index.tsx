@@ -287,7 +287,6 @@ const PreRelease: React.FC<any> = () => {
         <Tab />
         <CheckProgress
           refreshPage={async () => {
-            console.log('refresh');
             setGlobalLoading(true);
             const datas = await alalysisInitData('', '');
             showPageInitData(datas, true);

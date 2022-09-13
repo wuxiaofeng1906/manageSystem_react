@@ -146,7 +146,7 @@ const Tab: React.FC<any> = () => {
 
   // Tabs页面切换
   const onTabsChange = async (activeKeys: any) => {
-    console.log(activeKeys, 'activeKeys', tabsData, tabsData?.activeKey == activeKeys);
+    if (tabsData?.activeKey == activeKeys) return;
     setTabsData(activeKeys, tabsData.panes);
     setGlobalLoading(true);
     const newTabData = await alalysisInitData('', activeKeys);
@@ -291,7 +291,6 @@ const Tab: React.FC<any> = () => {
   // 修改tab的名字
   const tabsChangeName = (params: any) => {
     console.log(params, '==doubletab==');
-    params.stopPropagation();
     const currentName = params.target.innerText;
     setTabNameModal(true);
     tabNameSetForm.setFieldsValue({

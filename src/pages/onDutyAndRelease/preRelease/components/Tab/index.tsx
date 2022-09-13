@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Form, Input, message, Modal, Tabs } from 'antd';
-import { useModel } from '@@/plugin-model/useModel';
+import { useModel } from 'umi';
 import { getNewPageNumber, deleteReleaseItem, modifyTabsName } from './axiosRequest';
 import { alalysisInitData } from '../../datas/dataAnalyze';
 import { getCheckProcess } from '@/pages/onDutyAndRelease/preRelease/components/CheckProgress/axiosRequest';
@@ -403,7 +403,7 @@ const Tab: React.FC<any> = () => {
             onEdits(targetKey, action);
           }}
           style={{ marginTop: -20 }}
-          onDoubleClick={tabsChangeName}
+          onDoubleClick={(e) => tabsChangeName(e)}
           onContextMenu={onContextMenu}
         >
           {tabsData?.panes?.map((pane: any) => (

@@ -146,6 +146,7 @@ const Tab: React.FC<any> = () => {
 
   // Tabs页面切换
   const onTabsChange = async (activeKeys: any) => {
+    console.log(activeKeys, 'activeKeys');
     setTabsData(activeKeys, tabsData.panes);
     setGlobalLoading(true);
     const newTabData = await alalysisInitData('', activeKeys);
@@ -399,13 +400,13 @@ const Tab: React.FC<any> = () => {
         <Tabs
           type={tabType}
           activeKey={tabsData === undefined ? '' : tabsData.activeKey}
-          onChange={onTabsChange}
+          onChange={(v) => onTabsChange(v)}
           onEdit={(targetKey, action) => {
             onEdits(targetKey, action);
           }}
           style={{ marginTop: -20 }}
           onDoubleClick={(e) => tabsChangeName(e)}
-          onContextMenu={onContextMenu}
+          onContextMenu={(e) => onContextMenu(e)}
         >
           {tabsData?.panes?.map((pane: any) => (
             <TabPane tab={pane.title} key={pane.key} closable={pane.closable}>

@@ -289,6 +289,7 @@ const Tab: React.FC<any> = () => {
   const [tabNameModal, setTabNameModal] = useState(false);
   // 修改tab的名字
   const tabsChangeName = (params: any) => {
+    console.log(params, '==doubletab==');
     params.preventDefault?.();
     const currentName = params.target.innerText;
     setTabNameModal(true);

@@ -121,6 +121,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     const releaseEnv = releaseEnvForm.getFieldValue('releaseEnv')?.join();
     const grayReleaseNums: string[] = [];
     const releaseInfo = formForOfficialRelease.getFieldsValue();
+    releaseInfo.pulishType = releaseType;
     const releaseName = releaseNameForm.getFieldsValue();
     // 获取灰度所有的发布编号
     releaseServiceGridApi.current?.forEachNode((node: any) => {

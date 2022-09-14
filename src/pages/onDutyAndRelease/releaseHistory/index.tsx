@@ -228,10 +228,10 @@ const ReleaseHistory: React.FC<any> = () => {
   };
 
   // 一级灰度跳转到正式发布界面
-  const gotoFirstReleasePage = (releData: any) => {
+  const gotoFirstReleasePage = (releData: any, type: string) => {
     const onlineReleasedNum = releData.data?.release_gray_num;
     history.push(
-      `/onDutyAndRelease/officialRelease?releaseType=gray&onlineReleaseNum=${onlineReleasedNum}&history=true`,
+      `/onDutyAndRelease/officialRelease?releaseType=${type}&onlineReleaseNum=${onlineReleasedNum}&history=true`,
     );
   };
 
@@ -309,7 +309,7 @@ const ReleaseHistory: React.FC<any> = () => {
           marginLeft: -20,
         }}
         disabled={firstButtonDisable}
-        onClick={() => gotoFirstReleasePage(params)}
+        onClick={() => gotoFirstReleasePage(params, showDelete ? 'gray' : 'ongoing')}
       >
         <img
           src={firstSrcPath}

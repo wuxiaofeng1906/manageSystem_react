@@ -127,7 +127,9 @@ const OnlineBranch: React.FC<any> = () => {
         title: '新增',
         loading: false,
       });
-
+      if (onlineBranchModal.title === '修改') {
+        deleteLockStatus(lockedItem);
+      }
       const newData: any = await alalysisInitData('onlineBranch', tabsData.activeKey);
       if (newData.onlineBranch) {
         setOnlineBranch({
@@ -143,10 +145,6 @@ const OnlineBranch: React.FC<any> = () => {
           gridHight: getGridRowsHeight(reviewData.reviewData_confirm),
           gridData: reviewData.reviewData_confirm,
         });
-      }
-
-      if (onlineBranchModal.title === '修改') {
-        deleteLockStatus(lockedItem);
       }
     } else {
       message.error({
@@ -208,7 +206,9 @@ const OnlineBranch: React.FC<any> = () => {
     } else {
       newOnlineBranchNum = params.check_num;
       const oraData = await getModifiedData(newOnlineBranchNum);
-
+      modifyLockedItem(
+        `${tabsData.activeKey}-step4-onlineBranch-${oraData.checkHead?.branchCheckId}`,
+      );
       // 服务
       const servers = oraData.versonCheck?.server;
       // 时间
@@ -254,9 +254,7 @@ const OnlineBranch: React.FC<any> = () => {
         // beforeAutomationId: oraData.beforeOnlineCheck?.automationId,
         // afterAutomationId: oraData.afterOnlineCheck?.automationId,
       });
-      modifyLockedItem(
-        `${tabsData.activeKey}-step4-onlineBranch-${oraData.checkHead?.branchCheckId}`,
-      );
+
       const lockInfo = await getLockStatus(
         `${tabsData.activeKey}-step4-onlineBranch-${oraData.checkHead?.branchCheckId}`,
       );
@@ -713,10 +711,11 @@ const OnlineBranch: React.FC<any> = () => {
                         params.data?.branch_check_id,
                       );
                     }}
+                    onRowDataChanged={onlineBranchGridReady}
                     onGridReady={onlineBranchGridReady}
                     onGridSizeChanged={onlineBranchGridReady}
                     onColumnEverythingChanged={onlineBranchGridReady}
-                  ></AgGridReact>
+                  />
                 </div>
               </Spin>
             </div>

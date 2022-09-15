@@ -557,13 +557,13 @@ const UpgradeService: React.FC<any> = () => {
   /* endregion */
 
   const showArrays = async () => {
+    setDeployTip('');
     formUpgradeService.setFieldsValue({
       deployID: releasedIDArray,
       hitMessage: await getAutoCheckMessage(tabsData.activeKey), // 31357
     });
     // 初始化部署检查错误提示
     if (isEmpty(releasedIDArray)) {
-      setDeployTip('');
     } else if (initPage && !isEmpty(releasedIDArray) && !releaseIdDisable && !operteStatus) {
       inquireServiceClick(false).then(() => {
         setInitPage(false);

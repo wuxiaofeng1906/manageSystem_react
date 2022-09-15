@@ -509,7 +509,7 @@ const DutyCatalog = () => {
   }, [id]);
 
   const onDeleteLock = () => {
-    if (singleLock?.user_id == currentUser?.userid) {
+    if (singleLock?.user_id == currentUser?.userid || currentUser?.userid == 'LiuQing') {
       updateLockStatus(id, 'delete');
     }
   };

@@ -167,6 +167,7 @@ const CheckProgress: React.FC<{ refreshPage: Function }> = ({ refreshPage }) => 
         type={'pre'}
         ready_release_num={tabsData.activeKey}
         disabled={operteStatus}
+        value={processStatus.announcement_num}
       />
       {/* 检查进度 */}
       <div style={{ marginTop: -10 }}>

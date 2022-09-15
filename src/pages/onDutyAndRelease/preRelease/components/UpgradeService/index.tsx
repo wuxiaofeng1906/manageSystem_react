@@ -562,7 +562,7 @@ const UpgradeService: React.FC<any> = () => {
       hitMessage: await getAutoCheckMessage(tabsData.activeKey), // 31357
     });
     // 初始化部署检查错误提示
-    if (isEmpty(releasedIDArray) || initPage) {
+    if (isEmpty(releasedIDArray)) {
       setDeployTip('');
     } else if (initPage && !isEmpty(releasedIDArray) && !releaseIdDisable && !operteStatus) {
       inquireServiceClick(false).then(() => {
@@ -601,6 +601,7 @@ const UpgradeService: React.FC<any> = () => {
 
   useEffect(() => {
     setInitPage(true);
+    setDeployTip('');
   }, [tabsData.activeKey]);
 
   useEffect(() => {

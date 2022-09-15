@@ -33,21 +33,21 @@ const serverConfirmJudge = (currentOperateStatus: any, props: any, autoHitMessag
   }
 
   // 前端和测试需要判断有没有勾选自动化用例，如果没有，则不能进行修改。。
-  if (
-    (props.column.colId === 'front_confirm_status' ||
-      props.column.colId === 'test_confirm_status') &&
-    autoHitMessage !== ''
-  ) {
-    message.error({
-      content: '保存失败：存在未勾选自动化用例参数的一键部署ID！',
-      duration: 1,
-      style: {
-        marginTop: '50vh',
-      },
-    });
-
-    return false;
-  }
+  // if (
+  //   (props.column.colId === 'front_confirm_status' ||
+  //     props.column.colId === 'test_confirm_status') &&
+  //   autoHitMessage !== ''
+  // ) {
+  //   message.error({
+  //     content: '保存失败：存在未勾选自动化用例参数的一键部署ID！',
+  //     duration: 1,
+  //     style: {
+  //       marginTop: '50vh',
+  //     },
+  //   });
+  //
+  //   return false;
+  // }
 
   return true;
 };

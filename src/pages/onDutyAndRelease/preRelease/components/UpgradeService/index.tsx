@@ -601,6 +601,7 @@ const UpgradeService: React.FC<any> = () => {
 
   useEffect(() => {
     setInitPage(true);
+    setDeployTip('');
   }, [tabsData.activeKey]);
 
   useEffect(() => {

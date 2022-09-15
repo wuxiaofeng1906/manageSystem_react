@@ -109,6 +109,14 @@ const getColums = (prjNames: any) => {
       filter: false,
     },
     {
+      headerName: '未基线原因',
+      field: 'reason',
+      minWidth: 235,
+      cellRenderer: textDecorateRender,
+      tooltipField: 'reason',
+      filter: false,
+    },
+    {
       headerName: '所属计划',
       field: 'planName',
       minWidth: 150,

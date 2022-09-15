@@ -597,10 +597,6 @@ const DutyCatalog = () => {
     onDeleteLock();
   };
 
-  window.onunload = function () {
-    onDeleteLock();
-  };
-
   const otherEnv = envList
     .filter((o: any) => !Object.values(envType).includes(o.value))
     .map((it) => it.value);

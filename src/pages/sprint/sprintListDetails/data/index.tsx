@@ -2,7 +2,7 @@ import type { GqlClient } from '@/hooks';
 import { useQuery } from '@/hooks';
 import React from 'react';
 import { Select } from 'antd';
-import { sortBy } from 'lodash';
+import { isEmpty, sortBy } from 'lodash';
 
 const { Option } = Select;
 
@@ -163,7 +163,7 @@ const changeRowPosition = (data: any) => {
   const inStoryAndTask = [];
 
   // 如果所属需求或者任务不为空，则添加到新的数组里面
-  for (let index = 0; index < data.length; index += 1) {
+  for (let index = 0; index < data?.length; index += 1) {
     if (data[index].belongStory || data[index].belongTask) {
       inStoryAndTask.push(data[index]);
     }
@@ -194,18 +194,18 @@ const changeBaseLinePosition = (data: any) => {
   // });
 
   // return noBaseLineArray.concat(baseLineArray);
-  const format = data.map((it: any) => ({
+  const format = data?.map((it: any) => ({
     ...it,
     order: it.baseline == '0' && it.ztUnlinkedAt != null ? 2 : it.baseline == '0' ? 1 : 3,
   }));
-  const result = sortBy(format, ['order', 'ztUnlinkedAt']); // 顺序:  超范围-> 禅道需求移除 -> 未超范围
+  const result = sortBy(format ?? [], ['order', 'ztUnlinkedAt']); // 顺序:  超范围-> 禅道需求移除 -> 未超范围
   return result;
 };
 
 // bug转需求字段
 const changeTypeColumns = (oraData: any) => {
   const changedArray: any = [];
-  if (oraData && oraData.length > 0) {
+  if (oraData && oraData?.length > 0) {
     oraData.forEach((ele: any) => {
       const rows: any = { ...ele };
       if (ele.category === '3' && ele.fromBug !== 0) {
@@ -220,7 +220,7 @@ const changeTypeColumns = (oraData: any) => {
 // 过滤测试验证为是的数据
 const filterTestConfirmed = (oraData: any) => {
   const changedArray: any = [];
-  if (oraData && oraData.length > 0) {
+  if (oraData && oraData?.length > 0) {
     oraData.forEach((ele: any) => {
       if (ele.testConfirmed !== '1') {
         changedArray.push(ele);
@@ -326,6 +326,9 @@ const queryDevelopViews = async (
   `);
 
   let oraData: any = data?.proDetaiWithUser;
+  if (isEmpty(data?.proDetaiWithUser)) {
+    return { result: [], resCount: null };
+  }
   if (prjType === '') {
     const changedRow = changeRowPosition(data?.proDetaiWithUser); // 对数据进行想要的顺序排序(将需求相关的bug放到相关需求后面)
     oraData = changeBaseLinePosition(changedRow); //  将基线值为0的数据统一起来，放到页面最前面

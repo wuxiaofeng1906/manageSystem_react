@@ -321,6 +321,7 @@ const queryDevelopViews = async (
             notrevertMemo
             targetPno
             revertActor
+            nobaseDesc
           }
       }
   `);

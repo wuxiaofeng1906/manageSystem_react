@@ -110,10 +110,10 @@ const getColums = (prjNames: any) => {
     },
     {
       headerName: '未基线原因',
-      field: 'reason',
+      field: 'nobaseDesc',
       minWidth: 235,
       cellRenderer: textDecorateRender,
-      tooltipField: 'reason',
+      tooltipField: 'nobaseDesc',
       filter: false,
     },
     {

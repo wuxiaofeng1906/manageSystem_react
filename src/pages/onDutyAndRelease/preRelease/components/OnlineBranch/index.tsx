@@ -249,7 +249,10 @@ const OnlineBranch: React.FC<any> = () => {
         versionCheckId: oraData.versonCheck?.versionCheckId,
         envCheckId: oraData.envCheck?.checkId,
         // 是否可热更新检查
-        is_ignore: oraData.hotCheck?.check_status == 'skip' ? ['1'] : undefined,
+        is_ignore:
+          oraData.hotCheck?.check_status == 'skip' || isEmpty(oraData.hotCheck?.release_env)
+            ? ['1']
+            : undefined,
         check_env: oraData.hotCheck?.release_env,
         // beforeAutomationId: oraData.beforeOnlineCheck?.automationId,
         // afterAutomationId: oraData.afterOnlineCheck?.automationId,

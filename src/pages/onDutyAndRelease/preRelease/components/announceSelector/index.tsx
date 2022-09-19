@@ -10,11 +10,13 @@ const AnnounceSelector = ({
   ready_release_num,
   value,
   disabled,
+  onRefresh,
 }: {
   type: 'pre' | 'history';
   ready_release_num: string;
   value?: string;
   disabled: boolean;
+  onRefresh?: (v: string) => void;
 }) => {
   const { processStatus, modifyProcessStatus } = useModel('releaseProcess');
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
@@ -44,7 +46,9 @@ const AnnounceSelector = ({
       user_name: user?.name,
       user_id: user?.userid,
     });
-    modifyProcessStatus({ ...processStatus, announcement_num });
+    if (type == 'pre') {
+      modifyProcessStatus({ ...processStatus, announcement_num });
+    } else onRefresh?.(announcement_num);
   };
   useEffect(() => {
     getAnnouncementList();
@@ -52,9 +56,9 @@ const AnnounceSelector = ({
 
   useEffect(() => {
     announcementForm.setFieldsValue({
-      announcement_num: value == undefined ? processStatus.announcement_num : value,
+      announcement_num: value,
     });
-  }, [processStatus.announcement_num, value]);
+  }, [value]);
 
   return (
     <>
@@ -88,7 +92,7 @@ const AnnounceSelector = ({
               placeholder={'发布公告'}
               style={{ width: '100%' }}
               optionFilterProp={'label'}
-              onBlur={onSave}
+              onChange={onSave}
               onDeselect={onSave}
               allowClear
             />

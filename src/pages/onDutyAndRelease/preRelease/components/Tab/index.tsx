@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Form, Input, message, Modal, Tabs } from 'antd';
-import { useModel } from '@@/plugin-model/useModel';
+import { useModel } from 'umi';
 import { getNewPageNumber, deleteReleaseItem, modifyTabsName } from './axiosRequest';
 import { alalysisInitData } from '../../datas/dataAnalyze';
 import { getCheckProcess } from '@/pages/onDutyAndRelease/preRelease/components/CheckProgress/axiosRequest';
@@ -146,6 +146,7 @@ const Tab: React.FC<any> = () => {
 
   // Tabs页面切换
   const onTabsChange = async (activeKeys: any) => {
+    if (tabsData?.activeKey == activeKeys) return;
     setTabsData(activeKeys, tabsData.panes);
     setGlobalLoading(true);
     const newTabData = await alalysisInitData('', activeKeys);
@@ -397,13 +398,13 @@ const Tab: React.FC<any> = () => {
         <Tabs
           type={tabType}
           activeKey={tabsData === undefined ? '' : tabsData.activeKey}
-          onChange={onTabsChange}
+          onChange={(v) => onTabsChange(v)}
           onEdit={(targetKey, action) => {
             onEdits(targetKey, action);
           }}
           style={{ marginTop: -20 }}
-          onDoubleClick={tabsChangeName}
-          onContextMenu={onContextMenu}
+          onDoubleClick={(e) => tabsChangeName(e)}
+          onContextMenu={(e) => onContextMenu(e)}
         >
           {tabsData?.panes?.map((pane: any) => (
             <TabPane tab={pane.title} key={pane.key} closable={pane.closable}>

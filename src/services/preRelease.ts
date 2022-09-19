@@ -40,5 +40,11 @@ const PreReleaseServices = {
       params: { ready_release_num },
     });
   },
+  // 灰度发布失败列表
+  async getGrayFailList(params: any) {
+    return request(`${baseUrl}/release/gray_failure`, {
+      params,
+    });
+  },
 };
 export default PreReleaseServices;

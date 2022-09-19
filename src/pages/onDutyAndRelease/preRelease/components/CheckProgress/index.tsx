@@ -13,10 +13,16 @@ import { checkOnlineEnvSource } from '@/pages/onDutyAndRelease/preRelease/datas/
 
 const { Option } = Select;
 
-const CheckProgress: React.FC<any> = () => {
+const CheckProgress: React.FC<{ refreshPage: Function }> = ({ refreshPage }) => {
   // 获取当前页面的进度数据
-  const { tabsData, processStatus, modifyProcessStatus, operteStatus, releaseItem, upgradeApi } =
-    useModel('releaseProcess');
+  const {
+    tabsData,
+    processStatus,
+    modifyProcessStatus,
+    operteStatus,
+    releaseItem,
+    upgradeApi,
+  } = useModel('releaseProcess');
   const [pulishResultForm] = Form.useForm();
   const [disabled, setDisabled] = useState(false);
   const [isModalVisible, setModalVisible] = useState({
@@ -130,6 +136,7 @@ const CheckProgress: React.FC<any> = () => {
           result: '',
           show: false,
         });
+        refreshPage?.();
       } else {
         errorMessage(result.toString());
       }
@@ -160,6 +167,7 @@ const CheckProgress: React.FC<any> = () => {
         type={'pre'}
         ready_release_num={tabsData.activeKey}
         disabled={operteStatus}
+        value={processStatus.announcement_num}
       />
       {/* 检查进度 */}
       <div style={{ marginTop: -10 }}>

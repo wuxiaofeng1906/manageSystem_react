@@ -51,6 +51,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
   const historyQuery = props.location?.query?.history === 'true';
   const releaseType = props.location?.query?.releaseType;
   const [rowData, setRowData] = useState([]);
+  const [announceNum, setAnnounceNum] = useState<string>();
   const [releaseEnvForm] = Form.useForm();
   const dutyNameArray = useRequest(() => loadDutyNamesSelect(true)).data; // 关联值班名单
   const pageData = useRequest(() => getOfficialReleaseDetails(onlineReleaseNum, releaseType)).data; // 界面数据获取
@@ -121,6 +122,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     const releaseEnv = releaseEnvForm.getFieldValue('releaseEnv')?.join();
     const grayReleaseNums: string[] = [];
     const releaseInfo = formForOfficialRelease.getFieldsValue();
+    releaseInfo.pulishType = releaseType;
     const releaseName = releaseNameForm.getFieldsValue();
     // 获取灰度所有的发布编号
     releaseServiceGridApi.current?.forEachNode((node: any) => {
@@ -198,7 +200,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           });
         }
       } else {
-        saveReleaseInfo();
+        await saveReleaseInfo();
       }
       setDisabled(false);
 
@@ -285,6 +287,7 @@ const OfficialRelease: React.FC<any> = (props: any) => {
     if (sourceData && sourceData.length > 0) {
       // 当前只有一个Tab，不会有多个。
       const datas = sourceData[0];
+      setAnnounceNum(datas.announcement_num ?? '');
       releaseNameForm.setFieldsValue({
         release_name: datas?.release_name ?? '',
       });
@@ -418,8 +421,9 @@ const OfficialRelease: React.FC<any> = (props: any) => {
           <AnnounceSelector
             type={'history'}
             ready_release_num={otherSaveCondition.onlineReleaseNum}
-            value={pageData?.[0]?.announcement_num ?? ''}
+            value={announceNum}
             disabled={historyQuery}
+            onRefresh={(v) => setAnnounceNum(v)}
           />
         </div>
         {/* step 1 发布方式及时间 */}

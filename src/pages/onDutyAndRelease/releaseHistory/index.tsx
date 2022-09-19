@@ -15,7 +15,7 @@ import {
   getZeroGrayscaleListData,
 } from './axiosRequest/apiPage';
 import { history } from '@@/core/history';
-import { Button, DatePicker, Select, Popconfirm, Modal } from 'antd';
+import { Button, DatePicker, Select, Popconfirm, Modal, Form } from 'antd';
 import { loadPrjNameSelect } from '@/pages/onDutyAndRelease/preRelease/comControl/controler';
 import dayjs from 'dayjs';
 import moment from 'moment';
@@ -24,6 +24,8 @@ import { errorMessage, sucMessage } from '@/publicMethods/showMessages';
 import { gridHeadDivStyle, girdDefaultSetting } from './commonSetting';
 import './style.css';
 import { Link } from 'umi';
+import PreReleaseServices from '@/services/preRelease';
+import { isEmpty } from 'lodash';
 
 const RangePicker: any = DatePicker.RangePicker;
 
@@ -53,6 +55,7 @@ const ReleaseHistory: React.FC<any> = () => {
     firstGrid: 100,
     peddingGrid: 100,
     formalGrid: 100,
+    grayFailGrid: 200,
   });
 
   /* region 灰度发布界面 */
@@ -225,10 +228,10 @@ const ReleaseHistory: React.FC<any> = () => {
   };
 
   // 一级灰度跳转到正式发布界面
-  const gotoFirstReleasePage = (releData: any) => {
+  const gotoFirstReleasePage = (releData: any, type: string) => {
     const onlineReleasedNum = releData.data?.release_gray_num;
     history.push(
-      `/onDutyAndRelease/officialRelease?releaseType=gray&onlineReleaseNum=${onlineReleasedNum}&history=true`,
+      `/onDutyAndRelease/officialRelease?releaseType=${type}&onlineReleaseNum=${onlineReleasedNum}&history=true`,
     );
   };
 
@@ -306,7 +309,7 @@ const ReleaseHistory: React.FC<any> = () => {
           marginLeft: -20,
         }}
         disabled={firstButtonDisable}
-        onClick={() => gotoFirstReleasePage(params)}
+        onClick={() => gotoFirstReleasePage(params, showDelete ? 'gray' : 'ongoing')}
       >
         <img
           src={firstSrcPath}
@@ -353,6 +356,14 @@ const ReleaseHistory: React.FC<any> = () => {
   const releasedGridApi = useRef<GridApi>();
   const onReleasedGridReady = (params: GridReadyEvent) => {
     releasedGridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+  //灰度发布失败列表
+  const grayFailRef = useRef<GridApi>();
+  const [grayFailForm] = Form.useForm();
+  const [grayFailList, setGrayFailList] = useState<any[]>([]);
+  const onGrayFailReady = (params: GridReadyEvent) => {
+    grayFailRef.current = params.api;
     params.api.sizeColumnsToFit();
   };
 
@@ -420,7 +431,6 @@ const ReleaseHistory: React.FC<any> = () => {
         releasedNums.forEach((reInfo: any) => {
           detailsLinks.push(
             <p>
-              {' '}
               {reInfo.ready_release_name}:
               <Link
                 to={`/onDutyAndRelease/preRelease?releasedNum=${reInfo.ready_release_num}&history=true`}
@@ -438,7 +448,6 @@ const ReleaseHistory: React.FC<any> = () => {
         releasedNums.forEach((reInfo: any) => {
           detailsLinks.push(
             <p>
-              {' '}
               {reInfo.release_gray_name}:
               <Link
                 to={`/onDutyAndRelease/officialRelease?releaseType=gray&onlineReleaseNum=${reInfo.release_gray_num}&history=true`}
@@ -535,12 +544,41 @@ const ReleaseHistory: React.FC<any> = () => {
     }
   }, [peddingPublishData]);
 
+  useEffect(() => {
+    if (peddingPublishData?.data) {
+      setGridHeight({
+        ...gridHeight,
+        grayFailGrid: grayFailList.length * 30 + 80,
+      });
+    }
+  }, [JSON.stringify(grayFailList)]);
+
+  const requestGrayFailList = async () => {
+    const values = grayFailForm.getFieldsValue();
+    if (!isEmpty(values.time)) {
+      values.start = moment(values.time[0]).format('YYYY-MM-DD HH:mm:ss');
+      values.end = moment(values.time[1]).format('YYYY-MM-DD HH:mm:ss');
+    }
+    const data = await PreReleaseServices.getGrayFailList({
+      project_ids: values.project_ids?.map((it: string) => it.split('&')[1])?.join(',') ?? '',
+      start_time: values.start ?? '',
+      end_time: values.end ?? '',
+    });
+    setGrayFailList(data);
+  };
+
+  useEffect(() => {
+    grayFailForm.setFieldsValue({
+      time: [moment().subtract(7, 'day'), moment().add(7, 'day')],
+    });
+    requestGrayFailList();
+  }, []);
+
   return (
     <PageContainer>
       {/* 0级灰度积压列表 */}
       <div style={{ marginTop: -20 }}>
         <div style={gridHeadDivStyle}>
-          {' '}
           &nbsp;
           <label style={{ fontWeight: 'bold', float: 'left' }}>0级灰度积压列表</label>
           <Button type="text" onClick={generateFormalZeroRelease} style={{ float: 'right' }}>
@@ -550,7 +588,7 @@ const ReleaseHistory: React.FC<any> = () => {
               height="25"
               alt="一键生成1级灰度发布"
               title="一键生成1级灰度发布"
-            />{' '}
+            />
             &nbsp;{zeroButtonTitle}
           </Button>
           {/*<div style={{float: "right"}}>*/}
@@ -559,7 +597,6 @@ const ReleaseHistory: React.FC<any> = () => {
           {/*               onChange={onZeroGrayReleaseTimeChanged}/>*/}
           {/*</div>*/}
         </div>
-        <button></button>
         <div
           className="ag-theme-alpine init-agGrid"
           style={{ marginTop: -21, height: gridHeight.zeroGrid, width: '100%' }}
@@ -586,7 +623,6 @@ const ReleaseHistory: React.FC<any> = () => {
       {/* 1级灰度积压列表 */}
       <div style={{ marginTop: 20 }}>
         <div style={gridHeadDivStyle}>
-          {' '}
           &nbsp;
           <label style={{ fontWeight: 'bold', float: 'left' }}>1级灰度积压列表</label>
           <Button
@@ -600,7 +636,7 @@ const ReleaseHistory: React.FC<any> = () => {
               height="25"
               alt="一键生成正式发布"
               title="一键生成正式发布"
-            />{' '}
+            />
             &nbsp;{firstButtonTitle}
           </Button>
           {/*<div style={{float: "right"}}>*/}
@@ -609,7 +645,6 @@ const ReleaseHistory: React.FC<any> = () => {
           {/*               onChange={onFirstGrayReleaseTimeChanged}/>*/}
           {/*</div>*/}
         </div>
-        <button></button>
         <div
           className="ag-theme-alpine init-agGrid"
           style={{ marginTop: -21, height: gridHeight.firstGrid, width: '100%' }}
@@ -699,8 +734,6 @@ const ReleaseHistory: React.FC<any> = () => {
             />
           </div>
         </div>
-
-        <button></button>
         <div
           className="ag-theme-alpine init-agGrid"
           style={{ marginTop: -21, height: gridHeight.formalGrid, width: '100%' }}
@@ -797,6 +830,83 @@ const ReleaseHistory: React.FC<any> = () => {
               },
             }}
           ></AgGridReact>
+        </div>
+      </div>
+      {/*灰度发布失败列表*/}
+      <div style={{ marginTop: 40 }}>
+        <div
+          style={{
+            ...gridHeadDivStyle,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <label style={{ fontWeight: 'bold' }}>灰度发布失败列表</label>
+          <Form
+            form={grayFailForm}
+            layout={'inline'}
+            size={'small'}
+            onFieldsChange={(v) => requestGrayFailList()}
+          >
+            <Form.Item label={'发布项目'} name={'project_ids'}>
+              <Select
+                showSearch
+                mode="multiple"
+                options={projectsArray}
+                style={{ minWidth: 300 }}
+              />
+            </Form.Item>
+            <Form.Item label={'发布时间'} name={'time'} style={{ marginRight: 0 }}>
+              <RangePicker format={'YYYY-MM-DD'} />
+            </Form.Item>
+          </Form>
+        </div>
+        <div
+          className="ag-theme-alpine init-agGrid"
+          style={{ height: gridHeight.grayFailGrid, width: '100%' }}
+        >
+          <AgGridReact
+            columnDefs={releasedList('gray')} // 定义列
+            rowData={grayFailList} // 数据绑定
+            defaultColDef={girdDefaultSetting}
+            rowHeight={30}
+            headerHeight={35}
+            suppressRowTransform={true}
+            onGridReady={onGrayFailReady}
+            onRowDataChanged={onGrayFailReady}
+            frameworkComponents={{
+              officialReleaseDetails: (params: any) => {
+                const type = params.data.release_type;
+                return (
+                  <div>
+                    <Button
+                      className={'operateButton'}
+                      onClick={() => {
+                        if (type == 'zero') {
+                          history.push(
+                            `/onDutyAndRelease/preRelease?releasedNum=${params.data.release_gray_num}&history=true`,
+                          );
+                        } else if (type == 'one') {
+                          history.push(
+                            `/onDutyAndRelease/officialRelease?releaseType=gray&onlineReleaseNum=${params.data.release_gray_num}&history=true`,
+                          );
+                        }
+                      }}
+                    >
+                      <img
+                        src={'../gray_detail_normal.png'}
+                        width="20"
+                        height="20"
+                        alt={`${type == 'zero' ? 0 : 1}级灰度发布详情`}
+                        title={`${type == 'zero' ? 0 : 1}级灰度发布详情`}
+                      />
+                    </Button>
+                  </div>
+                );
+              },
+            }}
+          />
         </div>
       </div>
 

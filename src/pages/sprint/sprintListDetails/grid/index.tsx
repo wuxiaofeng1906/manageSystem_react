@@ -109,6 +109,14 @@ const getColums = (prjNames: any) => {
       filter: false,
     },
     {
+      headerName: '未基线原因',
+      field: 'nobaseDesc',
+      minWidth: 235,
+      cellRenderer: textDecorateRender,
+      tooltipField: 'nobaseDesc',
+      filter: false,
+    },
+    {
       headerName: '所属计划',
       field: 'planName',
       minWidth: 150,

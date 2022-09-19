@@ -23,10 +23,10 @@ const getStaticMessage = (oraData: any) => {
     );
   }
 
-  const bugs = oraData.bug === undefined ? 0 : oraData.bug;
-  const tasks = oraData.task === undefined ? 0 : oraData.task;
-  const storys = oraData.story === undefined ? 0 : oraData.story;
-  const B_story = oraData.B_story === undefined ? 0 : oraData.B_story;
+  const bugs = oraData?.bug ?? 0;
+  const tasks = oraData?.task ?? 0;
+  const storys = oraData?.story ?? 0;
+  const B_story = oraData?.B_story ?? 0;
 
   return (
     <label style={{ marginLeft: 25 }}>

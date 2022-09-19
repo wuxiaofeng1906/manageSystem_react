@@ -20,6 +20,7 @@ import { showReleasedId } from './components/UpgradeService/idDeal/dataDeal';
 import { getNewPageNumber } from './components/Tab/axiosRequest';
 import { history } from '@@/core/history';
 import { errorMessage } from '@/publicMethods/showMessages';
+import { isEmpty } from 'lodash';
 
 let currentKey: any;
 let currentPanes: any;
@@ -67,9 +68,9 @@ const PreRelease: React.FC<any> = () => {
   const { data, loading } = useRequest(() => alalysisInitData('', releasedNumStr));
 
   // 显示无数据界面
-  const showNoneDataPage = async () => {
+  const showNoneDataPage = async (data = {}) => {
     // tab 页面
-    if (currentKey === '') {
+    if (currentKey === '' || !isEmpty(data)) {
       // 如果当前key未空，则获取
       const newNum = await getNewPageNumber();
       const releaseNum = newNum.data?.ready_release_num;
@@ -80,13 +81,14 @@ const PreRelease: React.FC<any> = () => {
           key: releaseNum,
         },
       ];
-
+      currentKey = releaseNum;
       setTabsData(releaseNum, panesArray);
     }
 
     // 进度条
     modifyProcessStatus({
       ...processStatus,
+      ...data,
       // 进度条相关数据和颜色
       releaseProject: 'Gainsboro', // #2BF541
       upgradeService: 'Gainsboro',
@@ -138,19 +140,19 @@ const PreRelease: React.FC<any> = () => {
       return;
     }
 
-    if (initData.errmessage) {
+    if (initData?.errmessage) {
       // 出现异常情况时候，提醒错误，不更新界面。
       setGlobalLoading(false);
-      errorMessage(initData.errmessage.toString());
+      errorMessage(initData?.errmessage.toString());
       return;
     }
 
     // 自动刷新时无数据不更新数据
-    if (initData.length === 0) {
+    if (isEmpty(initData)) {
       // 初始化的时候无数据再显示，自动刷新无数据不更新界面
       if (initShow) {
-        // 后端无数据
-        showNoneDataPage();
+        // 无数据重置自动化检查
+        showNoneDataPage({ autoCheckResult: '' });
       }
       return;
     }
@@ -287,6 +289,7 @@ const PreRelease: React.FC<any> = () => {
         <Tab />
         <CheckProgress
           refreshPage={async () => {
+            setTabsData('', []);
             setGlobalLoading(true);
             const datas = await alalysisInitData('', '');
             showPageInitData(datas, true);

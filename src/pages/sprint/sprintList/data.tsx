@@ -1,6 +1,6 @@
 // 查询数据
 import { GqlClient } from '@/hooks';
-import { sortBy } from 'lodash';
+import { orderBy } from 'lodash';
 
 const queryDevelopViews = async (client: GqlClient<object>, params: any, syncData: boolean) => {
   const range = `{start:"${params.dateRange.start}", end:"${params.dateRange.end}"}`;
@@ -23,7 +23,7 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any, syncDat
       }
   `);
 
-  return sortBy(data?.project ?? [], ['expStage']);
+  return orderBy(data?.project ?? [], 'expStage', 'desc');
 };
 
 // 查询是否有重复数据

@@ -102,7 +102,6 @@ const SprintList: React.FC<any> = () => {
       ...choicedCondition,
       projectType: value,
     });
-
   };
 
   // 时间选择事件

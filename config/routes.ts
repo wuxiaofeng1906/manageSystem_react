@@ -54,7 +54,7 @@ export default [
   // },
   {
     name: '班车工作台',
-    icon: 'FileProtectOutlined',
+    icon: 'CarOutlined',
     path: '/sprint',
     routes: [
       {
@@ -127,7 +127,7 @@ export default [
   },
   {
     name: '值班与发布',
-    icon: 'ToolOutlined',
+    icon: 'DeploymentUnitOutlined',
     path: '/onDutyAndRelease',
     access: 'devCenter', // 仅研发中心人员可见，客服不可见
     routes: [
@@ -555,7 +555,7 @@ export default [
   },
   {
     name: '工具入口',
-    icon: 'CompassOutlined',
+    icon: 'ToolOutlined',
     path: 'toolIntegration',
     component: './toolIntegration',
     access: 'devCenter', // 仅研发中心人员可见，客服不可见
@@ -590,7 +590,7 @@ export default [
   },
   {
     name: '禅道管理',
-    icon: 'FileSearchOutlined',
+    icon: 'BlockOutlined',
     path: '/zentao',
     // hideInMenu: true,
     routes: [
@@ -641,7 +641,7 @@ export default [
   },
   {
     name: '石墨管理',
-    icon: 'AuditOutlined',
+    icon: 'InboxOutlined',
     path: '/shimo',
     hideInMenu: false,
     access: 'devCenter', // 仅研发中心人员可见，客服不可见，

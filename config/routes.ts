@@ -581,7 +581,7 @@ export default [
   },
   {
     name: '企业微信审批流',
-    icon: 'MessageOutlined',
+    icon: 'CommentOutlined',
     path: '/approvalFlow',
     // access: 'sysAdmin',
     // hideInMenu: true,

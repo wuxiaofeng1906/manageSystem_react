@@ -22,8 +22,15 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any, syncDat
         }
       }
   `);
+  const onlineQuestion = data?.project?.filter((it: any) => it.name == 'emergency20210930') ?? [];
 
-  return orderBy(data?.project ?? [], 'expStage', 'desc');
+  return onlineQuestion.concat(
+    orderBy(
+      data?.project?.flatMap((it: any) => (it.name == 'emergency20210930' ? [] : [it])) ?? [],
+      'expStage',
+      'desc',
+    ),
+  );
 };
 
 // 查询是否有重复数据

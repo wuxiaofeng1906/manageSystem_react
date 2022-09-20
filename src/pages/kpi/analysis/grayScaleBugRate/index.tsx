@@ -157,6 +157,7 @@ const GrayScaleBugRate: React.FC = () => {
             pivotMode={true}
             rowData={data}
             onGridReady={onGridReady}
+            suppressAggFuncInHeader={true}
             columnDefs={[
               { field: 'total', headerName: 'bug率', aggFunc: (data) => aggFunc(data, 5) },
               { field: 'numerator', headerName: '加权数', aggFunc: aggFunc },
@@ -169,7 +170,7 @@ const GrayScaleBugRate: React.FC = () => {
               resizable: true,
               filter: true,
               flex: 1,
-              minWidth: 100,
+              minWidth: 80,
             }}
           />
         </div>

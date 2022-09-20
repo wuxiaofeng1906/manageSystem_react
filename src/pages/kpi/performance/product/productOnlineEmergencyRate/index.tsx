@@ -129,12 +129,26 @@ const ProductOnlineEmergencyRate: React.FC = () => {
         </div>
         <div className={'ag-theme-alpine'} style={{ width: '100%', height: 400 }}>
           <AgGridReact
+            rowHeight={32}
+            headerHeight={35}
+            onGridReady={onGridReady}
+            pivotMode={true}
+            rowData={data}
+            suppressAggFuncInHeader={true}
+            defaultColDef={{
+              sortable: true,
+              resizable: true,
+              filter: true,
+              flex: 1,
+              minWidth: 80,
+            }}
             columnDefs={[
               {
                 field: 'total',
+                headerName: 'emergency占比',
                 aggFunc: (data: any) => {
                   let sum = 0;
-                  data?.forEach(function (value) {
+                  data?.forEach(function (value: any) {
                     if (value) {
                       sum = sum + parseFloat(value);
                     }
@@ -142,23 +156,10 @@ const ProductOnlineEmergencyRate: React.FC = () => {
                   if (!sum) return 0;
                   return sum.toFixed(2);
                 },
-                headerName: '总计',
               },
               { field: 'title', enablePivot: true, pivot: true },
               { field: 'subTitle', enablePivot: true, pivot: true },
             ]}
-            rowData={data}
-            defaultColDef={{
-              sortable: true,
-              resizable: true,
-              filter: true,
-              flex: 1,
-              minWidth: 100,
-            }}
-            rowHeight={32}
-            headerHeight={35}
-            onGridReady={onGridReady}
-            pivotMode={true}
           />
         </div>
         <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData} />

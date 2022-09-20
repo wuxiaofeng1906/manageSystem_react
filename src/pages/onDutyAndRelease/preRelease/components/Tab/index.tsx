@@ -398,18 +398,16 @@ const Tab: React.FC<any> = () => {
         <Tabs
           type={tabType}
           activeKey={tabsData === undefined ? '' : tabsData.activeKey}
-          onChange={(v) => onTabsChange(v)}
+          onChange={onTabsChange}
           onEdit={(targetKey, action) => {
             onEdits(targetKey, action);
           }}
           style={{ marginTop: -20 }}
-          onDoubleClick={(e) => tabsChangeName(e)}
-          onContextMenu={(e) => onContextMenu(e)}
+          onDoubleClick={tabsChangeName}
+          onContextMenu={onContextMenu}
         >
           {tabsData?.panes?.map((pane: any) => (
-            <TabPane tab={pane.title} key={pane.key} closable={pane.closable}>
-              {' '}
-            </TabPane>
+            <TabPane tab={pane.title} key={pane.key} closable={pane.closable} />
           ))}
         </Tabs>
       </div>
@@ -491,7 +489,7 @@ const Tab: React.FC<any> = () => {
               }}
               onClick={saveModifyName}
             >
-              保存{' '}
+              保存
             </Button>
           </Form.Item>
         </Form>

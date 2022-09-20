@@ -154,7 +154,35 @@ const GrayScaleBugRate: React.FC = () => {
                   if (!sum) return 0;
                   return sum.toFixed(5);
                 },
-                headerName: '总计',
+                headerName: 'bug率',
+              },
+              {
+                field: 'numerator',
+                aggFunc: (data: any) => {
+                  let sum = 0;
+                  data?.forEach(function (value) {
+                    if (value) {
+                      sum = sum + parseFloat(value);
+                    }
+                  });
+                  if (!sum) return 0;
+                  return sum;
+                },
+                headerName: '加权数',
+              },
+              {
+                field: 'denominator',
+                aggFunc: (data: any) => {
+                  let sum = 0;
+                  data?.forEach(function (value) {
+                    if (value) {
+                      sum = sum + parseFloat(value);
+                    }
+                  });
+                  if (!sum) return 0;
+                  return sum;
+                },
+                headerName: '代码量',
               },
               { field: 'title', enablePivot: true, pivot: true },
               {

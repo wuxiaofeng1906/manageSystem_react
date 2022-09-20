@@ -1,10 +1,10 @@
 // 查询数据
-import {GqlClient} from "@/hooks";
+import { GqlClient } from '@/hooks';
+import { orderBy } from 'lodash';
 
 const queryDevelopViews = async (client: GqlClient<object>, params: any, syncData: boolean) => {
-
   const range = `{start:"${params.dateRange.start}", end:"${params.dateRange.end}"}`;
-  const {data} = await client.query(`
+  const { data } = await client.query(`
       {
          project(name:"${params.projectName}",category:[${params.projectType}], range:${range},status:[${params.projectStatus}],order:ASC,doSync:${syncData}){
           id
@@ -22,13 +22,20 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any, syncDat
         }
       }
   `);
+  const onlineQuestion = data?.project?.filter((it: any) => it.name == 'emergency20210930') ?? [];
 
-  return data?.project;
+  return onlineQuestion.concat(
+    orderBy(
+      data?.project?.flatMap((it: any) => (it.name == 'emergency20210930' ? [] : [it])) ?? [],
+      'expStage',
+      'desc',
+    ),
+  );
 };
 
 // 查询是否有重复数据
 const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
-  const {data} = await client.query(`
+  const { data } = await client.query(`
       {
         proExist(name:"${prjName}"){
           ok
@@ -52,12 +59,12 @@ const queryRepeats = async (client: GqlClient<object>, prjName: string) => {
       }
   `);
 
-  console.log('data', data);
+  // console.log('data', data);
   return data?.proExist;
 };
 
 const queryDeleteCount = async (client: GqlClient<object>, params: any) => {
-  const {data} = await client.query(`
+  const { data } = await client.query(`
       {
          proDetail(project:${params}){
             id
@@ -69,4 +76,4 @@ const queryDeleteCount = async (client: GqlClient<object>, params: any) => {
   return data?.proDetail;
 };
 
-export {queryDevelopViews, queryRepeats, queryDeleteCount}
+export { queryDevelopViews, queryRepeats, queryDeleteCount };

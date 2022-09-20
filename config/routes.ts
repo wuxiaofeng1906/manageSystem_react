@@ -641,7 +641,7 @@ export default [
   },
   {
     name: '石墨管理',
-    icon: 'InboxOutlined',
+    icon: 'BookOutlined',
     path: '/shimo',
     hideInMenu: false,
     access: 'devCenter', // 仅研发中心人员可见，客服不可见，

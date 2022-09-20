@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { IRuleData } from '@/components/IStaticPerformance';
-import IStaticPerformance, { IDrawer } from '@/components/IStaticPerformance';
+import { IDrawer } from '@/components/IStaticPerformance';
 import StatisticServices from '@/services/statistic';
 import { Button, Spin } from 'antd';
 import { CalendarTwoTone, QuestionCircleTwoTone, ScheduleTwoTone } from '@ant-design/icons';
@@ -106,6 +106,17 @@ const GrayScaleBugRate: React.FC = () => {
     getTableSource();
   }, [catagory]);
 
+  const aggFunc = (data: any, number = 0) => {
+    let sum = 0;
+    data?.forEach(function (value: any) {
+      if (value) {
+        sum = sum + parseFloat(value);
+      }
+    });
+    if (!sum) return 0;
+    return number > 0 ? sum.toFixed(number) : sum;
+  };
+
   return (
     <PageContainer>
       <Spin spinning={loading} tip={'数据加载中...'}>
@@ -141,57 +152,18 @@ const GrayScaleBugRate: React.FC = () => {
         </div>
         <div className={'ag-theme-alpine'} style={{ width: '100%', height: 400 }}>
           <AgGridReact
-            columnDefs={[
-              {
-                field: 'total',
-                aggFunc: (data: any) => {
-                  let sum = 0;
-                  data?.forEach(function (value) {
-                    if (value) {
-                      sum = sum + parseFloat(value);
-                    }
-                  });
-                  if (!sum) return 0;
-                  return sum.toFixed(5);
-                },
-                headerName: 'bug率',
-              },
-              {
-                field: 'numerator',
-                aggFunc: (data: any) => {
-                  let sum = 0;
-                  data?.forEach(function (value) {
-                    if (value) {
-                      sum = sum + parseFloat(value);
-                    }
-                  });
-                  if (!sum) return 0;
-                  return sum;
-                },
-                headerName: '加权数',
-              },
-              {
-                field: 'denominator',
-                aggFunc: (data: any) => {
-                  let sum = 0;
-                  data?.forEach(function (value) {
-                    if (value) {
-                      sum = sum + parseFloat(value);
-                    }
-                  });
-                  if (!sum) return 0;
-                  return sum;
-                },
-                headerName: '代码量',
-              },
-              { field: 'title', enablePivot: true, pivot: true },
-              {
-                field: 'subTitle',
-                enablePivot: true,
-                pivot: true,
-              },
-            ]}
+            rowHeight={32}
+            headerHeight={35}
+            pivotMode={true}
             rowData={data}
+            onGridReady={onGridReady}
+            columnDefs={[
+              { field: 'total', headerName: 'bug率', aggFunc: (data) => aggFunc(data, 5) },
+              { field: 'numerator', headerName: '加权数', aggFunc: aggFunc },
+              { field: 'denominator', headerName: '代码量', aggFunc: aggFunc },
+              { field: 'title', enablePivot: true, pivot: true },
+              { field: 'subTitle', enablePivot: true, pivot: true, openByDefault: true },
+            ]}
             defaultColDef={{
               sortable: true,
               resizable: true,
@@ -199,10 +171,6 @@ const GrayScaleBugRate: React.FC = () => {
               flex: 1,
               minWidth: 100,
             }}
-            rowHeight={32}
-            headerHeight={35}
-            onGridReady={onGridReady}
-            pivotMode={true}
           />
         </div>
         <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData} />

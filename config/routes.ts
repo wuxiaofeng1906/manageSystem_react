@@ -367,13 +367,6 @@ export default [
                 // hideInMenu: true,
               },
               {
-                name: '灰度千行bug率',
-                icon: 'table',
-                path: 'grayScaleBugRate',
-                component: './kpi/performance/developer/grayScaleBugRate',
-                // hideInMenu: true,
-              },
-              {
                 name: '阻塞次数',
                 icon: 'table',
                 path: 'blockingTimes',
@@ -644,6 +637,13 @@ export default [
             path: 'bugResolutionSpeed',
             component: './kpi/analysis/bugResolutionSpeed',
             access: 'sysAdmin',
+          },
+          {
+            name: '灰度千行bug率',
+            icon: 'table',
+            path: 'grayScaleBugRate',
+            component: './kpi/analysis/grayScaleBugRate',
+            // hideInMenu: true,
           },
         ],
       },

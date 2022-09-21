@@ -18,6 +18,7 @@ const DragIcon = (props: any) => {
         alt="移动"
         title="移动"
         ref={myRef}
+        style={{ cursor: 'pointer' }}
       />
     </span>
   );

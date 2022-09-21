@@ -19,7 +19,7 @@ const Item = (params: { data: Iitem; bg?: string; child?: React.ReactNode }) => 
       <p>服务:{params.data.server?.join(',')}</p>
       <p>时间:{params.data.time}</p>
       <img
-        src={require('../../../public/delete_black_2.png')}
+        src={require('../../../../../public/delete_black_2.png')}
         className={styles.deleteIcon}
         onClick={() => {
           console.log(params.data);

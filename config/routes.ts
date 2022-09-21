@@ -159,6 +159,12 @@ export default [
         component: './onDutyAndRelease/preRelease',
       },
       {
+        name: '发布过程主页',
+        icon: 'table',
+        path: 'releaseProcess',
+        component: './onDutyAndRelease/preRelease/releaseProcess/index',
+      },
+      {
         name: '发布历史',
         icon: 'table',
         path: 'releaseHistory',
@@ -667,12 +673,6 @@ export default [
         ],
       },
     ],
-  },
-  {
-    name: '发布一览图',
-    icon: 'table',
-    path: './visual',
-    component: './visual',
   },
   {
     name: '系统管理',

@@ -1,47 +1,37 @@
-import React, { useEffect, useRef } from 'react';
-import { Button } from 'antd';
-import { AgGridReact } from 'ag-grid-react';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import DragIcon from '@/components/DragIcon';
+import React, { useEffect } from 'react';
+import { Tabs } from 'antd';
+import { useLocation, history } from 'umi';
+import { PageContainer } from '@ant-design/pro-layout';
+import PreReleaseList from '@/pages/onDutyAndRelease/preRelease/releaseProcess/PreReleaseList';
+import VisualView from '@/pages/onDutyAndRelease/preRelease/releaseProcess/VisualView';
+import HistoryList from '@/pages/onDutyAndRelease/preRelease/releaseProcess/HistoryList';
+import styles from './index.less';
 const Index = () => {
-  const gridRef = useRef<GridApi>();
-  const onGridReady = (params: GridReadyEvent) => {
-    gridRef.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
-  const onDrag = () => {
-    const sortArr: any = [];
-    gridRef.current?.forEachNode(function (node, index) {
-      const current = node.data;
+  const query = useLocation()?.query;
 
-      console.log(current);
-    });
-  };
+  useEffect(() => {
+    updateKey(query.key);
+  }, []);
+
+  const updateKey = (key?: string) =>
+    history.replace({ pathname: history.location.pathname, query: { key: key ?? 'pre' } });
+
   return (
-    <div>
-      <div>
-        <Button>新增发布</Button>
-        <div className="ag-theme-alpine" style={{ height: 800, width: '100%' }}>
-          <AgGridReact
-            columnDefs={[]} // 定义列
-            rowData={[]} // 数据绑定
-            defaultColDef={{
-              resizable: true,
-              // sortable: true,
-              filter: true,
-              flex: 1,
-              suppressMenu: true,
-            }}
-            rowDragManaged={true}
-            animateRows={true}
-            frameworkComponents={{ myCustomCell: DragIcon }}
-            onRowDragEnd={onDrag}
-            onGridReady={onGridReady}
-            onGridSizeChanged={onGridReady}
-          />
-        </div>
+    <PageContainer>
+      <div className={styles.processTabs}>
+        <Tabs defaultActiveKey={query.key} onChange={updateKey} animated={false}>
+          <Tabs.TabPane tab={'预发布列表'} key={'pre'}>
+            <PreReleaseList />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab={'发布历史'} key={'history'}>
+            <HistoryList />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab={'发布一览图'} key={'visual'}>
+            <VisualView />
+          </Tabs.TabPane>
+        </Tabs>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 export default Index;

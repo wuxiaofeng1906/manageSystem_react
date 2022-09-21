@@ -1,12 +1,12 @@
-import request from './request';
+import request, { irregularRequest } from './request';
 const SprintDetailServices = {
   // 记录标识
   async removeTag(data: any) {
-    return request('/api/sprint/project/child/remove', { data, method: 'put' }, false);
+    return irregularRequest('/api/sprint/project/child/remove', { data, method: 'put' });
   },
   // 移除
   async remove(data: any) {
-    return request('/api/sprint/project/child/remove', { data, method: 'delete' }, false);
+    return irregularRequest('/api/sprint/project/child/remove', { data, method: 'delete' });
   },
   // 获取最近的班车执行
   async getNextSprint(params: any) {

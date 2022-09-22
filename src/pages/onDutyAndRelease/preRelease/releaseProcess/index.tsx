@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Tabs } from 'antd';
+import { BarsOutlined, HistoryOutlined, FundViewOutlined } from '@ant-design/icons';
 import { useLocation, history } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import PreReleaseList from '@/pages/onDutyAndRelease/preRelease/releaseProcess/PreReleaseList';
@@ -18,15 +19,39 @@ const Index = () => {
 
   return (
     <PageContainer>
-      <div className={styles.processTabs}>
+      <div className={styles.releaseProcessContainer}>
         <Tabs defaultActiveKey={query.key} onChange={updateKey} animated={false}>
-          <Tabs.TabPane tab={'预发布列表'} key={'pre'}>
+          <Tabs.TabPane
+            key={'pre'}
+            tab={
+              <div>
+                <BarsOutlined />
+                预发布列表
+              </div>
+            }
+          >
             <PreReleaseList />
           </Tabs.TabPane>
-          <Tabs.TabPane tab={'发布历史'} key={'history'}>
+          <Tabs.TabPane
+            key={'history'}
+            tab={
+              <div>
+                <HistoryOutlined />
+                发布历史
+              </div>
+            }
+          >
             <HistoryList />
           </Tabs.TabPane>
-          <Tabs.TabPane tab={'发布一览图'} key={'visual'}>
+          <Tabs.TabPane
+            key={'view'}
+            tab={
+              <div>
+                <FundViewOutlined />
+                发布视图
+              </div>
+            }
+          >
             <VisualView />
           </Tabs.TabPane>
         </Tabs>

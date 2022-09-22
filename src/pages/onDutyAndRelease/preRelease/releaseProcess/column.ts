@@ -4,12 +4,14 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
   {
     headerName: '序号',
     field: 'num',
-    width: 105,
+    width: 70,
+    minWidth: 90,
+    maxWidth: 110,
     filter: false,
     cellRenderer: (params: any) => String(+params.node.id + 1),
   },
   {
-    headerName: '预发布批名',
+    headerName: '预发布批次名',
     field: 'name',
     minWidth: 110,
     cellRenderer: (p) =>
@@ -46,7 +48,7 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     headerName: '发布类型',
     field: 'type',
     minWidth: 120,
-    maxWidth: 150,
+    maxWidth: 140,
   },
   {
     headerName: '发布结果',
@@ -81,6 +83,7 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     headerName: '操作',
     cellRenderer: 'drag',
     width: 90,
+    maxWidth: 90,
     hide: type == 'history',
   },
 ];

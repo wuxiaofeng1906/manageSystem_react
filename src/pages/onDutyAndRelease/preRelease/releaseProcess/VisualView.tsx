@@ -164,21 +164,6 @@ const VisualView = () => {
                     />
                   }
                 />
-                <Item
-                  bg={initBg[2]}
-                  data={{
-                    time: '2022/09/12 12:32',
-                    server: ['web', 'h5'],
-                    project: 'emergency20220909',
-                    branch: 'hotfix',
-                  }}
-                  child={
-                    <div
-                      className={cns(styles.dotLineBase, styles.dotLineBlue)}
-                      style={{ width: `calc(50% + 7px)` }}
-                    />
-                  }
-                />
               </div>
             </td>
             {renderEmptyTD(memoLen + 2)}

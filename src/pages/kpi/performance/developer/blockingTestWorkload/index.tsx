@@ -39,11 +39,7 @@ const ruleData: IRuleData[] = [
 ];
 const BlockingTestWorkload: React.FC<any> = () => {
   return (
-    <IStaticPerformance
-      ruleData={ruleData}
-      request={StatisticServices.shuttleDelay}
-      identity={'DEVELOPER'}
-    />
+    <IStaticPerformance ruleData={ruleData} request={StatisticServices.blockingTestWorkload} />
   );
 };
 

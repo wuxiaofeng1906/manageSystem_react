@@ -178,6 +178,67 @@ const StatisticServices = {
     return { data: formatTreeData(data.data), loading };
   },
 
+  // 阻塞测试工作量
+  async blockingTestWorkload({ client, params, identity }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:devBlockWorkloadDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+        total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            parent{
+              dept
+              deptName
+            }
+            kpi
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData(data.data), loading };
+  },
+  // 阻塞次数
+  async blockingTimes({ client, params, identity }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:blockingTimes(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+        total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            parent{
+              dept
+              deptName
+            }
+            kpi
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData(data.data), loading };
+  },
+
   // 产品上线后引入emergency
   async onlineEmergency({
     client,

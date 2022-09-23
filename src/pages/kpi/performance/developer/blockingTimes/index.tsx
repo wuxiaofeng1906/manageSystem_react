@@ -2,7 +2,6 @@ import React from 'react';
 import type { IRuleData } from '@/components/IStaticPerformance';
 import IStaticPerformance from '@/components/IStaticPerformance';
 import StatisticServices from '@/services/statistic';
-import { getHalfYearTime } from '@/publicMethods/timeMethods';
 const ruleData: IRuleData[] = [
   {
     title: '统计范围',
@@ -26,13 +25,7 @@ const ruleData: IRuleData[] = [
   },
 ];
 const BlockingTimes: React.FC<any> = () => {
-  return (
-    <IStaticPerformance
-      ruleData={ruleData}
-      request={StatisticServices.shuttleDelay}
-      identity={'DEVELOPER'}
-    />
-  );
+  return <IStaticPerformance ruleData={ruleData} request={StatisticServices.blockingTimes} />;
 };
 
 export default BlockingTimes;

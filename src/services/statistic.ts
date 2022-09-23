@@ -206,7 +206,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data), loading };
+    return { data: formatTreeData(data.data, false, 1), loading };
   },
   // 阻塞次数
   async blockingTimes({ client, params, identity }: IStatisticQuery) {
@@ -214,7 +214,7 @@ const StatisticServices = {
     if (condition.typeFlag === 0) return [];
     const { data, loading } = await client.query(`
       {
-         data:blockingTimes(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+         data:devBlockTimesDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
         total{
             dept
             deptName
@@ -236,7 +236,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data), loading };
+    return { data: formatTreeData(data.data, false, 1), loading };
   },
 
   // 产品上线后引入emergency

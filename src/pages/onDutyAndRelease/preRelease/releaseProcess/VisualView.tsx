@@ -7,8 +7,8 @@ interface Iitem {
   server: string[];
   env?: string;
   time: string;
-  from: number;
-  to: number;
+  from?: number;
+  to?: number;
 }
 
 const thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
@@ -76,12 +76,13 @@ const VisualView = () => {
 
   return (
     <div className={styles.visualView}>
-      <table style={{ width: `${(memoLen || 1) * 10 + 100}%` }}>
+      <table
+      // style={{ width: `${((memoLen || 1) + 3) * 230 + 70}px` }}
+      >
         <thead>
           <tr>
             {thead.map((title) => {
               const isOnline = title == '线上';
-              // const singleW = ((memoLen || 1) + 3) / 100;
               const singleW = 230;
               return (
                 <th
@@ -108,9 +109,27 @@ const VisualView = () => {
         <tbody>
           {/*这一行需特殊处理*/}
           <tr>
-            <th className={styles.title}>版本基准</th>
+            <th>版本基准</th>
             <td className={styles.obliqueLine} />
             <td>
+              <Item
+                bg={'#93db9340'}
+                data={{
+                  time: '2022-09-12 12:32',
+                  server: ['web', 'h5'],
+                  project: '自定义门户',
+                  branch: 'hotfix',
+                }}
+              />
+              <Item
+                bg={'#93db9340'}
+                data={{
+                  time: '2022-09-12 12:32',
+                  server: ['web', 'h5'],
+                  project: '自定义门户',
+                  branch: 'hotfix',
+                }}
+              />
               <Item
                 bg={'#93db9340'}
                 data={{
@@ -144,9 +163,7 @@ const VisualView = () => {
             {renderEmptyTD(memoLen - 1)}
           </tr>
           <tr>
-            <th rowSpan={4} className={styles.title}>
-              预发布
-            </th>
+            <th rowSpan={4}>预发布</th>
             <td>
               <div>
                 <Item
@@ -160,7 +177,7 @@ const VisualView = () => {
                   child={
                     <div
                       className={cns(styles.dotLineBase, styles.dotLineOrange)}
-                      style={{ width: `calc(100% + 7px)` }}
+                      style={{ width: `calc(50% + 7px)` }}
                     />
                   }
                 />
@@ -207,7 +224,7 @@ const VisualView = () => {
                   child={
                     <div
                       className={cns(styles.dotLineBase, styles.dotLineBlue)}
-                      style={{ width: `calc(100% + 7px)` }}
+                      style={{ width: `calc(150% + 7px)` }}
                     />
                   }
                 />
@@ -229,7 +246,7 @@ const VisualView = () => {
                   child={
                     <div
                       className={cns(styles.dotLineBase, styles.dotLineBlue)}
-                      style={{ width: `calc(100% + 7px)` }}
+                      style={{ width: `calc(150% + 7px)` }}
                     />
                   }
                 />

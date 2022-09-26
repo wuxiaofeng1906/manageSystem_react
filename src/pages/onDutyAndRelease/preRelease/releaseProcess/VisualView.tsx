@@ -1,7 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import styles from './index.less';
 import cns from 'classnames';
+import { Collapse } from 'antd';
+import { useModel } from 'umi';
+
 interface Iitem {
+  id?: string;
   project: string;
   branch: string;
   server: string[];
@@ -9,26 +13,35 @@ interface Iitem {
   time: string;
   from?: number;
   to?: number;
+  bg?: string;
 }
 
 const thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
-const initBg = ['#93db9340', '#e8773c40', '#335d8a59'];
+const initBg = ['#93db9340', '#e8773c40', '#519ff259'];
 const Item = (params: { data: Iitem; bg?: string; child?: React.ReactNode }) => {
+  const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
+
+  const hasPermission = useMemo(() => user?.group == 'superGroup', [user]);
+
   return (
-    <div style={{ background: params.bg || initBg[0] }} className={styles.item}>
+    <div style={{ background: params.bg || params.data.bg || initBg[0] }} className={styles.item}>
       {params.child || <div />}
       <p>发布项目:{params.data.project}</p>
       <p>发布分支:{params.data.branch}</p>
       <p>发布服务:{params.data.server?.join(',')}</p>
       <p>发布集群:{params.data.server?.join(',')}</p>
       <p>计划发布时间:{params.data.time}</p>
-      <img
-        src={require('../../../../../public/delete_black_2.png')}
-        className={styles.deleteIcon}
-        onClick={() => {
-          console.log(params.data);
-        }}
-      />
+      {hasPermission ? (
+        <img
+          src={require('../../../../../public/delete_black_2.png')}
+          className={styles.deleteIcon}
+          onClick={() => {
+            console.log(params.data);
+          }}
+        />
+      ) : (
+        <div />
+      )}
     </div>
   );
 };
@@ -40,6 +53,7 @@ const VisualView = () => {
     setOnline([{ name: '集群2-3' }, { name: '集群4-6' }, { name: '集群7-8' }]);
     setSource([
       {
+        id: '1',
         time: '2022-09-12 12:32',
         server: ['web', 'h5'],
         project: '自定义门户',
@@ -47,8 +61,10 @@ const VisualView = () => {
         env: '',
         from: 1,
         to: 150,
+        bg: '#93db9340',
       },
       {
+        id: '2',
         time: '2022-09-12 12:32',
         server: ['web', 'app'],
         project: '库存管理',
@@ -56,6 +72,40 @@ const VisualView = () => {
         env: '',
         from: 1,
         to: 50,
+        bg: '#93db9340',
+      },
+      {
+        id: '3',
+        time: '2022-09-12 12:32',
+        server: ['web', 'app'],
+        project: '库存管理',
+        branch: 'hotfix',
+        env: '',
+        from: 1,
+        to: 50,
+        bg: '#93db9340',
+      },
+      {
+        id: '4',
+        time: '2022-09-12 12:32',
+        server: ['web', 'app'],
+        project: '库存管理',
+        branch: 'hotfix',
+        env: '',
+        from: 1,
+        to: 50,
+        bg: '#93db9340',
+      },
+      {
+        id: '5',
+        time: '2022-09-12 12:32',
+        server: ['web', 'app'],
+        project: '库存管理',
+        branch: 'hotfix',
+        env: '',
+        from: 1,
+        to: 50,
+        bg: '#93db9340',
       },
     ]);
   }, []);
@@ -76,9 +126,7 @@ const VisualView = () => {
 
   return (
     <div className={styles.visualView}>
-      <table
-      // style={{ width: `${((memoLen || 1) + 3) * 230 + 70}px` }}
-      >
+      <table>
         <thead>
           <tr>
             {thead.map((title) => {
@@ -112,33 +160,15 @@ const VisualView = () => {
             <th>版本基准</th>
             <td className={styles.obliqueLine} />
             <td>
-              <Item
-                bg={'#93db9340'}
-                data={{
-                  time: '2022-09-12 12:32',
-                  server: ['web', 'h5'],
-                  project: '自定义门户',
-                  branch: 'hotfix',
-                }}
-              />
-              <Item
-                bg={'#93db9340'}
-                data={{
-                  time: '2022-09-12 12:32',
-                  server: ['web', 'h5'],
-                  project: '自定义门户',
-                  branch: 'hotfix',
-                }}
-              />
-              <Item
-                bg={'#93db9340'}
-                data={{
-                  time: '2022-09-12 12:32',
-                  server: ['web', 'h5'],
-                  project: '自定义门户',
-                  branch: 'hotfix',
-                }}
-              />
+              <div className={styles.stackWrapper}>
+                <Collapse defaultActiveKey={['1', '2']}>
+                  {source.map((it, index) => (
+                    <Collapse.Panel key={it.id || index} header={it.project}>
+                      <Item data={it} />
+                    </Collapse.Panel>
+                  ))}
+                </Collapse>
+              </div>
             </td>
             <td>
               <Item
@@ -167,17 +197,17 @@ const VisualView = () => {
             <td>
               <div>
                 <Item
-                  bg={initBg[1]}
                   data={{
                     time: '2022/09/12 12:32',
                     server: ['web', 'h5'],
                     project: 'emergency20220901',
                     branch: 'hotfix',
+                    bg: initBg[1],
                   }}
                   child={
                     <div
                       className={cns(styles.dotLineBase, styles.dotLineOrange)}
-                      style={{ width: `calc(50% + 7px)` }}
+                      style={{ width: `calc(450% + 7px)` }}
                     />
                   }
                 />
@@ -190,12 +220,12 @@ const VisualView = () => {
             <td>
               <div>
                 <Item
-                  bg={initBg[2]}
                   data={{
                     time: '2022/09/12 12:32',
                     server: ['web', 'h5'],
                     project: '自定义',
                     branch: 'hotfix',
+                    bg: initBg[2],
                   }}
                   child={
                     <div
@@ -214,12 +244,12 @@ const VisualView = () => {
             <td>
               <div>
                 <Item
-                  bg={initBg[2]}
                   data={{
                     time: '2022/09/12 12:32',
                     server: ['web', 'h5'],
                     project: '采购管理',
                     branch: 'hotfix',
+                    bg: initBg[2],
                   }}
                   child={
                     <div
@@ -236,17 +266,17 @@ const VisualView = () => {
             <td>
               <div>
                 <Item
-                  bg={initBg[2]}
                   data={{
-                    time: '2022/09/12 12:32',
+                    time: '2022/09/30 12:32',
                     server: ['web', 'h5'],
                     project: 'sprint',
                     branch: 'hotfix',
+                    bg: initBg[2],
                   }}
                   child={
                     <div
                       className={cns(styles.dotLineBase, styles.dotLineBlue)}
-                      style={{ width: `calc(150% + 7px)` }}
+                      style={{ width: `calc(50% + 7px)` }}
                     />
                   }
                 />

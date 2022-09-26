@@ -18,6 +18,7 @@
       }
       td{
         vertical-align: top;
+        position: relative;
       }
       th, td {
         min-width: 230px;
@@ -54,11 +55,28 @@
           left: 100%;
           transform: translateY(-50%);
         }
-        .dotLineOrange{
-          background: url("../../../../../public/line_orange.png") no-repeat 100% center;
+        .dotLineOrange,.dotLineBlue{
+          height: 2px;
+          position: absolute;
+          top:50%;
+          transform: translateY(-50%);
+          border-bottom: 2px dotted #e8773c;
+          &:after{
+            right: -13px;
+            top:-8px;
+            position: absolute;
+            display: inline-block;
+            content: '';
+            border-left:12px solid #e8773c;
+            border-top:10px solid transparent;
+            border-bottom:10px solid transparent;
+          }
         }
         .dotLineBlue {
-          background: url("../../../../../public/line_blue.png") no-repeat 100% center;
+          border-bottom: 2px dotted #529ff2;
+          &:after{
+            border-left:12px solid #529ff2;
+          }
         }
       }
       // 右对角线
@@ -71,6 +89,20 @@
         rgba(#ddd, 1) 50%,
         rgba(0, 0, 0, 0) calc(50% + 0.5px),
         rgba(0, 0, 0, 0) 100%);
+      }
+    }
+  }
+    .stackWrapper{
+      padding:7px;
+      :global{
+        .ant-collapse-header{
+          padding: 6px 10px;
+          font-size: 12px;
+          font-width: bold;
+          background: white;
+        }
+        .ant-collapse-content > .ant-collapse-content-box{
+        padding: 0!important;
       }
     }
   }

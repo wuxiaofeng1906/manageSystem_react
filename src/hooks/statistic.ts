@@ -39,7 +39,12 @@ export const useStatistic = () => {
     setLoading(true);
     try {
       // eslint-disable-next-line @typescript-eslint/no-shadow
-      const { data, loading }: any = await request({ client: gqlClient, params: type, identity });
+      const { data, loading }: any = await request({
+        client: gqlClient,
+        params: type,
+        identity,
+        showDenominator,
+      });
       setRowData(data);
       setLoading(loading);
     } catch (e) {

@@ -29,6 +29,7 @@ const HumanEffect: React.FC<any> = () => {
       ruleData={ruleData}
       request={StatisticServices.humanEffect}
       identity={'DEVELOPER'}
+      showDenominator={true}
     />
   );
 };

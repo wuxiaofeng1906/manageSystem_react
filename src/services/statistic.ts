@@ -7,6 +7,7 @@ export interface IStatisticQuery {
   client: GqlClient<object>;
   params: IStaticBy;
   identity?: string;
+  showDenominator?: boolean;
 }
 const StatisticServices = {
   // patch
@@ -100,7 +101,7 @@ const StatisticServices = {
     return { data: formatTreeData(data.data), loading };
   },
 
-  async humanEffect({ client, params, identity }: IStatisticQuery) {
+  async humanEffect({ client, params, identity, showDenominator }: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
     const { data, loading } = await client.query(`
@@ -145,7 +146,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data), loading };
+    return { data: formatTreeData(data.data, showDenominator), loading };
   },
 
   async shuttleDelay({ client, params, identity }: IStatisticQuery) {

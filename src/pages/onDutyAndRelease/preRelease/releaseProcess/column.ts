@@ -14,10 +14,13 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     headerName: '预发布批次名',
     field: 'name',
     minWidth: 110,
-    cellRenderer: (p) =>
-      `<a href="/onDutyAndRelease/preRelease?releasedNum=${p.data.id}&history=${
-        type == 'history'
-      }">${p.value}</a>`,
+    cellRenderer: (p) => {
+      // let href=`/onDutyAndRelease/preRelease?releasedNum=${p.data.id}&history=${
+      //   type == 'history'
+      // }`;
+      const href = `/onDutyAndRelease/releaseOrder/${p.data.id}`;
+      return `<a href="${href}">${p.value}</a>`;
+    },
   },
   {
     headerName: '发布项目',
@@ -85,5 +88,55 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     width: 90,
     maxWidth: 90,
     hide: type == 'history',
+  },
+];
+export const historyOrderColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDef)[] => [
+  {
+    headerName: '序号',
+    field: 'num',
+    width: 70,
+    minWidth: 90,
+    maxWidth: 110,
+    filter: false,
+    cellRenderer: (params: any) => String(+params.node.id + 1),
+  },
+  {
+    headerName: '推送类型',
+    field: 'type',
+  },
+  {
+    headerName: '关联工单编号',
+    field: 'number',
+  },
+  {
+    headerName: '关联项目列表',
+    field: 'list',
+  },
+  {
+    headerName: '已发布集群',
+    field: 'env',
+  },
+  {
+    headerName: '操作',
+    cellRenderer: 'deleteOrder',
+  },
+];
+export const historyCheckColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDef)[] => [
+  {
+    headerName: '序号',
+    field: 'num',
+    width: 70,
+    minWidth: 90,
+    maxWidth: 110,
+    filter: false,
+    cellRenderer: (params: any) => String(+params.node.id + 1),
+  },
+  {
+    headerName: 'rd平台工单',
+    field: 'rd',
+  },
+  {
+    headerName: 'ops平台工单',
+    field: 'ops',
   },
 ];

@@ -165,6 +165,13 @@ export default [
         component: './onDutyAndRelease/preRelease/releaseProcess/index',
       },
       {
+        name: '发布历史', // 新版本发布历史
+        icon: 'table',
+        path: 'releaseOrder/:id',
+        hideInMenu: true,
+        component: './onDutyAndRelease/preRelease/releaseProcess/ReleaseOrder',
+      },
+      {
         name: '发布历史',
         icon: 'table',
         path: 'releaseHistory',

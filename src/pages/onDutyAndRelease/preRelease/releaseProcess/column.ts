@@ -15,10 +15,12 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     field: 'name',
     minWidth: 110,
     cellRenderer: (p) => {
-      // let href=`/onDutyAndRelease/preRelease?releasedNum=${p.data.id}&history=${
-      //   type == 'history'
-      // }`;
-      const href = `/onDutyAndRelease/releaseOrder/${p.data.id}`;
+      let href = `/onDutyAndRelease/preRelease?releasedNum=${p.data.id}&history=${
+        type == 'history'
+      }`;
+      if (p.data.page == 'online') {
+        href = `/onDutyAndRelease/releaseOrder/${p.data.id}`;
+      }
       return `<a href="${href}">${p.value}</a>`;
     },
   },
@@ -85,12 +87,12 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
   {
     headerName: '操作',
     cellRenderer: 'drag',
-    width: 90,
+    minWidth: 90,
     maxWidth: 90,
     hide: type == 'history',
   },
 ];
-export const historyOrderColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDef)[] => [
+export const historyOrderColumn = [
   {
     headerName: '序号',
     field: 'num',
@@ -119,9 +121,11 @@ export const historyOrderColumn = (type: 'history' | 'pre'): (ColDef | ColGroupD
   {
     headerName: '操作',
     cellRenderer: 'deleteOrder',
+    width: 130,
+    maxWidth: 140,
   },
 ];
-export const historyCheckColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDef)[] => [
+export const historyCompareColumn = [
   {
     headerName: '序号',
     field: 'num',

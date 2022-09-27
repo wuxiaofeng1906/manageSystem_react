@@ -45,6 +45,7 @@ const PreReleaseList = () => {
         type: '灰度推线上',
         method: '停服',
         env: '集群1',
+        page: 'online',
       },
       {
         id: '202209190031',
@@ -57,6 +58,7 @@ const PreReleaseList = () => {
         type: '灰度推线上',
         method: '停服',
         env: '集群2345',
+        page: 'gray',
       },
     ]);
   }, []);

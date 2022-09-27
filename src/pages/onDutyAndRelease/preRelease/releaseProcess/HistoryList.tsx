@@ -5,11 +5,13 @@ import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { releaseListColumn } from '@/pages/onDutyAndRelease/preRelease/releaseProcess/column';
 import IPagination from '@/components/IPagination';
 import { getHeight } from '@/publicMethods/pageSet';
+import PreReleaseServices from '@/services/preRelease';
 
 const HistoryList = () => {
   const gridRef = useRef<GridApi>();
   const [form] = Form.useForm();
   const [rowData, setRowData] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
   const [spinning, setSpinning] = useState(false);
   const [gridHeight, setGridHeight] = useState(getHeight() - 140);
 
@@ -22,9 +24,17 @@ const HistoryList = () => {
     gridRef.current = params.api;
     params.api.sizeColumnsToFit();
   };
+  const getProject = async () => {
+    const res = await PreReleaseServices.project();
+    setProjects(
+      res?.map((it: any) => ({ label: it.project_name, value: it.project_id, key: it.project_id })),
+    );
+  };
+
   window.onresize = function () {
     setGridHeight(Number(getHeight()) - 140);
   };
+
   const getTableList = async (page = 1, page_size = 20) => {
     const values = form.getFieldsValue();
     try {
@@ -60,7 +70,9 @@ const HistoryList = () => {
       setSpinning(false);
     }
   };
+
   useEffect(() => {
+    getProject();
     getTableList();
   }, []);
 
@@ -69,7 +81,7 @@ const HistoryList = () => {
       <Form layout={'inline'} size={'small'} form={form} onFieldsChange={() => getTableList()}>
         <Col span={8}>
           <Form.Item name={'project'} label={'发布项目'}>
-            <Select options={[]} style={{ width: '100%' }} />
+            <Select options={projects} style={{ width: '100%' }} />
           </Form.Item>
         </Col>
         <Col span={8}>

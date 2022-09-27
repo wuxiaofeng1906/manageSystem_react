@@ -98,7 +98,7 @@
         .ant-collapse-header{
           padding: 6px 10px;
           font-size: 12px;
-          font-width: bold;
+          font-weight: bold;
           background: white;
         }
         .ant-collapse-content > .ant-collapse-content-box{
@@ -125,7 +125,57 @@
     }
   }
 }
-.preReleaseList{
+.preReleaseList{}
+.releaseOrder{
+  padding: 12px;
+  background: white;
+  .save{
+    width: 100%;
+    text-align: right;
+    :global{
+      .ant-btn{
+        border-radius: 4px;
+        color:#46a0fc;
+        border-color: #46a0fc85;
+        background:  transparent;
+        min-width: 95px;
+        margin-bottom: 10px;
+        height: 28px;
+      }
+    }
 
+  }
+  .collapse{
+    :global{
+      .ant-collapse-header{
+        padding: 6px 10px;
+        font-size: 14px;
+        font-weight: bold;
+        background:white
+      }
+      .ant-collapse-content{
+        padding: 8px;
+      }
+      .ant-collapse-content-box{
+        background: #eaf7ffd1;
+        border-radius: 4px;
+        padding: 10px;
+      }
+    }
+      .baseInfo{
+        :global{
+          .ant-form-item-control{
+            min-width: 0;
+          }
+          .ant-col{
+            &:last-child{
+              .ant-form-item{
+                margin-right: 0;
+              }
+            }
+          }
+        }
+    }
+  }
 }
 

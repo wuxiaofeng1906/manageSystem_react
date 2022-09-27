@@ -46,5 +46,17 @@ const PreReleaseServices = {
       params,
     });
   },
+  // 关联值班名单
+  async dutyOrder() {
+    return request(`${baseUrl}/release/duty`);
+  },
+  // 发布集群
+  async environment() {
+    return request(`${baseUrl}/release/environment`);
+  },
+  // 发布项目
+  async project() {
+    return request(`${baseUrl}/duty/project`);
+  },
 };
 export default PreReleaseServices;

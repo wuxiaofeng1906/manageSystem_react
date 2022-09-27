@@ -78,7 +78,7 @@ const rendererUnitTest = (params: any) => {
   return `
         <div style="height: 66px">
             <div style="line-height: 26px;margin-left:100px;cursor: pointer">
-                <img src="../refresh.png" width="16" height="16" alt="刷新" title="刷新"
+                <img src="../refresh.png" width="20" height="20" alt="刷新" title="刷新"
                   onclick='refreshStatus(${JSON.stringify({
                     ready_release_num: params.data.ready_release_num,
                     refresh_param: 'test_unit',
@@ -130,7 +130,7 @@ const iconCheckRender = (params: any) => {
             !result
               ? ''
               : `<div style="line-height: 26px;margin-left: 60px">
-                  <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
+                  <img src="../执行.png" width="18" height="18" alt="执行" title="执行"
                     style="margin-right: 10px;cursor: pointer"
                     onclick='refreshStatus(${JSON.stringify({
                       ready_release_num: params.data.ready_release_num,
@@ -138,7 +138,7 @@ const iconCheckRender = (params: any) => {
                     })})'/>
                   <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
                           onclick='showIconCheckLog(${logs})'>
-                    <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+                    <img src="../taskUrl.png" width="16" height="16" alt="日志" title="日志">
                   </Button>
               </div>`
           }
@@ -255,11 +255,11 @@ const beforeOnlineVersionCheck = (params: any) => {
           <div style="line-height: 26px;margin-left: 120px">
             <Button  style=" margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
             onclick='excuteCheckData("versionCheck",${checkNum},${JSON.stringify(result)})'>
-              <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
+              <img src="../执行.png" width="18" height="18" alt="执行" title="执行">
             </Button>
            <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
                 onclick='versionCheckLogUrlClick(${JSON.stringify(values?.check_url)})'>
-                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+                <img src="../taskUrl.png" width="16" height="16" alt="日志" title="日志">
             </Button>
           </div>
           <div style="width: 210px">
@@ -328,12 +328,12 @@ const beforeOnlineEnvCheck = (params: any) => {
             <div style="margin-left: 120px;line-height: 26px" >
               <Button  style="margin-left: -10px; border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
               onclick='excuteCheckData("envCheck",${checkNum},${JSON.stringify(result)})'>
-                <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
+                <img src="../执行.png" width="18" height="18" alt="执行" title="执行">
               </Button>
               <a href="${values?.check_url}" target="_blank"  onclick="return visitCommenLog('${
     values?.check_url
   }')" >
-               <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+               <img src="../taskUrl.png" width="16" height="16" alt="日志" title="日志">
              </a>
             </div>
             <div style="line-height: 20px;font-size: 10px;width: 200px">
@@ -374,7 +374,7 @@ const hotCheck = (params: any) => {
   return `
         <div style="height: 66px">
             <div style="margin-left: 120px;line-height: 26px" >
-              <img src="../执行.png" width="16" height="16" alt="执行" title="执行"
+              <img src="../执行.png" width="18" height="18" alt="执行" title="执行"
                     style="margin-right: 10px;cursor: pointer"
                     onclick='hotUpdateCheckStatus(${checkNum},${JSON.stringify(
     hot_update_check?.check_status,
@@ -383,7 +383,7 @@ const hotCheck = (params: any) => {
                           onclick='showHotUpdateCheckLog(${JSON.stringify(
                             hot_update_check?.check_log,
                           )})'>
-                    <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+                    <img src="../taskUrl.png" width="16" height="16" alt="日志" title="日志">
                   </Button>
             </div>
             <div style="font-size: 10px;width: 200px;height:40px">
@@ -462,11 +462,11 @@ const beforeOnlineAutoCheck = (params: any, type: string) => {
               onclick='excuteCheckData(${JSON.stringify(title)},${JSON.stringify(
     params.data?.check_num,
   )},${JSON.stringify(value)})'>
-                <img src="../执行.png" width="16" height="16" alt="执行" title="执行">
+                <img src="../执行.png" width="18" height="18" alt="执行" title="执行">
               </Button>
               <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
               onclick='autoLogUrlClick(${JSON.stringify(checkType)},${JSON.stringify(logUrl)})'>
-                <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+                <img src="../taskUrl.png" width="16" height="16" alt="日志" title="日志">
               </Button>
             </div>
             <div style=" margin-top: -20px;font-size: 10px;width: 200px">
@@ -571,7 +571,7 @@ const sealStatusRenderer = (params: any) => {
     return `
           <div style="height: 66px">
             <div style="margin-left: 100px;line-height: 26px;" >
-            <img src="../refresh.png" width="16" height="16" alt="刷新" title="刷新"
+            <img src="../refresh.png" width="20" height="20" alt="刷新" title="刷新"
             style="margin-right: 10px;cursor: pointer"
             onclick='refreshStatus(${JSON.stringify({
               ready_release_num: params.data.ready_release_num,
@@ -579,7 +579,7 @@ const sealStatusRenderer = (params: any) => {
             })})'/>
               <Button  style="margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;cursor: pointer"
                 onclick='showCoverStatusLog(${JSON.stringify(params.value)})'>
-                  <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志" style="background-color: white;padding-top: -10px">
+                  <img src="../taskUrl.png" width="16" height="16" alt="日志" title="日志" style="background-color: white;padding-top: -10px">
                </Button>
             </div>
               <div style="line-height: 20px; font-size: 10px;background-color: transparent;" >
@@ -626,7 +626,7 @@ const sealStatusRenderer = (params: any) => {
     return `
           <div style="height: 66px">
             <div style="margin-left: 100px;line-height: 26px;">
-              <img src="../refresh.png" width="16" height="16" alt="刷新" title="刷新"
+              <img src="../refresh.png" width="20" height="20" alt="刷新" title="刷新"
               style="cursor: pointer;margin-right: 10px"
               onclick='refreshStatus(${JSON.stringify({
                 ready_release_num: params.data.ready_release_num,
@@ -634,7 +634,7 @@ const sealStatusRenderer = (params: any) => {
               })})'/>
                 <Button style=" margin-left: -10px;border: none; background-color: transparent; font-size: small; color: #46A0FC;height: 25px;cursor: pointer"
                   onclick='showCoverStatusLog(${JSON.stringify(params.value)})'>
-                    <img src="../taskUrl.png" width="14" height="14" alt="日志" title="日志">
+                    <img src="../taskUrl.png" width="16" height="16" alt="日志" title="日志">
                </Button>
             </div>
             <div style="font-size: 9px;height: 40px;line-height: 20px">

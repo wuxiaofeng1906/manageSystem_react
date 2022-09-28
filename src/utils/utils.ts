@@ -1,5 +1,5 @@
 import { IRecord } from '@/namespaces/interface';
-import { omit } from 'lodash';
+import { isEqual, omit } from 'lodash';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
@@ -186,5 +186,32 @@ export const formatTreeData = (origin: any[], showDenominator = false, percent: 
       }
     });
   });
-  return result;
+  return converseArrayToOne(result);
+};
+const converseArrayToOne = (origin: any) => {
+  const source: any[] = [];
+  for (let index = 0; index < origin.length; index += 1) {
+    let repeat = false;
+    // 判断原有数组是否包含有名字
+    for (let i = 0; i < source.length; i++) {
+      if (isEqual(source[i].Group, origin[index].Group)) {
+        repeat = true;
+        break;
+      }
+    }
+
+    if (repeat === false) {
+      const tempData = {};
+      for (let i = 0; i < origin.length; i++) {
+        tempData['Group'] = origin[index].Group;
+        if (isEqual(origin[index].Group, origin[i].Group)) {
+          Object.entries(origin[i]).forEach(([k, v]) => {
+            tempData[k] = v;
+          });
+        }
+      }
+      source.push(tempData);
+    }
+  }
+  return source;
 };

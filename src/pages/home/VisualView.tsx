@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import styles from './index.less';
 import cns from 'classnames';
-import { Collapse } from 'antd';
+import { Collapse, Form, Select, DatePicker, Col } from 'antd';
 import { useModel } from 'umi';
 
 interface Iitem {
@@ -17,7 +17,7 @@ interface Iitem {
 }
 
 const thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
-const initBg = ['#93db9340', '#e8773c40', '#519ff259'];
+const initBg = ['#93db9326', '#e83c3c26', '#519ff240'];
 const Item = (params: { data: Iitem; bg?: string; child?: React.ReactNode }) => {
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
 
@@ -30,7 +30,6 @@ const Item = (params: { data: Iitem; bg?: string; child?: React.ReactNode }) => 
       <p>发布分支:{params.data.branch}</p>
       <p>发布服务:{params.data.server?.join(',')}</p>
       <p>发布集群:{params.data.server?.join(',')}</p>
-      <p>计划发布时间:{params.data.time}</p>
       {hasPermission ? (
         <img
           src={require('../../../public/delete_black_2.png')}
@@ -61,7 +60,7 @@ const VisualView = () => {
         env: '',
         from: 1,
         to: 150,
-        bg: '#93db9340',
+        bg: initBg[0],
       },
       {
         id: '2',
@@ -72,7 +71,7 @@ const VisualView = () => {
         env: '',
         from: 1,
         to: 50,
-        bg: '#93db9340',
+        bg: initBg[0],
       },
       {
         id: '3',
@@ -83,7 +82,7 @@ const VisualView = () => {
         env: '',
         from: 1,
         to: 50,
-        bg: '#93db9340',
+        bg: initBg[0],
       },
       {
         id: '4',
@@ -94,18 +93,7 @@ const VisualView = () => {
         env: '',
         from: 1,
         to: 50,
-        bg: '#93db9340',
-      },
-      {
-        id: '5',
-        time: '2022-09-12 12:32',
-        server: ['web', 'app'],
-        project: '库存管理',
-        branch: 'hotfix',
-        env: '',
-        from: 1,
-        to: 50,
-        bg: '#93db9340',
+        bg: initBg[0],
       },
     ]);
   }, []);
@@ -127,6 +115,13 @@ const VisualView = () => {
   return (
     <div className={styles.visualView}>
       <table>
+        <colgroup>
+          <col style={{ width: 30 }} />
+          <col style={{ width: 100 }} />
+          <col style={{ width: '15%' }} />
+          <col style={{ width: '15%' }} />
+          <col style={{ width: '15%' }} />
+        </colgroup>
         <thead>
           <tr>
             {thead.map((title) => {
@@ -136,11 +131,9 @@ const VisualView = () => {
                 <th
                   key={title}
                   rowSpan={isOnline ? 1 : 2}
-                  colSpan={isOnline ? memoLen : 1}
+                  colSpan={isOnline ? memoLen : title == '类别' ? 2 : 1}
                   style={{
-                    width: `${
-                      title == '类别' ? 70 : isOnline ? singleW * (memoLen || 1) : singleW
-                    }px`,
+                    width: `${isOnline ? singleW * (memoLen || 1) : singleW}`,
                   }}
                 >
                   {title}
@@ -157,7 +150,7 @@ const VisualView = () => {
         <tbody>
           {/*这一行需特殊处理*/}
           <tr>
-            <th>版本基准</th>
+            <th colSpan={2}>版本基准</th>
             <td className={styles.obliqueLine} />
             <td>
               <div className={styles.stackWrapper}>
@@ -170,119 +163,161 @@ const VisualView = () => {
                 </Collapse>
               </div>
             </td>
+            <td></td>
             <td>
               <Item
                 data={{
-                  time: '2022/09/12 12:32',
-                  server: ['web', 'h5'],
+                  id: '4',
+                  time: '2022-09-12 12:32',
+                  server: ['web', 'app'],
                   project: '库存管理',
                   branch: 'hotfix',
+                  env: '',
+                  from: 1,
+                  to: 50,
+                  bg: initBg[0],
                 }}
               />
             </td>
             <td>
               <Item
                 data={{
-                  time: '2022/09/12 12:32',
-                  server: ['web', 'h5'],
-                  project: '采购管理',
+                  id: '4',
+                  time: '2022-09-12 12:32',
+                  server: ['web', 'app'],
+                  project: '库存管理',
                   branch: 'hotfix',
+                  env: '',
+                  from: 1,
+                  to: 50,
+                  bg: initBg[0],
                 }}
               />
             </td>
-            {renderEmptyTD(memoLen - 1)}
-          </tr>
-          <tr>
-            <th rowSpan={4}>预发布</th>
             <td>
-              <div>
-                <Item
-                  data={{
-                    time: '2022/09/12 12:32',
-                    server: ['web', 'h5'],
-                    project: 'emergency20220901',
-                    branch: 'hotfix',
-                    bg: initBg[1],
-                  }}
-                  child={
-                    <div
-                      className={cns(styles.dotLineBase, styles.dotLineOrange)}
-                      style={{ width: `calc(450% + 7px)` }}
-                    />
-                  }
-                />
-              </div>
+              <Item
+                data={{
+                  id: '4',
+                  time: '2022-09-12 12:32',
+                  server: ['web', 'app'],
+                  project: '库存管理',
+                  branch: 'hotfix',
+                  env: '',
+                  from: 1,
+                  to: 50,
+                  bg: initBg[0],
+                }}
+              />
             </td>
-            {renderEmptyTD(memoLen + 2)}
           </tr>
           <tr>
-            <td />
+            <th rowSpan={2}>当天待发版</th>
+            <td className={styles.time}>2022-10-13</td>
             <td>
-              <div>
-                <Item
-                  data={{
-                    time: '2022/09/12 12:32',
-                    server: ['web', 'h5'],
-                    project: '自定义',
-                    branch: 'hotfix',
-                    bg: initBg[2],
-                  }}
-                  child={
-                    <div
-                      className={cns(styles.dotLineBase, styles.dotLineBlue)}
-                      style={{ width: `calc(50% + 7px)` }}
-                    />
-                  }
-                />
-              </div>
+              <Item
+                data={{
+                  id: '4',
+                  time: '2022-09-12 12:32',
+                  server: ['web', 'app'],
+                  project: '库存管理',
+                  branch: 'hotfix',
+                  env: '',
+                  from: 1,
+                  to: 50,
+                  bg: initBg[2],
+                }}
+                child={
+                  <div
+                    className={cns(styles.dotLineBasic, styles.dotLinePrimary)}
+                    style={{ width: `calc(450% + 7px)` }}
+                  />
+                }
+              />
             </td>
-            {renderEmptyTD(memoLen + 1)}
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
           </tr>
           <tr>
-            <td />
-            <td />
+            <td className={styles.time}>2022-10-14</td>
             <td>
-              <div>
-                <Item
-                  data={{
-                    time: '2022/09/12 12:32',
-                    server: ['web', 'h5'],
-                    project: '采购管理',
-                    branch: 'hotfix',
-                    bg: initBg[2],
-                  }}
-                  child={
+              <Item
+                data={{
+                  id: '4',
+                  time: '2022-09-12 12:32',
+                  server: ['web', 'app'],
+                  project: '库存管理',
+                  branch: 'hotfix',
+                  env: '',
+                  from: 1,
+                  to: 50,
+                  bg: initBg[2],
+                }}
+                child={<div className={cns(styles.dotLineBasic, styles.dotLinePrimary)} />}
+              />
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          {/*搜索条件*/}
+          <tr>
+            <td colSpan={memoLen + 5}>
+              <Form size={'small'} layout={'inline'} className={styles.condition}>
+                <Col span={8}>
+                  <Form.Item name={'project'} label={'项目名称'}>
+                    <Select style={{ width: '100%' }} />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item name={'branch'} label={'分支名称'}>
+                    <Select style={{ width: '100%' }} />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item name={'date'} label={'计划上线日期'}>
+                    <DatePicker style={{ width: '100%' }} />
+                  </Form.Item>
+                </Col>
+              </Form>
+            </td>
+          </tr>
+          <tr>
+            <th rowSpan={2}>上线计划日历</th>
+            <td className={styles.time}>2022-10-13</td>
+            <td>
+              <Item
+                data={{
+                  id: '4',
+                  time: '2022-09-12 12:32',
+                  server: ['web', 'app'],
+                  project: '库存管理',
+                  branch: 'hotfix',
+                  env: '',
+                  from: 1,
+                  to: 50,
+                  bg: initBg[1],
+                }}
+                child={
+                  <div>
+                    <div className={cns(styles.dotLineBasic, styles.dotLineEmergency)} />
                     <div
-                      className={cns(styles.dotLineBase, styles.dotLineBlue)}
+                      className={cns(styles.dotLineBasic, styles.dotLineEmergency)}
                       style={{ width: `calc(150% + 7px)` }}
                     />
-                  }
-                />
-              </div>
+                  </div>
+                }
+              />
             </td>
-            {renderEmptyTD(memoLen)}
-          </tr>
-          <tr>
-            <td>
-              <div>
-                <Item
-                  data={{
-                    time: '2022/09/30 12:32',
-                    server: ['web', 'h5'],
-                    project: 'sprint',
-                    branch: 'hotfix',
-                    bg: initBg[2],
-                  }}
-                  child={
-                    <div
-                      className={cns(styles.dotLineBase, styles.dotLineBlue)}
-                      style={{ width: `calc(50% + 7px)` }}
-                    />
-                  }
-                />
-              </div>
-            </td>
-            {renderEmptyTD(memoLen + 2)}
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
           </tr>
         </tbody>
       </table>

@@ -1,0 +1,112 @@
+.visualView {
+  width:auto;
+  height: 100%;
+  overflow: auto;
+  background: white;
+  padding: 20px;
+
+  table {
+    min-height: 300px;
+    border-collapse: collapse;
+    border-spacing: 0;
+    table-layout: fixed;
+    max-width: 100%;
+    tr {
+      th {
+        line-height: 30px;
+        vertical-align: middle;
+      }
+      td{
+        vertical-align: top;
+        position: relative;
+      }
+      th, td {
+        min-width: 230px;
+        border: 1px dotted #ddd;
+        position: relative;
+
+        .item {
+          position: relative;
+          border-radius: 5px;
+          text-align: left;
+          margin: 5px;
+          padding: 0 5px;
+          p {
+            margin: 0;
+            line-height: 24px;
+            font-size: 12px
+          }
+          &:not(&:last-child) {
+            margin-bottom: 5px;
+          }
+          .deleteIcon{
+            width: 16px;
+            position: absolute;
+            right: 7px;
+            top:7px;
+            cursor: pointer;
+          }
+        }
+        .dotLineBase {
+          position: absolute;
+          width: calc(50% + 7px);
+          height: 100%;
+          top: 50%;
+          left: 100%;
+          transform: translateY(-50%);
+        }
+        .dotLineOrange,.dotLineBlue{
+          height: 2px;
+          position: absolute;
+          top:50%;
+          transform: translateY(-50%);
+          border-bottom: 2px dotted #e8773c;
+          &:after{
+            right: -13px;
+            top:-8px;
+            position: absolute;
+            display: inline-block;
+            content: '';
+            border-left:12px solid #e8773c;
+            border-top:10px solid transparent;
+            border-bottom:10px solid transparent;
+          }
+        }
+        .dotLineBlue {
+          border-bottom: 2px dotted #529ff2;
+          &:after{
+            border-left:12px solid #529ff2;
+          }
+        }
+      }
+      // 右对角线
+      .obliqueLine {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom right,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0) calc(50% - 0.5px),
+        rgba(#ddd, 1) 50%,
+        rgba(0, 0, 0, 0) calc(50% + 0.5px),
+        rgba(0, 0, 0, 0) 100%);
+      }
+    }
+  }
+  .stackWrapper{
+    padding:7px;
+    :global{
+      .ant-collapse-header{
+        padding: 6px 10px;
+        font-size: 12px;
+        font-weight: bold;
+        background: white;
+      }
+      .ant-collapse-content > .ant-collapse-content-box{
+        padding: 0!important;
+      }
+    }
+  }
+}
+.homePage{
+  background: white;
+}

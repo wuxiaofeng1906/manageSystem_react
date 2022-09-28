@@ -19,11 +19,17 @@ export default [
       },
     ],
   },
+  // {
+  //   path: '/welcomes',
+  //   name: '首页',
+  //   icon: 'smile',
+  //   component: './welcomes',
+  // },
   {
-    path: '/welcomes',
+    path: '/home',
     name: '首页',
     icon: 'smile',
-    component: './welcomes',
+    component: './home',
   },
   // {
   //   path: '/admin',
@@ -713,7 +719,7 @@ export default [
   },
   {
     path: '/',
-    redirect: './welcomes',
+    redirect: './home',
   },
   {
     component: './404',

@@ -21,7 +21,6 @@ const Home = () => {
   };
 
   const gridRef = useRef<GridApi>();
-  const [rowData, setRowData] = useState<any[]>([]);
   const [dutyPerson, setDutyPerson] = useState<any[]>([]);
 
   const onGridReady = (params: GridReadyEvent) => {
@@ -61,9 +60,11 @@ const Home = () => {
               flex: 1,
               suppressMenu: true,
               cellStyle: { 'line-height': '28px' },
+              minWidth: 100,
             }}
             rowHeight={28}
             headerHeight={30}
+            onGridSizeChanged={onGridReady}
             onGridReady={onGridReady}
           />
         </div>

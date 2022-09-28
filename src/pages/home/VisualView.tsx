@@ -3,6 +3,7 @@ import styles from './index.less';
 import cns from 'classnames';
 import { Collapse, Form, Select, DatePicker, Col } from 'antd';
 import { useModel } from 'umi';
+import PreReleaseServices from '@/services/preRelease';
 
 interface Iitem {
   id?: string;
@@ -48,7 +49,11 @@ const Item = (params: { data: Iitem; bg?: string; child?: React.ReactNode }) => 
 const VisualView = () => {
   const [online, setOnline] = useState<any[]>([]);
   const [source, setSource] = useState<Iitem[]>([]);
+  const [project, setProject] = useState<any[]>([]);
+  const [branch, setBranch] = useState<any[]>([]);
+
   useEffect(() => {
+    getProject();
     setOnline([{ name: '集群2-3' }, { name: '集群4-6' }, { name: '集群7-8' }]);
     setSource([
       {
@@ -98,6 +103,25 @@ const VisualView = () => {
     ]);
   }, []);
 
+  const getProject = async () => {
+    const projectList = await PreReleaseServices.project();
+    const branchList = await PreReleaseServices.branch();
+    setProject(
+      projectList?.map((it: any) => ({
+        label: it.project_name,
+        value: it.project_id,
+        key: it.project_id,
+      })),
+    );
+    setBranch(
+      branchList?.map((it: any) => ({
+        label: it.branch_name,
+        value: it.branch_id,
+        key: it.branch_id,
+      })),
+    );
+  };
+
   const renderEmptyTD = (len: number) => {
     if (len <= 0) return '';
     const arr = Array.from({ length: len }).fill('1');
@@ -116,25 +140,26 @@ const VisualView = () => {
     <div className={styles.visualView}>
       <table>
         <colgroup>
-          <col style={{ width: 30 }} />
-          <col style={{ width: 100 }} />
-          <col style={{ width: '15%' }} />
-          <col style={{ width: '15%' }} />
-          <col style={{ width: '15%' }} />
+          <col style={{ maxWidth: 50, width: 30 }} />
+          <col style={{ width: 100, maxWidth: 120 }} />
         </colgroup>
         <thead>
           <tr>
             {thead.map((title) => {
               const isOnline = title == '线上';
-              const singleW = 230;
+              const singleW = 200;
               return (
                 <th
                   key={title}
                   rowSpan={isOnline ? 1 : 2}
                   colSpan={isOnline ? memoLen : title == '类别' ? 2 : 1}
-                  style={{
-                    width: `${isOnline ? singleW * (memoLen || 1) : singleW}`,
-                  }}
+                  style={
+                    title == '类别'
+                      ? { width: 130, maxWidth: 170 }
+                      : {
+                          width: `${isOnline ? singleW * (memoLen || 1) : singleW}px`,
+                        }
+                  }
                 >
                   {title}
                 </th>
@@ -150,7 +175,9 @@ const VisualView = () => {
         <tbody>
           {/*这一行需特殊处理*/}
           <tr>
-            <th colSpan={2}>版本基准</th>
+            <th colSpan={2} style={{ wordBreak: 'break-all' }}>
+              版本基准
+            </th>
             <td className={styles.obliqueLine} />
             <td>
               <div className={styles.stackWrapper}>
@@ -211,7 +238,9 @@ const VisualView = () => {
             </td>
           </tr>
           <tr>
-            <th rowSpan={2}>当天待发版</th>
+            <th rowSpan={2}>
+              当<br />天<br />待<br />发<br />版
+            </th>
             <td className={styles.time}>2022-10-13</td>
             <td>
               <Item
@@ -270,12 +299,12 @@ const VisualView = () => {
               <Form size={'small'} layout={'inline'} className={styles.condition}>
                 <Col span={8}>
                   <Form.Item name={'project'} label={'项目名称'}>
-                    <Select style={{ width: '100%' }} />
+                    <Select style={{ width: '100%' }} options={project} />
                   </Form.Item>
                 </Col>
                 <Col span={8}>
                   <Form.Item name={'branch'} label={'分支名称'}>
-                    <Select style={{ width: '100%' }} />
+                    <Select style={{ width: '100%' }} options={branch} />
                   </Form.Item>
                 </Col>
                 <Col span={8}>
@@ -287,7 +316,10 @@ const VisualView = () => {
             </td>
           </tr>
           <tr>
-            <th rowSpan={2}>上线计划日历</th>
+            <th rowSpan={2}>
+              上<br />
+              线<br />计<br />划<br />日<br />历
+            </th>
             <td className={styles.time}>2022-10-13</td>
             <td>
               <Item

@@ -58,5 +58,9 @@ const PreReleaseServices = {
   async project() {
     return request(`${baseUrl}/duty/project`);
   },
+  // 分支
+  async branch() {
+    return request(`${baseUrl}/sonar/branch`);
+  },
 };
 export default PreReleaseServices;

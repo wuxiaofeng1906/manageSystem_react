@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, Fragment } from 'react';
 import styles from './index.less';
 import cns from 'classnames';
 import { Collapse, Form, Select, DatePicker, Col } from 'antd';
@@ -8,6 +8,11 @@ import { isEmpty } from 'lodash';
 
 const thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
 const ignore = ['cn-northwest-0', 'cn-northwest-1'];
+const baseColumn = [
+  { name: '线下版本', value: 'delay' },
+  { name: '集群0', value: 'cn-northwest-0' },
+  { name: '集群1', value: 'cn-northwest-1' },
+];
 const initBg = ['#93db9326', '#e83c3c26', '#519ff240'];
 const Item = (params: { data: any; bg?: string; child?: React.ReactNode }) => {
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
@@ -40,11 +45,11 @@ const Item = (params: { data: any; bg?: string; child?: React.ReactNode }) => {
 const VisualView = () => {
   const [project, setProject] = useState<any[]>([]);
   const [branch, setBranch] = useState<any[]>([]);
-  const [online, setOnline] = useState<any[]>([]); // 线上动态列
+  const [online, setOnline] = useState<{ name: string; value: string }[]>([]); // 线上动态列
   const [source, setSource] = useState<any[]>([]);
   const [baseSource, setBaseSource] = useState<any[]>([]); // 基准版本
   const [currentSource, setCurrentSource] = useState<any[]>([]); // 当天待发版
-  const [calator, setCalator] = useState<any[]>([]); // 上线日历
+  const [calendar, setCalendar] = useState<any[]>([]); // 上线日历
 
   useEffect(() => {
     getSelectData();
@@ -57,8 +62,6 @@ const VisualView = () => {
         project: '自定义门户',
         branch: 'hotfix',
         env: '集群1',
-        from: 1,
-        to: 150,
         bg: initBg[0],
         ztno: 2234,
       },
@@ -69,8 +72,6 @@ const VisualView = () => {
         project: '库存管理',
         branch: 'hotfix',
         env: '集群1',
-        from: 1,
-        to: 50,
         bg: initBg[0],
       },
       {
@@ -80,8 +81,6 @@ const VisualView = () => {
         project: '库存管理',
         branch: 'hotfix',
         env: '集群1',
-        from: 1,
-        to: 50,
         bg: initBg[0],
       },
       {
@@ -91,8 +90,6 @@ const VisualView = () => {
         project: '库存管理',
         branch: 'hotfix',
         env: '集群1',
-        from: 1,
-        to: 50,
         bg: initBg[0],
       },
     ]);
@@ -101,7 +98,7 @@ const VisualView = () => {
   const getViewData = async () => {
     // const base = await PreReleaseServices.releaseBaseline();
     // const currentDay = await PreReleaseServices.releaseView();
-    //
+
     // const basicOnline = base.map((it: any) => it.cluster)?.flat() ?? [];
     // const currentOnline = currentDay.map((it: any) => it.cluster)?.flat() ?? [];
     //
@@ -112,8 +109,8 @@ const VisualView = () => {
     // );
     // setBaseSource(base);
     // setCurrentSource(currentDay);
+
     setOnline([{ name: '集群2-4', value: 'cn-northwest-24' }]);
-    // 线上集群： 顺序：对应前的数据
     setCurrentSource([
       {
         project: 'CESHI',
@@ -121,9 +118,10 @@ const VisualView = () => {
         ztno: '212',
         apps: 'app',
         release_env: 'ddd',
-        cluster: ['cn-northwest-0', 'cn-northwest-1', 'cn-northwest-1-4'],
-        from: 0,
-        to: [1, 2, 3],
+        baseline_cluster: 'delay',
+        cluster: ['cn-northwest-0', 'cn-northwest-1', 'cn-northwest-24'],
+        cls: styles.dotLineEmergency,
+        bg: initBg[1],
       },
       {
         project: 'CESHI',
@@ -132,7 +130,9 @@ const VisualView = () => {
         apps: 'app',
         release_env: 'ddd',
         baseline_cluster: 'cn-northwest-0',
-        cluster: ['cn-northwest-0', 'cn-northwest-1', 'cn-northwest-1-4'],
+        cluster: ['cn-northwest-1', 'cn-northwest-24'],
+        cls: styles.dotLinePrimary,
+        bg: initBg[2],
       },
     ]);
   };
@@ -155,40 +155,75 @@ const VisualView = () => {
     );
   };
 
-  const renderTD = (len: number, data: any) => {
-    if (len <= 0) return '';
-    const arr = Array.from({ length: len }).fill('1');
-    // 线下版本 ： 空  集群1：<td/><td><itme/></td> 集群2:
+  const renderTr = (arr: any[], title: string) => {
+    const source = [...baseColumn, ...online];
+    if (arr.length == 0)
+      return (
+        <tr>
+          <th rowSpan={source.length}>
+            <span className={styles.title}>{title.split('').map((text) => `${text}\n`)}</span>
+          </th>
+          <td />
+          {[...baseColumn, ...online].map((_, index) => (
+            <td key={index} />
+          ))}
+        </tr>
+      );
     return (
-      <>
-        {arr.map((it, index) => (
-          <td key={index}>
-            {isEmpty(data.baseline_cluster) && index == 0 ? (
-              <Item
-                data={data}
-                child={
-                  <div>
-                    {data.cluster?.map((line: any) => {
-                      let onlineIndex = online.findIndex((env) => env.name == line);
-                      if (onlineIndex == -1) onlineIndex = 0;
-                      const percent =
-                        line == ignore[0] ? 1 : line == ignore[1] ? 2 : onlineIndex + 3;
-                      return (
-                        <div
-                          className={cns(styles.dotLineBasic, styles.dotLineEmergency)}
-                          style={{ width: `calc(${percent * 100 - 50}% + ${percent * 7}px)` }}
-                        />
-                      );
-                    })}
-                  </div>
-                }
-              />
-            ) : (
-              ''
-            )}
-          </td>
-        ))}
-      </>
+      <Fragment>
+        {arr.map((it, index) => {
+          return (
+            <tr key={index + it.plan_release_time}>
+              {index == 0 && (
+                <th rowSpan={arr.length}>
+                  <span className={styles.title}>{title.split('').map((text) => `${text}\n`)}</span>
+                </th>
+              )}
+              <td className={styles.time}>{it.plan_release_time}</td>
+              {renderTd(it)}
+            </tr>
+          );
+        })}
+      </Fragment>
+    );
+  };
+  const renderTd = (data: any) => {
+    const arr = [...baseColumn, ...online];
+    return (
+      <Fragment>
+        {arr.map((it) => {
+          return (
+            <td key={it.value}>
+              {data.baseline_cluster == it.value ? (
+                <Item
+                  data={data}
+                  child={
+                    <div>
+                      {data.cluster?.map((env: string, i: number) => {
+                        const baseIndex = arr.findIndex((v) => data.baseline_cluster == v.value);
+                        const envIndex = arr.findIndex((v) => v.value == env);
+                        const alpha = envIndex - baseIndex;
+                        if (envIndex < 0) return '';
+                        return (
+                          <div
+                            key={env}
+                            className={cns(styles.dotLineBasic, data.cls)}
+                            style={{
+                              width: `calc(${alpha * 100 - 50}% + ${alpha * 7 + i * 6}px)`,
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  }
+                />
+              ) : (
+                ''
+              )}
+            </td>
+          );
+        })}
+      </Fragment>
     );
   };
 
@@ -231,7 +266,6 @@ const VisualView = () => {
           </tr>
         </thead>
         <tbody>
-          {/*这一行需特殊处理*/}
           <tr>
             <th colSpan={2} style={{ wordBreak: 'break-all' }}>
               版本基准
@@ -266,20 +300,7 @@ const VisualView = () => {
             </td>
           </tr>
           {/*当天待发版*/}
-          {currentSource.map((it, index) => {
-            return (
-              <tr>
-                {index == 0 && (
-                  <th rowSpan={currentSource.length}>
-                    当<br />天<br />待<br />发<br />版
-                  </th>
-                )}
-                <td className={styles.time}>{it.plan_release_time}</td>
-                {/*{renderTD(onlineLen + 3, it)}*/}
-                {renderTD(4, it)}
-              </tr>
-            );
-          })}
+          {renderTr(currentSource, '当天待发版')}
           {/*搜索条件*/}
           <tr>
             <td colSpan={onlineLen + 5}>
@@ -303,17 +324,7 @@ const VisualView = () => {
             </td>
           </tr>
           {/*上线计划日历*/}
-          <tr>
-            <th rowSpan={2}>
-              上<br />
-              线<br />计<br />划<br />日<br />历
-            </th>
-            <td className={styles.time}>2022-10-13</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
+          {renderTr([], '上线计划日历')}
         </tbody>
       </table>
     </div>

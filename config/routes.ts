@@ -163,19 +163,20 @@ export default [
         icon: 'table',
         path: 'preRelease',
         component: './onDutyAndRelease/preRelease',
+        hideInMenu: true,
       },
       {
-        name: '发布过程主页',
+        name: '发布过程', // 新版本
         icon: 'table',
         path: 'releaseProcess',
-        component: './onDutyAndRelease/preRelease/releaseProcess/index',
+        component: './onDutyAndRelease/releaseProcess/index',
       },
       {
-        name: '发布历史', // 新版本发布历史
+        name: '发布历史', // 新版本积压工单
         icon: 'table',
         path: 'releaseOrder/:id',
         hideInMenu: true,
-        component: './onDutyAndRelease/preRelease/releaseProcess/ReleaseOrder',
+        component: './onDutyAndRelease/releaseProcess/ReleaseOrder',
       },
       {
         name: '发布历史',

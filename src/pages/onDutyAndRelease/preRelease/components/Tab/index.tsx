@@ -346,13 +346,13 @@ const Tab: React.FC<any> = () => {
 
   /* endregion */
 
-  useEffect(() => {
-    if (operteStatus) {
-      tabType = 'card';
-    } else {
-      tabType = 'editable-card';
-    }
-  }, [operteStatus]);
+  // useEffect(() => {
+  //   if (operteStatus) {
+  //     tabType = 'card';
+  //   } else {
+  //     tabType = 'editable-card';
+  //   }
+  // }, [operteStatus]);
 
   // 鼠标点击事件，右击时
   const onContextMenu = (e: any) => {
@@ -405,9 +405,10 @@ const Tab: React.FC<any> = () => {
           style={{ marginTop: -20 }}
           onDoubleClick={tabsChangeName}
           onContextMenu={onContextMenu}
+          hideAdd={true}
         >
           {tabsData?.panes?.map((pane: any) => (
-            <TabPane tab={pane.title} key={pane.key} closable={pane.closable} />
+            <TabPane tab={pane.title} key={pane.key} closable={false} />
           ))}
         </Tabs>
       </div>

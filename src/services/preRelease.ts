@@ -62,5 +62,43 @@ const PreReleaseServices = {
   async branch() {
     return request(`${baseUrl}/sonar/branch`);
   },
+  //  --------------新改版发布过程--------------
+  // 发布列表
+  async releaseList() {
+    return request(`${baseUrl}/latest-release/list`);
+  },
+  // 发布历史
+  async historyList(params: any) {
+    return request(`${baseUrl}/latest-release/history`, { params });
+  },
+  // 发布视图数据（版本基准）
+  async releaseBaseline() {
+    return request(`${baseUrl}/latest-release/views-version-baseline`);
+  },
+  // 发布视图数据（当天待发版）
+  async releaseView() {
+    return request(`${baseUrl}/latest-release/views-ready-release`);
+  },
+  // 删除列表工单
+  async removeRelease(data: any) {
+    return request(`${baseUrl}/latest-release/list`, { method: 'delete', data });
+  },
+  // 删除积压工单项目
+  async removeOrder(data: any) {
+    return request(`${baseUrl}/latest-release/latest-release/order-project`, {
+      method: 'delete',
+      data,
+    });
+  },
+  // 积压工单【环境】对应的列表数据
+  async orderList(cluster: string) {
+    return request(`${baseUrl}/latest-release/latest-release/order-project`, {
+      params: { cluster },
+    });
+  },
+  // 保存
+  async saveOrder(data: any) {
+    return request(`${baseUrl}/latest-release/list`, { method: 'post', data });
+  },
 };
 export default PreReleaseServices;

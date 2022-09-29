@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Form, Select, DatePicker, Spin, Col } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import { releaseListColumn } from '@/pages/onDutyAndRelease/preRelease/releaseProcess/column';
+import { releaseListColumn } from '@/pages/onDutyAndRelease/releaseProcess/column';
 import IPagination from '@/components/IPagination';
 import { getHeight } from '@/publicMethods/pageSet';
 import PreReleaseServices from '@/services/preRelease';
@@ -36,35 +36,16 @@ const HistoryList = () => {
   };
 
   const getTableList = async (page = 1, page_size = 20) => {
-    const values = form.getFieldsValue();
     try {
       setSpinning(true);
-      await setRowData([
-        {
-          id: '202209190031',
-          name: '2022091898发布',
-          project: 'sprint效果文化',
-          number: '2344',
-          services: 'apps,h5',
-          pm: '张三，李四',
-          branch: 'release20220822',
-          type: '灰度推线上',
-          method: '停服',
-          env: '集群1',
-        },
-        {
-          id: '202209190031',
-          name: '2022091-global发布',
-          project: '效果文化',
-          number: '2342',
-          services: 'apps',
-          pm: '李四',
-          branch: 'release20220822',
-          type: '灰度推线上',
-          method: '停服',
-          env: '集群2345',
-        },
-      ]);
+      const values = form.getFieldsValue();
+      const res = await PreReleaseServices.historyList({
+        pro_ids: values.pro_ids?.join(',') ?? '',
+        repair_order: values.repair_order?.join(',') ?? '',
+        page: page,
+        page_size: page_size,
+      });
+      setRowData(res);
       setSpinning(false);
     } catch (e) {
       setSpinning(false);
@@ -80,13 +61,25 @@ const HistoryList = () => {
     <Spin spinning={spinning} tip="数据加载中...">
       <Form layout={'inline'} size={'small'} form={form} onFieldsChange={() => getTableList()}>
         <Col span={8}>
-          <Form.Item name={'project'} label={'发布项目'}>
-            <Select options={projects} style={{ width: '100%' }} />
+          <Form.Item name={'pro_ids'} label={'发布项目'}>
+            <Select
+              options={projects}
+              optionFilterProp={'label'}
+              style={{ width: '100%' }}
+              mode={'multiple'}
+              showSearch
+            />
           </Form.Item>
         </Col>
         <Col span={8}>
-          <Form.Item name={'num'} label={'工单编号'}>
-            <Select options={[]} style={{ width: '100%' }} />
+          <Form.Item name={'repair_order'} label={'工单编号'}>
+            <Select
+              options={[]}
+              optionFilterProp={'label'}
+              style={{ width: '100%' }}
+              mode={'multiple'}
+              showSearch
+            />
           </Form.Item>
         </Col>
         <Col span={7}>

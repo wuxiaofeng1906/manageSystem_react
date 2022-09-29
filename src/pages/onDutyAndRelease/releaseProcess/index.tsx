@@ -3,8 +3,8 @@ import { Tabs } from 'antd';
 import { BarsOutlined, HistoryOutlined } from '@ant-design/icons';
 import { useLocation, history } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
-import PreReleaseList from '@/pages/onDutyAndRelease/preRelease/releaseProcess/PreReleaseList';
-import HistoryList from '@/pages/onDutyAndRelease/preRelease/releaseProcess/HistoryList';
+import PreReleaseList from '@/pages/onDutyAndRelease/releaseProcess/PreReleaseList';
+import HistoryList from '@/pages/onDutyAndRelease/releaseProcess/HistoryList';
 import styles from './index.less';
 const Index = () => {
   const query = useLocation()?.query;

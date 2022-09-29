@@ -12,14 +12,14 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
   },
   {
     headerName: '预发布批次名',
-    field: 'name',
+    field: 'release_name',
     minWidth: 110,
     cellRenderer: (p) => {
-      let href = `/onDutyAndRelease/preRelease?releasedNum=${p.data.id}&history=${
+      let href = `/onDutyAndRelease/preRelease?releasedNum=${p.data.release_num}&history=${
         type == 'history'
       }`;
-      if (p.data.page == 'online') {
-        href = `/onDutyAndRelease/releaseOrder/${p.data.id}`;
+      if (p.data.release_type == 'backlog_release') {
+        href = `/onDutyAndRelease/releaseOrder/${p.data.release_num}`;
       }
       return `<a href="${href}">${p.value}</a>`;
     },
@@ -31,17 +31,17 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
   },
   {
     headerName: '工单编号',
-    field: 'number',
+    field: 'repair_order',
     minWidth: 130,
   },
   {
     headerName: '发布服务',
-    field: 'services',
+    field: 'apps',
     minWidth: 130,
   },
   {
     headerName: '项目负责人',
-    field: 'pm',
+    field: 'project_manager',
     minWidth: 130,
   },
   {
@@ -51,38 +51,39 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
   },
   {
     headerName: '发布类型',
-    field: 'type',
+    field: 'release_type',
     minWidth: 120,
     maxWidth: 140,
+    cellRenderer: (p) =>
+      p.value == 'ready_release' ? '非积压发布' : p.value == 'backlog_release' ? '灰度推线上' : '',
   },
   {
     headerName: '发布结果',
-    field: 'result',
+    field: 'release_result',
     minWidth: 120,
     maxWidth: 130,
     hide: type == 'pre',
+    cellRenderer: (p: any) =>
+      `<span style="color:${
+        p.value == 'success' ? '#2BF541' : p.value == 'failure' ? 'red' : 'initial'
+      }">${p.value == 'success' ? '发布成功' : p.value == 'failure' ? '发布失败' : ''}</span>`,
   },
   {
     headerName: '发布方式',
-    field: 'method',
+    field: 'release_way',
     minWidth: 120,
+    cellRenderer: (p) =>
+      p.value == 'stop_server' ? '停服' : p.value == 'keep_server' ? '不停服' : '',
   },
   {
     headerName: '发布环境',
-    field: 'env',
+    field: 'release_env',
     minWidth: 120,
   },
   {
-    headerName: '计划发布时间',
-    field: 'time',
+    headerName: type == 'history' ? '发布时间' : '计划发布时间',
+    field: 'plan_release_time',
     minWidth: 100,
-    hide: type == 'history',
-  },
-  {
-    headerName: '发布时间',
-    field: 'time',
-    minWidth: 100,
-    hide: type == 'pre',
   },
   {
     headerName: '操作',
@@ -123,6 +124,7 @@ export const historyOrderColumn = [
     cellRenderer: 'deleteOrder',
     width: 130,
     maxWidth: 140,
+    hide: false,
   },
 ];
 export const historyCompareColumn = [

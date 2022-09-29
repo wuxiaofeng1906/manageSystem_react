@@ -3,9 +3,14 @@ import { Button, Modal, Form, Select } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import DragIcon from '@/components/DragIcon';
-import { releaseListColumn } from '@/pages/onDutyAndRelease/preRelease/releaseProcess/column';
+import { releaseListColumn } from '@/pages/onDutyAndRelease/releaseProcess/column';
 import { getHeight } from '@/publicMethods/pageSet';
 import styles from './index.less';
+import PreReleaseServices from '@/services/preRelease';
+import DutyListServices from '@/services/dutyList';
+import { isEmpty } from 'lodash';
+import { history } from 'umi';
+
 const PreReleaseList = () => {
   const gridRef = useRef<GridApi>();
   const [rowData, setRowData] = useState<any[]>([]);
@@ -27,40 +32,28 @@ const PreReleaseList = () => {
     });
     console.log(sortArr);
   };
-  const onFinish = (v: any) => {
-    if (v) console.log(v);
+
+  const onFinish = async (v: any) => {
+    if (v) {
+      const res = await DutyListServices.getDutyNum();
+      debugger;
+      if (!isEmpty(res)) {
+        let href = `/onDutyAndRelease/preRelease?releasedNum=${res.ready_release_num}`;
+        if (v == '2') {
+          href = `/onDutyAndRelease/releaseOrder/${res.ready_release_num}`;
+        }
+        history.push(href);
+      }
+    }
     setVisible(false);
+  };
+  const getTableList = async () => {
+    const res = await PreReleaseServices.releaseList();
+    setRowData(res);
   };
 
   useEffect(() => {
-    setRowData([
-      {
-        id: '202209190031',
-        name: '2022091898发布',
-        project: 'sprint效果文化',
-        number: '2344',
-        services: 'apps,h5',
-        pm: '张三，李四',
-        branch: 'release20220822',
-        type: '灰度推线上',
-        method: '停服',
-        env: '集群1',
-        page: 'online',
-      },
-      {
-        id: '202209190031',
-        name: '2022091-global发布',
-        project: '效果文化',
-        number: '2342',
-        services: 'apps',
-        pm: '李四',
-        branch: 'release20220822',
-        type: '灰度推线上',
-        method: '停服',
-        env: '集群2345',
-        page: 'gray',
-      },
-    ]);
+    getTableList();
   }, []);
 
   return (

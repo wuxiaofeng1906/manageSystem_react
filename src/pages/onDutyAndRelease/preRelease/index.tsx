@@ -284,15 +284,19 @@ const PreRelease: React.FC<any> = () => {
   /* endregion */
 
   return (
-    <PageContainer style={{ backgroundColor: 'white' }}>
+    <PageContainer style={{ backgroundColor: 'white' }} title={'非积压发布'}>
       <Spin spinning={loading || globalLoading} tip={'数据加载中...'}>
         <Tab />
         <CheckProgress
           refreshPage={async () => {
             setTabsData('', []);
             setGlobalLoading(true);
-            const datas = await alalysisInitData('', '');
-            showPageInitData(datas, true);
+            // const datas = await alalysisInitData('', '');
+            // showPageInitData(datas, true);
+
+            //新版本
+            const datas = await alalysisInitData('', location?.releasedNum as string);
+            showPageInitData(datas, false);
             setGlobalLoading(false);
           }}
         />

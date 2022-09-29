@@ -4,7 +4,7 @@ import cns from 'classnames';
 import { Collapse, Form, Select, DatePicker, Col } from 'antd';
 import { useModel } from 'umi';
 import PreReleaseServices from '@/services/preRelease';
-import { isEmpty } from 'lodash';
+import { isEmpty, sortBy, uniqBy } from 'lodash';
 
 const thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
 const ignore = ['cn-northwest-0', 'cn-northwest-1'];
@@ -96,21 +96,32 @@ const VisualView = () => {
   }, []);
 
   const getViewData = async () => {
-    // const base = await PreReleaseServices.releaseBaseline();
+    // const basic = await PreReleaseServices.releaseBaseline();
     // const currentDay = await PreReleaseServices.releaseView();
 
-    // const basicOnline = base.map((it: any) => it.cluster)?.flat() ?? [];
+    // const basicOnline = basic.map((it: any) => it.cluster)?.flat() ?? [];
     // const currentOnline = currentDay.map((it: any) => it.cluster)?.flat() ?? [];
-    //
+    // 去重并排序
     // setOnline(
-    //   [...new Set([...basicOnline, ...currentOnline])]
-    //     .flatMap((it) => (ignore.includes(it) ? [] : [it]))
-    //     .map((key) => ({ name: key })),
+    //   sortBy(
+    //     [uniqBy([...basicOnline, ...currentOnline],'id')]
+    //       .flatMap((it) => (ignore.includes(it) ? [] : [it]))
+    //       .map((key) => ({ name: key, value: key })),
+    //     ['value'],
+    //   ),
     // );
-    // setBaseSource(base);
+    // setBaseSource(basic);
     // setCurrentSource(currentDay);
 
-    setOnline([{ name: '集群2-4', value: 'cn-northwest-24' }]);
+    setOnline(
+      sortBy(
+        [
+          { name: '集群3-5', value: 'cn-northwest-35' },
+          { name: '集群2-4', value: 'cn-northwest-24' },
+        ],
+        ['value'],
+      ),
+    );
     setCurrentSource([
       {
         project: 'CESHI',

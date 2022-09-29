@@ -73,7 +73,7 @@ const PreReleaseProject: React.FC<any> = () => {
     if (tabsData.panes && tabsData.panes.length > 0) {
       tabsData.panes.forEach((ele: any) => {
         if (activeKey === ele.key) {
-          activeTitle = ele.title.toString();
+          activeTitle = ele.title?.toString() ?? '';
         }
       });
     }

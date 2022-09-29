@@ -11,7 +11,7 @@ import styles from './index.less';
 import PreReleaseServices from '@/services/preRelease';
 import AnnouncementServices from '@/services/announcement';
 import { useModel, useParams } from 'umi';
-import { isEmpty } from 'lodash';
+import { isEmpty, omit } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
 import moment from 'moment';
 
@@ -125,32 +125,36 @@ const ReleaseOrder = () => {
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
     const result = !isEmpty(base.release_result);
+    const checkObj = omit({ ...order, ...base }, ['release_result']);
     // 标记发布结果： 1：停服时，必须关联发布公告
+    const errTip = {
+      plan_release_time: '请填写发布时间!',
+      announcement_num: '请填写关联公告！',
+      person_duty_num: '请填写值班名单',
+      release_name: '请填写工单名称!',
+      cluster: '请填写发布环境!',
+      release_way: '请填写发布方式',
+    };
+    const valid = Object.values(checkObj).some((it) => isEmpty(it));
+    if (valid) {
+      const errArr = Object.entries(checkObj).find(([k, v]) => isEmpty(v)) as any[];
+      infoMessage(errTip[errArr?.[0]]);
+      return;
+    }
+    if (isEmpty(base.release_name?.trim())) return infoMessage(errTip.release_name);
+
     if (result && ['success', 'failure'].includes(base.release_result)) {
-      const errTip = {
-        plan_release_time: '请填写发布时间!',
-        announcement_num: '请填写关联公告！',
-        person_duty_num: '请填写值班名单',
-        release_name: '请填写工单名称!',
-        cluster: '请填写发布环境!',
-      };
-      const valid = Object.values({ ...order, ...base }).some((it) => isEmpty(it));
-      if (valid) {
-        const errArr = Object.entries({ ...order, ...base }).find(([k, v]) => isEmpty(v)) as any[];
-        infoMessage(errTip[errArr?.[0]]);
-        return;
-      }
       if (base.announcement_num == '免' && base.release_way == 'stop_server')
         return infoMessage(errTip.announcement_num);
     }
     await PreReleaseServices.saveOrder({
       user_id: user?.userid ?? '',
-      release_name: base.release_name,
+      release_name: base.release_name?.trim() ?? '',
       person_duty_num: order.person_duty_num,
-      announcement_num: order.announcement_num,
+      announcement_num: order.announcement_num ?? '',
       plan_release_time: moment(order.plan_release_time).format('YYYY-MM-DD HH:mm:ss'),
       release_type: 'backlog_release',
-      release_way: order.release_way,
+      release_way: order.release_way ?? '',
       release_result: order.release_result,
       cluster: base.cluster?.join(',') ?? '',
       release_num: id, // 发布编号
@@ -201,32 +205,13 @@ const ReleaseOrder = () => {
                 </Form.Item>
               </Col>
               <Col span={6}>
-                <Form.Item
-                  noStyle
-                  shouldUpdate={(old, next) => old.release_way != next.release_way}
-                >
-                  {({ getFieldValue }) => {
-                    return (
-                      <Form.Item
-                        name={'announcement_num'}
-                        label={'关联公告'}
-                        required={
-                          getFieldValue('release_way') == 'stop_server' &&
-                          getFieldValue('release_result') &&
-                          getFieldValue('release_result') !== 'unknown'
-                        }
-                      >
-                        <Select
-                          showSearch
-                          optionFilterProp={'label'}
-                          options={[{ key: '免', value: '免', label: '免' }].concat(
-                            announcementList,
-                          )}
-                          style={{ width: '100%' }}
-                        />
-                      </Form.Item>
-                    );
-                  }}
+                <Form.Item name={'announcement_num'} label={'关联公告'} required>
+                  <Select
+                    showSearch
+                    optionFilterProp={'label'}
+                    options={[{ key: '免', value: '免', label: '免' }].concat(announcementList)}
+                    style={{ width: '100%' }}
+                  />
                 </Form.Item>
               </Col>
               <Col span={6}>
@@ -269,7 +254,7 @@ const ReleaseOrder = () => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item name={'release_name'} label={'工单名称'}>
+              <Form.Item name={'release_name'} label={'工单名称'} required>
                 <Input style={{ width: '100%' }} />
               </Form.Item>
             </Col>

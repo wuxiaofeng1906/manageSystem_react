@@ -4,22 +4,12 @@ import cns from 'classnames';
 import { Collapse, Form, Select, DatePicker, Col } from 'antd';
 import { useModel } from 'umi';
 import PreReleaseServices from '@/services/preRelease';
-
-interface Iitem {
-  id?: string;
-  project: string;
-  branch: string;
-  server: string[];
-  env?: string;
-  time: string;
-  from?: number;
-  to?: number;
-  bg?: string;
-}
+import { isEmpty } from 'lodash';
 
 const thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
+const ignore = ['cn-northwest-0', 'cn-northwest-1'];
 const initBg = ['#93db9326', '#e83c3c26', '#519ff240'];
-const Item = (params: { data: Iitem; bg?: string; child?: React.ReactNode }) => {
+const Item = (params: { data: any; bg?: string; child?: React.ReactNode }) => {
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
 
   const hasPermission = useMemo(() => user?.group == 'superGroup', [user]);
@@ -27,10 +17,11 @@ const Item = (params: { data: Iitem; bg?: string; child?: React.ReactNode }) => 
   return (
     <div style={{ background: params.bg || params.data.bg || initBg[0] }} className={styles.item}>
       {params.child || <div />}
-      <p>发布项目:{params.data.project}</p>
-      <p>发布分支:{params.data.branch}</p>
-      <p>发布服务:{params.data.server?.join(',')}</p>
-      <p>发布集群:{params.data.server?.join(',')}</p>
+      <p>发布项目:{params.data.project ?? ''}</p>
+      <p>发布分支:{params.data.branch ?? ''}</p>
+      <p>发布需求:{params.data.ztno ?? ''}</p>
+      <p>发布服务:{params.data.apps ?? ''}</p>
+      <p>发布集群:{params.data.release_env ?? ''}</p>
       {hasPermission ? (
         <img
           src={require('../../../public/delete_black_2.png')}
@@ -47,14 +38,17 @@ const Item = (params: { data: Iitem; bg?: string; child?: React.ReactNode }) => 
 };
 
 const VisualView = () => {
-  const [online, setOnline] = useState<any[]>([]);
-  const [source, setSource] = useState<Iitem[]>([]);
   const [project, setProject] = useState<any[]>([]);
   const [branch, setBranch] = useState<any[]>([]);
+  const [online, setOnline] = useState<any[]>([]); // 线上动态列
+  const [source, setSource] = useState<any[]>([]);
+  const [baseSource, setBaseSource] = useState<any[]>([]); // 基准版本
+  const [currentSource, setCurrentSource] = useState<any[]>([]); // 当天待发版
+  const [calator, setCalator] = useState<any[]>([]); // 上线日历
 
   useEffect(() => {
-    getProject();
-    setOnline([{ name: '集群2-3' }, { name: '集群4-6' }, { name: '集群7-8' }]);
+    getSelectData();
+    getViewData();
     setSource([
       {
         id: '1',
@@ -62,10 +56,11 @@ const VisualView = () => {
         server: ['web', 'h5'],
         project: '自定义门户',
         branch: 'hotfix',
-        env: '',
+        env: '集群1',
         from: 1,
         to: 150,
         bg: initBg[0],
+        ztno: 2234,
       },
       {
         id: '2',
@@ -73,7 +68,7 @@ const VisualView = () => {
         server: ['web', 'app'],
         project: '库存管理',
         branch: 'hotfix',
-        env: '',
+        env: '集群1',
         from: 1,
         to: 50,
         bg: initBg[0],
@@ -84,7 +79,7 @@ const VisualView = () => {
         server: ['web', 'app'],
         project: '库存管理',
         branch: 'hotfix',
-        env: '',
+        env: '集群1',
         from: 1,
         to: 50,
         bg: initBg[0],
@@ -95,7 +90,7 @@ const VisualView = () => {
         server: ['web', 'app'],
         project: '库存管理',
         branch: 'hotfix',
-        env: '',
+        env: '集群1',
         from: 1,
         to: 50,
         bg: initBg[0],
@@ -103,7 +98,45 @@ const VisualView = () => {
     ]);
   }, []);
 
-  const getProject = async () => {
+  const getViewData = async () => {
+    // const base = await PreReleaseServices.releaseBaseline();
+    // const currentDay = await PreReleaseServices.releaseView();
+    //
+    // const basicOnline = base.map((it: any) => it.cluster)?.flat() ?? [];
+    // const currentOnline = currentDay.map((it: any) => it.cluster)?.flat() ?? [];
+    //
+    // setOnline(
+    //   [...new Set([...basicOnline, ...currentOnline])]
+    //     .flatMap((it) => (ignore.includes(it) ? [] : [it]))
+    //     .map((key) => ({ name: key })),
+    // );
+    // setBaseSource(base);
+    // setCurrentSource(currentDay);
+    setOnline([{ name: '集群2-4', value: 'cn-northwest-24' }]);
+    // 线上集群： 顺序：对应前的数据
+    setCurrentSource([
+      {
+        project: 'CESHI',
+        branch: 'hotfix',
+        ztno: '212',
+        apps: 'app',
+        release_env: 'ddd',
+        cluster: ['cn-northwest-0', 'cn-northwest-1', 'cn-northwest-1-4'],
+        from: 0,
+        to: [1, 2, 3],
+      },
+      {
+        project: 'CESHI',
+        branch: 'hotfix',
+        ztno: '212',
+        apps: 'app',
+        release_env: 'ddd',
+        baseline_cluster: 'cn-northwest-0',
+        cluster: ['cn-northwest-0', 'cn-northwest-1', 'cn-northwest-1-4'],
+      },
+    ]);
+  };
+  const getSelectData = async () => {
     const projectList = await PreReleaseServices.project();
     const branchList = await PreReleaseServices.branch();
     setProject(
@@ -122,19 +155,44 @@ const VisualView = () => {
     );
   };
 
-  const renderEmptyTD = (len: number) => {
+  const renderTD = (len: number, data: any) => {
     if (len <= 0) return '';
     const arr = Array.from({ length: len }).fill('1');
+    // 线下版本 ： 空  集群1：<td/><td><itme/></td> 集群2:
     return (
       <>
         {arr.map((it, index) => (
-          <td key={index} />
+          <td key={index}>
+            {isEmpty(data.baseline_cluster) && index == 0 ? (
+              <Item
+                data={data}
+                child={
+                  <div>
+                    {data.cluster?.map((line: any) => {
+                      let onlineIndex = online.findIndex((env) => env.name == line);
+                      if (onlineIndex == -1) onlineIndex = 0;
+                      const percent =
+                        line == ignore[0] ? 1 : line == ignore[1] ? 2 : onlineIndex + 3;
+                      return (
+                        <div
+                          className={cns(styles.dotLineBasic, styles.dotLineEmergency)}
+                          style={{ width: `calc(${percent * 100 - 50}% + ${percent * 7}px)` }}
+                        />
+                      );
+                    })}
+                  </div>
+                }
+              />
+            ) : (
+              ''
+            )}
+          </td>
         ))}
       </>
     );
   };
 
-  const memoLen = useMemo(() => online.length || 0, [online]);
+  const onlineLen = useMemo(() => online.length || 1, [online]);
 
   return (
     <div className={styles.visualView}>
@@ -152,12 +210,12 @@ const VisualView = () => {
                 <th
                   key={title}
                   rowSpan={isOnline ? 1 : 2}
-                  colSpan={isOnline ? memoLen : title == '类别' ? 2 : 1}
+                  colSpan={isOnline ? onlineLen : title == '类别' ? 2 : 1}
                   style={
                     title == '类别'
                       ? { width: 130, maxWidth: 170 }
                       : {
-                          width: `${isOnline ? singleW * (memoLen || 1) : singleW}px`,
+                          width: `${isOnline ? singleW * (onlineLen || 1) : singleW}px`,
                         }
                   }
                 >
@@ -168,7 +226,7 @@ const VisualView = () => {
           </tr>
           <tr>
             {online.map((it) => (
-              <th key={it.name}>{it.name}</th>
+              <th key={it.name}>{it.name ?? ''}</th>
             ))}
           </tr>
         </thead>
@@ -206,96 +264,25 @@ const VisualView = () => {
                 }}
               />
             </td>
-            <td>
-              <Item
-                data={{
-                  id: '4',
-                  time: '2022-09-12 12:32',
-                  server: ['web', 'app'],
-                  project: '库存管理',
-                  branch: 'hotfix',
-                  env: '',
-                  from: 1,
-                  to: 50,
-                  bg: initBg[0],
-                }}
-              />
-            </td>
-            <td>
-              <Item
-                data={{
-                  id: '4',
-                  time: '2022-09-12 12:32',
-                  server: ['web', 'app'],
-                  project: '库存管理',
-                  branch: 'hotfix',
-                  env: '',
-                  from: 1,
-                  to: 50,
-                  bg: initBg[0],
-                }}
-              />
-            </td>
           </tr>
-          <tr>
-            <th rowSpan={2}>
-              当<br />天<br />待<br />发<br />版
-            </th>
-            <td className={styles.time}>2022-10-13</td>
-            <td>
-              <Item
-                data={{
-                  id: '4',
-                  time: '2022-09-12 12:32',
-                  server: ['web', 'app'],
-                  project: '库存管理',
-                  branch: 'hotfix',
-                  env: '',
-                  from: 1,
-                  to: 50,
-                  bg: initBg[2],
-                }}
-                child={
-                  <div
-                    className={cns(styles.dotLineBasic, styles.dotLinePrimary)}
-                    style={{ width: `calc(450% + 7px)` }}
-                  />
-                }
-              />
-            </td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td className={styles.time}>2022-10-14</td>
-            <td>
-              <Item
-                data={{
-                  id: '4',
-                  time: '2022-09-12 12:32',
-                  server: ['web', 'app'],
-                  project: '库存管理',
-                  branch: 'hotfix',
-                  env: '',
-                  from: 1,
-                  to: 50,
-                  bg: initBg[2],
-                }}
-                child={<div className={cns(styles.dotLineBasic, styles.dotLinePrimary)} />}
-              />
-            </td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
+          {/*当天待发版*/}
+          {currentSource.map((it, index) => {
+            return (
+              <tr>
+                {index == 0 && (
+                  <th rowSpan={currentSource.length}>
+                    当<br />天<br />待<br />发<br />版
+                  </th>
+                )}
+                <td className={styles.time}>{it.plan_release_time}</td>
+                {/*{renderTD(onlineLen + 3, it)}*/}
+                {renderTD(4, it)}
+              </tr>
+            );
+          })}
           {/*搜索条件*/}
           <tr>
-            <td colSpan={memoLen + 5}>
+            <td colSpan={onlineLen + 5}>
               <Form size={'small'} layout={'inline'} className={styles.condition}>
                 <Col span={8}>
                   <Form.Item name={'project'} label={'项目名称'}>
@@ -315,37 +302,13 @@ const VisualView = () => {
               </Form>
             </td>
           </tr>
+          {/*上线计划日历*/}
           <tr>
             <th rowSpan={2}>
               上<br />
               线<br />计<br />划<br />日<br />历
             </th>
             <td className={styles.time}>2022-10-13</td>
-            <td>
-              <Item
-                data={{
-                  id: '4',
-                  time: '2022-09-12 12:32',
-                  server: ['web', 'app'],
-                  project: '库存管理',
-                  branch: 'hotfix',
-                  env: '',
-                  from: 1,
-                  to: 50,
-                  bg: initBg[1],
-                }}
-                child={
-                  <div>
-                    <div className={cns(styles.dotLineBasic, styles.dotLineEmergency)} />
-                    <div
-                      className={cns(styles.dotLineBasic, styles.dotLineEmergency)}
-                      style={{ width: `calc(150% + 7px)` }}
-                    />
-                  </div>
-                }
-              />
-            </td>
-            <td></td>
             <td></td>
             <td></td>
             <td></td>

@@ -36,7 +36,6 @@ const PreReleaseList = () => {
   const onFinish = async (v: any) => {
     if (v) {
       const res = await DutyListServices.getDutyNum();
-      debugger;
       if (!isEmpty(res)) {
         let href = `/onDutyAndRelease/preRelease?releasedNum=${res.ready_release_num}`;
         if (v == '2') {

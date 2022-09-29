@@ -340,12 +340,14 @@ export default [
                 icon: 'table',
                 path: 'patch',
                 component: './kpi/performance/developer/patch',
+                hideInMenu: true, // 临时屏蔽
               },
               {
                 name: '线上反馈平均时长',
                 icon: 'table',
                 path: 'avgOnlineTimeFeedBack',
                 component: './kpi/performance/developer/avgOnlineTimeFeedBack',
+                hideInMenu: true, // 临时屏蔽
               },
               {
                 name: '生产规模',
@@ -364,21 +366,21 @@ export default [
                 icon: 'table',
                 path: 'shuttleDelay',
                 component: './kpi/performance/developer/shuttleDelay',
-                // hideInMenu: true,
+                hideInMenu: true, // 临时屏蔽
               },
               {
                 name: '阻塞次数',
                 icon: 'table',
                 path: 'blockingTimes',
                 component: './kpi/performance/developer/blockingTimes',
-                // hideInMenu: true,
+                hideInMenu: true, // 临时屏蔽
               },
               {
                 name: '阻塞测试工作量',
                 icon: 'table',
                 path: 'blockingTestWorkload',
                 component: './kpi/performance/developer/blockingTestWorkload',
-                // hideInMenu: true,
+                hideInMenu: true, // 临时屏蔽
               },
             ],
           },
@@ -487,12 +489,14 @@ export default [
                 icon: 'table',
                 path: 'patch',
                 component: './kpi/performance/testers/patch',
+                hideInMenu: true, // 临时屏蔽
               },
               {
                 name: '线上反馈平均时长',
                 icon: 'table',
                 path: 'avgOnlineTimeFeedBack',
                 component: './kpi/performance/testers/avgOnlineTimeFeedBack',
+                hideInMenu: true, // 临时屏蔽
               },
               {
                 name: '生产规模',
@@ -511,7 +515,7 @@ export default [
                 icon: 'table',
                 path: 'shuttleDelay',
                 component: './kpi/performance/testers/shuttleDelay',
-                // hideInMenu: true,
+                hideInMenu: true, // 临时屏蔽
               },
             ],
           },
@@ -537,6 +541,7 @@ export default [
                 icon: 'table',
                 path: 'productOnlineEmergencyRate',
                 component: './kpi/performance/product/productOnlineEmergencyRate',
+                hideInMenu: true, // 临时屏蔽
               },
             ],
           },
@@ -563,7 +568,7 @@ export default [
                 icon: 'table',
                 path: 'deliveryThroughput',
                 component: './kpi/performance/service/deliveryThroughput',
-                // hideInMenu: true,
+                hideInMenu: true, // 临时屏蔽
               },
             ],
           },
@@ -643,7 +648,7 @@ export default [
             icon: 'table',
             path: 'grayScaleBugRate',
             component: './kpi/analysis/grayScaleBugRate',
-            // hideInMenu: true,
+            hideInMenu: true, // 临时屏蔽
           },
         ],
       },

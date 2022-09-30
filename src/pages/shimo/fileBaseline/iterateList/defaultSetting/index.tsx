@@ -5,12 +5,11 @@ const defaultTreeSelectParams: any = {
   allowClear: 'allowClear',
   placeholder: '默认选择全部',
   multiple: 'multiple',
-  dropdownStyle: {maxHeight: 400, overflow: 'auto'},
+  dropdownStyle: { maxHeight: 400, overflow: 'auto' },
   treeCheckable: true,
   maxTagCount: 'responsive',
   showCheckedStrategy: 'SHOW_ALL',
-  filterTreeNode: (inputValue: string, treeNode: any) =>
-    !!treeNode.title.includes(inputValue), // 返回true or false
+  filterTreeNode: (inputValue: string, treeNode: any) => !!treeNode.title.includes(inputValue), // 返回true or false
 };
 
 export default defaultTreeSelectParams;

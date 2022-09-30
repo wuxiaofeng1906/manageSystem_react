@@ -34,7 +34,7 @@ const Tab: React.FC<any> = () => {
   /* region tab 自身事件 */
   const [showTabs, setShowTabs] = useState({ shown: false, targetKey: '' });
 
-  // 无数据F
+  // 无数据
   const showNoneDataPage = async () => {
     modifyProcessStatus({
       // 进度条相关数据和颜色

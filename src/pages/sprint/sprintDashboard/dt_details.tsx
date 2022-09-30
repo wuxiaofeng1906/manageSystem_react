@@ -1,23 +1,25 @@
-import React, {useRef, useState} from 'react';
-import {AgGridReact} from 'ag-grid-react';
+import React, { useRef, useState } from 'react';
+import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {useRequest} from 'ahooks';
-import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient} from '@/hooks';
-import {PageHeader} from 'antd';
-import {history} from 'umi';
-import {getHeight} from '@/publicMethods/pageSet';
+import { useRequest } from 'ahooks';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GqlClient, useGqlClient } from '@/hooks';
+import { PageHeader } from 'antd';
+import { history } from 'umi';
+import { getHeight } from '@/publicMethods/pageSet';
 import {
   catagoryValueGetter,
   linkToZentaoPage,
   servertyValueGetter,
-  stageValueGetter, statusRenderer, statusValueGetter, timeRenderer
-} from "../sprintListDetails/grid/columnRenderer";
+  stageValueGetter,
+  statusRenderer,
+  statusValueGetter,
+  timeRenderer,
+} from '../sprintListDetails/grid/columnRenderer';
 
 const getColums = () => {
-
   const component: any = [
     {
       headerName: '序号',
@@ -53,8 +55,8 @@ const getColums = () => {
       headerName: '相关测试',
       field: 'tester',
       minWidth: 80,
-      tooltipField: "tester",
-      suppressMenu: false
+      tooltipField: 'tester',
+      suppressMenu: false,
     },
 
     {
@@ -62,7 +64,7 @@ const getColums = () => {
       field: 'title',
       minWidth: 350,
       // cellRenderer: stageForLineThrough,
-      tooltipField: "title"
+      tooltipField: 'title',
     },
     {
       headerName: '严重等级',
@@ -76,7 +78,7 @@ const getColums = () => {
       field: 'moduleName',
       minWidth: 100,
       // cellRenderer: stageForLineThrough,
-      tooltipField: "moduleName"
+      tooltipField: 'moduleName',
     },
     {
       headerName: '当前状态',
@@ -91,18 +93,16 @@ const getColums = () => {
       field: 'assignedTo',
       minWidth: 80,
       // cellRenderer: stageForLineThrough,
-      tooltipField: "assignedTo",
+      tooltipField: 'assignedTo',
       suppressMenu: false,
-
     },
     {
       headerName: '解决/完成人',
       field: 'finishedBy',
       minWidth: 80,
       // cellRenderer: stageForLineThrough,
-      tooltipField: "finishedBy",
+      tooltipField: 'finishedBy',
       suppressMenu: false,
-
     },
     {
       headerName: '反馈人',
@@ -127,7 +127,7 @@ const addNewAttributes = (source: any, category: string) => {
   if (source !== null) {
     for (let index = 0; index < source.length; index += 1) {
       const details = source[index];
-      details["category"] = category;
+      details['category'] = category;
       result.push(details);
     }
   }
@@ -136,8 +136,7 @@ const addNewAttributes = (source: any, category: string) => {
 };
 // 查询数据
 const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
-
-  const {data} = await client.query(`
+  const { data } = await client.query(`
       {
           relatedNums(category:"${params.category}",ztNo:${params.ztNo},relatedType:"${params.relatedType}",needQuery:${params.needQuery}){
           id
@@ -163,115 +162,113 @@ const queryDevelopViews = async (client: GqlClient<object>, params: any) => {
 
 // 组件初始化
 const DtDetailsList: React.FC<any> = () => {
+  /* 获取网页的项目id */
+  const paramsInfo: any = {
+    category: '',
+    ztNo: 0,
+    relatedType: '',
+    needQuery: false,
+  };
 
-    /* 获取网页的项目id */
-    const paramsInfo: any = {
-      category: "",
-      ztNo: 0,
-      relatedType: "",
-      needQuery: false,
-    };
-
-    const location = history.location.query;
-    if (location) {
-      paramsInfo.category = location.kind;
-      paramsInfo.ztNo = location.ztNo;
-      paramsInfo.relatedType = location.relatedType;
-      if (Number(location.count) > 0) {
-        paramsInfo.needQuery = true;
-      }
+  const location = history.location.query;
+  if (location) {
+    paramsInfo.category = location.kind;
+    paramsInfo.ztNo = location.ztNo;
+    paramsInfo.relatedType = location.relatedType;
+    if (Number(location.count) > 0) {
+      paramsInfo.needQuery = true;
     }
-
-    const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
-    const gqlClient = useGqlClient();
-    const {data, loading} = useRequest(() => queryDevelopViews(gqlClient, paramsInfo));
-
-    const onGridReady = (params: GridReadyEvent) => {
-      gridApi.current = params.api;
-      params.api.sizeColumnsToFit();
-    };
-
-    if (gridApi.current) {
-      if (loading) gridApi.current.showLoadingOverlay();
-      else gridApi.current.hideOverlay();
-    }
-
-    // 表格的屏幕大小自适应
-    const [gridHeight, setGridHeight] = useState(getHeight());
-    window.onresize = function () {
-      // console.log("新高度：", getHeight());
-      setGridHeight(getHeight());
-      gridApi.current?.sizeColumnsToFit();
-    };
-
-    const routes = [
-      {
-        path: '',
-        breadcrumbName: '班车工作台',
-      }, {
-        path: '',
-        breadcrumbName: '详情信息',
-      }];
-
-    const getPageTitle = () => {
-      let type = "";
-      switch (paramsInfo.category) {
-        case "1":
-          type = "Bug";
-          break;
-        case "2":
-          type = "Task";
-          break;
-        case "3":
-        case "-3":
-          type = "Story";
-          break;
-        default:
-          break;
-      }
-
-      return `${type} ${paramsInfo.ztNo}`;
-    }
-
-    return (
-      <div style={{marginTop: "-20px"}}>
-
-        <PageHeader
-          ghost={false}
-          title={getPageTitle()}
-          style={{height: "100px"}}
-          breadcrumb={{routes}}
-        />
-
-
-        {/* ag-grid 表格定义 */}
-        <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%', marginTop: "9px"}}>
-          <AgGridReact
-            columnDefs={getColums()} // 定义列
-            rowData={data} // 数据绑定
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true,
-              flex: 1,
-              minWidth: 100,
-              suppressMenu: true,
-              cellStyle: {"line-height": "30px"},
-            }}
-
-            autoGroupColumnDef={{
-              minWidth: 100,
-            }}
-            rowHeight={32}
-            headerHeight={35}
-            groupDefaultExpanded={9} // 展开分组
-            onGridReady={onGridReady}
-
-          />
-
-        </div>
-      </div>
-    );
   }
-;
+
+  const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
+  const gqlClient = useGqlClient();
+  const { data, loading } = useRequest(() => queryDevelopViews(gqlClient, paramsInfo));
+
+  const onGridReady = (params: GridReadyEvent) => {
+    gridApi.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+
+  if (gridApi.current) {
+    if (loading) gridApi.current.showLoadingOverlay();
+    else gridApi.current.hideOverlay();
+  }
+
+  // 表格的屏幕大小自适应
+  const [gridHeight, setGridHeight] = useState(getHeight());
+  window.onresize = function () {
+    // console.log("新高度：", getHeight());
+    setGridHeight(getHeight());
+    gridApi.current?.sizeColumnsToFit();
+  };
+
+  const routes = [
+    {
+      path: '',
+      breadcrumbName: '班车工作台',
+    },
+    {
+      path: '',
+      breadcrumbName: '详情信息',
+    },
+  ];
+
+  const getPageTitle = () => {
+    let type = '';
+    switch (paramsInfo.category) {
+      case '1':
+        type = 'Bug';
+        break;
+      case '2':
+        type = 'Task';
+        break;
+      case '3':
+      case '-3':
+        type = 'Story';
+        break;
+      default:
+        break;
+    }
+
+    return `${type} ${paramsInfo.ztNo}`;
+  };
+
+  return (
+    <div style={{ marginTop: '-20px' }}>
+      <PageHeader
+        ghost={false}
+        title={getPageTitle()}
+        style={{ height: '100px' }}
+        breadcrumb={{ routes }}
+      />
+
+      {/* ag-grid 表格定义 */}
+      <div
+        className="ag-theme-alpine"
+        style={{ height: gridHeight, width: '100%', marginTop: '9px' }}
+      >
+        <AgGridReact
+          columnDefs={getColums()} // 定义列
+          rowData={data} // 数据绑定
+          defaultColDef={{
+            resizable: true,
+            sortable: true,
+            filter: true,
+            flex: 1,
+            minWidth: 100,
+            suppressMenu: true,
+            cellStyle: { 'line-height': '30px' },
+          }}
+          autoGroupColumnDef={{
+            minWidth: 100,
+          }}
+          rowHeight={32}
+          headerHeight={35}
+          groupDefaultExpanded={9} // 展开分组
+          onGridReady={onGridReady}
+        />
+      </div>
+    </div>
+  );
+};
 export default DtDetailsList;

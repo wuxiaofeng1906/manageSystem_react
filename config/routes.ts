@@ -355,6 +355,53 @@ export default [
                 component: './kpi/performance/developer/releaseEmergencyCount',
                 // hideInMenu: true,
               },
+              {
+                name: '发布引入patch数',
+                icon: 'table',
+                path: 'patch',
+                component: './kpi/performance/developer/patch',
+                hideInMenu: true, // 临时屏蔽
+              },
+              {
+                name: '线上反馈平均时长',
+                icon: 'table',
+                path: 'avgOnlineTimeFeedBack',
+                component: './kpi/performance/developer/avgOnlineTimeFeedBack',
+                hideInMenu: true, // 临时屏蔽
+              },
+              {
+                name: '生产规模',
+                icon: 'table',
+                path: 'productionScale',
+                component: './kpi/performance/developer/productionScale',
+              },
+              {
+                name: '人效统计',
+                icon: 'table',
+                path: 'humanEffect',
+                component: './kpi/performance/developer/humanEffect',
+              },
+              {
+                name: '班车延期需求数',
+                icon: 'table',
+                path: 'shuttleDelay',
+                component: './kpi/performance/developer/shuttleDelay',
+                hideInMenu: true, // 临时屏蔽
+              },
+              {
+                name: '阻塞次数',
+                icon: 'table',
+                path: 'blockingTimes',
+                component: './kpi/performance/developer/blockingTimes',
+                hideInMenu: true, // 临时屏蔽
+              },
+              {
+                name: '阻塞测试工作量',
+                icon: 'table',
+                path: 'blockingTestWorkload',
+                component: './kpi/performance/developer/blockingTestWorkload',
+                hideInMenu: true, // 临时屏蔽
+              },
             ],
           },
           {
@@ -457,6 +504,39 @@ export default [
                 component: './kpi/performance/testers/releaseEmergencyCount',
                 // hideInMenu: true,
               },
+              {
+                name: '发布引入patch数',
+                icon: 'table',
+                path: 'patch',
+                component: './kpi/performance/testers/patch',
+                hideInMenu: true, // 临时屏蔽
+              },
+              {
+                name: '线上反馈平均时长',
+                icon: 'table',
+                path: 'avgOnlineTimeFeedBack',
+                component: './kpi/performance/testers/avgOnlineTimeFeedBack',
+                hideInMenu: true, // 临时屏蔽
+              },
+              {
+                name: '生产规模',
+                icon: 'table',
+                path: 'productionScale',
+                component: './kpi/performance/testers/productionScale',
+              },
+              {
+                name: '人效统计',
+                icon: 'table',
+                path: 'humanEffect',
+                component: './kpi/performance/testers/humanEffect',
+              },
+              {
+                name: '班车延期需求数',
+                icon: 'table',
+                path: 'shuttleDelay',
+                component: './kpi/performance/testers/shuttleDelay',
+                hideInMenu: true, // 临时屏蔽
+              },
             ],
           },
           {
@@ -475,6 +555,13 @@ export default [
                 icon: 'table',
                 path: 'avgAdviserFeedbackTime',
                 component: './kpi/performance/product/avgAdviserFeedbackTime',
+              },
+              {
+                name: '上线后emergency占比',
+                icon: 'table',
+                path: 'productOnlineEmergencyRate',
+                component: './kpi/performance/product/productOnlineEmergencyRate',
+                hideInMenu: true, // 临时屏蔽
               },
             ],
           },
@@ -495,6 +582,13 @@ export default [
                 icon: 'table',
                 path: 'avgEstablishTime',
                 component: './kpi/performance/service/avgEstablishTime',
+              },
+              {
+                name: '交付吞吐量',
+                icon: 'table',
+                path: 'deliveryThroughput',
+                component: './kpi/performance/service/deliveryThroughput',
+                hideInMenu: true, // 临时屏蔽
               },
             ],
           },
@@ -568,6 +662,13 @@ export default [
             path: 'bugResolutionSpeed',
             component: './kpi/analysis/bugResolutionSpeed',
             access: 'sysAdmin',
+          },
+          {
+            name: '灰度千行bug率',
+            icon: 'table',
+            path: 'grayScaleBugRate',
+            component: './kpi/analysis/grayScaleBugRate',
+            hideInMenu: true, // 临时屏蔽
           },
         ],
       },

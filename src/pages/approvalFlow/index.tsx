@@ -1,57 +1,53 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {PageContainer} from '@ant-design/pro-layout';
-import {AgGridReact} from 'ag-grid-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { PageContainer } from '@ant-design/pro-layout';
+import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {useRequest} from 'ahooks';
-import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {Button, message, Select, Input, DatePicker, Modal, InputNumber, Form} from 'antd';
-import {getHeight} from '@/publicMethods/pageSet';
+import { useRequest } from 'ahooks';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { Button, message, Select, Input, DatePicker, Modal, InputNumber, Form } from 'antd';
+import { getHeight } from '@/publicMethods/pageSet';
 import axios from 'axios';
-import {getGridColums, alaysisDatas} from "./columns";
-import {getFlowDIv} from "./flow";
+import { getGridColums, alaysisDatas } from './columns';
+import { getFlowDIv } from './flow';
 
-
-const {Option} = Select;
-const {RangePicker} = DatePicker;
+const { Option } = Select;
+const { RangePicker } = DatePicker;
 
 let clickedRow: any;
 
 // 查询数据
 const queryDevelopViews = async (condition: any) => {
-
   let datas: any = [];
   const pageInfo = {
     itemCount: 0,
     pageCount: 0,
-    pageSize: 0
+    pageSize: 0,
   };
 
   const paramData = {
-    temp_id: condition.approvalType,  // 类型
+    temp_id: condition.approvalType, // 类型
     approval_id: condition.status, // 状态
     leader_name: condition.manager, // 开发经理 or 项目经理
     user_id: condition.applicant, // 申请人
     start_time: condition.start, // 开始时间
-    end_time: condition.end,// 结束时间
+    end_time: condition.end, // 结束时间
     sp_no: condition.spNo,
     sp_person: condition.spPerson,
     page: condition.page, // 第几页
-    page_size: condition.pageSize  // 每页多少条
+    page_size: condition.pageSize, // 每页多少条
   };
 
-  await axios.get('/api/verify/apply/apply_data', {params: paramData})
+  await axios
+    .get('/api/verify/apply/apply_data', { params: paramData })
     .then(function (res) {
-
       if (res.data.code === 200) {
-
         pageInfo.itemCount = res.data.data.count;
         pageInfo.pageCount = res.data.data.page;
         pageInfo.pageSize = res.data.data.page_size;
 
         datas = alaysisDatas(condition, res.data.data.data);
-
       } else {
         message.error({
           content: `错误：${res.data.msg}`,
@@ -61,10 +57,8 @@ const queryDevelopViews = async (condition: any) => {
           },
         });
       }
-
-
-    }).catch(function (error) {
-
+    })
+    .catch(function (error) {
       message.error({
         content: `异常信息:${error.toString()}`,
         duration: 1, // 1S 后自动关闭
@@ -74,34 +68,32 @@ const queryDevelopViews = async (condition: any) => {
       });
     });
 
-  return {pageInfo, datas};
-
+  return { pageInfo, datas };
 };
 
 // 组件初始化
 const JenkinsCheck: React.FC<any> = () => {
-  const sys_accessToken = localStorage.getItem("accessId");
+  const sys_accessToken = localStorage.getItem('accessId');
   axios.defaults.headers['Authorization'] = `Bearer ${sys_accessToken}`;
 
   const [condition, setCondition] = useState({
-    approvalTypeName: "emergency申请",
-    approvalType: "Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu", // emergency id  变更申请：Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt emergency：Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu
-    applicant: "",
-    manager: "",
-    status: "",
-    start: "",
-    end: "",
-    spNo: "",
-    spPerson: "",
+    approvalTypeName: 'emergency申请',
+    approvalType: 'Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu', // emergency id  变更申请：Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt emergency：Bs7x1Pi9kpPJEEPC1N81bPfAhKrqpLH2CsuTHQCHu
+    applicant: '',
+    manager: '',
+    status: '',
+    start: '',
+    end: '',
+    spNo: '',
+    spPerson: '',
     page: 1,
-    pageSize: 20
+    pageSize: 20,
   });
 
   /* region  表格相关事件 */
 
-
   const gridApi = useRef<GridApi>();
-  const {data, loading} = useRequest(() => queryDevelopViews(condition));
+  const { data, loading } = useRequest(() => queryDevelopViews(condition));
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -123,18 +115,16 @@ const JenkinsCheck: React.FC<any> = () => {
     params.api.sizeColumnsToFit();
   };
 
-
   /* endregion */
-
 
   /* region 查询以及 翻页以及页面跳转功能 */
 
   const [Pages, setPages] = useState({
-    totalCounts: 0,  // 总条数
-    countsOfPage: 20,  // 每页显示多少条
-    totalPages: 0,  // 一共多少页
+    totalCounts: 0, // 总条数
+    countsOfPage: 20, // 每页显示多少条
+    totalPages: 0, // 一共多少页
     currentPage: 0, // 当前是第几页
-    jumpToPage: 0  // 跳转到第几页
+    jumpToPage: 0, // 跳转到第几页
   });
 
   // 计算分页信息
@@ -146,24 +136,24 @@ const JenkinsCheck: React.FC<any> = () => {
     if (data) {
       totalCount = Number(pageInfo.itemCount);
       countsOfPages = Number(pageInfo.pageSize);
-      totalPage = Number(pageInfo.itemCount) === 0 ? 0 : Math.ceil(Number(pageInfo.itemCount) / Number(pageInfo.pageSize));
+      totalPage =
+        Number(pageInfo.itemCount) === 0
+          ? 0
+          : Math.ceil(Number(pageInfo.itemCount) / Number(pageInfo.pageSize));
       currentPages = Number(pageInfo.pageCount);
     }
-
 
     setPages({
       totalCounts: totalCount,
       countsOfPage: countsOfPages,
       totalPages: totalPage,
       currentPage: currentPages,
-      jumpToPage: 1
+      jumpToPage: 1,
     });
   };
 
-
   // 表格查询按钮
   const refreshGrid = async (new_condition: any) => {
-
     const n_columns: any = getGridColums(new_condition.approvalType);
     gridApi.current?.setColumnDefs(n_columns);
     gridApi.current?.setRowData([]);
@@ -173,27 +163,22 @@ const JenkinsCheck: React.FC<any> = () => {
     showPageInfo(newData.pageInfo);
   };
 
-
   const refreshCellData = async (projectInfo: any, value: any) => {
-
     clickedRow.project_name = projectInfo.prjName;
     clickedRow.project_name_meets = projectInfo.flag;
     clickedRow.change_hours = {
-      "前端": value.front,
-      "后端": value.server,
-      "测试": value.test,
-      "合计": value.sum
+      前端: value.front,
+      后端: value.server,
+      测试: value.test,
+      合计: value.sum,
     };
 
     const rowNode = gridApi.current?.getRowNode(clickedRow.id);
     rowNode?.setData(clickedRow);
-
-
   };
 
   // 每页显示多少条数据
   const showItemChange = async (pageCount: any) => {
-
     setPages({
       ...Pages,
       countsOfPage: Number(pageCount),
@@ -210,22 +195,19 @@ const JenkinsCheck: React.FC<any> = () => {
       spNo: condition.spNo,
       spPerson: condition.spPerson,
       page: Pages.currentPage, // 第几页
-      pageSize: pageCount // 每页多少条
+      pageSize: pageCount, // 每页多少条
     };
 
     refreshGrid(queryCondition);
-
-
   };
 
   // 上一页
   const showPreviousPage = async () => {
-
     // 上一页不能为负数或0
     if (Pages.currentPage > 1) {
       setPages({
         ...Pages,
-        currentPage: Pages.currentPage - 1
+        currentPage: Pages.currentPage - 1,
       });
 
       const queryCondition = {
@@ -238,7 +220,7 @@ const JenkinsCheck: React.FC<any> = () => {
         spNo: condition.spNo,
         spPerson: condition.spPerson,
         page: Number(Pages.currentPage - 1), // 第几页
-        pageSize: Pages.countsOfPage // 每页多少条
+        pageSize: Pages.countsOfPage, // 每页多少条
       };
 
       refreshGrid(queryCondition);
@@ -251,7 +233,6 @@ const JenkinsCheck: React.FC<any> = () => {
         },
       });
     }
-
   };
 
   // 下一页
@@ -262,7 +243,7 @@ const JenkinsCheck: React.FC<any> = () => {
     if (nextPage <= Pages.totalPages) {
       setPages({
         ...Pages,
-        currentPage: Pages.currentPage + 1
+        currentPage: Pages.currentPage + 1,
       });
 
       const queryCondition = {
@@ -275,7 +256,7 @@ const JenkinsCheck: React.FC<any> = () => {
         spNo: condition.spNo,
         spPerson: condition.spPerson,
         page: Number(Pages.currentPage + 1), // 第几页
-        pageSize: Pages.countsOfPage // 每页多少条
+        pageSize: Pages.countsOfPage, // 每页多少条
       };
 
       refreshGrid(queryCondition);
@@ -288,15 +269,12 @@ const JenkinsCheck: React.FC<any> = () => {
         },
       });
     }
-
   };
 
   // 跳转到第几页
   const goToPage = async (params: any) => {
-
     const pageCounts = Number(params.currentTarget.defaultValue);
     if (pageCounts > Pages.totalPages) {
-
       // 提示已超过最大跳转页数
       message.error({
         content: '已超过最大跳转页数!',
@@ -305,10 +283,7 @@ const JenkinsCheck: React.FC<any> = () => {
           marginTop: '50vh',
         },
       });
-
     } else {
-
-
       const queryCondition = {
         approvalType: condition.approvalType, // emergency id
         applicant: condition.applicant,
@@ -319,14 +294,11 @@ const JenkinsCheck: React.FC<any> = () => {
         spNo: condition.spNo,
         spPerson: condition.spPerson,
         page: pageCounts, // 第几页
-        pageSize: Pages.countsOfPage // 每页多少条
+        pageSize: Pages.countsOfPage, // 每页多少条
       };
 
       refreshGrid(queryCondition);
-
     }
-
-
   };
 
   /* endregion */
@@ -336,18 +308,16 @@ const JenkinsCheck: React.FC<any> = () => {
   // 单据类型
   const [approvalType, setApprovalType] = useState([]);
   const getApprovalType = () => {
-    axios.get('/api/verify/apply/template', {params: {}})
+    axios
+      .get('/api/verify/apply/template', { params: {} })
       .then(function (res) {
-
         if (res.data.code === 200) {
           const typeDatas = res.data.data;
           const typeOp: any = [];
           for (let index = 0; index < typeDatas.length; index += 1) {
             const id = typeDatas[index].template_id;
-            const name = typeDatas[index].template_name
-            typeOp.push(
-              <Option value={id}>{name}</Option>,
-            );
+            const name = typeDatas[index].template_name;
+            typeOp.push(<Option value={id}>{name}</Option>);
           }
           setApprovalType(typeOp);
         } else {
@@ -359,35 +329,38 @@ const JenkinsCheck: React.FC<any> = () => {
             },
           });
         }
-
-      }).catch(function (error) {
-
-      message.error({
-        content: `异常信息:${error.toString()}`,
-        duration: 1, // 1S 后自动关闭
-        style: {
-          marginTop: '50vh',
-        },
+      })
+      .catch(function (error) {
+        message.error({
+          content: `异常信息:${error.toString()}`,
+          duration: 1, // 1S 后自动关闭
+          style: {
+            marginTop: '50vh',
+          },
+        });
       });
-    });
-
-
   };
 
   // 申请人
   const [applicant, setApplicant] = useState([]);
   const getApplicant = () => {
-    axios.get('/api/verify/apply/applicant', {params: {}})
+    axios
+      .get('/api/verify/apply/applicant', { params: {} })
       .then(function (res) {
-
         if (res.data.code === 200) {
           const applicantDatas = res.data.data;
-          const applicantOp: any = [<Option key={""} value={""}>{""}</Option>];
+          const applicantOp: any = [
+            <Option key={''} value={''}>
+              {''}
+            </Option>,
+          ];
           for (let index = 0; index < applicantDatas.length; index += 1) {
             const id = applicantDatas[index].user_id;
-            const name = applicantDatas[index].user_name
+            const name = applicantDatas[index].user_name;
             applicantOp.push(
-              <Option key={id} value={name}>{name}</Option>
+              <Option key={id} value={name}>
+                {name}
+              </Option>,
             );
           }
           setApplicant(applicantOp);
@@ -400,24 +373,21 @@ const JenkinsCheck: React.FC<any> = () => {
             },
           });
         }
-
-      }).catch(function (error) {
-
-      message.error({
-        content: `异常信息:${error.toString()}`,
-        duration: 1, // 1S 后自动关闭
-        style: {
-          marginTop: '50vh',
-        },
+      })
+      .catch(function (error) {
+        message.error({
+          content: `异常信息:${error.toString()}`,
+          duration: 1, // 1S 后自动关闭
+          style: {
+            marginTop: '50vh',
+          },
+        });
       });
-    });
-
-
   };
   const getselectedApplicant = (values: any, params: any) => {
     setCondition({
       ...condition,
-      applicant: params.key
+      applicant: params.key,
     });
 
     const queryCondition = {
@@ -430,27 +400,32 @@ const JenkinsCheck: React.FC<any> = () => {
       spPerson: condition.spPerson,
       spNo: condition.spNo,
       page: condition.page,
-      pageSize: condition.pageSize
+      pageSize: condition.pageSize,
     };
 
     refreshGrid(queryCondition);
-
   };
 
   // 状态
   const [status, setStatus] = useState([]);
   const getStatus = () => {
-    axios.get('/api/verify/apply/approval_status', {params: {}})
+    axios
+      .get('/api/verify/apply/approval_status', { params: {} })
       .then(function (res) {
-
         if (res.data.code === 200) {
           const statusDatas = res.data.data;
-          const statustOp: any = [<Option key={""} value={""}>{""}</Option>];
+          const statustOp: any = [
+            <Option key={''} value={''}>
+              {''}
+            </Option>,
+          ];
           for (let index = 0; index < statusDatas.length; index += 1) {
             const id = statusDatas[index].approval_id;
-            const name = statusDatas[index].approval_status
+            const name = statusDatas[index].approval_status;
             statustOp.push(
-              <Option key={id} value={name}>{name}</Option>
+              <Option key={id} value={name}>
+                {name}
+              </Option>,
             );
           }
           setStatus(statustOp);
@@ -463,24 +438,21 @@ const JenkinsCheck: React.FC<any> = () => {
             },
           });
         }
-
-      }).catch(function (error) {
-
-      message.error({
-        content: `异常信息:${error.toString()}`,
-        duration: 1, // 1S 后自动关闭
-        style: {
-          marginTop: '50vh',
-        },
+      })
+      .catch(function (error) {
+        message.error({
+          content: `异常信息:${error.toString()}`,
+          duration: 1, // 1S 后自动关闭
+          style: {
+            marginTop: '50vh',
+          },
+        });
       });
-    });
-
-
   };
   const getSelectedStatus = (values: any, params: any) => {
     setCondition({
       ...condition,
-      status: params.key
+      status: params.key,
     });
 
     const queryCondition = {
@@ -493,29 +465,32 @@ const JenkinsCheck: React.FC<any> = () => {
       spPerson: condition.spPerson,
       spNo: condition.spNo,
       page: condition.page,
-      pageSize: condition.pageSize
+      pageSize: condition.pageSize,
     };
 
     refreshGrid(queryCondition);
-
-
   };
-
 
   // 经理（开发经理 or 项目经理）
   const [managers, setManagers] = useState([]);
   const getManagers = (appType: string) => {
-    axios.get('/api/verify/apply/leader', {params: {temp_id: appType}})
+    axios
+      .get('/api/verify/apply/leader', { params: { temp_id: appType } })
       .then(function (res) {
-
         if (res.data.code === 200) {
           const managersDatas = res.data.data;
-          const managerstOp: any = [<Option key={""} value={""}>{""}</Option>];
+          const managerstOp: any = [
+            <Option key={''} value={''}>
+              {''}
+            </Option>,
+          ];
           for (let index = 0; index < managersDatas.length; index += 1) {
             // const id = managersDatas[index].approval_id;
-            const name = managersDatas[index].leader
+            const name = managersDatas[index].leader;
             managerstOp.push(
-              <Option key={name} value={name}>{name}</Option>
+              <Option key={name} value={name}>
+                {name}
+              </Option>,
             );
           }
           setManagers(managerstOp);
@@ -528,24 +503,21 @@ const JenkinsCheck: React.FC<any> = () => {
             },
           });
         }
-
-      }).catch(function (error) {
-
-      message.error({
-        content: `异常信息:${error.toString()}`,
-        duration: 1, // 1S 后自动关闭
-        style: {
-          marginTop: '50vh',
-        },
+      })
+      .catch(function (error) {
+        message.error({
+          content: `异常信息:${error.toString()}`,
+          duration: 1, // 1S 后自动关闭
+          style: {
+            marginTop: '50vh',
+          },
+        });
       });
-    });
-
-
   };
   const getDevManager = (values: any, params: any) => {
     setCondition({
       ...condition,
-      manager: params.key
+      manager: params.key,
     });
 
     const queryCondition = {
@@ -558,17 +530,15 @@ const JenkinsCheck: React.FC<any> = () => {
       spPerson: condition.spPerson,
       spNo: condition.spNo,
       page: condition.page,
-      pageSize: condition.pageSize
+      pageSize: condition.pageSize,
     };
 
     refreshGrid(queryCondition);
-
   };
   const getprojectManager = (values: any, params: any) => {
-
     setCondition({
       ...condition,
-      manager: params.key
+      manager: params.key,
     });
 
     const queryCondition = {
@@ -581,7 +551,7 @@ const JenkinsCheck: React.FC<any> = () => {
       spPerson: condition.spPerson,
       spNo: condition.spNo,
       page: condition.page,
-      pageSize: condition.pageSize
+      pageSize: condition.pageSize,
     };
 
     refreshGrid(queryCondition);
@@ -589,10 +559,9 @@ const JenkinsCheck: React.FC<any> = () => {
 
   // 待审批人
   const getselectedPendingApproval = (values: any, params: any) => {
-
     setCondition({
       ...condition,
-      spPerson: params.key.toString()
+      spPerson: params.key.toString(),
     });
 
     const queryCondition = {
@@ -605,21 +574,19 @@ const JenkinsCheck: React.FC<any> = () => {
       spPerson: params.key.toString(),
       spNo: condition.spNo,
       page: condition.page,
-      pageSize: condition.pageSize
+      pageSize: condition.pageSize,
     };
 
     refreshGrid(queryCondition);
-
   };
 
   // 获取审批编号
   const getSpNo = (params: any) => {
-
     const values = (params.currentTarget?.defaultValue).trim().toString();
 
     setCondition({
       ...condition,
-      spNo: values
+      spNo: values,
     });
 
     if (condition.spNo !== values) {
@@ -633,21 +600,18 @@ const JenkinsCheck: React.FC<any> = () => {
         spPerson: condition.spPerson,
         spNo: values,
         page: condition.page,
-        pageSize: condition.pageSize
+        pageSize: condition.pageSize,
       };
 
       refreshGrid(queryCondition);
     }
-
-
   };
   // 已选择的时间
   const getSelectedDateRange = (values: any, params: any) => {
-
     setCondition({
       ...condition,
       start: `${params[0].toString()} 00:00:00`,
-      end: `${params[1].toString()} 23:59:59`
+      end: `${params[1].toString()} 23:59:59`,
     });
 
     const queryCondition = {
@@ -660,43 +624,39 @@ const JenkinsCheck: React.FC<any> = () => {
       spPerson: condition.spPerson,
       spNo: condition.spNo,
       page: condition.page,
-      pageSize: condition.pageSize
+      pageSize: condition.pageSize,
     };
 
     refreshGrid(queryCondition);
-  }
+  };
 
   // 切换单据类型
 
   const [showCondition, setShowCondition] = useState({
-    devManager: "inline-block",
-    prjManager: "none"
+    devManager: 'inline-block',
+    prjManager: 'none',
   });
   const changeAppType = async (appType: any, appTypeObject: any) => {
-
-
-    console.log(appTypeObject.children)
+    console.log(appTypeObject.children);
     // 根据单据类型显示不同的经理选项（项目经理和开发经理）
     getManagers(appType);
     setCondition({
       ...condition,
       approvalTypeName: appTypeObject.children,
-      approvalType: appType
-
+      approvalType: appType,
     });
 
-    if (appType === "Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt") {
+    if (appType === 'Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt') {
       setShowCondition({
-        devManager: "none",
-        prjManager: "inline-block"
+        devManager: 'none',
+        prjManager: 'inline-block',
       });
     } else {
       setShowCondition({
-        devManager: "inline-block",
-        prjManager: "none"
+        devManager: 'inline-block',
+        prjManager: 'none',
       });
     }
-
 
     const queryCondition = {
       approvalType: appType, // emergency id
@@ -708,7 +668,7 @@ const JenkinsCheck: React.FC<any> = () => {
       spPerson: condition.spPerson,
       spNo: condition.spNo,
       page: condition.page,
-      pageSize: condition.pageSize
+      pageSize: condition.pageSize,
     };
 
     refreshGrid(queryCondition);
@@ -723,7 +683,8 @@ const JenkinsCheck: React.FC<any> = () => {
     setIsModalVisible(false);
   };
   const onRowDoubleClick = (params: any) => {
-    if (condition.approvalType !== "Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt") { // 如果是变更申请
+    if (condition.approvalType !== 'Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt') {
+      // 如果是变更申请
       return;
     }
 
@@ -733,9 +694,9 @@ const JenkinsCheck: React.FC<any> = () => {
     formForModify.setFieldsValue({
       appNo: datas.sp_no,
       prjName: datas.project_name,
-      frontTime: (datas.change_hours)["前端"] === undefined ? 0 : (datas.change_hours)["前端"],
-      backendTime: (datas.change_hours)["后端"] === undefined ? 0 : (datas.change_hours)["后端"],
-      testTime: (datas.change_hours)["测试"] === undefined ? 0 : (datas.change_hours)["测试"]
+      frontTime: datas.change_hours['前端'] === undefined ? 0 : datas.change_hours['前端'],
+      backendTime: datas.change_hours['后端'] === undefined ? 0 : datas.change_hours['后端'],
+      testTime: datas.change_hours['测试'] === undefined ? 0 : datas.change_hours['测试'],
     });
   };
 
@@ -743,25 +704,24 @@ const JenkinsCheck: React.FC<any> = () => {
     const formData = formForModify.getFieldsValue();
 
     const project = formData.prjName;
-    const frontData = formData.frontTime === null ? "0" : formData.frontTime;
-    const backend = formData.backendTime === null ? "0" : formData.backendTime;
-    const test = formData.testTime === null ? "0" : formData.testTime;
+    const frontData = formData.frontTime === null ? '0' : formData.frontTime;
+    const backend = formData.backendTime === null ? '0' : formData.backendTime;
+    const test = formData.testTime === null ? '0' : formData.testTime;
     const sum = Number(frontData) + Number(backend) + Number(test);
     const datas = {
-      "sp_no": formData.appNo,
-      "project_name": project,
-      "front": frontData.toString(),
-      "server": backend.toString(),
-      "test": test.toString(),
-      "sum": sum.toString()
+      sp_no: formData.appNo,
+      project_name: project,
+      front: frontData.toString(),
+      server: backend.toString(),
+      test: test.toString(),
+      sum: sum.toString(),
     };
 
     // await axios.put("/api/verify/apply/apply_data", datas)
-    await axios.put("/api/wechat/flow", datas)
+    await axios
+      .put('/api/wechat/flow', datas)
       .then(function (res) {
-
         if (res.data.code === 200) {
-
           message.info({
             content: `变更工时影响时间修改成功！`,
             duration: 1, // 1S 后自动关闭
@@ -772,7 +732,7 @@ const JenkinsCheck: React.FC<any> = () => {
 
           const projectInfo = {
             prjName: project,
-            flag: res.data.data.project_name_meets
+            flag: res.data.data.project_name_meets,
           };
 
           refreshCellData(projectInfo, datas);
@@ -786,10 +746,8 @@ const JenkinsCheck: React.FC<any> = () => {
             },
           });
         }
-
-
-      }).catch(function (error) {
-
+      })
+      .catch(function (error) {
         message.error({
           content: `异常信息:${error.toString()}`,
           duration: 1,
@@ -798,10 +756,7 @@ const JenkinsCheck: React.FC<any> = () => {
           },
         });
       });
-
-
   };
-
 
   // endregion
 
@@ -809,16 +764,15 @@ const JenkinsCheck: React.FC<any> = () => {
 
   const [flowDiv, setFlowDiv] = useState(<div></div>);
   const [isDetailsVisible, setDetailsVisible] = useState(false);
-  const [modalTitle, setModalTitle] = useState("");
+  const [modalTitle, setModalTitle] = useState('');
   const detailModalCancle = () => {
     setDetailsVisible(false);
   };
   const onChangeCellClicked = (params: any) => {
-
-
-    if (params.column.colId === "current_person") {
+    if (params.column.colId === 'current_person') {
       const datas = params.data;
-      if (condition.approvalType === "Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt") { // 如果是变更申请
+      if (condition.approvalType === 'Bs5Ku2j5MbW4WTNeiZBouW4quKxvhuy9WDdQnwUWt') {
+        // 如果是变更申请
         setModalTitle(datas.change_obj);
       } else {
         setModalTitle(condition.approvalTypeName);
@@ -840,60 +794,67 @@ const JenkinsCheck: React.FC<any> = () => {
     showPageInfo(data?.pageInfo);
     gridApi.current?.setColumnDefs(getGridColums(condition.approvalType));
     gridApi.current?.setRowData(data?.datas);
-
   }, [loading]);
 
-
   return (
-    <PageContainer style={{marginLeft: -30, marginRight: -30}}>
-
+    <PageContainer style={{ marginLeft: -30, marginRight: -30 }}>
       {/* 按钮 */}
-      <div style={{height: 35, marginTop: -15, overflow: "hidden"}}>
-
+      <div style={{ height: 35, marginTop: -15, overflow: 'hidden' }}>
         <label> 类型： </label>
-        <Select style={{minWidth: 140, width: '10%'}} onChange={changeAppType} value={condition.approvalType}>
+        <Select
+          style={{ minWidth: 140, width: '10%' }}
+          onChange={changeAppType}
+          value={condition.approvalType}
+        >
           {approvalType}
         </Select>
 
-        <label style={{marginLeft: 10}}> 申请人： </label>
-        <Select style={{minWidth: 90, width: '10%'}} showSearch onChange={getselectedApplicant}>
+        <label style={{ marginLeft: 10 }}> 申请人： </label>
+        <Select style={{ minWidth: 90, width: '10%' }} showSearch onChange={getselectedApplicant}>
           {applicant}
         </Select>
 
-        <label style={{marginLeft: 10, display: showCondition.devManager}}> 开发经理： </label>
-        <Select style={{minWidth: 90, width: '10%', display: showCondition.devManager}} showSearch
-                onChange={getDevManager}>
+        <label style={{ marginLeft: 10, display: showCondition.devManager }}> 开发经理： </label>
+        <Select
+          style={{ minWidth: 90, width: '10%', display: showCondition.devManager }}
+          showSearch
+          onChange={getDevManager}
+        >
           {managers}
         </Select>
 
-        <label style={{marginLeft: 10, display: showCondition.prjManager}}> 项目经理： </label>
-        <Select style={{minWidth: 90, width: '10%', display: showCondition.prjManager}} showSearch
-                onChange={getprojectManager}>
+        <label style={{ marginLeft: 10, display: showCondition.prjManager }}> 项目经理： </label>
+        <Select
+          style={{ minWidth: 90, width: '10%', display: showCondition.prjManager }}
+          showSearch
+          onChange={getprojectManager}
+        >
           {managers}
         </Select>
 
-        <label style={{marginLeft: 10}}> 待审批人： </label>
-        <Select style={{minWidth: 90, width: '10%'}} showSearch onChange={getselectedPendingApproval}>
+        <label style={{ marginLeft: 10 }}> 待审批人： </label>
+        <Select
+          style={{ minWidth: 90, width: '10%' }}
+          showSearch
+          onChange={getselectedPendingApproval}
+        >
           {applicant}
         </Select>
 
-
-        <label style={{marginLeft: 10}}> 状态： </label>
-        <Select style={{width: '10%'}} onChange={getSelectedStatus}>
+        <label style={{ marginLeft: 10 }}> 状态： </label>
+        <Select style={{ width: '10%' }} onChange={getSelectedStatus}>
           {status}
         </Select>
 
         {/* <label style={{marginLeft: 10}}> 时间： </label> */}
         {/* <RangePicker onChange={getSelectedDateRange}/> */}
 
-
-        <label style={{marginLeft: 10}}> 审批编号： </label>
-        <Input style={{width: '10%'}} onBlur={getSpNo}/>
-
+        <label style={{ marginLeft: 10 }}> 审批编号： </label>
+        <Input style={{ width: '10%' }} onBlur={getSpNo} />
       </div>
 
       {/* ag-grid 表格定义 */}
-      <div className="ag-theme-alpine" style={{marginTop: 3, height: gridHeight, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{ marginTop: 3, height: gridHeight, width: '100%' }}>
         <AgGridReact
           // columnDefs={getGridColums(condition.approvalType)} // 定义列
           // rowData={data?.datas} // 数据绑定
@@ -902,61 +863,90 @@ const JenkinsCheck: React.FC<any> = () => {
             sortable: true,
             suppressMenu: true,
             autoHeight: true,
-
           }}
-
           onGridReady={onGridReady}
           onGridSizeChanged={onChangeGridReady}
           onColumnEverythingChanged={onChangeGridReady}
           onRowDoubleClicked={onRowDoubleClick}
           onCellClicked={onChangeCellClicked}
-
-        >
-        </AgGridReact>
+        ></AgGridReact>
       </div>
 
       {/* 分页控件 */}
-      <div style={{background: 'white', marginTop: 2, height: 50, paddingTop: 10}}>
-
+      <div style={{ background: 'white', marginTop: 2, height: 50, paddingTop: 10 }}>
         {/* 共XX条 */}
-        <label style={{marginLeft: 20, fontWeight: "bold"}}> 共 {Pages.totalCounts} 条</label>
+        <label style={{ marginLeft: 20, fontWeight: 'bold' }}> 共 {Pages.totalCounts} 条</label>
 
         {/* 每页 XX 条 */}
-        <label style={{marginLeft: 20, fontWeight: "bold"}}>每页</label>
-        <Select style={{marginLeft: 10, width: 80}} onChange={showItemChange} value={Pages.countsOfPage}>
+        <label style={{ marginLeft: 20, fontWeight: 'bold' }}>每页</label>
+        <Select
+          style={{ marginLeft: 10, width: 80 }}
+          onChange={showItemChange}
+          value={Pages.countsOfPage}
+        >
           <Option value={20}>20 </Option>
           <Option value={50}>50 </Option>
           <Option value={100}>100 </Option>
           <Option value={200}>200 </Option>
         </Select>
 
+        <label style={{ marginLeft: 10, fontWeight: 'bold' }}>条</label>
 
-        <label style={{marginLeft: 10, fontWeight: "bold"}}>条</label>
-
-        <label style={{marginLeft: 10, fontWeight: "bold"}}>共 {Pages.totalPages} 页</label>
+        <label style={{ marginLeft: 10, fontWeight: 'bold' }}>共 {Pages.totalPages} 页</label>
 
         {/* 上一页 */}
-        <Button size={"small"}
-                style={{fontWeight: "bold", marginLeft: 20, color: 'black', backgroundColor: "WhiteSmoke"}}
-                onClick={showPreviousPage}>&lt;</Button>
+        <Button
+          size={'small'}
+          disabled={Pages.currentPage <= 1}
+          style={{
+            fontWeight: 'bold',
+            marginLeft: 20,
+            color: 'black',
+            backgroundColor: 'WhiteSmoke',
+          }}
+          onClick={showPreviousPage}
+        >
+          &lt;
+        </Button>
 
         {/* 条数显示 */}
-        <span style={{
-          display: "inline-block", marginLeft: 10, textAlign: "center",
-          fontWeight: "bold", backgroundColor: "#46A0FC", color: "white", width: "40px"
-        }}> {Pages.currentPage} </span>
+        <span
+          style={{
+            display: 'inline-block',
+            marginLeft: 10,
+            textAlign: 'center',
+            fontWeight: 'bold',
+            backgroundColor: '#46A0FC',
+            color: 'white',
+            width: '40px',
+          }}
+        >
+          {' '}
+          {Pages.currentPage}{' '}
+        </span>
 
         {/* 下一页 */}
-        <Button size={"small"}
-                style={{fontWeight: "bold", marginLeft: 10, color: 'black', backgroundColor: "WhiteSmoke"}}
-                onClick={showNextPage}>&gt;</Button>
+        <Button
+          size={'small'}
+          style={{
+            fontWeight: 'bold',
+            marginLeft: 10,
+            color: 'black',
+            backgroundColor: 'WhiteSmoke',
+          }}
+          onClick={showNextPage}
+        >
+          &gt;
+        </Button>
 
         {/* 跳转到第几页 */}
-        <label style={{marginLeft: 20, fontWeight: "bold"}}> 跳转到第 </label>
-        <Input style={{textAlign: "center", width: 50, marginLeft: 2}} defaultValue={1}
-               onBlur={goToPage}/>
-        <label style={{marginLeft: 2, fontWeight: "bold"}}> 页 </label>
-
+        <label style={{ marginLeft: 20, fontWeight: 'bold' }}> 跳转到第 </label>
+        <Input
+          style={{ textAlign: 'center', width: 50, marginLeft: 2 }}
+          defaultValue={1}
+          onBlur={goToPage}
+        />
+        <label style={{ marginLeft: 2, fontWeight: 'bold' }}> 页 </label>
       </div>
 
       {/* 设置变更工时 */}
@@ -966,73 +956,67 @@ const JenkinsCheck: React.FC<any> = () => {
         onCancel={modalCancel}
         centered={true}
         width={350}
-        bodyStyle={{height: 215}}
-        footer={
-          [
-            <Button
-              style={{borderRadius: 5, marginTop: -100}}
-              onClick={modalCancel}>取消
-            </Button>,
-            <Button type="primary"
-                    style={{
-                      marginLeft: 10,
-                      color: '#46A0FC',
-                      backgroundColor: "#ECF5FF",
-                      borderRadius: 5,
-                    }}
-
-                    onClick={carryModify}>保存
-            </Button>
-          ]
-        }
-
+        bodyStyle={{ height: 215 }}
+        footer={[
+          <Button style={{ borderRadius: 5, marginTop: -100 }} onClick={modalCancel}>
+            取消
+          </Button>,
+          <Button
+            type="primary"
+            style={{
+              marginLeft: 10,
+              color: '#46A0FC',
+              backgroundColor: '#ECF5FF',
+              borderRadius: 5,
+            }}
+            onClick={carryModify}
+          >
+            保存
+          </Button>,
+        ]}
       >
         <Form form={formForModify}>
-
-          <Form.Item label="审批编号" name="appNo" style={{marginTop: -15}}>
-            <Input disabled={true} style={{marginLeft: 25, width: 200, color: "black"}}/>
+          <Form.Item label="审批编号" name="appNo" style={{ marginTop: -15 }}>
+            <Input disabled={true} style={{ marginLeft: 25, width: 200, color: 'black' }} />
           </Form.Item>
 
-          <Form.Item label="项目名称" name="prjName" style={{marginTop: -15}}>
-            <Input style={{marginLeft: 25, width: 200, color: "black"}}/>
+          <Form.Item label="项目名称" name="prjName" style={{ marginTop: -15 }}>
+            <Input style={{ marginLeft: 25, width: 200, color: 'black' }} />
           </Form.Item>
 
-          <Form.Item label="前端影响[h]" name="frontTime" style={{marginTop: -15}}>
-            <InputNumber step={0.5} style={{marginLeft: 10, width: 200}}/>
+          <Form.Item label="前端影响[h]" name="frontTime" style={{ marginTop: -15 }}>
+            <InputNumber step={0.5} style={{ marginLeft: 10, width: 200 }} />
           </Form.Item>
 
-          <Form.Item label="后端影响[h]" name="backendTime" style={{marginTop: -15}}>
-            <InputNumber step={0.5} style={{marginLeft: 10, width: 200}}/>
+          <Form.Item label="后端影响[h]" name="backendTime" style={{ marginTop: -15 }}>
+            <InputNumber step={0.5} style={{ marginLeft: 10, width: 200 }} />
           </Form.Item>
 
-          <Form.Item label="测试影响[h]" name="testTime" style={{marginTop: -15}}>
-            <InputNumber step={0.5} style={{marginLeft: 10, width: 200}}/>
+          <Form.Item label="测试影响[h]" name="testTime" style={{ marginTop: -15 }}>
+            <InputNumber step={0.5} style={{ marginLeft: 10, width: 200 }} />
           </Form.Item>
-
-
         </Form>
       </Modal>
 
       {/* 显示变更流程 */}
       <Modal
-        title={<div style={{fontSize: 15, height: 5, marginLeft: -10, marginTop: -10}}>{modalTitle}</div>}
-        closeIcon={<div style={{marginTop: -10}}>X</div>}
+        title={
+          <div style={{ fontSize: 15, height: 5, marginLeft: -10, marginTop: -10 }}>
+            {modalTitle}
+          </div>
+        }
+        closeIcon={<div style={{ marginTop: -10 }}>X</div>}
         visible={isDetailsVisible}
         onCancel={detailModalCancle}
         centered={true}
         width={500}
-        bodyStyle={{maxHeight: 550, overflowY: "scroll"}}
+        bodyStyle={{ maxHeight: 550, overflowY: 'scroll' }}
         footer={null}
-
       >
-        <Form form={formForModify}>
-          {flowDiv}
-        </Form>
+        <Form form={formForModify}>{flowDiv}</Form>
       </Modal>
-
     </PageContainer>
   );
 };
-
 
 export default JenkinsCheck;

@@ -1,10 +1,10 @@
 import {message} from "antd";
 
 // 错误信息
-const errorMessage = (errMsg: string) => {
+const errorMessage = (errMsg: string, dutationTime: number = 1.5) => {
   message.error({
     content: errMsg,
-    duration: 1.5,
+    duration: dutationTime,
     style: {
       marginTop: '50vh',
     },
@@ -12,10 +12,10 @@ const errorMessage = (errMsg: string) => {
 };
 
 // 提示信息
-const infoMessage = (infoMsg: string) => {
+const infoMessage = (infoMsg: string, dutationTime: number = 1.5) => {
   message.info({
     content: infoMsg,
-    duration: 1.5,
+    duration: dutationTime,
     style: {
       marginTop: '50vh',
     },
@@ -23,10 +23,10 @@ const infoMessage = (infoMsg: string) => {
 };
 
 // 成功信息
-const sucMessage = (sucMsg: string) => {
+const sucMessage = (sucMsg: string, dutationTime: number = 1.5) => {
   message.success({
     content: sucMsg,
-    duration: 1.5,
+    duration: dutationTime,
     style: {
       marginTop: '50vh',
     },
@@ -34,10 +34,10 @@ const sucMessage = (sucMsg: string) => {
 };
 
 // 警告信息
-const warnMessage = (warningMsg: string) => {
+const warnMessage = (warningMsg: string, dutationTime: number = 1.5) => {
   message.warning({
     content: warningMsg,
-    duration: 1.5,
+    duration: dutationTime,
     style: {
       marginTop: '50vh',
     },

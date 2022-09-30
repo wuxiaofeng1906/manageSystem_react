@@ -135,7 +135,10 @@ const VisualView = () => {
     setBasicSource(basic);
     setCurrentSource(
       currentDay?.map((it: any) => {
-        const isRed = it.project.includes('stagepatch') || it.project.includes('emergency');
+        const isRed =
+          it.project.includes('stage-patch') ||
+          it.project.includes('stagepatch') ||
+          it.project.includes('emergency');
         return {
           ...it,
           baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Button, message, notification } from 'antd';
-import {useIntl} from "@@/plugin-locale/localeExports";
+import { useIntl } from '@@/plugin-locale/localeExports';
 import '@ant-design/pro-form/dist/form.css';
-import 'antd/dist/antd.css';
 import 'ag-grid-enterprise';
+import 'antd/dist/antd.css';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import defaultSettings from '../config/defaultSettings';

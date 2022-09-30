@@ -1,9 +1,9 @@
 import React from 'react';
 import { Settings as LayoutSettings, PageLoading } from '@ant-design/pro-layout';
 import { notification } from 'antd';
-import { history, RunTimeLayoutConfig } from 'umi';
+import { history } from 'umi';
 import RightContent from '@/components/RightContent';
-// import Footer from '@/WechatFlow/Footer';
+// import Footer from '@/components/Footer';
 import { ResponseError } from 'umi-request';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { GqlClient } from '@/hooks';
@@ -83,7 +83,7 @@ export async function getInitialState(): Promise<{
   };
 }
 
-export const layout: RunTimeLayoutConfig = ({ initialState }: any) => {
+export const layout = ({ initialState }: any) => {
   return {
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,

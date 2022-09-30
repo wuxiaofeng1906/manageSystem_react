@@ -16,9 +16,9 @@ sidemenu: false
  * background: '#f0f2f5'
  */
 import React from 'react';
-import Footer from '@/WechatFlow/Footer';
+import Footer from '@/components/Footer';
 
-export default () => <Footer/>;
+export default () => <Footer />;
 ```
 
 ## HeaderDropdown 头部下拉列表
@@ -31,7 +31,7 @@ HeaderDropdown 是 antd Dropdown 的封装，但是增加了移动端的特殊�
  */
 import { Button, Menu } from 'antd';
 import React from 'react';
-import HeaderDropdown from '@/WechatFlow/HeaderDropdown';
+import HeaderDropdown from '@/components/HeaderDropdown';
 
 export default () => {
   const menuHeaderDropdown = (
@@ -60,7 +60,7 @@ export default () => {
  */
 import { Button, Menu } from 'antd';
 import React from 'react';
-import HeaderSearch from '@/WechatFlow/HeaderSearch';
+import HeaderSearch from '@/components/HeaderSearch';
 
 export default () => {
   return (
@@ -112,7 +112,7 @@ export default () => {
  */
 import { message } from 'antd';
 import React from 'react';
-import NoticeIcon from '@/WechatFlow/NoticeIcon/NoticeIcon';
+import NoticeIcon from '@/components/NoticeIcon/NoticeIcon';
 
 export default () => {
   const list = [

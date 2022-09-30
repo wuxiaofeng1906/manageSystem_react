@@ -62,6 +62,6 @@ export default defineConfig({
     babelOptions: {},
   },
   resolve: {
-    includes: ['src/WechatFlow'],
+    includes: ['src/components'],
   },
 });

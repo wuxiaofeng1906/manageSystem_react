@@ -69,8 +69,8 @@ const deleteLockStatus = async (lockedId: string) => {
   let errorMessage = '';
 
   const datas = {
-    user_name: usersInfo.name,
-    user_id: usersInfo.userid,
+    user_name: usersInfo?.name ?? '',
+    user_id: usersInfo?.userid ?? '',
     param: lockedId,
   };
 

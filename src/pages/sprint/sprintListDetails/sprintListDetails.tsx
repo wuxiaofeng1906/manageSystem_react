@@ -1305,8 +1305,7 @@ const SprintList: React.FC<any> = () => {
   };
   /* endregion */
 
-  const hasPermission = useMemo(() => judgeAuthority('明细移除') === true, []);
-
+  const hasPermission = judgeAuthority('明细移除') === true;
   // 验证是否可批量 修改测试确认
   const checkTestValid = async () => {
     try {

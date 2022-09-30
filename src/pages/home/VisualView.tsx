@@ -5,13 +5,14 @@ import { Collapse, Form, Select, DatePicker, Col, Card } from 'antd';
 import { useModel } from 'umi';
 import PreReleaseServices from '@/services/preRelease';
 import { isEmpty, sortBy, uniqBy } from 'lodash';
+import moment from 'moment';
 
 const thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
 const ignore = ['cn-northwest-0', 'cn-northwest-1'];
 const baseColumn = [
-  { name: '线下版本', value: 'offline' },
-  { name: '集群0', value: 'cn-northwest-0' },
-  { name: '集群1', value: 'cn-northwest-1' },
+  { name: 'offline', value: '线下版本' },
+  { name: 'cn-northwest-0', value: '集群0' },
+  { name: 'cn-northwest-1', value: '集群1' },
 ];
 const initBg = ['#93db9326', '#e83c3c26', '#519ff240'];
 const Item = (params: { data: any; bg?: string; child?: React.ReactNode }) => {
@@ -118,40 +119,6 @@ const VisualView = () => {
         )['value'],
       ),
     );
-
-    // setOnline(
-    //   sortBy(
-    //     [
-    //       { name: '集群3-5', value: 'cn-northwest-35' },
-    //       { name: '集群2-4', value: 'cn-northwest-24' },
-    //     ],
-    //     ['value'],
-    //   ),
-    // );
-    // setCurrentSource([
-    //   {
-    //     project: 'CESHI',
-    //     branch: 'hotfix',
-    //     ztno: '212',
-    //     apps: 'app',
-    //     release_env: 'ddd',
-    //     baseline_cluster: 'delay',
-    //     cluster: ['cn-northwest-0', 'cn-northwest-1', 'cn-northwest-24'],
-    //     cls: styles.dotLineEmergency,
-    //     bg: initBg[1],
-    //   },
-    //   {
-    //     project: 'CESHI',
-    //     branch: 'hotfix',
-    //     ztno: '212',
-    //     apps: 'app',
-    //     release_env: 'ddd',
-    //     baseline_cluster: 'cn-northwest-0',
-    //     cluster: ['cn-northwest-1', 'cn-northwest-24'],
-    //     cls: styles.dotLinePrimary,
-    //     bg: initBg[2],
-    //   },
-    // ]);
   };
   const getSelectData = async () => {
     const projectList = await PreReleaseServices.project();
@@ -197,7 +164,13 @@ const VisualView = () => {
                   <span className={styles.title}>{title.split('').map((text) => `${text}\n`)}</span>
                 </th>
               )}
-              <td className={styles.time}>{it.plan_release_time}</td>
+              <td className={styles.time}>
+                第{index + 1}步：
+                <br />
+                {it.plan_release_time
+                  ? moment(it.plan_release_time).format('YYYY-MM-DD HH:mm')
+                  : ''}
+              </td>
               {renderTd(it)}
             </tr>
           );
@@ -213,14 +186,14 @@ const VisualView = () => {
         {arr.map((it) => {
           return (
             <td key={it.value}>
-              {data.baseline_cluster == it.value ? (
+              {data.baseline_cluster == it.name ? (
                 <Item
                   data={data}
                   child={
                     <div>
                       {data.cluster?.map((env: any, i: number) => {
-                        const baseIndex = arr.findIndex((v) => data.baseline_cluster == v.value);
-                        const envIndex = arr.findIndex((v) => v.value == env.value);
+                        const baseIndex = arr.findIndex((v) => data.baseline_cluster == v.name);
+                        const envIndex = arr.findIndex((v) => v.name == env.name);
                         const alpha = envIndex - baseIndex;
                         if (envIndex < 0) return '';
                         return (
@@ -287,9 +260,7 @@ const VisualView = () => {
           </thead>
           <tbody>
             <tr>
-              <th colSpan={2} style={{ wordBreak: 'break-all' }}>
-                版本基准
-              </th>
+              <th colSpan={2}>版本基准</th>
               <td className={styles.obliqueLine} />
               <td>
                 <div className={styles.stackWrapper}>

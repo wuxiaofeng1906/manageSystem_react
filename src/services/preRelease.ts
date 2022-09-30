@@ -1,4 +1,5 @@
 import request from './request';
+import { warn } from 'echarts/types/src/util/log';
 const baseUrl = '/api/verify';
 // 发布过程
 const PreReleaseServices = {
@@ -88,6 +89,7 @@ const PreReleaseServices = {
     return request(`${baseUrl}/latest-release/order-project`, {
       method: 'delete',
       data,
+      warn: true,
     });
   },
   // 积压工单【环境】对应的列表数据

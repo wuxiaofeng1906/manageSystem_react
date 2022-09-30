@@ -137,10 +137,10 @@ export const historyCompareColumn = [
   },
   {
     headerName: 'rd平台工单',
-    field: 'rd',
+    field: 'rdTitle',
   },
   {
     headerName: 'ops平台工单',
-    field: 'ops',
+    field: 'opsTitle',
   },
 ];

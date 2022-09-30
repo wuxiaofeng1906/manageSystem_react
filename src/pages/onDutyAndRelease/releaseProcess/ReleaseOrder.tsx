@@ -5,7 +5,7 @@ import {
   historyCompareColumn,
   historyOrderColumn,
 } from '@/pages/onDutyAndRelease/releaseProcess/column';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import FieldSet from '@/components/FieldSet';
 import styles from './index.less';
 import PreReleaseServices from '@/services/preRelease';
@@ -23,7 +23,10 @@ const ReleaseOrder = () => {
   const [orderForm] = Form.useForm();
   const [baseForm] = Form.useForm();
   const [orderData, setOrderData] = useState<any[]>([]);
-  const [compareData, setCompareData] = useState<any[]>([]);
+  const [compareData, setCompareData] = useState<{
+    opsData: any[];
+    alpha: any[];
+  }>();
   const [dutyList, setDutyList] = useState<any[]>([]);
   const [announcementList, setAnnouncementList] = useState<any[]>([]);
   const [envList, setEnvList] = useState<any[]>([]);
@@ -86,6 +89,7 @@ const ReleaseOrder = () => {
         cluster: res.cluster?.map((it: any) => it.name) ?? [],
       });
       setOrderData(res.ready_data ?? []);
+      await formatCompare(res?.ops_repair_order_data ?? [], res?.ready_data ?? []);
       setSpinning(false);
     } catch (e) {
       setSpinning(false);
@@ -93,33 +97,62 @@ const ReleaseOrder = () => {
   };
 
   const onLinkTable = async () => {
-    const values = baseForm.getFieldsValue();
-    const res = await PreReleaseServices.orderList(values.cluster?.join(',') ?? '');
-    const ops = await PreReleaseServices.opsList(values.cluster?.join(',') ?? '');
-    const flag = res.some((it: any) => it.repair_order_type.indexOf('停机') > -1);
-    orderForm.setFieldsValue({
-      release_way: flag ? 'stop_server' : 'keep_server',
-    });
-    let result: any[] = [];
+    setSpinning(true);
+    try {
+      const values = baseForm.getFieldsValue();
+      const rd = await PreReleaseServices.orderList(values.cluster?.join(',') ?? '');
+      setOrderData(rd);
+      const flag = rd.some((it: any) => it.repair_order_type.indexOf('停机') > -1);
+      orderForm.setFieldsValue({
+        release_way: flag ? 'stop_server' : 'keep_server',
+      });
+      await formatCompare([], rd);
+      setSpinning(false);
+    } catch (e) {
+      setSpinning(false);
+    }
+  };
+  const formatCompare = async (opsOrigin: any[], rdOrigin: any[]) => {
+    let ops = opsOrigin;
+    if (isEmpty(ops)) {
+      const values = baseForm.getFieldsValue();
+      ops = await PreReleaseServices.opsList(values.cluster?.join(',') ?? '');
+    }
+
+    if (isEmpty(ops) && isEmpty(rdOrigin)) {
+      setCompareData({ opsData: [], alpha: [] });
+      return;
+    }
+    let mergeArr: any[] = [];
+    let rdArr: any[] = [];
     ops.forEach((it: any, i: number) => {
+      rdArr.push(
+        !['BlueGreenDeploy', 'TenantStopDeploy'].includes(it.release_order_type) ||
+          isEmpty(rdOrigin[i])
+          ? { repair_order: '', project: '', repair_order_type: it.release_order_type }
+          : rdOrigin[i],
+      );
+    });
+
+    ops?.slice(0, 5).forEach((it: any, i: number) => {
       const otherOrder = !['BlueGreenDeploy', 'TenantStopDeploy'].includes(it.release_order_type);
-      result.push({
+      mergeArr.push({
         opsId: String(it.id ?? ''),
-        opsTitle: it.label,
+        opsTitle: it.label
+          ?.substring(it.label.indexOf('title:') + 7, it.label.indexOf('状态:'))
+          ?.trim(),
         opsType: it.release_order_type,
-        rd: otherOrder ? '' : res[i] ? res[i]?.repair_order : '',
-        rdTitle: otherOrder ? '' : res[i] ? `${res[i]?.repair_order}:${res[i]?.project}` : '',
-        rdType: otherOrder
-          ? ''
-          : res[i]
-          ? `${res[i]?.repair_order}:${res[i]?.repair_order_type}`
+        rd: rdArr[i]?.repair_order,
+        rdTitle: rdArr[i]?.repair_order ? `${rdArr[i]?.repair_order}:${rdArr[i]?.project}` : '',
+        rdType: rdArr[i]?.repair_order
+          ? `${rdArr[i]?.repair_order}:${rdArr[i]?.repair_order_type}`
           : '',
+        status: otherOrder ? '' : String(it.id) == String(rdArr[i]?.repair_order),
       });
     });
-    console.log(result);
-
-    setOrderData(res);
+    setCompareData({ opsData: ops, alpha: mergeArr });
   };
+
   const initForm = () => {
     orderForm.setFieldsValue({
       plan_release_time: moment().startOf('d'),
@@ -165,12 +198,15 @@ const ReleaseOrder = () => {
       plan_release_time: moment(order.plan_release_time).format('YYYY-MM-DD HH:mm:ss'),
       release_type: 'backlog_release',
       release_way: order.release_way ?? '',
-      release_result: order.release_result,
+      release_result: order.release_result ?? 'unknown',
       cluster: base.cluster?.join(',') ?? '',
       release_num: id, // 发布编号
-      ready_release_num: orderData.map((it) => it.ready_release_num)?.join(',') ?? '', // 积压工单id
+      ready_release_num: orderData?.map((it) => it.ready_release_num)?.join(',') ?? '', // 积压工单id
+      ops_repair_data: compareData?.opsData ?? [],
+      rd_repair_data: orderData ?? [],
     });
     // 更新详情
+    getOrderDetail();
   };
 
   const onRemove = (data: any) => {
@@ -301,7 +337,7 @@ const ReleaseOrder = () => {
               onGridReady={onGridReady}
               onGridSizeChanged={onGridReady}
               frameworkComponents={{
-                deleteOrder: (p) => (
+                deleteOrder: (p: CellClickedEvent) => (
                   <Button
                     size={'small'}
                     type={'text'}
@@ -321,7 +357,7 @@ const ReleaseOrder = () => {
         <div className="ag-theme-alpine" style={{ height: 300, width: '100%', marginTop: 8 }}>
           <AgGridReact
             columnDefs={historyCompareColumn}
-            rowData={compareData}
+            rowData={compareData?.alpha ?? []}
             defaultColDef={{
               resizable: true,
               filter: true,
@@ -335,9 +371,9 @@ const ReleaseOrder = () => {
             onGridSizeChanged={(r) => onGridReady(r, gridCompareRef)}
             getRowStyle={(p) => ({
               background:
-                p.data.status == 'success'
+                p.data.status == true
                   ? 'rgba(0, 255, 0, 0.06)'
-                  : p.data.status == 'error'
+                  : p.data.status == false
                   ? 'rgba(255, 2, 2, 0.06)'
                   : 'initial',
             })}

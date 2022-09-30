@@ -91,7 +91,9 @@ const ReleaseOrder = () => {
       setOrderData(res.ready_data ?? []);
       await formatCompare(res?.ops_repair_order_data ?? [], res?.ready_data ?? []);
       setSpinning(false);
-    } catch (e) {
+    } catch (e: any) {
+      if (e?.code == 4001) initForm();
+      else infoMessage(e.msg);
       setSpinning(false);
     }
   };
@@ -112,6 +114,7 @@ const ReleaseOrder = () => {
       setSpinning(false);
     }
   };
+
   const formatCompare = async (opsOrigin: any[], rdOrigin: any[]) => {
     let ops = opsOrigin;
     if (isEmpty(ops)) {
@@ -167,9 +170,7 @@ const ReleaseOrder = () => {
   const onSave = async () => {
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
-    const result = !isEmpty(base.release_result);
     const checkObj = omit({ ...order, ...base }, ['release_result']);
-    // 标记发布结果： 1：停服时，必须关联发布公告
     const errTip = {
       plan_release_time: '请填写发布时间!',
       announcement_num: '请填写关联公告！',
@@ -186,10 +187,6 @@ const ReleaseOrder = () => {
     }
     if (isEmpty(base.release_name?.trim())) return infoMessage(errTip.release_name);
 
-    if (result && ['success', 'failure'].includes(base.release_result)) {
-      if (base.announcement_num == '免' && base.release_way == 'stop_server')
-        return infoMessage(errTip.announcement_num);
-    }
     await PreReleaseServices.saveOrder({
       user_id: user?.userid ?? '',
       release_name: base.release_name?.trim() ?? '',

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, Fragment } from 'react';
 import styles from './index.less';
 import cns from 'classnames';
-import { Collapse, Form, Select, DatePicker, Col, Card } from 'antd';
+import { Collapse, Form, Select, DatePicker, Col, Card, Modal } from 'antd';
 import { useModel } from 'umi';
 import PreReleaseServices from '@/services/preRelease';
 import { isEmpty, sortBy, uniqBy } from 'lodash';
@@ -10,18 +10,32 @@ import moment from 'moment';
 const thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
 const ignore = ['cn-northwest-0', 'cn-northwest-1'];
 const baseColumn = [
-  { name: 'offline', value: '线下版本' },
-  { name: 'cn-northwest-0', value: '集群0' },
-  { name: 'cn-northwest-1', value: '集群1' },
+  { name: 'offline', value: thead[1] },
+  { name: ignore[0], value: thead[2] },
+  { name: ignore[1], value: thead[3] },
 ];
 const initBg = ['#93db9326', '#e83c3c26', '#519ff240'];
-const Item = (params: { data: any; bg?: string; child?: React.ReactNode }) => {
+
+const ICard = (params: { data: any; child?: React.ReactNode; onRefresh: Function }) => {
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
 
   const hasPermission = useMemo(() => user?.group == 'superGroup', [user]);
-
+  const onRemove = async (data: any) => {
+    Modal.confirm({
+      centered: true,
+      title: '删除发布提醒：',
+      content: '请确认是否要删除该发布！',
+      onOk: async () => {
+        await PreReleaseServices.removeRelease({
+          user_id: user?.userid ?? '',
+          release_num: data.ready_release_num ?? '',
+        });
+        params.onRefresh?.();
+      },
+    });
+  };
   return (
-    <div style={{ background: params.bg || params.data.bg || initBg[0] }} className={styles.item}>
+    <div style={{ background: params.data.bg || initBg[0] }} className={styles.item}>
       {params.child || <div />}
       <p>发布项目:{params.data.project ?? ''}</p>
       <p>发布分支:{params.data.branch ?? ''}</p>
@@ -32,9 +46,7 @@ const Item = (params: { data: any; bg?: string; child?: React.ReactNode }) => {
         <img
           src={require('../../../public/delete_black_2.png')}
           className={styles.deleteIcon}
-          onClick={() => {
-            console.log(params.data);
-          }}
+          onClick={() => onRemove(params.data)}
         />
       ) : (
         <div />
@@ -48,9 +60,9 @@ const VisualView = () => {
   const [branch, setBranch] = useState<any[]>([]);
   const [online, setOnline] = useState<{ name: string; value: string }[]>([]); // 线上动态列
   const [source, setSource] = useState<any[]>([]);
-  const [baseSource, setBaseSource] = useState<any[]>([]); // 基准版本
+  const [basicSource, setBasicSource] = useState<any[]>([]); // 基准版本
   const [currentSource, setCurrentSource] = useState<any[]>([]); // 当天待发版
-  const [calendar, setCalendar] = useState<any[]>([]); // 上线日历
+  const [planSource, setPlanSource] = useState<any[]>([]); // 计划上线日历
 
   useEffect(() => {
     getSelectData();
@@ -96,30 +108,6 @@ const VisualView = () => {
     ]);
   }, []);
 
-  const getViewData = async () => {
-    const basic = await PreReleaseServices.releaseBaseline();
-    const currentDay = await PreReleaseServices.releaseView();
-
-    const basicOnline = basic.map((it: any) => it.cluster)?.flat() ?? [];
-    const currentOnline = currentDay.map((it: any) => it.cluster)?.flat() ?? [];
-    setBaseSource(basic);
-    setCurrentSource(
-      currentDay?.map((it: any) => ({
-        ...it,
-        baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
-        cls: styles.dotLineEmergency,
-        bg: initBg[0],
-      })),
-    );
-    // 去重并排序(动态列)
-    setOnline(
-      sortBy(
-        uniqBy([...basicOnline, ...currentOnline], 'name').flatMap((it) =>
-          ignore.includes(it.name) ? [] : [it],
-        )['value'],
-      ),
-    );
-  };
   const getSelectData = async () => {
     const projectList = await PreReleaseServices.project();
     const branchList = await PreReleaseServices.branch();
@@ -138,18 +126,44 @@ const VisualView = () => {
       })),
     );
   };
+  const getViewData = async () => {
+    const basic = await PreReleaseServices.releaseBaseline();
+    const currentDay = await PreReleaseServices.releaseView();
+
+    const basicOnline = basic.map((it: any) => it.cluster)?.flat() ?? [];
+    const currentOnline = currentDay.map((it: any) => it.cluster)?.flat() ?? [];
+    setBasicSource(basic);
+    setCurrentSource(
+      currentDay?.map((it: any) => {
+        const isRed = it.project.includes('stagepatch') || it.project.includes('emergency');
+        return {
+          ...it,
+          baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
+          cls: isRed ? styles.dotLineEmergency : styles.dotLineSuccess,
+          bg: isRed ? initBg[1] : initBg[0],
+        };
+      }),
+    );
+    // 去重并排序(动态列计算)
+    setOnline(
+      sortBy(
+        uniqBy([...basicOnline, ...currentOnline], 'name').flatMap((it) =>
+          ignore.includes(it.name) ? [] : [it],
+        )['value'],
+      ),
+    );
+  };
 
   const renderTr = (arr: any[], title: string) => {
-    if (arr.length == 0) {
-      const source = [...baseColumn, ...online];
+    if (isEmpty(arr)) {
       return (
         <tr>
           <th rowSpan={source.length}>
             <span className={styles.title}>{title.split('').map((text) => `${text}\n`)}</span>
           </th>
           <td />
-          {[...baseColumn, ...online].map((_, index) => (
-            <td key={index} />
+          {dynamicColumn.map((_, index) => (
+            <td key={index} style={{ height: 280 }} />
           ))}
         </tr>
       );
@@ -178,28 +192,29 @@ const VisualView = () => {
       </Fragment>
     );
   };
-
   const renderTd = (data: any) => {
-    const arr = [...baseColumn, ...online];
     return (
       <Fragment>
-        {arr.map((it) => {
+        {dynamicColumn.map((it, index) => {
           return (
-            <td key={it.value}>
-              {data.baseline_cluster == it.name ? (
-                <Item
+            <td key={index}>
+              {data.baseline_cluster == it?.name ? (
+                <ICard
                   data={data}
+                  onRefresh={getViewData}
                   child={
                     <div>
                       {data.cluster?.map((env: any, i: number) => {
-                        const baseIndex = arr.findIndex((v) => data.baseline_cluster == v.name);
-                        const envIndex = arr.findIndex((v) => v.name == env.name);
+                        const baseIndex = dynamicColumn.findIndex(
+                          (v) => data.baseline_cluster == v.name,
+                        );
+                        const envIndex = dynamicColumn.findIndex((v) => v.name == env.name);
                         const alpha = envIndex - baseIndex;
                         if (envIndex < 0) return '';
                         return (
                           <div
                             key={env}
-                            className={cns(styles.dotLineBasic, data.cls)}
+                            className={cns(styles.dotLineBasic, data.cls ?? styles.dotLinePrimary)}
                             style={{
                               width: `calc(${alpha * 100 - 50}% + ${alpha * 7 + i * 6}px)`,
                             }}
@@ -220,6 +235,11 @@ const VisualView = () => {
   };
 
   const onlineLen = useMemo(() => online.length || 1, [online]);
+  // 动态列
+  const dynamicColumn = useMemo(
+    () => [...baseColumn, ...(isEmpty(online) ? [{ name: '', value: '' }] : online)],
+    [online],
+  );
 
   return (
     <div className={styles.visualView}>
@@ -267,30 +287,15 @@ const VisualView = () => {
                   <Collapse defaultActiveKey={['1', '2']}>
                     {source.map((it, index) => (
                       <Collapse.Panel key={it.id || index} header={it.project}>
-                        <Item data={it} />
+                        <ICard data={it} onRefresh={getViewData} />
                       </Collapse.Panel>
                     ))}
                   </Collapse>
                 </div>
               </td>
-              <td></td>
-              <td>
-                <Item
-                  data={{
-                    id: '4',
-                    time: '2022-09-12 12:32',
-                    server: ['web', 'app'],
-                    project: '库存管理',
-                    branch: 'hotfix',
-                    env: '',
-                    from: 1,
-                    to: 50,
-                    bg: initBg[0],
-                  }}
-                />
-              </td>
+              <td />
+              <td />
             </tr>
-            {/*当天待发版*/}
             {renderTr(currentSource, '当天待发版')}
             {/*搜索条件*/}
             <tr>
@@ -314,7 +319,6 @@ const VisualView = () => {
                 </Form>
               </td>
             </tr>
-            {/*上线计划日历*/}
             {renderTr([], '上线计划日历')}
           </tbody>
         </table>

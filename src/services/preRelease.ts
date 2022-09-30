@@ -80,7 +80,7 @@ const PreReleaseServices = {
   async releaseView() {
     return request(`${baseUrl}/latest-release/views-ready-release`);
   },
-  // 删除列表工单
+  // 删除发布列表（视图）
   async removeRelease(data: any) {
     return request(`${baseUrl}/latest-release/list`, { method: 'delete', data });
   },
@@ -109,7 +109,7 @@ const PreReleaseServices = {
     return request(`${baseUrl}/latest-release/list`, { method: 'post', data });
   },
   async orderDetail(params: any) {
-    return request(`${baseUrl}/latest-release/detail`, { params });
+    return request(`${baseUrl}/latest-release/detail`, { params, warn: false });
   },
 };
 export default PreReleaseServices;

@@ -35,7 +35,6 @@ const ReleaseOrder = () => {
     params.api.sizeColumnsToFit();
   };
   useEffect(() => {
-    initForm();
     getBaseList();
     getOrderDetail();
   }, []);
@@ -70,35 +69,23 @@ const ReleaseOrder = () => {
   const getOrderDetail = async () => {
     try {
       setSpinning(true);
-      setOrderData([
-        { type: '停机发布', number: '4178', list: '库存管理，存货管理，采购管理', env: '集群1' },
-      ]);
-      setCompareData([
-        {
-          id: 1,
-          rd: '4178:库存管理，存货管理，采购管理',
-          ops: '4178:库存管理，存货管理，采购管理',
-          status: 'success',
-        },
-        {
-          id: 2,
-          rd: '',
-          ops: '4179:库存管理，存货管理，采购管理',
-          status: '',
-        },
-        {
-          id: 3,
-          rd: '4134:库存管理，存货管理，采购管理',
-          ops: '4134:库存管理，存货管理，采购管理',
-          status: 'success',
-        },
-        {
-          id: 4,
-          rd: '4130:库存管理，存货管理',
-          ops: '4134:库存管理，存货管理，采购管理',
-          status: 'error',
-        },
-      ]);
+      const res = await PreReleaseServices.orderDetail({ release_num: id });
+      if (isEmpty(res)) {
+        initForm();
+      } else
+        orderForm.setFieldsValue({
+          ...res,
+          release_result:
+            isEmpty(res.release_result) || res.release_result == 'unknown'
+              ? null
+              : res.release_result,
+          plan_release_time: res.plan_release_time ? moment(res.plan_release_time) : null,
+        });
+      baseForm.setFieldsValue({
+        ...res,
+        cluster: res.cluster?.map((it: any) => it.name) ?? [],
+      });
+      setOrderData(res.ready_data ?? []);
       setSpinning(false);
     } catch (e) {
       setSpinning(false);
@@ -108,7 +95,30 @@ const ReleaseOrder = () => {
   const onLinkTable = async () => {
     const values = baseForm.getFieldsValue();
     const res = await PreReleaseServices.orderList(values.cluster?.join(',') ?? '');
-    console.log(res);
+    const ops = await PreReleaseServices.opsList(values.cluster?.join(',') ?? '');
+    const flag = res.some((it: any) => it.repair_order_type.indexOf('停机') > -1);
+    orderForm.setFieldsValue({
+      release_way: flag ? 'stop_server' : 'keep_server',
+    });
+    let result: any[] = [];
+    ops.forEach((it: any, i: number) => {
+      const otherOrder = !['BlueGreenDeploy', 'TenantStopDeploy'].includes(it.release_order_type);
+      result.push({
+        opsId: String(it.id ?? ''),
+        opsTitle: it.label,
+        opsType: it.release_order_type,
+        rd: otherOrder ? '' : res[i] ? res[i]?.repair_order : '',
+        rdTitle: otherOrder ? '' : res[i] ? `${res[i]?.repair_order}:${res[i]?.project}` : '',
+        rdType: otherOrder
+          ? ''
+          : res[i]
+          ? `${res[i]?.repair_order}:${res[i]?.repair_order_type}`
+          : '',
+      });
+    });
+    console.log(result);
+
+    setOrderData(res);
   };
   const initForm = () => {
     orderForm.setFieldsValue({

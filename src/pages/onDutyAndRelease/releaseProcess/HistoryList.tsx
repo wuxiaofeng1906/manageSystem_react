@@ -6,9 +6,12 @@ import { releaseListColumn } from '@/pages/onDutyAndRelease/releaseProcess/colum
 import IPagination from '@/components/IPagination';
 import { getHeight } from '@/publicMethods/pageSet';
 import PreReleaseServices from '@/services/preRelease';
+import { useLocation } from 'umi';
 
 const HistoryList = () => {
   const gridRef = useRef<GridApi>();
+  const query = useLocation()?.query;
+
   const [form] = Form.useForm();
   const [rowData, setRowData] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
@@ -45,7 +48,8 @@ const HistoryList = () => {
         page: page,
         page_size: page_size,
       });
-      setRowData(res);
+      setRowData(res.data ?? []);
+      setPages({ page: res.page, total: res.total, page_size: res.page_size });
       setSpinning(false);
     } catch (e) {
       setSpinning(false);
@@ -54,8 +58,10 @@ const HistoryList = () => {
 
   useEffect(() => {
     getProject();
-    getTableList();
   }, []);
+  useEffect(() => {
+    if (query.key == 'history') getTableList();
+  }, [query.key]);
 
   return (
     <Spin spinning={spinning} tip="数据加载中...">

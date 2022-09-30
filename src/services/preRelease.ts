@@ -85,20 +85,29 @@ const PreReleaseServices = {
   },
   // 删除积压工单项目
   async removeOrder(data: any) {
-    return request(`${baseUrl}/latest-release/latest-release/order-project`, {
+    return request(`${baseUrl}/latest-release/order-project`, {
       method: 'delete',
       data,
     });
   },
   // 积压工单【环境】对应的列表数据
   async orderList(cluster: string) {
-    return request(`${baseUrl}/latest-release/latest-release/order-project`, {
+    return request(`${baseUrl}/latest-release/order-project`, {
+      params: { cluster },
+    });
+  },
+  // 运维工单
+  async opsList(cluster: string) {
+    return request(`${baseUrl}/latest-release/ops-order`, {
       params: { cluster },
     });
   },
   // 保存
   async saveOrder(data: any) {
     return request(`${baseUrl}/latest-release/list`, { method: 'post', data });
+  },
+  async orderDetail(params: any) {
+    return request(`${baseUrl}/latest-release/detail`, { params });
   },
 };
 export default PreReleaseServices;

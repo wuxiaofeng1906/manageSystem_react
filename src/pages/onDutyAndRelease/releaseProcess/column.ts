@@ -15,9 +15,7 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     field: 'release_name',
     minWidth: 110,
     cellRenderer: (p) => {
-      let href = `/onDutyAndRelease/preRelease?releasedNum=${p.data.release_num}&history=${
-        type == 'history'
-      }`;
+      let href = `/onDutyAndRelease/preRelease?releasedNum=${p.data.release_num}`;
       if (p.data.release_type == 'backlog_release') {
         href = `/onDutyAndRelease/releaseOrder/${p.data.release_num}`;
       }
@@ -105,19 +103,19 @@ export const historyOrderColumn = [
   },
   {
     headerName: '推送类型',
-    field: 'type',
+    field: 'repair_order_type',
   },
   {
     headerName: '关联工单编号',
-    field: 'number',
+    field: 'repair_order',
   },
   {
     headerName: '关联项目列表',
-    field: 'list',
+    field: 'project',
   },
   {
     headerName: '已发布集群',
-    field: 'env',
+    field: 'cluster',
   },
   {
     headerName: '操作',

@@ -9,10 +9,11 @@ import styles from './index.less';
 import PreReleaseServices from '@/services/preRelease';
 import DutyListServices from '@/services/dutyList';
 import { isEmpty } from 'lodash';
-import { history } from 'umi';
+import { history, useLocation } from 'umi';
 
 const PreReleaseList = () => {
   const gridRef = useRef<GridApi>();
+  const query = useLocation()?.query;
   const [rowData, setRowData] = useState<any[]>([]);
   const [visible, setVisible] = useState(false);
   const [gridHeight, setGridHeight] = useState(getHeight() - 80);
@@ -52,8 +53,8 @@ const PreReleaseList = () => {
   };
 
   useEffect(() => {
-    getTableList();
-  }, []);
+    if (query.key == 'pre') getTableList();
+  }, [query.key]);
 
   return (
     <div className={styles.preReleaseList}>

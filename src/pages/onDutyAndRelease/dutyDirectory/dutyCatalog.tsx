@@ -131,13 +131,6 @@ const DutyCatalog = () => {
         'YYYY/MM/DD',
       ),
     };
-    const flag = dayjs().isAfter(dayjs('2022-10-16'));
-    if (!flag) {
-      oldSafari = {
-        start_time: '2022/10/08',
-        end_time: '2022/10/16',
-      };
-    }
     const firstDuty = await DutyListServices.getFirstDutyPerson(oldSafari);
     const duty = firstDuty?.data
       ?.flat()

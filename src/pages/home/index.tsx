@@ -43,6 +43,7 @@ const Home = () => {
   return (
     <div className={styles.homePage}>
       <Card
+        className={styles.card}
         title={
           <span>
             值班信息：{dayjs(oldSafari.start_time).format('YYYY-MM-DD')}~

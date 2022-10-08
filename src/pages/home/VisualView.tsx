@@ -132,7 +132,34 @@ const VisualView = () => {
 
     const basicOnline = basic.map((it: any) => it.cluster)?.flat() ?? [];
     const currentOnline = currentDay.map((it: any) => it.cluster)?.flat() ?? [];
-    setBasicSource(basic);
+    // setBasicSource(basic);
+
+    setBasicSource([
+      {
+        children: [
+          {
+            project: 'sprint20220929',
+            branch: 'sprint20220929',
+            release_server: 'web,h5',
+            cluster: '集群0-1',
+            repair_order_type: '蓝绿发布',
+            repair_order: '2145',
+            ready_release_num: '202209290008',
+            release_time: '2022-09-29 17:50',
+          },
+          {
+            project: 'sprint20220928',
+            branch: 'sprint20220928',
+            release_server: 'web,h5',
+            cluster: '集群0-1',
+            repair_order_type: '蓝绿发布',
+            repair_order: '2148',
+            ready_release_num: '202209290008',
+            release_time: '2022-09-29 17:53',
+          },
+        ],
+      },
+    ]);
     setCurrentSource(
       currentDay?.map((it: any) => {
         const isRed =
@@ -148,13 +175,17 @@ const VisualView = () => {
       }),
     );
     // 去重并排序(动态列计算)
-    setOnline(
-      sortBy(
-        uniqBy([...basicOnline, ...currentOnline], 'name').flatMap((it) =>
-          ignore.includes(it.name) ? [] : [it],
-        )['value'],
-      ),
-    );
+    // setOnline(
+    //   sortBy(
+    //     uniqBy([...basicOnline, ...currentOnline], 'name').flatMap((it) =>
+    //       ignore.includes(it.name) ? [] : [it],
+    //     )['value'],
+    //   ),
+    // );
+    setOnline([
+      { name: '集群2-6', value: 'clur-2-6' },
+      { name: '集群6-8', value: 'clur-6-8' },
+    ]);
   };
 
   const renderTr = (arr: any[], title: string) => {
@@ -245,8 +276,8 @@ const VisualView = () => {
   );
 
   return (
-    <div className={styles.visualView}>
-      <Card title={'待发布视图'}>
+    <Card title={'待发布视图'} className={styles.card}>
+      <div className={styles.visualView}>
         <table>
           <colgroup>
             <col style={{ maxWidth: 50, width: 30 }} />
@@ -298,6 +329,7 @@ const VisualView = () => {
               </td>
               <td />
               <td />
+              <td />
             </tr>
             {renderTr(currentSource, '当天待发版')}
             {/*搜索条件*/}
@@ -325,8 +357,8 @@ const VisualView = () => {
             {renderTr([], '上线计划日历')}
           </tbody>
         </table>
-      </Card>
-    </div>
+      </div>
+    </Card>
   );
 };
 export default VisualView;

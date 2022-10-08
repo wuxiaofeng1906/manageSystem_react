@@ -123,7 +123,7 @@ const DutyCatalog = () => {
   const getFirstDuty = async () => {
     const dateStart = dayjs().day(0);
     const dateEnd = dayjs().day(6);
-    const oldSafari = {
+    let oldSafari = {
       start_time: dayjs(
         `${dateStart.year()}-${dateStart.month() + 1}-${dateStart.date() + 1}`,
       ).format('YYYY/MM/DD'),
@@ -131,6 +131,13 @@ const DutyCatalog = () => {
         'YYYY/MM/DD',
       ),
     };
+    const flag = dayjs().isAfter(dayjs('2022-10-16'));
+    if (!flag) {
+      oldSafari = {
+        start_time: '2022/10/08',
+        end_time: '2022/10/16',
+      };
+    }
     const firstDuty = await DutyListServices.getFirstDutyPerson(oldSafari);
     const duty = firstDuty?.data
       ?.flat()

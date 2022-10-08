@@ -102,6 +102,12 @@ const ReleaseOrder = () => {
     setSpinning(true);
     try {
       const values = baseForm.getFieldsValue();
+      if (isEmpty(values.cluster)) {
+        setOrderData([]);
+        setCompareData({ opsData: [], alpha: [] });
+        setSpinning(false);
+        return;
+      }
       const rd = await PreReleaseServices.orderList(values.cluster?.join(',') ?? '');
       setOrderData(rd);
       const flag = rd.some((it: any) => it.repair_order_type.indexOf('停机') > -1);
@@ -244,7 +250,7 @@ const ReleaseOrder = () => {
               </Col>
               <Col span={5}>
                 <Form.Item name={'plan_release_time'} label={'发布时间'}>
-                  <DatePicker style={{ width: '100%' }} showTime />
+                  <DatePicker style={{ width: '100%' }} showTime format={'YYYY-MM-DD HH:mm'} />
                 </Form.Item>
               </Col>
               <Col span={6}>

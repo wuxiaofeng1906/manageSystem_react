@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useState, Fragment } from 'react';
+import React, { useEffect, useMemo, useState, useCallback, Fragment, memo } from 'react';
 import styles from './index.less';
 import cns from 'classnames';
 import { Collapse, Form, Select, DatePicker, Col, Card, Modal } from 'antd';
 import { useModel } from 'umi';
 import PreReleaseServices from '@/services/preRelease';
-import { isEmpty, sortBy, uniqBy } from 'lodash';
+import { isEmpty, sortBy, uniqBy, cloneDeep } from 'lodash';
 import moment from 'moment';
 
 const thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
@@ -59,7 +59,6 @@ const VisualView = () => {
   const [project, setProject] = useState<any[]>([]);
   const [branch, setBranch] = useState<any[]>([]);
   const [online, setOnline] = useState<{ name: string; value: string }[]>([]); // 线上动态列
-  const [source, setSource] = useState<any[]>([]);
   const [basicSource, setBasicSource] = useState<any[]>([]); // 基准版本
   const [currentSource, setCurrentSource] = useState<any[]>([]); // 当天待发版
   const [planSource, setPlanSource] = useState<any[]>([]); // 计划上线日历
@@ -67,45 +66,6 @@ const VisualView = () => {
   useEffect(() => {
     getSelectData();
     getViewData();
-    setSource([
-      {
-        id: '1',
-        time: '2022-09-12 12:32',
-        server: ['web', 'h5'],
-        project: '自定义门户',
-        branch: 'hotfix',
-        env: '集群1',
-        bg: initBg[0],
-        ztno: 2234,
-      },
-      {
-        id: '2',
-        time: '2022-09-12 12:32',
-        server: ['web', 'app'],
-        project: '库存管理',
-        branch: 'hotfix',
-        env: '集群1',
-        bg: initBg[0],
-      },
-      {
-        id: '3',
-        time: '2022-09-12 12:32',
-        server: ['web', 'app'],
-        project: '库存管理',
-        branch: 'hotfix',
-        env: '集群1',
-        bg: initBg[0],
-      },
-      {
-        id: '4',
-        time: '2022-09-12 12:32',
-        server: ['web', 'app'],
-        project: '库存管理',
-        branch: 'hotfix',
-        env: '集群1',
-        bg: initBg[0],
-      },
-    ]);
   }, []);
 
   const getSelectData = async () => {
@@ -134,10 +94,13 @@ const VisualView = () => {
     const currentOnline = currentDay.map((it: any) => it.cluster)?.flat() ?? [];
     // setBasicSource(basic);
 
+    // 需排序 集群0，集群1，线上集群
     setBasicSource([
       {
+        value: '集群0',
         children: [
           {
+            id: '1',
             project: 'sprint20220929',
             branch: 'sprint20220929',
             release_server: 'web,h5',
@@ -148,6 +111,7 @@ const VisualView = () => {
             release_time: '2022-09-29 17:50',
           },
           {
+            id: '2',
             project: 'sprint20220928',
             branch: 'sprint20220928',
             release_server: 'web,h5',
@@ -175,24 +139,27 @@ const VisualView = () => {
       }),
     );
     // 去重并排序(动态列计算)
-    // setOnline(
-    //   sortBy(
-    //     uniqBy([...basicOnline, ...currentOnline], 'name').flatMap((it) =>
-    //       ignore.includes(it.name) ? [] : [it],
-    //     )['value'],
-    //   ),
-    // );
-    setOnline([
-      { name: '集群2-6', value: 'clur-2-6' },
-      { name: '集群6-8', value: 'clur-6-8' },
-    ]);
+    setOnline(
+      sortBy(
+        uniqBy([...basicOnline, ...currentOnline], 'name').flatMap((it) =>
+          ignore.includes(it.name) ? [] : [it],
+        )['value'],
+      ),
+    );
   };
+
+  const onlineLen = useMemo(() => online.length || 1, [online]);
+  // 动态列
+  const dynamicColumn = useMemo(
+    () => [...baseColumn, ...(isEmpty(online) ? [{ name: '', value: '' }] : online)],
+    [online],
+  );
 
   const renderTr = (arr: any[], title: string) => {
     if (isEmpty(arr)) {
       return (
         <tr>
-          <th rowSpan={source.length}>
+          <th>
             <span className={styles.title}>{title.split('').map((text) => `${text}\n`)}</span>
           </th>
           <td />
@@ -226,6 +193,7 @@ const VisualView = () => {
       </Fragment>
     );
   };
+
   const renderTd = (data: any) => {
     return (
       <Fragment>
@@ -268,12 +236,37 @@ const VisualView = () => {
     );
   };
 
-  const onlineLen = useMemo(() => online.length || 1, [online]);
-  // 动态列
-  const dynamicColumn = useMemo(
-    () => [...baseColumn, ...(isEmpty(online) ? [{ name: '', value: '' }] : online)],
-    [online],
-  );
+  const renderBasicTd = useMemo(() => {
+    let source: any[] = cloneDeep(basicSource);
+    // 数据不齐：补齐td
+    const emptyLength = onlineLen + 2 - basicSource.length;
+    const empty = Array.from({ length: onlineLen + 2 });
+    if (isEmpty(basicSource)) return empty.map((it, i) => <td key={i} />);
+    if (emptyLength > 0) {
+      source = source.concat(Array.from({ length: emptyLength }, (it) => ({ children: [] })));
+    }
+    return (
+      <Fragment>
+        {source?.map((it, index) => {
+          return isEmpty(it.children) ? (
+            <td />
+          ) : (
+            <td>
+              <div className={styles.stackWrapper}>
+                <Collapse defaultActiveKey={['1', '2']}>
+                  {it.children?.map((child: any, i: number) => (
+                    <Collapse.Panel key={child.id || i} header={child.project}>
+                      <ICard data={child} onRefresh={getViewData} />
+                    </Collapse.Panel>
+                  ))}
+                </Collapse>
+              </div>
+            </td>
+          );
+        })}
+      </Fragment>
+    );
+  }, [basicSource, onlineLen]);
 
   return (
     <Card title={'待发布视图'} className={styles.card}>
@@ -316,20 +309,7 @@ const VisualView = () => {
             <tr>
               <th colSpan={2}>版本基准</th>
               <td className={styles.obliqueLine} />
-              <td>
-                <div className={styles.stackWrapper}>
-                  <Collapse defaultActiveKey={['1', '2']}>
-                    {source.map((it, index) => (
-                      <Collapse.Panel key={it.id || index} header={it.project}>
-                        <ICard data={it} onRefresh={getViewData} />
-                      </Collapse.Panel>
-                    ))}
-                  </Collapse>
-                </div>
-              </td>
-              <td />
-              <td />
-              <td />
+              {renderBasicTd}
             </tr>
             {renderTr(currentSource, '当天待发版')}
             {/*搜索条件*/}

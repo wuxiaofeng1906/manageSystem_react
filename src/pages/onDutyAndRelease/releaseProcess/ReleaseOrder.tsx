@@ -32,6 +32,7 @@ const ReleaseOrder = () => {
   const [envList, setEnvList] = useState<any[]>([]);
 
   const [spinning, setSpinning] = useState(false);
+  const [finished, setFinished] = useState(false);
 
   const onGridReady = (params: GridReadyEvent, ref = gridRef) => {
     ref.current = params.api;
@@ -88,6 +89,7 @@ const ReleaseOrder = () => {
         ...res,
         cluster: res.cluster?.map((it: any) => it.name) ?? [],
       });
+      setFinished(isEmpty(res.release_result) || res.release_result !== 'unknown');
       setOrderData(res.ready_data ?? []);
       await formatCompare(res?.ops_repair_order_data ?? [], res?.ready_data ?? []);
       setSpinning(false);
@@ -218,7 +220,7 @@ const ReleaseOrder = () => {
       title: '删除积压工单提醒：',
       content: '请确认是否要永久删除该积压工单！',
       onOk: async () => {
-        await PreReleaseServices.removeOrder({ ready_release_num: data.ready_release_num });
+        await PreReleaseServices.removeOrder({ release_num: data.ready_release_num });
         getOrderDetail();
       },
     });
@@ -231,7 +233,7 @@ const ReleaseOrder = () => {
         <Collapse defaultActiveKey={'1'} className={styles.collapse}>
           <Collapse.Panel key={'1'} header={'工单'}>
             <div className={styles.save}>
-              <Button size={'small'} onClick={onSave}>
+              <Button size={'small'} onClick={onSave} disabled={finished}>
                 保存
               </Button>
             </div>
@@ -250,13 +252,19 @@ const ReleaseOrder = () => {
               </Col>
               <Col span={5}>
                 <Form.Item name={'plan_release_time'} label={'发布时间'}>
-                  <DatePicker style={{ width: '100%' }} showTime format={'YYYY-MM-DD HH:mm'} />
+                  <DatePicker
+                    style={{ width: '100%' }}
+                    showTime
+                    format={'YYYY-MM-DD HH:mm'}
+                    disabled={finished}
+                  />
                 </Form.Item>
               </Col>
               <Col span={6}>
                 <Form.Item name={'announcement_num'} label={'关联公告'} required>
                   <Select
                     showSearch
+                    disabled={finished}
                     optionFilterProp={'label'}
                     options={[{ key: '免', value: '免', label: '免' }].concat(announcementList)}
                     style={{ width: '100%' }}
@@ -267,6 +275,7 @@ const ReleaseOrder = () => {
                 <Form.Item name={'person_duty_num'} label={'值班名单'}>
                   <Select
                     showSearch
+                    disabled={finished}
                     optionFilterProp={'label'}
                     options={[{ key: '免', value: '免', label: '免' }].concat(dutyList)}
                     style={{ width: '100%' }}
@@ -276,6 +285,7 @@ const ReleaseOrder = () => {
               <Col span={3}>
                 <Form.Item name={'release_result'}>
                   <Select
+                    disabled={finished}
                     options={[
                       { label: '发布成功', value: 'success', key: 'success' },
                       { label: '发布失败', value: 'failure', key: 'failure' },
@@ -304,13 +314,14 @@ const ReleaseOrder = () => {
             </Col>
             <Col span={8}>
               <Form.Item name={'release_name'} label={'工单名称'} required>
-                <Input style={{ width: '100%' }} />
+                <Input style={{ width: '100%' }} disabled={finished} />
               </Form.Item>
             </Col>
             <Col span={10}>
               <Form.Item name={'cluster'} label={'发布环境'} required>
                 <Select
                   showSearch
+                  disabled={finished}
                   options={envList}
                   style={{ width: '100%' }}
                   mode={'multiple'}
@@ -345,6 +356,7 @@ const ReleaseOrder = () => {
                     size={'small'}
                     type={'text'}
                     onClick={() => onRemove(p.data)}
+                    disabled={finished}
                     style={{ color: '#fb5858', padding: 0, fontWeight: 500 }}
                   >
                     永久删除积压工单

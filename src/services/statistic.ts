@@ -290,5 +290,29 @@ const StatisticServices = {
   `);
     return { data: data.data };
   },
+  // 服务 -交付吞吐量
+  async deliverThroughput({
+    client,
+    params,
+  }: {
+    client: GqlClient<object>;
+    params: { kind: number; ends: string };
+  }) {
+    const { data } = await client.query(`
+      {
+         data:deliverThroughput(kind: "${params.kind}", ends: ${params.ends}) {
+          range{
+            start
+            end
+          }
+          datas{
+            date
+            kpi
+          }
+        }
+      }
+  `);
+    return { data: data.data };
+  },
 };
 export default StatisticServices;

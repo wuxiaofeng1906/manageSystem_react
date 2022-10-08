@@ -1,7 +1,22 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { IRuleData } from '@/components/IStaticPerformance';
-import IStaticPerformance from '@/components/IStaticPerformance';
+import { IDrawer } from '@/components/IStaticPerformance';
 import StatisticServices from '@/services/statistic';
+import { useGqlClient } from '@/hooks';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import {
+  getFourQuarterTime,
+  getHalfYearTime,
+  getTwelveMonthTime,
+  getWeeksRange,
+  getYearsTime,
+} from '@/publicMethods/timeMethods';
+import moment from 'moment';
+import { isEmpty } from 'lodash';
+import { PageContainer } from '@ant-design/pro-layout';
+import { Button, Spin } from 'antd';
+import { CalendarTwoTone, QuestionCircleTwoTone, ScheduleTwoTone } from '@ant-design/icons';
+import { AgGridReact } from 'ag-grid-react';
 const ruleData: IRuleData[] = [
   {
     title: '统计周期',
@@ -27,13 +42,164 @@ const ruleData: IRuleData[] = [
     child: ['取已上线需求规模字段求和', '交付吞吐量 = SUM(已上线需求规模)  '],
   },
 ];
-const DeliveryThroughput: React.FC<any> = () => {
+const DeliveryThroughput: React.FC = () => {
+  const client = useGqlClient();
+  const gridRef = useRef<GridApi>();
+  const [catagory, setCatagory] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
+  const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<any[]>([]);
+  const onGridReady = (params: GridReadyEvent) => {
+    gridRef.current = params.api;
+    params.api.sizeColumnsToFit();
+  };
+  const getDate = () => {
+    const typeMap = {
+      year: getYearsTime,
+      halfYear: getHalfYearTime,
+      quarter: getFourQuarterTime,
+      month: getTwelveMonthTime,
+    };
+    const ranges = typeMap[catagory]?.();
+    const weekRanges = catagory == 'week' ? getWeeksRange(8) : [];
+    const data = catagory == 'week' ? weekRanges?.reverse() : ranges;
+    return JSON.stringify(data?.map((it) => it.end));
+  };
+
+  const getTableSource = async () => {
+    const kind = {
+      week: 1,
+      month: 2,
+      quarter: 3,
+      year: 4,
+    };
+    setLoading(true);
+    try {
+      const ends = getDate();
+      const { data } = await StatisticServices.deliverThroughput({
+        client,
+        params: {
+          kind: kind[catagory],
+          ends,
+        },
+      });
+      setData(
+        data
+          ?.map((it: any) => {
+            const title =
+              catagory == 'quarter'
+                ? `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`
+                : moment(it.range.start).format('YYYY年MM月');
+
+            if (isEmpty(it.datas)) return { title: title, total: 0 };
+
+            return it.datas.map((child: any) => ({
+              subTitle: moment(child.date).format('YYYYMMDD'),
+              title: title,
+              total: child.kpi ?? 0,
+            }));
+          })
+          .flat(),
+      );
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getTableSource();
+  }, [catagory]);
+
   return (
-    <IStaticPerformance
-      ruleData={ruleData}
-      request={StatisticServices.shuttleDelay}
-      identity={'DEVELOPER'}
-    />
+    <PageContainer>
+      <Spin spinning={loading} tip={'数据加载中...'}>
+        <div style={{ background: 'white' }}>
+          <Button
+            type="text"
+            style={{ color: 'black' }}
+            icon={<CalendarTwoTone />}
+            size={'large'}
+            onClick={() => setCatagory('week')}
+          >
+            按周统计
+          </Button>
+          <Button
+            type="text"
+            style={{ color: 'black' }}
+            icon={<CalendarTwoTone />}
+            size={'large'}
+            onClick={() => setCatagory('month')}
+          >
+            按月统计
+          </Button>
+          <Button
+            type="text"
+            style={{ color: 'black' }}
+            icon={<ScheduleTwoTone />}
+            size={'large'}
+            onClick={() => setCatagory('quarter')}
+          >
+            按季统计
+          </Button>
+          <Button
+            type="text"
+            style={{ color: 'black' }}
+            icon={<ScheduleTwoTone />}
+            size={'large'}
+            onClick={() => setCatagory('year')}
+          >
+            按年统计
+          </Button>
+          <label style={{ fontWeight: 'bold' }}>(统计单位：%)</label>
+          <Button
+            type="text"
+            style={{ color: '#1890FF', float: 'right' }}
+            icon={<QuestionCircleTwoTone />}
+            size={'large'}
+            onClick={() => setVisible(true)}
+          >
+            计算规则
+          </Button>
+        </div>
+        <div className={'ag-theme-alpine'} style={{ width: '100%', height: 400 }}>
+          <AgGridReact
+            rowHeight={32}
+            headerHeight={35}
+            onGridReady={onGridReady}
+            pivotMode={true}
+            rowData={data}
+            suppressAggFuncInHeader={true}
+            defaultColDef={{
+              sortable: true,
+              resizable: true,
+              filter: true,
+              flex: 1,
+              minWidth: 80,
+            }}
+            columnDefs={[
+              {
+                field: 'total',
+                headerName: '吞吐量',
+                aggFunc: (data: any) => {
+                  let sum = 0;
+                  data?.forEach(function (value: any) {
+                    if (value) {
+                      sum = sum + parseFloat(value);
+                    }
+                  });
+                  if (!sum) return 0;
+                  return sum.toFixed(2);
+                },
+              },
+              { field: 'title', enablePivot: true, pivot: true },
+              { field: 'subTitle', enablePivot: true, pivot: true },
+            ]}
+          />
+        </div>
+        <IDrawer visible={visible} setVisible={(v) => setVisible(v)} ruleData={ruleData} />
+      </Spin>
+    </PageContainer>
   );
 };
 

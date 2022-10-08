@@ -568,7 +568,7 @@ export default [
                 icon: 'table',
                 path: 'deliveryThroughput',
                 component: './kpi/performance/service/deliveryThroughput',
-                hideInMenu: true, // 临时屏蔽
+                // hideInMenu: true, // 临时屏蔽
               },
             ],
           },

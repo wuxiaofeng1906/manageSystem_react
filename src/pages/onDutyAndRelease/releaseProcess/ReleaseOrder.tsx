@@ -231,7 +231,10 @@ const ReleaseOrder = () => {
       title: '删除积压工单提醒：',
       content: '请确认是否要永久删除该积压工单！',
       onOk: async () => {
-        await PreReleaseServices.removeOrder({ release_num: data.ready_release_num });
+        await PreReleaseServices.removeOrder({
+          release_num: data.release_num,
+          user_id: user?.userid ?? '',
+        });
         getOrderDetail();
       },
     });

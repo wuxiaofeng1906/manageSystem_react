@@ -21,6 +21,7 @@ const ICard = (params: {
   isBasic?: boolean;
   child?: React.ReactNode;
   onRefresh: Function;
+  deleteIcon?: boolean;
 }) => {
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const isLink = params.data.baseline_cluster == 'office';
@@ -100,7 +101,7 @@ const ICard = (params: {
         </p>
       )}
 
-      {hasPermission ? (
+      {hasPermission || params.deleteIcon == true ? (
         <img
           src={require('../../../public/delete_black_2.png')}
           className={styles.deleteIcon}
@@ -114,6 +115,7 @@ const ICard = (params: {
 };
 
 const VisualView = () => {
+  const [form] = Form.useForm();
   const [project, setProject] = useState<any[]>([]);
   const [branch, setBranch] = useState<any[]>([]);
   const [online, setOnline] = useState<{ name: string; value: string }[]>([
@@ -141,15 +143,33 @@ const VisualView = () => {
     setBranch(
       branchList?.map((it: any) => ({
         label: it.branch_name,
-        value: it.branch_id,
+        value: it.branch_name,
         key: it.branch_id,
       })),
     );
   };
+  const getPlanList = async () => {
+    const values = form.getFieldsValue();
+    const plan = await PreReleaseServices.releasePlan({
+      project_id: values.project_id?.join(',') ?? '',
+      branch: values.branch?.join(',') ?? '',
+      plan_time: values.plan_time ? moment(values.plan_time).format('YYYY-MM-DD') : '',
+    });
+    setPlanSource(
+      plan?.map((it: any) => ({
+        ...it,
+        baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
+        cls: styles.dotLinePrimary,
+        bg: initBg[2],
+        plan_release_time: it.plan_time,
+      })),
+    );
+  };
+
   const getViewData = async () => {
     const basic = await PreReleaseServices.releaseBaseline();
     const currentDay = await PreReleaseServices.releaseView();
-    const plan = await PreReleaseServices.releasePlan();
+    const plan = await PreReleaseServices.releasePlan({});
 
     const basicOnline = basic.map((it: any) => it.cluster)?.flat() ?? [];
     const currentOnline = currentDay.map((it: any) => it.cluster)?.flat() ?? [];
@@ -228,15 +248,19 @@ const VisualView = () => {
                 </th>
               )}
               <td className={styles.time}>
-                {showStep && (
+                {showStep ? (
                   <Fragment>
                     第{index + 1}步：
                     <br />
+                    {it.plan_release_time
+                      ? moment(it.plan_release_time).format('YYYY-MM-DD HH:mm')
+                      : ''}
                   </Fragment>
+                ) : it.plan_release_time ? (
+                  moment(it.plan_release_time).format('YYYY-MM-DD')
+                ) : (
+                  ''
                 )}
-                {it.plan_release_time
-                  ? moment(it.plan_release_time).format('YYYY-MM-DD HH:mm')
-                  : ''}
               </td>
               {renderTd(it)}
             </tr>
@@ -256,6 +280,7 @@ const VisualView = () => {
                 <ICard
                   data={data}
                   onRefresh={getViewData}
+                  deleteIcon={index < 1}
                   child={
                     <div>
                       {data?.cluster?.map((env: any, i: number) => {
@@ -303,7 +328,12 @@ const VisualView = () => {
                 <Collapse defaultActiveKey={[1, 2]}>
                   {it.children?.map((child: any, i: number) => (
                     <Collapse.Panel key={i + 1} header={child.project}>
-                      <ICard data={child} onRefresh={getViewData} isBasic={true} />
+                      <ICard
+                        data={child}
+                        onRefresh={getViewData}
+                        isBasic={true}
+                        deleteIcon={index < 1}
+                      />
                     </Collapse.Panel>
                   ))}
                 </Collapse>
@@ -358,30 +388,46 @@ const VisualView = () => {
             {/*搜索条件*/}
             <tr>
               <td colSpan={onlineLen + 5}>
-                <Form size={'small'} layout={'inline'} className={styles.condition}>
+                <Form
+                  form={form}
+                  size={'small'}
+                  layout={'inline'}
+                  className={styles.condition}
+                  onFieldsChange={getPlanList}
+                >
                   <Col span={8}>
-                    <Form.Item name={'project'} label={'项目名称'}>
+                    <Form.Item name={'project_id'} label={'项目名称'}>
                       <Select
                         style={{ width: '100%' }}
                         options={project}
                         placeholder={'项目名称'}
+                        mode={'multiple'}
+                        showSearch
+                        optionFilterProp={'label'}
                       />
                     </Form.Item>
                   </Col>
                   <Col span={8}>
                     <Form.Item name={'branch'} label={'分支名称'}>
-                      <Select style={{ width: '100%' }} options={branch} placeholder={'分支名称'} />
+                      <Select
+                        style={{ width: '100%' }}
+                        options={branch}
+                        placeholder={'分支名称'}
+                        mode={'multiple'}
+                        showSearch
+                        optionFilterProp={'label'}
+                      />
                     </Form.Item>
                   </Col>
                   <Col span={8}>
-                    <Form.Item name={'date'} label={'计划上线日期'}>
+                    <Form.Item name={'plan_time'} label={'计划上线日期'}>
                       <DatePicker style={{ width: '100%' }} />
                     </Form.Item>
                   </Col>
                 </Form>
               </td>
             </tr>
-            {renderTr([], '上线计划日历', false)}
+            {renderTr(planSource, '上线计划日历', false)}
           </tbody>
         </table>
       </div>

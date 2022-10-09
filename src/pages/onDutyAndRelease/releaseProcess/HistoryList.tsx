@@ -48,7 +48,12 @@ const HistoryList = () => {
         page: page,
         page_size: page_size,
       });
-      setRowData(res.data ?? []);
+      setRowData(
+        res.data?.map((it: any) => ({
+          ...it,
+          project: it.project?.map((pro: any) => pro.pro_name)?.join(',') ?? '',
+        })) ?? [],
+      );
       setPages({ page: res.page, total: res.total, page_size: res.page_size });
       setSpinning(false);
     } catch (e) {

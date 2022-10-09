@@ -53,7 +53,12 @@ const PreReleaseList = () => {
   };
   const getTableList = async () => {
     const res = await PreReleaseServices.releaseList();
-    setRowData(res);
+    setRowData(
+      res.map((it: any) => ({
+        ...it,
+        project: it.project?.map((pro: any) => pro.pro_name)?.join(',') ?? '',
+      })),
+    );
   };
 
   useEffect(() => {

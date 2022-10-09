@@ -68,6 +68,10 @@ const PreReleaseServices = {
   async releaseList() {
     return request(`${baseUrl}/latest-release/list`);
   },
+  // 发布列表排序
+  async releaseOrder(data: any) {
+    return request(`${baseUrl}/latest-release/order-by`, { method: 'post', data });
+  },
   // 发布历史
   async historyList(params: any) {
     return request(`${baseUrl}/latest-release/history`, { params });

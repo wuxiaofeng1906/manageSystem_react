@@ -135,7 +135,11 @@ const PreRelease: React.FC<any> = () => {
   };
 
   // 显示有数据界面
-  const showPageInitData = async (initData: any, initShow: boolean, isAutoRefresh = false) => {
+  const showPageInitData = async (
+    initData: any,
+    initShow: boolean = false,
+    isAutoRefresh = false,
+  ) => {
     if (initData === undefined) {
       return;
     }
@@ -169,6 +173,8 @@ const PreRelease: React.FC<any> = () => {
         setTabsData(tabPageInfo?.activeKey, tabPageInfo?.panes);
       }
     } else {
+      currentPanes = tabPageInfo.panes;
+      currentKey = tabPageInfo.activeKey;
       setTabsData(tabPageInfo?.activeKey, currentPanes);
     }
     // 进度条数据
@@ -237,7 +243,7 @@ const PreRelease: React.FC<any> = () => {
   };
 
   useEffect(() => {
-    showPageInitData(data, true);
+    showPageInitData(data);
   }, [data, loading]);
 
   const interValRef: any = useRef(); // 定时任务数据id保存
@@ -296,7 +302,7 @@ const PreRelease: React.FC<any> = () => {
 
             //新版本
             const datas = await alalysisInitData('', location?.releasedNum as string);
-            showPageInitData(datas, false);
+            showPageInitData(datas);
             setGlobalLoading(false);
           }}
         />

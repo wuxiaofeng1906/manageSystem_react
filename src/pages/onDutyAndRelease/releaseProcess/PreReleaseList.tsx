@@ -26,12 +26,16 @@ const PreReleaseList = () => {
     setGridHeight(Number(getHeight()) - 80);
   };
 
-  const onDrag = () => {
+  const onDrag = async () => {
     const sortArr: any = [];
     gridRef.current?.forEachNode(function (node, index) {
-      sortArr.push({ sort: index, id: node.data.id });
+      sortArr.push({
+        release_index: index + 1,
+        release_num: node.data.release_num,
+      });
     });
-    console.log(sortArr);
+    await PreReleaseServices.releaseOrder(sortArr);
+    await getTableList();
   };
 
   const onFinish = async (v: any) => {

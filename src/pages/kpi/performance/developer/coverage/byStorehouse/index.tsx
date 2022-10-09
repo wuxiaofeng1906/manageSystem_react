@@ -191,7 +191,11 @@ const BranchTableList: React.FC<any> = () => {
 
   const updateGrid = async () => {
     const datas: any = await queryBranchViews(gqlClient, conditon);
-    gridApi.current?.setRowData(datas);
+    gridApi.current?.setRowData(
+      datas?.flatMap((it: any) =>
+        it.branch.startsWith('emergency') || it.branch.startsWith('stage-patch') ? [] : [it],
+      ) ?? [],
+    );
   };
 
   const projectChanged = (values: any) => {

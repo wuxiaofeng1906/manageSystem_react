@@ -286,7 +286,9 @@ const BranchTableList: React.FC<any> = () => {
       <div className="ag-theme-alpine" style={{ height: gridHeight, width: '100%' }}>
         <AgGridReact
           rowData={
-            data?.filter((it: any) => !['emergency', 'stage-patch'].includes(it.branch)) ?? []
+            data?.flatMap((it: any) =>
+              it.branch.startsWith('emergency') || it.branch.startsWith('stage-patch') ? [] : [it],
+            ) ?? []
           }
           defaultColDef={{
             resizable: true,

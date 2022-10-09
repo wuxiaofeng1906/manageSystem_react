@@ -7,6 +7,7 @@ import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import {
   getFourQuarterTime,
   getHalfYearTime,
+  getMonthWeek,
   getTwelveMonthTime,
   getWeeksRange,
   getYearsTime,
@@ -17,6 +18,7 @@ import { PageContainer } from '@ant-design/pro-layout';
 import { Button, Spin } from 'antd';
 import { CalendarTwoTone, QuestionCircleTwoTone, ScheduleTwoTone } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
+import dayjs from 'dayjs';
 const ruleData: IRuleData[] = [
   {
     title: '统计周期',
@@ -89,16 +91,19 @@ const DeliveryThroughput: React.FC = () => {
       setData(
         data
           ?.map((it: any) => {
-            const title =
-              catagory == 'quarter'
-                ? `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`
-                : moment(it.range.start).format('YYYY年MM月');
-
-            if (isEmpty(it.datas)) return { title: title, total: 0 };
+            const title = {
+              quarter: `${moment(it.range.start).format('YYYY')}年Q${moment(
+                it.range.start,
+              ).quarter()}`,
+              week: getMonthWeek(it.range.start),
+              month: moment(it.range.start).format('YYYY年MM月'),
+              year: moment(it.range.start).format('YYYY年'),
+            };
+            if (isEmpty(it.datas)) return { title: title[catagory], total: 0 };
 
             return it.datas.map((child: any) => ({
               subTitle: moment(child.date).format('YYYYMMDD'),
-              title: title,
+              title: title[catagory],
               total: child.kpi ?? 0,
             }));
           })

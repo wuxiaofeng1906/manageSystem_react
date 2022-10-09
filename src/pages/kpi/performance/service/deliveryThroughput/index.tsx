@@ -60,10 +60,13 @@ const DeliveryThroughput: React.FC = () => {
       quarter: getFourQuarterTime,
       month: getTwelveMonthTime,
     };
-    const ranges = typeMap[catagory]?.();
-    const weekRanges = catagory == 'week' ? getWeeksRange(8) : [];
-    const data = catagory == 'week' ? weekRanges?.reverse() : ranges;
-    return JSON.stringify(data?.map((it) => it.end));
+    const isWeek = catagory == 'week';
+    const ranges = typeMap[catagory]?.(
+      catagory == 'month' ? 3 : catagory == 'quarter' ? 6 : undefined,
+    );
+    const weekRanges = isWeek ? getWeeksRange(8) : [];
+    const data = isWeek ? weekRanges?.reverse() : ranges;
+    return JSON.stringify(data?.map((it: any) => (isWeek ? it.to : it.end)));
   };
 
   const getTableSource = async () => {

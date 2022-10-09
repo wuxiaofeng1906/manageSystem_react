@@ -84,6 +84,10 @@ const PreReleaseServices = {
   async releaseView() {
     return request(`${baseUrl}/latest-release/views-ready-release`);
   },
+  // 发布视图数据（发版计划）
+  async releasePlan() {
+    return request(`${baseUrl}/latest-release/release-plan`);
+  },
   // 删除发布列表（视图）
   async removeRelease(data: any) {
     return request(`${baseUrl}/latest-release/list`, { method: 'delete', data });

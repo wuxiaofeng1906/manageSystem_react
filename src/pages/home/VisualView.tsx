@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useState, useCallback, Fragment, memo } from 'react';
+import React, { useEffect, useMemo, useState, Fragment } from 'react';
 import styles from './index.less';
 import cns from 'classnames';
 import { Collapse, Form, Select, DatePicker, Col, Card, Modal } from 'antd';
 import { useModel } from 'umi';
 import PreReleaseServices from '@/services/preRelease';
-import { isEmpty, sortBy, uniqBy, cloneDeep } from 'lodash';
+import { isEmpty, sortBy, uniqBy, cloneDeep, isArray } from 'lodash';
 import moment from 'moment';
 
 const thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
@@ -25,6 +25,7 @@ const ICard = (params: {
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const isLink = params.data.baseline_cluster == 'office';
   const hasPermission = useMemo(() => user?.group == 'superGroup', [user]);
+
   const onRemove = async (data: any) => {
     Modal.confirm({
       centered: true,
@@ -44,38 +45,59 @@ const ICard = (params: {
       {params.child || <div />}
       <div className={styles.wrapper}>
         <span className={styles.label}>发布项目:</span>
-        {params.data.project?.map((it: any) => (
-          <span
-            className={cns(isLink ? styles.link : '', styles.value)}
-            onClick={() => {
-              if (!it.value || !isLink) return;
-              window.open(`http://zentao.77hub.com/zentao/execution-task-${it.value}.html`);
-            }}
-          >
-            {it.name ?? ''}
-          </span>
-        ))}
+        {isArray(params.data.project) ? (
+          params.data.project?.map((it: any) => (
+            <span
+              className={cns(isLink ? styles.link : '', styles.value)}
+              onClick={() => {
+                if (!it.pro_id || !isLink) return;
+                window.open(`http://zentao.77hub.com/zentao/execution-task-${it.pro_id}.html`);
+              }}
+            >
+              {it.pro_name ?? ''}
+            </span>
+          ))
+        ) : (
+          <span className={styles.value}>{params.data.project}</span>
+        )}
       </div>
-      <p>发布分支:{params.data.branch ?? ''}</p>
       <p>
-        发布需求:
-        {params.data.story?.split(',')?.map((ztno: number) => (
-          <span
-            className={isLink ? styles.link : ''}
-            onClick={() => {
-              if (!ztno || !isLink) return;
-              window.open(`http://zentao.77hub.com/zentao/story-view-${ztno}.html`);
-            }}
-          >
-            {ztno ?? ''}
-          </span>
-        ))}
+        <span className={styles.label}>发布分支:</span>
+        {params.data.branch ?? ''}
       </p>
-      <p>发布服务:{params.data.apps ?? ''}</p>
-      {params.isBasic ? (
-        <p>发布时间:{params.data.release_time ?? ''}</p>
+      {isEmpty(params.data.story) ? (
+        ''
       ) : (
-        <p>发布集群:{params.data.release_env ?? ''}</p>
+        <p>
+          <span className={styles.label}>发布需求:</span>
+          {params.data.story?.split(',')?.map((ztno: number) => (
+            <span
+              className={isLink ? styles.link : ''}
+              onClick={() => {
+                if (!ztno || !isLink) return;
+                window.open(`http://zentao.77hub.com/zentao/story-view-${ztno}.html`);
+              }}
+            >
+              {ztno ?? ''}
+            </span>
+          ))}
+        </p>
+      )}
+
+      <p>
+        <span className={styles.label}>发布服务:</span>
+        {params.data.apps ?? ''}
+      </p>
+      {params.isBasic ? (
+        <p>
+          <span className={styles.label}>发布时间:</span>
+          {params.data.release_time ?? ''}
+        </p>
+      ) : (
+        <p>
+          <span className={styles.label}>发布集群:</span>
+          {params.data.release_env ?? ''}
+        </p>
       )}
 
       {hasPermission ? (
@@ -127,9 +149,12 @@ const VisualView = () => {
   const getViewData = async () => {
     const basic = await PreReleaseServices.releaseBaseline();
     const currentDay = await PreReleaseServices.releaseView();
+    const plan = await PreReleaseServices.releasePlan();
 
     const basicOnline = basic.map((it: any) => it.cluster)?.flat() ?? [];
     const currentOnline = currentDay.map((it: any) => it.cluster)?.flat() ?? [];
+    const planOnline = plan.map((it: any) => it.cluster)?.flat() ?? [];
+
     setCurrentSource(
       currentDay?.map((it: any) => {
         const isRed =
@@ -144,9 +169,18 @@ const VisualView = () => {
         };
       }),
     );
+    setPlanSource(
+      plan?.map((it: any) => ({
+        ...it,
+        baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
+        cls: styles.dotLinePrimary,
+        bg: initBg[2],
+        plan_release_time: it.plan_time,
+      })),
+    );
     // 去重并排序(动态列计算)
     let formatOnline = sortBy(
-      uniqBy([...basicOnline, ...currentOnline], 'name').flatMap((it) =>
+      uniqBy([...basicOnline, ...currentOnline, ...planOnline], 'name').flatMap((it) =>
         ignore.includes(it.name) ? [] : [it],
       )['value'],
     );
@@ -169,7 +203,7 @@ const VisualView = () => {
   // 动态列
   const dynamicColumn = useMemo(() => [...baseColumn, ...online], [online]);
 
-  const renderTr = (arr: any[], title: string) => {
+  const renderTr = (arr: any[], title: string, showStep = true) => {
     if (isEmpty(arr)) {
       return (
         <tr>
@@ -194,8 +228,12 @@ const VisualView = () => {
                 </th>
               )}
               <td className={styles.time}>
-                第{index + 1}步：
-                <br />
+                {showStep && (
+                  <Fragment>
+                    第{index + 1}步：
+                    <br />
+                  </Fragment>
+                )}
                 {it.plan_release_time
                   ? moment(it.plan_release_time).format('YYYY-MM-DD HH:mm')
                   : ''}
@@ -220,7 +258,7 @@ const VisualView = () => {
                   onRefresh={getViewData}
                   child={
                     <div>
-                      {data.cluster?.map((env: any, i: number) => {
+                      {data?.cluster?.map((env: any, i: number) => {
                         const baseIndex = dynamicColumn.findIndex(
                           (v) => data.baseline_cluster == v.name,
                         );
@@ -298,9 +336,7 @@ const VisualView = () => {
                     style={
                       title == '类别'
                         ? { width: 130, maxWidth: 170 }
-                        : {
-                            width: `${isOnline ? singleW * (onlineLen || 1) : singleW}px`,
-                          }
+                        : { width: `${isOnline ? singleW * (onlineLen || 1) : singleW}px` }
                     }
                   >
                     {title}
@@ -325,12 +361,16 @@ const VisualView = () => {
                 <Form size={'small'} layout={'inline'} className={styles.condition}>
                   <Col span={8}>
                     <Form.Item name={'project'} label={'项目名称'}>
-                      <Select style={{ width: '100%' }} options={project} />
+                      <Select
+                        style={{ width: '100%' }}
+                        options={project}
+                        placeholder={'项目名称'}
+                      />
                     </Form.Item>
                   </Col>
                   <Col span={8}>
                     <Form.Item name={'branch'} label={'分支名称'}>
-                      <Select style={{ width: '100%' }} options={branch} />
+                      <Select style={{ width: '100%' }} options={branch} placeholder={'分支名称'} />
                     </Form.Item>
                   </Col>
                   <Col span={8}>
@@ -341,7 +381,7 @@ const VisualView = () => {
                 </Form>
               </td>
             </tr>
-            {renderTr([], '上线计划日历')}
+            {renderTr([], '上线计划日历', false)}
           </tbody>
         </table>
       </div>

@@ -22,6 +22,8 @@ const ReleaseOrder = () => {
   const gridCompareRef = useRef<GridApi>();
   const [orderForm] = Form.useForm();
   const [baseForm] = Form.useForm();
+  const watchCluster = Form.useWatch('cluster', baseForm);
+
   const [orderData, setOrderData] = useState<any[]>([]);
   const [compareData, setCompareData] = useState<{
     opsData: any[];
@@ -43,6 +45,10 @@ const ReleaseOrder = () => {
     getOrderDetail();
   }, []);
 
+  useEffect(() => {
+    onLinkTable();
+  }, [watchCluster]);
+
   const getBaseList = async () => {
     const announce = await AnnouncementServices.preAnnouncement();
     const envs = await PreReleaseServices.environment();
@@ -55,11 +61,17 @@ const ReleaseOrder = () => {
       })),
     );
     setEnvList(
-      envs?.map((it: any) => ({
-        label: it.online_environment_name ?? '',
-        value: it.online_environment_id,
-        key: it.online_environment_id,
-      })),
+      envs?.flatMap((it: any) =>
+        it.online_environment_name == '集群0'
+          ? []
+          : [
+              {
+                label: it.online_environment_name ?? '',
+                value: it.online_environment_id,
+                key: it.online_environment_id,
+              },
+            ],
+      ),
     );
     setAnnouncementList(
       announce.map((it: any) => ({
@@ -129,7 +141,6 @@ const ReleaseOrder = () => {
       const values = baseForm.getFieldsValue();
       ops = await PreReleaseServices.opsList(values.cluster?.join(',') ?? '');
     }
-
     if (isEmpty(ops) && isEmpty(rdOrigin)) {
       setCompareData({ opsData: [], alpha: [] });
       return;
@@ -325,8 +336,6 @@ const ReleaseOrder = () => {
                   options={envList}
                   style={{ width: '100%' }}
                   mode={'multiple'}
-                  onBlur={onLinkTable}
-                  onDeselect={onLinkTable}
                 />
               </Form.Item>
             </Col>

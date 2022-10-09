@@ -121,17 +121,14 @@ const DutyCatalog = () => {
 
   // 默认第一值班人
   const getFirstDuty = async () => {
-    const dateStart = dayjs().day(0);
-    const dateEnd = dayjs().day(6);
-    let oldSafari = {
-      start_time: dayjs(
-        `${dateStart.year()}-${dateStart.month() + 1}-${dateStart.date() + 1}`,
-      ).format('YYYY/MM/DD'),
-      end_time: dayjs(`${dateEnd.year()}-${dateEnd.month() + 1}-${dateEnd.date() + 1}`).format(
-        'YYYY/MM/DD',
-      ),
+    const from = dayjs().subtract(1, 'd').startOf('w').subtract(0, 'w');
+    const to = from.endOf('w');
+
+    const range = {
+      start_time: dayjs(from).add(1, 'day').format('YYYY/MM/DD'),
+      end_time: dayjs(to).add(1, 'day').format('YYYY/MM/DD'),
     };
-    const firstDuty = await DutyListServices.getFirstDutyPerson(oldSafari);
+    const firstDuty = await DutyListServices.getFirstDutyPerson(range);
     const duty = firstDuty?.data
       ?.flat()
       .filter(

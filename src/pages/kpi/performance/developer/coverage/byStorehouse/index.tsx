@@ -1,45 +1,46 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {PageContainer} from '@ant-design/pro-layout';
-import {AgGridColumn, AgGridReact} from 'ag-grid-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { PageContainer } from '@ant-design/pro-layout';
+import { AgGridColumn, AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {useRequest} from 'ahooks';
-import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient, useQuery} from '@/hooks';
+import { useRequest } from 'ahooks';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GqlClient, useGqlClient, useQuery } from '@/hooks';
 import * as dayjs from 'dayjs';
-import {Button, Drawer, Form, Select} from 'antd';
-import {QuestionCircleTwoTone} from '@ant-design/icons';
-import {getHeight} from '@/publicMethods/pageSet';
+import { Button, Drawer, Form, Select } from 'antd';
+import { QuestionCircleTwoTone } from '@ant-design/icons';
+import { getHeight } from '@/publicMethods/pageSet';
 
-const {Option} = Select;
-
+const { Option } = Select;
 
 const queryBranchViews = async (client: GqlClient<object>, queryCondition: any) => {
-
-  let project = "";  // 拼接gql 需要的数组
+  let project = ''; // 拼接gql 需要的数组
   if (queryCondition.frontLib) {
     project = `"${queryCondition.frontLib}"`;
   }
 
   if (queryCondition.backendLib) {
-    project = project === "" ? `"${queryCondition.backendLib}"` : `${project},"${queryCondition.backendLib}"`;
+    project =
+      project === ''
+        ? `"${queryCondition.backendLib}"`
+        : `${project},"${queryCondition.backendLib}"`;
   }
 
-  let qurStr: any = "";
+  let qurStr: any = '';
   if (queryCondition.module) {
     qurStr = `module:"${queryCondition.module}"`;
   }
 
   if (project) {
-    qurStr = qurStr === "" ? `project:[${project}]` : `${qurStr},project:[${project}]`;
+    qurStr = qurStr === '' ? `project:[${project}]` : `${qurStr},project:[${project}]`;
   }
 
   if (qurStr) {
-    qurStr = `(${qurStr})`
+    qurStr = `(${qurStr})`;
   }
 
-  const {data} = await client.query(`
+  const { data } = await client.query(`
     {
       fileCovers${qurStr}
       {
@@ -55,13 +56,12 @@ const queryBranchViews = async (client: GqlClient<object>, queryCondition: any) 
     }
     `);
 
-
   const datas = data?.fileCovers;
   const front: any = [];
   const backend: any = [];
 
   datas.forEach((ele: any) => {
-    if (ele.side === "FRONT") {
+    if (ele.side === 'FRONT') {
       front.push(ele);
     } else {
       backend.push(ele);
@@ -73,9 +73,8 @@ const queryBranchViews = async (client: GqlClient<object>, queryCondition: any) 
 
 // 日期渲染（加上latest）
 function dateCellRenderer(params: any) {
-
   if (params.value === undefined) {
-    return "";
+    return '';
   }
 
   const times: any = params.value;
@@ -102,7 +101,7 @@ function sideCellRenderer(params: any) {
 // 值为0显示为蓝色
 function coverageCellRenderer(params: any) {
   if (params.value === undefined) {
-    return "";
+    return '';
   }
   let values: number = 0;
   if (params.value === '' || params.value == null) {
@@ -117,11 +116,10 @@ function coverageCellRenderer(params: any) {
 }
 
 const LoadBranchCombobox = (module: any) => {
-
   const combobox = [<Option value=""> </Option>];
 
   // 传入的参数module不能是任何类型的数据。在后端，FRONT 和 BACKEND 本身就是一个类型，因此需要将传入的字符串双引号去掉。
-  const {data: {fileCoverBrachRepository = []} = {}} = useQuery(`
+  const { data: { fileCoverBrachRepository = [] } = {} } = useQuery(`
           {
              fileCoverBrachRepository(side:${module.replaceAll('"', '')}){
               side
@@ -134,17 +132,20 @@ const LoadBranchCombobox = (module: any) => {
     return combobox;
   }
   for (let index = 0; index < fileCoverBrachRepository.length; index += 1) {
-    combobox.push(<Option
-      value={fileCoverBrachRepository[index].name}> {fileCoverBrachRepository[index].name}</Option>);
+    combobox.push(
+      <Option value={fileCoverBrachRepository[index].name}>
+        {' '}
+        {fileCoverBrachRepository[index].name}
+      </Option>,
+    );
   }
   return combobox;
 };
 
 const LoadProjectCombobox = () => {
-
   const combobox = [<Option value=""> </Option>];
 
-  const {data: {fileCoverBrachModule = []} = {}} = useQuery(`
+  const { data: { fileCoverBrachModule = [] } = {} } = useQuery(`
           {
             fileCoverBrachModule{
               name
@@ -152,10 +153,10 @@ const LoadProjectCombobox = () => {
           }
       `);
 
-
   for (let index = 0; index < fileCoverBrachModule.length; index += 1) {
-    combobox.push(<Option
-      value={fileCoverBrachModule[index].name}> {fileCoverBrachModule[index].name}</Option>);
+    combobox.push(
+      <Option value={fileCoverBrachModule[index].name}> {fileCoverBrachModule[index].name}</Option>,
+    );
   }
   return combobox;
 };
@@ -164,11 +165,11 @@ const BranchTableList: React.FC<any> = () => {
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
   const [conditon, setCondition] = useState({
-    module: "",
-    frontLib: "",
-    backendLib: ""
+    module: '',
+    frontLib: '',
+    backendLib: '',
   });
-  const {data, loading} = useRequest(() => queryBranchViews(gqlClient, conditon));
+  const { data, loading } = useRequest(() => queryBranchViews(gqlClient, conditon));
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -188,18 +189,20 @@ const BranchTableList: React.FC<any> = () => {
     gridApi.current?.sizeColumnsToFit();
   };
 
-
   const updateGrid = async () => {
-
     const datas: any = await queryBranchViews(gqlClient, conditon);
-    gridApi.current?.setRowData(datas);
+    gridApi.current?.setRowData(
+      datas?.flatMap((it: any) =>
+        it.branch.startsWith('emergency') || it.branch.startsWith('stage-patch') ? [] : [it],
+      ) ?? [],
+    );
   };
 
   const projectChanged = (values: any) => {
     console.log(values);
     setCondition({
       ...conditon,
-      module: values
+      module: values,
     });
   };
 
@@ -207,16 +210,15 @@ const BranchTableList: React.FC<any> = () => {
     console.log(values);
     setCondition({
       ...conditon,
-      frontLib: values
+      frontLib: values,
     });
-
   };
 
   const backendLibChanged = (values: any) => {
     console.log(values);
     setCondition({
       ...conditon,
-      backendLib: values
+      backendLib: values,
     });
   };
 
@@ -229,22 +231,21 @@ const BranchTableList: React.FC<any> = () => {
     setVisible(false);
   };
 
-  const cssIndent = {textIndent: '2em'};
+  const cssIndent = { textIndent: '2em' };
   /* endregion */
-
 
   useEffect(() => {
     updateGrid();
-  }, [conditon])
+  }, [conditon]);
 
   return (
     <PageContainer>
-      <div style={{background: 'white'}}>
+      <div style={{ background: 'white' }}>
         <Form.Item>
-          <label style={{marginLeft: '10px'}}>项目名：</label>
+          <label style={{ marginLeft: '10px' }}>项目名：</label>
           <Select
             placeholder="请选择"
-            style={{width: '200px', marginTop: '5px'}}
+            style={{ width: '200px', marginTop: '5px' }}
             showSearch
             optionFilterProp="children"
             onChange={projectChanged}
@@ -252,32 +253,32 @@ const BranchTableList: React.FC<any> = () => {
             {LoadProjectCombobox()}
           </Select>
 
-          <label style={{marginLeft: '20px'}}>前端库：</label>
+          <label style={{ marginLeft: '20px' }}>前端库：</label>
           <Select
             placeholder="请选择"
-            style={{width: '200px', marginTop: '5px'}}
+            style={{ width: '200px', marginTop: '5px' }}
             showSearch
             optionFilterProp="children"
             onChange={frontLibChanged}
           >
-            {LoadBranchCombobox("FRONT")}
+            {LoadBranchCombobox('FRONT')}
           </Select>
 
-          <label style={{marginLeft: '20px'}}>后端库：</label>
+          <label style={{ marginLeft: '20px' }}>后端库：</label>
           <Select
             placeholder="请选择"
-            style={{width: '200px'}}
+            style={{ width: '200px' }}
             showSearch
             optionFilterProp="children"
             onChange={backendLibChanged}
           >
-            {LoadBranchCombobox("BACKEND")}
+            {LoadBranchCombobox('BACKEND')}
           </Select>
 
           <Button
             type="text"
-            style={{color: '#1890FF', float: 'right'}}
-            icon={<QuestionCircleTwoTone/>}
+            style={{ color: '#1890FF', float: 'right' }}
+            icon={<QuestionCircleTwoTone />}
             size={'large'}
             onClick={showRules}
           >
@@ -286,20 +287,23 @@ const BranchTableList: React.FC<any> = () => {
         </Form.Item>
       </div>
 
-      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{ height: gridHeight, width: '100%' }}>
         <AgGridReact
-          rowData={data}
+          rowData={
+            data?.flatMap((it: any) =>
+              it.branch.startsWith('emergency') || it.branch.startsWith('stage-patch') ? [] : [it],
+            ) ?? []
+          }
           defaultColDef={{
             resizable: true,
             sortable: true,
             filter: true,
             flex: 1,
             minWidth: 100,
-            cellStyle: {"margin-top": "-5px"}
+            cellStyle: { 'margin-top': '-5px' },
           }}
-
           autoGroupColumnDef={{
-            minWidth: 130,  // rowGroup 的最大宽度
+            minWidth: 130, // rowGroup 的最大宽度
           }}
           rowHeight={32}
           headerHeight={35}
@@ -316,9 +320,14 @@ const BranchTableList: React.FC<any> = () => {
             hide={true}
             cellRenderer={sideCellRenderer}
           />
-          <AgGridColumn field="moduleName" headerName="项目名" minWidth={150}/>
-          <AgGridColumn field="branch" headerName="分支名" minWidth={150}/>
-          <AgGridColumn field="reportDate" headerName="日期" minWidth={150} cellRenderer={dateCellRenderer}/>
+          <AgGridColumn field="moduleName" headerName="项目名" minWidth={150} />
+          <AgGridColumn field="branch" headerName="分支名" minWidth={150} />
+          <AgGridColumn
+            field="reportDate"
+            headerName="日期"
+            minWidth={150}
+            cellRenderer={dateCellRenderer}
+          />
           <AgGridColumn
             field="instCove"
             headerName="结构覆盖率"
@@ -330,13 +339,13 @@ const BranchTableList: React.FC<any> = () => {
             // type="numericColumn"
             cellRenderer={coverageCellRenderer}
           />
-          <AgGridColumn field="createAt" headerName="扫描时间"/>
+          <AgGridColumn field="createAt" headerName="扫描时间" />
         </AgGridReact>
       </div>
 
       <div>
         <Drawer
-          title={<label style={{fontWeight: 'bold', fontSize: 20}}>计算规则</label>}
+          title={<label style={{ fontWeight: 'bold', fontSize: 20 }}>计算规则</label>}
           placement="right"
           width={300}
           closable={false}

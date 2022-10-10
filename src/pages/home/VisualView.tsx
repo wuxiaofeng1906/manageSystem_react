@@ -162,6 +162,7 @@ const VisualView = () => {
         cls: styles.dotLinePrimary,
         bg: initBg[2],
         plan_release_time: it.plan_time,
+        project: '',
       })),
     );
   };
@@ -223,7 +224,7 @@ const VisualView = () => {
   // 动态列
   const dynamicColumn = useMemo(() => [...baseColumn, ...online], [online]);
 
-  const renderTr = (arr: any[], title: string, showStep = true) => {
+  const renderTr = (arr: any[], title: string, showStep = true, deleteIcon = true) => {
     if (isEmpty(arr)) {
       return (
         <tr>
@@ -262,7 +263,7 @@ const VisualView = () => {
                   ''
                 )}
               </td>
-              {renderTd(it)}
+              {renderTd(it, deleteIcon)}
             </tr>
           );
         })}
@@ -427,7 +428,7 @@ const VisualView = () => {
                 </Form>
               </td>
             </tr>
-            {renderTr(planSource, '上线计划日历', false)}
+            {renderTr(planSource, '上线计划日历', false, false)}
           </tbody>
         </table>
       </div>

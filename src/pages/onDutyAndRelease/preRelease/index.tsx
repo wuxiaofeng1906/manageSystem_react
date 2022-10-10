@@ -45,6 +45,7 @@ const PreRelease: React.FC<any> = () => {
     setCorrespOrder,
     modifyAllLockedArray,
     setGlobalLoading,
+    operteStatus,
   } = useModel('releaseProcess');
 
   // 用于定时任务显示数据，定时任务useEffect中渲染了一次。不能实时更新
@@ -68,27 +69,23 @@ const PreRelease: React.FC<any> = () => {
   const { data, loading } = useRequest(() => alalysisInitData('', releasedNumStr));
 
   // 显示无数据界面
-  const showNoneDataPage = async (data = {}) => {
+  const showNoneDataPage = async (resetPartProcess = {}) => {
     // tab 页面
-    if (currentKey === '' || !isEmpty(data)) {
-      // 如果当前key未空，则获取
+    let releaseNum = currentKey;
+    if (releaseNum === '') {
+      // 如果当前key为空，则获取
       const newNum = await getNewPageNumber();
-      const releaseNum = newNum.data?.ready_release_num;
-      const panesArray: any = [
-        {
-          title: `${releaseNum}灰度预发布`,
-          content: '',
-          key: releaseNum,
-        },
-      ];
-      currentKey = releaseNum;
-      setTabsData(releaseNum, panesArray);
+      releaseNum = newNum.data?.ready_release_num;
     }
+    const panesArray: any = [{ title: `${releaseNum}灰度预发布`, content: '', key: releaseNum }];
+    currentKey = releaseNum;
+    currentPanes = panesArray;
+    setTabsData(releaseNum, panesArray);
 
     // 进度条
     modifyProcessStatus({
       ...processStatus,
-      ...data,
+      ...resetPartProcess,
       // 进度条相关数据和颜色
       releaseProject: 'Gainsboro', // #2BF541
       upgradeService: 'Gainsboro',
@@ -143,14 +140,15 @@ const PreRelease: React.FC<any> = () => {
     if (initData === undefined) {
       return;
     }
-
+    if (releasedNumStr) {
+      currentKey = releasedNumStr;
+    }
     if (initData?.errmessage) {
       // 出现异常情况时候，提醒错误，不更新界面。
       setGlobalLoading(false);
       errorMessage(initData?.errmessage.toString());
       return;
     }
-
     // 自动刷新时无数据不更新数据
     if (isEmpty(initData)) {
       // 初始化的时候无数据再显示，自动刷新无数据不更新界面
@@ -173,8 +171,6 @@ const PreRelease: React.FC<any> = () => {
         setTabsData(tabPageInfo?.activeKey, tabPageInfo?.panes);
       }
     } else {
-      currentPanes = tabPageInfo.panes;
-      currentKey = tabPageInfo.activeKey;
       setTabsData(tabPageInfo?.activeKey, currentPanes);
     }
     // 进度条数据
@@ -243,12 +239,18 @@ const PreRelease: React.FC<any> = () => {
   };
 
   useEffect(() => {
-    showPageInitData(data);
+    currentKey = '';
+    currentPanes = [];
+    showPageInitData(data, true);
   }, [data, loading]);
 
   const interValRef: any = useRef(); // 定时任务数据id保存
   // 定时任务
   useEffect(() => {
+    if (operteStatus && interValRef.current) {
+      clearInterval(interValRef.current);
+      return;
+    }
     if (!interValRef.current) {
       // let count = 0;
       const id = setInterval(async () => {
@@ -275,6 +277,8 @@ const PreRelease: React.FC<any> = () => {
 
   // 窗口关闭释放锁
   window.onunload = () => {
+    currentKey = '';
+    currentPanes = [];
     deleteLockStatus(lockedItem);
   };
 
@@ -297,12 +301,8 @@ const PreRelease: React.FC<any> = () => {
           refreshPage={async () => {
             setTabsData('', []);
             setGlobalLoading(true);
-            // const datas = await alalysisInitData('', '');
-            // showPageInitData(datas, true);
-
-            //新版本
             const datas = await alalysisInitData('', location?.releasedNum as string);
-            showPageInitData(datas);
+            showPageInitData(datas, true);
             setGlobalLoading(false);
           }}
         />

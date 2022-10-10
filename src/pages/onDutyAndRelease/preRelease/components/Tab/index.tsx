@@ -390,7 +390,6 @@ const Tab: React.FC<any> = () => {
       }
     }
   };
-  console.log(tabsData?.panes, 'tab');
   return (
     <div>
       {/* Tabs 标签,固定在上面 */}

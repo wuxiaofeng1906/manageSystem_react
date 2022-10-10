@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Progress, Row, Select, Modal, Button, Form, Checkbox, message } from 'antd';
+import { Progress, Row, Select, Modal, Button, Form, Checkbox } from 'antd';
 import { useModel } from '@@/plugin-model/useModel';
 import { saveProcessResult, executeAutoCheck } from './axiosRequest';
 import { errorMessage, infoMessage, sucMessage } from '@/publicMethods/showMessages';

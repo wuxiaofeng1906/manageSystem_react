@@ -151,7 +151,6 @@ const PreRelease: React.FC<any> = () => {
     }
     // 自动刷新时无数据不更新数据
     if (isEmpty(initData)) {
-      debugger;
       // 初始化的时候无数据再显示，自动刷新无数据不更新界面
       if (initShow) {
         // 无数据重置自动化检查
@@ -163,6 +162,7 @@ const PreRelease: React.FC<any> = () => {
     // Tab数据
     const { tabPageInfo } = initData;
     if (initShow) {
+      // 针对路径无releaseNum时，全量获取所有tab
       if (releaseHistory === 'false' && !currentKey) {
         // 通过链接跳转到固定Tab
         const source: any = await alalysisInitData('tabPageInfo');
@@ -178,11 +178,7 @@ const PreRelease: React.FC<any> = () => {
     const processData: any = await getCheckProcess(tabPageInfo?.activeKey);
     if (processData) {
       // 根据发布结果判定是否可以进行修改
-      if (processData.data?.release_result !== '9') {
-        modifyOperteStatus(true);
-      } else {
-        modifyOperteStatus(false);
-      }
+      modifyOperteStatus(processData.data?.release_result !== '9');
       modifyProcessStatus(await showProgressData(processData.data));
     }
 
@@ -253,11 +249,7 @@ const PreRelease: React.FC<any> = () => {
       return;
     }
     if (!interValRef.current) {
-      // let count = 0;
       const id = setInterval(async () => {
-        // count += 1;
-        // console.log(`刷新次数=${count},定时任务id=${id},currentKey=${currentKey}`);
-        // 刷新
         if (lockedItem === '' && releaseHistory === 'false') {
           // 是历史记录查询则不需要进行刷新
           const datas = await alalysisInitData('', currentKey);
@@ -268,7 +260,7 @@ const PreRelease: React.FC<any> = () => {
       interValRef.current = id;
     }
     return () => clearInterval(interValRef.current);
-  }, [currentKey, operteStatus]);
+  }, [operteStatus]);
 
   /* region 释放锁 */
   // 刷新释放正锁住的锁

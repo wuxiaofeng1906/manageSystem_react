@@ -38,7 +38,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data), loading };
+    return { data: formatTreeData(data.data, false, 1), loading };
   },
   // feedback
   async feedback({ client, params, identity }: IStatisticQuery) {
@@ -68,7 +68,38 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data), loading };
+    return { data: formatTreeData(data.data, false, 1), loading };
+  },
+
+  // 线上反馈平均上线时长
+  async onlineTime({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:testOnlineFeedbackAvgonlineDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+        total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            parent{
+              dept
+              deptName
+            }
+            kpi
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData(data.data, false, 1), loading };
   },
 
   async productScale({ client, params, identity }: IStatisticQuery) {
@@ -176,7 +207,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data), loading };
+    return { data: formatTreeData(data.data, false, 1), loading };
   },
 
   // 阻塞测试工作量
@@ -284,6 +315,30 @@ const StatisticServices = {
             date
             numerator
             denominator
+          }
+        }
+      }
+  `);
+    return { data: data.data };
+  },
+  // 服务 -交付吞吐量
+  async deliverThroughput({
+    client,
+    params,
+  }: {
+    client: GqlClient<object>;
+    params: { kind: number; ends: string };
+  }) {
+    const { data } = await client.query(`
+      {
+         data:deliverThroughput(kind: "${params.kind}", ends: ${params.ends}) {
+          range{
+            start
+            end
+          }
+          datas{
+            date
+            kpi
           }
         }
       }

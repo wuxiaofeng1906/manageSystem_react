@@ -194,7 +194,11 @@ export const IDrawer = ({
             ? it.title && <p style={{ fontWeight: 'bold' }}>{`${i + 1}.${it.title}:`}</p>
             : it.title}
           {it.child?.map((v) =>
-            isString(v) ? <p style={{ textIndent: '2em', margin: '5px 0' }}>{`${v};`}</p> : v,
+            isString(v) ? (
+              <p key={v} style={{ textIndent: '2em', margin: '5px 0' }}>{`${v};`}</p>
+            ) : (
+              v
+            ),
           )}
           {!isEmpty(it.table) && (
             <Table

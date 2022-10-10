@@ -42,7 +42,7 @@ const ICard = (params: {
     });
   };
   return (
-    <div style={{ background: params.data.bg || initBg[0] }} className={styles.item}>
+    <div style={{ background: params.data.bg || initBg[0] }} className={styles.icard}>
       {params.child || <div />}
       <div className={styles.wrapper}>
         <span className={styles.label}>发布项目:</span>

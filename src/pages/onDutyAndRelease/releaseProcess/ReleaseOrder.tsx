@@ -101,7 +101,7 @@ const ReleaseOrder = () => {
         ...res,
         cluster: res.cluster?.map((it: any) => it.name) ?? [],
       });
-      setFinished(isEmpty(res.release_result) || res.release_result !== 'unknown');
+      setFinished(!isEmpty(res.release_result) && res.release_result !== 'unknown');
       setOrderData(res.ready_data ?? []);
       await formatCompare(res?.ops_repair_order_data ?? [], res?.ready_data ?? []);
       setSpinning(false);
@@ -226,6 +226,13 @@ const ReleaseOrder = () => {
   };
 
   const onRemove = (data: any) => {
+    // [ag-grid]拿不到最新的state
+    const release_result = orderForm.getFieldValue('release_result');
+    const hasResult = !isEmpty(release_result) && release_result != 'unknown';
+    if (hasResult || !hasPermission) {
+      return infoMessage(hasResult ? '已标记发布结果不能删除积压工单' : '您无删除积压工单权限');
+    }
+
     Modal.confirm({
       centered: true,
       title: '删除积压工单提醒：',
@@ -368,7 +375,6 @@ const ReleaseOrder = () => {
                     size={'small'}
                     type={'text'}
                     onClick={() => onRemove(p.data)}
-                    disabled={finished}
                     style={{ color: '#fb5858', padding: 0, fontWeight: 500 }}
                   >
                     永久删除积压工单

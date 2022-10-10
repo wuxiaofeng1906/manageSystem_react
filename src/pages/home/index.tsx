@@ -9,15 +9,12 @@ import DutyListServices from '@/services/dutyList';
 import VisualView from '@/pages/home/VisualView';
 
 const Home = () => {
-  const dateStart = dayjs().day(0);
-  const dateEnd = dayjs().day(6);
-  const oldSafari = {
-    start_time: dayjs(
-      `${dateStart.year()}-${dateStart.month() + 1}-${dateStart.date() + 1}`,
-    ).format('YYYY/MM/DD'),
-    end_time: dayjs(`${dateEnd.year()}-${dateEnd.month() + 1}-${dateEnd.date() + 1}`).format(
-      'YYYY/MM/DD',
-    ),
+  const from = dayjs().subtract(1, 'd').startOf('w').subtract(0, 'w');
+  const to = from.endOf('w');
+
+  const range = {
+    start_time: dayjs(from).add(1, 'day').format('YYYY/MM/DD'),
+    end_time: dayjs(to).add(1, 'day').format('YYYY/MM/DD'),
   };
 
   const gridRef = useRef<GridApi>();
@@ -28,7 +25,7 @@ const Home = () => {
     params.api.sizeColumnsToFit();
   };
   const getFirstDuty = async () => {
-    const firstDuty = await DutyListServices.getFirstDutyPerson(oldSafari);
+    const firstDuty = await DutyListServices.getFirstDutyPerson(range);
     const duty = firstDuty?.data?.flat().filter((it: any) => it.duty_order == '1');
     let obj = {};
     duty?.forEach((it: any) => {
@@ -46,8 +43,8 @@ const Home = () => {
         className={styles.card}
         title={
           <span>
-            值班信息：{dayjs(oldSafari.start_time).format('YYYY-MM-DD')}~
-            {dayjs(oldSafari.end_time).format('YYYY-MM-DD')}
+            值班信息：{dayjs(range.start_time).format('YYYY-MM-DD')}~
+            {dayjs(range.end_time).format('YYYY-MM-DD')}
           </span>
         }
       >

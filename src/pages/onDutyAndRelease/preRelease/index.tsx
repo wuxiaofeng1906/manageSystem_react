@@ -151,6 +151,7 @@ const PreRelease: React.FC<any> = () => {
     }
     // 自动刷新时无数据不更新数据
     if (isEmpty(initData)) {
+      debugger;
       // 初始化的时候无数据再显示，自动刷新无数据不更新界面
       if (initShow) {
         // 无数据重置自动化检查
@@ -162,7 +163,7 @@ const PreRelease: React.FC<any> = () => {
     // Tab数据
     const { tabPageInfo } = initData;
     if (initShow) {
-      if (releaseHistory === 'false') {
+      if (releaseHistory === 'false' && !currentKey) {
         // 通过链接跳转到固定Tab
         const source: any = await alalysisInitData('tabPageInfo');
         const tabsInfomation: any = source?.tabPageInfo;
@@ -247,7 +248,7 @@ const PreRelease: React.FC<any> = () => {
   const interValRef: any = useRef(); // 定时任务数据id保存
   // 定时任务
   useEffect(() => {
-    if (operteStatus && interValRef.current) {
+    if (operteStatus && !currentKey) {
       clearInterval(interValRef.current);
       return;
     }
@@ -267,7 +268,7 @@ const PreRelease: React.FC<any> = () => {
       interValRef.current = id;
     }
     return () => clearInterval(interValRef.current);
-  }, []);
+  }, [currentKey, operteStatus]);
 
   /* region 释放锁 */
   // 刷新释放正锁住的锁

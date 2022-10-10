@@ -101,7 +101,7 @@ const ICard = (params: {
         </p>
       )}
 
-      {hasPermission || params.deleteIcon == true ? (
+      {hasPermission && params.deleteIcon == true ? (
         <img
           src={require('../../../public/delete_black_2.png')}
           className={styles.deleteIcon}
@@ -224,7 +224,7 @@ const VisualView = () => {
   // 动态列
   const dynamicColumn = useMemo(() => [...baseColumn, ...online], [online]);
 
-  const renderTr = (arr: any[], title: string, showStep = true, deleteIcon = true) => {
+  const renderTr = (arr: any[], title: string, showStep = true, deleteIcon?: boolean) => {
     if (isEmpty(arr)) {
       return (
         <tr>
@@ -271,7 +271,7 @@ const VisualView = () => {
     );
   };
 
-  const renderTd = (data: any) => {
+  const renderTd = (data: any, deleteIcon?: boolean) => {
     return (
       <Fragment>
         {dynamicColumn.map((it, index) => {
@@ -281,7 +281,7 @@ const VisualView = () => {
                 <ICard
                   data={data}
                   onRefresh={getViewData}
-                  deleteIcon={index < 1}
+                  deleteIcon={deleteIcon ?? index < 1}
                   child={
                     <div>
                       {data?.cluster?.map((env: any, i: number) => {

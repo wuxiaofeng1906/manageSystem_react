@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './index.less';
-import { Select, DatePicker, Card } from 'antd';
+import { Card } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { dutyColumn } from '@/pages/home/column';
 import * as dayjs from 'dayjs';
 import DutyListServices from '@/services/dutyList';
 import VisualView from '@/pages/home/VisualView';
+import { isEmpty } from 'lodash';
 
 const Home = () => {
   const from = dayjs().subtract(1, 'd').startOf('w').subtract(0, 'w');
@@ -31,7 +32,7 @@ const Home = () => {
     duty?.forEach((it: any) => {
       obj[it.user_tech] = it.user_name;
     });
-    setDutyPerson([obj]);
+    setDutyPerson(isEmpty(obj) ? [] : [obj]);
   };
   useEffect(() => {
     getFirstDuty();

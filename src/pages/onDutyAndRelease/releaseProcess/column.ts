@@ -81,7 +81,7 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
   {
     headerName: type == 'history' ? '发布时间' : '计划发布时间',
     field: 'plan_release_time',
-    minWidth: 100,
+    minWidth: 150,
   },
   {
     headerName: '操作',

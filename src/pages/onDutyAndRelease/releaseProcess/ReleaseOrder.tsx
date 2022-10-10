@@ -155,21 +155,25 @@ const ReleaseOrder = () => {
           : rdOrigin[i],
       );
     });
-
-    ops?.slice(0, 5).forEach((it: any, i: number) => {
+    // 临时的假数据
+    if (ops.length > 100) {
+      ops = ops?.slice(0, 5);
+    }
+    ops.forEach((it: any, i: number) => {
       const otherOrder = !['BlueGreenDeploy', 'TenantStopDeploy'].includes(it.release_order_type);
+      const rdId = rdArr[i]?.repair_order;
+      const opsTitle = it.label
+        ?.substring(it.label.indexOf('title:') + 7, it.label.indexOf('状态:'))
+        ?.trim();
+
       mergeArr.push({
         opsId: String(it.id ?? ''),
-        opsTitle: it.label
-          ?.substring(it.label.indexOf('title:') + 7, it.label.indexOf('状态:'))
-          ?.trim(),
+        opsTitle: it.id ? `${it.id}:${opsTitle}` : opsTitle,
         opsType: it.release_order_type,
-        rd: rdArr[i]?.repair_order,
-        rdTitle: rdArr[i]?.repair_order ? `${rdArr[i]?.repair_order}:${rdArr[i]?.project}` : '',
-        rdType: rdArr[i]?.repair_order
-          ? `${rdArr[i]?.repair_order}:${rdArr[i]?.repair_order_type}`
-          : '',
-        status: otherOrder ? '' : String(it.id) == String(rdArr[i]?.repair_order),
+        rd: rdId,
+        rdTitle: rdId ? `${rdId}:${rdArr[i]?.project}` : rdArr[i]?.project ?? '',
+        rdType: rdId ? `${rdId}:${rdArr[i]?.repair_order_type}` : '',
+        status: otherOrder ? '' : String(it.id) == String(rdId),
       });
     });
     setCompareData({ opsData: ops, alpha: mergeArr });

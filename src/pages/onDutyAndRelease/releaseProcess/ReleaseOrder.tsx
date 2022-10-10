@@ -308,18 +308,39 @@ const ReleaseOrder = () => {
                 </Form.Item>
               </Col>
               <Col span={3}>
-                <Form.Item name={'release_result'}>
-                  <Select
-                    disabled={finished}
-                    options={[
-                      { label: '发布成功', value: 'success', key: 'success' },
-                      { label: '发布失败', value: 'failure', key: 'failure' },
-                      { label: '取消发布', value: 'cancel', key: 'cancel' },
-                      { label: ' ', value: 'unknown', key: 'unknown' },
-                    ]}
-                    style={{ width: '100%' }}
-                    placeholder={'标记发布结果'}
-                  />
+                <Form.Item
+                  noStyle
+                  shouldUpdate={(old, current) => old.release_result != current.release_result}
+                >
+                  {({ getFieldValue }) => {
+                    const result = getFieldValue('release_result');
+                    const color = { success: '#2BF541', failure: 'red' };
+                    return (
+                      <Form.Item name={'release_result'}>
+                        <Select
+                          allowClear={true}
+                          disabled={finished}
+                          className={styles.selectColor}
+                          options={[
+                            { label: '发布成功', value: 'success', key: 'success' },
+                            { label: '发布失败', value: 'failure', key: 'failure' },
+                            { label: '取消发布', value: 'cancel', key: 'cancel' },
+                            { label: ' ', value: 'unknown', key: 'unknown' },
+                          ]}
+                          style={{
+                            width: '100%',
+                            fontWeight: 'bold',
+                            color: color[result] ?? 'initial',
+                          }}
+                          placeholder={
+                            <span style={{ color: '#00bb8f', fontWeight: 'initial' }}>
+                              标记发布结果
+                            </span>
+                          }
+                        />
+                      </Form.Item>
+                    );
+                  }}
                 </Form.Item>
               </Col>
             </Form>

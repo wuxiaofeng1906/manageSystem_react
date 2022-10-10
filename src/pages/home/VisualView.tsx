@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, Fragment } from 'react';
 import styles from './index.less';
 import cns from 'classnames';
-import { Collapse, Form, Select, DatePicker, Col, Card, Modal } from 'antd';
+import { Collapse, Form, Select, DatePicker, Col, Card, Modal, Spin } from 'antd';
 import { useModel } from 'umi';
 import PreReleaseServices from '@/services/preRelease';
 import { isEmpty, sortBy, uniqBy, cloneDeep, isArray } from 'lodash';
@@ -116,6 +116,7 @@ const ICard = (params: {
 
 const VisualView = () => {
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
   const [project, setProject] = useState<any[]>([]);
   const [branch, setBranch] = useState<any[]>([]);
   const [online, setOnline] = useState<{ name: string; value: string }[]>([
@@ -168,56 +169,62 @@ const VisualView = () => {
   };
 
   const getViewData = async () => {
-    const basic = await PreReleaseServices.releaseBaseline();
-    const currentDay = await PreReleaseServices.releaseView();
-    const plan = await PreReleaseServices.releasePlan({});
+    setLoading(true);
+    try {
+      const basic = await PreReleaseServices.releaseBaseline();
+      const currentDay = await PreReleaseServices.releaseView();
+      const plan = await PreReleaseServices.releasePlan({});
 
-    const basicOnline = basic.map((it: any) => it.cluster)?.flat() ?? [];
-    const currentOnline = currentDay.map((it: any) => it.cluster)?.flat() ?? [];
-    const planOnline = plan.map((it: any) => it.cluster)?.flat() ?? [];
+      const basicOnline = basic.map((it: any) => it.cluster)?.flat() ?? [];
+      const currentOnline = currentDay.map((it: any) => it.cluster)?.flat() ?? [];
+      const planOnline = plan.map((it: any) => it.cluster)?.flat() ?? [];
 
-    setCurrentSource(
-      currentDay?.map((it: any) => {
-        const isRed =
-          it.project.includes('stage-patch') ||
-          it.project.includes('stagepatch') ||
-          it.project.includes('emergency');
-        return {
+      setCurrentSource(
+        currentDay?.map((it: any) => {
+          const isRed =
+            it.project.includes('stage-patch') ||
+            it.project.includes('stagepatch') ||
+            it.project.includes('emergency');
+          return {
+            ...it,
+            baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
+            cls: isRed ? styles.dotLineEmergency : styles.dotLineSuccess,
+            bg: isRed ? initBg[1] : initBg[0],
+          };
+        }),
+      );
+      setPlanSource(
+        plan?.map((it: any) => ({
           ...it,
           baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
-          cls: isRed ? styles.dotLineEmergency : styles.dotLineSuccess,
-          bg: isRed ? initBg[1] : initBg[0],
-        };
-      }),
-    );
-    setPlanSource(
-      plan?.map((it: any) => ({
-        ...it,
-        baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
-        cls: styles.dotLinePrimary,
-        bg: initBg[2],
-        plan_release_time: it.plan_time,
-      })),
-    );
-    // 去重并排序(动态列计算)
-    let formatOnline = sortBy(
-      uniqBy([...basicOnline, ...currentOnline, ...planOnline], 'name').flatMap((it) =>
-        ignore.includes(it.name) ? [] : [it],
-      )['value'],
-    );
-    if (isEmpty(formatOnline)) formatOnline = [{ name: '', value: '' }];
-    const basicGroup: any[] = [];
-    cloneDeep(baseColumn)
-      .splice(1)
-      .concat(formatOnline)
-      .forEach((it) => {
-        basicGroup.push({
-          name: it.name,
-          children: basic.filter((re: any) => re.cluster.includes(it.name)) ?? [],
+          cls: styles.dotLinePrimary,
+          bg: initBg[2],
+          plan_release_time: it.plan_time,
+        })),
+      );
+      // 去重并排序(动态列计算)
+      let formatOnline = sortBy(
+        uniqBy([...basicOnline, ...currentOnline, ...planOnline], 'name').flatMap((it) =>
+          ignore.includes(it.name) ? [] : [it],
+        )['value'],
+      );
+      if (isEmpty(formatOnline)) formatOnline = [{ name: '', value: '' }];
+      const basicGroup: any[] = [];
+      cloneDeep(baseColumn)
+        .splice(1)
+        .concat(formatOnline)
+        .forEach((it) => {
+          basicGroup.push({
+            name: it.name,
+            children: basic.filter((re: any) => re.cluster.includes(it.name)) ?? [],
+          });
         });
-      });
-    setBasicSource(basicGroup);
-    setOnline(formatOnline);
+      setBasicSource(basicGroup);
+      setOnline(formatOnline);
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+    }
   };
 
   const onlineLen = useMemo(() => online.length, [online]);
@@ -348,90 +355,92 @@ const VisualView = () => {
 
   return (
     <Card title={'待发布视图'} className={styles.card}>
-      <div className={styles.visualView}>
-        <table>
-          <colgroup>
-            <col style={{ maxWidth: 50, width: 30 }} />
-            <col style={{ width: 100, maxWidth: 120 }} />
-          </colgroup>
-          <thead>
-            <tr>
-              {thead.map((title) => {
-                const isOnline = title == '线上';
-                const singleW = 240;
-                return (
-                  <th
-                    key={title}
-                    rowSpan={isOnline ? 1 : 2}
-                    colSpan={isOnline ? onlineLen : title == '类别' ? 2 : 1}
-                    style={
-                      title == '类别'
-                        ? { width: 130, maxWidth: 170 }
-                        : { width: `${isOnline ? singleW * (onlineLen || 1) : singleW}px` }
-                    }
+      <Spin spinning={loading} tip={'数据加载中...'}>
+        <div className={styles.visualView}>
+          <table>
+            <colgroup>
+              <col style={{ maxWidth: 50, width: 30 }} />
+              <col style={{ width: 100, maxWidth: 120 }} />
+            </colgroup>
+            <thead>
+              <tr>
+                {thead.map((title) => {
+                  const isOnline = title == '线上';
+                  const singleW = 240;
+                  return (
+                    <th
+                      key={title}
+                      rowSpan={isOnline ? 1 : 2}
+                      colSpan={isOnline ? onlineLen : title == '类别' ? 2 : 1}
+                      style={
+                        title == '类别'
+                          ? { width: 130, maxWidth: 170 }
+                          : { width: `${isOnline ? singleW * (onlineLen || 1) : singleW}px` }
+                      }
+                    >
+                      {title}
+                    </th>
+                  );
+                })}
+              </tr>
+              <tr>
+                {online.map((it) => (it.name == '' ? '' : <th key={it.name}>{it.name ?? ''}</th>))}
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th colSpan={2}>版本基准</th>
+                <td className={styles.obliqueLine} />
+                {renderBasicTd}
+              </tr>
+              {renderTr(currentSource, '当天待发版')}
+              {/*搜索条件*/}
+              <tr>
+                <td colSpan={onlineLen + 5}>
+                  <Form
+                    form={form}
+                    size={'small'}
+                    layout={'inline'}
+                    className={styles.condition}
+                    onFieldsChange={getPlanList}
                   >
-                    {title}
-                  </th>
-                );
-              })}
-            </tr>
-            <tr>
-              {online.map((it) => (it.name == '' ? '' : <th key={it.name}>{it.name ?? ''}</th>))}
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th colSpan={2}>版本基准</th>
-              <td className={styles.obliqueLine} />
-              {renderBasicTd}
-            </tr>
-            {renderTr(currentSource, '当天待发版')}
-            {/*搜索条件*/}
-            <tr>
-              <td colSpan={onlineLen + 5}>
-                <Form
-                  form={form}
-                  size={'small'}
-                  layout={'inline'}
-                  className={styles.condition}
-                  onFieldsChange={getPlanList}
-                >
-                  <Col span={8}>
-                    <Form.Item name={'project_id'} label={'项目名称'}>
-                      <Select
-                        style={{ width: '100%' }}
-                        options={project}
-                        placeholder={'项目名称'}
-                        mode={'multiple'}
-                        showSearch
-                        optionFilterProp={'label'}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col span={8}>
-                    <Form.Item name={'branch'} label={'分支名称'}>
-                      <Select
-                        style={{ width: '100%' }}
-                        options={branch}
-                        placeholder={'分支名称'}
-                        mode={'multiple'}
-                        showSearch
-                        optionFilterProp={'label'}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col span={8}>
-                    <Form.Item name={'plan_time'} label={'计划上线日期'}>
-                      <DatePicker style={{ width: '100%' }} />
-                    </Form.Item>
-                  </Col>
-                </Form>
-              </td>
-            </tr>
-            {renderTr(planSource, '上线计划日历', false, false)}
-          </tbody>
-        </table>
-      </div>
+                    <Col span={8}>
+                      <Form.Item name={'project_id'} label={'项目名称'}>
+                        <Select
+                          style={{ width: '100%' }}
+                          options={project}
+                          placeholder={'项目名称'}
+                          mode={'multiple'}
+                          showSearch
+                          optionFilterProp={'label'}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                      <Form.Item name={'branch'} label={'分支名称'}>
+                        <Select
+                          style={{ width: '100%' }}
+                          options={branch}
+                          placeholder={'分支名称'}
+                          mode={'multiple'}
+                          showSearch
+                          optionFilterProp={'label'}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                      <Form.Item name={'plan_time'} label={'计划上线日期'}>
+                        <DatePicker style={{ width: '100%' }} />
+                      </Form.Item>
+                    </Col>
+                  </Form>
+                </td>
+              </tr>
+              {renderTr(planSource, '上线计划日历', false, false)}
+            </tbody>
+          </table>
+        </div>
+      </Spin>
     </Card>
   );
 };

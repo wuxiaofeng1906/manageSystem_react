@@ -24,7 +24,7 @@ const ICard = (params: {
   deleteIcon?: boolean;
 }) => {
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
-  const isLink = params.data.baseline_cluster == 'office';
+  const baseline = params.data.baseline_cluster == 'offline';
   const hasPermission = useMemo(() => user?.group == 'superGroup', [user]);
 
   const onRemove = async (data: any) => {
@@ -47,17 +47,23 @@ const ICard = (params: {
       <div className={styles.wrapper}>
         <span className={styles.label}>发布项目:</span>
         {isArray(params.data.project) ? (
-          params.data.project?.map((it: any) => (
-            <span
-              className={cns(isLink ? styles.link : '', styles.value)}
-              onClick={() => {
-                if (!it.pro_id || !isLink) return;
-                window.open(`http://zentao.77hub.com/zentao/execution-task-${it.pro_id}.html`);
-              }}
-            >
-              {it.pro_name ?? ''}
-            </span>
-          ))
+          params.data.project?.map((it: any) => {
+            const linkProject =
+              it.pro_name?.startsWith('emergency') ||
+              it.pro_name?.startsWith('stagepatch') ||
+              it.pro_name?.startsWith('stage-patch');
+            return (
+              <span
+                className={cns(baseline && linkProject ? styles.link : '', styles.value)}
+                onClick={() => {
+                  if (!it.pro_id || !(baseline && linkProject)) return;
+                  window.open(`http://zentao.77hub.com/zentao/execution-task-${it.pro_id}.html`);
+                }}
+              >
+                {it.pro_name ?? ''}
+              </span>
+            );
+          })
         ) : (
           <span className={styles.value}>{params.data.project}</span>
         )}
@@ -73,9 +79,9 @@ const ICard = (params: {
           <span className={styles.label}>发布需求:</span>
           {params.data.story?.split(',')?.map((ztno: number) => (
             <span
-              className={isLink ? styles.link : ''}
+              className={baseline ? styles.link : ''}
               onClick={() => {
-                if (!ztno || !isLink) return;
+                if (!ztno || !baseline) return;
                 window.open(`http://zentao.77hub.com/zentao/story-view-${ztno}.html`);
               }}
             >
@@ -163,7 +169,6 @@ const VisualView = () => {
         cls: styles.dotLinePrimary,
         bg: initBg[2],
         plan_release_time: it.plan_time,
-        project: '',
       })),
     );
   };
@@ -178,13 +183,14 @@ const VisualView = () => {
       const basicOnline = basic.map((it: any) => it.cluster)?.flat() ?? [];
       const currentOnline = currentDay.map((it: any) => it.cluster)?.flat() ?? [];
       const planOnline = plan.map((it: any) => it.cluster)?.flat() ?? [];
-
       setCurrentSource(
         currentDay?.map((it: any) => {
-          const isRed =
-            it.project.includes('stage-patch') ||
-            it.project.includes('stagepatch') ||
-            it.project.includes('emergency');
+          const isRed = it.project?.some(
+            (pro: any) =>
+              pro.pro_name?.startsWith('emergency') ||
+              pro.pro_name?.startsWith('stagepatch') ||
+              pro.pro_name?.startsWith('stage-patch'),
+          );
           return {
             ...it,
             baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
@@ -200,14 +206,25 @@ const VisualView = () => {
           cls: styles.dotLinePrimary,
           bg: initBg[2],
           plan_release_time: it.plan_time,
+          release_env: it.cluster?.map((it: any) => it.value)?.join(',') ?? '',
         })),
       );
       // 去重并排序(动态列计算)
       let formatOnline = sortBy(
-        uniqBy([...basicOnline, ...currentOnline, ...planOnline], 'name').flatMap((it) =>
-          ignore.includes(it.name) ? [] : [it],
-        )['value'],
+        uniqBy(
+          [
+            ...basicOnline?.map((name: string) => ({
+              name,
+              value: name?.replace('cn-northwest-', '集群'),
+            })),
+            ...currentOnline,
+            ...planOnline,
+          ],
+          'name',
+        ).flatMap((it) => (ignore.includes(it.name) ? [] : [it])),
+        ['name'],
       );
+
       if (isEmpty(formatOnline)) formatOnline = [{ name: '', value: '' }];
       const basicGroup: any[] = [];
       cloneDeep(baseColumn)
@@ -384,7 +401,7 @@ const VisualView = () => {
                 })}
               </tr>
               <tr>
-                {online.map((it) => (it.name == '' ? '' : <th key={it.name}>{it.name ?? ''}</th>))}
+                {online.map((it) => (it.name == '' ? '' : <th key={it.name}>{it.value ?? ''}</th>))}
               </tr>
             </thead>
             <tbody>

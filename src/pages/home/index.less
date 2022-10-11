@@ -43,6 +43,11 @@
             .value{
               max-width: 70%;
               word-break: break-all;
+              &:not(:last-child){
+                &:after{
+                  content: ',';
+                }
+              }
             }
           }
           .link{

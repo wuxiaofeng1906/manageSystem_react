@@ -14,6 +14,7 @@ import { useModel, useParams } from 'umi';
 import { isEmpty, omit } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
 import moment from 'moment';
+import { PageContainer } from '@ant-design/pro-layout';
 
 const ReleaseOrder = () => {
   const { id } = useParams() as { id: string };
@@ -250,136 +251,170 @@ const ReleaseOrder = () => {
 
   return (
     <Spin spinning={spinning} tip="数据加载中...">
-      <div className={styles.releaseOrder}>
-        <Collapse defaultActiveKey={'1'} className={styles.collapse}>
-          <Collapse.Panel key={'1'} header={'工单'}>
-            <div className={styles.save}>
-              <Button size={'small'} onClick={onSave} disabled={finished}>
-                保存
-              </Button>
-            </div>
-            <Form layout={'inline'} size={'small'} form={orderForm} className={styles.baseInfo}>
-              <Col span={4}>
-                <Form.Item name={'release_way'} label={'发布方式'}>
+      <PageContainer>
+        <div className={styles.releaseOrder}>
+          <Collapse defaultActiveKey={'1'} className={styles.collapse}>
+            <Collapse.Panel key={'1'} header={'工单'}>
+              <div className={styles.save}>
+                <Button size={'small'} onClick={onSave} disabled={finished}>
+                  保存
+                </Button>
+              </div>
+              <Form layout={'inline'} size={'small'} form={orderForm} className={styles.baseInfo}>
+                <Col span={4}>
+                  <Form.Item name={'release_way'} label={'发布方式'}>
+                    <Select
+                      disabled
+                      style={{ width: '100%' }}
+                      options={[
+                        { label: '停服', value: 'stop_server' },
+                        { label: '不停服', value: 'keep_server' },
+                      ]}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={5}>
+                  <Form.Item name={'plan_release_time'} label={'发布时间'}>
+                    <DatePicker
+                      style={{ width: '100%' }}
+                      showTime
+                      format={'YYYY-MM-DD HH:mm'}
+                      disabled={finished}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={6}>
+                  <Form.Item name={'announcement_num'} label={'关联公告'} required>
+                    <Select
+                      showSearch
+                      disabled={finished}
+                      optionFilterProp={'label'}
+                      options={[{ key: '免', value: '免', label: '免' }].concat(announcementList)}
+                      style={{ width: '100%' }}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={6}>
+                  <Form.Item name={'person_duty_num'} label={'值班名单'}>
+                    <Select
+                      showSearch
+                      disabled={finished}
+                      optionFilterProp={'label'}
+                      options={[{ key: '免', value: '免', label: '免' }].concat(dutyList)}
+                      style={{ width: '100%' }}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col span={3}>
+                  <Form.Item
+                    noStyle
+                    shouldUpdate={(old, current) => old.release_result != current.release_result}
+                  >
+                    {({ getFieldValue }) => {
+                      const result = getFieldValue('release_result');
+                      const color = { success: '#2BF541', failure: 'red' };
+                      return (
+                        <Form.Item name={'release_result'}>
+                          <Select
+                            allowClear={true}
+                            disabled={finished}
+                            className={styles.selectColor}
+                            options={[
+                              { label: '发布成功', value: 'success', key: 'success' },
+                              { label: '发布失败', value: 'failure', key: 'failure' },
+                              { label: '取消发布', value: 'cancel', key: 'cancel' },
+                              { label: ' ', value: 'unknown', key: 'unknown' },
+                            ]}
+                            style={{
+                              width: '100%',
+                              fontWeight: 'bold',
+                              color: color[result] ?? 'initial',
+                            }}
+                            placeholder={
+                              <span style={{ color: '#00bb8f', fontWeight: 'initial' }}>
+                                标记发布结果
+                              </span>
+                            }
+                          />
+                        </Form.Item>
+                      );
+                    }}
+                  </Form.Item>
+                </Col>
+              </Form>
+            </Collapse.Panel>
+          </Collapse>
+
+          <FieldSet data={{ title: '工单-基础设置' }}>
+            <Form layout={'inline'} size={'small'} form={baseForm} className={styles.baseInfo}>
+              <Col span={6}>
+                <Form.Item name={'release_type'} label={'工单类型选择'}>
                   <Select
+                    options={[{ label: '灰度推生产', value: 'backlog_release' }]}
+                    style={{ width: '100%' }}
                     disabled
-                    style={{ width: '100%' }}
-                    options={[
-                      { label: '停服', value: 'stop_server' },
-                      { label: '不停服', value: 'keep_server' },
-                    ]}
                   />
                 </Form.Item>
               </Col>
-              <Col span={5}>
-                <Form.Item name={'plan_release_time'} label={'发布时间'}>
-                  <DatePicker
-                    style={{ width: '100%' }}
-                    showTime
-                    format={'YYYY-MM-DD HH:mm'}
-                    disabled={finished}
-                  />
+              <Col span={8}>
+                <Form.Item name={'release_name'} label={'工单名称'} required>
+                  <Input style={{ width: '100%' }} disabled={finished} />
                 </Form.Item>
               </Col>
-              <Col span={6}>
-                <Form.Item name={'announcement_num'} label={'关联公告'} required>
+              <Col span={10}>
+                <Form.Item name={'cluster'} label={'发布环境'} required>
                   <Select
                     showSearch
                     disabled={finished}
-                    optionFilterProp={'label'}
-                    options={[{ key: '免', value: '免', label: '免' }].concat(announcementList)}
+                    options={envList}
                     style={{ width: '100%' }}
+                    mode={'multiple'}
+                    onChange={onLinkTable}
                   />
-                </Form.Item>
-              </Col>
-              <Col span={6}>
-                <Form.Item name={'person_duty_num'} label={'值班名单'}>
-                  <Select
-                    showSearch
-                    disabled={finished}
-                    optionFilterProp={'label'}
-                    options={[{ key: '免', value: '免', label: '免' }].concat(dutyList)}
-                    style={{ width: '100%' }}
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={3}>
-                <Form.Item
-                  noStyle
-                  shouldUpdate={(old, current) => old.release_result != current.release_result}
-                >
-                  {({ getFieldValue }) => {
-                    const result = getFieldValue('release_result');
-                    const color = { success: '#2BF541', failure: 'red' };
-                    return (
-                      <Form.Item name={'release_result'}>
-                        <Select
-                          allowClear={true}
-                          disabled={finished}
-                          className={styles.selectColor}
-                          options={[
-                            { label: '发布成功', value: 'success', key: 'success' },
-                            { label: '发布失败', value: 'failure', key: 'failure' },
-                            { label: '取消发布', value: 'cancel', key: 'cancel' },
-                            { label: ' ', value: 'unknown', key: 'unknown' },
-                          ]}
-                          style={{
-                            width: '100%',
-                            fontWeight: 'bold',
-                            color: color[result] ?? 'initial',
-                          }}
-                          placeholder={
-                            <span style={{ color: '#00bb8f', fontWeight: 'initial' }}>
-                              标记发布结果
-                            </span>
-                          }
-                        />
-                      </Form.Item>
-                    );
-                  }}
                 </Form.Item>
               </Col>
             </Form>
-          </Collapse.Panel>
-        </Collapse>
-
-        <FieldSet data={{ title: '工单-基础设置' }}>
-          <Form layout={'inline'} size={'small'} form={baseForm} className={styles.baseInfo}>
-            <Col span={6}>
-              <Form.Item name={'release_type'} label={'工单类型选择'}>
-                <Select
-                  options={[{ label: '灰度推生产', value: 'backlog_release' }]}
-                  style={{ width: '100%' }}
-                  disabled
-                />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item name={'release_name'} label={'工单名称'} required>
-                <Input style={{ width: '100%' }} disabled={finished} />
-              </Form.Item>
-            </Col>
-            <Col span={10}>
-              <Form.Item name={'cluster'} label={'发布环境'} required>
-                <Select
-                  showSearch
-                  disabled={finished}
-                  options={envList}
-                  style={{ width: '100%' }}
-                  mode={'multiple'}
-                  onChange={onLinkTable}
-                />
-              </Form.Item>
-            </Col>
-          </Form>
-        </FieldSet>
-        <FieldSet data={{ title: '工单-表单设置' }}>
+          </FieldSet>
+          <FieldSet data={{ title: '工单-表单设置' }}>
+            <div className="ag-theme-alpine" style={{ height: 300, width: '100%', marginTop: 8 }}>
+              <AgGridReact
+                columnDefs={historyOrderColumn.flatMap((it) => [
+                  { ...it, hide: it.headerName == '操作' && !hasPermission },
+                ])}
+                rowData={orderData}
+                defaultColDef={{
+                  resizable: true,
+                  filter: true,
+                  flex: 1,
+                  suppressMenu: true,
+                  cellStyle: { 'line-height': '28px' },
+                }}
+                rowHeight={28}
+                headerHeight={30}
+                onGridReady={onGridReady}
+                onGridSizeChanged={onGridReady}
+                frameworkComponents={{
+                  deleteOrder: (p: CellClickedEvent) => (
+                    <Button
+                      size={'small'}
+                      type={'text'}
+                      onClick={() => onRemove(p.data)}
+                      style={{ color: '#fb5858', padding: 0, fontWeight: 500 }}
+                    >
+                      永久删除积压工单
+                    </Button>
+                  ),
+                }}
+              />
+            </div>
+          </FieldSet>
+          <Divider plain>
+            <strong>工单核对检查（rd平台暂无接口与sql工单）</strong>
+          </Divider>
           <div className="ag-theme-alpine" style={{ height: 300, width: '100%', marginTop: 8 }}>
             <AgGridReact
-              columnDefs={historyOrderColumn.flatMap((it) => [
-                { ...it, hide: it.headerName == '操作' && !hasPermission },
-              ])}
-              rowData={orderData}
+              columnDefs={historyCompareColumn}
+              rowData={compareData?.alpha ?? []}
               defaultColDef={{
                 resizable: true,
                 filter: true,
@@ -389,52 +424,20 @@ const ReleaseOrder = () => {
               }}
               rowHeight={28}
               headerHeight={30}
-              onGridReady={onGridReady}
-              onGridSizeChanged={onGridReady}
-              frameworkComponents={{
-                deleteOrder: (p: CellClickedEvent) => (
-                  <Button
-                    size={'small'}
-                    type={'text'}
-                    onClick={() => onRemove(p.data)}
-                    style={{ color: '#fb5858', padding: 0, fontWeight: 500 }}
-                  >
-                    永久删除积压工单
-                  </Button>
-                ),
-              }}
+              onGridReady={(r) => onGridReady(r, gridCompareRef)}
+              onGridSizeChanged={(r) => onGridReady(r, gridCompareRef)}
+              getRowStyle={(p) => ({
+                background:
+                  p.data.status == true
+                    ? 'rgba(0, 255, 0, 0.06)'
+                    : p.data.status == false
+                    ? 'rgba(255, 2, 2, 0.06)'
+                    : 'initial',
+              })}
             />
           </div>
-        </FieldSet>
-        <Divider plain>
-          <strong>工单核对检查（rd平台暂无接口与sql工单）</strong>
-        </Divider>
-        <div className="ag-theme-alpine" style={{ height: 300, width: '100%', marginTop: 8 }}>
-          <AgGridReact
-            columnDefs={historyCompareColumn}
-            rowData={compareData?.alpha ?? []}
-            defaultColDef={{
-              resizable: true,
-              filter: true,
-              flex: 1,
-              suppressMenu: true,
-              cellStyle: { 'line-height': '28px' },
-            }}
-            rowHeight={28}
-            headerHeight={30}
-            onGridReady={(r) => onGridReady(r, gridCompareRef)}
-            onGridSizeChanged={(r) => onGridReady(r, gridCompareRef)}
-            getRowStyle={(p) => ({
-              background:
-                p.data.status == true
-                  ? 'rgba(0, 255, 0, 0.06)'
-                  : p.data.status == false
-                  ? 'rgba(255, 2, 2, 0.06)'
-                  : 'initial',
-            })}
-          />
         </div>
-      </div>
+      </PageContainer>
     </Spin>
   );
 };

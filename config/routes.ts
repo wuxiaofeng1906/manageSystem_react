@@ -172,7 +172,7 @@ export default [
         component: './onDutyAndRelease/releaseProcess/index',
       },
       {
-        name: '发布历史', // 新版本积压工单
+        name: '灰度推生产', // 新版本积压工单
         icon: 'table',
         path: 'releaseOrder/:id',
         hideInMenu: true,

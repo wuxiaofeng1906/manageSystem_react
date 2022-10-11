@@ -76,6 +76,10 @@ const PreReleaseServices = {
   async historyList(params: any) {
     return request(`${baseUrl}/latest-release/history`, { params });
   },
+  // 工单编号
+  async orderNumbers() {
+    return request(`${baseUrl}/latest-release/order`);
+  },
   // 发布视图数据（版本基准）
   async releaseBaseline() {
     return request(`${baseUrl}/latest-release/views-version-baseline`);
@@ -85,7 +89,7 @@ const PreReleaseServices = {
     return request(`${baseUrl}/latest-release/views-ready-release`);
   },
   // 发布视图数据（发版计划）
-  async releasePlan(params) {
+  async releasePlan(params: any) {
     return request(`${baseUrl}/latest-release/release-plan`, { params });
   },
   // 删除发布列表（视图）

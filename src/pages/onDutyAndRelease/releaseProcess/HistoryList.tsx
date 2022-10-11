@@ -15,6 +15,7 @@ const HistoryList = () => {
   const [form] = Form.useForm();
   const [rowData, setRowData] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
   const [spinning, setSpinning] = useState(false);
   const [gridHeight, setGridHeight] = useState(getHeight() - 140);
 
@@ -28,10 +29,16 @@ const HistoryList = () => {
     params.api.sizeColumnsToFit();
   };
   const getProject = async () => {
-    const res = await PreReleaseServices.project();
+    const project = await PreReleaseServices.project();
+    const order = await PreReleaseServices.orderNumbers();
     setProjects(
-      res?.map((it: any) => ({ label: it.project_name, value: it.project_id, key: it.project_id })),
+      project?.map((it: any) => ({
+        label: it.project_name,
+        value: it.project_id,
+        key: it.project_id,
+      })),
     );
+    setOrders(order?.flatMap((num: string) => (num ? [{ label: num, value: num, key: num }] : [])));
   };
 
   window.onresize = function () {
@@ -85,7 +92,7 @@ const HistoryList = () => {
         <Col span={8}>
           <Form.Item name={'repair_order'} label={'工单编号'}>
             <Select
-              options={[]}
+              options={orders ?? []}
               optionFilterProp={'label'}
               style={{ width: '100%' }}
               mode={'multiple'}

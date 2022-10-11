@@ -22,7 +22,7 @@ const ReleaseOrder = () => {
   const gridCompareRef = useRef<GridApi>();
   const [orderForm] = Form.useForm();
   const [baseForm] = Form.useForm();
-  const watchCluster = Form.useWatch('cluster', baseForm);
+  // const watchCluster = Form.useWatch('cluster', baseForm);
 
   const [orderData, setOrderData] = useState<any[]>([]);
   const [compareData, setCompareData] = useState<{
@@ -44,10 +44,6 @@ const ReleaseOrder = () => {
     getBaseList();
     getOrderDetail();
   }, []);
-
-  useEffect(() => {
-    onLinkTable();
-  }, [watchCluster]);
 
   const getBaseList = async () => {
     const announce = await AnnouncementServices.preAnnouncement();
@@ -371,6 +367,7 @@ const ReleaseOrder = () => {
                   options={envList}
                   style={{ width: '100%' }}
                   mode={'multiple'}
+                  onChange={onLinkTable}
                 />
               </Form.Item>
             </Col>

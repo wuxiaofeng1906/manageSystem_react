@@ -38,7 +38,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data, false, 1), loading };
+    return { data: formatTreeData(data.data), loading };
   },
   // feedback
   async feedback({ client, params, identity }: IStatisticQuery) {
@@ -68,7 +68,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data, false, 1), loading };
+    return { data: formatTreeData(data.data), loading };
   },
 
   // 线上反馈平均上线时长
@@ -99,7 +99,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data, false, 1), loading };
+    return { data: formatTreeData(data.data), loading };
   },
 
   async productScale({ client, params, identity }: IStatisticQuery) {
@@ -207,7 +207,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data, false, 1), loading };
+    return { data: formatTreeData(data.data), loading };
   },
 
   // 阻塞测试工作量
@@ -238,7 +238,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data, false, 1), loading };
+    return { data: formatTreeData(data.data), loading };
   },
   // 阻塞次数
   async blockingTimes({ client, params, identity }: IStatisticQuery) {
@@ -268,7 +268,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data, false, 1), loading };
+    return { data: formatTreeData(data.data), loading };
   },
 
   // 产品上线后引入emergency

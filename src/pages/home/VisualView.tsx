@@ -44,10 +44,10 @@ const ICard = (params: {
   return (
     <div style={{ background: params.data.bg || initBg[0] }} className={styles.icard}>
       {params.child || <div />}
-      <div className={styles.wrapper}>
+      <div className={styles.container}>
         <span className={styles.label}>发布项目:</span>
         <div
-          className={styles.projectBox}
+          className={styles.box}
           title={
             isArray(params.data.project)
               ? params.data.project?.map((it: any) => it.pro_name)?.join(',')
@@ -77,43 +77,49 @@ const ICard = (params: {
           )}
         </div>
       </div>
-      <p>
+      <div className={styles.container}>
         <span className={styles.label}>发布分支:</span>
-        {params.data.branch ?? ''}
-      </p>
+        <div className={styles.box}>{params.data.branch ?? ''}</div>
+      </div>
       {isEmpty(params.data.story) ? (
         ''
       ) : (
-        <p>
+        <div className={styles.container}>
           <span className={styles.label}>发布需求:</span>
-          {params.data.story?.split(',')?.map((ztno: number) => (
-            <span
-              className={baseline ? styles.link : ''}
-              onClick={() => {
-                if (!ztno || !baseline) return;
-                window.open(`http://zentao.77hub.com/zentao/story-view-${ztno}.html`);
-              }}
-            >
-              {ztno ?? ''}
-            </span>
-          ))}
-        </p>
+          <div className={styles.box} title={params.data.story ?? ''}>
+            {params.data.story?.split(',')?.map((ztno: number) => (
+              <span
+                className={baseline ? styles.link : ''}
+                onClick={() => {
+                  if (!ztno || !baseline) return;
+                  window.open(`http://zentao.77hub.com/zentao/story-view-${ztno}.html`);
+                }}
+              >
+                {ztno ?? ''}
+              </span>
+            ))}
+          </div>
+        </div>
       )}
 
-      <p>
+      <div className={styles.container}>
         <span className={styles.label}>发布服务:</span>
-        {params.data.apps ?? ''}
-      </p>
+        <div className={styles.box} title={params.data.apps ?? ''}>
+          {params.data.apps ?? ''}
+        </div>
+      </div>
       {params.isBasic ? (
-        <p>
+        <div className={styles.container}>
           <span className={styles.label}>发布时间:</span>
           {params.data.release_time ?? ''}
-        </p>
+        </div>
       ) : (
-        <p>
+        <div className={styles.container}>
           <span className={styles.label}>发布集群:</span>
-          {params.data.release_env ?? ''}
-        </p>
+          <div className={styles.box} title={params.data.release_env ?? ''}>
+            {params.data.release_env ?? ''}
+          </div>
+        </div>
       )}
 
       {hasPermission && params.deleteIcon == true ? (

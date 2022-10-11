@@ -54,32 +54,34 @@ const ICard = (params: {
               : params.data.project
           }
         >
-          {isArray(params.data.project) ? (
-            params.data.project?.map((it: any) => {
-              const linkProject =
-                it.pro_name?.startsWith('emergency') ||
-                it.pro_name?.startsWith('stagepatch') ||
-                it.pro_name?.startsWith('stage-patch');
-              return (
-                <span
-                  className={cns(baseline && linkProject ? styles.link : '', styles.value)}
-                  onClick={() => {
-                    if (!it.pro_id || !(baseline && linkProject)) return;
-                    window.open(`http://zentao.77hub.com/zentao/execution-task-${it.pro_id}.html`);
-                  }}
-                >
-                  {it.pro_name ?? ''}
-                </span>
-              );
-            })
-          ) : (
-            <span className={styles.value}>{params.data.project}</span>
-          )}
+          {isArray(params.data.project)
+            ? params.data.project?.map((it: any) => {
+                const linkProject =
+                  it.pro_name?.startsWith('emergency') ||
+                  it.pro_name?.startsWith('stagepatch') ||
+                  it.pro_name?.startsWith('stage-patch');
+                return (
+                  <span
+                    className={cns(baseline && linkProject ? styles.link : '', styles.value)}
+                    onClick={() => {
+                      if (!it.pro_id || !(baseline && linkProject)) return;
+                      window.open(
+                        `http://zentao.77hub.com/zentao/execution-task-${it.pro_id}.html`,
+                      );
+                    }}
+                  >
+                    {it.pro_name ?? ''}
+                  </span>
+                );
+              })
+            : params.data.project}
         </div>
       </div>
       <div className={styles.container}>
         <span className={styles.label}>发布分支:</span>
-        <div className={styles.box}>{params.data.branch ?? ''}</div>
+        <div className={styles.box} title={params.data.branch ?? ''}>
+          {params.data.branch ?? ''}
+        </div>
       </div>
       {isEmpty(params.data.story) ? (
         ''
@@ -329,7 +331,7 @@ const VisualView = () => {
                         );
                         const envIndex = dynamicColumn.findIndex((v) => v.name == env.name);
                         const alpha = envIndex - baseIndex;
-                        if (envIndex < 0) return '';
+                        if (envIndex < 0 || env.name == data.baseline_cluster) return '';
                         return (
                           <div
                             key={env}

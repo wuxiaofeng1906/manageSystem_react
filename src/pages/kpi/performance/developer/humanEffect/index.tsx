@@ -30,6 +30,7 @@ const HumanEffect: React.FC<any> = () => {
       request={StatisticServices.humanEffect}
       identity={'DEVELOPER'}
       showDenominator={true}
+      len={5}
     />
   );
 };

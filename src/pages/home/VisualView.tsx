@@ -227,18 +227,17 @@ const VisualView = () => {
         })),
       );
       // 去重并排序(动态列计算)
+      const formatBasicCluster =
+        basicOnline?.map((name: string) => {
+          const text = name?.replace('cn-northwest-', '集群');
+          const value =
+            text.length > 3 ? `${text.slice(0, 3)}-${text.slice(text.length - 1)}` : text;
+          return { name, value };
+        }) ?? [];
       let formatOnline = sortBy(
-        uniqBy(
-          [
-            ...basicOnline?.map((name: string) => ({
-              name,
-              value: name?.replace('cn-northwest-', '集群'),
-            })),
-            ...currentOnline,
-            ...planOnline,
-          ],
-          'name',
-        ).flatMap((it) => (ignore.includes(it.name) ? [] : [it])),
+        uniqBy([...formatBasicCluster, ...currentOnline, ...planOnline], 'name').flatMap((it) =>
+          ignore.includes(it.name) ? [] : [it],
+        ),
         ['name'],
       );
 
@@ -260,6 +259,9 @@ const VisualView = () => {
       setLoading(false);
     }
   };
+  let te = 'cn-northwest-2345';
+  const text = te.replace('cn-northwest-', '集群');
+  console.log(text.length > 3 ? `${text.slice(0, 3)}-${text.slice(text.length - 1)}` : text);
 
   const onlineLen = useMemo(() => online.length, [online]);
   // 动态列

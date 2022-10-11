@@ -28,7 +28,7 @@ export default [
   {
     path: '/home',
     name: '首页',
-    icon: 'smile',
+    icon: 'HomeOutlined',
     component: './home',
   },
   // {
@@ -60,7 +60,7 @@ export default [
   // },
   {
     name: '班车工作台',
-    icon: 'table',
+    icon: 'CarOutlined',
     path: '/sprint',
     routes: [
       {
@@ -133,7 +133,7 @@ export default [
   },
   {
     name: '值班与发布',
-    icon: 'table',
+    icon: 'DeploymentUnitOutlined',
     path: '/onDutyAndRelease',
     access: 'devCenter', // 仅研发中心人员可见，客服不可见
     routes: [
@@ -210,7 +210,7 @@ export default [
   {
     name: '研发过程数据',
     access: 'devCenter', // 仅研发中心人员可见，客服不可见
-    icon: 'table',
+    icon: 'FundProjectionScreenOutlined',
     path: '/kpi',
     routes: [
       {
@@ -684,14 +684,14 @@ export default [
   },
   {
     name: '工具入口',
-    icon: 'table',
+    icon: 'ToolOutlined',
     path: 'toolIntegration',
     component: './toolIntegration',
     access: 'devCenter', // 仅研发中心人员可见，客服不可见
   },
   {
     name: '检查工具',
-    icon: 'table',
+    icon: 'BugOutlined',
     path: '/checkTools',
     routes: [
       {
@@ -710,7 +710,7 @@ export default [
   },
   {
     name: '企业微信审批流',
-    icon: 'table',
+    icon: 'CommentOutlined',
     path: '/approvalFlow',
     // access: 'sysAdmin',
     // hideInMenu: true,
@@ -719,7 +719,7 @@ export default [
   },
   {
     name: '禅道管理',
-    icon: 'table',
+    icon: 'BlockOutlined',
     path: '/zentao',
     // hideInMenu: true,
     routes: [
@@ -770,7 +770,7 @@ export default [
   },
   {
     name: '石墨管理',
-    icon: 'table',
+    icon: 'BookOutlined',
     path: '/shimo',
     hideInMenu: false,
     access: 'devCenter', // 仅研发中心人员可见，客服不可见，
@@ -799,7 +799,7 @@ export default [
   },
   {
     name: '系统管理',
-    icon: 'table',
+    icon: 'SettingOutlined',
     path: '/authority',
     access: 'sysAdmin',
     routes: [

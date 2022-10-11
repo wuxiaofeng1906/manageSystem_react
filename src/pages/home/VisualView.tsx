@@ -46,27 +46,36 @@ const ICard = (params: {
       {params.child || <div />}
       <div className={styles.wrapper}>
         <span className={styles.label}>发布项目:</span>
-        {isArray(params.data.project) ? (
-          params.data.project?.map((it: any) => {
-            const linkProject =
-              it.pro_name?.startsWith('emergency') ||
-              it.pro_name?.startsWith('stagepatch') ||
-              it.pro_name?.startsWith('stage-patch');
-            return (
-              <span
-                className={cns(baseline && linkProject ? styles.link : '', styles.value)}
-                onClick={() => {
-                  if (!it.pro_id || !(baseline && linkProject)) return;
-                  window.open(`http://zentao.77hub.com/zentao/execution-task-${it.pro_id}.html`);
-                }}
-              >
-                {it.pro_name ?? ''}
-              </span>
-            );
-          })
-        ) : (
-          <span className={styles.value}>{params.data.project}</span>
-        )}
+        <div
+          className={styles.projectBox}
+          title={
+            isArray(params.data.project)
+              ? params.data.project?.map((it: any) => it.pro_name)?.join(',')
+              : params.data.project
+          }
+        >
+          {isArray(params.data.project) ? (
+            params.data.project?.map((it: any) => {
+              const linkProject =
+                it.pro_name?.startsWith('emergency') ||
+                it.pro_name?.startsWith('stagepatch') ||
+                it.pro_name?.startsWith('stage-patch');
+              return (
+                <span
+                  className={cns(baseline && linkProject ? styles.link : '', styles.value)}
+                  onClick={() => {
+                    if (!it.pro_id || !(baseline && linkProject)) return;
+                    window.open(`http://zentao.77hub.com/zentao/execution-task-${it.pro_id}.html`);
+                  }}
+                >
+                  {it.pro_name ?? ''}
+                </span>
+              );
+            })
+          ) : (
+            <span className={styles.value}>{params.data.project}</span>
+          )}
+        </div>
       </div>
       <p>
         <span className={styles.label}>发布分支:</span>

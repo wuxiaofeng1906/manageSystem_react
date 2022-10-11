@@ -218,7 +218,7 @@ const ReleaseOrder = () => {
       release_result: order.release_result ?? 'unknown',
       cluster: base.cluster?.join(',') ?? '',
       release_num: id, // 发布编号
-      ready_release_num: orderData?.map((it) => it.ready_release_num)?.join(',') ?? '', // 积压工单id
+      ready_release_num: orderData?.map((it) => it.release_num)?.join(',') ?? '', // 积压工单id
       ops_repair_data: compareData?.opsData ?? [],
       rd_repair_data: orderData ?? [],
     });

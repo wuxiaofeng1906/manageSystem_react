@@ -183,6 +183,7 @@ export default [
         icon: 'table',
         path: 'releaseHistory',
         component: './onDutyAndRelease/releaseHistory',
+        hideInMenu: true,
       },
       {
         name: '正式发布',

@@ -286,6 +286,7 @@ const ReleaseOrder = () => {
       sortArr.push({ ...node.data });
     });
     setOrderData(sortArr);
+    formatCompare(compareData?.opsData ?? [], sortArr);
   };
 
   const hasPermission = useMemo(() => user?.group == 'superGroup', []);

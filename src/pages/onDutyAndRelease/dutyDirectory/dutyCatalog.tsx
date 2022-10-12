@@ -135,7 +135,7 @@ const DutyCatalog = () => {
         (it: any) =>
           it.duty_order == '1' && Object.keys(recentType).includes(it.user_tech) && it.user_name,
       );
-    const data = duty.map((o: any, i: number) => ({
+    const data = duty.map((o: any) => ({
       value: `${o.user_id}_head`,
       key: o.user_id,
       type: 'head',

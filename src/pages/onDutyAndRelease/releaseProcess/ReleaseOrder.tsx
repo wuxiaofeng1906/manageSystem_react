@@ -23,13 +23,9 @@ const ReleaseOrder = () => {
   const gridCompareRef = useRef<GridApi>();
   const [orderForm] = Form.useForm();
   const [baseForm] = Form.useForm();
-  // const watchCluster = Form.useWatch('cluster', baseForm);
 
   const [orderData, setOrderData] = useState<any[]>([]);
-  const [compareData, setCompareData] = useState<{
-    opsData: any[];
-    alpha: any[];
-  }>();
+  const [compareData, setCompareData] = useState<{ opsData: any[]; alpha: any[] }>();
   const [dutyList, setDutyList] = useState<any[]>([]);
   const [announcementList, setAnnouncementList] = useState<any[]>([]);
   const [envList, setEnvList] = useState<any[]>([]);
@@ -99,7 +95,12 @@ const ReleaseOrder = () => {
         cluster: res.cluster?.map((it: any) => it.name) ?? [],
       });
       setFinished(!isEmpty(res.release_result) && res.release_result !== 'unknown');
-      setOrderData(res.ready_data ?? []);
+      setOrderData(
+        res.ready_data?.map((it: any) => ({
+          ...it,
+          cluster: it.cluster?.replaceAll('cn-northwest-', '集群'),
+        })) ?? [],
+      );
       await formatCompare(res?.ops_repair_order_data ?? [], res?.ready_data ?? []);
       setSpinning(false);
     } catch (e: any) {
@@ -120,13 +121,16 @@ const ReleaseOrder = () => {
         return;
       }
       const rd = await PreReleaseServices.orderList(values.cluster?.join(',') ?? '');
-      setOrderData(rd);
+      setOrderData(
+        rd?.map((it: any) => ({ ...it, cluster: it.cluster?.replaceAll('cn-northwest-', '集群') })),
+      );
       const flag = rd.some((it: any) => it.repair_order_type.indexOf('停机') > -1);
       orderForm.setFieldsValue({
         release_way: flag ? 'stop_server' : 'keep_server',
       });
       await formatCompare([], rd);
       setSpinning(false);
+      return rd;
     } catch (e) {
       setSpinning(false);
     }
@@ -190,6 +194,23 @@ const ReleaseOrder = () => {
   const onSave = async () => {
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
+    if (order.release_result == 'cancel') {
+      Modal.confirm({
+        centered: true,
+        title: '取消发布提醒',
+        content: '取消发布将删除工单，请确认是否取消发布?',
+        icon: <div />,
+        onOk: async () => {
+          await PreReleaseServices.removeRelease({
+            user_id: user?.userid ?? '',
+            release_num: id ?? '',
+          });
+          history.back();
+        },
+      });
+      return;
+    }
+
     const checkObj = omit({ ...order, ...base }, ['release_result']);
     const errTip = {
       plan_release_time: '请填写发布时间!',
@@ -206,21 +227,20 @@ const ReleaseOrder = () => {
       return;
     }
     if (isEmpty(base.release_name?.trim())) return infoMessage(errTip.release_name);
-
     await PreReleaseServices.saveOrder({
+      release_num: id, // 发布编号
       user_id: user?.userid ?? '',
       release_name: base.release_name?.trim() ?? '',
       person_duty_num: order.person_duty_num,
       announcement_num: order.announcement_num ?? '',
-      plan_release_time: moment(order.plan_release_time).format('YYYY-MM-DD HH:mm:ss'),
       release_type: 'backlog_release',
+      rd_repair_data: orderData ?? [],
       release_way: order.release_way ?? '',
+      ops_repair_data: compareData?.opsData ?? [],
       release_result: order.release_result ?? 'unknown',
       cluster: base.cluster?.join(',') ?? '',
-      release_num: id, // 发布编号
-      ready_release_num: orderData?.map((it) => it.release_num)?.join(',') ?? '', // 积压工单id
-      ops_repair_data: compareData?.opsData ?? [],
-      rd_repair_data: orderData ?? [],
+      ready_release_num: orderData?.map((it: any) => it.release_num)?.join(',') ?? '', // 积压工单id
+      plan_release_time: moment(order.plan_release_time).format('YYYY-MM-DD HH:mm:ss'),
     });
     // 更新详情
     getOrderDetail();
@@ -229,6 +249,7 @@ const ReleaseOrder = () => {
   const onRemove = (data: any) => {
     // [ag-grid]拿不到最新的state
     const release_result = orderForm.getFieldValue('release_result');
+    const cluster = baseForm.getFieldValue('cluster');
     const hasResult = !isEmpty(release_result) && release_result != 'unknown';
     if (hasResult || !hasPermission) {
       return infoMessage(hasResult ? '已标记发布结果不能删除积压工单' : '您无删除积压工单权限');
@@ -236,12 +257,23 @@ const ReleaseOrder = () => {
 
     Modal.confirm({
       centered: true,
-      title: '删除积压工单提醒：',
-      content: '请确认是否要永久删除该积压工单！',
+      title: '删除积压工单提醒',
+      content: `请确认是否要永久删除【${data.repair_order ?? ''}】工单?`,
       onOk: async () => {
         await PreReleaseServices.removeOrder({
           release_num: data.release_num,
           user_id: user?.userid ?? '',
+        });
+        const rd = await PreReleaseServices.orderList(cluster?.join(',') ?? '');
+        let ops = await PreReleaseServices.opsList(cluster?.join(',') ?? '');
+        // 临时的假数据
+        if (ops.length > 100) {
+          ops = ops?.slice(0, 5);
+        }
+        await PreReleaseServices.separateSaveOrder({
+          release_num: id,
+          ops_repair_data: ops ?? [],
+          rd_repair_data: rd ?? [],
         });
         getOrderDetail();
       },
@@ -369,7 +401,7 @@ const ReleaseOrder = () => {
                     options={envList}
                     style={{ width: '100%' }}
                     mode={'multiple'}
-                    onChange={onLinkTable}
+                    onChange={() => onLinkTable()}
                   />
                 </Form.Item>
               </Col>

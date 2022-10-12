@@ -1,5 +1,4 @@
 import request from './request';
-import { warn } from 'echarts/types/src/util/log';
 const baseUrl = '/api/verify';
 // 发布过程
 const PreReleaseServices = {
@@ -94,7 +93,7 @@ const PreReleaseServices = {
   },
   // 删除发布列表（视图）
   async removeRelease(data: any) {
-    return request(`${baseUrl}/latest-release/list`, { method: 'delete', data });
+    return request(`${baseUrl}/latest-release/list`, { method: 'delete', data, msg: '删除成功' });
   },
   // 删除积压工单项目
   async removeOrder(data: any) {
@@ -102,6 +101,7 @@ const PreReleaseServices = {
       method: 'delete',
       data,
       warn: true,
+      msg: '积压工单删除成功',
     });
   },
   // 积压工单【环境】对应的列表数据
@@ -118,7 +118,11 @@ const PreReleaseServices = {
   },
   // 保存
   async saveOrder(data: any) {
-    return request(`${baseUrl}/latest-release/list`, { method: 'post', data });
+    return request(`${baseUrl}/latest-release/list`, { method: 'post', data, msg: '保存成功' });
+  },
+  // 单独保存rd工单和OPS工单
+  async separateSaveOrder(data: any) {
+    return request(`${baseUrl}/latest-release/repair-data`, { method: 'post', data });
   },
   async orderDetail(params: any) {
     return request(`${baseUrl}/latest-release/detail`, { params, warn: false });

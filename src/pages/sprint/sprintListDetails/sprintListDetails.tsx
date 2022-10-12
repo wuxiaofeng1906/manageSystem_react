@@ -88,7 +88,7 @@ import {
 } from './common/axiosRequest';
 import defaultTreeSelectParams from '@/pages/shimo/fileBaseline/iterateList/defaultSetting';
 import styles from './sprintListDetails.less';
-import { isEmpty } from 'lodash';
+import { omit, isEmpty } from 'lodash';
 import RemoveModal, { DissatisfyModal } from '@/pages/sprint/sprintListDetails/removeModal';
 import SprintDetailServices from '@/services/sprintDetail';
 let ora_filter_data: any = [];
@@ -501,7 +501,27 @@ const SprintList: React.FC<any> = () => {
 
   //   发送请求 修改数据
   const modCommitDetails = async (datas: any) => {
-    const result = await mosidySprintDetails(datas);
+    const origin = gridApi.current?.getSelectedRows()?.[0];
+    let partData = {}; // 只传递有修改的参数
+    for (const key in datas) {
+      if (origin[key] != datas[key] && (datas[key] || origin[key])) {
+        partData[key] = datas[key];
+      }
+    }
+    // 没有数据修改时直接关闭弹窗
+    if (Object.keys(omit(partData, ['openedAt', 'resolvedAt', 'project']))?.length == 0) {
+      setformForTesterToModVisible(false);
+      setIsAddModalVisible(false);
+      setformForManagerToModVisible(false);
+      setformForUEDToModVisible(false);
+      return;
+    }
+    const result = await mosidySprintDetails({
+      ...partData,
+      id: datas.id,
+      category: datas.category,
+      project: datas.project,
+    });
     if (result.ok === true) {
       setformForTesterToModVisible(false);
       setIsAddModalVisible(false);

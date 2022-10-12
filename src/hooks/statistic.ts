@@ -20,6 +20,7 @@ export interface IRequest {
   type: IStaticBy;
   identity?: IIdentity;
   showDenominator?: boolean;
+  len?: number;
 }
 export const useStatistic = () => {
   const gqlClient = useGqlClient();
@@ -32,9 +33,10 @@ export const useStatistic = () => {
     type = 'week',
     identity,
     showDenominator = false,
+    len,
   }: IRequest) => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    renderColumn(type, showDenominator);
+    renderColumn(type, showDenominator, len);
     setRowData([]);
     setLoading(true);
     try {
@@ -53,7 +55,7 @@ export const useStatistic = () => {
     }
   };
 
-  const cellRenderer = (params: any, showSplit = false) => {
+  const cellRenderer = (params: any, showSplit = false, len?: number) => {
     const node = params.data;
     const result = params.value;
     let numerator = 0; // 分子
@@ -64,7 +66,7 @@ export const useStatistic = () => {
       denominator = node[`${currentTime}_denominator`] ?? 0; // 分母
     }
     const weight = node?.isDept ? 'bold' : 'initial';
-    const data = isNumber(result) && result ? result.toFixed(2) : 0;
+    const data = isNumber(result) && result ? (len ? result.toFixed(len) : result) : 0;
     if (isNumber(result)) {
       if (showSplit)
         return `<span>
@@ -79,7 +81,7 @@ export const useStatistic = () => {
   };
 
   // column
-  const renderColumn = (type: IStaticBy, showSplit = false) => {
+  const renderColumn = (type: IStaticBy, showSplit = false, len?: number) => {
     const component: (ColDef | ColGroupDef)[] = new Array();
     const typeMap = {
       year: getYearsTime,
@@ -97,14 +99,14 @@ export const useStatistic = () => {
         component.push({
           headerName: weekName,
           field: startTime?.toString(),
-          cellRenderer: (p) => cellRenderer(p, showSplit),
+          cellRenderer: (p) => cellRenderer(p, showSplit, len),
           minWidth: 100,
         });
       } else
         component.push(
           Object.assign(
             {
-              cellRenderer: (p: any) => cellRenderer(p, showSplit),
+              cellRenderer: (p: any) => cellRenderer(p, showSplit, len),
               headerName: data[index].title,
               field: data[index].start?.toString(),
             },

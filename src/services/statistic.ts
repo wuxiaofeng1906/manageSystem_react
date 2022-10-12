@@ -9,6 +9,10 @@ export interface IStatisticQuery {
   identity?: string;
   showDenominator?: boolean;
 }
+interface StaticOther {
+  client: GqlClient<object>;
+  params: { kind: number; ends: string };
+}
 const StatisticServices = {
   // patch
   async patch({ client, params, identity }: IStatisticQuery) {
@@ -38,7 +42,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data, false, 1), loading };
+    return { data: formatTreeData(data.data), loading };
   },
   // feedback
   async feedback({ client, params, identity }: IStatisticQuery) {
@@ -68,7 +72,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data, false, 1), loading };
+    return { data: formatTreeData(data.data), loading };
   },
 
   // 线上反馈平均上线时长
@@ -99,7 +103,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data, false, 1), loading };
+    return { data: formatTreeData(data.data), loading };
   },
 
   async productScale({ client, params, identity }: IStatisticQuery) {
@@ -207,7 +211,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data, false, 1), loading };
+    return { data: formatTreeData(data.data), loading };
   },
 
   // 阻塞测试工作量
@@ -238,7 +242,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data, false, 1), loading };
+    return { data: formatTreeData(data.data), loading };
   },
   // 阻塞次数
   async blockingTimes({ client, params, identity }: IStatisticQuery) {
@@ -268,17 +272,11 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data, false, 1), loading };
+    return { data: formatTreeData(data.data), loading };
   },
 
   // 产品上线后引入emergency
-  async onlineEmergency({
-    client,
-    params,
-  }: {
-    client: GqlClient<object>;
-    params: { kind: number; ends: string };
-  }) {
+  async onlineEmergency({ client, params }: StaticOther) {
     const { data } = await client.query(`
       {
          data:onlineEmerProportion(kind: "${params.kind}", ends: ${params.ends}) {
@@ -297,13 +295,7 @@ const StatisticServices = {
     return { data: data.data };
   },
   //灰度千行bug率
-  async grayThousBugRate({
-    client,
-    params,
-  }: {
-    client: GqlClient<object>;
-    params: { kind: number; ends: string };
-  }) {
+  async grayThousBugRate({ client, params }: StaticOther) {
     const { data } = await client.query(`
       {
          data:stageThousBugRate(kind: "${params.kind}", ends: ${params.ends}) {
@@ -322,13 +314,7 @@ const StatisticServices = {
     return { data: data.data };
   },
   // 服务 -交付吞吐量
-  async deliverThroughput({
-    client,
-    params,
-  }: {
-    client: GqlClient<object>;
-    params: { kind: number; ends: string };
-  }) {
+  async deliverThroughput({ client, params }: StaticOther) {
     const { data } = await client.query(`
       {
          data:deliverThroughput(kind: "${params.kind}", ends: ${params.ends}) {

@@ -131,7 +131,6 @@ const ReleaseOrder = () => {
       });
       await formatCompare([], rd);
       setSpinning(false);
-      return rd;
     } catch (e) {
       setSpinning(false);
     }
@@ -411,7 +410,7 @@ const ReleaseOrder = () => {
                     options={envList}
                     style={{ width: '100%' }}
                     mode={'multiple'}
-                    onChange={() => onLinkTable()}
+                    onChange={onLinkTable}
                   />
                 </Form.Item>
               </Col>

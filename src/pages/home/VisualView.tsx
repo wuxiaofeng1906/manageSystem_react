@@ -4,7 +4,7 @@ import cns from 'classnames';
 import { Collapse, Form, Select, DatePicker, Col, Card, Modal, Spin } from 'antd';
 import { useModel } from 'umi';
 import PreReleaseServices from '@/services/preRelease';
-import { isEmpty, sortBy, uniqBy, cloneDeep, isArray } from 'lodash';
+import { isEmpty, sortBy, uniqBy, cloneDeep, isArray, intersection } from 'lodash';
 import moment from 'moment';
 
 const thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
@@ -26,7 +26,6 @@ const ICard = (params: {
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const baseline = params.data.baseline_cluster == 'offline';
   const hasPermission = useMemo(() => user?.group == 'superGroup', [user]);
-
   const onRemove = async (data: any) => {
     Modal.confirm({
       centered: true,
@@ -321,7 +320,7 @@ const VisualView = () => {
                 <ICard
                   data={data}
                   onRefresh={getViewData}
-                  deleteIcon={deleteIcon ?? index < 1}
+                  deleteIcon={deleteIcon ?? ignore.includes(data.baseline_cluster)}
                   child={
                     <div>
                       {data?.cluster?.map((env: any, i: number) => {
@@ -373,7 +372,9 @@ const VisualView = () => {
                         data={child}
                         onRefresh={getViewData}
                         isBasic={true}
-                        deleteIcon={index < 1}
+                        deleteIcon={
+                          intersection(ignore, child.cluster ?? []).length > 0 && index < 2
+                        }
                       />
                     </Collapse.Panel>
                   ))}

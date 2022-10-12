@@ -39,7 +39,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
   identity,
   showDenominator = false,
   showHalfYear = false,
-  len = 2,
+  len,
 }) => {
   const gridApi = useRef<GridApi>();
   const { handleStaticBy, columns, rowData, loading } = useStatistic();

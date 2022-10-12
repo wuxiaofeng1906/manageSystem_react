@@ -33,7 +33,7 @@ export const useStatistic = () => {
     type = 'week',
     identity,
     showDenominator = false,
-    len = 2,
+    len,
   }: IRequest) => {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     renderColumn(type, showDenominator, len);
@@ -55,7 +55,7 @@ export const useStatistic = () => {
     }
   };
 
-  const cellRenderer = (params: any, showSplit = false, len = 2) => {
+  const cellRenderer = (params: any, showSplit = false, len?: number) => {
     const node = params.data;
     const result = params.value;
     let numerator = 0; // 分子
@@ -66,7 +66,7 @@ export const useStatistic = () => {
       denominator = node[`${currentTime}_denominator`] ?? 0; // 分母
     }
     const weight = node?.isDept ? 'bold' : 'initial';
-    const data = isNumber(result) && result ? result.toFixed(len) : 0;
+    const data = isNumber(result) && result ? (len ? result.toFixed(len) : result) : 0;
     if (isNumber(result)) {
       if (showSplit)
         return `<span>
@@ -81,7 +81,7 @@ export const useStatistic = () => {
   };
 
   // column
-  const renderColumn = (type: IStaticBy, showSplit = false, len: number) => {
+  const renderColumn = (type: IStaticBy, showSplit = false, len?: number) => {
     const component: (ColDef | ColGroupDef)[] = new Array();
     const typeMap = {
       year: getYearsTime,

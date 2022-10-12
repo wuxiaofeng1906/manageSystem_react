@@ -48,6 +48,7 @@ const AvgOnlineTimeFeedBack: React.FC<any> = () => {
       ruleData={ruleData}
       request={StatisticServices.feedback}
       identity={'TESTER'}
+      len={5}
     />
   );
 };

@@ -24,6 +24,7 @@ interface IStatic {
   showHalfYear?: boolean; // 按半年
   ruleData: IRuleData[];
   identity?: IIdentity;
+  len?: number;
 }
 
 type INode = string | React.ReactNode;
@@ -38,6 +39,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
   identity,
   showDenominator = false,
   showHalfYear = false,
+  len,
 }) => {
   const gridApi = useRef<GridApi>();
   const { handleStaticBy, columns, rowData, loading } = useStatistic();
@@ -57,7 +59,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
   };
 
   const changeStaticBy = async (type: IStaticBy) => {
-    await handleStaticBy({ request, type, identity, showDenominator });
+    await handleStaticBy({ request, type, identity, showDenominator, len });
   };
 
   useEffect(() => {

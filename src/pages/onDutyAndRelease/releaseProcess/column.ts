@@ -120,9 +120,8 @@ export const historyOrderColumn = [
   {
     headerName: '操作',
     cellRenderer: 'deleteOrder',
-    width: 130,
-    maxWidth: 140,
-    hide: false,
+    width: 120,
+    maxWidth: 120,
   },
 ];
 export const historyCompareColumn = [

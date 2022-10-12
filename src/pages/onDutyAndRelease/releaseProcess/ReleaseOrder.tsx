@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { Form, Select, DatePicker, Button, Input, Col, Spin, Divider, Collapse, Modal } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import {
@@ -15,6 +15,7 @@ import { isEmpty, omit } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
 import moment from 'moment';
 import { PageContainer } from '@ant-design/pro-layout';
+import DragIcon from '@/components/DragIcon';
 
 const ReleaseOrder = () => {
   const { id } = useParams() as { id: string };
@@ -279,6 +280,15 @@ const ReleaseOrder = () => {
       },
     });
   };
+
+  const onDrag = async () => {
+    const sortArr: any = [];
+    gridRef.current?.forEachNode(function (node) {
+      sortArr.push({ ...node.data });
+    });
+    setOrderData(sortArr);
+  };
+
   const hasPermission = useMemo(() => user?.group == 'superGroup', []);
 
   return (
@@ -410,9 +420,7 @@ const ReleaseOrder = () => {
           <FieldSet data={{ title: '工单-表单设置' }}>
             <div className="ag-theme-alpine" style={{ height: 300, width: '100%', marginTop: 8 }}>
               <AgGridReact
-                columnDefs={historyOrderColumn.flatMap((it) => [
-                  { ...it, hide: it.headerName == '操作' && !hasPermission },
-                ])}
+                columnDefs={historyOrderColumn}
                 rowData={orderData}
                 defaultColDef={{
                   resizable: true,
@@ -425,16 +433,26 @@ const ReleaseOrder = () => {
                 headerHeight={30}
                 onGridReady={onGridReady}
                 onGridSizeChanged={onGridReady}
+                rowDragManaged={true}
+                animateRows={true}
+                onRowDragEnd={onDrag}
                 frameworkComponents={{
                   deleteOrder: (p: CellClickedEvent) => (
-                    <Button
-                      size={'small'}
-                      type={'text'}
-                      onClick={() => onRemove(p.data)}
-                      style={{ color: '#fb5858', padding: 0, fontWeight: 500 }}
-                    >
-                      永久删除积压工单
-                    </Button>
+                    <Fragment>
+                      {hasPermission ? (
+                        <img
+                          title={'永久删除积压工单'}
+                          width="20"
+                          height="20"
+                          src={require('../../../../public/delete_red.png')}
+                          style={{ marginRight: 10 }}
+                          onClick={() => onRemove(p.data)}
+                        />
+                      ) : (
+                        <div />
+                      )}
+                      {DragIcon(p)}
+                    </Fragment>
                   ),
                 }}
               />

@@ -32,7 +32,7 @@ const ReleaseOrder = () => {
   const [envList, setEnvList] = useState<any[]>([]);
 
   const [spinning, setSpinning] = useState(false);
-  const [finished, setFinished] = useState(false);
+  const [detail, setDetail] = useState<any>();
 
   const onGridReady = (params: GridReadyEvent, ref = gridRef) => {
     ref.current = params.api;
@@ -95,7 +95,7 @@ const ReleaseOrder = () => {
         ...res,
         cluster: res.cluster?.map((it: any) => it.name) ?? [],
       });
-      setFinished(!isEmpty(res.release_result) && res.release_result !== 'unknown');
+      setDetail(res);
       setOrderData(res.ready_data);
       await formatCompare(res?.ops_repair_order_data ?? [], res?.ready_data ?? []);
       setSpinning(false);
@@ -276,6 +276,7 @@ const ReleaseOrder = () => {
   };
 
   const onDrag = async () => {
+    if (finished) return infoMessage('已标记发布结果不能修改工单顺序');
     const sortArr: any = [];
     gridRef.current?.forEachNode(function (node) {
       sortArr.push({ ...node.data });
@@ -285,6 +286,10 @@ const ReleaseOrder = () => {
   };
 
   const hasPermission = useMemo(() => user?.group == 'superGroup', []);
+  const finished = useMemo(
+    () => detail?.release_result !== 'unknown' && !isEmpty(detail?.release_result),
+    [detail?.release_result],
+  );
 
   return (
     <Spin spinning={spinning} tip="数据加载中...">
@@ -428,7 +433,7 @@ const ReleaseOrder = () => {
                 headerHeight={30}
                 onGridReady={onGridReady}
                 onGridSizeChanged={onGridReady}
-                rowDragManaged={true}
+                rowDragManaged={!finished}
                 animateRows={true}
                 onRowDragEnd={onDrag}
                 frameworkComponents={{

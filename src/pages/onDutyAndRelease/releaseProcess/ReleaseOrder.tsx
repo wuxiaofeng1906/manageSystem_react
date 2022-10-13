@@ -18,6 +18,7 @@ import { PageContainer } from '@ant-design/pro-layout';
 import DragIcon from '@/components/DragIcon';
 
 const ReleaseOrder = () => {
+  let agFinished = false; // 处理ag-grid 拿不到最新的state
   const { id } = useParams() as { id: string };
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const gridRef = useRef<GridApi>();
@@ -32,7 +33,7 @@ const ReleaseOrder = () => {
   const [envList, setEnvList] = useState<any[]>([]);
 
   const [spinning, setSpinning] = useState(false);
-  const [detail, setDetail] = useState<any>();
+  const [finished, setFinished] = useState(false);
 
   const onGridReady = (params: GridReadyEvent, ref = gridRef) => {
     ref.current = params.api;
@@ -95,7 +96,8 @@ const ReleaseOrder = () => {
         ...res,
         cluster: res.cluster?.map((it: any) => it.name) ?? [],
       });
-      setDetail(res);
+      agFinished = res?.release_result !== 'unknown' && !isEmpty(res?.release_result);
+      setFinished(agFinished);
       setOrderData(res.ready_data);
       await formatCompare(res?.ops_repair_order_data ?? [], res?.ready_data ?? []);
       setSpinning(false);
@@ -242,12 +244,9 @@ const ReleaseOrder = () => {
   };
 
   const onRemove = (data: any) => {
-    // [ag-grid]拿不到最新的state
-    const release_result = orderForm.getFieldValue('release_result');
     const cluster = baseForm.getFieldValue('cluster');
-    const hasResult = !isEmpty(release_result) && release_result != 'unknown';
-    if (hasResult || !hasPermission) {
-      return infoMessage(hasResult ? '已标记发布结果不能删除积压工单' : '您无删除积压工单权限');
+    if (agFinished || !hasPermission) {
+      return infoMessage(agFinished ? '已标记发布结果不能删除积压工单!' : '您无删除积压工单权限!');
     }
 
     Modal.confirm({
@@ -276,7 +275,7 @@ const ReleaseOrder = () => {
   };
 
   const onDrag = async () => {
-    if (finished) return infoMessage('已标记发布结果不能修改工单顺序');
+    if (finished) return infoMessage('已标记发布结果不能修改工单顺序!');
     const sortArr: any = [];
     gridRef.current?.forEachNode(function (node) {
       sortArr.push({ ...node.data });
@@ -286,11 +285,6 @@ const ReleaseOrder = () => {
   };
 
   const hasPermission = useMemo(() => user?.group == 'superGroup', []);
-  const finished = useMemo(
-    () => detail?.release_result !== 'unknown' && !isEmpty(detail?.release_result),
-    [detail?.release_result],
-  );
-
   return (
     <Spin spinning={spinning} tip="数据加载中...">
       <PageContainer>

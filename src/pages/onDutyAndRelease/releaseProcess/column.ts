@@ -91,7 +91,7 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     hide: type == 'history',
   },
 ];
-export const historyOrderColumn = [
+export const historyOrderColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
     field: 'num',
@@ -116,6 +116,7 @@ export const historyOrderColumn = [
   {
     headerName: '已发布集群',
     field: 'cluster',
+    valueFormatter: (p: any) => p.value?.replaceAll('cn-northwest-', '集群'),
   },
   {
     headerName: '操作',

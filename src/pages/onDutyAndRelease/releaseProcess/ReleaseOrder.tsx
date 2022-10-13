@@ -96,12 +96,7 @@ const ReleaseOrder = () => {
         cluster: res.cluster?.map((it: any) => it.name) ?? [],
       });
       setFinished(!isEmpty(res.release_result) && res.release_result !== 'unknown');
-      setOrderData(
-        res.ready_data?.map((it: any) => ({
-          ...it,
-          cluster: it.cluster?.replaceAll('cn-northwest-', '集群'),
-        })) ?? [],
-      );
+      setOrderData(res.ready_data);
       await formatCompare(res?.ops_repair_order_data ?? [], res?.ready_data ?? []);
       setSpinning(false);
     } catch (e: any) {

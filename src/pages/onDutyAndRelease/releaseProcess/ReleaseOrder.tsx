@@ -10,7 +10,7 @@ import FieldSet from '@/components/FieldSet';
 import styles from './index.less';
 import PreReleaseServices from '@/services/preRelease';
 import AnnouncementServices from '@/services/announcement';
-import { useModel, useParams } from 'umi';
+import { useModel, useParams, history } from 'umi';
 import { isEmpty, omit } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
 import moment from 'moment';
@@ -187,27 +187,61 @@ const ReleaseOrder = () => {
       release_name: `${id}灰度推生产`,
     });
   };
-
-  const onSave = async () => {
+  const onSaveBeforeCheck = () => {
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
-    if (order.release_result == 'cancel') {
+    const result = order.release_result;
+    const checkObj = omit({ ...order, ...base }, ['release_result']);
+    const errTip = {
+      plan_release_time: '请填写发布时间!',
+      announcement_num: '请填写关联公告！',
+      person_duty_num: '请填写值班名单',
+      release_name: '请填写工单名称!',
+      cluster: '请填写发布环境!',
+      release_way: '请填写发布方式',
+    };
+    const valid = Object.values(checkObj).some((it) => isEmpty(it));
+    if (valid) {
+      const errArr = Object.entries(checkObj).find(([k, v]) => isEmpty(v)) as any[];
+      infoMessage(errTip[errArr?.[0]]);
+      return;
+    }
+    if (isEmpty(base.release_name?.trim())) return infoMessage(errTip.release_name);
+    // 发布结果为空，直接保存
+    if (isEmpty(result)) {
+      onSave();
+    } else {
+      // 二次确认表姐发布结果
+      const tips = {
+        cancel: { title: '取消发布提醒', content: '取消发布将删除工单，请确认是否取消发布?' },
+        success: { title: '发布成功提醒', content: '请确认是否标记发布成功?' },
+        failure: { title: '发布失败提醒', content: '请确认是否标记发布失败?' },
+      };
       Modal.confirm({
         centered: true,
-        title: '取消发布提醒',
-        content: '取消发布将删除工单，请确认是否取消发布?',
+        title: tips[result].title,
+        content: tips[result].content,
         icon: <div />,
         onOk: async () => {
-          await PreReleaseServices.removeRelease({
-            user_id: user?.userid ?? '',
-            release_num: id ?? '',
-          });
-          history.back();
+          if (result == 'cancel') {
+            await PreReleaseServices.removeRelease({
+              user_id: user?.userid ?? '',
+              release_num: id ?? '',
+            });
+            history.replace('/onDutyAndRelease/releaseProcess?key=pre');
+          } else onSave();
+        },
+        onCancel: () => {
+          orderForm.setFieldsValue({ release_result: null });
         },
       });
       return;
     }
+  };
 
+  const onSave = async () => {
+    const order = orderForm.getFieldsValue();
+    const base = baseForm.getFieldsValue();
     const checkObj = omit({ ...order, ...base }, ['release_result']);
     const errTip = {
       plan_release_time: '请填写发布时间!',
@@ -287,12 +321,12 @@ const ReleaseOrder = () => {
   const hasPermission = useMemo(() => user?.group == 'superGroup', []);
   return (
     <Spin spinning={spinning} tip="数据加载中...">
-      <PageContainer>
+      <PageContainer title={<div />}>
         <div className={styles.releaseOrder}>
           <Collapse defaultActiveKey={'1'} className={styles.collapse}>
             <Collapse.Panel key={'1'} header={'工单'}>
               <div className={styles.save}>
-                <Button size={'small'} onClick={onSave} disabled={finished}>
+                <Button size={'small'} onClick={onSaveBeforeCheck} disabled={finished}>
                   保存
                 </Button>
               </div>
@@ -355,6 +389,7 @@ const ReleaseOrder = () => {
                             allowClear={true}
                             disabled={finished}
                             className={styles.selectColor}
+                            onChange={onSaveBeforeCheck}
                             options={[
                               { label: '发布成功', value: 'success', key: 'success' },
                               { label: '发布失败', value: 'failure', key: 'failure' },

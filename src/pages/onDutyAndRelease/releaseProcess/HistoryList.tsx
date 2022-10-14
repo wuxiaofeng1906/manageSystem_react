@@ -7,6 +7,8 @@ import IPagination from '@/components/IPagination';
 import { getHeight } from '@/publicMethods/pageSet';
 import PreReleaseServices from '@/services/preRelease';
 import { useLocation } from 'umi';
+import { isEmpty } from 'lodash';
+import moment from 'moment';
 
 const HistoryList = () => {
   const gridRef = useRef<GridApi>();
@@ -54,6 +56,12 @@ const HistoryList = () => {
         repair_order: values.repair_order?.join(',') ?? '',
         page: page,
         page_size: page_size,
+        start_time: isEmpty(values.time)
+          ? ''
+          : moment(values.time?.[0]).format('YYYY-MM-DD HH:mm:ss'),
+        end_time: isEmpty(values.time)
+          ? ''
+          : moment(values.time?.[1]).format('YYYY-MM-DD HH:mm:ss'),
       });
       setRowData(
         res.data?.map((it: any) => ({

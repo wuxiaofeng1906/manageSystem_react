@@ -531,6 +531,13 @@ export default [
                 component: './kpi/performance/testers/grayScaleBugRate',
                 hideInMenu: true, // 临时屏蔽
               },
+              {
+                name: '轮次测试P0+P1占比',
+                icon: 'table',
+                path: 'roundsTestRate',
+                component: './kpi/performance/testers/roundsTestRate',
+                // hideInMenu: true, // 临时屏蔽
+              },
             ],
           },
           {

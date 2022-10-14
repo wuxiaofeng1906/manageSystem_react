@@ -213,6 +213,36 @@ const StatisticServices = {
   `);
     return { data: formatTreeData(data.data), loading };
   },
+  // 轮次测试P0+P1占比
+  async roundsTestRate({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:testRoundP0P1ScoreDept(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+        total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            parent{
+              dept
+              deptName
+            }
+            kpi
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData(data.data), loading };
+  },
 
   // 阻塞测试工作量
   async blockingTestWorkload({ client, params, identity }: IStatisticQuery) {

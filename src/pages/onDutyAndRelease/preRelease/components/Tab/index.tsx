@@ -346,13 +346,13 @@ const Tab: React.FC<any> = () => {
 
   /* endregion */
 
-  // useEffect(() => {
-  //   if (operteStatus) {
-  //     tabType = 'card';
-  //   } else {
-  //     tabType = 'editable-card';
-  //   }
-  // }, [operteStatus]);
+  useEffect(() => {
+    if (operteStatus) {
+      tabType = 'card';
+    } else {
+      tabType = 'editable-card';
+    }
+  }, [operteStatus]);
 
   // 鼠标点击事件，右击时
   const onContextMenu = (e: any) => {

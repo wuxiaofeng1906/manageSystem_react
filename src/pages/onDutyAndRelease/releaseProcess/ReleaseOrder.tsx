@@ -57,7 +57,7 @@ const ReleaseOrder = () => {
     );
     setEnvList(
       envs?.flatMap((it: any) =>
-        it.online_environment_name == '集群0'
+        ['集群0', 'global'].includes(it.online_environment_name)
           ? []
           : [
               {

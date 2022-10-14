@@ -92,8 +92,12 @@ const PreReleaseServices = {
     return request(`${baseUrl}/latest-release/release-plan`, { params });
   },
   // 删除发布列表（视图）
-  async removeRelease(data: any) {
-    return request(`${baseUrl}/latest-release/list`, { method: 'delete', data, msg: '删除成功' });
+  async removeRelease(data: any, showMsg = true) {
+    return request(`${baseUrl}/latest-release/list`, {
+      method: 'delete',
+      data,
+      msg: showMsg ? '删除成功' : false,
+    });
   },
   // 删除积压工单项目
   async removeOrder(data: any) {

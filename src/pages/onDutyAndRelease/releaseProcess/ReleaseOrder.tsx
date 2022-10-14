@@ -204,14 +204,18 @@ const ReleaseOrder = () => {
     if (valid) {
       const errArr = Object.entries(checkObj).find(([k, v]) => isEmpty(v)) as any[];
       infoMessage(errTip[errArr?.[0]]);
+      orderForm.setFieldsValue({ release_result: null });
       return;
     }
-    if (isEmpty(base.release_name?.trim())) return infoMessage(errTip.release_name);
+    if (isEmpty(base.release_name?.trim())) {
+      orderForm.setFieldsValue({ release_result: null });
+      return infoMessage(errTip.release_name);
+    }
     // 发布结果为空，直接保存
     if (isEmpty(result)) {
       onSave();
     } else {
-      // 二次确认表姐发布结果
+      // 二次确认标记发布结果
       const tips = {
         cancel: { title: '取消发布提醒', content: '取消发布将删除工单，请确认是否取消发布?' },
         success: { title: '发布成功提醒', content: '请确认是否标记发布成功?' },
@@ -224,12 +228,15 @@ const ReleaseOrder = () => {
         icon: <div />,
         onOk: async () => {
           if (result == 'cancel') {
-            await PreReleaseServices.removeRelease({
-              user_id: user?.userid ?? '',
-              release_num: id ?? '',
-            });
-            history.replace('/onDutyAndRelease/releaseProcess?key=pre');
-          } else onSave();
+            await PreReleaseServices.removeRelease(
+              {
+                user_id: user?.userid ?? '',
+                release_num: id ?? '',
+              },
+              false,
+            );
+          } else await onSave();
+          history.replace('/onDutyAndRelease/releaseProcess?key=pre');
         },
         onCancel: () => {
           orderForm.setFieldsValue({ release_result: null });

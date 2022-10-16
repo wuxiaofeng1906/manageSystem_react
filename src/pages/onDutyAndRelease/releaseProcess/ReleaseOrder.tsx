@@ -1,5 +1,17 @@
 import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
-import { Form, Select, DatePicker, Button, Input, Col, Spin, Divider, Collapse, Modal } from 'antd';
+import {
+  Form,
+  Select,
+  DatePicker,
+  Button,
+  Input,
+  Col,
+  Spin,
+  Divider,
+  Collapse,
+  Modal,
+  Checkbox,
+} from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import {
   historyCompareColumn,
@@ -34,6 +46,7 @@ const ReleaseOrder = () => {
 
   const [spinning, setSpinning] = useState(false);
   const [finished, setFinished] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   const onGridReady = (params: GridReadyEvent, ref = gridRef) => {
     ref.current = params.api;
@@ -122,7 +135,7 @@ const ReleaseOrder = () => {
       setOrderData(
         rd?.map((it: any) => ({ ...it, cluster: it.cluster?.replaceAll('cn-northwest-', '集群') })),
       );
-      const flag = rd.some((it: any) => it.repair_order_type.indexOf('停机') > -1);
+      const flag = rd.some((it: any) => (it.repair_order_type ?? '').indexOf('停机') > -1);
       orderForm.setFieldsValue({
         release_way: flag ? 'stop_server' : 'keep_server',
       });
@@ -187,10 +200,12 @@ const ReleaseOrder = () => {
       release_name: `${id}灰度推生产`,
     });
   };
-  const onSaveBeforeCheck = () => {
+  const onSaveBeforeCheck = (isAuto?: false) => {
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
     const result = order.release_result;
+    if (isAuto && (isEmpty(result) || result == 'unknown')) return;
+
     const checkObj = omit({ ...order, ...base }, ['release_result']);
     const errTip = {
       plan_release_time: '请填写发布时间!',
@@ -201,6 +216,7 @@ const ReleaseOrder = () => {
       release_way: '请填写发布方式',
     };
     const valid = Object.values(checkObj).some((it) => isEmpty(it));
+
     if (valid) {
       const errArr = Object.entries(checkObj).find(([k, v]) => isEmpty(v)) as any[];
       infoMessage(errTip[errArr?.[0]]);
@@ -212,7 +228,7 @@ const ReleaseOrder = () => {
       return infoMessage(errTip.release_name);
     }
     // 发布结果为空，直接保存
-    if (isEmpty(result)) {
+    if (isEmpty(result) || result == 'unknown') {
       onSave();
     } else {
       // 二次确认标记发布结果
@@ -221,28 +237,31 @@ const ReleaseOrder = () => {
         success: { title: '发布成功提醒', content: '请确认是否标记发布成功?' },
         failure: { title: '发布失败提醒', content: '请确认是否标记发布失败?' },
       };
-      Modal.confirm({
-        centered: true,
-        title: tips[result].title,
-        content: tips[result].content,
-        icon: <div />,
-        onOk: async () => {
-          if (result == 'cancel') {
-            await PreReleaseServices.removeRelease(
-              {
-                user_id: user?.userid ?? '',
-                release_num: id ?? '',
-              },
-              false,
-            );
-          } else await onSave();
-          history.replace('/onDutyAndRelease/releaseProcess?key=pre');
-        },
-        onCancel: () => {
-          orderForm.setFieldsValue({ release_result: null });
-        },
-      });
-      return;
+      if (result == 'success') {
+        setVisible(true);
+      } else {
+        Modal.confirm({
+          centered: true,
+          title: tips[result].title,
+          content: tips[result].content,
+          icon: <div />,
+          onOk: async () => {
+            if (result == 'cancel') {
+              await PreReleaseServices.removeRelease(
+                {
+                  user_id: user?.userid ?? '',
+                  release_num: id ?? '',
+                },
+                false,
+              );
+            } else await onSave();
+            history.replace('/onDutyAndRelease/releaseProcess?key=pre');
+          },
+          onCancel: () => {
+            orderForm.setFieldsValue({ release_result: null });
+          },
+        });
+      }
     }
   };
 
@@ -284,6 +303,15 @@ const ReleaseOrder = () => {
     getOrderDetail();
   };
 
+  const onSuccessConfirm = (v: any) => {
+    setVisible(false);
+    if (isEmpty(v)) {
+      orderForm.setFieldsValue({ release_result: null });
+    } else {
+      onSave();
+      history.replace('/onDutyAndRelease/releaseProcess?key=pre');
+    }
+  };
   const onRemove = (data: any) => {
     const cluster = baseForm.getFieldValue('cluster');
     if (agFinished || !hasPermission) {
@@ -324,7 +352,6 @@ const ReleaseOrder = () => {
     setOrderData(sortArr);
     formatCompare(compareData?.opsData ?? [], sortArr);
   };
-
   const hasPermission = useMemo(() => user?.group == 'superGroup', []);
   return (
     <Spin spinning={spinning} tip="数据加载中...">
@@ -333,7 +360,7 @@ const ReleaseOrder = () => {
           <Collapse defaultActiveKey={'1'} className={styles.collapse}>
             <Collapse.Panel key={'1'} header={'工单'}>
               <div className={styles.save}>
-                <Button size={'small'} onClick={onSaveBeforeCheck} disabled={finished}>
+                <Button size={'small'} onClick={() => onSaveBeforeCheck()} disabled={finished}>
                   保存
                 </Button>
               </div>
@@ -393,10 +420,10 @@ const ReleaseOrder = () => {
                       return (
                         <Form.Item name={'release_result'}>
                           <Select
-                            allowClear={true}
+                            allowClear
                             disabled={finished}
                             className={styles.selectColor}
-                            onChange={onSaveBeforeCheck}
+                            onChange={() => onSaveBeforeCheck(true)}
                             options={[
                               { label: '发布成功', value: 'success', key: 'success' },
                               { label: '发布失败', value: 'failure', key: 'failure' },
@@ -422,7 +449,6 @@ const ReleaseOrder = () => {
               </Form>
             </Collapse.Panel>
           </Collapse>
-
           <FieldSet data={{ title: '工单-基础设置' }}>
             <Form layout={'inline'} size={'small'} form={baseForm} className={styles.baseInfo}>
               <Col span={6}>
@@ -522,9 +548,73 @@ const ReleaseOrder = () => {
               })}
             />
           </div>
+          <ModalSuccessCheck visible={visible} onOk={(v?: any) => onSuccessConfirm(v)} />
         </div>
       </PageContainer>
     </Spin>
   );
 };
 export default ReleaseOrder;
+
+const ModalSuccessCheck = ({ visible, onOk }: { visible: boolean; onOk: (v?: any) => void }) => {
+  const [form] = Form.useForm();
+
+  const onConfirm = async () => {
+    const values = await form.validateFields();
+    onOk(values);
+  };
+
+  useEffect(() => {
+    if (!visible) form.resetFields();
+  }, [visible]);
+  return (
+    <Modal
+      visible={visible}
+      title={'发布结果确认'}
+      onOk={onConfirm}
+      maskClosable={false}
+      onCancel={() => onOk()}
+      className={styles.modalSuccessCheck}
+      destroyOnClose
+    >
+      <div>请确认是否标记发布成功？</div>
+      <div>如有自动化也执行通过！确认通过，会自动开放所有租户。</div>
+      <Form form={form} layout={'inline'}>
+        <Form.Item
+          label="是否忽略发布成功后自动化检查"
+          name="ignoreAfterCheck"
+          valuePropName="checked"
+        >
+          <Checkbox value="yes" onChange={({ target }) => form.validateFields(['checkResult'])}>
+            忽略检查
+          </Checkbox>
+        </Form.Item>
+        <Form.Item
+          noStyle
+          shouldUpdate={(old, next) => old.ignoreAfterCheck != next.ignoreAfterCheck}
+        >
+          {({ getFieldValue }) => {
+            const afterCheck = getFieldValue('ignoreAfterCheck');
+            return (
+              <Form.Item
+                label="检查结果"
+                name="checkResult"
+                required={true}
+                rules={[{ required: afterCheck !== true, message: '请选择检查结果' }]}
+              >
+                <Checkbox.Group style={{ width: '100%' }}>
+                  <Checkbox value="ui">UI执行通过</Checkbox>
+                  <Checkbox value="applet">小程序执行通过</Checkbox>
+                </Checkbox.Group>
+              </Form.Item>
+            );
+          }}
+        </Form.Item>
+
+        <Form.Item label="是否挂起升级后公告" name="sendAnnouncementMsg" valuePropName="checked">
+          <Checkbox value="yes" defaultChecked={true} disabled={false} />
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+};

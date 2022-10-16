@@ -189,6 +189,26 @@ const VisualView = () => {
     );
   };
 
+  const computeFn = (origin: any[], key?: string) => {
+    let source: any[] = [];
+    const hasKey = !isEmpty(key);
+    if (isEmpty(origin)) return [];
+    origin.forEach((it: any) => {
+      const base = it?.baseline_cluster;
+      if (!isEmpty(it?.cluster)) {
+        it.cluster?.forEach((o: any) => {
+          source.push(o);
+        });
+      }
+      if (!isEmpty(base) || hasKey) {
+        const resetV = hasKey ? it : base;
+        const text = resetV?.replace('cn-northwest-', '集群');
+        const value = text.length > 3 ? `${text.slice(0, 3)}-${text.slice(text.length - 1)}` : text;
+        source.push({ value, name: resetV });
+      }
+    });
+    return source;
+  };
   const getViewData = async () => {
     setLoading(true);
     try {
@@ -197,8 +217,10 @@ const VisualView = () => {
       const plan = await PreReleaseServices.releasePlan({});
 
       const basicOnline = basic.map((it: any) => it.cluster)?.flat() ?? [];
-      const currentOnline = currentDay.map((it: any) => it.cluster)?.flat() ?? [];
-      const planOnline = plan.map((it: any) => it.cluster)?.flat() ?? [];
+      const formatBasicCluster = computeFn(basicOnline, 'key');
+      const currentOnline = computeFn(currentDay);
+      const planOnline = computeFn(plan);
+
       setCurrentSource(
         currentDay?.map((it: any) => {
           const isRed = it.project?.some(
@@ -226,13 +248,6 @@ const VisualView = () => {
         })),
       );
       // 去重并排序(动态列计算)
-      const formatBasicCluster =
-        basicOnline?.map((name: string) => {
-          const text = name?.replace('cn-northwest-', '集群');
-          const value =
-            text.length > 3 ? `${text.slice(0, 3)}-${text.slice(text.length - 1)}` : text;
-          return { name, value };
-        }) ?? [];
       let formatOnline = sortBy(
         uniqBy([...formatBasicCluster, ...currentOnline, ...planOnline], 'name').flatMap((it) =>
           ignore.includes(it.name) ? [] : [it],

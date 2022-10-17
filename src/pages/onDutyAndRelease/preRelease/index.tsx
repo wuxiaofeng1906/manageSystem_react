@@ -238,6 +238,7 @@ const PreRelease: React.FC<any> = () => {
   useEffect(() => {
     currentKey = '';
     currentPanes = [];
+    modifyOperteStatus(false);
     showPageInitData(data, true);
   }, [data, loading]);
 
@@ -272,6 +273,7 @@ const PreRelease: React.FC<any> = () => {
   window.onunload = () => {
     currentKey = '';
     currentPanes = [];
+    modifyOperteStatus(false);
     deleteLockStatus(lockedItem);
   };
 

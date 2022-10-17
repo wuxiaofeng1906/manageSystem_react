@@ -131,5 +131,13 @@ const PreReleaseServices = {
   async orderDetail(params: any) {
     return request(`${baseUrl}/latest-release/detail`, { params, warn: false });
   },
+  // 自动化检查-发布成功
+  async automation(data: any) {
+    return request(`${baseUrl}/latest-release/automation`, { data, method: 'post' });
+  },
+  // 升级公告挂起
+  async saveAnnouncement(params: any) {
+    return request(`${baseUrl}/latest-release/announcement`, { params });
+  },
 };
 export default PreReleaseServices;

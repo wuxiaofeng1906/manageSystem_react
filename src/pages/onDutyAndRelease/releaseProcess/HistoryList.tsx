@@ -58,10 +58,10 @@ const HistoryList = () => {
         page_size: page_size,
         start_time: isEmpty(values.time)
           ? ''
-          : moment(values.time?.[0]).format('YYYY-MM-DD HH:mm:ss'),
+          : moment(values.time?.[0]).startOf('d').format('YYYY-MM-DD HH:mm:ss'),
         end_time: isEmpty(values.time)
           ? ''
-          : moment(values.time?.[1]).format('YYYY-MM-DD HH:mm:ss'),
+          : moment(values.time?.[1]).endOf('d').format('YYYY-MM-DD HH:mm:ss'),
       });
       setRowData(
         res.data?.map((it: any) => ({

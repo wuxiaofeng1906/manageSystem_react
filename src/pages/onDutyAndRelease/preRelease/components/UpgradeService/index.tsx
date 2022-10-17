@@ -42,6 +42,8 @@ const { TextArea } = Input;
 const { Option } = Select;
 const userLogins: any = localStorage.getItem('userLogins');
 const usersInfo = JSON.parse(userLogins);
+let upgradeTable: any[];
+let servicesTable: any[];
 let currentOperateStatus = false; // 需要将useState中的operteStatus值赋值过来，如果直接取operteStatus，下拉框那边获取不到最新的operteStatus；
 const UpgradeService: React.FC<any> = () => {
   const {
@@ -460,13 +462,36 @@ const UpgradeService: React.FC<any> = () => {
   /* endregion */
 
   /* region 服务确认 */
+  // 表格数据重置
+  const resetTable = async (currentReleaseNum: string) => {
+    const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
+    serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+    serverConfirmGridApi2.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+  };
 
   // 下拉框选择是否确认事件
   const saveUperConfirmInfo = async (newValue: string, props: any, checkStepFourSource = false) => {
     const isOk = newValue == '1'; // 当前测试修改确认状态为是
     const currentReleaseNum = props.data?.ready_release_num;
     const testField = props.column.colId == 'test_confirm_status';
+    const editId = `${props.column.colId?.split('_')?.[0]}_user_id`;
     // checkStepFourSource: 检查step 4的上线环境是否存在未填【1.填写了应用2.填写了升级接口】
+    const upgrade = upgradeTable.flatMap((it: any) =>
+      it.edit_user_id == !isEmpty(it) && props.data?.[editId] && isEmpty(it?.online_environment)
+        ? [it.app]
+        : [],
+    );
+    const services = servicesTable?.flatMap((it: any) =>
+      !isEmpty(it) && it.edit_user_id == props.data?.[editId] && isEmpty(it?.online_environment)
+        ? [it.api_name]
+        : [],
+    );
+    // 校验各自值班确认服务集群是否为空
+    if (!isEmpty([...upgrade, ...services]) && !testField && isOk) {
+      infoMessage(`服务[${String([...upgrade, ...services])}]未填写相关信息，请填写完成后再次确认`);
+      resetTable(currentReleaseNum);
+      return;
+    }
 
     // 验证 集群是否未填写
     const checkEnvIsEmpty = checkStepFourSource && testField;
@@ -488,9 +513,7 @@ const UpgradeService: React.FC<any> = () => {
       // 重置为初始状态（不更新确认状态）
       if (!checkDeveloperHasFinish || checkEnvIsEmpty) {
         // (不管成功或者失败)刷新表格
-        const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
-        serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
-        serverConfirmGridApi2.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+        resetTable(currentReleaseNum);
         return;
       }
     }
@@ -614,6 +637,8 @@ const UpgradeService: React.FC<any> = () => {
   //  测试修改服务确认完成为【是】：检查 上线环境是否存在未填
   useEffect(() => {
     // 存在有一项数据不完整 为true
+    upgradeTable = releaseItem.gridData;
+    servicesTable = upgradeApi.gridData;
     const flag = checkOnlineEnvSource(releaseItem, upgradeApi);
     applicantConfirmForm.setFieldsValue({ status: flag });
   }, [JSON.stringify(releaseItem.gridData), JSON.stringify(upgradeApi.gridData)]);
@@ -626,7 +651,6 @@ const UpgradeService: React.FC<any> = () => {
           <legend className={'legendStyle'}>
             Step4 升级服务
             <label style={{ color: 'Gray' }}>
-              {' '}
               (值班测试：填写一键部署ID和测试服务确认完成；前后端值班：填写应用服务和升级接口/对应服务确认完成)
             </label>
           </legend>
@@ -837,6 +861,7 @@ const UpgradeService: React.FC<any> = () => {
                                     disabled={currentOperateStatus}
                                     style={{ width: '100%', color: Color }}
                                     onChange={(newValue: any) => {
+                                      console.log(upgradeTable, servicesTable);
                                       saveUperConfirmInfo(newValue, props, getFieldValue('status'));
                                     }}
                                   >
@@ -905,6 +930,8 @@ const UpgradeService: React.FC<any> = () => {
                           disabled={currentOperateStatus}
                           style={{ width: '100%', color: Color }}
                           onChange={(newValue: any) => {
+                            console.log(upgradeTable, servicesTable);
+
                             saveUperConfirmInfo(newValue, props);
                           }}
                         >

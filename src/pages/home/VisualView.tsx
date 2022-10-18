@@ -22,10 +22,21 @@ const ICard = (params: {
   child?: React.ReactNode;
   onRefresh: Function;
   deleteIcon?: boolean;
+  open: boolean;
 }) => {
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const baseline = params.data.baseline_cluster == 'offline';
   const hasPermission = useMemo(() => user?.group == 'superGroup', [user]);
+  const [activeKey, setActiveKey] = useState('');
+
+  const title = useMemo(
+    () =>
+      isArray(params.data.project)
+        ? params.data.project?.map((it: any) => it.pro_name)?.join(',')
+        : params.data.project,
+    [JSON.stringify(params.data.project)],
+  );
+
   const onRemove = async (data: any) => {
     Modal.confirm({
       centered: true,
@@ -40,98 +51,104 @@ const ICard = (params: {
       },
     });
   };
+
+  useEffect(() => {
+    setActiveKey(params.open ? params.data.release_num : '');
+  }, [params.open]);
+
   return (
-    <div style={{ background: params.data.bg || initBg[0] }} className={styles.icard}>
+    <div className={styles.stackWrapper}>
       {params.child || <div />}
-      <div className={styles.container}>
-        <span className={styles.label}>发布项目:</span>
-        <div
-          className={styles.box}
-          title={
-            isArray(params.data.project)
-              ? params.data.project?.map((it: any) => it.pro_name)?.join(',')
-              : params.data.project
-          }
-        >
-          {isArray(params.data.project)
-            ? params.data.project?.map((it: any) => {
-                const linkProject =
-                  it.pro_name?.startsWith('emergency') ||
-                  it.pro_name?.startsWith('stagepatch') ||
-                  it.pro_name?.startsWith('stage-patch');
-                return (
-                  <span
-                    className={cns(baseline && linkProject ? styles.link : '', styles.value)}
-                    onClick={() => {
-                      if (!it.pro_id || !(baseline && linkProject)) return;
-                      window.open(
-                        `http://zentao.77hub.com/zentao/execution-task-${it.pro_id}.html`,
+      <Collapse
+        activeKey={activeKey}
+        onChange={(v) => setActiveKey(!v.includes(activeKey) ? '' : params.data.release_num)}
+      >
+        <Collapse.Panel key={params.data.release_num} header={title}>
+          <div style={{ background: params.data.bg || initBg[0] }} className={styles.icard}>
+            <div className={styles.container}>
+              <span className={styles.label}>发布项目:</span>
+              <div className={styles.box} title={title}>
+                {isArray(params.data.project)
+                  ? params.data.project?.map((it: any) => {
+                      const linkProject =
+                        it.pro_name?.startsWith('emergency') ||
+                        it.pro_name?.startsWith('stagepatch') ||
+                        it.pro_name?.startsWith('stage-patch');
+                      return (
+                        <span
+                          className={cns(baseline && linkProject ? styles.link : '', styles.value)}
+                          onClick={() => {
+                            if (!it.pro_id || !(baseline && linkProject)) return;
+                            window.open(
+                              `http://zentao.77hub.com/zentao/execution-task-${it.pro_id}.html`,
+                            );
+                          }}
+                        >
+                          {it.pro_name ?? ''}
+                        </span>
                       );
-                    }}
-                  >
-                    {it.pro_name ?? ''}
-                  </span>
-                );
-              })
-            : params.data.project}
-        </div>
-      </div>
-      <div className={styles.container}>
-        <span className={styles.label}>发布分支:</span>
-        <div className={styles.box} title={params.data.branch ?? ''}>
-          {params.data.branch ?? ''}
-        </div>
-      </div>
-      {isEmpty(params.data.story) ? (
-        ''
-      ) : (
-        <div className={styles.container}>
-          <span className={styles.label}>发布需求:</span>
-          <div className={styles.box} title={params.data.story ?? ''}>
-            {params.data.story?.split(',')?.map((ztno: number) => (
-              <span
-                className={baseline ? styles.link : ''}
-                onClick={() => {
-                  if (!ztno || !baseline) return;
-                  window.open(`http://zentao.77hub.com/zentao/story-view-${ztno}.html`);
-                }}
-              >
-                {ztno ?? ''}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
+                    })
+                  : params.data.project}
+              </div>
+            </div>
+            <div className={styles.container}>
+              <span className={styles.label}>发布分支:</span>
+              <div className={styles.box} title={params.data.branch ?? ''}>
+                {params.data.branch ?? ''}
+              </div>
+            </div>
+            {isEmpty(params.data.story) ? (
+              ''
+            ) : (
+              <div className={styles.container}>
+                <span className={styles.label}>发布需求:</span>
+                <div className={styles.box} title={params.data.story ?? ''}>
+                  {params.data.story?.split(',')?.map((ztno: number) => (
+                    <span
+                      className={baseline ? styles.link : ''}
+                      onClick={() => {
+                        if (!ztno || !baseline) return;
+                        window.open(`http://zentao.77hub.com/zentao/story-view-${ztno}.html`);
+                      }}
+                    >
+                      {ztno ?? ''}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className={styles.container}>
+              <span className={styles.label}>发布服务:</span>
+              <div className={styles.box} title={params.data.apps ?? ''}>
+                {params.data.apps ?? ''}
+              </div>
+            </div>
+            {params.isBasic ? (
+              <div className={styles.container}>
+                <span className={styles.label}>发布时间:</span>
+                {params.data.release_time ?? ''}
+              </div>
+            ) : (
+              <div className={styles.container}>
+                <span className={styles.label}>发布集群:</span>
+                <div className={styles.box} title={params.data.release_env ?? ''}>
+                  {params.data.release_env ?? ''}
+                </div>
+              </div>
+            )}
 
-      <div className={styles.container}>
-        <span className={styles.label}>发布服务:</span>
-        <div className={styles.box} title={params.data.apps ?? ''}>
-          {params.data.apps ?? ''}
-        </div>
-      </div>
-      {params.isBasic ? (
-        <div className={styles.container}>
-          <span className={styles.label}>发布时间:</span>
-          {params.data.release_time ?? ''}
-        </div>
-      ) : (
-        <div className={styles.container}>
-          <span className={styles.label}>发布集群:</span>
-          <div className={styles.box} title={params.data.release_env ?? ''}>
-            {params.data.release_env ?? ''}
+            {hasPermission && params.deleteIcon == true ? (
+              <img
+                src={require('../../../public/delete_black_2.png')}
+                className={styles.deleteIcon}
+                onClick={() => onRemove(params.data)}
+              />
+            ) : (
+              <div />
+            )}
           </div>
-        </div>
-      )}
-
-      {hasPermission && params.deleteIcon == true ? (
-        <img
-          src={require('../../../public/delete_black_2.png')}
-          className={styles.deleteIcon}
-          onClick={() => onRemove(params.data)}
-        />
-      ) : (
-        <div />
-      )}
+        </Collapse.Panel>
+      </Collapse>
     </div>
   );
 };
@@ -210,6 +227,7 @@ const VisualView = () => {
     });
     return source;
   };
+
   const getViewData = async () => {
     setLoading(true);
     try {
@@ -235,7 +253,6 @@ const VisualView = () => {
             baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
             cls: isRed ? styles.dotLineEmergency : styles.dotLineSuccess,
             bg: isRed ? initBg[1] : initBg[0],
-            open: false,
           };
         }),
       );
@@ -247,7 +264,6 @@ const VisualView = () => {
           bg: initBg[2],
           plan_release_time: it.plan_time,
           release_env: it.cluster?.map((it: any) => it.value)?.join(',') ?? '',
-          open: false,
         })),
       );
       // 去重并排序(动态列计算)
@@ -266,9 +282,7 @@ const VisualView = () => {
         .forEach((it) => {
           basicGroup.push({
             name: it.name,
-            children: basic.flatMap((re: any) =>
-              re.cluster.includes(it.name) ? [{ ...re, open: false }] : [],
-            ),
+            children: basic.flatMap((re: any) => (re.cluster.includes(it.name) ? [re] : [])) ?? [],
           });
         });
       setBasicSource(basicGroup);
@@ -283,13 +297,7 @@ const VisualView = () => {
   // 动态列
   const dynamicColumn = useMemo(() => [...baseColumn, ...online], [online]);
 
-  const renderTr = (
-    arr: any[],
-    title: string,
-    showStep = true,
-    deleteIcon?: boolean,
-    type = 'current',
-  ) => {
+  const renderTr = (arr: any[], title: string, showStep = true, deleteIcon?: boolean) => {
     if (isEmpty(arr)) {
       return (
         <tr>
@@ -328,7 +336,7 @@ const VisualView = () => {
                   ''
                 )}
               </td>
-              {renderTd(it, deleteIcon, type)}
+              {renderTd(it, deleteIcon)}
             </tr>
           );
         })}
@@ -336,65 +344,40 @@ const VisualView = () => {
     );
   };
 
-  const renderTd = (data: any, deleteIcon?: boolean, type = 'current') => {
-    const activeData = type == 'current' ? currentSource : planSource;
+  const renderTd = (data: any, deleteIcon?: boolean) => {
     return (
       <Fragment>
         {dynamicColumn.map((it, index) => {
           return (
-            <td key={index}>
+            <td key={index} style={{ verticalAlign: 'middle' }}>
               {data.baseline_cluster == it?.name ? (
-                <div className={styles.stackWrapper}>
-                  <Collapse
-                    activeKey={activeData.flatMap((it) => (it.open ? [it.release_num] : []))}
-                    onChange={() => {
-                      const result = activeData.map((it) => ({
-                        ...it,
-                        open: it.release_num == data.release_num ? !it.open : it.open,
-                      }));
-                      if (type == 'current') {
-                        setCurrentSource(result);
-                      } else {
-                        setPlanSource(result);
-                      }
-                    }}
-                  >
-                    <Collapse.Panel
-                      key={data.release_num}
-                      header={data.project?.map((it: any) => it.pro_name)?.join(',')}
-                    >
-                      <ICard
-                        data={data}
-                        onRefresh={getViewData}
-                        deleteIcon={deleteIcon ?? ignore.includes(data.baseline_cluster)}
-                        child={
-                          <div>
-                            {data?.cluster?.map((env: any, i: number) => {
-                              const baseIndex = dynamicColumn.findIndex(
-                                (v) => data.baseline_cluster == v.name,
-                              );
-                              const envIndex = dynamicColumn.findIndex((v) => v.name == env.name);
-                              const alpha = envIndex - baseIndex;
-                              if (envIndex < 0 || env.name == data.baseline_cluster) return '';
-                              return (
-                                <div
-                                  key={env}
-                                  className={cns(
-                                    styles.dotLineBasic,
-                                    data.cls ?? styles.dotLinePrimary,
-                                  )}
-                                  style={{
-                                    width: `calc(${alpha * 100 - 50}% + ${alpha * 7 + i * 6}px)`,
-                                  }}
-                                />
-                              );
-                            })}
-                          </div>
-                        }
-                      />
-                    </Collapse.Panel>
-                  </Collapse>
-                </div>
+                <ICard
+                  data={data}
+                  onRefresh={getViewData}
+                  deleteIcon={deleteIcon ?? ignore.includes(data.baseline_cluster)}
+                  open={open}
+                  child={
+                    <div>
+                      {data?.cluster?.map((env: any, i: number) => {
+                        const baseIndex = dynamicColumn.findIndex(
+                          (v) => data.baseline_cluster == v.name,
+                        );
+                        const envIndex = dynamicColumn.findIndex((v) => v.name == env.name);
+                        const alpha = envIndex - baseIndex;
+                        if (envIndex < 0 || env.name == data.baseline_cluster) return '';
+                        return (
+                          <div
+                            key={env}
+                            className={cns(styles.dotLineBasic, data.cls ?? styles.dotLinePrimary)}
+                            style={{
+                              width: `calc(${alpha * 100 - 50}% - ${(i + 1) * 2}px)`,
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  }
+                />
               ) : (
                 ''
               )}
@@ -415,49 +398,24 @@ const VisualView = () => {
             <td />
           ) : (
             <td>
-              <div className={styles.stackWrapper}>
-                {it.children?.map((child: any, i: number) => (
-                  <Collapse
-                    activeKey={it.children?.flatMap((it: any) => (it.open ? [it.release_num] : []))}
-                    onChange={() => {
-                      let result = cloneDeep(basicSource);
-                      result[index].children[i] = {
-                        ...result[index].children?.[i],
-                        open: !result[index].children?.[i].open,
-                      };
-                      setBasicSource(result);
-                    }}
-                  >
-                    <Collapse.Panel key={child.release_num} header={child.project}>
-                      <ICard
-                        data={child}
-                        onRefresh={getViewData}
-                        isBasic={true}
-                        deleteIcon={
-                          intersection(ignore, child.cluster ?? []).length > 0 && index < 2
-                        }
-                      />
-                    </Collapse.Panel>
-                  </Collapse>
-                ))}
-              </div>
+              {it.children?.map((child: any) => {
+                return (
+                  <ICard
+                    key={child.release_num}
+                    data={child}
+                    onRefresh={getViewData}
+                    isBasic={true}
+                    open={open}
+                    deleteIcon={intersection(ignore, child.cluster ?? []).length > 0 && index < 2}
+                  />
+                );
+              })}
             </td>
           );
         })}
       </Fragment>
     );
   }, [basicSource, onlineLen, open]);
-
-  useEffect(() => {
-    setCurrentSource(currentSource?.map((it) => ({ ...it, open })));
-    setPlanSource(planSource?.map((it) => ({ ...it, open })));
-    setBasicSource(
-      basicSource.map((it) => ({
-        name: it.name,
-        children: it.children?.map((o: any) => ({ ...o, open })),
-      })),
-    );
-  }, [open]);
 
   return (
     <Card
@@ -554,7 +512,7 @@ const VisualView = () => {
                   </Form>
                 </td>
               </tr>
-              {renderTr(planSource, '上线计划日历', false, false, 'plan')}
+              {renderTr(planSource, '上线计划日历', false, false)}
             </tbody>
           </table>
         </div>

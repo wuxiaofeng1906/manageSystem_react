@@ -87,15 +87,15 @@
           position: absolute;
           width: calc(50% + 7px);
           height: 100%;
-          top: 50%;
-          left: 100%;
-          transform: translateY(-50%);
+          top: calc(50% - 2px);
+          left: calc(100% - 7px);
+          transform: translateY(calc(-50% + 2px));
         }
         .dotLineEmergency,.dotLinePrimary,.dotLineSuccess{
           height: 2px;
           position: absolute;
-          top:50%;
-          transform: translateY(-50%);
+          top:calc(50% - 2px);
+          transform: translateY(calc(-50% + 2px));
           border-bottom: 2px solid #e83d3d80;
           &:after{
             right: -12px;
@@ -134,7 +134,10 @@
     }
   }
   .stackWrapper{
-    padding:7px;
+    padding:5px 5px 0;
+    &:last-child{
+      padding-bottom: 5px;
+    }
     :global{
       .ant-collapse-header{
         padding: 5px 10px !important;

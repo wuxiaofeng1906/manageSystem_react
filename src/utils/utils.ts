@@ -159,23 +159,39 @@ export const formatTreeData = (
   const result: any = [];
   origin.forEach((elements: any) => {
     const startTime = elements.range.start;
-    const denominator = showDenominator
-      ? {
-          [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
-          [`${startTime}_denominator`]: elements.total.sideKpi.denominator,
-        }
-      : { [startTime]: elements.total.kpi * percent };
-    // 根节点
     result.push({
       Group: ['研发中心'],
       isDept: true,
-      ...denominator,
+      ...(showDenominator
+        ? {
+            [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
+            [`${startTime}_denominator`]: elements.total.sideKpi.denominator,
+          }
+        : { [startTime]: elements.total.kpi * percent }),
     });
     // 显示前后端
     if (showSide) {
       result.push(
-        { Group: ['研发中心', '前端'], isDept: true, ...denominator },
-        { Group: ['研发中心', '后端'], isDept: true, ...denominator },
+        {
+          Group: ['研发中心', '前端'],
+          isDept: true,
+          ...(showDenominator
+            ? {
+                [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
+                [`${startTime}_denominator`]: elements.total.sideKpi.denominator,
+              }
+            : { [startTime]: elements.side.front }),
+        },
+        {
+          Group: ['研发中心', '后端'],
+          isDept: true,
+          ...(showDenominator
+            ? {
+                [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
+                [`${startTime}_denominator`]: elements.total.sideKpi.denominator,
+              }
+            : { [startTime]: elements.side.backend }),
+        },
       );
     }
 

@@ -268,6 +268,10 @@ const StatisticServices = {
             start
             end
           }
+          side{
+              front
+              backend
+          }
           datas{
             dept
             deptName

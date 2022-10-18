@@ -28,7 +28,12 @@ const ruleData: IRuleData[] = [
 ];
 const CumulativeLineBugRate: React.FC<any> = () => {
   return (
-    <IStaticPerformance ruleData={ruleData} request={StatisticServices.patch} identity={'TESTER'} />
+    <IStaticPerformance
+      ruleData={ruleData}
+      request={StatisticServices.newPeriodBugThousTestDept}
+      identity={'TEST'}
+      len={2}
+    />
   );
 };
 

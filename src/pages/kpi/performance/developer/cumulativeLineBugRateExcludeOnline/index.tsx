@@ -30,8 +30,9 @@ const CumulativeLineBugRateExcludeOnline: React.FC<any> = () => {
   return (
     <IStaticPerformance
       ruleData={ruleData}
-      request={StatisticServices.patch}
-      identity={'DEVELOPER'}
+      request={StatisticServices.bugThousPeriodDept}
+      identity={'EXCLUDE_ONLINE'}
+      len={2}
     />
   );
 };

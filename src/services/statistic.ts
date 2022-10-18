@@ -213,6 +213,85 @@ const StatisticServices = {
   `);
     return { data: formatTreeData(data.data), loading };
   },
+
+  // 测试 - 累计千行bug率 3个 identity: TEST、OWN、REFER
+  async newPeriodBugThousTestDept({ client, params, identity }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:newPeriodBugThousTestDept(kind: "${condition.typeFlag}", ends: ${condition.ends},thous:${identity}) {
+          total{
+              dept
+              deptName
+              kpi
+            }
+          range{
+            start
+            end
+          }
+          code
+          datas{
+            dept
+            deptName
+            parent{
+              dept
+              deptName
+              kpi
+            }
+            kpi
+            users{
+              userId
+              userName
+              kpi
+            }
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData(data.data), loading };
+  },
+
+  // 开发- 累计千行bug率 2个 identity:ALL,EXCLUDE_ONLINE
+  async bugThousPeriodDept({ client, params, identity }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:bugThousPeriodDept(kind: "${condition.typeFlag}", ends: ${condition.ends},thous:${identity}) {
+          total{
+              dept
+              deptName
+              kpi
+            }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            parent{
+              dept
+              deptName
+            }
+            side{
+              front
+              backend
+            }
+            kpi
+            users{
+              userId
+              userName
+              kpi
+              tech
+            }
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData(data.data), loading };
+  },
   // 轮次测试P0+P1占比
   async roundsTestRate({ client, params }: IStatisticQuery) {
     const condition = getParamsByType(params);

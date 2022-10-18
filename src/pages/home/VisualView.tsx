@@ -241,7 +241,8 @@ const VisualView = () => {
       const currentDay = await PreReleaseServices.releaseView();
       const plan = await PreReleaseServices.releasePlan({});
 
-      const basicOnline = basic.map((it: any) => it.cluster)?.flat() ?? [];
+      const basicOnline =
+        basic.map((it: any) => [...(it.cluster ?? []), ...(it.exist_clu ?? [])])?.flat() ?? [];
       const formatBasicCluster = computeFn(basicOnline, 'key');
       const currentOnline = computeFn(currentDay);
       const planOnline = computeFn(plan);

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, Fragment } from 'react';
 import styles from './index.less';
 import cns from 'classnames';
-import { Collapse, Form, Select, DatePicker, Col, Card, Modal, Spin } from 'antd';
+import { Collapse, Form, Select, DatePicker, Col, Card, Modal, Spin, Switch } from 'antd';
 import { useModel } from 'umi';
 import PreReleaseServices from '@/services/preRelease';
 import { isEmpty, sortBy, uniqBy, cloneDeep, isArray, intersection } from 'lodash';
@@ -147,6 +147,7 @@ const VisualView = () => {
   const [basicSource, setBasicSource] = useState<any[]>([]); // 基准版本
   const [currentSource, setCurrentSource] = useState<any[]>([]); // 当天待发版
   const [planSource, setPlanSource] = useState<any[]>([]); // 计划上线日历
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     getSelectData();
@@ -234,6 +235,7 @@ const VisualView = () => {
             baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
             cls: isRed ? styles.dotLineEmergency : styles.dotLineSuccess,
             bg: isRed ? initBg[1] : initBg[0],
+            open: false,
           };
         }),
       );
@@ -245,6 +247,7 @@ const VisualView = () => {
           bg: initBg[2],
           plan_release_time: it.plan_time,
           release_env: it.cluster?.map((it: any) => it.value)?.join(',') ?? '',
+          open: false,
         })),
       );
       // 去重并排序(动态列计算)
@@ -263,7 +266,9 @@ const VisualView = () => {
         .forEach((it) => {
           basicGroup.push({
             name: it.name,
-            children: basic.filter((re: any) => re.cluster.includes(it.name)) ?? [],
+            children: basic.flatMap((re: any) =>
+              re.cluster.includes(it.name) ? [{ ...re, open: false }] : [],
+            ),
           });
         });
       setBasicSource(basicGroup);
@@ -278,7 +283,13 @@ const VisualView = () => {
   // 动态列
   const dynamicColumn = useMemo(() => [...baseColumn, ...online], [online]);
 
-  const renderTr = (arr: any[], title: string, showStep = true, deleteIcon?: boolean) => {
+  const renderTr = (
+    arr: any[],
+    title: string,
+    showStep = true,
+    deleteIcon?: boolean,
+    type = 'current',
+  ) => {
     if (isEmpty(arr)) {
       return (
         <tr>
@@ -317,7 +328,7 @@ const VisualView = () => {
                   ''
                 )}
               </td>
-              {renderTd(it, deleteIcon)}
+              {renderTd(it, deleteIcon, type)}
             </tr>
           );
         })}
@@ -325,39 +336,65 @@ const VisualView = () => {
     );
   };
 
-  const renderTd = (data: any, deleteIcon?: boolean) => {
+  const renderTd = (data: any, deleteIcon?: boolean, type = 'current') => {
+    const activeData = type == 'current' ? currentSource : planSource;
     return (
       <Fragment>
         {dynamicColumn.map((it, index) => {
           return (
             <td key={index}>
               {data.baseline_cluster == it?.name ? (
-                <ICard
-                  data={data}
-                  onRefresh={getViewData}
-                  deleteIcon={deleteIcon ?? ignore.includes(data.baseline_cluster)}
-                  child={
-                    <div>
-                      {data?.cluster?.map((env: any, i: number) => {
-                        const baseIndex = dynamicColumn.findIndex(
-                          (v) => data.baseline_cluster == v.name,
-                        );
-                        const envIndex = dynamicColumn.findIndex((v) => v.name == env.name);
-                        const alpha = envIndex - baseIndex;
-                        if (envIndex < 0 || env.name == data.baseline_cluster) return '';
-                        return (
-                          <div
-                            key={env}
-                            className={cns(styles.dotLineBasic, data.cls ?? styles.dotLinePrimary)}
-                            style={{
-                              width: `calc(${alpha * 100 - 50}% + ${alpha * 7 + i * 6}px)`,
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
-                  }
-                />
+                <div className={styles.stackWrapper}>
+                  <Collapse
+                    activeKey={activeData.flatMap((it) => (it.open ? [it.release_num] : []))}
+                    onChange={() => {
+                      const result = activeData.map((it) => ({
+                        ...it,
+                        open: it.release_num == data.release_num ? !it.open : it.open,
+                      }));
+                      if (type == 'current') {
+                        setCurrentSource(result);
+                      } else {
+                        setPlanSource(result);
+                      }
+                    }}
+                  >
+                    <Collapse.Panel
+                      key={data.release_num}
+                      header={data.project?.map((it: any) => it.pro_name)?.join(',')}
+                    >
+                      <ICard
+                        data={data}
+                        onRefresh={getViewData}
+                        deleteIcon={deleteIcon ?? ignore.includes(data.baseline_cluster)}
+                        child={
+                          <div>
+                            {data?.cluster?.map((env: any, i: number) => {
+                              const baseIndex = dynamicColumn.findIndex(
+                                (v) => data.baseline_cluster == v.name,
+                              );
+                              const envIndex = dynamicColumn.findIndex((v) => v.name == env.name);
+                              const alpha = envIndex - baseIndex;
+                              if (envIndex < 0 || env.name == data.baseline_cluster) return '';
+                              return (
+                                <div
+                                  key={env}
+                                  className={cns(
+                                    styles.dotLineBasic,
+                                    data.cls ?? styles.dotLinePrimary,
+                                  )}
+                                  style={{
+                                    width: `calc(${alpha * 100 - 50}% + ${alpha * 7 + i * 6}px)`,
+                                  }}
+                                />
+                              );
+                            })}
+                          </div>
+                        }
+                      />
+                    </Collapse.Panel>
+                  </Collapse>
+                </div>
               ) : (
                 ''
               )}
@@ -369,20 +406,29 @@ const VisualView = () => {
   };
 
   const renderBasicTd = useMemo(() => {
-    let source: any[] = cloneDeep(basicSource);
     const empty = Array.from({ length: onlineLen + 2 });
     if (isEmpty(basicSource)) return empty.map((it, i) => <td key={i} />);
     return (
       <Fragment>
-        {source?.map((it, index) => {
+        {basicSource?.map((it, index) => {
           return isEmpty(it.children) ? (
             <td />
           ) : (
             <td>
               <div className={styles.stackWrapper}>
-                <Collapse defaultActiveKey={[1, 2]}>
-                  {it.children?.map((child: any, i: number) => (
-                    <Collapse.Panel key={i + 1} header={child.project}>
+                {it.children?.map((child: any, i: number) => (
+                  <Collapse
+                    activeKey={it.children?.flatMap((it: any) => (it.open ? [it.release_num] : []))}
+                    onChange={() => {
+                      let result = cloneDeep(basicSource);
+                      result[index].children[i] = {
+                        ...result[index].children?.[i],
+                        open: !result[index].children?.[i].open,
+                      };
+                      setBasicSource(result);
+                    }}
+                  >
+                    <Collapse.Panel key={child.release_num} header={child.project}>
                       <ICard
                         data={child}
                         onRefresh={getViewData}
@@ -392,18 +438,41 @@ const VisualView = () => {
                         }
                       />
                     </Collapse.Panel>
-                  ))}
-                </Collapse>
+                  </Collapse>
+                ))}
               </div>
             </td>
           );
         })}
       </Fragment>
     );
-  }, [basicSource, onlineLen]);
+  }, [basicSource, onlineLen, open]);
+
+  useEffect(() => {
+    setCurrentSource(currentSource?.map((it) => ({ ...it, open })));
+    setPlanSource(planSource?.map((it) => ({ ...it, open })));
+    setBasicSource(
+      basicSource.map((it) => ({
+        name: it.name,
+        children: it.children?.map((o: any) => ({ ...o, open })),
+      })),
+    );
+  }, [open]);
 
   return (
-    <Card title={'待发布视图'} className={styles.card}>
+    <Card
+      title={
+        <div>
+          <span style={{ marginRight: 5 }}>待发布视图</span>
+          <Switch
+            checkedChildren={'展开全部'}
+            unCheckedChildren={'收起全部'}
+            onChange={(v) => setOpen(v)}
+          />
+        </div>
+      }
+      className={styles.card}
+    >
       <Spin spinning={loading} tip={'数据加载中...'}>
         <div className={styles.visualView}>
           <table>
@@ -485,7 +554,7 @@ const VisualView = () => {
                   </Form>
                 </td>
               </tr>
-              {renderTr(planSource, '上线计划日历', false, false)}
+              {renderTr(planSource, '上线计划日历', false, false, 'plan')}
             </tbody>
           </table>
         </div>

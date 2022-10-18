@@ -42,8 +42,6 @@ const { TextArea } = Input;
 const { Option } = Select;
 const userLogins: any = localStorage.getItem('userLogins');
 const usersInfo = JSON.parse(userLogins);
-let upgradeTable: any[];
-let servicesTable: any[];
 let currentOperateStatus = false; // 需要将useState中的operteStatus值赋值过来，如果直接取operteStatus，下拉框那边获取不到最新的operteStatus；
 const UpgradeService: React.FC<any> = () => {
   const {
@@ -476,23 +474,34 @@ const UpgradeService: React.FC<any> = () => {
     const testField = props.column.colId == 'test_confirm_status';
     const editId = `${props.column.colId?.split('_')?.[0]}_user_id`;
     // checkStepFourSource: 检查step 4的上线环境是否存在未填【1.填写了应用2.填写了升级接口】
-    const upgrade = upgradeTable.flatMap((it: any) =>
-      it.edit_user_id == !isEmpty(it) && props.data?.[editId] && isEmpty(it?.online_environment)
-        ? [it.app]
-        : [],
-    );
-    const services = servicesTable?.flatMap((it: any) =>
-      !isEmpty(it) && it.edit_user_id == props.data?.[editId] && isEmpty(it?.online_environment)
-        ? [it.api_name]
-        : [],
-    );
+
+    // 确认为是：检查对应值班人确认对应服务集群是否填写
+    const upgrade =
+      releaseItemGridApi.current
+        ?.getRenderedNodes()
+        ?.flatMap((it) =>
+          !isEmpty(it.data) &&
+          it.data?.edit_user_id == props.data?.[editId] &&
+          isEmpty(it.data?.online_environment)
+            ? [it.data?.app]
+            : [],
+        ) ?? [];
+    const services =
+      upGradeGridApi.current
+        ?.getRenderedNodes()
+        ?.flatMap((it) =>
+          !isEmpty(it.data) &&
+          it.data?.edit_user_id == props.data?.[editId] &&
+          isEmpty(it.data?.online_environment)
+            ? [it.data?.api_name]
+            : [],
+        ) ?? [];
     // 校验各自值班确认服务集群是否为空
     if (!isEmpty([...upgrade, ...services]) && !testField && isOk) {
       infoMessage(`服务[${String([...upgrade, ...services])}]未填写相关信息，请填写完成后再次确认`);
       resetTable(currentReleaseNum);
       return;
     }
-
     // 验证 集群是否未填写
     const checkEnvIsEmpty = checkStepFourSource && testField;
 
@@ -637,12 +646,9 @@ const UpgradeService: React.FC<any> = () => {
   //  测试修改服务确认完成为【是】：检查 上线环境是否存在未填
   useEffect(() => {
     // 存在有一项数据不完整 为true
-    upgradeTable = releaseItem.gridData;
-    servicesTable = upgradeApi.gridData;
     const flag = checkOnlineEnvSource(releaseItem, upgradeApi);
     applicantConfirmForm.setFieldsValue({ status: flag });
   }, [JSON.stringify(releaseItem.gridData), JSON.stringify(upgradeApi.gridData)]);
-
   return (
     <div>
       {/* 升级服务 */}
@@ -717,7 +723,7 @@ const UpgradeService: React.FC<any> = () => {
               >
                 <AgGridReact
                   columnDefs={getReleasedApiColumns()} // 定义列
-                  rowData={upgradeApi.gridData} // 数据绑定
+                  rowData={isEmpty(upgradeApi.gridData) ? [{}] : upgradeApi.gridData} // 数据绑定
                   defaultColDef={{
                     resizable: true,
                     sortable: true,
@@ -861,7 +867,6 @@ const UpgradeService: React.FC<any> = () => {
                                     disabled={currentOperateStatus}
                                     style={{ width: '100%', color: Color }}
                                     onChange={(newValue: any) => {
-                                      console.log(upgradeTable, servicesTable);
                                       saveUperConfirmInfo(newValue, props, getFieldValue('status'));
                                     }}
                                   >
@@ -930,8 +935,6 @@ const UpgradeService: React.FC<any> = () => {
                           disabled={currentOperateStatus}
                           style={{ width: '100%', color: Color }}
                           onChange={(newValue: any) => {
-                            console.log(upgradeTable, servicesTable);
-
                             saveUperConfirmInfo(newValue, props);
                           }}
                         >

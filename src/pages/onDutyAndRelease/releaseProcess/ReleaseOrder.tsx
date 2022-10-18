@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { Form, Select, DatePicker, Button, Input, Col, Spin, Divider, Modal, Checkbox } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
 import {
   historyCompareColumn,
@@ -43,6 +44,7 @@ const ReleaseOrder = () => {
   };
   useEffect(() => {
     agFinished = false;
+    Modal.destroyAll();
     getBaseList();
     getOrderDetail();
   }, []);
@@ -190,6 +192,7 @@ const ReleaseOrder = () => {
       release_name: `${id}灰度推生产`,
     });
   };
+
   const onSaveBeforeCheck = (isAuto = false) => {
     const order = orderForm.getFieldsValue();
     const base = baseForm.getFieldsValue();
@@ -231,10 +234,12 @@ const ReleaseOrder = () => {
         setVisible(true);
       } else {
         Modal.confirm({
+          okText: '确认',
+          cancelText: '取消',
           centered: true,
           title: tips[result].title,
           content: tips[result].content,
-          icon: <div />,
+          icon: <InfoCircleOutlined style={{ color: result == 'cancel' ? 'red' : '#1585ff' }} />,
           onOk: async () => {
             if (result == 'cancel') {
               await PreReleaseServices.removeRelease(
@@ -328,14 +333,16 @@ const ReleaseOrder = () => {
   };
   const onRemove = (data: any) => {
     const cluster = baseForm.getFieldValue('cluster');
-    console.log(finished, agFinished);
     if (agFinished || !hasPermission) {
       return infoMessage(agFinished ? '已标记发布结果不能删除积压工单!' : '您无删除积压工单权限!');
     }
 
     Modal.confirm({
       centered: true,
+      okText: '确认',
+      cancelText: '取消',
       title: '删除积压工单提醒',
+      icon: <InfoCircleOutlined style={{ color: 'red' }} />,
       content: `请确认是否要永久删除【${data.repair_order ?? ''}】工单?`,
       onOk: async () => {
         await PreReleaseServices.removeOrder({

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState, Fragment } from 'react';
 import styles from './index.less';
 import cns from 'classnames';
 import { Collapse, Form, Select, DatePicker, Col, Card, Modal, Spin, Switch } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import { useModel } from 'umi';
 import PreReleaseServices from '@/services/preRelease';
 import { isEmpty, sortBy, uniqBy, cloneDeep, isArray, intersection } from 'lodash';
@@ -40,8 +41,11 @@ const ICard = (params: {
   const onRemove = async (data: any) => {
     Modal.confirm({
       centered: true,
-      title: '删除发布提醒：',
-      content: '请确认是否要删除该发布！',
+      title: '删除积压工单提醒：',
+      okText: '确认',
+      cancelText: '取消',
+      content: '请确认是否删除该积压单，点确认将彻底从积压单中删除！',
+      icon: <InfoCircleOutlined style={{ color: 'red' }} />,
       onOk: async () => {
         await PreReleaseServices.removeRelease({
           user_id: user?.userid ?? '',
@@ -167,6 +171,7 @@ const VisualView = () => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
+    Modal.destroyAll();
     getSelectData();
     getViewData();
   }, []);
@@ -197,12 +202,13 @@ const VisualView = () => {
       plan_time: values.plan_time ? moment(values.plan_time).format('YYYY-MM-DD') : '',
     });
     setPlanSource(
-      plan?.map((it: any) => ({
+      plan?.map((it: any, i: number) => ({
         ...it,
         baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
         cls: styles.dotLinePrimary,
         bg: initBg[2],
         plan_release_time: it.plan_time,
+        release_num: it.branch + i,
       })),
     );
   };
@@ -257,7 +263,7 @@ const VisualView = () => {
         }),
       );
       setPlanSource(
-        plan?.map((it: any, i) => ({
+        plan?.map((it: any, i: number) => ({
           ...it,
           baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
           cls: styles.dotLinePrimary,
@@ -481,7 +487,7 @@ const VisualView = () => {
                     className={styles.condition}
                     onFieldsChange={getPlanList}
                   >
-                    <Col span={8}>
+                    <Col span={5}>
                       <Form.Item name={'project_id'} label={'项目名称'}>
                         <Select
                           style={{ width: '100%' }}
@@ -493,7 +499,7 @@ const VisualView = () => {
                         />
                       </Form.Item>
                     </Col>
-                    <Col span={8}>
+                    <Col span={5}>
                       <Form.Item name={'branch'} label={'分支名称'}>
                         <Select
                           style={{ width: '100%' }}
@@ -505,7 +511,7 @@ const VisualView = () => {
                         />
                       </Form.Item>
                     </Col>
-                    <Col span={8}>
+                    <Col span={5}>
                       <Form.Item name={'plan_time'} label={'计划上线日期'}>
                         <DatePicker style={{ width: '100%' }} />
                       </Form.Item>

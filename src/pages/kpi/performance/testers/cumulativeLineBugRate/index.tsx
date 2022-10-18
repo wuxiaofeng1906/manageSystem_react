@@ -31,7 +31,7 @@ const CumulativeLineBugRate: React.FC<any> = () => {
     <IStaticPerformance
       ruleData={ruleData}
       request={StatisticServices.newPeriodBugThousTestDept}
-      identity={'TEST'}
+      identity={'OWN'}
       len={2}
     />
   );

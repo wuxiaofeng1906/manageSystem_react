@@ -487,35 +487,29 @@ const VisualView = () => {
                     className={styles.condition}
                     onFieldsChange={getPlanList}
                   >
-                    <Col span={5}>
-                      <Form.Item name={'project_id'} label={'项目名称'}>
-                        <Select
-                          style={{ width: '100%' }}
-                          options={project}
-                          placeholder={'项目名称'}
-                          mode={'multiple'}
-                          showSearch
-                          optionFilterProp={'label'}
-                        />
-                      </Form.Item>
-                    </Col>
-                    <Col span={5}>
-                      <Form.Item name={'branch'} label={'分支名称'}>
-                        <Select
-                          style={{ width: '100%' }}
-                          options={branch}
-                          placeholder={'分支名称'}
-                          mode={'multiple'}
-                          showSearch
-                          optionFilterProp={'label'}
-                        />
-                      </Form.Item>
-                    </Col>
-                    <Col span={5}>
-                      <Form.Item name={'plan_time'} label={'计划上线日期'}>
-                        <DatePicker style={{ width: '100%' }} />
-                      </Form.Item>
-                    </Col>
+                    <Form.Item name={'project_id'} label={'项目名称'}>
+                      <Select
+                        style={{ width: '300px' }}
+                        options={project}
+                        placeholder={'项目名称'}
+                        mode={'multiple'}
+                        showSearch
+                        optionFilterProp={'label'}
+                      />
+                    </Form.Item>
+                    <Form.Item name={'branch'} label={'分支名称'}>
+                      <Select
+                        style={{ width: '300px' }}
+                        options={branch}
+                        placeholder={'分支名称'}
+                        mode={'multiple'}
+                        showSearch
+                        optionFilterProp={'label'}
+                      />
+                    </Form.Item>
+                    <Form.Item name={'plan_time'} label={'计划上线日期'}>
+                      <DatePicker style={{ width: '170px' }} />
+                    </Form.Item>
                   </Form>
                 </td>
               </tr>

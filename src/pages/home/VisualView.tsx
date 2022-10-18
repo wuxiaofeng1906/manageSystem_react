@@ -257,13 +257,14 @@ const VisualView = () => {
         }),
       );
       setPlanSource(
-        plan?.map((it: any) => ({
+        plan?.map((it: any, i) => ({
           ...it,
           baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
           cls: styles.dotLinePrimary,
           bg: initBg[2],
           plan_release_time: it.plan_time,
           release_env: it.cluster?.map((it: any) => it.value)?.join(',') ?? '',
+          release_num: it.branch + i,
         })),
       );
       // 去重并排序(动态列计算)

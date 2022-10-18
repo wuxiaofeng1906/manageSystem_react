@@ -32,7 +32,7 @@ const CumulativeLineBugRateContainTests: React.FC<any> = () => {
       ruleData={ruleData}
       request={StatisticServices.newPeriodBugThousTestDept}
       identity={'TEST'}
-      len={2}
+      len={5}
     />
   );
 };

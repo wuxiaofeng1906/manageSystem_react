@@ -290,7 +290,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data), loading };
+    return { data: formatTreeData(data.data, false, 1, true), loading };
   },
   // 轮次测试P0+P1占比
   async roundsTestRate({ client, params }: IStatisticQuery) {

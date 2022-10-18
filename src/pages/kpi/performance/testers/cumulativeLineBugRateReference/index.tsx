@@ -32,7 +32,7 @@ const CumulativeLineBugRateReference: React.FC<any> = () => {
       ruleData={ruleData}
       request={StatisticServices.newPeriodBugThousTestDept}
       identity={'REFER'}
-      len={2}
+      len={5}
     />
   );
 };

@@ -16,7 +16,7 @@ const Ellipsis = ({ value, width = 80, className, placement }: EllipsisProps) =>
 
   return visible ? (
     <Tooltip title={value} placement={placement}>
-      <div className={cs('ellipsis', className)} style={{ width, height }}>
+      <div className={cs('ellipsis', className)} style={{ width }}>
         {value}
       </div>
     </Tooltip>

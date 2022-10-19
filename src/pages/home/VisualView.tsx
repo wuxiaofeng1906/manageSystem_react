@@ -73,13 +73,14 @@ const ICard = (params: {
               <span className={styles.label}>发布项目:</span>
               <div className={styles.box} title={title}>
                 {isArray(params.data.project)
-                  ? params.data.project?.map((it: any) => {
+                  ? params.data.project?.map((it: any, i: number) => {
                       const linkProject =
                         it.pro_name?.startsWith('emergency') ||
                         it.pro_name?.startsWith('stagepatch') ||
                         it.pro_name?.startsWith('stage-patch');
                       return (
                         <span
+                          key={params.data.release_num + i}
                           className={cns(baseline && linkProject ? styles.link : '', styles.value)}
                           onClick={() => {
                             if (!it.pro_id || !(baseline && linkProject)) return;
@@ -107,8 +108,9 @@ const ICard = (params: {
               <div className={styles.container}>
                 <span className={styles.label}>发布需求:</span>
                 <div className={styles.box} title={params.data.story ?? ''}>
-                  {params.data.story?.split(',')?.map((ztno: number) => (
+                  {params.data.story?.split(',')?.map((ztno: number, i: number) => (
                     <span
+                      key={i}
                       className={baseline ? styles.link : ''}
                       onClick={() => {
                         if (!ztno || !baseline) return;
@@ -372,7 +374,7 @@ const VisualView = () => {
                         if (envIndex < 0 || env.name == data.baseline_cluster) return '';
                         return (
                           <div
-                            key={env}
+                            key={env + i}
                             className={cns(styles.dotLineBasic, data.cls ?? styles.dotLinePrimary)}
                             style={{
                               width: `calc(${alpha * 100 - 50}% - ${(i + 1) * 2}px)`,
@@ -401,13 +403,13 @@ const VisualView = () => {
       <Fragment>
         {basicSource?.map((it, index) => {
           return isEmpty(it.children) ? (
-            <td />
+            <td key={index} />
           ) : (
             <td>
-              {it.children?.map((child: any) => {
+              {it.children?.map((child: any, i: number) => {
                 return (
                   <ICard
-                    key={child.release_num}
+                    key={child.release_num + index}
                     data={child}
                     onRefresh={getViewData}
                     isBasic={true}

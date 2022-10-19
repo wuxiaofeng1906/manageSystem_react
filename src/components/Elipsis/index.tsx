@@ -1,22 +1,19 @@
 import { Tooltip } from 'antd';
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { TooltipPlacement } from 'antd/lib/tooltip';
+import React, { useState } from 'react';
+import { TooltipPropsWithTitle } from 'antd/lib/tooltip';
 import cs from 'classnames';
 import './index.css';
 
-interface EllipsisProps {
-  value: string;
+interface EllipsisProps extends TooltipPropsWithTitle {
   width?: number;
-  className?: string;
-  placement?: TooltipPlacement;
 }
-const Ellipsis = ({ value, width = 80, className, placement }: EllipsisProps) => {
+const Ellipsis = ({ width = 80, className, ...props }: EllipsisProps) => {
   const [visible, setVisible] = useState(false);
 
   return visible ? (
-    <Tooltip title={value} placement={placement}>
+    <Tooltip {...props}>
       <div className={cs('ellipsis', className)} style={{ width }}>
-        {value}
+        {props.title}
       </div>
     </Tooltip>
   ) : (
@@ -24,12 +21,12 @@ const Ellipsis = ({ value, width = 80, className, placement }: EllipsisProps) =>
       className={cs('ellipsis', className)}
       style={{ width }}
       ref={(e) => {
-        if (e?.scrollWidth > e?.clientWidth) {
+        if (e && e?.scrollWidth > e?.clientWidth) {
           setVisible(true);
         }
       }}
     >
-      {value}
+      {props.title}
     </div>
   );
 };

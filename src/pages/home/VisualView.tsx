@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState, Fragment } from 'react';
 import styles from './index.less';
 import cns from 'classnames';
-import { Collapse, Form, Select, DatePicker, Col, Card, Modal, Spin, Switch } from 'antd';
+import { Collapse, Form, Select, DatePicker, Card, Modal, Spin, Switch } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
-import { useModel } from 'umi';
 import PreReleaseServices from '@/services/preRelease';
 import { isEmpty, sortBy, uniqBy, cloneDeep, isArray, intersection } from 'lodash';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 const thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
 const ignore = ['cn-northwest-0', 'cn-northwest-1'];
@@ -16,6 +15,8 @@ const baseColumn = [
   { name: ignore[1], value: thead[3] },
 ];
 const initBg = ['#93db9326', '#e83c3c26', '#519ff240'];
+const userLogins: any = localStorage.getItem('userLogins');
+const user = JSON.parse(userLogins);
 
 const ICard = (params: {
   data: any;
@@ -25,7 +26,6 @@ const ICard = (params: {
   deleteIcon?: boolean;
   open: boolean;
 }) => {
-  const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const baseline = params.data.baseline_cluster == 'offline';
   const hasPermission = useMemo(() => user?.group == 'superGroup', [user]);
   const [activeKey, setActiveKey] = useState('');
@@ -194,12 +194,13 @@ const VisualView = () => {
       })),
     );
   };
+
   const getPlanList = async () => {
     const values = form.getFieldsValue();
     const plan = await PreReleaseServices.releasePlan({
       project_id: values.project_id?.join(',') ?? '',
       branch: values.branch?.join(',') ?? '',
-      plan_time: values.plan_time ? moment(values.plan_time).format('YYYY-MM-DD') : '',
+      plan_time: values.plan_time ? dayjs(values.plan_time).format('YYYY-MM-DD') : '',
     });
     setPlanSource(
       plan?.map((it: any, i: number) => ({
@@ -301,10 +302,6 @@ const VisualView = () => {
     }
   };
 
-  const onlineLen = useMemo(() => online.length, [online]);
-  // 动态列
-  const dynamicColumn = useMemo(() => [...baseColumn, ...online], [online]);
-
   const renderTr = (arr: any[], title: string, showStep = true, deleteIcon?: boolean) => {
     if (isEmpty(arr)) {
       return (
@@ -335,11 +332,11 @@ const VisualView = () => {
                     第{index + 1}步：
                     <br />
                     {it.plan_release_time
-                      ? moment(it.plan_release_time).format('YYYY-MM-DD HH:mm')
+                      ? dayjs(it.plan_release_time).format('YYYY-MM-DD HH:mm')
                       : ''}
                   </Fragment>
                 ) : it.plan_release_time ? (
-                  moment(it.plan_release_time).format('YYYY-MM-DD')
+                  dayjs(it.plan_release_time).format('YYYY-MM-DD')
                 ) : (
                   ''
                 )}
@@ -396,6 +393,7 @@ const VisualView = () => {
     );
   };
 
+  const onlineLen = useMemo(() => online.length, [online]);
   const renderBasicTd = useMemo(() => {
     const empty = Array.from({ length: onlineLen + 2 });
     if (isEmpty(basicSource)) return empty.map((it, i) => <td key={i} />);
@@ -424,9 +422,12 @@ const VisualView = () => {
       </Fragment>
     );
   }, [basicSource, onlineLen, open]);
+  // 动态列
+  const dynamicColumn = useMemo(() => [...baseColumn, ...online], [online]);
 
   return (
     <Card
+      className={styles.card}
       title={
         <div>
           <span style={{ marginRight: 5 }}>待发布视图</span>
@@ -437,7 +438,6 @@ const VisualView = () => {
           />
         </div>
       }
-      className={styles.card}
     >
       <Spin spinning={loading} tip={'数据加载中...'}>
         <div className={styles.visualView}>

@@ -1,5 +1,5 @@
 import { Tooltip } from 'antd';
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { TooltipPlacement } from 'antd/lib/tooltip';
 import cs from 'classnames';
 import './index.css';
@@ -7,6 +7,7 @@ import './index.css';
 interface EllipsisProps {
   value: string;
   width?: number;
+  height?: number;
   className?: string;
   placement?: TooltipPlacement;
 }
@@ -15,7 +16,7 @@ const Ellipsis = ({ value, width = 80, className, placement }: EllipsisProps) =>
 
   return visible ? (
     <Tooltip title={value} placement={placement}>
-      <div className={cs('ellipsis', className)} style={{ width }}>
+      <div className={cs('ellipsis', className)} style={{ width, height }}>
         {value}
       </div>
     </Tooltip>
@@ -24,7 +25,7 @@ const Ellipsis = ({ value, width = 80, className, placement }: EllipsisProps) =>
       className={cs('ellipsis', className)}
       style={{ width }}
       ref={(e) => {
-        if (e?.scrollWidth > e?.clientWidth) {
+        if (e && e?.scrollWidth > e?.clientWidth) {
           setVisible(true);
         }
       }}

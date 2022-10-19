@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getHeight } from '@/publicMethods/pageSet';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Table, Space, Button, Checkbox, message, Row, Col, Tooltip } from 'antd';
+import { Table, Space, Button, Checkbox, message, Row, Col } from 'antd';
 import { history } from '@@/core/history';
 import { addOrRemoveElement } from '@/publicMethods/arrayMethod';
 import type { GqlClient } from '@/hooks';
@@ -9,7 +9,7 @@ import { useGqlClient } from '@/hooks';
 import { useRequest } from 'ahooks';
 import axios from 'axios';
 import { judgeAuthority } from '@/publicMethods/authorityJudge';
-import Ellipsis from '@/components/elipsis';
+import Ellipsis from '@/components/Elipsis';
 
 const CheckboxGroup = Checkbox.Group;
 

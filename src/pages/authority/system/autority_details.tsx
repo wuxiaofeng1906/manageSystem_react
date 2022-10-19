@@ -1,20 +1,20 @@
-import React, {useEffect, useState} from 'react';
-import {getHeight} from '@/publicMethods/pageSet';
-import {PageContainer} from "@ant-design/pro-layout";
-import {Table, Space, Button, Checkbox, message, Row, Col} from 'antd';
-import {history} from "@@/core/history";
-import {addOrRemoveElement} from '@/publicMethods/arrayMethod';
-import type {GqlClient} from "@/hooks";
-import {useGqlClient} from "@/hooks";
-import {useRequest} from "ahooks";
-import axios from "axios";
-import {judgeAuthority} from "@/publicMethods/authorityJudge";
+import React, { useEffect, useState } from 'react';
+import { getHeight } from '@/publicMethods/pageSet';
+import { PageContainer } from '@ant-design/pro-layout';
+import { Table, Space, Button, Checkbox, message, Row, Col, Tooltip } from 'antd';
+import { history } from '@@/core/history';
+import { addOrRemoveElement } from '@/publicMethods/arrayMethod';
+import type { GqlClient } from '@/hooks';
+import { useGqlClient } from '@/hooks';
+import { useRequest } from 'ahooks';
+import axios from 'axios';
+import { judgeAuthority } from '@/publicMethods/authorityJudge';
+import Ellipsis from '@/components/elipsis';
 
 const CheckboxGroup = Checkbox.Group;
 
 /* region 已选择的方法功能 */
 const alaySelectedAuthority = (params: any) => {
-
   const moduleArray = Array();
   const methodArray = Array();
 
@@ -30,13 +30,13 @@ const alaySelectedAuthority = (params: any) => {
 
   const datas = {
     moduleData: moduleArray,
-    methodData: methodArray
+    methodData: methodArray,
   };
   return datas;
 };
 
 const queryselectedAuthorityViews = async (client: GqlClient<object>, groupId: any) => {
-  const {data} = await client.query(`
+  const { data } = await client.query(`
       {
         roleAuthority(group:${groupId}){
           name
@@ -56,7 +56,7 @@ const queryselectedAuthorityViews = async (client: GqlClient<object>, groupId: a
       }
   `);
 
-  console.log("已选择的方法功能 data?.roleAuthority", data?.roleAuthority);
+  console.log('已选择的方法功能 data?.roleAuthority', data?.roleAuthority);
 
   return alaySelectedAuthority(data?.roleAuthority);
 };
@@ -76,15 +76,12 @@ const alayAllAuthority = (params: any) => {
           moduleArray.push(ele.parent.id);
         }
       }
-
     });
 
     for (let index = 0; index < moduleArray.length; index += 1) {
-
       const myModule: any = Array();
       const myMethod: any = [];
       params.forEach((me: any) => {
-
         if (moduleArray[index] === me.parent?.id) {
           if (myModule.indexOf(me.parent.description) === -1) {
             myModule.push(me.parent.description);
@@ -93,25 +90,21 @@ const alayAllAuthority = (params: any) => {
           myMethod.push(me.description);
           allMethod.push(me.description);
         }
-
       });
 
-      datas.push(
-        {
-          id: index + 1,
-          module: myModule,
-          method: myMethod
-        });
-
+      datas.push({
+        id: index + 1,
+        module: myModule,
+        method: myMethod,
+      });
     }
   }
 
-
-  return {"datas": datas, "allModule": allModule, "allMethod": allMethod};
+  return { datas: datas, allModule: allModule, allMethod: allMethod };
 };
 
 const queryAllAuthorityViews = async (client: GqlClient<object>) => {
-  const {data} = await client.query(`
+  const { data } = await client.query(`
       {
         authorityItems{
           id
@@ -137,7 +130,6 @@ const queryAllAuthorityViews = async (client: GqlClient<object>) => {
 const getChildMethod = (parent: any, module: any) => {
   let methodFOrModule: any = [];
   for (let mIndex = 0; mIndex < module.length; mIndex += 1) {
-
     const module_value = module[mIndex];
     for (let index = 0; index < parent.length; index += 1) {
       const moduleName = parent[index].module;
@@ -157,7 +149,6 @@ const getselectedId = (alls: any, sModule: any, sMethod: any) => {
 
   // 获取被选中的id
   for (let index = 0; index < alls.length; index += 1) {
-
     // 方法id
     for (let nIndex = 0; nIndex < sMethod.length; nIndex += 1) {
       if (sMethod[nIndex] === alls[index].description) {
@@ -180,19 +171,24 @@ const getselectedId = (alls: any, sModule: any, sMethod: any) => {
 };
 
 const AuthorityDetails: React.FC<any> = () => {
-  const sys_accessToken = localStorage.getItem("accessId");
+  const sys_accessToken = localStorage.getItem('accessId');
 
   const clickedRowData = {
     module: [],
-    method: []
+    method: [],
   };
-  let clickedValue = "";
+  let clickedValue = '';
 
   // region title获取
   let pageTitle: string = '';
-  let groupId: any = "";
+  let groupId: any = '';
   const location = history.location.query;
-  if (location !== null && location !== undefined && location.groupname !== undefined && location.groupname !== null) {
+  if (
+    location !== null &&
+    location !== undefined &&
+    location.groupname !== undefined &&
+    location.groupname !== null
+  ) {
     pageTitle = location.groupname.toString();
     groupId = location.groupid === null ? 0 : Number(location.groupid);
   }
@@ -202,14 +198,15 @@ const AuthorityDetails: React.FC<any> = () => {
   /* region 数据查询 */
   const gqlClient = useGqlClient();
   // 查询所有权限
-  const {data} = useRequest(() => queryAllAuthorityViews(gqlClient));
+  const { data } = useRequest(() => queryAllAuthorityViews(gqlClient));
 
   // 将数据解析成表格可用的格式
   const alaieddata = alayAllAuthority(data);
   const oraData = data === undefined ? [] : alaieddata.datas; // 拿去表格需要的数据
 
   // 初始化已选择的权限
-  const selectedAuthority: any = useRequest(() => queryselectedAuthorityViews(gqlClient, groupId)).data;
+  const selectedAuthority: any = useRequest(() => queryselectedAuthorityViews(gqlClient, groupId))
+    .data;
 
   /* endregion */
 
@@ -218,10 +215,9 @@ const AuthorityDetails: React.FC<any> = () => {
 
   // 方法勾选动作
   const onMethodChange = () => {
-
     const methodGroup: any = [];
     for (let index = 0; index < methodList.length; index += 1) {
-      methodGroup.push(methodList[index]);  // 将默认的数据添加到新数组中
+      methodGroup.push(methodList[index]); // 将默认的数据添加到新数组中
     }
     const groups = addOrRemoveElement(methodGroup, clickedValue);
 
@@ -234,17 +230,16 @@ const AuthorityDetails: React.FC<any> = () => {
   const [moduleList, setModuleList] = useState(['']);
 
   const onModuleChange = () => {
-
     // 获取已有模块
     const moduleGroup = [];
     for (let index = 0; index < moduleList.length; index += 1) {
-      moduleGroup.push(moduleList[index]);  // 将默认的数据添加到新数组中
+      moduleGroup.push(moduleList[index]); // 将默认的数据添加到新数组中
     }
 
     // 获取已有方法
     let methodGroup: any = [];
     for (let index = 0; index < methodList.length; index += 1) {
-      methodGroup.push(methodList[index]);  // 将默认的数据添加到新数组中
+      methodGroup.push(methodList[index]); // 将默认的数据添加到新数组中
     }
 
     const clickedModule = [clickedValue];
@@ -263,7 +258,6 @@ const AuthorityDetails: React.FC<any> = () => {
           methodGroup.splice(delFlag, 1);
         }
       });
-
     } else {
       // 如果是新增模块，则新增模块和方法。
       moduleGroup.push(clickedValue); // 增加模块
@@ -272,9 +266,8 @@ const AuthorityDetails: React.FC<any> = () => {
       methodGroup = methodGroup.concat(methodArray); // 将已有方法和现有方法链接起来。
     }
 
-    setModuleList(moduleGroup);// 选中模块
-    setMethodList(methodGroup);  // 选中方法
-
+    setModuleList(moduleGroup); // 选中模块
+    setMethodList(methodGroup); // 选中方法
   };
 
   // endregion
@@ -285,7 +278,6 @@ const AuthorityDetails: React.FC<any> = () => {
   const selectAll = (params: any) => {
     if (params.target.checked === true) {
       if (alaieddata !== undefined) {
-
         // 选中所有的项目
         setMethodList(alaieddata.allMethod);
         setModuleList(alaieddata.allModule);
@@ -303,49 +295,54 @@ const AuthorityDetails: React.FC<any> = () => {
 
   const GetMethod = (method: any) => {
     const methodArray = method.params;
-    return <Row>
-      <Col>
-        {
-          methodArray.map((item: string) => {
-            return <Checkbox style={{
-              marginLeft: "10px",
-              width: "150px",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis"
-            }} value={item}>{item}</Checkbox>;
-          })
-        }
-      </Col>
-    </Row>;
+    return (
+      <Row>
+        <Col>
+          {methodArray.map((item: string) => {
+            return (
+              <Checkbox
+                style={{
+                  marginLeft: '10px',
+                  // width: '150px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+                value={item}
+              >
+                <Ellipsis value={item} width={150} placement={'bottomLeft'} />
+              </Checkbox>
+            );
+          })}
+        </Col>
+      </Row>
+    );
   };
-
 
   // 列的定义
   const columns = [
     {
-      title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 编号</span>,
+      title: <span style={{ fontWeight: 'bold', fontSize: '17px' }}> 编号</span>,
       dataIndex: 'id',
       key: 'id',
-      width: 60
+      width: 60,
     },
     {
-      title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 模块</span>,
+      title: <span style={{ fontWeight: 'bold', fontSize: '17px' }}> 模块</span>,
       key: 'module',
       width: 120,
       render: (text: any) => (
         <Space size="middle">
-          <CheckboxGroup options={text.module} value={moduleList} onChange={onModuleChange}/>
-
+          <CheckboxGroup options={text.module} value={moduleList} onChange={onModuleChange} />
         </Space>
       ),
     },
     {
-      title: <span style={{fontWeight: "bold", fontSize: "17px"}}> 方法</span>,
+      title: <span style={{ fontWeight: 'bold', fontSize: '17px' }}> 方法</span>,
       key: 'method',
       render: (text: any) => (
         <Checkbox.Group value={methodList} onChange={onMethodChange}>
-          <GetMethod params={text.method}/>
+          <GetMethod params={text.method} />
         </Checkbox.Group>
       ),
     },
@@ -354,27 +351,30 @@ const AuthorityDetails: React.FC<any> = () => {
   // region 最终按钮功能
   // 保存权限按钮
   const saveAuthority = () => {
-
     // 1.获取当前角色id（用户组id）  上面已获取到
     const methodGroup: any = [];
     for (let index = 0; index < methodList.length; index += 1) {
-      methodGroup.push(methodList[index]);  // 将默认的数据添加到新数组中
+      methodGroup.push(methodList[index]); // 将默认的数据添加到新数组中
     }
 
     const moduleGroup = [];
     for (let index = 0; index < moduleList.length; index += 1) {
-      moduleGroup.push(moduleList[index]);  // 将默认的数据添加到新数组中
+      moduleGroup.push(moduleList[index]); // 将默认的数据添加到新数组中
     }
 
     const idArray = getselectedId(data, moduleGroup, methodGroup);
 
     // 2.获取已勾选的权限id
-    axios.put(`/api/role/authority/${groupId}`, {data: idArray}, {headers: {Authorization: `Bearer ${sys_accessToken}`}})
+    axios
+      .put(
+        `/api/role/authority/${groupId}`,
+        { data: idArray },
+        { headers: { Authorization: `Bearer ${sys_accessToken}` } },
+      )
       .then(function (res) {
-
         if (res.data.ok === true) {
           message.info({
-            content: "权限保存成功！",
+            content: '权限保存成功！',
             duration: 1,
             style: {
               marginTop: '50vh',
@@ -382,14 +382,13 @@ const AuthorityDetails: React.FC<any> = () => {
           });
         } else if (Number(res.data.code) === 403) {
           message.error({
-            content: "您无权限修改！",
+            content: '您无权限修改！',
             duration: 1,
             style: {
               marginTop: '50vh',
             },
           });
         } else {
-
           message.error({
             content: `${res.data.message}`,
             duration: 1,
@@ -400,9 +399,9 @@ const AuthorityDetails: React.FC<any> = () => {
         }
       })
       .catch(function (error) {
-        if (error.toString().includes("403")) {
+        if (error.toString().includes('403')) {
           message.error({
-            content: "您无权限修改！",
+            content: '您无权限修改！',
             duration: 1,
             style: {
               marginTop: '50vh',
@@ -417,9 +416,7 @@ const AuthorityDetails: React.FC<any> = () => {
             },
           });
         }
-
       });
-
   };
 
   // 点击返回按钮
@@ -438,43 +435,51 @@ const AuthorityDetails: React.FC<any> = () => {
   }, [selectedAuthority]);
 
   return (
-    <PageContainer title={pageTitle} style={{height: getHeight(), backgroundColor: "#F2F2F2"}}>
+    <PageContainer title={pageTitle} style={{ height: getHeight(), backgroundColor: '#F2F2F2' }}>
       {/* 表格控件 */}
       <div>
-        <Table columns={columns}
-               dataSource={oraData}
-               pagination={false}  // 禁止分页
-               size="small"  // 紧凑型
-               bordered={true}
-               summary={() => (
-                 <Table.Summary.Row>
-                   <Table.Summary.Cell index={0}></Table.Summary.Cell>
-                   <Table.Summary.Cell index={1}>
-                     <Checkbox checked={checkAll} onChange={selectAll}>全选</Checkbox>
-                   </Table.Summary.Cell>
-                   <Table.Summary.Cell index={2}>
-                     <div><Button type="primary"
-                                  style={{display: judgeAuthority("修改权限组的人员") === true ? "inline" : "none"}}
-                                  onClick={saveAuthority}> 保存 </Button> <Button
-                       onClick={returns}> 返回 </Button></div>
-                   </Table.Summary.Cell>
-                 </Table.Summary.Row>
-               )}
-
-               onRow={(key: any, record: any) => {
-                 return {
-                   onClick: (param: any) => {
-
-                     // console.log("param", param);
-                     // clickedValue.module = param.target.innerText;
-                     clickedValue = param.target.defaultValue;
-                     clickedRowData.module = record.module;
-                     clickedRowData.method = record.method;
-                   }
-                 };
-               }}
-
-
+        <Table
+          columns={columns}
+          dataSource={oraData}
+          pagination={false} // 禁止分页
+          size="small" // 紧凑型
+          bordered={true}
+          summary={() => (
+            <Table.Summary.Row>
+              <Table.Summary.Cell index={0}></Table.Summary.Cell>
+              <Table.Summary.Cell index={1}>
+                <Checkbox checked={checkAll} onChange={selectAll}>
+                  全选
+                </Checkbox>
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={2}>
+                <div>
+                  <Button
+                    type="primary"
+                    style={{
+                      display: judgeAuthority('修改权限组的人员') === true ? 'inline' : 'none',
+                    }}
+                    onClick={saveAuthority}
+                  >
+                    {' '}
+                    保存{' '}
+                  </Button>{' '}
+                  <Button onClick={returns}> 返回 </Button>
+                </div>
+              </Table.Summary.Cell>
+            </Table.Summary.Row>
+          )}
+          onRow={(key: any, record: any) => {
+            return {
+              onClick: (param: any) => {
+                // console.log("param", param);
+                // clickedValue.module = param.target.innerText;
+                clickedValue = param.target.defaultValue;
+                clickedRowData.module = record.module;
+                clickedRowData.method = record.method;
+              },
+            };
+          }}
         />
       </div>
     </PageContainer>

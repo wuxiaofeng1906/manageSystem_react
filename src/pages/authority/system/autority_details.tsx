@@ -301,6 +301,7 @@ const AuthorityDetails: React.FC<any> = () => {
           {methodArray.map((item: string) => {
             return (
               <Checkbox
+                value={item}
                 style={{
                   marginLeft: '10px',
                   // width: '150px',
@@ -308,9 +309,8 @@ const AuthorityDetails: React.FC<any> = () => {
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                 }}
-                value={item}
               >
-                <Ellipsis value={item} width={150} placement={'bottomLeft'} />
+                <Ellipsis title={item} width={150} placement={'bottomLeft'} color={'#108ee9'} />
               </Checkbox>
             );
           })}

@@ -373,14 +373,14 @@ export default [
                 icon: 'table',
                 path: 'blockingTimes',
                 component: './kpi/performance/developer/blockingTimes',
-                hideInMenu: true, // 临时屏蔽
+                // hideInMenu: true, // 临时屏蔽
               },
               {
                 name: '阻塞测试工作量',
                 icon: 'table',
                 path: 'blockingTestWorkload',
                 component: './kpi/performance/developer/blockingTestWorkload',
-                hideInMenu: true, // 临时屏蔽
+                // hideInMenu: true, // 临时屏蔽
               },
               {
                 name: '累计千行bug率',
@@ -624,7 +624,7 @@ export default [
                 icon: 'table',
                 path: 'deliveryThroughput',
                 component: './kpi/performance/service/deliveryThroughput',
-                hideInMenu: true, // 临时屏蔽
+                // hideInMenu: true, // 临时屏蔽
               },
             ],
           },

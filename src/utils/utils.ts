@@ -149,12 +149,47 @@ const side = {
   2: '后端',
 };
 
-export const formatTreeData = (
-  origin: any[],
+const converseArrayToOne = (origin: any) => {
+  const source: any[] = [];
+  for (let index = 0; index < origin.length; index += 1) {
+    let repeat = false;
+    // 判断原有数组是否包含有名字
+    for (let i = 0; i < source.length; i++) {
+      if (isEqual(source[i].Group, origin[index].Group)) {
+        repeat = true;
+        break;
+      }
+    }
+
+    if (repeat === false) {
+      const tempData = {};
+      for (let i = 0; i < origin.length; i++) {
+        tempData['Group'] = origin[index].Group;
+        if (isEqual(origin[index].Group, origin[i].Group)) {
+          Object.entries(origin[i]).forEach(([k, v]) => {
+            tempData[k] = v;
+          });
+        }
+      }
+      source.push(tempData);
+    }
+  }
+  return source;
+};
+interface Iparam {
+  origin: any[];
+  showDenominator?: boolean;
+  percent?: number;
+  showSide?: boolean;
+  isMulti?: boolean;
+}
+export const formatTreeData = ({
+  origin = [],
   showDenominator = false,
-  percent: number = 1,
+  percent = 1,
   showSide = false,
-) => {
+  isMulti = true, // 默认为乘以
+}: Iparam) => {
   if (!origin) return null;
   const result: any = [];
   origin.forEach((elements: any) => {
@@ -167,7 +202,7 @@ export const formatTreeData = (
             [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
             [`${startTime}_denominator`]: elements.total.sideKpi.denominator,
           }
-        : { [startTime]: elements.total.kpi * percent }),
+        : { [startTime]: isMulti ? elements.total.kpi * percent : elements.total.kpi / percent }),
     });
     // 显示前后端
     if (showSide) {
@@ -210,7 +245,7 @@ export const formatTreeData = (
       result.push({
         Group: groups,
         isDept: true,
-        [startTime]: dept.kpi * percent,
+        [startTime]: isMulti ? dept.kpi * percent : dept.kpi / percent,
         ...denominator,
       });
       // 判断部门有没有前后端：
@@ -263,31 +298,4 @@ export const formatTreeData = (
     });
   });
   return converseArrayToOne(result);
-};
-const converseArrayToOne = (origin: any) => {
-  const source: any[] = [];
-  for (let index = 0; index < origin.length; index += 1) {
-    let repeat = false;
-    // 判断原有数组是否包含有名字
-    for (let i = 0; i < source.length; i++) {
-      if (isEqual(source[i].Group, origin[index].Group)) {
-        repeat = true;
-        break;
-      }
-    }
-
-    if (repeat === false) {
-      const tempData = {};
-      for (let i = 0; i < origin.length; i++) {
-        tempData['Group'] = origin[index].Group;
-        if (isEqual(origin[index].Group, origin[i].Group)) {
-          Object.entries(origin[i]).forEach(([k, v]) => {
-            tempData[k] = v;
-          });
-        }
-      }
-      source.push(tempData);
-    }
-  }
-  return source;
 };

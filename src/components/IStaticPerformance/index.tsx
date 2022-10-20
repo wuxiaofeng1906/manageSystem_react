@@ -25,6 +25,7 @@ interface IStatic {
   ruleData: IRuleData[];
   identity?: IIdentity;
   len?: number;
+  unit?: string;
 }
 
 type INode = string | React.ReactNode;
@@ -40,6 +41,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
   showDenominator = false,
   showHalfYear = false,
   len,
+  unit = '%',
 }) => {
   const gridApi = useRef<GridApi>();
   const { handleStaticBy, columns, rowData, loading } = useStatistic();
@@ -123,7 +125,7 @@ const IStaticPerformance: React.FC<IStatic> = ({
         >
           按年统计
         </Button>
-        <label style={{ fontWeight: 'bold' }}>(统计单位：%)</label>
+        <label style={{ fontWeight: 'bold' }}>(统计单位：{unit})</label>
         <Button
           type="text"
           style={{ color: '#1890FF', float: 'right' }}

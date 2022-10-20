@@ -42,7 +42,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data), loading };
+    return { data: formatTreeData({ origin: data.data }), loading };
   },
   // feedback
   async feedback({ client, params, identity }: IStatisticQuery) {
@@ -72,7 +72,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data), loading };
+    return { data: formatTreeData({ origin: data.data }), loading };
   },
 
   // 线上反馈平均上线时长
@@ -103,7 +103,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data), loading };
+    return { data: formatTreeData({ origin: data.data, percent: 86400, isMulti: false }), loading };
   },
 
   async productScale({ client, params, identity }: IStatisticQuery) {
@@ -133,7 +133,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data), loading };
+    return { data: formatTreeData({ origin: data.data }), loading };
   },
 
   async humanEffect({ client, params, identity, showDenominator }: IStatisticQuery) {
@@ -181,7 +181,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data, showDenominator), loading };
+    return { data: formatTreeData({ origin: data.data, showDenominator }), loading };
   },
 
   async shuttleDelay({ client, params, identity }: IStatisticQuery) {
@@ -211,7 +211,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data), loading };
+    return { data: formatTreeData({ origin: data.data }), loading };
   },
 
   // 测试 - 累计千行bug率 3个 identity: TEST、OWN、REFER
@@ -249,7 +249,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data), loading };
+    return { data: formatTreeData({ origin: data.data }), loading };
   },
 
   // 开发- 累计千行bug率 2个 identity:ALL,EXCLUDE_ONLINE
@@ -294,7 +294,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data, false, 1, true), loading };
+    return { data: formatTreeData({ origin: data.data, showSide: true }), loading };
   },
   // 轮次测试P0+P1占比
   async roundsTestRate({ client, params }: IStatisticQuery) {
@@ -324,7 +324,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data), loading };
+    return { data: formatTreeData({ origin: data.data }), loading };
   },
 
   // 阻塞测试工作量
@@ -355,7 +355,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data), loading };
+    return { data: formatTreeData({ origin: data.data }), loading };
   },
   // 阻塞次数
   async blockingTimes({ client, params, identity }: IStatisticQuery) {
@@ -385,7 +385,7 @@ const StatisticServices = {
         }
       }
   `);
-    return { data: formatTreeData(data.data), loading };
+    return { data: formatTreeData({ origin: data.data }), loading };
   },
 
   // 产品上线后引入emergency

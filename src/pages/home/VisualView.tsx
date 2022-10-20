@@ -222,23 +222,9 @@ const VisualView = () => {
     );
   };
 
-  const computeFn = (origin: any[], clusterMap: any, key?: string) => {
-    let source: any[] = [];
-    const hasKey = !isEmpty(key);
+  const computeFn = (origin: any[], clusterMap: any) => {
     if (isEmpty(origin)) return [];
-    origin.forEach((it: any) => {
-      const base = it?.baseline_cluster;
-      if (!isEmpty(it?.cluster)) {
-        it.cluster?.forEach((o: any) => {
-          source.push({ value: clusterMap[o], name: o });
-        });
-      }
-      if (!isEmpty(base) || hasKey) {
-        const resetV = hasKey ? it : base;
-        source.push({ value: clusterMap[resetV], name: resetV });
-      }
-    });
-    return source;
+    return origin.map((it: any) => ({ value: clusterMap[it], name: it }));
   };
 
   const getViewData = async (clusterMap = cluster) => {
@@ -247,12 +233,10 @@ const VisualView = () => {
       const basic = await PreReleaseServices.releaseBaseline();
       const currentDay = await PreReleaseServices.releaseView();
       const plan = await PreReleaseServices.releasePlan({});
-
-      const basicOnline =
-        basic.map((it: any) => [...(it.cluster ?? []), ...(it.exist_clu ?? [])])?.flat() ?? [];
-      const formatBasicCluster = computeFn(basicOnline, clusterMap, 'key');
-      const currentOnline = computeFn(currentDay, clusterMap);
-      const planOnline = computeFn(plan, clusterMap);
+      const formatBasicCluster = computeFn(
+        (basic.group ?? []).concat(basic.exist_clu ?? []),
+        clusterMap,
+      );
 
       setCurrentSource(
         currentDay?.map((it: any) => {
@@ -281,13 +265,8 @@ const VisualView = () => {
           release_num: it.branch + i,
         })),
       );
-      // 去重并排序(动态列计算)
-      let formatOnline = sortBy(
-        uniqBy([...formatBasicCluster, ...currentOnline, ...planOnline], 'name').flatMap((it) =>
-          ignore.includes(it.name) ? [] : [it],
-        ),
-        ['name'],
-      );
+      // 排序(动态列计算)
+      let formatOnline = sortBy(formatBasicCluster, ['name']);
 
       if (isEmpty(formatOnline)) formatOnline = [{ name: '', value: '' }];
       const basicGroup: any[] = [];
@@ -297,7 +276,8 @@ const VisualView = () => {
         .forEach((it) => {
           basicGroup.push({
             name: it.name,
-            children: basic.flatMap((re: any) => (re.cluster.includes(it.name) ? [re] : [])) ?? [],
+            children:
+              basic?.res.flatMap((re: any) => (re.cluster.includes(it.name) ? [re] : [])) ?? [],
           });
         });
       setBasicSource(basicGroup);

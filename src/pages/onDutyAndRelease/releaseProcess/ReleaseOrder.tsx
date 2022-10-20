@@ -54,30 +54,30 @@ const ReleaseOrder = () => {
     const envs = await PreReleaseServices.environment();
     const order = await PreReleaseServices.dutyOrder();
     setDutyList(
-      order?.map((it: any) => ({
+      order?.map((it: any, i: number) => ({
         label: it.duty_name ?? '',
         value: it.person_duty_num,
-        key: it.person_duty_num,
+        key: it.person_duty_num + i,
       })),
     );
     setEnvList(
-      envs?.flatMap((it: any) =>
+      envs?.flatMap((it: any, i: number) =>
         ['集群0', 'global', '集群0-8'].includes(it.online_environment_name)
           ? []
           : [
               {
                 label: it.online_environment_name ?? '',
                 value: it.online_environment_id,
-                key: it.online_environment_id,
+                key: it.online_environment_id + i,
               },
             ],
       ),
     );
     setAnnouncementList(
-      announce.map((it: any) => ({
+      announce.map((it: any, i: number) => ({
         label: it.announcement_name,
         value: it.announcement_num,
-        key: it.announcement_num,
+        key: it.announcement_num + i,
       })),
     );
   };
@@ -321,7 +321,7 @@ const ReleaseOrder = () => {
       agFinished = true;
       setFinished(true);
       await PreReleaseServices.automation(params);
-      if (hasAnnouncement) {
+      if (!hasAnnouncement) {
         await PreReleaseServices.saveAnnouncement({
           user_id: user?.userid ?? '',
           announcement_num: orderForm.getFieldValue('announcement_num'),

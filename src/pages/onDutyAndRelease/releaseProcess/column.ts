@@ -111,7 +111,6 @@ export const historyOrderColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '已发布集群',
     field: 'cluster',
-    valueFormatter: (p: any) => p.value?.replaceAll('cn-northwest-', '集群'),
   },
   {
     headerName: '操作',

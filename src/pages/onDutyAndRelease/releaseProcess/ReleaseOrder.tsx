@@ -18,6 +18,7 @@ import moment from 'moment';
 import { PageContainer } from '@ant-design/pro-layout';
 import DragIcon from '@/components/DragIcon';
 import cns from 'classnames';
+import { valueMap } from '@/utils/utils';
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 const ReleaseOrder = () => {
@@ -37,7 +38,7 @@ const ReleaseOrder = () => {
   const [spinning, setSpinning] = useState(false);
   const [finished, setFinished] = useState(false);
   const [visible, setVisible] = useState(false);
-
+  const [clusters, setClusters] = useState<any>();
   const onGridReady = (params: GridReadyEvent, ref = gridRef) => {
     ref.current = params.api;
     params.api.sizeColumnsToFit();
@@ -46,7 +47,11 @@ const ReleaseOrder = () => {
     agFinished = false;
     Modal.destroyAll();
     getBaseList();
-    getOrderDetail();
+    PreReleaseServices.clusterGroup().then((res) => {
+      const clusterMap = valueMap(res, ['name', 'value']);
+      setClusters(clusterMap);
+      getOrderDetail(clusterMap);
+    });
   }, []);
 
   const getBaseList = async () => {
@@ -54,35 +59,35 @@ const ReleaseOrder = () => {
     const envs = await PreReleaseServices.environment();
     const order = await PreReleaseServices.dutyOrder();
     setDutyList(
-      order?.map((it: any, i: number) => ({
+      order?.map((it: any) => ({
         label: it.duty_name ?? '',
         value: it.person_duty_num,
-        key: it.person_duty_num + i,
+        key: it.person_duty_num,
       })),
     );
     setEnvList(
-      envs?.flatMap((it: any, i: number) =>
+      envs?.flatMap((it: any) =>
         ['集群0', 'global', '集群0-8'].includes(it.online_environment_name)
           ? []
           : [
               {
                 label: it.online_environment_name ?? '',
                 value: it.online_environment_id,
-                key: it.online_environment_id + i,
+                key: it.online_environment_id,
               },
             ],
       ),
     );
     setAnnouncementList(
-      announce.map((it: any, i: number) => ({
+      announce.map((it: any) => ({
         label: it.announcement_name,
         value: it.announcement_num,
-        key: it.announcement_num + i,
+        key: it.announcement_num,
       })),
     );
   };
 
-  const getOrderDetail = async () => {
+  const getOrderDetail = async (clusterMap = clusters) => {
     try {
       setSpinning(true);
       const res = await PreReleaseServices.orderDetail({ release_num: id });
@@ -99,11 +104,19 @@ const ReleaseOrder = () => {
         });
       baseForm.setFieldsValue({
         ...res,
-        cluster: res.cluster?.map((it: any) => it.name) ?? [],
+        cluster: res.cluster ?? [],
       });
       agFinished = res?.release_result !== 'unknown' && !isEmpty(res?.release_result);
       setFinished(agFinished);
-      setOrderData(res.ready_data);
+      setOrderData(
+        res.ready_data?.map((it: any) => ({
+          ...it,
+          cluster: it.cluster
+            ?.split(',')
+            .map((o) => (o.includes('cn-northwest') ? clusterMap[o] ?? '' : o))
+            ?.join(','),
+        })),
+      );
       await formatCompare(res?.ops_repair_order_data ?? [], res?.ready_data ?? []);
       setSpinning(false);
     } catch (e: any) {
@@ -125,7 +138,13 @@ const ReleaseOrder = () => {
       }
       const rd = await PreReleaseServices.orderList(values.cluster?.join(',') ?? '');
       setOrderData(
-        rd?.map((it: any) => ({ ...it, cluster: it.cluster?.replaceAll('cn-northwest-', '集群') })),
+        rd?.map((it: any) => ({
+          ...it,
+          cluster: it.cluster
+            ?.split(',')
+            .map((o) => (o.includes('cn-northwest') ? clusters[o] ?? '' : o))
+            ?.join(','),
+        })),
       );
       const flag = rd.some((it: any) => (it.repair_order_type ?? '').indexOf('停机') > -1);
       orderForm.setFieldsValue({

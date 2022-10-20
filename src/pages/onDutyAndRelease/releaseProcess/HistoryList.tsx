@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Form, Select, DatePicker, Spin, Col } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { releaseListColumn } from '@/pages/onDutyAndRelease/releaseProcess/column';
 import IPagination from '@/components/IPagination';
 import { getHeight } from '@/publicMethods/pageSet';
@@ -9,6 +9,7 @@ import PreReleaseServices from '@/services/preRelease';
 import { useLocation } from 'umi';
 import { isEmpty } from 'lodash';
 import moment from 'moment';
+import { history } from '@@/core/history';
 
 const HistoryList = () => {
   const gridRef = useRef<GridApi>();
@@ -129,6 +130,30 @@ const HistoryList = () => {
           headerHeight={30}
           onGridReady={onGridReady}
           onGridSizeChanged={onGridReady}
+          frameworkComponents={{
+            link: (p: CellClickedEvent) => {
+              return (
+                <div
+                  style={{
+                    color: '#1890ff',
+                    cursor: 'pointer',
+                    width: '100%',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                  onClick={() => {
+                    let href = `/onDutyAndRelease/preRelease?releasedNum=${p.data.release_num}`;
+                    if (p.data.release_type == 'backlog_release') {
+                      href = `/onDutyAndRelease/releaseOrder/${p.data.release_num}`;
+                    }
+                    history.push(href);
+                  }}
+                >
+                  {p.value}
+                </div>
+              );
+            },
+          }}
         />
       </div>
       <IPagination

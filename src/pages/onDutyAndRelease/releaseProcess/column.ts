@@ -14,13 +14,8 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     headerName: '预发布批次名',
     field: 'release_name',
     minWidth: 110,
-    cellRenderer: (p) => {
-      let href = `/onDutyAndRelease/preRelease?releasedNum=${p.data.release_num}`;
-      if (p.data.release_type == 'backlog_release') {
-        href = `/onDutyAndRelease/releaseOrder/${p.data.release_num}`;
-      }
-      return `<a href="${href}">${p.value}</a>`;
-    },
+    cellRenderer: 'link',
+    tooltipField: 'release_name',
   },
   {
     headerName: '发布项目',

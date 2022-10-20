@@ -40,7 +40,12 @@ const ruleData: IRuleData[] = [
 ];
 const AvgTimeOnline: React.FC<any> = () => {
   return (
-    <IStaticPerformance ruleData={ruleData} request={StatisticServices.onlineTime} unit={'天'} />
+    <IStaticPerformance
+      ruleData={ruleData}
+      request={StatisticServices.onlineTime}
+      unit={'天'}
+      len={5}
+    />
   );
 };
 

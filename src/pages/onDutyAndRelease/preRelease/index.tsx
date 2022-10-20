@@ -278,13 +278,16 @@ const PreRelease: React.FC<any> = () => {
   };
 
   // 页面报错时释放锁
-  // window.addEventListener(
-  //   'error',
-  //   () => {
-  //     deleteLockStatus(lockedItem);
-  //   },
-  //   true,
-  // );
+  window.addEventListener(
+    'error',
+    () => {
+      if (window.location.pathname == '/onDutyAndRelease/preRelease') {
+        console.log('error', window.location.pathname);
+        deleteLockStatus(lockedItem);
+      }
+    },
+    true,
+  );
 
   /* endregion */
 

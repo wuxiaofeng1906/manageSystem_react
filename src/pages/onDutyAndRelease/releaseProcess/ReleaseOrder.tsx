@@ -340,7 +340,8 @@ const ReleaseOrder = () => {
       agFinished = true;
       setFinished(true);
       await PreReleaseServices.automation(params);
-      if (!hasAnnouncement) {
+      // 关联公告并勾选挂起公告
+      if (!hasAnnouncement && data.announcement) {
         await PreReleaseServices.saveAnnouncement({
           user_id: user?.userid ?? '',
           announcement_num: orderForm.getFieldValue('announcement_num'),

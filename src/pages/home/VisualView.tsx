@@ -6,6 +6,7 @@ import { InfoCircleOutlined } from '@ant-design/icons';
 import PreReleaseServices from '@/services/preRelease';
 import { isEmpty, sortBy, uniqBy, cloneDeep, isArray, intersection } from 'lodash';
 import dayjs from 'dayjs';
+import { valueMap } from '@/utils/utils';
 
 const thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
 const ignore = ['cn-northwest-0', 'cn-northwest-1'];
@@ -164,6 +165,7 @@ const VisualView = () => {
   const [loading, setLoading] = useState(false);
   const [project, setProject] = useState<any[]>([]);
   const [branch, setBranch] = useState<any[]>([]);
+  const [cluster, setCluster] = useState<any>();
   const [online, setOnline] = useState<{ name: string; value: string }[]>([
     { name: '', value: '' },
   ]); // 线上动态列
@@ -175,7 +177,11 @@ const VisualView = () => {
   useEffect(() => {
     Modal.destroyAll();
     getSelectData();
-    getViewData();
+    PreReleaseServices.clusterGroup().then((res) => {
+      const clusterMap = valueMap(res, ['name', 'value']);
+      setCluster(clusterMap);
+      getViewData(clusterMap);
+    });
   }, []);
 
   const getSelectData = async () => {
@@ -216,7 +222,7 @@ const VisualView = () => {
     );
   };
 
-  const computeFn = (origin: any[], key?: string) => {
+  const computeFn = (origin: any[], clusterMap: any, key?: string) => {
     let source: any[] = [];
     const hasKey = !isEmpty(key);
     if (isEmpty(origin)) return [];
@@ -224,20 +230,18 @@ const VisualView = () => {
       const base = it?.baseline_cluster;
       if (!isEmpty(it?.cluster)) {
         it.cluster?.forEach((o: any) => {
-          source.push(o);
+          source.push({ value: clusterMap[o], name: o });
         });
       }
       if (!isEmpty(base) || hasKey) {
         const resetV = hasKey ? it : base;
-        const text = resetV?.replace('cn-northwest-', '集群');
-        const value = text.length > 3 ? `${text.slice(0, 3)}-${text.slice(text.length - 1)}` : text;
-        source.push({ value, name: resetV });
+        source.push({ value: clusterMap[resetV], name: resetV });
       }
     });
     return source;
   };
 
-  const getViewData = async () => {
+  const getViewData = async (clusterMap = cluster) => {
     setLoading(true);
     try {
       const basic = await PreReleaseServices.releaseBaseline();
@@ -246,9 +250,9 @@ const VisualView = () => {
 
       const basicOnline =
         basic.map((it: any) => [...(it.cluster ?? []), ...(it.exist_clu ?? [])])?.flat() ?? [];
-      const formatBasicCluster = computeFn(basicOnline, 'key');
-      const currentOnline = computeFn(currentDay);
-      const planOnline = computeFn(plan);
+      const formatBasicCluster = computeFn(basicOnline, clusterMap, 'key');
+      const currentOnline = computeFn(currentDay, clusterMap);
+      const planOnline = computeFn(plan, clusterMap);
 
       setCurrentSource(
         currentDay?.map((it: any) => {
@@ -369,9 +373,9 @@ const VisualView = () => {
                         const baseIndex = dynamicColumn.findIndex(
                           (v) => data.baseline_cluster == v.name,
                         );
-                        const envIndex = dynamicColumn.findIndex((v) => v.name == env.name);
+                        const envIndex = dynamicColumn.findIndex((v) => v.name == env);
                         const alpha = envIndex - baseIndex;
-                        if (envIndex < 0 || env.name == data.baseline_cluster) return '';
+                        if (envIndex < 0 || env == data.baseline_cluster) return '';
                         return (
                           <div
                             key={env + i}

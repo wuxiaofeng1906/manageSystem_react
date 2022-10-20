@@ -139,5 +139,9 @@ const PreReleaseServices = {
   async saveAnnouncement(params: any) {
     return request(`${baseUrl}/latest-release/announcement`, { params });
   },
+  // 所有集群组合情况
+  async clusterGroup() {
+    return request(`${baseUrl}/latest-release/cluster`);
+  },
 };
 export default PreReleaseServices;

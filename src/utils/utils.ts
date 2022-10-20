@@ -131,63 +131,24 @@ const findParent = (departments: any[], dept: any, result: any) => {
     }
   });
 };
-
-export const formatTreeData = (origin: any[], showDenominator = false, percent: number = 1) => {
-  if (!origin) return null;
-  const result: any = [];
-  origin.forEach((elements: any) => {
-    const startTime = elements.range.start;
-    // 根节点
-    result.push({
-      Group: ['研发中心'],
-      isDept: true,
-      ...(showDenominator
-        ? {
-            [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
-            [`${startTime}_denominator`]: elements.total.sideKpi.denominator,
-          }
-        : { [startTime]: elements.total.kpi * percent }),
-    });
-
-    // department
-    const departments = elements.datas;
-    departments.forEach((dept: any) => {
-      const groups: any = [dept.deptName];
-      findParent(departments, dept, groups);
-      result.push({
-        Group: groups,
-        isDept: true,
-        [startTime]: dept.kpi * percent,
-        ...(showDenominator
-          ? {
-              [`${startTime}_numerator`]: dept.sideKpi.numerator,
-              [`${startTime}_denominator`]: dept.sideKpi.denominator,
-            }
-          : {}),
-      });
-      // user
-      const users = dept.users;
-      if (users) {
-        users.forEach((user: any) => {
-          const usersGroup = JSON.parse(JSON.stringify(groups));
-          usersGroup.push(user.userName);
-          result.push({
-            Group: usersGroup,
-            isDept: false,
-            [startTime]: user.kpi * percent,
-            ...(showDenominator
-              ? {
-                  [`${startTime}_numerator`]: user.sideKpi.numerator,
-                  [`${startTime}_denominator`]: user.sideKpi.denominator,
-                }
-              : {}),
-          });
-        });
-      }
-    });
-  });
-  return converseArrayToOne(result);
+const managers = [
+  '宋永强',
+  '郑江',
+  '万星',
+  '吴生祥',
+  '刘黎明',
+  '蒲姣',
+  '欧治成',
+  '刘云鹏',
+  '任航',
+  '胡敬华',
+  '何羽',
+];
+const side = {
+  1: '前端',
+  2: '后端',
 };
+
 const converseArrayToOne = (origin: any) => {
   const source: any[] = [];
   for (let index = 0; index < origin.length; index += 1) {
@@ -214,4 +175,127 @@ const converseArrayToOne = (origin: any) => {
     }
   }
   return source;
+};
+interface Iparam {
+  origin: any[];
+  showDenominator?: boolean;
+  percent?: number;
+  showSide?: boolean;
+  isMulti?: boolean;
+}
+export const formatTreeData = ({
+  origin = [],
+  showDenominator = false,
+  percent = 1,
+  showSide = false,
+  isMulti = true, // 默认为乘以
+}: Iparam) => {
+  if (!origin) return null;
+  const result: any = [];
+  origin.forEach((elements: any) => {
+    const startTime = elements.range.start;
+    result.push({
+      Group: ['研发中心'],
+      isDept: true,
+      ...(showDenominator
+        ? {
+            [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
+            [`${startTime}_denominator`]: elements.total.sideKpi.denominator,
+          }
+        : { [startTime]: isMulti ? elements.total.kpi * percent : elements.total.kpi / percent }),
+    });
+    // 显示前后端
+    if (showSide) {
+      result.push(
+        {
+          Group: ['研发中心', '前端'],
+          isDept: true,
+          ...(showDenominator
+            ? {
+                [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
+                [`${startTime}_denominator`]: elements.total.sideKpi.denominator,
+              }
+            : { [startTime]: elements.side.front }),
+        },
+        {
+          Group: ['研发中心', '后端'],
+          isDept: true,
+          ...(showDenominator
+            ? {
+                [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
+                [`${startTime}_denominator`]: elements.total.sideKpi.denominator,
+              }
+            : { [startTime]: elements.side.backend }),
+        },
+      );
+    }
+
+    // department
+    const departments = elements.datas;
+    departments.forEach((dept: any) => {
+      // 显示分子分母
+      const denominator = showDenominator
+        ? {
+            [`${startTime}_numerator`]: dept.sideKpi.numerator,
+            [`${startTime}_denominator`]: dept.sideKpi.denominator,
+          }
+        : {};
+      const groups: any = [dept.deptName];
+      findParent(departments, dept, groups);
+      result.push({
+        Group: groups,
+        isDept: true,
+        [startTime]: isMulti ? dept.kpi * percent : dept.kpi / percent,
+        ...denominator,
+      });
+      // 判断部门有没有前后端：
+      if (!['供应链后端', '应用架构部'].includes(dept.deptName) && showSide) {
+        const frontGroup: any = JSON.parse(JSON.stringify(groups));
+        frontGroup.push('前端');
+        result.push({
+          Group: frontGroup,
+          [startTime]: dept.side.front,
+          isDept: true,
+          ...denominator,
+        });
+      }
+
+      if (!['前端应用平台', '基础技术', '供应链前端'].includes(dept.deptName) && showSide) {
+        const backendGroup: any = JSON.parse(JSON.stringify(groups));
+        backendGroup.push('后端');
+        result.push({
+          Group: backendGroup,
+          [startTime]: dept.side.backend,
+          isDept: true,
+          ...denominator,
+        });
+      }
+      // user
+      const users = dept.users;
+      if (users) {
+        users.forEach((user: any) => {
+          const usersGroup = JSON.parse(JSON.stringify(groups));
+          if (!managers.includes(user.userName) && showSide) {
+            // 对管理人员的部门不加前后端，直接显示在部门下面
+            if (['1', '2'].includes(user.tech)) {
+              usersGroup.push(side[user.tech]);
+            }
+          }
+          usersGroup.push(user.userName);
+          result.push({
+            Group: usersGroup,
+            isDept: false,
+            [startTime]: user.kpi * percent,
+            ...(showDenominator
+              ? {
+                  [`${startTime}_numerator`]: user.sideKpi.numerator,
+                  [`${startTime}_denominator`]: user.sideKpi.denominator,
+                }
+              : {}),
+          });
+        });
+      }
+    });
+  });
+  return converseArrayToOne(result);
 };

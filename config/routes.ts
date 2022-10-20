@@ -373,14 +373,28 @@ export default [
                 icon: 'table',
                 path: 'blockingTimes',
                 component: './kpi/performance/developer/blockingTimes',
-                hideInMenu: true, // 临时屏蔽
+                // hideInMenu: true, // 临时屏蔽
               },
               {
                 name: '阻塞测试工作量',
                 icon: 'table',
                 path: 'blockingTestWorkload',
                 component: './kpi/performance/developer/blockingTestWorkload',
-                hideInMenu: true, // 临时屏蔽
+                // hideInMenu: true, // 临时屏蔽
+              },
+              {
+                name: '累计千行bug率',
+                icon: 'table',
+                path: 'cumulativeLineBugRate',
+                component: './kpi/performance/developer/cumulativeLineBugRate',
+                // hideInMenu: true, // 临时屏蔽
+              },
+              {
+                name: '累计千行bug率（不含线上）',
+                icon: 'table',
+                path: 'cumulativeLineBugRateExcludeOnline',
+                component: './kpi/performance/developer/cumulativeLineBugRateExcludeOnline',
+                // hideInMenu: true, // 临时屏蔽
               },
             ],
           },
@@ -529,7 +543,35 @@ export default [
                 icon: 'table',
                 path: 'grayScaleBugRate',
                 component: './kpi/performance/testers/grayScaleBugRate',
-                hideInMenu: true, // 临时屏蔽
+                // hideInMenu: true, // 临时屏蔽
+              },
+              {
+                name: '轮次测试P0+P1占比',
+                icon: 'table',
+                path: 'roundsTestRate',
+                component: './kpi/performance/testers/roundsTestRate',
+                // hideInMenu: true, // 临时屏蔽
+              },
+              {
+                name: '累计线上千行bug率',
+                icon: 'table',
+                path: 'cumulativeLineBugRate',
+                component: './kpi/performance/testers/cumulativeLineBugRate',
+                // hideInMenu: true, // 临时屏蔽
+              },
+              {
+                name: '累计线上千行bug率参考',
+                icon: 'table',
+                path: 'cumulativeLineBugRateReference',
+                component: './kpi/performance/testers/cumulativeLineBugRateReference',
+                // hideInMenu: true, // 临时屏蔽
+              },
+              {
+                name: '累计线上千行bug率（含测试）',
+                icon: 'table',
+                path: 'cumulativeLineBugRateTests',
+                component: './kpi/performance/testers/cumulativeLineBugRateTests',
+                // hideInMenu: true, // 临时屏蔽
               },
             ],
           },
@@ -582,7 +624,7 @@ export default [
                 icon: 'table',
                 path: 'deliveryThroughput',
                 component: './kpi/performance/service/deliveryThroughput',
-                hideInMenu: true, // 临时屏蔽
+                // hideInMenu: true, // 临时屏蔽
               },
             ],
           },

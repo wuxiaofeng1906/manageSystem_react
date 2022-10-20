@@ -14,7 +14,14 @@ import type { IStatisticQuery } from '@/services/statistic';
 
 // 统计
 export type IStaticBy = 'year' | 'halfYear' | 'quarter' | 'month' | 'week';
-export type IIdentity = 'DEVELOPER' | 'TESTER';
+export type IIdentity =
+  | 'DEVELOPER'
+  | 'TESTER'
+  | 'TEST'
+  | 'OWN'
+  | 'REFER'
+  | 'ALL'
+  | 'EXCLUDE_ONLINE';
 export interface IRequest {
   request: (data: IStatisticQuery) => void;
   type: IStaticBy;

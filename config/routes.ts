@@ -543,7 +543,7 @@ export default [
                 icon: 'table',
                 path: 'grayScaleBugRate',
                 component: './kpi/performance/testers/grayScaleBugRate',
-                hideInMenu: true, // 临时屏蔽
+                // hideInMenu: true, // 临时屏蔽
               },
               {
                 name: '轮次测试P0+P1占比',

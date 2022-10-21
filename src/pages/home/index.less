@@ -34,7 +34,7 @@
           position: relative;
           border-radius: 5px;
           text-align: left;
-          margin: 5px;
+          //margin: 5px;
           padding: 8px 0 8px 8px;
           box-shadow: 0 1px 2px -2px rgba(0, 0, 0, 0.16), 0 2px 2px 0 rgba(0, 0, 0, 0.12);
           .container{
@@ -65,10 +65,10 @@
             font-weight: bold;
             margin-right: 5px;
           }
-
-          &:not(&:last-child) {
-            margin-bottom: 5px;
-          }
+          //
+          //&:not(&:last-child) {
+          //  margin-bottom: 5px;
+          //}
           .deleteIcon{
             width: 16px;
             position: absolute;
@@ -134,20 +134,25 @@
     }
   }
   .stackWrapper{
-    padding:5px 5px 0;
-    &:last-child{
-      padding-bottom: 5px;
+    padding:0px 5px;
+    &:first-child{
+      padding-top: 5px;
+    }
+    &:not(last-child){
+      margin-bottom: 5px;
     }
     :global{
+      .ant-collapse{
+        border-radius: 5px;
+      }
       .ant-collapse-header{
         padding: 5px 10px !important;
         font-size: 12px;
         font-weight: bold;
-        background: white;
         word-break: break-all;
       }
       .ant-collapse-content > .ant-collapse-content-box{
-        padding: 0!important;
+        padding: 0px!important;
       }
     }
   }
@@ -164,6 +169,29 @@
   .card{
     border-radius: 6px;
     border: 1px solid #ddd;
+    .header{
+      .tag{
+        font-size: 14px;
+        font-weight: initial;
+        margin-top: 10px;
+        label{
+          color:#214ff3
+        }
+        span{
+          display: inline-block;
+          min-width:80px;
+          padding: 0 5px;
+          text-align: center;
+          border:1px solid #e0e0e0;
+          line-height: 26px;
+          background: #93db9326;
+          border-left: 0;
+          &:last-child{
+            border-left: 0;
+          }
+        }
+      }
+    }
     &:not(:first-child){
       margin-top: 16px;
     }

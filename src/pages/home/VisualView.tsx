@@ -4,7 +4,7 @@ import cns from 'classnames';
 import { Collapse, Form, Select, DatePicker, Card, Modal, Spin, Switch } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import PreReleaseServices from '@/services/preRelease';
-import { isEmpty, sortBy, uniqBy, cloneDeep, isArray, intersection } from 'lodash';
+import { isEmpty, sortBy, cloneDeep, isArray, intersection } from 'lodash';
 import dayjs from 'dayjs';
 import { valueMap } from '@/utils/utils';
 
@@ -48,7 +48,7 @@ const ICard = (params: {
       content: '请确认是否删除该积压单，点确认将彻底从积压单中删除！',
       icon: <InfoCircleOutlined style={{ color: 'red' }} />,
       onOk: async () => {
-        await PreReleaseServices.removeRelease({
+        await PreReleaseServices.removeOrder({
           user_id: user?.userid ?? '',
           release_num: data.release_num ?? '',
         });
@@ -66,6 +66,7 @@ const ICard = (params: {
       {params.child || <div />}
       <Collapse
         activeKey={activeKey}
+        style={{ background: params.data.bg || initBg[0] }}
         onChange={(v) => setActiveKey(!v.includes(activeKey) ? '' : params.data.release_num)}
       >
         <Collapse.Panel key={params.data.release_num} header={title}>
@@ -185,8 +186,10 @@ const VisualView = () => {
   }, []);
 
   const getSelectData = async () => {
-    const projectList = await PreReleaseServices.project();
-    const branchList = await PreReleaseServices.branch();
+    const [projectList, branchList] = await Promise.all([
+      PreReleaseServices.project(),
+      PreReleaseServices.branch(),
+    ]);
     setProject(
       projectList?.map((it: any) => ({
         label: it.project_name,
@@ -227,47 +230,52 @@ const VisualView = () => {
     return origin.map((it: any) => ({ value: clusterMap[it], name: it }));
   };
 
+  const preData = () => {
+    Promise.all([PreReleaseServices.releaseView(), PreReleaseServices.releasePlan({})]).then(
+      (res) => {
+        const [currentDay, plan] = res;
+        setCurrentSource(
+          currentDay?.map((it: any) => {
+            const isRed = it.project?.some(
+              (pro: any) =>
+                pro.pro_name?.startsWith('emergency') ||
+                pro.pro_name?.startsWith('stagepatch') ||
+                pro.pro_name?.startsWith('stage-patch'),
+            );
+            return {
+              ...it,
+              baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
+              cls: isRed ? styles.dotLineEmergency : styles.dotLineSuccess,
+              bg: isRed ? initBg[1] : initBg[0],
+            };
+          }),
+        );
+        setPlanSource(
+          plan?.map((it: any, i: number) => ({
+            ...it,
+            baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
+            cls: styles.dotLinePrimary,
+            bg: initBg[2],
+            plan_release_time: it.plan_time,
+            release_env: it.cluster?.map((it: any) => it.value)?.join(',') ?? '',
+            release_num: it.branch + i,
+          })),
+        );
+      },
+    );
+  };
+
   const getViewData = async (clusterMap = cluster) => {
     setLoading(true);
     try {
+      preData();
       const basic = await PreReleaseServices.releaseBaseline();
-      const currentDay = await PreReleaseServices.releaseView();
-      const plan = await PreReleaseServices.releasePlan({});
       const formatBasicCluster = computeFn(
         (basic.group ?? []).concat(basic.exist_clu ?? []),
         clusterMap,
       );
-
-      setCurrentSource(
-        currentDay?.map((it: any) => {
-          const isRed = it.project?.some(
-            (pro: any) =>
-              pro.pro_name?.startsWith('emergency') ||
-              pro.pro_name?.startsWith('stagepatch') ||
-              pro.pro_name?.startsWith('stage-patch'),
-          );
-          return {
-            ...it,
-            baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
-            cls: isRed ? styles.dotLineEmergency : styles.dotLineSuccess,
-            bg: isRed ? initBg[1] : initBg[0],
-          };
-        }),
-      );
-      setPlanSource(
-        plan?.map((it: any, i: number) => ({
-          ...it,
-          baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
-          cls: styles.dotLinePrimary,
-          bg: initBg[2],
-          plan_release_time: it.plan_time,
-          release_env: it.cluster?.map((it: any) => it.value)?.join(',') ?? '',
-          release_num: it.branch + i,
-        })),
-      );
       // 排序(动态列计算)
       let formatOnline = sortBy(formatBasicCluster, ['name']);
-
       if (isEmpty(formatOnline)) formatOnline = [{ name: '', value: '' }];
       const basicGroup: any[] = [];
       cloneDeep(baseColumn)
@@ -394,7 +402,7 @@ const VisualView = () => {
                 return (
                   <ICard
                     key={child.release_num + index}
-                    data={child}
+                    data={{ ...child, bg: '#93db9359' }}
                     onRefresh={getViewData}
                     isBasic={true}
                     open={open}
@@ -415,13 +423,22 @@ const VisualView = () => {
     <Card
       className={styles.card}
       title={
-        <div>
+        <div className={styles.header}>
           <span style={{ marginRight: 5 }}>待发布视图</span>
           <Switch
             checkedChildren={'展开全部'}
             unCheckedChildren={'收起全部'}
             onChange={(v) => setOpen(v)}
           />
+          <div className={styles.tag}>
+            <label>发布视图背景色说明</label>
+            <span style={{ background: initBg[1], marginLeft: 5, borderLeft: '1px solid #e0e0e0' }}>
+              emergency、stage-patch项目
+            </span>
+            <span style={{ background: '#93db9359' }}>版本基准</span>
+            <span>班车/特性项目</span>
+            <span style={{ background: initBg[2] }}>上线日历</span>
+          </div>
         </div>
       }
     >
@@ -500,7 +517,7 @@ const VisualView = () => {
                   </Form>
                 </td>
               </tr>
-              {renderTr(planSource, '上线计划日历', false, false)}
+              {renderTr(planSource, '计划上线日历', false, false)}
             </tbody>
           </table>
         </div>

@@ -432,10 +432,12 @@ const VisualView = () => {
           />
           <div className={styles.tag}>
             <label>发布视图背景色说明</label>
-            <span style={{ background: initBg[1], marginLeft: 5, borderLeft: '1px solid #e0e0e0' }}>
-              emergency、stage-patch项目
+            <span
+              style={{ background: '#93db9359', marginLeft: 5, borderLeft: '1px solid #e0e0e0' }}
+            >
+              版本基准
             </span>
-            <span style={{ background: '#93db9359' }}>版本基准</span>
+            <span style={{ background: initBg[1] }}>emergency/stage-patch项目</span>
             <span>班车/特性项目</span>
             <span style={{ background: initBg[2] }}>上线日历</span>
           </div>

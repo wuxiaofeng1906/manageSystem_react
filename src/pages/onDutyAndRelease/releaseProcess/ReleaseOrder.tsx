@@ -394,7 +394,10 @@ const ReleaseOrder = () => {
     setOrderData(sortArr);
     formatCompare(compareData?.opsData ?? [], sortArr);
   };
-  const hasPermission = useMemo(() => user?.group == 'superGroup', []);
+  const hasPermission = useMemo(
+    () => user?.authority?.find((it: any) => +it?.id == 152)?.id == 152,
+    [user],
+  );
   // 是否关联了公告
   const hasAnnouncement = useMemo(() => {
     const announce = orderForm.getFieldValue('announcement_num');

@@ -36,7 +36,7 @@ const Index = () => {
                   </div>
                 }
               >
-                <PreReleaseList disabled={hasPermission?.add} />
+                <PreReleaseList disabled={!hasPermission?.add} />
               </Tabs.TabPane>
             ) : (
               <div />

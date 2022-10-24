@@ -577,6 +577,12 @@ const ReleaseOrder = () => {
           <Divider plain>
             <strong>工单核对检查（rd平台暂无接口与sql工单）</strong>
           </Divider>
+          <div className={styles.orderTag}>
+            <h4>工单核对检查背景色说明:</h4>
+            <span>工单编号对比一致</span>
+            <span>接口工单/SQL工单(值班人员核对确认)</span>
+            <span>工单编号对比不一致</span>
+          </div>
           <div className="ag-theme-alpine" style={{ height: 300, width: '100%', marginTop: 8 }}>
             <AgGridReact
               columnDefs={historyCompareColumn}

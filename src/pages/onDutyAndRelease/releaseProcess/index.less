@@ -87,6 +87,38 @@
     border-radius: 4px;
     padding: 15px 10px;
   }
+  .orderTag{
+    vertical-align: middle;
+    h4{
+      color:#214ff3;
+      display: inline-block;
+    }
+    span{
+      position: relative;
+      &:before{
+        content: '';
+        display: inline-block;
+        width:22px;
+        border-radius: 50%;
+        text-align: center;
+        border:1px solid #e0e0e0;
+        vertical-align: middle;
+        height: 22px;
+        background: rgba(255, 2, 2, 0.06);
+        margin: 0 5px 0px;
+      }
+      &:first-of-type{
+        &:before{
+          background: rgba(0, 255, 0, 0.06);
+        }
+      }
+      &:nth-of-type(2){
+        &:before{
+          background: white;
+        }
+      }
+    }
+  }
 }
 .modalSuccessCheck{
   :global{

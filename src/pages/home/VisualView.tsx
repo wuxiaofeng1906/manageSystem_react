@@ -2,11 +2,12 @@ import React, { useEffect, useMemo, useState, Fragment } from 'react';
 import styles from './index.less';
 import cns from 'classnames';
 import { Collapse, Form, Select, DatePicker, Card, Modal, Spin, Switch } from 'antd';
-import { InfoCircleOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, RightOutlined, DownOutlined } from '@ant-design/icons';
 import PreReleaseServices from '@/services/preRelease';
 import { isEmpty, sortBy, cloneDeep, isArray, intersection } from 'lodash';
 import dayjs from 'dayjs';
 import { valueMap } from '@/utils/utils';
+import { history } from '@@/core/history';
 
 const thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
 const ignore = ['cn-northwest-0', 'cn-northwest-1'];
@@ -56,6 +57,7 @@ const ICard = (params: {
       },
     });
   };
+  const onCollapseChange = (v: any) => setActiveKey(!v?.includes(activeKey) ? '' : v);
 
   useEffect(() => {
     setActiveKey(params.open ? params.data.release_num : '');
@@ -66,10 +68,35 @@ const ICard = (params: {
       {params.child || <div />}
       <Collapse
         activeKey={activeKey}
+        collapsible={'header'}
         style={{ background: params.data.bg || initBg[0] }}
-        onChange={(v) => setActiveKey(!v.includes(activeKey) ? '' : params.data.release_num)}
+        expandIcon={() => {
+          return activeKey.includes(params.data.release_num) ? (
+            <DownOutlined onClick={() => onCollapseChange('')} />
+          ) : (
+            <RightOutlined onClick={() => onCollapseChange(params.data.release_num)} />
+          );
+        }}
+        onChange={onCollapseChange}
       >
-        <Collapse.Panel key={params.data.release_num} header={title}>
+        <Collapse.Panel
+          key={params.data.release_num}
+          extra={
+            <span
+              style={{ color: '#1296dbe6', cursor: 'pointer' }}
+              onClick={(e) => {
+                e.stopPropagation();
+                const backlogType = params.data.release_type == 'backlog_release';
+                let href = `/onDutyAndRelease/preRelease?releasedNum=${params.data.release_num}`;
+                if (backlogType) href = `/onDutyAndRelease/releaseOrder/${params.data.release_num}`;
+                history.push(href);
+              }}
+            >
+              查看
+            </span>
+          }
+          header={title}
+        >
           <div style={{ background: params.data.bg || initBg[0] }} className={styles.icard}>
             <div className={styles.container}>
               <span className={styles.label}>发布项目:</span>
@@ -431,15 +458,11 @@ const VisualView = () => {
             onChange={(v) => setOpen(v)}
           />
           <div className={styles.tag}>
-            <label>发布视图背景色说明</label>
-            <span
-              style={{ background: '#93db9359', marginLeft: 5, borderLeft: '1px solid #e0e0e0' }}
-            >
-              版本基准
-            </span>
-            <span style={{ background: initBg[1] }}>emergency/stage-patch项目</span>
+            <h4>发布视图背景色说明:</h4>
+            <span>版本基准</span>
+            <span>emergency/stage-patch项目</span>
             <span>班车/特性项目</span>
-            <span style={{ background: initBg[2] }}>上线日历</span>
+            <span>上线日历</span>
           </div>
         </div>
       }

@@ -11,7 +11,7 @@ import DutyListServices from '@/services/dutyList';
 import { isEmpty } from 'lodash';
 import { history, useLocation } from 'umi';
 
-const PreReleaseList = () => {
+const PreReleaseList = ({ disabled }: { disabled?: boolean }) => {
   const gridRef = useRef<GridApi>();
   const query = useLocation()?.query;
   const [rowData, setRowData] = useState<any[]>([]);
@@ -75,7 +75,13 @@ const PreReleaseList = () => {
   return (
     <Spin spinning={spinning} tip="数据加载中...">
       <div className={styles.preReleaseList}>
-        <Button type={'primary'} size={'small'} onClick={() => setVisible(true)} className={'btn'}>
+        <Button
+          type={'primary'}
+          size={'small'}
+          disabled={disabled}
+          onClick={() => setVisible(true)}
+          className={'btn'}
+        >
           新增发布
         </Button>
         <div className="ag-theme-alpine" style={{ height: gridHeight, width: '100%' }}>

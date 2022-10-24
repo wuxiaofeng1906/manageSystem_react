@@ -19,6 +19,7 @@ import { PageContainer } from '@ant-design/pro-layout';
 import DragIcon from '@/components/DragIcon';
 import cns from 'classnames';
 import { valueMap } from '@/utils/utils';
+import usePermission from '@/hooks/permission';
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 const ReleaseOrder = () => {
@@ -28,6 +29,9 @@ const ReleaseOrder = () => {
   const gridCompareRef = useRef<GridApi>();
   const [orderForm] = Form.useForm();
   const [baseForm] = Form.useForm();
+
+  const { prePermission } = usePermission();
+  const hasPermission = prePermission();
 
   const [orderData, setOrderData] = useState<any[]>([]);
   const [compareData, setCompareData] = useState<{ opsData: any[]; alpha: any[] }>();
@@ -353,7 +357,7 @@ const ReleaseOrder = () => {
   };
   const onRemove = (data: any) => {
     const cluster = baseForm.getFieldValue('cluster');
-    if (agFinished || !hasPermission) {
+    if (agFinished || !hasPermission.delete) {
       return infoMessage(agFinished ? '已标记发布结果不能删除积压工单!' : '您无删除积压工单权限!');
     }
 
@@ -394,10 +398,7 @@ const ReleaseOrder = () => {
     setOrderData(sortArr);
     formatCompare(compareData?.opsData ?? [], sortArr);
   };
-  const hasPermission = useMemo(
-    () => user?.authority?.find((it: any) => +it?.id == 152)?.id == 152,
-    [user],
-  );
+
   // 是否关联了公告
   const hasAnnouncement = useMemo(() => {
     const announce = orderForm.getFieldValue('announcement_num');
@@ -410,7 +411,11 @@ const ReleaseOrder = () => {
         <div className={styles.releaseOrder}>
           <div className={styles.header}>
             <div className={styles.title}>工单基本信息</div>
-            <Button size={'small'} onClick={() => onSaveBeforeCheck()} disabled={finished}>
+            <Button
+              size={'small'}
+              onClick={() => onSaveBeforeCheck()}
+              disabled={!hasPermission?.save || finished}
+            >
               保存
             </Button>
           </div>
@@ -476,7 +481,7 @@ const ReleaseOrder = () => {
                     <Form.Item name={'release_result'}>
                       <Select
                         allowClear
-                        disabled={finished}
+                        disabled={!hasPermission?.saveResult || finished}
                         className={styles.selectColor}
                         onChange={() => onSaveBeforeCheck(true)}
                         options={[
@@ -555,7 +560,7 @@ const ReleaseOrder = () => {
                 frameworkComponents={{
                   deleteOrder: (p: CellClickedEvent) => (
                     <Fragment>
-                      {hasPermission ? (
+                      {hasPermission.delete ? (
                         <img
                           title={'永久删除积压工单'}
                           width="20"

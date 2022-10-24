@@ -8,6 +8,7 @@ import { isEmpty, sortBy, cloneDeep, isArray, intersection } from 'lodash';
 import dayjs from 'dayjs';
 import { valueMap } from '@/utils/utils';
 import { history } from '@@/core/history';
+import { useModel } from '@@/plugin-model/useModel';
 
 const thead = ['类别', '线下版本', '集群0', '集群1', '线上'];
 const ignore = ['cn-northwest-0', 'cn-northwest-1'];
@@ -17,8 +18,6 @@ const baseColumn = [
   { name: ignore[1], value: thead[3] },
 ];
 const initBg = ['#93db9326', '#e83c3c26', '#519ff240'];
-const userLogins: any = localStorage.getItem('userLogins');
-const user = JSON.parse(userLogins);
 
 const ICard = (params: {
   data: any;
@@ -27,9 +26,9 @@ const ICard = (params: {
   onRefresh: Function;
   deleteIcon?: boolean;
   open: boolean;
+  user: any;
 }) => {
   const baseline = params.data.baseline_cluster == 'offline';
-  const hasPermission = useMemo(() => user?.group == 'superGroup', [user]);
   const [activeKey, setActiveKey] = useState('');
 
   const title = useMemo(
@@ -50,7 +49,7 @@ const ICard = (params: {
       icon: <InfoCircleOutlined style={{ color: 'red' }} />,
       onOk: async () => {
         await PreReleaseServices.removeOrder({
-          user_id: user?.userid ?? '',
+          user_id: params.user?.userid ?? '',
           release_num: data.release_num ?? '',
         });
         params.onRefresh?.();
@@ -81,6 +80,7 @@ const ICard = (params: {
       >
         <Collapse.Panel
           key={params.data.release_num}
+          header={title}
           extra={
             <span
               style={{ color: '#1296dbe6', cursor: 'pointer' }}
@@ -95,7 +95,6 @@ const ICard = (params: {
               查看
             </span>
           }
-          header={title}
         >
           <div style={{ background: params.data.bg || initBg[0] }} className={styles.icard}>
             <div className={styles.container}>
@@ -158,6 +157,12 @@ const ICard = (params: {
                 {params.data.apps ?? ''}
               </div>
             </div>
+            <div className={styles.container}>
+              <span className={styles.label}>release_num:</span>
+              <div className={styles.box} title={params.data.release_num ?? ''}>
+                {params.data.release_num ?? ''}
+              </div>
+            </div>
             {params.isBasic ? (
               <div className={styles.container}>
                 <span className={styles.label}>发布时间:</span>
@@ -172,7 +177,7 @@ const ICard = (params: {
               </div>
             )}
 
-            {hasPermission && params.deleteIcon == true ? (
+            {params.deleteIcon == true ? (
               <img
                 src={require('../../../public/delete_black_2.png')}
                 className={styles.deleteIcon}
@@ -190,6 +195,7 @@ const ICard = (params: {
 
 const VisualView = () => {
   const [form] = Form.useForm();
+  const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [loading, setLoading] = useState(false);
   const [project, setProject] = useState<any[]>([]);
   const [branch, setBranch] = useState<any[]>([]);
@@ -201,7 +207,6 @@ const VisualView = () => {
   const [currentSource, setCurrentSource] = useState<any[]>([]); // 当天待发版
   const [planSource, setPlanSource] = useState<any[]>([]); // 计划上线日历
   const [open, setOpen] = useState(false);
-
   useEffect(() => {
     Modal.destroyAll();
     getSelectData();
@@ -315,6 +320,24 @@ const VisualView = () => {
               basic?.res.flatMap((re: any) => (re.cluster.includes(it.name) ? [re] : [])) ?? [],
           });
         });
+      basicGroup.forEach((it) => {
+        it.children?.forEach((child: any, i: number) => {
+          child.detail?.forEach((o: any) => {
+            const cn = it.name.replace('cn-northwest-', '')?.split();
+            const clusters = o.cluster?.join(',')?.replaceAll('cn-northwest-', '')?.split(',');
+            if (
+              clusters?.filter((num: string) => cn?.join()?.includes(num))?.length > 0 // 存在集群合并的情况
+            ) {
+              it.children[i] = {
+                ...child,
+                release_type: o.release_type,
+                release_num: o.release_num,
+                release_time: o.plan_release_time,
+              };
+            }
+          });
+        });
+      });
       setBasicSource(basicGroup);
       setOnline(formatOnline);
       setLoading(false);
@@ -362,7 +385,7 @@ const VisualView = () => {
                   ''
                 )}
               </td>
-              {renderTd(it, deleteIcon)}
+              {renderTd(it, hasPermission && deleteIcon)}
             </tr>
           );
         })}
@@ -382,6 +405,7 @@ const VisualView = () => {
                   onRefresh={getViewData}
                   deleteIcon={deleteIcon ?? ignore.includes(data.baseline_cluster)}
                   open={open}
+                  user={user}
                   child={
                     <div>
                       {data?.cluster?.map((env: any, i: number) => {
@@ -414,7 +438,10 @@ const VisualView = () => {
     );
   };
 
+  const hasPermission = useMemo(() => user?.group == 'superGroup', [user]);
+
   const onlineLen = useMemo(() => online.length, [online]);
+
   const renderBasicTd = useMemo(() => {
     const empty = Array.from({ length: onlineLen + 2 });
     if (isEmpty(basicSource)) return empty.map((it, i) => <td key={i} />);
@@ -432,8 +459,13 @@ const VisualView = () => {
                     data={{ ...child, bg: '#93db9359' }}
                     onRefresh={getViewData}
                     isBasic={true}
+                    user={user}
                     open={open}
-                    deleteIcon={intersection(ignore, child.cluster ?? []).length > 0 && index < 2}
+                    deleteIcon={
+                      hasPermission &&
+                      intersection(ignore, child.cluster ?? []).length > 0 &&
+                      index < 2
+                    }
                   />
                 );
               })}
@@ -451,7 +483,7 @@ const VisualView = () => {
       className={styles.card}
       title={
         <div className={styles.header}>
-          <span style={{ marginRight: 5 }}>待发布视图</span>
+          <span style={{ marginRight: 5, verticalAlign: 'middle' }}>待发布视图</span>
           <Switch
             checkedChildren={'展开全部'}
             unCheckedChildren={'收起全部'}

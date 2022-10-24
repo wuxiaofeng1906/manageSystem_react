@@ -8,8 +8,13 @@ import * as dayjs from 'dayjs';
 import DutyListServices from '@/services/dutyList';
 import VisualView from '@/pages/home/VisualView';
 import { isEmpty } from 'lodash';
+import usePermission from '@/hooks/permission';
 
 const Home = () => {
+  const gridRef = useRef<GridApi>();
+  const [dutyPerson, setDutyPerson] = useState<any[]>([]);
+  const { prePermission } = usePermission();
+  const hasPermission = prePermission();
   const from = dayjs().subtract(1, 'd').startOf('w').subtract(0, 'w');
   const to = from.endOf('w');
 
@@ -17,9 +22,6 @@ const Home = () => {
     start_time: dayjs(from).add(1, 'day').format('YYYY/MM/DD'),
     end_time: dayjs(to).add(1, 'day').format('YYYY/MM/DD'),
   };
-
-  const gridRef = useRef<GridApi>();
-  const [dutyPerson, setDutyPerson] = useState<any[]>([]);
 
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
@@ -68,8 +70,7 @@ const Home = () => {
           />
         </div>
       </Card>
-
-      <VisualView />
+      {hasPermission?.preView ? <VisualView /> : <div />}
     </div>
   );
 };

@@ -12,7 +12,7 @@ import styles from './index.less';
 import PreReleaseServices from '@/services/preRelease';
 import AnnouncementServices from '@/services/announcement';
 import { useModel, useParams, history } from 'umi';
-import { isEmpty, omit, delay } from 'lodash';
+import { isEmpty, omit } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
 import moment from 'moment';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -268,19 +268,19 @@ const ReleaseOrder = () => {
           okButtonProps: { disabled: confirmDisabled },
           onOk: async () => {
             setConfirmDisabled(true);
-            // await delay(() => {
-            //   setConfirmDisabled(false);
-            // }, 3);
-            if (result == 'cancel') {
-              await PreReleaseServices.removeRelease(
-                {
-                  user_id: user?.userid ?? '',
-                  release_num: id ?? '',
-                },
-                false,
-              );
-            } else await onSave();
-            setConfirmDisabled(false);
+            try {
+              if (result == 'cancel') {
+                await PreReleaseServices.removeRelease(
+                  {
+                    user_id: user?.userid ?? '',
+                    release_num: id ?? '',
+                  },
+                  false,
+                );
+              } else await onSave();
+            } catch (e) {
+              setConfirmDisabled(false);
+            }
             history.replace('/onDutyAndRelease/releaseProcess?key=pre');
           },
           onCancel: () => {

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Tabs } from 'antd';
+import { Tabs, Result } from 'antd';
 import { BarsOutlined, HistoryOutlined } from '@ant-design/icons';
 import { useLocation, history } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -58,7 +58,7 @@ const Index = () => {
             )}
           </Tabs>
         ) : (
-          <h3 style={{ height: '500px', width: '100%' }}>您当前无查看发布过程权限，请联系管理员</h3>
+          <Result status={'403'} title="您没有此页面的访问权限，如需访问请联系管理员。" />
         )}
       </div>
     </PageContainer>

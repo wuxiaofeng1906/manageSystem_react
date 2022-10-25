@@ -472,7 +472,7 @@ const UpgradeService: React.FC<any> = () => {
     const isOk = newValue == '1'; // 当前测试修改确认状态为是
     const currentReleaseNum = props.data?.ready_release_num;
     const testField = props.column.colId == 'test_confirm_status';
-    const editId = `${props.column.colId?.split('_')?.[0]}_user_id`;
+    const editId = props.column.colId?.replace('confirm_status', 'user_id');
     // checkStepFourSource: 检查step 4的上线环境是否存在未填【1.填写了应用2.填写了升级接口】
 
     // 确认为是：检查对应值班人确认对应服务集群是否填写

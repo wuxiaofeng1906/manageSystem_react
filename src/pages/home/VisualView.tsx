@@ -504,7 +504,7 @@ const VisualView = () => {
           <table>
             <colgroup>
               <col style={{ maxWidth: 50, width: 30 }} />
-              <col style={{ width: 100, maxWidth: 120 }} />
+              <col style={{ width: 140, maxWidth: 160 }} />
             </colgroup>
             <thead>
               <tr>
@@ -518,7 +518,7 @@ const VisualView = () => {
                       colSpan={isOnline ? onlineLen : title == '类别' ? 2 : 1}
                       style={
                         title == '类别'
-                          ? { width: 130, maxWidth: 170 }
+                          ? { width: 170, maxWidth: 200 }
                           : { width: `${isOnline ? singleW * (onlineLen || 1) : singleW}px` }
                       }
                     >

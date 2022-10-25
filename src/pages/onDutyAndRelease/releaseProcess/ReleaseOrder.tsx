@@ -12,7 +12,7 @@ import styles from './index.less';
 import PreReleaseServices from '@/services/preRelease';
 import AnnouncementServices from '@/services/announcement';
 import { useModel, useParams, history } from 'umi';
-import { isEmpty, omit } from 'lodash';
+import { isEmpty, omit, delay } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
 import moment from 'moment';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -42,7 +42,9 @@ const ReleaseOrder = () => {
   const [spinning, setSpinning] = useState(false);
   const [finished, setFinished] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [clusters, setClusters] = useState<any>();
+  const [clusters, setClusters] = useState<any>(); // 所有组合集群
+  const [confirmDisabled, setConfirmDisabled] = useState(false);
+
   const onGridReady = (params: GridReadyEvent, ref = gridRef) => {
     ref.current = params.api;
     params.api.sizeColumnsToFit();
@@ -263,7 +265,12 @@ const ReleaseOrder = () => {
           title: tips[result].title,
           content: tips[result].content,
           icon: <InfoCircleOutlined style={{ color: result == 'cancel' ? 'red' : '#1585ff' }} />,
+          okButtonProps: { disabled: confirmDisabled },
           onOk: async () => {
+            setConfirmDisabled(true);
+            // await delay(() => {
+            //   setConfirmDisabled(false);
+            // }, 3);
             if (result == 'cancel') {
               await PreReleaseServices.removeRelease(
                 {
@@ -273,6 +280,7 @@ const ReleaseOrder = () => {
                 false,
               );
             } else await onSave();
+            setConfirmDisabled(false);
             history.replace('/onDutyAndRelease/releaseProcess?key=pre');
           },
           onCancel: () => {
@@ -635,10 +643,13 @@ const ModalSuccessCheck = ({
   onOk: (v?: any) => void;
 }) => {
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
 
   const onConfirm = async () => {
     const values = await form.validateFields();
+    setLoading(true);
     onOk(values);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -649,12 +660,12 @@ const ModalSuccessCheck = ({
     <Modal
       visible={visible}
       centered
-      title={'发布结果确认'}
       onOk={onConfirm}
       maskClosable={false}
       onCancel={() => onOk()}
       className={styles.modalSuccessCheck}
       destroyOnClose
+      okButtonProps={{ disabled: loading }}
     >
       <div>请确认是否标记发布成功？</div>
       <div>如有自动化也执行通过！确认通过，会自动开放所有租户。</div>

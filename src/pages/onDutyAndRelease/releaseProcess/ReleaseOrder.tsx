@@ -148,7 +148,7 @@ const ReleaseOrder = () => {
           ...it,
           cluster: it.cluster
             ?.split(',')
-            .map((o) => (o.includes('cn-northwest') ? clusters[o] ?? '' : o))
+            .map((o: string) => (o.includes('cn-northwest') ? clusters[o] ?? '' : o))
             ?.join(','),
         })),
       );
@@ -183,10 +183,6 @@ const ReleaseOrder = () => {
           : rdOrigin[i],
       );
     });
-    // 临时的假数据
-    if (ops.length > 100) {
-      ops = ops?.slice(0, 5);
-    }
     ops.forEach((it: any, i: number) => {
       const otherOrder = !['BlueGreenDeploy', 'TenantStopDeploy'].includes(it.release_order_type);
       const rdId = rdArr[i]?.repair_order;
@@ -196,11 +192,16 @@ const ReleaseOrder = () => {
 
       mergeArr.push({
         opsId: String(it.id ?? ''),
-        opsTitle: it.id ? `${it.id}:${opsTitle}` : opsTitle,
+        opsTitle: it.id && opsTitle ? `${it.id}: ${opsTitle}` : it.id ? it.id : opsTitle,
         opsType: it.release_order_type,
         rd: rdId,
-        rdTitle: rdId ? `${rdId}:${rdArr[i]?.project}` : rdArr[i]?.project ?? '',
-        rdType: rdId ? `${rdId}:${rdArr[i]?.repair_order_type}` : '',
+        rdTitle:
+          rdId && rdArr[i]?.project
+            ? `${rdId}: ${rdArr[i]?.project}`
+            : rdId
+            ? rdId
+            : rdArr[i]?.project ?? '',
+        rdType: rdId ? `${rdId}: ${rdArr[i]?.repair_order_type}` : '',
         status: otherOrder ? '' : String(it.id) == String(rdId),
       });
     });
@@ -382,11 +383,7 @@ const ReleaseOrder = () => {
           user_id: user?.userid ?? '',
         });
         const rd = await PreReleaseServices.orderList(cluster?.join(',') ?? '');
-        let ops = await PreReleaseServices.opsList(cluster?.join(',') ?? '');
-        // 临时的假数据
-        if (ops.length > 100) {
-          ops = ops?.slice(0, 5);
-        }
+        const ops = await PreReleaseServices.opsList(cluster?.join(',') ?? '');
         await PreReleaseServices.separateSaveOrder({
           release_num: id,
           ops_repair_data: ops ?? [],

@@ -83,7 +83,7 @@ const ICard = (params: {
           header={title}
           extra={
             <span
-              style={{ color: '#1296dbe6', cursor: 'pointer' }}
+              style={{ color: 'rgba(9,109,196,0.9)', cursor: 'pointer' }}
               onClick={(e) => {
                 e.stopPropagation();
                 const backlogType = params.data.release_type == 'backlog_release';

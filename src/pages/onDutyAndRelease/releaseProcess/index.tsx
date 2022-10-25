@@ -27,7 +27,7 @@ const Index = () => {
     <PageContainer>
       <div className={styles.releaseProcessContainer}>
         {hasPermission?.preList || hasPermission?.historyList ? (
-          <Tabs defaultActiveKey={query.key} onChange={updateKey} animated={false}>
+          <Tabs activeKey={query.key} onChange={updateKey} animated={false}>
             {hasPermission?.preList ? (
               <Tabs.TabPane
                 key={'pre'}

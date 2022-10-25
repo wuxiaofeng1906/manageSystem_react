@@ -157,12 +157,6 @@ const ICard = (params: {
                 {params.data.apps ?? ''}
               </div>
             </div>
-            <div className={styles.container}>
-              <span className={styles.label}>release_num:</span>
-              <div className={styles.box} title={params.data.release_num ?? ''}>
-                {params.data.release_num ?? ''}
-              </div>
-            </div>
             {params.isBasic ? (
               <div className={styles.container}>
                 <span className={styles.label}>发布时间:</span>

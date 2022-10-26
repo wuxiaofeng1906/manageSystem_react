@@ -59,7 +59,10 @@ const ICard = (params: {
       },
     });
   };
-  const onCollapseChange = (v: any) => setActiveKey(!v?.includes(activeKey) ? '' : v);
+  const onCollapseChange = (v: any) => {
+    console.log(v);
+    setActiveKey(!v?.includes(activeKey) ? '' : v);
+  };
 
   useEffect(() => {
     setActiveKey(params.open ? params.data.release_num : '');

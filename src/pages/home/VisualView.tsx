@@ -85,7 +85,7 @@ const ICard = (params: {
           header={title}
           extra={
             <img
-              style={{ cursor: 'pointer', width: 14, height: 14, filter: 'brightness(0.85)' }}
+              style={{ cursor: 'pointer', width: 14, height: 14 }}
               title={'查看工单详情'}
               src={require('../../../public/url.png')}
               onClick={(e) => {
@@ -209,8 +209,8 @@ const VisualView = () => {
   const [planSource, setPlanSource] = useState<any[]>([]); // 计划上线日历
   const [open, setOpen] = useState(false);
   useEffect(() => {
-    Modal.destroyAll();
-    getSelectData();
+    Modal.destroyAll?.();
+    // getSelectData();
     PreReleaseServices.clusterGroup().then((res) => {
       const clusterMap = valueMap(res, ['name', 'value']);
       setCluster(clusterMap);

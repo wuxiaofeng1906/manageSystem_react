@@ -14,6 +14,7 @@
       th {
         line-height: 30px;
         vertical-align: middle;
+        text-align: center;
       }
       td{
         vertical-align: top;
@@ -157,6 +158,8 @@
         font-size: 12px;
         font-weight: bold;
         word-break: break-all;
+        display: flex;
+        justify-content: flex-end;
         .ant-collapse-header-text{
           width:calc(100% - 50px);
           min-height: 18px;
@@ -164,6 +167,12 @@
       }
       .ant-collapse-content > .ant-collapse-content-box{
         padding: 0px!important;
+      }
+      .ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow{
+        padding:0;
+        width:24px;
+        height: 18px;
+        line-height: 18px;
       }
     }
   }

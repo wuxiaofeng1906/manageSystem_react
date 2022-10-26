@@ -534,7 +534,9 @@ const VisualView = () => {
                       style={
                         title == '类别'
                           ? { width: 170, maxWidth: 200 }
-                          : { width: `${isOnline ? singleW * (onlineLen || 1) : singleW}px` }
+                          : {
+                              width: `${isOnline ? singleW * (onlineLen || 1) : singleW}px`,
+                            }
                       }
                     >
                       {title}

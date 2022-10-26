@@ -31,19 +31,15 @@ const wxLogin = () => {
     //   "href": "",
     // });
 
-    (window as any)
-      .WwLogin({
-        id: 'container',
-        appid: 'wwcba5faed367cdeee',
-        agentid: 1000021,
-        // "redirect_uri": encodeURIComponent('http://dms.q7link.com:8000/user/myLogin'),
-        redirect_uri: encodeURIComponent('http://rd.q7link.com:8000/user/myLogin'),
-        state: 'wwcba5faed367cdeee',
-        href: '',
-      })
-      .then((res) => {
-        console.log(res, 'wxlogin');
-      });
+    (window as any).WwLogin({
+      id: 'container',
+      appid: 'wwcba5faed367cdeee',
+      agentid: 1000021,
+      // "redirect_uri": encodeURIComponent('http://dms.q7link.com:8000/user/myLogin'),
+      redirect_uri: encodeURIComponent('http://rd.q7link.com:8000/user/myLogin'),
+      state: 'wwcba5faed367cdeee',
+      href: '',
+    });
   }, 1000);
 };
 

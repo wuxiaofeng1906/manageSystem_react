@@ -92,33 +92,39 @@
           left: calc(100% - 7px);
           transform: translateY(calc(-50% + 2px));
         }
-        .dotLineEmergency,.dotLinePrimary,.dotLineSuccess{
+        .dotLineEmergency,.dotLinePrimary,.dotLineSuccess,.dotLineGray{
           height: 2px;
           position: absolute;
           top:calc(50% - 2px);
           transform: translateY(calc(-50% + 2px));
-          border-bottom: 2px solid #e83d3d80;
+          border-bottom: 2px solid #e83d3d59;
           &:after{
             right: -12px;
             top:-11px;
             position: absolute;
             display: inline-block;
             content: '';
-            border-left:12px solid #e83d3d80;
+            border-left:12px solid #e83d3d59;
             border-top:12px solid transparent;
             border-bottom:12px solid transparent;
           }
         }
         .dotLinePrimary {
-          border-bottom: 2px solid #509ef280;
+          border-bottom: 2px solid #519ff240;
           &:after{
-            border-left:12px solid #509ef280;
+            border-left:12px solid #519ff240;
           }
         }
         .dotLineSuccess {
-          border-bottom: 2px solid #93db9380;
+          border-bottom: 2px solid #93db9326;
           &:after{
-            border-left:12px solid #93db9380;
+            border-left:12px solid #93db9326;
+          }
+        }
+        .dotLineGray {
+          border-bottom: 2px solid #e2e8f0;
+          &:after{
+            border-left:12px solid #e2e8f0;
           }
         }
       }
@@ -191,18 +197,18 @@
           &:before{
             content: '';
             display: inline-block;
-            width:22px;
+            width:19px;
             border-radius: 50%;
             text-align: center;
             border:1px solid #e0e0e0;
             vertical-align: middle;
-            height: 22px;
+            height: 19px;
             margin: 0 5px 0px;
-            background: #93db9326;
+            background: #519ff226;
           }
           &:first-of-type{
             &:before{
-              background:#93db9359;
+              background:#93db9326;
             }
           }
           &:nth-of-type(2){
@@ -212,7 +218,7 @@
           }
           &:last-of-type{
             &:before{
-              background:  #519ff240;
+              background:  #b2bac326;
             }
           }
         }

@@ -17,7 +17,7 @@ const baseColumn = [
   { name: ignore[0], value: thead[2] },
   { name: ignore[1], value: thead[3] },
 ];
-const initBg = ['#93db9326', '#e83c3c26', '#519ff240'];
+const initBg = ['#93db9326', '#e83c3c26', '#519ff224', '#e2e8f066'];
 
 const ICard = (params: {
   data: any;
@@ -34,7 +34,9 @@ const ICard = (params: {
   const title = useMemo(
     () =>
       isArray(params.data.project)
-        ? params.data.project?.map((it: any) => it.pro_name)?.join(',')
+        ? params.data.project
+            ?.flatMap((it: any) => (isEmpty(it.pro_name) ? [] : [it.pro_name]))
+            ?.join(',')
         : params.data.project,
     [JSON.stringify(params.data.project)],
   );
@@ -82,8 +84,10 @@ const ICard = (params: {
           key={params.data.release_num}
           header={title}
           extra={
-            <span
-              style={{ color: 'rgba(9,109,196,0.9)', cursor: 'pointer' }}
+            <img
+              style={{ cursor: 'pointer', width: 14, height: 14, filter: 'brightness(0.85)' }}
+              title={'查看工单详情'}
+              src={require('../../../public/url.png')}
               onClick={(e) => {
                 e.stopPropagation();
                 const backlogType = params.data.release_type == 'backlog_release';
@@ -91,9 +95,7 @@ const ICard = (params: {
                 if (backlogType) href = `/onDutyAndRelease/releaseOrder/${params.data.release_num}`;
                 history.push(href);
               }}
-            >
-              查看
-            </span>
+            />
           }
         >
           <div style={{ background: params.data.bg || initBg[0] }} className={styles.icard}>
@@ -107,18 +109,23 @@ const ICard = (params: {
                         it.pro_name?.startsWith('stagepatch') ||
                         it.pro_name?.startsWith('stage-patch');
                       return (
-                        <span
-                          key={params.data.release_num + i}
-                          className={cns(baseline && linkProject ? styles.link : '', styles.value)}
-                          onClick={() => {
-                            if (!it.pro_id || !(baseline && linkProject)) return;
-                            window.open(
-                              `http://zentao.77hub.com/zentao/execution-task-${it.pro_id}.html`,
-                            );
-                          }}
-                        >
-                          {it.pro_name ?? ''}
-                        </span>
+                        it.pro_name && (
+                          <span
+                            key={params.data.release_num + i}
+                            className={cns(
+                              baseline && linkProject ? styles.link : '',
+                              styles.value,
+                            )}
+                            onClick={() => {
+                              if (!it.pro_id || !(baseline && linkProject)) return;
+                              window.open(
+                                `http://zentao.77hub.com/zentao/execution-task-${it.pro_id}.html`,
+                              );
+                            }}
+                          >
+                            {it.pro_name ?? ''}
+                          </span>
+                        )
                       );
                     })
                   : params.data.project}
@@ -271,8 +278,8 @@ const VisualView = () => {
             return {
               ...it,
               baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
-              cls: isRed ? styles.dotLineEmergency : styles.dotLineSuccess,
-              bg: isRed ? initBg[1] : initBg[0],
+              cls: isRed ? styles.dotLineEmergency : styles.dotLinePrimary,
+              bg: isRed ? initBg[1] : initBg[2],
             };
           }),
         );
@@ -280,8 +287,8 @@ const VisualView = () => {
           plan?.map((it: any, i: number) => ({
             ...it,
             baseline_cluster: isEmpty(it.baseline_cluster) ? 'offline' : it.baseline_cluster,
-            cls: styles.dotLinePrimary,
-            bg: initBg[2],
+            cls: styles.dotLineGray,
+            bg: initBg[3],
             plan_release_time: it.plan_time,
             release_env: it.cluster?.map((it: any) => it.value)?.join(',') ?? '',
             release_num: it.branch + i,
@@ -450,7 +457,7 @@ const VisualView = () => {
                 return (
                   <ICard
                     key={child.release_num + index}
-                    data={{ ...child, bg: '#93db9359' }}
+                    data={child}
                     onRefresh={getViewData}
                     isBasic={true}
                     user={user}
@@ -533,41 +540,41 @@ const VisualView = () => {
               </tr>
               {renderTr(currentSource, '当天待发版')}
               {/*搜索条件*/}
-              <tr>
-                <td colSpan={onlineLen + 5}>
-                  <Form
-                    form={form}
-                    size={'small'}
-                    layout={'inline'}
-                    className={styles.condition}
-                    onFieldsChange={getPlanList}
-                  >
-                    <Form.Item name={'project_id'} label={'项目名称'}>
-                      <Select
-                        style={{ width: '300px' }}
-                        options={project}
-                        placeholder={'项目名称'}
-                        mode={'multiple'}
-                        showSearch
-                        optionFilterProp={'label'}
-                      />
-                    </Form.Item>
-                    <Form.Item name={'branch'} label={'分支名称'}>
-                      <Select
-                        style={{ width: '300px' }}
-                        options={branch}
-                        placeholder={'分支名称'}
-                        mode={'multiple'}
-                        showSearch
-                        optionFilterProp={'label'}
-                      />
-                    </Form.Item>
-                    <Form.Item name={'plan_time'} label={'计划上线日期'}>
-                      <DatePicker style={{ width: '170px' }} />
-                    </Form.Item>
-                  </Form>
-                </td>
-              </tr>
+              {/*<tr>*/}
+              {/*  <td colSpan={onlineLen + 5}>*/}
+              {/*    <Form*/}
+              {/*      form={form}*/}
+              {/*      size={'small'}*/}
+              {/*      layout={'inline'}*/}
+              {/*      className={styles.condition}*/}
+              {/*      onFieldsChange={getPlanList}*/}
+              {/*    >*/}
+              {/*      <Form.Item name={'project_id'} label={'项目名称'}>*/}
+              {/*        <Select*/}
+              {/*          style={{ width: '300px' }}*/}
+              {/*          options={project}*/}
+              {/*          placeholder={'项目名称'}*/}
+              {/*          mode={'multiple'}*/}
+              {/*          showSearch*/}
+              {/*          optionFilterProp={'label'}*/}
+              {/*        />*/}
+              {/*      </Form.Item>*/}
+              {/*      <Form.Item name={'branch'} label={'分支名称'}>*/}
+              {/*        <Select*/}
+              {/*          style={{ width: '300px' }}*/}
+              {/*          options={branch}*/}
+              {/*          placeholder={'分支名称'}*/}
+              {/*          mode={'multiple'}*/}
+              {/*          showSearch*/}
+              {/*          optionFilterProp={'label'}*/}
+              {/*        />*/}
+              {/*      </Form.Item>*/}
+              {/*      <Form.Item name={'plan_time'} label={'计划上线日期'}>*/}
+              {/*        <DatePicker style={{ width: '170px' }} />*/}
+              {/*      </Form.Item>*/}
+              {/*    </Form>*/}
+              {/*  </td>*/}
+              {/*</tr>*/}
               {renderTr(planSource, '计划上线日历', false, false)}
             </tbody>
           </table>

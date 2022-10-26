@@ -473,6 +473,7 @@ const VisualView = () => {
                     data={child}
                     onRefresh={getViewData}
                     isBasic={true}
+                    showLink={true}
                     user={user}
                     open={open}
                     deleteIcon={

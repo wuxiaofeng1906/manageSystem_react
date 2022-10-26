@@ -4,7 +4,7 @@ import cns from 'classnames';
 import { Collapse, Form, Select, DatePicker, Card, Modal, Spin, Switch } from 'antd';
 import { InfoCircleOutlined, RightOutlined, DownOutlined } from '@ant-design/icons';
 import PreReleaseServices from '@/services/preRelease';
-import { isEmpty, sortBy, cloneDeep, isArray, intersection } from 'lodash';
+import { isEmpty, sortBy, cloneDeep, isArray, intersection, uniq, isEqual } from 'lodash';
 import dayjs from 'dayjs';
 import { valueMap } from '@/utils/utils';
 import { history } from '@@/core/history';
@@ -59,10 +59,7 @@ const ICard = (params: {
       },
     });
   };
-  const onCollapseChange = (v: any) => {
-    console.log(v);
-    setActiveKey(!v?.includes(activeKey) ? '' : v);
-  };
+  const onCollapseChange = (v: string) => setActiveKey(v);
 
   useEffect(() => {
     setActiveKey(params.open ? params.data.release_num : '');
@@ -76,13 +73,15 @@ const ICard = (params: {
         collapsible={'header'}
         style={{ background: params.data.bg || initBg[0] }}
         expandIcon={() => {
-          return activeKey.includes(params.data.release_num) ? (
+          return activeKey?.includes(params.data.release_num) ? (
             <DownOutlined onClick={() => onCollapseChange('')} />
           ) : (
             <RightOutlined onClick={() => onCollapseChange(params.data.release_num)} />
           );
         }}
-        onChange={onCollapseChange}
+        onChange={() =>
+          onCollapseChange(params.data.release_num == activeKey ? '' : params.data.release_num)
+        }
       >
         <Collapse.Panel
           key={params.data.release_num}

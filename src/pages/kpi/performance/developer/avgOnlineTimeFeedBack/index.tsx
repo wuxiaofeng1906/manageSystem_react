@@ -48,6 +48,7 @@ const AvgOnlineTimeFeedBack: React.FC<any> = () => {
       request={StatisticServices.feedback}
       identity={'DEVELOPER'}
       len={5}
+      unit={'天'}
     />
   );
 };

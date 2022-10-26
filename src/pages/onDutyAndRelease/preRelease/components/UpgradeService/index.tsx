@@ -460,14 +460,48 @@ const UpgradeService: React.FC<any> = () => {
   /* endregion */
 
   /* region 服务确认 */
+  // 表格数据重置
+  const resetTable = async (currentReleaseNum: string) => {
+    const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
+    serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+    serverConfirmGridApi2.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+  };
 
   // 下拉框选择是否确认事件
   const saveUperConfirmInfo = async (newValue: string, props: any, checkStepFourSource = false) => {
     const isOk = newValue == '1'; // 当前测试修改确认状态为是
     const currentReleaseNum = props.data?.ready_release_num;
     const testField = props.column.colId == 'test_confirm_status';
+    const editId = props.column.colId?.replace('confirm_status', 'user_id');
     // checkStepFourSource: 检查step 4的上线环境是否存在未填【1.填写了应用2.填写了升级接口】
 
+    // 确认为是：检查对应值班人确认对应服务集群是否填写
+    const upgrade =
+      releaseItemGridApi.current
+        ?.getRenderedNodes()
+        ?.flatMap((it) =>
+          !isEmpty(it.data) &&
+          it.data?.edit_user_id == props.data?.[editId] &&
+          isEmpty(it.data?.online_environment)
+            ? [it.data?.app]
+            : [],
+        ) ?? [];
+    const services =
+      upGradeGridApi.current
+        ?.getRenderedNodes()
+        ?.flatMap((it) =>
+          !isEmpty(it.data) &&
+          it.data?.edit_user_id == props.data?.[editId] &&
+          isEmpty(it.data?.online_environment)
+            ? [it.data?.api_name]
+            : [],
+        ) ?? [];
+    // 校验各自值班确认服务集群是否为空
+    if (!isEmpty([...upgrade, ...services]) && !testField && isOk) {
+      infoMessage(`服务[${String([...upgrade, ...services])}]未填写相关信息，请填写完成后再次确认`);
+      resetTable(currentReleaseNum);
+      return;
+    }
     // 验证 集群是否未填写
     const checkEnvIsEmpty = checkStepFourSource && testField;
 
@@ -488,9 +522,7 @@ const UpgradeService: React.FC<any> = () => {
       // 重置为初始状态（不更新确认状态）
       if (!checkDeveloperHasFinish || checkEnvIsEmpty) {
         // (不管成功或者失败)刷新表格
-        const newData_confirm: any = await alalysisInitData('pulishConfirm', currentReleaseNum);
-        serverConfirmGridApi.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
-        serverConfirmGridApi2.current?.setRowData(newData_confirm.upService_confirm); // 需要给服务确认刷新数据
+        resetTable(currentReleaseNum);
         return;
       }
     }
@@ -617,7 +649,6 @@ const UpgradeService: React.FC<any> = () => {
     const flag = checkOnlineEnvSource(releaseItem, upgradeApi);
     applicantConfirmForm.setFieldsValue({ status: flag });
   }, [JSON.stringify(releaseItem.gridData), JSON.stringify(upgradeApi.gridData)]);
-
   return (
     <div>
       {/* 升级服务 */}
@@ -626,7 +657,6 @@ const UpgradeService: React.FC<any> = () => {
           <legend className={'legendStyle'}>
             Step4 升级服务
             <label style={{ color: 'Gray' }}>
-              {' '}
               (值班测试：填写一键部署ID和测试服务确认完成；前后端值班：填写应用服务和升级接口/对应服务确认完成)
             </label>
           </legend>
@@ -693,7 +723,7 @@ const UpgradeService: React.FC<any> = () => {
               >
                 <AgGridReact
                   columnDefs={getReleasedApiColumns()} // 定义列
-                  rowData={upgradeApi.gridData} // 数据绑定
+                  rowData={isEmpty(upgradeApi.gridData) ? [{}] : upgradeApi.gridData} // 数据绑定
                   defaultColDef={{
                     resizable: true,
                     sortable: true,

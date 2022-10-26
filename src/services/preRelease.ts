@@ -46,5 +46,102 @@ const PreReleaseServices = {
       params,
     });
   },
+  // 关联值班名单
+  async dutyOrder() {
+    return request(`${baseUrl}/release/duty`);
+  },
+  // 发布集群
+  async environment() {
+    return request(`${baseUrl}/release/environment`);
+  },
+  // 发布项目
+  async project() {
+    return request(`${baseUrl}/duty/project`);
+  },
+  // 分支
+  async branch() {
+    return request(`${baseUrl}/sonar/branch`);
+  },
+  //  --------------新改版发布过程--------------
+  // 发布列表
+  async releaseList() {
+    return request(`${baseUrl}/latest-release/list`);
+  },
+  // 发布列表排序
+  async releaseOrder(data: any) {
+    return request(`${baseUrl}/latest-release/order-by`, { method: 'post', data });
+  },
+  // 发布历史
+  async historyList(params: any) {
+    return request(`${baseUrl}/latest-release/history`, { params });
+  },
+  // 工单编号
+  async orderNumbers() {
+    return request(`${baseUrl}/latest-release/order`);
+  },
+  // 发布视图数据（版本基准）
+  async releaseBaseline() {
+    return request(`${baseUrl}/latest-release/views-version-baseline`);
+  },
+  // 发布视图数据（当天待发版）
+  async releaseView() {
+    return request(`${baseUrl}/latest-release/views-ready-release`);
+  },
+  // 发布视图数据（发版计划）
+  async releasePlan(params: any) {
+    return request(`${baseUrl}/latest-release/release-plan`, { params });
+  },
+  // 删除发布列表（视图）
+  async removeRelease(data: any, showMsg = true) {
+    return request(`${baseUrl}/latest-release/list`, {
+      method: 'delete',
+      data,
+      msg: showMsg ? '删除成功' : false,
+    });
+  },
+  // 删除积压工单项目
+  async removeOrder(data: any) {
+    return request(`${baseUrl}/latest-release/order-project`, {
+      method: 'delete',
+      data,
+      warn: true,
+      msg: '积压工单删除成功',
+    });
+  },
+  // 积压工单【环境】对应的列表数据
+  async orderList(cluster: string) {
+    return request(`${baseUrl}/latest-release/order-project`, {
+      params: { cluster },
+    });
+  },
+  // 运维工单
+  async opsList(cluster: string) {
+    return request(`${baseUrl}/latest-release/ops-order`, {
+      params: { cluster },
+    });
+  },
+  // 保存
+  async saveOrder(data: any) {
+    return request(`${baseUrl}/latest-release/list`, { method: 'post', data, msg: '保存成功' });
+  },
+  // 单独保存rd工单和OPS工单
+  async separateSaveOrder(data: any) {
+    return request(`${baseUrl}/latest-release/repair-data`, { method: 'post', data });
+  },
+  async orderDetail(params: any) {
+    return request(`${baseUrl}/latest-release/detail`, { params, warn: false });
+  },
+  // 自动化检查-发布成功
+  async automation(data: any) {
+    return request(`${baseUrl}/latest-release/automation`, { data, method: 'post' });
+  },
+  // 升级公告挂起
+  async saveAnnouncement(params: any) {
+    return request(`${baseUrl}/latest-release/announcement`, { params });
+  },
+  // 所有集群组合情况
+  async clusterGroup() {
+    return request(`${baseUrl}/latest-release/cluster`);
+  },
 };
 export default PreReleaseServices;

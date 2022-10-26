@@ -45,6 +45,7 @@ const PreRelease: React.FC<any> = () => {
     setCorrespOrder,
     modifyAllLockedArray,
     setGlobalLoading,
+    operteStatus,
   } = useModel('releaseProcess');
 
   // 用于定时任务显示数据，定时任务useEffect中渲染了一次。不能实时更新
@@ -68,27 +69,23 @@ const PreRelease: React.FC<any> = () => {
   const { data, loading } = useRequest(() => alalysisInitData('', releasedNumStr));
 
   // 显示无数据界面
-  const showNoneDataPage = async (data = {}) => {
+  const showNoneDataPage = async (resetPartProcess = {}) => {
     // tab 页面
-    if (currentKey === '' || !isEmpty(data)) {
-      // 如果当前key未空，则获取
+    let releaseNum = currentKey;
+    if (releaseNum === '') {
+      // 如果当前key为空，则获取
       const newNum = await getNewPageNumber();
-      const releaseNum = newNum.data?.ready_release_num;
-      const panesArray: any = [
-        {
-          title: `${releaseNum}灰度预发布`,
-          content: '',
-          key: releaseNum,
-        },
-      ];
-      currentKey = releaseNum;
-      setTabsData(releaseNum, panesArray);
+      releaseNum = newNum.data?.ready_release_num;
     }
+    const panesArray: any = [{ title: `${releaseNum}灰度预发布`, content: '', key: releaseNum }];
+    currentKey = releaseNum;
+    currentPanes = panesArray;
+    setTabsData(releaseNum, panesArray);
 
     // 进度条
     modifyProcessStatus({
       ...processStatus,
-      ...data,
+      ...resetPartProcess,
       // 进度条相关数据和颜色
       releaseProject: 'Gainsboro', // #2BF541
       upgradeService: 'Gainsboro',
@@ -135,18 +132,23 @@ const PreRelease: React.FC<any> = () => {
   };
 
   // 显示有数据界面
-  const showPageInitData = async (initData: any, initShow: boolean, isAutoRefresh = false) => {
+  const showPageInitData = async (
+    initData: any,
+    initShow: boolean = false,
+    isAutoRefresh = false,
+  ) => {
     if (initData === undefined) {
       return;
     }
-
+    if (releasedNumStr) {
+      currentKey = releasedNumStr;
+    }
     if (initData?.errmessage) {
       // 出现异常情况时候，提醒错误，不更新界面。
       setGlobalLoading(false);
       errorMessage(initData?.errmessage.toString());
       return;
     }
-
     // 自动刷新时无数据不更新数据
     if (isEmpty(initData)) {
       // 初始化的时候无数据再显示，自动刷新无数据不更新界面
@@ -160,7 +162,8 @@ const PreRelease: React.FC<any> = () => {
     // Tab数据
     const { tabPageInfo } = initData;
     if (initShow) {
-      if (releaseHistory === 'false') {
+      // 针对路径无releaseNum时，全量获取所有tab
+      if (releaseHistory === 'false' && !currentKey) {
         // 通过链接跳转到固定Tab
         const source: any = await alalysisInitData('tabPageInfo');
         const tabsInfomation: any = source?.tabPageInfo;
@@ -175,11 +178,7 @@ const PreRelease: React.FC<any> = () => {
     const processData: any = await getCheckProcess(tabPageInfo?.activeKey);
     if (processData) {
       // 根据发布结果判定是否可以进行修改
-      if (processData.data?.release_result !== '9') {
-        modifyOperteStatus(true);
-      } else {
-        modifyOperteStatus(false);
-      }
+      modifyOperteStatus(processData.data?.release_result !== '9');
       modifyProcessStatus(await showProgressData(processData.data));
     }
 
@@ -237,18 +236,21 @@ const PreRelease: React.FC<any> = () => {
   };
 
   useEffect(() => {
+    currentKey = '';
+    currentPanes = [];
+    modifyOperteStatus(false);
     showPageInitData(data, true);
   }, [data, loading]);
 
   const interValRef: any = useRef(); // 定时任务数据id保存
   // 定时任务
   useEffect(() => {
+    if (operteStatus && !currentKey) {
+      clearInterval(interValRef.current);
+      return;
+    }
     if (!interValRef.current) {
-      // let count = 0;
       const id = setInterval(async () => {
-        // count += 1;
-        // console.log(`刷新次数=${count},定时任务id=${id},currentKey=${currentKey}`);
-        // 刷新
         if (lockedItem === '' && releaseHistory === 'false') {
           // 是历史记录查询则不需要进行刷新
           const datas = await alalysisInitData('', currentKey);
@@ -259,7 +261,7 @@ const PreRelease: React.FC<any> = () => {
       interValRef.current = id;
     }
     return () => clearInterval(interValRef.current);
-  }, []);
+  }, [operteStatus]);
 
   /* region 释放锁 */
   // 刷新释放正锁住的锁
@@ -269,6 +271,9 @@ const PreRelease: React.FC<any> = () => {
 
   // 窗口关闭释放锁
   window.onunload = () => {
+    currentKey = '';
+    currentPanes = [];
+    modifyOperteStatus(false);
     deleteLockStatus(lockedItem);
   };
 
@@ -276,7 +281,10 @@ const PreRelease: React.FC<any> = () => {
   window.addEventListener(
     'error',
     () => {
-      deleteLockStatus(lockedItem);
+      if (window.location.pathname == '/onDutyAndRelease/preRelease') {
+        console.log('error', window.location.pathname);
+        deleteLockStatus(lockedItem);
+      }
     },
     true,
   );
@@ -284,14 +292,14 @@ const PreRelease: React.FC<any> = () => {
   /* endregion */
 
   return (
-    <PageContainer style={{ backgroundColor: 'white' }}>
+    <PageContainer style={{ backgroundColor: 'white' }} title={'非积压发布'}>
       <Spin spinning={loading || globalLoading} tip={'数据加载中...'}>
         <Tab />
         <CheckProgress
           refreshPage={async () => {
             setTabsData('', []);
             setGlobalLoading(true);
-            const datas = await alalysisInitData('', '');
+            const datas = await alalysisInitData('', location?.releasedNum as string);
             showPageInitData(datas, true);
             setGlobalLoading(false);
           }}

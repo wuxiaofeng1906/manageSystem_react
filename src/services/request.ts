@@ -1,6 +1,8 @@
 import type { RequestOptionsInit } from 'umi-request';
 import { extend } from 'umi-request';
-import { notification, message } from 'antd';
+import { message } from 'antd';
+import axios, { AxiosRequestConfig } from 'axios';
+import { errorMessage } from '@/publicMethods/showMessages';
 
 const errorHandler = (error: { response: Response; message: any }): Response => {
   // notification.destroy();
@@ -8,7 +10,6 @@ const errorHandler = (error: { response: Response; message: any }): Response => 
   //   message: '网络异常',
   //   description: '网络发生异常，请稍后重试',
   // });
-  // eslint-disable-next-line @typescript-eslint/no-throw-literal
   throw error.response || error;
 };
 
@@ -17,12 +18,9 @@ const _request = extend({
   // credentials: 'include', // 默认请求是否带上cookie
 });
 
-_request.interceptors.request.use((url, options) => {
+const requestHeader = (url: string, options: any) => {
   const token = localStorage.getItem('accessId');
-  let headers: any = {
-    // 'Content-Type': 'application/json',
-    Accept: 'application/json',
-  };
+  let headers: any = { Accept: 'application/json' };
   if (token) {
     headers = { ...headers, Authorization: 'Bearer ' + token };
   }
@@ -30,6 +28,10 @@ _request.interceptors.request.use((url, options) => {
     url,
     options: { ...options, headers: { ...options.headers, ...headers } },
   };
+};
+
+_request.interceptors.request.use((url, options) => {
+  return requestHeader(url, options);
 });
 
 _request.interceptors.response.use((response) => {
@@ -44,14 +46,18 @@ interface IOption extends RequestOptionsInit {
   localCache?: boolean; // 本地缓存
   [key: string]: any;
 }
+interface IAxios extends AxiosRequestConfig {
+  msg?: boolean | string;
+  warn?: boolean | string;
+}
 
-function request(url: string, ioptions: IOption = {}, hasStandard = true) {
+function request(url: string, ioptions: IOption = {}) {
   const { dealRes = true, warn = true, forceLogin = true, msg, localCache, ...options } = ioptions;
   let mRequest;
-  const resWrap = hasStandard ? dealResWrap : notStandardResWrap;
   if (localCache) mRequest = localCacheWrap(url, options);
+  // 统一结构接口
   if (!mRequest) mRequest = _request(url, options);
-  if (dealRes) mRequest = resWrap(mRequest, warn, forceLogin, msg);
+  if (dealRes) mRequest = dealResWrap(mRequest, warn, forceLogin, msg);
   return mRequest;
 }
 
@@ -83,7 +89,6 @@ function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg
     .then((res) => {
       if (res?.code !== 200) {
         if (warn) {
-          // eslint-disable-next-line no-param-reassign
           if (warn === true) warn = '';
           message.warn(warn || res?.msg || '操作失败');
         }
@@ -95,32 +100,34 @@ function dealResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg
       return res?.data;
     })
     .catch((e) => {
-      return Promise.reject(e);
-    });
-}
-
-function notStandardResWrap(mRequest: Promise<any>, warn: any, forceLogin: boolean, msg?: any) {
-  return mRequest
-    .then((res) => {
-      if (res.ok == false) {
-        if (warn) {
-          // eslint-disable-next-line no-param-reassign
-          if (warn === true) warn = '';
-          message.warn(warn || res?.msg || '操作失败');
-        }
-        return Promise.reject(res);
-      }
-      if (msg) {
-        message.info(msg === true ? res.msg : msg);
-      }
-      return res?.data;
-    })
-    .catch((e) => {
-      if (e.status == 403) {
-        message.info('对不起，您无权操作');
-      } else message.info('操作失败');
       return Promise.reject(e);
     });
 }
 
 export default request;
+
+// 非统一结构接口
+export const irregularRequest = async (url: string, options: IAxios) => {
+  const opt = requestHeader(url, options);
+  try {
+    const res = await axios({
+      url,
+      ...options,
+      headers: opt.options.headers,
+      method: options.method ?? 'get',
+    });
+    return res.data?.data || res.data?.datas;
+  } catch (error: any) {
+    const errTip = JSON.parse(error.response.request.response);
+    if (errTip.code == 403) {
+      message.info('对不起，您无权操作');
+    } else if (options.msg || options.warn)
+      errorMessage(
+        options.msg == true || options.warn == true
+          ? errTip.message
+          : options.msg || options.warn || '操作失败',
+      );
+    else if (errTip.message && errTip.code !== 200) errorMessage(errTip.message);
+    throw errTip;
+  }
+};

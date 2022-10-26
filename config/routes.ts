@@ -19,11 +19,17 @@ export default [
       },
     ],
   },
+  // {
+  //   path: '/welcomes',
+  //   name: '首页',
+  //   icon: 'smile',
+  //   component: './welcomes',
+  // },
   {
-    path: '/welcomes',
+    path: '/home',
     name: '首页',
-    icon: 'smile',
-    component: './welcomes',
+    icon: 'HomeOutlined',
+    component: './home',
   },
   // {
   //   path: '/admin',
@@ -54,7 +60,7 @@ export default [
   // },
   {
     name: '班车工作台',
-    icon: 'table',
+    icon: 'CarOutlined',
     path: '/sprint',
     routes: [
       {
@@ -127,7 +133,7 @@ export default [
   },
   {
     name: '值班与发布',
-    icon: 'table',
+    icon: 'DeploymentUnitOutlined',
     path: '/onDutyAndRelease',
     access: 'devCenter', // 仅研发中心人员可见，客服不可见
     routes: [
@@ -157,12 +163,27 @@ export default [
         icon: 'table',
         path: 'preRelease',
         component: './onDutyAndRelease/preRelease',
+        hideInMenu: true,
+      },
+      {
+        name: '发布过程', // 新版本
+        icon: 'table',
+        path: 'releaseProcess',
+        component: './onDutyAndRelease/releaseProcess/index',
+      },
+      {
+        name: '灰度推生产', // 新版本积压工单
+        icon: 'table',
+        path: 'releaseOrder/:id',
+        hideInMenu: true,
+        component: './onDutyAndRelease/releaseProcess/ReleaseOrder',
       },
       {
         name: '发布历史',
         icon: 'table',
         path: 'releaseHistory',
         component: './onDutyAndRelease/releaseHistory',
+        hideInMenu: true,
       },
       {
         name: '正式发布',
@@ -189,7 +210,7 @@ export default [
   {
     name: '研发过程数据',
     access: 'devCenter', // 仅研发中心人员可见，客服不可见
-    icon: 'table',
+    icon: 'FundProjectionScreenOutlined',
     path: '/kpi',
     routes: [
       {
@@ -705,14 +726,14 @@ export default [
   },
   {
     name: '工具入口',
-    icon: 'table',
+    icon: 'ToolOutlined',
     path: 'toolIntegration',
     component: './toolIntegration',
     access: 'devCenter', // 仅研发中心人员可见，客服不可见
   },
   {
     name: '检查工具',
-    icon: 'table',
+    icon: 'BugOutlined',
     path: '/checkTools',
     routes: [
       {
@@ -731,7 +752,7 @@ export default [
   },
   {
     name: '企业微信审批流',
-    icon: 'table',
+    icon: 'CommentOutlined',
     path: '/approvalFlow',
     // access: 'sysAdmin',
     // hideInMenu: true,
@@ -740,7 +761,7 @@ export default [
   },
   {
     name: '禅道管理',
-    icon: 'table',
+    icon: 'BlockOutlined',
     path: '/zentao',
     // hideInMenu: true,
     routes: [
@@ -791,7 +812,7 @@ export default [
   },
   {
     name: '石墨管理',
-    icon: 'table',
+    icon: 'BookOutlined',
     path: '/shimo',
     hideInMenu: false,
     access: 'devCenter', // 仅研发中心人员可见，客服不可见，
@@ -820,7 +841,7 @@ export default [
   },
   {
     name: '系统管理',
-    icon: 'table',
+    icon: 'SettingOutlined',
     path: '/authority',
     access: 'sysAdmin',
     routes: [
@@ -850,7 +871,7 @@ export default [
   },
   {
     path: '/',
-    redirect: './welcomes',
+    redirect: './home',
   },
   {
     component: './404',

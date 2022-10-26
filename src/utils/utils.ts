@@ -1,5 +1,5 @@
 import { IRecord } from '@/namespaces/interface';
-import { isEqual, omit } from 'lodash';
+import { isEmpty, isEqual, omit } from 'lodash';
 
 /* eslint no-useless-escape:0 import/prefer-default-export:0 */
 const reg = /(((^https?:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(?::\d+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)$/;
@@ -79,6 +79,7 @@ export const storage = { set, get, remove, has };
 
 export function valueMap(option: IRecord[], values: string[]) {
   const result: IRecord = {};
+  if (isEmpty(option)) return {};
   option.forEach((it) => {
     if (it.hasOwnProperty(values[0]) && it.hasOwnProperty(values[1])) {
       result[it[values[0]]] = it[values[1]];

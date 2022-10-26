@@ -194,6 +194,7 @@ const OnlineBranch: React.FC<any> = () => {
         branchcheck: '1',
         branch_mainBranch: ['stage', 'master'],
         branch_teachnicalSide: ['front', 'backend'],
+        ignoreFrontCheck: '1',
         branch_mainSince: moment(dayjs().subtract(6, 'day').format('YYYY-MM-DD')),
       });
       setOnlineBranchModal({

@@ -4,7 +4,7 @@ import cns from 'classnames';
 import { Collapse, Form, Select, DatePicker, Card, Modal, Spin, Switch } from 'antd';
 import { InfoCircleOutlined, RightOutlined, DownOutlined } from '@ant-design/icons';
 import PreReleaseServices from '@/services/preRelease';
-import { isEmpty, sortBy, cloneDeep, isArray, intersection, uniq, isEqual } from 'lodash';
+import { isEmpty, sortBy, cloneDeep, isArray, intersection } from 'lodash';
 import dayjs from 'dayjs';
 import { valueMap } from '@/utils/utils';
 import { history } from '@@/core/history';

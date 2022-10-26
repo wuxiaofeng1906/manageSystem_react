@@ -105,8 +105,18 @@ export const historyOrderColumn: (ColDef | ColGroupDef)[] = [
     field: 'repair_order',
   },
   {
+    headerName: '发布批次名称',
+    field: 'ready_release_name',
+    cellRenderer: 'link',
+    tooltipField: 'ready_release_name',
+  },
+  {
     headerName: '关联项目列表',
     field: 'project',
+  },
+  {
+    headerName: '部署结束时间',
+    field: 'repair_order_fish_time',
   },
   {
     headerName: '已发布集群',

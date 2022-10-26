@@ -563,6 +563,25 @@ const ReleaseOrder = () => {
                 animateRows={true}
                 onRowDragEnd={onDrag}
                 frameworkComponents={{
+                  link: (p: CellClickedEvent) => (
+                    <div
+                      style={{
+                        color: '#1890ff',
+                        cursor: 'pointer',
+                        width: '100%',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                      onClick={() => {
+                        if (!p.data.release_num) return;
+                        history.push(
+                          `/onDutyAndRelease/preRelease?releasedNum=${p.data.release_num}&history=true`,
+                        );
+                      }}
+                    >
+                      {p.data.ready_release_name}
+                    </div>
+                  ),
                   deleteOrder: (p: CellClickedEvent) => (
                     <Fragment>
                       {hasPermission.delete ? (

@@ -88,6 +88,7 @@ export const layout = ({ initialState }: any) => {
     localStorage.setItem('accessId', '');
     localStorage.setItem('authority', '[]');
     localStorage.setItem('userLogins', '{}');
+    history.push('/user/myLogin');
   }
   return {
     rightContentRender: () => <RightContent />,

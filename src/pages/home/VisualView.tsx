@@ -65,6 +65,7 @@ const ICard = (params: {
     setActiveKey(params.open ? params.data.release_num : '');
   }, [params.open]);
 
+  console.log(REACT_APP_ENV, 'env');
   return (
     <div className={styles.stackWrapper}>
       {params.child || <div />}
@@ -72,6 +73,9 @@ const ICard = (params: {
         activeKey={activeKey}
         collapsible={'header'}
         style={{ background: params.data.bg || initBg[0] }}
+        className={cns({
+          testEnvCollapse: ['test', 'dev'].includes((REACT_APP_ENV ?? '') as string),
+        })}
         expandIcon={() => {
           return activeKey?.includes(params.data.release_num) ? (
             <DownOutlined onClick={() => onCollapseChange('')} />

@@ -84,6 +84,11 @@ export async function getInitialState(): Promise<{
 }
 
 export const layout = ({ initialState }: any) => {
+  if (localStorage.getItem('init') !== 'true') {
+    localStorage.setItem('accessId', '');jiang'z'
+    localStorage.setItem('authority', '[]');
+    localStorage.setItem('userLogins', '{}');
+  }
   return {
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,

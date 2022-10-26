@@ -159,7 +159,6 @@
         font-weight: bold;
         word-break: break-all;
         display: flex;
-        justify-content: flex-end;
         .ant-collapse-header-text{
           width:calc(100% - 50px);
           min-height: 18px;
@@ -169,10 +168,10 @@
         padding: 0px!important;
       }
       .ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow{
-        padding:0;
-        width:24px;
-        height: 18px;
-        line-height: 18px;
+        display: inline-block;
+        //margin-right: 12px;
+        font-size: 12px;
+        top:7px
       }
     }
   }

@@ -64,6 +64,7 @@ const Login: React.FC<{}> = () => {
     // console.log("登录后的token", userInfos.access_token);
     localStorage.setItem('accessId', userInfos.access_token); // 正式环境应放开
     localStorage.setItem('authority', JSON.stringify(userInfos.authorities));
+    localStorage.setItem('init', 'true');
     // console.log("myauth", JSON.stringify(userInfos.authorities));
 
     // 权限分组：
@@ -1567,7 +1568,7 @@ const Login: React.FC<{}> = () => {
       access: 'superGroup',
     };
     localStorage.setItem('userLogins', JSON.stringify(userInfos));
-
+    localStorage.setItem('init', 'true');
     if (userInfos) {
       setInitialState({
         ...initialState,

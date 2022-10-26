@@ -22,13 +22,13 @@ const usePermission = () => {
   const prePermission = useCallback(() => {
     const roles = user?.authority?.flatMap((it: any) => (it?.parentId == 114 ? [+it.id] : []));
     return {
-      delete: roles.includes(152),
-      preView: roles.includes(153),
-      preList: roles.includes(154),
+      delete: roles?.includes(152),
+      preView: roles?.includes(153),
+      preList: roles?.includes(154),
       historyList: roles.includes(155),
-      add: roles.includes(156),
-      save: roles.includes(157),
-      saveResult: roles.includes(158),
+      add: roles?.includes(156),
+      save: roles?.includes(157),
+      saveResult: roles?.includes(158),
     };
   }, [JSON.stringify(user)]);
 

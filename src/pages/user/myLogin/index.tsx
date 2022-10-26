@@ -31,15 +31,19 @@ const wxLogin = () => {
     //   "href": "",
     // });
 
-    (window as any).WwLogin({
-      id: 'container',
-      appid: 'wwcba5faed367cdeee',
-      agentid: 1000021,
-      // "redirect_uri": encodeURIComponent('http://dms.q7link.com:8000/user/myLogin'),
-      redirect_uri: encodeURIComponent('http://rd.q7link.com:8000/user/myLogin'),
-      state: 'wwcba5faed367cdeee',
-      href: '',
-    });
+    (window as any)
+      .WwLogin({
+        id: 'container',
+        appid: 'wwcba5faed367cdeee',
+        agentid: 1000021,
+        // "redirect_uri": encodeURIComponent('http://dms.q7link.com:8000/user/myLogin'),
+        redirect_uri: encodeURIComponent('http://rd.q7link.com:8000/user/myLogin'),
+        state: 'wwcba5faed367cdeee',
+        href: '',
+      })
+      .then((res) => {
+        console.log(res, 'wxlogin');
+      });
   }, 1000);
 };
 
@@ -64,7 +68,6 @@ const Login: React.FC<{}> = () => {
     // console.log("登录后的token", userInfos.access_token);
     localStorage.setItem('accessId', userInfos.access_token); // 正式环境应放开
     localStorage.setItem('authority', JSON.stringify(userInfos.authorities));
-    localStorage.setItem('init', 'true');
     // console.log("myauth", JSON.stringify(userInfos.authorities));
 
     // 权限分组：

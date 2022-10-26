@@ -73,14 +73,10 @@ const ICard = (params: {
         collapsible={'header'}
         style={{ background: params.data.bg || initBg[0] }}
         expandIcon={() => {
-          return (
-            <div>
-              {activeKey.includes(params.data.release_num) ? (
-                <DownOutlined onClick={() => onCollapseChange('')} />
-              ) : (
-                <RightOutlined onClick={() => onCollapseChange(params.data.release_num)} />
-              )}
-            </div>
+          return activeKey.includes(params.data.release_num) ? (
+            <DownOutlined onClick={() => onCollapseChange('')} />
+          ) : (
+            <RightOutlined onClick={() => onCollapseChange(params.data.release_num)} />
           );
         }}
         onChange={onCollapseChange}

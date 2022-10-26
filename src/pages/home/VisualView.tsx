@@ -25,6 +25,7 @@ const ICard = (params: {
   child?: React.ReactNode;
   onRefresh: Function;
   deleteIcon?: boolean;
+  showLink?: boolean;
   open: boolean;
   user: any;
 }) => {
@@ -84,18 +85,23 @@ const ICard = (params: {
           key={params.data.release_num}
           header={title}
           extra={
-            <img
-              style={{ cursor: 'pointer', width: 14, height: 14 }}
-              title={'查看工单详情'}
-              src={require('../../../public/url.png')}
-              onClick={(e) => {
-                e.stopPropagation();
-                const backlogType = params.data.release_type == 'backlog_release';
-                let href = `/onDutyAndRelease/preRelease?releasedNum=${params.data.release_num}`;
-                if (backlogType) href = `/onDutyAndRelease/releaseOrder/${params.data.release_num}`;
-                history.push(href);
-              }}
-            />
+            params.showLink ? (
+              <img
+                style={{ cursor: 'pointer', width: 14, height: 14 }}
+                title={'查看工单详情'}
+                src={require('../../../public/url.png')}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const backlogType = params.data.release_type == 'backlog_release';
+                  let href = `/onDutyAndRelease/preRelease?releasedNum=${params.data.release_num}`;
+                  if (backlogType)
+                    href = `/onDutyAndRelease/releaseOrder/${params.data.release_num}`;
+                  history.push(href);
+                }}
+              />
+            ) : (
+              <div />
+            )
           }
         >
           <div style={{ background: params.data.bg || initBg[0] }} className={styles.icard}>
@@ -347,7 +353,13 @@ const VisualView = () => {
     }
   };
 
-  const renderTr = (arr: any[], title: string, showStep = true, deleteIcon?: boolean) => {
+  const renderTr = (
+    arr: any[],
+    title: string,
+    showStep = true,
+    deleteIcon?: boolean,
+    showLink = true,
+  ) => {
     if (isEmpty(arr)) {
       return (
         <tr>
@@ -386,7 +398,7 @@ const VisualView = () => {
                   ''
                 )}
               </td>
-              {renderTd(it, hasPermission && deleteIcon)}
+              {renderTd(it, hasPermission && deleteIcon, showLink)}
             </tr>
           );
         })}
@@ -394,7 +406,7 @@ const VisualView = () => {
     );
   };
 
-  const renderTd = (data: any, deleteIcon?: boolean) => {
+  const renderTd = (data: any, deleteIcon?: boolean, showLink = true) => {
     return (
       <Fragment>
         {dynamicColumn.map((it, index) => {
@@ -407,6 +419,7 @@ const VisualView = () => {
                   deleteIcon={deleteIcon ?? ignore.includes(data.baseline_cluster)}
                   open={open}
                   user={user}
+                  showLink={showLink}
                   child={
                     <div>
                       {data?.cluster?.map((env: any, i: number) => {
@@ -575,7 +588,7 @@ const VisualView = () => {
               {/*    </Form>*/}
               {/*  </td>*/}
               {/*</tr>*/}
-              {renderTr(planSource, '计划上线日历', false, false)}
+              {renderTr(planSource, '计划上线日历', false, false, false)}
             </tbody>
           </table>
         </div>

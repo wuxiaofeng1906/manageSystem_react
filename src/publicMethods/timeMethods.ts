@@ -56,8 +56,7 @@ function getMonthWeek(starttime: string) {
   if (config.getMonth < 10) {
     monthStr = `0${config.getMonth}`;
   }
-  // const week = `${monthStr}月0${config.getWeek}周`;
-  const week = `0${config.getWeek}周${monthStr}月`;
+  const week = `${monthStr}月0${config.getWeek}周`;
   return week;
 }
 
@@ -153,8 +152,7 @@ function getFourQuarterTime(isCurMonth: boolean = false, len = 12) {
 
     const currentYear = currentMonth.year();
     quarterArray.push({
-      // title: `${currentYear}年${currentQuarter}季度`,
-      title: `${currentQuarter}季度${currentYear}年`,
+      title: `${currentYear}年${currentQuarter}季度`,
       start: `${currentYear}-${from}`,
       end: `${currentYear}-${to}`,
     });

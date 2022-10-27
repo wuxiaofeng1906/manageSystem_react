@@ -81,7 +81,7 @@ const GrayScaleBugRate: React.FC = () => {
           ?.map((it: any) => {
             const title =
               catagory == 'quarter'
-                ? `Q${moment(it.range.start).quarter()}${moment(it.range.start).format('YYYY')}年`
+                ? `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`
                 : moment(it.range.start).format('MM月YYYY年');
 
             if (isEmpty(it.datas)) return { title: title, total: 0 };

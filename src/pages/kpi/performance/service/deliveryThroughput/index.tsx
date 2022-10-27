@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { IRuleData } from '@/components/IStaticPerformance';
 import { IDrawer } from '@/components/IStaticPerformance';
 import StatisticServices from '@/services/statistic';
@@ -16,9 +16,14 @@ import moment from 'moment';
 import { isEmpty } from 'lodash';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Button, Spin } from 'antd';
-import { CalendarTwoTone, QuestionCircleTwoTone, ScheduleTwoTone } from '@ant-design/icons';
+import {
+  CalendarTwoTone,
+  QuestionCircleTwoTone,
+  ScheduleTwoTone,
+  ProfileTwoTone,
+  AppstoreTwoTone,
+} from '@ant-design/icons';
 import { AgGridReact } from 'ag-grid-react';
-import dayjs from 'dayjs';
 const ruleData: IRuleData[] = [
   {
     title: '统计周期',
@@ -45,6 +50,28 @@ const ruleData: IRuleData[] = [
   },
 ];
 const DeliveryThroughput: React.FC = () => {
+  const condition = [
+    {
+      icon: <ProfileTwoTone />,
+      type: 'week',
+      text: '按周统计',
+    },
+    {
+      icon: <CalendarTwoTone />,
+      type: 'month',
+      text: '按月统计',
+    },
+    {
+      icon: <ScheduleTwoTone />,
+      type: 'quarter',
+      text: '按季统计',
+    },
+    {
+      icon: <AppstoreTwoTone />,
+      type: 'year',
+      text: '按年统计',
+    },
+  ];
   const client = useGqlClient();
   const gridRef = useRef<GridApi>();
   const [catagory, setCatagory] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
@@ -92,9 +119,9 @@ const DeliveryThroughput: React.FC = () => {
         data
           ?.map((it: any) => {
             const title = {
-              quarter: `Q${moment(it.range.start).quarter()}${moment(it.range.start).format(
-                'YYYY',
-              )}年`,
+              quarter: `${moment(it.range.start).format('YYYY')}年Q${moment(
+                it.range.start,
+              ).quarter()}`,
               week: getMonthWeek(it.range.start),
               month: moment(it.range.start).format('MM月YYYY年'),
               year: moment(it.range.start).format('YYYY年'),
@@ -126,7 +153,7 @@ const DeliveryThroughput: React.FC = () => {
           <Button
             type="text"
             style={{ color: 'black' }}
-            icon={<CalendarTwoTone />}
+            icon={<ProfileTwoTone />}
             size={'large'}
             onClick={() => setCatagory('week')}
           >
@@ -153,7 +180,7 @@ const DeliveryThroughput: React.FC = () => {
           <Button
             type="text"
             style={{ color: 'black' }}
-            icon={<ScheduleTwoTone />}
+            icon={<AppstoreTwoTone />}
             size={'large'}
             onClick={() => setCatagory('year')}
           >

@@ -1567,7 +1567,6 @@ const Login: React.FC<{}> = () => {
       access: 'superGroup',
     };
     localStorage.setItem('userLogins', JSON.stringify(userInfos));
-    localStorage.setItem('init', 'true');
     if (userInfos) {
       setInitialState({
         ...initialState,

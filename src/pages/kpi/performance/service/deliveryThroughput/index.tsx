@@ -91,12 +91,20 @@ const DeliveryThroughput: React.FC = () => {
       setData(
         data
           ?.map((it: any) => {
+            // const title = {
+            //   quarter: `${moment(it.range.start).format('YYYY')}年Q${moment(
+            //     it.range.start,
+            //   ).quarter()}`,
+            //   week: getMonthWeek(it.range.start),
+            //   month: moment(it.range.start).format('YYYY年MM月'),
+            //   year: moment(it.range.start).format('YYYY年'),
+            // };
             const title = {
-              quarter: `${moment(it.range.start).format('YYYY')}年Q${moment(
-                it.range.start,
-              ).quarter()}`,
+              quarter: `Q${moment(it.range.start).quarter()}${moment(it.range.start).format(
+                'YYYY',
+              )}年`,
               week: getMonthWeek(it.range.start),
-              month: moment(it.range.start).format('YYYY年MM月'),
+              month: moment(it.range.start).format('MM月YYYY年'),
               year: moment(it.range.start).format('YYYY年'),
             };
             if (isEmpty(it.datas)) return { title: title[catagory], total: 0 };

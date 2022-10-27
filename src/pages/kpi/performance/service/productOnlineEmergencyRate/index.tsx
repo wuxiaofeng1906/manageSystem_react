@@ -69,10 +69,14 @@ const ProductOnlineEmergencyRate: React.FC = () => {
       setData(
         data
           ?.map((it: any) => {
+            // const title =
+            //   catagory == 'quarter'
+            //     ? `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`
+            //     : moment(it.range.start).format('YYYY年MM月');
             const title =
               catagory == 'quarter'
-                ? `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`
-                : moment(it.range.start).format('YYYY年MM月');
+                ? `Q${moment(it.range.start).quarter()}${moment(it.range.start).format('YYYY')}年`
+                : moment(it.range.start).format('MM月YYYY年');
 
             if (isEmpty(it.datas)) return { title: title, total: 0 };
 

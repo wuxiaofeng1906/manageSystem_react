@@ -56,7 +56,8 @@ function getMonthWeek(starttime: string) {
   if (config.getMonth < 10) {
     monthStr = `0${config.getMonth}`;
   }
-  const week = `${monthStr}月0${config.getWeek}周`;
+  // const week = `${monthStr}月0${config.getWeek}周`;
+  const week = `0${config.getWeek}周${monthStr}月`;
   return week;
 }
 
@@ -90,7 +91,8 @@ function getTwelveMonthTime(monthCount: number = 12) {
       month = `0${currentMonth.month() + 1}`;
     }
     monthArray.push({
-      title: `${currentMonth.year()}年${month}月`,
+      // title: `${currentMonth.year()}年${month}月`,
+      title: `${month}月${currentMonth.year()}年`,
       start: from,
       end: `${to}`,
     });
@@ -151,7 +153,8 @@ function getFourQuarterTime(isCurMonth: boolean = false, len = 12) {
 
     const currentYear = currentMonth.year();
     quarterArray.push({
-      title: `${currentYear}年${currentQuarter}季度`,
+      // title: `${currentYear}年${currentQuarter}季度`,
+      title: `${currentQuarter}季度${currentYear}年`,
       start: `${currentYear}-${from}`,
       end: `${currentYear}-${to}`,
     });

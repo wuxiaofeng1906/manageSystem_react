@@ -65,7 +65,6 @@ const ICard = (params: {
     setActiveKey(params.open ? params.data.release_num : '');
   }, [params.open]);
 
-  console.log(REACT_APP_ENV, 'env');
   return (
     <div className={styles.stackWrapper}>
       {params.child || <div />}
@@ -221,7 +220,7 @@ const VisualView = () => {
   const [planSource, setPlanSource] = useState<any[]>([]); // 计划上线日历
   const [open, setOpen] = useState(false);
   useEffect(() => {
-    Modal.destroyAll?.();
+    Modal?.destroyAll?.();
     // getSelectData();
     PreReleaseServices.clusterGroup().then((res) => {
       const clusterMap = valueMap(res, ['name', 'value']);
@@ -266,6 +265,7 @@ const VisualView = () => {
         bg: initBg[2],
         plan_release_time: it.plan_time,
         release_num: it.branch + i,
+        release_env: it.cluster ? it.cluster?.map((it: any) => cluster[it])?.join(',') ?? '' : '',
       })),
     );
   };
@@ -275,7 +275,7 @@ const VisualView = () => {
     return origin.map((it: any) => ({ value: clusterMap[it], name: it }));
   };
 
-  const preData = () => {
+  const preData = (clusterMap = cluster) => {
     Promise.all([PreReleaseServices.releaseView(), PreReleaseServices.releasePlan({})]).then(
       (res) => {
         const [currentDay, plan] = res;
@@ -302,7 +302,9 @@ const VisualView = () => {
             cls: styles.dotLineGray,
             bg: initBg[3],
             plan_release_time: it.plan_time,
-            release_env: it.cluster?.map((it: any) => it.value)?.join(',') ?? '',
+            release_env: it.cluster
+              ? it.cluster?.map((it: any) => clusterMap[it])?.join(',') ?? ''
+              : '',
             release_num: it.branch + i,
           })),
         );
@@ -313,7 +315,7 @@ const VisualView = () => {
   const getViewData = async (clusterMap = cluster) => {
     setLoading(true);
     try {
-      preData();
+      preData(clusterMap);
       const basic = await PreReleaseServices.releaseBaseline();
       const formatBasicCluster = computeFn(
         (basic.group ?? []).concat(basic.exist_clu ?? []),

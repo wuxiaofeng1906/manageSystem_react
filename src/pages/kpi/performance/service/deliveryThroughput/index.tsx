@@ -91,14 +91,6 @@ const DeliveryThroughput: React.FC = () => {
       setData(
         data
           ?.map((it: any) => {
-            // const title = {
-            //   quarter: `${moment(it.range.start).format('YYYY')}年Q${moment(
-            //     it.range.start,
-            //   ).quarter()}`,
-            //   week: getMonthWeek(it.range.start),
-            //   month: moment(it.range.start).format('YYYY年MM月'),
-            //   year: moment(it.range.start).format('YYYY年'),
-            // };
             const title = {
               quarter: `Q${moment(it.range.start).quarter()}${moment(it.range.start).format(
                 'YYYY',
@@ -208,8 +200,8 @@ const DeliveryThroughput: React.FC = () => {
                   return sum.toFixed(2);
                 },
               },
-              { field: 'title', enablePivot: true, pivot: true },
-              { field: 'subTitle', enablePivot: true, pivot: true },
+              { field: 'title', pivot: true, pivotComparator: () => 1 },
+              { field: 'subTitle', pivot: true },
             ]}
           />
         </div>

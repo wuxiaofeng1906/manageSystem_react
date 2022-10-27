@@ -62,6 +62,15 @@ const PreReleaseServices = {
   async branch() {
     return request(`${baseUrl}/sonar/branch`);
   },
+
+  // 取消发布
+  async cancelPublish(data: any) {
+    return request(`${baseUrl}/release/release_detail`, {
+      method: 'delete',
+      data,
+    });
+  },
+
   //  --------------新改版发布过程--------------
   // 发布列表
   async releaseList() {

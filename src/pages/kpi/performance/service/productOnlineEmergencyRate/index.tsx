@@ -72,7 +72,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
             const title =
               catagory == 'quarter'
                 ? `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`
-                : moment(it.range.start).format('YYYY年MM月');
+                : moment(it.range.start).format('MM月YYYY年');
 
             if (isEmpty(it.datas)) return { title: title, total: 0 };
 
@@ -157,8 +157,8 @@ const ProductOnlineEmergencyRate: React.FC = () => {
                   return sum.toFixed(2);
                 },
               },
-              { field: 'title', enablePivot: true, pivot: true },
-              { field: 'subTitle', enablePivot: true, pivot: true },
+              { field: 'title', pivot: true, pivotComparator: () => 1 },
+              { field: 'subTitle', pivot: true },
             ]}
           />
         </div>

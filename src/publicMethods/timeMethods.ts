@@ -90,7 +90,8 @@ function getTwelveMonthTime(monthCount: number = 12) {
       month = `0${currentMonth.month() + 1}`;
     }
     monthArray.push({
-      title: `${currentMonth.year()}年${month}月`,
+      // title: `${currentMonth.year()}年${month}月`,
+      title: `${month}月${currentMonth.year()}年`,
       start: from,
       end: `${to}`,
     });

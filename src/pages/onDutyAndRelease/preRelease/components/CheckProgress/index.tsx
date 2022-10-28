@@ -10,6 +10,9 @@ import {
 } from '@/pages/onDutyAndRelease/announcement/announcementDetail/axiosRequest/apiPage';
 import AnnounceSelector from '@/pages/onDutyAndRelease/preRelease/components/announceSelector';
 import { checkOnlineEnvSource } from '@/pages/onDutyAndRelease/preRelease/datas/dataAnalyze';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import PreReleaseServices from '@/services/preRelease';
+import { history } from '@@/core/history';
 
 const { Option } = Select;
 
@@ -23,8 +26,10 @@ const CheckProgress: React.FC<{ refreshPage: Function }> = ({ refreshPage }) => 
     releaseItem,
     upgradeApi,
   } = useModel('releaseProcess');
+  const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const [pulishResultForm] = Form.useForm();
   const [disabled, setDisabled] = useState(false);
+  const [confirmDisabled, setConfirmDisabled] = useState(false);
   const [isModalVisible, setModalVisible] = useState({
     show: false,
     result: '',
@@ -36,6 +41,38 @@ const CheckProgress: React.FC<{ refreshPage: Function }> = ({ refreshPage }) => 
 
   // 发布结果修改
   const pulishResulttChanged = async (params: any) => {
+    if (params === '3') {
+      Modal.confirm({
+        okText: '确认',
+        cancelText: '取消',
+        centered: true,
+        title: '取消发布提醒',
+        content: '取消发布将删除发布工单，请确认是否取消发布?',
+        icon: <InfoCircleOutlined style={{ color: 'red' }} />,
+        okButtonProps: { disabled: confirmDisabled },
+        onOk: async () => {
+          setConfirmDisabled(true);
+          try {
+            await PreReleaseServices.cancelPublish({
+              user_id: user?.userid ?? '',
+              user_name: user?.name ?? '',
+              ready_release_num: tabsData.activeKey,
+            });
+            await PreReleaseServices.removeRelease(
+              {
+                user_id: user?.userid ?? '',
+                release_num: tabsData.activeKey ?? '',
+              },
+              false,
+            );
+            history.replace('/onDutyAndRelease/releaseProcess?key=pre');
+          } catch (e) {
+            setConfirmDisabled(false);
+          }
+        },
+      });
+      return;
+    }
     // 需要验证前面的检查是否全部成功(前三个成功即可)。
     if (
       processStatus.releaseProject === 'Gainsboro' ||
@@ -246,6 +283,9 @@ const CheckProgress: React.FC<{ refreshPage: Function }> = ({ refreshPage }) => 
               </Option>
               <Option key={'2'} value={'2'}>
                 发布失败
+              </Option>
+              <Option key={'3'} value={'3'}>
+                取消发布
               </Option>
               <Option key={'9'} value={'9'}>
                 {' '}

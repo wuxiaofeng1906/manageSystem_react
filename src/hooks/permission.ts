@@ -1,7 +1,10 @@
 import { useCallback } from 'react';
+import { useModel } from 'umi';
 
 const usePermission = () => {
-  const authority = JSON.parse(localStorage.getItem('authority') ?? '{}') ?? [];
+  const [authority] = useModel('@@initialState', (init) => [
+    init.initialState?.currentUser?.authority,
+  ]);
   /*
    公告升级权限
    145,147,148，150，151 => 公告保存，公告查看，公告挂起，删除，新增

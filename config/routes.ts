@@ -122,12 +122,14 @@ export default [
         name: '项目列表',
         path: 'sprintList',
         component: './sprint/sprintList/sprintList',
+        wrappers: ['../wrappers/auth'],
       },
       {
         name: '项目详情',
         path: 'sprintListDetails',
         hideInMenu: true,
         component: './sprint/sprintListDetails/sprintListDetails',
+        wrappers: ['../wrappers/auth'],
       },
     ],
   },
@@ -170,6 +172,7 @@ export default [
         icon: 'table',
         path: 'releaseProcess',
         component: './onDutyAndRelease/releaseProcess/index',
+        wrappers: ['../wrappers/auth'],
       },
       {
         name: '灰度推生产', // 新版本积压工单

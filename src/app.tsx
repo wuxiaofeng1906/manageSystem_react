@@ -86,7 +86,12 @@ export async function getInitialState(): Promise<{
 
 export const layout = ({ initialState }: any) => {
   const { flag, redirect } = checkLogin();
-  if (!flag && isEmpty(initialState?.currentUser) && !location.pathname.includes('myLogin'))
+  if (
+    !flag &&
+    isEmpty(initialState?.currentUser) &&
+    !location.pathname.includes('myLogin') &&
+    initialState?.currentUser?.user_id == 'LiuQing'
+  )
     return history.push(redirect);
 
   return {
@@ -95,12 +100,7 @@ export const layout = ({ initialState }: any) => {
     // footerRender: () => <Footer />,
     onPageChange: () => {
       const { location } = history;
-      // 如果没有登录，重定向到 login
-      // if (!initialState?.currentUser && location.pathname !== '/user/login') {
-      //   history.push('/user/login');
-      // }
-
-      if (!initialState?.currentUser && !location.pathname.includes('myLogin')) {
+      if (!initialState?.currentUser && flag && !location.pathname.includes('myLogin')) {
         history.push(redirect);
       }
     },

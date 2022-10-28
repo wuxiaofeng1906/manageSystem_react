@@ -1,27 +1,23 @@
 import { Space } from 'antd';
-import React, { useCallback, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useModel } from 'umi';
 import Avatar from './AvatarDropdown';
 import styles from './index.less';
-import { useGqlClient } from '@/hooks/index';
-import { useSetUser } from '@/hooks/user';
+import { useUser } from '@/hooks/user';
 
 export type SiderTheme = 'light' | 'dark';
 
 const GlobalHeaderRight: React.FC<any> = () => {
-  const gqlClient = useGqlClient();
-  const { setUser } = useSetUser();
+  const { setUser } = useUser();
   const { initialState } = useModel('@@initialState');
-
-  const getUserAuth = useCallback(async () => {
-    await setUser({ client: gqlClient, userInfo: initialState });
-  }, []);
 
   if (!initialState || !initialState.settings) {
     return null;
   }
   useEffect(() => {
-    getUserAuth();
+    if (initialState?.currentUser?.userid == 'LiuQing') {
+      setUser();
+    }
   }, []);
 
   const { navTheme, layout } = initialState.settings;

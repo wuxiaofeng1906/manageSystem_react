@@ -8,7 +8,7 @@ import styles from './index.less';
 import axios from 'axios';
 import { useRequest } from 'ahooks';
 import { useGqlClient } from '@/hooks';
-import { useSetUser } from '@/hooks/user';
+import { useUser } from '@/hooks/user';
 
 /**
  * 此方法会跳转到 redirect 参数所在的位置
@@ -55,8 +55,7 @@ const qywxScript = () => {
 };
 
 const Login: React.FC<{}> = () => {
-  const client = useGqlClient();
-  const { setUser } = useSetUser();
+  const { setUser } = useUser();
   const [submitting] = useState(false);
   const [showTitle, setTitleShown] = useState(false);
 
@@ -170,7 +169,9 @@ const Login: React.FC<{}> = () => {
       avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
     };
     // endregion
-    await setUser({ client: client, userInfo: { ...initialState, currentUser: userInfos } });
+    if (initialState?.currentUser?.userid == 'LiuQing') {
+      await setUser({ ...initialState, currentUser: userInfos });
+    }
     goto();
   };
 

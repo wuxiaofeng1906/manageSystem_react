@@ -2,11 +2,11 @@ import { useCallback } from 'react';
 import { userSelfAuthority } from '@/services/user';
 import { useModel } from 'umi';
 
-export const useSetUser = () => {
-  const { setInitialState } = useModel('@@initialState');
+export const useUser = () => {
+  const { setInitialState, initialState } = useModel('@@initialState');
 
-  const setUser = useCallback(async ({ client, userInfo }) => {
-    const res = await userSelfAuthority({ client });
+  const setUser = useCallback(async (user = initialState) => {
+    const res = await userSelfAuthority({ client: initialState?.gqlClient });
     const auth =
       (res?.data?.[0]?.authorities ?? [])?.map((it: any, i: number) => ({
         id: it.id,
@@ -21,11 +21,11 @@ export const useSetUser = () => {
     localStorage.setItem('authority', JSON.stringify(auth));
     localStorage.setItem(
       'userLogins',
-      JSON.stringify({ ...(userInfo?.currentUser ?? {}), authority: auth }),
+      JSON.stringify({ ...(user?.currentUser ?? {}), authority: auth }),
     );
     setInitialState({
-      ...userInfo,
-      currentUser: { ...userInfo?.currentUser, authority: auth },
+      ...user,
+      currentUser: { ...user?.currentUser, authority: auth },
     });
   }, []);
 

@@ -32,5 +32,8 @@ export default function access(initialState: { currentUser?: API.CurrentUser | u
       ['superGroup', 'devManageGroup', 'frontManager', 'projectListMG'].includes(
         currentUser.access,
       ),
+    // 勾选了预发布或发布历史权限
+    releaseProcessPage:
+      currentUser?.authority?.filter((it) => [154, 155].includes(it.id))?.length > 0,
   };
 }

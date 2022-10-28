@@ -173,6 +173,7 @@ export default [
         path: 'releaseProcess',
         component: './onDutyAndRelease/releaseProcess/index',
         wrappers: ['../wrappers/auth'],
+        access: 'releaseProcessPage',
       },
       {
         name: '灰度推生产', // 新版本积压工单

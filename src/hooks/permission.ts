@@ -1,14 +1,14 @@
 import { useCallback } from 'react';
 
 const usePermission = () => {
-  const authority = JSON.parse(localStorage.getItem('authority') ?? '{}');
-
+  const authority = JSON.parse(localStorage.getItem('authority') ?? '{}') ?? [];
   /*
    公告升级权限
    145,147,148，150，151 => 公告保存，公告查看，公告挂起，删除，新增
    */
   const announcePermission = useCallback(() => {
-    const roles = authority?.flatMap((it: any) => (it?.parentId == 146 ? [+it.id] : []));
+    const roles: number[] =
+      authority?.flatMap((it: any) => (it?.parentId == 146 ? [+it.id] : [])) ?? [];
     return {
       edit: roles?.includes(145), // 保存权限
       push: roles?.includes(148), // 公告挂起
@@ -19,7 +19,7 @@ const usePermission = () => {
   }, [authority]);
 
   const prePermission = useCallback(() => {
-    const roles = authority?.flatMap((it: any) => (it?.parentId == 114 ? [+it.id] : []));
+    const roles = authority?.flatMap((it: any) => (it?.parentId == 114 ? [+it.id] : [])) ?? [];
     return {
       delete: roles?.includes(152),
       preView: roles?.includes(153),

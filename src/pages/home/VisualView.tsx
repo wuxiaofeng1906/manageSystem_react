@@ -562,7 +562,7 @@ const VisualView = () => {
                 <td className={styles.obliqueLine} />
                 {renderBasicTd}
               </tr>
-              {renderTr(currentSource, '当天待发版')}
+              {renderTr(currentSource, '待发布过程单')}
               {/*搜索条件*/}
               {/*<tr>*/}
               {/*  <td colSpan={onlineLen + 5}>*/}

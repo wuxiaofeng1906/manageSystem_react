@@ -82,7 +82,7 @@ const GrayScaleBugRate: React.FC = () => {
             const title =
               catagory == 'quarter'
                 ? `${moment(it.range.start).format('YYYY')}年Q${moment(it.range.start).quarter()}`
-                : moment(it.range.start).format('YYYY年MM月');
+                : moment(it.range.start).format('MM月YYYY年');
 
             if (isEmpty(it.datas)) return { title: title, total: 0 };
 
@@ -162,8 +162,8 @@ const GrayScaleBugRate: React.FC = () => {
               { field: 'total', headerName: 'bug率', aggFunc: (data) => aggFunc(data, 5) },
               { field: 'numerator', headerName: '加权数', aggFunc: aggFunc },
               { field: 'denominator', headerName: '代码量', aggFunc: aggFunc },
-              { field: 'title', enablePivot: true, pivot: true },
-              { field: 'subTitle', enablePivot: true, pivot: true, openByDefault: true },
+              { field: 'title', pivot: true, pivotComparator: () => 1 },
+              { field: 'subTitle', pivot: true },
             ]}
             defaultColDef={{
               sortable: true,

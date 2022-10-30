@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Spin } from 'antd';
+import { Spin, Modal } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import Tab from './components/Tab';
 import CheckProgress from './components/CheckProgress';
@@ -241,6 +241,10 @@ const PreRelease: React.FC<any> = () => {
     modifyOperteStatus(false);
     showPageInitData(data, true);
   }, [data, loading]);
+
+  useEffect(() => {
+    Modal?.destroyAll?.();
+  }, []);
 
   const interValRef: any = useRef(); // 定时任务数据id保存
   // 定时任务

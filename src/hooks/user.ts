@@ -6,7 +6,6 @@ export const useUser = () => {
   const { setInitialState, initialState } = useModel('@@initialState');
 
   const setUser = useCallback(async (user = initialState) => {
-    console.log(user);
     const res = await userSelfAuthority({ client: initialState?.gqlClient });
     const auth =
       (res?.data?.[0]?.authorities ?? [])?.map((it: any, i: number) => ({

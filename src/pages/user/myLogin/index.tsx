@@ -169,9 +169,7 @@ const Login: React.FC<{}> = () => {
       avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
     };
     // endregion
-    if (initialState?.currentUser?.userid == 'LiuQing') {
-      await setUser({ ...initialState, currentUser: userInfos });
-    }
+    await setUser({ ...initialState, currentUser: userInfos });
     goto();
   };
 

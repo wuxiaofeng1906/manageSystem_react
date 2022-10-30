@@ -7,9 +7,8 @@ import RightContent from '@/components/RightContent';
 import { ResponseError } from 'umi-request';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import { GqlClient } from '@/hooks';
+import { queryCurrent } from './services/user';
 import defaultSettings from '../config/defaultSettings';
-import { checkLogin } from '@/utils/utils';
-import { isEmpty } from 'lodash';
 
 /**
  * 获取用户信息比较慢的时候会展示一个 loading
@@ -85,23 +84,20 @@ export async function getInitialState(): Promise<{
 }
 
 export const layout = ({ initialState }: any) => {
-  const { flag, redirect } = checkLogin();
-  if (
-    !flag &&
-    isEmpty(initialState?.currentUser) &&
-    !location.pathname.includes('myLogin') &&
-    initialState?.currentUser?.user_id == 'LiuQing'
-  )
-    return history.push(redirect);
-
   return {
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
     // footerRender: () => <Footer />,
     onPageChange: () => {
       const { location } = history;
-      if (!initialState?.currentUser && flag && !location.pathname.includes('myLogin')) {
-        history.push(redirect);
+      // 如果没有登录，重定向到 login
+      // if (!initialState?.currentUser && location.pathname !== '/user/login') {
+      //   history.push('/user/login');
+      // }
+
+      if (!initialState?.currentUser && location.pathname !== '/user/myLogin') {
+        history.push('/user/myLogin');
+        // history.push('/welcomes');
       }
     },
     menuHeaderRender: undefined,

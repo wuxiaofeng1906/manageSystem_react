@@ -151,7 +151,7 @@ export default [
         path: 'dutyList',
         // access: 'dutyManager',
         component: './onDutyAndRelease/dutyDirectory/dutyList',
-        // wrappers: ['../wrappers/auth'],
+        wrappers: ['../wrappers/auth'],
       },
       {
         name: '值班名单',
@@ -160,7 +160,7 @@ export default [
         hideInMenu: true,
         // access: 'dutyManager',
         component: './onDutyAndRelease/dutyDirectory/dutyCatalog',
-        // wrappers: ['../wrappers/auth'],
+        wrappers: ['../wrappers/auth'],
       },
       {
         name: '发布过程',
@@ -614,7 +614,6 @@ export default [
                 icon: 'table',
                 path: 'needsChangeRate',
                 component: './kpi/performance/product/needsChangeRate',
-                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '响应顾问平均时长',

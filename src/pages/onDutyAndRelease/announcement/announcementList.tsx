@@ -75,6 +75,7 @@ const announcementList = () => {
   };
   // 新增、修改
   const onAdd = async (params?: CellClickedEvent) => {
+    if (!isEmpty(params) && !announcePermission?.().check) return infoMessage('您无查看公告权限！');
     // 新增
     if (isEmpty(params) && !announcePermission?.().add) return;
     if (!announcePermission?.().edit) return;
@@ -192,7 +193,7 @@ const announcementList = () => {
                     <Space size={8}>
                       <img
                         width={16}
-                        style={announcePermission?.().edit ? { cursor: 'pointer' } : disabledStyle}
+                        style={announcePermission?.().check ? { cursor: 'pointer' } : disabledStyle}
                         src={require('../../../../public/params.png')}
                         onClick={() => onAdd(params)}
                       />

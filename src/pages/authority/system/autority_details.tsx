@@ -174,7 +174,6 @@ const getselectedId = (alls: any, sModule: any, sMethod: any) => {
 
 const AuthorityDetails: React.FC<any> = () => {
   const sys_accessToken = localStorage.getItem('accessId');
-  const { initialState } = useModel('@@initialState');
   const { setUser } = useUser();
 
   const clickedRowData = {
@@ -384,9 +383,7 @@ const AuthorityDetails: React.FC<any> = () => {
               marginTop: '50vh',
             },
           });
-          if (initialState?.currentUser?.userid == 'LiuQing') {
-            setUser();
-          }
+          setUser();
         } else if (Number(res.data.code) === 403) {
           message.error({
             content: '您无权限修改！',

@@ -15,9 +15,7 @@ const GlobalHeaderRight: React.FC<any> = () => {
     return null;
   }
   useEffect(() => {
-    if (initialState?.currentUser?.userid == 'LiuQing') {
-      setUser();
-    }
+    setUser();
   }, []);
 
   const { navTheme, layout } = initialState.settings;

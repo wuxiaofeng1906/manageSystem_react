@@ -614,6 +614,7 @@ export default [
                 icon: 'table',
                 path: 'needsChangeRate',
                 component: './kpi/performance/product/needsChangeRate',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '响应顾问平均时长',

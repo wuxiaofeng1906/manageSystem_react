@@ -44,6 +44,7 @@ const ReleaseOrder = () => {
   const [visible, setVisible] = useState(false);
   const [clusters, setClusters] = useState<any>(); // 所有组合集群
   const [confirmDisabled, setConfirmDisabled] = useState(false);
+  const [tableHeight, setTableHeight] = useState((window.innerHeight - 370) / 2);
 
   const onGridReady = (params: GridReadyEvent, ref = gridRef) => {
     ref.current = params.api;
@@ -410,6 +411,10 @@ const ReleaseOrder = () => {
     return isEmpty(announce) || announce == '免';
   }, [orderForm?.getFieldValue('announcement_num')]);
 
+  window.onresize = function () {
+    setTableHeight((window.innerHeight - 370) / 2);
+  };
+
   return (
     <Spin spinning={spinning} tip="数据加载中...">
       <PageContainer title={<div />}>
@@ -544,7 +549,10 @@ const ReleaseOrder = () => {
             </Form>
           </FieldSet>
           <FieldSet data={{ title: '工单-表单设置' }}>
-            <div className="ag-theme-alpine" style={{ height: 300, width: '100%', marginTop: 8 }}>
+            <div
+              className="ag-theme-alpine"
+              style={{ height: tableHeight, width: '100%', marginTop: 8 }}
+            >
               <AgGridReact
                 columnDefs={historyOrderColumn}
                 rowData={orderData}
@@ -612,7 +620,10 @@ const ReleaseOrder = () => {
             <span>接口工单/SQL工单(值班人员核对确认)</span>
             <span>工单编号对比不一致</span>
           </div>
-          <div className="ag-theme-alpine" style={{ height: 300, width: '100%', marginTop: 8 }}>
+          <div
+            className="ag-theme-alpine"
+            style={{ height: tableHeight, width: '100%', marginTop: 8 }}
+          >
             <AgGridReact
               columnDefs={historyCompareColumn}
               rowData={compareData?.alpha ?? []}

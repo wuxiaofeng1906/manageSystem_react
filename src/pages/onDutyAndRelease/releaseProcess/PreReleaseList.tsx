@@ -99,6 +99,8 @@ const PreReleaseList = ({ disabled }: { disabled?: boolean }) => {
             headerHeight={30}
             rowDragManaged={true}
             animateRows={true}
+            onRowDragEnd={onDrag}
+            onGridReady={onGridReady}
             frameworkComponents={{
               drag: DragIcon,
               link: (p: CellClickedEvent) => {
@@ -125,8 +127,6 @@ const PreReleaseList = ({ disabled }: { disabled?: boolean }) => {
                 );
               },
             }}
-            onRowDragEnd={onDrag}
-            onGridReady={onGridReady}
           />
         </div>
         <AddModal visible={visible} onConfirm={onFinish} />

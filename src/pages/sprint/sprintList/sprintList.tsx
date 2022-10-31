@@ -219,6 +219,8 @@ const SprintList: React.FC<any> = () => {
       projectType = 'emergency';
     } else if (prjNames.indexOf('hotfix') !== -1) {
       projectType = 'hotfix';
+    } else if (prjNames.indexOf('stage-patch') !== -1) {
+      projectType = 'stage-patch';
     }
     prjTime = prjNames.replace(projectType, '').trim();
 

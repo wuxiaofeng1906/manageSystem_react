@@ -122,14 +122,14 @@ export default [
         name: '项目列表',
         path: 'sprintList',
         component: './sprint/sprintList/sprintList',
-        // wrappers: ['../wrappers/auth'],
+        wrappers: ['../wrappers/auth'],
       },
       {
         name: '项目详情',
         path: 'sprintListDetails',
         hideInMenu: true,
         component: './sprint/sprintListDetails/sprintListDetails',
-        // wrappers: ['../wrappers/auth'],
+        wrappers: ['../wrappers/auth'],
       },
     ],
   },
@@ -168,13 +168,14 @@ export default [
         path: 'preRelease',
         component: './onDutyAndRelease/preRelease',
         hideInMenu: true,
+        wrappers: ['../wrappers/auth'],
       },
       {
         name: '发布过程', // 新版本
         icon: 'table',
         path: 'releaseProcess',
         component: './onDutyAndRelease/releaseProcess/index',
-        // wrappers: ['../wrappers/auth'],
+        wrappers: ['../wrappers/auth'],
         access: 'releaseProcessPage',
       },
       {
@@ -183,7 +184,7 @@ export default [
         path: 'releaseOrder/:id',
         hideInMenu: true,
         component: './onDutyAndRelease/releaseProcess/ReleaseOrder',
-        // wrappers: ['../wrappers/auth'],
+        wrappers: ['../wrappers/auth'],
       },
       {
         name: '发布历史',
@@ -204,6 +205,7 @@ export default [
         icon: 'table',
         path: 'announcementList',
         component: './onDutyAndRelease/announcement/announcementList',
+        wrappers: ['../wrappers/auth'],
       },
       {
         name: '升级公告详情',
@@ -211,6 +213,7 @@ export default [
         path: 'announcementDetail/:id/:type/:status',
         component: './onDutyAndRelease/announcement/announcementDetail',
         hideInMenu: true,
+        wrappers: ['../wrappers/auth'],
       },
     ],
   },
@@ -242,12 +245,14 @@ export default [
                 icon: 'table',
                 path: 'thousandBugsRate',
                 component: './kpi/performance/developer/thousandBugsRate',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '千行Bug率(不含线上)',
                 icon: 'table',
                 path: 'thouBugsRateExcludeOnline',
                 component: './kpi/performance/developer/thouBugsRateExcludeOnline',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '单元测试覆盖率',
@@ -259,18 +264,21 @@ export default [
                     icon: 'table',
                     path: '/kpi/performance/developer/coverage/byStorehouse',
                     component: './kpi/performance/developer/coverage/byStorehouse',
+                    wrappers: ['../wrappers/auth'],
                   },
                   {
                     name: '按分支',
                     icon: 'table',
                     path: '/kpi/performance/developer/coverage/byBranch',
                     component: './kpi/performance/developer/coverage/byBranch',
+                    wrappers: ['../wrappers/auth'],
                   },
                   {
                     name: '按组',
                     icon: 'table',
                     path: '/kpi/performance/developer/coverage/byGroup',
                     component: './kpi/performance/developer/coverage/byGroup',
+                    wrappers: ['../wrappers/auth'],
                     // routes: [
                     //   {
                     //     name: '前端',
@@ -291,42 +299,49 @@ export default [
                 icon: 'table',
                 path: 'testPassRateForOnce',
                 component: './kpi/performance/developer/testPassRateForOnce',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: 'Bug Reopen率',
                 icon: 'table',
                 path: 'bugReopenRate',
                 component: './kpi/performance/developer/bugReopenRate',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: 'Code Review',
                 icon: 'table',
                 path: 'codeReview',
                 component: './kpi/performance/developer/codeReview',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: 'Bug修复时长',
                 icon: 'table',
                 path: 'bugRepairTime',
                 component: './kpi/performance/developer/bugRepairTime',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: 'Bug修复率',
                 icon: 'table',
                 path: 'bugRepairRate',
                 component: './kpi/performance/developer/bugRepairRate',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '缺陷排除率',
                 icon: 'table',
                 path: 'defectExclusionRate',
                 component: './kpi/performance/developer/defectExclusionRate',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '项目计划偏差率',
                 icon: 'table',
                 path: 'projectPlanDeviationRate',
                 component: './kpi/performance/developer/projectPlanDeviationRate',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
               {
@@ -334,6 +349,7 @@ export default [
                 icon: 'table',
                 path: 'manWorkPlanDevRate',
                 component: './kpi/performance/developer/manWorkPlanDevRate',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
               {
@@ -342,12 +358,14 @@ export default [
                 path: 'devShowTestPlanDeviationRate',
                 component: './kpi/performance/developer/devShowTestPlanDeviationRate',
                 // hideInMenu: true,
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: 'A类客户服务投入比',
                 icon: 'table',
                 path: 'cusInputRate_A',
                 component: './kpi/performance/developer/cusInputRate_A',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
               {
@@ -355,6 +373,7 @@ export default [
                 icon: 'table',
                 path: 'cusExperienceInputRate',
                 component: './kpi/performance/developer/cusExperienceInputRate',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
               {
@@ -362,6 +381,7 @@ export default [
                 icon: 'table',
                 path: 'releaseEmergencyCount',
                 component: './kpi/performance/developer/releaseEmergencyCount',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
               {
@@ -369,6 +389,7 @@ export default [
                 icon: 'table',
                 path: 'patch',
                 component: './kpi/performance/developer/patch',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
               {
@@ -376,6 +397,7 @@ export default [
                 icon: 'table',
                 path: 'avgOnlineTimeFeedBack',
                 component: './kpi/performance/developer/avgOnlineTimeFeedBack',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
               {
@@ -383,18 +405,21 @@ export default [
                 icon: 'table',
                 path: 'productionScale',
                 component: './kpi/performance/developer/productionScale',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '生产率',
                 icon: 'table',
                 path: 'humanEffect',
                 component: './kpi/performance/developer/humanEffect',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '班车延期需求数',
                 icon: 'table',
                 path: 'shuttleDelay',
                 component: './kpi/performance/developer/shuttleDelay',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
               {
@@ -402,6 +427,7 @@ export default [
                 icon: 'table',
                 path: 'blockingTimes',
                 component: './kpi/performance/developer/blockingTimes',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true, // 临时屏蔽
               },
               {
@@ -416,6 +442,7 @@ export default [
                 icon: 'table',
                 path: 'cumulativeLineBugRate',
                 component: './kpi/performance/developer/cumulativeLineBugRate',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true, // 临时屏蔽
               },
               {
@@ -423,6 +450,7 @@ export default [
                 icon: 'table',
                 path: 'cumulativeLineBugRateExcludeOnline',
                 component: './kpi/performance/developer/cumulativeLineBugRateExcludeOnline',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true, // 临时屏蔽
               },
             ],
@@ -443,54 +471,63 @@ export default [
                 icon: 'table',
                 path: 'on-lineBugRate-new',
                 component: './kpi/performance/testers/on-lineBugRate-new',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '线上千行bug率(参考)',
                 icon: 'table',
                 path: 'on-lineBugRateRefer',
                 component: './kpi/performance/testers/on-lineBugRateRefer',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '线上千行bug率(含测试)',
                 icon: 'table',
                 path: 'on_lineBugIncTester',
                 component: './kpi/performance/testers/on_lineBugIncTester',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '用例执行率',
                 icon: 'table',
                 path: 'exampleCarryRate',
                 component: './kpi/performance/testers/exampleCarryRate',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: 'bug回归时长',
                 icon: 'table',
                 path: 'avgBugReturnTime',
                 component: './kpi/performance/testers/avgBugReturnTime',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: 'bug回归率',
                 icon: 'table',
                 path: 'bugReturnRate',
                 component: './kpi/performance/testers/bugReturnRate',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '自动化覆盖率',
                 icon: 'table',
                 path: 'autoTestCover',
                 component: './kpi/performance/testers/autoTestCover',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '用例执行量',
                 icon: 'table',
                 path: 'exampleCarryQuantity',
                 component: './kpi/performance/testers/exampleCarryQuantity',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '有效用例率',
                 icon: 'table',
                 path: 'effectiveExampleRate',
                 component: './kpi/performance/testers/effectiveExampleRate',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '千行bug率收敛',
@@ -504,6 +541,7 @@ export default [
                 icon: 'table',
                 path: 'palnDeviationRate',
                 component: './kpi/performance/testers/palnDeviationRate',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
               {
@@ -511,6 +549,7 @@ export default [
                 icon: 'table',
                 path: 'cusInputRate_A',
                 component: './kpi/performance/testers/cusInputRate_A',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
               {
@@ -518,6 +557,7 @@ export default [
                 icon: 'table',
                 path: 'cusExperienceInputRate',
                 component: './kpi/performance/testers/cusExperienceInputRate',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
               {
@@ -525,6 +565,7 @@ export default [
                 icon: 'table',
                 path: 'releaseEmergencyCount',
                 component: './kpi/performance/testers/releaseEmergencyCount',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
               {
@@ -532,6 +573,7 @@ export default [
                 icon: 'table',
                 path: 'patch',
                 component: './kpi/performance/testers/patch',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
               {
@@ -539,6 +581,7 @@ export default [
                 icon: 'table',
                 path: 'avgOnlineTimeFeedBack',
                 component: './kpi/performance/testers/avgOnlineTimeFeedBack',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
               {
@@ -546,6 +589,7 @@ export default [
                 icon: 'table',
                 path: 'avgTimeOnline',
                 component: './kpi/performance/testers/avgTimeOnline',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
               {
@@ -553,18 +597,21 @@ export default [
                 icon: 'table',
                 path: 'productionScale',
                 component: './kpi/performance/testers/productionScale',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '生产率',
                 icon: 'table',
                 path: 'humanEffect',
                 component: './kpi/performance/testers/humanEffect',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '班车延期需求数',
                 icon: 'table',
                 path: 'shuttleDelay',
                 component: './kpi/performance/testers/shuttleDelay',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
               {
@@ -579,6 +626,7 @@ export default [
                 icon: 'table',
                 path: 'roundsTestRate',
                 component: './kpi/performance/testers/roundsTestRate',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true, // 临时屏蔽
               },
               {
@@ -586,6 +634,7 @@ export default [
                 icon: 'table',
                 path: 'cumulativeLineBugRate',
                 component: './kpi/performance/testers/cumulativeLineBugRate',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true, // 临时屏蔽
               },
               {
@@ -593,6 +642,7 @@ export default [
                 icon: 'table',
                 path: 'cumulativeLineBugRateReference',
                 component: './kpi/performance/testers/cumulativeLineBugRateReference',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true, // 临时屏蔽
               },
               {
@@ -600,6 +650,7 @@ export default [
                 icon: 'table',
                 path: 'cumulativeLineBugRateTests',
                 component: './kpi/performance/testers/cumulativeLineBugRateTests',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true, // 临时屏蔽
               },
             ],
@@ -614,12 +665,15 @@ export default [
                 icon: 'table',
                 path: 'needsChangeRate',
                 component: './kpi/performance/product/needsChangeRate',
+                wrappers: ['../wrappers/auth'],
+                hideInMenu: true,
               },
               {
                 name: '响应顾问平均时长',
                 icon: 'table',
                 path: 'avgAdviserFeedbackTime',
                 component: './kpi/performance/product/avgAdviserFeedbackTime',
+                wrappers: ['../wrappers/auth'],
               },
             ],
           },
@@ -634,18 +688,21 @@ export default [
                 icon: 'table',
                 path: 'avgLaunchTime',
                 component: './kpi/performance/service/avgLaunchTime',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '线上问题平均立项时长',
                 icon: 'table',
                 path: 'avgEstablishTime',
                 component: './kpi/performance/service/avgEstablishTime',
+                wrappers: ['../wrappers/auth'],
               },
               {
                 name: '上线后emergency占比',
                 icon: 'table',
                 path: 'productOnlineEmergencyRate',
                 component: './kpi/performance/service/productOnlineEmergencyRate',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true,
               },
               {
@@ -653,6 +710,7 @@ export default [
                 icon: 'table',
                 path: 'deliveryThroughput',
                 component: './kpi/performance/service/deliveryThroughput',
+                wrappers: ['../wrappers/auth'],
                 // hideInMenu: true, // 临时屏蔽
               },
             ],
@@ -685,6 +743,7 @@ export default [
             path: 'code',
             access: 'sysAdmin',
             component: './kpi/analysis/code',
+            wrappers: ['../wrappers/auth'],
           },
           {
             name: '前端 Dashboard',
@@ -692,6 +751,7 @@ export default [
             path: 'front_dashboard',
             component: './kpi/analysis/front_dashboard',
             access: 'frontManager',
+            wrappers: ['../wrappers/auth'],
           },
           {
             name: 'bug',
@@ -727,6 +787,7 @@ export default [
             path: 'bugResolutionSpeed',
             component: './kpi/analysis/bugResolutionSpeed',
             access: 'sysAdmin',
+            wrappers: ['../wrappers/auth'],
           },
         ],
       },
@@ -738,6 +799,7 @@ export default [
     path: 'toolIntegration',
     component: './toolIntegration',
     access: 'devCenter', // 仅研发中心人员可见，客服不可见
+    wrappers: ['../wrappers/auth'],
   },
   {
     name: '检查工具',
@@ -749,12 +811,14 @@ export default [
         path: 'checkBeforeOnline',
         access: 'onlineCheck',
         component: './checkTools/checkBeforeOnline',
+        wrappers: ['../wrappers/auth'],
       },
       {
         name: 'sonar扫描',
         path: 'sonar',
         access: 'sonarCheck',
         component: './checkTools/sonar',
+        wrappers: ['../wrappers/auth'],
       },
     ],
   },
@@ -766,6 +830,7 @@ export default [
     // hideInMenu: true,
     component: './approvalFlow',
     access: 'devCenter', // 仅研发中心人员可见，客服不可见
+    wrappers: ['../wrappers/auth'],
   },
   {
     name: '禅道管理',
@@ -779,6 +844,7 @@ export default [
         path: 'peopleExcuteSetting',
         component: './zentao/peopleExcuteSetting',
         access: 'sysAdmin', // 管理员可见
+        wrappers: ['../wrappers/auth'],
       },
       {
         name: '禅道模板',
@@ -786,6 +852,7 @@ export default [
         path: 'templateList',
         component: './zentao/zentaoTemplate/templateList',
         access: 'sysAdmin', // 管理员可见
+        wrappers: ['../wrappers/auth'],
       },
       {
         name: '禅道任务模板',
@@ -814,6 +881,7 @@ export default [
         path: 'taskDecomposition',
         component: './zentao/taskDecomposition',
         access: 'devCenter', // 研发中心可见
+        wrappers: ['../wrappers/auth'],
         // hideInMenu: true
       },
     ],
@@ -835,6 +903,7 @@ export default [
             icon: 'table',
             path: 'iterateList',
             component: './shimo/fileBaseline/iterateList',
+            wrappers: ['../wrappers/auth'],
           },
           {
             name: '基线详情',
@@ -857,6 +926,7 @@ export default [
         name: '权限管理',
         path: 'main',
         component: './authority/system/main',
+        wrappers: ['../wrappers/auth'],
       },
       {
         name: '权限明细',

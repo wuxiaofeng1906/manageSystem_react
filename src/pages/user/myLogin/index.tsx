@@ -33,7 +33,7 @@ const wxLogin = () => {
     //   "href": "",
     // });
 
-    (window as any).WwLogin({
+    (window as any).WwLogin?.({
       id: 'container',
       appid: 'wwcba5faed367cdeee',
       agentid: 1000021,

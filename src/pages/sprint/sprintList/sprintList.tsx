@@ -219,6 +219,8 @@ const SprintList: React.FC<any> = () => {
       projectType = 'emergency';
     } else if (prjNames.indexOf('hotfix') !== -1) {
       projectType = 'hotfix';
+    } else if (prjNames.indexOf('stage-patch') !== -1) {
+      projectType = 'stage-patch';
     }
     prjTime = prjNames.replace(projectType, '').trim();
 
@@ -478,6 +480,9 @@ const SprintList: React.FC<any> = () => {
                 <Option key={'emergency'} value={'emergency'}>
                   emergency
                 </Option>,
+                <Option key={'stagepatch'} value={'stagepatch'}>
+                  stage-patch
+                </Option>,
               ]}
             </Select>
 
@@ -646,6 +651,9 @@ const SprintList: React.FC<any> = () => {
                           </Option>,
                           <Option key={'emergency'} value={'emergency'}>
                             emergency
+                          </Option>,
+                          <Option key={'stagepatch'} value={'stage-patch'}>
+                            stage-patch
                           </Option>,
                         ]}
                       </Select>

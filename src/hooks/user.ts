@@ -7,6 +7,7 @@ export const useUser = () => {
 
   const setUser = useCallback(async (user = initialState) => {
     const res = await userSelfAuthority({ client: initialState?.gqlClient });
+    const name = res?.data?.[0]?.name ?? user?.currentUser?.name;
     const auth =
       (res?.data?.[0]?.authorities ?? [])?.map((it: any, i: number) => ({
         id: it.id,
@@ -21,11 +22,11 @@ export const useUser = () => {
     localStorage.setItem('authority', JSON.stringify(auth));
     localStorage.setItem(
       'userLogins',
-      JSON.stringify({ ...(user?.currentUser ?? {}), authority: auth }),
+      JSON.stringify({ ...(user?.currentUser ?? {}), authority: auth, access: name, group: name }),
     );
     setInitialState({
       ...user,
-      currentUser: { ...user?.currentUser, authority: auth },
+      currentUser: { ...user?.currentUser, authority: auth, access: name, group: name },
     });
   }, []);
 

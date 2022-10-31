@@ -33,6 +33,7 @@ const CumulativeLineBugRateReference: React.FC<any> = () => {
       request={StatisticServices.newPeriodBugThousTestDept}
       identity={'REFER'}
       len={5}
+      unit={'个/Kloc'}
     />
   );
 };

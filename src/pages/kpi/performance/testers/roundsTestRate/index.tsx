@@ -23,7 +23,13 @@ const ruleData: IRuleData[] = [
   },
 ];
 const RoundsTestRate: React.FC<any> = () => {
-  return <IStaticPerformance ruleData={ruleData} request={StatisticServices.roundsTestRate} />;
+  return (
+    <IStaticPerformance
+      ruleData={ruleData}
+      request={StatisticServices.roundsTestRate}
+      unit={'分'}
+    />
+  );
 };
 
 export default RoundsTestRate;

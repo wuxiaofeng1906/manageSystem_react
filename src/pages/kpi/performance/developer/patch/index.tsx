@@ -25,6 +25,7 @@ const Patch: React.FC<any> = () => {
       ruleData={ruleData}
       request={StatisticServices.patch}
       identity={'DEVELOPER'}
+      unit={'个'}
     />
   );
 };

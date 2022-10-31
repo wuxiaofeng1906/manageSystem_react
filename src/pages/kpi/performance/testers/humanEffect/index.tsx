@@ -31,6 +31,7 @@ const HumanEffect: React.FC<any> = () => {
       identity={'TESTER'}
       showDenominator={true}
       len={5}
+      unit={'FP/人天'}
     />
   );
 };

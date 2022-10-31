@@ -33,6 +33,7 @@ const CumulativeLineBugRateExcludeOnline: React.FC<any> = () => {
       request={StatisticServices.bugThousPeriodDept}
       identity={'EXCLUDE_ONLINE'}
       len={2}
+      unit={'个/Kloc'}
     />
   );
 };

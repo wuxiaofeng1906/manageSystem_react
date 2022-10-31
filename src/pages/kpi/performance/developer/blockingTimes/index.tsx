@@ -25,7 +25,9 @@ const ruleData: IRuleData[] = [
   },
 ];
 const BlockingTimes: React.FC<any> = () => {
-  return <IStaticPerformance ruleData={ruleData} request={StatisticServices.blockingTimes} />;
+  return (
+    <IStaticPerformance ruleData={ruleData} request={StatisticServices.blockingTimes} unit={'次'} />
+  );
 };
 
 export default BlockingTimes;

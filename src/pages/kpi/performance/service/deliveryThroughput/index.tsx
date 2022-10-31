@@ -186,7 +186,7 @@ const DeliveryThroughput: React.FC = () => {
           >
             按年统计
           </Button>
-          <label style={{ fontWeight: 'bold' }}>(统计单位：%)</label>
+          <label style={{ fontWeight: 'bold' }}>(统计单位：FP)</label>
           <Button
             type="text"
             style={{ color: '#1890FF', float: 'right' }}

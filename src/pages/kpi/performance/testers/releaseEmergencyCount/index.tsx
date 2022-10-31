@@ -141,7 +141,7 @@ const ReleaseEmergencyCounts: React.FC<any> = () => {
         >
           按年统计
         </Button>
-        <label style={{ fontWeight: 'bold' }}>(统计单位：%)</label>
+        <label style={{ fontWeight: 'bold' }}>(统计单位：个)</label>
         <Button
           type="text"
           style={{ color: '#1890FF', float: 'right' }}

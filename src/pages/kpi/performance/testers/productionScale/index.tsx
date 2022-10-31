@@ -25,6 +25,7 @@ const ProductionScale: React.FC<any> = () => {
       ruleData={ruleData}
       request={StatisticServices.productScale}
       identity={'TESTER'}
+      unit={'FP'}
     />
   );
 };

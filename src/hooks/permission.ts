@@ -1,15 +1,17 @@
-import { useModel } from 'umi';
 import { useCallback } from 'react';
+import { useModel } from 'umi';
 
 const usePermission = () => {
-  const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
-
+  const [authority] = useModel('@@initialState', (init) => [
+    init.initialState?.currentUser?.authority,
+  ]);
   /*
    公告升级权限
    145,147,148，150，151 => 公告保存，公告查看，公告挂起，删除，新增
    */
   const announcePermission = useCallback(() => {
-    const roles = user?.authority?.flatMap((it: any) => (it?.parentId == 146 ? [+it.id] : []));
+    const roles: number[] =
+      authority?.flatMap((it: any) => (it?.parentId == 146 ? [+it.id] : [])) ?? [];
     return {
       edit: roles?.includes(145), // 保存权限
       push: roles?.includes(148), // 公告挂起
@@ -17,10 +19,10 @@ const usePermission = () => {
       add: roles?.includes(151), // 新增公告
       delete: roles?.includes(150), // 删除
     };
-  }, [JSON.stringify(user)]);
+  }, [authority]);
 
   const prePermission = useCallback(() => {
-    const roles = user?.authority?.flatMap((it: any) => (it?.parentId == 114 ? [+it.id] : []));
+    const roles = authority?.flatMap((it: any) => (it?.parentId == 114 ? [+it.id] : [])) ?? [];
     return {
       delete: roles?.includes(152),
       preView: roles?.includes(153),
@@ -30,7 +32,7 @@ const usePermission = () => {
       save: roles?.includes(157),
       saveResult: roles?.includes(158),
     };
-  }, [JSON.stringify(user)]);
+  }, [authority]);
 
   return { announcePermission, prePermission };
 };

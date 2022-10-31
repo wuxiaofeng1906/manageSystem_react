@@ -300,3 +300,10 @@ export const formatTreeData = ({
   });
   return converseArrayToOne(result);
 };
+export const checkLogin = () => {
+  const token = localStorage.getItem('accessId');
+  console.log(token);
+  if (token) return { flag: true, redirect: '' };
+  const href = location.pathname + location.search;
+  return { flag: false, redirect: `/user/myLogin?redirect=${encodeURIComponent(href)}` };
+};

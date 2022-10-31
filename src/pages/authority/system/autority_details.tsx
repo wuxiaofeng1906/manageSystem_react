@@ -10,6 +10,8 @@ import { useRequest } from 'ahooks';
 import axios from 'axios';
 import { judgeAuthority } from '@/publicMethods/authorityJudge';
 import Ellipsis from '@/components/Elipsis';
+import { useUser } from '@/hooks/user';
+import { useModel } from 'umi';
 
 const CheckboxGroup = Checkbox.Group;
 
@@ -172,6 +174,8 @@ const getselectedId = (alls: any, sModule: any, sMethod: any) => {
 
 const AuthorityDetails: React.FC<any> = () => {
   const sys_accessToken = localStorage.getItem('accessId');
+  const { initialState } = useModel('@@initialState');
+  const { setUser } = useUser();
 
   const clickedRowData = {
     module: [],
@@ -380,6 +384,9 @@ const AuthorityDetails: React.FC<any> = () => {
               marginTop: '50vh',
             },
           });
+          if (initialState?.currentUser?.userid == 'LiuQing') {
+            setUser();
+          }
         } else if (Number(res.data.code) === 403) {
           message.error({
             content: '您无权限修改！',
@@ -461,9 +468,8 @@ const AuthorityDetails: React.FC<any> = () => {
                     }}
                     onClick={saveAuthority}
                   >
-                    {' '}
-                    保存{' '}
-                  </Button>{' '}
+                    保存
+                  </Button>
                   <Button onClick={returns}> 返回 </Button>
                 </div>
               </Table.Summary.Cell>

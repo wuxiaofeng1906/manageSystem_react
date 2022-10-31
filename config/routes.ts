@@ -122,12 +122,14 @@ export default [
         name: '项目列表',
         path: 'sprintList',
         component: './sprint/sprintList/sprintList',
+        // wrappers: ['../wrappers/auth'],
       },
       {
         name: '项目详情',
         path: 'sprintListDetails',
         hideInMenu: true,
         component: './sprint/sprintListDetails/sprintListDetails',
+        // wrappers: ['../wrappers/auth'],
       },
     ],
   },
@@ -149,6 +151,7 @@ export default [
         path: 'dutyList',
         // access: 'dutyManager',
         component: './onDutyAndRelease/dutyDirectory/dutyList',
+        // wrappers: ['../wrappers/auth'],
       },
       {
         name: '值班名单',
@@ -157,6 +160,7 @@ export default [
         hideInMenu: true,
         // access: 'dutyManager',
         component: './onDutyAndRelease/dutyDirectory/dutyCatalog',
+        // wrappers: ['../wrappers/auth'],
       },
       {
         name: '发布过程',
@@ -170,6 +174,8 @@ export default [
         icon: 'table',
         path: 'releaseProcess',
         component: './onDutyAndRelease/releaseProcess/index',
+        // wrappers: ['../wrappers/auth'],
+        access: 'releaseProcessPage',
       },
       {
         name: '灰度推生产', // 新版本积压工单
@@ -177,6 +183,7 @@ export default [
         path: 'releaseOrder/:id',
         hideInMenu: true,
         component: './onDutyAndRelease/releaseProcess/ReleaseOrder',
+        // wrappers: ['../wrappers/auth'],
       },
       {
         name: '发布历史',
@@ -228,6 +235,7 @@ export default [
                 icon: 'table',
                 path: 'avgCodePerWeek',
                 component: './kpi/performance/developer/avgCodePerWeek',
+                // wrappers: ['../wrappers/auth'],
               },
               {
                 name: '千行Bug率',

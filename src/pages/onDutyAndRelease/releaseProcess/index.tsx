@@ -15,7 +15,7 @@ const Index = () => {
   const hasPermission = prePermission();
 
   useEffect(() => {
-    let init = 'pre';
+    let init = query.key;
     if (!hasPermission?.preList && hasPermission?.historyList) init = 'history';
     updateKey(init);
   }, []);

@@ -551,7 +551,7 @@ const ReleaseOrder = () => {
           <FieldSet data={{ title: '工单-表单设置' }}>
             <div
               className="ag-theme-alpine"
-              style={{ height: tableHeight, width: '100%', marginTop: 8 }}
+              style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%', marginTop: 8 }}
             >
               <AgGridReact
                 columnDefs={historyOrderColumn}
@@ -622,7 +622,7 @@ const ReleaseOrder = () => {
           </div>
           <div
             className="ag-theme-alpine"
-            style={{ height: tableHeight, width: '100%', marginTop: 8 }}
+            style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%', marginTop: 8 }}
           >
             <AgGridReact
               columnDefs={historyCompareColumn}

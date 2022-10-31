@@ -650,6 +650,9 @@ const SprintList: React.FC<any> = () => {
                           <Option key={'emergency'} value={'emergency'}>
                             emergency
                           </Option>,
+                          <Option key={'stagepatch'} value={'stage-patch'}>
+                            stage-patch
+                          </Option>,
                         ]}
                       </Select>
                     </Form.Item>

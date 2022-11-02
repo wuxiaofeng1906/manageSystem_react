@@ -241,6 +241,9 @@ const SprintList: React.FC<any> = () => {
   const onSelectChanged = () => {
     const queryCondition = formForQuery.getFieldsValue();
     const filterData = filterDatasByCondition(queryCondition, ora_filter_data);
+    if (isEmpty(filterData)) {
+      setShowReason(false);
+    } else setShowReason(filterData?.some((it) => !isEmpty(it.nobaseDesc)));
     gridApi.current?.setRowData(filterData);
 
     // 过滤表格自带条件
@@ -1078,6 +1081,7 @@ const SprintList: React.FC<any> = () => {
   const [isFlowModalVisible, setIsFlowModalVisible] = useState(false); // 其他流程按钮
   const [flowHitmessage, setFlowHitmessage] = useState({ hintMessage: '' });
   const [testConfirm, setTestConfirm] = useState(undefined);
+  const [showReason, setShowReason] = useState(true);
 
   // 判断是否有勾选一条数据
   const judgingSelectdRow = () => {
@@ -1360,6 +1364,9 @@ const SprintList: React.FC<any> = () => {
       tester: personData?.tester,
       solvedBy: personData?.solvedBy,
     });
+    if (isEmpty(data?.result)) {
+      setShowReason(false);
+    } else setShowReason(data?.result?.some((it) => !isEmpty(it.nobaseDesc)));
   }, [data]);
 
   const getNextSprint = async () => {
@@ -1461,7 +1468,7 @@ const SprintList: React.FC<any> = () => {
       </div>
     );
   }, []);
-
+  const memoColumn = useMemo(() => getColums(prjNames, showReason), [showReason]);
   return (
     <div style={{ width: '100%', marginTop: '-30px' }} className={styles.sprintListDetails}>
       <PageHeader
@@ -1739,7 +1746,7 @@ const SprintList: React.FC<any> = () => {
         {/* ag-grid 表格定义 */}
         <div className="ag-theme-alpine" style={{ height: gridHeight, width: '100%' }}>
           <AgGridReact
-            columnDefs={getColums(prjNames)} // 定义列
+            columnDefs={memoColumn} // 定义列
             rowData={data?.result} // 数据绑定
             defaultColDef={{
               resizable: true,

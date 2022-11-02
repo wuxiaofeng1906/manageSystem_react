@@ -27,9 +27,8 @@ import {
 } from './columnRenderer';
 
 import { history } from '@@/core/history';
-import { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 // 定义列名
-const getColums = (prjNames: any) => {
+const getColums = (prjNames: any, hide = true) => {
   // 获取缓存的字段
   const fields = localStorage.getItem('sp_details_filed');
   const oraFields: any = [
@@ -115,11 +114,12 @@ const getColums = (prjNames: any) => {
       cellRenderer: textDecorateRender,
       tooltipField: 'nobaseDesc',
       filter: false,
+      hide: !hide,
     },
     {
       headerName: '应用服务',
       field: 'appservice',
-      minWidth: 235,
+      minWidth: 150,
       cellRenderer: textDecorateRender,
       tooltipField: 'appservice',
       filter: false,

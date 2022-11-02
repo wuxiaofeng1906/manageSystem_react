@@ -327,8 +327,70 @@ const StatisticServices = {
     return { data: formatTreeData({ origin: data.data }), loading };
   },
 
+  // 已发布需求平均关闭时长
+  async averageShutdownDuration({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:releStoryAvgClosedDura(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+        total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            parent{
+              dept
+              deptName
+            }
+            kpi
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData({ origin: data.data }), loading };
+  },
+
+  // 已发布未关闭需求数
+  async publishedAndUnclosedNumber({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:releStoryClosedNum(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+        total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            parent{
+              dept
+              deptName
+            }
+            kpi
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData({ origin: data.data }), loading };
+  },
+
   // 阻塞测试工作量
-  async blockingTestWorkload({ client, params, identity }: IStatisticQuery) {
+  async blockingTestWorkload({ client, params }: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
     const { data, loading } = await client.query(`
@@ -358,7 +420,7 @@ const StatisticServices = {
     return { data: formatTreeData({ origin: data.data }), loading };
   },
   // 阻塞次数
-  async blockingTimes({ client, params, identity }: IStatisticQuery) {
+  async blockingTimes({ client, params }: IStatisticQuery) {
     const condition = getParamsByType(params);
     if (condition.typeFlag === 0) return [];
     const { data, loading } = await client.query(`

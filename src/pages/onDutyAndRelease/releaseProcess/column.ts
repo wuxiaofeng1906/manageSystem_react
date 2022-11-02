@@ -4,18 +4,19 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
   {
     headerName: '序号',
     field: 'num',
-    width: 70,
-    minWidth: 90,
-    maxWidth: 110,
+    minWidth: 80,
+    maxWidth: 80,
     filter: false,
+    pinned: 'left',
     cellRenderer: (params: any) => String(+params.node.id + 1),
   },
   {
     headerName: '预发布批次名',
     field: 'release_name',
-    minWidth: 110,
+    minWidth: 150,
     cellRenderer: 'link',
     tooltipField: 'release_name',
+    pinned: 'left',
   },
   {
     headerName: '发布项目',
@@ -25,12 +26,13 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
   {
     headerName: '工单编号',
     field: 'repair_order',
-    minWidth: 130,
+    minWidth: 110,
   },
   {
     headerName: '发布服务',
     field: 'apps',
     minWidth: 130,
+    tooltipField: 'apps',
   },
   {
     headerName: '项目负责人',
@@ -41,12 +43,12 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     headerName: '发布分支',
     field: 'branch',
     minWidth: 130,
+    tooltipField: 'branch',
   },
   {
     headerName: '发布类型',
     field: 'release_type',
     minWidth: 120,
-    maxWidth: 140,
     cellRenderer: (p) =>
       p.value == 'ready_release' ? '非积压发布' : p.value == 'backlog_release' ? '灰度推线上' : '',
   },
@@ -54,7 +56,6 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     headerName: '发布结果',
     field: 'release_result',
     minWidth: 120,
-    maxWidth: 130,
     hide: type == 'pre',
     cellRenderer: (p: any) =>
       `<span style="color:${
@@ -64,7 +65,7 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
   {
     headerName: '发布方式',
     field: 'release_way',
-    minWidth: 120,
+    minWidth: 100,
     cellRenderer: (p) =>
       p.value == 'stop_server' ? '停服' : p.value == 'keep_server' ? '不停服' : '',
   },
@@ -84,6 +85,7 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     minWidth: 90,
     maxWidth: 90,
     hide: type == 'history',
+    pinned: 'right',
   },
 ];
 export const historyOrderColumn: (ColDef | ColGroupDef)[] = [

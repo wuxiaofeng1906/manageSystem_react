@@ -97,7 +97,7 @@ const gird_filter_condition: any = []; // 表格自带过滤了的条件
 const { Option } = Select;
 const SprintList: React.FC<any> = () => {
   const { initialState } = useModel('@@initialState');
-  const { prjId, prjNames, prjType, showTestConfirmFlag } = getProjectInfo();
+  const { prjId, prjNames, prjType, showTestConfirmFlag, ztId } = getProjectInfo();
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [testSelectorDisabled, setTestSelectorDisabled] = useState(false);
   // 不满足移除的数据
@@ -135,7 +135,7 @@ const SprintList: React.FC<any> = () => {
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
   const { data, loading } = useRequest(() =>
-    queryDevelopViews(gqlClient, prjId, prjType, true, showTestConfirmFlag),
+    queryDevelopViews(gqlClient, prjId, prjType, true, showTestConfirmFlag, ztId),
   );
 
   const onGridReady = (params: GridReadyEvent) => {
@@ -292,6 +292,7 @@ const SprintList: React.FC<any> = () => {
       prjType,
       false,
       showTestConfirmFlag,
+      ztId,
     );
     ora_filter_data = datas?.result;
     onSelectChanged();

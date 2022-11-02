@@ -117,6 +117,14 @@ const getColums = (prjNames: any) => {
       filter: false,
     },
     {
+      headerName: '应用服务',
+      field: 'appservice',
+      minWidth: 235,
+      cellRenderer: textDecorateRender,
+      tooltipField: 'appservice',
+      filter: false,
+    },
+    {
       headerName: '所属计划',
       field: 'planName',
       minWidth: 150,

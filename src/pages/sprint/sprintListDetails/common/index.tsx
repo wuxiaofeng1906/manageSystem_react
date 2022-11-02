@@ -8,6 +8,7 @@ const getProjectInfo = () => {
   let prjType: string = '';
   let showTestConfirmFlag = false;
   const location = history.location.query;
+  const ztId = location?.ztId || undefined;
   if (JSON.stringify(location) !== '{}') {
     if (location !== undefined && location.projectid !== null) {
       prjId = location.projectid.toString();
@@ -25,7 +26,7 @@ const getProjectInfo = () => {
     }
   }
 
-  return { prjId, prjNames, prjType, showTestConfirmFlag };
+  return { prjId, prjNames, prjType, showTestConfirmFlag, ztId };
 };
 
 const alayManagerData = (oradata: any, curRow: any, prjId: any) => {

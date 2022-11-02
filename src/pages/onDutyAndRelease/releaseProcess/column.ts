@@ -27,7 +27,6 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     headerName: '工单编号',
     field: 'repair_order',
     minWidth: 110,
-    maxWidth: 150,
   },
   {
     headerName: '发布服务',
@@ -50,7 +49,6 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     headerName: '发布类型',
     field: 'release_type',
     minWidth: 120,
-    maxWidth: 140,
     cellRenderer: (p) =>
       p.value == 'ready_release' ? '非积压发布' : p.value == 'backlog_release' ? '灰度推线上' : '',
   },
@@ -58,7 +56,6 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     headerName: '发布结果',
     field: 'release_result',
     minWidth: 120,
-    maxWidth: 130,
     hide: type == 'pre',
     cellRenderer: (p: any) =>
       `<span style="color:${
@@ -69,7 +66,6 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     headerName: '发布方式',
     field: 'release_way',
     minWidth: 100,
-    maxWidth: 100,
     cellRenderer: (p) =>
       p.value == 'stop_server' ? '停服' : p.value == 'keep_server' ? '不停服' : '',
   },
@@ -82,7 +78,6 @@ export const releaseListColumn = (type: 'history' | 'pre'): (ColDef | ColGroupDe
     headerName: type == 'history' ? '发布时间' : '计划发布时间',
     field: 'plan_release_time',
     minWidth: 190,
-    maxWidth: 190,
     tooltipField: 'plan_release_time',
     cellStyle: (p) => ({ color: p.data?.tip ? 'red' : 'initial', lineHeight: '28px' }),
   },

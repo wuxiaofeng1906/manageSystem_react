@@ -290,6 +290,7 @@ const Tab: React.FC<any> = () => {
   const [tabNameModal, setTabNameModal] = useState(false);
   // 修改tab的名字
   const tabsChangeName = (params: any) => {
+    if (operteStatus) return;
     const currentName = params.target.innerText;
     setTabNameModal(true);
     tabNameSetForm.setFieldsValue({

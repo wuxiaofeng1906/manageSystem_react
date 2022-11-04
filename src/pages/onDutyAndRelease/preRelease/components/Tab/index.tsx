@@ -329,7 +329,7 @@ const Tab: React.FC<any> = () => {
       });
       setTabNameModal(false);
       //   重置tab名
-      const tabInfo: any = await alalysisInitData('tabPageInfo', '');
+      const tabInfo: any = await alalysisInitData('tabPageInfo', tabsData.activeKey);
       const { tabPageInfo } = tabInfo;
       if (tabPageInfo) {
         setTabsData(tabsData.activeKey, tabPageInfo.panes);

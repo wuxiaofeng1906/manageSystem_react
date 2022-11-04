@@ -41,8 +41,8 @@ const StoryListModal = (props: { onRefresh?: Function }) => {
     try {
       setLoading(true);
       await updateStoryList(data);
-      getList();
       setLoading(false);
+      setShowStoryModal(false);
       props.onRefresh?.(false);
     } catch (e) {
       setLoading(false);

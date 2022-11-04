@@ -290,6 +290,7 @@ const Tab: React.FC<any> = () => {
   const [tabNameModal, setTabNameModal] = useState(false);
   // 修改tab的名字
   const tabsChangeName = (params: any) => {
+    if (operteStatus) return;
     const currentName = params.target.innerText;
     setTabNameModal(true);
     tabNameSetForm.setFieldsValue({
@@ -328,7 +329,7 @@ const Tab: React.FC<any> = () => {
       });
       setTabNameModal(false);
       //   重置tab名
-      const tabInfo: any = await alalysisInitData('tabPageInfo', '');
+      const tabInfo: any = await alalysisInitData('tabPageInfo', tabsData.activeKey);
       const { tabPageInfo } = tabInfo;
       if (tabPageInfo) {
         setTabsData(tabsData.activeKey, tabPageInfo.panes);

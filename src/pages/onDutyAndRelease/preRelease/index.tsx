@@ -18,7 +18,7 @@ import { deleteLockStatus, getAllLockedData } from './lock/rowLock';
 import { getGridRowsHeight } from './components/gridHeight';
 import { showReleasedId } from './components/UpgradeService/idDeal/dataDeal';
 import { getNewPageNumber } from './components/Tab/axiosRequest';
-import { history } from '@@/core/history';
+import { history } from 'umi';
 import { errorMessage } from '@/publicMethods/showMessages';
 import { isEmpty } from 'lodash';
 
@@ -54,7 +54,11 @@ const PreRelease: React.FC<any> = () => {
 
   // 获取当前链接是否有携带预发布编号（就是区分是否从历史记录跳转过来的），
   const location = history.location.query;
-
+  // 无 releasedNum参数跳转只列表页
+  if (!location?.releasedNum) {
+    history.replace('/onDutyAndRelease/releaseProcess');
+    return <div />;
+  }
   let releasedNumStr = '';
   let releaseHistory = 'false'; // 默认为未发布
   if (JSON.stringify(location) !== '{}' && location) {
@@ -162,6 +166,7 @@ const PreRelease: React.FC<any> = () => {
     // Tab数据
     const { tabPageInfo } = initData;
     if (initShow) {
+      if (!currentKey) return history.replace('/onDutyAndRelease/releaseProcess');
       // 针对路径无releaseNum时，全量获取所有tab
       if (releaseHistory === 'false' && !currentKey) {
         // 通过链接跳转到固定Tab

@@ -126,6 +126,7 @@ const analysiCorrespondOrder = (datas: any) => {
 /* endregion */
 
 const alalysisInitData = async (queryData: string = '', queryReleaseNum: string = '') => {
+  if (!queryReleaseNum) return [];
   try {
     const result = await getInitPageData(queryReleaseNum);
 

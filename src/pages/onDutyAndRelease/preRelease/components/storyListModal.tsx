@@ -25,21 +25,24 @@ const StoryListModal = (props: { onRefresh?: Function }) => {
   const [selected, setSelected] = useState<string[]>([]);
   const [stageFilter, setStageFilter] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [cancelDisabled, setCancelDisabled] = useState(false);
+  const [init, setInit] = useState(true);
 
   const onConfirm = async () => {
     if (operteStatus) return;
-    if (isEmpty(selected)) return infoMessage('请至少勾选一条需求！');
+    const checked = tableSource.filter((it) => selected.includes(String(it.story_num)));
+    const group = groupBy(checked, 'execution_id');
+    const data = Object.entries(group).map(([executions_id, arr]) => ({
+      story_num: isEmpty(selected) ? '' : arr.map((o) => o.story_num)?.join(),
+      execution: executions_id,
+      ready_release_num: tabsData.activeKey,
+    }));
+    if (isEmpty(data) || isEmpty(selected)) return infoMessage('请至少勾选一条需求！');
     try {
       setLoading(true);
-      const checked = tableSource.filter((it) => selected.includes(String(it.story_num)));
-      const group = groupBy(checked, 'execution_id');
-      const data = Object.entries(group).map(([executions_id, arr]) => ({
-        story_num: isEmpty(selected) ? '' : arr.map((o) => o.story_num)?.join(),
-        execution: executions_id,
-        ready_release_num: tabsData.activeKey,
-      }));
       await updateStoryList(data);
       setLoading(false);
+      setShowStoryModal(false);
       props.onRefresh?.(false);
     } catch (e) {
       setLoading(false);
@@ -54,6 +57,7 @@ const StoryListModal = (props: { onRefresh?: Function }) => {
         executions_id,
         ready_release_num: tabsData.activeKey ?? '',
       });
+      setCancelDisabled(isEmpty(res?.check_story) && !isEmpty(res.story_data));
       const initChecked = isEmpty(res?.check_story)
         ? res.story_data?.map((it: any) => String(it.story_num)) ?? []
         : res?.check_story;
@@ -79,34 +83,42 @@ const StoryListModal = (props: { onRefresh?: Function }) => {
 
   const onFilter = async () => {
     const values = form.getFieldsValue();
-    const data = autoStoryList.filter(
-      (it) =>
-        (values.story_num ?? []).includes(it.story_num) ||
-        (values.execution_ids ?? []).includes(String(it.execution_id)),
-    );
-    setStageFilter(data);
+    if (isEmpty(values.story_num) && isEmpty(values.execution_ids)) setStageFilter(autoStoryList);
+    else
+      setStageFilter(
+        autoStoryList.filter(
+          (it) =>
+            (values.story_num ?? []).includes(it.story_num) ||
+            (values.execution_ids ?? []).includes(String(it.execution_id)),
+        ),
+      );
   };
 
   useEffect(() => {
-    if (!showStoryModal) return;
+    if (!showStoryModal) {
+      setInit(true);
+      return;
+    }
     try {
       form.setFieldsValue({
         execution_ids: storyExecutionId ?? undefined,
       });
       getSelectList();
       getList();
+      setInit(false);
     } catch (e) {
       setLoading(false);
     }
   }, [showStoryModal]);
 
-  const formData = form.getFieldsValue();
-  const tableSource = useMemo(
-    () =>
-      isEmpty(formData.execution_ids) && isEmpty(formData.story_num) ? autoStoryList : stageFilter,
-    [JSON.stringify(formData)],
-  );
+  const tableSource = useMemo(() => (init ? autoStoryList : stageFilter) ?? [], [
+    init,
+    autoStoryList,
+    stageFilter,
+  ]);
+
   useUnmount(() => {
+    setInit(true);
     setShowStoryModal(false);
   });
 
@@ -114,15 +126,17 @@ const StoryListModal = (props: { onRefresh?: Function }) => {
     <Modal
       title={'待发布需求列表'}
       visible={showStoryModal}
-      onCancel={() => setShowStoryModal(false)}
-      onOk={onConfirm}
       width={1200}
       destroyOnClose
-      maskClosable={false}
-      okButtonProps={{ disabled: loading || operteStatus }}
-      okText={'确定'}
+      okText={'保存'}
       cancelText={'取消'}
       centered
+      closable={false}
+      maskClosable={false}
+      onOk={onConfirm}
+      onCancel={() => setShowStoryModal(false)}
+      okButtonProps={{ disabled: loading || operteStatus }}
+      cancelButtonProps={{ disabled: cancelDisabled || loading }}
     >
       <Spin spinning={loading}>
         <Form form={form} size={'small'} layout={'inline'} onFieldsChange={onFilter}>
@@ -152,7 +166,7 @@ const StoryListModal = (props: { onRefresh?: Function }) => {
           size={'small'}
           rowKey={(record) => String(record.story_num)}
           columns={publishListColumn}
-          dataSource={tableSource ?? []}
+          dataSource={tableSource}
           pagination={false}
           scroll={{ y: 500, x: 1000 }}
           rowSelection={{

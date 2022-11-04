@@ -237,11 +237,14 @@ const queryDevelopViews = async (
   prjType: any,
   syncQuery: boolean = false,
   showTestConfirmFlag: boolean,
+  execution: any,
 ) => {
   // baseline: 0 超范围 1 未超 ztUnlinkedAt： 禅道需求移除时间 null 未移除
   const { data } = await client.query(`
       {
-        proDetaiWithUser(project:${prjID},category:"${prjType}",order:ASC,doSync:${syncQuery}){
+        proDetaiWithUser(project:${prjID},category:"${prjType}",order:ASC,doSync:${syncQuery},execution:${
+    execution ?? undefined
+  }){
             planName
             id
             stage
@@ -322,6 +325,7 @@ const queryDevelopViews = async (
             targetPno
             revertActor
             nobaseDesc
+            appservice
           }
       }
   `);

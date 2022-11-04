@@ -389,6 +389,37 @@ const StatisticServices = {
     return { data: formatTreeData({ origin: data.data }), loading };
   },
 
+  // 班车超范围bug数
+  async sprintOverRangeBug({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:sprintOverRangeBugNum(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+        total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            parent{
+              dept
+              deptName
+            }
+            kpi
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData({ origin: data.data }), loading };
+  },
+
   // 阻塞测试工作量
   async blockingTestWorkload({ client, params }: IStatisticQuery) {
     const condition = getParamsByType(params);

@@ -1,5 +1,5 @@
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
-
+import type { ColumnsType } from 'antd/lib/table';
 export const calendarColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
@@ -98,71 +98,54 @@ export const preProcessColumn: (ColDef | ColGroupDef)[] = [
   },
 ];
 
-export const preServerColumn: (ColDef | ColGroupDef)[] = [
+export const preServerColumn: ColumnsType<any> = [
   {
-    headerName: '应用',
-    field: 'applicant',
-    minWidth: 100,
-    rowSpan: (p) => (p.data.applicant == 'h5' ? 2 : 1),
-    cellClassRules: {
-      'row-span': 'value == h5',
-    },
+    title: '应用',
+    dataIndex: 'applicant',
+    onCell: (v) => ({ rowSpan: v?.rowSpan ?? 1 }),
   },
   {
-    headerName: '项目名称',
-    field: 'project_name',
-    minWidth: 150,
-    tooltipField: 'project_name',
+    title: '项目名称',
+    dataIndex: 'project_name',
   },
   {
-    headerName: '是否封板',
-    field: 'env',
-    minWidth: 100,
+    title: '是否封板',
+    dataIndex: 'env',
   },
   {
-    headerName: '封板/封板人',
-    field: 'branch',
-    minWidth: 130,
-    tooltipField: 'branch',
+    title: '封板/封板人',
+    dataIndex: 'branch',
   },
   {
-    headerName: '封板/封板时间',
-    field: 'time',
-    minWidth: 110,
+    title: '封板/封板时间',
+    dataIndex: 'time',
   },
   {
-    headerName: '需求编号',
-    field: 'num',
-    minWidth: 110,
+    title: '需求编号',
+    dataIndex: 'num',
   },
   {
-    headerName: '需求标题',
-    field: 'title',
-    minWidth: 110,
+    title: '需求标题',
+    dataIndex: 'title',
   },
   {
-    headerName: '是否涉及数据update',
-    field: 'update',
-    minWidth: 110,
+    title: '是否涉及数据update',
+    dataIndex: 'update',
   },
   {
-    headerName: '是否涉及数据Recovery',
-    field: 'recovery',
-    minWidth: 110,
+    title: '是否涉及数据Recovery',
+    dataIndex: 'recovery',
   },
   {
-    headerName: '是否可热更',
-    field: 'hot',
-    minWidth: 110,
+    title: '是否可热更',
+    dataIndex: 'hot',
   },
   {
-    headerName: '需求创建人',
-    field: 'create_pm',
-    minWidth: 110,
+    title: '需求创建人',
+    dataIndex: 'create_pm',
   },
   {
-    headerName: '需求指派人',
-    field: 'point_pm',
-    minWidth: 110,
+    title: '需求指派人',
+    dataIndex: 'point_pm',
   },
 ];

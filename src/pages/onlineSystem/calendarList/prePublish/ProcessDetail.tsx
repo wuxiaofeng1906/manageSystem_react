@@ -1,19 +1,14 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Form, Select, Checkbox } from 'antd';
-import { AgGridReact } from 'ag-grid-react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
+import { Form, Select, Checkbox, Table } from 'antd';
 import { preServerColumn } from '@/pages/onlineSystem/common/column';
-import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
-import { history } from 'umi';
-import { uniq } from 'lodash';
+import { groupBy, isEmpty, uniq } from 'lodash';
+import { mergeCellsTable, valueMap } from '@/utils/utils';
 
 const ProcessDetail = () => {
-  const gridRef = useRef<GridApi>();
   const [serverData, setServerData] = useState<any[]>([]);
-
-  const onGridReady = (params: GridReadyEvent) => {
-    gridRef.current = params.api;
-    params.api.sizeColumnsToFit();
-  };
+  const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
+  const [checked, setChecked] = useState(false);
+  const [checkBoxOpt, setCheckBoxOpt] = useState<string[]>([]);
 
   useEffect(() => {
     const mock = [
@@ -24,50 +19,58 @@ const ProcessDetail = () => {
     ];
     setServerData(mock);
   }, []);
+
+  const memoGroup = useMemo(() => {
+    const table = mergeCellsTable(serverData ?? [], 'applicant');
+    return {
+      opts: uniq(serverData?.map((it) => it.applicant)),
+      table,
+    };
+  }, [serverData]);
   return (
     <div>
       <h3>一、项目名称&分支</h3>
       <h3>二、应用服务</h3>
-      <Checkbox>全部项目</Checkbox>
-      <Checkbox.Group options={uniq(serverData?.map((it) => it.applicant))} />
-      <div className="ag-theme-alpine" style={{ height: 300, width: '100%', marginTop: 8 }}>
-        <AgGridReact
-          columnDefs={preServerColumn}
-          rowData={serverData}
-          defaultColDef={{
-            resizable: true,
-            filter: true,
-            flex: 1,
-            suppressMenu: true,
-            cellStyle: { 'line-height': '28px' },
-          }}
-          rowHeight={28}
-          headerHeight={30}
-          onGridReady={onGridReady}
-          onGridSizeChanged={onGridReady}
-          suppressRowTransform={true}
-          frameworkComponents={{
-            link: (p: CellClickedEvent) => {
-              return (
-                <div
-                  style={{
-                    color: '#1890ff',
-                    cursor: 'pointer',
-                    width: '100%',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                  onClick={() => {
-                    history.push(`/onlineSystem/prePublish/${p.data.release_num}`);
-                  }}
-                >
-                  {p.value}
-                </div>
-              );
-            },
-          }}
-        />
-      </div>
+      <Checkbox
+        checked={checked}
+        onChange={({ target }) => {
+          setSelectedRowKeys(target.checked ? serverData : []);
+          setChecked(target.checked);
+        }}
+      >
+        全部项目
+      </Checkbox>
+      <Checkbox.Group
+        options={memoGroup.opts}
+        value={checked ? memoGroup.opts : uniq(checkBoxOpt)}
+        onChange={(v) => {
+          setCheckBoxOpt(v as string[]);
+          setChecked(v?.length == memoGroup.opts?.length);
+          setSelectedRowKeys(serverData?.flatMap((it) => (v.includes(it.applicant) ? [it] : [])));
+        }}
+      />
+      <Table
+        size={'small'}
+        rowKey={(record) => String(record.release_num)}
+        dataSource={memoGroup.table}
+        columns={preServerColumn}
+        pagination={false}
+        scroll={{ y: 400 }}
+        rowSelection={{
+          selectedRowKeys: selectedRowKeys?.map((it) => it.release_num),
+          onChange: (v, arr) => {
+            let group: string[] = [];
+            let compare = groupBy(arr, 'applicant');
+            let compareAll = groupBy(serverData, 'applicant');
+            Object.entries(compareAll).forEach(([k, v]) => {
+              if (compare[k]?.length == v?.length) group.push(k);
+            });
+            setCheckBoxOpt(group);
+            setChecked(arr.length == serverData?.length);
+            setSelectedRowKeys(arr);
+          },
+        }}
+      />
     </div>
   );
 };

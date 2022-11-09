@@ -127,7 +127,10 @@ export const irregularRequest = async (url: string, options: IAxios) => {
           ? errTip.message
           : options.msg || options.warn || '操作失败',
       );
-    else if (errTip.message && errTip.code !== 200) errorMessage(errTip.message);
+    else if (errTip?.ok == false && errTip.code !== 200)
+      errorMessage(
+        errTip.message || errTip.msg || errTip?.datas?.[0]?.message || '操作失败，请刷新重试',
+      );
     throw errTip;
   }
 };

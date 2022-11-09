@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useModel } from 'umi';
 import DutyListServices from '@/services/dutyList';
 import html2canvas from 'html2canvas';
-import { isEmpty, isEqual, pick, intersection, orderBy, uniq, cloneDeep } from 'lodash';
+import { isEmpty, isEqual, pick, intersection, orderBy, uniq, cloneDeep, uniqBy } from 'lodash';
 import { ExclamationCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { SelectProps } from 'antd/lib/select';
@@ -343,11 +343,13 @@ const DutyCatalog = () => {
       }
       setDetail(res);
       form.setFieldsValue({
-        front: uniq(res?.front?.map((it: any) => `${it.user_id}_${it.user_type}`)),
-        backend: uniq(res?.backend?.map((it: any) => `${it.user_id}_${it.user_type}`)),
-        test: uniq(res?.test?.map((it: any) => `${it.user_id}_${it.user_type}`)),
-        sqa: uniq(res?.sqa?.map((it: any) => `${it.user_id}_${it.user_type}`)),
-        operations: uniq(res?.operations?.map((it: any) => `${it.user_id}_${it.user_type}`)),
+        front: uniqBy(res?.front, 'user_id')?.map((it: any) => `${it.user_id}_${it.user_type}`),
+        backend: uniqBy(res?.backend, 'user_id')?.map((it: any) => `${it.user_id}_${it.user_type}`),
+        test: uniqBy(res?.test, 'user_id')?.map((it: any) => `${it.user_id}_${it.user_type}`),
+        sqa: uniqBy(res?.sqa, 'user_id')?.map((it: any) => `${it.user_id}_${it.user_type}`),
+        operations: uniqBy(res?.operations, 'user_id')?.map(
+          (it: any) => `${it.user_id}_${it.user_type}`,
+        ),
         project_ids: res?.project_ids ? res?.project_ids?.split(',') : undefined,
         project_pm: res?.project_pm,
         release_time: moment(res?.release_time),

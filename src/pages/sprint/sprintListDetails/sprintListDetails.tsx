@@ -153,14 +153,15 @@ const SprintList: React.FC<any> = () => {
   useEffect(() => {
     // 兼容直接通过详情链接访问
     const local = JSON.parse(localStorage.getItem('sprintHistoryTab') ?? '[]');
-    const id = window.location.search?.projectid as string;
     if (isEmpty(local)) {
-      if (id) {
+      if (!isEmpty(window.location.search)) {
         const init = [{ project: prjNames, projectid: prjId, ztId: ztId }];
         setTabs(init);
         localStorage.setItem('sprintHistoryTab', JSON.stringify(init));
       } else history.replace('/sprint/sprintList');
     } else {
+      isEmpty(window.location.search) &&
+        history.replace({ pathname: '/sprint/sprintListDetails', query: local[0] });
       setTabs(local);
     }
   }, []);

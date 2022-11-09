@@ -25,7 +25,7 @@ import { judgeAuthority } from '@/publicMethods/authorityJudge';
 import { useModel, history } from 'umi';
 import { errorMessage, infoMessage, sucMessage, warnMessage } from '@/publicMethods/showMessages';
 import { isEmpty } from 'lodash';
-import log from '@/pages/log';
+import { LocalstorageKeys } from '@/namespaces';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -628,8 +628,9 @@ const SprintList: React.FC<any> = () => {
                   <div
                     style={{ color: 'blue', cursor: 'pointer', textDecorationLine: 'underline' }}
                     onClick={() => {
-                      const historyTabs = (JSON.parse(localStorage.getItem('sprintHistoryTab')) ??
-                        []) as any[];
+                      const historyTabs = (JSON.parse(
+                        localStorage.getItem(LocalstorageKeys.sprintTab),
+                      ) ?? []) as any[];
                       if (
                         isEmpty(historyTabs) ||
                         historyTabs?.filter((it) => it.projectid == p.data.id)?.length == 0

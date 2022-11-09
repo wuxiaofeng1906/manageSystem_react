@@ -91,6 +91,7 @@ import styles from './sprintListDetails.less';
 import { omit, isEmpty } from 'lodash';
 import RemoveModal, { DissatisfyModal } from '@/pages/sprint/sprintListDetails/removeModal';
 import SprintDetailServices from '@/services/sprintDetail';
+import { LocalstorageKeys } from '@/namespaces';
 let ora_filter_data: any = [];
 
 const gird_filter_condition: any = []; // 表格自带过滤了的条件
@@ -104,7 +105,7 @@ const SprintList: React.FC<any> = () => {
   const [dissatisfy, setDissatisfy] = useState<any[]>([]);
   // 获取所有的班车所属执行
   const [sprintProject, setSprintProject] = useState<any[]>([]);
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<any>({});
   const [loading, setLoading] = useState(false);
   const [tabs, setTabs] = useState<any[]>([]);
 
@@ -152,12 +153,12 @@ const SprintList: React.FC<any> = () => {
   }
   useEffect(() => {
     // 兼容直接通过详情链接访问
-    const local = JSON.parse(localStorage.getItem('sprintHistoryTab') ?? '[]');
+    const local = JSON.parse(localStorage.getItem(LocalstorageKeys.sprintTab) ?? '[]');
     if (isEmpty(local)) {
       if (!isEmpty(window.location.search)) {
         const init = [{ project: prjNames, projectid: prjId, ztId: ztId }];
         setTabs(init);
-        localStorage.setItem('sprintHistoryTab', JSON.stringify(init));
+        localStorage.setItem(LocalstorageKeys.sprintTab, JSON.stringify(init));
       } else history.replace('/sprint/sprintList');
     } else {
       isEmpty(window.location.search) &&
@@ -1456,7 +1457,7 @@ const SprintList: React.FC<any> = () => {
 
   const onRemoveTab = (key: string) => {
     const data = tabs?.filter((it: any) => it.projectid !== +key);
-    localStorage.setItem('sprintHistoryTab', JSON.stringify(data));
+    localStorage.setItem(LocalstorageKeys.sprintTab, JSON.stringify(data));
     if (prjId == key) {
       history.replace({ pathname: history.location.pathname, query: data[0] });
     }

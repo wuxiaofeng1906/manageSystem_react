@@ -5,7 +5,7 @@ import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
 import { useRequest } from 'ahooks';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { useGqlClient } from '@/hooks';
 import { colums } from './girdInfo';
 import { queryDevelopViews, queryRepeats, queryDeleteCount } from './data';
@@ -22,8 +22,10 @@ import { formatMomentTime } from '@/publicMethods/timeMethods';
 import { getHeight } from '@/publicMethods/pageSet';
 import axios from 'axios';
 import { judgeAuthority } from '@/publicMethods/authorityJudge';
-import { useModel } from '@@/plugin-model/useModel';
+import { useModel, history } from 'umi';
 import { errorMessage, infoMessage, sucMessage, warnMessage } from '@/publicMethods/showMessages';
+import { isEmpty } from 'lodash';
+import log from '@/pages/log';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -616,6 +618,42 @@ const SprintList: React.FC<any> = () => {
             groupDefaultExpanded={9} // 展开分组
             onGridReady={onGridReady}
             onRowDoubleClicked={rowClicked}
+            frameworkComponents={{
+              linkRecord: (p: CellClickedEvent) => {
+                const format = {
+                  emergency20210728: '多组织阻塞bug跟踪',
+                  emergency20210930: '线上问题跟踪',
+                };
+                return (
+                  <div
+                    style={{ color: 'blue', cursor: 'pointer', textDecorationLine: 'underline' }}
+                    onClick={() => {
+                      const historyTabs = (JSON.parse(localStorage.getItem('sprintHistoryTab')) ??
+                        []) as any[];
+                      if (
+                        isEmpty(historyTabs) ||
+                        historyTabs?.filter((it) => it.projectid == p.data.id)?.length == 0
+                      ) {
+                        historyTabs.push({
+                          projectid: p.data.id,
+                          project: format[p.value] || p.value,
+                          ztId: p.data.ztId,
+                        }),
+                          localStorage.setItem('sprintHistoryTab', JSON.stringify(historyTabs));
+                      }
+
+                      history.push(
+                        `/sprint/sprintListDetails?projectid=${p.data.id}&project=${
+                          format[p.value] || p.value
+                        }&ztId=${p.data.ztId}`,
+                      );
+                    }}
+                  >
+                    {format[p.value] || p.value}
+                  </div>
+                );
+              },
+            }}
           ></AgGridReact>
         </div>
       </Spin>

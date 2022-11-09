@@ -24,31 +24,32 @@ const colums = () => {
       headerName: '项目名称',
       field: 'name',
       minWidth: 186,
-      cellRenderer: (params: any) => {
-        if (params.value === 'emergency20210728') {
-          return `<a  style="color:blue;text-decoration: underline" >多组织阻塞bug跟踪</a>`;
-        }
-        if (params.value === 'emergency20210930') {
-          return `<a  style="color:blue;text-decoration: underline" >线上问题跟踪</a>`;
-        }
-        return `<a  style="color:blue;text-decoration: underline" >${params.value}</a>`;
-      },
-      onCellClicked: (params: any) => {
-        // console.log('params', params.data);
-        if (params.data.name === 'emergency20210728') {
-          history.push(
-            `/sprint/sprintListDetails?projectid=${params.data.id}&project=多组织阻塞bug跟踪&ztId=${params.data.ztId}`,
-          );
-        } else if (params.value === 'emergency20210930') {
-          history.push(
-            `/sprint/sprintListDetails?projectid=${params.data.id}&project=线上问题跟踪&ztId=${params.data.ztId}`,
-          );
-        } else {
-          history.push(
-            `/sprint/sprintListDetails?projectid=${params.data.id}&project=${params.data.name}&ztId=${params.data.ztId}`,
-          );
-        }
-      },
+      cellRenderer: 'linkRecord',
+      // cellRenderer: (params: any) => {
+      //   if (params.value === 'emergency20210728') {
+      //     return `<a  style="color:blue;text-decoration: underline" >多组织阻塞bug跟踪</a>`;
+      //   }
+      //   if (params.value === 'emergency20210930') {
+      //     return `<a  style="color:blue;text-decoration: underline" >线上问题跟踪</a>`;
+      //   }
+      //   return `<a  style="color:blue;text-decoration: underline" >${params.value}</a>`;
+      // },
+      // onCellClicked: (params: any) => {
+      //   // console.log('params', params.data);
+      //   if (params.data.name === 'emergency20210728') {
+      //     history.push(
+      //       `/sprint/sprintListDetails?projectid=${params.data.id}&project=多组织阻塞bug跟踪&ztId=${params.data.ztId}`,
+      //     );
+      //   } else if (params.value === 'emergency20210930') {
+      //     history.push(
+      //       `/sprint/sprintListDetails?projectid=${params.data.id}&project=线上问题跟踪&ztId=${params.data.ztId}`,
+      //     );
+      //   } else {
+      //     history.push(
+      //       `/sprint/sprintListDetails?projectid=${params.data.id}&project=${params.data.name}&ztId=${params.data.ztId}`,
+      //     );
+      //   }
+      // },
     },
     {
       headerName: '开始时间',

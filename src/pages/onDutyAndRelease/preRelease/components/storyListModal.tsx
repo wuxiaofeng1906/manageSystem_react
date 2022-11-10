@@ -136,7 +136,7 @@ const StoryListModal = (props: { onRefresh?: Function }) => {
       onOk={onConfirm}
       onCancel={() => setShowStoryModal(false)}
       okButtonProps={{ disabled: loading || operteStatus }}
-      cancelButtonProps={{ disabled: cancelDisabled || loading }}
+      cancelButtonProps={{ disabled: operteStatus ? false : cancelDisabled || loading }}
     >
       <Spin spinning={loading}>
         <Form form={form} size={'small'} layout={'inline'} onFieldsChange={onFilter}>

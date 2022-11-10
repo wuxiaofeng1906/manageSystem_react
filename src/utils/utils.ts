@@ -121,7 +121,7 @@ const findParent = (departments: any[], dept: any, result: any) => {
   const deptName = dept.deptName;
   departments.forEach((item: any) => {
     if (item['deptName'] && deptName) {
-      if (deptName === item['deptName']) {
+      if (dept.dept == item.dept) {
         const parentName = item['parent'].deptName;
         if (parentName !== '北京企企科技有限公司') {
           // 过滤 北京企企科技有限公司

@@ -1375,10 +1375,14 @@ const SprintList: React.FC<any> = () => {
   useEffect(() => {
     if (!prjId) return;
     setLoading(true);
-    queryDevelopViews(gqlClient, prjId, prjType, true, showTestConfirmFlag, ztId).then((res) => {
-      setData(res ?? []);
-      setLoading(false);
-    });
+    queryDevelopViews(gqlClient, prjId, prjType, true, showTestConfirmFlag, ztId)
+      .then((res) => {
+        setData(res ?? {});
+        setLoading(false);
+      })
+      .catch((e) => {
+        setLoading(false);
+      });
   }, [prjId]);
 
   useEffect(() => {

@@ -492,7 +492,7 @@ const StatisticServices = {
           }
           datas{
             date
-            storyNum
+            count
             recordNum
           }
         }

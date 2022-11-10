@@ -22,9 +22,9 @@ const ruleData: IRuleData[] = [
   {
     title: '分子统计范围（上线后2个工作日客服顾问反馈问题）',
     child: [
-      '需求创建日期在发布日期后2个工作日内(若发布当天为工作日，要含发布当天），举例：发布日期为2022-08-11，则取需求创建日期为2022-08-11至2022-08-12的',
-      '且需求所属执行类型为emergency的',
-      '且(需求创建人为顾问/客服 或 bug转需求的查bug的创建人是顾问/客服）',
+      'bug创建日期在发布日期后2个工作日内(若发布当天为工作日，要含发布当天），举例：发布日期为2022-08-11，则取需求创建日期为2022-08-11至2022-08-12的',
+      'bug创建人为顾问/客服',
+      'bug的解决方案排除‘不是问题’',
     ],
   },
   {
@@ -34,7 +34,7 @@ const ruleData: IRuleData[] = [
   {
     title: '计算规则',
     child: [
-      '产品上线后emergency占比 = 上线后2个工作日客服顾问反馈问题 / 上线前1个月客服顾问反馈问题',
+      '产品上线后emergency占比 = 上线后2个工作日客服顾问反馈BUG / AVG(上线前1个月客服顾问反馈问题)*2*100%',
     ],
   },
 ];
@@ -79,7 +79,7 @@ const ProductOnlineEmergencyRate: React.FC = () => {
             return it.datas.map((child: any) => ({
               subTitle: moment(child.date).format('YYYYMMDD'),
               title: title,
-              total: +((child.storyNum / child.recordNum) * 100),
+              total: +((child.count / child.recordNum) * 2 * 100),
             }));
           })
           .flat(),

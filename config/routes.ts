@@ -447,24 +447,6 @@ export default [
                 component: './kpi/performance/developer/cumulativeLineBugRateExcludeOnline',
                 wrappers: ['../wrappers/auth'],
               },
-              {
-                name: '已发布需求平均关闭时长',
-                path: 'averageShutdownDuration',
-                component: './kpi/performance/developer/averageShutdownDuration',
-                wrappers: ['../wrappers/auth'],
-              },
-              {
-                name: '已发布未关闭需求数',
-                path: 'publishedAndUnclosedNumber',
-                component: './kpi/performance/developer/publishedAndUnclosedNumber',
-                wrappers: ['../wrappers/auth'],
-              },
-              {
-                name: '班车超范围bug数',
-                path: 'sprintOverRangeBug',
-                component: './kpi/performance/developer/sprintOverRangeBug',
-                wrappers: ['../wrappers/auth'],
-              },
             ],
           },
           {
@@ -724,6 +706,30 @@ export default [
                 component: './kpi/performance/service/deliveryThroughput',
                 wrappers: ['../wrappers/auth'],
                 // hideInMenu: true, // 临时屏蔽
+              },
+            ],
+          },
+          {
+            name: '积分',
+            path: '/kpi/performance/integral',
+            routes: [
+              {
+                name: '已发布需求平均关闭时长',
+                path: 'averageShutdownDuration',
+                component: './kpi/performance/integral/averageShutdownDuration',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '已发布未关闭需求数',
+                path: 'publishedAndUnclosedNumber',
+                component: './kpi/performance/integral/publishedAndUnclosedNumber',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '班车超范围bug数',
+                path: 'sprintOverRangeBug',
+                component: './kpi/performance/integral/sprintOverRangeBug',
+                wrappers: ['../wrappers/auth'],
               },
             ],
           },

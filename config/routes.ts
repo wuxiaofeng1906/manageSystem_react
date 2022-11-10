@@ -445,14 +445,12 @@ export default [
                 path: 'blockingTimes',
                 component: './kpi/performance/developer/blockingTimes',
                 wrappers: ['../wrappers/auth'],
-                // hideInMenu: true, // 临时屏蔽
               },
               {
                 name: '阻塞测试工作量',
                 icon: 'table',
                 path: 'blockingTestWorkload',
                 component: './kpi/performance/developer/blockingTestWorkload',
-                // hideInMenu: true, // 临时屏蔽
               },
               {
                 name: '累计千行bug率',
@@ -460,15 +458,12 @@ export default [
                 path: 'cumulativeLineBugRate',
                 component: './kpi/performance/developer/cumulativeLineBugRate',
                 wrappers: ['../wrappers/auth'],
-                // hideInMenu: true, // 临时屏蔽
               },
               {
                 name: '累计千行bug率（不含线上）',
-                icon: 'table',
                 path: 'cumulativeLineBugRateExcludeOnline',
                 component: './kpi/performance/developer/cumulativeLineBugRateExcludeOnline',
                 wrappers: ['../wrappers/auth'],
-                // hideInMenu: true, // 临时屏蔽
               },
             ],
           },
@@ -729,6 +724,30 @@ export default [
                 component: './kpi/performance/service/deliveryThroughput',
                 wrappers: ['../wrappers/auth'],
                 // hideInMenu: true, // 临时屏蔽
+              },
+            ],
+          },
+          {
+            name: '积分',
+            path: '/kpi/performance/integral',
+            routes: [
+              {
+                name: '已发布需求平均关闭时长',
+                path: 'averageShutdownDuration',
+                component: './kpi/performance/integral/averageShutdownDuration',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '已发布未关闭需求数',
+                path: 'publishedAndUnclosedNumber',
+                component: './kpi/performance/integral/publishedAndUnclosedNumber',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '班车超范围bug数',
+                path: 'sprintOverRangeBug',
+                component: './kpi/performance/integral/sprintOverRangeBug',
+                wrappers: ['../wrappers/auth'],
               },
             ],
           },

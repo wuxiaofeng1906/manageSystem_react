@@ -50,7 +50,7 @@ const PreReleaseProject: React.FC<any> = () => {
     if (result === '') {
       //   重置tab名
       // @ts-ignore
-      const { tabPageInfo } = await alalysisInitData('tabPageInfo', '');
+      const { tabPageInfo } = await alalysisInitData('tabPageInfo', tabsData.activeKey);
       if (tabPageInfo) {
         setTabsData(tabsData.activeKey, tabPageInfo.panes);
       }

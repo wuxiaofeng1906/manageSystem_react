@@ -41,8 +41,8 @@ const StoryListModal = (props: { onRefresh?: Function }) => {
     try {
       setLoading(true);
       await updateStoryList(data);
-      getList();
       setLoading(false);
+      setShowStoryModal(false);
       props.onRefresh?.(false);
     } catch (e) {
       setLoading(false);
@@ -136,7 +136,7 @@ const StoryListModal = (props: { onRefresh?: Function }) => {
       onOk={onConfirm}
       onCancel={() => setShowStoryModal(false)}
       okButtonProps={{ disabled: loading || operteStatus }}
-      cancelButtonProps={{ disabled: cancelDisabled || loading }}
+      cancelButtonProps={{ disabled: operteStatus ? false : cancelDisabled || loading }}
     >
       <Spin spinning={loading}>
         <Form form={form} size={'small'} layout={'inline'} onFieldsChange={onFilter}>

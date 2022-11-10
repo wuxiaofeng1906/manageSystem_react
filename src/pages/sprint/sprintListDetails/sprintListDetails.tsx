@@ -20,7 +20,7 @@ import {
   TreeSelect,
   Tooltip,
   Tag,
-  Popover,
+  Tabs,
 } from 'antd';
 import { formatMomentTime } from '@/publicMethods/timeMethods';
 import dayjs from 'dayjs';
@@ -56,7 +56,7 @@ import {
 import moment from 'moment';
 import { getHeight } from '@/publicMethods/pageSet';
 import { judgeAuthority } from '@/publicMethods/authorityJudge';
-import { useModel } from '@@/plugin-model/useModel';
+import { useModel, history } from 'umi';
 import { getColums, setRowColor } from './grid';
 import {
   queryDevelopViews,
@@ -91,6 +91,7 @@ import styles from './sprintListDetails.less';
 import { omit, isEmpty } from 'lodash';
 import RemoveModal, { DissatisfyModal } from '@/pages/sprint/sprintListDetails/removeModal';
 import SprintDetailServices from '@/services/sprintDetail';
+import { LocalstorageKeys } from '@/namespaces';
 let ora_filter_data: any = [];
 
 const gird_filter_condition: any = []; // 表格自带过滤了的条件
@@ -104,6 +105,9 @@ const SprintList: React.FC<any> = () => {
   const [dissatisfy, setDissatisfy] = useState<any[]>([]);
   // 获取所有的班车所属执行
   const [sprintProject, setSprintProject] = useState<any[]>([]);
+  const [data, setData] = useState<any>({});
+  const [loading, setLoading] = useState(false);
+  const [tabs, setTabs] = useState<any[]>([]);
 
   /* region 整个模块都需要用到的表单定义 */
   // 模块查询
@@ -134,9 +138,9 @@ const SprintList: React.FC<any> = () => {
   /* region  表格相关事件 */
   const gridApi = useRef<GridApi>(); // 绑定ag-grid 组件
   const gqlClient = useGqlClient();
-  const { data, loading } = useRequest(() =>
-    queryDevelopViews(gqlClient, prjId, prjType, true, showTestConfirmFlag, ztId),
-  );
+  // const { data, loading } = useRequest(() =>
+  //   queryDevelopViews(gqlClient, prjId, prjType, true, showTestConfirmFlag, ztId),
+  // );
 
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
@@ -147,6 +151,21 @@ const SprintList: React.FC<any> = () => {
     if (loading) gridApi.current.showLoadingOverlay();
     else gridApi.current.hideOverlay();
   }
+  useEffect(() => {
+    // 兼容直接通过详情链接访问
+    const local = JSON.parse(localStorage.getItem(LocalstorageKeys.sprintTab) ?? '[]');
+    if (isEmpty(local)) {
+      if (!isEmpty(window.location.search)) {
+        const init = [{ project: prjNames, projectid: prjId, ztId: ztId }];
+        setTabs(init);
+        localStorage.setItem(LocalstorageKeys.sprintTab, JSON.stringify(init));
+      } else history.replace('/sprint/sprintList');
+    } else {
+      isEmpty(window.location.search) &&
+        history.replace({ pathname: '/sprint/sprintListDetails', query: local[0] });
+      setTabs(local);
+    }
+  }, []);
 
   // 表格的屏幕大小自适应
   const [gridHeight, setGridHeight] = useState(getHeight());
@@ -1353,6 +1372,14 @@ const SprintList: React.FC<any> = () => {
       return message.warning('请先选择需要移除的项目！');
     setShowRemoveModal(true);
   };
+  useEffect(() => {
+    if (!prjId) return;
+    setLoading(true);
+    queryDevelopViews(gqlClient, prjId, prjType, true, showTestConfirmFlag, ztId).then((res) => {
+      setData(res ?? []);
+      setLoading(false);
+    });
+  }, [prjId]);
 
   useEffect(() => {
     setPageTitle(getStaticMessage(data?.resCount));
@@ -1428,11 +1455,24 @@ const SprintList: React.FC<any> = () => {
     Modal.destroyAll();
   }, []);
 
+  const onRemoveTab = (key: string) => {
+    const data = tabs?.filter((it: any) => it.projectid !== +key);
+    localStorage.setItem(LocalstorageKeys.sprintTab, JSON.stringify(data));
+    if (prjId == key) {
+      history.replace({ pathname: history.location.pathname, query: data[0] });
+    }
+    setTabs(data);
+  };
+  const onTabChange = (v: number) => {
+    const current = tabs?.find((it: any) => it.projectid == v);
+    history.replace({ pathname: history.location.pathname, query: current });
+  };
+
   const renderHeader = useMemo(() => {
     return (
       <div className={styles.header}>
         <div className={styles.desc}>
-          {prjNames}
+          <h2 style={{ margin: 0 }}>{prjNames}</h2>
           <div className={styles.tag}>
             <label>班车背景色说明：</label>
             <span>未基线</span>
@@ -1467,20 +1507,33 @@ const SprintList: React.FC<any> = () => {
         </div>
       </div>
     );
-  }, []);
+  }, [prjNames]);
   const memoColumn = useMemo(() => getColums(prjNames, showReason), [showReason]);
   return (
     <div style={{ width: '100%', marginTop: '-30px' }} className={styles.sprintListDetails}>
-      <PageHeader
-        ghost={false}
-        title={renderHeader}
-        style={{ height: '85px' }}
-        breadcrumbRender={() => {
-          return <Breadcrumb>{headerPath}</Breadcrumb>;
-        }}
-      />
+      <Spin spinning={refreshItem || loading} tip="项目详情同步中..." size={'large'}>
+        <PageHeader
+          ghost={false}
+          title={' '}
+          style={{ height: '50px' }}
+          breadcrumbRender={() => {
+            return <Breadcrumb>{headerPath}</Breadcrumb>;
+          }}
+        />
 
-      <Spin spinning={refreshItem} tip="项目详情同步中..." size={'large'}>
+        <Tabs
+          activeKey={prjId || tabs?.[0]?.projectid}
+          type="editable-card"
+          onEdit={(key, type) => onRemoveTab(key)}
+          hideAdd={true}
+          onChange={(v) => onTabChange(v)}
+          style={{ background: 'white', paddingBottom: 5, marginTop: 15 }}
+        >
+          {tabs.map((it) => (
+            <Tabs.TabPane tab={it.project} key={it.projectid} closable={tabs?.length > 1} />
+          ))}
+        </Tabs>
+        {renderHeader}
         {/* 蓝色title展示 */}
         <div style={{ color: 'blue', backgroundColor: 'white' }}> {pageTitle}</div>
         {/* 条件筛选 */}

@@ -84,5 +84,11 @@ export const DEFAULT_DECIMAL_PLACES = 2;
 export const MOMENT_FORMAT = {
   date: 'YYYY-MM-DD',
   time: 'HH:mm:ss',
-  utc:'YYYY-MM-DD HH:mm:ss'
+  utc: 'YYYY-MM-DD HH:mm:ss',
+};
+export const LocalstorageKeys = {
+  user: 'userLogins',
+  token: 'accessId',
+  authority: 'authority',
+  sprintTab: 'sprintHistoryTab',
 };

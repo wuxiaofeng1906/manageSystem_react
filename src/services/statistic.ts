@@ -419,6 +419,35 @@ const StatisticServices = {
   `);
     return { data: formatTreeData({ origin: data.data }), loading };
   },
+  async closeNormativeRequired({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:abnormallyClosedStoryNum(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+        total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            parent{
+              dept
+              deptName
+            }
+            kpi
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData({ origin: data.data }), loading };
+  },
 
   // 阻塞测试工作量
   async blockingTestWorkload({ client, params }: IStatisticQuery) {

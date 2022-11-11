@@ -221,16 +221,22 @@ export default [
       {
         name: '上线日历',
         path: 'profile/:id',
-        component: './onlineSystem/calendarList/profile',
+        component: './onlineSystem/calendarList/profile', // 禅道概况
         wrappers: ['../wrappers/auth'],
         hideInMenu: true,
       },
       {
-        name: '上线日历',
+        name: '发布过程单',
         path: 'prePublish/:id',
         component: './onlineSystem/calendarList/prePublish/layout',
         wrappers: ['../wrappers/auth'],
         hideInMenu: true,
+      },
+      {
+        name: '应用服务配置',
+        path: 'applicationServerConfig',
+        component: './onlineSystem/applicationServerConfig',
+        wrappers: ['../wrappers/auth'],
       },
     ],
   },

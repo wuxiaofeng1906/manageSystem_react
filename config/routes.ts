@@ -749,6 +749,12 @@ export default [
                 component: './kpi/performance/integral/sprintOverRangeBug',
                 wrappers: ['../wrappers/auth'],
               },
+              {
+                name: '需求关闭不规范数',
+                path: 'closeNormativeRequired',
+                component: './kpi/performance/integral/closeNormativeRequired',
+                wrappers: ['../wrappers/auth'],
+              },
             ],
           },
         ],

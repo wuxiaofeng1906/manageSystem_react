@@ -198,12 +198,13 @@ export const formatTreeData = ({
     result.push({
       Group: ['研发中心'],
       isDept: true,
+      [startTime]: isMulti ? elements.total.kpi * percent : elements.total.kpi / percent,
       ...(showDenominator
         ? {
             [`${startTime}_numerator`]: elements.total.sideKpi.numerator,
             [`${startTime}_denominator`]: elements.total.sideKpi.denominator,
           }
-        : { [startTime]: isMulti ? elements.total.kpi * percent : elements.total.kpi / percent }),
+        : {}),
     });
     // 显示前后端
     if (showSide) {

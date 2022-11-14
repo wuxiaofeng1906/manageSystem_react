@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { Form, Select, Row, Col, Spin } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
@@ -7,7 +7,7 @@ import { history } from '@@/core/history';
 import { zentaoStoryColumn, zentaoTestColumn } from '@/pages/onlineSystem/common/column';
 import IPagination from '@/components/IPagination';
 
-const ZentaoDetail = () => {
+const ZentaoDetail = (props: any, ref: any) => {
   const [storyForm] = Form.useForm();
   const [testForm] = Form.useForm();
   const storyRef = useRef<GridApi>();
@@ -21,6 +21,10 @@ const ZentaoDetail = () => {
     total: 0,
     page: 1,
   });
+  useImperativeHandle(ref, () => ({
+    onRefresh: getTableList,
+  }));
+
   const onGridReady = (params: GridReadyEvent) => {
     storyRef.current = params.api;
     params.api.sizeColumnsToFit();
@@ -30,13 +34,18 @@ const ZentaoDetail = () => {
     params.api.sizeColumnsToFit();
   };
 
+  const onRefresh = () => {
+    console.log('fresh');
+  };
+
   window.onresize = function () {
     setTableHeight((window.innerHeight - 400) / 2);
   };
 
   useEffect(() => {
     getTableList();
-  });
+  }, []);
+
   const getTableList = async (page = 1, page_size = 20) => {
     try {
       setSpin(true);
@@ -91,7 +100,7 @@ const ZentaoDetail = () => {
     <Spin spinning={spin} tip={'数据加载中...'}>
       <div>
         <h3>一、需求/任务/bug列表</h3>
-        <Form form={storyForm}>
+        <Form form={storyForm} size={'small'}>
           <Row justify={'space-between'} gutter={8}>
             <Col span={4}>
               <Form.Item label={'部门/组'} name={'orgs'}>
@@ -173,7 +182,7 @@ const ZentaoDetail = () => {
           showQuickJumper={getTableList}
           onShowSizeChange={(size) => getTableList(1, size)}
         />
-        <Form form={testForm}>
+        <Form form={testForm} size={'small'}>
           <Row justify={'space-between'} gutter={8}>
             <Col span={8}>
               <Form.Item label={'归属执行'} name={'execution'}>
@@ -237,4 +246,4 @@ const ZentaoDetail = () => {
     </Spin>
   );
 };
-export default ZentaoDetail;
+export default forwardRef(ZentaoDetail);

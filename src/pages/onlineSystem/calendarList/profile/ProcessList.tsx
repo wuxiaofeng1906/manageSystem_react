@@ -1,21 +1,26 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Button } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { preProcessColumn } from '@/pages/onlineSystem/common/column';
 import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { history } from 'umi';
+import DemandListModal from '@/pages/onlineSystem/components/DemandListModal';
 
 const ProcessList = () => {
   const gridRef = useRef<GridApi>();
-
+  const [showModal, setShowModal] = useState(false);
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
     params.api.sizeColumnsToFit();
   };
+  const onConfirm = (v: any) => {
+    console.log(v);
+    setShowModal(false);
+  };
 
   return (
     <div>
-      <Button>新增发布过程</Button>
+      <Button onClick={(e) => setShowModal(true)}>新增发布过程</Button>
       <div className="ag-theme-alpine" style={{ height: 300, width: '100%', marginTop: 8 }}>
         <AgGridReact
           columnDefs={preProcessColumn}
@@ -53,6 +58,7 @@ const ProcessList = () => {
           }}
         />
       </div>
+      <DemandListModal visible={showModal} onOk={onConfirm} />
     </div>
   );
 };

@@ -68,24 +68,12 @@ const CalendarList = () => {
           <Form layout={'inline'} size={'small'} form={form} onFieldsChange={() => getTableList()}>
             <Col span={8}>
               <Form.Item name={'branch'} label={'上线分支'}>
-                <Select
-                  options={[]}
-                  optionFilterProp={'label'}
-                  style={{ width: '100%' }}
-                  mode={'multiple'}
-                  showSearch
-                />
+                <Select options={[]} optionFilterProp={'label'} mode={'multiple'} showSearch />
               </Form.Item>
             </Col>
             <Col span={8}>
               <Form.Item name={'pro_ids'} label={'项目名称'}>
-                <Select
-                  options={[]}
-                  optionFilterProp={'label'}
-                  style={{ width: '100%' }}
-                  mode={'multiple'}
-                  showSearch
-                />
+                <Select options={[]} optionFilterProp={'label'} mode={'multiple'} showSearch />
               </Form.Item>
             </Col>
             <Col span={7}>

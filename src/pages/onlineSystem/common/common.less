@@ -9,4 +9,44 @@
     border-bottom: 1px solid lightgrey !important;
   }
 }
+.profileAndProcess{
+  padding: 10px;
+  background: white;
+}
+.onlineTab{
+  :global{
+    .ant-tabs-nav{
+      border-radius: 6px;
+      border:1px solid #f0f0f0;
+      padding: 8px;
+      &:before{
+        border-bottom: 0 ;
+      }
+    }
+    .ant-tabs-nav-list{
+      .ant-tabs-tab{
+        background:#eaf7ffd1 ;
+        position: relative;
+        line-height: 28px;
+        height: 28px;
+        min-width: 100px;
+        text-indent: 0.5em;
+        font-size: 14px;
+        font-weight: bold;
+        &:after{
+          content: ' ';
+          display: block;
+          width: 14px;
+          height: 100%;
+          border-style: solid;
+          border-width: 14px 0 14px 14px;
+          border-color: transparent transparent transparent #eaf7ffd1;
+          position: absolute;
+          right: -14px;
+          top: 0;
+        }
+      }
+    }
+  }
+}
 

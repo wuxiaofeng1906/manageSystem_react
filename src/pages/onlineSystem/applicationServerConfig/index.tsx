@@ -9,16 +9,25 @@ import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { getHeight } from '@/publicMethods/pageSet';
 import { applicationConfigColumn } from './column';
 import { TechnicalSide, WhetherOrNot } from '@/pages/onlineSystem/common/constant';
+import { infoMessage } from '@/publicMethods/showMessages';
 
 const ApplicationServerConfig = () => {
   const [gridHeight, setGridHeight] = useState(getHeight() - 60);
   const [list, setList] = useState<any[]>([]);
   const [spinning, setSpinning] = useState(false);
+  const [editModal, setEditModal] = useState(false);
+  const [activeItem, setActiveItem] = useState<any>();
   const gridRef = useRef<GridApi>();
 
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
     params.api.sizeColumnsToFit();
+  };
+
+  const onRemove = async () => {
+    const selected = gridRef.current?.getSelectedRows();
+    if (isEmpty(selected)) return infoMessage('请先选择删除项！');
+    console.log(selected);
   };
   window.onresize = function () {
     setGridHeight(Number(getHeight()) - 60);
@@ -52,8 +61,12 @@ const ApplicationServerConfig = () => {
       <PageContainer>
         <div className={styles.applicationServerConfig}>
           <div className={styles.btnBox}>
-            <Button type={'primary'}>新增</Button>
-            <Button type={'primary'}>删除</Button>
+            <Button type={'primary'} onClick={() => setEditModal(true)}>
+              新增
+            </Button>
+            <Button type={'primary'} onClick={onRemove}>
+              删除
+            </Button>
           </div>
           <div style={{ height: gridHeight }}>
             <AgGridReact
@@ -72,8 +85,20 @@ const ApplicationServerConfig = () => {
               onGridSizeChanged={onGridReady}
               columnDefs={applicationConfigColumn}
               rowData={list}
+              onRowDoubleClicked={(p) => {
+                setActiveItem(p.data);
+                setEditModal(true);
+              }}
             />
           </div>
+          <EditModal
+            onCancel={() => {
+              setActiveItem(undefined);
+              setEditModal(false);
+            }}
+            visible={editModal}
+            data={activeItem}
+          />
         </div>
       </PageContainer>
     </Spin>
@@ -82,26 +107,53 @@ const ApplicationServerConfig = () => {
 export default ApplicationServerConfig;
 
 const EditModal = (props: ModalFuncProps & { data: any }) => {
+  const [loading, setLoading] = useState(false);
+  const [form] = Form.useForm();
   const memoWhetherOrNot = useMemo(
     () => Object.entries(WhetherOrNot).map(([k, v]) => ({ label: v, value: k })),
     [],
   );
+  const onConfirm = async () => {
+    const values = await form.validateFields();
+    props.onCancel?.(values);
+  };
+  useEffect(() => {
+    if (!props?.visible) {
+      form.resetFields();
+      return;
+    }
+    form.setFieldsValue(props.data);
+  }, [props?.visible]);
 
   return (
     <Modal
       {...props}
+      centered
+      maskClosable={false}
       title={`${isEmpty(props.data) ? '新增' : '编辑'}新增应用服务配置`}
-      onCancel={() => {}}
+      onCancel={() => props?.onCancel?.()}
+      onOk={onConfirm}
+      destroyOnClose={true}
+      okButtonProps={{ disabled: loading }}
+      width={800}
     >
-      <Form>
-        <Row>
-          <Col>
-            <Form.Item name={'applicant'} label={'应用名称'}>
+      <Form form={form}>
+        <Row gutter={6}>
+          <Col span={12}>
+            <Form.Item
+              name={'applicant'}
+              label={'应用名称'}
+              rules={[{ message: '请选择应用名称', required: true }]}
+            >
               <Select placeholder={'请选择应用名称'} options={[]} />
             </Form.Item>
           </Col>
-          <Col>
-            <Form.Item name={'side'} label={'技术侧'}>
+          <Col span={12}>
+            <Form.Item
+              name={'side'}
+              label={'技术侧'}
+              rules={[{ message: '请选择应用名称', required: true }]}
+            >
               <Select
                 placeholder={'请选择技术侧'}
                 mode={'multiple'}
@@ -109,8 +161,14 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
               />
             </Form.Item>
           </Col>
-          <Col>
-            <Form.Item name={'type'} label={'所属应用类型'}>
+        </Row>
+        <Row gutter={6}>
+          <Col span={12}>
+            <Form.Item
+              name={'type'}
+              label={'所属应用类型'}
+              rules={[{ message: '请选择所属应用类型', required: true }]}
+            >
               <Select
                 placeholder={'请选择所属应用类型'}
                 options={[
@@ -122,51 +180,81 @@ const EditModal = (props: ModalFuncProps & { data: any }) => {
               />
             </Form.Item>
           </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Form.Item name={'env'} label={'可上线环境'}>
-              <Select placeholder={'请选择应用名称'} options={[]} />
+          <Col span={12}>
+            <Form.Item
+              name={'env'}
+              label={'可上线环境'}
+              rules={[{ message: '请选择可上线环境', required: true }]}
+            >
+              <Select placeholder={'请选择可上线环境'} options={[]} mode={'multiple'} />
             </Form.Item>
           </Col>
-          <Col>
-            <Form.Item name={'apk'} label={'是否是应用包'}>
+        </Row>
+        <Row gutter={6}>
+          <Col span={12}>
+            <Form.Item
+              name={'apk'}
+              label={'是否是应用包'}
+              rules={[{ message: '请选择是否是应用包', required: true }]}
+            >
               <Select placeholder={'应用包'} options={memoWhetherOrNot} />
             </Form.Item>
           </Col>
-          <Col>
-            <Form.Item name={'unit_check'} label={'是否需要检查单元测试'}>
-              <Select placeholder={'检查单元测试'} options={memoWhetherOrNot} />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Form.Item name={'env_check'} label={'是否需要执行环境一致性检查'}>
-              <Select placeholder={'是否需要执行环境一致性检查'} options={memoWhetherOrNot} />
-            </Form.Item>
-          </Col>
-          <Col>
-            <Form.Item name={'hot'} label={'是否执行"可热更"辅助检查'}>
+          <Col span={12}>
+            <Form.Item
+              name={'hot'}
+              label={'是否执行"可热更"辅助检查'}
+              rules={[{ message: '请选择是否执行"可热更"辅助检查', required: true }]}
+            >
               <Select placeholder={'是否执行"可热更"辅助检查'} options={memoWhetherOrNot} />
             </Form.Item>
           </Col>
-          <Col>
-            <Form.Item name={'upgrade'} label={'是否涉及数据修复/升级(backend/apps/build)'}>
+        </Row>
+        <Row gutter={6}>
+          <Col span={12}>
+            <Form.Item
+              name={'unit_check'}
+              label={'是否需要检查单元测试'}
+              rules={[{ message: '请选择是否需要检查单元测试', required: true }]}
+            >
+              <Select placeholder={'检查单元测试'} options={memoWhetherOrNot} />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name={'env_check'}
+              label={'是否需要执行环境一致性检查'}
+              rules={[{ message: '请选择是否需要执行环境一致性检查', required: true }]}
+            >
+              <Select placeholder={'是否需要执行环境一致性检查'} options={memoWhetherOrNot} />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={6}>
+          <Col span={12}>
+            <Form.Item
+              name={'upgrade'}
+              label={'是否涉及数据修复/升级'}
+              rules={[{ message: '请选择是否涉及数据修复/升级', required: true }]}
+            >
               <Select
                 placeholder={'是否涉及数据修复/升级(backend/apps/build)'}
                 options={memoWhetherOrNot}
               />
             </Form.Item>
           </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Form.Item name={'gitlab'} label={'对应gitlab工程地址'}>
+          <Col span={12}>
+            <Form.Item
+              name={'gitlab'}
+              label={'对应gitlab工程地址'}
+              rules={[{ message: '请填写对应gitlab工程地址', required: true }]}
+            >
               <Input placeholder={'对应gitlab工程地址'} />
             </Form.Item>
           </Col>
-          <Col>
+        </Row>
+        <Row>
+          <Col span={24}>
             <Form.Item name={'mark'} label={'备注'}>
               <Input.TextArea placeholder={'备注'} />
             </Form.Item>

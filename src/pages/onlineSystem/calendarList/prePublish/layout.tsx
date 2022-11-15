@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Tabs, Button } from 'antd';
+import { Tabs, Button, Space } from 'antd';
 import ProcessDetail from './ProcessDetail';
 import Check from './Check';
 import SheetInfo from './SheetInfo';
 // import Approval from './Approval';
 // import Publish from './Publish';
 import { useLocation, history, useParams } from 'umi';
+import { BarsOutlined, SyncOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import styles from '../../common/common.less';
 
@@ -40,25 +41,47 @@ const Layout = () => {
   const renderTabContent = useMemo(() => {
     if (query.key == 'server')
       return (
-        <div>
-          <Button onClick={() => ref.current?.onShow()}>需求列表</Button>
-          <Button onClick={() => ref.current?.onCancelPublish()}>取消发布</Button>
-          <Button onClick={() => ref.current?.onRefresh()}>刷新</Button>
-        </div>
+        <Space size={10}>
+          <BarsOutlined
+            onClick={() => ref.current?.onShow()}
+            title={'需求列表'}
+            style={{ color: '#0079ff', fontSize: 16 }}
+          />
+          <Button size={'small'} onClick={() => ref.current?.onCancelPublish()}>
+            取消发布
+          </Button>
+          <SyncOutlined
+            onClick={() => ref.current?.onRefresh()}
+            title={'刷新'}
+            style={{ color: '#0079ff', fontSize: 16 }}
+          />
+        </Space>
       );
     else if (query.key == 'check')
       return (
-        <div>
-          <Button onClick={() => ref.current?.onSetting()}>检查参数设置</Button>
-          <Button onClick={() => ref.current?.onCheck()}>一键执行检查</Button>
-          <Button onClick={() => ref.current?.onLock()}>封板锁定</Button>
-          <Button onClick={() => ref.current?.onRefreshCheck()}>刷新</Button>
-        </div>
+        <Space size={10}>
+          <Button size={'small'} onClick={() => ref.current?.onSetting()}>
+            检查参数设置
+          </Button>
+          <Button size={'small'} onClick={() => ref.current?.onCheck()}>
+            一键执行检查
+          </Button>
+          <Button size={'small'} onClick={() => ref.current?.onLock()}>
+            封板锁定
+          </Button>
+          <SyncOutlined
+            onClick={() => ref.current?.onRefreshCheck()}
+            title={'刷新'}
+            style={{ color: '#0079ff', fontSize: 16 }}
+          />
+        </Space>
       );
     else
       return (
         <div>
-          <Button onClick={() => ref.current?.onSave()}>保存</Button>
+          <Button size={'small'} onClick={() => ref.current?.onSave()}>
+            保存
+          </Button>
         </div>
       );
   }, [id, query.key]);

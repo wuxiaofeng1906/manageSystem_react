@@ -31,19 +31,46 @@
         height: 28px;
         min-width: 100px;
         text-indent: 0.5em;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: bold;
+        padding: 0 10px;
         &:after{
           content: ' ';
           display: block;
-          width: 14px;
+          width: 26px;
           height: 100%;
           border-style: solid;
-          border-width: 14px 0 14px 14px;
+          border-width: 13px 0 13px 24px;
           border-color: transparent transparent transparent #eaf7ffd1;
           position: absolute;
-          right: -14px;
+          right: -26px;
           top: 0;
+        }
+      }
+    }
+    .ant-btn{
+      padding: 0 8px;
+      border-radius: 4px;
+      color:#46a0fc;
+      border-color: #46a0fc85;
+      background:  #ecf5ff;
+    }
+  }
+}
+.onlineTable{
+  :global{
+    .ant-table-thead > tr > th, .ant-table-tbody > tr > td, .ant-table tfoot > tr > th, .ant-table tfoot > tr > td{
+      padding:5px 16px;
+    }
+  }
+}
+.processDetail{
+  .step2{
+    display: flex;
+    :global{
+      .ant-btn{
+        &:nth-child(2){
+          border-color: orange;
         }
       }
     }

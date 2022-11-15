@@ -1,8 +1,11 @@
 import React, { useImperativeHandle, useState, forwardRef } from 'react';
 import { Table, Switch, Spin } from 'antd';
 import { checkInfo } from '@/pages/onlineSystem/common/constant';
+import styles from '../../common/common.less';
+
 const Check = (props: any, ref: any) => {
   const [spin, setSpin] = useState(false);
+  const [selected, setSelected] = useState([]);
 
   useImperativeHandle(
     ref,
@@ -24,10 +27,10 @@ const Check = (props: any, ref: any) => {
   );
   return (
     <Spin spinning={spin} tip={'数据加载中...'}>
-      <div>
+      <div className={styles.onlineTable}>
         <Table
           columns={[
-            { title: '序号', dataIndex: 'num' },
+            { title: '序号', dataIndex: 'num', render: (_, r, i) => i + 1 },
             { title: '检查类别', dataIndex: 'check_type' },
             { title: '所属端', dataIndex: 'side' },
             { title: '检查状态', dataIndex: 'status' },
@@ -44,6 +47,8 @@ const Check = (props: any, ref: any) => {
           ]}
           dataSource={checkInfo}
           pagination={false}
+          rowKey={(p) => p.id}
+          rowSelection={{ selectedRowKeys: selected }}
         />
       </div>
     </Spin>

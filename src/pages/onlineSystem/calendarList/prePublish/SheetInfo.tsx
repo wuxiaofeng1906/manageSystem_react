@@ -46,12 +46,6 @@ const SheetInfo = (props: any, ref: any) => {
   return (
     <Spin spinning={spinning} tip="数据加载中...">
       <div className={styles.releaseOrder}>
-        <div className={styles.header}>
-          <div className={styles.title}>工单基本信息</div>
-          <Button size={'small'} onClick={() => {}} disabled={!hasPermission?.save || finished}>
-            保存
-          </Button>
-        </div>
         <Form
           layout={'inline'}
           size={'small'}
@@ -142,7 +136,7 @@ const SheetInfo = (props: any, ref: any) => {
         </Form>
         <h3>一、工单-基础设置</h3>
         <Form size={'small'} form={baseForm} className={styles.baseInfo}>
-          <Row>
+          <Row gutter={8}>
             <Col span={6}>
               <Form.Item name={'release_type'} label={'预发布分支'}>
                 <Select options={[]} style={{ width: '100%' }} disabled />
@@ -154,7 +148,7 @@ const SheetInfo = (props: any, ref: any) => {
               </Form.Item>
             </Col>
           </Row>
-          <Row>
+          <Row gutter={8}>
             <Col span={6}>
               <Form.Item name={'cluster'} label={'发布环境工单类型选择'} required>
                 <Select

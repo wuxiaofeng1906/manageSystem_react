@@ -249,10 +249,12 @@ export const preServerColumn: ColumnsType<any> = [
     title: '应用',
     dataIndex: 'applicant',
     onCell: (v) => ({ rowSpan: v?.rowSpan ?? 1 }),
+    fixed: 'left',
   },
   {
     title: '项目名称',
     dataIndex: 'project_name',
+    fixed: 'left',
   },
   {
     title: '是否封板',

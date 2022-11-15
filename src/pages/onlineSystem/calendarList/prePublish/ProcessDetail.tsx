@@ -18,6 +18,7 @@ import { mergeCellsTable } from '@/utils/utils';
 import { AgGridReact } from 'ag-grid-react';
 import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import DemandListModal from '@/pages/onlineSystem/components/DemandListModal';
+import styles from '@/pages/onlineSystem/common/common.less';
 
 const ProcessDetail = (props: any, ref: any) => {
   const [serverData, setServerData] = useState<any[]>([]);
@@ -62,8 +63,8 @@ const ProcessDetail = (props: any, ref: any) => {
     };
   }, [serverData]);
   return (
-    <div>
-      <h3>一、基础信息</h3>
+    <div className={styles.processDetail}>
+      <h4>一、基础信息</h4>
       <Form size={'small'}>
         <Row justify={'space-between'} gutter={8}>
           <Col span={12}>
@@ -117,11 +118,11 @@ const ProcessDetail = (props: any, ref: any) => {
           </Col>
         </Row>
       </Form>
-      <div>
-        <h3>二、应用服务</h3>
-        <Button>封板</Button>
-        <Button>解除封板</Button>
-        <Button>移除</Button>
+      <div className={styles.step2}>
+        <h4>二、应用服务</h4>
+        <Button size={'small'}>封板</Button>
+        <Button size={'small'}>解除封板</Button>
+        <Button size={'small'}>移除</Button>
       </div>
 
       <Checkbox
@@ -142,30 +143,33 @@ const ProcessDetail = (props: any, ref: any) => {
           setSelectedRowKeys(serverData?.flatMap((it) => (v.includes(it.applicant) ? [it] : [])));
         }}
       />
-      <Table
-        size={'small'}
-        rowKey={(record) => String(record.release_num)}
-        dataSource={memoGroup.table}
-        columns={preServerColumn}
-        pagination={false}
-        scroll={{ y: 400 }}
-        rowSelection={{
-          selectedRowKeys: selectedRowKeys?.map((it) => it.release_num),
-          onChange: (v, arr) => {
-            let group: string[] = [];
-            let compare = groupBy(arr, 'applicant');
-            let compareAll = groupBy(serverData, 'applicant');
-            Object.entries(compareAll).forEach(([k, v]) => {
-              if (compare[k]?.length == v?.length) group.push(k);
-            });
-            setCheckBoxOpt(group);
-            setChecked(arr.length == serverData?.length);
-            setSelectedRowKeys(arr);
-          },
-        }}
-      />
+      <div className={styles.onlineTable}>
+        <Table
+          size={'small'}
+          rowKey={(record) => String(record.release_num)}
+          dataSource={memoGroup.table}
+          columns={preServerColumn}
+          pagination={false}
+          scroll={{ y: 400, x: 300 }}
+          style={{ wordBreak: 'keep-all' }}
+          rowSelection={{
+            selectedRowKeys: selectedRowKeys?.map((it) => it.release_num),
+            onChange: (v, arr) => {
+              let group: string[] = [];
+              let compare = groupBy(arr, 'applicant');
+              let compareAll = groupBy(serverData, 'applicant');
+              Object.entries(compareAll).forEach(([k, v]) => {
+                if (compare[k]?.length == v?.length) group.push(k);
+              });
+              setCheckBoxOpt(group);
+              setChecked(arr.length == serverData?.length);
+              setSelectedRowKeys(arr);
+            },
+          }}
+        />
+      </div>
       <div>
-        <h3>升级接口</h3>
+        <h4>升级接口</h4>
         <Button>移除</Button>
       </div>
       <div style={{ height: 300, width: '100%' }}>
@@ -185,7 +189,7 @@ const ProcessDetail = (props: any, ref: any) => {
         />
       </div>
       <div>
-        <h3>四、数据修复/升级</h3>
+        <h4>四、数据修复/升级</h4>
         <Button>移除</Button>
       </div>
       <div style={{ height: 300, width: '100%' }}>
@@ -205,7 +209,7 @@ const ProcessDetail = (props: any, ref: any) => {
         />
       </div>
       <div>
-        <h3>五、服务确认</h3>
+        <h4>五、服务确认</h4>
       </div>
       <div style={{ height: 300, width: '100%' }}>
         <AgGridReact

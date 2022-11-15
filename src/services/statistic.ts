@@ -357,6 +357,66 @@ const StatisticServices = {
   `);
     return { data: formatTreeData({ origin: data.data }), loading };
   },
+  // 计划平均延期次数
+  async planedDelayAverageNum({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:planAvDelayCount(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+        total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            parent{
+              dept
+              deptName
+            }
+            kpi
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData({ origin: data.data }), loading };
+  },
+  // 任务平均延期次数
+  async taskCumulativeDelayNum({ client, params }: IStatisticQuery) {
+    const condition = getParamsByType(params);
+    if (condition.typeFlag === 0) return [];
+    const { data, loading } = await client.query(`
+      {
+         data:taskCumulativeDelayNum(kind: "${condition.typeFlag}", ends: ${condition.ends}) {
+        total{
+            dept
+            deptName
+            kpi
+          }
+          range{
+            start
+            end
+          }
+          datas{
+            dept
+            deptName
+            parent{
+              dept
+              deptName
+            }
+            kpi
+          }
+        }
+      }
+  `);
+    return { data: formatTreeData({ origin: data.data }), loading };
+  },
 
   // 已发布未关闭需求数
   async publishedAndUnclosedNumber({ client, params }: IStatisticQuery) {

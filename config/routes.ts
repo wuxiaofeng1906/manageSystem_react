@@ -737,6 +737,18 @@ export default [
                 component: './kpi/performance/integral/closeNormativeRequired',
                 wrappers: ['../wrappers/auth'],
               },
+              {
+                name: '计划平均延期次数',
+                path: 'planedDelayAverageNum',
+                component: './kpi/performance/integral/planedDelayAverageNum',
+                wrappers: ['../wrappers/auth'],
+              },
+              {
+                name: '任务平均延期次数',
+                path: 'taskCumulativeDelayNum',
+                component: './kpi/performance/integral/taskCumulativeDelayNum',
+                wrappers: ['../wrappers/auth'],
+              },
             ],
           },
         ],

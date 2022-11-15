@@ -6,7 +6,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
 } from 'react';
-import { Form, Select, Checkbox, Table, Row, Col, Input, DatePicker, Button } from 'antd';
+import { Form, Select, Checkbox, Table, Row, Col, Input, DatePicker, Button, Modal } from 'antd';
 import {
   preServerColumn,
   repaireColumn,
@@ -16,23 +16,50 @@ import {
 import { groupBy, isEmpty, uniq } from 'lodash';
 import { mergeCellsTable } from '@/utils/utils';
 import { AgGridReact } from 'ag-grid-react';
-import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import DemandListModal from '@/pages/onlineSystem/components/DemandListModal';
 import styles from '@/pages/onlineSystem/common/common.less';
+import { infoMessage } from '@/publicMethods/showMessages';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { history, useModel } from 'umi';
+import IPagination from '@/components/IPagination';
 
 const ProcessDetail = (props: any, ref: any) => {
   const [serverData, setServerData] = useState<any[]>([]);
+  const [interfaceData, setInterfaceData] = useState<any[]>([]);
+  const [repaireData, setRepaireData] = useState<any[]>([]);
+  const [confirmData, setConfirmData] = useState<any[]>([]);
+
   const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
   const [checked, setChecked] = useState(false);
   const [checkBoxOpt, setCheckBoxOpt] = useState<string[]>([]);
   const [show, setShow] = useState(false);
-  const upgradeRef = useRef<GridApi>();
+  const confirmRef = useRef<GridApi>();
+  const interfaceRef = useRef<GridApi>();
+  const repaireRef = useRef<GridApi>();
+  const [pages, setPages] = useState({
+    page_size: 20,
+    total: 0,
+    page: 1,
+  });
+
   useImperativeHandle(
     ref,
     () => ({
       onShow: () => setShow(true),
       onCancelPublish: () => {
-        console.log('cancel');
+        Modal.confirm({
+          okText: '确认',
+          cancelText: '取消',
+          centered: true,
+          title: '取消发布提示',
+          content: '请确认是否取消发布？',
+          closable: false,
+          onOk: async () => {
+            console.log('取消');
+            history.replace('/onlineSystem/calendarList');
+          },
+        });
       },
       onRefresh: () => {
         console.log('refresh');
@@ -51,10 +78,61 @@ const ProcessDetail = (props: any, ref: any) => {
     setServerData(mock);
   }, []);
 
-  const onGridReady = (params: GridReadyEvent) => {
-    upgradeRef.current = params.api;
+  const onGridReady = (
+    params: GridReadyEvent,
+    ref: React.MutableRefObject<GridApi | undefined>,
+  ) => {
+    ref.current = params.api;
     params.api.sizeColumnsToFit();
   };
+  const onSeal = async () => {
+    if (isEmpty(selectedRowKeys)) return infoMessage('请先选择需封板项目');
+    const selected = serverData.flatMap((it) => (selectedRowKeys.includes(it.id) ? [it] : []));
+    if (selected?.some((it) => it.flag)) return infoMessage('请选择未封板项目进行封板');
+    Modal.confirm({
+      title: '封板提示',
+      content: '请确认是否封板该项目?',
+      onOk: async () => {
+        // 1.校验用例是否通过
+        console.log();
+      },
+    });
+  };
+
+  const onUnseal = async () => {
+    if (isEmpty(selectedRowKeys)) return infoMessage('请先选择需解除封板项目');
+    const selected = serverData.flatMap((it) => (selectedRowKeys.includes(it.id) ? [it] : []));
+    if (selected?.some((it) => !it.flag)) return infoMessage('请选择封板项目进行解除封板');
+    Modal.confirm({
+      title: '解除封板提示',
+      content: '请确认是否解除封板该项目?',
+      onOk: async () => {
+        console.log();
+      },
+    });
+  };
+
+  const onDelete = async (type: 'server' | 'interface' | 'repaire') => {
+    const gridSelected =
+      type == 'interface'
+        ? interfaceRef?.current?.getSelectedRows()
+        : type == 'repaire'
+        ? repaireRef?.current?.getSelectedRows()
+        : serverData.flatMap((it) => (selectedRowKeys.includes(it.id) ? [it] : []));
+    if (isEmpty(gridSelected)) return infoMessage('请先选择需移除的项目！');
+    if (type == 'server' && gridSelected?.some((it) => it.flag))
+      return infoMessage('已封板项目不能移除！');
+    Modal.confirm({
+      title: '移除提示',
+      icon: <InfoCircleOutlined style={{ color: 'red' }} />,
+      content: `请确认是否要移除该项目?`,
+      onOk: async () => {
+        console.log(gridSelected);
+      },
+    });
+  };
+
+  const getTableList = async (page = 1, page_size = 20) => {};
   const memoGroup = useMemo(() => {
     const table = mergeCellsTable(serverData ?? [], 'applicant');
     return {
@@ -62,17 +140,14 @@ const ProcessDetail = (props: any, ref: any) => {
       table,
     };
   }, [serverData]);
+
   return (
     <div className={styles.processDetail}>
       <h4>一、基础信息</h4>
       <Form size={'small'}>
         <Row justify={'space-between'} gutter={8}>
           <Col span={12}>
-            <Form.Item
-              label={'批次名称'}
-              name={'name'}
-              rules={[{ message: '请填写批次名称', required: true }]}
-            >
+            <Form.Item label={'批次名称'} name={'name'} required>
               <Input />
             </Form.Item>
           </Col>
@@ -99,30 +174,28 @@ const ProcessDetail = (props: any, ref: any) => {
             </Form.Item>
           </Col>
           <Col span={4}>
-            <Form.Item
-              label={'镜像环境绑定'}
-              name={'online_env'}
-              rules={[{ message: '请填写镜像环境', required: true }]}
-            >
+            <Form.Item label={'镜像环境绑定'} name={'online_env'} required>
               <Select />
             </Form.Item>
           </Col>
           <Col span={4}>
-            <Form.Item
-              label={'发布时间'}
-              name={'time'}
-              rules={[{ message: '请填写发布时间', required: true }]}
-            >
-              <DatePicker />
+            <Form.Item label={'发布时间'} name={'time'} required>
+              <DatePicker style={{ width: '100%' }} />
             </Form.Item>
           </Col>
         </Row>
       </Form>
-      <div className={styles.step2}>
+      <div className={styles.tableHeader}>
         <h4>二、应用服务</h4>
-        <Button size={'small'}>封板</Button>
-        <Button size={'small'}>解除封板</Button>
-        <Button size={'small'}>移除</Button>
+        <Button size={'small'} onClick={onSeal}>
+          封板
+        </Button>
+        <Button size={'small'} onClick={onUnseal}>
+          解除封板
+        </Button>
+        <Button size={'small'} className={styles.remove} onClick={() => onDelete('server')}>
+          移除
+        </Button>
       </div>
 
       <Checkbox
@@ -168,15 +241,17 @@ const ProcessDetail = (props: any, ref: any) => {
           }}
         />
       </div>
-      <div>
-        <h4>升级接口</h4>
-        <Button>移除</Button>
+      <div className={styles.tableHeader}>
+        <h4>三、升级接口</h4>
+        <Button size={'small'} className={styles.remove} onClick={() => onDelete('interface')}>
+          移除
+        </Button>
       </div>
       <div style={{ height: 300, width: '100%' }}>
         <AgGridReact
           className="ag-theme-alpine"
           columnDefs={upgradeServicesColumn}
-          rowData={[]}
+          rowData={interfaceData}
           defaultColDef={{
             resizable: true,
             sortable: true,
@@ -185,18 +260,20 @@ const ProcessDetail = (props: any, ref: any) => {
           }}
           rowHeight={30}
           headerHeight={35}
-          onGridReady={onGridReady}
+          onGridReady={(p) => onGridReady(p, interfaceRef)}
         />
       </div>
-      <div>
+      <div className={styles.tableHeader}>
         <h4>四、数据修复/升级</h4>
-        <Button>移除</Button>
+        <Button size={'small'} className={styles.remove} onClick={() => onDelete('repaire')}>
+          移除
+        </Button>
       </div>
       <div style={{ height: 300, width: '100%' }}>
         <AgGridReact
           className="ag-theme-alpine"
           columnDefs={repaireColumn}
-          rowData={[]}
+          rowData={repaireData}
           defaultColDef={{
             resizable: true,
             sortable: true,
@@ -205,9 +282,15 @@ const ProcessDetail = (props: any, ref: any) => {
           }}
           rowHeight={30}
           headerHeight={35}
-          onGridReady={onGridReady}
+          onGridReady={(p) => onGridReady(p, repaireRef)}
         />
       </div>
+      <IPagination
+        page={pages}
+        onChange={getTableList}
+        showQuickJumper={getTableList}
+        onShowSizeChange={(size) => getTableList(1, size)}
+      />
       <div>
         <h4>五、服务确认</h4>
       </div>
@@ -215,7 +298,7 @@ const ProcessDetail = (props: any, ref: any) => {
         <AgGridReact
           className="ag-theme-alpine"
           columnDefs={serverConfirmColumn}
-          rowData={[]}
+          rowData={confirmData}
           defaultColDef={{
             resizable: true,
             sortable: true,
@@ -224,7 +307,7 @@ const ProcessDetail = (props: any, ref: any) => {
           }}
           rowHeight={30}
           headerHeight={35}
-          onGridReady={onGridReady}
+          onGridReady={(p) => onGridReady(p, confirmRef)}
         />
       </div>
       <DemandListModal

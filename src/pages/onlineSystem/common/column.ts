@@ -560,6 +560,7 @@ export const PublishSeverColumn: (ColDef | ColGroupDef)[] = [
 ];
 export const PublishUpgradeColumn: (ColDef | ColGroupDef)[] = [
   { headerName: '序号', minWidth: 110, cellRenderer: (params: any) => String(+params.node.id + 1) },
+  { headerName: '接口服务', field: 'server', minWidth: 110 },
   { headerName: '接口Method', field: 'method', minWidth: 110 },
   { headerName: '接口URL', field: 'url', minWidth: 110 },
   { headerName: 'Data', field: 'data', minWidth: 110 },

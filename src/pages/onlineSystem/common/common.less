@@ -37,13 +37,13 @@
         &:after{
           content: ' ';
           display: block;
-          width: 26px;
+          width: 20px;
           height: 100%;
           border-style: solid;
-          border-width: 13px 0 13px 24px;
+          border-width: 13px 0 13px 20px;
           border-color: transparent transparent transparent #eaf7ffd1;
           position: absolute;
-          right: -26px;
+          right: -20px;
           top: 0;
         }
       }
@@ -65,14 +65,24 @@
   }
 }
 .processDetail{
-  .step2{
+  .tableHeader{
     display: flex;
+    margin:10px 0;
     :global{
       .ant-btn{
-        &:nth-child(2){
-          border-color: orange;
+        background: transparent;
+        color:initial;
+        &:nth-of-type(1){
+          margin-left: 10px;
+        }&:nth-of-type(2){
+          border-color: #edbf6b;
+          margin: 0 8px;
         }
       }
+
+    }
+    .remove{
+      border-color: #ff8484;
     }
   }
 }

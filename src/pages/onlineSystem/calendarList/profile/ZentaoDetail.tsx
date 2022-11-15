@@ -6,8 +6,12 @@ import styles from '@/pages/onlineSystem/releaseProcess/index.less';
 import { history } from '@@/core/history';
 import { zentaoStoryColumn, zentaoTestColumn } from '@/pages/onlineSystem/common/column';
 import IPagination from '@/components/IPagination';
+import { OnlineSystemServices } from '@/services/onlineSystem';
+import { useGqlClient } from '@/hooks/index';
+import { isEmpty, groupBy } from 'lodash';
 
 const ZentaoDetail = (props: any, ref: any) => {
+  const client = useGqlClient();
   const [storyForm] = Form.useForm();
   const [testForm] = Form.useForm();
   const storyRef = useRef<GridApi>();
@@ -34,15 +38,18 @@ const ZentaoDetail = (props: any, ref: any) => {
     params.api.sizeColumnsToFit();
   };
 
-  const onRefresh = () => {
-    console.log('fresh');
-  };
-
   window.onresize = function () {
     setTableHeight((window.innerHeight - 400) / 2);
   };
-
+  const getSelectList = async () => {
+    const org = await OnlineSystemServices.getOrgList(client);
+    let source: any[] = [];
+    if (!isEmpty(org.organization)) {
+      console.log(groupBy(org.organization, 'parent'));
+    }
+  };
   useEffect(() => {
+    getSelectList();
     getTableList();
   }, []);
 
@@ -99,7 +106,7 @@ const ZentaoDetail = (props: any, ref: any) => {
   return (
     <Spin spinning={spin} tip={'数据加载中...'}>
       <div>
-        <h3>一、需求/任务/bug列表</h3>
+        <h4>一、需求/任务/bug列表</h4>
         <Form form={storyForm} size={'small'}>
           <Row justify={'space-between'} gutter={8}>
             <Col span={4}>

@@ -145,7 +145,7 @@ const DemandListModal = (props: ModalFuncProps) => {
       onOk={onConfirm}
     >
       <div>
-        <Form form={form}>
+        <Form form={form} size={'small'}>
           <Row justify={'space-between'} gutter={8}>
             <Col span={8}>
               <Form.Item

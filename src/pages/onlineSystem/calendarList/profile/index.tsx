@@ -5,6 +5,7 @@ import { PageContainer } from '@ant-design/pro-layout';
 import styles from '../../common/common.less';
 import ProcessList from './ProcessList';
 import ZentaoDetail from './ZentaoDetail';
+import { SyncOutlined } from '@ant-design/icons';
 
 const Profile = () => {
   const refreshRef = useRef() as React.MutableRefObject<{ onRefresh: Function }>;
@@ -28,7 +29,11 @@ const Profile = () => {
           className={styles.onlineTab}
           tabBarExtraContent={
             query.key == 'profile' ? (
-              <Button onClick={() => refreshRef.current?.onRefresh()}>刷新</Button>
+              <SyncOutlined
+                onClick={() => refreshRef.current?.onRefresh()}
+                title={'刷新'}
+                style={{ color: '#0079ff', fontSize: 16 }}
+              />
             ) : (
               <Fragment />
             )

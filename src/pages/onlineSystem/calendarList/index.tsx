@@ -8,6 +8,7 @@ import { calendarColumn } from '@/pages/onlineSystem/common/column';
 import { history } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
 import styles from '../common/common.less';
+import { OnlineSystemServices } from '@/services/onlineSystem';
 
 const CalendarList = () => {
   const gridRef = useRef<GridApi>();
@@ -16,12 +17,14 @@ const CalendarList = () => {
   const [rowData, setRowData] = useState<any[]>([]);
   const [spinning, setSpinning] = useState(false);
   const [gridHeight, setGridHeight] = useState(getHeight() - 60);
+  const [projects, setProjects] = useState<any[]>([]);
 
   const [pages, setPages] = useState({
     page_size: 20,
     total: 0,
     page: 1,
   });
+
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
     params.api.sizeColumnsToFit();
@@ -29,6 +32,10 @@ const CalendarList = () => {
 
   window.onresize = function () {
     setGridHeight(Number(getHeight()) - 60);
+  };
+  const getSelectList = async () => {
+    const res = await OnlineSystemServices.getProjects();
+    setProjects(res?.map((it) => ({ label: it.project_name, value: it.project_id })));
   };
 
   const getTableList = async (page = 1, page_size = 20) => {
@@ -58,6 +65,7 @@ const CalendarList = () => {
   };
 
   useEffect(() => {
+    getSelectList();
     getTableList();
   }, []);
 
@@ -73,7 +81,12 @@ const CalendarList = () => {
             </Col>
             <Col span={8}>
               <Form.Item name={'pro_ids'} label={'项目名称'}>
-                <Select options={[]} optionFilterProp={'label'} mode={'multiple'} showSearch />
+                <Select
+                  options={projects}
+                  optionFilterProp={'label'}
+                  mode={'multiple'}
+                  showSearch
+                />
               </Form.Item>
             </Col>
             <Col span={7}>

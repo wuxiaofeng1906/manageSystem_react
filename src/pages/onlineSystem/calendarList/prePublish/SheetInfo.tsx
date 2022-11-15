@@ -1,14 +1,33 @@
-import React, { forwardRef, useRef, useState, useMemo, useImperativeHandle } from 'react';
+import React, {
+  forwardRef,
+  useRef,
+  useState,
+  useMemo,
+  useImperativeHandle,
+  useEffect,
+} from 'react';
 import styles from '@/pages/onlineSystem/releaseProcess/index.less';
-import { Button, Col, DatePicker, Form, Input, Select, Spin, Row } from 'antd';
+import {
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  Select,
+  Spin,
+  Row,
+  Space,
+  Modal,
+  InputNumber,
+  ModalFuncProps,
+} from 'antd';
 import cns from 'classnames';
 import { AgGridReact } from 'ag-grid-react';
 import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
-import { history } from '@@/core/history';
 import DragIcon from '@/components/DragIcon';
 import { infoMessage } from '@/publicMethods/showMessages';
 import { useModel } from '@@/plugin-model/useModel';
 import { PublishSeverColumn, PublishUpgradeColumn } from '@/pages/onlineSystem/common/column';
+
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 
 const SheetInfo = (props: any, ref: any) => {
@@ -16,7 +35,9 @@ const SheetInfo = (props: any, ref: any) => {
   const [baseForm] = Form.useForm();
   const [orderForm] = Form.useForm();
   const [finished, setFinished] = useState(false);
-
+  const [visible, setVisible] = useState(false);
+  const [activeItem, setActiveItem] = useState<any>();
+  const [upgradeData, setUpgradeData] = useState<any[]>([]);
   const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
   const gridRef = useRef<GridApi>();
   const gridCompareRef = useRef<GridApi>();
@@ -38,6 +59,22 @@ const SheetInfo = (props: any, ref: any) => {
     gridRef.current?.forEachNode(function (node) {
       sortArr.push({ ...node.data });
     });
+  };
+  useEffect(() => {
+    getDetail();
+  }, []);
+
+  const getDetail = async () => {
+    setUpgradeData([
+      {
+        release_num: '111111',
+        server: 'basebi',
+        method: 'post',
+        url: '/basebi/',
+        tendent: '全量租户',
+        count: 20,
+      },
+    ]);
   };
   const hasPermission = useMemo(() => {
     return { save: true };
@@ -134,7 +171,7 @@ const SheetInfo = (props: any, ref: any) => {
             </Form.Item>
           </Col>
         </Form>
-        <h3>一、工单-基础设置</h3>
+        <h4>一、工单-基础设置</h4>
         <Form size={'small'} form={baseForm} className={styles.baseInfo}>
           <Row gutter={8}>
             <Col span={6}>
@@ -161,7 +198,7 @@ const SheetInfo = (props: any, ref: any) => {
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name={'cluster'} label={'工单名称'}>
+              <Form.Item name={'cluster'} label={'工单名称'} required>
                 <Input style={{ width: '100%' }} />
               </Form.Item>
             </Col>
@@ -178,13 +215,13 @@ const SheetInfo = (props: any, ref: any) => {
           </Row>
           <Row>
             <Col span={24}>
-              <Form.Item name={'ids'} label={'一键部署ID'} required={true}>
+              <Form.Item name={'ids'} label={'一键部署ID'} required>
                 <Select />
               </Form.Item>
             </Col>
           </Row>
         </Form>
-        <h3>二、发布服务</h3>
+        <h4>二、发布服务</h4>
         <div className="ag-theme-alpine" style={{ height: 180, width: '100%', marginTop: 8 }}>
           <AgGridReact
             columnDefs={PublishSeverColumn}
@@ -202,11 +239,11 @@ const SheetInfo = (props: any, ref: any) => {
             onGridSizeChanged={(r) => onGridReady(r, gridCompareRef)}
           />
         </div>
-        <h3>三、升级接口</h3>
+        <h4>三、升级接口</h4>
         <div className="ag-theme-alpine" style={{ height: 180, width: '100%', marginTop: 8 }}>
           <AgGridReact
             columnDefs={PublishUpgradeColumn}
-            rowData={[]}
+            rowData={upgradeData}
             defaultColDef={{
               resizable: true,
               filter: true,
@@ -223,32 +260,88 @@ const SheetInfo = (props: any, ref: any) => {
             onRowDragEnd={onDrag}
             frameworkComponents={{
               operation: (p: CellClickedEvent) => (
-                <div>
-                  <div
+                <Space size={8}>
+                  <img
+                    src={require('../../../../../public/edit.png')}
                     style={{
-                      color: '#1890ff',
+                      width: 18,
+                      height: 18,
                       cursor: 'pointer',
-                      width: '100%',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
                     }}
                     onClick={() => {
-                      if (!p.data.release_num) return;
-                      history.push(
-                        `/onDutyAndRelease/preRelease?releasedNum=${p.data.release_num}&history=true`,
-                      );
+                      setVisible(true);
+                      setActiveItem(p.data);
                     }}
-                  >
-                    {p.data.ready_release_name}
-                  </div>
+                  />
                   {DragIcon(p)}
-                </div>
+                  <img
+                    src={require('../../../../../public/logs.png')}
+                    style={{
+                      width: 18,
+                      height: 18,
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => {}}
+                  />
+                </Space>
               ),
             }}
           />
         </div>
+        <EditModal
+          visible={visible}
+          data={activeItem}
+          onOk={(v) => {
+            setVisible(false);
+          }}
+        />
       </div>
     </Spin>
   );
 };
 export default forwardRef(SheetInfo);
+
+const EditModal = (props: ModalFuncProps & { data: any }) => {
+  const [form] = Form.useForm();
+
+  const onConfirm = async () => {
+    const values = await form.validateFields();
+    props.onOk?.(true);
+  };
+
+  useEffect(() => {
+    if (!props.visible) {
+      form.resetFields();
+      return;
+    }
+    form.setFieldsValue(props.data);
+  }, [props.visible]);
+
+  return (
+    <Modal
+      title={'编辑-升级接口'}
+      centered
+      {...props}
+      onCancel={() => props.onOk?.()}
+      onOk={onConfirm}
+      maskClosable={false}
+      destroyOnClose
+    >
+      <Form form={form} labelCol={{ span: 6 }}>
+        <Form.Item label={'接口服务'} name={'server'}>
+          <Input disabled />
+        </Form.Item>
+        <Form.Item label={'接口Method'} name={'method'}>
+          <Input disabled />
+        </Form.Item>
+        <Form.Item
+          label={'并发数'}
+          name={'count'}
+          rules={[{ message: '请填写并发数', required: true }]}
+        >
+          <InputNumber style={{ width: '100%' }} min={0} max={99999999} />
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+};

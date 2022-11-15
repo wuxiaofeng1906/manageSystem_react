@@ -14,6 +14,7 @@ const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IPar
       <label style={{ marginLeft: 20, fontWeight: 'bold' }}> 共 {page.total} 条</label>
       <label style={{ marginLeft: 20, fontWeight: 'bold' }}>每页</label>
       <Select
+        size={'small'}
         style={{ marginLeft: 10, width: 80 }}
         onChange={onShowSizeChange}
         value={page.page_size}
@@ -67,6 +68,7 @@ const IPagination = ({ page, onChange, showQuickJumper, onShowSizeChange }: IPar
       </Button>
       <label style={{ marginLeft: 20, fontWeight: 'bold' }}> 跳转到第 </label>
       <InputNumber
+        size={'small'}
         style={{ display: 'inline-block' }}
         onBlur={(e) => {
           let current = +e.target.value;

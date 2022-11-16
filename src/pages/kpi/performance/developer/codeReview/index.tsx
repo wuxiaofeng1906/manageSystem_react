@@ -1,28 +1,36 @@
-import React, {useRef, useState} from 'react';
-import {PageContainer} from '@ant-design/pro-layout';
-import {AgGridReact} from 'ag-grid-react';
+import React, { useRef, useState } from 'react';
+import { PageContainer } from '@ant-design/pro-layout';
+import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import {useRequest} from 'ahooks';
-import {GridApi, GridReadyEvent} from 'ag-grid-community';
-import {GqlClient, useGqlClient} from '@/hooks';
+import { useRequest } from 'ahooks';
+import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GqlClient, useGqlClient } from '@/hooks';
 import {
-  getWeeksRange, getMonthWeek, getTwelveMonthTime, getFourQuarterTime, getParamsByType, getYearsTime
+  getWeeksRange,
+  getMonthWeek,
+  getTwelveMonthTime,
+  getFourQuarterTime,
+  getParamsByType,
+  getYearsTime,
 } from '@/publicMethods/timeMethods';
 
-import {Button, Drawer} from "antd";
+import { Button, Drawer } from 'antd';
 import {
-  ScheduleTwoTone, CalendarTwoTone, ProfileTwoTone, QuestionCircleTwoTone, AppstoreTwoTone
-} from "@ant-design/icons";
-import {getHeight} from "@/publicMethods/pageSet";
-import {converseFormatForAgGrid} from "../devMethod/deptDataAnalyze";
+  ScheduleTwoTone,
+  CalendarTwoTone,
+  ProfileTwoTone,
+  QuestionCircleTwoTone,
+  AppstoreTwoTone,
+} from '@ant-design/icons';
+import { getHeight } from '@/publicMethods/pageSet';
+import { converseFormatForAgGrid } from '../devMethod/deptDataAnalyze';
 
 // 获取近四周的时间范围
 const weekRanges = getWeeksRange(8);
 const monthRanges = getTwelveMonthTime();
 const quarterTime = getFourQuarterTime();
-
 
 /* region 列的定义和渲染 */
 
@@ -31,7 +39,6 @@ const dataRender = (params: any) => {
   const node = params.data;
 
   if (params.value) {
-
     if (node && node.isDept === true) {
       return `<span style="font-weight: bold"> ${params.value}</span>`;
     }
@@ -44,8 +51,7 @@ const dataRender = (params: any) => {
   }
 
   return `<span style="color: silver"> ${0}</span>`;
-
-}
+};
 
 const columsForWeeks = () => {
   const component = new Array();
@@ -55,9 +61,8 @@ const columsForWeeks = () => {
     component.push({
       headerName: weekName,
       field: starttime.toString(),
-      cellRenderer: dataRender
+      cellRenderer: dataRender,
     });
-
   }
   return component;
 };
@@ -68,10 +73,8 @@ const columsForMonths = () => {
     component.push({
       headerName: monthRanges[index].title,
       field: monthRanges[index].start,
-      cellRenderer: dataRender
+      cellRenderer: dataRender,
     });
-
-
   }
   return component;
 };
@@ -82,7 +85,7 @@ const columsForQuarters = () => {
     component.push({
       headerName: quarterTime[index].title,
       field: quarterTime[index].start,
-      cellRenderer: dataRender
+      cellRenderer: dataRender,
     });
   }
   return component;
@@ -95,9 +98,8 @@ const columsForYears = () => {
     component.push({
       headerName: yearsTime[index].title,
       field: yearsTime[index].start,
-      cellRenderer: dataRender
+      cellRenderer: dataRender,
     });
-
   }
   return component;
 };
@@ -112,7 +114,7 @@ const queryCodeReviewCount = async (client: GqlClient<object>, params: string) =
     return [];
   }
 
-  const {data} = await client.query(`
+  const { data } = await client.query(`
       {
         codeReviewDept(kind:"${condition.typeFlag}",ends:${condition.ends}){
           total {
@@ -159,13 +161,10 @@ const queryCodeReviewCount = async (client: GqlClient<object>, params: string) =
 /* endregion */
 
 const CodeReviewTableList: React.FC<any> = () => {
-
   /* region ag-grid */
   const gridApi = useRef<GridApi>();
   const gqlClient = useGqlClient();
-  const {data, loading} = useRequest(() =>
-    queryCodeReviewCount(gqlClient, 'quarter'),
-  );
+  const { data, loading } = useRequest(() => queryCodeReviewCount(gqlClient, 'quarter'));
   const onGridReady = (params: GridReadyEvent) => {
     gridApi.current = params.api;
     params.api.sizeColumnsToFit();
@@ -193,7 +192,6 @@ const CodeReviewTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs(weekColums);
     const datas: any = await queryCodeReviewCount(gqlClient, 'week');
     gridApi.current?.setRowData(datas);
-
   };
 
   // 按月统计
@@ -204,7 +202,6 @@ const CodeReviewTableList: React.FC<any> = () => {
     gridApi.current?.setColumnDefs(monthColums);
     const datas: any = await queryCodeReviewCount(gqlClient, 'month');
     gridApi.current?.setRowData(datas);
-
   };
 
   // 按季度统计
@@ -237,25 +234,60 @@ const CodeReviewTableList: React.FC<any> = () => {
     setVisible(false);
   };
 
-  const cssIndent = {textIndent: '2em'};
+  const cssIndent = { textIndent: '2em' };
 
   /* endregion */
 
   return (
     <PageContainer>
-      <div style={{background: 'white'}}>
-        <Button type="text" style={{color: 'black'}} icon={<ProfileTwoTone/>} size={'large'}
-                onClick={statisticsByWeeks}>按周统计</Button>
-        <Button type="text" style={{color: 'black'}} icon={<CalendarTwoTone/>} size={'large'}
-                onClick={statisticsByMonths}>按月统计</Button>
-        <Button type="text" style={{color: 'black'}} icon={<ScheduleTwoTone/>} size={'large'}
-                onClick={statisticsByQuarters}>按季统计</Button>
-        <Button type="text" style={{color: 'black'}} icon={<AppstoreTwoTone/>} size={'large'}
-                onClick={statisticsByYear}>按年统计</Button>
-        <Button type="text" style={{color: '#1890FF', float: 'right'}} icon={<QuestionCircleTwoTone/>}
-                size={'large'} onClick={showRules}>计算规则</Button>
+      <div style={{ background: 'white' }}>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<ProfileTwoTone />}
+          size={'large'}
+          onClick={statisticsByWeeks}
+        >
+          按周统计
+        </Button>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<CalendarTwoTone />}
+          size={'large'}
+          onClick={statisticsByMonths}
+        >
+          按月统计
+        </Button>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<ScheduleTwoTone />}
+          size={'large'}
+          onClick={statisticsByQuarters}
+        >
+          按季统计
+        </Button>
+        <Button
+          type="text"
+          style={{ color: 'black' }}
+          icon={<AppstoreTwoTone />}
+          size={'large'}
+          onClick={statisticsByYear}
+        >
+          按年统计
+        </Button>
+        <Button
+          type="text"
+          style={{ color: '#1890FF', float: 'right' }}
+          icon={<QuestionCircleTwoTone />}
+          size={'large'}
+          onClick={showRules}
+        >
+          计算规则
+        </Button>
       </div>
-      <div className="ag-theme-alpine" style={{height: gridHeight, width: '100%'}}>
+      <div className="ag-theme-alpine" style={{ height: gridHeight, width: '100%' }}>
         <AgGridReact
           columnDefs={columsForQuarters()} // 定义列
           rowData={data} // 数据绑定
@@ -264,16 +296,15 @@ const CodeReviewTableList: React.FC<any> = () => {
             sortable: true,
             filter: true,
             flex: 1,
-            suppressMenu: true
+            suppressMenu: true,
           }}
           autoGroupColumnDef={{
             minWidth: 280,
             headerName: '部门-人员',
-            cellRendererParams: {suppressCount: true},
+            cellRendererParams: { suppressCount: true },
             pinned: 'left',
-            suppressMenu: false
+            suppressMenu: false,
           }}
-
           rowHeight={32}
           headerHeight={35}
           onGridReady={onGridReady}
@@ -283,22 +314,30 @@ const CodeReviewTableList: React.FC<any> = () => {
           getDataPath={(source: any) => {
             return source.Group;
           }}
-        >
-        </AgGridReact>
+        ></AgGridReact>
       </div>
 
       <div>
-        <Drawer title={<label style={{"fontWeight": 'bold', fontSize: 20}}>计算规则</label>} placement="right" width={300}
-                closable={false} onClose={onClose} visible={messageVisible}>
-          <p><strong>1.统计周期</strong></p>
-          <p style={cssIndent}>按周统计：任务完成日期为周一00:00:00--周日23:59:59；</p>
-          <p style={cssIndent}>按月统计：任务完成日期为每月1号00:00:00--每月最后1天23:59:59；</p>
-          <p style={cssIndent}>按季统计：任务完成日期为每季第一个月1号00:00:00--每季第三个月最后1天23:59:59；</p>
-          <p><strong>2.统计项</strong></p>
-          <p style={cssIndent}>任务标题含“code review”字样，大小写均可，由谁完成为开发的；</p>
+        <Drawer
+          title={<label style={{ fontWeight: 'bold', fontSize: 20 }}>计算规则</label>}
+          placement="right"
+          width={300}
+          closable={false}
+          onClose={onClose}
+          visible={messageVisible}
+        >
+          <p>
+            <strong>1.统计范围</strong>
+          </p>
+          <p style={cssIndent}>
+            产品为‘1.0产品经理’，任务类型为'CodeReview'，任务状态为’已完成‘或已关闭，且是主任务，且任务未删除；
+          </p>
+          <p>
+            <strong>2.计算规则</strong>
+          </p>
+          <p style={cssIndent}>该周期该部门CodeReview次数 = SUM(该部门所有CodeReview次数)</p>
         </Drawer>
       </div>
-
     </PageContainer>
   );
 };

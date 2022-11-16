@@ -583,6 +583,8 @@ const StatisticServices = {
             date
             count
             recordNum
+            days
+            kpi
           }
         }
       }

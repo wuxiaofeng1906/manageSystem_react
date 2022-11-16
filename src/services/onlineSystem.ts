@@ -5,6 +5,9 @@ export const OnlineSystemServices = {
   async getProjects() {
     return request(`${baseUrl}/duty/project`);
   },
+  async getEnvs() {
+    return request(`${baseUrl}/release/online_environment`);
+  },
   async getOrgList(client: GqlClient<object>) {
     const { data } = await client.query(`
       {

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin } from 'antd';
 import { useModel } from 'umi';
 import styles from './DemandListModal.less';
+import { OnlineSystemServices } from '@/services/onlineSystem';
 
 const DemandListModal = (props: ModalFuncProps) => {
   const [form] = Form.useForm();
@@ -9,12 +10,20 @@ const DemandListModal = (props: ModalFuncProps) => {
   const [list, setList] = useState<any[]>([]);
   const [spin, setSpin] = useState(false);
   const [selected, setSelected] = useState<any[]>([]);
+  const [envs, setEnvs] = useState<any[]>([]);
 
   useEffect(() => {
     if (props.visible) return;
+    getSelectList();
     getTableList();
   }, [props.visible]);
 
+  const getSelectList = async () => {
+    const res = await OnlineSystemServices.getEnvs();
+    setEnvs(
+      res?.map((it) => ({ label: it.online_environment_name, value: it.online_environment_id })),
+    );
+  };
   const getTableList = async () => {
     setSpin(true);
     try {
@@ -31,6 +40,35 @@ const DemandListModal = (props: ModalFuncProps) => {
           create_pm: '张三',
           point_pm: '李四',
           id: '20221111',
+          type: 'stage-patch',
+        },
+        {
+          name: 'stage-patch20221110',
+          num: 1120,
+          title: '预算方案改进',
+          phase: '测试完',
+          server: 'global',
+          update: 'yes',
+          recovery: 'no',
+          hot: 'yes',
+          create_pm: '张三',
+          point_pm: '李四',
+          id: '1111',
+          type: 'global',
+        },
+        {
+          name: 'stage-patch20221117',
+          num: 1120,
+          title: '预算方案改进',
+          phase: '测试完',
+          server: 'h5',
+          update: 'yes',
+          recovery: 'no',
+          hot: 'yes',
+          create_pm: '张三',
+          point_pm: '李四',
+          id: '1111',
+          type: 'emergency',
         },
       ]);
       setSpin(false);
@@ -43,9 +81,14 @@ const DemandListModal = (props: ModalFuncProps) => {
     const values = await form.validateFields();
     props.onOk?.(true);
   };
+  const onChange = (v: string) => {
+    form.setFieldsValue({
+      cluster: v == 'global' ? ['global'] : ['0'],
+    });
+  };
 
   const memoColumn = useMemo(() => {
-    const flag = list.every((it) => ['stage-patch', 'emergency'].includes(it.name));
+    const flag = list.every((it) => ['stage-patch', 'emergency'].includes(it.type));
     if (flag)
       return [
         {
@@ -153,38 +196,60 @@ const DemandListModal = (props: ModalFuncProps) => {
                 label={'发布环境类型'}
                 rules={[{ required: true, message: '请选择发布环境' }]}
               >
-                <Select />
+                <Select
+                  placeholder={'发布环境类型'}
+                  options={[
+                    { label: 'global集群', value: 'global' },
+                    { label: '租户集群发布', value: 'tenant' },
+                  ]}
+                  onChange={onChange}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item noStyle shouldUpdate={(old, next) => old.env !== next.env}>
+                {({ getFieldValue }) => {
+                  const env = getFieldValue('env');
+                  return (
+                    <Form.Item
+                      name={'cluster'}
+                      label={'发布集群'}
+                      rules={[{ required: true, message: '请选择发布集群' }]}
+                    >
+                      <Select
+                        mode={'multiple'}
+                        options={envs}
+                        disabled={env == 'global'}
+                        placeholder={'发布集群'}
+                      />
+                    </Form.Item>
+                  );
+                }}
               </Form.Item>
             </Col>
             <Col span={8}>
               <Form.Item
-                name={'cluster'}
-                label={'发布集群'}
-                rules={[{ required: true, message: '请选择发布集群' }]}
-              >
-                <Select mode={'multiple'} />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item
-                name={'cluster'}
+                name={'clusters'}
                 label={'镜像环境绑定'}
                 rules={[{ required: true, message: '请选择镜像环境绑定' }]}
               >
-                <Select showSearch />
+                <Select showSearch options={[]} placeholder={'镜像环境绑定'} />
               </Form.Item>
             </Col>
           </Row>
         </Form>
         <Table
+          pagination={false}
           columns={memoColumn}
           rowKey={(p) => p.id}
           dataSource={list}
           rowSelection={{
             selectedRowKeys: selected,
             onChange: (selectedRowKeys) => setSelected(selectedRowKeys),
+            getCheckboxProps: (record) => ({
+              disabled: form.getFieldValue('env') == 'global' ? record.type !== 'global' : false,
+            }),
           }}
-          pagination={false}
         />
         <p style={{ marginTop: 8 }}>提示：如本次发布不涉及的需求，请将对应需求前勾选的复选框去掉</p>
       </div>

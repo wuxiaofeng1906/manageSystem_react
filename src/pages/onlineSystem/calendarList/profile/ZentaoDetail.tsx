@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
-import { Form, Select, Row, Col, Spin } from 'antd';
+import { Form, Select, Row, Col, Spin, TreeSelect } from 'antd';
 import { AgGridReact } from 'ag-grid-react';
 import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
-import styles from '@/pages/onlineSystem/releaseProcess/index.less';
-import { history } from '@@/core/history';
 import { zentaoStoryColumn, zentaoTestColumn } from '@/pages/onlineSystem/common/column';
 import IPagination from '@/components/IPagination';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 import { useGqlClient } from '@/hooks/index';
-import { isEmpty, groupBy } from 'lodash';
+import { isEmpty } from 'lodash';
+import { ZentaoPhase, ZentaoStatus, ZentaoType } from '../../common/constant';
+import styles from '../../common/common.less';
 
 const ZentaoDetail = (props: any, ref: any) => {
   const client = useGqlClient();
@@ -20,6 +20,8 @@ const ZentaoDetail = (props: any, ref: any) => {
   const [testData, setTestData] = useState<any[]>([]);
   const [tableHeight, setTableHeight] = useState((window.innerHeight - 400) / 2);
   const [spin, setSpin] = useState(false);
+  const [orgTree, setOrgTree] = useState<any[]>([]);
+
   const [pages, setPages] = useState({
     page_size: 20,
     total: 0,
@@ -42,12 +44,27 @@ const ZentaoDetail = (props: any, ref: any) => {
     setTableHeight((window.innerHeight - 400) / 2);
   };
   const getSelectList = async () => {
-    const org = await OnlineSystemServices.getOrgList(client);
     let source: any[] = [];
+    const fn = (arr: any[], origin: any[]) => {
+      if (!isEmpty(arr)) {
+        arr.forEach((it) => {
+          const children = origin
+            .filter((o: any) => it.value == o.parent)
+            ?.map((o) => ({ title: o.name, value: o.id, key: o.id, parent: o.parent }));
+          it.children = children;
+          fn(children, origin);
+        });
+      }
+    };
+    const org = await OnlineSystemServices.getOrgList(client);
     if (!isEmpty(org.organization)) {
-      console.log(groupBy(org.organization, 'parent'));
+      const node = org.organization.find((it: any) => it.id == 59);
+      source.push({ title: node.name, value: node.id, key: node.id, parent: node.parent });
+      fn(source, org.organization);
     }
+    setOrgTree(source);
   };
+
   useEffect(() => {
     getSelectList();
     getTableList();
@@ -65,7 +82,7 @@ const ZentaoDetail = (props: any, ref: any) => {
       // });
       setStoryData([
         {
-          name: '1',
+          type: 'bug',
           num: '6172',
           phase: '1',
           execution: '笑果文化',
@@ -82,7 +99,7 @@ const ZentaoDetail = (props: any, ref: any) => {
           execution: '笑果文化',
           name: '笑果文化第一轮测试',
           version: '笑果文化第一轮测试',
-          status: '进行中',
+          status: 'active',
           pm: '邓九州',
           total: 23,
           passNum: 13,
@@ -105,43 +122,69 @@ const ZentaoDetail = (props: any, ref: any) => {
 
   return (
     <Spin spinning={spin} tip={'数据加载中...'}>
-      <div>
+      <div className={styles.zentaoDetail}>
         <h4>一、需求/任务/bug列表</h4>
-        <Form form={storyForm} size={'small'}>
+        <Form form={storyForm} size={'small'} className={styles.resetForm} labelCol={{ span: 4 }}>
           <Row justify={'space-between'} gutter={8}>
-            <Col span={4}>
+            <Col span={8}>
               <Form.Item label={'部门/组'} name={'orgs'}>
-                <Select options={[]} mode={'multiple'} showSearch />
+                <TreeSelect
+                  treeDefaultExpandedKeys={[59]}
+                  treeData={orgTree}
+                  showSearch
+                  treeCheckable
+                  multiple
+                  showCheckedStrategy={'SHOW_ALL'}
+                  style={{ width: '100%' }}
+                  filterTreeNode={(inputValue: string, treeNode: any) =>
+                    !!treeNode.title.includes(inputValue)
+                  }
+                />
               </Form.Item>
             </Col>
-            <Col span={4}>
+            <Col span={8}>
               <Form.Item label={'归属执行'} name={'execution'}>
                 <Select options={[]} mode={'multiple'} showSearch />
               </Form.Item>
             </Col>
-            <Col span={4}>
+            <Col span={8}>
               <Form.Item label={'类型'} name={'type'}>
-                <Select options={[]} mode={'multiple'} showSearch />
+                <Select
+                  options={Object.keys(ZentaoType).map((key) => ({
+                    label: ZentaoType[key],
+                    value: key,
+                  }))}
+                  mode={'multiple'}
+                  showSearch
+                />
               </Form.Item>
             </Col>
-            <Col span={4}>
+          </Row>
+          <Row gutter={8}>
+            <Col span={8}>
               <Form.Item label={'阶段'} name={'phase'}>
-                <Select options={[]} mode={'multiple'} showSearch />
+                <Select
+                  options={Object.keys(ZentaoPhase).map((it) => ({
+                    label: ZentaoPhase[it],
+                    value: it,
+                  }))}
+                  mode={'multiple'}
+                  showSearch
+                />
               </Form.Item>
             </Col>
-            <Col span={4}>
+            <Col span={8}>
               <Form.Item label={'编号'} name={'num'}>
                 <Select options={[]} mode={'multiple'} showSearch />
               </Form.Item>
             </Col>
-            <Col span={4}>
+            <Col span={8}>
               <Form.Item label={'指派给'} name={'assignedTo'}>
                 <Select options={[]} mode={'multiple'} showSearch />
               </Form.Item>
             </Col>
           </Row>
         </Form>
-
         <div className="ag-theme-alpine" style={{ height: tableHeight, width: '100%' }}>
           <AgGridReact
             columnDefs={zentaoStoryColumn}
@@ -169,11 +212,10 @@ const ZentaoDetail = (props: any, ref: any) => {
                     }}
                     className={styles.links}
                     onClick={() => {
-                      let href = `/onDutyAndRelease/preRelease?releasedNum=${p.data.release_num}`;
-                      if (p.data.release_type == 'backlog_release') {
-                        href = `/onDutyAndRelease/releaseOrder/${p.data.release_num}`;
-                      }
-                      history.push(href);
+                      const href = `zentao.77hub.com/zentao/${
+                        p.data.type == 'bug' ? 'bug' : 'story'
+                      }-view-${p.data.ztno}.html`;
+                      window.open(href);
                     }}
                   >
                     {p.value}
@@ -189,7 +231,7 @@ const ZentaoDetail = (props: any, ref: any) => {
           showQuickJumper={getTableList}
           onShowSizeChange={(size) => getTableList(1, size)}
         />
-        <Form form={testForm} size={'small'}>
+        <Form form={testForm} size={'small'} className={styles.resetForm}>
           <Row justify={'space-between'} gutter={8}>
             <Col span={8}>
               <Form.Item label={'归属执行'} name={'execution'}>
@@ -203,7 +245,14 @@ const ZentaoDetail = (props: any, ref: any) => {
             </Col>
             <Col span={8}>
               <Form.Item label={'状态'} name={'phase'}>
-                <Select options={[]} mode={'multiple'} showSearch />
+                <Select
+                  options={Object.keys(ZentaoStatus).map((it) => ({
+                    label: ZentaoStatus[it],
+                    value: it,
+                  }))}
+                  mode={'multiple'}
+                  showSearch
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -235,11 +284,8 @@ const ZentaoDetail = (props: any, ref: any) => {
                     }}
                     className={styles.links}
                     onClick={() => {
-                      let href = `/onDutyAndRelease/preRelease?releasedNum=${p.data.release_num}`;
-                      if (p.data.release_type == 'backlog_release') {
-                        href = `/onDutyAndRelease/releaseOrder/${p.data.release_num}`;
-                      }
-                      history.push(href);
+                      const href = `zentao.77hub.com/zentao/testtask-cases-2417.html`;
+                      window.open(href);
                     }}
                   >
                     {p.value}

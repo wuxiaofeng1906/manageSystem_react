@@ -3,16 +3,33 @@
   padding: 15px 10px 10px;
   background: white;
 }
-:global{
-  .row-span {
-    background-color: transparent;
-    border-bottom: 1px solid lightgrey !important;
-  }
-}
 .profileAndProcess{
   padding: 10px;
   background: white;
 }
+
+.processDetail{
+  .tableHeader{
+    display: flex;
+    margin:10px 0;
+    :global{
+      .ant-btn{
+        background: transparent;
+        color:initial;
+        &:nth-of-type(1){
+          margin-left: 10px;
+        }&:nth-of-type(2){
+          border-color: #edbf6b;
+          margin: 0 8px;
+        }
+      }
+    }
+    .remove{
+      border-color: #ff8484;
+    }
+  }
+}
+
 .onlineTab{
   :global{
     .ant-tabs-nav{
@@ -64,25 +81,10 @@
     }
   }
 }
-.processDetail{
-  .tableHeader{
-    display: flex;
-    margin:10px 0;
-    :global{
-      .ant-btn{
-        background: transparent;
-        color:initial;
-        &:nth-of-type(1){
-          margin-left: 10px;
-        }&:nth-of-type(2){
-          border-color: #edbf6b;
-          margin: 0 8px;
-        }
-      }
-
-    }
-    .remove{
-      border-color: #ff8484;
+.resetForm{
+  :global{
+    .ant-form-item {
+      margin-bottom: 8px;
     }
   }
 }

@@ -1,5 +1,33 @@
 export const WhetherOrNot = { yes: '是', no: '否' };
 export const TechnicalSide = { backend: '后端', front: '前端', frontBackend: '前后端' };
+export const ZentaoPhase = {
+  1: '未开始',
+  2: '开发中',
+  3: '开发完',
+  4: '已提测',
+  5: '测试中',
+  6: 'TE测试环境已验过',
+  7: 'UED测试环境已验过',
+  8: '已取消',
+  9: '开发已revert',
+  10: '测试已验证revert',
+  11: '灰度已验过',
+  12: '线上已验过',
+};
+export const ZentaoType = { bug: 'Bug', story: 'Story', B_story: 'B_Story', task: 'Task' };
+export const ZentaoStatus = {
+  active: '激活',
+  closed: '已关闭',
+  verified: '已验证',
+  resolved: '已解决',
+  wait: '未开始',
+  doing: '进行中',
+  done: '已完成',
+  pause: '已暂停',
+  cancel: '已取消',
+  changed: '已更改',
+  draft: '已草拟',
+};
 export const checkInfo = [
   {
     check_type: '前端单元测试运行是否通过',

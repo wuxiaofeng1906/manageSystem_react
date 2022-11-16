@@ -1,5 +1,6 @@
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import type { ColumnsType } from 'antd/lib/table';
+import { ZentaoPhase, ZentaoStatus, ZentaoType } from '@/pages/onlineSystem/common/constant';
 export const calendarColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
@@ -108,8 +109,9 @@ export const zentaoStoryColumn: (ColDef | ColGroupDef)[] = [
   },
   {
     headerName: '类型',
-    field: 'name',
+    field: 'type',
     minWidth: 120,
+    valueFormatter: (p) => ZentaoType[p.value] ?? '',
   },
   {
     headerName: '编号',
@@ -121,6 +123,7 @@ export const zentaoStoryColumn: (ColDef | ColGroupDef)[] = [
     headerName: '阶段',
     field: 'phase',
     minWidth: 110,
+    valueFormatter: (p) => ZentaoPhase[p.value] ?? '',
   },
   {
     headerName: '执行名称',
@@ -186,6 +189,7 @@ export const zentaoTestColumn: (ColDef | ColGroupDef)[] = [
     headerName: '状态',
     field: 'status',
     minWidth: 130,
+    valueFormatter: (p) => ZentaoStatus[p.value] ?? '',
   },
   {
     headerName: '负责人',
@@ -206,11 +210,13 @@ export const zentaoTestColumn: (ColDef | ColGroupDef)[] = [
     headerName: '阻塞用例数',
     field: 'blockNum',
     minWidth: 110,
+    cellStyle: { color: 'red' },
   },
   {
     headerName: '失败用例数',
     field: 'failNum',
     minWidth: 110,
+    cellStyle: { color: 'red' },
   },
   {
     headerName: '未执行用例数',

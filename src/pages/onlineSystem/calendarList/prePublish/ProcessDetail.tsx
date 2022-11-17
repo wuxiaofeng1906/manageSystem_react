@@ -144,43 +144,48 @@ const ProcessDetail = (props: any, ref: any) => {
   return (
     <div className={styles.processDetail}>
       <h4>一、基础信息</h4>
-      <Form size={'small'}>
+      <Form size={'small'} className={styles.resetForm}>
         <Row justify={'space-between'} gutter={8}>
-          <Col span={12}>
+          <Col span={10}>
             <Form.Item label={'批次名称'} name={'name'} required>
-              <Input />
+              <Input placeholder={'批次名称'} />
             </Form.Item>
           </Col>
-          <Col span={12}>
+          <Col span={14}>
             <Form.Item label={'发布项目'} name={'project'}>
-              <Select disabled />
+              <Select disabled placeholder={'发布项目'} />
             </Form.Item>
           </Col>
         </Row>
         <Row justify={'space-between'} gutter={8}>
-          <Col span={6}>
+          <Col span={5}>
             <Form.Item label={'上线分支'} name={'branch'}>
-              <Select disabled />
+              <Select disabled placeholder={'上线分支'} />
             </Form.Item>
           </Col>
-          <Col span={6}>
+          <Col span={5}>
             <Form.Item label={'发布集群类型'} name={'cluster'}>
-              <Select disabled />
+              <Select disabled placeholder={'发布集群类型'} />
             </Form.Item>
           </Col>
           <Col span={4}>
             <Form.Item label={'发布集群'} name={'env'}>
-              <Select disabled />
+              <Select disabled placeholder={'发布集群'} />
             </Form.Item>
           </Col>
-          <Col span={4}>
+          <Col span={5}>
             <Form.Item label={'镜像环境绑定'} name={'online_env'} required>
-              <Select />
+              <Select placeholder={'镜像环境绑定'} />
             </Form.Item>
           </Col>
-          <Col span={4}>
+          <Col span={5}>
             <Form.Item label={'发布时间'} name={'time'} required>
-              <DatePicker style={{ width: '100%' }} />
+              <DatePicker
+                style={{ width: '100%' }}
+                placeholder={'发布时间'}
+                showTime
+                format="YYYY-MM-DD HH:mm"
+              />
             </Form.Item>
           </Col>
         </Row>
@@ -197,9 +202,9 @@ const ProcessDetail = (props: any, ref: any) => {
           移除
         </Button>
       </div>
-
       <Checkbox
         checked={checked}
+        style={{ marginLeft: 8 }}
         onChange={({ target }) => {
           setSelectedRowKeys(target.checked ? serverData : []);
           setChecked(target.checked);
@@ -223,8 +228,7 @@ const ProcessDetail = (props: any, ref: any) => {
           dataSource={memoGroup.table}
           columns={preServerColumn}
           pagination={false}
-          scroll={{ y: 400, x: 300 }}
-          style={{ wordBreak: 'keep-all' }}
+          scroll={{ y: 400, x: 1200 }}
           rowSelection={{
             selectedRowKeys: selectedRowKeys?.map((it) => it.release_num),
             onChange: (v, arr) => {

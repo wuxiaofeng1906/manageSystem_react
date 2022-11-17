@@ -1,6 +1,9 @@
 import type { ColDef, ColGroupDef } from 'ag-grid-community/dist/lib/entities/colDef';
 import type { ColumnsType } from 'antd/lib/table';
 import { ZentaoPhase, ZentaoStatus, ZentaoType } from '@/pages/onlineSystem/common/constant';
+import Ellipsis from '@/components/Elipsis';
+import React from 'react';
+
 export const calendarColumn: (ColDef | ColGroupDef)[] = [
   {
     headerName: '序号',
@@ -255,52 +258,64 @@ export const preServerColumn: ColumnsType<any> = [
     title: '应用',
     dataIndex: 'applicant',
     onCell: (v) => ({ rowSpan: v?.rowSpan ?? 1 }),
-    fixed: 'left',
+    width: 100,
   },
   {
     title: '项目名称',
     dataIndex: 'project_name',
-    fixed: 'left',
+    width: 140,
+    ellipsis: { showTitle: false },
+    render: (v) => <Ellipsis title={v} width={140} placement={'bottomLeft'} color={'#108ee9'} />,
   },
   {
     title: '是否封板',
     dataIndex: 'env',
+    width: 120,
   },
   {
     title: '封板/封板人',
     dataIndex: 'branch',
+    width: 120,
   },
   {
     title: '封板/封板时间',
     dataIndex: 'time',
+    width: 120,
   },
   {
     title: '需求编号',
     dataIndex: 'num',
+    width: 120,
   },
   {
     title: '需求标题',
     dataIndex: 'title',
+    width: 120,
   },
   {
     title: '是否涉及数据update',
     dataIndex: 'update',
+    width: 150,
   },
   {
     title: '是否涉及数据Recovery',
     dataIndex: 'recovery',
+    width: 160,
   },
   {
     title: '是否可热更',
     dataIndex: 'hot',
+    width: 120,
   },
   {
     title: '需求创建人',
     dataIndex: 'create_pm',
+    width: 120,
   },
   {
     title: '需求指派人',
     dataIndex: 'point_pm',
+    width: 120,
   },
 ];
 // 升级接口

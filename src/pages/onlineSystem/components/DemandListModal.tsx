@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin } from 'antd';
+import { Modal, ModalFuncProps, Table, Select, Form, Col, Row, Spin, Checkbox } from 'antd';
 import { useModel } from 'umi';
 import styles from './DemandListModal.less';
 import { OnlineSystemServices } from '@/services/onlineSystem';
@@ -13,7 +13,11 @@ const DemandListModal = (props: ModalFuncProps) => {
   const [envs, setEnvs] = useState<any[]>([]);
 
   useEffect(() => {
-    if (props.visible) return;
+    if (props.visible) {
+      form.resetFields();
+      setSelected([]);
+      return;
+    }
     getSelectList();
     getTableList();
   }, [props.visible]);
@@ -40,7 +44,8 @@ const DemandListModal = (props: ModalFuncProps) => {
           create_pm: '张三',
           point_pm: '李四',
           id: '20221111',
-          type: 'stage-patch',
+          type: 'tenant',
+          disabled: false,
         },
         {
           name: 'stage-patch20221110',
@@ -53,8 +58,9 @@ const DemandListModal = (props: ModalFuncProps) => {
           hot: 'yes',
           create_pm: '张三',
           point_pm: '李四',
-          id: '1111',
+          id: '111133',
           type: 'global',
+          disabled: false,
         },
         {
           name: 'stage-patch20221117',
@@ -68,7 +74,8 @@ const DemandListModal = (props: ModalFuncProps) => {
           create_pm: '张三',
           point_pm: '李四',
           id: '1111',
-          type: 'emergency',
+          type: 'tenant',
+          disabled: false,
         },
       ]);
       setSpin(false);
@@ -82,13 +89,15 @@ const DemandListModal = (props: ModalFuncProps) => {
     props.onOk?.(true);
   };
   const onChange = (v: string) => {
+    setSelected([]);
     form.setFieldsValue({
       cluster: v == 'global' ? ['global'] : ['0'],
     });
+    setList(list.map((it) => ({ ...it, disabled: it.type !== v })));
   };
 
   const memoColumn = useMemo(() => {
-    const flag = list.every((it) => ['stage-patch', 'emergency'].includes(it.type));
+    const flag = list.every((it) => ['stage-patch', 'emergency'].includes(it.server));
     if (flag)
       return [
         {
@@ -246,9 +255,7 @@ const DemandListModal = (props: ModalFuncProps) => {
           rowSelection={{
             selectedRowKeys: selected,
             onChange: (selectedRowKeys) => setSelected(selectedRowKeys),
-            getCheckboxProps: (record) => ({
-              disabled: form.getFieldValue('env') == 'global' ? record.type !== 'global' : false,
-            }),
+            getCheckboxProps: (record) => ({ disabled: record.disabled }),
           }}
         />
         <p style={{ marginTop: 8 }}>提示：如本次发布不涉及的需求，请将对应需求前勾选的复选框去掉</p>

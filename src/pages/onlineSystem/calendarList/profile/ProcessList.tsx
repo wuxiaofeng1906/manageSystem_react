@@ -9,6 +9,8 @@ import DemandListModal from '@/pages/onlineSystem/components/DemandListModal';
 const ProcessList = () => {
   const gridRef = useRef<GridApi>();
   const [showModal, setShowModal] = useState(false);
+  const [tableHeight, setTableHeight] = useState(window.innerHeight - 300);
+
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
     params.api.sizeColumnsToFit();
@@ -17,13 +19,16 @@ const ProcessList = () => {
     console.log(v);
     setShowModal(false);
   };
+  window.onresize = function () {
+    setTableHeight(window.innerHeight - 300);
+  };
 
   return (
     <div>
       <Button size={'small'} onClick={(e) => setShowModal(true)}>
         新增发布过程
       </Button>
-      <div className="ag-theme-alpine" style={{ height: 300, width: '100%', marginTop: 8 }}>
+      <div className="ag-theme-alpine" style={{ height: tableHeight, width: '100%', marginTop: 8 }}>
         <AgGridReact
           columnDefs={preProcessColumn}
           rowData={[{ name: '202209190001灰度发布', release_num: '202209190001' }]}

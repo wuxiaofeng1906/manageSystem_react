@@ -1,4 +1,4 @@
-import React, { useImperativeHandle, useState, forwardRef, useEffect } from 'react';
+import React, { useImperativeHandle, useState, forwardRef, useEffect, useCallback } from 'react';
 import {
   Table,
   Switch,
@@ -11,14 +11,17 @@ import {
   ModalFuncProps,
   Button,
 } from 'antd';
-import { checkInfo } from '@/pages/onlineSystem/common/constant';
+import { checkInfo, CheckStatus } from '@/pages/onlineSystem/common/constant';
 import styles from '../../common/common.less';
 import { isEmpty } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
+import Ellipsis from '@/components/Elipsis';
+import { mergeCellsTable } from '@/utils/utils';
 
 const Check = (props: any, ref: any) => {
   const [spin, setSpin] = useState(false);
-  const [selected, setSelected] = useState([]);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [list, setList] = useState(checkInfo);
   const [visible, setVisible] = useState(false);
 
   useImperativeHandle(
@@ -29,8 +32,9 @@ const Check = (props: any, ref: any) => {
       onSetting: () => setVisible(true),
       onLock: onLock,
     }),
-    [],
+    [selected, ref],
   );
+
   const onCheck = async () => {
     if (isEmpty(selected)) return infoMessage('请先选择检查项！');
   };
@@ -42,32 +46,110 @@ const Check = (props: any, ref: any) => {
      */
   };
 
-  const getDetail = async () => {};
+  const getDetail = async () => {
+    setList(
+      mergeCellsTable(
+        list.map((it) => ({ ...it, disabled: !it.open })),
+        'side',
+      ),
+    );
+  };
 
   useEffect(() => {
     getDetail();
   }, []);
+
   return (
     <Spin spinning={spin} tip={'数据加载中...'}>
-      <div className={styles.onlineTable}>
+      <div className={styles.onlineTable} style={{ height: '100%' }}>
         <Table
+          size="small"
+          bordered
           columns={[
-            { title: '序号', dataIndex: 'num', render: (_, r, i) => i + 1 },
-            { title: '检查类别', dataIndex: 'check_type' },
-            { title: '所属端', dataIndex: 'side' },
-            { title: '检查状态', dataIndex: 'status' },
-            { title: '检查开始时间', dataIndex: 'start_time' },
-            { title: '检查结束时间', dataIndex: 'end_time' },
+            {
+              title: '序号',
+              dataIndex: 'num',
+              width: 60,
+              align: 'center',
+              render: (_, r, i) => i + 1,
+            },
+            {
+              title: '检查类别',
+              dataIndex: 'check_type',
+              width: '24%',
+              render: (v) => (
+                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+              ),
+            },
+            {
+              title: '所属端',
+              dataIndex: 'side',
+              width: 90,
+              align: 'center',
+              onCell: (v) => ({ rowSpan: v?.rowSpan ?? 1 }),
+            },
+            {
+              title: '检查状态',
+              dataIndex: 'status',
+              width: 100,
+              align: 'center',
+              render: (p) => (
+                <span style={{ color: CheckStatus[p]?.color ?? '#000000d9' }}>
+                  {CheckStatus[p]?.text ?? ''}
+                </span>
+              ),
+            },
+            {
+              title: '检查开始时间',
+              dataIndex: 'start_time',
+              width: '12%',
+              render: (v) => (
+                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+              ),
+            },
+            {
+              title: '检查结束时间',
+              dataIndex: 'end_time',
+              width: '12%',
+              render: (v) => (
+                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+              ),
+            },
             {
               title: '是否启用',
               dataIndex: 'open',
-              render: (p) => <Switch checkedChildren={'开启'} unCheckedChildren={'忽略'} />,
+              width: 90,
+              align: 'center',
+              render: (v, record, index) => (
+                <Switch
+                  checkedChildren={'开启'}
+                  unCheckedChildren={'忽略'}
+                  onChange={(e) => {
+                    list[index].open = e;
+                    list[index].disabled = !e;
+                    setList([...list]);
+                    if (!e) {
+                      setSelected(selected.filter((it) => it != record.rowKey));
+                    }
+                  }}
+                />
+              ),
             },
-            { title: '启用/忽略人', dataIndex: 'open_pm' },
-            { title: '启用/忽略时间', dataIndex: 'open_time' },
+            { title: '启用/忽略人', dataIndex: 'open_pm', width: 100 },
+            {
+              title: '启用/忽略时间',
+              dataIndex: 'open_time',
+              width: '12%',
+              render: (v) => (
+                <Ellipsis title={v} width={'100%'} placement={'bottomLeft'} color={'#108ee9'} />
+              ),
+            },
             {
               title: '检查日志',
               dataIndex: 'log',
+              width: 90,
+              fixed: 'right',
+              align: 'center',
               render: (p) => (
                 <img
                   style={{ width: 18, height: 18, marginRight: 10 }}
@@ -77,10 +159,17 @@ const Check = (props: any, ref: any) => {
               ),
             },
           ]}
-          dataSource={checkInfo}
+          dataSource={list}
           pagination={false}
-          rowKey={(p) => p.id}
-          rowSelection={{ selectedRowKeys: selected }}
+          scroll={{ x: 1200 }}
+          rowKey={(p) => p.rowKey}
+          rowSelection={{
+            selectedRowKeys: selected,
+            onChange: (p) => {
+              setSelected(p as string[]);
+            },
+            getCheckboxProps: (record) => ({ disabled: record.disabled }),
+          }}
         />
         <CheckSettingModal
           visible={visible}
@@ -106,6 +195,7 @@ const CheckSettingModal = (props: ModalFuncProps) => {
     const values = await form.validateFields();
     props.onOk?.(true);
   };
+
   return (
     <Modal
       {...props}
@@ -133,7 +223,7 @@ const CheckSettingModal = (props: ModalFuncProps) => {
           name={'branch'}
           rules={[{ message: '请选择对比分支', required: true }]}
         >
-          <Select options={[]} />
+          <Select options={[]} allowClear showSearch mode={'multiple'} />
         </Form.Item>
         <Form.Item
           label={'对比起始时间'}

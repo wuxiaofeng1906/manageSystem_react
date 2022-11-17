@@ -11,21 +11,22 @@
 .processDetail{
   .tableHeader{
     display: flex;
-    margin:10px 0;
+    margin:16px 0;
     :global{
       .ant-btn{
         background: transparent;
         color:initial;
+        padding: 0 10px;
         &:nth-of-type(1){
-          margin-left: 10px;
+          margin-left: 20px;
         }&:nth-of-type(2){
-          border-color: #edbf6b;
+          border-color: #ffe58f;
           margin: 0 8px;
         }
       }
     }
     .remove{
-      border-color: #ff8484;
+      border-color: #ffa39e;
     }
   }
 }
@@ -76,8 +77,17 @@
 }
 .onlineTable{
   :global{
-    .ant-table-thead > tr > th, .ant-table-tbody > tr > td, .ant-table tfoot > tr > th, .ant-table tfoot > tr > td{
-      padding:5px 16px;
+    .ant-table{
+      max-width:100%;
+    }
+    th, td {
+      white-space: nowrap;
+      padding:5px 10px;
+    }
+    td{
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
   }
 }
@@ -87,5 +97,10 @@
       margin-bottom: 8px;
     }
   }
+}
+.bgForm{
+  background: #eaf7ffd1;
+  border-radius: 4px;
+  padding: 15px 10px;
 }
 

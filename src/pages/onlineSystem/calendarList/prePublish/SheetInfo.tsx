@@ -6,7 +6,7 @@ import React, {
   useImperativeHandle,
   useEffect,
 } from 'react';
-import styles from '@/pages/onlineSystem/releaseProcess/index.less';
+import styles from '../../common/common.less';
 import {
   Col,
   DatePicker,
@@ -20,18 +20,19 @@ import {
   InputNumber,
   ModalFuncProps,
 } from 'antd';
-import cns from 'classnames';
 import { AgGridReact } from 'ag-grid-react';
 import { CellClickedEvent, GridApi, GridReadyEvent } from 'ag-grid-community';
 import DragIcon from '@/components/DragIcon';
 import { infoMessage } from '@/publicMethods/showMessages';
 import { useModel } from '@@/plugin-model/useModel';
 import { PublishSeverColumn, PublishUpgradeColumn } from '@/pages/onlineSystem/common/column';
+import { WhetherOrNot } from '@/pages/onlineSystem/common/constant';
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 
 const SheetInfo = (props: any, ref: any) => {
   const [spinning, setSpinning] = useState(false);
+  const [tableHeight, setTableHeight] = useState((window.innerHeight - 460) / 2);
   const [baseForm] = Form.useForm();
   const [orderForm] = Form.useForm();
   const [finished, setFinished] = useState(false);
@@ -42,11 +43,15 @@ const SheetInfo = (props: any, ref: any) => {
   const gridRef = useRef<GridApi>();
   const gridCompareRef = useRef<GridApi>();
 
-  useImperativeHandle(ref, () => ({
-    onSave: () => {
-      console.log('save');
-    },
-  }));
+  useImperativeHandle(
+    ref,
+    () => ({
+      onSave: () => {
+        console.log('save');
+      },
+    }),
+    [],
+  );
 
   const onGridReady = (params: GridReadyEvent, ref = gridRef) => {
     ref.current = params.api;
@@ -80,15 +85,14 @@ const SheetInfo = (props: any, ref: any) => {
     return { save: true };
   }, [user]);
 
+  window.onresize = function () {
+    setTableHeight((window.innerHeight - 460) / 2);
+  };
+
   return (
     <Spin spinning={spinning} tip="数据加载中...">
-      <div className={styles.releaseOrder}>
-        <Form
-          layout={'inline'}
-          size={'small'}
-          form={orderForm}
-          className={cns(styles.baseInfo, styles.bgForm)}
-        >
+      <div>
+        <Form layout={'inline'} size={'small'} form={orderForm} className={styles.bgForm}>
           <Col span={4}>
             <Form.Item name={'release_way'} label={'发布方式'}>
               <Select
@@ -171,8 +175,8 @@ const SheetInfo = (props: any, ref: any) => {
             </Form.Item>
           </Col>
         </Form>
-        <h4>一、工单-基础设置</h4>
-        <Form size={'small'} form={baseForm} className={styles.baseInfo}>
+        <h4 style={{ margin: '16px 0' }}>一、工单-基础设置</h4>
+        <Form size={'small'} form={baseForm} className={styles.resetForm}>
           <Row gutter={8}>
             <Col span={6}>
               <Form.Item name={'release_type'} label={'预发布分支'}>
@@ -187,7 +191,7 @@ const SheetInfo = (props: any, ref: any) => {
           </Row>
           <Row gutter={8}>
             <Col span={6}>
-              <Form.Item name={'cluster'} label={'发布环境工单类型选择'} required>
+              <Form.Item name={'order'} label={'工单类型选择'} required>
                 <Select
                   showSearch
                   disabled
@@ -198,31 +202,45 @@ const SheetInfo = (props: any, ref: any) => {
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name={'cluster'} label={'工单名称'} required>
+              <Form.Item name={'name'} label={'工单名称'} required>
                 <Input style={{ width: '100%' }} />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name={'cluster'} label={'是否需要升级后自动化'}>
-                <Select showSearch options={[]} style={{ width: '100%' }} />
+              <Form.Item name={'cluster'} label={'是否需要跑升级后自动化'}>
+                <Select
+                  style={{ width: '100%' }}
+                  options={Object.keys(WhetherOrNot).map((it) => ({
+                    label: WhetherOrNot[it],
+                    value: it,
+                  }))}
+                />
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item name={'cluster'} label={'升级后自动化结果'}>
+              <Form.Item name={'result'} label={'升级后自动化结果'}>
                 <Input />
               </Form.Item>
             </Col>
           </Row>
-          <Row>
-            <Col span={24}>
+          <Row gutter={8}>
+            <Col span={18}>
               <Form.Item name={'ids'} label={'一键部署ID'} required>
-                <Select />
+                <Select showSearch allowClear />
               </Form.Item>
+            </Col>
+            <Col span={6}>
+              <a target={'_blank'} href={'www.baidu.com'}>
+                点击进入自动化平台
+              </a>
             </Col>
           </Row>
         </Form>
-        <h4>二、发布服务</h4>
-        <div className="ag-theme-alpine" style={{ height: 180, width: '100%', marginTop: 8 }}>
+        <h4 style={{ margin: '16px 0' }}>二、发布服务</h4>
+        <div
+          className="ag-theme-alpine"
+          style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%', marginTop: 8 }}
+        >
           <AgGridReact
             columnDefs={PublishSeverColumn}
             rowData={[]}
@@ -239,8 +257,11 @@ const SheetInfo = (props: any, ref: any) => {
             onGridSizeChanged={(r) => onGridReady(r, gridCompareRef)}
           />
         </div>
-        <h4>三、升级接口</h4>
-        <div className="ag-theme-alpine" style={{ height: 180, width: '100%', marginTop: 8 }}>
+        <h4 style={{ margin: '16px 0' }}>三、升级接口</h4>
+        <div
+          className="ag-theme-alpine"
+          style={{ height: tableHeight > 180 ? tableHeight : 180, width: '100%' }}
+        >
           <AgGridReact
             columnDefs={PublishUpgradeColumn}
             rowData={upgradeData}

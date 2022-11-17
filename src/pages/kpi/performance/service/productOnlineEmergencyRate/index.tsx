@@ -79,7 +79,8 @@ const ProductOnlineEmergencyRate: React.FC = () => {
             return it.datas.map((child: any) => ({
               subTitle: moment(child.date).format('YYYYMMDD'),
               title: title,
-              total: +((child.count / child.recordNum) * 2 * 100),
+              // total: +((child.count / child.recordNum) * 2 * 100),
+              total: child.kpi * 100,
             }));
           })
           .flat(),

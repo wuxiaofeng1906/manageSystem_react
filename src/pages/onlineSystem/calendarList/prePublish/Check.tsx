@@ -1,4 +1,11 @@
-import React, { useImperativeHandle, useState, forwardRef, useEffect, useCallback } from 'react';
+import React, {
+  useImperativeHandle,
+  useState,
+  forwardRef,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
 import {
   Table,
   Switch,
@@ -16,9 +23,15 @@ import styles from '../../common/common.less';
 import { isEmpty } from 'lodash';
 import { infoMessage } from '@/publicMethods/showMessages';
 import Ellipsis from '@/components/Elipsis';
-import { mergeCellsTable } from '@/utils/utils';
+import { useLocation, useModel } from 'umi';
+import { history } from '@@/core/history';
 
 const Check = (props: any, ref: any) => {
+  const query = useLocation()?.query;
+  const [global, setGlobal] = useModel('onlineSystem', (online) => [
+    online.global,
+    online.setGlobal,
+  ]);
   const [spin, setSpin] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [list, setList] = useState(checkInfo);
@@ -32,7 +45,7 @@ const Check = (props: any, ref: any) => {
       onSetting: () => setVisible(true),
       onLock: onLock,
     }),
-    [selected, ref],
+    [selected, ref, global],
   );
 
   const onCheck = async () => {
@@ -44,20 +57,30 @@ const Check = (props: any, ref: any) => {
      * 1.检查是否封板，是否已确认
      * 2. 检查状态是否通过、忽略
      */
+    if (!global.finished) {
+      setGlobal({ ...global, locked: !global.locked });
+    }
   };
 
   const getDetail = async () => {
-    setList(
-      mergeCellsTable(
-        list.map((it) => ({ ...it, disabled: !it.open })),
-        'side',
-      ),
-    );
+    setSelected([]);
+    setList(list.map((it) => ({ ...it, disabled: !it.open })));
   };
 
   useEffect(() => {
-    getDetail();
-  }, []);
+    if (query.key == 'check') {
+      getDetail();
+    }
+  }, [query.key]);
+
+  useEffect(() => {
+    if (global.locked && global.step == 2) {
+      console.log('check');
+      history.replace({ pathname: history.location.pathname, query: { key: 'sheet' } });
+    }
+  }, [global]);
+
+  const hasEdit = useMemo(() => global.locked || global.finished, [global]);
 
   return (
     <Spin spinning={spin} tip={'数据加载中...'}>
@@ -71,6 +94,7 @@ const Check = (props: any, ref: any) => {
               dataIndex: 'num',
               width: 60,
               align: 'center',
+              fixed: 'left',
               render: (_, r, i) => i + 1,
             },
             {
@@ -94,7 +118,7 @@ const Check = (props: any, ref: any) => {
               width: 100,
               align: 'center',
               render: (p) => (
-                <span style={{ color: CheckStatus[p]?.color ?? '#000000d9' }}>
+                <span style={{ color: CheckStatus[p]?.color ?? '#000000d9', fontWeight: 500 }}>
                   {CheckStatus[p]?.text ?? ''}
                 </span>
               ),
@@ -124,6 +148,7 @@ const Check = (props: any, ref: any) => {
                 <Switch
                   checkedChildren={'开启'}
                   unCheckedChildren={'忽略'}
+                  disabled={hasEdit}
                   onChange={(e) => {
                     list[index].open = e;
                     list[index].disabled = !e;
@@ -152,9 +177,17 @@ const Check = (props: any, ref: any) => {
               align: 'center',
               render: (p) => (
                 <img
-                  style={{ width: 18, height: 18, marginRight: 10 }}
+                  style={{
+                    width: 18,
+                    height: 18,
+                    marginRight: 10,
+                    ...(hasEdit ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {}),
+                  }}
                   src={require('../../../../../public/logs.png')}
                   title={'日志'}
+                  onClick={() => {
+                    if (hasEdit) return;
+                  }}
                 />
               ),
             },
@@ -168,7 +201,7 @@ const Check = (props: any, ref: any) => {
             onChange: (p) => {
               setSelected(p as string[]);
             },
-            getCheckboxProps: (record) => ({ disabled: record.disabled }),
+            getCheckboxProps: (record) => ({ disabled: hasEdit || record.disabled }),
           }}
         />
         <CheckSettingModal

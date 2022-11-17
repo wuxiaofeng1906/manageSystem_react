@@ -5,7 +5,7 @@ import Check from './Check';
 import SheetInfo from './SheetInfo';
 // import Approval from './Approval';
 // import Publish from './Publish';
-import { useLocation, history, useParams } from 'umi';
+import { useLocation, history, useParams, useModel } from 'umi';
 import { BarsOutlined, SyncOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
 import styles from '../../common/common.less';
@@ -19,6 +19,7 @@ const tabs = [
 ];
 const Layout = () => {
   const query = useLocation()?.query;
+  const [global] = useModel('onlineSystem', (online) => [online.global]);
   const { id } = useParams() as { id: string };
   const ref = useRef() as React.MutableRefObject<{
     onRefresh: Function;
@@ -37,23 +38,34 @@ const Layout = () => {
 
   const updateKey = (key?: string) =>
     history.replace({ pathname: history.location.pathname, query: { key: key ?? 'server' } });
+  const disableStyle = useMemo(
+    () =>
+      global.locked || global.finished ? { filter: 'grayscale(1)', cursor: 'not-allowed' } : {},
+    [global],
+  );
 
   const renderTabContent = useMemo(() => {
     if (query.key == 'server')
       return (
         <Space size={10}>
           <BarsOutlined
-            onClick={() => ref.current?.onShow()}
+            onClick={() => {
+              if (global.locked || global.finished) return;
+              ref.current?.onShow();
+            }}
             title={'需求列表'}
-            style={{ color: '#0079ff', fontSize: 16 }}
+            style={{ color: '#0079ff', fontSize: 16, ...disableStyle }}
           />
           <Button size={'small'} onClick={() => ref.current?.onCancelPublish()}>
             取消发布
           </Button>
           <SyncOutlined
-            onClick={() => ref.current?.onRefresh()}
             title={'刷新'}
-            style={{ color: '#0079ff', fontSize: 16 }}
+            onClick={() => {
+              if (global.locked || global.finished) return;
+              ref.current?.onRefresh();
+            }}
+            style={{ color: '#0079ff', fontSize: 16, ...disableStyle }}
           />
         </Space>
       );
@@ -63,16 +75,23 @@ const Layout = () => {
           <Button size={'small'} onClick={() => ref.current?.onSetting()}>
             检查参数设置
           </Button>
-          <Button size={'small'} onClick={() => ref.current?.onCheck()}>
+          <Button
+            size={'small'}
+            onClick={() => ref.current?.onCheck()}
+            disabled={global.locked || global.finished}
+          >
             一键执行检查
           </Button>
-          <Button size={'small'} onClick={() => ref.current?.onLock()}>
-            封板锁定
+          <Button size={'small'} disabled={global.finished} onClick={() => ref.current?.onLock()}>
+            {global.locked || global.finished ? '取消封板锁定' : '封板锁定'}
           </Button>
           <SyncOutlined
-            onClick={() => ref.current?.onRefreshCheck()}
             title={'刷新'}
-            style={{ color: '#0079ff', fontSize: 16 }}
+            style={{ color: '#0079ff', fontSize: 16, ...disableStyle }}
+            onClick={() => {
+              if (global.locked || global.finished) return;
+              ref.current?.onRefreshCheck();
+            }}
           />
         </Space>
       );
@@ -84,7 +103,7 @@ const Layout = () => {
           </Button>
         </div>
       );
-  }, [id, query.key]);
+  }, [id, query.key, global]);
 
   return (
     <PageContainer title={'预发布工单'}>
@@ -96,9 +115,9 @@ const Layout = () => {
           className={styles.onlineTab}
           tabBarExtraContent={renderTabContent}
         >
-          {tabs?.map((it) => {
+          {tabs?.map((it, index) => {
             return (
-              <Tabs.TabPane key={it.key} tab={it.name}>
+              <Tabs.TabPane key={it.key} tab={it.name} disabled={global.step < index}>
                 <it.comp ref={ref} />
               </Tabs.TabPane>
             );

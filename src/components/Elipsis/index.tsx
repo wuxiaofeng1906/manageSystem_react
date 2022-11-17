@@ -22,7 +22,7 @@ const Ellipsis = ({ width = 80, className, ...props }: EllipsisProps) => {
       style={{ width }}
       ref={(e) => {
         if (e && e?.scrollWidth > e?.clientWidth) {
-          setVisible(true);
+          setVisible(e && e?.scrollWidth > e?.clientWidth);
         }
       }}
     >

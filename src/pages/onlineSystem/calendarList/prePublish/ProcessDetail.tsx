@@ -25,6 +25,7 @@ import { history, useModel } from 'umi';
 import IPagination from '@/components/IPagination';
 
 const ProcessDetail = (props: any, ref: any) => {
+  const [global] = useModel('onlineSystem', (online) => [online.global]);
   const [serverData, setServerData] = useState<any[]>([]);
   const [interfaceData, setInterfaceData] = useState<any[]>([]);
   const [repaireData, setRepaireData] = useState<any[]>([]);
@@ -141,6 +142,8 @@ const ProcessDetail = (props: any, ref: any) => {
     };
   }, [serverData]);
 
+  const hasEdit = useMemo(() => global.locked || global.finished, [global]);
+
   return (
     <div className={styles.processDetail}>
       <h4>一、基础信息</h4>
@@ -148,7 +151,7 @@ const ProcessDetail = (props: any, ref: any) => {
         <Row justify={'space-between'} gutter={8}>
           <Col span={10}>
             <Form.Item label={'批次名称'} name={'name'} required>
-              <Input placeholder={'批次名称'} />
+              <Input placeholder={'批次名称'} disabled={hasEdit} />
             </Form.Item>
           </Col>
           <Col span={14}>
@@ -175,7 +178,7 @@ const ProcessDetail = (props: any, ref: any) => {
           </Col>
           <Col span={5}>
             <Form.Item label={'镜像环境绑定'} name={'online_env'} required>
-              <Select placeholder={'镜像环境绑定'} />
+              <Select placeholder={'镜像环境绑定'} disabled={hasEdit} />
             </Form.Item>
           </Col>
           <Col span={5}>
@@ -185,6 +188,7 @@ const ProcessDetail = (props: any, ref: any) => {
                 placeholder={'发布时间'}
                 showTime
                 format="YYYY-MM-DD HH:mm"
+                disabled={hasEdit}
               />
             </Form.Item>
           </Col>
@@ -192,17 +196,23 @@ const ProcessDetail = (props: any, ref: any) => {
       </Form>
       <div className={styles.tableHeader}>
         <h4>二、应用服务</h4>
-        <Button size={'small'} onClick={onSeal}>
+        <Button size={'small'} onClick={onSeal} disabled={hasEdit}>
           封板
         </Button>
-        <Button size={'small'} onClick={onUnseal}>
+        <Button size={'small'} onClick={onUnseal} disabled={hasEdit}>
           解除封板
         </Button>
-        <Button size={'small'} className={styles.remove} onClick={() => onDelete('server')}>
+        <Button
+          size={'small'}
+          disabled={hasEdit}
+          className={styles.remove}
+          onClick={() => onDelete('server')}
+        >
           移除
         </Button>
       </div>
       <Checkbox
+        disabled={hasEdit}
         checked={checked}
         style={{ marginLeft: 8 }}
         onChange={({ target }) => {
@@ -213,6 +223,7 @@ const ProcessDetail = (props: any, ref: any) => {
         全部项目
       </Checkbox>
       <Checkbox.Group
+        disabled={hasEdit}
         options={memoGroup.opts}
         value={checked ? memoGroup.opts : uniq(checkBoxOpt)}
         onChange={(v) => {
@@ -242,12 +253,18 @@ const ProcessDetail = (props: any, ref: any) => {
               setChecked(arr.length == serverData?.length);
               setSelectedRowKeys(arr);
             },
+            getCheckboxProps: (record) => ({ disabled: hasEdit }),
           }}
         />
       </div>
       <div className={styles.tableHeader}>
         <h4>三、升级接口</h4>
-        <Button size={'small'} className={styles.remove} onClick={() => onDelete('interface')}>
+        <Button
+          disabled={hasEdit}
+          size={'small'}
+          className={styles.remove}
+          onClick={() => onDelete('interface')}
+        >
           移除
         </Button>
       </div>
@@ -269,7 +286,12 @@ const ProcessDetail = (props: any, ref: any) => {
       </div>
       <div className={styles.tableHeader}>
         <h4>四、数据修复/升级</h4>
-        <Button size={'small'} className={styles.remove} onClick={() => onDelete('repaire')}>
+        <Button
+          disabled={hasEdit}
+          size={'small'}
+          className={styles.remove}
+          onClick={() => onDelete('repaire')}
+        >
           移除
         </Button>
       </div>

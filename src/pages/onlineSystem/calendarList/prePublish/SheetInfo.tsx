@@ -27,10 +27,16 @@ import { infoMessage } from '@/publicMethods/showMessages';
 import { useModel } from '@@/plugin-model/useModel';
 import { PublishSeverColumn, PublishUpgradeColumn } from '@/pages/onlineSystem/common/column';
 import { WhetherOrNot } from '@/pages/onlineSystem/common/constant';
+import { history, useLocation } from 'umi';
+import { Prompt } from 'react-router-dom';
 
 let agFinished = false; // 处理ag-grid 拿不到最新的state
 
 const SheetInfo = (props: any, ref: any) => {
+  const query = useLocation()?.query;
+  const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
+  const [global] = useModel('onlineSystem', (online) => [online.global]);
+
   const [spinning, setSpinning] = useState(false);
   const [tableHeight, setTableHeight] = useState((window.innerHeight - 460) / 2);
   const [baseForm] = Form.useForm();
@@ -39,7 +45,8 @@ const SheetInfo = (props: any, ref: any) => {
   const [visible, setVisible] = useState(false);
   const [activeItem, setActiveItem] = useState<any>();
   const [upgradeData, setUpgradeData] = useState<any[]>([]);
-  const [user] = useModel('@@initialState', (init) => [init.initialState?.currentUser]);
+  const [isSave, setIssave] = useState(false);
+
   const gridRef = useRef<GridApi>();
   const gridCompareRef = useRef<GridApi>();
 
@@ -65,6 +72,7 @@ const SheetInfo = (props: any, ref: any) => {
       sortArr.push({ ...node.data });
     });
   };
+
   useEffect(() => {
     getDetail();
   }, []);
@@ -89,8 +97,23 @@ const SheetInfo = (props: any, ref: any) => {
     setTableHeight((window.innerHeight - 460) / 2);
   };
 
+  useEffect(() => {
+    const listener = (ev) => {
+      ev.preventDefault();
+      ev.returnValue = '离开提示';
+    };
+    window.addEventListener('beforeunload', listener);
+    return () => {
+      window.removeEventListener('beforeunload', listener);
+    };
+  }, [isSave]);
+
   return (
     <Spin spinning={spinning} tip="数据加载中...">
+      <Prompt
+        when={isSave}
+        message={'离开当前页后，所有未保存的数据将会丢失，请确认是否仍要离开？'}
+      />
       <div>
         <Form layout={'inline'} size={'small'} form={orderForm} className={styles.bgForm}>
           <Col span={4}>
@@ -112,6 +135,9 @@ const SheetInfo = (props: any, ref: any) => {
                 showTime
                 format={'YYYY-MM-DD HH:mm'}
                 disabled={finished}
+                onChange={(e) => {
+                  setIssave(true);
+                }}
               />
             </Form.Item>
           </Col>

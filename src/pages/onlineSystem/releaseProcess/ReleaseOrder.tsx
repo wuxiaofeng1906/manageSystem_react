@@ -176,25 +176,51 @@ const ReleaseOrder = () => {
     }
     let mergeArr: any[] = [];
     let rdArr: any[] = [];
-    ops.forEach((it: any, i: number) => {
-      rdArr.push(
-        !['BlueGreenDeploy', 'TenantStopDeploy'].includes(it.release_order_type) ||
-          isEmpty(rdOrigin[i])
-          ? { repair_order: '', project: '', repair_order_type: it.release_order_type }
-          : rdOrigin[i],
-      );
-    });
-    ops.forEach((it: any, i: number) => {
-      const otherOrder = !['BlueGreenDeploy', 'TenantStopDeploy'].includes(it.release_order_type);
+    const len = ops?.length > rdOrigin?.length ? ops.length : rdOrigin?.length;
+
+    Array.from(
+      {
+        length: len,
+      },
+      (it, i) => {
+        const rdItem = rdOrigin[i];
+        const opsItem = ops[i];
+        if (
+          !['BlueGreenDeploy', 'TenantStopDeploy'].includes(opsItem?.release_order_type) &&
+          !isEmpty(opsItem)
+        ) {
+          rdArr.push({
+            repair_order: '',
+            project: '',
+            repair_order_type: opsItem?.release_order_type,
+          });
+        }
+        rdArr.push({
+          repair_order: rdItem?.repair_order,
+          project: rdItem?.project,
+          repair_order_type: rdItem?.release_order_type,
+        });
+      },
+    );
+    for (let i = 0; i < rdArr?.length; i++) {
+      const opsItem = ops[i];
+      const otherOrder =
+        !['BlueGreenDeploy', 'TenantStopDeploy'].includes(opsItem?.release_order_type) &&
+        !isEmpty(opsItem);
       const rdId = rdArr[i]?.repair_order;
-      const opsTitle = it.label
-        ?.substring(it.label.indexOf('title:') + 7, it.label.indexOf('状态:'))
+      const opsTitle = opsItem?.label
+        ?.substring(opsItem?.label?.indexOf('title:') + 7, opsItem?.label?.indexOf('状态:'))
         ?.trim();
 
       mergeArr.push({
-        opsId: String(it.id ?? ''),
-        opsTitle: it.id && opsTitle ? `${it.id}: ${opsTitle}` : it.id ? it.id : opsTitle,
-        opsType: it.release_order_type,
+        opsId: String(opsItem?.id ?? ''),
+        opsTitle:
+          opsItem?.id && opsTitle
+            ? `${opsItem.id}: ${opsTitle}`
+            : opsItem?.id
+            ? opsItem.id
+            : opsTitle,
+        opsType: opsItem?.release_order_type,
         rd: rdId,
         rdTitle:
           rdId && rdArr[i]?.project
@@ -203,9 +229,14 @@ const ReleaseOrder = () => {
             ? rdId
             : rdArr[i]?.project ?? '',
         rdType: rdId ? `${rdId}: ${rdArr[i]?.repair_order_type}` : '',
-        status: otherOrder ? '' : String(it.id) == String(rdId),
+        color: otherOrder
+          ? 'white'
+          : String(opsItem?.id) == String(rdId)
+          ? 'rgba(0, 255, 0, 0.06)'
+          : 'rgba(255, 2, 2, 0.06)',
       });
-    });
+    }
+
     setCompareData({ opsData: ops, alpha: mergeArr });
   };
 
@@ -638,14 +669,7 @@ const ReleaseOrder = () => {
               headerHeight={30}
               onGridReady={(r) => onGridReady(r, gridCompareRef)}
               onGridSizeChanged={(r) => onGridReady(r, gridCompareRef)}
-              getRowStyle={(p) => ({
-                background:
-                  p.data.status == true
-                    ? 'rgba(0, 255, 0, 0.06)'
-                    : p.data.status == false
-                    ? 'rgba(255, 2, 2, 0.06)'
-                    : 'initial',
-              })}
+              getRowStyle={(p) => ({ background: p.data.color })}
             />
           </div>
           <ModalSuccessCheck

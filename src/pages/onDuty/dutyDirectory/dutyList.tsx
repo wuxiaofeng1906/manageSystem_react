@@ -99,7 +99,7 @@ const DutyList = () => {
     if (isEmpty(lockedNode) && !isEmpty(data) && data?.is_push_msg !== 'yes') {
       await updateLockStatus(release_num, 'post');
     }
-    history.push(`/onDutyAndRelease/dutyCatalog/${release_num}`);
+    history.push(`/onDuty/dutyCatalog/${release_num}`);
   };
   const onDelete = async () => {
     if (!hasPermission.super) return;

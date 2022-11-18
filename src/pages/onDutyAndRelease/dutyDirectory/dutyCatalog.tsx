@@ -343,12 +343,20 @@ const DutyCatalog = () => {
       }
       setDetail(res);
       form.setFieldsValue({
-        front: uniqBy(res?.front, 'user_id')?.map((it: any) => `${it.user_id}_${it.user_type}`),
-        backend: uniqBy(res?.backend, 'user_id')?.map((it: any) => `${it.user_id}_${it.user_type}`),
-        test: uniqBy(res?.test, 'user_id')?.map((it: any) => `${it.user_id}_${it.user_type}`),
-        sqa: uniqBy(res?.sqa, 'user_id')?.map((it: any) => `${it.user_id}_${it.user_type}`),
-        operations: uniqBy(res?.operations, 'user_id')?.map(
-          (it: any) => `${it.user_id}_${it.user_type}`,
+        front: uniqBy(res?.front, 'user_id')?.flatMap((it: any) =>
+          it.user_name ? [`${it.user_id}_${it.user_type}`] : [],
+        ),
+        backend: uniqBy(res?.backend, 'user_id')?.flatMap((it: any) =>
+          it.user_name ? [`${it.user_id}_${it.user_type}`] : [],
+        ),
+        test: uniqBy(res?.test, 'user_id')?.flatMap((it: any) =>
+          it.user_name ? [`${it.user_id}_${it.user_type}`] : [],
+        ),
+        sqa: uniqBy(res?.sqa, 'user_id')?.flatMap((it: any) =>
+          it.user_name ? [`${it.user_id}_${it.user_type}`] : [],
+        ),
+        operations: uniqBy(res?.operations, 'user_id')?.flatMap((it: any) =>
+          it.user_name ? [`${it.user_id}_${it.user_type}`] : [],
         ),
         project_ids: res?.project_ids ? res?.project_ids?.split(',') : undefined,
         project_pm: res?.project_pm,

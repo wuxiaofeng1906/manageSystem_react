@@ -115,9 +115,9 @@ const PreReleaseList = ({ disabled }: { disabled?: boolean }) => {
                     }}
                     className={styles.links}
                     onClick={() => {
-                      let href = `/onDutyAndRelease/preRelease?releasedNum=${p.data.release_num}`;
+                      let href = `/onlineSystem/preRelease?releasedNum=${p.data.release_num}`;
                       if (p.data.release_type == 'backlog_release') {
-                        href = `/onDutyAndRelease/releaseOrder/${p.data.release_num}`;
+                        href = `/onlineSystem/releaseOrder/${p.data.release_num}`;
                       }
                       history.push(href);
                     }}

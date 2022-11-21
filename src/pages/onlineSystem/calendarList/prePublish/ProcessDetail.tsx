@@ -138,11 +138,18 @@ const ProcessDetail = (props: any, ref: any) => {
     };
   }, [serverData]);
 
+  const onSave = () => {};
+
   const hasEdit = useMemo(() => globalState.locked || globalState.finished, [globalState]);
 
   return (
     <div className={styles.processDetail}>
-      <h4>一、基础信息</h4>
+      <div className={styles.tableHeader}>
+        <h4>一、基础信息</h4>
+        <Button size={'small'} onClick={onSave} disabled={hasEdit}>
+          保存
+        </Button>
+      </div>
       <Form size={'small'} className={styles.resetForm}>
         <Row justify={'space-between'} gutter={8}>
           <Col span={10}>

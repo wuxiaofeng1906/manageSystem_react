@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { OnlineSystemServices } from '@/services/onlineSystem';
 
 export default () => {
-  const [globalState, setGlobalState] = useState({ locked: true, finished: false, step: 2 });
+  const [globalState, setGlobalState] = useState({ locked: false, finished: false, step: 2 });
   const [releaseInfo, setReleaseInfo] = useState<{
     basicInfo: any;
     serverApp: any[];
